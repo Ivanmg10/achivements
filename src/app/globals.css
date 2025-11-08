@@ -1,6 +1,21 @@
 @import "tailwindcss";
 
 :root {
+  /* Fondo principal (casi negro, con tono rojizo) */
+  --background: rgb(16, 0, 0); /* #100000 */
+  --color-bg-dark-alt: rgb(32, 0, 0); /* #200000 */
+
+  /* Fondo profundo con tinte azulado (zonas más oscuras) */
+  --color-bg-deep: rgb(16, 16, 32); /* #101020 */
+
+  /* Texto beige principal (“ZOOM”) */
+  --color-text-beige: rgb(240, 224, 192); /* #F0E0C0 */
+
+  /* Líneas y acentos rojos */
+  --color-accent-red: rgb(255, 0, 0); /* #FF0000 */
+}
+
+:root {
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -14,7 +29,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: rgb(16, 0, 0);
     --foreground: #ededed;
   }
 }
@@ -22,5 +37,13 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-quicksand), sans-serif;
+}
+
+.main-header {
+  background: var(--color-bg-dark-alt);
+}
+
+.main-footer {
+  background: var(--color-bg-dark-alt);
 }
