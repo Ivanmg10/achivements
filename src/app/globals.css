@@ -2,8 +2,8 @@
 
 :root {
   /* Fondo principal (casi negro, con tono rojizo) */
-  --background: rgb(16, 0, 0); /* #100000 */
-  --color-bg-dark-alt: rgb(32, 0, 0); /* #200000 */
+  --background: rgb(32, 0, 0); /* #200000 */
+  --color-bg-dark-alt: rgb(16, 0, 0); /* #200000 */
 
   /* Fondo profundo con tinte azulado (zonas más oscuras) */
   --color-bg-deep: rgb(16, 16, 32); /* #101020 */
@@ -29,7 +29,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: rgb(16, 0, 0);
+    --background: rgb(32, 0, 0);
     --foreground: rgb(240, 224, 192);
   }
 }
