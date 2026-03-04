@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 export default function ApiTest() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<object | null>(null);
   useEffect(() => {
     fetch("/api/getUserProfile")
       .then((res) => res.json())
