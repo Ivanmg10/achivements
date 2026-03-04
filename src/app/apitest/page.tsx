@@ -1,7 +1,7 @@
 "use client";
 
+import { useTheme } from "@/context/ThemeContext";
 import {
-  RetroAchievementsGame,
   RetroAchievementsGameWithAchievements,
   RetroAchievementsUserProfile,
 } from "@/types/types";
@@ -9,6 +9,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function ApiTest() {
+  const { theme } = useTheme();
+
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<RetroAchievementsUserProfile | null>(null);
   const [gameData, setGameData] =
@@ -30,12 +32,10 @@ export default function ApiTest() {
       .finally(() => setIsLoading(false));
   }, [data]);
 
-  console.log(gameData);
-
   if (isLoading) return <p>Loading...</p>;
   return (
-    <main className="min-h-screen">
-      <section className="main-content text-center">
+    <main className={`min-h-screen main-body-${theme}`}>
+      <section className="text-center">
         <h1 className="text-4xl font-bold p-5">User</h1>
 
         <aside className="flex flex-row items-center justify-center gap-5 p-5">
@@ -56,7 +56,9 @@ export default function ApiTest() {
         </aside>
       </section>
 
-      <section className="main-content text-center">
+      <hr className="w-3/4 m-auto mt-5 mb-5" />
+
+      <section className="text-center">
         <h1 className="text-4xl font-bold p-5">Game</h1>
 
         <aside className="flex flex-row items-center justify-center gap-5 p-5">

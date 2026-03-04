@@ -1,3 +1,5 @@
+export type Theme = "red" | "blue" | "yellow" | "green" | "dark";
+
 export type RetroAchievementsUserProfile = {
   ID: number;
   User: string;

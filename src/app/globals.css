@@ -2,29 +2,77 @@
 
 :root {
   /* Fondo principal (casi negro, con tono rojizo) */
-  --background: rgb(32, 0, 0); /* #200000 */
-  --color-bg-dark-alt: rgb(16, 0, 0); /* #200000 */
+  --background-red: rgb(32, 0, 0); /* #200000 */
+  --color-bg-dark-red-alt: rgb(16, 0, 0); /* #200000 */
 
   /* Fondo profundo con tinte azulado (zonas más oscuras) */
-  --color-bg-deep: rgb(16, 16, 32); /* #101020 */
+  --color-bg-red-deep: rgb(16, 16, 32); /* #101020 */
 
   /* Texto beige principal (“ZOOM”) */
-  --color-text-beige: rgb(240, 224, 192); /* #F0E0C0 */
+  --color-text-red-beige: rgb(240, 224, 192); /* #F0E0C0 */
 
   /* Líneas y acentos rojos */
   --color-accent-red: rgb(255, 0, 0); /* #FF0000 */
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Fondo principal verde muy oscuro */
+  --background-green: rgb(8, 20, 14); /* #08140E */
+  --color-bg-dark-green-alt: rgb(4, 14, 10); /* #040E0A */
+
+  /* Fondo profundo verde azulado */
+  --color-bg-green-deep: rgb(6, 28, 22); /* #061C16 */
+
+  /* Texto verde claro suave */
+  --color-text-green-light: rgb(210, 255, 230); /* #D2FFE6 */
+
+  /* Acento verde brillante */
+  --color-accent-green: rgb(0, 220, 120); /* #00DC78 */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  /* Fondo principal (gris casi negro) */
+  --background-dark: rgb(20, 20, 22); /* #141416 */
+  --color-bg-dark-dark-alt: rgb(12, 12, 14); /* #0C0C0E */
+
+  /* Fondo profundo ligeramente frío */
+  --color-bg-dark-deep: rgb(18, 20, 26); /* #12141A */
+
+  /* Texto gris claro */
+  --color-text-dark-light: rgb(220, 220, 225); /* #DCDCE1 */
+
+  /* Acento gris claro brillante */
+  --color-accent-dark: rgb(180, 180, 190); /* #B4B4BE */
+}
+
+:root {
+  /* Fondo principal azul muy oscuro */
+  --background-blue: rgb(10, 18, 32); /* #0A1220 */
+  --color-bg-dark-blue-alt: rgb(6, 12, 24); /* #060C18 */
+
+  /* Fondo profundo azul intenso */
+  --color-bg-blue-deep: rgb(8, 24, 48); /* #081830 */
+
+  /* Texto azul claro casi blanco */
+  --color-text-blue-light: rgb(210, 230, 255); /* #D2E6FF */
+
+  /* Acento azul eléctrico */
+  --color-accent-blue: rgb(0, 140, 255); /* #008CFF */
+}
+
+:root {
+  /* Fondo principal casi negro neutro */
+  --background-yellow: rgb(22, 22, 18); /* #161612 */
+  --color-bg-dark-yellow-alt: rgb(14, 14, 10); /* #0E0E0A */
+
+  /* Fondo profundo con matiz oliva oscuro */
+  --color-bg-yellow-deep: rgb(28, 28, 12); /* #1C1C0C */
+
+  /* Texto claro cálido */
+  --color-text-yellow-light: rgb(255, 245, 200); /* #FFF5C8 */
+
+  /* Acento amarillo vibrante */
+  --color-accent-yellow: rgb(255, 200, 0); /* #FFC800 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -35,21 +83,51 @@
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-quicksand), sans-serif;
 }
 
-.main-header {
-  background: var(--color-bg-dark-alt);
+.main-header-red {
+  background: var(--color-bg-dark-red-alt);
+}
+
+.main-header-blue {
+  background: var(--color-bg-dark-blue-alt);
+}
+
+.main-header-yellow {
+  background: var(--color-bg-dark-yellow-alt);
+}
+
+.main-header-green {
+  background: var(--color-bg-dark-green-alt);
+}
+
+.main-header-dark {
+  background: var(--color-bg-dark-dark-alt);
+}
+
+.main-body-red {
+  background: var(--background-red);
+}
+
+.main-body-blue {
+  background: var(--background-blue);
+}
+
+.main-body-yellow {
+  background: var(--background-yellow);
+}
+
+.main-body-green {
+  background: var(--background-green);
+}
+
+.main-body-dark {
+  background: var(--background-dark);
 }
 
 .main-content {
-  background: var(--color-bg-dark-alt);
   border-radius: 0.5rem;
   margin: 10px;
-}
-
-.main-footer {
-  background: var(--color-bg-dark-alt);
 }
