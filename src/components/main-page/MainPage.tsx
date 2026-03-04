@@ -11,8 +11,6 @@ export default function MainPage() {
   const { theme } = useTheme();
   const { data: session } = useSession();
 
-  if (session) console.log(session);
-
   if (!session)
     return (
       <main
@@ -25,7 +23,14 @@ export default function MainPage() {
     <main
       className={`min-h-screen grid grid-cols-5 grid-rows-5 main-body-${theme}`}
     >
-      <MainPageCarousel theme={theme} user={session?.user} />
+      <h1 className="text-4xl m-7">Hola {session?.user?.name}</h1>
+      <button
+        onClick={() => signOut()}
+        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Desconectar
+      </button>
+      <MainPageCarousel theme={theme} />
       <MainPageGames theme={theme} />
       <MainPageHot theme={theme} />
       <MainPageProfile theme={theme} />
