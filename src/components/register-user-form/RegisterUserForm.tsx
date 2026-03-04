@@ -19,10 +19,10 @@ export default function RegisterUserForm() {
   }
 
   return (
-    <main className="min-h-screen main-body-dark">
+    <main className="">
       <form
         onSubmit={handleSubmit}
-        className="text-center main-header-dark flex flex-col items-center"
+        className="text-center flex flex-col items-center"
       >
         <h1 className="text-4xl font-bold p-5">Registro</h1>
         <input

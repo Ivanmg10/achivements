@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession, signOut } from "next-auth/react";
 import { useTheme } from "@/context/ThemeContext";
 import MainPageCarousel from "./main-page-carousel/MainPageCarousel";
 import MainPageGames from "./main-page-games/MainPageGames";
@@ -8,12 +9,23 @@ import MainPageProfile from "./main-page-profile/MainPageProfile";
 
 export default function MainPage() {
   const { theme } = useTheme();
+  const { data: session } = useSession();
 
+  if (session) console.log(session);
+
+  if (!session)
+    return (
+      <main
+        className={`min-h-screen flex justify-center items-center main-body-${theme}`}
+      >
+        <h1 className="text-4xl">Registrate para ver esta pantalla</h1>
+      </main>
+    );
   return (
     <main
       className={`min-h-screen grid grid-cols-5 grid-rows-5 main-body-${theme}`}
     >
-      <MainPageCarousel theme={theme} />
+      <MainPageCarousel theme={theme} user={session?.user} />
       <MainPageGames theme={theme} />
       <MainPageHot theme={theme} />
       <MainPageProfile theme={theme} />
