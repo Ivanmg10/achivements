@@ -44,6 +44,12 @@ body {
   background: var(--color-bg-dark-alt);
 }
 
+.main-content {
+  background: var(--color-bg-dark-alt);
+  border-radius: 0.5rem;
+  margin: 10px;
+}
+
 .main-footer {
   background: var(--color-bg-dark-alt);
 }
