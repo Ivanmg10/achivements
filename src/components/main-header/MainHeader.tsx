@@ -18,9 +18,6 @@ export default function MainHeader() {
             <Link href="/">Main</Link>
           </li>
           <li className="text-2xl">
-            <Link href="/home">Home</Link>
-          </li>
-          <li className="text-2xl">
             <Link href="/apitest">ApiTest</Link>
           </li>
         </ul>

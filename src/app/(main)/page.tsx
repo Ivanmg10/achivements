@@ -1,5 +1,5 @@
-import MainStart from "@/components/main-start/MainStart";
+import MainPage from "@/components/main-page/MainPage";
 
 export default function Home() {
-  return <MainStart />;
+  return <MainPage />;
 }
