@@ -1,24 +1,36 @@
 "use client";
 
 import { Theme } from "@/types/types";
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
 type ThemeContextType = {
   theme: Theme;
-  toggleTheme: (color?: Theme) => void;
+  setTheme: (theme: Theme) => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("red");
+export function ThemeProvider({
+  children,
+  defaultTheme = "red",
+}: {
+  children: ReactNode;
+  defaultTheme?: Theme;
+}) {
+  const [theme, setTheme] = useState<Theme>(defaultTheme);
 
-  const toggleTheme = (color?: Theme) => {
-    setTheme((prev) => (color ? color : prev === "red" ? "blue" : "red"));
-  };
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -26,8 +38,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
 export function useTheme() {
   const context = useContext(ThemeContext);
+
   if (!context) {
     throw new Error("useTheme must be used inside ThemeProvider");
   }
+
   return context;
 }

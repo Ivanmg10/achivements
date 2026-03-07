@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "@/context/ThemeContext";
+import Spinner from "@/components/main-spinner/Spinner";
 import {
   RetroAchievementsGameWithAchievements,
   RetroAchievementsUserProfile,
@@ -9,8 +9,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function ApiTest() {
-  const { theme } = useTheme();
-
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<RetroAchievementsUserProfile | null>(null);
   const [gameData, setGameData] =
@@ -32,9 +30,14 @@ export default function ApiTest() {
       .finally(() => setIsLoading(false));
   }, [data]);
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading)
+    return (
+      <main className="min-h-screen bg-bg-main text-text-main flex justify-center items-center">
+        <Spinner />
+      </main>
+    );
   return (
-    <main className={`min-h-screen main-body-${theme}`}>
+    <main className="min-h-screen bg-bg-main text-text-main">
       <section className="text-center">
         <h1 className="text-4xl font-bold p-5">User</h1>
 

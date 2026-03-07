@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="red">
       <body className={`${quicksand.variable}`}>
         <Providers>{children}</Providers>
       </body>

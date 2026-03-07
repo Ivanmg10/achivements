@@ -1,17 +1,13 @@
 "use client";
 
-import { useTheme } from "@/context/ThemeContext";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
 export default function MainHeader() {
-  const { theme } = useTheme();
   const { data: session } = useSession();
 
   return (
-    <header
-      className={`flex flex-row justify-between items-center main-header-${theme}`}
-    >
+    <header className="flex flex-row justify-between items-center bg-bg-header text-text-main">
       <nav className="px-3 py-6 w-100">
         <ul className="flex gap-7">
           <li className="text-2xl">

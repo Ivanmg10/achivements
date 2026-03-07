@@ -27,7 +27,7 @@ export default function LoginUserForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="text-center flex flex-col items-center justify-center main-header-red rounded-3xl p-5 h-1/3"
+      className="text-center flex flex-col items-center justify-center bg-bg-header text-text-main rounded-3xl p-5 h-1/3"
     >
       <h1 className="text-4xl font-bold p-5 mb-10">Inicia sesión</h1>
       {isRegister && (

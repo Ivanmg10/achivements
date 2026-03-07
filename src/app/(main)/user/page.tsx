@@ -5,12 +5,12 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 
 export default function UserPage() {
-  const { theme, toggleTheme } = useTheme();
+  const { setTheme } = useTheme();
   const { data: session } = useSession();
 
   return (
     <main
-      className={`min-h-screen main-body-${theme} flex flex-col justify-center items-center`}
+      className={`min-h-screen bg-bg-main text-text-main flex flex-col justify-center items-center`}
     >
       <section className="flex justify-center items-center gap-5">
         <p className="text-xl">{session?.user.name}</p>
@@ -28,39 +28,44 @@ export default function UserPage() {
         </div>
       </section>
 
-      <div className="p-5 flex flex-row gap-5 items-center">
+      <section className="p-5 flex flex-row gap-5 items-center">
         <h1>Color</h1>
         <button
-          onClick={() => toggleTheme("red")}
+          onClick={() => setTheme("red")}
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
         >
           Rojo
         </button>
         <button
-          onClick={() => toggleTheme("blue")}
+          onClick={() => setTheme("blue")}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Azul
         </button>
         <button
-          onClick={() => toggleTheme("yellow")}
+          onClick={() => setTheme("yellow")}
           className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
         >
           Amarillo
         </button>
         <button
-          onClick={() => toggleTheme("green")}
+          onClick={() => setTheme("green")}
           className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
         >
           Verde
         </button>
         <button
-          onClick={() => toggleTheme("dark")}
+          onClick={() => setTheme("dark")}
           className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
         >
           Negro
         </button>
-      </div>
+      </section>
+      <section>
+        <button className="bg-bg-header text-text-main p-2 rounded-3xl w-100">
+          <p>Guardar cambios</p>
+        </button>
+      </section>
     </main>
   );
 }

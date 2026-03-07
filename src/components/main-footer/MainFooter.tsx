@@ -1,12 +1,8 @@
 "use client";
 
-import { useTheme } from "@/context/ThemeContext";
-
 export default function MainFooter() {
-  const { theme } = useTheme();
-
   return (
-    <footer className={`flex justify-around main-header-${theme}`}>
+    <footer className="flex justify-around bg-bg-header text-text-main">
       <section className="px-2 py-4">
         <p className="text-2xl">© 2025 Achivements</p>
       </section>
