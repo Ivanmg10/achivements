@@ -30,10 +30,7 @@ export default function MainHeader() {
           <p className="hover:text-white w-full">Cerrar session</p>
         </button>
       ) : (
-        <button
-          className="main-body-red px-2 py-1 m-5 rounded-3xl"
-          onClick={() => signOut()}
-        >
+        <button className="main-body-red px-2 py-1 m-5 rounded-3xl">
           <Link href="/authPage" className="hover:text-white w-full">
             Iniciar sesión
           </Link>
