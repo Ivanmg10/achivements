@@ -10,7 +10,9 @@ import Spinner from "../main-spinner/Spinner";
 
 export default function MainPage() {
   const { theme } = useTheme();
-  const { status } = useSession();
+  const { status, data: session } = useSession();
+
+  console.log(session);
 
   if (status === "unauthenticated")
     return (
