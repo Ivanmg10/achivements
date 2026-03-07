@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Quicksand } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
 import MainFooter from "@/components/main-footer/MainFooter";
-import Providers from "./providers";
+import Providers from "../providers";
 import MainHeader from "@/components/main-header/MainHeader";
 
 const quicksand = Quicksand({
