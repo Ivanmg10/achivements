@@ -2,10 +2,10 @@
 
 import { useSession } from "next-auth/react";
 import MainPageCarousel from "./main-page-carousel/MainPageCarousel";
-import MainPageGames from "./main-page-games/MainPageGames";
-import MainPageHot from "./main-page-hot/MainPageHot";
-import MainPageProfile from "./main-page-profile/MainPageProfile";
 import Spinner from "../main-spinner/Spinner";
+import MainPageRecommended from "./main-page-games/MainPageGames";
+import MainPageProfile from "./main-page-profile/MainPageProfile";
+import MainPageHot from "./main-page-hot/MainPageHot";
 
 export default function MainPage() {
   const { status } = useSession();
@@ -26,9 +26,9 @@ export default function MainPage() {
     <main className="bg-bg-main flex justify-center">
       <div className="min-h-screen grid grid-cols-5 grid-rows-5  text-text-main w-5/6">
         <MainPageCarousel />
-        <MainPageGames />
-        <MainPageHot />
+        <MainPageRecommended />
         <MainPageProfile />
+        <MainPageHot />
       </div>
     </main>
   );
