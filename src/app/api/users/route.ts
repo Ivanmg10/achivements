@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       `INSERT INTO "users" (username, password, raId, theme, avatar)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [username, hashedPassword, raId || null, theme || "red", avatar || null],
+      [username, hashedPassword, raId || null, theme || "dark", avatar || null],
     );
 
     const user = result.rows[0];

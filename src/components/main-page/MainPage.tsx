@@ -23,11 +23,13 @@ export default function MainPage() {
       </main>
     );
   return (
-    <main className="min-h-screen grid grid-cols-5 grid-rows-5 bg-bg-main text-text-main">
-      <MainPageCarousel />
-      <MainPageGames />
-      <MainPageHot />
-      <MainPageProfile />
+    <main className="bg-bg-main flex justify-center">
+      <div className="min-h-screen grid grid-cols-5 grid-rows-5  text-text-main w-5/6">
+        <MainPageCarousel />
+        <MainPageGames />
+        <MainPageHot />
+        <MainPageProfile />
+      </div>
     </main>
   );
 }

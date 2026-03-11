@@ -7,6 +7,11 @@ declare module "next-auth" {
       theme?: string;
       avatar?: string;
       raid?: string;
+      rausername?: string;
+      steamid?: string;
+      steamusername?: string;
+      email?: string;
+      admin?: boolean;
     } & DefaultSession["user"];
   }
 
@@ -15,6 +20,11 @@ declare module "next-auth" {
     theme?: string;
     avatar?: string;
     raid?: string;
+    rausername?: string;
+    steamid?: string;
+    steamusername?: string;
+    email?: string;
+    admin?: boolean;
   }
 
   interface JWT {
@@ -22,5 +32,10 @@ declare module "next-auth" {
     theme?: string;
     avatar?: string;
     raid?: string;
+    rausername?: string;
+    steamid?: string;
+    steamusername?: string;
+    email?: string;
+    admin?: boolean;
   }
 }

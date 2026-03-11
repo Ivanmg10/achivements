@@ -32,6 +32,11 @@ const handler = NextAuth({
           theme: user.theme,
           avatar: user.avatar,
           raid: user.raid,
+          rausername: user.rausername,
+          steamid: user.steamid,
+          steamusername: user.steamusername,
+          email: user.email,
+          admin: user.admin,
         };
       },
     }),
@@ -48,6 +53,11 @@ const handler = NextAuth({
         token.name = user.name;
         token.avatar = user.avatar;
         token.raid = user.raid;
+        token.rausername = user.rausername;
+        token.steamid = user.steamid;
+        token.steamusername = user.steamusername;
+        token.email = user.email;
+        token.admin = user.admin;
       }
       return token;
     },
@@ -59,6 +69,11 @@ const handler = NextAuth({
         session.user.name = token.name;
         session.user.avatar = token.avatar;
         session.user.raid = token.raid;
+        session.user.rausername = token.rausername;
+        session.user.steamid = token.steamid;
+        session.user.steamusername = token.steamusername;
+        session.user.email = token.email;
+        session.user.admin = token.admin;
       }
       return session;
     },

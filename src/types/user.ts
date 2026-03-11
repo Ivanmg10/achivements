@@ -5,4 +5,10 @@ export interface User {
   raId?: string | null;
   theme: string;
   avatar?: string | null;
+  raid?: string | null;
+  rausername?: string | null;
+  steamid?: string | null;
+  steamusername?: string | null;
+  email?: string | null;
+  admin?: boolean;
 }

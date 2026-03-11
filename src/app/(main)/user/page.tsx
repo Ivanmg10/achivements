@@ -3,28 +3,55 @@
 import { useTheme } from "@/context/ThemeContext";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function UserPage() {
   const { setTheme } = useTheme();
   const { data: session } = useSession();
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+
+  const updateAvatar = async (url: string) => {
+    console.log(url);
+  };
 
   return (
     <main
       className={`min-h-screen bg-bg-main text-text-main flex flex-col justify-center items-center`}
     >
-      <section className="flex justify-center items-center gap-5">
-        <p className="text-xl">{session?.user.name}</p>
-        <Image
-          className="rounded-full w-15 h-15"
-          objectFit="fit"
-          src={session?.user.avatar}
-          alt="UserPic"
-          width={150}
-          height={150}
-        />
-        <div>
-          <p className="text-xl">ULID: {session?.user.raid}</p>
-          <p className="text-xl">Theme: {session?.user.theme}</p>
+      <section className="flex flex-col justify-center items-center gap-5">
+        <div className="flex items-center gap-3">
+          <p className="text-xl">{session?.user.name}</p>
+          {session?.user.avatar && (
+            <Image
+              className="rounded-full w-15 h-15"
+              objectFit="fit"
+              src={session?.user.avatar}
+              alt="UserPic"
+              width={150}
+              height={150}
+            />
+          )}
+          <div>
+            <p className="text-xl">ULID: {session?.user.raid}</p>
+            <p className="text-xl">Theme: {session?.user.theme}</p>
+          </div>
+        </div>
+
+        <div className="w-full flex flex-col gap-1">
+          <p className="text-xl">Cambiar avatar</p>
+          <input
+            type="text"
+            className="bg-bg-deep text-text-main rounded-lg p-2 w-full"
+            placeholder="URL del avatar"
+            value={avatarUrl}
+            onChange={(e) => setAvatarUrl(e.target.value)}
+          />
+          <button
+            className="bg-bg-header text-text-main p-2 rounded-3xl w-full"
+            onClick={() => updateAvatar(avatarUrl)}
+          >
+            <p>Guardar cambios</p>
+          </button>
         </div>
       </section>
 
@@ -60,9 +87,8 @@ export default function UserPage() {
         >
           Negro
         </button>
-      </section>
-      <section>
-        <button className="bg-bg-header text-text-main p-2 rounded-3xl w-100">
+
+        <button className="bg-bg-header text-text-main p-2 rounded-3xl">
           <p>Guardar cambios</p>
         </button>
       </section>

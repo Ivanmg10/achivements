@@ -15,16 +15,12 @@
 /* themes */
 
 :root {
-  /* backgrounds */
-  --bg-main: 32 0 0;
-  --bg-header: 16 0 0;
-  --bg-deep: 16 0 0;
+  --bg-main: 20 20 22;
+  --bg-header: 12 12 14;
+  --bg-deep: 18 20 26;
 
-  /* text */
-  --text-main: 240 224 192;
-
-  /* accent */
-  --accent: 255 0 0;
+  --text-main: 220 220 225;
+  --accent: 180 180 190;
 }
 
 [data-theme="red"] {

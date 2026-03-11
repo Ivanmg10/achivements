@@ -1,6 +1,7 @@
 "use client";
 
 import { Theme } from "@/types/types";
+import { useSession } from "next-auth/react";
 import {
   createContext,
   useContext,
@@ -18,7 +19,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "red",
+  defaultTheme = "dark",
 }: {
   children: ReactNode;
   defaultTheme?: Theme;
