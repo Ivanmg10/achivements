@@ -40,13 +40,15 @@ export default function MainHeader() {
       {session ? (
         <Link href="/user" className="flex items-center hover:text-amber-100">
           <p>{session.user.name}</p>
-          <Image
-            className="w-12 h-12 m-5 cursor-pointer rounded-full"
-            width={100}
-            height={100}
-            src={session.user.avatar}
-            alt="imagen"
-          />
+          {session.user.avatar && (
+            <Image
+              className="w-12 h-12 m-5 cursor-pointer rounded-full"
+              width={100}
+              height={100}
+              src={session.user.avatar}
+              alt="imagen"
+            />
+          )}
         </Link>
       ) : (
         <button className="main-body-red px-2 py-1 m-5 rounded-3xl">
