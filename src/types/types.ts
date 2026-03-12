@@ -66,7 +66,7 @@ export type RetroAchievementsGameWithAchievements = {
   ConsoleName: string;
   ForumTopicID: number;
   Flags: number | null;
-
+  GameTitle: string;
   ImageIcon: string;
   ImageTitle: string;
   ImageIngame: string;
