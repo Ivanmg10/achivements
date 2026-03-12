@@ -1,16 +1,17 @@
 "use client";
 
 import { getRandomGameIds } from "@/utils/utils";
-import { Game } from "@retroachievements/api";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import MainPageGamesList from "./main-page-games-list/MainPageGamesList";
+import { RetroAchievementsGameWithAchievements } from "@/types/types";
 
 export default function MainPageRecommended() {
   const { status } = useSession();
-  const [listGames, setListGames] = useState<Array<Game | undefined>>([]);
+  const [listGames, setListGames] = useState<
+    Array<RetroAchievementsGameWithAchievements>
+  >([]);
   const hasFetched = useRef(false);
 
   const getListOfGames = async () => {

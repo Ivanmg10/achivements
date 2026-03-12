@@ -1,5 +1,4 @@
 import { RetroAchievementsGameWithAchievements } from "@/types/types";
-import { Game } from "@retroachievements/api";
 import Image from "next/image";
 
 export default function MainPageGamesList({
