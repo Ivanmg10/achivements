@@ -11,13 +11,14 @@ export default function MainPageProfileRa({
       <h2 className="text-xl">Retroachivements</h2>
 
       <div className="break-all flex gap-3">
-        <Image
-          src={"https://retroachievements.org/" + user?.UserPic}
-          alt="imagen"
-          width={100}
-          height={100}
-          className="w-25 h-25"
-        />
+        {user?.UserPic && (
+          <Image
+            src={`https://retroachievements.org${user?.UserPic}`}
+            alt="UserPic"
+            width={100}
+            height={100}
+          />
+        )}
         <div>
           <p className="text-lg">{user?.User}</p>
           <p className="text-lg">{user?.ID}</p>

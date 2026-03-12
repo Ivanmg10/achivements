@@ -44,12 +44,14 @@ export default function ApiTest() {
         <h1 className="text-4xl font-bold p-5">User</h1>
 
         <aside className="flex flex-row items-center justify-center gap-5 p-5">
-          <Image
-            src={"https://retroachievements.org/" + data?.UserPic}
-            alt="UserPic"
-            width={200}
-            height={200}
-          />
+          {data?.UserPic && (
+            <Image
+              src={`https://retroachievements.org${data?.UserPic}`}
+              alt="UserPic"
+              width={200}
+              height={200}
+            />
+          )}
           <div className="text-left m-5">
             <p className="text-3xl mb-5">{data?.User}</p>
             <p>ULID: {data?.ULID}</p>
@@ -67,12 +69,14 @@ export default function ApiTest() {
         <h1 className="text-4xl font-bold p-5">Game</h1>
 
         <aside className="flex flex-row items-center justify-center gap-5 p-5">
-          <Image
-            src={"https://retroachievements.org/" + gameData?.ImageIcon}
-            alt="UserPic"
-            width={200}
-            height={200}
-          />
+          {gameData?.ImageIcon && (
+            <Image
+              src={`https://retroachievements.org${gameData?.ImageIcon}`}
+              alt="UserPic"
+              width={200}
+              height={200}
+            />
+          )}
           <div className="text-left m-5">
             <p className="text-3xl mb-5 break-words">{gameData?.Title}</p>
             <p>Console: {gameData?.ConsoleName}</p>
