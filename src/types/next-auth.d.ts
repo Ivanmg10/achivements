@@ -1,4 +1,5 @@
 import { DefaultSession } from "next-auth";
+import { JWT as DefaultJWT } from "next-auth/jwt";
 
 declare module "next-auth" {
   interface Session {
@@ -26,8 +27,10 @@ declare module "next-auth" {
     email?: string;
     admin?: boolean;
   }
+}
 
-  interface JWT {
+declare module "next-auth/jwt" {
+  interface JWT extends DefaultJWT {
     id: string;
     theme?: string;
     avatar?: string;
@@ -35,7 +38,7 @@ declare module "next-auth" {
     rausername?: string;
     steamid?: string;
     steamusername?: string;
-    email?: string;
     admin?: boolean;
+    email?: string;
   }
 }
