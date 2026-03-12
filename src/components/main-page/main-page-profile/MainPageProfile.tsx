@@ -24,8 +24,6 @@ export default function MainPageProfile() {
     }
   }, [status]);
 
-  console.log(user);
-
   return (
     <section className="col-start-4 col-end-6 row-start-2 row-end-4 main-content bg-bg-header text-text-main m-3 rounded-xl">
       <h1 className="text-3xl w-[95%] m-2 py-2">

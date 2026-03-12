@@ -2,10 +2,19 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: [
-      "retroachievements.org",
-      "cdn.discordapp.com",
-      "encrypted-tbn0.gstatic.com",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "retroachievements.org",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.discordapp.com",
+      },
+      {
+        protocol: "https",
+        hostname: "encrypted-tbn0.gstatic.com",
+      },
     ],
   },
 };
