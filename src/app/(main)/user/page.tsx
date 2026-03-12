@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "@/context/ThemeContext";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -24,18 +24,25 @@ export default function UserPage() {
             <p className="text-xl">{session?.user.name}</p>
             {session?.user?.avatar && (
               <Image
-                className="rounded-full w-15 h-15"
-                objectFit="fit"
+                className="rounded-full w-15 h-15 object-cover"
                 src={session?.user?.avatar}
                 alt="UserPic"
                 width={150}
                 height={150}
+                unoptimized
               />
             )}
             <div>
               <p className="text-xl">ULID: {session?.user.raid}</p>
               <p className="text-xl">Theme: {session?.user.theme}</p>
             </div>
+
+            <button
+              className="bg-bg-header px-2 py-1 m-5 rounded-3xl"
+              onClick={() => signOut()}
+            >
+              <p className="hover:text-white w-full">Cerrar session</p>
+            </button>
           </div>
         )}
 

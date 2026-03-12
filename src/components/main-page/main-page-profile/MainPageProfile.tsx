@@ -11,8 +11,12 @@ export default function MainPageProfile() {
   const [user, setUser] = useState<RetroAchievementsUserProfile | null>();
   const hasFetched = useRef(false);
 
+  console.log(session);
+
   const getUserInfo = async () => {
-    const user = await fetch("/api/getUserProfile").then((res) => res.json());
+    const user = await fetch(
+      `/api/getUserProfile?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
+    ).then((res) => res.json());
 
     setUser(user);
   };

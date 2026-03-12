@@ -42,11 +42,12 @@ export default function MainHeader() {
           <p>{session.user.name}</p>
           {session.user.avatar && (
             <Image
-              className="w-12 h-12 m-5 cursor-pointer rounded-full"
+              className="w-12 h-12 m-5 cursor-pointer rounded-full object-cover"
               width={100}
               height={100}
               src={session.user.avatar}
               alt="imagen"
+              unoptimized
             />
           )}
         </Link>

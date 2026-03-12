@@ -5,10 +5,12 @@ import {
   RetroAchievementsGameWithAchievements,
   RetroAchievementsUserProfile,
 } from "@/types/types";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function ApiTest() {
+  const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<RetroAchievementsUserProfile | null>(null);
   const [gameData, setGameData] =
@@ -16,7 +18,9 @@ export default function ApiTest() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch("/api/getUserProfile")
+    fetch(
+      `/api/getUserProfile?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
+    )
       .then((res) => res.json())
       .then((data) => setData(data))
       .catch((err) => console.error(err));
