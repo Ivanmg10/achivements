@@ -19,23 +19,25 @@ export default function UserPage() {
       className={`min-h-screen bg-bg-main text-text-main flex flex-col justify-center items-center`}
     >
       <section className="flex flex-col justify-center items-center gap-5">
-        <div className="flex items-center gap-3">
-          <p className="text-xl">{session?.user.name}</p>
-          {session?.user.avatar && (
-            <Image
-              className="rounded-full w-15 h-15"
-              objectFit="fit"
-              src={session?.user.avatar}
-              alt="UserPic"
-              width={150}
-              height={150}
-            />
-          )}
-          <div>
-            <p className="text-xl">ULID: {session?.user.raid}</p>
-            <p className="text-xl">Theme: {session?.user.theme}</p>
+        {session?.user && (
+          <div className="flex items-center gap-3">
+            <p className="text-xl">{session?.user.name}</p>
+            {session?.user?.avatar && (
+              <Image
+                className="rounded-full w-15 h-15"
+                objectFit="fit"
+                src={session?.user?.avatar}
+                alt="UserPic"
+                width={150}
+                height={150}
+              />
+            )}
+            <div>
+              <p className="text-xl">ULID: {session?.user.raid}</p>
+              <p className="text-xl">Theme: {session?.user.theme}</p>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="w-full flex flex-col gap-1">
           <p className="text-xl">Cambiar avatar</p>
