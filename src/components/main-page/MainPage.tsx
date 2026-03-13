@@ -1,11 +1,11 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import MainPageCarousel from "./main-page-carousel/MainPageCarousel";
+import MainPageProgression from "./main-page-progression/MainPageProgression";
 import Spinner from "../main-spinner/Spinner";
 import MainPageRecommended from "./main-page-games/MainPageGames";
 import MainPageProfile from "./main-page-profile/MainPageProfile";
-import MainPageHot from "./main-page-hot/MainPageHot";
+import MainPageWantToPlay from "./main-page-want-to-play/MainPageWantToPlay";
 
 export default function MainPage() {
   const { status } = useSession();
@@ -24,11 +24,12 @@ export default function MainPage() {
     );
   return (
     <main className="bg-bg-main flex justify-center">
-      <div className="min-h-screen grid grid-cols-5 grid-rows-5  text-text-main w-5/6">
-        <MainPageCarousel />
-        <MainPageRecommended />
+      <div className="min-h-screen grid grid-cols-5 grid-rows-6 text-text-main w-[90%]">
+        <MainPageProgression />
+
         <MainPageProfile />
-        <MainPageHot />
+        <MainPageWantToPlay />
+        <MainPageRecommended />
       </div>
     </main>
   );

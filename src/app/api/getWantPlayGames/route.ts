@@ -2,15 +2,12 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const gameId = request.nextUrl.searchParams.get("gameId");
   const username = request.nextUrl.searchParams.get("username");
   const publicKey = request.nextUrl.searchParams.get("publicKey");
 
   const response = await fetch(
-    `https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=${username}&y=${publicKey}&g=${gameId}`,
+    `https://retroachievements.org/API/API_GetUserWantToPlayList.php?u=${username}&y=${publicKey}&c=5`,
   );
-
   const data = await response.json();
-
   return NextResponse.json(data);
 }

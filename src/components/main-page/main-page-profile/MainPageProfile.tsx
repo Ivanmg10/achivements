@@ -11,8 +11,6 @@ export default function MainPageProfile() {
   const [user, setUser] = useState<RetroAchievementsUserProfile | null>();
   const hasFetched = useRef(false);
 
-  console.log(session);
-
   const getUserInfo = async () => {
     const user = await fetch(
       `/api/getUserProfile?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
@@ -29,10 +27,7 @@ export default function MainPageProfile() {
   }, [status]);
 
   return (
-    <section className="col-start-4 col-end-6 row-start-2 row-end-4 main-content bg-bg-header text-text-main m-3 rounded-xl">
-      <h1 className="text-3xl w-[95%] m-2 py-2">
-        Bienvenido {session?.user?.name}
-      </h1>
+    <section className="col-start-4 col-end-6 row-start-3 row-end-7 main-content bg-bg-header text-text-main m-3 rounded-xl break-all">
       <MainPageProfileRa user={user} />
 
       <MainPageProfileSt />

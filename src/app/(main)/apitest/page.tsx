@@ -29,7 +29,9 @@ export default function ApiTest() {
   useEffect(() => {
     const gameId = "5578";
 
-    fetch(`/api/getGameProgression?gameId=${gameId}`)
+    fetch(
+      `/api/getGameProgression?gameId=${gameId}&username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
+    )
       .then((res) => res.json())
       .then((data) => setGameData(data))
       .catch((err) => console.error(err))

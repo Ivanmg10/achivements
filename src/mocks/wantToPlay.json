@@ -1,0 +1,348 @@
+{
+  "Count": 38,
+  "Total": 38,
+  "Results": [
+    {
+      "ID": 668,
+      "Title": "Pokémon Emerald Version",
+      "ConsoleID": 5,
+      "ConsoleName": "Game Boy Advance",
+      "ImageIcon": "/Images/104473.png",
+      "PointsTotal": 2086,
+      "AchievementsPublished": 197
+    },
+    {
+      "ID": 788,
+      "Title": "Pokémon LeafGreen Version",
+      "ConsoleID": 5,
+      "ConsoleName": "Game Boy Advance",
+      "ImageIcon": "/Images/104330.png",
+      "PointsTotal": 776,
+      "AchievementsPublished": 128
+    },
+    {
+      "ID": 810,
+      "Title": "Pokémon Crystal Version",
+      "ConsoleID": 6,
+      "ConsoleName": "Game Boy Color",
+      "ImageIcon": "/Images/105173.png",
+      "PointsTotal": 831,
+      "AchievementsPublished": 113
+    },
+    {
+      "ID": 2721,
+      "Title": "Dragon Quest VIII: Journey of the Cursed King",
+      "ConsoleID": 21,
+      "ConsoleName": "PlayStation 2",
+      "ImageIcon": "/Images/038649.png",
+      "PointsTotal": 1461,
+      "AchievementsPublished": 208
+    },
+    {
+      "ID": 2901,
+      "Title": "Animal Crossing",
+      "ConsoleID": 16,
+      "ConsoleName": "GameCube",
+      "ImageIcon": "/Images/089222.png",
+      "PointsTotal": 975,
+      "AchievementsPublished": 117
+    },
+    {
+      "ID": 3103,
+      "Title": "Phoenix Wright: Ace Attorney - Trials and Tribulations",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/060428.png",
+      "PointsTotal": 438,
+      "AchievementsPublished": 75
+    },
+    {
+      "ID": 3780,
+      "Title": "Pokémon XD: Gale of Darkness",
+      "ConsoleID": 16,
+      "ConsoleName": "GameCube",
+      "ImageIcon": "/Images/068144.png",
+      "PointsTotal": 1370,
+      "AchievementsPublished": 151
+    },
+    {
+      "ID": 3887,
+      "Title": "Pokémon Black Version",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/104482.png",
+      "PointsTotal": 842,
+      "AchievementsPublished": 118
+    },
+    {
+      "ID": 3997,
+      "Title": "InviZimals",
+      "ConsoleID": 41,
+      "ConsoleName": "PlayStation Portable",
+      "ImageIcon": "/Images/095107.png",
+      "PointsTotal": 604,
+      "AchievementsPublished": 87
+    },
+    {
+      "ID": 5853,
+      "Title": "Pokémon Black Version 2",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/105979.png",
+      "PointsTotal": 1787,
+      "AchievementsPublished": 187
+    },
+    {
+      "ID": 7212,
+      "Title": "Pokémon HeartGold Version | Pokémon SoulSilver Version",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/063592.png",
+      "PointsTotal": 1605,
+      "AchievementsPublished": 136
+    },
+    {
+      "ID": 7601,
+      "Title": "Professor Layton and the Last Specter",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/040979.png",
+      "PointsTotal": 335,
+      "AchievementsPublished": 40
+    },
+    {
+      "ID": 9190,
+      "Title": "The Legend of Zelda: The Wind Waker",
+      "ConsoleID": 16,
+      "ConsoleName": "GameCube",
+      "ImageIcon": "/Images/099022.png",
+      "PointsTotal": 1000,
+      "AchievementsPublished": 126
+    },
+    {
+      "ID": 9518,
+      "Title": "Professor Layton and the Curious Village",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/068336.png",
+      "PointsTotal": 373,
+      "AchievementsPublished": 42
+    },
+    {
+      "ID": 9537,
+      "Title": "Phoenix Wright: Ace Attorney - Justice for All",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/086532.png",
+      "PointsTotal": 400,
+      "AchievementsPublished": 66
+    },
+    {
+      "ID": 9564,
+      "Title": "Professor Layton and the Diabolical Box",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/068337.png",
+      "PointsTotal": 407,
+      "AchievementsPublished": 43
+    },
+    {
+      "ID": 9831,
+      "Title": "Professor Layton and the Unwound Future",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/068338.png",
+      "PointsTotal": 253,
+      "AchievementsPublished": 28
+    },
+    {
+      "ID": 9898,
+      "Title": "The Legend of Zelda: Spirit Tracks",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/046401.png",
+      "PointsTotal": 565,
+      "AchievementsPublished": 70
+    },
+    {
+      "ID": 10113,
+      "Title": "The Legend of Zelda: Ocarina of Time",
+      "ConsoleID": 2,
+      "ConsoleName": "Nintendo 64",
+      "ImageIcon": "/Images/022051.png",
+      "PointsTotal": 690,
+      "AchievementsPublished": 97
+    },
+    {
+      "ID": 11732,
+      "Title": "Pokémon Platinum Version",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/104787.png",
+      "PointsTotal": 1254,
+      "AchievementsPublished": 101
+    },
+    {
+      "ID": 12747,
+      "Title": "Phoenix Wright: Ace Attorney",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/060426.png",
+      "PointsTotal": 344,
+      "AchievementsPublished": 83
+    },
+    {
+      "ID": 14323,
+      "Title": "The Legend of Zelda: Phantom Hourglass",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/109728.png",
+      "PointsTotal": 534,
+      "AchievementsPublished": 67
+    },
+    {
+      "ID": 14853,
+      "Title": "Pokémon Mystery Dungeon: Explorers of Sky",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/042484.png",
+      "PointsTotal": 1155,
+      "AchievementsPublished": 128
+    },
+    {
+      "ID": 16236,
+      "Title": "The Sims 2",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/047391.png",
+      "PointsTotal": 513,
+      "AchievementsPublished": 57
+    },
+    {
+      "ID": 16295,
+      "Title": "Pokémon Ranger",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/077490.png",
+      "PointsTotal": 711,
+      "AchievementsPublished": 58
+    },
+    {
+      "ID": 16622,
+      "Title": "Inazuma Eleven",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/107150.png",
+      "PointsTotal": 656,
+      "AchievementsPublished": 71
+    },
+    {
+      "ID": 16655,
+      "Title": "Dragon Quest Monsters: Joker",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/063344.png",
+      "PointsTotal": 710,
+      "AchievementsPublished": 60
+    },
+    {
+      "ID": 17530,
+      "Title": "~Hack~ Pokémon Unbound",
+      "ConsoleID": 5,
+      "ConsoleName": "Game Boy Advance",
+      "ImageIcon": "/Images/073204.png",
+      "PointsTotal": 1492,
+      "AchievementsPublished": 129
+    },
+    {
+      "ID": 17580,
+      "Title": "Bakugan: Battle Brawlers",
+      "ConsoleID": 18,
+      "ConsoleName": "Nintendo DS",
+      "ImageIcon": "/Images/072319.png",
+      "PointsTotal": 379,
+      "AchievementsPublished": 68
+    },
+    {
+      "ID": 18363,
+      "Title": "Star Wars: The Force Unleashed",
+      "ConsoleID": 41,
+      "ConsoleName": "PlayStation Portable",
+      "ImageIcon": "/Images/113878.png",
+      "PointsTotal": 519,
+      "AchievementsPublished": 57
+    },
+    {
+      "ID": 19010,
+      "Title": "The Simpsons: Hit & Run",
+      "ConsoleID": 21,
+      "ConsoleName": "PlayStation 2",
+      "ImageIcon": "/Images/112858.png",
+      "PointsTotal": 615,
+      "AchievementsPublished": 69
+    },
+    {
+      "ID": 19178,
+      "Title": "The Sims 2",
+      "ConsoleID": 21,
+      "ConsoleName": "PlayStation 2",
+      "ImageIcon": "/Images/088897.png",
+      "PointsTotal": 480,
+      "AchievementsPublished": 54
+    },
+    {
+      "ID": 20545,
+      "Title": "NBA Street Vol. 2",
+      "ConsoleID": 21,
+      "ConsoleName": "PlayStation 2",
+      "ImageIcon": "/Images/073159.png",
+      "PointsTotal": 377,
+      "AchievementsPublished": 58
+    },
+    {
+      "ID": 20586,
+      "Title": "Ultimate Spider-Man",
+      "ConsoleID": 21,
+      "ConsoleName": "PlayStation 2",
+      "ImageIcon": "/Images/071906.png",
+      "PointsTotal": 550,
+      "AchievementsPublished": 39
+    },
+    {
+      "ID": 20588,
+      "Title": "Dragon Ball Z: Budokai Tenkaichi 2",
+      "ConsoleID": 21,
+      "ConsoleName": "PlayStation 2",
+      "ImageIcon": "/Images/064807.png",
+      "PointsTotal": 505,
+      "AchievementsPublished": 107
+    },
+    {
+      "ID": 20637,
+      "Title": "Tony Hawk's American Wasteland",
+      "ConsoleID": 21,
+      "ConsoleName": "PlayStation 2",
+      "ImageIcon": "/Images/063328.png",
+      "PointsTotal": 799,
+      "AchievementsPublished": 102
+    },
+    {
+      "ID": 21111,
+      "Title": "The Sims 2: Castaway",
+      "ConsoleID": 21,
+      "ConsoleName": "PlayStation 2",
+      "ImageIcon": "/Images/113166.png",
+      "PointsTotal": 281,
+      "AchievementsPublished": 73
+    },
+    {
+      "ID": 32650,
+      "Title": "Kingdom Hearts",
+      "ConsoleID": 21,
+      "ConsoleName": "PlayStation 2",
+      "ImageIcon": "/Images/112095.png",
+      "PointsTotal": 619,
+      "AchievementsPublished": 67
+    }
+  ]
+}

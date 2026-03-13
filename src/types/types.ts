@@ -32,11 +32,11 @@ export type RetroAchievementsGame = {
   ImageTitle: string;
   ImageIngame: string;
   ImageBoxArt: string;
-  Developer: string;
-  Publisher: string;
-  Genre: string;
-  Released: string; // puedes convertirlo a Date si lo procesas
-  ReleasedAtGranularity: "year" | "month" | "day";
+  Developer: string | null;
+  Publisher: string | null;
+  Genre: string | null;
+  Released: string;
+  ReleasedAtGranularity: "year" | "month" | "day" | string;
 };
 
 export type RetroAchievement = {
@@ -100,4 +100,21 @@ export type RetroAchievementsGameWithAchievements = {
 
   HighestAwardKind: "mastered" | "completed" | string;
   HighestAwardDate: string;
+};
+
+export type WantToPlayGame = {
+  ID: number;
+  Title: string;
+  ImageIcon: string;
+  ConsoleID: number;
+  ConsoleName: string;
+  PointsTotal: number;
+  AchievementsPublished: number;
+  GameTitle: string;
+};
+
+export type WantToPlayUser = {
+  Count: number;
+  Total: number;
+  Results: WantToPlayGame[];
 };

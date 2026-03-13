@@ -1,13 +1,13 @@
-import { RetroAchievementsGameWithAchievements } from "@/types/types";
+import { RetroAchievementsGame, WantToPlayGame } from "@/types/types";
 import Image from "next/image";
 
 export default function MainPageGamesList({
   listGames,
 }: {
-  listGames: Array<RetroAchievementsGameWithAchievements>;
+  listGames: Array<RetroAchievementsGame> | Array<WantToPlayGame>;
 }) {
   return listGames.map(
-    (game: RetroAchievementsGameWithAchievements, index: number) => (
+    (game: RetroAchievementsGame | WantToPlayGame, index: number) => (
       <div
         key={index}
         className="flex flex-row gap-3 m-2 bg-bg-main rounded-xl w-[95%] p-1 hover:bg-bg-header transition-all duration-300 hover:border-bg-main border-2 border-bg-main cursor-pointer"
@@ -22,7 +22,9 @@ export default function MainPageGamesList({
           />
         )}
         <div>
-          <p className="text-xl">{game?.GameTitle}</p>
+          <p className="text-xl">
+            {game?.GameTitle ? game?.GameTitle : game?.Title}
+          </p>
           <p className="text-lg">{game?.ConsoleName}</p>
         </div>
       </div>

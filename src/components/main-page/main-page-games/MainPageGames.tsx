@@ -5,25 +5,33 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import MainPageGamesList from "./main-page-games-list/MainPageGamesList";
-import { RetroAchievementsGameWithAchievements } from "@/types/types";
+import { RetroAchievementsGame } from "@/types/types";
+import recomendedGamesMock from "@/mocks/recomendedGames.json";
 
 export default function MainPageRecommended() {
   const { status } = useSession();
-  const [listGames, setListGames] = useState<
-    Array<RetroAchievementsGameWithAchievements>
-  >([]);
+  const [listGames, setListGames] = useState<Array<RetroAchievementsGame>>([]);
   const hasFetched = useRef(false);
 
+  const USE_MOCK = true;
+
   const getListOfGames = async () => {
-    const ids = getRandomGameIds();
+    if (USE_MOCK) {
+      const games = recomendedGamesMock;
+      console.log(games);
+      setListGames(games);
+      return;
+    } else {
+      const ids = getRandomGameIds();
 
-    const games = await Promise.all(
-      ids.map((id) =>
-        fetch(`/api/getGameData?gameId=${id}`).then((res) => res.json()),
-      ),
-    );
+      const games = await Promise.all(
+        ids.map((id) =>
+          fetch(`/api/getGameData?gameId=${id}`).then((res) => res.json()),
+        ),
+      );
 
-    setListGames(games);
+      setListGames(games);
+    }
   };
 
   useEffect(() => {
@@ -34,7 +42,7 @@ export default function MainPageRecommended() {
   }, [status]);
 
   return (
-    <section className="col-start-1 col-end-4 row-start-2 row-end-4 main-content bg-bg-header text-text-main m-3 rounded-xl flex flex-col items-center justify-center">
+    <section className="col-start-1 col-end-4 row-start-5 row-end-7 main-content bg-bg-header text-text-main m-3 rounded-xl flex flex-col items-center justify-center">
       <h1 className="text-3xl w-[95%] m-2 py-2 ">Recomendados</h1>
       <MainPageGamesList listGames={listGames} />
       <Link href="/" className="w-[95%] py-2 m-1">
