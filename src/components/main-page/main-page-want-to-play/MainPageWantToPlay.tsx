@@ -6,14 +6,13 @@ import { useEffect, useRef, useState } from "react";
 import MainPageGamesList from "../main-page-games/main-page-games-list/MainPageGamesList";
 import Link from "next/link";
 import wantToPlayMock from "@/mocks/wantToPlay.json";
+import { USE_MOCK } from "@/constants";
 
 export default function MainPageWantToPlay() {
   const { status, data: session } = useSession();
   const [wantGames, setWantGames] = useState<Array<WantToPlayGame>>();
   const [error, setError] = useState<string>();
   const hasFetched = useRef(false);
-
-  const USE_MOCK = true;
 
   const getWantGames = async () => {
     try {

@@ -4,6 +4,8 @@ import { RetroAchievementsGameWithAchievements } from "@/types/types";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import gameProgression from "@/mocks/gameProgression.json";
+import { USE_MOCK } from "@/constants";
 
 export default function MainPageProgression() {
   const { status, data: session } = useSession();
@@ -24,13 +26,15 @@ export default function MainPageProgression() {
   useEffect(() => {
     if (status === "authenticated" && !hasFetched.current) {
       hasFetched.current = true;
-      getGamesInfo("5578");
-      getGamesInfo("788");
-      getGamesInfo("19010");
+      if (USE_MOCK) {
+        setGames(gameProgression);
+      } else {
+        getGamesInfo("5578");
+        getGamesInfo("788");
+        getGamesInfo("19010");
+      }
     }
   }, [status]);
-
-  console.log(games);
 
   return (
     <section className="col-start-1 col-end-6 row-start-1 row-end-3 main-content bg-bg-header text-text-main m-3 rounded-xl flex flex-col justify-start items-center">
@@ -66,7 +70,7 @@ export default function MainPageProgression() {
                 <div className="w-[90%] m-auto mt-2 h-3 border bg- border-white rounded-full bg-transparent overflow-hidden">
                   <div
                     className="h-full bg-white"
-                    style={{ width: game?.UserCompletion }}
+                    style={{ width: game?.UserCompletion ?? undefined }}
                   />
                 </div>
                 <p>{game?.UserCompletion}</p>

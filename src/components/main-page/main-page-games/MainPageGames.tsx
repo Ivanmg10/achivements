@@ -7,18 +7,16 @@ import { useEffect, useRef, useState } from "react";
 import MainPageGamesList from "./main-page-games-list/MainPageGamesList";
 import { RetroAchievementsGame } from "@/types/types";
 import recomendedGamesMock from "@/mocks/recomendedGames.json";
+import { USE_MOCK } from "@/constants";
 
 export default function MainPageRecommended() {
   const { status } = useSession();
   const [listGames, setListGames] = useState<Array<RetroAchievementsGame>>([]);
   const hasFetched = useRef(false);
 
-  const USE_MOCK = true;
-
   const getListOfGames = async () => {
     if (USE_MOCK) {
       const games = recomendedGamesMock;
-      console.log(games);
       setListGames(games);
       return;
     } else {

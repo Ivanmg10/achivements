@@ -1,4 +1,4 @@
-import { ragamesIds } from "@/mocks/ragamesidpool";
+import { ragamesIds } from "@/constants/ragamesidpool";
 
 export function getRandomGameIds(count: number = 5): string[] {
   const shuffled = [...ragamesIds].sort(() => Math.random() - 0.5);

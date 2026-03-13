@@ -17,9 +17,6 @@ export default function MainHeader() {
           <li className="text-l">
             <Link href="/">Home</Link>
           </li>
-          <li className="text-l">
-            <Link href="/apitest">ApiTest</Link>
-          </li>
         </ul>
       </nav>
 

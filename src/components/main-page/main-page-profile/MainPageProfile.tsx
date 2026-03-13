@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import MainPageProfileRa from "./main-page-profile-ra/MainPageProfileRa";
 import MainPageProfileSt from "./main-page-profile-st/MainPageProfileSt";
+import { USE_MOCK } from "@/constants";
+import userRAMock from "@/mocks/userRA.json";
 
 export default function MainPageProfile() {
   const { status, data: session } = useSession();
@@ -12,11 +14,17 @@ export default function MainPageProfile() {
   const hasFetched = useRef(false);
 
   const getUserInfo = async () => {
-    const user = await fetch(
-      `/api/getUserProfile?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
-    ).then((res) => res.json());
+    if (USE_MOCK) {
+      const user = userRAMock;
+      setUser(user);
+      return;
+    } else {
+      const user = await fetch(
+        `/api/getUserProfile?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
+      ).then((res) => res.json());
 
-    setUser(user);
+      setUser(user);
+    }
   };
 
   useEffect(() => {

@@ -1,5 +1,9 @@
 export type Theme = "red" | "blue" | "yellow" | "green" | "dark";
 
+type Nullable<T> = {
+  [K in keyof T]: T[K] | null;
+};
+
 export type RetroAchievementsUserProfile = {
   ID: number;
   User: string;
@@ -43,45 +47,56 @@ export type RetroAchievement = {
   ID: number;
   NumAwarded: number;
   NumAwardedHardcore: number;
+
   Title: string;
   Description: string;
+
   Points: number;
   TrueRatio: number;
+
   Author: string;
   AuthorULID: string;
+
   DateModified: string;
   DateCreated: string;
+
   BadgeName: string;
+
   DisplayOrder: number;
+
   MemAddr: string;
-  type: "progression" | "win_condition" | "missable" | string;
-  DateEarnedHardcore: string | null;
-  DateEarned: string | null;
+
+  Type?: string | null;
+
+  DateEarned?: string | null;
+  DateEarnedHardcore?: string | null;
 };
 
-export type RetroAchievementsGameWithAchievements = {
+export type RetroAchievementsGameWithAchievementsBase = {
   ID: number;
   Title: string;
+
   ConsoleID: number;
   ConsoleName: string;
+
   ForumTopicID: number;
   Flags: number | null;
-  GameTitle: string;
+
   ImageIcon: string;
   ImageTitle: string;
   ImageIngame: string;
   ImageBoxArt: string;
 
-  Publisher: string;
-  Developer: string;
-  Genre: string;
+  Publisher: string | null;
+  Developer: string | null;
+  Genre: string | null;
 
   Released: string;
-  ReleasedAtGranularity: "year" | "month" | "day";
+  ReleasedAtGranularity: string;
 
-  IsFinal: boolean; // deprecated pero viene
+  IsFinal: boolean;
   RichPresencePatch: string;
-  GuideURL: string | null;
+
   ParentGameID: number | null;
 
   NumDistinctPlayers: number;
@@ -89,7 +104,8 @@ export type RetroAchievementsGameWithAchievements = {
   NumDistinctPlayersHardcore: number;
 
   NumAchievements: number;
-  Achievements: Record<string, RetroAchievement>;
+
+  Achievements: Record<string, RetroAchievement | undefined>;
 
   NumAwardedToUser: number;
   NumAwardedToUserHardcore: number;
@@ -98,9 +114,14 @@ export type RetroAchievementsGameWithAchievements = {
   UserCompletionHardcore: string;
   UserTotalPlaytime: number;
 
-  HighestAwardKind: "mastered" | "completed" | string;
-  HighestAwardDate: string;
+  GameTitle?: string;
+  GuideURL?: string | null;
+  HighestAwardKind?: string;
+  HighestAwardDate?: string;
 };
+
+export type RetroAchievementsGameWithAchievements =
+  Nullable<RetroAchievementsGameWithAchievementsBase>;
 
 export type WantToPlayGame = {
   ID: number;
