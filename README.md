@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎮 Achievements Tracker
 
-## Getting Started
+> A web app to track your RetroAchievements progress — games, logros, and everything in between.
 
-First, run the development server:
+---
+
+## 🚧 Roadmap
+
+### 📱 Views
+
+- [ ] **Mobile view** — responsive layout for small screens
+- [ ] **Tablet view** — mid-size breakpoint adjustments
+
+### 👤 Pages
+
+- [ ] **User page** — profile, stats, and history
+- [ ] **Improve home** — better landing experience
+- [ ] **Improve login / register** — cleaner auth flow
+
+### 🎨 UI / UX
+
+- [ ] **Improve side panel** — navigation and layout refinements
+
+### 🔌 API
+
+- [ ] **Contact RetroAchievements** — request improvements to API calls
+
+---
+
+## 🛠 Tech Stack
+
+- [Next.js](https://nextjs.org/)
+- [NextAuth.js](https://next-auth.js.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [RetroAchievements API](https://api-docs.retroachievements.org/)
+
+---
+
+## 🚀 Getting Started
 
 ```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+
+# Run the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> Make sure to set `NEXTAUTH_URL` and `NEXTAUTH_SECRET` in your `.env.local`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---

@@ -7,29 +7,56 @@ export default function GameInfoAchivement({
   achievement?: RetroAchievement;
 }) {
   const classNameEarned =
-    "bg-bg-header p-3 rounded-xl flex flex-row items-start gap-2 w-full cursor-pointer hover:bg-bg-header/80 transition-all duration-300";
+    "cursor-pointer hover:bg-bg-header transition-all duration-300";
+  const classNameNotEarned = "opacity-40";
 
-  const classNameNotEarned =
-    "bg-bg-header/30 p-3 rounded-xl flex flex-row items-start gap-2 w-full";
+  if (achievement)
+    // return (
 
-  return (
-    <div
-      key={achievement?.ID}
-      className={achievement?.DateEarned ? classNameEarned : classNameNotEarned}
-    >
-      {achievement?.BadgeName && (
-        <Image
-          src={`https://media.retroachievements.org/Badge/${achievement.BadgeName}.png`}
-          alt="achievement icon"
-          width={100}
-          height={100}
-          className={`w-20 h-20 rounded-xl ${achievement?.DateEarned ? "" : "grayscale"}`}
-        />
-      )}
-      <div className="flex flex-col">
-        <h3 className="text-lg">{achievement?.Title}</h3>
-        <p className="text-sm">{achievement?.Description}</p>
-      </div>
-    </div>
-  );
+    return (
+      <tr
+        className={
+          achievement?.DateEarned ? classNameEarned : classNameNotEarned
+        }
+      >
+        {/* Icono */}
+        <td className="p-2 w-20 align-middle">
+          {achievement?.BadgeName && (
+            <Image
+              src={`https://media.retroachievements.org/Badge/${achievement.BadgeName}.png`}
+              alt="achievement icon"
+              width={80}
+              height={80}
+              className={`w-16 h-16 rounded-xl object-cover shrink-0 ${achievement?.DateEarned ? "" : "grayscale"}`}
+            />
+          )}
+        </td>
+
+        {/* Logro */}
+        <td className="p-2">
+          <h3 className="text-lg">{achievement?.Title}</h3>
+          <p className="text-sm text-text-secondary">
+            {achievement?.Description}
+          </p>
+        </td>
+
+        {/* Jugadores */}
+        <td className="p-2 text-sm text-text-secondary w-56">
+          <p>{achievement.NumAwarded} jugadores</p>
+          <p>{achievement.NumAwardedHardcore} en hardcore</p>
+        </td>
+
+        {/* Puntos */}
+        <td className="p-2 text-xs text-text-secondary w-20">
+          {achievement.Points} pts
+        </td>
+
+        {/* Obtenido */}
+        <td className="p-2 text-xs text-text-secondary text-center w-20">
+          {achievement.DateEarned
+            ? new Date(achievement.DateEarned).toLocaleDateString()
+            : "-"}
+        </td>
+      </tr>
+    );
 }
