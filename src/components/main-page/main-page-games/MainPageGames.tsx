@@ -24,7 +24,9 @@ export default function MainPageRecommended() {
 
       const games = await Promise.all(
         ids.map((id) =>
-          fetch(`/api/getGameData?gameId=${id}`).then((res) => res.json()),
+          fetch(`/api/getGameData?gameId=${id}`)
+            .then((res) => res.json())
+            .then((game) => ({ ...game, ID: id })),
         ),
       );
 

@@ -5,7 +5,7 @@ export default function Spinner() {
         aria-hidden="true"
         className="w-10 h-10 text-neutral-tertiary animate-spin fill-brand"
         viewBox="0 0 100 101"
-        fill="red"
+        fill="dark"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path

@@ -1,5 +1,6 @@
 import { RetroAchievementsGame, WantToPlayGame } from "@/types/types";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function MainPageGamesList({
   listGames,
@@ -8,9 +9,10 @@ export default function MainPageGamesList({
 }) {
   return listGames.map(
     (game: RetroAchievementsGame | WantToPlayGame, index: number) => (
-      <div
+      <Link
         key={index}
         className="flex flex-row gap-3 m-2 bg-bg-main rounded-xl w-[95%] p-1 hover:bg-bg-header transition-all duration-300 hover:border-bg-main border-2 border-bg-main cursor-pointer"
+        href={`/gameInfo/${game.ID}`}
       >
         {game?.ImageIcon && (
           <Image
@@ -27,7 +29,7 @@ export default function MainPageGamesList({
           </p>
           <p className="text-lg">{game?.ConsoleName}</p>
         </div>
-      </div>
+      </Link>
     ),
   );
 }

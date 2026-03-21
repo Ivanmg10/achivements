@@ -16,7 +16,8 @@
     "Developer": null,
     "Genre": null,
     "Released": "2005-09-22",
-    "ReleasedAtGranularity": "day"
+    "ReleasedAtGranularity": "day",
+    "ID": "20586"
   },
   {
     "Title": "Dragon Ball Z: Budokai Tenkaichi 2",
@@ -35,7 +36,8 @@
     "Developer": "Spike",
     "Genre": "Arena Fighting",
     "Released": "2006-10-05",
-    "ReleasedAtGranularity": "day"
+    "ReleasedAtGranularity": "day",
+    "ID": "20588"
   },
   {
     "Title": "NBA Street Vol. 2",
@@ -54,7 +56,8 @@
     "Developer": "Electronic Arts, NuFX",
     "Genre": "Sports - Basketball",
     "Released": "2003-04-28",
-    "ReleasedAtGranularity": "day"
+    "ReleasedAtGranularity": "day",
+    "ID": "20545"
   },
   {
     "Title": "Inazuma Eleven",
@@ -73,7 +76,8 @@
     "Developer": "Level-5",
     "Genre": "Role-Playing Game",
     "Released": "2011-01-21",
-    "ReleasedAtGranularity": "day"
+    "ReleasedAtGranularity": "day",
+    "ID": "16622"
   },
   {
     "Title": "The Legend of Zelda: The Wind Waker",
@@ -92,6 +96,7 @@
     "Developer": null,
     "Genre": "Action-Adventure",
     "Released": "2002-12-13",
-    "ReleasedAtGranularity": "day"
+    "ReleasedAtGranularity": "day",
+    "ID": "9190"
   }
 ]

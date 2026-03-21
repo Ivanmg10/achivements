@@ -6,6 +6,9 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import gameProgression from "@/mocks/gameProgression.json";
 import { USE_MOCK } from "@/constants";
+import { getGamesInfoList } from "@/utils/apiCallsUtils";
+import Link from "next/link";
+import { get } from "http";
 
 export default function MainPageProgression() {
   const { status, data: session } = useSession();
@@ -14,14 +17,6 @@ export default function MainPageProgression() {
   >([]);
   const hasFetched = useRef(false);
 
-  const getGamesInfo = async (gameId: string) => {
-    const newGame = await fetch(
-      `/api/getGameProgression?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}&gameId=${gameId}`,
-    ).then((res) => res.json());
-
-    setGames((prev) => [...prev, newGame]);
-  };
-
   //Por ahora solo se muestran 3 juegos a pelo
   useEffect(() => {
     if (status === "authenticated" && !hasFetched.current) {
@@ -29,9 +24,10 @@ export default function MainPageProgression() {
       if (USE_MOCK) {
         setGames(gameProgression);
       } else {
-        getGamesInfo("5578");
-        getGamesInfo("788");
-        getGamesInfo("19010");
+        getGamesInfoList("5578", session, setGames);
+        getGamesInfoList("2762", session, setGames);
+        getGamesInfoList("20580", session, setGames);
+        // getGamesInfoList("3152", session, setGames);
       }
     }
   }, [status]);
@@ -41,9 +37,10 @@ export default function MainPageProgression() {
       <h1 className="text-3xl w-[98%] m-2 py-2">Tus progresos recientes</h1>
 
       {games.map((game) => (
-        <aside
+        <Link
           className="flex flex-col items-center justify-left gap-5 p-5 bg-bg-main rounded-xl w-[98%] m-2 hover:bg-bg-header transition-all duration-300 hover:border-bg-main border-2 border-bg-main cursor-pointer"
           key={game.ID}
+          href={`/gameInfo/${game.ID}`}
         >
           <div className="flex items-center justify-left gap-5 w-full">
             {game?.ImageIcon && (
@@ -75,7 +72,7 @@ export default function MainPageProgression() {
               </div>
             </div>
           </div>
-        </aside>
+        </Link>
       ))}
     </section>
   );

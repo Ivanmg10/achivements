@@ -41,6 +41,7 @@ export type RetroAchievementsGame = {
   Genre: string | null;
   Released: string;
   ReleasedAtGranularity: "year" | "month" | "day" | string;
+  ID?: string;
 };
 
 export type RetroAchievement = {

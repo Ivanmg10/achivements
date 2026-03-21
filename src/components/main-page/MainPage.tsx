@@ -13,8 +13,6 @@ export default function MainPage() {
   const { status } = useSession();
   const router = useRouter();
 
-  console.log("MainPage status:", status);
-
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/authPage");
