@@ -38,9 +38,7 @@ export default function MainPageProgression() {
 
   return (
     <section className="col-start-1 col-end-6 row-start-1 row-end-3 main-content bg-bg-header text-text-main m-3 rounded-xl flex flex-col justify-start items-center">
-      <h1 className="text-3xl w-[98%] m-2 py-2">
-        Bienvenido {session?.user?.name}
-      </h1>
+      <h1 className="text-3xl w-[98%] m-2 py-2">Tus progresos recientes</h1>
 
       {games.map((game) => (
         <aside
