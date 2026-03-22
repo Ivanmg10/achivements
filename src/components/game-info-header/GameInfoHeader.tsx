@@ -17,7 +17,7 @@ export default function GameInfoHeader({
           className="w-25 h-25 rounded-xl"
         />
       )}
-      <div className="flex flex-col">
+      <div className="flex flex-col w-1/2 gap-3">
         <h1 className="text-3xl">{gameData?.Title}</h1>
         <p className="text-lg">{gameData?.ConsoleName}</p>
         {/* //TODO: meter esto en un componente aparte */}
@@ -30,7 +30,7 @@ export default function GameInfoHeader({
               style={{ width: gameData?.UserCompletion ?? undefined }}
             />
           </div>
-          <p>{gameData?.UserCompletion}</p>
+          <p>100%</p>
         </div>
         <div className="flex gap-3">
           <p className="text-sm text-text-secondary">Hardcore:</p>
@@ -41,7 +41,7 @@ export default function GameInfoHeader({
               style={{ width: gameData?.UserCompletionHardcore ?? undefined }}
             />
           </div>
-          <p>{gameData?.UserCompletionHardcore}</p>
+          <p>100%</p>
         </div>
       </div>
     </section>

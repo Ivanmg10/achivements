@@ -1,11 +1,20 @@
-import { RetroAchievementsUserProfile } from "@/types/types";
+import {
+  RetroAchievementsGameWithAchievements,
+  RetroAchievementsUserProfile,
+} from "@/types/types";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function MainPageProfileRa({
   user,
+  game,
 }: {
   user: RetroAchievementsUserProfile | null | undefined;
+  game: RetroAchievementsGameWithAchievements | null | undefined;
 }) {
+  console.log(user);
+  console.log(game);
+
   return (
     <div className="flex flex-col gap-3 m-2 bg-bg-main rounded-xl w-[95%] p-2">
       {/* <h2 className="text-xl">Retroachivements</h2> */}
@@ -17,20 +26,41 @@ export default function MainPageProfileRa({
             alt="UserPic"
             width={100}
             height={100}
+            className="m-1 rounded-lg"
           />
         )}
         <div>
-          <p className="text-lg">{user?.User}</p>
-          <p className="text-lg">{user?.ID}</p>
+          <p className="text-2xl">{user?.User}</p>
+          <p className="text-md">{user?.ID}</p>
         </div>
       </div>
 
-      <div>
-        <p className="text-xl">{user?.TotalPoints} puntos totales</p>
-        <p className="text-xl">
+      <div className="m-1">
+        <Link
+          className="mb-3 bg-bg-header rounded-lg p-3 flex flex-col gap-3 w-fit"
+          href={`/gameInfo/${game?.ID}`}
+        >
+          <p className="text-sm mb-3">{user?.RichPresenceMsg}</p>
+          <div className="flex">
+            <Image
+              src={`https://retroachievements.org/${game?.ImageIcon}`}
+              alt="GameIcon"
+              width={50}
+              height={50}
+              className="rounded-lg"
+            />
+            <div className="flex flex-col">
+              <span className="ml-2 text-sm">{game?.Title}</span>
+              <span className="ml-2 text-sm">{game?.ConsoleName}</span>
+              {/* <span className="ml-2 text-sm">{game?.UserCompletion}</span> */}
+            </div>
+          </div>
+        </Link>
+        <p className="text-lg">{user?.TotalPoints} puntos totales</p>
+        <p className="text-lg">
           {user?.TotalSoftcorePoints} puntos totales en softcore
         </p>
-        <p className="text-xl">
+        <p className="text-lg">
           {user?.TotalTruePoints} puntos totales verdaderos
         </p>
 

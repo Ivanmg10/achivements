@@ -68,7 +68,7 @@ export default function MainPageProgression() {
                     style={{ width: game?.UserCompletion ?? undefined }}
                   />
                 </div>
-                <p>{game?.UserCompletion}</p>
+                <p>100%</p>
               </div>
             </div>
           </div>
