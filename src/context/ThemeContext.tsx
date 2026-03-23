@@ -27,7 +27,7 @@ export function ThemeProvider({
   const { data: session } = useSession();
   const [theme, setTheme] = useState<Theme>(defaultTheme);
 
-  console.log("Current theme:", session?.user.theme);
+  // console.log("Current theme:", session?.user.theme);
 
   useEffect(() => {
     // if (session?.user?.theme) {

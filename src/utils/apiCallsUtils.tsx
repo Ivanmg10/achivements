@@ -49,3 +49,15 @@ export const getUserInfo = async (
     setUser(user);
   }
 };
+
+export const unlinkRaUser = async (
+  update: (data: Partial<Session>) => Promise<Session | null>,
+) => {
+  await fetch("/api/updateRaUser", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ raUser: {} }),
+  });
+
+  await update({ raUser: {} } as Partial<Session>);
+};

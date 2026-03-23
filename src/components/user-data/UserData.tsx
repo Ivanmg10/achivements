@@ -1,21 +1,12 @@
 "use client";
 
-import { RetroAchievementsUserProfile } from "@/types/types";
-import { getUserInfo } from "@/utils/apiCallsUtils";
 import { Session } from "next-auth";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import RaLoginModal from "../ra-login-modal/RaLoginModal";
 
-export default function UserData({ session }: { session: Session | null }) {
-  const [raUser, setRaUser] = useState<RetroAchievementsUserProfile | null>(
-    null,
-  );
-
-  useEffect(() => {
-    if (session) getUserInfo(setRaUser, session);
-  }, [session]);
-
-  console.log(raUser);
+export default function UserData({ session }: { session: Session }) {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-5 pt-3 pb-3 w-[95%]">
@@ -42,12 +33,12 @@ export default function UserData({ session }: { session: Session | null }) {
       </article>
 
       <article className="flex flex-row justify-center items-center gap-5 bg-bg-card rounded-3xl p-5 ">
-        {raUser?.User ? (
+        {session?.user?.raUser?.User ? (
           <>
-            {raUser?.UserPic && (
+            {session?.user?.raUser?.UserPic && (
               <Image
                 className="rounded-full w-35 h-35 object-cover mr-5"
-                src={`https://retroachievements.org${raUser?.UserPic}`}
+                src={`https://retroachievements.org${session?.user?.raUser?.UserPic}`}
                 alt="UserPic"
                 width={150}
                 height={150}
@@ -55,26 +46,38 @@ export default function UserData({ session }: { session: Session | null }) {
               />
             )}
             <div>
-              <p className="text-2xl mb-5">{raUser?.User}</p>
-              <p className="text-lg">ULID: {raUser?.ULID}</p>
-              <p className="text-lg">Puntos totales: {raUser?.TotalPoints}</p>
+              <p className="text-2xl mb-5">{session?.user?.raUser?.User}</p>
+              <p className="text-md">ULID: {session?.user?.raUser?.ULID}</p>
               <p className="text-lg">
-                Puntos totales softcore: {raUser?.TotalSoftcorePoints}
+                Puntos totales: {session?.user?.raUser?.TotalPoints}
+              </p>
+              <p className="text-lg">
+                Puntos totales softcore:{" "}
+                {session?.user?.raUser?.TotalSoftcorePoints}
               </p>
             </div>
           </>
         ) : (
-          <button className="w-full text-center bg-bg-main p-3 rounded-3xl hover:duration-500 hover:transform hover:scale-102 transition duration-500">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="w-full text-center bg-bg-main p-3 rounded-3xl hover:duration-500 hover:transform hover:scale-102 transition duration-500"
+          >
             Iniciar sesion en Retroachivements
           </button>
         )}
       </article>
 
       <article className="flex flex-col justify-center items-center gap-5 bg-bg-card rounded-3xl p-5 ">
-        <button className="w-full text-center bg-bg-main p-3 rounded-3xl hover:duration-500 hover:transform hover:scale-102 transition duration-500">
+        <button
+          onClick={() => setIsOpen(true)}
+          disabled
+          className="w-full text-center bg-bg-main/50 p-3 rounded-3xl"
+        >
           Iniciar sesion en Steam
         </button>
       </article>
+
+      <RaLoginModal isOpen={isOpen} setIsOpen={setIsOpen} />
     </section>
   );
 }

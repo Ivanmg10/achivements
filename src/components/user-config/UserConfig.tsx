@@ -1,7 +1,11 @@
-import { signOut } from "next-auth/react";
+"use client";
+
+import { signOut, useSession } from "next-auth/react";
 import UserTheme from "../user-theme/UserTheme";
+import { unlinkRaUser } from "@/utils/apiCallsUtils";
 
 export default function UserConfig() {
+  const { data: session, update } = useSession();
   return (
     <section className="grid grid-col-2grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-3 w-[95%]">
       {/* CONFIGURACIÓN DE TEMA */}
@@ -28,6 +32,17 @@ export default function UserConfig() {
                 Cerrar sesion
               </button>
             </li>
+            {session?.user.raUser &&
+              Object.keys(session.user.raUser).length > 0 && (
+                <li>
+                  <button
+                    onClick={() => unlinkRaUser(update)}
+                    className="w-full text-left bg-red-500 hover:bg-red-700 text-white font-bold p-3 rounded-3xl"
+                  >
+                    Cerrar sesion en RA
+                  </button>
+                </li>
+              )}
           </ul>
         </aside>
       </article>

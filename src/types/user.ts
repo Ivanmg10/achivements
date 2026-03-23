@@ -1,3 +1,5 @@
+import { RetroAchievementsUserProfile } from "./types";
+
 export interface User {
   id: number;
   username: string;
@@ -11,4 +13,5 @@ export interface User {
   steamusername?: string | null;
   email?: string | null;
   admin?: boolean;
+  raUser?: RetroAchievementsUserProfile | object;
 }

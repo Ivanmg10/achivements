@@ -9,5 +9,6 @@ export async function GET(request: NextRequest) {
     `https://retroachievements.org/API/API_GetUserProfile.php?u=${username}&y=${publicKey}`,
   );
   const data = await response.json();
+
   return NextResponse.json(data);
 }

@@ -1,5 +1,6 @@
 import { DefaultSession } from "next-auth";
 import { JWT as DefaultJWT } from "next-auth/jwt";
+import { RetroAchievementsUserProfile } from "./types";
 
 declare module "next-auth" {
   interface Session {
@@ -13,6 +14,7 @@ declare module "next-auth" {
       steamusername?: string;
       email?: string;
       admin?: boolean;
+      raUser?: RetroAchievementsUserProfile | null;
     } & DefaultSession["user"];
   }
 
@@ -26,6 +28,7 @@ declare module "next-auth" {
     steamusername?: string;
     email?: string;
     admin?: boolean;
+    raUser?: RetroAchievementsUserProfile | null;
   }
 }
 
@@ -40,5 +43,6 @@ declare module "next-auth/jwt" {
     steamusername?: string;
     admin?: boolean;
     email?: string;
+    raUser?: RetroAchievementsUserProfile | null;
   }
 }
