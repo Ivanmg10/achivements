@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import RaLoginModal from "../ra-login-modal/RaLoginModal";
 
-export default function UserData({ session }: { session: Session }) {
+export default function UserData({ session }: { session: Session | null }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
