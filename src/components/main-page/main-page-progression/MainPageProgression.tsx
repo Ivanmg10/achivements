@@ -33,12 +33,12 @@ export default function MainPageProgression() {
   }, [status]);
 
   return (
-    <section className="col-start-1 col-end-6 row-start-1 row-end-3 main-content bg-bg-header text-text-main m-3 rounded-xl flex flex-col justify-start items-center">
+    <section className="col-start-1 col-end-6 row-start-1 row-end-3 main-content bg-bg-card text-text-main m-3 rounded-xl flex flex-col justify-start items-center">
       <h1 className="text-3xl w-[98%] m-2 py-2">Tus progresos recientes</h1>
 
       {games.map((game) => (
         <Link
-          className="flex flex-col items-center justify-left gap-5 p-5 bg-bg-main rounded-xl w-[98%] m-2 hover:bg-bg-header transition-all duration-300 hover:border-bg-main border-2 border-bg-main cursor-pointer"
+          className="flex flex-col items-center justify-left gap-5 p-5 bg-bg-main rounded-xl w-[98%] m-2 hover:bg-bg-card transition-all duration-300 hover:border-bg-main border-2 border-bg-main cursor-pointer"
           key={game.ID}
           href={`/gameInfo/${game.ID}`}
         >

@@ -7,7 +7,7 @@ export default function GameInfoAchivement({
   achievement?: RetroAchievement;
 }) {
   const classNameEarned =
-    "cursor-pointer hover:bg-bg-header transition-all duration-300";
+    "cursor-pointer hover:bg-bg-card transition-all duration-300";
   const classNameNotEarned = "opacity-40";
 
   if (achievement)

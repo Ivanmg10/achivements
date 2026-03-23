@@ -24,11 +24,17 @@ export function ThemeProvider({
   children: ReactNode;
   defaultTheme?: Theme;
 }) {
+  const { data: session } = useSession();
   const [theme, setTheme] = useState<Theme>(defaultTheme);
 
+  console.log("Current theme:", session?.user.theme);
+
   useEffect(() => {
+    // if (session?.user?.theme) {
+    //   setTheme(session.user.theme as Theme);
+    // }
     document.documentElement.dataset.theme = theme;
-  }, [theme]);
+  }, [theme, session?.user?.theme]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>

@@ -11,7 +11,7 @@ export default function MainPageGamesList({
     (game: RetroAchievementsGame | WantToPlayGame, index: number) => (
       <Link
         key={index}
-        className="flex flex-row gap-3 m-2 bg-bg-main rounded-xl w-[95%] p-1 hover:bg-bg-header transition-all duration-300 hover:border-bg-main border-2 border-bg-main cursor-pointer"
+        className="flex flex-row gap-3 m-2 bg-bg-main rounded-xl w-[95%] p-1 hover:bg-bg-card transition-all duration-300 hover:border-bg-main border-2 border-bg-main cursor-pointer"
         href={`/gameInfo/${game.ID}`}
       >
         {game?.ImageIcon && (

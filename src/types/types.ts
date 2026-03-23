@@ -1,4 +1,11 @@
-export type Theme = "red" | "blue" | "yellow" | "green" | "dark";
+export type Theme =
+  | "red"
+  | "blue"
+  | "yellow"
+  | "green"
+  | "dark"
+  | "purple"
+  | "brown";
 
 type Nullable<T> = {
   [K in keyof T]: T[K] | null;

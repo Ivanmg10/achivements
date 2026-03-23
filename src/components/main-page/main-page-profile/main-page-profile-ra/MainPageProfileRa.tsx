@@ -37,7 +37,7 @@ export default function MainPageProfileRa({
 
       <div className="m-1">
         <Link
-          className="mb-3 bg-bg-header rounded-lg p-3 flex flex-col gap-3 w-fit"
+          className="mb-3 bg-bg-card rounded-lg p-3 flex flex-col gap-3 w-full"
           href={`/gameInfo/${game?.ID}`}
         >
           <p className="text-sm mb-3">{user?.RichPresenceMsg}</p>

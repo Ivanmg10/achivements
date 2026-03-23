@@ -8,7 +8,7 @@ export default function MainHeader() {
   const { data: session } = useSession();
 
   return (
-    <header className="flex flex-row justify-between items-center bg-bg-header text-text-main">
+    <header className="flex flex-row justify-between items-center bg-bg-card text-text-main">
       <nav className="px-3 py-6 w-100">
         <ul className="flex gap-7 items-center">
           <li className="text-3xl mr-5 ml-5">
@@ -35,11 +35,14 @@ export default function MainHeader() {
         </button>
       )} */}
       {session ? (
-        <Link href="/user" className="flex items-center hover:text-amber-100">
+        <Link
+          href="/user"
+          className="flex items-center hover:text-amber-100 m-5"
+        >
           <p>{session.user.name}</p>
           {session.user.avatar && (
             <Image
-              className="w-12 h-12 m-5 cursor-pointer rounded-full object-cover"
+              className="w-12 h-12 ml-5 cursor-pointer rounded-full object-cover"
               width={100}
               height={100}
               src={session.user.avatar}

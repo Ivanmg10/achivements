@@ -6,10 +6,20 @@
   --color-bg-main: rgb(var(--bg-main));
   --color-bg-header: rgb(var(--bg-header));
   --color-bg-deep: rgb(var(--bg-deep));
+  --color-bg-card: rgb(var(--bg-card));
+  --color-bg-tertiary: rgb(var(--bg-tertiary));
 
   --color-text-main: rgb(var(--text-main));
+  --color-text-secondary: rgb(var(--text-secondary));
+  --color-text-accent: rgb(var(--text-accent));
 
   --color-accent: rgb(var(--accent));
+  --color-accent-hover: rgb(var(--accent-hover));
+
+  --color-btn-primary: rgb(var(--btn-primary));
+  --color-btn-primary-text: rgb(var(--btn-primary-text));
+  --color-btn-danger: rgb(var(--btn-danger));
+  --color-btn-danger-text: rgb(var(--btn-danger-text));
 }
 
 /* themes */
@@ -18,52 +28,276 @@
   --bg-main: 20 20 22;
   --bg-header: 12 12 14;
   --bg-deep: 18 20 26;
+  --bg-card: 12 12 14;
+  --bg-tertiary: 36 36 42;
 
   --text-main: 220 220 225;
+  --text-secondary: 140 140 148;
+  --text-accent: 255 255 255;
+
   --accent: 180 180 190;
+  --accent-hover: 200 200 210;
+
+  --btn-primary: 80 80 90;
+  --btn-primary-text: 255 255 255;
+  --btn-danger: 180 40 40;
+  --btn-danger-text: 255 255 255;
 }
 
-[data-theme="red"] {
-  --bg-main: 32 0 0;
-  --bg-header: 16 0 0;
-  --bg-deep: 16 16 32;
-
-  --text-main: 240 224 192;
-  --accent: 255 0 0;
-}
-
-[data-theme="green"] {
-  --bg-main: 8 20 14;
-  --bg-header: 4 14 10;
-  --bg-deep: 6 28 22;
-
-  --text-main: 210 255 230;
-  --accent: 0 220 120;
-}
-
+/* ============================================
+   BASE / DARK — sin cambios
+   ============================================ */
 [data-theme="dark"] {
   --bg-main: 20 20 22;
   --bg-header: 12 12 14;
   --bg-deep: 18 20 26;
+  --bg-card: 12 12 14;
+  --bg-tertiary: 36 36 42;
 
   --text-main: 220 220 225;
+  --text-secondary: 140 140 148;
+  --text-accent: 255 255 255;
+
   --accent: 180 180 190;
+  --accent-hover: 200 200 210;
+
+  --btn-primary: 80 80 90;
+  --btn-primary-text: 255 255 255;
+  --btn-danger: 180 40 40;
+  --btn-danger-text: 255 255 255;
 }
 
-[data-theme="blue"] {
-  --bg-main: 10 18 32;
-  --bg-header: 6 12 24;
-  --bg-deep: 8 24 48;
-
-  --text-main: 210 230 255;
-  --accent: 0 140 255;
-}
-
-[data-theme="yellow"] {
-  --bg-main: 22 22 18;
-  --bg-header: 14 14 10;
-  --bg-deep: 28 28 12;
+/* ============================================
+   ROJO — Estilo Ferrari
+   Rojo intenso, carbono, cromo
+   ============================================ */
+[data-theme="red"] {
+  --bg-main: 18 10 8;
+  --bg-header: 26 6 6;
+  --bg-deep: 12 6 4;
+  --bg-card: 26 6 6;
+  --bg-tertiary: 40 18 10;
 
   --text-main: 255 245 200;
-  --accent: 255 200 0;
+  --text-secondary: 200 160 100;
+  --text-accent: 255 255 255;
+
+  --accent: 255 188 0;
+  --accent-hover: 255 210 30;
+
+  --btn-primary: 255 188 0;
+  --btn-primary-text: 18 10 8;
+  --btn-danger: 196 18 18;
+  --btn-danger-text: 255 245 200;
+}
+
+/* ============================================
+   VERDE — Estilo Starbucks
+   Verde oscuro, crema, kraft
+   ============================================ */
+[data-theme="green"] {
+  --bg-main: 10 26 18;
+  --bg-header: 6 18 12;
+  --bg-deep: 4 14 10;
+  --bg-card: 6 18 12;
+  --bg-tertiary: 20 48 32;
+
+  --text-main: 240 230 210;
+  --text-secondary: 160 180 150;
+  --text-accent: 255 250 235;
+
+  --accent: 0 168 90;
+  --accent-hover: 0 190 110;
+
+  --btn-primary: 0 112 74;
+  --btn-primary-text: 240 230 210;
+  --btn-danger: 140 40 30;
+  --btn-danger-text: 255 235 220;
+}
+
+/* ============================================
+   BLUE — Estilo GitHub
+   Gris azulado oscuro, azul eléctrico
+   ============================================ */
+[data-theme="blue"] {
+  --bg-main: 13 17 23;
+  --bg-header: 22 27 34;
+  --bg-deep: 8 12 18;
+  --bg-card: 22 27 34;
+  --bg-tertiary: 40 50 62;
+
+  --text-main: 201 209 217;
+  --text-secondary: 110 118 129;
+  --text-accent: 255 255 255;
+
+  --accent: 31 111 235;
+  --accent-hover: 56 139 253;
+
+  --btn-primary: 31 111 235;
+  --btn-primary-text: 255 255 255;
+  --btn-danger: 218 54 51;
+  --btn-danger-text: 255 255 255;
+}
+
+/* ============================================
+   YELLOW — Estilo McDonald's
+   Rojo oscuro, amarillo dorado, negro
+   ============================================ */
+[data-theme="yellow"] {
+  --bg-main: 22 20 14;
+  --bg-header: 30 28 18;
+  --bg-deep: 14 12 8;
+  --bg-card: 30 28 18;
+  --bg-tertiary: 48 42 28;
+
+  --text-main: 220 215 230;
+  --text-secondary: 140 130 160;
+  --text-accent: 0 0 0;
+
+  --accent: 255 220 0;
+  --accent-hover: 255 240 60;
+
+  --btn-primary: 255 220 0;
+  --btn-primary-text: 0 0 0;
+  --btn-danger: 255 0 100;
+  --btn-danger-text: 255 255 255;
+}
+
+/* ============================================
+   PURPLE — Estilo propio
+   Morado profundo, lavanda, magenta suave
+   ============================================ */
+[data-theme="purple"] {
+  --bg-main: 18 16 28;
+  --bg-header: 26 22 40;
+  --bg-deep: 12 10 20;
+  --bg-card: 26 22 40;
+  --bg-tertiary: 40 35 62;
+
+  --text-main: 220 215 230;
+  --text-secondary: 140 130 160;
+  --text-accent: 0 0 0;
+
+  --accent: 255 220 0;
+  --accent-hover: 255 240 60;
+
+  --btn-primary: 255 220 0;
+  --btn-primary-text: 0 0 0;
+  --btn-danger: 255 0 100;
+  --btn-danger-text: 255 255 255;
+}
+
+/* ============================================
+   BROWN — Estilo Burger King
+   Marrón tostado, naranja llama, crema
+   ============================================ */
+[data-theme="brown"] {
+  --bg-main: 20 12 6;
+  --bg-header: 30 18 8;
+  --bg-deep: 14 8 4;
+  --bg-card: 30 18 8;
+  --bg-tertiary: 48 28 12;
+
+  --text-main: 255 240 210;
+  --text-secondary: 190 155 100;
+  --text-accent: 255 255 255;
+
+  --accent: 210 90 20;
+  --accent-hover: 240 110 30;
+
+  --btn-primary: 210 90 20;
+  --btn-primary-text: 255 240 210;
+  --btn-danger: 160 30 20;
+  --btn-danger-text: 255 230 200;
+}
+
+/* RED — Ferrari */
+.button-red {
+  background-color: rgb(14 10 10);
+  border: 1px solid rgb(204 0 0);
+  color: rgb(245 235 230);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.button-red:hover {
+  background-color: rgb(204 0 0);
+  color: rgb(14 10 10);
+}
+
+/* GREEN — Starbucks */
+.button-green {
+  background-color: rgb(10 26 18);
+  border: 1px solid rgb(0 168 90);
+  color: rgb(240 230 210);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.button-green:hover {
+  background-color: rgb(0 168 90);
+  color: rgb(10 26 18);
+}
+
+/* DARK */
+.button-dark {
+  background-color: rgb(20 20 22);
+  border: 1px solid rgb(80 80 90);
+  color: rgb(220 220 225);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.button-dark:hover {
+  background-color: rgb(80 80 90);
+  color: rgb(20 20 22);
+}
+
+/* BLUE — GitHub */
+.button-blue {
+  background-color: rgb(13 17 23);
+  border: 1px solid rgb(31 111 235);
+  color: rgb(201 209 217);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.button-blue:hover {
+  background-color: rgb(31 111 235);
+  color: rgb(13 17 23);
+}
+
+/* YELLOW — Cyberpunk */
+.button-yellow {
+  background-color: rgb(22 20 14);
+  border: 1px solid rgb(255 220 0);
+  color: rgb(220 215 230);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.button-yellow:hover {
+  background-color: rgb(255 220 0);
+  color: rgb(22 20 14);
+}
+
+/* PURPLE */
+.button-purple {
+  background-color: rgb(16 10 28);
+  border: 1px solid rgb(160 80 255);
+  color: rgb(230 220 255);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.button-purple:hover {
+  background-color: rgb(160 80 255);
+  color: rgb(16 10 28);
+}
+
+/* BROWN — Burger King */
+.button-brown {
+  background-color: rgb(20 12 6);
+  border: 1px solid rgb(210 90 20);
+  color: rgb(255 240 210);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.button-brown:hover {
+  background-color: rgb(210 90 20);
+  color: rgb(20 12 6);
 }

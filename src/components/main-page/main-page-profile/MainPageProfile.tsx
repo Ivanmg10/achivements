@@ -33,7 +33,7 @@ export default function MainPageProfile() {
   }, [user]);
 
   return (
-    <section className="col-start-4 col-end-6 row-start-3 row-end-7 main-content bg-bg-header text-text-main m-3 rounded-xl break-all flex flex-col items-center">
+    <section className="col-start-4 col-end-6 row-start-3 row-end-7 main-content bg-bg-card text-text-main m-3 rounded-xl break-all flex flex-col items-center">
       <MainPageProfileRa user={user} game={game} />
 
       <MainPageProfileSt />
