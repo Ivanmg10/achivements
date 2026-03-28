@@ -22,11 +22,11 @@ export default function MainPage() {
   if (status === "loading")
     return (
       <main className="h-lvh flex justify-center items-center text-text-main">
-        <Spinner />
+        <Spinner size={45} />
       </main>
     );
   return (
-    <main className="min-h-screen grid grid-cols-5 grid-rows-6 text-text-main">
+    <main className="min-h-screen grid grid-cols-6 grid-rows-5 text-text-main">
       <MainPageProgression />
       <MainPageProfile />
       <MainPageWantToPlay />

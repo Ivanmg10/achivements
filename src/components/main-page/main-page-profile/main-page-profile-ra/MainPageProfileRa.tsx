@@ -14,8 +14,6 @@ export default function MainPageProfileRa({
 }) {
   return (
     <div className="flex flex-col gap-3 m-2 bg-bg-main rounded-xl w-[95%] p-2">
-      <h2 className="text-xl p-1">Retroachivements</h2>
-
       {user?.User ? (
         <>
           <div className="break-all flex gap-3">

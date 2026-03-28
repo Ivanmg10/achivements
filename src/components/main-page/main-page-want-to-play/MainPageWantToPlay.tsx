@@ -7,6 +7,7 @@ import MainPageGamesList from "../main-page-games/main-page-games-list/MainPageG
 import Link from "next/link";
 import wantToPlayMock from "@/mocks/wantToPlay.json";
 import { USE_MOCK } from "@/constants";
+import Spinner from "@/components/main-spinner/Spinner";
 
 export default function MainPageWantToPlay() {
   const { status, data: session } = useSession();
@@ -16,21 +17,22 @@ export default function MainPageWantToPlay() {
 
   const getWantGames = async () => {
     try {
-      let user;
+      let games;
 
       //FORZAR MOCK
       if (USE_MOCK) {
-        user = wantToPlayMock;
+        games = wantToPlayMock;
       } else {
-        user = await fetch(
+        games = await fetch(
           `/api/getWantPlayGames?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
         ).then((res) => res.json());
       }
 
-      // Solo devuelve los 5 primeros
-      const getFiveGames = user.Results.slice(0, 5);
+      const getSliceGames = [...(games?.Results ?? [])]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 7);
 
-      setWantGames(getFiveGames);
+      setWantGames(getSliceGames);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -47,14 +49,22 @@ export default function MainPageWantToPlay() {
     }
   }, []);
 
+  console.log(wantGames);
+
   if (error) return <p>Error: {error}</p>;
   return (
-    <section className=" col-start-1 col-end-4 row-start-3 row-end-5 main-content bg-bg-card text-text-main m-3 rounded-xl flex flex-col items-center justify-center">
-      <h1 className="text-3xl w-[95%] m-2 py-2 ">Want to play</h1>
-      {wantGames && <MainPageGamesList listGames={wantGames} />}
-      <Link href="/" className="w-[95%] py-2 m-1">
-        Ver mas...
-      </Link>
+    <section className=" col-start-1 col-end-5 row-start-2 row-end-4 main-content bg-bg-card text-text-main m-3 rounded-xl flex flex-col items-center justify-center">
+      {wantGames ? (
+        <>
+          <h1 className="text-3xl w-[95%] m-2 py-2 ">Quier@ jugar</h1>
+          {wantGames && <MainPageGamesList listGames={wantGames} />}
+          <Link href="/" className="w-[95%] py-2 m-1">
+            Ver mas...
+          </Link>
+        </>
+      ) : (
+        <Spinner size={45} />
+      )}
     </section>
   );
 }

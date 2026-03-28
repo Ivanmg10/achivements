@@ -78,7 +78,7 @@ export default function RaLoginModal({
             disabled
             className="bg-bg-main p-3 rounded-lg flex justify-center items-center"
           >
-            <Spinner />
+            <Spinner size={12} />
           </button>
         )}
       </form>

@@ -11,24 +11,30 @@ export default function MainPageGamesList({
     (game: RetroAchievementsGame | WantToPlayGame, index: number) => (
       <Link
         key={index}
-        className="flex flex-row gap-3 m-2 bg-bg-main rounded-xl w-[95%] p-1 hover:bg-bg-card transition-all duration-300 hover:border-bg-main border-2 border-bg-main cursor-pointer"
+        className="flex flex-row justify-between gap-3 m-2 bg-bg-main rounded-xl w-[95%] p-1 hover:bg-bg-card transition-all duration-300 hover:border-bg-main border-2 border-bg-main cursor-pointer"
         href={`/gameInfo/${game.ID}`}
       >
-        {game?.ImageIcon && (
-          <Image
-            src={`https://retroachievements.org${game?.ImageIcon}`}
-            alt="imagen"
-            width={50}
-            height={50}
-            className="w-15 h-15 rounded-bl-xl rounded-tl-xl"
-          />
-        )}
-        <div>
-          <p className="text-xl">
-            {game?.GameTitle ? game?.GameTitle : game?.Title}
-          </p>
-          <p className="text-lg">{game?.ConsoleName}</p>
+        <div className="flex flex-row gap-3">
+          {game?.ImageIcon && (
+            <Image
+              src={`https://retroachievements.org${game?.ImageIcon}`}
+              alt="imagen"
+              width={50}
+              height={50}
+              className="w-15 h-15 rounded-bl-xl rounded-tl-xl"
+            />
+          )}
+          <div>
+            <p className="text-xl">
+              {game?.GameTitle ? game?.GameTitle : game?.Title}
+            </p>
+            <p className="text-lg">{game?.ConsoleName}</p>
+          </div>
         </div>
+
+        {/* <div className="flex flex-row items-center mr-5">
+          <p className="text-md">{game?.AchievementsPublished}</p>
+        </div> */}
       </Link>
     ),
   );
