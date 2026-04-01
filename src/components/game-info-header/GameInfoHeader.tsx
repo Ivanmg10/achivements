@@ -1,13 +1,15 @@
 import { RetroAchievementsGameWithAchievements } from "@/types/types";
 import Image from "next/image";
 import GameInfoProgressionHeader from "./game-info-header-progression/GameInfoProgressionHeader";
+import { CONSOLES } from "@/constants";
 
 export default function GameInfoHeader({
   gameData,
 }: {
   gameData?: RetroAchievementsGameWithAchievements | null;
 }) {
-  console.log(gameData);
+  const consoleIcon = CONSOLES.find((c) => c.id === gameData?.ConsoleID)?.icon;
+
   return (
     <section className="bg-bg-main p-5 rounded-xl min-w-[95%] grid grid-cols-[1fr_200px]">
       <div className="flex flex-row items-start gap-5">
@@ -22,7 +24,18 @@ export default function GameInfoHeader({
         )}
         <div className="flex flex-col w-1/2 gap-3">
           <h1 className="text-3xl">{gameData?.Title}</h1>
-          <p className="text-lg">{gameData?.ConsoleName}</p>
+          <div className="flex gap-2">
+            {consoleIcon && gameData?.ConsoleName && (
+              <Image
+                src={consoleIcon}
+                alt={gameData?.ConsoleName}
+                width={16}
+                height={16}
+                className="object-contain"
+              />
+            )}
+            <p className="text-lg">{gameData?.ConsoleName}</p>
+          </div>
           <GameInfoProgressionHeader gameData={gameData} />
           <ul>
             <li className="text-lg">

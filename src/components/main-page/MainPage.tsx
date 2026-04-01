@@ -8,6 +8,7 @@ import MainPageProfile from "./main-page-profile/MainPageProfile";
 import MainPageWantToPlay from "./main-page-want-to-play/MainPageWantToPlay";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import MainPageCompleted from "./main-page-completed/MainPageCompleted";
 
 export default function MainPage() {
   const { status } = useSession();
@@ -31,6 +32,7 @@ export default function MainPage() {
       <MainPageProfile />
       <MainPageWantToPlay />
       <MainPageRecommended />
+      <MainPageCompleted />
     </main>
   );
 }

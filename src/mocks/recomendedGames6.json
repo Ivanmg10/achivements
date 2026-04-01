@@ -40,26 +40,6 @@
     "ID": "20588"
   },
   {
-    "Title": "NBA Street Vol. 2",
-    "GameTitle": "NBA Street Vol. 2",
-    "ConsoleID": 21,
-    "ConsoleName": "PlayStation 2",
-    "Console": "PlayStation 2",
-    "ForumTopicID": 18315,
-    "Flags": 0,
-    "GameIcon": "/Images/073159.png",
-    "ImageIcon": "/Images/073159.png",
-    "ImageTitle": "/Images/071662.png",
-    "ImageIngame": "/Images/071663.png",
-    "ImageBoxArt": "/Images/062285.png",
-    "Publisher": "Electronic Arts",
-    "Developer": "Electronic Arts, NuFX",
-    "Genre": "Sports - Basketball",
-    "Released": "2003-04-28",
-    "ReleasedAtGranularity": "day",
-    "ID": "20545"
-  },
-  {
     "Title": "Inazuma Eleven",
     "GameTitle": "Inazuma Eleven",
     "ConsoleID": 18,
@@ -80,26 +60,6 @@
     "ID": "16622"
   },
   {
-    "Title": "The Legend of Zelda: The Wind Waker",
-    "GameTitle": "The Legend of Zelda: The Wind Waker",
-    "ConsoleID": 16,
-    "ConsoleName": "GameCube",
-    "Console": "GameCube",
-    "ForumTopicID": 25301,
-    "Flags": 0,
-    "GameIcon": "/Images/099022.png",
-    "ImageIcon": "/Images/099022.png",
-    "ImageTitle": "/Images/099572.png",
-    "ImageIngame": "/Images/099571.png",
-    "ImageBoxArt": "/Images/050398.png",
-    "Publisher": "Nintendo",
-    "Developer": null,
-    "Genre": "Action-Adventure",
-    "Released": "2002-12-13",
-    "ReleasedAtGranularity": "day",
-    "ID": "9190"
-  },
-  {
     "Title": "Kingdom Hearts",
     "GameTitle": "Kingdom Hearts",
     "ConsoleID": 21,
@@ -118,8 +78,8 @@
     "Released": "2002-03-28",
     "ReleasedAtGranularity": "day",
     "ID": "32650"
-},
-{
+  },
+  {
     "Title": "Star Wars: The Force Unleashed",
     "GameTitle": "Star Wars: The Force Unleashed",
     "ConsoleID": 41,
@@ -138,8 +98,8 @@
     "Released": "2008-09-16",
     "ReleasedAtGranularity": "day",
     "ID": "18363"
-},
-{
+  },
+  {
     "Title": "Jak II",
     "GameTitle": "Jak II",
     "ConsoleID": 21,
@@ -158,5 +118,25 @@
     "Released": "2003-10-14",
     "ReleasedAtGranularity": "day",
     "ID": "3062"
-}
+  },
+  {
+    "Title": "Jak II",
+    "GameTitle": "Jak II",
+    "ConsoleID": 21,
+    "ConsoleName": "PlayStation 2",
+    "Console": "PlayStation 2",
+    "ForumTopicID": 18379,
+    "Flags": 0,
+    "GameIcon": "/Images/122493.png",
+    "ImageIcon": "/Images/122493.png",
+    "ImageTitle": "/Images/062567.png",
+    "ImageIngame": "/Images/062634.png",
+    "ImageBoxArt": "/Images/095671.png",
+    "Publisher": "Sony Computer Entertainment",
+    "Developer": "Naughty Dog",
+    "Genre": "3D Platforming",
+    "Released": "2003-10-14",
+    "ReleasedAtGranularity": "day",
+    "ID": "3062"
+  }
 ]

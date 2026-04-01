@@ -1,13 +1,12 @@
 "use client";
 
+import { CATEGORIES, CONSOLES } from "@/constants";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function MainSidePanel() {
   const { data: session } = useSession();
-
-  console.log(session);
 
   return (
     <aside className="bg-bg-card m-2 rounded-lg flex flex-col items-center">
@@ -32,10 +31,39 @@ export default function MainSidePanel() {
         </Link>
       </section>
       <hr className="border-b-2 border-white w-[95%] m-5" />
-      <ul className="pl-5 w-full flex flex-col gap-3">
-        <li className="text-lg">Quier@ jugar</li>
-        <li className="text-lg">Est@y jugando</li>
-        <li className="text-lg">He completado</li>
+      <ul className="pl-5 w-full flex flex-col gap-3 list-none">
+        {CATEGORIES.map((category) => (
+          <li key={category.slug} className="text-lg">
+            <Link
+              className="transition-transform duration-200 hover:scale-105"
+              href={`/${category.slug}`}
+            >
+              {category.label}
+            </Link>
+            <ul className="pl-5 flex flex-col gap-1 mt-1">
+              {CONSOLES.map((console) => (
+                <li
+                  key={console.id}
+                  className="transition-transform duration-200 hover:scale-105"
+                >
+                  <Link
+                    href={`/${category.slug}/${console.id}`}
+                    className="flex items-center gap-2 text-base text-gray-400"
+                  >
+                    <Image
+                      src={console.icon}
+                      alt={console.name}
+                      width={20}
+                      height={20}
+                      className="object-contain"
+                    />
+                    {console.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
       </ul>
     </aside>
   );

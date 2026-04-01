@@ -50,6 +50,7 @@ export type RetroAchievementsGame = {
   ReleasedAtGranularity: "year" | "month" | "day" | string;
   ID?: string;
   AchievementsPublished?: number;
+  GameID?: number;
 };
 
 export type RetroAchievement = {
@@ -141,10 +142,38 @@ export type WantToPlayGame = {
   PointsTotal: number;
   AchievementsPublished: number;
   GameTitle: string;
+  GameID?: number;
 };
 
 export type WantToPlayUser = {
   Count: number;
   Total: number;
   Results: WantToPlayGame[];
+};
+
+export type RetroAchievementsGameCompleted = {
+  GameID: number;
+  Title: string;
+  ImageIcon: string;
+  ConsoleID: number;
+  ConsoleName: string;
+  MaxPossible: number;
+  NumAwarded: number;
+  PctWon: string;
+  HardcoreMode: string;
+  ID?: string;
+  GameTitle?: string;
+};
+
+export type RecentAchievement = {
+  Date: string; // "2024-01-15 20:30:00"
+  HardcoreMode: string;
+  AchievementID: number;
+  Title: string;
+  Description: string;
+  BadgeName: string;
+  Points: number;
+  GameID: number;
+  GameTitle: string;
+  ConsoleName: string;
 };
