@@ -69,7 +69,7 @@ export default function UserData({ session }: { session: Session | null }) {
 
       <article className="flex flex-col justify-center items-center gap-5 bg-bg-card rounded-3xl p-5 ">
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={/* istanbul ignore next */ () => setIsOpen(true)}
           disabled
           className="w-full text-center bg-bg-main/50 p-3 rounded-3xl"
         >

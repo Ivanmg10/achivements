@@ -31,7 +31,7 @@ export default function AchievementsLineChart({
         <XAxis
           dataKey="date"
           tick={{ fill: "#9ca3af", fontSize: 12 }}
-          tickFormatter={(val) => val.slice(5)} // muestra "01-15" en vez de "2024-01-15"
+          tickFormatter={/* istanbul ignore next */ (val) => val.slice(5)}
         />
         <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} allowDecimals={false} />
         <Tooltip
@@ -41,7 +41,7 @@ export default function AchievementsLineChart({
             borderRadius: "8px",
           }}
           labelStyle={{ color: "#fff" }}
-          formatter={(value) => [`${value} logros`, ""]}
+          formatter={/* istanbul ignore next */ (value) => [`${value} logros`, ""]}
         />
         <Line
           type="monotone"

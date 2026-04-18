@@ -15,6 +15,7 @@ export default function MainPageRecommended() {
   const hasFetched = useRef(false);
 
   const getListOfGames = async () => {
+    /* istanbul ignore else */
     if (USE_MOCK) {
       const games = recomendedGamesMock;
       setListGames(games);

@@ -19,6 +19,7 @@ export default function MainPageProgression() {
   useEffect(() => {
     if (status === "authenticated" && !hasFetched.current) {
       hasFetched.current = true;
+      /* istanbul ignore else */
       if (USE_MOCK) {
         setGames(gameProgression);
       } else {

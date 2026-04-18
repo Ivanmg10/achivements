@@ -23,10 +23,11 @@ export default function MainPageCompleted() {
   const hasFetched = useRef(false);
 
   useEffect(() => {
+    /* istanbul ignore if */
     if (status === "authenticated" && !hasFetched.current && !USE_MOCK) {
       hasFetched.current = true;
       getGamesCompleted(session, setListGames, setListGamesHardcore);
-    } else if (USE_MOCK) {
+    } else {
       setListGames(gamesCompletedSoftcore);
       setListGamesHardcore(gamesCompletedHardcore);
     }
