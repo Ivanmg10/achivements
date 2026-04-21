@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 
-export async function GET(request: NextRequest) {
-  const username = request.nextUrl.searchParams.get("username");
-  const publicKey = request.nextUrl.searchParams.get("publicKey");
-  const count = request.nextUrl.searchParams.get("count");
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: "No autorizado" }, { status: 401 });
+  }
+
+  const username = session.user.rausername;
+  const publicKey = session.user.raid;
 
   const response = await fetch(
     `https://retroachievements.org/API/API_GetUserWantToPlayList.php?u=${username}&y=${publicKey}`,

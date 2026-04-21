@@ -34,6 +34,16 @@ test("POST creates user and returns 201", async () => {
   expect(res.data).not.toHaveProperty("password");
 });
 
+test("POST creates user with optional fields", async () => {
+  const req = new NextRequest("http://localhost/api/users", {
+    method: "POST",
+    body: JSON.stringify({ username: "ivan", password: "pass123", raId: "42", theme: "light", avatar: "https://example.com/img.png" }),
+    headers: { "Content-Type": "application/json" },
+  });
+  const res = await POST(req);
+  expect(res.status).toBe(201);
+});
+
 test("POST returns 400 when username missing", async () => {
   const req = new NextRequest("http://localhost/api/users", {
     method: "POST",
@@ -52,6 +62,30 @@ test("POST returns 400 when password missing", async () => {
   });
   const res = await POST(req);
   expect(res.status).toBe(400);
+});
+
+test("POST returns 401 when REGISTER_TOKEN set and token wrong", async () => {
+  process.env.REGISTER_TOKEN = "secret123";
+  const req = new NextRequest("http://localhost/api/users", {
+    method: "POST",
+    body: JSON.stringify({ username: "ivan", password: "pass", registerToken: "wrong" }),
+    headers: { "Content-Type": "application/json" },
+  });
+  const res = await POST(req);
+  expect(res.status).toBe(401);
+  delete process.env.REGISTER_TOKEN;
+});
+
+test("POST creates user when REGISTER_TOKEN matches", async () => {
+  process.env.REGISTER_TOKEN = "secret123";
+  const req = new NextRequest("http://localhost/api/users", {
+    method: "POST",
+    body: JSON.stringify({ username: "ivan", password: "pass", registerToken: "secret123" }),
+    headers: { "Content-Type": "application/json" },
+  });
+  const res = await POST(req);
+  expect(res.status).toBe(201);
+  delete process.env.REGISTER_TOKEN;
 });
 
 test("POST returns 500 on db error", async () => {

@@ -3,8 +3,7 @@ import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
   const gameId = request.nextUrl.searchParams.get("gameId");
-  //   const username = "PalmeraMiami";
-  const publicKey = "dSPZGidkZDLw1UaiUOWRk4jBiTbku6va";
+  const publicKey = process.env.RA_API_KEY;
 
   const response = await fetch(
     `https://retroachievements.org/API/API_GetGame.php?i=${gameId}&y=${publicKey}`,

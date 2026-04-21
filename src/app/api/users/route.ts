@@ -6,7 +6,12 @@ import { User } from "@/types/user";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { username, password, raId, theme, avatar } = body as Partial<User>;
+    const { username, password, raId, theme, avatar, registerToken } = body as Partial<User> & { registerToken?: string };
+
+    const expectedToken = process.env.REGISTER_TOKEN;
+    if (expectedToken && registerToken !== expectedToken) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
 
     if (!username || !password) {
       return NextResponse.json(

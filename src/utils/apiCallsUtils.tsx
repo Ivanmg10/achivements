@@ -19,7 +19,7 @@ export const getGamesInfo = async (
   >,
 ) => {
   const newGame = await fetch(
-    `/api/getGameProgression?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}&gameId=${gameId}`,
+    `/api/getGameProgression?gameId=${gameId}`,
   ).then((res) => res.json());
 
   setGameData(newGame);
@@ -31,7 +31,7 @@ export const getGamesInfoList = async (
   setGames: Dispatch<SetStateAction<RetroAchievementsGameWithAchievements[]>>,
 ) => {
   const newGame = await fetch(
-    `/api/getGameProgression?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}&gameId=${gameId}`,
+    `/api/getGameProgression?gameId=${gameId}`,
   ).then((res) => res.json());
 
   setGames((prev) => [...prev, newGame]);
@@ -46,9 +46,7 @@ export const getUserInfo = async (
     setUser(user);
     return;
   } else {
-    const user = await fetch(
-      `/api/getUserProfile?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
-    ).then((res) => res.json());
+    const user = await fetch(`/api/getUserProfile`).then((res) => res.json());
 
     setUser(user);
   }
@@ -72,7 +70,7 @@ export const getGamesCompleted = async (
   setHardcoreGames: Dispatch<SetStateAction<RetroAchievementsGameCompleted[]>>,
 ) => {
   const completedGames: RetroAchievementsGameCompleted[] = await fetch(
-    `/api/getGamesCompleted?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
+    `/api/getGamesCompleted`,
   ).then((res) => res.json());
 
   const softcore = completedGames
@@ -92,7 +90,7 @@ export const getAllGamesPlayed = async (
   setHardcoreGames: Dispatch<SetStateAction<RetroAchievementsGameCompleted[]>>,
 ) => {
   const completedGames: RetroAchievementsGameCompleted[] = await fetch(
-    `/api/getGamesCompleted?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
+    `/api/getGamesCompleted`,
   ).then((res) => res.json());
 
   if (!Array.isArray(completedGames)) return;
@@ -129,7 +127,7 @@ export const getWantGames = async (
       games = wantToPlayMock;
     } else {
       games = await fetch(
-        `/api/getWantPlayGames?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
+        `/api/getWantPlayGames`,
       ).then((res) => res.json());
     }
 
@@ -152,7 +150,7 @@ export const getRecentAchievements = async (
   setAchievements: Dispatch<SetStateAction<RecentAchievement[]>>,
 ) => {
   const data: RecentAchievement[] = await fetch(
-    `/api/getRecentAchievements?username=${session?.user?.rausername}&publicKey=${session?.user?.raid}`,
+    `/api/getRecentAchievements`,
   ).then((res) => res.json());
 
   setAchievements(data);

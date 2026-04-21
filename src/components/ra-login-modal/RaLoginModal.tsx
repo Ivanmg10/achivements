@@ -20,9 +20,11 @@ export default function RaLoginModal({
     if (!username || !apiKey) return;
     setIsLoading(true);
 
-    const user = await fetch(
-      `/api/getUserProfile?username=${username}&publicKey=${apiKey}`,
-    ).then((res) => res.json());
+    const user = await fetch("/api/getUserProfile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, apiKey }),
+    }).then((res) => res.json());
 
     if (user.message) {
       alert(user.message);
