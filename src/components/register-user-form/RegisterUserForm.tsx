@@ -11,51 +11,77 @@ export default function RegisterUserForm({
 }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [registerToken, setRegisterToken] = useState("");
+  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
+
     const res = await fetch("/api/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password, registerToken: registerToken || undefined }),
     });
 
     const data = await res.json();
-    if (data) {
-      setIsLogin(true);
-      setIsRegister(true);
+    if (!res.ok) {
+      setError(data.error || "Error al crear la cuenta");
+      return;
     }
+
+    setIsLogin(true);
+    setIsRegister(true);
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="text-center flex flex-col items-center justify-center bg-bg-card text-text-main rounded-3xl p-5 h-1/3"
-    >
-      <h1 className="text-4xl font-bold p-5 mb-10">Registro</h1>
-      <input
-        type="text"
-        className="border-2 rounded-3xl p-2 m-2 w-100"
-        placeholder="Nombre de usuario"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        className="border-2 rounded-3xl p-2 m-2 w-100"
-        placeholder="Contraseña"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={() => setIsLogin(true)} className="w-100 text-left p-2">
-        <p className="hover:text-white w-full">Ya tienes una cuenta?</p>
-      </button>
+    <div className="bg-bg-card rounded-2xl p-8 w-full max-w-sm">
+      <h1 className="text-3xl font-bold text-text-accent mb-8">Registro</h1>
+
+      {error && (
+        <div className="mb-5 bg-red-900/40 border border-red-700 rounded-xl p-3">
+          <p className="text-sm text-red-400">{error}</p>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3 mb-4">
+        <input
+          type="text"
+          className="bg-bg-tertiary text-text-main rounded-xl p-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
+          placeholder="Nombre de usuario"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="password"
+          className="bg-bg-tertiary text-text-main rounded-xl p-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <input
+          type="text"
+          className="bg-bg-tertiary text-text-main rounded-xl p-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
+          placeholder="Código de invitación (si aplica)"
+          value={registerToken}
+          onChange={(e) => setRegisterToken(e.target.value)}
+        />
+
+        <button
+          type="submit"
+          className="bg-btn-primary text-btn-primary-text w-full py-3 rounded-xl font-medium hover:opacity-80 transition-opacity mt-1"
+        >
+          Crear cuenta
+        </button>
+      </form>
+
       <button
-        className="bg-white text-black px-4 py-2 rounded-3xl m-2 w-100"
-        type="submit"
+        type="button"
+        onClick={() => setIsLogin(true)}
+        className="text-text-secondary hover:text-text-main text-sm transition-colors w-full text-center"
       >
-        Registrar
+        ¿Ya tienes cuenta? Inicia sesión
       </button>
-    </form>
+    </div>
   );
 }

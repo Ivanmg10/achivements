@@ -12,7 +12,7 @@ export async function GET() {
   const publicKey = session.user.raid;
 
   const response = await fetch(
-    `https://retroachievements.org/API/API_GetUserRecentAchievements.php?u=${username}&y=${publicKey}&c=50`,
+    `https://retroachievements.org/API/API_GetUserRecentAchievements.php?u=${username}&y=${publicKey}&m=10080&c=100`,
   );
 
   const data = await response.json();

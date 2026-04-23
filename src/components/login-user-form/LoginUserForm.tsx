@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginUserForm({
@@ -10,55 +11,76 @@ export default function LoginUserForm({
   setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
   isRegister: boolean;
 }) {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError("");
 
     const result = await signIn("credentials", {
       username,
       password,
-      redirect: true,
-      callbackUrl: "/",
+      redirect: false,
     });
+
+    if (!result?.ok) {
+      setError("Usuario o contraseña incorrectos");
+      return;
+    }
+
+    router.push("/");
+    router.refresh();
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="text-center flex flex-col items-center justify-center bg-bg-card text-text-main rounded-3xl p-5 h-1/3"
-    >
-      <h1 className="text-4xl font-bold p-5 mb-10">Inicia sesión</h1>
+    <div className="bg-bg-card rounded-2xl p-8 w-full max-w-sm">
+      <h1 className="text-3xl font-bold text-text-accent mb-8">Inicia sesión</h1>
+
       {isRegister && (
-        <div className="m-5 -mt-5 bg-green-400 border-3 border-green-300 rounded-xl p-2 w-100">
-          <p className="text-1xl font-bold text-white">
-            Has creado una cuenta correctamente
-          </p>
+        <div className="mb-5 bg-green-900/40 border border-green-700 rounded-xl p-3">
+          <p className="text-sm text-green-400">Cuenta creada correctamente</p>
         </div>
       )}
-      <input
-        value={username}
-        className="border-2 rounded-3xl p-2 m-2 w-100"
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Username"
-      />
-      <input
-        type="password"
-        value={password}
-        className="border-2 rounded-3xl p-2 m-2 w-100"
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-      />
-      <button onClick={() => setIsLogin(false)} className="w-100 text-left p-2">
-        <p className="hover:text-white w-full">No tienes cuenta?</p>
-      </button>
+      {error && (
+        <div className="mb-5 bg-red-900/40 border border-red-700 rounded-xl p-3">
+          <p className="text-sm text-red-400">{error}</p>
+        </div>
+      )}
+
+      <div className="flex flex-col gap-3 mb-4">
+        <input
+          value={username}
+          className="bg-bg-tertiary text-text-main rounded-xl p-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Usuario"
+        />
+        <input
+          type="password"
+          value={password}
+          className="bg-bg-tertiary text-text-main rounded-xl p-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Contraseña"
+        />
+      </div>
+
       <button
         type="submit"
-        className="bg-white text-black px-4 py-2 rounded-3xl m-2 w-100"
+        onClick={handleSubmit}
+        className="bg-btn-primary text-btn-primary-text w-full py-3 rounded-xl font-medium hover:opacity-80 transition-opacity mb-4"
       >
-        Iniciar
+        Iniciar sesión
       </button>
-    </form>
+
+      <button
+        type="button"
+        onClick={() => setIsLogin(false)}
+        className="text-text-secondary hover:text-text-main text-sm transition-colors w-full text-center"
+      >
+        ¿No tienes cuenta? Regístrate
+      </button>
+    </div>
   );
 }

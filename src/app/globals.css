@@ -68,51 +68,49 @@
 }
 
 /* ============================================
-   ROJO — Estilo Ferrari
-   Rojo intenso, carbono, cromo
+   ROJO
    ============================================ */
 [data-theme="red"] {
-  --bg-main: 18 10 8;
-  --bg-header: 26 6 6;
-  --bg-deep: 12 6 4;
-  --bg-card: 26 6 6;
-  --bg-tertiary: 40 18 10;
+  --bg-main: 20 13 13;
+  --bg-header: 12 8 8;
+  --bg-deep: 13 8 8;
+  --bg-card: 28 17 17;
+  --bg-tertiary: 46 28 28;
 
-  --text-main: 255 245 200;
-  --text-secondary: 200 160 100;
+  --text-main: 225 210 210;
+  --text-secondary: 148 120 120;
   --text-accent: 255 255 255;
 
-  --accent: 255 188 0;
-  --accent-hover: 255 210 30;
+  --accent: 220 45 45;
+  --accent-hover: 240 65 65;
 
-  --btn-primary: 255 188 0;
-  --btn-primary-text: 18 10 8;
-  --btn-danger: 196 18 18;
-  --btn-danger-text: 255 245 200;
+  --btn-primary: 200 35 35;
+  --btn-primary-text: 255 255 255;
+  --btn-danger: 160 25 25;
+  --btn-danger-text: 255 255 255;
 }
 
 /* ============================================
-   VERDE — Estilo Starbucks
-   Verde oscuro, crema, kraft
+   VERDE
    ============================================ */
 [data-theme="green"] {
-  --bg-main: 10 26 18;
-  --bg-header: 6 18 12;
-  --bg-deep: 4 14 10;
-  --bg-card: 6 18 12;
-  --bg-tertiary: 20 48 32;
+  --bg-main: 12 20 15;
+  --bg-header: 8 14 10;
+  --bg-deep: 8 14 11;
+  --bg-card: 17 28 21;
+  --bg-tertiary: 26 45 34;
 
-  --text-main: 240 230 210;
-  --text-secondary: 160 180 150;
-  --text-accent: 255 250 235;
+  --text-main: 210 225 216;
+  --text-secondary: 120 148 132;
+  --text-accent: 255 255 255;
 
-  --accent: 0 168 90;
-  --accent-hover: 0 190 110;
+  --accent: 0 195 95;
+  --accent-hover: 0 218 110;
 
-  --btn-primary: 0 112 74;
-  --btn-primary-text: 240 230 210;
-  --btn-danger: 140 40 30;
-  --btn-danger-text: 255 235 220;
+  --btn-primary: 0 165 80;
+  --btn-primary-text: 255 255 255;
+  --btn-danger: 180 40 40;
+  --btn-danger-text: 255 255 255;
 }
 
 /* ============================================
@@ -140,104 +138,121 @@
 }
 
 /* ============================================
-   YELLOW — Estilo McDonald's
-   Rojo oscuro, amarillo dorado, negro
+   YELLOW
    ============================================ */
 [data-theme="yellow"] {
-  --bg-main: 22 20 14;
-  --bg-header: 30 28 18;
-  --bg-deep: 14 12 8;
-  --bg-card: 30 28 18;
-  --bg-tertiary: 48 42 28;
+  --bg-main: 20 18 11;
+  --bg-header: 12 11 6;
+  --bg-deep: 14 12 7;
+  --bg-card: 28 25 15;
+  --bg-tertiary: 44 40 22;
 
-  --text-main: 220 215 230;
-  --text-secondary: 140 130 160;
-  --text-accent: 0 0 0;
+  --text-main: 225 220 198;
+  --text-secondary: 148 140 110;
+  --text-accent: 255 255 255;
 
-  --accent: 255 220 0;
-  --accent-hover: 255 240 60;
+  --accent: 255 215 0;
+  --accent-hover: 255 235 50;
 
-  --btn-primary: 255 220 0;
-  --btn-primary-text: 0 0 0;
-  --btn-danger: 255 0 100;
+  --btn-primary: 230 190 0;
+  --btn-primary-text: 18 16 5;
+  --btn-danger: 200 45 30;
   --btn-danger-text: 255 255 255;
 }
 
 /* ============================================
-   PURPLE — Estilo propio
-   Morado profundo, lavanda, magenta suave
+   PURPLE
    ============================================ */
 [data-theme="purple"] {
   --bg-main: 18 16 28;
-  --bg-header: 26 22 40;
+  --bg-header: 12 10 20;
   --bg-deep: 12 10 20;
   --bg-card: 26 22 40;
   --bg-tertiary: 40 35 62;
 
-  --text-main: 220 215 230;
-  --text-secondary: 140 130 160;
-  --text-accent: 0 0 0;
+  --text-main: 220 215 235;
+  --text-secondary: 140 130 165;
+  --text-accent: 255 255 255;
 
-  --accent: 255 220 0;
-  --accent-hover: 255 240 60;
+  --accent: 160 80 255;
+  --accent-hover: 180 105 255;
 
-  --btn-primary: 255 220 0;
-  --btn-primary-text: 0 0 0;
-  --btn-danger: 255 0 100;
+  --btn-primary: 140 65 240;
+  --btn-primary-text: 255 255 255;
+  --btn-danger: 220 40 80;
   --btn-danger-text: 255 255 255;
 }
 
 /* ============================================
-   BROWN — Estilo Burger King
-   Marrón tostado, naranja llama, crema
+   TEAL
    ============================================ */
-[data-theme="brown"] {
-  --bg-main: 20 12 6;
-  --bg-header: 30 18 8;
-  --bg-deep: 14 8 4;
-  --bg-card: 30 18 8;
-  --bg-tertiary: 48 28 12;
+[data-theme="teal"] {
+  --bg-main: 10 20 20;
+  --bg-header: 6 13 13;
+  --bg-deep: 7 14 14;
+  --bg-card: 15 28 28;
+  --bg-tertiary: 24 44 44;
 
-  --text-main: 255 240 210;
-  --text-secondary: 190 155 100;
+  --text-main: 210 228 226;
+  --text-secondary: 118 148 145;
   --text-accent: 255 255 255;
 
-  --accent: 210 90 20;
-  --accent-hover: 240 110 30;
+  --accent: 0 188 185;
+  --accent-hover: 0 212 208;
 
-  --btn-primary: 210 90 20;
-  --btn-primary-text: 255 240 210;
-  --btn-danger: 160 30 20;
-  --btn-danger-text: 255 230 200;
+  --btn-primary: 0 165 162;
+  --btn-primary-text: 255 255 255;
+  --btn-danger: 180 40 40;
+  --btn-danger-text: 255 255 255;
 }
 
-/* RED — Ferrari */
+/* ============================================
+   LIGHT
+   ============================================ */
+[data-theme="light"] {
+  --bg-main: 240 240 246;
+  --bg-header: 255 255 255;
+  --bg-deep: 224 224 236;
+  --bg-card: 255 255 255;
+  --bg-tertiary: 224 224 236;
+
+  --text-main: 22 22 30;
+  --text-secondary: 95 95 110;
+  --text-accent: 255 255 255;
+
+  --accent: 99 102 241;
+  --accent-hover: 118 120 255;
+
+  --btn-primary: 79 70 229;
+  --btn-primary-text: 255 255 255;
+  --btn-danger: 210 38 38;
+  --btn-danger-text: 255 255 255;
+}
+
 .button-red {
-  background-color: rgb(14 10 10);
-  border: 1px solid rgb(204 0 0);
-  color: rgb(245 235 230);
+  background-color: rgb(20 13 13);
+  border: 1px solid rgb(220 45 45);
+  color: rgb(225 210 210);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 .button-red:hover {
-  background-color: rgb(204 0 0);
-  color: rgb(14 10 10);
+  background-color: rgb(220 45 45);
+  color: rgb(255 255 255);
 }
 
-/* GREEN — Starbucks */
 .button-green {
-  background-color: rgb(10 26 18);
-  border: 1px solid rgb(0 168 90);
-  color: rgb(240 230 210);
+  background-color: rgb(12 20 15);
+  border: 1px solid rgb(0 195 95);
+  color: rgb(210 225 216);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 .button-green:hover {
-  background-color: rgb(0 168 90);
-  color: rgb(10 26 18);
+  background-color: rgb(0 195 95);
+  color: rgb(255 255 255);
 }
 
-/* DARK */
 .button-dark {
   background-color: rgb(20 20 22);
   border: 1px solid rgb(80 80 90);
@@ -247,10 +262,9 @@
 }
 .button-dark:hover {
   background-color: rgb(80 80 90);
-  color: rgb(20 20 22);
+  color: rgb(255 255 255);
 }
 
-/* BLUE — GitHub */
 .button-blue {
   background-color: rgb(13 17 23);
   border: 1px solid rgb(31 111 235);
@@ -260,44 +274,53 @@
 }
 .button-blue:hover {
   background-color: rgb(31 111 235);
-  color: rgb(13 17 23);
+  color: rgb(255 255 255);
 }
 
-/* YELLOW — Cyberpunk */
 .button-yellow {
-  background-color: rgb(22 20 14);
-  border: 1px solid rgb(255 220 0);
-  color: rgb(220 215 230);
+  background-color: rgb(20 18 11);
+  border: 1px solid rgb(255 215 0);
+  color: rgb(225 220 198);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 .button-yellow:hover {
-  background-color: rgb(255 220 0);
-  color: rgb(22 20 14);
+  background-color: rgb(255 215 0);
+  color: rgb(18 16 5);
 }
 
-/* PURPLE */
 .button-purple {
-  background-color: rgb(16 10 28);
+  background-color: rgb(18 16 28);
   border: 1px solid rgb(160 80 255);
-  color: rgb(230 220 255);
+  color: rgb(220 215 235);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 .button-purple:hover {
   background-color: rgb(160 80 255);
-  color: rgb(16 10 28);
+  color: rgb(255 255 255);
 }
 
-/* BROWN — Burger King */
-.button-brown {
-  background-color: rgb(20 12 6);
-  border: 1px solid rgb(210 90 20);
-  color: rgb(255 240 210);
+.button-teal {
+  background-color: rgb(10 20 20);
+  border: 1px solid rgb(0 188 185);
+  color: rgb(210 228 226);
   transition: all 0.2s ease;
   cursor: pointer;
 }
-.button-brown:hover {
-  background-color: rgb(210 90 20);
-  color: rgb(20 12 6);
+.button-teal:hover {
+  background-color: rgb(0 188 185);
+  color: rgb(255 255 255);
+}
+
+.button-light {
+  background-color: rgb(242 242 247);
+  border: 1px solid rgb(80 80 200);
+  color: rgb(28 28 35);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.button-light:hover {
+  background-color: rgb(80 80 200);
+  color: rgb(255 255 255);
 }

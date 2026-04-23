@@ -1,12 +1,12 @@
-"use client";
+'use client'
 
-import { CATEGORIES, CONSOLES } from "@/constants";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-import Link from "next/link";
+import { CATEGORIES, CONSOLES } from '@/constants'
+import { useSession } from 'next-auth/react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 export default function MainSidePanel() {
-  const { data: session } = useSession();
+  const { data: session } = useSession()
 
   return (
     <aside className="bg-bg-card m-2 rounded-lg flex flex-col items-center">
@@ -42,10 +42,7 @@ export default function MainSidePanel() {
             </Link>
             <ul className="pl-5 flex flex-col gap-1 mt-1">
               {CONSOLES.map((console) => (
-                <li
-                  key={console.id}
-                  className="transition-transform duration-200 hover:scale-105"
-                >
+                <li key={console.id} className="transition-transform duration-200 hover:scale-105">
                   <Link
                     href={`/${category.slug}/${console.id}`}
                     className="flex items-center gap-2 text-base text-gray-400"
@@ -66,5 +63,5 @@ export default function MainSidePanel() {
         ))}
       </ul>
     </aside>
-  );
+  )
 }

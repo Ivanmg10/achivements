@@ -30,11 +30,14 @@ export function ThemeProvider({
   // console.log("Current theme:", session?.user.theme);
 
   useEffect(() => {
-    // if (session?.user?.theme) {
-    //   setTheme(session.user.theme as Theme);
-    // }
+    if (session?.user?.theme) {
+      setTheme(session.user.theme as Theme);
+    }
+  }, [session?.user?.theme]);
+
+  useEffect(() => {
     document.documentElement.dataset.theme = theme;
-  }, [theme, session?.user?.theme]);
+  }, [theme]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>

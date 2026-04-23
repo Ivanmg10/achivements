@@ -62,6 +62,7 @@ export const authOptions: NextAuthOptions = {
 
       if (trigger === "update" && session !== undefined) {
         token.raUser = session?.raUser ?? {};
+        if (session?.theme) token.theme = session.theme;
       }
 
       return token;
@@ -85,6 +86,6 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/login",
+    signIn: "/authPage",
   },
 };

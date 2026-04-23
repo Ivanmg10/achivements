@@ -5,7 +5,8 @@ export type Theme =
   | "green"
   | "dark"
   | "purple"
-  | "brown";
+  | "teal"
+  | "light";
 
 type Nullable<T> = {
   [K in keyof T]: T[K] | null;

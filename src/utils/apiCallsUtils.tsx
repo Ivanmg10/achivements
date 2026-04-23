@@ -103,13 +103,15 @@ export const getAllGamesPlayed = async (
 };
 
 export const groupByConsole = (games: RetroAchievementsGameCompleted[]) => {
-  const grouped = games.reduce(
-    (acc, game) => {
-      acc[game.ConsoleName] = (acc[game.ConsoleName] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
+  const grouped = games
+    .filter((game) => game.ConsoleName !== "Events")
+    .reduce(
+      (acc, game) => {
+        acc[game.ConsoleName] = (acc[game.ConsoleName] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
   return Object.entries(grouped).map(([name, value]) => ({ name, value }));
 };
