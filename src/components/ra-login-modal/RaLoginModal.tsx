@@ -71,7 +71,7 @@ export default function RaLoginModal({
         {!isLoading ? (
           <button
             type="submit"
-            className="bg-bg-main p-3 rounded-lg hover:duration-500 hover:transform hover:scale-102 transition duration-500"
+            className="bg-bg-main p-3 rounded-lg hover:scale-[1.03] transition-transform duration-200"
           >
             Iniciar sesion
           </button>

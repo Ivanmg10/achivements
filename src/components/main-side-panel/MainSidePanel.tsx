@@ -25,7 +25,7 @@ export default function MainSidePanel() {
         </div>
         <Link
           href="/user"
-          className="w-[90%] text-center bg-bg-main px-2 py-2 rounded-3xl hover:duration-200 hover:bg-bg-card border-bg-card border-2 hover:border-bg-main transition duration-200"
+          className="w-[90%] text-center bg-bg-main px-2 py-2 rounded-3xl border-2 border-bg-card hover:scale-[1.03] transition-transform duration-200"
         >
           Ajustes de usuario
         </Link>

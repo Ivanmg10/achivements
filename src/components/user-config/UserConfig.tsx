@@ -15,19 +15,19 @@ export default function UserConfig() {
           <h2 className="text-2xl mb-4">Configuración de cuenta</h2>
           <ul className="space-y-2">
             <li>
-              <button className="w-full text-left bg-bg-card p-3 rounded-3xl hover:duration-500 hover:transform hover:scale-102 transition duration-500">
+              <button className="w-full text-left bg-bg-card p-3 rounded-3xl hover:scale-[1.03] transition-transform duration-200">
                 Cambiar contraseña
               </button>
             </li>
             <li>
-              <button className="w-full text-left bg-bg-card p-3 rounded-3xl hover:duration-500 hover:transform hover:scale-102 transition duration-500">
+              <button className="w-full text-left bg-bg-card p-3 rounded-3xl hover:scale-[1.03] transition-transform duration-200">
                 Configurar notificaciones
               </button>
             </li>
             <li>
               <button
                 onClick={() => signOut()}
-                className="w-full text-left bg-red-500 hover:bg-red-700 text-white font-bold p-3 mt-5 rounded-3xl"
+                className="w-full text-left bg-red-500 text-white font-bold p-3 mt-5 rounded-3xl hover:scale-[1.03] transition-transform duration-200"
               >
                 Cerrar sesion
               </button>
@@ -37,7 +37,7 @@ export default function UserConfig() {
                 <li>
                   <button
                     onClick={() => unlinkRaUser(update)}
-                    className="w-full text-left bg-red-500 hover:bg-red-700 text-white font-bold p-3 rounded-3xl"
+                    className="w-full text-left bg-red-500 text-white font-bold p-3 rounded-3xl hover:scale-[1.03] transition-transform duration-200"
                   >
                     Cerrar sesion en RA
                   </button>

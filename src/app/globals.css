@@ -237,8 +237,7 @@
   cursor: pointer;
 }
 .button-red:hover {
-  background-color: rgb(220 45 45);
-  color: rgb(255 255 255);
+  transform: scale(1.03);
 }
 
 .button-green {
@@ -249,8 +248,7 @@
   cursor: pointer;
 }
 .button-green:hover {
-  background-color: rgb(0 195 95);
-  color: rgb(255 255 255);
+  transform: scale(1.03);
 }
 
 .button-dark {
@@ -261,8 +259,7 @@
   cursor: pointer;
 }
 .button-dark:hover {
-  background-color: rgb(80 80 90);
-  color: rgb(255 255 255);
+  transform: scale(1.03);
 }
 
 .button-blue {
@@ -273,8 +270,7 @@
   cursor: pointer;
 }
 .button-blue:hover {
-  background-color: rgb(31 111 235);
-  color: rgb(255 255 255);
+  transform: scale(1.03);
 }
 
 .button-yellow {
@@ -285,8 +281,7 @@
   cursor: pointer;
 }
 .button-yellow:hover {
-  background-color: rgb(255 215 0);
-  color: rgb(18 16 5);
+  transform: scale(1.03);
 }
 
 .button-purple {
@@ -297,8 +292,7 @@
   cursor: pointer;
 }
 .button-purple:hover {
-  background-color: rgb(160 80 255);
-  color: rgb(255 255 255);
+  transform: scale(1.03);
 }
 
 .button-teal {
@@ -309,8 +303,7 @@
   cursor: pointer;
 }
 .button-teal:hover {
-  background-color: rgb(0 188 185);
-  color: rgb(255 255 255);
+  transform: scale(1.03);
 }
 
 .button-light {
@@ -321,6 +314,5 @@
   cursor: pointer;
 }
 .button-light:hover {
-  background-color: rgb(80 80 200);
-  color: rgb(255 255 255);
+  transform: scale(1.03);
 }

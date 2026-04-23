@@ -69,7 +69,7 @@ export default function LoginUserForm({
       <button
         type="submit"
         onClick={handleSubmit}
-        className="bg-btn-primary text-btn-primary-text w-full py-3 rounded-xl font-medium hover:opacity-80 transition-opacity mb-4"
+        className="bg-btn-primary text-btn-primary-text w-full py-3 rounded-xl font-medium hover:scale-[1.02] transition-transform duration-200 mb-4"
       >
         Iniciar sesión
       </button>

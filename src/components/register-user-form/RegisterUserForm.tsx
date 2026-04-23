@@ -69,7 +69,7 @@ export default function RegisterUserForm({
 
         <button
           type="submit"
-          className="bg-btn-primary text-btn-primary-text w-full py-3 rounded-xl font-medium hover:opacity-80 transition-opacity mt-1"
+          className="bg-btn-primary text-btn-primary-text w-full py-3 rounded-xl font-medium hover:scale-[1.02] transition-transform duration-200 mt-1"
         >
           Crear cuenta
         </button>

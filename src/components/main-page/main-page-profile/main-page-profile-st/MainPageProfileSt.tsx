@@ -6,7 +6,7 @@ export default function MainPageProfileSt() {
       <h2 className="text-xl p-1">Steam</h2>
       <Link
         href="/user"
-        className="w-full text-left bg-bg-card p-3 rounded-3xl hover:duration-500 hover:transform hover:scale-102 transition duration-500"
+        className="w-full text-left bg-bg-card p-3 rounded-3xl hover:scale-[1.03] transition-transform duration-200"
       >
         Iniciar sesion con Steam
       </Link>

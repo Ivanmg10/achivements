@@ -1,15 +1,15 @@
-import { RetroAchievementsGameWithAchievements } from "@/types/types";
-import Image from "next/image";
-import Link from "next/link";
+import { RetroAchievementsGameWithAchievements } from '@/types/types'
+import Image from 'next/image'
+import Link from 'next/link'
 
 export default function MainPageProgressionCard({
   game,
 }: {
-  game: RetroAchievementsGameWithAchievements;
+  game: RetroAchievementsGameWithAchievements
 }) {
   return (
     <Link
-      className="flex flex-col items-center justify-center gap-5 p-5 bg-bg-main rounded-xl w-[98%] m-2 hover:bg-bg-card transition-all duration-300 hover:border-bg-main border-2 border-bg-main cursor-pointer min-h-1/3"
+      className="flex flex-col items-center justify-center gap-5 p-5 bg-bg-main rounded-xl w-[98%] m-2 border-2 border-bg-main cursor-pointer min-h-1/3 hover:scale-[1.01] transition-transform duration-200"
       key={game.ID}
       href={`/gameInfo/${game.ID}`}
     >
@@ -25,9 +25,7 @@ export default function MainPageProgressionCard({
         )}
         <div className="w-full">
           <div>
-            <p className="text-xl">
-              {game?.GameTitle ? game?.GameTitle : game?.Title}
-            </p>
+            <p className="text-xl">{game?.GameTitle ? game?.GameTitle : game?.Title}</p>
             <p className="text-lg">{game?.ConsoleName}</p>
           </div>
 
@@ -44,5 +42,5 @@ export default function MainPageProgressionCard({
         </div>
       </div>
     </Link>
-  );
+  )
 }
