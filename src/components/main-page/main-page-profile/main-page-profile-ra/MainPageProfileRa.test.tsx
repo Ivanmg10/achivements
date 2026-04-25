@@ -28,18 +28,18 @@ const mockGame = {
 } as any;
 
 test("renders user info when user present", () => {
-  render(<MainPageProfileRa user={mockUser} game={mockGame} />);
+  render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} />);
   expect(screen.getByText("IvanXMarine")).toBeInTheDocument();
   expect(screen.getByText("272 puntos totales")).toBeInTheDocument();
   expect(screen.getByText("Playing level 1")).toBeInTheDocument();
 });
 
 test("renders login link when no user", () => {
-  render(<MainPageProfileRa user={null} game={null} />);
+  render(<MainPageProfileRa user={null} game={null} recentAchievements={[]} />);
   expect(screen.getByText("Iniciar sesion con Retroachivements")).toBeInTheDocument();
 });
 
 test("renders without UserPic", () => {
-  render(<MainPageProfileRa user={{ ...mockUser, UserPic: undefined as any }} game={mockGame} />);
+  render(<MainPageProfileRa user={{ ...mockUser, UserPic: undefined as any }} game={mockGame} recentAchievements={[]} />);
   expect(screen.getByText("IvanXMarine")).toBeInTheDocument();
 });

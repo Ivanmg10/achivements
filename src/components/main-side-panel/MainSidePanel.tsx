@@ -10,7 +10,7 @@ export default function MainSidePanel() {
 
   return (
     <aside className="bg-bg-card m-2 rounded-lg flex flex-col items-center">
-      <section className="flex flex-col items-center">
+      <section className="flex flex-col items-center w-full">
         <div className="flex p-5 gap-3 justify-between items-start">
           <h1 className="text-xl">Bienvenido {session?.user?.raUser?.User}</h1>
           {session?.user?.raUser?.UserPic && (
@@ -24,10 +24,10 @@ export default function MainSidePanel() {
           )}
         </div>
         <Link
-          href="/user"
+          href={session === undefined ? '/authPage' : '/user'}
           className="w-[90%] text-center bg-bg-main px-2 py-2 rounded-3xl border-2 border-bg-card hover:scale-[1.03] transition-transform duration-200"
         >
-          Ajustes de usuario
+          {session === undefined ? 'Iniciar session' : 'Ajustes de usuario'}
         </Link>
       </section>
       <hr className="border-b-2 border-white w-[95%] m-5" />

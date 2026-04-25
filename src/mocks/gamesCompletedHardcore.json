@@ -1,27 +1,5 @@
 [
   {
-    "GameID": 5578,
-    "Title": "Need for Speed: Carbon - Collectors Edition",
-    "ImageIcon": "/Images/108704.png",
-    "ConsoleID": 21,
-    "ConsoleName": "PlayStation 2",
-    "MaxPossible": 109,
-    "NumAwarded": 109,
-    "PctWon": "1.0000",
-    "HardcoreMode": "0"
-  },
-  {
-    "GameID": 19010,
-    "Title": "The Simpsons: Hit & Run",
-    "ImageIcon": "/Images/112858.png",
-    "ConsoleID": 21,
-    "ConsoleName": "PlayStation 2",
-    "MaxPossible": 69,
-    "NumAwarded": 69,
-    "PctWon": "1.0000",
-    "HardcoreMode": "0"
-  },
-  {
     "GameID": 515,
     "Title": "Pokémon FireRed Version",
     "ImageIcon": "/Images/105044.png",
@@ -30,6 +8,28 @@
     "MaxPossible": 61,
     "NumAwarded": 61,
     "PctWon": "1.0000",
-    "HardcoreMode": "0"
+    "HardcoreMode": "1"
+  },
+  {
+    "GameID": 723,
+    "Title": "Crash Bandicoot 2: Cortex Strikes Back",
+    "ImageIcon": "/Images/067895.png",
+    "ConsoleID": 12,
+    "ConsoleName": "PlayStation",
+    "MaxPossible": 43,
+    "NumAwarded": 43,
+    "PctWon": "1.0000",
+    "HardcoreMode": "1"
+  },
+  {
+    "GameID": 11332,
+    "Title": "Spyro the Dragon",
+    "ImageIcon": "/Images/074560.png",
+    "ConsoleID": 12,
+    "ConsoleName": "PlayStation",
+    "MaxPossible": 38,
+    "NumAwarded": 38,
+    "PctWon": "1.0000",
+    "HardcoreMode": "1"
   }
 ]

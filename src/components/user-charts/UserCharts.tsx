@@ -25,8 +25,6 @@ export default function UserCharts() {
     }
   }, [session, status])
 
-  console.log(recentAchievements)
-
   return (
     <section className="bg-bg-card w-[95%] rounded-3xl pt-3 pb-3 grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2 gap-5">
       <div className="flex flex-col items-center justify-center md:justify-start md:items-start pl-3">

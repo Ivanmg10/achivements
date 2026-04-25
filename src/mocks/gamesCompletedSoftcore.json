@@ -20,16 +20,5 @@
     "NumAwarded": 69,
     "PctWon": "1.0000",
     "HardcoreMode": "0"
-  },
-  {
-    "GameID": 515,
-    "Title": "Pokémon FireRed Version",
-    "ImageIcon": "/Images/105044.png",
-    "ConsoleID": 5,
-    "ConsoleName": "Game Boy Advance",
-    "MaxPossible": 61,
-    "NumAwarded": 61,
-    "PctWon": "1.0000",
-    "HardcoreMode": "0"
   }
 ]

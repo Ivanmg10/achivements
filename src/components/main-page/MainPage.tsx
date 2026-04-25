@@ -1,7 +1,6 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import MainPageProgression from "./main-page-progression/MainPageProgression";
 import Spinner from "../main-spinner/Spinner";
 import MainPageRecommended from "./main-page-games/MainPageGames";
 import MainPageProfile from "./main-page-profile/MainPageProfile";
@@ -27,10 +26,9 @@ export default function MainPage() {
       </main>
     );
   return (
-    <main className="min-h-screen grid grid-cols-6 grid-rows-5 text-text-main">
-      <MainPageProgression />
-      <MainPageProfile />
+    <main className="flex-1 min-h-0 grid grid-cols-6 grid-rows-[auto_1fr] text-text-main">
       <MainPageWantToPlay />
+      <MainPageProfile />
       <MainPageRecommended />
       <MainPageCompleted />
     </main>
