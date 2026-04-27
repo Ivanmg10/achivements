@@ -1,25 +1,37 @@
 'use client'
 
-import { CATEGORIES, CONSOLES } from '@/constants'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { useRecentAchievements } from '@/hooks/useRecentAchievements'
+import { calcStreak } from '@/utils/utils'
+
+import MainSidePanelCategories from './main-side-panel-categories/MainSidePanelCategories'
+import MainSidePanelLastAchievement from './main-side-panel-last-achievement/MainSidePanelLastAchievement'
+import MainSidePanelStats from './main-side-panel-stats/MainSidePanelStats'
+
 export default function MainSidePanel() {
   const { data: session } = useSession()
+  const recentAch = useRecentAchievements()
+
+  const raUser = session?.user?.raUser
+  const lastAch = recentAch[0] ?? null
+  const streak = calcStreak(recentAch)
 
   return (
-    <aside className="bg-bg-card m-2 rounded-lg flex flex-col items-center">
+    <aside className="bg-bg-card m-2 rounded-lg flex flex-col items-center gap-4 pb-4">
       <section className="flex flex-col items-center w-full">
-        <div className="flex p-5 gap-3 justify-between items-start">
-          <h1 className="text-xl">Bienvenido {session?.user?.raUser?.User}</h1>
-          {session?.user?.raUser?.UserPic && (
+        <div className="flex p-5 gap-3 justify-between items-start w-full">
+          <h1 className="text-xl">Bienvenido {raUser?.User}</h1>
+          {raUser?.UserPic && (
             <Image
-              src={`https://retroachievements.org${session?.user?.raUser?.UserPic}`}
+              src={`https://retroachievements.org${raUser.UserPic}`}
               alt="user"
               width={100}
               height={100}
               className="w-1/3 rounded-full"
+              unoptimized
             />
           )}
         </div>
@@ -30,38 +42,12 @@ export default function MainSidePanel() {
           {session === undefined ? 'Iniciar session' : 'Ajustes de usuario'}
         </Link>
       </section>
-      <hr className="border-b-2 border-white w-[95%] m-5" />
-      <ul className="pl-5 w-full flex flex-col gap-3 list-none">
-        {CATEGORIES.map((category) => (
-          <li key={category.slug} className="text-lg">
-            <Link
-              className="transition-transform duration-200 hover:scale-105"
-              href={`/${category.slug}`}
-            >
-              {category.label}
-            </Link>
-            <ul className="pl-5 flex flex-col gap-1 mt-1">
-              {CONSOLES.map((console) => (
-                <li key={console.id} className="transition-transform duration-200 hover:scale-105">
-                  <Link
-                    href={`/${category.slug}/${console.id}`}
-                    className="flex items-center gap-2 text-base text-gray-400"
-                  >
-                    <Image
-                      src={console.icon}
-                      alt={console.name}
-                      width={20}
-                      height={20}
-                      className="object-contain"
-                    />
-                    {console.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
+
+      {raUser && <MainSidePanelStats raUser={raUser} streak={streak} />}
+
+      {lastAch && <MainSidePanelLastAchievement achievement={lastAch} />}
+
+      <MainSidePanelCategories />
     </aside>
   )
 }

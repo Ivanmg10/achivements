@@ -1,19 +1,29 @@
-jest.mock("@/mocks/recomendedGames6.json", () => [
+const mockInProgress = [
   {
-    GameTitle: "Sly Cooper",
-    Title: "Sly Cooper",
-    ConsoleID: 21,
-    ConsoleName: "PS2",
+    GameID: 1234,
+    Title: "Crash Bandicoot",
+    GameTitle: "Crash Bandicoot",
+    ConsoleID: 12,
+    ConsoleName: "PlayStation",
     ImageIcon: "/icon.png",
-    ID: "1",
+    MaxPossible: 40,
+    NumAwarded: 18,
+    PctWon: "0.4500",
+    HardcoreMode: "0",
   },
-], { virtual: true });
+];
+
+jest.mock("@/utils/apiCallsUtils", () => ({
+  getGamesInProgress: jest.fn((_session: unknown, setter: (g: unknown[]) => void) => {
+    setter(mockInProgress);
+  }),
+}));
 
 import { render, screen } from "@testing-library/react";
 import MainPageRecommended from "./MainPageGames";
 import { useSession } from "next-auth/react";
 
-test("renders recommended section title", () => {
+test("renders section title", () => {
   (useSession as jest.Mock).mockReturnValue({
     status: "authenticated",
     data: { user: {} },
@@ -22,13 +32,26 @@ test("renders recommended section title", () => {
   expect(screen.getByText("Estoy jugando")).toBeInTheDocument();
 });
 
-test("renders games list when authenticated", () => {
+test("renders in-progress games", () => {
   (useSession as jest.Mock).mockReturnValue({
     status: "authenticated",
     data: { user: {} },
   });
   render(<MainPageRecommended />);
-  expect(screen.getByText("Sly Cooper")).toBeInTheDocument();
+  expect(screen.getByText("Crash Bandicoot")).toBeInTheDocument();
+});
+
+test("shows empty message when no in-progress games", () => {
+  const { getGamesInProgress } = require("@/utils/apiCallsUtils");
+  (getGamesInProgress as jest.Mock).mockImplementationOnce(
+    (_s: unknown, setter: (g: unknown[]) => void) => setter([]),
+  );
+  (useSession as jest.Mock).mockReturnValue({
+    status: "authenticated",
+    data: { user: {} },
+  });
+  render(<MainPageRecommended />);
+  expect(screen.getByText("No hay juegos en progreso")).toBeInTheDocument();
 });
 
 test("hasFetched guard prevents double fetch", () => {

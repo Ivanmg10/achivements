@@ -1,25 +1,17 @@
-jest.mock("@/utils/apiCallsUtils", () => ({
-  getGamesInfoList: jest.fn(),
-}));
+const mockGame = {
+  ID: 1,
+  GameTitle: "Sly Cooper",
+  Title: "Sly Cooper",
+  ConsoleName: "PS2",
+  ImageIcon: "/icon.png",
+  UserCompletion: "50%",
+};
 
-jest.mock("@/mocks/gameProgression.json", () => [
-  {
-    ID: 1,
-    GameTitle: "Sly Cooper",
-    Title: "Sly Cooper",
-    ConsoleName: "PS2",
-    ImageIcon: "/icon.png",
-    UserCompletion: "50%",
-  },
-  {
-    ID: 2,
-    GameTitle: "Jak and Daxter",
-    Title: "Jak and Daxter",
-    ConsoleName: "PS2",
-    ImageIcon: "/icon2.png",
-    UserCompletion: "75%",
-  },
-], { virtual: true });
+jest.mock("@/utils/apiCallsUtils", () => ({
+  getGamesInfoList: jest.fn((_id: string, _session: unknown, setter: (fn: (prev: unknown[]) => unknown[]) => void) => {
+    setter((prev: unknown[]) => [...prev, mockGame]);
+  }),
+}));
 
 import { render, screen } from "@testing-library/react";
 import MainPageProgression from "./MainPageProgression";
@@ -40,7 +32,7 @@ test("renders games when authenticated", () => {
     data: { user: {} },
   });
   render(<MainPageProgression />);
-  expect(screen.getByText("Sly Cooper")).toBeInTheDocument();
+  expect(screen.getAllByText("Sly Cooper").length).toBeGreaterThan(0);
 });
 
 test("hasFetched guard prevents double fetch", () => {

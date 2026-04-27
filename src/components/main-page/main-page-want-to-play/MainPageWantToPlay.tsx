@@ -1,43 +1,22 @@
 'use client'
 
-import { WantToPlayGame } from '@/types/types'
-import { useSession } from 'next-auth/react'
-import { useEffect, useRef, useState } from 'react'
-import MainPageGamesList from '../main-page-games/main-page-games-list/MainPageGamesList'
 import Link from 'next/link'
+import { useRef } from 'react'
+
+import { useResizableList } from '@/hooks/useResizableList'
+import { useWantGames } from '@/hooks/useWantGames'
 
 import Spinner from '@/components/main-spinner/Spinner'
-import { getWantGames } from '@/utils/apiCallsUtils'
+import MainPageGamesList from '../main-page-games/main-page-games-list/MainPageGamesList'
 
 const CARD_HEIGHT_PX = 70
 const HEADER_PX = 60
 const FOOTER_PX = 40
 
 export default function MainPageWantToPlay() {
-  const { status, data: session } = useSession()
-  const [wantGames, setWantGames] = useState<Array<WantToPlayGame>>([])
-  const [error, setError] = useState<string>()
-  const [visibleCount, setVisibleCount] = useState(3)
   const sectionRef = useRef<HTMLElement>(null)
-  const hasFetched = useRef(false)
-
-  useEffect(() => {
-    if (status === 'authenticated' && !hasFetched.current) {
-      hasFetched.current = true
-      getWantGames(session, setWantGames, setError)
-    }
-  }, [status])
-
-  useEffect(() => {
-    if (!sectionRef.current) return
-    const observer = new ResizeObserver(() => {
-      const height = sectionRef.current?.clientHeight ?? 0
-      const available = height - HEADER_PX - FOOTER_PX
-      setVisibleCount(Math.max(1, Math.floor(available / CARD_HEIGHT_PX)))
-    })
-    observer.observe(sectionRef.current)
-    return () => observer.disconnect()
-  }, [])
+  const { wantGames, error } = useWantGames()
+  const visibleCount = useResizableList({ sectionRef, cardHeightPx: CARD_HEIGHT_PX, headerPx: HEADER_PX, footerPx: FOOTER_PX })
 
   if (error) return <p>Error: {error}</p>
   return (

@@ -7,9 +7,6 @@ import {
   RetroAchievementsUserProfile,
   WantToPlayGame,
 } from "@/types/types";
-import { USE_MOCK } from "@/constants";
-import userRAMock from "@/mocks/userRA.json";
-import wantToPlayMock from "@/mocks/wantToPlay.json";
 
 export const getGamesInfo = async (
   gameId: string,
@@ -41,15 +38,8 @@ export const getUserInfo = async (
   setUser: Dispatch<SetStateAction<RetroAchievementsUserProfile | null>>,
   session: Session | null,
 ) => {
-  if (USE_MOCK) {
-    const user = userRAMock;
-    setUser(user);
-    return;
-  } else {
-    const user = await fetch(`/api/getUserProfile`).then((res) => res.json());
-
-    setUser(user);
-  }
+  const user = await fetch(`/api/getUserProfile`).then((res) => res.json());
+  setUser(user);
 };
 
 export const unlinkRaUser = async (
@@ -73,15 +63,38 @@ export const getGamesCompleted = async (
     `/api/getGamesCompleted`,
   ).then((res) => res.json());
 
-  const softcore = completedGames
-    .filter((g) => g.HardcoreMode === "0" && g.PctWon === "1.0000")
-    .slice(0, 3);
   const hardcore = completedGames
-    .filter((g) => g.HardcoreMode === "1" && g.PctWon === "1.0000")
+    .filter((g) => Number(g.HardcoreMode) === 1 && parseFloat(g.PctWon) >= 1)
+    .slice(0, 3);
+  const hardcoreIds = new Set(hardcore.map((g) => g.GameID));
+  const softcore = completedGames
+    .filter(
+      (g) =>
+        Number(g.HardcoreMode) === 0 &&
+        parseFloat(g.PctWon) >= 1 &&
+        !hardcoreIds.has(g.GameID),
+    )
     .slice(0, 3);
 
   setGames(softcore);
   setHardcoreGames(hardcore);
+};
+
+export const getGamesInProgress = async (
+  session: Session | null,
+  setGames: Dispatch<SetStateAction<RetroAchievementsGameCompleted[]>>,
+) => {
+  const games: RetroAchievementsGameCompleted[] = await fetch(
+    `/api/getGamesCompleted`,
+  ).then((res) => res.json());
+
+  const inProgress = games.filter(
+    (g) => Number(g.HardcoreMode) === 0 &&
+           parseFloat(g.PctWon) > 0 &&
+           parseFloat(g.PctWon) < 1,
+  );
+
+  setGames(inProgress);
 };
 
 export const getAllGamesPlayed = async (
@@ -102,36 +115,15 @@ export const getAllGamesPlayed = async (
   setHardcoreGames(hardcore);
 };
 
-export const groupByConsole = (games: RetroAchievementsGameCompleted[]) => {
-  const grouped = games
-    .filter((game) => game.ConsoleName !== "Events")
-    .reduce(
-      (acc, game) => {
-        acc[game.ConsoleName] = (acc[game.ConsoleName] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-
-  return Object.entries(grouped).map(([name, value]) => ({ name, value }));
-};
-
 export const getWantGames = async (
   session: Session | null,
   setWantGames: Dispatch<SetStateAction<Array<WantToPlayGame>>>,
   setError: Dispatch<SetStateAction<string | undefined>>,
 ) => {
   try {
-    let games;
-
-    //FORZAR MOCK
-    if (USE_MOCK) {
-      games = wantToPlayMock;
-    } else {
-      games = await fetch(
-        `/api/getWantPlayGames`,
-      ).then((res) => res.json());
-    }
+    const games = await fetch(`/api/getWantPlayGames`).then((res) =>
+      res.json(),
+    );
 
     const getSliceGames = [...(games?.Results ?? [])]
       .sort(() => Math.random() - 0.5)

@@ -30,7 +30,7 @@ const mockGame = {
 test("renders user info when user present", () => {
   render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} />);
   expect(screen.getByText("IvanXMarine")).toBeInTheDocument();
-  expect(screen.getByText("272 puntos totales")).toBeInTheDocument();
+  expect(screen.getByText("Puntos hardcore")).toBeInTheDocument();
   expect(screen.getByText("Playing level 1")).toBeInTheDocument();
 });
 

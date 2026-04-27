@@ -1,7 +1,7 @@
 'use client'
 
 import { RetroAchievementsGameCompleted } from '@/types/types'
-import { groupByConsole } from '@/utils/apiCallsUtils'
+import { groupByConsole } from '@/utils/utils'
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 
 const COLORS = [
