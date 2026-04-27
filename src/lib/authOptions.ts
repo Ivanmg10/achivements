@@ -61,7 +61,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (trigger === "update" && session !== undefined) {
-        token.raUser = session?.raUser ?? {};
+        if ("raUser" in session) token.raUser = session.raUser ?? {};
         if (session?.theme) token.theme = session.theme;
       }
 

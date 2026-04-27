@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+import { withCache } from "@/lib/raCache";
+
+const TTL = 10 * 60 * 1000;
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -10,14 +13,13 @@ export async function GET(request: NextRequest) {
   }
 
   const gameId = request.nextUrl.searchParams.get("gameId");
-  const username = session.user.rausername;
-  const publicKey = session.user.raid;
+  const { rausername, raid, id } = session.user;
 
-  const response = await fetch(
-    `https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=${username}&y=${publicKey}&g=${gameId}`,
+  const data = await withCache(`gameProgression:${id}:${gameId}`, TTL, () =>
+    fetch(
+      `https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=${rausername}&y=${raid}&g=${gameId}`,
+    ).then((r) => r.json()),
   );
-
-  const data = await response.json();
 
   return NextResponse.json(data);
 }

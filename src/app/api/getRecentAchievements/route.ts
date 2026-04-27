@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+import { withCache } from "@/lib/raCache";
+
+const TTL = 5 * 60 * 1000;
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -8,14 +11,13 @@ export async function GET() {
     return NextResponse.json({ message: "No autorizado" }, { status: 401 });
   }
 
-  const username = session.user.rausername;
-  const publicKey = session.user.raid;
+  const { rausername, raid, id } = session.user;
 
-  const response = await fetch(
-    `https://retroachievements.org/API/API_GetUserRecentAchievements.php?u=${username}&y=${publicKey}&m=10080&c=100`,
+  const data = await withCache(`recentAch:${id}`, TTL, () =>
+    fetch(
+      `https://retroachievements.org/API/API_GetUserRecentAchievements.php?u=${rausername}&y=${raid}&m=10080&c=100`,
+    ).then((r) => r.json()),
   );
-
-  const data = await response.json();
 
   return NextResponse.json(data);
 }
