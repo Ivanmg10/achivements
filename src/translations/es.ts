@@ -1,0 +1,150 @@
+import { Translations } from './en'
+
+export const es: Translations = {
+  header: {
+    signIn: 'Iniciar sesión',
+  },
+  sidePanel: {
+    welcome: 'Bienvenido',
+    signIn: 'Iniciar sesión',
+    userSettings: 'Ajustes de usuario',
+    searchConsole: 'Buscar consola…',
+    noResults: 'Sin resultados',
+    streak: 'Racha',
+  },
+  categories: {
+    wantToPlay: 'Quiero jugar',
+    playing: 'Estoy jugando',
+    completed: 'He completado',
+  },
+  mainPage: {
+    playing: 'Estoy jugando',
+    noGamesInProgress: 'No hay juegos en progreso',
+    seeMore: 'Ver mas...',
+    wantToPlay: 'Quiero jugar',
+    completed: 'Completados',
+    normal: 'Normal',
+    hardcore: 'Hardcore',
+    noGamesCompleted: 'No hay juegos completados en modo {tab}',
+  },
+  userData: {
+    welcome: 'Bienvenido',
+    email: 'Email',
+    theme: 'Tema',
+    totalPoints: 'Puntos totales',
+    totalSoftcorePoints: 'Puntos totales softcore',
+    signInRA: 'Iniciar sesion en Retroachivements',
+    signInSteam: 'Iniciar sesion en Steam',
+  },
+  userTheme: {
+    theme: 'Tema',
+  },
+  userConfig: {
+    accountSettings: 'Configuración de cuenta',
+    changePassword: 'Cambiar contraseña',
+    language: 'Idioma',
+    signOut: 'Cerrar sesion',
+    signOutRA: 'Cerrar sesion en RA',
+  },
+  userCharts: {
+    games: 'Juegos',
+    recentAchievements: 'Logros recientes',
+  },
+  gameInfoTable: {
+    sortOrder: 'Orden',
+    sortPoints: 'Puntos',
+    sortRarity: 'Rareza',
+    filterAll: 'Todos',
+    filterEarned: 'Obtenidos',
+    filterUnearned: 'Sin obtener',
+    headerIcon: 'Icono',
+    headerAchievement: 'Logro',
+    headerPlayers: 'Jugadores',
+    headerPoints: 'Puntos',
+    headerEarned: 'Obtenido',
+    missableWarning: '⚠ Logros que se pueden perder',
+  },
+  achievement: {
+    progression: 'Progresión',
+    winCondition: 'Victoria',
+    missable: 'Perdible',
+    completed: 'Completado',
+    players: 'jugadores',
+    inHardcore: 'en hardcore',
+    haveIt: '% lo tienen',
+    notEarned: 'Sin obtener',
+  },
+  raLoginModal: {
+    title: 'Iniciar sesion en Retroachivements',
+    username: 'Usuario',
+    signIn: 'Iniciar sesion',
+  },
+  loginForm: {
+    title: 'Inicia sesión',
+    accountCreated: 'Cuenta creada correctamente',
+    invalidCredentials: 'Usuario o contraseña incorrectos',
+    username: 'Usuario',
+    password: 'Contraseña',
+    signIn: 'Iniciar sesión',
+    noAccount: '¿No tienes cuenta? Regístrate',
+  },
+  registerForm: {
+    title: 'Registro',
+    username: 'Nombre de usuario',
+    password: 'Contraseña',
+    invitationCode: 'Código de invitación (si aplica)',
+    createAccount: 'Crear cuenta',
+    errorCreating: 'Error al crear la cuenta',
+    alreadyHaveAccount: '¿Ya tienes cuenta? Inicia sesión',
+  },
+  categoryPage: {
+    noWantToPlay: 'No tienes juegos que quieras jugar en esta consola',
+    noPlaying: 'No estas jugando ningun juego en esta consola',
+    noCompleted: 'No has completado ningun juego en esta consola',
+  },
+  statusGameItem: {
+    achievements: 'logros',
+    noPublishedAchievements: 'Sin logros publicados',
+  },
+  gameInfoPage: {
+    retry: 'Reintentar',
+  },
+  pieChart: {
+    noData: 'Sin datos',
+  },
+  profileStats: {
+    hardcorePoints: 'Puntos hardcore',
+    truePoints: 'Puntos verdaderos',
+    softcorePoints: 'Puntos softcore',
+    hardcoreRatio: 'Ratio hardcore',
+  },
+  profileRa: {
+    memberSince: 'Miembro desde',
+    contributions: 'Contribuciones',
+    achievementsCreated: 'Logros creados',
+    pointsContributed: 'Puntos aportados',
+    signIn: 'Iniciar sesion con Retroachivements',
+    playingNow: 'Jugando ahora',
+  },
+  lineChart: {
+    achievementsLast7Days: '{total} logros en los últimos 7 días',
+    noActivity: 'Sin actividad esta semana',
+    achievements: 'logros',
+  },
+  profileSt: {
+    signIn: 'Iniciar sesion con Steam',
+  },
+  progression: {
+    recentProgress: 'Tus progresos recientes',
+  },
+  gamesList: {
+    achievements: 'logros',
+  },
+  mainStart: {
+    welcome: 'Bienvenido',
+    description: 'Una aplicación para ver tus logros y progresos en retroachivements y steam',
+  },
+  profileAchievements: {
+    recentAchievements: 'Logros recientes',
+  },
+}

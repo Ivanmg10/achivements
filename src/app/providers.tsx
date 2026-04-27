@@ -1,6 +1,7 @@
 'use client'
 
 import { ThemeProvider } from '@/context/ThemeContext'
+import { LanguageProvider } from '@/context/LanguageContext'
 import { SessionProvider } from 'next-auth/react'
 import { useEffect } from 'react'
 
@@ -14,7 +15,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <SessionProvider>
-      <ThemeProvider defaultTheme="dark">{children}</ThemeProvider>
+      <LanguageProvider>
+        <ThemeProvider defaultTheme="dark">{children}</ThemeProvider>
+      </LanguageProvider>
     </SessionProvider>
   )
 }

@@ -1,0 +1,150 @@
+export const en = {
+  header: {
+    signIn: 'Sign in',
+  },
+  sidePanel: {
+    welcome: 'Welcome',
+    signIn: 'Sign in',
+    userSettings: 'User settings',
+    searchConsole: 'Search console…',
+    noResults: 'No results',
+    streak: 'Streak',
+  },
+  categories: {
+    wantToPlay: 'Want to play',
+    playing: 'Playing',
+    completed: 'Completed',
+  },
+  mainPage: {
+    playing: 'Playing',
+    noGamesInProgress: 'No games in progress',
+    seeMore: 'See more...',
+    wantToPlay: 'Want to play',
+    completed: 'Completed',
+    normal: 'Normal',
+    hardcore: 'Hardcore',
+    noGamesCompleted: 'No games completed in {tab} mode',
+  },
+  userData: {
+    welcome: 'Welcome',
+    email: 'Email',
+    theme: 'Theme',
+    totalPoints: 'Total points',
+    totalSoftcorePoints: 'Total softcore points',
+    signInRA: 'Sign in to RetroAchievements',
+    signInSteam: 'Sign in to Steam',
+  },
+  userTheme: {
+    theme: 'Theme',
+  },
+  userConfig: {
+    accountSettings: 'Account settings',
+    changePassword: 'Change password',
+    language: 'Language',
+    signOut: 'Sign out',
+    signOutRA: 'Sign out from RA',
+  },
+  userCharts: {
+    games: 'Games',
+    recentAchievements: 'Recent achievements',
+  },
+  gameInfoTable: {
+    sortOrder: 'Order',
+    sortPoints: 'Points',
+    sortRarity: 'Rarity',
+    filterAll: 'All',
+    filterEarned: 'Earned',
+    filterUnearned: 'Unearned',
+    headerIcon: 'Icon',
+    headerAchievement: 'Achievement',
+    headerPlayers: 'Players',
+    headerPoints: 'Points',
+    headerEarned: 'Earned',
+    missableWarning: '⚠ Missable achievements',
+  },
+  achievement: {
+    progression: 'Progression',
+    winCondition: 'Win',
+    missable: 'Missable',
+    completed: 'Completed',
+    players: 'players',
+    inHardcore: 'in hardcore',
+    haveIt: '% have it',
+    notEarned: 'Not earned',
+  },
+  raLoginModal: {
+    title: 'Sign in to RetroAchievements',
+    username: 'Username',
+    signIn: 'Sign in',
+  },
+  loginForm: {
+    title: 'Sign in',
+    accountCreated: 'Account created successfully',
+    invalidCredentials: 'Incorrect username or password',
+    username: 'Username',
+    password: 'Password',
+    signIn: 'Sign in',
+    noAccount: "Don't have an account? Register",
+  },
+  registerForm: {
+    title: 'Register',
+    username: 'Username',
+    password: 'Password',
+    invitationCode: 'Invitation code (if applicable)',
+    createAccount: 'Create account',
+    errorCreating: 'Error creating account',
+    alreadyHaveAccount: 'Already have an account? Sign in',
+  },
+  categoryPage: {
+    noWantToPlay: 'You have no games you want to play on this console',
+    noPlaying: 'You are not playing any game on this console',
+    noCompleted: "You haven't completed any game on this console",
+  },
+  statusGameItem: {
+    achievements: 'achievements',
+    noPublishedAchievements: 'No published achievements',
+  },
+  gameInfoPage: {
+    retry: 'Retry',
+  },
+  pieChart: {
+    noData: 'No data',
+  },
+  profileStats: {
+    hardcorePoints: 'Hardcore points',
+    truePoints: 'True points',
+    softcorePoints: 'Softcore points',
+    hardcoreRatio: 'Hardcore ratio',
+  },
+  profileRa: {
+    memberSince: 'Member since',
+    contributions: 'Contributions',
+    achievementsCreated: 'Achievements created',
+    pointsContributed: 'Points contributed',
+    signIn: 'Sign in with RetroAchievements',
+    playingNow: 'Playing now',
+  },
+  lineChart: {
+    achievementsLast7Days: '{total} achievements in the last 7 days',
+    noActivity: 'No activity this week',
+    achievements: 'achievements',
+  },
+  profileSt: {
+    signIn: 'Sign in with Steam',
+  },
+  progression: {
+    recentProgress: 'Your recent progress',
+  },
+  gamesList: {
+    achievements: 'achievements',
+  },
+  mainStart: {
+    welcome: 'Welcome',
+    description: 'An app to track your achievements and progress in RetroAchievements and Steam',
+  },
+  profileAchievements: {
+    recentAchievements: 'Recent achievements',
+  },
+}
+
+export type Translations = typeof en
