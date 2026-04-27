@@ -1,11 +1,13 @@
-"use client";
+'use client'
 
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-import Link from "next/link";
+import { useSession } from 'next-auth/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MainHeader() {
-  const { data: session } = useSession();
+  const { data: session } = useSession()
+  const { T } = useLanguage()
 
   return (
     <header className="flex flex-row justify-between items-center bg-bg-card text-text-main">
@@ -20,20 +22,6 @@ export default function MainHeader() {
         </ul>
       </nav>
 
-      {/* {session ? (
-        <button
-          className="main-body-red px-2 py-1 m-5 rounded-3xl"
-          onClick={() => signOut()}
-        >
-          <p className="hover:text-white w-full">Cerrar session</p>
-        </button>
-      ) : (
-        <button className="main-body-red px-2 py-1 m-5 rounded-3xl">
-          <Link href="/authPage" className="hover:text-white w-full">
-            Iniciar sesión
-          </Link>
-        </button>
-      )} */}
       {session ? (
         <Link
           href="/user"
@@ -54,10 +42,10 @@ export default function MainHeader() {
       ) : (
         <button className="main-body-red px-2 py-1 m-5 rounded-3xl">
           <Link href="/authPage" className="hover:text-white w-full">
-            Iniciar sesión
+            {T.header.signIn}
           </Link>
         </button>
       )}
     </header>
-  );
+  )
 }

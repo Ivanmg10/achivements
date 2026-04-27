@@ -1,62 +1,62 @@
-import { useState } from "react";
-import CommonModal from "../common-modal/CommonModal";
-import Spinner from "../main-spinner/Spinner";
-import { useSession } from "next-auth/react";
+import { useState } from 'react'
+import CommonModal from '../common-modal/CommonModal'
+import Spinner from '../main-spinner/Spinner'
+import { useSession } from 'next-auth/react'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function RaLoginModal({
   isOpen,
   setIsOpen,
 }: {
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
 }) {
-  const { update } = useSession();
-  const [isLoading, setIsLoading] = useState(false);
-  const [username, setUsername] = useState("");
-  const [apiKey, setApiKey] = useState("");
+  const { update } = useSession()
+  const [isLoading, setIsLoading] = useState(false)
+  const [username, setUsername] = useState('')
+  const [apiKey, setApiKey] = useState('')
+  const { T } = useLanguage()
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!username || !apiKey) return;
-    setIsLoading(true);
+    e.preventDefault()
+    if (!username || !apiKey) return
+    setIsLoading(true)
 
-    const user = await fetch("/api/getUserProfile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const user = await fetch('/api/getUserProfile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, apiKey }),
-    }).then((res) => res.json());
+    }).then((res) => res.json())
 
     if (user.message) {
-      alert(user.message);
-      setUsername("");
-      setApiKey("");
-      setIsLoading(false);
-      return;
+      alert(user.message)
+      setUsername('')
+      setApiKey('')
+      setIsLoading(false)
+      return
     }
 
-    await fetch("/api/updateRaUser", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    await fetch('/api/updateRaUser', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ raUser: user }),
-    });
+    })
 
-    await update({ raUser: user });
+    await update({ raUser: user })
 
-    setIsLoading(false);
-    setUsername("");
-    setApiKey("");
-    setIsOpen(false);
-  };
+    setIsLoading(false)
+    setUsername('')
+    setApiKey('')
+    setIsOpen(false)
+  }
 
   return (
     <CommonModal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-      <h2 className="text-2xl mb-5">Iniciar sesion en Retroachivements</h2>
+      <h2 className="text-2xl mb-5">{T.raLoginModal.title}</h2>
       <form className="flex flex-col gap-5" onSubmit={handleLogin}>
-        {" "}
-        {/* 👈 */}
         <input
           type="text"
-          placeholder="Usuario"
+          placeholder={T.raLoginModal.username}
           className="rounded-xl bg-bg-main p-3 w-full"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -73,7 +73,7 @@ export default function RaLoginModal({
             type="submit"
             className="bg-bg-main p-3 rounded-lg hover:scale-[1.03] transition-transform duration-200"
           >
-            Iniciar sesion
+            {T.raLoginModal.signIn}
           </button>
         ) : (
           <button
@@ -85,5 +85,5 @@ export default function RaLoginModal({
         )}
       </form>
     </CommonModal>
-  );
+  )
 }

@@ -4,9 +4,11 @@ import { Session } from 'next-auth'
 import Image from 'next/image'
 import { useState } from 'react'
 import RaLoginModal from '../ra-login-modal/RaLoginModal'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function UserData({ session }: { session: Session | null }) {
   const [isOpen, setIsOpen] = useState(false)
+  const { T } = useLanguage()
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-5 pt-3 pb-3 w-[95%]">
@@ -24,9 +26,9 @@ export default function UserData({ session }: { session: Session | null }) {
               />
             )}
             <div>
-              <p className="text-2xl mb-5">Bienvenido: {session?.user.name}</p>
-              <p className="text-lg">Email: {session?.user.email}</p>
-              <p className="text-lg">Tema: {session?.user.theme}</p>
+              <p className="text-2xl mb-5">{T.userData.welcome}: {session?.user.name}</p>
+              <p className="text-lg">{T.userData.email}: {session?.user.email}</p>
+              <p className="text-lg">{T.userData.theme}: {session?.user.theme}</p>
             </div>
           </>
         )}
@@ -48,9 +50,9 @@ export default function UserData({ session }: { session: Session | null }) {
             <div>
               <p className="text-2xl mb-5">{session?.user?.raUser?.User}</p>
               <p className="text-md">ULID: {session?.user?.raUser?.ULID}</p>
-              <p className="text-lg">Puntos totales: {session?.user?.raUser?.TotalPoints}</p>
+              <p className="text-lg">{T.userData.totalPoints}: {session?.user?.raUser?.TotalPoints}</p>
               <p className="text-lg">
-                Puntos totales softcore: {session?.user?.raUser?.TotalSoftcorePoints}
+                {T.userData.totalSoftcorePoints}: {session?.user?.raUser?.TotalSoftcorePoints}
               </p>
             </div>
           </>
@@ -59,7 +61,7 @@ export default function UserData({ session }: { session: Session | null }) {
             onClick={() => setIsOpen(true)}
             className="w-full text-center bg-bg-main p-3 rounded-3xl hover:scale-[1.03] transition-transform duration-200"
           >
-            Iniciar sesion en Retroachivements
+            {T.userData.signInRA}
           </button>
         )}
       </article>
@@ -70,7 +72,7 @@ export default function UserData({ session }: { session: Session | null }) {
           disabled
           className="w-full text-center bg-bg-main/50 p-3 rounded-3xl"
         >
-          Iniciar sesion en Steam
+          {T.userData.signInSteam}
         </button>
       </article>
 

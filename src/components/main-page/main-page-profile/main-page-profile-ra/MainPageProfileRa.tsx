@@ -1,3 +1,5 @@
+'use client'
+
 import {
   RecentAchievement,
   RetroAchievementsGameWithAchievements,
@@ -5,6 +7,7 @@ import {
 } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useLanguage } from '@/context/LanguageContext'
 
 import MainPageProfileRaAchievements from './main-page-profile-ra-achievements/MainPageProfileRaAchievements'
 import MainPageProfileRaGame from './main-page-profile-ra-game/MainPageProfileRaGame'
@@ -19,6 +22,8 @@ export default function MainPageProfileRa({
   game: RetroAchievementsGameWithAchievements | null | undefined
   recentAchievements: RecentAchievement[]
 }) {
+  const { T } = useLanguage()
+
   const hardcoreRatio =
     user && user.TotalTruePoints > 0
       ? Math.round((user.TotalTruePoints / (user.TotalPoints || 1)) * 100)
@@ -53,7 +58,7 @@ export default function MainPageProfileRa({
               {user.Motto && (
                 <p className="text-xs text-gray-400 italic">&ldquo;{user.Motto}&rdquo;</p>
               )}
-              {memberYear && <p className="text-xs text-gray-500">Miembro desde {memberYear}</p>}
+              {memberYear && <p className="text-xs text-gray-500">{T.profileRa.memberSince} {memberYear}</p>}
             </div>
           </div>
 
@@ -67,19 +72,19 @@ export default function MainPageProfileRa({
 
           {hasContribs && (
             <div className="bg-bg-card rounded-lg p-3 flex flex-col gap-2">
-              <p className="text-xs text-gray-400 uppercase tracking-wider">Contribuciones</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileRa.contributions}</p>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
                   <span className="text-lg font-bold text-purple-400">
                     {user.ContribCount.toLocaleString()}
                   </span>
-                  <span className="text-xs text-gray-400">Logros creados</span>
+                  <span className="text-xs text-gray-400">{T.profileRa.achievementsCreated}</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-lg font-bold text-pink-400">
                     {user.ContribYield.toLocaleString()}
                   </span>
-                  <span className="text-xs text-gray-400">Puntos aportados</span>
+                  <span className="text-xs text-gray-400">{T.profileRa.pointsContributed}</span>
                 </div>
               </div>
             </div>
@@ -90,7 +95,7 @@ export default function MainPageProfileRa({
           href="/user"
           className="w-full text-left bg-bg-card p-3 rounded-3xl hover:scale-[1.03] transition-transform duration-200"
         >
-          Iniciar sesion con Retroachivements
+          {T.profileRa.signIn}
         </Link>
       )}
     </div>

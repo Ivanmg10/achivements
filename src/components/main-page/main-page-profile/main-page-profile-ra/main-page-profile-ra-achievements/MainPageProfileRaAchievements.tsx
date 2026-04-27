@@ -1,10 +1,15 @@
+'use client'
+
 import { RecentAchievement } from '@/types/types'
 import Image from 'next/image'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MainPageProfileRaAchievements({ achievements }: { achievements: RecentAchievement[] }) {
+  const { T } = useLanguage()
+
   return (
     <div className="bg-bg-card rounded-lg p-3 flex flex-col gap-2">
-      <p className="text-xs text-gray-400 uppercase tracking-wider">Logros recientes</p>
+      <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileAchievements.recentAchievements}</p>
       <div className="flex flex-col gap-2">
         {achievements.slice(0, 5).map((ach) => (
           <div key={ach.AchievementID} className="flex gap-2 items-center">

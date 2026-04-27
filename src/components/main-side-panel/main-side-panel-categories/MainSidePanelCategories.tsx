@@ -1,6 +1,8 @@
 'use client'
 
 import { CATEGORIES, CONSOLES } from '@/constants'
+import { useLanguage } from '@/context/LanguageContext'
+import { Translations } from '@/translations/en'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -8,6 +10,7 @@ import { useState } from 'react'
 export default function MainSidePanelCategories() {
   const [open, setOpen] = useState<Record<string, boolean>>({})
   const [search, setSearch] = useState('')
+  const { T } = useLanguage()
 
   function toggle(slug: string) {
     setOpen((prev) => ({ ...prev, [slug]: !prev[slug] }))
@@ -23,7 +26,7 @@ export default function MainSidePanelCategories() {
       <div className="w-[90%]">
         <input
           type="text"
-          placeholder="Buscar consola…"
+          placeholder={T.sidePanel.searchConsole}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full bg-bg-main text-text-main text-sm px-3 py-2 rounded-xl outline-none placeholder:text-text-secondary"
@@ -33,6 +36,7 @@ export default function MainSidePanelCategories() {
       <ul className="pl-5 w-full flex flex-col gap-3 list-none">
         {CATEGORIES.map((category) => {
           const isOpen = isSearching || !!open[category.slug]
+          const label = T.categories[category.slug as keyof Translations['categories']]
           return (
             <li key={category.slug} className="text-lg">
               <button
@@ -40,7 +44,7 @@ export default function MainSidePanelCategories() {
                 className="flex items-center w-full text-left gap-2 pr-5"
               >
                 <span className="transition-transform duration-200 hover:scale-105 inline-block origin-left">
-                  {category.label}
+                  {label}
                 </span>
                 <span
                   className={`ml-auto text-gray-400 text-xs transition-transform duration-300 ease-in-out ${
@@ -82,7 +86,7 @@ export default function MainSidePanelCategories() {
                       </li>
                     ))
                   ) : (
-                    <li className="text-sm text-text-secondary pl-1">Sin resultados</li>
+                    <li className="text-sm text-text-secondary pl-1">{T.sidePanel.noResults}</li>
                   )}
                 </ul>
               </div>

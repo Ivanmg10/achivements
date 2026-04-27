@@ -1,6 +1,9 @@
+'use client'
+
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useLanguage } from '@/context/LanguageContext'
 
 function CompletionBar({ label, value, color = 'bg-yellow-500' }: { label: string; value: string; color?: string }) {
   const pct = parseFloat(value) || 0
@@ -27,12 +30,14 @@ export default function MainPageProfileRaGame({
   game: RetroAchievementsGameWithAchievements
   richPresenceMsg?: string
 }) {
+  const { T } = useLanguage()
+
   return (
     <Link
       className="bg-bg-card rounded-lg p-3 flex flex-col gap-3 w-full hover:scale-[1.02] transition-transform duration-200"
       href={`/gameInfo/${game.ID}`}
     >
-      <p className="text-xs text-gray-400 uppercase tracking-wider">Jugando ahora</p>
+      <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileRa.playingNow}</p>
       {richPresenceMsg && <p className="text-xs text-gray-300 italic">{richPresenceMsg}</p>}
       <div className="flex gap-3 items-center">
         <Image

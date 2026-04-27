@@ -1,3 +1,4 @@
+import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievementsUserProfile } from '@/types/types'
 
 function StatPill({ label, value, suffix = '' }: { label: string; value: number; suffix?: string }) {
@@ -18,11 +19,13 @@ export default function MainSidePanelStats({
   raUser: RetroAchievementsUserProfile
   streak: number
 }) {
+  const { T } = useLanguage()
+
   return (
     <section className="w-[90%] grid grid-cols-3 gap-2">
       <StatPill label="HC" value={raUser.TotalPoints} />
       <StatPill label="SC" value={raUser.TotalSoftcorePoints} />
-      <StatPill label="Racha" value={streak} suffix="d" />
+      <StatPill label={T.sidePanel.streak} value={streak} suffix="d" />
     </section>
   )
 }

@@ -3,6 +3,7 @@
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { groupByConsole } from '@/utils/utils'
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
+import { useLanguage } from '@/context/LanguageContext'
 
 const COLORS = [
   '#6366f1',
@@ -17,11 +18,12 @@ const COLORS = [
 
 export default function ConsolesPieChart({ games }: { games: RetroAchievementsGameCompleted[] }) {
   const data = groupByConsole(games)
+  const { T } = useLanguage()
 
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-96 w-full text-text-secondary text-sm">
-        Sin datos
+        {T.pieChart.noData}
       </div>
     )
   }

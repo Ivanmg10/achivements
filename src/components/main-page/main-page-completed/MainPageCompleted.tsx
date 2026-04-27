@@ -5,6 +5,7 @@ import { useRef, useState } from 'react'
 
 import { useGamesCompletedPreview } from '@/hooks/useGamesCompletedPreview'
 import { useResizableList } from '@/hooks/useResizableList'
+import { useLanguage } from '@/context/LanguageContext'
 
 import MainPageGamesList from '../main-page-games/main-page-games-list/MainPageGamesList'
 
@@ -18,6 +19,7 @@ export default function MainPageCompleted() {
   const sectionRef = useRef<HTMLElement>(null)
   const { listGames, listGamesHardcore } = useGamesCompletedPreview()
   const visibleCount = useResizableList({ sectionRef, maxItems: MAX_GAMES, cardHeightPx: CARD_HEIGHT_PX, headerPx: HEADER_PX, footerPx: FOOTER_PX })
+  const { T } = useLanguage()
 
   const activeList = tab === 'normal' ? listGames : listGamesHardcore
 
@@ -27,19 +29,19 @@ export default function MainPageCompleted() {
       className="col-start-4 col-end-7 row-start-2 row-end-3 main-content bg-bg-card text-text-main m-3 rounded-xl flex flex-col"
     >
       <div className="flex items-center w-[95%] m-2 py-2 gap-3 self-center">
-        <h1 className="text-3xl">Completados</h1>
+        <h1 className="text-3xl">{T.mainPage.completed}</h1>
         <div className="flex items-center">
           <button
             className={`text-sm px-3 py-1 cursor-pointer rounded-lg m-1 transition-colors ${tab === 'normal' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
             onClick={() => setTab('normal')}
           >
-            Normal
+            {T.mainPage.normal}
           </button>
           <button
             className={`text-sm px-3 py-1 cursor-pointer rounded-lg m-1 transition-colors ${tab === 'hardcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
             onClick={() => setTab('hardcore')}
           >
-            Hardcore
+            {T.mainPage.hardcore}
           </button>
         </div>
       </div>
@@ -50,12 +52,12 @@ export default function MainPageCompleted() {
         </div>
       ) : (
         <p className="text-gray-400 text-sm w-[95%] px-2">
-          No hay juegos completados en modo {tab}
+          {T.mainPage.noGamesCompleted.replace('{tab}', tab)}
         </p>
       )}
 
       <Link href="/" className="w-[95%] p-2 mt-auto self-center">
-        Ver mas...
+        {T.mainPage.seeMore}
       </Link>
     </section>
   )

@@ -1,49 +1,58 @@
-import { CONSOLES } from "@/constants";
+'use client'
+
+import { CONSOLES } from '@/constants'
 import {
   RetroAchievementsGame,
   RetroAchievementsGameCompleted,
   WantToPlayGame,
-} from "@/types/types";
-import Image from "next/image";
-import Link from "next/link";
+} from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
+import Image from 'next/image'
+import Link from 'next/link'
 
-type AnyGame = RetroAchievementsGame | WantToPlayGame | RetroAchievementsGameCompleted;
+type AnyGame = RetroAchievementsGame | WantToPlayGame | RetroAchievementsGameCompleted
 
 function isCompleted(game: AnyGame): game is RetroAchievementsGameCompleted {
-  return 'PctWon' in game && game.PctWon !== undefined;
+  return 'PctWon' in game && game.PctWon !== undefined
 }
 
 function ringColor(game: AnyGame): string {
-  if (!isCompleted(game)) return '';
-  const pct = (parseFloat(game.PctWon) || 0) * 100;
-  if (pct < 100) return '';
-  return game.HardcoreMode === '1' ? 'ring-2 ring-yellow-400' : 'ring-2 ring-blue-400';
+  if (!isCompleted(game)) return ''
+  const pct = (parseFloat(game.PctWon) || 0) * 100
+  if (pct < 100) return ''
+  return game.HardcoreMode === '1' ? 'ring-2 ring-yellow-400' : 'ring-2 ring-blue-400'
 }
 
-function getBadge(game: AnyGame): { top: string; bottom: string } | null {
+function getBadge(
+  game: AnyGame,
+  achievementsLabel: string,
+): { top: string; bottom: string } | null {
   if (isCompleted(game)) {
-    const pct = (parseFloat(game.PctWon) || 0) * 100;
+    const pct = (parseFloat(game.PctWon) || 0) * 100
     return {
       top: `${pct.toFixed(0)}%`,
       bottom: `${game.NumAwarded}/${game.MaxPossible}`,
-    };
+    }
   }
-  const achievements = (game as RetroAchievementsGame).AchievementsPublished
-    ?? (game as WantToPlayGame).AchievementsPublished;
+  const achievements =
+    (game as RetroAchievementsGame).AchievementsPublished ??
+    (game as WantToPlayGame).AchievementsPublished
   if (achievements != null && achievements > 0) {
-    return { top: `${achievements}`, bottom: 'logros' };
+    return { top: `${achievements}`, bottom: achievementsLabel }
   }
-  return null;
+  return null
 }
 
 export default function MainPageGamesList({
   listGames,
 }: {
-  listGames: Array<AnyGame>;
+  listGames: Array<AnyGame>
 }) {
+  const { T } = useLanguage()
+
   return listGames.map((game: AnyGame, index: number) => {
-    const consoleIcon = CONSOLES.find((c) => c.id === game.ConsoleID)?.icon;
-    const badge = getBadge(game);
+    const consoleIcon = CONSOLES.find((c) => c.id === game.ConsoleID)?.icon
+    const badge = getBadge(game, T.gamesList.achievements)
 
     return (
       <Link
@@ -87,6 +96,6 @@ export default function MainPageGamesList({
           </div>
         )}
       </Link>
-    );
-  });
+    )
+  })
 }

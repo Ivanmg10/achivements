@@ -25,7 +25,7 @@ test("renders achievement with earned date", () => {
   const { container } = render(
     <table>
       <tbody>
-        <GameInfoAchivement achievement={mockAchievement} />
+        <GameInfoAchivement achievement={mockAchievement} numDistinctPlayers={1000} />
       </tbody>
     </table>,
   );
@@ -38,7 +38,7 @@ test("renders achievement without earned date shows dash", () => {
   render(
     <table>
       <tbody>
-        <GameInfoAchivement achievement={{ ...mockAchievement, DateEarned: null }} />
+        <GameInfoAchivement achievement={{ ...mockAchievement, DateEarned: null }} numDistinctPlayers={1000} />
       </tbody>
     </table>,
   );
@@ -49,7 +49,7 @@ test("renders nothing when no achievement", () => {
   const { container } = render(
     <table>
       <tbody>
-        <GameInfoAchivement />
+        <GameInfoAchivement numDistinctPlayers={1000} />
       </tbody>
     </table>,
   );
