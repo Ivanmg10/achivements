@@ -36,7 +36,7 @@ export default function MainPageProfileRaGame({
       {richPresenceMsg && <p className="text-xs text-gray-300 italic">{richPresenceMsg}</p>}
       <div className="flex gap-3 items-center">
         <Image
-          src={`https://retroachievements.org/${game.ImageIcon}`}
+          src={`https://retroachievements.org${game.ImageIcon}`}
           alt="GameIcon"
           width={50}
           height={50}
