@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 
-import { useGamesCompleted } from '@/hooks/useGamesCompleted'
+import { useGamesCompletedPreview } from '@/hooks/useGamesCompletedPreview'
 import { useResizableList } from '@/hooks/useResizableList'
 
 import MainPageGamesList from '../main-page-games/main-page-games-list/MainPageGamesList'
@@ -16,7 +16,7 @@ const FOOTER_PX = 40
 export default function MainPageCompleted() {
   const [tab, setTab] = useState<'normal' | 'hardcore'>('normal')
   const sectionRef = useRef<HTMLElement>(null)
-  const { listGames, listGamesHardcore } = useGamesCompleted()
+  const { listGames, listGamesHardcore } = useGamesCompletedPreview()
   const visibleCount = useResizableList({ sectionRef, maxItems: MAX_GAMES, cardHeightPx: CARD_HEIGHT_PX, headerPx: HEADER_PX, footerPx: FOOTER_PX })
 
   const activeList = tab === 'normal' ? listGames : listGamesHardcore

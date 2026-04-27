@@ -1,20 +1,21 @@
 import { RetroAchievementsGameCompleted } from '@/types/types'
-import { getGamesInProgress } from '@/utils/apiCallsUtils'
+import { getGamesCompleted } from '@/utils/apiCallsUtils'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
 
-export function useGamesInProgress() {
+export function useGamesCompletedPreview() {
   const { status, data: session } = useSession()
   const [listGames, setListGames] = useState<RetroAchievementsGameCompleted[]>([])
+  const [listGamesHardcore, setListGamesHardcore] = useState<RetroAchievementsGameCompleted[]>([])
   const hasFetched = useRef(false)
 
   useEffect(() => {
     /* istanbul ignore if */
     if (status === 'authenticated' && !hasFetched.current) {
       hasFetched.current = true
-      getGamesInProgress(session, setListGames)
+      getGamesCompleted(session, setListGames, setListGamesHardcore)
     }
   }, [status])
 
-  return listGames
+  return { listGames, listGamesHardcore }
 }

@@ -3,7 +3,7 @@ import { getWantGames } from '@/utils/apiCallsUtils'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
 
-export function useWantGames() {
+export function useWantGamesPreview() {
   const { status, data: session } = useSession()
   const [wantGames, setWantGames] = useState<WantToPlayGame[]>([])
   const [error, setError] = useState<string>()

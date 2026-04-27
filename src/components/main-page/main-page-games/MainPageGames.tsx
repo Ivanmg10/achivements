@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRef } from 'react'
 
-import { useGamesInProgress } from '@/hooks/useGamesInProgress'
+import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useResizableList } from '@/hooks/useResizableList'
 
 import MainPageGamesList from './main-page-games-list/MainPageGamesList'
@@ -15,7 +15,7 @@ const FOOTER_PX = 40
 
 export default function MainPageGames() {
   const sectionRef = useRef<HTMLElement>(null)
-  const listGames = useGamesInProgress()
+  const listGames = useGamesInProgressPreview()
   const visibleCount = useResizableList({ sectionRef, maxItems: MAX_GAMES, cardHeightPx: CARD_HEIGHT_PX, headerPx: HEADER_PX, footerPx: FOOTER_PX })
 
   return (

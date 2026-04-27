@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRef } from 'react'
 
 import { useResizableList } from '@/hooks/useResizableList'
-import { useWantGames } from '@/hooks/useWantGames'
+import { useWantGamesPreview } from '@/hooks/useWantGamesPreview'
 
 import Spinner from '@/components/main-spinner/Spinner'
 import MainPageGamesList from '../main-page-games/main-page-games-list/MainPageGamesList'
@@ -15,7 +15,7 @@ const FOOTER_PX = 40
 
 export default function MainPageWantToPlay() {
   const sectionRef = useRef<HTMLElement>(null)
-  const { wantGames, error } = useWantGames()
+  const { wantGames, error } = useWantGamesPreview()
   const visibleCount = useResizableList({ sectionRef, cardHeightPx: CARD_HEIGHT_PX, headerPx: HEADER_PX, footerPx: FOOTER_PX })
 
   if (error) return <p>Error: {error}</p>
