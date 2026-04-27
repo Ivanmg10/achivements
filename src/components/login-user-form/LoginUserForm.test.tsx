@@ -5,32 +5,32 @@ import { signIn } from "next-auth/react";
 test("renders login form", () => {
   render(<LoginUserForm setIsLogin={jest.fn()} isRegister={false} />);
   expect(screen.getByText("Inicia sesión")).toBeInTheDocument();
-  expect(screen.getByPlaceholderText("Username")).toBeInTheDocument();
-  expect(screen.getByPlaceholderText("Password")).toBeInTheDocument();
+  expect(screen.getByPlaceholderText("Usuario")).toBeInTheDocument();
+  expect(screen.getByPlaceholderText("Contraseña")).toBeInTheDocument();
 });
 
 test("shows success message when isRegister is true", () => {
   render(<LoginUserForm setIsLogin={jest.fn()} isRegister={true} />);
-  expect(screen.getByText("Has creado una cuenta correctamente")).toBeInTheDocument();
+  expect(screen.getByText("Cuenta creada correctamente")).toBeInTheDocument();
 });
 
 test("clicking register button calls setIsLogin(false)", () => {
   const setIsLogin = jest.fn();
   render(<LoginUserForm setIsLogin={setIsLogin} isRegister={false} />);
-  fireEvent.click(screen.getByText("No tienes cuenta?"));
+  fireEvent.click(screen.getByText("¿No tienes cuenta? Regístrate"));
   expect(setIsLogin).toHaveBeenCalledWith(false);
 });
 
 test("submitting form calls signIn", async () => {
   (signIn as jest.Mock).mockResolvedValue(null);
   render(<LoginUserForm setIsLogin={jest.fn()} isRegister={false} />);
-  fireEvent.change(screen.getByPlaceholderText("Username"), {
+  fireEvent.change(screen.getByPlaceholderText("Usuario"), {
     target: { value: "ivan" },
   });
-  fireEvent.change(screen.getByPlaceholderText("Password"), {
+  fireEvent.change(screen.getByPlaceholderText("Contraseña"), {
     target: { value: "pass" },
   });
-  fireEvent.click(screen.getByText("Iniciar"));
+  fireEvent.click(screen.getByText("Iniciar sesión"));
   await Promise.resolve();
   expect(signIn).toHaveBeenCalledWith("credentials", expect.objectContaining({ username: "ivan" }));
 });

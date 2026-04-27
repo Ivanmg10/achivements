@@ -1,8 +1,4 @@
-import { USE_MOCK, CONSOLES, CATEGORIES } from "./index";
-
-test("USE_MOCK is true", () => {
-  expect(USE_MOCK).toBe(true);
-});
+import { CONSOLES, CATEGORIES } from "./index";
 
 test("CONSOLES has 8 entries", () => {
   expect(CONSOLES.length).toBe(8);

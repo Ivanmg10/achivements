@@ -51,7 +51,7 @@ test("updates document theme when session has user.theme", () => {
       <TestConsumer />
     </ThemeProvider>,
   );
-  expect(document.documentElement.dataset.theme).toBe("dark");
+  expect(document.documentElement.dataset.theme).toBe("red");
 });
 
 test("useTheme throws outside provider", () => {

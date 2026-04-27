@@ -1,21 +1,11 @@
-jest.mock("@/constants", () => ({ USE_MOCK: false }));
-jest.mock("@/mocks/userRA.json", () => ({ User: "MockUser", TotalPoints: 100 }), {
-  virtual: true,
-});
-jest.mock(
-  "@/mocks/wantToPlay.json",
-  () => ({ Count: 2, Total: 2, Results: [{ ID: 1 }, { ID: 2 }] }),
-  { virtual: true },
-);
-
 import {
   getGamesInfo,
   getGamesInfoList,
   getUserInfo,
   unlinkRaUser,
   getGamesCompleted,
+  getGamesInProgress,
   getAllGamesPlayed,
-  groupByConsole,
   getWantGames,
   getRecentAchievements,
 } from "./apiCallsUtils";
@@ -52,24 +42,13 @@ test("getGamesInfoList appends to state", async () => {
   expect(updater([{ ID: 1 }])).toEqual([{ ID: 1 }, { ID: 2, Title: "Game2" }]);
 });
 
-test("getUserInfo fetches from API when USE_MOCK is false", async () => {
+test("getUserInfo fetches from API", async () => {
   const setUser = jest.fn();
   (fetch as jest.Mock).mockResolvedValueOnce({
     json: () => Promise.resolve({ User: "ivan" }),
   });
   await getUserInfo(setUser, mockSession);
   expect(setUser).toHaveBeenCalledWith({ User: "ivan" });
-});
-
-test("getUserInfo uses mock when USE_MOCK is true", async () => {
-  jest.resetModules();
-  jest.mock("@/constants", () => ({ USE_MOCK: true }));
-  jest.mock("@/mocks/userRA.json", () => ({ User: "MockUser" }), { virtual: true });
-  jest.mock("@/mocks/wantToPlay.json", () => ({ Results: [] }), { virtual: true });
-  const { getUserInfo: getUserInfoMock } = await import("./apiCallsUtils");
-  const setUser = jest.fn();
-  await getUserInfoMock(setUser, null);
-  expect(setUser).toHaveBeenCalledWith({ User: "MockUser" });
 });
 
 test("unlinkRaUser calls fetch and update", async () => {
@@ -96,6 +75,45 @@ test("getGamesCompleted filters and sets games", async () => {
   expect(setHardcore).toHaveBeenCalledWith([{ HardcoreMode: "1", PctWon: "1.0000", GameID: 2 }]);
 });
 
+test("getGamesCompleted excludes softcore entry when same GameID beaten in hardcore", async () => {
+  const games = [
+    { HardcoreMode: "0", PctWon: "1.0000", GameID: 5 },
+    { HardcoreMode: "1", PctWon: "1.0000", GameID: 5 },
+  ];
+  (fetch as jest.Mock).mockResolvedValueOnce({ json: () => Promise.resolve(games) });
+  const setGames = jest.fn();
+  const setHardcore = jest.fn();
+  await getGamesCompleted(mockSession, setGames as any, setHardcore as any);
+  expect(setHardcore).toHaveBeenCalledWith([{ HardcoreMode: "1", PctWon: "1.0000", GameID: 5 }]);
+  expect(setGames).toHaveBeenCalledWith([]);
+});
+
+test("getGamesCompleted works with numeric HardcoreMode from API", async () => {
+  const games = [
+    { HardcoreMode: 0, PctWon: "1.0000", GameID: 1 },
+    { HardcoreMode: 1, PctWon: "1.0000", GameID: 2 },
+  ];
+  (fetch as jest.Mock).mockResolvedValueOnce({ json: () => Promise.resolve(games) });
+  const setGames = jest.fn();
+  const setHardcore = jest.fn();
+  await getGamesCompleted(mockSession, setGames as any, setHardcore as any);
+  expect(setGames).toHaveBeenCalledWith([{ HardcoreMode: 0, PctWon: "1.0000", GameID: 1 }]);
+  expect(setHardcore).toHaveBeenCalledWith([{ HardcoreMode: 1, PctWon: "1.0000", GameID: 2 }]);
+});
+
+test("getGamesInProgress returns only in-progress softcore games", async () => {
+  const games = [
+    { HardcoreMode: "0", PctWon: "1.0000", GameID: 1 },
+    { HardcoreMode: "0", PctWon: "0.4500", GameID: 2 },
+    { HardcoreMode: "1", PctWon: "0.5000", GameID: 3 },
+    { HardcoreMode: "0", PctWon: "0.0000", GameID: 4 },
+  ];
+  (fetch as jest.Mock).mockResolvedValueOnce({ json: () => Promise.resolve(games) });
+  const setGames = jest.fn();
+  await getGamesInProgress(mockSession, setGames as any);
+  expect(setGames).toHaveBeenCalledWith([{ HardcoreMode: "0", PctWon: "0.4500", GameID: 2 }]);
+});
+
 test("getAllGamesPlayed splits softcore/hardcore", async () => {
   const games = [
     { HardcoreMode: "0", GameID: 1 },
@@ -117,35 +135,7 @@ test("getAllGamesPlayed returns early when not array", async () => {
   expect(setGames).not.toHaveBeenCalled();
 });
 
-test("groupByConsole groups games by console", () => {
-  const games = [
-    { ConsoleName: "PS2", GameID: 1 },
-    { ConsoleName: "PS2", GameID: 2 },
-    { ConsoleName: "GBA", GameID: 3 },
-  ] as any;
-  const result = groupByConsole(games);
-  expect(result).toContainEqual({ name: "PS2", value: 2 });
-  expect(result).toContainEqual({ name: "GBA", value: 1 });
-});
-
-test("getWantGames uses mock when USE_MOCK is true", async () => {
-  jest.resetModules();
-  jest.mock("@/constants", () => ({ USE_MOCK: true }));
-  jest.mock(
-    "@/mocks/wantToPlay.json",
-    () => ({ Results: [{ ID: 1 }, { ID: 2 }, { ID: 3 }, { ID: 4 }, { ID: 5 }, { ID: 6 }, { ID: 7 }] }),
-    { virtual: true },
-  );
-  jest.mock("@/mocks/userRA.json", () => ({}), { virtual: true });
-  const { getWantGames: getWantGamesMock } = await import("./apiCallsUtils");
-  const setWantGames = jest.fn();
-  const setError = jest.fn();
-  await getWantGamesMock(null, setWantGames, setError);
-  expect(setWantGames).toHaveBeenCalled();
-  expect(setError).not.toHaveBeenCalled();
-});
-
-test("getWantGames calls API when USE_MOCK false", async () => {
+test("getWantGames calls API and sets games", async () => {
   const results = [{ ID: 1 }, { ID: 2 }];
   (fetch as jest.Mock).mockResolvedValueOnce({
     json: () => Promise.resolve({ Results: results }),

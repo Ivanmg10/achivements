@@ -12,7 +12,7 @@ test("renders pie chart", () => {
   expect(screen.getByTestId("PieChart")).toBeInTheDocument();
 });
 
-test("renders with empty games array", () => {
+test("renders empty state when no games", () => {
   render(<GamesPlayedPieChart games={[]} />);
-  expect(screen.getByTestId("PieChart")).toBeInTheDocument();
+  expect(screen.getByText("Sin datos")).toBeInTheDocument();
 });
