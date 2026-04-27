@@ -13,11 +13,11 @@ function isCompleted(game: AnyGame): game is RetroAchievementsGameCompleted {
   return 'PctWon' in game && game.PctWon !== undefined;
 }
 
-function ringColor(pct: number): string {
-  if (pct >= 100) return 'ring-2 ring-yellow-400';
-  if (pct >= 75)  return 'ring-2 ring-blue-400';
-  if (pct >= 50)  return 'ring-2 ring-gray-500';
-  return '';
+function ringColor(game: AnyGame): string {
+  if (!isCompleted(game)) return '';
+  const pct = (parseFloat(game.PctWon) || 0) * 100;
+  if (pct < 100) return '';
+  return game.HardcoreMode === '1' ? 'ring-2 ring-yellow-400' : 'ring-2 ring-blue-400';
 }
 
 function getBadge(game: AnyGame): { top: string; bottom: string } | null {
@@ -36,14 +36,6 @@ function getBadge(game: AnyGame): { top: string; bottom: string } | null {
   return null;
 }
 
-function badgeAccent(game: AnyGame): string {
-  if (!isCompleted(game)) return 'text-gray-400';
-  const pct = (parseFloat(game.PctWon) || 0) * 100;
-  if (pct >= 100) return 'text-yellow-400';
-  if (pct >= 75)  return 'text-blue-400';
-  return 'text-gray-400';
-}
-
 export default function MainPageGamesList({
   listGames,
 }: {
@@ -51,8 +43,6 @@ export default function MainPageGamesList({
 }) {
   return listGames.map((game: AnyGame, index: number) => {
     const consoleIcon = CONSOLES.find((c) => c.id === game.ConsoleID)?.icon;
-    const completed = isCompleted(game);
-    const pct = completed ? (parseFloat(game.PctWon) || 0) * 100 : null;
     const badge = getBadge(game);
 
     return (
@@ -68,7 +58,7 @@ export default function MainPageGamesList({
               alt="imagen"
               width={50}
               height={50}
-              className={`w-15 h-15 rounded-bl-xl rounded-tl-xl ${completed && pct !== null ? ringColor(pct) : ''}`}
+              className={`w-15 h-15 rounded-bl-xl rounded-tl-xl ${ringColor(game)}`}
             />
           )}
           <div className="flex flex-col justify-center">
@@ -92,7 +82,7 @@ export default function MainPageGamesList({
 
         {badge && (
           <div className="flex flex-col items-end justify-center pr-2 shrink-0">
-            <span className={`text-sm font-bold ${badgeAccent(game)}`}>{badge.top}</span>
+            <span className="text-sm font-bold text-gray-400">{badge.top}</span>
             <span className="text-xs text-gray-500">{badge.bottom}</span>
           </div>
         )}
