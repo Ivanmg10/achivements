@@ -20,5 +20,38 @@
     "NumAwarded": 69,
     "PctWon": "1.0000",
     "HardcoreMode": "0"
+  },
+  {
+    "GameID": 1234,
+    "Title": "Crash Bandicoot",
+    "ImageIcon": "/Images/063888.png",
+    "ConsoleID": 12,
+    "ConsoleName": "PlayStation",
+    "MaxPossible": 40,
+    "NumAwarded": 18,
+    "PctWon": "0.4500",
+    "HardcoreMode": "0"
+  },
+  {
+    "GameID": 2762,
+    "Title": "Jak and Daxter: The Precursor Legacy",
+    "ImageIcon": "/Images/085657.png",
+    "ConsoleID": 21,
+    "ConsoleName": "PlayStation 2",
+    "MaxPossible": 56,
+    "NumAwarded": 42,
+    "PctWon": "0.7500",
+    "HardcoreMode": "0"
+  },
+  {
+    "GameID": 3001,
+    "Title": "Spyro the Dragon",
+    "ImageIcon": "/Images/044895.png",
+    "ConsoleID": 12,
+    "ConsoleName": "PlayStation",
+    "MaxPossible": 30,
+    "NumAwarded": 5,
+    "PctWon": "0.1667",
+    "HardcoreMode": "0"
   }
 ]
