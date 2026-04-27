@@ -12,6 +12,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import MainPageProfileRaAchievements from './main-page-profile-ra-achievements/MainPageProfileRaAchievements'
 import MainPageProfileRaGame from './main-page-profile-ra-game/MainPageProfileRaGame'
 import MainPageProfileRaStats from './main-page-profile-ra-stats/MainPageProfileRaStats'
+// import MainPageProfileConsoles from '../main-page-profile-consoles/MainPageProfileConsoles'
 
 export default function MainPageProfileRa({
   user,
@@ -40,7 +41,7 @@ export default function MainPageProfileRa({
   const hasContribs = user && (user.ContribCount > 0 || user.ContribYield > 0)
 
   return (
-    <div className="flex flex-col gap-3 m-2 bg-bg-main rounded-xl w-[95%] p-2 h-full">
+    <div className="flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
       {user?.User ? (
         <>
           <div className="flex gap-3 items-center">
@@ -70,8 +71,10 @@ export default function MainPageProfileRa({
             <MainPageProfileRaAchievements achievements={recentAchievements} />
           )}
 
+          {/* <MainPageProfileConsoles /> */}
+
           {hasContribs && (
-            <div className="bg-bg-card rounded-lg p-3 flex flex-col gap-2">
+            <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2">
               <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileRa.contributions}</p>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">

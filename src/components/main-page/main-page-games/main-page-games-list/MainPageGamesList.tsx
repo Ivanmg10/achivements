@@ -57,21 +57,21 @@ export default function MainPageGamesList({
     return (
       <Link
         key={index}
-        className="flex flex-row justify-between p-1 m-2 bg-bg-main rounded-xl w-[95%] border-2 border-bg-main cursor-pointer hover:scale-[1.02] transition-transform duration-200"
+        className="flex flex-row items-center justify-between p-2 mx-2 my-1 bg-bg-main rounded-xl w-[95%] border-2 border-bg-main cursor-pointer hover:scale-[1.02] transition-transform duration-200"
         href={`/gameInfo/${game.ID ? game.ID : game.GameID}`}
       >
-        <div className="flex flex-row gap-3">
+        <div className="flex flex-row items-center gap-3">
           {game?.ImageIcon && (
             <Image
               src={`https://retroachievements.org${game?.ImageIcon}`}
               alt="imagen"
-              width={50}
-              height={50}
-              className={`w-15 h-15 rounded-bl-xl rounded-tl-xl ${ringColor(game)}`}
+              width={48}
+              height={48}
+              className={`w-12 h-12 rounded-lg object-cover shrink-0 ${ringColor(game)}`}
             />
           )}
-          <div className="flex flex-col justify-center">
-            <p className="text-xl leading-tight">
+          <div className="flex flex-col justify-center gap-0.5">
+            <p className="text-base font-medium leading-tight">
               {game?.GameTitle ? game?.GameTitle : game?.Title}
             </p>
             <div className="flex flex-row items-center gap-1">
@@ -79,19 +79,19 @@ export default function MainPageGamesList({
                 <Image
                   src={consoleIcon}
                   alt={game.ConsoleName}
-                  width={16}
-                  height={16}
+                  width={12}
+                  height={12}
                   className="object-contain"
                 />
               )}
-              <p className="text-sm text-gray-400">{game?.ConsoleName}</p>
+              <p className="text-xs text-gray-400">{game?.ConsoleName}</p>
             </div>
           </div>
         </div>
 
         {badge && (
-          <div className="flex flex-col items-end justify-center pr-2 shrink-0">
-            <span className="text-sm font-bold text-gray-400">{badge.top}</span>
+          <div className="flex flex-col items-end justify-center pr-1 shrink-0 gap-0.5">
+            <span className="text-sm font-bold text-gray-300">{badge.top}</span>
             <span className="text-xs text-gray-500">{badge.bottom}</span>
           </div>
         )}

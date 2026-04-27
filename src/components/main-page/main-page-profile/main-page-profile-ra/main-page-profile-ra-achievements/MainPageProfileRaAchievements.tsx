@@ -8,7 +8,7 @@ export default function MainPageProfileRaAchievements({ achievements }: { achiev
   const { T } = useLanguage()
 
   return (
-    <div className="bg-bg-card rounded-lg p-3 flex flex-col gap-2">
+    <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2">
       <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileAchievements.recentAchievements}</p>
       <div className="flex flex-col gap-2">
         {achievements.slice(0, 5).map((ach) => (

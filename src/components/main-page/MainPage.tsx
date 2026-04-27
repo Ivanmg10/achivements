@@ -29,12 +29,22 @@ export default function MainPage() {
     )
 
   return (
-    <main className="flex-1 min-h-0 grid grid-cols-6 grid-rows-[auto_1fr] text-text-main">
-      {/* <MainPageProgression /> */}
-      <MainPageWantToPlay />
+    <main className="h-full grid grid-cols-[2fr_1fr] text-text-main">
+      {/* Left: 3 equal rows - game sections */}
+      <div className="grid grid-rows-3 min-h-0">
+        <MainPageGames />
+        <MainPageWantToPlay />
+        <MainPageCompleted />
+      </div>
+
+      {/* Right: user profile */}
       <MainPageProfile />
-      <MainPageGames />
-      <MainPageCompleted />
+
+      {/* Future: charts section below
+      <section className="col-start-1 col-end-3 row-start-2">
+        Charts coming soon
+      </section>
+      */}
     </main>
   )
 }

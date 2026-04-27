@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useRef, useState } from 'react'
 
 import { useGamesCompletedPreview } from '@/hooks/useGamesCompletedPreview'
@@ -8,11 +7,12 @@ import { useResizableList } from '@/hooks/useResizableList'
 import { useLanguage } from '@/context/LanguageContext'
 
 import MainPageGamesList from '../main-page-games/main-page-games-list/MainPageGamesList'
+import ConsoleSideList from '../console-side-list/ConsoleSideList'
 
-const MAX_GAMES = 3
+const MAX_GAMES = 2
 const CARD_HEIGHT_PX = 70
 const HEADER_PX = 72
-const FOOTER_PX = 40
+const FOOTER_PX = 0
 
 export default function MainPageCompleted() {
   const [tab, setTab] = useState<'normal' | 'hardcore'>('normal')
@@ -26,39 +26,38 @@ export default function MainPageCompleted() {
   return (
     <section
       ref={sectionRef}
-      className="col-start-4 col-end-7 row-start-2 row-end-3 main-content bg-bg-card text-text-main m-3 rounded-xl flex flex-col"
+      className="main-content bg-bg-card text-text-main m-3 rounded-xl flex flex-col overflow-hidden"
     >
-      <div className="flex items-center w-[95%] m-2 py-2 gap-3 self-center">
-        <h1 className="text-3xl">{T.mainPage.completed}</h1>
-        <div className="flex items-center">
-          <button
-            className={`text-sm px-3 py-1 cursor-pointer rounded-lg m-1 transition-colors ${tab === 'normal' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
-            onClick={() => setTab('normal')}
-          >
-            {T.mainPage.normal}
-          </button>
-          <button
-            className={`text-sm px-3 py-1 cursor-pointer rounded-lg m-1 transition-colors ${tab === 'hardcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
-            onClick={() => setTab('hardcore')}
-          >
-            {T.mainPage.hardcore}
-          </button>
+      <div className="flex items-center gap-8 w-[95%] self-center mt-2 py-2 shrink-0 overflow-hidden">
+        <div className="flex items-center gap-3 shrink-0">
+          <h1 className="text-3xl">{T.mainPage.completed}</h1>
+          <div className="flex items-center">
+            <button
+              className={`text-sm px-3 py-1 cursor-pointer rounded-lg m-1 transition-colors ${tab === 'normal' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
+              onClick={() => setTab('normal')}
+            >
+              {T.mainPage.normal}
+            </button>
+            <button
+              className={`text-sm px-3 py-1 cursor-pointer rounded-lg m-1 transition-colors ${tab === 'hardcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
+              onClick={() => setTab('hardcore')}
+            >
+              {T.mainPage.hardcore}
+            </button>
+          </div>
         </div>
+        <ConsoleSideList slug="completed" />
       </div>
 
-      {activeList.length > 0 ? (
-        <div className="w-full flex flex-col items-center">
+      <div className="flex flex-col items-center w-full overflow-hidden">
+        {activeList.length > 0 ? (
           <MainPageGamesList listGames={activeList.slice(0, visibleCount)} />
-        </div>
-      ) : (
-        <p className="text-gray-400 text-sm w-[95%] px-2">
-          {T.mainPage.noGamesCompleted.replace('{tab}', tab)}
-        </p>
-      )}
-
-      <Link href="/" className="w-[95%] p-2 mt-auto self-center">
-        {T.mainPage.seeMore}
-      </Link>
+        ) : (
+          <p className="text-gray-400 text-sm w-[95%] px-2">
+            {T.mainPage.noGamesCompleted.replace('{tab}', tab)}
+          </p>
+        )}
+      </div>
     </section>
   )
 }
