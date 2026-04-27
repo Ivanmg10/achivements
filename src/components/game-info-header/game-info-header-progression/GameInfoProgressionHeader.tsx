@@ -6,28 +6,30 @@ export default function GameInfoProgressionHeader({
   gameData?: RetroAchievementsGameWithAchievements | null;
 }) {
   return (
-    <div className="w-1/2">
-      <div className="flex gap-3">
-        <p className="text-sm text-text-secondary">Standard:</p>
-        {/* <p className="">{gameData?.UserCompletion}</p> */}
-        <div className="w-[90%] m-auto mt-2 h-3 border bg-border-white rounded-full bg-transparent overflow-hidden">
+    <div className="flex flex-col gap-2 w-full">
+      <div className="flex flex-col gap-1">
+        <div className="flex justify-between text-xs text-text-secondary">
+          <span>Standard</span>
+          <span>{gameData?.UserCompletion ?? '0%'}</span>
+        </div>
+        <div className="w-full h-2 bg-bg-card rounded-full overflow-hidden">
           <div
-            className="h-full bg-white"
-            style={{ width: gameData?.UserCompletion ?? undefined }}
+            className="h-full bg-blue-500 rounded-full transition-all duration-500"
+            style={{ width: gameData?.UserCompletion ?? '0%' }}
           />
         </div>
-        <p>100%</p>
       </div>
-      <div className="flex gap-3">
-        <p className="text-sm text-text-secondary">Hardcore:</p>
-        {/* <p className="">{gameData?.UserCompletionHardcore}</p> */}
-        <div className="w-[90%] m-auto mt-2 h-3 border bg-border-white rounded-full bg-transparent overflow-hidden">
+      <div className="flex flex-col gap-1">
+        <div className="flex justify-between text-xs text-text-secondary">
+          <span>Hardcore</span>
+          <span>{gameData?.UserCompletionHardcore ?? '0%'}</span>
+        </div>
+        <div className="w-full h-2 bg-bg-card rounded-full overflow-hidden">
           <div
-            className="h-full bg-white"
-            style={{ width: gameData?.UserCompletionHardcore ?? undefined }}
+            className="h-full bg-yellow-400 rounded-full transition-all duration-500"
+            style={{ width: gameData?.UserCompletionHardcore ?? '0%' }}
           />
         </div>
-        <p>100%</p>
       </div>
     </div>
   );
