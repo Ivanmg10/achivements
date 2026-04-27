@@ -30,7 +30,7 @@ export default function MainPage() {
 
   return (
     <main className="flex-1 min-h-0 grid grid-cols-6 grid-rows-[auto_1fr] text-text-main">
-      <MainPageProgression />
+      {/* <MainPageProgression /> */}
       <MainPageWantToPlay />
       <MainPageProfile />
       <MainPageGames />
