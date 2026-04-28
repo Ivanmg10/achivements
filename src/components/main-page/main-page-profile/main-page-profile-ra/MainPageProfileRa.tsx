@@ -48,16 +48,16 @@ export default function MainPageProfileRa({
             {user?.UserPic && (
               <Image
                 src={`https://retroachievements.org${user.UserPic}`}
-                alt="UserPic"
+                alt={`Avatar of ${user.User}`}
                 width={90}
                 height={90}
-                className={`m-1 rounded-lg ring-2 ${ringColor}`}
+                className={`m-1 rounded-lg ring-2 shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5 ${ringColor}`}
               />
             )}
-            <div className="flex flex-col gap-1">
-              <p className="text-2xl font-bold leading-tight">{user.User}</p>
+            <div className="flex flex-col gap-1 min-w-0">
+              <p className="text-xl lg:text-2xl font-bold leading-tight truncate">{user.User}</p>
               {user.Motto && (
-                <p className="text-xs text-gray-400 italic">&ldquo;{user.Motto}&rdquo;</p>
+                <p className="text-xs text-gray-400 italic line-clamp-2">&ldquo;{user.Motto}&rdquo;</p>
               )}
               {memberYear && <p className="text-xs text-gray-500">{T.profileRa.memberSince} {memberYear}</p>}
             </div>
@@ -71,10 +71,8 @@ export default function MainPageProfileRa({
             <MainPageProfileRaAchievements achievements={recentAchievements} />
           )}
 
-          {/* <MainPageProfileConsoles /> */}
-
           {hasContribs && (
-            <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2">
+            <div className="flex flex-col gap-2 bg-bg-main rounded-lg p-3">
               <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileRa.contributions}</p>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
