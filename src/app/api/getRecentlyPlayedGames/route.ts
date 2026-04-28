@@ -13,9 +13,9 @@ export async function GET() {
 
   const { rausername, raid, id } = session.user;
 
-  const data = await withCache(`recentAch:${id}`, TTL, () =>
+  const data = await withCache(`recentlyPlayed:${id}`, TTL, () =>
     fetch(
-      `https://retroachievements.org/API/API_GetUserRecentAchievements.php?u=${rausername}&y=${raid}&m=525600&c=500`,
+      `https://retroachievements.org/API/API_GetUserRecentlyPlayedGames.php?u=${rausername}&y=${raid}&c=500`,
     ).then((r) => r.json()),
   );
 
