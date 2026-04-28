@@ -48,28 +48,40 @@ export default function MainHeader() {
       <div className="flex items-center gap-1 shrink-0">
         <Link
           href="/"
-          className="p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main"
+          aria-label="Home"
+          className="p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
-          <IconHome className="w-5 h-5" />
+          <IconHome className="w-5 h-5" aria-hidden="true" />
         </Link>
         {!isHome && (
           <button
             onClick={() => router.back()}
-            className="p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main cursor-pointer"
+            aria-label="Go back"
+            className="p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
-            <IconChevronLeft className="w-5 h-5" />
+            <IconChevronLeft className="w-5 h-5" aria-hidden="true" />
           </button>
         )}
       </div>
 
-      {/* Left: HC / SC / Streak */}
-      <div className="flex items-center gap-2 flex-1">
-        {raUser && <HeaderStats raUser={raUser} streak={streak} />}
+      {/* Left: HC / SC / Streak — hidden on mobile */}
+      <div className="hidden sm:flex items-center gap-2 flex-1">
+        {raUser ? (
+          <HeaderStats raUser={raUser} streak={streak} />
+        ) : session ? (
+          <Link
+            href="/user"
+            className="flex items-center gap-2 bg-bg-main px-3 py-1.5 rounded-xl text-xs text-text-secondary hover:text-text-main transition-colors border border-dashed border-text-secondary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          >
+            <span>Connect RetroAchievements</span>
+          </Link>
+        ) : null}
       </div>
 
-      {/* Center: search bar (non-functional) */}
-      <div className="flex-1 flex justify-center">
+      {/* Center: search bar — hidden on mobile */}
+      <div className="hidden md:flex flex-1 justify-center">
         <input
+          aria-label="Search"
           className="w-full max-w-md bg-bg-main rounded-xl px-4 py-2 text-sm text-text-main placeholder:text-text-secondary outline-none cursor-not-allowed opacity-60"
           placeholder="Search..."
           disabled
@@ -78,11 +90,15 @@ export default function MainHeader() {
 
       {/* Right: RA user profile */}
       {raUser ? (
-        <Link href="/user" className="flex items-center gap-3 flex-1 justify-end hover:text-amber-100">
-          <p className="text-sm">{raUser.User}</p>
+        <Link
+          href="/user"
+          aria-label={`Profile of ${raUser.User}`}
+          className="flex items-center gap-3 flex-1 justify-end hover:text-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-lg"
+        >
+          <p className="text-sm hidden sm:block">{raUser.User}</p>
           {raUser.UserPic && (
             <Image
-              className="w-10 h-10 cursor-pointer rounded-full object-cover"
+              className="w-10 h-10 cursor-pointer rounded-full object-cover shrink-0"
               width={100}
               height={100}
               src={`https://retroachievements.org${raUser.UserPic}`}
