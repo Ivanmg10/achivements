@@ -11,7 +11,7 @@ import ConsoleSideList from '../console-side-list/ConsoleSideList'
 
 const MAX_GAMES = 2
 const CARD_HEIGHT_PX = 70
-const HEADER_PX = 72
+const HEADER_PX = 100
 const FOOTER_PX = 0
 
 export default function MainPageCompleted() {
@@ -28,8 +28,8 @@ export default function MainPageCompleted() {
       ref={sectionRef}
       className="main-content bg-bg-card text-text-main m-3 rounded-xl flex flex-col overflow-hidden"
     >
-      <div className="flex items-center gap-8 w-[95%] self-center mt-2 py-2 shrink-0 overflow-hidden">
-        <div className="flex items-center gap-3 shrink-0">
+      <div className="flex flex-col gap-1.5 w-[95%] self-center mt-2 pt-2 pb-3 shrink-0">
+        <div className="flex items-center gap-3">
           <h1 className="text-3xl">{T.mainPage.completed}</h1>
           <div className="flex items-center">
             <button
