@@ -13,7 +13,7 @@ export async function GET() {
 
   const { rausername, raid, id } = session.user;
 
-  const data = await withCache(`activityHeatmap:${id}`, TTL, async () => {
+  const data = await withCache(`activityHeatmap_v2:${id}`, TTL, async () => {
     const now = Math.floor(Date.now() / 1000);
     const day30 = now - 30 * 24 * 3600;
     const day60 = now - 60 * 24 * 3600;
@@ -26,17 +26,6 @@ export async function GET() {
         `https://retroachievements.org/API/API_GetAchievementsEarnedBetween.php?u=${rausername}&y=${raid}&f=${day60}&t=${day30}`,
       ).then((r) => r.json()).catch(() => null),
     ]);
-
-    console.log(
-      "[heatmap chunk1] type:", typeof chunk1,
-      "| isArray:", Array.isArray(chunk1),
-      "| sample:", JSON.stringify(chunk1).slice(0, 200),
-    );
-    console.log(
-      "[heatmap chunk2] type:", typeof chunk2,
-      "| isArray:", Array.isArray(chunk2),
-      "| sample:", JSON.stringify(chunk2).slice(0, 200),
-    );
 
     const toArr = (r: unknown) => (Array.isArray(r) ? r : []);
     return [...toArr(chunk1), ...toArr(chunk2)];
