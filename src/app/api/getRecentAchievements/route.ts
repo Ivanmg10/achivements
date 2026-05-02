@@ -3,7 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { withCache } from "@/lib/raCache";
 
-const TTL = 5 * 60 * 1000;
+// 60s TTL — achievements are time-sensitive; 5 min was too long and served
+// stale data when user earned achievements and immediately refreshed the page
+const TTL = 60 * 1000;
 
 export async function GET() {
   const session = await getServerSession(authOptions);
