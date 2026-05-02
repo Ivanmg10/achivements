@@ -29,7 +29,7 @@ export default function MainPage() {
       </main>
     )
 
-  if (status === 'authenticated' && !session?.user?.raUser)
+  if (status === 'authenticated' && !session?.user?.raUser?.User)
     return <MainPageNoRa />
 
   return (
