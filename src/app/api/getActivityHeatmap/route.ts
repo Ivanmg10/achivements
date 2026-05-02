@@ -13,7 +13,8 @@ export async function GET() {
 
   const { rausername, raid, id } = session.user;
 
-  const data = await withCache(`activityHeatmap_v2:${id}`, TTL, async () => {
+  let bothChunksValid = false;
+  const data = await withCache(`activityHeatmap_v3:${id}`, TTL, async () => {
     const now = Math.floor(Date.now() / 1000);
     const day30 = now - 30 * 24 * 3600;
     const day60 = now - 60 * 24 * 3600;
@@ -27,9 +28,10 @@ export async function GET() {
       ).then((r) => r.json()).catch(() => null),
     ]);
 
+    bothChunksValid = Array.isArray(chunk1) && Array.isArray(chunk2);
     const toArr = (r: unknown) => (Array.isArray(r) ? r : []);
     return [...toArr(chunk1), ...toArr(chunk2)];
-  });
+  }, () => bothChunksValid);
 
   return NextResponse.json(data);
 }
