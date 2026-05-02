@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
 import { getAllGamesPlayed } from '@/utils/apiCallsUtils'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
+import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 
@@ -27,6 +28,7 @@ function ChartCard({ children, className = '' }: { children: React.ReactNode; cl
 export default function MainPageCharts() {
   const { data: session, status } = useSession()
   const { achievements, isLoading: achLoading } = useRecentAchievements()
+  const { achievements: heatmapData } = useActivityHeatmap()
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
   const recentlyPlayed = useRecentlyPlayedGames()
 
@@ -50,7 +52,7 @@ export default function MainPageCharts() {
       {/* Row 2: Heatmap + Pie chart + Line chart */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <ChartCard>
-          <MainPageHeatmap achievements={achievements} />
+          <MainPageHeatmap achievements={heatmapData} />
         </ChartCard>
         <ChartCard>
           <div className="flex items-center gap-2">

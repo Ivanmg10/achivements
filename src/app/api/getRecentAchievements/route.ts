@@ -14,8 +14,10 @@ export async function GET() {
   const { rausername, raid, id } = session.user;
 
   const data = await withCache(`recentAch:${id}`, TTL, async () => {
+    // 14-day window — small enough that c=500 cap is never exceeded for any user,
+    // ensuring the NEWEST achievements are always included regardless of API sort order
     const raw = await fetch(
-      `https://retroachievements.org/API/API_GetUserRecentAchievements.php?u=${rausername}&y=${raid}&m=525600&c=500`,
+      `https://retroachievements.org/API/API_GetUserRecentAchievements.php?u=${rausername}&y=${raid}&m=20160&c=500`,
     ).then((r) => r.json())
     if (!Array.isArray(raw)) return raw
     return (raw as { Date: string }[]).sort(
