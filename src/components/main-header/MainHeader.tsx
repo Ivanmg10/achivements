@@ -66,7 +66,7 @@ export default function MainHeader() {
 
       {/* Left: HC / SC / Streak — hidden on mobile */}
       <div className="hidden sm:flex items-center gap-2 flex-1">
-        {raUser ? (
+        {raUser?.User ? (
           <HeaderStats raUser={raUser} streak={streak} />
         ) : session ? (
           <Link
@@ -88,8 +88,8 @@ export default function MainHeader() {
         />
       </div>
 
-      {/* Right: RA user profile */}
-      {raUser ? (
+      {/* Right: user profile */}
+      {raUser?.User ? (
         <Link
           href="/user"
           aria-label={`Profile of ${raUser.User}`}
@@ -107,7 +107,27 @@ export default function MainHeader() {
             />
           )}
         </Link>
-      ) : !session ? (
+      ) : session ? (
+        <div className="flex items-center gap-3 flex-1 justify-end">
+          <p className="text-sm hidden sm:block text-text-secondary">{session.user?.name ?? session.user?.email}</p>
+          {session.user?.image ? (
+            <Image
+              className="w-10 h-10 rounded-full object-cover shrink-0"
+              width={100}
+              height={100}
+              src={session.user.image}
+              alt={session.user?.name ?? 'User'}
+              unoptimized
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-bg-main flex items-center justify-center shrink-0">
+              <span className="text-sm font-bold text-text-secondary">
+                {(session.user?.name ?? session.user?.email ?? '?')[0].toUpperCase()}
+              </span>
+            </div>
+          )}
+        </div>
+      ) : (
         <div className="flex-1 flex justify-end">
           <button className="main-body-red px-2 py-1 rounded-3xl">
             <Link href="/authPage" className="hover:text-white w-full">
@@ -115,8 +135,6 @@ export default function MainHeader() {
             </Link>
           </button>
         </div>
-      ) : (
-        <div className="flex-1" />
       )}
     </header>
   )
