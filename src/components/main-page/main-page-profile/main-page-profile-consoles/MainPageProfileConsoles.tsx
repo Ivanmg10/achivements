@@ -9,7 +9,7 @@ import { useGamesCompletedPreview } from '@/hooks/useGamesCompletedPreview'
 const TOP_N = 5
 
 export default function MainPageProfileConsoles() {
-  const playing = useGamesInProgressPreview()
+  const { listGames: playing } = useGamesInProgressPreview()
   const { wantGames } = useWantGamesPreview()
   const { listGames, listGamesHardcore } = useGamesCompletedPreview()
 

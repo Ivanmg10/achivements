@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useEffect, useState } from 'react'
+import { useMemo, useEffect, useRef, useState } from 'react'
 import { RecentAchievement } from '@/types/types'
 import { groupByDays } from '@/utils/utils'
 
@@ -31,6 +31,8 @@ const GAP = 3  // px
 export default function MainPageHeatmap({ achievements }: { achievements: RecentAchievement[] }) {
   const totalDays = useTotalDays()
   const label = totalDays <= 91 ? 'last 3 months' : totalDays <= 120 ? 'last 4 months' : 'last 6 months'
+  const tooltipRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const { totalAch, truncated, weeks, monthLabels } = useMemo(() => {
     const data = groupByDays(achievements, totalDays)
@@ -55,10 +57,35 @@ export default function MainPageHeatmap({ achievements }: { achievements: Recent
     return { totalAch, truncated, weeks, monthLabels }
   }, [achievements, totalDays])
 
-  // max cell size per breakpoint prevents cells bloating on wide/sparse cards
   const cellMax = totalDays <= 91 ? 20 : totalDays <= 120 ? 17 : 14
   const maxWidth = weeks.length * cellMax + (weeks.length - 1) * GAP
   const gridCols = `repeat(${weeks.length}, 1fr)`
+
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const cell = (e.target as HTMLElement).closest('[data-date]') as HTMLElement | null
+    const tooltip = tooltipRef.current
+    const container = containerRef.current
+    if (!cell || !tooltip || !container) {
+      if (tooltip) tooltip.style.display = 'none'
+      return
+    }
+    const rect = container.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const date = cell.dataset.date ?? ''
+    const count = cell.dataset.count ?? '0'
+    const formatted = new Date(date + 'T00:00:00').toLocaleDateString('default', {
+      month: 'short', day: 'numeric', year: 'numeric',
+    })
+    tooltip.textContent = `${formatted}: ${count} achievement${count !== '1' ? 's' : ''}`
+    tooltip.style.display = 'block'
+    tooltip.style.left = `${x + 12}px`
+    tooltip.style.top = `${y - 36}px`
+  }
+
+  function handleMouseLeave() {
+    if (tooltipRef.current) tooltipRef.current.style.display = 'none'
+  }
 
   return (
     <div
@@ -84,7 +111,23 @@ export default function MainPageHeatmap({ achievements }: { achievements: Recent
         className="flex-1 flex flex-col justify-center gap-1"
         aria-hidden="true"
       >
-        <div className="w-full mx-auto flex flex-col gap-1" style={{ maxWidth }}>
+        <div
+          ref={containerRef}
+          className="w-full mx-auto flex flex-col gap-1 relative"
+          style={{ maxWidth }}
+        >
+          {/* tooltip */}
+          <div
+            ref={tooltipRef}
+            className="pointer-events-none absolute z-10 px-2 py-1 rounded text-[11px] text-white whitespace-nowrap"
+            style={{
+              display: 'none',
+              backgroundColor: '#1e1e2e',
+              border: '1px solid #3730a3',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+            }}
+          />
+
           {/* month labels */}
           <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: `${GAP}px` }}>
             {weeks.map((_, wi) => {
@@ -101,8 +144,10 @@ export default function MainPageHeatmap({ achievements }: { achievements: Recent
             })}
           </div>
 
-          {/* cells — column-by-column via grid-auto-flow */}
+          {/* cells */}
           <div
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
             style={{
               display: 'grid',
               gridTemplateColumns: gridCols,
@@ -119,6 +164,8 @@ export default function MainPageHeatmap({ achievements }: { achievements: Recent
                     key={`${wi}-${di}`}
                     className="aspect-square rounded-sm"
                     style={{ backgroundColor: cell ? cellBg(cell.count) : '#0f0f1a' }}
+                    data-date={cell?.date}
+                    data-count={cell?.count ?? 0}
                   />
                 )
               })

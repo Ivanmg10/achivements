@@ -34,7 +34,7 @@ function HeaderStats({ raUser, streak }: { raUser: RetroAchievementsUserProfile;
 export default function MainHeader() {
   const { data: session } = useSession()
   const { T } = useLanguage()
-  const recentAch = useRecentAchievements()
+  const { achievements: recentAch } = useRecentAchievements()
   const router = useRouter()
   const pathname = usePathname()
 

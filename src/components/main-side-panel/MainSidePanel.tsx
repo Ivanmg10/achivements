@@ -14,7 +14,7 @@ import MainSidePanelStats from './main-side-panel-stats/MainSidePanelStats'
 
 export default function MainSidePanel() {
   const { data: session } = useSession()
-  const recentAch = useRecentAchievements()
+  const { achievements: recentAch } = useRecentAchievements()
   const { T } = useLanguage()
 
   const raUser = session?.user?.raUser

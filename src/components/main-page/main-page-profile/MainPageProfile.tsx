@@ -11,7 +11,7 @@ export default function MainPageProfile() {
   const { data: session } = useSession()
   const lastGameId = session?.user?.raUser?.LastGameID?.toString() ?? null
   const game = useGameProgression(lastGameId)
-  const recentAchievements = useRecentAchievements()
+  const { achievements: recentAchievements } = useRecentAchievements()
 
   return (
     <section className="main-content text-text-main m-3 rounded-xl flex flex-col items-center overflow-y-auto">

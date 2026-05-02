@@ -26,8 +26,8 @@ function ChartCard({ children, className = '' }: { children: React.ReactNode; cl
 
 export default function MainPageCharts() {
   const { data: session, status } = useSession()
-  const achievements = useRecentAchievements()
-  const playing = useGamesInProgressPreview()
+  const { achievements, isLoading: achLoading } = useRecentAchievements()
+  const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
   const recentlyPlayed = useRecentlyPlayedGames()
 
   const [softcoreGames, setSoftcoreGames] = useState<RetroAchievementsGameCompleted[]>([])
@@ -45,7 +45,7 @@ export default function MainPageCharts() {
       <h2 className="text-xl font-semibold text-text-main">Stats & Activity</h2>
 
       {/* Row 1: Points stats */}
-      <MainPagePointsStats achievements={achievements} />
+      <MainPagePointsStats achievements={achievements} isLoading={achLoading} />
 
       {/* Row 2: Heatmap + Pie chart + Line chart */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -75,7 +75,7 @@ export default function MainPageCharts() {
         <ChartCard className="md:col-span-2 lg:col-span-1">
           <p className="text-[10px] uppercase tracking-widest text-text-secondary">Achievements / day (7d)</p>
           <div aria-hidden="true">
-            <AchievementsLineChart achievements={achievements} />
+            <AchievementsLineChart achievements={achievements} isLoading={achLoading} />
           </div>
         </ChartCard>
       </div>
@@ -91,7 +91,7 @@ export default function MainPageCharts() {
         </ChartCard>
 
         <ChartCard className="md:col-span-2 lg:col-span-1">
-          <MainPageAbandoned playing={playing} />
+          <MainPageAbandoned playing={playing} isLoading={playingLoading} />
         </ChartCard>
       </div>
     </section>

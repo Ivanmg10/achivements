@@ -65,6 +65,7 @@ export const getGamesCompleted = async (
 
   const hardcore = completedGames
     .filter((g) => Number(g.HardcoreMode) === 1 && parseFloat(g.PctWon) >= 1)
+    .sort(() => Math.random() - 0.5)
     .slice(0, 3);
   const hardcoreIds = new Set(hardcore.map((g) => g.GameID));
   const softcore = completedGames
@@ -74,6 +75,7 @@ export const getGamesCompleted = async (
         parseFloat(g.PctWon) >= 1 &&
         !hardcoreIds.has(g.GameID),
     )
+    .sort(() => Math.random() - 0.5)
     .slice(0, 3);
 
   setGames(softcore);
@@ -88,11 +90,15 @@ export const getGamesInProgress = async (
     `/api/getGamesCompleted`,
   ).then((res) => res.json());
 
-  const inProgress = games.filter(
-    (g) => Number(g.HardcoreMode) === 0 &&
-           parseFloat(g.PctWon) > 0 &&
-           parseFloat(g.PctWon) < 1,
-  );
+  if (!Array.isArray(games)) return;
+
+  const inProgress = games
+    .filter(
+      (g) => Number(g.HardcoreMode) === 0 &&
+             parseFloat(g.PctWon) > 0 &&
+             parseFloat(g.PctWon) < 1,
+    )
+    .sort(() => Math.random() - 0.5);
 
   setGames(inProgress);
 };
@@ -143,9 +149,10 @@ export const getRecentAchievements = async (
   session: Session | null,
   setAchievements: Dispatch<SetStateAction<RecentAchievement[]>>,
 ) => {
-  const data: RecentAchievement[] = await fetch(
-    `/api/getRecentAchievements`,
-  ).then((res) => res.json());
-
-  setAchievements(data);
+  const data = await fetch(`/api/getRecentAchievements`).then((res) => res.json());
+  if (!Array.isArray(data)) return;
+  const sorted = [...data].sort(
+    (a, b) => new Date(b.Date).getTime() - new Date(a.Date).getTime(),
+  );
+  setAchievements(sorted);
 };

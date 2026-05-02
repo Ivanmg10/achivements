@@ -7,16 +7,25 @@ import { RetroAchievementsGameCompleted } from '@/types/types'
 
 const ABANDONED_DAYS = 90
 
-export default function MainPageAbandoned({ playing }: { playing: RetroAchievementsGameCompleted[] }) {
+export default function MainPageAbandoned({
+  playing,
+  isLoading,
+}: {
+  playing: RetroAchievementsGameCompleted[]
+  isLoading?: boolean
+}) {
   const [lastAchDates, setLastAchDates] = useState<Record<number, string>>({})
+  const [datesLoading, setDatesLoading] = useState(false)
 
   const allIdsKey = useMemo(() => playing.map((g) => g.GameID).join(','), [playing])
 
   useEffect(() => {
     if (!allIdsKey) return
+    setDatesLoading(true)
     fetch(`/api/getGamesLastPlayed?gameIds=${allIdsKey}`)
       .then((r) => r.json())
       .then((data) => { if (typeof data === 'object' && data) setLastAchDates(data) })
+      .finally(() => setDatesLoading(false))
   }, [allIdsKey])
 
   const abandoned = useMemo(() => {
@@ -33,6 +42,19 @@ export default function MainPageAbandoned({ playing }: { playing: RetroAchieveme
       .filter((g): g is typeof g & { daysAgo: number } => g.daysAgo !== null && g.daysAgo >= ABANDONED_DAYS)
       .sort((a, b) => b.daysAgo - a.daysAgo)
   }, [playing, lastAchDates])
+
+  const loading = isLoading || datesLoading
+
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-2">
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Abandoned games</p>
+        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">
+          Loading...
+        </div>
+      </div>
+    )
+  }
 
   if (abandoned.length === 0) {
     return (

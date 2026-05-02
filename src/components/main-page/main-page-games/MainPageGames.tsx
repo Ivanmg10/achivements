@@ -16,7 +16,7 @@ const FOOTER_PX = 0
 
 export default function MainPageGames() {
   const sectionRef = useRef<HTMLElement>(null)
-  const listGames = useGamesInProgressPreview()
+  const { listGames } = useGamesInProgressPreview()
   const visibleCount = useResizableList({
     sectionRef,
     maxItems: MAX_GAMES,

@@ -5,14 +5,17 @@ import { useEffect, useRef, useState } from 'react'
 
 export function useRecentAchievements() {
   const { data: session } = useSession()
-  const [recentAchievements, setRecentAchievements] = useState<RecentAchievement[]>([])
+  const [achievements, setAchievements] = useState<RecentAchievement[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const hasFetched = useRef(false)
 
   useEffect(() => {
-    if (!session?.user?.rausername || hasFetched.current) return
+    if (!session?.user?.rausername) { setIsLoading(false); return }
+    if (hasFetched.current) return
     hasFetched.current = true
-    getRecentAchievements(session, setRecentAchievements)
+    setIsLoading(true)
+    getRecentAchievements(session, setAchievements).finally(() => setIsLoading(false))
   }, [session?.user?.rausername])
 
-  return recentAchievements
+  return { achievements, isLoading }
 }

@@ -6,15 +6,17 @@ import { useEffect, useRef, useState } from 'react'
 export function useGamesInProgressPreview() {
   const { status, data: session } = useSession()
   const [listGames, setListGames] = useState<RetroAchievementsGameCompleted[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const hasFetched = useRef(false)
 
   useEffect(() => {
-    /* istanbul ignore if */
-    if (status === 'authenticated' && !hasFetched.current) {
-      hasFetched.current = true
-      getGamesInProgress(session, setListGames)
-    }
+    if (status === 'loading') return
+    if (status !== 'authenticated') { setIsLoading(false); return }
+    if (hasFetched.current) return
+    hasFetched.current = true
+    setIsLoading(true)
+    getGamesInProgress(session, setListGames).finally(() => setIsLoading(false))
   }, [status])
 
-  return listGames
+  return { listGames, isLoading }
 }
