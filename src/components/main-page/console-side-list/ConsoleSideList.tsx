@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export default function ConsoleSideList({ slug }: { slug: string }) {
   return (
-    <div className="flex flex-row flex-wrap gap-x-3 gap-y-1">
+    <div className="flex flex-row flex-wrap justify-end gap-x-3 gap-y-1">
       {CONSOLES.map((console) => (
         <Link
           key={console.id}

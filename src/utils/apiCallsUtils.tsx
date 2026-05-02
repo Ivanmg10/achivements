@@ -152,7 +152,8 @@ export const getRecentAchievements = async (
   const data = await fetch(`/api/getRecentAchievements`).then((res) => res.json());
   if (!Array.isArray(data)) return;
   const sorted = [...data].sort(
-    (a, b) => new Date(b.Date).getTime() - new Date(a.Date).getTime(),
+    (a, b) =>
+      new Date(b.Date.replace(' ', 'T')).getTime() - new Date(a.Date.replace(' ', 'T')).getTime(),
   );
   setAchievements(sorted);
 };

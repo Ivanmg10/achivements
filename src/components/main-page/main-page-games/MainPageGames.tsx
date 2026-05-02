@@ -11,7 +11,7 @@ import ConsoleSideList from '../console-side-list/ConsoleSideList'
 
 const MAX_GAMES = 2
 const CARD_HEIGHT_PX = 70
-const HEADER_PX = 88
+const HEADER_PX = 64
 const FOOTER_PX = 0
 
 export default function MainPageGames() {
@@ -31,8 +31,8 @@ export default function MainPageGames() {
       ref={sectionRef}
       className="main-content bg-bg-card text-text-main m-3 rounded-xl flex flex-col overflow-hidden"
     >
-      <div className="flex flex-col gap-1.5 w-[95%] self-center mt-2 pt-2 pb-3 shrink-0">
-        <h1 className="text-3xl">{T.mainPage.playing}</h1>
+      <div className="flex items-center justify-between gap-2 w-[95%] self-center mt-2 pt-2 pb-3 shrink-0">
+        <h1 className="text-3xl shrink-0">{T.mainPage.playing}</h1>
         <ConsoleSideList slug="playing" />
       </div>
       <div className="flex flex-col items-center w-full overflow-hidden">

@@ -13,11 +13,15 @@ export async function GET() {
 
   const { rausername, raid, id } = session.user;
 
-  const data = await withCache(`recentAch:${id}`, TTL, () =>
-    fetch(
+  const data = await withCache(`recentAch:${id}`, TTL, async () => {
+    const raw = await fetch(
       `https://retroachievements.org/API/API_GetUserRecentAchievements.php?u=${rausername}&y=${raid}&m=525600&c=500`,
-    ).then((r) => r.json()),
-  );
+    ).then((r) => r.json())
+    if (!Array.isArray(raw)) return raw
+    return (raw as { Date: string }[]).sort(
+      (a, b) => new Date(b.Date.replace(' ', 'T')).getTime() - new Date(a.Date.replace(' ', 'T')).getTime(),
+    )
+  });
 
   return NextResponse.json(data);
 }
