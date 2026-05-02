@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { withCache } from "@/lib/raCache";
 
-const TTL = 15 * 60 * 1000; // 15 min
+const TTL = 15 * 60 * 1000;
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -18,23 +18,28 @@ export async function GET() {
     const day30 = now - 30 * 24 * 3600;
     const day60 = now - 60 * 24 * 3600;
 
-    // Two parallel calls covering 60 days in 30-day chunks.
-    // API_GetAchievementsEarnedBetween queries by date range with no count cap,
-    // avoiding the ascending-order + c=500 truncation issue.
     const [chunk1, chunk2] = await Promise.all([
       fetch(
         `https://retroachievements.org/API/API_GetAchievementsEarnedBetween.php?u=${rausername}&y=${raid}&f=${day30}&t=${now}`,
-      ).then((r) => r.json()).catch(() => []),
+      ).then((r) => r.json()).catch(() => null),
       fetch(
         `https://retroachievements.org/API/API_GetAchievementsEarnedBetween.php?u=${rausername}&y=${raid}&f=${day60}&t=${day30}`,
-      ).then((r) => r.json()).catch(() => []),
+      ).then((r) => r.json()).catch(() => null),
     ]);
 
-    const merged = [
-      ...(Array.isArray(chunk1) ? chunk1 : []),
-      ...(Array.isArray(chunk2) ? chunk2 : []),
-    ];
-    return merged;
+    console.log(
+      "[heatmap chunk1] type:", typeof chunk1,
+      "| isArray:", Array.isArray(chunk1),
+      "| sample:", JSON.stringify(chunk1).slice(0, 200),
+    );
+    console.log(
+      "[heatmap chunk2] type:", typeof chunk2,
+      "| isArray:", Array.isArray(chunk2),
+      "| sample:", JSON.stringify(chunk2).slice(0, 200),
+    );
+
+    const toArr = (r: unknown) => (Array.isArray(r) ? r : []);
+    return [...toArr(chunk1), ...toArr(chunk2)];
   });
 
   return NextResponse.json(data);
