@@ -10,12 +10,23 @@ import { calcStreak } from '@/utils/utils'
 import { RetroAchievementsUserProfile } from '@/types/types'
 import { IconHome, IconChevronLeft } from '@tabler/icons-react'
 
-function StatPill({ label, value, suffix = '' }: { label: string; value: number; suffix?: string }) {
+function StatPill({
+  label,
+  value,
+  suffix = '',
+}: {
+  label: string
+  value: number
+  suffix?: string
+}) {
   return (
     <div className="flex flex-col items-center bg-bg-main rounded-xl px-4 py-1.5 min-w-16">
-      <span className="text-[10px] uppercase tracking-widest text-text-secondary font-medium">{label}</span>
+      <span className="text-[10px] uppercase tracking-widest text-text-secondary font-medium">
+        {label}
+      </span>
       <span className="text-base font-bold text-text-main leading-tight">
-        {value.toLocaleString()}{suffix}
+        {value.toLocaleString()}
+        {suffix}
       </span>
     </div>
   )
@@ -108,8 +119,13 @@ export default function MainHeader() {
           )}
         </Link>
       ) : session ? (
-        <div className="flex items-center gap-3 flex-1 justify-end">
-          <p className="text-sm hidden sm:block text-text-secondary">{session.user?.name ?? session.user?.email}</p>
+        <Link
+          href="/user"
+          className="flex items-center gap-3 flex-1 justify-end hover:text-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-lg"
+        >
+          <p className="text-sm hidden sm:block text-text-secondary">
+            {session.user?.name ?? session.user?.email}
+          </p>
           {session.user?.image ? (
             <Image
               className="w-10 h-10 rounded-full object-cover shrink-0"
@@ -126,7 +142,7 @@ export default function MainHeader() {
               </span>
             </div>
           )}
-        </div>
+        </Link>
       ) : (
         <div className="flex-1 flex justify-end">
           <button className="main-body-red px-2 py-1 rounded-3xl">
