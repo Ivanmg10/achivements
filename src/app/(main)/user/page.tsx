@@ -1,7 +1,7 @@
 "use client";
 
 import GamesPlayedPieChart from "@/components/games-played-pie-chart/GamesPlayedPieChart";
-import NoMainHeader from "@/components/no-main-header/NoMainHeader";
+// import NoMainHeader from "@/components/no-main-header/NoMainHeader";
 import UserCharts from "@/components/user-charts/UserCharts";
 import UserConfig from "@/components/user-config/UserConfig";
 import UserData from "@/components/user-data/UserData";
@@ -16,8 +16,8 @@ export default function UserPage() {
     <main
       className={`min-h-screen bg-bg-main text-text-main flex flex-col justify-start items-center`}
     >
-      {/* BACK BUTTON */}
-      <NoMainHeader />
+      {/* BACK BUTTON - now handled by MainHeader */}
+      {/* <NoMainHeader /> */}
 
       {/* DATOS DE USUARIO */}
       <UserData session={session} />

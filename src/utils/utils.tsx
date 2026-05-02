@@ -42,6 +42,23 @@ export const groupByConsole = (games: RetroAchievementsGameCompleted[]) => {
   return Object.entries(grouped).map(([name, value]) => ({ name, value }))
 }
 
+export const groupByDays = (achievements: RecentAchievement[], totalDays: number) => {
+  const days: string[] = []
+  for (let i = totalDays - 1; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    days.push(d.toISOString().split('T')[0])
+  }
+  const grouped = achievements.reduce((acc, a) => {
+    const day = a.Date.split(' ')[0]
+    acc[day] = (acc[day] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+  return days.map((date) => ({ date, count: grouped[date] || 0 }))
+}
+
+export const groupBy365Days = (achievements: RecentAchievement[]) => groupByDays(achievements, 365)
+
 export function calcStreak(achievements: RecentAchievement[]): number {
   if (!achievements.length) return 0
   const days = new Set(achievements.map((a) => a.Date.split(' ')[0]))

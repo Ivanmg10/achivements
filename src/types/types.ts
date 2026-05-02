@@ -152,6 +152,20 @@ export type WantToPlayUser = {
   Results: WantToPlayGame[];
 };
 
+export type RecentlyPlayedGame = {
+  GameID: number;
+  Title: string;
+  ImageIcon: string;
+  ConsoleName: string;
+  LastPlayed: string; // "2024-01-15 20:30:00"
+  NumPossibleAchievements: number;
+  PossibleScore: number;
+  NumAchieved: number;
+  ScoreAchieved: number;
+  NumAchievedHardcore: number;
+  ScoreAchievedHardcore: number;
+}
+
 export type RetroAchievementsGameCompleted = {
   GameID: number;
   Title: string;
@@ -174,7 +188,9 @@ export type RecentAchievement = {
   Description: string;
   BadgeName: string;
   Points: number;
+  TrueRatio?: number;
   GameID: number;
   GameTitle: string;
+  GameIcon?: string;
   ConsoleName: string;
 };

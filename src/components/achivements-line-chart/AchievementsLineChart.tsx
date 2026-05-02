@@ -16,8 +16,10 @@ import {
 
 export default function AchievementsLineChart({
   achievements,
+  isLoading,
 }: {
   achievements: RecentAchievement[]
+  isLoading?: boolean
 }) {
   const data = groupByDay(achievements)
   const total = data.reduce((sum, d) => sum + d.count, 0)
@@ -28,7 +30,11 @@ export default function AchievementsLineChart({
       <p className="text-text-secondary text-sm px-4 pb-3">
         {T.lineChart.achievementsLast7Days.replace('{total}', String(total))}
       </p>
-      {total === 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center h-85 text-text-secondary text-sm">
+          Loading...
+        </div>
+      ) : total === 0 ? (
         <div className="flex items-center justify-center h-85 text-text-secondary text-sm">
           {T.lineChart.noActivity}
         </div>

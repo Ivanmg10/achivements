@@ -1,9 +1,8 @@
 import { RecentAchievement } from '@/types/types'
-import { getRecentAchievements } from '@/utils/apiCallsUtils'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
 
-export function useRecentAchievements() {
+export function useActivityHeatmap() {
   const { data: session } = useSession()
   const [achievements, setAchievements] = useState<RecentAchievement[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -14,7 +13,10 @@ export function useRecentAchievements() {
     if (hasFetched.current) return
     hasFetched.current = true
     setIsLoading(true)
-    getRecentAchievements(session, setAchievements).finally(() => setIsLoading(false))
+    fetch('/api/getActivityHeatmap')
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setAchievements(data) })
+      .finally(() => setIsLoading(false))
   }, [session?.user?.rausername])
 
   return { achievements, isLoading }
