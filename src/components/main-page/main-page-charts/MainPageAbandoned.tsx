@@ -15,17 +15,16 @@ export default function MainPageAbandoned({
   isLoading?: boolean
 }) {
   const [lastAchDates, setLastAchDates] = useState<Record<number, string>>({})
-  const [datesLoading, setDatesLoading] = useState(false)
+  const [fetchedKey, setFetchedKey] = useState('')
 
   const allIdsKey = useMemo(() => playing.map((g) => g.GameID).join(','), [playing])
 
   useEffect(() => {
     if (!allIdsKey) return
-    setDatesLoading(true)
     fetch(`/api/getGamesLastPlayed?gameIds=${allIdsKey}`)
       .then((r) => r.json())
       .then((data) => { if (typeof data === 'object' && data) setLastAchDates(data) })
-      .finally(() => setDatesLoading(false))
+      .finally(() => setFetchedKey(allIdsKey))
   }, [allIdsKey])
 
   const abandoned = useMemo(() => {
@@ -43,7 +42,9 @@ export default function MainPageAbandoned({
       .sort((a, b) => b.daysAgo - a.daysAgo)
   }, [playing, lastAchDates])
 
-  const loading = isLoading || datesLoading
+  // dates not yet fetched for current set of games → still loading
+  const datesNotReady = allIdsKey !== '' && fetchedKey !== allIdsKey
+  const loading = isLoading || datesNotReady
 
   if (loading) {
     return (
