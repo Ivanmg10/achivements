@@ -28,7 +28,7 @@ function ChartCard({ children, className = '' }: { children: React.ReactNode; cl
 export default function MainPageCharts() {
   const { data: session, status } = useSession()
   const { achievements, isLoading: achLoading } = useRecentAchievements()
-  const { achievements: heatmapData } = useActivityHeatmap()
+  const { achievements: heatmapData, isLoading: heatmapLoading } = useActivityHeatmap()
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
   const recentlyPlayed = useRecentlyPlayedGames()
 
@@ -52,7 +52,7 @@ export default function MainPageCharts() {
       {/* Row 2: Heatmap + Pie chart + Line chart */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <ChartCard>
-          <MainPageHeatmap achievements={heatmapData} />
+          <MainPageHeatmap achievements={heatmapData} isLoading={heatmapLoading} />
         </ChartCard>
         <ChartCard>
           <div className="flex items-center gap-2">
