@@ -68,55 +68,53 @@ export default function MainPageCharts() {
             isLoading={achLoading || rankLoading}
           />
 
-          {/* Row 2-3: 3-column layout
-              Left:   Heatmap + Line chart stacked
-              Center: Pie chart + Most Active + Rarest + Abandoned stacked
-              Right:  Perfect Games (top half) + Mastery (bottom half)
+          {/* Rows 2-4: single grid-cols-3
+              Row 2: Heatmap | Line chart | Pie chart
+              Row 3: [Most Active + Rarest + Abandoned col-span-2 nested] | [PG + Mastery col-span-1 50/50]
+              Row 4: Completion Dist col-span-1 | Almost There col-span-2
           */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-            {/* Left col: Heatmap + Line chart */}
-            <div className="flex flex-col gap-4">
-              <ChartCard className="flex-1">
-                <MainPageHeatmap achievements={heatmapData} isLoading={heatmapLoading} onRefresh={refetchHeatmap} />
-              </ChartCard>
-              <ChartCard className="flex-1">
-                <p className="text-[10px] uppercase tracking-widest text-text-secondary">Daily achievements — last 7 days</p>
-                <div aria-hidden="true">
-                  <AchievementsLineChart achievements={achievements} isLoading={achLoading} />
+            {/* Row 2 */}
+            <ChartCard>
+              <MainPageHeatmap achievements={heatmapData} isLoading={heatmapLoading} onRefresh={refetchHeatmap} />
+            </ChartCard>
+            <ChartCard>
+              <p className="text-[10px] uppercase tracking-widest text-text-secondary">Daily achievements — last 7 days</p>
+              <div aria-hidden="true">
+                <AchievementsLineChart achievements={achievements} isLoading={achLoading} />
+              </div>
+            </ChartCard>
+            <ChartCard>
+              <div className="flex items-center gap-2">
+                <p className="text-[10px] uppercase tracking-widest text-text-secondary">Games by console</p>
+                <div className="flex gap-1 ml-auto">
+                  <button
+                    onClick={() => setChartMode('softcore')}
+                    aria-pressed={chartMode === 'softcore'}
+                    className={`text-xs px-2 py-0.5 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${chartMode === 'softcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
+                  >SC</button>
+                  <button
+                    onClick={() => setChartMode('hardcore')}
+                    aria-pressed={chartMode === 'hardcore'}
+                    className={`text-xs px-2 py-0.5 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${chartMode === 'hardcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
+                  >HC</button>
                 </div>
-              </ChartCard>
-            </div>
+              </div>
+              <div aria-hidden="true" className="flex-1 flex min-h-0">
+                <GamesPlayedPieChart games={chartMode === 'softcore' ? softcore : hardcore} />
+              </div>
+            </ChartCard>
 
-            {/* Center col: Pie chart + 3 list cards */}
-            <div className="flex flex-col gap-4">
+            {/* Row 3: col-span-2 nested 3-cols + col-span-1 50/50 */}
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
               <ChartCard>
-                <div className="flex items-center gap-2">
-                  <p className="text-[10px] uppercase tracking-widest text-text-secondary">Games by console</p>
-                  <div className="flex gap-1 ml-auto">
-                    <button
-                      onClick={() => setChartMode('softcore')}
-                      aria-pressed={chartMode === 'softcore'}
-                      className={`text-xs px-2 py-0.5 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${chartMode === 'softcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
-                    >SC</button>
-                    <button
-                      onClick={() => setChartMode('hardcore')}
-                      aria-pressed={chartMode === 'hardcore'}
-                      className={`text-xs px-2 py-0.5 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${chartMode === 'hardcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
-                    >HC</button>
-                  </div>
-                </div>
-                <div aria-hidden="true" className="flex-1 flex min-h-0">
-                  <GamesPlayedPieChart games={chartMode === 'softcore' ? softcore : hardcore} />
-                </div>
-              </ChartCard>
-              <ChartCard className="flex-1">
                 <MainPageTopGames achievements={achievements} />
               </ChartCard>
-              <ChartCard className="flex-1">
+              <ChartCard>
                 <MainPageRarest achievements={achievements} />
               </ChartCard>
-              <ChartCard className="flex-1">
+              <ChartCard>
                 <MainPageAbandoned
                   playing={playing}
                   isLoading={playingLoading}
@@ -125,8 +123,6 @@ export default function MainPageCharts() {
                 />
               </ChartCard>
             </div>
-
-            {/* Right col: Perfect Games + Mastery stacked 50/50 */}
             <div className="flex flex-col gap-4">
               <ChartCard className="flex-1">
                 <MainPagePerfectGames games={all} />
@@ -136,16 +132,14 @@ export default function MainPageCharts() {
               </ChartCard>
             </div>
 
-          </div>
-
-          {/* Row 4: Completion distribution + Almost there */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Row 4: col-span-1 + col-span-2 */}
             <ChartCard>
               <MainPageCompletionDist games={all} />
             </ChartCard>
-            <ChartCard>
+            <ChartCard className="lg:col-span-2">
               <MainPageAlmostThere games={all} />
             </ChartCard>
+
           </div>
         </div>
       </SectionFallback>
