@@ -19,10 +19,14 @@ export async function GET(request: NextRequest) {
   const gameIds = gameIdsParam.split(",").map(Number).filter(Boolean);
 
   async function fetchGame(gameId: number): Promise<[number, string | null]> {
-    const data = await withCache(`gameProgression:${id}:${gameId}`, TTL, () =>
-      fetch(
-        `https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=${rausername}&y=${raid}&g=${gameId}`,
-      ).then((r) => r.json()).catch(() => null),
+    const data = await withCache(
+      `gameProgression_v2:${id}:${gameId}`,
+      TTL,
+      () =>
+        fetch(
+          `https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=${rausername}&y=${raid}&g=${gameId}`,
+        ).then((r) => r.json()).catch(() => null),
+      (d) => d !== null && typeof d === 'object' && 'ID' in d,
     );
 
     const achievements: Record<string, { DateEarned?: string; DateEarnedHardcore?: string }> = data?.Achievements ?? {};

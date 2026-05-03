@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   const { rausername, raid, id } = session.user;
 
   const data = await withCache(
-    `gameProgression:${id}:${gameId}`,
+    `gameProgression_v2:${id}:${gameId}`,
     TTL,
     () =>
       fetch(
@@ -27,6 +27,6 @@ export async function GET(request: NextRequest) {
     (d) => d !== null && typeof d === 'object' && 'ID' in d,
   );
 
-  if (!data) return NextResponse.json({ message: "Game not found" }, { status: 404 });
+  if (data === null) return NextResponse.json({ message: "Game not found" }, { status: 404 });
   return NextResponse.json(data);
 }
