@@ -180,6 +180,32 @@ export type RetroAchievementsGameCompleted = {
   GameTitle?: string;
 };
 
+export type UserRankAndScore = {
+  Score: number
+  SoftcoreScore: number
+  Rank: number
+}
+
+export type UserAward = {
+  AwardedAt: string
+  AwardType: string
+  AwardData: number
+  AwardDataExtra: number
+  Title: string
+  ConsoleName: string
+  ImageIcon: string
+}
+
+export type UserAwards = {
+  TotalAwardsCount: number
+  MasteryAwardsCount: number
+  CompletionAwardsCount: number
+  BeatenHardcoreAwardsCount: number
+  BeatenSoftcoreAwardsCount: number
+  EventAwardsCount: number
+  VisibleUserAwards: UserAward[]
+}
+
 export type RecentAchievement = {
   Date: string; // "2024-01-15 20:30:00"
   HardcoreMode: string;

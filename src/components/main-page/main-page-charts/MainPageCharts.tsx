@@ -5,6 +5,8 @@ import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useGamesData } from '@/contexts/GamesDataContext'
+import { useUserRank } from '@/hooks/useUserRank'
+import { useUserAwards } from '@/hooks/useUserAwards'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
@@ -14,6 +16,9 @@ import MainPagePointsStats from './MainPagePointsStats'
 import MainPageRarest from './MainPageRarest'
 import MainPageAbandoned from './MainPageAbandoned'
 import MainPageTopGames from './MainPageTopGames'
+import MainPageMastery from './MainPageMastery'
+import MainPageCompletionDist from './MainPageCompletionDist'
+import MainPageConsoleCompletion from './MainPageConsoleCompletion'
 
 function ChartCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
@@ -27,22 +32,26 @@ export default function MainPageCharts() {
   const { achievements, isLoading: achLoading, error: achError, refetch: refetchAch } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()
   const { listGames: playing, isLoading: playingLoading, error: playingError, refetch: refetchPlaying } = useGamesInProgressPreview()
-  const { softcore, hardcore, error: chartError, refetch: refetchChart } = useGamesData()
+  const { all, softcore, hardcore, error: chartError, refetch: refetchChart } = useGamesData()
+  const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
+  const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
 
   const [abandonedError, setAbandonedError] = useState(false)
   const [resetKey, setResetKey] = useState(0)
   const [chartMode, setChartMode] = useState<'softcore' | 'hardcore'>('softcore')
 
-  const anyError = achError || heatmapError || chartError || playingError || abandonedError
+  const anyError = achError || heatmapError || chartError || playingError || rankError || awardsError || abandonedError
 
   const refetchAll = useCallback(() => {
     refetchAch()
     refetchHeatmap()
     refetchChart()
     refetchPlaying()
+    refetchRank()
+    refetchAwards()
     setAbandonedError(false)
     setResetKey((k) => k + 1)
-  }, [refetchAch, refetchHeatmap, refetchChart, refetchPlaying])
+  }, [refetchAch, refetchHeatmap, refetchChart, refetchPlaying, refetchRank, refetchAwards])
 
   return (
     <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-label="Stats & Activity">
@@ -50,8 +59,13 @@ export default function MainPageCharts() {
 
       <SectionFallback error={anyError} onRefresh={refetchAll}>
         <div className="flex flex-col gap-4">
-          {/* Row 1: Points stats */}
-          <MainPagePointsStats achievements={achievements} isLoading={achLoading} />
+          {/* Row 1: Pills */}
+          <MainPagePointsStats
+            achievements={achievements}
+            heatmapAchievements={heatmapData}
+            rank={rank}
+            isLoading={achLoading || rankLoading}
+          />
 
           {/* Row 2: Heatmap + Pie chart + Line chart */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -91,11 +105,9 @@ export default function MainPageCharts() {
             <ChartCard>
               <MainPageTopGames achievements={achievements} />
             </ChartCard>
-
             <ChartCard>
               <MainPageRarest achievements={achievements} />
             </ChartCard>
-
             <ChartCard className="md:col-span-2 lg:col-span-1">
               <MainPageAbandoned
                 playing={playing}
@@ -103,6 +115,19 @@ export default function MainPageCharts() {
                 resetKey={resetKey}
                 onError={setAbandonedError}
               />
+            </ChartCard>
+          </div>
+
+          {/* Row 4: Mastery + Completion distribution + Console completion */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <ChartCard>
+              <MainPageMastery awards={awards} isLoading={awardsLoading} />
+            </ChartCard>
+            <ChartCard>
+              <MainPageCompletionDist games={all} />
+            </ChartCard>
+            <ChartCard className="md:col-span-2 lg:col-span-1">
+              <MainPageConsoleCompletion games={all} />
             </ChartCard>
           </div>
         </div>
