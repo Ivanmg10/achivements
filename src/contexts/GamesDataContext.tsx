@@ -19,6 +19,12 @@ const Ctx = createContext<CtxType>({
   isLoading: true, error: false, refetch: () => {},
 })
 
+// ConsoleID 100 = Hubs, 101 = Events — RA system entries, not real games
+const RA_SYSTEM_CONSOLE_IDS = new Set([100, 101])
+function isRealGame(g: RetroAchievementsGameCompleted) {
+  return !RA_SYSTEM_CONSOLE_IDS.has(g.ConsoleID)
+}
+
 export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
   const [all, setAll] = useState<RetroAchievementsGameCompleted[]>([])
@@ -32,7 +38,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     setError(false)
     fetch('/api/getGamesCompleted')
       .then((r) => { if (!r.ok) throw new Error('not ok'); return r.json() })
-      .then((data) => { if (Array.isArray(data)) setAll(data) })
+      .then((data) => { if (Array.isArray(data)) setAll(data.filter(isRealGame)) })
       .catch(() => setError(true))
       .finally(() => setIsLoading(false))
   }, [status])
