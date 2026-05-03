@@ -220,3 +220,19 @@ export type RecentAchievement = {
   GameIcon?: string;
   ConsoleName: string;
 };
+
+export type TopTenUser = {
+  1: string  // username
+  2: string  // total points
+  3: string  // total true points
+}
+
+export type PopularGame = {
+  ID: number
+  Title: string
+  ImageIcon: string
+  ConsoleID: number
+  ConsoleName: string
+  NumAchievements: number
+  Points: number
+}

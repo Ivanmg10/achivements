@@ -4,6 +4,7 @@ import { useMemo, useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { RetroAchievementsGameCompleted } from '@/types/types'
+import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
 const ABANDONED_DAYS = 90
 
@@ -27,7 +28,7 @@ export default function MainPageAbandoned({
   useEffect(() => {
     if (!allIdsKey) return
     setDatesError(false)
-    fetch(`/api/getGamesLastPlayed?gameIds=${allIdsKey}`)
+    fetchWithRetry(`/api/getGamesLastPlayed?gameIds=${allIdsKey}`)
       .then((r) => { if (!r.ok) throw new Error('not ok'); return r.json() })
       .then((data) => { if (typeof data === 'object' && data) setLastAchDates(data) })
       .catch(() => setDatesError(true))

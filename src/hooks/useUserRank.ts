@@ -1,6 +1,7 @@
 import { UserRankAndScore } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
 export function useUserRank() {
   const { data: session } = useSession()
@@ -13,7 +14,7 @@ export function useUserRank() {
     if (!session?.user?.rausername) { setIsLoading(false); return }
     setIsLoading(true)
     setError(false)
-    fetch('/api/getUserRankAndScore')
+    fetchWithRetry('/api/getUserRankAndScore')
       .then((r) => { if (!r.ok) throw new Error('not ok'); return r.json() })
       .then((data) => setRank(data))
       .catch(() => setError(true))

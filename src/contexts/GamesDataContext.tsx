@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { useSession } from 'next-auth/react'
+import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
 type CtxType = {
   all: RetroAchievementsGameCompleted[]
@@ -36,7 +37,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     if (status !== 'authenticated') { setIsLoading(false); return }
     setIsLoading(true)
     setError(false)
-    fetch('/api/getGamesCompleted')
+    fetchWithRetry('/api/getGamesCompleted')
       .then((r) => { if (!r.ok) throw new Error('not ok'); return r.json() })
       .then((data) => { if (Array.isArray(data)) setAll(data.filter(isRealGame)) })
       .catch(() => setError(true))

@@ -1,12 +1,15 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useSession } from 'next-auth/react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useGamesData } from '@/contexts/GamesDataContext'
 import { useUserRank } from '@/hooks/useUserRank'
 import { useUserAwards } from '@/hooks/useUserAwards'
+import { useTopTenUsers } from '@/hooks/useTopTenUsers'
+import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
@@ -20,6 +23,9 @@ import MainPageMastery from './MainPageMastery'
 import MainPageCompletionDist from './MainPageCompletionDist'
 import MainPageAlmostThere from './MainPageAlmostThere'
 import MainPagePerfectGames from './MainPagePerfectGames'
+import MainPageTopTen from './MainPageTopTen'
+import MainPageBestPeriod from './MainPageBestPeriod'
+import MainPageConsoleBreakdown from './MainPageConsoleBreakdown'
 
 function ChartCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
@@ -30,12 +36,15 @@ function ChartCard({ children, className = '' }: { children: React.ReactNode; cl
 }
 
 export default function MainPageCharts() {
+  const { data: session } = useSession()
   const { achievements, isLoading: achLoading, error: achError, refetch: refetchAch } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()
   const { listGames: playing, isLoading: playingLoading, error: playingError, refetch: refetchPlaying } = useGamesInProgressPreview()
   const { all, softcore, hardcore, error: chartError, refetch: refetchChart } = useGamesData()
   const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
   const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
+  const { topTen, isLoading: topTenLoading, refetch: refetchTopTen } = useTopTenUsers()
+  const { achievements: yearAch, isLoading: yearLoading, refetch: refetchYear } = useActivityHeatmapYear()
 
   const [abandonedError, setAbandonedError] = useState(false)
   const [resetKey, setResetKey] = useState(0)
@@ -50,9 +59,11 @@ export default function MainPageCharts() {
     refetchPlaying()
     refetchRank()
     refetchAwards()
+    refetchTopTen()
+    refetchYear()
     setAbandonedError(false)
     setResetKey((k) => k + 1)
-  }, [refetchAch, refetchHeatmap, refetchChart, refetchPlaying, refetchRank, refetchAwards])
+  }, [refetchAch, refetchHeatmap, refetchChart, refetchPlaying, refetchRank, refetchAwards, refetchTopTen, refetchYear])
 
   return (
     <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-label="Stats & Activity">
@@ -68,10 +79,12 @@ export default function MainPageCharts() {
             isLoading={achLoading || rankLoading}
           />
 
-          {/* Rows 2-4: single grid-cols-3
-              Row 2: Heatmap | Line chart | Pie chart
-              Row 3: [Most Active + Rarest + Abandoned col-span-2 nested] | [PG + Mastery col-span-1 50/50]
-              Row 4: Completion Dist col-span-1 | Almost There col-span-2
+          {/*
+            Rows 2-5: single grid-cols-3
+            Row 2: Heatmap | Line chart | Pie chart
+            Row 3: [Most Active + Rarest + Abandoned col-span-2 nested] | [PG + Mastery col-span-1 50/50]
+            Row 4+5 col 1-2: Completion Dist | Almost There / Top 10 | Best period
+            Row 4+5 col 3: Console Breakdown row-span-2
           */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
@@ -132,12 +145,34 @@ export default function MainPageCharts() {
               </ChartCard>
             </div>
 
-            {/* Row 4: col-span-1 + col-span-2 */}
+            {/* Row 4 col 1-2 */}
             <ChartCard>
               <MainPageCompletionDist games={all} />
             </ChartCard>
-            <ChartCard className="lg:col-span-2">
+            <ChartCard>
               <MainPageAlmostThere games={all} />
+            </ChartCard>
+
+            {/* Col 3 row-span-2 */}
+            <ChartCard className="lg:row-span-2">
+              <MainPageConsoleBreakdown games={all} />
+            </ChartCard>
+
+            {/* Row 5 col 1-2 */}
+            <ChartCard>
+              <MainPageTopTen
+                topTen={topTen}
+                isLoading={topTenLoading}
+                currentUsername={session?.user?.rausername}
+              />
+            </ChartCard>
+            <ChartCard>
+              <MainPageBestPeriod
+                achievements={heatmapData}
+                yearAchievements={yearAch}
+                isLoading={heatmapLoading}
+                yearLoading={yearLoading}
+              />
             </ChartCard>
 
           </div>

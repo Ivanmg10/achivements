@@ -1,11 +1,11 @@
-import { RecentAchievement } from '@/types/types'
+import { PopularGame } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
-export function useActivityHeatmap() {
+export function usePopularUnplayed() {
   const { data: session } = useSession()
-  const [achievements, setAchievements] = useState<RecentAchievement[]>([])
+  const [games, setGames] = useState<PopularGame[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
   const hasFetched = useRef(false)
@@ -14,9 +14,9 @@ export function useActivityHeatmap() {
     if (!session?.user?.rausername) { setIsLoading(false); return }
     setIsLoading(true)
     setError(false)
-    fetchWithRetry('/api/getActivityHeatmap')
+    fetchWithRetry('/api/getPopularUnplayed')
       .then((r) => { if (!r.ok) throw new Error('not ok'); return r.json() })
-      .then((data) => { if (Array.isArray(data)) setAchievements(data) })
+      .then((data) => { if (Array.isArray(data)) setGames(data) })
       .catch(() => setError(true))
       .finally(() => setIsLoading(false))
   }, [session?.user?.rausername])
@@ -28,10 +28,7 @@ export function useActivityHeatmap() {
     doFetch()
   }, [session?.user?.rausername, doFetch])
 
-  const refetch = useCallback(() => {
-    setAchievements([])
-    doFetch()
-  }, [doFetch])
+  const refetch = useCallback(() => { setGames([]); doFetch() }, [doFetch])
 
-  return { achievements, isLoading, error, refetch }
+  return { games, isLoading, error, refetch }
 }

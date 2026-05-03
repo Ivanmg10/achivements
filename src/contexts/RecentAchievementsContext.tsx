@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { RecentAchievement } from '@/types/types'
 import { useSession } from 'next-auth/react'
+import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
 type CtxType = {
   achievements: RecentAchievement[]
@@ -24,7 +25,7 @@ export function RecentAchievementsProvider({ children }: { children: React.React
     if (!session?.user?.rausername) { setIsLoading(false); return }
     setIsLoading(true)
     setError(false)
-    fetch('/api/getRecentAchievements')
+    fetchWithRetry('/api/getRecentAchievements')
       .then((r) => { if (!r.ok) throw new Error('not ok'); return r.json() })
       .then((data) => {
         if (!Array.isArray(data)) return
