@@ -18,7 +18,8 @@ import MainPageAbandoned from './MainPageAbandoned'
 import MainPageTopGames from './MainPageTopGames'
 import MainPageMastery from './MainPageMastery'
 import MainPageCompletionDist from './MainPageCompletionDist'
-import MainPageConsoleCompletion from './MainPageConsoleCompletion'
+import MainPageAlmostThere from './MainPageAlmostThere'
+import MainPagePerfectGames from './MainPagePerfectGames'
 
 function ChartCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
@@ -118,7 +119,7 @@ export default function MainPageCharts() {
             </ChartCard>
           </div>
 
-          {/* Row 4: Mastery + Completion distribution + Console completion */}
+          {/* Row 4: Mastery + Completion distribution + Almost there */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <ChartCard>
               <MainPageMastery awards={awards} isLoading={awardsLoading} />
@@ -127,9 +128,14 @@ export default function MainPageCharts() {
               <MainPageCompletionDist games={all} />
             </ChartCard>
             <ChartCard className="md:col-span-2 lg:col-span-1">
-              <MainPageConsoleCompletion games={all} />
+              <MainPageAlmostThere games={all} />
             </ChartCard>
           </div>
+
+          {/* Row 5: Perfect games gallery */}
+          <ChartCard>
+            <MainPagePerfectGames games={all} />
+          </ChartCard>
         </div>
       </SectionFallback>
     </section>
