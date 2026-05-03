@@ -3,6 +3,7 @@
 import { useMemo, useEffect, useRef, useState } from 'react'
 import { RecentAchievement } from '@/types/types'
 import { groupByDays } from '@/utils/utils'
+import { IconRefresh } from '@tabler/icons-react'
 
 function cellBg(count: number): string {
   if (count === 0) return '#1a1a2e'
@@ -32,9 +33,11 @@ const GAP = 3
 export default function MainPageHeatmap({
   achievements,
   isLoading,
+  onRefresh,
 }: {
   achievements: RecentAchievement[]
   isLoading?: boolean
+  onRefresh?: () => void
 }) {
   const totalDays = useTotalDays()
   const label = totalDays <= 30 ? 'last 30 days' : totalDays <= 45 ? 'last 45 days' : 'last 60 days'
@@ -103,7 +106,19 @@ export default function MainPageHeatmap({
       {/* header */}
       <div className="flex items-center justify-between flex-wrap gap-1 shrink-0 mb-2">
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">Activity — {label}</p>
-        <p className="text-xs font-semibold text-text-main">{isLoading ? '—' : totalAch}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs font-semibold text-text-main">{isLoading ? '—' : totalAch}</p>
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              disabled={isLoading}
+              aria-label="Refresh heatmap"
+              className="text-text-secondary hover:text-text-main disabled:opacity-30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
+            >
+              <IconRefresh size={12} className={isLoading ? 'animate-spin' : ''} />
+            </button>
+          )}
+        </div>
       </div>
 
       {isLoading ? (
