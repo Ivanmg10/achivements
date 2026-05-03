@@ -66,7 +66,7 @@ export default function MainPageAbandoned({
   return (
     <div className="flex flex-col gap-2">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">
-        Abandoned (+{ABANDONED_DAYS}d no activity)
+        Abandoned — {ABANDONED_DAYS}+ days idle
       </p>
 
       {loading ? (

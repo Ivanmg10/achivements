@@ -22,7 +22,7 @@ export default function MainPageRarest({ achievements }: { achievements: RecentA
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Rarest unlocked</p>
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Rarest recent unlocks</p>
       <div className="flex flex-col gap-2">
         {withRarity.map((a) => (
           <Link
@@ -43,7 +43,7 @@ export default function MainPageRarest({ achievements }: { achievements: RecentA
             </div>
             <div className="flex flex-col items-end shrink-0">
               <span className="text-xs font-bold text-yellow-400">{a.TrueRatio}</span>
-              <span className="text-[9px] text-text-secondary">true pts</span>
+              <span className="text-[9px] text-text-secondary">true ratio</span>
             </div>
           </Link>
         ))}

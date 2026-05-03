@@ -93,7 +93,7 @@ export default function MainPageCharts() {
               </div>
             </ChartCard>
             <ChartCard className="md:col-span-2 lg:col-span-1">
-              <p className="text-[10px] uppercase tracking-widest text-text-secondary">Achievements / day (7d)</p>
+              <p className="text-[10px] uppercase tracking-widest text-text-secondary">Daily achievements — last 7 days</p>
               <div aria-hidden="true">
                 <AchievementsLineChart achievements={achievements} isLoading={achLoading} />
               </div>

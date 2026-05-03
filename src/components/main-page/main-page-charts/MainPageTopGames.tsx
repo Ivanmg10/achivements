@@ -30,7 +30,7 @@ export default function MainPageTopGames({ achievements }: { achievements: Recen
   if (data.length === 0) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Most played — last 30 days</p>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Most active games — last 30 days</p>
         <div className="flex items-center justify-center py-4 text-text-secondary text-sm">No data</div>
       </div>
     )
@@ -38,7 +38,7 @@ export default function MainPageTopGames({ achievements }: { achievements: Recen
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Most played — last 30 days</p>
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Most active games — last 30 days</p>
       <div className="flex flex-col gap-2">
         {data.map(({ name, count, gameId, icon, console: con }) => (
           <Link
