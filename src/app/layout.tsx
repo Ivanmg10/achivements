@@ -1,5 +1,11 @@
+import type { Metadata } from 'next'
 import "./globals.css";
 import Providers from "./providers";
+
+export const metadata: Metadata = {
+  title: 'CheevoVault',
+  description: 'Track your achievements across RetroAchievements and Steam in one place.',
+}
 
 export default function RootLayout({
   children,
