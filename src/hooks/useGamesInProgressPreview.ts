@@ -1,22 +1,43 @@
 import { RetroAchievementsGameCompleted } from '@/types/types'
-import { getGamesInProgress } from '@/utils/apiCallsUtils'
 import { useSession } from 'next-auth/react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export function useGamesInProgressPreview() {
-  const { status, data: session } = useSession()
+  const { status } = useSession()
   const [listGames, setListGames] = useState<RetroAchievementsGameCompleted[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(false)
   const hasFetched = useRef(false)
+
+  const doFetch = useCallback(() => {
+    if (status !== 'authenticated') { setIsLoading(false); return }
+    setIsLoading(true)
+    setError(false)
+    fetch('/api/getGamesCompleted')
+      .then((r) => { if (!r.ok) throw new Error('not ok'); return r.json() })
+      .then((data) => {
+        if (!Array.isArray(data)) return
+        const inProgress = data
+          .filter((g) => Number(g.HardcoreMode) === 0 && parseFloat(g.PctWon) > 0 && parseFloat(g.PctWon) < 1)
+          .sort(() => Math.random() - 0.5)
+        setListGames(inProgress)
+      })
+      .catch(() => setError(true))
+      .finally(() => setIsLoading(false))
+  }, [status])
 
   useEffect(() => {
     if (status === 'loading') return
     if (status !== 'authenticated') { setIsLoading(false); return }
     if (hasFetched.current) return
     hasFetched.current = true
-    setIsLoading(true)
-    getGamesInProgress(session, setListGames).finally(() => setIsLoading(false))
-  }, [status])
+    doFetch()
+  }, [status, doFetch])
 
-  return { listGames, isLoading }
+  const refetch = useCallback(() => {
+    setListGames([])
+    doFetch()
+  }, [doFetch])
+
+  return { listGames, isLoading, error, refetch }
 }

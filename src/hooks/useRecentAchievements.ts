@@ -1,21 +1,42 @@
 import { RecentAchievement } from '@/types/types'
-import { getRecentAchievements } from '@/utils/apiCallsUtils'
 import { useSession } from 'next-auth/react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export function useRecentAchievements() {
   const { data: session } = useSession()
   const [achievements, setAchievements] = useState<RecentAchievement[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(false)
   const hasFetched = useRef(false)
+
+  const doFetch = useCallback(() => {
+    if (!session?.user?.rausername) { setIsLoading(false); return }
+    setIsLoading(true)
+    setError(false)
+    fetch('/api/getRecentAchievements')
+      .then((r) => { if (!r.ok) throw new Error('not ok'); return r.json() })
+      .then((data) => {
+        if (!Array.isArray(data)) return
+        const sorted = [...data].sort(
+          (a, b) => new Date(b.Date.replace(' ', 'T')).getTime() - new Date(a.Date.replace(' ', 'T')).getTime()
+        )
+        setAchievements(sorted)
+      })
+      .catch(() => setError(true))
+      .finally(() => setIsLoading(false))
+  }, [session?.user?.rausername])
 
   useEffect(() => {
     if (!session?.user?.rausername) { setIsLoading(false); return }
     if (hasFetched.current) return
     hasFetched.current = true
-    setIsLoading(true)
-    getRecentAchievements(session, setAchievements).finally(() => setIsLoading(false))
-  }, [session?.user?.rausername])
+    doFetch()
+  }, [session?.user?.rausername, doFetch])
 
-  return { achievements, isLoading }
+  const refetch = useCallback(() => {
+    setAchievements([])
+    doFetch()
+  }, [doFetch])
+
+  return { achievements, isLoading, error, refetch }
 }
