@@ -15,11 +15,18 @@ export async function GET(request: NextRequest) {
   const gameId = request.nextUrl.searchParams.get("gameId");
   const { rausername, raid, id } = session.user;
 
-  const data = await withCache(`gameProgression:${id}:${gameId}`, TTL, () =>
-    fetch(
-      `https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=${rausername}&y=${raid}&g=${gameId}`,
-    ).then((r) => r.json()),
+  const data = await withCache(
+    `gameProgression:${id}:${gameId}`,
+    TTL,
+    () =>
+      fetch(
+        `https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=${rausername}&y=${raid}&g=${gameId}`,
+      )
+        .then((r) => r.json())
+        .catch(() => null),
+    (d) => d !== null && typeof d === 'object' && 'ID' in d,
   );
 
+  if (!data) return NextResponse.json({ message: "Game not found" }, { status: 404 });
   return NextResponse.json(data);
 }
