@@ -26,7 +26,6 @@ export function RecentAchievementsProvider({ children }: { children: React.React
     setIsLoading(true)
     setError(false)
     fetchWithRetry('/api/getRecentAchievements')
-      .then((r) => { if (!r.ok) throw new Error('not ok'); return r.json() })
       .then((data) => {
         if (!Array.isArray(data)) return
         setAchievements([...data].sort(

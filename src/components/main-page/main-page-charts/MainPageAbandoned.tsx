@@ -29,8 +29,7 @@ export default function MainPageAbandoned({
     if (!allIdsKey) return
     setDatesError(false)
     fetchWithRetry(`/api/getGamesLastPlayed?gameIds=${allIdsKey}`)
-      .then((r) => { if (!r.ok) throw new Error('not ok'); return r.json() })
-      .then((data) => { if (typeof data === 'object' && data) setLastAchDates(data) })
+      .then((data) => { if (typeof data === 'object' && data) setLastAchDates(data as Record<number, string>) })
       .catch(() => setDatesError(true))
       .finally(() => setFetchedKey(allIdsKey))
   }, [allIdsKey])

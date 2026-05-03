@@ -4,6 +4,7 @@ import {
   RetroAchievementsGameWithAchievements,
   WantToPlayGame,
 } from "@/types/types";
+import { fetchWithRetry } from "@/lib/fetchWithRetry";
 
 export const getGamesInfo = async (
   gameId: string,
@@ -49,9 +50,7 @@ export const getWantGames = async (
   setError: Dispatch<SetStateAction<string | undefined>>,
 ) => {
   try {
-    const games = await fetch(`/api/getWantPlayGames`).then((res) =>
-      res.json(),
-    );
+    const games = await fetchWithRetry(`/api/getWantPlayGames`) as { Results?: WantToPlayGame[] };
 
     const getSliceGames = [...(games?.Results ?? [])]
       .sort(() => Math.random() - 0.5)
