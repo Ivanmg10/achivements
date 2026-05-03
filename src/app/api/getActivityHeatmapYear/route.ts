@@ -18,6 +18,7 @@ export async function GET() {
   if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
 
   const { rausername, raid, id } = session.user
+  if (!rausername || !raid) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
 
   const now = Math.floor(Date.now() / 1000)
   const cutoff60 = now - 60 * 24 * 3600
