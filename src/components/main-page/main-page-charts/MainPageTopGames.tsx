@@ -27,7 +27,14 @@ export default function MainPageTopGames({ achievements }: { achievements: Recen
       .slice(0, 6)
   }, [achievements])
 
-  if (data.length === 0) return null
+  if (data.length === 0) {
+    return (
+      <div className="flex flex-col gap-2">
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Most played — last 30 days</p>
+        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">No data</div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-2">
