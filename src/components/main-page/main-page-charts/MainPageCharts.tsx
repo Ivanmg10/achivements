@@ -1,11 +1,10 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
-import { useCallback, useEffect, useState } from 'react'
-import { RetroAchievementsGameCompleted } from '@/types/types'
+import { useState } from 'react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
+import { useGamesData } from '@/contexts/GamesDataContext'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
@@ -25,38 +24,12 @@ function ChartCard({ children, className = '' }: { children: React.ReactNode; cl
 }
 
 export default function MainPageCharts() {
-  const { status } = useSession()
   const { achievements, isLoading: achLoading, error: achError, refetch: refetchAch } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()
   const { listGames: playing, isLoading: playingLoading, error: playingError, refetch: refetchPlaying } = useGamesInProgressPreview()
+  const { softcore, hardcore, error: chartError, refetch: refetchChart } = useGamesData()
 
-  const [softcoreGames, setSoftcoreGames] = useState<RetroAchievementsGameCompleted[]>([])
-  const [hardcoreGames, setHardcoreGames] = useState<RetroAchievementsGameCompleted[]>([])
   const [chartMode, setChartMode] = useState<'softcore' | 'hardcore'>('softcore')
-  const [chartError, setChartError] = useState(false)
-
-  const fetchChart = useCallback(() => {
-    if (status !== 'authenticated') return
-    setChartError(false)
-    fetch('/api/getGamesCompleted')
-      .then((r) => { if (!r.ok) throw new Error('not ok'); return r.json() })
-      .then((data) => {
-        if (!Array.isArray(data)) return
-        setSoftcoreGames(data.filter((g) => g.HardcoreMode === '0'))
-        setHardcoreGames(data.filter((g) => g.HardcoreMode === '1'))
-      })
-      .catch(() => setChartError(true))
-  }, [status])
-
-  useEffect(() => {
-    fetchChart()
-  }, [fetchChart])
-
-  const refetchChart = useCallback(() => {
-    setSoftcoreGames([])
-    setHardcoreGames([])
-    fetchChart()
-  }, [fetchChart])
 
   return (
     <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-label="Stats & Activity">
@@ -92,7 +65,7 @@ export default function MainPageCharts() {
               </div>
             </div>
             <div aria-hidden="true" className="flex-1 flex min-h-0">
-              <GamesPlayedPieChart games={chartMode === 'softcore' ? softcoreGames : hardcoreGames} />
+              <GamesPlayedPieChart games={chartMode === 'softcore' ? softcore : hardcore} />
             </div>
           </SectionFallback>
         </ChartCard>
