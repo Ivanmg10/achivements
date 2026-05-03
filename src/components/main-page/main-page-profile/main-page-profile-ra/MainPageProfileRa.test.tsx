@@ -36,7 +36,7 @@ test("renders user info when user present", () => {
 
 test("renders login link when no user", () => {
   render(<MainPageProfileRa user={null} game={null} recentAchievements={[]} />);
-  expect(screen.getByText("Iniciar sesion con Retroachivements")).toBeInTheDocument();
+  expect(screen.getByText("Iniciar sesion con RetroAchievements")).toBeInTheDocument();
 });
 
 test("renders without UserPic", () => {

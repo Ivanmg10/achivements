@@ -152,6 +152,20 @@ export type WantToPlayUser = {
   Results: WantToPlayGame[];
 };
 
+export type RecentlyPlayedGame = {
+  GameID: number;
+  Title: string;
+  ImageIcon: string;
+  ConsoleName: string;
+  LastPlayed: string; // "2024-01-15 20:30:00"
+  NumPossibleAchievements: number;
+  PossibleScore: number;
+  NumAchieved: number;
+  ScoreAchieved: number;
+  NumAchievedHardcore: number;
+  ScoreAchievedHardcore: number;
+}
+
 export type RetroAchievementsGameCompleted = {
   GameID: number;
   Title: string;
@@ -166,6 +180,32 @@ export type RetroAchievementsGameCompleted = {
   GameTitle?: string;
 };
 
+export type UserRankAndScore = {
+  Score: number
+  SoftcoreScore: number
+  Rank: number
+}
+
+export type UserAward = {
+  AwardedAt: string
+  AwardType: string
+  AwardData: number
+  AwardDataExtra: number
+  Title: string
+  ConsoleName: string
+  ImageIcon: string
+}
+
+export type UserAwards = {
+  TotalAwardsCount: number
+  MasteryAwardsCount: number
+  CompletionAwardsCount: number
+  BeatenHardcoreAwardsCount: number
+  BeatenSoftcoreAwardsCount: number
+  EventAwardsCount: number
+  VisibleUserAwards: UserAward[]
+}
+
 export type RecentAchievement = {
   Date: string; // "2024-01-15 20:30:00"
   HardcoreMode: string;
@@ -174,7 +214,25 @@ export type RecentAchievement = {
   Description: string;
   BadgeName: string;
   Points: number;
+  TrueRatio?: number;
   GameID: number;
   GameTitle: string;
+  GameIcon?: string;
   ConsoleName: string;
 };
+
+export type TopTenUser = {
+  1: string  // username
+  2: string  // total points
+  3: string  // total true points
+}
+
+export type PopularGame = {
+  ID: number
+  Title: string
+  ImageIcon: string
+  ConsoleID: number
+  ConsoleName: string
+  NumAchievements: number
+  Points: number
+}

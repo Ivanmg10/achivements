@@ -5,7 +5,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 
-function CompletionBar({ label, value, color = 'bg-yellow-500' }: { label: string; value: string; color?: string }) {
+function CompletionBar({
+  label,
+  value,
+  color = 'bg-yellow-500',
+}: {
+  label: string
+  value: string
+  color?: string
+}) {
   const pct = parseFloat(value) || 0
   return (
     <div className="flex flex-col gap-1">
@@ -34,7 +42,7 @@ export default function MainPageProfileRaGame({
 
   return (
     <Link
-      className="bg-bg-card rounded-lg p-3 flex flex-col gap-3 w-full hover:scale-[1.02] transition-transform duration-200"
+      className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 w-full hover:scale-[1.005] transition-transform duration-200"
       href={`/gameInfo/${game.ID}`}
     >
       <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileRa.playingNow}</p>
@@ -56,7 +64,11 @@ export default function MainPageProfileRaGame({
         <div className="flex flex-col gap-2">
           <CompletionBar label="Normal" value={game.UserCompletion} />
           {game.UserCompletionHardcore && (
-            <CompletionBar label="Hardcore" value={game.UserCompletionHardcore} color="bg-orange-500" />
+            <CompletionBar
+              label="Hardcore"
+              value={game.UserCompletionHardcore}
+              color="bg-orange-500"
+            />
           )}
         </div>
       )}

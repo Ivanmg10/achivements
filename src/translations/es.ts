@@ -33,7 +33,7 @@ export const es: Translations = {
     theme: 'Tema',
     totalPoints: 'Puntos totales',
     totalSoftcorePoints: 'Puntos totales softcore',
-    signInRA: 'Iniciar sesion en Retroachivements',
+    signInRA: 'Iniciar sesion en RetroAchievements',
     signInSteam: 'Iniciar sesion en Steam',
   },
   userTheme: {
@@ -75,7 +75,7 @@ export const es: Translations = {
     notEarned: 'Sin obtener',
   },
   raLoginModal: {
-    title: 'Iniciar sesion en Retroachivements',
+    title: 'Iniciar sesion en RetroAchievements',
     username: 'Usuario',
     signIn: 'Iniciar sesion',
   },
@@ -123,7 +123,7 @@ export const es: Translations = {
     contributions: 'Contribuciones',
     achievementsCreated: 'Logros creados',
     pointsContributed: 'Puntos aportados',
-    signIn: 'Iniciar sesion con Retroachivements',
+    signIn: 'Iniciar sesion con RetroAchievements',
     playingNow: 'Jugando ahora',
   },
   lineChart: {
@@ -142,7 +142,7 @@ export const es: Translations = {
   },
   mainStart: {
     welcome: 'Bienvenido',
-    description: 'Una aplicación para ver tus logros y progresos en retroachivements y steam',
+    description: 'Sigue tus logros en RetroAchievements y Steam desde un solo sitio.',
   },
   profileAchievements: {
     recentAchievements: 'Logros recientes',

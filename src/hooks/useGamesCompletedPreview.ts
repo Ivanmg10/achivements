@@ -1,21 +1,19 @@
-import { RetroAchievementsGameCompleted } from '@/types/types'
-import { getGamesCompleted } from '@/utils/apiCallsUtils'
-import { useSession } from 'next-auth/react'
-import { useEffect, useRef, useState } from 'react'
+import { useMemo } from 'react'
+import { useGamesData } from '@/contexts/GamesDataContext'
 
 export function useGamesCompletedPreview() {
-  const { status, data: session } = useSession()
-  const [listGames, setListGames] = useState<RetroAchievementsGameCompleted[]>([])
-  const [listGamesHardcore, setListGamesHardcore] = useState<RetroAchievementsGameCompleted[]>([])
-  const hasFetched = useRef(false)
+  const { softcore, hardcore } = useGamesData()
 
-  useEffect(() => {
-    /* istanbul ignore if */
-    if (status === 'authenticated' && !hasFetched.current) {
-      hasFetched.current = true
-      getGamesCompleted(session, setListGames, setListGamesHardcore)
-    }
-  }, [status])
-
-  return { listGames, listGamesHardcore }
+  return useMemo(() => {
+    const completedHardcore = hardcore
+      .filter((g) => parseFloat(g.PctWon) >= 1)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3)
+    const hardcoreIds = new Set(completedHardcore.map((g) => g.GameID))
+    const completedSoftcore = softcore
+      .filter((g) => parseFloat(g.PctWon) >= 1 && !hardcoreIds.has(g.GameID))
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3)
+    return { listGames: completedSoftcore, listGamesHardcore: completedHardcore }
+  }, [softcore, hardcore])
 }

@@ -2,7 +2,6 @@
 
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { groupByConsole } from '@/utils/utils'
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { useLanguage } from '@/context/LanguageContext'
 
 const COLORS = [
@@ -17,50 +16,63 @@ const COLORS = [
 ]
 
 export default function ConsolesPieChart({ games }: { games: RetroAchievementsGameCompleted[] }) {
-  const data = groupByConsole(games)
+  const data = groupByConsole(games).sort((a, b) => b.value - a.value).slice(0, 6)
   const { T } = useLanguage()
+  const max = data[0]?.value ?? 1
 
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-96 w-full text-text-secondary text-sm">
+      <div className="flex items-center justify-center w-full text-text-secondary text-sm">
         {T.pieChart.noData}
       </div>
     )
   }
 
   return (
-    <ResponsiveContainer width="90%" height={420}>
-      <PieChart>
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          innerRadius={85}
-          outerRadius={145}
-          paddingAngle={3}
-          dataKey="value"
-        >
-          {data.map((_, index) => (
-            <Cell key={index} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
-        <Tooltip
-          contentStyle={{
-            backgroundColor: '#1e1e2e',
-            border: 'none',
-            borderRadius: '8px',
-          }}
-          labelStyle={{ color: '#fff' }}
-        />
-        <Legend
-          layout="vertical"
-          align="right"
-          verticalAlign="middle"
-          formatter={
-            /* istanbul ignore next */ (value, entry: any) => `${value} (${entry.payload?.value})`
-          }
-        />
-      </PieChart>
-    </ResponsiveContainer>
+    <div className="flex flex-col w-full h-full gap-2">
+      {/* bars */}
+      <div className="flex items-end justify-around gap-2 w-full flex-1 min-h-0">
+        {data.map(({ name, value }, i) => {
+          const color = COLORS[i % COLORS.length]
+          const shortName = name
+            .replace('PlayStation', 'PS')
+            .replace('Nintendo', 'N')
+            .replace('Game Boy', 'GB')
+            .replace(' Advance', 'A')
+            .replace(' Portable', 'P')
+          return (
+            <div key={name} className="flex flex-col items-center gap-1.5 flex-1 min-w-0 h-full">
+              <span className="text-[10px] font-bold shrink-0" style={{ color }}>{value}</span>
+
+              {/* column track */}
+              <div
+                className="flex-1 w-full rounded-md flex flex-col justify-end min-h-0 overflow-hidden"
+                style={{ backgroundColor: `${color}18` }}
+              >
+                {/* spacer */}
+                <div style={{ flexGrow: max - value }} />
+                {/* bar */}
+                <div
+                  className="w-full rounded-md"
+                  style={{
+                    flexGrow: value,
+                    minHeight: '6px',
+                    background: `linear-gradient(to top, ${color}99, ${color})`,
+                    boxShadow: `0 0 10px ${color}66, inset 0 1px 0 ${color}cc`,
+                  }}
+                />
+              </div>
+
+              <span className="text-[9px] text-text-secondary text-center leading-tight truncate w-full shrink-0">
+                {shortName}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* baseline */}
+      <div className="h-px w-full bg-white/10 shrink-0" />
+    </div>
   )
 }

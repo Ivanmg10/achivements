@@ -25,12 +25,12 @@ test("renders user info", () => {
 
 test("renders RA login button when no raUser", () => {
   render(<UserData session={mockSession} />);
-  expect(screen.getAllByText("Iniciar sesion en Retroachivements").length).toBeGreaterThan(0);
+  expect(screen.getAllByText("Iniciar sesion en RetroAchievements").length).toBeGreaterThan(0);
 });
 
 test("opens RA modal on button click", () => {
   render(<UserData session={mockSession} />);
-  const buttons = screen.getAllByText("Iniciar sesion en Retroachivements");
+  const buttons = screen.getAllByText("Iniciar sesion en RetroAchievements");
   fireEvent.click(buttons[0]);
   expect(screen.getByTestId("ra-modal")).toBeInTheDocument();
 });

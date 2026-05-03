@@ -3,7 +3,7 @@
 import GameInfoHeader from '@/components/game-info-header/GameInfoHeader'
 import GameInfoTable from '@/components/game-info-table/GameInfoTable'
 import Spinner from '@/components/main-spinner/Spinner'
-import NoMainHeader from '@/components/no-main-header/NoMainHeader'
+// import NoMainHeader from '@/components/no-main-header/NoMainHeader'
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
@@ -46,7 +46,7 @@ export default function GameInfo() {
   if (gameData !== null) {
     return (
       <main className="flex-1 flex flex-col items-center text-text-main">
-        <NoMainHeader />
+        {/* <NoMainHeader /> */}
         <GameInfoHeader gameData={gameData} />
         <GameInfoTable gameData={gameData} />
       </main>

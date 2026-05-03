@@ -1,6 +1,7 @@
 import { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
+import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
 type ValidCategory = 'wantToPlay' | 'playing' | 'completed'
 
@@ -29,19 +30,18 @@ export function useGamesByCategory(category: string, consoleId: string) {
     const id = Number(consoleId)
 
     if (category === 'wantToPlay') {
-      fetch('/api/getWantPlayGames')
-        .then((res) => res.json())
+      fetchWithRetry('/api/getWantPlayGames')
         .then((data) => {
-          const results: WantToPlayGame[] = data?.Results ?? []
+          const results: WantToPlayGame[] = (data as { Results?: WantToPlayGame[] })?.Results ?? []
           setGames(results.filter((g) => g.ConsoleID === id))
         })
         .catch((err) => setError(err instanceof Error ? err.message : 'Unknown error'))
         .finally(() => setLoading(false))
     } else {
-      fetch('/api/getGamesCompleted')
-        .then((res) => res.json())
-        .then((data: RetroAchievementsGameCompleted[]) => {
-          const byConsole = data.filter((g) => g.ConsoleID === id)
+      fetchWithRetry('/api/getGamesCompleted')
+        .then((data) => {
+          const list = data as RetroAchievementsGameCompleted[]
+          const byConsole = list.filter((g) => g.ConsoleID === id)
           if (category === 'playing') {
             setGames(
               byConsole.filter(
