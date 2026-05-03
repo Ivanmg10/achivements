@@ -18,23 +18,28 @@ export async function GET(request: NextRequest) {
 
   const gameIds = gameIdsParam.split(",").map(Number).filter(Boolean);
 
-  const results = await Promise.all(
-    gameIds.map(async (gameId) => {
-      const data = await withCache(`gameProgression:${id}:${gameId}`, TTL, () =>
-        fetch(
-          `https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=${rausername}&y=${raid}&g=${gameId}`,
-        ).then((r) => r.json()),
-      );
+  async function fetchGame(gameId: number): Promise<[number, string | null]> {
+    const data = await withCache(`gameProgression:${id}:${gameId}`, TTL, () =>
+      fetch(
+        `https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=${rausername}&y=${raid}&g=${gameId}`,
+      ).then((r) => r.json()).catch(() => null),
+    );
 
-      const achievements: Record<string, { DateEarned?: string; DateEarnedHardcore?: string }> = data?.Achievements ?? {};
-      let lastPlayed: string | null = null;
-      for (const ach of Object.values(achievements)) {
-        const d = ach.DateEarnedHardcore ?? ach.DateEarned ?? null;
-        if (d && (!lastPlayed || d > lastPlayed)) lastPlayed = d;
-      }
-      return [gameId, lastPlayed] as const;
-    }),
-  );
+    const achievements: Record<string, { DateEarned?: string; DateEarnedHardcore?: string }> = data?.Achievements ?? {};
+    let lastPlayed: string | null = null;
+    for (const ach of Object.values(achievements)) {
+      const d = ach.DateEarnedHardcore ?? ach.DateEarned ?? null;
+      if (d && (!lastPlayed || d > lastPlayed)) lastPlayed = d;
+    }
+    return [gameId, lastPlayed];
+  }
+
+  const BATCH = 5;
+  const results: [number, string | null][] = [];
+  for (let i = 0; i < gameIds.length; i += BATCH) {
+    const batch = await Promise.all(gameIds.slice(i, i + BATCH).map(fetchGame));
+    results.push(...batch);
+  }
 
   return NextResponse.json(Object.fromEntries(results));
 }
