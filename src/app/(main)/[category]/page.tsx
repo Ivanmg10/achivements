@@ -2,19 +2,19 @@
 
 import { useParams } from 'next/navigation'
 import { useState, useMemo } from 'react'
-import { useGamesByCategory } from '../../../../hooks/useGamesByCategory'
-import { useGameExtraData } from '../../../../hooks/useGameExtraData'
+import { useGamesByCategory } from '../../../hooks/useGamesByCategory'
+import { useGameExtraData } from '../../../hooks/useGameExtraData'
 import { RetroAchievementsGameCompleted } from '@/types/types'
-import StatusGameList from '../../../../components/statusGameList/StatusGameList'
-import StatusPageHeader from '../../../../components/status-page-header/StatusPageHeader'
-import CompletedFilter, { CompletedMode } from '../../../../components/completed-filter/CompletedFilter'
-import Spinner from '../../../../components/main-spinner/Spinner'
-import EmptyState from '../../../../components/empty-state/EmptyState'
+import StatusGameList from '../../../components/statusGameList/StatusGameList'
+import StatusPageHeader from '../../../components/status-page-header/StatusPageHeader'
+import CompletedFilter, { CompletedMode } from '../../../components/completed-filter/CompletedFilter'
+import Spinner from '../../../components/main-spinner/Spinner'
+import EmptyState from '../../../components/empty-state/EmptyState'
 import { useLanguage } from '@/context/LanguageContext'
 
-export default function CategoryConsolePage() {
-  const { consoleId, category } = useParams()
-  const { games, loading, error } = useGamesByCategory(category as string, consoleId as string)
+export default function CategoryPage() {
+  const { category } = useParams()
+  const { games, loading, error } = useGamesByCategory(category as string)
   const extraData = useGameExtraData()
   const { T } = useLanguage()
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
@@ -75,11 +75,7 @@ export default function CategoryConsolePage() {
         ) : (
           <>
             <div className="flex items-center justify-between gap-4 flex-wrap">
-              <StatusPageHeader
-                consoleName={games[0].ConsoleName}
-                category={cat}
-                gameCount={visibleGames.length}
-              />
+              <StatusPageHeader category={cat} gameCount={visibleGames.length} />
               {cat === 'completed' && (
                 <CompletedFilter value={completedMode} onChange={setCompletedMode} />
               )}

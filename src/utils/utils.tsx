@@ -1,6 +1,20 @@
 import { ragamesIds } from '@/constants/ragamesidpool'
 import { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
 
+export function relativeTime(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  const hours = Math.floor(diff / 3600000)
+  const days = Math.floor(diff / 86400000)
+  const months = Math.floor(days / 30)
+  const years = Math.floor(days / 365)
+  if (mins < 60) return `${mins}m ago`
+  if (hours < 24) return `${hours}h ago`
+  if (days < 30) return `${days}d ago`
+  if (months < 12) return `${months}mo ago`
+  return `${years}y ago`
+}
+
 export function getRandomGameIds(count: number = 5): string[] {
   const shuffled = [...ragamesIds].sort(() => Math.random() - 0.5)
   return shuffled.slice(0, count)

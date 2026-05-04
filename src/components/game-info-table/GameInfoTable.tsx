@@ -5,12 +5,13 @@ import {
   RetroAchievementsGameWithAchievements,
 } from '@/types/types'
 import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
+import AchievementModal from '../achievement-modal/AchievementModal'
 import Image from 'next/image'
 import { useState, useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 
 type Filter = 'all' | 'earned' | 'unearned'
-type SortKey = 'default' | 'points' | 'rarity'
+type SortKey = 'default' | 'points' | 'rarity' | 'players' | 'hc' | 'earned'
 type SortDir = 'asc' | 'desc'
 type SortState = { key: SortKey; dir: SortDir }
 
@@ -18,6 +19,9 @@ const DEFAULT_DIRS: Record<SortKey, SortDir> = {
   default: 'asc',
   points: 'desc',
   rarity: 'asc',
+  players: 'desc',
+  hc: 'desc',
+  earned: 'desc',
 }
 
 export default function GameInfoTable({
@@ -28,13 +32,8 @@ export default function GameInfoTable({
   const [filter, setFilter] = useState<Filter>('all')
   const [sortState, setSortState] = useState<SortState>({ key: 'default', dir: 'asc' })
   const [missableOpen, setMissableOpen] = useState(false)
+  const [selectedAchievement, setSelectedAchievement] = useState<RetroAchievement | null>(null)
   const { T } = useLanguage()
-
-  const SORT_LABELS: Record<SortKey, string> = {
-    default: T.gameInfoTable.sortOrder,
-    points: T.gameInfoTable.sortPoints,
-    rarity: T.gameInfoTable.sortRarity,
-  }
 
   const FILTER_LABELS: Record<Filter, string> = {
     all: T.gameInfoTable.filterAll,
@@ -66,6 +65,14 @@ export default function GameInfoTable({
     const sorted = [...list].sort((a, b) => {
       if (key === 'points') return b.Points - a.Points
       if (key === 'rarity') return a.NumAwarded / numDistinctPlayers - b.NumAwarded / numDistinctPlayers
+      if (key === 'players') return b.NumAwarded - a.NumAwarded
+      if (key === 'hc') return b.NumAwardedHardcore - a.NumAwardedHardcore
+      if (key === 'earned') {
+        if (!a.DateEarned && !b.DateEarned) return 0
+        if (!a.DateEarned) return 1
+        if (!b.DateEarned) return -1
+        return new Date(b.DateEarned).getTime() - new Date(a.DateEarned).getTime()
+      }
       return a.DisplayOrder - b.DisplayOrder
     })
 
@@ -77,6 +84,29 @@ export default function GameInfoTable({
       prev.key === key
         ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
         : { key, dir: DEFAULT_DIRS[key] },
+    )
+  }
+
+  function SortableHeader({
+    sortKey,
+    children,
+    className,
+  }: {
+    sortKey: SortKey
+    children: React.ReactNode
+    className?: string
+  }) {
+    const active = sortState.key === sortKey
+    const arrow = active ? (sortState.dir === 'asc' ? ' ↑' : ' ↓') : ''
+    return (
+      <th
+        onClick={() => handleSort(sortKey)}
+        className={`px-3 py-2 cursor-pointer select-none transition-colors hover:text-text-main ${
+          active ? 'text-text-main' : 'text-text-secondary'
+        } ${className ?? ''}`}
+      >
+        {children}{arrow}
+      </th>
     )
   }
 
@@ -118,53 +148,45 @@ export default function GameInfoTable({
         </div>
       )}
 
-      <div className="flex items-center gap-3 w-full flex-wrap">
-        <div className="flex gap-2">
-          {(['all', 'earned', 'unearned'] as Filter[]).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                filter === f
-                  ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30'
-                  : 'bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card'
-              }`}
-            >
-              {FILTER_LABELS[f]}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex gap-2 ml-auto">
-          {(['default', 'points', 'rarity'] as SortKey[]).map((s) => {
-            const active = sortState.key === s
-            const arrow = active ? (sortState.dir === 'asc' ? ' ↑' : ' ↓') : ''
-            return (
-              <button
-                key={s}
-                onClick={() => handleSort(s)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  active
-                    ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30'
-                    : 'bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card'
-                }`}
-              >
-                {SORT_LABELS[s]}{arrow}
-              </button>
-            )
-          })}
-        </div>
+      <div className="flex gap-2">
+        {(['all', 'earned', 'unearned'] as Filter[]).map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+              filter === f
+                ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30'
+                : 'bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card'
+            }`}
+          >
+            {FILTER_LABELS[f]}
+          </button>
+        ))}
       </div>
 
       {gameData && (
         <table className="w-full border-collapse">
           <thead>
-            <tr className="text-left text-text-secondary text-sm border-b border-bg-header">
-              <th className="p-2 w-20">{T.gameInfoTable.headerIcon}</th>
-              <th className="p-2">{T.gameInfoTable.headerAchievement}</th>
-              <th className="p-2 w-56">{T.gameInfoTable.headerPlayers}</th>
-              <th className="p-2 w-20">{T.gameInfoTable.headerPoints}</th>
-              <th className="p-2 w-20">{T.gameInfoTable.headerEarned}</th>
+            <tr className="text-sm border-b border-bg-header">
+              <th className="px-3 py-2 w-24 text-center text-text-secondary">{T.gameInfoTable.headerIcon}</th>
+              <SortableHeader sortKey="default" className="text-left">
+                {T.gameInfoTable.headerAchievement}
+              </SortableHeader>
+              <SortableHeader sortKey="players" className="w-48 text-center hidden sm:table-cell">
+                {T.gameInfoTable.headerPlayers}
+              </SortableHeader>
+              <SortableHeader sortKey="hc" className="w-48 text-center hidden sm:table-cell">
+                {T.gameInfoTable.headerHC}
+              </SortableHeader>
+              <SortableHeader sortKey="rarity" className="w-36 text-center hidden sm:table-cell">
+                {T.gameInfoTable.headerRarity}
+              </SortableHeader>
+              <SortableHeader sortKey="earned" className="w-40 text-center hidden sm:table-cell">
+                {T.gameInfoTable.headerEarned}
+              </SortableHeader>
+              <SortableHeader sortKey="points" className="w-28 text-center">
+                {T.gameInfoTable.headerPoints}
+              </SortableHeader>
             </tr>
           </thead>
           <tbody>
@@ -173,10 +195,19 @@ export default function GameInfoTable({
                 achievement={achievement}
                 numDistinctPlayers={numDistinctPlayers}
                 key={achievement.ID}
+                onClick={() => setSelectedAchievement(achievement)}
               />
             ))}
           </tbody>
         </table>
+      )}
+
+      {selectedAchievement && (
+        <AchievementModal
+          achievement={selectedAchievement}
+          numDistinctPlayers={numDistinctPlayers}
+          onClose={() => setSelectedAchievement(null)}
+        />
       )}
     </section>
   )
