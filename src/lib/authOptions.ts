@@ -37,6 +37,8 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           admin: user.admin,
           raUser: user.raUser ?? null,
+          location: user.location ?? null,
+          favorite_game: user.favorite_game ?? null,
         };
       },
     }),
@@ -58,11 +60,18 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email;
         token.admin = user.admin;
         token.raUser = user.raUser ?? null;
+        token.location = user.location ?? null;
+        token.favorite_game = user.favorite_game ?? null;
       }
 
       if (trigger === "update" && session !== undefined) {
         if ("raUser" in session) token.raUser = session.raUser ?? {};
         if (session?.theme) token.theme = session.theme;
+        if (session?.name) token.name = session.name;
+        if ("email" in session && session.email) token.email = session.email;
+        if ("avatar" in session && session.avatar) token.avatar = session.avatar;
+        if ("location" in session) token.location = session.location ?? null;
+        if ("favorite_game" in session) token.favorite_game = session.favorite_game ?? null;
       }
 
       return token;
@@ -80,6 +89,8 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email;
         session.user.admin = token.admin;
         session.user.raUser = token.raUser;
+        session.user.location = token.location;
+        session.user.favorite_game = token.favorite_game;
       }
       return session;
     },
