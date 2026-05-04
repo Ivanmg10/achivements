@@ -1,8 +1,6 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
 
 import Spinner from '../main-spinner/Spinner'
 import MainPageCompleted from './main-page-completed/MainPageCompleted'
@@ -15,12 +13,6 @@ import MainPageCharts from './main-page-charts/MainPageCharts'
 
 export default function MainPage() {
   const { status, data: session } = useSession()
-  const router = useRouter()
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/authPage')
-    }
-  }, [status])
 
   if (status === 'loading')
     return (

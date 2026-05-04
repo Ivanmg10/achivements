@@ -1,0 +1,49 @@
+'use client'
+
+import CommonModal from '../common-modal/CommonModal'
+import { useLanguage } from '@/context/LanguageContext'
+
+const LANGUAGES = [
+  { id: 'en' as const, label: 'English', flag: '🇬🇧' },
+  { id: 'es' as const, label: 'Español', flag: '🇪🇸' },
+]
+
+interface Props {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export default function LanguageModal({ isOpen, onClose }: Props) {
+  const { lang, setLang, T } = useLanguage()
+
+  const handleSelect = (id: 'en' | 'es') => {
+    setLang(id)
+    onClose()
+  }
+
+  return (
+    <CommonModal isOpen={isOpen} onClose={onClose}>
+      <h2 className="text-xl font-bold">{T.userConfig.language}</h2>
+
+      <div className="flex flex-col gap-3">
+        {LANGUAGES.map(({ id, label, flag }) => (
+          <button
+            key={id}
+            onClick={() => handleSelect(id)}
+            className={`flex items-center gap-4 p-4 rounded-2xl transition-all text-left ${
+              lang === id
+                ? 'bg-accent text-bg-main'
+                : 'bg-bg-main hover:bg-bg-card text-text-main'
+            }`}
+          >
+            <span className="text-2xl">{flag}</span>
+            <span className="text-lg font-medium">{label}</span>
+            {lang === id && (
+              <span className="ml-auto w-2.5 h-2.5 rounded-full bg-current opacity-80" />
+            )}
+          </button>
+        ))}
+      </div>
+    </CommonModal>
+  )
+}
