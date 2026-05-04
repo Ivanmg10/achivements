@@ -2,9 +2,9 @@
 
 import GameInfoHeader from '@/components/game-info-header/GameInfoHeader'
 import GameInfoTable from '@/components/game-info-table/GameInfoTable'
+import GameInfoSubsetSelector from '@/components/game-info-subset-selector/GameInfoSubsetSelector'
 import Spinner from '@/components/main-spinner/Spinner'
-// import NoMainHeader from '@/components/no-main-header/NoMainHeader'
-import { RetroAchievementsGameWithAchievements } from '@/types/types'
+import { RetroAchievementsGameWithAchievements, SubsetGame } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -13,6 +13,10 @@ import { useLanguage } from '@/context/LanguageContext'
 export default function GameInfo() {
   const { data: session } = useSession()
   const [gameData, setGameData] = useState<RetroAchievementsGameWithAchievements | null>(null)
+  const [subsets, setSubsets] = useState<SubsetGame[]>([])
+  const [parentId, setParentId] = useState<number | null>(null)
+  const [parentTitle, setParentTitle] = useState('')
+  const [parentIcon, setParentIcon] = useState('')
   const [error, setError] = useState<string | null>(null)
   const { gameId } = useParams()
   const { T } = useLanguage()
@@ -20,12 +24,44 @@ export default function GameInfo() {
   useEffect(() => {
     if (!session || !gameId) return
     setError(null)
+    setGameData(null)
+    setSubsets([])
+    setParentId(null)
+    setParentTitle('')
+    setParentIcon('')
+
     fetch(`/api/getGameProgression?gameId=${gameId}`)
       .then((res) => {
         if (!res.ok) throw new Error(`Error ${res.status}`)
         return res.json()
       })
-      .then(setGameData)
+      .then(async (data: RetroAchievementsGameWithAchievements) => {
+        setGameData(data)
+
+        if (data.ParentGameID) {
+          // Current game IS a subset — fetch parent to get its title + sibling subsets
+          setParentId(data.ParentGameID)
+          const [parentRes, subsetsRes] = await Promise.all([
+            fetch(`/api/getGameProgression?gameId=${data.ParentGameID}`),
+            fetch(`/api/getGameSubsets?gameId=${data.ParentGameID}&consoleId=${data.ConsoleID}&baseTitle=${encodeURIComponent((data.Title ?? '').split(' [Subset')[0].split(' |')[0].trim())}`),
+          ])
+          if (parentRes.ok) {
+            const parentData: RetroAchievementsGameWithAchievements = await parentRes.json()
+            setParentTitle(parentData.Title ?? '')
+            setParentIcon(parentData.ImageIcon ?? '')
+          }
+          if (subsetsRes.ok) setSubsets(await subsetsRes.json())
+        } else {
+          // Current game is a base game — look for subsets
+          setParentId(data.ID)
+          setParentTitle(data.Title ?? '')
+          setParentIcon(data.ImageIcon ?? '')
+          const subsetsRes = await fetch(
+            `/api/getGameSubsets?gameId=${data.ID}&consoleId=${data.ConsoleID}&baseTitle=${encodeURIComponent(data.Title ?? '')}`
+          )
+          if (subsetsRes.ok) setSubsets(await subsetsRes.json())
+        }
+      })
       .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Error loading game'))
   }, [gameId, session?.user?.rausername])
 
@@ -44,10 +80,20 @@ export default function GameInfo() {
   }
 
   if (gameData !== null) {
+    const showSelector = subsets.length > 0 || parentId !== null
     return (
       <main className="flex-1 flex flex-col items-center text-text-main">
-        {/* <NoMainHeader /> */}
-        <GameInfoHeader gameData={gameData} />
+        <GameInfoHeader gameData={gameData}>
+          {showSelector && (
+            <GameInfoSubsetSelector
+              currentId={gameData.ID!}
+              parentId={parentId !== gameData.ID ? parentId : null}
+              parentTitle={parentTitle}
+              parentIcon={parentIcon}
+              subsets={subsets}
+            />
+          )}
+        </GameInfoHeader>
         <GameInfoTable gameData={gameData} />
       </main>
     )
