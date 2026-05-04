@@ -83,6 +83,13 @@ export type RetroAchievement = {
   DateEarnedHardcore?: string | null;
 };
 
+export type SubsetGame = {
+  ID: number
+  Title: string
+  ImageIcon: string
+  NumAchievements: number
+}
+
 export type RetroAchievementsGameWithAchievementsBase = {
   ID: number;
   Title: string;
@@ -109,6 +116,7 @@ export type RetroAchievementsGameWithAchievementsBase = {
   RichPresencePatch: string;
 
   ParentGameID: number | null;
+  Subsets?: SubsetGame[];
 
   NumDistinctPlayers: number;
   NumDistinctPlayersCasual: number;
@@ -188,7 +196,7 @@ export type UserRankAndScore = {
 
 export type UserAward = {
   AwardedAt: string
-  AwardType: string
+  AwardType: 'Game Beaten' | 'Mastery/Completion' | string
   AwardData: number
   AwardDataExtra: number
   Title: string

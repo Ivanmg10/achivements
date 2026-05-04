@@ -11,29 +11,39 @@ function isValidCategory(cat: string): cat is ValidCategory {
 
 export type CategoryGame = WantToPlayGame | RetroAchievementsGameCompleted
 
-export function useGamesByCategory(category: string, consoleId: string) {
+export function useGamesByCategory(category: string, consoleId?: string) {
   const { status } = useSession()
   const [games, setGames] = useState<CategoryGame[]>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>()
   const fetchedForRef = useRef('')
 
   useEffect(() => {
-    const key = `${category}-${consoleId}`
-    if (status !== 'authenticated' || fetchedForRef.current === key || !isValidCategory(category)) return
+    if (status === 'loading') return
+    if (status === 'unauthenticated') { setLoading(false); return }
+    const key = `${category}-${consoleId ?? 'all'}`
+    if (fetchedForRef.current === key || !isValidCategory(category)) { setLoading(false); return }
 
     fetchedForRef.current = key
     setGames([])
     setLoading(true)
     setError(undefined)
 
-    const id = Number(consoleId)
+    const id = consoleId ? Number(consoleId) : null
 
     if (category === 'wantToPlay') {
-      fetchWithRetry('/api/getWantPlayGames')
-        .then((data) => {
-          const results: WantToPlayGame[] = (data as { Results?: WantToPlayGame[] })?.Results ?? []
-          setGames(results.filter((g) => g.ConsoleID === id))
+      Promise.all([
+        fetchWithRetry('/api/getWantPlayGames'),
+        fetchWithRetry('/api/getGamesCompleted'),
+      ])
+        .then(([wantData, completedData]) => {
+          const results: WantToPlayGame[] = (wantData as { Results?: WantToPlayGame[] })?.Results ?? []
+          const completed = completedData as RetroAchievementsGameCompleted[]
+          const startedIds = new Set(
+            completed.filter((g) => g.NumAwarded > 0).map((g) => g.GameID)
+          )
+          const filtered = results.filter((g) => !startedIds.has(g.ID ?? g.GameID!) && g.ConsoleName !== 'Events')
+          setGames(id !== null ? filtered.filter((g) => g.ConsoleID === id) : filtered)
         })
         .catch((err) => setError(err instanceof Error ? err.message : 'Unknown error'))
         .finally(() => setLoading(false))
@@ -41,7 +51,8 @@ export function useGamesByCategory(category: string, consoleId: string) {
       fetchWithRetry('/api/getGamesCompleted')
         .then((data) => {
           const list = data as RetroAchievementsGameCompleted[]
-          const byConsole = list.filter((g) => g.ConsoleID === id)
+          const byConsole = (id !== null ? list.filter((g) => g.ConsoleID === id) : list)
+            .filter((g) => g.ConsoleName !== 'Events')
           if (category === 'playing') {
             setGames(
               byConsole.filter(
@@ -49,7 +60,13 @@ export function useGamesByCategory(category: string, consoleId: string) {
               ),
             )
           } else {
-            setGames(byConsole.filter((g) => Number(g.HardcoreMode) === 1 && parseFloat(g.PctWon) >= 1))
+            const all = byConsole.filter((g) => parseFloat(g.PctWon) >= 1)
+            const best = new Map<number, RetroAchievementsGameCompleted>()
+            for (const g of all) {
+              const prev = best.get(g.GameID)
+              if (!prev || Number(g.HardcoreMode) > Number(prev.HardcoreMode)) best.set(g.GameID, g)
+            }
+            setGames(Array.from(best.values()))
           }
         })
         .catch((err) => setError(err instanceof Error ? err.message : 'Unknown error'))
