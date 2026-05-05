@@ -16,9 +16,9 @@ export default function GameInfoHeader({
   return (
     <section className="bg-bg-main p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_400px] mt-5">
       <div className="flex flex-row items-start gap-5">
-        {gameData?.ImageIcon && (
+        {gameData?.ImageBoxArt && (
           <Image
-            src={`https://retroachievements.org${gameData?.ImageBoxArt}`}
+            src={`https://retroachievements.org${gameData.ImageBoxArt}`}
             alt="game icon"
             width={150}
             height={150}

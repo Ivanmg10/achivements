@@ -48,13 +48,15 @@ export default function MainPageProfileRaGame({
       <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileRa.playingNow}</p>
       {richPresenceMsg && <p className="text-xs text-gray-300 italic">{richPresenceMsg}</p>}
       <div className="flex gap-3 items-center">
-        <Image
-          src={`https://retroachievements.org${game.ImageIcon}`}
-          alt="GameIcon"
-          width={50}
-          height={50}
-          className="rounded-lg shrink-0"
-        />
+        {game.ImageIcon && (
+          <Image
+            src={`https://retroachievements.org${game.ImageIcon}`}
+            alt="GameIcon"
+            width={50}
+            height={50}
+            className="rounded-lg shrink-0"
+          />
+        )}
         <div className="flex flex-col gap-1 min-w-0">
           <span className="text-sm font-semibold truncate">{game.Title}</span>
           <span className="text-xs text-gray-400">{game.ConsoleName}</span>

@@ -42,13 +42,15 @@ export default function GameInfoSubsetSelector({
                 : 'opacity-50 hover:opacity-100 hover:ring-2 hover:ring-white/30'
             }`}
           >
-            <Image
-              src={`https://retroachievements.org${tab.icon}`}
-              alt={tab.label}
-              width={48}
-              height={48}
-              className="w-12 h-12 object-cover block"
-            />
+            {tab.icon && (
+              <Image
+                src={`https://retroachievements.org${tab.icon}`}
+                alt={tab.label}
+                width={48}
+                height={48}
+                className="w-12 h-12 object-cover block"
+              />
+            )}
           </Link>
         )
       })}
