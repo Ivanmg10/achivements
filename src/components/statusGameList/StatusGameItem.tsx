@@ -218,13 +218,15 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
             isHardcore ? 'ring-2 ring-yellow-400/70 hover:ring-yellow-400' : 'hover:ring-2 hover:ring-white/40'
           }`}
         >
-          <Image
-            src={`https://retroachievements.org${game.ImageIcon}`}
-            alt={game.Title}
-            width={96}
-            height={96}
-            className="w-24 h-24 rounded-xl object-cover block"
-          />
+          {game.ImageIcon && (
+            <Image
+              src={`https://retroachievements.org${game.ImageIcon}`}
+              alt={game.Title}
+              width={96}
+              height={96}
+              className="w-24 h-24 rounded-xl object-cover block"
+            />
+          )}
         </Link>
 
         <div className="flex flex-col flex-1 min-w-0 gap-1">

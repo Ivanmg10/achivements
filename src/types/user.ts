@@ -14,4 +14,6 @@ export interface User {
   email?: string | null;
   admin?: boolean;
   raUser?: RetroAchievementsUserProfile | object;
+  location?: string | null;
+  favorite_game?: { id: number; title: string; imageIcon: string } | null;
 }

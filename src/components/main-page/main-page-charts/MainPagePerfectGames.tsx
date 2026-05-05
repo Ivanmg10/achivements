@@ -55,13 +55,15 @@ export default function MainPagePerfectGames({ games }: { games: RetroAchievemen
             title={`${g.Title} — ${g.ConsoleName}`}
             className="relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
           >
-            <Image
-              src={`https://retroachievements.org${g.ImageIcon}`}
-              alt={g.Title}
-              width={40}
-              height={40}
-              className="rounded hover:scale-110 transition-transform"
-            />
+            {g.ImageIcon && (
+              <Image
+                src={`https://retroachievements.org${g.ImageIcon}`}
+                alt={g.Title}
+                width={40}
+                height={40}
+                className="rounded hover:scale-110 transition-transform"
+              />
+            )}
             {g.HardcoreMode === '1' && (
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full border border-bg-card" title="Hardcore" />
             )}
