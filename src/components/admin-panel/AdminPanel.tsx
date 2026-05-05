@@ -7,19 +7,7 @@ import { useSession } from 'next-auth/react'
 import AdminCreateUserModal from './AdminCreateUserModal'
 import AdminEditUserModal from './AdminEditUserModal'
 import { codeToFlag } from '@/utils/countries'
-
-interface AdminUser {
-  id: number
-  username: string
-  email: string | null
-  theme: string
-  avatar: string | null
-  admin: boolean
-  rausername: string | null
-  ra_display: string | null
-  location: string | null
-  steamusername?: string | null
-}
+import type { AdminUser } from '@/types/user'
 
 export default function AdminPanel() {
   const { data: session } = useSession()
@@ -168,7 +156,7 @@ function UserRow({
           )}
           {isSelf && <span className="text-xs text-text-secondary italic">(you)</span>}
           {user.location && (
-            <span className="text-base leading-none">{codeToFlag(user.location)}</span>
+            <span className="text-base leading-none" aria-hidden="true">{codeToFlag(user.location)}</span>
           )}
         </div>
         <div className="flex items-center gap-3 mt-0.5">
@@ -187,7 +175,7 @@ function UserRow({
         <button
           onClick={onToggleAdmin}
           disabled={isSelf}
-          title={user.admin ? 'Remove admin' : 'Make admin'}
+          aria-label={user.admin ? `Remove admin from ${user.username}` : `Make ${user.username} admin`}
           className={`p-2 rounded-lg transition-colors ${
             isSelf
               ? 'opacity-30 cursor-not-allowed text-text-secondary'
@@ -196,14 +184,14 @@ function UserRow({
                 : 'text-text-secondary hover:bg-bg-main hover:text-text-main'
           }`}
         >
-          {user.admin ? <IconShield size={15} /> : <IconShieldOff size={15} />}
+          {user.admin ? <IconShield size={15} aria-hidden="true" /> : <IconShieldOff size={15} aria-hidden="true" />}
         </button>
         <button
           onClick={onEdit}
-          title="Edit user"
+          aria-label={`Edit ${user.username}`}
           className="p-2 rounded-lg text-text-secondary hover:bg-bg-main hover:text-text-main transition-colors"
         >
-          <IconPencil size={15} />
+          <IconPencil size={15} aria-hidden="true" />
         </button>
       </div>
     </div>

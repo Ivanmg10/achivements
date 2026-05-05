@@ -109,36 +109,40 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
 
       {/* New value */}
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-text-secondary uppercase tracking-wider">
+        <label htmlFor="edit-new-value" className="text-xs text-text-secondary uppercase tracking-wider">
           {T.editProfileModal.newLabel} {label}
         </label>
         <input
+          id="edit-new-value"
           type={field === 'email' ? 'email' : 'text'}
           value={newValue}
           onChange={(e) => { setNewValue(e.target.value); setError(null) }}
           placeholder={field === 'avatar' ? 'https://...' : ''}
           className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
           disabled={loading || success}
+          autoFocus
         />
       </div>
 
       {/* Confirm value */}
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-text-secondary uppercase tracking-wider">
+        <label htmlFor="edit-confirm-value" className="text-xs text-text-secondary uppercase tracking-wider">
           {T.editProfileModal.confirmLabel} {label}
         </label>
         <input
+          id="edit-confirm-value"
           type={field === 'email' ? 'email' : 'text'}
           value={confirmValue}
           onChange={(e) => { setConfirmValue(e.target.value); setError(null) }}
           placeholder={field === 'avatar' ? 'https://...' : ''}
+          aria-describedby={mismatch ? 'edit-mismatch-error' : undefined}
           className={`bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 w-full transition-colors ${
             mismatch ? 'ring-2 ring-red-500 focus:ring-red-500' : 'focus:ring-accent'
           }`}
           disabled={loading || success}
         />
         {mismatch && (
-          <span className="text-xs text-red-400">{T.editProfileModal.mismatch}</span>
+          <span id="edit-mismatch-error" role="alert" className="text-xs text-red-400">{T.editProfileModal.mismatch}</span>
         )}
       </div>
 
@@ -160,12 +164,12 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
 
       {/* Error */}
       {error && (
-        <p className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>
+        <p role="alert" className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>
       )}
 
       {/* Success */}
       {success && (
-        <p className="text-sm text-green-400 bg-green-500/10 rounded-xl px-4 py-2">
+        <p role="status" className="text-sm text-green-400 bg-green-500/10 rounded-xl px-4 py-2">
           {T.editProfileModal.success}
         </p>
       )}

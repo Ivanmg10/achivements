@@ -41,15 +41,17 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
   return (
     <CommonModal isOpen={isOpen} onClose={onClose}>
       <h2 className="text-xl font-bold">{T.userTheme.theme}</h2>
-      <div className="grid grid-cols-2 gap-3">
+      <div role="radiogroup" aria-label={T.userTheme.theme} className="grid grid-cols-2 gap-3">
         {THEMES.map(({ id, label, cls }) => (
           <button
             key={id}
             onClick={() => handleSelect(id)}
+            role="radio"
+            aria-checked={theme === id}
             className={`${cls} py-3 px-4 rounded-xl text-sm font-medium flex items-center justify-between gap-2`}
           >
             {label}
-            {theme === id && <span className="w-2 h-2 rounded-full bg-current opacity-80" />}
+            {theme === id && <span className="w-2 h-2 rounded-full bg-current opacity-80" aria-hidden="true" />}
           </button>
         ))}
       </div>

@@ -63,6 +63,7 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder={T.userData.searchCountry}
+        aria-label={T.userData.searchCountry}
         className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
         autoFocus
       />
@@ -80,15 +81,16 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
               key={country.code}
               onClick={() => handleSelect(country.code)}
               disabled={loading}
+              aria-pressed={currentCode === country.code}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors disabled:opacity-50 ${
                 currentCode === country.code
                   ? 'bg-accent text-bg-main'
                   : 'hover:bg-bg-main text-text-main'
               }`}
             >
-              <span className="text-xl">{codeToFlag(country.code)}</span>
+              <span className="text-xl" aria-hidden="true">{codeToFlag(country.code)}</span>
               <span className="text-sm font-medium">{country.name}</span>
-              <span className="text-xs text-current opacity-50 ml-auto">{country.code}</span>
+              <span className="text-xs text-current opacity-50 ml-auto" aria-hidden="true">{country.code}</span>
             </button>
           ))
         )}

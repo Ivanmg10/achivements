@@ -212,4 +212,10 @@ export const es: Translations = {
   profileAchievements: {
     recentAchievements: 'Logros recientes',
   },
+  favorites: {
+    title: 'Logros fijados',
+    empty: 'Fija logros en la página del juego para seguirlos aquí',
+    addFavorite: 'Fijar logro',
+    removeFavorite: 'Quitar logro fijado',
+  },
 }

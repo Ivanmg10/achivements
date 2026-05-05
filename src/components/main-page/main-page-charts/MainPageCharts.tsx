@@ -25,7 +25,7 @@ import MainPageAlmostThere from './MainPageAlmostThere'
 import MainPagePerfectGames from './MainPagePerfectGames'
 import MainPageTopTen from './MainPageTopTen'
 import MainPageBestPeriod from './MainPageBestPeriod'
-import MainPageConsoleBreakdown from './MainPageConsoleBreakdown'
+import MainPageFavorites from '../main-page-favorites/MainPageFavorites'
 
 function ChartCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
@@ -155,7 +155,7 @@ export default function MainPageCharts() {
 
             {/* Col 3 row-span-2 */}
             <ChartCard className="lg:row-span-2">
-              <MainPageConsoleBreakdown games={all} />
+              <MainPageFavorites />
             </ChartCard>
 
             {/* Row 5 col 1-2 */}

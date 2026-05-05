@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { memo, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import { CategoryGame } from '../../hooks/useGamesByCategory'
 import { GameExtraData } from './StatusGameList'
@@ -29,15 +29,51 @@ type TooltipData = { achievement: RetroAchievement; x: number; y: number }
 const AchievementGrid = memo(function AchievementGrid({
   achievements,
   numDistinctPlayers,
+  gameId,
+  gameTitle,
 }: {
   achievements: RetroAchievement[]
   numDistinctPlayers: number
+  gameId: number | string
+  gameTitle: string
 }) {
   const [tooltip, setTooltip] = useState<TooltipData | null>(null)
   const [selected, setSelected] = useState<RetroAchievement | null>(null)
   const [allLoaded, setAllLoaded] = useState(false)
+  const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set())
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { T } = useLanguage()
+
+  useEffect(() => {
+    fetch(`/api/favorites?gameId=${gameId}`)
+      .then((r) => r.json())
+      .then((rows: { achievement_id: number }[]) => {
+        setFavoritedIds(new Set(rows.map((r) => r.achievement_id)))
+      })
+      .catch(() => {})
+  }, [gameId])
+
+  const handleToggleFavorite = useCallback(
+    async (achievement: RetroAchievement) => {
+      const isFav = favoritedIds.has(achievement.ID)
+      setFavoritedIds((prev) => {
+        const next = new Set(prev)
+        if (isFav) next.delete(achievement.ID)
+        else next.add(achievement.ID)
+        return next
+      })
+      if (isFav) {
+        await fetch(`/api/favorites?achievementId=${achievement.ID}`, { method: 'DELETE' })
+      } else {
+        await fetch('/api/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ achievement, gameId, gameTitle, numDistinctPlayers }),
+        })
+      }
+    },
+    [favoritedIds, gameId, numDistinctPlayers],
+  )
 
   useEffect(() => {
     if (achievements.length === 0) { setAllLoaded(true); return }
@@ -150,6 +186,9 @@ const AchievementGrid = memo(function AchievementGrid({
           achievement={selected}
           numDistinctPlayers={numDistinctPlayers}
           onClose={() => setSelected(null)}
+          gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
+          isFavorited={favoritedIds.has(selected.ID)}
+          onToggleFavorite={() => handleToggleFavorite(selected)}
         />
       )}
     </>
@@ -322,7 +361,7 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
                     First → last unlock: <span className="text-text-secondary/90 font-medium">{completionDuration}</span>
                   </p>
                 )}
-                <AchievementGrid achievements={achievements} numDistinctPlayers={gameData?.NumDistinctPlayers ?? 1} />
+                <AchievementGrid achievements={achievements} numDistinctPlayers={gameData?.NumDistinctPlayers ?? 1} gameId={gameId} gameTitle={game.Title} />
               </div>
             )}
           </div>

@@ -3,18 +3,7 @@
 import { useState } from 'react'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import CommonModal from '../common-modal/CommonModal'
-
-interface AdminUser {
-  id: number
-  username: string
-  email: string | null
-  theme: string
-  avatar: string | null
-  admin: boolean
-  rausername: string | null
-  ra_display: string | null
-  location: string | null
-}
+import type { AdminUser } from '@/types/user'
 
 interface Props {
   isOpen: boolean
@@ -62,40 +51,49 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
 
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-text-secondary uppercase tracking-wider">Username *</label>
-          <input value={username} onChange={e => { setUsername(e.target.value); setError(null) }}
+          <label htmlFor="create-username" className="text-xs text-text-secondary uppercase tracking-wider">Username *</label>
+          <input id="create-username" value={username} onChange={e => { setUsername(e.target.value); setError(null) }}
+            autoFocus
             className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full" />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-text-secondary uppercase tracking-wider">Email</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+          <label htmlFor="create-email" className="text-xs text-text-secondary uppercase tracking-wider">Email</label>
+          <input id="create-email" type="email" value={email} onChange={e => setEmail(e.target.value)}
             className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full" />
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-text-secondary uppercase tracking-wider">Password *</label>
+          <label htmlFor="create-password" className="text-xs text-text-secondary uppercase tracking-wider">Password *</label>
           <div className="relative">
-            <input type={showPass ? 'text' : 'password'} value={password}
+            <input id="create-password" type={showPass ? 'text' : 'password'} value={password}
               onChange={e => { setPassword(e.target.value); setError(null) }}
               className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full pr-10" />
             <button type="button" onClick={() => setShowPass(s => !s)}
+              aria-label={showPass ? 'Hide password' : 'Show password'}
+              aria-pressed={showPass}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main" tabIndex={-1}>
-              {showPass ? <IconEyeOff size={16} /> : <IconEye size={16} />}
+              {showPass ? <IconEyeOff size={16} aria-hidden="true" /> : <IconEye size={16} aria-hidden="true" />}
             </button>
           </div>
           {password.length > 0 && password.length < 6 && (
             <span className="text-xs text-text-secondary">Minimum 6 characters</span>
           )}
         </div>
-        <label className="flex items-center gap-3 cursor-pointer">
-          <div onClick={() => setIsAdmin(v => !v)}
-            className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${isAdmin ? 'bg-accent' : 'bg-bg-main'}`}>
-            <div className={`w-4 h-4 rounded-full bg-white transition-transform ${isAdmin ? 'translate-x-4' : 'translate-x-0'}`} />
-          </div>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={isAdmin}
+            onClick={() => setIsAdmin(v => !v)}
+            aria-label="Admin privileges"
+            className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${isAdmin ? 'bg-accent' : 'bg-bg-main'}`}
+          >
+            <div className={`w-4 h-4 rounded-full bg-white transition-transform ${isAdmin ? 'translate-x-4' : 'translate-x-0'}`} aria-hidden="true" />
+          </button>
           <span className="text-sm">Admin</span>
-        </label>
+        </div>
       </div>
 
-      {error && <p className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>}
+      {error && <p role="alert" className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>}
 
       <div className="flex gap-3 mt-2">
         <button onClick={handleClose} className="flex-1 bg-bg-main text-text-secondary rounded-xl py-3 hover:text-text-main transition-colors">

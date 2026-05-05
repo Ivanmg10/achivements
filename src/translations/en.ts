@@ -210,6 +210,12 @@ export const en = {
   profileAchievements: {
     recentAchievements: 'Recent achievements',
   },
+  favorites: {
+    title: 'Pinned achievements',
+    empty: 'Pin achievements in a game page to track them here',
+    addFavorite: 'Pin achievement',
+    removeFavorite: 'Unpin achievement',
+  },
 }
 
 export type Translations = typeof en

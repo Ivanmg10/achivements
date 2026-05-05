@@ -11,11 +11,13 @@ interface Props {
 }
 
 function PasswordInput({
+  id,
   label,
   value,
   onChange,
   disabled,
 }: {
+  id: string
   label: string
   value: string
   onChange: (v: string) => void
@@ -24,9 +26,10 @@ function PasswordInput({
   const [show, setShow] = useState(false)
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs text-text-secondary uppercase tracking-wider">{label}</label>
+      <label htmlFor={id} className="text-xs text-text-secondary uppercase tracking-wider">{label}</label>
       <div className="relative">
         <input
+          id={id}
           type={show ? 'text' : 'password'}
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -36,10 +39,12 @@ function PasswordInput({
         <button
           type="button"
           onClick={() => setShow((s) => !s)}
+          aria-label={show ? 'Hide password' : 'Show password'}
+          aria-pressed={show}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main transition-colors"
           tabIndex={-1}
         >
-          {show ? <IconEyeOff size={16} /> : <IconEye size={16} />}
+          {show ? <IconEyeOff size={16} aria-hidden="true" /> : <IconEye size={16} aria-hidden="true" />}
         </button>
       </div>
     </div>
@@ -96,43 +101,47 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
       <h2 className="text-xl font-bold">{T.userConfig.changePassword}</h2>
 
       <PasswordInput
+        id="pw-current"
         label={T.changePassword.current}
         value={current}
         onChange={(v) => { setCurrent(v); setError(null) }}
         disabled={loading || success}
       />
       <PasswordInput
+        id="pw-new"
         label={T.changePassword.new}
         value={next}
         onChange={(v) => { setNext(v); setError(null) }}
         disabled={loading || success}
       />
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-text-secondary uppercase tracking-wider">
+        <label htmlFor="pw-confirm" className="text-xs text-text-secondary uppercase tracking-wider">
           {T.changePassword.confirm}
         </label>
         <div className="relative">
           <input
+            id="pw-confirm"
             type="password"
             value={confirm}
             onChange={(e) => { setConfirm(e.target.value); setError(null) }}
             disabled={loading || success}
+            aria-describedby={mismatch ? 'pw-mismatch-error' : undefined}
             className={`bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 w-full transition-colors ${
               mismatch ? 'ring-2 ring-red-500 focus:ring-red-500' : 'focus:ring-accent'
             }`}
           />
         </div>
-        {mismatch && <span className="text-xs text-red-400">{T.editProfileModal.mismatch}</span>}
+        {mismatch && <span id="pw-mismatch-error" role="alert" className="text-xs text-red-400">{T.editProfileModal.mismatch}</span>}
         {next.length > 0 && next.length < 6 && (
           <span className="text-xs text-text-secondary">{T.changePassword.minLength}</span>
         )}
       </div>
 
       {error && (
-        <p className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>
+        <p role="alert" className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>
       )}
       {success && (
-        <p className="text-sm text-green-400 bg-green-500/10 rounded-xl px-4 py-2">
+        <p role="status" className="text-sm text-green-400 bg-green-500/10 rounded-xl px-4 py-2">
           {T.editProfileModal.success}
         </p>
       )}
