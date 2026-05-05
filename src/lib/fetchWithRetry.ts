@@ -1,4 +1,5 @@
 const BASE_DELAY = 800
+const TIMEOUT_MS = 8000
 
 export async function fetchWithRetry(
   url: string,
@@ -6,8 +7,11 @@ export async function fetchWithRetry(
 ): Promise<unknown> {
   let lastErr: unknown
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
     try {
-      const res = await fetch(url)
+      const res = await fetch(url, { signal: controller.signal })
+      clearTimeout(timer)
       // 4xx = client error, throw immediately without retry
       if (res.status >= 400 && res.status < 500) {
         throw Object.assign(new Error(`HTTP ${res.status}`), { status: res.status })
@@ -17,6 +21,7 @@ export async function fetchWithRetry(
       // Parse JSON inside the loop so empty/truncated bodies also get retried
       return await res.json()
     } catch (e) {
+      clearTimeout(timer)
       lastErr = e
       const status = (e as { status?: number }).status
       if (status && status >= 400 && status < 500) throw e // never retry 4xx

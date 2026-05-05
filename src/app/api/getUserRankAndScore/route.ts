@@ -10,6 +10,8 @@ export async function GET() {
   if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
 
   const { rausername, raid, id } = session.user
+  if (!rausername || !raid) return NextResponse.json({ message: 'No RA account linked' }, { status: 400 })
+
   const data = await withCache(
     `userRankAndScore_v1:${id}`,
     TTL,

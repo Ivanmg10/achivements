@@ -14,11 +14,14 @@ export async function GET(request: NextRequest) {
   }
 
   const achievementId = request.nextUrl.searchParams.get('achievementId')
-  if (!achievementId) {
+  if (!achievementId || !/^\d+$/.test(achievementId)) {
     return NextResponse.json({ message: 'achievementId required' }, { status: 400 })
   }
 
   const { rausername, raid, id } = session.user
+  if (!rausername || !raid) {
+    return NextResponse.json({ message: 'No RA account linked' }, { status: 400 })
+  }
 
   const data = await withCache(
     `achievementDetail:${id}:${achievementId}`,

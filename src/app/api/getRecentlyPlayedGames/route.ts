@@ -12,12 +12,18 @@ export async function GET() {
   }
 
   const { rausername, raid, id } = session.user;
+  if (!rausername || !raid) {
+    return NextResponse.json([]);
+  }
 
-  const data = await withCache(`recentlyPlayed:${id}`, TTL, () =>
-    fetch(
-      `https://retroachievements.org/API/API_GetUserRecentlyPlayedGames.php?u=${rausername}&y=${raid}&c=500`,
-    ).then((r) => r.json()),
-  );
-
-  return NextResponse.json(data);
+  try {
+    const data = await withCache(`recentlyPlayed:${id}`, TTL, () =>
+      fetch(
+        `https://retroachievements.org/API/API_GetUserRecentlyPlayedGames.php?u=${rausername}&y=${raid}&c=500`,
+      ).then((r) => r.json()),
+    );
+    return NextResponse.json(data);
+  } catch {
+    return NextResponse.json([]);
+  }
 }

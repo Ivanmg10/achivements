@@ -20,17 +20,24 @@ export async function GET() {
   }
 
   const { rausername, raid, id } = session.user;
+  if (!rausername || !raid) {
+    return NextResponse.json([]);
+  }
 
-  const data = await withCache(`recentAch_v2:${id}`, TTL, async () => {
-    const raw = await fetch(
-      `https://retroachievements.org/API/API_GetUserRecentAchievements.php?u=${rausername}&y=${raid}&m=20160&c=500`,
-    ).then((r) => r.json());
+  try {
+    const data = await withCache(`recentAch_v2:${id}`, TTL, async () => {
+      const raw = await fetch(
+        `https://retroachievements.org/API/API_GetUserRecentAchievements.php?u=${rausername}&y=${raid}&m=20160&c=500`,
+      ).then((r) => r.json());
 
-    if (Array.isArray(raw)) return sortDesc(raw);
-    if (raw?.Results && Array.isArray(raw.Results)) return sortDesc(raw.Results);
-    if (raw?.Data && Array.isArray(raw.Data)) return sortDesc(raw.Data);
-    return [];
-  });
+      if (Array.isArray(raw)) return sortDesc(raw);
+      if (raw?.Results && Array.isArray(raw.Results)) return sortDesc(raw.Results);
+      if (raw?.Data && Array.isArray(raw.Data)) return sortDesc(raw.Data);
+      return [];
+    });
 
-  return NextResponse.json(data);
+    return NextResponse.json(data);
+  } catch {
+    return NextResponse.json([]);
+  }
 }

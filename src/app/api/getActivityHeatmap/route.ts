@@ -12,6 +12,9 @@ export async function GET() {
   }
 
   const { rausername, raid, id } = session.user;
+  if (!rausername || !raid) {
+    return NextResponse.json({ message: 'No RA account linked' }, { status: 400 });
+  }
 
   let bothChunksValid = false;
   const data = await withCache(`activityHeatmap_v3:${id}`, TTL, async () => {

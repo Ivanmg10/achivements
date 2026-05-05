@@ -11,7 +11,14 @@ export async function GET(request: NextRequest) {
   if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
 
   const gameId = request.nextUrl.searchParams.get('gameId')
+  if (!gameId || !/^\d+$/.test(gameId)) {
+    return NextResponse.json({ message: 'Invalid gameId' }, { status: 400 })
+  }
+
   const { raid, id } = session.user
+  if (!raid) {
+    return NextResponse.json({ message: 'No RA account linked' }, { status: 400 })
+  }
 
   const data = await withCache(
     `gameExtended_v1:${gameId}`,
