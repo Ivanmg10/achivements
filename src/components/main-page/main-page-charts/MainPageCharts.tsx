@@ -46,7 +46,7 @@ export default function MainPageCharts() {
   const { achievements, isLoading: achLoading } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading } = useActivityHeatmap()
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
-  const { all, softcore, hardcore } = useGamesData()
+  const { all, softcore, hardcore, isLoading: gamesLoading } = useGamesData()
   const { rank, isLoading: rankLoading } = useUserRank()
   const { awards, isLoading: awardsLoading } = useUserAwards()
   const { topTen, isLoading: topTenLoading } = useTopTenUsers()
@@ -96,17 +96,17 @@ export default function MainPageCharts() {
               </div>
             </div>
             <div aria-hidden="true" className="flex-1 flex min-h-0">
-              <GamesPlayedPieChart games={chartMode === 'softcore' ? softcore : hardcore} />
+              <GamesPlayedPieChart games={chartMode === 'softcore' ? softcore : hardcore} isLoading={gamesLoading} />
             </div>
           </ChartCard>
 
           {/* Row 3 */}
           <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
             <ChartCard>
-              <MainPageTopGames achievements={achievements} />
+              <MainPageTopGames achievements={achievements} isLoading={achLoading} />
             </ChartCard>
             <ChartCard>
-              <MainPageRarest achievements={achievements} />
+              <MainPageRarest achievements={achievements} isLoading={achLoading} />
             </ChartCard>
             <ChartCard>
               <MainPageAbandoned
@@ -117,7 +117,7 @@ export default function MainPageCharts() {
           </div>
           <div className="flex flex-col gap-4">
             <ChartCard className="flex-1">
-              <MainPagePerfectGames games={all} />
+              <MainPagePerfectGames games={all} isLoading={gamesLoading} />
             </ChartCard>
             <ChartCard className="flex-1">
               <MainPageMastery awards={awards} isLoading={awardsLoading} />
@@ -126,10 +126,10 @@ export default function MainPageCharts() {
 
           {/* Row 4 col 1-2 */}
           <ChartCard>
-            <MainPageCompletionDist games={all} />
+            <MainPageCompletionDist games={all} isLoading={gamesLoading} />
           </ChartCard>
           <ChartCard>
-            <MainPageAlmostThere games={all} />
+            <MainPageAlmostThere games={all} isLoading={gamesLoading} />
           </ChartCard>
 
           {/* Col 3 row-span-2 */}

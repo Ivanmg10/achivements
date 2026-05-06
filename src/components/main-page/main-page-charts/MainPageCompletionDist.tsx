@@ -9,7 +9,7 @@ const BUCKETS = [
   { label: '100%', min: 1, max: Infinity, color: 'bg-green-500' },
 ]
 
-export default function MainPageCompletionDist({ games }: { games: RetroAchievementsGameCompleted[] }) {
+export default function MainPageCompletionDist({ games, isLoading }: { games: RetroAchievementsGameCompleted[]; isLoading?: boolean }) {
   const buckets = useMemo(() => {
     const counts = BUCKETS.map((b) => ({
       ...b,
@@ -23,6 +23,27 @@ export default function MainPageCompletionDist({ games }: { games: RetroAchievem
   }, [games])
 
   const total = buckets.reduce((s, b) => s + b.count, 0)
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-2 animate-pulse">
+        <div className="h-2 w-36 rounded bg-white/10" />
+        <div className="flex h-3 rounded-full overflow-hidden gap-0.5">
+          {[40, 25, 20, 10, 5].map((w, i) => (
+            <div key={i} className="bg-white/10 rounded-full" style={{ width: `${w}%` }} />
+          ))}
+        </div>
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-white/10 shrink-0" />
+            <div className="h-2 w-10 rounded bg-white/10 shrink-0" />
+            <div className="flex-1 bg-white/10 rounded-full h-1.5" />
+            <div className="h-2 w-4 rounded bg-white/10 shrink-0" />
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   if (total === 0) {
     return (

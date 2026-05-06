@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { RecentAchievement } from '@/types/types'
 
-export default function MainPageRarest({ achievements }: { achievements: RecentAchievement[] }) {
+export default function MainPageRarest({ achievements, isLoading }: { achievements: RecentAchievement[]; isLoading?: boolean }) {
   const withRarity = useMemo(() =>
     achievements
       .filter((a) => a.TrueRatio !== undefined && a.TrueRatio > a.Points)
@@ -11,6 +11,24 @@ export default function MainPageRarest({ achievements }: { achievements: RecentA
       .slice(0, 6),
     [achievements]
   )
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-2 animate-pulse">
+        <div className="h-2 w-32 rounded bg-white/10" />
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="flex items-center gap-2 bg-bg-main rounded-lg p-2">
+            <div className="w-7 h-7 rounded bg-white/10 shrink-0" />
+            <div className="flex flex-col flex-1 gap-1.5">
+              <div className="h-2.5 w-24 rounded bg-white/10" />
+              <div className="h-2 w-16 rounded bg-white/10" />
+            </div>
+            <div className="h-3 w-8 rounded bg-white/10 shrink-0" />
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   if (withRarity.length === 0) {
     return (
