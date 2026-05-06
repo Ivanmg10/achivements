@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import { useGamesData } from '@/contexts/GamesDataContext'
 
 export function useGamesCompletedPreview() {
-  const { softcore, hardcore } = useGamesData()
+  const { softcore, hardcore, isLoading } = useGamesData()
 
-  return useMemo(() => {
+  const games = useMemo(() => {
     const completedHardcore = hardcore
       .filter((g) => parseFloat(g.PctWon) >= 1)
       .sort(() => Math.random() - 0.5)
@@ -16,4 +16,6 @@ export function useGamesCompletedPreview() {
       .slice(0, 3)
     return { listGames: completedSoftcore, listGamesHardcore: completedHardcore }
   }, [softcore, hardcore])
+
+  return { ...games, isLoading }
 }

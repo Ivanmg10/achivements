@@ -5,6 +5,7 @@ import { useRef } from 'react'
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useResizableList } from '@/hooks/useResizableList'
 import { useLanguage } from '@/context/LanguageContext'
+import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
 
 import Link from 'next/link'
 import MainPageGamesList from './main-page-games-list/MainPageGamesList'
@@ -18,7 +19,7 @@ const FOOTER_PX = 0
 
 export default function MainPageGames() {
   const sectionRef = useRef<HTMLElement>(null)
-  const { listGames } = useGamesInProgressPreview()
+  const { listGames, isLoading } = useGamesInProgressPreview()
   const visibleCount = useResizableList({
     sectionRef,
     maxItems: MAX_GAMES,
@@ -38,7 +39,12 @@ export default function MainPageGames() {
         <ConsoleSideList slug="playing" />
       </div>
       <div className="flex flex-col items-center w-full flex-1 overflow-hidden">
-        {listGames.length > 0 ? (
+        {isLoading ? (
+          <div className="w-full">
+            <GameCardSkeleton />
+            <GameCardSkeleton />
+          </div>
+        ) : listGames.length > 0 ? (
           <MainPageGamesList listGames={listGames.slice(0, visibleCount)} />
         ) : (
           <EmptyState icon="🎮" title={T.mainPage.noGamesInProgress} subtitle={T.mainPage.noGamesInProgressSub} className="py-8" />

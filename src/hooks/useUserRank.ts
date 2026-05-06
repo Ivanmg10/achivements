@@ -7,17 +7,24 @@ export function useUserRank() {
   const { data: session } = useSession()
   const [rank, setRank] = useState<UserRankAndScore | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(false)
   const hasFetched = useRef(false)
+  const attemptRef = useRef(0)
+  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const doFetch = useCallback(() => {
     if (!session?.user?.rausername) { setIsLoading(false); return }
     setIsLoading(true)
-    setError(false)
     fetchWithRetry('/api/getUserRankAndScore')
-      .then((data) => setRank(data as UserRankAndScore))
-      .catch(() => setError(true))
-      .finally(() => setIsLoading(false))
+      .then((data) => {
+        setRank(data as UserRankAndScore)
+        setIsLoading(false)
+        attemptRef.current = 0
+      })
+      .catch(() => {
+        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
+        attemptRef.current++
+        retryTimer.current = setTimeout(doFetch, delay)
+      })
   }, [session?.user?.rausername])
 
   useEffect(() => {
@@ -27,7 +34,14 @@ export function useUserRank() {
     doFetch()
   }, [session?.user?.rausername, doFetch])
 
-  const refetch = useCallback(() => { setRank(null); doFetch() }, [doFetch])
+  useEffect(() => () => clearTimeout(retryTimer.current), [])
 
-  return { rank, isLoading, error, refetch }
+  const refetch = useCallback(() => {
+    clearTimeout(retryTimer.current)
+    attemptRef.current = 0
+    setRank(null)
+    doFetch()
+  }, [doFetch])
+
+  return { rank, isLoading, refetch }
 }

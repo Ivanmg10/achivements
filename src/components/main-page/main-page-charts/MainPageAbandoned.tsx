@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useEffect, useState } from 'react'
+import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { RetroAchievementsGameCompleted } from '@/types/types'
@@ -11,39 +11,43 @@ const ABANDONED_DAYS = 90
 export default function MainPageAbandoned({
   playing,
   isLoading,
-  resetKey,
-  onError,
 }: {
   playing: RetroAchievementsGameCompleted[]
   isLoading?: boolean
-  resetKey?: number
-  onError?: (hasError: boolean) => void
 }) {
   const [lastAchDates, setLastAchDates] = useState<Record<number, string>>({})
   const [fetchedKey, setFetchedKey] = useState('')
-  const [datesError, setDatesError] = useState(false)
+  const attemptRef = useRef(0)
+  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const allIdsKey = useMemo(() => playing.map((g) => g.GameID).join(','), [playing])
 
+  const doFetch = useCallback((key: string) => {
+    if (!key) return
+    fetchWithRetry(`/api/getGamesLastPlayed?gameIds=${key}`)
+      .then((data) => {
+        if (typeof data === 'object' && data) {
+          setLastAchDates(data as Record<number, string>)
+          setFetchedKey(key)
+          attemptRef.current = 0
+        }
+      })
+      .catch(() => {
+        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
+        attemptRef.current++
+        retryTimer.current = setTimeout(() => doFetch(key), delay)
+      })
+  }, [])
+
   useEffect(() => {
     if (!allIdsKey) return
-    setDatesError(false)
-    fetchWithRetry(`/api/getGamesLastPlayed?gameIds=${allIdsKey}`)
-      .then((data) => { if (typeof data === 'object' && data) setLastAchDates(data as Record<number, string>) })
-      .catch(() => setDatesError(true))
-      .finally(() => setFetchedKey(allIdsKey))
-  }, [allIdsKey])
-
-  useEffect(() => {
-    onError?.(datesError)
-  }, [datesError, onError])
-
-  useEffect(() => {
-    if (resetKey === undefined) return
-    setLastAchDates({})
+    clearTimeout(retryTimer.current)
+    attemptRef.current = 0
     setFetchedKey('')
-    setDatesError(false)
-  }, [resetKey])
+    doFetch(allIdsKey)
+  }, [allIdsKey, doFetch])
+
+  useEffect(() => () => clearTimeout(retryTimer.current), [])
 
   const abandoned = useMemo(() => {
     const now = new Date()
@@ -70,8 +74,19 @@ export default function MainPageAbandoned({
       </p>
 
       {loading ? (
-        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">
-          Loading...
+        <div className="flex flex-col gap-2 animate-pulse">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex items-center gap-2 bg-bg-main rounded-lg p-2">
+              <div className="w-7 h-7 rounded bg-white/10 shrink-0" />
+              <div className="flex-1 flex flex-col gap-1.5">
+                <div className="h-2.5 w-24 rounded bg-white/10" />
+                <div className="h-2 w-16 rounded bg-white/10" />
+              </div>
+              <div className="flex flex-col items-end gap-1 shrink-0">
+                <div className="h-2.5 w-8 rounded bg-white/10" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : abandoned.length === 0 ? (
         <div className="flex items-center justify-center py-4 text-text-secondary text-sm">

@@ -7,17 +7,24 @@ export function useTopTenUsers() {
   const { data: session } = useSession()
   const [topTen, setTopTen] = useState<TopTenUser[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(false)
   const hasFetched = useRef(false)
+  const attemptRef = useRef(0)
+  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const doFetch = useCallback(() => {
     if (!session?.user?.rausername) { setIsLoading(false); return }
     setIsLoading(true)
-    setError(false)
     fetchWithRetry('/api/getTopTenUsers')
-      .then((data) => { if (Array.isArray(data)) setTopTen(data as TopTenUser[]) })
-      .catch(() => setError(true))
-      .finally(() => setIsLoading(false))
+      .then((data) => {
+        if (Array.isArray(data)) setTopTen(data as TopTenUser[])
+        setIsLoading(false)
+        attemptRef.current = 0
+      })
+      .catch(() => {
+        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
+        attemptRef.current++
+        retryTimer.current = setTimeout(doFetch, delay)
+      })
   }, [session?.user?.rausername])
 
   useEffect(() => {
@@ -27,7 +34,14 @@ export function useTopTenUsers() {
     doFetch()
   }, [session?.user?.rausername, doFetch])
 
-  const refetch = useCallback(() => { setTopTen([]); doFetch() }, [doFetch])
+  useEffect(() => () => clearTimeout(retryTimer.current), [])
 
-  return { topTen, isLoading, error, refetch }
+  const refetch = useCallback(() => {
+    clearTimeout(retryTimer.current)
+    attemptRef.current = 0
+    setTopTen([])
+    doFetch()
+  }, [doFetch])
+
+  return { topTen, isLoading, refetch }
 }

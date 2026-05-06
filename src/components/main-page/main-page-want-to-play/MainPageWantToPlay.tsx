@@ -2,10 +2,10 @@
 
 import { useRef } from 'react'
 
-import Spinner from '@/components/main-spinner/Spinner'
 import { useResizableList } from '@/hooks/useResizableList'
 import { useWantGamesPreview } from '@/hooks/useWantGamesPreview'
 import { useLanguage } from '@/context/LanguageContext'
+import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
 
 import Link from 'next/link'
 import MainPageGamesList from '../main-page-games/main-page-games-list/MainPageGamesList'
@@ -19,11 +19,10 @@ const FOOTER_PX = 0
 
 export default function MainPageWantToPlay() {
   const sectionRef = useRef<HTMLElement>(null)
-  const { wantGames, error, loading } = useWantGamesPreview()
+  const { wantGames, loading } = useWantGamesPreview()
   const visibleCount = useResizableList({ sectionRef, cardHeightPx: CARD_HEIGHT_PX, headerPx: HEADER_PX, footerPx: FOOTER_PX })
   const { T } = useLanguage()
 
-  if (error) return <p>Error: {error}</p>
   return (
     <section
       ref={sectionRef}
@@ -34,12 +33,13 @@ export default function MainPageWantToPlay() {
         <ConsoleSideList slug="wantToPlay" />
       </div>
       <div className="flex flex-col items-center w-full flex-1 overflow-hidden">
-        {wantGames.length > 0 ? (
-          <MainPageGamesList listGames={wantGames.slice(0, Math.min(visibleCount, MAX_GAMES))} />
-        ) : loading ? (
-          <div className="flex flex-1 items-center justify-center py-8">
-            <Spinner size={24} />
+        {loading ? (
+          <div className="w-full">
+            <GameCardSkeleton />
+            <GameCardSkeleton />
           </div>
+        ) : wantGames.length > 0 ? (
+          <MainPageGamesList listGames={wantGames.slice(0, Math.min(visibleCount, MAX_GAMES))} />
         ) : (
           <EmptyState icon="🔖" title={T.mainPage.noWantToPlay} subtitle={T.mainPage.noWantToPlaySub} className="py-8" />
         )}

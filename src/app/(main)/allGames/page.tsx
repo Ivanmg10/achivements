@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import { fadeUp } from '@/lib/animations'
 
 export default function AllGamesPage() {
-  const { wantToPlay, playing, completed, loading, error } = useAllGamesGlobal()
+  const { wantToPlay, playing, completed, loading } = useAllGamesGlobal()
   const extraData = useGameExtraData()
 
   return (
@@ -20,10 +20,6 @@ export default function AllGamesPage() {
     >
       <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
         <NoMainHeader />
-
-        {error && (
-          <p className="text-red-400 text-sm text-center">{error}</p>
-        )}
 
         <AllGamesSection
           category="wantToPlay"

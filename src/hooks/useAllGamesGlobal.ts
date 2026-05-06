@@ -1,14 +1,13 @@
 import { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { useSession } from 'next-auth/react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type AllGamesGlobal = {
   wantToPlay: WantToPlayGame[]
   playing: RetroAchievementsGameCompleted[]
   completed: RetroAchievementsGameCompleted[]
   loading: boolean
-  error?: string
 }
 
 export function useAllGamesGlobal(): AllGamesGlobal {
@@ -17,15 +16,13 @@ export function useAllGamesGlobal(): AllGamesGlobal {
   const [playing, setPlaying] = useState<RetroAchievementsGameCompleted[]>([])
   const [completed, setCompleted] = useState<RetroAchievementsGameCompleted[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string>()
   const fetched = useRef(false)
+  const attemptRef = useRef(0)
+  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  useEffect(() => {
-    if (status === 'loading') return
-    if (status === 'unauthenticated') { setLoading(false); return }
-    if (fetched.current) return
-    fetched.current = true
-
+  const doFetch = useCallback(() => {
+    if (status !== 'authenticated') { setLoading(false); return }
+    setLoading(true)
     Promise.all([
       fetchWithRetry('/api/getWantPlayGames'),
       fetchWithRetry('/api/getGamesCompleted'),
@@ -44,7 +41,6 @@ export function useAllGamesGlobal(): AllGamesGlobal {
             (g) => !startedIds.has(g.ID ?? g.GameID!) && g.ConsoleName !== 'Events',
           ),
         )
-
         setPlaying(
           allCompleted.filter(
             (g) =>
@@ -54,7 +50,6 @@ export function useAllGamesGlobal(): AllGamesGlobal {
               parseFloat(g.PctWon) < 1,
           ),
         )
-
         const compAll = allCompleted.filter(
           (g) => g.ConsoleName !== 'Events' && parseFloat(g.PctWon) >= 1,
         )
@@ -64,10 +59,25 @@ export function useAllGamesGlobal(): AllGamesGlobal {
           if (!prev || Number(g.HardcoreMode) > Number(prev.HardcoreMode)) best.set(g.GameID, g)
         }
         setCompleted(Array.from(best.values()))
+        setLoading(false)
+        attemptRef.current = 0
       })
-      .catch((err) => setError(err instanceof Error ? err.message : 'Unknown error'))
-      .finally(() => setLoading(false))
+      .catch(() => {
+        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
+        attemptRef.current++
+        retryTimer.current = setTimeout(doFetch, delay)
+      })
   }, [status])
 
-  return { wantToPlay, playing, completed, loading, error }
+  useEffect(() => {
+    if (status === 'loading') return
+    if (status === 'unauthenticated') { setLoading(false); return }
+    if (fetched.current) return
+    fetched.current = true
+    doFetch()
+  }, [status, doFetch])
+
+  useEffect(() => () => clearTimeout(retryTimer.current), [])
+
+  return { wantToPlay, playing, completed, loading }
 }

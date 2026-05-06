@@ -121,17 +121,28 @@ export default function UserStats() {
         )}
       </div>
 
-      {!awardsLoading && awards && (
-        <div className="bg-bg-card rounded-3xl p-5 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
-              {T.userStats.awards}
-            </h2>
+      <div className="bg-bg-card rounded-3xl p-5 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
+            {T.userStats.awards}
+          </h2>
+          {!awardsLoading && awards && (
             <span className="text-sm text-text-secondary">
               {T.userStats.total}: {awards.TotalAwardsCount}
             </span>
-          </div>
+          )}
+        </div>
 
+        {awardsLoading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 animate-pulse">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-bg-main rounded-xl p-3 flex flex-col items-center gap-2">
+                <div className="h-7 w-10 rounded bg-white/10" />
+                <div className="h-2.5 w-14 rounded bg-white/10" />
+              </div>
+            ))}
+          </div>
+        ) : awards ? (
           <motion.div
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"
             variants={staggerContainer}
@@ -165,8 +176,8 @@ export default function UserStats() {
               accent="text-purple-400"
             />
           </motion.div>
-        </div>
-      )}
+        ) : null}
+      </div>
     </section>
   )
 }

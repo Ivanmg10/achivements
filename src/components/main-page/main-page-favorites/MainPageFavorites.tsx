@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
-import Spinner from '@/components/main-spinner/Spinner'
 import { AnimatePresence } from 'framer-motion'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
 interface FavoriteRow {
   achievement_id: number
@@ -22,14 +22,28 @@ export default function MainPageFavorites() {
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<FavoriteRow | null>(null)
   const { T } = useLanguage()
+  const attemptRef = useRef(0)
+  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  const doFetch = useCallback(() => {
+    setLoading(true)
+    fetchWithRetry('/api/favorites')
+      .then((data) => {
+        if (Array.isArray(data)) setFavorites(data as FavoriteRow[])
+        setLoading(false)
+        attemptRef.current = 0
+      })
+      .catch(() => {
+        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
+        attemptRef.current++
+        retryTimer.current = setTimeout(doFetch, delay)
+      })
+  }, [])
 
   useEffect(() => {
-    fetch('/api/favorites')
-      .then((r) => r.json())
-      .then(setFavorites)
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
+    doFetch()
+    return () => clearTimeout(retryTimer.current)
+  }, [doFetch])
 
   const handleUnpin = useCallback(async (achievementId: number) => {
     setFavorites((prev) => prev.filter((f) => f.achievement_id !== achievementId))
@@ -43,8 +57,17 @@ export default function MainPageFavorites() {
       </p>
 
       {loading && (
-        <div className="flex-1 flex items-center justify-center">
-          <Spinner size={24} />
+        <div className="flex flex-col gap-2 animate-pulse">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center gap-3 px-2 py-1.5">
+              <div className="w-9 h-9 rounded-lg bg-white/10 shrink-0" />
+              <div className="flex flex-col gap-1.5 flex-1">
+                <div className="h-2.5 w-28 rounded bg-white/10" />
+                <div className="h-2 w-20 rounded bg-white/10" />
+              </div>
+              <div className="w-6 h-4 rounded bg-white/10 shrink-0" />
+            </div>
+          ))}
         </div>
       )}
 
@@ -99,11 +122,7 @@ export default function MainPageFavorites() {
                     className="text-yellow-400 hover:text-yellow-300 transition-colors"
                     title={T.favorites.removeFavorite}
                   >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="w-4 h-4"
-                    >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                       <path
                         fillRule="evenodd"
                         d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.562.562 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
