@@ -1,5 +1,9 @@
-import { useMemo } from 'react'
+'use client'
+
+import { useMemo, useState } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { RecentAchievement } from '@/types/types'
+import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const CELL = 10 // px
@@ -23,6 +27,8 @@ export default function MainPageYearHeatmap({
   isLoading?: boolean
   error?: boolean
 }) {
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+
   const { weeks, monthLabels, totalAch, activeDays } = useMemo(() => {
     const byDay: Record<string, number> = {}
     for (const a of achievements) {
@@ -103,7 +109,8 @@ export default function MainPageYearHeatmap({
                     <div
                       key={day.date}
                       title={day.count > 0 ? `${day.date}: ${day.count} achievement${day.count !== 1 ? 's' : ''}` : day.date}
-                      className={`w-2.5 h-2.5 rounded-sm ${getColorClass(day.count)}`}
+                      className={`w-2.5 h-2.5 rounded-sm ${getColorClass(day.count)}${day.count > 0 ? ' cursor-pointer hover:ring-1 hover:ring-white/30' : ''}`}
+                      onClick={() => day.count > 0 && setSelectedDate(day.date)}
                     />
                   ))}
                 </div>
@@ -121,6 +128,16 @@ export default function MainPageYearHeatmap({
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {selectedDate && (
+          <DayAchievementsModal
+            date={selectedDate}
+            achievements={achievements}
+            onClose={() => setSelectedDate(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

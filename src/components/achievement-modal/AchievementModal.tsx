@@ -2,8 +2,12 @@
 
 import { RetroAchievement } from '@/types/types'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { motion } from 'framer-motion'
+import { modalOverlay, modalContent } from '@/lib/animations'
+import Spinner from '@/components/main-spinner/Spinner'
 
 interface AchievementUnlock {
   User: string
@@ -47,10 +51,16 @@ export default function AchievementModal({
   achievement,
   numDistinctPlayers,
   onClose,
+  gameId,
+  isFavorited = false,
+  onToggleFavorite,
 }: {
   achievement: RetroAchievement
   numDistinctPlayers: number
   onClose: () => void
+  gameId?: number | null
+  isFavorited?: boolean
+  onToggleFavorite?: () => void
 }) {
   const { T } = useLanguage()
   const [detail, setDetail] = useState<AchievementDetail | null>(null)
@@ -101,12 +111,20 @@ export default function AchievementModal({
     : null
 
   return (
-    <div
+    <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      variants={modalOverlay}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
       onClick={onClose}
     >
-      <div
+      <motion.div
         className="bg-bg-main rounded-2xl w-full max-w-4xl max-h-[65vh] overflow-y-auto flex flex-col"
+        variants={modalContent}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -124,7 +142,30 @@ export default function AchievementModal({
           )}
           <div className="flex flex-col gap-1 flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-xl font-semibold">{achievement.Title}</h2>
+              {onToggleFavorite && (
+                <button
+                  onClick={onToggleFavorite}
+                  aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
+                  className={`shrink-0 transition-colors duration-150 ${
+                    isFavorited ? 'text-yellow-400 hover:text-yellow-300' : 'text-text-secondary/50 hover:text-yellow-400'
+                  }`}
+                >
+                  <svg viewBox="0 0 24 24" fill={isFavorited ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.8} className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.562.562 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                  </svg>
+                </button>
+              )}
+              {gameId ? (
+                <Link
+                  href={`/gameInfo/${gameId}`}
+                  onClick={onClose}
+                  className="text-xl font-semibold hover:underline underline-offset-2"
+                >
+                  {achievement.Title}
+                </Link>
+              ) : (
+                <h2 className="text-xl font-semibold">{achievement.Title}</h2>
+              )}
               {typeBadge && (
                 <span className={`text-xs px-2 py-0.5 rounded-full ${typeBadge.className}`}>
                   {typeBadge.label}
@@ -180,7 +221,7 @@ export default function AchievementModal({
         <div className="flex flex-col gap-6 p-6">
           {loading && (
             <div className="flex justify-center py-8">
-              <div className="w-6 h-6 border-2 border-text-secondary/30 border-t-text-main rounded-full animate-spin" />
+              <Spinner size={28} />
             </div>
           )}
 
@@ -302,7 +343,7 @@ export default function AchievementModal({
             )
           })()}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

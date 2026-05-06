@@ -31,22 +31,33 @@ function InfoRow({
   placeholder?: string
   onEdit?: () => void
 }) {
-  return (
-    <div
-      className={`flex flex-col gap-0.5 ${onEdit ? 'cursor-pointer group' : ''}`}
-      onClick={onEdit}
-    >
+  const content = (
+    <>
       <span className="text-xs text-text-secondary">{label}</span>
       <div className="flex items-center gap-2">
         <span className={`text-sm ${mono ? 'font-mono' : 'font-medium'} ${!value ? 'text-text-secondary italic' : ''} break-all`}>
           {value || placeholder || '—'}
         </span>
         {onEdit && (
-          <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+          <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
         )}
       </div>
-    </div>
+    </>
   )
+
+  if (onEdit) {
+    return (
+      <button
+        onClick={onEdit}
+        className="flex flex-col gap-0.5 cursor-pointer group text-left"
+        aria-label={`Edit ${label}`}
+      >
+        {content}
+      </button>
+    )
+  }
+
+  return <div className="flex flex-col gap-0.5">{content}</div>
 }
 
 export default function UserData({ session }: { session: Session | null }) {
@@ -80,28 +91,29 @@ export default function UserData({ session }: { session: Session | null }) {
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4">
             {/* Avatar with hover edit overlay */}
-            <div
+            <button
               className="relative group shrink-0 cursor-pointer"
               onClick={() => openEdit('avatar', session?.user?.avatar ?? '')}
+              aria-label="Edit avatar"
             >
               {session?.user?.avatar ? (
                 <Image
                   className="rounded-full w-16 h-16 object-cover"
                   src={session.user.avatar}
-                  alt="avatar"
+                  alt={session.user.name ?? 'avatar'}
                   width={64}
                   height={64}
                   unoptimized
                 />
               ) : (
                 <div className="rounded-full w-16 h-16 bg-bg-main flex items-center justify-center">
-                  <IconPencil size={20} className="text-text-secondary" />
+                  <IconPencil size={20} className="text-text-secondary" aria-hidden="true" />
                 </div>
               )}
-              <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true">
                 <IconPencil size={16} className="text-white" />
               </div>
-            </div>
+            </button>
 
             <div className="flex flex-col gap-0.5 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
@@ -111,7 +123,7 @@ export default function UserData({ session }: { session: Session | null }) {
                   className="text-text-secondary hover:text-text-main transition-colors"
                   aria-label="Edit username"
                 >
-                  <IconPencil size={14} />
+                  <IconPencil size={14} aria-hidden="true" />
                 </button>
                 {session?.user?.admin && (
                   <span className="text-xs bg-accent text-bg-main font-bold px-2 py-0.5 rounded-full">
@@ -129,14 +141,14 @@ export default function UserData({ session }: { session: Session | null }) {
               onClick={() => setPasswordModalOpen(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-bg-main text-text-secondary hover:text-text-main transition-colors"
             >
-              <IconLock size={13} />
+              <IconLock size={13} aria-hidden="true" />
               {T.userData.changePassword}
             </button>
             <button
               onClick={() => signOut({ callbackUrl: '/authPage' })}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-colors font-medium"
             >
-              <IconLogout size={13} />
+              <IconLogout size={13} aria-hidden="true" />
               {T.userConfig.signOut}
             </button>
           </div>
@@ -151,45 +163,48 @@ export default function UserData({ session }: { session: Session | null }) {
             placeholder="—"
           />
           {/* Location — flag selector */}
-          <div
-            className="flex flex-col gap-0.5 cursor-pointer group"
+          <button
+            className="flex flex-col gap-0.5 cursor-pointer group text-left"
             onClick={() => setLocationModalOpen(true)}
+            aria-label={`Edit ${T.userData.location}`}
           >
             <span className="text-xs text-text-secondary">{T.userData.location}</span>
             <div className="flex items-center gap-2">
               {session?.user?.location ? (
                 <>
-                  <span className="text-lg leading-none">{codeToFlag(session.user.location)}</span>
+                  <span className="text-lg leading-none" aria-hidden="true">{codeToFlag(session.user.location)}</span>
                   <span className="text-sm font-medium">{findCountry(session.user.location)?.name ?? session.user.location}</span>
                 </>
               ) : (
                 <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
               )}
-              <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+              <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
             </div>
-          </div>
+          </button>
           {/* Language — opens modal */}
-          <div
-            className="flex flex-col gap-0.5 cursor-pointer group"
+          <button
+            className="flex flex-col gap-0.5 cursor-pointer group text-left"
             onClick={() => setLangModalOpen(true)}
+            aria-label={`Edit ${T.userConfig.language}`}
           >
             <span className="text-xs text-text-secondary">{T.userConfig.language}</span>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium uppercase">{lang}</span>
-              <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+              <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
             </div>
-          </div>
+          </button>
           {/* Theme — opens modal */}
-          <div
-            className="flex flex-col gap-0.5 cursor-pointer group"
+          <button
+            className="flex flex-col gap-0.5 cursor-pointer group text-left"
             onClick={() => setThemeModalOpen(true)}
+            aria-label={`Edit ${T.userTheme.theme}`}
           >
             <span className="text-xs text-text-secondary">{T.userTheme.theme}</span>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium capitalize">{theme}</span>
-              <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+              <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
             </div>
-          </div>
+          </button>
 
           {/* Favourite game — coming soon */}
           <div className="flex flex-col gap-0.5">

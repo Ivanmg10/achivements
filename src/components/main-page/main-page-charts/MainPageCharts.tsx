@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
@@ -10,7 +10,7 @@ import { useUserRank } from '@/hooks/useUserRank'
 import { useUserAwards } from '@/hooks/useUserAwards'
 import { useTopTenUsers } from '@/hooks/useTopTenUsers'
 import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
-import { SectionFallback } from '@/components/ui/SectionFallback'
+import { motion } from 'framer-motion'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
 import GamesPlayedPieChart from '@/components/games-played-pie-chart/GamesPlayedPieChart'
@@ -25,159 +25,137 @@ import MainPageAlmostThere from './MainPageAlmostThere'
 import MainPagePerfectGames from './MainPagePerfectGames'
 import MainPageTopTen from './MainPageTopTen'
 import MainPageBestPeriod from './MainPageBestPeriod'
-import MainPageConsoleBreakdown from './MainPageConsoleBreakdown'
+import MainPageFavorites from '../main-page-favorites/MainPageFavorites'
 
 function ChartCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-bg-card rounded-xl p-4 flex flex-col gap-3 ${className}`}>
+    <motion.div
+      className={`bg-bg-card rounded-xl p-4 flex flex-col gap-3 ${className}`}
+      initial={{ opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+    >
       {children}
-    </div>
+    </motion.div>
   )
 }
 
 export default function MainPageCharts() {
   const { data: session } = useSession()
-  const { achievements, isLoading: achLoading, error: achError, refetch: refetchAch } = useRecentAchievements()
-  const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()
-  const { listGames: playing, isLoading: playingLoading, error: playingError, refetch: refetchPlaying } = useGamesInProgressPreview()
-  const { all, softcore, hardcore, error: chartError, refetch: refetchChart } = useGamesData()
-  const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
-  const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
-  const { topTen, isLoading: topTenLoading, refetch: refetchTopTen } = useTopTenUsers()
-  const { achievements: yearAch, isLoading: yearLoading, refetch: refetchYear } = useActivityHeatmapYear()
+  const { achievements, isLoading: achLoading } = useRecentAchievements()
+  const { achievements: heatmapData, isLoading: heatmapLoading } = useActivityHeatmap()
+  const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
+  const { all, softcore, hardcore, isLoading: gamesLoading } = useGamesData()
+  const { rank, isLoading: rankLoading } = useUserRank()
+  const { awards, isLoading: awardsLoading } = useUserAwards()
+  const { topTen, isLoading: topTenLoading } = useTopTenUsers()
+  const { achievements: yearAch, isLoading: yearLoading } = useActivityHeatmapYear()
 
-  const [abandonedError, setAbandonedError] = useState(false)
-  const [resetKey, setResetKey] = useState(0)
   const [chartMode, setChartMode] = useState<'softcore' | 'hardcore'>('softcore')
-
-  const anyError = achError || heatmapError || chartError || playingError || rankError || awardsError || abandonedError
-
-  const refetchAll = useCallback(() => {
-    refetchAch()
-    refetchHeatmap()
-    refetchChart()
-    refetchPlaying()
-    refetchRank()
-    refetchAwards()
-    refetchTopTen()
-    refetchYear()
-    setAbandonedError(false)
-    setResetKey((k) => k + 1)
-  }, [refetchAch, refetchHeatmap, refetchChart, refetchPlaying, refetchRank, refetchAwards, refetchTopTen, refetchYear])
 
   return (
     <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-label="Stats & Activity">
       <h2 className="text-xl font-semibold text-text-main">Stats & Activity</h2>
 
-      <SectionFallback error={anyError} onRefresh={refetchAll}>
-        <div className="flex flex-col gap-4">
-          {/* Row 1: Pills */}
-          <MainPagePointsStats
-            achievements={achievements}
-            heatmapAchievements={heatmapData}
-            rank={rank}
-            isLoading={achLoading || rankLoading}
-          />
+      <div className="flex flex-col gap-4">
+        {/* Row 1: Pills */}
+        <MainPagePointsStats
+          achievements={achievements}
+          heatmapAchievements={heatmapData}
+          rank={rank}
+          isLoading={achLoading || rankLoading}
+        />
 
-          {/*
-            Rows 2-5: single grid-cols-3
-            Row 2: Heatmap | Line chart | Pie chart
-            Row 3: [Most Active + Rarest + Abandoned col-span-2 nested] | [PG + Mastery col-span-1 50/50]
-            Row 4+5 col 1-2: Completion Dist | Almost There / Top 10 | Best period
-            Row 4+5 col 3: Console Breakdown row-span-2
-          */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-            {/* Row 2 */}
-            <ChartCard>
-              <MainPageHeatmap achievements={heatmapData} isLoading={heatmapLoading} onRefresh={refetchHeatmap} />
-            </ChartCard>
-            <ChartCard>
-              <p className="text-[10px] uppercase tracking-widest text-text-secondary">Daily achievements — last 7 days</p>
-              <div aria-hidden="true">
-                <AchievementsLineChart achievements={achievements} isLoading={achLoading} />
-              </div>
-            </ChartCard>
-            <ChartCard>
-              <div className="flex items-center gap-2">
-                <p className="text-[10px] uppercase tracking-widest text-text-secondary">Games by console</p>
-                <div className="flex gap-1 ml-auto">
-                  <button
-                    onClick={() => setChartMode('softcore')}
-                    aria-pressed={chartMode === 'softcore'}
-                    className={`text-xs px-2 py-0.5 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${chartMode === 'softcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
-                  >SC</button>
-                  <button
-                    onClick={() => setChartMode('hardcore')}
-                    aria-pressed={chartMode === 'hardcore'}
-                    className={`text-xs px-2 py-0.5 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${chartMode === 'hardcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
-                  >HC</button>
-                </div>
-              </div>
-              <div aria-hidden="true" className="flex-1 flex min-h-0">
-                <GamesPlayedPieChart games={chartMode === 'softcore' ? softcore : hardcore} />
-              </div>
-            </ChartCard>
-
-            {/* Row 3: col-span-2 nested 3-cols + col-span-1 50/50 */}
-            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
-              <ChartCard>
-                <MainPageTopGames achievements={achievements} />
-              </ChartCard>
-              <ChartCard>
-                <MainPageRarest achievements={achievements} />
-              </ChartCard>
-              <ChartCard>
-                <MainPageAbandoned
-                  playing={playing}
-                  isLoading={playingLoading}
-                  resetKey={resetKey}
-                  onError={setAbandonedError}
-                />
-              </ChartCard>
+          {/* Row 2 */}
+          <ChartCard>
+            <MainPageHeatmap achievements={heatmapData} isLoading={heatmapLoading} />
+          </ChartCard>
+          <ChartCard>
+            <p className="text-[10px] uppercase tracking-widest text-text-secondary">Daily achievements — last 7 days</p>
+            <div aria-hidden="true">
+              <AchievementsLineChart achievements={achievements} isLoading={achLoading} />
             </div>
-            <div className="flex flex-col gap-4">
-              <ChartCard className="flex-1">
-                <MainPagePerfectGames games={all} />
-              </ChartCard>
-              <ChartCard className="flex-1">
-                <MainPageMastery awards={awards} isLoading={awardsLoading} />
-              </ChartCard>
+          </ChartCard>
+          <ChartCard>
+            <div className="flex items-center gap-2">
+              <p className="text-[10px] uppercase tracking-widest text-text-secondary">Games by console</p>
+              <div className="flex gap-1 ml-auto">
+                <button
+                  onClick={() => setChartMode('softcore')}
+                  aria-pressed={chartMode === 'softcore'}
+                  className={`text-xs px-2 py-0.5 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${chartMode === 'softcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
+                >SC</button>
+                <button
+                  onClick={() => setChartMode('hardcore')}
+                  aria-pressed={chartMode === 'hardcore'}
+                  className={`text-xs px-2 py-0.5 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${chartMode === 'hardcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
+                >HC</button>
+              </div>
             </div>
+            <div aria-hidden="true" className="flex-1 flex min-h-0">
+              <GamesPlayedPieChart games={chartMode === 'softcore' ? softcore : hardcore} isLoading={gamesLoading} />
+            </div>
+          </ChartCard>
 
-            {/* Row 4 col 1-2 */}
+          {/* Row 3 */}
+          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
             <ChartCard>
-              <MainPageCompletionDist games={all} />
+              <MainPageTopGames achievements={achievements} isLoading={achLoading} />
             </ChartCard>
             <ChartCard>
-              <MainPageAlmostThere games={all} />
+              <MainPageRarest achievements={achievements} isLoading={achLoading} />
             </ChartCard>
-
-            {/* Col 3 row-span-2 */}
-            <ChartCard className="lg:row-span-2">
-              <MainPageConsoleBreakdown games={all} />
-            </ChartCard>
-
-            {/* Row 5 col 1-2 */}
             <ChartCard>
-              <MainPageTopTen
-                topTen={topTen}
-                isLoading={topTenLoading}
-                currentUsername={session?.user?.rausername}
+              <MainPageAbandoned
+                playing={playing}
+                isLoading={playingLoading}
               />
             </ChartCard>
-            <ChartCard>
-              <MainPageBestPeriod
-                achievements={heatmapData}
-                yearAchievements={yearAch}
-                isLoading={heatmapLoading}
-                yearLoading={yearLoading}
-              />
-            </ChartCard>
-
           </div>
+          <div className="flex flex-col gap-4">
+            <ChartCard className="flex-1">
+              <MainPagePerfectGames games={all} isLoading={gamesLoading} />
+            </ChartCard>
+            <ChartCard className="flex-1">
+              <MainPageMastery awards={awards} isLoading={awardsLoading} />
+            </ChartCard>
+          </div>
+
+          {/* Row 4 col 1-2 */}
+          <ChartCard>
+            <MainPageCompletionDist games={all} isLoading={gamesLoading} />
+          </ChartCard>
+          <ChartCard>
+            <MainPageAlmostThere games={all} isLoading={gamesLoading} />
+          </ChartCard>
+
+          {/* Col 3 row-span-2 */}
+          <ChartCard className="lg:row-span-2">
+            <MainPageFavorites />
+          </ChartCard>
+
+          {/* Row 5 col 1-2 */}
+          <ChartCard>
+            <MainPageTopTen
+              topTen={topTen}
+              isLoading={topTenLoading}
+              currentUsername={session?.user?.rausername}
+            />
+          </ChartCard>
+          <ChartCard>
+            <MainPageBestPeriod
+              achievements={heatmapData}
+              yearAchievements={yearAch}
+              isLoading={heatmapLoading}
+              yearLoading={yearLoading}
+            />
+          </ChartCard>
+
         </div>
-      </SectionFallback>
+      </div>
     </section>
   )
 }

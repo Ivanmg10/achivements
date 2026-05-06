@@ -7,7 +7,8 @@ import {
 import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
 import AchievementModal from '../achievement-modal/AchievementModal'
 import Image from 'next/image'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 
 type Filter = 'all' | 'earned' | 'unearned'
@@ -33,6 +34,7 @@ export default function GameInfoTable({
   const [sortState, setSortState] = useState<SortState>({ key: 'default', dir: 'asc' })
   const [missableOpen, setMissableOpen] = useState(false)
   const [selectedAchievement, setSelectedAchievement] = useState<RetroAchievement | null>(null)
+  const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set())
   const { T } = useLanguage()
 
   const FILTER_LABELS: Record<Filter, string> = {
@@ -42,6 +44,45 @@ export default function GameInfoTable({
   }
 
   const numDistinctPlayers = gameData?.NumDistinctPlayers ?? 1
+
+  useEffect(() => {
+    if (!gameData?.ID) return
+    fetch(`/api/favorites?gameId=${gameData.ID}`)
+      .then((r) => r.json())
+      .then((rows: { achievement_id: number }[]) => {
+        setFavoritedIds(new Set(rows.map((r) => r.achievement_id)))
+      })
+      .catch(() => {})
+  }, [gameData?.ID])
+
+  const handleToggleFavorite = useCallback(
+    async (achievement: RetroAchievement) => {
+      const isFav = favoritedIds.has(achievement.ID)
+
+      setFavoritedIds((prev) => {
+        const next = new Set(prev)
+        if (isFav) next.delete(achievement.ID)
+        else next.add(achievement.ID)
+        return next
+      })
+
+      if (isFav) {
+        await fetch(`/api/favorites?achievementId=${achievement.ID}`, { method: 'DELETE' })
+      } else {
+        await fetch('/api/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            achievement,
+            gameId: gameData?.ID,
+            gameTitle: gameData?.Title,
+            numDistinctPlayers,
+          }),
+        })
+      }
+    },
+    [favoritedIds, gameData?.ID, gameData?.Title, numDistinctPlayers],
+  )
 
   const achievements = useMemo(() => {
     if (!gameData) return []
@@ -62,7 +103,8 @@ export default function GameInfoTable({
     else list = achievements
 
     const { key, dir } = sortState
-    const sorted = [...list].sort((a, b) => {
+
+    const sortFn = (a: RetroAchievement, b: RetroAchievement): number => {
       if (key === 'points') return b.Points - a.Points
       if (key === 'rarity') return a.NumAwarded / numDistinctPlayers - b.NumAwarded / numDistinctPlayers
       if (key === 'players') return b.NumAwarded - a.NumAwarded
@@ -74,10 +116,18 @@ export default function GameInfoTable({
         return new Date(b.DateEarned).getTime() - new Date(a.DateEarned).getTime()
       }
       return a.DisplayOrder - b.DisplayOrder
-    })
+    }
 
-    return dir === 'desc' ? sorted.reverse() : sorted
-  }, [achievements, filter, sortState, numDistinctPlayers])
+    const sortGroup = (group: RetroAchievement[]) => {
+      const sorted = [...group].sort(sortFn)
+      return dir === 'desc' ? sorted.reverse() : sorted
+    }
+
+    const favGroup = list.filter((a) => favoritedIds.has(a.ID))
+    const restGroup = list.filter((a) => !favoritedIds.has(a.ID))
+
+    return [...sortGroup(favGroup), ...sortGroup(restGroup)]
+  }, [achievements, filter, sortState, numDistinctPlayers, favoritedIds])
 
   function handleSort(key: SortKey) {
     setSortState((prev) =>
@@ -195,6 +245,8 @@ export default function GameInfoTable({
                 achievement={achievement}
                 numDistinctPlayers={numDistinctPlayers}
                 key={achievement.ID}
+                isFavorited={favoritedIds.has(achievement.ID)}
+                onToggleFavorite={handleToggleFavorite}
                 onClick={() => setSelectedAchievement(achievement)}
               />
             ))}
@@ -202,13 +254,18 @@ export default function GameInfoTable({
         </table>
       )}
 
-      {selectedAchievement && (
-        <AchievementModal
-          achievement={selectedAchievement}
-          numDistinctPlayers={numDistinctPlayers}
-          onClose={() => setSelectedAchievement(null)}
-        />
-      )}
+      <AnimatePresence>
+        {selectedAchievement && (
+          <AchievementModal
+            achievement={selectedAchievement}
+            numDistinctPlayers={numDistinctPlayers}
+            onClose={() => setSelectedAchievement(null)}
+            gameId={gameData?.ID}
+            isFavorited={favoritedIds.has(selectedAchievement.ID)}
+            onToggleFavorite={() => handleToggleFavorite(selectedAchievement)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   )
 }

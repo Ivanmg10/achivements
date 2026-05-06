@@ -210,6 +210,34 @@ export const en = {
   profileAchievements: {
     recentAchievements: 'Recent achievements',
   },
+  favorites: {
+    title: 'Pinned achievements',
+    empty: 'Pin achievements in a game page to track them here',
+    addFavorite: 'Pin achievement',
+    removeFavorite: 'Unpin achievement',
+  },
+  loadingPage: {
+    title: 'Loading your achievements',
+    subtitle: 'Fetching your game data...',
+    wantToPlay: 'Loading your wishlist...',
+    playing: 'Loading your active games...',
+    completed: 'Loading your completions...',
+    game: 'Loading game data...',
+  },
+  search: {
+    placeholder: 'Search your games...',
+    hint: 'Search across your library',
+    noResults: 'No games found',
+    completedHC: 'Completed HC',
+    completedSC: 'Completed SC',
+    inProgress: 'In progress',
+    wantToPlay: 'Want to play',
+  },
+  dayModal: {
+    title: 'Achievements earned',
+    empty: 'No achievements this day',
+    achievements: 'achievements',
+  },
 }
 
 export type Translations = typeof en

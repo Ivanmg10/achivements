@@ -5,6 +5,7 @@ import { useRef, useState } from 'react'
 import { useGamesCompletedPreview } from '@/hooks/useGamesCompletedPreview'
 import { useResizableList } from '@/hooks/useResizableList'
 import { useLanguage } from '@/context/LanguageContext'
+import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
 
 import Link from 'next/link'
 import MainPageGamesList from '../main-page-games/main-page-games-list/MainPageGamesList'
@@ -19,7 +20,7 @@ const FOOTER_PX = 0
 export default function MainPageCompleted() {
   const [tab, setTab] = useState<'normal' | 'hardcore'>('normal')
   const sectionRef = useRef<HTMLElement>(null)
-  const { listGames, listGamesHardcore } = useGamesCompletedPreview()
+  const { listGames, listGamesHardcore, isLoading } = useGamesCompletedPreview()
   const visibleCount = useResizableList({ sectionRef, maxItems: MAX_GAMES, cardHeightPx: CARD_HEIGHT_PX, headerPx: HEADER_PX, footerPx: FOOTER_PX })
   const { T } = useLanguage()
 
@@ -52,7 +53,12 @@ export default function MainPageCompleted() {
       </div>
 
       <div className="flex flex-col items-center w-full flex-1 overflow-hidden">
-        {activeList.length > 0 ? (
+        {isLoading ? (
+          <div className="w-full">
+            <GameCardSkeleton />
+            <GameCardSkeleton />
+          </div>
+        ) : activeList.length > 0 ? (
           <MainPageGamesList listGames={activeList.slice(0, visibleCount)} />
         ) : (
           <EmptyState

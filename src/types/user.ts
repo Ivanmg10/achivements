@@ -13,7 +13,20 @@ export interface User {
   steamusername?: string | null;
   email?: string | null;
   admin?: boolean;
-  raUser?: RetroAchievementsUserProfile | object;
+  raUser?: RetroAchievementsUserProfile | null;
   location?: string | null;
   favorite_game?: { id: number; title: string; imageIcon: string } | null;
+}
+
+export interface AdminUser {
+  id: number;
+  username: string;
+  email: string | null;
+  theme: string;
+  avatar: string | null;
+  admin: boolean;
+  rausername: string | null;
+  ra_display: string | null;
+  location: string | null;
+  steamusername?: string | null;
 }

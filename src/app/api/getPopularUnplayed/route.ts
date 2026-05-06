@@ -23,6 +23,9 @@ export async function GET() {
   if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
 
   const { rausername, raid, id } = session.user
+  if (!rausername || !raid) {
+    return NextResponse.json([], { status: 200 })
+  }
 
   const data = await withCache(
     `popularUnplayed_v2:${id}`,

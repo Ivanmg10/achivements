@@ -7,17 +7,24 @@ export function useUserAwards() {
   const { data: session } = useSession()
   const [awards, setAwards] = useState<UserAwards | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(false)
   const hasFetched = useRef(false)
+  const attemptRef = useRef(0)
+  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const doFetch = useCallback(() => {
     if (!session?.user?.rausername) { setIsLoading(false); return }
     setIsLoading(true)
-    setError(false)
     fetchWithRetry('/api/getUserAwards')
-      .then((data) => setAwards(data as UserAwards))
-      .catch(() => setError(true))
-      .finally(() => setIsLoading(false))
+      .then((data) => {
+        setAwards(data as UserAwards)
+        setIsLoading(false)
+        attemptRef.current = 0
+      })
+      .catch(() => {
+        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
+        attemptRef.current++
+        retryTimer.current = setTimeout(doFetch, delay)
+      })
   }, [session?.user?.rausername])
 
   useEffect(() => {
@@ -27,7 +34,14 @@ export function useUserAwards() {
     doFetch()
   }, [session?.user?.rausername, doFetch])
 
-  const refetch = useCallback(() => { setAwards(null); doFetch() }, [doFetch])
+  useEffect(() => () => clearTimeout(retryTimer.current), [])
 
-  return { awards, isLoading, error, refetch }
+  const refetch = useCallback(() => {
+    clearTimeout(retryTimer.current)
+    attemptRef.current = 0
+    setAwards(null)
+    doFetch()
+  }, [doFetch])
+
+  return { awards, isLoading, refetch }
 }

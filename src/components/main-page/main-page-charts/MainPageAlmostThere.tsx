@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 
-export default function MainPageAlmostThere({ games }: { games: RetroAchievementsGameCompleted[] }) {
+export default function MainPageAlmostThere({ games, isLoading }: { games: RetroAchievementsGameCompleted[]; isLoading?: boolean }) {
   const candidates = useMemo(() => {
     const best: Record<number, RetroAchievementsGameCompleted> = {}
     for (const g of games) {
@@ -16,6 +16,24 @@ export default function MainPageAlmostThere({ games }: { games: RetroAchievement
       .sort((a, b) => parseFloat(b.PctWon) - parseFloat(a.PctWon))
       .slice(0, 6)
   }, [games])
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-2 animate-pulse">
+        <div className="h-2 w-28 rounded bg-white/10" />
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex items-center gap-2 bg-bg-main rounded-lg p-2">
+            <div className="w-7 h-7 rounded bg-white/10 shrink-0" />
+            <div className="flex flex-col flex-1 gap-1.5">
+              <div className="h-2.5 w-24 rounded bg-white/10" />
+              <div className="flex-1 bg-white/10 rounded-full h-1" />
+            </div>
+            <div className="h-2.5 w-8 rounded bg-white/10 shrink-0" />
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   if (candidates.length === 0) {
     return (

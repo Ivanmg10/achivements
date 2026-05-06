@@ -11,16 +11,14 @@ type CtxType = {
   hardcore: RetroAchievementsGameCompleted[]
   inProgress: RetroAchievementsGameCompleted[]
   isLoading: boolean
-  error: boolean
   refetch: () => void
 }
 
 const Ctx = createContext<CtxType>({
   all: [], softcore: [], hardcore: [], inProgress: [],
-  isLoading: true, error: false, refetch: () => {},
+  isLoading: true, refetch: () => {},
 })
 
-// ConsoleID 100 = Hubs, 101 = Events — RA system entries, not real games
 const RA_SYSTEM_CONSOLE_IDS = new Set([100, 101])
 function isRealGame(g: RetroAchievementsGameCompleted) {
   return !RA_SYSTEM_CONSOLE_IDS.has(g.ConsoleID)
@@ -30,28 +28,46 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
   const [all, setAll] = useState<RetroAchievementsGameCompleted[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(false)
   const hasFetched = useRef(false)
+  const attemptRef = useRef(0)
+  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const doFetch = useCallback(() => {
     if (status !== 'authenticated') { setIsLoading(false); return }
     setIsLoading(true)
-    setError(false)
     fetchWithRetry('/api/getGamesCompleted')
-      .then((data) => { if (Array.isArray(data)) setAll((data as RetroAchievementsGameCompleted[]).filter(isRealGame)) })
-      .catch(() => setError(true))
-      .finally(() => setIsLoading(false))
+      .then((data) => {
+        if (Array.isArray(data)) setAll((data as RetroAchievementsGameCompleted[]).filter(isRealGame))
+        setIsLoading(false)
+        attemptRef.current = 0
+      })
+      .catch(() => {
+        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
+        attemptRef.current++
+        retryTimer.current = setTimeout(doFetch, delay)
+      })
   }, [status])
 
   useEffect(() => {
     if (status === 'loading') return
-    if (status !== 'authenticated') { setIsLoading(false); return }
+    if (status === 'unauthenticated') {
+      hasFetched.current = false
+      clearTimeout(retryTimer.current)
+      attemptRef.current = 0
+      setAll([])
+      setIsLoading(false)
+      return
+    }
     if (hasFetched.current) return
     hasFetched.current = true
     doFetch()
   }, [status, doFetch])
 
+  useEffect(() => () => clearTimeout(retryTimer.current), [])
+
   const refetch = useCallback(() => {
+    clearTimeout(retryTimer.current)
+    attemptRef.current = 0
     setAll([])
     doFetch()
   }, [doFetch])
@@ -67,7 +83,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <Ctx.Provider value={{ all, softcore, hardcore, inProgress, isLoading, error, refetch }}>
+    <Ctx.Provider value={{ all, softcore, hardcore, inProgress, isLoading, refetch }}>
       {children}
     </Ctx.Provider>
   )

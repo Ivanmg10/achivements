@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -7,37 +8,30 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { calcStreak } from '@/utils/utils'
-import { RetroAchievementsUserProfile } from '@/types/types'
-import { IconHome, IconChevronLeft } from '@tabler/icons-react'
+import { IconHome, IconChevronLeft, IconSearch, IconFlame } from '@tabler/icons-react'
+import SearchModal from '@/components/search-modal/SearchModal'
 
-function StatPill({
-  label,
-  value,
-  suffix = '',
-}: {
-  label: string
-  value: number
-  suffix?: string
-}) {
+function NavLink({ href, label, active }: { href: string; label: string; active: boolean }) {
   return (
-    <div className="flex flex-col items-center bg-bg-main rounded-xl px-4 py-1.5 min-w-16">
-      <span className="text-[10px] uppercase tracking-widest text-text-secondary font-medium">
-        {label}
-      </span>
-      <span className="text-base font-bold text-text-main leading-tight">
-        {value.toLocaleString()}
-        {suffix}
-      </span>
-    </div>
+    <Link
+      href={href}
+      className={`px-3.5 py-1.5 text-sm rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 whitespace-nowrap ${
+        active
+          ? 'text-text-main font-medium bg-bg-main ring-1 ring-white/10'
+          : 'text-text-secondary hover:text-text-main hover:bg-bg-main/60'
+      }`}
+    >
+      {label}
+    </Link>
   )
 }
 
-function HeaderStats({ raUser, streak }: { raUser: RetroAchievementsUserProfile; streak: number }) {
+function StreakBadge({ streak }: { streak: number }) {
+  if (streak === 0) return null
   return (
-    <div className="flex items-center gap-2">
-      <StatPill label="HC" value={raUser.TotalPoints} />
-      <StatPill label="SC" value={raUser.TotalSoftcorePoints} />
-      <StatPill label="Streak" value={streak} suffix="d" />
+    <div className="flex items-center gap-1 bg-bg-main px-3 py-1.5 rounded-full shrink-0 ring-1 ring-white/10">
+      <IconFlame className="w-3.5 h-3.5 text-orange-400" aria-hidden />
+      <span className="text-xs font-bold text-text-main">{streak}d</span>
     </div>
   )
 }
@@ -48,110 +42,122 @@ export default function MainHeader() {
   const { achievements: recentAch } = useRecentAchievements()
   const router = useRouter()
   const pathname = usePathname()
+  const [searchOpen, setSearchOpen] = useState(false)
 
-  const raUser = session?.user?.raUser
   const streak = calcStreak(recentAch)
   const isHome = pathname === '/'
+  const avatarSrc = session?.user?.avatar ?? session?.user?.image ?? null
+
+  const openSearch = useCallback(() => setSearchOpen(true), [])
+  const closeSearch = useCallback(() => setSearchOpen(false), [])
+
+  const navItems = [
+    { href: '/playing', label: T.mainPage.playing },
+    { href: '/wantToPlay', label: T.mainPage.wantToPlay },
+    { href: '/completed', label: T.mainPage.completed },
+  ]
 
   return (
-    <header className="flex flex-row justify-between items-center bg-bg-card text-text-main px-4 py-2 gap-4 h-16">
-      {/* Far left: home + back */}
-      <div className="flex items-center gap-1 shrink-0">
-        <Link
-          href="/"
-          aria-label="Home"
-          className="p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-        >
-          <IconHome className="w-5 h-5" aria-hidden="true" />
-        </Link>
-        {!isHome && (
-          <button
-            onClick={() => router.back()}
-            aria-label="Go back"
-            className="p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            <IconChevronLeft className="w-5 h-5" aria-hidden="true" />
-          </button>
-        )}
-      </div>
+    <>
+      <header className="flex flex-row items-center bg-bg-card text-text-main px-4 py-2 gap-3 h-16">
 
-      {/* Left: HC / SC / Streak — hidden on mobile */}
-      <div className="hidden sm:flex items-center gap-2 flex-1">
-        {raUser?.User ? (
-          <HeaderStats raUser={raUser} streak={streak} />
-        ) : session ? (
+        {/* Left: home + back + nav */}
+        <div className="flex items-center gap-1 flex-1">
           <Link
-            href="/user"
-            className="flex items-center gap-2 bg-bg-main px-3 py-1.5 rounded-xl text-xs text-text-secondary hover:text-text-main transition-colors border border-dashed border-text-secondary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            href="/"
+            aria-label="Home"
+            className="p-1.5 rounded-full hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0"
           >
-            <span>Connect RetroAchievements</span>
+            <IconHome className="w-5 h-5" aria-hidden="true" />
           </Link>
-        ) : null}
-      </div>
-
-      {/* Center: search bar — hidden on mobile */}
-      <div className="hidden md:flex flex-1 justify-center">
-        <input
-          aria-label="Search"
-          className="w-full max-w-md bg-bg-main rounded-xl px-4 py-2 text-sm text-text-main placeholder:text-text-secondary outline-none cursor-not-allowed opacity-60"
-          placeholder="Search..."
-          disabled
-        />
-      </div>
-
-      {/* Right: user profile */}
-      {raUser?.User ? (
-        <Link
-          href="/user"
-          aria-label={`Profile of ${raUser.User}`}
-          className="flex items-center gap-3 flex-1 justify-end hover:text-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-lg"
-        >
-          <p className="text-sm hidden sm:block">{raUser.User}</p>
-          {raUser.UserPic && (
-            <Image
-              className="w-10 h-10 cursor-pointer rounded-full object-cover shrink-0"
-              width={100}
-              height={100}
-              src={`https://retroachievements.org${raUser.UserPic}`}
-              alt={raUser.User}
-              unoptimized
-            />
+          {!isHome && (
+            <button
+              onClick={() => router.back()}
+              aria-label="Go back"
+              className="p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0"
+            >
+              <IconChevronLeft className="w-5 h-5" aria-hidden="true" />
+            </button>
           )}
-        </Link>
-      ) : session ? (
-        <Link
-          href="/user"
-          className="flex items-center gap-3 flex-1 justify-end hover:text-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-lg"
-        >
-          <p className="text-sm hidden sm:block text-text-secondary">
-            {session.user?.name ?? session.user?.email}
-          </p>
-          {session.user?.image ? (
-            <Image
-              className="w-10 h-10 rounded-full object-cover shrink-0"
-              width={100}
-              height={100}
-              src={session.user.image}
-              alt={session.user?.name ?? 'User'}
-              unoptimized
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-bg-main flex items-center justify-center shrink-0">
-              <span className="text-sm font-bold text-text-secondary">
-                {(session.user?.name ?? session.user?.email ?? '?')[0].toUpperCase()}
-              </span>
-            </div>
-          )}
-        </Link>
-      ) : (
-        <div className="flex-1 flex justify-end">
-          <button className="main-body-red px-2 py-1 rounded-3xl">
-            <Link href="/authPage" className="hover:text-white w-full">
-              {T.header.signIn}
-            </Link>
+
+          {/* Mobile search icon */}
+          <button
+            onClick={openSearch}
+            aria-label="Search games"
+            className="md:hidden p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0"
+          >
+            <IconSearch className="w-5 h-5" aria-hidden="true" />
+          </button>
+
+          {/* Nav links */}
+          <nav className="hidden md:flex items-center gap-0.5 ml-2" aria-label="Main navigation">
+            {navItems.map(({ href, label }) => (
+              <NavLink
+                key={href}
+                href={session ? href : '/authPage'}
+                label={label}
+                active={pathname === href}
+              />
+            ))}
+          </nav>
+        </div>
+
+        {/* Center: search */}
+        <div className="hidden md:flex justify-center shrink-0">
+          <button
+            onClick={openSearch}
+            aria-label="Search games"
+            className="w-64 bg-bg-main rounded-full px-4 py-2 text-sm text-text-secondary text-left hover:bg-bg-main/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 flex items-center gap-2 cursor-pointer ring-1 ring-white/5"
+          >
+            <IconSearch className="w-4 h-4 shrink-0" aria-hidden />
+            <span>{T.search.placeholder}</span>
           </button>
         </div>
-      )}
-    </header>
+
+        {/* Right: streak + user */}
+        <div className="flex items-center gap-2 flex-1 justify-end">
+          {session ? (
+            <>
+              <StreakBadge streak={streak} />
+              <Link
+                href="/user"
+                aria-label="Profile"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-bg-main hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ring-1 ring-white/10"
+              >
+                <span className="text-sm font-medium hidden sm:block text-text-main leading-none">
+                  {session.user?.name ?? session.user?.email}
+                </span>
+                {avatarSrc ? (
+                  <Image
+                    className="w-8 h-8 rounded-full object-cover shrink-0"
+                    width={64}
+                    height={64}
+                    src={avatarSrc}
+                    alt={session.user?.name ?? 'User'}
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
+                    <span className="text-xs font-bold text-accent">
+                      {(session.user?.name ?? session.user?.email ?? '?')[0].toUpperCase()}
+                    </span>
+                  </div>
+                )}
+              </Link>
+            </>
+          ) : (
+            <Link
+              href="/authPage"
+              className="px-4 py-1.5 rounded-full bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            >
+              {T.header.signIn}
+            </Link>
+          )}
+        </div>
+
+      </header>
+
+      <SearchModal isOpen={searchOpen} onClose={closeSearch} />
+    </>
   )
 }

@@ -5,19 +5,7 @@ import Image from 'next/image'
 import CommonModal from '../common-modal/CommonModal'
 import { codeToFlag, findCountry, COUNTRIES } from '@/utils/countries'
 import type { Country } from '@/utils/countries'
-
-interface AdminUser {
-  id: number
-  username: string
-  email: string | null
-  theme: string
-  avatar: string | null
-  admin: boolean
-  rausername: string | null
-  ra_display: string | null
-  location: string | null
-  steamusername?: string | null
-}
+import type { AdminUser } from '@/types/user'
 
 interface Props {
   isOpen: boolean
@@ -168,7 +156,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, c
               >
                 {currentLocation ? (
                   <>
-                    <span className="text-base">{codeToFlag(currentLocation)}</span>
+                    <span className="text-base" aria-hidden="true">{codeToFlag(currentLocation)}</span>
                     <span>{findCountry(currentLocation)?.name ?? currentLocation}</span>
                   </>
                 ) : (
@@ -202,7 +190,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, c
                     }}
                     className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-bg-card text-sm text-left"
                   >
-                    <span className="text-base">{codeToFlag(c.code)}</span>
+                    <span className="text-base" aria-hidden="true">{codeToFlag(c.code)}</span>
                     <span>{c.name}</span>
                   </button>
                 ))}
@@ -221,9 +209,13 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, c
             {user.id === currentAdminId && (
               <span className="text-xs text-text-secondary italic">Can't remove own admin</span>
             )}
-            <div
+            <button
+              type="button"
+              role="switch"
+              aria-checked={values.admin as boolean}
+              aria-label="Admin privileges"
+              disabled={user.id === currentAdminId}
               onClick={() => {
-                if (user.id === currentAdminId) return
                 const next = !(values.admin as boolean)
                 setValues(v => ({ ...v, admin: next }))
                 patch('admin', next)
@@ -232,8 +224,8 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, c
                 user.id === currentAdminId ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
               } ${values.admin ? 'bg-accent' : 'bg-bg-main'}`}
             >
-              <div className={`w-4 h-4 rounded-full bg-white transition-transform ${values.admin ? 'translate-x-4' : 'translate-x-0'}`} />
-            </div>
+              <div className={`w-4 h-4 rounded-full bg-white transition-transform ${values.admin ? 'translate-x-4' : 'translate-x-0'}`} aria-hidden="true" />
+            </button>
           </div>
         </div>
 

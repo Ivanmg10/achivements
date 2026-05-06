@@ -8,16 +8,24 @@ import { RetroAchievementsGameCompleted } from '@/types/types'
 import StatusGameList from '../../../../components/statusGameList/StatusGameList'
 import StatusPageHeader from '../../../../components/status-page-header/StatusPageHeader'
 import CompletedFilter, { CompletedMode } from '../../../../components/completed-filter/CompletedFilter'
-import Spinner from '../../../../components/main-spinner/Spinner'
+import ConsoleFilter, { buildConsolePills } from '@/components/console-filter/ConsoleFilter'
 import EmptyState from '../../../../components/empty-state/EmptyState'
+import LoadingPage from '../../../../components/loading-page/LoadingPage'
 import { useLanguage } from '@/context/LanguageContext'
+import { motion } from 'framer-motion'
+import { fadeUp } from '@/lib/animations'
 
 export default function CategoryConsolePage() {
   const { consoleId, category } = useParams()
-  const { games, loading, error } = useGamesByCategory(category as string, consoleId as string)
+  // Fetch ALL games for this category (no consoleId filter) so the filter works across consoles
+  const { games, loading, error } = useGamesByCategory(category as string)
   const extraData = useGameExtraData()
   const { T } = useLanguage()
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
+  // Pre-select the console from the URL param
+  const [selected, setSelected] = useState<Set<number>>(
+    () => new Set(consoleId ? [Number(consoleId)] : []),
+  )
 
   const EMPTY_STATE: Record<string, { icon: string; title: string; sub: string }> = {
     wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay,  sub: T.categoryPage.noWantToPlaySub },
@@ -27,8 +35,19 @@ export default function CategoryConsolePage() {
 
   const cat = category as string
 
+  const consolePills = useMemo(() => buildConsolePills(games), [games])
+
+  function toggleConsole(id: number) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
   const visibleGames = useMemo(() => {
     let list = games
+    if (selected.size > 0) list = list.filter((g) => selected.has(g.ConsoleID))
     if (cat === 'completed' && completedMode !== 'all') {
       list = list.filter((g) => {
         const hc = Number((g as RetroAchievementsGameCompleted).HardcoreMode)
@@ -41,12 +60,8 @@ export default function CategoryConsolePage() {
         const bId = b.GameID ?? (b.ID as number)
         const aExtra = extraData.get(aId)
         const bExtra = extraData.get(bId)
-        const aDate = cat === 'playing'
-          ? aExtra?.lastPlayed
-          : aExtra?.awards?.[0]?.AwardedAt
-        const bDate = cat === 'playing'
-          ? bExtra?.lastPlayed
-          : bExtra?.awards?.[0]?.AwardedAt
+        const aDate = cat === 'playing' ? aExtra?.lastPlayed : aExtra?.awards?.[0]?.AwardedAt
+        const bDate = cat === 'playing' ? bExtra?.lastPlayed : bExtra?.awards?.[0]?.AwardedAt
         if (!aDate && !bDate) return 0
         if (!aDate) return 1
         if (!bDate) return -1
@@ -54,15 +69,21 @@ export default function CategoryConsolePage() {
       })
     }
     return list
-  }, [games, cat, completedMode, extraData])
+  }, [games, cat, selected, completedMode, extraData])
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white">
+    <motion.div
+      className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white"
+      variants={fadeUp}
+      initial="hidden"
+      animate="visible"
+    >
       <div className="w-full lg:max-w-[98%] flex flex-col gap-3">
         {loading ? (
-          <div className="flex flex-1 items-center justify-center min-h-[60vh]">
-            <Spinner size={45} />
-          </div>
+          <LoadingPage subtitle={
+            { wantToPlay: T.loadingPage.wantToPlay, playing: T.loadingPage.playing, completed: T.loadingPage.completed }[cat]
+            ?? T.loadingPage.subtitle
+          } />
         ) : error ? (
           <p className="text-red-400 text-sm text-center mt-10">{error}</p>
         ) : games.length === 0 ? (
@@ -76,7 +97,9 @@ export default function CategoryConsolePage() {
           <>
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <StatusPageHeader
-                consoleName={games[0].ConsoleName}
+                consoleName={selected.size === 1
+                  ? consolePills.find((c) => selected.has(c.id))?.name
+                  : undefined}
                 category={cat}
                 gameCount={visibleGames.length}
               />
@@ -84,10 +107,31 @@ export default function CategoryConsolePage() {
                 <CompletedFilter value={completedMode} onChange={setCompletedMode} />
               )}
             </div>
-            <StatusGameList games={visibleGames} extraData={extraData} category={cat} />
+
+            {consolePills.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 py-1">
+                <ConsoleFilter
+                  pills={consolePills}
+                  selected={selected}
+                  onToggle={toggleConsole}
+                  onClear={() => setSelected(new Set())}
+                />
+              </div>
+            )}
+
+            {visibleGames.length === 0 ? (
+              <EmptyState
+                icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
+                title={EMPTY_STATE[cat]?.title ?? ''}
+                subtitle={EMPTY_STATE[cat]?.sub ?? ''}
+                className="min-h-[40vh]"
+              />
+            ) : (
+              <StatusGameList games={visibleGames} extraData={extraData} category={cat} />
+            )}
           </>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

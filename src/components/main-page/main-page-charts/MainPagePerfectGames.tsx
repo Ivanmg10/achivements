@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 
-export default function MainPagePerfectGames({ games }: { games: RetroAchievementsGameCompleted[] }) {
+export default function MainPagePerfectGames({ games, isLoading }: { games: RetroAchievementsGameCompleted[]; isLoading?: boolean }) {
   const { perfects, hcCount, scCount } = useMemo(() => {
     const hcIds = new Set<number>()
     const scIds = new Set<number>()
@@ -26,6 +26,19 @@ export default function MainPagePerfectGames({ games }: { games: RetroAchievemen
       scCount: scIds.size,
     }
   }, [games])
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-2 animate-pulse">
+        <div className="h-2 w-28 rounded bg-white/10" />
+        <div className="flex flex-wrap gap-2">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="w-10 h-10 rounded bg-white/10" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   if (perfects.length === 0) {
     return (

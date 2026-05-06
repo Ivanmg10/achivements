@@ -13,6 +13,10 @@ export async function GET(request: NextRequest) {
   }
 
   const { rausername, raid, id } = session.user;
+  if (!rausername || !raid) {
+    return NextResponse.json({});
+  }
+
   const gameIdsParam = request.nextUrl.searchParams.get("gameIds");
   if (!gameIdsParam) return NextResponse.json({});
 

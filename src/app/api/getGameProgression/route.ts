@@ -13,7 +13,14 @@ export async function GET(request: NextRequest) {
   }
 
   const gameId = request.nextUrl.searchParams.get("gameId");
+  if (!gameId || !/^\d+$/.test(gameId)) {
+    return NextResponse.json({ message: "Invalid gameId" }, { status: 400 });
+  }
+
   const { rausername, raid, id } = session.user;
+  if (!rausername || !raid) {
+    return NextResponse.json({ message: "No RA account linked" }, { status: 400 });
+  }
 
   const data = await withCache(
     `gameProgression_v2:${id}:${gameId}`,
