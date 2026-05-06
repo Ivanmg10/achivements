@@ -224,6 +224,15 @@ export const en = {
     completed: 'Loading your completions...',
     game: 'Loading game data...',
   },
+  search: {
+    placeholder: 'Search your games...',
+    hint: 'Search across your library',
+    noResults: 'No games found',
+    completedHC: 'Completed HC',
+    completedSC: 'Completed SC',
+    inProgress: 'In progress',
+    wantToPlay: 'Want to play',
+  },
 }
 
 export type Translations = typeof en

@@ -226,4 +226,13 @@ export const es: Translations = {
     completed: 'Cargando tus completados...',
     game: 'Cargando datos del juego...',
   },
+  search: {
+    placeholder: 'Buscar tus juegos...',
+    hint: 'Busca en tu librería',
+    noResults: 'No se encontraron juegos',
+    completedHC: 'Completado HC',
+    completedSC: 'Completado SC',
+    inProgress: 'En progreso',
+    wantToPlay: 'Quiero jugar',
+  },
 }
