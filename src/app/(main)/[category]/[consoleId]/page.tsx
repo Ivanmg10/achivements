@@ -9,9 +9,11 @@ import StatusGameList from '../../../../components/statusGameList/StatusGameList
 import StatusPageHeader from '../../../../components/status-page-header/StatusPageHeader'
 import CompletedFilter, { CompletedMode } from '../../../../components/completed-filter/CompletedFilter'
 import ConsoleFilter, { buildConsolePills } from '@/components/console-filter/ConsoleFilter'
-import Spinner from '../../../../components/main-spinner/Spinner'
 import EmptyState from '../../../../components/empty-state/EmptyState'
+import LoadingPage from '../../../../components/loading-page/LoadingPage'
 import { useLanguage } from '@/context/LanguageContext'
+import { motion } from 'framer-motion'
+import { fadeUp } from '@/lib/animations'
 
 export default function CategoryConsolePage() {
   const { consoleId, category } = useParams()
@@ -70,12 +72,18 @@ export default function CategoryConsolePage() {
   }, [games, cat, selected, completedMode, extraData])
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white">
+    <motion.div
+      className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white"
+      variants={fadeUp}
+      initial="hidden"
+      animate="visible"
+    >
       <div className="w-full lg:max-w-[98%] flex flex-col gap-3">
         {loading ? (
-          <div className="flex flex-1 items-center justify-center min-h-[60vh]">
-            <Spinner size={45} />
-          </div>
+          <LoadingPage subtitle={
+            { wantToPlay: T.loadingPage.wantToPlay, playing: T.loadingPage.playing, completed: T.loadingPage.completed }[cat]
+            ?? T.loadingPage.subtitle
+          } />
         ) : error ? (
           <p className="text-red-400 text-sm text-center mt-10">{error}</p>
         ) : games.length === 0 ? (
@@ -124,6 +132,6 @@ export default function CategoryConsolePage() {
           </>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

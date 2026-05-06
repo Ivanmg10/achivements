@@ -218,4 +218,12 @@ export const es: Translations = {
     addFavorite: 'Fijar logro',
     removeFavorite: 'Quitar logro fijado',
   },
+  loadingPage: {
+    title: 'Cargando tus logros',
+    subtitle: 'Obteniendo datos de juego...',
+    wantToPlay: 'Cargando tu lista de deseos...',
+    playing: 'Cargando tus juegos activos...',
+    completed: 'Cargando tus completados...',
+    game: 'Cargando datos del juego...',
+  },
 }

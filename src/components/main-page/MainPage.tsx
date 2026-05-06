@@ -1,8 +1,10 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
+import { motion } from 'framer-motion'
+import { fadeUp } from '@/lib/animations'
 
-import Spinner from '../main-spinner/Spinner'
+import LoadingPage from '../loading-page/LoadingPage'
 import MainPageCompleted from './main-page-completed/MainPageCompleted'
 import MainPageGames from './main-page-games/MainPageGames'
 import MainPageProfile from './main-page-profile/MainPageProfile'
@@ -15,17 +17,18 @@ export default function MainPage() {
   const { status, data: session } = useSession()
 
   if (status === 'loading')
-    return (
-      <main className="h-lvh flex justify-center items-center text-text-main">
-        <Spinner size={45} />
-      </main>
-    )
+    return <LoadingPage />
 
   if (status === 'authenticated' && !session?.user?.raUser?.User)
     return <MainPageNoRa />
 
   return (
-    <main className="flex flex-col min-h-full text-text-main">
+    <motion.main
+      className="flex flex-col min-h-full text-text-main"
+      variants={fadeUp}
+      initial="hidden"
+      animate="visible"
+    >
       <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
         {/* Profile first in DOM → top on mobile; placed col-2 on desktop */}
         <div className="lg:col-start-2 lg:row-start-1">
@@ -40,6 +43,6 @@ export default function MainPage() {
       </div>
 
       <MainPageCharts />
-    </main>
+    </motion.main>
   )
 }

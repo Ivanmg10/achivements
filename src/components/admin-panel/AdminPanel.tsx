@@ -6,6 +6,7 @@ import { IconPlus, IconPencil, IconShield, IconShieldOff, IconUser } from '@tabl
 import { useSession } from 'next-auth/react'
 import AdminCreateUserModal from './AdminCreateUserModal'
 import AdminEditUserModal from './AdminEditUserModal'
+import Spinner from '@/components/main-spinner/Spinner'
 import { codeToFlag } from '@/utils/countries'
 import type { AdminUser } from '@/types/user'
 
@@ -73,7 +74,8 @@ export default function AdminPanel() {
 
       <div className="bg-bg-card rounded-3xl overflow-hidden">
         {loading && (
-          <div className="flex items-center justify-center py-12 text-text-secondary text-sm">
+          <div className="flex items-center justify-center gap-3 py-12 text-text-secondary text-sm">
+            <Spinner size={20} />
             Loading users...
           </div>
         )}
@@ -156,7 +158,9 @@ function UserRow({
           )}
           {isSelf && <span className="text-xs text-text-secondary italic">(you)</span>}
           {user.location && (
-            <span className="text-base leading-none" aria-hidden="true">{codeToFlag(user.location)}</span>
+            <span className="text-base leading-none" aria-hidden="true">
+              {codeToFlag(user.location)}
+            </span>
           )}
         </div>
         <div className="flex items-center gap-3 mt-0.5">
@@ -175,7 +179,9 @@ function UserRow({
         <button
           onClick={onToggleAdmin}
           disabled={isSelf}
-          aria-label={user.admin ? `Remove admin from ${user.username}` : `Make ${user.username} admin`}
+          aria-label={
+            user.admin ? `Remove admin from ${user.username}` : `Make ${user.username} admin`
+          }
           className={`p-2 rounded-lg transition-colors ${
             isSelf
               ? 'opacity-30 cursor-not-allowed text-text-secondary'
@@ -184,7 +190,11 @@ function UserRow({
                 : 'text-text-secondary hover:bg-bg-main hover:text-text-main'
           }`}
         >
-          {user.admin ? <IconShield size={15} aria-hidden="true" /> : <IconShieldOff size={15} aria-hidden="true" />}
+          {user.admin ? (
+            <IconShield size={15} aria-hidden="true" />
+          ) : (
+            <IconShieldOff size={15} aria-hidden="true" />
+          )}
         </button>
         <button
           onClick={onEdit}

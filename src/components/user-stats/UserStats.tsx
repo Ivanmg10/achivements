@@ -1,5 +1,7 @@
 'use client'
 
+import { motion } from 'framer-motion'
+import { staggerContainer, staggerItem } from '@/lib/animations'
 import { useSession } from 'next-auth/react'
 import { useUserRank } from '@/hooks/useUserRank'
 import { useUserAwards } from '@/hooks/useUserAwards'
@@ -8,19 +10,25 @@ import { RetroAchievementsUserProfile } from '@/types/types'
 
 function StatCard({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
-    <div className="bg-bg-main rounded-xl p-3 flex flex-col gap-1">
+    <motion.div
+      className="bg-bg-main rounded-xl p-3 flex flex-col gap-1"
+      variants={staggerItem}
+    >
       <span className={`text-xl font-bold ${accent ?? 'text-text-main'}`}>{value}</span>
       <span className="text-xs text-text-secondary">{label}</span>
-    </div>
+    </motion.div>
   )
 }
 
 function AwardCard({ label, value, accent }: { label: string; value: number; accent?: string }) {
   return (
-    <div className="bg-bg-main rounded-xl p-3 flex flex-col items-center gap-1 text-center">
+    <motion.div
+      className="bg-bg-main rounded-xl p-3 flex flex-col items-center gap-1 text-center"
+      variants={staggerItem}
+    >
       <span className={`text-2xl font-bold ${accent ?? 'text-text-main'}`}>{value}</span>
       <span className="text-xs text-text-secondary">{label}</span>
-    </div>
+    </motion.div>
   )
 }
 
@@ -49,7 +57,13 @@ export default function UserStats() {
           RetroAchievements
         </h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
           <StatCard
             label={T.userStats.globalRank}
             value={rankLoading ? '...' : rank?.Rank ? `#${rank.Rank.toLocaleString()}` : '—'}
@@ -78,7 +92,7 @@ export default function UserStats() {
             label={T.profileRa.memberSince}
             value={memberYear}
           />
-        </div>
+        </motion.div>
 
         {raUser.Motto && (
           <p className="text-sm italic text-text-secondary px-1">&ldquo;{raUser.Motto}&rdquo;</p>
@@ -118,7 +132,13 @@ export default function UserStats() {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
             <AwardCard
               label={T.userStats.masteries}
               value={awards.MasteryAwardsCount}
@@ -144,7 +164,7 @@ export default function UserStats() {
               value={awards.EventAwardsCount}
               accent="text-purple-400"
             />
-          </div>
+          </motion.div>
         </div>
       )}
     </section>

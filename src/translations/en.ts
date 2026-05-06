@@ -216,6 +216,14 @@ export const en = {
     addFavorite: 'Pin achievement',
     removeFavorite: 'Unpin achievement',
   },
+  loadingPage: {
+    title: 'Loading your achievements',
+    subtitle: 'Fetching your game data...',
+    wantToPlay: 'Loading your wishlist...',
+    playing: 'Loading your active games...',
+    completed: 'Loading your completions...',
+    game: 'Loading game data...',
+  },
 }
 
 export type Translations = typeof en

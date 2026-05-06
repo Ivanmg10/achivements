@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 
+import Spinner from '@/components/main-spinner/Spinner'
 import { useResizableList } from '@/hooks/useResizableList'
 import { useWantGamesPreview } from '@/hooks/useWantGamesPreview'
 import { useLanguage } from '@/context/LanguageContext'
@@ -37,7 +38,7 @@ export default function MainPageWantToPlay() {
           <MainPageGamesList listGames={wantGames.slice(0, Math.min(visibleCount, MAX_GAMES))} />
         ) : loading ? (
           <div className="flex flex-1 items-center justify-center py-8">
-            <div className="w-6 h-6 border-2 border-text-secondary/30 border-t-text-main rounded-full animate-spin" />
+            <Spinner size={24} />
           </div>
         ) : (
           <EmptyState icon="🔖" title={T.mainPage.noWantToPlay} subtitle={T.mainPage.noWantToPlaySub} className="py-8" />

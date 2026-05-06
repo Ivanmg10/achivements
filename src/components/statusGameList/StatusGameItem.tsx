@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import { CategoryGame } from '../../hooks/useGamesByCategory'
 import { GameExtraData } from './StatusGameList'
@@ -181,16 +182,18 @@ const AchievementGrid = memo(function AchievementGrid({
         </div>
       )}
 
-      {selected && (
-        <AchievementModal
-          achievement={selected}
-          numDistinctPlayers={numDistinctPlayers}
-          onClose={() => setSelected(null)}
-          gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
-          isFavorited={favoritedIds.has(selected.ID)}
-          onToggleFavorite={() => handleToggleFavorite(selected)}
-        />
-      )}
+      <AnimatePresence>
+        {selected && (
+          <AchievementModal
+            achievement={selected}
+            numDistinctPlayers={numDistinctPlayers}
+            onClose={() => setSelected(null)}
+            gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
+            isFavorited={favoritedIds.has(selected.ID)}
+            onToggleFavorite={() => handleToggleFavorite(selected)}
+          />
+        )}
+      </AnimatePresence>
     </>
   )
 })
@@ -245,7 +248,13 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
   const isHardcore = 'HardcoreMode' in game && Number(game.HardcoreMode) === 1
 
   return (
-    <div className="bg-bg-card w-full rounded-xl overflow-hidden hover:ring-1 hover:ring-white/10 transition-shadow duration-150">
+    <motion.div
+      className="bg-bg-card w-full rounded-xl overflow-hidden hover:ring-1 hover:ring-white/10 transition-shadow duration-150"
+      initial={{ opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+    >
       <div
         onClick={handleToggle}
         className="flex flex-row items-center gap-5 p-5 cursor-pointer hover:bg-bg-header/20 transition-colors select-none"
@@ -367,6 +376,6 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

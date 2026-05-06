@@ -1,9 +1,11 @@
 'use client'
 
+import { motion } from 'framer-motion'
+import { fadeUp } from '@/lib/animations'
+import LoadingPage from '@/components/loading-page/LoadingPage'
 import GameInfoHeader from '@/components/game-info-header/GameInfoHeader'
 import GameInfoTable from '@/components/game-info-table/GameInfoTable'
 import GameInfoSubsetSelector from '@/components/game-info-subset-selector/GameInfoSubsetSelector'
-import Spinner from '@/components/main-spinner/Spinner'
 import { RetroAchievementsGameWithAchievements, SubsetGame } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
@@ -82,7 +84,12 @@ export default function GameInfo() {
   if (gameData !== null) {
     const showSelector = subsets.length > 0 || parentId !== null
     return (
-      <main className="flex-1 flex flex-col items-center text-text-main">
+      <motion.main
+        className="flex-1 flex flex-col items-center text-text-main"
+        variants={fadeUp}
+        initial="hidden"
+        animate="visible"
+      >
         <GameInfoHeader gameData={gameData}>
           {showSelector && (
             <GameInfoSubsetSelector
@@ -95,13 +102,9 @@ export default function GameInfo() {
           )}
         </GameInfoHeader>
         <GameInfoTable gameData={gameData} />
-      </main>
+      </motion.main>
     )
   }
 
-  return (
-    <main className="flex-1 flex flex-col justify-center items-center text-text-main">
-      <Spinner size={45} />
-    </main>
-  )
+  return <LoadingPage subtitle={T.loadingPage.game} />
 }

@@ -5,6 +5,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { motion } from 'framer-motion'
+import { modalOverlay, modalContent } from '@/lib/animations'
+import Spinner from '@/components/main-spinner/Spinner'
 
 interface AchievementUnlock {
   User: string
@@ -108,12 +111,20 @@ export default function AchievementModal({
     : null
 
   return (
-    <div
+    <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      variants={modalOverlay}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
       onClick={onClose}
     >
-      <div
+      <motion.div
         className="bg-bg-main rounded-2xl w-full max-w-4xl max-h-[65vh] overflow-y-auto flex flex-col"
+        variants={modalContent}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -210,7 +221,7 @@ export default function AchievementModal({
         <div className="flex flex-col gap-6 p-6">
           {loading && (
             <div className="flex justify-center py-8">
-              <div className="w-6 h-6 border-2 border-text-secondary/30 border-t-text-main rounded-full animate-spin" />
+              <Spinner size={28} />
             </div>
           )}
 
@@ -332,7 +343,7 @@ export default function AchievementModal({
             )
           })()}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

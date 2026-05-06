@@ -5,6 +5,8 @@ import RegisterUserForm from "@/components/register-user-form/RegisterUserForm";
 import { IconArrowLeft } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { formTransition } from "@/lib/animations";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,14 +20,32 @@ export default function AuthPage() {
         </Link>
       </header>
       <main className="flex justify-center items-center min-h-screen px-4">
-        {isLogin ? (
-          <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />
-        ) : (
-          <RegisterUserForm
-            setIsLogin={setIsLogin}
-            setIsRegister={setHasRegister}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {isLogin ? (
+            <motion.div
+              key="login"
+              variants={formTransition}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="register"
+              variants={formTransition}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <RegisterUserForm
+                setIsLogin={setIsLogin}
+                setIsRegister={setHasRegister}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );

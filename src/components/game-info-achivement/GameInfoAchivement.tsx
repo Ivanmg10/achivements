@@ -1,6 +1,7 @@
 import { RetroAchievement } from '@/types/types'
 import Image from 'next/image'
 import { useLanguage } from '@/context/LanguageContext'
+import { motion } from 'framer-motion'
 
 export default function GameInfoAchivement({
   achievement,
@@ -46,11 +47,15 @@ export default function GameInfoAchivement({
     : null
 
   return (
-    <tr
+    <motion.tr
       onClick={onClick}
       className={`group border-b border-bg-header/60 cursor-pointer hover:bg-bg-header/30 transition-colors duration-150 ${
-        earned ? '' : 'opacity-40'
-      } ${isFavorited ? 'bg-yellow-900/10' : ''}`}
+        isFavorited ? 'bg-yellow-900/10' : ''
+      }`}
+      initial={{ opacity: 0, y: 4 }}
+      whileInView={{ opacity: earned ? 1 : 0.4, y: 0 }}
+      viewport={{ once: true, margin: '-20px' }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
     >
       <td className="px-3 py-2 w-24 align-middle text-center">
         {achievement.BadgeName && (
@@ -149,6 +154,6 @@ export default function GameInfoAchivement({
         <p className="text-xs text-text-secondary/60">pts</p>
       </td>
 
-    </tr>
+    </motion.tr>
   )
 }

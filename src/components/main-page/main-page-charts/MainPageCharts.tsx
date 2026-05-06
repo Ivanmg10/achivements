@@ -11,6 +11,7 @@ import { useUserAwards } from '@/hooks/useUserAwards'
 import { useTopTenUsers } from '@/hooks/useTopTenUsers'
 import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
 import { SectionFallback } from '@/components/ui/SectionFallback'
+import { motion } from 'framer-motion'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
 import GamesPlayedPieChart from '@/components/games-played-pie-chart/GamesPlayedPieChart'
@@ -29,9 +30,15 @@ import MainPageFavorites from '../main-page-favorites/MainPageFavorites'
 
 function ChartCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-bg-card rounded-xl p-4 flex flex-col gap-3 ${className}`}>
+    <motion.div
+      className={`bg-bg-card rounded-xl p-4 flex flex-col gap-3 ${className}`}
+      initial={{ opacity: 0, y: 8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+    >
       {children}
-    </div>
+    </motion.div>
   )
 }
 

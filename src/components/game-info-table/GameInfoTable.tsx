@@ -8,6 +8,7 @@ import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
 import AchievementModal from '../achievement-modal/AchievementModal'
 import Image from 'next/image'
 import { useState, useMemo, useEffect, useCallback } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 
 type Filter = 'all' | 'earned' | 'unearned'
@@ -253,16 +254,18 @@ export default function GameInfoTable({
         </table>
       )}
 
-      {selectedAchievement && (
-        <AchievementModal
-          achievement={selectedAchievement}
-          numDistinctPlayers={numDistinctPlayers}
-          onClose={() => setSelectedAchievement(null)}
-          gameId={gameData?.ID}
-          isFavorited={favoritedIds.has(selectedAchievement.ID)}
-          onToggleFavorite={() => handleToggleFavorite(selectedAchievement)}
-        />
-      )}
+      <AnimatePresence>
+        {selectedAchievement && (
+          <AchievementModal
+            achievement={selectedAchievement}
+            numDistinctPlayers={numDistinctPlayers}
+            onClose={() => setSelectedAchievement(null)}
+            gameId={gameData?.ID}
+            isFavorited={favoritedIds.has(selectedAchievement.ID)}
+            onToggleFavorite={() => handleToggleFavorite(selectedAchievement)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   )
 }

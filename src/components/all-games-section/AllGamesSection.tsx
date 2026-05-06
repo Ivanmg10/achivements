@@ -8,6 +8,7 @@ import StatusGameList from '@/components/statusGameList/StatusGameList'
 import CompletedFilter, { CompletedMode } from '@/components/completed-filter/CompletedFilter'
 import ConsoleFilter, { buildConsolePills } from '@/components/console-filter/ConsoleFilter'
 import Spinner from '@/components/main-spinner/Spinner'
+import { motion } from 'framer-motion'
 
 type Category = 'wantToPlay' | 'playing' | 'completed'
 
@@ -58,7 +59,12 @@ export default function AllGamesSection({
   }
 
   return (
-    <div className="w-full bg-bg-card rounded-xl overflow-hidden">
+    <motion.div
+      className="w-full bg-bg-card rounded-xl overflow-hidden"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+    >
       {/* Section header */}
       <button
         onClick={() => setOpen((o) => !o)}
@@ -123,6 +129,6 @@ export default function AllGamesSection({
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

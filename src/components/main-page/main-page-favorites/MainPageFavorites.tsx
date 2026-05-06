@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
+import Spinner from '@/components/main-spinner/Spinner'
+import { AnimatePresence } from 'framer-motion'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 
@@ -42,7 +44,7 @@ export default function MainPageFavorites() {
 
       {loading && (
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-text-secondary/30 border-t-text-main rounded-full animate-spin" />
+          <Spinner size={24} />
         </div>
       )}
 
@@ -116,19 +118,21 @@ export default function MainPageFavorites() {
         </div>
       )}
 
-      {selected && (
-        <AchievementModal
-          achievement={selected.snapshot}
-          numDistinctPlayers={selected.num_distinct_players}
-          onClose={() => setSelected(null)}
-          gameId={selected.game_id}
-          isFavorited={true}
-          onToggleFavorite={() => {
-            handleUnpin(selected.achievement_id)
-            setSelected(null)
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {selected && (
+          <AchievementModal
+            achievement={selected.snapshot}
+            numDistinctPlayers={selected.num_distinct_players}
+            onClose={() => setSelected(null)}
+            gameId={selected.game_id}
+            isFavorited={true}
+            onToggleFavorite={() => {
+              handleUnpin(selected.achievement_id)
+              setSelected(null)
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
