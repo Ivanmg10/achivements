@@ -233,6 +233,11 @@ export const en = {
     inProgress: 'In progress',
     wantToPlay: 'Want to play',
   },
+  dayModal: {
+    title: 'Achievements earned',
+    empty: 'No achievements this day',
+    achievements: 'achievements',
+  },
 }
 
 export type Translations = typeof en

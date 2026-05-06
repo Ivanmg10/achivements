@@ -235,4 +235,9 @@ export const es: Translations = {
     inProgress: 'En progreso',
     wantToPlay: 'Quiero jugar',
   },
+  dayModal: {
+    title: 'Logros conseguidos',
+    empty: 'Sin logros este día',
+    achievements: 'logros',
+  },
 }

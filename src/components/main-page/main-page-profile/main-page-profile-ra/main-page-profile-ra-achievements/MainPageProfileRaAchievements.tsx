@@ -2,6 +2,7 @@
 
 import { RecentAchievement } from '@/types/types'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 
 export default function MainPageProfileRaAchievements({ achievements }: { achievements: RecentAchievement[] }) {
@@ -12,7 +13,11 @@ export default function MainPageProfileRaAchievements({ achievements }: { achiev
       <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileAchievements.recentAchievements}</p>
       <div className="flex flex-col gap-2">
         {achievements.slice(0, 5).map((ach) => (
-          <div key={ach.AchievementID} className="flex gap-2 items-center">
+          <Link
+            key={ach.AchievementID}
+            href={`/gameInfo/${ach.GameID}`}
+            className="flex gap-2 items-center rounded-lg hover:bg-white/5 transition-colors group p-1 -mx-1"
+          >
             <Image
               src={`https://media.retroachievements.org/Badge/${ach.BadgeName}.png`}
               alt={ach.Title}
@@ -21,7 +26,7 @@ export default function MainPageProfileRaAchievements({ achievements }: { achiev
               className="rounded shrink-0"
             />
             <div className="flex flex-col min-w-0">
-              <span className="text-xs font-semibold truncate">{ach.Title}</span>
+              <span className="text-xs font-semibold truncate group-hover:text-accent transition-colors">{ach.Title}</span>
               <span className="text-xs text-gray-500 truncate">{ach.GameTitle}</span>
             </div>
             <span
@@ -29,7 +34,7 @@ export default function MainPageProfileRaAchievements({ achievements }: { achiev
             >
               {ach.Points}pts
             </span>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

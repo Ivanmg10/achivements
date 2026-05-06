@@ -1,9 +1,11 @@
 'use client'
 
 import { useMemo, useEffect, useRef, useState } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { RecentAchievement } from '@/types/types'
 import { groupByDays } from '@/utils/utils'
 import { IconRefresh } from '@tabler/icons-react'
+import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 
 function cellBg(count: number): string {
   if (count === 0) return '#1a1a2e'
@@ -43,6 +45,7 @@ export default function MainPageHeatmap({
   const label = totalDays <= 30 ? 'last 30 days' : totalDays <= 45 ? 'last 45 days' : 'last 60 days'
   const tooltipRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
 
   const { totalAch, weeks, monthLabels } = useMemo(() => {
     const data = groupByDays(achievements, totalDays)
@@ -195,10 +198,11 @@ export default function MainPageHeatmap({
                   return (
                     <div
                       key={`${wi}-${di}`}
-                      className="aspect-square rounded-sm"
+                      className={`aspect-square rounded-sm${cell && cell.count > 0 ? ' cursor-pointer hover:ring-1 hover:ring-white/30' : ''}`}
                       style={{ backgroundColor: cell ? cellBg(cell.count) : '#0f0f1a' }}
                       data-date={cell?.date}
                       data-count={cell?.count ?? 0}
+                      onClick={() => cell && cell.count > 0 && setSelectedDate(cell.date)}
                     />
                   )
                 })
@@ -220,6 +224,16 @@ export default function MainPageHeatmap({
           </div>
         </div>
       )}
+
+      <AnimatePresence>
+        {selectedDate && (
+          <DayAchievementsModal
+            date={selectedDate}
+            achievements={achievements}
+            onClose={() => setSelectedDate(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }
