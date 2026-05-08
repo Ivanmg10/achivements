@@ -39,9 +39,9 @@ export default function MainPageRarest({ achievements, isLoading }: { achievemen
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 flex-1">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">Rarest recent unlocks</p>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 flex-1">
         {withRarity.map((a) => (
           <Link
             key={a.AchievementID}

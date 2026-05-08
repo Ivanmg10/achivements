@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
-const ABANDONED_DAYS = 90
+const ABANDONED_DAYS = 30
 
 export default function MainPageAbandoned({
   playing,
@@ -70,7 +70,7 @@ export default function MainPageAbandoned({
   return (
     <div className="flex flex-col gap-2">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">
-        Abandoned — {ABANDONED_DAYS}+ days idle
+        Abandoned — {ABANDONED_DAYS}d+ idle
       </p>
 
       {loading ? (

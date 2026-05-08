@@ -45,9 +45,9 @@ export default function MainPageAlmostThere({ games, isLoading }: { games: Retro
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 flex-1">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">Almost there (75–99%)</p>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 flex-1">
         {candidates.map((g) => {
           const pct = Math.round(parseFloat(g.PctWon) * 100)
           const remaining = g.MaxPossible - g.NumAwarded

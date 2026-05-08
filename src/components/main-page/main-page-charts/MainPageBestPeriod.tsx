@@ -56,13 +56,13 @@ export default function MainPageBestPeriod({
   }), [achievements, yearAchievements])
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 flex-1">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">Best performance</p>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-6 text-text-secondary text-sm">Loading...</div>
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col flex-1 justify-between gap-2">
           {bestWeek ? (
             <div className="bg-bg-main rounded-lg p-2.5 flex flex-col gap-0.5">
               <span className="text-[10px] uppercase tracking-widest text-text-secondary">Best week</span>

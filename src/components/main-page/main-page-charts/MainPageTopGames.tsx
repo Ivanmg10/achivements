@@ -55,9 +55,9 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 flex-1">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">Most active games — last 30 days</p>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 flex-1">
         {data.map(({ name, count, gameId, icon, console: con }) => (
           <Link
             key={name}
