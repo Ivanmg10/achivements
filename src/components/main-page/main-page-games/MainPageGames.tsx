@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useResizableList } from '@/hooks/useResizableList'
@@ -20,6 +20,13 @@ const FOOTER_PX = 0
 export default function MainPageGames() {
   const sectionRef = useRef<HTMLElement>(null)
   const { listGames, isLoading } = useGamesInProgressPreview()
+  const gamesKey = listGames.map((g) => g.GameID).join(',')
+  // shuffle at display level so context list stays stable (needed for abandoned tracking)
+  const shuffledGames = useMemo(
+    () => [...listGames].sort(() => Math.random() - 0.5),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [gamesKey]
+  )
   const visibleCount = useResizableList({
     sectionRef,
     maxItems: MAX_GAMES,
@@ -44,8 +51,8 @@ export default function MainPageGames() {
             <GameCardSkeleton />
             <GameCardSkeleton />
           </div>
-        ) : listGames.length > 0 ? (
-          <MainPageGamesList listGames={listGames.slice(0, visibleCount)} />
+        ) : shuffledGames.length > 0 ? (
+          <MainPageGamesList listGames={shuffledGames.slice(0, visibleCount)} />
         ) : (
           <EmptyState icon="🎮" title={T.mainPage.noGamesInProgress} subtitle={T.mainPage.noGamesInProgressSub} className="py-8" />
         )}

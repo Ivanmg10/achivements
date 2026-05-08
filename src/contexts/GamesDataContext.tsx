@@ -84,7 +84,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     () =>
       all
         .filter((g) => Number(g.HardcoreMode) === 0 && parseFloat(g.PctWon) > 0 && parseFloat(g.PctWon) < 1)
-        .sort(() => Math.random() - 0.5),
+        .sort((a, b) => a.GameID - b.GameID),
     [all]
   )
 
