@@ -27,9 +27,9 @@ function uniqueConsoles(
 }
 
 const SECTIONS = [
-  { slug: 'playing',    label: 'Playing',      emoji: '🎮' },
-  { slug: 'wantToPlay', label: 'Want to play',  emoji: '🔖' },
-  { slug: 'completed',  label: 'Completed',     emoji: '🏆' },
+  { slug: 'playing',    label: 'Playing',     emoji: '🎮' },
+  { slug: 'wantToPlay', label: 'Want to play', emoji: '🔖' },
+  { slug: 'completed',  label: 'Completed',    emoji: '🏆' },
 ] as const
 
 export default function MainPageConsoleNav() {
@@ -46,14 +46,14 @@ export default function MainPageConsoleNav() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-5 animate-pulse">
-        <div className="h-2 w-28 rounded bg-white/10" />
+      <div className="flex flex-col gap-3 animate-pulse">
+        <div className="h-2 w-20 rounded bg-white/10" />
         {[0, 1, 2].map((i) => (
-          <div key={i} className="flex flex-col gap-2">
-            <div className="h-2.5 w-20 rounded bg-white/10" />
+          <div key={i} className="bg-bg-main rounded-lg p-3 flex flex-col gap-2">
+            <div className="h-3 w-24 rounded bg-white/10" />
             <div className="flex gap-2">
-              {[0, 1, 2, 3].map((j) => (
-                <div key={j} className="h-6 w-16 rounded-md bg-white/10" />
+              {[0, 1, 2].map((j) => (
+                <div key={j} className="h-7 w-20 rounded-lg bg-white/10" />
               ))}
             </div>
           </div>
@@ -64,25 +64,28 @@ export default function MainPageConsoleNav() {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Quick navigation</p>
-      <div className="flex flex-col gap-4">
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Navigation</p>
+      <div className="flex flex-col gap-2">
         {SECTIONS.map(({ slug, label, emoji }) => {
           const consoles = bySection[slug]
           return (
-            <div key={slug} className="flex flex-col gap-2">
+            <div key={slug} className="bg-bg-main rounded-lg p-3 flex flex-col gap-2.5">
+              {/* Section title → links to /[slug] */}
               <Link
                 href={`/${slug}`}
-                className="flex items-center gap-1.5 group w-fit focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
+                className="flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
               >
-                <span className="text-sm leading-none">{emoji}</span>
-                <span className="text-xs font-semibold text-text-main group-hover:text-accent transition-colors">
-                  {label}
-                </span>
-                <span className="text-[10px] text-text-secondary/50 ml-1">→</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm leading-none">{emoji}</span>
+                  <span className="text-xs font-semibold text-text-main group-hover:text-accent transition-colors">
+                    {label}
+                  </span>
+                </div>
+                <span className="text-[10px] text-text-secondary/50 group-hover:text-accent transition-colors">→</span>
               </Link>
 
               {consoles.length === 0 ? (
-                <p className="text-[10px] text-text-secondary/40 pl-0.5">No games</p>
+                <p className="text-[10px] text-text-secondary/40">No games</p>
               ) : (
                 <div className="flex flex-wrap gap-1.5">
                   {consoles.map(({ id, name, icon }) => (
@@ -90,16 +93,16 @@ export default function MainPageConsoleNav() {
                       key={id}
                       href={`/${slug}/${id}`}
                       title={name}
-                      className="flex items-center gap-1 bg-bg-main rounded-md px-2 py-1 hover:bg-white/10 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                      className="flex items-center gap-1.5 bg-bg-card rounded-md px-2 py-1.5 hover:bg-white/10 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                     >
                       <Image
                         src={icon}
                         alt={name}
-                        width={14}
-                        height={14}
-                        className="object-contain opacity-60 group-hover:opacity-100 transition-opacity"
+                        width={16}
+                        height={16}
+                        className="object-contain shrink-0"
                       />
-                      <span className="text-[10px] text-text-secondary group-hover:text-text-main transition-colors">
+                      <span className="text-[10px] text-text-secondary group-hover:text-text-main transition-colors whitespace-nowrap">
                         {name}
                       </span>
                     </Link>
