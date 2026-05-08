@@ -78,7 +78,7 @@ export default function MainPageCharts() {
             <MainPageGroupsPlaceholder />
           </ChartCard>
 
-          {/* Row 2: [Active | Rarest | Abandoned] | [Perfect + Mastery stacked] */}
+          {/* Row 2: [Active | Rarest | Abandoned] | [col3: Perfect alone] */}
           <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
             <ChartCard>
               <MainPageTopGames achievements={achievements} isLoading={achLoading} />
@@ -93,27 +93,22 @@ export default function MainPageCharts() {
               />
             </ChartCard>
           </div>
-          <div className="flex flex-col gap-4">
-            <ChartCard className="flex-1">
-              <MainPagePerfectGames games={all} isLoading={gamesLoading} />
-            </ChartCard>
-            <ChartCard className="flex-1">
-              <MainPageMastery awards={awards} isLoading={awardsLoading} />
-            </ChartCard>
-          </div>
-
-          {/* Row 3: Console Nav (col1 row-span-2) | Almost (col2) | Pinned (col3 row-span-2) */}
-          <ChartCard className="lg:row-span-2">
-            <MainPageConsoleNav />
+          <ChartCard>
+            <MainPagePerfectGames games={all} isLoading={gamesLoading} />
           </ChartCard>
+
+          {/* Row 3: Almost There (col1) | Mastery (col2) | Pinned (col3 row-span-2) */}
           <ChartCard>
             <MainPageAlmostThere games={all} isLoading={gamesLoading} />
+          </ChartCard>
+          <ChartCard>
+            <MainPageMastery awards={awards} isLoading={awardsLoading} />
           </ChartCard>
           <ChartCard className="lg:row-span-2">
             <MainPageFavorites />
           </ChartCard>
 
-          {/* Row 4 col2: Best Performance */}
+          {/* Row 4: Best Performance (col1) | Console Nav (col2) | Pinned continues */}
           <ChartCard>
             <MainPageBestPeriod
               achievements={heatmapData}
@@ -121,6 +116,9 @@ export default function MainPageCharts() {
               isLoading={heatmapLoading}
               yearLoading={yearLoading}
             />
+          </ChartCard>
+          <ChartCard>
+            <MainPageConsoleNav />
           </ChartCard>
 
         </div>

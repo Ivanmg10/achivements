@@ -21,7 +21,7 @@ export default function MainPagePerfectGames({ games, isLoading }: { games: Retr
     }
 
     return {
-      perfects: Object.values(byId),
+      perfects: Object.values(byId).sort((a, b) => a.Title.localeCompare(b.Title)),
       hcCount: hcIds.size,
       scCount: scIds.size,
     }
