@@ -37,7 +37,13 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true)
     fetchWithRetry('/api/getGamesCompleted')
       .then((data) => {
-        if (Array.isArray(data)) setAll((data as RetroAchievementsGameCompleted[]).filter(isRealGame))
+        if (!Array.isArray(data)) {
+          const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
+          attemptRef.current++
+          retryTimer.current = setTimeout(doFetch, delay)
+          return
+        }
+        setAll((data as RetroAchievementsGameCompleted[]).filter(isRealGame))
         setIsLoading(false)
         attemptRef.current = 0
       })
