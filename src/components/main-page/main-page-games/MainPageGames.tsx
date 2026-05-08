@@ -3,6 +3,7 @@
 import { useRef, useMemo } from 'react'
 
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
+import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useResizableList } from '@/hooks/useResizableList'
 import { useLanguage } from '@/context/LanguageContext'
 import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
@@ -20,13 +21,27 @@ const FOOTER_PX = 0
 export default function MainPageGames() {
   const sectionRef = useRef<HTMLElement>(null)
   const { listGames, isLoading } = useGamesInProgressPreview()
-  const gamesKey = listGames.map((g) => g.GameID).join(',')
-  // shuffle at display level so context list stays stable (needed for abandoned tracking)
-  const shuffledGames = useMemo(
-    () => [...listGames].sort(() => Math.random() - 0.5),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [gamesKey]
-  )
+  const recentlyPlayed = useRecentlyPlayedGames()
+
+  const lastPlayedMap = useMemo(() => {
+    const map = new Map<number, string>()
+    for (const g of recentlyPlayed) map.set(g.GameID, g.LastPlayed)
+    return map
+  }, [recentlyPlayed])
+
+  const sortedGames = useMemo(() => {
+    return [...listGames].sort((a, b) => {
+      const aId = a.GameID ?? Number(a.ID)
+      const bId = b.GameID ?? Number(b.ID)
+      const aDate = lastPlayedMap.get(aId) ?? ''
+      const bDate = lastPlayedMap.get(bId) ?? ''
+      if (!aDate && !bDate) return 0
+      if (!aDate) return 1
+      if (!bDate) return -1
+      return new Date(bDate).getTime() - new Date(aDate).getTime()
+    })
+  }, [listGames, lastPlayedMap])
+
   const visibleCount = useResizableList({
     sectionRef,
     maxItems: MAX_GAMES,
@@ -51,8 +66,8 @@ export default function MainPageGames() {
             <GameCardSkeleton />
             <GameCardSkeleton />
           </div>
-        ) : shuffledGames.length > 0 ? (
-          <MainPageGamesList listGames={shuffledGames.slice(0, visibleCount)} />
+        ) : sortedGames.length > 0 ? (
+          <MainPageGamesList listGames={sortedGames.slice(0, visibleCount)} />
         ) : (
           <EmptyState icon="🎮" title={T.mainPage.noGamesInProgress} subtitle={T.mainPage.noGamesInProgressSub} className="py-8" />
         )}

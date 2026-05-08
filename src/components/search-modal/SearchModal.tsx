@@ -143,8 +143,25 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return []
-    return allGames.filter((g) => g.title.toLowerCase().includes(q)).slice(0, 8)
+    return allGames
+      .filter((g) => g.title.toLowerCase().includes(q))
+      .map((g) => {
+        const t = g.title.toLowerCase()
+        const score = t === q ? 3 : t.startsWith(q) ? 2 : t.split(/\s+/).some((w) => w.startsWith(q)) ? 1 : 0
+        return { g, score }
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 20)
+      .map(({ g }) => g)
   }, [query, allGames])
+
+  const directGameId = useMemo(() => {
+    const q = query.trim()
+    if (/^\d{3,}$/.test(q)) return parseInt(q)
+    const urlMatch = q.match(/retroachievements\.org\/game\/(\d+)/i)
+    if (urlMatch) return parseInt(urlMatch[1])
+    return null
+  }, [query])
 
   const handleSelect = useCallback(
     (id: number) => {
@@ -207,10 +224,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               {/* Results */}
               {query.trim() ? (
                 <div className="max-h-105 overflow-y-auto">
-                  {results.length === 0 ? (
-                    <p className="text-text-secondary text-sm text-center py-8">
-                      {T.search.noResults}
-                    </p>
+                  {results.length === 0 && !directGameId ? (
+                    <div className="flex flex-col items-center gap-2 py-8">
+                      <p className="text-text-secondary text-sm">{T.search.noResults}</p>
+                      <p className="text-text-secondary/50 text-xs">{T.search.libraryOnly}</p>
+                    </div>
                   ) : (
                     <motion.ul
                       initial="hidden"
@@ -247,6 +265,22 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                           </button>
                         </motion.li>
                       ))}
+                      {directGameId && !results.find((r) => r.id === directGameId) && (
+                        <motion.li variants={resultVariants}>
+                          <button
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer border-t border-white/5"
+                            onClick={() => handleSelect(directGameId)}
+                          >
+                            <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-text-secondary text-xs font-bold">
+                              #{directGameId}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-text-main">{T.search.openById}</p>
+                              <p className="text-xs text-text-secondary">Game ID {directGameId}</p>
+                            </div>
+                          </button>
+                        </motion.li>
+                      )}
                     </motion.ul>
                   )}
                 </div>

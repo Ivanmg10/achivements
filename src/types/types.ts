@@ -244,3 +244,26 @@ export type PopularGame = {
   NumAchievements: number
   Points: number
 }
+
+export type GameGroupItem = {
+  id: number
+  game_id: number
+  title: string
+  image_icon: string | null
+  console_name: string | null
+  pct_won: string
+  position: number
+}
+
+export type GameGroup = {
+  id: number
+  title: string
+  description: string | null
+  icon: string | null
+  is_public: boolean
+  position: number
+  created_at: string
+  updated_at: string
+  game_count: number
+  items?: GameGroupItem[]
+}

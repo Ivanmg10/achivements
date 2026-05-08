@@ -1,9 +1,14 @@
+'use client'
+
 import { useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { RetroAchievementsGameCompleted } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MainPagePerfectGames({ games, isLoading }: { games: RetroAchievementsGameCompleted[]; isLoading?: boolean }) {
+  const { T } = useLanguage()
+
   const { perfects, hcCount, scCount } = useMemo(() => {
     const hcIds = new Set<number>()
     const scIds = new Set<number>()
@@ -43,8 +48,8 @@ export default function MainPagePerfectGames({ games, isLoading }: { games: Retr
   if (perfects.length === 0) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Perfect games — 100%</p>
-        <div className="flex items-center justify-center py-8 text-text-secondary text-sm">No completed games yet</div>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mastered100}</p>
+        <div className="flex items-center justify-center py-8 text-text-secondary text-sm">{T.cards.noCompletedGames}</div>
       </div>
     )
   }
@@ -52,7 +57,7 @@ export default function MainPagePerfectGames({ games, isLoading }: { games: Retr
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Perfect games — 100%</p>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mastered100}</p>
         <div className="flex items-center gap-2 text-[10px]">
           <span className="text-yellow-400 font-semibold">{hcCount} HC</span>
           <span className="text-text-secondary/40">·</span>

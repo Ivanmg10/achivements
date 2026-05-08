@@ -1,9 +1,13 @@
+'use client'
+
 import { useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { RetroAchievementsGameCompleted } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MainPageAlmostThere({ games, isLoading }: { games: RetroAchievementsGameCompleted[]; isLoading?: boolean }) {
+  const { T } = useLanguage()
   const candidates = useMemo(() => {
     const best: Record<number, RetroAchievementsGameCompleted> = {}
     for (const g of games) {
@@ -38,15 +42,15 @@ export default function MainPageAlmostThere({ games, isLoading }: { games: Retro
   if (candidates.length === 0) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Almost there (75–99%)</p>
-        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">No games in progress</div>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.almostThere}</p>
+        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">{T.cards.noGamesInProgress}</div>
       </div>
     )
   }
 
   return (
     <div className="flex flex-col gap-3 flex-1">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Almost there (75–99%)</p>
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.almostThere}</p>
       <div className="flex flex-col gap-2 flex-1">
         {candidates.map((g) => {
           const pct = Math.round(parseFloat(g.PctWon) * 100)
@@ -75,7 +79,7 @@ export default function MainPageAlmostThere({ games, isLoading }: { games: Retro
                   <div className="flex-1 bg-bg-card rounded-full h-1 overflow-hidden">
                     <div className="h-full bg-accent transition-all" style={{ width: `${pct}%` }} />
                   </div>
-                  <span className="text-[9px] text-text-secondary shrink-0">{remaining} left</span>
+                  <span className="text-[9px] text-text-secondary shrink-0">{remaining} {T.cards.left}</span>
                 </div>
               </div>
             </Link>

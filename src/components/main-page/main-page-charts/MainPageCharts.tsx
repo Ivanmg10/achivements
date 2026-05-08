@@ -10,6 +10,7 @@ import { useUserRank } from '@/hooks/useUserRank'
 import { useUserAwards } from '@/hooks/useUserAwards'
 import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
 import { motion } from 'framer-motion'
+import { useLanguage } from '@/context/LanguageContext'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
 import MainPageHeatmap from './MainPageHeatmap'
@@ -23,7 +24,7 @@ import MainPagePerfectGames from './MainPagePerfectGames'
 import MainPageBestPeriod from './MainPageBestPeriod'
 import MainPageFavorites from '../main-page-favorites/MainPageFavorites'
 import MainPageConsoleNav from './MainPageConsoleNav'
-import MainPageGroupsPlaceholder from './MainPageGroupsPlaceholder'
+import MainPageGroups from './MainPageGroups'
 
 function ChartCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
@@ -40,6 +41,7 @@ function ChartCard({ children, className = '' }: { children: React.ReactNode; cl
 }
 
 export default function MainPageCharts() {
+  const { T } = useLanguage()
   const { data: session } = useSession()
   const { achievements, isLoading: achLoading } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading } = useActivityHeatmap()
@@ -50,8 +52,8 @@ export default function MainPageCharts() {
   const { achievements: yearAch, isLoading: yearLoading } = useActivityHeatmapYear()
 
   return (
-    <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-label="Stats & Activity">
-      <h2 className="text-xl font-semibold text-text-main">Stats & Activity</h2>
+    <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-label={T.cards.statsActivity}>
+      <h2 className="text-xl font-semibold text-text-main">{T.cards.statsActivity}</h2>
 
       <div className="flex flex-col gap-4">
         {/* Stats pills */}
@@ -69,13 +71,13 @@ export default function MainPageCharts() {
             <MainPageHeatmap achievements={heatmapData} isLoading={heatmapLoading} />
           </ChartCard>
           <ChartCard>
-            <p className="text-[10px] uppercase tracking-widest text-text-secondary">Daily achievements — last 7 days</p>
+            <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.dailyAchievements}</p>
             <div aria-hidden="true">
               <AchievementsLineChart achievements={achievements} isLoading={achLoading} />
             </div>
           </ChartCard>
           <ChartCard className="flex-1">
-            <MainPageGroupsPlaceholder />
+            <MainPageGroups />
           </ChartCard>
 
           {/* Row 2: [Active | Rarest | Abandoned] | [col3: Perfect alone] */}

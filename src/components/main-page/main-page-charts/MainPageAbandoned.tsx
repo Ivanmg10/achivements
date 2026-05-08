@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import { useLanguage } from '@/context/LanguageContext'
 
 const ABANDONED_DAYS = 30
 
@@ -15,6 +16,7 @@ export default function MainPageAbandoned({
   playing: RetroAchievementsGameCompleted[]
   isLoading?: boolean
 }) {
+  const { T } = useLanguage()
   const [lastAchDates, setLastAchDates] = useState<Record<number, string>>({})
   const [fetchedKey, setFetchedKey] = useState('')
   const attemptRef = useRef(0)
@@ -70,7 +72,7 @@ export default function MainPageAbandoned({
   return (
     <div className="flex flex-col gap-2">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">
-        Abandoned — {ABANDONED_DAYS}d+ idle
+        {T.cards.abandoned} — {ABANDONED_DAYS}{T.cards.abandonedIdle}
       </p>
 
       {loading ? (
@@ -90,7 +92,7 @@ export default function MainPageAbandoned({
         </div>
       ) : abandoned.length === 0 ? (
         <div className="flex items-center justify-center py-4 text-text-secondary text-sm">
-          No abandoned games
+          {T.cards.noAbandonedGames}
         </div>
       ) : (
         <div className="flex flex-col gap-2">

@@ -4,8 +4,10 @@ import { useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { RecentAchievement } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MainPageTopGames({ achievements, isLoading }: { achievements: RecentAchievement[]; isLoading?: boolean }) {
+  const { T } = useLanguage()
   const data = useMemo(() => {
     const cutoff = new Date()
     cutoff.setDate(cutoff.getDate() - 30)
@@ -48,15 +50,15 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
   if (data.length === 0) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Most active games — last 30 days</p>
-        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">No data</div>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mostActiveGames}</p>
+        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">{T.cards.noData}</div>
       </div>
     )
   }
 
   return (
     <div className="flex flex-col gap-2 flex-1">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Most active games — last 30 days</p>
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mostActiveGames}</p>
       <div className="flex flex-col gap-2 flex-1">
         {data.map(({ name, count, gameId, icon, console: con }) => (
           <Link
@@ -79,7 +81,7 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
             </div>
             <div className="flex flex-col items-end shrink-0">
               <span className="text-xs font-bold text-accent">{count}</span>
-              <span className="text-[9px] text-text-secondary">ach</span>
+              <span className="text-[9px] text-text-secondary">{T.lineChart.achievements}</span>
             </div>
           </Link>
         ))}

@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import { useAllGamesGlobal } from '@/hooks/useAllGamesGlobal'
 import { CONSOLES } from '@/constants'
 import { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
 
 const CONSOLE_MAP = new Map(CONSOLES.map((c) => [c.id, c]))
 
@@ -26,14 +27,15 @@ function uniqueConsoles(
   return result
 }
 
-const SECTIONS = [
-  { slug: 'playing',    label: 'Playing',     emoji: '🎮' },
-  { slug: 'wantToPlay', label: 'Want to play', emoji: '🔖' },
-  { slug: 'completed',  label: 'Completed',    emoji: '🏆' },
-] as const
+const SECTION_SLUGS = [
+  { slug: 'playing',    emoji: '🎮', key: 'playing'    as const },
+  { slug: 'wantToPlay', emoji: '🔖', key: 'wantToPlay' as const },
+  { slug: 'completed',  emoji: '🏆', key: 'completed'  as const },
+] satisfies { slug: string; emoji: string; key: 'playing' | 'wantToPlay' | 'completed' }[]
 
 export default function MainPageConsoleNav() {
   const { playing, wantToPlay, completed, loading } = useAllGamesGlobal()
+  const { T } = useLanguage()
 
   const bySection = useMemo(
     () => ({
@@ -64,10 +66,11 @@ export default function MainPageConsoleNav() {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Navigation</p>
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.navigation}</p>
       <div className="flex flex-col gap-2">
-        {SECTIONS.map(({ slug, label, emoji }) => {
-          const consoles = bySection[slug]
+        {SECTION_SLUGS.map(({ slug, emoji, key }) => {
+          const label = T.categories[key]
+          const consoles = bySection[key]
           return (
             <div key={slug} className="bg-bg-main rounded-lg p-3 flex flex-col gap-2.5">
               {/* Section title → links to /[slug] */}
@@ -85,7 +88,7 @@ export default function MainPageConsoleNav() {
               </Link>
 
               {consoles.length === 0 ? (
-                <p className="text-[10px] text-text-secondary/40">No games</p>
+                <p className="text-[10px] text-text-secondary/40">{T.cards.noGames}</p>
               ) : (
                 <div className="flex flex-wrap gap-1.5">
                   {consoles.map(({ id, name, icon }) => (

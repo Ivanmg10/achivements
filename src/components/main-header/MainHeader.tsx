@@ -7,8 +7,9 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
+import { useMainView } from '@/contexts/MainViewContext'
 import { calcStreak } from '@/utils/utils'
-import { IconHome, IconChevronLeft, IconSearch, IconFlame } from '@tabler/icons-react'
+import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconLayoutList, IconHistory } from '@tabler/icons-react'
 import SearchModal from '@/components/search-modal/SearchModal'
 
 function NavLink({ href, label, active }: { href: string; label: string; active: boolean }) {
@@ -40,6 +41,7 @@ export default function MainHeader() {
   const { data: session } = useSession()
   const { T } = useLanguage()
   const { achievements: recentAch } = useRecentAchievements()
+  const { view, setView } = useMainView()
   const router = useRouter()
   const pathname = usePathname()
   const [searchOpen, setSearchOpen] = useState(false)
@@ -55,12 +57,12 @@ export default function MainHeader() {
     { href: '/playing', label: T.mainPage.playing },
     { href: '/wantToPlay', label: T.mainPage.wantToPlay },
     { href: '/completed', label: T.mainPage.completed },
+    { href: '/groups', label: T.groups.title },
   ]
 
   return (
     <>
       <header className="flex flex-row items-center bg-bg-card text-text-main px-4 py-2 gap-3 h-16">
-
         {/* Left: home + back + nav */}
         <div className="flex items-center gap-1 flex-1">
           <Link
@@ -107,12 +109,32 @@ export default function MainHeader() {
           <button
             onClick={openSearch}
             aria-label="Search games"
-            className="w-64 bg-bg-main rounded-full px-4 py-2 text-sm text-text-secondary text-left hover:bg-bg-main/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 flex items-center gap-2 cursor-pointer ring-1 ring-white/5"
+            className="w-80 bg-bg-main rounded-full px-4 py-2.5 text-sm text-text-secondary text-left hover:bg-bg-main/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 flex items-center gap-2 cursor-pointer ring-1 ring-white/5"
           >
             <IconSearch className="w-4 h-4 shrink-0" aria-hidden />
             <span>{T.search.placeholder}</span>
           </button>
         </div>
+
+        {/* Home view toggle */}
+        {isHome && (
+          <div className="hidden md:flex items-center gap-0.5 bg-bg-main rounded-full p-1 ring-1 ring-white/10 shrink-0">
+            <button
+              onClick={() => setView('panels')}
+              aria-label="Show game panels"
+              className={`p-1.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${view === 'panels' ? 'bg-accent text-bg-main' : 'text-text-secondary hover:text-text-main'}`}
+            >
+              <IconLayoutList className="w-4 h-4" aria-hidden />
+            </button>
+            <button
+              onClick={() => setView('recent')}
+              aria-label="Show recently played"
+              className={`p-1.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${view === 'recent' ? 'bg-accent text-bg-main' : 'text-text-secondary hover:text-text-main'}`}
+            >
+              <IconHistory className="w-4 h-4" aria-hidden />
+            </button>
+          </div>
+        )}
 
         {/* Right: streak + user */}
         <div className="flex items-center gap-2 flex-1 justify-end">
@@ -154,7 +176,6 @@ export default function MainHeader() {
             </Link>
           )}
         </div>
-
       </header>
 
       <SearchModal isOpen={searchOpen} onClose={closeSearch} />

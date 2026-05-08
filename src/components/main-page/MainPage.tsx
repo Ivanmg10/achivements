@@ -12,9 +12,12 @@ import MainPageProgression from './main-page-progression/MainPageProgression'
 import MainPageWantToPlay from './main-page-want-to-play/MainPageWantToPlay'
 import MainPageNoRa from './main-page-no-ra/MainPageNoRa'
 import MainPageCharts from './main-page-charts/MainPageCharts'
+import RARecentlyPlayed from '@/components/ra-recently-played/RARecentlyPlayed'
+import { useMainView } from '@/contexts/MainViewContext'
 
 export default function MainPage() {
   const { status, data: session } = useSession()
+  const { view } = useMainView()
 
   if (status === 'loading')
     return <LoadingPage />
@@ -34,11 +37,19 @@ export default function MainPage() {
         <div className="lg:col-start-2 lg:row-start-1">
           <MainPageProfile />
         </div>
-        {/* Games below profile on mobile; placed col-1 on desktop */}
-        <div className="flex flex-col lg:grid lg:grid-rows-3 min-h-0 lg:col-start-1 lg:row-start-1">
-          <MainPageGames />
-          <MainPageWantToPlay />
-          <MainPageCompleted />
+        {/* Left column: either 3-panel block or recently played */}
+        <div className="flex flex-col min-h-0 lg:col-start-1 lg:row-start-1">
+          {view === 'panels' ? (
+            <div className="flex flex-col lg:grid lg:grid-rows-3 min-h-0 flex-1">
+              <MainPageGames />
+              <MainPageWantToPlay />
+              <MainPageCompleted />
+            </div>
+          ) : (
+            <div className="m-3 bg-bg-card rounded-xl p-4 flex flex-col flex-1 min-h-0">
+              <RARecentlyPlayed />
+            </div>
+          )}
         </div>
       </div>
 

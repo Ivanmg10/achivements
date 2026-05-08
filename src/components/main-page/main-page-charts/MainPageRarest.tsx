@@ -1,9 +1,13 @@
+'use client'
+
 import { useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { RecentAchievement } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MainPageRarest({ achievements, isLoading }: { achievements: RecentAchievement[]; isLoading?: boolean }) {
+  const { T } = useLanguage()
   const withRarity = useMemo(() =>
     achievements
       .filter((a) => a.TrueRatio !== undefined && a.TrueRatio > a.Points)
@@ -33,14 +37,14 @@ export default function MainPageRarest({ achievements, isLoading }: { achievemen
   if (withRarity.length === 0) {
     return (
       <div className="flex items-center justify-center h-full text-text-secondary text-sm">
-        No rarity data
+        {T.cards.noRarityData}
       </div>
     )
   }
 
   return (
     <div className="flex flex-col gap-2 flex-1">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Rarest recent unlocks</p>
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.rarestUnlocks}</p>
       <div className="flex flex-col gap-2 flex-1">
         {withRarity.map((a) => (
           <Link
@@ -61,7 +65,7 @@ export default function MainPageRarest({ achievements, isLoading }: { achievemen
             </div>
             <div className="flex flex-col items-end shrink-0">
               <span className="text-xs font-bold text-yellow-400">{a.TrueRatio}</span>
-              <span className="text-[9px] text-text-secondary">true ratio</span>
+              <span className="text-[9px] text-text-secondary">{T.cards.trueRatio}</span>
             </div>
           </Link>
         ))}
