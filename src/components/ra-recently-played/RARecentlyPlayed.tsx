@@ -321,13 +321,17 @@ export default function RARecentlyPlayed() {
                       onClick={(e) => e.stopPropagation()}
                       className="shrink-0 focus-visible:outline-none"
                     >
-                      <Image
-                        src={`https://retroachievements.org${g.ImageIcon}`}
-                        alt={g.Title}
-                        width={56}
-                        height={56}
-                        className="rounded-xl object-cover w-14 h-14"
-                      />
+                      {g.ImageIcon ? (
+                        <Image
+                          src={`https://retroachievements.org${g.ImageIcon}`}
+                          alt={g.Title}
+                          width={56}
+                          height={56}
+                          className="rounded-xl object-cover w-14 h-14"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-xl bg-white/10 shrink-0" />
+                      )}
                     </Link>
 
                     <div className="flex flex-col min-w-0 flex-1 gap-1">
