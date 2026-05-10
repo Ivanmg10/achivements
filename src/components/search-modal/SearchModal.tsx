@@ -241,14 +241,18 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                             className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer"
                             onClick={() => handleSelect(game.id)}
                           >
-                            <Image
-                              src={`https://retroachievements.org${game.icon}`}
-                              alt={game.title}
-                              width={32}
-                              height={32}
-                              className="w-8 h-8 rounded object-cover shrink-0"
-                              unoptimized
-                            />
+                            {game.icon ? (
+                              <Image
+                                src={`https://retroachievements.org${game.icon}`}
+                                alt={game.title}
+                                width={32}
+                                height={32}
+                                className="w-8 h-8 rounded object-cover shrink-0"
+                                unoptimized
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded bg-white/10 shrink-0" />
+                            )}
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-text-main truncate">
                                 {game.title}

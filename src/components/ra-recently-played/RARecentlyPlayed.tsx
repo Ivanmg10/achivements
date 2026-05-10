@@ -115,14 +115,18 @@ function AchievementGrid({
                 isHardcore ? 'ring-2 ring-yellow-400' : isSoftcore ? 'ring-2 ring-blue-400' : ''
               }`}
             >
-              <Image
-                src={`https://media.retroachievements.org/Badge/${a.BadgeName}.png`}
-                alt={a.Title}
-                width={40}
-                height={40}
-                className={`w-10 h-10 object-cover ${earned ? '' : 'grayscale opacity-35'}`}
-                unoptimized
-              />
+              {a.BadgeName ? (
+                <Image
+                  src={`https://media.retroachievements.org/Badge/${a.BadgeName}.png`}
+                  alt={a.Title}
+                  width={40}
+                  height={40}
+                  className={`w-10 h-10 object-cover ${earned ? '' : 'grayscale opacity-35'}`}
+                  unoptimized
+                />
+              ) : (
+                <div className={`w-10 h-10 rounded-lg bg-white/10 ${earned ? '' : 'opacity-35'}`} />
+              )}
             </div>
           )
         })}

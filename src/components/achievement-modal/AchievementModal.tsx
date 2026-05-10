@@ -258,13 +258,17 @@ export default function AchievementModal({
                         {detail.unlocks.Unlocks.map((u, i) => (
                           <div key={i} className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-2">
-                              <Image
-                                src={`https://media.retroachievements.org/UserPic/${u.User}.png`}
-                                alt={u.User}
-                                width={28}
-                                height={28}
-                                className="w-7 h-7 rounded-full object-cover"
-                              />
+                              {u.User ? (
+                                <Image
+                                  src={`https://media.retroachievements.org/UserPic/${u.User}.png`}
+                                  alt={u.User}
+                                  width={28}
+                                  height={28}
+                                  className="w-7 h-7 rounded-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-7 h-7 rounded-full bg-white/10 shrink-0" />
+                              )}
                               <p className="text-sm">{u.User}</p>
                               {u.HardcoreMode === '1' && (
                                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-900/60 text-yellow-300">HC</span>
@@ -314,13 +318,17 @@ export default function AchievementModal({
                     <div className="flex flex-col gap-4">
                       {pageComments.map((c, i) => (
                         <div key={i} className="flex gap-3">
-                          <Image
-                            src={`https://media.retroachievements.org/UserPic/${c.User}.png`}
-                            alt={c.User}
-                            width={32}
-                            height={32}
-                            className="w-8 h-8 rounded-full object-cover shrink-0"
-                          />
+                          {c.User ? (
+                            <Image
+                              src={`https://media.retroachievements.org/UserPic/${c.User}.png`}
+                              alt={c.User}
+                              width={32}
+                              height={32}
+                              className="w-8 h-8 rounded-full object-cover shrink-0"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-white/10 shrink-0" />
+                          )}
                           <div className="flex flex-col gap-0.5 flex-1 min-w-0">
                             <div className="flex items-baseline gap-2">
                               <p className="text-sm font-medium">{c.User}</p>
