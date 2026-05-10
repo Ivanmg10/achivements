@@ -11,6 +11,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import AchievementModal from '../achievement-modal/AchievementModal'
 import { CONSOLES } from '@/constants'
 import { relativeTime } from '@/utils/utils'
+import { DualProgressBar } from '@/components/ui/DualProgressBar'
 
 function getGameId(g: CategoryGame): number | string {
   return g.ID ?? g.GameID!
@@ -296,12 +297,12 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
           </p>
           {pct !== null && (
             <div className="flex items-center gap-2 mt-1">
-              <div className="w-40 h-1.5 bg-bg-main rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${isComplete ? 'bg-green-500' : 'bg-blue-500'}`}
-                  style={{ width: `${Math.min(pct, 100)}%` }}
-                />
-              </div>
+              <DualProgressBar
+                softcorePct={isHardcore ? 0 : Math.min(pct, 100)}
+                hardcorePct={isHardcore ? Math.min(pct, 100) : 0}
+                trackClass="bg-bg-main"
+                className="w-40"
+              />
               <span className="text-xs text-text-secondary/60 tabular-nums">{Math.round(pct)}%</span>
             </div>
           )}

@@ -1,12 +1,16 @@
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
+import { DualProgressBar } from '@/components/ui/DualProgressBar'
 
 export default function MainPageProgressionCard({
   game,
 }: {
   game: RetroAchievementsGameWithAchievements
 }) {
+  const scPct = parseFloat(game.UserCompletion ?? '0') || 0
+  const hcPct = parseFloat(game.UserCompletionHardcore ?? '0') || 0
+
   return (
     <Link
       className="flex flex-col items-center justify-center gap-5 p-5 bg-bg-main rounded-xl w-[98%] m-2 border-2 border-bg-main cursor-pointer min-h-1/3 hover:scale-[1.01] transition-transform duration-200"
@@ -23,22 +27,18 @@ export default function MainPageProgressionCard({
             className="w-20 h-20"
           />
         )}
-        <div className="w-full">
+        <div className="w-full flex flex-col gap-2">
           <div>
             <p className="text-xl">{game?.GameTitle ? game?.GameTitle : game?.Title}</p>
             <p className="text-lg">{game?.ConsoleName}</p>
           </div>
-
-          <div className="flex gap-3">
-            <p className="">{game?.UserCompletion}</p>
-            <div className="w-[90%] m-auto mt-2 h-3 border bg- border-white rounded-full bg-transparent overflow-hidden">
-              <div
-                className="h-full bg-white"
-                style={{ width: game?.UserCompletion ?? undefined }}
-              />
-            </div>
-            <p>100%</p>
+          <div className="flex items-center gap-2">
+            <span className="text-sm">{game?.UserCompletion ?? '0%'}</span>
+            {hcPct > 0 && (
+              <span className="text-xs text-yellow-400">{game?.UserCompletionHardcore} HC</span>
+            )}
           </div>
+          <DualProgressBar softcorePct={scPct} hardcorePct={hcPct} trackClass="bg-bg-card" height="h-3" />
         </div>
       </div>
     </Link>
