@@ -10,7 +10,7 @@ const MainViewContext = createContext<{
 } | null>(null)
 
 export function MainViewProvider({ children }: { children: React.ReactNode }) {
-  const [view, setView] = useState<MainView>('panels')
+  const [view, setView] = useState<MainView>('recent')
   return (
     <MainViewContext.Provider value={{ view, setView }}>
       {children}

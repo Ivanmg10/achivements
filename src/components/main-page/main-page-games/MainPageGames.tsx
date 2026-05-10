@@ -6,7 +6,9 @@ import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useResizableList } from '@/hooks/useResizableList'
 import { useLanguage } from '@/context/LanguageContext'
+import { useMainView } from '@/contexts/MainViewContext'
 import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
+import { IconHistory } from '@tabler/icons-react'
 
 import Link from 'next/link'
 import MainPageGamesList from './main-page-games-list/MainPageGamesList'
@@ -50,6 +52,7 @@ export default function MainPageGames() {
     footerPx: FOOTER_PX,
   })
   const { T } = useLanguage()
+  const { setView } = useMainView()
 
   return (
     <section
@@ -58,7 +61,16 @@ export default function MainPageGames() {
     >
       <div className="flex items-center justify-between gap-2 w-[95%] self-center mt-2 pt-2 pb-3 shrink-0">
         <Link href="/playing" className="text-3xl shrink-0 hover:underline underline-offset-2 decoration-white/40">{T.mainPage.playing}</Link>
-        <ConsoleSideList slug="playing" />
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setView('recent')}
+            aria-label="Ver jugados recientemente"
+            className="p-1.5 rounded-lg text-text-secondary hover:text-text-main hover:bg-white/8 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          >
+            <IconHistory className="w-4 h-4" aria-hidden />
+          </button>
+          <ConsoleSideList slug="playing" />
+        </div>
       </div>
       <div className="flex flex-col items-center w-full flex-1 overflow-hidden">
         {isLoading ? (

@@ -10,10 +10,12 @@ import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievementsGameWithAchievements, RetroAchievement } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { relativeTime } from '@/utils/utils'
-import { IconChevronLeft } from '@tabler/icons-react'
+import { IconChevronLeft, IconLayoutList } from '@tabler/icons-react'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
+import { DualProgressBar } from '@/components/ui/DualProgressBar'
+import { useMainView } from '@/contexts/MainViewContext'
 
-const MAX_GAMES = 8
+const MAX_GAMES = 7
 const GAP_PX = 6 // gap-1.5
 const BADGE_PX = 44 // w-10 (40) + gap-1 (4)
 const CARD_PADDING_X = 24 // px-3 * 2
@@ -22,7 +24,7 @@ const CONSOLE_BY_NAME = new Map(CONSOLES.map((c) => [c.name, c.icon]))
 
 function pct(achieved: number, total: number) {
   if (!total) return 0
-  return Math.round((achieved / total) * 100)
+  return (achieved / total) * 100
 }
 
 // ─── Achievement grid ─────────────────────────────────────────────────────────
@@ -171,6 +173,7 @@ function AchievementGrid({
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function RARecentlyPlayed() {
   const { T } = useLanguage()
+  const { setView } = useMainView()
   const games = useRecentlyPlayedGames()
   const recent = games.slice(0, MAX_GAMES)
 
@@ -262,9 +265,14 @@ export default function RARecentlyPlayed() {
             </motion.button>
           )}
         </AnimatePresence>
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">
-          {T.cards.recentlyPlayed}
-        </p>
+        <p className="text-2xl font-bold flex-1">{T.cards.recentlyPlayed}</p>
+        <button
+          onClick={() => setView('panels')}
+          aria-label="Ver estoy jugando"
+          className="p-1.5 rounded-lg text-text-secondary hover:text-text-main hover:bg-white/8 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        >
+          <IconLayoutList className="w-4 h-4" aria-hidden />
+        </button>
       </div>
 
       {/* Cards */}
@@ -277,10 +285,6 @@ export default function RARecentlyPlayed() {
           <AnimatePresence mode="popLayout">
             {displayedGames.map((g) => {
               const isExp = expanded === g.GameID
-              const progress = pct(
-                g.NumAchievedHardcore || g.NumAchieved,
-                g.NumPossibleAchievements
-              )
               const consoleIcon = CONSOLE_BY_NAME.get(g.ConsoleName)
               const data = gameDataMap.get(g.GameID)
               const achievements = data
@@ -355,12 +359,11 @@ export default function RARecentlyPlayed() {
                           </span>
                         </div>
                         {g.NumPossibleAchievements > 0 && (
-                          <div className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-accent transition-[width] duration-500"
-                              style={{ width: `${progress}%` }}
-                            />
-                          </div>
+                          <DualProgressBar
+                            softcorePct={pct(g.NumAchieved, g.NumPossibleAchievements)}
+                            hardcorePct={pct(g.NumAchievedHardcore, g.NumPossibleAchievements)}
+                            className="flex-1"
+                          />
                         )}
                         <motion.span
                           animate={{ rotate: isExp ? 180 : 0 }}

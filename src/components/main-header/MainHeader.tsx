@@ -7,9 +7,8 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
-import { useMainView } from '@/contexts/MainViewContext'
 import { calcStreak } from '@/utils/utils'
-import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconLayoutList, IconHistory } from '@tabler/icons-react'
+import { IconHome, IconChevronLeft, IconSearch, IconFlame } from '@tabler/icons-react'
 import SearchModal from '@/components/search-modal/SearchModal'
 
 function NavLink({ href, label, active }: { href: string; label: string; active: boolean }) {
@@ -41,7 +40,6 @@ export default function MainHeader() {
   const { data: session } = useSession()
   const { T } = useLanguage()
   const { achievements: recentAch } = useRecentAchievements()
-  const { view, setView } = useMainView()
   const router = useRouter()
   const pathname = usePathname()
   const [searchOpen, setSearchOpen] = useState(false)
@@ -116,25 +114,6 @@ export default function MainHeader() {
           </button>
         </div>
 
-        {/* Home view toggle */}
-        {isHome && (
-          <div className="hidden md:flex items-center gap-0.5 bg-bg-main rounded-full p-1 ring-1 ring-white/10 shrink-0">
-            <button
-              onClick={() => setView('panels')}
-              aria-label="Show game panels"
-              className={`p-1.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${view === 'panels' ? 'bg-accent text-bg-main' : 'text-text-secondary hover:text-text-main'}`}
-            >
-              <IconLayoutList className="w-4 h-4" aria-hidden />
-            </button>
-            <button
-              onClick={() => setView('recent')}
-              aria-label="Show recently played"
-              className={`p-1.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${view === 'recent' ? 'bg-accent text-bg-main' : 'text-text-secondary hover:text-text-main'}`}
-            >
-              <IconHistory className="w-4 h-4" aria-hidden />
-            </button>
-          </div>
-        )}
 
         {/* Right: streak + user */}
         <div className="flex items-center gap-2 flex-1 justify-end">
