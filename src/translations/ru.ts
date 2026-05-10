@@ -58,6 +58,9 @@ export const ru: Translations = {
     noResults: 'Страны не найдены',
     favoriteGame: 'Любимая игра',
     favoriteGameSoon: 'Поиск будет доступен скоро',
+    favoriteGameSearch: 'Поиск игр…',
+    favoriteGameRemove: 'Убрать',
+    favoriteGameChange: 'Изменить',
     changePassword: 'Изменить пароль',
   },
   userTheme: {

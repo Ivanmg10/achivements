@@ -58,6 +58,9 @@ export const es: Translations = {
     noResults: 'No se encontraron países',
     favoriteGame: 'Juego favorito',
     favoriteGameSoon: 'Búsqueda disponible próximamente',
+    favoriteGameSearch: 'Busca entre tus juegos…',
+    favoriteGameRemove: 'Quitar',
+    favoriteGameChange: 'Cambiar',
     changePassword: 'Cambiar contraseña',
   },
   userTheme: {

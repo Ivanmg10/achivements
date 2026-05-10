@@ -56,6 +56,9 @@ export const en = {
     noResults: 'No countries found',
     favoriteGame: 'Favourite game',
     favoriteGameSoon: 'Search integration coming soon',
+    favoriteGameSearch: 'Search your games…',
+    favoriteGameRemove: 'Remove',
+    favoriteGameChange: 'Change',
     changePassword: 'Change password',
   },
   userTheme: {

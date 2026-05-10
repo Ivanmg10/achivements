@@ -407,7 +407,7 @@ export default function RARecentlyPlayed() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.3, delay: 0.18 }}
-                      className="flex-1 overflow-y-auto px-3 pb-3 min-h-0"
+                      className="flex-1 overflow-y-auto px-3 pb-3 pt-3 min-h-0"
                     >
                       <AchievementGrid
                         achievements={loadingId === g.GameID ? [] : achievements}

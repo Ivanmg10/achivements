@@ -58,6 +58,9 @@ export const ja: Translations = {
     noResults: '国が見つかりません',
     favoriteGame: 'お気に入りゲーム',
     favoriteGameSoon: '検索機能は近日対応予定',
+    favoriteGameSearch: 'ゲームを検索…',
+    favoriteGameRemove: '削除',
+    favoriteGameChange: '変更',
     changePassword: 'パスワード変更',
   },
   userTheme: {
