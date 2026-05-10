@@ -1,5 +1,8 @@
+'use client'
+
 import { useMemo } from 'react'
 import { RecentAchievement } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
 
 function getBestWeek(achievements: RecentAchievement[]) {
   const byWeek: Record<string, { pts: number; ach: number }> = {}
@@ -49,6 +52,8 @@ export default function MainPageBestPeriod({
   isLoading?: boolean
   yearLoading?: boolean
 }) {
+  const { T } = useLanguage()
+
   const { bestWeek, bestMonth, bestYear } = useMemo(() => ({
     bestWeek: getBestWeek(achievements),
     bestMonth: getBestMonth(achievements),
@@ -56,50 +61,50 @@ export default function MainPageBestPeriod({
   }), [achievements, yearAchievements])
 
   return (
-    <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Best performance</p>
+    <div className="flex flex-col gap-3 flex-1">
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestPerformance}</p>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">Loading...</div>
+        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">{T.cards.loading}</div>
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col flex-1 justify-between gap-2">
           {bestWeek ? (
             <div className="bg-bg-main rounded-lg p-2.5 flex flex-col gap-0.5">
-              <span className="text-[10px] uppercase tracking-widest text-text-secondary">Best week</span>
+              <span className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestWeek}</span>
               <span className="text-lg font-bold text-yellow-400">{bestWeek[1].pts.toLocaleString()} pts</span>
               <span className="text-xs text-text-secondary">
-                {bestWeek[1].ach} achievements · week of {bestWeek[0]}
+                {bestWeek[1].ach} {T.lineChart.achievements} · {T.cards.weekOf.replace('{date}', bestWeek[0])}
               </span>
             </div>
           ) : (
-            <div className="bg-bg-main rounded-lg p-2.5 text-xs text-text-secondary">No data</div>
+            <div className="bg-bg-main rounded-lg p-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
 
           {bestMonth ? (
             <div className="bg-bg-main rounded-lg p-2.5 flex flex-col gap-0.5">
-              <span className="text-[10px] uppercase tracking-widest text-text-secondary">Best month</span>
+              <span className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestMonth}</span>
               <span className="text-lg font-bold text-accent">{bestMonth[1].pts.toLocaleString()} pts</span>
               <span className="text-xs text-text-secondary">
-                {bestMonth[1].ach} achievements · {bestMonth[0]}
+                {bestMonth[1].ach} {T.lineChart.achievements} · {bestMonth[0]}
               </span>
             </div>
           ) : (
-            <div className="bg-bg-main rounded-lg p-2.5 text-xs text-text-secondary">No data</div>
+            <div className="bg-bg-main rounded-lg p-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
 
           <div className="bg-bg-main rounded-lg p-2.5 flex flex-col gap-0.5">
-            <span className="text-[10px] uppercase tracking-widest text-text-secondary">Best year</span>
+            <span className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestYear}</span>
             {yearLoading ? (
-              <span className="text-xs text-text-secondary">Loading...</span>
+              <span className="text-xs text-text-secondary">{T.cards.loading}</span>
             ) : bestYear ? (
               <>
                 <span className="text-lg font-bold text-green-400">{bestYear[1].pts.toLocaleString()} pts</span>
                 <span className="text-xs text-text-secondary">
-                  {bestYear[1].ach} achievements · {bestYear[0]}
+                  {bestYear[1].ach} {T.lineChart.achievements} · {bestYear[0]}
                 </span>
               </>
             ) : (
-              <span className="text-xs text-text-secondary">No data</span>
+              <span className="text-xs text-text-secondary">{T.cards.noData}</span>
             )}
           </div>
         </div>

@@ -22,7 +22,7 @@ export default async function MainLayout({
       <div className="min-h-screen flex flex-col">
         <MainHeader />
         <RaUserRefresher />
-        {children}
+        <main className="flex-1">{children}</main>
         <MainFooter />
       </div>
     </MainProviders>

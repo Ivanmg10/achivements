@@ -9,16 +9,16 @@ import { WantToPlayGame, RetroAchievementsGameCompleted } from '@/types/types'
 const DUMMY_PLAYING: WantToPlayGame[] = [
   { ID: 1, Title: 'Super Mario 64', GameTitle: 'Super Mario 64', ImageIcon: '', ConsoleID: 2, ConsoleName: 'Nintendo 64', PointsTotal: 400, AchievementsPublished: 80 },
   { ID: 2, Title: 'Pokémon FireRed', GameTitle: 'Pokémon FireRed', ImageIcon: '', ConsoleID: 5, ConsoleName: 'Game Boy Advance', PointsTotal: 500, AchievementsPublished: 100 },
-  { ID: 3, Title: 'Crash Bandicoot 2', GameTitle: 'Crash Bandicoot 2', ImageIcon: '', ConsoleID: 12, ConsoleName: 'PS1', PointsTotal: 300, AchievementsPublished: 60 },
+  { ID: 3, Title: 'Crash Bandicoot 2', GameTitle: 'Crash Bandicoot 2', ImageIcon: '', ConsoleID: 12, ConsoleName: 'PlayStation', PointsTotal: 300, AchievementsPublished: 60 },
 ]
 
 const DUMMY_WANT: WantToPlayGame[] = [
-  { ID: 4, Title: 'Kingdom Hearts', GameTitle: 'Kingdom Hearts', ImageIcon: '', ConsoleID: 21, ConsoleName: 'PS2', PointsTotal: 800, AchievementsPublished: 160 },
+  { ID: 4, Title: 'Kingdom Hearts', GameTitle: 'Kingdom Hearts', ImageIcon: '', ConsoleID: 21, ConsoleName: 'PlayStation 2', PointsTotal: 800, AchievementsPublished: 160 },
   { ID: 5, Title: 'Metroid Fusion', GameTitle: 'Metroid Fusion', ImageIcon: '', ConsoleID: 5, ConsoleName: 'Game Boy Advance', PointsTotal: 250, AchievementsPublished: 50 },
 ]
 
 const DUMMY_COMPLETED: RetroAchievementsGameCompleted[] = [
-  { GameID: 6, Title: 'Spyro the Dragon', GameTitle: 'Spyro the Dragon', ImageIcon: '', ConsoleID: 12, ConsoleName: 'PS1', MaxPossible: 56, NumAwarded: 56, PctWon: '1.0000', HardcoreMode: '1' },
+  { GameID: 6, Title: 'Spyro the Dragon', GameTitle: 'Spyro the Dragon', ImageIcon: '', ConsoleID: 12, ConsoleName: 'PlayStation', MaxPossible: 56, NumAwarded: 56, PctWon: '1.0000', HardcoreMode: '1' },
   { GameID: 7, Title: 'Wario Land 4', GameTitle: 'Wario Land 4', ImageIcon: '', ConsoleID: 5, ConsoleName: 'Game Boy Advance', MaxPossible: 40, NumAwarded: 40, PctWon: '1.0000', HardcoreMode: '0' },
 ]
 

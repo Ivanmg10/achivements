@@ -55,12 +55,12 @@ export default function MainHeader() {
     { href: '/playing', label: T.mainPage.playing },
     { href: '/wantToPlay', label: T.mainPage.wantToPlay },
     { href: '/completed', label: T.mainPage.completed },
+    { href: '/groups', label: T.groups.title },
   ]
 
   return (
     <>
       <header className="flex flex-row items-center bg-bg-card text-text-main px-4 py-2 gap-3 h-16">
-
         {/* Left: home + back + nav */}
         <div className="flex items-center gap-1 flex-1">
           <Link
@@ -107,12 +107,13 @@ export default function MainHeader() {
           <button
             onClick={openSearch}
             aria-label="Search games"
-            className="w-64 bg-bg-main rounded-full px-4 py-2 text-sm text-text-secondary text-left hover:bg-bg-main/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 flex items-center gap-2 cursor-pointer ring-1 ring-white/5"
+            className="w-80 bg-bg-main rounded-full px-4 py-2.5 text-sm text-text-secondary text-left hover:bg-bg-main/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 flex items-center gap-2 cursor-pointer ring-1 ring-white/5"
           >
             <IconSearch className="w-4 h-4 shrink-0" aria-hidden />
             <span>{T.search.placeholder}</span>
           </button>
         </div>
+
 
         {/* Right: streak + user */}
         <div className="flex items-center gap-2 flex-1 justify-end">
@@ -154,7 +155,6 @@ export default function MainHeader() {
             </Link>
           )}
         </div>
-
       </header>
 
       <SearchModal isOpen={searchOpen} onClose={closeSearch} />

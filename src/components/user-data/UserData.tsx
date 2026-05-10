@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { IconPencil, IconLock, IconLogout } from '@tabler/icons-react'
 import { signOut, useSession } from 'next-auth/react'
 import RaLoginModal from '../ra-login-modal/RaLoginModal'
+import FavoriteGameModal from './FavoriteGameModal'
 import EditProfileModal, { EditProfileField } from '../edit-profile-modal/EditProfileModal'
 import LanguageModal from '../language-modal/LanguageModal'
 import LocationModal from '../location-modal/LocationModal'
@@ -67,6 +68,7 @@ export default function UserData({ session }: { session: Session | null }) {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false)
   const [themeModalOpen, setThemeModalOpen] = useState(false)
   const [editModal, setEditModal] = useState<{ field: EditProfileField; value: string } | null>(null)
+  const [favModalOpen, setFavModalOpen] = useState(false)
   const { update } = useSession()
   const { lang, T } = useLanguage()
   const { theme } = useTheme()
@@ -80,6 +82,19 @@ export default function UserData({ session }: { session: Session | null }) {
 
   const openEdit = (field: EditProfileField, value: string) =>
     setEditModal({ field, value })
+
+  const handleSaveFavorite = async (game: { id: number; title: string; imageIcon: string } | null) => {
+    if (game) {
+      await fetch('/api/updateFavoriteGame', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(game),
+      })
+    } else {
+      await fetch('/api/updateFavoriteGame', { method: 'DELETE' })
+    }
+    await update({ favorite_game: game })
+  }
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-3 gap-5 pt-3 pb-3 w-[95%]">
@@ -206,11 +221,37 @@ export default function UserData({ session }: { session: Session | null }) {
             </div>
           </button>
 
-          {/* Favourite game — coming soon */}
-          <div className="flex flex-col gap-0.5">
+          {/* Favourite game — picker */}
+          <button
+            className="flex flex-col gap-0.5 cursor-pointer group text-left"
+            onClick={() => setFavModalOpen(true)}
+            aria-label={T.userData.favoriteGame}
+          >
             <span className="text-xs text-text-secondary">{T.userData.favoriteGame}</span>
-            <span className="text-sm text-text-secondary italic">{T.userData.favoriteGameSoon}</span>
-          </div>
+            {session?.user?.favorite_game ? (
+              <div className="flex items-center gap-1.5">
+                {session.user.favorite_game.imageIcon && (
+                  <Image
+                    src={`https://retroachievements.org${session.user.favorite_game.imageIcon}`}
+                    alt={session.user.favorite_game.title}
+                    width={20}
+                    height={20}
+                    className="w-5 h-5 rounded object-cover shrink-0"
+                    unoptimized
+                  />
+                )}
+                <span className="text-sm font-medium truncate max-w-30">
+                  {session.user.favorite_game.title}
+                </span>
+                <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-text-secondary italic">{T.userData.favoriteGameChange}</span>
+                <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+              </div>
+            )}
+          </button>
         </div>
 
         {/* App stats */}
@@ -313,6 +354,12 @@ export default function UserData({ session }: { session: Session | null }) {
         </div>
       </article>
 
+      <FavoriteGameModal
+        isOpen={favModalOpen}
+        current={session?.user?.favorite_game ?? null}
+        onClose={() => setFavModalOpen(false)}
+        onSave={handleSaveFavorite}
+      />
       <ChangePasswordModal isOpen={passwordModalOpen} onClose={() => setPasswordModalOpen(false)} />
       <ThemeModal isOpen={themeModalOpen} onClose={() => setThemeModalOpen(false)} />
       <RaLoginModal isOpen={raModalOpen} setIsOpen={setRaModalOpen} />

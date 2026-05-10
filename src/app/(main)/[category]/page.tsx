@@ -1,10 +1,11 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { useGamesByCategory } from '../../../hooks/useGamesByCategory'
 import { useGameExtraData } from '../../../hooks/useGameExtraData'
-import { RetroAchievementsGameCompleted } from '@/types/types'
+import { useConsoleFilter } from '../../../hooks/useConsoleFilter'
+import { useGameFiltering } from '../../../hooks/useGameFiltering'
 import StatusGameList from '../../../components/statusGameList/StatusGameList'
 import StatusPageHeader from '../../../components/status-page-header/StatusPageHeader'
 import CompletedFilter, {
@@ -16,6 +17,7 @@ import LoadingPage from '../../../components/loading-page/LoadingPage'
 import { useLanguage } from '@/context/LanguageContext'
 import { motion } from 'framer-motion'
 import { fadeUp } from '@/lib/animations'
+import { useMemo } from 'react'
 
 export default function CategoryPage() {
   const { category } = useParams()
@@ -23,59 +25,17 @@ export default function CategoryPage() {
   const extraData = useGameExtraData()
   const { T } = useLanguage()
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
-  const [selected, setSelected] = useState<Set<number>>(new Set())
+  const { selected, toggle, clear } = useConsoleFilter()
 
   const EMPTY_STATE: Record<string, { icon: string; title: string; sub: string }> = {
-    wantToPlay: {
-      icon: '🔖',
-      title: T.categoryPage.noWantToPlay,
-      sub: T.categoryPage.noWantToPlaySub,
-    },
+    wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay, sub: T.categoryPage.noWantToPlaySub },
     playing: { icon: '🎮', title: T.categoryPage.noPlaying, sub: T.categoryPage.noPlayingSub },
-    completed: {
-      icon: '🏆',
-      title: T.categoryPage.noCompleted,
-      sub: T.categoryPage.noCompletedSub,
-    },
+    completed: { icon: '🏆', title: T.categoryPage.noCompleted, sub: T.categoryPage.noCompletedSub },
   }
 
   const cat = category as string
-
   const consolePills = useMemo(() => buildConsolePills(games), [games])
-
-  function toggleConsole(id: number) {
-    setSelected((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
-  }
-
-  const visibleGames = useMemo(() => {
-    let list = games
-    if (selected.size > 0) list = list.filter((g) => selected.has(g.ConsoleID))
-    if (cat === 'completed' && completedMode !== 'all') {
-      list = list.filter((g) => {
-        const hc = Number((g as RetroAchievementsGameCompleted).HardcoreMode)
-        return completedMode === 'hardcore' ? hc === 1 : hc === 0
-      })
-    }
-    if (cat === 'playing' || cat === 'completed') {
-      list = [...list].sort((a, b) => {
-        const aId = a.GameID ?? (a.ID as number)
-        const bId = b.GameID ?? (b.ID as number)
-        const aExtra = extraData.get(aId)
-        const bExtra = extraData.get(bId)
-        const aDate = cat === 'playing' ? aExtra?.lastPlayed : aExtra?.awards?.[0]?.AwardedAt
-        const bDate = cat === 'playing' ? bExtra?.lastPlayed : bExtra?.awards?.[0]?.AwardedAt
-        if (!aDate && !bDate) return 0
-        if (!aDate) return 1
-        if (!bDate) return -1
-        return new Date(bDate).getTime() - new Date(aDate).getTime()
-      })
-    }
-    return list
-  }, [games, cat, selected, completedMode, extraData])
+  const visibleGames = useGameFiltering({ games, cat, extraData, selected, completedMode })
 
   return (
     <motion.div
@@ -125,8 +85,8 @@ export default function CategoryPage() {
                 <ConsoleFilter
                   pills={consolePills}
                   selected={selected}
-                  onToggle={toggleConsole}
-                  onClear={() => setSelected(new Set())}
+                  onToggle={toggle}
+                  onClear={clear}
                 />
               </div>
             )}

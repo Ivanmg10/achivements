@@ -4,32 +4,7 @@ import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
-
-function CompletionBar({
-  label,
-  value,
-  color = 'bg-yellow-500',
-}: {
-  label: string
-  value: string
-  color?: string
-}) {
-  const pct = parseFloat(value) || 0
-  return (
-    <div className="flex flex-col gap-1">
-      <div className="flex justify-between text-xs text-gray-400">
-        <span>{label}</span>
-        <span>{value}</span>
-      </div>
-      <div className="w-full bg-bg-main rounded-full h-2">
-        <div
-          className={`h-2 rounded-full ${color} transition-all duration-500`}
-          style={{ width: `${Math.min(pct, 100)}%` }}
-        />
-      </div>
-    </div>
-  )
-}
+import { DualProgressBar } from '@/components/ui/DualProgressBar'
 
 export default function MainPageProfileRaGame({
   game,
@@ -39,6 +14,9 @@ export default function MainPageProfileRaGame({
   richPresenceMsg?: string
 }) {
   const { T } = useLanguage()
+
+  const scPct = parseFloat(game.UserCompletion ?? '0') || 0
+  const hcPct = parseFloat(game.UserCompletionHardcore ?? '0') || 0
 
   return (
     <Link
@@ -62,18 +40,23 @@ export default function MainPageProfileRaGame({
           <span className="text-xs text-gray-400">{game.ConsoleName}</span>
         </div>
       </div>
-      {game.UserCompletion && (
-        <div className="flex flex-col gap-2">
-          <CompletionBar label="Normal" value={game.UserCompletion} />
-          {game.UserCompletionHardcore && (
-            <CompletionBar
-              label="Hardcore"
-              value={game.UserCompletionHardcore}
-              color="bg-orange-500"
-            />
-          )}
+      {scPct > 0 || hcPct > 0 ? (
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-3 text-xs text-gray-400">
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
+              {game.UserCompletion ?? '0%'}
+            </span>
+            {hcPct > 0 && (
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block w-2 h-2 rounded-full bg-yellow-400" />
+                {game.UserCompletionHardcore}
+              </span>
+            )}
+          </div>
+          <DualProgressBar softcorePct={scPct} hardcorePct={hcPct} trackClass="bg-bg-card" height="h-2" />
         </div>
-      )}
+      ) : null}
     </Link>
   )
 }

@@ -63,13 +63,17 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                 onClick={onClose}
                 className="flex gap-2.5 items-center p-2 rounded-lg hover:bg-white/5 transition-colors group"
               >
-                <Image
-                  src={`https://media.retroachievements.org/Badge/${ach.BadgeName}.png`}
-                  alt={ach.Title}
-                  width={40}
-                  height={40}
-                  className="rounded shrink-0"
-                />
+                {ach.BadgeName ? (
+                  <Image
+                    src={`https://media.retroachievements.org/Badge/${ach.BadgeName}.png`}
+                    alt={ach.Title}
+                    width={40}
+                    height={40}
+                    className="rounded shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded bg-white/10 shrink-0" />
+                )}
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="text-xs font-semibold text-text-main truncate group-hover:text-accent transition-colors">
                     {ach.Title}

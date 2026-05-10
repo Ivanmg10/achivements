@@ -16,6 +16,12 @@ export function useUserAwards() {
     setIsLoading(true)
     fetchWithRetry('/api/getUserAwards')
       .then((data) => {
+        if (!data || typeof data !== 'object' || Array.isArray(data)) {
+          const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
+          attemptRef.current++
+          retryTimer.current = setTimeout(doFetch, delay)
+          return
+        }
         setAwards(data as UserAwards)
         setIsLoading(false)
         attemptRef.current = 0

@@ -1,12 +1,13 @@
 'use client'
 
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import { useLanguage } from '@/context/LanguageContext'
+import { GameListRow } from '@/components/ui/GameListRow'
+import { SkeletonGameList } from '@/components/ui/SkeletonList'
 
-const ABANDONED_DAYS = 90
+const ABANDONED_DAYS = 30
 
 export default function MainPageAbandoned({
   playing,
@@ -15,6 +16,7 @@ export default function MainPageAbandoned({
   playing: RetroAchievementsGameCompleted[]
   isLoading?: boolean
 }) {
+  const { T } = useLanguage()
   const [lastAchDates, setLastAchDates] = useState<Record<number, string>>({})
   const [fetchedKey, setFetchedKey] = useState('')
   const attemptRef = useRef(0)
@@ -70,58 +72,29 @@ export default function MainPageAbandoned({
   return (
     <div className="flex flex-col gap-2">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">
-        Abandoned — {ABANDONED_DAYS}+ days idle
+        {T.cards.abandoned} — {ABANDONED_DAYS}{T.cards.abandonedIdle}
       </p>
 
       {loading ? (
-        <div className="flex flex-col gap-2 animate-pulse">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="flex items-center gap-2 bg-bg-main rounded-lg p-2">
-              <div className="w-7 h-7 rounded bg-white/10 shrink-0" />
-              <div className="flex-1 flex flex-col gap-1.5">
-                <div className="h-2.5 w-24 rounded bg-white/10" />
-                <div className="h-2 w-16 rounded bg-white/10" />
-              </div>
-              <div className="flex flex-col items-end gap-1 shrink-0">
-                <div className="h-2.5 w-8 rounded bg-white/10" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <SkeletonGameList count={3} />
       ) : abandoned.length === 0 ? (
         <div className="flex items-center justify-center py-4 text-text-secondary text-sm">
-          No abandoned games
+          {T.cards.noAbandonedGames}
         </div>
       ) : (
         <div className="flex flex-col gap-2">
           {abandoned.slice(0, 6).map((g) => (
-            <Link
+            <GameListRow
               key={g.GameID}
               href={`/gameInfo/${g.GameID}`}
-              className="flex items-center gap-2 bg-bg-main rounded-lg p-2 hover:bg-white/5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-            >
-              {g.ImageIcon && (
-                <Image
-                  src={`https://retroachievements.org${g.ImageIcon}`}
-                  alt={g.Title}
-                  width={28}
-                  height={28}
-                  className="rounded shrink-0"
-                />
-              )}
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-semibold truncate group-hover:text-accent transition-colors">
-                  {g.Title}
-                </span>
-                <span className="text-[10px] text-text-secondary">{g.ConsoleName}</span>
-              </div>
-              <div className="flex flex-col items-end shrink-0">
-                <span className="text-xs font-bold text-orange-400">{g.daysAgo}d</span>
-                <span className="text-[9px] text-text-secondary">
-                  {Math.round(parseFloat(g.PctWon) * 100)}%
-                </span>
-              </div>
-            </Link>
+              imageUrl={g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : undefined}
+              imageAlt={g.Title}
+              title={g.Title}
+              subtitle={g.ConsoleName}
+              stat={`${g.daysAgo}d`}
+              statLabel={`${Math.round(parseFloat(g.PctWon) * 100)}%`}
+              statClassName="text-orange-400"
+            />
           ))}
         </div>
       )}

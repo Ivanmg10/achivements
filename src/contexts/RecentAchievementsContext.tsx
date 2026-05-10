@@ -26,7 +26,12 @@ export function RecentAchievementsProvider({ children }: { children: React.React
     setIsLoading(true)
     fetchWithRetry('/api/getRecentAchievements')
       .then((data) => {
-        if (!Array.isArray(data)) return
+        if (!Array.isArray(data)) {
+          const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
+          attemptRef.current++
+          retryTimer.current = setTimeout(doFetch, delay)
+          return
+        }
         setAchievements([...data].sort(
           (a, b) => new Date(b.Date.replace(' ', 'T')).getTime() - new Date(a.Date.replace(' ', 'T')).getTime()
         ))

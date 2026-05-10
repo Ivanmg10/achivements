@@ -1,29 +1,16 @@
 'use client'
 
-import {
-  RetroAchievement,
-  RetroAchievementsGameWithAchievements,
-} from '@/types/types'
+import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
 import AchievementModal from '../achievement-modal/AchievementModal'
 import Image from 'next/image'
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
+import { SortableHeader, SortState, SortKey, DEFAULT_DIRS } from './SortableHeader'
 
 type Filter = 'all' | 'earned' | 'unearned'
-type SortKey = 'default' | 'points' | 'rarity' | 'players' | 'hc' | 'earned'
 type SortDir = 'asc' | 'desc'
-type SortState = { key: SortKey; dir: SortDir }
-
-const DEFAULT_DIRS: Record<SortKey, SortDir> = {
-  default: 'asc',
-  points: 'desc',
-  rarity: 'asc',
-  players: 'desc',
-  hc: 'desc',
-  earned: 'desc',
-}
 
 export default function GameInfoTable({
   gameData,
@@ -81,19 +68,19 @@ export default function GameInfoTable({
         })
       }
     },
-    [favoritedIds, gameData?.ID, gameData?.Title, numDistinctPlayers],
+    [favoritedIds, gameData?.ID, gameData?.Title, numDistinctPlayers]
   )
 
   const achievements = useMemo(() => {
     if (!gameData) return []
     return Object.values(gameData.Achievements ?? {}).filter(
-      (a): a is RetroAchievement => a !== undefined,
+      (a): a is RetroAchievement => a !== undefined
     )
   }, [gameData])
 
   const missableUnearned = useMemo(
     () => achievements.filter((a) => a.Type === 'missable' && !a.DateEarned),
-    [achievements],
+    [achievements]
   )
 
   const filtered = useMemo(() => {
@@ -106,7 +93,8 @@ export default function GameInfoTable({
 
     const sortFn = (a: RetroAchievement, b: RetroAchievement): number => {
       if (key === 'points') return b.Points - a.Points
-      if (key === 'rarity') return a.NumAwarded / numDistinctPlayers - b.NumAwarded / numDistinctPlayers
+      if (key === 'rarity')
+        return a.NumAwarded / numDistinctPlayers - b.NumAwarded / numDistinctPlayers
       if (key === 'players') return b.NumAwarded - a.NumAwarded
       if (key === 'hc') return b.NumAwardedHardcore - a.NumAwardedHardcore
       if (key === 'earned') {
@@ -132,36 +120,13 @@ export default function GameInfoTable({
   function handleSort(key: SortKey) {
     setSortState((prev) =>
       prev.key === key
-        ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-        : { key, dir: DEFAULT_DIRS[key] },
-    )
-  }
-
-  function SortableHeader({
-    sortKey,
-    children,
-    className,
-  }: {
-    sortKey: SortKey
-    children: React.ReactNode
-    className?: string
-  }) {
-    const active = sortState.key === sortKey
-    const arrow = active ? (sortState.dir === 'asc' ? ' ↑' : ' ↓') : ''
-    return (
-      <th
-        onClick={() => handleSort(sortKey)}
-        className={`px-3 py-2 cursor-pointer select-none transition-colors hover:text-text-main ${
-          active ? 'text-text-main' : 'text-text-secondary'
-        } ${className ?? ''}`}
-      >
-        {children}{arrow}
-      </th>
+        ? { key, dir: (prev.dir === 'asc' ? 'desc' : 'asc') as SortDir }
+        : { key, dir: DEFAULT_DIRS[key] }
     )
   }
 
   return (
-    <section className="bg-bg-main p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
+    <section className="bg-bg-card p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
       {missableUnearned.length > 0 && (
         <div className="w-full border border-red-800/50 rounded-xl overflow-hidden">
           <button
@@ -218,23 +183,25 @@ export default function GameInfoTable({
         <table className="w-full border-collapse">
           <thead>
             <tr className="text-sm border-b border-bg-header">
-              <th className="px-3 py-2 w-24 text-center text-text-secondary">{T.gameInfoTable.headerIcon}</th>
-              <SortableHeader sortKey="default" className="text-left">
+              <th className="px-3 py-2 w-24 text-center text-text-secondary">
+                {T.gameInfoTable.headerIcon}
+              </th>
+              <SortableHeader sortKey="default" sortState={sortState} onSort={handleSort} className="text-left">
                 {T.gameInfoTable.headerAchievement}
               </SortableHeader>
-              <SortableHeader sortKey="players" className="w-48 text-center hidden sm:table-cell">
+              <SortableHeader sortKey="players" sortState={sortState} onSort={handleSort} className="w-48 text-center hidden sm:table-cell">
                 {T.gameInfoTable.headerPlayers}
               </SortableHeader>
-              <SortableHeader sortKey="hc" className="w-48 text-center hidden sm:table-cell">
+              <SortableHeader sortKey="hc" sortState={sortState} onSort={handleSort} className="w-48 text-center hidden sm:table-cell">
                 {T.gameInfoTable.headerHC}
               </SortableHeader>
-              <SortableHeader sortKey="rarity" className="w-36 text-center hidden sm:table-cell">
+              <SortableHeader sortKey="rarity" sortState={sortState} onSort={handleSort} className="w-36 text-center hidden sm:table-cell">
                 {T.gameInfoTable.headerRarity}
               </SortableHeader>
-              <SortableHeader sortKey="earned" className="w-40 text-center hidden sm:table-cell">
+              <SortableHeader sortKey="earned" sortState={sortState} onSort={handleSort} className="w-40 text-center hidden sm:table-cell">
                 {T.gameInfoTable.headerEarned}
               </SortableHeader>
-              <SortableHeader sortKey="points" className="w-28 text-center">
+              <SortableHeader sortKey="points" sortState={sortState} onSort={handleSort} className="w-28 text-center">
                 {T.gameInfoTable.headerPoints}
               </SortableHeader>
             </tr>

@@ -13,11 +13,11 @@ export async function GET(req: NextRequest) {
 
   const query = gameId
     ? `SELECT achievement_id, game_id, game_title, snapshot, num_distinct_players, created_at
-       FROM favorite_achievements
+       FROM pinned_achievements
        WHERE user_id = $1 AND game_id = $2
        ORDER BY created_at DESC`
     : `SELECT achievement_id, game_id, game_title, snapshot, num_distinct_players, created_at
-       FROM favorite_achievements
+       FROM pinned_achievements
        WHERE user_id = $1
        ORDER BY created_at DESC`
 
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   }
 
   await pool.query(
-    `INSERT INTO favorite_achievements
+    `INSERT INTO pinned_achievements
        (user_id, achievement_id, game_id, game_title, snapshot, num_distinct_players)
      VALUES ($1, $2, $3, $4, $5, $6)
      ON CONFLICT (user_id, achievement_id)
@@ -63,7 +63,7 @@ export async function DELETE(req: NextRequest) {
   }
 
   await pool.query(
-    'DELETE FROM favorite_achievements WHERE user_id = $1 AND achievement_id = $2',
+    'DELETE FROM pinned_achievements WHERE user_id = $1 AND achievement_id = $2',
     [session.user.id, achievementId],
   )
 

@@ -4,7 +4,8 @@ import { useParams } from 'next/navigation'
 import { useState, useMemo } from 'react'
 import { useGamesByCategory } from '../../../../hooks/useGamesByCategory'
 import { useGameExtraData } from '../../../../hooks/useGameExtraData'
-import { RetroAchievementsGameCompleted } from '@/types/types'
+import { useConsoleFilter } from '../../../../hooks/useConsoleFilter'
+import { useGameFiltering } from '../../../../hooks/useGameFiltering'
 import StatusGameList from '../../../../components/statusGameList/StatusGameList'
 import StatusPageHeader from '../../../../components/status-page-header/StatusPageHeader'
 import CompletedFilter, { CompletedMode } from '../../../../components/completed-filter/CompletedFilter'
@@ -17,59 +18,23 @@ import { fadeUp } from '@/lib/animations'
 
 export default function CategoryConsolePage() {
   const { consoleId, category } = useParams()
-  // Fetch ALL games for this category (no consoleId filter) so the filter works across consoles
   const { games, loading, error } = useGamesByCategory(category as string)
   const extraData = useGameExtraData()
   const { T } = useLanguage()
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
-  // Pre-select the console from the URL param
-  const [selected, setSelected] = useState<Set<number>>(
-    () => new Set(consoleId ? [Number(consoleId)] : []),
+  const { selected, toggle, clear } = useConsoleFilter(
+    consoleId ? [Number(consoleId)] : undefined
   )
 
   const EMPTY_STATE: Record<string, { icon: string; title: string; sub: string }> = {
-    wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay,  sub: T.categoryPage.noWantToPlaySub },
-    playing:    { icon: '🎮', title: T.categoryPage.noPlaying,     sub: T.categoryPage.noPlayingSub },
-    completed:  { icon: '🏆', title: T.categoryPage.noCompleted,   sub: T.categoryPage.noCompletedSub },
+    wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay, sub: T.categoryPage.noWantToPlaySub },
+    playing: { icon: '🎮', title: T.categoryPage.noPlaying, sub: T.categoryPage.noPlayingSub },
+    completed: { icon: '🏆', title: T.categoryPage.noCompleted, sub: T.categoryPage.noCompletedSub },
   }
 
   const cat = category as string
-
   const consolePills = useMemo(() => buildConsolePills(games), [games])
-
-  function toggleConsole(id: number) {
-    setSelected((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
-  }
-
-  const visibleGames = useMemo(() => {
-    let list = games
-    if (selected.size > 0) list = list.filter((g) => selected.has(g.ConsoleID))
-    if (cat === 'completed' && completedMode !== 'all') {
-      list = list.filter((g) => {
-        const hc = Number((g as RetroAchievementsGameCompleted).HardcoreMode)
-        return completedMode === 'hardcore' ? hc === 1 : hc === 0
-      })
-    }
-    if (cat === 'playing' || cat === 'completed') {
-      list = [...list].sort((a, b) => {
-        const aId = a.GameID ?? (a.ID as number)
-        const bId = b.GameID ?? (b.ID as number)
-        const aExtra = extraData.get(aId)
-        const bExtra = extraData.get(bId)
-        const aDate = cat === 'playing' ? aExtra?.lastPlayed : aExtra?.awards?.[0]?.AwardedAt
-        const bDate = cat === 'playing' ? bExtra?.lastPlayed : bExtra?.awards?.[0]?.AwardedAt
-        if (!aDate && !bDate) return 0
-        if (!aDate) return 1
-        if (!bDate) return -1
-        return new Date(bDate).getTime() - new Date(aDate).getTime()
-      })
-    }
-    return list
-  }, [games, cat, selected, completedMode, extraData])
+  const visibleGames = useGameFiltering({ games, cat, extraData, selected, completedMode })
 
   return (
     <motion.div
@@ -113,8 +78,8 @@ export default function CategoryConsolePage() {
                 <ConsoleFilter
                   pills={consolePills}
                   selected={selected}
-                  onToggle={toggleConsole}
-                  onClear={() => setSelected(new Set())}
+                  onToggle={toggle}
+                  onClear={clear}
                 />
               </div>
             )}

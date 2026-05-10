@@ -6,6 +6,7 @@ import { RecentAchievement } from '@/types/types'
 import { groupByDays } from '@/utils/utils'
 import { IconRefresh } from '@tabler/icons-react'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
+import { useLanguage } from '@/context/LanguageContext'
 
 function cellBg(count: number): string {
   if (count === 0) return '#1a1a2e'
@@ -41,8 +42,10 @@ export default function MainPageHeatmap({
   isLoading?: boolean
   onRefresh?: () => void
 }) {
+  const { T } = useLanguage()
   const totalDays = useTotalDays()
-  const label = totalDays <= 30 ? 'last 30 days' : totalDays <= 45 ? 'last 45 days' : 'last 60 days'
+  const daysCount = totalDays <= 30 ? 30 : totalDays <= 45 ? 45 : 60
+  const label = T.cards.activityLastDays.replace('{n}', String(daysCount))
   const tooltipRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
@@ -108,7 +111,7 @@ export default function MainPageHeatmap({
     >
       {/* header */}
       <div className="flex items-center justify-between flex-wrap gap-1 shrink-0 mb-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Activity — {label}</p>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.activityLabel} — {label}</p>
         <div className="flex items-center gap-2">
           <p className="text-xs font-semibold text-text-main">{isLoading ? '—' : totalAch}</p>
           {onRefresh && (
