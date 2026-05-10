@@ -1,9 +1,6 @@
 'use client'
 
-import {
-  RetroAchievement,
-  RetroAchievementsGameWithAchievements,
-} from '@/types/types'
+import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
 import AchievementModal from '../achievement-modal/AchievementModal'
 import Image from 'next/image'
@@ -81,19 +78,19 @@ export default function GameInfoTable({
         })
       }
     },
-    [favoritedIds, gameData?.ID, gameData?.Title, numDistinctPlayers],
+    [favoritedIds, gameData?.ID, gameData?.Title, numDistinctPlayers]
   )
 
   const achievements = useMemo(() => {
     if (!gameData) return []
     return Object.values(gameData.Achievements ?? {}).filter(
-      (a): a is RetroAchievement => a !== undefined,
+      (a): a is RetroAchievement => a !== undefined
     )
   }, [gameData])
 
   const missableUnearned = useMemo(
     () => achievements.filter((a) => a.Type === 'missable' && !a.DateEarned),
-    [achievements],
+    [achievements]
   )
 
   const filtered = useMemo(() => {
@@ -106,7 +103,8 @@ export default function GameInfoTable({
 
     const sortFn = (a: RetroAchievement, b: RetroAchievement): number => {
       if (key === 'points') return b.Points - a.Points
-      if (key === 'rarity') return a.NumAwarded / numDistinctPlayers - b.NumAwarded / numDistinctPlayers
+      if (key === 'rarity')
+        return a.NumAwarded / numDistinctPlayers - b.NumAwarded / numDistinctPlayers
       if (key === 'players') return b.NumAwarded - a.NumAwarded
       if (key === 'hc') return b.NumAwardedHardcore - a.NumAwardedHardcore
       if (key === 'earned') {
@@ -133,7 +131,7 @@ export default function GameInfoTable({
     setSortState((prev) =>
       prev.key === key
         ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-        : { key, dir: DEFAULT_DIRS[key] },
+        : { key, dir: DEFAULT_DIRS[key] }
     )
   }
 
@@ -155,13 +153,14 @@ export default function GameInfoTable({
           active ? 'text-text-main' : 'text-text-secondary'
         } ${className ?? ''}`}
       >
-        {children}{arrow}
+        {children}
+        {arrow}
       </th>
     )
   }
 
   return (
-    <section className="bg-bg-main p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
+    <section className="bg-bg-card p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
       {missableUnearned.length > 0 && (
         <div className="w-full border border-red-800/50 rounded-xl overflow-hidden">
           <button
@@ -218,7 +217,9 @@ export default function GameInfoTable({
         <table className="w-full border-collapse">
           <thead>
             <tr className="text-sm border-b border-bg-header">
-              <th className="px-3 py-2 w-24 text-center text-text-secondary">{T.gameInfoTable.headerIcon}</th>
+              <th className="px-3 py-2 w-24 text-center text-text-secondary">
+                {T.gameInfoTable.headerIcon}
+              </th>
               <SortableHeader sortKey="default" className="text-left">
                 {T.gameInfoTable.headerAchievement}
               </SortableHeader>

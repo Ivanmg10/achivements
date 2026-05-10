@@ -1,8 +1,12 @@
+'use client'
+
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import Image from 'next/image'
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import GameInfoProgressionHeader from './game-info-header-progression/GameInfoProgressionHeader'
+import GameHashesModal from './GameHashesModal'
 import { CONSOLES } from '@/constants'
+import { IconHash, IconExternalLink } from '@tabler/icons-react'
 
 export default function GameInfoHeader({
   gameData,
@@ -12,10 +16,31 @@ export default function GameInfoHeader({
   children?: ReactNode
 }) {
   const consoleIcon = CONSOLES.find((c) => c.id === gameData?.ConsoleID)?.icon
+  const [hashesOpen, setHashesOpen] = useState(false)
+
+  const bgImage = gameData?.ImageTitle ?? gameData?.ImageIngame ?? null
 
   return (
-    <section className="bg-bg-main p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_400px] mt-5">
-      <div className="flex flex-row items-start gap-5">
+    <section className="relative bg-bg-card p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_400px] mt-5 overflow-hidden">
+      {/* Blurred background */}
+      {bgImage && (
+        <>
+          <div
+            className="absolute inset-0 scale-110"
+            style={{
+              backgroundImage: `url(https://retroachievements.org${bgImage})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              filter: 'blur(12px)',
+              opacity: 0.8,
+            }}
+          />
+          <div className="absolute inset-0 bg-bg-main/60" />
+        </>
+      )}
+
+      {/* Content — above background layers */}
+      <div className="relative z-10 flex flex-row items-start gap-5">
         {gameData?.ImageBoxArt && (
           <Image
             src={`https://retroachievements.org${gameData.ImageBoxArt}`}
@@ -63,11 +88,31 @@ export default function GameInfoHeader({
               {gameData?.Released ?? '—'}
             </li>
           </ul>
+          {gameData?.ID && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => setHashesOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
+              >
+                <IconHash className="w-3.5 h-3.5" />
+                Hashes compatibles
+              </button>
+              <a
+                href={`https://retroachievements.org/game/${gameData.ID}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
+              >
+                <IconExternalLink className="w-3.5 h-3.5" />
+                RetroAchievements
+              </a>
+            </div>
+          )}
         </div>
       </div>
-      <div className="flex flex-col items-center lg:items-end gap-4 lg:justify-between mt-4 lg:mt-0">
+      <div className="relative z-10 flex flex-col items-center lg:items-end gap-4 lg:justify-between mt-4 lg:mt-0">
         <p
-          className={`text-2xl ${gameData?.NumAwardedToUser == gameData?.NumAchievements ? 'bg-green-800' : 'bg-bg-card'} px-5 py-3 rounded-full text-center whitespace-nowrap`}
+          className={`hidden lg:block text-2xl ${gameData?.NumAwardedToUser == gameData?.NumAchievements ? 'bg-green-800' : 'bg-bg-card'} px-5 py-3 rounded-full text-center whitespace-nowrap`}
         >
           {gameData?.NumAwardedToUser} / {gameData?.NumAchievements}
         </p>
@@ -101,6 +146,15 @@ export default function GameInfoHeader({
           </div>
         )}
       </div>
+
+      {gameData?.ID && (
+        <GameHashesModal
+          isOpen={hashesOpen}
+          onClose={() => setHashesOpen(false)}
+          gameId={gameData.ID}
+          gameTitle={gameData.Title ?? ''}
+        />
+      )}
     </section>
   )
 }
