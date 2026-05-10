@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-import { useSession } from 'next-auth/react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
@@ -9,8 +7,8 @@ import { useGamesData } from '@/contexts/GamesDataContext'
 import { useUserRank } from '@/hooks/useUserRank'
 import { useUserAwards } from '@/hooks/useUserAwards'
 import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
-import { motion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
+import { ChartCard } from '@/components/ui/ChartCard'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
 import MainPageHeatmap from './MainPageHeatmap'
@@ -26,23 +24,8 @@ import MainPageFavorites from '../main-page-favorites/MainPageFavorites'
 import MainPageConsoleNav from './MainPageConsoleNav'
 import MainPageGroups from './MainPageGroups'
 
-function ChartCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return (
-    <motion.div
-      className={`bg-bg-card rounded-xl p-4 flex flex-col gap-3 h-full ${className}`}
-      initial={{ opacity: 0, y: 8 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
-    >
-      {children}
-    </motion.div>
-  )
-}
-
 export default function MainPageCharts() {
   const { T } = useLanguage()
-  const { data: session } = useSession()
   const { achievements, isLoading: achLoading } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading } = useActivityHeatmap()
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()

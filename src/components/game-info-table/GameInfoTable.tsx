@@ -7,20 +7,10 @@ import Image from 'next/image'
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
+import { SortableHeader, SortState, SortKey, DEFAULT_DIRS } from './SortableHeader'
 
 type Filter = 'all' | 'earned' | 'unearned'
-type SortKey = 'default' | 'points' | 'rarity' | 'players' | 'hc' | 'earned'
 type SortDir = 'asc' | 'desc'
-type SortState = { key: SortKey; dir: SortDir }
-
-const DEFAULT_DIRS: Record<SortKey, SortDir> = {
-  default: 'asc',
-  points: 'desc',
-  rarity: 'asc',
-  players: 'desc',
-  hc: 'desc',
-  earned: 'desc',
-}
 
 export default function GameInfoTable({
   gameData,
@@ -130,32 +120,8 @@ export default function GameInfoTable({
   function handleSort(key: SortKey) {
     setSortState((prev) =>
       prev.key === key
-        ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
+        ? { key, dir: (prev.dir === 'asc' ? 'desc' : 'asc') as SortDir }
         : { key, dir: DEFAULT_DIRS[key] }
-    )
-  }
-
-  function SortableHeader({
-    sortKey,
-    children,
-    className,
-  }: {
-    sortKey: SortKey
-    children: React.ReactNode
-    className?: string
-  }) {
-    const active = sortState.key === sortKey
-    const arrow = active ? (sortState.dir === 'asc' ? ' ↑' : ' ↓') : ''
-    return (
-      <th
-        onClick={() => handleSort(sortKey)}
-        className={`px-3 py-2 cursor-pointer select-none transition-colors hover:text-text-main ${
-          active ? 'text-text-main' : 'text-text-secondary'
-        } ${className ?? ''}`}
-      >
-        {children}
-        {arrow}
-      </th>
     )
   }
 
@@ -220,22 +186,22 @@ export default function GameInfoTable({
               <th className="px-3 py-2 w-24 text-center text-text-secondary">
                 {T.gameInfoTable.headerIcon}
               </th>
-              <SortableHeader sortKey="default" className="text-left">
+              <SortableHeader sortKey="default" sortState={sortState} onSort={handleSort} className="text-left">
                 {T.gameInfoTable.headerAchievement}
               </SortableHeader>
-              <SortableHeader sortKey="players" className="w-48 text-center hidden sm:table-cell">
+              <SortableHeader sortKey="players" sortState={sortState} onSort={handleSort} className="w-48 text-center hidden sm:table-cell">
                 {T.gameInfoTable.headerPlayers}
               </SortableHeader>
-              <SortableHeader sortKey="hc" className="w-48 text-center hidden sm:table-cell">
+              <SortableHeader sortKey="hc" sortState={sortState} onSort={handleSort} className="w-48 text-center hidden sm:table-cell">
                 {T.gameInfoTable.headerHC}
               </SortableHeader>
-              <SortableHeader sortKey="rarity" className="w-36 text-center hidden sm:table-cell">
+              <SortableHeader sortKey="rarity" sortState={sortState} onSort={handleSort} className="w-36 text-center hidden sm:table-cell">
                 {T.gameInfoTable.headerRarity}
               </SortableHeader>
-              <SortableHeader sortKey="earned" className="w-40 text-center hidden sm:table-cell">
+              <SortableHeader sortKey="earned" sortState={sortState} onSort={handleSort} className="w-40 text-center hidden sm:table-cell">
                 {T.gameInfoTable.headerEarned}
               </SortableHeader>
-              <SortableHeader sortKey="points" className="w-28 text-center">
+              <SortableHeader sortKey="points" sortState={sortState} onSort={handleSort} className="w-28 text-center">
                 {T.gameInfoTable.headerPoints}
               </SortableHeader>
             </tr>

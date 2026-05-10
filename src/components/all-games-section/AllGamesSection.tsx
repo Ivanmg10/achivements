@@ -8,6 +8,7 @@ import StatusGameList from '@/components/statusGameList/StatusGameList'
 import CompletedFilter, { CompletedMode } from '@/components/completed-filter/CompletedFilter'
 import ConsoleFilter, { buildConsolePills } from '@/components/console-filter/ConsoleFilter'
 import Spinner from '@/components/main-spinner/Spinner'
+import { useConsoleFilter } from '@/hooks/useConsoleFilter'
 import { motion } from 'framer-motion'
 
 type Category = 'wantToPlay' | 'playing' | 'completed'
@@ -17,7 +18,6 @@ const CATEGORY_META: Record<Category, { label: string; icon: string; badge: stri
   playing:    { label: 'Jugando',        icon: '🎮', badge: 'bg-blue-900/50   text-blue-300'   },
   completed:  { label: 'Completados',    icon: '🏆', badge: 'bg-green-900/50  text-green-300'  },
 }
-
 
 export default function AllGamesSection({
   category,
@@ -31,11 +31,10 @@ export default function AllGamesSection({
   extraData: Map<number, GameExtraData>
 }) {
   const [open, setOpen] = useState(true)
-  const [selected, setSelected] = useState<Set<number>>(new Set())
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
+  const { selected, toggle, clear } = useConsoleFilter()
 
   const meta = CATEGORY_META[category]
-
   const consolePills = useMemo(() => buildConsolePills(games), [games])
 
   const filtered = useMemo(() => {
@@ -49,14 +48,6 @@ export default function AllGamesSection({
     }
     return list
   }, [games, selected, completedMode, category])
-
-  function toggleConsole(id: number) {
-    setSelected((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
-  }
 
   return (
     <motion.div
@@ -104,11 +95,10 @@ export default function AllGamesSection({
                   <ConsoleFilter
                     pills={consolePills}
                     selected={selected}
-                    onToggle={toggleConsole}
-                    onClear={() => setSelected(new Set())}
+                    onToggle={toggle}
+                    onClear={clear}
                   />
 
-                  {/* Hardcore/softcore filter for completed */}
                   {category === 'completed' && (
                     <div className="shrink-0">
                       <CompletedFilter value={completedMode} onChange={setCompletedMode} />
