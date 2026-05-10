@@ -21,7 +21,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
   }
 
-  const { game_id, title, image_icon, console_name, pct_won } = await req.json()
+  const { game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points } = await req.json()
 
   if (!game_id || !title) {
     return NextResponse.json({ message: 'Datos incompletos' }, { status: 400 })
@@ -34,11 +34,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const position = posRes.rows[0].next
 
   const result = await pool.query(
-    `INSERT INTO game_group_items (group_id, game_id, title, image_icon, console_name, pct_won, position)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `INSERT INTO game_group_items (group_id, game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points, position)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
      ON CONFLICT (group_id, game_id) DO NOTHING
-     RETURNING id, game_id, title, image_icon, console_name, pct_won, position`,
-    [groupId, game_id, title, image_icon ?? null, console_name ?? null, pct_won ?? 0, position],
+     RETURNING id, game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points, position, added_at`,
+    [groupId, game_id, title, image_icon ?? null, console_name ?? null, pct_won ?? 0,
+     num_awarded ?? 0, max_possible ?? 0, points_won ?? 0, max_points ?? 0, position],
   )
 
   if (!result.rows.length) {
@@ -108,6 +109,38 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   } finally {
     client.release()
   }
+
+  return NextResponse.json({ ok: true })
+}
+
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const groupId = parseInt(id)
+
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+  }
+
+  if (!(await ownsGroup(session.user.id, groupId))) {
+    return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
+  }
+
+  const updates: { game_id: number; num_awarded: number; max_possible: number; points_won: number; max_points: number }[] = await req.json()
+  if (!Array.isArray(updates) || !updates.length) {
+    return NextResponse.json({ ok: true })
+  }
+
+  await Promise.all(
+    updates.map((u) =>
+      pool.query(
+        `UPDATE game_group_items
+         SET num_awarded = $1, max_possible = $2, points_won = $3, max_points = $4
+         WHERE group_id = $5 AND game_id = $6`,
+        [u.num_awarded, u.max_possible, u.points_won, u.max_points, groupId, u.game_id],
+      ),
+    ),
+  )
 
   return NextResponse.json({ ok: true })
 }

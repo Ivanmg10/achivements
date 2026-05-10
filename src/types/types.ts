@@ -252,7 +252,12 @@ export type GameGroupItem = {
   image_icon: string | null
   console_name: string | null
   pct_won: string
+  num_awarded: number
+  max_possible: number
+  points_won: number
+  max_points: number
   position: number
+  added_at: string
 }
 
 export type GameGroup = {
@@ -265,5 +270,7 @@ export type GameGroup = {
   created_at: string
   updated_at: string
   game_count: number
+  total_awarded: number
+  total_possible: number
   items?: GameGroupItem[]
 }

@@ -3,11 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { IconPlus, IconFolder } from '@tabler/icons-react'
+import { IconPlus, IconFolder, IconTrash } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
 import { GameGroup, RetroAchievementsGameCompleted } from '@/types/types'
 import GroupModal from '@/components/groups/GroupModal'
+import { relativeTime } from '@/utils/utils'
 
 function isImageUrl(s: string) {
   return s.startsWith('http://') || s.startsWith('https://')
@@ -38,8 +39,14 @@ function GroupIcon({ group }: { group: GameGroup }) {
 
 export default function MainPageGroups({ isLoading: externalLoading }: { isLoading?: boolean }) {
   const { T } = useLanguage()
-  const { groups, isLoading, createGroup } = useGroups()
+  const { groups, isLoading, createGroup, deleteGroup } = useGroups()
   const [modalOpen, setModalOpen] = useState(false)
+  const [confirmingDelete, setConfirmingDelete] = useState<number | null>(null)
+
+  async function handleDelete(id: number) {
+    await deleteGroup(id)
+    setConfirmingDelete(null)
+  }
 
   const loading = externalLoading || isLoading
 
@@ -69,6 +76,8 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
               image_icon: g.ImageIcon,
               console_name: g.ConsoleName,
               pct_won: parseFloat(g.PctWon),
+              num_awarded: g.NumAwarded,
+              max_possible: g.MaxPossible,
             }),
           })
         )
@@ -118,23 +127,60 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
       ) : (
         <div className="flex flex-col gap-2 flex-1">
           {groups.slice(0, 4).map((group) => (
-            <Link
-              key={group.id}
-              href={`/groups/${group.id}`}
-              className="flex items-center gap-2.5 bg-bg-main rounded-lg p-2 hover:bg-white/5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-            >
-              <GroupIcon group={group} />
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-xs font-semibold truncate group-hover:text-accent transition-colors">
-                  {group.title}
-                </span>
-                <span className="text-[10px] text-text-secondary">
-                  {group.game_count} {T.groups.games}
-                  {group.is_public && <span className="ml-1.5 text-accent/70">·</span>}
-                  {group.is_public && <span className="ml-1 text-accent/70 text-[10px]">public</span>}
-                </span>
-              </div>
-            </Link>
+            <div key={group.id} className="group/card relative">
+              {confirmingDelete === group.id ? (
+                <div className="flex items-center justify-between bg-bg-main rounded-lg p-2 gap-2">
+                  <span className="text-xs text-text-secondary truncate">{T.groups.confirmDelete}</span>
+                  <div className="flex gap-1 shrink-0">
+                    <button
+                      onClick={() => setConfirmingDelete(null)}
+                      className="text-[10px] px-2 py-1 rounded-lg bg-bg-card text-text-secondary hover:text-text-main transition-colors"
+                    >
+                      {T.groups.cancel}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(group.id)}
+                      className="text-[10px] px-2 py-1 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+                    >
+                      {T.groups.deleteGroup}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    href={`/groups/${group.id}`}
+                    className="flex items-center gap-2.5 bg-bg-main rounded-lg p-2 pr-8 hover:bg-white/5 transition-colors group/link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  >
+                    <GroupIcon group={group} />
+                    <div className="flex flex-col min-w-0 flex-1 gap-0.5">
+                      <span className="text-xs font-semibold truncate group-hover/link:text-accent transition-colors">
+                        {group.title}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] text-text-secondary shrink-0">
+                          {group.game_count} {T.groups.games}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px] text-text-secondary/50">
+                        {group.total_possible > 0 && (
+                          <span>{group.total_awarded}/{group.total_possible}</span>
+                        )}
+                        {group.total_possible > 0 && <span className="opacity-40">·</span>}
+                        <span>{relativeTime(group.updated_at)}</span>
+                      </div>
+                    </div>
+                  </Link>
+                  <button
+                    onClick={() => setConfirmingDelete(group.id)}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-text-secondary hover:text-red-400 hover:bg-red-400/10 opacity-0 group-hover/card:opacity-100 transition-all focus:opacity-100"
+                    aria-label={T.groups.deleteGroup}
+                  >
+                    <IconTrash className="w-3.5 h-3.5" aria-hidden />
+                  </button>
+                </>
+              )}
+            </div>
           ))}
           {groups.length < 4 && (
             <button

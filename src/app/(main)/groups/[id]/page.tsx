@@ -35,11 +35,18 @@ import {
   IconCheck,
 } from '@tabler/icons-react'
 import { fadeUp } from '@/lib/animations'
+import { relativeTime } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
 import { useGamesData } from '@/contexts/GamesDataContext'
+import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
-import { GameGroup, GameGroupItem, RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
+import {
+  GameGroup,
+  GameGroupItem,
+  RetroAchievementsGameCompleted,
+  WantToPlayGame,
+} from '@/types/types'
 import GroupModal from '@/components/groups/GroupModal'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import { CONSOLES } from '@/constants'
@@ -64,7 +71,14 @@ function GroupIconDisplay({ icon }: { icon?: string | null }) {
   if (!icon) return <span className="text-4xl leading-none">📁</span>
   if (isImageUrl(icon)) {
     return (
-      <Image src={icon} alt="icon" width={56} height={56} className="w-14 h-14 rounded-xl object-cover" unoptimized />
+      <Image
+        src={icon}
+        alt="icon"
+        width={56}
+        height={56}
+        className="w-14 h-14 rounded-xl object-cover"
+        unoptimized
+      />
     )
   }
   return <span className="text-4xl leading-none">{icon}</span>
@@ -74,10 +88,16 @@ function SortableItem({
   item,
   onRemove,
   draggable,
+  achStats,
+  ptsStats,
+  lastPlayed,
 }: {
   item: GameGroupItem
   onRemove: (id: number) => void
   draggable: boolean
+  achStats?: { earned: number; total: number }
+  ptsStats?: { earned: number; total: number }
+  lastPlayed?: string
 }) {
   const { T } = useLanguage()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -89,6 +109,11 @@ function SortableItem({
   const isComplete = pct >= 100
   const consoleIcon = CONSOLES.find((c) => c.name === item.console_name)?.icon
 
+  const achEarned = achStats?.earned ?? item.num_awarded
+  const achTotal = achStats?.total || item.max_possible
+  const ptsEarned = ptsStats?.earned ?? item.points_won
+  const ptsTotal = ptsStats?.total || item.max_points
+
   const [open, setOpen] = useState(false)
   const [gameData, setGameData] = useState<RetroAchievementsGameWithAchievements | null>(null)
   const [loadingAch, setLoadingAch] = useState(false)
@@ -99,7 +124,9 @@ function SortableItem({
     if (!open || favoritedIds.size > 0) return
     fetch(`/api/favorites?gameId=${item.game_id}`)
       .then((r) => r.json())
-      .then((rows: { achievement_id: number }[]) => setFavoritedIds(new Set(rows.map((r) => r.achievement_id))))
+      .then((rows: { achievement_id: number }[]) =>
+        setFavoritedIds(new Set(rows.map((r) => r.achievement_id)))
+      )
       .catch(() => {})
   }, [open, item.game_id, favoritedIds.size])
 
@@ -107,7 +134,9 @@ function SortableItem({
     if (!open && !gameData) {
       setOpen(true)
       setLoadingAch(true)
-      const data = await fetch(`/api/getGameProgression?gameId=${item.game_id}`).then((r) => r.json())
+      const data = await fetch(`/api/getGameProgression?gameId=${item.game_id}`).then((r) =>
+        r.json()
+      )
       setGameData(data)
       setLoadingAch(false)
     } else {
@@ -194,6 +223,7 @@ function SortableItem({
           >
             <p className="text-xl font-semibold leading-tight">{item.title}</p>
           </Link>
+          {/* Console name */}
           {item.console_name && (
             <div className="flex items-center gap-1.5">
               {consoleIcon && (
@@ -205,23 +235,53 @@ function SortableItem({
                   className="w-3.5 h-3.5 object-contain opacity-60"
                 />
               )}
-              <p className="text-xs text-text-secondary/70 uppercase tracking-wide">{item.console_name}</p>
+              <p className="text-xs text-text-secondary/70 uppercase tracking-wide">
+                {item.console_name}
+              </p>
             </div>
           )}
-          <div className="flex items-center gap-2 mt-1">
-            <div className="w-40 h-1.5 bg-bg-main rounded-full overflow-hidden">
+          {/* Progress bar — own row so all bars start/end at same position */}
+          <div className="flex items-center gap-2 mt-0.5">
+            <div className="w-full max-w-200 h-2 bg-bg-main rounded-full overflow-hidden">
               <div
-                className={`h-full rounded-full ${isComplete ? 'bg-green-500' : pct > 0 ? 'bg-blue-500' : 'bg-white/10'}`}
+                className={`h-full rounded-full transition-[width] duration-500 ${isComplete ? 'bg-green-500' : pct > 0 ? 'bg-accent' : 'bg-white/10'}`}
                 style={{ width: `${pct}%` }}
               />
             </div>
             <span className="text-xs text-text-secondary/60 tabular-nums">{pct}%</span>
           </div>
+
+          {/* Stats row */}
+          <div className="flex items-center gap-2 text-xs text-text-secondary/50">
+            {achTotal > 0 ? (
+              <span>
+                {achEarned}/{achTotal} logros
+              </span>
+            ) : (
+              <span>— logros</span>
+            )}
+            <span className="opacity-90">·</span>
+            {ptsTotal > 0 ? (
+              <span>
+                {ptsEarned}/{ptsTotal} pts
+              </span>
+            ) : (
+              <span>— pts</span>
+            )}
+            <span className="opacity-90">·</span>
+            <span>{lastPlayed ? relativeTime(lastPlayed) : 'No lo has jugado aun'}</span>
+            <span className="ml-auto text-[10px] text-text-secondary/60">
+              +{relativeTime(item.added_at)}
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-1 shrink-0">
           <button
-            onClick={(e) => { e.stopPropagation(); onRemove(item.id) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              onRemove(item.id)
+            }}
             className="p-2 rounded-lg text-text-secondary hover:text-red-400 hover:bg-red-400/10 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all"
             aria-label="Remove game"
           >
@@ -249,7 +309,9 @@ function SortableItem({
                 ))}
               </div>
             ) : achievements.length === 0 ? (
-              <p className="text-center text-text-secondary text-sm py-2">{T.statusGameItem.noPublishedAchievements}</p>
+              <p className="text-center text-text-secondary text-sm py-2">
+                {T.statusGameItem.noPublishedAchievements}
+              </p>
             ) : (
               <div className="flex flex-wrap gap-1">
                 {achievements.map((a) => {
@@ -259,9 +321,16 @@ function SortableItem({
                   return (
                     <div
                       key={a.ID}
-                      onClick={(e) => { e.stopPropagation(); setSelectedAch(a) }}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setSelectedAch(a)
+                      }}
                       className={`rounded-lg overflow-hidden shrink-0 transition-transform duration-100 hover:scale-125 hover:z-10 relative cursor-pointer ${
-                        isHardcore ? 'ring-2 ring-yellow-400' : isSoftcore ? 'ring-2 ring-blue-400' : ''
+                        isHardcore
+                          ? 'ring-2 ring-yellow-400'
+                          : isSoftcore
+                            ? 'ring-2 ring-blue-400'
+                            : ''
                       }`}
                     >
                       <Image
@@ -322,6 +391,7 @@ function AddGameModal({
 }) {
   const { T } = useLanguage()
   const { all } = useGamesData()
+  const recentlyPlayedData = useRecentlyPlayedGames()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<Map<number, RetroAchievementsGameCompleted>>(new Map())
   const [saving, setSaving] = useState(false)
@@ -337,27 +407,39 @@ function AddGameModal({
     if (!wantFetched.current) {
       wantFetched.current = true
       fetchWithRetry('/api/getWantPlayGames')
-        .then((data) => { setWantToPlay((data as { Results?: WantToPlayGame[] })?.Results ?? []) })
+        .then((data) => {
+          setWantToPlay((data as { Results?: WantToPlayGame[] })?.Results ?? [])
+        })
         .catch(() => {})
     }
   }, [isOpen])
 
   useEffect(() => {
     if (!isOpen) return
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [isOpen, onClose])
 
   const uniqueGames = useMemo(() => {
     const seen = new Map<number, RetroAchievementsGameCompleted>()
-    for (const g of all) { if (!seen.has(g.GameID)) seen.set(g.GameID, g) }
+    for (const g of all) {
+      if (!seen.has(g.GameID)) seen.set(g.GameID, g)
+    }
     for (const g of wantToPlay) {
       if (!seen.has(g.ID)) {
         seen.set(g.ID, {
-          GameID: g.ID, Title: g.Title, ImageIcon: g.ImageIcon,
-          ConsoleID: g.ConsoleID, ConsoleName: g.ConsoleName,
-          MaxPossible: g.AchievementsPublished, NumAwarded: 0, PctWon: '0', HardcoreMode: '0',
+          GameID: g.ID,
+          Title: g.Title,
+          ImageIcon: g.ImageIcon,
+          ConsoleID: g.ConsoleID,
+          ConsoleName: g.ConsoleName,
+          MaxPossible: g.AchievementsPublished,
+          NumAwarded: 0,
+          PctWon: '0',
+          HardcoreMode: '0',
         })
       }
     }
@@ -378,7 +460,8 @@ function AddGameModal({
       .filter((g) => g.Title.toLowerCase().includes(q) && !existingIds.has(g.GameID))
       .map((g) => {
         const t = g.Title.toLowerCase()
-        const score = t === q ? 3 : t.startsWith(q) ? 2 : t.split(/\s+/).some((w) => w.startsWith(q)) ? 1 : 0
+        const score =
+          t === q ? 3 : t.startsWith(q) ? 2 : t.split(/\s+/).some((w) => w.startsWith(q)) ? 1 : 0
         return { g, score }
       })
       .sort((a, b) => b.score - a.score)
@@ -399,9 +482,15 @@ function AddGameModal({
       const data = await fetch(`/api/getGameData?gameId=${id}`).then((r) => r.json())
       if (data?.Title) {
         const g: RetroAchievementsGameCompleted = {
-          GameID: id, Title: data.Title, ImageIcon: data.ImageIcon ?? '',
-          ConsoleID: data.ConsoleID ?? 0, ConsoleName: data.ConsoleName ?? '',
-          MaxPossible: data.NumAchievements ?? 0, NumAwarded: 0, PctWon: '0', HardcoreMode: '0',
+          GameID: id,
+          Title: data.Title,
+          ImageIcon: data.ImageIcon ?? '',
+          ConsoleID: data.ConsoleID ?? 0,
+          ConsoleName: data.ConsoleName ?? '',
+          MaxPossible: data.NumAchievements ?? 0,
+          NumAwarded: 0,
+          PctWon: '0',
+          HardcoreMode: '0',
         }
         setSelected((prev) => {
           const next = new Map(prev)
@@ -410,7 +499,9 @@ function AddGameModal({
         })
         setQuery('')
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   async function handleConfirm() {
@@ -423,12 +514,17 @@ function AddGameModal({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            game_id: g.GameID, title: g.Title, image_icon: g.ImageIcon,
-            console_name: g.ConsoleName, pct_won: parseFloat(g.PctWon),
+            game_id: g.GameID,
+            title: g.Title,
+            image_icon: g.ImageIcon,
+            console_name: g.ConsoleName,
+            pct_won: parseFloat(g.PctWon),
           }),
         })
         if (res.ok) added.push(await res.json())
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
     setSaving(false)
     onAdded(added)
@@ -440,7 +536,10 @@ function AddGameModal({
       {isOpen && (
         <motion.div
           className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-          variants={overlayVariants} initial="hidden" animate="visible" exit="exit"
+          variants={overlayVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
           onClick={onClose}
         >
           <div className="absolute top-[12%] left-1/2 -translate-x-1/2 w-full max-w-2xl px-4">
@@ -452,11 +551,17 @@ function AddGameModal({
               <div className="flex items-center gap-3 px-4 py-3.5 border-b border-white/5 shrink-0">
                 <IconSearch className="w-5 h-5 text-text-secondary shrink-0" aria-hidden />
                 <input
-                  ref={inputRef} value={query} onChange={(e) => setQuery(e.target.value)}
+                  ref={inputRef}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
                   placeholder={T.groups.searchGames}
                   className="flex-1 bg-transparent text-text-main text-base outline-none placeholder:text-text-secondary"
                 />
-                <button onClick={onClose} className="p-1 rounded-lg text-text-secondary hover:text-text-main transition-colors shrink-0" aria-label="Close">
+                <button
+                  onClick={onClose}
+                  className="p-1 rounded-lg text-text-secondary hover:text-text-main transition-colors shrink-0"
+                  aria-label="Close"
+                >
                   <IconX className="w-4 h-4" aria-hidden />
                 </button>
               </div>
@@ -466,31 +571,53 @@ function AddGameModal({
                   {results.map((g) => {
                     const isSel = selected.has(g.GameID)
                     return (
-                      <button key={g.GameID} onClick={() => toggleGame(g)}
+                      <button
+                        key={g.GameID}
+                        onClick={() => toggleGame(g)}
                         className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left ${isSel ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
                       >
-                        {g.ImageIcon && <Image src={`https://retroachievements.org${g.ImageIcon}`} alt={g.Title} width={32} height={32} className="w-8 h-8 rounded object-cover shrink-0" unoptimized />}
+                        {g.ImageIcon && (
+                          <Image
+                            src={`https://retroachievements.org${g.ImageIcon}`}
+                            alt={g.Title}
+                            width={32}
+                            height={32}
+                            className="w-8 h-8 rounded object-cover shrink-0"
+                            unoptimized
+                          />
+                        )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-text-main truncate">{g.Title}</p>
                           <p className="text-xs text-text-secondary truncate">{g.ConsoleName}</p>
                         </div>
-                        <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${isSel ? 'bg-accent border-accent' : 'border-white/20'}`}>
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${isSel ? 'bg-accent border-accent' : 'border-white/20'}`}
+                        >
                           {isSel && <IconCheck className="w-3 h-3 text-bg-main" aria-hidden />}
                         </div>
                       </button>
                     )
                   })}
                   {directGameId && !existingIds.has(directGameId) && (
-                    <button onClick={() => addDirectById(directGameId)}
+                    <button
+                      onClick={() => addDirectById(directGameId)}
                       className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-t border-white/5 ${selected.has(directGameId) ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
                     >
-                      <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">ID</div>
+                      <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">
+                        ID
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-text-main">{T.search.openById} #{directGameId}</p>
+                        <p className="text-sm font-medium text-text-main">
+                          {T.search.openById} #{directGameId}
+                        </p>
                         <p className="text-xs text-text-secondary">Game ID</p>
                       </div>
-                      <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected.has(directGameId) ? 'bg-accent border-accent' : 'border-white/20'}`}>
-                        {selected.has(directGameId) && <IconCheck className="w-3 h-3 text-bg-main" aria-hidden />}
+                      <div
+                        className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected.has(directGameId) ? 'bg-accent border-accent' : 'border-white/20'}`}
+                      >
+                        {selected.has(directGameId) && (
+                          <IconCheck className="w-3 h-3 text-bg-main" aria-hidden />
+                        )}
                       </div>
                     </button>
                   )}
@@ -501,16 +628,34 @@ function AddGameModal({
                 <div className="border-t border-white/5 px-4 py-3 flex flex-col gap-3 shrink-0">
                   <div className="flex flex-wrap gap-1.5">
                     {Array.from(selected.values()).map((g) => (
-                      <span key={g.GameID} className="flex items-center gap-1.5 bg-accent/15 text-accent text-xs px-2.5 py-1 rounded-full">
-                        {g.ImageIcon && <Image src={`https://retroachievements.org${g.ImageIcon}`} alt={g.Title} width={14} height={14} className="rounded shrink-0" unoptimized />}
+                      <span
+                        key={g.GameID}
+                        className="flex items-center gap-1.5 bg-accent/15 text-accent text-xs px-2.5 py-1 rounded-full"
+                      >
+                        {g.ImageIcon && (
+                          <Image
+                            src={`https://retroachievements.org${g.ImageIcon}`}
+                            alt={g.Title}
+                            width={14}
+                            height={14}
+                            className="rounded shrink-0"
+                            unoptimized
+                          />
+                        )}
                         <span className="truncate max-w-32">{g.Title}</span>
-                        <button onClick={() => toggleGame(g)} className="text-accent/60 hover:text-accent transition-colors ml-0.5" aria-label={`Remove ${g.Title}`}>
+                        <button
+                          onClick={() => toggleGame(g)}
+                          className="text-accent/60 hover:text-accent transition-colors ml-0.5"
+                          aria-label={`Remove ${g.Title}`}
+                        >
                           <IconX className="w-3 h-3" aria-hidden />
                         </button>
                       </span>
                     ))}
                   </div>
-                  <button onClick={handleConfirm} disabled={saving}
+                  <button
+                    onClick={handleConfirm}
+                    disabled={saving}
                     className="w-full py-2.5 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
                   >
                     {saving ? '…' : `${T.groups.addGame} (${selected.size})`}
@@ -519,7 +664,9 @@ function AddGameModal({
               )}
 
               {!query.trim() && selected.size === 0 && (
-                <p className="text-text-secondary text-xs text-center py-6">{T.groups.searchGames}</p>
+                <p className="text-text-secondary text-xs text-center py-6">
+                  {T.groups.searchGames}
+                </p>
               )}
             </motion.div>
           </div>
@@ -535,6 +682,41 @@ export default function GroupDetailPage() {
   const router = useRouter()
   const { T } = useLanguage()
   const { updateGroup, deleteGroup } = useGroups()
+  const { all: allGames } = useGamesData()
+  const recentlyPlayed = useRecentlyPlayedGames()
+
+  const achievementMap = useMemo(() => {
+    const map = new Map<number, { earned: number; total: number }>()
+    // recentlyPlayed as base — has NumAchieved + NumPossibleAchievements for any played game
+    for (const g of recentlyPlayed)
+      map.set(g.GameID, {
+        earned: g.NumAchievedHardcore || g.NumAchieved,
+        total: g.NumPossibleAchievements,
+      })
+    // allGames overrides when earned count is higher (completed-games list is authoritative)
+    for (const g of allGames) {
+      const existing = map.get(g.GameID)
+      if (!existing || g.NumAwarded > existing.earned)
+        map.set(g.GameID, { earned: g.NumAwarded, total: g.MaxPossible })
+    }
+    return map
+  }, [allGames, recentlyPlayed])
+
+  const pointsMap = useMemo(() => {
+    const map = new Map<number, { earned: number; total: number }>()
+    for (const g of recentlyPlayed)
+      map.set(g.GameID, {
+        earned: g.ScoreAchievedHardcore || g.ScoreAchieved,
+        total: g.PossibleScore,
+      })
+    return map
+  }, [recentlyPlayed])
+
+  const lastPlayedMap = useMemo(() => {
+    const map = new Map<number, string>()
+    for (const g of recentlyPlayed) map.set(g.GameID, g.LastPlayed)
+    return map
+  }, [recentlyPlayed])
 
   const [group, setGroup] = useState<(GameGroup & { items: GameGroupItem[] }) | null>(null)
   const [loading, setLoading] = useState(true)
@@ -551,7 +733,10 @@ export default function GroupDetailPage() {
   const fetchGroup = useCallback(async () => {
     try {
       const res = await fetch(`/api/groups/${groupId}`)
-      if (!res.ok) { router.push('/groups'); return }
+      if (!res.ok) {
+        router.push('/groups')
+        return
+      }
       setGroup(await res.json())
     } catch {
       router.push('/groups')
@@ -560,7 +745,9 @@ export default function GroupDetailPage() {
     }
   }, [groupId, router])
 
-  useEffect(() => { fetchGroup() }, [fetchGroup])
+  useEffect(() => {
+    fetchGroup()
+  }, [fetchGroup])
 
   const fetchReleaseYears = useCallback(async (items: GameGroupItem[]) => {
     const toFetch = items.filter((i) => !fetchedIdsRef.current.has(i.game_id))
@@ -574,24 +761,123 @@ export default function GroupDetailPage() {
             id: item.game_id,
             year: d.Released ? parseInt(d.Released.substring(0, 4)) : null,
           }))
-          .catch(() => ({ id: item.game_id, year: null as number | null })),
-      ),
+          .catch(() => ({ id: item.game_id, year: null as number | null }))
+      )
     )
     setReleaseYears((prev) => {
       const next = new Map(prev)
-      for (const r of results) { if (r.year && !isNaN(r.year)) next.set(r.id, r.year) }
+      for (const r of results) {
+        if (r.year && !isNaN(r.year)) next.set(r.id, r.year)
+      }
       return next
     })
   }, [])
 
   useEffect(() => {
     if (group?.items.length) fetchReleaseYears(group.items)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [group?.id, fetchReleaseYears])
+
+  type SyncItem = {
+    game_id: number
+    num_awarded: number
+    max_possible: number
+    points_won: number
+    max_points: number
+  }
+
+  const rpSyncedRef = useRef<number | null>(null)
+  const fetchSyncedRef = useRef<number | null>(null)
+
+  // Sync ach + pts counts from recentlyPlayed into DB
+  useEffect(() => {
+    if (!group || !recentlyPlayed.length || rpSyncedRef.current === group.id) return
+    rpSyncedRef.current = group.id
+    const updates: SyncItem[] = group.items.flatMap((item) => {
+      const rp = recentlyPlayed.find((g) => g.GameID === item.game_id)
+      if (!rp) return []
+      return [
+        {
+          game_id: item.game_id,
+          num_awarded: rp.NumAchievedHardcore || rp.NumAchieved,
+          max_possible: rp.NumPossibleAchievements || item.max_possible,
+          points_won: rp.ScoreAchievedHardcore || rp.ScoreAchieved,
+          max_points: rp.PossibleScore,
+        },
+      ]
+    })
+    if (!updates.length) return
+    setGroup((g) =>
+      g
+        ? {
+            ...g,
+            items: g.items.map((item) => {
+              const u = updates.find((u) => u.game_id === item.game_id)
+              return u ? { ...item, ...u } : item
+            }),
+          }
+        : g
+    )
+    fetch(`/api/groups/${groupId}/games`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    }).catch(() => {})
+  }, [group, recentlyPlayed, groupId])
+
+  // Background fetch game progression for items with no ach data anywhere
+  useEffect(() => {
+    if (!group || fetchSyncedRef.current === group.id) return
+    const missing = group.items.filter((item) => item.max_possible === 0)
+    fetchSyncedRef.current = group.id
+    if (!missing.length) return
+    Promise.allSettled(
+      missing.slice(0, 20).map(async (item): Promise<SyncItem | null> => {
+        const data = await fetch(`/api/getGameProgression?gameId=${item.game_id}`).then((r) =>
+          r.json()
+        )
+        const achs = Object.values(
+          (data.Achievements ?? {}) as Record<string, RetroAchievement | undefined>
+        ).filter((a): a is RetroAchievement => !!a)
+        if (!achs.length) return null
+        const earned = achs.filter((a) => a.DateEarnedHardcore || a.DateEarned)
+        return {
+          game_id: item.game_id,
+          num_awarded: earned.length,
+          max_possible: achs.length,
+          points_won: earned.reduce((s, a) => s + (a.Points ?? 0), 0),
+          max_points: achs.reduce((s, a) => s + (a.Points ?? 0), 0),
+        }
+      })
+    ).then((results) => {
+      const ok: SyncItem[] = results
+        .filter(
+          (r): r is PromiseFulfilledResult<SyncItem> => r.status === 'fulfilled' && r.value !== null
+        )
+        .map((r) => r.value)
+      if (!ok.length) return
+      setGroup((g) =>
+        g
+          ? {
+              ...g,
+              items: g.items.map((item) => {
+                const u = ok.find((u) => u.game_id === item.game_id)
+                return u ? { ...item, ...u } : item
+              }),
+            }
+          : g
+      )
+      fetch(`/api/groups/${groupId}/games`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ok),
+      }).catch(() => {})
+    })
+  }, [group, recentlyPlayed, groupId])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
   function handleDragEnd(event: DragEndEvent) {
@@ -599,7 +885,10 @@ export default function GroupDetailPage() {
     if (!over || active.id === over.id || !group) return
     const oldIndex = group.items.findIndex((i) => i.id === active.id)
     const newIndex = group.items.findIndex((i) => i.id === over.id)
-    const newItems = arrayMove(group.items, oldIndex, newIndex).map((item, idx) => ({ ...item, position: idx }))
+    const newItems = arrayMove(group.items, oldIndex, newIndex).map((item, idx) => ({
+      ...item,
+      position: idx,
+    }))
     setGroup({ ...group, items: newItems })
     clearTimeout(saveOrderTimer.current)
     saveOrderTimer.current = setTimeout(() => {
@@ -619,7 +908,12 @@ export default function GroupDetailPage() {
     setGroup({ ...group, items: group.items.filter((i) => i.id !== itemId) })
   }
 
-  async function handleEdit(data: { title: string; description: string; icon: string; is_public: boolean }) {
+  async function handleEdit(data: {
+    title: string
+    description: string
+    icon: string
+    is_public: boolean
+  }) {
     const updated = await updateGroup(groupId, {
       title: data.title,
       description: data.description || undefined,
@@ -634,10 +928,7 @@ export default function GroupDetailPage() {
     router.push('/groups')
   }
 
-  const existingIds = useMemo(
-    () => new Set((group?.items ?? []).map((i) => i.game_id)),
-    [group],
-  )
+  const existingIds = useMemo(() => new Set((group?.items ?? []).map((i) => i.game_id)), [group])
 
   const consolePills = useMemo(() => {
     if (!group) return []
@@ -656,7 +947,11 @@ export default function GroupDetailPage() {
   const filteredItems = useMemo(() => {
     if (!group) return []
     return group.items.filter((item) => {
-      if (selectedConsoles.size > 0 && (!item.console_name || !selectedConsoles.has(item.console_name))) return false
+      if (
+        selectedConsoles.size > 0 &&
+        (!item.console_name || !selectedConsoles.has(item.console_name))
+      )
+        return false
       const pct = parseFloat(item.pct_won)
       if (pctFilter === '0' && pct !== 0) return false
       if (pctFilter === 'progress' && !(pct > 0 && pct < 1)) return false
@@ -710,7 +1005,10 @@ export default function GroupDetailPage() {
     >
       <div className="w-full lg:max-w-[98%] flex flex-col gap-3">
         {/* Back */}
-        <Link href="/groups" className="flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-main transition-colors w-fit">
+        <Link
+          href="/groups"
+          className="flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-main transition-colors w-fit"
+        >
           <IconArrowLeft className="w-4 h-4" aria-hidden />
           {T.groups.title}
         </Link>
@@ -733,8 +1031,12 @@ export default function GroupDetailPage() {
                 </span>
               )}
             </div>
-            {group.description && <p className="text-sm text-text-secondary">{group.description}</p>}
-            <p className="text-xs text-text-secondary">{group.items.length} {T.groups.games}</p>
+            {group.description && (
+              <p className="text-sm text-text-secondary">{group.description}</p>
+            )}
+            <p className="text-xs text-text-secondary">
+              {group.items.length} {T.groups.games}
+            </p>
           </div>
           <div className="flex items-center gap-1 shrink-0">
             <button
@@ -774,7 +1076,15 @@ export default function GroupDetailPage() {
                     : 'bg-bg-card text-text-secondary hover:text-text-main'
                 }`}
               >
-                {c.icon && <Image src={c.icon} alt={c.name} width={14} height={14} className="object-contain shrink-0" />}
+                {c.icon && (
+                  <Image
+                    src={c.icon}
+                    alt={c.name}
+                    width={14}
+                    height={14}
+                    className="object-contain shrink-0"
+                  />
+                )}
                 {c.name}
               </button>
             ))}
@@ -793,12 +1103,14 @@ export default function GroupDetailPage() {
         {group.items.length > 0 && (
           <div className="flex flex-wrap gap-2">
             <div className="flex flex-wrap gap-1.5">
-              {([
-                { value: 'all', label: T.groups.filterAll },
-                { value: '0', label: T.groups.filter0 },
-                { value: 'progress', label: T.groups.filterProgress },
-                { value: '100', label: T.groups.filter100 },
-              ] as { value: PctFilter; label: string }[]).map((opt) => (
+              {(
+                [
+                  { value: 'all', label: T.groups.filterAll },
+                  { value: '0', label: T.groups.filter0 },
+                  { value: 'progress', label: T.groups.filterProgress },
+                  { value: '100', label: T.groups.filter100 },
+                ] as { value: PctFilter; label: string }[]
+              ).map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => setPctFilter(opt.value)}
@@ -815,14 +1127,16 @@ export default function GroupDetailPage() {
 
             {hasYearsData && (
               <div className="flex flex-wrap gap-1.5">
-                {([
-                  { value: 'all', label: T.groups.filterAll },
-                  { value: '80s', label: "80's" },
-                  { value: '90s', label: "90's" },
-                  { value: '00s', label: "00's" },
-                  { value: '10s', label: "10's" },
-                  { value: '20s', label: "20's" },
-                ] as { value: DecadeFilter; label: string }[]).map((opt) => (
+                {(
+                  [
+                    { value: 'all', label: T.groups.filterAll },
+                    { value: '80s', label: "80's" },
+                    { value: '90s', label: "90's" },
+                    { value: '00s', label: "00's" },
+                    { value: '10s', label: "10's" },
+                    { value: '20s', label: "20's" },
+                  ] as { value: DecadeFilter; label: string }[]
+                ).map((opt) => (
                   <button
                     key={opt.value}
                     onClick={() => setDecadeFilter(opt.value)}
@@ -855,7 +1169,11 @@ export default function GroupDetailPage() {
           <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
             <p className="text-sm text-text-secondary">{T.groups.noGamesFilter}</p>
             <button
-              onClick={() => { setPctFilter('all'); setDecadeFilter('all'); setSelectedConsoles(new Set()) }}
+              onClick={() => {
+                setPctFilter('all')
+                setDecadeFilter('all')
+                setSelectedConsoles(new Set())
+              }}
               className="text-xs text-accent hover:underline"
             >
               {T.groups.clearFilters}
@@ -864,15 +1182,38 @@ export default function GroupDetailPage() {
         ) : filtersActive ? (
           <div className="flex flex-col gap-3">
             {filteredItems.map((item) => (
-              <SortableItem key={item.id} item={item} onRemove={handleRemoveGame} draggable={false} />
+              <SortableItem
+                key={item.id}
+                item={item}
+                onRemove={handleRemoveGame}
+                draggable={false}
+                achStats={achievementMap.get(item.game_id)}
+                ptsStats={pointsMap.get(item.game_id)}
+                lastPlayed={lastPlayedMap.get(item.game_id)}
+              />
             ))}
           </div>
         ) : (
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={group.items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={group.items.map((i) => i.id)}
+              strategy={verticalListSortingStrategy}
+            >
               <div className="flex flex-col gap-3">
                 {group.items.map((item) => (
-                  <SortableItem key={item.id} item={item} onRemove={handleRemoveGame} draggable={true} />
+                  <SortableItem
+                    key={item.id}
+                    item={item}
+                    onRemove={handleRemoveGame}
+                    draggable={true}
+                    achStats={achievementMap.get(item.game_id)}
+                    ptsStats={pointsMap.get(item.game_id)}
+                    lastPlayed={lastPlayedMap.get(item.game_id)}
+                  />
                 ))}
               </div>
             </SortableContext>
@@ -887,7 +1228,7 @@ export default function GroupDetailPage() {
         groupId={groupId}
         existingIds={existingIds}
         onAdded={(items) => {
-          setGroup((g) => g ? { ...g, items: [...g.items, ...items] } : g)
+          setGroup((g) => (g ? { ...g, items: [...g.items, ...items] } : g))
           fetchReleaseYears(items)
         }}
       />
@@ -902,14 +1243,26 @@ export default function GroupDetailPage() {
 
       {/* Delete confirm */}
       {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={() => setConfirmDelete(false)}>
-          <div className="bg-bg-card rounded-2xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
+          onClick={() => setConfirmDelete(false)}
+        >
+          <div
+            className="bg-bg-card rounded-2xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <p className="text-sm text-text-main">{T.groups.confirmDelete}</p>
             <div className="flex gap-2">
-              <button onClick={() => setConfirmDelete(false)} className="flex-1 px-4 py-2 rounded-lg bg-bg-main text-text-secondary text-sm hover:text-text-main transition-colors">
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="flex-1 px-4 py-2 rounded-lg bg-bg-main text-text-secondary text-sm hover:text-text-main transition-colors"
+              >
                 {T.groups.cancel}
               </button>
-              <button onClick={handleDelete} className="flex-1 px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors">
+              <button
+                onClick={handleDelete}
+                className="flex-1 px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+              >
                 {T.groups.deleteGroup}
               </button>
             </div>

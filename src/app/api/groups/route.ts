@@ -11,7 +11,9 @@ export async function GET() {
 
   const result = await pool.query(
     `SELECT g.id, g.title, g.description, g.icon, g.is_public, g.position, g.created_at, g.updated_at,
-            COUNT(i.id)::int AS game_count
+            COUNT(i.id)::int                        AS game_count,
+            COALESCE(SUM(i.num_awarded), 0)::int    AS total_awarded,
+            COALESCE(SUM(i.max_possible), 0)::int   AS total_possible
      FROM game_groups g
      LEFT JOIN game_group_items i ON i.group_id = g.id
      WHERE g.user_id = $1

@@ -29,7 +29,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   const itemsRes = await pool.query(
-    `SELECT id, game_id, title, image_icon, console_name, pct_won, position
+    `SELECT id, game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points, position, added_at
      FROM game_group_items
      WHERE group_id = $1
      ORDER BY position ASC`,
