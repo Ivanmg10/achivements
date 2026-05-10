@@ -1,39 +1,119 @@
 # Achievements Tracker
 
-> A personal RetroAchievements companion — track your games, logros, and hardcore progress in one place.
+> Multi-user RetroAchievements companion — track games, logros, and hardcore progress with rich stats, custom groups, and full personalization.
 
 ---
 
 ## Features
 
+### Authentication
+- Email / password login and registration
+- Optional invitation code on sign-up
+- RetroAchievements account linking via OAuth
+- Steam account linking *(coming soon)*
+- Admin panel for admin users
+
+---
+
 ### Dashboard
-- **Recently played** as default view — expandable game cards with achievement grids
-- **In progress** panel — games sorted by last played date
-- **Want to play** and **Completed** lists
-- **Stats & Activity** — heatmap, mastery list, console breakdown, almost-there tracker, console completion averages
-- **Groups** — custom game collections with per-item progress tracking and background sync
 
-### Progress bars
-- Unified dual bar (blue = softcore, yellow = hardcore) across the whole app, same style as RetroAchievements
-- Per-game softcore and hardcore percentages tracked separately where the API provides both
+**Games panel** (left column, switchable views)
+- **Recently Played** — default view; expandable game cards with full achievement grids
+- **Playing** — in-progress games sorted by last played date
+- **Want to Play** — wishlist preview
+- **Completed** — finished games preview
 
-### Game info page
+**Profile sidebar** (right column)
+- RA stats: member since, hardcore / softcore / true points, hardcore ratio %, contributions and achievements created, global rank
+- Steam profile *(coming soon)*
+
+**Stats & Activity section** — scrollable card grid:
+
+| Card | What it shows |
+|---|---|
+| Points Stats | Total hardcore + softcore points, global rank |
+| Activity Heatmap | 7-day achievement calendar |
+| Daily Achievements | Line chart — last 7 days |
+| Groups | Quick access to created groups |
+| Most Active Games | Top 3 games (last 30 days) |
+| Rarest Recent Unlocks | Achievement rarity stats |
+| Abandoned Games | Games idle for extended periods |
+| Perfect Games | 100% completed games |
+| Almost There | Games at 75–99% completion |
+| Mastered & Awards | Mastery badges and special awards |
+| Best Performance | Best week / month / year + yearly heatmap |
+| Console Navigation | Click-through to console-filtered views |
+| Pinned Achievements | Manually favorited achievements |
+
+---
+
+### Game Library Pages
+- **All Games** — global view of all tracked games across every status
+- **Want to Play**, **Playing**, **Completed** — dedicated category pages
+- Console filtering on every category page
+- Softcore / hardcore completion toggle on Completed view
+
+---
+
+### Game Info Page
 - Blurred title screen as section background
+- Achievement grid — rarity %, hardcore / softcore unlock counts, earned date, ring indicators (gold HC / blue SC)
+- Achievement type badges: progression, win condition, missable
+- Game subset selector for DLC / multi-version games
+- Parent game navigation
 - Game hashes modal — REDUMP / NO-INTRO / TOSEC labels, one-click MD5 copy, patch links
-- Direct link to the game's RetroAchievements page
-- Achievement grid with tooltip, type badges (progression / win condition / missable), softcore/hardcore ring indicators
+- Direct link to RetroAchievements page
+
+---
 
 ### Groups
-- Create up to 4 named groups with emoji or image icon
-- Per-game logros and points tracked, synced from recently played and fetched in background for unplayed entries
-- Add games from your completed list; reorder via drag-and-drop
+- Up to 4 named groups with emoji or image icon + optional description
 - Public / private visibility toggle
+- Per-game achievement count and points tracked, synced in background
+- Add games from completed list; reorder via drag-and-drop
+- Filter group games by console, completion % (not started / in progress / completed), release decade (80s–20s)
+- Shareable public group URLs
 
-### Other
-- 8 themes
-- English / Spanish i18n
-- Search across your library
-- Streak counter
+---
+
+### Modals & Dialogs
+- **Achievement detail** — icon, points, earned date, rarity, favorite/pin toggle, missable warning
+- **Day Achievements** — all achievements earned on a selected date
+- **Game Hashes** — emulator ROM identifiers
+- **Search** — query-based library search or direct Game ID entry, multi-select
+- **Group create / edit** — title, description, icon, visibility, initial game selection
+- **Edit profile** — username, email, avatar URL with preview
+- **Change password**
+- **Language selector**
+- **Location / country picker** — with flag emoji
+- **Theme picker**
+- **RA login** — connect / disconnect RA account
+
+---
+
+### Progress Bars
+- Unified dual bar (blue = softcore, yellow = hardcore) across the whole app
+- Per-game softcore and hardcore percentages tracked separately
+
+---
+
+### Personalization
+- 8 color themes
+- 9 UI languages: English, Spanish, German, French, Italian, Japanese, Polish, Portuguese, Russian
+- Country / region with flag display
+- Persistent preferences stored per user
+
+---
+
+### Search
+- Global game search across full library
+- Filter results by status and console
+- Direct Game ID lookup
+
+---
+
+### Streak Counter
+- Tracks consecutive days with at least one achievement earned
 
 ---
 
@@ -85,5 +165,4 @@ psql $DATABASE_URL -f migrations/005_groups_pts.sql
 - [ ] Steam integration
 - [ ] Public user profiles
 - [ ] Group hardcore achievement tracking (requires DB migration)
-- [ ] Mobile / tablet responsive pass
 - [ ] Push notifications for new achievements
