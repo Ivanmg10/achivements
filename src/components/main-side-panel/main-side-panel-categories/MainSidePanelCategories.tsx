@@ -70,14 +70,14 @@ export default function MainSidePanelCategories() {
                       <li key={con.id}>
                         <Link
                           href={`/${category.slug}/${con.id}`}
-                          className="flex items-center gap-2 text-base text-gray-400"
+                          className={`inline-flex items-center gap-1.5 text-sm px-2 py-1 rounded-md transition-colors hover:brightness-125 ${con.color ?? 'text-gray-400'}`}
                         >
                           <Image
                             src={con.icon}
                             alt={con.name}
-                            width={20}
-                            height={20}
-                            className="object-contain"
+                            width={14}
+                            height={14}
+                            className="object-contain shrink-0"
                           />
                           <span className="transition-transform duration-200 hover:scale-105 inline-block origin-left">
                             {con.name}

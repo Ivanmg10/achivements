@@ -15,7 +15,9 @@ export default function GameInfoHeader({
   gameData?: RetroAchievementsGameWithAchievements | null
   children?: ReactNode
 }) {
-  const consoleIcon = CONSOLES.find((c) => c.id === gameData?.ConsoleID)?.icon
+  const consoleDef = CONSOLES.find((c) => c.id === gameData?.ConsoleID)
+  const consoleIcon = consoleDef?.icon
+  const consoleColor = consoleDef?.color
   const [hashesOpen, setHashesOpen] = useState(false)
 
   const bgImage = gameData?.ImageTitle ?? gameData?.ImageIngame ?? null
@@ -52,18 +54,20 @@ export default function GameInfoHeader({
         )}
         <div className="flex flex-col flex-1 min-w-0 gap-3">
           <h1 className="text-2xl lg:text-3xl">{gameData?.Title}</h1>
-          <div className="flex gap-2">
-            {consoleIcon && gameData?.ConsoleName && (
-              <Image
-                src={consoleIcon}
-                alt={gameData?.ConsoleName}
-                width={16}
-                height={16}
-                className="object-contain"
-              />
-            )}
-            <p className="text-lg">{gameData?.ConsoleName}</p>
-          </div>
+          {gameData?.ConsoleName && (
+            <span className={`inline-flex items-center gap-1.5 text-sm px-2 py-0.5 rounded-md font-medium self-start ${consoleColor ?? 'text-text-secondary'}`}>
+              {consoleIcon && (
+                <Image
+                  src={consoleIcon}
+                  alt={gameData.ConsoleName}
+                  width={14}
+                  height={14}
+                  className="object-contain shrink-0"
+                />
+              )}
+              {gameData.ConsoleName}
+            </span>
+          )}
           <GameInfoProgressionHeader gameData={gameData} />
           {children}
           <ul className="flex flex-col gap-1 text-sm">

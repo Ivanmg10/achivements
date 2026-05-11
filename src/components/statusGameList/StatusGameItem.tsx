@@ -208,7 +208,9 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
   const gameId = getGameId(game)
   const { earned, total, pct } = getAchievementMeta(game)
   const isComplete = earned !== null && earned === total && total > 0
-  const consoleIcon = CONSOLES.find((c) => c.id === Number(game.ConsoleID))?.icon
+  const consoleDef = CONSOLES.find((c) => c.id === Number(game.ConsoleID))
+  const consoleIcon = consoleDef?.icon
+  const consoleColor = consoleDef?.color
 
   async function handleToggle() {
     if (!open && !gameData) {
@@ -287,10 +289,12 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
             <p className="text-xl font-semibold leading-tight">{game.Title}</p>
           </Link>
           <div className="flex items-center gap-1.5">
-            {consoleIcon && (
-              <Image src={consoleIcon} alt={game.ConsoleName} width={14} height={14} className="w-3.5 h-3.5 object-contain opacity-60" />
-            )}
-            <p className="text-xs text-text-secondary/70 uppercase tracking-wide">{game.ConsoleName}</p>
+            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${consoleColor ?? 'bg-bg-main text-text-secondary/70'}`}>
+              {consoleIcon && (
+                <Image src={consoleIcon} alt={game.ConsoleName} width={12} height={12} className="w-3 h-3 object-contain shrink-0" />
+              )}
+              {game.ConsoleName}
+            </span>
           </div>
           <p className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>
             {earned !== null ? `${earned} / ${total}` : total} {T.statusGameItem.achievements}

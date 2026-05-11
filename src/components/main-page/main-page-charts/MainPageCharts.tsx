@@ -17,7 +17,6 @@ import MainPageRarest from './MainPageRarest'
 import MainPageAbandoned from './MainPageAbandoned'
 import MainPageTopGames from './MainPageTopGames'
 import MainPageMastery from './MainPageMastery'
-import MainPageAlmostThere from './MainPageAlmostThere'
 import MainPagePerfectGames from './MainPagePerfectGames'
 import MainPageBestPeriod from './MainPageBestPeriod'
 import MainPageFavorites from '../main-page-favorites/MainPageFavorites'
@@ -82,18 +81,18 @@ export default function MainPageCharts() {
             <MainPagePerfectGames games={all} isLoading={gamesLoading} />
           </ChartCard>
 
-          {/* Row 3: Almost There (col1) | Mastery (col2) | Pinned (col3 row-span-2) */}
-          <ChartCard>
-            <MainPageAlmostThere games={all} isLoading={gamesLoading} />
-          </ChartCard>
-          <ChartCard>
-            <MainPageMastery awards={awards} isLoading={awardsLoading} />
+          {/* Row 3: Console Nav (col1-2) | Pinned (col3 row-span-2) */}
+          <ChartCard className="lg:col-span-2">
+            <MainPageConsoleNav />
           </ChartCard>
           <ChartCard className="lg:row-span-2">
             <MainPageFavorites />
           </ChartCard>
 
-          {/* Row 4: Best Performance (col1) | Console Nav (col2) | Pinned continues */}
+          {/* Row 4: Mastery (col1) | Best Performance (col2) | Pinned continues */}
+          <ChartCard>
+            <MainPageMastery awards={awards} isLoading={awardsLoading} />
+          </ChartCard>
           <ChartCard>
             <MainPageBestPeriod
               achievements={heatmapData}
@@ -101,9 +100,6 @@ export default function MainPageCharts() {
               isLoading={heatmapLoading}
               yearLoading={yearLoading}
             />
-          </ChartCard>
-          <ChartCard>
-            <MainPageConsoleNav />
           </ChartCard>
 
         </div>

@@ -41,15 +41,18 @@ export function useAllGamesGlobal(): AllGamesGlobal {
             (g) => !startedIds.has(g.ID ?? g.GameID!) && g.ConsoleName !== 'Events',
           ),
         )
-        setPlaying(
-          allCompleted.filter(
-            (g) =>
-              g.ConsoleName !== 'Events' &&
-              Number(g.HardcoreMode) === 0 &&
-              parseFloat(g.PctWon) > 0 &&
-              parseFloat(g.PctWon) < 1,
-          ),
+        const inProgress = allCompleted.filter(
+          (g) =>
+            g.ConsoleName !== 'Events' &&
+            parseFloat(g.PctWon) > 0 &&
+            parseFloat(g.PctWon) < 1,
         )
+        const playingBest = new Map<number, RetroAchievementsGameCompleted>()
+        for (const g of inProgress) {
+          const prev = playingBest.get(g.GameID)
+          if (!prev || Number(g.HardcoreMode) > Number(prev.HardcoreMode)) playingBest.set(g.GameID, g)
+        }
+        setPlaying(Array.from(playingBest.values()))
         const compAll = allCompleted.filter(
           (g) => g.ConsoleName !== 'Events' && parseFloat(g.PctWon) >= 1,
         )

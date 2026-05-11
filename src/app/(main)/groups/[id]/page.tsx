@@ -49,6 +49,7 @@ import {
 } from '@/types/types'
 import GroupModal from '@/components/groups/GroupModal'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
+import { DualProgressBar } from '@/components/ui/DualProgressBar'
 import { CONSOLES } from '@/constants'
 import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 
@@ -95,7 +96,7 @@ function SortableItem({
   item: GameGroupItem
   onRemove: (id: number) => void
   draggable: boolean
-  achStats?: { earned: number; total: number }
+  achStats?: { scEarned: number; hcEarned: number; total: number }
   ptsStats?: { earned: number; total: number }
   lastPlayed?: string
 }) {
@@ -105,13 +106,18 @@ function SortableItem({
     disabled: !draggable,
   })
   const style = { transform: CSS.Transform.toString(transform), transition }
-  const consoleIcon = CONSOLES.find((c) => c.name === item.console_name)?.icon
+  const consoleDef = CONSOLES.find((c) => c.name === item.console_name)
+  const consoleIcon = consoleDef?.icon
+  const consoleColor = consoleDef?.color
 
-  const achEarned = achStats?.earned ?? item.num_awarded
   const achTotal = achStats?.total || item.max_possible
-  const pct = achTotal > 0
-    ? Math.min(Math.round((achEarned / achTotal) * 100), 100)
+  const scEarned = achStats?.scEarned ?? item.num_awarded
+  const hcEarned = achStats?.hcEarned ?? 0
+  const scPct = achTotal > 0
+    ? Math.min(Math.round((scEarned / achTotal) * 100), 100)
     : Math.min(Math.round(parseFloat(item.pct_won) * 100), 100)
+  const hcPct = achTotal > 0 ? Math.min(Math.round((hcEarned / achTotal) * 100), 100) : 0
+  const pct = Math.max(scPct, hcPct)
   const isComplete = pct >= 100
   const ptsEarned = ptsStats?.earned ?? item.points_won
   const ptsTotal = ptsStats?.total || item.max_points
@@ -237,29 +243,27 @@ function SortableItem({
           </Link>
           {/* Console name */}
           {item.console_name && (
-            <div className="flex items-center gap-1.5">
+            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium self-start ${consoleColor ?? 'bg-bg-main text-text-secondary/70'}`}>
               {consoleIcon && (
                 <Image
                   src={consoleIcon}
                   alt={item.console_name}
-                  width={14}
-                  height={14}
-                  className="w-3.5 h-3.5 object-contain opacity-60"
+                  width={12}
+                  height={12}
+                  className="w-3 h-3 object-contain shrink-0"
                 />
               )}
-              <p className="text-xs text-text-secondary/70 uppercase tracking-wide">
-                {item.console_name}
-              </p>
-            </div>
+              {item.console_name}
+            </span>
           )}
           {/* Progress bar — own row so all bars start/end at same position */}
           <div className="flex items-center gap-2 mt-0.5">
-            <div className="w-full max-w-200 h-2 bg-bg-main rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-[width] duration-500 ${isComplete ? 'bg-green-500' : pct > 0 ? 'bg-accent' : 'bg-white/10'}`}
-                style={{ width: `${pct}%` }}
-              />
-            </div>
+            <DualProgressBar
+              softcorePct={isComplete ? 0 : scPct}
+              hardcorePct={isComplete ? 0 : hcPct}
+              trackClass={isComplete ? 'bg-green-500/20' : 'bg-bg-main'}
+              className="w-full max-w-200"
+            />
             <span className="text-xs text-text-secondary/60 tabular-nums">{pct}%</span>
           </div>
 
@@ -267,7 +271,7 @@ function SortableItem({
           <div className="flex items-center gap-2 text-xs text-text-secondary/50">
             {achTotal > 0 ? (
               <span>
-                {achEarned}/{achTotal} logros
+                {scEarned}/{achTotal} logros
               </span>
             ) : (
               <span>— logros</span>
@@ -737,18 +741,38 @@ export default function GroupDetailPage() {
   const recentlyPlayed = useRecentlyPlayedGames()
 
   const achievementMap = useMemo(() => {
-    const map = new Map<number, { earned: number; total: number }>()
-    // recentlyPlayed as base — has NumAchieved + NumPossibleAchievements for any played game
-    for (const g of recentlyPlayed)
-      map.set(g.GameID, {
-        earned: g.NumAchievedHardcore || g.NumAchieved,
-        total: g.NumPossibleAchievements,
-      })
-    // allGames overrides when earned count is higher (completed-games list is authoritative)
+    const hcEarnedMap = new Map<number, number>()
+    const scEarnedMap = new Map<number, number>()
+    const totalMap = new Map<number, number>()
+
+    for (const g of recentlyPlayed) {
+      totalMap.set(g.GameID, g.NumPossibleAchievements)
+      if (g.NumAchievedHardcore > (hcEarnedMap.get(g.GameID) ?? 0))
+        hcEarnedMap.set(g.GameID, g.NumAchievedHardcore)
+      if (g.NumAchieved > (scEarnedMap.get(g.GameID) ?? 0))
+        scEarnedMap.set(g.GameID, g.NumAchieved)
+    }
+
     for (const g of allGames) {
-      const existing = map.get(g.GameID)
-      if (!existing || g.NumAwarded > existing.earned)
-        map.set(g.GameID, { earned: g.NumAwarded, total: g.MaxPossible })
+      if (!totalMap.has(g.GameID) || g.MaxPossible > (totalMap.get(g.GameID) ?? 0))
+        totalMap.set(g.GameID, g.MaxPossible)
+      if (Number(g.HardcoreMode) === 1) {
+        if (g.NumAwarded > (hcEarnedMap.get(g.GameID) ?? 0))
+          hcEarnedMap.set(g.GameID, g.NumAwarded)
+      } else {
+        if (g.NumAwarded > (scEarnedMap.get(g.GameID) ?? 0))
+          scEarnedMap.set(g.GameID, g.NumAwarded)
+      }
+    }
+
+    const map = new Map<number, { scEarned: number; hcEarned: number; total: number }>()
+    const allIds = new Set([...hcEarnedMap.keys(), ...scEarnedMap.keys()])
+    for (const id of allIds) {
+      map.set(id, {
+        scEarned: scEarnedMap.get(id) ?? 0,
+        hcEarned: hcEarnedMap.get(id) ?? 0,
+        total: totalMap.get(id) ?? 0,
+      })
     }
     return map
   }, [allGames, recentlyPlayed])
@@ -983,11 +1007,11 @@ export default function GroupDetailPage() {
 
   const consolePills = useMemo(() => {
     if (!group) return []
-    const seen = new Map<string, { name: string; icon?: string }>()
+    const seen = new Map<string, { name: string; icon?: string; color?: string }>()
     for (const item of group.items) {
       if (item.console_name && !seen.has(item.console_name)) {
         const cons = CONSOLES.find((c) => c.name === item.console_name)
-        seen.set(item.console_name, { name: item.console_name, icon: cons?.icon })
+        seen.set(item.console_name, { name: item.console_name, icon: cons?.icon, color: cons?.color })
       }
     }
     return Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name))
@@ -1123,8 +1147,8 @@ export default function GroupDetailPage() {
                 onClick={() => toggleConsole(c.name)}
                 className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                   selectedConsoles.has(c.name)
-                    ? 'bg-accent text-bg-main'
-                    : 'bg-bg-card text-text-secondary hover:text-text-main'
+                    ? (c.color ?? 'bg-accent text-bg-main')
+                    : 'bg-bg-main text-text-secondary hover:text-text-main'
                 }`}
               >
                 {c.icon && (
