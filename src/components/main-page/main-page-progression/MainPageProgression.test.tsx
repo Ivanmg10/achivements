@@ -1,47 +1,34 @@
-const mockGame = {
-  ID: 1,
-  GameTitle: "Sly Cooper",
-  Title: "Sly Cooper",
-  ConsoleName: "PS2",
-  ImageIcon: "/icon.png",
-  UserCompletion: "50%",
-};
+jest.mock('@/hooks/useGamesProgressionList', () => ({
+  useGamesProgressionList: jest.fn(),
+}))
 
-jest.mock("@/utils/apiCallsUtils", () => ({
-  getGamesInfoList: jest.fn((_id: string, _session: unknown, setter: (fn: (prev: unknown[]) => unknown[]) => void) => {
-    setter((prev: unknown[]) => [...prev, mockGame]);
-  }),
-}));
+jest.mock('@/components/main-page/main-page-progression/main-page-progression-card/MainPageProgressionCard', () => ({
+  __esModule: true,
+  default: ({ game }: { game: { GameTitle: string } }) => <div>{game.GameTitle}</div>,
+}))
 
-import { render, screen } from "@testing-library/react";
-import MainPageProgression from "./MainPageProgression";
-import { useSession } from "next-auth/react";
+import { render, screen } from '@testing-library/react'
+import MainPageProgression from './MainPageProgression'
+import { useGamesProgressionList } from '@/hooks/useGamesProgressionList'
 
-test("renders progression section", () => {
-  (useSession as jest.Mock).mockReturnValue({
-    status: "authenticated",
-    data: { user: {} },
-  });
-  render(<MainPageProgression />);
-  expect(screen.getByText("Tus progresos recientes")).toBeInTheDocument();
-});
+const mockGame = { ID: 1, GameTitle: 'Sly Cooper', ConsoleName: 'PS2', ImageIcon: '/icon.png', UserCompletion: '50%' }
 
-test("renders games when authenticated", () => {
-  (useSession as jest.Mock).mockReturnValue({
-    status: "authenticated",
-    data: { user: {} },
-  });
-  render(<MainPageProgression />);
-  expect(screen.getAllByText("Sly Cooper").length).toBeGreaterThan(0);
-});
+beforeEach(() => {
+  ;(useGamesProgressionList as jest.Mock).mockReturnValue([mockGame])
+})
 
-test("hasFetched guard prevents double fetch", () => {
-  (useSession as jest.Mock).mockReturnValue({
-    status: "authenticated",
-    data: { user: {} },
-  });
-  const { rerender } = render(<MainPageProgression />);
-  (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated", data: null });
-  rerender(<MainPageProgression />);
-  expect(screen.getByText("Tus progresos recientes")).toBeInTheDocument();
-});
+test('renders progression section header', () => {
+  render(<MainPageProgression />)
+  expect(screen.getByText('Your recent progress')).toBeInTheDocument()
+})
+
+test('renders games', () => {
+  render(<MainPageProgression />)
+  expect(screen.getByText('Sly Cooper')).toBeInTheDocument()
+})
+
+test('renders with empty games list', () => {
+  ;(useGamesProgressionList as jest.Mock).mockReturnValue([])
+  render(<MainPageProgression />)
+  expect(screen.getByText('Your recent progress')).toBeInTheDocument()
+})
