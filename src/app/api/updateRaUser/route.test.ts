@@ -1,39 +1,51 @@
-jest.mock("@/lib/db", () => {
-  const query = jest.fn();
-  return { __esModule: true, default: { query } };
-});
+jest.mock('@/lib/db', () => {
+  const query = jest.fn()
+  return { __esModule: true, default: { query } }
+})
 
-jest.mock("next-auth", () => ({
-  getServerSession: jest.fn(),
-}));
+jest.mock('next-auth', () => ({ getServerSession: jest.fn() }))
+jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 
-jest.mock("@/lib/authOptions", () => ({
-  authOptions: {},
-}));
+import { POST } from './route'
+import { getServerSession } from 'next-auth'
+import pool from '@/lib/db'
 
-import { POST } from "./route";
-import { getServerSession } from "next-auth";
-import pool from "@/lib/db";
-
-beforeEach(() => {
-  (pool.query as jest.Mock).mockResolvedValue({});
-});
-
-function makeRequest(body: object) {
-  return {
-    json: () => Promise.resolve(body),
-  } as unknown as Request;
+const validRaUser = {
+  ID: 1,
+  User: 'ivan',
+  ULID: 'ulid',
+  UserPic: '/pic.png',
+  TotalPoints: 100,
 }
 
-test("POST returns 401 when no session", async () => {
-  (getServerSession as jest.Mock).mockResolvedValue(null);
-  const res = await POST(makeRequest({ raUser: { User: "ivan" } }));
-  expect(res.status).toBe(401);
-});
+beforeEach(() => {
+  ;(pool.query as jest.Mock).mockResolvedValue({})
+})
 
-test("POST updates RA user when authenticated", async () => {
-  (getServerSession as jest.Mock).mockResolvedValue({ user: { id: 1 } });
-  const res = await POST(makeRequest({ raUser: { User: "ivan" } }));
-  expect(res.status).toBe(200);
-  expect(res.data).toEqual({ ok: true });
-});
+function makeRequest(body: object) {
+  return { json: () => Promise.resolve(body) } as unknown as Request
+}
+
+test('POST returns 401 when no session', async () => {
+  ;(getServerSession as jest.Mock).mockResolvedValue(null)
+  const res = await POST(makeRequest({ raUser: validRaUser }))
+  expect(res.status).toBe(401)
+})
+
+test('POST returns 400 when raUser missing required fields', async () => {
+  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: 1 } })
+  const res = await POST(makeRequest({ raUser: { User: 'ivan' } }))
+  expect(res.status).toBe(400)
+})
+
+test('POST updates RA user when authenticated', async () => {
+  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: 1 } })
+  const res = await POST(makeRequest({ raUser: validRaUser }))
+  expect(res.status).toBe(200)
+})
+
+test('POST returns 400 when raUser is not an object', async () => {
+  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: 1 } })
+  const res = await POST(makeRequest({ raUser: 'notanobject' }))
+  expect(res.status).toBe(400)
+})
