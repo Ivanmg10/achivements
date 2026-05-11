@@ -1,32 +1,33 @@
-jest.mock("@/components/no-main-header/NoMainHeader", () => ({
-  __esModule: true,
-  default: () => <div data-testid="no-header">NoHeader</div>,
-}));
-
-jest.mock("@/components/user-data/UserData", () => ({
+jest.mock('@/components/user-data/UserData', () => ({
   __esModule: true,
   default: () => <div data-testid="user-data">UserData</div>,
-}));
+}))
 
-jest.mock("@/components/user-charts/UserCharts", () => ({
+jest.mock('@/components/user-stats/UserStats', () => ({
   __esModule: true,
-  default: () => <div data-testid="user-charts">UserCharts</div>,
-}));
+  default: () => <div data-testid="user-stats">UserStats</div>,
+}))
 
-jest.mock("@/components/user-config/UserConfig", () => ({
+jest.mock('@/components/admin-panel/AdminPanel', () => ({
   __esModule: true,
-  default: () => <div data-testid="user-config">UserConfig</div>,
-}));
+  default: () => <div data-testid="admin-panel">AdminPanel</div>,
+}))
 
-import { render, screen } from "@testing-library/react";
-import UserPage from "./page";
-import { useSession } from "next-auth/react";
+import { render, screen } from '@testing-library/react'
+import UserPage from './page'
+import { useSession } from 'next-auth/react'
 
-test("renders all user page sections", () => {
-  (useSession as jest.Mock).mockReturnValue({ data: null });
-  render(<UserPage />);
-  expect(screen.getByTestId("no-header")).toBeInTheDocument();
-  expect(screen.getByTestId("user-data")).toBeInTheDocument();
-  expect(screen.getByTestId("user-charts")).toBeInTheDocument();
-  expect(screen.getByTestId("user-config")).toBeInTheDocument();
-});
+test('renders user page sections', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: null })
+  render(<UserPage />)
+  expect(screen.getByTestId('user-data')).toBeInTheDocument()
+  expect(screen.getByTestId('user-stats')).toBeInTheDocument()
+})
+
+test('renders admin panel when user is admin', () => {
+  ;(useSession as jest.Mock).mockReturnValue({
+    data: { user: { admin: true } },
+  })
+  render(<UserPage />)
+  expect(screen.getByTestId('admin-panel')).toBeInTheDocument()
+})
