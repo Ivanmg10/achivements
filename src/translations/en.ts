@@ -136,6 +136,7 @@ export const en = {
     haveIt: '% have it',
     notEarned: 'Not earned',
     earnedOn: 'Unlocked on',
+    noComments: 'No comments yet',
   },
   raLoginModal: {
     title: 'Sign in to RetroAchievements',
@@ -311,6 +312,22 @@ export const en = {
     filter100: 'Completed',
     noGamesFilter: 'No games match the selected filters',
     clearFilters: 'Clear filters',
+  },
+  charts: {
+    popularUnplayed: 'Popular — not yet played',
+    popularPlayedAll: "You've played everything!",
+    failedToLoad: 'Failed to load',
+    topTen: 'Top 10 global players',
+    yearHeatmapTitle: 'Activity — last 365 days',
+    yearHeatmapLoading: 'Loading yearly activity...',
+    yearHeatmapActiveDays: 'active days',
+    yearHeatmapLess: 'Less',
+    yearHeatmapMore: 'More',
+    consoleCompletionTitle: 'Completion by console',
+    completionDistTitle: 'Completion distribution',
+    games: 'games',
+    done: 'done',
+    consoleBreakdownTitle: 'Rank by console',
   },
 }
 

@@ -121,6 +121,16 @@ function SortableItem({
   const [loadingAch, setLoadingAch] = useState(false)
   const [selectedAch, setSelectedAch] = useState<RetroAchievement | null>(null)
   const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set())
+  const [tooltip, setTooltip] = useState<{ achievement: RetroAchievement; x: number; y: number } | null>(null)
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function handleAchEnter(a: RetroAchievement, x: number, y: number) {
+    hoverTimeout.current = setTimeout(() => setTooltip({ achievement: a, x, y }), 450)
+  }
+  function handleAchLeave() {
+    if (hoverTimeout.current) clearTimeout(hoverTimeout.current)
+    setTooltip(null)
+  }
 
   useEffect(() => {
     if (!open || favoritedIds.size > 0) return
@@ -323,8 +333,11 @@ function SortableItem({
                   return (
                     <div
                       key={a.ID}
+                      onMouseEnter={(e) => handleAchEnter(a, e.clientX, e.clientY)}
+                      onMouseLeave={handleAchLeave}
                       onClick={(e) => {
                         e.stopPropagation()
+                        handleAchLeave()
                         setSelectedAch(a)
                       }}
                       className={`rounded-lg overflow-hidden shrink-0 transition-transform duration-100 hover:scale-125 hover:z-10 relative cursor-pointer ${
@@ -363,6 +376,42 @@ function SortableItem({
           />
         )}
       </AnimatePresence>
+
+      {tooltip && (
+        <div
+          className="fixed z-50 pointer-events-none bg-bg-card border border-bg-header/80 rounded-xl shadow-2xl p-3 max-w-65"
+          style={{ left: tooltip.x + 14, top: tooltip.y - 10 }}
+        >
+          <p className="text-sm font-semibold text-text-main">{tooltip.achievement.Title}</p>
+          <p className="text-xs text-text-secondary mt-1 leading-snug">{tooltip.achievement.Description}</p>
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <span className="text-xs text-text-secondary">{tooltip.achievement.Points} pts</span>
+            {tooltip.achievement.Type === 'progression' && (
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-blue-900/60 text-blue-300">Progression</span>
+            )}
+            {tooltip.achievement.Type === 'win_condition' && (
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-yellow-900/60 text-yellow-300">Win condition</span>
+            )}
+            {tooltip.achievement.Type === 'missable' && (
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-red-900/60 text-red-300">Missable</span>
+            )}
+            {tooltip.achievement.DateEarnedHardcore && (
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-yellow-900/60 text-yellow-300">Hardcore</span>
+            )}
+            {tooltip.achievement.DateEarned && !tooltip.achievement.DateEarnedHardcore && (
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-blue-900/60 text-blue-300">Softcore</span>
+            )}
+            {!tooltip.achievement.DateEarned && !tooltip.achievement.DateEarnedHardcore && (
+              <span className="text-xs text-text-secondary/60">{T.achievement.notEarned}</span>
+            )}
+          </div>
+          {(tooltip.achievement.DateEarnedHardcore ?? tooltip.achievement.DateEarned) && (
+            <p className="text-xs text-text-secondary/60 mt-1">
+              {new Date((tooltip.achievement.DateEarnedHardcore ?? tooltip.achievement.DateEarned)!).toLocaleDateString()}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   )
 }

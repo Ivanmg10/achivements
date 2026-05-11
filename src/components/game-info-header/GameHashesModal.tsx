@@ -64,6 +64,7 @@ function CopyButton({ text }: { text: string }) {
 export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: Props) {
   const [hashes, setHashes] = useState<GameHash[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
@@ -71,10 +72,14 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
   useEffect(() => {
     if (!isOpen) return
     setLoading(true)
+    setError(false)
     fetch(`/api/getGameHashes?gameId=${gameId}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error('Failed to load hashes')
+        return r.json()
+      })
       .then((data) => setHashes(data.Results ?? []))
-      .catch(() => setHashes([]))
+      .catch(() => { setHashes([]); setError(true) })
       .finally(() => setLoading(false))
   }, [isOpen, gameId])
 
@@ -90,7 +95,11 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
           animate="visible"
           exit="exit"
         >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+          <button
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default"
+            onClick={onClose}
+            aria-label="Cerrar modal"
+          />
           <motion.div
             className="relative bg-bg-card border border-white/10 rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col"
             variants={contentVariants}
@@ -126,6 +135,10 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                       <div className="h-2.5 w-64 rounded bg-white/10" />
                     </div>
                   ))}
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
+                  <p className="text-sm text-red-400" role="alert">Error al cargar hashes</p>
                 </div>
               ) : hashes.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">

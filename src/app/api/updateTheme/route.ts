@@ -4,20 +4,25 @@ import pool from "@/lib/db";
 import { authOptions } from "@/lib/authOptions";
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ message: "No autorizado" }, { status: 401 });
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ message: "No autorizado" }, { status: 401 });
+    }
+
+    const { theme } = await req.json();
+    if (!theme) {
+      return NextResponse.json({ message: "theme requerido" }, { status: 400 });
+    }
+
+    await pool.query(`UPDATE users SET theme = $1 WHERE id = $2`, [
+      theme,
+      session.user.id,
+    ]);
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error('[updateTheme POST]', err)
+    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
   }
-
-  const { theme } = await req.json();
-  if (!theme) {
-    return NextResponse.json({ message: "theme requerido" }, { status: 400 });
-  }
-
-  await pool.query(`UPDATE users SET theme = $1 WHERE id = $2`, [
-    theme,
-    session.user.id,
-  ]);
-
-  return NextResponse.json({ ok: true });
 }

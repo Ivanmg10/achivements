@@ -10,13 +10,14 @@ import ConsoleFilter, { buildConsolePills } from '@/components/console-filter/Co
 import Spinner from '@/components/main-spinner/Spinner'
 import { useConsoleFilter } from '@/hooks/useConsoleFilter'
 import { motion } from 'framer-motion'
+import { useLanguage } from '@/context/LanguageContext'
 
 type Category = 'wantToPlay' | 'playing' | 'completed'
 
-const CATEGORY_META: Record<Category, { label: string; icon: string; badge: string }> = {
-  wantToPlay: { label: 'Quiero jugar',   icon: '🔖', badge: 'bg-purple-900/50 text-purple-300' },
-  playing:    { label: 'Jugando',        icon: '🎮', badge: 'bg-blue-900/50   text-blue-300'   },
-  completed:  { label: 'Completados',    icon: '🏆', badge: 'bg-green-900/50  text-green-300'  },
+const CATEGORY_META: Record<Category, { icon: string; badge: string }> = {
+  wantToPlay: { icon: '🔖', badge: 'bg-purple-900/50 text-purple-300' },
+  playing:    { icon: '🎮', badge: 'bg-blue-900/50   text-blue-300'   },
+  completed:  { icon: '🏆', badge: 'bg-green-900/50  text-green-300'  },
 }
 
 export default function AllGamesSection({
@@ -33,8 +34,10 @@ export default function AllGamesSection({
   const [open, setOpen] = useState(true)
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
   const { selected, toggle, clear } = useConsoleFilter()
+  const { T } = useLanguage()
 
   const meta = CATEGORY_META[category]
+  const label = T.categories[category]
   const consolePills = useMemo(() => buildConsolePills(games), [games])
 
   const filtered = useMemo(() => {
@@ -62,7 +65,7 @@ export default function AllGamesSection({
         className="w-full flex items-center gap-3 px-5 py-4 hover:bg-bg-header/30 transition-colors cursor-pointer text-left select-none"
       >
         <span className="text-xl">{meta.icon}</span>
-        <span className="text-xl font-bold">{meta.label}</span>
+        <span className="text-xl font-bold">{label}</span>
         <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${meta.badge}`}>
           {loading ? '…' : filtered.length}
         </span>
@@ -87,7 +90,7 @@ export default function AllGamesSection({
                 <Spinner size={36} />
               </div>
             ) : games.length === 0 ? (
-              <p className="text-center text-text-secondary text-sm py-8">Sin juegos</p>
+              <p className="text-center text-text-secondary text-sm py-8">{T.cards.noGames}</p>
             ) : (
               <>
                 {/* Filters row */}
@@ -109,7 +112,7 @@ export default function AllGamesSection({
                 {/* Games list */}
                 <div className="flex flex-col items-center gap-3 py-4">
                   {filtered.length === 0 ? (
-                    <p className="text-text-secondary text-sm py-4">Sin juegos con ese filtro</p>
+                    <p className="text-text-secondary text-sm py-4">{T.groups.noGamesFilter}</p>
                   ) : (
                     <StatusGameList games={filtered} extraData={extraData} category={category} />
                   )}

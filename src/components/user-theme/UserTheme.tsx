@@ -20,13 +20,19 @@ export default function UserTheme() {
   const { T } = useLanguage()
 
   async function handleSelect(id: Theme) {
+    const previous = theme
     setTheme(id)
-    await fetch('/api/updateTheme', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ theme: id }),
-    })
-    await update({ theme: id })
+    try {
+      const res = await fetch('/api/updateTheme', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theme: id }),
+      })
+      if (!res.ok) throw new Error('Failed to update theme')
+      await update({ theme: id })
+    } catch {
+      setTheme(previous)
+    }
   }
 
   return (

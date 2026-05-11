@@ -47,26 +47,35 @@ export default function RegisterUserForm({
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 mb-4">
+        <label htmlFor="register-username" className="sr-only">{T.registerForm.username}</label>
         <input
+          id="register-username"
           type="text"
           className="bg-bg-tertiary text-text-main rounded-xl p-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
           placeholder={T.registerForm.username}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          autoComplete="username"
         />
+        <label htmlFor="register-password" className="sr-only">{T.registerForm.password}</label>
         <input
+          id="register-password"
           type="password"
           className="bg-bg-tertiary text-text-main rounded-xl p-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
           placeholder={T.registerForm.password}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="new-password"
         />
+        <label htmlFor="register-token" className="sr-only">{T.registerForm.invitationCode}</label>
         <input
+          id="register-token"
           type="text"
           className="bg-bg-tertiary text-text-main rounded-xl p-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
           placeholder={T.registerForm.invitationCode}
           value={registerToken}
           onChange={(e) => setRegisterToken(e.target.value)}
+          autoComplete="off"
         />
 
         <button

@@ -2,42 +2,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { IconPlus, IconFolder, IconLock, IconWorld } from '@tabler/icons-react'
 import { fadeUp } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
-import { GameGroup, RetroAchievementsGameCompleted } from '@/types/types'
+import { RetroAchievementsGameCompleted } from '@/types/types'
 import GroupModal from '@/components/groups/GroupModal'
+import GroupIcon from '@/components/groups/group-icon/GroupIcon'
 import { relativeTime } from '@/utils/utils'
-
-function isImageUrl(s: string) {
-  return s.startsWith('http://') || s.startsWith('https://')
-}
-
-function GroupIcon({ group }: { group: GameGroup }) {
-  const icon = group.icon
-  if (icon) {
-    if (isImageUrl(icon)) {
-      return (
-        <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-bg-main">
-          <Image src={icon} alt={group.title} width={56} height={56} className="w-full h-full object-cover" unoptimized />
-        </div>
-      )
-    }
-    return (
-      <div className="w-14 h-14 rounded-xl bg-bg-main flex items-center justify-center shrink-0 text-3xl leading-none">
-        {icon}
-      </div>
-    )
-  }
-  return (
-    <div className="w-14 h-14 rounded-xl bg-bg-main flex items-center justify-center shrink-0">
-      <IconFolder className="w-7 h-7 text-text-secondary" aria-hidden />
-    </div>
-  )
-}
 
 export default function GroupsPage() {
   const { T } = useLanguage()
@@ -59,7 +32,7 @@ export default function GroupsPage() {
     })
 
     if (data.initialGames?.length) {
-      await Promise.all(
+      const results = await Promise.allSettled(
         data.initialGames.map((g) =>
           fetch(`/api/groups/${group.id}/games`, {
             method: 'POST',
@@ -73,9 +46,12 @@ export default function GroupsPage() {
               num_awarded: g.NumAwarded,
               max_possible: g.MaxPossible,
             }),
-          })
+          }).then((res) => { if (!res.ok) throw new Error(`Failed to add game ${g.GameID}`) })
         )
       )
+      results.forEach((r) => {
+        if (r.status === 'rejected') console.error('[GroupsPage] add game:', r.reason)
+      })
     }
   }
 

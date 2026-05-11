@@ -35,11 +35,14 @@ export default function GameInfoTable({
   useEffect(() => {
     if (!gameData?.ID) return
     fetch(`/api/favorites?gameId=${gameData.ID}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error('Failed to load favorites')
+        return r.json()
+      })
       .then((rows: { achievement_id: number }[]) => {
         setFavoritedIds(new Set(rows.map((r) => r.achievement_id)))
       })
-      .catch(() => {})
+      .catch((err) => console.error('[GameInfoTable] favorites fetch:', err))
   }, [gameData?.ID])
 
   const handleToggleFavorite = useCallback(
@@ -53,18 +56,30 @@ export default function GameInfoTable({
         return next
       })
 
-      if (isFav) {
-        await fetch(`/api/favorites?achievementId=${achievement.ID}`, { method: 'DELETE' })
-      } else {
-        await fetch('/api/favorites', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            achievement,
-            gameId: gameData?.ID,
-            gameTitle: gameData?.Title,
-            numDistinctPlayers,
-          }),
+      try {
+        if (isFav) {
+          const res = await fetch(`/api/favorites?achievementId=${achievement.ID}`, { method: 'DELETE' })
+          if (!res.ok) throw new Error('Failed to unpin achievement')
+        } else {
+          const res = await fetch('/api/favorites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              achievement,
+              gameId: gameData?.ID,
+              gameTitle: gameData?.Title,
+              numDistinctPlayers,
+            }),
+          })
+          if (!res.ok) throw new Error('Failed to pin achievement')
+        }
+      } catch (err) {
+        console.error('[GameInfoTable] toggle favorite:', err)
+        setFavoritedIds((prev) => {
+          const next = new Set(prev)
+          if (isFav) next.add(achievement.ID)
+          else next.delete(achievement.ID)
+          return next
         })
       }
     },

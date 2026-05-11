@@ -1,11 +1,15 @@
+'use client'
+
 import { useMemo } from 'react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MainPageConsoleBreakdown({
   games,
 }: {
   games: RetroAchievementsGameCompleted[]
 }) {
+  const { T } = useLanguage()
   const consoles = useMemo(() => {
     const map: Record<string, { total: number; completed: number; pts: number }> = {}
     for (const g of games) {
@@ -23,8 +27,8 @@ export default function MainPageConsoleBreakdown({
   if (consoles.length === 0) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Rank by console</p>
-        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">No data</div>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.consoleBreakdownTitle}</p>
+        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">{T.cards.noData}</div>
       </div>
     )
   }
@@ -33,13 +37,13 @@ export default function MainPageConsoleBreakdown({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Rank by console</p>
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.consoleBreakdownTitle}</p>
       <div className="flex flex-col gap-2">
         {consoles.map((c) => (
           <div key={c.name} className="flex flex-col gap-0.5">
             <div className="flex items-baseline justify-between">
-              <span className="text-xs font-semibold truncate max-w-[140px]">{c.name}</span>
-              <span className="text-[10px] text-text-secondary shrink-0 ml-1">{c.total} games · {c.pct}% done</span>
+              <span className="text-xs font-semibold truncate max-w-35">{c.name}</span>
+              <span className="text-[10px] text-text-secondary shrink-0 ml-1">{c.total} {T.charts.games} · {c.pct}% {T.charts.done}</span>
             </div>
             <div className="flex gap-1 items-center">
               <div className="flex-1 bg-bg-main rounded-full h-1.5 overflow-hidden">

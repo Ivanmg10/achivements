@@ -345,7 +345,7 @@ export default function AchievementModal({
                     </div>
                   </div>
                 ) : (
-                  <p className="text-sm text-text-secondary/50 text-center py-2">No comments yet</p>
+                  <p className="text-sm text-text-secondary/50 text-center py-2">{T.achievement.noComments}</p>
                 )}
               </>
             )

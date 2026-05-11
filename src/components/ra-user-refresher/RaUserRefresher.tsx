@@ -14,12 +14,16 @@ export default function RaUserRefresher() {
     raRefreshed = true
 
     fetch('/api/getUserProfile')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to refresh RA profile')
+        return res.json()
+      })
       .then((freshUser) => {
         if (freshUser && !freshUser.message) {
           update({ raUser: freshUser })
         }
       })
+      .catch((err) => console.error('[RaUserRefresher]', err))
   }, [status])
 
   return null

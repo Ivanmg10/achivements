@@ -13,11 +13,14 @@ export const getGamesInfo = async (
     SetStateAction<RetroAchievementsGameWithAchievements | null>
   >,
 ) => {
-  const newGame = await fetch(
-    `/api/getGameProgression?gameId=${gameId}`,
-  ).then((res) => res.json());
-
-  setGameData(newGame);
+  try {
+    const res = await fetch(`/api/getGameProgression?gameId=${gameId}`)
+    if (!res.ok) throw new Error(`Failed to fetch game ${gameId}`)
+    const newGame = await res.json()
+    setGameData(newGame)
+  } catch (err) {
+    console.error('[getGamesInfo]', err)
+  }
 };
 
 export const getGamesInfoList = async (
@@ -25,23 +28,30 @@ export const getGamesInfoList = async (
   session: Session | null,
   setGames: Dispatch<SetStateAction<RetroAchievementsGameWithAchievements[]>>,
 ) => {
-  const newGame = await fetch(
-    `/api/getGameProgression?gameId=${gameId}`,
-  ).then((res) => res.json());
-
-  setGames((prev) => [...prev, newGame]);
+  try {
+    const res = await fetch(`/api/getGameProgression?gameId=${gameId}`)
+    if (!res.ok) throw new Error(`Failed to fetch game ${gameId}`)
+    const newGame = await res.json()
+    setGames((prev) => [...prev, newGame])
+  } catch (err) {
+    console.error('[getGamesInfoList]', err)
+  }
 };
 
 export const unlinkRaUser = async (
   update: (data: Partial<Session>) => Promise<Session | null>,
 ) => {
-  await fetch("/api/updateRaUser", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ raUser: {} }),
-  });
-
-  await update({ raUser: {} } as Partial<Session>);
+  try {
+    const res = await fetch("/api/updateRaUser", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ raUser: {} }),
+    })
+    if (!res.ok) throw new Error('Failed to unlink RA user')
+    await update({ raUser: {} } as Partial<Session>)
+  } catch (err) {
+    console.error('[unlinkRaUser]', err)
+  }
 };
 
 export const getWantGames = async (

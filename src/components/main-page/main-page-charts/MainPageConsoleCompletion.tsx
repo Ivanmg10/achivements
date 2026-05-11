@@ -1,8 +1,12 @@
+'use client'
+
 import { useMemo } from 'react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MainPageConsoleCompletion({ games }: { games: RetroAchievementsGameCompleted[] }) {
+  const { T } = useLanguage()
   const consoles = useMemo(() => {
     const map: Record<string, { scSum: number; scCount: number; hcSum: number; hcCount: number }> = {}
     for (const g of games) {
@@ -29,15 +33,15 @@ export default function MainPageConsoleCompletion({ games }: { games: RetroAchie
   if (consoles.length === 0) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Completion by console</p>
-        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">No data</div>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.consoleCompletionTitle}</p>
+        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">{T.cards.noData}</div>
       </div>
     )
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Completion by console</p>
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.consoleCompletionTitle}</p>
       <div className="flex flex-col gap-2">
         {consoles.map(({ name, total, scAvg, hcAvg, bestAvg }) => {
           const pct = Math.round(bestAvg * 100)

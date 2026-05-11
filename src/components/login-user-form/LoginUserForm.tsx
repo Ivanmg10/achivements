@@ -53,18 +53,24 @@ export default function LoginUserForm({
       )}
 
       <div className="flex flex-col gap-3 mb-4">
+        <label htmlFor="login-username" className="sr-only">{T.loginForm.username}</label>
         <input
+          id="login-username"
           value={username}
           className="bg-bg-tertiary text-text-main rounded-xl p-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
           onChange={(e) => setUsername(e.target.value)}
           placeholder={T.loginForm.username}
+          autoComplete="username"
         />
+        <label htmlFor="login-password" className="sr-only">{T.loginForm.password}</label>
         <input
+          id="login-password"
           type="password"
           value={password}
           className="bg-bg-tertiary text-text-main rounded-xl p-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
           onChange={(e) => setPassword(e.target.value)}
           placeholder={T.loginForm.password}
+          autoComplete="current-password"
         />
       </div>
 
