@@ -105,12 +105,14 @@ function SortableItem({
     disabled: !draggable,
   })
   const style = { transform: CSS.Transform.toString(transform), transition }
-  const pct = Math.min(Math.round(parseFloat(item.pct_won) * 100), 100)
-  const isComplete = pct >= 100
   const consoleIcon = CONSOLES.find((c) => c.name === item.console_name)?.icon
 
   const achEarned = achStats?.earned ?? item.num_awarded
   const achTotal = achStats?.total || item.max_possible
+  const pct = achTotal > 0
+    ? Math.min(Math.round((achEarned / achTotal) * 100), 100)
+    : Math.min(Math.round(parseFloat(item.pct_won) * 100), 100)
+  const isComplete = pct >= 100
   const ptsEarned = ptsStats?.earned ?? item.points_won
   const ptsTotal = ptsStats?.total || item.max_points
 
