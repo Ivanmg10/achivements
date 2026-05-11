@@ -1,18 +1,35 @@
-import { render, screen } from "@testing-library/react";
-import AchievementsLineChart from "./AchievementsLineChart";
+import { render, screen } from '@testing-library/react'
+import AchievementsLineChart from './AchievementsLineChart'
 
-const mockAchievements = [
-  { Date: "2024-01-15 10:00:00" } as any,
-  { Date: "2024-01-15 12:00:00" } as any,
-  { Date: "2024-01-16 10:00:00" } as any,
-];
+jest.mock('@/components/day-achievements-modal/DayAchievementsModal', () => ({
+  __esModule: true,
+  default: () => null,
+}))
 
-test("renders line chart with achievements", () => {
-  render(<AchievementsLineChart achievements={mockAchievements} />);
-  expect(screen.getByTestId("ResponsiveContainer")).toBeInTheDocument();
-});
+function recentDate(daysAgo = 0) {
+  const d = new Date()
+  d.setDate(d.getDate() - daysAgo)
+  return d.toISOString().replace('T', ' ').slice(0, 19)
+}
 
-test("renders with empty achievements", () => {
-  render(<AchievementsLineChart achievements={[]} />);
-  expect(screen.getByTestId("ResponsiveContainer")).toBeInTheDocument();
-});
+const recentAchievements = [
+  { Date: recentDate(0) } as any,
+  { Date: recentDate(1) } as any,
+  { Date: recentDate(2) } as any,
+]
+
+test('renders line chart with recent achievements', () => {
+  render(<AchievementsLineChart achievements={recentAchievements} />)
+  expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
+})
+
+test('renders no activity message with empty achievements', () => {
+  render(<AchievementsLineChart achievements={[]} />)
+  expect(screen.getByText('No activity this week')).toBeInTheDocument()
+})
+
+test('renders no activity message with only old achievements', () => {
+  const old = [{ Date: '2020-01-01 00:00:00' } as any]
+  render(<AchievementsLineChart achievements={old} />)
+  expect(screen.getByText('No activity this week')).toBeInTheDocument()
+})
