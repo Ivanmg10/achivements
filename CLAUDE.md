@@ -86,6 +86,9 @@ Mobile-first. Tailwind sm/md/lg prefixes. No fixed widths that break mobile.
 - New strings → add to both `src/translations/en.ts` and `src/translations/es.ts`
 - Admin panel exempt
 
+## Git — commits
+**Never commit on behalf of the user.** Stage and show the diff if needed, but the user runs `git commit` themselves. Do not run `git commit` unless the user explicitly asks for it in that specific moment.
+
 ## Style
 - Single quotes, no trailing semicolons
 - Spanish UI text is intentional — do not change it
