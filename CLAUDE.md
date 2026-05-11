@@ -87,7 +87,7 @@ Mobile-first. Tailwind sm/md/lg prefixes. No fixed widths that break mobile.
 - Admin panel exempt
 
 ## Git — commits
-**Never commit on behalf of the user.** Stage and show the diff if needed, but the user runs `git commit` themselves. Do not run `git commit` unless the user explicitly asks for it in that specific moment.
+Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — all commits must appear solely under the user's name so GitHub contributions are attributed correctly.
 
 ## Style
 - Single quotes, no trailing semicolons
