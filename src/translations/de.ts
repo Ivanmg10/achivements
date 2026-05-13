@@ -111,6 +111,8 @@ export const de: Translations = {
     beatenSC: 'Geschlagen SC',
     completions: 'Abschlüsse',
     events: 'Events',
+    unlockedHC: 'HC freigeschaltet',
+    unlockedSC: 'SC freigeschaltet',
   },
   gameInfoTable: {
     sortOrder: 'Reihenfolge',
@@ -127,6 +129,9 @@ export const de: Translations = {
     headerPoints: 'Punkte',
     headerEarned: 'Erhalten',
     missableWarning: '⚠ Verpassbare Errungenschaften',
+    expandTable: 'Alle Errungenschaften anzeigen',
+    collapseTable: 'Einklappen',
+    author: 'Autor',
   },
   achievement: {
     progression: 'Progression',
@@ -139,6 +144,22 @@ export const de: Translations = {
     notEarned: 'Nicht erhalten',
     earnedOn: 'Freigeschaltet am',
     noComments: 'No comments yet',
+    by: 'by',
+  },
+  gameComments: {
+    title: 'Game Comments',
+    loading: 'Loading comments...',
+    empty: 'No comments for this game yet',
+    error: 'Could not load comments',
+    showMore: 'Show more',
+    collapse: 'Collapse',
+  },
+  gameStatus: {
+    mastered: 'Mastered',
+    completed: 'Completed',
+    beatenHC: 'Beaten HC',
+    beaten: 'Beaten',
+    inProgress: 'In Progress',
   },
   raLoginModal: {
     title: 'Bei RetroAchievements anmelden',
@@ -196,6 +217,7 @@ export const de: Translations = {
     pointsContributed: 'Beigetragene Punkte',
     signIn: 'Mit RetroAchievements anmelden',
     playingNow: 'Spielt gerade',
+    viewOnRA: 'Auf RA ansehen',
   },
   lineChart: {
     achievementsLast7Days: '{total} Errungenschaften in den letzten 7 Tagen',

@@ -111,6 +111,8 @@ export const ja: Translations = {
     beatenSC: 'クリアSC',
     completions: '完了数',
     events: 'イベント',
+    unlockedHC: 'HCでアンロック',
+    unlockedSC: 'SCでアンロック',
   },
   gameInfoTable: {
     sortOrder: '順序',
@@ -127,6 +129,9 @@ export const ja: Translations = {
     headerPoints: 'ポイント',
     headerEarned: '獲得',
     missableWarning: '⚠ 取り逃がし注意の実績',
+    expandTable: 'すべての実績を表示',
+    collapseTable: '折りたたむ',
+    author: '作者',
   },
   achievement: {
     progression: 'プログレッション',
@@ -139,6 +144,22 @@ export const ja: Translations = {
     notEarned: '未獲得',
     earnedOn: 'アンロック日',
     noComments: 'No comments yet',
+    by: 'by',
+  },
+  gameComments: {
+    title: 'Game Comments',
+    loading: 'Loading comments...',
+    empty: 'No comments for this game yet',
+    error: 'Could not load comments',
+    showMore: 'Show more',
+    collapse: 'Collapse',
+  },
+  gameStatus: {
+    mastered: 'Mastered',
+    completed: 'Completed',
+    beatenHC: 'Beaten HC',
+    beaten: 'Beaten',
+    inProgress: 'In Progress',
   },
   raLoginModal: {
     title: 'RetroAchievementsにログイン',
@@ -196,6 +217,7 @@ export const ja: Translations = {
     pointsContributed: '貢献したポイント',
     signIn: 'RetroAchievementsでログイン',
     playingNow: '現在プレイ中',
+    viewOnRA: 'RAで見る',
   },
   lineChart: {
     achievementsLast7Days: '過去7日間で{total}件の実績',

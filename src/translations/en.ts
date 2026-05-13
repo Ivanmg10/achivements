@@ -109,6 +109,8 @@ export const en = {
     beatenSC: 'Beaten SC',
     completions: 'Completions',
     events: 'Events',
+    unlockedHC: 'Unlocked HC',
+    unlockedSC: 'Unlocked SC',
   },
   gameInfoTable: {
     sortOrder: 'Order',
@@ -125,6 +127,9 @@ export const en = {
     headerPoints: 'Points',
     headerEarned: 'Earned',
     missableWarning: '⚠ Missable achievements',
+    expandTable: 'Show all achievements',
+    collapseTable: 'Collapse',
+    author: 'Author',
   },
   achievement: {
     progression: 'Progression',
@@ -137,6 +142,22 @@ export const en = {
     notEarned: 'Not earned',
     earnedOn: 'Unlocked on',
     noComments: 'No comments yet',
+    by: 'by',
+  },
+  gameComments: {
+    title: 'Game Comments',
+    loading: 'Loading comments...',
+    empty: 'No comments for this game yet',
+    error: 'Could not load comments',
+    showMore: 'Show more',
+    collapse: 'Collapse',
+  },
+  gameStatus: {
+    mastered: 'Mastered',
+    completed: 'Completed',
+    beatenHC: 'Beaten HC',
+    beaten: 'Beaten',
+    inProgress: 'In Progress',
   },
   raLoginModal: {
     title: 'Sign in to RetroAchievements',
@@ -194,6 +215,7 @@ export const en = {
     pointsContributed: 'Points contributed',
     signIn: 'Sign in with RetroAchievements',
     playingNow: 'Playing now',
+    viewOnRA: 'View on RA',
   },
   lineChart: {
     achievementsLast7Days: '{total} achievements in the last 7 days',

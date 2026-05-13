@@ -111,6 +111,8 @@ export const pt: Translations = {
     beatenSC: 'Zerado SC',
     completions: 'Conclusões',
     events: 'Eventos',
+    unlockedHC: 'Desbloqueado HC',
+    unlockedSC: 'Desbloqueado SC',
   },
   gameInfoTable: {
     sortOrder: 'Ordem',
@@ -127,6 +129,9 @@ export const pt: Translations = {
     headerPoints: 'Pontos',
     headerEarned: 'Obtido',
     missableWarning: '⚠ Conquistas que podem ser perdidas',
+    expandTable: 'Ver todas as conquistas',
+    collapseTable: 'Recolher',
+    author: 'Autor',
   },
   achievement: {
     progression: 'Progressão',
@@ -139,6 +144,22 @@ export const pt: Translations = {
     notEarned: 'Não obtido',
     earnedOn: 'Desbloqueado em',
     noComments: 'No comments yet',
+    by: 'by',
+  },
+  gameComments: {
+    title: 'Game Comments',
+    loading: 'Loading comments...',
+    empty: 'No comments for this game yet',
+    error: 'Could not load comments',
+    showMore: 'Show more',
+    collapse: 'Collapse',
+  },
+  gameStatus: {
+    mastered: 'Mastered',
+    completed: 'Completed',
+    beatenHC: 'Beaten HC',
+    beaten: 'Beaten',
+    inProgress: 'In Progress',
   },
   raLoginModal: {
     title: 'Entrar no RetroAchievements',
@@ -196,6 +217,7 @@ export const pt: Translations = {
     pointsContributed: 'Pontos contribuídos',
     signIn: 'Entrar com RetroAchievements',
     playingNow: 'Jogando agora',
+    viewOnRA: 'Ver no RA',
   },
   lineChart: {
     achievementsLast7Days: '{total} conquistas nos últimos 7 dias',

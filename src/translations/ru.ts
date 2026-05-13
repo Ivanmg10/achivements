@@ -111,6 +111,8 @@ export const ru: Translations = {
     beatenSC: 'Пройдено SC',
     completions: 'Завершения',
     events: 'События',
+    unlockedHC: 'Разблокировано HC',
+    unlockedSC: 'Разблокировано SC',
   },
   gameInfoTable: {
     sortOrder: 'Порядок',
@@ -127,6 +129,9 @@ export const ru: Translations = {
     headerPoints: 'Очки',
     headerEarned: 'Получено',
     missableWarning: '⚠ Пропускаемые достижения',
+    expandTable: 'Показать все достижения',
+    collapseTable: 'Свернуть',
+    author: 'Автор',
   },
   achievement: {
     progression: 'Прогресс',
@@ -139,6 +144,22 @@ export const ru: Translations = {
     notEarned: 'Не получено',
     earnedOn: 'Разблокировано',
     noComments: 'No comments yet',
+    by: 'by',
+  },
+  gameComments: {
+    title: 'Game Comments',
+    loading: 'Loading comments...',
+    empty: 'No comments for this game yet',
+    error: 'Could not load comments',
+    showMore: 'Show more',
+    collapse: 'Collapse',
+  },
+  gameStatus: {
+    mastered: 'Mastered',
+    completed: 'Completed',
+    beatenHC: 'Beaten HC',
+    beaten: 'Beaten',
+    inProgress: 'In Progress',
   },
   raLoginModal: {
     title: 'Войти в RetroAchievements',
@@ -196,6 +217,7 @@ export const ru: Translations = {
     pointsContributed: 'Внесено очков',
     signIn: 'Войти через RetroAchievements',
     playingNow: 'Играет сейчас',
+    viewOnRA: 'Смотреть на RA',
   },
   lineChart: {
     achievementsLast7Days: '{total} достижений за последние 7 дней',
