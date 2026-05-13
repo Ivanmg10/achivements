@@ -80,7 +80,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                   </span>
                   <span className="text-[11px] text-text-secondary truncate">{ach.GameTitle}</span>
                 </div>
-                <span className={`text-xs shrink-0 ${ach.HardcoreMode === '1' ? 'text-yellow-400' : 'text-text-secondary'}`}>
+                <span className={`text-xs shrink-0 ${ach.HardcoreMode === '1' ? 'text-warning' : 'text-text-secondary'}`}>
                   {ach.Points}pts
                 </span>
               </Link>

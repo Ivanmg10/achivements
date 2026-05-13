@@ -2,15 +2,20 @@
 
 import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
+import GameInfoAchievementCard from '../game-info-achivement/GameInfoAchievementCard'
 import AchievementModal from '../achievement-modal/AchievementModal'
 import Image from 'next/image'
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { SortableHeader, SortState, SortKey, DEFAULT_DIRS } from './SortableHeader'
+import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 
 type Filter = 'all' | 'earned' | 'unearned'
 type SortDir = 'asc' | 'desc'
+
+const COLLAPSED_ROWS = 3
+const COLLAPSED_HEIGHT = COLLAPSED_ROWS * 82
 
 export default function GameInfoTable({
   gameData,
@@ -22,6 +27,7 @@ export default function GameInfoTable({
   const [missableOpen, setMissableOpen] = useState(false)
   const [selectedAchievement, setSelectedAchievement] = useState<RetroAchievement | null>(null)
   const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set())
+  const [tableExpanded, setTableExpanded] = useState(false)
   const { T } = useLanguage()
 
   const FILTER_LABELS: Record<Filter, string> = {
@@ -94,7 +100,10 @@ export default function GameInfoTable({
   }, [gameData])
 
   const missableUnearned = useMemo(
-    () => achievements.filter((a) => a.Type === 'missable' && !a.DateEarned),
+    () =>
+      achievements
+        .filter((a) => a.Type === 'missable' && !a.DateEarned)
+        .sort((a, b) => a.DisplayOrder - b.DisplayOrder),
     [achievements]
   )
 
@@ -140,24 +149,31 @@ export default function GameInfoTable({
     )
   }
 
+  const needsToggle = filtered.length > COLLAPSED_ROWS
+
   return (
     <section className="bg-bg-card p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
+      {/* Missable warning */}
       {missableUnearned.length > 0 && (
-        <div className="w-full border border-red-800/50 rounded-xl overflow-hidden">
+        <div className="w-full border border-danger/40 rounded-xl overflow-hidden">
           <button
             onClick={() => setMissableOpen((o) => !o)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-red-950/40 hover:bg-red-950/60 transition-colors text-left"
+            className="w-full flex items-center justify-between px-4 py-3 bg-danger/10 hover:bg-danger/15 transition-colors text-left"
           >
-            <span className="text-red-400 font-semibold text-sm uppercase tracking-wide">
+            <span className="text-danger font-semibold text-sm uppercase tracking-wide">
               {T.gameInfoTable.missableWarning} ({missableUnearned.length})
             </span>
-            <span className="text-red-400 text-xs">{missableOpen ? '▲' : '▼'}</span>
+            <span className="text-danger text-xs">{missableOpen ? '▲' : '▼'}</span>
           </button>
 
           {missableOpen && (
-            <div className="flex flex-col gap-2 p-4 bg-red-950/20">
+            <div className="flex flex-col gap-2 p-4 bg-danger/5">
               {missableUnearned.map((a) => (
-                <div key={a.ID} className="flex items-center gap-3 opacity-80">
+                <button
+                  key={a.ID}
+                  onClick={() => setSelectedAchievement(a)}
+                  className="flex items-center gap-3 opacity-80 hover:opacity-100 transition-opacity text-left w-full rounded-lg hover:bg-danger/10 p-1 -m-1"
+                >
                   {a.BadgeName && (
                     <Image
                       src={`https://media.retroachievements.org/Badge/${a.BadgeName}.png`}
@@ -171,13 +187,14 @@ export default function GameInfoTable({
                     <p className="text-sm font-medium">{a.Title}</p>
                     <p className="text-xs text-text-secondary">{a.Description}</p>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}
         </div>
       )}
 
+      {/* Filter buttons */}
       <div className="flex gap-2">
         {(['all', 'earned', 'unearned'] as Filter[]).map((f) => (
           <button
@@ -195,45 +212,104 @@ export default function GameInfoTable({
       </div>
 
       {gameData && (
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="text-sm border-b border-bg-header">
-              <th className="px-3 py-2 w-24 text-center text-text-secondary">
-                {T.gameInfoTable.headerIcon}
-              </th>
-              <SortableHeader sortKey="default" sortState={sortState} onSort={handleSort} className="text-left">
-                {T.gameInfoTable.headerAchievement}
-              </SortableHeader>
-              <SortableHeader sortKey="players" sortState={sortState} onSort={handleSort} className="w-48 text-center hidden sm:table-cell">
-                {T.gameInfoTable.headerPlayers}
-              </SortableHeader>
-              <SortableHeader sortKey="hc" sortState={sortState} onSort={handleSort} className="w-48 text-center hidden sm:table-cell">
-                {T.gameInfoTable.headerHC}
-              </SortableHeader>
-              <SortableHeader sortKey="rarity" sortState={sortState} onSort={handleSort} className="w-36 text-center hidden sm:table-cell">
-                {T.gameInfoTable.headerRarity}
-              </SortableHeader>
-              <SortableHeader sortKey="earned" sortState={sortState} onSort={handleSort} className="w-40 text-center hidden sm:table-cell">
-                {T.gameInfoTable.headerEarned}
-              </SortableHeader>
-              <SortableHeader sortKey="points" sortState={sortState} onSort={handleSort} className="w-28 text-center">
-                {T.gameInfoTable.headerPoints}
-              </SortableHeader>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((achievement) => (
-              <GameInfoAchivement
-                achievement={achievement}
-                numDistinctPlayers={numDistinctPlayers}
-                key={achievement.ID}
-                isFavorited={favoritedIds.has(achievement.ID)}
-                onToggleFavorite={handleToggleFavorite}
-                onClick={() => setSelectedAchievement(achievement)}
-              />
-            ))}
-          </tbody>
-        </table>
+        <>
+          {/* Desktop table */}
+          <div className="hidden sm:block w-full">
+            <div
+              className="relative"
+              style={!tableExpanded && needsToggle ? { maxHeight: `${COLLAPSED_HEIGHT}px`, overflow: 'hidden' } : undefined}
+            >
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="text-sm border-b border-bg-header">
+                    <th className="px-3 py-2 w-24 text-center text-text-secondary">
+                      {T.gameInfoTable.headerIcon}
+                    </th>
+                    <SortableHeader sortKey="default" sortState={sortState} onSort={handleSort} className="text-left">
+                      {T.gameInfoTable.headerAchievement}
+                    </SortableHeader>
+                    <SortableHeader sortKey="players" sortState={sortState} onSort={handleSort} className="w-40 text-center">
+                      {T.gameInfoTable.headerPlayers}
+                    </SortableHeader>
+                    <SortableHeader sortKey="hc" sortState={sortState} onSort={handleSort} className="w-36 text-center">
+                      {T.gameInfoTable.headerHC}
+                    </SortableHeader>
+                    <SortableHeader sortKey="rarity" sortState={sortState} onSort={handleSort} className="w-32 text-center">
+                      {T.gameInfoTable.headerRarity}
+                    </SortableHeader>
+                    <SortableHeader sortKey="earned" sortState={sortState} onSort={handleSort} className="w-36 text-center">
+                      {T.gameInfoTable.headerEarned}
+                    </SortableHeader>
+                    <SortableHeader sortKey="points" sortState={sortState} onSort={handleSort} className="w-24 text-center">
+                      {T.gameInfoTable.headerPoints}
+                    </SortableHeader>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((achievement) => (
+                    <GameInfoAchivement
+                      achievement={achievement}
+                      numDistinctPlayers={numDistinctPlayers}
+                      key={achievement.ID}
+                      isFavorited={favoritedIds.has(achievement.ID)}
+                      onToggleFavorite={handleToggleFavorite}
+                      onClick={() => setSelectedAchievement(achievement)}
+                    />
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Fade overlay when collapsed */}
+              {!tableExpanded && needsToggle && (
+                <div className="absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-bg-card via-bg-card/80 to-transparent pointer-events-none" />
+              )}
+            </div>
+          </div>
+
+          {/* Mobile card list */}
+          <div className="sm:hidden w-full">
+            <div
+              className="relative flex flex-col gap-2"
+              style={!tableExpanded && needsToggle ? { maxHeight: `${COLLAPSED_ROWS * 110}px`, overflow: 'hidden' } : undefined}
+            >
+              {filtered.map((achievement) => (
+                <GameInfoAchievementCard
+                  key={achievement.ID}
+                  achievement={achievement}
+                  numDistinctPlayers={numDistinctPlayers}
+                  isFavorited={favoritedIds.has(achievement.ID)}
+                  onToggleFavorite={handleToggleFavorite}
+                  onClick={() => setSelectedAchievement(achievement)}
+                />
+              ))}
+
+              {/* Fade overlay when collapsed */}
+              {!tableExpanded && needsToggle && (
+                <div className="absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-bg-card via-bg-card/80 to-transparent pointer-events-none" />
+              )}
+            </div>
+          </div>
+
+          {/* Expand / collapse toggle */}
+          {needsToggle && (
+            <button
+              onClick={() => setTableExpanded((e) => !e)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-bg-header hover:bg-bg-header/80 text-text-secondary hover:text-text-main transition-colors self-center"
+            >
+              {tableExpanded ? (
+                <>
+                  <IconChevronUp className="w-4 h-4" />
+                  {T.gameInfoTable.collapseTable}
+                </>
+              ) : (
+                <>
+                  <IconChevronDown className="w-4 h-4" />
+                  {T.gameInfoTable.expandTable} ({filtered.length})
+                </>
+              )}
+            </button>
+          )}
+        </>
       )}
 
       <AnimatePresence>

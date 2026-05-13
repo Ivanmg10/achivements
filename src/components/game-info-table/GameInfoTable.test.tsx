@@ -33,7 +33,7 @@ const mockGameData = { Achievements: { '1': mockAchievement } } as any
 test('renders table with achievements', () => {
   render(<GameInfoTable gameData={mockGameData} />)
   expect(screen.getByText('Icon')).toBeInTheDocument()
-  expect(screen.getByText('First Blood')).toBeInTheDocument()
+  expect(screen.getAllByText('First Blood')).toHaveLength(2)
 })
 
 test('renders empty when no gameData', () => {
@@ -44,5 +44,5 @@ test('renders empty when no gameData', () => {
 test('filters out undefined achievements', () => {
   const gameData = { Achievements: { '1': mockAchievement, '2': undefined } } as any
   render(<GameInfoTable gameData={gameData} />)
-  expect(screen.getByText('First Blood')).toBeInTheDocument()
+  expect(screen.getAllByText('First Blood')).toHaveLength(2)
 })

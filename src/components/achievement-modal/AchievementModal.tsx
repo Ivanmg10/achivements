@@ -72,9 +72,9 @@ export default function AchievementModal({
   const COMMENTS_PER_PAGE = 50
 
   const TYPE_BADGES: Record<string, { label: string; className: string }> = {
-    progression: { label: T.achievement.progression, className: 'bg-blue-900/60 text-blue-300' },
-    win_condition: { label: T.achievement.winCondition, className: 'bg-yellow-900/60 text-yellow-300' },
-    missable: { label: T.achievement.missable, className: 'bg-red-900/60 text-red-300' },
+    progression: { label: T.achievement.progression, className: 'bg-info/20 text-info' },
+    win_condition: { label: T.achievement.winCondition, className: 'bg-warning/20 text-warning' },
+    missable: { label: T.achievement.missable, className: 'bg-danger/20 text-danger' },
   }
 
   const typeBadge = achievement.Type ? TYPE_BADGES[achievement.Type] : null
@@ -136,7 +136,7 @@ export default function AchievementModal({
               width={80}
               height={80}
               className={`w-20 h-20 rounded-xl object-cover shrink-0 ${
-                earnedHardcore ? 'ring-2 ring-yellow-400' : earned ? 'ring-2 ring-blue-500/50' : 'grayscale opacity-50'
+                earnedHardcore ? 'ring-2 ring-warning' : earned ? 'ring-2 ring-info/50' : 'grayscale opacity-50'
               }`}
             />
           )}
@@ -147,7 +147,7 @@ export default function AchievementModal({
                   onClick={onToggleFavorite}
                   aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
                   className={`shrink-0 transition-colors duration-150 ${
-                    isFavorited ? 'text-yellow-400 hover:text-yellow-300' : 'text-text-secondary/50 hover:text-yellow-400'
+                    isFavorited ? 'text-warning hover:text-warning/80' : 'text-text-secondary/50 hover:text-warning'
                   }`}
                 >
                   <svg viewBox="0 0 24 24" fill={isFavorited ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={1.8} className="w-5 h-5">
@@ -172,7 +172,7 @@ export default function AchievementModal({
                 </span>
               )}
               {earnedHardcore && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-900/60 text-yellow-300">HC</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-warning/20 text-warning">HC</span>
               )}
             </div>
             <p className="text-sm text-text-secondary">{achievement.Description}</p>
@@ -225,7 +225,7 @@ export default function AchievementModal({
             </div>
           )}
 
-          {error && <p className="text-sm text-red-400 text-center">{error}</p>}
+          {error && <p className="text-sm text-danger text-center">{error}</p>}
 
           {!loading && detail && (() => {
             const sortedComments = detail.comments?.Results

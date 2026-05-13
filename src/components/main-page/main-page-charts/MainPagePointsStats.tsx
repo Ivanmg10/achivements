@@ -46,12 +46,12 @@ export default function MainPagePointsStats({
 
   return (
     <div className="flex flex-wrap gap-3">
-      <StatPill label="Today" value={ptsToday.toLocaleString()} sub={todaySub} accent={ptsToday > 0 ? 'text-yellow-400' : undefined} />
+      <StatPill label="Today" value={ptsToday.toLocaleString()} sub={todaySub} accent={ptsToday > 0 ? 'text-warning' : undefined} />
       <StatPill label="This week" value={pts7d.toLocaleString()} sub={`${ach7d} achievement${ach7d !== 1 ? 's' : ''}`} />
-      <StatPill label="HC this week" value={hc7d.toLocaleString()} sub="hardcore pts" accent={hc7d > 0 ? 'text-yellow-400' : undefined} />
-      <StatPill label="SC this week" value={sc7d.toLocaleString()} sub="softcore pts" accent={sc7d > 0 ? 'text-blue-400' : undefined} />
+      <StatPill label="HC this week" value={hc7d.toLocaleString()} sub="hardcore pts" accent={hc7d > 0 ? 'text-warning' : undefined} />
+      <StatPill label="SC this week" value={sc7d.toLocaleString()} sub="softcore pts" accent={sc7d > 0 ? 'text-info' : undefined} />
       {rank && <StatPill label="Global rank" value={`#${rank.Rank.toLocaleString()}`} sub={`${rank.Score.toLocaleString()} pts`} accent="text-accent" />}
-      <StatPill label="Streak" value={`${streak}d`} sub={streak > 0 ? 'active' : 'no streak'} accent={streak >= 7 ? 'text-orange-400' : streak > 0 ? 'text-green-400' : undefined} />
+      <StatPill label="Streak" value={`${streak}d`} sub={streak > 0 ? 'active' : 'no streak'} accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined} />
     </div>
   )
 }

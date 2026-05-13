@@ -7,6 +7,27 @@ import GameInfoProgressionHeader from './game-info-header-progression/GameInfoPr
 import GameHashesModal from './GameHashesModal'
 import { CONSOLES } from '@/constants'
 import { IconHash, IconExternalLink } from '@tabler/icons-react'
+import { useLanguage } from '@/context/LanguageContext'
+
+type StatusKey = 'mastered' | 'completed' | 'beatenHC' | 'beaten' | 'inProgress'
+
+const STATUS_CLASSES: Record<StatusKey, string> = {
+  mastered: 'bg-warning/20 text-warning',
+  completed: 'bg-success/20 text-success',
+  beatenHC: 'bg-warning/15 text-warning',
+  beaten: 'bg-success/15 text-success',
+  inProgress: 'bg-info/20 text-info',
+}
+
+function deriveStatus(gameData: RetroAchievementsGameWithAchievements): StatusKey | null {
+  const kind = gameData.HighestAwardKind
+  if (kind === 'mastered') return 'mastered'
+  if (kind === 'completed') return 'completed'
+  if (kind === 'beaten-hardcore') return 'beatenHC'
+  if (kind === 'beaten-softcore') return 'beaten'
+  if ((gameData.NumAwardedToUser ?? 0) > 0) return 'inProgress'
+  return null
+}
 
 export default function GameInfoHeader({
   gameData,
@@ -15,12 +36,14 @@ export default function GameInfoHeader({
   gameData?: RetroAchievementsGameWithAchievements | null
   children?: ReactNode
 }) {
+  const { T } = useLanguage()
   const consoleDef = CONSOLES.find((c) => c.id === gameData?.ConsoleID)
   const consoleIcon = consoleDef?.icon
   const consoleColor = consoleDef?.color
   const [hashesOpen, setHashesOpen] = useState(false)
 
   const bgImage = gameData?.ImageTitle ?? gameData?.ImageIngame ?? null
+  const status = gameData ? deriveStatus(gameData) : null
 
   return (
     <section className="relative bg-bg-card p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_400px] mt-5 overflow-hidden">
@@ -54,20 +77,30 @@ export default function GameInfoHeader({
         )}
         <div className="flex flex-col flex-1 min-w-0 gap-3">
           <h1 className="text-2xl lg:text-3xl">{gameData?.Title}</h1>
-          {gameData?.ConsoleName && (
-            <span className={`inline-flex items-center gap-1.5 text-sm px-2 py-0.5 rounded-md font-medium self-start ${consoleColor ?? 'text-text-secondary'}`}>
-              {consoleIcon && (
-                <Image
-                  src={consoleIcon}
-                  alt={gameData.ConsoleName}
-                  width={14}
-                  height={14}
-                  className="object-contain shrink-0"
-                />
-              )}
-              {gameData.ConsoleName}
-            </span>
-          )}
+
+          {/* Console + status row */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {gameData?.ConsoleName && (
+              <span className={`inline-flex items-center gap-1.5 text-sm px-2 py-0.5 rounded-md font-medium ${consoleColor ?? 'text-text-secondary'}`}>
+                {consoleIcon && (
+                  <Image
+                    src={consoleIcon}
+                    alt={gameData.ConsoleName}
+                    width={14}
+                    height={14}
+                    className="object-contain shrink-0"
+                  />
+                )}
+                {gameData.ConsoleName}
+              </span>
+            )}
+            {status && (
+              <span className={`inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium ${STATUS_CLASSES[status]}`}>
+                {T.gameStatus[status]}
+              </span>
+            )}
+          </div>
+
           <GameInfoProgressionHeader gameData={gameData} />
           {children}
           <ul className="flex flex-col gap-1 text-sm">
@@ -116,7 +149,7 @@ export default function GameInfoHeader({
       </div>
       <div className="relative z-10 flex flex-col items-center lg:items-end gap-4 lg:justify-between mt-4 lg:mt-0">
         <p
-          className={`hidden lg:block text-2xl ${gameData?.NumAwardedToUser == gameData?.NumAchievements ? 'bg-green-800' : 'bg-bg-card'} px-5 py-3 rounded-full text-center whitespace-nowrap`}
+          className={`hidden lg:block text-2xl ${gameData?.NumAwardedToUser == gameData?.NumAchievements ? 'bg-success/20 text-success' : 'bg-bg-card'} px-5 py-3 rounded-full text-center whitespace-nowrap`}
         >
           {gameData?.NumAwardedToUser} / {gameData?.NumAchievements}
         </p>

@@ -5,7 +5,17 @@ import Link from 'next/link'
 import { UserAwards } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 
-export default function MainPageMastery({ awards, isLoading }: { awards: UserAwards | null; isLoading?: boolean }) {
+export default function MainPageMastery({
+  awards,
+  isLoading,
+  unlockedHC,
+  unlockedSC,
+}: {
+  awards: UserAwards | null
+  isLoading?: boolean
+  unlockedHC: number
+  unlockedSC: number
+}) {
   const { T } = useLanguage()
 
   if (isLoading) {
@@ -13,7 +23,7 @@ export default function MainPageMastery({ awards, isLoading }: { awards: UserAwa
       <div className="flex flex-col gap-3">
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.masteryAwards}</p>
         <div className="grid grid-cols-2 gap-2">
-          {[1, 2, 3, 4].map((i) => (
+          {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="bg-bg-main rounded-lg h-16 animate-pulse" />
           ))}
         </div>
@@ -32,10 +42,12 @@ export default function MainPageMastery({ awards, isLoading }: { awards: UserAwa
   const recentCovers = mastered.slice(0, 8)
 
   const stats = [
-    { value: awards.MasteryAwardsCount,         label: T.cards.mastered,       color: 'text-yellow-400' },
-    { value: awards.CompletionAwardsCount,       label: T.cards.completedSC,    color: 'text-purple-400' },
-    { value: awards.BeatenHardcoreAwardsCount,   label: T.userStats.beatenHC,   color: 'text-blue-400'   },
-    { value: awards.BeatenSoftcoreAwardsCount,   label: T.userStats.beatenSC,   color: 'text-text-main'  },
+    { value: awards.MasteryAwardsCount,         label: T.cards.mastered,         color: 'text-warning' },
+    { value: awards.CompletionAwardsCount,       label: T.cards.completedSC,      color: 'text-accent-secondary' },
+    { value: awards.BeatenHardcoreAwardsCount,   label: T.userStats.beatenHC,     color: 'text-info'   },
+    { value: awards.BeatenSoftcoreAwardsCount,   label: T.userStats.beatenSC,    color: 'text-text-main'  },
+    { value: unlockedHC,                         label: T.userStats.unlockedHC,   color: 'text-accent' },
+    { value: unlockedSC,                         label: T.userStats.unlockedSC,   color: 'text-text-secondary'   },
   ]
 
   return (
@@ -55,7 +67,7 @@ export default function MainPageMastery({ awards, isLoading }: { awards: UserAwa
       {awards.EventAwardsCount > 0 && (
         <div className="bg-bg-main rounded-lg px-3 py-2 flex items-center justify-between">
           <span className="text-[10px] text-text-secondary">{T.userStats.events}</span>
-          <span className="text-sm font-bold text-green-400">{awards.EventAwardsCount}</span>
+          <span className="text-sm font-bold text-success">{awards.EventAwardsCount}</span>
         </div>
       )}
 
@@ -82,7 +94,7 @@ export default function MainPageMastery({ awards, isLoading }: { awards: UserAwa
                 ) : (
                   <div className="w-full aspect-square rounded bg-white/10" />
                 )}
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full border border-bg-card" aria-hidden="true" />
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-warning rounded-full border border-bg-card" aria-hidden="true" />
               </Link>
             ))}
           </div>

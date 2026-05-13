@@ -17,14 +17,22 @@ export function DualProgressBar({
     <div className={`relative w-full ${height} ${trackClass} rounded-full overflow-hidden ${className}`}>
       {sc > 0 && (
         <div
-          className="absolute inset-y-0 left-0 bg-blue-500 rounded-full transition-[width] duration-500"
-          style={{ width: `${sc}%` }}
+          className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-500"
+          style={{
+            width: `${sc}%`,
+            background: 'linear-gradient(to right, rgb(37 99 235), rgb(96 165 250))',
+            boxShadow: '0 0 6px rgb(59 130 246 / 0.5)',
+          }}
         />
       )}
       {hc > 0 && (
         <div
-          className="absolute inset-y-0 left-0 bg-yellow-400 rounded-full transition-[width] duration-500"
-          style={{ width: `${hc}%` }}
+          className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-500"
+          style={{
+            width: `${hc}%`,
+            background: 'linear-gradient(to right, rgb(217 119 6), rgb(251 191 36))',
+            boxShadow: '0 0 6px rgb(245 158 11 / 0.5)',
+          }}
         />
       )}
     </div>

@@ -42,13 +42,13 @@ export default function LoginUserForm({
       <h1 className="text-3xl font-bold text-text-accent mb-8">{T.loginForm.title}</h1>
 
       {isRegister && (
-        <div className="mb-5 bg-green-900/40 border border-green-700 rounded-xl p-3">
-          <p className="text-sm text-green-400">{T.loginForm.accountCreated}</p>
+        <div className="mb-5 bg-success/20 border border-success/40 rounded-xl p-3">
+          <p className="text-sm text-success">{T.loginForm.accountCreated}</p>
         </div>
       )}
       {error && (
-        <div className="mb-5 bg-red-900/40 border border-red-700 rounded-xl p-3">
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3">
+          <p className="text-sm text-danger">{error}</p>
         </div>
       )}
 

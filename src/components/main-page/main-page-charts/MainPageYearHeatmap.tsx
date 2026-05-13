@@ -12,10 +12,13 @@ const GAP = 3 // px
 const STEP = CELL + GAP // 13px per column
 
 function getColorClass(count: number): string {
-  if (count === 0) return 'bg-bg-main'
+  if (count === 0) return 'bg-bg-header'
   if (count <= 2) return 'bg-accent/20'
-  if (count <= 5) return 'bg-accent/40'
-  if (count <= 10) return 'bg-accent/70'
+  if (count <= 5) return 'bg-accent/35'
+  if (count <= 8) return 'bg-accent/50'
+  if (count <= 12) return 'bg-accent/65'
+  if (count <= 18) return 'bg-accent/80'
+  if (count <= 25) return 'bg-accent/90'
   return 'bg-accent'
 }
 
