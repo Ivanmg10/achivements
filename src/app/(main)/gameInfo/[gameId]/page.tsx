@@ -6,6 +6,7 @@ import LoadingPage from '@/components/loading-page/LoadingPage'
 import GameInfoHeader from '@/components/game-info-header/GameInfoHeader'
 import GameInfoTable from '@/components/game-info-table/GameInfoTable'
 import GameInfoSubsetSelector from '@/components/game-info-subset-selector/GameInfoSubsetSelector'
+import GameInfoComments from '@/components/game-info-comments/GameInfoComments'
 import { RetroAchievementsGameWithAchievements, SubsetGame } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
@@ -41,7 +42,6 @@ export default function GameInfo() {
         setGameData(data)
 
         if (data.ParentGameID) {
-          // Current game IS a subset — fetch parent to get its title + sibling subsets
           setParentId(data.ParentGameID)
           const [parentRes, subsetsRes] = await Promise.all([
             fetch(`/api/getGameProgression?gameId=${data.ParentGameID}`),
@@ -54,7 +54,6 @@ export default function GameInfo() {
           }
           if (subsetsRes.ok) setSubsets(await subsetsRes.json())
         } else {
-          // Current game is a base game — look for subsets
           setParentId(data.ID)
           setParentTitle(data.Title ?? '')
           setParentIcon(data.ImageIcon ?? '')
@@ -83,13 +82,31 @@ export default function GameInfo() {
 
   if (gameData !== null) {
     const showSelector = subsets.length > 0 || parentId !== null
+    const heroImage = gameData.ImageTitle ?? gameData.ImageIngame ?? null
+
     return (
       <motion.main
-        className="flex-1 flex flex-col items-center text-text-main"
+        className="flex-1 flex flex-col items-center text-text-main relative"
         variants={fadeUp}
         initial="hidden"
         animate="visible"
       >
+        {/* Hero background — true full-width, fades down */}
+        {heroImage && (
+          <div
+            className="absolute top-0 h-80 -z-10 pointer-events-none overflow-hidden"
+            style={{ left: '50%', transform: 'translateX(-50%)', width: '100vw' }}
+          >
+            <img
+              src={`https://retroachievements.org${heroImage}`}
+              alt=""
+              aria-hidden="true"
+              className="w-full h-full object-cover object-top opacity-40"
+            />
+            <div className="absolute inset-0 bg-linear-to-b from-transparent via-bg-main/60 to-bg-main" />
+          </div>
+        )}
+
         <GameInfoHeader gameData={gameData}>
           {showSelector && (
             <GameInfoSubsetSelector
@@ -102,6 +119,7 @@ export default function GameInfo() {
           )}
         </GameInfoHeader>
         <GameInfoTable gameData={gameData} />
+        {gameData.ID && <GameInfoComments gameId={gameData.ID} />}
       </motion.main>
     )
   }

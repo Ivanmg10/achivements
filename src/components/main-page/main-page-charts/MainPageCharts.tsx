@@ -28,7 +28,7 @@ export default function MainPageCharts() {
   const { achievements, isLoading: achLoading } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading } = useActivityHeatmap()
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
-  const { all, isLoading: gamesLoading } = useGamesData()
+  const { all, hardcore, softcore, isLoading: gamesLoading } = useGamesData()
   const { rank, isLoading: rankLoading } = useUserRank()
   const { awards, isLoading: awardsLoading } = useUserAwards()
   const { achievements: yearAch, isLoading: yearLoading } = useActivityHeatmapYear()
@@ -91,7 +91,12 @@ export default function MainPageCharts() {
 
           {/* Row 4: Mastery (col1) | Best Performance (col2) | Pinned continues */}
           <ChartCard>
-            <MainPageMastery awards={awards} isLoading={awardsLoading} />
+            <MainPageMastery
+              awards={awards}
+              isLoading={awardsLoading}
+              unlockedHC={hardcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
+              unlockedSC={softcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
+            />
           </ChartCard>
           <ChartCard>
             <MainPageBestPeriod
