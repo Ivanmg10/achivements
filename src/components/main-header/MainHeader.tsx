@@ -8,8 +8,9 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { calcStreak } from '@/utils/utils'
-import { IconHome, IconChevronLeft, IconSearch, IconFlame } from '@tabler/icons-react'
+import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconMenu } from '@tabler/icons-react'
 import SearchModal from '@/components/search-modal/SearchModal'
+import MobileNavModal from './MobileNavModal'
 
 function NavLink({ href, label, active }: { href: string; label: string; active: boolean }) {
   return (
@@ -17,7 +18,7 @@ function NavLink({ href, label, active }: { href: string; label: string; active:
       href={href}
       className={`px-3.5 py-1.5 text-sm rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 whitespace-nowrap ${
         active
-          ? 'text-text-main font-medium bg-bg-main ring-1 ring-white/10'
+          ? 'text-accent font-medium bg-bg-main ring-1 ring-white/10'
           : 'text-text-secondary hover:text-text-main hover:bg-bg-main/60'
       }`}
     >
@@ -43,6 +44,7 @@ export default function MainHeader() {
   const router = useRouter()
   const pathname = usePathname()
   const [searchOpen, setSearchOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const streak = calcStreak(recentAch)
   const isHome = pathname === '/'
@@ -60,9 +62,9 @@ export default function MainHeader() {
 
   return (
     <>
-      <header className="flex flex-row items-center bg-bg-card text-text-main px-4 py-2 gap-3 h-16">
-        {/* Left: home + back + nav */}
-        <div className="flex items-center gap-1 flex-1">
+      <header className="relative flex items-center bg-bg-card text-text-main px-4 h-16">
+        {/* Left: home + back + nav (desktop) / hamburguesa (mobile) */}
+        <div className="flex items-center gap-1 shrink-0 z-10">
           <Link
             href="/"
             aria-label="Home"
@@ -80,16 +82,7 @@ export default function MainHeader() {
             </button>
           )}
 
-          {/* Mobile search icon */}
-          <button
-            onClick={openSearch}
-            aria-label="Search games"
-            className="md:hidden p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0"
-          >
-            <IconSearch className="w-5 h-5" aria-hidden="true" />
-          </button>
-
-          {/* Nav links */}
+          {/* Desktop nav - visible on md+ */}
           <nav className="hidden md:flex items-center gap-0.5 ml-2" aria-label="Main navigation">
             {navItems.map(({ href, label }) => (
               <NavLink
@@ -100,23 +93,40 @@ export default function MainHeader() {
               />
             ))}
           </nav>
+
+          {/* Hamburger menu - mobile only */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Menu"
+            className="md:hidden p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          >
+            <IconMenu className="w-5 h-5" aria-hidden="true" />
+          </button>
         </div>
 
-        {/* Center: search */}
-        <div className="hidden md:flex justify-center shrink-0">
+        {/* Center: search bar - absolute only on lg+, hidden on smaller */}
+        <div className="hidden 2xl:flex absolute xl:w-[80%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4 pointer-events-none">
           <button
             onClick={openSearch}
             aria-label="Search games"
-            className="w-80 bg-bg-main rounded-full px-4 py-2.5 text-sm text-text-secondary text-left hover:bg-bg-main/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 flex items-center gap-2 cursor-pointer ring-1 ring-white/5"
+            className="flex w-[40%] mx-auto bg-bg-main rounded-full px-4 py-2.5 text-sm text-text-secondary text-left hover:bg-bg-main/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 flex items-center gap-2 cursor-pointer ring-1 ring-white/5 pointer-events-auto"
           >
             <IconSearch className="w-4 h-4 shrink-0" aria-hidden />
             <span>{T.search.placeholder}</span>
           </button>
         </div>
 
+        {/* Right: search icon (mobile) + streak + user */}
+        <div className="flex items-center gap-2 shrink-0 ml-auto z-10">
+          {/* Search icon - mobile only, to the right */}
+          <button
+            onClick={openSearch}
+            aria-label="Search games"
+            className="2xl:hidden p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0"
+          >
+            <IconSearch className="w-5 h-5" aria-hidden="true" />
+          </button>
 
-        {/* Right: streak + user */}
-        <div className="flex items-center gap-2 flex-1 justify-end">
           {session ? (
             <>
               <StreakBadge streak={streak} />
@@ -158,6 +168,7 @@ export default function MainHeader() {
       </header>
 
       <SearchModal isOpen={searchOpen} onClose={closeSearch} />
+      <MobileNavModal isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </>
   )
 }
