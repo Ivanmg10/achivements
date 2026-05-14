@@ -27,7 +27,7 @@ export default function GameInfoTable({
   const [missableOpen, setMissableOpen] = useState(false)
   const [selectedAchievement, setSelectedAchievement] = useState<RetroAchievement | null>(null)
   const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set())
-  const [tableExpanded, setTableExpanded] = useState(false)
+  const [tableExpanded, setTableExpanded] = useState(true)
   const { T } = useLanguage()
 
   const FILTER_LABELS: Record<Filter, string> = {
@@ -210,6 +210,24 @@ export default function GameInfoTable({
           </button>
         ))}
       </div>
+
+      {/* Top collapse toggle */}
+      {gameData && needsToggle && (
+        <button
+          onClick={() => setTableExpanded((e) => !e)}
+          className="w-full flex items-center justify-between px-5 py-3 rounded-xl bg-bg-header/40 hover:bg-bg-header/60 backdrop-blur-sm border border-white/5 transition-all group"
+        >
+          <span className="flex items-center gap-2 text-sm font-medium text-text-main">
+            <span className={`inline-block transition-transform duration-300 ${tableExpanded ? 'rotate-180' : ''}`}>
+              <IconChevronDown className="w-4 h-4 text-accent" aria-hidden />
+            </span>
+            {tableExpanded ? T.gameInfoTable.collapseTable : `${T.gameInfoTable.expandTable} (${filtered.length})`}
+          </span>
+          <span className="text-xs text-text-secondary/60 bg-bg-main/30 px-2 py-0.5 rounded-full tabular-nums">
+            {filtered.length} / {achievements.length}
+          </span>
+        </button>
+      )}
 
       {gameData && (
         <>

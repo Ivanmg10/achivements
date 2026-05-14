@@ -34,7 +34,7 @@ beforeEach(() => {
 })
 
 test('renders loading page while gameData is null', () => {
-  ;(useSession as jest.Mock).mockReturnValue({ data: null })
+  ;(useSession as jest.Mock).mockReturnValue({ data: null, status: 'loading' })
   render(<GameInfo />)
   expect(screen.getByTestId('loading-page')).toBeInTheDocument()
 })
@@ -43,6 +43,7 @@ test('renders loading page with session before fetch resolves', () => {
   ;(fetch as jest.Mock).mockReturnValue(new Promise(() => {}))
   ;(useSession as jest.Mock).mockReturnValue({
     data: { user: { rausername: 'ivan', raid: 'key' } },
+    status: 'authenticated',
   })
   render(<GameInfo />)
   expect(screen.getByTestId('loading-page')).toBeInTheDocument()
@@ -51,6 +52,7 @@ test('renders loading page with session before fetch resolves', () => {
 test('renders game info when data loaded', async () => {
   ;(useSession as jest.Mock).mockReturnValue({
     data: { user: { rausername: 'ivan', raid: 'key' } },
+    status: 'authenticated',
   })
   ;(fetch as jest.Mock).mockResolvedValue({
     ok: true,
@@ -66,6 +68,7 @@ test('renders game info when data loaded', async () => {
 test('renders error message on fetch failure', async () => {
   ;(useSession as jest.Mock).mockReturnValue({
     data: { user: { rausername: 'ivan', raid: 'key' } },
+    status: 'authenticated',
   })
   ;(fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 })
   await act(async () => {

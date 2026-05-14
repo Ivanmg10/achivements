@@ -42,27 +42,10 @@ export default function GameInfoHeader({
   const consoleColor = consoleDef?.color
   const [hashesOpen, setHashesOpen] = useState(false)
 
-  const bgImage = gameData?.ImageTitle ?? gameData?.ImageIngame ?? null
   const status = gameData ? deriveStatus(gameData) : null
 
   return (
-    <section className="relative bg-bg-card p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_400px] mt-5 overflow-hidden">
-      {/* Blurred background */}
-      {bgImage && (
-        <>
-          <div
-            className="absolute inset-0 scale-110"
-            style={{
-              backgroundImage: `url(https://retroachievements.org${bgImage})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(12px)',
-              opacity: 0.8,
-            }}
-          />
-          <div className="absolute inset-0 bg-bg-main/60" />
-        </>
-      )}
+    <section className="relative bg-transparent p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_400px] mt-5 overflow-hidden">
 
       {/* Content — above background layers */}
       <div className="relative z-10 flex flex-row items-start gap-5">
