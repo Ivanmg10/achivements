@@ -5,10 +5,11 @@ import { staggerContainer, staggerItem } from '@/lib/animations'
 import { useSession } from 'next-auth/react'
 import { useUserRank } from '@/hooks/useUserRank'
 import { useUserAwards } from '@/hooks/useUserAwards'
+import { useGamesData } from '@/contexts/GamesDataContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievementsUserProfile } from '@/types/types'
 
-function StatCard({ label, value, accent }: { label: string; value: string; accent?: string }) {
+function StatCard({ label, value, accent, subValue }: { label: string; value: string; accent?: string; subValue?: string }) {
   return (
     <motion.div
       className="bg-bg-main rounded-xl p-3 flex flex-col gap-1"
@@ -16,6 +17,7 @@ function StatCard({ label, value, accent }: { label: string; value: string; acce
     >
       <span className={`text-xl font-bold ${accent ?? 'text-text-main'}`}>{value}</span>
       <span className="text-xs text-text-secondary">{label}</span>
+      {subValue && <span className="text-xs text-text-secondary/60">{subValue}</span>}
     </motion.div>
   )
 }
@@ -26,8 +28,20 @@ function AwardCard({ label, value, accent }: { label: string; value: number; acc
       className="bg-bg-main rounded-xl p-3 flex flex-col items-center gap-1 text-center"
       variants={staggerItem}
     >
-      <span className={`text-2xl font-bold ${accent ?? 'text-text-main'}`}>{value}</span>
+      <span className={`text-2xl font-bold ${accent ?? 'text-text-main'}`}>{value.toLocaleString()}</span>
       <span className="text-xs text-text-secondary">{label}</span>
+    </motion.div>
+  )
+}
+
+function GamesCard({ label, value, accent }: { label: string; value: number; accent?: string }) {
+  return (
+    <motion.div
+      className="bg-bg-main rounded-xl p-3 flex flex-col items-center gap-0.5"
+      variants={staggerItem}
+    >
+      <span className={`text-xl font-bold ${accent ?? 'text-text-main'}`}>{value}</span>
+      <span className="text-xs text-text-secondary text-center">{label}</span>
     </motion.div>
   )
 }
@@ -36,6 +50,7 @@ export default function UserStats() {
   const { data: session } = useSession()
   const { rank, isLoading: rankLoading } = useUserRank()
   const { awards, isLoading: awardsLoading } = useUserAwards()
+  const { all, softcore, hardcore, inProgress } = useGamesData()
   const { T } = useLanguage()
 
   const raUser = session?.user?.raUser as RetroAchievementsUserProfile | null | undefined
@@ -49,6 +64,14 @@ export default function UserStats() {
 
   const memberYear = raUser.MemberSince ? new Date(raUser.MemberSince).getFullYear().toString() : '—'
   const hasContribs = raUser.ContribCount > 0 || raUser.ContribYield > 0
+
+  const totalAchievements = awards
+    ? awards.MasteryAwardsCount + awards.BeatenHardcoreAwardsCount + awards.BeatenSoftcoreAwardsCount + awards.CompletionAwardsCount + awards.EventAwardsCount
+    : 0
+
+  const totalGames = all.length
+  const completedSC = softcore.filter((g) => parseFloat(g.PctWon) >= 1).length
+  const completedHC = hardcore.filter((g) => parseFloat(g.PctWon) >= 1).length
 
   return (
     <section className="w-[95%] pt-3 pb-3 flex flex-col gap-4">
@@ -128,7 +151,7 @@ export default function UserStats() {
           </h2>
           {!awardsLoading && awards && (
             <span className="text-sm text-text-secondary">
-              {T.userStats.total}: {awards.TotalAwardsCount}
+              {totalAchievements.toLocaleString()} {T.userStats.achievementsUnlocked}
             </span>
           )}
         </div>
@@ -177,6 +200,41 @@ export default function UserStats() {
             />
           </motion.div>
         ) : null}
+      </div>
+
+      <div className="bg-bg-card rounded-3xl p-5 flex flex-col gap-4">
+        <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
+          {T.userStats.games}
+        </h2>
+
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 gap-3"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <GamesCard
+            label={T.userStats.registeredGames}
+            value={totalGames}
+            accent="text-text-main"
+          />
+          <GamesCard
+            label={T.userStats.inProgress}
+            value={inProgress.length}
+            accent="text-amber-400"
+          />
+          <GamesCard
+            label={T.userStats.completedSC}
+            value={completedSC}
+            accent="text-blue-400"
+          />
+          <GamesCard
+            label={T.userStats.completedHC}
+            value={completedHC}
+            accent="text-orange-400"
+          />
+        </motion.div>
       </div>
     </section>
   )

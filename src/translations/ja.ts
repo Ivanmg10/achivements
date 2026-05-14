@@ -113,6 +113,12 @@ export const ja: Translations = {
     events: 'イベント',
     unlockedHC: 'HCでアンロック',
     unlockedSC: 'SCでアンロック',
+    achievementsUnlocked: '実績',
+    games: 'ゲーム',
+    registeredGames: '登録済み',
+    inProgress: '進行中',
+    completedSC: '完了SC',
+    completedHC: '完了HC',
   },
   gameInfoTable: {
     sortOrder: '順序',

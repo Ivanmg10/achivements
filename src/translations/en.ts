@@ -111,6 +111,12 @@ export const en = {
     events: 'Events',
     unlockedHC: 'Unlocked HC',
     unlockedSC: 'Unlocked SC',
+    achievementsUnlocked: 'achievements',
+    games: 'Games',
+    registeredGames: 'Registered',
+    inProgress: 'In Progress',
+    completedSC: 'Completed SC',
+    completedHC: 'Completed HC',
   },
   gameInfoTable: {
     sortOrder: 'Order',

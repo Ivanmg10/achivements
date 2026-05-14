@@ -113,6 +113,12 @@ export const es: Translations = {
     events: 'Eventos',
     unlockedHC: 'Desbloqueado HC',
     unlockedSC: 'Desbloqueado SC',
+    achievementsUnlocked: 'logros',
+    games: 'Juegos',
+    registeredGames: 'Registrados',
+    inProgress: 'En progreso',
+    completedSC: 'Completados SC',
+    completedHC: 'Completados HC',
   },
   gameInfoTable: {
     sortOrder: 'Orden',

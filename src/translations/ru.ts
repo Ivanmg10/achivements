@@ -113,6 +113,12 @@ export const ru: Translations = {
     events: 'События',
     unlockedHC: 'Разблокировано HC',
     unlockedSC: 'Разблокировано SC',
+    achievementsUnlocked: 'достижений',
+    games: 'Игры',
+    registeredGames: 'Зарегистрировано',
+    inProgress: 'В процессе',
+    completedSC: 'Завершено SC',
+    completedHC: 'Завершено HC',
   },
   gameInfoTable: {
     sortOrder: 'Порядок',

@@ -113,6 +113,12 @@ export const de: Translations = {
     events: 'Events',
     unlockedHC: 'HC freigeschaltet',
     unlockedSC: 'SC freigeschaltet',
+    achievementsUnlocked: 'Erfolge',
+    games: 'Spiele',
+    registeredGames: 'Registriert',
+    inProgress: 'In Arbeit',
+    completedSC: 'Abgeschlossen SC',
+    completedHC: 'Abgeschlossen HC',
   },
   gameInfoTable: {
     sortOrder: 'Reihenfolge',
