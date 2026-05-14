@@ -5,7 +5,7 @@ import { staggerContainer, staggerItem } from '@/lib/animations'
 import { useSession } from 'next-auth/react'
 import { useUserRank } from '@/hooks/useUserRank'
 import { useUserAwards } from '@/hooks/useUserAwards'
-import { useGamesData } from '@/contexts/GamesDataContext'
+import { useGamesData } from '@/context/GamesDataContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievementsUserProfile } from '@/types/types'
 

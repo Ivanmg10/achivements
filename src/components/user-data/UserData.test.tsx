@@ -23,7 +23,7 @@ jest.mock('@/components/theme-modal/ThemeModal', () => ({
   __esModule: true,
   default: () => null,
 }))
-jest.mock('@/contexts/GamesDataContext', () => ({
+jest.mock('@/context/GamesDataContext', () => ({
   useGamesData: () => ({ all: [], softcore: [], hardcore: [], inProgress: [] }),
 }))
 

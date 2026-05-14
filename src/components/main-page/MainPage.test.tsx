@@ -43,7 +43,7 @@ jest.mock('@/components/main-page/main-page-progression/MainPageProgression', ()
   default: () => null,
 }))
 
-jest.mock('@/contexts/MainViewContext', () => ({
+jest.mock('@/context/MainViewContext', () => ({
   useMainView: () => ({ view: 'panels' }),
   MainViewProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))

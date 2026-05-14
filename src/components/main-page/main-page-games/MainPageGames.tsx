@@ -6,7 +6,7 @@ import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useResizableList } from '@/hooks/useResizableList'
 import { useLanguage } from '@/context/LanguageContext'
-import { useMainView } from '@/contexts/MainViewContext'
+import { useMainView } from '@/context/MainViewContext'
 import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
 import { IconHistory } from '@tabler/icons-react'
 

@@ -8,7 +8,7 @@ jest.mock('@/components/achivements-line-chart/AchievementsLineChart', () => ({
   default: () => <div data-testid="line-chart">LineChart</div>,
 }))
 
-jest.mock('@/contexts/GamesDataContext', () => ({
+jest.mock('@/context/GamesDataContext', () => ({
   useGamesData: () => ({ softcore: [], hardcore: [], achievements: [] }),
 }))
 

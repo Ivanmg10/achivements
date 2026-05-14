@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useGamesData } from '@/contexts/GamesDataContext'
+import { useGamesData } from '@/context/GamesDataContext'
 
 export function useGamesCompletedPreview() {
   const { softcore, hardcore, isLoading } = useGamesData()

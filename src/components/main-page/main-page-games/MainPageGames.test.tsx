@@ -10,7 +10,7 @@ jest.mock('@/hooks/useResizableList', () => ({
   useResizableList: () => 5,
 }))
 
-jest.mock('@/contexts/MainViewContext', () => ({
+jest.mock('@/context/MainViewContext', () => ({
   useMainView: () => ({ view: 'all' }),
 }))
 

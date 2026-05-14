@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import Image from 'next/image'
 import { IconSearch, IconX } from '@tabler/icons-react'
-import { useGamesData } from '@/contexts/GamesDataContext'
+import { useGamesData } from '@/context/GamesDataContext'
 import { useLanguage } from '@/context/LanguageContext'
 
 type FavoriteGame = { id: number; title: string; imageIcon: string }
