@@ -1,1 +1,1 @@
-export { useRecentAchievements } from '@/contexts/RecentAchievementsContext'
+export { useRecentAchievements } from '@/context/RecentAchievementsContext'

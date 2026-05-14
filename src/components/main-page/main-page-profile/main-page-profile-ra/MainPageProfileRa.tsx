@@ -7,6 +7,7 @@ import {
 } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
+import { IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
 import MainPageProfileRaAchievements from './main-page-profile-ra-achievements/MainPageProfileRaAchievements'
@@ -41,10 +42,21 @@ export default function MainPageProfileRa({
   const hasContribs = user && (user.ContribCount > 0 || user.ContribYield > 0)
 
   return (
-    <div className="flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
+    <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
       {user?.User ? (
         <>
-          <div className="flex gap-3 items-center">
+          <a
+            href={`https://retroachievements.org/user/${user.User}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
+            aria-label={T.profileRa.viewOnRA}
+          >
+            <IconExternalLink className="w-3.5 h-3.5" />
+            {T.profileRa.viewOnRA}
+          </a>
+
+          <div className="flex gap-3 items-center pr-24">
             {user?.UserPic && (
               <Image
                 src={`https://retroachievements.org${user.UserPic}`}
@@ -54,12 +66,18 @@ export default function MainPageProfileRa({
                 className={`m-1 rounded-lg ring-2 shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5 ${ringColor}`}
               />
             )}
-            <div className="flex flex-col gap-1 min-w-0">
+            <div className="flex flex-col gap-1 min-w-0 w-full">
               <p className="text-xl lg:text-2xl font-bold leading-tight truncate">{user.User}</p>
               {user.Motto && (
-                <p className="text-xs text-gray-400 italic line-clamp-2">&ldquo;{user.Motto}&rdquo;</p>
+                <p className="text-xs text-gray-400 italic line-clamp-2">
+                  &ldquo;{user.Motto}&rdquo;
+                </p>
               )}
-              {memberYear && <p className="text-xs text-gray-500">{T.profileRa.memberSince} {memberYear}</p>}
+              {memberYear && (
+                <p className="text-xs text-gray-500">
+                  {T.profileRa.memberSince} {memberYear}
+                </p>
+              )}
             </div>
           </div>
 
@@ -73,7 +91,9 @@ export default function MainPageProfileRa({
 
           {hasContribs && (
             <div className="flex flex-col gap-2 bg-bg-main rounded-lg p-3">
-              <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileRa.contributions}</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wider">
+                {T.profileRa.contributions}
+              </p>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
                   <span className="text-lg font-bold text-purple-400">

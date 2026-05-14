@@ -1,5 +1,8 @@
+'use client'
+
 import { useMemo } from 'react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
 
 const BUCKETS = [
   { label: '1–24%', min: 0, max: 0.25, color: 'bg-gray-500' },
@@ -10,6 +13,7 @@ const BUCKETS = [
 ]
 
 export default function MainPageCompletionDist({ games, isLoading }: { games: RetroAchievementsGameCompleted[]; isLoading?: boolean }) {
+  const { T } = useLanguage()
   const buckets = useMemo(() => {
     const counts = BUCKETS.map((b) => ({
       ...b,
@@ -48,8 +52,8 @@ export default function MainPageCompletionDist({ games, isLoading }: { games: Re
   if (total === 0) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Completion distribution</p>
-        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">No data</div>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.completionDistTitle}</p>
+        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">{T.cards.noData}</div>
       </div>
     )
   }
@@ -57,8 +61,8 @@ export default function MainPageCompletionDist({ games, isLoading }: { games: Re
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Completion distribution</p>
-        <span className="text-[10px] text-text-secondary/60">{total} games</span>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.completionDistTitle}</p>
+        <span className="text-[10px] text-text-secondary/60">{total} {T.charts.games}</span>
       </div>
 
       <div className="flex h-3 rounded-full overflow-hidden gap-0.5">

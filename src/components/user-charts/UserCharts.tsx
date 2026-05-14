@@ -3,7 +3,7 @@ import GamesPlayedPieChart from '../games-played-pie-chart/GamesPlayedPieChart'
 import AchievementsLineChart from '../achivements-line-chart/AchievementsLineChart'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
-import { useGamesData } from '@/contexts/GamesDataContext'
+import { useGamesData } from '@/context/GamesDataContext'
 
 export default function UserCharts() {
   const { T } = useLanguage()

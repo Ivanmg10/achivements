@@ -19,9 +19,9 @@ export default function GameInfoAchivement({
   const { T } = useLanguage()
 
   const TYPE_BADGES: Record<string, { label: string; className: string }> = {
-    progression: { label: T.achievement.progression, className: 'bg-blue-900/60 text-blue-300' },
-    win_condition: { label: T.achievement.winCondition, className: 'bg-yellow-900/60 text-yellow-300' },
-    missable: { label: T.achievement.missable, className: 'bg-red-900/60 text-red-300' },
+    progression: { label: T.achievement.progression, className: 'bg-info/20 text-info' },
+    win_condition: { label: T.achievement.winCondition, className: 'bg-warning/20 text-warning' },
+    missable: { label: T.achievement.missable, className: 'bg-danger/20 text-danger' },
   }
 
   if (!achievement) return null
@@ -50,7 +50,7 @@ export default function GameInfoAchivement({
     <motion.tr
       onClick={onClick}
       className={`group border-b border-bg-header/60 cursor-pointer hover:bg-bg-header/30 transition-colors duration-150 ${
-        isFavorited ? 'bg-yellow-900/10' : ''
+        isFavorited ? 'bg-warning/10' : ''
       }`}
       initial={{ opacity: 0, y: 4 }}
       whileInView={{ opacity: earned ? 1 : 0.4, y: 0 }}
@@ -65,7 +65,7 @@ export default function GameInfoAchivement({
             width={80}
             height={80}
             className={`w-16 h-16 rounded-xl object-cover block mx-auto ${
-              earnedHardcore ? 'ring-2 ring-yellow-400' : ''
+              earnedHardcore ? 'ring-2 ring-warning' : ''
             } ${earned ? '' : 'grayscale'}`}
           />
         )}
@@ -82,8 +82,8 @@ export default function GameInfoAchivement({
               aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
               className={`shrink-0 transition-colors duration-150 ${
                 isFavorited
-                  ? 'text-yellow-400 hover:text-yellow-300'
-                  : 'text-text-secondary/50 hover:text-yellow-400'
+                  ? 'text-warning hover:text-warning/80'
+                  : 'text-text-secondary/50 hover:text-warning'
               }`}
             >
               <svg
@@ -112,6 +112,11 @@ export default function GameInfoAchivement({
         {earnedDate && (
           <p className="text-xs text-text-secondary/60 mt-0.5">
             {T.achievement.earnedOn} {earnedDate}
+          </p>
+        )}
+        {achievement.Author && (
+          <p className="text-xs text-text-secondary/40 mt-0.5">
+            {T.achievement.by} {achievement.Author}
           </p>
         )}
       </td>
@@ -143,7 +148,7 @@ export default function GameInfoAchivement({
 
       <td className="px-3 py-2 w-40 text-center align-middle hidden sm:table-cell">
         {earned ? (
-          <span className="text-green-400 text-base">✓</span>
+          <span className="text-success text-base">✓</span>
         ) : (
           <span className="text-text-secondary/40 text-sm">—</span>
         )}

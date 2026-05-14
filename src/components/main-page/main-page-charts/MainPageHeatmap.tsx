@@ -9,11 +9,14 @@ import DayAchievementsModal from '@/components/day-achievements-modal/DayAchieve
 import { useLanguage } from '@/context/LanguageContext'
 
 function cellBg(count: number): string {
-  if (count === 0) return '#1a1a2e'
-  if (count <= 2) return '#3730a3'
-  if (count <= 5) return '#4f46e5'
-  if (count <= 9) return '#6366f1'
-  return '#818cf8'
+  if (count === 0) return 'rgb(var(--bg-header))'
+  if (count <= 2) return 'rgb(var(--accent-muted) / 0.15)'
+  if (count <= 5) return 'rgb(var(--accent-muted) / 0.30)'
+  if (count <= 8) return 'rgb(var(--accent-muted) / 0.45)'
+  if (count <= 12) return 'rgb(var(--accent-muted) / 0.60)'
+  if (count <= 18) return 'rgb(var(--accent-muted) / 0.75)'
+  if (count <= 25) return 'rgb(var(--accent-muted) / 0.85)'
+  return 'rgb(var(--accent-muted) / 0.95)'
 }
 
 // mobile → 30d, tablet → 45d, desktop → 60d
@@ -161,9 +164,9 @@ export default function MainPageHeatmap({
               className="pointer-events-none absolute z-10 px-2 py-1 rounded text-[11px] text-white whitespace-nowrap"
               style={{
                 display: 'none',
-                backgroundColor: '#1e1e2e',
-                border: '1px solid #3730a3',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                backgroundColor: 'rgb(var(--bg-card))',
+                border: '1px solid rgb(var(--accent-muted) / 0.5)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
               }}
             />
 
@@ -202,7 +205,7 @@ export default function MainPageHeatmap({
                     <div
                       key={`${wi}-${di}`}
                       className={`aspect-square rounded-sm${cell && cell.count > 0 ? ' cursor-pointer hover:ring-1 hover:ring-white/30' : ''}`}
-                      style={{ backgroundColor: cell ? cellBg(cell.count) : '#0f0f1a' }}
+                      style={{ backgroundColor: cell ? cellBg(cell.count) : 'rgb(var(--bg-header))' }}
                       data-date={cell?.date}
                       data-count={cell?.count ?? 0}
                       onClick={() => cell && cell.count > 0 && setSelectedDate(cell.date)}

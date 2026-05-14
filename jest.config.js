@@ -5,6 +5,7 @@ module.exports = {
   moduleNameMapper: {
     "\\.(css|less|scss|sass)$": "<rootDir>/__mocks__/styleMock.js",
     "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/__mocks__/fileMock.js",
+    "^@/context/LanguageContext$": "<rootDir>/__mocks__/context/LanguageContext.js",
     "^@/(.*)$": "<rootDir>/src/$1",
     "^next/image$": "<rootDir>/__mocks__/next/image.js",
     "^next/link$": "<rootDir>/__mocks__/next/link.js",
@@ -14,6 +15,7 @@ module.exports = {
     "^next-auth/react$": "<rootDir>/__mocks__/next-auth/react.js",
     "^@tabler/icons-react$": "<rootDir>/__mocks__/tablerIconsMock.js",
     "^recharts$": "<rootDir>/__mocks__/recharts.js",
+    "^framer-motion$": "<rootDir>/__mocks__/framer-motion.js",
   },
   collectCoverage: true,
   collectCoverageFrom: [

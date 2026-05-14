@@ -19,9 +19,10 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const filtered = COUNTRIES.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.code.toLowerCase().includes(search.toLowerCase())
+  const filtered = COUNTRIES.filter(
+    (c) =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.code.toLowerCase().includes(search.toLowerCase())
   )
 
   const handleSelect = async (code: string) => {
@@ -55,8 +56,8 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={handleClose}>
-      <h2 className="text-xl font-bold">{T.userData.location}</h2>
+    <CommonModal isOpen={isOpen} onClose={handleClose} className="max-w-lg">
+      <h2 className="text-xl font-bold mb-4">{T.userData.location}</h2>
 
       <input
         type="text"
@@ -64,17 +65,19 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
         onChange={(e) => setSearch(e.target.value)}
         placeholder={T.userData.searchCountry}
         aria-label={T.userData.searchCountry}
-        className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+        className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full mb-3"
         autoFocus
       />
 
       {error && (
-        <p className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>
+        <p className="text-sm text-danger bg-danger/10 rounded-xl px-4 py-2 mb-3">{error}</p>
       )}
 
-      <div className="flex flex-col gap-1 overflow-y-auto max-h-72">
+      <div className="grid grid-cols-3 gap-2 overflow-y-auto max-h-80">
         {filtered.length === 0 ? (
-          <p className="text-sm text-text-secondary text-center py-4">{T.userData.noResults}</p>
+          <p className="col-span-3 text-sm text-text-secondary text-center py-4">
+            {T.userData.noResults}
+          </p>
         ) : (
           filtered.map((country) => (
             <button
@@ -82,15 +85,18 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
               onClick={() => handleSelect(country.code)}
               disabled={loading}
               aria-pressed={currentCode === country.code}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors disabled:opacity-50 ${
+              className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-all disabled:opacity-50 ${
                 currentCode === country.code
                   ? 'bg-accent text-bg-main'
-                  : 'hover:bg-bg-main text-text-main'
+                  : 'bg-bg-main hover:bg-bg-card text-text-main'
               }`}
             >
-              <span className="text-xl" aria-hidden="true">{codeToFlag(country.code)}</span>
-              <span className="text-sm font-medium">{country.name}</span>
-              <span className="text-xs text-current opacity-50 ml-auto" aria-hidden="true">{country.code}</span>
+              <span className="text-xl shrink-0" aria-hidden="true">
+                {codeToFlag(country.code)}
+              </span>
+              <span className="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+                {country.name}
+              </span>
             </button>
           ))
         )}

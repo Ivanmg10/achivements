@@ -13,7 +13,7 @@ import MainPageWantToPlay from './main-page-want-to-play/MainPageWantToPlay'
 import MainPageNoRa from './main-page-no-ra/MainPageNoRa'
 import MainPageCharts from './main-page-charts/MainPageCharts'
 import RARecentlyPlayed from '@/components/ra-recently-played/RARecentlyPlayed'
-import { useMainView } from '@/contexts/MainViewContext'
+import { useMainView } from '@/context/MainViewContext'
 
 export default function MainPage() {
   const { status, data: session } = useSession()

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { RecentAchievement } from '@/types/types'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
+import { useLanguage } from '@/context/LanguageContext'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const CELL = 10 // px
@@ -11,10 +12,13 @@ const GAP = 3 // px
 const STEP = CELL + GAP // 13px per column
 
 function getColorClass(count: number): string {
-  if (count === 0) return 'bg-bg-main'
+  if (count === 0) return 'bg-bg-header'
   if (count <= 2) return 'bg-accent/20'
-  if (count <= 5) return 'bg-accent/40'
-  if (count <= 10) return 'bg-accent/70'
+  if (count <= 5) return 'bg-accent/35'
+  if (count <= 8) return 'bg-accent/50'
+  if (count <= 12) return 'bg-accent/65'
+  if (count <= 18) return 'bg-accent/80'
+  if (count <= 25) return 'bg-accent/90'
   return 'bg-accent'
 }
 
@@ -28,6 +32,7 @@ export default function MainPageYearHeatmap({
   error?: boolean
 }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const { T } = useLanguage()
 
   const { weeks, monthLabels, totalAch, activeDays } = useMemo(() => {
     const byDay: Record<string, number> = {}
@@ -72,19 +77,19 @@ export default function MainPageYearHeatmap({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Activity — last 365 days</p>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.yearHeatmapTitle}</p>
         {!isLoading && !error && (
           <div className="flex gap-3 text-[10px] text-text-secondary">
-            <span>{totalAch.toLocaleString()} achievements</span>
-            <span>{activeDays} active days</span>
+            <span>{totalAch.toLocaleString()} {T.lineChart.achievements}</span>
+            <span>{activeDays} {T.charts.yearHeatmapActiveDays}</span>
           </div>
         )}
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-8 text-text-secondary text-sm">Loading yearly activity...</div>
+        <div className="flex items-center justify-center py-8 text-text-secondary text-sm">{T.charts.yearHeatmapLoading}</div>
       ) : error ? (
-        <div className="flex items-center justify-center py-8 text-text-secondary text-sm">Failed to load</div>
+        <div className="flex items-center justify-center py-8 text-text-secondary text-sm" role="alert">{T.charts.failedToLoad}</div>
       ) : (
         <div className="overflow-x-auto pb-1">
           <div className="inline-flex flex-col gap-1">
@@ -119,11 +124,11 @@ export default function MainPageYearHeatmap({
 
             {/* Legend */}
             <div className="flex items-center gap-1.5 mt-1 self-end">
-              <span className="text-[9px] text-text-secondary">Less</span>
+              <span className="text-[9px] text-text-secondary">{T.charts.yearHeatmapLess}</span>
               {[0, 1, 3, 6, 11].map((n) => (
                 <div key={n} className={`w-2.5 h-2.5 rounded-sm ${getColorClass(n)}`} />
               ))}
-              <span className="text-[9px] text-text-secondary">More</span>
+              <span className="text-[9px] text-text-secondary">{T.charts.yearHeatmapMore}</span>
             </div>
           </div>
         </div>

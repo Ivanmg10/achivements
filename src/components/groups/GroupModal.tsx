@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import Image from 'next/image'
 import { IconX, IconSearch, IconTrash } from '@tabler/icons-react'
-import { useGamesData } from '@/contexts/GamesDataContext'
+import { useGamesData } from '@/context/GamesDataContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { GameGroup, GameGroupItem, RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
@@ -283,7 +283,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                           {g.ImageIcon && (
                             <Image src={`https://retroachievements.org${g.ImageIcon}`} alt={g.Title} width={20} height={20} className="rounded shrink-0" />
                           )}
-                          <span className="text-xs flex-1 truncate">{g.Title}</span>
+                          <span className="text-xs flex-1 line-clamp-1">{g.Title}</span>
                           <button
                             type="button"
                             onClick={() => removeSelected(g.GameID)}
@@ -320,7 +320,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                             <Image src={`https://retroachievements.org${g.ImageIcon}`} alt={g.Title} width={20} height={20} className="rounded shrink-0" />
                           )}
                           <div className="flex flex-col min-w-0 flex-1">
-                            <span className="text-xs truncate">{g.Title}</span>
+                            <span className="text-xs line-clamp-1">{g.Title}</span>
                             <span className="text-[10px] text-text-secondary">{g.ConsoleName}</span>
                           </div>
                         </button>

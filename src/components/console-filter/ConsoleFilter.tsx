@@ -3,13 +3,15 @@
 import Image from 'next/image'
 import { CONSOLES } from '@/constants'
 
-export type ConsolePill = { id: number; name: string; icon?: string }
+export type ConsolePill = { id: number; name: string; icon?: string; color?: string }
+
+const CONSOLE_COLOR_MAP = new Map(CONSOLES.map((c) => [c.id, c.color]))
 
 export function buildConsolePills(games: { ConsoleID: number; ConsoleName: string }[]): ConsolePill[] {
   const map = new Map<number, ConsolePill>()
   // Seed with all known consoles so every platform shows regardless of current-category games
   for (const c of CONSOLES) {
-    map.set(c.id, { id: c.id, name: c.name, icon: c.icon })
+    map.set(c.id, { id: c.id, name: c.name, icon: c.icon, color: c.color })
   }
   // Add any extras the user has that aren't in the constant (e.g. NES, Atari)
   for (const g of games) {
@@ -35,28 +37,32 @@ export default function ConsoleFilter({
 
   return (
     <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
-      {pills.map((c) => (
-        <button
-          key={c.id}
-          onClick={() => onToggle(c.id)}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
-            selected.has(c.id)
-              ? 'bg-accent text-bg-main'
-              : 'bg-bg-main text-text-secondary hover:text-text-main'
-          }`}
-        >
-          {c.icon && (
-            <Image
-              src={c.icon}
-              alt={c.name}
-              width={14}
-              height={14}
-              className="object-contain shrink-0"
-            />
-          )}
-          {c.name}
-        </button>
-      ))}
+      {pills.map((c) => {
+        const color = c.color ?? CONSOLE_COLOR_MAP.get(c.id)
+        const isSelected = selected.has(c.id)
+        return (
+          <button
+            key={c.id}
+            onClick={() => onToggle(c.id)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+              isSelected
+                ? (color ?? 'bg-accent text-bg-main')
+                : 'bg-bg-main text-text-secondary hover:text-text-main'
+            }`}
+          >
+            {c.icon && (
+              <Image
+                src={c.icon}
+                alt={c.name}
+                width={14}
+                height={14}
+                className="object-contain shrink-0"
+              />
+            )}
+            {c.name}
+          </button>
+        )
+      })}
       {selected.size > 0 && (
         <button
           onClick={onClear}

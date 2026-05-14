@@ -1,4 +1,7 @@
+'use client'
+
 import { TopTenUser } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MainPageTopTen({
   topTen,
@@ -9,14 +12,16 @@ export default function MainPageTopTen({
   isLoading?: boolean
   currentUsername?: string
 }) {
+  const { T } = useLanguage()
+
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Top 10 global players</p>
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.topTen}</p>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">Loading...</div>
+        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">{T.cards.loading}</div>
       ) : topTen.length === 0 ? (
-        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">No data</div>
+        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">{T.cards.noData}</div>
       ) : (
         <div className="flex flex-col gap-1.5">
           {topTen.map((u, i) => {

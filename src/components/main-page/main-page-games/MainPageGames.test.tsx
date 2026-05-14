@@ -1,66 +1,80 @@
-const mockInProgress = [
-  {
-    GameID: 1234,
-    Title: "Crash Bandicoot",
-    GameTitle: "Crash Bandicoot",
-    ConsoleID: 12,
-    ConsoleName: "PlayStation",
-    ImageIcon: "/icon.png",
-    MaxPossible: 40,
-    NumAwarded: 18,
-    PctWon: "0.4500",
-    HardcoreMode: "0",
-  },
-];
+jest.mock('@/hooks/useGamesInProgressPreview', () => ({
+  useGamesInProgressPreview: jest.fn(),
+}))
 
-jest.mock("@/utils/apiCallsUtils", () => ({
-  getGamesInProgress: jest.fn((_session: unknown, setter: (g: unknown[]) => void) => {
-    setter(mockInProgress);
-  }),
-}));
+jest.mock('@/hooks/useRecentlyPlayedGames', () => ({
+  useRecentlyPlayedGames: () => [],
+}))
 
-import { render, screen } from "@testing-library/react";
-import MainPageRecommended from "./MainPageGames";
-import { useSession } from "next-auth/react";
+jest.mock('@/hooks/useResizableList', () => ({
+  useResizableList: () => 5,
+}))
 
-test("renders section title", () => {
-  (useSession as jest.Mock).mockReturnValue({
-    status: "authenticated",
-    data: { user: {} },
-  });
-  render(<MainPageRecommended />);
-  expect(screen.getByText("Estoy jugando")).toBeInTheDocument();
-});
+jest.mock('@/context/MainViewContext', () => ({
+  useMainView: () => ({ view: 'all' }),
+}))
 
-test("renders in-progress games", () => {
-  (useSession as jest.Mock).mockReturnValue({
-    status: "authenticated",
-    data: { user: {} },
-  });
-  render(<MainPageRecommended />);
-  expect(screen.getByText("Crash Bandicoot")).toBeInTheDocument();
-});
+jest.mock('@/components/main-page/main-page-games/main-page-games-list/MainPageGamesList', () => ({
+  __esModule: true,
+  default: ({ listGames }: { listGames: { GameTitle: string }[] }) => (
+    <div>{(listGames ?? []).map((g) => <span key={g.GameTitle}>{g.GameTitle}</span>)}</div>
+  ),
+}))
 
-test("shows empty message when no in-progress games", () => {
-  const { getGamesInProgress } = require("@/utils/apiCallsUtils");
-  (getGamesInProgress as jest.Mock).mockImplementationOnce(
-    (_s: unknown, setter: (g: unknown[]) => void) => setter([]),
-  );
-  (useSession as jest.Mock).mockReturnValue({
-    status: "authenticated",
-    data: { user: {} },
-  });
-  render(<MainPageRecommended />);
-  expect(screen.getByText("No hay juegos en progreso")).toBeInTheDocument();
-});
+jest.mock('@/components/main-page/console-side-list/ConsoleSideList', () => ({
+  __esModule: true,
+  default: () => null,
+}))
 
-test("hasFetched guard prevents double fetch", () => {
-  (useSession as jest.Mock).mockReturnValue({
-    status: "authenticated",
-    data: { user: {} },
-  });
-  const { rerender } = render(<MainPageRecommended />);
-  (useSession as jest.Mock).mockReturnValue({ status: "unauthenticated", data: null });
-  rerender(<MainPageRecommended />);
-  expect(screen.getByText("Estoy jugando")).toBeInTheDocument();
-});
+jest.mock('@/components/ui/GameCardSkeleton', () => ({
+  GameCardSkeleton: () => <div data-testid="skeleton" />,
+}))
+
+jest.mock('@/components/empty-state/EmptyState', () => ({
+  __esModule: true,
+  default: ({ title }: { title: string }) => <div>{title}</div>,
+}))
+
+import { render, screen } from '@testing-library/react'
+import MainPageGames from './MainPageGames'
+import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
+
+const mockGame = {
+  GameID: 1234,
+  GameTitle: 'Crash Bandicoot',
+  ConsoleID: 12,
+  ConsoleName: 'PlayStation',
+  ImageIcon: '/icon.png',
+  NumAchievements: 40,
+  NumAchievedHardcore: 18,
+  PctWon: '0.45',
+}
+
+beforeEach(() => {
+  ;(useGamesInProgressPreview as jest.Mock).mockReturnValue({
+    listGames: [mockGame],
+    isLoading: false,
+  })
+})
+
+test('renders section title', () => {
+  render(<MainPageGames />)
+  expect(screen.getByText('Playing')).toBeInTheDocument()
+})
+
+test('renders in-progress games', () => {
+  render(<MainPageGames />)
+  expect(screen.getByText('Crash Bandicoot')).toBeInTheDocument()
+})
+
+test('shows empty message when no in-progress games', () => {
+  ;(useGamesInProgressPreview as jest.Mock).mockReturnValue({ listGames: [], isLoading: false })
+  render(<MainPageGames />)
+  expect(screen.getByText('Nothing playing right now')).toBeInTheDocument()
+})
+
+test('shows skeletons when loading', () => {
+  ;(useGamesInProgressPreview as jest.Mock).mockReturnValue({ listGames: [], isLoading: true })
+  render(<MainPageGames />)
+  expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0)
+})

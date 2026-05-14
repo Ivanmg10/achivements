@@ -13,7 +13,7 @@ import { relativeTime } from '@/utils/utils'
 import { IconChevronLeft, IconLayoutList } from '@tabler/icons-react'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
-import { useMainView } from '@/contexts/MainViewContext'
+import { useMainView } from '@/context/MainViewContext'
 
 const MAX_GAMES = 7
 const GAP_PX = 6 // gap-1.5

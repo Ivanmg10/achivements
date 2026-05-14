@@ -1,80 +1,60 @@
-jest.mock("@/utils/apiCallsUtils", () => ({
-  getWantGames: jest.fn(),
-}));
+jest.mock('@/hooks/useWantGamesPreview', () => ({
+  useWantGamesPreview: jest.fn(),
+}))
 
-import { render, screen, act } from "@testing-library/react";
-import MainPageWantToPlay from "./MainPageWantToPlay";
-import { useSession } from "next-auth/react";
-import { getWantGames } from "@/utils/apiCallsUtils";
+jest.mock('@/hooks/useResizableList', () => ({
+  useResizableList: () => 5,
+}))
 
-const mockGames = [
-  {
-    ID: 1,
-    GameTitle: "Pokémon Emerald",
-    Title: "Pokémon Emerald",
-    ConsoleID: 5,
-    ConsoleName: "GBA",
-    ImageIcon: "/icon.png",
-  },
-];
+jest.mock('@/components/main-page/main-page-games/main-page-games-list/MainPageGamesList', () => ({
+  __esModule: true,
+  default: ({ listGames }: { listGames: { GameTitle: string }[] }) => (
+    <div>{(listGames ?? []).map((g) => <span key={g.GameTitle}>{g.GameTitle}</span>)}</div>
+  ),
+}))
+
+jest.mock('@/components/main-page/console-side-list/ConsoleSideList', () => ({
+  __esModule: true,
+  default: () => null,
+}))
+
+jest.mock('@/components/ui/GameCardSkeleton', () => ({
+  GameCardSkeleton: () => <div data-testid="skeleton" />,
+}))
+
+jest.mock('@/components/empty-state/EmptyState', () => ({
+  __esModule: true,
+  default: ({ title }: { title: string }) => <div>{title}</div>,
+}))
+
+import { render, screen } from '@testing-library/react'
+import MainPageWantToPlay from './MainPageWantToPlay'
+import { useWantGamesPreview } from '@/hooks/useWantGamesPreview'
+
+const mockGame = { ID: 1, GameTitle: 'Pokémon Emerald', ConsoleID: 5, ConsoleName: 'GBA', ImageIcon: '/icon.png' }
 
 beforeEach(() => {
-  (getWantGames as jest.Mock).mockImplementation((_session, setWantGames, _setError) => {
-    setWantGames(mockGames);
-    return Promise.resolve();
-  });
-});
+  ;(useWantGamesPreview as jest.Mock).mockReturnValue({ wantGames: [mockGame], loading: false })
+})
 
-test("hasFetched guard prevents double fetch", async () => {
-  (getWantGames as jest.Mock).mockImplementation((_session, setWantGames) => {
-    setWantGames(mockGames);
-    return Promise.resolve();
-  });
-  (useSession as jest.Mock).mockReturnValue({
-    status: "authenticated",
-    data: { user: {} },
-  });
-  const { rerender } = render(<MainPageWantToPlay />);
-  (useSession as jest.Mock).mockReturnValue({
-    status: "unauthenticated",
-    data: null,
-  });
-  rerender(<MainPageWantToPlay />);
-  expect(getWantGames).toHaveBeenCalledTimes(1);
-});
+test('renders want to play header', () => {
+  render(<MainPageWantToPlay />)
+  expect(screen.getByText('Want to play')).toBeInTheDocument()
+})
 
-test("renders spinner when no games yet", () => {
-  (getWantGames as jest.Mock).mockImplementation(() => Promise.resolve());
-  (useSession as jest.Mock).mockReturnValue({
-    status: "authenticated",
-    data: { user: {} },
-  });
-  const { container } = render(<MainPageWantToPlay />);
-  expect(container.querySelector(".loader")).toBeInTheDocument();
-});
+test('renders want-to-play games', () => {
+  render(<MainPageWantToPlay />)
+  expect(screen.getByText('Pokémon Emerald')).toBeInTheDocument()
+})
 
-test("renders want-to-play games", async () => {
-  (useSession as jest.Mock).mockReturnValue({
-    status: "authenticated",
-    data: { user: {} },
-  });
-  await act(async () => {
-    render(<MainPageWantToPlay />);
-  });
-  expect(screen.getByText("Pokémon Emerald")).toBeInTheDocument();
-});
+test('renders empty state when no games', () => {
+  ;(useWantGamesPreview as jest.Mock).mockReturnValue({ wantGames: [], loading: false })
+  render(<MainPageWantToPlay />)
+  expect(screen.getByText('Your wishlist is empty')).toBeInTheDocument()
+})
 
-test("renders error state", async () => {
-  (getWantGames as jest.Mock).mockImplementation((_session, _setGames, setError) => {
-    setError("Network error");
-    return Promise.resolve();
-  });
-  (useSession as jest.Mock).mockReturnValue({
-    status: "authenticated",
-    data: { user: {} },
-  });
-  await act(async () => {
-    render(<MainPageWantToPlay />);
-  });
-  expect(screen.getByText("Error: Network error")).toBeInTheDocument();
-});
+test('shows skeletons when loading', () => {
+  ;(useWantGamesPreview as jest.Mock).mockReturnValue({ wantGames: [], loading: true })
+  render(<MainPageWantToPlay />)
+  expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0)
+})

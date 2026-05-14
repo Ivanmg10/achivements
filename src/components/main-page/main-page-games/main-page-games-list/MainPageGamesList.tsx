@@ -51,7 +51,7 @@ export default function MainPageGamesList({
   const { T } = useLanguage()
 
   return listGames.map((game: AnyGame, index: number) => {
-    const consoleIcon = CONSOLES.find((c) => c.id === game.ConsoleID)?.icon
+    const consoleDef = CONSOLES.find((c) => c.id === game.ConsoleID)
     const badge = getBadge(game, T.gamesList.achievements)
 
     return (
@@ -75,16 +75,18 @@ export default function MainPageGamesList({
               {game?.GameTitle ? game?.GameTitle : game?.Title}
             </p>
             <div className="flex flex-row items-center gap-1">
-              {consoleIcon && (
-                <Image
-                  src={consoleIcon}
-                  alt={game.ConsoleName}
-                  width={12}
-                  height={12}
-                  className="object-contain"
-                />
-              )}
-              <p className="text-xs text-gray-400">{game?.ConsoleName}</p>
+              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${consoleDef?.color ?? 'text-gray-400'}`}>
+                {consoleDef?.icon && (
+                  <Image
+                    src={consoleDef.icon}
+                    alt={game.ConsoleName}
+                    width={10}
+                    height={10}
+                    className="object-contain shrink-0"
+                  />
+                )}
+                {game?.ConsoleName}
+              </span>
             </div>
           </div>
         </div>

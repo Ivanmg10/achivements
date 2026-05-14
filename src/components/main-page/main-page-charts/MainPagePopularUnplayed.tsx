@@ -1,6 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { PopularGame } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function MainPagePopularUnplayed({
   games,
@@ -11,11 +14,13 @@ export default function MainPagePopularUnplayed({
   isLoading?: boolean
   error?: boolean
 }) {
+  const { T } = useLanguage()
+
   if (isLoading) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Popular — not yet played</p>
-        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">Loading...</div>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.popularUnplayed}</p>
+        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">{T.cards.loading}</div>
       </div>
     )
   }
@@ -23,8 +28,8 @@ export default function MainPagePopularUnplayed({
   if (error) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Popular — not yet played</p>
-        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">Failed to load</div>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.popularUnplayed}</p>
+        <div className="flex items-center justify-center py-6 text-text-secondary text-sm" role="alert">{T.charts.failedToLoad}</div>
       </div>
     )
   }
@@ -32,15 +37,15 @@ export default function MainPagePopularUnplayed({
   if (games.length === 0) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">Popular — not yet played</p>
-        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">You&apos;ve played everything!</div>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.popularUnplayed}</p>
+        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">{T.charts.popularPlayedAll}</div>
       </div>
     )
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">Popular — not yet played</p>
+      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.popularUnplayed}</p>
       <div className="flex flex-col gap-2">
         {games.slice(0, 6).map((g) => {
           const id = g.ID ?? 0

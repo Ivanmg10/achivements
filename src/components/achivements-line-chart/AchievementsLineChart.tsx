@@ -50,28 +50,31 @@ export default function AchievementsLineChart({
       ) : (
         <ResponsiveContainer width="100%" height={340}>
           <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }} onClick={handleChartClick} style={{ cursor: 'pointer' }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2e2e3e" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="rgb(var(--bg-header))"
+            />
             <XAxis
               dataKey="date"
-              tick={{ fill: '#9ca3af', fontSize: 12 }}
+              tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 12 }}
               tickFormatter={/* istanbul ignore next */ (val: string) => val.slice(5)}
             />
-            <YAxis tick={{ fill: '#9ca3af', fontSize: 12 }} allowDecimals={false} />
+            <YAxis tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 12 }} allowDecimals={false} />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#1e1e2e',
-                border: 'none',
+                backgroundColor: 'rgb(var(--bg-card))',
+                border: '1px solid rgb(var(--bg-header))',
                 borderRadius: '8px',
               }}
-              labelStyle={{ color: '#fff' }}
+              labelStyle={{ color: 'rgb(var(--text-main))' }}
               formatter={/* istanbul ignore next */ (value) => [`${value} ${T.lineChart.achievements}`, '']}
             />
             <Line
               type="monotone"
               dataKey="count"
-              stroke="#6366f1"
+              stroke="rgb(var(--accent))"
               strokeWidth={2}
-              dot={{ fill: '#6366f1', r: 4 }}
+              dot={{ fill: 'rgb(var(--accent))', r: 4 }}
               activeDot={{ r: 6 }}
             />
           </LineChart>

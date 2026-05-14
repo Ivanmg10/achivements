@@ -15,304 +15,329 @@
 
   --color-accent: rgb(var(--accent));
   --color-accent-hover: rgb(var(--accent-hover));
+  --color-accent-secondary: rgb(var(--accent-secondary));
+  --color-accent-muted: rgb(var(--accent-muted));
 
   --color-btn-primary: rgb(var(--btn-primary));
   --color-btn-primary-text: rgb(var(--btn-primary-text));
   --color-btn-danger: rgb(var(--btn-danger));
   --color-btn-danger-text: rgb(var(--btn-danger-text));
+
+  --color-success: rgb(var(--success));
+  --color-warning: rgb(var(--warning));
+  --color-info: rgb(var(--info));
+  --color-danger: rgb(var(--danger));
+  --color-metric-1: rgb(var(--metric-1));
+
+  --color-chart-1: rgb(var(--chart-1));
+  --color-chart-2: rgb(var(--chart-2));
 }
 
-/* themes */
+/* ============================================
+   VARIABLES BASE — fallback
+   ============================================ */
 
 :root {
-  --bg-main: 20 20 22;
-  --bg-header: 12 12 14;
-  --bg-deep: 18 20 26;
-  --bg-card: 12 12 14;
-  --bg-tertiary: 36 36 42;
+  --bg-main: 15 16 20;
+  --bg-header: 10 10 14;
+  --bg-deep: 12 14 22;
+  --bg-card: 20 20 26;
+  --bg-tertiary: 35 36 46;
 
-  --text-main: 220 220 225;
-  --text-secondary: 140 140 148;
-  --text-accent: 255 255 255;
+  --text-main: 225 228 235;
+  --text-secondary: 140 145 155;
+  --text-accent: 250 250 255;
 
-  --accent: 180 180 190;
-  --accent-hover: 200 200 210;
+  --accent: 180 185 200;
+  --accent-hover: 200 205 220;
+  --accent-secondary: 148 153 168;
+  --accent-muted: 180 185 200;
 
   --btn-primary: 80 80 90;
   --btn-primary-text: 255 255 255;
   --btn-danger: 180 40 40;
   --btn-danger-text: 255 255 255;
+
+  --success: 34 197 94;
+  --warning: 245 158 11;
+  --info: 96 165 250;
+  --danger: 239 68 68;
+  --metric-1: 180 185 200;
+  --chart-1: 59 130 246;
+  --chart-2: 245 158 11;
 }
 
 /* ============================================
-   BASE / DARK — sin cambios
+   DARK
    ============================================ */
 [data-theme="dark"] {
-  --bg-main: 20 20 22;
-  --bg-header: 12 12 14;
-  --bg-deep: 18 20 26;
-  --bg-card: 12 12 14;
-  --bg-tertiary: 36 36 42;
+  --bg-main: 15 16 20;
+  --bg-header: 10 10 14;
+  --bg-deep: 12 14 22;
+  --bg-card: 20 20 26;
+  --bg-tertiary: 35 36 46;
 
-  --text-main: 220 220 225;
-  --text-secondary: 140 140 148;
-  --text-accent: 255 255 255;
+  --text-main: 225 228 235;
+  --text-secondary: 140 145 155;
+  --text-accent: 250 250 255;
 
-  --accent: 180 180 190;
-  --accent-hover: 200 200 210;
+  --accent: 180 185 200;
+  --accent-hover: 200 205 220;
+  --accent-secondary: 148 153 168;
+  --accent-muted: 180 185 200;
 
   --btn-primary: 80 80 90;
   --btn-primary-text: 255 255 255;
   --btn-danger: 180 40 40;
   --btn-danger-text: 255 255 255;
+
+  --success: 34 197 94;
+  --warning: 245 158 11;
+  --info: 96 165 250;
+  --danger: 239 68 68;
+  --metric-1: 180 185 200;
+  --chart-1: 59 130 246;
+  --chart-2: 245 158 11;
 }
 
 /* ============================================
-   ROJO
+   LIGHT — Neutro suave
    ============================================ */
-[data-theme="red"] {
-  --bg-main: 20 13 13;
-  --bg-header: 12 8 8;
-  --bg-deep: 13 8 8;
-  --bg-card: 28 17 17;
-  --bg-tertiary: 46 28 28;
+[data-theme="light"] {
+  --bg-main: 230 232 236;
+  --bg-header: 224 226 230;
+  --bg-deep: 220 222 226;
+  --bg-card: 238 240 244;
+  --bg-tertiary: 218 220 224;
 
-  --text-main: 225 210 210;
-  --text-secondary: 148 120 120;
+  --text-main: 50 52 58;
+  --text-secondary: 100 102 110;
   --text-accent: 255 255 255;
 
-  --accent: 220 45 45;
-  --accent-hover: 240 65 65;
+  --accent: 70 75 85;
+  --accent-hover: 55 60 68;
+  --accent-secondary: 110 115 125;
+  --accent-muted: 70 75 85;
 
-  --btn-primary: 200 35 35;
+  --btn-primary: 65 70 80;
   --btn-primary-text: 255 255 255;
-  --btn-danger: 160 25 25;
+  --btn-danger: 200 40 40;
   --btn-danger-text: 255 255 255;
+
+  --success: 25 150 75;
+  --warning: 195 110 15;
+  --info: 40 100 200;
+  --danger: 195 40 40;
+  --metric-1: 95 100 108;
+  --chart-1: 70 75 85;
+  --chart-2: 195 110 15;
+}
+
+.button-light {
+  background-color: rgb(230 232 236);
+  border: 1px solid rgb(70 75 85);
+  color: rgb(50 52 58);
+}
+.button-light:hover {
+  border-color: rgb(55 60 68);
+  background-color: rgb(224 226 230);
 }
 
 /* ============================================
-   VERDE
-   ============================================ */
-[data-theme="green"] {
-  --bg-main: 12 20 15;
-  --bg-header: 8 14 10;
-  --bg-deep: 8 14 11;
-  --bg-card: 17 28 21;
-  --bg-tertiary: 26 45 34;
-
-  --text-main: 210 225 216;
-  --text-secondary: 120 148 132;
-  --text-accent: 255 255 255;
-
-  --accent: 0 195 95;
-  --accent-hover: 0 218 110;
-
-  --btn-primary: 0 165 80;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 180 40 40;
-  --btn-danger-text: 255 255 255;
-}
-
-/* ============================================
-   BLUE — Estilo GitHub
-   Gris azulado oscuro, azul eléctrico
+   BLUE
    ============================================ */
 [data-theme="blue"] {
-  --bg-main: 13 17 23;
-  --bg-header: 22 27 34;
-  --bg-deep: 8 12 18;
-  --bg-card: 22 27 34;
-  --bg-tertiary: 40 50 62;
+  --bg-main: 10 15 28;
+  --bg-header: 15 20 35;
+  --bg-deep: 8 12 22;
+  --bg-card: 18 24 42;
+  --bg-tertiary: 28 38 58;
 
-  --text-main: 201 209 217;
-  --text-secondary: 110 118 129;
-  --text-accent: 255 255 255;
+  --text-main: 218 228 245;
+  --text-secondary: 125 140 170;
+  --text-accent: 250 252 255;
 
-  --accent: 31 111 235;
-  --accent-hover: 56 139 253;
+  --accent: 59 130 246;
+  --accent-hover: 96 165 250;
+  --accent-secondary: 147 197 253;
+  --accent-muted: 59 130 246;
 
-  --btn-primary: 31 111 235;
+  --btn-primary: 59 130 246;
   --btn-primary-text: 255 255 255;
-  --btn-danger: 218 54 51;
+  --btn-danger: 239 68 68;
   --btn-danger-text: 255 255 255;
-}
 
-/* ============================================
-   YELLOW
-   ============================================ */
-[data-theme="yellow"] {
-  --bg-main: 20 18 11;
-  --bg-header: 12 11 6;
-  --bg-deep: 14 12 7;
-  --bg-card: 28 25 15;
-  --bg-tertiary: 44 40 22;
-
-  --text-main: 225 220 198;
-  --text-secondary: 148 140 110;
-  --text-accent: 255 255 255;
-
-  --accent: 255 215 0;
-  --accent-hover: 255 235 50;
-
-  --btn-primary: 230 190 0;
-  --btn-primary-text: 18 16 5;
-  --btn-danger: 200 45 30;
-  --btn-danger-text: 255 255 255;
+  --success: 34 197 94;
+  --warning: 245 158 11;
+  --info: 59 130 246;
+  --danger: 239 68 68;
+  --metric-1: 147 197 253;
+  --chart-1: 59 130 246;
+  --chart-2: 245 158 11;
 }
 
 /* ============================================
    PURPLE
    ============================================ */
 [data-theme="purple"] {
-  --bg-main: 18 16 28;
-  --bg-header: 12 10 20;
-  --bg-deep: 12 10 20;
-  --bg-card: 26 22 40;
-  --bg-tertiary: 40 35 62;
+  --bg-main: 18 12 32;
+  --bg-header: 12 8 24;
+  --bg-deep: 10 6 18;
+  --bg-card: 24 16 40;
+  --bg-tertiary: 38 26 62;
 
-  --text-main: 220 215 235;
-  --text-secondary: 140 130 165;
-  --text-accent: 255 255 255;
+  --text-main: 225 220 242;
+  --text-secondary: 155 148 185;
+  --text-accent: 248 248 255;
 
-  --accent: 160 80 255;
-  --accent-hover: 180 105 255;
+  --accent: 168 85 247;
+  --accent-hover: 192 110 255;
+  --accent-secondary: 196 181 251;
+  --accent-muted: 168 85 247;
 
-  --btn-primary: 140 65 240;
+  --btn-primary: 168 85 247;
   --btn-primary-text: 255 255 255;
-  --btn-danger: 220 40 80;
+  --btn-danger: 248 113 113;
   --btn-danger-text: 255 255 255;
+
+  --success: 52 211 153;
+  --warning: 251 191 36;
+  --info: 168 85 247;
+  --danger: 248 113 113;
+  --metric-1: 196 181 251;
+  --chart-1: 168 85 247;
+  --chart-2: 251 191 36;
 }
 
 /* ============================================
-   TEAL
+   GREEN
    ============================================ */
-[data-theme="teal"] {
-  --bg-main: 10 20 20;
-  --bg-header: 6 13 13;
-  --bg-deep: 7 14 14;
-  --bg-card: 15 28 28;
-  --bg-tertiary: 24 44 44;
+[data-theme="green"] {
+  --bg-main: 10 18 10;
+  --bg-header: 6 12 6;
+  --bg-deep: 8 15 8;
+  --bg-card: 14 26 14;
+  --bg-tertiary: 24 40 24;
 
-  --text-main: 210 228 226;
-  --text-secondary: 118 148 145;
-  --text-accent: 255 255 255;
+  --text-main: 212 224 212;
+  --text-secondary: 125 152 128;
+  --text-accent: 248 252 248;
 
-  --accent: 0 188 185;
-  --accent-hover: 0 212 208;
+  --accent: 132 184 80;
+  --accent-hover: 152 204 100;
+  --accent-secondary: 180 210 140;
+  --accent-muted: 132 184 80;
 
-  --btn-primary: 0 165 162;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 180 40 40;
+  --btn-primary: 132 184 80;
+  --btn-primary-text: 18 24 14;
+  --btn-danger: 210 80 70;
   --btn-danger-text: 255 255 255;
+
+  --success: 74 175 80;
+  --warning: 188 184 56;
+  --info: 132 184 80;
+  --danger: 210 80 70;
+  --metric-1: 168 205 140;
+  --chart-1: 132 184 80;
+  --chart-2: 188 184 56;
 }
 
 /* ============================================
-   LIGHT
+   RED
    ============================================ */
-[data-theme="light"] {
-  --bg-main: 240 240 246;
-  --bg-header: 255 255 255;
-  --bg-deep: 224 224 236;
-  --bg-card: 255 255 255;
-  --bg-tertiary: 224 224 236;
+[data-theme="red"] {
+  --bg-main: 28 12 14;
+  --bg-header: 20 8 10;
+  --bg-deep: 14 6 8;
+  --bg-card: 36 16 18;
+  --bg-tertiary: 55 28 32;
 
-  --text-main: 22 22 30;
-  --text-secondary: 95 95 110;
-  --text-accent: 255 255 255;
+  --text-main: 248 232 232;
+  --text-secondary: 185 155 158;
+  --text-accent: 255 252 252;
 
-  --accent: 99 102 241;
-  --accent-hover: 118 120 255;
+  --accent: 224 60 80;
+  --accent-hover: 240 80 100;
+  --accent-secondary: 244 140 155;
+  --accent-muted: 224 60 80;
 
-  --btn-primary: 79 70 229;
+  --btn-primary: 224 60 80;
   --btn-primary-text: 255 255 255;
-  --btn-danger: 210 38 38;
+  --btn-danger: 160 40 50;
   --btn-danger-text: 255 255 255;
+
+  --success: 52 211 153;
+  --warning: 251 191 36;
+  --info: 99 160 255;
+  --danger: 224 60 80;
+  --metric-1: 244 160 170;
+  --chart-1: 224 60 80;
+  --chart-2: 251 191 36;
 }
 
-.button-red {
-  background-color: rgb(20 13 13);
-  border: 1px solid rgb(220 45 45);
-  color: rgb(225 210 210);
+/* ============================================
+   UTILITY CLASSES — Botones de tema
+   ============================================ */
+
+.theme-button {
   transition: all 0.2s ease;
   cursor: pointer;
 }
-.button-red:hover {
-  transform: scale(1.03);
-}
-
-.button-green {
-  background-color: rgb(12 20 15);
-  border: 1px solid rgb(0 195 95);
-  color: rgb(210 225 216);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-.button-green:hover {
-  transform: scale(1.03);
+.theme-button:hover {
+  transform: scale(1.05);
 }
 
 .button-dark {
-  background-color: rgb(20 20 22);
+  background-color: rgb(15 16 20);
   border: 1px solid rgb(80 80 90);
-  color: rgb(220 220 225);
-  transition: all 0.2s ease;
-  cursor: pointer;
+  color: rgb(225 228 235);
 }
 .button-dark:hover {
-  transform: scale(1.03);
-}
-
-.button-blue {
-  background-color: rgb(13 17 23);
-  border: 1px solid rgb(31 111 235);
-  color: rgb(201 209 217);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-.button-blue:hover {
-  transform: scale(1.03);
-}
-
-.button-yellow {
-  background-color: rgb(20 18 11);
-  border: 1px solid rgb(255 215 0);
-  color: rgb(225 220 198);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-.button-yellow:hover {
-  transform: scale(1.03);
-}
-
-.button-purple {
-  background-color: rgb(18 16 28);
-  border: 1px solid rgb(160 80 255);
-  color: rgb(220 215 235);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-.button-purple:hover {
-  transform: scale(1.03);
-}
-
-.button-teal {
-  background-color: rgb(10 20 20);
-  border: 1px solid rgb(0 188 185);
-  color: rgb(210 228 226);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-.button-teal:hover {
-  transform: scale(1.03);
+  border-color: rgb(100 100 110);
+  background-color: rgb(20 21 26);
 }
 
 .button-light {
-  background-color: rgb(242 242 247);
-  border: 1px solid rgb(80 80 200);
-  color: rgb(28 28 35);
-  transition: all 0.2s ease;
-  cursor: pointer;
+  background-color: rgb(225 235 238);
+  border: 1px solid rgb(45 130 145);
+  color: rgb(30 35 45);
 }
 .button-light:hover {
-  transform: scale(1.03);
+  border-color: rgb(35 115 130);
+}
+
+.button-blue {
+  background-color: rgb(10 15 28);
+  border: 1px solid rgb(59 130 246);
+  color: rgb(218 228 245);
+}
+.button-blue:hover {
+  border-color: rgb(96 165 250);
+}
+
+.button-purple {
+  background-color: rgb(18 12 32);
+  border: 1px solid rgb(168 85 247);
+  color: rgb(225 220 242);
+}
+.button-purple:hover {
+  border-color: rgb(192 110 255);
+}
+
+.button-green {
+  background-color: rgb(10 18 10);
+  border: 1px solid rgb(132 184 80);
+  color: rgb(212 224 212);
+}
+.button-green:hover {
+  border-color: rgb(152 204 100);
+}
+
+.button-red {
+  background-color: rgb(28 12 14);
+  border: 1px solid rgb(224 60 80);
+  color: rgb(248 232 232);
+}
+.button-red:hover {
+  border-color: rgb(240 80 100);
 }

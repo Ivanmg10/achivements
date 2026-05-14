@@ -8,17 +8,18 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { calcStreak } from '@/utils/utils'
-import { IconHome, IconChevronLeft, IconSearch, IconFlame } from '@tabler/icons-react'
+import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconMenu } from '@tabler/icons-react'
 import SearchModal from '@/components/search-modal/SearchModal'
+import MobileNavModal from './MobileNavModal'
 
-function NavLink({ href, label, active }: { href: string; label: string; active: boolean }) {
+function NavLink({ href, label, active, glass }: { href: string; label: string; active: boolean; glass?: boolean }) {
   return (
     <Link
       href={href}
       className={`px-3.5 py-1.5 text-sm rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 whitespace-nowrap ${
         active
-          ? 'text-text-main font-medium bg-bg-main ring-1 ring-white/10'
-          : 'text-text-secondary hover:text-text-main hover:bg-bg-main/60'
+          ? `text-accent font-medium ${glass ? 'bg-white/10 backdrop-blur-sm' : 'bg-bg-main'} ring-1 ring-white/10`
+          : `text-text-secondary hover:text-text-main ${glass ? 'hover:bg-white/10' : 'hover:bg-bg-main/60'}`
       }`}
     >
       {label}
@@ -26,10 +27,10 @@ function NavLink({ href, label, active }: { href: string; label: string; active:
   )
 }
 
-function StreakBadge({ streak }: { streak: number }) {
+function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
   if (streak === 0) return null
   return (
-    <div className="flex items-center gap-1 bg-bg-main px-3 py-1.5 rounded-full shrink-0 ring-1 ring-white/10">
+    <div className={`flex items-center gap-1 ${glass ? 'bg-white/10 backdrop-blur-sm' : 'bg-bg-main'} px-3 py-1.5 rounded-full shrink-0 ring-1 ring-white/10`}>
       <IconFlame className="w-3.5 h-3.5 text-orange-400" aria-hidden />
       <span className="text-xs font-bold text-text-main">{streak}d</span>
     </div>
@@ -43,9 +44,11 @@ export default function MainHeader() {
   const router = useRouter()
   const pathname = usePathname()
   const [searchOpen, setSearchOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const streak = calcStreak(recentAch)
   const isHome = pathname === '/'
+  const isGameInfo = pathname.startsWith('/gameInfo/')
   const avatarSrc = session?.user?.avatar ?? session?.user?.image ?? null
 
   const openSearch = useCallback(() => setSearchOpen(true), [])
@@ -60,13 +63,13 @@ export default function MainHeader() {
 
   return (
     <>
-      <header className="flex flex-row items-center bg-bg-card text-text-main px-4 py-2 gap-3 h-16">
-        {/* Left: home + back + nav */}
-        <div className="flex items-center gap-1 flex-1">
+      <header className={`relative flex items-center text-text-main px-4 h-16 ${isGameInfo ? 'bg-transparent z-[1]' : 'bg-bg-card'}`}>
+        {/* Left: home + back + nav (desktop) / hamburguesa (mobile) */}
+        <div className="flex items-center gap-1 shrink-0 z-10">
           <Link
             href="/"
             aria-label="Home"
-            className="p-1.5 rounded-full hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0"
+            className={`p-1.5 rounded-full transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0 ${isGameInfo ? 'hover:bg-white/10' : 'hover:bg-bg-main'}`}
           >
             <IconHome className="w-5 h-5" aria-hidden="true" />
           </Link>
@@ -74,22 +77,13 @@ export default function MainHeader() {
             <button
               onClick={() => router.back()}
               aria-label="Go back"
-              className="p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0"
+              className={`p-1.5 rounded-lg transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0 ${isGameInfo ? 'hover:bg-white/10' : 'hover:bg-bg-main'}`}
             >
               <IconChevronLeft className="w-5 h-5" aria-hidden="true" />
             </button>
           )}
 
-          {/* Mobile search icon */}
-          <button
-            onClick={openSearch}
-            aria-label="Search games"
-            className="md:hidden p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0"
-          >
-            <IconSearch className="w-5 h-5" aria-hidden="true" />
-          </button>
-
-          {/* Nav links */}
+          {/* Desktop nav - visible on md+ */}
           <nav className="hidden md:flex items-center gap-0.5 ml-2" aria-label="Main navigation">
             {navItems.map(({ href, label }) => (
               <NavLink
@@ -97,33 +91,51 @@ export default function MainHeader() {
                 href={session ? href : '/authPage'}
                 label={label}
                 active={pathname === href}
+                glass={isGameInfo}
               />
             ))}
           </nav>
+
+          {/* Hamburger menu - mobile only */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Menu"
+            className={`md:hidden p-1.5 rounded-lg transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${isGameInfo ? 'hover:bg-white/10' : 'hover:bg-bg-main'}`}
+          >
+            <IconMenu className="w-5 h-5" aria-hidden="true" />
+          </button>
         </div>
 
-        {/* Center: search */}
-        <div className="hidden md:flex justify-center shrink-0">
+        {/* Center: search bar - absolute only on lg+, hidden on smaller */}
+        <div className="hidden 2xl:flex absolute xl:w-[80%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4 pointer-events-none">
           <button
             onClick={openSearch}
             aria-label="Search games"
-            className="w-80 bg-bg-main rounded-full px-4 py-2.5 text-sm text-text-secondary text-left hover:bg-bg-main/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 flex items-center gap-2 cursor-pointer ring-1 ring-white/5"
+            className={`flex w-[40%] mx-auto rounded-full px-4 py-2.5 text-sm text-text-secondary text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 flex items-center gap-2 cursor-pointer ring-1 pointer-events-auto ${isGameInfo ? 'bg-white/10 backdrop-blur-sm ring-white/20 hover:bg-white/20' : 'bg-bg-main ring-white/5 hover:bg-bg-main/80'}`}
           >
             <IconSearch className="w-4 h-4 shrink-0" aria-hidden />
             <span>{T.search.placeholder}</span>
           </button>
         </div>
 
+        {/* Right: search icon (mobile) + streak + user */}
+        <div className="flex items-center gap-2 shrink-0 ml-auto z-10">
+          {/* Search icon - mobile only, to the right */}
+          <button
+            onClick={openSearch}
+            aria-label="Search games"
+            className={`2xl:hidden p-1.5 rounded-lg transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0 ${isGameInfo ? 'hover:bg-white/10' : 'hover:bg-bg-main'}`}
+          >
+            <IconSearch className="w-5 h-5" aria-hidden="true" />
+          </button>
 
-        {/* Right: streak + user */}
-        <div className="flex items-center gap-2 flex-1 justify-end">
           {session ? (
             <>
-              <StreakBadge streak={streak} />
+              <StreakBadge streak={streak} glass={isGameInfo} />
               <Link
                 href="/user"
                 aria-label="Profile"
-                className="flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-bg-main hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ring-1 ring-white/10"
+                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ring-1 ring-white/10 ${isGameInfo ? 'bg-white/10 backdrop-blur-sm hover:bg-white/20' : 'bg-bg-main hover:bg-white/5'}`}
               >
                 <span className="text-sm font-medium hidden sm:block text-text-main leading-none">
                   {session.user?.name ?? session.user?.email}
@@ -158,6 +170,7 @@ export default function MainHeader() {
       </header>
 
       <SearchModal isOpen={searchOpen} onClose={closeSearch} />
+      <MobileNavModal isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </>
   )
 }

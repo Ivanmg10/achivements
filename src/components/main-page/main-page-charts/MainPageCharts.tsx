@@ -3,7 +3,7 @@
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
-import { useGamesData } from '@/contexts/GamesDataContext'
+import { useGamesData } from '@/context/GamesDataContext'
 import { useUserRank } from '@/hooks/useUserRank'
 import { useUserAwards } from '@/hooks/useUserAwards'
 import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
@@ -17,7 +17,6 @@ import MainPageRarest from './MainPageRarest'
 import MainPageAbandoned from './MainPageAbandoned'
 import MainPageTopGames from './MainPageTopGames'
 import MainPageMastery from './MainPageMastery'
-import MainPageAlmostThere from './MainPageAlmostThere'
 import MainPagePerfectGames from './MainPagePerfectGames'
 import MainPageBestPeriod from './MainPageBestPeriod'
 import MainPageFavorites from '../main-page-favorites/MainPageFavorites'
@@ -29,7 +28,7 @@ export default function MainPageCharts() {
   const { achievements, isLoading: achLoading } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading } = useActivityHeatmap()
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
-  const { all, isLoading: gamesLoading } = useGamesData()
+  const { all, hardcore, softcore, isLoading: gamesLoading } = useGamesData()
   const { rank, isLoading: rankLoading } = useUserRank()
   const { awards, isLoading: awardsLoading } = useUserAwards()
   const { achievements: yearAch, isLoading: yearLoading } = useActivityHeatmapYear()
@@ -82,18 +81,23 @@ export default function MainPageCharts() {
             <MainPagePerfectGames games={all} isLoading={gamesLoading} />
           </ChartCard>
 
-          {/* Row 3: Almost There (col1) | Mastery (col2) | Pinned (col3 row-span-2) */}
-          <ChartCard>
-            <MainPageAlmostThere games={all} isLoading={gamesLoading} />
-          </ChartCard>
-          <ChartCard>
-            <MainPageMastery awards={awards} isLoading={awardsLoading} />
+          {/* Row 3: Console Nav (col1-2) | Pinned (col3 row-span-2) */}
+          <ChartCard className="lg:col-span-2">
+            <MainPageConsoleNav />
           </ChartCard>
           <ChartCard className="lg:row-span-2">
             <MainPageFavorites />
           </ChartCard>
 
-          {/* Row 4: Best Performance (col1) | Console Nav (col2) | Pinned continues */}
+          {/* Row 4: Mastery (col1) | Best Performance (col2) | Pinned continues */}
+          <ChartCard>
+            <MainPageMastery
+              awards={awards}
+              isLoading={awardsLoading}
+              unlockedHC={hardcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
+              unlockedSC={softcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
+            />
+          </ChartCard>
           <ChartCard>
             <MainPageBestPeriod
               achievements={heatmapData}
@@ -101,9 +105,6 @@ export default function MainPageCharts() {
               isLoading={heatmapLoading}
               yearLoading={yearLoading}
             />
-          </ChartCard>
-          <ChartCard>
-            <MainPageConsoleNav />
           </ChartCard>
 
         </div>

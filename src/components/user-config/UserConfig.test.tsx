@@ -1,53 +1,38 @@
-jest.mock("@/utils/apiCallsUtils", () => ({
-  unlinkRaUser: jest.fn(),
-}));
-
-jest.mock("@/components/user-theme/UserTheme", () => ({
+jest.mock('@/components/user-theme/UserTheme', () => ({
   __esModule: true,
   default: () => <div data-testid="user-theme">UserTheme</div>,
-}));
+}))
 
-import { render, screen, fireEvent } from "@testing-library/react";
-import UserConfig from "./UserConfig";
-import { useSession, signOut } from "next-auth/react";
-import { unlinkRaUser } from "@/utils/apiCallsUtils";
+import { render, screen, fireEvent } from '@testing-library/react'
+import UserConfig from './UserConfig'
 
-test("renders config section", () => {
-  (useSession as jest.Mock).mockReturnValue({
-    data: { user: { raUser: null } },
-    update: jest.fn(),
-  });
-  render(<UserConfig />);
-  expect(screen.getByText("Configuración de cuenta")).toBeInTheDocument();
-  expect(screen.getByTestId("user-theme")).toBeInTheDocument();
-});
+test('renders account settings section', () => {
+  render(<UserConfig />)
+  expect(screen.getByText('Account settings')).toBeInTheDocument()
+  expect(screen.getByTestId('user-theme')).toBeInTheDocument()
+})
 
-test("shows RA sign out when raUser present", () => {
-  (useSession as jest.Mock).mockReturnValue({
-    data: { user: { raUser: { User: "Ivan" } } },
-    update: jest.fn(),
-  });
-  render(<UserConfig />);
-  expect(screen.getByText("Cerrar sesion en RA")).toBeInTheDocument();
-});
+test('renders change password button', () => {
+  render(<UserConfig />)
+  expect(screen.getByText('Change password')).toBeInTheDocument()
+})
 
-test("clicking sign out calls signOut", () => {
-  (useSession as jest.Mock).mockReturnValue({
-    data: { user: { raUser: null } },
-    update: jest.fn(),
-  });
-  render(<UserConfig />);
-  fireEvent.click(screen.getByText("Cerrar sesion"));
-  expect(signOut).toHaveBeenCalled();
-});
+test('renders language switcher', () => {
+  render(<UserConfig />)
+  expect(screen.getByText('Language')).toBeInTheDocument()
+  expect(screen.getByText('EN')).toBeInTheDocument()
+  expect(screen.getByText('ES')).toBeInTheDocument()
+})
 
-test("clicking RA sign out calls unlinkRaUser", () => {
-  const update = jest.fn();
-  (useSession as jest.Mock).mockReturnValue({
-    data: { user: { raUser: { User: "Ivan" } } },
-    update,
-  });
-  render(<UserConfig />);
-  fireEvent.click(screen.getByText("Cerrar sesion en RA"));
-  expect(unlinkRaUser).toHaveBeenCalledWith(update);
-});
+test('clicking language buttons triggers setLang', () => {
+  const mockSetLang = jest.fn()
+  const { useLanguage } = require('@/context/LanguageContext')
+  ;(useLanguage as jest.Mock).mockReturnValue({
+    lang: 'en',
+    setLang: mockSetLang,
+    T: require('@/translations/en').en,
+  })
+  render(<UserConfig />)
+  fireEvent.click(screen.getByText('ES'))
+  expect(mockSetLang).toHaveBeenCalledWith('es')
+})

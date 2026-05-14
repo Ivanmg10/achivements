@@ -54,11 +54,15 @@ export function useGamesByCategory(category: string, consoleId?: string) {
           const byConsole = (id !== null ? list.filter((g) => g.ConsoleID === id) : list)
             .filter((g) => g.ConsoleName !== 'Events')
           if (category === 'playing') {
-            setGames(
-              byConsole.filter(
-                (g) => Number(g.HardcoreMode) === 0 && parseFloat(g.PctWon) > 0 && parseFloat(g.PctWon) < 1,
-              ),
+            const inProgress = byConsole.filter(
+              (g) => parseFloat(g.PctWon) > 0 && parseFloat(g.PctWon) < 1,
             )
+            const best = new Map<number, RetroAchievementsGameCompleted>()
+            for (const g of inProgress) {
+              const prev = best.get(g.GameID)
+              if (!prev || Number(g.HardcoreMode) > Number(prev.HardcoreMode)) best.set(g.GameID, g)
+            }
+            setGames(Array.from(best.values()))
           } else {
             const all = byConsole.filter((g) => parseFloat(g.PctWon) >= 1)
             const best = new Map<number, RetroAchievementsGameCompleted>()

@@ -1,6 +1,6 @@
 import { WantToPlayGame } from '@/types/types'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
-import { useGamesData } from '@/contexts/GamesDataContext'
+import { useGamesData } from '@/context/GamesDataContext'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 

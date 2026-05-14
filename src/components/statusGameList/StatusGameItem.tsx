@@ -92,9 +92,9 @@ const AchievementGrid = memo(function AchievementGrid({
   }, [achievements])
 
   const TYPE_BADGES: Record<string, { label: string; className: string }> = {
-    progression:   { label: T.achievement.progression, className: 'bg-blue-900/60 text-blue-300' },
-    win_condition: { label: T.achievement.completed,   className: 'bg-yellow-900/60 text-yellow-300' },
-    missable:      { label: T.achievement.missable,    className: 'bg-red-900/60 text-red-300' },
+    progression:   { label: T.achievement.progression, className: 'bg-info/20 text-info' },
+    win_condition: { label: T.achievement.completed,   className: 'bg-warning/20 text-warning' },
+    missable:      { label: T.achievement.missable,    className: 'bg-danger/20 text-danger' },
   }
 
   function handleEnter(a: RetroAchievement, x: number, y: number) {
@@ -160,12 +160,12 @@ const AchievementGrid = memo(function AchievementGrid({
               </span>
             )}
             {tooltip.achievement.DateEarnedHardcore && (
-              <span className="text-xs px-1.5 py-0.5 rounded-full bg-yellow-900/60 text-yellow-300">
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-warning/20 text-warning">
                 Hardcore
               </span>
             )}
             {tooltip.achievement.DateEarned && !tooltip.achievement.DateEarnedHardcore && (
-              <span className="text-xs px-1.5 py-0.5 rounded-full bg-blue-900/60 text-blue-300">
+              <span className="text-xs px-1.5 py-0.5 rounded-full bg-info/20 text-info">
                 Softcore
               </span>
             )}
@@ -208,7 +208,9 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
   const gameId = getGameId(game)
   const { earned, total, pct } = getAchievementMeta(game)
   const isComplete = earned !== null && earned === total && total > 0
-  const consoleIcon = CONSOLES.find((c) => c.id === Number(game.ConsoleID))?.icon
+  const consoleDef = CONSOLES.find((c) => c.id === Number(game.ConsoleID))
+  const consoleIcon = consoleDef?.icon
+  const consoleColor = consoleDef?.color
 
   async function handleToggle() {
     if (!open && !gameData) {
@@ -287,10 +289,12 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
             <p className="text-xl font-semibold leading-tight">{game.Title}</p>
           </Link>
           <div className="flex items-center gap-1.5">
-            {consoleIcon && (
-              <Image src={consoleIcon} alt={game.ConsoleName} width={14} height={14} className="w-3.5 h-3.5 object-contain opacity-60" />
-            )}
-            <p className="text-xs text-text-secondary/70 uppercase tracking-wide">{game.ConsoleName}</p>
+            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${consoleColor ?? 'bg-bg-main text-text-secondary/70'}`}>
+              {consoleIcon && (
+                <Image src={consoleIcon} alt={game.ConsoleName} width={12} height={12} className="w-3 h-3 object-contain shrink-0" />
+              )}
+              {game.ConsoleName}
+            </span>
           </div>
           <p className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>
             {earned !== null ? `${earned} / ${total}` : total} {T.statusGameItem.achievements}
@@ -314,7 +318,7 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
                   const isHC = award.AwardDataExtra === 1
                   return (
                     <span key={i} className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${
-                      isHC ? 'bg-yellow-400/10 text-yellow-400/90' : 'bg-green-400/10 text-green-400/90'
+                      isHC ? 'bg-warning/10 text-warning/90' : 'bg-success/10 text-success/90'
                     }`}>
                       {isHC ? '★ Mastered' : '✓ Completed'} · {date}
                     </span>
@@ -324,7 +328,7 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
                   const isHC = award.AwardDataExtra === 1
                   return (
                     <span key={i} className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${
-                      isHC ? 'bg-yellow-400/10 text-yellow-300/80' : 'bg-blue-400/10 text-blue-400/90'
+                      isHC ? 'bg-warning/10 text-warning/80' : 'bg-info/10 text-info/90'
                     }`}>
                       ⚔ Beaten{isHC ? ' HC' : ''} · {date}
                     </span>

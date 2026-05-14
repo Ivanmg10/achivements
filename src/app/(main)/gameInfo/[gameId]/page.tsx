@@ -6,6 +6,7 @@ import LoadingPage from '@/components/loading-page/LoadingPage'
 import GameInfoHeader from '@/components/game-info-header/GameInfoHeader'
 import GameInfoTable from '@/components/game-info-table/GameInfoTable'
 import GameInfoSubsetSelector from '@/components/game-info-subset-selector/GameInfoSubsetSelector'
+import GameInfoComments from '@/components/game-info-comments/GameInfoComments'
 import { RetroAchievementsGameWithAchievements, SubsetGame } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
@@ -13,7 +14,7 @@ import { useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 
 export default function GameInfo() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const [gameData, setGameData] = useState<RetroAchievementsGameWithAchievements | null>(null)
   const [subsets, setSubsets] = useState<SubsetGame[]>([])
   const [parentId, setParentId] = useState<number | null>(null)
@@ -24,7 +25,7 @@ export default function GameInfo() {
   const { T } = useLanguage()
 
   useEffect(() => {
-    if (!session || !gameId) return
+    if (status !== 'authenticated' || !gameId) return
     setError(null)
     setGameData(null)
     setSubsets([])
@@ -41,7 +42,6 @@ export default function GameInfo() {
         setGameData(data)
 
         if (data.ParentGameID) {
-          // Current game IS a subset — fetch parent to get its title + sibling subsets
           setParentId(data.ParentGameID)
           const [parentRes, subsetsRes] = await Promise.all([
             fetch(`/api/getGameProgression?gameId=${data.ParentGameID}`),
@@ -54,7 +54,6 @@ export default function GameInfo() {
           }
           if (subsetsRes.ok) setSubsets(await subsetsRes.json())
         } else {
-          // Current game is a base game — look for subsets
           setParentId(data.ID)
           setParentTitle(data.Title ?? '')
           setParentIcon(data.ImageIcon ?? '')
@@ -65,7 +64,7 @@ export default function GameInfo() {
         }
       })
       .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Error loading game'))
-  }, [gameId, session?.user?.rausername])
+  }, [gameId, status])
 
   if (error) {
     return (
@@ -83,26 +82,47 @@ export default function GameInfo() {
 
   if (gameData !== null) {
     const showSelector = subsets.length > 0 || parentId !== null
+    const heroImage = gameData.ImageTitle ?? gameData.ImageIngame ?? null
+
     return (
-      <motion.main
-        className="flex-1 flex flex-col items-center text-text-main"
-        variants={fadeUp}
-        initial="hidden"
-        animate="visible"
-      >
-        <GameInfoHeader gameData={gameData}>
-          {showSelector && (
-            <GameInfoSubsetSelector
-              currentId={gameData.ID!}
-              parentId={parentId !== gameData.ID ? parentId : null}
-              parentTitle={parentTitle}
-              parentIcon={parentIcon}
-              subsets={subsets}
+      <main className="flex-1 flex flex-col items-center text-text-main relative">
+        {heroImage && (
+          <div
+            className="absolute pointer-events-none overflow-hidden"
+            style={{ top: '-64px', left: '50%', transform: 'translateX(-50%)', width: '100vw', height: '900px' }}
+          >
+            <img
+              src={`https://retroachievements.org${heroImage}`}
+              alt=""
+              aria-hidden="true"
+              className="w-full h-full object-cover object-top opacity-60 scale-110"
+              style={{ filter: 'blur(16px)' }}
             />
-          )}
-        </GameInfoHeader>
-        <GameInfoTable gameData={gameData} />
-      </motion.main>
+            <div className="absolute inset-0 bg-linear-to-b from-transparent via-bg-main/60 to-bg-main" />
+            <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-b from-black/40 via-black/15 to-transparent pointer-events-none" />
+          </div>
+        )}
+        <motion.div
+          className="relative w-full flex flex-col items-center"
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+        >
+          <GameInfoHeader gameData={gameData}>
+            {showSelector && (
+              <GameInfoSubsetSelector
+                currentId={gameData.ID!}
+                parentId={parentId !== gameData.ID ? parentId : null}
+                parentTitle={parentTitle}
+                parentIcon={parentIcon}
+                subsets={subsets}
+              />
+            )}
+          </GameInfoHeader>
+          <GameInfoTable gameData={gameData} />
+          {gameData.ID && <GameInfoComments gameId={gameData.ID} />}
+        </motion.div>
+      </main>
     )
   }
 
