@@ -36,11 +36,17 @@ function InfoRow({
     <>
       <span className="text-xs text-text-secondary">{label}</span>
       <div className="flex items-center gap-2">
-        <span className={`text-sm ${mono ? 'font-mono' : 'font-medium'} ${!value ? 'text-text-secondary italic' : ''} break-all`}>
+        <span
+          className={`text-sm ${mono ? 'font-mono' : 'font-medium'} ${!value ? 'text-text-secondary italic' : ''} break-all`}
+        >
           {value || placeholder || '—'}
         </span>
         {onEdit && (
-          <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+          <IconPencil
+            size={13}
+            className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity"
+            aria-hidden="true"
+          />
         )}
       </div>
     </>
@@ -67,7 +73,9 @@ export default function UserData({ session }: { session: Session | null }) {
   const [locationModalOpen, setLocationModalOpen] = useState(false)
   const [passwordModalOpen, setPasswordModalOpen] = useState(false)
   const [themeModalOpen, setThemeModalOpen] = useState(false)
-  const [editModal, setEditModal] = useState<{ field: EditProfileField; value: string } | null>(null)
+  const [editModal, setEditModal] = useState<{ field: EditProfileField; value: string } | null>(
+    null
+  )
   const [favModalOpen, setFavModalOpen] = useState(false)
   const { update } = useSession()
   const { lang, T } = useLanguage()
@@ -80,10 +88,11 @@ export default function UserData({ session }: { session: Session | null }) {
   const completedSC = softcore.filter((g) => parseFloat(g.PctWon) >= 1).length
   const completedHC = hardcore.filter((g) => parseFloat(g.PctWon) >= 1).length
 
-  const openEdit = (field: EditProfileField, value: string) =>
-    setEditModal({ field, value })
+  const openEdit = (field: EditProfileField, value: string) => setEditModal({ field, value })
 
-  const handleSaveFavorite = async (game: { id: number; title: string; imageIcon: string } | null) => {
+  const handleSaveFavorite = async (
+    game: { id: number; title: string; imageIcon: string } | null
+  ) => {
     if (game) {
       await fetch('/api/updateFavoriteGame', {
         method: 'POST',
@@ -98,10 +107,8 @@ export default function UserData({ session }: { session: Session | null }) {
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-3 gap-5 pt-3 pb-3 w-[95%]">
-
       {/* LOCAL ACCOUNT — col-span-2 */}
       <article className="lg:col-span-2 bg-bg-card rounded-3xl p-5 flex flex-col gap-4">
-
         {/* Header: avatar + name + action buttons */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4">
@@ -125,7 +132,10 @@ export default function UserData({ session }: { session: Session | null }) {
                   <IconPencil size={20} className="text-text-secondary" aria-hidden="true" />
                 </div>
               )}
-              <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true">
+              <div
+                className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-hidden="true"
+              >
                 <IconPencil size={16} className="text-white" />
               </div>
             </button>
@@ -187,13 +197,21 @@ export default function UserData({ session }: { session: Session | null }) {
             <div className="flex items-center gap-2">
               {session?.user?.location ? (
                 <>
-                  <span className="text-lg leading-none" aria-hidden="true">{codeToFlag(session.user.location)}</span>
-                  <span className="text-sm font-medium">{findCountry(session.user.location)?.name ?? session.user.location}</span>
+                  <span className="text-lg leading-none" aria-hidden="true">
+                    {codeToFlag(session.user.location)}
+                  </span>
+                  <span className="text-sm font-medium">
+                    {findCountry(session.user.location)?.name ?? session.user.location}
+                  </span>
                 </>
               ) : (
                 <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
               )}
-              <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+              <IconPencil
+                size={13}
+                className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-hidden="true"
+              />
             </div>
           </button>
           {/* Language — opens modal */}
@@ -205,7 +223,11 @@ export default function UserData({ session }: { session: Session | null }) {
             <span className="text-xs text-text-secondary">{T.userConfig.language}</span>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium uppercase">{lang}</span>
-              <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+              <IconPencil
+                size={13}
+                className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-hidden="true"
+              />
             </div>
           </button>
           {/* Theme — opens modal */}
@@ -217,7 +239,11 @@ export default function UserData({ session }: { session: Session | null }) {
             <span className="text-xs text-text-secondary">{T.userTheme.theme}</span>
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium capitalize">{theme}</span>
-              <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+              <IconPencil
+                size={13}
+                className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-hidden="true"
+              />
             </div>
           </button>
 
@@ -243,35 +269,25 @@ export default function UserData({ session }: { session: Session | null }) {
                 <span className="text-sm font-medium truncate max-w-30">
                   {session.user.favorite_game.title}
                 </span>
-                <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+                <IconPencil
+                  size={13}
+                  className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-hidden="true"
+                />
               </div>
             ) : (
               <div className="flex items-center gap-1">
-                <span className="text-sm text-text-secondary italic">{T.userData.favoriteGameChange}</span>
-                <IconPencil size={13} className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+                <span className="text-sm text-text-secondary italic">
+                  {T.userData.favoriteGameChange}
+                </span>
+                <IconPencil
+                  size={13}
+                  className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-hidden="true"
+                />
               </div>
             )}
           </button>
-        </div>
-
-        {/* App stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="bg-bg-main rounded-xl p-3 flex flex-col gap-1 text-center">
-            <span className="text-2xl font-bold text-accent">{totalGames}</span>
-            <span className="text-xs text-text-secondary">{T.userData.gamesTracked}</span>
-          </div>
-          <div className="bg-bg-main rounded-xl p-3 flex flex-col gap-1 text-center">
-            <span className="text-2xl font-bold text-orange-400">{inProgress.length}</span>
-            <span className="text-xs text-text-secondary">{T.userData.inProgress}</span>
-          </div>
-          <div className="bg-bg-main rounded-xl p-3 flex flex-col gap-1 text-center">
-            <span className="text-2xl font-bold text-yellow-400">{completedSC}</span>
-            <span className="text-xs text-text-secondary">{T.userData.completedSC}</span>
-          </div>
-          <div className="bg-bg-main rounded-xl p-3 flex flex-col gap-1 text-center">
-            <span className="text-2xl font-bold text-green-400">{completedHC}</span>
-            <span className="text-xs text-text-secondary">{T.userData.completedHC}</span>
-          </div>
         </div>
       </article>
 
@@ -314,10 +330,16 @@ export default function UserData({ session }: { session: Session | null }) {
                 )}
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="font-bold truncate">{raUser.User}</span>
-                  <span className="text-xs text-text-secondary font-mono truncate">{raUser.ULID}</span>
+                  <span className="text-xs text-text-secondary font-mono truncate">
+                    {raUser.ULID}
+                  </span>
                   <span className="text-xs text-text-secondary">
-                    HC: <span className="text-text-main">{raUser.TotalPoints?.toLocaleString()}</span>
-                    {' · '}SC: <span className="text-text-main">{raUser.TotalSoftcorePoints?.toLocaleString()}</span>
+                    HC:{' '}
+                    <span className="text-text-main">{raUser.TotalPoints?.toLocaleString()}</span>
+                    {' · '}SC:{' '}
+                    <span className="text-text-main">
+                      {raUser.TotalSoftcorePoints?.toLocaleString()}
+                    </span>
                   </span>
                 </div>
               </div>
@@ -345,7 +367,9 @@ export default function UserData({ session }: { session: Session | null }) {
             <div className="flex flex-col gap-0.5">
               <span className="font-bold">{session.user.steamusername}</span>
               {session.user.steamid && (
-                <span className="text-xs text-text-secondary font-mono">{session.user.steamid}</span>
+                <span className="text-xs text-text-secondary font-mono">
+                  {session.user.steamid}
+                </span>
               )}
             </div>
           ) : (

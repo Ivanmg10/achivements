@@ -153,7 +153,7 @@ export default function FavoriteGameModal({ isOpen, current, onClose, onSave }: 
                   ) : (
                     <div className="w-7 h-7 rounded bg-white/10 shrink-0" />
                   )}
-                  <span className="flex-1 text-sm font-medium text-accent truncate">{current.title}</span>
+                  <span className="flex-1 text-sm font-medium text-accent line-clamp-1">{current.title}</span>
                   <button
                     onClick={handleRemove}
                     disabled={saving}
@@ -198,8 +198,8 @@ export default function FavoriteGameModal({ isOpen, current, onClose, onSave }: 
                             <div className="w-8 h-8 rounded bg-white/10 shrink-0" />
                           )}
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-text-main truncate">{game.title}</p>
-                            <p className="text-xs text-text-secondary truncate">{game.consoleName}</p>
+                            <p className="text-sm font-medium text-text-main line-clamp-1">{game.title}</p>
+                            <p className="text-xs text-text-secondary line-clamp-1">{game.consoleName}</p>
                           </div>
                           {current?.id === game.id && (
                             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-accent/20 text-accent whitespace-nowrap shrink-0">

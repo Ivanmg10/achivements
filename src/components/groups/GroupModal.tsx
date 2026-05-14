@@ -283,7 +283,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                           {g.ImageIcon && (
                             <Image src={`https://retroachievements.org${g.ImageIcon}`} alt={g.Title} width={20} height={20} className="rounded shrink-0" />
                           )}
-                          <span className="text-xs flex-1 truncate">{g.Title}</span>
+                          <span className="text-xs flex-1 line-clamp-1">{g.Title}</span>
                           <button
                             type="button"
                             onClick={() => removeSelected(g.GameID)}
@@ -320,7 +320,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                             <Image src={`https://retroachievements.org${g.ImageIcon}`} alt={g.Title} width={20} height={20} className="rounded shrink-0" />
                           )}
                           <div className="flex flex-col min-w-0 flex-1">
-                            <span className="text-xs truncate">{g.Title}</span>
+                            <span className="text-xs line-clamp-1">{g.Title}</span>
                             <span className="text-[10px] text-text-secondary">{g.ConsoleName}</span>
                           </div>
                         </button>

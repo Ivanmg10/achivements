@@ -254,10 +254,10 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                               <div className="w-8 h-8 rounded bg-white/10 shrink-0" />
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-text-main truncate">
+                              <p className="text-sm font-medium text-text-main line-clamp-1">
                                 {game.title}
                               </p>
-                              <p className="text-xs text-text-secondary truncate">
+                              <p className="text-xs text-text-secondary line-clamp-1">
                                 {game.consoleName}
                               </p>
                             </div>

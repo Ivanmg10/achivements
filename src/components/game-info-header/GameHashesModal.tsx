@@ -113,8 +113,8 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                 <IconHash className="w-4.5 h-4.5 text-accent" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate">Hashes compatibles</p>
-                <p className="text-xs text-text-secondary truncate">{gameTitle}</p>
+                <p className="text-sm font-semibold line-clamp-1">Hashes compatibles</p>
+                <p className="text-xs text-text-secondary line-clamp-1">{gameTitle}</p>
               </div>
               <button
                 onClick={onClose}

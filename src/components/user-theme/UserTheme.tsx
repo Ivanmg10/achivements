@@ -11,7 +11,7 @@ const THEMES: {
   accentColor: string
 }[] = [
   { id: 'dark',    label: 'Dark',    bgColor: 'rgb(15 16 20)',   textColor: 'rgb(225 228 235)', accentColor: 'rgb(180 185 200)'   },
-  { id: 'light',   label: 'Light',   bgColor: 'rgb(255 255 255)', textColor: 'rgb(44 44 50)',   accentColor: 'rgb(0 122 255)'     },
+  { id: 'light',   label: 'Light',   bgColor: 'rgb(238 240 244)', textColor: 'rgb(50 52 58)',   accentColor: 'rgb(70 75 85)'     },
   { id: 'blue',    label: 'Blue',   bgColor: 'rgb(10 15 28)',   textColor: 'rgb(218 228 245)', accentColor: 'rgb(59 130 246)'  },
   { id: 'purple',  label: 'Purple', bgColor: 'rgb(18 12 32)',   textColor: 'rgb(225 220 242)', accentColor: 'rgb(168 85 247)'  },
   { id: 'green',   label: 'Green',  bgColor: 'rgb(10 18 10)',   textColor: 'rgb(212 224 212)', accentColor: 'rgb(132 184 80)'  },

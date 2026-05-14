@@ -204,7 +204,7 @@ export default function AchievementModal({
           </div>
           {detail?.unlocks?.Achievement && <>
             <div className="flex flex-col items-center gap-0.5 py-4 px-2 border-t border-bg-header">
-              <p className="text-sm font-semibold text-center truncate w-full">{detail.unlocks.Achievement.Author}</p>
+              <p className="text-sm font-semibold text-center line-clamp-1 w-full">{detail.unlocks.Achievement.Author}</p>
               <p className="text-xs text-text-secondary">author</p>
             </div>
             <div className="flex flex-col items-center gap-0.5 py-4 px-2 border-t border-bg-header">

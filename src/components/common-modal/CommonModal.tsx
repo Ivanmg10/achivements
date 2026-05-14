@@ -7,10 +7,12 @@ export default function CommonModal({
   isOpen,
   onClose,
   children,
+  className = '',
 }: {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
     <AnimatePresence>
@@ -24,7 +26,7 @@ export default function CommonModal({
           onClick={onClose}
         >
           <motion.div
-            className="bg-bg-header rounded-2xl p-6 w-full max-w-md text-text-main min-h-100 flex flex-col justify-center gap-5"
+            className={`bg-bg-header rounded-2xl p-6 w-full max-w-md text-text-main min-h-100 flex flex-col justify-center gap-5 ${className}`}
             variants={modalContent}
             initial="hidden"
             animate="visible"
