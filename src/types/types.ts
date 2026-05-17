@@ -258,6 +258,13 @@ export type GameGroupItem = {
   added_at: string
 }
 
+export type Streak = {
+  start: string
+  end: string
+  days: number
+  achievements: RecentAchievement[]
+}
+
 export type GameGroup = {
   id: number
   title: string

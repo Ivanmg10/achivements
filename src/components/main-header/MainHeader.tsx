@@ -30,10 +30,14 @@ function NavLink({ href, label, active, glass }: { href: string; label: string; 
 function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
   if (streak === 0) return null
   return (
-    <div className={`flex items-center gap-1 ${glass ? 'bg-white/10 backdrop-blur-sm' : 'bg-bg-main'} px-3 py-1.5 rounded-full shrink-0 ring-1 ring-white/10`}>
+    <Link
+      href="/racha"
+      aria-label={`Racha: ${streak} días`}
+      className={`flex items-center gap-1 ${glass ? 'bg-white/10 backdrop-blur-sm hover:bg-white/20' : 'bg-bg-main hover:bg-bg-main/80'} px-3 py-1.5 rounded-full shrink-0 ring-1 ring-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+    >
       <IconFlame className="w-3.5 h-3.5 text-orange-400" aria-hidden />
       <span className="text-xs font-bold text-text-main">{streak}d</span>
-    </div>
+    </Link>
   )
 }
 

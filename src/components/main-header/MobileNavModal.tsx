@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import Link from 'next/link'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { IconX, IconPlayerPlay, IconHeart, IconCheck, IconFolder } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -30,15 +29,15 @@ const itemVariants: Variants = {
   visible: { opacity: 1, x: 0, transition: { duration: 0.15 } },
 }
 
-const navItems = [
-  { href: '/playing', labelKey: 'playing' as const, icon: IconPlayerPlay },
-  { href: '/wantToPlay', labelKey: 'wantToPlay' as const, icon: IconHeart },
-  { href: '/completed', labelKey: 'completed' as const, icon: IconCheck },
-  { href: '/groups', labelKey: 'title' as const, icon: IconFolder },
-]
-
 export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps) {
   const { T } = useLanguage()
+
+  const navItems = [
+    { href: '/playing', label: T.mainPage.playing, icon: IconPlayerPlay },
+    { href: '/wantToPlay', label: T.mainPage.wantToPlay, icon: IconHeart },
+    { href: '/completed', label: T.mainPage.completed, icon: IconCheck },
+    { href: '/groups', label: T.groups.title, icon: IconFolder },
+  ]
   const router = useRouter()
   const pathname = usePathname()
   const { data: session } = useSession()
@@ -97,7 +96,7 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
                 animate="visible"
                 variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
               >
-                {navItems.map(({ href, labelKey, icon: Icon }) => {
+                {navItems.map(({ href, label, icon: Icon }) => {
                   const isActive = pathname === href
                   return (
                     <motion.li key={href} variants={itemVariants}>
@@ -110,9 +109,7 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
                         }`}
                       >
                         <Icon className="w-5 h-5 shrink-0" aria-hidden />
-                        <span className="text-sm font-medium">
-                          {labelKey === 'title' ? T.groups.title : T.mainPage[labelKey]}
-                        </span>
+                        <span className="text-sm font-medium">{label}</span>
                       </button>
                     </motion.li>
                   )

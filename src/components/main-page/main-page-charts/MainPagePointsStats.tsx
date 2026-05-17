@@ -51,7 +51,7 @@ export default function MainPagePointsStats({
       <StatPill label="HC this week" value={hc7d.toLocaleString()} sub="hardcore pts" accent={hc7d > 0 ? 'text-warning' : undefined} />
       <StatPill label="SC this week" value={sc7d.toLocaleString()} sub="softcore pts" accent={sc7d > 0 ? 'text-info' : undefined} />
       {rank && <StatPill label="Global rank" value={`#${rank.Rank.toLocaleString()}`} sub={`${rank.Score.toLocaleString()} pts`} accent="text-accent" />}
-      <StatPill label="Streak" value={`${streak}d`} sub={streak > 0 ? 'active' : 'no streak'} accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined} />
+      <StatPill label="Streak" value={`${streak}d`} sub={streak > 0 ? 'active' : 'no streak'} accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined} href="/racha" />
     </div>
   )
 }
