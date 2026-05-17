@@ -377,4 +377,17 @@ export const es: Translations = {
     done: 'completado',
     consoleBreakdownTitle: 'Ranking por consola',
   },
+  publicProfile: {
+    notFound: 'Usuario "{u}" no encontrado en RetroAchievements',
+    recentActivity: 'Actividad reciente',
+    viewStreak: 'Ver página de racha',
+    searchUsers: 'Buscar usuarios',
+    searchUsersPlaceholder: 'Buscar usuario de RA…',
+    userTab: 'Usuarios',
+    gamesTab: 'Juegos',
+    noUserFound: 'No se encontró ningún usuario con ese nombre exacto',
+    searchUsersHint: 'Escribe el nombre exacto de RA (mín. 3 caracteres)',
+    noSpaces: 'Los usernames de RA no tienen espacios',
+    searchOnRA: 'Buscar en RetroAchievements',
+  },
 }

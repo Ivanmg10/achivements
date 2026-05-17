@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { GameComment } from '@/app/api/getGameComments/route'
 import Image from 'next/image'
+import Link from 'next/link'
 import { IconMessageCircle, IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 
 const PREVIEW_COUNT = 5
@@ -103,10 +104,8 @@ function CommentRow({ comment }: { comment: GameComment }) {
 
   return (
     <div className="flex items-start gap-3">
-      <a
-        href={`https://retroachievements.org/user/${comment.User}`}
-        target="_blank"
-        rel="noopener noreferrer"
+      <Link
+        href={`/user/${comment.User}`}
         className="shrink-0"
         tabIndex={-1}
         aria-hidden="true"
@@ -118,17 +117,15 @@ function CommentRow({ comment }: { comment: GameComment }) {
           height={32}
           className="w-8 h-8 rounded-full object-cover bg-bg-header"
         />
-      </a>
+      </Link>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
-          <a
-            href={`https://retroachievements.org/user/${comment.User}`}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={`/user/${comment.User}`}
             className="text-sm font-medium hover:underline"
           >
             {comment.User}
-          </a>
+          </Link>
           <span className="text-xs text-text-secondary/60">{date}</span>
         </div>
         <p className="text-sm text-text-secondary mt-0.5 wrap-break-word">{comment.CommentText}</p>

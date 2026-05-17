@@ -377,4 +377,17 @@ export const pt: Translations = {
     done: 'done',
     consoleBreakdownTitle: 'Rank by console',
   },
+  publicProfile: {
+    notFound: 'User "{u}" not found on RetroAchievements',
+    recentActivity: 'Recent activity',
+    viewStreak: 'View streak page',
+    searchUsers: 'Search users',
+    searchUsersPlaceholder: 'Search RA username…',
+    userTab: 'Users',
+    gamesTab: 'Games',
+    noUserFound: 'No user found with that exact username',
+    searchUsersHint: 'Type the exact RA username (min. 3 characters)',
+    noSpaces: 'RA usernames have no spaces',
+    searchOnRA: 'Search on RetroAchievements',
+  },
 }
