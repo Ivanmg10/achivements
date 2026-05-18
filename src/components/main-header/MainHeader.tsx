@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
-import { useRecentAchievements } from '@/hooks/useRecentAchievements'
-import { calcStreak } from '@/utils/utils'
+import { useStreakData } from '@/hooks/useStreakData'
 import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconMenu } from '@tabler/icons-react'
 import SearchModal from '@/components/search-modal/SearchModal'
 import MobileNavModal from './MobileNavModal'
@@ -44,19 +43,35 @@ function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
 export default function MainHeader() {
   const { data: session } = useSession()
   const { T } = useLanguage()
-  const { achievements: recentAch } = useRecentAchievements()
+  const { activeStreak } = useStreakData()
   const router = useRouter()
   const pathname = usePathname()
   const [searchOpen, setSearchOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [initialQuery, setInitialQuery] = useState('')
 
-  const streak = calcStreak(recentAch)
+  const streak = activeStreak?.days ?? 0
   const isHome = pathname === '/'
   const isGameInfo = pathname.startsWith('/gameInfo/')
   const avatarSrc = session?.user?.avatar ?? session?.user?.image ?? null
 
-  const openSearch = useCallback(() => setSearchOpen(true), [])
+  const openSearch = useCallback(() => { setInitialQuery(''); setSearchOpen(true) }, [])
   const closeSearch = useCallback(() => setSearchOpen(false), [])
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (searchOpen) return
+      if (e.ctrlKey || e.metaKey || e.altKey) return
+      if (e.key.length !== 1) return
+      const tag = (document.activeElement?.tagName ?? '').toLowerCase()
+      if (['input', 'textarea', 'select'].includes(tag)) return
+      if (document.activeElement?.getAttribute('contenteditable')) return
+      setInitialQuery(e.key)
+      setSearchOpen(true)
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [searchOpen])
 
   const navItems = [
     { href: '/playing', label: T.mainPage.playing },
@@ -173,7 +188,7 @@ export default function MainHeader() {
         </div>
       </header>
 
-      <SearchModal isOpen={searchOpen} onClose={closeSearch} />
+      <SearchModal isOpen={searchOpen} onClose={closeSearch} initialQuery={initialQuery} />
       <MobileNavModal isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </>
   )

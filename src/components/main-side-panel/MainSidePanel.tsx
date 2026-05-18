@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
-import { calcStreak } from '@/utils/utils'
+import { useStreakData } from '@/hooks/useStreakData'
 import { useLanguage } from '@/context/LanguageContext'
 
 import MainSidePanelCategories from './main-side-panel-categories/MainSidePanelCategories'
@@ -17,9 +17,10 @@ export default function MainSidePanel() {
   const { achievements: recentAch } = useRecentAchievements()
   const { T } = useLanguage()
 
+  const { activeStreak } = useStreakData()
   const raUser = session?.user?.raUser
   const lastAch = recentAch[0] ?? null
-  const streak = calcStreak(recentAch)
+  const streak = activeStreak?.days ?? 0
 
   return (
     <aside className="bg-bg-card m-2 rounded-lg flex flex-col items-center gap-4 pb-4">

@@ -100,9 +100,10 @@ type SearchTab = 'games' | 'users'
 interface SearchModalProps {
   isOpen: boolean
   onClose: () => void
+  initialQuery?: string
 }
 
-export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
+export default function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalProps) {
   const { T } = useLanguage()
   const router = useRouter()
   const { all: completedGames } = useGamesData()
@@ -129,6 +130,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
   useEffect(() => {
     if (isOpen) {
+      setQuery(initialQuery)
       const t = setTimeout(() => inputRef.current?.focus(), 50)
       return () => clearTimeout(t)
     } else {
@@ -137,7 +139,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       setUserResult(null)
       setUserError(false)
     }
-  }, [isOpen])
+  }, [isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isOpen) return
