@@ -86,6 +86,29 @@ Mobile-first. Tailwind sm/md/lg prefixes. No fixed widths that break mobile.
 - New strings → add to both `src/translations/en.ts` and `src/translations/es.ts`
 - Admin panel exempt
 
+## Versioning
+
+Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
+
+**Scheme (semver):**
+- `x.0.0` — major: huge integrations or platform shifts (e.g. Steam)
+- `0.x.0` — minor: new pages, sections, significant feature changes
+- `0.0.x` — patch: small fixes, optimizations, tweaks
+
+**Pre-release suffixes** (optional, for WIP features):
+- `0.9.0-beta` — feature in progress
+- `0.9.0-rc.1` — release candidate, near-final
+
+**Auto-bump via git hook (`.githooks/pre-commit`):**
+- Every commit auto-bumps patch (`0.8.0` → `0.8.1`)
+- To do a minor/major bump: edit `src/lib/version.ts` manually before committing — hook detects the change, skips auto-bump, and syncs `package.json`
+- Hook is activated via `npm run prepare` (already wired in `package.json`)
+
+**Current milestone targets:**
+- `0.8.x` — current: login/register polish + optimizations
+- `0.9.0` — stats page reorganization
+- `1.0.0` — Steam integration
+
 ## Git — commits
 Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — all commits must appear solely under the user's name so GitHub contributions are attributed correctly.
 
