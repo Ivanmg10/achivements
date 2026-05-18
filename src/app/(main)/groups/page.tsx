@@ -64,11 +64,11 @@ export default function GroupsPage() {
           <h1 className="text-2xl font-bold text-text-main">{T.groups.title}</h1>
           {groups.length > 0 && (
             <p className="text-sm text-text-secondary mt-0.5">
-              {groups.length}/4 {T.groups.title.toLowerCase()}
+              {groups.length}/10 {T.groups.title.toLowerCase()}
             </p>
           )}
         </div>
-        {groups.length < 4 && (
+        {groups.length < 10 && (
           <button
             onClick={() => setModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
@@ -159,7 +159,7 @@ export default function GroupsPage() {
             </motion.div>
           ))}
 
-          {groups.length < 4 && (
+          {groups.length < 10 && (
             <button
               onClick={() => setModalOpen(true)}
               className="flex items-center gap-4 bg-bg-card/50 border border-dashed border-white/10 rounded-xl p-4 hover:border-accent/40 hover:bg-bg-card transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70"

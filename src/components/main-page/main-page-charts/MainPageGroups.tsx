@@ -88,8 +88,13 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
   return (
     <div className="flex flex-col gap-3 flex-1">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.groups.title}</p>
-        {!loading && groups.length < 4 && (
+        <Link
+          href="/groups"
+          className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-text-main transition-colors"
+        >
+          {T.groups.title}
+        </Link>
+        {!loading && groups.length < 10 && (
           <button
             onClick={() => setModalOpen(true)}
             className="p-1 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70"
@@ -182,7 +187,19 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
               )}
             </div>
           ))}
-          {groups.length < 4 && (
+          {groups.length > 4 ? (
+            <Link
+              href="/groups"
+              className="flex items-center gap-2.5 bg-bg-main rounded-lg p-2 hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            >
+              <div className="w-9 h-9 rounded-lg bg-bg-card flex items-center justify-center shrink-0">
+                <IconFolder className="w-4 h-4 text-text-secondary" aria-hidden />
+              </div>
+              <span className="text-xs text-text-secondary hover:text-text-main transition-colors">
+                +{groups.length - 4} {T.groups.title.toLowerCase()} más →
+              </span>
+            </Link>
+          ) : groups.length < 10 && (
             <button
               onClick={() => setModalOpen(true)}
               className="flex items-center gap-2 bg-bg-main/50 border border-dashed border-white/10 rounded-lg p-2 hover:border-accent/40 hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70"
