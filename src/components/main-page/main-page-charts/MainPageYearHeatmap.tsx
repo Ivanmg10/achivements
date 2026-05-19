@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { RecentAchievement } from '@/types/types'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import { useLanguage } from '@/context/LanguageContext'
@@ -92,7 +92,7 @@ export default function MainPageYearHeatmap({
             {Array.from({ length: 53 }).map((_, wi) => (
               <div key={wi} className="flex flex-col gap-0.75">
                 {Array.from({ length: 7 }).map((_, di) => (
-                  <div key={di} className="w-2.5 h-2.5 rounded-sm bg-white/10" />
+                  <div key={di} className="w-2.5 h-2.5 rounded-sm bg-accent/20" />
                 ))}
               </div>
             ))}
@@ -101,7 +101,12 @@ export default function MainPageYearHeatmap({
       ) : error ? (
         <div className="flex items-center justify-center py-8 text-text-secondary text-sm" role="alert">{T.charts.failedToLoad}</div>
       ) : (
-        <div className="overflow-x-auto pb-1">
+        <motion.div
+          className="overflow-x-auto pb-1"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+        >
           <div className="inline-flex flex-col gap-1">
             {/* Month labels */}
             <div className="relative h-3" style={{ width: `${weeks.length * STEP}px` }}>
@@ -141,7 +146,7 @@ export default function MainPageYearHeatmap({
               <span className="text-[9px] text-text-secondary">{T.charts.yearHeatmapMore}</span>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       <AnimatePresence>
