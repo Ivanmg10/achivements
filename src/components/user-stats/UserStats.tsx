@@ -22,13 +22,13 @@ function StatCard({ label, value, accent, subValue }: { label: string; value: st
   )
 }
 
-function AwardCard({ label, value, accent }: { label: string; value: number; accent?: string }) {
+function AwardCard({ label, value, accent }: { label: string; value: number | null; accent?: string }) {
   return (
     <motion.div
       className="bg-bg-main rounded-xl p-3 flex flex-col items-center gap-1 text-center"
       variants={staggerItem}
     >
-      <span className={`text-2xl font-bold ${accent ?? 'text-text-main'}`}>{value.toLocaleString()}</span>
+      <span className={`text-2xl font-bold ${accent ?? 'text-text-main'}`}>{(value ?? 0).toLocaleString()}</span>
       <span className="text-xs text-text-secondary">{label}</span>
     </motion.div>
   )
@@ -58,15 +58,15 @@ export default function UserStats() {
   if (!raUser?.User) return null
 
   const hardcoreRatio =
-    raUser.TotalTruePoints > 0
-      ? Math.round((raUser.TotalTruePoints / (raUser.TotalPoints || 1)) * 100)
+    (raUser.TotalTruePoints ?? 0) > 0
+      ? Math.round(((raUser.TotalTruePoints ?? 0) / (raUser.TotalPoints || 1)) * 100)
       : 0
 
   const memberYear = raUser.MemberSince ? new Date(raUser.MemberSince).getFullYear().toString() : '—'
-  const hasContribs = raUser.ContribCount > 0 || raUser.ContribYield > 0
+  const hasContribs = (raUser.ContribCount ?? 0) > 0 || (raUser.ContribYield ?? 0) > 0
 
   const totalAchievements = awards
-    ? awards.MasteryAwardsCount + awards.BeatenHardcoreAwardsCount + awards.BeatenSoftcoreAwardsCount + awards.CompletionAwardsCount + awards.EventAwardsCount
+    ? (awards.MasteryAwardsCount ?? 0) + (awards.BeatenHardcoreAwardsCount ?? 0) + (awards.BeatenSoftcoreAwardsCount ?? 0) + (awards.CompletionAwardsCount ?? 0) + (awards.EventAwardsCount ?? 0)
     : 0
 
   const totalGames = all.length
@@ -94,17 +94,17 @@ export default function UserStats() {
           />
           <StatCard
             label={T.profileStats.hardcorePoints}
-            value={raUser.TotalPoints.toLocaleString()}
+            value={(raUser.TotalPoints ?? 0).toLocaleString()}
             accent="text-yellow-400"
           />
           <StatCard
             label={T.profileStats.truePoints}
-            value={raUser.TotalTruePoints.toLocaleString()}
+            value={(raUser.TotalTruePoints ?? 0).toLocaleString()}
             accent="text-blue-400"
           />
           <StatCard
             label={T.profileStats.softcorePoints}
-            value={raUser.TotalSoftcorePoints.toLocaleString()}
+            value={(raUser.TotalSoftcorePoints ?? 0).toLocaleString()}
           />
           <StatCard
             label={T.profileStats.hardcoreRatio}
@@ -129,13 +129,13 @@ export default function UserStats() {
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1">
                 <span className="text-xl font-bold text-purple-400">
-                  {raUser.ContribCount.toLocaleString()}
+                  {(raUser.ContribCount ?? 0).toLocaleString()}
                 </span>
                 <span className="text-xs text-text-secondary">{T.profileRa.achievementsCreated}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xl font-bold text-pink-400">
-                  {raUser.ContribYield.toLocaleString()}
+                  {(raUser.ContribYield ?? 0).toLocaleString()}
                 </span>
                 <span className="text-xs text-text-secondary">{T.profileRa.pointsContributed}</span>
               </div>

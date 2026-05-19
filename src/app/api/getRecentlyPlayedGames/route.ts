@@ -24,7 +24,7 @@ export async function GET() {
       () => fetchRA(
         `https://retroachievements.org/API/API_GetUserRecentlyPlayedGames.php?u=${rausername}&y=${raid}&c=500`,
       ),
-      (d) => Array.isArray(d) && (d as unknown[]).length > 0,
+      (d) => Array.isArray(d),
     )
     return NextResponse.json(data)
   } catch {

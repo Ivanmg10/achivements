@@ -74,7 +74,7 @@ export default function PublicUserStats({
             <StatPill label="This week" value={pts7d.toLocaleString()} sub={`${ach7d} achievement${ach7d !== 1 ? 's' : ''}`} />
             <StatPill label="HC this week" value={hc7d.toLocaleString()} sub="hardcore pts" accent={hc7d > 0 ? 'text-warning' : undefined} />
             <StatPill label="SC this week" value={sc7d.toLocaleString()} sub="softcore pts" accent={sc7d > 0 ? 'text-info' : undefined} />
-            {rank && <StatPill label="Global rank" value={`#${rank.Rank.toLocaleString()}`} sub={`${rank.Score.toLocaleString()} pts`} accent="text-accent" />}
+            {rank?.Rank != null && <StatPill label="Global rank" value={`#${rank.Rank.toLocaleString()}`} sub={`${(rank.Score ?? 0).toLocaleString()} pts`} accent="text-accent" />}
             <StatPill label="Streak" value={`${streak}d`} sub={streak > 0 ? 'active' : 'no streak'} accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined} />
           </>
         )}

@@ -39,10 +39,10 @@ export default function RaLoginModal({
     await fetch('/api/updateRaUser', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ raUser: user }),
+      body: JSON.stringify({ raUser: user, apiKey }),
     })
 
-    await update({ raUser: user })
+    await update({ raUser: user, raidKey: apiKey } as Parameters<typeof update>[0])
 
     setIsLoading(false)
     setUsername('')

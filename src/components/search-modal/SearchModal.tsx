@@ -407,7 +407,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                           />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-text-main">{userResult.User}</p>
-                            <p className="text-xs text-text-secondary">{userResult.TotalPoints.toLocaleString()} pts</p>
+                            <p className="text-xs text-text-secondary">{(userResult.TotalPoints ?? 0).toLocaleString()} pts</p>
                           </div>
                           <span className="text-[10px] text-text-secondary">→</span>
                         </button>

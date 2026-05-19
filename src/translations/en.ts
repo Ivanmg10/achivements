@@ -170,6 +170,10 @@ export const en = {
     username: 'Username',
     signIn: 'Sign in',
   },
+  authPage: {
+    brand: 'CheevoVault',
+    tagline: 'A RetroAchievements alternative — Steam achievement integration in progress to track all your platforms in one place',
+  },
   loginForm: {
     title: 'Sign in',
     accountCreated: 'Account created successfully',

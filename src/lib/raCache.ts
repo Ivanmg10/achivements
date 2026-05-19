@@ -22,9 +22,11 @@ export async function withCache<T>(
 
   const promise = fetcher()
     .then((data) => {
-      if (!shouldCache || shouldCache(data)) {
-        store.set(key, { data, expiresAt: Date.now() + ttlMs })
+      if (shouldCache && !shouldCache(data)) {
+        inFlight.delete(key)
+        throw Object.assign(new Error('RA_VALIDATION_FAILED'), { code: 'RA_VALIDATION_FAILED' })
       }
+      store.set(key, { data, expiresAt: Date.now() + ttlMs })
       inFlight.delete(key)
       return data
     })

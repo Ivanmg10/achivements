@@ -24,8 +24,7 @@ export async function GET() {
       () => fetchRA(
         `https://retroachievements.org/API/API_GetUserCompletedGames.php?u=${rausername}&y=${raid}`,
       ),
-      // Never cache empty — avoids pinning a transient RA failure as "no games" for the full TTL
-      (d) => Array.isArray(d) && (d as unknown[]).length > 0,
+      (d) => Array.isArray(d),
     )
     return NextResponse.json(data)
   } catch {

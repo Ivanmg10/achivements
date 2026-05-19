@@ -25,7 +25,8 @@ function isRealGame(g: RetroAchievementsGameCompleted) {
 }
 
 export function GamesDataProvider({ children }: { children: React.ReactNode }) {
-  const { status } = useSession()
+  const { data: session, status } = useSession()
+  const rausername = session?.user?.rausername
   const [all, setAll] = useState<RetroAchievementsGameCompleted[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const hasFetched = useRef(false)
@@ -34,6 +35,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
 
   const doFetch = useCallback(() => {
     if (status !== 'authenticated') { setIsLoading(false); return }
+    if (!rausername) { setIsLoading(false); return }
     setIsLoading(true)
     fetchWithRetry('/api/getGamesCompleted')
       .then((data) => {
@@ -52,7 +54,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
         attemptRef.current++
         retryTimer.current = setTimeout(doFetch, delay)
       })
-  }, [status])
+  }, [status, rausername])
 
   useEffect(() => {
     if (status === 'loading') return
@@ -64,10 +66,11 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false)
       return
     }
+    if (!rausername) { setIsLoading(false); return }
     if (hasFetched.current) return
     hasFetched.current = true
     doFetch()
-  }, [status, doFetch])
+  }, [status, rausername, doFetch])
 
   useEffect(() => () => clearTimeout(retryTimer.current), [])
 

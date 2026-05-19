@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
+import { fetchRA } from '@/lib/fetchRA'
 
 const TTL = 60 * 60 * 1000
 
@@ -27,27 +28,21 @@ export async function GET(request: NextRequest) {
     const raw = await withCache(
       `gameList_v1:${consoleId}`,
       TTL,
-      () => fetch(`https://retroachievements.org/API/API_GetGameList.php?i=${consoleId}&y=${raid}`)
-        .then((r) => r.json())
-        .catch(() => null),
+      () => fetchRA(`https://retroachievements.org/API/API_GetGameList.php?i=${consoleId}&y=${raid}`),
       (d) => Array.isArray(d) && d.length > 0,
     )
 
-    if (!Array.isArray(raw)) {
-      console.log('[getGameSubsets] raw not array:', typeof raw, raw)
-      return NextResponse.json([], { status: 200 })
-    }
+    if (!Array.isArray(raw)) return NextResponse.json([], { status: 200 })
 
     const list = raw as GameListEntry[]
-const subsets = list.filter((g) => {
+    const subsets = list.filter((g) => {
       if (g.ID === Number(gameId)) return false
       if (!g.Title?.includes('[Subset -')) return false
       return g.Title.startsWith(baseTitle + ' [') || g.Title.startsWith(baseTitle + ' |')
     })
 
     return NextResponse.json(subsets)
-  } catch (err) {
-    console.error('[getGameSubsets]', err)
+  } catch {
     return NextResponse.json([], { status: 200 })
   }
 }

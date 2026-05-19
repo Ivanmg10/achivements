@@ -16,7 +16,7 @@ export function useUserRank() {
     setIsLoading(true)
     fetchWithRetry('/api/getUserRankAndScore')
       .then((data) => {
-        if (!data || typeof data !== 'object' || Array.isArray(data)) {
+        if (!data || typeof data !== 'object' || Array.isArray(data) || !('Rank' in data)) {
           const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
           attemptRef.current++
           retryTimer.current = setTimeout(doFetch, delay)

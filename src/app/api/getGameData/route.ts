@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { withCache } from "@/lib/raCache";
+import { fetchRA } from "@/lib/fetchRA";
 
-const TTL = 60 * 60 * 1000;
+const TTL = 4 * 60 * 60 * 1000;
 const publicKey = process.env.RA_API_KEY;
 
 export async function GET(request: NextRequest) {
@@ -13,13 +14,14 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const data = await withCache(`gameData:${gameId}`, TTL, () =>
-      fetch(
-        `https://retroachievements.org/API/API_GetGame.php?i=${gameId}&y=${publicKey}`,
-      ).then((r) => r.json()),
+    const data = await withCache(
+      `gameData_v2:${gameId}`,
+      TTL,
+      () => fetchRA(`https://retroachievements.org/API/API_GetGame.php?i=${gameId}&y=${publicKey}`),
+      (d) => d !== null && typeof d === 'object' && 'ID' in d,
     );
     return NextResponse.json(data);
   } catch {
-    return NextResponse.json({ message: "Failed to fetch game data" }, { status: 502 });
+    return NextResponse.json({ message: "RA service unavailable" }, { status: 503 });
   }
 }

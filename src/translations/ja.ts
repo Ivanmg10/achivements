@@ -172,6 +172,10 @@ export const ja: Translations = {
     username: 'ユーザー名',
     signIn: 'ログイン',
   },
+  authPage: {
+    brand: 'CheevoVault',
+    tagline: 'CheevoVault',
+  },
   loginForm: {
     title: 'ログイン',
     accountCreated: 'アカウントが正常に作成されました',

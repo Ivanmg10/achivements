@@ -65,7 +65,16 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (trigger === "update" && session !== undefined) {
-        if ("raUser" in session) token.raUser = session.raUser ?? {};
+        if ("raUser" in session) {
+          const raUserObj = session.raUser as Record<string, unknown> | null | undefined
+          const sessionAny = session as Record<string, unknown>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          token.raUser = (raUserObj ?? null) as any
+          token.rausername = (raUserObj?.User as string) ?? null
+          // Use the explicit API key passed from RaLoginModal, not ULID (they differ in RA)
+          if (sessionAny.raidKey) token.raid = sessionAny.raidKey as string
+          else if (!raUserObj) token.raid = undefined
+        }
         if (session?.theme) token.theme = session.theme;
         if (session?.name) token.name = session.name;
         if ("email" in session && session.email) token.email = session.email;

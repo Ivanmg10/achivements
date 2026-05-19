@@ -17,10 +17,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
   }
 
-  const { raUser } = body as { raUser?: unknown };
+  const { raUser, apiKey } = body as { raUser?: unknown; apiKey?: unknown };
 
   if (!raUser || typeof raUser !== "object" || Array.isArray(raUser)) {
     return NextResponse.json({ message: "raUser must be an object" }, { status: 400 });
+  }
+
+  if (typeof apiKey !== "string" || !apiKey.trim()) {
+    return NextResponse.json({ message: "apiKey is required" }, { status: 400 });
   }
 
   const missing = REQUIRED_FIELDS.filter((f) => !(f in (raUser as Record<string, unknown>)));
@@ -36,10 +40,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "raUser payload too large" }, { status: 400 });
   }
 
-  await pool.query(`UPDATE users SET "raUser" = $1 WHERE id = $2`, [
-    serialized,
-    session.user.id,
-  ]);
+  const raUserObj = raUser as Record<string, unknown>
+  await pool.query(
+    `UPDATE users SET "raUser" = $1, rausername = $2, raid = $3 WHERE id = $4`,
+    [serialized, raUserObj.User, apiKey.trim(), session.user.id],
+  );
 
   return NextResponse.json({ ok: true });
 }

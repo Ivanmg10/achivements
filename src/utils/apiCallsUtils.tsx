@@ -42,13 +42,9 @@ export const unlinkRaUser = async (
   update: (data: Partial<Session>) => Promise<Session | null>,
 ) => {
   try {
-    const res = await fetch("/api/updateRaUser", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ raUser: {} }),
-    })
+    const res = await fetch('/api/unlinkRaUser', { method: 'POST' })
     if (!res.ok) throw new Error('Failed to unlink RA user')
-    await update({ raUser: {} } as Partial<Session>)
+    await update({ raUser: null } as Partial<Session>)
   } catch (err) {
     console.error('[unlinkRaUser]', err)
   }

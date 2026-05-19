@@ -82,20 +82,24 @@ test("jwt callback handles update trigger", async () => {
     token: { raUser: {} },
     user: undefined,
     trigger: "update",
-    session: { raUser: { User: "ivan" } },
+    session: { raUser: { User: "ivan" }, raidKey: "real-api-key" },
   });
   expect(token.raUser).toEqual({ User: "ivan" });
+  expect(token.rausername).toBe("ivan");
+  expect(token.raid).toBe("real-api-key");
 });
 
 test("jwt callback handles update trigger with null raUser in session", async () => {
   const jwtCallback = authOptions.callbacks?.jwt as any;
   const token = await jwtCallback({
-    token: { raUser: { User: "old" } },
+    token: { raUser: { User: "old" }, rausername: "old", raid: "old" },
     user: undefined,
     trigger: "update",
     session: { raUser: null },
   });
-  expect(token.raUser).toEqual({});
+  expect(token.raUser).toBeNull();
+  expect(token.rausername).toBeNull();
+  expect(token.raid).toBeUndefined();
 });
 
 test("session callback skips when no token", async () => {

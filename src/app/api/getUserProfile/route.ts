@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { withCache } from "@/lib/raCache";
+import { fetchRA } from "@/lib/fetchRA";
 
 const TTL = 5 * 60 * 1000;
 
@@ -18,14 +19,15 @@ export async function GET() {
   }
 
   try {
-    const data = await withCache(`userProfile:${id}`, TTL, () =>
-      fetch(
-        `https://retroachievements.org/API/API_GetUserProfile.php?u=${rausername}&y=${raid}`,
-      ).then((r) => r.json()),
+    const data = await withCache(
+      `userProfile_v1:${id}`,
+      TTL,
+      () => fetchRA(`https://retroachievements.org/API/API_GetUserProfile.php?u=${rausername}&y=${raid}`),
+      (d) => d !== null && typeof d === 'object' && 'User' in d && !!(d as Record<string, unknown>).User,
     );
     return NextResponse.json(data);
   } catch {
-    return NextResponse.json({ message: "Failed to fetch RA profile" }, { status: 502 });
+    return NextResponse.json({ message: "RA service unavailable" }, { status: 503 });
   }
 }
 

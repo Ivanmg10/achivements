@@ -172,6 +172,10 @@ export const ru: Translations = {
     username: 'Имя пользователя',
     signIn: 'Войти',
   },
+  authPage: {
+    brand: 'CheevoVault',
+    tagline: 'CheevoVault',
+  },
   loginForm: {
     title: 'Войти',
     accountCreated: 'Аккаунт успешно создан',

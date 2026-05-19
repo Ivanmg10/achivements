@@ -13,8 +13,8 @@ export default function MainSidePanelStats({
 
   return (
     <section className="w-[90%] grid grid-cols-3 gap-2">
-      <StatPill size="sm" label="HC" value={raUser.TotalPoints} />
-      <StatPill size="sm" label="SC" value={raUser.TotalSoftcorePoints} />
+      <StatPill size="sm" label="HC" value={raUser.TotalPoints ?? 0} />
+      <StatPill size="sm" label="SC" value={raUser.TotalSoftcorePoints ?? 0} />
       <StatPill size="sm" label={T.sidePanel.streak} value={`${streak}d`} />
     </section>
   )

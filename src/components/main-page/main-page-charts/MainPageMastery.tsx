@@ -42,12 +42,12 @@ export default function MainPageMastery({
   const recentCovers = mastered.slice(0, 8)
 
   const stats = [
-    { value: awards.MasteryAwardsCount,         label: T.cards.mastered,         color: 'text-warning' },
-    { value: awards.CompletionAwardsCount,       label: T.cards.completedSC,      color: 'text-accent-secondary' },
-    { value: awards.BeatenHardcoreAwardsCount,   label: T.userStats.beatenHC,     color: 'text-info'   },
-    { value: awards.BeatenSoftcoreAwardsCount,   label: T.userStats.beatenSC,    color: 'text-text-main'  },
-    { value: unlockedHC,                         label: T.userStats.unlockedHC,   color: 'text-accent' },
-    { value: unlockedSC,                         label: T.userStats.unlockedSC,   color: 'text-text-secondary'   },
+    { value: awards.MasteryAwardsCount ?? 0,         label: T.cards.mastered,         color: 'text-warning' },
+    { value: awards.CompletionAwardsCount ?? 0,       label: T.cards.completedSC,      color: 'text-accent-secondary' },
+    { value: awards.BeatenHardcoreAwardsCount ?? 0,   label: T.userStats.beatenHC,     color: 'text-info'   },
+    { value: awards.BeatenSoftcoreAwardsCount ?? 0,   label: T.userStats.beatenSC,    color: 'text-text-main'  },
+    { value: unlockedHC,                              label: T.userStats.unlockedHC,   color: 'text-accent' },
+    { value: unlockedSC,                              label: T.userStats.unlockedSC,   color: 'text-text-secondary'   },
   ]
 
   return (
@@ -64,7 +64,7 @@ export default function MainPageMastery({
         ))}
       </div>
 
-      {awards.EventAwardsCount > 0 && (
+      {(awards.EventAwardsCount ?? 0) > 0 && (
         <div className="bg-bg-main rounded-lg px-3 py-2 flex items-center justify-between">
           <span className="text-[10px] text-text-secondary">{T.userStats.events}</span>
           <span className="text-sm font-bold text-success">{awards.EventAwardsCount}</span>

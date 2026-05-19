@@ -20,11 +20,11 @@ export type RetroAchievementsUserProfile = {
   Permissions: number;
   RichPresenceMsg: string;
   LastGameID: number;
-  ContribCount: number;
-  ContribYield: number;
-  TotalPoints: number;
-  TotalSoftcorePoints: number;
-  TotalTruePoints: number;
+  ContribCount: number | null;
+  ContribYield: number | null;
+  TotalPoints: number | null;
+  TotalSoftcorePoints: number | null;
+  TotalTruePoints: number | null;
   Untracked: number;
   UserWallActive: number;
 };
@@ -187,9 +187,9 @@ export type RetroAchievementsGameCompleted = {
 };
 
 export type UserRankAndScore = {
-  Score: number
-  SoftcoreScore: number
-  Rank: number
+  Score: number | null
+  SoftcoreScore: number | null
+  Rank: number | null
 }
 
 export type UserAward = {
@@ -203,12 +203,12 @@ export type UserAward = {
 }
 
 export type UserAwards = {
-  TotalAwardsCount: number
-  MasteryAwardsCount: number
-  CompletionAwardsCount: number
-  BeatenHardcoreAwardsCount: number
-  BeatenSoftcoreAwardsCount: number
-  EventAwardsCount: number
+  TotalAwardsCount: number | null
+  MasteryAwardsCount: number | null
+  CompletionAwardsCount: number | null
+  BeatenHardcoreAwardsCount: number | null
+  BeatenSoftcoreAwardsCount: number | null
+  EventAwardsCount: number | null
   VisibleUserAwards: UserAward[]
 }
 

@@ -27,8 +27,8 @@ export default function MainPageProfileRa({
   const { T } = useLanguage()
 
   const hardcoreRatio =
-    user && user.TotalTruePoints > 0
-      ? Math.round((user.TotalTruePoints / (user.TotalPoints || 1)) * 100)
+    user && (user.TotalTruePoints ?? 0) > 0
+      ? Math.round(((user.TotalTruePoints ?? 0) / (user.TotalPoints || 1)) * 100)
       : 0
 
   const ringColor =
@@ -39,7 +39,7 @@ export default function MainPageProfileRa({
         : 'ring-gray-600'
 
   const memberYear = user?.MemberSince ? new Date(user.MemberSince).getFullYear() : null
-  const hasContribs = user && (user.ContribCount > 0 || user.ContribYield > 0)
+  const hasContribs = user && ((user.ContribCount ?? 0) > 0 || (user.ContribYield ?? 0) > 0)
 
   return (
     <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
@@ -97,13 +97,13 @@ export default function MainPageProfileRa({
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-1">
                   <span className="text-lg font-bold text-purple-400">
-                    {user.ContribCount.toLocaleString()}
+                    {(user.ContribCount ?? 0).toLocaleString()}
                   </span>
                   <span className="text-xs text-gray-400">{T.profileRa.achievementsCreated}</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-lg font-bold text-pink-400">
-                    {user.ContribYield.toLocaleString()}
+                    {(user.ContribYield ?? 0).toLocaleString()}
                   </span>
                   <span className="text-xs text-gray-400">{T.profileRa.pointsContributed}</span>
                 </div>

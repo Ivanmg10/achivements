@@ -9,6 +9,10 @@ export default function RaUserRefresher() {
   const { data: session, status, update } = useSession()
 
   useEffect(() => {
+    if (status === 'unauthenticated') {
+      raRefreshed = false
+      return
+    }
     if (status !== 'authenticated' || !session?.user?.raUser?.User || raRefreshed) return
 
     raRefreshed = true

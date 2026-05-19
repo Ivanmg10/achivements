@@ -24,10 +24,7 @@ export async function GET() {
       () => fetchRA(
         `https://retroachievements.org/API/API_GetUserWantToPlayList.php?u=${rausername}&y=${raid}`,
       ),
-      (d) => {
-        const results = (d as { Results?: unknown[] })?.Results
-        return Array.isArray(results) && results.length > 0
-      },
+      (d) => d !== null && typeof d === 'object' && 'Results' in d && Array.isArray((d as { Results: unknown }).Results),
     )
     return NextResponse.json(data)
   } catch {

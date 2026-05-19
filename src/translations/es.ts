@@ -172,6 +172,10 @@ export const es: Translations = {
     username: 'Usuario',
     signIn: 'Iniciar sesion',
   },
+  authPage: {
+    brand: 'CheevoVault',
+    tagline: 'Un sustitutivo a RetroAchievements — integración con logros de Steam en desarrollo para trackear todas tus plataformas juntas',
+  },
   loginForm: {
     title: 'Inicia sesión',
     accountCreated: 'Cuenta creada correctamente',

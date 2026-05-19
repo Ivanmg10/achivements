@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { withCache } from "@/lib/raCache";
+import { fetchRA } from "@/lib/fetchRA";
 
 const TTL = 10 * 60 * 1000;
 
@@ -23,23 +24,27 @@ export async function GET(request: NextRequest) {
   const gameIds = gameIdsParam.split(",").map(Number).filter(Boolean);
 
   async function fetchGame(gameId: number): Promise<[number, string | null]> {
-    const data = await withCache(
-      `gameProgression_v2:${id}:${gameId}`,
-      TTL,
-      () =>
-        fetch(
+    try {
+      const data = await withCache(
+        `gameProgression_v2:${id}:${gameId}`,
+        TTL,
+        () => fetchRA(
           `https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=${rausername}&y=${raid}&g=${gameId}`,
-        ).then((r) => r.json()).catch(() => null),
-      (d) => d !== null && typeof d === 'object' && 'ID' in d,
-    );
+        ),
+        (d) => d !== null && typeof d === 'object' && 'ID' in d,
+      );
 
-    const achievements: Record<string, { DateEarned?: string; DateEarnedHardcore?: string }> = data?.Achievements ?? {};
-    let lastPlayed: string | null = null;
-    for (const ach of Object.values(achievements)) {
-      const d = ach.DateEarnedHardcore ?? ach.DateEarned ?? null;
-      if (d && (!lastPlayed || d > lastPlayed)) lastPlayed = d;
+      const achievements: Record<string, { DateEarned?: string; DateEarnedHardcore?: string }> =
+        (data as { Achievements?: Record<string, { DateEarned?: string; DateEarnedHardcore?: string }> } | null)?.Achievements ?? {};
+      let lastPlayed: string | null = null;
+      for (const ach of Object.values(achievements)) {
+        const d = ach.DateEarnedHardcore ?? ach.DateEarned ?? null;
+        if (d && (!lastPlayed || d > lastPlayed)) lastPlayed = d;
+      }
+      return [gameId, lastPlayed];
+    } catch {
+      return [gameId, null];
     }
-    return [gameId, lastPlayed];
   }
 
   const BATCH = 5;

@@ -45,3 +45,24 @@ test('clearCache forces refetch', async () => {
   await withCache('key', 5000, fetcher)
   expect(fetcher).toHaveBeenCalledTimes(2)
 })
+
+test('throws RA_VALIDATION_FAILED when shouldCache returns false', async () => {
+  const fetcher = jest.fn().mockResolvedValue({ bad: true })
+  await expect(
+    withCache('key', 5000, fetcher, (d) => typeof d === 'object' && d !== null && 'id' in d),
+  ).rejects.toMatchObject({ message: 'RA_VALIDATION_FAILED' })
+})
+
+test('does not cache data when shouldCache returns false', async () => {
+  const fetcher = jest.fn().mockResolvedValue({ bad: true })
+  await withCache('key', 5000, fetcher, () => false).catch(() => {})
+  await withCache('key', 5000, fetcher, () => false).catch(() => {})
+  expect(fetcher).toHaveBeenCalledTimes(2)
+})
+
+test('caches data when shouldCache returns true', async () => {
+  const fetcher = jest.fn().mockResolvedValue({ id: 1 })
+  await withCache('key', 5000, fetcher, (d) => typeof d === 'object' && d !== null && 'id' in d)
+  await withCache('key', 5000, fetcher, (d) => typeof d === 'object' && d !== null && 'id' in d)
+  expect(fetcher).toHaveBeenCalledTimes(1)
+})
