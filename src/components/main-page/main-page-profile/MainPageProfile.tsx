@@ -10,7 +10,7 @@ import MainPageProfileRa from './main-page-profile-ra/MainPageProfileRa'
 export default function MainPageProfile() {
   const { data: session } = useSession()
   const lastGameId = session?.user?.raUser?.LastGameID?.toString() ?? null
-  const game = useGameProgression(lastGameId)
+  const { game, isLoading: gameLoading } = useGameProgression(lastGameId)
   const { achievements: recentAchievements } = useRecentAchievements()
 
   return (
@@ -18,6 +18,7 @@ export default function MainPageProfile() {
       <MainPageProfileRa
         user={session?.user?.raUser}
         game={game}
+        gameLoading={gameLoading}
         recentAchievements={recentAchievements}
       />
     </section>

@@ -18,10 +18,12 @@ import MainPageProfileRaStats from './main-page-profile-ra-stats/MainPageProfile
 export default function MainPageProfileRa({
   user,
   game,
+  gameLoading,
   recentAchievements,
 }: {
   user: RetroAchievementsUserProfile | null | undefined
   game: RetroAchievementsGameWithAchievements | null | undefined
+  gameLoading?: boolean
   recentAchievements: RecentAchievement[]
 }) {
   const { T } = useLanguage()
@@ -83,7 +85,22 @@ export default function MainPageProfileRa({
 
           <MainPageProfileRaStats user={user} hardcoreRatio={hardcoreRatio} />
 
-          {game && <MainPageProfileRaGame game={game} richPresenceMsg={user?.RichPresenceMsg} />}
+          {gameLoading && !game ? (
+            <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 animate-pulse">
+              <div className="h-3 w-20 bg-white/10 rounded" />
+              <div className="h-3 w-40 bg-white/10 rounded" />
+              <div className="flex gap-3 items-center">
+                <div className="w-12.5 h-12.5 rounded-lg bg-white/10 shrink-0" />
+                <div className="flex flex-col gap-1.5 flex-1">
+                  <div className="h-3.5 bg-white/10 rounded w-3/4" />
+                  <div className="h-3 bg-white/10 rounded w-1/3" />
+                </div>
+              </div>
+              <div className="h-2 bg-white/10 rounded" />
+            </div>
+          ) : game ? (
+            <MainPageProfileRaGame game={game} richPresenceMsg={user?.RichPresenceMsg} />
+          ) : null}
 
           {recentAchievements.length > 0 && (
             <MainPageProfileRaAchievements achievements={recentAchievements} />
