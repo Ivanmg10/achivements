@@ -11,7 +11,7 @@ export default function MainPageProfile() {
   const { data: session } = useSession()
   const lastGameId = session?.user?.raUser?.LastGameID?.toString() ?? null
   const { game, isLoading: gameLoading } = useGameProgression(lastGameId)
-  const { achievements: recentAchievements } = useRecentAchievements()
+  const { achievements: recentAchievements, isLoading: achievementsLoading } = useRecentAchievements()
 
   return (
     <section className="main-content text-text-main m-3 rounded-xl flex flex-col items-center overflow-y-auto">
@@ -20,6 +20,7 @@ export default function MainPageProfile() {
         game={game}
         gameLoading={gameLoading}
         recentAchievements={recentAchievements}
+        achievementsLoading={achievementsLoading}
       />
     </section>
   )

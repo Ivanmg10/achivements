@@ -20,11 +20,13 @@ export default function MainPageProfileRa({
   game,
   gameLoading,
   recentAchievements,
+  achievementsLoading,
 }: {
   user: RetroAchievementsUserProfile | null | undefined
   game: RetroAchievementsGameWithAchievements | null | undefined
   gameLoading?: boolean
   recentAchievements: RecentAchievement[]
+  achievementsLoading?: boolean
 }) {
   const { T } = useLanguage()
 
@@ -102,8 +104,8 @@ export default function MainPageProfileRa({
             <MainPageProfileRaGame game={game} richPresenceMsg={user?.RichPresenceMsg} />
           ) : null}
 
-          {recentAchievements.length > 0 && (
-            <MainPageProfileRaAchievements achievements={recentAchievements} />
+          {(recentAchievements.length > 0 || achievementsLoading) && (
+            <MainPageProfileRaAchievements achievements={recentAchievements} isLoading={achievementsLoading} />
           )}
 
           {hasContribs && (

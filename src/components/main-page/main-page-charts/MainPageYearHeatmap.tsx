@@ -87,7 +87,17 @@ export default function MainPageYearHeatmap({
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-8 text-text-secondary text-sm">{T.charts.yearHeatmapLoading}</div>
+        <div className="overflow-x-auto pb-1 animate-pulse">
+          <div className="inline-flex gap-0.75">
+            {Array.from({ length: 53 }).map((_, wi) => (
+              <div key={wi} className="flex flex-col gap-0.75">
+                {Array.from({ length: 7 }).map((_, di) => (
+                  <div key={di} className="w-2.5 h-2.5 rounded-sm bg-white/10" />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       ) : error ? (
         <div className="flex items-center justify-center py-8 text-text-secondary text-sm" role="alert">{T.charts.failedToLoad}</div>
       ) : (

@@ -65,7 +65,15 @@ export default function MainPageBestPeriod({
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestPerformance}</p>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">{T.cards.loading}</div>
+        <div className="flex flex-col flex-1 justify-between gap-2 animate-pulse">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="bg-bg-main rounded-lg p-2.5 flex flex-col gap-1.5">
+              <div className="h-2 w-16 bg-white/10 rounded" />
+              <div className="h-5 w-24 bg-white/10 rounded" />
+              <div className="h-2 w-32 bg-white/10 rounded" />
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="flex flex-col flex-1 justify-between gap-2">
           {bestWeek ? (
@@ -95,7 +103,10 @@ export default function MainPageBestPeriod({
           <div className="bg-bg-main rounded-lg p-2.5 flex flex-col gap-0.5">
             <span className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestYear}</span>
             {yearLoading ? (
-              <span className="text-xs text-text-secondary">{T.cards.loading}</span>
+              <div className="flex flex-col gap-1.5 animate-pulse">
+                <div className="h-5 w-24 bg-white/10 rounded" />
+                <div className="h-2 w-32 bg-white/10 rounded" />
+              </div>
             ) : bestYear ? (
               <>
                 <span className="text-lg font-bold text-green-400">{bestYear[1].pts.toLocaleString()} pts</span>

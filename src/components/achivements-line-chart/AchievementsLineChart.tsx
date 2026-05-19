@@ -40,8 +40,17 @@ export default function AchievementsLineChart({
         {T.lineChart.achievementsLast7Days.replace('{total}', String(total))}
       </p>
       {isLoading ? (
-        <div className="flex items-center justify-center h-85 text-text-secondary text-sm">
-          Loading...
+        <div className="px-4 h-85 flex flex-col justify-end gap-1 animate-pulse">
+          <div className="flex items-end gap-2 h-70">
+            {[45, 70, 30, 90, 55, 20, 80].map((h, i) => (
+              <div key={i} className="flex-1 bg-white/10 rounded-t-sm" style={{ height: `${h}%` }} />
+            ))}
+          </div>
+          <div className="flex gap-2">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="flex-1 h-3 bg-white/10 rounded" />
+            ))}
+          </div>
         </div>
       ) : total === 0 ? (
         <div className="flex items-center justify-center h-85 text-text-secondary text-sm">
