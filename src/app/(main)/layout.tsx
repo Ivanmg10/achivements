@@ -5,6 +5,7 @@ import MainFooter from "@/components/main-footer/MainFooter";
 import MainHeader from "@/components/main-header/MainHeader";
 import RaUserRefresher from "@/components/ra-user-refresher/RaUserRefresher";
 import { MainProviders } from "@/components/main-providers/MainProviders";
+import VersionBadge from "@/components/version-badge/VersionBadge";
 
 export default async function MainLayout({
   children,
@@ -25,6 +26,7 @@ export default async function MainLayout({
         <main className="flex-1">{children}</main>
         <MainFooter />
       </div>
+      <VersionBadge />
     </MainProviders>
   );
 }

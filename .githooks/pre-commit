@@ -1,0 +1,36 @@
+#!/bin/bash
+# Auto-bumps patch version on every commit.
+# If version.ts was manually staged (major/minor bump), syncs package.json and exits.
+
+VERSION_FILE="src/lib/version.ts"
+PKG_FILE="package.json"
+
+get_version() {
+  grep "APP_VERSION" "$VERSION_FILE" | sed "s/.*'\(.*\)'.*/\1/"
+}
+
+set_version() {
+  local v="$1"
+  sed -i "s/APP_VERSION = '.*'/APP_VERSION = '$v'/" "$VERSION_FILE"
+  sed -i "s/\"version\": \".*\"/\"version\": \"$v\"/" "$PKG_FILE"
+}
+
+# If dev manually staged version.ts, respect it — just sync package.json
+if git diff --cached --name-only | grep -q "$VERSION_FILE"; then
+  NEW_VERSION=$(get_version)
+  sed -i "s/\"version\": \".*\"/\"version\": \"$NEW_VERSION\"/" "$PKG_FILE"
+  git add "$PKG_FILE"
+  echo "Version set to $NEW_VERSION"
+  exit 0
+fi
+
+# Auto-bump patch
+CURRENT=$(get_version)
+MAJOR=$(echo "$CURRENT" | cut -d. -f1)
+MINOR=$(echo "$CURRENT" | cut -d. -f2)
+PATCH=$(echo "$CURRENT" | cut -d. -f3 | cut -d- -f1)
+NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+
+set_version "$NEW_VERSION"
+git add "$VERSION_FILE" "$PKG_FILE"
+echo "Version bumped: $CURRENT → $NEW_VERSION"

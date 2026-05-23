@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
-import { useRecentAchievements } from '@/hooks/useRecentAchievements'
-import { calcStreak } from '@/utils/utils'
+import { useStreakData } from '@/hooks/useStreakData'
 import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconMenu } from '@tabler/icons-react'
 import SearchModal from '@/components/search-modal/SearchModal'
 import MobileNavModal from './MobileNavModal'
@@ -30,29 +29,49 @@ function NavLink({ href, label, active, glass }: { href: string; label: string; 
 function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
   if (streak === 0) return null
   return (
-    <div className={`flex items-center gap-1 ${glass ? 'bg-white/10 backdrop-blur-sm' : 'bg-bg-main'} px-3 py-1.5 rounded-full shrink-0 ring-1 ring-white/10`}>
+    <Link
+      href="/racha"
+      aria-label={`Racha: ${streak} días`}
+      className={`flex items-center gap-1 ${glass ? 'bg-white/10 backdrop-blur-sm hover:bg-white/20' : 'bg-bg-main hover:bg-bg-main/80'} px-3 py-1.5 rounded-full shrink-0 ring-1 ring-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+    >
       <IconFlame className="w-3.5 h-3.5 text-orange-400" aria-hidden />
       <span className="text-xs font-bold text-text-main">{streak}d</span>
-    </div>
+    </Link>
   )
 }
 
 export default function MainHeader() {
   const { data: session } = useSession()
   const { T } = useLanguage()
-  const { achievements: recentAch } = useRecentAchievements()
+  const { activeStreak } = useStreakData()
   const router = useRouter()
   const pathname = usePathname()
   const [searchOpen, setSearchOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [initialQuery, setInitialQuery] = useState('')
 
-  const streak = calcStreak(recentAch)
+  const streak = activeStreak?.days ?? 0
   const isHome = pathname === '/'
   const isGameInfo = pathname.startsWith('/gameInfo/')
   const avatarSrc = session?.user?.avatar ?? session?.user?.image ?? null
 
-  const openSearch = useCallback(() => setSearchOpen(true), [])
+  const openSearch = useCallback(() => { setInitialQuery(''); setSearchOpen(true) }, [])
   const closeSearch = useCallback(() => setSearchOpen(false), [])
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (searchOpen) return
+      if (e.ctrlKey || e.metaKey || e.altKey) return
+      if (e.key.length !== 1) return
+      const tag = (document.activeElement?.tagName ?? '').toLowerCase()
+      if (['input', 'textarea', 'select'].includes(tag)) return
+      if (document.activeElement?.getAttribute('contenteditable')) return
+      setInitialQuery(e.key)
+      setSearchOpen(true)
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [searchOpen])
 
   const navItems = [
     { href: '/playing', label: T.mainPage.playing },
@@ -169,7 +188,7 @@ export default function MainHeader() {
         </div>
       </header>
 
-      <SearchModal isOpen={searchOpen} onClose={closeSearch} />
+      <SearchModal isOpen={searchOpen} onClose={closeSearch} initialQuery={initialQuery} />
       <MobileNavModal isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </>
   )

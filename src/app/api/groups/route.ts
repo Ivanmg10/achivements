@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
       'SELECT COUNT(*) FROM game_groups WHERE user_id = $1',
       [session.user.id],
     )
-    if (parseInt(countRes.rows[0].count) >= 4) {
-      return NextResponse.json({ message: 'Máximo 4 grupos permitidos' }, { status: 400 })
+    if (parseInt(countRes.rows[0].count) >= 10) {
+      return NextResponse.json({ message: 'Máximo 10 grupos permitidos' }, { status: 400 })
     }
 
     const posRes = await pool.query(

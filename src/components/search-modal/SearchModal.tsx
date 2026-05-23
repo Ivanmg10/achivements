@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { IconSearch, IconX } from '@tabler/icons-react'
+import { IconSearch, IconX, IconUser } from '@tabler/icons-react'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
+import { RetroAchievementsGameCompleted, RetroAchievementsUserProfile, WantToPlayGame } from '@/types/types'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
 type GameStatus = 'completed-hc' | 'completed-sc' | 'in-progress' | 'want-to-play'
@@ -26,6 +26,9 @@ const STATUS_PRIORITY: Record<GameStatus, number> = {
   'in-progress': 2,
   'want-to-play': 1,
 }
+
+const normalize = (s: string) =>
+  s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
 const STATUS_CLASSES: Record<GameStatus, string> = {
   'completed-hc': 'bg-amber-500/20 text-amber-400',
@@ -92,18 +95,26 @@ function buildIndex(
   return Array.from(map.values())
 }
 
+type SearchTab = 'games' | 'users'
+
 interface SearchModalProps {
   isOpen: boolean
   onClose: () => void
+  initialQuery?: string
 }
 
-export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
+export default function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalProps) {
   const { T } = useLanguage()
   const router = useRouter()
   const { all: completedGames } = useGamesData()
+  const [tab, setTab] = useState<SearchTab>('games')
   const [query, setQuery] = useState('')
   const [wantToPlay, setWantToPlay] = useState<WantToPlayGame[]>([])
+  const [userResult, setUserResult] = useState<RetroAchievementsUserProfile | null>(null)
+  const [userLoading, setUserLoading] = useState(false)
+  const [userError, setUserError] = useState(false)
   const wantFetched = useRef(false)
+  const userDebounce = useRef<ReturnType<typeof setTimeout>>(undefined)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -119,12 +130,16 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
   useEffect(() => {
     if (isOpen) {
+      setQuery(initialQuery)
       const t = setTimeout(() => inputRef.current?.focus(), 50)
       return () => clearTimeout(t)
     } else {
       setQuery('')
+      setTab('games')
+      setUserResult(null)
+      setUserError(false)
     }
-  }, [isOpen])
+  }, [isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isOpen) return
@@ -135,18 +150,47 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     return () => window.removeEventListener('keydown', handler)
   }, [isOpen, onClose])
 
+  useEffect(() => {
+    if (tab !== 'users') return
+    const q = query.trim()
+    setUserResult(null)
+    setUserError(false)
+    // RA API requires exact username — spaces are invalid, min 3 chars
+    if (q.length < 3 || q.includes(' ')) return
+    clearTimeout(userDebounce.current)
+    userDebounce.current = setTimeout(() => {
+      setUserLoading(true)
+      fetch(`/api/public/user/search?u=${encodeURIComponent(q)}`)
+        .then((r) => {
+          if (!r.ok) throw new Error('Not found')
+          return r.json()
+        })
+        .then((data) => {
+          setUserResult(data?.User ? data : null)
+          setUserError(!data?.User)
+          setUserLoading(false)
+        })
+        .catch(() => {
+          setUserResult(null)
+          setUserError(true)
+          setUserLoading(false)
+        })
+    }, 400)
+    return () => clearTimeout(userDebounce.current)
+  }, [query, tab])
+
   const allGames = useMemo(
     () => buildIndex(completedGames, wantToPlay),
     [completedGames, wantToPlay],
   )
 
   const results = useMemo(() => {
-    const q = query.trim().toLowerCase()
+    const q = normalize(query.trim())
     if (!q) return []
     return allGames
-      .filter((g) => g.title.toLowerCase().includes(q))
+      .filter((g) => normalize(g.title).includes(q))
       .map((g) => {
-        const t = g.title.toLowerCase()
+        const t = normalize(g.title)
         const score = t === q ? 3 : t.startsWith(q) ? 2 : t.split(/\s+/).some((w) => w.startsWith(q)) ? 1 : 0
         return { g, score }
       })
@@ -184,6 +228,16 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     [T],
   )
 
+  const placeholder = tab === 'users' ? T.publicProfile.searchUsersPlaceholder : T.search.placeholder
+
+  const handleUserSelect = useCallback(
+    (username: string) => {
+      router.push(`/user/${encodeURIComponent(username)}`)
+      onClose()
+    },
+    [router, onClose],
+  )
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -203,14 +257,17 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             >
               {/* Input row */}
               <div className="flex items-center gap-3 px-4 py-3.5 border-b border-white/5">
-                <IconSearch className="w-5 h-5 text-text-secondary shrink-0" aria-hidden />
+                {tab === 'users'
+                  ? <IconUser className="w-5 h-5 text-text-secondary shrink-0" aria-hidden />
+                  : <IconSearch className="w-5 h-5 text-text-secondary shrink-0" aria-hidden />
+                }
                 <input
                   ref={inputRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder={T.search.placeholder}
+                  placeholder={placeholder}
                   className="flex-1 bg-transparent text-text-main text-base outline-none placeholder:text-text-secondary"
-                  aria-label={T.search.placeholder}
+                  aria-label={placeholder}
                 />
                 <button
                   onClick={onClose}
@@ -221,76 +278,156 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 </button>
               </div>
 
-              {/* Results */}
-              {query.trim() ? (
-                <div className="max-h-105 overflow-y-auto">
-                  {results.length === 0 && !directGameId ? (
-                    <div className="flex flex-col items-center gap-2 py-8">
-                      <p className="text-text-secondary text-sm">{T.search.noResults}</p>
-                      <p className="text-text-secondary/50 text-xs">{T.search.libraryOnly}</p>
-                    </div>
-                  ) : (
-                    <motion.ul
-                      initial="hidden"
-                      animate="visible"
-                      variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
-                    >
-                      {results.map((game) => (
-                        <motion.li key={game.id} variants={resultVariants}>
-                          <button
-                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer"
-                            onClick={() => handleSelect(game.id)}
-                          >
-                            {game.icon ? (
-                              <Image
-                                src={`https://retroachievements.org${game.icon}`}
-                                alt={game.title}
-                                width={32}
-                                height={32}
-                                className="w-8 h-8 rounded object-cover shrink-0"
-                                unoptimized
-                              />
-                            ) : (
-                              <div className="w-8 h-8 rounded bg-white/10 shrink-0" />
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-text-main line-clamp-1">
-                                {game.title}
-                              </p>
-                              <p className="text-xs text-text-secondary line-clamp-1">
-                                {game.consoleName}
-                              </p>
-                            </div>
-                            <span
-                              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${STATUS_CLASSES[game.status]}`}
+              {/* Tab toggle */}
+              <div className="flex border-b border-white/5 px-4 gap-4">
+                {(['games', 'users'] as SearchTab[]).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => { setTab(t); setQuery('') }}
+                    className={`py-2 text-xs font-medium border-b-2 transition-colors ${tab === t ? 'border-accent text-text-main' : 'border-transparent text-text-secondary hover:text-text-main'}`}
+                  >
+                    {t === 'games' ? T.publicProfile.gamesTab : T.publicProfile.userTab}
+                  </button>
+                ))}
+              </div>
+
+              {/* Results — Games */}
+              {tab === 'games' && (
+                query.trim() ? (
+                  <div className="max-h-105 overflow-y-auto">
+                    {results.length === 0 && !directGameId ? (
+                      <div className="flex flex-col items-center gap-2 py-8 px-4">
+                        <p className="text-text-secondary text-sm">{T.search.noResults}</p>
+                        <p className="text-text-secondary/50 text-xs text-center">{T.search.libraryOnly}</p>
+                        <a
+                          href={`https://retroachievements.org/searchresults.php?s=${encodeURIComponent(query.trim())}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-accent hover:underline mt-1"
+                        >
+                          {T.publicProfile.searchOnRA} →
+                        </a>
+                      </div>
+                    ) : (
+                      <motion.ul
+                        initial="hidden"
+                        animate="visible"
+                        variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
+                      >
+                        {results.map((game) => (
+                          <motion.li key={game.id} variants={resultVariants}>
+                            <button
+                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer"
+                              onClick={() => handleSelect(game.id)}
                             >
-                              {statusLabel(game.status)}
-                            </span>
-                          </button>
-                        </motion.li>
-                      ))}
-                      {directGameId && !results.find((r) => r.id === directGameId) && (
-                        <motion.li variants={resultVariants}>
-                          <button
-                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer border-t border-white/5"
-                            onClick={() => handleSelect(directGameId)}
-                          >
-                            <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-text-secondary text-xs font-bold">
-                              #{directGameId}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-text-main">{T.search.openById}</p>
-                              <p className="text-xs text-text-secondary">Game ID {directGameId}</p>
-                            </div>
-                          </button>
-                        </motion.li>
-                      )}
-                    </motion.ul>
-                  )}
-                </div>
-              ) : (
-                <p className="text-text-secondary text-xs text-center py-6">{T.search.hint}</p>
+                              {game.icon ? (
+                                <Image
+                                  src={`https://retroachievements.org${game.icon}`}
+                                  alt={game.title}
+                                  width={32}
+                                  height={32}
+                                  className="w-8 h-8 rounded object-cover shrink-0"
+                                  unoptimized
+                                />
+                              ) : (
+                                <div className="w-8 h-8 rounded bg-white/10 shrink-0" />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-text-main line-clamp-1">{game.title}</p>
+                                <p className="text-xs text-text-secondary line-clamp-1">{game.consoleName}</p>
+                              </div>
+                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${STATUS_CLASSES[game.status]}`}>
+                                {statusLabel(game.status)}
+                              </span>
+                            </button>
+                          </motion.li>
+                        ))}
+                        {directGameId && !results.find((r) => r.id === directGameId) && (
+                          <motion.li variants={resultVariants}>
+                            <button
+                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer border-t border-white/5"
+                              onClick={() => handleSelect(directGameId)}
+                            >
+                              <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-text-secondary text-xs font-bold">
+                                #{directGameId}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-text-main">{T.search.openById}</p>
+                                <p className="text-xs text-text-secondary">Game ID {directGameId}</p>
+                              </div>
+                            </button>
+                          </motion.li>
+                        )}
+                      </motion.ul>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-text-secondary text-xs text-center py-6">{T.search.hint}</p>
+                )
               )}
+
+              {/* Results — Users */}
+              {tab === 'users' && (() => {
+                const q = query.trim()
+                const tooShort = q.length < 3
+                const hasSpace = q.includes(' ')
+                const searching = !tooShort && !hasSpace
+
+                if (!searching) {
+                  return (
+                    <div className="flex flex-col items-center gap-1.5 py-6 px-4">
+                      <p className="text-text-secondary text-xs text-center">{T.publicProfile.searchUsersHint}</p>
+                      {hasSpace && (
+                        <p className="text-text-secondary/60 text-[10px] text-center">{T.publicProfile.noSpaces}</p>
+                      )}
+                    </div>
+                  )
+                }
+
+                return (
+                  <div className="max-h-105 overflow-y-auto">
+                    {userLoading ? (
+                      <div className="flex items-center gap-3 px-4 py-3">
+                        <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse shrink-0" />
+                        <div className="h-4 bg-white/10 rounded animate-pulse w-32" />
+                      </div>
+                    ) : userResult ? (
+                      <motion.div initial="hidden" animate="visible" variants={resultVariants}>
+                        <button
+                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer"
+                          onClick={() => handleUserSelect(userResult.User)}
+                        >
+                          <Image
+                            src={`https://retroachievements.org${userResult.UserPic}`}
+                            alt={userResult.User}
+                            width={32}
+                            height={32}
+                            className="w-8 h-8 rounded-full object-cover shrink-0"
+                            unoptimized
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-text-main">{userResult.User}</p>
+                            <p className="text-xs text-text-secondary">{userResult.TotalPoints.toLocaleString()} pts</p>
+                          </div>
+                          <span className="text-[10px] text-text-secondary">→</span>
+                        </button>
+                      </motion.div>
+                    ) : userError ? (
+                      <div className="flex flex-col items-center gap-3 py-8 px-4">
+                        <p className="text-text-secondary text-sm text-center">{T.publicProfile.noUserFound}</p>
+                        <a
+                          href={`https://retroachievements.org/userList.php?s=${encodeURIComponent(q)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-accent hover:underline"
+                        >
+                          {T.publicProfile.searchOnRA} →
+                        </a>
+                      </div>
+                    ) : null}
+                  </div>
+                )
+              })()}
             </motion.div>
           </div>
         </motion.div>

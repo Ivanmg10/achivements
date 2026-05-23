@@ -53,7 +53,12 @@ export default function MainPageConsoleNav() {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.navigation}</p>
+      <Link
+        href="/allGames"
+        className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-text-main transition-colors self-start"
+      >
+        {T.cards.navigation}
+      </Link>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {SECTION_SLUGS.map(({ slug, emoji, key }) => {
           const label = T.categories[key]

@@ -1,5 +1,5 @@
 import { ragamesIds } from '@/constants/ragamesidpool'
-import { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
+import { RecentAchievement, RetroAchievementsGameCompleted, Streak } from '@/types/types'
 
 export function relativeTime(dateStr: string | null | undefined): string {
   if (!dateStr) return '—'
@@ -89,4 +89,36 @@ export function calcStreak(achievements: RecentAchievement[]): number {
     else if (i > 0) break
   }
   return count
+}
+
+export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
+  if (!achievements.length) return []
+  const uniqueDays = [...new Set(achievements.map(a => a.Date.split(' ')[0]))].sort()
+  const streaks: Streak[] = []
+  let start = uniqueDays[0]
+  let prev = uniqueDays[0]
+
+  const makeStreak = (s: string, e: string): Streak => {
+    const days = Math.round((new Date(e + 'T00:00:00').getTime() - new Date(s + 'T00:00:00').getTime()) / 86400000) + 1
+    return {
+      start: s,
+      end: e,
+      days,
+      achievements: achievements.filter(a => { const d = a.Date.split(' ')[0]; return d >= s && d <= e }),
+    }
+  }
+
+  for (let i = 1; i < uniqueDays.length; i++) {
+    const curr = uniqueDays[i]
+    const diff = Math.round((new Date(curr + 'T00:00:00').getTime() - new Date(prev + 'T00:00:00').getTime()) / 86400000)
+    if (diff === 1) {
+      prev = curr
+    } else {
+      streaks.push(makeStreak(start, prev))
+      start = curr
+      prev = curr
+    }
+  }
+  streaks.push(makeStreak(start, prev))
+  return streaks.sort((a, b) => b.days - a.days)
 }
