@@ -1,6 +1,13 @@
 import { ragamesIds } from '@/constants/ragamesidpool'
 import { RecentAchievement, RetroAchievementsGameCompleted, Streak } from '@/types/types'
 
+export function formatDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return '—'
+  const d = new Date(dateStr.replace(' ', 'T'))
+  if (isNaN(d.getTime())) return '—'
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
 export function relativeTime(dateStr: string | null | undefined): string {
   if (!dateStr) return '—'
   const t = new Date(dateStr).getTime()

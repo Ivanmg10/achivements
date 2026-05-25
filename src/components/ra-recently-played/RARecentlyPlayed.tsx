@@ -9,7 +9,7 @@ import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievementsGameWithAchievements, RetroAchievement } from '@/types/types'
 import { CONSOLES } from '@/constants'
-import { relativeTime } from '@/utils/utils'
+import { formatDate } from '@/utils/utils'
 import { IconChevronLeft, IconLayoutList } from '@tabler/icons-react'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
@@ -396,7 +396,7 @@ export default function RARecentlyPlayed() {
                             <span className="opacity-40">·</span>
                           </>
                         )}
-                        <span>{relativeTime(g.LastPlayed)}</span>
+                        <span>{formatDate(g.LastPlayed)}</span>
                       </div>
                     </div>
                   </div>

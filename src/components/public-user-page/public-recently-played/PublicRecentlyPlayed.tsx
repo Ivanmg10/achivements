@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { RecentlyPlayedGame, RetroAchievementsGameWithAchievements, RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { CONSOLES } from '@/constants'
-import { relativeTime } from '@/utils/utils'
+import { formatDate } from '@/utils/utils'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
 import { IconChevronLeft } from '@tabler/icons-react'
 
@@ -230,7 +230,7 @@ export default function PublicRecentlyPlayed({
                             <span className="opacity-40">·</span>
                           </>
                         )}
-                        <span>{relativeTime(g.LastPlayed)}</span>
+                        <span>{formatDate(g.LastPlayed)}</span>
                       </div>
                     </div>
                   </div>
