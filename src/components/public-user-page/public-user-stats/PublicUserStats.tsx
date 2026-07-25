@@ -119,9 +119,7 @@ export default function PublicUserStats({
           <ChartCard className="lg:col-span-3">
             <MainPageBestPeriod
               achievements={achievements}
-              yearAchievements={achievements}
               isLoading={isLoading}
-              yearLoading={isLoading}
             />
           </ChartCard>
 

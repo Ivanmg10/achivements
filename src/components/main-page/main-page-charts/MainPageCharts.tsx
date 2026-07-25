@@ -6,7 +6,6 @@ import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useUserRank } from '@/hooks/useUserRank'
 import { useUserAwards } from '@/hooks/useUserAwards'
-import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
 import { useLanguage } from '@/context/LanguageContext'
 import { ChartCard } from '@/components/ui/ChartCard'
 
@@ -31,8 +30,6 @@ export default function MainPageCharts() {
   const { all, hardcore, softcore, isLoading: gamesLoading } = useGamesData()
   const { rank, isLoading: rankLoading } = useUserRank()
   const { awards, isLoading: awardsLoading } = useUserAwards()
-  const { achievements: yearAch, isLoading: yearLoading } = useActivityHeatmapYear()
-
   return (
     <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-label={T.cards.statsActivity}>
       <h2 className="text-xl font-semibold text-text-main">{T.cards.statsActivity}</h2>
@@ -101,9 +98,7 @@ export default function MainPageCharts() {
           <ChartCard>
             <MainPageBestPeriod
               achievements={heatmapData}
-              yearAchievements={yearAch}
               isLoading={heatmapLoading}
-              yearLoading={yearLoading}
             />
           </ChartCard>
 
