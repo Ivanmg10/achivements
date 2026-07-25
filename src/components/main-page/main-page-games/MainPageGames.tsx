@@ -14,6 +14,7 @@ import Link from 'next/link'
 import MainPageGamesList from './main-page-games-list/MainPageGamesList'
 import ConsoleSideList from '../console-side-list/ConsoleSideList'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 
 const MAX_GAMES = 2
 const CARD_HEIGHT_PX = 70
@@ -25,9 +26,17 @@ export default function MainPageGames() {
   const { listGames, isLoading } = useGamesInProgressPreview()
   const recentlyPlayed = useRecentlyPlayedGames()
 
-  const lastPlayedMap = useMemo(() => {
-    const map = new Map<number, string>()
-    for (const g of recentlyPlayed) map.set(g.GameID, g.LastPlayed)
+  const extraDataMap = useMemo(() => {
+    const map = new Map<number, GameExtraData>()
+    for (const g of recentlyPlayed) {
+      map.set(g.GameID, {
+        awards: [],
+        lastPlayed: g.LastPlayed,
+        possibleScore: g.PossibleScore,
+        scoreAchieved: g.ScoreAchieved,
+        scoreAchievedHardcore: g.ScoreAchievedHardcore,
+      })
+    }
     return map
   }, [recentlyPlayed])
 
@@ -35,14 +44,14 @@ export default function MainPageGames() {
     return [...listGames].sort((a, b) => {
       const aId = a.GameID ?? Number(a.ID)
       const bId = b.GameID ?? Number(b.ID)
-      const aDate = lastPlayedMap.get(aId) ?? ''
-      const bDate = lastPlayedMap.get(bId) ?? ''
+      const aDate = extraDataMap.get(aId)?.lastPlayed ?? ''
+      const bDate = extraDataMap.get(bId)?.lastPlayed ?? ''
       if (!aDate && !bDate) return 0
       if (!aDate) return 1
       if (!bDate) return -1
       return new Date(bDate).getTime() - new Date(aDate).getTime()
     })
-  }, [listGames, lastPlayedMap])
+  }, [listGames, extraDataMap])
 
   const visibleCount = useResizableList({
     sectionRef,
@@ -79,7 +88,7 @@ export default function MainPageGames() {
             <GameCardSkeleton />
           </div>
         ) : sortedGames.length > 0 ? (
-          <MainPageGamesList listGames={sortedGames.slice(0, visibleCount)} />
+          <MainPageGamesList listGames={sortedGames.slice(0, visibleCount)} extraData={extraDataMap} />
         ) : (
           <EmptyState icon="🎮" title={T.mainPage.noGamesInProgress} subtitle={T.mainPage.noGamesInProgressSub} className="py-8" />
         )}

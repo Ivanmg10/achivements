@@ -12,12 +12,16 @@ import CompletedFilter, {
   CompletedMode,
 } from '../../../components/completed-filter/CompletedFilter'
 import ConsoleFilter, { buildConsolePills } from '@/components/console-filter/ConsoleFilter'
+import StatusSortControl, {
+  StatusSortState,
+  defaultSortStateFor,
+} from '@/components/status-sort-control/StatusSortControl'
 import EmptyState from '../../../components/empty-state/EmptyState'
 import LoadingPage from '../../../components/loading-page/LoadingPage'
 import { useLanguage } from '@/context/LanguageContext'
 import { motion } from 'framer-motion'
 import { fadeUp } from '@/lib/animations'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
 export default function CategoryPage() {
   const { category } = useParams()
@@ -26,6 +30,12 @@ export default function CategoryPage() {
   const { T } = useLanguage()
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
   const { selected, toggle, clear } = useConsoleFilter()
+  const cat = category as string
+  const [sortState, setSortState] = useState<StatusSortState>(() => defaultSortStateFor(cat))
+
+  useEffect(() => {
+    setSortState(defaultSortStateFor(cat))
+  }, [cat])
 
   const EMPTY_STATE: Record<string, { icon: string; title: string; sub: string }> = {
     wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay, sub: T.categoryPage.noWantToPlaySub },
@@ -33,9 +43,8 @@ export default function CategoryPage() {
     completed: { icon: '🏆', title: T.categoryPage.noCompleted, sub: T.categoryPage.noCompletedSub },
   }
 
-  const cat = category as string
   const consolePills = useMemo(() => buildConsolePills(games), [games])
-  const visibleGames = useGameFiltering({ games, cat, extraData, selected, completedMode })
+  const visibleGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
 
   return (
     <motion.div
@@ -76,9 +85,12 @@ export default function CategoryPage() {
                 category={cat}
                 gameCount={visibleGames.length}
               />
-              {cat === 'completed' && (
-                <CompletedFilter value={completedMode} onChange={setCompletedMode} />
-              )}
+              <div className="flex items-center gap-2">
+                {cat === 'completed' && (
+                  <CompletedFilter value={completedMode} onChange={setCompletedMode} />
+                )}
+                <StatusSortControl cat={cat} sortState={sortState} onChange={setSortState} />
+              </div>
             </div>
             {consolePills.length > 0 && (
               <div className="flex flex-wrap gap-1.5 py-1">

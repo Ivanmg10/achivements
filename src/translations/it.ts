@@ -3,6 +3,7 @@ import { Translations } from './en'
 export const it: Translations = {
   header: {
     signIn: 'Accedi',
+    status: 'Stato',
   },
   sidePanel: {
     welcome: 'Benvenuto',
@@ -16,6 +17,13 @@ export const it: Translations = {
     wantToPlay: 'Voglio giocare',
     playing: 'Sto giocando',
     completed: 'Completato',
+  },
+  statusSort: {
+    label: 'Ordina',
+    name: 'A-Z',
+    lastPlayed: 'Ultima partita',
+    percent: '% completato',
+    points: 'Punti',
   },
   mainPage: {
     playing: 'Sto giocando',
@@ -207,6 +215,8 @@ export const it: Translations = {
   statusGameItem: {
     achievements: 'obiettivi',
     noPublishedAchievements: 'Nessun obiettivo pubblicato',
+    pointsTotal: 'punti',
+    pointsEarned: 'punti ottenuti',
   },
   gameInfoPage: {
     retry: 'Riprova',
@@ -291,6 +301,10 @@ export const it: Translations = {
     abandonedIdle: 'g+ inattivo',
     almostThere: 'Quasi (75–99%)',
     mastered100: 'Padronati & Completati — 100%',
+    reorderMasteredAria: 'Riordina i giochi padroneggiati',
+    reorderMasteredTitle: 'Riordina i tuoi giochi padroneggiati',
+    dragToReorder: 'Trascina per riordinare',
+    close: 'Chiudi',
     masteryAwards: 'Padronanza & Premi',
     mastered: 'Padronato',
     completedSC: 'Completati SC',

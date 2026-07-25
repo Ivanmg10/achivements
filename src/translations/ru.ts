@@ -3,6 +3,7 @@ import { Translations } from './en'
 export const ru: Translations = {
   header: {
     signIn: 'Войти',
+    status: 'Статус',
   },
   sidePanel: {
     welcome: 'Добро пожаловать',
@@ -16,6 +17,13 @@ export const ru: Translations = {
     wantToPlay: 'Хочу сыграть',
     playing: 'Играю',
     completed: 'Завершено',
+  },
+  statusSort: {
+    label: 'Сортировка',
+    name: 'А-Я',
+    lastPlayed: 'Последняя игра',
+    percent: '% завершения',
+    points: 'Очки',
   },
   mainPage: {
     playing: 'Играю',
@@ -207,6 +215,8 @@ export const ru: Translations = {
   statusGameItem: {
     achievements: 'достижений',
     noPublishedAchievements: 'Нет опубликованных достижений',
+    pointsTotal: 'очков',
+    pointsEarned: 'очков получено',
   },
   gameInfoPage: {
     retry: 'Повторить',
@@ -291,6 +301,10 @@ export const ru: Translations = {
     abandonedIdle: 'д+ неактивно',
     almostThere: 'Почти (75–99%)',
     mastered100: 'Пройдено & Завершено — 100%',
+    reorderMasteredAria: 'Изменить порядок пройденных игр',
+    reorderMasteredTitle: 'Измените порядок пройденных игр',
+    dragToReorder: 'Перетащите, чтобы изменить порядок',
+    close: 'Закрыть',
     masteryAwards: 'Мастерство & Награды',
     mastered: 'Пройдено',
     completedSC: 'Завершено SC',

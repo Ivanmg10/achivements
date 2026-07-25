@@ -310,6 +310,17 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
               <span className="text-xs text-text-secondary/60 tabular-nums">{Math.round(pct)}%</span>
             </div>
           )}
+          {'AchievementsPublished' in game
+            ? game.PointsTotal > 0 && (
+              <p className="text-xs text-text-secondary/60 mt-1">
+                {game.PointsTotal} {T.statusGameItem.pointsTotal}
+              </p>
+            )
+            : extra?.possibleScore != null && (
+              <p className="text-xs text-text-secondary/60 mt-1">
+                {extra.scoreAchievedHardcore || extra.scoreAchieved || 0} / {extra.possibleScore} {T.statusGameItem.pointsEarned}
+              </p>
+            )}
           {extra && extra.awards.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-1.5">
               {extra.awards.map((award, i) => {

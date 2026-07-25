@@ -7,6 +7,7 @@ import {
   WantToPlayGame,
 } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -43,16 +44,30 @@ function getBadge(
   return null
 }
 
+function getPointsLabel(game: AnyGame, extra?: GameExtraData): string | null {
+  if ('PointsTotal' in game) {
+    return game.PointsTotal > 0 ? `${game.PointsTotal} pts` : null
+  }
+  if (extra?.possibleScore != null) {
+    const earned = extra.scoreAchievedHardcore || extra.scoreAchieved || 0
+    return `${earned}/${extra.possibleScore} pts`
+  }
+  return null
+}
+
 export default function MainPageGamesList({
   listGames,
+  extraData,
 }: {
   listGames: Array<AnyGame>
+  extraData?: Map<number, GameExtraData>
 }) {
   const { T } = useLanguage()
 
   return listGames.map((game: AnyGame, index: number) => {
     const consoleDef = CONSOLES.find((c) => c.id === game.ConsoleID)
     const badge = getBadge(game, T.gamesList.achievements)
+    const pointsLabel = getPointsLabel(game, extraData?.get(game.GameID ?? Number(game.ID)))
 
     return (
       <Link
@@ -91,10 +106,15 @@ export default function MainPageGamesList({
           </div>
         </div>
 
-        {badge && (
+        {(badge || pointsLabel) && (
           <div className="flex flex-col items-end justify-center pr-1 shrink-0 gap-0.5">
-            <span className="text-sm font-bold text-gray-300">{badge.top}</span>
-            <span className="text-xs text-gray-500">{badge.bottom}</span>
+            {badge && (
+              <>
+                <span className="text-sm font-bold text-gray-300">{badge.top}</span>
+                <span className="text-xs text-gray-500">{badge.bottom}</span>
+              </>
+            )}
+            {pointsLabel && <span className="text-[10px] text-gray-500/80">{pointsLabel}</span>}
           </div>
         )}
       </Link>

@@ -2,6 +2,10 @@ jest.mock('@/hooks/useGamesCompletedPreview', () => ({
   useGamesCompletedPreview: jest.fn(),
 }))
 
+jest.mock('@/hooks/useRecentlyPlayedGames', () => ({
+  useRecentlyPlayedGames: () => [],
+}))
+
 jest.mock('@/hooks/useResizableList', () => ({
   useResizableList: () => 5,
 }))

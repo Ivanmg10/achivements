@@ -1,10 +1,18 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
-import { IconX, IconPlayerPlay, IconHeart, IconCheck, IconFolder } from '@tabler/icons-react'
+import {
+  IconX,
+  IconPlayerPlay,
+  IconHeart,
+  IconCheck,
+  IconFolder,
+  IconListDetails,
+  IconChevronDown,
+} from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
 interface MobileNavModalProps {
@@ -31,16 +39,18 @@ const itemVariants: Variants = {
 
 export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps) {
   const { T } = useLanguage()
+  const [statusOpen, setStatusOpen] = useState(false)
 
-  const navItems = [
+  const statusItems = [
     { href: '/playing', label: T.mainPage.playing, icon: IconPlayerPlay },
     { href: '/wantToPlay', label: T.mainPage.wantToPlay, icon: IconHeart },
     { href: '/completed', label: T.mainPage.completed, icon: IconCheck },
-    { href: '/groups', label: T.groups.title, icon: IconFolder },
   ]
+  const groupsItem = { href: '/groups', label: T.groups.title, icon: IconFolder }
   const router = useRouter()
   const pathname = usePathname()
   const { data: session } = useSession()
+  const isStatusActive = statusItems.some(({ href }) => pathname === href)
 
   useEffect(() => {
     if (!isOpen) return
@@ -50,6 +60,10 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [isOpen, onClose])
+
+  useEffect(() => {
+    if (!isOpen) setStatusOpen(false)
+  }, [isOpen])
 
   const handleNavigate = (href: string) => {
     if (!session) {
@@ -96,24 +110,68 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
                 animate="visible"
                 variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
               >
-                {navItems.map(({ href, label, icon: Icon }) => {
-                  const isActive = pathname === href
-                  return (
-                    <motion.li key={href} variants={itemVariants}>
-                      <button
-                        onClick={() => handleNavigate(href)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left cursor-pointer ${
-                          isActive
-                            ? 'bg-bg-main text-accent'
-                            : 'text-text-secondary hover:text-text-main hover:bg-bg-main/60'
-                        }`}
+                <motion.li variants={itemVariants}>
+                  <button
+                    onClick={() => setStatusOpen((o) => !o)}
+                    aria-expanded={statusOpen}
+                    className={`w-full flex items-center justify-between gap-3 px-4 py-3 transition-colors text-left cursor-pointer ${
+                      isStatusActive
+                        ? 'bg-bg-main text-accent'
+                        : 'text-text-secondary hover:text-text-main hover:bg-bg-main/60'
+                    }`}
+                  >
+                    <span className="flex items-center gap-3">
+                      <IconListDetails className="w-5 h-5 shrink-0" aria-hidden />
+                      <span className="text-sm font-medium">{T.header.status}</span>
+                    </span>
+                    <IconChevronDown
+                      className={`w-4 h-4 shrink-0 transition-transform ${statusOpen ? 'rotate-180' : ''}`}
+                      aria-hidden
+                    />
+                  </button>
+                  <AnimatePresence>
+                    {statusOpen && (
+                      <motion.ul
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
                       >
-                        <Icon className="w-5 h-5 shrink-0" aria-hidden />
-                        <span className="text-sm font-medium">{label}</span>
-                      </button>
-                    </motion.li>
-                  )
-                })}
+                        {statusItems.map(({ href, label, icon: Icon }) => {
+                          const isActive = pathname === href
+                          return (
+                            <motion.li key={href} variants={itemVariants}>
+                              <button
+                                onClick={() => handleNavigate(href)}
+                                className={`w-full flex items-center gap-3 pl-11 pr-4 py-2.5 transition-colors text-left cursor-pointer ${
+                                  isActive
+                                    ? 'bg-bg-main text-accent'
+                                    : 'text-text-secondary hover:text-text-main hover:bg-bg-main/60'
+                                }`}
+                              >
+                                <Icon className="w-4 h-4 shrink-0" aria-hidden />
+                                <span className="text-sm">{label}</span>
+                              </button>
+                            </motion.li>
+                          )
+                        })}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                </motion.li>
+                <motion.li variants={itemVariants}>
+                  <button
+                    onClick={() => handleNavigate(groupsItem.href)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left cursor-pointer ${
+                      pathname === groupsItem.href
+                        ? 'bg-bg-main text-accent'
+                        : 'text-text-secondary hover:text-text-main hover:bg-bg-main/60'
+                    }`}
+                  >
+                    <IconFolder className="w-5 h-5 shrink-0" aria-hidden />
+                    <span className="text-sm font-medium">{groupsItem.label}</span>
+                  </button>
+                </motion.li>
               </motion.ul>
             </motion.div>
           </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useGamesByCategory } from '../../../../hooks/useGamesByCategory'
 import { useGameExtraData } from '../../../../hooks/useGameExtraData'
 import { useConsoleFilter } from '../../../../hooks/useConsoleFilter'
@@ -10,6 +10,10 @@ import StatusGameList from '../../../../components/statusGameList/StatusGameList
 import StatusPageHeader from '../../../../components/status-page-header/StatusPageHeader'
 import CompletedFilter, { CompletedMode } from '../../../../components/completed-filter/CompletedFilter'
 import ConsoleFilter, { buildConsolePills } from '@/components/console-filter/ConsoleFilter'
+import StatusSortControl, {
+  StatusSortState,
+  defaultSortStateFor,
+} from '@/components/status-sort-control/StatusSortControl'
 import EmptyState from '../../../../components/empty-state/EmptyState'
 import LoadingPage from '../../../../components/loading-page/LoadingPage'
 import { useLanguage } from '@/context/LanguageContext'
@@ -25,6 +29,12 @@ export default function CategoryConsolePage() {
   const { selected, toggle, clear } = useConsoleFilter(
     consoleId ? [Number(consoleId)] : undefined
   )
+  const cat = category as string
+  const [sortState, setSortState] = useState<StatusSortState>(() => defaultSortStateFor(cat))
+
+  useEffect(() => {
+    setSortState(defaultSortStateFor(cat))
+  }, [cat])
 
   const EMPTY_STATE: Record<string, { icon: string; title: string; sub: string }> = {
     wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay, sub: T.categoryPage.noWantToPlaySub },
@@ -32,9 +42,8 @@ export default function CategoryConsolePage() {
     completed: { icon: '🏆', title: T.categoryPage.noCompleted, sub: T.categoryPage.noCompletedSub },
   }
 
-  const cat = category as string
   const consolePills = useMemo(() => buildConsolePills(games), [games])
-  const visibleGames = useGameFiltering({ games, cat, extraData, selected, completedMode })
+  const visibleGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
 
   return (
     <motion.div
@@ -68,9 +77,12 @@ export default function CategoryConsolePage() {
                 category={cat}
                 gameCount={visibleGames.length}
               />
-              {cat === 'completed' && (
-                <CompletedFilter value={completedMode} onChange={setCompletedMode} />
-              )}
+              <div className="flex items-center gap-2">
+                {cat === 'completed' && (
+                  <CompletedFilter value={completedMode} onChange={setCompletedMode} />
+                )}
+                <StatusSortControl cat={cat} sortState={sortState} onChange={setSortState} />
+              </div>
             </div>
 
             {consolePills.length > 0 && (

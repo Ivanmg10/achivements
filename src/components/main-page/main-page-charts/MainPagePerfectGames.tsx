@@ -1,15 +1,21 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { IconEdit } from '@tabler/icons-react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import { usePerfectGamesOrder } from '@/hooks/usePerfectGamesOrder'
+import { applyCustomOrder } from '@/utils/utils'
+import PerfectGamesOrderModal from '@/components/main-page/perfect-games-order-modal/PerfectGamesOrderModal'
 
 export default function MainPagePerfectGames({ games, isLoading }: { games: RetroAchievementsGameCompleted[]; isLoading?: boolean }) {
   const { T } = useLanguage()
+  const { order, saveOrder } = usePerfectGamesOrder()
+  const [editOpen, setEditOpen] = useState(false)
 
-  const { perfects, hcCount, scCount } = useMemo(() => {
+  const { rawPerfects, hcCount, scCount } = useMemo(() => {
     const hcIds = new Set<number>()
     const scIds = new Set<number>()
     const byId: Record<number, RetroAchievementsGameCompleted> = {}
@@ -26,11 +32,13 @@ export default function MainPagePerfectGames({ games, isLoading }: { games: Retr
     }
 
     return {
-      perfects: Object.values(byId).sort((a, b) => a.Title.localeCompare(b.Title)),
+      rawPerfects: Object.values(byId),
       hcCount: hcIds.size,
       scCount: scIds.size,
     }
   }, [games])
+
+  const perfects = useMemo(() => applyCustomOrder(rawPerfects, order), [rawPerfects, order])
 
   if (isLoading) {
     return (
@@ -48,7 +56,12 @@ export default function MainPagePerfectGames({ games, isLoading }: { games: Retr
   if (perfects.length === 0) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mastered100}</p>
+        <Link
+          href="/completed"
+          className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-text-main hover:underline transition-colors self-start"
+        >
+          {T.cards.mastered100}
+        </Link>
         <div className="flex items-center justify-center py-8 text-text-secondary text-sm">{T.cards.noCompletedGames}</div>
       </div>
     )
@@ -57,11 +70,23 @@ export default function MainPagePerfectGames({ games, isLoading }: { games: Retr
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mastered100}</p>
+        <Link
+          href="/completed"
+          className="text-[10px] uppercase tracking-widest text-text-secondary hover:text-text-main hover:underline transition-colors"
+        >
+          {T.cards.mastered100}
+        </Link>
         <div className="flex items-center gap-2 text-[10px]">
           <span className="text-yellow-400 font-semibold">{hcCount} HC</span>
           <span className="text-text-secondary/40">·</span>
           <span className="text-text-secondary">{scCount} SC</span>
+          <button
+            onClick={() => setEditOpen(true)}
+            aria-label={T.cards.reorderMasteredAria}
+            className="p-1 rounded hover:bg-bg-card transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70 cursor-pointer"
+          >
+            <IconEdit className="w-3.5 h-3.5" aria-hidden />
+          </button>
         </div>
       </div>
 
@@ -88,6 +113,14 @@ export default function MainPagePerfectGames({ games, isLoading }: { games: Retr
           </Link>
         ))}
       </div>
+
+      <PerfectGamesOrderModal
+        isOpen={editOpen}
+        onClose={() => setEditOpen(false)}
+        games={rawPerfects}
+        order={order}
+        onSaveOrder={saveOrder}
+      />
     </div>
   )
 }

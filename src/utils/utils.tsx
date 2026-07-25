@@ -1,5 +1,8 @@
 import { ragamesIds } from '@/constants/ragamesidpool'
-import { RecentAchievement, RetroAchievementsGameCompleted, Streak } from '@/types/types'
+import { RecentAchievement, RetroAchievement, RetroAchievementsGameCompleted, Streak } from '@/types/types'
+import { CategoryGame } from '@/hooks/useGamesByCategory'
+import { GameExtraData } from '@/components/statusGameList/StatusGameList'
+import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
 
 export function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '—'
@@ -128,4 +131,77 @@ export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
   }
   streaks.push(makeStreak(start, prev))
   return streaks.sort((a, b) => b.days - a.days)
+}
+
+export function getGameSortValue(
+  game: CategoryGame,
+  extra: GameExtraData | undefined,
+  key: StatusSortKey,
+): string | number | null {
+  const isWantToPlay = 'PointsTotal' in game
+
+  switch (key) {
+    case 'name':
+      return game.Title
+    case 'lastPlayed':
+      return isWantToPlay ? null : (extra?.lastPlayed ?? null)
+    case 'percent':
+      return isWantToPlay ? null : (parseFloat((game as RetroAchievementsGameCompleted).PctWon) || 0) * 100
+    case 'points':
+      if (isWantToPlay) return game.PointsTotal
+      if (extra?.possibleScore == null) return null
+      return extra.scoreAchievedHardcore || extra.scoreAchieved || 0
+  }
+}
+
+export function compareSortValues(
+  a: string | number | null,
+  b: string | number | null,
+  dir: SortDir,
+): number {
+  if (a === null && b === null) return 0
+  if (a === null) return 1
+  if (b === null) return -1
+  const cmp = typeof a === 'string' || typeof b === 'string'
+    ? String(a).localeCompare(String(b))
+    : a - b
+  return dir === 'asc' ? cmp : -cmp
+}
+
+export function applyCustomOrder(
+  perfects: RetroAchievementsGameCompleted[],
+  savedOrder: number[],
+): RetroAchievementsGameCompleted[] {
+  const byId = new Map(perfects.map((g) => [g.GameID, g]))
+  const ordered: RetroAchievementsGameCompleted[] = []
+  const seen = new Set<number>()
+
+  for (const id of savedOrder) {
+    const g = byId.get(id)
+    if (g) {
+      ordered.push(g)
+      seen.add(id)
+    }
+  }
+
+  const rest = perfects
+    .filter((g) => !seen.has(g.GameID))
+    .sort((a, b) => a.Title.localeCompare(b.Title))
+
+  return [...ordered, ...rest]
+}
+
+export function sumAchievementPoints(
+  achievements: Record<string, RetroAchievement | undefined | null>,
+  hardcoreOnly = false,
+): { earned: number; total: number } {
+  let earned = 0
+  let total = 0
+  for (const a of Object.values(achievements)) {
+    if (!a) continue
+    total += a.Points
+    const isEarned = hardcoreOnly ? !!a.DateEarnedHardcore : !!(a.DateEarned || a.DateEarnedHardcore)
+    if (isEarned) earned += a.Points
+  }
+  return { earned, total }
 }

@@ -1,8 +1,9 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 
 import { useGamesCompletedPreview } from '@/hooks/useGamesCompletedPreview'
+import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useResizableList } from '@/hooks/useResizableList'
 import { useLanguage } from '@/context/LanguageContext'
 import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
@@ -11,6 +12,7 @@ import Link from 'next/link'
 import MainPageGamesList from '../main-page-games/main-page-games-list/MainPageGamesList'
 import ConsoleSideList from '../console-side-list/ConsoleSideList'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 
 const MAX_GAMES = 2
 const CARD_HEIGHT_PX = 70
@@ -21,8 +23,23 @@ export default function MainPageCompleted() {
   const [tab, setTab] = useState<'normal' | 'hardcore'>('normal')
   const sectionRef = useRef<HTMLElement>(null)
   const { listGames, listGamesHardcore, isLoading } = useGamesCompletedPreview()
+  const recentlyPlayed = useRecentlyPlayedGames()
   const visibleCount = useResizableList({ sectionRef, maxItems: MAX_GAMES, cardHeightPx: CARD_HEIGHT_PX, headerPx: HEADER_PX, footerPx: FOOTER_PX })
   const { T } = useLanguage()
+
+  const extraDataMap = useMemo(() => {
+    const map = new Map<number, GameExtraData>()
+    for (const g of recentlyPlayed) {
+      map.set(g.GameID, {
+        awards: [],
+        lastPlayed: g.LastPlayed,
+        possibleScore: g.PossibleScore,
+        scoreAchieved: g.ScoreAchieved,
+        scoreAchievedHardcore: g.ScoreAchievedHardcore,
+      })
+    }
+    return map
+  }, [recentlyPlayed])
 
   const activeList = tab === 'normal' ? listGames : listGamesHardcore
 
@@ -59,7 +76,7 @@ export default function MainPageCompleted() {
             <GameCardSkeleton />
           </div>
         ) : activeList.length > 0 ? (
-          <MainPageGamesList listGames={activeList.slice(0, visibleCount)} />
+          <MainPageGamesList listGames={activeList.slice(0, visibleCount)} extraData={extraDataMap} />
         ) : (
           <EmptyState
             icon={tab === 'hardcore' ? '💀' : '🏆'}

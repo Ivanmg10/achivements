@@ -3,6 +3,7 @@ import { Translations } from './en'
 export const ja: Translations = {
   header: {
     signIn: 'ログイン',
+    status: 'ステータス',
   },
   sidePanel: {
     welcome: 'ようこそ',
@@ -16,6 +17,13 @@ export const ja: Translations = {
     wantToPlay: 'プレイしたい',
     playing: 'プレイ中',
     completed: '完了',
+  },
+  statusSort: {
+    label: '並び替え',
+    name: 'A-Z',
+    lastPlayed: '最終プレイ',
+    percent: '完了率',
+    points: 'ポイント',
   },
   mainPage: {
     playing: 'プレイ中',
@@ -207,6 +215,8 @@ export const ja: Translations = {
   statusGameItem: {
     achievements: '実績',
     noPublishedAchievements: '公開された実績はありません',
+    pointsTotal: 'ポイント',
+    pointsEarned: '獲得ポイント',
   },
   gameInfoPage: {
     retry: '再試行',
@@ -291,6 +301,10 @@ export const ja: Translations = {
     abandonedIdle: '日以上',
     almostThere: 'もうすぐ (75–99%)',
     mastered100: 'マスター & 完了 — 100%',
+    reorderMasteredAria: 'マスターしたゲームを並び替え',
+    reorderMasteredTitle: 'マスターしたゲームを並び替える',
+    dragToReorder: 'ドラッグして並び替え',
+    close: '閉じる',
     masteryAwards: 'マスタリー & アワード',
     mastered: 'マスター',
     completedSC: '完了SC',

@@ -5,6 +5,9 @@ import StatusGameItem from './StatusGameItem'
 export type GameExtraData = {
   lastPlayed?: string
   awards: UserAward[]
+  possibleScore?: number
+  scoreAchieved?: number
+  scoreAchievedHardcore?: number
 }
 
 export default function StatusGameList({

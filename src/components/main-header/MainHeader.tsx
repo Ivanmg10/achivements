@@ -10,6 +10,7 @@ import { useStreakData } from '@/hooks/useStreakData'
 import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconMenu } from '@tabler/icons-react'
 import SearchModal from '@/components/search-modal/SearchModal'
 import MobileNavModal from './MobileNavModal'
+import StatusNavDropdown from './status-nav-dropdown/StatusNavDropdown'
 
 function NavLink({ href, label, active, glass }: { href: string; label: string; active: boolean; glass?: boolean }) {
   return (
@@ -73,12 +74,13 @@ export default function MainHeader() {
     return () => document.removeEventListener('keydown', handler)
   }, [searchOpen])
 
-  const navItems = [
+  const statusItems = [
     { href: '/playing', label: T.mainPage.playing },
     { href: '/wantToPlay', label: T.mainPage.wantToPlay },
     { href: '/completed', label: T.mainPage.completed },
-    { href: '/groups', label: T.groups.title },
   ]
+  const navItems = [{ href: '/groups', label: T.groups.title }]
+  const isStatusActive = statusItems.some(({ href }) => pathname === href)
 
   return (
     <>
@@ -104,6 +106,15 @@ export default function MainHeader() {
 
           {/* Desktop nav - visible on md+ */}
           <nav className="hidden md:flex items-center gap-0.5 ml-2" aria-label="Main navigation">
+            <StatusNavDropdown
+              items={statusItems.map(({ href, label }) => ({
+                href: session ? href : '/authPage',
+                label,
+              }))}
+              active={isStatusActive}
+              glass={isGameInfo}
+              label={T.header.status}
+            />
             {navItems.map(({ href, label }) => (
               <NavLink
                 key={href}

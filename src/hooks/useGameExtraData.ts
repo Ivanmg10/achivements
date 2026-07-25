@@ -12,7 +12,13 @@ export function useGameExtraData(): Map<number, GameExtraData> {
 
     for (const g of recentGames) {
       const prev = map.get(g.GameID) ?? { awards: [] }
-      map.set(g.GameID, { ...prev, lastPlayed: g.LastPlayed })
+      map.set(g.GameID, {
+        ...prev,
+        lastPlayed: g.LastPlayed,
+        possibleScore: g.PossibleScore,
+        scoreAchieved: g.ScoreAchieved,
+        scoreAchievedHardcore: g.ScoreAchievedHardcore,
+      })
     }
 
     for (const award of awards?.VisibleUserAwards ?? []) {

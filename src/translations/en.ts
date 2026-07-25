@@ -1,6 +1,7 @@
 export const en = {
   header: {
     signIn: 'Sign in',
+    status: 'Status',
   },
   sidePanel: {
     welcome: 'Welcome',
@@ -14,6 +15,13 @@ export const en = {
     wantToPlay: 'Want to play',
     playing: 'Playing',
     completed: 'Completed',
+  },
+  statusSort: {
+    label: 'Sort',
+    name: 'A-Z',
+    lastPlayed: 'Last played',
+    percent: '% completed',
+    points: 'Points',
   },
   mainPage: {
     playing: 'Playing',
@@ -205,6 +213,8 @@ export const en = {
   statusGameItem: {
     achievements: 'achievements',
     noPublishedAchievements: 'No published achievements',
+    pointsTotal: 'points',
+    pointsEarned: 'points earned',
   },
   gameInfoPage: {
     retry: 'Retry',
@@ -289,6 +299,10 @@ export const en = {
     abandonedIdle: 'd+ idle',
     almostThere: 'Almost there (75–99%)',
     mastered100: 'Mastered & Completed — 100%',
+    reorderMasteredAria: 'Reorder mastered games',
+    reorderMasteredTitle: 'Reorder your mastered games',
+    dragToReorder: 'Drag to reorder',
+    close: 'Close',
     masteryAwards: 'Mastery & Awards',
     mastered: 'Mastered',
     completedSC: 'Completed SC',
