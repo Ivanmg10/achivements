@@ -25,6 +25,12 @@ export const de: Translations = {
     percent: '% abgeschlossen',
     points: 'Punkte',
   },
+  statusGrid: {
+    label: 'Rastergröße',
+    cols1: '1 pro Reihe',
+    cols2: '2 pro Reihe',
+    cols3: '3 pro Reihe',
+  },
   mainPage: {
     playing: 'Spiele gerade',
     noGamesInProgress: 'Gerade nichts in Arbeit',

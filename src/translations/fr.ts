@@ -25,6 +25,12 @@ export const fr: Translations = {
     percent: '% terminé',
     points: 'Points',
   },
+  statusGrid: {
+    label: 'Taille de grille',
+    cols1: '1 par ligne',
+    cols2: '2 par ligne',
+    cols3: '3 par ligne',
+  },
   mainPage: {
     playing: 'En cours',
     noGamesInProgress: 'Rien en cours pour le moment',

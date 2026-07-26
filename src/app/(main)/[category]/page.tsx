@@ -16,6 +16,7 @@ import StatusSortControl, {
   StatusSortState,
   defaultSortStateFor,
 } from '@/components/status-sort-control/StatusSortControl'
+import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import EmptyState from '../../../components/empty-state/EmptyState'
 import LoadingPage from '../../../components/loading-page/LoadingPage'
 import { useLanguage } from '@/context/LanguageContext'
@@ -32,6 +33,7 @@ export default function CategoryPage() {
   const { selected, toggle, clear } = useConsoleFilter()
   const cat = category as string
   const [sortState, setSortState] = useState<StatusSortState>(() => defaultSortStateFor(cat))
+  const [gridCols, setGridCols] = useState<StatusGridCols>(2)
 
   useEffect(() => {
     setSortState(defaultSortStateFor(cat))
@@ -90,6 +92,7 @@ export default function CategoryPage() {
                   <CompletedFilter value={completedMode} onChange={setCompletedMode} />
                 )}
                 <StatusSortControl cat={cat} sortState={sortState} onChange={setSortState} />
+                <StatusGridControl cols={gridCols} onChange={setGridCols} />
               </div>
             </div>
             {consolePills.length > 0 && (
@@ -110,7 +113,7 @@ export default function CategoryPage() {
                 className="min-h-[40vh]"
               />
             ) : (
-              <StatusGameList games={visibleGames} extraData={extraData} category={cat} />
+              <StatusGameList games={visibleGames} extraData={extraData} category={cat} gridCols={gridCols} />
             )}
           </>
         )}

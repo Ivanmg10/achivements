@@ -25,6 +25,12 @@ export const ru: Translations = {
     percent: '% завершения',
     points: 'Очки',
   },
+  statusGrid: {
+    label: 'Размер сетки',
+    cols1: '1 в ряд',
+    cols2: '2 в ряд',
+    cols3: '3 в ряд',
+  },
   mainPage: {
     playing: 'Играю',
     noGamesInProgress: 'Сейчас ничего не играется',

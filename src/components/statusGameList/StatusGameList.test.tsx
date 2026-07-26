@@ -21,3 +21,8 @@ test('renders without crashing with empty list', () => {
   const { container } = render(<StatusGameList games={[]} />)
   expect(container.firstChild).toBeInTheDocument()
 })
+
+test('positions items absolutely within a relatively-positioned container', () => {
+  const { container } = render(<StatusGameList games={mockGames} gridCols={3} />)
+  expect(container.firstChild).toHaveClass('relative')
+})

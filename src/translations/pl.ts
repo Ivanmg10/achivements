@@ -25,6 +25,12 @@ export const pl: Translations = {
     percent: '% ukończenia',
     points: 'Punkty',
   },
+  statusGrid: {
+    label: 'Rozmiar siatki',
+    cols1: '1 w rzędzie',
+    cols2: '2 w rzędzie',
+    cols3: '3 w rzędzie',
+  },
   mainPage: {
     playing: 'Gram',
     noGamesInProgress: 'Brak aktywnych gier',

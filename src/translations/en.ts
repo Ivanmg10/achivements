@@ -23,6 +23,12 @@ export const en = {
     percent: '% completed',
     points: 'Points',
   },
+  statusGrid: {
+    label: 'Grid size',
+    cols1: '1 per row',
+    cols2: '2 per row',
+    cols3: '3 per row',
+  },
   mainPage: {
     playing: 'Playing',
     noGamesInProgress: 'Nothing playing right now',

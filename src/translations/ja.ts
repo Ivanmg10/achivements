@@ -25,6 +25,12 @@ export const ja: Translations = {
     percent: '完了率',
     points: 'ポイント',
   },
+  statusGrid: {
+    label: 'グリッドサイズ',
+    cols1: '1列表示',
+    cols2: '2列表示',
+    cols3: '3列表示',
+  },
   mainPage: {
     playing: 'プレイ中',
     noGamesInProgress: '現在プレイ中のゲームはありません',

@@ -25,6 +25,12 @@ export const pt: Translations = {
     percent: '% concluído',
     points: 'Pontos',
   },
+  statusGrid: {
+    label: 'Tamanho da grade',
+    cols1: '1 por linha',
+    cols2: '2 por linha',
+    cols3: '3 por linha',
+  },
   mainPage: {
     playing: 'Jogando',
     noGamesInProgress: 'Nada em andamento agora',

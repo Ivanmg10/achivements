@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
 import { CategoryGame } from '../../hooks/useGamesByCategory'
@@ -199,7 +199,19 @@ const AchievementGrid = memo(function AchievementGrid({
   )
 })
 
-export default function StatusGameItem({ game, extra, category }: { game: CategoryGame; extra?: GameExtraData; category?: string }) {
+export default function StatusGameItem({
+  game,
+  extra,
+  category,
+  itemRef,
+  style,
+}: {
+  game: CategoryGame
+  extra?: GameExtraData
+  category?: string
+  itemRef?: (el: HTMLDivElement | null) => void
+  style?: CSSProperties
+}) {
   const [open, setOpen] = useState(false)
   const [gameData, setGameData] = useState<RetroAchievementsGameWithAchievements | null>(null)
   const [loading, setLoading] = useState(false)
@@ -252,35 +264,43 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
 
   return (
     <motion.div
-      className="bg-bg-card w-full rounded-xl overflow-hidden hover:ring-1 hover:ring-white/10 transition-shadow duration-150"
+      ref={itemRef}
+      layout
+      style={style}
+      className="bg-bg-card rounded-xl overflow-hidden hover:ring-1 hover:ring-white/10 transition-shadow duration-150"
       initial={{ opacity: 0, y: 8 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
+      transition={{ duration: 0.3, ease: 'easeOut', layout: { duration: 0.35, ease: 'easeInOut' } }}
     >
       <div
         onClick={handleToggle}
-        className="flex flex-row items-center gap-5 p-5 cursor-pointer hover:bg-bg-header/20 transition-colors select-none"
+        className="flex flex-row items-start gap-5 p-5 cursor-pointer hover:bg-bg-header/20 transition-colors select-none"
       >
         <Link
           href={`/gameInfo/${gameId}`}
           onClick={(e) => e.stopPropagation()}
-          className={`shrink-0 rounded-xl transition-all duration-150 ${
-            isHardcore ? 'ring-2 ring-yellow-400/70 hover:ring-yellow-400' : 'hover:ring-2 hover:ring-white/40'
-          }`}
+          className="shrink-0"
         >
           {game.ImageIcon && (
-            <Image
-              src={`https://retroachievements.org${game.ImageIcon}`}
-              alt={game.Title}
-              width={96}
-              height={96}
-              className="w-24 h-24 rounded-xl object-cover block"
-            />
+            <motion.div
+              layout
+              className={`w-24 h-24 rounded-xl overflow-hidden transition-all duration-150 ${
+                isHardcore ? 'ring-2 ring-yellow-400/70 hover:ring-yellow-400' : 'hover:ring-2 hover:ring-white/40'
+              }`}
+            >
+              <Image
+                src={`https://retroachievements.org${game.ImageIcon}`}
+                alt={game.Title}
+                width={96}
+                height={96}
+                className="w-24 h-24 rounded-xl object-cover block"
+              />
+            </motion.div>
           )}
         </Link>
 
-        <div className="flex flex-col flex-1 min-w-0 gap-1">
+        <motion.div layout className="flex flex-col flex-1 min-w-0 gap-1">
           <Link
             href={`/gameInfo/${gameId}`}
             onClick={(e) => e.stopPropagation()}
@@ -354,44 +374,50 @@ export default function StatusGameItem({ game, extra, category }: { game: Catego
               Last played · {extra?.lastPlayed ? new Date(extra.lastPlayed).toLocaleDateString() : 'a long time ago'}
             </p>
           )}
-        </div>
+        </motion.div>
 
         <span
-          className="text-text-secondary/50 text-xs shrink-0 transition-transform duration-300"
+          className="text-text-secondary/50 text-xs shrink-0 self-center transition-transform duration-300"
           style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
         >
           ▼
         </span>
       </div>
 
-      <div
-        className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
-          open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-        }`}
-      >
-        <div className="overflow-hidden min-h-0">
-          <div className="border-t border-bg-main px-4 py-4">
-            {loading ? (
-              <div className="flex flex-wrap gap-1">
-                {Array.from({ length: total > 0 ? total : 12 }).map((_, i) => (
-                  <div key={i} className="w-12 h-12 rounded-lg bg-bg-main animate-pulse" />
-                ))}
-              </div>
-            ) : achievements.length === 0 ? (
-              <p className="text-center text-text-secondary text-sm py-2">{T.statusGameItem.noPublishedAchievements}</p>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {completionDuration && (
-                  <p className="text-xs text-text-secondary/60">
-                    First → last unlock: <span className="text-text-secondary/90 font-medium">{completionDuration}</span>
-                  </p>
-                )}
-                <AchievementGrid achievements={achievements} numDistinctPlayers={gameData?.NumDistinctPlayers ?? 1} gameId={gameId} gameTitle={game.Title} />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="achievements"
+            layout
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="border-t border-bg-main px-4 py-4">
+              {loading ? (
+                <div className="flex flex-wrap gap-1">
+                  {Array.from({ length: total > 0 ? total : 12 }).map((_, i) => (
+                    <div key={i} className="w-12 h-12 rounded-lg bg-bg-main animate-pulse" />
+                  ))}
+                </div>
+              ) : achievements.length === 0 ? (
+                <p className="text-center text-text-secondary text-sm py-2">{T.statusGameItem.noPublishedAchievements}</p>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {completionDuration && (
+                    <p className="text-xs text-text-secondary/60">
+                      First → last unlock: <span className="text-text-secondary/90 font-medium">{completionDuration}</span>
+                    </p>
+                  )}
+                  <AchievementGrid achievements={achievements} numDistinctPlayers={gameData?.NumDistinctPlayers ?? 1} gameId={gameId} gameTitle={game.Title} />
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
