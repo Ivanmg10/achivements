@@ -378,6 +378,16 @@ export const en = {
     beaten: 'Beaten',
     completions: 'Completions during this streak',
   },
+  pointsStats: {
+    today: 'Today',
+    thisWeek: 'This week',
+    thisMonth: 'This month',
+    avgPerDay: 'Avg/day (30d)',
+    perDay: 'ach/day',
+    noActivity: 'no activity',
+    active: 'active',
+    noStreak: 'no streak',
+  },
   charts: {
     popularUnplayed: 'Popular — not yet played',
     popularPlayedAll: "You've played everything!",

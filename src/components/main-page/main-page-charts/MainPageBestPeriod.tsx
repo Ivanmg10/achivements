@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { RecentAchievement } from '@/types/types'
+import { getBestMonth } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import WeekAchievementsModal from '@/components/week-achievements-modal/WeekAchievementsModal'
@@ -31,17 +32,6 @@ function getBestWeek(achievements: RecentAchievement[]) {
     byWeek[key].ach++
   }
   return Object.entries(byWeek).sort((a, b) => b[1].pts - a[1].pts)[0] ?? null
-}
-
-function getBestMonth(achievements: RecentAchievement[]) {
-  const byMonth: Record<string, { pts: number; ach: number }> = {}
-  for (const a of achievements) {
-    const key = a.Date.slice(0, 7)
-    if (!byMonth[key]) byMonth[key] = { pts: 0, ach: 0 }
-    byMonth[key].pts += a.Points
-    byMonth[key].ach++
-  }
-  return Object.entries(byMonth).sort((a, b) => b[1].pts - a[1].pts)[0] ?? null
 }
 
 export default function MainPageBestPeriod({

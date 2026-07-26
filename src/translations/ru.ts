@@ -380,6 +380,16 @@ export const ru: Translations = {
     beaten: 'Пройдено',
     completions: 'Прохождения за эту серию',
   },
+  pointsStats: {
+    today: 'Сегодня',
+    thisWeek: 'На этой неделе',
+    thisMonth: 'В этом месяце',
+    avgPerDay: 'Сред/день (30д)',
+    perDay: 'достижений/день',
+    noActivity: 'нет активности',
+    active: 'активна',
+    noStreak: 'нет серии',
+  },
   charts: {
     popularUnplayed: 'Popular — not yet played',
     popularPlayedAll: "You've played everything!",

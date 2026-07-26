@@ -380,6 +380,16 @@ export const ja: Translations = {
     beaten: 'クリア',
     completions: 'このストリークでの達成',
   },
+  pointsStats: {
+    today: '今日',
+    thisWeek: '今週',
+    thisMonth: '今月',
+    avgPerDay: '平均/日 (30日)',
+    perDay: '実績/日',
+    noActivity: '活動なし',
+    active: '継続中',
+    noStreak: '連続記録なし',
+  },
   charts: {
     popularUnplayed: 'Popular — not yet played',
     popularPlayedAll: "You've played everything!",

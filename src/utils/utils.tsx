@@ -101,6 +101,33 @@ export function calcStreak(achievements: RecentAchievement[]): number {
   return count
 }
 
+export function getBestMonth(achievements: RecentAchievement[]): [string, { pts: number; ach: number }] | null {
+  const byMonth: Record<string, { pts: number; ach: number }> = {}
+  for (const a of achievements) {
+    const key = a.Date.slice(0, 7)
+    if (!byMonth[key]) byMonth[key] = { pts: 0, ach: 0 }
+    byMonth[key].pts += a.Points
+    byMonth[key].ach++
+  }
+  return Object.entries(byMonth).sort((a, b) => b[1].pts - a[1].pts)[0] ?? null
+}
+
+export function calcThisMonth(achievements: RecentAchievement[]): { pts: number; ach: number } {
+  const key = new Date().toISOString().slice(0, 7)
+  let pts = 0, ach = 0
+  for (const a of achievements) {
+    if (a.Date.slice(0, 7) === key) { pts += a.Points; ach++ }
+  }
+  return { pts, ach }
+}
+
+export function calcAvgPerDay(achievements: RecentAchievement[], days: number = 30): number {
+  if (!achievements.length) return 0
+  const cutoff = Date.now() - days * 86400000
+  const count = achievements.filter((a) => new Date(a.Date.replace(' ', 'T')).getTime() >= cutoff).length
+  return count / days
+}
+
 export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
   if (!achievements.length) return []
   const uniqueDays = [...new Set(achievements.map(a => a.Date.split(' ')[0]))].sort()

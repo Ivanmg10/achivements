@@ -380,6 +380,16 @@ export const fr: Translations = {
     beaten: 'Terminé',
     completions: 'Complétions durant cette série',
   },
+  pointsStats: {
+    today: "Aujourd'hui",
+    thisWeek: 'Cette semaine',
+    thisMonth: 'Ce mois-ci',
+    avgPerDay: 'Moy/jour (30j)',
+    perDay: 'succès/jour',
+    noActivity: 'aucune activité',
+    active: 'actif',
+    noStreak: 'aucune série',
+  },
   charts: {
     popularUnplayed: 'Popular — not yet played',
     popularPlayedAll: "You've played everything!",

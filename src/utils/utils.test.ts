@@ -1,4 +1,4 @@
-import { applyCustomOrder, calcStreak, compareSortValues, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, sumAchievementPoints } from "./utils";
+import { applyCustomOrder, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, sumAchievementPoints } from "./utils";
 
 describe("getRandomGameIds", () => {
   test("returns correct count", () => {
@@ -100,6 +100,56 @@ describe("calcStreak", () => {
       { Date: twoDaysAgo.toISOString().split("T")[0] + " 10:00:00" } as any,
     ];
     expect(calcStreak(achievements)).toBe(0);
+  });
+});
+
+describe("getBestMonth", () => {
+  test("returns null for empty array", () => {
+    expect(getBestMonth([])).toBeNull();
+  });
+
+  test("picks the month with the highest total points", () => {
+    const achievements = [
+      { Date: "2024-01-05 10:00:00", Points: 10 } as any,
+      { Date: "2024-01-15 10:00:00", Points: 10 } as any,
+      { Date: "2024-02-10 10:00:00", Points: 5 } as any,
+    ];
+    const result = getBestMonth(achievements);
+    expect(result?.[0]).toBe("2024-01");
+    expect(result?.[1]).toEqual({ pts: 20, ach: 2 });
+  });
+});
+
+describe("calcThisMonth", () => {
+  test("returns zero totals when there is no data", () => {
+    expect(calcThisMonth([])).toEqual({ pts: 0, ach: 0 });
+  });
+
+  test("sums only achievements from the current calendar month", () => {
+    const monthKey = new Date().toISOString().slice(0, 7);
+    const achievements = [
+      { Date: `${monthKey}-05 10:00:00`, Points: 10 } as any,
+      { Date: `${monthKey}-15 10:00:00`, Points: 5 } as any,
+      { Date: "2000-01-01 10:00:00", Points: 100 } as any,
+    ];
+    expect(calcThisMonth(achievements)).toEqual({ pts: 15, ach: 2 });
+  });
+});
+
+describe("calcAvgPerDay", () => {
+  test("returns 0 for empty array", () => {
+    expect(calcAvgPerDay([])).toBe(0);
+  });
+
+  test("counts only achievements within the given day window", () => {
+    const now = new Date();
+    const recent = new Date(now); recent.setDate(now.getDate() - 5);
+    const old = new Date(now); old.setDate(now.getDate() - 40);
+    const achievements = [
+      { Date: `${recent.toISOString().split("T")[0]} 10:00:00`, Points: 5 } as any,
+      { Date: `${old.toISOString().split("T")[0]} 10:00:00`, Points: 5 } as any,
+    ];
+    expect(calcAvgPerDay(achievements, 30)).toBeCloseTo(1 / 30);
   });
 });
 
