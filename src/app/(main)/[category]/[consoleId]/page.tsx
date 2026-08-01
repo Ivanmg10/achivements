@@ -17,8 +17,6 @@ import StatusSortControl, {
 import EmptyState from '../../../../components/empty-state/EmptyState'
 import LoadingPage from '../../../../components/loading-page/LoadingPage'
 import { useLanguage } from '@/context/LanguageContext'
-import { motion } from 'framer-motion'
-import { fadeUp } from '@/lib/animations'
 
 export default function CategoryConsolePage() {
   const { consoleId, category } = useParams()
@@ -46,12 +44,7 @@ export default function CategoryConsolePage() {
   const visibleGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
 
   return (
-    <motion.div
-      className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white"
-      variants={fadeUp}
-      initial="hidden"
-      animate="visible"
-    >
+    <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white">
       <div className="w-full lg:max-w-[98%] flex flex-col gap-3">
         {loading ? (
           <LoadingPage subtitle={
@@ -109,6 +102,6 @@ export default function CategoryConsolePage() {
           </>
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }
