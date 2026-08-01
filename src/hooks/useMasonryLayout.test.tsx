@@ -46,26 +46,26 @@ function Harness({
 }
 
 test('packs each item into the column with the least accumulated height', () => {
-  render(<Harness containerWidth={650} heights={[100, 50, 80, 20]} columns={2} gap={10} />)
+  render(<Harness containerWidth={810} heights={[100, 50, 80, 20]} columns={2} gap={10} />)
 
   expect(lastResult.positions).toEqual([
-    { top: 0, left: 0, width: 320 },
-    { top: 0, left: 330, width: 320 },
-    { top: 60, left: 330, width: 320 },
-    { top: 110, left: 0, width: 320 },
+    { top: 0, left: 0, width: 400 },
+    { top: 0, left: 410, width: 400 },
+    { top: 60, left: 410, width: 400 },
+    { top: 110, left: 0, width: 400 },
   ])
   expect(lastResult.containerHeight).toBe(140)
 })
 
-test('collapses to a single column below the sm breakpoint regardless of requested columns', () => {
+test('collapses to a single column below the mobile breakpoint regardless of requested columns', () => {
   render(<Harness containerWidth={500} heights={[100, 100]} columns={3} />)
 
   expect(lastResult.positions.every((p) => p.left === 0)).toBe(true)
   expect(lastResult.positions[0].width).toBe(500)
 })
 
-test('caps at 2 columns between the sm and lg breakpoints', () => {
-  render(<Harness containerWidth={700} heights={[100, 100, 100]} columns={3} />)
+test('caps at 2 columns between the mobile and lg breakpoints', () => {
+  render(<Harness containerWidth={900} heights={[100, 100, 100]} columns={3} />)
 
   const distinctLefts = new Set(lastResult.positions.map((p) => p.left))
   expect(distinctLefts.size).toBe(2)

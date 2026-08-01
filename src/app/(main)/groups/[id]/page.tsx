@@ -17,7 +17,7 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
+  rectSortingStrategy,
 } from '@dnd-kit/sortable'
 import { motion } from 'framer-motion'
 import {
@@ -39,10 +39,17 @@ import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDi
 import SortableItem from '@/components/groups/sortable-item/SortableItem'
 import AddGameModal from '@/components/groups/add-game-modal/AddGameModal'
 import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
+import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import { CONSOLES } from '@/constants'
 
 type PctFilter = 'all' | '0' | 'progress' | '100'
 type DecadeFilter = 'all' | '80s' | '90s' | '00s' | '10s' | '20s'
+
+const GRID_COLS_CLASS: Record<StatusGridCols, string> = {
+  1: 'grid-cols-1',
+  2: 'grid-cols-1 md:grid-cols-2',
+  3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+}
 
 function getDecade(year: number): DecadeFilter {
   if (year < 1990) return '80s'
@@ -122,6 +129,7 @@ export default function GroupDetailPage() {
   const [selectedConsoles, setSelectedConsoles] = useState<Set<string>>(new Set())
   const [pctFilter, setPctFilter] = useState<PctFilter>('all')
   const [decadeFilter, setDecadeFilter] = useState<DecadeFilter>('all')
+  const [gridCols, setGridCols] = useState<StatusGridCols>(1)
   const [releaseYears, setReleaseYears] = useState<Map<number, number>>(new Map())
   const fetchedIdsRef = useRef<Set<number>>(new Set())
   const saveOrderTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -434,7 +442,8 @@ export default function GroupDetailPage() {
               {group.items.length} {T.groups.games}
             </p>
           </div>
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
+            {group.items.length > 0 && <StatusGridControl cols={gridCols} onChange={setGridCols} />}
             <button
               onClick={() => setAddGameOpen(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-bg-main text-xs font-medium hover:bg-accent/90 transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
@@ -576,7 +585,7 @@ export default function GroupDetailPage() {
             </button>
           </div>
         ) : filtersActive ? (
-          <div className="flex flex-col gap-3">
+          <div className={`grid gap-3 ${GRID_COLS_CLASS[gridCols]}`}>
             {filteredItems.map((item) => (
               <SortableItem
                 key={item.id}
@@ -597,9 +606,9 @@ export default function GroupDetailPage() {
           >
             <SortableContext
               items={group.items.map((i) => i.id)}
-              strategy={verticalListSortingStrategy}
+              strategy={rectSortingStrategy}
             >
-              <div className="flex flex-col gap-3">
+              <div className={`grid gap-3 ${GRID_COLS_CLASS[gridCols]}`}>
                 {group.items.map((item) => (
                   <SortableItem
                     key={item.id}

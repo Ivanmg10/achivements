@@ -2,11 +2,11 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 
 export type MasonryPosition = { top: number; left: number; width: number }
 
-const BREAKPOINT_SM = 640
+const BREAKPOINT_MOBILE = 768
 const BREAKPOINT_LG = 1024
 
 function effectiveColumns(containerWidth: number, requestedColumns: number): number {
-  if (containerWidth < BREAKPOINT_SM) return 1
+  if (containerWidth < BREAKPOINT_MOBILE) return 1
   if (containerWidth < BREAKPOINT_LG) return Math.min(requestedColumns, 2)
   return requestedColumns
 }

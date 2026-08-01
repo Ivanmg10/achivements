@@ -187,38 +187,27 @@ export default function SortableItem({
               {item.console_name}
             </span>
           )}
-          <div className="flex items-center gap-2 mt-0.5">
-            <DualProgressBar
-              softcorePct={isComplete ? 0 : scPct}
-              hardcorePct={isComplete ? 0 : hcPct}
-              trackClass={isComplete ? 'bg-green-500/20' : 'bg-bg-main'}
-              className="w-full max-w-200"
-            />
-            <span className="text-xs text-text-secondary/60 tabular-nums">{pct}%</span>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-text-secondary/50">
-            {achTotal > 0 ? (
-              <span>
-                {scEarned}/{achTotal} logros
-              </span>
-            ) : (
-              <span>— logros</span>
-            )}
-            <span className="opacity-90">·</span>
-            {ptsTotal > 0 ? (
-              <span>
-                {ptsEarned}/{ptsTotal} pts
-              </span>
-            ) : (
-              <span>— pts</span>
-            )}
-            <span className="opacity-90">·</span>
-            <span>{lastPlayed ? relativeTime(lastPlayed) : 'No lo has jugado aun'}</span>
-            <span className="ml-auto text-[10px] text-text-secondary/60">
-              +{relativeTime(item.added_at)}
-            </span>
-          </div>
+          <p className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>
+            {achTotal > 0 ? `${Math.max(scEarned, hcEarned)} / ${achTotal}` : '—'} {T.statusGameItem.achievements}
+          </p>
+          {achTotal > 0 && (
+            <div className="flex items-center gap-2 mt-1">
+              <DualProgressBar
+                softcorePct={isComplete ? 0 : scPct}
+                hardcorePct={isComplete ? 0 : hcPct}
+                trackClass={isComplete ? 'bg-green-500/20' : 'bg-bg-main'}
+                className="w-40"
+              />
+              <span className="text-xs text-text-secondary/60 tabular-nums">{pct}%</span>
+            </div>
+          )}
+          <p className="text-xs text-text-secondary/60 mt-1">
+            {ptsTotal > 0 ? `${ptsEarned} / ${ptsTotal} ${T.statusGameItem.pointsEarned}` : '—'}
+          </p>
+          <p className="text-xs text-text-secondary/60 mt-1">
+            {lastPlayed ? relativeTime(lastPlayed) : 'No lo has jugado aun'}
+            <span className="text-text-secondary/40"> · +{relativeTime(item.added_at)}</span>
+          </p>
         </div>
 
         <div className="flex items-center gap-1 shrink-0">

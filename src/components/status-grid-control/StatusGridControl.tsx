@@ -21,7 +21,7 @@ export default function StatusGridControl({
   const { T } = useLanguage()
 
   return (
-    <div role="group" aria-label={T.statusGrid.label} className="flex items-center gap-0.5 bg-bg-card rounded-lg p-0.5">
+    <div role="group" aria-label={T.statusGrid.label} className="hidden md:flex items-center gap-0.5 bg-bg-card rounded-lg p-0.5">
       {OPTIONS.map(({ cols: optionCols, icon: Icon }) => {
         const active = cols === optionCols
         return (
