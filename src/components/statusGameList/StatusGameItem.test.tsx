@@ -49,9 +49,10 @@ test('prefers hardcore score over softcore score when both are present', () => {
   expect(screen.getByText(/200 \/ 200/)).toBeInTheDocument()
 })
 
-test('hides the points line when extra data has no possibleScore', () => {
+test('shows a placeholder instead of hiding the points line when extra data has no possibleScore', () => {
   render(<StatusGameItem game={completedGame} extra={{ awards: [] }} category="completed" />)
   expect(screen.queryByText((_, el) => el?.textContent === '150 / 200 points earned')).not.toBeInTheDocument()
+  expect(screen.getByText('—')).toBeInTheDocument()
 })
 
 test('renders total points only for a want-to-play game', () => {
