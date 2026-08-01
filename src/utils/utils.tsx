@@ -160,6 +160,47 @@ export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
   return streaks.sort((a, b) => b.days - a.days)
 }
 
+export function groupGameAchievementsByPeriod(
+  achievements: RetroAchievement[],
+  period: 'week' | 'month',
+): { label: string; count: number }[] {
+  const dated = achievements
+    .map((a) => a.DateEarnedHardcore ?? a.DateEarned)
+    .filter((d): d is string => !!d)
+    .map((d) => new Date(d.replace(' ', 'T')))
+    .filter((d) => !isNaN(d.getTime()))
+
+  if (period === 'month') {
+    const months = 6
+    const now = new Date()
+    const buckets = Array.from({ length: months }, (_, i) =>
+      new Date(now.getFullYear(), now.getMonth() - (months - 1 - i), 1).toISOString().slice(0, 7),
+    )
+    const grouped = dated.reduce((acc, d) => {
+      const key = d.toISOString().slice(0, 7)
+      acc[key] = (acc[key] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+    return buckets.map((label) => ({ label, count: grouped[label] || 0 }))
+  }
+
+  const weeks = 8
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const buckets = Array.from({ length: weeks }, (_, i) => {
+    const offset = weeks - 1 - i
+    const end = new Date(today)
+    end.setDate(end.getDate() - offset * 7)
+    const start = new Date(end)
+    start.setDate(start.getDate() - 6)
+    return { label: start.toISOString().slice(5, 10), start: start.getTime(), end: end.getTime() + 86399999 }
+  })
+  return buckets.map(({ label, start, end }) => ({
+    label,
+    count: dated.filter((d) => d.getTime() >= start && d.getTime() <= end).length,
+  }))
+}
+
 export function getGameSortValue(
   game: CategoryGame,
   extra: GameExtraData | undefined,
