@@ -1,21 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { IconPlus, IconFolder, IconLock, IconWorld } from '@tabler/icons-react'
-import { fadeUp } from '@/lib/animations'
+import { IconPlus } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import GroupModal from '@/components/groups/GroupModal'
-import GroupIcon from '@/components/groups/group-icon/GroupIcon'
-import { relativeTime } from '@/utils/utils'
+import GroupList from '@/components/groups/group-list/GroupList'
+import EmptyState from '@/components/empty-state/EmptyState'
+import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 
 export default function GroupsPage() {
   const { T } = useLanguage()
-  const { groups, isLoading, createGroup } = useGroups()
+  const { groups, isLoading, error, createGroup } = useGroups()
   const [modalOpen, setModalOpen] = useState(false)
+  const [gridCols, setGridCols] = useState<StatusGridCols>(2)
 
   async function handleCreate(data: {
     title: string
@@ -59,7 +58,7 @@ export default function GroupsPage() {
     <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4">
     <div className="w-full lg:max-w-[98%] flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-text-main">{T.groups.title}</h1>
           {groups.length > 0 && (
@@ -68,15 +67,18 @@ export default function GroupsPage() {
             </p>
           )}
         </div>
-        {groups.length < 10 && (
-          <button
-            onClick={() => setModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
-          >
-            <IconPlus className="w-4 h-4" aria-hidden />
-            {T.groups.newGroup}
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {groups.length > 0 && <StatusGridControl cols={gridCols} onChange={setGridCols} />}
+          {groups.length < 10 && (
+            <button
+              onClick={() => setModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
+            >
+              <IconPlus className="w-4 h-4" aria-hidden />
+              {T.groups.newGroup}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Content */}
@@ -92,72 +94,26 @@ export default function GroupsPage() {
             </div>
           ))}
         </div>
+      ) : error ? (
+        <p className="text-red-400 text-sm text-center mt-10">{error}</p>
       ) : groups.length === 0 ? (
-        <motion.div
-          className="flex flex-col items-center justify-center gap-3 py-20 text-center"
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-        >
-          <IconFolder className="w-16 h-16 text-text-secondary opacity-20" aria-hidden />
-          <p className="text-lg font-semibold text-text-main">{T.groups.noGroups}</p>
-          <p className="text-sm text-text-secondary max-w-xs">{T.groups.noGroupsSub}</p>
+        <>
+          <EmptyState
+            icon="📁"
+            title={T.groups.noGroups}
+            subtitle={T.groups.noGroupsSub}
+            className="min-h-[40vh]"
+          />
           <button
             onClick={() => setModalOpen(true)}
-            className="mt-2 px-5 py-2.5 rounded-xl bg-accent text-bg-main font-medium hover:bg-accent/90 transition-colors"
+            className="mx-auto px-5 py-2.5 rounded-xl bg-accent text-bg-main font-medium hover:bg-accent/90 transition-colors"
           >
             {T.groups.newGroup}
           </button>
-        </motion.div>
+        </>
       ) : (
         <div className="flex flex-col gap-3">
-          {groups.map((group, i) => (
-            <motion.div
-              key={group.id}
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: i * 0.05 }}
-            >
-              <Link
-                href={`/groups/${group.id}`}
-                className="flex items-center gap-4 bg-bg-card rounded-xl p-4 hover:bg-white/5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-              >
-                <GroupIcon group={group} />
-                <div className="flex flex-col min-w-0 flex-1 gap-1">
-                  {/* Title row */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold truncate group-hover:text-accent transition-colors">
-                      {group.title}
-                    </span>
-                    {group.is_public ? (
-                      <IconWorld className="w-3.5 h-3.5 text-accent/60 shrink-0" aria-label="Public" />
-                    ) : (
-                      <IconLock className="w-3.5 h-3.5 text-text-secondary/60 shrink-0" aria-label="Private" />
-                    )}
-                  </div>
-
-                  {/* Game count */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-text-secondary shrink-0">
-                      {group.game_count} {T.groups.games}
-                    </span>
-                  </div>
-
-                  {/* Stats + last activity */}
-                  <div className="flex items-center gap-2 text-xs text-text-secondary/50">
-                    {group.total_possible > 0 && (
-                      <>
-                        <span>{group.total_awarded}/{group.total_possible} logros</span>
-                        <span className="opacity-40">·</span>
-                      </>
-                    )}
-                    <span>{relativeTime(group.updated_at)}</span>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+          <GroupList groups={groups} gridCols={gridCols} />
 
           {groups.length < 10 && (
             <button

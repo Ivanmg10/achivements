@@ -2,12 +2,14 @@
 
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import Image from 'next/image'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
 import GameInfoProgressionHeader from './game-info-header-progression/GameInfoProgressionHeader'
 import GameHashesModal from './GameHashesModal'
 import { CONSOLES } from '@/constants'
 import { IconHash, IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { sumAchievementPoints } from '@/utils/utils'
+import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 
 type StatusKey = 'mastered' | 'completed' | 'beatenHC' | 'beaten' | 'inProgress'
 
@@ -43,6 +45,7 @@ export default function GameInfoHeader({
   const [hashesOpen, setHashesOpen] = useState(false)
 
   const status = gameData ? deriveStatus(gameData) : null
+  const points = useMemo(() => sumAchievementPoints(gameData?.Achievements ?? {}), [gameData])
 
   return (
     <section className="relative bg-transparent p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_400px] mt-5 overflow-hidden">
@@ -82,6 +85,7 @@ export default function GameInfoHeader({
                 {T.gameStatus[status]}
               </span>
             )}
+            {gameData?.ID && <PinToggleButton gameId={gameData.ID} />}
           </div>
 
           <GameInfoProgressionHeader gameData={gameData} />
@@ -136,6 +140,13 @@ export default function GameInfoHeader({
         >
           {gameData?.NumAwardedToUser} / {gameData?.NumAchievements}
         </p>
+        {points.total > 0 && (
+          <p
+            className={`hidden lg:block text-sm ${points.earned === points.total ? 'bg-success/20 text-success' : 'bg-bg-card text-text-secondary'} px-4 py-1.5 rounded-full text-center whitespace-nowrap`}
+          >
+            {points.earned} / {points.total} {T.statusGameItem.pointsTotal}
+          </p>
+        )}
 
         {(gameData?.ImageTitle || gameData?.ImageIngame) && (
           <div className="grid grid-cols-2 gap-2 w-full max-w-sm lg:max-w-none">

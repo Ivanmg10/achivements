@@ -1,5 +1,8 @@
 import { ragamesIds } from '@/constants/ragamesidpool'
-import { RecentAchievement, RetroAchievementsGameCompleted, Streak } from '@/types/types'
+import { RecentAchievement, RetroAchievement, RetroAchievementsGameCompleted, Streak } from '@/types/types'
+import { CategoryGame } from '@/hooks/useGamesByCategory'
+import { GameExtraData } from '@/components/statusGameList/StatusGameList'
+import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
 
 export function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '—'
@@ -98,6 +101,33 @@ export function calcStreak(achievements: RecentAchievement[]): number {
   return count
 }
 
+export function getBestMonth(achievements: RecentAchievement[]): [string, { pts: number; ach: number }] | null {
+  const byMonth: Record<string, { pts: number; ach: number }> = {}
+  for (const a of achievements) {
+    const key = a.Date.slice(0, 7)
+    if (!byMonth[key]) byMonth[key] = { pts: 0, ach: 0 }
+    byMonth[key].pts += a.Points
+    byMonth[key].ach++
+  }
+  return Object.entries(byMonth).sort((a, b) => b[1].pts - a[1].pts)[0] ?? null
+}
+
+export function calcThisMonth(achievements: RecentAchievement[]): { pts: number; ach: number } {
+  const key = new Date().toISOString().slice(0, 7)
+  let pts = 0, ach = 0
+  for (const a of achievements) {
+    if (a.Date.slice(0, 7) === key) { pts += a.Points; ach++ }
+  }
+  return { pts, ach }
+}
+
+export function calcAvgPerDay(achievements: RecentAchievement[], days: number = 30): number {
+  if (!achievements.length) return 0
+  const cutoff = Date.now() - days * 86400000
+  const count = achievements.filter((a) => new Date(a.Date.replace(' ', 'T')).getTime() >= cutoff).length
+  return count / days
+}
+
 export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
   if (!achievements.length) return []
   const uniqueDays = [...new Set(achievements.map(a => a.Date.split(' ')[0]))].sort()
@@ -128,4 +158,118 @@ export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
   }
   streaks.push(makeStreak(start, prev))
   return streaks.sort((a, b) => b.days - a.days)
+}
+
+export function groupGameAchievementsByPeriod(
+  achievements: RetroAchievement[],
+  period: 'week' | 'month',
+): { label: string; count: number }[] {
+  const dated = achievements
+    .map((a) => a.DateEarnedHardcore ?? a.DateEarned)
+    .filter((d): d is string => !!d)
+    .map((d) => new Date(d.replace(' ', 'T')))
+    .filter((d) => !isNaN(d.getTime()))
+
+  if (period === 'month') {
+    const months = 6
+    const now = new Date()
+    const buckets = Array.from({ length: months }, (_, i) =>
+      new Date(now.getFullYear(), now.getMonth() - (months - 1 - i), 1).toISOString().slice(0, 7),
+    )
+    const grouped = dated.reduce((acc, d) => {
+      const key = d.toISOString().slice(0, 7)
+      acc[key] = (acc[key] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+    return buckets.map((label) => ({ label, count: grouped[label] || 0 }))
+  }
+
+  const weeks = 8
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const buckets = Array.from({ length: weeks }, (_, i) => {
+    const offset = weeks - 1 - i
+    const end = new Date(today)
+    end.setDate(end.getDate() - offset * 7)
+    const start = new Date(end)
+    start.setDate(start.getDate() - 6)
+    return { label: start.toISOString().slice(5, 10), start: start.getTime(), end: end.getTime() + 86399999 }
+  })
+  return buckets.map(({ label, start, end }) => ({
+    label,
+    count: dated.filter((d) => d.getTime() >= start && d.getTime() <= end).length,
+  }))
+}
+
+export function getGameSortValue(
+  game: CategoryGame,
+  extra: GameExtraData | undefined,
+  key: StatusSortKey,
+): string | number | null {
+  const isWantToPlay = 'PointsTotal' in game
+
+  switch (key) {
+    case 'name':
+      return game.Title
+    case 'lastPlayed':
+      return isWantToPlay ? null : (extra?.lastPlayed ?? null)
+    case 'percent':
+      return isWantToPlay ? null : (parseFloat((game as RetroAchievementsGameCompleted).PctWon) || 0) * 100
+    case 'points':
+      if (isWantToPlay) return game.PointsTotal
+      if (extra?.possibleScore == null) return null
+      return extra.scoreAchievedHardcore || extra.scoreAchieved || 0
+  }
+}
+
+export function compareSortValues(
+  a: string | number | null,
+  b: string | number | null,
+  dir: SortDir,
+): number {
+  if (a === null && b === null) return 0
+  if (a === null) return 1
+  if (b === null) return -1
+  const cmp = typeof a === 'string' || typeof b === 'string'
+    ? String(a).localeCompare(String(b))
+    : a - b
+  return dir === 'asc' ? cmp : -cmp
+}
+
+export function applyCustomOrder(
+  perfects: RetroAchievementsGameCompleted[],
+  savedOrder: number[],
+): RetroAchievementsGameCompleted[] {
+  const byId = new Map(perfects.map((g) => [g.GameID, g]))
+  const ordered: RetroAchievementsGameCompleted[] = []
+  const seen = new Set<number>()
+
+  for (const id of savedOrder) {
+    const g = byId.get(id)
+    if (g) {
+      ordered.push(g)
+      seen.add(id)
+    }
+  }
+
+  const rest = perfects
+    .filter((g) => !seen.has(g.GameID))
+    .sort((a, b) => a.Title.localeCompare(b.Title))
+
+  return [...ordered, ...rest]
+}
+
+export function sumAchievementPoints(
+  achievements: Record<string, RetroAchievement | undefined | null>,
+  hardcoreOnly = false,
+): { earned: number; total: number } {
+  let earned = 0
+  let total = 0
+  for (const a of Object.values(achievements)) {
+    if (!a) continue
+    total += a.Points
+    const isEarned = hardcoreOnly ? !!a.DateEarnedHardcore : !!(a.DateEarned || a.DateEarnedHardcore)
+    if (isEarned) earned += a.Points
+  }
+  return { earned, total }
 }

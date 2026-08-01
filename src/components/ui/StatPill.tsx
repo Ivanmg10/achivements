@@ -8,6 +8,7 @@ export function StatPill({
   size = 'lg',
   className = '',
   href,
+  onClick,
 }: {
   label: string
   value: string | number
@@ -16,7 +17,10 @@ export function StatPill({
   size?: 'sm' | 'lg'
   className?: string
   href?: string
+  onClick?: () => void
 }) {
+  const interactiveCls = 'text-left hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+
   if (size === 'sm') {
     const inner = (
       <>
@@ -26,9 +30,9 @@ export function StatPill({
       </>
     )
     const cls = `bg-bg-main rounded-xl p-2 flex flex-col items-center gap-0.5 ${className}`
-    return href
-      ? <Link href={href} className={`${cls} hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}>{inner}</Link>
-      : <div className={cls}>{inner}</div>
+    if (href) return <Link href={href} className={`${cls} ${interactiveCls}`}>{inner}</Link>
+    if (onClick) return <button type="button" onClick={onClick} className={`${cls} ${interactiveCls}`}>{inner}</button>
+    return <div className={cls}>{inner}</div>
   }
 
   const inner = (
@@ -39,9 +43,9 @@ export function StatPill({
     </>
   )
   const cls = `bg-bg-main rounded-xl px-5 py-3 flex flex-col gap-0.5 flex-1 min-w-30 ${className}`
-  return href
-    ? <Link href={href} className={`${cls} hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}>{inner}</Link>
-    : <div className={cls}>{inner}</div>
+  if (href) return <Link href={href} className={`${cls} ${interactiveCls}`}>{inner}</Link>
+  if (onClick) return <button type="button" onClick={onClick} className={`${cls} ${interactiveCls}`}>{inner}</button>
+  return <div className={cls}>{inner}</div>
 }
 
 export function StatCard({

@@ -49,3 +49,28 @@ test("shows console icon for known consoles", () => {
   const imgs = screen.getAllByRole("img");
   expect(imgs.length).toBeGreaterThan(0);
 });
+
+test("shows total points for a want-to-play game", () => {
+  const wantToPlay = [{ ...games[0], PointsTotal: 450, GameID: 1 }];
+  render(<MainPageGamesList listGames={wantToPlay} />);
+  expect(screen.getByText("450 pts")).toBeInTheDocument();
+});
+
+test("hides points line for a want-to-play game with zero total points", () => {
+  const wantToPlay = [{ ...games[0], PointsTotal: 0, GameID: 1 }];
+  render(<MainPageGamesList listGames={wantToPlay} />);
+  expect(screen.queryByText(/pts/)).not.toBeInTheDocument();
+});
+
+test("shows earned/total points for a playing game when extraData is present", () => {
+  const playing = [{ ...games[1], GameID: 2 }];
+  const extraData = new Map([[2, { awards: [], possibleScore: 200, scoreAchieved: 120, scoreAchievedHardcore: 0 }]]);
+  render(<MainPageGamesList listGames={playing} extraData={extraData} />);
+  expect(screen.getByText("120/200 pts")).toBeInTheDocument();
+});
+
+test("hides points line for a playing game when extraData is missing", () => {
+  const playing = [{ ...games[1], GameID: 2 }];
+  render(<MainPageGamesList listGames={playing} />);
+  expect(screen.queryByText(/pts/)).not.toBeInTheDocument();
+});

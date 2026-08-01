@@ -3,19 +3,9 @@ jest.mock('@/components/main-page/main-page-profile/MainPageProfile', () => ({
   default: () => <div data-testid="profile">Profile</div>,
 }))
 
-jest.mock('@/components/main-page/main-page-want-to-play/MainPageWantToPlay', () => ({
+jest.mock('@/components/main-page/main-page-pinned-games/MainPagePinnedGames', () => ({
   __esModule: true,
-  default: () => <div data-testid="want-to-play">WantToPlay</div>,
-}))
-
-jest.mock('@/components/main-page/main-page-games/MainPageGames', () => ({
-  __esModule: true,
-  default: () => <div data-testid="games">Games</div>,
-}))
-
-jest.mock('@/components/main-page/main-page-completed/MainPageCompleted', () => ({
-  __esModule: true,
-  default: () => <div data-testid="completed">Completed</div>,
+  default: () => <div data-testid="pinned-games">PinnedGames</div>,
 }))
 
 jest.mock('@/components/main-page/main-page-no-ra/MainPageNoRa', () => ({
@@ -44,7 +34,7 @@ jest.mock('@/components/main-page/main-page-progression/MainPageProgression', ()
 }))
 
 jest.mock('@/context/MainViewContext', () => ({
-  useMainView: () => ({ view: 'panels' }),
+  useMainView: () => ({ view: 'pinned' }),
   MainViewProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
@@ -59,6 +49,15 @@ test('renders profile when authenticated with raUser', () => {
   })
   render(<MainPage />)
   expect(screen.getByTestId('profile')).toBeInTheDocument()
+})
+
+test('renders the pinned games section when view is "pinned"', () => {
+  ;(useSession as jest.Mock).mockReturnValue({
+    status: 'authenticated',
+    data: { user: { raUser: { User: 'Ivan' } } },
+  })
+  render(<MainPage />)
+  expect(screen.getByTestId('pinned-games')).toBeInTheDocument()
 })
 
 test('renders loading page when status is loading', () => {

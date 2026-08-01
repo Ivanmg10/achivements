@@ -7,6 +7,8 @@ module.exports = {
   ResponsiveContainer: mock("ResponsiveContainer"),
   LineChart: mock("LineChart"),
   Line: mock("Line"),
+  BarChart: mock("BarChart"),
+  Bar: mock("Bar"),
   CartesianGrid: mock("CartesianGrid"),
   XAxis: mock("XAxis"),
   YAxis: mock("YAxis"),

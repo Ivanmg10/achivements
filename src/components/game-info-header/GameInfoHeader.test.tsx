@@ -39,3 +39,32 @@ test("renders without console icon when ConsoleID not in CONSOLES", () => {
   render(<GameInfoHeader gameData={{ ...mockGameData, ConsoleID: 999 }} />);
   expect(screen.getByText("Sly Cooper")).toBeInTheDocument();
 });
+
+test("does not render points pill when there are no achievements", () => {
+  render(<GameInfoHeader gameData={mockGameData} />);
+  expect(screen.queryByText(/pts|points/)).not.toBeInTheDocument();
+});
+
+test("renders points pill with earned/total when achievements are present", () => {
+  const gameData = {
+    ...mockGameData,
+    Achievements: {
+      a: { Points: 10, DateEarned: "2024-01-01" },
+      b: { Points: 5 },
+    },
+  };
+  render(<GameInfoHeader gameData={gameData} />);
+  expect(screen.getByText("10 / 15 points")).toBeInTheDocument();
+});
+
+test("highlights points pill when all points earned", () => {
+  const gameData = {
+    ...mockGameData,
+    Achievements: {
+      a: { Points: 10, DateEarned: "2024-01-01" },
+      b: { Points: 5, DateEarnedHardcore: "2024-01-02" },
+    },
+  };
+  render(<GameInfoHeader gameData={gameData} />);
+  expect(screen.getByText("15 / 15 points")).toBeInTheDocument();
+});
