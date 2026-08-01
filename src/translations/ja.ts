@@ -45,6 +45,17 @@ export const ja: Translations = {
     noGamesCompleted: '{tab}モードで完了したゲームはありません',
     noGamesCompletedSub: 'ゲームを完了するとここに表示されます',
   },
+  pinnedGames: {
+    title: 'Pinned games',
+    viewRecentAria: 'View recently played',
+    viewPinnedAria: 'View pinned games',
+    pinAria: 'Pin game',
+    unpinAria: 'Unpin game',
+    error: "Couldn't update pin, please try again",
+    addAria: 'Pin a game',
+    searchPlaceholder: 'Search a game to pin…',
+    confirmPin: 'Pin',
+  },
   userData: {
     welcome: 'ようこそ',
     email: 'メール',

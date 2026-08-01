@@ -45,6 +45,17 @@ export const ru: Translations = {
     noGamesCompleted: 'Нет завершённых игр в режиме {tab}',
     noGamesCompletedSub: 'Завершите игру, и она появится здесь',
   },
+  pinnedGames: {
+    title: 'Pinned games',
+    viewRecentAria: 'View recently played',
+    viewPinnedAria: 'View pinned games',
+    pinAria: 'Pin game',
+    unpinAria: 'Unpin game',
+    error: "Couldn't update pin, please try again",
+    addAria: 'Pin a game',
+    searchPlaceholder: 'Search a game to pin…',
+    confirmPin: 'Pin',
+  },
   userData: {
     welcome: 'Добро пожаловать',
     email: 'Email',

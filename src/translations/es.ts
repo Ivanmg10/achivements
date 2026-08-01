@@ -45,6 +45,17 @@ export const es: Translations = {
     noGamesCompleted: 'Sin completados en modo {tab}',
     noGamesCompletedSub: 'Completa un juego y aparecerá aquí',
   },
+  pinnedGames: {
+    title: 'Juegos fijados',
+    viewRecentAria: 'Ver jugados recientemente',
+    viewPinnedAria: 'Ver juegos fijados',
+    pinAria: 'Fijar juego',
+    unpinAria: 'Quitar fijado',
+    error: 'No se pudo actualizar el fijado, inténtalo de nuevo',
+    addAria: 'Fijar un juego',
+    searchPlaceholder: 'Buscar un juego para fijar…',
+    confirmPin: 'Fijar',
+  },
   userData: {
     welcome: 'Bienvenido',
     email: 'Email',

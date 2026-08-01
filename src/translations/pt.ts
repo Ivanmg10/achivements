@@ -45,6 +45,17 @@ export const pt: Translations = {
     noGamesCompleted: 'Nenhum jogo concluído em {tab}',
     noGamesCompletedSub: 'Conclua um jogo e ele aparecerá aqui',
   },
+  pinnedGames: {
+    title: 'Pinned games',
+    viewRecentAria: 'View recently played',
+    viewPinnedAria: 'View pinned games',
+    pinAria: 'Pin game',
+    unpinAria: 'Unpin game',
+    error: "Couldn't update pin, please try again",
+    addAria: 'Pin a game',
+    searchPlaceholder: 'Search a game to pin…',
+    confirmPin: 'Pin',
+  },
   userData: {
     welcome: 'Bem-vindo',
     email: 'E-mail',

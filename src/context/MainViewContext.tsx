@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState } from 'react'
 
-type MainView = 'panels' | 'recent'
+type MainView = 'pinned' | 'recent'
 
 const MainViewContext = createContext<{
   view: MainView

@@ -43,6 +43,17 @@ export const en = {
     noGamesCompleted: 'No {tab} completions yet',
     noGamesCompletedSub: 'Complete a game and it will appear here',
   },
+  pinnedGames: {
+    title: 'Pinned games',
+    viewRecentAria: 'View recently played',
+    viewPinnedAria: 'View pinned games',
+    pinAria: 'Pin game',
+    unpinAria: 'Unpin game',
+    error: "Couldn't update pin, please try again",
+    addAria: 'Pin a game',
+    searchPlaceholder: 'Search a game to pin…',
+    confirmPin: 'Pin',
+  },
   userData: {
     welcome: 'Welcome',
     email: 'Email',

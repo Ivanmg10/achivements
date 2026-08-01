@@ -9,6 +9,7 @@ import { CONSOLES } from '@/constants'
 import { IconHash, IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { sumAchievementPoints } from '@/utils/utils'
+import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 
 type StatusKey = 'mastered' | 'completed' | 'beatenHC' | 'beaten' | 'inProgress'
 
@@ -84,6 +85,7 @@ export default function GameInfoHeader({
                 {T.gameStatus[status]}
               </span>
             )}
+            {gameData?.ID && <PinToggleButton gameId={gameData.ID} />}
           </div>
 
           <GameInfoProgressionHeader gameData={gameData} />
