@@ -3,12 +3,13 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { IconEdit } from '@tabler/icons-react'
+import { IconEdit, IconTrophy } from '@tabler/icons-react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePerfectGamesOrder } from '@/hooks/usePerfectGamesOrder'
 import { applyCustomOrder } from '@/utils/utils'
 import PerfectGamesOrderModal from '@/components/main-page/perfect-games-order-modal/PerfectGamesOrderModal'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 export default function MainPagePerfectGames({ games, isLoading }: { games: RetroAchievementsGameCompleted[]; isLoading?: boolean }) {
   const { T } = useLanguage()
@@ -62,7 +63,13 @@ export default function MainPagePerfectGames({ games, isLoading }: { games: Retr
         >
           {T.cards.mastered100}
         </Link>
-        <div className="flex items-center justify-center py-8 text-text-secondary text-sm">{T.cards.noCompletedGames}</div>
+        <EmptyState
+          icon={<IconTrophy className="w-6 h-6" />}
+          title={T.cards.noCompletedGames}
+          subtitle={T.cards.noCompletedGamesSub}
+          size="compact"
+          className="py-2"
+        />
       </div>
     )
   }

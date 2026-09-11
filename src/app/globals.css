@@ -3,6 +3,8 @@
 /* tokens que Tailwind convierte en utilidades */
 
 @theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
   --color-bg-main: rgb(var(--bg-main));
   --color-bg-header: rgb(var(--bg-header));
   --color-bg-deep: rgb(var(--bg-deep));

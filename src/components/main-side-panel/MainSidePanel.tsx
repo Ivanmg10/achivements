@@ -14,7 +14,7 @@ import MainSidePanelStats from './main-side-panel-stats/MainSidePanelStats'
 
 export default function MainSidePanel() {
   const { data: session } = useSession()
-  const { achievements: recentAch } = useRecentAchievements()
+  const { achievements: recentAch, isLoading: achievementsLoading } = useRecentAchievements()
   const { T } = useLanguage()
 
   const { activeStreak } = useStreakData()
@@ -48,7 +48,9 @@ export default function MainSidePanel() {
 
       {raUser && <MainSidePanelStats raUser={raUser} streak={streak} />}
 
-      {lastAch && <MainSidePanelLastAchievement achievement={lastAch} />}
+      {raUser && (
+        <MainSidePanelLastAchievement achievement={lastAch} isLoading={achievementsLoading} />
+      )}
 
       <MainSidePanelCategories />
     </aside>

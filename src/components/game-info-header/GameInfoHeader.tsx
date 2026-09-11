@@ -10,6 +10,7 @@ import { IconHash, IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { sumAchievementPoints } from '@/utils/utils'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
+import GameInfoHeaderStatsBadge from './game-info-header-stats-badge/GameInfoHeaderStatsBadge'
 
 type StatusKey = 'mastered' | 'completed' | 'beatenHC' | 'beaten' | 'inProgress'
 
@@ -46,6 +47,8 @@ export default function GameInfoHeader({
 
   const status = gameData ? deriveStatus(gameData) : null
   const points = useMemo(() => sumAchievementPoints(gameData?.Achievements ?? {}), [gameData])
+  const achievementsDone = (gameData?.NumAchievements ?? 0) > 0 && gameData?.NumAwardedToUser === gameData?.NumAchievements
+  const pointsDone = points.total > 0 && points.earned === points.total
 
   return (
     <section className="relative bg-transparent p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_400px] mt-5 overflow-hidden">
@@ -92,23 +95,23 @@ export default function GameInfoHeader({
           {children}
           <ul className="flex flex-col gap-1 text-sm">
             <li>
-              <span className="text-text-secondary">ID: </span>
+              <span className="text-text-secondary">{T.gameInfoPage.id}: </span>
               {gameData?.ID}
             </li>
             <li>
-              <span className="text-text-secondary">Publisher: </span>
+              <span className="text-text-secondary">{T.gameInfoPage.publisher}: </span>
               {gameData?.Publisher ?? '—'}
             </li>
             <li>
-              <span className="text-text-secondary">Developer: </span>
+              <span className="text-text-secondary">{T.gameInfoPage.developer}: </span>
               {gameData?.Developer ?? '—'}
             </li>
             <li>
-              <span className="text-text-secondary">Genre: </span>
+              <span className="text-text-secondary">{T.gameInfoPage.genre}: </span>
               {gameData?.Genre ?? '—'}
             </li>
             <li>
-              <span className="text-text-secondary">Released: </span>
+              <span className="text-text-secondary">{T.gameInfoPage.released}: </span>
               {gameData?.Released ?? '—'}
             </li>
           </ul>
@@ -119,7 +122,7 @@ export default function GameInfoHeader({
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
               >
                 <IconHash className="w-3.5 h-3.5" />
-                Hashes compatibles
+                {T.gameInfoPage.hashesCompatible}
               </button>
               <a
                 href={`https://retroachievements.org/game/${gameData.ID}`}
@@ -128,26 +131,25 @@ export default function GameInfoHeader({
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
               >
                 <IconExternalLink className="w-3.5 h-3.5" />
-                RetroAchievements
+                {T.profileRa.viewOnRA}
               </a>
             </div>
           )}
         </div>
       </div>
       <div className="relative z-10 flex flex-col items-center lg:items-end gap-4 lg:justify-between mt-4 lg:mt-0">
-        <p
-          className={`hidden lg:block text-2xl ${gameData?.NumAwardedToUser == gameData?.NumAchievements ? 'bg-success/20 text-success' : 'bg-bg-card'} px-5 py-3 rounded-full text-center whitespace-nowrap`}
-        >
-          {gameData?.NumAwardedToUser} / {gameData?.NumAchievements}
-        </p>
-        {points.total > 0 && (
-          <p
-            className={`hidden lg:block text-sm ${points.earned === points.total ? 'bg-success/20 text-success' : 'bg-bg-card text-text-secondary'} px-4 py-1.5 rounded-full text-center whitespace-nowrap`}
-          >
-            {points.earned} / {points.total} {T.statusGameItem.pointsTotal}
-          </p>
+        {gameData?.ID && (
+          <div className="flex flex-wrap justify-center lg:justify-end gap-2">
+            <GameInfoHeaderStatsBadge
+              label={T.gameInfoPage.achievements}
+              value={`${gameData.NumAwardedToUser ?? 0} / ${gameData.NumAchievements ?? 0}`}
+              done={achievementsDone}
+            />
+            {points.total > 0 && (
+              <GameInfoHeaderStatsBadge label={T.gameInfoPage.points} value={`${points.earned} / ${points.total}`} done={pointsDone} />
+            )}
+          </div>
         )}
-
         {(gameData?.ImageTitle || gameData?.ImageIngame) && (
           <div className="grid grid-cols-2 gap-2 w-full max-w-sm lg:max-w-none">
             {gameData.ImageTitle && (

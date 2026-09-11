@@ -4,7 +4,7 @@ import { useUserAwards } from './useUserAwards'
 import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 
 export function useGameExtraData(): Map<number, GameExtraData> {
-  const recentGames = useRecentlyPlayedGames()
+  const { games: recentGames } = useRecentlyPlayedGames()
   const { awards } = useUserAwards()
 
   return useMemo(() => {

@@ -10,6 +10,7 @@ module.exports = {
     "^next/image$": "<rootDir>/__mocks__/next/image.js",
     "^next/link$": "<rootDir>/__mocks__/next/link.js",
     "^next/navigation$": "<rootDir>/__mocks__/next/navigation.js",
+    "^next/font/google$": "<rootDir>/__mocks__/next/font/google.js",
     "^next/server$": "<rootDir>/__mocks__/next/server.js",
     "^next-auth$": "<rootDir>/__mocks__/next-auth.js",
     "^next-auth/react$": "<rootDir>/__mocks__/next-auth/react.js",

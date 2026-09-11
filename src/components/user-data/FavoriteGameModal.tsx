@@ -168,7 +168,7 @@ export default function FavoriteGameModal({ isOpen, current, onClose, onSave }: 
               <div className="max-h-96 overflow-y-auto">
                 {results.length === 0 ? (
                   <div className="py-8 text-center text-text-secondary text-sm">
-                    {query ? 'No results' : 'No games in library'}
+                    {query ? T.userData.favoriteGameNoResults : T.userData.favoriteGameNoGames}
                   </div>
                 ) : (
                   <motion.ul

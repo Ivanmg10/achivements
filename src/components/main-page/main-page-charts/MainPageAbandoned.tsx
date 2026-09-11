@@ -1,11 +1,13 @@
 'use client'
 
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
+import { IconMoodEmpty } from '@tabler/icons-react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { useLanguage } from '@/context/LanguageContext'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 const ABANDONED_DAYS = 30
 
@@ -78,9 +80,13 @@ export default function MainPageAbandoned({
       {loading ? (
         <SkeletonGameList count={3} />
       ) : abandoned.length === 0 ? (
-        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">
-          {T.cards.noAbandonedGames}
-        </div>
+        <EmptyState
+          icon={<IconMoodEmpty className="w-6 h-6" />}
+          title={T.cards.noAbandonedGames}
+          subtitle={T.cards.noAbandonedGamesSub}
+          size="compact"
+          className="py-2"
+        />
       ) : (
         <div className="flex flex-col gap-2">
           {abandoned.slice(0, 6).map((g) => (

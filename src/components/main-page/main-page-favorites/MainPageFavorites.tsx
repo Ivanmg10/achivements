@@ -5,9 +5,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import { AnimatePresence } from 'framer-motion'
+import { IconStar } from '@tabler/icons-react'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 interface FavoriteRow {
   achievement_id: number
@@ -72,9 +74,12 @@ export default function MainPageFavorites() {
       )}
 
       {!loading && favorites.length === 0 && (
-        <div className="flex-1 flex items-center justify-center text-text-secondary text-sm text-center px-2 py-6">
-          {T.favorites.empty}
-        </div>
+        <EmptyState
+          icon={<IconStar className="w-6 h-6" />}
+          title={T.favorites.emptyTitle}
+          subtitle={T.favorites.empty}
+          size="compact"
+        />
       )}
 
       {!loading && favorites.length > 0 && (

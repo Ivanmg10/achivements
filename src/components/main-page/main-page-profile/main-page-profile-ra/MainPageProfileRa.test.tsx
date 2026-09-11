@@ -38,3 +38,9 @@ test('renders without UserPic', () => {
   render(<MainPageProfileRa user={{ ...mockUser, UserPic: undefined as any }} game={mockGame} recentAchievements={[]} />)
   expect(screen.getByText('IvanXMarine')).toBeInTheDocument()
 })
+
+test('keeps the recent achievements block visible with an empty state instead of collapsing when there is none', () => {
+  render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} achievementsLoading={false} />)
+  expect(screen.getByText('Recent achievements')).toBeInTheDocument()
+  expect(screen.getByText('No achievements earned yet')).toBeInTheDocument()
+})

@@ -6,6 +6,7 @@ import { fetchWithRetry } from '@/lib/fetchWithRetry'
 export function useRecentlyPlayedGames() {
   const { status } = useSession()
   const [games, setGames] = useState<RecentlyPlayedGame[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -21,6 +22,7 @@ export function useRecentlyPlayedGames() {
           return
         }
         setGames(data as RecentlyPlayedGame[])
+        setIsLoading(false)
         attemptRef.current = 0
       })
       .catch(() => {
@@ -36,6 +38,7 @@ export function useRecentlyPlayedGames() {
       clearTimeout(retryTimer.current)
       attemptRef.current = 0
       setGames([])
+      setIsLoading(false)
       return
     }
     if (status !== 'authenticated' || hasFetched.current) return
@@ -45,5 +48,5 @@ export function useRecentlyPlayedGames() {
 
   useEffect(() => () => clearTimeout(retryTimer.current), [])
 
-  return games
+  return { games, isLoading }
 }

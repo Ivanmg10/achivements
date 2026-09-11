@@ -3,7 +3,9 @@
 import { RecentAchievement } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
+import { IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 export default function MainPageProfileRaAchievements({
   achievements,
@@ -15,7 +17,7 @@ export default function MainPageProfileRaAchievements({
   const { T } = useLanguage()
 
   return (
-    <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2">
+    <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2 min-h-[220px]">
       <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileAchievements.recentAchievements}</p>
       {isLoading && achievements.length === 0 ? (
         <div className="flex flex-col gap-2 animate-pulse">
@@ -30,6 +32,8 @@ export default function MainPageProfileRaAchievements({
             </div>
           ))}
         </div>
+      ) : achievements.length === 0 ? (
+        <EmptyState icon={<IconTrophy className="w-6 h-6" />} title={T.cards.noEarned} size="compact" className="flex-1" />
       ) : (
       <div className="flex flex-col gap-2">
         {achievements.slice(0, 5).map((ach) => (

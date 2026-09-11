@@ -40,7 +40,7 @@ export default function AddGameModal({
 }) {
   const { T } = useLanguage()
   const { all } = useGamesData()
-  const recentlyPlayedData = useRecentlyPlayedGames()
+  const { games: recentlyPlayedData } = useRecentlyPlayedGames()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<Map<number, RetroAchievementsGameCompleted>>(new Map())
   const [saving, setSaving] = useState(false)
