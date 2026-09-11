@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { withCache } from "@/lib/raCache";
 import { fetchRA } from "@/lib/fetchRA";
+import { cachedJson } from "@/lib/httpCache";
 
 const TTL = 4 * 60 * 60 * 1000;
 const publicKey = process.env.RA_API_KEY;
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
       () => fetchRA(`https://retroachievements.org/API/API_GetGame.php?i=${gameId}&y=${publicKey}`),
       (d) => d !== null && typeof d === 'object' && 'ID' in d,
     );
-    return NextResponse.json(data);
+    return cachedJson(data, TTL);
   } catch {
     return NextResponse.json({ message: "RA service unavailable" }, { status: 503 });
   }

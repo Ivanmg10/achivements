@@ -237,6 +237,10 @@ export const de: Translations = {
     pointsTotal: 'Punkte',
     pointsEarned: 'Punkte erhalten',
   },
+  errorBoundary: {
+    title: 'Etwas ist schiefgelaufen',
+    subtitle: 'Beim Laden dieser Seite ist ein unerwarteter Fehler aufgetreten. Du kannst es erneut versuchen.',
+  },
   gameInfoPage: {
     retry: 'Erneut versuchen',
     id: 'ID',

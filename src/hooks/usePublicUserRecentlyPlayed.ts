@@ -4,11 +4,12 @@ import { RecentlyPlayedGame } from '@/types/types'
 export function usePublicUserRecentlyPlayed(raUsername: string) {
   const [games, setGames] = useState<RecentlyPlayedGame[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const hasFetched = useRef(false)
+  const fetchedFor = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!raUsername || hasFetched.current) return
-    hasFetched.current = true
+    if (!raUsername || fetchedFor.current === raUsername) return
+    fetchedFor.current = raUsername
+    setGames([])
     setIsLoading(true)
     fetch(`/api/public/user/recentlyPlayed?u=${encodeURIComponent(raUsername)}`)
       .then((r) => {

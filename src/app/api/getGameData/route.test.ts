@@ -22,6 +22,12 @@ test('GET returns game data', async () => {
   expect((res as any).data).toHaveProperty('ID', 1)
 })
 
+test('GET sets a private Cache-Control header matching the cache TTL', async () => {
+  const req = new NextRequest('http://localhost/api/getGameData?gameId=123')
+  const res = await GET(req)
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=14400')
+})
+
 test('GET returns 400 when no gameId', async () => {
   const req = new NextRequest('http://localhost/api/getGameData')
   const res = await GET(req)

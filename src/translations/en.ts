@@ -235,6 +235,10 @@ export const en = {
     pointsTotal: 'points',
     pointsEarned: 'points earned',
   },
+  errorBoundary: {
+    title: 'Something went wrong',
+    subtitle: 'An unexpected error occurred while loading this page. You can try again.',
+  },
   gameInfoPage: {
     retry: 'Retry',
     id: 'ID',

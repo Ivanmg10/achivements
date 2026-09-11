@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
 import { fetchRA } from '@/lib/fetchRA'
+import { cachedJson } from '@/lib/httpCache'
 
 const TTL = 15 * 60 * 1000
 
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
       () => fetchRA(`https://retroachievements.org/API/API_GetUserRankAndScore.php?u=${encodeURIComponent(username)}&y=${apiKey}`),
       (d) => d !== null && typeof d === 'object' && 'Rank' in (d as object),
     )
-    return NextResponse.json(data)
+    return cachedJson(data, TTL)
   } catch {
     return NextResponse.json({ message: 'Failed to fetch rank' }, { status: 502 })
   }

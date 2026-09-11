@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
+import { cachedJson } from '@/lib/httpCache'
 
 const TTL_RECENT = 15 * 60 * 1000
 const TTL_OLD = 24 * 60 * 60 * 1000
@@ -61,5 +62,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: 'Failed to fetch' }, { status: 502 })
   }
 
-  return NextResponse.json(results.flat())
+  return cachedJson(results.flat(), TTL_RECENT)
 }

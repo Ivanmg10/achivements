@@ -237,6 +237,10 @@ export const ru: Translations = {
     pointsTotal: 'очков',
     pointsEarned: 'очков получено',
   },
+  errorBoundary: {
+    title: 'Что-то пошло не так',
+    subtitle: 'При загрузке этой страницы произошла непредвиденная ошибка. Вы можете повторить попытку.',
+  },
   gameInfoPage: {
     retry: 'Повторить',
     id: 'ID',

@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { withCache } from "@/lib/raCache";
 import { fetchRA } from "@/lib/fetchRA";
+import { cachedJson } from "@/lib/httpCache";
 
 const TTL = 10 * 60 * 1000;
 
@@ -54,5 +55,5 @@ export async function GET(request: NextRequest) {
     results.push(...batch);
   }
 
-  return NextResponse.json(Object.fromEntries(results));
+  return cachedJson(Object.fromEntries(results), TTL);
 }

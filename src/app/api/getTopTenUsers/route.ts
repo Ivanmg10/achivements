@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
 import { fetchRA } from '@/lib/fetchRA'
+import { cachedJson } from '@/lib/httpCache'
 
 const TTL = 15 * 60 * 1000
 
@@ -20,7 +21,7 @@ export async function GET() {
       () => fetchRA(`https://retroachievements.org/API/API_GetTopTenUsers.php?y=${raid}`),
       (d) => Array.isArray(d) && d.length > 0,
     )
-    return NextResponse.json(data)
+    return cachedJson(data, TTL)
   } catch {
     return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
   }

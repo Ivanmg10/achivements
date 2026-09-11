@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
 import { fetchRA } from '@/lib/fetchRA'
+import { cachedJson } from '@/lib/httpCache'
 
 const TTL = 5 * 60 * 1000
 
@@ -26,7 +27,7 @@ export async function GET() {
       ),
       (d) => Array.isArray(d),
     )
-    return NextResponse.json(data)
+    return cachedJson(data, TTL)
   } catch {
     return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
   }

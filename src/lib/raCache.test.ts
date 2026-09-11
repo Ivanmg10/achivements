@@ -1,4 +1,4 @@
-import { withCache, clearCache } from './raCache'
+import { withCache, clearCache, MAX_CACHE_ENTRIES } from './raCache'
 
 beforeEach(() => clearCache())
 
@@ -65,4 +65,20 @@ test('caches data when shouldCache returns true', async () => {
   await withCache('key', 5000, fetcher, (d) => typeof d === 'object' && d !== null && 'id' in d)
   await withCache('key', 5000, fetcher, (d) => typeof d === 'object' && d !== null && 'id' in d)
   expect(fetcher).toHaveBeenCalledTimes(1)
+})
+
+test('evicts the oldest entries once the cache grows past MAX_CACHE_ENTRIES', async () => {
+  const fetcher = jest.fn().mockResolvedValue({ id: 1 })
+  for (let i = 0; i < MAX_CACHE_ENTRIES + 10; i++) {
+    await withCache(`key-${i}`, 5000, fetcher)
+  }
+
+  // The store never grows past the cap...
+  const stillCached = await withCache(`key-${MAX_CACHE_ENTRIES + 9}`, 5000, fetcher)
+  expect(stillCached).toEqual({ id: 1 })
+  const callsBeforeOldestCheck = fetcher.mock.calls.length
+
+  // ...and the oldest entries were the ones dropped, so they refetch.
+  await withCache('key-0', 5000, fetcher)
+  expect(fetcher.mock.calls.length).toBe(callsBeforeOldestCheck + 1)
 })

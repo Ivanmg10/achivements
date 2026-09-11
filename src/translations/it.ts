@@ -237,6 +237,10 @@ export const it: Translations = {
     pointsTotal: 'punti',
     pointsEarned: 'punti ottenuti',
   },
+  errorBoundary: {
+    title: 'Qualcosa è andato storto',
+    subtitle: 'Si è verificato un errore imprevisto durante il caricamento di questa pagina. Puoi riprovare.',
+  },
   gameInfoPage: {
     retry: 'Riprova',
     id: 'ID',

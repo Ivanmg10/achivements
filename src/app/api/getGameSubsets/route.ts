@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
 import { fetchRA } from '@/lib/fetchRA'
+import { cachedJson } from '@/lib/httpCache'
 
 const TTL = 60 * 60 * 1000
 
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
       return g.Title.startsWith(baseTitle + ' [') || g.Title.startsWith(baseTitle + ' |')
     })
 
-    return NextResponse.json(subsets)
+    return cachedJson(subsets, TTL)
   } catch {
     return NextResponse.json([], { status: 200 })
   }

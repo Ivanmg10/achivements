@@ -4,11 +4,12 @@ import { UserRankAndScore } from '@/types/types'
 export function usePublicUserRank(raUsername: string) {
   const [rank, setRank] = useState<UserRankAndScore | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const hasFetched = useRef(false)
+  const fetchedFor = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!raUsername || hasFetched.current) return
-    hasFetched.current = true
+    if (!raUsername || fetchedFor.current === raUsername) return
+    fetchedFor.current = raUsername
+    setRank(null)
     setIsLoading(true)
     fetch(`/api/public/user/rank?u=${encodeURIComponent(raUsername)}`)
       .then((r) => {

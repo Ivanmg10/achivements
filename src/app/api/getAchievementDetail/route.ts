@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import { cachedJson } from '@/lib/httpCache'
 
 const TTL = 5 * 60 * 1000
 
@@ -42,5 +43,5 @@ export async function GET(request: NextRequest) {
   )
 
   if (!data) return NextResponse.json({ message: 'Not found' }, { status: 404 })
-  return NextResponse.json(data)
+  return cachedJson(data, TTL)
 }

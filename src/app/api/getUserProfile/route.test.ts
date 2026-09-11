@@ -30,6 +30,11 @@ test('GET returns user profile', async () => {
   expect((res as any).data).toHaveProperty('User', 'IvanXMarine')
 })
 
+test('GET sets a private Cache-Control header matching the cache TTL', async () => {
+  const res = await GET()
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=300')
+})
+
 test('GET returns 401 when no session', async () => {
   ;(getServerSession as jest.Mock).mockResolvedValue(null)
   const res = await GET()

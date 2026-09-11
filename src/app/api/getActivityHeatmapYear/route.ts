@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
 import { fetchRA } from '@/lib/fetchRA'
+import { cachedJson } from '@/lib/httpCache'
 
 const TTL_RECENT = 15 * 60 * 1000
 const TTL_OLD = 24 * 60 * 60 * 1000
@@ -40,5 +41,8 @@ export async function GET() {
   )
 
   const merged = settled.flat()
-  return NextResponse.json(merged)
+  // Use the shorter of the two chunk TTLs for the response header — the
+  // recent-day chunks refresh more often than the response should ever be
+  // treated as fresh by the browser.
+  return cachedJson(merged, TTL_RECENT)
 }

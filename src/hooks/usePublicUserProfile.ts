@@ -5,11 +5,13 @@ export function usePublicUserProfile(raUsername: string) {
   const [profile, setProfile] = useState<RetroAchievementsUserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
-  const hasFetched = useRef(false)
+  const fetchedFor = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!raUsername || hasFetched.current) return
-    hasFetched.current = true
+    if (!raUsername || fetchedFor.current === raUsername) return
+    fetchedFor.current = raUsername
+    setProfile(null)
+    setError(false)
     setIsLoading(true)
     fetch(`/api/public/user/profile?u=${encodeURIComponent(raUsername)}`)
       .then((r) => {

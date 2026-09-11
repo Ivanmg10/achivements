@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { withCache } from "@/lib/raCache";
 import { fetchRA } from "@/lib/fetchRA";
+import { cachedJson } from "@/lib/httpCache";
 
 const TTL = 10 * 60 * 1000;
 
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
     if (!data || typeof data !== 'object' || !('ID' in data)) {
       return NextResponse.json({ message: "Game not found" }, { status: 404 });
     }
-    return NextResponse.json(data);
+    return cachedJson(data, TTL);
   } catch {
     return NextResponse.json({ message: "RA service unavailable" }, { status: 503 });
   }
