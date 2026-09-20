@@ -118,3 +118,39 @@ test("session callback populates session user", async () => {
   expect(session.user.id).toBe(1);
   expect(session.user.theme).toBe("dark");
 });
+
+test("jwt callback stores a Steam link pushed through update", async () => {
+  const jwtCallback = authOptions.callbacks?.jwt as any;
+  const token = await jwtCallback({
+    token: {},
+    user: undefined,
+    trigger: "update",
+    session: { steamid: "76561198000000000", steamusername: "Ivan" },
+  });
+  expect(token.steamid).toBe("76561198000000000");
+  expect(token.steamusername).toBe("Ivan");
+});
+
+test("jwt callback clears the Steam link when update sends nulls", async () => {
+  const jwtCallback = authOptions.callbacks?.jwt as any;
+  const token = await jwtCallback({
+    token: { steamid: "76561198000000000", steamusername: "Ivan" },
+    user: undefined,
+    trigger: "update",
+    session: { steamid: null, steamusername: null },
+  });
+  expect(token.steamid).toBeUndefined();
+  expect(token.steamusername).toBeUndefined();
+});
+
+test("jwt callback leaves the Steam link alone on an unrelated update", async () => {
+  const jwtCallback = authOptions.callbacks?.jwt as any;
+  const token = await jwtCallback({
+    token: { steamid: "76561198000000000", steamusername: "Ivan" },
+    user: undefined,
+    trigger: "update",
+    session: { theme: "dark" },
+  });
+  expect(token.steamid).toBe("76561198000000000");
+  expect(token.steamusername).toBe("Ivan");
+});

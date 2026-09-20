@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { IconPencil, IconLock, IconLogout } from '@tabler/icons-react'
 import { signOut, useSession } from 'next-auth/react'
 import RaLoginModal from '../ra-login-modal/RaLoginModal'
+import UserDataSteamAccount from './user-data-steam-account/UserDataSteamAccount'
 import FavoriteGameModal from './FavoriteGameModal'
 import EditProfileModal, { EditProfileField } from '../edit-profile-modal/EditProfileModal'
 import LanguageModal from '../language-modal/LanguageModal'
@@ -356,26 +357,7 @@ export default function UserData({ session }: { session: Session | null }) {
         </div>
 
         {/* Steam */}
-        <div className="bg-bg-main rounded-xl p-4 flex flex-col gap-3 opacity-60">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-text-secondary">Steam</span>
-            <span className="text-xs bg-bg-card text-text-secondary px-2 py-0.5 rounded-full">
-              {T.userData.comingSoon}
-            </span>
-          </div>
-          {session?.user?.steamusername ? (
-            <div className="flex flex-col gap-0.5">
-              <span className="font-bold">{session.user.steamusername}</span>
-              {session.user.steamid && (
-                <span className="text-xs text-text-secondary font-mono">
-                  {session.user.steamid}
-                </span>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-text-secondary">{T.userData.notConnected}</p>
-          )}
-        </div>
+        <UserDataSteamAccount />
       </article>
 
       <FavoriteGameModal

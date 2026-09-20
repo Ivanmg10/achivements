@@ -75,6 +75,12 @@ export const authOptions: NextAuthOptions = {
           if (sessionAny.raidKey) token.raid = sessionAny.raidKey as string
           else if (!raUserObj) token.raid = undefined
         }
+        // Steam linking happens over an OpenID redirect, which cannot write the
+        // JWT cookie — the client pushes the stored link in through update().
+        if ("steamid" in session) {
+          token.steamid = (session.steamid as string | null) ?? undefined;
+          token.steamusername = (session.steamusername as string | null) ?? undefined;
+        }
         if (session?.theme) token.theme = session.theme;
         if (session?.name) token.name = session.name;
         if ("email" in session && session.email) token.email = session.email;
