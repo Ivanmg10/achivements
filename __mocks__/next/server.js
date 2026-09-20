@@ -34,6 +34,13 @@ class NextResponse {
     res.data = data
     return res
   }
+
+  static redirect(url, init = {}) {
+    const res = new NextResponse(null, { status: init.status || 307 })
+    res.headers.set('location', String(url))
+    res.url = String(url)
+    return res
+  }
 }
 
 module.exports = { NextRequest, NextResponse }
