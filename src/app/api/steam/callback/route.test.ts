@@ -4,9 +4,9 @@ jest.mock('@/lib/steamOpenId', () => {
   const actual = jest.requireActual('@/lib/steamOpenId')
   return { ...actual, verifyAssertion: jest.fn() }
 })
-jest.mock('@/lib/fetchSteam', () => {
-  const actual = jest.requireActual('@/lib/fetchSteam')
-  return { ...actual, fetchSteam: jest.fn() }
+jest.mock('@/lib/steamClient', () => {
+  const actual = jest.requireActual('@/lib/steamClient')
+  return { ...actual, getPlayerSummaries: jest.fn() }
 })
 
 import { GET } from './route'
@@ -14,7 +14,7 @@ import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
 import pool from '@/lib/db'
 import { verifyAssertion, signState } from '@/lib/steamOpenId'
-import { fetchSteam } from '@/lib/fetchSteam'
+import { getPlayerSummaries } from '@/lib/steamClient'
 
 const STEAM_ID = '76561198000000000'
 const CLAIMED = `https://steamcommunity.com/openid/id/${STEAM_ID}`
@@ -46,7 +46,7 @@ beforeEach(() => {
   process.env.STEAM_API_KEY = 'steam-key'
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7' } })
   ;(verifyAssertion as jest.Mock).mockResolvedValue(true)
-  ;(fetchSteam as jest.Mock).mockResolvedValue({ response: { players: [{ personaname: 'Ivan' }] } })
+  ;(getPlayerSummaries as jest.Mock).mockResolvedValue({ response: { players: [{ personaname: 'Ivan' }] } })
   ;(pool.query as jest.Mock).mockResolvedValue({ rowCount: 0, rows: [] })
 })
 
@@ -114,7 +114,7 @@ test('refuses a Steam account already linked to another user', async () => {
 })
 
 test('still links when the persona lookup fails', async () => {
-  ;(fetchSteam as jest.Mock).mockRejectedValue(new Error('steam down'))
+  ;(getPlayerSummaries as jest.Mock).mockRejectedValue(new Error('steam down'))
   const res = await GET(makeRequest(validParams()))
   expect(steamStatus(res as never)).toBe('linked')
   expect(pool.query).toHaveBeenLastCalledWith(expect.any(String), [STEAM_ID, null, '7'])
@@ -124,12 +124,12 @@ test('still links when no Steam API key is configured', async () => {
   delete process.env.STEAM_API_KEY
   const res = await GET(makeRequest(validParams()))
   expect(steamStatus(res as never)).toBe('linked')
-  expect(fetchSteam).not.toHaveBeenCalled()
+  expect(getPlayerSummaries).not.toHaveBeenCalled()
   expect(pool.query).toHaveBeenLastCalledWith(expect.any(String), [STEAM_ID, null, '7'])
 })
 
 test('stores null when Steam returns no players', async () => {
-  ;(fetchSteam as jest.Mock).mockResolvedValue({ response: { players: [] } })
+  ;(getPlayerSummaries as jest.Mock).mockResolvedValue({ response: { players: [] } })
   const res = await GET(makeRequest(validParams()))
   expect(steamStatus(res as never)).toBe('linked')
   expect(pool.query).toHaveBeenLastCalledWith(expect.any(String), [STEAM_ID, null, '7'])

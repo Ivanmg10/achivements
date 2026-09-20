@@ -3,7 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
 import { verifyAssertion, extractSteamId, verifyState, configuredOrigin } from '@/lib/steamOpenId'
-import { fetchSteam, steamApiKey, STEAM_API_BASE } from '@/lib/fetchSteam'
+import { steamApiKey } from '@/lib/fetchSteam'
+import { getPlayerSummaries } from '@/lib/steamClient'
 
 /** Sends the user back to /user with a flag the UI turns into a message. */
 function back(origin: string, status: 'linked' | string) {
@@ -17,9 +18,7 @@ async function fetchPersonaName(steamId: string): Promise<string | null> {
   const key = steamApiKey()
   if (!key) return null
   try {
-    const data = await fetchSteam(
-      `${STEAM_API_BASE}/ISteamUser/GetPlayerSummaries/v2/?key=${encodeURIComponent(key)}&steamids=${steamId}`,
-    )
+    const data = await getPlayerSummaries(steamId, key)
     const players = (data as { response?: { players?: { personaname?: string }[] } })?.response?.players
     return players?.[0]?.personaname ?? null
   } catch {

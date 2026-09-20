@@ -1,9 +1,11 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
+jest.mock('@/lib/steamCache', () => ({ ...jest.requireActual('@/lib/steamCache'), clearUserCache: jest.fn() }))
 
 import { POST } from './route'
 import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
+import { clearUserCache } from '@/lib/steamCache'
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -31,4 +33,15 @@ test('returns 500 when the DB write fails', async () => {
   ;(pool.query as jest.Mock).mockRejectedValue(new Error('db down'))
   const res = await POST()
   expect(res.status).toBe(500)
+})
+
+test('drops the user cached Steam data along with the link', async () => {
+  await POST()
+  expect(clearUserCache).toHaveBeenCalledWith('7')
+})
+
+test('does not touch the cache when the unlink write failed', async () => {
+  ;(pool.query as jest.Mock).mockRejectedValue(new Error('db down'))
+  await POST()
+  expect(clearUserCache).not.toHaveBeenCalled()
 })
