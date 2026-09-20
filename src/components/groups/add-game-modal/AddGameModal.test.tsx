@@ -15,7 +15,7 @@ jest.mock('@/context/GamesDataContext', () => ({
 }))
 
 jest.mock('@/hooks/useRecentlyPlayedGames', () => ({
-  useRecentlyPlayedGames: () => [],
+  useRecentlyPlayedGames: () => ({ games: [], isLoading: false }),
 }))
 
 jest.mock('next/image', () => ({ src, alt, ...props }: any) => (

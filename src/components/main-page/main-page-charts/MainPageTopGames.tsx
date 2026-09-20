@@ -1,10 +1,12 @@
 'use client'
 
 import { useMemo } from 'react'
+import { IconActivity } from '@tabler/icons-react'
 import { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 export default function MainPageTopGames({ achievements, isLoading }: { achievements: RecentAchievement[]; isLoading?: boolean }) {
   const { T } = useLanguage()
@@ -35,7 +37,7 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
     return (
       <div className="flex flex-col gap-2">
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mostActiveGames}</p>
-        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">{T.cards.noData}</div>
+        <EmptyState icon={<IconActivity className="w-6 h-6" />} title={T.cards.noData} size="compact" className="py-2" />
       </div>
     )
   }

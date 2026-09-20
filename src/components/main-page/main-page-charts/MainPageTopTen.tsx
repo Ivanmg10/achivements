@@ -1,7 +1,9 @@
 'use client'
 
+import { IconUsers } from '@tabler/icons-react'
 import { TopTenUser } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 export default function MainPageTopTen({
   topTen,
@@ -21,7 +23,7 @@ export default function MainPageTopTen({
       {isLoading ? (
         <div className="flex items-center justify-center py-6 text-text-secondary text-sm">{T.cards.loading}</div>
       ) : topTen.length === 0 ? (
-        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">{T.cards.noData}</div>
+        <EmptyState icon={<IconUsers className="w-6 h-6" />} title={T.cards.noData} size="compact" className="py-4" />
       ) : (
         <div className="flex flex-col gap-1.5">
           {topTen.map((u, i) => {

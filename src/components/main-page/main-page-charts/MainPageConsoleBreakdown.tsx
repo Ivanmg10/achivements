@@ -1,8 +1,10 @@
 'use client'
 
 import { useMemo } from 'react'
+import { IconDeviceGamepad2 } from '@tabler/icons-react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 export default function MainPageConsoleBreakdown({
   games,
@@ -28,7 +30,7 @@ export default function MainPageConsoleBreakdown({
     return (
       <div className="flex flex-col gap-2">
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.consoleBreakdownTitle}</p>
-        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">{T.cards.noData}</div>
+        <EmptyState icon={<IconDeviceGamepad2 className="w-6 h-6" />} title={T.cards.noData} size="compact" className="py-2" />
       </div>
     )
   }

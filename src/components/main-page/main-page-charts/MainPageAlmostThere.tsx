@@ -3,9 +3,11 @@
 import { useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { IconTarget } from '@tabler/icons-react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 export default function MainPageAlmostThere({ games, isLoading }: { games: RetroAchievementsGameCompleted[]; isLoading?: boolean }) {
   const { T } = useLanguage()
@@ -63,7 +65,13 @@ export default function MainPageAlmostThere({ games, isLoading }: { games: Retro
     return (
       <div className="flex flex-col gap-2">
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.almostThere}</p>
-        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">{T.cards.noGamesInProgress}</div>
+        <EmptyState
+          icon={<IconTarget className="w-6 h-6" />}
+          title={T.cards.noGamesInProgress}
+          subtitle={T.cards.almostThereSub}
+          size="compact"
+          className="py-2"
+        />
       </div>
     )
   }

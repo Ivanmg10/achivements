@@ -21,6 +21,11 @@ test('GET returns completed games', async () => {
   expect(res.data).toEqual([{ GameID: 1, Title: 'Game' }])
 })
 
+test('GET sets a private Cache-Control header matching the cache TTL', async () => {
+  const res = await GET()
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=600')
+})
+
 test('GET returns 401 when no session', async () => {
   ;(getServerSession as jest.Mock).mockResolvedValue(null)
   const res = await GET()

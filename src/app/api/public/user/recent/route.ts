@@ -1,28 +1,22 @@
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
+import { cachedJson } from '@/lib/httpCache'
+import { requireViewerApiKey } from '@/lib/apiAuth'
+import { getAchievementsEarnedBetween } from '@/lib/raClient'
 
 const TTL_RECENT = 15 * 60 * 1000
 const TTL_OLD = 24 * 60 * 60 * 1000
 const CHUNK_DAYS = 30
 const TOTAL_DAYS = 365
 
-async function fetchChunk(username: string, apiKey: string, fromTs: number, toTs: number) {
-  const url = `https://retroachievements.org/API/API_GetAchievementsEarnedBetween.php?u=${encodeURIComponent(username)}&y=${apiKey}&f=${fromTs}&t=${toTs}`
-  return fetch(url).then((r) => r.json()).catch(() => null)
-}
-
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+  const auth = await requireViewerApiKey()
+  if (!auth.ok) return auth.response
+  const { apiKey } = auth
 
   const username = req.nextUrl.searchParams.get('u')
   if (!username) return NextResponse.json({ message: 'Missing username' }, { status: 400 })
-
-  const apiKey = session.user.raid ?? process.env.RA_API_KEY ?? null
-  if (!apiKey) return NextResponse.json({ message: 'No RA API key configured' }, { status: 503 })
 
   const now = Math.floor(Date.now() / 1000)
   const cutoff60 = now - 60 * 24 * 3600
@@ -46,9 +40,9 @@ export async function GET(req: NextRequest) {
         return withCache(
           chunkKey,
           ttl,
-          () => fetchChunk(username, apiKey, from, to),
+          () => getAchievementsEarnedBetween(username, apiKey, from, to),
           (d) => Array.isArray(d),
-        )
+        ).catch(() => null)
       }),
     )
     for (const r of batchResults) {
@@ -61,5 +55,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: 'Failed to fetch' }, { status: 502 })
   }
 
-  return NextResponse.json(results.flat())
+  return cachedJson(results.flat(), TTL_RECENT)
 }

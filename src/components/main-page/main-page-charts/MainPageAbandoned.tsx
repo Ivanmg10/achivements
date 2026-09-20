@@ -1,11 +1,14 @@
 'use client'
 
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
+import { IconMoodEmpty } from '@tabler/icons-react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { useLanguage } from '@/context/LanguageContext'
+import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 const ABANDONED_DAYS = 30
 
@@ -17,12 +20,26 @@ export default function MainPageAbandoned({
   isLoading?: boolean
 }) {
   const { T } = useLanguage()
+  // Recently played games already carry a LastPlayed date and are fetched once
+  // and shared app-wide — reuse it instead of a per-game RA call for every
+  // "playing" game. Only games missing from that list (rare: very old, very
+  // inactive games that fell out of RA's most-recently-played window) still
+  // need the dedicated /api/getGamesLastPlayed lookup.
+  const { games: recentlyPlayed, isLoading: recentlyPlayedLoading } = useRecentlyPlayedGames()
   const [lastAchDates, setLastAchDates] = useState<Record<number, string>>({})
   const [fetchedKey, setFetchedKey] = useState('')
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  const allIdsKey = useMemo(() => playing.map((g) => g.GameID).join(','), [playing])
+  const lastPlayedMap = useMemo(
+    () => new Map(recentlyPlayed.map((g) => [g.GameID, g.LastPlayed])),
+    [recentlyPlayed]
+  )
+
+  const missingIdsKey = useMemo(
+    () => playing.filter((g) => !lastPlayedMap.has(g.GameID)).map((g) => g.GameID).join(','),
+    [playing, lastPlayedMap]
+  )
 
   const doFetch = useCallback((key: string) => {
     if (!key) return
@@ -42,12 +59,17 @@ export default function MainPageAbandoned({
   }, [])
 
   useEffect(() => {
-    if (!allIdsKey) return
+    if (recentlyPlayedLoading) return
     clearTimeout(retryTimer.current)
     attemptRef.current = 0
+    if (!missingIdsKey) {
+      setLastAchDates({})
+      setFetchedKey('')
+      return
+    }
     setFetchedKey('')
-    doFetch(allIdsKey)
-  }, [allIdsKey, doFetch])
+    doFetch(missingIdsKey)
+  }, [missingIdsKey, recentlyPlayedLoading, doFetch])
 
   useEffect(() => () => clearTimeout(retryTimer.current), [])
 
@@ -55,7 +77,7 @@ export default function MainPageAbandoned({
     const now = new Date()
     return playing
       .map((g) => {
-        const dateStr = lastAchDates[g.GameID]
+        const dateStr = lastPlayedMap.get(g.GameID) ?? lastAchDates[g.GameID]
         const last = dateStr ? new Date(dateStr.replace(' ', 'T')) : null
         const daysAgo = last
           ? Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24))
@@ -64,9 +86,9 @@ export default function MainPageAbandoned({
       })
       .filter((g): g is typeof g & { daysAgo: number } => g.daysAgo !== null && g.daysAgo >= ABANDONED_DAYS)
       .sort((a, b) => b.daysAgo - a.daysAgo)
-  }, [playing, lastAchDates])
+  }, [playing, lastPlayedMap, lastAchDates])
 
-  const datesNotReady = allIdsKey !== '' && fetchedKey !== allIdsKey
+  const datesNotReady = recentlyPlayedLoading || (missingIdsKey !== '' && fetchedKey !== missingIdsKey)
   const loading = isLoading || datesNotReady
 
   return (
@@ -78,9 +100,13 @@ export default function MainPageAbandoned({
       {loading ? (
         <SkeletonGameList count={3} />
       ) : abandoned.length === 0 ? (
-        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">
-          {T.cards.noAbandonedGames}
-        </div>
+        <EmptyState
+          icon={<IconMoodEmpty className="w-6 h-6" />}
+          title={T.cards.noAbandonedGames}
+          subtitle={T.cards.noAbandonedGamesSub}
+          size="compact"
+          className="py-2"
+        />
       ) : (
         <div className="flex flex-col gap-2">
           {abandoned.slice(0, 6).map((g) => (

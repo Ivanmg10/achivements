@@ -1,6 +1,13 @@
 import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import "./globals.css";
 import Providers from "./providers";
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'CheevoVault',
@@ -13,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-theme="dark" className="bg-bg-header">
+    <html lang="en" data-theme="dark" className={`${inter.variable} bg-bg-header`}>
       <body className="text-text-main bg-bg-main">
         <Providers>{children}</Providers>
       </body>

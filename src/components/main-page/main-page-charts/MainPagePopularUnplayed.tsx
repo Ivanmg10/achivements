@@ -2,8 +2,10 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { IconCheck } from '@tabler/icons-react'
 import { PopularGame } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 export default function MainPagePopularUnplayed({
   games,
@@ -38,7 +40,7 @@ export default function MainPagePopularUnplayed({
     return (
       <div className="flex flex-col gap-2">
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.popularUnplayed}</p>
-        <div className="flex items-center justify-center py-6 text-text-secondary text-sm">{T.charts.popularPlayedAll}</div>
+        <EmptyState icon={<IconCheck className="w-6 h-6" />} title={T.charts.popularPlayedAll} size="compact" className="py-2" />
       </div>
     )
   }

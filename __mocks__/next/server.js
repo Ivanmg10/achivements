@@ -26,6 +26,7 @@ class NextResponse {
   constructor(body, init = {}) {
     this.body = body
     this.status = init.status || 200
+    this.headers = new Map(Object.entries(init.headers || {}))
   }
 
   static json(data, init = {}) {

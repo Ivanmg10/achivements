@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
+import { withCache } from '@/lib/raCache'
+import { cachedJson } from '@/lib/httpCache'
+import { getGameList } from '@/lib/raClient'
 
 const CONSOLE_IDS = [3, 7, 5, 39, 41] // SNES, NES, GBA, GB, GBC
 const COLLAGE_COUNT = 12
+const TTL = 12 * 60 * 60 * 1000
 
 type RawGame = {
   ID?: number
@@ -15,9 +19,6 @@ export type CollageGame = {
   imageIcon: string
 }
 
-let memCache: { data: CollageGame[]; ts: number } | null = null
-const CACHE_TTL = 12 * 60 * 60 * 1000
-
 function shuffle<T>(arr: T[]): T[] {
   return arr
     .map((v) => ({ v, sort: Math.random() }))
@@ -26,34 +27,31 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export async function GET() {
-  if (memCache && Date.now() - memCache.ts < CACHE_TTL) {
-    return NextResponse.json(memCache.data)
-  }
-
   const apiKey = process.env.RA_API_KEY
   if (!apiKey) return NextResponse.json([])
 
   try {
-    const lists = await Promise.all(
-      CONSOLE_IDS.map((cid) =>
-        fetch(
-          `https://retroachievements.org/API/API_GetGameList.php?i=${cid}&f=1&y=${apiKey}`,
-          { next: { revalidate: 43200 } }
+    const selected = await withCache(
+      'collageGames_v1',
+      TTL,
+      async () => {
+        const lists = await Promise.all(
+          CONSOLE_IDS.map((cid) =>
+            getGameList(cid, apiKey, true).catch(() => [] as RawGame[]),
+          ),
         )
-          .then((r) => (r.ok ? (r.json() as Promise<RawGame[]>) : []))
-          .catch(() => [] as RawGame[])
-      )
+
+        const all: CollageGame[] = (lists as RawGame[][])
+          .flat()
+          .filter((g) => g.ID && g.ImageIcon)
+          .map((g) => ({ id: g.ID!, title: g.Title ?? '', imageIcon: g.ImageIcon! }))
+
+        return shuffle(all).slice(0, COLLAGE_COUNT)
+      },
+      (d) => Array.isArray(d),
     )
 
-    const all: CollageGame[] = lists
-      .flat()
-      .filter((g) => g.ID && g.ImageIcon)
-      .map((g) => ({ id: g.ID!, title: g.Title ?? '', imageIcon: g.ImageIcon! }))
-
-    const selected = shuffle(all).slice(0, COLLAGE_COUNT)
-
-    memCache = { data: selected, ts: Date.now() }
-    return NextResponse.json(selected)
+    return cachedJson(selected, TTL)
   } catch {
     return NextResponse.json([])
   }

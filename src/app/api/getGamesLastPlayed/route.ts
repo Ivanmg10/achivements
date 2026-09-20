@@ -3,7 +3,8 @@ import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { withCache } from "@/lib/raCache";
-import { fetchRA } from "@/lib/fetchRA";
+import { cachedJson } from "@/lib/httpCache";
+import { getGameInfoAndUserProgress } from "@/lib/raClient";
 
 const TTL = 10 * 60 * 1000;
 
@@ -17,6 +18,8 @@ export async function GET(request: NextRequest) {
   if (!rausername || !raid) {
     return NextResponse.json({});
   }
+  const username: string = rausername;
+  const apiKey: string = raid;
 
   const gameIdsParam = request.nextUrl.searchParams.get("gameIds");
   if (!gameIdsParam) return NextResponse.json({});
@@ -28,9 +31,7 @@ export async function GET(request: NextRequest) {
       const data = await withCache(
         `gameProgression_v2:${id}:${gameId}`,
         TTL,
-        () => fetchRA(
-          `https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=${rausername}&y=${raid}&g=${gameId}`,
-        ),
+        () => getGameInfoAndUserProgress(username, apiKey, gameId),
         (d) => d !== null && typeof d === 'object' && 'ID' in d,
       );
 
@@ -54,5 +55,5 @@ export async function GET(request: NextRequest) {
     results.push(...batch);
   }
 
-  return NextResponse.json(Object.fromEntries(results));
+  return cachedJson(Object.fromEntries(results), TTL);
 }

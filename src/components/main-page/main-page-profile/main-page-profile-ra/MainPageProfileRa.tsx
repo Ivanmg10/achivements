@@ -104,9 +104,7 @@ export default function MainPageProfileRa({
             <MainPageProfileRaGame game={game} richPresenceMsg={user?.RichPresenceMsg} />
           ) : null}
 
-          {(recentAchievements.length > 0 || achievementsLoading) && (
-            <MainPageProfileRaAchievements achievements={recentAchievements} isLoading={achievementsLoading} />
-          )}
+          <MainPageProfileRaAchievements achievements={recentAchievements} isLoading={achievementsLoading} />
 
           {hasContribs && (
             <div className="flex flex-col gap-2 bg-bg-main rounded-lg p-3">

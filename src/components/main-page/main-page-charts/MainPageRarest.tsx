@@ -1,10 +1,12 @@
 'use client'
 
 import { useMemo } from 'react'
+import { IconSparkles } from '@tabler/icons-react'
 import { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 export default function MainPageRarest({ achievements, isLoading }: { achievements: RecentAchievement[]; isLoading?: boolean }) {
   const { T } = useLanguage()
@@ -20,8 +22,15 @@ export default function MainPageRarest({ achievements, isLoading }: { achievemen
 
   if (withRarity.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full text-text-secondary text-sm">
-        {T.cards.noRarityData}
+      <div className="flex flex-col gap-2 h-full">
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.rarestUnlocks}</p>
+        <EmptyState
+          icon={<IconSparkles className="w-6 h-6" />}
+          title={T.cards.noRarityData}
+          subtitle={T.cards.noRarityDataSub}
+          size="compact"
+          className="flex-1"
+        />
       </div>
     )
   }

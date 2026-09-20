@@ -4,11 +4,12 @@ import { RecentAchievement } from '@/types/types'
 export function usePublicUserAchievements(raUsername: string) {
   const [achievements, setAchievements] = useState<RecentAchievement[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const hasFetched = useRef(false)
+  const fetchedFor = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!raUsername || hasFetched.current) return
-    hasFetched.current = true
+    if (!raUsername || fetchedFor.current === raUsername) return
+    fetchedFor.current = raUsername
+    setAchievements([])
     setIsLoading(true)
     fetch(`/api/public/user/recent?u=${encodeURIComponent(raUsername)}`)
       .then((r) => {

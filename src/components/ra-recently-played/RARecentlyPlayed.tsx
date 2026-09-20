@@ -9,11 +9,12 @@ import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievementsGameWithAchievements, RetroAchievement } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { formatDate } from '@/utils/utils'
-import { IconChevronLeft } from '@tabler/icons-react'
+import { IconChevronLeft, IconDeviceGamepad2 } from '@tabler/icons-react'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { MainViewToggle } from '@/components/main-view-toggle/MainViewToggle'
 import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-recently-played-expanded/RARecentlyPlayedExpanded'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 const MAX_GAMES = 7
 
@@ -27,7 +28,7 @@ function pct(achieved: number, total: number) {
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function RARecentlyPlayed() {
   const { T } = useLanguage()
-  const games = useRecentlyPlayedGames()
+  const { games, isLoading } = useRecentlyPlayedGames()
   const recent = games.slice(0, MAX_GAMES)
 
   const [expanded, setExpanded] = useState<number | null>(null)
@@ -60,8 +61,6 @@ export default function RARecentlyPlayed() {
 
   const displayedGames = expanded === null ? recent : recent.filter((g) => g.GameID === expanded)
 
-  const isLoading = recent.length === 0
-
   return (
     <div className="flex flex-col flex-1 min-h-0 gap-2">
       {/* Header */}
@@ -91,6 +90,12 @@ export default function RARecentlyPlayed() {
           Array.from({ length: MAX_GAMES }).map((_, i) => (
             <div key={i} className="flex-1 bg-bg-main rounded-xl animate-pulse" />
           ))
+        ) : recent.length === 0 ? (
+          <EmptyState
+            icon={<IconDeviceGamepad2 className="w-6 h-6" />}
+            title={T.cards.noGames}
+            subtitle={T.mainPage.noGamesInProgressSub}
+          />
         ) : (
           <AnimatePresence mode="popLayout">
             {displayedGames.map((g) => {

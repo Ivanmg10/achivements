@@ -1,26 +1,24 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
-import { fetchRA } from '@/lib/fetchRA'
+import { cachedJson } from '@/lib/httpCache'
+import { requireRaSession } from '@/lib/apiAuth'
+import { getTopTenUsers } from '@/lib/raClient'
 
 const TTL = 15 * 60 * 1000
 
 export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-
-  const { raid } = session.user
-  if (!raid) return NextResponse.json({ message: 'No RA account linked' }, { status: 400 })
+  const auth = await requireRaSession()
+  if (!auth.ok) return auth.response
+  const { raid } = auth.session
 
   try {
     const data = await withCache(
       'topTenUsers_v1',
       TTL,
-      () => fetchRA(`https://retroachievements.org/API/API_GetTopTenUsers.php?y=${raid}`),
+      () => getTopTenUsers(raid),
       (d) => Array.isArray(d) && d.length > 0,
     )
-    return NextResponse.json(data)
+    return cachedJson(data, TTL)
   } catch {
     return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
   }

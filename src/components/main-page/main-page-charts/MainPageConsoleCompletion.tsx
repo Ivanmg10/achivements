@@ -1,9 +1,11 @@
 'use client'
 
 import { useMemo } from 'react'
+import { IconChartPie } from '@tabler/icons-react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
 import { useLanguage } from '@/context/LanguageContext'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 export default function MainPageConsoleCompletion({ games }: { games: RetroAchievementsGameCompleted[] }) {
   const { T } = useLanguage()
@@ -34,7 +36,7 @@ export default function MainPageConsoleCompletion({ games }: { games: RetroAchie
     return (
       <div className="flex flex-col gap-2">
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.consoleCompletionTitle}</p>
-        <div className="flex items-center justify-center py-4 text-text-secondary text-sm">{T.cards.noData}</div>
+        <EmptyState icon={<IconChartPie className="w-6 h-6" />} title={T.cards.noData} size="compact" className="py-2" />
       </div>
     )
   }

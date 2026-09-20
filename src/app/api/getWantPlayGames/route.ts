@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
-import { fetchRA } from '@/lib/fetchRA'
+import { cachedJson } from '@/lib/httpCache'
+import { getUserWantToPlayList } from '@/lib/raClient'
 
 const TTL = 15 * 60 * 1000
 
@@ -21,12 +22,10 @@ export async function GET() {
     const data = await withCache(
       `wantToPlay:${id}`,
       TTL,
-      () => fetchRA(
-        `https://retroachievements.org/API/API_GetUserWantToPlayList.php?u=${rausername}&y=${raid}`,
-      ),
+      () => getUserWantToPlayList(rausername, raid),
       (d) => d !== null && typeof d === 'object' && 'Results' in d && Array.isArray((d as { Results: unknown }).Results),
     )
-    return NextResponse.json(data)
+    return cachedJson(data, TTL)
   } catch {
     return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
   }

@@ -4,11 +4,12 @@ import { UserAwards } from '@/types/types'
 export function usePublicUserAwards(raUsername: string) {
   const [awards, setAwards] = useState<UserAwards | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const hasFetched = useRef(false)
+  const fetchedFor = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!raUsername || hasFetched.current) return
-    hasFetched.current = true
+    if (!raUsername || fetchedFor.current === raUsername) return
+    fetchedFor.current = raUsername
+    setAwards(null)
     setIsLoading(true)
     fetch(`/api/public/user/awards?u=${encodeURIComponent(raUsername)}`)
       .then((r) => {

@@ -13,7 +13,7 @@ jest.mock('@/context/PinnedGamesContext', () => ({
 }))
 
 jest.mock('@/hooks/useRecentlyPlayedGames', () => ({
-  useRecentlyPlayedGames: () => [],
+  useRecentlyPlayedGames: () => ({ games: [], isLoading: false }),
 }))
 
 jest.mock('@/lib/fetchWithRetry', () => ({ fetchWithRetry: jest.fn() }))

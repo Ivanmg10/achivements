@@ -1,29 +1,27 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
-import { fetchRA } from '@/lib/fetchRA'
+import { cachedJson } from '@/lib/httpCache'
+import { requireRaSession } from '@/lib/apiAuth'
+import { getUserRankAndScore } from '@/lib/raClient'
 
 const TTL = 15 * 60 * 1000
 
 export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-
-  const { rausername, raid, id } = session.user
-  if (!rausername || !raid) return NextResponse.json({ message: 'No RA account linked' }, { status: 400 })
+  const auth = await requireRaSession()
+  if (!auth.ok) return auth.response
+  const { id, rausername, raid } = auth.session
 
   try {
     const data = await withCache(
       `userRankAndScore_v1:${id}`,
       TTL,
-      () => fetchRA(`https://retroachievements.org/API/API_GetUserRankAndScore.php?u=${rausername}&y=${raid}`),
+      () => getUserRankAndScore(rausername, raid),
       (d) => d !== null && typeof d === 'object' && 'Rank' in d,
     )
     if (!data || typeof data !== 'object' || !('Rank' in data)) {
       return NextResponse.json({ message: 'Invalid RA response' }, { status: 404 })
     }
-    return NextResponse.json(data)
+    return cachedJson(data, TTL)
   } catch {
     return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
   }

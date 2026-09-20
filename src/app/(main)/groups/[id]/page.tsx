@@ -66,7 +66,7 @@ export default function GroupDetailPage() {
   const { T } = useLanguage()
   const { updateGroup, deleteGroup } = useGroups()
   const { all: allGames } = useGamesData()
-  const recentlyPlayed = useRecentlyPlayedGames()
+  const { games: recentlyPlayed } = useRecentlyPlayedGames()
 
   const achievementMap = useMemo(() => {
     const hcEarnedMap = new Map<number, number>()

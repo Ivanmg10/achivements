@@ -4,11 +4,12 @@ import { RetroAchievementsGameCompleted } from '@/types/types'
 export function usePublicUserCompleted(raUsername: string) {
   const [completed, setCompleted] = useState<RetroAchievementsGameCompleted[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const hasFetched = useRef(false)
+  const fetchedFor = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!raUsername || hasFetched.current) return
-    hasFetched.current = true
+    if (!raUsername || fetchedFor.current === raUsername) return
+    fetchedFor.current = raUsername
+    setCompleted([])
     setIsLoading(true)
     fetch(`/api/public/user/completed?u=${encodeURIComponent(raUsername)}`)
       .then((r) => {

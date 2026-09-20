@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
-import { fetchRA } from '@/lib/fetchRA'
+import { cachedJson } from '@/lib/httpCache'
+import { getUserCompletedGames } from '@/lib/raClient'
 
 const TTL = 10 * 60 * 1000
 
@@ -21,12 +22,10 @@ export async function GET() {
     const data = await withCache(
       `gamesCompleted:${id}`,
       TTL,
-      () => fetchRA(
-        `https://retroachievements.org/API/API_GetUserCompletedGames.php?u=${rausername}&y=${raid}`,
-      ),
+      () => getUserCompletedGames(rausername, raid),
       (d) => Array.isArray(d),
     )
-    return NextResponse.json(data)
+    return cachedJson(data, TTL)
   } catch {
     return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
   }

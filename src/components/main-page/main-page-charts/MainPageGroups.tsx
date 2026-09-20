@@ -9,6 +9,7 @@ import { useGroups } from '@/hooks/useGroups'
 import { GameGroup, RetroAchievementsGameCompleted } from '@/types/types'
 import GroupModal from '@/components/groups/GroupModal'
 import { relativeTime } from '@/utils/utils'
+import EmptyState from '@/components/empty-state/EmptyState'
 
 function isImageUrl(s: string) {
   return s.startsWith('http://') || s.startsWith('https://')
@@ -118,10 +119,13 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
           ))}
         </div>
       ) : groups.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center py-4">
-          <IconFolder className="w-8 h-8 text-text-secondary opacity-30" aria-hidden />
-          <p className="text-xs text-text-secondary">{T.groups.noGroups}</p>
-          <p className="text-[10px] text-text-secondary opacity-60">{T.groups.noGroupsSub}</p>
+        <div className="flex-1 flex flex-col items-center justify-center gap-1 py-4">
+          <EmptyState
+            icon={<IconFolder className="w-6 h-6" />}
+            title={T.groups.noGroups}
+            subtitle={T.groups.noGroupsSub}
+            size="compact"
+          />
           <button
             onClick={() => setModalOpen(true)}
             className="mt-1 px-3 py-1.5 rounded-lg bg-accent text-bg-main text-xs font-medium hover:bg-accent/90 transition-colors"
