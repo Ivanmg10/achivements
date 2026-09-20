@@ -1,27 +1,20 @@
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
-import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { cachedJson } from '@/lib/httpCache'
+import { requireRaSession } from '@/lib/apiAuth'
+import { getAchievementUnlocks, getAchievementComments } from '@/lib/raClient'
 
 const TTL = 5 * 60 * 1000
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) {
-    return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-  }
+  const auth = await requireRaSession()
+  if (!auth.ok) return auth.response
+  const { id, rausername, raid } = auth.session
 
   const achievementId = request.nextUrl.searchParams.get('achievementId')
   if (!achievementId || !/^\d+$/.test(achievementId)) {
     return NextResponse.json({ message: 'achievementId required' }, { status: 400 })
-  }
-
-  const { rausername, raid, id } = session.user
-  if (!rausername || !raid) {
-    return NextResponse.json({ message: 'No RA account linked' }, { status: 400 })
   }
 
   const data = await withCache(
@@ -29,12 +22,8 @@ export async function GET(request: NextRequest) {
     TTL,
     async () => {
       const [unlocks, comments] = await Promise.all([
-        fetchWithRetry(
-          `https://retroachievements.org/API/API_GetAchievementUnlocks.php?z=${rausername}&y=${raid}&a=${achievementId}&c=10`,
-        ).catch(() => null),
-        fetchWithRetry(
-          `https://retroachievements.org/API/API_GetComments.php?z=${rausername}&y=${raid}&i=${achievementId}&t=2&c=500`,
-        ).catch(() => null),
+        getAchievementUnlocks(rausername, raid, achievementId).catch(() => null),
+        getAchievementComments(rausername, raid, achievementId).catch(() => null),
       ])
 
       return { unlocks, comments }

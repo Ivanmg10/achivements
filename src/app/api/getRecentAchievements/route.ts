@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
-import { fetchRA } from '@/lib/fetchRA'
 import { cachedJson } from '@/lib/httpCache'
+import { getUserRecentAchievements } from '@/lib/raClient'
 
 const TTL = 60 * 1000
 
@@ -39,9 +39,7 @@ export async function GET() {
       `recentAch_v2:${id}`,
       TTL,
       async () => {
-        const raw = await fetchRA(
-          `https://retroachievements.org/API/API_GetUserRecentAchievements.php?u=${rausername}&y=${raid}&m=20160&c=500`,
-        )
+        const raw = await getUserRecentAchievements(rausername, raid, 20160, 500)
         return normalizeRaw(raw)
       },
       (d) => Array.isArray(d) && (d as unknown[]).length > 0,
