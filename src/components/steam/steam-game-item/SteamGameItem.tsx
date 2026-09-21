@@ -24,10 +24,13 @@ export default function SteamGameItem({
   game,
   expanded,
   onToggle,
+  className = '',
 }: {
   game: SteamGameProgress
   expanded?: boolean
   onToggle?: () => void
+  /** Extra classes for the root, e.g. to fill a flex slot in the recent feed. */
+  className?: string
 }) {
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
@@ -49,7 +52,7 @@ export default function SteamGameItem({
   else progressText = T.steam.progressUnknown
 
   return (
-    <div className="bg-bg-main rounded-xl overflow-hidden flex flex-col min-h-0">
+    <div className={`bg-bg-main rounded-xl overflow-hidden flex flex-col min-h-0 ${className}`}>
       <button
         onClick={toggle}
         aria-expanded={isExpanded}
@@ -106,7 +109,7 @@ export default function SteamGameItem({
       </button>
 
       {isExpanded && (
-        <div id={panelId} className="px-3 pb-3 pt-1 overflow-y-auto min-h-0">
+        <div id={panelId} className="flex-1 px-3 pb-3 pt-1 overflow-y-auto min-h-0">
           {game.hasStats ? (
             <SteamGameItemAchievements appId={game.id} />
           ) : (

@@ -117,3 +117,8 @@ describe('expansion', () => {
     expect(screen.getByTestId('achievements')).toBeInTheDocument()
   })
 })
+
+test('accepts extra root classes so it can fill a layout slot', () => {
+  const { container } = render(<SteamGameItem game={game()} className="h-full" />)
+  expect((container.firstChild as HTMLElement).className).toContain('h-full')
+})

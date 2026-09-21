@@ -2,14 +2,21 @@
 
 import NoMainHeader from '@/components/no-main-header/NoMainHeader'
 import AllGamesSection from '@/components/all-games-section/AllGamesSection'
+import SteamCategorySection from '@/components/steam/steam-category-section/SteamCategorySection'
 import { useAllGamesGlobal } from '@/hooks/useAllGamesGlobal'
 import { useGameExtraData } from '@/hooks/useGameExtraData'
+import { useLanguage } from '@/context/LanguageContext'
 import { motion } from 'framer-motion'
 import { fadeUp } from '@/lib/animations'
+
+const CATEGORIES = ['wantToPlay', 'playing', 'completed'] as const
 
 export default function AllGamesPage() {
   const { wantToPlay, playing, completed, loading } = useAllGamesGlobal()
   const extraData = useGameExtraData()
+  const { T } = useLanguage()
+
+  const raGames = { wantToPlay, playing, completed }
 
   return (
     <motion.div
@@ -21,24 +28,22 @@ export default function AllGamesPage() {
       <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
         <NoMainHeader />
 
-        <AllGamesSection
-          category="wantToPlay"
-          games={wantToPlay}
-          loading={loading}
-          extraData={extraData}
-        />
-        <AllGamesSection
-          category="playing"
-          games={playing}
-          loading={loading}
-          extraData={extraData}
-        />
-        <AllGamesSection
-          category="completed"
-          games={completed}
-          loading={loading}
-          extraData={extraData}
-        />
+        {CATEGORIES.map((category) => (
+          <div key={category} className="flex flex-col gap-4">
+            <AllGamesSection
+              category={category}
+              games={raGames[category]}
+              loading={loading}
+              extraData={extraData}
+            />
+            {/* Renders nothing unless Steam is linked, so no empty card for RA-only users. */}
+            <SteamCategorySection
+              category={category}
+              title={`Steam · ${T.categories[category]}`}
+              className="bg-bg-card rounded-xl p-5"
+            />
+          </div>
+        ))}
       </div>
     </motion.div>
   )

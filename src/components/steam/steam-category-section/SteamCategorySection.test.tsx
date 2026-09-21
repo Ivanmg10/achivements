@@ -106,3 +106,17 @@ test('defaults to two columns', () => {
   const { container } = render(<SteamCategorySection category="playing" />)
   expect((container.querySelector('.grid') as HTMLElement).className).toContain('md:grid-cols-2')
 })
+
+test('takes a heading override for pages showing several categories', () => {
+  render(<SteamCategorySection category="playing" title="Steam · Playing" />)
+  expect(screen.getByRole('region', { name: 'Steam · Playing' })).toBeInTheDocument()
+})
+
+test('applies root classes, and renders no wrapper at all when unlinked', () => {
+  const { container, rerender } = render(<SteamCategorySection category="playing" className="bg-bg-card" />)
+  expect((container.firstChild as HTMLElement).className).toContain('bg-bg-card')
+
+  setHook({ isLinked: false })
+  rerender(<SteamCategorySection category="playing" className="bg-bg-card" />)
+  expect(container).toBeEmptyDOMElement()
+})

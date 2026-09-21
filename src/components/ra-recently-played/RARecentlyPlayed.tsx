@@ -15,8 +15,19 @@ import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { MainViewToggle } from '@/components/main-view-toggle/MainViewToggle'
 import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-recently-played-expanded/RARecentlyPlayedExpanded'
 import EmptyState from '@/components/empty-state/EmptyState'
+import SteamGameItem from '@/components/steam/steam-game-item/SteamGameItem'
+import { useSteamGamesData } from '@/context/SteamGamesDataContext'
+import { mergeRecentFeeds, RecentFeedItem } from '@/utils/steamFeed'
 
 const MAX_GAMES = 7
+
+const CARD_MOTION = {
+  initial: { opacity: 0, y: 6 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8, scaleY: 0.85, transition: { duration: 0.2 } },
+  transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] as const },
+  style: { originY: 0, flex: '1 1 0%' },
+}
 
 const CONSOLE_BY_NAME = new Map(CONSOLES.map((c) => [c.name, c.icon]))
 
@@ -29,22 +40,30 @@ function pct(achieved: number, total: number) {
 export default function RARecentlyPlayed() {
   const { T } = useLanguage()
   const { games, isLoading } = useRecentlyPlayedGames()
-  const recent = games.slice(0, MAX_GAMES)
+  const { recent: steamRecent } = useSteamGamesData()
+  // One feed across platforms, newest first. Steam entries merge in when they
+  // arrive rather than holding the RA feed back while Steam loads.
+  const feed = mergeRecentFeeds(games, steamRecent, MAX_GAMES)
 
-  const [expanded, setExpanded] = useState<number | null>(null)
+  // Keyed by feed key, not game id: RA game 730 and Steam app 730 are different games.
+  const [expanded, setExpanded] = useState<string | null>(null)
   const [gameDataMap, setGameDataMap] = useState<
     Map<number, RetroAchievementsGameWithAchievements>
   >(new Map())
   const [loadingId, setLoadingId] = useState<number | null>(null)
 
-  async function handleExpand(gameId: number) {
-    if (expanded === gameId) {
+  async function handleExpand(item: RecentFeedItem) {
+    if (expanded === item.key) {
       setExpanded(null)
       return
     }
 
-    setExpanded(gameId)
+    setExpanded(item.key)
 
+    // Steam cards load their own achievements when opened.
+    if (item.source === 'steam') return
+
+    const gameId = item.game.GameID
     if (!gameDataMap.has(gameId)) {
       setLoadingId(gameId)
       try {
@@ -59,7 +78,7 @@ export default function RARecentlyPlayed() {
     }
   }
 
-  const displayedGames = expanded === null ? recent : recent.filter((g) => g.GameID === expanded)
+  const displayedItems = expanded === null ? feed : feed.filter((item) => item.key === expanded)
 
   return (
     <div className="flex flex-col flex-1 min-h-0 gap-2">
@@ -90,7 +109,7 @@ export default function RARecentlyPlayed() {
           Array.from({ length: MAX_GAMES }).map((_, i) => (
             <div key={i} className="flex-1 bg-bg-main rounded-xl animate-pulse" />
           ))
-        ) : recent.length === 0 ? (
+        ) : feed.length === 0 ? (
           <EmptyState
             icon={<IconDeviceGamepad2 className="w-6 h-6" />}
             title={T.cards.noGames}
@@ -98,8 +117,28 @@ export default function RARecentlyPlayed() {
           />
         ) : (
           <AnimatePresence mode="popLayout">
-            {displayedGames.map((g) => {
-              const isExp = expanded === g.GameID
+            {displayedItems.map((item) => {
+              const isExp = expanded === item.key
+
+              if (item.source === 'steam') {
+                return (
+                  <motion.div
+                    key={item.key}
+                    layout
+                    {...CARD_MOTION}
+                    className="flex flex-col min-h-0"
+                  >
+                    <SteamGameItem
+                      game={item.game}
+                      expanded={isExp}
+                      onToggle={() => handleExpand(item)}
+                      className="flex-1"
+                    />
+                  </motion.div>
+                )
+              }
+
+              const g = item.game
               const consoleIcon = CONSOLE_BY_NAME.get(g.ConsoleName)
               const data = gameDataMap.get(g.GameID)
               const achievements = data
@@ -113,21 +152,17 @@ export default function RARecentlyPlayed() {
 
               return (
                 <motion.div
-                  key={g.GameID}
+                  key={item.key}
                   layout
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8, scaleY: 0.85, transition: { duration: 0.2 } }}
-                  transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                  style={{ originY: 0, flex: '1 1 0%' }}
+                  {...CARD_MOTION}
                   className="bg-bg-main rounded-xl overflow-hidden flex flex-col min-h-0"
                 >
                   {/* Card row — div+onClick avoids nested <button><a> invalid HTML */}
                   <div
                     role="button"
                     tabIndex={0}
-                    onClick={() => handleExpand(g.GameID)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleExpand(g.GameID)}
+                    onClick={() => handleExpand(item)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleExpand(item)}
                     className="flex items-center gap-3 px-3 py-3 w-full text-left hover:bg-white/5 transition-colors cursor-pointer focus-visible:outline-none shrink-0"
                   >
                     {/* Icon — link only on this element */}

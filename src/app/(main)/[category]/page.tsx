@@ -20,6 +20,9 @@ import StatusGridControl, { StatusGridCols } from '@/components/status-grid-cont
 import EmptyState from '../../../components/empty-state/EmptyState'
 import LoadingPage from '../../../components/loading-page/LoadingPage'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSteamGamesData } from '@/context/SteamGamesDataContext'
+import SteamCategorySection from '@/components/steam/steam-category-section/SteamCategorySection'
+import { useSession } from 'next-auth/react'
 import { useEffect, useMemo } from 'react'
 
 export default function CategoryPage() {
@@ -32,6 +35,11 @@ export default function CategoryPage() {
   const cat = category as string
   const [sortState, setSortState] = useState<StatusSortState>(() => defaultSortStateFor(cat))
   const [gridCols, setGridCols] = useState<StatusGridCols>(2)
+  const { data: session } = useSession()
+  const { isLinked: steamLinked } = useSteamGamesData()
+  // A Steam-only user has no RA list to show — its empty state would tell them
+  // to go play on RetroAchievements. Without either account, keep the RA page.
+  const showRa = Boolean(session?.user?.raUser?.User) || !steamLinked
 
   useEffect(() => {
     setSortState(defaultSortStateFor(cat))
@@ -49,7 +57,7 @@ export default function CategoryPage() {
   return (
     <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white">
       <div className="w-full lg:max-w-[98%] flex flex-col gap-3">
-        {loading ? (
+        {!showRa ? null : loading ? (
           <LoadingPage
             subtitle={
               {
@@ -66,7 +74,7 @@ export default function CategoryPage() {
             icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
             title={EMPTY_STATE[cat]?.title ?? ''}
             subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-            className="min-h-[60vh]"
+            className={steamLinked ? 'min-h-[20vh]' : 'min-h-[60vh]'}
           />
         ) : (
           <>
@@ -110,6 +118,8 @@ export default function CategoryPage() {
             )}
           </>
         )}
+        {/* Steam games get their own section: the RA list's filters and sorting are RA-only. */}
+        {(!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} />}
       </div>
     </div>
   )

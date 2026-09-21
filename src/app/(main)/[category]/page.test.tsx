@@ -1,3 +1,12 @@
+jest.mock('@/components/steam/steam-category-section/SteamCategorySection', () => ({
+  __esModule: true,
+  default: ({ category }: { category: string }) => <div data-testid="steam-section">{category}</div>,
+}))
+
+jest.mock('@/context/SteamGamesDataContext', () => ({
+  useSteamGamesData: jest.fn(() => ({ isLinked: false })),
+}))
+
 jest.mock('../../../hooks/useGamesByCategory', () => ({
   useGamesByCategory: jest.fn(),
 }))
@@ -52,6 +61,8 @@ import CategoryPage from './page'
 import { useParams } from 'next/navigation'
 import { useGamesByCategory } from '../../../hooks/useGamesByCategory'
 import { useGameFiltering } from '../../../hooks/useGameFiltering'
+import { useSession } from 'next-auth/react'
+import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 
 const mockGames = [
   { GameID: 1, GameTitle: 'Sly Cooper', ConsoleID: 21, ConsoleName: 'PS2', ImageIcon: '/icon.png', NumAchievements: 10, NumAchievedHardcore: 5, PctWon: '0.5' },
@@ -101,4 +112,58 @@ test('passes a default name sort state for the want-to-play category', () => {
   expect(useGameFiltering).toHaveBeenCalledWith(
     expect.objectContaining({ sortState: { key: 'name', dir: 'asc' } }),
   )
+})
+
+describe('Steam section', () => {
+  function asUser(user: Record<string, unknown>, steamLinked: boolean) {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user }, status: 'authenticated', update: jest.fn() })
+    ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: steamLinked })
+  }
+
+  afterEach(() => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: null, status: 'unauthenticated', update: jest.fn() })
+    ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false })
+  })
+
+  test('follows the RA list for the same category', () => {
+    asUser({ raUser: { User: 'Ivan' } }, true)
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: mockGames, loading: false, error: undefined })
+    render(<CategoryPage />)
+
+    const list = screen.getByTestId('game-list')
+    const steam = screen.getByTestId('steam-section')
+    expect(steam).toHaveTextContent('playing')
+    expect(list.compareDocumentPosition(steam) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  test('waits for the RA list rather than showing under a loading page', () => {
+    asUser({ raUser: { User: 'Ivan' } }, true)
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: true, error: undefined })
+    render(<CategoryPage />)
+    expect(screen.queryByTestId('steam-section')).not.toBeInTheDocument()
+  })
+
+  test('a Steam-only user sees only Steam — no RA empty state telling them to play on RA', () => {
+    asUser({ steamid: '765' }, true)
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: undefined })
+    render(<CategoryPage />)
+
+    expect(screen.getByTestId('steam-section')).toBeInTheDocument()
+    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('loading-page')).not.toBeInTheDocument()
+  })
+
+  test('a Steam-only user is not held up by the RA loading state', () => {
+    asUser({ steamid: '765' }, true)
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: true, error: undefined })
+    render(<CategoryPage />)
+    expect(screen.getByTestId('steam-section')).toBeInTheDocument()
+  })
+
+  test('with neither account the RA page is unchanged', () => {
+    asUser({}, false)
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: undefined })
+    render(<CategoryPage />)
+    expect(screen.getByTestId('empty-state')).toBeInTheDocument()
+  })
 })

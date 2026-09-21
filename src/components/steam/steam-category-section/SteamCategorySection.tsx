@@ -25,9 +25,15 @@ const GRID_CLASS: Record<StatusGridCols, string> = {
 export default function SteamCategorySection({
   category,
   gridCols = 2,
+  title,
+  className = '',
 }: {
   category: string
   gridCols?: StatusGridCols
+  /** Heading override, for pages that show several categories at once. */
+  title?: string
+  /** Root classes — lets a page card the section without an empty card when unlinked. */
+  className?: string
 }) {
   const { T } = useLanguage()
   const { games, isLinked, loading, error, progressTruncated, refetch } = useSteamGamesByCategory(category)
@@ -37,11 +43,11 @@ export default function SteamCategorySection({
   const headingId = `steam-section-${category}`
 
   return (
-    <section aria-labelledby={headingId} className="flex flex-col gap-3 w-full">
+    <section aria-labelledby={headingId} className={`flex flex-col gap-3 w-full ${className}`}>
       <div className="flex items-baseline gap-2 flex-wrap">
         <h2 id={headingId} className="flex items-center gap-2 text-xl font-bold">
           <IconBrandSteam size={22} className="text-[#66c0f4]" aria-hidden="true" />
-          {T.steam.gamesSection}
+          {title ?? T.steam.gamesSection}
         </h2>
         {!loading && !error && <span className="text-sm text-text-secondary">{games.length}</span>}
       </div>
