@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { IconBrandSteam } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import SteamGameItem from '../steam-game-item/SteamGameItem'
@@ -45,7 +45,7 @@ export default function SteamRecentList() {
           </button>
         </div>
       ) : games.length === 0 ? (
-        <EmptyState icon={<IconBrandSteam className="w-6 h-6" />} title={T.steam.recentEmpty} />
+        <EmptyState icon={<SteamLogo className="w-6 h-6" />} title={T.steam.recentEmpty} />
       ) : (
         <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-y-auto">
           {games.map((g) => (

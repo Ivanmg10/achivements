@@ -17,7 +17,7 @@ test('shows title, platform line and icon', () => {
 
 test('marks a Steam game with the Steam logo', () => {
   render(<GamePickerRow candidate={STEAM} selected={false} onToggle={jest.fn()} />)
-  expect(screen.getByTestId('IconBrandSteam')).toBeInTheDocument()
+  expect(screen.getByTestId('steam-logo')).toBeInTheDocument()
   expect(screen.getByText('Steam')).toBeInTheDocument()
 })
 

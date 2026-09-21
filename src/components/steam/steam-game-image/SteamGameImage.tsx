@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { IconBrandSteam } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { steamAssetUrl, SteamAsset } from '@/lib/steamClient'
 
 /**
@@ -46,7 +46,7 @@ export default function SteamGameImage({
         aria-hidden={alt ? undefined : true}
         className={`bg-[#1b2838] flex items-center justify-center ${className}`}
       >
-        <IconBrandSteam size={Math.round(size / 2)} className="text-[#66c0f4]" aria-hidden="true" />
+        <SteamLogo size={Math.round(size / 2)} className="text-[#66c0f4]" aria-hidden="true" />
       </div>
     )
   }

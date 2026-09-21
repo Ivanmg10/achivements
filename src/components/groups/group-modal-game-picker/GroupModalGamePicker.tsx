@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
-import { IconBrandSteam, IconSearch, IconTrash } from '@tabler/icons-react'
+import { IconSearch, IconTrash } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { fetchRaCandidateById } from '@/utils/apiCallsUtils'
@@ -71,7 +72,7 @@ export default function GroupModalGamePicker({
                 {icon && <Image src={icon} alt="" width={20} height={20} className="rounded shrink-0" unoptimized />}
                 <span className="text-xs flex-1 line-clamp-1">{g.title}</span>
                 {g.source === 'steam' && (
-                  <IconBrandSteam size={12} className="text-[#66c0f4] shrink-0" aria-label="Steam" />
+                  <SteamLogo size={12} className="text-[#66c0f4] shrink-0" aria-label="Steam" />
                 )}
                 <button
                   type="button"
@@ -120,7 +121,7 @@ export default function GroupModalGamePicker({
                   <span className="text-xs line-clamp-1">{c.title}</span>
                   <span className="text-[10px] text-text-secondary flex items-center gap-1">
                     {c.source === 'steam' && (
-                      <IconBrandSteam size={10} className="text-[#66c0f4] shrink-0" aria-hidden="true" />
+                      <SteamLogo size={10} className="text-[#66c0f4] shrink-0" aria-hidden="true" />
                     )}
                     {c.subtitle}
                   </span>

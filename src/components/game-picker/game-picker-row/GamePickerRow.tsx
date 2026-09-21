@@ -1,7 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import { IconBrandSteam, IconCheck } from '@tabler/icons-react'
+import { IconCheck } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { candidateIconUrl, GameCandidate } from '@/utils/gameCandidates'
 
 /**
@@ -34,7 +35,7 @@ export default function GamePickerRow({
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-text-main truncate">{c.title}</p>
         <p className="text-xs text-text-secondary truncate flex items-center gap-1">
-          {c.source === 'steam' && <IconBrandSteam size={11} className="text-[#66c0f4] shrink-0" aria-hidden="true" />}
+          {c.source === 'steam' && <SteamLogo size={11} className="text-[#66c0f4] shrink-0" aria-hidden="true" />}
           {c.subtitle}
         </p>
       </div>

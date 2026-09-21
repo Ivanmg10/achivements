@@ -1,7 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import { IconBrandSteam, IconExternalLink } from '@tabler/icons-react'
+import { IconExternalLink } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
@@ -97,7 +98,7 @@ export default function MainPageProfileStLinked({
             aria-hidden="true"
             className="m-1 rounded-lg bg-[#1b2838] shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5 flex items-center justify-center"
           >
-            <IconBrandSteam size={32} className="text-[#66c0f4]" />
+            <SteamLogo size={32} className="text-[#66c0f4]" />
           </div>
         )}
         <div className="flex flex-col gap-1 min-w-0 w-full">

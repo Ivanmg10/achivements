@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { IconBrandSteam } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { candidateIconUrl, CandidateStatus, GameCandidate } from '@/utils/gameCandidates'
 
@@ -49,7 +49,7 @@ export default function SearchModalGameResult({
         <p className="text-sm font-medium text-text-main line-clamp-1">{game.title}</p>
         <p className="text-xs text-text-secondary line-clamp-1 flex items-center gap-1">
           {game.source === 'steam' && (
-            <IconBrandSteam size={11} className="text-[#66c0f4] shrink-0" aria-hidden="true" />
+            <SteamLogo size={11} className="text-[#66c0f4] shrink-0" aria-hidden="true" />
           )}
           {game.subtitle}
         </p>

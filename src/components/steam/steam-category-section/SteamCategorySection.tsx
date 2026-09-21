@@ -1,6 +1,6 @@
 'use client'
 
-import { IconBrandSteam } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import CollapsibleSection from '@/components/collapsible-section/CollapsibleSection'
@@ -45,7 +45,7 @@ export default function SteamCategorySection({
   return (
     <CollapsibleSection
       title={title ?? T.steam.gamesSection}
-      icon={<IconBrandSteam size={22} className="text-[#66c0f4]" aria-hidden="true" />}
+      icon={<SteamLogo size={22} className="text-[#66c0f4]" aria-hidden="true" />}
       count={loading || error ? undefined : games.length}
       storageKey={`steam-section-open:${category}`}
       className={className}
@@ -76,7 +76,7 @@ export default function SteamCategorySection({
       ) : games.length === 0 ? (
         <EmptyState
           size="compact"
-          icon={<IconBrandSteam className="w-6 h-6" />}
+          icon={<SteamLogo className="w-6 h-6" />}
           title={T.steam.noGamesInCategory}
           className="py-6"
         />

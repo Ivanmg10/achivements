@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { IconBrandSteam } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import RaLogo from '@/components/ra-logo/RaLogo'
 
 import { useGameProgression } from '@/hooks/useGameProgression'
@@ -53,7 +53,7 @@ export default function MainPageProfile() {
         onSelect={setTab}
         tabs={[
           { id: 'ra', label: 'RetroAchievements', icon: <RaLogo height={11} /> },
-          { id: 'steam', label: 'Steam', icon: <IconBrandSteam size={13} aria-hidden="true" /> },
+          { id: 'steam', label: 'Steam', icon: <SteamLogo size={13} aria-hidden="true" /> },
         ]}
       />
       <div

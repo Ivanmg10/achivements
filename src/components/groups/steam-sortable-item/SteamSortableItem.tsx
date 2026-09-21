@@ -4,7 +4,8 @@ import { useId, useState } from 'react'
 import Link from 'next/link'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { IconBrandSteam, IconClock, IconGripVertical, IconX } from '@tabler/icons-react'
+import { IconClock, IconGripVertical, IconX } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
@@ -111,7 +112,7 @@ export default function SteamSortableItem({
             <span className="flex flex-col flex-1 min-w-0 gap-1">
               <span className="flex items-center gap-1.5 flex-wrap">
                 <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium bg-[#1b2838] text-[#66c0f4]">
-                  <IconBrandSteam size={12} aria-hidden="true" />
+                  <SteamLogo size={12} aria-hidden="true" />
                   Steam
                 </span>
                 {isComplete && (

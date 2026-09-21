@@ -2,7 +2,8 @@
 
 import { useId, useState } from 'react'
 import Link from 'next/link'
-import { IconBrandSteam, IconChevronDown, IconClock } from '@tabler/icons-react'
+import { IconChevronDown, IconClock } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
@@ -85,7 +86,7 @@ export default function SteamGameItem({
           >
             <span className="flex items-center gap-2 w-full">
               <span className="flex items-center gap-1 shrink-0 text-xs text-text-secondary">
-                <IconBrandSteam size={12} className="opacity-60" aria-hidden="true" />
+                <SteamLogo size={12} className="opacity-60" aria-hidden="true" />
                 Steam
               </span>
               {hasCounts && <SteamProgressBar pct={game.pctWon} label={game.title} className="flex-1" />}

@@ -1,6 +1,6 @@
 'use client'
 
-import { IconBrandSteam } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamLink, STEAM_LINK_URL, SteamLinkStatus } from '@/hooks/useSteamLink'
 
@@ -50,7 +50,7 @@ export default function UserDataSteamAccount() {
       {isLinked ? (
         <>
           <div className="flex items-center gap-3">
-            <IconBrandSteam size={40} className="shrink-0 text-text-secondary" aria-hidden="true" />
+            <SteamLogo size={40} className="shrink-0 text-text-secondary" aria-hidden="true" />
             <div className="flex flex-col gap-0.5 min-w-0">
               <span className="font-bold truncate">{steamUsername || '—'}</span>
               <span className="text-xs text-text-secondary font-mono truncate">{steamId}</span>
@@ -71,7 +71,7 @@ export default function UserDataSteamAccount() {
             href={STEAM_LINK_URL}
             className="w-full bg-accent text-bg-main font-bold py-2 rounded-xl hover:opacity-90 transition-opacity text-sm flex items-center justify-center gap-2"
           >
-            <IconBrandSteam size={18} aria-hidden="true" />
+            <SteamLogo size={18} aria-hidden="true" />
             {T.userData.steamConnect}
           </a>
         </>

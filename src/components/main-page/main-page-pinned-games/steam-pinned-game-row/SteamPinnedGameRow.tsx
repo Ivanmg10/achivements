@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { IconBrandSteam, IconChevronDown, IconGripVertical } from '@tabler/icons-react'
+import { IconChevronDown, IconGripVertical } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
@@ -80,7 +81,7 @@ export default function SteamPinnedGameRow({
 
           <div className="flex items-center gap-2">
             <span className="flex items-center gap-1 shrink-0 text-xs text-text-secondary">
-              <IconBrandSteam size={12} className="opacity-60" aria-hidden="true" />
+              <SteamLogo size={12} className="opacity-60" aria-hidden="true" />
               Steam
             </span>
             {hasCounts && <SteamProgressBar pct={game.pctWon} label={game.title} className="flex-1" />}

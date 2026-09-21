@@ -28,7 +28,7 @@ test('steps down cover → header → icon → placeholder as each fails', () =>
 
   fireEvent.error(img(container)!)
   expect(img(container)).toBeNull()
-  expect(screen.getByTestId('IconBrandSteam')).toBeInTheDocument()
+  expect(screen.getByTestId('steam-logo')).toBeInTheDocument()
 })
 
 test('does not try the header twice when the header was the request', () => {

@@ -1,6 +1,7 @@
 'use client'
 
-import { IconBrandSteam, IconExternalLink } from '@tabler/icons-react'
+import { IconExternalLink } from '@tabler/icons-react'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import GameInfoHeaderStatsBadge from '@/components/game-info-header/game-info-header-stats-badge/GameInfoHeaderStatsBadge'
@@ -64,7 +65,7 @@ export default function SteamGameInfoHeader({
 
           <div className="flex items-center gap-2 flex-wrap">
             <span className="inline-flex items-center gap-1.5 text-sm px-2 py-0.5 rounded-md font-medium bg-[#1b2838] text-[#66c0f4]">
-              <IconBrandSteam size={14} aria-hidden="true" />
+              <SteamLogo size={14} aria-hidden="true" />
               Steam
             </span>
             {isPerfect && (
