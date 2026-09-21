@@ -481,7 +481,7 @@ export const ja: Translations = {
   steam: {
     viewOnSteam: 'Steam で見る',
     totalPlaytime: '総プレイ時間',
-    partialProgressNote: '進捗は最近プレイしたゲームのみ読み込まれます',
+    partialProgressNote: '一部のゲームの進捗はまだ読み込み中か取得できなかったため、この一覧は不完全な可能性があります',
     minutesShort: '分',
     hoursShort: '時間',
     playtime: 'プレイ時間',

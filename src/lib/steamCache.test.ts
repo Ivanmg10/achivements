@@ -1,7 +1,7 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
 import pool from '@/lib/db'
-import { readCache, writeCache, withSteamCache, clearUserCache, sweepExpired, TTL } from './steamCache'
+import { readCache, readCacheMany, writeCache, withSteamCache, clearUserCache, sweepExpired, TTL } from './steamCache'
 
 const query = pool.query as jest.Mock
 
@@ -142,4 +142,30 @@ test('TTLs match how fast each endpoint changes', () => {
   expect(TTL.recentlyPlayed).toBeLessThan(TTL.profile)
   expect(TTL.profile).toBeLessThan(TTL.ownedGames)
   expect(TTL.schema).toBeGreaterThan(TTL.achievements)
+})
+
+describe('readCacheMany', () => {
+  test('returns live entries for many keys in one query', async () => {
+    query.mockResolvedValue({ rows: [
+      { cache_key: 'a', cache_data: [1] },
+      { cache_key: 'c', cache_data: [3] },
+    ] })
+
+    const found = await readCacheMany(['a', 'b', 'c'])
+    expect(query).toHaveBeenCalledTimes(1)
+    expect(query.mock.calls[0][0]).toContain('cache_key = ANY($1)')
+    expect(query.mock.calls[0][0]).toContain('expires_at > NOW()')
+    expect(query.mock.calls[0][1]).toEqual([['a', 'b', 'c']])
+    expect([...found]).toEqual([['a', [1]], ['c', [3]]])
+  })
+
+  test('skips the query entirely for no keys', async () => {
+    await expect(readCacheMany([])).resolves.toEqual(new Map())
+    expect(query).not.toHaveBeenCalled()
+  })
+
+  test('degrades to all misses when the DB is down', async () => {
+    query.mockRejectedValue(new Error('db down'))
+    await expect(readCacheMany(['a'])).resolves.toEqual(new Map())
+  })
 })

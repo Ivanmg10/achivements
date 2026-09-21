@@ -2,7 +2,12 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { countLoadedProgress, hasUnloadedProgress } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
+
+/** Follow-up library requests while the server is still filling counts. */
+const MAX_FILL_PASSES = 10
+const FILL_DELAY_MS = 500
 
 type SteamGamesCtx = {
   isLinked: boolean
@@ -84,16 +89,40 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
       if (current()) setRecentLoading(false)
     }
 
+    let games: SteamGameProgress[]
     try {
-      const games = await fetchGames('/api/steam/ownedGames')
+      games = await fetchGames('/api/steam/ownedGames')
       if (!current()) return
       setLibrary(games)
     } catch (err) {
       if (!current()) return
       console.error('[SteamGamesData] library', forId, err)
       setLibraryError(err instanceof Error ? err.message : 'Unknown error')
+      return
     } finally {
       if (current()) setLibraryLoading(false)
+    }
+
+    // The server counts achievements a batch per request, so a first load can
+    // come back part-filled. Keep asking in the background until it is done —
+    // or a pass makes no progress (a private profile, a game Steam keeps
+    // failing), which would otherwise loop forever.
+    for (let pass = 0; pass < MAX_FILL_PASSES && hasUnloadedProgress(games); pass++) {
+      await new Promise((r) => setTimeout(r, FILL_DELAY_MS))
+      if (!current()) return
+      let next: SteamGameProgress[]
+      try {
+        next = await fetchGames('/api/steam/ownedGames')
+      } catch (err) {
+        // Keep what is already shown; the list is just less complete.
+        console.error('[SteamGamesData] library fill', forId, err)
+        return
+      }
+      if (!current()) return
+      const progressed = countLoadedProgress(next) > countLoadedProgress(games)
+      setLibrary(next)
+      games = next
+      if (!progressed) return
     }
   }, [])
 
@@ -115,6 +144,15 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
     setRecent([])
     setLibrary([])
     load(steamid)
+
+    // On unmount (e.g. signing out) or a new account, end any load or
+    // background fill in progress. Clearing loadedFor too means a remount —
+    // including Strict Mode's dev-only unmount/remount — loads again instead
+    // of finding the discarded load marked as done.
+    return () => {
+      generation.current++
+      loadedFor.current = null
+    }
   }, [steamid, load])
 
   const refetch = useCallback(() => {

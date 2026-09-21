@@ -96,3 +96,16 @@ export function formatPlaytime(
   const rounded = hours < 10 ? Math.round(hours * 10) / 10 : Math.round(hours)
   return `${rounded.toLocaleString(locale)} ${units.hours}`
 }
+
+/**
+ * True while some played game with achievements has no counts yet — the
+ * server fills counts over several requests, and a game it could not fetch
+ * stays unloaded. Until then playing/completed totals are a lower bound.
+ */
+export function hasUnloadedProgress(games: SteamGameProgress[]): boolean {
+  return games.some((g) => g.hasStats && g.playtimeForever > 0 && !g.achievementsLoaded)
+}
+
+export function countLoadedProgress(games: SteamGameProgress[]): number {
+  return games.filter((g) => g.achievementsLoaded).length
+}

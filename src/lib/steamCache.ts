@@ -21,6 +21,12 @@ export const TTL = {
   achievements: 60 * 60 * 1000,
   /** Achievement definitions change only when a developer ships an update. */
   schema: 24 * 60 * 60 * 1000,
+  /**
+   * Unlock counts keyed by the game's last-played time. Progress can only move
+   * when the game is played, which changes the key — so an entry for a game
+   * not touched since is still right a month later.
+   */
+  settledProgress: 30 * 24 * 60 * 60 * 1000,
 } as const
 
 /** Dedupes concurrent misses within one process before they reach Steam. */
@@ -38,6 +44,26 @@ export async function readCache<T>(key: string): Promise<T | null> {
     console.error('[steamCache] read', key, err)
     return null
   }
+}
+
+/**
+ * Live entries for many keys in one query — for enriching a whole library
+ * without one round trip per game. Missing and expired keys are absent from
+ * the map; a DB failure degrades to an empty map (all misses).
+ */
+export async function readCacheMany<T>(keys: string[]): Promise<Map<string, T>> {
+  const found = new Map<string, T>()
+  if (keys.length === 0) return found
+  try {
+    const result = await pool.query(
+      'SELECT cache_key, cache_data FROM steam_cache WHERE cache_key = ANY($1) AND expires_at > NOW()',
+      [keys],
+    )
+    for (const row of result.rows) found.set(row.cache_key, row.cache_data as T)
+  } catch (err) {
+    console.error('[steamCache] readMany', keys.length, err)
+  }
+  return found
 }
 
 export async function writeCache(

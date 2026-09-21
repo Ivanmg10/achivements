@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
-import { classifySteamGame, SteamCategory } from '@/utils/steamFeed'
+import { classifySteamGame, hasUnloadedProgress, SteamCategory } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
 
 function isSteamCategory(cat: string): cat is SteamCategory {
@@ -29,10 +29,7 @@ export function useSteamGamesByCategory(category: string) {
    * server's per-request budget ran out. Those games cannot be placed in
    * playing/completed, so those lists may be incomplete and should say so.
    */
-  const progressTruncated = useMemo(
-    () => library.some((g) => g.hasStats && g.playtimeForever > 0 && !g.achievementsLoaded),
-    [library],
-  )
+  const progressTruncated = useMemo(() => hasUnloadedProgress(library), [library])
 
   return { games, isLinked, loading: libraryLoading, error: libraryError, progressTruncated, refetch }
 }

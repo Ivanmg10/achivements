@@ -481,7 +481,7 @@ export const ru: Translations = {
   steam: {
     viewOnSteam: 'Открыть в Steam',
     totalPlaytime: 'Всего в игре',
-    partialProgressNote: 'Прогресс загружается только для недавно запущенных игр',
+    partialProgressNote: 'Прогресс некоторых игр ещё загружается или недоступен, поэтому список может быть неполным',
     minutesShort: 'мин',
     hoursShort: 'ч',
     playtime: 'Время в игре',

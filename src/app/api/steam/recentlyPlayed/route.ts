@@ -34,8 +34,8 @@ export async function GET() {
           .map((g) => toSteamGameProgress({ ...g, rtime_last_played: g.rtime_last_played ?? lastPlayed.get(g.appid) }))
           // Steam orders these by recent playtime, not by date.
           .sort(byLastPlayedDesc)
-        // The initial feed: counts for every recent game (≤20 calls, each cached 1h).
-        return enrichWithAchievementCounts(mapped, auth.session, COUNT)
+        // The initial feed: counts for every recent game (≤20 calls, shared with the library cache).
+        return (await enrichWithAchievementCounts(mapped, auth.session, COUNT)).games
       },
       { userId: id },
     )

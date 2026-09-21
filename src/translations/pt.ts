@@ -481,7 +481,7 @@ export const pt: Translations = {
   steam: {
     viewOnSteam: 'Ver na Steam',
     totalPlaytime: 'Tempo total',
-    partialProgressNote: 'O progresso só é carregado para os jogos que jogaste mais recentemente',
+    partialProgressNote: 'O progresso de alguns jogos ainda está a carregar ou não pôde ser obtido, por isso esta lista pode estar incompleta',
     minutesShort: 'min',
     hoursShort: 'h',
     playtime: 'Tempo jogado',

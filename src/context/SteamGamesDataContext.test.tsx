@@ -1,4 +1,5 @@
-import { renderHook, waitFor, act } from '@testing-library/react'
+import { StrictMode } from 'react'
+import { render, renderHook, waitFor, act } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { SteamGamesDataProvider, useSteamGamesData } from './SteamGamesDataContext'
 
@@ -169,4 +170,112 @@ test('drops a response that arrives after the account changed', async () => {
   // The first account's recent feed finally lands — it must not overwrite.
   await act(async () => { releaseOld(ok([{ id: 1, title: 'Old account' }])) })
   expect(result.current.recent).toEqual([{ id: 99, title: 'New account' }])
+})
+
+describe('filling achievement counts in the background', () => {
+  const unloaded = { _source: 'steam', id: 5, title: 'Pending', hasStats: true, playtimeForever: 60, achievementsLoaded: false }
+  const loaded = { ...unloaded, achievementsLoaded: true, maxPossible: 10, numAwarded: 10 }
+
+  function libraryResponses(...bodies: unknown[]) {
+    const queue = [...bodies]
+    ;(global.fetch as jest.Mock).mockImplementation(async (url: string) => {
+      if (url === '/api/steam/recentlyPlayed') return ok(RECENT)
+      const next = queue.length > 1 ? queue.shift() : queue[0]
+      if (next instanceof Error) throw next
+      return ok(next)
+    })
+  }
+
+  const libraryCalls = () =>
+    (fetch as jest.Mock).mock.calls.filter((c) => c[0] === '/api/steam/ownedGames').length
+
+  test('keeps asking until every countable game has counts', async () => {
+    setSteamId('765')
+    libraryResponses([unloaded], [loaded])
+    const { result } = renderHook(() => useSteamGamesData(), { wrapper })
+
+    await waitFor(() => expect(result.current.library).toEqual([loaded]), { timeout: 3000 })
+    expect(libraryCalls()).toBe(2)
+  })
+
+  test('shows the first partial result straight away rather than waiting for the fill', async () => {
+    setSteamId('765')
+    libraryResponses([unloaded], [loaded])
+    const { result } = renderHook(() => useSteamGamesData(), { wrapper })
+
+    await waitFor(() => expect(result.current.library).toEqual([unloaded]))
+    expect(result.current.libraryLoading).toBe(false)
+  })
+
+  test('stops when a pass makes no progress, e.g. a private profile', async () => {
+    setSteamId('765')
+    libraryResponses([unloaded])
+    const { result } = renderHook(() => useSteamGamesData(), { wrapper })
+
+    await waitFor(() => expect(libraryCalls()).toBe(2), { timeout: 3000 })
+    await new Promise((r) => setTimeout(r, 800))
+    expect(libraryCalls()).toBe(2)
+    expect(result.current.library).toEqual([unloaded])
+  })
+
+  test('a failed fill pass keeps what is shown and reports no error', async () => {
+    setSteamId('765')
+    libraryResponses([unloaded], new Error('offline'))
+    const { result } = renderHook(() => useSteamGamesData(), { wrapper })
+
+    await waitFor(() => expect(libraryCalls()).toBe(2), { timeout: 3000 })
+    expect(result.current.library).toEqual([unloaded])
+    expect(result.current.libraryError).toBeNull()
+  })
+
+  test('stops filling once the account is unlinked', async () => {
+    setSteamId('765')
+    libraryResponses([unloaded], [loaded])
+    const { result, rerender } = renderHook(() => useSteamGamesData(), { wrapper })
+    await waitFor(() => expect(result.current.library).toEqual([unloaded]))
+
+    setSteamId(null)
+    rerender()
+    await new Promise((r) => setTimeout(r, 800))
+
+    expect(libraryCalls()).toBe(1)
+    expect(result.current.library).toEqual([])
+  })
+})
+
+test('unmounting ends a background fill in progress', async () => {
+  const unloaded = { _source: 'steam', id: 5, title: 'Pending', hasStats: true, playtimeForever: 60, achievementsLoaded: false }
+  setSteamId('765')
+  ;(global.fetch as jest.Mock).mockImplementation(async (url: string) =>
+    ok(url === '/api/steam/recentlyPlayed' ? RECENT : [unloaded]),
+  )
+  const { result, unmount } = renderHook(() => useSteamGamesData(), { wrapper })
+  await waitFor(() => expect(result.current.library).toEqual([unloaded]))
+
+  unmount()
+  await new Promise((r) => setTimeout(r, 800))
+
+  const libraryCalls = (fetch as jest.Mock).mock.calls.filter((c) => c[0] === '/api/steam/ownedGames').length
+  expect(libraryCalls).toBe(1)
+})
+
+test('loads under Strict Mode, whose dev-only remount discards the first load', async () => {
+  // render, not renderHook: only render reproduces Strict Mode's effect
+  // unmount/remount, which keeps the provider's refs across the remount.
+  setSteamId('765')
+  mockRoutes()
+  const seen: { library: unknown[] } = { library: [] }
+  function Probe() {
+    seen.library = useSteamGamesData().library
+    return null
+  }
+  render(
+    <StrictMode>
+      <SteamGamesDataProvider>
+        <Probe />
+      </SteamGamesDataProvider>
+    </StrictMode>,
+  )
+
+  await waitFor(() => expect(seen.library).toEqual(LIBRARY))
 })

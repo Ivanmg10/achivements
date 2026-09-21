@@ -108,3 +108,16 @@ test('treats a missing profile with no error as an error, not a blank card', () 
   renderIt({ profile: null })
   expect(screen.getByRole('alert')).toBeInTheDocument()
 })
+
+test('marks the completed total as a lower bound while counts are still filling', () => {
+  const pending = { ...game(300), hasStats: true, achievementsLoaded: false }
+  setLibrary({ library: [...LIBRARY, pending] })
+  renderIt()
+
+  expect(screen.getByText(en.categories.completed).nextElementSibling?.textContent).toBe('1+')
+})
+
+test('shows the completed total as final once every game is counted', () => {
+  renderIt()
+  expect(screen.getByText(en.categories.completed).nextElementSibling?.textContent).toBe('1')
+})

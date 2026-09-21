@@ -62,26 +62,48 @@ test('caches for an hour', async () => {
   expect((await GET()).headers.get('Cache-Control')).toBe('private, max-age=3600')
 })
 
-test('spends the count budget on the most recently played, not the most played', async () => {
-  // 31 eligible games: the most-played one was last touched longest ago, so it
-  // falls outside the 30-game budget even though it sorts first in the output.
-  const games = Array.from({ length: 31 }, (_, i) => ({
+describe('filling counts across a large library', () => {
+  // 61 countable games: one more than a single request fetches. The most-played
+  // one was last touched longest ago, so it is the one left for the next request
+  // even though it sorts first in the output.
+  const games = Array.from({ length: 61 }, (_, i) => ({
     appid: i + 1,
     name: `G${i + 1}`,
     playtime_forever: i === 0 ? 99999 : 100 + i,
     rtime_last_played: i === 0 ? 1 : 1_700_000_000 + i,
     has_community_visible_stats: true,
   }))
-  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games } })
-  ;(getPlayerAchievements as jest.Mock).mockResolvedValue({
-    playerstats: { success: true, achievements: [{ apiname: 'A', achieved: 1, unlocktime: 1 }] },
+
+  beforeEach(() => {
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games } })
+    ;(getPlayerAchievements as jest.Mock).mockResolvedValue({
+      playerstats: { success: true, achievements: [{ apiname: 'A', achieved: 1, unlocktime: 1 }] },
+    })
   })
 
-  const out = data(await GET())
-  expect(getPlayerAchievements).toHaveBeenCalledTimes(30)
-  expect(out[0].title).toBe('G1')
-  expect(out[0].achievementsLoaded).toBe(false)
-  expect(out.filter((g) => g.achievementsLoaded)).toHaveLength(30)
+  test('fetches the most recently played first, up to the per-request cap', async () => {
+    const out = data(await GET())
+    expect(getPlayerAchievements).toHaveBeenCalledTimes(60)
+    expect(out[0].title).toBe('G1')
+    expect(out[0].achievementsLoaded).toBe(false)
+    expect(out.filter((g) => g.achievementsLoaded)).toHaveLength(60)
+  })
+
+  test('does not cache an unfinished fill, so the next request carries on', async () => {
+    const res = await GET()
+    const { shouldCache } = (withSteamCache as jest.Mock).mock.calls[0][3]
+    expect(shouldCache()).toBe(false)
+    // Nor may the browser reuse it for the follow-up request.
+    expect(res.headers.get('Cache-Control')).toBe('private, max-age=0')
+  })
+
+  test('caches a finished fill for an hour', async () => {
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: games.slice(1) } })
+    const res = await GET()
+    const { shouldCache } = (withSteamCache as jest.Mock).mock.calls[0][3]
+    expect(shouldCache()).toBe(true)
+    expect(res.headers.get('Cache-Control')).toBe('private, max-age=3600')
+  })
 })
 
 test('keeps games with no last-played date in the list', async () => {

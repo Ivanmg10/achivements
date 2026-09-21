@@ -479,7 +479,7 @@ export const en = {
   steam: {
     viewOnSteam: 'View on Steam',
     totalPlaytime: 'Total playtime',
-    partialProgressNote: 'Progress is only loaded for your most recently played games',
+    partialProgressNote: 'Some games are still loading their progress or could not be loaded, so this list may be incomplete',
     minutesShort: 'min',
     hoursShort: 'h',
     playtime: 'Playtime',

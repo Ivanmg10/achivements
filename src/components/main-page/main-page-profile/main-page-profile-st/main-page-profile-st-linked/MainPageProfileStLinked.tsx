@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { IconBrandSteam, IconExternalLink, IconPlayerPlayFilled } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
-import { classifySteamGame, formatPlaytime } from '@/utils/steamFeed'
+import { classifySteamGame, formatPlaytime, hasUnloadedProgress } from '@/utils/steamFeed'
 import type { SteamPlayerSummary } from '@/types/steam'
 
 /**
@@ -49,11 +49,14 @@ export default function MainPageProfileStLinked({
   const totalMinutes = library.reduce((sum, g) => sum + g.playtimeForever, 0)
   const completed = library.filter((g) => classifySteamGame(g) === 'completed').length
   const units = { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }
+  // Counts are still being filled in (or some could not be fetched), so the
+  // completed total is a lower bound — say so rather than show a final-looking number.
+  const completedSuffix = hasUnloadedProgress(library) ? '+' : ''
 
   const stats = [
     { label: T.steam.gamesOwned, value: library.length.toLocaleString(lang) },
     { label: T.steam.totalPlaytime, value: formatPlaytime(totalMinutes, units, lang) },
-    { label: T.categories.completed, value: completed.toLocaleString(lang) },
+    { label: T.categories.completed, value: `${completed.toLocaleString(lang)}${completedSuffix}` },
   ]
 
   return (

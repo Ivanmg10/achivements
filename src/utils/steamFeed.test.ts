@@ -1,4 +1,4 @@
-import { classifySteamGame, raDateToIso, mergeRecentFeeds, formatPlaytime } from './steamFeed'
+import { classifySteamGame, raDateToIso, mergeRecentFeeds, formatPlaytime, hasUnloadedProgress, countLoadedProgress } from './steamFeed'
 import { toSteamGameProgress } from './steamMappers'
 import type { RecentlyPlayedGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
@@ -131,5 +131,27 @@ describe('formatPlaytime', () => {
 
   test('uses the units it is given', () => {
     expect(formatPlaytime(120, { minutes: 'мин', hours: 'ч' })).toBe('2 ч')
+  })
+})
+
+describe('hasUnloadedProgress / countLoadedProgress', () => {
+  test('flags a played game with achievements and no counts', () => {
+    expect(hasUnloadedProgress([steam({ achievementsLoaded: false })])).toBe(true)
+  })
+
+  test('ignores games that could never have counts', () => {
+    expect(hasUnloadedProgress([
+      steam({ playtimeForever: 0, achievementsLoaded: false }),
+      steam({ hasStats: false, achievementsLoaded: false }),
+      steam({ achievementsLoaded: true }),
+    ])).toBe(false)
+  })
+
+  test('counts loaded games', () => {
+    expect(countLoadedProgress([
+      steam({ achievementsLoaded: true }),
+      steam({ achievementsLoaded: false }),
+      steam({ achievementsLoaded: true }),
+    ])).toBe(2)
   })
 })
