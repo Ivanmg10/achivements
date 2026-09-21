@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import Image from 'next/image'
-import { IconX, IconSearch, IconTrash } from '@tabler/icons-react'
-import { useGamesData } from '@/context/GamesDataContext'
+import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { fetchWithRetry } from '@/lib/fetchWithRetry'
-import { GameGroup, GameGroupItem, RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
+import { GameGroup, GameGroupItem } from '@/types/types'
+import type { GameCandidate } from '@/utils/gameCandidates'
+import GroupModalGamePicker from '@/components/groups/group-modal-game-picker/GroupModalGamePicker'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -29,7 +29,7 @@ type Props = {
     description: string
     icon: string
     is_public: boolean
-    initialGames?: RetroAchievementsGameCompleted[]
+    initialGames?: GameCandidate[]
   }) => Promise<void>
 }
 
@@ -39,7 +39,6 @@ function isImageUrl(s: string) {
 
 export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
   const { T } = useLanguage()
-  const { all } = useGamesData()
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -47,10 +46,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
   const [isPublic, setIsPublic] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [query, setQuery] = useState('')
-  const [selectedGames, setSelectedGames] = useState<RetroAchievementsGameCompleted[]>([])
-  const [wantToPlay, setWantToPlay] = useState<WantToPlayGame[]>([])
-  const wantFetched = useRef(false)
+  const [selectedGames, setSelectedGames] = useState<GameCandidate[]>([])
 
   const isEditing = !!group
 
@@ -61,102 +57,9 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
       setIcon(group?.icon ?? '')
       setIsPublic(group?.is_public ?? false)
       setError('')
-      setQuery('')
       setSelectedGames([])
-      if (!wantFetched.current) {
-        wantFetched.current = true
-        fetchWithRetry('/api/getWantPlayGames')
-          .then((data) => {
-            const results = (data as { Results?: WantToPlayGame[] })?.Results ?? []
-            setWantToPlay(results)
-          })
-          .catch(() => {})
-      }
     }
   }, [isOpen, group])
-
-  const uniqueGames = useMemo(() => {
-    const seen = new Map<number, RetroAchievementsGameCompleted>()
-    for (const g of all) {
-      if (!seen.has(g.GameID)) seen.set(g.GameID, g)
-    }
-    for (const g of wantToPlay) {
-      if (!seen.has(g.ID)) {
-        seen.set(g.ID, {
-          GameID: g.ID,
-          Title: g.Title,
-          ImageIcon: g.ImageIcon,
-          ConsoleID: g.ConsoleID,
-          ConsoleName: g.ConsoleName,
-          MaxPossible: g.AchievementsPublished,
-          NumAwarded: 0,
-          PctWon: '0',
-          HardcoreMode: '0',
-        })
-      }
-    }
-    return Array.from(seen.values()).sort((a, b) => a.Title.localeCompare(b.Title))
-  }, [all, wantToPlay])
-
-  const existingIds = useMemo(
-    () => new Set((group?.items ?? []).map((i) => i.game_id)),
-    [group],
-  )
-
-  const directGameId = useMemo(() => {
-    const q = query.trim()
-    if (/^\d{3,}$/.test(q)) return parseInt(q)
-    const urlMatch = q.match(/retroachievements\.org\/game\/(\d+)/i)
-    if (urlMatch) return parseInt(urlMatch[1])
-    return null
-  }, [query])
-
-  const searchResults = useMemo(() => {
-    if (!query.trim() || directGameId) return []
-    const q = query.toLowerCase()
-    return uniqueGames
-      .filter((g) => g.Title.toLowerCase().includes(q) && !existingIds.has(g.GameID) && !selectedGames.find((s) => s.GameID === g.GameID))
-      .map((g) => {
-        const t = g.Title.toLowerCase()
-        const score = t === q ? 3 : t.startsWith(q) ? 2 : t.split(/\s+/).some((w) => w.startsWith(q)) ? 1 : 0
-        return { g, score }
-      })
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 8)
-      .map(({ g }) => g)
-  }, [query, uniqueGames, existingIds, selectedGames, directGameId])
-
-  async function addById(id: number) {
-    if (existingIds.has(id) || selectedGames.find((s) => s.GameID === id)) return
-    try {
-      const data = await fetch(`/api/getGameData?gameId=${id}`).then((r) => r.json())
-      if (data?.Title) {
-        const game: RetroAchievementsGameCompleted = {
-          GameID: id,
-          Title: data.Title,
-          ImageIcon: data.ImageIcon ?? '',
-          ConsoleID: data.ConsoleID ?? 0,
-          ConsoleName: data.ConsoleName ?? '',
-          MaxPossible: data.NumAchievements ?? 0,
-          NumAwarded: 0,
-          PctWon: '0',
-          HardcoreMode: '0',
-        }
-        addGame(game)
-      }
-    } catch {
-      setError('Game not found')
-    }
-  }
-
-  function addGame(g: RetroAchievementsGameCompleted) {
-    setSelectedGames((prev) => [...prev, g])
-    setQuery('')
-  }
-
-  function removeSelected(gameId: number) {
-    setSelectedGames((prev) => prev.filter((g) => g.GameID !== gameId))
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -272,78 +175,11 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
 
               {/* Game search — only when creating */}
               {!isEditing && (
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] uppercase tracking-widest text-text-secondary">{T.groups.addGame}</label>
-
-                  {/* Selected games */}
-                  {selectedGames.length > 0 && (
-                    <div className="flex flex-col gap-1.5">
-                      {selectedGames.map((g) => (
-                        <div key={g.GameID} className="flex items-center gap-2 bg-bg-main rounded-lg px-2.5 py-1.5">
-                          {g.ImageIcon && (
-                            <Image src={`https://retroachievements.org${g.ImageIcon}`} alt={g.Title} width={20} height={20} className="rounded shrink-0" />
-                          )}
-                          <span className="text-xs flex-1 line-clamp-1">{g.Title}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeSelected(g.GameID)}
-                            className="text-text-secondary hover:text-red-400 transition-colors"
-                          >
-                            <IconTrash className="w-3.5 h-3.5" aria-hidden />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Search input */}
-                  <div className="relative">
-                    <IconSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-secondary pointer-events-none" aria-hidden />
-                    <input
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder={T.groups.searchGames}
-                      className="w-full bg-bg-main rounded-lg pl-8 pr-3 py-2 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70"
-                    />
-                  </div>
-
-                  {(searchResults.length > 0 || directGameId) && (
-                    <div className="flex flex-col gap-1 max-h-40 overflow-y-auto">
-                      {searchResults.map((g) => (
-                        <button
-                          key={g.GameID}
-                          type="button"
-                          onClick={() => addGame(g)}
-                          className="flex items-center gap-2 bg-bg-main hover:bg-white/5 rounded-lg px-2.5 py-1.5 transition-colors text-left"
-                        >
-                          {g.ImageIcon && (
-                            <Image src={`https://retroachievements.org${g.ImageIcon}`} alt={g.Title} width={20} height={20} className="rounded shrink-0" />
-                          )}
-                          <div className="flex flex-col min-w-0 flex-1">
-                            <span className="text-xs line-clamp-1">{g.Title}</span>
-                            <span className="text-[10px] text-text-secondary">{g.ConsoleName}</span>
-                          </div>
-                        </button>
-                      ))}
-                      {directGameId && !existingIds.has(directGameId) && !selectedGames.find((s) => s.GameID === directGameId) && (
-                        <button
-                          type="button"
-                          onClick={() => addById(directGameId)}
-                          className="flex items-center gap-2 bg-bg-main hover:bg-white/5 rounded-lg px-2.5 py-1.5 transition-colors text-left border border-white/10"
-                        >
-                          <div className="w-5 h-5 rounded bg-bg-card flex items-center justify-center shrink-0 text-[9px] font-bold text-text-secondary">
-                            ID
-                          </div>
-                          <span className="text-xs text-text-secondary">{T.search.openById} #{directGameId}</span>
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <GroupModalGamePicker enabled={isOpen} selected={selectedGames} onChange={setSelectedGames} />
               )}
 
               {error && (
-                <p className="text-xs text-red-400">{error}</p>
+                <p role="alert" className="text-xs text-red-400">{error}</p>
               )}
 
               {/* Actions */}

@@ -420,6 +420,7 @@ export const ru: Translations = {
     filter100: 'Завершено',
     noGamesFilter: 'Нет игр, соответствующих выбранным фильтрам',
     clearFilters: 'Сбросить фильтры',
+    addError: 'Не удалось добавить некоторые игры. Попробуйте ещё раз.',
   },
   streak: {
     title: 'Серия',

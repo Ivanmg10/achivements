@@ -420,6 +420,7 @@ export const pl: Translations = {
     filter100: 'Ukończone',
     noGamesFilter: 'Brak gier pasujących do wybranych filtrów',
     clearFilters: 'Wyczyść filtry',
+    addError: 'Nie udało się dodać niektórych gier. Spróbuj ponownie.',
   },
   streak: {
     title: 'Seria',

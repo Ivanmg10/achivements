@@ -420,6 +420,7 @@ export const es: Translations = {
     filter100: 'Completado',
     noGamesFilter: 'Ningún juego coincide con los filtros',
     clearFilters: 'Limpiar filtros',
+    addError: 'No se pudieron añadir algunos juegos. Inténtalo de nuevo.',
   },
   streak: {
     title: 'Racha',

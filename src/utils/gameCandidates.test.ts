@@ -2,6 +2,7 @@ import {
   buildRaCandidates,
   buildSteamCandidates,
   candidateIconUrl,
+  candidateToGroupItemBody,
   normalizeTitle,
   searchCandidates,
   GameCandidate,
@@ -122,5 +123,28 @@ describe('searchCandidates', () => {
 
   test('returns nothing for a blank query', () => {
     expect(searchCandidates(list, '   ')).toEqual([])
+  })
+})
+
+describe('candidateToGroupItemBody', () => {
+  test('carries the platform, so a Steam appid is not stored as an RA game', () => {
+    const [steam] = buildSteamCandidates([
+      { ...toSteamGameProgress({ appid: 620, name: 'Portal 2', playtime_forever: 60, img_icon_url: 'abc' }), achievementsLoaded: true, maxPossible: 50, numAwarded: 25, pctWon: 50 },
+    ])
+    expect(candidateToGroupItemBody(steam)).toEqual({
+      source: 'steam',
+      game_id: 620,
+      title: 'Portal 2',
+      image_icon: steam.imageRef,
+      console_name: 'Steam',
+      pct_won: 0.5,
+      num_awarded: 25,
+      max_possible: 50,
+    })
+  })
+
+  test('an RA game keeps its console and image path', () => {
+    const [ra] = buildRaCandidates([completed(7, '1', '1', 'Zelda')], [], [])
+    expect(candidateToGroupItemBody(ra)).toMatchObject({ source: 'ra', game_id: 7, title: 'Zelda', pct_won: 1 })
   })
 })

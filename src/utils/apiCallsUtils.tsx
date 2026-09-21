@@ -6,7 +6,7 @@ import {
 } from "@/types/types";
 import { fetchWithRetry } from "@/lib/fetchWithRetry";
 import { gameKey } from "@/utils/gameRef";
-import type { GameCandidate } from "@/utils/gameCandidates";
+import { candidateToGroupItemBody, type GameCandidate } from "@/utils/gameCandidates";
 
 export const getGamesInfo = async (
   gameId: string,
@@ -102,3 +102,28 @@ export const fetchRaCandidateById = async (id: number): Promise<GameCandidate | 
     return null
   }
 };
+
+/**
+ * Adds a new group's first games (RA or Steam) in parallel. One failed add
+ * does not stop the others; returns the candidates that could not be added.
+ */
+export const addGamesToGroup = async (groupId: number, games: GameCandidate[]): Promise<GameCandidate[]> => {
+  const results = await Promise.allSettled(
+    games.map(async (g) => {
+      const res = await fetch(`/api/groups/${groupId}/games`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(candidateToGroupItemBody(g)),
+      })
+      if (!res.ok) throw new Error(`Failed to add game ${g.key} (${res.status})`)
+    }),
+  )
+  const failed: GameCandidate[] = []
+  results.forEach((r, i) => {
+    if (r.status === 'rejected') {
+      console.error('[addGamesToGroup]', r.reason)
+      failed.push(games[i])
+    }
+  })
+  return failed
+}

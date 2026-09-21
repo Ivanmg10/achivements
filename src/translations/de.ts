@@ -420,6 +420,7 @@ export const de: Translations = {
     filter100: 'Abgeschlossen',
     noGamesFilter: 'Keine Spiele entsprechen den ausgewählten Filtern',
     clearFilters: 'Filter zurücksetzen',
+    addError: 'Einige Spiele konnten nicht hinzugefügt werden. Versuche es erneut.',
   },
   streak: {
     title: 'Serie',

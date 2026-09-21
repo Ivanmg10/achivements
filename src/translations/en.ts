@@ -418,6 +418,7 @@ export const en = {
     filter100: 'Completed',
     noGamesFilter: 'No games match the selected filters',
     clearFilters: 'Clear filters',
+    addError: 'Some games could not be added. Try again.',
   },
   streak: {
     title: 'Streak',

@@ -420,6 +420,7 @@ export const pt: Translations = {
     filter100: 'Concluído',
     noGamesFilter: 'Nenhum jogo corresponde aos filtros selecionados',
     clearFilters: 'Limpar filtros',
+    addError: 'Não foi possível adicionar alguns jogos. Tente novamente.',
   },
   streak: {
     title: 'Sequência',

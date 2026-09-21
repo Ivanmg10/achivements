@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let mockOnSave: (d: any) => Promise<void> = async () => {}
+
 const mockT = {
   groups: {
     title: 'Groups',
@@ -17,7 +20,10 @@ jest.mock('@/hooks/useGroups', () => ({
 
 jest.mock('@/components/groups/GroupModal', () => ({
   __esModule: true,
-  default: () => <div data-testid="group-modal" />,
+  default: ({ onSave }: { onSave: (d: unknown) => Promise<void> }) => {
+    mockOnSave = onSave
+    return <div data-testid="group-modal" />
+  },
 }))
 
 jest.mock('@/components/groups/group-list/GroupList', () => ({
@@ -70,4 +76,24 @@ test('renders error message on fetch error', () => {
   ;(useGroups as jest.Mock).mockReturnValue({ groups: [], isLoading: false, error: 'Error loading groups', createGroup: jest.fn() })
   render(<GroupsPage />)
   expect(screen.getByText('Error loading groups')).toBeInTheDocument()
+})
+
+test('creating a group adds its initial games, Steam ones with their platform', async () => {
+  const createGroup = jest.fn().mockResolvedValue({ id: 7 })
+  ;(useGroups as jest.Mock).mockReturnValue({ groups: [], isLoading: false, error: null, createGroup })
+  global.fetch = jest.fn().mockResolvedValue({ ok: true })
+  render(<GroupsPage />)
+
+  await mockOnSave({
+    title: 'Mix', description: '', icon: '', is_public: false,
+    initialGames: [{
+      key: 'steam:620', source: 'steam', id: 620, title: 'Portal 2', subtitle: 'Steam', imageRef: 'https://cdn/i.jpg',
+      pctWon: 1, numAwarded: 51, maxPossible: 51, status: 'perfect',
+    }],
+  })
+
+  expect(createGroup).toHaveBeenCalledWith(expect.objectContaining({ title: 'Mix' }))
+  const [url, init] = (global.fetch as jest.Mock).mock.calls[0]
+  expect(url).toBe('/api/groups/7/games')
+  expect(JSON.parse(init.body)).toMatchObject({ source: 'steam', game_id: 620, console_name: 'Steam', pct_won: 1 })
 })

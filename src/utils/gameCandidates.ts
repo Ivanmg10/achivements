@@ -140,3 +140,17 @@ export function searchCandidates(
     .slice(0, limit)
     .map(({ c }) => c)
 }
+
+/** The body that adds a candidate to a group (POST /api/groups/[id]/games). */
+export function candidateToGroupItemBody(c: GameCandidate) {
+  return {
+    source: c.source,
+    game_id: c.id,
+    title: c.title,
+    image_icon: c.imageRef,
+    console_name: c.subtitle,
+    pct_won: c.pctWon,
+    num_awarded: c.numAwarded,
+    max_possible: c.maxPossible,
+  }
+}

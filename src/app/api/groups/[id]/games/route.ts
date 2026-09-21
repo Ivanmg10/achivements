@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
+import { isGameSource } from '@/utils/gameRef'
+import type { GameSource } from '@/types/steam'
+
+/**
+ * Group items can be RA or Steam games; an item is (source, game_id), since RA
+ * game ids and Steam appids overlap. A request without a source means RA, so
+ * clients from before Steam existed keep working.
+ */
+function readSource(value: unknown): GameSource | null {
+  if (value === undefined || value === null) return 'ra'
+  return isGameSource(value) ? value : null
+}
 
 async function ownsGroup(userId: string, groupId: number) {
   const res = await pool.query('SELECT id FROM game_groups WHERE id = $1 AND user_id = $2', [groupId, userId])
@@ -22,10 +34,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
     }
 
-    const { game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points } = await req.json()
+    const { source: rawSource, game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points } = await req.json()
+    const source = readSource(rawSource)
 
     if (!game_id || !title) {
       return NextResponse.json({ message: 'Datos incompletos' }, { status: 400 })
+    }
+    if (!source) {
+      return NextResponse.json({ message: 'source debe ser ra o steam' }, { status: 400 })
     }
 
     const posRes = await pool.query(
@@ -35,11 +51,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const position = posRes.rows[0].next
 
     const result = await pool.query(
-      `INSERT INTO game_group_items (group_id, game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points, position)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-       ON CONFLICT (group_id, game_id) DO NOTHING
-       RETURNING id, game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points, position, added_at`,
-      [groupId, game_id, title, image_icon ?? null, console_name ?? null, pct_won ?? 0,
+      `INSERT INTO game_group_items (group_id, source, game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points, position)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+       ON CONFLICT (group_id, source, game_id) DO NOTHING
+       RETURNING id, source, game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points, position, added_at`,
+      [groupId, source, game_id, title, image_icon ?? null, console_name ?? null, pct_won ?? 0,
        num_awarded ?? 0, max_possible ?? 0, points_won ?? 0, max_points ?? 0, position],
     )
 
@@ -69,13 +85,17 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     }
 
     const gameId = req.nextUrl.searchParams.get('gameId')
+    const source = readSource(req.nextUrl.searchParams.get('source'))
     if (!gameId) {
       return NextResponse.json({ message: 'Falta gameId' }, { status: 400 })
     }
+    if (!source) {
+      return NextResponse.json({ message: 'source debe ser ra o steam' }, { status: 400 })
+    }
 
     await pool.query(
-      'DELETE FROM game_group_items WHERE group_id = $1 AND game_id = $2',
-      [groupId, gameId],
+      'DELETE FROM game_group_items WHERE group_id = $1 AND source = $2 AND game_id = $3',
+      [groupId, source, gameId],
     )
 
     return NextResponse.json({ ok: true })
@@ -137,7 +157,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
     }
 
-    const updates: { game_id: number; num_awarded: number; max_possible: number; points_won: number; max_points: number }[] = await req.json()
+    const updates: { source?: GameSource; game_id: number; num_awarded: number; max_possible: number; points_won: number; max_points: number }[] = await req.json()
     if (!Array.isArray(updates) || !updates.length) {
       return NextResponse.json({ ok: true })
     }
@@ -147,8 +167,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         pool.query(
           `UPDATE game_group_items
            SET num_awarded = $1, max_possible = $2, points_won = $3, max_points = $4
-           WHERE group_id = $5 AND game_id = $6`,
-          [u.num_awarded, u.max_possible, u.points_won, u.max_points, groupId, u.game_id],
+           WHERE group_id = $5 AND source = $6 AND game_id = $7`,
+          [u.num_awarded, u.max_possible, u.points_won, u.max_points, groupId, readSource(u.source) ?? 'ra', u.game_id],
         ),
       ),
     )

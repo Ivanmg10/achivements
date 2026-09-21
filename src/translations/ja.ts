@@ -420,6 +420,7 @@ export const ja: Translations = {
     filter100: '完了',
     noGamesFilter: '選択したフィルターに合うゲームがありません',
     clearFilters: 'フィルターをクリア',
+    addError: '一部のゲームを追加できませんでした。もう一度お試しください。',
   },
   streak: {
     title: 'ストリーク',

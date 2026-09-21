@@ -1,3 +1,5 @@
+import type { GameSource } from '@/types/steam'
+
 export type Theme =
   | 'dark'
   | 'light'
@@ -245,6 +247,8 @@ export type PopularGame = {
 
 export type GameGroupItem = {
   id: number
+  /** Absent on rows from before Steam; treat as RA. */
+  source?: GameSource
   game_id: number
   title: string
   image_icon: string | null
