@@ -477,6 +477,9 @@ export const en = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    notOwned: 'Not in your Steam library',
+    screenshot: 'Screenshot',
+    sortDefault: 'Order',
     lastPlayed: 'Last played',
     perfect: 'Perfect',
     neverPlayed: 'Never played',

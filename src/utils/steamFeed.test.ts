@@ -1,4 +1,4 @@
-import { classifySteamGame, raDateToIso, mergeRecentFeeds, formatPlaytime, hasUnloadedProgress, countLoadedProgress } from './steamFeed'
+import { classifySteamGame, raDateToIso, mergeRecentFeeds, formatPlaytime, hasUnloadedProgress, countLoadedProgress, formatRarity, formatUnlock } from './steamFeed'
 import { toSteamGameProgress } from './steamMappers'
 import type { RecentlyPlayedGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
@@ -153,5 +153,23 @@ describe('hasUnloadedProgress / countLoadedProgress', () => {
       steam({ achievementsLoaded: false }),
       steam({ achievementsLoaded: true }),
     ])).toBe(2)
+  })
+})
+
+describe('formatRarity', () => {
+  test('one decimal from 1% up, two below so rare ones stay distinct', () => {
+    expect(formatRarity(83.34)).toBe('83.3')
+    expect(formatRarity(1)).toBe('1.0')
+    expect(formatRarity(0.054)).toBe('0.05')
+  })
+})
+
+describe('formatUnlock', () => {
+  test('formats date and time in the given language', () => {
+    const iso = '2024-01-15T12:00:00.000Z'
+    expect(formatUnlock(iso, 'en')).toBe(
+      new Date(iso).toLocaleString('en', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+    )
+    expect(formatUnlock(iso, 'es')).not.toBe(formatUnlock(iso, 'en'))
   })
 })

@@ -479,6 +479,9 @@ export const ja: Translations = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    notOwned: 'Steam ライブラリにありません',
+    screenshot: 'スクリーンショット',
+    sortDefault: '順序',
     lastPlayed: '最終プレイ',
     perfect: 'パーフェクト',
     neverPlayed: '未プレイ',

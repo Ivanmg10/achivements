@@ -109,3 +109,19 @@ export function hasUnloadedProgress(games: SteamGameProgress[]): boolean {
 export function countLoadedProgress(games: SteamGameProgress[]): number {
   return games.filter((g) => g.achievementsLoaded).length
 }
+
+/** Global rarity as shown: rare achievements keep enough digits to tell apart. */
+export function formatRarity(pct: number): string {
+  return pct < 1 ? pct.toFixed(2) : pct.toFixed(1)
+}
+
+/** Unlock date and time, in the app language. */
+export function formatUnlock(iso: string, lang: string): string {
+  return new Date(iso).toLocaleString(lang, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}

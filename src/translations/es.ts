@@ -479,6 +479,9 @@ export const es: Translations = {
     searchOnRA: 'Buscar en RetroAchievements',
   },
   steam: {
+    notOwned: 'No está en tu biblioteca de Steam',
+    screenshot: 'Captura',
+    sortDefault: 'Orden',
     lastPlayed: 'Jugado por última vez',
     perfect: 'Perfecto',
     neverPlayed: 'Sin jugar',
