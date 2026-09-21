@@ -69,3 +69,36 @@ test('does not mutate the shared library while sorting', () => {
   renderHook(() => useSteamGamesByCategory('playing'))
   expect(LIBRARY.map((g) => g.id)).toEqual(before)
 })
+
+describe('progressTruncated', () => {
+  test('is true when a played game with achievements has no counts', () => {
+    // LIBRARY contains 'Unknown': played, has stats, not loaded.
+    const { result } = renderHook(() => useSteamGamesByCategory('playing'))
+    expect(result.current.progressTruncated).toBe(true)
+  })
+
+  test('is false when every countable game was counted', () => {
+    setContext({ library: LIBRARY.filter((g) => g.title !== 'Unknown') })
+    const { result } = renderHook(() => useSteamGamesByCategory('playing'))
+    expect(result.current.progressTruncated).toBe(false)
+  })
+
+  test('ignores unplayed games and games without achievements', () => {
+    setContext({
+      library: [
+        game(10, 'Never played', { playtimeForever: 0, achievementsLoaded: false }),
+        game(11, 'No stats', { hasStats: false, achievementsLoaded: false }),
+      ],
+    })
+    const { result } = renderHook(() => useSteamGamesByCategory('playing'))
+    expect(result.current.progressTruncated).toBe(false)
+  })
+})
+
+test('exposes the shared refetch', () => {
+  const refetch = jest.fn()
+  setContext({ refetch })
+  const { result } = renderHook(() => useSteamGamesByCategory('playing'))
+  result.current.refetch()
+  expect(refetch).toHaveBeenCalledTimes(1)
+})

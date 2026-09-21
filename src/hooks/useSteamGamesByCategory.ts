@@ -13,7 +13,7 @@ function byLastPlayedDesc(a: SteamGameProgress, b: SteamGameProgress) {
 
 /** Steam games for one category page, derived from the shared library. */
 export function useSteamGamesByCategory(category: string) {
-  const { isLinked, library, libraryLoading, libraryError } = useSteamGamesData()
+  const { isLinked, library, libraryLoading, libraryError, refetch } = useSteamGamesData()
 
   const games = useMemo(() => {
     if (!isSteamCategory(category)) return []
@@ -24,5 +24,15 @@ export function useSteamGamesByCategory(category: string) {
       : inCategory.sort(byLastPlayedDesc)
   }, [category, library])
 
-  return { games, isLinked, loading: libraryLoading, error: libraryError }
+  /**
+   * True when some played games with achievements have no counts because the
+   * server's per-request budget ran out. Those games cannot be placed in
+   * playing/completed, so those lists may be incomplete and should say so.
+   */
+  const progressTruncated = useMemo(
+    () => library.some((g) => g.hasStats && g.playtimeForever > 0 && !g.achievementsLoaded),
+    [library],
+  )
+
+  return { games, isLinked, loading: libraryLoading, error: libraryError, progressTruncated, refetch }
 }

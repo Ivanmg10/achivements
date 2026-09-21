@@ -20,6 +20,21 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "media.retroachievements.org",
       },
+      // Steam spreads images across several CDNs: game icons on
+      // media.steampowered.com, avatars and achievement badges on the
+      // *.steamstatic.com mirrors, and older assets on steamcdn-a.
+      {
+        protocol: "https",
+        hostname: "media.steampowered.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.steamstatic.com",
+      },
+      {
+        protocol: "https",
+        hostname: "steamcdn-a.akamaihd.net",
+      },
     ],
   },
 };
