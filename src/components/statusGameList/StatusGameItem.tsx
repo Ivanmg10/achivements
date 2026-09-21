@@ -12,7 +12,6 @@ import { relativeTime } from '@/utils/utils'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
-import ExpandPanel from '@/components/expand-panel/ExpandPanel'
 
 function getGameId(g: CategoryGame): number | string {
   return g.ID ?? g.GameID!
@@ -209,7 +208,7 @@ export default function StatusGameItem({
         </div>
       </div>
 
-      <ExpandPanel open={open}>
+      {open && (
         <div className="border-t border-bg-main px-4 py-4">
           {loading ? (
             <div className="flex flex-wrap gap-1">
@@ -237,7 +236,7 @@ export default function StatusGameItem({
             </div>
           )}
         </div>
-      </ExpandPanel>
+      )}
     </div>
   )
 }

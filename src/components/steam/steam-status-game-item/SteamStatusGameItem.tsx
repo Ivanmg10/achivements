@@ -10,7 +10,6 @@ import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
-import ExpandPanel from '@/components/expand-panel/ExpandPanel'
 import type { SteamGameProgress } from '@/types/steam'
 
 /**
@@ -133,8 +132,8 @@ export default function SteamStatusGameItem({
         <PinToggleButton gameId={game.id} source="steam" className="self-center" />
       </div>
 
-      <ExpandPanel open={open} id={panelId}>
-        <div className="border-t border-bg-main px-4 py-4">
+      {open && (
+        <div id={panelId} className="border-t border-bg-main px-4 py-4">
           {game.hasStats ? (
             <SteamGameItemAchievements
               appId={game.id}
@@ -145,7 +144,7 @@ export default function SteamStatusGameItem({
             <p className="text-center text-text-secondary text-sm py-2">{T.steam.noAchievements}</p>
           )}
         </div>
-      </ExpandPanel>
+      )}
     </div>
   )
 }
