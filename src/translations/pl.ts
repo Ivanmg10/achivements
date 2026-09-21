@@ -507,6 +507,8 @@ export const pl: Translations = {
     progressUnknown: 'Postęp niewczytany',
     hiddenAchievement: 'Ukryte osiągnięcie',
     hiddenAchievementDesc: 'Graj dalej, aby je odkryć',
+    likelyOnline: 'Online?',
+    likelyOnlineHint: 'Prawdopodobnie wymaga gry online — oszacowane na podstawie opisu',
     earned: 'Zdobyte',
     locked: 'Zablokowane',
     achievementsError: 'Nie udało się wczytać osiągnięć',

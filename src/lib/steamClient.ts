@@ -85,6 +85,14 @@ export function getAppDetails(appId: string | number, lang = 'english') {
 }
 
 /**
+ * Just the store categories (game modes) of a game, in English. Same store
+ * rate limit as getAppDetails, so callers must cache it.
+ */
+export function getAppCategories(appId: string | number) {
+  return fetchSteam(`${STORE_API}/appdetails?${qs({ appids: appId, filters: 'categories', l: 'english' })}`)
+}
+
+/**
  * Official per-game artwork on Steam's CDN, keyed only by appid. Far better
  * than img_icon_url, which is a 32×32 library icon:
  * - cover: 600×900 portrait capsule (library art)

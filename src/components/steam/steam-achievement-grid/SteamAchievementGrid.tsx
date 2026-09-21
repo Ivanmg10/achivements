@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { createPortal } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatDate } from '@/utils/utils'
+import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 import type { SteamAchievementUnified } from '@/types/steam'
 
 const SIZE_CLASSES = {
@@ -121,6 +122,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
               ) : (
                 <span className="text-xs text-text-secondary/60">{T.achievement.notEarned}</span>
               )}
+              {tooltip.achievement.likelyOnline && <SteamOnlineBadge />}
             </div>
             {tooltip.achievement.dateEarned && (
               <p className="text-xs text-text-secondary/60 mt-1">{formatDate(tooltip.achievement.dateEarned)}</p>

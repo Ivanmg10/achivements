@@ -507,6 +507,8 @@ export const ja: Translations = {
     progressUnknown: '進捗は未読み込み',
     hiddenAchievement: '隠し実績',
     hiddenAchievementDesc: 'プレイを続けて解除しよう',
+    likelyOnline: 'オンライン?',
+    likelyOnlineHint: 'オンラインプレイが必要な可能性があります(説明文からの推定)',
     earned: '解除済み',
     locked: '未解除',
     achievementsError: '実績を読み込めませんでした',

@@ -116,7 +116,7 @@ describe('toSteamAchievements', () => {
     expect(win).toEqual({
       _source: 'steam', id: 'ACH_WIN', apiname: 'ACH_WIN', title: 'Win a Match',
       description: 'Win your first match', earned: true, dateEarned: '2023-11-14T22:13:20.000Z',
-      badgeUrl: 'icon.jpg', displayOrder: 0, hidden: false, globalPct: null,
+      badgeUrl: 'icon.jpg', displayOrder: 0, hidden: false, globalPct: null, likelyOnline: false,
     })
     expect(secret.earned).toBe(false)
     expect(secret.dateEarned).toBeNull()
@@ -250,4 +250,13 @@ describe('toSteamGameDetails', () => {
     expect(toSteamGameDetails(2, RESPONSE)).toBeNull()
     expect(toSteamGameDetails(1, null)).toBeNull()
   })
+})
+
+test('toSteamAchievements marks the achievements guessed to need online play', () => {
+  const schema = [
+    { name: 'A', defaultvalue: 0, displayName: 'A', hidden: 0 as const, icon: '', icongray: '' },
+    { name: 'B', defaultvalue: 0, displayName: 'B', hidden: 0 as const, icon: '', icongray: '' },
+  ]
+  const result = toSteamAchievements(schema, [], new Map(), new Set(['B']))
+  expect(result.map((a) => a.likelyOnline)).toEqual([false, true])
 })

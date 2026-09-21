@@ -75,6 +75,7 @@ export function toSteamAchievements(
   schema: SteamSchemaAchievement[],
   player: SteamPlayerAchievement[],
   globalPct: Map<string, number> = new Map(),
+  likelyOnline: Set<string> = new Set(),
 ): SteamAchievementUnified[] {
   const unlocked = new Map(player.map((p) => [p.apiname, p]))
 
@@ -95,6 +96,7 @@ export function toSteamAchievements(
       displayOrder: index,
       hidden: def.hidden === 1,
       globalPct: globalPct.get(def.name) ?? null,
+      likelyOnline: likelyOnline.has(def.name),
     }
   })
 }

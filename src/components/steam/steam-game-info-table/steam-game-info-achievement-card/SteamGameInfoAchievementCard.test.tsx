@@ -6,7 +6,7 @@ import type { SteamAchievementUnified } from '@/types/steam'
 function ach(overrides: Partial<SteamAchievementUnified> = {}): SteamAchievementUnified {
   return {
     _source: 'steam', id: 'WIN', apiname: 'WIN', title: 'Win a Match', description: 'Win your first match',
-    earned: false, dateEarned: null, badgeUrl: 'icon.jpg', displayOrder: 0, hidden: false, globalPct: null,
+    earned: false, dateEarned: null, badgeUrl: 'icon.jpg', displayOrder: 0, hidden: false, globalPct: null, likelyOnline: false,
     ...overrides,
   }
 }
@@ -61,4 +61,9 @@ test('carries its api name and the highlight', () => {
 test('falls back to a placeholder badge', () => {
   const { container } = renderCard(ach({ badgeUrl: '' }))
   expect(container.querySelector('img')).toBeNull()
+})
+
+test('flags an achievement that probably needs online play', () => {
+  renderCard(ach({ likelyOnline: true }))
+  expect(screen.getByText(en.steam.likelyOnline)).toBeInTheDocument()
 })

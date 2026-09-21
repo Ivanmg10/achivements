@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatRarity, formatUnlock } from '@/utils/steamFeed'
+import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 import type { SteamAchievementUnified } from '@/types/steam'
 
 /**
@@ -61,6 +62,7 @@ export default function SteamGameInfoAchievementCard({
               {T.achievement.haveIt}
             </span>
           )}
+          {a.likelyOnline && <SteamOnlineBadge />}
         </div>
       </div>
     </li>

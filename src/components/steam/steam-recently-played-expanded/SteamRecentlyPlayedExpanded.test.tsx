@@ -46,7 +46,7 @@ const GAME: SteamGameProgress = {
 function ach(earned: boolean, date: string | null = null): SteamAchievementUnified {
   return {
     _source: 'steam', id: 'A', apiname: 'A', title: 'A', description: '', earned, dateEarned: date,
-    badgeUrl: '', displayOrder: 0, hidden: false, globalPct: null,
+    badgeUrl: '', displayOrder: 0, hidden: false, globalPct: null, likelyOnline: false,
   }
 }
 

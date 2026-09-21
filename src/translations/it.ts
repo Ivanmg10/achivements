@@ -507,6 +507,8 @@ export const it: Translations = {
     progressUnknown: 'Progresso non caricato',
     hiddenAchievement: 'Obiettivo nascosto',
     hiddenAchievementDesc: 'Continua a giocare per scoprirlo',
+    likelyOnline: 'Online?',
+    likelyOnlineHint: 'Probabilmente richiede il gioco online — stimato dalla descrizione',
     earned: 'Ottenuto',
     locked: 'Bloccato',
     achievementsError: 'Impossibile caricare gli obiettivi',

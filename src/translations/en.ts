@@ -505,6 +505,8 @@ export const en = {
     progressUnknown: 'Progress not loaded',
     hiddenAchievement: 'Hidden achievement',
     hiddenAchievementDesc: 'Keep playing to reveal it',
+    likelyOnline: 'Online?',
+    likelyOnlineHint: 'Probably needs online play — estimated from its description',
     earned: 'Earned',
     locked: 'Locked',
     achievementsError: 'Could not load achievements',

@@ -507,6 +507,8 @@ export const fr: Translations = {
     progressUnknown: 'Progression non chargée',
     hiddenAchievement: 'Succès caché',
     hiddenAchievementDesc: 'Continuez à jouer pour le découvrir',
+    likelyOnline: 'En ligne ?',
+    likelyOnlineHint: 'Nécessite probablement le jeu en ligne — estimé d’après sa description',
     earned: 'Obtenu',
     locked: 'Verrouillé',
     achievementsError: 'Impossible de charger les succès',

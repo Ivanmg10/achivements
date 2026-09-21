@@ -507,6 +507,8 @@ export const ru: Translations = {
     progressUnknown: 'Прогресс не загружен',
     hiddenAchievement: 'Скрытое достижение',
     hiddenAchievementDesc: 'Продолжайте играть, чтобы открыть его',
+    likelyOnline: 'Онлайн?',
+    likelyOnlineHint: 'Вероятно, требует онлайн-игры — оценка по описанию',
     earned: 'Получено',
     locked: 'Не получено',
     achievementsError: 'Не удалось загрузить достижения',

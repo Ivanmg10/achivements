@@ -6,7 +6,7 @@ import type { SteamAchievementUnified } from '@/types/steam'
 function ach(overrides: Partial<SteamAchievementUnified> = {}): SteamAchievementUnified {
   return {
     _source: 'steam', id: 'WIN', apiname: 'WIN', title: 'Win a Match', description: 'Win your first match',
-    earned: false, dateEarned: null, badgeUrl: 'icon.jpg', displayOrder: 0, hidden: false, globalPct: null,
+    earned: false, dateEarned: null, badgeUrl: 'icon.jpg', displayOrder: 0, hidden: false, globalPct: null, likelyOnline: false,
     ...overrides,
   }
 }
@@ -79,4 +79,14 @@ test('falls back to a placeholder badge', () => {
   const { container } = renderRow(ach({ badgeUrl: '' }))
   expect(container.querySelector('img')).toBeNull()
   expect(container.querySelector('[aria-hidden="true"]')).not.toBeNull()
+})
+
+test('flags an achievement that probably needs online play, and only that', () => {
+  renderRow(ach({ likelyOnline: true }))
+  expect(screen.getByText(en.steam.likelyOnline)).toBeInTheDocument()
+})
+
+test('no online flag by default', () => {
+  renderRow(ach())
+  expect(screen.queryByText(en.steam.likelyOnline)).not.toBeInTheDocument()
 })

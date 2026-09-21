@@ -111,6 +111,8 @@ export type SteamStoreData = {
   short_description?: string
   header_image?: string
   screenshots?: { id: number; path_thumbnail: string; path_full: string }[]
+  /** Game modes (multi-player, online co-op…); ids are stable, descriptions localised. */
+  categories?: { id: number | string; description: string }[]
 }
 
 /** Store appdetails is keyed by appid: { "377160": { success, data } }. */
@@ -206,6 +208,8 @@ export type SteamAchievementUnified = AchievementBase & {
   earned: boolean
   /** Share of all Steam players who have it, 0–100 — Steam's equivalent of RA rarity. */
   globalPct: number | null
+  /** Probably needs online play — guessed from its description, Steam has no such flag. */
+  likelyOnline: boolean
 }
 
 export type UnifiedAchievement = RaAchievementUnified | SteamAchievementUnified

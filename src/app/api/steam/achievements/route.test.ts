@@ -9,13 +9,14 @@ jest.mock('@/lib/steamClient', () => ({
   getPlayerAchievements: jest.fn(),
   getSchemaForGame: jest.fn(),
   getGlobalAchievementPercentages: jest.fn(),
+  getAppCategories: jest.fn(),
 }))
 
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
 import { withSteamCache } from '@/lib/steamCache'
-import { getPlayerAchievements, getSchemaForGame, getGlobalAchievementPercentages } from '@/lib/steamClient'
+import { getAppCategories, getPlayerAchievements, getSchemaForGame, getGlobalAchievementPercentages } from '@/lib/steamClient'
 import type { SteamAchievementUnified } from '@/types/steam'
 
 const SCHEMA = [
@@ -43,6 +44,7 @@ beforeEach(() => {
   ;(getPlayerAchievements as jest.Mock).mockResolvedValue({
     playerstats: { success: true, achievements: [{ apiname: 'ACH_WIN', achieved: 1, unlocktime: 1700000000 }] },
   })
+  ;(getAppCategories as jest.Mock).mockResolvedValue({ 730: { success: true, data: { categories: [] } } })
   jest.spyOn(console, 'error').mockImplementation(() => {})
 })
 
@@ -149,5 +151,46 @@ describe('language and rarity', () => {
     const [a] = data(await GET(makeRequest('730')))
     expect(a.title).toBe('Win')
     expect(a.globalPct).toBeNull()
+  })
+})
+
+describe('online guess', () => {
+  const ONLINE_SCHEMA = [
+    { name: 'ACH_WIN', defaultvalue: 0, displayName: 'Win', description: 'Win 10 matches', hidden: 0, icon: 'i', icongray: 'g' },
+    { name: 'ACH_RANK', defaultvalue: 0, displayName: 'Ranked', description: 'Reach gold in ranked', hidden: 0, icon: 'i', icongray: 'g' },
+    { name: 'ACH_STORY', defaultvalue: 0, displayName: 'The end', description: 'Finish the story', hidden: 0, icon: 'i', icongray: 'g' },
+  ]
+
+  beforeEach(() => {
+    ;(getSchemaForGame as jest.Mock).mockResolvedValue({ game: { availableGameStats: { achievements: ONLINE_SCHEMA } } })
+  })
+
+  function online(achievements: SteamAchievementUnified[]) {
+    return achievements.filter((a) => a.likelyOnline).map((a) => a.apiname)
+  }
+
+  test('in a game with online modes, match wording counts too', async () => {
+    ;(getAppCategories as jest.Mock).mockResolvedValue({ 730: { success: true, data: { categories: [{ id: 36, description: 'Online PvP' }] } } })
+    expect(online(data(await GET(makeRequest('730'))))).toEqual(['ACH_WIN', 'ACH_RANK'])
+    const keys = (withSteamCache as jest.Mock).mock.calls.map((c) => c[0])
+    expect(keys).toContain('steamOnlineModes:730')
+  })
+
+  test('without online modes only clear wording counts', async () => {
+    expect(online(data(await GET(makeRequest('730'))))).toEqual(['ACH_RANK'])
+  })
+
+  test('reads the English text when the page is in another language', async () => {
+    const url = new URL('http://localhost:3000/api/steam/achievements?appid=730&lang=spanish')
+    await GET(new NextRequest(url.toString()))
+    expect(getSchemaForGame).toHaveBeenCalledWith(730, 'steam-key', 'spanish')
+    expect(getSchemaForGame).toHaveBeenCalledWith(730, 'steam-key', 'english')
+  })
+
+  test('a store failure still returns the achievements, with only clear wording marked', async () => {
+    ;(getAppCategories as jest.Mock).mockRejectedValue(new Error('store down'))
+    const res = await GET(makeRequest('730'))
+    expect(res.status).toBe(200)
+    expect(online(data(res))).toEqual(['ACH_RANK'])
   })
 })

@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatRarity, formatUnlock } from '@/utils/steamFeed'
+import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 import type { SteamAchievementUnified } from '@/types/steam'
 
 /**
@@ -46,7 +47,10 @@ export default function SteamGameInfoAchievement({
       </td>
 
       <td className={`px-3 py-2 ${a.earned ? '' : 'opacity-60'}`}>
-        <h3 className="text-lg">{concealed ? T.steam.hiddenAchievement : a.title}</h3>
+        <h3 className="text-lg">
+          {concealed ? T.steam.hiddenAchievement : a.title}
+          {a.likelyOnline && <SteamOnlineBadge className="ml-2 align-middle" />}
+        </h3>
         <p className="text-sm text-text-secondary">{concealed ? T.steam.hiddenAchievementDesc : a.description}</p>
       </td>
 

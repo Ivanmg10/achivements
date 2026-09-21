@@ -507,6 +507,8 @@ export const es: Translations = {
     progressUnknown: 'Progreso no cargado',
     hiddenAchievement: 'Logro oculto',
     hiddenAchievementDesc: 'Sigue jugando para descubrirlo',
+    likelyOnline: '¿Online?',
+    likelyOnlineHint: 'Probablemente requiere jugar online — estimado a partir de su descripción',
     earned: 'Conseguido',
     locked: 'Bloqueado',
     achievementsError: 'No se pudieron cargar los logros',

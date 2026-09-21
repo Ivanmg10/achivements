@@ -24,7 +24,7 @@ import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import SteamCategorySection from '@/components/steam/steam-category-section/SteamCategorySection'
 import CollapsibleSection from '@/components/collapsible-section/CollapsibleSection'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
-import { IconTrophy } from '@tabler/icons-react'
+import RaLogo from '@/components/ra-logo/RaLogo'
 import { useSession } from 'next-auth/react'
 import { useEffect, useMemo } from 'react'
 
@@ -140,7 +140,7 @@ export default function CategoryPage() {
             </div>
             <CollapsibleSection
               title="RetroAchievements"
-              icon={<IconTrophy size={22} className="text-warning" aria-hidden="true" />}
+              icon={<RaLogo height={20} />}
               count={visibleGames.length}
               storageKey={`ra-section-open:${cat}`}
             >

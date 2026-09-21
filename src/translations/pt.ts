@@ -507,6 +507,8 @@ export const pt: Translations = {
     progressUnknown: 'Progresso não carregado',
     hiddenAchievement: 'Conquista oculta',
     hiddenAchievementDesc: 'Continua a jogar para a descobrir',
+    likelyOnline: 'Online?',
+    likelyOnlineHint: 'Provavelmente requer jogo online — estimado pela descrição',
     earned: 'Obtida',
     locked: 'Bloqueada',
     achievementsError: 'Não foi possível carregar as conquistas',

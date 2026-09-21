@@ -15,7 +15,7 @@ function ach(overrides: Partial<SteamAchievementUnified> = {}): SteamAchievement
     badgeUrl: 'icon.jpg',
     displayOrder: 0,
     hidden: false,
-    globalPct: null,
+    globalPct: null, likelyOnline: false,
     ...overrides,
   }
 }
@@ -130,4 +130,11 @@ describe('hidden achievements', () => {
     render(<SteamAchievementGrid appId={620} achievements={[ach({ hidden: true, title: 'Spoiler', earned: true })]} />)
     expect(screen.getByRole('link', { name: `Spoiler — ${en.steam.earned}` })).toBeInTheDocument()
   })
+})
+
+test('the tooltip flags an achievement that probably needs online play', () => {
+  render(<SteamAchievementGrid appId={620} achievements={[ach({ likelyOnline: true })]} />)
+  fireEvent.mouseEnter(screen.getByRole('link'), { clientX: 10, clientY: 10 })
+  act(() => { jest.advanceTimersByTime(450) })
+  expect(screen.getByRole('tooltip')).toHaveTextContent(en.steam.likelyOnline)
 })

@@ -15,7 +15,7 @@ function ach(apiname: string, overrides: Partial<SteamAchievementUnified> = {}):
     badgeUrl: `${apiname}.jpg`,
     displayOrder: 0,
     hidden: false,
-    globalPct: null,
+    globalPct: null, likelyOnline: false,
     ...overrides,
   }
 }

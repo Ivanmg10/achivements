@@ -507,6 +507,8 @@ export const de: Translations = {
     progressUnknown: 'Fortschritt nicht geladen',
     hiddenAchievement: 'Versteckter Erfolg',
     hiddenAchievementDesc: 'Spiel weiter, um ihn aufzudecken',
+    likelyOnline: 'Online?',
+    likelyOnlineHint: 'Erfordert wahrscheinlich Online-Spiel — anhand der Beschreibung geschätzt',
     earned: 'Erhalten',
     locked: 'Gesperrt',
     achievementsError: 'Erfolge konnten nicht geladen werden',
