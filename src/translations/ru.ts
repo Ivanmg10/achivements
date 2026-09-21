@@ -479,6 +479,9 @@ export const ru: Translations = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    lastPlayed: 'Последний запуск',
+    perfect: 'Идеально',
+    neverPlayed: 'Не запускалась',
     viewOnSteam: 'Открыть в Steam',
     totalPlaytime: 'Всего в игре',
     partialProgressNote: 'Прогресс некоторых игр ещё загружается или недоступен, поэтому список может быть неполным',

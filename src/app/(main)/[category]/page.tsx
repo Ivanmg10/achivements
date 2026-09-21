@@ -22,6 +22,9 @@ import LoadingPage from '../../../components/loading-page/LoadingPage'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import SteamCategorySection from '@/components/steam/steam-category-section/SteamCategorySection'
+import CollapsibleSection from '@/components/collapsible-section/CollapsibleSection'
+import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
+import { IconTrophy } from '@tabler/icons-react'
 import { useSession } from 'next-auth/react'
 import { useEffect, useMemo } from 'react'
 
@@ -53,6 +56,38 @@ export default function CategoryPage() {
 
   const consolePills = useMemo(() => buildConsolePills(games), [games])
   const visibleGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
+  const { games: steamGames } = useSteamGamesByCategory(cat)
+
+  const selectedConsoleName =
+    selected.size === 1 ? consolePills.find((c) => selected.has(c.id))?.name : undefined
+
+  // RA-only controls: completion filter and sort apply to the RA list alone.
+  const raControls = (
+    <>
+      {cat === 'completed' && <CompletedFilter value={completedMode} onChange={setCompletedMode} />}
+      <StatusSortControl cat={cat} sortState={sortState} onChange={setSortState} />
+    </>
+  )
+
+  const raBody = (
+    <>
+      {consolePills.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 py-1">
+          <ConsoleFilter pills={consolePills} selected={selected} onToggle={toggle} onClear={clear} />
+        </div>
+      )}
+      {visibleGames.length === 0 ? (
+        <EmptyState
+          icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
+          title={EMPTY_STATE[cat]?.title ?? ''}
+          subtitle={EMPTY_STATE[cat]?.sub ?? ''}
+          className="min-h-[40vh]"
+        />
+      ) : (
+        <StatusGameList games={visibleGames} extraData={extraData} category={cat} gridCols={gridCols} />
+      )}
+    </>
+  )
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white">
@@ -69,56 +104,62 @@ export default function CategoryPage() {
           />
         ) : error ? (
           <p className="text-red-400 text-sm text-center mt-10">{error}</p>
-        ) : games.length === 0 ? (
-          <EmptyState
-            icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-            title={EMPTY_STATE[cat]?.title ?? ''}
-            subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-            className={steamLinked ? 'min-h-[20vh]' : 'min-h-[60vh]'}
-          />
+        ) : !steamLinked ? (
+          // RA only: the page as it always was.
+          games.length === 0 ? (
+            <EmptyState
+              icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
+              title={EMPTY_STATE[cat]?.title ?? ''}
+              subtitle={EMPTY_STATE[cat]?.sub ?? ''}
+              className="min-h-[60vh]"
+            />
+          ) : (
+            <>
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <StatusPageHeader consoleName={selectedConsoleName} category={cat} gameCount={visibleGames.length} />
+                <div className="flex items-center gap-2">
+                  {raControls}
+                  <StatusGridControl cols={gridCols} onChange={setGridCols} />
+                </div>
+              </div>
+              {raBody}
+            </>
+          )
         ) : (
+          // RA and Steam: shared header (the grid control drives both lists),
+          // then each platform in a section that folds away, so reaching Steam
+          // does not mean scrolling past the whole RA list.
           <>
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <StatusPageHeader
-                consoleName={
-                  selected.size === 1
-                    ? consolePills.find((c) => selected.has(c.id))?.name
-                    : undefined
-                }
+                consoleName={selectedConsoleName}
                 category={cat}
-                gameCount={visibleGames.length}
+                gameCount={visibleGames.length + steamGames.length}
               />
-              <div className="flex items-center gap-2">
-                {cat === 'completed' && (
-                  <CompletedFilter value={completedMode} onChange={setCompletedMode} />
-                )}
-                <StatusSortControl cat={cat} sortState={sortState} onChange={setSortState} />
-                <StatusGridControl cols={gridCols} onChange={setGridCols} />
-              </div>
+              <StatusGridControl cols={gridCols} onChange={setGridCols} />
             </div>
-            {consolePills.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 py-1">
-                <ConsoleFilter
-                  pills={consolePills}
-                  selected={selected}
-                  onToggle={toggle}
-                  onClear={clear}
+            <CollapsibleSection
+              title="RetroAchievements"
+              icon={<IconTrophy size={22} className="text-warning" aria-hidden="true" />}
+              count={visibleGames.length}
+              storageKey={`ra-section-open:${cat}`}
+            >
+              {games.length === 0 ? (
+                <EmptyState
+                  icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
+                  title={EMPTY_STATE[cat]?.title ?? ''}
+                  subtitle={EMPTY_STATE[cat]?.sub ?? ''}
+                  className="min-h-[20vh]"
                 />
-              </div>
-            )}
-            {visibleGames.length === 0 ? (
-              <EmptyState
-                icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-                title={EMPTY_STATE[cat]?.title ?? ''}
-                subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-                className="min-h-[40vh]"
-              />
-            ) : (
-              <StatusGameList games={visibleGames} extraData={extraData} category={cat} gridCols={gridCols} />
-            )}
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 flex-wrap">{raControls}</div>
+                  {raBody}
+                </>
+              )}
+            </CollapsibleSection>
           </>
         )}
-        {/* Steam games get their own section: the RA list's filters and sorting are RA-only. */}
         {(!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} />}
       </div>
     </div>

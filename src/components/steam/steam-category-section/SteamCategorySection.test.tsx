@@ -4,9 +4,13 @@ import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import { en } from '@/translations/en'
 
 jest.mock('@/hooks/useSteamGamesByCategory', () => ({ useSteamGamesByCategory: jest.fn() }))
-jest.mock('../steam-game-item/SteamGameItem', () => ({
+jest.mock('@/components/steam/steam-status-game-list/SteamStatusGameList', () => ({
   __esModule: true,
-  default: ({ game }: { game: { title: string } }) => <div data-testid="steam-game">{game.title}</div>,
+  default: ({ games, gridCols }: { games: { title: string }[]; gridCols: number }) => (
+    <div data-testid="list" data-cols={gridCols}>
+      {games.map((g) => g.title).join(',')}
+    </div>
+  ),
 }))
 
 const refetch = jest.fn()
@@ -26,6 +30,7 @@ function setHook(overrides: Record<string, unknown> = {}) {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  window.localStorage.clear()
   setHook()
 })
 
@@ -40,19 +45,47 @@ test('asks for the given category', () => {
   expect(useSteamGamesByCategory).toHaveBeenCalledWith('completed')
 })
 
-test('is a labelled section listing the games with a count', () => {
+test('is a labelled section listing the games, with a count', () => {
   render(<SteamCategorySection category="playing" />)
 
   expect(screen.getByRole('region', { name: en.steam.gamesSection })).toBeInTheDocument()
-  expect(screen.getAllByTestId('steam-game').map((e) => e.textContent)).toEqual(['Portal 2', 'Hades'])
+  expect(screen.getByTestId('list')).toHaveTextContent('Portal 2,Hades')
   expect(screen.getByText('2')).toBeInTheDocument()
+})
+
+test('hands the grid choice to the RA-style masonry list', () => {
+  render(<SteamCategorySection category="playing" gridCols={3} />)
+  expect(screen.getByTestId('list').dataset.cols).toBe('3')
+})
+
+test('defaults to two columns', () => {
+  render(<SteamCategorySection category="playing" />)
+  expect(screen.getByTestId('list').dataset.cols).toBe('2')
+})
+
+describe('folding', () => {
+  test('folds away so the page below does not have to be scrolled past', () => {
+    render(<SteamCategorySection category="playing" />)
+    fireEvent.click(screen.getByRole('button', { expanded: true }))
+    expect(screen.queryByTestId('list')).not.toBeInTheDocument()
+  })
+
+  test('remembers the state per category', () => {
+    render(<SteamCategorySection category="playing" />)
+    fireEvent.click(screen.getByRole('button', { expanded: true }))
+    expect(window.localStorage.getItem('steam-section-open:playing')).toBe('closed')
+  })
 })
 
 test('shows a busy skeleton and no count while loading', () => {
   setHook({ loading: true, games: [] })
-  const { container } = render(<SteamCategorySection category="playing" />)
+  const { container } = render(<SteamCategorySection category="playing" gridCols={3} />)
 
-  expect(container.querySelector('[aria-busy="true"]')).not.toBeNull()
+  const skeleton = container.querySelector('[aria-busy="true"]') as HTMLElement
+  expect(skeleton).not.toBeNull()
+  // Single column on phones, as the real list is.
+  expect(skeleton.className).toContain('grid-cols-1')
+  expect(skeleton.className).toContain('lg:grid-cols-3')
   expect(screen.queryByText('0')).not.toBeInTheDocument()
 })
 
@@ -73,7 +106,7 @@ test('shows an empty state when the category has no Steam games', () => {
 })
 
 describe('partial progress note', () => {
-  test('warns that playing/completed may be incomplete when counts ran out', () => {
+  test('warns that playing/completed may be incomplete while counts are missing', () => {
     setHook({ progressTruncated: true })
     render(<SteamCategorySection category="completed" />)
     expect(screen.getByText(en.steam.partialProgressNote)).toBeInTheDocument()
@@ -89,22 +122,6 @@ describe('partial progress note', () => {
     render(<SteamCategorySection category="playing" />)
     expect(screen.queryByText(en.steam.partialProgressNote)).not.toBeInTheDocument()
   })
-})
-
-test.each([
-  [1, 'grid-cols-1'],
-  [2, 'md:grid-cols-2'],
-  [3, 'lg:grid-cols-3'],
-] as const)('lays out %i column(s) and stays single-column on phones', (cols, cls) => {
-  const { container } = render(<SteamCategorySection category="playing" gridCols={cols} />)
-  const grid = container.querySelector('.grid') as HTMLElement
-  expect(grid.className).toContain(cls)
-  expect(grid.className).toContain('grid-cols-1')
-})
-
-test('defaults to two columns', () => {
-  const { container } = render(<SteamCategorySection category="playing" />)
-  expect((container.querySelector('.grid') as HTMLElement).className).toContain('md:grid-cols-2')
 })
 
 test('takes a heading override for pages showing several categories', () => {

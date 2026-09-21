@@ -479,6 +479,9 @@ export const ja: Translations = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    lastPlayed: '最終プレイ',
+    perfect: 'パーフェクト',
+    neverPlayed: '未プレイ',
     viewOnSteam: 'Steam で見る',
     totalPlaytime: '総プレイ時間',
     partialProgressNote: '一部のゲームの進捗はまだ読み込み中か取得できなかったため、この一覧は不完全な可能性があります',

@@ -477,6 +477,9 @@ export const en = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    lastPlayed: 'Last played',
+    perfect: 'Perfect',
+    neverPlayed: 'Never played',
     viewOnSteam: 'View on Steam',
     totalPlaytime: 'Total playtime',
     partialProgressNote: 'Some games are still loading their progress or could not be loaded, so this list may be incomplete',

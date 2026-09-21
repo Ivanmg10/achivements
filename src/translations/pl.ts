@@ -479,6 +479,9 @@ export const pl: Translations = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    lastPlayed: 'Ostatnio grano',
+    perfect: 'Perfekcyjnie',
+    neverPlayed: 'Nigdy nie grano',
     viewOnSteam: 'Zobacz na Steam',
     totalPlaytime: 'Łączny czas gry',
     partialProgressNote: 'Postęp niektórych gier wciąż się wczytuje lub jest niedostępny, więc ta lista może być niepełna',

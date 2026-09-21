@@ -479,6 +479,9 @@ export const es: Translations = {
     searchOnRA: 'Buscar en RetroAchievements',
   },
   steam: {
+    lastPlayed: 'Jugado por última vez',
+    perfect: 'Perfecto',
+    neverPlayed: 'Sin jugar',
     viewOnSteam: 'Ver en Steam',
     totalPlaytime: 'Tiempo total',
     partialProgressNote: 'El progreso de algunos juegos aún se está cargando o no se pudo obtener, así que esta lista puede estar incompleta',
