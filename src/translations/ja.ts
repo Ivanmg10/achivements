@@ -237,6 +237,9 @@ export const ja: Translations = {
     noCompletedSub: 'ゲームを完了するとここに表示されます',
     steamComingSoon: 'Steam連携は近日公開予定',
     steamComingSoonSub: '準備中です — お楽しみに',
+    showAllGames: '{n}本のゲームをすべて表示',
+    showAll: 'すべてのゲームを表示',
+    showLess: '閉じる',
   },
   statusGameItem: {
     achievements: '実績',

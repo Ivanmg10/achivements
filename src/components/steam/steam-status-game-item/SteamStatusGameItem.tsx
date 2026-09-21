@@ -10,6 +10,7 @@ import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
+import ExpandPanel from '@/components/expand-panel/ExpandPanel'
 import type { SteamGameProgress } from '@/types/steam'
 
 /**
@@ -55,7 +56,7 @@ export default function SteamStatusGameItem({
     <div
       ref={itemRef}
       style={style}
-      className="bg-bg-card rounded-xl overflow-hidden hover:ring-1 hover:ring-white/10 transition-shadow duration-150"
+      className="bg-bg-card rounded-xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow duration-150"
     >
       <div className="flex flex-row items-start gap-5 p-5">
         {/* Same destination as the title link, so it is kept out of the tab order. */}
@@ -132,8 +133,8 @@ export default function SteamStatusGameItem({
         <PinToggleButton gameId={game.id} source="steam" className="self-center" />
       </div>
 
-      {open && (
-        <div id={panelId} className="border-t border-bg-main px-4 py-4">
+      <ExpandPanel open={open} id={panelId}>
+        <div className="border-t border-bg-main px-4 py-4">
           {game.hasStats ? (
             <SteamGameItemAchievements
               appId={game.id}
@@ -144,7 +145,7 @@ export default function SteamStatusGameItem({
             <p className="text-center text-text-secondary text-sm py-2">{T.steam.noAchievements}</p>
           )}
         </div>
-      )}
+      </ExpandPanel>
     </div>
   )
 }

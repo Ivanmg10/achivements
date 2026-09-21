@@ -4,9 +4,11 @@ import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import CollapsibleSection from '@/components/collapsible-section/CollapsibleSection'
+import CollapsibleSectionPreview from '@/components/collapsible-section/collapsible-section-preview/CollapsibleSectionPreview'
 import SteamStatusGameList from '@/components/steam/steam-status-game-list/SteamStatusGameList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
+import { steamPreviewGames } from '@/utils/sectionPreview'
 
 const SKELETON_CARDS = 4
 
@@ -49,6 +51,7 @@ export default function SteamCategorySection({
       count={loading || error ? undefined : games.length}
       storageKey={`steam-section-open:${category}`}
       className={className}
+      preview={error ? null : <CollapsibleSectionPreview games={steamPreviewGames(games)} loading={loading} />}
     >
       {progressTruncated && category !== 'wantToPlay' && !loading && !error && (
         <p className="text-xs text-text-secondary">{T.steam.partialProgressNote}</p>

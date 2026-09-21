@@ -134,6 +134,7 @@ describe('Steam section', () => {
   test('follows the RA list for the same category', () => {
     asUser({ raUser: { User: 'Ivan' } }, true)
     ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: mockGames, loading: false, error: undefined })
+    window.sessionStorage.setItem('ra-section-open:playing', 'open')
     render(<CategoryPage />)
 
     const list = screen.getByTestId('game-list')
@@ -182,7 +183,7 @@ describe('foldable RA and Steam sections', () => {
     ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: mockGames, loading: false, error: undefined })
   }
 
-  beforeEach(() => window.localStorage.clear())
+  beforeEach(() => window.sessionStorage.clear())
 
   afterEach(() => {
     ;(useSession as jest.Mock).mockReturnValue({ data: null, status: 'unauthenticated', update: jest.fn() })
@@ -190,23 +191,33 @@ describe('foldable RA and Steam sections', () => {
     ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [] })
   })
 
-  test('with both accounts the RA list sits in a section that folds away', () => {
+  test('with both accounts the RA list sits in a section that starts folded', () => {
     bothAccounts()
     render(<CategoryPage />)
 
     expect(screen.getByRole('region', { name: 'RetroAchievements' })).toBeInTheDocument()
+    expect(screen.queryByTestId('game-list')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /RetroAchievements/ }))
-
+    expect(screen.getByTestId('game-list')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /RetroAchievements/ }))
     expect(screen.queryByTestId('game-list')).not.toBeInTheDocument()
     // Steam is still right there.
     expect(screen.getByTestId('steam-section')).toBeInTheDocument()
   })
 
-  test('remembers the RA section state per category', () => {
+  test('remembers the RA section state per category for the session', () => {
     bothAccounts()
     render(<CategoryPage />)
     fireEvent.click(screen.getByRole('button', { name: /RetroAchievements/ }))
-    expect(window.localStorage.getItem('ra-section-open:playing')).toBe('closed')
+    expect(window.sessionStorage.getItem('ra-section-open:playing')).toBe('open')
+  })
+
+  test('folded, the RA section previews its first games', () => {
+    bothAccounts()
+    render(<CategoryPage />)
+    const links = screen.getByRole('region', { name: 'RetroAchievements' }).querySelectorAll('a[href^="/gameInfo/"]')
+    expect(links.length).toBeGreaterThan(0)
+    expect(links.length).toBeLessThanOrEqual(3)
   })
 
   test('the page count covers both platforms', () => {
@@ -236,6 +247,7 @@ describe('foldable RA and Steam sections', () => {
     bothAccounts()
     ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: undefined })
     render(<CategoryPage />)
+    fireEvent.click(screen.getByRole('button', { name: /RetroAchievements/ }))
     expect(screen.getByTestId('empty-state')).toBeInTheDocument()
     expect(screen.getByTestId('steam-section')).toBeInTheDocument()
   })

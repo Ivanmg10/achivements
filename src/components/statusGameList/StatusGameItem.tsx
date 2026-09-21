@@ -12,6 +12,7 @@ import { relativeTime } from '@/utils/utils'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
+import ExpandPanel from '@/components/expand-panel/ExpandPanel'
 
 function getGameId(g: CategoryGame): number | string {
   return g.ID ?? g.GameID!
@@ -92,7 +93,7 @@ export default function StatusGameItem({
     <div
       ref={itemRef}
       style={style}
-      className="bg-bg-card rounded-xl overflow-hidden hover:ring-1 hover:ring-white/10 transition-shadow duration-150"
+      className="bg-bg-card rounded-xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow duration-150"
     >
       <div
         onClick={handleToggle}
@@ -208,7 +209,7 @@ export default function StatusGameItem({
         </div>
       </div>
 
-      {open && (
+      <ExpandPanel open={open}>
         <div className="border-t border-bg-main px-4 py-4">
           {loading ? (
             <div className="flex flex-wrap gap-1">
@@ -236,7 +237,7 @@ export default function StatusGameItem({
             </div>
           )}
         </div>
-      )}
+      </ExpandPanel>
     </div>
   )
 }

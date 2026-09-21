@@ -235,6 +235,9 @@ export const en = {
     noCompletedSub: 'Complete a game and it will appear here',
     steamComingSoon: 'Steam integration coming soon',
     steamComingSoonSub: "We're working on it — stay tuned",
+    showAllGames: 'Show all {n} games',
+    showAll: 'Show all games',
+    showLess: 'Show less',
   },
   statusGameItem: {
     achievements: 'achievements',

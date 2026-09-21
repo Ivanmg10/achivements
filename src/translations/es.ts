@@ -237,6 +237,9 @@ export const es: Translations = {
     noCompletedSub: 'Completa un juego y aparecerá aquí',
     steamComingSoon: 'Integración con Steam próximamente',
     steamComingSoonSub: 'Estamos trabajando en ello — ¡espera novedades!',
+    showAllGames: 'Ver los {n} juegos',
+    showAll: 'Ver todos los juegos',
+    showLess: 'Ver menos',
   },
   statusGameItem: {
     achievements: 'logros',

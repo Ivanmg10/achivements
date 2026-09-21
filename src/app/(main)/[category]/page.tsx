@@ -23,6 +23,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import SteamCategorySection from '@/components/steam/steam-category-section/SteamCategorySection'
 import CollapsibleSection from '@/components/collapsible-section/CollapsibleSection'
+import CollapsibleSectionPreview from '@/components/collapsible-section/collapsible-section-preview/CollapsibleSectionPreview'
+import { raPreviewGames } from '@/utils/sectionPreview'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import { useSession } from 'next-auth/react'
@@ -143,6 +145,7 @@ export default function CategoryPage() {
               icon={<RaLogo height={20} />}
               count={visibleGames.length}
               storageKey={`ra-section-open:${cat}`}
+              preview={<CollapsibleSectionPreview games={raPreviewGames(visibleGames)} />}
             >
               {games.length === 0 ? (
                 <EmptyState

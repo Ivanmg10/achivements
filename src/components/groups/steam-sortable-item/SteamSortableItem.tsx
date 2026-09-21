@@ -11,6 +11,7 @@ import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
+import ExpandPanel from '@/components/expand-panel/ExpandPanel'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { relativeTime } from '@/utils/utils'
 import type { GameGroupItem } from '@/types/types'
@@ -167,15 +168,15 @@ export default function SteamSortableItem({
         </button>
       </div>
 
-      {open && (
-        <div id={panelId} className="border-t border-bg-main px-4 py-4">
+      <ExpandPanel open={open} id={panelId}>
+        <div className="border-t border-bg-main px-4 py-4">
           {hasStats ? (
             <SteamGameItemAchievements appId={item.game_id} expectedCount={hasCounts ? total : undefined} badgeSize={48} />
           ) : (
             <p className="text-center text-text-secondary text-sm py-2">{T.steam.noAchievements}</p>
           )}
         </div>
-      )}
+      </ExpandPanel>
     </div>
   )
 }

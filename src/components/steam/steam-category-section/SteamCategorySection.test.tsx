@@ -30,7 +30,9 @@ function setHook(overrides: Record<string, unknown> = {}) {
 
 beforeEach(() => {
   jest.clearAllMocks()
-  window.localStorage.clear()
+  window.sessionStorage.clear()
+  // Most tests look at the unfolded list; folding has its own tests below.
+  for (const c of ['playing', 'completed', 'wantToPlay']) window.sessionStorage.setItem(`steam-section-open:${c}`, 'open')
   setHook()
 })
 
@@ -70,10 +72,27 @@ describe('folding', () => {
     expect(screen.queryByTestId('list')).not.toBeInTheDocument()
   })
 
-  test('remembers the state per category', () => {
+  test('remembers the state per category for the session', () => {
     render(<SteamCategorySection category="playing" />)
     fireEvent.click(screen.getByRole('button', { expanded: true }))
-    expect(window.localStorage.getItem('steam-section-open:playing')).toBe('closed')
+    expect(window.sessionStorage.getItem('steam-section-open:playing')).toBe('closed')
+  })
+
+  test('starts folded on a new visit, previewing the first games', () => {
+    window.sessionStorage.clear()
+    render(<SteamCategorySection category="playing" />)
+    expect(screen.queryByTestId('list')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Portal 2/ }).getAttribute('href')).toBe('/steamGame/1')
+    fireEvent.click(screen.getByRole('button', { name: en.categoryPage.showAllGames.replace('{n}', '2') }))
+    expect(screen.getByTestId('list')).toBeInTheDocument()
+  })
+
+  test('folded, it previews placeholders while loading', () => {
+    window.sessionStorage.clear()
+    setHook({ loading: true, games: [] })
+    const { container } = render(<SteamCategorySection category="playing" />)
+    expect(container.querySelectorAll('.animate-pulse')).toHaveLength(3)
+    expect(screen.getByRole('button', { name: en.categoryPage.showAll })).toBeInTheDocument()
   })
 })
 

@@ -18,5 +18,6 @@ const useAnimation = () => ({ start: jest.fn(), stop: jest.fn() })
 const useInView = () => true
 const useMotionValue = (v) => ({ get: () => v, set: jest.fn() })
 const useTransform = () => ({ get: () => 0 })
+const useReducedMotion = () => false
 
-module.exports = { motion, AnimatePresence, useAnimation, useInView, useMotionValue, useTransform }
+module.exports = { motion, AnimatePresence, useAnimation, useInView, useMotionValue, useTransform, useReducedMotion }

@@ -40,7 +40,6 @@ export default function AllGamesPage() {
             <SteamCategorySection
               category={category}
               title={`Steam · ${T.categories[category]}`}
-              className="bg-bg-card rounded-xl p-5"
             />
           </div>
         ))}
