@@ -1,15 +1,22 @@
 'use client'
 
 import Image from 'next/image'
-import { IconBrandSteam, IconExternalLink, IconPlayerPlayFilled } from '@tabler/icons-react'
+import { IconBrandSteam, IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
-import { classifySteamGame, formatPlaytime, hasUnloadedProgress } from '@/utils/steamFeed'
-import type { SteamPlayerSummary } from '@/types/steam'
+import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
+import { codeToFlag, findCountry } from '@/utils/countries'
+import MainPageProfileStStats from '../main-page-profile-st-stats/MainPageProfileStStats'
+import MainPageProfileStGame from '../main-page-profile-st-game/MainPageProfileStGame'
+import MainPageProfileStAchievements from '../main-page-profile-st-achievements/MainPageProfileStAchievements'
+import type { SteamProfile } from '@/types/steam'
 
 /**
- * A linked Steam profile: avatar, persona, what they are playing right now,
- * and library totals. Totals come from the shared library, not extra calls.
+ * A linked Steam profile, built like MainPageProfileRa block for block:
+ * header (avatar, name, level, status, member since, link out), four stats,
+ * the current or last game with its progress, and recent unlocks.
+ *
+ * Library figures come from the shared context — no extra calls.
  */
 export default function MainPageProfileStLinked({
   profile,
@@ -17,16 +24,17 @@ export default function MainPageProfileStLinked({
   error,
   onRetry,
 }: {
-  profile: SteamPlayerSummary | null
+  profile: SteamProfile | null
   isLoading: boolean
   error: string | null
   onRetry: () => void
 }) {
-  const { T, lang } = useLanguage()
-  const { library, libraryLoading } = useSteamGamesData()
+  const { T } = useLanguage()
+  const { library, libraryLoading, recent } = useSteamGamesData()
+  const recentAchievements = useSteamRecentAchievements()
 
   if (isLoading) {
-    return <div aria-busy="true" className="w-full h-32 bg-bg-card rounded-xl animate-pulse" />
+    return <div aria-busy="true" className="w-full h-full min-h-32 bg-bg-card rounded-xl animate-pulse" />
   }
 
   if (error || !profile) {
@@ -46,18 +54,18 @@ export default function MainPageProfileStLinked({
     )
   }
 
-  const totalMinutes = library.reduce((sum, g) => sum + g.playtimeForever, 0)
-  const completed = library.filter((g) => classifySteamGame(g) === 'completed').length
-  const units = { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }
-  // Counts are still being filled in (or some could not be fetched), so the
-  // completed total is a lower bound — say so rather than show a final-looking number.
-  const completedSuffix = hasUnloadedProgress(library) ? '+' : ''
+  // The game running right now if Steam says so, otherwise the last one played.
+  const runningId = profile.gameid ? Number(profile.gameid) : null
+  const running = runningId !== null ? [...recent, ...library].find((g) => g.id === runningId) : undefined
+  const featured = running ?? recent[0]
 
-  const stats = [
-    { label: T.steam.gamesOwned, value: library.length.toLocaleString(lang) },
-    { label: T.steam.totalPlaytime, value: formatPlaytime(totalMinutes, units, lang) },
-    { label: T.categories.completed, value: `${completed.toLocaleString(lang)}${completedSuffix}` },
-  ]
+  const memberYear = profile.timecreated ? new Date(profile.timecreated * 1000).getFullYear() : null
+  const country = profile.loccountrycode ? findCountry(profile.loccountrycode) : undefined
+
+  let status: { text: string; dot: string }
+  if (profile.gameextrainfo) status = { text: `${T.steam.nowPlaying}: ${profile.gameextrainfo}`, dot: 'bg-[#a4d007]' }
+  else if ((profile.personastate ?? 0) > 0) status = { text: T.steam.online, dot: 'bg-[#66c0f4]' }
+  else status = { text: T.steam.offline, dot: 'bg-gray-500' }
 
   return (
     // Fills the column like the RA card, so switching tabs does not resize it.
@@ -92,31 +100,47 @@ export default function MainPageProfileStLinked({
             <IconBrandSteam size={32} className="text-[#66c0f4]" />
           </div>
         )}
-        <div className="flex flex-col gap-1 min-w-0">
-          <span className="flex items-center gap-1 text-xs text-text-secondary">
-            <IconBrandSteam size={12} aria-hidden="true" />
-            Steam
-          </span>
+        <div className="flex flex-col gap-1 min-w-0 w-full">
           <p className="text-xl lg:text-2xl font-bold leading-tight truncate">{profile.personaname}</p>
-          {profile.gameextrainfo && (
-            <p className="flex items-center gap-1 text-xs text-[#a4d007] truncate">
-              <IconPlayerPlayFilled size={10} aria-hidden="true" />
-              <span className="truncate">
-                {T.steam.nowPlaying}: {profile.gameextrainfo}
+          <div className="flex items-center gap-2 flex-wrap text-xs">
+            {profile.level !== null && (
+              <span className="inline-flex items-center gap-1 text-text-secondary">
+                {T.steam.level}
+                <span className="inline-flex items-center justify-center min-w-6 h-6 px-1 rounded-full border-2 border-[#66c0f4] text-text-main font-bold tabular-nums">
+                  {profile.level}
+                </span>
               </span>
+            )}
+            <span className="inline-flex items-center gap-1.5 text-text-secondary min-w-0">
+              <span aria-hidden="true" className={`inline-block w-2 h-2 rounded-full shrink-0 ${status.dot}`} />
+              <span className="truncate">{status.text}</span>
+            </span>
+          </div>
+          {(memberYear || country) && (
+            <p className="text-xs text-gray-500">
+              {memberYear && `${T.profileRa.memberSince} ${memberYear}`}
+              {memberYear && country && ' · '}
+              {country && (
+                <span>
+                  <span aria-hidden="true">{codeToFlag(country.code)} </span>
+                  {country.name}
+                </span>
+              )}
             </p>
           )}
         </div>
       </div>
 
-      <dl className="grid grid-cols-3 gap-2" aria-busy={libraryLoading}>
-        {stats.map((s) => (
-          <div key={s.label} className="flex flex-col items-center bg-bg-main rounded-lg p-2 text-center">
-            <dt className="text-[10px] uppercase tracking-wider text-text-secondary">{s.label}</dt>
-            <dd className="text-sm font-bold">{libraryLoading ? '—' : s.value}</dd>
-          </div>
-        ))}
-      </dl>
+      <MainPageProfileStStats library={library} isLoading={libraryLoading} />
+
+      {featured && <MainPageProfileStGame game={featured} playingNow={featured === running} />}
+
+      <MainPageProfileStAchievements
+        achievements={recentAchievements.achievements}
+        isLoading={recentAchievements.isLoading}
+        error={recentAchievements.error}
+        onRetry={recentAchievements.retry}
+      />
     </div>
   )
 }

@@ -1,11 +1,13 @@
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
-import { getOwnedGames, getPlayerAchievements } from '@/lib/steamClient'
+import { getOwnedGames, getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
 import { withPlayerAchievementCounts } from '@/utils/steamMappers'
 import type {
   SteamGameProgress,
   SteamOwnedGamesResponse,
   SteamPlayerAchievement,
   SteamPlayerAchievementsResponse,
+  SteamSchemaAchievement,
+  SteamSchemaResponse,
 } from '@/types/steam'
 
 /** Parallel Steam calls per enrichment — keeps a burst well under the rate limit. */
@@ -191,4 +193,16 @@ export async function loadOwnedFacts(auth: SteamAuth): Promise<Map<number, Owned
     console.error('[steamProgress] owned facts', err)
     return new Map()
   }
+}
+
+/**
+ * A game's achievement definitions (names, descriptions, badges) in one
+ * language, cached for everyone for a day. Shared by the achievements route
+ * and the recent-unlocks list so each schema is downloaded once.
+ */
+export function loadSchema(appId: number, apiKey: string, lang: string): Promise<SteamSchemaAchievement[]> {
+  return withSteamCache<SteamSchemaAchievement[]>(`steamSchema:${appId}:${lang}`, TTL.schema, async () => {
+    const data = (await getSchemaForGame(appId, apiKey, lang)) as SteamSchemaResponse
+    return data?.game?.availableGameStats?.achievements ?? []
+  })
 }

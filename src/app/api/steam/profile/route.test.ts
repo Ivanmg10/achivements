@@ -7,12 +7,13 @@ jest.mock('@/lib/steamCache', () => ({
 jest.mock('@/lib/steamClient', () => ({
   ...jest.requireActual('@/lib/steamClient'),
   getPlayerSummaries: jest.fn(),
+  getSteamLevel: jest.fn(),
 }))
 
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
 import { withSteamCache } from '@/lib/steamCache'
-import { getPlayerSummaries } from '@/lib/steamClient'
+import { getPlayerSummaries, getSteamLevel } from '@/lib/steamClient'
 
 const PLAYER = { steamid: '765', personaname: 'Ivan', avatarfull: 'a.jpg' }
 
@@ -27,6 +28,7 @@ beforeEach(() => {
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7', steamid: '765' } })
   jest.spyOn(console, 'error').mockImplementation(() => {})
   passThroughCache()
+  ;(getSteamLevel as jest.Mock).mockResolvedValue({ response: { player_level: 78 } })
 })
 
 afterEach(() => { (console.error as jest.Mock).mockRestore() })
@@ -46,11 +48,31 @@ test('returns 503 when the app has no Steam key', async () => {
   expect((await GET()).status).toBe(503)
 })
 
-test('unwraps the first player out of the Steam envelope', async () => {
+test('unwraps the first player and adds the Steam level', async () => {
   ;(getPlayerSummaries as jest.Mock).mockResolvedValue({ response: { players: [PLAYER] } })
   const res = await GET()
   expect(res.status).toBe(200)
-  expect((res as unknown as { data: unknown }).data).toEqual(PLAYER)
+  expect((res as unknown as { data: unknown }).data).toEqual({ ...PLAYER, level: 78 })
+})
+
+test('still returns the profile when the level is unavailable', async () => {
+  ;(getPlayerSummaries as jest.Mock).mockResolvedValue({ response: { players: [PLAYER] } })
+  ;(getSteamLevel as jest.Mock).mockRejectedValue(new Error('steam down'))
+  const res = await GET()
+  expect((res as unknown as { data: { level: unknown } }).data.level).toBeNull()
+})
+
+test('treats a malformed level payload as no level', async () => {
+  ;(getPlayerSummaries as jest.Mock).mockResolvedValue({ response: { players: [PLAYER] } })
+  ;(getSteamLevel as jest.Mock).mockResolvedValue({ response: {} })
+  const res = await GET()
+  expect((res as unknown as { data: { level: unknown } }).data.level).toBeNull()
+})
+
+test('caches under a new key, since the cached shape changed', async () => {
+  ;(getPlayerSummaries as jest.Mock).mockResolvedValue({ response: { players: [PLAYER] } })
+  await GET()
+  expect((withSteamCache as jest.Mock).mock.calls[0][0]).toBe('steamProfile_v2:765')
 })
 
 test('returns 404 when Steam knows no such player', async () => {

@@ -109,3 +109,8 @@ export function steamAssetUrl(appId: number, asset: SteamAsset): string {
 export function steamStoreUrl(appId: number): string {
   return `https://store.steampowered.com/app/${appId}`
 }
+
+/** The player's Steam level — the nearest thing Steam has to RA's rank. */
+export function getSteamLevel(steamId: string, apiKey: string) {
+  return fetchSteam(`${STEAM_API_BASE}/IPlayerService/GetSteamLevel/v1/?${qs({ key: apiKey, steamid: steamId })}`)
+}

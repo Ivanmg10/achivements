@@ -16,6 +16,7 @@ import {
   getAppDetails,
   steamAssetUrl,
   steamStoreUrl,
+  getSteamLevel,
 } from './steamClient'
 
 const KEY = 'api key/with+chars'
@@ -132,4 +133,12 @@ describe('store and artwork', () => {
   test('steamStoreUrl points at the store page', () => {
     expect(steamStoreUrl(730)).toBe('https://store.steampowered.com/app/730')
   })
+})
+
+test('getSteamLevel asks for the player level with the key', async () => {
+  await getSteamLevel('765', KEY)
+  const url = calledUrl()
+  expect(url.pathname).toBe('/IPlayerService/GetSteamLevel/v1/')
+  expect(url.searchParams.get('steamid')).toBe('765')
+  expect(url.searchParams.get('key')).toBe(KEY)
 })

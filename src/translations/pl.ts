@@ -479,6 +479,12 @@ export const pl: Translations = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    level: 'Poziom',
+    online: 'Online',
+    offline: 'Offline',
+    statGames: 'Gry',
+    statPerfect: 'Perfekcyjne gry',
+    statAchievements: 'Odblokowane osiągnięcia',
     profileTabsLabel: 'Profil',
     last2Weeks: 'Ostatnie 2 tygodnie',
     rarestUnlocked: 'Twoje najrzadsze',

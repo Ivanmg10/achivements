@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
 import { withSteamCache, TTL } from '@/lib/steamCache'
-import { getGlobalAchievementPercentages, getSchemaForGame } from '@/lib/steamClient'
-import { loadPlayerAchievements } from '@/lib/steamProgress'
+import { getGlobalAchievementPercentages } from '@/lib/steamClient'
+import { loadPlayerAchievements, loadSchema } from '@/lib/steamProgress'
 import { toGlobalPctMap, toSteamAchievements } from '@/utils/steamMappers'
 import { parseSteamLanguage } from '@/utils/steamLanguage'
 import { cachedJson } from '@/lib/httpCache'
-import type { SteamSchemaResponse, SteamSchemaAchievement, SteamGlobalPercentagesResponse } from '@/types/steam'
+import type { SteamGlobalPercentagesResponse } from '@/types/steam'
 
 /**
  * Achievements for one game: the schema (names, badges — localised) joined
@@ -29,14 +29,7 @@ export async function GET(req: NextRequest) {
   const lang = parseSteamLanguage(req.nextUrl.searchParams.get('lang'))
 
   try {
-    const schema = await withSteamCache<SteamSchemaAchievement[]>(
-      `steamSchema:${appId}:${lang}`,
-      TTL.schema,
-      async () => {
-        const data = (await getSchemaForGame(appId, apiKey, lang)) as SteamSchemaResponse
-        return data?.game?.availableGameStats?.achievements ?? []
-      },
-    )
+    const schema = await loadSchema(appId, apiKey, lang)
 
     // A game with no achievements at all needs no per-player call.
     if (schema.length === 0) return cachedJson([], TTL.schema)

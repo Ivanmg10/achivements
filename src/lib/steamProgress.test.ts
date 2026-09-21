@@ -9,10 +9,11 @@ jest.mock('@/lib/steamClient', () => ({
   ...jest.requireActual('@/lib/steamClient'),
   getPlayerAchievements: jest.fn(),
   getOwnedGames: jest.fn(),
+  getSchemaForGame: jest.fn(),
 }))
 
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
-import { getPlayerAchievements, getOwnedGames } from '@/lib/steamClient'
+import { getPlayerAchievements, getOwnedGames, getSchemaForGame } from '@/lib/steamClient'
 import {
   loadPlayerAchievements,
   fetchPlayerAchievements,
@@ -25,6 +26,7 @@ import {
   isNoStats,
   applyUnlocks,
   NO_STATS,
+  loadSchema,
 } from './steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 
@@ -317,5 +319,25 @@ describe('games Steam says have no stats (400)', () => {
 
   test('applyUnlocks counts a normal list as before', () => {
     expect(applyUnlocks(lab(), list(1, 2))).toMatchObject({ achievementsLoaded: true, numAwarded: 1, maxPossible: 2 })
+  })
+})
+
+describe('loadSchema', () => {
+  test('returns the definitions, cached for everyone per language', async () => {
+    ;(getSchemaForGame as jest.Mock).mockResolvedValue({
+      game: { availableGameStats: { achievements: [{ name: 'A' }] } },
+    })
+    await expect(loadSchema(730, 'key', 'spanish')).resolves.toEqual([{ name: 'A' }])
+
+    const [key, ttl, , options] = (withSteamCache as jest.Mock).mock.calls[0]
+    expect(key).toBe('steamSchema:730:spanish')
+    expect(ttl).toBe(TTL.schema)
+    expect(options).toBeUndefined()
+    expect(getSchemaForGame).toHaveBeenCalledWith(730, 'key', 'spanish')
+  })
+
+  test('returns [] for a game without achievements', async () => {
+    ;(getSchemaForGame as jest.Mock).mockResolvedValue({ game: {} })
+    await expect(loadSchema(1, 'key', 'english')).resolves.toEqual([])
   })
 })

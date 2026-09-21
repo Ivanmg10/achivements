@@ -479,6 +479,12 @@ export const ru: Translations = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    level: 'Уровень',
+    online: 'В сети',
+    offline: 'Не в сети',
+    statGames: 'Игры',
+    statPerfect: 'Идеальные игры',
+    statAchievements: 'Получено достижений',
     profileTabsLabel: 'Профиль',
     last2Weeks: 'Последние 2 недели',
     rarestUnlocked: 'Ваши самые редкие',

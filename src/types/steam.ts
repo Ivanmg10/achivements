@@ -19,6 +19,24 @@ export type SteamPlayerSummary = {
   /** Present only while the player is in a game. */
   gameextrainfo?: string
   gameid?: string
+  /** Account creation, unix seconds — only on public profiles. */
+  timecreated?: number
+  /** 0 offline, 1 online, 2 busy, 3 away, 4 snooze, 5 looking to trade, 6 looking to play. */
+  personastate?: number
+}
+
+/** What /api/steam/profile returns: the summary plus the Steam level. */
+export type SteamProfile = SteamPlayerSummary & { level: number | null }
+
+/** One recent unlock across the player's games, as the profile column lists them. */
+export type SteamRecentAchievement = {
+  appId: number
+  gameTitle: string
+  apiname: string
+  title: string
+  badgeUrl: string
+  /** ISO time of the unlock. */
+  unlockedAt: string
 }
 
 export type SteamPlayerSummariesResponse = {

@@ -479,6 +479,12 @@ export const ja: Translations = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    level: 'レベル',
+    online: 'オンライン',
+    offline: 'オフライン',
+    statGames: 'ゲーム',
+    statPerfect: 'パーフェクト',
+    statAchievements: '解除した実績',
     profileTabsLabel: 'プロフィール',
     last2Weeks: '過去2週間',
     rarestUnlocked: 'あなたの最もレア',
