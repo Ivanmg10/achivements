@@ -43,7 +43,7 @@ export default function MainPageProfile() {
     )
   }
 
-  // Both accounts: one profile at a time, switched at the top of the column.
+  // Both accounts: one profile at a time, switched by low-key tabs at the top.
   return (
     <section className="main-content text-text-main m-3 rounded-xl flex flex-col items-center gap-3 overflow-y-auto">
       <MainPageProfileTabs<Tab>
@@ -51,8 +51,8 @@ export default function MainPageProfile() {
         selected={tab}
         onSelect={setTab}
         tabs={[
-          { id: 'ra', label: 'RetroAchievements', icon: <IconTrophy size={14} aria-hidden="true" /> },
-          { id: 'steam', label: 'Steam', icon: <IconBrandSteam size={14} aria-hidden="true" /> },
+          { id: 'ra', label: 'RetroAchievements', icon: <IconTrophy size={13} aria-hidden="true" /> },
+          { id: 'steam', label: 'Steam', icon: <IconBrandSteam size={13} aria-hidden="true" /> },
         ]}
       />
       <div

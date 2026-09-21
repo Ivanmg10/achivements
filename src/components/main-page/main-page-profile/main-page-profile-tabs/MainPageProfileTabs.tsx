@@ -14,9 +14,13 @@ export function profilePanelId(prefix: string, id: string) {
 }
 
 /**
- * The RA / Steam switch at the top of the main page profile column. Same pill
- * look as MainViewToggle; behaves as an ARIA tablist: only the selected tab is
- * in the tab order, and the arrow keys (plus Home/End) move between tabs.
+ * The RA / Steam switch at the top of the main page profile column. Kept
+ * low-key — small text tabs with a thin underline on the active one (plus
+ * bolder text, so it is not colour alone) — so it does not compete with the
+ * profile below.
+ *
+ * Behaves as an ARIA tablist: only the selected tab is in the tab order, and
+ * the arrow keys (plus Home/End) move between tabs.
  */
 export default function MainPageProfileTabs<T extends string>({
   tabs,
@@ -48,7 +52,7 @@ export default function MainPageProfileTabs<T extends string>({
     <div
       role="tablist"
       aria-label={T.steam.profileTabsLabel}
-      className="flex items-center gap-0.5 p-0.5 rounded-full bg-white/5 w-full"
+      className="flex items-center gap-4 w-full px-1 border-b border-white/5"
     >
       {tabs.map((tab, i) => {
         const active = tab.id === selected
@@ -63,8 +67,10 @@ export default function MainPageProfileTabs<T extends string>({
             tabIndex={active ? 0 : -1}
             onClick={() => onSelect(tab.id)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              active ? 'bg-accent text-bg-main' : 'text-text-secondary hover:text-text-main hover:bg-white/8'
+            className={`-mb-px flex items-center gap-1.5 px-0.5 pb-1.5 pt-0.5 text-xs border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-t ${
+              active
+                ? 'border-accent text-text-main font-semibold'
+                : 'border-transparent text-text-secondary/70 hover:text-text-secondary font-medium'
             }`}
           >
             {tab.icon}
