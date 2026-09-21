@@ -43,6 +43,7 @@ export function toSteamGameProgress(game: SteamOwnedGame): SteamGameProgress {
     playtime2Weeks: game.playtime_2weeks ?? 0,
     imgLogoUrl: gameLogoUrl(game.appid, game.img_logo_url),
     hasStats: game.has_community_visible_stats === true,
+    achievementsLoaded: false,
   }
 }
 
@@ -58,6 +59,7 @@ export function withAchievementCounts(
     maxPossible,
     numAwarded,
     pctWon: maxPossible === 0 ? 0 : Math.round((numAwarded / maxPossible) * 10000) / 100,
+    achievementsLoaded: true,
   }
 }
 
@@ -88,4 +90,28 @@ export function toSteamAchievements(
       hidden: def.hidden === 1,
     }
   })
+}
+
+/**
+ * Fills counts from the player's unlock list alone. GetPlayerAchievements
+ * returns every achievement of the game with an `achieved` flag, so the total
+ * and the earned count both come from one call — no schema needed.
+ *
+ * An empty list is not "zero achievements": for a game that has stats it means
+ * the data was unavailable (private profile), so the game stays unloaded.
+ */
+export function withPlayerAchievementCounts(
+  game: SteamGameProgress,
+  player: SteamPlayerAchievement[],
+): SteamGameProgress {
+  if (player.length === 0) return game
+  const maxPossible = player.length
+  const numAwarded = player.filter((p) => p.achieved === 1).length
+  return {
+    ...game,
+    maxPossible,
+    numAwarded,
+    pctWon: Math.round((numAwarded / maxPossible) * 10000) / 100,
+    achievementsLoaded: true,
+  }
 }

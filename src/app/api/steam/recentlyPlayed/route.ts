@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
 import { withSteamCache, TTL } from '@/lib/steamCache'
 import { getRecentlyPlayedGames } from '@/lib/steamClient'
+import { enrichWithAchievementCounts } from '@/lib/steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 import { cachedJson } from '@/lib/httpCache'
 import type { SteamRecentlyPlayedResponse, SteamGameProgress } from '@/types/steam'
@@ -20,7 +21,9 @@ export async function GET() {
       async () => {
         const data = (await getRecentlyPlayedGames(steamid, apiKey, COUNT)) as SteamRecentlyPlayedResponse
         // A player with nothing played in two weeks gets `{ response: {} }`.
-        return (data?.response?.games ?? []).map(toSteamGameProgress)
+        const mapped = (data?.response?.games ?? []).map(toSteamGameProgress)
+        // The initial feed: counts for every recent game (≤20 calls, each cached 1h).
+        return enrichWithAchievementCounts(mapped, auth.session, COUNT)
       },
       { userId: id },
     )

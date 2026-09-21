@@ -114,6 +114,12 @@ export type SteamGameProgress = GameProgressBase & {
   playtime2Weeks: number
   imgLogoUrl: string
   hasStats: boolean
+  /**
+   * Whether maxPossible/numAwarded are real. Counts cost one API call per game,
+   * so only a bounded set is filled in; without this flag an unloaded game and
+   * a game with no achievements would both look like 0/0.
+   */
+  achievementsLoaded: boolean
 }
 
 export type UnifiedGame = RaGameProgress | SteamGameProgress

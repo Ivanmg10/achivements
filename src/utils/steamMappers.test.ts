@@ -3,6 +3,7 @@ import {
   toSteamGameProgress,
   withAchievementCounts,
   toSteamAchievements,
+  withPlayerAchievementCounts,
   STEAM_PLATFORM,
 } from './steamMappers'
 import type { SteamOwnedGame, SteamSchemaAchievement, SteamPlayerAchievement } from '@/types/steam'
@@ -46,6 +47,7 @@ describe('toSteamGameProgress', () => {
       playtime2Weeks: 120,
       imgLogoUrl: 'https://media.steampowered.com/steamcommunity/public/images/apps/730/logohash.jpg',
       hasStats: true,
+      achievementsLoaded: false,
     })
   })
 
@@ -148,4 +150,27 @@ describe('toSteamAchievements', () => {
     expect(result[0].dateEarned).toBeNull()
     expect(result[0].badgeUrl).toBe('icon.jpg')
   })
+})
+
+describe('withPlayerAchievementCounts', () => {
+  const base = toSteamGameProgress(GAME)
+
+  test('counts from the unlock list alone', () => {
+    const result = withPlayerAchievementCounts(base, [
+      { apiname: 'A', achieved: 1, unlocktime: 1 },
+      { apiname: 'B', achieved: 0, unlocktime: 0 },
+      { apiname: 'C', achieved: 1, unlocktime: 1 },
+    ])
+    expect(result).toMatchObject({ maxPossible: 3, numAwarded: 2, pctWon: 66.67, achievementsLoaded: true })
+  })
+
+  test('leaves the game unloaded on an empty list — unknown, not zero', () => {
+    expect(withPlayerAchievementCounts(base, [])).toBe(base)
+  })
+})
+
+test('a freshly mapped game is not yet loaded; counting marks it loaded', () => {
+  const base = toSteamGameProgress(GAME)
+  expect(base.achievementsLoaded).toBe(false)
+  expect(withAchievementCounts(base, []).achievementsLoaded).toBe(true)
 })

@@ -7,12 +7,13 @@ jest.mock('@/lib/steamCache', () => ({
 jest.mock('@/lib/steamClient', () => ({
   ...jest.requireActual('@/lib/steamClient'),
   getOwnedGames: jest.fn(),
+  getPlayerAchievements: jest.fn(),
 }))
 
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
 import { withSteamCache } from '@/lib/steamCache'
-import { getOwnedGames } from '@/lib/steamClient'
+import { getOwnedGames, getPlayerAchievements } from '@/lib/steamClient'
 import type { SteamGameProgress } from '@/types/steam'
 
 function data(res: unknown) {
@@ -59,4 +60,36 @@ test('returns 503 when Steam is unavailable', async () => {
 test('caches for an hour', async () => {
   ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [] } })
   expect((await GET()).headers.get('Cache-Control')).toBe('private, max-age=3600')
+})
+
+test('spends the count budget on the most recently played, not the most played', async () => {
+  // 31 eligible games: the most-played one was last touched longest ago, so it
+  // falls outside the 30-game budget even though it sorts first in the output.
+  const games = Array.from({ length: 31 }, (_, i) => ({
+    appid: i + 1,
+    name: `G${i + 1}`,
+    playtime_forever: i === 0 ? 99999 : 100 + i,
+    rtime_last_played: i === 0 ? 1 : 1_700_000_000 + i,
+    has_community_visible_stats: true,
+  }))
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games } })
+  ;(getPlayerAchievements as jest.Mock).mockResolvedValue({
+    playerstats: { success: true, achievements: [{ apiname: 'A', achieved: 1, unlocktime: 1 }] },
+  })
+
+  const out = data(await GET())
+  expect(getPlayerAchievements).toHaveBeenCalledTimes(30)
+  expect(out[0].title).toBe('G1')
+  expect(out[0].achievementsLoaded).toBe(false)
+  expect(out.filter((g) => g.achievementsLoaded)).toHaveLength(30)
+})
+
+test('keeps games with no last-played date in the list', async () => {
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({
+    response: { games: [
+      { appid: 1, name: 'Never', playtime_forever: 0 },
+      { appid: 2, name: 'Played', playtime_forever: 5, rtime_last_played: 1_700_000_000 },
+    ] },
+  })
+  expect(data(await GET()).map((g) => g.title)).toEqual(['Played', 'Never'])
 })

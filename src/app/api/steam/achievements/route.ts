@@ -1,15 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
 import { withSteamCache, TTL } from '@/lib/steamCache'
-import { getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
+import { getSchemaForGame } from '@/lib/steamClient'
+import { loadPlayerAchievements } from '@/lib/steamProgress'
 import { toSteamAchievements } from '@/utils/steamMappers'
 import { cachedJson } from '@/lib/httpCache'
-import type {
-  SteamPlayerAchievementsResponse,
-  SteamSchemaResponse,
-  SteamSchemaAchievement,
-  SteamPlayerAchievement,
-} from '@/types/steam'
+import type { SteamSchemaResponse, SteamSchemaAchievement } from '@/types/steam'
 
 /**
  * Achievements for one game, joining the global schema (definitions, badges)
@@ -23,7 +19,7 @@ import type {
 export async function GET(req: NextRequest) {
   const auth = await requireSteamSession()
   if (!auth.ok) return auth.response
-  const { id, steamid, apiKey } = auth.session
+  const { apiKey } = auth.session
 
   const appIdRaw = req.nextUrl.searchParams.get('appid')
   if (!appIdRaw || !/^\d+$/.test(appIdRaw)) {
@@ -44,24 +40,7 @@ export async function GET(req: NextRequest) {
     // A game with no achievements at all needs no per-player call.
     if (schema.length === 0) return cachedJson([], TTL.schema)
 
-    const player = await withSteamCache<SteamPlayerAchievement[]>(
-      `steamAch:${steamid}:${appId}`,
-      TTL.achievements,
-      async () => {
-        try {
-          const data = (await getPlayerAchievements(steamid, apiKey, appId)) as SteamPlayerAchievementsResponse
-          return data?.playerstats?.success ? (data.playerstats.achievements ?? []) : []
-        } catch (err) {
-          // Steam answers 403 for a private profile. The game is still
-          // renderable from the schema with everything locked, so degrade
-          // instead of failing the whole request.
-          if ((err as { status?: number }).status === 403) return []
-          throw err
-        }
-      },
-      { userId: id },
-    )
-
+    const player = await loadPlayerAchievements(auth.session, appId)
     return cachedJson(toSteamAchievements(schema, player), TTL.achievements)
   } catch (err) {
     console.error('[steam/achievements]', appId, err)

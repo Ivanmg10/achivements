@@ -7,12 +7,13 @@ jest.mock('@/lib/steamCache', () => ({
 jest.mock('@/lib/steamClient', () => ({
   ...jest.requireActual('@/lib/steamClient'),
   getRecentlyPlayedGames: jest.fn(),
+  getPlayerAchievements: jest.fn(),
 }))
 
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
 import { withSteamCache } from '@/lib/steamCache'
-import { getRecentlyPlayedGames } from '@/lib/steamClient'
+import { getRecentlyPlayedGames, getPlayerAchievements } from '@/lib/steamClient'
 import type { SteamGameProgress } from '@/types/steam'
 
 function data(res: unknown) {
@@ -76,4 +77,24 @@ test('caches for the short recently-played TTL', async () => {
   ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: { games: [] } })
   const res = await GET()
   expect(res.headers.get('Cache-Control')).toBe('private, max-age=300')
+})
+
+test('fills achievement counts for played games with stats', async () => {
+  ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({
+    response: { games: [
+      { appid: 730, name: 'CS2', playtime_forever: 100, has_community_visible_stats: true },
+      { appid: 440, name: 'No stats', playtime_forever: 100, has_community_visible_stats: false },
+    ] },
+  })
+  ;(getPlayerAchievements as jest.Mock).mockResolvedValue({
+    playerstats: { success: true, achievements: [
+      { apiname: 'A', achieved: 1, unlocktime: 1 },
+      { apiname: 'B', achieved: 0, unlocktime: 0 },
+    ] },
+  })
+
+  const [cs2, noStats] = data(await GET())
+  expect(cs2).toMatchObject({ achievementsLoaded: true, numAwarded: 1, maxPossible: 2, pctWon: 50 })
+  expect(noStats.achievementsLoaded).toBe(false)
+  expect(getPlayerAchievements).toHaveBeenCalledTimes(1)
 })
