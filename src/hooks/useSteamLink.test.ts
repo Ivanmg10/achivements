@@ -22,7 +22,8 @@ function setParams(params: Record<string, string> = {}) {
 
 beforeEach(() => {
   jest.clearAllMocks()
-  mockUpdate.mockResolvedValue(null)
+  // Like next-auth: resolves to the session after the jwt callback merged the data.
+  mockUpdate.mockImplementation(async (data: Record<string, unknown>) => ({ user: { id: '7', ...data } }))
   ;(useRouter as jest.Mock).mockReturnValue({ replace: mockReplace, push: jest.fn(), prefetch: jest.fn() })
   ;(usePathname as jest.Mock).mockReturnValue('/user')
   setSession({ id: '7' })
@@ -169,4 +170,90 @@ test('dismiss clears the status message', async () => {
 
 test('exposes the link route for the Connect control to point at', () => {
   expect(STEAM_LINK_URL).toBe('/api/steam/link')
+})
+
+describe('regression: link saved in the DB but never reaching the session', () => {
+  function linkedAccount() {
+    ;(fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({ steamid: STEAM_ID, steamusername: 'Ivan' }),
+    })
+  }
+
+  test('waits for the session to finish loading before updating it', async () => {
+    // Right after the redirect back from Steam the session is still loading,
+    // and next-auth's update() silently does nothing in that state.
+    linkedAccount()
+    setParams({ steam: 'linked' })
+    ;(useSession as jest.Mock).mockReturnValue({ data: null, status: 'loading', update: mockUpdate })
+
+    const { result, rerender } = renderHook(() => useSteamLink())
+    expect(fetch).not.toHaveBeenCalled()
+    expect(mockUpdate).not.toHaveBeenCalled()
+    // Not claimed as linked yet, and the param is kept until it is processed.
+    expect(result.current.status).toBeNull()
+    expect(mockReplace).not.toHaveBeenCalled()
+
+    setSession({ id: '7' })
+    rerender()
+
+    await waitFor(() => expect(result.current.status).toBe('linked'))
+    expect(mockUpdate).toHaveBeenCalledWith({ steamid: STEAM_ID, steamusername: 'Ivan' })
+    expect(mockReplace).toHaveBeenCalledWith('/user')
+  })
+
+  test('does not claim success when update() skipped without throwing', async () => {
+    linkedAccount()
+    setParams({ steam: 'linked' })
+    mockUpdate.mockResolvedValue(undefined)
+
+    const { result } = renderHook(() => useSteamLink())
+    await waitFor(() => expect(result.current.status).toBe('failed'))
+  })
+
+  test('does not claim success when the session came back without the link', async () => {
+    linkedAccount()
+    setParams({ steam: 'linked' })
+    mockUpdate.mockResolvedValue({ user: { id: '7' } })
+
+    const { result } = renderHook(() => useSteamLink())
+    await waitFor(() => expect(result.current.status).toBe('failed'))
+  })
+
+  test('fails when the account read back has no Steam link stored', async () => {
+    ;(fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({ steamid: null, steamusername: null }) })
+    setParams({ steam: 'linked' })
+
+    const { result } = renderHook(() => useSteamLink())
+    await waitFor(() => expect(result.current.status).toBe('failed'))
+    expect(mockUpdate).not.toHaveBeenCalled()
+  })
+
+  test('shows non-success outcomes without waiting for the session', () => {
+    setParams({ steam: 'cancelled' })
+    ;(useSession as jest.Mock).mockReturnValue({ data: null, status: 'loading', update: mockUpdate })
+
+    const { result } = renderHook(() => useSteamLink())
+    expect(result.current.status).toBe('cancelled')
+  })
+
+  test('disconnect fails loudly if the session still holds the link', async () => {
+    setSession({ id: '7', steamid: STEAM_ID })
+    ;(fetch as jest.Mock).mockResolvedValue({ ok: true })
+    mockUpdate.mockResolvedValue({ user: { id: '7', steamid: STEAM_ID } })
+
+    const { result } = renderHook(() => useSteamLink())
+    await act(async () => { await result.current.disconnect() })
+    expect(result.current.status).toBe('failed')
+  })
+
+  test('disconnect fails loudly if update() skipped', async () => {
+    setSession({ id: '7', steamid: STEAM_ID })
+    ;(fetch as jest.Mock).mockResolvedValue({ ok: true })
+    mockUpdate.mockResolvedValue(undefined)
+
+    const { result } = renderHook(() => useSteamLink())
+    await act(async () => { await result.current.disconnect() })
+    expect(result.current.status).toBe('failed')
+  })
 })

@@ -31,7 +31,7 @@ const STATUS_BY_PARAM: Record<string, Exclude<SteamLinkStatus, null>> = {
  * and unlinking.
  */
 export function useSteamLink() {
-  const { data: session, update } = useSession()
+  const { data: session, status: sessionStatus, update } = useSession()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -44,37 +44,52 @@ export function useSteamLink() {
 
   useEffect(() => {
     if (!steamParam || handled.current) return
-    handled.current = true
-
     const next = STATUS_BY_PARAM[steamParam] ?? 'failed'
-    setStatus(next)
 
-    // Drop ?steam= so a refresh does not replay the message.
+    if (next !== 'linked') {
+      handled.current = true
+      setStatus(next)
+      // Drop ?steam= so a refresh does not replay the message.
+      router.replace(pathname)
+      return
+    }
+
+    // next-auth's update() silently does nothing while the session is still
+    // loading — and it always is right after the full-page redirect back from
+    // Steam. Wait for it, or the link is saved in the DB but never reaches the JWT.
+    if (sessionStatus !== 'authenticated') return
+    handled.current = true
     router.replace(pathname)
 
-    if (next !== 'linked') return
-
     // The redirect could not write the JWT cookie, so read the stored link and
-    // push it into the session.
+    // push it into the session. "Linked" is only shown once the session holds it.
     ;(async () => {
       try {
         const res = await fetch('/api/steam/account')
         if (!res.ok) throw new Error(`Failed to read Steam account (${res.status})`)
         const data = (await res.json()) as { steamid: string | null; steamusername: string | null }
-        await update({ steamid: data.steamid, steamusername: data.steamusername } as Partial<Session>)
+        if (!data.steamid) throw new Error('Steam account was not stored')
+
+        const updated = await update({ steamid: data.steamid, steamusername: data.steamusername } as Partial<Session>)
+        // update() resolves without throwing when it skips, so check the link landed.
+        if (updated?.user?.steamid !== data.steamid) throw new Error('Session did not take the Steam link')
+
+        setStatus('linked')
       } catch (err) {
         console.error('[useSteamLink] refresh', err)
         setStatus('failed')
       }
     })()
-  }, [steamParam, pathname, router, update])
+  }, [steamParam, sessionStatus, pathname, router, update])
 
   const disconnect = useCallback(async () => {
     setIsUnlinking(true)
     try {
       const res = await fetch('/api/steam/unlink', { method: 'POST' })
       if (!res.ok) throw new Error(`Failed to unlink Steam (${res.status})`)
-      await update({ steamid: null, steamusername: null } as Partial<Session>)
+      const updated = await update({ steamid: null, steamusername: null } as Partial<Session>)
+      // Same silent-skip risk as linking: the DB is cleared, make sure the session is too.
+      if (!updated || updated.user?.steamid) throw new Error('Session still holds the Steam link')
       setStatus(null)
     } catch (err) {
       console.error('[useSteamLink] disconnect', err)
