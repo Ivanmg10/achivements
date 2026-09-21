@@ -6,6 +6,7 @@ import { ActivityHeatmapYearProvider } from '@/context/ActivityHeatmapYearContex
 import { GamesDataProvider } from '@/context/GamesDataContext'
 import { MainViewProvider } from '@/context/MainViewContext'
 import { PinnedGamesProvider } from '@/context/PinnedGamesContext'
+import { SteamGamesDataProvider } from '@/context/SteamGamesDataContext'
 
 export function MainProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -15,7 +16,9 @@ export function MainProviders({ children }: { children: React.ReactNode }) {
           <ActivityHeatmapYearProvider>
             <GamesDataProvider>
               <PinnedGamesProvider>
-                {children}
+                <SteamGamesDataProvider>
+                  {children}
+                </SteamGamesDataProvider>
               </PinnedGamesProvider>
             </GamesDataProvider>
           </ActivityHeatmapYearProvider>
