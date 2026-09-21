@@ -6,11 +6,12 @@ jest.mock('@/lib/steamCache', () => ({
 jest.mock('@/lib/steamClient', () => ({
   ...jest.requireActual('@/lib/steamClient'),
   getPlayerAchievements: jest.fn(),
+  getOwnedGames: jest.fn(),
 }))
 
 import { withSteamCache } from '@/lib/steamCache'
-import { getPlayerAchievements } from '@/lib/steamClient'
-import { loadPlayerAchievements, mapWithConcurrency, enrichWithAchievementCounts } from './steamProgress'
+import { getPlayerAchievements, getOwnedGames } from '@/lib/steamClient'
+import { loadPlayerAchievements, mapWithConcurrency, enrichWithAchievementCounts, loadLastPlayedDates } from './steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 
 const AUTH = { id: '7', steamid: '765', apiKey: 'key' }
@@ -152,5 +153,28 @@ describe('enrichWithAchievementCounts', () => {
     ;(getPlayerAchievements as jest.Mock).mockRejectedValue(Object.assign(new Error('Forbidden'), { status: 403 }))
     const [g] = await enrichWithAchievementCounts([game(1)], AUTH, 10)
     expect(g.achievementsLoaded).toBe(false)
+  })
+})
+
+describe('loadLastPlayedDates', () => {
+  test('maps appid to last-played time, skipping never-played games', async () => {
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
+      { appid: 1, playtime_forever: 5, rtime_last_played: 1700000000 },
+      { appid: 2, playtime_forever: 0, rtime_last_played: 0 },
+      { appid: 3, playtime_forever: 0 },
+    ] } })
+
+    const dates = await loadLastPlayedDates(AUTH)
+    expect([...dates]).toEqual([[1, 1700000000]])
+  })
+
+  test('returns an empty map for a private profile', async () => {
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: {} })
+    await expect(loadLastPlayedDates(AUTH)).resolves.toEqual(new Map())
+  })
+
+  test('returns an empty map instead of throwing when Steam fails', async () => {
+    ;(getOwnedGames as jest.Mock).mockRejectedValue(new Error('steam down'))
+    await expect(loadLastPlayedDates(AUTH)).resolves.toEqual(new Map())
   })
 })

@@ -8,12 +8,13 @@ jest.mock('@/lib/steamClient', () => ({
   ...jest.requireActual('@/lib/steamClient'),
   getRecentlyPlayedGames: jest.fn(),
   getPlayerAchievements: jest.fn(),
+  getOwnedGames: jest.fn(),
 }))
 
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
 import { withSteamCache } from '@/lib/steamCache'
-import { getRecentlyPlayedGames, getPlayerAchievements } from '@/lib/steamClient'
+import { getRecentlyPlayedGames, getPlayerAchievements, getOwnedGames } from '@/lib/steamClient'
 import type { SteamGameProgress } from '@/types/steam'
 
 function data(res: unknown) {
@@ -25,6 +26,7 @@ beforeEach(() => {
   process.env.STEAM_API_KEY = 'steam-key'
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7', steamid: '765' } })
   ;(withSteamCache as jest.Mock).mockImplementation(async (_k, _t, fetcher) => fetcher())
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [] } })
   jest.spyOn(console, 'error').mockImplementation(() => {})
 })
 
@@ -97,4 +99,55 @@ test('fills achievement counts for played games with stats', async () => {
   expect(cs2).toMatchObject({ achievementsLoaded: true, numAwarded: 1, maxPossible: 2, pctWon: 50 })
   expect(noStats.achievementsLoaded).toBe(false)
   expect(getPlayerAchievements).toHaveBeenCalledTimes(1)
+})
+
+describe('last played dates', () => {
+  // Shape seen from the real API: GetRecentlyPlayedGames has no
+  // rtime_last_played and is not ordered by date.
+  const RECENT = { response: { games: [
+    { appid: 12210, name: 'GTA IV', playtime_forever: 500, playtime_2weeks: 300 },
+    { appid: 311210, name: 'Black Ops III', playtime_forever: 900, playtime_2weeks: 20 },
+    { appid: 377160, name: 'Fallout 4', playtime_forever: 100, playtime_2weeks: 50 },
+  ] } }
+
+  test('takes each date from the owned list and orders newest first', async () => {
+    ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue(RECENT)
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
+      { appid: 12210, playtime_forever: 500, rtime_last_played: 1789324742 },
+      { appid: 311210, playtime_forever: 900, rtime_last_played: 1789808762 },
+      { appid: 377160, playtime_forever: 100, rtime_last_played: 1788802145 },
+    ] } })
+
+    const games = data(await GET())
+    expect(games.map((g) => g.title)).toEqual(['Black Ops III', 'GTA IV', 'Fallout 4'])
+    expect(games[0].lastPlayed).toBe(new Date(1789808762 * 1000).toISOString())
+  })
+
+  test('still returns the games, undated, if the owned lookup fails', async () => {
+    ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue(RECENT)
+    ;(getOwnedGames as jest.Mock).mockRejectedValue(new Error('steam down'))
+
+    const games = data(await GET())
+    expect(games).toHaveLength(3)
+    expect(games.every((g) => g.lastPlayed === null)).toBe(true)
+  })
+
+  test('leaves a game undated when it is missing from the owned list (e.g. family sharing)', async () => {
+    ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue(RECENT)
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
+      { appid: 12210, playtime_forever: 500, rtime_last_played: 1789324742 },
+    ] } })
+
+    const games = data(await GET())
+    expect(games[0].title).toBe('GTA IV')
+    expect(games.slice(1).every((g) => g.lastPlayed === null)).toBe(true)
+  })
+
+  test('keeps a date Steam did send on the recent entry', async () => {
+    ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: { games: [
+      { appid: 1, name: 'Dated', playtime_forever: 5, rtime_last_played: 1700000000 },
+    ] } })
+    const [g] = data(await GET())
+    expect(g.lastPlayed).toBe(new Date(1700000000 * 1000).toISOString())
+  })
 })

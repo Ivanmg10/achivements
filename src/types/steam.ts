@@ -34,6 +34,7 @@ export type SteamOwnedGame = {
   img_logo_url?: string
   /** False means the game exposes no achievements — treat it as having none. */
   has_community_visible_stats?: boolean
+  /** Only GetOwnedGames returns this — GetRecentlyPlayedGames does not. */
   rtime_last_played?: number
 }
 

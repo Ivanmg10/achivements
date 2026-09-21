@@ -1,7 +1,12 @@
 import { withSteamCache, TTL } from '@/lib/steamCache'
-import { getPlayerAchievements } from '@/lib/steamClient'
+import { getOwnedGames, getPlayerAchievements } from '@/lib/steamClient'
 import { withPlayerAchievementCounts } from '@/utils/steamMappers'
-import type { SteamGameProgress, SteamPlayerAchievement, SteamPlayerAchievementsResponse } from '@/types/steam'
+import type {
+  SteamGameProgress,
+  SteamOwnedGamesResponse,
+  SteamPlayerAchievement,
+  SteamPlayerAchievementsResponse,
+} from '@/types/steam'
 
 /** Parallel Steam calls per enrichment — keeps a burst well under the rate limit. */
 const CONCURRENCY = 4
@@ -81,4 +86,28 @@ export async function enrichWithAchievementCounts(
       return game
     }
   })
+}
+
+/**
+ * appid → last-played time (unix seconds), from the owned-games list.
+ *
+ * GetRecentlyPlayedGames does not return rtime_last_played — only
+ * GetOwnedGames does — and it does not order its games by date either. Without
+ * this, recent Steam games have no date, sort after every dated RA game in the
+ * merged feed, and never make the cut.
+ *
+ * Never throws: if the lookup fails the games are still worth showing undated.
+ */
+export async function loadLastPlayedDates(auth: SteamAuth): Promise<Map<number, number>> {
+  try {
+    const data = (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse
+    const dates = new Map<number, number>()
+    for (const g of data?.response?.games ?? []) {
+      if (g.rtime_last_played) dates.set(g.appid, g.rtime_last_played)
+    }
+    return dates
+  } catch (err) {
+    console.error('[steamProgress] last played dates', err)
+    return new Map()
+  }
 }
