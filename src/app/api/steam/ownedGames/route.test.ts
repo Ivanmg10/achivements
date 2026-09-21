@@ -57,9 +57,13 @@ test('returns 503 when Steam is unavailable', async () => {
   expect((await GET()).status).toBe(503)
 })
 
-test('caches for an hour', async () => {
+test('is cached in the DB for an hour but never by the browser', async () => {
+  // A browser-held copy froze a partial fill in place; the DB cache is what
+  // keeps repeat requests cheap.
   ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [] } })
-  expect((await GET()).headers.get('Cache-Control')).toBe('private, max-age=3600')
+  const res = await GET()
+  expect((withSteamCache as jest.Mock).mock.calls[0][1]).toBe(3600000)
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=0')
 })
 
 describe('filling counts across a large library', () => {
@@ -97,12 +101,11 @@ describe('filling counts across a large library', () => {
     expect(res.headers.get('Cache-Control')).toBe('private, max-age=0')
   })
 
-  test('caches a finished fill for an hour', async () => {
+  test('caches a finished fill', async () => {
     ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: games.slice(1) } })
-    const res = await GET()
+    await GET()
     const { shouldCache } = (withSteamCache as jest.Mock).mock.calls[0][3]
     expect(shouldCache()).toBe(true)
-    expect(res.headers.get('Cache-Control')).toBe('private, max-age=3600')
   })
 })
 
@@ -114,4 +117,22 @@ test('keeps games with no last-played date in the list', async () => {
     ] },
   })
   expect(data(await GET()).map((g) => g.title)).toEqual(['Played', 'Never'])
+})
+
+test('a game Steam says has no stats (400) does not keep the library from completing', async () => {
+  // Seen live: The Lab is flagged as having stats but always answers
+  // 400 "Requested app has no stats".
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
+    { appid: 450390, name: 'The Lab', playtime_forever: 60, has_community_visible_stats: true },
+    { appid: 2, name: 'Real', playtime_forever: 60, has_community_visible_stats: true },
+  ] } })
+  ;(getPlayerAchievements as jest.Mock).mockImplementation(async (_s: string, _k: string, appId: number) => {
+    if (appId === 450390) throw Object.assign(new Error('Steam API error 400'), { status: 400 })
+    return { playerstats: { success: true, achievements: [{ apiname: 'A', achieved: 1, unlocktime: 1 }] } }
+  })
+
+  const out = data(await GET())
+  const { shouldCache } = (withSteamCache as jest.Mock).mock.calls[0][3]
+  expect(shouldCache()).toBe(true)
+  expect(out.find((g) => g.id === 450390)).toMatchObject({ hasStats: false, achievementsLoaded: false })
 })

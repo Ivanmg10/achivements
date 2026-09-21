@@ -279,3 +279,14 @@ test('loads under Strict Mode, whose dev-only remount discards the first load', 
 
   await waitFor(() => expect(seen.library).toEqual(LIBRARY))
 })
+
+test('always asks the server, never a browser-cached copy', async () => {
+  setSteamId('765')
+  mockRoutes()
+  const { result } = renderHook(() => useSteamGamesData(), { wrapper })
+  await waitFor(() => expect(result.current.libraryLoading).toBe(false))
+
+  for (const call of (fetch as jest.Mock).mock.calls) {
+    expect(call[1]).toEqual({ cache: 'no-store' })
+  }
+})

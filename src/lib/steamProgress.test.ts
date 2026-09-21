@@ -22,6 +22,9 @@ import {
   progressCacheKey,
   progressTtl,
   isCountable,
+  isNoStats,
+  applyUnlocks,
+  NO_STATS,
 } from './steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 
@@ -269,5 +272,47 @@ describe('loadLastPlayedDates', () => {
   test('returns an empty map instead of throwing when Steam fails', async () => {
     ;(getOwnedGames as jest.Mock).mockRejectedValue(new Error('steam down'))
     await expect(loadLastPlayedDates(AUTH)).resolves.toEqual(new Map())
+  })
+})
+
+describe('games Steam says have no stats (400)', () => {
+  const lab = () => game(450390, { name: 'The Lab' })
+  const noStats400 = () => Object.assign(new Error('Steam API error 400'), { status: 400 })
+
+  test('fetchPlayerAchievements reports NO_STATS, distinct from a private profile', async () => {
+    ;(getPlayerAchievements as jest.Mock).mockRejectedValue(noStats400())
+    const unlocks = await fetchPlayerAchievements(AUTH, 450390)
+    expect(isNoStats(unlocks)).toBe(true)
+    expect(isNoStats([])).toBe(false)
+  })
+
+  test('the game becomes one with no achievements — not unknown, not retried', async () => {
+    ;(getPlayerAchievements as jest.Mock).mockRejectedValue(noStats400())
+    const g = lab()
+    const { games: [out], complete } = await enrichWithAchievementCounts([g], AUTH, 10)
+
+    expect(complete).toBe(true)
+    expect(out.hasStats).toBe(false)
+    expect(isCountable(out)).toBe(false)
+    // Final, so it gets the settled TTL rather than the short "unknown" one.
+    expect(writeCache).toHaveBeenCalledWith(progressCacheKey('765', g), NO_STATS, TTL.settledProgress, '7')
+  })
+
+  test('a cached NO_STATS is applied without calling Steam', async () => {
+    const g = lab()
+    ;(readCacheMany as jest.Mock).mockResolvedValue(new Map([[progressCacheKey('765', g), NO_STATS]]))
+
+    const { games: [out] } = await enrichWithAchievementCounts([g], AUTH, 10)
+    expect(getPlayerAchievements).not.toHaveBeenCalled()
+    expect(out.hasStats).toBe(false)
+  })
+
+  test('the detail view gets an empty list for it', async () => {
+    ;(getPlayerAchievements as jest.Mock).mockRejectedValue(noStats400())
+    await expect(loadPlayerAchievements(AUTH, 450390)).resolves.toEqual([])
+  })
+
+  test('applyUnlocks counts a normal list as before', () => {
+    expect(applyUnlocks(lab(), list(1, 2))).toMatchObject({ achievementsLoaded: true, numAwarded: 1, maxPossible: 2 })
   })
 })

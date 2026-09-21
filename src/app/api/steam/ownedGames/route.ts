@@ -44,7 +44,10 @@ export async function GET() {
       { userId: id, shouldCache: () => complete },
     )
 
-    return cachedJson(games, complete ? TTL.ownedGames : 0)
+    // No browser caching: the list changes as counts fill in, and a copy held
+    // by the browser for an hour froze a partial fill in place. The DB cache
+    // above is what keeps repeat requests cheap.
+    return cachedJson(games, 0)
   } catch (err) {
     console.error('[steam/ownedGames]', err)
     return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })

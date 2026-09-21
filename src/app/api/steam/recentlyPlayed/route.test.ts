@@ -75,10 +75,11 @@ test('returns 503 when Steam is unavailable', async () => {
   expect((await GET()).status).toBe(503)
 })
 
-test('caches for the short recently-played TTL', async () => {
+test('is cached in the DB for 5 minutes but never by the browser', async () => {
   ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: { games: [] } })
   const res = await GET()
-  expect(res.headers.get('Cache-Control')).toBe('private, max-age=300')
+  expect((withSteamCache as jest.Mock).mock.calls[0][1]).toBe(300000)
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=0')
 })
 
 test('fills achievement counts for played games with stats', async () => {

@@ -40,7 +40,8 @@ export async function GET() {
       { userId: id },
     )
 
-    return cachedJson(games, TTL.recentlyPlayed)
+    // Not browser-cached — see ownedGames; the DB cache keeps it cheap.
+    return cachedJson(games, 0)
   } catch (err) {
     console.error('[steam/recentlyPlayed]', err)
     return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })

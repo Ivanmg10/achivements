@@ -35,8 +35,13 @@ const EMPTY: SteamGamesCtx = {
 
 const Ctx = createContext<SteamGamesCtx>(EMPTY)
 
+/**
+ * Always straight from the server: these lists change as the server fills in
+ * counts, so a browser-cached copy would freeze a partial list in place. The
+ * server's DB cache already makes a repeat request cheap.
+ */
 async function fetchGames(url: string): Promise<SteamGameProgress[]> {
-  const res = await fetch(url)
+  const res = await fetch(url, { cache: 'no-store' })
   if (!res.ok) throw new Error(`Steam request failed (${res.status})`)
   const data = await res.json()
   if (!Array.isArray(data)) throw new Error('Unexpected Steam response')

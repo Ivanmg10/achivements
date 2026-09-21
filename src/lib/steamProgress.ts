@@ -21,17 +21,42 @@ const ACTIVE_WINDOW_MS = 48 * 60 * 60 * 1000
 export type SteamAuth = { id: string; steamid: string; apiKey: string }
 
 /**
- * One game's unlock list straight from Steam. A private profile answers 403;
- * that degrades to an empty list, because the game is still worth showing.
+ * Steam's answer for a game that has no achievements, even when the owned list
+ * flagged it as having stats (seen live: The Lab, "Requested app has no
+ * stats", every time). Unlike an empty list, it is definitive.
  */
-export async function fetchPlayerAchievements(auth: SteamAuth, appId: number): Promise<SteamPlayerAchievement[]> {
+export const NO_STATS = { noStats: true } as const
+export type PlayerUnlocks = SteamPlayerAchievement[] | typeof NO_STATS
+
+export function isNoStats(unlocks: PlayerUnlocks): unlocks is typeof NO_STATS {
+  return !Array.isArray(unlocks) && unlocks?.noStats === true
+}
+
+/**
+ * One game's unlocks straight from Steam.
+ *
+ * - 403 (private profile): an empty list — progress unknown, but the game is
+ *   still worth showing.
+ * - 400 (the app has no stats): NO_STATS — the game has no achievements.
+ *   Treating it as a transient failure would retry it forever and keep the
+ *   library from ever counting as complete.
+ */
+export async function fetchPlayerAchievements(auth: SteamAuth, appId: number): Promise<PlayerUnlocks> {
   try {
     const data = (await getPlayerAchievements(auth.steamid, auth.apiKey, appId)) as SteamPlayerAchievementsResponse
     return data?.playerstats?.success ? (data.playerstats.achievements ?? []) : []
   } catch (err) {
-    if ((err as { status?: number }).status === 403) return []
+    const status = (err as { status?: number }).status
+    if (status === 403) return []
+    if (status === 400) return NO_STATS
     throw err
   }
+}
+
+/** Applies unlocks to a game: counts, or "has no achievements" for NO_STATS. */
+export function applyUnlocks(game: SteamGameProgress, unlocks: PlayerUnlocks): SteamGameProgress {
+  if (isNoStats(unlocks)) return { ...game, hasStats: false }
+  return withPlayerAchievementCounts(game, unlocks)
 }
 
 /** The unlock list for one game's detail view, cached per player for an hour. */
@@ -39,7 +64,10 @@ export function loadPlayerAchievements(auth: SteamAuth, appId: number): Promise<
   return withSteamCache<SteamPlayerAchievement[]>(
     `steamAch:${auth.steamid}:${appId}`,
     TTL.achievements,
-    () => fetchPlayerAchievements(auth, appId),
+    async () => {
+      const unlocks = await fetchPlayerAchievements(auth, appId)
+      return isNoStats(unlocks) ? [] : unlocks
+    },
     { userId: auth.id },
   )
 }
@@ -101,7 +129,7 @@ export async function enrichWithAchievementCounts(
 ): Promise<{ games: SteamGameProgress[]; complete: boolean }> {
   const countable = games.filter(isCountable)
   const keyOf = new Map(countable.map((g) => [g.id, progressCacheKey(auth.steamid, g)]))
-  const cached = await readCacheMany<SteamPlayerAchievement[]>([...keyOf.values()])
+  const cached = await readCacheMany<PlayerUnlocks>([...keyOf.values()])
 
   const misses = countable.filter((g) => !cached.has(keyOf.get(g.id)!))
   const toFetch = new Set(misses.slice(0, maxFetches).map((g) => g.id))
@@ -112,16 +140,17 @@ export async function enrichWithAchievementCounts(
     if (!key) return game
 
     const hit = cached.get(key)
-    if (hit) return withPlayerAchievementCounts(game, hit)
+    if (hit) return applyUnlocks(game, hit)
     if (!toFetch.has(game.id)) return game
 
     try {
-      const list = await fetchPlayerAchievements(auth, game.id)
+      const unlocks = await fetchPlayerAchievements(auth, game.id)
       // An empty list (private profile) is cached briefly rather than skipped,
       // or every page load would re-fetch it — but not for a month either, so
-      // making the profile public takes effect.
-      await writeCache(key, list, list.length > 0 ? progressTtl(game) : TTL.achievements, auth.id)
-      return withPlayerAchievementCounts(game, list)
+      // making the profile public takes effect. NO_STATS is final.
+      const unknown = Array.isArray(unlocks) && unlocks.length === 0
+      await writeCache(key, unlocks, unknown ? TTL.achievements : progressTtl(game), auth.id)
+      return applyUnlocks(game, unlocks)
     } catch (err) {
       console.error('[steamProgress] enrich', game.id, err)
       complete = false
