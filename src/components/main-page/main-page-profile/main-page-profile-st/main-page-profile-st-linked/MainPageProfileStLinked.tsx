@@ -60,7 +60,8 @@ export default function MainPageProfileStLinked({
   ]
 
   return (
-    <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full">
+    // Fills the column like the RA card, so switching tabs does not resize it.
+    <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
       {profile.profileurl && (
         <a
           href={profile.profileurl}

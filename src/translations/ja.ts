@@ -479,6 +479,7 @@ export const ja: Translations = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    profileTabsLabel: 'プロフィール',
     last2Weeks: '過去2週間',
     rarestUnlocked: 'あなたの最もレア',
     noneUnlocked: 'まだ実績を解除していません',

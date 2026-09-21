@@ -479,6 +479,7 @@ export const it: Translations = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    profileTabsLabel: 'Profilo',
     last2Weeks: 'Ultime 2 settimane',
     rarestUnlocked: 'I tuoi più rari',
     noneUnlocked: 'Nessun obiettivo sbloccato finora',

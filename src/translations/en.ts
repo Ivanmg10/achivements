@@ -477,6 +477,7 @@ export const en = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    profileTabsLabel: 'Profile',
     last2Weeks: 'Last 2 weeks',
     rarestUnlocked: 'Your rarest',
     noneUnlocked: 'No achievements unlocked yet',

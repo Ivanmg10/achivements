@@ -10,7 +10,7 @@ jest.mock("@/components/main-page/main-page-profile/main-page-profile-ra/MainPag
   default: () => <div data-testid="profile-ra">ProfileRa</div>,
 }));
 
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import MainPageProfile from "./MainPageProfile";
 import { useSession } from "next-auth/react";
 import { useSteamGamesData } from "@/context/SteamGamesDataContext";
@@ -31,19 +31,52 @@ test("renders without raUser", () => {
   expect(screen.getByTestId("profile-ra")).toBeInTheDocument();
 });
 
-describe("Steam profile", () => {
-  afterEach(() => (useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false }));
-
-  test("is shown under the RA profile once Steam is linked", () => {
+describe("RA / Steam tabs", () => {
+  function bothAccounts() {
     (useSession as jest.Mock).mockReturnValue({ data: { user: { raUser: { User: "Ivan" } } } });
     (useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true });
+  }
+
+  beforeEach(() => window.localStorage.clear());
+  afterEach(() => (useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false }));
+
+  test("with both accounts, one profile at a time under tabs at the top — RA first", () => {
+    bothAccounts();
+    render(<MainPageProfile />);
+
+    const tabs = screen.getAllByRole("tab");
+    expect(tabs.map((t) => t.textContent)).toEqual(["RetroAchievements", "Steam"]);
+    expect(tabs[0].getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByTestId("profile-ra")).toBeInTheDocument();
+    expect(screen.queryByTestId("profile-st")).not.toBeInTheDocument();
+  });
+
+  test("switches to the Steam profile, in a panel labelled by its tab", () => {
+    bothAccounts();
+    render(<MainPageProfile />);
+    fireEvent.click(screen.getByRole("tab", { name: "Steam" }));
+
+    expect(screen.getByTestId("profile-st")).toBeInTheDocument();
+    expect(screen.queryByTestId("profile-ra")).not.toBeInTheDocument();
+    const panel = screen.getByRole("tabpanel");
+    expect(panel.getAttribute("aria-labelledby")).toBe(screen.getByRole("tab", { name: "Steam" }).id);
+  });
+
+  test("remembers the chosen tab", () => {
+    bothAccounts();
+    const { unmount } = render(<MainPageProfile />);
+    fireEvent.click(screen.getByRole("tab", { name: "Steam" }));
+    unmount();
+
     render(<MainPageProfile />);
     expect(screen.getByTestId("profile-st")).toBeInTheDocument();
   });
 
-  test("is not shown — no connect prompt either — while Steam is unlinked", () => {
+  test("with RA only there are no tabs — and no connect prompt either", () => {
     (useSession as jest.Mock).mockReturnValue({ data: { user: { raUser: { User: "Ivan" } } } });
     render(<MainPageProfile />);
+    expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
+    expect(screen.getByTestId("profile-ra")).toBeInTheDocument();
     expect(screen.queryByTestId("profile-st")).not.toBeInTheDocument();
   });
 });
