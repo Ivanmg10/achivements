@@ -93,7 +93,7 @@ describe('links to the game page', () => {
 
   test('no link sits inside the expand button', () => {
     render(<SteamGameItem game={game()} />)
-    expect(screen.getByRole('button').querySelector('a')).toBeNull()
+    expect(screen.getByRole('button', { name: /achievements: / }).querySelector('a')).toBeNull()
   })
 })
 
@@ -107,7 +107,7 @@ describe('expansion', () => {
 
   test('toggles locally and loads achievements only when opened', () => {
     render(<SteamGameItem game={game()} />)
-    const button = screen.getByRole('button')
+    const button = screen.getByRole('button', { name: /achievements: / })
 
     fireEvent.click(button)
     expect(button.getAttribute('aria-expanded')).toBe('true')
@@ -122,7 +122,7 @@ describe('expansion', () => {
 
   test('does not fetch achievements for a game without stats', () => {
     render(<SteamGameItem game={game({ hasStats: false })} />)
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: /achievements: / }))
 
     expect(screen.queryByTestId('achievements')).not.toBeInTheDocument()
     expect(screen.getAllByText(en.steam.noAchievements)).toHaveLength(2)
@@ -132,7 +132,7 @@ describe('expansion', () => {
     const onToggle = jest.fn()
     const { rerender } = render(<SteamGameItem game={game()} expanded={false} onToggle={onToggle} />)
 
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: /achievements: / }))
     expect(onToggle).toHaveBeenCalledTimes(1)
     expect(screen.queryByTestId('achievements')).not.toBeInTheDocument()
 
@@ -148,12 +148,18 @@ test('accepts extra root classes so it can fill a layout slot', () => {
 
 test('the expand button names the action it will take', () => {
   render(<SteamGameItem game={game()} />)
-  fireEvent.click(screen.getByRole('button'))
+  fireEvent.click(screen.getByRole('button', { name: /achievements: / }))
   expect(screen.getByRole('button', { name: `${en.steam.hideAchievements}: Portal 2` })).toBeInTheDocument()
 })
 
 test('opens the same dashboard RA games open into, for this game', () => {
   render(<SteamGameItem game={game(loaded)} />)
-  fireEvent.click(screen.getByRole('button'))
+  fireEvent.click(screen.getByRole('button', { name: /achievements: / }))
   expect(screen.getByTestId('achievements')).toHaveTextContent('achievements for 620 (50)')
+})
+
+test('can be pinned as a Steam game, from outside the expand button', () => {
+  render(<SteamGameItem game={game()} />)
+  const pin = screen.getByRole('button', { name: en.pinnedGames.pinAria })
+  expect(pin.closest('button[aria-expanded]')).toBeNull()
 })

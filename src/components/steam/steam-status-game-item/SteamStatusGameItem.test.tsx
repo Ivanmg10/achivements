@@ -87,7 +87,7 @@ describe('links', () => {
 
   test('no link sits inside the expand button', () => {
     render(<SteamStatusGameItem game={game()} />)
-    expect(screen.getByRole('button').querySelector('a')).toBeNull()
+    expect(screen.getByRole('button', { name: /achievements: / }).querySelector('a')).toBeNull()
   })
 })
 
@@ -101,7 +101,7 @@ describe('expanding', () => {
 
   test('opens the 48px badge grid, sized to the known count, and closes again', () => {
     render(<SteamStatusGameItem game={game(partial)} />)
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: /achievements: / }))
 
     const button = screen.getByRole('button', { name: `${en.steam.hideAchievements}: Fallout 4` })
     expect(button.getAttribute('aria-expanded')).toBe('true')
@@ -114,7 +114,7 @@ describe('expanding', () => {
 
   test('does not fetch achievements for a game without stats', () => {
     render(<SteamStatusGameItem game={game({ hasStats: false })} />)
-    fireEvent.click(screen.getByRole('button'))
+    fireEvent.click(screen.getByRole('button', { name: /achievements: / }))
     expect(screen.queryByTestId('achievements')).not.toBeInTheDocument()
     expect(screen.getAllByText(en.steam.noAchievements)).toHaveLength(2)
   })
@@ -127,4 +127,9 @@ test('takes a ref and style so a masonry list can position it', () => {
   )
   expect(ref).toHaveBeenCalledWith(container.firstChild)
   expect((container.firstChild as HTMLElement).style.top).toBe('12px')
+})
+
+test('can be pinned as a Steam game, like RA cards', () => {
+  render(<SteamStatusGameItem game={game()} />)
+  expect(screen.getByRole('button', { name: en.pinnedGames.pinAria })).toBeInTheDocument()
 })

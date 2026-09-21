@@ -12,6 +12,7 @@ import { CONSOLES } from '@/constants'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-recently-played-expanded/RARecentlyPlayedExpanded'
+import { gameKey } from '@/utils/gameRef'
 
 const CONSOLE_BY_ID = new Map(CONSOLES.map((c) => [c.id, c.icon]))
 
@@ -31,8 +32,9 @@ export default function PinnedGameRow({
 }) {
   const { T } = useLanguage()
   const { game, isLoading } = useGameProgression(String(gameId))
+  // Keyed by platform too: pinned RA and Steam games share one sortable list.
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: gameId,
+    id: gameKey('ra', gameId),
   })
   const style = { transform: CSS.Transform.toString(transform), transition }
 

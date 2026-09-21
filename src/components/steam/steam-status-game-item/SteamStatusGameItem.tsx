@@ -8,6 +8,7 @@ import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
 import { formatPlaytime } from '@/utils/steamFeed'
+import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import type { SteamGameProgress } from '@/types/steam'
 
 /**
@@ -126,6 +127,8 @@ export default function SteamStatusGameItem({
             </span>
           </button>
         </div>
+
+        <PinToggleButton gameId={game.id} source="steam" className="self-center" />
       </div>
 
       {open && (

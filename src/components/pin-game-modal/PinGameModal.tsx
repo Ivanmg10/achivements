@@ -1,19 +1,16 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo } from 'react'
-import Image from 'next/image'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
-import {
-  IconSearch,
-  IconX,
-  IconCheck,
-} from '@tabler/icons-react'
+import { IconSearch, IconX, IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useGamesData } from '@/context/GamesDataContext'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
-import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
-import { fetchWithRetry } from '@/lib/fetchWithRetry'
-import { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
+import { useGameCandidates } from '@/hooks/useGameCandidates'
+import { fetchRaCandidateById } from '@/utils/apiCallsUtils'
+import { searchCandidates, GameCandidate } from '@/utils/gameCandidates'
+import { gameKey } from '@/utils/gameRef'
+import GamePickerRow from '@/components/game-picker/game-picker-row/GamePickerRow'
+import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -26,26 +23,18 @@ const spotlightVariants: Variants = {
   exit: { opacity: 0, y: -8, scale: 0.97, transition: { duration: 0.15 } },
 }
 
-export default function PinGameModal({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean
-  onClose: () => void
-}) {
+/** Pick games to pin — RA and Steam alike — by title, or an RA game by id. */
+export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { T } = useLanguage()
-  const { all } = useGamesData()
-  const { pinnedIds, pinGame } = usePinnedGames()
-  const { games: recentlyPlayedData } = useRecentlyPlayedGames()
+  const { pins, pinGame } = usePinnedGames()
+  const candidates = useGameCandidates(isOpen)
   const [query, setQuery] = useState('')
-  const [selected, setSelected] = useState<Map<number, RetroAchievementsGameCompleted>>(new Map())
+  const [selected, setSelected] = useState<Map<string, GameCandidate>>(new Map())
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(false)
-  const [wantToPlay, setWantToPlay] = useState<WantToPlayGame[]>([])
-  const wantFetched = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const existingIds = useMemo(() => new Set(pinnedIds), [pinnedIds])
+  const pinnedKeys = useMemo(() => new Set(pins.map((p) => gameKey(p.source, p.id))), [pins])
 
   useEffect(() => {
     if (!isOpen) return
@@ -53,14 +42,6 @@ export default function PinGameModal({
     setQuery('')
     setSelected(new Map())
     setError(false)
-    if (!wantFetched.current) {
-      wantFetched.current = true
-      fetchWithRetry('/api/getWantPlayGames')
-        .then((data) => {
-          setWantToPlay((data as { Results?: WantToPlayGame[] })?.Results ?? [])
-        })
-        .catch(() => {})
-    }
   }, [isOpen])
 
   useEffect(() => {
@@ -72,44 +53,7 @@ export default function PinGameModal({
     return () => window.removeEventListener('keydown', handler)
   }, [isOpen, onClose])
 
-  const uniqueGames = useMemo(() => {
-    const seen = new Map<number, RetroAchievementsGameCompleted>()
-    for (const g of all) {
-      if (!seen.has(g.GameID)) seen.set(g.GameID, g)
-    }
-    for (const g of recentlyPlayedData) {
-      if (!seen.has(g.GameID)) {
-        seen.set(g.GameID, {
-          GameID: g.GameID,
-          Title: g.Title,
-          ImageIcon: g.ImageIcon,
-          ConsoleID: 0,
-          ConsoleName: g.ConsoleName,
-          MaxPossible: g.NumPossibleAchievements,
-          NumAwarded: g.NumAchieved,
-          PctWon: '0',
-          HardcoreMode: '0',
-        })
-      }
-    }
-    for (const g of wantToPlay) {
-      if (!seen.has(g.ID)) {
-        seen.set(g.ID, {
-          GameID: g.ID,
-          Title: g.Title,
-          ImageIcon: g.ImageIcon,
-          ConsoleID: g.ConsoleID,
-          ConsoleName: g.ConsoleName,
-          MaxPossible: g.AchievementsPublished,
-          NumAwarded: 0,
-          PctWon: '0',
-          HardcoreMode: '0',
-        })
-      }
-    }
-    return Array.from(seen.values())
-  }, [all, recentlyPlayedData, wantToPlay])
-
+  /** A pasted RA id or game URL opens that RA game directly. */
   const directGameId = useMemo(() => {
     const q = query.trim()
     if (/^\d{3,}$/.test(q)) return parseInt(q)
@@ -117,55 +61,24 @@ export default function PinGameModal({
     return m ? parseInt(m[1]) : null
   }, [query])
 
-  const results = useMemo(() => {
-    if (!query.trim() || directGameId) return []
-    const q = query.toLowerCase()
-    return uniqueGames
-      .filter((g) => g.Title.toLowerCase().includes(q) && !existingIds.has(g.GameID))
-      .map((g) => {
-        const t = g.Title.toLowerCase()
-        const score =
-          t === q ? 3 : t.startsWith(q) ? 2 : t.split(/\s+/).some((w) => w.startsWith(q)) ? 1 : 0
-        return { g, score }
-      })
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 20)
-      .map(({ g }) => g)
-  }, [query, uniqueGames, existingIds, directGameId])
+  const results = useMemo(
+    () => (directGameId ? [] : searchCandidates(candidates, query, pinnedKeys)),
+    [candidates, query, pinnedKeys, directGameId],
+  )
 
-  function toggleGame(g: RetroAchievementsGameCompleted) {
+  function toggle(c: GameCandidate) {
     setSelected((prev) => {
       const next = new Map(prev)
-      next.has(g.GameID) ? next.delete(g.GameID) : next.set(g.GameID, g)
+      next.has(c.key) ? next.delete(c.key) : next.set(c.key, c)
       return next
     })
   }
 
   async function addDirectById(id: number) {
-    try {
-      const data = await fetch(`/api/getGameData?gameId=${id}`).then((r) => r.json())
-      if (data?.Title) {
-        const g: RetroAchievementsGameCompleted = {
-          GameID: id,
-          Title: data.Title,
-          ImageIcon: data.ImageIcon ?? '',
-          ConsoleID: data.ConsoleID ?? 0,
-          ConsoleName: data.ConsoleName ?? '',
-          MaxPossible: data.NumAchievements ?? 0,
-          NumAwarded: 0,
-          PctWon: '0',
-          HardcoreMode: '0',
-        }
-        setSelected((prev) => {
-          const next = new Map(prev)
-          next.has(id) ? next.delete(id) : next.set(id, g)
-          return next
-        })
-        setQuery('')
-      }
-    } catch {
-      /* the empty result list already reflects that nothing was found */
-    }
+    const c = await fetchRaCandidateById(id)
+    if (!c) return
+    toggle(c)
+    setQuery('')
   }
 
   async function handleConfirm() {
@@ -173,8 +86,8 @@ export default function PinGameModal({
     setSaving(true)
     setError(false)
     try {
-      for (const g of selected.values()) {
-        await pinGame(g.GameID)
+      for (const c of selected.values()) {
+        await pinGame(c.id, c.source)
       }
       setSaving(false)
       onClose()
@@ -183,6 +96,8 @@ export default function PinGameModal({
       setError(true)
     }
   }
+
+  const directKey = directGameId ? gameKey('ra', directGameId) : null
 
   return (
     <AnimatePresence>
@@ -208,6 +123,7 @@ export default function PinGameModal({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={T.pinnedGames.searchPlaceholder}
+                  aria-label={T.pinnedGames.searchPlaceholder}
                   className="flex-1 bg-transparent text-text-main text-base outline-none placeholder:text-text-secondary"
                 />
                 <button
@@ -221,40 +137,14 @@ export default function PinGameModal({
 
               {(results.length > 0 || directGameId) && (
                 <div className="max-h-80 overflow-y-auto">
-                  {results.map((g) => {
-                    const isSel = selected.has(g.GameID)
-                    return (
-                      <button
-                        key={g.GameID}
-                        onClick={() => toggleGame(g)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left ${isSel ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
-                      >
-                        {g.ImageIcon && (
-                          <Image
-                            src={`https://retroachievements.org${g.ImageIcon}`}
-                            alt={g.Title}
-                            width={32}
-                            height={32}
-                            className="w-8 h-8 rounded object-cover shrink-0"
-                            unoptimized
-                          />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-text-main truncate">{g.Title}</p>
-                          <p className="text-xs text-text-secondary truncate">{g.ConsoleName}</p>
-                        </div>
-                        <div
-                          className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${isSel ? 'bg-accent border-accent' : 'border-white/20'}`}
-                        >
-                          {isSel && <IconCheck className="w-3 h-3 text-bg-main" aria-hidden />}
-                        </div>
-                      </button>
-                    )
-                  })}
-                  {directGameId && !existingIds.has(directGameId) && (
+                  {results.map((c) => (
+                    <GamePickerRow key={c.key} candidate={c} selected={selected.has(c.key)} onToggle={() => toggle(c)} />
+                  ))}
+                  {directGameId && directKey && !pinnedKeys.has(directKey) && (
                     <button
                       onClick={() => addDirectById(directGameId)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-t border-white/5 ${selected.has(directGameId) ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
+                      aria-pressed={selected.has(directKey)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-t border-white/5 ${selected.has(directKey) ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
                     >
                       <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">
                         ID
@@ -266,11 +156,10 @@ export default function PinGameModal({
                         <p className="text-xs text-text-secondary">Game ID</p>
                       </div>
                       <div
-                        className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected.has(directGameId) ? 'bg-accent border-accent' : 'border-white/20'}`}
+                        aria-hidden="true"
+                        className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected.has(directKey) ? 'bg-accent border-accent' : 'border-white/20'}`}
                       >
-                        {selected.has(directGameId) && (
-                          <IconCheck className="w-3 h-3 text-bg-main" aria-hidden />
-                        )}
+                        {selected.has(directKey) && <IconCheck className="w-3 h-3 text-bg-main" />}
                       </div>
                     </button>
                   )}
@@ -280,30 +169,8 @@ export default function PinGameModal({
               {selected.size > 0 && (
                 <div className="border-t border-white/5 px-4 py-3 flex flex-col gap-3 shrink-0">
                   <div className="flex flex-wrap gap-1.5">
-                    {Array.from(selected.values()).map((g) => (
-                      <span
-                        key={g.GameID}
-                        className="flex items-center gap-1.5 bg-accent/15 text-accent text-xs px-2.5 py-1 rounded-full"
-                      >
-                        {g.ImageIcon && (
-                          <Image
-                            src={`https://retroachievements.org${g.ImageIcon}`}
-                            alt={g.Title}
-                            width={14}
-                            height={14}
-                            className="rounded shrink-0"
-                            unoptimized
-                          />
-                        )}
-                        <span className="truncate max-w-32">{g.Title}</span>
-                        <button
-                          onClick={() => toggleGame(g)}
-                          className="text-accent/60 hover:text-accent transition-colors ml-0.5"
-                          aria-label={`Remove ${g.Title}`}
-                        >
-                          <IconX className="w-3 h-3" aria-hidden />
-                        </button>
-                      </span>
+                    {Array.from(selected.values()).map((c) => (
+                      <GamePickerChip key={c.key} candidate={c} removeLabel={`Remove ${c.title}`} onRemove={() => toggle(c)} />
                     ))}
                   </div>
                   {error && (
@@ -322,9 +189,7 @@ export default function PinGameModal({
               )}
 
               {!query.trim() && selected.size === 0 && (
-                <p className="text-text-secondary text-xs text-center py-6">
-                  {T.pinnedGames.searchPlaceholder}
-                </p>
+                <p className="text-text-secondary text-xs text-center py-6">{T.pinnedGames.searchPlaceholder}</p>
               )}
             </motion.div>
           </div>

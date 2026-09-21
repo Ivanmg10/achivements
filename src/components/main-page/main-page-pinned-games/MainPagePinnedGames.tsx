@@ -21,16 +21,30 @@ import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { MainViewToggle } from '@/components/main-view-toggle/MainViewToggle'
 import PinnedGameRow from './pinned-game-row/PinnedGameRow'
 import PinGameCard from './pin-game-card/PinGameCard'
+import SteamPinnedGameRow from './steam-pinned-game-row/SteamPinnedGameRow'
+import { gameKey, GameRef } from '@/utils/gameRef'
 
 export default function MainPagePinnedGames() {
   const { T } = useLanguage()
-  const { pinnedIds, isLoading, reorder } = usePinnedGames()
-  const [localIds, setLocalIds] = useState<number[] | null>(null)
-  const [expandedId, setExpandedId] = useState<number | null>(null)
-  const displayIds = localIds ?? pinnedIds
+  const { pins, isLoading, reorder } = usePinnedGames()
+  const [localPins, setLocalPins] = useState<GameRef[] | null>(null)
+  // Keys, not ids: an RA game and a Steam app can share an id.
+  const [expandedKey, setExpandedKey] = useState<string | null>(null)
+  const displayPins = localPins ?? pins
+  const keys = displayPins.map((p) => gameKey(p.source, p.id))
 
-  function toggleExpand(gameId: number) {
-    setExpandedId((current) => (current === gameId ? null : gameId))
+  function toggleExpand(key: string) {
+    setExpandedKey((current) => (current === key ? null : key))
+  }
+
+  function renderRow(pin: GameRef, isOpen: boolean) {
+    const key = gameKey(pin.source, pin.id)
+    const onToggle = () => toggleExpand(key)
+    return pin.source === 'steam' ? (
+      <SteamPinnedGameRow key={key} appId={pin.id} isOpen={isOpen} onToggle={onToggle} />
+    ) : (
+      <PinnedGameRow key={key} gameId={pin.id} isOpen={isOpen} onToggle={onToggle} />
+    )
   }
 
   const sensors = useSensors(
@@ -41,14 +55,14 @@ export default function MainPagePinnedGames() {
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     if (!over || active.id === over.id) return
-    const oldIndex = displayIds.findIndex((id) => id === active.id)
-    const newIndex = displayIds.findIndex((id) => id === over.id)
-    const next = arrayMove(displayIds, oldIndex, newIndex)
-    setLocalIds(next)
+    const oldIndex = keys.indexOf(String(active.id))
+    const newIndex = keys.indexOf(String(over.id))
+    const next = arrayMove(displayPins, oldIndex, newIndex)
+    setLocalPins(next)
     try {
       await reorder(next)
     } finally {
-      setLocalIds(null)
+      setLocalPins(null)
     }
   }
 
@@ -65,24 +79,13 @@ export default function MainPagePinnedGames() {
             <div className="h-24 bg-bg-main rounded-xl animate-pulse" />
             <div className="h-24 bg-bg-main rounded-xl animate-pulse" />
           </div>
-        ) : expandedId !== null ? (
-          <PinnedGameRow
-            gameId={expandedId}
-            isOpen
-            onToggle={() => toggleExpand(expandedId)}
-          />
+        ) : expandedKey !== null && displayPins.some((p) => gameKey(p.source, p.id) === expandedKey) ? (
+          renderRow(displayPins.find((p) => gameKey(p.source, p.id) === expandedKey)!, true)
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={displayIds} strategy={rectSortingStrategy}>
+            <SortableContext items={keys} strategy={rectSortingStrategy}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {displayIds.map((id) => (
-                  <PinnedGameRow
-                    key={id}
-                    gameId={id}
-                    isOpen={false}
-                    onToggle={() => toggleExpand(id)}
-                  />
-                ))}
+                {displayPins.map((pin) => renderRow(pin, false))}
                 <PinGameCard />
               </div>
             </SortableContext>

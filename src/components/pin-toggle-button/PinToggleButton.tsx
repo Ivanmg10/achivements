@@ -4,26 +4,30 @@ import { useState, type MouseEvent } from 'react'
 import { IconPin, IconPinFilled } from '@tabler/icons-react'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
+import type { GameSource } from '@/types/steam'
 
 export function PinToggleButton({
   gameId,
+  source = 'ra',
   onClick,
   className = '',
 }: {
   gameId: number
+  /** Which platform the id belongs to — RA and Steam ids overlap. */
+  source?: GameSource
   onClick?: (e: MouseEvent) => void
   className?: string
 }) {
   const { T } = useLanguage()
   const { isPinned, pinGame, unpinGame } = usePinnedGames()
   const [hasError, setHasError] = useState(false)
-  const pinned = isPinned(gameId)
+  const pinned = isPinned(gameId, source)
 
   async function handleClick(e: MouseEvent) {
     onClick?.(e)
     try {
-      if (pinned) await unpinGame(gameId)
-      else await pinGame(gameId)
+      if (pinned) await unpinGame(gameId, source)
+      else await pinGame(gameId, source)
       setHasError(false)
     } catch {
       setHasError(true)

@@ -7,6 +7,7 @@ import GameInfoHeaderStatsBadge from '@/components/game-info-header/game-info-he
 import SteamGameInfoHeaderProgression from './steam-game-info-header-progression/SteamGameInfoHeaderProgression'
 import SteamGameInfoHeaderScreenshots from './steam-game-info-header-screenshots/SteamGameInfoHeaderScreenshots'
 import { steamStoreUrl } from '@/lib/steamClient'
+import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameDetails, SteamGameProgress } from '@/types/steam'
 
@@ -81,6 +82,7 @@ export default function SteamGameInfoHeader({
                 {T.steam.notOwned}
               </span>
             )}
+            <PinToggleButton gameId={appId} source="steam" />
           </div>
 
           {details?.description && (
