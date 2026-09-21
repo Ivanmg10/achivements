@@ -8,13 +8,14 @@ jest.mock('@/lib/steamClient', () => ({
   ...jest.requireActual('@/lib/steamClient'),
   getPlayerAchievements: jest.fn(),
   getSchemaForGame: jest.fn(),
+  getGlobalAchievementPercentages: jest.fn(),
 }))
 
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
 import { NextRequest } from 'next/server'
 import { withSteamCache } from '@/lib/steamCache'
-import { getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
+import { getPlayerAchievements, getSchemaForGame, getGlobalAchievementPercentages } from '@/lib/steamClient'
 import type { SteamAchievementUnified } from '@/types/steam'
 
 const SCHEMA = [
@@ -81,7 +82,7 @@ test('caches the schema globally and the unlock state per player', async () => {
   await GET(makeRequest('730'))
 
   const [schemaCall, playerCall] = (withSteamCache as jest.Mock).mock.calls
-  expect(schemaCall[0]).toBe('steamSchema:730')
+  expect(schemaCall[0]).toBe('steamSchema:730:english')
   expect(schemaCall[3]).toBeUndefined()
   expect(playerCall[0]).toBe('steamAch:765:730')
   expect(playerCall[3]).toEqual({ userId: '7' })
@@ -94,8 +95,8 @@ test('still renders everything locked when the profile is private (403)', async 
 
   const achievements = data(await GET(makeRequest('730')))
   expect(achievements).toHaveLength(1)
+  expect(achievements[0].earned).toBe(false)
   expect(achievements[0].dateEarned).toBeNull()
-  expect(achievements[0].badgeUrl).toBe('g.jpg')
 })
 
 test('treats an unsuccessful playerstats payload as no unlocks', async () => {
@@ -113,4 +114,40 @@ test('returns 503 when the player call fails for a reason other than privacy', a
     Object.assign(new Error('boom'), { status: 500 }),
   )
   expect((await GET(makeRequest('730'))).status).toBe(503)
+})
+
+describe('language and rarity', () => {
+  beforeEach(() => {
+    ;(getGlobalAchievementPercentages as jest.Mock).mockResolvedValue({
+      achievementpercentages: { achievements: [{ name: 'ACH_WIN', percent: '12.5' }] },
+    })
+  })
+
+  test('asks Steam for the requested language and caches the schema per language', async () => {
+    const url = new URL('http://localhost:3000/api/steam/achievements?appid=730&lang=spanish')
+    await GET(new NextRequest(url.toString()))
+
+    expect(getSchemaForGame).toHaveBeenCalledWith(730, 'steam-key', 'spanish')
+    expect((withSteamCache as jest.Mock).mock.calls[0][0]).toBe('steamSchema:730:spanish')
+  })
+
+  test('falls back to English for a language Steam does not know', async () => {
+    const url = new URL('http://localhost:3000/api/steam/achievements?appid=730&lang=klingon')
+    await GET(new NextRequest(url.toString()))
+    expect(getSchemaForGame).toHaveBeenCalledWith(730, 'steam-key', 'english')
+  })
+
+  test('attaches global rarity, cached for everyone', async () => {
+    const [a] = data(await GET(makeRequest('730')))
+    expect(a.globalPct).toBe(12.5)
+    const keys = (withSteamCache as jest.Mock).mock.calls.map((c) => c[0])
+    expect(keys).toContain('steamGlobalPct:730')
+  })
+
+  test('still returns the achievements when rarity is unavailable', async () => {
+    ;(getGlobalAchievementPercentages as jest.Mock).mockRejectedValue(new Error('steam down'))
+    const [a] = data(await GET(makeRequest('730')))
+    expect(a.title).toBe('Win')
+    expect(a.globalPct).toBeNull()
+  })
 })

@@ -5,6 +5,9 @@ import type {
   SteamPlayerAchievement,
   SteamSchemaAchievement,
   SteamAchievementUnified,
+  SteamGlobalPercentagesResponse,
+  SteamAppDetailsResponse,
+  SteamGameDetails,
 } from '@/types/steam'
 
 /**
@@ -53,7 +56,7 @@ export function withAchievementCounts(
   achievements: SteamAchievementUnified[],
 ): SteamGameProgress {
   const maxPossible = achievements.length
-  const numAwarded = achievements.filter((a) => a.dateEarned !== null).length
+  const numAwarded = achievements.filter((a) => a.earned).length
   return {
     ...game,
     maxPossible,
@@ -71,6 +74,7 @@ export function withAchievementCounts(
 export function toSteamAchievements(
   schema: SteamSchemaAchievement[],
   player: SteamPlayerAchievement[],
+  globalPct: Map<string, number> = new Map(),
 ): SteamAchievementUnified[] {
   const unlocked = new Map(player.map((p) => [p.apiname, p]))
 
@@ -83,13 +87,49 @@ export function toSteamAchievements(
       apiname: def.name,
       title: def.displayName || def.name,
       description: def.description ?? '',
+      earned,
       dateEarned: earned ? unixToIso(state?.unlocktime) : null,
-      // Steam ships a separate greyed-out badge for locked achievements.
-      badgeUrl: earned ? def.icon : def.icongray,
+      // Always the colour badge: locked ones are greyed out in the UI, as RA
+      // does. Steam's own icongray is often too dark to make out.
+      badgeUrl: def.icon,
       displayOrder: index,
       hidden: def.hidden === 1,
+      globalPct: globalPct.get(def.name) ?? null,
     }
   })
+}
+
+/**
+ * apiname → share of players who have it. The live API sends percent as a
+ * string; anything unparseable is dropped rather than shown as NaN.
+ */
+export function toGlobalPctMap(data: SteamGlobalPercentagesResponse | null | undefined): Map<string, number> {
+  const map = new Map<string, number>()
+  for (const a of data?.achievementpercentages?.achievements ?? []) {
+    const pct = typeof a.percent === 'number' ? a.percent : parseFloat(a.percent)
+    if (Number.isFinite(pct)) map.set(a.name, pct)
+  }
+  return map
+}
+
+/** Store appdetails → the trimmed shape the game page uses, or null if Steam has none. */
+export function toSteamGameDetails(
+  appId: number,
+  data: SteamAppDetailsResponse | null | undefined,
+): SteamGameDetails | null {
+  const entry = data?.[String(appId)]
+  if (!entry?.success || !entry.data) return null
+  const d = entry.data
+  return {
+    appId,
+    name: d.name,
+    developers: d.developers ?? [],
+    publishers: d.publishers ?? [],
+    genres: (d.genres ?? []).map((g) => g.description),
+    releaseDate: d.release_date?.date || null,
+    description: d.short_description || null,
+    screenshots: (d.screenshots ?? []).map((s) => ({ thumb: s.path_thumbnail, full: s.path_full })),
+  }
 }
 
 /**

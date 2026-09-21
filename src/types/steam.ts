@@ -76,6 +76,40 @@ export type SteamSchemaAchievement = {
   icongray: string
 }
 
+export type SteamGlobalPercentagesResponse = {
+  achievementpercentages?: {
+    /** percent arrives as a string ("83.3") from the live API. */
+    achievements?: { name: string; percent: string | number }[]
+  }
+}
+
+export type SteamStoreData = {
+  name: string
+  type?: string
+  developers?: string[]
+  publishers?: string[]
+  genres?: { id?: string; description: string }[]
+  release_date?: { coming_soon: boolean; date: string }
+  short_description?: string
+  header_image?: string
+  screenshots?: { id: number; path_thumbnail: string; path_full: string }[]
+}
+
+/** Store appdetails is keyed by appid: { "377160": { success, data } }. */
+export type SteamAppDetailsResponse = Record<string, { success: boolean; data?: SteamStoreData }>
+
+/** What /api/steam/gameDetails returns: store data, flattened and trimmed. */
+export type SteamGameDetails = {
+  appId: number
+  name: string
+  developers: string[]
+  publishers: string[]
+  genres: string[]
+  releaseDate: string | null
+  description: string | null
+  screenshots: { thumb: string; full: string }[]
+}
+
 export type SteamSchemaResponse = {
   game?: {
     gameName?: string
@@ -147,6 +181,13 @@ export type SteamAchievementUnified = AchievementBase & {
   _source: 'steam'
   apiname: string
   hidden: boolean
+  /**
+   * Unlocked or not. Not derivable from dateEarned: achievements unlocked before
+   * Steam kept timestamps come back achieved with unlocktime 0, so no date.
+   */
+  earned: boolean
+  /** Share of all Steam players who have it, 0–100 — Steam's equivalent of RA rarity. */
+  globalPct: number | null
 }
 
 export type UnifiedAchievement = RaAchievementUnified | SteamAchievementUnified

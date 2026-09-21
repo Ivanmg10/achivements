@@ -4,6 +4,8 @@ import {
   withAchievementCounts,
   toSteamAchievements,
   withPlayerAchievementCounts,
+  toGlobalPctMap,
+  toSteamGameDetails,
   STEAM_PLATFORM,
 } from './steamMappers'
 import type { SteamOwnedGame, SteamSchemaAchievement, SteamPlayerAchievement } from '@/types/steam'
@@ -71,10 +73,10 @@ describe('withAchievementCounts', () => {
 
   test('counts earned achievements and the percentage', () => {
     const result = withAchievementCounts(base, [
-      { dateEarned: '2023-01-01T00:00:00.000Z' },
-      { dateEarned: null },
-      { dateEarned: '2023-01-02T00:00:00.000Z' },
-      { dateEarned: null },
+      { earned: true },
+      { earned: false },
+      { earned: true },
+      { earned: false },
     ] as never)
 
     expect(result.maxPossible).toBe(4)
@@ -84,7 +86,7 @@ describe('withAchievementCounts', () => {
 
   test('rounds the percentage to two decimals', () => {
     const result = withAchievementCounts(base, [
-      { dateEarned: 'x' }, { dateEarned: null }, { dateEarned: null },
+      { earned: true }, { earned: false }, { earned: false },
     ] as never)
     expect(result.pctWon).toBe(33.33)
   })
@@ -113,11 +115,13 @@ describe('toSteamAchievements', () => {
 
     expect(win).toEqual({
       _source: 'steam', id: 'ACH_WIN', apiname: 'ACH_WIN', title: 'Win a Match',
-      description: 'Win your first match', dateEarned: '2023-11-14T22:13:20.000Z',
-      badgeUrl: 'icon.jpg', displayOrder: 0, hidden: false,
+      description: 'Win your first match', earned: true, dateEarned: '2023-11-14T22:13:20.000Z',
+      badgeUrl: 'icon.jpg', displayOrder: 0, hidden: false, globalPct: null,
     })
+    expect(secret.earned).toBe(false)
     expect(secret.dateEarned).toBeNull()
-    expect(secret.badgeUrl).toBe('gray2.jpg')
+    // Colour badge even when locked — the UI greys it out, as RA does.
+    expect(secret.badgeUrl).toBe('icon2.jpg')
     expect(secret.hidden).toBe(true)
     expect(secret.description).toBe('')
   })
@@ -125,8 +129,8 @@ describe('toSteamAchievements', () => {
   test('renders the full list from the schema alone when the player has no data', () => {
     const result = toSteamAchievements(schema, [])
     expect(result).toHaveLength(2)
-    expect(result.every((a) => a.dateEarned === null)).toBe(true)
-    expect(result.map((a) => a.badgeUrl)).toEqual(['gray.jpg', 'gray2.jpg'])
+    expect(result.every((a) => !a.earned && a.dateEarned === null)).toBe(true)
+    expect(result.map((a) => a.badgeUrl)).toEqual(['icon.jpg', 'icon2.jpg'])
   })
 
   test('ignores player entries with no matching schema definition', () => {
@@ -147,8 +151,20 @@ describe('toSteamAchievements', () => {
 
   test('treats an unlock with achieved=1 but no timestamp as earned with no date', () => {
     const result = toSteamAchievements(schema, [{ apiname: 'ACH_WIN', achieved: 1, unlocktime: 0 }])
+    // Unlocked before Steam kept timestamps: still earned, just undated.
+    expect(result[0].earned).toBe(true)
     expect(result[0].dateEarned).toBeNull()
-    expect(result[0].badgeUrl).toBe('icon.jpg')
+  })
+
+  test('attaches global rarity by api name', () => {
+    const result = toSteamAchievements(schema, [], new Map([['ACH_WIN', 83.3]]))
+    expect(result[0].globalPct).toBe(83.3)
+    expect(result[1].globalPct).toBeNull()
+  })
+
+  test('an earned-but-undated achievement still counts as earned', () => {
+    const [a] = toSteamAchievements(schema, [{ apiname: 'ACH_WIN', achieved: 1, unlocktime: 0 }])
+    expect(withAchievementCounts(toSteamGameProgress(GAME), [a]).numAwarded).toBe(1)
   })
 })
 
@@ -173,4 +189,65 @@ test('a freshly mapped game is not yet loaded; counting marks it loaded', () => 
   const base = toSteamGameProgress(GAME)
   expect(base.achievementsLoaded).toBe(false)
   expect(withAchievementCounts(base, []).achievementsLoaded).toBe(true)
+})
+
+describe('toGlobalPctMap', () => {
+  test('parses the string percents the live API sends', () => {
+    const map = toGlobalPctMap({ achievementpercentages: { achievements: [
+      { name: 'A', percent: '83.3' },
+      { name: 'B', percent: 4.2 },
+    ] } })
+    expect([...map]).toEqual([['A', 83.3], ['B', 4.2]])
+  })
+
+  test('drops unparseable values instead of producing NaN', () => {
+    const map = toGlobalPctMap({ achievementpercentages: { achievements: [{ name: 'A', percent: 'n/a' }] } })
+    expect(map.size).toBe(0)
+  })
+
+  test('handles a missing payload', () => {
+    expect(toGlobalPctMap(null).size).toBe(0)
+    expect(toGlobalPctMap({}).size).toBe(0)
+  })
+})
+
+describe('toSteamGameDetails', () => {
+  const RESPONSE = {
+    '377160': {
+      success: true,
+      data: {
+        name: 'Fallout 4',
+        developers: ['Bethesda Game Studios'],
+        publishers: ['Bethesda Softworks'],
+        genres: [{ id: '3', description: 'Rol' }],
+        release_date: { coming_soon: false, date: '9 NOV 2015' },
+        short_description: 'Desc',
+        screenshots: [{ id: 0, path_thumbnail: 't.jpg', path_full: 'f.jpg' }],
+      },
+    },
+  }
+
+  test('flattens the store payload for the requested app', () => {
+    expect(toSteamGameDetails(377160, RESPONSE)).toEqual({
+      appId: 377160,
+      name: 'Fallout 4',
+      developers: ['Bethesda Game Studios'],
+      publishers: ['Bethesda Softworks'],
+      genres: ['Rol'],
+      releaseDate: '9 NOV 2015',
+      description: 'Desc',
+      screenshots: [{ thumb: 't.jpg', full: 'f.jpg' }],
+    })
+  })
+
+  test('fills empty fields when the store omits them', () => {
+    const d = toSteamGameDetails(1, { '1': { success: true, data: { name: 'Bare' } } })
+    expect(d).toMatchObject({ developers: [], publishers: [], genres: [], releaseDate: null, description: null, screenshots: [] })
+  })
+
+  test('returns null when Steam has no store entry (delisted, or success false)', () => {
+    expect(toSteamGameDetails(1, { '1': { success: false } })).toBeNull()
+    expect(toSteamGameDetails(2, RESPONSE)).toBeNull()
+    expect(toSteamGameDetails(1, null)).toBeNull()
+  })
 })

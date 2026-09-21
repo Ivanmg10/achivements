@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
 import { withSteamCache, TTL } from '@/lib/steamCache'
-import { getSchemaForGame } from '@/lib/steamClient'
+import { getGlobalAchievementPercentages, getSchemaForGame } from '@/lib/steamClient'
 import { loadPlayerAchievements } from '@/lib/steamProgress'
-import { toSteamAchievements } from '@/utils/steamMappers'
+import { toGlobalPctMap, toSteamAchievements } from '@/utils/steamMappers'
+import { parseSteamLanguage } from '@/utils/steamLanguage'
 import { cachedJson } from '@/lib/httpCache'
-import type { SteamSchemaResponse, SteamSchemaAchievement } from '@/types/steam'
+import type { SteamSchemaResponse, SteamSchemaAchievement, SteamGlobalPercentagesResponse } from '@/types/steam'
 
 /**
- * Achievements for one game, joining the global schema (definitions, badges)
- * with the player's unlock state.
+ * Achievements for one game: the schema (names, badges — localised) joined
+ * with the player's unlock state and global rarity.
  *
- * The two halves cache separately and very differently: definitions are the
- * same for everyone and change only on a game update (24h, shared), while
- * unlock state is per player (1h). Caching them together would mean every
- * user re-downloading the same schema.
+ * The three parts cache separately because they change at different rates
+ * and for different audiences: the schema per language for everyone (24h),
+ * rarity for everyone (24h), unlock state per player (1h).
  */
 export async function GET(req: NextRequest) {
   const auth = await requireSteamSession()
@@ -26,13 +26,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: 'Missing or invalid appid' }, { status: 400 })
   }
   const appId = Number(appIdRaw)
+  const lang = parseSteamLanguage(req.nextUrl.searchParams.get('lang'))
 
   try {
     const schema = await withSteamCache<SteamSchemaAchievement[]>(
-      `steamSchema:${appId}`,
+      `steamSchema:${appId}:${lang}`,
       TTL.schema,
       async () => {
-        const data = (await getSchemaForGame(appId, apiKey)) as SteamSchemaResponse
+        const data = (await getSchemaForGame(appId, apiKey, lang)) as SteamSchemaResponse
         return data?.game?.availableGameStats?.achievements ?? []
       },
     )
@@ -40,10 +41,28 @@ export async function GET(req: NextRequest) {
     // A game with no achievements at all needs no per-player call.
     if (schema.length === 0) return cachedJson([], TTL.schema)
 
-    const player = await loadPlayerAchievements(auth.session, appId)
-    return cachedJson(toSteamAchievements(schema, player), TTL.achievements)
+    const [player, globalPct] = await Promise.all([
+      loadPlayerAchievements(auth.session, appId),
+      loadGlobalPct(appId),
+    ])
+    return cachedJson(toSteamAchievements(schema, player, globalPct), TTL.achievements)
   } catch (err) {
     console.error('[steam/achievements]', appId, err)
     return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })
+  }
+}
+
+/** Rarity is a nice-to-have: if Steam will not give it, the list still renders. */
+async function loadGlobalPct(appId: number): Promise<Map<string, number>> {
+  try {
+    const data = await withSteamCache<SteamGlobalPercentagesResponse>(
+      `steamGlobalPct:${appId}`,
+      TTL.schema,
+      async () => (await getGlobalAchievementPercentages(appId)) as SteamGlobalPercentagesResponse,
+    )
+    return toGlobalPctMap(data)
+  } catch (err) {
+    console.error('[steam/achievements] global pct', appId, err)
+    return new Map()
   }
 }

@@ -1,5 +1,7 @@
 import { renderHook, waitFor, act } from '@testing-library/react'
 import { useSteamAchievements } from './useSteamAchievements'
+import { useLanguage } from '@/context/LanguageContext'
+import { en } from '@/translations/en'
 
 const ACH = [{ _source: 'steam', id: 'A', title: 'Win' }]
 
@@ -23,7 +25,7 @@ test('loads the selected game', async () => {
   const { result } = renderHook(() => useSteamAchievements(730))
 
   await waitFor(() => expect(result.current.achievements).toEqual(ACH))
-  expect(fetch).toHaveBeenCalledWith('/api/steam/achievements?appid=730')
+  expect(fetch).toHaveBeenCalledWith('/api/steam/achievements?appid=730&lang=english')
   expect(result.current.isLoading).toBe(false)
 })
 
@@ -85,7 +87,7 @@ test('ignores a duplicate retry while a load is in flight', async () => {
 test('a slow earlier game does not clear the loading flag of the current one', async () => {
   const releases: Record<number, (v: unknown) => void> = {}
   ;(fetch as jest.Mock).mockImplementation((url: string) => {
-    const id = Number(url.split('=')[1])
+    const id = Number(new URL(url, 'http://x').searchParams.get('appid'))
     return new Promise((r) => { releases[id] = r })
   })
 
@@ -100,4 +102,32 @@ test('a slow earlier game does not clear the loading flag of the current one', a
 
   await act(async () => { releases[2]({ ok: true, json: async () => ACH }) })
   expect(result.current.isLoading).toBe(false)
+})
+
+describe('language', () => {
+  afterEach(() => {
+    ;(useLanguage as jest.Mock).mockReturnValue({ lang: 'en', setLang: jest.fn(), T: en })
+  })
+
+  test('asks for achievement names in the app language', async () => {
+    ;(useLanguage as jest.Mock).mockReturnValue({ lang: 'es', setLang: jest.fn(), T: en })
+    ;(fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ACH })
+    renderHook(() => useSteamAchievements(730))
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('/api/steam/achievements?appid=730&lang=spanish'))
+  })
+
+  test('refetches when the language changes, and reuses each language once loaded', async () => {
+    ;(fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ACH })
+    const { result, rerender } = renderHook(() => useSteamAchievements(730))
+    await waitFor(() => expect(result.current.achievements).toEqual(ACH))
+
+    ;(useLanguage as jest.Mock).mockReturnValue({ lang: 'es', setLang: jest.fn(), T: en })
+    rerender()
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2))
+    expect((fetch as jest.Mock).mock.calls[1][0]).toContain('lang=spanish')
+
+    ;(useLanguage as jest.Mock).mockReturnValue({ lang: 'en', setLang: jest.fn(), T: en })
+    rerender()
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
 })

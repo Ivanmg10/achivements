@@ -13,6 +13,9 @@ import {
   getGlobalAchievementPercentages,
   gameIconUrl,
   gameLogoUrl,
+  getAppDetails,
+  steamAssetUrl,
+  steamStoreUrl,
 } from './steamClient'
 
 const KEY = 'api key/with+chars'
@@ -99,5 +102,34 @@ describe('image URLs', () => {
   test('returns an empty string when Steam gave no hash', () => {
     expect(gameIconUrl(730, undefined)).toBe('')
     expect(gameLogoUrl(730, undefined)).toBe('')
+  })
+})
+
+describe('store and artwork', () => {
+  test('getAppDetails queries the store API, localised, with no key', async () => {
+    await getAppDetails(377160, 'spanish')
+    const url = calledUrl()
+    expect(url.origin + url.pathname).toBe('https://store.steampowered.com/api/appdetails')
+    expect(url.searchParams.get('appids')).toBe('377160')
+    expect(url.searchParams.get('l')).toBe('spanish')
+    expect(url.searchParams.get('key')).toBeNull()
+  })
+
+  test('getAppDetails defaults to English', async () => {
+    await getAppDetails(1)
+    expect(calledUrl().searchParams.get('l')).toBe('english')
+  })
+
+  test.each([
+    ['cover', 'library_600x900.jpg'],
+    ['header', 'header.jpg'],
+    ['hero', 'library_hero.jpg'],
+    ['logo', 'logo.png'],
+  ] as const)('steamAssetUrl builds the %s URL', (asset, file) => {
+    expect(steamAssetUrl(730, asset)).toBe(`https://cdn.akamai.steamstatic.com/steam/apps/730/${file}`)
+  })
+
+  test('steamStoreUrl points at the store page', () => {
+    expect(steamStoreUrl(730)).toBe('https://store.steampowered.com/app/730')
   })
 })

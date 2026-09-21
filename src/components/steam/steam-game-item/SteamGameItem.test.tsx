@@ -6,7 +6,9 @@ import type { SteamGameProgress } from '@/types/steam'
 
 jest.mock('./steam-game-item-achievements/SteamGameItemAchievements', () => ({
   __esModule: true,
-  default: ({ appId }: { appId: number }) => <div data-testid="achievements">achievements for {appId}</div>,
+  default: ({ appId, expectedCount, badgeSize }: { appId: number; expectedCount?: number; badgeSize?: number }) => (
+    <div data-testid="achievements">achievements for {appId} ({String(expectedCount)}, {badgeSize})</div>
+  ),
 }))
 
 function game(overrides: Partial<SteamGameProgress> = {}): SteamGameProgress {
@@ -68,16 +70,37 @@ test('omits the date when the game was never played', () => {
   expect(screen.queryByText('15 Jan 2024')).not.toBeInTheDocument()
 })
 
-test('falls back to a Steam placeholder when there is no icon', () => {
-  const { container } = render(<SteamGameItem game={game({ imageIcon: '' })} />)
-  expect(container.querySelector('img')).toBeNull()
-  expect(screen.getAllByTestId('IconBrandSteam').length).toBeGreaterThan(1)
+test('shows the 600×900 cover rather than the 32×32 library icon', () => {
+  const { container } = render(<SteamGameItem game={game()} />)
+  expect(container.querySelector('img')?.getAttribute('src')).toBe(
+    'https://cdn.akamai.steamstatic.com/steam/apps/620/library_600x900.jpg',
+  )
+})
+
+describe('links to the game page', () => {
+  test('the title links to the Steam game page', () => {
+    render(<SteamGameItem game={game()} />)
+    expect(screen.getByRole('link', { name: 'Portal 2' }).getAttribute('href')).toBe('/steamGame/620')
+  })
+
+  test('the cover links there too, without a second stop in the tab order', () => {
+    const { container } = render(<SteamGameItem game={game()} />)
+    const links = container.querySelectorAll('a[href="/steamGame/620"]')
+    expect(links).toHaveLength(2)
+    expect(links[0].getAttribute('tabindex')).toBe('-1')
+    expect(links[0].getAttribute('aria-hidden')).toBe('true')
+  })
+
+  test('no link sits inside the expand button', () => {
+    render(<SteamGameItem game={game()} />)
+    expect(screen.getByRole('button').querySelector('a')).toBeNull()
+  })
 })
 
 describe('expansion', () => {
-  test('is a real button that reports its state', () => {
+  test('is a real button that reports its state and names the game', () => {
     render(<SteamGameItem game={game()} />)
-    const button = screen.getByRole('button')
+    const button = screen.getByRole('button', { name: `${en.steam.showAchievements}: Portal 2` })
     expect(button.getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByTestId('achievements')).not.toBeInTheDocument()
   })
@@ -121,4 +144,22 @@ describe('expansion', () => {
 test('accepts extra root classes so it can fill a layout slot', () => {
   const { container } = render(<SteamGameItem game={game()} className="h-full" />)
   expect((container.firstChild as HTMLElement).className).toContain('h-full')
+})
+
+test('the expand button names the action it will take', () => {
+  render(<SteamGameItem game={game()} />)
+  fireEvent.click(screen.getByRole('button'))
+  expect(screen.getByRole('button', { name: `${en.steam.hideAchievements}: Portal 2` })).toBeInTheDocument()
+})
+
+test('opens a compact badge grid, sized to the known count', () => {
+  render(<SteamGameItem game={game(loaded)} />)
+  fireEvent.click(screen.getByRole('button'))
+  expect(screen.getByTestId('achievements')).toHaveTextContent('achievements for 620 (50, 40)')
+})
+
+test('passes no count when the count is not known', () => {
+  render(<SteamGameItem game={game()} />)
+  fireEvent.click(screen.getByRole('button'))
+  expect(screen.getByTestId('achievements')).toHaveTextContent('(undefined, 40)')
 })
