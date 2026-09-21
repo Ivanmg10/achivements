@@ -18,7 +18,7 @@ import {
   fetchPlayerAchievements,
   mapWithConcurrency,
   enrichWithAchievementCounts,
-  loadLastPlayedDates,
+  loadOwnedFacts,
   progressCacheKey,
   progressTtl,
   isCountable,
@@ -252,26 +252,29 @@ describe('enrichWithAchievementCounts', () => {
   })
 })
 
-describe('loadLastPlayedDates', () => {
-  test('maps appid to last-played time, skipping never-played games', async () => {
+describe('loadOwnedFacts', () => {
+  test('maps appid to the facts the recent list leaves out', async () => {
     ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
-      { appid: 1, playtime_forever: 5, rtime_last_played: 1700000000 },
-      { appid: 2, playtime_forever: 0, rtime_last_played: 0 },
+      { appid: 1, playtime_forever: 5, rtime_last_played: 1700000000, has_community_visible_stats: true },
+      { appid: 2, playtime_forever: 0, rtime_last_played: 0, has_community_visible_stats: false },
       { appid: 3, playtime_forever: 0 },
     ] } })
 
-    const dates = await loadLastPlayedDates(AUTH)
-    expect([...dates]).toEqual([[1, 1700000000]])
+    const facts = await loadOwnedFacts(AUTH)
+    expect(facts.get(1)).toEqual({ rtime_last_played: 1700000000, has_community_visible_stats: true })
+    // A zero timestamp means never played, not 1970.
+    expect(facts.get(2)).toEqual({ rtime_last_played: undefined, has_community_visible_stats: false })
+    expect(facts.get(3)).toEqual({ rtime_last_played: undefined, has_community_visible_stats: undefined })
   })
 
   test('returns an empty map for a private profile', async () => {
     ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: {} })
-    await expect(loadLastPlayedDates(AUTH)).resolves.toEqual(new Map())
+    await expect(loadOwnedFacts(AUTH)).resolves.toEqual(new Map())
   })
 
   test('returns an empty map instead of throwing when Steam fails', async () => {
     ;(getOwnedGames as jest.Mock).mockRejectedValue(new Error('steam down'))
-    await expect(loadLastPlayedDates(AUTH)).resolves.toEqual(new Map())
+    await expect(loadOwnedFacts(AUTH)).resolves.toEqual(new Map())
   })
 })
 

@@ -479,6 +479,9 @@ export const pl: Translations = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    last2Weeks: 'Ostatnie 2 tygodnie',
+    rarestUnlocked: 'Twoje najrzadsze',
+    noneUnlocked: 'Nie odblokowano jeszcze osiągnięć',
     notOwned: 'Brak w twojej bibliotece Steam',
     screenshot: 'Zrzut ekranu',
     sortDefault: 'Kolejność',

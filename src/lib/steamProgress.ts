@@ -161,26 +161,34 @@ export async function enrichWithAchievementCounts(
   return { games: enriched, complete }
 }
 
+/** What the owned list knows about a game that the recent list leaves out. */
+export type OwnedFacts = { rtime_last_played?: number; has_community_visible_stats?: boolean }
+
 /**
- * appid → last-played time (unix seconds), from the owned-games list.
+ * appid → facts only GetOwnedGames returns.
  *
- * GetRecentlyPlayedGames does not return rtime_last_played — only
- * GetOwnedGames does — and it does not order its games by date either. Without
- * this, recent Steam games have no date, sort after every dated RA game in the
- * merged feed, and never make the cut.
+ * GetRecentlyPlayedGames (checked against the live API) returns neither
+ * rtime_last_played nor has_community_visible_stats, and does not order its
+ * games by date. Without the date, recent Steam games sort after every dated
+ * RA game in the merged feed and never make the cut; without the stats flag,
+ * every recent game looks achievement-less — no counts, no bar, and nothing
+ * to load when a card is opened.
  *
- * Never throws: if the lookup fails the games are still worth showing undated.
+ * Never throws: if the lookup fails the games are still worth showing.
  */
-export async function loadLastPlayedDates(auth: SteamAuth): Promise<Map<number, number>> {
+export async function loadOwnedFacts(auth: SteamAuth): Promise<Map<number, OwnedFacts>> {
   try {
     const data = (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse
-    const dates = new Map<number, number>()
+    const facts = new Map<number, OwnedFacts>()
     for (const g of data?.response?.games ?? []) {
-      if (g.rtime_last_played) dates.set(g.appid, g.rtime_last_played)
+      facts.set(g.appid, {
+        rtime_last_played: g.rtime_last_played || undefined,
+        has_community_visible_stats: g.has_community_visible_stats,
+      })
     }
-    return dates
+    return facts
   } catch (err) {
-    console.error('[steamProgress] last played dates', err)
+    console.error('[steamProgress] owned facts', err)
     return new Map()
   }
 }

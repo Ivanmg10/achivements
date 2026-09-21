@@ -152,3 +152,30 @@ describe('last played dates', () => {
     expect(g.lastPlayed).toBe(new Date(1700000000 * 1000).toISOString())
   })
 })
+
+test('takes the achievements flag from the owned list — the recent list has none', async () => {
+  // Real shape: GetRecentlyPlayedGames sends no has_community_visible_stats,
+  // so every recent game looked achievement-less: no bar, nothing to expand.
+  ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: { games: [
+    { appid: 377160, name: 'Fallout 4', playtime_forever: 29055, playtime_2weeks: 60 },
+  ] } })
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
+    { appid: 377160, playtime_forever: 29055, rtime_last_played: 1788802145, has_community_visible_stats: true },
+  ] } })
+  ;(getPlayerAchievements as jest.Mock).mockResolvedValue({
+    playerstats: { success: true, achievements: [{ apiname: 'A', achieved: 1, unlocktime: 1 }] },
+  })
+
+  const [g] = data(await GET())
+  expect(g.hasStats).toBe(true)
+  expect(g).toMatchObject({ achievementsLoaded: true, numAwarded: 1, maxPossible: 1 })
+})
+
+test('a game missing from the owned list keeps no stats flag rather than guessing', async () => {
+  ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: { games: [
+    { appid: 9, name: 'Shared', playtime_forever: 10 },
+  ] } })
+  const [g] = data(await GET())
+  expect(g.hasStats).toBe(false)
+  expect(getPlayerAchievements).not.toHaveBeenCalled()
+})

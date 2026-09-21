@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
 import { withSteamCache, TTL } from '@/lib/steamCache'
 import { getRecentlyPlayedGames } from '@/lib/steamClient'
-import { enrichWithAchievementCounts, loadLastPlayedDates } from '@/lib/steamProgress'
+import { enrichWithAchievementCounts, loadOwnedFacts } from '@/lib/steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 import { cachedJson } from '@/lib/httpCache'
 import type { SteamRecentlyPlayedResponse, SteamGameProgress } from '@/types/steam'
@@ -23,15 +23,23 @@ export async function GET() {
       `steamRecent:${steamid}`,
       TTL.recentlyPlayed,
       async () => {
-        // Recent games come without a last-played date, so it is looked up in
-        // the owned list — inside this 5-minute cache, so the dates stay fresh.
-        const [data, lastPlayed] = await Promise.all([
+        // Recent games come without a last-played date or a stats flag, so both
+        // are looked up in the owned list — inside this 5-minute cache, so the
+        // dates stay fresh.
+        const [data, owned] = await Promise.all([
           getRecentlyPlayedGames(steamid, apiKey, COUNT) as Promise<SteamRecentlyPlayedResponse>,
-          loadLastPlayedDates(auth.session),
+          loadOwnedFacts(auth.session),
         ])
         // A player with nothing played in two weeks gets `{ response: {} }`.
         const mapped = (data?.response?.games ?? [])
-          .map((g) => toSteamGameProgress({ ...g, rtime_last_played: g.rtime_last_played ?? lastPlayed.get(g.appid) }))
+          .map((g) => {
+            const facts = owned.get(g.appid)
+            return toSteamGameProgress({
+              ...g,
+              rtime_last_played: g.rtime_last_played ?? facts?.rtime_last_played,
+              has_community_visible_stats: g.has_community_visible_stats ?? facts?.has_community_visible_stats,
+            })
+          })
           // Steam orders these by recent playtime, not by date.
           .sort(byLastPlayedDesc)
         // The initial feed: counts for every recent game (≤20 calls, shared with the library cache).

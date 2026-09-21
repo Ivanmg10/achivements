@@ -160,8 +160,11 @@ export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
   return streaks.sort((a, b) => b.days - a.days)
 }
 
+/** Only unlock dates are read, so any platform's achievements can be grouped. */
+export type DatedUnlock = Pick<RetroAchievement, 'DateEarned' | 'DateEarnedHardcore'>
+
 export function groupGameAchievementsByPeriod(
-  achievements: RetroAchievement[],
+  achievements: DatedUnlock[],
   period: 'week' | 'month',
 ): { label: string; count: number }[] {
   const dated = achievements

@@ -4,10 +4,10 @@ import { en } from '@/translations/en'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 import type { SteamGameProgress } from '@/types/steam'
 
-jest.mock('./steam-game-item-achievements/SteamGameItemAchievements', () => ({
+jest.mock('@/components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded', () => ({
   __esModule: true,
-  default: ({ appId, expectedCount, badgeSize }: { appId: number; expectedCount?: number; badgeSize?: number }) => (
-    <div data-testid="achievements">achievements for {appId} ({String(expectedCount)}, {badgeSize})</div>
+  default: ({ game }: { game: { id: number; maxPossible: number } }) => (
+    <div data-testid="achievements">achievements for {game.id} ({game.maxPossible})</div>
   ),
 }))
 
@@ -152,14 +152,8 @@ test('the expand button names the action it will take', () => {
   expect(screen.getByRole('button', { name: `${en.steam.hideAchievements}: Portal 2` })).toBeInTheDocument()
 })
 
-test('opens a compact badge grid, sized to the known count', () => {
+test('opens the same dashboard RA games open into, for this game', () => {
   render(<SteamGameItem game={game(loaded)} />)
   fireEvent.click(screen.getByRole('button'))
-  expect(screen.getByTestId('achievements')).toHaveTextContent('achievements for 620 (50, 40)')
-})
-
-test('passes no count when the count is not known', () => {
-  render(<SteamGameItem game={game()} />)
-  fireEvent.click(screen.getByRole('button'))
-  expect(screen.getByTestId('achievements')).toHaveTextContent('(undefined, 40)')
+  expect(screen.getByTestId('achievements')).toHaveTextContent('achievements for 620 (50)')
 })

@@ -477,6 +477,9 @@ export const en = {
     searchOnRA: 'Search on RetroAchievements',
   },
   steam: {
+    last2Weeks: 'Last 2 weeks',
+    rarestUnlocked: 'Your rarest',
+    noneUnlocked: 'No achievements unlocked yet',
     notOwned: 'Not in your Steam library',
     screenshot: 'Screenshot',
     sortDefault: 'Order',

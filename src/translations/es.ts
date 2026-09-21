@@ -479,6 +479,9 @@ export const es: Translations = {
     searchOnRA: 'Buscar en RetroAchievements',
   },
   steam: {
+    last2Weeks: 'Últimas 2 semanas',
+    rarestUnlocked: 'Tus más raros',
+    noneUnlocked: 'Aún no has desbloqueado logros',
     notOwned: 'No está en tu biblioteca de Steam',
     screenshot: 'Captura',
     sortDefault: 'Orden',

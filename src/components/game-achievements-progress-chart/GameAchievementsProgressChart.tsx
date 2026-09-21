@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { RetroAchievement } from '@/types/types'
-import { groupGameAchievementsByPeriod } from '@/utils/utils'
+import { groupGameAchievementsByPeriod, DatedUnlock } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 
 type Period = 'week' | 'month'
@@ -12,7 +11,7 @@ export function GameAchievementsProgressChart({
   achievements,
   isLoading,
 }: {
-  achievements: RetroAchievement[]
+  achievements: DatedUnlock[]
   isLoading?: boolean
 }) {
   const { T } = useLanguage()

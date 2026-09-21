@@ -6,7 +6,7 @@ import { IconBrandSteam, IconChevronDown, IconClock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
-import SteamGameItemAchievements from './steam-game-item-achievements/SteamGameItemAchievements'
+import SteamRecentlyPlayedExpanded from '@/components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { formatDate } from '@/utils/utils'
 import type { SteamGameProgress } from '@/types/steam'
@@ -115,13 +115,10 @@ export default function SteamGameItem({
       </div>
 
       {isExpanded && (
-        <div id={panelId} className="flex-1 px-3 pb-3 pt-1 overflow-y-auto min-h-0">
+        <div id={panelId} className="flex-1 overflow-y-auto px-3 pb-3 pt-3 min-h-0 w-full">
+          {/* The same dashboard RA games open into: ring, chart, badge grid, side panel. */}
           {game.hasStats ? (
-            <SteamGameItemAchievements
-              appId={game.id}
-              expectedCount={game.achievementsLoaded ? game.maxPossible : undefined}
-              badgeSize={40}
-            />
+            <SteamRecentlyPlayedExpanded game={game} />
           ) : (
             <p className="text-sm text-text-secondary">{T.steam.noAchievements}</p>
           )}
