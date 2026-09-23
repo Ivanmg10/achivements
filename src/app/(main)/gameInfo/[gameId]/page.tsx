@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { fadeUp } from '@/lib/animations'
 import LoadingPage from '@/components/loading-page/LoadingPage'
+import GameInfoHeroBackground from '@/components/game-info-hero-background/GameInfoHeroBackground'
 import GameInfoHeader from '@/components/game-info-header/GameInfoHeader'
 import GameInfoTable from '@/components/game-info-table/GameInfoTable'
 import GameInfoSubsetSelector from '@/components/game-info-subset-selector/GameInfoSubsetSelector'
@@ -86,22 +87,7 @@ export default function GameInfo() {
 
     return (
       <main className="flex-1 flex flex-col items-center text-text-main relative">
-        {heroImage && (
-          <div
-            className="absolute pointer-events-none overflow-hidden"
-            style={{ top: '-64px', left: '50%', transform: 'translateX(-50%)', width: '100vw', height: '900px' }}
-          >
-            <img
-              src={`https://retroachievements.org${heroImage}`}
-              alt=""
-              aria-hidden="true"
-              className="w-full h-full object-cover object-top opacity-60 scale-110"
-              style={{ filter: 'blur(16px)' }}
-            />
-            <div className="absolute inset-0 bg-linear-to-b from-transparent via-bg-main/60 to-bg-main" />
-            <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-b from-black/40 via-black/15 to-transparent pointer-events-none" />
-          </div>
-        )}
+        <GameInfoHeroBackground imagePath={heroImage} />
         <motion.div
           className="relative w-full flex flex-col items-center"
           variants={fadeUp}
