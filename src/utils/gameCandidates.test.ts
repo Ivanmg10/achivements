@@ -5,6 +5,7 @@ import {
   candidateToGroupItemBody,
   normalizeTitle,
   searchCandidates,
+  titleMatches,
   GameCandidate,
 } from './gameCandidates'
 import { toSteamGameProgress } from './steamMappers'
@@ -146,5 +147,18 @@ describe('candidateToGroupItemBody', () => {
   test('an RA game keeps its console and image path', () => {
     const [ra] = buildRaCandidates([completed(7, '1', '1', 'Zelda')], [], [])
     expect(candidateToGroupItemBody(ra)).toMatchObject({ source: 'ra', game_id: 7, title: 'Zelda', pct_won: 1 })
+  })
+})
+
+describe('titleMatches', () => {
+  test('matches ignoring case and accents, and anywhere in the title', () => {
+    expect(titleMatches('Pokémon Colosseum', 'pokemon')).toBe(true)
+    expect(titleMatches('Pokémon Colosseum', 'COLOS')).toBe(true)
+    expect(titleMatches('Pokémon Colosseum', 'zelda')).toBe(false)
+  })
+
+  test('an empty or blank filter matches everything', () => {
+    expect(titleMatches('Anything', '')).toBe(true)
+    expect(titleMatches('Anything', '   ')).toBe(true)
   })
 })

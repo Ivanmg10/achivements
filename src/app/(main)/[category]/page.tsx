@@ -27,6 +27,8 @@ import CollapsibleSectionPreview from '@/components/collapsible-section/collapsi
 import { raPreviewGames } from '@/utils/sectionPreview'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import RaLogo from '@/components/ra-logo/RaLogo'
+import CategorySearch from '@/components/category-search/CategorySearch'
+import { titleMatches } from '@/utils/gameCandidates'
 import { useSession } from 'next-auth/react'
 import { useEffect, useMemo } from 'react'
 
@@ -57,8 +59,13 @@ export default function CategoryPage() {
   }
 
   const consolePills = useMemo(() => buildConsolePills(games), [games])
-  const visibleGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
-  const { games: steamGames } = useSteamGamesByCategory(cat)
+  const filteredGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
+  const { games: allSteamGames } = useSteamGamesByCategory(cat)
+
+  // One search box for both platforms: a game is found without knowing which it is on.
+  const [query, setQuery] = useState('')
+  const visibleGames = useMemo(() => filteredGames.filter((g) => titleMatches(g.Title, query)), [filteredGames, query])
+  const steamGames = useMemo(() => allSteamGames.filter((g) => titleMatches(g.title, query)), [allSteamGames, query])
 
   const selectedConsoleName =
     selected.size === 1 ? consolePills.find((c) => selected.has(c.id))?.name : undefined
@@ -119,7 +126,8 @@ export default function CategoryPage() {
             <>
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <StatusPageHeader consoleName={selectedConsoleName} category={cat} gameCount={visibleGames.length} />
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <CategorySearch value={query} onChange={setQuery} />
                   {raControls}
                   <StatusGridControl cols={gridCols} onChange={setGridCols} />
                 </div>
@@ -138,7 +146,10 @@ export default function CategoryPage() {
                 category={cat}
                 gameCount={visibleGames.length + steamGames.length}
               />
-              <StatusGridControl cols={gridCols} onChange={setGridCols} />
+              <div className="flex items-center gap-2 flex-wrap">
+                <CategorySearch value={query} onChange={setQuery} />
+                <StatusGridControl cols={gridCols} onChange={setGridCols} />
+              </div>
             </div>
             <CollapsibleSection
               title="RetroAchievements"
@@ -163,7 +174,13 @@ export default function CategoryPage() {
             </CollapsibleSection>
           </>
         )}
-        {(!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} />}
+        {/* Steam alone: no RA header above, so the search box gets its own row. */}
+        {!showRa && (
+          <div className="flex justify-end">
+            <CategorySearch value={query} onChange={setQuery} />
+          </div>
+        )}
+        {(!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} query={query} />}
       </div>
     </div>
   )

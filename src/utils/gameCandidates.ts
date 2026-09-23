@@ -154,3 +154,9 @@ export function candidateToGroupItemBody(c: GameCandidate) {
     max_possible: c.maxPossible,
   }
 }
+
+/** Whether a game title matches a free-text filter. An empty filter matches everything. */
+export function titleMatches(title: string, query: string): boolean {
+  const q = normalizeTitle(query.trim())
+  return q === '' || normalizeTitle(title).includes(q)
+}

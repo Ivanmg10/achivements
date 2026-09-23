@@ -1,7 +1,9 @@
 'use client'
 
+import { useMemo } from 'react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
+import { titleMatches } from '@/utils/gameCandidates'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import CollapsibleSection from '@/components/collapsible-section/CollapsibleSection'
 import CollapsibleSectionPreview from '@/components/collapsible-section/collapsible-section-preview/CollapsibleSectionPreview'
@@ -31,6 +33,7 @@ export default function SteamCategorySection({
   gridCols = 2,
   title,
   className = '',
+  query = '',
 }: {
   category: string
   gridCols?: StatusGridCols
@@ -38,9 +41,12 @@ export default function SteamCategorySection({
   title?: string
   /** Root classes — lets a page card the section without an empty card when unlinked. */
   className?: string
+  /** Title filter shared with the RA list, from the page's search box. */
+  query?: string
 }) {
   const { T } = useLanguage()
-  const { games, isLinked, loading, error, progressTruncated, refetch } = useSteamGamesByCategory(category)
+  const { games: allGames, isLinked, loading, error, progressTruncated, refetch } = useSteamGamesByCategory(category)
+  const games = useMemo(() => allGames.filter((g) => titleMatches(g.title, query)), [allGames, query])
 
   if (!isLinked) return null
 
@@ -80,7 +86,7 @@ export default function SteamCategorySection({
         <EmptyState
           size="compact"
           icon={<SteamLogo className="w-6 h-6" />}
-          title={T.steam.noGamesInCategory}
+          title={query ? T.search.noResults : T.steam.noGamesInCategory}
           className="py-6"
         />
       ) : (

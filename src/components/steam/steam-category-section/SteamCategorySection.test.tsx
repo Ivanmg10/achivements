@@ -156,3 +156,26 @@ test('applies root classes, and renders no wrapper at all when unlinked', () => 
   rerender(<SteamCategorySection category="playing" className="bg-bg-card" />)
   expect(container).toBeEmptyDOMElement()
 })
+
+describe('shared search', () => {
+  test('keeps only the games matching the page-wide filter, counting them in the heading', () => {
+    render(<SteamCategorySection category="playing" query="port" />)
+    expect(screen.getByTestId('list')).toHaveTextContent('Portal 2')
+    expect(screen.getByTestId('list')).not.toHaveTextContent('Hades')
+    expect(screen.getByRole('button', { name: /Steam/ })).toHaveTextContent('1')
+  })
+
+  test('matches ignoring case and accents', () => {
+    ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({
+      games: [{ id: 3, title: 'Pokémon Colosseum' }], isLinked: true, loading: false, error: null, progressTruncated: false, refetch,
+    })
+    render(<SteamCategorySection category="playing" query="pokemon" />)
+    expect(screen.getByTestId('list')).toHaveTextContent('Pokémon Colosseum')
+  })
+
+  test('says no game matches, rather than that the category is empty', () => {
+    render(<SteamCategorySection category="playing" query="zelda" />)
+    expect(screen.getByText(en.search.noResults)).toBeInTheDocument()
+    expect(screen.queryByText(en.steam.noGamesInCategory)).not.toBeInTheDocument()
+  })
+})
