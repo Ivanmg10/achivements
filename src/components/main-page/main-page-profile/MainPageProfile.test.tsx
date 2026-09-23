@@ -14,12 +14,21 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import MainPageProfile from "./MainPageProfile";
 import { useSession } from "next-auth/react";
 import { useSteamGamesData } from "@/context/SteamGamesDataContext";
+import { MainPlatformProvider } from "@/context/MainPlatformContext";
+
+function renderProfile() {
+  return render(
+    <MainPlatformProvider>
+      <MainPageProfile />
+    </MainPlatformProvider>,
+  );
+}
 
 test("renders profile sub-components", () => {
   (useSession as jest.Mock).mockReturnValue({
     data: { user: { raUser: { User: "Ivan", LastGameID: 19010 } } },
   });
-  render(<MainPageProfile />);
+  renderProfile();
   expect(screen.getByTestId("profile-ra")).toBeInTheDocument();
 });
 
@@ -27,7 +36,7 @@ test("renders without raUser", () => {
   (useSession as jest.Mock).mockReturnValue({
     data: { user: { raUser: null } },
   });
-  render(<MainPageProfile />);
+  renderProfile();
   expect(screen.getByTestId("profile-ra")).toBeInTheDocument();
 });
 
@@ -42,7 +51,7 @@ describe("RA / Steam tabs", () => {
 
   test("with both accounts, one profile at a time under tabs at the top — RA first", () => {
     bothAccounts();
-    render(<MainPageProfile />);
+    renderProfile();
 
     const tabs = screen.getAllByRole("tab");
     expect(tabs.map((t) => t.textContent)).toEqual(["RetroAchievements", "Steam"]);
@@ -53,7 +62,7 @@ describe("RA / Steam tabs", () => {
 
   test("switches to the Steam profile, in a panel labelled by its tab", () => {
     bothAccounts();
-    render(<MainPageProfile />);
+    renderProfile();
     fireEvent.click(screen.getByRole("tab", { name: "Steam" }));
 
     expect(screen.getByTestId("profile-st")).toBeInTheDocument();
@@ -64,17 +73,17 @@ describe("RA / Steam tabs", () => {
 
   test("remembers the chosen tab", () => {
     bothAccounts();
-    const { unmount } = render(<MainPageProfile />);
+    const { unmount } = renderProfile();
     fireEvent.click(screen.getByRole("tab", { name: "Steam" }));
     unmount();
 
-    render(<MainPageProfile />);
+    renderProfile();
     expect(screen.getByTestId("profile-st")).toBeInTheDocument();
   });
 
   test("with RA only there are no tabs — and no connect prompt either", () => {
     (useSession as jest.Mock).mockReturnValue({ data: { user: { raUser: { User: "Ivan" } } } });
-    render(<MainPageProfile />);
+    renderProfile();
     expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
     expect(screen.getByTestId("profile-ra")).toBeInTheDocument();
     expect(screen.queryByTestId("profile-st")).not.toBeInTheDocument();

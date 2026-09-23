@@ -2,13 +2,17 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { IconCalendarEvent, IconCalendarMonth, IconCalendarWeek } from '@tabler/icons-react'
 import { RecentAchievement } from '@/types/types'
+import MainPageBestPeriodRow from './main-page-best-period-row/MainPageBestPeriodRow'
 import { getBestMonth } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import WeekAchievementsModal from '@/components/week-achievements-modal/WeekAchievementsModal'
 
-function getBestDay(achievements: RecentAchievement[]) {
+type Metric = 'pts' | 'ach'
+
+function getBestDay(achievements: RecentAchievement[], by: Metric) {
   const byDay: Record<string, { pts: number; ach: number }> = {}
   for (const a of achievements) {
     const key = a.Date.split(' ')[0]
@@ -16,10 +20,10 @@ function getBestDay(achievements: RecentAchievement[]) {
     byDay[key].pts += a.Points
     byDay[key].ach++
   }
-  return Object.entries(byDay).sort((a, b) => b[1].pts - a[1].pts)[0] ?? null
+  return Object.entries(byDay).sort((a, b) => b[1][by] - a[1][by])[0] ?? null
 }
 
-function getBestWeek(achievements: RecentAchievement[]) {
+function getBestWeek(achievements: RecentAchievement[], by: Metric) {
   const byWeek: Record<string, { pts: number; ach: number }> = {}
   for (const a of achievements) {
     const d = new Date(a.Date.replace(' ', 'T'))
@@ -31,7 +35,7 @@ function getBestWeek(achievements: RecentAchievement[]) {
     byWeek[key].pts += a.Points
     byWeek[key].ach++
   }
-  return Object.entries(byWeek).sort((a, b) => b[1].pts - a[1].pts)[0] ?? null
+  return Object.entries(byWeek).sort((a, b) => b[1][by] - a[1][by])[0] ?? null
 }
 
 export default function MainPageBestPeriod({
@@ -47,11 +51,24 @@ export default function MainPageBestPeriod({
   const [selectedWeek, setSelectedWeek] = useState<string | null>(null)
   const [expandedMonth, setExpandedMonth] = useState<string | null>(null)
 
+  // Steam has no points: its best periods are the ones with the most unlocks.
+  const isSteam = achievements.some((a) => a.Source === 'steam')
+  const metric: Metric = isSteam ? 'ach' : 'pts'
+
   const { bestDay, bestWeek, bestMonth } = useMemo(() => ({
-    bestDay: getBestDay(achievements),
-    bestWeek: getBestWeek(achievements),
-    bestMonth: getBestMonth(achievements),
-  }), [achievements])
+    bestDay: getBestDay(achievements, metric),
+    bestWeek: getBestWeek(achievements, metric),
+    bestMonth: getBestMonth(achievements, metric),
+  }), [achievements, metric])
+
+  /** The period's total: RA counts points, Steam counts unlocks. */
+  const amount = (p: { pts: number; ach: number }) =>
+    isSteam
+      ? { value: p.ach.toLocaleString(), unit: T.lineChart.achievements }
+      : { value: p.pts.toLocaleString(), unit: 'pts' }
+  /** The line under the period: when it was, with RA's unlock count alongside. */
+  const when = (p: { pts: number; ach: number }, date: string) =>
+    isSteam ? date : `${p.ach} ${T.lineChart.achievements} · ${date}`
 
   const monthDays = useMemo(() => {
     if (!expandedMonth || !achievements.length) return []
@@ -75,66 +92,64 @@ export default function MainPageBestPeriod({
   }, [])
 
   return (
-    <div className="flex flex-col gap-3 flex-1">
+    <div className="flex flex-col gap-3">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestPerformance}</p>
 
       {isLoading ? (
-        <div className="flex flex-col flex-1 justify-between gap-2 animate-pulse">
+        <div className="flex flex-col gap-2 animate-pulse">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="bg-bg-main rounded-lg p-2.5 flex flex-col gap-1.5">
-              <div className="h-2 w-16 bg-white/10 rounded" />
-              <div className="h-5 w-24 bg-white/10 rounded" />
-              <div className="h-2 w-32 bg-white/10 rounded" />
+            <div key={i} className="bg-bg-main rounded-lg px-3 py-2.5 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-white/10 shrink-0" />
+              <div className="flex flex-col gap-1.5 flex-1">
+                <div className="h-2 w-16 bg-white/10 rounded" />
+                <div className="h-2 w-28 bg-white/10 rounded" />
+              </div>
+              <div className="h-5 w-10 bg-white/10 rounded" />
             </div>
           ))}
         </div>
       ) : (
-        <div className="flex flex-col flex-1 justify-between gap-2">
+        <div className="flex flex-col gap-2">
           {/* Best Day — purple */}
           {bestDay ? (
-            <button
+            <MainPageBestPeriodRow
+              label={T.cards.bestDay}
+              tone="purple"
+              icon={<IconCalendarEvent className="w-4 h-4" />}
+              {...amount(bestDay[1])}
+              when={when(bestDay[1], T.cards.dayOf.replace('{date}', bestDay[0]))}
               onClick={() => setSelectedDay(bestDay[0])}
-              className="bg-bg-main rounded-lg p-2.5 flex flex-col gap-0.5 text-left cursor-pointer hover:bg-bg-card transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/70"
-            >
-              <span className="text-[10px] uppercase tracking-widest text-purple-400">{T.cards.bestDay}</span>
-              <span className="text-lg font-bold text-purple-400">{bestDay[1].pts.toLocaleString()} pts</span>
-              <span className="text-xs text-text-secondary">
-                {bestDay[1].ach} {T.lineChart.achievements} · {T.cards.dayOf.replace('{date}', bestDay[0])}
-              </span>
-            </button>
+            />
           ) : (
-            <div className="bg-bg-main rounded-lg p-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
+            <div className="bg-bg-main rounded-lg px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
 
           {/* Best Week — yellow */}
           {bestWeek ? (
-            <button
+            <MainPageBestPeriodRow
+              label={T.cards.bestWeek}
+              tone="yellow"
+              icon={<IconCalendarWeek className="w-4 h-4" />}
+              {...amount(bestWeek[1])}
+              when={when(bestWeek[1], T.cards.weekOf.replace('{date}', bestWeek[0]))}
               onClick={() => setSelectedWeek(bestWeek[0])}
-              className="bg-bg-main rounded-lg p-2.5 flex flex-col gap-0.5 text-left cursor-pointer hover:bg-bg-card transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/70"
-            >
-              <span className="text-[10px] uppercase tracking-widest text-yellow-400">{T.cards.bestWeek}</span>
-              <span className="text-lg font-bold text-yellow-400">{bestWeek[1].pts.toLocaleString()} pts</span>
-              <span className="text-xs text-text-secondary">
-                {bestWeek[1].ach} {T.lineChart.achievements} · {T.cards.weekOf.replace('{date}', bestWeek[0])}
-              </span>
-            </button>
+            />
           ) : (
-            <div className="bg-bg-main rounded-lg p-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
+            <div className="bg-bg-main rounded-lg px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
 
           {/* Best Month — red */}
           {bestMonth ? (
             <div className="flex flex-col">
-              <button
+              <MainPageBestPeriodRow
+                label={T.cards.bestMonth}
+                tone="red"
+                icon={<IconCalendarMonth className="w-4 h-4" />}
+                {...amount(bestMonth[1])}
+                when={when(bestMonth[1], bestMonth[0])}
                 onClick={() => toggleMonth(bestMonth[0])}
-                className="bg-bg-main rounded-lg p-2.5 flex flex-col gap-0.5 text-left cursor-pointer hover:bg-bg-card transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70"
-              >
-                <span className="text-[10px] uppercase tracking-widest text-red-400">{T.cards.bestMonth}</span>
-                <span className="text-lg font-bold text-red-400">{bestMonth[1].pts.toLocaleString()} pts</span>
-                <span className="text-xs text-text-secondary">
-                  {bestMonth[1].ach} {T.lineChart.achievements} · {bestMonth[0]}
-                </span>
-              </button>
+                expanded={expandedMonth === bestMonth[0]}
+              />
 
               <AnimatePresence>
                 {expandedMonth === bestMonth[0] && monthDays.length > 0 && (
@@ -158,7 +173,7 @@ export default function MainPageBestPeriod({
                           })}
                         </span>
                         <span className="text-text-secondary">
-                          {pts.toLocaleString()}pts · {ach} {T.dayModal.achievements}
+                          {!isSteam && `${pts.toLocaleString()}pts · `}{ach} {T.dayModal.achievements}
                         </span>
                       </button>
                     ))}

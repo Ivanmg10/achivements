@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
 import { withSteamCache, TTL } from '@/lib/steamCache'
-import { getAppCategories, getGlobalAchievementPercentages } from '@/lib/steamClient'
-import { loadPlayerAchievements, loadSchema } from '@/lib/steamProgress'
-import { toGlobalPctMap, toSteamAchievements } from '@/utils/steamMappers'
+import { getAppCategories } from '@/lib/steamClient'
+import { loadGlobalPct, loadPlayerAchievements, loadSchema } from '@/lib/steamProgress'
+import { toSteamAchievements } from '@/utils/steamMappers'
 import { parseSteamLanguage } from '@/utils/steamLanguage'
 import { hasOnlineModes, likelyOnlineNames } from '@/utils/steamOnline'
 import { cachedJson } from '@/lib/httpCache'
-import type { SteamAppDetailsResponse, SteamGlobalPercentagesResponse, SteamSchemaAchievement } from '@/types/steam'
+import type { SteamAppDetailsResponse, SteamSchemaAchievement } from '@/types/steam'
 
 /**
  * Achievements for one game: the schema (names, badges — localised) joined
@@ -45,21 +45,6 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     console.error('[steam/achievements]', appId, err)
     return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })
-  }
-}
-
-/** Rarity is a nice-to-have: if Steam will not give it, the list still renders. */
-async function loadGlobalPct(appId: number): Promise<Map<string, number>> {
-  try {
-    const data = await withSteamCache<SteamGlobalPercentagesResponse>(
-      `steamGlobalPct:${appId}`,
-      TTL.schema,
-      async () => (await getGlobalAchievementPercentages(appId)) as SteamGlobalPercentagesResponse,
-    )
-    return toGlobalPctMap(data)
-  } catch (err) {
-    console.error('[steam/achievements] global pct', appId, err)
-    return new Map()
   }
 }
 

@@ -41,37 +41,87 @@ export default function MainPageMastery({
   const mastered = awards.VisibleUserAwards?.filter((a) => a.AwardType === 'Mastery') ?? []
   const recentCovers = mastered.slice(0, 8)
 
+  const masteries = awards.MasteryAwardsCount ?? 0
+
+  /**
+   * The award mix as parts of one whole, in fixed order. The four hues were
+   * checked with the palette validator: they clear the colourblind and
+   * lightness bands on both themes, and every band is labelled besides.
+   */
+  const mix = [
+    { value: masteries, label: T.cards.mastered, color: 'bg-[#D97706]' },
+    { value: awards.CompletionAwardsCount ?? 0, label: T.cards.completedSC, color: 'bg-[#2563EB]' },
+    { value: awards.BeatenHardcoreAwardsCount ?? 0, label: T.userStats.beatenHC, color: 'bg-[#15803D]' },
+    { value: awards.BeatenSoftcoreAwardsCount ?? 0, label: T.userStats.beatenSC, color: 'bg-[#9333EA]' },
+  ]
+  const mixTotal = mix.reduce((sum, m) => sum + m.value, 0)
+
+  // Supporting numbers: they explain the headline, they do not compete with it.
   const stats = [
-    { value: awards.MasteryAwardsCount ?? 0,         label: T.cards.mastered,         color: 'text-warning' },
-    { value: awards.CompletionAwardsCount ?? 0,       label: T.cards.completedSC,      color: 'text-accent-secondary' },
-    { value: awards.BeatenHardcoreAwardsCount ?? 0,   label: T.userStats.beatenHC,     color: 'text-info'   },
-    { value: awards.BeatenSoftcoreAwardsCount ?? 0,   label: T.userStats.beatenSC,    color: 'text-text-main'  },
-    { value: unlockedHC,                              label: T.userStats.unlockedHC,   color: 'text-accent' },
-    { value: unlockedSC,                              label: T.userStats.unlockedSC,   color: 'text-text-secondary'   },
+    { value: unlockedHC.toLocaleString(), label: T.userStats.unlockedHC },
+    { value: unlockedSC.toLocaleString(), label: T.userStats.unlockedSC },
+    ...((awards.EventAwardsCount ?? 0) > 0
+      ? [{ value: String(awards.EventAwardsCount), label: T.userStats.events }]
+      : []),
   ]
 
   return (
     <div className="flex flex-col gap-3">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.masteryAwards}</p>
 
-      {/* 2×2 stat grid */}
-      <div className="grid grid-cols-2 gap-2">
-        {stats.map(({ value, label, color }) => (
-          <div key={label} className="bg-bg-main rounded-lg px-3 py-2.5 flex flex-col gap-0.5">
-            <span className={`text-2xl font-bold ${color}`}>{value}</span>
-            <span className="text-[10px] text-text-secondary">{label}</span>
+      {/*
+        Wide card: the award totals sit beside the games mastered lately, and
+        spread across the full width before there are any masteries to show.
+      */}
+      <div className={`grid gap-4 ${recentCovers.length > 0 ? 'lg:grid-cols-[3fr_2fr]' : ''}`}>
+        <div className="flex flex-col gap-4">
+          {/* The headline: masteries, against every award earned. */}
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-bold text-warning tabular-nums leading-none">{masteries}</span>
+            <span className="text-xs text-text-secondary">
+              {T.cards.mastered} · {(awards.TotalAwardsCount ?? mixTotal).toLocaleString()} {T.userStats.awards.toLowerCase()}
+            </span>
           </div>
-        ))}
-      </div>
 
-      {(awards.EventAwardsCount ?? 0) > 0 && (
-        <div className="bg-bg-main rounded-lg px-3 py-2 flex items-center justify-between">
-          <span className="text-[10px] text-text-secondary">{T.userStats.events}</span>
-          <span className="text-sm font-bold text-success">{awards.EventAwardsCount}</span>
+          {mixTotal > 0 && (
+            <div className="flex flex-col gap-2">
+              <div
+                className="flex gap-0.5 h-2.5"
+                role="img"
+                aria-label={mix.map((m) => `${m.label}: ${m.value}`).join(', ')}
+              >
+                {mix.map((m) => (
+                  m.value > 0 && (
+                    <div
+                      key={m.label}
+                      className={`${m.color} first:rounded-l-full last:rounded-r-full`}
+                      style={{ width: `${(m.value / mixTotal) * 100}%` }}
+                    />
+                  )
+                ))}
+              </div>
+              <ul className="flex flex-wrap gap-x-3 gap-y-1">
+                {mix.map((m) => (
+                  <li key={m.label} className="flex items-center gap-1.5 text-[10px] text-text-secondary">
+                    <span className={`w-2 h-2 rounded-sm shrink-0 ${m.color}`} aria-hidden="true" />
+                    {m.label}
+                    <span className="text-text-main tabular-nums">{m.value}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            {stats.map(({ value, label }) => (
+              <div key={label} className="flex flex-col">
+                <span className="text-sm font-semibold text-text-main tabular-nums">{value}</span>
+                <span className="text-[10px] text-text-secondary">{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      )}
 
-      {/* 4-col mastery covers */}
       {recentCovers.length > 0 && (
         <div className="flex flex-col gap-1.5">
           <p className="text-[10px] text-text-secondary/60 uppercase tracking-widest">{T.cards.recentMasteries}</p>
@@ -100,6 +150,7 @@ export default function MainPageMastery({
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }

@@ -37,6 +37,11 @@ export type SteamRecentAchievement = {
   badgeUrl: string
   /** ISO time of the unlock. */
   unlockedAt: string
+  /**
+   * Share of all Steam players who have it, 0–100; null when Steam gives no
+   * rarity. Absent on lists cached before rarity was added.
+   */
+  globalPct?: number | null
 }
 
 export type SteamPlayerSummariesResponse = {

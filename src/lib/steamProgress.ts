@@ -1,8 +1,9 @@
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
-import { getOwnedGames, getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
-import { withPlayerAchievementCounts } from '@/utils/steamMappers'
+import { getGlobalAchievementPercentages, getOwnedGames, getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
+import { toGlobalPctMap, withPlayerAchievementCounts } from '@/utils/steamMappers'
 import type {
   SteamGameProgress,
+  SteamGlobalPercentagesResponse,
   SteamOwnedGamesResponse,
   SteamPlayerAchievement,
   SteamPlayerAchievementsResponse,
@@ -205,4 +206,23 @@ export function loadSchema(appId: number, apiKey: string, lang: string): Promise
     const data = (await getSchemaForGame(appId, apiKey, lang)) as SteamSchemaResponse
     return data?.game?.availableGameStats?.achievements ?? []
   })
+}
+
+/**
+ * Each achievement's share of all Steam players (0–100), cached for everyone
+ * for a day. Rarity is a nice-to-have: if Steam will not give it, the result
+ * is empty and callers render without it.
+ */
+export async function loadGlobalPct(appId: number): Promise<Map<string, number>> {
+  try {
+    const data = await withSteamCache<SteamGlobalPercentagesResponse>(
+      `steamGlobalPct:${appId}`,
+      TTL.schema,
+      async () => (await getGlobalAchievementPercentages(appId)) as SteamGlobalPercentagesResponse,
+    )
+    return toGlobalPctMap(data)
+  } catch (err) {
+    console.error('[steamProgress] global pct', appId, err)
+    return new Map()
+  }
 }

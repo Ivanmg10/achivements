@@ -1,4 +1,5 @@
-import { gameIconUrl, gameLogoUrl } from '@/lib/steamClient'
+import { gameIconUrl, gameLogoUrl, steamAssetUrl } from '@/lib/steamClient'
+import type { RecentAchievement } from '@/types/types'
 import type {
   SteamOwnedGame,
   SteamGameProgress,
@@ -8,6 +9,7 @@ import type {
   SteamGlobalPercentagesResponse,
   SteamAppDetailsResponse,
   SteamGameDetails,
+  SteamRecentAchievement,
 } from '@/types/steam'
 
 /**
@@ -155,5 +157,33 @@ export function withPlayerAchievementCounts(
     numAwarded,
     pctWon: Math.round((numAwarded / maxPossible) * 10000) / 100,
     achievementsLoaded: true,
+  }
+}
+
+/**
+ * A Steam unlock in RA's recent-achievement shape, so the main page's activity
+ * charts (heatmap, daily chart, most-active games, day modal) work unchanged
+ * for Steam. Dates follow RA's "YYYY-MM-DD HH:MM:SS" in UTC, which the charts
+ * group by. Steam has no points or hardcore mode; images are full URLs, and
+ * `Source` tells the charts to link to the Steam game page.
+ *
+ * Steam achievements have no numeric id, so `AchievementID` is the unlock's
+ * position in its list — unique within it, which is all the charts key on.
+ */
+export function toRecentAchievement(a: SteamRecentAchievement, index: number): RecentAchievement {
+  return {
+    Date: a.unlockedAt.replace('T', ' ').slice(0, 19),
+    HardcoreMode: '0',
+    AchievementID: index,
+    Title: a.title,
+    Description: '',
+    BadgeName: '',
+    Points: 0,
+    GameID: a.appId,
+    GameTitle: a.gameTitle,
+    ConsoleName: STEAM_PLATFORM,
+    Source: 'steam',
+    BadgeUrl: a.badgeUrl,
+    GameIconUrl: steamAssetUrl(a.appId, 'header'),
   }
 }

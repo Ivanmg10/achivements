@@ -68,3 +68,34 @@ test('does not treat a recently played game (LastPlayed within the window) as ab
   await waitFor(() => expect(screen.getByText('No abandoned games')).toBeInTheDocument())
   expect(screen.queryByText('Abandoned Game')).not.toBeInTheDocument()
 })
+
+describe('with Steam games', () => {
+  function steamGame(id: number, idleDays: number, over: Record<string, unknown> = {}) {
+    return {
+      _source: 'steam', id, title: `Steam ${id}`, imageIcon: '', consoleName: 'Steam', maxPossible: 10, numAwarded: 4,
+      pctWon: 40, lastPlayed: new Date(Date.now() - idleDays * 24 * 60 * 60 * 1000).toISOString(),
+      playtimeForever: 100, playtime2Weeks: 0, imgLogoUrl: '', hasStats: true, achievementsLoaded: true, ...over,
+    } as never
+  }
+
+  beforeEach(() => {
+    ;(useRecentlyPlayedGames as jest.Mock).mockReturnValue({ games: [{ GameID: 1, LastPlayed: daysAgo(40) }], isLoading: false })
+  })
+
+  test('mixes idle Steam games in progress with RA ones, longest idle first', () => {
+    render(<MainPageAbandoned playing={playing} steamGames={[steamGame(620, 90), steamGame(621, 5)]} />)
+    const links = screen.getAllByRole('link')
+    expect(links.map((l) => l.getAttribute('href'))).toEqual(['/steamGame/620', '/gameInfo/1'])
+    expect(screen.getByText('40%')).toBeInTheDocument()
+  })
+
+  test('leaves out Steam games that are perfect or not started', () => {
+    render(
+      <MainPageAbandoned
+        playing={[]}
+        steamGames={[steamGame(1, 90, { numAwarded: 10, pctWon: 100 }), steamGame(2, 90, { numAwarded: 0, pctWon: 0 })]}
+      />,
+    )
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
+  })
+})

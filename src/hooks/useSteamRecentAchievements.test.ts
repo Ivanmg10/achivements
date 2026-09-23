@@ -104,3 +104,22 @@ test('a slow answer for the previous language does not land on top', async () =>
   await act(async () => { releases.english({ ok: true, json: async () => [{ ...LIST[0], title: 'EN' }] }) })
   expect(result.current.achievements[0].title).toBe('ES')
 })
+
+describe('scope', () => {
+  test('activity loads the 60-day window', async () => {
+    setSteamId('765')
+    ;(global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => LIST })
+    const { result } = renderHook(() => useSteamRecentAchievements('activity'))
+    await waitFor(() => expect(result.current.achievements).toEqual(LIST))
+    expect(fetch).toHaveBeenCalledWith('/api/steam/activity?lang=english', { cache: 'no-store' })
+  })
+
+  test('null loads nothing, even with Steam linked', () => {
+    setSteamId('765')
+    const { result } = renderHook(() => useSteamRecentAchievements(null))
+    expect(fetch).not.toHaveBeenCalled()
+    expect(result.current.isLoading).toBe(false)
+    act(() => result.current.retry())
+    expect(fetch).not.toHaveBeenCalled()
+  })
+})

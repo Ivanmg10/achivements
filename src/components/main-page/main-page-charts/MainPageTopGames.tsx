@@ -4,6 +4,8 @@ import { useMemo } from 'react'
 import { IconActivity } from '@tabler/icons-react'
 import { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import { achievementGameIconUrl } from '@/utils/utils'
+import { gameHref } from '@/utils/gameRef'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
@@ -18,15 +20,16 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
     const byGame = achievements
       .filter((a) => a.Date.split(' ')[0] >= cutoffStr)
       .reduce((acc, a) => {
-        if (!acc[a.GameTitle]) {
-          acc[a.GameTitle] = { count: 0, gameId: a.GameID, icon: a.GameIcon, console: a.ConsoleName }
+        // RA game ids and Steam appids share a number space: key by both.
+        const key = `${a.Source ?? 'ra'}:${a.GameID}`
+        if (!acc[key]) {
+          acc[key] = { count: 0, name: a.GameTitle, href: gameHref(a.Source ?? 'ra', a.GameID), icon: achievementGameIconUrl(a), console: a.ConsoleName }
         }
-        acc[a.GameTitle].count++
+        acc[key].count++
         return acc
-      }, {} as Record<string, { count: number; gameId?: number; icon?: string; console?: string }>)
+      }, {} as Record<string, { count: number; name: string; href: string; icon?: string; console?: string }>)
 
-    return Object.entries(byGame)
-      .map(([name, { count, gameId, icon, console: con }]) => ({ name, count, gameId, icon, console: con }))
+    return Object.values(byGame)
       .sort((a, b) => b.count - a.count)
       .slice(0, 6)
   }, [achievements])
@@ -46,11 +49,11 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
     <div className="flex flex-col gap-2 flex-1">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mostActiveGames}</p>
       <div className="flex flex-col gap-2 flex-1">
-        {data.map(({ name, count, gameId, icon, console: con }) => (
+        {data.map(({ name, count, href, icon, console: con }) => (
           <GameListRow
-            key={name}
-            href={gameId ? `/gameInfo/${gameId}` : '#'}
-            imageUrl={icon ? `https://retroachievements.org${icon}` : undefined}
+            key={href}
+            href={href}
+            imageUrl={icon}
             imageAlt={name}
             title={name}
             subtitle={con}

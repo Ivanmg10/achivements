@@ -6,21 +6,19 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
-import { useStoredChoice } from '@/hooks/useStoredChoice'
+import { useMainPlatform, MainPlatform } from '@/context/MainPlatformContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 
 import MainPageProfileRa from './main-page-profile-ra/MainPageProfileRa'
 import MainPageProfileSt from './main-page-profile-st/MainPageProfileSt'
 import MainPageProfileTabs, { profilePanelId, profileTabId } from './main-page-profile-tabs/MainPageProfileTabs'
 
-const TABS = ['ra', 'steam'] as const
-type Tab = (typeof TABS)[number]
 const ID_PREFIX = 'main-profile'
 
 export default function MainPageProfile() {
   const { data: session } = useSession()
   const { isLinked: steamLinked } = useSteamGamesData()
-  const [tab, setTab] = useStoredChoice<Tab>('main-profile-tab', TABS, 'ra')
+  const { platform: tab, setPlatform: setTab } = useMainPlatform()
   const lastGameId = session?.user?.raUser?.LastGameID?.toString() ?? null
   const { game, isLoading: gameLoading } = useGameProgression(lastGameId)
   const { achievements: recentAchievements, isLoading: achievementsLoading } = useRecentAchievements()
@@ -47,7 +45,7 @@ export default function MainPageProfile() {
   // Both accounts: one profile at a time, switched by low-key tabs at the top.
   return (
     <section className="main-content text-text-main m-3 rounded-xl flex flex-col items-center gap-3 overflow-y-auto">
-      <MainPageProfileTabs<Tab>
+      <MainPageProfileTabs<MainPlatform>
         idPrefix={ID_PREFIX}
         selected={tab}
         onSelect={setTab}

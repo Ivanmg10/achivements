@@ -7,6 +7,7 @@ import {
   toGlobalPctMap,
   toSteamGameDetails,
   STEAM_PLATFORM,
+  toRecentAchievement,
 } from './steamMappers'
 import type { SteamOwnedGame, SteamSchemaAchievement, SteamPlayerAchievement } from '@/types/steam'
 
@@ -259,4 +260,25 @@ test('toSteamAchievements marks the achievements guessed to need online play', (
   ]
   const result = toSteamAchievements(schema, [], new Map(), new Set(['B']))
   expect(result.map((a) => a.likelyOnline)).toEqual([false, true])
+})
+
+describe('toRecentAchievement', () => {
+  test('maps a Steam unlock into RA’s recent-achievement shape, dated in UTC', () => {
+    const mapped = toRecentAchievement(
+      { appId: 620, gameTitle: 'Portal 2', apiname: 'WIN', title: 'Win', badgeUrl: 'https://cdn/win.jpg', unlockedAt: '2024-01-15T20:30:05.000Z' },
+      3,
+    )
+    expect(mapped).toMatchObject({
+      Date: '2024-01-15 20:30:05',
+      AchievementID: 3,
+      Title: 'Win',
+      Points: 0,
+      GameID: 620,
+      GameTitle: 'Portal 2',
+      ConsoleName: STEAM_PLATFORM,
+      Source: 'steam',
+      BadgeUrl: 'https://cdn/win.jpg',
+    })
+    expect(mapped.GameIconUrl).toContain('/620/header.jpg')
+  })
 })

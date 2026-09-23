@@ -10,10 +10,11 @@ jest.mock('@/lib/steamClient', () => ({
   getPlayerAchievements: jest.fn(),
   getOwnedGames: jest.fn(),
   getSchemaForGame: jest.fn(),
+  getGlobalAchievementPercentages: jest.fn(),
 }))
 
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
-import { getPlayerAchievements, getOwnedGames, getSchemaForGame } from '@/lib/steamClient'
+import { getPlayerAchievements, getOwnedGames, getSchemaForGame, getGlobalAchievementPercentages } from '@/lib/steamClient'
 import {
   loadPlayerAchievements,
   fetchPlayerAchievements,
@@ -27,6 +28,7 @@ import {
   applyUnlocks,
   NO_STATS,
   loadSchema,
+  loadGlobalPct,
 } from './steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 
@@ -339,5 +341,25 @@ describe('loadSchema', () => {
   test('returns [] for a game without achievements', async () => {
     ;(getSchemaForGame as jest.Mock).mockResolvedValue({ game: {} })
     await expect(loadSchema(1, 'key', 'english')).resolves.toEqual([])
+  })
+})
+
+describe('loadGlobalPct', () => {
+  test('returns each achievement’s global share, cached for everyone for a day', async () => {
+    ;(withSteamCache as jest.Mock).mockImplementation(async (_k, _t, fetcher) => fetcher())
+    ;(getGlobalAchievementPercentages as jest.Mock).mockResolvedValue({
+      achievementpercentages: { achievements: [{ name: 'WIN', percent: 12.5 }] },
+    })
+    const pct = await loadGlobalPct(620)
+    expect(pct.get('WIN')).toBe(12.5)
+    const [key, ttl] = (withSteamCache as jest.Mock).mock.calls.at(-1)
+    expect(key).toBe('steamGlobalPct:620')
+    expect(ttl).toBe(TTL.schema)
+  })
+
+  test('is empty when Steam will not give it', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    ;(withSteamCache as jest.Mock).mockRejectedValue(new Error('down'))
+    expect((await loadGlobalPct(620)).size).toBe(0)
   })
 })

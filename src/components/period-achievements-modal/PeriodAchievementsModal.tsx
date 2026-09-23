@@ -5,9 +5,8 @@ import { motion } from 'framer-motion'
 import { RecentAchievement } from '@/types/types'
 import { modalOverlay, modalContent } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
-import Image from 'next/image'
-import Link from 'next/link'
 import { IconX } from '@tabler/icons-react'
+import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
 
 interface Props {
   title: string
@@ -17,6 +16,8 @@ interface Props {
 
 export default function PeriodAchievementsModal({ title, achievements, onClose }: Props) {
   const { T } = useLanguage()
+  // Steam unlocks have no points; a mixed list still totals the RA ones.
+  const hasPoints = achievements.some(a => a.Source !== 'steam')
 
   const days = useMemo(() => {
     const byDay: Record<string, RecentAchievement[]> = {}
@@ -75,38 +76,12 @@ export default function PeriodAchievementsModal({ title, achievements, onClose }
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-text-main capitalize">{day.label}</span>
                   <span className="text-[10px] text-text-secondary">
-                    {day.pts.toLocaleString()}pts · {day.achievements.length} {T.dayModal.achievements}
+                    {hasPoints && `${day.pts.toLocaleString()}pts · `}{day.achievements.length} {T.dayModal.achievements}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {day.achievements.map(ach => (
-                    <Link
-                      key={ach.AchievementID}
-                      href={`/gameInfo/${ach.GameID}`}
-                      onClick={onClose}
-                      className="flex gap-2 items-center p-3 rounded-xl bg-bg-main hover:bg-bg-card transition-colors group min-w-0"
-                    >
-                      {ach.BadgeName ? (
-                        <Image
-                          src={`https://media.retroachievements.org/Badge/${ach.BadgeName}.png`}
-                          alt={ach.Title}
-                          width={36}
-                          height={36}
-                          className="rounded shrink-0"
-                        />
-                      ) : (
-                        <div className="w-9 h-9 rounded bg-white/10 shrink-0" />
-                      )}
-                      <div className="flex flex-col min-w-0 flex-1 gap-0.5">
-                        <span className="text-xs font-semibold text-text-main group-hover:text-accent transition-colors line-clamp-2">
-                          {ach.Title}
-                        </span>
-                        <span className="text-[10px] text-text-secondary line-clamp-1">{ach.GameTitle}</span>
-                      </div>
-                      <span className={`text-xs shrink-0 ${ach.HardcoreMode === '1' ? 'text-warning font-semibold' : 'text-text-secondary'}`}>
-                        {ach.Points}pts
-                      </span>
-                    </Link>
+                    <RecentAchievementRow key={ach.AchievementID} ach={ach} onNavigate={onClose} />
                   ))}
                 </div>
               </div>
@@ -116,7 +91,7 @@ export default function PeriodAchievementsModal({ title, achievements, onClose }
 
         {totalAch > 0 && (
           <p className="text-xs text-text-secondary text-right pt-2 border-t border-white/5 shrink-0">
-            {totalAch} {T.dayModal.achievements} · {totalPts.toLocaleString()}pts
+            {totalAch} {T.dayModal.achievements}{hasPoints && ` · ${totalPts.toLocaleString()}pts`}
           </p>
         )}
       </motion.div>
