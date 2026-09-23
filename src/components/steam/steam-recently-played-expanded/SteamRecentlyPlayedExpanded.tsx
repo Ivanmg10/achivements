@@ -66,7 +66,7 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
             </button>
           </div>
         ) : loaded ? (
-          <SteamAchievementGrid appId={game.id} achievements={achievements} badgeSize={40} />
+          <SteamAchievementGrid appId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={40} />
         ) : (
           <p className="text-sm text-text-secondary">{T.steam.noAchievements}</p>
         )}

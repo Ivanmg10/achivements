@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
 import SteamGameInfoAchievement from './steam-game-info-achievement/SteamGameInfoAchievement'
 import SteamGameInfoAchievementCard from './steam-game-info-achievement-card/SteamGameInfoAchievementCard'
 import {
@@ -46,10 +47,20 @@ function sortAchievements(list: SteamAchievementUnified[], { key, dir }: SteamSo
  * rarity, unlock date), and fold to the first rows.
  *
  * Opening the page from a badge link (…#ach-<apiname>) scrolls to that
- * achievement and highlights it briefly.
+ * achievement and highlights it briefly. Each achievement can be pinned to
+ * the main page, as RA's table does.
  */
-export default function SteamGameInfoTable({ achievements }: { achievements: SteamAchievementUnified[] }) {
+export default function SteamGameInfoTable({
+  achievements,
+  appId,
+  gameTitle,
+}: {
+  achievements: SteamAchievementUnified[]
+  appId: number
+  gameTitle: string
+}) {
   const { T } = useLanguage()
+  const { pinned, toggle, canPin } = useSteamFavoriteAchievements(appId, gameTitle)
   const [filter, setFilter] = useState<Filter>('all')
   const [sortState, setSortState] = useState<SteamSortState>({ key: 'default', dir: 'asc' })
   const [expanded, setExpanded] = useState(true)
@@ -140,11 +151,18 @@ export default function SteamGameInfoTable({ achievements }: { achievements: Ste
                   <SteamSortableHeader sortKey="earned" sortState={sortState} onSort={handleSort} className="w-44 text-center">
                     {T.gameInfoTable.headerEarned}
                   </SteamSortableHeader>
+                  {canPin && <th className="w-12" aria-label={T.favorites.title} />}
                 </tr>
               </thead>
               <tbody>
                 {shown.map((a) => (
-                  <SteamGameInfoAchievement key={a.apiname} achievement={a} highlighted={highlighted === a.apiname} />
+                  <SteamGameInfoAchievement
+                    key={a.apiname}
+                    achievement={a}
+                    highlighted={highlighted === a.apiname}
+                    pinned={canPin ? pinned.has(a.apiname) : undefined}
+                    onTogglePin={() => toggle(a)}
+                  />
                 ))}
               </tbody>
             </table>
@@ -153,7 +171,13 @@ export default function SteamGameInfoTable({ achievements }: { achievements: Ste
           {/* Phone card list */}
           <ul className="sm:hidden w-full flex flex-col gap-2">
             {shown.map((a) => (
-              <SteamGameInfoAchievementCard key={a.apiname} achievement={a} highlighted={highlighted === a.apiname} />
+              <SteamGameInfoAchievementCard
+                key={a.apiname}
+                achievement={a}
+                highlighted={highlighted === a.apiname}
+                pinned={canPin ? pinned.has(a.apiname) : undefined}
+                onTogglePin={() => toggle(a)}
+              />
             ))}
           </ul>
 

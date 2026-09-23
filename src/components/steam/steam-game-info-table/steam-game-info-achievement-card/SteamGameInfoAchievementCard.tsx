@@ -3,6 +3,7 @@ import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatRarity, formatUnlock } from '@/utils/steamFeed'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
+import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import type { SteamAchievementUnified } from '@/types/steam'
 
 /**
@@ -12,9 +13,14 @@ import type { SteamAchievementUnified } from '@/types/steam'
 export default function SteamGameInfoAchievementCard({
   achievement: a,
   highlighted = false,
+  pinned,
+  onTogglePin,
 }: {
   achievement: SteamAchievementUnified
   highlighted?: boolean
+  /** Undefined for a signed-out visitor, who cannot pin. */
+  pinned?: boolean
+  onTogglePin?: () => void
 }) {
   const { T, lang } = useLanguage()
   const concealed = a.hidden && !a.earned
@@ -65,6 +71,15 @@ export default function SteamGameInfoAchievementCard({
           {a.likelyOnline && <SteamOnlineBadge />}
         </div>
       </div>
+
+      {pinned !== undefined && (
+        <SteamPinAchievementButton
+          pinned={pinned}
+          title={concealed ? T.steam.hiddenAchievement : a.title}
+          onToggle={() => onTogglePin?.()}
+          className="shrink-0 mt-0.5"
+        />
+      )}
     </li>
   )
 }

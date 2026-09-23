@@ -3,6 +3,7 @@ import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatRarity, formatUnlock } from '@/utils/steamFeed'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
+import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import type { SteamAchievementUnified } from '@/types/steam'
 
 /**
@@ -13,10 +14,15 @@ import type { SteamAchievementUnified } from '@/types/steam'
 export default function SteamGameInfoAchievement({
   achievement: a,
   highlighted = false,
+  pinned,
+  onTogglePin,
 }: {
   achievement: SteamAchievementUnified
   /** Set when the page was opened on this achievement's link. */
   highlighted?: boolean
+  /** Undefined for a signed-out visitor, who cannot pin. */
+  pinned?: boolean
+  onTogglePin?: () => void
 }) {
   const { T, lang } = useLanguage()
   // Steam keeps the text of secret achievements hidden until they are unlocked.
@@ -71,6 +77,17 @@ export default function SteamGameInfoAchievement({
           </span>
         )}
       </td>
+
+      {pinned !== undefined && (
+        <td className="px-3 py-2 w-12 text-center align-middle">
+          <SteamPinAchievementButton
+            pinned={pinned}
+            title={concealed ? T.steam.hiddenAchievement : a.title}
+            onToggle={() => onTogglePin?.()}
+            size={18}
+          />
+        </td>
+      )}
     </tr>
   )
 }

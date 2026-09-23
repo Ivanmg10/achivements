@@ -137,6 +137,7 @@ export default function SteamStatusGameItem({
           {game.hasStats ? (
             <SteamGameItemAchievements
               appId={game.id}
+              gameTitle={game.title}
               expectedCount={game.achievementsLoaded ? game.maxPossible : undefined}
               badgeSize={48}
             />

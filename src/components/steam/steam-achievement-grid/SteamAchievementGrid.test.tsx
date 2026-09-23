@@ -1,7 +1,17 @@
+jest.mock('@/hooks/useSteamFavoriteAchievements', () => ({ useSteamFavoriteAchievements: jest.fn() }))
+
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import { SteamAchievementGrid, achievementAnchor } from './SteamAchievementGrid'
+import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
 import { en } from '@/translations/en'
 import type { SteamAchievementUnified } from '@/types/steam'
+
+const mockToggle = jest.fn()
+function pins(canPin: boolean, pinned: string[] = []) {
+  ;(useSteamFavoriteAchievements as jest.Mock).mockReturnValue({
+    pinned: new Set(pinned), toggle: mockToggle, canPin, error: null,
+  })
+}
 
 function ach(overrides: Partial<SteamAchievementUnified> = {}): SteamAchievementUnified {
   return {
@@ -20,25 +30,53 @@ function ach(overrides: Partial<SteamAchievementUnified> = {}): SteamAchievement
   }
 }
 
-beforeEach(() => jest.useFakeTimers())
+beforeEach(() => {
+  jest.useFakeTimers()
+  jest.clearAllMocks()
+  pins(false)
+})
 afterEach(() => jest.useRealTimers())
 
+describe('pin star', () => {
+  test('is absent when the user cannot pin', () => {
+    render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
+    expect(screen.queryByRole('switch')).not.toBeInTheDocument()
+    expect(useSteamFavoriteAchievements).toHaveBeenCalledWith(620, 'Portal 2')
+  })
+
+  test('pins an unpinned achievement', () => {
+    pins(true)
+    render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
+    const star = screen.getByRole('switch', { name: `${en.favorites.addFavorite}: Win a Match` })
+    expect(star.getAttribute('aria-checked')).toBe('false')
+    fireEvent.click(star)
+    expect(mockToggle).toHaveBeenCalledWith(expect.objectContaining({ apiname: 'WIN' }))
+  })
+
+  test('shows a pinned achievement as checked, labelled to unpin', () => {
+    pins(true, ['WIN'])
+    render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
+    const star = screen.getByRole('switch', { name: `${en.favorites.removeFavorite}: Win a Match` })
+    expect(star.getAttribute('aria-checked')).toBe('true')
+  })
+})
+
 test('each badge links to its achievement on the game page', () => {
-  render(<SteamAchievementGrid appId={620} achievements={[ach()]} />)
+  render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
   const link = screen.getByRole('link')
   expect(link.getAttribute('href')).toBe(`/steamGame/620#${achievementAnchor('WIN')}`)
   expect(achievementAnchor('WIN')).toBe('ach-WIN')
 })
 
 test('an earned badge is in colour with a ring, and says so in its name', () => {
-  const { container } = render(<SteamAchievementGrid appId={620} achievements={[ach({ earned: true })]} />)
+  const { container } = render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach({ earned: true })]} />)
   const link = screen.getByRole('link', { name: `Win a Match — ${en.steam.earned}` })
   expect(link.className).toContain('ring-2')
   expect(container.querySelector('img')?.className).not.toContain('grayscale')
 })
 
 test('a locked badge is the colour badge greyed out, RA style, and says so in its name', () => {
-  const { container } = render(<SteamAchievementGrid appId={620} achievements={[ach()]} />)
+  const { container } = render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
   const link = screen.getByRole('link', { name: `Win a Match — ${en.steam.locked}` })
   expect(link.className).not.toContain('ring-2 ring-')
   const img = container.querySelector('img')!
@@ -50,13 +88,13 @@ test('a locked badge is the colour badge greyed out, RA style, and says so in it
 })
 
 test('falls back to a placeholder when a badge has no image', () => {
-  const { container } = render(<SteamAchievementGrid appId={620} achievements={[ach({ badgeUrl: '' })]} />)
+  const { container } = render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach({ badgeUrl: '' })]} />)
   expect(container.querySelector('img')).toBeNull()
   expect(container.querySelector('div[aria-hidden="true"]')).not.toBeNull()
 })
 
 test('supports the smaller 40px size', () => {
-  const { container } = render(<SteamAchievementGrid appId={620} achievements={[ach()]} badgeSize={40} />)
+  const { container } = render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} badgeSize={40} />)
   expect(container.querySelector('img')?.className).toContain('w-10')
 })
 
@@ -65,6 +103,7 @@ describe('tooltip', () => {
     render(
       <SteamAchievementGrid
         appId={620}
+        gameTitle="Portal 2"
         achievements={[ach({ earned: true, dateEarned: '2024-01-15T12:00:00.000Z', globalPct: 12.34 })]}
       />,
     )
@@ -81,7 +120,7 @@ describe('tooltip', () => {
   })
 
   test('says not earned, and omits rarity when Steam gave none', () => {
-    render(<SteamAchievementGrid appId={620} achievements={[ach()]} />)
+    render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
     fireEvent.mouseEnter(screen.getByRole('link'), { clientX: 0, clientY: 0 })
     act(() => { jest.advanceTimersByTime(450) })
 
@@ -91,7 +130,7 @@ describe('tooltip', () => {
   })
 
   test('shows at once on keyboard focus and hides on blur', () => {
-    render(<SteamAchievementGrid appId={620} achievements={[ach()]} />)
+    render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
     const link = screen.getByRole('link')
 
     act(() => { link.focus() })
@@ -103,7 +142,7 @@ describe('tooltip', () => {
   })
 
   test('hides on mouse leave, including before the delay elapses', () => {
-    render(<SteamAchievementGrid appId={620} achievements={[ach()]} />)
+    render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
     const link = screen.getByRole('link')
 
     fireEvent.mouseEnter(link, { clientX: 0, clientY: 0 })
@@ -115,7 +154,7 @@ describe('tooltip', () => {
 
 describe('hidden achievements', () => {
   test('keep their text concealed until earned — in the name and the tooltip', () => {
-    render(<SteamAchievementGrid appId={620} achievements={[ach({ hidden: true, title: 'Spoiler', description: 'The ending' })]} />)
+    render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach({ hidden: true, title: 'Spoiler', description: 'The ending' })]} />)
     const link = screen.getByRole('link', { name: `${en.steam.hiddenAchievement} — ${en.steam.locked}` })
 
     fireEvent.mouseEnter(link, { clientX: 0, clientY: 0 })
@@ -127,13 +166,13 @@ describe('hidden achievements', () => {
   })
 
   test('are revealed once earned', () => {
-    render(<SteamAchievementGrid appId={620} achievements={[ach({ hidden: true, title: 'Spoiler', earned: true })]} />)
+    render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach({ hidden: true, title: 'Spoiler', earned: true })]} />)
     expect(screen.getByRole('link', { name: `Spoiler — ${en.steam.earned}` })).toBeInTheDocument()
   })
 })
 
 test('the tooltip flags an achievement that probably needs online play', () => {
-  render(<SteamAchievementGrid appId={620} achievements={[ach({ likelyOnline: true })]} />)
+  render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach({ likelyOnline: true })]} />)
   fireEvent.mouseEnter(screen.getByRole('link'), { clientX: 10, clientY: 10 })
   act(() => { jest.advanceTimersByTime(450) })
   expect(screen.getByRole('tooltip')).toHaveTextContent(en.steam.likelyOnline)

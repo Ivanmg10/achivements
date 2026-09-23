@@ -93,7 +93,7 @@ export default function SteamGamePage() {
             <p className="text-text-secondary">{T.steam.noAchievements}</p>
           </section>
         ) : (
-          <SteamGameInfoTable achievements={achievements} />
+          <SteamGameInfoTable achievements={achievements} appId={appId} gameTitle={title} />
         )}
       </motion.div>
     </main>

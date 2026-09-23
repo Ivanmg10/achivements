@@ -5,8 +5,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { createPortal } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
 import { formatDate } from '@/utils/utils'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
+import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import type { SteamAchievementUnified } from '@/types/steam'
 
 const SIZE_CLASSES = {
@@ -30,18 +32,23 @@ export function achievementAnchor(apiname: string): string {
  * the details.
  *
  * Each badge links to that achievement on the game page. Earned/locked is in
- * the accessible name too, not only in the greyscale.
+ * the accessible name too, not only in the greyscale. A star in the corner
+ * pins it to the main page's pinned card — shown on hover/focus, and always
+ * once pinned.
  */
 export const SteamAchievementGrid = memo(function SteamAchievementGrid({
   appId,
+  gameTitle,
   achievements,
   badgeSize = 48,
 }: {
   appId: number
+  gameTitle: string
   achievements: SteamAchievementUnified[]
   badgeSize?: 40 | 48
 }) {
   const { T } = useLanguage()
+  const { pinned, toggle, canPin } = useSteamFavoriteAchievements(appId, gameTitle)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
   const size = SIZE_CLASSES[badgeSize]
@@ -64,7 +71,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
     <>
       <ul className="flex flex-wrap gap-1">
         {achievements.map((a) => (
-          <li key={a.apiname}>
+          <li key={a.apiname} className="relative group/badge">
             <Link
               href={`/steamGame/${appId}#${achievementAnchor(a.apiname)}`}
               aria-label={`${titleOf(a)} — ${a.earned ? T.steam.earned : T.steam.locked}`}
@@ -92,6 +99,17 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
                 <div className={`${size.badge} bg-white/10 ${a.earned ? '' : 'opacity-40'}`} aria-hidden="true" />
               )}
             </Link>
+            {canPin && (
+              <SteamPinAchievementButton
+                pinned={pinned.has(a.apiname)}
+                title={titleOf(a)}
+                onToggle={() => toggle(a)}
+                size={12}
+                className={`absolute -top-1 -right-1 z-20 w-5 h-5 rounded-full bg-bg-card/90 flex items-center justify-center ${
+                  pinned.has(a.apiname) ? 'opacity-100' : 'opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100'
+                }`}
+              />
+            )}
           </li>
         ))}
       </ul>

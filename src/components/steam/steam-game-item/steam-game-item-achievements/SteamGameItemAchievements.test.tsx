@@ -30,13 +30,13 @@ beforeEach(() => {
 })
 
 test('asks the hook for this game', () => {
-  render(<SteamGameItemAchievements appId={730} />)
+  render(<SteamGameItemAchievements appId={730} gameTitle="Counter-Strike" />)
   expect(useSteamAchievements).toHaveBeenCalledWith(730)
 })
 
 test('shows a badge-shaped skeleton sized to the known count while loading', () => {
   setHook({ isLoading: true })
-  const { container } = render(<SteamGameItemAchievements appId={730} expectedCount={5} />)
+  const { container } = render(<SteamGameItemAchievements appId={730} gameTitle="Counter-Strike" expectedCount={5} />)
   const skeleton = container.querySelector('[aria-busy="true"]')!
   expect(skeleton.children).toHaveLength(5)
   expect(skeleton.children[0].className).toContain('w-12')
@@ -44,10 +44,10 @@ test('shows a badge-shaped skeleton sized to the known count while loading', () 
 
 test('caps a huge skeleton and uses a default when the count is unknown', () => {
   setHook({ isLoading: true })
-  const { container, rerender } = render(<SteamGameItemAchievements appId={730} expectedCount={500} />)
+  const { container, rerender } = render(<SteamGameItemAchievements appId={730} gameTitle="Counter-Strike" expectedCount={500} />)
   expect(container.querySelector('[aria-busy="true"]')!.children).toHaveLength(60)
 
-  rerender(<SteamGameItemAchievements appId={730} badgeSize={40} />)
+  rerender(<SteamGameItemAchievements appId={730} gameTitle="Counter-Strike" badgeSize={40} />)
   const skeleton = container.querySelector('[aria-busy="true"]')!
   expect(skeleton.children).toHaveLength(12)
   expect(skeleton.children[0].className).toContain('w-10')
@@ -55,7 +55,7 @@ test('caps a huge skeleton and uses a default when the count is unknown', () => 
 
 test('announces an error with the privacy hint and a retry', () => {
   setHook({ error: 'Failed' })
-  render(<SteamGameItemAchievements appId={730} />)
+  render(<SteamGameItemAchievements appId={730} gameTitle="Counter-Strike" />)
 
   expect(screen.getByRole('alert')).toHaveTextContent(en.steam.achievementsError)
   expect(screen.getByText(en.steam.privateProfileHint)).toBeInTheDocument()
@@ -64,12 +64,12 @@ test('announces an error with the privacy hint and a retry', () => {
 })
 
 test('says so when the game has no achievements', () => {
-  render(<SteamGameItemAchievements appId={730} />)
+  render(<SteamGameItemAchievements appId={730} gameTitle="Counter-Strike" />)
   expect(screen.getByText(en.steam.noAchievements)).toBeInTheDocument()
 })
 
 test('renders the badge grid once loaded', () => {
   setHook({ achievements: [{}, {}, {}] })
-  render(<SteamGameItemAchievements appId={730} badgeSize={40} />)
+  render(<SteamGameItemAchievements appId={730} gameTitle="Counter-Strike" badgeSize={40} />)
   expect(screen.getByTestId('grid')).toHaveTextContent('730:3:40')
 })

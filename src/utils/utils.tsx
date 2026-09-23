@@ -1,5 +1,5 @@
 import { ragamesIds } from '@/constants/ragamesidpool'
-import { RecentAchievement, RetroAchievement, RetroAchievementsGameCompleted, Streak } from '@/types/types'
+import { PinnedAchievement, RecentAchievement, RetroAchievement, RetroAchievementsGameCompleted, Streak } from '@/types/types'
 import { CategoryGame } from '@/hooks/useGamesByCategory'
 import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
@@ -101,64 +101,6 @@ export function calcStreak(achievements: RecentAchievement[]): number {
   return count
 }
 
-export function getBestMonth(achievements: RecentAchievement[]): [string, { pts: number; ach: number }] | null {
-  const byMonth: Record<string, { pts: number; ach: number }> = {}
-  for (const a of achievements) {
-    const key = a.Date.slice(0, 7)
-    if (!byMonth[key]) byMonth[key] = { pts: 0, ach: 0 }
-    byMonth[key].pts += a.Points
-    byMonth[key].ach++
-  }
-  return Object.entries(byMonth).sort((a, b) => b[1].pts - a[1].pts)[0] ?? null
-}
-
-export function calcThisMonth(achievements: RecentAchievement[]): { pts: number; ach: number } {
-  const key = new Date().toISOString().slice(0, 7)
-  let pts = 0, ach = 0
-  for (const a of achievements) {
-    if (a.Date.slice(0, 7) === key) { pts += a.Points; ach++ }
-  }
-  return { pts, ach }
-}
-
-export function calcAvgPerDay(achievements: RecentAchievement[], days: number = 30): number {
-  if (!achievements.length) return 0
-  const cutoff = Date.now() - days * 86400000
-  const count = achievements.filter((a) => new Date(a.Date.replace(' ', 'T')).getTime() >= cutoff).length
-  return count / days
-}
-
-export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
-  if (!achievements.length) return []
-  const uniqueDays = [...new Set(achievements.map(a => a.Date.split(' ')[0]))].sort()
-  const streaks: Streak[] = []
-  let start = uniqueDays[0]
-  let prev = uniqueDays[0]
-
-  const makeStreak = (s: string, e: string): Streak => {
-    const days = Math.round((new Date(e + 'T00:00:00').getTime() - new Date(s + 'T00:00:00').getTime()) / 86400000) + 1
-    return {
-      start: s,
-      end: e,
-      days,
-      achievements: achievements.filter(a => { const d = a.Date.split(' ')[0]; return d >= s && d <= e }),
-    }
-  }
-
-  for (let i = 1; i < uniqueDays.length; i++) {
-    const curr = uniqueDays[i]
-    const diff = Math.round((new Date(curr + 'T00:00:00').getTime() - new Date(prev + 'T00:00:00').getTime()) / 86400000)
-    if (diff === 1) {
-      prev = curr
-    } else {
-      streaks.push(makeStreak(start, prev))
-      start = curr
-      prev = curr
-    }
-  }
-  streaks.push(makeStreak(start, prev))
-  return streaks.sort((a, b) => b.days - a.days)
-}
 
 /** Only unlock dates are read, so any platform's achievements can be grouped. */
 export type DatedUnlock = Pick<RetroAchievement, 'DateEarned' | 'DateEarnedHardcore'>
@@ -239,28 +181,66 @@ export function compareSortValues(
   return dir === 'asc' ? cmp : -cmp
 }
 
-export function applyCustomOrder(
-  perfects: RetroAchievementsGameCompleted[],
-  savedOrder: number[],
-): RetroAchievementsGameCompleted[] {
-  const byId = new Map(perfects.map((g) => [g.GameID, g]))
-  const ordered: RetroAchievementsGameCompleted[] = []
-  const seen = new Set<number>()
+/** The month with the most points (RA), or with the most unlocks when `by` is 'ach' (Steam has no points). */
+export function getBestMonth(achievements: RecentAchievement[], by: 'pts' | 'ach' = 'pts'): [string, { pts: number; ach: number }] | null {
+  const byMonth: Record<string, { pts: number; ach: number }> = {}
+  for (const a of achievements) {
+    const key = a.Date.slice(0, 7)
+    if (!byMonth[key]) byMonth[key] = { pts: 0, ach: 0 }
+    byMonth[key].pts += a.Points
+    byMonth[key].ach++
+  }
+  return Object.entries(byMonth).sort((a, b) => b[1][by] - a[1][by])[0] ?? null
+}
 
-  for (const id of savedOrder) {
-    const g = byId.get(id)
-    if (g) {
-      ordered.push(g)
-      seen.add(id)
+export function calcThisMonth(achievements: RecentAchievement[]): { pts: number; ach: number } {
+  const key = new Date().toISOString().slice(0, 7)
+  let pts = 0, ach = 0
+  for (const a of achievements) {
+    if (a.Date.slice(0, 7) === key) { pts += a.Points; ach++ }
+  }
+  return { pts, ach }
+}
+
+export function calcAvgPerDay(achievements: RecentAchievement[], days: number = 30): number {
+  if (!achievements.length) return 0
+  const cutoff = Date.now() - days * 86400000
+  const count = achievements.filter((a) => new Date(a.Date.replace(' ', 'T')).getTime() >= cutoff).length
+  return count / days
+}
+
+export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
+  if (!achievements.length) return []
+  const uniqueDays = [...new Set(achievements.map(a => a.Date.split(' ')[0]))].sort()
+  const streaks: Streak[] = []
+  let start = uniqueDays[0]
+  let prev = uniqueDays[0]
+
+  const makeStreak = (s: string, e: string): Streak => {
+    const days = Math.round((new Date(e + 'T00:00:00').getTime() - new Date(s + 'T00:00:00').getTime()) / 86400000) + 1
+    return {
+      start: s,
+      end: e,
+      days,
+      achievements: achievements.filter(a => { const d = a.Date.split(' ')[0]; return d >= s && d <= e }),
     }
   }
 
-  const rest = perfects
-    .filter((g) => !seen.has(g.GameID))
-    .sort((a, b) => a.Title.localeCompare(b.Title))
-
-  return [...ordered, ...rest]
+  for (let i = 1; i < uniqueDays.length; i++) {
+    const curr = uniqueDays[i]
+    const diff = Math.round((new Date(curr + 'T00:00:00').getTime() - new Date(prev + 'T00:00:00').getTime()) / 86400000)
+    if (diff === 1) {
+      prev = curr
+    } else {
+      streaks.push(makeStreak(start, prev))
+      start = curr
+      prev = curr
+    }
+  }
+  streaks.push(makeStreak(start, prev))
+  return streaks.sort((a, b) => b.days - a.days)
 }
+
 
 export function sumAchievementPoints(
   achievements: Record<string, RetroAchievement | undefined | null>,
@@ -275,4 +255,37 @@ export function sumAchievementPoints(
     if (isEarned) earned += a.Points
   }
   return { earned, total }
+}
+
+/** Stable identity of a pinned achievement: RA by its global id, Steam by game + apiname. */
+export function pinnedKey(fav: PinnedAchievement): string {
+  return fav.source === 'steam' ? `steam:${fav.game_id}:${fav.steam_apiname}` : `ra:${fav.achievement_id}`
+}
+
+/** An achievement's badge image: the full URL a Steam unlock carries, or RA's badge path. */
+export function achievementBadgeUrl(a: RecentAchievement): string | undefined {
+  if (a.BadgeUrl) return a.BadgeUrl
+  return a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : undefined
+}
+
+/** The image of an achievement's game: the full URL a Steam unlock carries, or RA's icon path. */
+export function achievementGameIconUrl(a: RecentAchievement): string | undefined {
+  if (a.GameIconUrl) return a.GameIconUrl
+  return a.GameIcon ? `https://retroachievements.org${a.GameIcon}` : undefined
+}
+
+/** Completion bands, as fractions: <25%, 25–49%, 50–74%, 75–99%, 100%. */
+export const COMPLETION_BANDS = [0.25, 0.5, 0.75, 1] as const
+
+/**
+ * How many games fall in each completion band, for the distribution bar.
+ * Takes fractions (0–1) so RA's PctWon and Steam's percentage both feed it.
+ */
+export function completionBuckets(fractions: number[]): number[] {
+  const counts = [0, 0, 0, 0, 0]
+  for (const f of fractions) {
+    const i = f >= 1 ? 4 : COMPLETION_BANDS.findIndex((b) => f < b)
+    counts[i < 0 ? 4 : i]++
+  }
+  return counts
 }

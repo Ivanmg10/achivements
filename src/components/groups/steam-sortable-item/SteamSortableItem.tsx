@@ -170,7 +170,7 @@ export default function SteamSortableItem({
       {open && (
         <div id={panelId} className="border-t border-bg-main px-4 py-4">
           {hasStats ? (
-            <SteamGameItemAchievements appId={item.game_id} expectedCount={hasCounts ? total : undefined} badgeSize={48} />
+            <SteamGameItemAchievements appId={item.game_id} gameTitle={item.title} expectedCount={hasCounts ? total : undefined} badgeSize={48} />
           ) : (
             <p className="text-center text-text-secondary text-sm py-2">{T.steam.noAchievements}</p>
           )}

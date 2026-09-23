@@ -1,4 +1,4 @@
-import { applyCustomOrder, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, sumAchievementPoints } from "./utils";
+import { calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets } from "./utils";
 
 describe("getRandomGameIds", () => {
   test("returns correct count", () => {
@@ -118,6 +118,16 @@ describe("getBestMonth", () => {
     expect(result?.[0]).toBe("2024-01");
     expect(result?.[1]).toEqual({ pts: 20, ach: 2 });
   });
+
+  test("picks the month with the most unlocks when ranking by count (Steam has no points)", () => {
+    const achievements = [
+      { Date: "2024-01-05 10:00:00", Points: 50 } as never,
+      { Date: "2024-02-10 10:00:00", Points: 0 } as never,
+      { Date: "2024-02-11 10:00:00", Points: 0 } as never,
+    ];
+    expect(getBestMonth(achievements, "ach")?.[0]).toBe("2024-02");
+    expect(getBestMonth(achievements)?.[0]).toBe("2024-01");
+  });
 });
 
 describe("calcThisMonth", () => {
@@ -235,29 +245,6 @@ describe("getGameSortValue", () => {
   });
 });
 
-describe("applyCustomOrder", () => {
-  const games = [
-    { GameID: 1, Title: "Zelda" } as any,
-    { GameID: 2, Title: "Alpha" } as any,
-    { GameID: 3, Title: "Metroid" } as any,
-  ];
-
-  test("returns alphabetical order when there is no saved order", () => {
-    expect(applyCustomOrder(games, []).map((g) => g.Title)).toEqual(["Alpha", "Metroid", "Zelda"]);
-  });
-
-  test("preserves saved order exactly when it fully covers the list", () => {
-    expect(applyCustomOrder(games, [1, 3, 2]).map((g) => g.Title)).toEqual(["Zelda", "Metroid", "Alpha"]);
-  });
-
-  test("puts saved-order games first, then unordered games alphabetically", () => {
-    expect(applyCustomOrder(games, [3]).map((g) => g.Title)).toEqual(["Metroid", "Alpha", "Zelda"]);
-  });
-
-  test("silently drops stale ids no longer present in the list", () => {
-    expect(applyCustomOrder(games, [999, 3]).map((g) => g.Title)).toEqual(["Metroid", "Alpha", "Zelda"]);
-  });
-});
 
 describe("compareSortValues", () => {
   test("treats null as always last regardless of direction", () => {
@@ -276,5 +263,43 @@ describe("compareSortValues", () => {
     expect(compareSortValues("a", "b", "asc")).toBeLessThan(0);
     expect(compareSortValues("b", "a", "asc")).toBeGreaterThan(0);
     expect(compareSortValues("a", "a", "asc")).toBe(0);
+  });
+});
+
+describe('pinnedKey', () => {
+  test('keys RA pins by achievement id and Steam pins by game + apiname', () => {
+    expect(pinnedKey({ source: 'ra', achievement_id: 5 } as never)).toBe('ra:5')
+    expect(pinnedKey({ source: 'steam', game_id: 620, steam_apiname: 'WIN' } as never)).toBe('steam:620:WIN')
+  })
+})
+
+describe('achievement image URLs', () => {
+  const base = { BadgeName: '123', GameIcon: '/Images/1.png' } as never
+
+  test('build RA URLs from RA paths', () => {
+    expect(achievementBadgeUrl(base)).toBe('https://media.retroachievements.org/Badge/123.png')
+    expect(achievementGameIconUrl(base)).toBe('https://retroachievements.org/Images/1.png')
+  })
+
+  test('use the full URLs a Steam unlock carries', () => {
+    const steam = { BadgeName: '', BadgeUrl: 'https://cdn/b.jpg', GameIconUrl: 'https://cdn/h.jpg' } as never
+    expect(achievementBadgeUrl(steam)).toBe('https://cdn/b.jpg')
+    expect(achievementGameIconUrl(steam)).toBe('https://cdn/h.jpg')
+  })
+
+  test('are undefined without any image', () => {
+    expect(achievementBadgeUrl({ BadgeName: '' } as never)).toBeUndefined()
+    expect(achievementGameIconUrl({} as never)).toBeUndefined()
+  })
+})
+
+describe("completionBuckets", () => {
+  test("counts games per completion band, with 100% on its own", () => {
+    expect(completionBuckets([0, 0.1, 0.24, 0.25, 0.6, 0.75, 0.99, 1])).toEqual([3, 1, 1, 2, 1]);
+  });
+
+  test("is all zeros without games, and puts over-100% with the perfect ones", () => {
+    expect(completionBuckets([])).toEqual([0, 0, 0, 0, 0]);
+    expect(completionBuckets([1.2])).toEqual([0, 0, 0, 0, 1]);
   });
 });
