@@ -34,7 +34,24 @@ test('no pill for a game without a status, and a placeholder without an icon', (
     <SearchModalGameResult game={{ ...BASE, status: null, imageRef: '' }} onSelect={jest.fn()} />,
   )
   expect(screen.queryByText(en.search.completedHC)).not.toBeInTheDocument()
-  expect(container.querySelector('img')).toBeNull()
+  // Scoped to the icon slot: a direct child of the button. The platform logo
+  // next to the subtitle is nested deeper and always renders.
+  expect(container.querySelector('button > img')).toBeNull()
+})
+
+test('marks an RA game with the RA logo, a Steam one with the Steam logo', () => {
+  const { container, rerender } = render(<SearchModalGameResult game={BASE} onSelect={jest.fn()} />)
+  const logoSrcs = Array.from(container.querySelectorAll('img')).map((img) => img.getAttribute('src'))
+  expect(logoSrcs).toContain('/media/ra-logo.webp')
+  expect(screen.queryByTestId('steam-logo')).not.toBeInTheDocument()
+
+  rerender(
+    <SearchModalGameResult
+      game={{ ...BASE, source: 'steam', subtitle: 'Steam' }}
+      onSelect={jest.fn()}
+    />,
+  )
+  expect(screen.getByTestId('steam-logo')).toBeInTheDocument()
 })
 
 test('selects on click', () => {

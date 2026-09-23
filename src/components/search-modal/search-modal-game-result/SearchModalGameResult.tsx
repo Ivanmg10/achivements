@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { candidateIconUrl, CandidateStatus, GameCandidate } from '@/utils/gameCandidates'
@@ -48,8 +49,10 @@ export default function SearchModalGameResult({
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-text-main line-clamp-1">{game.title}</p>
         <p className="text-xs text-text-secondary line-clamp-1 flex items-center gap-1">
-          {game.source === 'steam' && (
-            <SteamLogo size={11} className="text-[#66c0f4] shrink-0" aria-hidden="true" />
+          {game.source === 'steam' ? (
+            <SteamLogo size={14} className="text-[#66c0f4] shrink-0" aria-hidden="true" />
+          ) : (
+            <RaLogo height={12} className="opacity-60 shrink-0" />
           )}
           {game.subtitle}
         </p>

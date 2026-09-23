@@ -5,6 +5,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { GameGroup } from '@/types/types'
 import { relativeTime } from '@/utils/utils'
 import GroupIcon from '@/components/groups/group-icon/GroupIcon'
+import RaLogo from '@/components/ra-logo/RaLogo'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 
 export default function GroupCard({
   group,
@@ -16,6 +18,8 @@ export default function GroupCard({
   style?: CSSProperties
 }) {
   const { T } = useLanguage()
+  const raCount = group.game_count - group.steam_count
+  const isMixed = raCount > 0 && group.steam_count > 0
 
   return (
     <div ref={itemRef} style={style}>
@@ -40,6 +44,12 @@ export default function GroupCard({
             <span className="text-xs text-text-secondary shrink-0">
               {group.game_count} {T.groups.games}
             </span>
+            {isMixed && (
+              <span className="flex items-center gap-1.5 shrink-0" role="img" aria-label={T.groups.mixedPlatforms}>
+                <RaLogo height={11} className="opacity-70" />
+                <SteamLogo size={11} className="text-[#66c0f4]/80" />
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-2 text-xs text-text-secondary/50">

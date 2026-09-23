@@ -1,4 +1,4 @@
-import type { GameSource } from '@/types/steam'
+import type { GameSource, SteamAchievementUnified } from '@/types/steam'
 
 export type Theme =
   | 'dark'
@@ -214,6 +214,25 @@ export type UserAwards = {
   VisibleUserAwards: UserAward[]
 }
 
+/** A user-pinned achievement — from RA (by its global id) or Steam (by apiname, scoped to its game). */
+export type PinnedAchievement =
+  | {
+      source: 'ra'
+      achievement_id: number
+      game_id: number
+      game_title: string
+      snapshot: RetroAchievement
+      num_distinct_players: number
+    }
+  | {
+      source: 'steam'
+      steam_apiname: string
+      game_id: number
+      game_title: string
+      snapshot: SteamAchievementUnified
+      num_distinct_players: number
+    }
+
 export type RecentAchievement = {
   Date: string; // "2024-01-15 20:30:00"
   HardcoreMode: string;
@@ -227,6 +246,12 @@ export type RecentAchievement = {
   GameTitle: string;
   GameIcon?: string;
   ConsoleName: string;
+  /** Set on Steam unlocks mapped into this shape; absent means RA. */
+  Source?: GameSource;
+  /** Full badge URL, used instead of RA's BadgeName path when set (Steam). */
+  BadgeUrl?: string;
+  /** Full game image URL, used instead of RA's GameIcon path when set (Steam). */
+  GameIconUrl?: string;
 };
 
 export type TopTenUser = {
@@ -279,6 +304,7 @@ export type GameGroup = {
   created_at: string
   updated_at: string
   game_count: number
+  steam_count: number
   total_awarded: number
   total_possible: number
   items?: GameGroupItem[]

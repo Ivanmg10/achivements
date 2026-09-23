@@ -10,6 +10,8 @@ import { RetroAchievementsUserProfile } from '@/types/types'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { searchCandidates } from '@/utils/gameCandidates'
 import { gameHref, GameRef } from '@/utils/gameRef'
+import RaLogo from '@/components/ra-logo/RaLogo'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
 import SearchModalGameResult from './search-modal-game-result/SearchModalGameResult'
 
 const overlayVariants: Variants = {
@@ -30,6 +32,7 @@ const resultVariants: Variants = {
 }
 
 type SearchTab = 'games' | 'users'
+type PlatformFilter = 'all' | 'ra' | 'steam'
 
 interface SearchModalProps {
   isOpen: boolean
@@ -42,6 +45,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   const router = useRouter()
   const candidates = useGameCandidates(isOpen)
   const [tab, setTab] = useState<SearchTab>('games')
+  const [platformFilter, setPlatformFilter] = useState<PlatformFilter>('all')
   const [query, setQuery] = useState('')
   const [userResult, setUserResult] = useState<RetroAchievementsUserProfile | null>(null)
   const [userLoading, setUserLoading] = useState(false)
@@ -57,6 +61,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
     } else {
       setQuery('')
       setTab('games')
+      setPlatformFilter('all')
       setUserResult(null)
       setUserError(false)
     }
@@ -100,7 +105,12 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
     return () => clearTimeout(userDebounce.current)
   }, [query, tab])
 
-  const results = useMemo(() => searchCandidates(candidates, query), [candidates, query])
+  const allResults = useMemo(() => searchCandidates(candidates, query), [candidates, query])
+  const results = useMemo(
+    () => (platformFilter === 'all' ? allResults : allResults.filter((r) => r.source === platformFilter)),
+    [allResults, platformFilter],
+  )
+  const hasBothPlatforms = allResults.some((r) => r.source === 'ra') && allResults.some((r) => r.source === 'steam')
 
   const directGameId = useMemo(() => {
     const q = query.trim()
@@ -181,6 +191,33 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                   </button>
                 ))}
               </div>
+
+              {/* Platform filter — only worth showing once both platforms are in the library */}
+              {tab === 'games' && hasBothPlatforms && (
+                <div className="flex items-center gap-3 px-4 py-2 border-b border-white/5" role="group" aria-label={T.search.platformAll}>
+                  {(
+                    [
+                      { value: 'all' as PlatformFilter, label: T.search.platformAll, icon: null },
+                      { value: 'ra' as PlatformFilter, label: T.search.platformRa, icon: <RaLogo height={11} /> },
+                      { value: 'steam' as PlatformFilter, label: T.search.platformSteam, icon: <SteamLogo size={12} className="text-[#66c0f4]" aria-hidden="true" /> },
+                    ]
+                  ).map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setPlatformFilter(opt.value)}
+                      aria-pressed={platformFilter === opt.value}
+                      className={`flex items-center gap-1.5 pb-1 text-[11px] font-medium border-b-2 transition-colors ${
+                        platformFilter === opt.value
+                          ? 'border-accent text-text-main'
+                          : 'border-transparent text-text-secondary/70 hover:text-text-secondary'
+                      }`}
+                    >
+                      {opt.icon}
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* Results — Games */}
               {tab === 'games' && (

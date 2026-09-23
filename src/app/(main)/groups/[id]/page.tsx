@@ -404,6 +404,7 @@ export default function GroupDetailPage() {
   }, [group, selectedConsoles, pctFilter, decadeFilter, releaseYears, steamPctMap])
 
   const hasYearsData = releaseYears.size > 0
+  const hasSteamItems = useMemo(() => (group?.items ?? []).some((i) => !isRa(i)), [group])
 
   function renderItem(item: GameGroupItem, draggable: boolean) {
     if (!isRa(item)) {
@@ -607,6 +608,12 @@ export default function GroupDetailPage() {
                   </button>
                 ))}
               </div>
+            )}
+
+            {hasYearsData && hasSteamItems && (
+              <p className="w-full text-[11px] text-text-secondary/60">
+                {T.groups.decadeFilterExcludesSteam}
+              </p>
             )}
           </div>
         )}

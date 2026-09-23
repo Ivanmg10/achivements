@@ -89,6 +89,32 @@ test('keeps the game when the delete fails', async () => {
   expect(screen.getByText('ra-item Zelda')).toBeInTheDocument()
 })
 
+test('warns that the decade filter excludes Steam games once year data loads', async () => {
+  ;(global.fetch as jest.Mock).mockImplementation((url: string) =>
+    url === '/api/groups/5'
+      ? json(GROUP)
+      : url.startsWith('/api/getGameData')
+        ? json({ Released: '1998-11-21' })
+        : json({}),
+  )
+  render(<GroupDetailPage />)
+  expect(await screen.findByText(en.groups.decadeFilterExcludesSteam)).toBeInTheDocument()
+})
+
+test('does not warn about the decade filter when the group has no Steam games', async () => {
+  const raOnlyGroup = { ...GROUP, items: [item(1, undefined, 620, 'Zelda')] }
+  ;(global.fetch as jest.Mock).mockImplementation((url: string) =>
+    url === '/api/groups/5'
+      ? json(raOnlyGroup)
+      : url.startsWith('/api/getGameData')
+        ? json({ Released: '1998-11-21' })
+        : json({}),
+  )
+  render(<GroupDetailPage />)
+  await screen.findByText('ra-item Zelda')
+  expect(screen.queryByText(en.groups.decadeFilterExcludesSteam)).not.toBeInTheDocument()
+})
+
 test('the completed filter uses live Steam progress', async () => {
   ;(useSteamGamesData as jest.Mock).mockReturnValue({
     library: [{ id: 620, achievementsLoaded: true, maxPossible: 10, numAwarded: 10 }],

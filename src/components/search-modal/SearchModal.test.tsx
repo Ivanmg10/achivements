@@ -72,6 +72,25 @@ test('says so when nothing matches', () => {
   expect(screen.getByText(en.search.noResults)).toBeInTheDocument()
 })
 
+test('filters results by platform, and resets the filter on close/reopen', () => {
+  const { rerender } = render(<SearchModal isOpen onClose={jest.fn()} />)
+  type('a')
+  fireEvent.click(screen.getByRole('button', { name: en.search.platformSteam }))
+  expect(screen.queryByRole('button', { name: /Zelda/ })).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Portal 2/ })).toBeInTheDocument()
+
+  rerender(<SearchModal isOpen={false} onClose={jest.fn()} />)
+  rerender(<SearchModal isOpen onClose={jest.fn()} />)
+  type('a')
+  expect(screen.getByRole('button', { name: /Zelda/ })).toBeInTheDocument()
+})
+
+test('hides the platform filter when the library has only one platform', () => {
+  ;(useGameCandidates as jest.Mock).mockReturnValue([candidate('ra', 620, 'Zelda')])
+  render(<SearchModal isOpen onClose={jest.fn()} />)
+  expect(screen.queryByRole('button', { name: en.search.platformSteam })).not.toBeInTheDocument()
+})
+
 test('the selected tab is announced', () => {
   render(<SearchModal isOpen onClose={jest.fn()} />)
   expect(screen.getByRole('button', { name: en.publicProfile.gamesTab }).getAttribute('aria-pressed')).toBe('true')
