@@ -240,6 +240,8 @@ export const ja: Translations = {
     showAllGames: '{n}本のゲームをすべて表示',
     showAll: 'すべてのゲームを表示',
     showLess: '閉じる',
+    searchGames: 'ゲームを検索',
+    clearSearch: '検索をクリア',
   },
   statusGameItem: {
     achievements: '実績',
@@ -342,6 +344,9 @@ export const ja: Translations = {
     completedSC: '完了SC',
     inProgress: '進行中',
     wantToPlay: 'プレイしたい',
+    platformAll: 'すべて',
+    platformRa: 'RetroAchievements',
+    platformSteam: 'Steam',
   },
   dayModal: {
     title: '獲得した実績',
@@ -391,6 +396,12 @@ export const ja: Translations = {
     recentlyPlayed: '最近プレイしたゲーム',
     earnedOf: '{total}個中{n}個獲得',
     noEarned: 'まだ実績を獲得していません',
+    steamRarityLabel: 'のプレイヤー',
+    steamPerfect100: 'パーフェクトゲーム — 100%',
+    noSteamPerfectSub: 'ゲームの実績をすべて解除するとここに表示されます',
+    steamProgress: 'Steamの進捗',
+    steamAvgCompletion: '平均達成率',
+    closestToPerfect: 'パーフェクト目前',
   },
   groups: {
     title: 'グループ',
@@ -424,6 +435,8 @@ export const ja: Translations = {
     noGamesFilter: '選択したフィルターに合うゲームがありません',
     clearFilters: 'フィルターをクリア',
     addError: '一部のゲームを追加できませんでした。もう一度お試しください。',
+    decadeFilterExcludesSteam: '年代フィルターはSteamのゲームには適用されません',
+    mixedPlatforms: 'RetroAchievementsとSteamのゲームを含みます',
   },
   streak: {
     title: 'ストリーク',

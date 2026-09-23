@@ -240,6 +240,8 @@ export const fr: Translations = {
     showAllGames: 'Voir les {n} jeux',
     showAll: 'Voir tous les jeux',
     showLess: 'Voir moins',
+    searchGames: 'Rechercher tes jeux',
+    clearSearch: 'Effacer la recherche',
   },
   statusGameItem: {
     achievements: 'succès',
@@ -342,6 +344,9 @@ export const fr: Translations = {
     completedSC: 'Terminé SC',
     inProgress: 'En cours',
     wantToPlay: 'À jouer',
+    platformAll: 'Toutes',
+    platformRa: 'RetroAchievements',
+    platformSteam: 'Steam',
   },
   dayModal: {
     title: 'Succès obtenus',
@@ -391,6 +396,12 @@ export const fr: Translations = {
     recentlyPlayed: 'Joués récemment',
     earnedOf: '{n} sur {total} obtenus',
     noEarned: "Aucun succès obtenu pour l'instant",
+    steamRarityLabel: 'des joueurs',
+    steamPerfect100: 'Jeux parfaits — 100%',
+    noSteamPerfectSub: 'Débloque tous les succès d’un jeu pour le voir ici',
+    steamProgress: 'Progression Steam',
+    steamAvgCompletion: 'Complétion moy.',
+    closestToPerfect: 'Presque parfaits',
   },
   groups: {
     title: 'Groupes',
@@ -424,6 +435,8 @@ export const fr: Translations = {
     noGamesFilter: 'Aucun jeu ne correspond aux filtres sélectionnés',
     clearFilters: 'Effacer les filtres',
     addError: 'Certains jeux n’ont pas pu être ajoutés. Réessaie.',
+    decadeFilterExcludesSteam: "Le filtre par décennie ne s'applique pas aux jeux Steam",
+    mixedPlatforms: 'Inclut des jeux RetroAchievements et Steam',
   },
   streak: {
     title: 'Série',

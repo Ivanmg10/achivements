@@ -238,6 +238,8 @@ export const en = {
     showAllGames: 'Show all {n} games',
     showAll: 'Show all games',
     showLess: 'Show less',
+    searchGames: 'Search your games',
+    clearSearch: 'Clear search',
   },
   statusGameItem: {
     achievements: 'achievements',
@@ -340,6 +342,9 @@ export const en = {
     completedSC: 'Completed SC',
     inProgress: 'In progress',
     wantToPlay: 'Want to play',
+    platformAll: 'All',
+    platformRa: 'RetroAchievements',
+    platformSteam: 'Steam',
   },
   dayModal: {
     title: 'Achievements earned',
@@ -389,6 +394,12 @@ export const en = {
     recentlyPlayed: 'Recently played',
     earnedOf: '{n} of {total} earned',
     noEarned: 'No achievements earned yet',
+    steamRarityLabel: 'of players',
+    steamPerfect100: 'Perfect games — 100%',
+    noSteamPerfectSub: 'Unlock every achievement in a game to see it here',
+    steamProgress: 'Steam progress',
+    steamAvgCompletion: 'Avg. completion',
+    closestToPerfect: 'Closest to perfect',
   },
   groups: {
     title: 'Groups',
@@ -422,6 +433,8 @@ export const en = {
     noGamesFilter: 'No games match the selected filters',
     clearFilters: 'Clear filters',
     addError: 'Some games could not be added. Try again.',
+    decadeFilterExcludesSteam: "Decade filter doesn't apply to Steam games",
+    mixedPlatforms: 'Includes RetroAchievements and Steam games',
   },
   streak: {
     title: 'Streak',

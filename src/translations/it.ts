@@ -240,6 +240,8 @@ export const it: Translations = {
     showAllGames: 'Mostra tutti i {n} giochi',
     showAll: 'Mostra tutti i giochi',
     showLess: 'Mostra meno',
+    searchGames: 'Cerca i tuoi giochi',
+    clearSearch: 'Cancella ricerca',
   },
   statusGameItem: {
     achievements: 'obiettivi',
@@ -342,6 +344,9 @@ export const it: Translations = {
     completedSC: 'Completato SC',
     inProgress: 'In corso',
     wantToPlay: 'Voglio giocare',
+    platformAll: 'Tutte',
+    platformRa: 'RetroAchievements',
+    platformSteam: 'Steam',
   },
   dayModal: {
     title: 'Obiettivi ottenuti',
@@ -391,6 +396,12 @@ export const it: Translations = {
     recentlyPlayed: 'Giocati di recente',
     earnedOf: '{n} di {total} ottenuti',
     noEarned: 'Nessun risultato ottenuto ancora',
+    steamRarityLabel: 'dei giocatori',
+    steamPerfect100: 'Giochi perfetti — 100%',
+    noSteamPerfectSub: 'Sblocca tutti gli obiettivi di un gioco per vederlo qui',
+    steamProgress: 'Progressi su Steam',
+    steamAvgCompletion: 'Completamento medio',
+    closestToPerfect: 'Quasi perfetti',
   },
   groups: {
     title: 'Gruppi',
@@ -424,6 +435,8 @@ export const it: Translations = {
     noGamesFilter: 'Nessun gioco corrisponde ai filtri selezionati',
     clearFilters: 'Cancella filtri',
     addError: 'Alcuni giochi non sono stati aggiunti. Riprova.',
+    decadeFilterExcludesSteam: 'Il filtro per decennio non si applica ai giochi Steam',
+    mixedPlatforms: 'Include giochi RetroAchievements e Steam',
   },
   streak: {
     title: 'Serie',

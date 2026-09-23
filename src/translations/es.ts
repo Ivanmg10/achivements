@@ -240,6 +240,8 @@ export const es: Translations = {
     showAllGames: 'Ver los {n} juegos',
     showAll: 'Ver todos los juegos',
     showLess: 'Ver menos',
+    searchGames: 'Buscar tus juegos',
+    clearSearch: 'Limpiar búsqueda',
   },
   statusGameItem: {
     achievements: 'logros',
@@ -342,6 +344,9 @@ export const es: Translations = {
     completedSC: 'Completado SC',
     inProgress: 'En progreso',
     wantToPlay: 'Quiero jugar',
+    platformAll: 'Todas',
+    platformRa: 'RetroAchievements',
+    platformSteam: 'Steam',
   },
   dayModal: {
     title: 'Logros conseguidos',
@@ -391,6 +396,12 @@ export const es: Translations = {
     recentlyPlayed: 'Jugados recientemente',
     earnedOf: '{n} de {total} conseguidos',
     noEarned: 'Aún no tienes logros',
+    steamRarityLabel: 'de jugadores',
+    steamPerfect100: 'Juegos perfectos — 100%',
+    noSteamPerfectSub: 'Desbloquea todos los logros de un juego para verlo aquí',
+    steamProgress: 'Progreso en Steam',
+    steamAvgCompletion: 'Completado medio',
+    closestToPerfect: 'A punto de ser perfectos',
   },
   groups: {
     title: 'Grupos',
@@ -424,6 +435,8 @@ export const es: Translations = {
     noGamesFilter: 'Ningún juego coincide con los filtros',
     clearFilters: 'Limpiar filtros',
     addError: 'No se pudieron añadir algunos juegos. Inténtalo de nuevo.',
+    decadeFilterExcludesSteam: 'El filtro de década no aplica a los juegos de Steam',
+    mixedPlatforms: 'Incluye juegos de RetroAchievements y Steam',
   },
   streak: {
     title: 'Racha',

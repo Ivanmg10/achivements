@@ -240,6 +240,8 @@ export const ru: Translations = {
     showAllGames: 'Показать все игры ({n})',
     showAll: 'Показать все игры',
     showLess: 'Свернуть',
+    searchGames: 'Поиск по вашим играм',
+    clearSearch: 'Очистить поиск',
   },
   statusGameItem: {
     achievements: 'достижений',
@@ -342,6 +344,9 @@ export const ru: Translations = {
     completedSC: 'Завершено SC',
     inProgress: 'В процессе',
     wantToPlay: 'Хочу сыграть',
+    platformAll: 'Все',
+    platformRa: 'RetroAchievements',
+    platformSteam: 'Steam',
   },
   dayModal: {
     title: 'Полученные достижения',
@@ -391,6 +396,12 @@ export const ru: Translations = {
     recentlyPlayed: 'Недавно играл',
     earnedOf: '{n} из {total} получено',
     noEarned: 'Достижений пока нет',
+    steamRarityLabel: 'игроков',
+    steamPerfect100: 'Идеальные игры — 100%',
+    noSteamPerfectSub: 'Получите все достижения в игре, чтобы увидеть её здесь',
+    steamProgress: 'Прогресс в Steam',
+    steamAvgCompletion: 'Средний прогресс',
+    closestToPerfect: 'Почти идеальные',
   },
   groups: {
     title: 'Группы',
@@ -424,6 +435,8 @@ export const ru: Translations = {
     noGamesFilter: 'Нет игр, соответствующих выбранным фильтрам',
     clearFilters: 'Сбросить фильтры',
     addError: 'Не удалось добавить некоторые игры. Попробуйте ещё раз.',
+    decadeFilterExcludesSteam: 'Фильтр по десятилетию не применяется к играм Steam',
+    mixedPlatforms: 'Включает игры RetroAchievements и Steam',
   },
   streak: {
     title: 'Серия',
