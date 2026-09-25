@@ -25,10 +25,10 @@ test('each column repeats its games once, so the loop has no seam', () => {
   }
 })
 
-test('shows every game in the pool, across the columns', () => {
+test('shows a slice of the pool, spread across the columns', () => {
   const { container } = render(<AuthCollagePanel />)
   const sources = new Set(Array.from(container.querySelectorAll('img')).map((img) => img.getAttribute('src')))
-  expect(sources.size).toBe(44)
+  expect(sources.size).toBe(40)
 })
 
 test('every tile comes from the pool, never a made-up id', () => {

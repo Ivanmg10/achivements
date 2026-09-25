@@ -42,6 +42,60 @@ const RA_IMAGES: string[] = [
   'https://media.retroachievements.org/Images/104787.png',
   'https://media.retroachievements.org/Images/045842.png',
   'https://media.retroachievements.org/Images/089382.png',
+
+  // Added from game ids sent by the user; art fetched from the RA API.
+  'https://media.retroachievements.org/Images/068145.png', // Pokémon Colosseum (GameCube)
+  'https://media.retroachievements.org/Images/081263.png', // Super Mario Sunshine (GameCube)
+  'https://media.retroachievements.org/Images/097988.png', // Pikmin (GameCube)
+  'https://media.retroachievements.org/Images/086944.png', // The Simpsons: Hit & Run (GameCube)
+  'https://media.retroachievements.org/Images/114344.png', // Paper Mario: The Thousand-Year Door (GameCube)
+  'https://media.retroachievements.org/Images/117057.png', // Metroid Prime (GameCube)
+  'https://media.retroachievements.org/Images/081531.png', // F-Zero GX (GameCube)
+  'https://media.retroachievements.org/Images/101496.png', // Spider-Man (PlayStation)
+  'https://media.retroachievements.org/Images/105481.png', // Pokémon Gold Version (Game Boy Color)
+  'https://media.retroachievements.org/Images/044233.png', // Sonic Advance (Game Boy Advance)
+  'https://media.retroachievements.org/Images/048626.png', // Grand Theft Auto: Liberty City Stories (PlayStation Portable)
+  'https://media.retroachievements.org/Images/115716.png', // PaRappa the Rapper 2 (PlayStation 2)
+  'https://media.retroachievements.org/Images/115618.png', // Sonic Adventure 2: Battle — GameCube
+  'https://media.retroachievements.org/Images/122566.png', // Sonic Adventure DX — GameCube
+  'https://media.retroachievements.org/Images/110929.png', // ~Hack~ Pokémon Yellow Legacy — Game Boy
+  'https://media.retroachievements.org/Images/109501.png', // Metal Gear Solid — PlayStation
+  'https://media.retroachievements.org/Images/131211.png', // Tekken 3 — PlayStation
+  'https://media.retroachievements.org/Images/066590.png', // Pepsiman: The Running Hero — PlayStation
+  'https://media.retroachievements.org/Images/067095.png', // Castlevania: Chronicles — PlayStation
+  'https://media.retroachievements.org/Images/101538.png', // Gran Turismo — PlayStation
+  'https://media.retroachievements.org/Images/080437.png', // Harry Potter and the Sorcerer's Stone — PlayStation
+  'https://media.retroachievements.org/Images/160909.png', // JoJo's Bizarre Adventure — PlayStation
+  'https://media.retroachievements.org/Images/059053.png', // The Legend of Zelda — NES/Famicom
+  'https://media.retroachievements.org/Images/064350.png', // Tetris — NES/Famicom
+  'https://media.retroachievements.org/Images/060606.png', // Metroid — NES/Famicom
+  'https://media.retroachievements.org/Images/103430.png', // Battletoads — NES/Famicom
+  'https://media.retroachievements.org/Images/105171.png', // Pokémon Silver Version — Game Boy Color
+  'https://media.retroachievements.org/Images/091409.png', // Pokémon Trading Card Game — Game Boy Color
+  'https://media.retroachievements.org/Images/112389.png', // Wario Land II — Game Boy Color
+  'https://media.retroachievements.org/Images/108280.png', // The Legend of Zelda: Oracle of Ages — Game Boy Color
+  'https://media.retroachievements.org/Images/108279.png', // The Legend of Zelda: Oracle of Seasons — Game Boy Color
+  'https://media.retroachievements.org/Images/113471.png', // The Legend of Zelda: The Minish Cap — Game Boy Advance
+  'https://media.retroachievements.org/Images/157383.png', // ~Hack~ Pokémon Unbound — Game Boy Advance
+  'https://media.retroachievements.org/Images/116411.png', // Mario & Luigi: Superstar Saga — Game Boy Advance
+  'https://media.retroachievements.org/Images/092736.png', // Pokémon Pinball: Ruby & Sapphire — Game Boy Advance
+  'https://media.retroachievements.org/Images/160957.png', // Golden Sun — Game Boy Advance
+  'https://media.retroachievements.org/Images/025922.png', // Mega Man Zero — Game Boy Advance
+  'https://media.retroachievements.org/Images/093870.png', // Dragon Ball Z: The Legacy of Goku — Game Boy Advance
+  'https://media.retroachievements.org/Images/104258.png', // Dragon Ball Z: Shin Budokai — PlayStation Portable
+  'https://media.retroachievements.org/Images/047405.png', // Monster Hunter Freedom Unite — PlayStation Portable
+  'https://media.retroachievements.org/Images/061474.png', // Tony Hawk's Underground — PlayStation 2
+  'https://media.retroachievements.org/Images/056405.png', // Grand Theft Auto: Vice City — PlayStation 2
+  'https://media.retroachievements.org/Images/077012.png', // Devil May Cry — PlayStation 2
+  'https://media.retroachievements.org/Images/061921.png', // Guitar Hero III: Legends of Rock — PlayStation 2
+  'https://media.retroachievements.org/Images/088612.png', // Manhunt — PlayStation 2
+  'https://media.retroachievements.org/Images/087306.png', // Prince of Persia: The Sands of Time — PlayStation 2
+  'https://media.retroachievements.org/Images/126560.png', // Naruto Shippuden: Ultimate Ninja 5 — PlayStation 2
+  'https://media.retroachievements.org/Images/069853.png', // Ape Escape 3 — PlayStation 2
+  'https://media.retroachievements.org/Images/078715.png', // Shadow the Hedgehog — PlayStation 2
+  'https://media.retroachievements.org/Images/158713.png', // Kingdom Hearts: Final Mix — PlayStation 2
+  'https://media.retroachievements.org/Images/076406.png', // The Simpsons Game — PlayStation 2
+  'https://media.retroachievements.org/Images/056407.png', // Grand Theft Auto: San Andreas — PlayStation 2
 ]
 
 /**
@@ -61,6 +115,9 @@ const STEAM_APP_IDS = [
 const ALL_IMAGES = [...RA_IMAGES, ...STEAM_APP_IDS.map((id) => steamAssetUrl(id, 'cover'))]
 
 const COLUMNS = 4
+/** How many of the pool are on screen: enough to fill the columns, few enough
+ * that a visit does not download the whole library. */
+const TILES_SHOWN = 40
 /** Seconds per full pass, one per column: slow enough to read, never matching. */
 const COLUMN_SECONDS = [118, 146, 104, 132]
 /** Head start per column, so tiles never line up as a grid. */
@@ -87,10 +144,10 @@ function intoColumns(images: string[]): string[][] {
 export default function AuthCollagePanel() {
   // A fixed order first, so the server and the first paint agree; a different
   // draw once mounted, so no two visits look the same.
-  const [images, setImages] = useState(ALL_IMAGES)
+  const [images, setImages] = useState(() => ALL_IMAGES.slice(0, TILES_SHOWN))
 
   useEffect(() => {
-    setImages([...ALL_IMAGES].sort(() => Math.random() - 0.5))
+    setImages([...ALL_IMAGES].sort(() => Math.random() - 0.5).slice(0, TILES_SHOWN))
   }, [])
 
   return (
