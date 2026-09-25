@@ -343,3 +343,18 @@
 .button-red:hover {
   border-color: rgb(240 80 100);
 }
+
+/* Auth collage: columns of game art drifting up and down, opposite ways. */
+@keyframes marquee-up {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+@keyframes marquee-down {
+  from { transform: translateY(-50%); }
+  to { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-column {
+    animation: none !important;
+  }
+}

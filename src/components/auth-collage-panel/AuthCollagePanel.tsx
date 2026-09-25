@@ -1,8 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion, useMotionValue, useReducedMotion } from 'framer-motion'
-import AuthCollageTile from './auth-collage-tile/AuthCollageTile'
 import { steamAssetUrl } from '@/lib/steamClient'
 
 const RA_IMAGES: string[] = [
@@ -62,149 +60,86 @@ const STEAM_APP_IDS = [
 
 const ALL_IMAGES = [...RA_IMAGES, ...STEAM_APP_IDS.map((id) => steamAssetUrl(id, 'cover'))]
 
-// 6 rows × 4 columns, each row staggered so neighbours overlap instead of
-// lining up in a grid.
-const POSITIONS = [
-  { top: '1%', left: '3%', rotate: -11, z: 3 },
-  { top: '4%', left: '26%', rotate: 7, z: 5 },
-  { top: '0%', left: '51%', rotate: -5, z: 1 },
-  { top: '3%', left: '76%', rotate: 12, z: 4 },
-  { top: '14%', left: '14%', rotate: 9, z: 4 },
-  { top: '21%', left: '37%', rotate: -13, z: 1 },
-  { top: '16%', left: '62%', rotate: 6, z: 3 },
-  { top: '22%', left: '84%', rotate: -10, z: 2 },
-  { top: '33%', left: '5%', rotate: -7, z: 2 },
-  { top: '39%', left: '28%', rotate: 11, z: 4 },
-  { top: '35%', left: '53%', rotate: -9, z: 5 },
-  { top: '40%', left: '78%', rotate: 5, z: 1 },
-  { top: '50%', left: '16%', rotate: 13, z: 5 },
-  { top: '56%', left: '40%', rotate: -6, z: 2 },
-  { top: '52%', left: '65%', rotate: 10, z: 4 },
-  { top: '57%', left: '87%', rotate: -8, z: 3 },
-  { top: '68%', left: '8%', rotate: -9, z: 1 },
-  { top: '74%', left: '31%', rotate: 8, z: 3 },
-  { top: '70%', left: '56%', rotate: -12, z: 2 },
-  { top: '75%', left: '80%', rotate: 6, z: 5 },
-  { top: '87%', left: '20%', rotate: -8, z: 3 },
-  { top: '91%', left: '44%', rotate: 6, z: 2 },
-  { top: '88%', left: '68%', rotate: -11, z: 4 },
-  { top: '92%', left: '89%', rotate: 9, z: 1 },
-]
+const COLUMNS = 4
+/** Seconds per full pass, one per column: never the same speed side by side. */
+const COLUMN_SECONDS = [46, 58, 40, 52]
+/** Fixed tilt per tile, cycling — not random, so the markup is the same everywhere. */
+const ROTATIONS = [-8, 6, -4, 10, -7, 5, -11, 8, -3, 9, -6, 7]
 
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.045 } },
+/** Round-robin split, so each column holds a different set of games. */
+function intoColumns(images: string[]): string[][] {
+  const columns: string[][] = Array.from({ length: COLUMNS }, () => [])
+  images.forEach((src, i) => columns[i % COLUMNS].push(src))
+  return columns
 }
-
-const itemVariants = {
-  hidden: { opacity: 0, scale: 0.55, y: 20 },
-  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
-}
-
-/** How often a tile turns over to show a different game, and how long that takes. */
-const FLIP_EVERY_MS = 3200
-const FLIP_MS = 700
 
 /**
- * The art wall beside the sign-in and register forms: game boxes from both
- * platforms, scattered and overlapping.
+ * The art wall beside the sign-in and register forms: columns of game boxes
+ * sliding past each other, the odd ones going up and the even ones down, each
+ * at its own speed.
  *
- * Every visit deals a different hand from the pool. The tiles lean towards the
- * pointer by depth, breathe on their own slow loops, and every few seconds one
- * turns over and comes back as another game — the wall keeps re-dealing itself
- * while you type. All of it stops under reduced motion.
+ * Every visit deals a different hand from the pool, and each column's content
+ * is doubled so the loop never shows a seam. Hovering stops the column under
+ * the pointer; reduced motion stops all of them.
  */
 export default function AuthCollagePanel() {
-  const reduce = useReducedMotion()
-  const still = Boolean(reduce)
-
-  // A fixed slice first, so the server and the first paint agree; a different
+  // A fixed order first, so the server and the first paint agree; a different
   // draw once mounted, so no two visits look the same.
-  const [images, setImages] = useState(() => ALL_IMAGES.slice(0, POSITIONS.length))
-  const [flipping, setFlipping] = useState<number | null>(null)
-
-  const pointerX = useMotionValue(0)
-  const pointerY = useMotionValue(0)
+  const [images, setImages] = useState(ALL_IMAGES)
 
   useEffect(() => {
-    setImages([...ALL_IMAGES].sort(() => Math.random() - 0.5).slice(0, POSITIONS.length))
+    setImages([...ALL_IMAGES].sort(() => Math.random() - 0.5))
   }, [])
 
-  useEffect(() => {
-    if (still) return
-    const timers: ReturnType<typeof setTimeout>[] = []
-
-    const interval = setInterval(() => {
-      const i = Math.floor(Math.random() * POSITIONS.length)
-      setFlipping(i)
-      // Swap while the tile is edge-on, so the change is never seen happening.
-      timers.push(
-        setTimeout(() => {
-          setImages((prev) => {
-            const spare = ALL_IMAGES.filter((src) => !prev.includes(src))
-            if (!spare.length) return prev
-            const next = [...prev]
-            next[i] = spare[Math.floor(Math.random() * spare.length)]
-            return next
-          })
-        }, FLIP_MS / 2),
-      )
-      timers.push(setTimeout(() => setFlipping(null), FLIP_MS))
-    }, FLIP_EVERY_MS)
-
-    return () => {
-      clearInterval(interval)
-      timers.forEach(clearTimeout)
-    }
-  }, [still])
-
-  function handlePointer(e: React.MouseEvent<HTMLDivElement>) {
-    if (still) return
-    const box = e.currentTarget.getBoundingClientRect()
-    pointerX.set(((e.clientX - box.left) / box.width) * 2 - 1)
-    pointerY.set(((e.clientY - box.top) / box.height) * 2 - 1)
-  }
-
-  function resetPointer() {
-    pointerX.set(0)
-    pointerY.set(0)
-  }
-
   return (
-    <div
-      className="relative w-full h-full overflow-hidden bg-bg-card"
-      onMouseMove={handlePointer}
-      onMouseLeave={resetPointer}
-    >
+    <div className="relative w-full h-full overflow-hidden bg-bg-card">
       {/* subtle accent glow behind images */}
       <div className="absolute inset-0 bg-linear-to-br from-accent/10 via-transparent to-bg-secondary/60" />
 
       {/* blend edges into form bg */}
       <div className="absolute inset-y-0 left-0 w-10 z-20 bg-linear-to-r from-bg-main to-transparent pointer-events-none" />
       <div className="absolute inset-y-0 right-0 w-10 z-20 bg-linear-to-l from-bg-main to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 top-0 h-12 z-20 bg-linear-to-b from-bg-main to-transparent pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-12 z-20 bg-linear-to-t from-bg-main to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-16 z-20 bg-linear-to-b from-bg-main to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-16 z-20 bg-linear-to-t from-bg-main to-transparent pointer-events-none" />
 
-      <motion.div
-        className="relative w-full h-full"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {POSITIONS.map((pos, i) => (
-          <motion.div key={i} variants={itemVariants}>
-            <AuthCollageTile
-              src={images[i]}
-              position={pos}
-              index={i}
-              flipping={flipping === i}
-              still={still}
-              pointerX={pointerX}
-              pointerY={pointerY}
-            />
-          </motion.div>
-        ))}
-      </motion.div>
+      <div className="absolute inset-0 flex justify-center gap-5 px-6">
+        {intoColumns(images).map((column, c) => {
+          // Doubled so translateY(-50%) always lands on an identical frame.
+          const tiles = [...column, ...column]
+          return (
+            <div key={c} className="flex-1 max-w-36 overflow-hidden">
+              <div
+                data-column={c}
+                className="marquee-column flex flex-col items-center gap-5 hover:[animation-play-state:paused]"
+                style={{
+                  animationName: c % 2 === 0 ? 'marquee-up' : 'marquee-down',
+                  animationDuration: `${COLUMN_SECONDS[c % COLUMN_SECONDS.length]}s`,
+                  animationTimingFunction: 'linear',
+                  animationIterationCount: 'infinite',
+                }}
+              >
+                {tiles.map((src, i) => (
+                  <div key={i} style={{ transform: `rotate(${ROTATIONS[(c + i) % ROTATIONS.length]}deg)` }}>
+                    <div className="bg-bg-tertiary p-1.5 rounded-xl shadow-2xl border border-white/10 hover:scale-110 hover:shadow-accent/25 transition-transform duration-200">
+                      <img
+                        src={src}
+                        alt=""
+                        aria-hidden="true"
+                        className="w-24 h-24 object-cover rounded-lg"
+                        loading="lazy"
+                        // A dead URL would otherwise sit as a broken-image icon forever.
+                        onError={(e) => {
+                          e.currentTarget.style.visibility = 'hidden'
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

@@ -1,16 +1,45 @@
-import { render, fireEvent, act } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import AuthCollagePanel from './AuthCollagePanel'
 
-test('fills every position in the scatter with a game tile', () => {
+test('four columns, alternating up and down at their own speeds', () => {
   const { container } = render(<AuthCollagePanel />)
-  expect(container.querySelectorAll('img').length).toBe(24)
+  const columns = Array.from(container.querySelectorAll('.marquee-column')) as HTMLElement[]
+
+  expect(columns).toHaveLength(4)
+  expect(columns.map((c) => c.style.animationName)).toEqual([
+    'marquee-up',
+    'marquee-down',
+    'marquee-up',
+    'marquee-down',
+  ])
+  const speeds = columns.map((c) => c.style.animationDuration)
+  expect(new Set(speeds).size).toBe(speeds.length)
 })
 
-test('mixes both platforms', () => {
+test('each column repeats its games once, so the loop has no seam', () => {
   const { container } = render(<AuthCollagePanel />)
-  const sources = Array.from(container.querySelectorAll('img')).map((img) => img.getAttribute('src') ?? '')
-  expect(sources.some((src) => src.includes('retroachievements.org'))).toBe(true)
-  expect(sources.some((src) => src.includes('steamstatic.com'))).toBe(true)
+  for (const column of Array.from(container.querySelectorAll('.marquee-column'))) {
+    const sources = Array.from(column.querySelectorAll('img')).map((img) => img.getAttribute('src'))
+    const half = sources.length / 2
+    expect(sources.slice(0, half)).toEqual(sources.slice(half))
+  }
+})
+
+test('shows every game in the pool, across the columns', () => {
+  const { container } = render(<AuthCollagePanel />)
+  const sources = new Set(Array.from(container.querySelectorAll('img')).map((img) => img.getAttribute('src')))
+  expect(sources.size).toBe(44)
+})
+
+test('every tile comes from the pool, never a made-up id', () => {
+  const { container } = render(<AuthCollagePanel />)
+  for (const img of Array.from(container.querySelectorAll('img'))) {
+    const src = img.getAttribute('src') ?? ''
+    expect(
+      src.startsWith('https://media.retroachievements.org/') ||
+        src.startsWith('https://cdn.akamai.steamstatic.com/'),
+    ).toBe(true)
+  }
 })
 
 test('every tile is decorative: empty alt text, hidden from assistive tech', () => {
@@ -21,26 +50,8 @@ test('every tile is decorative: empty alt text, hidden from assistive tech', () 
   }
 })
 
-test('every tile comes from the pool, never a made-up id', () => {
-  const { container } = render(<AuthCollagePanel />)
-  const sources = Array.from(container.querySelectorAll('img')).map((img) => img.getAttribute('src') ?? '')
-  const ids = sources.filter((src) => src.includes('retroachievements')).map((src) => src.split('/').pop())
-  expect(new Set(ids).size).toBe(ids.length)
-  for (const src of sources) {
-    expect(src.startsWith('https://media.retroachievements.org/') || src.startsWith('https://cdn.akamai.steamstatic.com/')).toBe(true)
-  }
-})
-
-test('a tile that fails to load hides itself instead of leaving a broken image', () => {
-  const { container } = render(<AuthCollagePanel />)
-  const img = container.querySelector('img') as HTMLImageElement
-  fireEvent.error(img)
-  expect(img.style.visibility).toBe('hidden')
-})
-
 test('deals a different hand once mounted, so a refresh changes the wall', () => {
-  const random = jest.spyOn(Math, 'random')
-  random.mockReturnValue(0.9)
+  const random = jest.spyOn(Math, 'random').mockReturnValue(0.9)
   const first = render(<AuthCollagePanel />)
   const a = Array.from(first.container.querySelectorAll('img')).map((img) => img.getAttribute('src'))
   first.unmount()
@@ -52,17 +63,16 @@ test('deals a different hand once mounted, so a refresh changes the wall', () =>
   random.mockRestore()
 })
 
-test('turns a tile over every few seconds and swaps its game', () => {
-  jest.useFakeTimers()
+test('a column stops while the pointer is on it', () => {
   const { container } = render(<AuthCollagePanel />)
-  const before = Array.from(container.querySelectorAll('img')).map((img) => img.getAttribute('src'))
+  expect(container.querySelector('.marquee-column')?.className).toContain(
+    'hover:[animation-play-state:paused]',
+  )
+})
 
-  act(() => { jest.advanceTimersByTime(3200) })
-  expect(container.querySelector('[data-flipping]')).not.toBeNull()
-
-  act(() => { jest.advanceTimersByTime(700) })
-  const after = Array.from(container.querySelectorAll('img')).map((img) => img.getAttribute('src'))
-  expect(after).not.toEqual(before)
-  expect(container.querySelector('[data-flipping]')).toBeNull()
-  jest.useRealTimers()
+test('a dead image hides itself instead of leaving a broken icon', () => {
+  const { container } = render(<AuthCollagePanel />)
+  const img = container.querySelector('img') as HTMLImageElement
+  fireEvent.error(img)
+  expect(img.style.visibility).toBe('hidden')
 })
