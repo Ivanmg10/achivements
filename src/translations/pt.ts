@@ -146,6 +146,7 @@ export const pt: Translations = {
     hideData: 'Ocultar dados',
     editAvatar: 'Mudar avatar',
     editName: 'Mudar nome de utilizador',
+    username: 'Nome de utilizador',
     raConnectHint: 'Liga o RetroAchievements para acompanhar aqui os teus jogos retro.',
     steamConnectHint: 'Liga a Steam para acompanhar aqui a tua biblioteca e as conquistas.',
     psnHint: 'O suporte para a PlayStation Network está a caminho.',

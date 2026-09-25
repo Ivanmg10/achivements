@@ -88,7 +88,7 @@ export default function UserPlatforms() {
   ]
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <UserPlatformCard
         name="RetroAchievements"
         logo={<RaLogo height={18} />}

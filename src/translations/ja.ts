@@ -146,6 +146,7 @@ export const ja: Translations = {
     hideData: 'データを隠す',
     editAvatar: 'アバターを変更',
     editName: 'ユーザー名を変更',
+    username: 'ユーザー名',
     raConnectHint: 'RetroAchievementsを連携すると、レトロゲームをここで管理できます。',
     steamConnectHint: 'Steamを連携すると、ライブラリと実績をここで管理できます。',
     psnHint: 'PlayStation Networkへの対応は準備中です。',

@@ -6,14 +6,12 @@ import { useSession } from 'next-auth/react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import FavoriteGameModal, { FavoriteGame } from '@/components/favorite-game-modal/FavoriteGameModal'
 import LanguageModal from '@/components/language-modal/LanguageModal'
-import LocationModal from '@/components/location-modal/LocationModal'
 import ThemeModal from '@/components/theme-modal/ThemeModal'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { candidateIconUrl } from '@/utils/gameCandidates'
-import { codeToFlag, findCountry } from '@/utils/countries'
 import type { GameSource } from '@/types/steam'
 
 /** Saves the favourite game for one platform and refreshes the session. */
@@ -42,9 +40,9 @@ function FavoriteValue({ game, source, empty }: { game: FavoriteGame | null; sou
 }
 
 /**
- * How the app looks and what the user calls their own: theme, language,
- * country and a favourite game per platform. Each line opens the picker it
- * belongs to; nothing here is typed in directly.
+ * How the app looks and what the user calls their own: theme, language and
+ * a favourite game per platform. Each line opens the picker it belongs to;
+ * nothing here is typed in directly.
  */
 export default function UserPreferencesCard() {
   const { data: session, update } = useSession()
@@ -52,11 +50,9 @@ export default function UserPreferencesCard() {
   const { theme } = useTheme()
   const [themeOpen, setThemeOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
-  const [locationOpen, setLocationOpen] = useState(false)
   const [favoriteOpen, setFavoriteOpen] = useState<GameSource | null>(null)
 
   const user = session?.user
-  const country = user?.location ? findCountry(user.location) : null
   const raFavorite = user?.favorite_game ?? null
   const steamFavorite = user?.favorite_steam_game ?? null
 
@@ -83,19 +79,6 @@ export default function UserPreferencesCard() {
           <span className="text-base font-medium uppercase">{lang}</span>
         </ProfileField>
 
-        <ProfileField label={T.userData.location} onEdit={() => setLocationOpen(true)}>
-          {country ? (
-            <span className="flex items-center gap-2 min-w-0">
-              <span className="text-xl leading-none" aria-hidden="true">
-                {codeToFlag(country.code)}
-              </span>
-              <span className="text-base font-medium truncate">{country.name}</span>
-            </span>
-          ) : (
-            <span className="text-base text-text-secondary italic">{T.userData.notSet}</span>
-          )}
-        </ProfileField>
-
         <ProfileField label={T.userPage.favoriteRaGame} onEdit={() => setFavoriteOpen('ra')}>
           <span className="flex items-center gap-1.5 min-w-0">
             <RaLogo height={14} className="opacity-70" />
@@ -113,11 +96,6 @@ export default function UserPreferencesCard() {
 
       <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
       <LanguageModal isOpen={langOpen} onClose={() => setLangOpen(false)} />
-      <LocationModal
-        isOpen={locationOpen}
-        onClose={() => setLocationOpen(false)}
-        currentCode={user?.location}
-      />
       <FavoriteGameModal
         isOpen={favoriteOpen !== null}
         source={favoriteOpen ?? 'ra'}

@@ -3,6 +3,7 @@ import UserIdentityCard from './UserIdentityCard'
 import { useSession, signOut } from 'next-auth/react'
 import { en } from '@/translations/en'
 
+jest.mock('@/components/location-modal/LocationModal', () => ({ __esModule: true, default: () => null }))
 jest.mock('@/components/change-password-modal/ChangePasswordModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="password-modal" /> : null),
@@ -23,12 +24,15 @@ beforeEach(() => {
   setUser()
 })
 
-test('shows who you are: name, id, country and email', () => {
+test('shows who you are: name, id, and an editable username, email and country', () => {
   render(<UserIdentityCard />)
   expect(screen.getByRole('heading', { name: 'ivanxmarine' })).toBeInTheDocument()
   expect(screen.getByText('ID: 3')).toBeInTheDocument()
   expect(screen.getByText('Spain')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: `${en.userPage.username}: ivanxmarine` })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: `${en.userData.email}: a@b.c` })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: `${en.userData.location}: Spain` })).toBeInTheDocument()
+  expect(screen.queryByText(en.userData.userId)).not.toBeInTheDocument()
 })
 
 test('the RetroAchievements rank belongs to its platform card, not here', () => {

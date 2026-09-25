@@ -146,6 +146,7 @@ export const de: Translations = {
     hideData: 'Daten ausblenden',
     editAvatar: 'Avatar ändern',
     editName: 'Benutzernamen ändern',
+    username: 'Benutzername',
     raConnectHint: 'Verbinde RetroAchievements, um deine Retro-Spiele hier zu verfolgen.',
     steamConnectHint: 'Verbinde Steam, um deine Bibliothek und Erfolge hier zu verfolgen.',
     psnHint: 'PlayStation Network folgt in Kürze.',

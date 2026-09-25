@@ -7,6 +7,7 @@ import { IconLock, IconLogout, IconPencil } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import EditProfileModal, { EditProfileField } from '@/components/edit-profile-modal/EditProfileModal'
 import ChangePasswordModal from '@/components/change-password-modal/ChangePasswordModal'
+import LocationModal from '@/components/location-modal/LocationModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -16,7 +17,7 @@ import { summarizeSteamLibrary } from '@/utils/steamFeed'
 import { codeToFlag, findCountry } from '@/utils/countries'
 
 /**
- * Who you are on CheevoVault: avatar, username, country, email and id, with
+ * Who you are on CheevoVault: avatar, username, email and country, with
  * change password and sign out kept together at the top right.
  *
  * Under that, what the account holds — games, groups and pins — counted
@@ -30,6 +31,7 @@ export default function UserIdentityCard() {
   const { pins } = usePinnedGames()
   const { groups } = useGroups()
   const [passwordOpen, setPasswordOpen] = useState(false)
+  const [locationOpen, setLocationOpen] = useState(false)
   const [edit, setEdit] = useState<{ field: EditProfileField; value: string } | null>(null)
 
   const user = session?.user
@@ -82,25 +84,12 @@ export default function UserIdentityCard() {
           <div className="flex flex-col gap-1.5 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-3xl font-bold truncate">{user?.name}</h1>
-              <button
-                onClick={() => setEdit({ field: 'name', value: user?.name ?? '' })}
-                aria-label={T.userPage.editName}
-                className="text-text-secondary hover:text-text-main transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-              >
-                <IconPencil size={15} aria-hidden="true" />
-              </button>
               {user?.admin && (
                 <span className="text-xs bg-accent text-bg-main font-bold px-2 py-0.5 rounded-full">
                   {T.userData.admin}
                 </span>
               )}
             </div>
-            {country && (
-              <p className="text-sm text-text-secondary flex items-center gap-1.5">
-                <span aria-hidden="true">{codeToFlag(country.code)}</span>
-                {country.name}
-              </p>
-            )}
             <p className="text-xs text-text-secondary font-mono">ID: {user?.id}</p>
           </div>
         </div>
@@ -123,14 +112,35 @@ export default function UserIdentityCard() {
         </div>
       </div>
 
-      <div className="bg-bg-main rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="bg-bg-main rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <ProfileField
+          label={T.userPage.username}
+          value={user?.name}
+          onEdit={() => setEdit({ field: 'name', value: user?.name ?? '' })}
+        />
         <ProfileField
           label={T.userData.email}
           value={user?.email}
           empty={T.userData.notSet}
           onEdit={() => setEdit({ field: 'email', value: user?.email ?? '' })}
         />
-        <ProfileField label={T.userData.userId} value={user?.id} />
+        <ProfileField
+          label={T.userData.location}
+          value={country?.name}
+          empty={T.userData.notSet}
+          onEdit={() => setLocationOpen(true)}
+        >
+          {country ? (
+            <span className="flex items-center gap-2 min-w-0">
+              <span className="text-lg leading-none" aria-hidden="true">
+                {codeToFlag(country.code)}
+              </span>
+              <span className="text-sm font-medium truncate">{country.name}</span>
+            </span>
+          ) : (
+            <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
+          )}
+        </ProfileField>
       </div>
 
       <div className="flex flex-col gap-2 mt-auto">
@@ -148,6 +158,11 @@ export default function UserIdentityCard() {
       </div>
 
       <ChangePasswordModal isOpen={passwordOpen} onClose={() => setPasswordOpen(false)} />
+      <LocationModal
+        isOpen={locationOpen}
+        onClose={() => setLocationOpen(false)}
+        currentCode={user?.location}
+      />
       {edit && (
         <EditProfileModal
           isOpen

@@ -144,6 +144,7 @@ export const en = {
     hideData: 'Hide data',
     editAvatar: 'Change avatar',
     editName: 'Change username',
+    username: 'Username',
     raConnectHint: 'Connect RetroAchievements to track your retro games here.',
     steamConnectHint: 'Connect Steam to track your library and achievements here.',
     psnHint: 'PlayStation Network support is on the way.',

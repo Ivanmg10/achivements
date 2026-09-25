@@ -7,7 +7,6 @@ const update = jest.fn()
 
 jest.mock('@/context/ThemeContext', () => ({ useTheme: () => ({ theme: 'dark' }) }))
 jest.mock('@/components/language-modal/LanguageModal', () => ({ __esModule: true, default: () => null }))
-jest.mock('@/components/location-modal/LocationModal', () => ({ __esModule: true, default: () => null }))
 jest.mock('@/components/theme-modal/ThemeModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="theme-modal" /> : null),
@@ -32,11 +31,10 @@ beforeEach(() => {
   setUser({ location: 'ES', favorite_game: { id: 1, title: 'Zelda', imageIcon: '/z.png' } })
 })
 
-test('lists theme, language, country and a favourite per platform', () => {
+test('lists theme, language and a favourite per platform', () => {
   render(<UserPreferencesCard />)
   expect(screen.getByText(en.userPage.preferences)).toBeInTheDocument()
   expect(screen.getByText('dark')).toBeInTheDocument()
-  expect(screen.getByText('Spain')).toBeInTheDocument()
   expect(screen.getByText('Zelda')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteSteamGame) })).toHaveTextContent(
     en.userData.notSet,
