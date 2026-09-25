@@ -12,6 +12,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamLink, STEAM_LINK_URL, SteamLinkStatus } from '@/hooks/useSteamLink'
+import { useSteamProfile } from '@/hooks/useSteamProfile'
 import { useUserRank } from '@/hooks/useUserRank'
 import { useUserAwards } from '@/hooks/useUserAwards'
 import { formatPlaytime, summarizeSteamLibrary } from '@/utils/steamFeed'
@@ -42,6 +43,7 @@ export default function UserPlatforms() {
   const { T, lang } = useLanguage()
   const { steamId, steamUsername, isLinked: steamLinked, status, isUnlinking, disconnect } = useSteamLink()
   const { library, libraryLoading } = useSteamGamesData()
+  const { profile: steamProfile } = useSteamProfile()
   const { all, inProgress } = useGamesData()
   const { rank, isLoading: rankLoading } = useUserRank()
   const { awards, isLoading: awardsLoading } = useUserAwards()
@@ -151,9 +153,20 @@ export default function UserPlatforms() {
         identity={
           steamLinked ? (
             <div className="flex items-center gap-3 min-w-0">
-              <SteamLogo size={40} className="shrink-0 text-text-secondary" aria-hidden="true" />
+              {steamProfile?.avatarfull ? (
+                <Image
+                  src={steamProfile.avatarfull}
+                  alt=""
+                  width={44}
+                  height={44}
+                  className="rounded-lg w-11 h-11 object-cover shrink-0"
+                  unoptimized
+                />
+              ) : (
+                <SteamLogo size={40} className="shrink-0 text-text-secondary" aria-hidden="true" />
+              )}
               <div className="flex flex-col gap-0.5 min-w-0">
-                <span className="font-bold truncate">{steamUsername || '—'}</span>
+                <span className="font-bold truncate">{steamProfile?.personaname || steamUsername || '—'}</span>
                 <span className="text-xs text-text-secondary font-mono truncate">{steamId}</span>
               </div>
             </div>

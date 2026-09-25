@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import UserPlatforms from './UserPlatforms'
 import { useSession } from 'next-auth/react'
 import { useSteamLink } from '@/hooks/useSteamLink'
+import { useSteamProfile } from '@/hooks/useSteamProfile'
 import { unlinkRaUser } from '@/utils/apiCallsUtils'
 import { en } from '@/translations/en'
 
@@ -10,6 +11,7 @@ jest.mock('@/hooks/useSteamLink', () => ({
   useSteamLink: jest.fn(),
 }))
 jest.mock('@/utils/apiCallsUtils', () => ({ unlinkRaUser: jest.fn() }))
+jest.mock('@/hooks/useSteamProfile', () => ({ useSteamProfile: jest.fn(() => ({ profile: null })) }))
 jest.mock('@/hooks/useUserRank', () => ({ useUserRank: () => ({ rank: { Rank: 16520 }, isLoading: false }) }))
 jest.mock('@/hooks/useUserAwards', () => ({ useUserAwards: () => ({ awards: { MasteryAwardsCount: 12 }, isLoading: false }) }))
 jest.mock('@/context/GamesDataContext', () => ({ useGamesData: () => ({ all: [{}, {}], inProgress: [{}], hardcore: [], softcore: [] }) }))
@@ -91,4 +93,20 @@ test('a failed Steam link is announced', () => {
   setSteam({ isLinked: false, status: 'failed' })
   render(<UserPlatforms />)
   expect(screen.getByRole('alert')).toHaveTextContent(en.userData.steamFailed)
+})
+
+test('the Steam card shows the Steam profile picture and name, as RA does', () => {
+  ;(useSteamProfile as jest.Mock).mockReturnValue({
+    profile: { personaname: 'Palmera', avatarfull: 'https://avatars.steamstatic.com/abc_full.jpg' },
+  })
+  const { container } = render(<UserPlatforms />)
+  const steam = screen.getByRole('region', { name: 'Steam' })
+  expect(steam).toHaveTextContent('Palmera')
+  expect(container.querySelector('img[src*="avatars.steamstatic.com"]')).not.toBeNull()
+})
+
+test('falls back to the Steam logo until the profile loads', () => {
+  ;(useSteamProfile as jest.Mock).mockReturnValue({ profile: null })
+  render(<UserPlatforms />)
+  expect(screen.getByRole('region', { name: 'Steam' })).toHaveTextContent('ivan')
 })
