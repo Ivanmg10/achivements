@@ -1,29 +1,45 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { motion, useMotionValue, useReducedMotion } from 'framer-motion'
+import AuthCollageTile from './auth-collage-tile/AuthCollageTile'
 import { steamAssetUrl } from '@/lib/steamClient'
 
-const RA_IMAGES = [
+const RA_IMAGES: string[] = [
   'https://media.retroachievements.org/Images/122047.png',
   'https://media.retroachievements.org/Images/097499.png',
   'https://media.retroachievements.org/Images/107150.png',
-  'https://media.retroachievements.org/Images/084102.png',
-  'https://media.retroachievements.org/Images/069307.png',
-  'https://media.retroachievements.org/Images/111905.png',
-  'https://media.retroachievements.org/Images/060409.png',
-  'https://media.retroachievements.org/Images/052570.png',
-  'https://media.retroachievements.org/Images/063596.png',
-  'https://media.retroachievements.org/Images/086406.png',
-  'https://media.retroachievements.org/Images/065049.png',
-  'https://media.retroachievements.org/Images/077137.png',
-  'https://media.retroachievements.org/Images/065707.png',
-  'https://media.retroachievements.org/Images/078392.png',
-  'https://media.retroachievements.org/Images/074003.png',
-  'https://media.retroachievements.org/Images/054157.png',
-  'https://media.retroachievements.org/Images/098860.png',
-  'https://media.retroachievements.org/Images/063805.png',
-  'https://media.retroachievements.org/Images/084414.png',
-  'https://media.retroachievements.org/Images/069905.png',
+  'https://media.retroachievements.org/Images/109728.png',
+  'https://media.retroachievements.org/Images/104482.png',
+  'https://media.retroachievements.org/Images/061105.png',
+  'https://media.retroachievements.org/Images/089222.png',
+  'https://media.retroachievements.org/Images/109943.png',
+  'https://media.retroachievements.org/Images/022051.png',
+  'https://media.retroachievements.org/Images/095107.png',
+  'https://media.retroachievements.org/Images/113279.png',
+  'https://media.retroachievements.org/Images/112421.png',
+  'https://media.retroachievements.org/Images/067087.png',
+  'https://media.retroachievements.org/Images/106752.png',
+  'https://media.retroachievements.org/Images/068336.png',
+  'https://media.retroachievements.org/Images/064807.png',
+  'https://media.retroachievements.org/Images/116501.png',
+  'https://media.retroachievements.org/Images/124258.png',
+  'https://media.retroachievements.org/Images/125487.png',
+  'https://media.retroachievements.org/Images/112858.png',
+  'https://media.retroachievements.org/Images/104260.png',
+  'https://media.retroachievements.org/Images/105173.png',
+  'https://media.retroachievements.org/Images/068144.png',
+  'https://media.retroachievements.org/Images/114756.png',
+  'https://media.retroachievements.org/Images/062373.png',
+  'https://media.retroachievements.org/Images/103756.png',
+  'https://media.retroachievements.org/Images/093950.png',
+  'https://media.retroachievements.org/Images/100662.png',
+  'https://media.retroachievements.org/Images/058558.png',
+  'https://media.retroachievements.org/Images/122562.png',
+  'https://media.retroachievements.org/Images/126558.png',
+  'https://media.retroachievements.org/Images/071275.png',
+  'https://media.retroachievements.org/Images/124487.png',
+  'https://media.retroachievements.org/Images/052103.png',
   'https://media.retroachievements.org/Images/060426.png',
   'https://media.retroachievements.org/Images/104787.png',
   'https://media.retroachievements.org/Images/045842.png',
@@ -44,21 +60,11 @@ const STEAM_APP_IDS = [
   489830, // The Elder Scrolls V: Skyrim Special Edition
 ]
 
-/** RA first, Steam threaded in every fourth slot: both platforms, no clumping. */
-const TILE_IMAGES = (() => {
-  const steam = STEAM_APP_IDS.map((id) => steamAssetUrl(id, 'cover'))
-  const out: string[] = []
-  let s = 0
-  for (let i = 0; i < RA_IMAGES.length; i++) {
-    if (i > 0 && i % 4 === 0 && s < steam.length) out.push(steam[s++])
-    out.push(RA_IMAGES[i])
-  }
-  return out
-})()
+const ALL_IMAGES = [...RA_IMAGES, ...STEAM_APP_IDS.map((id) => steamAssetUrl(id, 'cover'))]
 
 // 6 rows × 4 columns, each row staggered so neighbours overlap instead of
 // lining up in a grid.
-const POSITIONS: { top: string; left: string; rotate: number; z: number }[] = [
+const POSITIONS = [
   { top: '1%', left: '3%', rotate: -11, z: 3 },
   { top: '4%', left: '26%', rotate: 7, z: 5 },
   { top: '0%', left: '51%', rotate: -5, z: 1 },
@@ -85,24 +91,6 @@ const POSITIONS: { top: string; left: string; rotate: number; z: number }[] = [
   { top: '92%', left: '89%', rotate: 9, z: 1 },
 ]
 
-/**
- * Each tile drifts on its own slow loop. Everything is derived from the
- * tile's index rather than random, so the server and the browser draw the
- * same thing, and no two neighbours ever move in step.
- */
-function drift(i: number) {
-  const dx = ((i % 5) - 2) * 3 // -6…6 px
-  const dy = ((i % 3) - 1) * 5 // -5…5 px
-  const dr = ((i % 4) - 1.5) * 0.9 // ±1.35 deg
-  return {
-    x: [0, dx, 0, -dx, 0],
-    y: [0, dy, -dy, dy / 2, 0],
-    rotate: [0, dr, -dr, dr / 2, 0],
-    duration: 14 + (i % 7) * 2, // 14…26 s
-    delay: (i % 9) * 0.7,
-  }
-}
-
 const containerVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.045 } },
@@ -113,17 +101,81 @@ const itemVariants = {
   visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
 }
 
+/** How often a tile turns over to show a different game, and how long that takes. */
+const FLIP_EVERY_MS = 3200
+const FLIP_MS = 700
+
 /**
- * The art wall beside the sign-in form: game boxes from both platforms,
- * scattered and overlapping. They fade in on load, then breathe — a few
- * pixels each, slowly and out of step — so the panel feels alive without
- * pulling the eye off the form. Still under reduced motion.
+ * The art wall beside the sign-in and register forms: game boxes from both
+ * platforms, scattered and overlapping.
+ *
+ * Every visit deals a different hand from the pool. The tiles lean towards the
+ * pointer by depth, breathe on their own slow loops, and every few seconds one
+ * turns over and comes back as another game — the wall keeps re-dealing itself
+ * while you type. All of it stops under reduced motion.
  */
 export default function AuthCollagePanel() {
   const reduce = useReducedMotion()
+  const still = Boolean(reduce)
+
+  // A fixed slice first, so the server and the first paint agree; a different
+  // draw once mounted, so no two visits look the same.
+  const [images, setImages] = useState(() => ALL_IMAGES.slice(0, POSITIONS.length))
+  const [flipping, setFlipping] = useState<number | null>(null)
+
+  const pointerX = useMotionValue(0)
+  const pointerY = useMotionValue(0)
+
+  useEffect(() => {
+    setImages([...ALL_IMAGES].sort(() => Math.random() - 0.5).slice(0, POSITIONS.length))
+  }, [])
+
+  useEffect(() => {
+    if (still) return
+    const timers: ReturnType<typeof setTimeout>[] = []
+
+    const interval = setInterval(() => {
+      const i = Math.floor(Math.random() * POSITIONS.length)
+      setFlipping(i)
+      // Swap while the tile is edge-on, so the change is never seen happening.
+      timers.push(
+        setTimeout(() => {
+          setImages((prev) => {
+            const spare = ALL_IMAGES.filter((src) => !prev.includes(src))
+            if (!spare.length) return prev
+            const next = [...prev]
+            next[i] = spare[Math.floor(Math.random() * spare.length)]
+            return next
+          })
+        }, FLIP_MS / 2),
+      )
+      timers.push(setTimeout(() => setFlipping(null), FLIP_MS))
+    }, FLIP_EVERY_MS)
+
+    return () => {
+      clearInterval(interval)
+      timers.forEach(clearTimeout)
+    }
+  }, [still])
+
+  function handlePointer(e: React.MouseEvent<HTMLDivElement>) {
+    if (still) return
+    const box = e.currentTarget.getBoundingClientRect()
+    pointerX.set(((e.clientX - box.left) / box.width) * 2 - 1)
+    pointerY.set(((e.clientY - box.top) / box.height) * 2 - 1)
+  }
+
+  function resetPointer() {
+    pointerX.set(0)
+    pointerY.set(0)
+  }
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-bg-card">
+    <div
+      className="relative w-full h-full overflow-hidden bg-bg-card"
+      onMouseMove={handlePointer}
+      onMouseLeave={resetPointer}
+    >
       {/* subtle accent glow behind images */}
       <div className="absolute inset-0 bg-linear-to-br from-accent/10 via-transparent to-bg-secondary/60" />
 
@@ -139,38 +191,19 @@ export default function AuthCollagePanel() {
         initial="hidden"
         animate="visible"
       >
-        {POSITIONS.map((pos, i) => {
-          const { duration, delay, ...path } = drift(i)
-          return (
-            <motion.div
-              key={i}
-              variants={itemVariants}
-              className="absolute"
-              style={{ top: pos.top, left: pos.left, zIndex: pos.z }}
-            >
-              <motion.div
-                animate={reduce ? undefined : path}
-                transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <div style={{ transform: `rotate(${pos.rotate}deg)` }}>
-                  <div className="bg-bg-tertiary p-1.5 rounded-xl shadow-2xl border border-white/10 hover:scale-110 hover:shadow-accent/25 transition-transform duration-200">
-                    <img
-                      src={TILE_IMAGES[i % TILE_IMAGES.length]}
-                      alt=""
-                      aria-hidden="true"
-                      className="w-24 h-24 object-cover rounded-lg"
-                      loading="lazy"
-                      // A wrong id would otherwise sit as a broken-image icon forever.
-                      onError={(e) => {
-                        e.currentTarget.style.visibility = 'hidden'
-                      }}
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )
-        })}
+        {POSITIONS.map((pos, i) => (
+          <motion.div key={i} variants={itemVariants}>
+            <AuthCollageTile
+              src={images[i]}
+              position={pos}
+              index={i}
+              flipping={flipping === i}
+              still={still}
+              pointerX={pointerX}
+              pointerY={pointerY}
+            />
+          </motion.div>
+        ))}
       </motion.div>
     </div>
   )

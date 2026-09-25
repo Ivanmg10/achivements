@@ -17,7 +17,8 @@ const AnimatePresence = ({ children }) => children
 const useAnimation = () => ({ start: jest.fn(), stop: jest.fn() })
 const useInView = () => true
 const useMotionValue = (v) => ({ get: () => v, set: jest.fn() })
-const useTransform = () => ({ get: () => 0 })
+const useTransform = () => ({ get: () => 0, set: jest.fn() })
+const useSpring = (v) => v ?? { get: () => 0, set: jest.fn() }
 const useReducedMotion = () => false
 
-module.exports = { motion, AnimatePresence, useAnimation, useInView, useMotionValue, useTransform, useReducedMotion }
+module.exports = { motion, AnimatePresence, useAnimation, useInView, useMotionValue, useTransform, useReducedMotion, useSpring }
