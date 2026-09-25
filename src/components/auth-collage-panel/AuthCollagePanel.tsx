@@ -64,7 +64,7 @@ const COLUMNS = 4
 /** Seconds per full pass, one per column: slow enough to read, never matching. */
 const COLUMN_SECONDS = [82, 104, 74, 94]
 /** Head start per column, so tiles never line up as a grid. */
-const COLUMN_OFFSETS = ['-6rem', '2rem', '-3rem', '4rem']
+const COLUMN_OFFSETS = ['-9rem', '3rem', '-5rem', '7rem']
 /** Fixed tilt per tile, cycling — not random, so the markup is the same everywhere. */
 const ROTATIONS = [-8, 6, -4, 10, -7, 5, -11, 8, -3, 9, -6, 7]
 
@@ -104,7 +104,7 @@ export default function AuthCollagePanel() {
       <div className="absolute inset-x-0 top-0 h-16 z-20 bg-linear-to-b from-bg-main to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-16 z-20 bg-linear-to-t from-bg-main to-transparent pointer-events-none" />
 
-      <div className="absolute inset-0 flex items-start gap-8 px-8">
+      <div className="absolute inset-0 flex items-start gap-4 px-4">
         {intoColumns(images).map((column, c) => {
           // Doubled so translateY(-50%) always lands on an identical frame.
           const tiles = [...column, ...column]
@@ -112,7 +112,7 @@ export default function AuthCollagePanel() {
             <div key={c} className="flex-1 h-full overflow-hidden">
               <div
                 data-column={c}
-                className="marquee-column flex flex-col items-center gap-10 hover:[animation-play-state:paused]"
+                className="marquee-column flex flex-col items-center gap-28 hover:[animation-play-state:paused]"
                 style={{
                   marginTop: COLUMN_OFFSETS[c % COLUMN_OFFSETS.length],
                   willChange: 'transform',
@@ -127,7 +127,7 @@ export default function AuthCollagePanel() {
                     key={i}
                     /* A little sideways lean per tile breaks the column into a scatter. */
                     style={{
-                      transform: `translateX(${((i + c) % 3) - 1}rem) rotate(${ROTATIONS[(c + i) % ROTATIONS.length]}deg)`,
+                      transform: `translateX(${(((i + c) % 4) - 1.5) * 1.8}rem) rotate(${ROTATIONS[(c + i) % ROTATIONS.length]}deg)`,
                     }}
                   >
                     <div className="bg-bg-tertiary p-1.5 rounded-xl shadow-2xl border border-white/10 hover:scale-110 hover:shadow-accent/25 transition-transform duration-200">
