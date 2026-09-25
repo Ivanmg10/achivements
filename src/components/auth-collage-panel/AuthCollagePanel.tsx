@@ -110,9 +110,105 @@ const STEAM_APP_IDS = [
   1817070, // Marvel's Spider-Man Remastered
   22380, // Fallout: New Vegas
   489830, // The Elder Scrolls V: Skyrim Special Edition
+  251570, // 7 Days to Die
+  813780, // Age of Empires II: Definitive Edition
+  933110, // Age of Empires III: Definitive Edition
+  1017900, // Age of Empires: Definitive Edition
+  33230, // Assassin's Creed 2
+  48190, // Assassin’s Creed Brotherhood
+  582160, // Assassin's Creed Origins
+  289650, // Assassin's Creed Unity
+  2379780, // Balatro
+  7670, // BioShock
+  8850, // BioShock 2
+  774361, // Blasphemous
+  49520, // Borderlands 2
+  729040, // Borderlands Game of the Year Enhanced
+  2835570, // Buckshot Roulette
+  7940, // Call of Duty 4: Modern Warfare
+  42700, // Call of Duty: Black Ops
+  202970, // Call of Duty: Black Ops II
+  311210, // Call of Duty: Black Ops III
+  10180, // Call of Duty: Modern Warfare 2
+  504230, // Celeste
+  3321460, // Crimson Desert Enhanced
+  1091500, // Cyberpunk 2077
+  335300, // DARK SOULS II: Scholar of the First Sin
+  570940, // DARK SOULS: REMASTERED
+  262060, // Darkest Dungeon
+  427190, // DEAD RISING
+  45740, // Dead Rising 2
+  265550, // Dead Rising 3 Apocalypse Edition
+  205100, // Dishonored
+  454650, // DRAGON BALL XENOVERSE 2
+  1790600, // DRAGON BALL: Sparking! ZERO
+  1295510, // DRAGON QUEST XI S: Echoes of an Elusive Age - Definitive Edition
+  312530, // Duck Game
+  239140, // Dying Light
+  1245620, // ELDEN RING
+  377160, // Fallout 4
+  19900, // Far Cry 2
+  220240, // Far Cry 3
+  298110, // Far Cry 4
+  12210, // Grand Theft Auto IV: The Complete Edition
+  12220, // Grand Theft Auto: Episodes from Liberty City
+  599140, // Graveyard Keeper
+  219990, // Grim Dawn
+  1145360, // Hades
+  1145350, // Hades II
+  70, // Half-Life
+  220, // Half-Life 2
+  219150, // Hotline Miami
+  2799860, // INAZUMA ELEVEN: Victory Road
+  232090, // Killing Floor 2
+  1041720, // Kingdoms of Amalur: Re-Reckoning
+  1030830, // Mafia II: Definitive Edition
+  1328670, // Mass Effect Legendary Edition
+  286690, // Metro 2033 Redux
+  287390, // Metro: Last Light Redux
+  2246340, // Monster Hunter Wilds
+  582010, // Monster Hunter: World
+  535520, // Nidhogg 2
+  485510, // Nioh: Complete Edition
+  275850, // No Man's Sky
+  2824660, // Old School Rally
+  238320, // Outlast
+  400, // Portal
+  620, // Portal 2
+  1174180, // Red Dead Redemption 2
+  418370, // Resident Evil 7 Biohazard
+  814380, // Sekiro: Shadows Die Twice - GOTY Edition
+  962730, // Skater XL - The Ultimate Skateboarding Game
+  646570, // Slay the Spire
+  2868840, // Slay the Spire 2
+  17390, // SPORE
+  32370, // STAR WARS Knights of the Old Republic
+  208580, // STAR WARS Knights of the Old Republic II - The Sith Lords
+  1286830, // STAR WARS: The Old Republic
+  413150, // Stardew Valley
+  1049410, // Superliminal
+  22330, // The Elder Scrolls IV: Oblivion GOTY
+  305620, // The Long Dark
+  292030, // The Witcher 3: Wild Hunt
+  391540, // Undertale
+  1794680, // Vampire Survivors
+  230410, // Warframe
 ]
 
-const ALL_IMAGES = [...RA_IMAGES, ...STEAM_APP_IDS.map((id) => steamAssetUrl(id, 'cover'))]
+/** These have no portrait cover on the CDN, so they use the wide header instead. */
+const STEAM_HEADER_IDS = [
+  15100, // Assassin's Creed: Director's Cut
+  201870, // Assassin's Creed Revelations
+  911400, // Assassin's Creed III Remastered
+  592390, // STAY
+  243470, // Watch Dogs
+]
+
+const ALL_IMAGES = [
+  ...RA_IMAGES,
+  ...STEAM_APP_IDS.map((id) => steamAssetUrl(id, 'cover')),
+  ...STEAM_HEADER_IDS.map((id) => steamAssetUrl(id, 'header')),
+]
 
 const COLUMNS = 4
 /** How many of the pool are on screen: enough to fill the columns, few enough
