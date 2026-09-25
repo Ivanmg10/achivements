@@ -29,14 +29,14 @@ async function saveFavorite(source: GameSource, game: FavoriteGame | null) {
 }
 
 function FavoriteValue({ game, source, empty }: { game: FavoriteGame | null; source: GameSource; empty: string }) {
-  if (!game) return <span className="text-sm text-text-secondary italic truncate">{empty}</span>
+  if (!game) return <span className="text-base text-text-secondary italic truncate">{empty}</span>
   const icon = candidateIconUrl({ source, imageRef: game.imageIcon })
   return (
     <span className="flex items-center gap-1.5 min-w-0">
       {icon && (
-        <Image src={icon} alt="" width={20} height={20} className="w-5 h-5 rounded object-cover shrink-0" unoptimized />
+        <Image src={icon} alt="" width={32} height={32} className="w-8 h-8 rounded-lg object-cover shrink-0" unoptimized />
       )}
-      <span className="text-sm font-medium truncate">{game.title}</span>
+      <span className="text-base font-medium truncate">{game.title}</span>
     </span>
   )
 }
@@ -66,46 +66,46 @@ export default function UserPreferencesCard() {
   }
 
   return (
-    <section className="bg-bg-card rounded-3xl p-5 flex flex-col gap-4 h-full">
+    <section className="bg-bg-card rounded-3xl p-6 flex flex-col gap-5 h-full">
       <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
         {T.userPage.preferences}
       </h2>
 
-      <div className="bg-bg-main rounded-2xl p-4 flex flex-col gap-3.5">
+      <div className="bg-bg-main rounded-2xl p-5 flex flex-col gap-5 flex-1">
         <ProfileField label={T.userTheme.theme} onEdit={() => setThemeOpen(true)}>
           <span className="flex items-center gap-2 min-w-0">
-            <span aria-hidden="true" className="w-3.5 h-3.5 rounded-full bg-accent shrink-0" />
-            <span className="text-sm font-medium capitalize truncate">{theme}</span>
+            <span aria-hidden="true" className="w-4 h-4 rounded-full bg-accent shrink-0" />
+            <span className="text-base font-medium capitalize truncate">{theme}</span>
           </span>
         </ProfileField>
 
         <ProfileField label={T.userConfig.language} onEdit={() => setLangOpen(true)}>
-          <span className="text-sm font-medium uppercase">{lang}</span>
+          <span className="text-base font-medium uppercase">{lang}</span>
         </ProfileField>
 
         <ProfileField label={T.userData.location} onEdit={() => setLocationOpen(true)}>
           {country ? (
             <span className="flex items-center gap-2 min-w-0">
-              <span className="text-lg leading-none" aria-hidden="true">
+              <span className="text-xl leading-none" aria-hidden="true">
                 {codeToFlag(country.code)}
               </span>
-              <span className="text-sm font-medium truncate">{country.name}</span>
+              <span className="text-base font-medium truncate">{country.name}</span>
             </span>
           ) : (
-            <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
+            <span className="text-base text-text-secondary italic">{T.userData.notSet}</span>
           )}
         </ProfileField>
 
         <ProfileField label={T.userPage.favoriteRaGame} onEdit={() => setFavoriteOpen('ra')}>
           <span className="flex items-center gap-1.5 min-w-0">
-            <RaLogo height={12} className="opacity-70" />
+            <RaLogo height={14} className="opacity-70" />
             <FavoriteValue game={raFavorite} source="ra" empty={T.userData.notSet} />
           </span>
         </ProfileField>
 
         <ProfileField label={T.userPage.favoriteSteamGame} onEdit={() => setFavoriteOpen('steam')}>
           <span className="flex items-center gap-1.5 min-w-0">
-            <SteamLogo size={13} className="text-[#66c0f4]" aria-hidden="true" />
+            <SteamLogo size={15} className="text-[#66c0f4]" aria-hidden="true" />
             <FavoriteValue game={steamFavorite} source="steam" empty={T.userData.notSet} />
           </span>
         </ProfileField>

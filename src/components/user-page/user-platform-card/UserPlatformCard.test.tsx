@@ -1,9 +1,13 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import UserPlatformCard from './UserPlatformCard'
 import { en } from '@/translations/en'
 
-test('connected: shows the account, the data toggle and disconnect', () => {
-  const onToggleData = jest.fn()
+const STATS = [
+  { label: 'Games', value: '120' },
+  { label: 'Perfect', value: '8' },
+]
+
+test('connected: the account, its numbers and the disconnect button', () => {
   render(
     <UserPlatformCard
       name="Steam"
@@ -11,49 +15,33 @@ test('connected: shows the account, the data toggle and disconnect', () => {
       accent="bg-blue-500"
       connected
       identity={<p>ivanxmarine</p>}
-      connectAction={<button>Connect</button>}
-      disconnectAction={<button>Disconnect</button>}
-      dataOpen={false}
-      onToggleData={onToggleData}
-      dataPanelId="panel"
+      stats={STATS}
+      action={<button>Disconnect</button>}
     />,
   )
 
   expect(screen.getByRole('region', { name: 'Steam' })).toBeInTheDocument()
   expect(screen.getByText(en.userData.connected)).toBeInTheDocument()
   expect(screen.getByText('ivanxmarine')).toBeInTheDocument()
+  expect(screen.getByText('Games')).toBeInTheDocument()
+  expect(screen.getByText('120')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Disconnect' })).toBeInTheDocument()
-  expect(screen.queryByRole('button', { name: 'Connect' })).not.toBeInTheDocument()
-
-  const toggle = screen.getByRole('button', { name: en.userPage.viewData })
-  expect(toggle.getAttribute('aria-expanded')).toBe('false')
-  expect(toggle.getAttribute('aria-controls')).toBe('panel')
-  fireEvent.click(toggle)
-  expect(onToggleData).toHaveBeenCalled()
 })
 
-test('open: the toggle offers to hide the data', () => {
-  render(
-    <UserPlatformCard name="Steam" logo={null} accent="" connected dataOpen onToggleData={jest.fn()} />,
-  )
-  expect(screen.getByRole('button', { name: en.userPage.hideData }).getAttribute('aria-expanded')).toBe('true')
-})
-
-test('disconnected: only connect, no data toggle', () => {
+test('disconnected: says so, and shows no numbers', () => {
   render(
     <UserPlatformCard
       name="Steam"
       logo={null}
       accent=""
       connected={false}
-      connectAction={<button>Connect</button>}
-      disconnectAction={<button>Disconnect</button>}
-      onToggleData={jest.fn()}
+      identity={<p>Connect Steam to…</p>}
+      action={<button>Connect</button>}
     />,
   )
   expect(screen.getByText(en.userData.notConnected)).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Connect' })).toBeInTheDocument()
-  expect(screen.queryByRole('button', { name: en.userPage.viewData })).not.toBeInTheDocument()
+  expect(document.querySelector('dl')).toBeNull()
 })
 
 test('a platform that is not ready yet says so', () => {

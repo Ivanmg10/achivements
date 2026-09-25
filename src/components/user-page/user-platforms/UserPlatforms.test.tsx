@@ -10,17 +10,13 @@ jest.mock('@/hooks/useSteamLink', () => ({
   useSteamLink: jest.fn(),
 }))
 jest.mock('@/utils/apiCallsUtils', () => ({ unlinkRaUser: jest.fn() }))
+jest.mock('@/hooks/useUserRank', () => ({ useUserRank: () => ({ rank: { Rank: 16520 }, isLoading: false }) }))
+jest.mock('@/hooks/useUserAwards', () => ({ useUserAwards: () => ({ awards: { MasteryAwardsCount: 12 }, isLoading: false }) }))
+jest.mock('@/context/GamesDataContext', () => ({ useGamesData: () => ({ all: [{}, {}], inProgress: [{}], hardcore: [], softcore: [] }) }))
+jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: () => ({ library: [], libraryLoading: false }) }))
 jest.mock('@/components/ra-login-modal/RaLoginModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="ra-modal" /> : null),
-}))
-jest.mock('@/components/user-stats/user-ra-stats/UserRaStats', () => ({
-  __esModule: true,
-  default: () => <div data-testid="ra-stats" />,
-}))
-jest.mock('@/components/user-stats/user-steam-stats/UserSteamStats', () => ({
-  __esModule: true,
-  default: () => <div data-testid="steam-stats" />,
 }))
 
 const disconnect = jest.fn()
@@ -62,20 +58,13 @@ test('a connected platform shows the account it is connected as', () => {
   expect(screen.getByText('765')).toBeInTheDocument()
 })
 
-test('opening a platform shows its data, and only one at a time', () => {
+test('each connected platform shows its headline numbers', () => {
   render(<UserPlatforms />)
-  expect(screen.queryByTestId('ra-stats')).not.toBeInTheDocument()
-
-  const [raToggle, steamToggle] = screen.getAllByRole('button', { name: en.userPage.viewData })
-  fireEvent.click(raToggle)
-  expect(screen.getByTestId('ra-stats')).toBeInTheDocument()
-
-  fireEvent.click(steamToggle)
-  expect(screen.getByTestId('steam-stats')).toBeInTheDocument()
-  expect(screen.queryByTestId('ra-stats')).not.toBeInTheDocument()
-
-  fireEvent.click(screen.getByRole('button', { name: en.userPage.hideData }))
-  expect(screen.queryByTestId('steam-stats')).not.toBeInTheDocument()
+  const ra = screen.getByRole('region', { name: 'RetroAchievements' })
+  expect(ra).toHaveTextContent(en.userStats.globalRank)
+  expect(ra).toHaveTextContent(/4.?200/)
+  expect(screen.getByRole('region', { name: 'Steam' })).toHaveTextContent(en.steam.perfect)
+  expect(screen.queryByRole('button', { name: en.userPage.viewData })).not.toBeInTheDocument()
 })
 
 test('disconnecting: RA unlinks, Steam disconnects', () => {
@@ -92,7 +81,6 @@ test('disconnected platforms offer to connect instead', () => {
   setSteam({ isLinked: false })
   render(<UserPlatforms />)
 
-  expect(screen.queryByRole('button', { name: en.userPage.viewData })).not.toBeInTheDocument()
   expect(screen.getByRole('link', { name: en.userData.steamConnect }).getAttribute('href')).toContain('/api/steam/link')
 
   fireEvent.click(screen.getByRole('button', { name: en.userData.signInRA }))

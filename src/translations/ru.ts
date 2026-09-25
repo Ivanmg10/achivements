@@ -139,6 +139,7 @@ export const ru: Translations = {
   },
   userPage: {
     preferences: 'Настройки',
+    library: 'Ваша коллекция',
     favoriteRaGame: 'Любимая игра в RA',
     favoriteSteamGame: 'Любимая игра в Steam',
     viewData: 'Показать данные',

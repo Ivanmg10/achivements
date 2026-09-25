@@ -137,6 +137,7 @@ export const en = {
   },
   userPage: {
     preferences: 'Preferences',
+    library: 'Your vault',
     favoriteRaGame: 'Favourite RA game',
     favoriteSteamGame: 'Favourite Steam game',
     viewData: 'View data',

@@ -1,10 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import UserIdentityCard from './UserIdentityCard'
 import { useSession, signOut } from 'next-auth/react'
-import { useUserRank } from '@/hooks/useUserRank'
 import { en } from '@/translations/en'
 
-jest.mock('@/hooks/useUserRank', () => ({ useUserRank: jest.fn() }))
 jest.mock('@/components/change-password-modal/ChangePasswordModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="password-modal" /> : null),
@@ -22,23 +20,20 @@ function setUser(user: Record<string, unknown> = USER) {
 
 beforeEach(() => {
   jest.clearAllMocks()
-  ;(useUserRank as jest.Mock).mockReturnValue({ rank: { Rank: 1234 }, isLoading: false })
   setUser()
 })
 
-test('shows who you are: name, id, country, email and RA rank', () => {
+test('shows who you are: name, id, country and email', () => {
   render(<UserIdentityCard />)
   expect(screen.getByRole('heading', { name: 'ivanxmarine' })).toBeInTheDocument()
   expect(screen.getByText('ID: 3')).toBeInTheDocument()
   expect(screen.getByText('Spain')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: `${en.userData.email}: a@b.c` })).toBeInTheDocument()
-  expect(screen.getByText(/^#1.?234$/)).toBeInTheDocument()
 })
 
-test('no rank without RetroAchievements', () => {
-  setUser({ ...USER, rausername: undefined })
+test('the RetroAchievements rank belongs to its platform card, not here', () => {
   render(<UserIdentityCard />)
-  expect(screen.queryByText(/^#1.?234$/)).not.toBeInTheDocument()
+  expect(screen.queryByText(en.userStats.globalRank)).not.toBeInTheDocument()
 })
 
 test('the admin badge is only for admins', () => {

@@ -139,6 +139,7 @@ export const it: Translations = {
   },
   userPage: {
     preferences: 'Preferenze',
+    library: 'La tua collezione',
     favoriteRaGame: 'Gioco RA preferito',
     favoriteSteamGame: 'Gioco Steam preferito',
     viewData: 'Vedi i dati',

@@ -1,17 +1,18 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
+export type PlatformStat = { label: string; value: string; accent?: string }
+
 /**
- * One platform on the account page: its logo, whether it is connected, who
- * it is connected as, and the three things you can do with it — connect,
- * look at your data, disconnect.
+ * One platform on the account page: its logo, whether it is connected, the
+ * account it is connected as, its headline numbers, and the one button that
+ * changes anything — connect or disconnect.
  *
- * The shell is shared so RetroAchievements, Steam and PlayStation read as
- * the same kind of thing; each card passes its own identity block, buttons
- * and accent. A platform that is not available yet passes `soon`.
+ * The shell is shared so RetroAchievements, Steam and PlayStation read as the
+ * same kind of thing; each card passes its own identity, numbers and accent.
+ * A platform that is not available yet passes `soon`.
  */
 export default function UserPlatformCard({
   name,
@@ -21,15 +22,12 @@ export default function UserPlatformCard({
   soon = false,
   status,
   identity,
-  connectAction,
-  disconnectAction,
-  dataOpen,
-  onToggleData,
-  dataPanelId,
+  stats = [],
+  action,
 }: {
   name: string
   logo: ReactNode
-  /** Tailwind classes tinting the card's top edge and chips. */
+  /** Tailwind classes tinting the card's top edge. */
   accent: string
   connected: boolean
   soon?: boolean
@@ -37,18 +35,16 @@ export default function UserPlatformCard({
   status?: ReactNode
   /** Account details once connected. */
   identity?: ReactNode
-  connectAction?: ReactNode
-  disconnectAction?: ReactNode
-  dataOpen?: boolean
-  onToggleData?: () => void
-  dataPanelId?: string
+  /** Four or five headline numbers, side by side. */
+  stats?: PlatformStat[]
+  action?: ReactNode
 }) {
   const { T } = useLanguage()
 
   return (
     <section
       aria-label={name}
-      className={`relative bg-bg-card rounded-3xl p-5 flex flex-col gap-3 ring-1 ring-white/5 overflow-hidden ${
+      className={`relative bg-bg-card rounded-3xl p-5 flex flex-col gap-4 ring-1 ring-white/5 overflow-hidden ${
         soon ? 'opacity-60' : ''
       }`}
     >
@@ -61,11 +57,7 @@ export default function UserPlatformCard({
         </span>
         <span
           className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-            soon
-              ? 'bg-white/5 text-text-secondary'
-              : connected
-                ? 'bg-green-500/20 text-green-400'
-                : 'bg-white/5 text-text-secondary'
+            connected && !soon ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-text-secondary'
           }`}
         >
           {soon ? T.userData.comingSoon : connected ? T.userData.connected : T.userData.notConnected}
@@ -74,26 +66,28 @@ export default function UserPlatformCard({
 
       {status}
 
-      <div className="flex-1 min-h-0">{identity}</div>
+      {identity}
 
-      <div className="flex flex-col gap-2">
-        {connected && onToggleData && (
-          <button
-            onClick={onToggleData}
-            aria-expanded={dataOpen}
-            aria-controls={dataPanelId}
-            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl bg-bg-main text-sm font-medium text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            {dataOpen ? T.userPage.hideData : T.userPage.viewData}
-            <IconChevronDown
-              size={14}
-              aria-hidden="true"
-              className={`transition-transform duration-300 ${dataOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-        )}
-        {connected ? disconnectAction : connectAction}
-      </div>
+      {stats.length > 0 && (
+        <dl className="grid grid-cols-2 gap-2">
+          {stats.map((stat, i) => (
+            <div
+              key={stat.label}
+              /* An odd count leaves the last one alone on its row: let it fill it. */
+              className={`bg-bg-main rounded-xl px-3 py-2.5 flex flex-col gap-0.5 min-w-0 ${
+                stats.length % 2 === 1 && i === stats.length - 1 ? 'col-span-2' : ''
+              }`}
+            >
+              <dt className="text-[11px] text-text-secondary truncate">{stat.label}</dt>
+              <dd className={`text-lg font-bold tabular-nums truncate ${stat.accent ?? 'text-text-main'}`}>
+                {stat.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      <div className="mt-auto">{action}</div>
     </section>
   )
 }
