@@ -263,8 +263,8 @@ function intoColumns(images: string[]): string[][] {
  * at its own speed.
  *
  * Every visit deals a different hand from the pool, and each column's content
- * is doubled so the loop never shows a seam. Hovering stops the column under
- * the pointer; reduced motion stops all of them.
+ * is doubled so the loop never shows a seam. Resting on a game stops its
+ * column so it can be read; reduced motion stops all of them.
  */
 export default function AuthCollagePanel() {
   // A fixed order first, so the server and the first paint agree; a different
@@ -294,7 +294,7 @@ export default function AuthCollagePanel() {
             <div key={c} className="flex-1 h-full overflow-hidden">
               <div
                 data-column={c}
-                className="marquee-column flex flex-col items-center gap-36 hover:[animation-play-state:paused]"
+                className="marquee-column flex flex-col items-center gap-36"
                 style={{
                   marginTop: COLUMN_OFFSETS[c % COLUMN_OFFSETS.length],
                   willChange: 'transform',
@@ -307,6 +307,7 @@ export default function AuthCollagePanel() {
                 {tiles.map((src, i) => (
                   <div
                     key={i}
+                    data-tile
                     /* Leaning left and right in turn, tilted the way it leans. */
                     style={{
                       transform: `translateX(${zigzag(c, i)}rem) rotate(${

@@ -77,11 +77,14 @@ test('deals a different hand once mounted, so a refresh changes the wall', () =>
   random.mockRestore()
 })
 
-test('a column stops while the pointer is on it', () => {
+test('only a game stops its column, not the gaps between them', () => {
   const { container } = render(<AuthCollagePanel />)
-  expect(container.querySelector('.marquee-column')?.className).toContain(
-    'hover:[animation-play-state:paused]',
-  )
+  const column = container.querySelector('.marquee-column') as HTMLElement
+
+  // The column itself never pauses on hover…
+  expect(column.className).not.toContain('animation-play-state')
+  // …the rule keys off a tile under the pointer instead (see globals.css).
+  expect(column.querySelectorAll('[data-tile]').length).toBeGreaterThan(0)
 })
 
 test('a dead image hides itself instead of leaving a broken icon', () => {
