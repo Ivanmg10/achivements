@@ -25,10 +25,24 @@ test('each column repeats its games once, so the loop has no seam', () => {
   }
 })
 
+const platform = (src: string | null) => (src?.includes('retroachievements') ? 'ra' : 'steam')
+
 test('shows a slice of the pool, spread across the columns', () => {
   const { container } = render(<AuthCollagePanel />)
   const sources = new Set(Array.from(container.querySelectorAll('img')).map((img) => img.getAttribute('src')))
   expect(sources.size).toBe(40)
+})
+
+test('every column carries both platforms, alternating as it scrolls', () => {
+  const { container } = render(<AuthCollagePanel />)
+  for (const column of Array.from(container.querySelectorAll('.marquee-column'))) {
+    const platforms = Array.from(column.querySelectorAll('img'))
+      .slice(0, 5)
+      .map((img) => platform(img.getAttribute('src')))
+    expect(new Set(platforms).size).toBe(2)
+    // …and never the same platform twice in a row.
+    for (let i = 1; i < platforms.length; i++) expect(platforms[i]).not.toBe(platforms[i - 1])
+  }
 })
 
 test('every tile comes from the pool, never a made-up id', () => {

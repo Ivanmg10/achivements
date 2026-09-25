@@ -204,11 +204,11 @@ const STEAM_HEADER_IDS = [
   243470, // Watch Dogs
 ]
 
-const ALL_IMAGES = [
-  ...RA_IMAGES,
+const STEAM_IMAGES = [
   ...STEAM_APP_IDS.map((id) => steamAssetUrl(id, 'cover')),
   ...STEAM_HEADER_IDS.map((id) => steamAssetUrl(id, 'header')),
 ]
+const ALL_IMAGES = [...RA_IMAGES, ...STEAM_IMAGES]
 
 const COLUMNS = 4
 /** How many of the pool are on screen: enough to fill the columns, few enough
@@ -227,6 +227,27 @@ const ZIGZAG = [4.2, 3.4, 4.6, 3.8]
 function zigzag(column: number, i: number) {
   const side = (i + column) % 2 === 0 ? -1 : 1
   return side * ZIGZAG[i % ZIGZAG.length]
+}
+
+const shuffle = (list: string[]) => [...list].sort(() => Math.random() - 0.5)
+
+/**
+ * Lays the two platforms out like a checkerboard: going down a column the art
+ * alternates between RetroAchievements and Steam, and so does going across.
+ * Both libraries are on show wherever you look, instead of in streaks.
+ */
+function dealBothPlatforms(ra: string[], steam: string[], count: number): string[] {
+  const decks = [ [...ra], [...steam] ]
+  const deck: string[] = []
+  for (let i = 0; i < count; i++) {
+    const row = Math.floor(i / COLUMNS)
+    const wanted = ((i % COLUMNS) + row) % 2
+    // Fall back to the other platform once one of them runs out.
+    const from = decks[wanted].length ? decks[wanted] : decks[1 - wanted]
+    if (!from.length) break
+    deck.push(from.shift()!)
+  }
+  return deck
 }
 
 /** Round-robin split, so each column holds a different set of games. */
@@ -248,10 +269,10 @@ function intoColumns(images: string[]): string[][] {
 export default function AuthCollagePanel() {
   // A fixed order first, so the server and the first paint agree; a different
   // draw once mounted, so no two visits look the same.
-  const [images, setImages] = useState(() => ALL_IMAGES.slice(0, TILES_SHOWN))
+  const [images, setImages] = useState(() => dealBothPlatforms(RA_IMAGES, STEAM_IMAGES, TILES_SHOWN))
 
   useEffect(() => {
-    setImages([...ALL_IMAGES].sort(() => Math.random() - 0.5).slice(0, TILES_SHOWN))
+    setImages(dealBothPlatforms(shuffle(RA_IMAGES), shuffle(STEAM_IMAGES), TILES_SHOWN))
   }, [])
 
   return (
