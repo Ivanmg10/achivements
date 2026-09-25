@@ -62,9 +62,9 @@ const ALL_IMAGES = [...RA_IMAGES, ...STEAM_APP_IDS.map((id) => steamAssetUrl(id,
 
 const COLUMNS = 4
 /** Seconds per full pass, one per column: slow enough to read, never matching. */
-const COLUMN_SECONDS = [82, 104, 74, 94]
+const COLUMN_SECONDS = [118, 146, 104, 132]
 /** Head start per column, so tiles never line up as a grid. */
-const COLUMN_OFFSETS = ['-9rem', '3rem', '-5rem', '7rem']
+const COLUMN_OFFSETS = ['-11rem', '4rem', '-6rem', '9rem']
 /** Fixed tilt per tile, cycling — not random, so the markup is the same everywhere. */
 const ROTATIONS = [-8, 6, -4, 10, -7, 5, -11, 8, -3, 9, -6, 7]
 
@@ -112,7 +112,7 @@ export default function AuthCollagePanel() {
             <div key={c} className="flex-1 h-full overflow-hidden">
               <div
                 data-column={c}
-                className="marquee-column flex flex-col items-center gap-28 hover:[animation-play-state:paused]"
+                className="marquee-column flex flex-col items-center gap-36 hover:[animation-play-state:paused]"
                 style={{
                   marginTop: COLUMN_OFFSETS[c % COLUMN_OFFSETS.length],
                   willChange: 'transform',
