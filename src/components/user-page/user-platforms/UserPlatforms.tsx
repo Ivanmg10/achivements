@@ -3,11 +3,11 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
-import { IconDeviceGamepad2 } from '@tabler/icons-react'
 import UserPlatformCard, { PlatformStat } from '@/components/user-page/user-platform-card/UserPlatformCard'
 import RaLoginModal from '@/components/ra-login-modal/RaLoginModal'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
+import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -92,8 +92,11 @@ export default function UserPlatforms() {
       <UserPlatformCard
         name="RetroAchievements"
         logo={<RaLogo height={18} />}
-        accent="bg-[#2a80c7]"
+        bigLogo={<RaLogo height={40} />}
+        gradient="from-[#2a80c7] via-[#2a80c7]/40 to-[#e5b53f]"
+        tint="from-[#2a80c7]/15"
         connected={raConnected}
+        hint={T.userPage.raConnectHint}
         identity={
           raUser?.User ? (
             <div className="flex items-center gap-3 min-w-0">
@@ -112,9 +115,7 @@ export default function UserPlatforms() {
                 <span className="text-xs text-text-secondary font-mono truncate">{raUser.ULID}</span>
               </div>
             </div>
-          ) : (
-            <p className="text-sm text-text-secondary">{T.userPage.raConnectHint}</p>
-          )
+          ) : null
         }
         stats={raConnected ? raStats : []}
         action={
@@ -134,8 +135,11 @@ export default function UserPlatforms() {
       <UserPlatformCard
         name="Steam"
         logo={<SteamLogo size={18} className="text-[#66c0f4]" aria-hidden="true" />}
-        accent="bg-[#66c0f4]"
+        bigLogo={<SteamLogo size={40} className="text-[#66c0f4]" aria-hidden="true" />}
+        gradient="from-[#66c0f4] via-[#2a475e] to-[#1b2838]"
+        tint="from-[#66c0f4]/15"
         connected={steamLinked}
+        hint={T.userPage.steamConnectHint}
         status={
           status && (
             <p
@@ -155,9 +159,7 @@ export default function UserPlatforms() {
                 <span className="text-xs text-text-secondary font-mono truncate">{steamId}</span>
               </div>
             </div>
-          ) : (
-            <p className="text-sm text-text-secondary">{T.userPage.steamConnectHint}</p>
-          )
+          ) : null
         }
         stats={steamLinked ? steamStats : []}
         action={
@@ -176,11 +178,13 @@ export default function UserPlatforms() {
 
       <UserPlatformCard
         name="PlayStation Network"
-        logo={<IconDeviceGamepad2 size={18} className="text-[#0070d1]" aria-hidden="true" />}
-        accent="bg-[#0070d1]"
+        logo={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />}
+        bigLogo={<PlaystationLogo size={40} className="text-[#0070d1]" aria-hidden="true" />}
+        gradient="from-[#0070d1] via-[#0070d1]/40 to-[#003791]"
+        tint="from-[#0070d1]/15"
         connected={false}
         soon
-        identity={<p className="text-sm text-text-secondary">{T.userPage.psnHint}</p>}
+        hint={T.userPage.psnHint}
         action={
           <button disabled className={`${CONNECT_CLASS} opacity-50 cursor-not-allowed`}>
             {T.userData.comingSoon}

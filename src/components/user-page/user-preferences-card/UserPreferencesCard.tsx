@@ -7,8 +7,6 @@ import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import FavoriteGameModal, { FavoriteGame } from '@/components/favorite-game-modal/FavoriteGameModal'
 import LanguageModal from '@/components/language-modal/LanguageModal'
 import ThemeModal from '@/components/theme-modal/ThemeModal'
-import RaLogo from '@/components/ra-logo/RaLogo'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { candidateIconUrl } from '@/utils/gameCandidates'
@@ -80,17 +78,11 @@ export default function UserPreferencesCard() {
         </ProfileField>
 
         <ProfileField label={T.userPage.favoriteRaGame} onEdit={() => setFavoriteOpen('ra')}>
-          <span className="flex items-center gap-1.5 min-w-0">
-            <RaLogo height={14} className="opacity-70" />
-            <FavoriteValue game={raFavorite} source="ra" empty={T.userData.notSet} />
-          </span>
+          <FavoriteValue game={raFavorite} source="ra" empty={T.userData.notSet} />
         </ProfileField>
 
         <ProfileField label={T.userPage.favoriteSteamGame} onEdit={() => setFavoriteOpen('steam')}>
-          <span className="flex items-center gap-1.5 min-w-0">
-            <SteamLogo size={15} className="text-[#66c0f4]" aria-hidden="true" />
-            <FavoriteValue game={steamFavorite} source="steam" empty={T.userData.notSet} />
-          </span>
+          <FavoriteValue game={steamFavorite} source="steam" empty={T.userData.notSet} />
         </ProfileField>
       </div>
 
