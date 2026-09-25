@@ -122,8 +122,16 @@ const TILES_SHOWN = 40
 const COLUMN_SECONDS = [118, 146, 104, 132]
 /** Head start per column, so tiles never line up as a grid. */
 const COLUMN_OFFSETS = ['-11rem', '4rem', '-6rem', '9rem']
-/** Fixed tilt per tile, cycling — not random, so the markup is the same everywhere. */
-const ROTATIONS = [-8, 6, -4, 10, -7, 5, -11, 8, -3, 9, -6, 7]
+/** Tilt per tile, cycling — not random, so the markup is the same everywhere. */
+const ROTATIONS = [8, 6, 11, 5, 9, 7, 10, 4]
+/** How far a tile leans off its column's centre line, in rem. */
+const ZIGZAG = [4.2, 3.4, 4.6, 3.8]
+
+/** Alternating lean, so a column reads as a zig-zag rather than a straight line. */
+function zigzag(column: number, i: number) {
+  const side = (i + column) % 2 === 0 ? -1 : 1
+  return side * ZIGZAG[i % ZIGZAG.length]
+}
 
 /** Round-robin split, so each column holds a different set of games. */
 function intoColumns(images: string[]): string[][] {
@@ -182,9 +190,11 @@ export default function AuthCollagePanel() {
                 {tiles.map((src, i) => (
                   <div
                     key={i}
-                    /* A little sideways lean per tile breaks the column into a scatter. */
+                    /* Leaning left and right in turn, tilted the way it leans. */
                     style={{
-                      transform: `translateX(${(((i + c) % 4) - 1.5) * 1.8}rem) rotate(${ROTATIONS[(c + i) % ROTATIONS.length]}deg)`,
+                      transform: `translateX(${zigzag(c, i)}rem) rotate(${
+                        Math.sign(zigzag(c, i)) * ROTATIONS[(c + i) % ROTATIONS.length]
+                      }deg)`,
                     }}
                   >
                     <div className="bg-bg-tertiary p-1.5 rounded-xl shadow-2xl border border-white/10 hover:scale-110 hover:shadow-accent/25 transition-transform duration-200">
