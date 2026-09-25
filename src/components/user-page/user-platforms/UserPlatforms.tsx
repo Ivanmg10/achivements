@@ -94,7 +94,6 @@ export default function UserPlatforms() {
         logo={<RaLogo height={18} />}
         bigLogo={<RaLogo height={40} />}
         gradient="from-[#2a80c7] via-[#2a80c7]/40 to-[#e5b53f]"
-        tint="from-[#2a80c7]/15"
         connected={raConnected}
         hint={T.userPage.raConnectHint}
         identity={
@@ -137,7 +136,6 @@ export default function UserPlatforms() {
         logo={<SteamLogo size={18} className="text-[#66c0f4]" aria-hidden="true" />}
         bigLogo={<SteamLogo size={40} className="text-[#66c0f4]" aria-hidden="true" />}
         gradient="from-[#66c0f4] via-[#2a475e] to-[#1b2838]"
-        tint="from-[#66c0f4]/15"
         connected={steamLinked}
         hint={T.userPage.steamConnectHint}
         status={
@@ -181,7 +179,6 @@ export default function UserPlatforms() {
         logo={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />}
         bigLogo={<PlaystationLogo size={40} className="text-[#0070d1]" aria-hidden="true" />}
         gradient="from-[#0070d1] via-[#0070d1]/40 to-[#003791]"
-        tint="from-[#0070d1]/15"
         connected={false}
         soon
         hint={T.userPage.psnHint}

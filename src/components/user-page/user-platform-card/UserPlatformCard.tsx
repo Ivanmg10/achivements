@@ -11,16 +11,15 @@ export type PlatformStat = { label: string; value: string; accent?: string }
  * changes anything — connect or disconnect.
  *
  * The shell is shared so the platforms read as the same kind of thing; each
- * one brings its own colours (a gradient hairline around the card and a wash
- * behind the header) so they are still told apart at a glance. Disconnected,
- * the card shows its logo and what connecting is for instead of empty space.
+ * one is outlined in its own gradient so they are still told apart at a
+ * glance. Disconnected, the card shows its logo and what connecting is for
+ * instead of empty space.
  */
 export default function UserPlatformCard({
   name,
   logo,
   bigLogo,
   gradient,
-  tint,
   connected,
   soon = false,
   status,
@@ -35,8 +34,6 @@ export default function UserPlatformCard({
   bigLogo?: ReactNode
   /** Gradient stops for the card's outline, e.g. "from-[#66c0f4] to-[#1b2838]". */
   gradient: string
-  /** Colour wash behind the header, e.g. "from-[#66c0f4]/12". */
-  tint: string
   connected: boolean
   soon?: boolean
   /** A message about the last connection attempt. */
@@ -57,11 +54,6 @@ export default function UserPlatformCard({
         aria-label={name}
         className="relative h-full bg-bg-card rounded-[calc(1.5rem-1px)] p-5 flex flex-col gap-4 overflow-hidden"
       >
-        <span
-          aria-hidden="true"
-          className={`absolute inset-x-0 top-0 h-28 bg-gradient-to-b ${tint} to-transparent pointer-events-none`}
-        />
-
         <div className="relative flex items-center justify-between gap-2">
           <span className="flex items-center gap-2 min-w-0">
             {logo}

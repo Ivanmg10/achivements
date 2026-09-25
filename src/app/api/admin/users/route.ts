@@ -153,3 +153,27 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }
+
+// DELETE — remove a user and everything they own (groups, pins, cache: all cascade)
+export async function DELETE(req: Request) {
+  try {
+    const session = await requireAdmin()
+    if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+    const id = new URL(req.url).searchParams.get('id')
+    if (!id || !/^\d+$/.test(id)) {
+      return NextResponse.json({ error: 'A numeric id is required' }, { status: 400 })
+    }
+    if (String(id) === String(session.user.id)) {
+      return NextResponse.json({ error: 'Cannot delete your own account' }, { status: 400 })
+    }
+
+    const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id', [id])
+    if (!result.rows.length) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+
+    return NextResponse.json({ ok: true })
+  } catch (err) {
+    console.error('[admin/users DELETE]', err)
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+  }
+}

@@ -10,7 +10,7 @@ const USER: AdminUser = {
 }
 
 test('shows the user, their country and the accounts they linked', () => {
-  render(<AdminUserCard user={USER} isSelf={false} onEdit={jest.fn()} onToggleAdmin={jest.fn()} />)
+  render(<AdminUserCard user={USER} isSelf={false} onEdit={jest.fn()} onToggleAdmin={jest.fn()} onDelete={jest.fn()} />)
   expect(screen.getByText('papucarrot')).toBeInTheDocument()
   expect(screen.getByText('#11')).toBeInTheDocument()
   expect(screen.getByText('papu@test.com')).toBeInTheDocument()
@@ -22,26 +22,38 @@ test('shows the user, their country and the accounts they linked', () => {
 test('grants and revokes admin', () => {
   const onToggleAdmin = jest.fn()
   const { rerender } = render(
-    <AdminUserCard user={USER} isSelf={false} onEdit={jest.fn()} onToggleAdmin={onToggleAdmin} />,
+    <AdminUserCard user={USER} isSelf={false} onEdit={jest.fn()} onToggleAdmin={onToggleAdmin} onDelete={jest.fn()} />,
   )
   fireEvent.click(screen.getByRole('button', { name: 'Make papucarrot admin' }))
   expect(onToggleAdmin).toHaveBeenCalled()
 
   rerender(
-    <AdminUserCard user={{ ...USER, admin: true }} isSelf={false} onEdit={jest.fn()} onToggleAdmin={onToggleAdmin} />,
+    <AdminUserCard user={{ ...USER, admin: true }} isSelf={false} onEdit={jest.fn()} onToggleAdmin={onToggleAdmin} onDelete={jest.fn()} />,
   )
   expect(screen.getByRole('button', { name: 'Remove admin from papucarrot' })).toBeInTheDocument()
 })
 
 test('an admin cannot change their own role', () => {
-  render(<AdminUserCard user={{ ...USER, admin: true }} isSelf onEdit={jest.fn()} onToggleAdmin={jest.fn()} />)
+  render(<AdminUserCard user={{ ...USER, admin: true }} isSelf onEdit={jest.fn()} onToggleAdmin={jest.fn()} onDelete={jest.fn()} />)
   expect(screen.getByRole('button', { name: 'Remove admin from papucarrot' })).toBeDisabled()
   expect(screen.getByText('(you)')).toBeInTheDocument()
 })
 
 test('edit opens the editor', () => {
   const onEdit = jest.fn()
-  render(<AdminUserCard user={USER} isSelf={false} onEdit={onEdit} onToggleAdmin={jest.fn()} />)
+  render(<AdminUserCard user={USER} isSelf={false} onEdit={onEdit} onToggleAdmin={jest.fn()} onDelete={jest.fn()} />)
   fireEvent.click(screen.getByRole('button', { name: 'Edit papucarrot' }))
   expect(onEdit).toHaveBeenCalled()
+})
+
+test('deletes, except your own account', () => {
+  const onDelete = jest.fn()
+  const { rerender } = render(
+    <AdminUserCard user={USER} isSelf={false} onEdit={jest.fn()} onToggleAdmin={jest.fn()} onDelete={onDelete} />,
+  )
+  fireEvent.click(screen.getByRole('button', { name: 'Delete papucarrot' }))
+  expect(onDelete).toHaveBeenCalled()
+
+  rerender(<AdminUserCard user={USER} isSelf onEdit={jest.fn()} onToggleAdmin={jest.fn()} onDelete={onDelete} />)
+  expect(screen.getByRole('button', { name: 'Delete papucarrot' })).toBeDisabled()
 })

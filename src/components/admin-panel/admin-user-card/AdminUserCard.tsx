@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { IconPencil, IconShield, IconShieldOff, IconUser } from '@tabler/icons-react'
+import { IconPencil, IconShield, IconShieldOff, IconTrash, IconUser } from '@tabler/icons-react'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { codeToFlag, findCountry } from '@/utils/countries'
@@ -10,19 +10,21 @@ import type { AdminUser } from '@/types/user'
 /**
  * One user in the admin panel, as a card: avatar, name, the accounts they
  * have linked, and the two things an admin does with them — grant or revoke
- * admin, and edit. Admins cannot change their own role, so that button is
- * disabled on their own card.
+ * admin, edit and delete. An admin cannot change their own role or delete
+ * their own account, so both are disabled on their own card.
  */
 export default function AdminUserCard({
   user,
   isSelf,
   onEdit,
   onToggleAdmin,
+  onDelete,
 }: {
   user: AdminUser
   isSelf: boolean
   onEdit: () => void
   onToggleAdmin: () => void
+  onDelete: () => void
 }) {
   const country = user.location ? findCountry(user.location) : null
 
@@ -99,6 +101,18 @@ export default function AdminUserCard({
           className="p-2 rounded-xl bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <IconPencil size={15} aria-hidden="true" />
+        </button>
+        <button
+          onClick={onDelete}
+          disabled={isSelf}
+          aria-label={`Delete ${user.username}`}
+          className={`p-2 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 ${
+            isSelf
+              ? 'opacity-30 cursor-not-allowed bg-bg-main text-text-secondary'
+              : 'bg-bg-main text-text-secondary hover:bg-red-500/15 hover:text-red-400'
+          }`}
+        >
+          <IconTrash size={15} aria-hidden="true" />
         </button>
       </div>
     </li>

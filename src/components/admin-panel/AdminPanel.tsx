@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import AdminCreateUserModal from './AdminCreateUserModal'
 import AdminEditUserModal from './AdminEditUserModal'
 import AdminUserCard from './admin-user-card/AdminUserCard'
+import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
 import Spinner from '@/components/main-spinner/Spinner'
 import { normalizeTitle } from '@/utils/gameCandidates'
 import type { AdminUser } from '@/types/user'
@@ -18,6 +19,8 @@ export default function AdminPanel() {
   const [createOpen, setCreateOpen] = useState(false)
   const [editUser, setEditUser] = useState<AdminUser | null>(null)
   const [query, setQuery] = useState('')
+  const [deleteUser, setDeleteUser] = useState<AdminUser | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const currentAdminId = Number(session?.user?.id)
 
@@ -66,6 +69,24 @@ export default function AdminPanel() {
       body: JSON.stringify({ id: user.id, field: 'admin', value: next }),
     })
     if (res.ok) handleUpdated(user.id, 'admin', next)
+  }
+
+  const confirmDelete = async () => {
+    if (!deleteUser) return
+    setDeleteError(null)
+    try {
+      const res = await fetch(`/api/admin/users?id=${deleteUser.id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setDeleteError(data.error ?? 'Failed to delete user')
+        return
+      }
+      setUsers((prev) => prev.filter((u) => u.id !== deleteUser.id))
+    } catch {
+      setDeleteError('Failed to delete user')
+    } finally {
+      setDeleteUser(null)
+    }
   }
 
   return (
@@ -125,11 +146,26 @@ export default function AdminPanel() {
                 isSelf={user.id === currentAdminId}
                 onEdit={() => setEditUser(user)}
                 onToggleAdmin={() => toggleAdmin(user)}
+                onDelete={() => setDeleteUser(user)}
               />
             ))}
           </ul>
         )}
       </div>
+
+      {deleteError && (
+        <p role="alert" className="text-sm text-red-400">
+          {deleteError}
+        </p>
+      )}
+
+      <DeleteConfirmDialog
+        isOpen={deleteUser !== null}
+        onClose={() => setDeleteUser(null)}
+        onConfirm={confirmDelete}
+        message={`Delete ${deleteUser?.username} and everything they own? This cannot be undone.`}
+        confirmLabel="Delete user"
+      />
 
       <AdminCreateUserModal
         isOpen={createOpen}
