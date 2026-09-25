@@ -30,7 +30,7 @@ const platform = (src: string | null) => (src?.includes('retroachievements') ? '
 test('shows a slice of the pool, spread across the columns', () => {
   const { container } = render(<AuthCollagePanel />)
   const sources = new Set(Array.from(container.querySelectorAll('img')).map((img) => img.getAttribute('src')))
-  expect(sources.size).toBe(40)
+  expect(sources.size).toBe(32)
 })
 
 test('every column carries both platforms, alternating as it scrolls', () => {

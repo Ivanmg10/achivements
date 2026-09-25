@@ -211,17 +211,24 @@ const STEAM_IMAGES = [
 const ALL_IMAGES = [...RA_IMAGES, ...STEAM_IMAGES]
 
 const COLUMNS = 4
-/** How many of the pool are on screen: enough to fill the columns, few enough
- * that a visit does not download the whole library. */
-const TILES_SHOWN = 40
+/**
+ * How many of the pool are on screen. Steam cover art is ~65 KB a piece and
+ * there is no smaller portrait on their CDN, so this is the knob that decides
+ * what a visit weighs: 32 tiles ≈ 1.3 MB, all of it behind the form.
+ */
+const TILES_SHOWN = 32
 /** Seconds per full pass, one per column: slow enough to read, never matching. */
 const COLUMN_SECONDS = [118, 146, 104, 132]
 /** Head start per column, so tiles never line up as a grid. */
 const COLUMN_OFFSETS = ['-11rem', '4rem', '-6rem', '9rem']
 /** Tilt per tile, cycling — not random, so the markup is the same everywhere. */
 const ROTATIONS = [8, 6, 11, 5, 9, 7, 10, 4]
-/** How far a tile leans off its column's centre line, in rem. */
-const ZIGZAG = [4.2, 3.4, 4.6, 3.8]
+/**
+ * How far a tile leans off its column's centre line, as a multiple of --zig.
+ * The panel sets --zig per breakpoint, so a narrow panel leans less and the
+ * art never lands outside it.
+ */
+const ZIGZAG = [1, 0.8, 1.1, 0.9]
 
 /** Alternating lean, so a column reads as a zig-zag rather than a straight line. */
 function zigzag(column: number, i: number) {
@@ -276,7 +283,7 @@ export default function AuthCollagePanel() {
   }, [])
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-bg-card">
+    <div className="relative w-full h-full overflow-hidden bg-bg-card [--zig:1.2rem] md:[--zig:2rem] xl:[--zig:3.6rem]">
       {/* subtle accent glow behind images */}
       <div className="absolute inset-0 bg-linear-to-br from-accent/10 via-transparent to-bg-secondary/60" />
 
@@ -286,15 +293,15 @@ export default function AuthCollagePanel() {
       <div className="absolute inset-x-0 top-0 h-16 z-20 bg-linear-to-b from-bg-main to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-16 z-20 bg-linear-to-t from-bg-main to-transparent pointer-events-none" />
 
-      <div className="absolute inset-0 flex items-start gap-4 px-4">
+      <div className="absolute inset-0 flex items-start gap-2 px-2 sm:gap-4 sm:px-4">
         {intoColumns(images).map((column, c) => {
           // Doubled so translateY(-50%) always lands on an identical frame.
           const tiles = [...column, ...column]
           return (
-            <div key={c} className="flex-1 h-full overflow-hidden">
+            <div key={c} className="flex-1 h-full min-w-0">
               <div
                 data-column={c}
-                className="marquee-column flex flex-col items-center gap-36"
+                className="marquee-column flex flex-col items-center gap-20 sm:gap-28 xl:gap-36"
                 style={{
                   marginTop: COLUMN_OFFSETS[c % COLUMN_OFFSETS.length],
                   willChange: 'transform',
@@ -310,7 +317,7 @@ export default function AuthCollagePanel() {
                     data-tile
                     /* Leaning left and right in turn, tilted the way it leans. */
                     style={{
-                      transform: `translateX(${zigzag(c, i)}rem) rotate(${
+                      transform: `translateX(calc(var(--zig) * ${zigzag(c, i)})) rotate(${
                         Math.sign(zigzag(c, i)) * ROTATIONS[(c + i) % ROTATIONS.length]
                       }deg)`,
                     }}
@@ -320,8 +327,11 @@ export default function AuthCollagePanel() {
                         src={src}
                         alt=""
                         aria-hidden="true"
-                        className="w-24 h-24 object-cover rounded-lg"
+                        className="w-16 h-16 sm:w-20 sm:h-20 xl:w-24 xl:h-24 object-cover rounded-lg"
                         loading="lazy"
+                        decoding="async"
+                        // Decoration: never ahead of the form or its fonts.
+                        fetchPriority="low"
                         // A dead URL would otherwise sit as a broken-image icon forever.
                         onError={(e) => {
                           e.currentTarget.style.visibility = 'hidden'
