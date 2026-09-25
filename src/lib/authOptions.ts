@@ -39,6 +39,7 @@ export const authOptions: NextAuthOptions = {
           raUser: user.raUser ?? null,
           location: user.location ?? null,
           favorite_game: user.favorite_game ?? null,
+          favorite_steam_game: user.favorite_steam_game ?? null,
         };
       },
     }),
@@ -62,6 +63,7 @@ export const authOptions: NextAuthOptions = {
         token.raUser = user.raUser ?? null;
         token.location = user.location ?? null;
         token.favorite_game = user.favorite_game ?? null;
+        token.favorite_steam_game = user.favorite_steam_game ?? null;
       }
 
       if (trigger === "update" && session !== undefined) {
@@ -87,6 +89,7 @@ export const authOptions: NextAuthOptions = {
         if ("avatar" in session && session.avatar) token.avatar = session.avatar;
         if ("location" in session) token.location = session.location ?? null;
         if ("favorite_game" in session) token.favorite_game = session.favorite_game ?? null;
+        if ("favorite_steam_game" in session) token.favorite_steam_game = session.favorite_steam_game ?? null;
       }
 
       return token;
@@ -106,6 +109,7 @@ export const authOptions: NextAuthOptions = {
         session.user.raUser = token.raUser;
         session.user.location = token.location;
         session.user.favorite_game = token.favorite_game;
+        session.user.favorite_steam_game = token.favorite_steam_game;
       }
       return session;
     },

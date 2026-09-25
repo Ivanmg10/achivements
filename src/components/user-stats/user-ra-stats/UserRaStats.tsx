@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { staggerContainer, staggerItem } from '@/lib/animations'
 import { useSession } from 'next-auth/react'
@@ -46,7 +47,7 @@ function GamesCard({ label, value, accent }: { label: string; value: number; acc
   )
 }
 
-export default function UserStats() {
+export default function UserRaStats() {
   const { data: session } = useSession()
   const { rank, isLoading: rankLoading } = useUserRank()
   const { awards, isLoading: awardsLoading } = useUserAwards()
@@ -74,7 +75,7 @@ export default function UserStats() {
   const completedHC = hardcore.filter((g) => parseFloat(g.PctWon) >= 1).length
 
   return (
-    <section className="w-[95%] pt-3 pb-3 flex flex-col gap-4">
+    <section className="w-full flex flex-col gap-4">
       <div className="bg-bg-card rounded-3xl p-5 flex flex-col gap-4">
         <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
           RetroAchievements
@@ -119,6 +120,19 @@ export default function UserStats() {
 
         {raUser.Motto && (
           <p className="text-sm italic text-text-secondary px-1">&ldquo;{raUser.Motto}&rdquo;</p>
+        )}
+
+        {/* RA already sends this on every profile fetch; "Unknown" means nothing is running. */}
+        {raUser.RichPresenceMsg && raUser.RichPresenceMsg.toLowerCase() !== 'unknown' && raUser.LastGameID > 0 && (
+          <Link
+            href={`/gameInfo/${raUser.LastGameID}`}
+            className="bg-bg-main rounded-xl p-3 flex flex-col gap-0.5 hover:bg-bg-main/70 transition-colors"
+          >
+            <span className="text-xs text-text-secondary uppercase tracking-wider">
+              {T.profileRa.playingNow}
+            </span>
+            <span className="text-sm text-text-main">{raUser.RichPresenceMsg}</span>
+          </Link>
         )}
 
         {hasContribs && (

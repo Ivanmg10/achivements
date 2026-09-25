@@ -17,6 +17,7 @@ declare module "next-auth" {
       raUser?: RetroAchievementsUserProfile | null;
       location?: string | null;
       favorite_game?: { id: number; title: string; imageIcon: string } | null;
+      favorite_steam_game?: { id: number; title: string; imageIcon: string } | null;
     } & DefaultSession["user"];
   }
 
@@ -33,6 +34,7 @@ declare module "next-auth" {
     raUser?: RetroAchievementsUserProfile | null;
     location?: string | null;
     favorite_game?: { id: number; title: string; imageIcon: string } | null;
+    favorite_steam_game?: { id: number; title: string; imageIcon: string } | null;
   }
 }
 
@@ -50,5 +52,6 @@ declare module "next-auth/jwt" {
     raUser?: RetroAchievementsUserProfile | null;
     location?: string | null;
     favorite_game?: { id: number; title: string; imageIcon: string } | null;
+    favorite_steam_game?: { id: number; title: string; imageIcon: string } | null;
   }
 }

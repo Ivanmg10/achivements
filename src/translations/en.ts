@@ -93,6 +93,7 @@ export const en = {
     favoriteGameChange: 'Change',
     favoriteGameNoResults: 'No results',
     favoriteGameNoGames: 'No games in library',
+    favoriteGameError: 'Could not save your favourite game. Try again.',
     changePassword: 'Change password',
   },
   userTheme: {
@@ -133,6 +134,18 @@ export const en = {
       email: 'Email',
       avatar: 'Avatar',
     },
+  },
+  userPage: {
+    preferences: 'Preferences',
+    favoriteRaGame: 'Favourite RA game',
+    favoriteSteamGame: 'Favourite Steam game',
+    viewData: 'View data',
+    hideData: 'Hide data',
+    editAvatar: 'Change avatar',
+    editName: 'Change username',
+    raConnectHint: 'Connect RetroAchievements to track your retro games here.',
+    steamConnectHint: 'Connect Steam to track your library and achievements here.',
+    psnHint: 'PlayStation Network support is on the way.',
   },
   userStats: {
     globalRank: 'Global rank',

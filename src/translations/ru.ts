@@ -95,6 +95,7 @@ export const ru: Translations = {
     favoriteGameChange: 'Изменить',
     favoriteGameNoResults: 'Нет результатов',
     favoriteGameNoGames: 'В библиотеке нет игр',
+    favoriteGameError: 'Не удалось сохранить любимую игру. Попробуйте ещё раз.',
     changePassword: 'Изменить пароль',
   },
   userTheme: {
@@ -135,6 +136,18 @@ export const ru: Translations = {
       email: 'Email',
       avatar: 'Аватар',
     },
+  },
+  userPage: {
+    preferences: 'Настройки',
+    favoriteRaGame: 'Любимая игра в RA',
+    favoriteSteamGame: 'Любимая игра в Steam',
+    viewData: 'Показать данные',
+    hideData: 'Скрыть данные',
+    editAvatar: 'Сменить аватар',
+    editName: 'Изменить имя пользователя',
+    raConnectHint: 'Подключите RetroAchievements, чтобы следить здесь за ретро-играми.',
+    steamConnectHint: 'Подключите Steam, чтобы следить здесь за библиотекой и достижениями.',
+    psnHint: 'Поддержка PlayStation Network скоро появится.',
   },
   userStats: {
     globalRank: 'Глобальный рейтинг',

@@ -95,6 +95,7 @@ export const ja: Translations = {
     favoriteGameChange: '変更',
     favoriteGameNoResults: '結果がありません',
     favoriteGameNoGames: 'ライブラリにゲームがありません',
+    favoriteGameError: 'お気に入りゲームを保存できませんでした。もう一度お試しください。',
     changePassword: 'パスワード変更',
   },
   userTheme: {
@@ -135,6 +136,18 @@ export const ja: Translations = {
       email: 'メール',
       avatar: 'アバター',
     },
+  },
+  userPage: {
+    preferences: '設定',
+    favoriteRaGame: 'RAのお気に入りゲーム',
+    favoriteSteamGame: 'Steamのお気に入りゲーム',
+    viewData: 'データを見る',
+    hideData: 'データを隠す',
+    editAvatar: 'アバターを変更',
+    editName: 'ユーザー名を変更',
+    raConnectHint: 'RetroAchievementsを連携すると、レトロゲームをここで管理できます。',
+    steamConnectHint: 'Steamを連携すると、ライブラリと実績をここで管理できます。',
+    psnHint: 'PlayStation Networkへの対応は準備中です。',
   },
   userStats: {
     globalRank: 'グローバルランク',

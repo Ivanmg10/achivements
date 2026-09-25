@@ -95,6 +95,7 @@ export const fr: Translations = {
     favoriteGameChange: 'Modifier',
     favoriteGameNoResults: 'Aucun résultat',
     favoriteGameNoGames: 'Aucun jeu dans la bibliothèque',
+    favoriteGameError: 'Impossible d’enregistrer ton jeu préféré. Réessaie.',
     changePassword: 'Changer le mot de passe',
   },
   userTheme: {
@@ -135,6 +136,18 @@ export const fr: Translations = {
       email: 'E-mail',
       avatar: 'Avatar',
     },
+  },
+  userPage: {
+    preferences: 'Préférences',
+    favoriteRaGame: 'Jeu RA préféré',
+    favoriteSteamGame: 'Jeu Steam préféré',
+    viewData: 'Voir les données',
+    hideData: 'Masquer les données',
+    editAvatar: 'Changer d’avatar',
+    editName: 'Changer de nom d’utilisateur',
+    raConnectHint: 'Connecte RetroAchievements pour suivre tes jeux rétro ici.',
+    steamConnectHint: 'Connecte Steam pour suivre ta bibliothèque et tes succès ici.',
+    psnHint: 'PlayStation Network arrive bientôt.',
   },
   userStats: {
     globalRank: 'Classement mondial',

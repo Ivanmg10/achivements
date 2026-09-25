@@ -16,6 +16,7 @@ export interface User {
   raUser?: RetroAchievementsUserProfile | null;
   location?: string | null;
   favorite_game?: { id: number; title: string; imageIcon: string } | null;
+  favorite_steam_game?: { id: number; title: string; imageIcon: string } | null;
 }
 
 export interface AdminUser {
