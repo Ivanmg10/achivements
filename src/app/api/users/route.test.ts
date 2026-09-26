@@ -3,6 +3,10 @@ jest.mock('@/lib/db', () => {
   return { __esModule: true, default: { query } }
 })
 
+jest.mock('@/lib/signupRateLimit', () => ({
+  ...jest.requireActual('@/lib/signupRateLimit'),
+}))
+
 jest.mock('bcrypt', () => ({
   hash: jest.fn().mockResolvedValue('hashedPassword'),
 }))
@@ -10,11 +14,13 @@ jest.mock('bcrypt', () => ({
 import { POST } from './route'
 import { NextRequest } from 'next/server'
 import pool from '@/lib/db'
+import { resetSignupLimit } from '@/lib/signupRateLimit'
 
 const mockUser = { id: 1, username: 'ivan', email: null, theme: 'dark', avatar: null, admin: false }
 
 beforeEach(() => {
-  process.env.REGISTER_TOKEN = 'secret123'
+  resetSignupLimit()
+  delete process.env.REGISTRATION_OPEN
   ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
   ;(pool.query as jest.Mock).mockImplementation((sql: string) => {
     if (sql.startsWith('SELECT')) return Promise.resolve({ rows: [] })
@@ -23,7 +29,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  delete process.env.REGISTER_TOKEN
+  delete process.env.REGISTRATION_OPEN
 })
 
 function makeReq(body: object) {
@@ -34,34 +40,35 @@ function makeReq(body: object) {
   })
 }
 
-test('POST returns 403 when REGISTER_TOKEN not set', async () => {
-  delete process.env.REGISTER_TOKEN
-  const res = await POST(makeReq({ username: 'ivan', password: 'pass123', registerToken: 'x' }))
+test('POST refuses when registration is closed', async () => {
+  process.env.REGISTRATION_OPEN = 'false'
+  const res = await POST(makeReq({ username: 'ivan', password: 'pass123' }))
   expect(res.status).toBe(403)
 })
 
-test('POST returns 401 when token wrong', async () => {
-  const res = await POST(makeReq({ username: 'ivan', password: 'pass', registerToken: 'wrong' }))
-  expect(res.status).toBe(401)
+test('POST stops an address that keeps creating accounts', async () => {
+  for (let i = 0; i < 5; i++) await POST(makeReq({ username: 'ivan' + i, password: 'pass123' }))
+  const res = await POST(makeReq({ username: 'ivan9', password: 'pass123' }))
+  expect(res.status).toBe(429)
 })
 
 test('POST creates user and returns 201', async () => {
-  const res = await POST(makeReq({ username: 'ivan', password: 'pass123', registerToken: 'secret123' }))
+  const res = await POST(makeReq({ username: 'ivan', password: 'pass123' }))
   expect(res.status).toBe(201)
 })
 
 test('POST returns 400 when username missing', async () => {
-  const res = await POST(makeReq({ password: 'pass123', registerToken: 'secret123' }))
+  const res = await POST(makeReq({ password: 'pass123' }))
   expect(res.status).toBe(400)
 })
 
 test('POST returns 400 when password missing', async () => {
-  const res = await POST(makeReq({ username: 'ivan', registerToken: 'secret123' }))
+  const res = await POST(makeReq({ username: 'ivan' }))
   expect(res.status).toBe(400)
 })
 
 test('POST returns 500 on db error', async () => {
   ;(pool.query as jest.Mock).mockRejectedValueOnce(new Error('DB error'))
-  const res = await POST(makeReq({ username: 'ivan', password: 'pass123', registerToken: 'secret123' }))
+  const res = await POST(makeReq({ username: 'ivan', password: 'pass123' }))
   expect(res.status).toBe(500)
 })

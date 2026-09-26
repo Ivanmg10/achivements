@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { IconUser, IconLock, IconArrowRight, IconTicket } from '@tabler/icons-react'
+import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
 import { checkPassword, checkUsername, PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
@@ -16,9 +16,8 @@ export default function RegisterUserForm({
 }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [inviteCode, setInviteCode] = useState('')
   const [error, setError] = useState('')
-  const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string; invite?: string }>({})
+  const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string }>({})
   const [submitting, setSubmitting] = useState(false)
   const { T } = useLanguage()
 
@@ -38,8 +37,6 @@ export default function RegisterUserForm({
     if (pass === 'empty') next.password = T.registerForm.required
     else if (pass === 'shape') next.password = passwordRule
 
-    if (!inviteCode.trim()) next.invite = T.registerForm.required
-
     setFieldErrors(next)
     return Object.keys(next).length === 0
   }
@@ -54,7 +51,7 @@ export default function RegisterUserForm({
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password, registerToken: inviteCode.trim() }),
+        body: JSON.stringify({ username: username.trim(), password }),
       })
 
       const data = await res.json().catch(() => ({}))
@@ -113,21 +110,6 @@ export default function RegisterUserForm({
           hint={passwordRule}
           error={fieldErrors.password}
           autoComplete="new-password"
-          required
-          disabled={submitting}
-        />
-
-        <AuthFormField
-          label={T.registerForm.invitationCode}
-          icon={<IconTicket size={18} />}
-          value={inviteCode}
-          onChange={(v) => {
-            setInviteCode(v)
-            setFieldErrors((f) => ({ ...f, invite: undefined }))
-          }}
-          hint={T.registerForm.invitationHint}
-          error={fieldErrors.invite}
-          autoComplete="off"
           required
           disabled={submitting}
         />

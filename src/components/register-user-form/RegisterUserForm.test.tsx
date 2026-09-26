@@ -12,10 +12,9 @@ function renderForm() {
   return { setIsLogin, setIsRegister }
 }
 
-function fill({ username = 'ivan', password = 'secret', code = 'invite' } = {}) {
+function fill({ username = 'ivan', password = 'secret' } = {}) {
   fireEvent.change(screen.getByLabelText(en.registerForm.username), { target: { value: username } })
   fireEvent.change(screen.getByLabelText(en.registerForm.password), { target: { value: password } })
-  fireEvent.change(screen.getByLabelText(en.registerForm.invitationCode), { target: { value: code } })
 }
 
 const submit = () => fireEvent.click(screen.getByRole('button', { name: new RegExp(en.registerForm.createAccount, 'i') }))
@@ -29,12 +28,6 @@ test('shows the rules for each field before anything is typed', () => {
   renderForm()
   expect(screen.getByText(usernameRule)).toBeInTheDocument()
   expect(screen.getByText(passwordRule)).toBeInTheDocument()
-  expect(screen.getByText(en.registerForm.invitationHint)).toBeInTheDocument()
-})
-
-test('asks for the invite code, which the visitor types in', () => {
-  renderForm()
-  expect(screen.getByLabelText(en.registerForm.invitationCode)).toBeInTheDocument()
 })
 
 test('a username that breaks the rules never reaches the server', () => {
@@ -58,7 +51,7 @@ test('a short password never reaches the server', () => {
 test('an empty form marks every field', () => {
   renderForm()
   submit()
-  expect(screen.getAllByText(en.registerForm.required)).toHaveLength(3)
+  expect(screen.getAllByText(en.registerForm.required)).toHaveLength(2)
   expect(global.fetch).not.toHaveBeenCalled()
 })
 
@@ -69,16 +62,16 @@ test('typing again clears that field’s complaint', () => {
   expect(screen.getByLabelText(en.registerForm.username).getAttribute('aria-invalid')).toBeNull()
 })
 
-test('sends the typed code, and never a build-time secret', async () => {
+test('sends only what the visitor typed: no code, no build-time secret', async () => {
   const { setIsLogin, setIsRegister } = renderForm()
-  fill({ code: 'let-me-in' })
+  fill()
   submit()
 
   await waitFor(() => expect(setIsLogin).toHaveBeenCalledWith(true))
   expect(setIsRegister).toHaveBeenCalledWith(true)
   const [url, init] = (global.fetch as jest.Mock).mock.calls[0]
   expect(url).toBe('/api/users')
-  expect(JSON.parse(init.body)).toEqual({ username: 'ivan', password: 'secret', registerToken: 'let-me-in' })
+  expect(JSON.parse(init.body)).toEqual({ username: 'ivan', password: 'secret' })
 })
 
 test('while creating the account the button says so and cannot be pressed again', async () => {
@@ -96,13 +89,13 @@ test('while creating the account the button says so and cannot be pressed again'
   release({ ok: true, json: () => Promise.resolve({}) })
 })
 
-test('a rejected code is reported and the form stays usable', async () => {
-  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'No autorizado' }) })
+test('a refusal from the server is reported and the form stays usable', async () => {
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'Username ya en uso' }) })
   const { setIsLogin } = renderForm()
   fill()
   submit()
 
-  expect(await screen.findByRole('alert')).toHaveTextContent('No autorizado')
+  expect(await screen.findByRole('alert')).toHaveTextContent('Username ya en uso')
   expect(setIsLogin).not.toHaveBeenCalled()
   expect(screen.getByRole('button', { name: new RegExp(en.registerForm.createAccount, 'i') })).not.toBeDisabled()
 })
