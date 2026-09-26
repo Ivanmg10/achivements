@@ -8,8 +8,8 @@
 
 ### Authentication
 - Username / password login and registration, open to anyone
-- Optional email on sign-up — the only way to recover an account later
-- Password recovery by email **(built, but inert until a domain is verified in Resend — see [Email](#email))**
+- Email required on sign-up — the only way to recover an account later
+- Password recovery by email through Resend — **works today only for the Resend account owner, until a domain is verified (see [Email](#email))**
 - Five sign-ups and five reset requests per address per hour, counted in the database
 - RetroAchievements account linking with a Web API key
 - Steam account linking via OpenID
@@ -175,19 +175,18 @@ for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 ## Email
 
 Password recovery sends one message through [Resend](https://resend.com), over
-their REST API (no SDK). It is wired up end to end — request form, token table,
-reset page — **but it cannot deliver to anyone until a sending domain is
-verified in Resend**, because Resend's shared sender (`onboarding@resend.dev`)
-only delivers to the Resend account owner's own address.
+their REST API (no SDK). Everything is wired up: request form, hashed
+single-use token, reset page.
 
-**Current state: the API key exists, the domain does not.** Until that changes:
+**What works depends on what is set:**
 
-- `emailConfigured()` is false whenever `RESEND_API_KEY` or `EMAIL_FROM` is missing.
-- `POST /api/auth/forgotPassword` answers `503 { error: 'email-not-configured' }`
-  and the UI says so plainly, rather than promising a message that cannot arrive.
-- Nothing else in the app depends on email.
+| Env | What happens |
+|---|---|
+| Nothing | `POST /api/auth/forgotPassword` answers `503 { error: 'email-not-configured' }` and the UI says so. No message is sent, none is promised. |
+| `RESEND_API_KEY` only | Sends from Resend's shared address. **Delivers only to the Resend account owner's own address** — enough to try the flow end to end, useless for other people. |
+| `RESEND_API_KEY` + `EMAIL_FROM` on a verified domain | Delivers to everyone. This is the finished state. |
 
-**To switch it on:**
+**To reach everyone:**
 
 1. Verify a domain (or a subdomain, e.g. `mail.yourdomain.com`) in Resend and add
    the DNS records it asks for.
@@ -200,7 +199,7 @@ only delivers to the Resend account owner's own address.
 
 3. Make sure `NEXTAUTH_URL` is the public URL — the reset link is built from it.
 
-No code change is needed: the flow turns itself on when both variables are set.
+No code change is needed; the sender is read from the environment.
 
 | Piece | Where |
 |---|---|
@@ -209,6 +208,10 @@ No code change is needed: the flow turns itself on when both variables are set.
 | Request / reset endpoints | `src/app/api/auth/forgotPassword`, `src/app/api/auth/resetPassword` |
 | UI | `src/components/forgot-password-modal`, `src/components/reset-password-form`, `/resetPassword` |
 | Table | `migrations/016_password_resets.sql` |
+
+**Not done yet:** email verification. When a domain is in place, the plan is a
+soft one — the account works straight away and an unverified address only earns
+a banner, never a locked door.
 
 ---
 

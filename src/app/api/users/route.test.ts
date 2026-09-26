@@ -43,18 +43,18 @@ function makeReq(body: object) {
 
 test('POST refuses when registration is closed', async () => {
   process.env.REGISTRATION_OPEN = 'false'
-  const res = await POST(makeReq({ username: 'ivan', password: 'pass123' }))
+  const res = await POST(makeReq({ username: 'ivan', password: 'pass123', email: 'ivan@test.com' }))
   expect(res.status).toBe(403)
 })
 
 test('POST stops an address the limiter has had enough of', async () => {
   ;(allowAttempt as jest.Mock).mockResolvedValue(false)
-  const res = await POST(makeReq({ username: 'ivan', password: 'pass123' }))
+  const res = await POST(makeReq({ username: 'ivan', password: 'pass123', email: 'ivan@test.com' }))
   expect(res.status).toBe(429)
 })
 
 test('POST creates user and returns 201', async () => {
-  const res = await POST(makeReq({ username: 'ivan', password: 'pass123' }))
+  const res = await POST(makeReq({ username: 'ivan', password: 'pass123', email: 'ivan@test.com' }))
   expect(res.status).toBe(201)
 })
 
@@ -70,6 +70,11 @@ test('POST returns 400 when password missing', async () => {
 
 test('POST returns 500 on db error', async () => {
   ;(pool.query as jest.Mock).mockRejectedValueOnce(new Error('DB error'))
-  const res = await POST(makeReq({ username: 'ivan', password: 'pass123' }))
+  const res = await POST(makeReq({ username: 'ivan', password: 'pass123', email: 'ivan@test.com' }))
   expect(res.status).toBe(500)
+})
+
+test('POST refuses a missing or malformed email', async () => {
+  expect((await POST(makeReq({ username: 'ivan', password: 'pass123' }))).status).toBe(400)
+  expect((await POST(makeReq({ username: 'ivan', password: 'pass123', email: 'nope' }))).status).toBe(400)
 })

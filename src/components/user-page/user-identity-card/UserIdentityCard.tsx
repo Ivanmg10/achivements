@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { signOut, useSession } from 'next-auth/react'
-import { IconLock, IconLogout, IconPencil } from '@tabler/icons-react'
+import { IconAlertTriangle, IconLock, IconLogout, IconPencil } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import EditProfileModal, { EditProfileField } from '@/components/edit-profile-modal/EditProfileModal'
 import ChangePasswordModal from '@/components/change-password-modal/ChangePasswordModal'
@@ -36,6 +36,8 @@ export default function UserIdentityCard() {
 
   const user = session?.user
   const country = user?.location ? findCountry(user.location) : null
+  // Accounts made before the email became compulsory have no way back in.
+  const missingEmail = Boolean(user) && !user?.email
 
   const steam = summarizeSteamLibrary(library)
   const completedRa = new Set(
@@ -111,6 +113,22 @@ export default function UserIdentityCard() {
           </button>
         </div>
       </div>
+
+      {missingEmail && (
+        <div role="alert" className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
+          <IconAlertTriangle size={18} className="text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <div className="flex flex-col gap-1 min-w-0">
+            <p className="text-sm font-semibold text-amber-300">{T.passwordReset.missingEmailTitle}</p>
+            <p className="text-xs text-text-secondary">{T.passwordReset.missingEmailText}</p>
+            <button
+              onClick={() => setEdit({ field: 'email', value: '' })}
+              className="self-start mt-1 text-xs font-medium text-amber-300 underline underline-offset-2 hover:text-amber-200 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+            >
+              {T.passwordReset.addEmail}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="bg-bg-main rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <ProfileField

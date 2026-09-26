@@ -12,9 +12,10 @@ function renderForm() {
   return { setIsLogin, setIsRegister }
 }
 
-function fill({ username = 'ivan', password = 'secret' } = {}) {
+function fill({ username = 'ivan', password = 'secret', email = 'ivan@test.com' } = {}) {
   fireEvent.change(screen.getByLabelText(en.registerForm.username), { target: { value: username } })
   fireEvent.change(screen.getByLabelText(en.registerForm.password), { target: { value: password } })
+  fireEvent.change(screen.getByLabelText(en.passwordReset.email), { target: { value: email } })
 }
 
 const submit = () => fireEvent.click(screen.getByRole('button', { name: new RegExp(en.registerForm.createAccount, 'i') }))
@@ -51,7 +52,7 @@ test('a short password never reaches the server', () => {
 test('an empty form marks every field', () => {
   renderForm()
   submit()
-  expect(screen.getAllByText(en.registerForm.required)).toHaveLength(2)
+  expect(screen.getAllByText(en.registerForm.required)).toHaveLength(3)
   expect(global.fetch).not.toHaveBeenCalled()
 })
 
@@ -62,7 +63,7 @@ test('typing again clears that field’s complaint', () => {
   expect(screen.getByLabelText(en.registerForm.username).getAttribute('aria-invalid')).toBeNull()
 })
 
-test('sends only what the visitor typed: no code, no build-time secret', async () => {
+test('sends what the visitor typed, email included', async () => {
   const { setIsLogin, setIsRegister } = renderForm()
   fill()
   submit()
@@ -71,7 +72,7 @@ test('sends only what the visitor typed: no code, no build-time secret', async (
   expect(setIsRegister).toHaveBeenCalledWith(true)
   const [url, init] = (global.fetch as jest.Mock).mock.calls[0]
   expect(url).toBe('/api/users')
-  expect(JSON.parse(init.body)).toEqual({ username: 'ivan', password: 'secret' })
+  expect(JSON.parse(init.body)).toEqual({ username: 'ivan', password: 'secret', email: 'ivan@test.com' })
 })
 
 test('while creating the account the button says so and cannot be pressed again', async () => {
@@ -106,4 +107,12 @@ test('the sign-in link reads as a link and switches form', () => {
   expect(link.className).toContain('underline')
   fireEvent.click(link)
   expect(setIsLogin).toHaveBeenCalledWith(true)
+})
+
+test('an address that is not one never reaches the server', () => {
+  renderForm()
+  fill({ email: 'not-an-email' })
+  submit()
+  expect(screen.getByText(en.passwordReset.emailInvalid)).toBeInTheDocument()
+  expect(global.fetch).not.toHaveBeenCalled()
 })

@@ -1,4 +1,4 @@
-import { checkPassword, checkUsername } from './authValidation'
+import { checkEmail, checkPassword, checkUsername } from './authValidation'
 
 describe('checkUsername', () => {
   test('accepts letters, numbers and underscores, 3 to 20 long', () => {
@@ -31,5 +31,20 @@ describe('checkPassword', () => {
 
   test('accepts spaces as characters', () => {
     expect(checkPassword('a b c ')).toBeNull()
+  })
+})
+
+describe('checkEmail', () => {
+  test('accepts an ordinary address, spaces around it and all', () => {
+    expect(checkEmail('ivan@test.com')).toBeNull()
+    expect(checkEmail('  ivan.marquez+ra@test.co.uk  ')).toBeNull()
+  })
+
+  test('reports an empty field apart from a malformed one', () => {
+    expect(checkEmail('')).toBe('empty')
+    expect(checkEmail('   ')).toBe('empty')
+    expect(checkEmail('ivan')).toBe('shape')
+    expect(checkEmail('ivan@test')).toBe('shape')
+    expect(checkEmail('ivan @test.com')).toBe('shape')
   })
 })

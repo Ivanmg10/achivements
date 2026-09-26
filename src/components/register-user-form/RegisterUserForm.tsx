@@ -5,7 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
-import { checkPassword, checkUsername, PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
+import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 
 export default function RegisterUserForm({
   setIsLogin,
@@ -18,7 +18,7 @@ export default function RegisterUserForm({
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
-  const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string }>({})
+  const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string; email?: string }>({})
   const [submitting, setSubmitting] = useState(false)
   const { T } = useLanguage()
 
@@ -38,6 +38,10 @@ export default function RegisterUserForm({
     if (pass === 'empty') next.password = T.registerForm.required
     else if (pass === 'shape') next.password = passwordRule
 
+    const address = checkEmail(email)
+    if (address === 'empty') next.email = T.registerForm.required
+    else if (address === 'shape') next.email = T.passwordReset.emailInvalid
+
     setFieldErrors(next)
     return Object.keys(next).length === 0
   }
@@ -52,7 +56,7 @@ export default function RegisterUserForm({
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password, email: email.trim() || undefined }),
+        body: JSON.stringify({ username: username.trim(), password, email: email.trim() }),
       })
 
       const data = await res.json().catch(() => ({}))
@@ -116,12 +120,18 @@ export default function RegisterUserForm({
         />
 
         <AuthFormField
-          label={T.passwordReset.emailOptional}
+          label={T.passwordReset.email}
           icon={<IconMail size={18} />}
           type="email"
           value={email}
-          onChange={setEmail}
+          onChange={(v) => {
+            setEmail(v)
+            setFieldErrors((f) => ({ ...f, email: undefined }))
+          }}
+          hint={T.passwordReset.emailWhy}
+          error={fieldErrors.email}
           autoComplete="email"
+          required
           disabled={submitting}
         />
 

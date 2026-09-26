@@ -1,4 +1,4 @@
-import { emailConfigured, sendEmail } from './email'
+import { emailConfigured, emailSender, sendEmail } from './email'
 
 const message = { to: 'a@b.c', subject: 'Hi', html: '<p>Hi</p>', text: 'Hi' }
 
@@ -14,12 +14,18 @@ afterEach(() => {
   delete process.env.EMAIL_FROM
 })
 
-test('says nothing is configured until both the key and the sender are set', () => {
+test('the key alone is enough to send; without it nothing is configured', () => {
   expect(emailConfigured()).toBe(true)
   delete process.env.EMAIL_FROM
-  expect(emailConfigured()).toBe(false)
+  expect(emailConfigured()).toBe(true)
   delete process.env.RESEND_API_KEY
   expect(emailConfigured()).toBe(false)
+})
+
+test(`falls back to Resend's shared sender until a domain is set`, () => {
+  expect(emailSender()).toBe('CheevoVault <no-reply@example.com>')
+  delete process.env.EMAIL_FROM
+  expect(emailSender()).toContain('onboarding@resend.dev')
 })
 
 test('without configuration it reports that, and sends nothing', async () => {

@@ -62,3 +62,16 @@ test('change password opens its modal, sign out signs out', () => {
   fireEvent.click(screen.getByRole('button', { name: en.userConfig.signOut }))
   expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/authPage' })
 })
+
+test('an account with no email is told why that matters', () => {
+  setUser({ ...USER, email: undefined })
+  render(<UserIdentityCard />)
+  expect(screen.getByRole('alert')).toHaveTextContent(en.passwordReset.missingEmailTitle)
+  fireEvent.click(screen.getByRole('button', { name: en.passwordReset.addEmail }))
+  expect(screen.getByTestId('edit-modal')).toHaveTextContent('email')
+})
+
+test('no warning once an address is set', () => {
+  render(<UserIdentityCard />)
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+})

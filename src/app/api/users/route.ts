@@ -45,9 +45,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Optional, but the only way to recover an account later.
+    // Required: it is the only way to recover an account later.
     const trimmedEmail = typeof email === "string" ? email.trim() : "";
-    if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       return NextResponse.json({ error: "Correo no válido" }, { status: 400 });
     }
 
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       `INSERT INTO users (username, password, email, theme)
        VALUES ($1, $2, $3, 'dark')
        RETURNING id, username, email, theme, avatar, admin`,
-      [username, hashedPassword, trimmedEmail || null],
+      [username, hashedPassword, trimmedEmail],
     );
 
     return NextResponse.json(result.rows[0], { status: 201 });

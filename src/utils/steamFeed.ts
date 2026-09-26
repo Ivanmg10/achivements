@@ -110,6 +110,36 @@ export function countLoadedProgress(games: SteamGameProgress[]): number {
   return games.filter((g) => g.achievementsLoaded).length
 }
 
+export type SteamLibrarySummary = {
+  perfect: number
+  playing: number
+  unlocked: number
+  /** Average completion of started games (playing + perfect), 0–100. */
+  avgCompletion: number
+  totalGames: number
+  /** Total minutes across the whole library, loaded or not — Steam reports this either way. */
+  totalMinutes: number
+}
+
+/**
+ * The library rolled up into the numbers both the main page's Steam card and
+ * the profile page's Steam section show — one place computing them so the
+ * two never quietly disagree.
+ */
+export function summarizeSteamLibrary(games: SteamGameProgress[]): SteamLibrarySummary {
+  const playing = games.filter((g) => classifySteamGame(g) === 'playing')
+  const perfect = games.filter((g) => classifySteamGame(g) === 'completed')
+  const started = [...playing, ...perfect]
+  return {
+    perfect: perfect.length,
+    playing: playing.length,
+    unlocked: games.reduce((sum, g) => sum + (g.achievementsLoaded ? g.numAwarded : 0), 0),
+    avgCompletion: started.length ? Math.round(started.reduce((sum, g) => sum + g.pctWon, 0) / started.length) : 0,
+    totalGames: games.length,
+    totalMinutes: games.reduce((sum, g) => sum + g.playtimeForever, 0),
+  }
+}
+
 /** Global rarity as shown: rare achievements keep enough digits to tell apart. */
 export function formatRarity(pct: number): string {
   return pct < 1 ? pct.toFixed(2) : pct.toFixed(1)

@@ -111,28 +111,37 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 
 ## Email — read before touching anything that sends one
 
-Password recovery is **finished but inert**. It goes out through Resend
-(`src/lib/email.ts`, REST API, no SDK) and only works once a sending domain is
-verified there. The account has an API key; it does **not** have a domain yet,
-and Resend's shared sender only delivers to the account owner's own address.
+Password recovery goes out through Resend (`src/lib/email.ts`, REST API, no SDK).
+How far it reaches depends only on the environment:
 
-- Gate: `emailConfigured()` — true only when `RESEND_API_KEY` **and** `EMAIL_FROM` are set.
-- With email off, `POST /api/auth/forgotPassword` returns `503 { error: 'email-not-configured' }`
-  and the UI tells the user plainly. **Do not "fix" this by pretending the mail was sent.**
-- Turning it on is configuration only — verify the domain, set both env vars. No code change.
+- **No `RESEND_API_KEY`** → `emailConfigured()` is false, `POST /api/auth/forgotPassword`
+  returns `503 { error: 'email-not-configured' }`, and the UI tells the user plainly.
+  **Do not "fix" this by pretending the mail was sent.**
+- **Key only** → sends from Resend's shared address, which delivers **only to the
+  Resend account owner**. That is the state while the project has no domain.
+- **Key + `EMAIL_FROM` on a verified domain** → reaches everyone. Configuration
+  only; no code change.
+
+Other things to keep true:
+
 - Reset links are built from `NEXTAUTH_URL`.
 - Tokens: random 32 bytes, only their SHA-256 stored, one hour, single use
   (`src/lib/passwordReset.ts`, table from `migrations/016_password_resets.sql`).
+- `/api/auth/forgotPassword` answers the same whether or not the address has an
+  account. Keep it that way: it is what stops the endpoint being used to find users.
 - Never add a second mail provider or an SMTP fallback without asking.
+- Email verification does not exist yet. When it arrives it is meant to be soft:
+  a banner for unverified addresses, never a blocked sign-in.
 
 ## Registration
 
-Public and open: anyone can sign up with a username and a password, plus an
-optional email (the only way to recover the account). There is no invite code —
-the old `REGISTER_TOKEN` / `NEXT_PUBLIC_REGISTER_TOKEN` pair is gone, and the
-public one leaked the secret into the browser bundle. `REGISTRATION_OPEN=false`
-closes sign-ups; unset means open. Both sign-ups and reset requests are limited
-per address in the database (`src/lib/attemptLimit.ts`).
+Public and open: anyone can sign up with a username, a password and an **email,
+which is required** — it is the only way to recover an account. Accounts created
+before that rule have none, and the account page shows them a warning.
+There is no invite code; the old `REGISTER_TOKEN` / `NEXT_PUBLIC_REGISTER_TOKEN`
+pair is gone, and the public one leaked the secret into the browser bundle.
+`REGISTRATION_OPEN=false` closes sign-ups; unset means open. Sign-ups and reset
+requests are both limited per address in the database (`src/lib/attemptLimit.ts`).
 
 ## Git — commits
 Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — all commits must appear solely under the user's name so GitHub contributions are attributed correctly.
