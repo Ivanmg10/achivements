@@ -2,7 +2,10 @@
 
 import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react'
+import { IconUser, IconLock, IconArrowRight, IconTicket } from '@tabler/icons-react'
+import AuthFormField from '@/components/auth-form-field/AuthFormField'
+import Spinner from '@/components/main-spinner/Spinner'
+import { checkPassword, checkUsername, PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 
 export default function RegisterUserForm({
   setIsLogin,
@@ -13,27 +16,60 @@ export default function RegisterUserForm({
 }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [inviteCode, setInviteCode] = useState('')
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string; invite?: string }>({})
+  const [submitting, setSubmitting] = useState(false)
   const { T } = useLanguage()
+
+  const usernameRule = T.registerForm.usernameRule
+    .replace('{min}', String(USERNAME_MIN))
+    .replace('{max}', String(USERNAME_MAX))
+  const passwordRule = T.registerForm.passwordRule.replace('{min}', String(PASSWORD_MIN))
+
+  /** The server checks all of this again; this only saves a failed round trip. */
+  function validate() {
+    const next: typeof fieldErrors = {}
+    const name = checkUsername(username)
+    if (name === 'empty') next.username = T.registerForm.required
+    else if (name === 'shape') next.username = usernameRule
+
+    const pass = checkPassword(password)
+    if (pass === 'empty') next.password = T.registerForm.required
+    else if (pass === 'shape') next.password = passwordRule
+
+    if (!inviteCode.trim()) next.invite = T.registerForm.required
+
+    setFieldErrors(next)
+    return Object.keys(next).length === 0
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    if (!validate()) return
 
-    const res = await fetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, registerToken: process.env.NEXT_PUBLIC_REGISTER_TOKEN }),
-    })
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username.trim(), password, registerToken: inviteCode.trim() }),
+      })
 
-    const data = await res.json()
-    if (!res.ok) {
-      setError(data.error || T.registerForm.errorCreating)
-      return
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setError(data.error || T.registerForm.errorCreating)
+        setSubmitting(false)
+        return
+      }
+
+      setIsLogin(true)
+      setIsRegister(true)
+    } catch {
+      setError(T.registerForm.errorCreating)
+      setSubmitting(false)
     }
-
-    setIsLogin(true)
-    setIsRegister(true)
   }
 
   return (
@@ -49,51 +85,82 @@ export default function RegisterUserForm({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <div className="relative">
-          <IconUser size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" aria-hidden="true" />
-          <label htmlFor="register-username" className="sr-only">{T.registerForm.username}</label>
-          <input
-            id="register-username"
-            type="text"
-            className="bg-bg-tertiary text-text-main rounded-xl pl-9 pr-3 py-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
-            placeholder={T.registerForm.username}
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            autoComplete="username"
-          />
-        </div>
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
+        <AuthFormField
+          label={T.registerForm.username}
+          icon={<IconUser size={18} />}
+          value={username}
+          onChange={(v) => {
+            setUsername(v)
+            setFieldErrors((f) => ({ ...f, username: undefined }))
+          }}
+          hint={usernameRule}
+          error={fieldErrors.username}
+          autoComplete="username"
+          required
+          disabled={submitting}
+        />
 
-        <div className="relative">
-          <IconLock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" aria-hidden="true" />
-          <label htmlFor="register-password" className="sr-only">{T.registerForm.password}</label>
-          <input
-            id="register-password"
-            type="password"
-            className="bg-bg-tertiary text-text-main rounded-xl pl-9 pr-3 py-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
-            placeholder={T.registerForm.password}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="new-password"
-          />
-        </div>
+        <AuthFormField
+          label={T.registerForm.password}
+          icon={<IconLock size={18} />}
+          type="password"
+          value={password}
+          onChange={(v) => {
+            setPassword(v)
+            setFieldErrors((f) => ({ ...f, password: undefined }))
+          }}
+          hint={passwordRule}
+          error={fieldErrors.password}
+          autoComplete="new-password"
+          required
+          disabled={submitting}
+        />
+
+        <AuthFormField
+          label={T.registerForm.invitationCode}
+          icon={<IconTicket size={18} />}
+          value={inviteCode}
+          onChange={(v) => {
+            setInviteCode(v)
+            setFieldErrors((f) => ({ ...f, invite: undefined }))
+          }}
+          hint={T.registerForm.invitationHint}
+          error={fieldErrors.invite}
+          autoComplete="off"
+          required
+          disabled={submitting}
+        />
 
         <button
           type="submit"
-          className="bg-btn-primary text-btn-primary-text w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform duration-200 mt-1"
+          disabled={submitting}
+          className="bg-accent text-bg-main w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main"
         >
-          {T.registerForm.createAccount}
-          <IconArrowRight size={16} aria-hidden="true" />
+          {submitting ? (
+            <>
+              <Spinner size={16} />
+              {T.registerForm.creating}
+            </>
+          ) : (
+            <>
+              {T.registerForm.createAccount}
+              <IconArrowRight size={16} aria-hidden="true" />
+            </>
+          )}
         </button>
       </form>
 
-      <button
-        type="button"
-        onClick={() => setIsLogin(true)}
-        className="text-text-secondary hover:text-text-main text-sm transition-colors w-full text-center mt-5"
-      >
-        {T.registerForm.alreadyHaveAccount}
-      </button>
+      <p className="text-text-secondary text-sm text-center mt-5">
+        {T.registerForm.alreadyHaveAccountLead}{' '}
+        <button
+          type="button"
+          onClick={() => setIsLogin(true)}
+          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        >
+          {T.registerForm.alreadyHaveAccountAction}
+        </button>
+      </p>
     </div>
   )
 }

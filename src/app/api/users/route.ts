@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 import bcrypt from "bcrypt";
+import { timingSafeEqual } from "crypto";
+
+/** Compares the invite code without leaking its length or contents by timing. */
+function sameSecret(given: string, expected: string) {
+  const a = Buffer.from(given);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
+}
 
 export async function POST(req: NextRequest) {
   try {
-    // Registration is disabled when REGISTER_TOKEN is not set
+    // Registration is invite-only: the code lives on the server and the
+    // visitor types it into the form. Nothing about it reaches the browser.
     const expectedToken = process.env.REGISTER_TOKEN;
     if (!expectedToken) {
       return NextResponse.json({ error: "Registration is disabled" }, { status: 403 });
@@ -17,7 +27,7 @@ export async function POST(req: NextRequest) {
       registerToken?: string;
     };
 
-    if (registerToken !== expectedToken) {
+    if (typeof registerToken !== "string" || !sameSecret(registerToken, expectedToken)) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
