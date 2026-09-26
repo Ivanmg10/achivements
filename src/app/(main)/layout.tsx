@@ -1,5 +1,4 @@
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/authOptions";
 import MainFooter from "@/components/main-footer/MainFooter";
 import MainHeader from "@/components/main-header/MainHeader";
@@ -14,9 +13,9 @@ export default async function MainLayout({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
-    redirect("/authPage");
-  }
+  // Signed out, the only page that gets this far is the landing (see
+  // middleware.ts), and it brings its own header and footer.
+  if (!session) return <>{children}</>;
 
   return (
     <MainProviders>

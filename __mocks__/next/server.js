@@ -29,6 +29,11 @@ class NextResponse {
     this.headers = new Map(Object.entries(init.headers || {}))
   }
 
+  /** Lets the request through, as the real one does in middleware. */
+  static next() {
+    return new NextResponse(null, { status: 200 })
+  }
+
   static json(data, init = {}) {
     const res = new NextResponse(JSON.stringify(data), init)
     res.data = data
