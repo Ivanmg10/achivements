@@ -219,11 +219,21 @@ export const fr: Translations = {
   raLoginModal: {
     title: 'Se connecter à RetroAchievements',
     username: "Nom d'utilisateur",
+    apiKey: 'Clé d’API',
     signIn: 'Se connecter',
   },
   authPage: {
     brand: 'CheevoVault',
     tagline: 'CheevoVault',
+  },
+  connect: {
+    title: 'Connecte un compte pour commencer',
+    subtitle: 'CheevoVault lit tes succès depuis les plateformes que tu relies. Tu peux relier les deux.',
+    raPitch: 'Il te faut ton nom d’utilisateur et ta clé d’API RetroAchievements.',
+    steamPitch: 'Un clic via Steam. Aucun mot de passe à saisir.',
+    whatYouGet: 'Ce qui apparaît une fois connecté',
+    raKeyHelp: 'Où trouver ma clé ?',
+    raKeyPath: 'Sur RetroAchievements : Settings → Keys → Web API Key',
   },
   landing: {
     tagline: 'Tous tes succès au même endroit',

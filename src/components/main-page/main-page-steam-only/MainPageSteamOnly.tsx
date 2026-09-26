@@ -1,10 +1,12 @@
 'use client'
 
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { IconPlugConnected } from '@tabler/icons-react'
 import { fadeUp } from '@/lib/animations'
+import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import RaLoginModal from '@/components/ra-login-modal/RaLoginModal'
+import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamRecentList from '@/components/steam/steam-recent-list/SteamRecentList'
 import MainPageProfileSt from '../main-page-profile/main-page-profile-st/MainPageProfileSt'
 
@@ -16,6 +18,7 @@ import MainPageProfileSt from '../main-page-profile/main-page-profile-st/MainPag
  */
 export default function MainPageSteamOnly() {
   const { T } = useLanguage()
+  const [raModalOpen, setRaModalOpen] = useState(false)
 
   return (
     <motion.main
@@ -31,12 +34,13 @@ export default function MainPageSteamOnly() {
           <div className="flex flex-col items-start gap-2 p-4 bg-bg-card rounded-xl">
             <IconPlugConnected className="w-6 h-6 text-text-secondary" aria-hidden="true" />
             <p className="text-sm text-text-secondary">{T.steam.steamOnlyHint}</p>
-            <Link
-              href="/user"
-              className="px-4 py-1.5 bg-accent text-bg-main font-semibold rounded-xl hover:scale-[1.03] transition-transform duration-200 text-sm"
+            <button
+              onClick={() => setRaModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-1.5 bg-accent text-bg-main font-semibold rounded-xl hover:bg-accent-hover transition-colors text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
+              <RaLogo height={13} />
               {T.steam.connectRa}
-            </Link>
+            </button>
           </div>
         </div>
 
@@ -46,6 +50,8 @@ export default function MainPageSteamOnly() {
           </div>
         </div>
       </div>
+
+      <RaLoginModal isOpen={raModalOpen} setIsOpen={setRaModalOpen} />
     </motion.main>
   )
 }

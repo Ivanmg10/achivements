@@ -57,17 +57,33 @@ export default function RaLoginModal({
         <input
           type="text"
           placeholder={T.raLoginModal.username}
+          aria-label={T.raLoginModal.username}
           className="rounded-xl bg-bg-main p-3 w-full"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-        <input
-          type="text"
-          placeholder="apiKey"
-          value={apiKey}
-          className="rounded-xl bg-bg-main p-3 w-full"
-          onChange={(e) => setApiKey(e.target.value)}
-        />
+        <div className="flex flex-col gap-1.5">
+          <input
+            type="text"
+            placeholder={T.raLoginModal.apiKey}
+            aria-label={T.raLoginModal.apiKey}
+            value={apiKey}
+            className="rounded-xl bg-bg-main p-3 w-full"
+            onChange={(e) => setApiKey(e.target.value)}
+          />
+          {/* The key is buried in RA's settings, so say exactly where. */}
+          <p className="text-xs text-text-secondary">
+            {T.connect.raKeyPath}{' '}
+            <a
+              href="https://retroachievements.org/settings"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            >
+              {T.connect.raKeyHelp}
+            </a>
+          </p>
+        </div>
         {!isLoading ? (
           <button
             type="submit"

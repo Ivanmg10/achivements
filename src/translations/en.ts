@@ -217,11 +217,21 @@ export const en = {
   raLoginModal: {
     title: 'Sign in to RetroAchievements',
     username: 'Username',
+    apiKey: 'Web API key',
     signIn: 'Sign in',
   },
   authPage: {
     brand: 'CheevoVault',
     tagline: 'A RetroAchievements alternative — Steam achievement integration in progress to track all your platforms in one place',
+  },
+  connect: {
+    title: 'Connect an account to get started',
+    subtitle: 'CheevoVault reads your achievements from the platforms you link. You can link both.',
+    raPitch: 'Needs your RetroAchievements username and Web API key.',
+    steamPitch: 'One click through Steam. No password to type.',
+    whatYouGet: 'What shows up once you connect',
+    raKeyHelp: 'Where do I find my key?',
+    raKeyPath: 'On RetroAchievements: Settings → Keys → Web API Key',
   },
   landing: {
     tagline: 'Every achievement you have earned, in one place',

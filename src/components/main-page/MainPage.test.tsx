@@ -8,9 +8,9 @@ jest.mock('@/components/main-page/main-page-pinned-games/MainPagePinnedGames', (
   default: () => <div data-testid="pinned-games">PinnedGames</div>,
 }))
 
-jest.mock('@/components/main-page/main-page-no-ra/MainPageNoRa', () => ({
+jest.mock('@/components/connect-accounts/ConnectAccounts', () => ({
   __esModule: true,
-  default: () => <div data-testid="no-ra">NoRa</div>,
+  default: () => <div data-testid="connect">NoRa</div>,
 }))
 
 jest.mock('@/components/main-page/main-page-steam-only/MainPageSteamOnly', () => ({
@@ -77,7 +77,7 @@ test('renders NoRa page when authenticated but no raUser', () => {
     data: { user: {} },
   })
   render(<MainPage />)
-  expect(screen.getByTestId('no-ra')).toBeInTheDocument()
+  expect(screen.getByTestId('connect')).toBeInTheDocument()
 })
 
 test('renders the Steam-only page when Steam is linked but RA is not', () => {
@@ -87,7 +87,7 @@ test('renders the Steam-only page when Steam is linked but RA is not', () => {
   })
   render(<MainPage />)
   expect(screen.getByTestId('steam-only')).toBeInTheDocument()
-  expect(screen.queryByTestId('no-ra')).not.toBeInTheDocument()
+  expect(screen.queryByTestId('connect')).not.toBeInTheDocument()
 })
 
 test('keeps the full RA page when both accounts are linked', () => {

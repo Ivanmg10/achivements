@@ -219,11 +219,21 @@ export const ja: Translations = {
   raLoginModal: {
     title: 'RetroAchievementsにログイン',
     username: 'ユーザー名',
+    apiKey: 'Web APIキー',
     signIn: 'ログイン',
   },
   authPage: {
     brand: 'CheevoVault',
     tagline: 'CheevoVault',
+  },
+  connect: {
+    title: 'アカウントを連携して始めましょう',
+    subtitle: 'CheevoVaultは連携したプラットフォームから実績を読み込みます。両方の連携もできます。',
+    raPitch: 'RetroAchievementsのユーザー名とWeb APIキーが必要です。',
+    steamPitch: 'Steamでワンクリック。パスワードの入力は不要です。',
+    whatYouGet: '連携すると表示されるもの',
+    raKeyHelp: 'キーはどこにありますか?',
+    raKeyPath: 'RetroAchievements: Settings → Keys → Web API Key',
   },
   landing: {
     tagline: 'すべての実績を、ひとつの場所に',

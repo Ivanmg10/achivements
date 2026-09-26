@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { en } from '@/translations/en'
 import RaLoginModal from './RaLoginModal'
 import { useSession } from 'next-auth/react'
 
@@ -25,7 +26,7 @@ test('does not render when closed', () => {
 test('renders form when open', () => {
   render(<RaLoginModal isOpen={true} setIsOpen={jest.fn()} />)
   expect(screen.getByPlaceholderText('Username')).toBeInTheDocument()
-  expect(screen.getByPlaceholderText('apiKey')).toBeInTheDocument()
+  expect(screen.getByLabelText(en.raLoginModal.apiKey)).toBeInTheDocument()
 })
 
 test('submitting with empty fields does nothing', async () => {
@@ -38,7 +39,7 @@ test('successful login closes modal', async () => {
   const setIsOpen = jest.fn()
   render(<RaLoginModal isOpen={true} setIsOpen={setIsOpen} />)
   fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'ivan' } })
-  fireEvent.change(screen.getByPlaceholderText('apiKey'), { target: { value: 'apikey123' } })
+  fireEvent.change(screen.getByLabelText(en.raLoginModal.apiKey), { target: { value: 'apikey123' } })
   fireEvent.click(screen.getByText('Sign in'))
   await waitFor(() => expect(setIsOpen).toHaveBeenCalledWith(false))
 })
@@ -57,7 +58,15 @@ test('shows alert on error message', async () => {
   })
   render(<RaLoginModal isOpen={true} setIsOpen={jest.fn()} />)
   fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'ivan' } })
-  fireEvent.change(screen.getByPlaceholderText('apiKey'), { target: { value: 'badkey' } })
+  fireEvent.change(screen.getByLabelText(en.raLoginModal.apiKey), { target: { value: 'badkey' } })
   fireEvent.click(screen.getByText('Sign in'))
   await waitFor(() => expect(window.alert).toHaveBeenCalledWith('Invalid credentials'))
+})
+
+test('says where the RetroAchievements key lives, with a link to it', () => {
+  render(<RaLoginModal isOpen={true} setIsOpen={jest.fn()} />)
+  expect(screen.getByText(en.connect.raKeyPath, { exact: false })).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: en.connect.raKeyHelp }).getAttribute('href')).toBe(
+    'https://retroachievements.org/settings',
+  )
 })

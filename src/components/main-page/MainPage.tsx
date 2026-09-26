@@ -8,7 +8,7 @@ import LoadingPage from '../loading-page/LoadingPage'
 import MainPagePinnedGames from './main-page-pinned-games/MainPagePinnedGames'
 import MainPageProfile from './main-page-profile/MainPageProfile'
 import MainPageProgression from './main-page-progression/MainPageProgression'
-import MainPageNoRa from './main-page-no-ra/MainPageNoRa'
+import ConnectAccounts from '@/components/connect-accounts/ConnectAccounts'
 import MainPageSteamOnly from './main-page-steam-only/MainPageSteamOnly'
 import MainPageCharts from './main-page-charts/MainPageCharts'
 import RARecentlyPlayed from '@/components/ra-recently-played/RARecentlyPlayed'
@@ -23,7 +23,7 @@ export default function MainPage() {
 
   if (status === 'authenticated' && !session?.user?.raUser?.User) {
     // Steam alone is enough for a main page; neither account gets the connect prompt.
-    return session?.user?.steamid ? <MainPageSteamOnly /> : <MainPageNoRa />
+    return session?.user?.steamid ? <MainPageSteamOnly /> : <ConnectAccounts />
   }
 
   return (

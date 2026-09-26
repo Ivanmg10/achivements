@@ -17,10 +17,9 @@ test('shows the Steam recent feed and profile', () => {
   expect(screen.getByTestId('steam-profile')).toBeInTheDocument()
 })
 
-test('points to settings to link RetroAchievements too', () => {
+test('links RetroAchievements right there, without going to settings', () => {
   render(<MainPageSteamOnly />)
-  expect(screen.getByText(en.steam.steamOnlyHint)).toBeInTheDocument()
-  expect(screen.getByRole('link', { name: en.steam.connectRa }).getAttribute('href')).toBe('/user')
+  expect(screen.getByRole('button', { name: new RegExp(en.steam.connectRa) })).toBeInTheDocument()
 })
 
 test('puts the profile first in the DOM so it tops the page on mobile', () => {
