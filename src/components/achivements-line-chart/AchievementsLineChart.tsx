@@ -52,10 +52,6 @@ export default function AchievementsLineChart({
             ))}
           </div>
         </div>
-      ) : total === 0 ? (
-        <div className="flex items-center justify-center h-85 text-text-secondary text-sm">
-          {T.lineChart.noActivity}
-        </div>
       ) : (
         <ResponsiveContainer width="100%" height={340}>
           <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }} onClick={handleChartClick} style={{ cursor: 'pointer' }}>
@@ -68,7 +64,12 @@ export default function AchievementsLineChart({
               tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 12 }}
               tickFormatter={/* istanbul ignore next */ (val: string) => val.slice(5)}
             />
-            <YAxis tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 12 }} allowDecimals={false} />
+            {/* A flat 0 week still needs a real 0–1 axis, not an empty band. */}
+            <YAxis
+              tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 12 }}
+              allowDecimals={false}
+              domain={total === 0 ? [0, 1] : undefined}
+            />
             <Tooltip
               contentStyle={{
                 backgroundColor: 'rgb(var(--bg-card))',

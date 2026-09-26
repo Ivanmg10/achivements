@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
+import ForgotPasswordModal from '@/components/forgot-password-modal/ForgotPasswordModal'
 
 export default function LoginUserForm({
   setIsLogin,
@@ -20,6 +21,7 @@ export default function LoginUserForm({
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [forgotOpen, setForgotOpen] = useState(false)
   const { T } = useLanguage()
 
   async function handleSubmit(e: React.FormEvent) {
@@ -113,7 +115,17 @@ export default function LoginUserForm({
         </button>
       </form>
 
-      <p className="text-text-secondary text-sm text-center mt-5">
+      <p className="text-center mt-4">
+        <button
+          type="button"
+          onClick={() => setForgotOpen(true)}
+          className="text-text-secondary hover:text-text-main text-sm underline underline-offset-2 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        >
+          {T.passwordReset.forgotLink}
+        </button>
+      </p>
+
+      <p className="text-text-secondary text-sm text-center mt-3">
         {T.loginForm.noAccountLead}{' '}
         <button
           type="button"
@@ -123,6 +135,8 @@ export default function LoginUserForm({
           {T.loginForm.noAccountAction}
         </button>
       </p>
+
+      <ForgotPasswordModal isOpen={forgotOpen} onClose={() => setForgotOpen(false)} />
     </div>
   )
 }

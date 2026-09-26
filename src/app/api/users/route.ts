@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 import bcrypt from "bcrypt";
-import { allowSignup, clientAddress } from "@/lib/signupRateLimit";
+import { allowAttempt, clientAddress } from "@/lib/attemptLimit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Registration is closed" }, { status: 403 });
     }
 
-    if (!(await allowSignup(clientAddress(req.headers)))) {
+    if (!(await allowAttempt("signup", clientAddress(req.headers)))) {
       return NextResponse.json(
         { error: "Demasiadas cuentas creadas desde aquí. Inténtalo más tarde." },
         { status: 429 },
@@ -18,9 +18,10 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { username, password } = body as {
+    const { username, password, email } = body as {
       username?: string;
       password?: string;
+      email?: string;
     };
 
     if (!username || !password) {
@@ -44,6 +45,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Optional, but the only way to recover an account later.
+    const trimmedEmail = typeof email === "string" ? email.trim() : "";
+    if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      return NextResponse.json({ error: "Correo no válido" }, { status: 400 });
+    }
+
     const existing = await pool.query("SELECT id FROM users WHERE username = $1", [username]);
     if (existing.rows.length > 0) {
       return NextResponse.json({ error: "Username ya en uso" }, { status: 409 });
@@ -52,10 +59,10 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      `INSERT INTO users (username, password, theme)
-       VALUES ($1, $2, 'dark')
+      `INSERT INTO users (username, password, email, theme)
+       VALUES ($1, $2, $3, 'dark')
        RETURNING id, username, email, theme, avatar, admin`,
-      [username, hashedPassword],
+      [username, hashedPassword, trimmedEmail || null],
     );
 
     return NextResponse.json(result.rows[0], { status: 201 });

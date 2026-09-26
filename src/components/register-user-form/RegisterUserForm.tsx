@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react'
+import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
 import { checkPassword, checkUsername, PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
@@ -16,6 +16,7 @@ export default function RegisterUserForm({
 }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string }>({})
   const [submitting, setSubmitting] = useState(false)
@@ -51,7 +52,7 @@ export default function RegisterUserForm({
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password }),
+        body: JSON.stringify({ username: username.trim(), password, email: email.trim() || undefined }),
       })
 
       const data = await res.json().catch(() => ({}))
@@ -111,6 +112,16 @@ export default function RegisterUserForm({
           error={fieldErrors.password}
           autoComplete="new-password"
           required
+          disabled={submitting}
+        />
+
+        <AuthFormField
+          label={T.passwordReset.emailOptional}
+          icon={<IconMail size={18} />}
+          type="email"
+          value={email}
+          onChange={setEmail}
+          autoComplete="email"
           disabled={submitting}
         />
 

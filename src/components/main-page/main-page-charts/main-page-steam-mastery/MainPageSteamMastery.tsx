@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import type { SteamGameProgress } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
-import { classifySteamGame, hasUnloadedProgress } from '@/utils/steamFeed'
+import { classifySteamGame, hasUnloadedProgress, summarizeSteamLibrary } from '@/utils/steamFeed'
 import { GameListRow } from '@/components/ui/GameListRow'
 import CompletionDistribution from '@/components/completion-distribution/CompletionDistribution'
 
@@ -20,13 +20,8 @@ export default function MainPageSteamMastery({ games, isLoading }: { games: Stea
 
   const summary = useMemo(() => {
     const playing = games.filter((g) => classifySteamGame(g) === 'playing')
-    const perfect = games.filter((g) => classifySteamGame(g) === 'completed')
-    const started = [...playing, ...perfect]
     return {
-      perfect: perfect.length,
-      playing: playing.length,
-      unlocked: games.reduce((sum, g) => sum + (g.achievementsLoaded ? g.numAwarded : 0), 0),
-      avgCompletion: started.length ? Math.round(started.reduce((sum, g) => sum + g.pctWon, 0) / started.length) : 0,
+      ...summarizeSteamLibrary(games),
       hours: Math.round(games.reduce((sum, g) => sum + g.playtimeForever, 0) / 60),
       closest: [...playing].sort((a, b) => b.pctWon - a.pctWon).slice(0, CLOSEST),
       // Only games whose counts are really loaded: the rest would read as 0%.

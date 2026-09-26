@@ -3,9 +3,9 @@ jest.mock('@/lib/db', () => {
   return { __esModule: true, default: { query } }
 })
 
-jest.mock('@/lib/signupRateLimit', () => ({
+jest.mock('@/lib/attemptLimit', () => ({
   clientAddress: () => '1.2.3.4',
-  allowSignup: jest.fn(),
+  allowAttempt: jest.fn(),
 }))
 
 jest.mock('bcrypt', () => ({
@@ -15,12 +15,12 @@ jest.mock('bcrypt', () => ({
 import { POST } from './route'
 import { NextRequest } from 'next/server'
 import pool from '@/lib/db'
-import { allowSignup } from '@/lib/signupRateLimit'
+import { allowAttempt } from '@/lib/attemptLimit'
 
 const mockUser = { id: 1, username: 'ivan', email: null, theme: 'dark', avatar: null, admin: false }
 
 beforeEach(() => {
-  ;(allowSignup as jest.Mock).mockResolvedValue(true)
+  ;(allowAttempt as jest.Mock).mockResolvedValue(true)
   delete process.env.REGISTRATION_OPEN
   ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
   ;(pool.query as jest.Mock).mockImplementation((sql: string) => {
@@ -48,7 +48,7 @@ test('POST refuses when registration is closed', async () => {
 })
 
 test('POST stops an address the limiter has had enough of', async () => {
-  ;(allowSignup as jest.Mock).mockResolvedValue(false)
+  ;(allowAttempt as jest.Mock).mockResolvedValue(false)
   const res = await POST(makeReq({ username: 'ivan', password: 'pass123' }))
   expect(res.status).toBe(429)
 })

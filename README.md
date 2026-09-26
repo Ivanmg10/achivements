@@ -7,11 +7,14 @@
 ## Features
 
 ### Authentication
-- Email / password login and registration
-- Optional invitation code on sign-up
-- RetroAchievements account linking via OAuth
-- Steam account linking *(coming soon)*
-- Admin panel for admin users
+- Username / password login and registration, open to anyone
+- Optional email on sign-up — the only way to recover an account later
+- Password recovery by email **(built, but inert until a domain is verified in Resend — see [Email](#email))**
+- Five sign-ups and five reset requests per address per hour, counted in the database
+- RetroAchievements account linking with a Web API key
+- Steam account linking via OpenID
+- PlayStation Network *(coming soon)*
+- Admin panel for admin users: search, edit, promote and delete accounts
 
 ---
 
@@ -142,21 +145,70 @@ npm run dev
 Required env vars:
 
 ```
-NEXTAUTH_URL=
+NEXTAUTH_URL=           # also used to build password-reset links
 NEXTAUTH_SECRET=
 DATABASE_URL=
-RA_API_KEY=        # your RetroAchievements API key
+RA_API_KEY=             # shared RetroAchievements API key
+STEAM_API_KEY=          # Steam Web API key, for the Steam integration
 ```
 
-Run migrations in order before first boot:
+Optional:
+
+```
+RESEND_API_KEY=         # see Email below — without it, password recovery stays off
+EMAIL_FROM=             # e.g. CheevoVault <no-reply@yourdomain.com>
+REGISTRATION_OPEN=false # closes sign-ups; registration is open when unset
+```
+
+Run every migration in `migrations/` in order before first boot:
 
 ```bash
-psql $DATABASE_URL -f migrations/001_initial.sql
-psql $DATABASE_URL -f migrations/002_groups.sql
-psql $DATABASE_URL -f migrations/003_groups_ach_count.sql
-psql $DATABASE_URL -f migrations/004_groups_ach_count.sql
-psql $DATABASE_URL -f migrations/005_groups_pts.sql
+for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 ```
+
+> `011_drop_sourceless_game_keys.sql` is the exception: only run it once the
+> Steam branch is deployed, since the old constraints are what the previous
+> code relies on.
+
+---
+
+## Email
+
+Password recovery sends one message through [Resend](https://resend.com), over
+their REST API (no SDK). It is wired up end to end — request form, token table,
+reset page — **but it cannot deliver to anyone until a sending domain is
+verified in Resend**, because Resend's shared sender (`onboarding@resend.dev`)
+only delivers to the Resend account owner's own address.
+
+**Current state: the API key exists, the domain does not.** Until that changes:
+
+- `emailConfigured()` is false whenever `RESEND_API_KEY` or `EMAIL_FROM` is missing.
+- `POST /api/auth/forgotPassword` answers `503 { error: 'email-not-configured' }`
+  and the UI says so plainly, rather than promising a message that cannot arrive.
+- Nothing else in the app depends on email.
+
+**To switch it on:**
+
+1. Verify a domain (or a subdomain, e.g. `mail.yourdomain.com`) in Resend and add
+   the DNS records it asks for.
+2. Set both variables and redeploy:
+
+   ```
+   RESEND_API_KEY=re_xxxxxxxx
+   EMAIL_FROM=CheevoVault <no-reply@yourdomain.com>
+   ```
+
+3. Make sure `NEXTAUTH_URL` is the public URL — the reset link is built from it.
+
+No code change is needed: the flow turns itself on when both variables are set.
+
+| Piece | Where |
+|---|---|
+| Sending | `src/lib/email.ts` |
+| Tokens (hashed, one hour, single use) | `src/lib/passwordReset.ts` |
+| Request / reset endpoints | `src/app/api/auth/forgotPassword`, `src/app/api/auth/resetPassword` |
+| UI | `src/components/forgot-password-modal`, `src/components/reset-password-form`, `/resetPassword` |
+| Table | `migrations/016_password_resets.sql` |
 
 ---
 

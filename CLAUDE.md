@@ -109,6 +109,31 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 - `0.9.0` — stats page reorganization
 - `1.0.0` — Steam integration
 
+## Email — read before touching anything that sends one
+
+Password recovery is **finished but inert**. It goes out through Resend
+(`src/lib/email.ts`, REST API, no SDK) and only works once a sending domain is
+verified there. The account has an API key; it does **not** have a domain yet,
+and Resend's shared sender only delivers to the account owner's own address.
+
+- Gate: `emailConfigured()` — true only when `RESEND_API_KEY` **and** `EMAIL_FROM` are set.
+- With email off, `POST /api/auth/forgotPassword` returns `503 { error: 'email-not-configured' }`
+  and the UI tells the user plainly. **Do not "fix" this by pretending the mail was sent.**
+- Turning it on is configuration only — verify the domain, set both env vars. No code change.
+- Reset links are built from `NEXTAUTH_URL`.
+- Tokens: random 32 bytes, only their SHA-256 stored, one hour, single use
+  (`src/lib/passwordReset.ts`, table from `migrations/016_password_resets.sql`).
+- Never add a second mail provider or an SMTP fallback without asking.
+
+## Registration
+
+Public and open: anyone can sign up with a username and a password, plus an
+optional email (the only way to recover the account). There is no invite code —
+the old `REGISTER_TOKEN` / `NEXT_PUBLIC_REGISTER_TOKEN` pair is gone, and the
+public one leaked the secret into the browser bundle. `REGISTRATION_OPEN=false`
+closes sign-ups; unset means open. Both sign-ups and reset requests are limited
+per address in the database (`src/lib/attemptLimit.ts`).
+
 ## Git — commits
 Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — all commits must appear solely under the user's name so GitHub contributions are attributed correctly.
 

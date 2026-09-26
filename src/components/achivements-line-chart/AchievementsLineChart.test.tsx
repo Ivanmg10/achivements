@@ -23,13 +23,14 @@ test('renders line chart with recent achievements', () => {
   expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
 })
 
-test('renders no activity message with empty achievements', () => {
+test('still renders the chart, flat at 0, with no achievements', () => {
   render(<AchievementsLineChart achievements={[]} />)
-  expect(screen.getByText('No activity this week')).toBeInTheDocument()
+  expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
+  expect(screen.getByText('0 achievements in the last 7 days')).toBeInTheDocument()
 })
 
-test('renders no activity message with only old achievements', () => {
+test('still renders the chart, flat at 0, with only old achievements', () => {
   const old = [{ Date: '2020-01-01 00:00:00' } as any]
   render(<AchievementsLineChart achievements={old} />)
-  expect(screen.getByText('No activity this week')).toBeInTheDocument()
+  expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
 })

@@ -1,6 +1,6 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
-import { allowSignup, clientAddress } from './signupRateLimit'
+import { allowAttempt, clientAddress } from './attemptLimit'
 import pool from '@/lib/db'
 
 const query = pool.query as jest.Mock
@@ -19,29 +19,29 @@ afterEach(() => (Math.random as jest.Mock).mockRestore())
 
 test('allows an address under the limit, and records the attempt', async () => {
   recent(4)
-  await expect(allowSignup('1.2.3.4')).resolves.toBe(true)
+  await expect(allowAttempt('signup', '1.2.3.4')).resolves.toBe(true)
   expect(query.mock.calls[1][0]).toContain('INSERT INTO signup_attempts')
-  expect(query.mock.calls[1][1]).toEqual(['1.2.3.4'])
+  expect(query.mock.calls[1][1]).toEqual(['signup', '1.2.3.4'])
 })
 
 test('stops an address that already made five in the window', async () => {
   recent(5)
-  await expect(allowSignup('1.2.3.4')).resolves.toBe(false)
+  await expect(allowAttempt('signup', '1.2.3.4')).resolves.toBe(false)
   expect(query).toHaveBeenCalledTimes(1)
 })
 
 test('counts only the last hour, for that address', async () => {
   recent(0)
-  await allowSignup('1.2.3.4')
+  await allowAttempt('signup', '1.2.3.4')
   const [sql, params] = query.mock.calls[0]
   expect(sql).toContain('created_at > NOW()')
-  expect(params).toEqual(['1.2.3.4', '60'])
+  expect(params).toEqual(['signup', '1.2.3.4', '60'])
 })
 
 test('clears out old rows now and then', async () => {
   ;(Math.random as jest.Mock).mockReturnValue(0.01)
   recent(0)
-  await allowSignup('1.2.3.4')
+  await allowAttempt('signup', '1.2.3.4')
   expect(query.mock.calls[2][0]).toContain('DELETE FROM signup_attempts')
 })
 
@@ -49,7 +49,7 @@ test('a database that will not answer does not block sign-ups', async () => {
   jest.spyOn(console, 'error').mockImplementation(() => {})
   query.mockReset()
   query.mockRejectedValue(new Error('db down'))
-  await expect(allowSignup('1.2.3.4')).resolves.toBe(true)
+  await expect(allowAttempt('signup', '1.2.3.4')).resolves.toBe(true)
 })
 
 describe('clientAddress', () => {
@@ -61,4 +61,10 @@ describe('clientAddress', () => {
     expect(clientAddress(new Headers({ 'x-real-ip': '8.8.8.8' }))).toBe('8.8.8.8')
     expect(clientAddress(new Headers())).toBe('unknown')
   })
+})
+
+test('asking for a password reset has a tighter window of its own', async () => {
+  recent(0)
+  await allowAttempt('reset', '1.2.3.4')
+  expect(query.mock.calls[0][1]).toEqual(['reset', '1.2.3.4', '15'])
 })

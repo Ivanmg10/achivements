@@ -7,7 +7,7 @@ import { getToken } from 'next-auth/jwt'
  * signed out it shows the landing page, which is what tells a visitor what
  * CheevoVault is before asking them to sign up.
  */
-const PUBLIC_PATHS = ['/', '/authPage']
+const PUBLIC_PATHS = ['/', '/authPage', '/resetPassword']
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
