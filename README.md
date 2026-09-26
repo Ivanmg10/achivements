@@ -215,6 +215,17 @@ a banner, never a locked door.
 
 ---
 
+## Before 1.0
+
+- [ ] **Verify a domain in Resend and set `EMAIL_FROM`.** Password recovery
+      currently only reaches the Resend account owner; everyone else would lose
+      their account on a forgotten password.
+- [ ] `NEXTAUTH_URL` pointing at the public URL in production.
+- [ ] Decide on email verification (soft banner, or deliberately skipped).
+- [ ] Run `migrations/011_drop_sourceless_game_keys.sql` once the Steam work is deployed.
+
+---
+
 ## Roadmap
 
 - [ ] Steam integration
