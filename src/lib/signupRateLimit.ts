@@ -1,18 +1,14 @@
+import pool from '@/lib/db'
+
 /**
  * A brake on account creation, per client address.
  *
  * Registration is open, so the endpoint writes a row for anyone who asks.
- * This keeps one address from filling the table in a loop. It lives in the
- * process, so each server instance counts on its own — enough for a hobby
- * deployment, not a defence against a distributed flood.
- *
- * ponytail: in-memory per instance; move to the database or a shared cache if
- * the app ever runs on more than one instance and this starts mattering.
+ * The count lives in the database rather than in memory, so the limit still
+ * holds when the app runs as several serverless instances.
  */
-const WINDOW_MS = 60 * 60 * 1000
+const WINDOW_MINUTES = 60
 const MAX_PER_WINDOW = 5
-
-const attempts = new Map<string, number[]>()
 
 /** The address Vercel and most proxies put the real client in. */
 export function clientAddress(headers: Headers): string {
@@ -21,26 +17,29 @@ export function clientAddress(headers: Headers): string {
   return headers.get('x-real-ip') ?? 'unknown'
 }
 
-/** Records an attempt. False when this address has had too many lately. */
-export function allowSignup(address: string, now = Date.now()): boolean {
-  const recent = (attempts.get(address) ?? []).filter((at) => now - at < WINDOW_MS)
-  if (recent.length >= MAX_PER_WINDOW) {
-    attempts.set(address, recent)
-    return false
-  }
-  recent.push(now)
-  attempts.set(address, recent)
+/**
+ * Records an attempt and says whether it is allowed. A database that will not
+ * answer must not stop people signing up, so a failure here lets them through.
+ */
+export async function allowSignup(address: string): Promise<boolean> {
+  try {
+    const { rows } = await pool.query(
+      `SELECT COUNT(*)::int AS recent
+         FROM signup_attempts
+        WHERE address = $1 AND created_at > NOW() - ($2 || ' minutes')::interval`,
+      [address, String(WINDOW_MINUTES)],
+    )
+    if ((rows[0]?.recent ?? 0) >= MAX_PER_WINDOW) return false
 
-  // Keep the map from growing forever on a long-running instance.
-  if (attempts.size > 5000) {
-    for (const [key, times] of attempts) {
-      if (times.every((at) => now - at >= WINDOW_MS)) attempts.delete(key)
+    await pool.query('INSERT INTO signup_attempts (address) VALUES ($1)', [address])
+
+    // Cheap housekeeping: drop what no longer counts, now and then.
+    if (Math.random() < 0.05) {
+      await pool.query(`DELETE FROM signup_attempts WHERE created_at < NOW() - INTERVAL '1 day'`)
     }
+    return true
+  } catch (err) {
+    console.error('[signupRateLimit]', err)
+    return true
   }
-  return true
-}
-
-/** Test seam: forgets every address. */
-export function resetSignupLimit() {
-  attempts.clear()
 }

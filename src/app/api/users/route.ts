@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Registration is closed" }, { status: 403 });
     }
 
-    if (!allowSignup(clientAddress(req.headers))) {
+    if (!(await allowSignup(clientAddress(req.headers)))) {
       return NextResponse.json(
         { error: "Demasiadas cuentas creadas desde aquí. Inténtalo más tarde." },
         { status: 429 },

@@ -19,7 +19,10 @@ function AuthBrand() {
       <h1 className="text-4xl font-extrabold text-text-main tracking-tight">{T.authPage.brand}</h1>
       <div className="flex items-center justify-center gap-2 mt-3">
         <span className="text-xs px-2.5 py-1 rounded-full bg-accent/15 text-accent border border-accent/25 font-medium">RetroAchievements</span>
-        <span className="text-xs px-2.5 py-1 rounded-full bg-bg-tertiary text-text-secondary border border-white/10 font-medium">Steam · coming soon</span>
+        <span className="text-xs px-2.5 py-1 rounded-full bg-accent/15 text-accent border border-accent/25 font-medium">Steam</span>
+        <span className="text-xs px-2.5 py-1 rounded-full bg-bg-tertiary text-text-secondary border border-white/10 font-medium">
+          PlayStation · {T.userData.comingSoon.toLowerCase()}
+        </span>
       </div>
     </div>
   )
