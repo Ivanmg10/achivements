@@ -41,7 +41,7 @@ export default function LandingPage() {
           <p className="text-base sm:text-lg text-text-secondary max-w-xl leading-relaxed">{T.landing.intro}</p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
-            <Link href="/authPage" className={PRIMARY}>
+            <Link href="/authPage?mode=register" className={PRIMARY}>
               {T.landing.createAccount}
               <IconArrowRight size={18} aria-hidden="true" />
             </Link>
@@ -92,7 +92,7 @@ export default function LandingPage() {
         <div className="bg-bg-card rounded-3xl ring-1 ring-white/5 px-6 py-10 flex flex-col items-center text-center gap-4">
           <h2 className="text-xl sm:text-2xl font-bold">{T.landing.closingTitle}</h2>
           <p className="text-sm text-text-secondary max-w-md">{T.landing.closingText}</p>
-          <Link href="/authPage" className={PRIMARY}>
+          <Link href="/authPage?mode=register" className={PRIMARY}>
             {T.landing.createAccount}
             <IconArrowRight size={18} aria-hidden="true" />
           </Link>

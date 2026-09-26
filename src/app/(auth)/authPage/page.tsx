@@ -3,7 +3,8 @@
 import LoginUserForm from '@/components/login-user-form/LoginUserForm'
 import RegisterUserForm from '@/components/register-user-form/RegisterUserForm'
 import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { formTransition } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
@@ -28,8 +29,10 @@ function AuthBrand() {
   )
 }
 
-export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true)
+/** ?mode=register opens straight on the register form, for the landing button. */
+function AuthPageContent() {
+  const wantsRegister = useSearchParams().get('mode') === 'register'
+  const [isLogin, setIsLogin] = useState(!wantsRegister)
   const [hasRegister, setHasRegister] = useState(false)
 
   return (
@@ -98,5 +101,13 @@ export default function AuthPage() {
       </div>
 
     </div>
+  )
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense>
+      <AuthPageContent />
+    </Suspense>
   )
 }

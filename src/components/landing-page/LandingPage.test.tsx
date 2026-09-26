@@ -18,7 +18,7 @@ test('offers both ways in, pointing at the auth page', () => {
   render(<LandingPage />)
   const create = screen.getAllByRole('link', { name: new RegExp(en.landing.createAccount) })
   expect(create.length).toBeGreaterThan(0)
-  for (const link of create) expect(link.getAttribute('href')).toBe('/authPage')
+  for (const link of create) expect(link.getAttribute('href')).toBe('/authPage?mode=register')
   expect(screen.getByRole('link', { name: en.landing.signIn }).getAttribute('href')).toBe('/authPage')
 })
 
