@@ -2,7 +2,7 @@ jest.mock("@/lib/db", () => ({ __esModule: true, default: { query: jest.fn() } }
 jest.mock("bcrypt", () => ({ compare: jest.fn() }));
 jest.mock("@/lib/userRecord", () => ({
   ...jest.requireActual("@/lib/userRecord"),
-  loadUser: jest.fn(),
+  loadUserSynced: jest.fn(),
   loadUserByUsername: jest.fn(),
 }));
 jest.mock("@/lib/attemptLimit", () => ({
@@ -13,7 +13,7 @@ jest.mock("@/lib/attemptLimit", () => ({
 
 import bcrypt from "bcrypt";
 import { authHandlerOptions, authOptions, SESSION_REVOKED, TOO_MANY_ATTEMPTS } from "./authOptions";
-import { loadUser, loadUserByUsername, passwordVersion } from "@/lib/userRecord";
+import { loadUserByUsername, loadUserSynced, passwordVersion } from "@/lib/userRecord";
 import { isLimited, recordAttempt } from "@/lib/attemptLimit";
 
 const row = {
@@ -42,11 +42,17 @@ const jwt = authOptions.callbacks!.jwt as (p: any) => Promise<any>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const session = authOptions.callbacks!.session as (p: any) => Promise<any>;
 const req = { headers: { "x-forwarded-for": "9.9.9.9" } };
+const SYNCED_AT = 1_000;
+
+/** What loadUserSynced answers: the row, and when it was read. */
+function stored(value: unknown, at = SYNCED_AT) {
+  (loadUserSynced as jest.Mock).mockResolvedValue({ row: value, at });
+}
 
 beforeEach(() => {
   jest.clearAllMocks();
   (loadUserByUsername as jest.Mock).mockResolvedValue(row);
-  (loadUser as jest.Mock).mockResolvedValue(row);
+  stored(row);
   (bcrypt.compare as jest.Mock).mockResolvedValue(true);
   (isLimited as jest.Mock).mockResolvedValue(false);
 });
@@ -55,6 +61,7 @@ describe("authorize", () => {
   test("returns the user's token fields on the right password", async () => {
     const user = await authorize({ username: "ivan", password: "pass" }, req);
     expect(user).toMatchObject({ id: "1", name: "ivan", raLinked: true, steamid: row.steamid, pwv: PWV });
+    expect(typeof user.syncedAt).toBe("number");
     expect(recordAttempt).not.toHaveBeenCalled();
   });
 
@@ -95,19 +102,25 @@ describe("jwt", () => {
   test("signing in copies the user into the token", async () => {
     const token = await jwt({ token: {}, user: { id: "1", theme: "dark", pwv: PWV } });
     expect(token).toMatchObject({ id: "1", theme: "dark", pwv: PWV });
-    expect(loadUser).not.toHaveBeenCalled();
+    expect(loadUserSynced).not.toHaveBeenCalled();
   });
 
   test("later reads refresh the token from the database", async () => {
     const token = await jwt({ token: { id: "1", pwv: PWV, theme: "light", admin: true } });
-    expect(loadUser).toHaveBeenCalledWith("1", { fresh: false });
+    expect(loadUserSynced).toHaveBeenCalledWith("1", { fresh: false, notBefore: 0 });
     expect(token.theme).toBe("dark");
     expect(token.admin).toBe(false);
+    expect(token.syncedAt).toBe(SYNCED_AT);
   });
 
   test("an update from the browser re-reads the row, bypassing the cache", async () => {
     await jwt({ token: { id: "1", pwv: PWV }, trigger: "update", session: {} });
-    expect(loadUser).toHaveBeenCalledWith("1", { fresh: true });
+    expect(loadUserSynced).toHaveBeenCalledWith("1", { fresh: true, notBefore: 0 });
+  });
+
+  test("a cached row older than the token is not allowed to undo it (another instance saw a newer change)", async () => {
+    await jwt({ token: { id: "1", pwv: PWV, syncedAt: 5_000 } });
+    expect(loadUserSynced).toHaveBeenCalledWith("1", { fresh: false, notBefore: 5_000 });
   });
 
   test("whatever an update sends is ignored: a Steam or RA account cannot be claimed from the browser", async () => {
@@ -132,19 +145,19 @@ describe("jwt", () => {
   });
 
   test("a deleted account ends the session", async () => {
-    (loadUser as jest.Mock).mockResolvedValue(null);
+    stored(null);
     await expect(jwt({ token: { id: "1", pwv: PWV } })).rejects.toThrow(SESSION_REVOKED);
   });
 
   test("a database blip keeps the token as it was rather than signing everyone out", async () => {
     jest.spyOn(console, "error").mockImplementation(() => {});
-    (loadUser as jest.Mock).mockRejectedValue(new Error("db down"));
+    (loadUserSynced as jest.Mock).mockRejectedValue(new Error("db down"));
     const token = { id: "1", pwv: PWV, theme: "light" };
     await expect(jwt({ token })).resolves.toBe(token);
   });
 
   test("raLinked needs both the RA username and its key", async () => {
-    (loadUser as jest.Mock).mockResolvedValue({ ...row, raid: null });
+    stored({ ...row, raid: null });
     expect((await jwt({ token: { id: "1", pwv: PWV } })).raLinked).toBe(false);
   });
 });

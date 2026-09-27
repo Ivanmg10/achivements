@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import type { NextAuthOptions, Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import { clientAddress, isLimited, recordAttempt } from "@/lib/attemptLimit";
-import { loadUser, loadUserByUsername, passwordVersion, type UserRecord } from "@/lib/userRecord";
+import { loadUserByUsername, loadUserSynced, passwordVersion, type UserRecord } from "@/lib/userRecord";
 
 export const SESSION_REVOKED = "session-revoked";
 export const TOO_MANY_ATTEMPTS = "too-many-attempts";
@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        return tokenFields(user);
+        return { ...tokenFields(user), syncedAt: Date.now() };
       },
     }),
   ],
@@ -84,8 +84,13 @@ export const authOptions: NextAuthOptions = {
       if (user) return { ...token, ...(user as unknown as Partial<JWT>) };
 
       let row: UserRecord | null;
+      let syncedAt: number;
       try {
-        row = await loadUser(token.id, { fresh: trigger === "update" });
+        ({ row, at: syncedAt } = await loadUserSynced(token.id, {
+          fresh: trigger === "update",
+          // Never older than what the token already holds (see userRecord).
+          notBefore: token.syncedAt ?? 0,
+        }));
       } catch (err) {
         // A database blip should not sign everyone out; the token stands as it was.
         console.error("[auth] could not refresh the session", err);
@@ -95,7 +100,7 @@ export const authOptions: NextAuthOptions = {
       if (!row || !token.pwv || passwordVersion(row.password) !== token.pwv) {
         throw new Error(SESSION_REVOKED);
       }
-      return { ...token, ...tokenFields(row) };
+      return { ...token, ...tokenFields(row), syncedAt };
     },
     async session({ session, token }) {
       if (token) {

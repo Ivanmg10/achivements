@@ -32,3 +32,16 @@ test('the CSP keeps scripts, connections and framing to this site', async () => 
   expect(csp).toContain("img-src 'self' data: blob: https:")
   expect(csp).not.toMatch(/img-src[^;]*http:/)
 })
+
+test('only preview deployments let in Vercel’s toolbar', async () => {
+  expect((await headers())['Content-Security-Policy']).not.toContain('vercel.live')
+
+  jest.resetModules()
+  process.env.VERCEL_ENV = 'preview'
+  const preview = (await import('./next.config')).default
+  const rules = await preview.headers!()
+  const csp = rules[0].headers.find((h) => h.key === 'Content-Security-Policy')!.value
+  expect(csp).toMatch(/script-src[^;]*https:\/\/vercel\.live/)
+  expect(csp).toContain('frame-src https://vercel.live')
+  delete process.env.VERCEL_ENV
+})

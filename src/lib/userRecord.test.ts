@@ -1,7 +1,7 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
 import pool from '@/lib/db'
-import { forgetUser, loadUser, loadUserByUsername, passwordVersion } from './userRecord'
+import { forgetUser, loadUser, loadUserByUsername, loadUserSynced, passwordVersion } from './userRecord'
 
 const query = pool.query as jest.Mock
 const row = { id: 1, username: 'ivan', password: '$2b$10$hash' }
@@ -71,4 +71,32 @@ test('passwordVersion is stable, short, and changes with the hash', () => {
   expect(passwordVersion('a')).toHaveLength(16)
   expect(passwordVersion('a')).not.toBe(passwordVersion('b'))
   expect(passwordVersion('$2b$10$hash')).not.toContain('$2b$')
+})
+
+describe('loadUserSynced', () => {
+  test('says when the row was read', async () => {
+    const now = jest.spyOn(Date, 'now').mockReturnValue(2_000_000)
+    await expect(loadUserSynced(1)).resolves.toEqual({ row, at: 2_000_000 })
+    now.mockRestore()
+  })
+
+  test('a cached row older than the session’s last sync is read again', async () => {
+    const now = jest.spyOn(Date, 'now').mockReturnValue(3_000_000)
+    await loadUserSynced(1)
+    now.mockReturnValue(3_000_010)
+    // Another instance put a newer row in the token at 3_000_005.
+    const { at } = await loadUserSynced(1, { notBefore: 3_000_005 })
+    expect(query).toHaveBeenCalledTimes(2)
+    expect(at).toBe(3_000_010)
+    now.mockRestore()
+  })
+
+  test('a cached row at least as new as the session is reused', async () => {
+    const now = jest.spyOn(Date, 'now').mockReturnValue(4_000_000)
+    await loadUserSynced(1)
+    now.mockReturnValue(4_000_010)
+    await loadUserSynced(1, { notBefore: 4_000_000 })
+    expect(query).toHaveBeenCalledTimes(1)
+    now.mockRestore()
+  })
 })

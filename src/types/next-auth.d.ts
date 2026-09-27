@@ -35,11 +35,14 @@ declare module "next-auth" {
   interface User extends SessionUserFields {
     /** Fingerprint of the password hash the session was issued with; see passwordVersion(). */
     pwv?: string;
+    syncedAt?: number;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT extends DefaultJWT, SessionUserFields {
     pwv?: string;
+    /** When the token's fields were last read from the users row (ms). */
+    syncedAt?: number;
   }
 }
