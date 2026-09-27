@@ -11,7 +11,6 @@ import { NextResponse } from 'next/server'
 
 beforeEach(() => {
   jest.clearAllMocks()
-  process.env.RA_API_KEY = 'testkey'
   ;(requireViewerApiKey as jest.Mock).mockResolvedValue({ ok: true, viewerId: '1', apiKey: 'viewerkey' })
   ;(withCache as jest.Mock).mockImplementation(async (_key: string, _ttl: number, fetcher: () => Promise<unknown>, shouldCache?: (d: unknown) => boolean) => {
     const data = await fetcher()

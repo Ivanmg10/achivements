@@ -20,7 +20,7 @@ const completed = [
 beforeEach(() => {
   jest.clearAllMocks()
   ;(useGamesData as jest.Mock).mockReturnValue({ all: completed, isLoading: false })
-  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { rausername: 'Ivan', raid: 'key' } } })
 })
 
 test('derives "playing" games from the shared context without fetching getGamesCompleted', async () => {
@@ -62,4 +62,11 @@ test('filters by consoleId when provided', async () => {
   const { result: otherConsole } = renderHook(() => useGamesByCategory('completed', '999'))
   await waitFor(() => expect(otherConsole.current.loading).toBe(false))
   expect(otherConsole.current.games).toHaveLength(0)
+})
+
+test('with no RA account the want-to-play list is never asked for', async () => {
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { steamid: '7656' } } })
+  const { result } = renderHook(() => useGamesByCategory('wantToPlay'))
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(fetchWithRetry).not.toHaveBeenCalled()
 })

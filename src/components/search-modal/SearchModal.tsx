@@ -8,6 +8,7 @@ import { IconSearch, IconX, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievementsUserProfile } from '@/types/types'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
+import { useRaLinked } from '@/hooks/useRaLinked'
 import { searchCandidates } from '@/utils/gameCandidates'
 import { gameHref, GameRef } from '@/utils/gameRef'
 import RaLogo from '@/components/ra-logo/RaLogo'
@@ -44,6 +45,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   const { T } = useLanguage()
   const router = useRouter()
   const candidates = useGameCandidates(isOpen)
+  const raLinked = useRaLinked()
   const [tab, setTab] = useState<SearchTab>('games')
   const [platformFilter, setPlatformFilter] = useState<PlatformFilter>('all')
   const [query, setQuery] = useState('')
@@ -77,7 +79,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   }, [isOpen, onClose])
 
   useEffect(() => {
-    if (tab !== 'users') return
+    if (tab !== 'users' || !raLinked) return
     const q = query.trim()
     setUserResult(null)
     setUserError(false)
@@ -103,7 +105,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
         })
     }, 400)
     return () => clearTimeout(userDebounce.current)
-  }, [query, tab])
+  }, [query, tab, raLinked])
 
   const allResults = useMemo(() => searchCandidates(candidates, query), [candidates, query])
   const results = useMemo(
@@ -113,12 +115,13 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   const hasBothPlatforms = allResults.some((r) => r.source === 'ra') && allResults.some((r) => r.source === 'steam')
 
   const directGameId = useMemo(() => {
+    if (!raLinked) return null
     const q = query.trim()
     if (/^\d{3,}$/.test(q)) return parseInt(q)
     const urlMatch = q.match(/retroachievements\.org\/game\/(\d+)/i)
     if (urlMatch) return parseInt(urlMatch[1])
     return null
-  }, [query])
+  }, [query, raLinked])
 
   const handleSelect = useCallback(
     ({ source, id }: GameRef) => {
@@ -178,7 +181,9 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                 </button>
               </div>
 
-              {/* Tab toggle */}
+              {/* Tab toggle — the users tab searches RA, so without RA there is
+                  only one tab and nothing to toggle */}
+              {raLinked && (
               <div className="flex border-b border-white/5 px-4 gap-4">
                 {(['games', 'users'] as SearchTab[]).map((t) => (
                   <button
@@ -191,6 +196,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                   </button>
                 ))}
               </div>
+              )}
 
               {/* Platform filter — only worth showing once both platforms are in the library */}
               {tab === 'games' && hasBothPlatforms && (
@@ -227,14 +233,16 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                       <div className="flex flex-col items-center gap-2 py-8 px-4">
                         <p className="text-text-secondary text-sm">{T.search.noResults}</p>
                         <p className="text-text-secondary/50 text-xs text-center">{T.search.libraryOnly}</p>
-                        <a
-                          href={`https://retroachievements.org/searchresults.php?s=${encodeURIComponent(query.trim())}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-accent hover:underline mt-1"
-                        >
-                          {T.publicProfile.searchOnRA} →
-                        </a>
+                        {raLinked && (
+                          <a
+                            href={`https://retroachievements.org/searchresults.php?s=${encodeURIComponent(query.trim())}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-accent hover:underline mt-1"
+                          >
+                            {T.publicProfile.searchOnRA} →
+                          </a>
+                        )}
                       </div>
                     ) : (
                       <motion.ul

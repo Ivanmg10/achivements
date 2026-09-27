@@ -29,7 +29,7 @@ import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import CategorySearch from '@/components/category-search/CategorySearch'
 import { titleMatches } from '@/utils/gameCandidates'
-import { useSession } from 'next-auth/react'
+import { useRaLinked } from '@/hooks/useRaLinked'
 import { useEffect, useMemo } from 'react'
 
 export default function CategoryPage() {
@@ -42,11 +42,11 @@ export default function CategoryPage() {
   const cat = category as string
   const [sortState, setSortState] = useState<StatusSortState>(() => defaultSortStateFor(cat))
   const [gridCols, setGridCols] = useState<StatusGridCols>(2)
-  const { data: session } = useSession()
   const { isLinked: steamLinked } = useSteamGamesData()
   // A Steam-only user has no RA list to show — its empty state would tell them
   // to go play on RetroAchievements. Without either account, keep the RA page.
-  const showRa = Boolean(session?.user?.raUser?.User) || !steamLinked
+  // No RA account, no RA section — not even an empty one.
+  const showRa = useRaLinked()
 
   useEffect(() => {
     setSortState(defaultSortStateFor(cat))

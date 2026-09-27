@@ -50,7 +50,7 @@ import { useSession } from 'next-auth/react'
 test('renders profile when authenticated with raUser', () => {
   ;(useSession as jest.Mock).mockReturnValue({
     status: 'authenticated',
-    data: { user: { raUser: { User: 'Ivan' } } },
+    data: { user: { raUser: { User: 'Ivan' }, rausername: 'Ivan', raid: 'key' } },
   })
   render(<MainPage />)
   expect(screen.getByTestId('profile')).toBeInTheDocument()
@@ -59,7 +59,7 @@ test('renders profile when authenticated with raUser', () => {
 test('renders the pinned games section when view is "pinned"', () => {
   ;(useSession as jest.Mock).mockReturnValue({
     status: 'authenticated',
-    data: { user: { raUser: { User: 'Ivan' } } },
+    data: { user: { raUser: { User: 'Ivan' }, rausername: 'Ivan', raid: 'key' } },
   })
   render(<MainPage />)
   expect(screen.getByTestId('pinned-games')).toBeInTheDocument()
@@ -93,7 +93,7 @@ test('renders the Steam-only page when Steam is linked but RA is not', () => {
 test('keeps the full RA page when both accounts are linked', () => {
   ;(useSession as jest.Mock).mockReturnValue({
     status: 'authenticated',
-    data: { user: { raUser: { User: 'Ivan' }, steamid: '76561198000000000' } },
+    data: { user: { raUser: { User: 'Ivan' }, rausername: 'Ivan', raid: 'key', steamid: '76561198000000000' } },
   })
   render(<MainPage />)
   expect(screen.getByTestId('profile')).toBeInTheDocument()

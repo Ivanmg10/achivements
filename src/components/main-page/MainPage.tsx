@@ -13,15 +13,17 @@ import MainPageSteamOnly from './main-page-steam-only/MainPageSteamOnly'
 import MainPageCharts from './main-page-charts/MainPageCharts'
 import RARecentlyPlayed from '@/components/ra-recently-played/RARecentlyPlayed'
 import { useMainView } from '@/context/MainViewContext'
+import { useRaLinked } from '@/hooks/useRaLinked'
 
 export default function MainPage() {
   const { status, data: session } = useSession()
   const { view } = useMainView()
+  const raLinked = useRaLinked()
 
   if (status === 'loading')
     return <LoadingPage />
 
-  if (status === 'authenticated' && !session?.user?.raUser?.User) {
+  if (status === 'authenticated' && !raLinked) {
     // Steam alone is enough for a main page; neither account gets the connect prompt.
     return session?.user?.steamid ? <MainPageSteamOnly /> : <ConnectAccounts />
   }

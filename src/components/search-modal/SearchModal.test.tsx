@@ -1,12 +1,14 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import SearchModal from './SearchModal'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
+import { useRaLinked } from '@/hooks/useRaLinked'
 import { en } from '@/translations/en'
 import type { GameCandidate } from '@/utils/gameCandidates'
 
 const mockPush = jest.fn()
 jest.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }))
 jest.mock('@/hooks/useGameCandidates', () => ({ useGameCandidates: jest.fn() }))
+jest.mock('@/hooks/useRaLinked', () => ({ useRaLinked: jest.fn() }))
 jest.mock('next/image', () => ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />)
 
 function candidate(source: 'ra' | 'steam', id: number, title: string): GameCandidate {
@@ -19,6 +21,7 @@ function candidate(source: 'ra' | 'steam', id: number, title: string): GameCandi
 beforeEach(() => {
   jest.clearAllMocks()
   ;(useGameCandidates as jest.Mock).mockReturnValue([candidate('ra', 620, 'Zelda'), candidate('steam', 620, 'Portal 2')])
+  ;(useRaLinked as jest.Mock).mockReturnValue(true)
 })
 
 function type(value: string) {
@@ -96,4 +99,13 @@ test('the selected tab is announced', () => {
   expect(screen.getByRole('button', { name: en.publicProfile.gamesTab }).getAttribute('aria-pressed')).toBe('true')
   fireEvent.click(screen.getByRole('button', { name: en.publicProfile.userTab }))
   expect(screen.getByRole('button', { name: en.publicProfile.userTab }).getAttribute('aria-pressed')).toBe('true')
+})
+
+test('with no RA account there is no users tab and no RA lookup by id', () => {
+  ;(useRaLinked as jest.Mock).mockReturnValue(false)
+  render(<SearchModal isOpen onClose={jest.fn()} />)
+  expect(screen.queryByRole('button', { name: en.publicProfile.userTab })).not.toBeInTheDocument()
+
+  type('620')
+  expect(screen.queryByText(en.search.openById)).not.toBeInTheDocument()
 })

@@ -60,12 +60,14 @@ jest.mock('../../../components/loading-page/LoadingPage', () => ({
   default: () => <div data-testid="loading-page" />,
 }))
 
+jest.mock('@/hooks/useRaLinked', () => ({ useRaLinked: jest.fn() }))
+
 import { render, screen } from '@testing-library/react'
 import CategoryPage from './page'
 import { useParams } from 'next/navigation'
 import { useGamesByCategory } from '../../../hooks/useGamesByCategory'
 import { useGameFiltering } from '../../../hooks/useGameFiltering'
-import { useSession } from 'next-auth/react'
+import { useRaLinked } from '@/hooks/useRaLinked'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import { fireEvent } from '@testing-library/react'
@@ -76,6 +78,7 @@ const mockGames = [
 
 beforeEach(() => {
   ;(useParams as jest.Mock).mockReturnValue({ category: 'playing' })
+  ;(useRaLinked as jest.Mock).mockReturnValue(true)
 })
 
 test('renders loading state', () => {
@@ -121,18 +124,17 @@ test('passes a default name sort state for the want-to-play category', () => {
 })
 
 describe('Steam section', () => {
-  function asUser(user: Record<string, unknown>, steamLinked: boolean) {
-    ;(useSession as jest.Mock).mockReturnValue({ data: { user }, status: 'authenticated', update: jest.fn() })
+  function asUser(raLinked: boolean, steamLinked: boolean) {
+    ;(useRaLinked as jest.Mock).mockReturnValue(raLinked)
     ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: steamLinked })
   }
 
   afterEach(() => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: null, status: 'unauthenticated', update: jest.fn() })
     ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false })
   })
 
   test('follows the RA list for the same category', () => {
-    asUser({ raUser: { User: 'Ivan' } }, true)
+    asUser(true, true)
     ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: mockGames, loading: false, error: undefined })
     window.sessionStorage.setItem('ra-section-open:playing', 'open')
     render(<CategoryPage />)
@@ -144,14 +146,14 @@ describe('Steam section', () => {
   })
 
   test('waits for the RA list rather than showing under a loading page', () => {
-    asUser({ raUser: { User: 'Ivan' } }, true)
+    asUser(true, true)
     ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: true, error: undefined })
     render(<CategoryPage />)
     expect(screen.queryByTestId('steam-section')).not.toBeInTheDocument()
   })
 
   test('a Steam-only user sees only Steam — no RA empty state telling them to play on RA', () => {
-    asUser({ steamid: '765' }, true)
+    asUser(false, true)
     ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: undefined })
     render(<CategoryPage />)
 
@@ -161,23 +163,25 @@ describe('Steam section', () => {
   })
 
   test('a Steam-only user is not held up by the RA loading state', () => {
-    asUser({ steamid: '765' }, true)
+    asUser(false, true)
     ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: true, error: undefined })
     render(<CategoryPage />)
     expect(screen.getByTestId('steam-section')).toBeInTheDocument()
   })
 
-  test('with neither account the RA page is unchanged', () => {
-    asUser({}, false)
+  test('with no RA account there is no RA section at all, not even an empty one', () => {
+    asUser(false, false)
     ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: undefined })
     render(<CategoryPage />)
-    expect(screen.getByTestId('empty-state')).toBeInTheDocument()
+    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('game-list')).not.toBeInTheDocument()
+    expect(screen.getByTestId('steam-section')).toBeInTheDocument()
   })
 })
 
 describe('foldable RA and Steam sections', () => {
   function bothAccounts() {
-    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { raUser: { User: 'Ivan' } } }, status: 'authenticated', update: jest.fn() })
+    ;(useRaLinked as jest.Mock).mockReturnValue(true)
     ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true })
     ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [{ id: 1 }, { id: 2 }] })
     ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: mockGames, loading: false, error: undefined })
@@ -186,7 +190,6 @@ describe('foldable RA and Steam sections', () => {
   beforeEach(() => window.sessionStorage.clear())
 
   afterEach(() => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: null, status: 'unauthenticated', update: jest.fn() })
     ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false })
     ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [] })
   })

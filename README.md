@@ -148,7 +148,6 @@ Required env vars:
 NEXTAUTH_URL=           # also used to build password-reset links
 NEXTAUTH_SECRET=
 DATABASE_URL=
-RA_API_KEY=             # shared RetroAchievements API key
 STEAM_API_KEY=          # Steam Web API key, for the Steam integration
 ```
 

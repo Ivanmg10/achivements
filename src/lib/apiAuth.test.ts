@@ -62,18 +62,12 @@ describe('requireViewerApiKey', () => {
     expect(result).toEqual({ ok: true, viewerId: '1', apiKey: 'my-key' })
   })
 
-  test('falls back to the shared RA_API_KEY when the viewer has no raid', async () => {
+  test('never falls back to a shared key: no RA account, no RA data', async () => {
     process.env.RA_API_KEY = 'shared-key'
     ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1' } })
     const result = await requireViewerApiKey()
-    expect(result).toEqual({ ok: true, viewerId: '1', apiKey: 'shared-key' })
-  })
-
-  test('returns 503 when neither the viewer nor the app has an API key', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1' } })
-    const result = await requireViewerApiKey()
     expect(result.ok).toBe(false)
-    if (!result.ok) expect(result.response.status).toBe(503)
+    if (!result.ok) expect(result.response.status).toBe(400)
   })
 })
 
