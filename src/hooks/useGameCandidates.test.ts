@@ -1,4 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react'
+import { useSession } from 'next-auth/react'
 import { useGameCandidates } from './useGameCandidates'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
@@ -10,6 +11,7 @@ jest.mock('@/context/GamesDataContext', () => ({ useGamesData: jest.fn() }))
 jest.mock('@/hooks/useRecentlyPlayedGames', () => ({ useRecentlyPlayedGames: jest.fn() }))
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
 jest.mock('@/lib/fetchWithRetry', () => ({ fetchWithRetry: jest.fn() }))
+jest.mock('next-auth/react', () => ({ useSession: jest.fn() }))
 
 const RA = { GameID: 730, Title: 'RA Game', ImageIcon: '/i.png', ConsoleID: 1, ConsoleName: 'SNES', MaxPossible: 10, NumAwarded: 5, PctWon: '0.5', HardcoreMode: '0' }
 const STEAM = toSteamGameProgress({ appid: 730, name: 'CS2', playtime_forever: 60 })
@@ -20,6 +22,7 @@ beforeEach(() => {
   ;(useRecentlyPlayedGames as jest.Mock).mockReturnValue({ games: [] })
   ;(useSteamGamesData as jest.Mock).mockReturnValue({ library: [STEAM] })
   ;(fetchWithRetry as jest.Mock).mockResolvedValue({ Results: [] })
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { rausername: 'Ivan' } } })
   jest.spyOn(console, 'error').mockImplementation(() => {})
 })
 
@@ -63,4 +66,11 @@ test('tolerates missing lists and an empty want-to-play payload', async () => {
   const { result } = renderHook(() => useGameCandidates(true))
   await waitFor(() => expect(fetchWithRetry).toHaveBeenCalled())
   expect(result.current).toEqual([])
+})
+
+test('never asks RetroAchievements for anything when no RA account is linked', async () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: {} } })
+  const { result } = renderHook(() => useGameCandidates(true))
+  await waitFor(() => expect(result.current).toHaveLength(2))
+  expect(fetchWithRetry).not.toHaveBeenCalled()
 })
