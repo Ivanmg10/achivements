@@ -47,7 +47,7 @@ export default function MainPageCharts() {
   // the streak already loads — both platforms, and no call of its own.
   const { achievements: year, isLoading: yearLoading, error: yearError, refetch: refetchYear } = useActivityHeatmapYear()
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
-  const { all, hardcore, softcore, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()
+  const { all, hardcore, softcore, inProgress, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()
   const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
   const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
   const { platform } = useMainPlatform()
@@ -155,6 +155,7 @@ export default function MainPageCharts() {
                   isLoading={awardsLoading}
                   unlockedHC={hardcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
                   unlockedSC={softcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
+                  inProgress={inProgress}
                 />
               </SectionFallback>
             )}

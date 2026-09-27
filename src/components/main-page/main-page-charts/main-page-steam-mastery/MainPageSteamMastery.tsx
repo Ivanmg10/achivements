@@ -4,10 +4,8 @@ import { useMemo } from 'react'
 import type { SteamGameProgress } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { classifySteamGame, hasUnloadedProgress, summarizeSteamLibrary } from '@/utils/steamFeed'
-import { GameListRow } from '@/components/ui/GameListRow'
 import CompletionDistribution from '@/components/completion-distribution/CompletionDistribution'
-
-const CLOSEST = 3
+import ClosestToComplete, { CLOSEST_SHOWN } from '../closest-to-complete/ClosestToComplete'
 
 /**
  * Steam's side of the mastery card. Steam has no mastery or beaten awards, so
@@ -23,7 +21,18 @@ export default function MainPageSteamMastery({ games, isLoading }: { games: Stea
     return {
       ...summarizeSteamLibrary(games),
       hours: Math.round(games.reduce((sum, g) => sum + g.playtimeForever, 0) / 60),
-      closest: [...playing].sort((a, b) => b.pctWon - a.pctWon).slice(0, CLOSEST),
+      closest: [...playing]
+        .sort((a, b) => b.pctWon - a.pctWon)
+        .slice(0, CLOSEST_SHOWN)
+        .map((g) => ({
+          key: String(g.id),
+          href: `/steamGame/${g.id}`,
+          title: g.title,
+          imageUrl: g.imageIcon || undefined,
+          done: g.numAwarded,
+          total: g.maxPossible,
+          percent: g.pctWon,
+        })),
       // Only games whose counts are really loaded: the rest would read as 0%.
       loadedFractions: games.filter((g) => g.achievementsLoaded && g.maxPossible > 0).map((g) => g.numAwarded / g.maxPossible),
       truncated: hasUnloadedProgress(games),
@@ -81,23 +90,7 @@ export default function MainPageSteamMastery({ games, isLoading }: { games: Stea
             </div>
           </div>
 
-          {summary.closest.length > 0 && (
-            <div className="flex flex-col gap-1.5">
-              <p className="text-[10px] text-text-secondary/60 uppercase tracking-widest">{T.cards.closestToPerfect}</p>
-              {summary.closest.map((g) => (
-                <GameListRow
-                  key={g.id}
-                  href={`/steamGame/${g.id}`}
-                  imageUrl={g.imageIcon || undefined}
-                  imageAlt={g.title}
-                  title={g.title}
-                  subtitle={`${g.numAwarded}/${g.maxPossible}`}
-                  stat={`${Math.round(g.pctWon)}%`}
-                  statClassName="text-[#66c0f4]"
-                />
-              ))}
-            </div>
-          )}
+          <ClosestToComplete games={summary.closest} statClassName="text-[#66c0f4]" />
         </div>
       )}
     </div>

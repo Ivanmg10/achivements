@@ -2,19 +2,23 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { UserAwards } from '@/types/types'
+import { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import ClosestToComplete, { CLOSEST_SHOWN } from './closest-to-complete/ClosestToComplete'
 
 export default function MainPageMastery({
   awards,
   isLoading,
   unlockedHC,
   unlockedSC,
+  inProgress = [],
 }: {
   awards: UserAwards | null
   isLoading?: boolean
   unlockedHC: number
   unlockedSC: number
+  /** Started games, for the ones nearest a mastery. */
+  inProgress?: RetroAchievementsGameCompleted[]
 }) {
   const { T } = useLanguage()
 
@@ -43,6 +47,21 @@ export default function MainPageMastery({
 
   const masteries = awards.MasteryAwardsCount ?? 0
 
+  // What the card is missing next to the rest of the page: masteries say what
+  // is finished, this says what is nearly finished.
+  const closest = [...inProgress]
+    .sort((a, b) => parseFloat(b.PctWon) - parseFloat(a.PctWon))
+    .slice(0, CLOSEST_SHOWN)
+    .map((game) => ({
+      key: String(game.GameID),
+      href: `/gameInfo/${game.GameID}`,
+      title: game.Title,
+      imageUrl: game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : undefined,
+      done: game.NumAwarded,
+      total: game.MaxPossible,
+      percent: parseFloat(game.PctWon) * 100,
+    }))
+
   /**
    * The award mix as parts of one whole, in fixed order. The four hues were
    * checked with the palette validator: they clear the colourblind and
@@ -65,15 +84,19 @@ export default function MainPageMastery({
       : []),
   ]
 
+  const sides = (recentCovers.length > 0 ? 1 : 0) + (closest.length > 0 ? 1 : 0)
+  const columns = sides === 2 ? 'lg:grid-cols-[3fr_2fr_2fr]' : sides === 1 ? 'lg:grid-cols-[3fr_2fr]' : ''
+
   return (
     <div className="flex flex-col gap-3">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.masteryAwards}</p>
 
       {/*
-        Wide card: the award totals sit beside the games mastered lately, and
-        spread across the full width before there are any masteries to show.
+        Wide card: the award totals sit beside what was mastered lately and
+        what is nearly there, and spread across the width of whichever of those
+        two there is nothing to show.
       */}
-      <div className={`grid gap-4 ${recentCovers.length > 0 ? 'lg:grid-cols-[3fr_2fr]' : ''}`}>
+      <div className={`grid gap-4 ${columns}`}>
         <div className="flex flex-col gap-4">
           {/* The headline: masteries, against every award earned. */}
           <div className="flex items-baseline gap-2">
@@ -150,6 +173,8 @@ export default function MainPageMastery({
           </div>
         </div>
       )}
+
+      <ClosestToComplete games={closest} statClassName="text-accent" />
       </div>
     </div>
   )

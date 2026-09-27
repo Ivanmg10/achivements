@@ -68,3 +68,38 @@ test('shows a placeholder while loading', () => {
   const { container } = render(<MainPageMastery {...props({ isLoading: true })} />)
   expect(container.querySelector('.animate-pulse')).not.toBeNull()
 })
+
+function started(id: number, title: string, awarded: number, total: number) {
+  return {
+    GameID: id, Title: title, ImageIcon: `/Images/${id}.png`, ConsoleID: 1, ConsoleName: 'SNES',
+    MaxPossible: total, NumAwarded: awarded, PctWon: String(awarded / total), HardcoreMode: '0',
+  }
+}
+
+test('lists the started games closest to a mastery, nearest first', () => {
+  const inProgress = [
+    started(1, 'Far off', 2, 10),
+    started(2, 'Nearly there', 9, 10),
+    started(3, 'Halfway', 5, 10),
+    started(4, 'Just begun', 1, 10),
+  ]
+  render(<MainPageMastery {...props({ inProgress })} />)
+
+  expect(screen.getByText(en.cards.closestToPerfect)).toBeInTheDocument()
+  const titles = screen.getAllByRole('link').map((l) => l.textContent)
+  expect(titles[0]).toContain('Nearly there')
+  expect(titles[0]).toContain('90%')
+  expect(titles[0]).toContain('9/10')
+  // Three is the list; the fourth game is not on it.
+  expect(screen.queryByText('Just begun')).not.toBeInTheDocument()
+})
+
+test('a game on the list links to its RA page', () => {
+  render(<MainPageMastery {...props({ inProgress: [started(42, 'Metroid', 9, 10)] })} />)
+  expect(screen.getByRole('link', { name: /Metroid/ }).getAttribute('href')).toBe('/gameInfo/42')
+})
+
+test('nothing started means no list at all, rather than an empty heading', () => {
+  render(<MainPageMastery {...props()} />)
+  expect(screen.queryByText(en.cards.closestToPerfect)).not.toBeInTheDocument()
+})
