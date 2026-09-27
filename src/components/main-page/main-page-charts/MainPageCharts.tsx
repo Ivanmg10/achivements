@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
+import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useUserRank } from '@/hooks/useUserRank'
@@ -42,6 +43,9 @@ export default function MainPageCharts() {
   const { T } = useLanguage()
   const { achievements, isLoading: achLoading, error: achError, refetch: refetchAch } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()
+  // The heatmap draws as far back as the card is wide, so it reads the year
+  // the streak already loads — both platforms, and no call of its own.
+  const { achievements: year, isLoading: yearLoading, error: yearError, refetch: refetchYear } = useActivityHeatmapYear()
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
   const { all, hardcore, softcore, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()
   const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
@@ -55,7 +59,6 @@ export default function MainPageCharts() {
   const steamRecent = useMemo(() => steamActivity.map(toRecentAchievement), [steamActivity])
   const byDateDesc = (a: { Date: string }, b: { Date: string }) => b.Date.localeCompare(a.Date)
   const recent = useMemo(() => [...achievements, ...steamRecent].sort(byDateDesc), [achievements, steamRecent])
-  const heatmap = useMemo(() => [...heatmapData, ...steamRecent].sort(byDateDesc), [heatmapData, steamRecent])
 
   // Best performance follows the selector: points (RA) and unlocks (Steam) do not add up.
   const bestPeriodData = isSteam ? steamRecent : heatmapData
@@ -89,8 +92,8 @@ export default function MainPageCharts() {
 
           {/* Row 1: Heatmap | Daily | Groups placeholder */}
           <ChartCard>
-            <SectionFallback error={heatmapError} onRefresh={refetchHeatmap}>
-              <MainPageHeatmap achievements={heatmap} isLoading={heatmapLoading} />
+            <SectionFallback error={yearError} onRefresh={refetchYear}>
+              <MainPageHeatmap achievements={year} isLoading={yearLoading} />
             </SectionFallback>
           </ChartCard>
           <ChartCard>

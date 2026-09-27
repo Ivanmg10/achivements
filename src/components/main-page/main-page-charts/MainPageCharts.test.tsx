@@ -1,5 +1,6 @@
 jest.mock('@/hooks/useRecentAchievements', () => ({ useRecentAchievements: jest.fn() }))
 jest.mock('@/hooks/useActivityHeatmap', () => ({ useActivityHeatmap: jest.fn() }))
+jest.mock('@/hooks/useActivityHeatmapYear', () => ({ useActivityHeatmapYear: jest.fn() }))
 jest.mock('@/hooks/useGamesInProgressPreview', () => ({ useGamesInProgressPreview: () => ({ listGames: [], isLoading: false }) }))
 jest.mock('@/context/GamesDataContext', () => ({ useGamesData: () => ({ all: [], hardcore: [], softcore: [], isLoading: false }) }))
 jest.mock('@/hooks/useUserRank', () => ({ useUserRank: () => ({ rank: null, isLoading: false }) }))
@@ -37,6 +38,7 @@ import { render, screen } from '@testing-library/react'
 import MainPageCharts from './MainPageCharts'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
+import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { useMainPlatform } from '@/context/MainPlatformContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -52,6 +54,13 @@ beforeEach(() => {
   ;(useActivityHeatmap as jest.Mock).mockReturnValue({ achievements: [{ Title: 'Heatmap RA', Date: '2024-01-10 10:00:00' }], isLoading: false })
   ;(useSteamRecentAchievements as jest.Mock).mockReturnValue({ achievements: [STEAM_UNLOCK], isLoading: false })
   ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true, library: [], libraryLoading: false })
+  // The year context merges both platforms itself, so the page passes it on whole.
+  ;(useActivityHeatmapYear as jest.Mock).mockReturnValue({
+    achievements: [{ Title: 'Year RA', Date: '2023-06-01 10:00:00' }],
+    isLoading: false,
+    error: false,
+    refetch: jest.fn(),
+  })
 })
 
 test('feeds the shared activity cards both platforms, newest first', () => {
@@ -59,7 +68,6 @@ test('feeds the shared activity cards both platforms, newest first', () => {
   render(<MainPageCharts />)
   expect(useSteamRecentAchievements).toHaveBeenCalledWith('activity')
   // Steam unlock is dated 2024-01-15, between the two RA fixtures.
-  expect(screen.getByTestId('heatmap')).toHaveTextContent('Win,Heatmap RA')
   expect(screen.getByTestId('daily')).toHaveTextContent('Recent RA,Win')
   expect(screen.getByTestId('top-games')).toHaveTextContent('Recent RA,Win')
 })
@@ -99,3 +107,12 @@ test('in Steam mode, swaps them for the Steam versions and feeds best performanc
   expect(screen.getByTestId('favorites')).toBeInTheDocument()
 })
 
+
+test('the heatmap reads the year both platforms share, not the 60-day list', () => {
+  platform('ra')
+  render(<MainPageCharts />)
+
+  // Its own call would be a second one for data the streak already loaded.
+  expect(screen.getByTestId('heatmap')).toHaveTextContent('Year RA')
+  expect(screen.getByTestId('heatmap')).not.toHaveTextContent('Heatmap RA')
+})
