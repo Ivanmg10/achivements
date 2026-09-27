@@ -9,6 +9,7 @@ jest.mock('@/hooks/useRecentlyPlayedGames', () => ({
 }))
 
 jest.mock('@/lib/fetchWithRetry', () => ({
+  ...jest.requireActual('@/lib/fetchWithRetry'),
   fetchWithRetry: jest.fn(),
 }))
 

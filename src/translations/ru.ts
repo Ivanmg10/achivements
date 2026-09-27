@@ -100,6 +100,7 @@ export const ru: Translations = {
   },
   userTheme: {
     theme: 'Тема',
+    saveError: 'Не удалось сохранить тему. Попробуйте ещё раз.',
   },
   userConfig: {
     accountSettings: 'Настройки аккаунта',
@@ -221,6 +222,7 @@ export const ru: Translations = {
     username: 'Имя пользователя',
     apiKey: 'Ключ Web API',
     signIn: 'Войти',
+    error: 'Не удалось подключить аккаунт RetroAchievements. Попробуйте ещё раз.',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -330,6 +332,11 @@ export const ru: Translations = {
   errorBoundary: {
     title: 'Что-то пошло не так',
     subtitle: 'При загрузке этой страницы произошла непредвиденная ошибка. Вы можете повторить попытку.',
+  },
+  notFound: {
+    title: 'Страница не найдена',
+    subtitle: 'Эта страница не существует или была перемещена.',
+    home: 'На главную',
   },
   gameInfoPage: {
     retry: 'Повторить',

@@ -1,11 +1,12 @@
 'use client'
 
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { createPortal } from 'react-dom'
 import { AnimatePresence } from 'framer-motion'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
 
 type TooltipData = { achievement: RetroAchievement; x: number; y: number }
@@ -35,40 +36,12 @@ export const AchievementGrid = memo(function AchievementGrid({
   const [tooltip, setTooltip] = useState<TooltipData | null>(null)
   const [selected, setSelected] = useState<RetroAchievement | null>(null)
   const [allLoaded, setAllLoaded] = useState(false)
-  const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set())
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
   const size = SIZE_CLASSES[badgeSize]
 
-  useEffect(() => {
-    fetch(`/api/favorites?gameId=${gameId}`)
-      .then((r) => r.json())
-      .then((rows: { achievement_id: number }[]) =>
-        setFavoritedIds(new Set(rows.map((r) => r.achievement_id)))
-      )
-      .catch(() => {})
-  }, [gameId])
-
-  const handleToggleFavorite = useCallback(
-    async (achievement: RetroAchievement) => {
-      const isFav = favoritedIds.has(achievement.ID)
-      setFavoritedIds((prev) => {
-        const next = new Set(prev)
-        if (isFav) next.delete(achievement.ID)
-        else next.add(achievement.ID)
-        return next
-      })
-      if (isFav) {
-        await fetch(`/api/favorites?achievementId=${achievement.ID}`, { method: 'DELETE' })
-      } else {
-        await fetch('/api/favorites', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ achievement, gameId, gameTitle, numDistinctPlayers }),
-        })
-      }
-    },
-    [favoritedIds, gameId, gameTitle, numDistinctPlayers]
-  )
+  const { favoritedIds, toggleFavorite } = useRaFavoriteIds(gameId)
+  const handleToggleFavorite = (achievement: RetroAchievement) =>
+    toggleFavorite(achievement, { gameTitle, numDistinctPlayers })
 
   useEffect(() => {
     if (achievements.length === 0) {

@@ -100,6 +100,7 @@ export const de: Translations = {
   },
   userTheme: {
     theme: 'Thema',
+    saveError: 'Das Design konnte nicht gespeichert werden. Versuche es erneut.',
   },
   userConfig: {
     accountSettings: 'Kontoeinstellungen',
@@ -221,6 +222,7 @@ export const de: Translations = {
     username: 'Benutzername',
     apiKey: 'Web-API-Schlüssel',
     signIn: 'Anmelden',
+    error: 'Dein RetroAchievements-Konto konnte nicht verbunden werden. Versuche es erneut.',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -330,6 +332,11 @@ export const de: Translations = {
   errorBoundary: {
     title: 'Etwas ist schiefgelaufen',
     subtitle: 'Beim Laden dieser Seite ist ein unerwarteter Fehler aufgetreten. Du kannst es erneut versuchen.',
+  },
+  notFound: {
+    title: 'Seite nicht gefunden',
+    subtitle: 'Diese Seite existiert nicht oder wurde verschoben.',
+    home: 'Zur Startseite',
   },
   gameInfoPage: {
     retry: 'Erneut versuchen',

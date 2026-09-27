@@ -3,20 +3,22 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { RecentAchievement } from '@/types/types'
 import { useSession } from 'next-auth/react'
-import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 
 type CtxType = {
   achievements: RecentAchievement[]
   isLoading: boolean
+  error: boolean
   refetch: () => void
 }
 
-const Ctx = createContext<CtxType>({ achievements: [], isLoading: true, refetch: () => {} })
+const Ctx = createContext<CtxType>({ achievements: [], isLoading: true, error: false, refetch: () => {} })
 
 export function RecentAchievementsProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const [achievements, setAchievements] = useState<RecentAchievement[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(false)
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -24,25 +26,20 @@ export function RecentAchievementsProvider({ children }: { children: React.React
   const doFetch = useCallback(() => {
     if (!session?.user?.rausername) { setIsLoading(false); return }
     setIsLoading(true)
+    setError(false)
+    const onFail = (err?: unknown) => {
+      if (!scheduleRetry(attemptRef, retryTimer, doFetch, err)) { setError(true); setIsLoading(false) }
+    }
     fetchWithRetry('/api/getRecentAchievements')
       .then((data) => {
-        if (!Array.isArray(data)) {
-          const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
-          attemptRef.current++
-          retryTimer.current = setTimeout(doFetch, delay)
-          return
-        }
+        if (!Array.isArray(data)) return onFail()
         setAchievements([...data].sort(
           (a, b) => new Date(b.Date.replace(' ', 'T')).getTime() - new Date(a.Date.replace(' ', 'T')).getTime()
         ))
         setIsLoading(false)
         attemptRef.current = 0
       })
-      .catch(() => {
-        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
-        attemptRef.current++
-        retryTimer.current = setTimeout(doFetch, delay)
-      })
+      .catch(onFail)
   }, [session?.user?.rausername])
 
   useEffect(() => {
@@ -69,7 +66,7 @@ export function RecentAchievementsProvider({ children }: { children: React.React
     doFetch()
   }, [doFetch])
 
-  return <Ctx.Provider value={{ achievements, isLoading, refetch }}>{children}</Ctx.Provider>
+  return <Ctx.Provider value={{ achievements, isLoading, error, refetch }}>{children}</Ctx.Provider>
 }
 
 export const useRecentAchievements = () => useContext(Ctx)

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import CommonModal from '../common-modal/CommonModal'
 import { useTheme } from '@/context/ThemeContext'
@@ -30,16 +31,27 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
   const { theme, setTheme } = useTheme()
   const { update } = useSession()
   const { T } = useLanguage()
+  const [saveError, setSaveError] = useState(false)
 
   const handleSelect = async (id: Theme) => {
+    const previous = theme
     setTheme(id)
-    await fetch('/api/updateTheme', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ theme: id }),
-    })
-    await update({ theme: id })
-    onClose()
+    setSaveError(false)
+    try {
+      const res = await fetch('/api/updateTheme', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theme: id }),
+      })
+      if (!res.ok) throw new Error(`updateTheme ${res.status}`)
+      await update({ theme: id })
+      onClose()
+    } catch (err) {
+      // Not saved: put the old theme back rather than show one that will vanish on reload.
+      console.error('[ThemeModal]', err)
+      setTheme(previous)
+      setSaveError(true)
+    }
   }
 
   return (
@@ -91,6 +103,11 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
           </button>
         ))}
       </div>
+      {saveError && (
+        <p role="alert" className="mt-4 text-sm text-danger">
+          {T.userTheme.saveError}
+        </p>
+      )}
     </CommonModal>
   )
 }

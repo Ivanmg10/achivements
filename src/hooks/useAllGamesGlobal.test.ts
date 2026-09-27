@@ -6,7 +6,10 @@ import { useAllGamesGlobal } from './useAllGamesGlobal'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 
 jest.mock('@/context/GamesDataContext', () => ({ useGamesData: jest.fn() }))
-jest.mock('@/lib/fetchWithRetry', () => ({ fetchWithRetry: jest.fn() }))
+jest.mock('@/lib/fetchWithRetry', () => ({
+  ...jest.requireActual('@/lib/fetchWithRetry'),
+  fetchWithRetry: jest.fn(),
+}))
 
 const completed = [
   { GameID: 1, ConsoleName: 'PS2', NumAwarded: 5, PctWon: '0.5', HardcoreMode: '0' },
@@ -20,7 +23,7 @@ beforeEach(() => {
 })
 
 test('does not fetch getGamesCompleted itself — it reuses the shared GamesDataContext', async () => {
-  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { rausername: 'Ivan' } } })
   ;(fetchWithRetry as jest.Mock).mockResolvedValue({ Results: [] })
 
   const { result } = renderHook(() => useAllGamesGlobal())
@@ -31,7 +34,7 @@ test('does not fetch getGamesCompleted itself — it reuses the shared GamesData
 })
 
 test('derives playing/completed from the shared context data, excluding Events consoles', async () => {
-  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { rausername: 'Ivan' } } })
   ;(fetchWithRetry as jest.Mock).mockResolvedValue({ Results: [] })
 
   const { result } = renderHook(() => useAllGamesGlobal())
@@ -42,7 +45,7 @@ test('derives playing/completed from the shared context data, excluding Events c
 })
 
 test('filters out want-to-play games already started', async () => {
-  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { rausername: 'Ivan' } } })
   ;(fetchWithRetry as jest.Mock).mockResolvedValue({
     Results: [
       { ID: 1, ConsoleName: 'PS2' },
@@ -58,9 +61,18 @@ test('filters out want-to-play games already started', async () => {
 
 test('stays loading while the shared context is still loading', () => {
   ;(useGamesData as jest.Mock).mockReturnValue({ all: [], isLoading: true })
-  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { rausername: 'Ivan' } } })
   ;(fetchWithRetry as jest.Mock).mockResolvedValue({ Results: [] })
 
   const { result } = renderHook(() => useAllGamesGlobal())
   expect(result.current.loading).toBe(true)
+})
+
+test('asks RetroAchievements for nothing when no RA account is linked', async () => {
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: {} } })
+  ;(useGamesData as jest.Mock).mockReturnValue({ all: [], isLoading: false })
+
+  const { result } = renderHook(() => useAllGamesGlobal())
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(fetchWithRetry).not.toHaveBeenCalled()
 })

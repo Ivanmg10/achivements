@@ -6,13 +6,14 @@ import SteamCategorySection from '@/components/steam/steam-category-section/Stea
 import { useAllGamesGlobal } from '@/hooks/useAllGamesGlobal'
 import { useGameExtraData } from '@/hooks/useGameExtraData'
 import { useLanguage } from '@/context/LanguageContext'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 import { motion } from 'framer-motion'
 import { fadeUp } from '@/lib/animations'
 
 const CATEGORIES = ['wantToPlay', 'playing', 'completed'] as const
 
 export default function AllGamesPage() {
-  const { wantToPlay, playing, completed, loading } = useAllGamesGlobal()
+  const { wantToPlay, playing, completed, loading, error, refetch } = useAllGamesGlobal()
   const extraData = useGameExtraData()
   const { T } = useLanguage()
 
@@ -30,12 +31,14 @@ export default function AllGamesPage() {
 
         {CATEGORIES.map((category) => (
           <div key={category} className="flex flex-col gap-4">
-            <AllGamesSection
-              category={category}
-              games={raGames[category]}
-              loading={loading}
-              extraData={extraData}
-            />
+            <SectionFallback error={error} onRefresh={refetch}>
+              <AllGamesSection
+                category={category}
+                games={raGames[category]}
+                loading={loading}
+                extraData={extraData}
+              />
+            </SectionFallback>
             {/* Renders nothing unless Steam is linked, so no empty card for RA-only users. */}
             <SteamCategorySection
               category={category}

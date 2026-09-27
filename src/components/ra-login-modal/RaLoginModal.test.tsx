@@ -8,11 +8,13 @@ global.fetch = jest.fn()
 const mockUpdate = jest.fn()
 
 beforeEach(() => {
+  jest.clearAllMocks()
   ;(useSession as jest.Mock).mockReturnValue({
     data: { user: {} },
     update: mockUpdate,
   })
   ;(fetch as jest.Mock).mockResolvedValue({
+    ok: true,
     json: () => Promise.resolve({ User: 'ivan' }),
   })
   mockUpdate.mockResolvedValue(null)
@@ -51,16 +53,45 @@ test('closes modal via backdrop (onClose)', () => {
   expect(setIsOpen).toHaveBeenCalledWith(false)
 })
 
-test('shows alert on error message', async () => {
-  window.alert = jest.fn()
+function submit(apiKey = 'apikey123') {
+  fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'ivan' } })
+  fireEvent.change(screen.getByLabelText(en.raLoginModal.apiKey), { target: { value: apiKey } })
+  fireEvent.click(screen.getByText('Sign in'))
+}
+
+test('shows RA’s message inline when the name or key is wrong, and stays open', async () => {
   ;(fetch as jest.Mock).mockResolvedValueOnce({
+    ok: true,
     json: () => Promise.resolve({ message: 'Invalid credentials' }),
   })
+  const setIsOpen = jest.fn()
+  render(<RaLoginModal isOpen={true} setIsOpen={setIsOpen} />)
+  submit('badkey')
+  expect(await screen.findByRole('alert')).toHaveTextContent('Invalid credentials')
+  expect(setIsOpen).not.toHaveBeenCalled()
+  expect(screen.getByText('Sign in')).toBeInTheDocument()
+})
+
+test('says it failed when saving the account is refused', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  ;(fetch as jest.Mock)
+    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ User: 'ivan' }) })
+    .mockResolvedValueOnce({ ok: false, status: 500 })
+  const setIsOpen = jest.fn()
+  render(<RaLoginModal isOpen={true} setIsOpen={setIsOpen} />)
+  submit()
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.raLoginModal.error)
+  expect(mockUpdate).not.toHaveBeenCalled()
+  expect(setIsOpen).not.toHaveBeenCalled()
+})
+
+test('says it failed when the network is down, and the button comes back', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  ;(fetch as jest.Mock).mockRejectedValueOnce(new Error('offline'))
   render(<RaLoginModal isOpen={true} setIsOpen={jest.fn()} />)
-  fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'ivan' } })
-  fireEvent.change(screen.getByLabelText(en.raLoginModal.apiKey), { target: { value: 'badkey' } })
-  fireEvent.click(screen.getByText('Sign in'))
-  await waitFor(() => expect(window.alert).toHaveBeenCalledWith('Invalid credentials'))
+  submit()
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.raLoginModal.error)
+  expect(screen.getByText('Sign in')).toBeInTheDocument()
 })
 
 test('says where the RetroAchievements key lives, with a link to it', () => {

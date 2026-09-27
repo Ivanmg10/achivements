@@ -151,7 +151,7 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
         <div className="flex items-center gap-3 bg-bg-main rounded-xl p-3">
           <Image
             src={newValue.trim()}
-            alt="preview"
+            alt={T.editProfileModal.avatarPreview}
             width={48}
             height={48}
             className="rounded-full w-12 h-12 object-cover"

@@ -38,6 +38,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLangState(getSavedLang())
   }, [])
 
+  // Screen readers pick their voice from <html lang>; keep it on the language actually shown.
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
+
   const setLang = (next: Lang) => {
     localStorage.setItem(STORAGE_KEY, next)
     setLangState(next)

@@ -174,12 +174,20 @@ export default function GroupDetailPage() {
     const results = await Promise.all(
       toFetch.map((item) =>
         fetch(`/api/getGameData?gameId=${item.game_id}`)
-          .then((r) => r.json())
+          .then((r) => {
+            if (!r.ok) throw new Error(`getGameData ${r.status}`)
+            return r.json()
+          })
           .then((d: { Released?: string | null }) => ({
             id: itemKey(item),
             year: d.Released ? parseInt(d.Released.substring(0, 4)) : null,
           }))
-          .catch(() => ({ id: itemKey(item), year: null as number | null }))
+          .catch((err) => {
+            // Only costs this game its place in the decade filter; forget it so a later pass asks again.
+            console.error('[GroupDetailPage] release year', item.game_id, err)
+            fetchedKeysRef.current.delete(itemKey(item))
+            return { id: itemKey(item), year: null as number | null }
+          })
       )
     )
     setReleaseYears((prev) => {
@@ -242,7 +250,10 @@ export default function GroupDetailPage() {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
-    }).catch(() => {})
+    })
+      .then((r) => { if (!r.ok) throw new Error(`sync ${r.status}`) })
+      // Only the cached counts; the page already shows the fresh ones.
+      .catch((err) => console.error('[GroupDetailPage] sync counts', err))
   }, [group, recentlyPlayed, groupId])
 
   // Background fetch game progression for items with no ach data anywhere
@@ -253,9 +264,9 @@ export default function GroupDetailPage() {
     if (!missing.length) return
     Promise.allSettled(
       missing.slice(0, 20).map(async (item): Promise<SyncItem | null> => {
-        const data = await fetch(`/api/getGameProgression?gameId=${item.game_id}`).then((r) =>
-          r.json()
-        )
+        const res = await fetch(`/api/getGameProgression?gameId=${item.game_id}`)
+        if (!res.ok) throw new Error(`getGameProgression ${res.status}`)
+        const data = await res.json()
         const achs = Object.values(
           (data.Achievements ?? {}) as Record<string, RetroAchievement | undefined>
         ).filter((a): a is RetroAchievement => !!a)
@@ -292,7 +303,9 @@ export default function GroupDetailPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(ok),
-      }).catch(() => {})
+      })
+        .then((r) => { if (!r.ok) throw new Error(`sync ${r.status}`) })
+        .catch((err) => console.error('[GroupDetailPage] sync counts', err))
     })
   }, [group, recentlyPlayed, groupId])
 
@@ -318,6 +331,12 @@ export default function GroupDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ order: newItems.map((i) => i.id) }),
       })
+        .then((r) => { if (!r.ok) throw new Error(`reorder ${r.status}`) })
+        .catch((err) => {
+          // Not saved: reload so the list shows the order that actually stuck.
+          console.error('[GroupDetailPage] reorder', err)
+          fetchGroup()
+        })
     }, 600)
   }
 

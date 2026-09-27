@@ -4,7 +4,7 @@ import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
 import { IconMoodEmpty } from '@tabler/icons-react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
-import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { classifySteamGame } from '@/utils/steamFeed'
@@ -66,10 +66,9 @@ export default function MainPageAbandoned({
           attemptRef.current = 0
         }
       })
-      .catch(() => {
-        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
-        attemptRef.current++
-        retryTimer.current = setTimeout(() => doFetch(key), delay)
+      .catch((err) => {
+        // Giving up just leaves out the RA games with no known date; the rest still show.
+        if (!scheduleRetry(attemptRef, retryTimer, () => doFetch(key), err)) setFetchedKey(key)
       })
   }, [])
 

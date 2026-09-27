@@ -18,7 +18,10 @@ jest.mock('@/hooks/useRecentlyPlayedGames', () => ({
   useRecentlyPlayedGames: () => ({ games: [], isLoading: false }),
 }))
 
-jest.mock('@/lib/fetchWithRetry', () => ({ fetchWithRetry: jest.fn() }))
+jest.mock('@/lib/fetchWithRetry', () => ({
+  ...jest.requireActual('@/lib/fetchWithRetry'),
+  fetchWithRetry: jest.fn(),
+}))
 
 jest.mock('@/context/SteamGamesDataContext', () => ({
   useSteamGamesData: jest.fn(() => ({ library: [] })),

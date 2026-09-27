@@ -18,8 +18,9 @@ describe('GroupIconDisplay', () => {
 
   it('renders an img when icon is a URL', () => {
     render(<GroupIconDisplay icon="https://example.com/icon.png" />)
-    const img = screen.getByAltText('icon')
-    expect(img).toBeInTheDocument()
+    // Decorative: the group's name sits right beside it.
+    const img = screen.getByRole('presentation')
+    expect(img).toHaveAttribute('alt', '')
     expect(img).toHaveAttribute('src', 'https://example.com/icon.png')
   })
 

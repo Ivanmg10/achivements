@@ -13,6 +13,7 @@ import { useMainPlatform } from '@/context/MainPlatformContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { toRecentAchievement } from '@/utils/steamMappers'
 import { ChartCard } from '@/components/ui/ChartCard'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
 import MainPageHeatmap from './MainPageHeatmap'
@@ -39,12 +40,12 @@ import MainPageSteamMastery from './main-page-steam-mastery/MainPageSteamMastery
  */
 export default function MainPageCharts() {
   const { T } = useLanguage()
-  const { achievements, isLoading: achLoading } = useRecentAchievements()
-  const { achievements: heatmapData, isLoading: heatmapLoading } = useActivityHeatmap()
+  const { achievements, isLoading: achLoading, error: achError, refetch: refetchAch } = useRecentAchievements()
+  const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
-  const { all, hardcore, softcore, isLoading: gamesLoading } = useGamesData()
-  const { rank, isLoading: rankLoading } = useUserRank()
-  const { awards, isLoading: awardsLoading } = useUserAwards()
+  const { all, hardcore, softcore, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()
+  const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
+  const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
   const { platform } = useMainPlatform()
   const { isLinked: steamLinked, library, libraryLoading } = useSteamGamesData()
   const isSteam = platform === 'steam'
@@ -59,6 +60,11 @@ export default function MainPageCharts() {
   // Best performance follows the selector: points (RA) and unlocks (Steam) do not add up.
   const bestPeriodData = isSteam ? steamRecent : heatmapData
   const bestPeriodLoading = isSteam ? steamLoading : heatmapLoading
+  const bestPeriodError = !isSteam && heatmapError
+  const refetchStats = () => {
+    if (achError) refetchAch()
+    if (rankError) refetchRank()
+  }
 
   return (
     <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-label={T.cards.statsActivity}>
@@ -69,25 +75,31 @@ export default function MainPageCharts() {
         {isSteam ? (
           <MainPageSteamStats achievements={steamRecent} games={library} isLoading={steamLoading} />
         ) : (
-          <MainPagePointsStats
-            achievements={achievements}
-            heatmapAchievements={heatmapData}
-            rank={rank}
-            isLoading={achLoading || rankLoading}
-          />
+          <SectionFallback error={achError || rankError} onRefresh={refetchStats}>
+            <MainPagePointsStats
+              achievements={achievements}
+              heatmapAchievements={heatmapData}
+              rank={rank}
+              isLoading={achLoading || rankLoading}
+            />
+          </SectionFallback>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
           {/* Row 1: Heatmap | Daily | Groups placeholder */}
           <ChartCard>
-            <MainPageHeatmap achievements={heatmap} isLoading={heatmapLoading} />
+            <SectionFallback error={heatmapError} onRefresh={refetchHeatmap}>
+              <MainPageHeatmap achievements={heatmap} isLoading={heatmapLoading} />
+            </SectionFallback>
           </ChartCard>
           <ChartCard>
             <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.dailyAchievements}</p>
-            <div aria-hidden="true">
-              <AchievementsLineChart achievements={recent} isLoading={achLoading} />
-            </div>
+            <SectionFallback error={achError} onRefresh={refetchAch}>
+              <div aria-hidden="true">
+                <AchievementsLineChart achievements={recent} isLoading={achLoading} />
+              </div>
+            </SectionFallback>
           </ChartCard>
           <ChartCard className="flex-1">
             <MainPageGroups />
@@ -96,17 +108,25 @@ export default function MainPageCharts() {
           {/* Row 2: [Active | Rarest | Abandoned] | [col3: Perfect alone] */}
           <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
             <ChartCard>
-              <MainPageTopGames achievements={recent} isLoading={achLoading} />
+              <SectionFallback error={achError} onRefresh={refetchAch}>
+                <MainPageTopGames achievements={recent} isLoading={achLoading} />
+              </SectionFallback>
             </ChartCard>
             <ChartCard>
-              <MainPageRarest achievements={achievements} steamAchievements={steamActivity} isLoading={achLoading} />
+              <SectionFallback error={achError} onRefresh={refetchAch}>
+                <MainPageRarest achievements={achievements} steamAchievements={steamActivity} isLoading={achLoading} />
+              </SectionFallback>
             </ChartCard>
             <ChartCard>
-              <MainPageAbandoned playing={playing} steamGames={library} isLoading={playingLoading} />
+              <SectionFallback error={gamesError} onRefresh={refetchGames}>
+                <MainPageAbandoned playing={playing} steamGames={library} isLoading={playingLoading} />
+              </SectionFallback>
             </ChartCard>
           </div>
           <ChartCard>
-            <MainPagePerfectGames games={all} steamGames={library} isLoading={gamesLoading} />
+            <SectionFallback error={gamesError} onRefresh={refetchGames}>
+              <MainPagePerfectGames games={all} steamGames={library} isLoading={gamesLoading} />
+            </SectionFallback>
           </ChartCard>
 
         </div>
@@ -126,16 +146,20 @@ export default function MainPageCharts() {
             {isSteam ? (
               <MainPageSteamMastery games={library} isLoading={libraryLoading} />
             ) : (
-              <MainPageMastery
-                awards={awards}
-                isLoading={awardsLoading}
-                unlockedHC={hardcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
-                unlockedSC={softcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
-              />
+              <SectionFallback error={awardsError} onRefresh={refetchAwards}>
+                <MainPageMastery
+                  awards={awards}
+                  isLoading={awardsLoading}
+                  unlockedHC={hardcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
+                  unlockedSC={softcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
+                />
+              </SectionFallback>
             )}
           </ChartCard>
           <ChartCard>
-            <MainPageBestPeriod achievements={bestPeriodData} isLoading={bestPeriodLoading} />
+            <SectionFallback error={bestPeriodError} onRefresh={refetchHeatmap}>
+              <MainPageBestPeriod achievements={bestPeriodData} isLoading={bestPeriodLoading} />
+            </SectionFallback>
           </ChartCard>
 
           {/* Pinned closes the page across the full width: the list can run long. */}

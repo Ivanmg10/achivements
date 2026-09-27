@@ -1,4 +1,7 @@
-jest.mock('@/lib/fetchWithRetry', () => ({ fetchWithRetry: jest.fn() }))
+jest.mock('@/lib/fetchWithRetry', () => ({
+  ...jest.requireActual('@/lib/fetchWithRetry'),
+  fetchWithRetry: jest.fn(),
+}))
 
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
@@ -57,4 +60,20 @@ test('puts the row back in place when unpinning fails', async () => {
 
   await act(() => result.current.unpin(RA))
   expect(result.current.pinned).toEqual([RA, RA2])
+})
+
+test('reports the error once the background retries run out, and refetch loads again', async () => {
+  jest.useFakeTimers()
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  ;(fetchWithRetry as jest.Mock).mockRejectedValue(new Error('down'))
+  const { result } = renderHook(() => usePinnedAchievements())
+  for (let i = 0; i < 6; i++) await act(async () => { jest.advanceTimersByTime(30_000) })
+  expect(result.current.isLoading).toBe(false)
+  expect(result.current.error).toBe(true)
+  jest.useRealTimers()
+
+  ;(fetchWithRetry as jest.Mock).mockResolvedValueOnce([RA])
+  act(() => result.current.refetch())
+  await waitFor(() => expect(result.current.pinned).toEqual([RA]))
+  expect(result.current.error).toBe(false)
 })

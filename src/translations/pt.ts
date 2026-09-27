@@ -100,6 +100,7 @@ export const pt: Translations = {
   },
   userTheme: {
     theme: 'Tema',
+    saveError: 'Não foi possível salvar o tema. Tente novamente.',
   },
   userConfig: {
     accountSettings: 'Configurações da conta',
@@ -221,6 +222,7 @@ export const pt: Translations = {
     username: 'Nome de usuário',
     apiKey: 'Chave de API',
     signIn: 'Entrar',
+    error: 'Não foi possível conectar sua conta do RetroAchievements. Tente novamente.',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -330,6 +332,11 @@ export const pt: Translations = {
   errorBoundary: {
     title: 'Algo deu errado',
     subtitle: 'Ocorreu um erro inesperado ao carregar esta página. Você pode tentar novamente.',
+  },
+  notFound: {
+    title: 'Página não encontrada',
+    subtitle: 'Esta página não existe ou foi movida.',
+    home: 'Voltar ao início',
   },
   gameInfoPage: {
     retry: 'Tentar novamente',

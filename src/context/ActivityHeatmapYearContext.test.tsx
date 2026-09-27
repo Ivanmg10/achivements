@@ -4,7 +4,10 @@ import { useSession } from 'next-auth/react'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
 jest.mock('next-auth/react', () => ({ useSession: jest.fn() }))
-jest.mock('@/lib/fetchWithRetry', () => ({ fetchWithRetry: jest.fn() }))
+jest.mock('@/lib/fetchWithRetry', () => ({
+  ...jest.requireActual('@/lib/fetchWithRetry'),
+  fetchWithRetry: jest.fn(),
+}))
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ActivityHeatmapYearProvider>{children}</ActivityHeatmapYearProvider>

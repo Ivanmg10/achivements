@@ -100,6 +100,7 @@ export const fr: Translations = {
   },
   userTheme: {
     theme: 'Thème',
+    saveError: 'Impossible d’enregistrer le thème. Réessayez.',
   },
   userConfig: {
     accountSettings: 'Paramètres du compte',
@@ -221,6 +222,7 @@ export const fr: Translations = {
     username: "Nom d'utilisateur",
     apiKey: 'Clé d’API',
     signIn: 'Se connecter',
+    error: 'Impossible de connecter votre compte RetroAchievements. Réessayez.',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -330,6 +332,11 @@ export const fr: Translations = {
   errorBoundary: {
     title: "Un problème est survenu",
     subtitle: "Une erreur inattendue s'est produite lors du chargement de cette page. Vous pouvez réessayer.",
+  },
+  notFound: {
+    title: 'Page introuvable',
+    subtitle: 'Cette page n’existe pas ou a été déplacée.',
+    home: 'Retour à l’accueil',
   },
   gameInfoPage: {
     retry: 'Réessayer',

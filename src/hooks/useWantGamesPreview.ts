@@ -1,21 +1,27 @@
 import { WantToPlayGame } from '@/types/types'
-import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 
 export function useWantGamesPreview() {
-  const { status } = useSession()
+  const { data: session, status } = useSession()
+  const rausername = session?.user?.rausername
   const { all: completedGames } = useGamesData()
   const [wantGames, setWantGames] = useState<WantToPlayGame[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const doFetch = useCallback(() => {
-    if (status !== 'authenticated') { setLoading(false); return }
+    if (status !== 'authenticated' || !rausername) { setLoading(false); return }
     setLoading(true)
+    setError(false)
+    const onFail = (err?: unknown) => {
+      if (!scheduleRetry(attemptRef, retryTimer, doFetch, err)) { setError(true); setLoading(false) }
+    }
     fetchWithRetry('/api/getWantPlayGames')
       .then((data) => {
         const results = (data as { Results?: WantToPlayGame[] })?.Results ?? []
@@ -23,12 +29,8 @@ export function useWantGamesPreview() {
         setLoading(false)
         attemptRef.current = 0
       })
-      .catch(() => {
-        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
-        attemptRef.current++
-        retryTimer.current = setTimeout(doFetch, delay)
-      })
-  }, [status])
+      .catch(onFail)
+  }, [status, rausername])
 
   useEffect(() => {
     if (status === 'loading') return
@@ -50,5 +52,5 @@ export function useWantGamesPreview() {
     [wantGames, startedIds],
   )
 
-  return { wantGames: filteredGames, loading }
+  return { wantGames: filteredGames, loading, error }
 }

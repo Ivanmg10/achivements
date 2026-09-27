@@ -98,6 +98,7 @@ export const en = {
   },
   userTheme: {
     theme: 'Theme',
+    saveError: 'Could not save your theme. Try again.',
   },
   userConfig: {
     accountSettings: 'Account settings',
@@ -219,6 +220,7 @@ export const en = {
     username: 'Username',
     apiKey: 'Web API key',
     signIn: 'Sign in',
+    error: 'Could not connect your RetroAchievements account. Try again.',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -328,6 +330,11 @@ export const en = {
   errorBoundary: {
     title: 'Something went wrong',
     subtitle: 'An unexpected error occurred while loading this page. You can try again.',
+  },
+  notFound: {
+    title: 'Page not found',
+    subtitle: 'This page does not exist or has moved.',
+    home: 'Back to home',
   },
   gameInfoPage: {
     retry: 'Retry',

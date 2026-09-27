@@ -7,7 +7,8 @@ import { getToken } from 'next-auth/jwt'
  * signed out it shows the landing page, which is what tells a visitor what
  * CheevoVault is before asking them to sign up.
  */
-const PUBLIC_PATHS = ['/', '/authPage', '/resetPassword']
+// /opengraph-image is the link preview: the sites that fetch it never have a session.
+const PUBLIC_PATHS = ['/', '/authPage', '/resetPassword', '/opengraph-image']
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl

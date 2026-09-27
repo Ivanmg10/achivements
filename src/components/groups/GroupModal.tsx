@@ -142,7 +142,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                   <div className="w-9 h-9 rounded-lg bg-bg-main flex items-center justify-center shrink-0 overflow-hidden">
                     {icon ? (
                       isImageUrl(icon) ? (
-                        <Image src={icon} alt="icon" width={36} height={36} className="w-full h-full object-cover" unoptimized />
+                        <Image src={icon} alt={T.groups.icon} width={36} height={36} className="w-full h-full object-cover" unoptimized />
                       ) : (
                         <span className="text-xl leading-none">{icon}</span>
                       )

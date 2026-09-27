@@ -1,12 +1,13 @@
 import { RecentAchievement } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 
 export function useActivityHeatmap() {
   const { data: session } = useSession()
   const [achievements, setAchievements] = useState<RecentAchievement[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(false)
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -14,23 +15,18 @@ export function useActivityHeatmap() {
   const doFetch = useCallback(() => {
     if (!session?.user?.rausername) { setIsLoading(false); return }
     setIsLoading(true)
+    setError(false)
+    const onFail = (err?: unknown) => {
+      if (!scheduleRetry(attemptRef, retryTimer, doFetch, err)) { setError(true); setIsLoading(false) }
+    }
     fetchWithRetry('/api/getActivityHeatmap')
       .then((data) => {
-        if (!Array.isArray(data)) {
-          const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
-          attemptRef.current++
-          retryTimer.current = setTimeout(doFetch, delay)
-          return
-        }
+        if (!Array.isArray(data)) return onFail()
         setAchievements(data as RecentAchievement[])
         setIsLoading(false)
         attemptRef.current = 0
       })
-      .catch(() => {
-        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
-        attemptRef.current++
-        retryTimer.current = setTimeout(doFetch, delay)
-      })
+      .catch(onFail)
   }, [session?.user?.rausername])
 
   useEffect(() => {
@@ -49,5 +45,5 @@ export function useActivityHeatmap() {
     doFetch()
   }, [doFetch])
 
-  return { achievements, isLoading, refetch }
+  return { achievements, isLoading, error, refetch }
 }

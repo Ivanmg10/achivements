@@ -100,6 +100,7 @@ export const ja: Translations = {
   },
   userTheme: {
     theme: 'テーマ',
+    saveError: 'テーマを保存できませんでした。もう一度お試しください。',
   },
   userConfig: {
     accountSettings: 'アカウント設定',
@@ -221,6 +222,7 @@ export const ja: Translations = {
     username: 'ユーザー名',
     apiKey: 'Web APIキー',
     signIn: 'ログイン',
+    error: 'RetroAchievementsアカウントを接続できませんでした。もう一度お試しください。',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -330,6 +332,11 @@ export const ja: Translations = {
   errorBoundary: {
     title: '問題が発生しました',
     subtitle: 'このページの読み込み中に予期しないエラーが発生しました。もう一度お試しください。',
+  },
+  notFound: {
+    title: 'ページが見つかりません',
+    subtitle: 'このページは存在しないか、移動されました。',
+    home: 'ホームに戻る',
   },
   gameInfoPage: {
     retry: '再試行',

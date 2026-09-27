@@ -9,6 +9,7 @@ import { usePinnedAchievements } from '@/hooks/usePinnedAchievements'
 import { pinnedKey } from '@/utils/utils'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 import MainPageFavoritesRaRow from './main-page-favorites-ra-row/MainPageFavoritesRaRow'
 import MainPageFavoritesSteamRow from './main-page-favorites-steam-row/MainPageFavoritesSteamRow'
 
@@ -17,7 +18,7 @@ type RaPin = Extract<PinnedAchievement, { source: 'ra' }>
 /** The main page's pinned achievements from RA and Steam together, newest first. */
 export default function MainPageFavorites() {
   const { T } = useLanguage()
-  const { pinned, isLoading, unpin } = usePinnedAchievements()
+  const { pinned, isLoading, error, refetch, unpin } = usePinnedAchievements()
   const [selected, setSelected] = useState<RaPin | null>(null)
 
   return (
@@ -44,7 +45,9 @@ export default function MainPageFavorites() {
         </div>
       )}
 
-      {!isLoading && pinned.length === 0 && (
+      {error && <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>}
+
+      {!isLoading && !error && pinned.length === 0 && (
         <EmptyState
           icon={<IconStar className="w-6 h-6" />}
           title={T.favorites.emptyTitle}

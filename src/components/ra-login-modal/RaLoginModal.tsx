@@ -15,39 +15,46 @@ export default function RaLoginModal({
   const [isLoading, setIsLoading] = useState(false)
   const [username, setUsername] = useState('')
   const [apiKey, setApiKey] = useState('')
+  const [error, setError] = useState<string | null>(null)
   const { T } = useLanguage()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!username || !apiKey) return
     setIsLoading(true)
+    setError(null)
 
-    const user = await fetch('/api/getUserProfile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, apiKey }),
-    }).then((res) => res.json())
+    try {
+      const profileRes = await fetch('/api/getUserProfile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, apiKey }),
+      })
+      const user = await profileRes.json().catch(() => ({}))
+      // A wrong name or key comes back with RA's own message; show that, keep what was typed.
+      if (!profileRes.ok || user.message) {
+        setError(user.message ?? T.raLoginModal.error)
+        return
+      }
 
-    if (user.message) {
-      alert(user.message)
+      const saveRes = await fetch('/api/updateRaUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ raUser: user, apiKey }),
+      })
+      if (!saveRes.ok) throw new Error(`updateRaUser ${saveRes.status}`)
+
+      await update({ raUser: user, raidKey: apiKey } as Parameters<typeof update>[0])
+
       setUsername('')
       setApiKey('')
+      setIsOpen(false)
+    } catch (err) {
+      console.error('[RaLoginModal]', err)
+      setError(T.raLoginModal.error)
+    } finally {
       setIsLoading(false)
-      return
     }
-
-    await fetch('/api/updateRaUser', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ raUser: user, apiKey }),
-    })
-
-    await update({ raUser: user, raidKey: apiKey } as Parameters<typeof update>[0])
-
-    setIsLoading(false)
-    setUsername('')
-    setApiKey('')
-    setIsOpen(false)
   }
 
   return (
@@ -84,6 +91,11 @@ export default function RaLoginModal({
             </a>
           </p>
         </div>
+        {error && (
+          <p role="alert" className="text-sm text-danger">
+            {error}
+          </p>
+        )}
         {!isLoading ? (
           <button
             type="submit"

@@ -100,6 +100,7 @@ export const pl: Translations = {
   },
   userTheme: {
     theme: 'Motyw',
+    saveError: 'Nie udało się zapisać motywu. Spróbuj ponownie.',
   },
   userConfig: {
     accountSettings: 'Ustawienia konta',
@@ -221,6 +222,7 @@ export const pl: Translations = {
     username: 'Nazwa użytkownika',
     apiKey: 'Klucz Web API',
     signIn: 'Zaloguj się',
+    error: 'Nie udało się połączyć konta RetroAchievements. Spróbuj ponownie.',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -330,6 +332,11 @@ export const pl: Translations = {
   errorBoundary: {
     title: 'Coś poszło nie tak',
     subtitle: 'Podczas ładowania tej strony wystąpił nieoczekiwany błąd. Możesz spróbować ponownie.',
+  },
+  notFound: {
+    title: 'Nie znaleziono strony',
+    subtitle: 'Ta strona nie istnieje lub została przeniesiona.',
+    home: 'Wróć na stronę główną',
   },
   gameInfoPage: {
     retry: 'Spróbuj ponownie',

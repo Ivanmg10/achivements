@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { useSession } from 'next-auth/react'
-import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 
 type CtxType = {
   all: RetroAchievementsGameCompleted[]
@@ -11,12 +11,13 @@ type CtxType = {
   hardcore: RetroAchievementsGameCompleted[]
   inProgress: RetroAchievementsGameCompleted[]
   isLoading: boolean
+  error: boolean
   refetch: () => void
 }
 
 const Ctx = createContext<CtxType>({
   all: [], softcore: [], hardcore: [], inProgress: [],
-  isLoading: true, refetch: () => {},
+  isLoading: true, error: false, refetch: () => {},
 })
 
 const RA_SYSTEM_CONSOLE_IDS = new Set([100, 101])
@@ -29,6 +30,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   const rausername = session?.user?.rausername
   const [all, setAll] = useState<RetroAchievementsGameCompleted[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(false)
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -37,23 +39,18 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     if (status !== 'authenticated') { setIsLoading(false); return }
     if (!rausername) { setIsLoading(false); return }
     setIsLoading(true)
+    setError(false)
+    const onFail = (err?: unknown) => {
+      if (!scheduleRetry(attemptRef, retryTimer, doFetch, err)) { setError(true); setIsLoading(false) }
+    }
     fetchWithRetry('/api/getGamesCompleted')
       .then((data) => {
-        if (!Array.isArray(data)) {
-          const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
-          attemptRef.current++
-          retryTimer.current = setTimeout(doFetch, delay)
-          return
-        }
+        if (!Array.isArray(data)) return onFail()
         setAll((data as RetroAchievementsGameCompleted[]).filter(isRealGame))
         setIsLoading(false)
         attemptRef.current = 0
       })
-      .catch(() => {
-        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
-        attemptRef.current++
-        retryTimer.current = setTimeout(doFetch, delay)
-      })
+      .catch(onFail)
   }, [status, rausername])
 
   useEffect(() => {
@@ -92,7 +89,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <Ctx.Provider value={{ all, softcore, hardcore, inProgress, isLoading, refetch }}>
+    <Ctx.Provider value={{ all, softcore, hardcore, inProgress, isLoading, error, refetch }}>
       {children}
     </Ctx.Provider>
   )

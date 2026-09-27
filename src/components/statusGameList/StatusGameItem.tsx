@@ -3,15 +3,17 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, type CSSProperties } from 'react'
-import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
+import { RetroAchievement } from '@/types/types'
 import { CategoryGame } from '../../hooks/useGamesByCategory'
 import { GameExtraData } from './StatusGameList'
+import { useGameProgression } from '@/hooks/useGameProgression'
 import { useLanguage } from '@/context/LanguageContext'
 import { CONSOLES } from '@/constants'
 import { relativeTime } from '@/utils/utils'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 
 function getGameId(g: CategoryGame): number | string {
   return g.ID ?? g.GameID!
@@ -39,27 +41,20 @@ export default function StatusGameItem({
   style?: CSSProperties
 }) {
   const [open, setOpen] = useState(false)
-  const [gameData, setGameData] = useState<RetroAchievementsGameWithAchievements | null>(null)
-  const [loading, setLoading] = useState(false)
   const { T } = useLanguage()
 
   const gameId = getGameId(game)
+  // Asked for on first open; the hook keeps the result when the row closes again.
+  const { game: gameData, isLoading, error, refetch } = useGameProgression(open ? String(gameId) : null)
+  const loading = isLoading || (open && !gameData && !error)
   const { earned, total, pct } = getAchievementMeta(game)
   const isComplete = earned !== null && earned === total && total > 0
   const consoleDef = CONSOLES.find((c) => c.id === Number(game.ConsoleID))
   const consoleIcon = consoleDef?.icon
   const consoleColor = consoleDef?.color
 
-  async function handleToggle() {
-    if (!open && !gameData) {
-      setOpen(true)
-      setLoading(true)
-      const data = await fetch(`/api/getGameProgression?gameId=${gameId}`).then((r) => r.json())
-      setGameData(data)
-      setLoading(false)
-    } else {
-      setOpen((o) => !o)
-    }
+  function handleToggle() {
+    setOpen((o) => !o)
   }
 
   const achievements = gameData
@@ -216,6 +211,8 @@ export default function StatusGameItem({
                 <div key={i} className="w-12 h-12 rounded-lg bg-bg-main animate-pulse" />
               ))}
             </div>
+          ) : error && !gameData ? (
+            <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>
           ) : achievements.length === 0 ? (
             <p className="text-center text-text-secondary text-sm py-2">{T.statusGameItem.noPublishedAchievements}</p>
           ) : (

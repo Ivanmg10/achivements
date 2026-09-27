@@ -15,6 +15,7 @@ import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { MainViewToggle } from '@/components/main-view-toggle/MainViewToggle'
 import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-recently-played-expanded/RARecentlyPlayedExpanded'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 import SteamGameItem from '@/components/steam/steam-game-item/SteamGameItem'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { mergeRecentFeeds, RecentFeedItem } from '@/utils/steamFeed'
@@ -39,7 +40,7 @@ function pct(achieved: number, total: number) {
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function RARecentlyPlayed() {
   const { T } = useLanguage()
-  const { games, isLoading } = useRecentlyPlayedGames()
+  const { games, isLoading, error, refetch } = useRecentlyPlayedGames()
   const { recent: steamRecent } = useSteamGamesData()
   // One feed across platforms, newest first. Steam entries merge in when they
   // arrive rather than holding the RA feed back while Steam loads.
@@ -109,6 +110,8 @@ export default function RARecentlyPlayed() {
           Array.from({ length: MAX_GAMES }).map((_, i) => (
             <div key={i} className="flex-1 bg-bg-main rounded-xl animate-pulse" />
           ))
+        ) : error && feed.length === 0 ? (
+          <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>
         ) : feed.length === 0 ? (
           <EmptyState
             icon={<IconDeviceGamepad2 className="w-6 h-6" />}

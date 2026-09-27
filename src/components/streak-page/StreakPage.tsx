@@ -5,12 +5,13 @@ import { useStreakData } from '@/hooks/useStreakData'
 import { useLanguage } from '@/context/LanguageContext'
 import { Streak } from '@/types/types'
 import Spinner from '@/components/main-spinner/Spinner'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 import StreakStatsBanner from './streak-stats-banner/StreakStatsBanner'
 import StreakChart from './streak-chart/StreakChart'
 import StreakList from './streak-list/StreakList'
 
 export default function StreakPage() {
-  const { streaks, activeStreak, bestStreak, isLoading } = useStreakData()
+  const { streaks, activeStreak, bestStreak, isLoading, error, refetch } = useStreakData()
   const { T } = useLanguage()
   const [selectedStreak, setSelectedStreak] = useState<Streak | null>(null)
 
@@ -26,6 +27,14 @@ export default function StreakPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Spinner size={45} />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col justify-center min-h-[60vh] px-4">
+        <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>
       </div>
     )
   }

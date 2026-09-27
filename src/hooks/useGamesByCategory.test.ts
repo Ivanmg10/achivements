@@ -6,7 +6,10 @@ import { useGamesByCategory } from './useGamesByCategory'
 import { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 
 jest.mock('@/context/GamesDataContext', () => ({ useGamesData: jest.fn() }))
-jest.mock('@/lib/fetchWithRetry', () => ({ fetchWithRetry: jest.fn() }))
+jest.mock('@/lib/fetchWithRetry', () => ({
+  ...jest.requireActual('@/lib/fetchWithRetry'),
+  fetchWithRetry: jest.fn(),
+}))
 
 const completed = [
   { GameID: 1, ConsoleID: 21, ConsoleName: 'PS2', NumAwarded: 5, PctWon: '0.5', HardcoreMode: '0' },
