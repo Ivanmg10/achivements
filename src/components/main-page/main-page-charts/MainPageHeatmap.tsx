@@ -20,8 +20,11 @@ function cellBg(count: number): string {
   return 'rgb(var(--accent-muted) / 0.95)'
 }
 
-const MONTH_ROW = 12
+const MONTH_ROW = 14
 const LEGEND_ROW = 14
+
+/** Columns a month needs before its name fits above it without overlapping. */
+const MIN_LABEL_COLS = 3
 
 export default function MainPageHeatmap({
   achievements,
@@ -60,14 +63,21 @@ export default function MainPageHeatmap({
     const columns: (typeof data[0] | null)[][] = []
     for (let i = 0; i < weeks * 7; i += 7) columns.push(fitted.slice(i, i + 7))
 
-    const monthLabels: { label: string; col: number }[] = []
+    const starts: { label: string; col: number }[] = []
     let lastMonth = ''
     columns.forEach((week, wi) => {
       const firstReal = week.find((d) => d !== null)
       if (!firstReal) return
       const m = new Date(firstReal.date + 'T00:00:00').toLocaleString('default', { month: 'short' })
-      if (m !== lastMonth) { monthLabels.push({ label: m, col: wi }); lastMonth = m }
+      if (m !== lastMonth) { starts.push({ label: m, col: wi }); lastMonth = m }
     })
+
+    // The first column is rarely the first of its month, so that month can own
+    // a single column and print its name on top of the next one's. A month too
+    // narrow to be labelled without colliding goes unlabelled.
+    const monthLabels = starts.filter(
+      (start, i) => i === 0 ? (starts[1]?.col ?? MIN_LABEL_COLS) - start.col >= MIN_LABEL_COLS : true,
+    )
 
     return { totalAch, columns, monthLabels }
   }, [achievements, weeks, days])
@@ -156,20 +166,21 @@ export default function MainPageHeatmap({
                 }}
               />
 
-              {/* month labels */}
-              <div style={{ ...gridStyle, height: MONTH_ROW }}>
-                {Array.from({ length: weeks }).map((_, wi) => {
-                  const lbl = monthLabels.find((m) => m.col === wi)
-                  return (
-                    <div key={wi} style={{ overflow: 'visible' }}>
-                      {lbl && (
-                        <span className="text-[9px] text-text-secondary whitespace-nowrap leading-none">
-                          {lbl.label}
-                        </span>
-                      )}
-                    </div>
-                  )
-                })}
+              {/*
+                Placed over the row rather than inside its columns: a name is
+                wider than the column its month starts in, and a grid cell
+                clipped it to a couple of letters.
+              */}
+              <div className="relative" style={{ height: MONTH_ROW }}>
+                {monthLabels.map(({ label, col }) => (
+                  <span
+                    key={col}
+                    className="absolute top-0 text-[10px] font-medium text-text-secondary capitalize whitespace-nowrap leading-none"
+                    style={{ left: Math.min(col * (cell + GAP), Math.max(0, gridWidth - 26)) }}
+                  >
+                    {label}
+                  </span>
+                ))}
               </div>
 
               {/* cells — loading draws the same grid, so nothing shifts when it fills */}

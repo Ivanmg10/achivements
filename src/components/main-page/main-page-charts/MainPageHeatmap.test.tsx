@@ -80,3 +80,40 @@ test('draws nothing at all until the card has been measured', () => {
   render(<MainPageHeatmap achievements={[unlock(today(), 'Win')]} />)
   expect(cells()).toHaveLength(0)
 })
+
+describe('month labels', () => {
+  // A year's worth, so every month in the window has unlocks to date it.
+  const wholeWindow = Array.from({ length: 200 }, (_, i) => unlock(today(i), `A${i}`))
+
+  function labels() {
+    return Array.from(document.querySelectorAll('span'))
+      .map((el) => ({ text: el.textContent ?? '', left: parseFloat((el as HTMLElement).style.left) }))
+      .filter((l) => !Number.isNaN(l.left))
+  }
+
+  test('each month is placed over the column it starts in, free of the grid cells', () => {
+    render(<MainPageHeatmap achievements={wholeWindow} />)
+    const placed = labels()
+
+    expect(placed.length).toBeGreaterThan(1)
+    // Inside a cell the name would be clipped to the cell's width; these are not.
+    for (const { left } of placed) expect(left % (CELL + 3)).toBe(0)
+  })
+
+  test('two months never print on top of each other', () => {
+    render(<MainPageHeatmap achievements={wholeWindow} />)
+    const lefts = labels().map((l) => l.left).sort((a, b) => a - b)
+
+    for (let i = 1; i < lefts.length; i++) {
+      expect(lefts[i] - lefts[i - 1]).toBeGreaterThanOrEqual(3 * (CELL + 3) - 1)
+    }
+  })
+
+  test('a month too narrow to name is left unnamed rather than overlapping', () => {
+    ;(useHeatmapGrid as jest.Mock).mockReturnValue({ weeks: 5, cell: CELL, days: 33 })
+    render(<MainPageHeatmap achievements={wholeWindow} />)
+
+    // Five columns can hold at most one month name with room to read it.
+    expect(labels().length).toBeLessThanOrEqual(2)
+  })
+})
