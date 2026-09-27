@@ -7,11 +7,14 @@
 ## Features
 
 ### Authentication
-- Email / password login and registration
-- Optional invitation code on sign-up
-- RetroAchievements account linking via OAuth
-- Steam account linking *(coming soon)*
-- Admin panel for admin users
+- Username / password login and registration, open to anyone
+- Email required on sign-up — the only way to recover an account later
+- Password recovery by email through Resend — **works today only for the Resend account owner, until a domain is verified (see [Email](#email))**
+- Five sign-ups and five reset requests per address per hour, counted in the database
+- RetroAchievements account linking with a Web API key
+- Steam account linking via OpenID
+- PlayStation Network *(coming soon)*
+- Admin panel for admin users: search, edit, promote and delete accounts
 
 ---
 
@@ -142,21 +145,83 @@ npm run dev
 Required env vars:
 
 ```
-NEXTAUTH_URL=
+NEXTAUTH_URL=           # also used to build password-reset links
 NEXTAUTH_SECRET=
 DATABASE_URL=
-RA_API_KEY=        # your RetroAchievements API key
+STEAM_API_KEY=          # Steam Web API key, for the Steam integration
 ```
 
-Run migrations in order before first boot:
+Optional:
+
+```
+RESEND_API_KEY=         # see Email below — without it, password recovery stays off
+EMAIL_FROM=             # e.g. CheevoVault <no-reply@yourdomain.com>
+REGISTRATION_OPEN=false # closes sign-ups; registration is open when unset
+```
+
+Run every migration in `migrations/` in order before first boot:
 
 ```bash
-psql $DATABASE_URL -f migrations/001_initial.sql
-psql $DATABASE_URL -f migrations/002_groups.sql
-psql $DATABASE_URL -f migrations/003_groups_ach_count.sql
-psql $DATABASE_URL -f migrations/004_groups_ach_count.sql
-psql $DATABASE_URL -f migrations/005_groups_pts.sql
+for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 ```
+
+> `011_drop_sourceless_game_keys.sql` is the exception: only run it once the
+> Steam branch is deployed, since the old constraints are what the previous
+> code relies on.
+
+---
+
+## Email
+
+Password recovery sends one message through [Resend](https://resend.com), over
+their REST API (no SDK). Everything is wired up: request form, hashed
+single-use token, reset page.
+
+**What works depends on what is set:**
+
+| Env | What happens |
+|---|---|
+| Nothing | `POST /api/auth/forgotPassword` answers `503 { error: 'email-not-configured' }` and the UI says so. No message is sent, none is promised. |
+| `RESEND_API_KEY` only | Sends from Resend's shared address. **Delivers only to the Resend account owner's own address** — enough to try the flow end to end, useless for other people. |
+| `RESEND_API_KEY` + `EMAIL_FROM` on a verified domain | Delivers to everyone. This is the finished state. |
+
+**To reach everyone:**
+
+1. Verify a domain (or a subdomain, e.g. `mail.yourdomain.com`) in Resend and add
+   the DNS records it asks for.
+2. Set both variables and redeploy:
+
+   ```
+   RESEND_API_KEY=re_xxxxxxxx
+   EMAIL_FROM=CheevoVault <no-reply@yourdomain.com>
+   ```
+
+3. Make sure `NEXTAUTH_URL` is the public URL — the reset link is built from it.
+
+No code change is needed; the sender is read from the environment.
+
+| Piece | Where |
+|---|---|
+| Sending | `src/lib/email.ts` |
+| Tokens (hashed, one hour, single use) | `src/lib/passwordReset.ts` |
+| Request / reset endpoints | `src/app/api/auth/forgotPassword`, `src/app/api/auth/resetPassword` |
+| UI | `src/components/forgot-password-modal`, `src/components/reset-password-form`, `/resetPassword` |
+| Table | `migrations/016_password_resets.sql` |
+
+**Not done yet:** email verification. When a domain is in place, the plan is a
+soft one — the account works straight away and an unverified address only earns
+a banner, never a locked door.
+
+---
+
+## Before 1.0
+
+- [ ] **Verify a domain in Resend and set `EMAIL_FROM`.** Password recovery
+      currently only reaches the Resend account owner; everyone else would lose
+      their account on a forgotten password.
+- [ ] `NEXTAUTH_URL` pointing at the public URL in production.
+- [ ] Decide on email verification (soft banner, or deliberately skipped).
+- [ ] Run `migrations/011_drop_sourceless_game_keys.sql` once the Steam work is deployed.
 
 ---
 

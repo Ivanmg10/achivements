@@ -12,7 +12,8 @@ export async function GET() {
 
     const result = await pool.query(
       `SELECT g.id, g.title, g.description, g.icon, g.is_public, g.position, g.created_at, g.updated_at,
-              COUNT(i.id)::int                        AS game_count,
+              COUNT(i.id)::int                                          AS game_count,
+              COUNT(i.id) FILTER (WHERE i.source = 'steam')::int        AS steam_count,
               COALESCE(SUM(i.num_awarded), 0)::int    AS total_awarded,
               COALESCE(SUM(i.max_possible), 0)::int   AS total_possible
        FROM game_groups g
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
       [session.user.id, title.trim(), description ?? null, icon ?? null, is_public ?? false, position],
     )
 
-    return NextResponse.json({ ...result.rows[0], game_count: 0 }, { status: 201 })
+    return NextResponse.json({ ...result.rows[0], game_count: 0, steam_count: 0 }, { status: 201 })
   } catch (err) {
     console.error('[groups POST]', err)
     return NextResponse.json({ message: 'Error interno' }, { status: 500 })

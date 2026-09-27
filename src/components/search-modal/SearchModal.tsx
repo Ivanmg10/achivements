@@ -5,37 +5,15 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { IconSearch, IconX, IconUser } from '@tabler/icons-react'
-import { useGamesData } from '@/context/GamesDataContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { RetroAchievementsGameCompleted, RetroAchievementsUserProfile, WantToPlayGame } from '@/types/types'
-import { fetchWithRetry } from '@/lib/fetchWithRetry'
-
-type GameStatus = 'completed-hc' | 'completed-sc' | 'in-progress' | 'want-to-play'
-
-type SearchResult = {
-  id: number
-  title: string
-  icon: string
-  consoleName: string
-  status: GameStatus
-}
-
-const STATUS_PRIORITY: Record<GameStatus, number> = {
-  'completed-hc': 4,
-  'completed-sc': 3,
-  'in-progress': 2,
-  'want-to-play': 1,
-}
-
-const normalize = (s: string) =>
-  s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
-
-const STATUS_CLASSES: Record<GameStatus, string> = {
-  'completed-hc': 'bg-amber-500/20 text-amber-400',
-  'completed-sc': 'bg-green-500/20 text-green-400',
-  'in-progress': 'bg-blue-500/20 text-blue-400',
-  'want-to-play': 'bg-purple-500/20 text-purple-400',
-}
+import { RetroAchievementsUserProfile } from '@/types/types'
+import { useGameCandidates } from '@/hooks/useGameCandidates'
+import { useRaLinked } from '@/hooks/useRaLinked'
+import { searchCandidates } from '@/utils/gameCandidates'
+import { gameHref, GameRef } from '@/utils/gameRef'
+import RaLogo from '@/components/ra-logo/RaLogo'
+import SteamLogo from '@/components/steam-logo/SteamLogo'
+import SearchModalGameResult from './search-modal-game-result/SearchModalGameResult'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -54,48 +32,8 @@ const resultVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.15, ease: 'easeOut' } },
 }
 
-function buildIndex(
-  completed: RetroAchievementsGameCompleted[],
-  wantToPlay: WantToPlayGame[],
-): SearchResult[] {
-  const map = new Map<number, SearchResult>()
-
-  for (const g of completed) {
-    const pct = parseFloat(g.PctWon)
-    let status: GameStatus
-    if (g.HardcoreMode === '1' && pct >= 1) status = 'completed-hc'
-    else if (g.HardcoreMode === '0' && pct >= 1) status = 'completed-sc'
-    else status = 'in-progress'
-
-    const existing = map.get(g.GameID)
-    if (!existing || STATUS_PRIORITY[status] > STATUS_PRIORITY[existing.status]) {
-      map.set(g.GameID, {
-        id: g.GameID,
-        title: g.Title,
-        icon: g.ImageIcon,
-        consoleName: g.ConsoleName,
-        status,
-      })
-    }
-  }
-
-  for (const g of wantToPlay) {
-    const id = g.ID ?? g.GameID!
-    if (!map.has(id)) {
-      map.set(id, {
-        id,
-        title: g.Title,
-        icon: g.ImageIcon,
-        consoleName: g.ConsoleName,
-        status: 'want-to-play',
-      })
-    }
-  }
-
-  return Array.from(map.values())
-}
-
 type SearchTab = 'games' | 'users'
+type PlatformFilter = 'all' | 'ra' | 'steam'
 
 interface SearchModalProps {
   isOpen: boolean
@@ -106,27 +44,16 @@ interface SearchModalProps {
 export default function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalProps) {
   const { T } = useLanguage()
   const router = useRouter()
-  const { all: completedGames } = useGamesData()
+  const candidates = useGameCandidates(isOpen)
+  const raLinked = useRaLinked()
   const [tab, setTab] = useState<SearchTab>('games')
+  const [platformFilter, setPlatformFilter] = useState<PlatformFilter>('all')
   const [query, setQuery] = useState('')
-  const [wantToPlay, setWantToPlay] = useState<WantToPlayGame[]>([])
   const [userResult, setUserResult] = useState<RetroAchievementsUserProfile | null>(null)
   const [userLoading, setUserLoading] = useState(false)
   const [userError, setUserError] = useState(false)
-  const wantFetched = useRef(false)
   const userDebounce = useRef<ReturnType<typeof setTimeout>>(undefined)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (!isOpen || wantFetched.current) return
-    wantFetched.current = true
-    fetchWithRetry('/api/getWantPlayGames')
-      .then((data) => {
-        const results = (data as { Results?: WantToPlayGame[] })?.Results ?? []
-        setWantToPlay(results)
-      })
-      .catch(() => {})
-  }, [isOpen])
 
   useEffect(() => {
     if (isOpen) {
@@ -136,6 +63,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
     } else {
       setQuery('')
       setTab('games')
+      setPlatformFilter('all')
       setUserResult(null)
       setUserError(false)
     }
@@ -151,7 +79,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   }, [isOpen, onClose])
 
   useEffect(() => {
-    if (tab !== 'users') return
+    if (tab !== 'users' || !raLinked) return
     const q = query.trim()
     setUserResult(null)
     setUserError(false)
@@ -177,55 +105,30 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
         })
     }, 400)
     return () => clearTimeout(userDebounce.current)
-  }, [query, tab])
+  }, [query, tab, raLinked])
 
-  const allGames = useMemo(
-    () => buildIndex(completedGames, wantToPlay),
-    [completedGames, wantToPlay],
+  const allResults = useMemo(() => searchCandidates(candidates, query), [candidates, query])
+  const results = useMemo(
+    () => (platformFilter === 'all' ? allResults : allResults.filter((r) => r.source === platformFilter)),
+    [allResults, platformFilter],
   )
-
-  const results = useMemo(() => {
-    const q = normalize(query.trim())
-    if (!q) return []
-    return allGames
-      .filter((g) => normalize(g.title).includes(q))
-      .map((g) => {
-        const t = normalize(g.title)
-        const score = t === q ? 3 : t.startsWith(q) ? 2 : t.split(/\s+/).some((w) => w.startsWith(q)) ? 1 : 0
-        return { g, score }
-      })
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 20)
-      .map(({ g }) => g)
-  }, [query, allGames])
+  const hasBothPlatforms = allResults.some((r) => r.source === 'ra') && allResults.some((r) => r.source === 'steam')
 
   const directGameId = useMemo(() => {
+    if (!raLinked) return null
     const q = query.trim()
     if (/^\d{3,}$/.test(q)) return parseInt(q)
     const urlMatch = q.match(/retroachievements\.org\/game\/(\d+)/i)
     if (urlMatch) return parseInt(urlMatch[1])
     return null
-  }, [query])
+  }, [query, raLinked])
 
   const handleSelect = useCallback(
-    (id: number) => {
-      router.push(`/gameInfo/${id}`)
+    ({ source, id }: GameRef) => {
+      router.push(gameHref(source, id))
       onClose()
     },
     [router, onClose],
-  )
-
-  const statusLabel = useCallback(
-    (status: GameStatus) => {
-      const map: Record<GameStatus, string> = {
-        'completed-hc': T.search.completedHC,
-        'completed-sc': T.search.completedSC,
-        'in-progress': T.search.inProgress,
-        'want-to-play': T.search.wantToPlay,
-      }
-      return map[status]
-    },
-    [T],
   )
 
   const placeholder = tab === 'users' ? T.publicProfile.searchUsersPlaceholder : T.search.placeholder
@@ -278,18 +181,49 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                 </button>
               </div>
 
-              {/* Tab toggle */}
+              {/* Tab toggle — the users tab searches RA, so without RA there is
+                  only one tab and nothing to toggle */}
+              {raLinked && (
               <div className="flex border-b border-white/5 px-4 gap-4">
                 {(['games', 'users'] as SearchTab[]).map((t) => (
                   <button
                     key={t}
                     onClick={() => { setTab(t); setQuery('') }}
+                    aria-pressed={tab === t}
                     className={`py-2 text-xs font-medium border-b-2 transition-colors ${tab === t ? 'border-accent text-text-main' : 'border-transparent text-text-secondary hover:text-text-main'}`}
                   >
                     {t === 'games' ? T.publicProfile.gamesTab : T.publicProfile.userTab}
                   </button>
                 ))}
               </div>
+              )}
+
+              {/* Platform filter — only worth showing once both platforms are in the library */}
+              {tab === 'games' && hasBothPlatforms && (
+                <div className="flex items-center gap-3 px-4 py-2 border-b border-white/5" role="group" aria-label={T.search.platformAll}>
+                  {(
+                    [
+                      { value: 'all' as PlatformFilter, label: T.search.platformAll, icon: null },
+                      { value: 'ra' as PlatformFilter, label: T.search.platformRa, icon: <RaLogo height={11} /> },
+                      { value: 'steam' as PlatformFilter, label: T.search.platformSteam, icon: <SteamLogo size={12} className="text-[#66c0f4]" aria-hidden="true" /> },
+                    ]
+                  ).map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setPlatformFilter(opt.value)}
+                      aria-pressed={platformFilter === opt.value}
+                      className={`flex items-center gap-1.5 pb-1 text-[11px] font-medium border-b-2 transition-colors ${
+                        platformFilter === opt.value
+                          ? 'border-accent text-text-main'
+                          : 'border-transparent text-text-secondary/70 hover:text-text-secondary'
+                      }`}
+                    >
+                      {opt.icon}
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* Results — Games */}
               {tab === 'games' && (
@@ -299,14 +233,16 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                       <div className="flex flex-col items-center gap-2 py-8 px-4">
                         <p className="text-text-secondary text-sm">{T.search.noResults}</p>
                         <p className="text-text-secondary/50 text-xs text-center">{T.search.libraryOnly}</p>
-                        <a
-                          href={`https://retroachievements.org/searchresults.php?s=${encodeURIComponent(query.trim())}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-accent hover:underline mt-1"
-                        >
-                          {T.publicProfile.searchOnRA} →
-                        </a>
+                        {raLinked && (
+                          <a
+                            href={`https://retroachievements.org/searchresults.php?s=${encodeURIComponent(query.trim())}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-accent hover:underline mt-1"
+                          >
+                            {T.publicProfile.searchOnRA} →
+                          </a>
+                        )}
                       </div>
                     ) : (
                       <motion.ul
@@ -315,38 +251,15 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                         variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
                       >
                         {results.map((game) => (
-                          <motion.li key={game.id} variants={resultVariants}>
-                            <button
-                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer"
-                              onClick={() => handleSelect(game.id)}
-                            >
-                              {game.icon ? (
-                                <Image
-                                  src={`https://retroachievements.org${game.icon}`}
-                                  alt={game.title}
-                                  width={32}
-                                  height={32}
-                                  className="w-8 h-8 rounded object-cover shrink-0"
-                                  unoptimized
-                                />
-                              ) : (
-                                <div className="w-8 h-8 rounded bg-white/10 shrink-0" />
-                              )}
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-text-main line-clamp-1">{game.title}</p>
-                                <p className="text-xs text-text-secondary line-clamp-1">{game.consoleName}</p>
-                              </div>
-                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${STATUS_CLASSES[game.status]}`}>
-                                {statusLabel(game.status)}
-                              </span>
-                            </button>
+                          <motion.li key={game.key} variants={resultVariants}>
+                            <SearchModalGameResult game={game} onSelect={() => handleSelect(game)} />
                           </motion.li>
                         ))}
-                        {directGameId && !results.find((r) => r.id === directGameId) && (
+                        {directGameId && !results.find((r) => r.source === 'ra' && r.id === directGameId) && (
                           <motion.li variants={resultVariants}>
                             <button
                               className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer border-t border-white/5"
-                              onClick={() => handleSelect(directGameId)}
+                              onClick={() => handleSelect({ source: 'ra', id: directGameId })}
                             >
                               <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-text-secondary text-xs font-bold">
                                 #{directGameId}

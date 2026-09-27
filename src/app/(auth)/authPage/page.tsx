@@ -3,7 +3,8 @@
 import LoginUserForm from '@/components/login-user-form/LoginUserForm'
 import RegisterUserForm from '@/components/register-user-form/RegisterUserForm'
 import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { formTransition } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
@@ -19,14 +20,19 @@ function AuthBrand() {
       <h1 className="text-4xl font-extrabold text-text-main tracking-tight">{T.authPage.brand}</h1>
       <div className="flex items-center justify-center gap-2 mt-3">
         <span className="text-xs px-2.5 py-1 rounded-full bg-accent/15 text-accent border border-accent/25 font-medium">RetroAchievements</span>
-        <span className="text-xs px-2.5 py-1 rounded-full bg-bg-tertiary text-text-secondary border border-white/10 font-medium">Steam · coming soon</span>
+        <span className="text-xs px-2.5 py-1 rounded-full bg-accent/15 text-accent border border-accent/25 font-medium">Steam</span>
+        <span className="text-xs px-2.5 py-1 rounded-full bg-bg-tertiary text-text-secondary border border-white/10 font-medium">
+          PlayStation · {T.userData.comingSoon.toLowerCase()}
+        </span>
       </div>
     </div>
   )
 }
 
-export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true)
+/** ?mode=register opens straight on the register form, for the landing button. */
+function AuthPageContent() {
+  const wantsRegister = useSearchParams().get('mode') === 'register'
+  const [isLogin, setIsLogin] = useState(!wantsRegister)
   const [hasRegister, setHasRegister] = useState(false)
 
   return (
@@ -95,5 +101,13 @@ export default function AuthPage() {
       </div>
 
     </div>
+  )
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense>
+      <AuthPageContent />
+    </Suspense>
   )
 }

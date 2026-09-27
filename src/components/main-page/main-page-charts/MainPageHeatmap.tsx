@@ -1,12 +1,13 @@
 'use client'
 
-import { useMemo, useEffect, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { RecentAchievement } from '@/types/types'
 import { groupByDays } from '@/utils/utils'
 import { IconRefresh } from '@tabler/icons-react'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import { useLanguage } from '@/context/LanguageContext'
+import { useHeatmapGrid, HEATMAP_GAP as GAP } from '@/hooks/useHeatmapGrid'
 
 function cellBg(count: number): string {
   if (count === 0) return 'rgb(var(--bg-header))'
@@ -19,22 +20,11 @@ function cellBg(count: number): string {
   return 'rgb(var(--accent-muted) / 0.95)'
 }
 
-// mobile → 30d, tablet → 45d, desktop → 60d
-function useTotalDays() {
-  const [days, setDays] = useState(60)
-  useEffect(() => {
-    function calc() {
-      const w = window.innerWidth
-      setDays(w < 640 ? 30 : w < 1024 ? 45 : 60)
-    }
-    calc()
-    window.addEventListener('resize', calc)
-    return () => window.removeEventListener('resize', calc)
-  }, [])
-  return days
-}
+const MONTH_ROW = 14
+const LEGEND_ROW = 14
 
-const GAP = 3
+/** Columns a month needs before its name fits above it without overlapping. */
+const MIN_LABEL_COLS = 3
 
 export default function MainPageHeatmap({
   achievements,
@@ -46,53 +36,72 @@ export default function MainPageHeatmap({
   onRefresh?: () => void
 }) {
   const { T } = useLanguage()
-  const totalDays = useTotalDays()
-  const daysCount = totalDays <= 30 ? 30 : totalDays <= 45 ? 45 : 60
-  const label = T.cards.activityLastDays.replace('{n}', String(daysCount))
   const tooltipRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const boxRef = useRef<HTMLDivElement>(null)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
 
-  const { totalAch, weeks, monthLabels } = useMemo(() => {
-    const data = groupByDays(achievements, totalDays)
+  // How many days fit is a question about the card, not about the data.
+  const { weeks, cell, days } = useHeatmapGrid(boxRef)
+  const label = T.cards.activityLastDays.replace('{n}', String(days))
+
+  const { totalAch, columns, monthLabels } = useMemo(() => {
+    if (!weeks) return { totalAch: 0, columns: [], monthLabels: [] }
+
+    const data = groupByDays(achievements, days)
     const totalAch = data.reduce((s, d) => s + d.count, 0)
 
-    const firstDow = new Date(data[0].date).getDay()
-    const padded = [...Array(firstDow).fill(null), ...data]
+    // The grid ends on the last day of this week, so the days run out before
+    // the final column does; the rest of it stays empty.
+    const padded: (typeof data[0] | null)[] = [
+      ...Array(new Date(data[0].date + 'T00:00:00').getDay()).fill(null),
+      ...data,
+    ]
+    // Should the days not divide into the columns exactly, the oldest go: the
+    // last column has to stay the current week for the grid to read as "now".
+    const fitted = padded.slice(Math.max(0, padded.length - weeks * 7))
+    const columns: (typeof data[0] | null)[][] = []
+    for (let i = 0; i < weeks * 7; i += 7) columns.push(fitted.slice(i, i + 7))
 
-    const weeks: (typeof data[0] | null)[][] = []
-    for (let i = 0; i < padded.length; i += 7) weeks.push(padded.slice(i, i + 7))
-
-    const monthLabels: { label: string; col: number }[] = []
+    const starts: { label: string; col: number }[] = []
     let lastMonth = ''
-    weeks.forEach((week, wi) => {
+    columns.forEach((week, wi) => {
       const firstReal = week.find((d) => d !== null)
       if (!firstReal) return
-      const m = new Date(firstReal.date).toLocaleString('default', { month: 'short' })
-      if (m !== lastMonth) { monthLabels.push({ label: m, col: wi }); lastMonth = m }
+      const m = new Date(firstReal.date + 'T00:00:00').toLocaleString('default', { month: 'short' })
+      if (m !== lastMonth) { starts.push({ label: m, col: wi }); lastMonth = m }
     })
 
-    return { totalAch, weeks, monthLabels }
-  }, [achievements, totalDays])
+    // The first column is rarely the first of its month, so that month can own
+    // a single column and print its name on top of the next one's. A month too
+    // narrow to be labelled without colliding goes unlabelled.
+    const monthLabels = starts.filter(
+      (start, i) => i === 0 ? (starts[1]?.col ?? MIN_LABEL_COLS) - start.col >= MIN_LABEL_COLS : true,
+    )
 
-  // larger cellMax = bigger cells since we have fewer weeks now
-  const cellMax = totalDays <= 30 ? 52 : totalDays <= 45 ? 36 : 26
-  const maxWidth = weeks.length * cellMax + (weeks.length - 1) * GAP
-  const gridCols = `repeat(${weeks.length}, 1fr)`
+    return { totalAch, columns, monthLabels }
+  }, [achievements, weeks, days])
+
+  const gridStyle = {
+    display: 'grid',
+    gridTemplateColumns: `repeat(${weeks}, ${cell}px)`,
+    gap: `${GAP}px`,
+  } as const
+  const gridWidth = weeks * cell + (weeks - 1) * GAP
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const cell = (e.target as HTMLElement).closest('[data-date]') as HTMLElement | null
+    const cellEl = (e.target as HTMLElement).closest('[data-date]') as HTMLElement | null
     const tooltip = tooltipRef.current
     const container = containerRef.current
-    if (!cell || !tooltip || !container) {
+    if (!cellEl || !tooltip || !container) {
       if (tooltip) tooltip.style.display = 'none'
       return
     }
     const rect = container.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
-    const date = cell.dataset.date ?? ''
-    const count = cell.dataset.count ?? '0'
+    const date = cellEl.dataset.date ?? ''
+    const count = cellEl.dataset.count ?? '0'
     const formatted = new Date(date + 'T00:00:00').toLocaleDateString('default', {
       month: 'short', day: 'numeric', year: 'numeric',
     })
@@ -108,13 +117,15 @@ export default function MainPageHeatmap({
 
   return (
     <div
-      className="flex flex-col w-full flex-1"
+      className="flex flex-col w-full flex-1 min-h-0"
       role="img"
       aria-label={`Achievement activity heatmap — ${totalAch} achievements in the ${label}`}
     >
       {/* header */}
       <div className="flex items-center justify-between flex-wrap gap-1 shrink-0 mb-2">
-        <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.activityLabel} — {label}</p>
+        <p className="text-[10px] uppercase tracking-widest text-text-secondary">
+          {T.cards.activityLabel} — {label}
+        </p>
         <div className="flex items-center gap-2">
           <p className="text-xs font-semibold text-text-main">{isLoading ? '—' : totalAch}</p>
           {onRefresh && (
@@ -130,106 +141,85 @@ export default function MainPageHeatmap({
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-2">
-            {/* skeleton grid */}
+      {/*
+        The measured box. Everything inside is taken out of the flow, so the
+        grid drawn from these measurements can never change them back.
+      */}
+      <div ref={boxRef} className="relative flex-1 min-h-0" data-testid="heatmap-box">
+        {weeks > 0 && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
             <div
-              className="opacity-20 animate-pulse"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: `repeat(9, 1fr)`,
-                gridTemplateRows: 'repeat(7, auto)',
-                gridAutoFlow: 'column',
-                gap: `${GAP}px`,
-                width: '207px',
-              }}
+              ref={containerRef}
+              className="relative flex flex-col gap-1"
+              style={{ width: gridWidth }}
+              aria-hidden="true"
             >
-              {Array.from({ length: 63 }).map((_, i) => (
-                <div key={i} className="w-5 h-5 rounded-sm bg-indigo-800" />
-              ))}
+              {/* tooltip */}
+              <div
+                ref={tooltipRef}
+                className="pointer-events-none absolute z-10 px-2 py-1 rounded text-[11px] text-white whitespace-nowrap"
+                style={{
+                  display: 'none',
+                  backgroundColor: 'rgb(var(--bg-card))',
+                  border: '1px solid rgb(var(--accent-muted) / 0.5)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                }}
+              />
+
+              {/*
+                Placed over the row rather than inside its columns: a name is
+                wider than the column its month starts in, and a grid cell
+                clipped it to a couple of letters.
+              */}
+              <div className="relative" style={{ height: MONTH_ROW }}>
+                {monthLabels.map(({ label, col }) => (
+                  <span
+                    key={col}
+                    className="absolute top-0 text-[10px] font-medium text-text-secondary capitalize whitespace-nowrap leading-none"
+                    style={{ left: Math.min(col * (cell + GAP), Math.max(0, gridWidth - 26)) }}
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
+
+              {/* cells — loading draws the same grid, so nothing shifts when it fills */}
+              <div
+                onMouseMove={isLoading ? undefined : handleMouseMove}
+                onMouseLeave={isLoading ? undefined : handleMouseLeave}
+                className={isLoading ? 'animate-pulse' : ''}
+                style={{ ...gridStyle, gridTemplateRows: `repeat(7, ${cell}px)`, gridAutoFlow: 'column' }}
+              >
+                {Array.from({ length: weeks }).flatMap((_, wi) =>
+                  Array.from({ length: 7 }).map((_, di) => {
+                    const day = isLoading ? null : columns[wi]?.[di] ?? null
+                    const count = day?.count ?? 0
+                    return (
+                      <div
+                        key={`${wi}-${di}`}
+                        className={`rounded-sm${count > 0 ? ' cursor-pointer hover:ring-1 hover:ring-white/30' : ''}`}
+                        style={{ backgroundColor: cellBg(count) }}
+                        data-date={day?.date}
+                        data-count={count}
+                        onClick={() => day && count > 0 && setSelectedDate(day.date)}
+                      />
+                    )
+                  })
+                )}
+              </div>
+
+              {/* legend */}
+              <div className="flex items-center justify-end gap-1" style={{ height: LEGEND_ROW }}>
+                <span className="text-[9px] text-text-secondary">Less</span>
+                {[0, 1, 3, 6, 10].map((v) => (
+                  <div key={v} className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: cellBg(v) }} />
+                ))}
+                <span className="text-[9px] text-text-secondary">More</span>
+              </div>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="flex-1 flex flex-col justify-center gap-1" aria-hidden="true">
-          <div
-            ref={containerRef}
-            className="w-full mx-auto flex flex-col gap-1 relative"
-            style={{ maxWidth }}
-          >
-            {/* tooltip */}
-            <div
-              ref={tooltipRef}
-              className="pointer-events-none absolute z-10 px-2 py-1 rounded text-[11px] text-white whitespace-nowrap"
-              style={{
-                display: 'none',
-                backgroundColor: 'rgb(var(--bg-card))',
-                border: '1px solid rgb(var(--accent-muted) / 0.5)',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-              }}
-            />
-
-            {/* month labels */}
-            <div style={{ display: 'grid', gridTemplateColumns: gridCols, gap: `${GAP}px` }}>
-              {weeks.map((_, wi) => {
-                const lbl = monthLabels.find((m) => m.col === wi)
-                return (
-                  <div key={wi} style={{ height: 12, overflow: 'hidden' }}>
-                    {lbl && (
-                      <span className="text-[8px] text-text-secondary whitespace-nowrap leading-none">
-                        {lbl.label}
-                      </span>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* cells */}
-            <div
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: gridCols,
-                gridTemplateRows: 'repeat(7, auto)',
-                gridAutoFlow: 'column',
-                gap: `${GAP}px`,
-              }}
-            >
-              {weeks.flatMap((week, wi) =>
-                Array.from({ length: 7 }).map((_, di) => {
-                  const cell = week[di] ?? null
-                  return (
-                    <div
-                      key={`${wi}-${di}`}
-                      className={`aspect-square rounded-sm${cell && cell.count > 0 ? ' cursor-pointer hover:ring-1 hover:ring-white/30' : ''}`}
-                      style={{ backgroundColor: cell ? cellBg(cell.count) : 'rgb(var(--bg-header))' }}
-                      data-date={cell?.date}
-                      data-count={cell?.count ?? 0}
-                      onClick={() => cell && cell.count > 0 && setSelectedDate(cell.date)}
-                    />
-                  )
-                })
-              )}
-            </div>
-
-            {/* legend */}
-            <div className="flex items-center justify-end gap-1 mt-0.5">
-              <span className="text-[8px] text-text-secondary">Less</span>
-              {[0, 1, 3, 6, 10].map((v) => (
-                <div
-                  key={v}
-                  className="w-2.5 h-2.5 rounded-sm"
-                  style={{ backgroundColor: cellBg(v) }}
-                />
-              ))}
-              <span className="text-[8px] text-text-secondary">More</span>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <AnimatePresence>
         {selectedDate && (

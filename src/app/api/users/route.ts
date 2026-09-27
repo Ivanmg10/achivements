@@ -1,27 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 import bcrypt from "bcrypt";
+import { allowAttempt, clientAddress } from "@/lib/attemptLimit";
+import { BCRYPT_COST, PASSWORD_MIN } from "@/utils/authValidation";
 
 export async function POST(req: NextRequest) {
   try {
-    // Registration is disabled when REGISTER_TOKEN is not set
-    const expectedToken = process.env.REGISTER_TOKEN;
-    if (!expectedToken) {
-      return NextResponse.json({ error: "Registration is disabled" }, { status: 403 });
+    // Anyone can sign up. Set REGISTRATION_OPEN=false to close the door.
+    if (process.env.REGISTRATION_OPEN === "false") {
+      return NextResponse.json({ error: "Registration is closed" }, { status: 403 });
+    }
+
+    if (!(await allowAttempt("signup", clientAddress(req.headers)))) {
+      return NextResponse.json(
+        { error: "Demasiadas cuentas creadas desde aquí. Inténtalo más tarde." },
+        { status: 429 },
+      );
     }
 
     const body = await req.json();
-    const { username, password, registerToken } = body as {
+    const { username, password, email } = body as {
       username?: string;
       password?: string;
-      registerToken?: string;
+      email?: string;
     };
 
-    if (registerToken !== expectedToken) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
-
-    if (!username || !password) {
+    if (typeof username !== "string" || typeof password !== "string" || !username || !password) {
       return NextResponse.json(
         { error: "username y password son obligatorios" },
         { status: 400 },
@@ -35,25 +39,39 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (password.length < 6) {
+    if (password.length < PASSWORD_MIN) {
       return NextResponse.json(
-        { error: "La contraseña debe tener al menos 6 caracteres" },
+        { error: `La contraseña debe tener al menos ${PASSWORD_MIN} caracteres` },
         { status: 400 },
       );
     }
 
-    const existing = await pool.query("SELECT id FROM users WHERE username = $1", [username]);
+    // Required: it is the only way to recover an account later.
+    const trimmedEmail = typeof email === "string" ? email.trim() : "";
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      return NextResponse.json({ error: "Correo no válido" }, { status: 400 });
+    }
+
+    // Case-insensitive, so nobody can sign up as "Ivan" next to "ivan".
+    const existing = await pool.query("SELECT id FROM users WHERE LOWER(username) = LOWER($1)", [username]);
     if (existing.rows.length > 0) {
       return NextResponse.json({ error: "Username ya en uso" }, { status: 409 });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // One account per address: recovery mails the address, so two accounts on
+    // it would leave the reset link going to whichever one the query found first.
+    const emailTaken = await pool.query("SELECT id FROM users WHERE LOWER(email) = LOWER($1)", [trimmedEmail]);
+    if (emailTaken.rows.length > 0) {
+      return NextResponse.json({ error: "email-taken" }, { status: 409 });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_COST);
 
     const result = await pool.query(
-      `INSERT INTO users (username, password, theme)
-       VALUES ($1, $2, 'dark')
+      `INSERT INTO users (username, password, email, theme)
+       VALUES ($1, $2, $3, 'dark')
        RETURNING id, username, email, theme, avatar, admin`,
-      [username, hashedPassword],
+      [username, hashedPassword, trimmedEmail],
     );
 
     return NextResponse.json(result.rows[0], { status: 201 });

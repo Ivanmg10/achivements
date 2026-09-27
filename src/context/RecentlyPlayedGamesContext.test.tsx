@@ -4,7 +4,10 @@ import { useSession } from 'next-auth/react'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
 jest.mock('next-auth/react', () => ({ useSession: jest.fn() }))
-jest.mock('@/lib/fetchWithRetry', () => ({ fetchWithRetry: jest.fn() }))
+jest.mock('@/lib/fetchWithRetry', () => ({
+  ...jest.requireActual('@/lib/fetchWithRetry'),
+  fetchWithRetry: jest.fn(),
+}))
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <RecentlyPlayedGamesProvider>{children}</RecentlyPlayedGamesProvider>
@@ -24,7 +27,7 @@ test('starts in a loading state while the session is resolving', () => {
 test('fetches once when authenticated', async () => {
   const games = [{ GameID: 1, Title: 'Sly Cooper' }]
   ;(fetchWithRetry as jest.Mock).mockResolvedValue(games)
-  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { rausername: 'Ivan' } } })
 
   const { result } = renderHook(() => useRecentlyPlayedGames(), { wrapper })
 
@@ -44,7 +47,7 @@ test('stops loading with an empty list when unauthenticated', () => {
 test('shares a single fetch across multiple consumers under the same provider', async () => {
   const games = [{ GameID: 1, Title: 'Sly Cooper' }]
   ;(fetchWithRetry as jest.Mock).mockResolvedValue(games)
-  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { rausername: 'Ivan' } } })
 
   function Consumer({ testId }: { testId: string }) {
     const { games } = useRecentlyPlayedGames()
@@ -66,7 +69,7 @@ test('shares a single fetch across multiple consumers under the same provider', 
 test('refetch clears games and fetches again', async () => {
   const games = [{ GameID: 1, Title: 'Sly Cooper' }]
   ;(fetchWithRetry as jest.Mock).mockResolvedValue(games)
-  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { rausername: 'Ivan' } } })
 
   const { result } = renderHook(() => useRecentlyPlayedGames(), { wrapper })
   await waitFor(() => expect(result.current.games).toEqual(games))
@@ -75,4 +78,11 @@ test('refetch clears games and fetches again', async () => {
   expect(result.current.games).toEqual([])
   await waitFor(() => expect(result.current.games).toEqual(games))
   expect(fetchWithRetry).toHaveBeenCalledTimes(2)
+})
+
+test('never calls the RA endpoint without a linked RA account', async () => {
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: {} } })
+  const { result } = renderHook(() => useRecentlyPlayedGames(), { wrapper })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  expect(fetchWithRetry).not.toHaveBeenCalled()
 })

@@ -4,7 +4,7 @@ import { calcAllStreaks } from '@/utils/utils'
 import { Streak } from '@/types/types'
 
 export function useStreakData() {
-  const { achievements, isLoading } = useActivityHeatmapYear()
+  const { achievements, isLoading, error, refetch } = useActivityHeatmapYear()
 
   const streaks = useMemo(() => calcAllStreaks(achievements), [achievements])
 
@@ -17,5 +17,5 @@ export function useStreakData() {
 
   const bestStreak = streaks[0] ?? null
 
-  return { streaks, activeStreak, bestStreak, isLoading }
+  return { streaks, activeStreak, bestStreak, isLoading, error, refetch }
 }

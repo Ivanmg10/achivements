@@ -6,6 +6,7 @@ import { RecentAchievement } from '@/types/types'
 import { modalOverlay, modalContent } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { useUserAwards } from '@/hooks/useUserAwards'
+import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
 import Image from 'next/image'
 import Link from 'next/link'
 import { IconX, IconStar, IconCheck } from '@tabler/icons-react'
@@ -31,6 +32,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
   })
 
   const dayAwards = useMemo(() => {
+    // Mastery/beaten awards are RA's; Steam unlocks in the list simply have none.
     if (!awards?.VisibleUserAwards) return []
     return awards.VisibleUserAwards.filter(
       a => COMPLETION_TYPES.has(a.AwardType) && awardDate(a.AwardedAt) === date
@@ -125,33 +127,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
               <p className="col-span-3 text-sm text-text-secondary text-center py-6">{T.dayModal.empty}</p>
             ) : (
               dayAchs.map(ach => (
-                <Link
-                  key={ach.AchievementID}
-                  href={`/gameInfo/${ach.GameID}`}
-                  onClick={onClose}
-                  className="flex gap-2 items-center p-3 rounded-xl bg-bg-main hover:bg-bg-card transition-colors group min-w-0"
-                >
-                  {ach.BadgeName ? (
-                    <Image
-                      src={`https://media.retroachievements.org/Badge/${ach.BadgeName}.png`}
-                      alt={ach.Title}
-                      width={36}
-                      height={36}
-                      className="rounded shrink-0"
-                    />
-                  ) : (
-                    <div className="w-9 h-9 rounded bg-white/10 shrink-0" />
-                  )}
-                  <div className="flex flex-col min-w-0 flex-1 gap-0.5">
-                    <span className="text-xs font-semibold text-text-main group-hover:text-accent transition-colors line-clamp-2">
-                      {ach.Title}
-                    </span>
-                    <span className="text-[10px] text-text-secondary line-clamp-1">{ach.GameTitle}</span>
-                  </div>
-                  <span className={`text-xs shrink-0 ${ach.HardcoreMode === '1' ? 'text-warning font-semibold' : 'text-text-secondary'}`}>
-                    {ach.Points}pts
-                  </span>
-                </Link>
+                <RecentAchievementRow key={ach.AchievementID} ach={ach} onNavigate={onClose} />
               ))
             )}
           </div>

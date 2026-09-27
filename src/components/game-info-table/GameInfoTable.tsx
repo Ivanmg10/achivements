@@ -5,9 +5,10 @@ import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
 import GameInfoAchievementCard from '../game-info-achivement/GameInfoAchievementCard'
 import AchievementModal from '../achievement-modal/AchievementModal'
 import Image from 'next/image'
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
+import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
 import { SortableHeader, SortState, SortKey, DEFAULT_DIRS } from './SortableHeader'
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 
@@ -26,7 +27,6 @@ export default function GameInfoTable({
   const [sortState, setSortState] = useState<SortState>({ key: 'default', dir: 'asc' })
   const [missableOpen, setMissableOpen] = useState(false)
   const [selectedAchievement, setSelectedAchievement] = useState<RetroAchievement | null>(null)
-  const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set())
   const [tableExpanded, setTableExpanded] = useState(true)
   const { T } = useLanguage()
 
@@ -38,58 +38,11 @@ export default function GameInfoTable({
 
   const numDistinctPlayers = gameData?.NumDistinctPlayers ?? 1
 
-  useEffect(() => {
-    if (!gameData?.ID) return
-    fetch(`/api/favorites?gameId=${gameData.ID}`)
-      .then((r) => {
-        if (!r.ok) throw new Error('Failed to load favorites')
-        return r.json()
-      })
-      .then((rows: { achievement_id: number }[]) => {
-        setFavoritedIds(new Set(rows.map((r) => r.achievement_id)))
-      })
-      .catch((err) => console.error('[GameInfoTable] favorites fetch:', err))
-  }, [gameData?.ID])
-
+  const { favoritedIds, toggleFavorite } = useRaFavoriteIds(gameData?.ID)
   const handleToggleFavorite = useCallback(
-    async (achievement: RetroAchievement) => {
-      const isFav = favoritedIds.has(achievement.ID)
-
-      setFavoritedIds((prev) => {
-        const next = new Set(prev)
-        if (isFav) next.delete(achievement.ID)
-        else next.add(achievement.ID)
-        return next
-      })
-
-      try {
-        if (isFav) {
-          const res = await fetch(`/api/favorites?achievementId=${achievement.ID}`, { method: 'DELETE' })
-          if (!res.ok) throw new Error('Failed to unpin achievement')
-        } else {
-          const res = await fetch('/api/favorites', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              achievement,
-              gameId: gameData?.ID,
-              gameTitle: gameData?.Title,
-              numDistinctPlayers,
-            }),
-          })
-          if (!res.ok) throw new Error('Failed to pin achievement')
-        }
-      } catch (err) {
-        console.error('[GameInfoTable] toggle favorite:', err)
-        setFavoritedIds((prev) => {
-          const next = new Set(prev)
-          if (isFav) next.add(achievement.ID)
-          else next.delete(achievement.ID)
-          return next
-        })
-      }
-    },
-    [favoritedIds, gameData?.ID, gameData?.Title, numDistinctPlayers]
+    (achievement: RetroAchievement) =>
+      toggleFavorite(achievement, { gameTitle: gameData?.Title, numDistinctPlayers }),
+    [toggleFavorite, gameData?.Title, numDistinctPlayers]
   )
 
   const achievements = useMemo(() => {

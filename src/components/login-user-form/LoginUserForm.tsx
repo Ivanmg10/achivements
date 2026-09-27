@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react'
+import AuthFormField from '@/components/auth-form-field/AuthFormField'
+import Spinner from '@/components/main-spinner/Spinner'
+import ForgotPasswordModal from '@/components/forgot-password-modal/ForgotPasswordModal'
 
 export default function LoginUserForm({
   setIsLogin,
@@ -17,25 +20,40 @@ export default function LoginUserForm({
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [forgotOpen, setForgotOpen] = useState(false)
   const { T } = useLanguage()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
 
-    const result = await signIn('credentials', {
-      username,
-      password,
-      redirect: false,
-    })
-
-    if (!result?.ok) {
-      setError(T.loginForm.invalidCredentials)
+    // Says what is actually missing, rather than "wrong credentials".
+    if (!username.trim() || !password) {
+      setError(T.loginForm.missingFields)
       return
     }
 
-    router.push('/')
-    router.refresh()
+    setSubmitting(true)
+    try {
+      const result = await signIn('credentials', {
+        username,
+        password,
+        redirect: false,
+      })
+
+      if (!result?.ok) {
+        setError(result?.error === 'too-many-attempts' ? T.loginForm.tooManyAttempts : T.loginForm.invalidCredentials)
+        setSubmitting(false)
+        return
+      }
+
+      router.push('/')
+      router.refresh()
+    } catch {
+      setError(T.loginForm.invalidCredentials)
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -56,50 +74,69 @@ export default function LoginUserForm({
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <div className="relative">
-          <IconUser size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" aria-hidden="true" />
-          <label htmlFor="login-username" className="sr-only">{T.loginForm.username}</label>
-          <input
-            id="login-username"
-            value={username}
-            className="bg-bg-tertiary text-text-main rounded-xl pl-9 pr-3 py-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder={T.loginForm.username}
-            autoComplete="username"
-          />
-        </div>
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
+        <AuthFormField
+          label={T.loginForm.username}
+          icon={<IconUser size={18} />}
+          value={username}
+          onChange={setUsername}
+          autoComplete="username"
+          required
+          disabled={submitting}
+        />
 
-        <div className="relative">
-          <IconLock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" aria-hidden="true" />
-          <label htmlFor="login-password" className="sr-only">{T.loginForm.password}</label>
-          <input
-            id="login-password"
-            type="password"
-            value={password}
-            className="bg-bg-tertiary text-text-main rounded-xl pl-9 pr-3 py-3 w-full outline-none focus:ring-1 focus:ring-accent placeholder:text-text-secondary"
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={T.loginForm.password}
-            autoComplete="current-password"
-          />
-        </div>
+        <AuthFormField
+          label={T.loginForm.password}
+          icon={<IconLock size={18} />}
+          type="password"
+          value={password}
+          onChange={setPassword}
+          autoComplete="current-password"
+          required
+          disabled={submitting}
+        />
 
         <button
           type="submit"
-          className="bg-btn-primary text-btn-primary-text w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform duration-200 mt-1"
+          disabled={submitting}
+          className="bg-accent text-bg-main w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main"
         >
-          {T.loginForm.signIn}
-          <IconArrowRight size={16} aria-hidden="true" />
+          {submitting ? (
+            <>
+              <Spinner size={16} />
+              {T.loginForm.signingIn}
+            </>
+          ) : (
+            <>
+              {T.loginForm.signIn}
+              <IconArrowRight size={16} aria-hidden="true" />
+            </>
+          )}
         </button>
       </form>
 
-      <button
-        type="button"
-        onClick={() => setIsLogin(false)}
-        className="text-text-secondary hover:text-text-main text-sm transition-colors w-full text-center mt-5"
-      >
-        {T.loginForm.noAccount}
-      </button>
+      <p className="text-center mt-4">
+        <button
+          type="button"
+          onClick={() => setForgotOpen(true)}
+          className="text-text-secondary hover:text-text-main text-sm underline underline-offset-2 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        >
+          {T.passwordReset.forgotLink}
+        </button>
+      </p>
+
+      <p className="text-text-secondary text-sm text-center mt-3">
+        {T.loginForm.noAccountLead}{' '}
+        <button
+          type="button"
+          onClick={() => setIsLogin(false)}
+          className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        >
+          {T.loginForm.noAccountAction}
+        </button>
+      </p>
+
+      <ForgotPasswordModal isOpen={forgotOpen} onClose={() => setForgotOpen(false)} />
     </div>
   )
 }

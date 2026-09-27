@@ -16,7 +16,7 @@ export async function GET() {
       'topTenUsers_v1',
       TTL,
       () => getTopTenUsers(raid),
-      (d) => Array.isArray(d) && d.length > 0,
+      (d) => Array.isArray(d),
     )
     return cachedJson(data, TTL)
   } catch {

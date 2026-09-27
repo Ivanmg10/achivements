@@ -72,18 +72,19 @@ describe('PUT', () => {
     expect(res.status).toBe(400)
   })
 
-  test('returns 400 when order contains non-numeric ids', async () => {
-    const res = await PUT(makePutRequest({ order: [1, 'two'] }))
-    expect(res.status).toBe(400)
+  test('returns 400 when an entry names no game', async () => {
+    expect((await PUT(makePutRequest({ order: [1, 'two'] }))).status).toBe(400)
+    expect((await PUT(makePutRequest({ order: ['switch:5'] }))).status).toBe(400)
   })
 
-  test('upserts each game id with its index as position', async () => {
-    const res = await PUT(makePutRequest({ order: [10, 20, 30] }))
+  test('upserts each game with its platform and its index as position', async () => {
+    const res = await PUT(makePutRequest({ order: ['ra:10', 'steam:20', 30] }))
     expect(res.data).toEqual({ ok: true })
     expect(mockClient.query).toHaveBeenCalledWith('BEGIN')
-    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 10, 0])
-    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 20, 1])
-    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 30, 2])
+    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 'ra', 10, 0])
+    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 'steam', 20, 1])
+    // A bare number is an RA id, as the order was stored before Steam joined.
+    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 'ra', 30, 2])
     expect(mockClient.query).toHaveBeenCalledWith('COMMIT')
     expect(mockClient.release).toHaveBeenCalled()
   })
@@ -94,7 +95,7 @@ describe('PUT', () => {
       if (sql.includes('ON CONFLICT')) return Promise.reject(new Error('fail'))
       return Promise.resolve()
     })
-    const res = await PUT(makePutRequest({ order: [10] }))
+    const res = await PUT(makePutRequest({ order: ['ra:10'] }))
     expect(res.status).toBe(500)
     expect(mockClient.query).toHaveBeenCalledWith('ROLLBACK')
     expect(mockClient.release).toHaveBeenCalled()

@@ -1,52 +1,126 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import RegisterUserForm from './RegisterUserForm'
+import { en } from '@/translations/en'
 
-global.fetch = jest.fn()
+const usernameRule = en.registerForm.usernameRule.replace('{min}', '3').replace('{max}', '20')
+const passwordRule = en.registerForm.passwordRule.replace('{min}', '8')
 
-beforeEach(() => {
-  ;(fetch as jest.Mock).mockResolvedValue({
-    ok: true,
-    json: () => Promise.resolve({ id: 1, username: 'ivan' }),
-  })
-})
-
-test('renders register form', () => {
-  render(<RegisterUserForm setIsLogin={jest.fn()} setIsRegister={jest.fn()} />)
-  expect(screen.getByText('Register')).toBeInTheDocument()
-  expect(screen.getByPlaceholderText('Username')).toBeInTheDocument()
-  expect(screen.getByPlaceholderText('Password')).toBeInTheDocument()
-})
-
-test('clicking login button calls setIsLogin(true)', () => {
-  const setIsLogin = jest.fn()
-  render(<RegisterUserForm setIsLogin={setIsLogin} setIsRegister={jest.fn()} />)
-  fireEvent.click(screen.getByText('Already have an account? Sign in'))
-  expect(setIsLogin).toHaveBeenCalledWith(true)
-})
-
-test('does not redirect when api returns error', async () => {
-  ;(fetch as jest.Mock).mockResolvedValueOnce({
-    ok: false,
-    json: () => Promise.resolve({ error: 'Error creating account' }),
-  })
-  const setIsLogin = jest.fn()
-  render(<RegisterUserForm setIsLogin={setIsLogin} setIsRegister={jest.fn()} />)
-  fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'ivan' } })
-  fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass' } })
-  fireEvent.click(screen.getByText('Create account'))
-  await new Promise((r) => setTimeout(r, 10))
-  expect(setIsLogin).not.toHaveBeenCalled()
-})
-
-test('submitting form calls API and redirects', async () => {
+function renderForm() {
   const setIsLogin = jest.fn()
   const setIsRegister = jest.fn()
   render(<RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setIsRegister} />)
-  fireEvent.change(screen.getByPlaceholderText('Username'), { target: { value: 'ivan' } })
-  fireEvent.change(screen.getByPlaceholderText('Password'), { target: { value: 'pass' } })
-  fireEvent.click(screen.getByText('Create account'))
-  await waitFor(() => {
-    expect(setIsLogin).toHaveBeenCalledWith(true)
-    expect(setIsRegister).toHaveBeenCalledWith(true)
-  })
+  return { setIsLogin, setIsRegister }
+}
+
+function fill({ username = 'ivan', password = 'secret12', email = 'ivan@test.com' } = {}) {
+  fireEvent.change(screen.getByLabelText(en.registerForm.username), { target: { value: username } })
+  fireEvent.change(screen.getByLabelText(en.registerForm.password), { target: { value: password } })
+  fireEvent.change(screen.getByLabelText(en.passwordReset.email), { target: { value: email } })
+}
+
+const submit = () => fireEvent.click(screen.getByRole('button', { name: new RegExp(en.registerForm.createAccount, 'i') }))
+
+beforeEach(() => {
+  jest.clearAllMocks()
+  global.fetch = jest.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ id: 1, username: 'ivan' }) })
+})
+
+test('shows the rules for each field before anything is typed', () => {
+  renderForm()
+  expect(screen.getByText(usernameRule)).toBeInTheDocument()
+  expect(screen.getByText(passwordRule)).toBeInTheDocument()
+})
+
+test('a username that breaks the rules never reaches the server', () => {
+  renderForm()
+  fill({ username: 'a b' })
+  submit()
+
+  expect(screen.getByLabelText(en.registerForm.username).getAttribute('aria-invalid')).toBe('true')
+  expect(global.fetch).not.toHaveBeenCalled()
+})
+
+test('a short password never reaches the server', () => {
+  renderForm()
+  fill({ password: '12345' })
+  submit()
+
+  expect(screen.getByLabelText(en.registerForm.password).getAttribute('aria-invalid')).toBe('true')
+  expect(global.fetch).not.toHaveBeenCalled()
+})
+
+test('an empty form marks every field', () => {
+  renderForm()
+  submit()
+  expect(screen.getAllByText(en.registerForm.required)).toHaveLength(3)
+  expect(global.fetch).not.toHaveBeenCalled()
+})
+
+test('typing again clears that field’s complaint', () => {
+  renderForm()
+  submit()
+  fireEvent.change(screen.getByLabelText(en.registerForm.username), { target: { value: 'ivan' } })
+  expect(screen.getByLabelText(en.registerForm.username).getAttribute('aria-invalid')).toBeNull()
+})
+
+test('sends what the visitor typed, email included', async () => {
+  const { setIsLogin, setIsRegister } = renderForm()
+  fill()
+  submit()
+
+  await waitFor(() => expect(setIsLogin).toHaveBeenCalledWith(true))
+  expect(setIsRegister).toHaveBeenCalledWith(true)
+  const [url, init] = (global.fetch as jest.Mock).mock.calls[0]
+  expect(url).toBe('/api/users')
+  expect(JSON.parse(init.body)).toEqual({ username: 'ivan', password: 'secret12', email: 'ivan@test.com' })
+})
+
+test('while creating the account the button says so and cannot be pressed again', async () => {
+  let release: (value: unknown) => void = () => {}
+  ;(global.fetch as jest.Mock).mockReturnValue(new Promise((r) => { release = r }))
+  renderForm()
+  fill()
+  submit()
+
+  const busy = await screen.findByRole('button', { name: new RegExp(en.registerForm.creating) })
+  expect(busy).toBeDisabled()
+  fireEvent.click(busy)
+  expect(global.fetch).toHaveBeenCalledTimes(1)
+
+  release({ ok: true, json: () => Promise.resolve({}) })
+})
+
+test('a refusal from the server is reported and the form stays usable', async () => {
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'Username ya en uso' }) })
+  const { setIsLogin } = renderForm()
+  fill()
+  submit()
+
+  expect(await screen.findByRole('alert')).toHaveTextContent('Username ya en uso')
+  expect(setIsLogin).not.toHaveBeenCalled()
+  expect(screen.getByRole('button', { name: new RegExp(en.registerForm.createAccount, 'i') })).not.toBeDisabled()
+})
+
+test('the sign-in link reads as a link and switches form', () => {
+  const { setIsLogin } = renderForm()
+  const link = screen.getByRole('button', { name: en.registerForm.alreadyHaveAccountAction })
+  expect(link.className).toContain('underline')
+  fireEvent.click(link)
+  expect(setIsLogin).toHaveBeenCalledWith(true)
+})
+
+test('an address that is not one never reaches the server', () => {
+  renderForm()
+  fill({ email: 'not-an-email' })
+  submit()
+  expect(screen.getByText(en.passwordReset.emailInvalid)).toBeInTheDocument()
+  expect(global.fetch).not.toHaveBeenCalled()
+})
+
+test('an email that already has an account is explained in the visitor’s language', async () => {
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'email-taken' }) })
+  renderForm()
+  fill()
+  submit()
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.registerForm.emailTaken)
 })

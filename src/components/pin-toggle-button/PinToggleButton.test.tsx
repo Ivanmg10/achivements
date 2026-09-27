@@ -33,7 +33,7 @@ test('pins the game when clicked while unpinned', async () => {
   ;(usePinnedGames as jest.Mock).mockReturnValue({ isPinned: () => false, pinGame, unpinGame })
   render(<PinToggleButton gameId={42} />)
   fireEvent.click(screen.getByRole('button'))
-  await waitFor(() => expect(pinGame).toHaveBeenCalledWith(42))
+  await waitFor(() => expect(pinGame).toHaveBeenCalledWith(42, 'ra'))
   expect(unpinGame).not.toHaveBeenCalled()
 })
 
@@ -41,7 +41,7 @@ test('unpins the game when clicked while pinned', async () => {
   ;(usePinnedGames as jest.Mock).mockReturnValue({ isPinned: () => true, pinGame, unpinGame })
   render(<PinToggleButton gameId={42} />)
   fireEvent.click(screen.getByRole('button'))
-  await waitFor(() => expect(unpinGame).toHaveBeenCalledWith(42))
+  await waitFor(() => expect(unpinGame).toHaveBeenCalledWith(42, 'ra'))
   expect(pinGame).not.toHaveBeenCalled()
 })
 
@@ -60,4 +60,26 @@ test('shows an alert when the toggle request fails', async () => {
   render(<PinToggleButton gameId={1} />)
   fireEvent.click(screen.getByRole('button'))
   expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't update pin, please try again")
+})
+
+describe('platform', () => {
+  test('checks and pins as RA by default', async () => {
+    const isPinned = jest.fn(() => false)
+    ;(usePinnedGames as jest.Mock).mockReturnValue({ isPinned, pinGame, unpinGame })
+    render(<PinToggleButton gameId={730} />)
+
+    expect(isPinned).toHaveBeenCalledWith(730, 'ra')
+    fireEvent.click(screen.getByRole('button'))
+    await waitFor(() => expect(pinGame).toHaveBeenCalledWith(730, 'ra'))
+  })
+
+  test('pins and unpins a Steam game as Steam', async () => {
+    const isPinned = jest.fn(() => true)
+    ;(usePinnedGames as jest.Mock).mockReturnValue({ isPinned, pinGame, unpinGame })
+    render(<PinToggleButton gameId={730} source="steam" />)
+
+    expect(isPinned).toHaveBeenCalledWith(730, 'steam')
+    fireEvent.click(screen.getByRole('button'))
+    await waitFor(() => expect(unpinGame).toHaveBeenCalledWith(730, 'steam'))
+  })
 })

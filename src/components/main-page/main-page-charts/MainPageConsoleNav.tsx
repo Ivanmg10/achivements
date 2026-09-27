@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import { useAllGamesGlobal } from '@/hooks/useAllGamesGlobal'
 import { CONSOLES } from '@/constants'
 import { useLanguage } from '@/context/LanguageContext'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 
 const CONSOLE_MAP = new Map(CONSOLES.map((c) => [c.id, c]))
 
@@ -23,13 +24,15 @@ function hasGamesForConsole(
 }
 
 export default function MainPageConsoleNav() {
-  const { playing, wantToPlay, completed, loading } = useAllGamesGlobal()
+  const { playing, wantToPlay, completed, loading, error, refetch } = useAllGamesGlobal()
   const { T } = useLanguage()
 
   const gamesBySection = useMemo(
     () => ({ playing, wantToPlay, completed }),
     [playing, wantToPlay, completed]
   )
+
+  if (error) return <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>
 
   if (loading) {
     return (

@@ -2,6 +2,8 @@ import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
+import { checkCurrentPassword } from '@/lib/currentPassword'
+import { forgetUser } from '@/lib/userRecord'
 
 const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location'] as const
 type AllowedField = (typeof ALLOWED_FIELDS)[number]
@@ -10,10 +12,11 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
+// https only: a plain-http image would be loaded by everyone who sees the
+// avatar, over a connection anyone on their network can read or alter.
 function isValidUrl(url: string) {
   try {
-    const parsed = new URL(url)
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:'
+    return new URL(url).protocol === 'https:'
   } catch {
     return false
   }
@@ -27,13 +30,13 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
-    const { field, value } = body as { field: AllowedField; value: string }
+    const { field, value, currentPassword } = body as { field: AllowedField; value: string; currentPassword?: unknown }
 
     if (!ALLOWED_FIELDS.includes(field)) {
       return NextResponse.json({ error: 'Invalid field' }, { status: 400 })
     }
 
-    const trimmed = value?.trim()
+    const trimmed = typeof value === 'string' ? value.trim() : ''
     if (!trimmed) {
       return NextResponse.json({ error: 'Value is required' }, { status: 400 })
     }
@@ -45,7 +48,7 @@ export async function POST(req: Request) {
       if (!/^[a-zA-Z0-9_]+$/.test(trimmed)) {
         return NextResponse.json({ error: 'Username: only letters, numbers and underscores' }, { status: 400 })
       }
-      const existing = await pool.query('SELECT id FROM users WHERE username = $1 AND id != $2', [trimmed, session.user.id])
+      const existing = await pool.query('SELECT id FROM users WHERE LOWER(username) = LOWER($1) AND id != $2', [trimmed, session.user.id])
       if (existing.rows.length > 0) {
         return NextResponse.json({ error: 'Username already taken' }, { status: 409 })
       }
@@ -55,15 +58,22 @@ export async function POST(req: Request) {
       if (!isValidEmail(trimmed)) {
         return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
       }
-      const existing = await pool.query('SELECT id FROM users WHERE email = $1 AND id != $2', [trimmed, session.user.id])
+      const existing = await pool.query('SELECT id FROM users WHERE LOWER(email) = LOWER($1) AND id != $2', [trimmed, session.user.id])
       if (existing.rows.length > 0) {
         return NextResponse.json({ error: 'Email already in use' }, { status: 409 })
       }
+      // The recovery address is the key to the account: with a stolen session
+      // and no password check, changing it and asking for a reset would be a
+      // takeover. So it takes the current password too.
+      const check = await checkCurrentPassword(session.user.id, currentPassword)
+      if (check === 'too-many') return NextResponse.json({ error: 'too-many-attempts' }, { status: 429 })
+      if (check === 'no-user') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      if (check === 'wrong') return NextResponse.json({ error: 'wrong-password' }, { status: 403 })
     }
 
     if (field === 'avatar') {
       if (!isValidUrl(trimmed)) {
-        return NextResponse.json({ error: 'Avatar must be a valid http(s) URL' }, { status: 400 })
+        return NextResponse.json({ error: 'Avatar must be a valid https URL' }, { status: 400 })
       }
     }
 
@@ -74,6 +84,7 @@ export async function POST(req: Request) {
     const column = field === 'username' ? 'username' : field
     const valueToStore = field === 'location' ? trimmed.toUpperCase() : trimmed
     await pool.query(`UPDATE users SET "${column}" = $1 WHERE id = $2`, [valueToStore, session.user.id])
+    forgetUser(session.user.id)
 
     return NextResponse.json({ ok: true, field, value: trimmed })
   } catch (err) {

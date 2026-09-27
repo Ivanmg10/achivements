@@ -6,7 +6,9 @@ import Image from 'next/image'
 import { IconPlus, IconFolder, IconTrash } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
-import { GameGroup, RetroAchievementsGameCompleted } from '@/types/types'
+import { GameGroup } from '@/types/types'
+import type { GameCandidate } from '@/utils/gameCandidates'
+import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import GroupModal from '@/components/groups/GroupModal'
 import { relativeTime } from '@/utils/utils'
 import EmptyState from '@/components/empty-state/EmptyState'
@@ -56,7 +58,7 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
     description: string
     icon: string
     is_public: boolean
-    initialGames?: RetroAchievementsGameCompleted[]
+    initialGames?: GameCandidate[]
   }) {
     const group = await createGroup({
       title: data.title,
@@ -65,25 +67,7 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
       is_public: data.is_public,
     })
 
-    if (data.initialGames?.length) {
-      await Promise.all(
-        data.initialGames.map((g) =>
-          fetch(`/api/groups/${group.id}/games`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              game_id: g.GameID,
-              title: g.Title,
-              image_icon: g.ImageIcon,
-              console_name: g.ConsoleName,
-              pct_won: parseFloat(g.PctWon),
-              num_awarded: g.NumAwarded,
-              max_possible: g.MaxPossible,
-            }),
-          })
-        )
-      )
-    }
+    if (data.initialGames?.length) await addGamesToGroup(group.id, data.initialGames)
   }
 
   return (

@@ -30,9 +30,9 @@ jest.mock('@dnd-kit/utilities', () => ({
 }))
 
 const games = [
-  { GameID: 1, Title: 'Sly Cooper', ImageIcon: '/icon.png', HardcoreMode: '0' },
-  { GameID: 2, Title: 'Jak 2', ImageIcon: '/icon2.png', HardcoreMode: '1' },
-] as any
+  { key: 'ra:1', source: 'ra', id: 1, title: 'Sly Cooper', imageUrl: '/icon.png', subtitle: 'PS2', hardcore: false },
+  { key: 'steam:620', source: 'steam', id: 620, title: 'Portal 2', imageUrl: '/icon2.png', subtitle: 'Steam', hardcore: false },
+] as never
 
 test('renders nothing when closed', () => {
   render(
@@ -46,7 +46,7 @@ test('renders one row per game when open', () => {
     <PerfectGamesOrderModal isOpen={true} onClose={jest.fn()} games={games} order={[]} onSaveOrder={jest.fn()} />,
   )
   expect(screen.getByText('Sly Cooper')).toBeInTheDocument()
-  expect(screen.getByText('Jak 2')).toBeInTheDocument()
+  expect(screen.getByText('Portal 2')).toBeInTheDocument()
 })
 
 test('clicking close saves the current order and closes', async () => {
@@ -57,13 +57,13 @@ test('clicking close saves the current order and closes', async () => {
       isOpen={true}
       onClose={onClose}
       games={games}
-      order={[2, 1]}
+      order={['steam:620', 'ra:1']}
       onSaveOrder={onSaveOrder}
     />,
   )
   fireEvent.click(screen.getByText('Close'))
   await Promise.resolve()
-  expect(onSaveOrder).toHaveBeenCalledWith([2, 1])
+  expect(onSaveOrder).toHaveBeenCalledWith(['steam:620', 'ra:1'])
   expect(onClose).toHaveBeenCalled()
 })
 

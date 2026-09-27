@@ -1,13 +1,18 @@
 import { useLanguage } from '@/context/LanguageContext'
 
+/** Asks before deleting something. Defaults to the wording for a group. */
 export default function DeleteConfirmDialog({
   isOpen,
   onClose,
   onConfirm,
+  message,
+  confirmLabel,
 }: {
   isOpen: boolean
   onClose: () => void
   onConfirm: () => void
+  message?: string
+  confirmLabel?: string
 }) {
   const { T } = useLanguage()
   if (!isOpen) return null
@@ -21,7 +26,7 @@ export default function DeleteConfirmDialog({
         className="bg-bg-card rounded-2xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="text-sm text-text-main">{T.groups.confirmDelete}</p>
+        <p className="text-sm text-text-main">{message ?? T.groups.confirmDelete}</p>
         <div className="flex gap-2">
           <button
             onClick={onClose}
@@ -33,7 +38,7 @@ export default function DeleteConfirmDialog({
             onClick={onConfirm}
             className="flex-1 px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
           >
-            {T.groups.deleteGroup}
+            {confirmLabel ?? T.groups.deleteGroup}
           </button>
         </div>
       </div>

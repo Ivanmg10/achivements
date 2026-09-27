@@ -1,9 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { gameKey } from '@/utils/gameRef'
+import type { GameSource } from '@/types/steam'
 
+/**
+ * The user's own order for the "Mastered & Completed" card, as game keys
+ * ("ra:123", "steam:620") — both platforms share the one list.
+ */
 export function usePerfectGamesOrder() {
   const { status } = useSession()
-  const [order, setOrder] = useState<number[]>([])
+  const [order, setOrder] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const fetched = useRef(false)
 
@@ -12,8 +18,9 @@ export function usePerfectGamesOrder() {
     try {
       const res = await fetch('/api/perfectGamesOrder')
       if (!res.ok) throw new Error('fetch failed')
-      const data: { game_id: number; position: number }[] = await res.json()
-      setOrder(data.map((d) => d.game_id))
+      // Rows saved before Steam joined the card carry no source: they are RA's.
+      const data: { game_id: number; source?: GameSource; position: number }[] = await res.json()
+      setOrder(data.map((d) => gameKey(d.source ?? 'ra', d.game_id)))
     } catch {
       setOrder([])
     } finally {
@@ -29,7 +36,7 @@ export function usePerfectGamesOrder() {
     fetchOrder()
   }, [status, fetchOrder])
 
-  const saveOrder = useCallback(async (newOrder: number[]) => {
+  const saveOrder = useCallback(async (newOrder: string[]) => {
     setOrder(newOrder)
     const res = await fetch('/api/perfectGamesOrder', {
       method: 'PUT',

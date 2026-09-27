@@ -52,6 +52,9 @@ export default function MainHeader() {
   const [initialQuery, setInitialQuery] = useState('')
 
   const streak = activeStreak?.days ?? 0
+  // With no platform linked there is nothing to search, sort or count: the
+  // bar keeps only the way home and the way to the account.
+  const hasPlatform = Boolean(session?.user?.rausername || session?.user?.steamid)
   const isHome = pathname === '/'
   const isGameInfo = pathname.startsWith('/gameInfo/')
   const avatarSrc = session?.user?.avatar ?? session?.user?.image ?? null
@@ -61,7 +64,7 @@ export default function MainHeader() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (searchOpen) return
+      if (searchOpen || !hasPlatform) return
       if (e.ctrlKey || e.metaKey || e.altKey) return
       if (e.key.length !== 1) return
       const tag = (document.activeElement?.tagName ?? '').toLowerCase()
@@ -72,7 +75,7 @@ export default function MainHeader() {
     }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
-  }, [searchOpen])
+  }, [searchOpen, hasPlatform])
 
   const statusItems = [
     { href: '/playing', label: T.mainPage.playing },
@@ -105,6 +108,7 @@ export default function MainHeader() {
           )}
 
           {/* Desktop nav - visible on md+ */}
+          {hasPlatform && (
           <nav className="hidden md:flex items-center gap-0.5 ml-2" aria-label="Main navigation">
             <StatusNavDropdown
               items={statusItems.map(({ href, label }) => ({
@@ -125,8 +129,10 @@ export default function MainHeader() {
               />
             ))}
           </nav>
+          )}
 
           {/* Hamburger menu - mobile only */}
+          {hasPlatform && (
           <button
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Menu"
@@ -134,9 +140,11 @@ export default function MainHeader() {
           >
             <IconMenu className="w-5 h-5" aria-hidden="true" />
           </button>
+          )}
         </div>
 
         {/* Center: search bar - absolute only on lg+, hidden on smaller */}
+        {hasPlatform && (
         <div className="hidden 2xl:flex absolute xl:w-[80%] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full px-4 pointer-events-none">
           <button
             onClick={openSearch}
@@ -147,10 +155,12 @@ export default function MainHeader() {
             <span>{T.search.placeholder}</span>
           </button>
         </div>
+        )}
 
         {/* Right: search icon (mobile) + streak + user */}
         <div className="flex items-center gap-2 shrink-0 ml-auto z-10">
           {/* Search icon - mobile only, to the right */}
+          {hasPlatform && (
           <button
             onClick={openSearch}
             aria-label="Search games"
@@ -158,6 +168,7 @@ export default function MainHeader() {
           >
             <IconSearch className="w-5 h-5" aria-hidden="true" />
           </button>
+          )}
 
           {session ? (
             <>

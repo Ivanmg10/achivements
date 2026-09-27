@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
       `publicCompleted:${username.toLowerCase()}`,
       TTL,
       () => getUserCompletedGames(username, auth.apiKey),
-      (d) => Array.isArray(d) && (d as unknown[]).length > 0,
+      (d) => Array.isArray(d),
     )
     return cachedJson(data, TTL)
   } catch {

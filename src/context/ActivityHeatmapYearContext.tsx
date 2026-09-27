@@ -1,65 +1,101 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { RecentAchievement } from '@/types/types'
-import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
+import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
+import { toRecentAchievement } from '@/utils/steamMappers'
 
 type CtxType = {
   achievements: RecentAchievement[]
   isLoading: boolean
+  error: boolean
   refetch: () => void
 }
 
-const Ctx = createContext<CtxType>({ achievements: [], isLoading: true, refetch: () => {} })
+const Ctx = createContext<CtxType>({ achievements: [], isLoading: true, error: false, refetch: () => {} })
 
+const byDateDesc = (a: RecentAchievement, b: RecentAchievement) => b.Date.localeCompare(a.Date)
+
+/**
+ * A year of unlocks across every linked platform — what the streak is counted
+ * from, here and not in the hook so the three places that read it (the header
+ * badge, the side panel, the streak page) share one load.
+ *
+ * Both platforms together is the point: a day spent on Steam is a day played,
+ * and leaving it out broke streaks that never happened.
+ */
 export function ActivityHeatmapYearProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
-  const [achievements, setAchievements] = useState<RecentAchievement[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const rausername = session?.user?.rausername
+  const steamid = session?.user?.steamid
+  const [raAchievements, setRaAchievements] = useState<RecentAchievement[]>([])
+  const [raLoading, setRaLoading] = useState(true)
+  const [raError, setRaError] = useState(false)
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
+  // A year of Steam has to be assembled game by game, so it comes from its own
+  // endpoint; the hook already handles the language and the account changing.
+  const steam = useSteamRecentAchievements(steamid ? 'year' : null)
+
   const doFetch = useCallback(() => {
-    if (!session?.user?.rausername) { setIsLoading(false); return }
-    setIsLoading(true)
+    if (!rausername) { setRaLoading(false); return }
+    setRaLoading(true)
+    setRaError(false)
+    const onFail = (err?: unknown) => {
+      if (!scheduleRetry(attemptRef, retryTimer, doFetch, err)) { setRaError(true); setRaLoading(false) }
+    }
     fetchWithRetry('/api/getActivityHeatmapYear')
       .then((data) => {
-        if (!Array.isArray(data)) {
-          const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
-          attemptRef.current++
-          retryTimer.current = setTimeout(doFetch, delay)
-          return
-        }
-        setAchievements(data as RecentAchievement[])
-        setIsLoading(false)
+        if (!Array.isArray(data)) return onFail()
+        setRaAchievements(data as RecentAchievement[])
+        setRaLoading(false)
         attemptRef.current = 0
       })
-      .catch(() => {
-        const delay = Math.min(3_000 * 2 ** attemptRef.current, 30_000)
-        attemptRef.current++
-        retryTimer.current = setTimeout(doFetch, delay)
-      })
-  }, [session?.user?.rausername])
+      .catch(onFail)
+  }, [rausername])
 
   useEffect(() => {
-    if (!session?.user?.rausername) { setIsLoading(false); return }
+    if (!rausername) { setRaLoading(false); return }
     if (hasFetched.current) return
     hasFetched.current = true
     doFetch()
-  }, [session?.user?.rausername, doFetch])
+  }, [rausername, doFetch])
 
   useEffect(() => () => clearTimeout(retryTimer.current), [])
+
+  const steamAchievements = useMemo(
+    () => steam.achievements.map(toRecentAchievement),
+    [steam.achievements],
+  )
+
+  const achievements = useMemo(
+    () => [...raAchievements, ...steamAchievements].sort(byDateDesc),
+    [raAchievements, steamAchievements],
+  )
 
   const refetch = useCallback(() => {
     clearTimeout(retryTimer.current)
     attemptRef.current = 0
-    setAchievements([])
+    setRaAchievements([])
     doFetch()
-  }, [doFetch])
+    steam.retry()
+  }, [doFetch, steam])
 
-  return <Ctx.Provider value={{ achievements, isLoading, refetch }}>{children}</Ctx.Provider>
+  // One platform failing is not the streak failing: it only counts as an error
+  // when nothing came back at all, so a Steam outage does not hide RA's year.
+  const isLoading = raLoading || steam.isLoading
+  const error = (raError || Boolean(steam.error)) && achievements.length === 0
+
+  const value = useMemo(
+    () => ({ achievements, isLoading, error, refetch }),
+    [achievements, isLoading, error, refetch],
+  )
+
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 
 export const useActivityHeatmapYear = () => useContext(Ctx)

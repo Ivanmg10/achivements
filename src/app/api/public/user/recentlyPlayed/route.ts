@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
       `publicRecentlyPlayed:${username.toLowerCase()}`,
       TTL,
       () => getUserRecentlyPlayedGames(username, auth.apiKey, 7),
-      (d) => Array.isArray(d) && (d as unknown[]).length > 0,
+      (d) => Array.isArray(d),
     )
     return cachedJson(data, TTL)
   } catch {

@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { signOut } from 'next-auth/react'
 import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import CommonModal from '../common-modal/CommonModal'
 import { useLanguage } from '@/context/LanguageContext'
+import { PASSWORD_MIN } from '@/utils/authValidation'
 
 interface Props {
   isOpen: boolean
@@ -61,7 +63,8 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
   const [success, setSuccess] = useState(false)
 
   const mismatch = next.length > 0 && confirm.length > 0 && next !== confirm
-  const canSubmit = current.length > 0 && next.length >= 6 && next === confirm && !loading
+  const canSubmit = current.length > 0 && next.length >= PASSWORD_MIN && next === confirm && !loading
+  const minLength = T.changePassword.minLength.replace('{min}', String(PASSWORD_MIN))
 
   const handleClose = () => {
     setCurrent('')
@@ -82,13 +85,19 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword: current, newPassword: next }),
       })
-      const data = await res.json()
+      const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setError(data.error ?? T.editProfileModal.errorGeneric)
+        const byCode: Record<string, string> = {
+          'wrong-password': T.changePassword.wrongPassword,
+          'too-many-attempts': T.changePassword.tooManyAttempts,
+          'weak-password': minLength,
+        }
+        setError(byCode[data.error] ?? T.editProfileModal.errorGeneric)
         return
       }
+      // A new password ends every session, this one too: say so, then sign in again.
       setSuccess(true)
-      setTimeout(handleClose, 1200)
+      setTimeout(() => signOut({ callbackUrl: '/authPage' }), 1500)
     } catch {
       setError(T.editProfileModal.errorGeneric)
     } finally {
@@ -132,8 +141,8 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
           />
         </div>
         {mismatch && <span id="pw-mismatch-error" role="alert" className="text-xs text-red-400">{T.editProfileModal.mismatch}</span>}
-        {next.length > 0 && next.length < 6 && (
-          <span className="text-xs text-text-secondary">{T.changePassword.minLength}</span>
+        {next.length > 0 && next.length < PASSWORD_MIN && (
+          <span className="text-xs text-text-secondary">{minLength}</span>
         )}
       </div>
 
@@ -142,7 +151,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
       )}
       {success && (
         <p role="status" className="text-sm text-green-400 bg-green-500/10 rounded-xl px-4 py-2">
-          {T.editProfileModal.success}
+          {T.changePassword.changedSignIn}
         </p>
       )}
 

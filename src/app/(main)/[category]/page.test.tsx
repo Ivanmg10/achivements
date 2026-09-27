@@ -1,3 +1,16 @@
+jest.mock('@/hooks/useSteamGamesByCategory', () => ({
+  useSteamGamesByCategory: jest.fn(() => ({ games: [] })),
+}))
+
+jest.mock('@/components/steam/steam-category-section/SteamCategorySection', () => ({
+  __esModule: true,
+  default: ({ category }: { category: string }) => <div data-testid="steam-section">{category}</div>,
+}))
+
+jest.mock('@/context/SteamGamesDataContext', () => ({
+  useSteamGamesData: jest.fn(() => ({ isLinked: false })),
+}))
+
 jest.mock('../../../hooks/useGamesByCategory', () => ({
   useGamesByCategory: jest.fn(),
 }))
@@ -23,7 +36,7 @@ jest.mock('../../../components/statusGameList/StatusGameList', () => ({
 
 jest.mock('../../../components/status-page-header/StatusPageHeader', () => ({
   __esModule: true,
-  default: () => <div data-testid="status-header" />,
+  default: ({ gameCount }: { gameCount: number }) => <div data-testid="status-header">{gameCount}</div>,
 }))
 
 jest.mock('../../../components/completed-filter/CompletedFilter', () => ({
@@ -47,11 +60,17 @@ jest.mock('../../../components/loading-page/LoadingPage', () => ({
   default: () => <div data-testid="loading-page" />,
 }))
 
+jest.mock('@/hooks/useRaLinked', () => ({ useRaLinked: jest.fn() }))
+
 import { render, screen } from '@testing-library/react'
 import CategoryPage from './page'
 import { useParams } from 'next/navigation'
 import { useGamesByCategory } from '../../../hooks/useGamesByCategory'
 import { useGameFiltering } from '../../../hooks/useGameFiltering'
+import { useRaLinked } from '@/hooks/useRaLinked'
+import { useSteamGamesData } from '@/context/SteamGamesDataContext'
+import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
+import { fireEvent } from '@testing-library/react'
 
 const mockGames = [
   { GameID: 1, GameTitle: 'Sly Cooper', ConsoleID: 21, ConsoleName: 'PS2', ImageIcon: '/icon.png', NumAchievements: 10, NumAchievedHardcore: 5, PctWon: '0.5' },
@@ -59,6 +78,7 @@ const mockGames = [
 
 beforeEach(() => {
   ;(useParams as jest.Mock).mockReturnValue({ category: 'playing' })
+  ;(useRaLinked as jest.Mock).mockReturnValue(true)
 })
 
 test('renders loading state', () => {
@@ -101,4 +121,137 @@ test('passes a default name sort state for the want-to-play category', () => {
   expect(useGameFiltering).toHaveBeenCalledWith(
     expect.objectContaining({ sortState: { key: 'name', dir: 'asc' } }),
   )
+})
+
+describe('Steam section', () => {
+  function asUser(raLinked: boolean, steamLinked: boolean) {
+    ;(useRaLinked as jest.Mock).mockReturnValue(raLinked)
+    ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: steamLinked })
+  }
+
+  afterEach(() => {
+    ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false })
+  })
+
+  test('follows the RA list for the same category', () => {
+    asUser(true, true)
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: mockGames, loading: false, error: undefined })
+    window.sessionStorage.setItem('ra-section-open:playing', 'open')
+    render(<CategoryPage />)
+
+    const list = screen.getByTestId('game-list')
+    const steam = screen.getByTestId('steam-section')
+    expect(steam).toHaveTextContent('playing')
+    expect(list.compareDocumentPosition(steam) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  test('waits for the RA list rather than showing under a loading page', () => {
+    asUser(true, true)
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: true, error: undefined })
+    render(<CategoryPage />)
+    expect(screen.queryByTestId('steam-section')).not.toBeInTheDocument()
+  })
+
+  test('a Steam-only user sees only Steam — no RA empty state telling them to play on RA', () => {
+    asUser(false, true)
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: undefined })
+    render(<CategoryPage />)
+
+    expect(screen.getByTestId('steam-section')).toBeInTheDocument()
+    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('loading-page')).not.toBeInTheDocument()
+  })
+
+  test('a Steam-only user is not held up by the RA loading state', () => {
+    asUser(false, true)
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: true, error: undefined })
+    render(<CategoryPage />)
+    expect(screen.getByTestId('steam-section')).toBeInTheDocument()
+  })
+
+  test('with no RA account there is no RA section at all, not even an empty one', () => {
+    asUser(false, false)
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: undefined })
+    render(<CategoryPage />)
+    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('game-list')).not.toBeInTheDocument()
+    expect(screen.getByTestId('steam-section')).toBeInTheDocument()
+  })
+})
+
+describe('foldable RA and Steam sections', () => {
+  function bothAccounts() {
+    ;(useRaLinked as jest.Mock).mockReturnValue(true)
+    ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true })
+    ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [{ id: 1 }, { id: 2 }] })
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: mockGames, loading: false, error: undefined })
+  }
+
+  beforeEach(() => window.sessionStorage.clear())
+
+  afterEach(() => {
+    ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false })
+    ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [] })
+  })
+
+  test('with both accounts the RA list sits in a section that starts folded', () => {
+    bothAccounts()
+    render(<CategoryPage />)
+
+    expect(screen.getByRole('region', { name: 'RetroAchievements' })).toBeInTheDocument()
+    expect(screen.queryByTestId('game-list')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /RetroAchievements/ }))
+    expect(screen.getByTestId('game-list')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /RetroAchievements/ }))
+    expect(screen.queryByTestId('game-list')).not.toBeInTheDocument()
+    // Steam is still right there.
+    expect(screen.getByTestId('steam-section')).toBeInTheDocument()
+  })
+
+  test('remembers the RA section state per category for the session', () => {
+    bothAccounts()
+    render(<CategoryPage />)
+    fireEvent.click(screen.getByRole('button', { name: /RetroAchievements/ }))
+    expect(window.sessionStorage.getItem('ra-section-open:playing')).toBe('open')
+  })
+
+  test('folded, the RA section previews its first games', () => {
+    bothAccounts()
+    render(<CategoryPage />)
+    const links = screen.getByRole('region', { name: 'RetroAchievements' }).querySelectorAll('a[href^="/gameInfo/"]')
+    expect(links.length).toBeGreaterThan(0)
+    expect(links.length).toBeLessThanOrEqual(3)
+  })
+
+  test('the page count covers both platforms', () => {
+    bothAccounts()
+    render(<CategoryPage />)
+    expect(screen.getByTestId('status-header')).toHaveTextContent('3')
+  })
+
+  test('the grid control stays outside the RA section, since it drives both lists', () => {
+    bothAccounts()
+    render(<CategoryPage />)
+    const raSection = screen.getByRole('region', { name: 'RetroAchievements' })
+    fireEvent.click(screen.getByRole('button', { name: /RetroAchievements/ }))
+    // Folding RA must not take the grid control away from the Steam list.
+    expect(screen.getByTestId('status-header')).toBeInTheDocument()
+    expect(raSection.contains(screen.getByTestId('status-header'))).toBe(false)
+  })
+
+  test('without Steam there is no fold — the RA page is as before', () => {
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: mockGames, loading: false, error: undefined })
+    render(<CategoryPage />)
+    expect(screen.queryByRole('region', { name: 'RetroAchievements' })).not.toBeInTheDocument()
+    expect(screen.getByTestId('game-list')).toBeInTheDocument()
+  })
+
+  test('an empty RA list keeps the Steam section close by', () => {
+    bothAccounts()
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: undefined })
+    render(<CategoryPage />)
+    fireEvent.click(screen.getByRole('button', { name: /RetroAchievements/ }))
+    expect(screen.getByTestId('empty-state')).toBeInTheDocument()
+    expect(screen.getByTestId('steam-section')).toBeInTheDocument()
+  })
 })

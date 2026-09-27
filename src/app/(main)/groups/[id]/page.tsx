@@ -33,14 +33,17 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
+import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { GameGroup, GameGroupItem, RetroAchievement } from '@/types/types'
 import GroupModal from '@/components/groups/GroupModal'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
 import SortableItem from '@/components/groups/sortable-item/SortableItem'
+import SteamSortableItem from '@/components/groups/steam-sortable-item/SteamSortableItem'
 import AddGameModal from '@/components/groups/add-game-modal/AddGameModal'
 import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
 import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import { CONSOLES } from '@/constants'
+import { gameKey } from '@/utils/gameRef'
 
 type PctFilter = 'all' | '0' | 'progress' | '100'
 type DecadeFilter = 'all' | '80s' | '90s' | '00s' | '10s' | '20s'
@@ -49,6 +52,15 @@ const GRID_COLS_CLASS: Record<StatusGridCols, string> = {
   1: 'grid-cols-1',
   2: 'grid-cols-1 md:grid-cols-2',
   3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+}
+
+/** Rows from before Steam have no source; they are RA games. */
+function itemKey(item: GameGroupItem): string {
+  return gameKey(item.source ?? 'ra', item.game_id)
+}
+
+function isRa(item: GameGroupItem): boolean {
+  return (item.source ?? 'ra') === 'ra'
 }
 
 function getDecade(year: number): DecadeFilter {
@@ -67,6 +79,7 @@ export default function GroupDetailPage() {
   const { updateGroup, deleteGroup } = useGroups()
   const { all: allGames } = useGamesData()
   const { games: recentlyPlayed } = useRecentlyPlayedGames()
+  const { library: steamLibrary } = useSteamGamesData()
 
   const achievementMap = useMemo(() => {
     const hcEarnedMap = new Map<number, number>()
@@ -130,8 +143,8 @@ export default function GroupDetailPage() {
   const [pctFilter, setPctFilter] = useState<PctFilter>('all')
   const [decadeFilter, setDecadeFilter] = useState<DecadeFilter>('all')
   const [gridCols, setGridCols] = useState<StatusGridCols>(1)
-  const [releaseYears, setReleaseYears] = useState<Map<number, number>>(new Map())
-  const fetchedIdsRef = useRef<Set<number>>(new Set())
+  const [releaseYears, setReleaseYears] = useState<Map<string, number>>(new Map())
+  const fetchedKeysRef = useRef<Set<string>>(new Set())
   const saveOrderTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const fetchGroup = useCallback(async () => {
@@ -154,18 +167,27 @@ export default function GroupDetailPage() {
   }, [fetchGroup])
 
   const fetchReleaseYears = useCallback(async (items: GameGroupItem[]) => {
-    const toFetch = items.filter((i) => !fetchedIdsRef.current.has(i.game_id))
+    // Release years come from RA; Steam items are left out of the decade filter.
+    const toFetch = items.filter((i) => isRa(i) && !fetchedKeysRef.current.has(itemKey(i)))
     if (!toFetch.length) return
-    toFetch.forEach((i) => fetchedIdsRef.current.add(i.game_id))
+    toFetch.forEach((i) => fetchedKeysRef.current.add(itemKey(i)))
     const results = await Promise.all(
       toFetch.map((item) =>
         fetch(`/api/getGameData?gameId=${item.game_id}`)
-          .then((r) => r.json())
+          .then((r) => {
+            if (!r.ok) throw new Error(`getGameData ${r.status}`)
+            return r.json()
+          })
           .then((d: { Released?: string | null }) => ({
-            id: item.game_id,
+            id: itemKey(item),
             year: d.Released ? parseInt(d.Released.substring(0, 4)) : null,
           }))
-          .catch(() => ({ id: item.game_id, year: null as number | null }))
+          .catch((err) => {
+            // Only costs this game its place in the decade filter; forget it so a later pass asks again.
+            console.error('[GroupDetailPage] release year', item.game_id, err)
+            fetchedKeysRef.current.delete(itemKey(item))
+            return { id: itemKey(item), year: null as number | null }
+          })
       )
     )
     setReleaseYears((prev) => {
@@ -183,6 +205,7 @@ export default function GroupDetailPage() {
   }, [group?.id, fetchReleaseYears])
 
   type SyncItem = {
+    source: 'ra'
     game_id: number
     num_awarded: number
     max_possible: number
@@ -197,11 +220,12 @@ export default function GroupDetailPage() {
   useEffect(() => {
     if (!group || !recentlyPlayed.length || rpSyncedRef.current === group.id) return
     rpSyncedRef.current = group.id
-    const updates: SyncItem[] = group.items.flatMap((item) => {
+    const updates: SyncItem[] = group.items.filter(isRa).flatMap((item) => {
       const rp = recentlyPlayed.find((g) => g.GameID === item.game_id)
       if (!rp) return []
       return [
         {
+          source: 'ra' as const,
           game_id: item.game_id,
           num_awarded: rp.NumAchievedHardcore || rp.NumAchieved,
           max_possible: rp.NumPossibleAchievements || item.max_possible,
@@ -216,7 +240,7 @@ export default function GroupDetailPage() {
         ? {
             ...g,
             items: g.items.map((item) => {
-              const u = updates.find((u) => u.game_id === item.game_id)
+              const u = isRa(item) ? updates.find((u) => u.game_id === item.game_id) : undefined
               return u ? { ...item, ...u } : item
             }),
           }
@@ -226,26 +250,30 @@ export default function GroupDetailPage() {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
-    }).catch(() => {})
+    })
+      .then((r) => { if (!r.ok) throw new Error(`sync ${r.status}`) })
+      // Only the cached counts; the page already shows the fresh ones.
+      .catch((err) => console.error('[GroupDetailPage] sync counts', err))
   }, [group, recentlyPlayed, groupId])
 
   // Background fetch game progression for items with no ach data anywhere
   useEffect(() => {
     if (!group || fetchSyncedRef.current === group.id) return
-    const missing = group.items.filter((item) => item.max_possible === 0)
+    const missing = group.items.filter((item) => isRa(item) && item.max_possible === 0)
     fetchSyncedRef.current = group.id
     if (!missing.length) return
     Promise.allSettled(
       missing.slice(0, 20).map(async (item): Promise<SyncItem | null> => {
-        const data = await fetch(`/api/getGameProgression?gameId=${item.game_id}`).then((r) =>
-          r.json()
-        )
+        const res = await fetch(`/api/getGameProgression?gameId=${item.game_id}`)
+        if (!res.ok) throw new Error(`getGameProgression ${res.status}`)
+        const data = await res.json()
         const achs = Object.values(
           (data.Achievements ?? {}) as Record<string, RetroAchievement | undefined>
         ).filter((a): a is RetroAchievement => !!a)
         if (!achs.length) return null
         const earned = achs.filter((a) => a.DateEarnedHardcore || a.DateEarned)
         return {
+          source: 'ra',
           game_id: item.game_id,
           num_awarded: earned.length,
           max_possible: achs.length,
@@ -265,7 +293,7 @@ export default function GroupDetailPage() {
           ? {
               ...g,
               items: g.items.map((item) => {
-                const u = ok.find((u) => u.game_id === item.game_id)
+                const u = isRa(item) ? ok.find((u) => u.game_id === item.game_id) : undefined
                 return u ? { ...item, ...u } : item
               }),
             }
@@ -275,7 +303,9 @@ export default function GroupDetailPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(ok),
-      }).catch(() => {})
+      })
+        .then((r) => { if (!r.ok) throw new Error(`sync ${r.status}`) })
+        .catch((err) => console.error('[GroupDetailPage] sync counts', err))
     })
   }, [group, recentlyPlayed, groupId])
 
@@ -301,6 +331,12 @@ export default function GroupDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ order: newItems.map((i) => i.id) }),
       })
+        .then((r) => { if (!r.ok) throw new Error(`reorder ${r.status}`) })
+        .catch((err) => {
+          // Not saved: reload so the list shows the order that actually stuck.
+          console.error('[GroupDetailPage] reorder', err)
+          fetchGroup()
+        })
     }, 600)
   }
 
@@ -308,8 +344,19 @@ export default function GroupDetailPage() {
     if (!group) return
     const item = group.items.find((i) => i.id === itemId)
     if (!item) return
-    await fetch(`/api/groups/${groupId}/games?gameId=${item.game_id}`, { method: 'DELETE' })
-    setGroup({ ...group, items: group.items.filter((i) => i.id !== itemId) })
+    try {
+      const res = await fetch(
+        `/api/groups/${groupId}/games?gameId=${item.game_id}&source=${item.source ?? 'ra'}`,
+        { method: 'DELETE' },
+      )
+      if (!res.ok) {
+        console.error('[GroupDetailPage] remove failed', res.status)
+        return
+      }
+      setGroup((g) => (g ? { ...g, items: g.items.filter((i) => i.id !== itemId) } : g))
+    } catch (err) {
+      console.error('[GroupDetailPage] remove failed', err)
+    }
   }
 
   async function handleEdit(data: {
@@ -332,7 +379,14 @@ export default function GroupDetailPage() {
     router.push('/groups')
   }
 
-  const existingIds = useMemo(() => new Set((group?.items ?? []).map((i) => i.game_id)), [group])
+  const existingKeys = useMemo(() => new Set((group?.items ?? []).map(itemKey)), [group])
+
+  /** Steam completion comes live from the library; RA uses the stored fraction. */
+  const steamPctMap = useMemo(() => {
+    const map = new Map<number, number>()
+    for (const g of steamLibrary) if (g.achievementsLoaded && g.maxPossible > 0) map.set(g.id, g.numAwarded / g.maxPossible)
+    return map
+  }, [steamLibrary])
 
   const consolePills = useMemo(() => {
     if (!group) return []
@@ -356,19 +410,37 @@ export default function GroupDetailPage() {
         (!item.console_name || !selectedConsoles.has(item.console_name))
       )
         return false
-      const pct = parseFloat(item.pct_won)
+      const pct = isRa(item) ? parseFloat(item.pct_won) : (steamPctMap.get(item.game_id) ?? parseFloat(item.pct_won))
       if (pctFilter === '0' && pct !== 0) return false
       if (pctFilter === 'progress' && !(pct > 0 && pct < 1)) return false
       if (pctFilter === '100' && pct < 1) return false
       if (decadeFilter !== 'all') {
-        const year = releaseYears.get(item.game_id)
+        const year = releaseYears.get(itemKey(item))
         if (!year || getDecade(year) !== decadeFilter) return false
       }
       return true
     })
-  }, [group, selectedConsoles, pctFilter, decadeFilter, releaseYears])
+  }, [group, selectedConsoles, pctFilter, decadeFilter, releaseYears, steamPctMap])
 
   const hasYearsData = releaseYears.size > 0
+  const hasSteamItems = useMemo(() => (group?.items ?? []).some((i) => !isRa(i)), [group])
+
+  function renderItem(item: GameGroupItem, draggable: boolean) {
+    if (!isRa(item)) {
+      return <SteamSortableItem key={item.id} item={item} onRemove={handleRemoveGame} draggable={draggable} />
+    }
+    return (
+      <SortableItem
+        key={item.id}
+        item={item}
+        onRemove={handleRemoveGame}
+        draggable={draggable}
+        achStats={achievementMap.get(item.game_id)}
+        ptsStats={pointsMap.get(item.game_id)}
+        lastPlayed={lastPlayedMap.get(item.game_id)}
+      />
+    )
+  }
 
   function toggleConsole(name: string) {
     setSelectedConsoles((prev) => {
@@ -556,6 +628,12 @@ export default function GroupDetailPage() {
                 ))}
               </div>
             )}
+
+            {hasYearsData && hasSteamItems && (
+              <p className="w-full text-[11px] text-text-secondary/60">
+                {T.groups.decadeFilterExcludesSteam}
+              </p>
+            )}
           </div>
         )}
 
@@ -586,17 +664,7 @@ export default function GroupDetailPage() {
           </div>
         ) : filtersActive ? (
           <div className={`grid gap-3 ${GRID_COLS_CLASS[gridCols]}`}>
-            {filteredItems.map((item) => (
-              <SortableItem
-                key={item.id}
-                item={item}
-                onRemove={handleRemoveGame}
-                draggable={false}
-                achStats={achievementMap.get(item.game_id)}
-                ptsStats={pointsMap.get(item.game_id)}
-                lastPlayed={lastPlayedMap.get(item.game_id)}
-              />
-            ))}
+            {filteredItems.map((item) => renderItem(item, false))}
           </div>
         ) : (
           <DndContext
@@ -609,17 +677,7 @@ export default function GroupDetailPage() {
               strategy={rectSortingStrategy}
             >
               <div className={`grid gap-3 ${GRID_COLS_CLASS[gridCols]}`}>
-                {group.items.map((item) => (
-                  <SortableItem
-                    key={item.id}
-                    item={item}
-                    onRemove={handleRemoveGame}
-                    draggable={true}
-                    achStats={achievementMap.get(item.game_id)}
-                    ptsStats={pointsMap.get(item.game_id)}
-                    lastPlayed={lastPlayedMap.get(item.game_id)}
-                  />
-                ))}
+                {group.items.map((item) => renderItem(item, true))}
               </div>
             </SortableContext>
           </DndContext>
@@ -631,7 +689,7 @@ export default function GroupDetailPage() {
         isOpen={addGameOpen}
         onClose={() => setAddGameOpen(false)}
         groupId={groupId}
-        existingIds={existingIds}
+        existingKeys={existingKeys}
         onAdded={(items) => {
           setGroup((g) => (g ? { ...g, items: [...g.items, ...items] } : g))
           fetchReleaseYears(items)

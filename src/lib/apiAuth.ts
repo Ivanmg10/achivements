@@ -38,11 +38,14 @@ export async function requireRaSession(): Promise<RaSessionResult> {
 export type ViewerApiKeyResult = { ok: true; viewerId: string; apiKey: string } | { ok: false; response: NextResponse }
 
 /**
- * Requires a signed-in viewer, for routes that fetch a THIRD PARTY's public
- * RA data (public/user/*) rather than the viewer's own. The RA Web API key
- * used to authenticate the call can come from the viewer's own linked
- * account, or fall back to the shared app key — either way it's just
- * authenticating the outbound call, not scoping the response to the viewer.
+ * Requires a signed-in viewer with their own RA key, for routes that fetch a
+ * THIRD PARTY's public RA data (public/user/*) rather than the viewer's own.
+ * The key only authenticates the outbound call; it does not scope the response.
+ *
+ * There is deliberately no shared app key to fall back on: without an RA
+ * account of their own, a viewer sees nothing from RA, so there is nothing to
+ * ask RA for. A missing key is therefore the viewer's state to fix (400), not
+ * a server fault (503).
  */
 export async function requireViewerApiKey(): Promise<ViewerApiKeyResult> {
   const session = await getServerSession(authOptions)
@@ -50,10 +53,38 @@ export async function requireViewerApiKey(): Promise<ViewerApiKeyResult> {
     return { ok: false, response: NextResponse.json({ message: 'No autorizado' }, { status: 401 }) }
   }
 
-  const apiKey = session.user.raid ?? process.env.RA_API_KEY ?? null
+  const apiKey = session.user.raid
   if (!apiKey) {
-    return { ok: false, response: NextResponse.json({ message: 'No RA API key configured' }, { status: 503 }) }
+    return { ok: false, response: NextResponse.json({ message: 'No RA account linked' }, { status: 400 }) }
   }
 
   return { ok: true, viewerId: session.user.id, apiKey }
+}
+
+export type SteamSession = { id: string; steamid: string; apiKey: string }
+export type SteamSessionResult = { ok: true; session: SteamSession } | { ok: false; response: NextResponse }
+
+/**
+ * Requires a signed-in user with a linked Steam account, plus the server-wide
+ * Steam Web API key. Unlike RA — where the key is the user's own — Steam uses
+ * one app key for every call, so a missing key is a 503 (our misconfiguration),
+ * not a 400 (something the user can fix).
+ */
+export async function requireSteamSession(): Promise<SteamSessionResult> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return { ok: false, response: NextResponse.json({ message: 'No autorizado' }, { status: 401 }) }
+  }
+
+  const { id, steamid } = session.user
+  if (!steamid) {
+    return { ok: false, response: NextResponse.json({ message: 'No Steam account linked' }, { status: 400 }) }
+  }
+
+  const apiKey = process.env.STEAM_API_KEY?.trim()
+  if (!apiKey) {
+    return { ok: false, response: NextResponse.json({ message: 'No Steam API key configured' }, { status: 503 }) }
+  }
+
+  return { ok: true, session: { id, steamid, apiKey } }
 }

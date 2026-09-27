@@ -15,39 +15,43 @@ export default function RaLoginModal({
   const [isLoading, setIsLoading] = useState(false)
   const [username, setUsername] = useState('')
   const [apiKey, setApiKey] = useState('')
+  const [error, setError] = useState<string | null>(null)
   const { T } = useLanguage()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!username || !apiKey) return
     setIsLoading(true)
+    setError(null)
 
-    const user = await fetch('/api/getUserProfile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, apiKey }),
-    }).then((res) => res.json())
+    try {
+      // The server asks RA for the profile itself and stores what RA answers.
+      const res = await fetch('/api/updateRaUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, apiKey }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        const byCode: Record<string, string> = {
+          'ra-invalid': T.raLoginModal.invalid,
+          'key-in-use': T.raLoginModal.keyInUse,
+        }
+        setError(byCode[data.error] ?? T.raLoginModal.error)
+        return
+      }
 
-    if (user.message) {
-      alert(user.message)
+      await update()
+
       setUsername('')
       setApiKey('')
+      setIsOpen(false)
+    } catch (err) {
+      console.error('[RaLoginModal]', err)
+      setError(T.raLoginModal.error)
+    } finally {
       setIsLoading(false)
-      return
     }
-
-    await fetch('/api/updateRaUser', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ raUser: user, apiKey }),
-    })
-
-    await update({ raUser: user, raidKey: apiKey } as Parameters<typeof update>[0])
-
-    setIsLoading(false)
-    setUsername('')
-    setApiKey('')
-    setIsOpen(false)
   }
 
   return (
@@ -57,17 +61,38 @@ export default function RaLoginModal({
         <input
           type="text"
           placeholder={T.raLoginModal.username}
+          aria-label={T.raLoginModal.username}
           className="rounded-xl bg-bg-main p-3 w-full"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-        <input
-          type="text"
-          placeholder="apiKey"
-          value={apiKey}
-          className="rounded-xl bg-bg-main p-3 w-full"
-          onChange={(e) => setApiKey(e.target.value)}
-        />
+        <div className="flex flex-col gap-1.5">
+          <input
+            type="text"
+            placeholder={T.raLoginModal.apiKey}
+            aria-label={T.raLoginModal.apiKey}
+            value={apiKey}
+            className="rounded-xl bg-bg-main p-3 w-full"
+            onChange={(e) => setApiKey(e.target.value)}
+          />
+          {/* The key is buried in RA's settings, so say exactly where. */}
+          <p className="text-xs text-text-secondary">
+            {T.connect.raKeyPath}{' '}
+            <a
+              href="https://retroachievements.org/settings"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent underline underline-offset-2 hover:text-accent-hover transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            >
+              {T.connect.raKeyHelp}
+            </a>
+          </p>
+        </div>
+        {error && (
+          <p role="alert" className="text-sm text-danger">
+            {error}
+          </p>
+        )}
         {!isLoading ? (
           <button
             type="submit"

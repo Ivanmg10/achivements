@@ -138,7 +138,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, c
               placeholder="https://..."
             />
             {(values.avatar as string) && (
-              <Image src={values.avatar as string} alt="preview" width={32} height={32}
+              <Image src={values.avatar as string} alt="Avatar preview" width={32} height={32}
                 className="rounded-full w-8 h-8 object-cover shrink-0" unoptimized
                 onError={() => {}} />
             )}

@@ -1,11 +1,12 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 
 import { getServerSession } from 'next-auth'
-import { requireRaSession, requireViewerApiKey, requireSession } from './apiAuth'
+import { requireRaSession, requireViewerApiKey, requireSession, requireSteamSession } from './apiAuth'
 
 beforeEach(() => {
   jest.clearAllMocks()
   delete process.env.RA_API_KEY
+  delete process.env.STEAM_API_KEY
 })
 
 describe('requireSession', () => {
@@ -61,17 +62,53 @@ describe('requireViewerApiKey', () => {
     expect(result).toEqual({ ok: true, viewerId: '1', apiKey: 'my-key' })
   })
 
-  test('falls back to the shared RA_API_KEY when the viewer has no raid', async () => {
+  test('never falls back to a shared key: no RA account, no RA data', async () => {
     process.env.RA_API_KEY = 'shared-key'
     ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1' } })
     const result = await requireViewerApiKey()
-    expect(result).toEqual({ ok: true, viewerId: '1', apiKey: 'shared-key' })
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.response.status).toBe(400)
+  })
+})
+
+describe('requireSteamSession', () => {
+  beforeEach(() => {
+    process.env.STEAM_API_KEY = 'steam-key'
   })
 
-  test('returns 503 when neither the viewer nor the app has an API key', async () => {
+  test('returns 401 when there is no session', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue(null)
+    const result = await requireSteamSession()
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.response.status).toBe(401)
+  })
+
+  test('returns 400 when signed in but no Steam account linked', async () => {
     ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1' } })
-    const result = await requireViewerApiKey()
+    const result = await requireSteamSession()
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.response.status).toBe(400)
+  })
+
+  test('returns 503 when the app has no Steam API key — our problem, not the user’s', async () => {
+    delete process.env.STEAM_API_KEY
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', steamid: '765' } })
+    const result = await requireSteamSession()
     expect(result.ok).toBe(false)
     if (!result.ok) expect(result.response.status).toBe(503)
+  })
+
+  test('treats a blank API key as missing', async () => {
+    process.env.STEAM_API_KEY = '   '
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', steamid: '765' } })
+    const result = await requireSteamSession()
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.response.status).toBe(503)
+  })
+
+  test('returns the session and app key when linked', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', steamid: '765' } })
+    const result = await requireSteamSession()
+    expect(result).toEqual({ ok: true, session: { id: '1', steamid: '765', apiKey: 'steam-key' } })
   })
 })

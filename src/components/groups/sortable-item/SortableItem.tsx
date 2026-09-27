@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useSortable } from '@dnd-kit/sortable'
@@ -12,9 +12,12 @@ import {
 } from '@tabler/icons-react'
 import { relativeTime } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
-import { RetroAchievement, RetroAchievementsGameWithAchievements, GameGroupItem } from '@/types/types'
+import { useGameProgression } from '@/hooks/useGameProgression'
+import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
+import { RetroAchievement, GameGroupItem } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
+import { SectionFallback } from '@/components/ui/SectionFallback'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
 
 export default function SortableItem({
@@ -55,10 +58,7 @@ export default function SortableItem({
   const ptsTotal = ptsStats?.total || item.max_points
 
   const [open, setOpen] = useState(false)
-  const [gameData, setGameData] = useState<RetroAchievementsGameWithAchievements | null>(null)
-  const [loadingAch, setLoadingAch] = useState(false)
   const [selectedAch, setSelectedAch] = useState<RetroAchievement | null>(null)
-  const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set())
   const [tooltip, setTooltip] = useState<{ achievement: RetroAchievement; x: number; y: number } | null>(null)
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -70,51 +70,25 @@ export default function SortableItem({
     setTooltip(null)
   }
 
-  useEffect(() => {
-    if (!open || favoritedIds.size > 0) return
-    fetch(`/api/favorites?gameId=${item.game_id}`)
-      .then((r) => r.json())
-      .then((rows: { achievement_id: number }[]) =>
-        setFavoritedIds(new Set(rows.map((r) => r.achievement_id)))
-      )
-      .catch(() => {})
-  }, [open, item.game_id, favoritedIds.size])
+  // Asked for on first open; the hook keeps the result when the row closes again.
+  const {
+    game: gameData,
+    isLoading,
+    error: achError,
+    refetch: refetchAch,
+  } = useGameProgression(open ? String(item.game_id) : null)
+  const loadingAch = isLoading || (open && !gameData && !achError)
+  const { favoritedIds, toggleFavorite } = useRaFavoriteIds(item.game_id, open)
 
-  async function handleToggle() {
-    if (!open && !gameData) {
-      setOpen(true)
-      setLoadingAch(true)
-      const data = await fetch(`/api/getGameProgression?gameId=${item.game_id}`).then((r) =>
-        r.json()
-      )
-      setGameData(data)
-      setLoadingAch(false)
-    } else {
-      setOpen((o) => !o)
-    }
+  function handleToggle() {
+    setOpen((o) => !o)
   }
 
-  async function handleToggleFavorite(achievement: RetroAchievement) {
-    const isFav = favoritedIds.has(achievement.ID)
-    setFavoritedIds((prev) => {
-      const next = new Set(prev)
-      isFav ? next.delete(achievement.ID) : next.add(achievement.ID)
-      return next
+  function handleToggleFavorite(achievement: RetroAchievement) {
+    return toggleFavorite(achievement, {
+      gameTitle: item.title,
+      numDistinctPlayers: gameData?.NumDistinctPlayers ?? 1,
     })
-    if (isFav) {
-      await fetch(`/api/favorites?achievementId=${achievement.ID}`, { method: 'DELETE' })
-    } else {
-      await fetch('/api/favorites', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          achievement,
-          gameId: item.game_id,
-          gameTitle: item.title,
-          numDistinctPlayers: gameData?.NumDistinctPlayers ?? 1,
-        }),
-      })
-    }
   }
 
   const achievements = gameData
@@ -242,6 +216,8 @@ export default function SortableItem({
                   <div key={i} className="w-12 h-12 rounded-lg bg-bg-main animate-pulse" />
                 ))}
               </div>
+            ) : achError && !gameData ? (
+              <SectionFallback error onRefresh={refetchAch}>{null}</SectionFallback>
             ) : achievements.length === 0 ? (
               <p className="text-center text-text-secondary text-sm py-2">
                 {T.statusGameItem.noPublishedAchievements}

@@ -20,12 +20,16 @@ test('fetches saved order once when authenticated', async () => {
   ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
   ;(fetch as jest.Mock).mockResolvedValue({
     ok: true,
-    json: async () => [{ game_id: 10, position: 0 }, { game_id: 20, position: 1 }],
+    json: async () => [
+      { source: 'steam', game_id: 10, position: 0 },
+      { game_id: 20, position: 1 },
+    ],
   })
 
   const { result, rerender } = renderHook(() => usePerfectGamesOrder())
   await waitFor(() => expect(result.current.isLoading).toBe(false))
-  expect(result.current.order).toEqual([10, 20])
+  // The second row predates the source column: rows without one are RA's.
+  expect(result.current.order).toEqual(['steam:10', 'ra:20'])
 
   rerender()
   expect(fetch).toHaveBeenCalledTimes(1)
@@ -50,15 +54,15 @@ test('saveOrder PUTs the new order and updates state optimistically', async () =
   await waitFor(() => expect(result.current.isLoading).toBe(false))
 
   await act(async () => {
-    await result.current.saveOrder([30, 10, 20])
+    await result.current.saveOrder(['ra:30', 'steam:10', 'ra:20'])
   })
 
   expect(fetch).toHaveBeenLastCalledWith('/api/perfectGamesOrder', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ order: [30, 10, 20] }),
+    body: JSON.stringify({ order: ['ra:30', 'steam:10', 'ra:20'] }),
   })
-  expect(result.current.order).toEqual([30, 10, 20])
+  expect(result.current.order).toEqual(['ra:30', 'steam:10', 'ra:20'])
 })
 
 test('saveOrder throws when the PUT response is not ok', async () => {
@@ -71,6 +75,6 @@ test('saveOrder throws when the PUT response is not ok', async () => {
   await waitFor(() => expect(result.current.isLoading).toBe(false))
 
   await act(async () => {
-    await expect(result.current.saveOrder([1])).rejects.toThrow('Error saving order')
+    await expect(result.current.saveOrder(['ra:1'])).rejects.toThrow('Error saving order')
   })
 })

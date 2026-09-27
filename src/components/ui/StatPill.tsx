@@ -61,10 +61,10 @@ export function StatCard({
 }) {
   return (
     <div className={`bg-bg-main rounded-lg p-3 flex flex-col gap-1 ${className}`}>
-      <span className={`text-xl font-bold ${accent ?? 'text-white'}`}>
+      <span className={`text-xl font-bold ${accent ?? 'text-text-main'}`}>
         {typeof value === 'number' ? value.toLocaleString() : value}
       </span>
-      <span className="text-xs text-gray-400">{label}</span>
+      <span className="text-xs text-text-secondary">{label}</span>
     </div>
   )
 }

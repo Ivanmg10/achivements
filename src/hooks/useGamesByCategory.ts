@@ -3,6 +3,7 @@ import { useSession } from 'next-auth/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { useGamesData } from '@/context/GamesDataContext'
+import { useRaLinked } from '@/hooks/useRaLinked'
 
 type ValidCategory = 'wantToPlay' | 'playing' | 'completed'
 
@@ -14,6 +15,7 @@ export type CategoryGame = WantToPlayGame | RetroAchievementsGameCompleted
 
 export function useGamesByCategory(category: string, consoleId?: string) {
   const { status } = useSession()
+  const raLinked = useRaLinked()
   // Completed/in-progress games are fetched once and shared app-wide via
   // GamesDataContext — don't re-fetch /api/getGamesCompleted here too.
   const { all: allCompleted, isLoading: completedLoading } = useGamesData()
@@ -24,7 +26,7 @@ export function useGamesByCategory(category: string, consoleId?: string) {
 
   useEffect(() => {
     if (status === 'loading') return
-    if (status === 'unauthenticated' || category !== 'wantToPlay') { setWantLoading(false); return }
+    if (status === 'unauthenticated' || !raLinked || category !== 'wantToPlay') { setWantLoading(false); return }
     if (fetchedRef.current) return
     fetchedRef.current = true
     setWantLoading(true)
@@ -34,7 +36,7 @@ export function useGamesByCategory(category: string, consoleId?: string) {
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Unknown error'))
       .finally(() => setWantLoading(false))
-  }, [status, category])
+  }, [status, raLinked, category])
 
   const id = consoleId ? Number(consoleId) : null
 

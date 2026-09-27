@@ -30,3 +30,27 @@ export async function fetchWithRetry(
   }
   throw lastErr
 }
+
+const MAX_BACKGROUND_RETRIES = 5
+
+/**
+ * The slow retry loop the data hooks run after fetchWithRetry gives up: 3 s,
+ * 6 s, 12 s… capped at 30 s. Returns false when it is time to stop and show
+ * the error instead — after MAX_BACKGROUND_RETRIES, or at once on a 4xx,
+ * which asking again will not fix. Before this cap a failing endpoint left
+ * its section loading forever.
+ */
+export function scheduleRetry(
+  attempt: { current: number },
+  timer: { current: ReturnType<typeof setTimeout> | undefined },
+  retry: () => void,
+  err?: unknown,
+): boolean {
+  const status = (err as { status?: number } | undefined)?.status
+  if (status && status >= 400 && status < 500) return false
+  if (attempt.current >= MAX_BACKGROUND_RETRIES) return false
+  const delay = Math.min(3_000 * 2 ** attempt.current, 30_000)
+  attempt.current++
+  timer.current = setTimeout(retry, delay)
+  return true
+}

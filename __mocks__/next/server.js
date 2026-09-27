@@ -29,11 +29,32 @@ class NextResponse {
     this.headers = new Map(Object.entries(init.headers || {}))
   }
 
+  /** Lets the request through, as the real one does in middleware. */
+  static next() {
+    return new NextResponse(null, { status: 200 })
+  }
+
   static json(data, init = {}) {
     const res = new NextResponse(JSON.stringify(data), init)
     res.data = data
     return res
   }
+
+  static redirect(url, init = {}) {
+    const res = new NextResponse(null, { status: init.status || 307 })
+    res.headers.set('location', String(url))
+    res.url = String(url)
+    return res
+  }
 }
 
-module.exports = { NextRequest, NextResponse }
+/**
+ * Runs the task at once, as the real one does once the response is sent.
+ * Tests await after.pending to see its effects.
+ */
+function after(task) {
+  after.pending.push(Promise.resolve(typeof task === 'function' ? task() : task))
+}
+after.pending = []
+
+module.exports = { NextRequest, NextResponse, after }

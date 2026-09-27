@@ -109,6 +109,74 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 - `0.9.0` — stats page reorganization
 - `1.0.0` — Steam integration
 
+## Release gates — things that must be true before 1.0
+
+**Warn the user, unprompted, whenever they talk about cutting 1.0, tagging a
+release, or 'going live' while any of these is still open.** They asked for
+this reminder on purpose, because it is easy to forget.
+
+- [ ] **A domain verified in Resend, with `EMAIL_FROM` set on it.** Until then
+      password recovery only reaches the Resend account owner, so every other
+      user is one forgotten password away from losing their account. This is
+      the blocker: a public site with no working recovery is not 1.0.
+- [ ] `NEXTAUTH_URL` set to the public URL in Vercel — reset links are built
+      from it, and a wrong value sends people to localhost.
+- [ ] Email verification decided: ship it (soft, a banner and nothing blocked)
+      or write down that it is deliberately left out.
+- [ ] `migrations/011_drop_sourceless_game_keys.sql` run, once the Steam work
+      has been deployed for a while.
+
+## Email — read before touching anything that sends one
+
+Password recovery goes out through Resend (`src/lib/email.ts`, REST API, no SDK).
+How far it reaches depends only on the environment:
+
+- **No `RESEND_API_KEY`** → `emailConfigured()` is false, `POST /api/auth/forgotPassword`
+  returns `503 { error: 'email-not-configured' }`, and the UI tells the user plainly.
+  **Do not "fix" this by pretending the mail was sent.**
+- **Key only** → sends from Resend's shared address, which delivers **only to the
+  Resend account owner**. That is the state while the project has no domain.
+- **Key + `EMAIL_FROM` on a verified domain** → reaches everyone. Configuration
+  only; no code change.
+
+Other things to keep true:
+
+- Reset links are built from `NEXTAUTH_URL`.
+- Tokens: random 32 bytes, only their SHA-256 stored, one hour, single use
+  (`src/lib/passwordReset.ts`, table from `migrations/016_password_resets.sql`).
+- `/api/auth/forgotPassword` answers the same whether or not the address has an
+  account. Keep it that way: it is what stops the endpoint being used to find users.
+- Never add a second mail provider or an SMTP fallback without asking.
+- Email verification does not exist yet. When it arrives it is meant to be soft:
+  a banner for unverified addresses, never a blocked sign-in.
+
+## Sessions — read before touching auth
+
+- The session is rebuilt from the `users` row on every read (`jwt` callback in
+  `src/lib/authOptions.ts`, cached ~60 s per instance in `src/lib/userRecord.ts`).
+  **Never copy data from `update()`'s payload into the token**: the browser
+  controls it. To change a session field, save it in the DB, then call `update()`
+  with no arguments.
+- Changing the password (hash) ends every session, this one included. A deleted
+  user's session ends too.
+- The RA API key (`raid`) is server-only: `getServerSession(authOptions)` has it,
+  the browser's session (`authHandlerOptions`) does not. Client code uses `raLinked`.
+- Admin checks read the DB (`loadUser(id, { fresh: true })`), not the session.
+- Sign-in, current-password checks, sign-up and reset requests are rate limited
+  in the DB (`src/lib/attemptLimit.ts`). Password rules: `PASSWORD_MIN` and
+  `BCRYPT_COST` in `src/utils/authValidation.ts`.
+- Changing the email asks for the current password; it is the recovery address.
+
+## Registration
+
+Public and open: anyone can sign up with a username, a password and an **email,
+which is required** — it is the only way to recover an account. Accounts created
+before that rule have none, and the account page shows them a warning.
+There is no invite code; the old `REGISTER_TOKEN` / `NEXT_PUBLIC_REGISTER_TOKEN`
+pair is gone, and the public one leaked the secret into the browser bundle.
+`REGISTRATION_OPEN=false` closes sign-ups; unset means open. Sign-ups and reset
+requests are both limited per address in the database (`src/lib/attemptLimit.ts`).
+
 ## Git — commits
 Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — all commits must appear solely under the user's name so GitHub contributions are attributed correctly.
 
