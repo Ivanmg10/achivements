@@ -22,12 +22,26 @@ beforeEach(() => {
   })
 })
 
-test('fetches profile when authenticated with raUser', async () => {
-  mockSession('authenticated', { raUser: { User: 'IvanXMarine' } })
+test('asks the server to refresh the stored RA profile, then re-reads the session', async () => {
+  const update = jest.fn()
+  mockSession('authenticated', { raUser: { User: 'IvanXMarine' } }, update)
   await act(async () => {
     render(<RaUserRefresher />)
   })
-  expect(fetch).toHaveBeenCalledWith('/api/getUserProfile')
+  expect(fetch).toHaveBeenCalledWith('/api/updateRaUser', { method: 'PUT' })
+  expect(update).toHaveBeenCalledWith()
+})
+
+test('a failed refresh is logged and leaves the session alone', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  ;(fetch as jest.Mock).mockResolvedValue({ ok: false, status: 502 })
+  const update = jest.fn()
+  mockSession('authenticated', { raUser: { User: 'IvanXMarine' } }, update)
+  await act(async () => {
+    render(<RaUserRefresher />)
+  })
+  expect(console.error).toHaveBeenCalled()
+  expect(update).not.toHaveBeenCalled()
 })
 
 test('does not fetch when authenticated but no raUser', async () => {

@@ -20,10 +20,13 @@ function setParams(params: Record<string, string> = {}) {
   ;(useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams(params))
 }
 
+/** What the users row holds; update() answers with it, like the server re-reading the row. */
+let stored: Record<string, unknown> = {}
+
 beforeEach(() => {
   jest.clearAllMocks()
-  // Like next-auth: resolves to the session after the jwt callback merged the data.
-  mockUpdate.mockImplementation(async (data: Record<string, unknown>) => ({ user: { id: '7', ...data } }))
+  stored = { steamid: STEAM_ID, steamusername: 'Ivan' }
+  mockUpdate.mockImplementation(async () => ({ user: { id: '7', ...stored } }))
   ;(useRouter as jest.Mock).mockReturnValue({ replace: mockReplace, push: jest.fn(), prefetch: jest.fn() })
   ;(usePathname as jest.Mock).mockReturnValue('/user')
   setSession({ id: '7' })
@@ -66,7 +69,7 @@ describe('handling the callback redirect', () => {
 
     await waitFor(() => expect(mockUpdate).toHaveBeenCalled())
     expect(fetch).toHaveBeenCalledWith('/api/steam/account')
-    expect(mockUpdate).toHaveBeenCalledWith({ steamid: STEAM_ID, steamusername: 'Ivan' })
+    expect(mockUpdate).toHaveBeenCalledWith()
     expect(mockReplace).toHaveBeenCalledWith('/user')
     expect(result.current.status).toBe('linked')
   })
@@ -126,13 +129,17 @@ describe('handling the callback redirect', () => {
 describe('disconnect', () => {
   test('unlinks and clears the session fields', async () => {
     setSession({ id: '7', steamid: STEAM_ID, steamusername: 'Ivan' })
-    ;(fetch as jest.Mock).mockResolvedValue({ ok: true })
+    ;(fetch as jest.Mock).mockImplementation(async () => {
+      stored = {}
+      return { ok: true }
+    })
 
     const { result } = renderHook(() => useSteamLink())
     await act(async () => { await result.current.disconnect() })
 
     expect(fetch).toHaveBeenCalledWith('/api/steam/unlink', { method: 'POST' })
-    expect(mockUpdate).toHaveBeenCalledWith({ steamid: null, steamusername: null })
+    expect(mockUpdate).toHaveBeenCalledWith()
+    expect(result.current.status).toBeNull()
     expect(result.current.isUnlinking).toBe(false)
   })
 
@@ -198,7 +205,7 @@ describe('regression: link saved in the DB but never reaching the session', () =
     rerender()
 
     await waitFor(() => expect(result.current.status).toBe('linked'))
-    expect(mockUpdate).toHaveBeenCalledWith({ steamid: STEAM_ID, steamusername: 'Ivan' })
+    expect(mockUpdate).toHaveBeenCalledWith()
     expect(mockReplace).toHaveBeenCalledWith('/user')
   })
 

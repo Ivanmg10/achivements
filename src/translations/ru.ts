@@ -117,7 +117,10 @@ export const ru: Translations = {
     current: 'Текущий пароль',
     new: 'Новый пароль',
     confirm: 'Подтвердите новый пароль',
-    minLength: 'Минимум 6 символов',
+    minLength: 'Минимум {min} символов',
+    wrongPassword: 'Текущий пароль неверен.',
+    tooManyAttempts: 'Слишком много неверных попыток. Подождите 15 минут и попробуйте снова.',
+    changedSignIn: 'Пароль изменён. Войдите снова с новым паролем.',
   },
   editProfileModal: {
     title: 'Редактировать',
@@ -223,6 +226,8 @@ export const ru: Translations = {
     apiKey: 'Ключ Web API',
     signIn: 'Войти',
     error: 'Не удалось подключить аккаунт RetroAchievements. Попробуйте ещё раз.',
+    invalid: 'RetroAchievements не принял это имя пользователя и ключ. Проверьте оба и попробуйте снова.',
+    keyInUse: 'Этот API-ключ уже привязан к другому аккаунту здесь.',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -266,6 +271,7 @@ export const ru: Translations = {
     signingIn: 'Вход…',
     noAccountLead: 'Нет аккаунта?',
     noAccountAction: 'Зарегистрируйтесь',
+    tooManyAttempts: 'Слишком много неудачных попыток. Подождите 15 минут и попробуйте снова.',
   },
   passwordReset: {
     forgotLink: 'Забыли пароль?',
@@ -307,6 +313,7 @@ export const ru: Translations = {
     creating: 'Создание аккаунта…',
     alreadyHaveAccountLead: 'Уже есть аккаунт?',
     alreadyHaveAccountAction: 'Войти',
+    emailTaken: 'На этот адрес уже есть аккаунт. Войдите или восстановите пароль.',
   },
   categoryPage: {
     noWantToPlay: 'Ничего в вашем списке для этой консоли',

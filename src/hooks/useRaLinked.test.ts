@@ -9,16 +9,13 @@ const linked = (user: unknown) => {
   return renderHook(() => useRaLinked()).result.current
 }
 
-test('a username and a key means linked', () => {
-  expect(linked({ rausername: 'Ivan', raid: 'key' })).toBe(true)
+test('linked when the server says a username and a key are stored', () => {
+  expect(linked({ rausername: 'Ivan', raLinked: true })).toBe(true)
 })
 
-test('a username without a key is not linked — no call could succeed', () => {
+test('a username the server does not vouch for is not linked — no call could succeed', () => {
+  expect(linked({ rausername: 'Ivan', raLinked: false })).toBe(false)
   expect(linked({ rausername: 'Ivan' })).toBe(false)
-})
-
-test('a key without a username is not linked', () => {
-  expect(linked({ raid: 'key' })).toBe(false)
 })
 
 test('a Steam-only account is not linked', () => {

@@ -54,7 +54,7 @@ test('saves the Steam favourite under its own platform and refreshes the session
 
   fireEvent.click(screen.getByTestId('fav-modal'))
 
-  await waitFor(() => expect(update).toHaveBeenCalledWith({ favorite_steam_game: { id: 7, title: 'Picked', imageIcon: '/i.png' } }))
+  await waitFor(() => expect(update).toHaveBeenCalledWith())
   const [url, init] = (global.fetch as jest.Mock).mock.calls[0]
   expect(url).toBe('/api/updateFavoriteGame')
   expect(JSON.parse(init.body)).toMatchObject({ id: 7, source: 'steam' })
@@ -64,7 +64,7 @@ test('saving the RA favourite keeps the RA field', async () => {
   render(<UserPreferencesCard />)
   fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteRaGame) }))
   fireEvent.click(screen.getByTestId('fav-modal'))
-  await waitFor(() => expect(update).toHaveBeenCalledWith({ favorite_game: { id: 7, title: 'Picked', imageIcon: '/i.png' } }))
+  await waitFor(() => expect(update).toHaveBeenCalledWith())
 })
 
 test('a failed save does not touch the session', async () => {

@@ -117,7 +117,10 @@ export const ja: Translations = {
     current: '現在のパスワード',
     new: '新しいパスワード',
     confirm: '新しいパスワードを確認',
-    minLength: '最低6文字',
+    minLength: '最低{min}文字',
+    wrongPassword: '現在のパスワードが正しくありません。',
+    tooManyAttempts: '誤った試行が多すぎます。15分待ってからもう一度お試しください。',
+    changedSignIn: 'パスワードを変更しました。新しいパスワードで再度ログインしてください。',
   },
   editProfileModal: {
     title: '編集',
@@ -223,6 +226,8 @@ export const ja: Translations = {
     apiKey: 'Web APIキー',
     signIn: 'ログイン',
     error: 'RetroAchievementsアカウントを接続できませんでした。もう一度お試しください。',
+    invalid: 'RetroAchievementsがそのユーザー名とキーを受け付けませんでした。両方を確認してもう一度お試しください。',
+    keyInUse: 'そのAPIキーは既にここで別のアカウントにリンクされています。',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -266,6 +271,7 @@ export const ja: Translations = {
     signingIn: 'サインイン中…',
     noAccountLead: 'アカウントをお持ちでないですか?',
     noAccountAction: '新規登録',
+    tooManyAttempts: '失敗した試行が多すぎます。15分待ってからもう一度お試しください。',
   },
   passwordReset: {
     forgotLink: 'パスワードをお忘れですか?',
@@ -307,6 +313,7 @@ export const ja: Translations = {
     creating: 'アカウントを作成中…',
     alreadyHaveAccountLead: 'すでにアカウントをお持ちですか?',
     alreadyHaveAccountAction: 'サインイン',
+    emailTaken: 'このメールアドレスには既にアカウントがあります。ログインするか、パスワードを復元してください。',
   },
   categoryPage: {
     noWantToPlay: 'このコンソールのリストに何もありません',

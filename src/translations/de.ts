@@ -117,7 +117,10 @@ export const de: Translations = {
     current: 'Aktuelles Passwort',
     new: 'Neues Passwort',
     confirm: 'Neues Passwort bestätigen',
-    minLength: 'Mindestens 6 Zeichen',
+    minLength: 'Mindestens {min} Zeichen',
+    wrongPassword: 'Dein aktuelles Passwort ist falsch.',
+    tooManyAttempts: 'Zu viele falsche Versuche. Warte 15 Minuten und versuche es erneut.',
+    changedSignIn: 'Passwort geändert. Melde dich mit dem neuen erneut an.',
   },
   editProfileModal: {
     title: 'Bearbeiten',
@@ -223,6 +226,8 @@ export const de: Translations = {
     apiKey: 'Web-API-Schlüssel',
     signIn: 'Anmelden',
     error: 'Dein RetroAchievements-Konto konnte nicht verbunden werden. Versuche es erneut.',
+    invalid: 'RetroAchievements hat diesen Benutzernamen und Schlüssel nicht akzeptiert. Prüfe beides und versuche es erneut.',
+    keyInUse: 'Dieser API-Schlüssel ist hier bereits mit einem anderen Konto verknüpft.',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -266,6 +271,7 @@ export const de: Translations = {
     signingIn: 'Anmeldung läuft…',
     noAccountLead: 'Noch kein Konto?',
     noAccountAction: 'Registrieren',
+    tooManyAttempts: 'Zu viele fehlgeschlagene Versuche. Warte 15 Minuten und versuche es erneut.',
   },
   passwordReset: {
     forgotLink: 'Passwort vergessen?',
@@ -307,6 +313,7 @@ export const de: Translations = {
     creating: 'Konto wird erstellt…',
     alreadyHaveAccountLead: 'Schon ein Konto?',
     alreadyHaveAccountAction: 'Anmelden',
+    emailTaken: 'Für diese E-Mail gibt es bereits ein Konto. Melde dich an oder stelle dein Passwort wieder her.',
   },
   categoryPage: {
     noWantToPlay: 'Nichts auf deiner Liste für diese Konsole',

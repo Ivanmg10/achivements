@@ -5,6 +5,7 @@ import pool from '@/lib/db'
 import { verifyAssertion, extractSteamId, verifyState, configuredOrigin } from '@/lib/steamOpenId'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { getPlayerSummaries } from '@/lib/steamClient'
+import { forgetUser } from '@/lib/userRecord'
 
 /** Sends the user back to /user with a flag the UI turns into a message. */
 function back(origin: string, status: 'linked' | string) {
@@ -61,6 +62,7 @@ export async function GET(req: NextRequest) {
       'UPDATE users SET steamid = $1, steamusername = $2 WHERE id = $3',
       [steamId, personaName, session.user.id],
     )
+    forgetUser(session.user.id)
   } catch {
     return back(origin, 'error')
   }

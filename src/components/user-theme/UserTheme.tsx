@@ -33,7 +33,7 @@ export default function UserTheme() {
         body: JSON.stringify({ theme: id }),
       })
       if (!res.ok) throw new Error('Failed to update theme')
-      await update({ theme: id })
+      await update()
     } catch {
       setTheme(previous)
     }

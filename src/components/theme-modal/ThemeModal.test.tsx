@@ -24,7 +24,8 @@ test('saves the theme and closes', async () => {
   fireEvent.click(screen.getByRole('radio', { name: /Blue/ }))
   await waitFor(() => expect(onClose).toHaveBeenCalled())
   expect(setTheme).toHaveBeenCalledWith('blue')
-  expect(update).toHaveBeenCalledWith({ theme: 'blue' })
+  // The theme was saved first; update() only asks the server to re-read it.
+  expect(update).toHaveBeenCalledWith()
 })
 
 test('puts the old theme back and says so when saving fails', async () => {

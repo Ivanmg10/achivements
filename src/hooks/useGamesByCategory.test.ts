@@ -20,7 +20,7 @@ const completed = [
 beforeEach(() => {
   jest.clearAllMocks()
   ;(useGamesData as jest.Mock).mockReturnValue({ all: completed, isLoading: false })
-  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { rausername: 'Ivan', raid: 'key' } } })
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { rausername: 'Ivan', raLinked: true } } })
 })
 
 test('derives "playing" games from the shared context without fetching getGamesCompleted', async () => {

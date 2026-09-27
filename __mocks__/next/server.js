@@ -48,4 +48,13 @@ class NextResponse {
   }
 }
 
-module.exports = { NextRequest, NextResponse }
+/**
+ * Runs the task at once, as the real one does once the response is sent.
+ * Tests await after.pending to see its effects.
+ */
+function after(task) {
+  after.pending.push(Promise.resolve(typeof task === 'function' ? task() : task))
+}
+after.pending = []
+
+module.exports = { NextRequest, NextResponse, after }

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import type { Session } from 'next-auth'
 
 /** Where the Connect control points. A full page load, so it is a link, not JS. */
 export const STEAM_LINK_URL = '/api/steam/link'
@@ -70,7 +69,7 @@ export function useSteamLink() {
         const data = (await res.json()) as { steamid: string | null; steamusername: string | null }
         if (!data.steamid) throw new Error('Steam account was not stored')
 
-        const updated = await update({ steamid: data.steamid, steamusername: data.steamusername } as Partial<Session>)
+        const updated = await update()
         // update() resolves without throwing when it skips, so check the link landed.
         if (updated?.user?.steamid !== data.steamid) throw new Error('Session did not take the Steam link')
 
@@ -87,7 +86,7 @@ export function useSteamLink() {
     try {
       const res = await fetch('/api/steam/unlink', { method: 'POST' })
       if (!res.ok) throw new Error(`Failed to unlink Steam (${res.status})`)
-      const updated = await update({ steamid: null, steamusername: null } as Partial<Session>)
+      const updated = await update()
       // Same silent-skip risk as linking: the DB is cleared, make sure the session is too.
       if (!updated || updated.user?.steamid) throw new Error('Session still holds the Steam link')
       setStatus(null)

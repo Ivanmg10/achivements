@@ -1,6 +1,6 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
-import { consumeToken, createResetToken, hashToken, resetUrl, userForToken } from './passwordReset'
+import { claimToken, createResetToken, hashToken, resetUrl } from './passwordReset'
 import pool from '@/lib/db'
 
 const query = pool.query as jest.Mock
@@ -30,25 +30,24 @@ test('each token is different', async () => {
   expect(a).not.toBe(b)
 })
 
-test('a live token names its user; anything else does not', async () => {
+test('claiming a live token names its user; anything else does not', async () => {
   query.mockResolvedValueOnce({ rows: [{ user_id: 3 }] })
-  await expect(userForToken('abc')).resolves.toBe(3)
+  await expect(claimToken('abc')).resolves.toBe(3)
 
   query.mockResolvedValueOnce({ rows: [] })
-  await expect(userForToken('abc')).resolves.toBeNull()
+  await expect(claimToken('abc')).resolves.toBeNull()
 })
 
-test('the lookup rules out used and expired tokens', async () => {
-  await userForToken('abc')
-  const [sql] = query.mock.calls[0]
+test('claiming checks and spends the token in one statement, so a race cannot use it twice', async () => {
+  query.mockResolvedValueOnce({ rows: [] })
+  await claimToken('abc')
+  expect(query).toHaveBeenCalledTimes(1)
+  const [sql, params] = query.mock.calls[0]
+  expect(sql).toContain('SET used_at = NOW()')
   expect(sql).toContain('used_at IS NULL')
   expect(sql).toContain('expires_at > NOW()')
-})
-
-test('using a token marks it spent', async () => {
-  await consumeToken('abc')
-  expect(query.mock.calls[0][0]).toContain('SET used_at = NOW()')
-  expect(query.mock.calls[0][1]).toEqual([hashToken('abc')])
+  expect(sql).toContain('RETURNING user_id')
+  expect(params).toEqual([hashToken('abc')])
 })
 
 test('the link points at the reset page on this deployment', () => {

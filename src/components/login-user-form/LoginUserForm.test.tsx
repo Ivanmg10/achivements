@@ -96,3 +96,20 @@ test('a network failure is reported rather than leaving it spinning', async () =
   expect(await screen.findByRole('alert')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: new RegExp(en.loginForm.signIn, 'i') })).not.toBeDisabled()
 })
+
+test('a wrong password says so', async () => {
+  ;(signIn as jest.Mock).mockResolvedValue({ ok: false, error: 'CredentialsSignin' })
+  renderForm()
+  fill()
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(en.loginForm.signIn, 'i') }))
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.loginForm.invalidCredentials)
+  expect(mockPush).not.toHaveBeenCalled()
+})
+
+test('when the server has had too many failures, it says to wait instead of blaming the password', async () => {
+  ;(signIn as jest.Mock).mockResolvedValue({ ok: false, error: 'too-many-attempts' })
+  renderForm()
+  fill()
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(en.loginForm.signIn, 'i') }))
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.loginForm.tooManyAttempts)
+})

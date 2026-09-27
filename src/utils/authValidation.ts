@@ -5,7 +5,9 @@
  */
 export const USERNAME_MIN = 3
 export const USERNAME_MAX = 20
-export const PASSWORD_MIN = 6
+export const PASSWORD_MIN = 8
+/** bcrypt work factor for new hashes. Existing ones keep theirs until the password changes. */
+export const BCRYPT_COST = 12
 
 const USERNAME_SHAPE = /^[a-zA-Z0-9_]+$/
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/

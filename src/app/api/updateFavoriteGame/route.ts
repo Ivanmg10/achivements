@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
+import { forgetUser } from '@/lib/userRecord'
 import { isGameSource } from '@/utils/gameRef'
 import type { GameSource } from '@/types/steam'
 
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
 
     const value = JSON.stringify({ id, title, imageIcon: imageIcon ?? '' })
     await pool.query(`UPDATE users SET ${column} = $1 WHERE id = $2`, [value, session.user.id])
+    forgetUser(session.user.id)
 
     return NextResponse.json({ ok: true })
   } catch (err) {
@@ -52,6 +54,7 @@ export async function DELETE(req: NextRequest) {
     if (!column) return NextResponse.json({ error: 'source must be ra or steam' }, { status: 400 })
 
     await pool.query(`UPDATE users SET ${column} = NULL WHERE id = $1`, [session.user.id])
+    forgetUser(session.user.id)
 
     return NextResponse.json({ ok: true })
   } catch (err) {

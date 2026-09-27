@@ -10,8 +10,10 @@ import { useSession } from 'next-auth/react'
  *
  * A username without a key counts as not linked: no RA call can succeed
  * without the key, so showing RA data would only promise what it cannot fetch.
+ * The server works that out (raLinked = username && key) because the key
+ * itself never reaches the browser.
  */
 export function useRaLinked(): boolean {
   const { data: session } = useSession()
-  return Boolean(session?.user?.rausername && session?.user?.raid)
+  return session?.user?.raLinked === true
 }

@@ -115,7 +115,10 @@ export const en = {
     current: 'Current password',
     new: 'New password',
     confirm: 'Confirm new password',
-    minLength: 'Minimum 6 characters',
+    minLength: 'Minimum {min} characters',
+    wrongPassword: 'Your current password is incorrect.',
+    tooManyAttempts: 'Too many wrong attempts. Wait 15 minutes and try again.',
+    changedSignIn: 'Password changed. Sign in again with the new one.',
   },
   editProfileModal: {
     title: 'Edit',
@@ -221,6 +224,8 @@ export const en = {
     apiKey: 'Web API key',
     signIn: 'Sign in',
     error: 'Could not connect your RetroAchievements account. Try again.',
+    invalid: 'RetroAchievements did not accept that username and key. Check both and try again.',
+    keyInUse: 'That API key is already linked to another account here.',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -264,6 +269,7 @@ export const en = {
     signingIn: 'Signing in…',
     noAccountLead: 'Don’t have an account?',
     noAccountAction: 'Register',
+    tooManyAttempts: 'Too many failed attempts. Wait 15 minutes and try again.',
   },
   passwordReset: {
     forgotLink: 'Forgot your password?',
@@ -305,6 +311,7 @@ export const en = {
     creating: 'Creating account…',
     alreadyHaveAccountLead: 'Already have an account?',
     alreadyHaveAccountAction: 'Sign in',
+    emailTaken: 'That email already has an account. Sign in, or recover your password.',
   },
   categoryPage: {
     noWantToPlay: 'Nothing on your wishlist for this console',

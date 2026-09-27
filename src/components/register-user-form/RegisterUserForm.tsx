@@ -61,7 +61,7 @@ export default function RegisterUserForm({
 
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setError(data.error || T.registerForm.errorCreating)
+        setError(data.error === 'email-taken' ? T.registerForm.emailTaken : data.error || T.registerForm.errorCreating)
         setSubmitting(false)
         return
       }

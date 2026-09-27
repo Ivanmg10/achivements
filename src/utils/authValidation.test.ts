@@ -23,14 +23,14 @@ describe('checkUsername', () => {
 })
 
 describe('checkPassword', () => {
-  test('needs six characters', () => {
-    expect(checkPassword('secret')).toBeNull()
-    expect(checkPassword('12345')).toBe('shape')
+  test('needs eight characters', () => {
+    expect(checkPassword('secret12')).toBeNull()
+    expect(checkPassword('1234567')).toBe('shape')
     expect(checkPassword('')).toBe('empty')
   })
 
   test('accepts spaces as characters', () => {
-    expect(checkPassword('a b c ')).toBeNull()
+    expect(checkPassword('a b c d ')).toBeNull()
   })
 })
 

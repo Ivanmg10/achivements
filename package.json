@@ -1,6 +1,6 @@
 {
   "name": "cheevovault",
-  "version": "0.9.32",
+  "version": "0.9.33",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -14,17 +14,15 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@retroachievements/api": "^2.10.0",
     "@tabler/icons-react": "^3.38.0",
     "bcrypt": "^6.0.0",
     "framer-motion": "^12.38.0",
-    "next": "^16.1.6",
-    "next-auth": "^4.24.13",
+    "next": "^16.3.6",
+    "next-auth": "^4.24.15",
     "pg": "^8.19.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "recharts": "^3.8.1",
-    "use-debounce": "^10.1.0"
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
@@ -41,20 +39,13 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "autoprefixer": "^10.4.21",
     "babel-jest": "^30.3.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
-    "msw": "^2.13.6",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",
     "typescript": "^5"
-  },
-  "msw": {
-    "workerDirectory": [
-      "public"
-    ]
   }
 }

@@ -57,7 +57,7 @@ test('unlinkRaUser calls fetch and update', async () => {
   ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: true })
   await unlinkRaUser(update)
   expect(fetch).toHaveBeenCalledWith('/api/unlinkRaUser', expect.objectContaining({ method: 'POST' }))
-  expect(update).toHaveBeenCalledWith({ raUser: null })
+  expect(update).toHaveBeenCalledWith()
 })
 
 test('unlinkRaUser does not throw on error', async () => {

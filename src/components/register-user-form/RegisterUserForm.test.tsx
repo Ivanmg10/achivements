@@ -3,7 +3,7 @@ import RegisterUserForm from './RegisterUserForm'
 import { en } from '@/translations/en'
 
 const usernameRule = en.registerForm.usernameRule.replace('{min}', '3').replace('{max}', '20')
-const passwordRule = en.registerForm.passwordRule.replace('{min}', '6')
+const passwordRule = en.registerForm.passwordRule.replace('{min}', '8')
 
 function renderForm() {
   const setIsLogin = jest.fn()
@@ -12,7 +12,7 @@ function renderForm() {
   return { setIsLogin, setIsRegister }
 }
 
-function fill({ username = 'ivan', password = 'secret', email = 'ivan@test.com' } = {}) {
+function fill({ username = 'ivan', password = 'secret12', email = 'ivan@test.com' } = {}) {
   fireEvent.change(screen.getByLabelText(en.registerForm.username), { target: { value: username } })
   fireEvent.change(screen.getByLabelText(en.registerForm.password), { target: { value: password } })
   fireEvent.change(screen.getByLabelText(en.passwordReset.email), { target: { value: email } })
@@ -72,7 +72,7 @@ test('sends what the visitor typed, email included', async () => {
   expect(setIsRegister).toHaveBeenCalledWith(true)
   const [url, init] = (global.fetch as jest.Mock).mock.calls[0]
   expect(url).toBe('/api/users')
-  expect(JSON.parse(init.body)).toEqual({ username: 'ivan', password: 'secret', email: 'ivan@test.com' })
+  expect(JSON.parse(init.body)).toEqual({ username: 'ivan', password: 'secret12', email: 'ivan@test.com' })
 })
 
 test('while creating the account the button says so and cannot be pressed again', async () => {
@@ -115,4 +115,12 @@ test('an address that is not one never reaches the server', () => {
   submit()
   expect(screen.getByText(en.passwordReset.emailInvalid)).toBeInTheDocument()
   expect(global.fetch).not.toHaveBeenCalled()
+})
+
+test('an email that already has an account is explained in the visitor’s language', async () => {
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, json: () => Promise.resolve({ error: 'email-taken' }) })
+  renderForm()
+  fill()
+  submit()
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.registerForm.emailTaken)
 })

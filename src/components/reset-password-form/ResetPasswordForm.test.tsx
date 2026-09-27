@@ -30,18 +30,18 @@ test('a link without a token says so instead of showing a form', () => {
 
 test('sets the password and says it worked', async () => {
   withToken('tok')
-  fill('secret1')
+  fill('secret12')
   save()
 
   await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(en.passwordReset.done))
   const [url, init] = (global.fetch as jest.Mock).mock.calls[0]
   expect(url).toBe('/api/auth/resetPassword')
-  expect(JSON.parse(init.body)).toEqual({ token: 'tok', password: 'secret1' })
+  expect(JSON.parse(init.body)).toEqual({ token: 'tok', password: 'secret12' })
 })
 
 test('the two passwords have to match', () => {
   withToken('tok')
-  fill('secret1', 'secret2')
+  fill('secret12', 'secret13')
   save()
   expect(screen.getByText(en.passwordReset.mismatch)).toBeInTheDocument()
   expect(global.fetch).not.toHaveBeenCalled()
@@ -61,7 +61,7 @@ test('a spent or stale link is reported', async () => {
     json: () => Promise.resolve({ error: 'invalid-token' }),
   })
   withToken('tok')
-  fill('secret1')
+  fill('secret12')
   save()
   expect(await screen.findByRole('alert')).toHaveTextContent(en.passwordReset.invalidToken)
 })

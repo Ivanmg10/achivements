@@ -150,6 +150,23 @@ Other things to keep true:
 - Email verification does not exist yet. When it arrives it is meant to be soft:
   a banner for unverified addresses, never a blocked sign-in.
 
+## Sessions — read before touching auth
+
+- The session is rebuilt from the `users` row on every read (`jwt` callback in
+  `src/lib/authOptions.ts`, cached ~60 s per instance in `src/lib/userRecord.ts`).
+  **Never copy data from `update()`'s payload into the token**: the browser
+  controls it. To change a session field, save it in the DB, then call `update()`
+  with no arguments.
+- Changing the password (hash) ends every session, this one included. A deleted
+  user's session ends too.
+- The RA API key (`raid`) is server-only: `getServerSession(authOptions)` has it,
+  the browser's session (`authHandlerOptions`) does not. Client code uses `raLinked`.
+- Admin checks read the DB (`loadUser(id, { fresh: true })`), not the session.
+- Sign-in, current-password checks, sign-up and reset requests are rate limited
+  in the DB (`src/lib/attemptLimit.ts`). Password rules: `PASSWORD_MIN` and
+  `BCRYPT_COST` in `src/utils/authValidation.ts`.
+- Changing the email asks for the current password; it is the recovery address.
+
 ## Registration
 
 Public and open: anyone can sign up with a username, a password and an **email,

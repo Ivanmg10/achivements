@@ -25,26 +25,23 @@ export default function RaLoginModal({
     setError(null)
 
     try {
-      const profileRes = await fetch('/api/getUserProfile', {
+      // The server asks RA for the profile itself and stores what RA answers.
+      const res = await fetch('/api/updateRaUser', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, apiKey }),
       })
-      const user = await profileRes.json().catch(() => ({}))
-      // A wrong name or key comes back with RA's own message; show that, keep what was typed.
-      if (!profileRes.ok || user.message) {
-        setError(user.message ?? T.raLoginModal.error)
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        const byCode: Record<string, string> = {
+          'ra-invalid': T.raLoginModal.invalid,
+          'key-in-use': T.raLoginModal.keyInUse,
+        }
+        setError(byCode[data.error] ?? T.raLoginModal.error)
         return
       }
 
-      const saveRes = await fetch('/api/updateRaUser', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ raUser: user, apiKey }),
-      })
-      if (!saveRes.ok) throw new Error(`updateRaUser ${saveRes.status}`)
-
-      await update({ raUser: user, raidKey: apiKey } as Parameters<typeof update>[0])
+      await update()
 
       setUsername('')
       setApiKey('')

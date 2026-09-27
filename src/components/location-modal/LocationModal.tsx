@@ -39,7 +39,7 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
         setError(data.error ?? T.editProfileModal.errorGeneric)
         return
       }
-      await update({ location: code })
+      await update()
       setSearch('')
       onClose()
     } catch {

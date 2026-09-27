@@ -25,7 +25,6 @@ module.exports = {
     "!src/**/*.d.ts",
     "!src/types/**",
     "!src/**/*.css",
-    "!src/mocks/**",
   ],
   // ponytail: repo-wide coverage never actually reached 100% (most components sit at 0%,
   // pre-existing, unrelated to this branch). Threshold set as a floor at current real

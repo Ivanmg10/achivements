@@ -2,56 +2,44 @@ import { DefaultSession } from "next-auth";
 import { JWT as DefaultJWT } from "next-auth/jwt";
 import { RetroAchievementsUserProfile } from "./types";
 
+type SavedGame = { id: number; title: string; imageIcon: string } | null;
+
+/** What a session knows about its user. */
+type SessionUserFields = {
+  id: string;
+  theme?: string;
+  avatar?: string;
+  rausername?: string;
+  /**
+   * The user's RA Web API key. Server-side only: getServerSession(authOptions)
+   * has it, the session the browser receives (authHandlerOptions) does not.
+   */
+  raid?: string;
+  /** An RA username AND its API key are stored, so RA calls can be made. */
+  raLinked?: boolean;
+  steamid?: string;
+  steamusername?: string;
+  email?: string;
+  admin?: boolean;
+  raUser?: RetroAchievementsUserProfile | null;
+  location?: string | null;
+  favorite_game?: SavedGame;
+  favorite_steam_game?: SavedGame;
+};
+
 declare module "next-auth" {
   interface Session {
-    user: {
-      id: string;
-      theme?: string;
-      avatar?: string;
-      raid?: string;
-      rausername?: string;
-      steamid?: string;
-      steamusername?: string;
-      email?: string;
-      admin?: boolean;
-      raUser?: RetroAchievementsUserProfile | null;
-      location?: string | null;
-      favorite_game?: { id: number; title: string; imageIcon: string } | null;
-      favorite_steam_game?: { id: number; title: string; imageIcon: string } | null;
-    } & DefaultSession["user"];
+    user: SessionUserFields & DefaultSession["user"];
   }
 
-  interface User {
-    id: string;
-    theme?: string;
-    avatar?: string;
-    raid?: string;
-    rausername?: string;
-    steamid?: string;
-    steamusername?: string;
-    email?: string;
-    admin?: boolean;
-    raUser?: RetroAchievementsUserProfile | null;
-    location?: string | null;
-    favorite_game?: { id: number; title: string; imageIcon: string } | null;
-    favorite_steam_game?: { id: number; title: string; imageIcon: string } | null;
+  interface User extends SessionUserFields {
+    /** Fingerprint of the password hash the session was issued with; see passwordVersion(). */
+    pwv?: string;
   }
 }
 
 declare module "next-auth/jwt" {
-  interface JWT extends DefaultJWT {
-    id: string;
-    theme?: string;
-    avatar?: string;
-    raid?: string;
-    rausername?: string;
-    steamid?: string;
-    steamusername?: string;
-    admin?: boolean;
-    email?: string;
-    raUser?: RetroAchievementsUserProfile | null;
-    location?: string | null;
-    favorite_game?: { id: number; title: string; imageIcon: string } | null;
-    favorite_steam_game?: { id: number; title: string; imageIcon: string } | null;
+  interface JWT extends DefaultJWT, SessionUserFields {
+    pwv?: string;
   }
 }

@@ -41,12 +41,12 @@ export const getGamesInfoList = async (
 };
 
 export const unlinkRaUser = async (
-  update: (data: Partial<Session>) => Promise<Session | null>,
+  update: () => Promise<Session | null>,
 ) => {
   try {
     const res = await fetch('/api/unlinkRaUser', { method: 'POST' })
     if (!res.ok) throw new Error('Failed to unlink RA user')
-    await update({ raUser: null } as Partial<Session>)
+    await update()
   } catch (err) {
     console.error('[unlinkRaUser]', err)
   }

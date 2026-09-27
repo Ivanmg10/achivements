@@ -44,7 +44,7 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
         body: JSON.stringify({ theme: id }),
       })
       if (!res.ok) throw new Error(`updateTheme ${res.status}`)
-      await update({ theme: id })
+      await update()
       onClose()
     } catch (err) {
       // Not saved: put the old theme back rather than show one that will vanish on reload.

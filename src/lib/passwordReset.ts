@@ -24,19 +24,19 @@ export async function createResetToken(userId: number): Promise<string> {
   return token
 }
 
-/** The user a live token belongs to, or null when it is unknown, used or stale. */
-export async function userForToken(token: string): Promise<number | null> {
+/**
+ * Spends a live token and says whose it was, or null when it is unknown, used
+ * or stale. Checking and spending are one statement, so two requests racing
+ * with the same link cannot both get through.
+ */
+export async function claimToken(token: string): Promise<number | null> {
   const { rows } = await pool.query(
-    `SELECT user_id FROM password_resets
-      WHERE token_hash = $1 AND used_at IS NULL AND expires_at > NOW()`,
+    `UPDATE password_resets SET used_at = NOW()
+      WHERE token_hash = $1 AND used_at IS NULL AND expires_at > NOW()
+      RETURNING user_id`,
     [hashToken(token)],
   )
   return rows[0]?.user_id ?? null
-}
-
-/** Marks the token spent, so the same link cannot be used twice. */
-export async function consumeToken(token: string): Promise<void> {
-  await pool.query('UPDATE password_resets SET used_at = NOW() WHERE token_hash = $1', [hashToken(token)])
 }
 
 /** The link that goes in the email. */

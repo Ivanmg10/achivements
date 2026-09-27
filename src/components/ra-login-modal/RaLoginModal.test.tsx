@@ -59,30 +59,31 @@ function submit(apiKey = 'apikey123') {
   fireEvent.click(screen.getByText('Sign in'))
 }
 
-test('shows RA’s message inline when the name or key is wrong, and stays open', async () => {
-  ;(fetch as jest.Mock).mockResolvedValueOnce({
-    ok: true,
-    json: () => Promise.resolve({ message: 'Invalid credentials' }),
-  })
-  const setIsOpen = jest.fn()
-  render(<RaLoginModal isOpen={true} setIsOpen={setIsOpen} />)
-  submit('badkey')
-  expect(await screen.findByRole('alert')).toHaveTextContent('Invalid credentials')
-  expect(setIsOpen).not.toHaveBeenCalled()
-  expect(screen.getByText('Sign in')).toBeInTheDocument()
-})
-
-test('says it failed when saving the account is refused', async () => {
-  jest.spyOn(console, 'error').mockImplementation(() => {})
-  ;(fetch as jest.Mock)
-    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ User: 'ivan' }) })
-    .mockResolvedValueOnce({ ok: false, status: 500 })
+test('sends only the username and key, to the route that asks RA itself, then re-reads the session', async () => {
   const setIsOpen = jest.fn()
   render(<RaLoginModal isOpen={true} setIsOpen={setIsOpen} />)
   submit()
-  expect(await screen.findByRole('alert')).toHaveTextContent(en.raLoginModal.error)
-  expect(mockUpdate).not.toHaveBeenCalled()
+  await waitFor(() => expect(setIsOpen).toHaveBeenCalledWith(false))
+  expect(fetch).toHaveBeenCalledTimes(1)
+  const [url, init] = (fetch as jest.Mock).mock.calls[0]
+  expect(url).toBe('/api/updateRaUser')
+  expect(JSON.parse(init.body)).toEqual({ username: 'ivan', apiKey: 'apikey123' })
+  expect(mockUpdate).toHaveBeenCalledWith()
+})
+
+test.each([
+  ['ra-invalid', en.raLoginModal.invalid],
+  ['key-in-use', en.raLoginModal.keyInUse],
+  ['something-else', en.raLoginModal.error],
+])('a %s answer is explained inline and the modal stays open', async (code, message) => {
+  ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: false, json: () => Promise.resolve({ error: code }) })
+  const setIsOpen = jest.fn()
+  render(<RaLoginModal isOpen={true} setIsOpen={setIsOpen} />)
+  submit('badkey')
+  expect(await screen.findByRole('alert')).toHaveTextContent(message)
   expect(setIsOpen).not.toHaveBeenCalled()
+  expect(mockUpdate).not.toHaveBeenCalled()
+  expect(screen.getByText('Sign in')).toBeInTheDocument()
 })
 
 test('says it failed when the network is down, and the button comes back', async () => {

@@ -56,7 +56,7 @@ export default function UserPreferencesCard() {
 
   async function handleSave(source: GameSource, game: FavoriteGame | null) {
     await saveFavorite(source, game)
-    await update(source === 'ra' ? { favorite_game: game } : { favorite_steam_game: game })
+    await update()
   }
 
   return (

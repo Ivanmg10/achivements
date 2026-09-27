@@ -3,11 +3,18 @@ import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import bcrypt from 'bcrypt'
 import { authOptions } from '@/lib/authOptions'
+import { forgetUser, loadUser } from '@/lib/userRecord'
+import { BCRYPT_COST, PASSWORD_MIN } from '@/utils/authValidation'
 
+/**
+ * Asks the database, not the session: a session is re-read about once a
+ * minute, and an admin who has just been demoted must lose access now.
+ */
 async function requireAdmin() {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) return null
-  if (!session.user.admin) return null
+  const row = await loadUser(session.user.id, { fresh: true })
+  if (row?.admin !== true) return null
   return session
 }
 
@@ -17,8 +24,7 @@ function isValidEmail(email: string) {
 
 function isValidUrl(url: string) {
   try {
-    const p = new URL(url)
-    return p.protocol === 'http:' || p.protocol === 'https:'
+    return new URL(url).protocol === 'https:'
   } catch {
     return false
   }
@@ -56,19 +62,25 @@ export async function POST(req: Request) {
     if (username.length < 3 || username.length > 20 || !/^[a-zA-Z0-9_]+$/.test(username)) {
       return NextResponse.json({ error: 'Username: 3–20 chars, letters/numbers/underscore' }, { status: 400 })
     }
-    if (password.length < 6) {
-      return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 })
+    if (typeof password !== 'string' || password.length < PASSWORD_MIN) {
+      return NextResponse.json({ error: `Password must be at least ${PASSWORD_MIN} characters` }, { status: 400 })
     }
     if (email && !isValidEmail(email)) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
     }
 
-    const existing = await pool.query('SELECT id FROM users WHERE username = $1', [username])
+    const existing = await pool.query('SELECT id FROM users WHERE LOWER(username) = LOWER($1)', [username])
     if (existing.rows.length > 0) {
       return NextResponse.json({ error: 'Username already taken' }, { status: 409 })
     }
+    if (email) {
+      const taken = await pool.query('SELECT id FROM users WHERE LOWER(email) = LOWER($1)', [email])
+      if (taken.rows.length > 0) {
+        return NextResponse.json({ error: 'Email already in use' }, { status: 409 })
+      }
+    }
 
-    const hashed = await bcrypt.hash(password, 10)
+    const hashed = await bcrypt.hash(password, BCRYPT_COST)
     const result = await pool.query(
       `INSERT INTO users (username, email, password, theme, admin)
        VALUES ($1, $2, $3, 'dark', $4)
@@ -115,7 +127,7 @@ export async function PATCH(req: Request) {
       if (typeof value !== 'string' || value.length < 3 || value.length > 20 || !/^[a-zA-Z0-9_]+$/.test(value)) {
         return NextResponse.json({ error: 'Username: 3–20 chars, letters/numbers/underscore' }, { status: 400 })
       }
-      const existing = await pool.query('SELECT id FROM users WHERE username = $1 AND id != $2', [value, id])
+      const existing = await pool.query('SELECT id FROM users WHERE LOWER(username) = LOWER($1) AND id != $2', [value, id])
       if (existing.rows.length > 0) {
         return NextResponse.json({ error: 'Username already taken' }, { status: 409 })
       }
@@ -125,11 +137,17 @@ export async function PATCH(req: Request) {
       if (value !== null && (typeof value !== 'string' || !isValidEmail(value))) {
         return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
       }
+      if (value !== null) {
+        const taken = await pool.query('SELECT id FROM users WHERE LOWER(email) = LOWER($1) AND id != $2', [value, id])
+        if (taken.rows.length > 0) {
+          return NextResponse.json({ error: 'Email already in use' }, { status: 409 })
+        }
+      }
     }
 
     if (field === 'avatar') {
       if (value !== null && (typeof value !== 'string' || !isValidUrl(value))) {
-        return NextResponse.json({ error: 'Avatar must be a valid http(s) URL' }, { status: 400 })
+        return NextResponse.json({ error: 'Avatar must be a valid https URL' }, { status: 400 })
       }
     }
 
@@ -147,6 +165,7 @@ export async function PATCH(req: Request) {
     }
 
     await pool.query(`UPDATE users SET "${field}" = $1 WHERE id = $2`, [value, id])
+    forgetUser(id)
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[admin/users PATCH]', err)
@@ -170,6 +189,7 @@ export async function DELETE(req: Request) {
 
     const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id', [id])
     if (!result.rows.length) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    forgetUser(id)
 
     return NextResponse.json({ ok: true })
   } catch (err) {

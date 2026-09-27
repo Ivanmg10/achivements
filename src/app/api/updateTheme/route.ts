@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import { authOptions } from "@/lib/authOptions";
+import { forgetUser } from "@/lib/userRecord";
 
 export async function POST(req: Request) {
   try {
@@ -20,6 +21,7 @@ export async function POST(req: Request) {
       session.user.id,
     ]);
 
+    forgetUser(session.user.id);
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('[updateTheme POST]', err)

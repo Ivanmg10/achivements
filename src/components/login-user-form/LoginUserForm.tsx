@@ -43,7 +43,7 @@ export default function LoginUserForm({
       })
 
       if (!result?.ok) {
-        setError(T.loginForm.invalidCredentials)
+        setError(result?.error === 'too-many-attempts' ? T.loginForm.tooManyAttempts : T.loginForm.invalidCredentials)
         setSubmitting(false)
         return
       }

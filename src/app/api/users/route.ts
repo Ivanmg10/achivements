@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 import bcrypt from "bcrypt";
 import { allowAttempt, clientAddress } from "@/lib/attemptLimit";
+import { BCRYPT_COST, PASSWORD_MIN } from "@/utils/authValidation";
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
       email?: string;
     };
 
-    if (!username || !password) {
+    if (typeof username !== "string" || typeof password !== "string" || !username || !password) {
       return NextResponse.json(
         { error: "username y password son obligatorios" },
         { status: 400 },
@@ -38,9 +39,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (password.length < 6) {
+    if (password.length < PASSWORD_MIN) {
       return NextResponse.json(
-        { error: "La contraseña debe tener al menos 6 caracteres" },
+        { error: `La contraseña debe tener al menos ${PASSWORD_MIN} caracteres` },
         { status: 400 },
       );
     }
@@ -51,12 +52,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Correo no válido" }, { status: 400 });
     }
 
-    const existing = await pool.query("SELECT id FROM users WHERE username = $1", [username]);
+    // Case-insensitive, so nobody can sign up as "Ivan" next to "ivan".
+    const existing = await pool.query("SELECT id FROM users WHERE LOWER(username) = LOWER($1)", [username]);
     if (existing.rows.length > 0) {
       return NextResponse.json({ error: "Username ya en uso" }, { status: 409 });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // One account per address: recovery mails the address, so two accounts on
+    // it would leave the reset link going to whichever one the query found first.
+    const emailTaken = await pool.query("SELECT id FROM users WHERE LOWER(email) = LOWER($1)", [trimmedEmail]);
+    if (emailTaken.rows.length > 0) {
+      return NextResponse.json({ error: "email-taken" }, { status: 409 });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_COST);
 
     const result = await pool.query(
       `INSERT INTO users (username, password, email, theme)
