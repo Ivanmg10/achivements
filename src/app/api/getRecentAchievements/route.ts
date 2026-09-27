@@ -42,7 +42,7 @@ export async function GET() {
         const raw = await getUserRecentAchievements(rausername, raid, 20160, 500)
         return normalizeRaw(raw)
       },
-      (d) => Array.isArray(d) && (d as unknown[]).length > 0,
+      (d) => Array.isArray(d),
     )
     return cachedJson(data, TTL)
   } catch {

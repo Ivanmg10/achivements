@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       `gameList_v1:${consoleId}`,
       TTL,
       () => getGameList(consoleId, raid),
-      (d) => Array.isArray(d) && d.length > 0,
+      (d) => Array.isArray(d),
     )
 
     if (!Array.isArray(raw)) return NextResponse.json([], { status: 200 })

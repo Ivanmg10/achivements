@@ -37,6 +37,14 @@ if (typeof setInterval !== 'undefined') {
   sweepTimer.unref?.()
 }
 
+/**
+ * `shouldCache` is a validity check, and failing it throws RA_VALIDATION_FAILED
+ * — which every caller turns into a 503. So it must only ask whether the
+ * response has the SHAPE it should, never whether it has anything in it: an
+ * empty list is a real answer (no achievements in the window, a game with no
+ * subsets, a user who has finished nothing) and answering 503 to it told the
+ * UI that RA was down and kept it retrying forever.
+ */
 export async function withCache<T>(
   key: string,
   ttlMs: number,
