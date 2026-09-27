@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
 import { RecentAchievement, UserAward } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import { achievementBadgeUrl } from '@/utils/utils'
+import { gameHref } from '@/utils/gameRef'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import StreakCompletionCard from '../streak-completion-card/StreakCompletionCard'
 
@@ -50,27 +52,32 @@ export default function StreakDayRow({ date, achievements, awards = [] }: Props)
       )}
 
       <div className="flex flex-wrap gap-1.5">
-        {visible.map((ach) => (
-          <Link
-            key={ach.AchievementID}
-            href={`/gameInfo/${ach.GameID}`}
-            aria-label={`${ach.Title} — ${ach.GameTitle}`}
-            className={`relative rounded-lg overflow-hidden shrink-0 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${ach.HardcoreMode === '1' ? 'ring-2 ring-yellow-400/70' : ''}`}
-          >
-            {ach.BadgeName ? (
-              <Image
-                src={`https://media.retroachievements.org/Badge/${ach.BadgeName}.png`}
-                alt={ach.Title}
-                width={40}
-                height={40}
-                className="w-10 h-10 object-cover"
-                unoptimized
-              />
-            ) : (
-              <div className="w-10 h-10 bg-bg-main rounded-lg" />
-            )}
-          </Link>
-        ))}
+        {visible.map((ach) => {
+          const badge = achievementBadgeUrl(ach)
+          return (
+            <Link
+              // A Steam unlock has no id of its own, so its number is only
+              // unique within its own list — the source has to be in the key.
+              key={`${ach.Source ?? 'ra'}:${ach.GameID}:${ach.AchievementID}`}
+              href={gameHref(ach.Source ?? 'ra', ach.GameID)}
+              aria-label={`${ach.Title} — ${ach.GameTitle}`}
+              className={`relative rounded-lg overflow-hidden shrink-0 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${ach.HardcoreMode === '1' ? 'ring-2 ring-yellow-400/70' : ''}`}
+            >
+              {badge ? (
+                <Image
+                  src={badge}
+                  alt={ach.Title}
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 object-cover"
+                  unoptimized
+                />
+              ) : (
+                <div className="w-10 h-10 bg-bg-main rounded-lg" />
+              )}
+            </Link>
+          )
+        })}
 
         {overflow > 0 && (
           <button

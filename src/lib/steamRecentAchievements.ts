@@ -101,24 +101,31 @@ export async function loadRecentAchievements(
 
 /**
  * Every unlock of the last `days` days, newest first — what the main page's
- * activity heatmap, daily chart and most-active games need for Steam.
+ * activity heatmap, daily chart and most-active games need for Steam, and what
+ * the streak needs over a year.
  *
  * "Recently played" only covers two weeks, so the games come from the library
  * instead: those with stats last played inside the window, the most recent
- * `ACTIVITY_GAMES_MAX` of them.
+ * `maxGames` of them.
+ *
+ * ponytail: the cap is the ceiling — each game costs one unlock-list call, so a
+ * player with more games than that in the window loses the least recently
+ * played ones. Raise it, or keep a table of unlocks as they are seen, if that
+ * starts mattering.
  */
 export async function loadActivityAchievements(
   auth: SteamAuth,
   lang: string,
   days = 60,
   now = Date.now(),
+  maxGames = ACTIVITY_GAMES_MAX,
 ): Promise<SteamRecentAchievement[]> {
   const cutoff = Math.floor(now / 1000) - days * 86_400
   const owned = (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse
   const games = (owned?.response?.games ?? [])
     .filter((g) => g.has_community_visible_stats && (g.rtime_last_played ?? 0) >= cutoff)
     .sort((a, b) => (b.rtime_last_played ?? 0) - (a.rtime_last_played ?? 0))
-    .slice(0, ACTIVITY_GAMES_MAX)
+    .slice(0, maxGames)
 
   const inWindow = (await unlocksOf(auth, games))
     .filter((u) => u.unlocktime >= cutoff)

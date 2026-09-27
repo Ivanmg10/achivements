@@ -18,6 +18,12 @@ export const TTL = {
   profile: 15 * 60 * 1000,
   ownedGames: 60 * 60 * 1000,
   recentlyPlayed: 5 * 60 * 1000,
+  /**
+   * A year of unlocks, for the streak. Long because a cold scan costs one call
+   * per game played in the year; short enough that today's unlock shows up
+   * while the day it belongs to is still today.
+   */
+  unlockYear: 30 * 60 * 1000,
   achievements: 60 * 60 * 1000,
   /** Achievement definitions change only when a developer ships an update. */
   schema: 24 * 60 * 60 * 1000,

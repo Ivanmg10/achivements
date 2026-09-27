@@ -4,13 +4,22 @@ import { useLanguage } from '@/context/LanguageContext'
 import { toSteamLanguage } from '@/utils/steamLanguage'
 import type { SteamRecentAchievement } from '@/types/steam'
 
+const ENDPOINTS = {
+  recent: 'recentAchievements',
+  activity: 'activity',
+  year: 'unlockYear',
+} as const
+
+export type SteamUnlockScope = keyof typeof ENDPOINTS
+
 /**
  * The player's Steam unlocks, in the app language: the latest few across recent
- * games (`recent`, for the profile column), or every unlock of the last 60 days
- * (`activity`, for the main page's activity charts). `null` loads nothing.
+ * games (`recent`, for the profile column), every unlock of the last 60 days
+ * (`activity`, for the main page's activity charts), or of the last year
+ * (`year`, for the streak). `null` loads nothing.
  */
-export function useSteamRecentAchievements(scope: 'recent' | 'activity' | null = 'recent') {
-  const endpoint = scope === 'activity' ? 'activity' : scope === 'recent' ? 'recentAchievements' : null
+export function useSteamRecentAchievements(scope: SteamUnlockScope | null = 'recent') {
+  const endpoint = scope ? ENDPOINTS[scope] : null
   const { data: session } = useSession()
   const steamid = session?.user?.steamid ?? null
   const { lang } = useLanguage()
