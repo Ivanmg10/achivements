@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
-import { verifyAssertion, extractSteamId, verifyState, configuredOrigin } from '@/lib/steamOpenId'
+import { verifyAssertion, extractSteamId, verifyState, siteOrigin } from '@/lib/steamOpenId'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { forgetUser } from '@/lib/userRecord'
@@ -28,7 +28,7 @@ async function fetchPersonaName(steamId: string): Promise<string | null> {
 }
 
 export async function GET(req: NextRequest) {
-  const origin = configuredOrigin()
+  const origin = siteOrigin(req.url)
   if (!origin) {
     return NextResponse.json({ message: 'NEXTAUTH_URL is not configured' }, { status: 503 })
   }

@@ -123,3 +123,30 @@ export function configuredOrigin(): string | null {
     return null
   }
 }
+
+/** Hosts Vercel itself assigns to this deployment: its own URL, its branch alias, production. */
+const VERCEL_HOST_VARS = ['VERCEL_URL', 'VERCEL_BRANCH_URL', 'VERCEL_PROJECT_PRODUCTION_URL'] as const
+
+/**
+ * The origin to send Steam back to: the one the visitor is on, when it is one
+ * of this project's own (NEXTAUTH_URL, or a host Vercel assigned), otherwise
+ * NEXTAUTH_URL. The link has to come back to the same host it left from — the
+ * session cookie belongs to that host, and on a preview deployment NEXTAUTH_URL
+ * points at production, which may not even have these routes. A Host header
+ * that is not on the list is never used, so it cannot aim the redirect elsewhere.
+ */
+export function siteOrigin(requestUrl: string): string | null {
+  const configured = configuredOrigin()
+  let origin: string
+  try {
+    origin = new URL(requestUrl).origin
+  } catch {
+    return configured
+  }
+  const trusted = new Set<string>(configured ? [configured] : [])
+  for (const name of VERCEL_HOST_VARS) {
+    const host = process.env[name]?.trim()
+    if (host) trusted.add(`https://${host}`)
+  }
+  return trusted.has(origin) ? origin : configured
+}
