@@ -129,8 +129,11 @@ this reminder on purpose, because it is easy to forget.
 - [x] Email verification decided: shipped, soft. A banner on the account page
       for an unconfirmed address, with a resend button. Nothing is ever
       blocked — not sign-in, not a feature. See Email below.
-- [ ] `migrations/011_drop_sourceless_game_keys.sql` run, once the Steam work
-      has been deployed for a while.
+- [x] `migrations/011_drop_sourceless_game_keys.sql` run (2026-09-28). The
+      sourceless unique keys are gone, so an RA game and a Steam app with the
+      same number can both be pinned and both sit in one group. Code older
+      than the Steam work can no longer pin against this database: its
+      `ON CONFLICT (…, game_id)` has no constraint left to name.
 
 ## Email — read before touching anything that sends one
 
