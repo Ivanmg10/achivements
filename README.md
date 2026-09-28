@@ -187,16 +187,21 @@ single-use token, reset page.
 
 **To reach everyone:**
 
-1. Verify a domain (or a subdomain, e.g. `mail.yourdomain.com`) in Resend and add
-   the DNS records it asks for.
+The domain is `cheevovault.com`, bought on 2026-09-28. Owning it is not the
+same as Resend being allowed to send from it, which is what the steps below do.
+
+1. Verify `cheevovault.com` (or a subdomain, e.g. `mail.cheevovault.com`) in
+   Resend and add the DNS records it asks for. They are Resend's own records —
+   separate from whatever points the domain at Vercel.
 2. Set both variables and redeploy:
 
    ```
    RESEND_API_KEY=re_xxxxxxxx
-   EMAIL_FROM=CheevoVault <no-reply@yourdomain.com>
+   EMAIL_FROM=CheevoVault <no-reply@cheevovault.com>
    ```
 
-3. Make sure `NEXTAUTH_URL` is the public URL — the reset link is built from it.
+3. Make sure `NEXTAUTH_URL` is `https://cheevovault.com` — the reset link is
+   built from it, and a stale value sends people to localhost.
 
 No code change is needed; the sender is read from the environment.
 

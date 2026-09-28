@@ -115,12 +115,14 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 release, or 'going live' while any of these is still open.** They asked for
 this reminder on purpose, because it is easy to forget.
 
-- [ ] **A domain verified in Resend, with `EMAIL_FROM` set on it.** Until then
-      password recovery only reaches the Resend account owner, so every other
-      user is one forgotten password away from losing their account. This is
-      the blocker: a public site with no working recovery is not 1.0.
-- [ ] `NEXTAUTH_URL` set to the public URL in Vercel — reset links are built
-      from it, and a wrong value sends people to localhost.
+- [ ] **`cheevovault.com` verified in Resend, with `EMAIL_FROM` set on it.**
+      The domain was bought on 2026-09-28; owning it is not the same as Resend
+      being allowed to send from it. Until it is verified, password recovery
+      only reaches the Resend account owner, so every other user is one
+      forgotten password away from losing their account. This is the blocker:
+      a public site with no working recovery is not 1.0.
+- [ ] `NEXTAUTH_URL` set to `https://cheevovault.com` in Vercel — reset links
+      are built from it, and a wrong value sends people to localhost.
 - [ ] Email verification decided: ship it (soft, a banner and nothing blocked)
       or write down that it is deliberately left out.
 - [ ] `migrations/011_drop_sourceless_game_keys.sql` run, once the Steam work
@@ -135,7 +137,8 @@ How far it reaches depends only on the environment:
   returns `503 { error: 'email-not-configured' }`, and the UI tells the user plainly.
   **Do not "fix" this by pretending the mail was sent.**
 - **Key only** → sends from Resend's shared address, which delivers **only to the
-  Resend account owner**. That is the state while the project has no domain.
+  Resend account owner**. That is the state until `cheevovault.com` is verified
+  in Resend, which is DNS and dashboard work, not code.
 - **Key + `EMAIL_FROM` on a verified domain** → reaches everyone. Configuration
   only; no code change.
 
