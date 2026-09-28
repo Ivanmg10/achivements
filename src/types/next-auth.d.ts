@@ -20,6 +20,8 @@ type SessionUserFields = {
   steamid?: string;
   steamusername?: string;
   email?: string;
+  /** The address has been confirmed. False blocks nothing — it only shows a banner. */
+  emailVerified?: boolean;
   admin?: boolean;
   raUser?: RetroAchievementsUserProfile | null;
   location?: string | null;

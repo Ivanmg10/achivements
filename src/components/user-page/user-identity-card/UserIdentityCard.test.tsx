@@ -13,7 +13,7 @@ jest.mock('@/components/edit-profile-modal/EditProfileModal', () => ({
   default: ({ field }: { field: string }) => <div data-testid="edit-modal">{field}</div>,
 }))
 
-const USER = { id: '3', name: 'ivanxmarine', email: 'a@b.c', location: 'ES', rausername: 'Ivan', avatar: 'https://x/a.png' }
+const USER = { id: '3', name: 'ivanxmarine', email: 'a@b.c', emailVerified: true, location: 'ES', rausername: 'Ivan', avatar: 'https://x/a.png' }
 
 function setUser(user: Record<string, unknown> = USER) {
   ;(useSession as jest.Mock).mockReturnValue({ data: { user }, update: jest.fn() })
@@ -71,7 +71,16 @@ test('an account with no email is told why that matters', () => {
   expect(screen.getByTestId('edit-modal')).toHaveTextContent('email')
 })
 
-test('no warning once an address is set', () => {
+test('no warning once an address is set and confirmed', () => {
   render(<UserIdentityCard />)
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+})
+
+test('an address nobody has confirmed is flagged, without blocking anything', () => {
+  setUser({ ...USER, emailVerified: false })
+  render(<UserIdentityCard />)
+
+  expect(screen.getByRole('alert')).toHaveTextContent(en.passwordReset.verifyTitle)
+  // The card itself still works: a notice, not a gate.
+  expect(screen.getByRole('button', { name: en.userData.changePassword })).toBeInTheDocument()
 })

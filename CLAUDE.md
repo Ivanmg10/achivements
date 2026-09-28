@@ -115,16 +115,25 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 release, or 'going live' while any of these is still open.** They asked for
 this reminder on purpose, because it is easy to forget.
 
-- [ ] **A domain verified in Resend, with `EMAIL_FROM` set on it.** Until then
-      password recovery only reaches the Resend account owner, so every other
-      user is one forgotten password away from losing their account. This is
-      the blocker: a public site with no working recovery is not 1.0.
-- [ ] `NEXTAUTH_URL` set to the public URL in Vercel — reset links are built
-      from it, and a wrong value sends people to localhost.
-- [ ] Email verification decided: ship it (soft, a banner and nothing blocked)
-      or write down that it is deliberately left out.
-- [ ] `migrations/011_drop_sourceless_game_keys.sql` run, once the Steam work
-      has been deployed for a while.
+- [ ] **`cheevovault.com` verified in Resend, with `EMAIL_FROM` set on it.**
+      The domain was bought on 2026-09-28; owning it is not the same as Resend
+      being allowed to send from it. Until it is verified, password recovery
+      only reaches the Resend account owner, so every other user is one
+      forgotten password away from losing their account. This is the blocker:
+      a public site with no working recovery is not 1.0.
+- [ ] `NEXTAUTH_URL` set to `https://www.cheevovault.com` in Vercel. **www, not
+      the apex**: the apex 308-redirects to www, so that is the host visitors
+      are on. Reset links are built from it, NextAuth compares it against the
+      real host when signing in, and Steam's return_to has to come back to the
+      same host the session cookie belongs to.
+- [x] Email verification decided: shipped, soft. A banner on the account page
+      for an unconfirmed address, with a resend button. Nothing is ever
+      blocked — not sign-in, not a feature. See Email below.
+- [x] `migrations/011_drop_sourceless_game_keys.sql` run (2026-09-28). The
+      sourceless unique keys are gone, so an RA game and a Steam app with the
+      same number can both be pinned and both sit in one group. Code older
+      than the Steam work can no longer pin against this database: its
+      `ON CONFLICT (…, game_id)` has no constraint left to name.
 
 ## Email — read before touching anything that sends one
 
@@ -135,7 +144,8 @@ How far it reaches depends only on the environment:
   returns `503 { error: 'email-not-configured' }`, and the UI tells the user plainly.
   **Do not "fix" this by pretending the mail was sent.**
 - **Key only** → sends from Resend's shared address, which delivers **only to the
-  Resend account owner**. That is the state while the project has no domain.
+  Resend account owner**. That is the state until `cheevovault.com` is verified
+  in Resend, which is DNS and dashboard work, not code.
 - **Key + `EMAIL_FROM` on a verified domain** → reaches everyone. Configuration
   only; no code change.
 
@@ -147,8 +157,26 @@ Other things to keep true:
 - `/api/auth/forgotPassword` answers the same whether or not the address has an
   account. Keep it that way: it is what stops the endpoint being used to find users.
 - Never add a second mail provider or an SMTP fallback without asking.
-- Email verification does not exist yet. When it arrives it is meant to be soft:
-  a banner for unverified addresses, never a blocked sign-in.
+
+### Email verification (soft, and it stays soft)
+
+A link goes out on sign-up and can be resent from the account page. Following
+it sets `users.email_verified_at` (`migrations/017_email_verification.sql`).
+
+- **Nothing is ever gated on it.** Sign-in, RA, Steam, groups — all work with an
+  unconfirmed address. The only effect is a banner
+  (`email-verification-notice/EmailVerificationNotice.tsx`). Do not add a check
+  that blocks a feature on `emailVerified` without asking: the point of the
+  address is recovery, and locking someone out of an achievement tracker over a
+  mail that landed in spam costs more than it saves.
+- Tokens are **signed, not stored** (`src/lib/emailVerification.ts`): verifying
+  is idempotent, so there is nothing to spend. They last a week, and carry the
+  address, so a link dies when the account's email changes.
+- `POST /api/auth/resendVerification` mails the address **on the account**,
+  never one from the request body, and is rate limited like the reset flow.
+- The session exposes `emailVerified`; the column is read in
+  `src/lib/userRecord.ts`, so it follows the same fresh-from-the-row rule as
+  everything else in Sessions.
 
 ## Sessions — read before touching auth
 

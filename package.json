@@ -1,6 +1,6 @@
 {
   "name": "cheevovault",
-  "version": "0.9.40",
+  "version": "0.9.46",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -15,6 +15,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@tabler/icons-react": "^3.38.0",
+    "@vercel/analytics": "^2.0.1",
     "bcrypt": "^6.0.0",
     "framer-motion": "^12.38.0",
     "next": "^16.3.6",
