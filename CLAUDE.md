@@ -121,8 +121,11 @@ this reminder on purpose, because it is easy to forget.
       only reaches the Resend account owner, so every other user is one
       forgotten password away from losing their account. This is the blocker:
       a public site with no working recovery is not 1.0.
-- [ ] `NEXTAUTH_URL` set to `https://cheevovault.com` in Vercel — reset links
-      are built from it, and a wrong value sends people to localhost.
+- [ ] `NEXTAUTH_URL` set to `https://www.cheevovault.com` in Vercel. **www, not
+      the apex**: the apex 308-redirects to www, so that is the host visitors
+      are on. Reset links are built from it, NextAuth compares it against the
+      real host when signing in, and Steam's return_to has to come back to the
+      same host the session cookie belongs to.
 - [ ] Email verification decided: ship it (soft, a banner and nothing blocked)
       or write down that it is deliberately left out.
 - [ ] `migrations/011_drop_sourceless_game_keys.sql` run, once the Steam work

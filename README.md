@@ -200,8 +200,8 @@ same as Resend being allowed to send from it, which is what the steps below do.
    EMAIL_FROM=CheevoVault <no-reply@cheevovault.com>
    ```
 
-3. Make sure `NEXTAUTH_URL` is `https://cheevovault.com` — the reset link is
-   built from it, and a stale value sends people to localhost.
+3. Make sure `NEXTAUTH_URL` is `https://www.cheevovault.com` — the reset link
+   is built from it, and a stale value sends people to localhost.
 
 No code change is needed; the sender is read from the environment.
 
