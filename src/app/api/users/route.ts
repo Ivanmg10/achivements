@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import pool from "@/lib/db";
 import bcrypt from "bcrypt";
 import { allowAttempt, clientAddress } from "@/lib/attemptLimit";
 import { BCRYPT_COST, PASSWORD_MIN } from "@/utils/authValidation";
+import { sendVerificationEmail } from "@/lib/verificationEmail";
 
 export async function POST(req: NextRequest) {
   try {
@@ -74,7 +75,12 @@ export async function POST(req: NextRequest) {
       [username, hashedPassword, trimmedEmail],
     );
 
-    return NextResponse.json(result.rows[0], { status: 201 });
+    const created = result.rows[0];
+    // After the response: a slow mail server must not hold up the sign-up, and
+    // an address that cannot be reached is not a reason to refuse an account.
+    after(() => sendVerificationEmail(created.id, created.username, trimmedEmail));
+
+    return NextResponse.json(created, { status: 201 });
   } catch (err) {
     console.error("[users POST]", err);
     return NextResponse.json(

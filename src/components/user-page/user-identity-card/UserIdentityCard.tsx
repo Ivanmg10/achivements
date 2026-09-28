@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { signOut, useSession } from 'next-auth/react'
 import { IconAlertTriangle, IconLock, IconLogout, IconPencil } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
+import EmailVerificationNotice from '@/components/user-page/email-verification-notice/EmailVerificationNotice'
 import EditProfileModal, { EditProfileField } from '@/components/edit-profile-modal/EditProfileModal'
 import ChangePasswordModal from '@/components/change-password-modal/ChangePasswordModal'
 import LocationModal from '@/components/location-modal/LocationModal'
@@ -113,6 +114,8 @@ export default function UserIdentityCard() {
           </button>
         </div>
       </div>
+
+      <EmailVerificationNotice />
 
       {missingEmail && (
         <div role="alert" className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">

@@ -26,6 +26,7 @@ function tokenFields(row: UserRecord) {
     steamid: row.steamid ?? undefined,
     steamusername: row.steamusername ?? undefined,
     email: row.email ?? undefined,
+    emailVerified: Boolean(row.email_verified_at),
     admin: row.admin === true,
     raUser: row.raUser ?? null,
     location: row.location ?? null,
@@ -114,6 +115,7 @@ export const authOptions: NextAuthOptions = {
         session.user.steamid = token.steamid;
         session.user.steamusername = token.steamusername;
         session.user.email = token.email ?? undefined;
+        session.user.emailVerified = token.emailVerified === true;
         session.user.admin = token.admin;
         session.user.raUser = token.raUser;
         session.user.location = token.location;
