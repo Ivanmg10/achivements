@@ -104,22 +104,6 @@ export default function RegisterUserForm({
         />
 
         <AuthFormField
-          label={T.registerForm.password}
-          icon={<IconLock size={18} />}
-          type="password"
-          value={password}
-          onChange={(v) => {
-            setPassword(v)
-            setFieldErrors((f) => ({ ...f, password: undefined }))
-          }}
-          hint={passwordRule}
-          error={fieldErrors.password}
-          autoComplete="new-password"
-          required
-          disabled={submitting}
-        />
-
-        <AuthFormField
           label={T.passwordReset.email}
           icon={<IconMail size={18} />}
           type="email"
@@ -131,6 +115,22 @@ export default function RegisterUserForm({
           hint={T.passwordReset.emailWhy}
           error={fieldErrors.email}
           autoComplete="email"
+          required
+          disabled={submitting}
+        />
+
+        <AuthFormField
+          label={T.registerForm.password}
+          icon={<IconLock size={18} />}
+          type="password"
+          value={password}
+          onChange={(v) => {
+            setPassword(v)
+            setFieldErrors((f) => ({ ...f, password: undefined }))
+          }}
+          hint={passwordRule}
+          error={fieldErrors.password}
+          autoComplete="new-password"
           required
           disabled={submitting}
         />

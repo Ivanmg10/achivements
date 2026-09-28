@@ -124,3 +124,18 @@ test('an email that already has an account is explained in the visitor’s langu
   submit()
   expect(await screen.findByRole('alert')).toHaveTextContent(en.registerForm.emailTaken)
 })
+
+test('asks for the email before the password: it is what recovers the account', () => {
+  renderForm()
+  const order = screen.getAllByRole('textbox').concat(
+    Array.from(document.querySelectorAll('input[type="password"]')) as HTMLElement[],
+  )
+  const labels = Array.from(document.querySelectorAll('label')).map((l) => l.textContent)
+
+  expect(order.length).toBeGreaterThan(0)
+  expect(labels).toEqual([
+    en.registerForm.username,
+    en.passwordReset.email,
+    en.registerForm.password,
+  ])
+})
