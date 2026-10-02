@@ -1,23 +1,15 @@
-import { getServerSession } from 'next-auth'
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import pool from '@/lib/db'
 import bcrypt from 'bcrypt'
-import { authOptions } from '@/lib/authOptions'
-import { forgetUser, loadUser } from '@/lib/userRecord'
+import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
+import { sendEmailChangedNotice } from '@/lib/emailChangedNotice'
+import { forgetUser } from '@/lib/userRecord'
+import { sendVerificationEmail } from '@/lib/verificationEmail'
 import { BCRYPT_COST, PASSWORD_MIN } from '@/utils/authValidation'
 import { isTheme } from '@/types/types'
 
-/**
- * Asks the database, not the session: a session is re-read about once a
- * minute, and an admin who has just been demoted must lose access now.
- */
-async function requireAdmin() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return null
-  const row = await loadUser(session.user.id, { fresh: true })
-  if (row?.admin !== true) return null
-  return session
-}
+// Every handler here needs an admin who has unlocked the panel with their
+// password (see adminAuth), and every change is written to the action log.
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -31,14 +23,17 @@ function isValidUrl(url: string) {
   }
 }
 
+const isUsername = (v: unknown): v is string =>
+  typeof v === 'string' && v.length >= 3 && v.length <= 20 && /^[a-zA-Z0-9_]+$/.test(v)
+
 // GET — list all users
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const session = await requireAdmin()
-    if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    const auth = await requireAdmin(req)
+    if (!auth.ok) return auth.response
 
     const result = await pool.query(
-      `SELECT id, username, email, theme, avatar, admin, rausername, steamusername, location,
+      `SELECT id, username, email, theme, avatar, admin, rausername, steamid, steamusername, location,
               "raUser"->>'User' AS ra_display
        FROM users ORDER BY id ASC`
     )
@@ -49,33 +44,34 @@ export async function GET() {
   }
 }
 
-// POST — create user
+// POST — create user (for the odd case the admin has to; sign-up is open to anyone)
 export async function POST(req: Request) {
   try {
-    const session = await requireAdmin()
-    if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    const auth = await requireAdmin(req)
+    if (!auth.ok) return auth.response
 
-    const { username, email, password, admin } = await req.json()
+    const { username, email, password, admin } = ((await req.json().catch(() => null)) ?? {}) as Record<string, unknown>
 
     if (!username || !password) {
       return NextResponse.json({ error: 'Username and password required' }, { status: 400 })
     }
-    if (username.length < 3 || username.length > 20 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+    if (!isUsername(username)) {
       return NextResponse.json({ error: 'Username: 3–20 chars, letters/numbers/underscore' }, { status: 400 })
     }
     if (typeof password !== 'string' || password.length < PASSWORD_MIN) {
       return NextResponse.json({ error: `Password must be at least ${PASSWORD_MIN} characters` }, { status: 400 })
     }
-    if (email && !isValidEmail(email)) {
+    if (email && (typeof email !== 'string' || !isValidEmail(email))) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
     }
+    const address = (email as string | undefined) || null
 
     const existing = await pool.query('SELECT id FROM users WHERE LOWER(username) = LOWER($1)', [username])
     if (existing.rows.length > 0) {
       return NextResponse.json({ error: 'Username already taken' }, { status: 409 })
     }
-    if (email) {
-      const taken = await pool.query('SELECT id FROM users WHERE LOWER(email) = LOWER($1)', [email])
+    if (address) {
+      const taken = await pool.query('SELECT id FROM users WHERE LOWER(email) = LOWER($1)', [address])
       if (taken.rows.length > 0) {
         return NextResponse.json({ error: 'Email already in use' }, { status: 409 })
       }
@@ -85,10 +81,15 @@ export async function POST(req: Request) {
     const result = await pool.query(
       `INSERT INTO users (username, email, password, theme, admin)
        VALUES ($1, $2, $3, 'dark', $4)
-       RETURNING id, username, email, theme, avatar, admin, rausername`,
-      [username, email ?? null, hashed, admin === true]
+       RETURNING id, username, email, theme, avatar, admin, rausername, steamid, steamusername, location`,
+      [username, address, hashed, admin === true]
     )
-    return NextResponse.json(result.rows[0], { status: 201 })
+    const created = result.rows[0]
+    await logAdminAction(auth.admin, 'create-user', created, { email: address, admin: admin === true })
+    // The owner confirms the address themselves, as on a normal sign-up.
+    if (address) after(() => sendVerificationEmail(created.id, created.username, address))
+
+    return NextResponse.json(created, { status: 201 })
   } catch (err) {
     if ((err as { code?: string }).code === '23505') {
       return NextResponse.json({ error: 'Username or email already in use' }, { status: 409 })
@@ -101,10 +102,10 @@ export async function POST(req: Request) {
 // PATCH — edit user fields
 export async function PATCH(req: Request) {
   try {
-    const session = await requireAdmin()
-    if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    const auth = await requireAdmin(req)
+    if (!auth.ok) return auth.response
 
-    const { id, field, value } = await req.json()
+    const { id, field, value } = ((await req.json().catch(() => null)) ?? {}) as Record<string, unknown>
 
     if (!id || !field) {
       return NextResponse.json({ error: 'id and field required' }, { status: 400 })
@@ -120,7 +121,7 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'Field not allowed' }, { status: 400 })
     }
 
-    if (field === 'admin' && String(id) === String(session.user.id) && value === false) {
+    if (field === 'admin' && String(id) === auth.admin.id && value === false) {
       return NextResponse.json({ error: 'Cannot remove your own admin' }, { status: 400 })
     }
 
@@ -131,7 +132,7 @@ export async function PATCH(req: Request) {
     }
 
     if (field === 'username') {
-      if (typeof value !== 'string' || value.length < 3 || value.length > 20 || !/^[a-zA-Z0-9_]+$/.test(value)) {
+      if (!isUsername(value)) {
         return NextResponse.json({ error: 'Username: 3–20 chars, letters/numbers/underscore' }, { status: 400 })
       }
       const existing = await pool.query('SELECT id FROM users WHERE LOWER(username) = LOWER($1) AND id != $2', [value, id])
@@ -170,10 +171,23 @@ export async function PATCH(req: Request) {
       }
     }
 
+    // What it was, for the log and for telling the old address.
+    const before = await pool.query(`SELECT id, username, email, "${field}" AS previous FROM users WHERE id = $1`, [id])
+    const target = before.rows[0]
+    if (!target) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+
     // A new address has not been confirmed yet, whatever the old one was.
     const resetVerified = field === 'email' ? ', email_verified_at = NULL' : ''
     await pool.query(`UPDATE users SET "${field}" = $1${resetVerified} WHERE id = $2`, [value, id])
-    forgetUser(id)
+    forgetUser(id as string)
+    await logAdminAction(auth.admin, 'update-user', target, { field, from: target.previous ?? null, to: value ?? null })
+
+    if (field === 'email' && target.email && typeof value === 'string' && target.email.toLowerCase() !== value.toLowerCase()) {
+      // An admin changing the recovery address is exactly what a takeover
+      // looks like: the old address always hears about it.
+      const notice = { to: target.email as string, username: target.username as string, newEmail: value, byAdmin: true }
+      after(() => sendEmailChangedNotice(notice))
+    }
     return NextResponse.json({ ok: true })
   } catch (err) {
     if ((err as { code?: string }).code === '23505') {
@@ -187,20 +201,21 @@ export async function PATCH(req: Request) {
 // DELETE — remove a user and everything they own (groups, pins, cache: all cascade)
 export async function DELETE(req: Request) {
   try {
-    const session = await requireAdmin()
-    if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    const auth = await requireAdmin(req)
+    if (!auth.ok) return auth.response
 
     const id = new URL(req.url).searchParams.get('id')
     if (!id || !/^\d+$/.test(id)) {
       return NextResponse.json({ error: 'A numeric id is required' }, { status: 400 })
     }
-    if (String(id) === String(session.user.id)) {
+    if (id === auth.admin.id) {
       return NextResponse.json({ error: 'Cannot delete your own account' }, { status: 400 })
     }
 
-    const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id', [id])
+    const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id, username', [id])
     if (!result.rows.length) return NextResponse.json({ error: 'User not found' }, { status: 404 })
     forgetUser(id)
+    await logAdminAction(auth.admin, 'delete-user', result.rows[0])
 
     return NextResponse.json({ ok: true })
   } catch (err) {

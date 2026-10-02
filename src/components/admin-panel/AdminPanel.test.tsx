@@ -98,3 +98,41 @@ describe('deleting a user', () => {
     expect(screen.getByText('papucarrot')).toBeInTheDocument()
   })
 })
+
+describe('the unlock', () => {
+  const locked = () => {
+    const body = { error: 'reauth-required' }
+    return { ok: false, status: 403, json: () => Promise.resolve(body), clone: () => ({ json: () => Promise.resolve(body) }) }
+  }
+
+  test('until the panel is unlocked, nobody is listed and it asks for the password', async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue(locked())
+    render(<AdminPanel />)
+    expect(await screen.findByLabelText('Your password')).toBeInTheDocument()
+    expect(screen.queryByText('ivanxmarine')).not.toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: 'Search users' })).not.toBeInTheDocument()
+  })
+
+  test('the right password unlocks it and the users load', async () => {
+    ;(global.fetch as jest.Mock)
+      .mockResolvedValueOnce(locked())
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ ok: true }) })
+      .mockResolvedValue({ ok: true, json: () => Promise.resolve(USERS) })
+    render(<AdminPanel />)
+    fireEvent.change(await screen.findByLabelText('Your password'), { target: { value: 'secret12' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Unlock' }))
+
+    expect(await screen.findByText('ivanxmarine')).toBeInTheDocument()
+    expect(global.fetch).toHaveBeenCalledWith('/api/admin/unlock', expect.objectContaining({ method: 'POST' }))
+  })
+
+  test('Lock ends the unlock and hides everyone again', async () => {
+    render(<AdminPanel />)
+    await screen.findByText('ivanxmarine')
+    fireEvent.click(screen.getByRole('button', { name: 'Lock' }))
+
+    expect(await screen.findByLabelText('Your password')).toBeInTheDocument()
+    expect(screen.queryByText('ivanxmarine')).not.toBeInTheDocument()
+    expect(global.fetch).toHaveBeenCalledWith('/api/admin/unlock', { method: 'DELETE' })
+  })
+})

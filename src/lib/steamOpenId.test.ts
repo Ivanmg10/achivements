@@ -3,6 +3,7 @@ import {
   verifyAssertion,
   extractSteamId,
   returnsHere,
+  readSteamId,
   signState,
   verifyState,
   configuredOrigin,
@@ -194,5 +195,18 @@ describe('returnsHere', () => {
     ['a signature that leaves the identity out', { 'openid.signed': 'signed,op_endpoint,return_to' }],
   ])('refuses an assertion for %s', (_, overrides) => {
     expect(returnsHere(params(overrides), ORIGIN)).toBe(false)
+  })
+})
+
+describe('readSteamId', () => {
+  test('takes the bare ID or a profile link', () => {
+    expect(readSteamId('76561198000000000')).toBe('76561198000000000')
+    expect(readSteamId(' https://steamcommunity.com/profiles/76561198000000000/ ')).toBe('76561198000000000')
+  })
+
+  test('anything else is not one', () => {
+    expect(readSteamId('https://steamcommunity.com/id/gaben')).toBeNull()
+    expect(readSteamId('7656119800000000')).toBeNull()
+    expect(readSteamId(42)).toBeNull()
   })
 })

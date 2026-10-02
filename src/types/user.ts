@@ -8,5 +8,6 @@ export interface AdminUser {
   rausername: string | null;
   ra_display: string | null;
   location: string | null;
+  steamid?: string | null;
   steamusername?: string | null;
 }

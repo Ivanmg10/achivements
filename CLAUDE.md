@@ -190,10 +190,36 @@ it sets `users.email_verified_at` (`migrations/017_email_verification.sql`).
 - The RA API key (`raid`) is server-only: `getServerSession(authOptions)` has it,
   the browser's session (`authHandlerOptions`) does not. Client code uses `raLinked`.
 - Admin checks read the DB (`loadUser(id, { fresh: true })`), not the session.
+  See Admin panel below for the rest.
 - Sign-in, current-password checks, sign-up and reset requests are rate limited
   in the DB (`src/lib/attemptLimit.ts`). Password rules: `PASSWORD_MIN` and
   `BCRYPT_COST` in `src/utils/authValidation.ts`.
 - Changing the email asks for the current password; it is the recovery address.
+
+## Admin panel — read before touching `/api/admin/*`
+
+Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
+`requireAdmin(req)`.
+
+- **Two locks.** The admin flag is read fresh from the DB, and the panel must be
+  **unlocked with the admin's own password** (`POST /api/admin/unlock`). The
+  unlock is a signed, httpOnly cookie scoped to `/api/admin`, valid 15 minutes,
+  bound to the admin and to their password hash (a password change ends it).
+  Without it the endpoints answer `403 reauth-required` and the panel shows the
+  password form, so a stolen or unattended session reads no one's data.
+  Do not add an admin endpoint that skips `requireAdmin(req)`.
+- **Everything is logged** in `admin_actions` (`migrations/020_admin_actions.sql`,
+  run 2026-10-02): who, what, to whom, when, with names copied in. Kept a year.
+  New admin actions must call `logAdminAction`. Readable from the panel.
+- **Changing an email notifies the old address** (`src/lib/emailChangedNotice.ts`),
+  whether the user or an admin did it. It is what stops a quiet takeover: change
+  the address, then reset the password.
+- Admins can create users (for odd cases; sign-up is open), edit, delete, and
+  link/unlink RA (checked against RA with the user's key) and Steam (checked to
+  exist through the Steam API). Linking Steam here skips the OpenID proof of
+  ownership — the admin vouches for it, and the log records it.
+- The privacy policy (`/privacy`) says all of this; `/terms` says when an
+  account may be suspended or deleted. Change the policy if the panel changes.
 
 ## Registration
 

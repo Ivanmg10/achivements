@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import CommonModal from '../common-modal/CommonModal'
+import AdminLinkedAccounts from './admin-linked-accounts/AdminLinkedAccounts'
+import { adminFetch } from '@/utils/adminFetch'
 import { codeToFlag, findCountry, COUNTRIES } from '@/utils/countries'
 import type { Country } from '@/utils/countries'
 import type { AdminUser } from '@/types/user'
@@ -12,12 +14,13 @@ interface Props {
   onClose: () => void
   user: AdminUser
   onUpdated: (userId: number, field: string, value: unknown) => void
+  onChanged: (userId: number, changes: Partial<AdminUser>) => void
   currentAdminId: number
 }
 
 type Field = 'username' | 'email' | 'avatar' | 'location' | 'admin'
 
-export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, currentAdminId }: Props) {
+export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, onChanged, currentAdminId }: Props) {
   const [values, setValues] = useState<Record<string, string | boolean>>({
     username: user.username,
     email: user.email ?? '',
@@ -34,7 +37,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, c
     setSaving(field)
     setErrors(e => ({ ...e, [field]: '' }))
     try {
-      const res = await fetch('/api/admin/users', {
+      const res = await adminFetch('/api/admin/users', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: user.id, field, value }),
@@ -216,24 +219,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, c
           </div>
         </div>
 
-        {/* RA / Steam info (read-only) */}
-        {(user.rausername || user.steamusername) && (
-          <div className="bg-bg-main rounded-xl p-3 flex flex-col gap-2">
-            <span className="text-xs text-text-secondary uppercase tracking-wider">Connected accounts</span>
-            {user.rausername && (
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-text-secondary text-xs">RA:</span>
-                <span className="font-medium">{user.ra_display ?? user.rausername}</span>
-              </div>
-            )}
-            {user.steamusername && (
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-text-secondary text-xs">Steam:</span>
-                <span className="font-medium">{user.steamusername}</span>
-              </div>
-            )}
-          </div>
-        )}
+        <AdminLinkedAccounts user={user} onUpdated={onChanged} />
       </div>
 
       <button onClick={onClose}

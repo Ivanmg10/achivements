@@ -1,13 +1,17 @@
-jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
-jest.mock('@/lib/userRecord', () => ({ loadUser: jest.fn(), forgetUser: jest.fn() }))
+jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))
+jest.mock('@/lib/adminAuth', () => ({ requireAdmin: jest.fn(), logAdminAction: jest.fn() }))
+jest.mock('@/lib/verificationEmail', () => ({ sendVerificationEmail: jest.fn() }))
+jest.mock('@/lib/emailChangedNotice', () => ({ sendEmailChangedNotice: jest.fn() }))
 jest.mock('bcrypt', () => ({ hash: jest.fn().mockResolvedValue('hashed') }))
 
-import { DELETE, PATCH, POST } from './route'
-import { getServerSession } from 'next-auth'
+import { DELETE, GET, PATCH, POST } from './route'
 import pool from '@/lib/db'
-import { NextRequest } from 'next/server'
-import { forgetUser, loadUser } from '@/lib/userRecord'
+import { NextRequest, NextResponse } from 'next/server'
+import { forgetUser } from '@/lib/userRecord'
+import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
+import { sendVerificationEmail } from '@/lib/verificationEmail'
+import { sendEmailChangedNotice } from '@/lib/emailChangedNotice'
 import bcrypt from 'bcrypt'
 
 function del(id?: string) {
@@ -19,39 +23,74 @@ function del(id?: string) {
 const withBody = (method: string, body: unknown) =>
   new NextRequest('http://localhost/api/admin/users', { method, body: JSON.stringify(body) }) as unknown as Request
 
-/** The admin flag as the database has it right now. */
-function isAdmin(admin: boolean) {
-  ;(loadUser as jest.Mock).mockResolvedValue({ id: 3, admin })
-}
+const ADMIN = { id: '3', username: 'boss', pwv: 'v1' }
 
 beforeEach(() => {
   jest.clearAllMocks()
-  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '3', admin: true } })
-  isAdmin(true)
+  ;(requireAdmin as jest.Mock).mockResolvedValue({ ok: true, admin: ADMIN })
   ;(pool.query as jest.Mock).mockResolvedValue({ rows: [{ id: 11 }] })
 })
 
 describe('who may use it', () => {
-  test('the admin flag is read fresh from the database, not from the session', async () => {
+  test('without an admin who unlocked the panel, every handler answers what adminAuth says and touches nothing', async () => {
+    const locked = NextResponse.json({ error: 'reauth-required' }, { status: 403 })
+    ;(requireAdmin as jest.Mock).mockResolvedValue({ ok: false, response: locked })
+
+    expect(await GET(withBody('GET', {}))).toBe(locked)
+    expect(await POST(withBody('POST', { username: 'new', password: 'secret12' }))).toBe(locked)
+    expect(await PATCH(withBody('PATCH', { id: 11, field: 'location', value: 'ES' }))).toBe(locked)
+    expect(await DELETE(del('11'))).toBe(locked)
+    expect(pool.query).not.toHaveBeenCalled()
+  })
+})
+
+describe('the action log', () => {
+  test('a deletion is logged with the deleted name', async () => {
+    ;(pool.query as jest.Mock).mockResolvedValue({ rows: [{ id: 11, username: 'bob' }] })
     await DELETE(del('11'))
-    expect(loadUser).toHaveBeenCalledWith('3', { fresh: true })
+    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'delete-user', { id: 11, username: 'bob' })
   })
 
-  test('a session that still says admin, for someone just demoted, is refused', async () => {
-    isAdmin(false)
-    expect((await DELETE(del('11'))).status).toBe(403)
-    expect(pool.query).not.toHaveBeenCalled()
+  test('an edit is logged with what it was and what it became', async () => {
+    ;(pool.query as jest.Mock).mockImplementation((sql: string) =>
+      Promise.resolve(sql.startsWith('SELECT id, username, email') ? { rows: [{ id: 11, username: 'bob', email: null, previous: 'FR' }] } : { rows: [] }),
+    )
+    await PATCH(withBody('PATCH', { id: 11, field: 'location', value: 'ES' }))
+    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'update-user', expect.objectContaining({ id: 11 }), { field: 'location', from: 'FR', to: 'ES' })
   })
 
-  test('no session is refused', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue(null)
-    expect((await DELETE(del('11'))).status).toBe(403)
-    expect(pool.query).not.toHaveBeenCalled()
+  test('a creation is logged, and the new address gets its verification link', async () => {
+    ;(pool.query as jest.Mock).mockImplementation((sql: string) =>
+      Promise.resolve(sql.startsWith('INSERT') ? { rows: [{ id: 12, username: 'new' }] } : { rows: [] }),
+    )
+    expect((await POST(withBody('POST', { username: 'new', email: 'n@test.com', password: 'secret12' }))).status).toBe(201)
+    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'create-user', { id: 12, username: 'new' }, { email: 'n@test.com', admin: false })
+    expect(sendVerificationEmail).toHaveBeenCalledWith(12, 'new', 'n@test.com')
+  })
+})
+
+describe("changing a user's email", () => {
+  const current = (email: string | null) =>
+    (pool.query as jest.Mock).mockImplementation((sql: string) =>
+      Promise.resolve(sql.startsWith('SELECT id, username, email') ? { rows: [{ id: 11, username: 'bob', email, previous: email }] } : { rows: [] }),
+    )
+
+  test('the old address is told an administrator changed it', async () => {
+    current('old@test.com')
+    expect((await PATCH(withBody('PATCH', { id: 11, field: 'email', value: 'new@test.com' }))).status).toBe(200)
+    expect(sendEmailChangedNotice).toHaveBeenCalledWith({ to: 'old@test.com', username: 'bob', newEmail: 'new@test.com', byAdmin: true })
   })
 
-  test('an account that no longer exists is refused', async () => {
-    ;(loadUser as jest.Mock).mockResolvedValue(null)
-    expect((await DELETE(del('11'))).status).toBe(403)
+  test('no notice when there was no address before', async () => {
+    current(null)
+    await PATCH(withBody('PATCH', { id: 11, field: 'email', value: 'new@test.com' }))
+    expect(sendEmailChangedNotice).not.toHaveBeenCalled()
+  })
+
+  test('404 for a user that does not exist, before anything is written', async () => {
+    ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
+    expect((await PATCH(withBody('PATCH', { id: 99, field: 'location', value: 'ES' }))).status).toBe(404)
+    expect((pool.query as jest.Mock).mock.calls.some(([sql]) => String(sql).startsWith('UPDATE'))).toBe(false)
   })
 })
 
@@ -118,7 +157,9 @@ describe('PATCH', () => {
   })
 
   test('a new email is no longer verified', async () => {
-    ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
+    ;(pool.query as jest.Mock).mockImplementation((sql: string) =>
+      Promise.resolve(sql.startsWith('SELECT id, username, email') ? { rows: [{ id: 11, username: 'bob', email: null }] } : { rows: [] }),
+    )
     expect((await PATCH(withBody('PATCH', { id: 11, field: 'email', value: 'new@test.com' }))).status).toBe(200)
     const update = (pool.query as jest.Mock).mock.calls.find(([sql]) => String(sql).startsWith('UPDATE'))
     expect(update[0]).toContain('email_verified_at = NULL')

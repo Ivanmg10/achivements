@@ -85,6 +85,13 @@ export function returnsHere(params: URLSearchParams, origin: string): boolean {
   }
 }
 
+/** A SteamID64 as someone typed it: the bare 17 digits, or a steamcommunity.com/profiles/<id> link. */
+export function readSteamId(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  const match = value.trim().match(/^(?:https?:\/\/steamcommunity\.com\/profiles\/)?(\d{17})\/?$/)
+  return match ? match[1] : null
+}
+
 /** Pulls the SteamID64 out of a claimed_id, or null if it is not a Steam identity URL. */
 export function extractSteamId(claimedId: string | null): string | null {
   if (!claimedId || !claimedId.startsWith(CLAIMED_ID_PREFIX)) return null

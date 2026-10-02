@@ -1,14 +1,16 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/currentPassword', () => ({ checkCurrentPassword: jest.fn() }))
-jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))
+jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn(), loadUser: jest.fn() }))
 jest.mock('@/lib/verificationEmail', () => ({ sendVerificationEmail: jest.fn() }))
+jest.mock('@/lib/emailChangedNotice', () => ({ sendEmailChangedNotice: jest.fn() }))
 
 import { POST } from './route'
 import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
 import { checkCurrentPassword } from '@/lib/currentPassword'
-import { forgetUser } from '@/lib/userRecord'
+import { forgetUser, loadUser } from '@/lib/userRecord'
+import { sendEmailChangedNotice } from '@/lib/emailChangedNotice'
 import { sendVerificationEmail } from '@/lib/verificationEmail'
 
 const request = (body: unknown) => ({ json: () => Promise.resolve(body) }) as unknown as Request
@@ -17,6 +19,7 @@ beforeEach(() => {
   jest.clearAllMocks()
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', name: 'ivan' } })
   ;(checkCurrentPassword as jest.Mock).mockResolvedValue('ok')
+  ;(loadUser as jest.Mock).mockResolvedValue({ id: 1, email: 'old@test.com' })
   ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
 })
 
@@ -35,6 +38,18 @@ describe('email, the recovery address', () => {
     await POST(request({ field: 'email', value: 'new@test.com', currentPassword: 'pass' }))
     expect(updates()[0][0]).toContain('email_verified_at = NULL')
     expect(sendVerificationEmail).toHaveBeenCalledWith('1', 'ivan', 'new@test.com')
+  })
+
+  test('the old address is told, so a change nobody asked for gets noticed', async () => {
+    await POST(request({ field: 'email', value: 'new@test.com', currentPassword: 'pass' }))
+    expect(sendEmailChangedNotice).toHaveBeenCalledWith({ to: 'old@test.com', username: 'ivan', newEmail: 'new@test.com', byAdmin: false })
+  })
+
+  test('no notice when the address only changes case, or there was none', async () => {
+    await POST(request({ field: 'email', value: 'OLD@test.com', currentPassword: 'pass' }))
+    ;(loadUser as jest.Mock).mockResolvedValue({ id: 1, email: null })
+    await POST(request({ field: 'email', value: 'new@test.com', currentPassword: 'pass' }))
+    expect(sendEmailChangedNotice).not.toHaveBeenCalled()
   })
 
   test('without the right password, a stolen session cannot redirect the recovery mail', async () => {
