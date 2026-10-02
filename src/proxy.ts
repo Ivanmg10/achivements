@@ -8,9 +8,9 @@ import { getToken } from 'next-auth/jwt'
  * CheevoVault is before asking them to sign up.
  */
 // /opengraph-image is the link preview: the sites that fetch it never have a session.
-const PUBLIC_PATHS = ['/', '/authPage', '/resetPassword', '/opengraph-image']
+const PUBLIC_PATHS = ['/', '/authPage', '/resetPassword', '/privacy', '/opengraph-image']
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
   if (PUBLIC_PATHS.includes(pathname)) return NextResponse.next()
 

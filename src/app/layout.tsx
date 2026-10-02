@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
 import "./globals.css";
 import Providers from "./providers";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from '@/lib/siteUrl'
@@ -34,8 +33,6 @@ export default function RootLayout({
     <html lang="en" data-theme="dark" className={`${inter.variable} bg-bg-header`}>
       <body className="text-text-main bg-bg-main">
         <Providers>{children}</Providers>
-        {/* Page views only, and cookieless — nothing to ask consent for. */}
-        <Analytics />
       </body>
     </html>
   );

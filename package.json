@@ -1,6 +1,6 @@
 {
   "name": "cheevovault",
-  "version": "0.9.47",
+  "version": "0.9.48",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -15,7 +15,6 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@tabler/icons-react": "^3.38.0",
-    "@vercel/analytics": "^2.0.1",
     "bcrypt": "^6.0.0",
     "framer-motion": "^12.38.0",
     "next": "^16.3.6",
@@ -30,7 +29,6 @@
     "@babel/preset-env": "^7.29.2",
     "@babel/preset-react": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
-    "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -42,7 +40,7 @@
     "@types/react-dom": "^19",
     "babel-jest": "^30.3.0",
     "eslint": "^9",
-    "eslint-config-next": "15.5.4",
+    "eslint-config-next": "^16.3.6",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
     "postcss": "^8.5.6",
