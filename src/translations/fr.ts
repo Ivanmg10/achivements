@@ -259,6 +259,84 @@ export const fr: Translations = {
     closingText: 'C’est gratuit, et tu connectes tes comptes quand tu veux.',
     footer: 'Sans lien avec RetroAchievements, Valve ou Sony.',
   },
+  cookies: {
+    title: 'Cookies',
+    text: 'Nous utilisons des cookies Google Analytics pour savoir quelles pages sont visitées et améliorer le site. Rien n’est déposé sans votre accord, et vous pouvez changer d’avis depuis le pied de page.',
+    accept: 'Accepter',
+    reject: 'Refuser',
+    settings: 'Paramètres des cookies',
+  },
+  mainFooter: {
+    poweredBy: 'Propulsé par',
+  },
+  passwordInput: {
+    show: 'Afficher le mot de passe',
+    hide: 'Masquer le mot de passe',
+  },
+  deleteAccount: {
+    title: 'Supprimer le compte',
+    text: 'Supprime votre compte et tout ce qu’il contient : groupes, jeux épinglés, favoris et comptes liés. C’est irréversible.',
+    button: 'Supprimer le compte',
+    confirmText: 'Cela supprime définitivement votre compte et toutes ses données. Saisissez votre mot de passe pour confirmer.',
+    password: 'Mot de passe',
+    confirm: 'Supprimer mon compte',
+    deleting: 'Suppression...',
+    wrongPassword: 'Ce mot de passe est incorrect.',
+    tooManyAttempts: 'Trop de tentatives erronées. Attendez 15 minutes et réessayez.',
+    lastAdmin: 'Vous êtes le seul administrateur. Nommez quelqu’un d’autre administrateur avant de supprimer votre compte.',
+  },
+  privacy: {
+    link: 'Confidentialité et cookies',
+    title: 'Confidentialité et cookies',
+    updated: 'Dernière mise à jour : 2 octobre 2026',
+    intro: 'CheevoVault suit vos succès RetroAchievements et Steam. Cette page explique quelles données il conserve sur vous, pourquoi, et ce que vous pouvez faire.',
+    contact: 'Contact',
+    controller: 'Responsable du traitement',
+    back: 'Retour à CheevoVault',
+    sections: [
+      {
+        heading: 'Ce que nous conservons',
+        body: [
+          'Votre compte : un nom d’utilisateur, un hash de votre mot de passe (jamais le mot de passe lui-même) et votre adresse e-mail, utilisée uniquement pour récupérer le compte et confirmer qu’il vous appartient.',
+          'Ce que vous choisissez d’ajouter : un lien d’avatar, votre pays, vos jeux et succès favoris et épinglés, et vos groupes.',
+          'Comptes liés : votre nom d’utilisateur et votre clé Web API RetroAchievements, ainsi que votre Steam ID et votre nom affiché, pour récupérer votre progression. La clé ne quitte jamais notre serveur.',
+          'Journaux de sécurité : l’adresse IP (et le nom d’utilisateur, pour les connexions) des connexions échouées, inscriptions et demandes de réinitialisation, conservée un jour pour freiner les abus.',
+        ],
+      },
+      {
+        heading: 'Pourquoi',
+        body: [
+          'Pour fournir le service auquel vous vous êtes inscrit, le garder sûr et — seulement si vous l’acceptez — mesurer les visites avec Google Analytics.',
+        ],
+      },
+      {
+        heading: 'Cookies et stockage local',
+        body: [
+          'Nécessaires, sans consentement : un cookie de session qui vous garde connecté, et le stockage local pour votre langue, votre thème et votre choix de cookies.',
+          'Mesure d’audience, seulement si vous acceptez : cookies Google Analytics (_ga, _ga_*), conservés jusqu’à deux ans. Google ne reçoit que le chemin de la page, jamais le reste de l’adresse. Vous pouvez retirer votre consentement à tout moment depuis les paramètres des cookies en bas de page : la mesure s’arrête aussitôt et ses cookies sont supprimés.',
+        ],
+      },
+      {
+        heading: 'Qui d’autre les traite',
+        body: [
+          'Vercel héberge le site, Resend envoie nos e-mails, Google fournit la mesure d’audience (uniquement avec votre consentement), et RetroAchievements et Steam reçoivent les requêtes nécessaires pour afficher vos données. Certains sont aux États-Unis ; ces transferts reposent sur le cadre de protection des données UE–États-Unis ou sur les clauses contractuelles types de la Commission européenne.',
+        ],
+      },
+      {
+        heading: 'Combien de temps',
+        body: [
+          'Les données du compte sont conservées jusqu’à sa suppression, et tout ce qui y est lié disparaît avec lui. Les liens de réinitialisation expirent au bout d’une heure, les journaux de sécurité au bout d’un jour.',
+        ],
+      },
+      {
+        heading: 'Vos droits',
+        body: [
+          'Vous pouvez accéder à vos données, les rectifier, les exporter ou les effacer, vous opposer à leur utilisation ou la limiter, et retirer votre consentement. L’essentiel se modifie depuis votre page de compte, où vous pouvez aussi le supprimer ; pour le reste, écrivez-nous.',
+          'Si vous estimez que vos données n’ont pas été traitées correctement, vous pouvez saisir l’Agence espagnole de protection des données (aepd.es).',
+        ],
+      },
+    ],
+  },
   loginForm: {
     title: 'Se connecter',
     accountCreated: 'Compte créé avec succès',
@@ -405,9 +483,6 @@ export const fr: Translations = {
   },
   profileSt: {
     signIn: 'Se connecter avec Steam',
-  },
-  progression: {
-    recentProgress: 'Votre progression récente',
   },
   gamesList: {
     achievements: 'succès',

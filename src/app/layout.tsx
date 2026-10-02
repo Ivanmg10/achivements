@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import CookieBanner from '@/components/cookie-banner/CookieBanner'
+import GoogleAnalytics from '@/components/google-analytics/GoogleAnalytics'
 import "./globals.css";
 import Providers from "./providers";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from '@/lib/siteUrl'
@@ -32,7 +34,12 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="dark" className={`${inter.variable} bg-bg-header`}>
       <body className="text-text-main bg-bg-main">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <CookieBanner />
+        </Providers>
+        {/* Loads only after the visitor accepts cookies in the banner. */}
+        <GoogleAnalytics />
       </body>
     </html>
   );

@@ -7,7 +7,7 @@ jest.mock("@/components/auth-collage-panel/AuthCollagePanel", () => ({
 
 jest.mock("@/components/login-user-form/LoginUserForm", () => ({
   __esModule: true,
-  default: ({ setIsLogin }: any) => (
+  default: ({ setIsLogin }: { setIsLogin: (login: boolean) => void }) => (
     <div data-testid="login-form">
       <button onClick={() => setIsLogin(false)}>Go Register</button>
     </div>
@@ -16,7 +16,7 @@ jest.mock("@/components/login-user-form/LoginUserForm", () => ({
 
 jest.mock("@/components/register-user-form/RegisterUserForm", () => ({
   __esModule: true,
-  default: ({ setIsLogin }: any) => (
+  default: ({ setIsLogin }: { setIsLogin: (login: boolean) => void }) => (
     <div data-testid="register-form">
       <button onClick={() => setIsLogin(true)}>Go Login</button>
     </div>
@@ -26,6 +26,7 @@ jest.mock("@/components/register-user-form/RegisterUserForm", () => ({
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useSearchParams } from "next/navigation";
 import AuthPage from "./page";
+import { en } from "@/translations/en";
 
 beforeEach(() => {
   (useSearchParams as jest.Mock).mockReturnValue({ get: () => null });
@@ -54,4 +55,9 @@ test("?mode=register opens on the register form, as the landing button expects",
   (useSearchParams as jest.Mock).mockReturnValue({ get: (k: string) => (k === "mode" ? "register" : null) });
   render(<AuthPage />);
   expect(screen.getAllByTestId("register-form").length).toBeGreaterThan(0);
+});
+
+test("links to the privacy policy once, where the account is created", () => {
+  render(<AuthPage />);
+  expect(screen.getByRole("link", { name: en.privacy.link })).toHaveAttribute("href", "/privacy");
 });

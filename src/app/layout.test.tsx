@@ -1,9 +1,14 @@
+jest.mock("@/components/google-analytics/GoogleAnalytics", () => ({ __esModule: true, default: jest.fn(() => null) }));
+jest.mock("@/components/cookie-banner/CookieBanner", () => ({ __esModule: true, default: jest.fn(() => null) }));
+
 jest.mock("@/app/providers", () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 import { render, screen } from "@testing-library/react";
+import GoogleAnalytics from "@/components/google-analytics/GoogleAnalytics";
+import CookieBanner from "@/components/cookie-banner/CookieBanner";
 import RootLayout, { metadata } from "./layout";
 import { SITE_NAME } from "@/lib/siteUrl";
 
@@ -14,6 +19,12 @@ afterAll(() => consoleError.mockRestore());
 test("renders children in layout", () => {
   render(<RootLayout><p>Content</p></RootLayout>);
   expect(screen.getByText("Content")).toBeInTheDocument();
+});
+
+test("mounts the cookie banner and analytics on every page", () => {
+  render(<RootLayout><p>Content</p></RootLayout>);
+  expect(CookieBanner).toHaveBeenCalled();
+  expect(GoogleAnalytics).toHaveBeenCalled();
 });
 
 describe("metadata", () => {

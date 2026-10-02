@@ -27,7 +27,9 @@ test('the CSP keeps scripts, connections and framing to this site', async () => 
   expect(csp).toContain("base-uri 'self'")
   expect(csp).toContain("form-action 'self'")
   expect(csp).toMatch(/connect-src 'self'/)
-  expect(csp).not.toMatch(/script-src[^;]*https:/)
+  // The only outside script host is Google's tag loader, which runs after cookie consent.
+  const scriptHosts = csp.match(/script-src([^;]*)/)![1].split(' ').filter((s) => s.startsWith('https:'))
+  expect(scriptHosts).toEqual(['https://www.googletagmanager.com'])
   // Avatars are pasted https URLs, so images may come from any https host — but never http.
   expect(csp).toContain("img-src 'self' data: blob: https:")
   expect(csp).not.toMatch(/img-src[^;]*http:/)

@@ -5,11 +5,12 @@ import UserIdentityCard from '@/components/user-page/user-identity-card/UserIden
 import UserPreferencesCard from '@/components/user-page/user-preferences-card/UserPreferencesCard'
 import UserPlatforms from '@/components/user-page/user-platforms/UserPlatforms'
 import AdminPanel from '@/components/admin-panel/AdminPanel'
+import DeleteAccountCard from '@/components/user-page/delete-account-card/DeleteAccountCard'
 
 /**
  * The account page: who you are and how the app behaves on the top row, the
- * platforms you track games on in the middle, and the admin panel below for
- * the users who have one.
+ * platforms you track games on in the middle, the admin panel below for
+ * the users who have one, and deleting the account last.
  */
 export default function UserPage() {
   const { data: session } = useSession()
@@ -25,6 +26,8 @@ export default function UserPage() {
         <UserPlatforms />
 
         {session?.user?.admin && <AdminPanel />}
+
+        <DeleteAccountCard />
       </div>
     </main>
   )

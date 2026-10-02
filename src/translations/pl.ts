@@ -259,6 +259,84 @@ export const pl: Translations = {
     closingText: 'Za darmo, a konta podłączysz kiedy zechcesz.',
     footer: 'Bez związku z RetroAchievements, Valve ani Sony.',
   },
+  cookies: {
+    title: 'Pliki cookie',
+    text: 'Używamy plików cookie Google Analytics, aby wiedzieć, które strony są odwiedzane, i ulepszać serwis. Nic nie jest zapisywane bez Twojej zgody, a decyzję możesz zmienić w stopce.',
+    accept: 'Akceptuj',
+    reject: 'Odrzuć',
+    settings: 'Ustawienia cookie',
+  },
+  mainFooter: {
+    poweredBy: 'Działa dzięki',
+  },
+  passwordInput: {
+    show: 'Pokaż hasło',
+    hide: 'Ukryj hasło',
+  },
+  deleteAccount: {
+    title: 'Usuń konto',
+    text: 'Usuwa Twoje konto i wszystko, co w nim jest: grupy, przypięte gry, ulubione i połączone konta. Nie można tego cofnąć.',
+    button: 'Usuń konto',
+    confirmText: 'To trwale usunie Twoje konto i wszystkie jego dane. Wpisz hasło, aby potwierdzić.',
+    password: 'Hasło',
+    confirm: 'Usuń moje konto',
+    deleting: 'Usuwanie...',
+    wrongPassword: 'Hasło jest nieprawidłowe.',
+    tooManyAttempts: 'Zbyt wiele nieudanych prób. Odczekaj 15 minut i spróbuj ponownie.',
+    lastAdmin: 'Jesteś jedynym administratorem. Nadaj komuś innemu uprawnienia administratora przed usunięciem konta.',
+  },
+  privacy: {
+    link: 'Prywatność i cookies',
+    title: 'Prywatność i cookies',
+    updated: 'Ostatnia aktualizacja: 2 października 2026',
+    intro: 'CheevoVault śledzi Twoje osiągnięcia z RetroAchievements i Steam. Ta strona wyjaśnia, jakie dane o Tobie przechowuje, w jakim celu i co możesz z tym zrobić.',
+    contact: 'Kontakt',
+    controller: 'Administrator danych',
+    back: 'Wróć do CheevoVault',
+    sections: [
+      {
+        heading: 'Co przechowujemy',
+        body: [
+          'Twoje konto: nazwę użytkownika, hash hasła (nigdy samo hasło) i adres e-mail, używany wyłącznie do odzyskania konta i potwierdzenia, że należy do Ciebie.',
+          'To, co sam dodajesz: link do awatara, kraj, ulubione i przypięte gry oraz osiągnięcia, a także Twoje grupy.',
+          'Połączone konta: nazwę użytkownika i klucz Web API RetroAchievements oraz Steam ID i nazwę wyświetlaną, aby pobierać Twoje postępy. Klucz nigdy nie opuszcza naszego serwera.',
+          'Rejestry bezpieczeństwa: adres IP (a przy logowaniu także nazwę użytkownika) nieudanych logowań, rejestracji i próśb o reset hasła, przechowywany przez jeden dzień, aby ograniczać nadużycia.',
+        ],
+      },
+      {
+        heading: 'W jakim celu',
+        body: [
+          'Aby świadczyć usługę, na którą się zarejestrowałeś, dbać o jej bezpieczeństwo i — tylko jeśli się zgodzisz — mierzyć odwiedziny za pomocą Google Analytics.',
+        ],
+      },
+      {
+        heading: 'Cookies i pamięć lokalna',
+        body: [
+          'Niezbędne, bez zgody: cookie sesji, które utrzymuje Cię zalogowanym, oraz pamięć lokalna na język, motyw i Twój wybór dotyczący cookies.',
+          'Analityka, tylko za Twoją zgodą: cookies Google Analytics (_ga, _ga_*), ważne do dwóch lat. Google otrzymuje tylko ścieżkę strony, nigdy resztę adresu. Zgodę możesz wycofać w każdej chwili w ustawieniach cookies na dole strony: analityka zatrzymuje się od razu, a jej cookies są usuwane.',
+        ],
+      },
+      {
+        heading: 'Kto jeszcze je przetwarza',
+        body: [
+          'Vercel hostuje stronę, Resend wysyła nasze e-maile, Google dostarcza analitykę (tylko za Twoją zgodą), a RetroAchievements i Steam otrzymują zapytania potrzebne do wyświetlenia Twoich danych. Niektórzy z nich są w Stanach Zjednoczonych; te transfery opierają się na Ramach ochrony danych UE–USA lub na standardowych klauzulach umownych Komisji Europejskiej.',
+        ],
+      },
+      {
+        heading: 'Jak długo',
+        body: [
+          'Dane konta są przechowywane do momentu jego usunięcia, a wszystko, co jest z nim powiązane, znika razem z nim. Linki do resetu hasła wygasają po godzinie, rejestry bezpieczeństwa po jednym dniu.',
+        ],
+      },
+      {
+        heading: 'Twoje prawa',
+        body: [
+          'Możesz uzyskać dostęp do swoich danych, poprawić je, wyeksportować lub usunąć, sprzeciwić się ich wykorzystaniu lub je ograniczyć oraz wycofać zgodę. Większość możesz edytować na stronie konta, gdzie możesz je też usunąć; w pozostałych sprawach napisz do nas.',
+          'Jeśli uważasz, że Twoje dane nie zostały potraktowane właściwie, możesz złożyć skargę do hiszpańskiej Agencji Ochrony Danych (aepd.es).',
+        ],
+      },
+    ],
+  },
   loginForm: {
     title: 'Zaloguj się',
     accountCreated: 'Konto zostało pomyślnie utworzone',
@@ -405,9 +483,6 @@ export const pl: Translations = {
   },
   profileSt: {
     signIn: 'Zaloguj się przez Steam',
-  },
-  progression: {
-    recentProgress: 'Twój ostatni postęp',
   },
   gamesList: {
     achievements: 'osiągnięć',

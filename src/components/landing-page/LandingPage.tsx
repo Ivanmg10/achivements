@@ -8,6 +8,7 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import VersionBadge from '@/components/version-badge/VersionBadge'
+import LegalLinks from '@/components/legal-links/LegalLinks'
 import { useLanguage } from '@/context/LanguageContext'
 
 const PRIMARY =
@@ -99,8 +100,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="mt-auto px-6 py-6 text-center text-xs text-text-secondary/60">
-        {T.landing.footer}
+      <footer className="mt-auto px-6 py-6 flex flex-col items-center gap-2 text-center text-xs text-text-secondary/60">
+        <span>{T.landing.footer}</span>
+        <LegalLinks />
       </footer>
 
       <VersionBadge />

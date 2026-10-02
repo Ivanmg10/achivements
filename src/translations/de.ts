@@ -259,6 +259,84 @@ export const de: Translations = {
     closingText: 'Kostenlos, und du verbindest deine Konten, wann du willst.',
     footer: 'Nicht mit RetroAchievements, Valve oder Sony verbunden.',
   },
+  cookies: {
+    title: 'Cookies',
+    text: 'Wir nutzen Google-Analytics-Cookies, um zu sehen, welche Seiten besucht werden, und die Website zu verbessern. Ohne deine Zustimmung wird nichts gespeichert, und du kannst es in der Fußzeile jederzeit ändern.',
+    accept: 'Akzeptieren',
+    reject: 'Ablehnen',
+    settings: 'Cookie-Einstellungen',
+  },
+  mainFooter: {
+    poweredBy: 'Unterstützt von',
+  },
+  passwordInput: {
+    show: 'Passwort anzeigen',
+    hide: 'Passwort verbergen',
+  },
+  deleteAccount: {
+    title: 'Konto löschen',
+    text: 'Löscht dein Konto und alles darin: Gruppen, angeheftete Spiele, Favoriten und verknüpfte Konten. Das kann nicht rückgängig gemacht werden.',
+    button: 'Konto löschen',
+    confirmText: 'Damit werden dein Konto und alle seine Daten endgültig gelöscht. Gib zur Bestätigung dein Passwort ein.',
+    password: 'Passwort',
+    confirm: 'Mein Konto löschen',
+    deleting: 'Wird gelöscht...',
+    wrongPassword: 'Das Passwort ist falsch.',
+    tooManyAttempts: 'Zu viele falsche Versuche. Warte 15 Minuten und versuche es erneut.',
+    lastAdmin: 'Du bist der einzige Admin. Mach jemand anderen zum Admin, bevor du dein Konto löschst.',
+  },
+  privacy: {
+    link: 'Datenschutz & Cookies',
+    title: 'Datenschutz & Cookies',
+    updated: 'Zuletzt aktualisiert: 2. Oktober 2026',
+    intro: 'CheevoVault verfolgt deine Erfolge auf RetroAchievements und Steam. Diese Seite erklärt, welche Daten über dich gespeichert werden, wozu und was du dagegen tun kannst.',
+    contact: 'Kontakt',
+    controller: 'Verantwortlicher',
+    back: 'Zurück zu CheevoVault',
+    sections: [
+      {
+        heading: 'Was wir speichern',
+        body: [
+          'Dein Konto: ein Benutzername, ein Hash deines Passworts (nie das Passwort selbst) und deine E-Mail-Adresse, die nur zur Wiederherstellung des Kontos und zur Bestätigung, dass es dir gehört, genutzt wird.',
+          'Was du selbst hinzufügst: einen Avatar-Link, dein Land, Lieblings- und angeheftete Spiele und Erfolge sowie deine Gruppen.',
+          'Verknüpfte Konten: dein RetroAchievements-Benutzername und Web-API-Schlüssel sowie deine Steam-ID und dein Anzeigename, um deinen Fortschritt abzurufen. Der Schlüssel verlässt nie unseren Server.',
+          'Sicherheitsprotokolle: die IP-Adresse (bei Anmeldungen auch der Benutzername) fehlgeschlagener Anmeldungen, Registrierungen und Passwort-Zurücksetzungen, einen Tag lang gespeichert, um Missbrauch zu bremsen.',
+        ],
+      },
+      {
+        heading: 'Wozu',
+        body: [
+          'Um den Dienst bereitzustellen, für den du dich registriert hast, ihn sicher zu halten und — nur wenn du zustimmst — Besuche mit Google Analytics zu messen.',
+        ],
+      },
+      {
+        heading: 'Cookies und lokaler Speicher',
+        body: [
+          'Notwendig, ohne Einwilligung: ein Sitzungs-Cookie, das dich angemeldet hält, und lokaler Speicher für Sprache, Theme und deine Cookie-Auswahl.',
+          'Analyse, nur mit deiner Zustimmung: Google-Analytics-Cookies (_ga, _ga_*), die bis zu zwei Jahre gelten. Google erhält nur den Seitenpfad, nie den Rest der Adresse. Du kannst die Einwilligung jederzeit über die Cookie-Einstellungen unten auf der Seite widerrufen: Die Analyse stoppt sofort und ihre Cookies werden gelöscht.',
+        ],
+      },
+      {
+        heading: 'Wer sie außerdem verarbeitet',
+        body: [
+          'Vercel hostet die Seite, Resend verschickt unsere E-Mails, Google stellt die Analyse bereit (nur mit deiner Einwilligung), und RetroAchievements und Steam erhalten die Anfragen, die zur Anzeige deiner Daten nötig sind. Einige sitzen in den USA; diese Übermittlungen stützen sich auf das EU-US Data Privacy Framework oder die Standardvertragsklauseln der Europäischen Kommission.',
+        ],
+      },
+      {
+        heading: 'Wie lange',
+        body: [
+          'Kontodaten bleiben, bis das Konto gelöscht wird, und alles damit Verknüpfte wird mitgelöscht. Links zum Zurücksetzen des Passworts verfallen nach einer Stunde, Sicherheitsprotokolle nach einem Tag.',
+        ],
+      },
+      {
+        heading: 'Deine Rechte',
+        body: [
+          'Du kannst deine Daten einsehen, berichtigen, exportieren oder löschen lassen, der Nutzung widersprechen oder sie einschränken und deine Einwilligung widerrufen. Das meiste kannst du auf deiner Kontoseite bearbeiten, wo du dein Konto auch löschen kannst; für alles andere schreib uns.',
+          'Wenn du meinst, dass deine Daten nicht korrekt behandelt wurden, kannst du dich bei der spanischen Datenschutzbehörde beschweren (aepd.es).',
+        ],
+      },
+    ],
+  },
   loginForm: {
     title: 'Anmelden',
     accountCreated: 'Konto erfolgreich erstellt',
@@ -405,9 +483,6 @@ export const de: Translations = {
   },
   profileSt: {
     signIn: 'Mit Steam anmelden',
-  },
-  progression: {
-    recentProgress: 'Dein kürzlicher Fortschritt',
   },
   gamesList: {
     achievements: 'Errungenschaften',

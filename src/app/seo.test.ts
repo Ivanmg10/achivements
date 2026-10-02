@@ -9,5 +9,5 @@ test('robots keeps crawlers out of the API and points at the sitemap', () => {
 })
 
 test('the sitemap lists only the public pages, as absolute URLs', () => {
-  expect(sitemap().map((e) => e.url)).toEqual([`${SITE_URL}/`, `${SITE_URL}/authPage`])
+  expect(sitemap().map((e) => e.url)).toEqual([`${SITE_URL}/`, `${SITE_URL}/authPage`, `${SITE_URL}/privacy`])
 })

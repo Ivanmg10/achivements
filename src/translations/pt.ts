@@ -259,6 +259,84 @@ export const pt: Translations = {
     closingText: 'É grátis, e ligas as tuas contas quando quiseres.',
     footer: 'Sem ligação ao RetroAchievements, à Valve ou à Sony.',
   },
+  cookies: {
+    title: 'Cookies',
+    text: 'Usamos cookies do Google Analytics para saber que páginas são visitadas e melhorar o site. Nada é guardado se não aceitar, e pode mudar de ideias no rodapé.',
+    accept: 'Aceitar',
+    reject: 'Rejeitar',
+    settings: 'Definições de cookies',
+  },
+  mainFooter: {
+    poweredBy: 'Com tecnologia de',
+  },
+  passwordInput: {
+    show: 'Mostrar palavra-passe',
+    hide: 'Ocultar palavra-passe',
+  },
+  deleteAccount: {
+    title: 'Eliminar conta',
+    text: 'Apaga a sua conta e tudo o que contém: grupos, jogos fixados, favoritos e contas ligadas. Não pode ser desfeito.',
+    button: 'Eliminar conta',
+    confirmText: 'Isto apaga a sua conta e todos os seus dados para sempre. Escreva a sua palavra-passe para confirmar.',
+    password: 'Palavra-passe',
+    confirm: 'Eliminar a minha conta',
+    deleting: 'A eliminar...',
+    wrongPassword: 'A palavra-passe está incorreta.',
+    tooManyAttempts: 'Demasiadas tentativas erradas. Aguarde 15 minutos e tente novamente.',
+    lastAdmin: 'É o único administrador. Torne outra pessoa administrador antes de eliminar a sua conta.',
+  },
+  privacy: {
+    link: 'Privacidade e cookies',
+    title: 'Privacidade e cookies',
+    updated: 'Última atualização: 2 de outubro de 2026',
+    intro: 'O CheevoVault acompanha as suas conquistas do RetroAchievements e do Steam. Esta página explica que dados guarda sobre si, para quê e o que pode fazer em relação a isso.',
+    contact: 'Contacto',
+    controller: 'Responsável pelo tratamento',
+    back: 'Voltar ao CheevoVault',
+    sections: [
+      {
+        heading: 'O que guardamos',
+        body: [
+          'A sua conta: um nome de utilizador, um hash da sua palavra-passe (nunca a palavra-passe em si) e o seu email, usado apenas para recuperar a conta e confirmar que é sua.',
+          'O que decide adicionar: um link de avatar, o seu país, jogos e conquistas favoritos e fixados, e os seus grupos.',
+          'Contas ligadas: o seu utilizador e chave Web API do RetroAchievements, e o seu Steam ID e nome visível, para obter o seu progresso. A chave nunca sai do nosso servidor.',
+          'Registos de segurança: o endereço IP (e o utilizador, nos inícios de sessão) de inícios de sessão falhados, registos e pedidos de redefinição de palavra-passe, guardados durante um dia para travar abusos.',
+        ],
+      },
+      {
+        heading: 'Para quê',
+        body: [
+          'Para prestar o serviço em que se registou, mantê-lo seguro e — apenas se aceitar — medir as visitas com o Google Analytics.',
+        ],
+      },
+      {
+        heading: 'Cookies e armazenamento local',
+        body: [
+          'Necessários, sem consentimento: um cookie de sessão que mantém a sessão iniciada, e armazenamento local para o idioma, o tema e a sua escolha de cookies.',
+          'Analítica, apenas se aceitar: cookies do Google Analytics (_ga, _ga_*), que duram até dois anos. Ao Google só é enviado o caminho da página, nunca o resto do endereço. Pode retirar o consentimento a qualquer momento nas definições de cookies, no fundo da página: a analítica para de imediato e os seus cookies são apagados.',
+        ],
+      },
+      {
+        heading: 'Quem mais os trata',
+        body: [
+          'A Vercel aloja o site, a Resend envia os nossos emails, a Google fornece a analítica (apenas com o seu consentimento) e o RetroAchievements e o Steam recebem os pedidos necessários para mostrar os seus dados. Alguns estão nos Estados Unidos; essas transferências baseiam-se no Quadro de Privacidade de Dados UE-EUA ou nas cláusulas contratuais-tipo da Comissão Europeia.',
+        ],
+      },
+      {
+        heading: 'Durante quanto tempo',
+        body: [
+          'Os dados da conta ficam até a conta ser eliminada, e tudo o que lhe está associado é apagado com ela. Os links de redefinição expiram ao fim de uma hora e os registos de segurança ao fim de um dia.',
+        ],
+      },
+      {
+        heading: 'Os seus direitos',
+        body: [
+          'Pode aceder aos seus dados, corrigi-los, exportá-los ou apagá-los, opor-se ao seu uso ou limitá-lo, e retirar o consentimento. Quase tudo pode ser editado na página da sua conta, onde também a pode eliminar; para o resto, escreva-nos.',
+          'Se considerar que os seus dados não foram tratados como devido, pode apresentar reclamação à Agência Espanhola de Proteção de Dados (aepd.es).',
+        ],
+      },
+    ],
+  },
   loginForm: {
     title: 'Entrar',
     accountCreated: 'Conta criada com sucesso',
@@ -405,9 +483,6 @@ export const pt: Translations = {
   },
   profileSt: {
     signIn: 'Entrar com Steam',
-  },
-  progression: {
-    recentProgress: 'Seu progresso recente',
   },
   gamesList: {
     achievements: 'conquistas',
