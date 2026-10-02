@@ -4,12 +4,12 @@ import { useGameFiltering } from './useGameFiltering'
 const playingGames = [
   { GameID: 1, Title: 'Beta Game', ConsoleID: 21, PctWon: '0.5', HardcoreMode: '0' },
   { GameID: 2, Title: 'Alpha Game', ConsoleID: 22, PctWon: '0.8', HardcoreMode: '1' },
-] as any
+] as never
 
 const wantToPlayGames = [
   { GameID: 3, Title: 'Zeta Game', ConsoleID: 21, PointsTotal: 100 },
   { GameID: 4, Title: 'Alpha Want', ConsoleID: 21, PointsTotal: 300 },
-] as any
+] as never
 
 function setup(overrides: Partial<Parameters<typeof useGameFiltering>[0]> = {}) {
   return renderHook(() =>

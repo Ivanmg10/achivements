@@ -18,10 +18,11 @@ export function usePinnedAchievements() {
   const [error, setError] = useState(false)
   const [reloadKey, setReloadKey] = useState(0)
   const attemptRef = useRef(0)
-  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     let current = true
+    // This run's own retry timer, cleared when the run is replaced or unmounted.
+    const retryTimer: { current: ReturnType<typeof setTimeout> | undefined } = { current: undefined }
     attemptRef.current = 0
     setIsLoading(true)
     setError(false)

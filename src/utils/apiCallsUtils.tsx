@@ -25,21 +25,6 @@ export const getGamesInfo = async (
   }
 };
 
-export const getGamesInfoList = async (
-  gameId: string,
-  session: Session | null,
-  setGames: Dispatch<SetStateAction<RetroAchievementsGameWithAchievements[]>>,
-) => {
-  try {
-    const res = await fetch(`/api/getGameProgression?gameId=${gameId}`)
-    if (!res.ok) throw new Error(`Failed to fetch game ${gameId}`)
-    const newGame = await res.json()
-    setGames((prev) => [...prev, newGame])
-  } catch (err) {
-    console.error('[getGamesInfoList]', err)
-  }
-};
-
 export const unlinkRaUser = async (
   update: () => Promise<Session | null>,
 ) => {

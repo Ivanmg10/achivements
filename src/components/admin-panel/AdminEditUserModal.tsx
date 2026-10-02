@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import CommonModal from '../common-modal/CommonModal'
 import { codeToFlag, findCountry, COUNTRIES } from '@/utils/countries'
@@ -29,19 +29,6 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, c
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [countrySearch, setCountrySearch] = useState('')
   const [showCountryPicker, setShowCountryPicker] = useState(false)
-
-  useEffect(() => {
-    setValues({
-      username: user.username,
-      email: user.email ?? '',
-      avatar: user.avatar ?? '',
-      location: user.location ?? '',
-      admin: user.admin,
-    })
-    setErrors({})
-    setCountrySearch('')
-    setShowCountryPicker(false)
-  }, [user.id, isOpen])
 
   const patch = async (field: Field, value: unknown) => {
     setSaving(field)
@@ -207,7 +194,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, c
           <span className="text-xs text-text-secondary uppercase tracking-wider">Admin</span>
           <div className="flex items-center gap-3">
             {user.id === currentAdminId && (
-              <span className="text-xs text-text-secondary italic">Can't remove own admin</span>
+              <span className="text-xs text-text-secondary italic">Can&apos;t remove own admin</span>
             )}
             <button
               type="button"

@@ -17,8 +17,6 @@ export function useMasonryLayout(itemCount: number, requestedColumns: number, ga
   const [positions, setPositions] = useState<MasonryPosition[]>([])
   const [containerHeight, setContainerHeight] = useState(0)
 
-  itemRefs.current.length = itemCount
-
   const setItemRef = useCallback(
     (index: number) => (el: HTMLDivElement | null) => {
       itemRefs.current[index] = el
@@ -27,6 +25,8 @@ export function useMasonryLayout(itemCount: number, requestedColumns: number, ga
   )
 
   const recalculate = useCallback(() => {
+    // Forget refs of items that are gone (done here, not during render).
+    itemRefs.current.length = itemCount
     const containerWidth = containerRef.current?.offsetWidth ?? 0
     const columns = effectiveColumns(containerWidth, requestedColumns)
     const colWidth = columns > 0 ? (containerWidth - gap * (columns - 1)) / columns : 0

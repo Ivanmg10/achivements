@@ -20,7 +20,7 @@ const mockUser = {
   UserWallActive: 1,
 }
 
-const mockGame = { ID: 19010, Title: 'Sly Cooper', ImageIcon: '/icon.png', ConsoleName: 'PS2' } as any
+const mockGame = { ID: 19010, Title: 'Sly Cooper', ImageIcon: '/icon.png', ConsoleName: 'PS2' } as never
 
 test('renders user info when user present', () => {
   render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} />)
@@ -35,7 +35,7 @@ test('renders login link when no user', () => {
 })
 
 test('renders without UserPic', () => {
-  render(<MainPageProfileRa user={{ ...mockUser, UserPic: undefined as any }} game={mockGame} recentAchievements={[]} />)
+  render(<MainPageProfileRa user={{ ...mockUser, UserPic: undefined as never }} game={mockGame} recentAchievements={[]} />)
   expect(screen.getByText('IvanXMarine')).toBeInTheDocument()
 })
 

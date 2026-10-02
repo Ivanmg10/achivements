@@ -81,7 +81,8 @@ export default function AddGameModal({
   function toggle(c: GameCandidate) {
     setSelected((prev) => {
       const next = new Map(prev)
-      next.has(c.key) ? next.delete(c.key) : next.set(c.key, c)
+      if (next.has(c.key)) next.delete(c.key)
+      else next.set(c.key, c)
       return next
     })
   }

@@ -13,7 +13,6 @@ import { useLanguage } from '@/context/LanguageContext'
 import MainPageProfileRaAchievements from './main-page-profile-ra-achievements/MainPageProfileRaAchievements'
 import MainPageProfileRaGame from './main-page-profile-ra-game/MainPageProfileRaGame'
 import MainPageProfileRaStats from './main-page-profile-ra-stats/MainPageProfileRaStats'
-// import MainPageProfileConsoles from '../main-page-profile-consoles/MainPageProfileConsoles'
 
 export default function MainPageProfileRa({
   user,

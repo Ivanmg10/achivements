@@ -5,6 +5,8 @@ jest.mock('@/components/user-theme/UserTheme', () => ({
 
 import { render, screen, fireEvent } from '@testing-library/react'
 import UserConfig from './UserConfig'
+import { useLanguage } from '@/context/LanguageContext'
+import { en } from '@/translations/en'
 
 test('renders account settings section', () => {
   render(<UserConfig />)
@@ -26,11 +28,10 @@ test('renders language switcher', () => {
 
 test('clicking language buttons triggers setLang', () => {
   const mockSetLang = jest.fn()
-  const { useLanguage } = require('@/context/LanguageContext')
   ;(useLanguage as jest.Mock).mockReturnValue({
     lang: 'en',
     setLang: mockSetLang,
-    T: require('@/translations/en').en,
+    T: en,
   })
   render(<UserConfig />)
   fireEvent.click(screen.getByText('ES'))

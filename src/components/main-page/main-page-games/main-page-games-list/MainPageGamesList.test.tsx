@@ -20,7 +20,7 @@ const games = [
     ID: undefined,
     GameID: 2,
   },
-] as any;
+] as never;
 
 test("renders game list items", () => {
   render(<MainPageGamesList listGames={games} />);

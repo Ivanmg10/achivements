@@ -2,12 +2,12 @@ jest.mock('@/lib/fetchWithRetry', () => ({
   fetchWithRetry: jest.fn(),
 }))
 
-import { addGamesToGroup, fetchRaCandidateById, getGamesInfo, getGamesInfoList, unlinkRaUser, getWantGames } from './apiCallsUtils'
+import { addGamesToGroup, fetchRaCandidateById, getGamesInfo, unlinkRaUser, getWantGames } from './apiCallsUtils'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
 global.fetch = jest.fn()
 
-const mockSession = { user: { rausername: 'ivan', raid: 'key' } } as any
+const mockSession = { user: { rausername: 'ivan', raid: 'key' } } as never
 
 beforeEach(() => {
   ;(fetch as jest.Mock).mockResolvedValue({
@@ -31,25 +31,6 @@ test('getGamesInfo does not throw on error response', async () => {
   ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: false })
   await expect(getGamesInfo('123', mockSession, setGameData)).resolves.not.toThrow()
   expect(setGameData).not.toHaveBeenCalled()
-})
-
-test('getGamesInfoList appends to state', async () => {
-  const setGames = jest.fn()
-  ;(fetch as jest.Mock).mockResolvedValueOnce({
-    ok: true,
-    json: () => Promise.resolve({ ID: 2, Title: 'Game2' }),
-  })
-  await getGamesInfoList('456', mockSession, setGames)
-  expect(setGames).toHaveBeenCalled()
-  const updater = (setGames as jest.Mock).mock.calls[0][0]
-  expect(updater([{ ID: 1 }])).toEqual([{ ID: 1 }, { ID: 2, Title: 'Game2' }])
-})
-
-test('getGamesInfoList does not throw on error response', async () => {
-  const setGames = jest.fn()
-  ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: false })
-  await expect(getGamesInfoList('456', mockSession, setGames)).resolves.not.toThrow()
-  expect(setGames).not.toHaveBeenCalled()
 })
 
 test('unlinkRaUser calls fetch and update', async () => {

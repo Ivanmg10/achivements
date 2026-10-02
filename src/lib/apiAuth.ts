@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 
-export type RaSession = { id: string; rausername: string; raid: string }
+type RaSession = { id: string; rausername: string; raid: string }
 export type RaSessionResult = { ok: true; session: RaSession } | { ok: false; response: NextResponse }
 
 export type SessionResult = { ok: true; id: string } | { ok: false; response: NextResponse }
@@ -61,7 +61,7 @@ export async function requireViewerApiKey(): Promise<ViewerApiKeyResult> {
   return { ok: true, viewerId: session.user.id, apiKey }
 }
 
-export type SteamSession = { id: string; steamid: string; apiKey: string }
+type SteamSession = { id: string; steamid: string; apiKey: string }
 export type SteamSessionResult = { ok: true; session: SteamSession } | { ok: false; response: NextResponse }
 
 /**

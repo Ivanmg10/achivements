@@ -4,7 +4,7 @@ import GameInfoProgressionHeader from './GameInfoProgressionHeader'
 const mockGameData = {
   UserCompletion: '50%',
   UserCompletionHardcore: '25%',
-} as any
+} as never
 
 test('renders softcore percentage', () => {
   render(<GameInfoProgressionHeader gameData={mockGameData} />)
@@ -22,6 +22,6 @@ test('renders without gameData', () => {
 })
 
 test('hides hardcore label when hardcorePct is 0', () => {
-  render(<GameInfoProgressionHeader gameData={{ UserCompletion: '50%', UserCompletionHardcore: '0%' } as any} />)
+  render(<GameInfoProgressionHeader gameData={{ UserCompletion: '50%', UserCompletionHardcore: '0%' } as never} />)
   expect(screen.queryByText('0%')).toBeNull()
 })

@@ -42,20 +42,24 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
   const steam = useSteamRecentAchievements(steamid ? 'year' : null)
 
   const doFetch = useCallback(() => {
-    if (!rausername) { setRaLoading(false); return }
-    setRaLoading(true)
-    setRaError(false)
-    const onFail = (err?: unknown) => {
-      if (!scheduleRetry(attemptRef, retryTimer, doFetch, err)) { setRaError(true); setRaLoading(false) }
+    // Named, so a retry can call it again.
+    const run = () => {
+      if (!rausername) { setRaLoading(false); return }
+      setRaLoading(true)
+      setRaError(false)
+      const onFail = (err?: unknown) => {
+        if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setRaError(true); setRaLoading(false) }
+      }
+      fetchWithRetry('/api/getActivityHeatmapYear')
+        .then((data) => {
+          if (!Array.isArray(data)) return onFail()
+          setRaAchievements(data as RecentAchievement[])
+          setRaLoading(false)
+          attemptRef.current = 0
+        })
+        .catch(onFail)
     }
-    fetchWithRetry('/api/getActivityHeatmapYear')
-      .then((data) => {
-        if (!Array.isArray(data)) return onFail()
-        setRaAchievements(data as RecentAchievement[])
-        setRaLoading(false)
-        attemptRef.current = 0
-      })
-      .catch(onFail)
+    run()
   }, [rausername])
 
   useEffect(() => {

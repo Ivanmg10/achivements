@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react'
 import GamesPlayedPieChart from './GamesPlayedPieChart'
 
 const mockGames = [
-  { ConsoleName: 'PS2', GameID: 1, HardcoreMode: '0', PctWon: '1.0000' } as any,
-  { ConsoleName: 'PS2', GameID: 2, HardcoreMode: '0', PctWon: '0.5000' } as any,
-  { ConsoleName: 'GBA', GameID: 3, HardcoreMode: '0', PctWon: '1.0000' } as any,
+  { ConsoleName: 'PS2', GameID: 1, HardcoreMode: '0', PctWon: '1.0000' } as never,
+  { ConsoleName: 'PS2', GameID: 2, HardcoreMode: '0', PctWon: '0.5000' } as never,
+  { ConsoleName: 'GBA', GameID: 3, HardcoreMode: '0', PctWon: '1.0000' } as never,
 ]
 
 test('renders bar chart with games', () => {

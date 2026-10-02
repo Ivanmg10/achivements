@@ -20,7 +20,6 @@ export default function SteamGameHeroBackground({ appId }: { appId: number }) {
       className="absolute pointer-events-none overflow-hidden"
       style={{ top: '-64px', left: '50%', transform: 'translateX(-50%)', width: '100vw', height: '900px' }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- a blurred backdrop, as on the RA page */}
       <img
         key={sources[index]}
         src={sources[index]}

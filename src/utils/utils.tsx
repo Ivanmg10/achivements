@@ -84,7 +84,6 @@ export const groupByDays = (achievements: RecentAchievement[], totalDays: number
   return days.map((date) => ({ date, count: grouped[date] || 0 }))
 }
 
-export const groupBy365Days = (achievements: RecentAchievement[]) => groupByDays(achievements, 365)
 
 export function calcStreak(achievements: RecentAchievement[]): number {
   if (!achievements.length) return 0
@@ -275,7 +274,7 @@ export function achievementGameIconUrl(a: RecentAchievement): string | undefined
 }
 
 /** Completion bands, as fractions: <25%, 25–49%, 50–74%, 75–99%, 100%. */
-export const COMPLETION_BANDS = [0.25, 0.5, 0.75, 1] as const
+const COMPLETION_BANDS = [0.25, 0.5, 0.75, 1] as const
 
 /**
  * How many games fall in each completion band, for the distribution bar.

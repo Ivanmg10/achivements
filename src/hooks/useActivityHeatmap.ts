@@ -13,20 +13,24 @@ export function useActivityHeatmap() {
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const doFetch = useCallback(() => {
-    if (!session?.user?.rausername) { setIsLoading(false); return }
-    setIsLoading(true)
-    setError(false)
-    const onFail = (err?: unknown) => {
-      if (!scheduleRetry(attemptRef, retryTimer, doFetch, err)) { setError(true); setIsLoading(false) }
+    // Named, so a retry can call it again.
+    const run = () => {
+      if (!session?.user?.rausername) { setIsLoading(false); return }
+      setIsLoading(true)
+      setError(false)
+      const onFail = (err?: unknown) => {
+        if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
+      }
+      fetchWithRetry('/api/getActivityHeatmap')
+        .then((data) => {
+          if (!Array.isArray(data)) return onFail()
+          setAchievements(data as RecentAchievement[])
+          setIsLoading(false)
+          attemptRef.current = 0
+        })
+        .catch(onFail)
     }
-    fetchWithRetry('/api/getActivityHeatmap')
-      .then((data) => {
-        if (!Array.isArray(data)) return onFail()
-        setAchievements(data as RecentAchievement[])
-        setIsLoading(false)
-        attemptRef.current = 0
-      })
-      .catch(onFail)
+    run()
   }, [session?.user?.rausername])
 
   useEffect(() => {

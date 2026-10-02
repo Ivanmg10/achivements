@@ -7,7 +7,7 @@ jest.mock('@/context/LanguageContext', () => ({
   useLanguage: () => ({ T: mockT }),
 }))
 
-jest.mock('next/link', () => ({ children, ...props }: any) => (
+jest.mock('next/link', () => ({ children, ...props }: React.ComponentProps<'a'>) => (
   <a {...props}>{children}</a>
 ))
 

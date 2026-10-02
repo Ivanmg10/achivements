@@ -208,7 +208,6 @@ const STEAM_IMAGES = [
   ...STEAM_APP_IDS.map((id) => steamAssetUrl(id, 'cover')),
   ...STEAM_HEADER_IDS.map((id) => steamAssetUrl(id, 'header')),
 ]
-const ALL_IMAGES = [...RA_IMAGES, ...STEAM_IMAGES]
 
 const COLUMNS = 4
 /**

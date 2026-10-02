@@ -175,6 +175,8 @@ export default function AdminPanel() {
 
       {editUser && (
         <AdminEditUserModal
+          // A new user is a new form: the key starts it from that user's values.
+          key={editUser.id}
           isOpen
           onClose={() => setEditUser(null)}
           user={editUser}

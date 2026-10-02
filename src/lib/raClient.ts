@@ -26,10 +26,6 @@ export function getGame(gameId: string | number, apiKey: string) {
   return fetchRA(`${BASE}/API_GetGame.php?${qs({ i: gameId, y: apiKey })}`)
 }
 
-export function getGameExtended(gameId: string | number, apiKey: string) {
-  return fetchRA(`${BASE}/API_GetGameExtended.php?${qs({ i: gameId, y: apiKey })}`)
-}
-
 export function getGameInfoAndUserProgress(username: string, apiKey: string, gameId: string | number) {
   return fetchRA(`${BASE}/API_GetGameInfoAndUserProgress.php?${qs({ u: username, y: apiKey, g: gameId })}`)
 }
@@ -68,10 +64,6 @@ export function getUserRankAndScore(username: string, apiKey: string) {
 
 export function getUserWantToPlayList(username: string, apiKey: string) {
   return fetchRA(`${BASE}/API_GetUserWantToPlayList.php?${qs({ u: username, y: apiKey })}`)
-}
-
-export function getTopTenUsers(apiKey: string) {
-  return fetchRA(`${BASE}/API_GetTopTenUsers.php?${qs({ y: apiKey })}`)
 }
 
 export function getUserRecentAchievements(username: string, apiKey: string, minutes: number, count: number) {

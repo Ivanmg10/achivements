@@ -9,14 +9,14 @@ export type StatusSortKey = 'name' | 'lastPlayed' | 'percent' | 'points'
 export type SortDir = 'asc' | 'desc'
 export type StatusSortState = { key: StatusSortKey; dir: SortDir }
 
-export const STATUS_SORT_DEFAULT_DIRS: Record<StatusSortKey, SortDir> = {
+const STATUS_SORT_DEFAULT_DIRS: Record<StatusSortKey, SortDir> = {
   name: 'asc',
   lastPlayed: 'desc',
   percent: 'desc',
   points: 'desc',
 }
 
-export const STATUS_SORT_KEYS_BY_CATEGORY: Record<string, StatusSortKey[]> = {
+const STATUS_SORT_KEYS_BY_CATEGORY: Record<string, StatusSortKey[]> = {
   wantToPlay: ['name', 'points'],
   playing: ['name', 'lastPlayed', 'percent', 'points'],
   completed: ['name', 'lastPlayed', 'percent', 'points'],

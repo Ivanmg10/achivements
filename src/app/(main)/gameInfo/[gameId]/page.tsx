@@ -15,11 +15,10 @@ import { useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 
 export default function GameInfo() {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const [gameData, setGameData] = useState<RetroAchievementsGameWithAchievements | null>(null)
   const [subsets, setSubsets] = useState<SubsetGame[]>([])
   const [parentId, setParentId] = useState<number | null>(null)
-  const [parentTitle, setParentTitle] = useState('')
   const [parentIcon, setParentIcon] = useState('')
   const [error, setError] = useState<string | null>(null)
   const { gameId } = useParams()
@@ -31,7 +30,6 @@ export default function GameInfo() {
     setGameData(null)
     setSubsets([])
     setParentId(null)
-    setParentTitle('')
     setParentIcon('')
 
     fetch(`/api/getGameProgression?gameId=${gameId}`)
@@ -50,13 +48,11 @@ export default function GameInfo() {
           ])
           if (parentRes.ok) {
             const parentData: RetroAchievementsGameWithAchievements = await parentRes.json()
-            setParentTitle(parentData.Title ?? '')
             setParentIcon(parentData.ImageIcon ?? '')
           }
           if (subsetsRes.ok) setSubsets(await subsetsRes.json())
         } else {
           setParentId(data.ID)
-          setParentTitle(data.Title ?? '')
           setParentIcon(data.ImageIcon ?? '')
           const subsetsRes = await fetch(
             `/api/getGameSubsets?gameId=${data.ID}&consoleId=${data.ConsoleID}&baseTitle=${encodeURIComponent(data.Title ?? '')}`
@@ -99,7 +95,6 @@ export default function GameInfo() {
               <GameInfoSubsetSelector
                 currentId={gameData.ID!}
                 parentId={parentId !== gameData.ID ? parentId : null}
-                parentTitle={parentTitle}
                 parentIcon={parentIcon}
                 subsets={subsets}
               />

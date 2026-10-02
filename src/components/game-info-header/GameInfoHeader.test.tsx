@@ -16,7 +16,7 @@ const mockGameData = {
   NumAchievements: 10,
   UserCompletion: "50%",
   UserCompletionHardcore: "25%",
-} as any;
+} as never;
 
 test("renders game title and info", () => {
   render(<GameInfoHeader gameData={mockGameData} />);

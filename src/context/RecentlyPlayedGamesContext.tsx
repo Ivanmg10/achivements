@@ -26,20 +26,24 @@ export function RecentlyPlayedGamesProvider({ children }: { children: React.Reac
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const doFetch = useCallback(() => {
-    if (status !== 'authenticated' || !rausername) return
-    setIsLoading(true)
-    setError(false)
-    const onFail = (err?: unknown) => {
-      if (!scheduleRetry(attemptRef, retryTimer, doFetch, err)) { setError(true); setIsLoading(false) }
+    // Named, so a retry can call it again.
+    const run = () => {
+      if (status !== 'authenticated' || !rausername) return
+      setIsLoading(true)
+      setError(false)
+      const onFail = (err?: unknown) => {
+        if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
+      }
+      fetchWithRetry('/api/getRecentlyPlayedGames')
+        .then((data) => {
+          if (!Array.isArray(data)) return onFail()
+          setGames(data as RecentlyPlayedGame[])
+          setIsLoading(false)
+          attemptRef.current = 0
+        })
+        .catch(onFail)
     }
-    fetchWithRetry('/api/getRecentlyPlayedGames')
-      .then((data) => {
-        if (!Array.isArray(data)) return onFail()
-        setGames(data as RecentlyPlayedGame[])
-        setIsLoading(false)
-        attemptRef.current = 0
-      })
-      .catch(onFail)
+    run()
   }, [status, rausername])
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import MainPagePointsStats from './MainPagePointsStats'
+import type { RecentAchievement, UserRankAndScore } from '@/types/types'
 
 jest.mock('@/components/day-achievements-modal/DayAchievementsModal', () => ({
   __esModule: true,
@@ -39,6 +40,10 @@ function daysAgo(n: number) {
 }
 
 describe('MainPagePointsStats', () => {
+  // Mid-month, so "a few days ago" is always this month too, whatever day the suite runs.
+  beforeEach(() => jest.useFakeTimers({ now: new Date(2026, 5, 15, 12) }))
+  afterEach(() => jest.useRealTimers())
+
   test('renders loading skeleton with labels only', () => {
     render(<MainPagePointsStats achievements={[]} heatmapAchievements={[]} rank={null} isLoading />)
     expect(screen.getAllByText('—').length).toBeGreaterThan(0)
@@ -52,9 +57,9 @@ describe('MainPagePointsStats', () => {
 
   test('sums points earned today and this week', () => {
     const achievements = [
-      { Date: `${daysAgo(0)} 10:00:00`, Points: 10, HardcoreMode: '1' } as any,
-      { Date: `${daysAgo(3)} 10:00:00`, Points: 5, HardcoreMode: '0' } as any,
-      { Date: `${daysAgo(20)} 10:00:00`, Points: 100, HardcoreMode: '0' } as any,
+      { Date: `${daysAgo(0)} 10:00:00`, Points: 10, HardcoreMode: '1' } as unknown as RecentAchievement,
+      { Date: `${daysAgo(3)} 10:00:00`, Points: 5, HardcoreMode: '0' } as unknown as RecentAchievement,
+      { Date: `${daysAgo(20)} 10:00:00`, Points: 100, HardcoreMode: '0' } as unknown as RecentAchievement,
     ]
     render(<MainPagePointsStats achievements={achievements} heatmapAchievements={[]} rank={null} />)
     expect(screen.getByText('10')).toBeInTheDocument()
@@ -71,7 +76,7 @@ describe('MainPagePointsStats', () => {
       <MainPagePointsStats
         achievements={[]}
         heatmapAchievements={[]}
-        rank={{ Rank: 1234, Score: 5000, SoftcoreScore: 0 } as any}
+        rank={{ Rank: 1234, Score: 5000, SoftcoreScore: 0 } as unknown as UserRankAndScore}
       />,
     )
     expect(screen.getByText('#1234')).toBeInTheDocument()
@@ -80,9 +85,9 @@ describe('MainPagePointsStats', () => {
 
   test('sums only this-calendar-month points from heatmap achievements', () => {
     const heatmapAchievements = [
-      { Date: `${daysAgo(2)} 10:00:00`, Points: 50, HardcoreMode: '0' } as any,
-      { Date: `${daysAgo(5)} 10:00:00`, Points: 50, HardcoreMode: '0' } as any,
-      { Date: '2000-01-01 10:00:00', Points: 999, HardcoreMode: '0' } as any,
+      { Date: `${daysAgo(2)} 10:00:00`, Points: 50, HardcoreMode: '0' } as unknown as RecentAchievement,
+      { Date: `${daysAgo(5)} 10:00:00`, Points: 50, HardcoreMode: '0' } as unknown as RecentAchievement,
+      { Date: '2000-01-01 10:00:00', Points: 999, HardcoreMode: '0' } as unknown as RecentAchievement,
     ]
     render(<MainPagePointsStats achievements={[]} heatmapAchievements={heatmapAchievements} rank={null} />)
     expect(screen.getByText('This month')).toBeInTheDocument()
@@ -108,9 +113,9 @@ describe('MainPagePointsStats', () => {
 
   test('clicking This week opens the period modal with the rolling 7-day achievements', () => {
     const achievements = [
-      { Date: `${daysAgo(0)} 10:00:00`, Points: 10, HardcoreMode: '1' } as any,
-      { Date: `${daysAgo(3)} 10:00:00`, Points: 5, HardcoreMode: '0' } as any,
-      { Date: `${daysAgo(20)} 10:00:00`, Points: 100, HardcoreMode: '0' } as any,
+      { Date: `${daysAgo(0)} 10:00:00`, Points: 10, HardcoreMode: '1' } as unknown as RecentAchievement,
+      { Date: `${daysAgo(3)} 10:00:00`, Points: 5, HardcoreMode: '0' } as unknown as RecentAchievement,
+      { Date: `${daysAgo(20)} 10:00:00`, Points: 100, HardcoreMode: '0' } as unknown as RecentAchievement,
     ]
     render(<MainPagePointsStats achievements={achievements} heatmapAchievements={[]} rank={null} />)
     fireEvent.click(screen.getByText('This week').closest('button')!)
@@ -119,8 +124,8 @@ describe('MainPagePointsStats', () => {
 
   test('clicking This month opens the period modal with this-calendar-month achievements', () => {
     const heatmapAchievements = [
-      { Date: `${daysAgo(2)} 10:00:00`, Points: 50, HardcoreMode: '0' } as any,
-      { Date: '2000-01-01 10:00:00', Points: 999, HardcoreMode: '0' } as any,
+      { Date: `${daysAgo(2)} 10:00:00`, Points: 50, HardcoreMode: '0' } as unknown as RecentAchievement,
+      { Date: '2000-01-01 10:00:00', Points: 999, HardcoreMode: '0' } as unknown as RecentAchievement,
     ]
     render(<MainPagePointsStats achievements={[]} heatmapAchievements={heatmapAchievements} rank={null} />)
     fireEvent.click(screen.getByText('This month').closest('button')!)

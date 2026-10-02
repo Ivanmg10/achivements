@@ -26,8 +26,8 @@ describe("groupByDay", () => {
   test("counts achievements that fall within last 7 days", () => {
     const today = new Date().toISOString().split("T")[0];
     const achievements = [
-      { Date: `${today} 10:00:00` } as any,
-      { Date: `${today} 12:00:00` } as any,
+      { Date: `${today} 10:00:00` } as never,
+      { Date: `${today} 12:00:00` } as never,
     ];
     const result = groupByDay(achievements);
     const todayEntry = result.find((r) => r.date === today);
@@ -35,7 +35,7 @@ describe("groupByDay", () => {
   });
 
   test("returns zero counts for non-array input", () => {
-    const result = groupByDay(null as any);
+    const result = groupByDay(null as never);
     expect(result.length).toBe(7);
     result.forEach((r) => expect(r.count).toBe(0));
   });
@@ -59,7 +59,7 @@ describe("groupByConsole", () => {
       { ConsoleName: "PS2", GameID: 1 },
       { ConsoleName: "PS2", GameID: 2 },
       { ConsoleName: "GBA", GameID: 3 },
-    ] as any;
+    ] as never;
     const result = groupByConsole(games);
     expect(result).toContainEqual({ name: "PS2", value: 2 });
     expect(result).toContainEqual({ name: "GBA", value: 1 });
@@ -69,7 +69,7 @@ describe("groupByConsole", () => {
     const games = [
       { ConsoleName: "Events", GameID: 1 },
       { ConsoleName: "PS2", GameID: 2 },
-    ] as any;
+    ] as never;
     const result = groupByConsole(games);
     expect(result).not.toContainEqual(expect.objectContaining({ name: "Events" }));
     expect(result).toContainEqual({ name: "PS2", value: 1 });
@@ -86,8 +86,8 @@ describe("calcStreak", () => {
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
     const achievements = [
-      { Date: today.toISOString().split("T")[0] + " 10:00:00" } as any,
-      { Date: yesterday.toISOString().split("T")[0] + " 10:00:00" } as any,
+      { Date: today.toISOString().split("T")[0] + " 10:00:00" } as never,
+      { Date: yesterday.toISOString().split("T")[0] + " 10:00:00" } as never,
     ];
     expect(calcStreak(achievements)).toBe(2);
   });
@@ -97,7 +97,7 @@ describe("calcStreak", () => {
     const twoDaysAgo = new Date(today);
     twoDaysAgo.setDate(today.getDate() - 2);
     const achievements = [
-      { Date: twoDaysAgo.toISOString().split("T")[0] + " 10:00:00" } as any,
+      { Date: twoDaysAgo.toISOString().split("T")[0] + " 10:00:00" } as never,
     ];
     expect(calcStreak(achievements)).toBe(0);
   });
@@ -110,9 +110,9 @@ describe("getBestMonth", () => {
 
   test("picks the month with the highest total points", () => {
     const achievements = [
-      { Date: "2024-01-05 10:00:00", Points: 10 } as any,
-      { Date: "2024-01-15 10:00:00", Points: 10 } as any,
-      { Date: "2024-02-10 10:00:00", Points: 5 } as any,
+      { Date: "2024-01-05 10:00:00", Points: 10 } as never,
+      { Date: "2024-01-15 10:00:00", Points: 10 } as never,
+      { Date: "2024-02-10 10:00:00", Points: 5 } as never,
     ];
     const result = getBestMonth(achievements);
     expect(result?.[0]).toBe("2024-01");
@@ -138,9 +138,9 @@ describe("calcThisMonth", () => {
   test("sums only achievements from the current calendar month", () => {
     const monthKey = new Date().toISOString().slice(0, 7);
     const achievements = [
-      { Date: `${monthKey}-05 10:00:00`, Points: 10 } as any,
-      { Date: `${monthKey}-15 10:00:00`, Points: 5 } as any,
-      { Date: "2000-01-01 10:00:00", Points: 100 } as any,
+      { Date: `${monthKey}-05 10:00:00`, Points: 10 } as never,
+      { Date: `${monthKey}-15 10:00:00`, Points: 5 } as never,
+      { Date: "2000-01-01 10:00:00", Points: 100 } as never,
     ];
     expect(calcThisMonth(achievements)).toEqual({ pts: 15, ach: 2 });
   });
@@ -156,8 +156,8 @@ describe("calcAvgPerDay", () => {
     const recent = new Date(now); recent.setDate(now.getDate() - 5);
     const old = new Date(now); old.setDate(now.getDate() - 40);
     const achievements = [
-      { Date: `${recent.toISOString().split("T")[0]} 10:00:00`, Points: 5 } as any,
-      { Date: `${old.toISOString().split("T")[0]} 10:00:00`, Points: 5 } as any,
+      { Date: `${recent.toISOString().split("T")[0]} 10:00:00`, Points: 5 } as never,
+      { Date: `${old.toISOString().split("T")[0]} 10:00:00`, Points: 5 } as never,
     ];
     expect(calcAvgPerDay(achievements, 30)).toBeCloseTo(1 / 30);
   });
@@ -170,32 +170,32 @@ describe("sumAchievementPoints", () => {
 
   test("sums all points as total, none earned when no dates set", () => {
     const achievements = {
-      a: { Points: 10 } as any,
-      b: { Points: 5 } as any,
+      a: { Points: 10 } as never,
+      b: { Points: 5 } as never,
     };
     expect(sumAchievementPoints(achievements)).toEqual({ earned: 0, total: 15 });
   });
 
   test("sums earned points from softcore or hardcore date", () => {
     const achievements = {
-      a: { Points: 10, DateEarned: "2024-01-01" } as any,
-      b: { Points: 5, DateEarnedHardcore: "2024-01-02" } as any,
-      c: { Points: 3 } as any,
+      a: { Points: 10, DateEarned: "2024-01-01" } as never,
+      b: { Points: 5, DateEarnedHardcore: "2024-01-02" } as never,
+      c: { Points: 3 } as never,
     };
     expect(sumAchievementPoints(achievements)).toEqual({ earned: 15, total: 18 });
   });
 
   test("hardcoreOnly ignores softcore-earned achievements", () => {
     const achievements = {
-      a: { Points: 10, DateEarned: "2024-01-01" } as any,
-      b: { Points: 5, DateEarnedHardcore: "2024-01-02" } as any,
+      a: { Points: 10, DateEarned: "2024-01-01" } as never,
+      b: { Points: 5, DateEarnedHardcore: "2024-01-02" } as never,
     };
     expect(sumAchievementPoints(achievements, true)).toEqual({ earned: 5, total: 15 });
   });
 
   test("skips null/undefined entries", () => {
     const achievements = {
-      a: { Points: 10, DateEarned: "2024-01-01" } as any,
+      a: { Points: 10, DateEarned: "2024-01-01" } as never,
       b: undefined,
     };
     expect(sumAchievementPoints(achievements)).toEqual({ earned: 10, total: 10 });
@@ -203,8 +203,8 @@ describe("sumAchievementPoints", () => {
 });
 
 describe("getGameSortValue", () => {
-  const wantToPlay = { Title: "Jak 2", PointsTotal: 450 } as any;
-  const playing = { Title: "Sly Cooper", PctWon: "0.5" } as any;
+  const wantToPlay = { Title: "Jak 2", PointsTotal: 450 } as never;
+  const playing = { Title: "Sly Cooper", PctWon: "0.5" } as never;
 
   test("returns Title for name key regardless of game shape", () => {
     expect(getGameSortValue(wantToPlay, undefined, "name")).toBe("Jak 2");
