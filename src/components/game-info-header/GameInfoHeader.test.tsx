@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import GameInfoHeader from "./GameInfoHeader";
+import type { RetroAchievementsGameWithAchievements } from "@/types/types";
 
 const mockGameData = {
   ID: 1,
@@ -16,7 +17,7 @@ const mockGameData = {
   NumAchievements: 10,
   UserCompletion: "50%",
   UserCompletionHardcore: "25%",
-} as any;
+} as unknown as RetroAchievementsGameWithAchievements;
 
 test("renders game title and info", () => {
   render(<GameInfoHeader gameData={mockGameData} />);
@@ -55,7 +56,7 @@ test("renders a points badge with earned/total when the game has achievements", 
       a: { Points: 10, DateEarned: "2024-01-01" },
       b: { Points: 5 },
     },
-  };
+  } as unknown as RetroAchievementsGameWithAchievements;
   render(<GameInfoHeader gameData={gameData} />);
   expect(screen.getByText("10 / 15")).toBeInTheDocument();
 });

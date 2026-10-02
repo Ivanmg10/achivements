@@ -46,7 +46,7 @@ const game = {
     1: { ID: 1, DisplayOrder: 0 },
     2: { ID: 2, DisplayOrder: 1 },
   },
-} as any
+} as never
 
 // Uncontrolled wrapper so tests can exercise open/close via clicks like before.
 function UncontrolledPinnedGameRow({ gameId }: { gameId: number }) {

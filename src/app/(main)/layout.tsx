@@ -14,7 +14,7 @@ export default async function MainLayout({
   const session = await getServerSession(authOptions);
 
   // Signed out, the only page that gets this far is the landing (see
-  // middleware.ts), and it brings its own header and footer.
+  // proxy.ts), and it brings its own header and footer.
   if (!session) return <>{children}</>;
 
   return (

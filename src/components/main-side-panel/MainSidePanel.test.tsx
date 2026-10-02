@@ -1,6 +1,6 @@
 global.fetch = jest.fn()
 
-import { render, screen, act } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MainSidePanel from './MainSidePanel'
 import { useSession } from 'next-auth/react'

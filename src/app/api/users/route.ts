@@ -82,6 +82,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(created, { status: 201 });
   } catch (err) {
+    // Two sign-ups raced past the checks above; the unique index stopped the second.
+    const { code, constraint } = err as { code?: string; constraint?: string };
+    if (code === "23505") {
+      return constraint === "users_email_lower_key"
+        ? NextResponse.json({ error: "email-taken" }, { status: 409 })
+        : NextResponse.json({ error: "Username ya en uso" }, { status: 409 });
+    }
     console.error("[users POST]", err);
     return NextResponse.json(
       { error: "Error creando usuario" },

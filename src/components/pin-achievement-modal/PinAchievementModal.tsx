@@ -6,6 +6,7 @@ import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievement } from '@/types/types'
+import { notify } from '@/lib/notify'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -61,6 +62,7 @@ export function PinAchievementModal({
       })
       if (!res.ok) throw new Error('Failed to pin achievement')
       onPinned()
+      notify.success(T.toast.achievementsUpdated)
       onClose()
     } catch {
       setError(true)

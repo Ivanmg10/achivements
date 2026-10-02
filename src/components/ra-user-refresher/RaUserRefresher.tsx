@@ -24,7 +24,7 @@ export default function RaUserRefresher() {
         return update()
       })
       .catch((err) => console.error('[RaUserRefresher]', err))
-  }, [status])
+  }, [status, session?.user?.raUser?.User, update])
 
   return null
 }

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import GroupIconDisplay from './GroupIconDisplay'
 
-jest.mock('next/image', () => ({ src, alt, ...props }: any) => (
+jest.mock('next/image', () => ({ src, alt, ...props }: React.ComponentProps<'img'>) => (
   <img src={src} alt={alt} {...props} />
 ))
 

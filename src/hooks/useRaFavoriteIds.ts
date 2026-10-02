@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { RetroAchievement } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
+import { notify } from '@/lib/notify'
 
 type FavoriteMeta = { gameTitle?: string | null; numDistinctPlayers: number }
 
@@ -10,6 +12,7 @@ type FavoriteMeta = { gameTitle?: string | null; numDistinctPlayers: number }
  * lets a collapsed row wait until it is opened before asking.
  */
 export function useRaFavoriteIds(gameId: number | string | null | undefined, enabled = true) {
+  const { T } = useLanguage()
   const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -51,12 +54,14 @@ export function useRaFavoriteIds(gameId: number | string | null | undefined, ena
               body: JSON.stringify({ achievement, gameId, ...meta }),
             })
         if (!res.ok) throw new Error(`Failed to ${isFav ? 'unpin' : 'pin'} achievement (${res.status})`)
+        notify.success(T.toast.achievementsUpdated)
       } catch (err) {
         console.error('[useRaFavoriteIds] toggle', err)
         flip(isFav)
+        notify.error(T.toast.achievementsFailed)
       }
     },
-    [favoritedIds, gameId]
+    [favoritedIds, gameId, T]
   )
 
   return { favoritedIds, toggleFavorite }

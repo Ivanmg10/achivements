@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
@@ -153,6 +154,18 @@ export default function RegisterUserForm({
           )}
         </button>
       </form>
+
+      <p className="text-text-secondary text-xs text-center mt-4">
+        {T.registerForm.acceptTerms.split(/(\{terms\}|\{privacy\})/).map((part, i) =>
+          part === '{terms}' ? (
+            <Link key={i} href="/terms" className="text-accent underline underline-offset-2">{T.terms.link}</Link>
+          ) : part === '{privacy}' ? (
+            <Link key={i} href="/privacy" className="text-accent underline underline-offset-2">{T.privacy.link}</Link>
+          ) : (
+            part
+          ),
+        )}
+      </p>
 
       <p className="text-text-secondary text-sm text-center mt-5">
         {T.registerForm.alreadyHaveAccountLead}{' '}

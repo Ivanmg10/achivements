@@ -1,7 +1,9 @@
+jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import AdminPanel from './AdminPanel'
 import { useSession } from 'next-auth/react'
 import { en } from '@/translations/en'
+import { notify } from '@/lib/notify'
 
 jest.mock('./AdminCreateUserModal', () => ({ __esModule: true, default: () => null }))
 jest.mock('./AdminEditUserModal', () => ({ __esModule: true, default: () => null }))
@@ -97,4 +99,51 @@ describe('deleting a user', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Cannot delete your own account')
     expect(screen.getByText('papucarrot')).toBeInTheDocument()
   })
+})
+
+describe('the unlock', () => {
+  const locked = () => {
+    const body = { error: 'reauth-required' }
+    return { ok: false, status: 403, json: () => Promise.resolve(body), clone: () => ({ json: () => Promise.resolve(body) }) }
+  }
+
+  test('until the panel is unlocked, nobody is listed and it asks for the password', async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue(locked())
+    render(<AdminPanel />)
+    expect(await screen.findByLabelText('Your password')).toBeInTheDocument()
+    expect(screen.queryByText('ivanxmarine')).not.toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: 'Search users' })).not.toBeInTheDocument()
+  })
+
+  test('the right password unlocks it and the users load', async () => {
+    ;(global.fetch as jest.Mock)
+      .mockResolvedValueOnce(locked())
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ ok: true }) })
+      .mockResolvedValue({ ok: true, json: () => Promise.resolve(USERS) })
+    render(<AdminPanel />)
+    fireEvent.change(await screen.findByLabelText('Your password'), { target: { value: 'secret12' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Unlock' }))
+
+    expect(await screen.findByText('ivanxmarine')).toBeInTheDocument()
+    expect(global.fetch).toHaveBeenCalledWith('/api/admin/unlock', expect.objectContaining({ method: 'POST' }))
+  })
+
+  test('Lock ends the unlock and hides everyone again', async () => {
+    render(<AdminPanel />)
+    await screen.findByText('ivanxmarine')
+    fireEvent.click(screen.getByRole('button', { name: 'Lock' }))
+
+    expect(await screen.findByLabelText('Your password')).toBeInTheDocument()
+    expect(screen.queryByText('ivanxmarine')).not.toBeInTheDocument()
+    expect(global.fetch).toHaveBeenCalledWith('/api/admin/unlock', { method: 'DELETE' })
+  })
+})
+
+test('deleting a user says who went', async () => {
+  render(<AdminPanel />)
+  await screen.findByText('papucarrot')
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve({ ok: true }) })
+  fireEvent.click(screen.getByRole('button', { name: 'delete papucarrot' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Delete user' }))
+  await waitFor(() => expect(notify.success).toHaveBeenCalledWith('papucarrot deleted'))
 })

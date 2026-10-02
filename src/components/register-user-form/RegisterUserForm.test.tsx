@@ -139,3 +139,9 @@ test('asks for the email before the password: it is what recovers the account', 
     en.registerForm.password,
   ])
 })
+
+test('says that signing up accepts the terms and the privacy policy, and links both', () => {
+  renderForm()
+  expect(screen.getByRole('link', { name: en.terms.link })).toHaveAttribute('href', '/terms')
+  expect(screen.getByRole('link', { name: en.privacy.link })).toHaveAttribute('href', '/privacy')
+})

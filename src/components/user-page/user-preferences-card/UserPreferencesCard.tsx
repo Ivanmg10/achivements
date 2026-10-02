@@ -11,6 +11,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { candidateIconUrl } from '@/utils/gameCandidates'
 import type { GameSource } from '@/types/steam'
+import { notify } from '@/lib/notify'
 
 /** Saves the favourite game for one platform and refreshes the session. */
 async function saveFavorite(source: GameSource, game: FavoriteGame | null) {
@@ -57,6 +58,7 @@ export default function UserPreferencesCard() {
   async function handleSave(source: GameSource, game: FavoriteGame | null) {
     await saveFavorite(source, game)
     await update()
+    notify.success(T.toast.saved)
   }
 
   return (

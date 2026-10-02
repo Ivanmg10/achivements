@@ -25,7 +25,7 @@ test('GET returns game progression', async () => {
   const req = new NextRequest('http://localhost/api/getGameProgression?gameId=123')
   const res = await GET(req)
   expect(res.status).toBe(200)
-  expect((res as any).data).toHaveProperty('UserCompletion')
+  expect((res as unknown as { data: unknown }).data).toHaveProperty('UserCompletion')
 })
 
 test('GET returns 401 when no session', async () => {

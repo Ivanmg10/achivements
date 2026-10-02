@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import SortableItem from './SortableItem'
 
 jest.mock('@dnd-kit/sortable', () => ({
@@ -24,11 +24,11 @@ jest.mock('@/context/LanguageContext', () => ({
   useLanguage: () => ({ T: mockT }),
 }))
 
-jest.mock('next/image', () => ({ src, alt, ...props }: any) => (
+jest.mock('next/image', () => ({ src, alt, ...props }: React.ComponentProps<'img'>) => (
   <img src={src} alt={alt} {...props} />
 ))
 
-jest.mock('next/link', () => ({ children, ...props }: any) => (
+jest.mock('next/link', () => ({ children, ...props }: React.ComponentProps<'a'>) => (
   <a {...props}>{children}</a>
 ))
 
@@ -57,7 +57,7 @@ describe('SortableItem', () => {
   it('renders game title and progress', () => {
     render(
       <SortableItem
-        item={baseItem as any}
+        item={baseItem as never}
         onRemove={jest.fn()}
         draggable={false}
       />
@@ -70,7 +70,7 @@ describe('SortableItem', () => {
   it('renders drag handle when draggable is true', () => {
     render(
       <SortableItem
-        item={baseItem as any}
+        item={baseItem as never}
         onRemove={jest.fn()}
         draggable={true}
       />
@@ -81,7 +81,7 @@ describe('SortableItem', () => {
   it('does not render drag handle when draggable is false', () => {
     render(
       <SortableItem
-        item={baseItem as any}
+        item={baseItem as never}
         onRemove={jest.fn()}
         draggable={false}
       />
@@ -93,7 +93,7 @@ describe('SortableItem', () => {
     const item = { ...baseItem, image_icon: '' }
     const { container } = render(
       <SortableItem
-        item={item as any}
+        item={item as never}
         onRemove={jest.fn()}
         draggable={false}
       />
@@ -105,7 +105,7 @@ describe('SortableItem', () => {
     const onRemove = jest.fn()
     render(
       <SortableItem
-        item={baseItem as any}
+        item={baseItem as never}
         onRemove={onRemove}
         draggable={false}
       />

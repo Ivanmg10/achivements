@@ -33,11 +33,6 @@ jest.mock('@/components/ra-recently-played/RARecentlyPlayed', () => ({
   default: () => null,
 }))
 
-jest.mock('@/components/main-page/main-page-progression/MainPageProgression', () => ({
-  __esModule: true,
-  default: () => null,
-}))
-
 jest.mock('@/context/MainViewContext', () => ({
   useMainView: () => ({ view: 'pinned' }),
   MainViewProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,

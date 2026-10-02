@@ -106,7 +106,7 @@ export type SteamGlobalPercentagesResponse = {
   }
 }
 
-export type SteamStoreData = {
+type SteamStoreData = {
   name: string
   type?: string
   developers?: string[]
@@ -146,7 +146,7 @@ export type SteamSchemaResponse = {
 
 export type GameSource = 'ra' | 'steam'
 
-export type GameProgressBase = {
+type GameProgressBase = {
   _source: GameSource
   id: number
   title: string
@@ -156,15 +156,6 @@ export type GameProgressBase = {
   numAwarded: number
   pctWon: number
   lastPlayed: string | null
-}
-
-export type RaGameProgress = GameProgressBase & {
-  _source: 'ra'
-  hardcoreMode: boolean
-  numAwardedHardcore: number
-  pointsTotal: number
-  pointsEarned: number
-  consoleId: number
 }
 
 export type SteamGameProgress = GameProgressBase & {
@@ -182,9 +173,7 @@ export type SteamGameProgress = GameProgressBase & {
   achievementsLoaded: boolean
 }
 
-export type UnifiedGame = RaGameProgress | SteamGameProgress
-
-export type AchievementBase = {
+type AchievementBase = {
   _source: GameSource
   id: string | number
   title: string
@@ -192,14 +181,6 @@ export type AchievementBase = {
   dateEarned: string | null
   badgeUrl: string
   displayOrder: number
-}
-
-export type RaAchievementUnified = AchievementBase & {
-  _source: 'ra'
-  points: number
-  trueRatio: number
-  type: 'progression' | 'win_condition' | 'missable' | null
-  dateEarnedHardcore: string | null
 }
 
 export type SteamAchievementUnified = AchievementBase & {
@@ -216,5 +197,3 @@ export type SteamAchievementUnified = AchievementBase & {
   /** Probably needs online play — guessed from its description, Steam has no such flag. */
   likelyOnline: boolean
 }
-
-export type UnifiedAchievement = RaAchievementUnified | SteamAchievementUnified

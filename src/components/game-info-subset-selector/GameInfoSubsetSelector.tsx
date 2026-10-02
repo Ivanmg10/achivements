@@ -10,13 +10,11 @@ function extractSubsetLabel(title: string): string {
 export default function GameInfoSubsetSelector({
   currentId,
   parentId,
-  parentTitle,
   parentIcon,
   subsets,
 }: {
   currentId: number
   parentId: number | null
-  parentTitle: string
   parentIcon: string
   subsets: SubsetGame[]
 }) {

@@ -23,6 +23,7 @@ import PinnedGameRow from './pinned-game-row/PinnedGameRow'
 import PinGameCard from './pin-game-card/PinGameCard'
 import SteamPinnedGameRow from './steam-pinned-game-row/SteamPinnedGameRow'
 import { gameKey, GameRef } from '@/utils/gameRef'
+import { notify } from '@/lib/notify'
 
 export default function MainPagePinnedGames() {
   const { T } = useLanguage()
@@ -61,6 +62,8 @@ export default function MainPagePinnedGames() {
     setLocalPins(next)
     try {
       await reorder(next)
+    } catch {
+      notify.error(T.toast.orderFailed)
     } finally {
       setLocalPins(null)
     }

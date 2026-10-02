@@ -62,6 +62,36 @@ export async function verifyAssertion(params: URLSearchParams): Promise<boolean>
   }
 }
 
+/**
+ * Whether an assertion was issued for this very callback. check_authentication
+ * proves Steam signed it; this proves it was meant for us — signed by Steam's
+ * own endpoint, covering the identity and return_to, and returning to this
+ * origin's callback with this request's state — so an assertion captured from
+ * another site's "Sign in through Steam" cannot be replayed here.
+ */
+export function returnsHere(params: URLSearchParams, origin: string): boolean {
+  const signed = (params.get('openid.signed') ?? '').split(',')
+  if (!signed.includes('claimed_id') || !signed.includes('return_to')) return false
+  if (params.get('openid.op_endpoint') !== STEAM_OPENID_ENDPOINT) return false
+  try {
+    const returnTo = new URL(params.get('openid.return_to') ?? '')
+    return (
+      returnTo.origin === origin &&
+      returnTo.pathname === '/api/steam/callback' &&
+      returnTo.searchParams.get('state') === params.get('state')
+    )
+  } catch {
+    return false
+  }
+}
+
+/** A SteamID64 as someone typed it: the bare 17 digits, or a steamcommunity.com/profiles/<id> link. */
+export function readSteamId(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  const match = value.trim().match(/^(?:https?:\/\/steamcommunity\.com\/profiles\/)?(\d{17})\/?$/)
+  return match ? match[1] : null
+}
+
 /** Pulls the SteamID64 out of a claimed_id, or null if it is not a Steam identity URL. */
 export function extractSteamId(claimedId: string | null): string | null {
   if (!claimedId || !claimedId.startsWith(CLAIMED_ID_PREFIX)) return null

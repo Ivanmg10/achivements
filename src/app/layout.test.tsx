@@ -1,4 +1,5 @@
-jest.mock("@vercel/analytics/next", () => ({ Analytics: jest.fn(() => null) }));
+jest.mock("@/components/google-analytics/GoogleAnalytics", () => ({ __esModule: true, default: jest.fn(() => null) }));
+jest.mock("@/components/cookie-banner/CookieBanner", () => ({ __esModule: true, default: jest.fn(() => null) }));
 
 jest.mock("@/app/providers", () => ({
   __esModule: true,
@@ -6,7 +7,8 @@ jest.mock("@/app/providers", () => ({
 }));
 
 import { render, screen } from "@testing-library/react";
-import { Analytics } from "@vercel/analytics/next";
+import GoogleAnalytics from "@/components/google-analytics/GoogleAnalytics";
+import CookieBanner from "@/components/cookie-banner/CookieBanner";
 import RootLayout, { metadata } from "./layout";
 import { SITE_NAME } from "@/lib/siteUrl";
 
@@ -19,9 +21,10 @@ test("renders children in layout", () => {
   expect(screen.getByText("Content")).toBeInTheDocument();
 });
 
-test("mounts Vercel analytics on every page", () => {
+test("mounts the cookie banner and analytics on every page", () => {
   render(<RootLayout><p>Content</p></RootLayout>);
-  expect(Analytics).toHaveBeenCalled();
+  expect(CookieBanner).toHaveBeenCalled();
+  expect(GoogleAnalytics).toHaveBeenCalled();
 });
 
 describe("metadata", () => {

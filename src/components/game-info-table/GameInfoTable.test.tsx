@@ -28,7 +28,7 @@ const mockAchievement = {
   MemAddr: '0x0000',
 }
 
-const mockGameData = { Achievements: { '1': mockAchievement } } as any
+const mockGameData = { Achievements: { '1': mockAchievement } } as never
 
 test('renders table with achievements', () => {
   render(<GameInfoTable gameData={mockGameData} />)
@@ -42,7 +42,7 @@ test('renders empty when no gameData', () => {
 })
 
 test('filters out undefined achievements', () => {
-  const gameData = { Achievements: { '1': mockAchievement, '2': undefined } } as any
+  const gameData = { Achievements: { '1': mockAchievement, '2': undefined } } as never
   render(<GameInfoTable gameData={gameData} />)
   expect(screen.getAllByText('First Blood')).toHaveLength(2)
 })

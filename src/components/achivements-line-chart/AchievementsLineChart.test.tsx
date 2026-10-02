@@ -13,9 +13,9 @@ function recentDate(daysAgo = 0) {
 }
 
 const recentAchievements = [
-  { Date: recentDate(0) } as any,
-  { Date: recentDate(1) } as any,
-  { Date: recentDate(2) } as any,
+  { Date: recentDate(0) } as never,
+  { Date: recentDate(1) } as never,
+  { Date: recentDate(2) } as never,
 ]
 
 test('renders line chart with recent achievements', () => {
@@ -30,7 +30,7 @@ test('still renders the chart, flat at 0, with no achievements', () => {
 })
 
 test('still renders the chart, flat at 0, with only old achievements', () => {
-  const old = [{ Date: '2020-01-01 00:00:00' } as any]
+  const old = [{ Date: '2020-01-01 00:00:00' } as never]
   render(<AchievementsLineChart achievements={old} />)
   expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
 })

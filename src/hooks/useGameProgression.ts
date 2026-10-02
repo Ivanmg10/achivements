@@ -14,24 +14,28 @@ export function useGameProgression(gameId: string | null) {
 
   const doFetch = useCallback(
     (id: string) => {
-      if (status !== 'authenticated') return
-      setIsLoading(true)
-      setError(false)
-      const onFail = (err?: unknown) => {
-        if (!scheduleRetry(attemptRef, retryTimer, () => doFetch(id), err)) { setError(true); setIsLoading(false) }
+      // Named, so a retry can call it again.
+      const run = (id: string) => {
+        if (status !== 'authenticated') return
+        setIsLoading(true)
+        setError(false)
+        const onFail = (err?: unknown) => {
+          if (!scheduleRetry(attemptRef, retryTimer, () => run(id), err)) { setError(true); setIsLoading(false) }
+        }
+        fetch(`/api/getGameProgression?gameId=${id}`)
+          .then((r) => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`)
+            return r.json()
+          })
+          .then((data: RetroAchievementsGameWithAchievements) => {
+            if (!data?.ID) return onFail()
+            setGame(data)
+            setIsLoading(false)
+            attemptRef.current = 0
+          })
+          .catch(onFail)
       }
-      fetch(`/api/getGameProgression?gameId=${id}`)
-        .then((r) => {
-          if (!r.ok) throw new Error(`HTTP ${r.status}`)
-          return r.json()
-        })
-        .then((data: RetroAchievementsGameWithAchievements) => {
-          if (!data?.ID) return onFail()
-          setGame(data)
-          setIsLoading(false)
-          attemptRef.current = 0
-        })
-        .catch(onFail)
+      run(id)
     },
     [status],
   )

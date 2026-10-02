@@ -2,6 +2,7 @@
 
 import LoginUserForm from '@/components/login-user-form/LoginUserForm'
 import RegisterUserForm from '@/components/register-user-form/RegisterUserForm'
+import LegalLinks from '@/components/legal-links/LegalLinks'
 import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
 import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -36,7 +37,7 @@ function AuthPageContent() {
   const [hasRegister, setHasRegister] = useState(false)
 
   return (
-    <div className="bg-bg-main text-text-main h-screen overflow-hidden flex">
+    <div className="relative bg-bg-main text-text-main h-screen overflow-hidden flex">
 
       {/* ── Mobile ── */}
       <div className="lg:hidden flex-1 flex items-center justify-center relative px-6 overflow-hidden">
@@ -100,6 +101,12 @@ function AuthPageContent() {
         </AnimatePresence>
       </div>
 
+      {/* Signing up hands over data: what happens to it is one click away. */}
+      <div className="absolute bottom-4 inset-x-0 z-20 flex justify-center pointer-events-none">
+        <div className="pointer-events-auto text-xs bg-bg-main/80 backdrop-blur px-3 py-1.5 rounded-full border border-white/10">
+          <LegalLinks />
+        </div>
+      </div>
     </div>
   )
 }

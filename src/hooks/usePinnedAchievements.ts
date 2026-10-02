@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { pinnedKey } from '@/utils/utils'
 import type { PinnedAchievement } from '@/types/types'
+import { useLanguage } from '@/context/LanguageContext'
+import { notify } from '@/lib/notify'
 
 /**
  * The user's pinned achievements across RA and Steam, newest first — what the
@@ -13,15 +15,17 @@ import type { PinnedAchievement } from '@/types/types'
  * optimistic and puts the row back if the request fails.
  */
 export function usePinnedAchievements() {
+  const { T } = useLanguage()
   const [pinned, setPinned] = useState<PinnedAchievement[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
   const [reloadKey, setReloadKey] = useState(0)
   const attemptRef = useRef(0)
-  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   useEffect(() => {
     let current = true
+    // This run's own retry timer, cleared when the run is replaced or unmounted.
+    const retryTimer: { current: ReturnType<typeof setTimeout> | undefined } = { current: undefined }
     attemptRef.current = 0
     setIsLoading(true)
     setError(false)
@@ -68,8 +72,10 @@ export function usePinnedAchievements() {
     try {
       const res = await fetch(url, { method: 'DELETE' })
       if (!res.ok) throw new Error(`Failed to unpin (${res.status})`)
+      notify.success(T.toast.achievementsUpdated)
     } catch (err) {
       console.error('[usePinnedAchievements] unpin', key, err)
+      notify.error(T.toast.achievementsFailed)
       setPinned((prev) => {
         if (prev.some((p) => pinnedKey(p) === key)) return prev
         const next = [...prev]
@@ -77,7 +83,7 @@ export function usePinnedAchievements() {
         return next
       })
     }
-  }, [])
+  }, [T])
 
   return { pinned, isLoading, error, refetch, unpin }
 }

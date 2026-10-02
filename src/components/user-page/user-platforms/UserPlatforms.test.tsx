@@ -1,10 +1,12 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import UserPlatforms from './UserPlatforms'
 import { useSession } from 'next-auth/react'
 import { useSteamLink } from '@/hooks/useSteamLink'
 import { useSteamProfile } from '@/hooks/useSteamProfile'
 import { unlinkRaUser } from '@/utils/apiCallsUtils'
 import { en } from '@/translations/en'
+import { notify } from '@/lib/notify'
 
 jest.mock('@/hooks/useSteamLink', () => ({
   ...jest.requireActual('@/hooks/useSteamLink'),
@@ -109,4 +111,15 @@ test('falls back to the Steam logo until the profile loads', () => {
   ;(useSteamProfile as jest.Mock).mockReturnValue({ profile: null })
   render(<UserPlatforms />)
   expect(screen.getByRole('region', { name: 'Steam' })).toHaveTextContent('ivan')
+})
+
+test('unlinking RA says whether it worked', async () => {
+  ;(unlinkRaUser as jest.Mock).mockResolvedValueOnce(true)
+  render(<UserPlatforms />)
+  fireEvent.click(screen.getByRole('button', { name: en.userConfig.signOutRA }))
+  await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.raUnlinked))
+
+  ;(unlinkRaUser as jest.Mock).mockResolvedValueOnce(false)
+  fireEvent.click(screen.getByRole('button', { name: en.userConfig.signOutRA }))
+  await waitFor(() => expect(notify.error).toHaveBeenCalledWith(en.toast.unlinkFailed))
 })

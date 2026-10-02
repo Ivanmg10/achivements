@@ -149,14 +149,17 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
     setRecent([])
     setLibrary([])
     load(steamid)
+    // The ref objects themselves: the cleanup must bump whatever load is live then.
+    const gen = generation
+    const loaded = loadedFor
 
     // On unmount (e.g. signing out) or a new account, end any load or
     // background fill in progress. Clearing loadedFor too means a remount —
     // including Strict Mode's dev-only unmount/remount — loads again instead
     // of finding the discarded load marked as done.
     return () => {
-      generation.current++
-      loadedFor.current = null
+      gen.current++
+      loaded.current = null
     }
   }, [steamid, load])
 

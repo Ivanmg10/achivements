@@ -1,9 +1,11 @@
 import { getServerSession } from 'next-auth'
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
 import { checkCurrentPassword } from '@/lib/currentPassword'
-import { forgetUser } from '@/lib/userRecord'
+import { forgetUser, loadUser } from '@/lib/userRecord'
+import { sendVerificationEmail } from '@/lib/verificationEmail'
+import { sendEmailChangedNotice } from '@/lib/emailChangedNotice'
 
 const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location'] as const
 type AllowedField = (typeof ALLOWED_FIELDS)[number]
@@ -37,6 +39,7 @@ export async function POST(req: Request) {
     }
 
     const trimmed = typeof value === 'string' ? value.trim() : ''
+    let previousEmail: string | null = null
     if (!trimmed) {
       return NextResponse.json({ error: 'Value is required' }, { status: 400 })
     }
@@ -69,6 +72,8 @@ export async function POST(req: Request) {
       if (check === 'too-many') return NextResponse.json({ error: 'too-many-attempts' }, { status: 429 })
       if (check === 'no-user') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       if (check === 'wrong') return NextResponse.json({ error: 'wrong-password' }, { status: 403 })
+      // Read just now by the password check, so this comes from the cache.
+      previousEmail = (await loadUser(session.user.id))?.email ?? null
     }
 
     if (field === 'avatar') {
@@ -83,11 +88,26 @@ export async function POST(req: Request) {
 
     const column = field === 'username' ? 'username' : field
     const valueToStore = field === 'location' ? trimmed.toUpperCase() : trimmed
-    await pool.query(`UPDATE users SET "${column}" = $1 WHERE id = $2`, [valueToStore, session.user.id])
+    // A new address has not been confirmed yet, whatever the old one was.
+    const resetVerified = field === 'email' ? ', email_verified_at = NULL' : ''
+    await pool.query(`UPDATE users SET "${column}" = $1${resetVerified} WHERE id = $2`, [valueToStore, session.user.id])
     forgetUser(session.user.id)
+    if (field === 'email') {
+      const username = session.user.name ?? ''
+      after(() => sendVerificationEmail(session.user.id, username, trimmed))
+      // The old address hears about it too: it is the one a takeover would silence.
+      if (previousEmail && previousEmail.toLowerCase() !== trimmed.toLowerCase()) {
+        const to = previousEmail
+        after(() => sendEmailChangedNotice({ to, username, newEmail: trimmed, byAdmin: false }))
+      }
+    }
 
     return NextResponse.json({ ok: true, field, value: trimmed })
   } catch (err) {
+    // Another account took the name or address between the check and the write.
+    if ((err as { code?: string }).code === '23505') {
+      return NextResponse.json({ error: 'Already in use' }, { status: 409 })
+    }
     console.error('[updateUserProfile POST]', err)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }

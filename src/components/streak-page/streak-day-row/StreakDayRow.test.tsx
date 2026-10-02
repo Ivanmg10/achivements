@@ -5,7 +5,6 @@ import { en } from '@/translations/en'
 
 jest.mock('next/image', () => {
   const NextImage = ({ src, alt }: { src: string; alt: string }) =>
-    // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt={alt} />
   NextImage.displayName = 'NextImage'
   return NextImage

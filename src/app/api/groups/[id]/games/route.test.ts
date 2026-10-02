@@ -8,7 +8,7 @@ jest.mock('@/lib/db', () => ({
   },
 }))
 
-import { POST, DELETE, PATCH } from './route'
+import { POST, DELETE, PATCH, PUT } from './route'
 import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
 import { NextRequest } from 'next/server'
@@ -141,5 +141,66 @@ describe('PATCH', () => {
     const calls = (pool.query as jest.Mock).mock.calls.slice(1)
     expect(calls[0][1]).toEqual([1, 2, 3, 4, 5, 'ra', 1])
     expect(calls[1][1]).toEqual([5, 6, 0, 0, 5, 'steam', 620])
+  })
+
+  test('counts that make no sense are refused, and nothing is written', async () => {
+    ownsGroup()
+    const res = await PATCH(makeRequest('PATCH', [{ game_id: 1, num_awarded: -5, max_possible: 2 }]), params)
+    expect(res.status).toBe(400)
+    expect(pool.query).toHaveBeenCalledTimes(1)
+  })
+
+  test('too many updates in one request are refused', async () => {
+    ownsGroup()
+    const many = Array.from({ length: 201 }, (_, i) => ({ game_id: i + 1 }))
+    expect((await PATCH(makeRequest('PATCH', many), params)).status).toBe(400)
+  })
+})
+
+describe('POST limits', () => {
+  test('a group cannot grow past its maximum', async () => {
+    ownsGroup()
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [{ next: 200, count: 200 }] })
+    const res = await POST(makeRequest('POST', { game_id: 1, title: 'x' }), params)
+    expect(res.status).toBe(400)
+    expect(pool.query).toHaveBeenCalledTimes(2)
+  })
+
+  test('a game with impossible progress is refused', async () => {
+    ownsGroup()
+    const res = await POST(makeRequest('POST', { game_id: 1, title: 'x', num_awarded: 9, max_possible: 1 }), params)
+    expect(res.status).toBe(400)
+  })
+})
+
+describe('PUT (reorder)', () => {
+  test('saves the new order in one statement, scoped to this group', async () => {
+    ownsGroup()
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
+    const res = await PUT(makeRequest('PUT', { order: [30, 10, 20] }), params)
+    expect(res.status).toBe(200)
+    const [sql, args] = (pool.query as jest.Mock).mock.calls[1]
+    expect(sql).toContain('WITH ORDINALITY')
+    expect(sql).toContain('i.group_id = $2')
+    expect(args).toEqual([[30, 10, 20], 5])
+  })
+
+  test('refuses an order that is not a list of ids', async () => {
+    ownsGroup()
+    expect((await PUT(makeRequest('PUT', { order: ['a'] }), params)).status).toBe(400)
+    ownsGroup()
+    expect((await PUT(makeRequest('PUT', { order: 'x' }), params)).status).toBe(400)
+  })
+
+  test('someone else cannot reorder', async () => {
+    ownsGroup(false)
+    expect((await PUT(makeRequest('PUT', { order: [1] }), params)).status).toBe(403)
+  })
+
+  test('500 instead of throwing when the database fails', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    ownsGroup()
+    ;(pool.query as jest.Mock).mockRejectedValueOnce(new Error('db down'))
+    expect((await PUT(makeRequest('PUT', { order: [1] }), params)).status).toBe(500)
   })
 })

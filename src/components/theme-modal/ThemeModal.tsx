@@ -6,6 +6,7 @@ import CommonModal from '../common-modal/CommonModal'
 import { useTheme } from '@/context/ThemeContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { Theme } from '@/types/types'
+import { notify } from '@/lib/notify'
 
 const THEMES: {
   id: Theme
@@ -45,6 +46,7 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
       })
       if (!res.ok) throw new Error(`updateTheme ${res.status}`)
       await update()
+      notify.success(T.toast.saved)
       onClose()
     } catch (err) {
       // Not saved: put the old theme back rather than show one that will vanish on reload.

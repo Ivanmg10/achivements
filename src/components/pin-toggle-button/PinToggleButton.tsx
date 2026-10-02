@@ -5,6 +5,7 @@ import { IconPin, IconPinFilled } from '@tabler/icons-react'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
 import type { GameSource } from '@/types/steam'
+import { notify } from '@/lib/notify'
 
 export function PinToggleButton({
   gameId,
@@ -29,8 +30,10 @@ export function PinToggleButton({
       if (pinned) await unpinGame(gameId, source)
       else await pinGame(gameId, source)
       setHasError(false)
+      notify.success(T.toast.pinsUpdated)
     } catch {
       setHasError(true)
+      notify.error(T.toast.pinsFailed)
     }
   }
 

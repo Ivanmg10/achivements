@@ -27,10 +27,14 @@ function makeRequest(params: Record<string, string>) {
 
 /** A well-formed callback for user 7 — individual tests override one piece at a time. */
 function validParams(overrides: Record<string, string> = {}) {
+  const state = signState('7')
   return {
     'openid.mode': 'id_res',
+    'openid.op_endpoint': 'https://steamcommunity.com/openid/login',
     'openid.claimed_id': CLAIMED,
-    state: signState('7'),
+    'openid.return_to': `http://localhost:3000/api/steam/callback?state=${encodeURIComponent(state)}`,
+    'openid.signed': 'signed,op_endpoint,claimed_id,identity,return_to,response_nonce,assoc_handle',
+    state,
     ...overrides,
   }
 }
@@ -139,4 +143,18 @@ test('redirects with an error when the DB write fails', async () => {
   ;(pool.query as jest.Mock).mockRejectedValue(new Error('db down'))
   const res = await GET(makeRequest(validParams()))
   expect(steamStatus(res as never)).toBe('error')
+})
+
+test('refuses an assertion that was issued for another site', async () => {
+  const res = await GET(makeRequest(validParams({ 'openid.return_to': 'https://other.test/auth/steam' })))
+  expect(steamStatus(res as never)).toBe('invalid_assertion')
+  expect(verifyAssertion).not.toHaveBeenCalled()
+})
+
+test('a link that raced another account onto the same Steam ID is already_linked, not an error', async () => {
+  ;(pool.query as jest.Mock)
+    .mockResolvedValueOnce({ rowCount: 0, rows: [] })
+    .mockRejectedValueOnce(Object.assign(new Error('duplicate key'), { code: '23505' }))
+  const res = await GET(makeRequest(validParams()))
+  expect(steamStatus(res as never)).toBe('already_linked')
 })

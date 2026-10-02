@@ -44,6 +44,7 @@ import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/Delet
 import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import { CONSOLES } from '@/constants'
 import { gameKey } from '@/utils/gameRef'
+import { notify } from '@/lib/notify'
 
 type PctFilter = 'all' | '0' | 'progress' | '100'
 type DecadeFilter = 'all' | '80s' | '90s' | '00s' | '10s' | '20s'
@@ -335,6 +336,7 @@ export default function GroupDetailPage() {
         .catch((err) => {
           // Not saved: reload so the list shows the order that actually stuck.
           console.error('[GroupDetailPage] reorder', err)
+          notify.error(T.toast.orderFailed)
           fetchGroup()
         })
     }, 600)
@@ -351,11 +353,14 @@ export default function GroupDetailPage() {
       )
       if (!res.ok) {
         console.error('[GroupDetailPage] remove failed', res.status)
+        notify.error(T.toast.gameRemoveFailed)
         return
       }
       setGroup((g) => (g ? { ...g, items: g.items.filter((i) => i.id !== itemId) } : g))
+      notify.success(T.toast.gameRemoved)
     } catch (err) {
       console.error('[GroupDetailPage] remove failed', err)
+      notify.error(T.toast.gameRemoveFailed)
     }
   }
 
@@ -372,10 +377,17 @@ export default function GroupDetailPage() {
       is_public: data.is_public,
     })
     if (group) setGroup({ ...group, ...updated })
+    notify.success(T.toast.groupSaved)
   }
 
   async function handleDelete() {
-    await deleteGroup(groupId)
+    try {
+      await deleteGroup(groupId)
+    } catch {
+      notify.error(T.toast.groupDeleteFailed)
+      return
+    }
+    notify.success(T.toast.groupDeleted)
     router.push('/groups')
   }
 
@@ -445,7 +457,8 @@ export default function GroupDetailPage() {
   function toggleConsole(name: string) {
     setSelectedConsoles((prev) => {
       const next = new Set(prev)
-      next.has(name) ? next.delete(name) : next.add(name)
+      if (next.has(name)) next.delete(name)
+      else next.add(name)
       return next
     })
   }

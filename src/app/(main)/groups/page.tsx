@@ -10,6 +10,7 @@ import GroupModal from '@/components/groups/GroupModal'
 import GroupList from '@/components/groups/group-list/GroupList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
+import { notify } from '@/lib/notify'
 
 export default function GroupsPage() {
   const { T } = useLanguage()
@@ -31,7 +32,9 @@ export default function GroupsPage() {
       is_public: data.is_public,
     })
 
-    if (data.initialGames?.length) await addGamesToGroup(group.id, data.initialGames)
+    const failed = data.initialGames?.length ? await addGamesToGroup(group.id, data.initialGames) : []
+    if (failed.length) notify.error(T.toast.someGamesFailed)
+    else notify.success(T.toast.groupCreated)
   }
 
   return (

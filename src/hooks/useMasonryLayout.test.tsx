@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { render } from '@testing-library/react'
 import { useMasonryLayout, MasonryPosition } from './useMasonryLayout'
 
@@ -35,7 +36,9 @@ function Harness({
     columns,
     gap,
   )
-  lastResult = { positions, containerHeight }
+  useEffect(() => {
+    lastResult = { positions, containerHeight }
+  })
   return (
     <div ref={containerRef} data-width={containerWidth}>
       {heights.map((h, i) => (

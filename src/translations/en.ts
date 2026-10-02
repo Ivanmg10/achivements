@@ -257,6 +257,157 @@ export const en = {
     closingText: 'Free, and you can connect your accounts whenever you like.',
     footer: 'Not affiliated with RetroAchievements, Valve or Sony.',
   },
+  toast: {
+    close: 'Close',
+    saved: 'Changes saved',
+    saveFailed: 'Could not save the changes',
+    pinsUpdated: 'Pinned games updated',
+    pinsFailed: 'Could not update your pinned games',
+    orderFailed: 'Could not save the new order',
+    achievementsUpdated: 'Pinned achievements updated',
+    achievementsFailed: 'Could not update your pinned achievements',
+    groupCreated: 'Group created',
+    groupSaved: 'Group saved',
+    groupDeleted: 'Group deleted',
+    groupDeleteFailed: 'Could not delete the group',
+    gamesAdded: 'Games added to the group',
+    someGamesFailed: 'Some games could not be added to the group',
+    gameRemoved: 'Game removed from the group',
+    gameRemoveFailed: 'Could not remove the game from the group',
+    raLinked: 'RetroAchievements account linked',
+    raUnlinked: 'RetroAchievements account unlinked',
+    unlinkFailed: 'Could not unlink the account',
+  },
+  cookies: {
+    title: 'Cookies',
+    text: 'We use Google Analytics cookies to see which pages are visited and improve the site. Nothing is set unless you accept, and you can change your mind from the footer.',
+    accept: 'Accept',
+    reject: 'Reject',
+    settings: 'Cookie settings',
+  },
+  mainFooter: {
+    poweredBy: 'Powered by',
+  },
+  passwordInput: {
+    show: 'Show password',
+    hide: 'Hide password',
+  },
+  deleteAccount: {
+    title: 'Delete account',
+    text: 'Deletes your account and everything in it: groups, pins, favourites and linked accounts. It cannot be undone.',
+    button: 'Delete account',
+    confirmText: 'This deletes your account and all its data for good. Type your password to confirm.',
+    password: 'Password',
+    confirm: 'Delete my account',
+    deleting: 'Deleting...',
+    wrongPassword: 'That password is incorrect.',
+    tooManyAttempts: 'Too many wrong attempts. Wait 15 minutes and try again.',
+    lastAdmin: 'You are the only admin. Make someone else admin before deleting your account.',
+  },
+  privacy: {
+    link: 'Privacy & cookies',
+    title: 'Privacy & cookies',
+    updated: 'Last updated: 2 October 2026',
+    intro: 'CheevoVault tracks your RetroAchievements and Steam achievements. This page explains what it keeps about you, why, and what you can do about it.',
+    contact: 'Contact',
+    controller: 'Data controller',
+    back: 'Back to CheevoVault',
+    sections: [
+      {
+        heading: 'What we store',
+        body: [
+          'Your account: a username, a hash of your password (never the password itself) and your email address, which is used only to recover the account and to confirm it is yours.',
+          'What you choose to add: an avatar link, your country, favourite and pinned games and achievements, and your groups.',
+          'Linked accounts: your RetroAchievements username and Web API key, and your Steam ID and display name, so your progress can be fetched. The API key never leaves our server.',
+          'Security records: the IP address (and username, for sign-ins) of failed sign-ins, sign-ups and password reset requests, kept for one day to stop abuse.',
+        ],
+      },
+      {
+        heading: 'Why',
+        body: [
+          'To provide the service you signed up for, to keep it secure, and — only if you accept — to measure visits with Google Analytics.',
+        ],
+      },
+      {
+        heading: 'Cookies and local storage',
+        body: [
+          'Necessary, no consent needed: a session cookie that keeps you signed in, and local storage for your language, theme and cookie choice.',
+          'Analytics, only if you accept: Google Analytics cookies (_ga, _ga_*), which last up to two years. Google is told the page path, never the rest of the address. You can withdraw consent at any time from "Cookie settings" at the bottom of the page: analytics stops at once and its cookies are deleted.',
+        ],
+      },
+      {
+        heading: 'Who else handles it',
+        body: [
+          'Vercel hosts the site, Resend sends our emails, Google provides analytics (only with your consent), and RetroAchievements and Steam receive the requests needed to show your data. Some of them are in the United States; those transfers rely on the EU–US Data Privacy Framework or the European Commission’s standard contractual clauses.',
+        ],
+      },
+      {
+        heading: 'Administration',
+        body: [
+          'The site’s administrator can see your account details (username, email, country and linked accounts) and can correct them, link or unlink your RetroAchievements and Steam accounts, or delete the account: to give you support, to act on your requests, or when the terms of use are broken. Each of those actions is recorded with who did it and when, and the record is kept for a year.',
+          'If the email on your account changes, whoever changes it, the old address gets a notice.',
+        ],
+      },
+      {
+        heading: 'How long',
+        body: [
+          'Account data stays until the account is deleted, and everything linked to it goes with it. Password reset links expire after an hour, security records after a day.',
+        ],
+      },
+      {
+        heading: 'Your rights',
+        body: [
+          'You can access, correct, export or delete your data, object to or restrict how it is used, and withdraw consent. Most of it can be edited from your account page, where you can also delete your account; for anything else, write to us.',
+          'If you think your data has not been handled properly, you can complain to the Spanish Data Protection Agency (aepd.es).',
+        ],
+      },
+    ],
+  },
+  terms: {
+    link: 'Terms of use',
+    title: 'Terms of use',
+    updated: 'Last updated: 2 October 2026',
+    intro: 'These terms apply to anyone who uses CheevoVault. Using the site means accepting them.',
+    back: 'Back to CheevoVault',
+    sections: [
+      {
+        heading: 'The service',
+        body: [
+          'CheevoVault is a free, personal project that shows your RetroAchievements and Steam progress in one place. It is not affiliated with RetroAchievements, Valve or Sony. It may change, pause or end at any time.',
+        ],
+      },
+      {
+        heading: 'Your account',
+        body: [
+          'One account per person, with your own details. Keep your password to yourself: what is done with your account is your responsibility. The RetroAchievements key and the Steam account you link must be your own.',
+        ],
+      },
+      {
+        heading: 'Acceptable use',
+        body: [
+          'Do not attack the site, overload it or try to get around its protections; do not use it to collect other people’s data; and do not put offensive or illegal content in your username, avatar or groups.',
+        ],
+      },
+      {
+        heading: 'Suspension and deletion',
+        body: [
+          'The administrator may correct, suspend or delete an account that breaks these terms, or when its owner asks. You can delete your own account at any time from your account page.',
+        ],
+      },
+      {
+        heading: 'No guarantees',
+        body: [
+          'The site is offered as it is and for free, with no promise that it will always be available or that the data it shows — which comes from RetroAchievements and Steam — is complete or exact. As far as the law allows, we are not liable for losses arising from its use.',
+        ],
+      },
+      {
+        heading: 'Changes and law',
+        body: [
+          'These terms may change; the date at the top says when they last did, and using the site afterwards means accepting the new version. They are governed by Spanish law.',
+        ],
+      },
+    ],
+  },
   loginForm: {
     title: 'Sign in',
     accountCreated: 'Account created successfully',
@@ -307,6 +458,7 @@ export const en = {
     backToSignIn: 'Go to sign in',
   },
   registerForm: {
+    acceptTerms: 'By creating an account you accept the {terms} and the {privacy}.',
     title: 'Register',
     username: 'Username',
     password: 'Password',
@@ -403,9 +555,6 @@ export const en = {
   },
   profileSt: {
     signIn: 'Sign in with Steam',
-  },
-  progression: {
-    recentProgress: 'Your recent progress',
   },
   gamesList: {
     achievements: 'achievements',

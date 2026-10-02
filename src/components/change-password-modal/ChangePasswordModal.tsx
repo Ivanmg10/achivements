@@ -2,55 +2,14 @@
 
 import { useState } from 'react'
 import { signOut } from 'next-auth/react'
-import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import CommonModal from '../common-modal/CommonModal'
+import PasswordInput from '@/components/password-input/PasswordInput'
 import { useLanguage } from '@/context/LanguageContext'
 import { PASSWORD_MIN } from '@/utils/authValidation'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
-}
-
-function PasswordInput({
-  id,
-  label,
-  value,
-  onChange,
-  disabled,
-}: {
-  id: string
-  label: string
-  value: string
-  onChange: (v: string) => void
-  disabled?: boolean
-}) {
-  const [show, setShow] = useState(false)
-  return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-xs text-text-secondary uppercase tracking-wider">{label}</label>
-      <div className="relative">
-        <input
-          id={id}
-          type={show ? 'text' : 'password'}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-          className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full pr-10"
-        />
-        <button
-          type="button"
-          onClick={() => setShow((s) => !s)}
-          aria-label={show ? 'Hide password' : 'Show password'}
-          aria-pressed={show}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-main transition-colors"
-          tabIndex={-1}
-        >
-          {show ? <IconEyeOff size={16} aria-hidden="true" /> : <IconEye size={16} aria-hidden="true" />}
-        </button>
-      </div>
-    </div>
-  )
 }
 
 export default function ChangePasswordModal({ isOpen, onClose }: Props) {
@@ -119,6 +78,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
       <PasswordInput
         id="pw-new"
         label={T.changePassword.new}
+        autoComplete="new-password"
         value={next}
         onChange={(v) => { setNext(v); setError(null) }}
         disabled={loading || success}

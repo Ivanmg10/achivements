@@ -259,6 +259,157 @@ export const de: Translations = {
     closingText: 'Kostenlos, und du verbindest deine Konten, wann du willst.',
     footer: 'Nicht mit RetroAchievements, Valve oder Sony verbunden.',
   },
+  toast: {
+    close: 'Schließen',
+    saved: 'Änderungen gespeichert',
+    saveFailed: 'Änderungen konnten nicht gespeichert werden',
+    pinsUpdated: 'Angeheftete Spiele aktualisiert',
+    pinsFailed: 'Deine angehefteten Spiele konnten nicht aktualisiert werden',
+    orderFailed: 'Die neue Reihenfolge konnte nicht gespeichert werden',
+    achievementsUpdated: 'Angeheftete Erfolge aktualisiert',
+    achievementsFailed: 'Deine angehefteten Erfolge konnten nicht aktualisiert werden',
+    groupCreated: 'Gruppe erstellt',
+    groupSaved: 'Gruppe gespeichert',
+    groupDeleted: 'Gruppe gelöscht',
+    groupDeleteFailed: 'Die Gruppe konnte nicht gelöscht werden',
+    gamesAdded: 'Spiele zur Gruppe hinzugefügt',
+    someGamesFailed: 'Einige Spiele konnten nicht zur Gruppe hinzugefügt werden',
+    gameRemoved: 'Spiel aus der Gruppe entfernt',
+    gameRemoveFailed: 'Das Spiel konnte nicht aus der Gruppe entfernt werden',
+    raLinked: 'RetroAchievements-Konto verknüpft',
+    raUnlinked: 'RetroAchievements-Konto getrennt',
+    unlinkFailed: 'Das Konto konnte nicht getrennt werden',
+  },
+  cookies: {
+    title: 'Cookies',
+    text: 'Wir nutzen Google-Analytics-Cookies, um zu sehen, welche Seiten besucht werden, und die Website zu verbessern. Ohne deine Zustimmung wird nichts gespeichert, und du kannst es in der Fußzeile jederzeit ändern.',
+    accept: 'Akzeptieren',
+    reject: 'Ablehnen',
+    settings: 'Cookie-Einstellungen',
+  },
+  mainFooter: {
+    poweredBy: 'Unterstützt von',
+  },
+  passwordInput: {
+    show: 'Passwort anzeigen',
+    hide: 'Passwort verbergen',
+  },
+  deleteAccount: {
+    title: 'Konto löschen',
+    text: 'Löscht dein Konto und alles darin: Gruppen, angeheftete Spiele, Favoriten und verknüpfte Konten. Das kann nicht rückgängig gemacht werden.',
+    button: 'Konto löschen',
+    confirmText: 'Damit werden dein Konto und alle seine Daten endgültig gelöscht. Gib zur Bestätigung dein Passwort ein.',
+    password: 'Passwort',
+    confirm: 'Mein Konto löschen',
+    deleting: 'Wird gelöscht...',
+    wrongPassword: 'Das Passwort ist falsch.',
+    tooManyAttempts: 'Zu viele falsche Versuche. Warte 15 Minuten und versuche es erneut.',
+    lastAdmin: 'Du bist der einzige Admin. Mach jemand anderen zum Admin, bevor du dein Konto löschst.',
+  },
+  privacy: {
+    link: 'Datenschutz & Cookies',
+    title: 'Datenschutz & Cookies',
+    updated: 'Zuletzt aktualisiert: 2. Oktober 2026',
+    intro: 'CheevoVault verfolgt deine Erfolge auf RetroAchievements und Steam. Diese Seite erklärt, welche Daten über dich gespeichert werden, wozu und was du dagegen tun kannst.',
+    contact: 'Kontakt',
+    controller: 'Verantwortlicher',
+    back: 'Zurück zu CheevoVault',
+    sections: [
+      {
+        heading: 'Was wir speichern',
+        body: [
+          'Dein Konto: ein Benutzername, ein Hash deines Passworts (nie das Passwort selbst) und deine E-Mail-Adresse, die nur zur Wiederherstellung des Kontos und zur Bestätigung, dass es dir gehört, genutzt wird.',
+          'Was du selbst hinzufügst: einen Avatar-Link, dein Land, Lieblings- und angeheftete Spiele und Erfolge sowie deine Gruppen.',
+          'Verknüpfte Konten: dein RetroAchievements-Benutzername und Web-API-Schlüssel sowie deine Steam-ID und dein Anzeigename, um deinen Fortschritt abzurufen. Der Schlüssel verlässt nie unseren Server.',
+          'Sicherheitsprotokolle: die IP-Adresse (bei Anmeldungen auch der Benutzername) fehlgeschlagener Anmeldungen, Registrierungen und Passwort-Zurücksetzungen, einen Tag lang gespeichert, um Missbrauch zu bremsen.',
+        ],
+      },
+      {
+        heading: 'Wozu',
+        body: [
+          'Um den Dienst bereitzustellen, für den du dich registriert hast, ihn sicher zu halten und — nur wenn du zustimmst — Besuche mit Google Analytics zu messen.',
+        ],
+      },
+      {
+        heading: 'Cookies und lokaler Speicher',
+        body: [
+          'Notwendig, ohne Einwilligung: ein Sitzungs-Cookie, das dich angemeldet hält, und lokaler Speicher für Sprache, Theme und deine Cookie-Auswahl.',
+          'Analyse, nur mit deiner Zustimmung: Google-Analytics-Cookies (_ga, _ga_*), die bis zu zwei Jahre gelten. Google erhält nur den Seitenpfad, nie den Rest der Adresse. Du kannst die Einwilligung jederzeit über die Cookie-Einstellungen unten auf der Seite widerrufen: Die Analyse stoppt sofort und ihre Cookies werden gelöscht.',
+        ],
+      },
+      {
+        heading: 'Wer sie außerdem verarbeitet',
+        body: [
+          'Vercel hostet die Seite, Resend verschickt unsere E-Mails, Google stellt die Analyse bereit (nur mit deiner Einwilligung), und RetroAchievements und Steam erhalten die Anfragen, die zur Anzeige deiner Daten nötig sind. Einige sitzen in den USA; diese Übermittlungen stützen sich auf das EU-US Data Privacy Framework oder die Standardvertragsklauseln der Europäischen Kommission.',
+        ],
+      },
+      {
+        heading: 'Administration',
+        body: [
+          'Der Administrator der Seite kann die Daten deines Kontos sehen (Benutzername, E-Mail, Land und verknüpfte Konten) und sie berichtigen, deine RetroAchievements- und Steam-Konten verknüpfen oder trennen oder das Konto löschen: um dir zu helfen, um deine Anfragen zu bearbeiten oder wenn gegen die Nutzungsbedingungen verstoßen wird. Jede dieser Aktionen wird mit Urheber und Zeitpunkt protokolliert; das Protokoll wird ein Jahr aufbewahrt.',
+          'Ändert sich die E-Mail-Adresse deines Kontos – egal durch wen –, erhält die alte Adresse eine Benachrichtigung.',
+        ],
+      },
+      {
+        heading: 'Wie lange',
+        body: [
+          'Kontodaten bleiben, bis das Konto gelöscht wird, und alles damit Verknüpfte wird mitgelöscht. Links zum Zurücksetzen des Passworts verfallen nach einer Stunde, Sicherheitsprotokolle nach einem Tag.',
+        ],
+      },
+      {
+        heading: 'Deine Rechte',
+        body: [
+          'Du kannst deine Daten einsehen, berichtigen, exportieren oder löschen lassen, der Nutzung widersprechen oder sie einschränken und deine Einwilligung widerrufen. Das meiste kannst du auf deiner Kontoseite bearbeiten, wo du dein Konto auch löschen kannst; für alles andere schreib uns.',
+          'Wenn du meinst, dass deine Daten nicht korrekt behandelt wurden, kannst du dich bei der spanischen Datenschutzbehörde beschweren (aepd.es).',
+        ],
+      },
+    ],
+  },
+  terms: {
+    link: 'Nutzungsbedingungen',
+    title: 'Nutzungsbedingungen',
+    updated: 'Zuletzt aktualisiert: 2. Oktober 2026',
+    intro: 'Diese Bedingungen gelten für alle, die CheevoVault nutzen. Wer die Seite nutzt, akzeptiert sie.',
+    back: 'Zurück zu CheevoVault',
+    sections: [
+      {
+        heading: 'Der Dienst',
+        body: [
+          'CheevoVault ist ein kostenloses, privates Projekt, das deinen Fortschritt auf RetroAchievements und Steam an einem Ort zeigt. Es steht in keiner Verbindung zu RetroAchievements, Valve oder Sony. Es kann sich jederzeit ändern, pausiert oder eingestellt werden.',
+        ],
+      },
+      {
+        heading: 'Dein Konto',
+        body: [
+          'Ein Konto pro Person, mit deinen eigenen Daten. Behalte dein Passwort für dich: Was mit deinem Konto geschieht, liegt in deiner Verantwortung. Der RetroAchievements-Schlüssel und das Steam-Konto, die du verknüpfst, müssen deine eigenen sein.',
+        ],
+      },
+      {
+        heading: 'Zulässige Nutzung',
+        body: [
+          'Greife die Seite nicht an, überlaste sie nicht und versuche nicht, ihre Schutzmaßnahmen zu umgehen; nutze sie nicht, um Daten anderer zu sammeln; und verwende keine beleidigenden oder rechtswidrigen Inhalte in Benutzername, Avatar oder Gruppen.',
+        ],
+      },
+      {
+        heading: 'Sperrung und Löschung',
+        body: [
+          'Der Administrator kann ein Konto berichtigen, sperren oder löschen, das gegen diese Bedingungen verstößt, oder wenn der Inhaber es verlangt. Du kannst dein Konto jederzeit auf deiner Kontoseite löschen.',
+        ],
+      },
+      {
+        heading: 'Keine Gewähr',
+        body: [
+          'Die Seite wird kostenlos und so wie sie ist angeboten, ohne Gewähr, dass sie immer verfügbar ist oder dass die angezeigten Daten – die von RetroAchievements und Steam stammen – vollständig oder richtig sind. Soweit gesetzlich zulässig, haften wir nicht für Schäden aus ihrer Nutzung.',
+        ],
+      },
+      {
+        heading: 'Änderungen und anwendbares Recht',
+        body: [
+          'Diese Bedingungen können sich ändern; das Datum oben zeigt die letzte Änderung, und wer die Seite danach weiter nutzt, akzeptiert die neue Fassung. Es gilt spanisches Recht.',
+        ],
+      },
+    ],
+  },
   loginForm: {
     title: 'Anmelden',
     accountCreated: 'Konto erfolgreich erstellt',
@@ -309,6 +460,7 @@ export const de: Translations = {
     backToSignIn: 'Zur Anmeldung',
   },
   registerForm: {
+    acceptTerms: 'Mit dem Erstellen eines Kontos akzeptierst du die {terms} und die {privacy}.',
     title: 'Registrieren',
     username: 'Benutzername',
     password: 'Passwort',
@@ -405,9 +557,6 @@ export const de: Translations = {
   },
   profileSt: {
     signIn: 'Mit Steam anmelden',
-  },
-  progression: {
-    recentProgress: 'Dein kürzlicher Fortschritt',
   },
   gamesList: {
     achievements: 'Errungenschaften',

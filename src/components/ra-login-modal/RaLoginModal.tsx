@@ -3,6 +3,7 @@ import CommonModal from '../common-modal/CommonModal'
 import Spinner from '../main-spinner/Spinner'
 import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
+import { notify } from '@/lib/notify'
 
 export default function RaLoginModal({
   isOpen,
@@ -45,6 +46,7 @@ export default function RaLoginModal({
 
       setUsername('')
       setApiKey('')
+      notify.success(T.toast.raLinked)
       setIsOpen(false)
     } catch (err) {
       console.error('[RaLoginModal]', err)

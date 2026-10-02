@@ -24,22 +24,26 @@ export function RecentAchievementsProvider({ children }: { children: React.React
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const doFetch = useCallback(() => {
-    if (!session?.user?.rausername) { setIsLoading(false); return }
-    setIsLoading(true)
-    setError(false)
-    const onFail = (err?: unknown) => {
-      if (!scheduleRetry(attemptRef, retryTimer, doFetch, err)) { setError(true); setIsLoading(false) }
+    // Named, so a retry can call it again.
+    const run = () => {
+      if (!session?.user?.rausername) { setIsLoading(false); return }
+      setIsLoading(true)
+      setError(false)
+      const onFail = (err?: unknown) => {
+        if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
+      }
+      fetchWithRetry('/api/getRecentAchievements')
+        .then((data) => {
+          if (!Array.isArray(data)) return onFail()
+          setAchievements([...data].sort(
+            (a, b) => new Date(b.Date.replace(' ', 'T')).getTime() - new Date(a.Date.replace(' ', 'T')).getTime()
+          ))
+          setIsLoading(false)
+          attemptRef.current = 0
+        })
+        .catch(onFail)
     }
-    fetchWithRetry('/api/getRecentAchievements')
-      .then((data) => {
-        if (!Array.isArray(data)) return onFail()
-        setAchievements([...data].sort(
-          (a, b) => new Date(b.Date.replace(' ', 'T')).getTime() - new Date(a.Date.replace(' ', 'T')).getTime()
-        ))
-        setIsLoading(false)
-        attemptRef.current = 0
-      })
-      .catch(onFail)
+    run()
   }, [session?.user?.rausername])
 
   useEffect(() => {

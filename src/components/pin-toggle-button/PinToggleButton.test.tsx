@@ -1,6 +1,9 @@
+jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { PinToggleButton } from './PinToggleButton'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
+import { en } from '@/translations/en'
+import { notify } from '@/lib/notify'
 
 jest.mock('@/context/PinnedGamesContext', () => ({
   usePinnedGames: jest.fn(),
@@ -82,4 +85,15 @@ describe('platform', () => {
     fireEvent.click(screen.getByRole('button'))
     await waitFor(() => expect(unpinGame).toHaveBeenCalledWith(730, 'steam'))
   })
+})
+
+test('says so when the pin is saved, and when it is not', async () => {
+  ;(usePinnedGames as jest.Mock).mockReturnValue({ isPinned: () => false, pinGame, unpinGame })
+  render(<PinToggleButton gameId={42} />)
+  fireEvent.click(screen.getByRole('button'))
+  await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.pinsUpdated))
+
+  pinGame.mockRejectedValueOnce(new Error('down'))
+  fireEvent.click(screen.getByRole('button'))
+  await waitFor(() => expect(notify.error).toHaveBeenCalledWith(en.toast.pinsFailed))
 })

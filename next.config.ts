@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV !== "production";
+// Google Analytics: the gtag script, and the hosts it reports to. It only loads after consent.
+const GA_SCRIPT = " https://www.googletagmanager.com";
+const GA_CONNECT = " https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com";
+
 // Preview deployments carry Vercel's feedback toolbar; production does not.
 const vercelLive = process.env.VERCEL_ENV === "preview" ? " https://vercel.live" : "";
 
@@ -14,11 +18,11 @@ const vercelLive = process.env.VERCEL_ENV === "preview" ? " https://vercel.live"
  */
 const CSP = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${vercelLive}`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${GA_SCRIPT}${vercelLive}`,
   `style-src 'self' 'unsafe-inline'${vercelLive}`,
   "img-src 'self' data: blob: https:",
   `font-src 'self' data:${vercelLive ? " https://vercel.live https://assets.vercel.com" : ""}`,
-  `connect-src 'self'${isDev ? " ws: wss:" : ""}${vercelLive ? " https://vercel.live wss://ws-us3.pusher.com" : ""}`,
+  `connect-src 'self'${GA_CONNECT}${isDev ? " ws: wss:" : ""}${vercelLive ? " https://vercel.live wss://ws-us3.pusher.com" : ""}`,
   ...(vercelLive ? ["frame-src https://vercel.live"] : []),
   "media-src 'self' https:",
   "object-src 'none'",

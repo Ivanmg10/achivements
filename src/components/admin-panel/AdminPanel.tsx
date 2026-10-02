@@ -1,15 +1,19 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { IconPlus, IconSearch, IconShield } from '@tabler/icons-react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import { IconLock, IconPlus, IconSearch, IconShield } from '@tabler/icons-react'
 import { useSession } from 'next-auth/react'
 import AdminCreateUserModal from './AdminCreateUserModal'
 import AdminEditUserModal from './AdminEditUserModal'
 import AdminUserCard from './admin-user-card/AdminUserCard'
+import AdminUnlock from './admin-unlock/AdminUnlock'
+import AdminActionLog from './admin-action-log/AdminActionLog'
 import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
 import Spinner from '@/components/main-spinner/Spinner'
 import { normalizeTitle } from '@/utils/gameCandidates'
+import { ADMIN_LOCKED_EVENT, adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
+import { notify } from '@/lib/notify'
 
 export default function AdminPanel() {
   const { data: session } = useSession()
@@ -21,6 +25,8 @@ export default function AdminPanel() {
   const [query, setQuery] = useState('')
   const [deleteUser, setDeleteUser] = useState<AdminUser | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  // Whether the panel must be unlocked with the admin's password first (see adminAuth).
+  const [locked, setLocked] = useState(false)
 
   const currentAdminId = Number(session?.user?.id)
 
@@ -35,53 +41,89 @@ export default function AdminPanel() {
     )
   }, [users, query])
 
-  useEffect(() => {
-    fetch('/api/admin/users')
-      .then((r) => {
-        if (!r.ok) throw new Error('Failed to load users')
-        return r.json()
-      })
-      .then((data) => {
-        if (Array.isArray(data)) setUsers(data)
-        else setError(data.error ?? 'Failed to load users')
+  // State only changes once the answer is in, so the first load can run from an effect.
+  const fetchUsers = useCallback(() => {
+    adminFetch('/api/admin/users')
+      .then(async (r) => {
+        const data = await r.json().catch(() => null)
+        if (r.status === 403 && data?.error === 'reauth-required') return setLocked(true)
+        if (!r.ok || !Array.isArray(data)) throw new Error('Failed to load users')
+        setUsers(data)
       })
       .catch(() => setError('Failed to load users'))
       .finally(() => setLoading(false))
   }, [])
 
+  const loadUsers = () => {
+    setLoading(true)
+    setError(null)
+    fetchUsers()
+  }
+
+  useEffect(() => {
+    fetchUsers()
+    // Any admin call that finds the unlock expired sends the panel back to the door.
+    const lock = () => {
+      setLocked(true)
+      setUsers([])
+      setEditUser(null)
+    }
+    window.addEventListener(ADMIN_LOCKED_EVENT, lock)
+    return () => window.removeEventListener(ADMIN_LOCKED_EVENT, lock)
+  }, [fetchUsers])
+
+  const handleUnlocked = () => {
+    setLocked(false)
+    loadUsers()
+  }
+
+  const lockNow = async () => {
+    await fetch('/api/admin/unlock', { method: 'DELETE' }).catch(() => null)
+    window.dispatchEvent(new Event(ADMIN_LOCKED_EVENT))
+  }
+
   const handleCreated = (user: AdminUser) => {
     setUsers((prev) => [...prev, user])
   }
 
-  const handleUpdated = (userId: number, field: string, value: unknown) => {
-    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, [field]: value } : u)))
+  const handleChanged = (userId: number, changes: Partial<AdminUser>) => {
+    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, ...changes } : u)))
     if (editUser?.id === userId) {
-      setEditUser((prev) => (prev ? { ...prev, [field]: value } : prev))
+      setEditUser((prev) => (prev ? { ...prev, ...changes } : prev))
     }
   }
+
+  const handleUpdated = (userId: number, field: string, value: unknown) =>
+    handleChanged(userId, { [field]: value } as Partial<AdminUser>)
 
   const toggleAdmin = async (user: AdminUser) => {
     if (user.id === currentAdminId) return
     const next = !user.admin
-    const res = await fetch('/api/admin/users', {
+    const res = await adminFetch('/api/admin/users', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: user.id, field: 'admin', value: next }),
     })
-    if (res.ok) handleUpdated(user.id, 'admin', next)
+    if (res.ok) {
+      handleUpdated(user.id, 'admin', next)
+      notify.success(next ? `${user.username} is now an admin` : `${user.username} is no longer an admin`)
+    } else {
+      notify.error(`Could not change ${user.username}'s role`)
+    }
   }
 
   const confirmDelete = async () => {
     if (!deleteUser) return
     setDeleteError(null)
     try {
-      const res = await fetch(`/api/admin/users?id=${deleteUser.id}`, { method: 'DELETE' })
+      const res = await adminFetch(`/api/admin/users?id=${deleteUser.id}`, { method: 'DELETE' })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         setDeleteError(data.error ?? 'Failed to delete user')
         return
       }
       setUsers((prev) => prev.filter((u) => u.id !== deleteUser.id))
+      notify.success(`${deleteUser.username} deleted`)
     } catch {
       setDeleteError('Failed to delete user')
     } finally {
@@ -95,11 +137,13 @@ export default function AdminPanel() {
         <div className="flex items-center gap-2">
           <IconShield size={18} className="text-accent" />
           <h2 className="text-lg font-bold">Admin panel</h2>
-          <span className="text-xs bg-accent text-bg-main font-bold px-2 py-0.5 rounded-full">
-            {users.length}
-          </span>
+          {!locked && (
+            <span className="text-xs bg-accent text-bg-main font-bold px-2 py-0.5 rounded-full">
+              {users.length}
+            </span>
+          )}
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+        {!locked && <div className="flex items-center gap-2 flex-wrap">
           <div className="relative">
             <IconSearch
               size={15}
@@ -118,12 +162,20 @@ export default function AdminPanel() {
             onClick={() => setCreateOpen(true)}
             className="flex items-center gap-1.5 px-3 py-2 bg-accent text-bg-main text-sm font-bold rounded-xl hover:opacity-90 transition-opacity"
           >
-            <IconPlus size={14} />
+            <IconPlus size={14} aria-hidden="true" />
             New user
           </button>
-        </div>
+          <button
+            onClick={lockNow}
+            className="flex items-center gap-1.5 px-3 py-2 bg-bg-card text-text-secondary text-sm rounded-xl hover:text-text-main transition-colors"
+          >
+            <IconLock size={14} aria-hidden="true" />
+            Lock
+          </button>
+        </div>}
       </div>
 
+      {locked ? <AdminUnlock onUnlocked={handleUnlocked} /> : <>
       <div>
         {loading && (
           <div className="flex items-center justify-center gap-3 py-12 text-text-secondary text-sm">
@@ -159,6 +211,9 @@ export default function AdminPanel() {
         </p>
       )}
 
+      <AdminActionLog />
+      </>}
+
       <DeleteConfirmDialog
         isOpen={deleteUser !== null}
         onClose={() => setDeleteUser(null)}
@@ -175,10 +230,13 @@ export default function AdminPanel() {
 
       {editUser && (
         <AdminEditUserModal
+          // A new user is a new form: the key starts it from that user's values.
+          key={editUser.id}
           isOpen
           onClose={() => setEditUser(null)}
           user={editUser}
           onUpdated={handleUpdated}
+          onChanged={handleChanged}
           currentAdminId={currentAdminId}
         />
       )}

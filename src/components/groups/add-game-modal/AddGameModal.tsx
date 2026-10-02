@@ -11,6 +11,7 @@ import { candidateToGroupItemBody, searchCandidates, GameCandidate } from '@/uti
 import { gameKey } from '@/utils/gameRef'
 import GamePickerRow from '@/components/game-picker/game-picker-row/GamePickerRow'
 import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
+import { notify } from '@/lib/notify'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -81,7 +82,8 @@ export default function AddGameModal({
   function toggle(c: GameCandidate) {
     setSelected((prev) => {
       const next = new Map(prev)
-      next.has(c.key) ? next.delete(c.key) : next.set(c.key, c)
+      if (next.has(c.key)) next.delete(c.key)
+      else next.set(c.key, c)
       return next
     })
   }
@@ -130,6 +132,7 @@ export default function AddGameModal({
       setError(true)
       return
     }
+    notify.success(T.toast.gamesAdded)
     onClose()
   }
 

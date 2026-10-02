@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import StatusGameItem from './StatusGameItem'
+import type { CategoryGame } from '@/hooks/useGamesByCategory'
 
 const completedGame = {
   GameID: 1,
@@ -13,7 +14,7 @@ const completedGame = {
   NumAwarded: 10,
   PctWon: '1.0',
   HardcoreMode: '0',
-} as any
+} as unknown as CategoryGame
 
 const wantToPlayGame = {
   GameID: 2,
@@ -25,7 +26,7 @@ const wantToPlayGame = {
   ImageIcon: '/icon2.png',
   AchievementsPublished: 30,
   PointsTotal: 450,
-} as any
+} as unknown as CategoryGame
 
 test('renders earned/total points for a playing/completed game when extra data is present', () => {
   render(

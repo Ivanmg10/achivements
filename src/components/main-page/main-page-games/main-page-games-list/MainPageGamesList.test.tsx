@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import MainPageGamesList from "./MainPageGamesList";
+import type { RetroAchievementsGameCompleted } from "@/types/types";
 
 const games = [
   {
@@ -20,7 +21,7 @@ const games = [
     ID: undefined,
     GameID: 2,
   },
-] as any;
+] as unknown as RetroAchievementsGameCompleted[];
 
 test("renders game list items", () => {
   render(<MainPageGamesList listGames={games} />);

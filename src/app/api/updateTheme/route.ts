@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import { authOptions } from "@/lib/authOptions";
 import { forgetUser } from "@/lib/userRecord";
+import { isTheme } from "@/types/types";
 
 export async function POST(req: Request) {
   try {
@@ -11,9 +12,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "No autorizado" }, { status: 401 });
     }
 
-    const { theme } = await req.json();
-    if (!theme) {
-      return NextResponse.json({ message: "theme requerido" }, { status: 400 });
+    const { theme } = (await req.json().catch(() => null)) ?? {};
+    if (!isTheme(theme)) {
+      return NextResponse.json({ message: "theme no válido" }, { status: 400 });
     }
 
     await pool.query(`UPDATE users SET theme = $1 WHERE id = $2`, [

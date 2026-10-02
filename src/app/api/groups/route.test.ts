@@ -84,4 +84,10 @@ describe('POST', () => {
     const res = await POST(makeRequest('POST', { title: 'New' }))
     expect(res.status).toBe(500)
   })
+
+  test('refuses a title over the limit before touching the database', async () => {
+    const res = await POST(makeRequest('POST', { title: 'a'.repeat(61) }))
+    expect(res.status).toBe(400)
+    expect(pool.query).not.toHaveBeenCalled()
+  })
 })

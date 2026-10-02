@@ -17,11 +17,6 @@ test('getGame builds the expected URL', () => {
   expect(fetchRA).toHaveBeenCalledWith('https://retroachievements.org/API/API_GetGame.php?i=123&y=key')
 })
 
-test('getGameExtended builds the expected URL', () => {
-  raClient.getGameExtended(123, 'key')
-  expect(fetchRA).toHaveBeenCalledWith('https://retroachievements.org/API/API_GetGameExtended.php?i=123&y=key')
-})
-
 test('getGameInfoAndUserProgress builds the expected URL', () => {
   raClient.getGameInfoAndUserProgress('ivan', 'key', 456)
   expect(fetchRA).toHaveBeenCalledWith(
@@ -83,11 +78,6 @@ test('getUserRankAndScore builds the expected URL', () => {
 test('getUserWantToPlayList builds the expected URL', () => {
   raClient.getUserWantToPlayList('ivan', 'key')
   expect(fetchRA).toHaveBeenCalledWith('https://retroachievements.org/API/API_GetUserWantToPlayList.php?u=ivan&y=key')
-})
-
-test('getTopTenUsers builds the expected URL', () => {
-  raClient.getTopTenUsers('key')
-  expect(fetchRA).toHaveBeenCalledWith('https://retroachievements.org/API/API_GetTopTenUsers.php?y=key')
 })
 
 test('getUserRecentAchievements builds the expected URL', () => {

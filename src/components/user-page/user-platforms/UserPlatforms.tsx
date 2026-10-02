@@ -18,6 +18,7 @@ import { useUserAwards } from '@/hooks/useUserAwards'
 import { formatPlaytime, summarizeSteamLibrary } from '@/utils/steamFeed'
 import { unlinkRaUser } from '@/utils/apiCallsUtils'
 import { RetroAchievementsUserProfile } from '@/types/types'
+import { notify } from '@/lib/notify'
 
 /** Only 'linked' is good news — the rest are warnings the user may need to act on. */
 function isLinkError(status: SteamLinkStatus) {
@@ -121,7 +122,13 @@ export default function UserPlatforms() {
         stats={raConnected ? raStats : []}
         action={
           raConnected ? (
-            <button onClick={() => unlinkRaUser(update)} className={DISCONNECT_CLASS}>
+            <button
+              onClick={async () => {
+                if (await unlinkRaUser(update)) notify.success(T.toast.raUnlinked)
+                else notify.error(T.toast.unlinkFailed)
+              }}
+              className={DISCONNECT_CLASS}
+            >
               {T.userConfig.signOutRA}
             </button>
           ) : (

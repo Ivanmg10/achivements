@@ -48,7 +48,12 @@ export function clientAddress(headers: HeaderSource): string {
  * will not answer must not lock people out, so a failure here lets them through.
  */
 export async function isLimited(scope: AttemptScope, address: string): Promise<boolean> {
-  const { max, windowMinutes } = LIMITS[scope]
+  return (await recentAttempts(scope, address)) >= LIMITS[scope].max
+}
+
+/** Attempts in the window. A database that will not answer counts as none. */
+async function recentAttempts(scope: AttemptScope, address: string): Promise<number> {
+  const { windowMinutes } = LIMITS[scope]
   try {
     const { rows } = await pool.query(
       `SELECT COUNT(*)::int AS recent
@@ -56,10 +61,10 @@ export async function isLimited(scope: AttemptScope, address: string): Promise<b
         WHERE scope = $1 AND address = $2 AND created_at > NOW() - ($3 || ' minutes')::interval`,
       [scope, address, String(windowMinutes)],
     )
-    return (rows[0]?.recent ?? 0) >= max
+    return rows[0]?.recent ?? 0
   } catch (err) {
     console.error('[attemptLimit]', scope, err)
-    return false
+    return 0
   }
 }
 
@@ -77,9 +82,13 @@ export async function recordAttempt(scope: AttemptScope, address: string): Promi
   }
 }
 
-/** Records an attempt and says whether it is allowed. */
+/**
+ * Records an attempt and says whether it is allowed. Recording comes first:
+ * each insert is committed before its count runs, so requests racing each
+ * other all see one another, and a burst cannot slip past the limit together.
+ * Refused attempts count too, which only keeps a hammering address out longer.
+ */
 export async function allowAttempt(scope: AttemptScope, address: string): Promise<boolean> {
-  if (await isLimited(scope, address)) return false
   await recordAttempt(scope, address)
-  return true
+  return (await recentAttempts(scope, address)) <= LIMITS[scope].max
 }

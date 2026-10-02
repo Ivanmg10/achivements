@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
+import { readGroupFields } from '@/utils/groupValidation'
 
 async function ownsGroup(userId: string, groupId: number) {
+  if (!Number.isInteger(groupId)) return false
   const res = await pool.query('SELECT id FROM game_groups WHERE id = $1 AND user_id = $2', [groupId, userId])
   return res.rows.length > 0
 }
@@ -12,6 +14,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const { id } = await params
     const groupId = parseInt(id)
+
+    if (!Number.isInteger(groupId)) {
+      return NextResponse.json({ message: 'No encontrado' }, { status: 404 })
+    }
 
     const session = await getServerSession(authOptions)
 
@@ -58,18 +64,16 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
     }
 
-    const { title, description, icon, is_public } = await req.json()
-
-    if (!title?.trim()) {
-      return NextResponse.json({ message: 'El título es obligatorio' }, { status: 400 })
-    }
+    const fields = readGroupFields(await req.json().catch(() => null))
+    if (!fields.ok) return NextResponse.json({ message: fields.message }, { status: 400 })
+    const { title, description, icon, is_public } = fields.value
 
     const result = await pool.query(
       `UPDATE game_groups
        SET title = $1, description = $2, icon = $3, is_public = $4, updated_at = NOW()
        WHERE id = $5
        RETURNING id, title, description, icon, is_public, position, created_at, updated_at`,
-      [title.trim(), description ?? null, icon ?? null, is_public ?? false, groupId],
+      [title, description, icon, is_public, groupId],
     )
 
     return NextResponse.json(result.rows[0])
