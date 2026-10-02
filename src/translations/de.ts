@@ -323,6 +323,13 @@ export const de: Translations = {
         ],
       },
       {
+        heading: 'Administration',
+        body: [
+          'Der Administrator der Seite kann die Daten deines Kontos sehen (Benutzername, E-Mail, Land und verknüpfte Konten) und sie berichtigen, deine RetroAchievements- und Steam-Konten verknüpfen oder trennen oder das Konto löschen: um dir zu helfen, um deine Anfragen zu bearbeiten oder wenn gegen die Nutzungsbedingungen verstoßen wird. Jede dieser Aktionen wird mit Urheber und Zeitpunkt protokolliert; das Protokoll wird ein Jahr aufbewahrt.',
+          'Ändert sich die E-Mail-Adresse deines Kontos – egal durch wen –, erhält die alte Adresse eine Benachrichtigung.',
+        ],
+      },
+      {
         heading: 'Wie lange',
         body: [
           'Kontodaten bleiben, bis das Konto gelöscht wird, und alles damit Verknüpfte wird mitgelöscht. Links zum Zurücksetzen des Passworts verfallen nach einer Stunde, Sicherheitsprotokolle nach einem Tag.',
@@ -333,6 +340,51 @@ export const de: Translations = {
         body: [
           'Du kannst deine Daten einsehen, berichtigen, exportieren oder löschen lassen, der Nutzung widersprechen oder sie einschränken und deine Einwilligung widerrufen. Das meiste kannst du auf deiner Kontoseite bearbeiten, wo du dein Konto auch löschen kannst; für alles andere schreib uns.',
           'Wenn du meinst, dass deine Daten nicht korrekt behandelt wurden, kannst du dich bei der spanischen Datenschutzbehörde beschweren (aepd.es).',
+        ],
+      },
+    ],
+  },
+  terms: {
+    link: 'Nutzungsbedingungen',
+    title: 'Nutzungsbedingungen',
+    updated: 'Zuletzt aktualisiert: 2. Oktober 2026',
+    intro: 'Diese Bedingungen gelten für alle, die CheevoVault nutzen. Wer die Seite nutzt, akzeptiert sie.',
+    back: 'Zurück zu CheevoVault',
+    sections: [
+      {
+        heading: 'Der Dienst',
+        body: [
+          'CheevoVault ist ein kostenloses, privates Projekt, das deinen Fortschritt auf RetroAchievements und Steam an einem Ort zeigt. Es steht in keiner Verbindung zu RetroAchievements, Valve oder Sony. Es kann sich jederzeit ändern, pausiert oder eingestellt werden.',
+        ],
+      },
+      {
+        heading: 'Dein Konto',
+        body: [
+          'Ein Konto pro Person, mit deinen eigenen Daten. Behalte dein Passwort für dich: Was mit deinem Konto geschieht, liegt in deiner Verantwortung. Der RetroAchievements-Schlüssel und das Steam-Konto, die du verknüpfst, müssen deine eigenen sein.',
+        ],
+      },
+      {
+        heading: 'Zulässige Nutzung',
+        body: [
+          'Greife die Seite nicht an, überlaste sie nicht und versuche nicht, ihre Schutzmaßnahmen zu umgehen; nutze sie nicht, um Daten anderer zu sammeln; und verwende keine beleidigenden oder rechtswidrigen Inhalte in Benutzername, Avatar oder Gruppen.',
+        ],
+      },
+      {
+        heading: 'Sperrung und Löschung',
+        body: [
+          'Der Administrator kann ein Konto berichtigen, sperren oder löschen, das gegen diese Bedingungen verstößt, oder wenn der Inhaber es verlangt. Du kannst dein Konto jederzeit auf deiner Kontoseite löschen.',
+        ],
+      },
+      {
+        heading: 'Keine Gewähr',
+        body: [
+          'Die Seite wird kostenlos und so wie sie ist angeboten, ohne Gewähr, dass sie immer verfügbar ist oder dass die angezeigten Daten – die von RetroAchievements und Steam stammen – vollständig oder richtig sind. Soweit gesetzlich zulässig, haften wir nicht für Schäden aus ihrer Nutzung.',
+        ],
+      },
+      {
+        heading: 'Änderungen und anwendbares Recht',
+        body: [
+          'Diese Bedingungen können sich ändern; das Datum oben zeigt die letzte Änderung, und wer die Seite danach weiter nutzt, akzeptiert die neue Fassung. Es gilt spanisches Recht.',
         ],
       },
     ],
@@ -387,6 +439,7 @@ export const de: Translations = {
     backToSignIn: 'Zur Anmeldung',
   },
   registerForm: {
+    acceptTerms: 'Mit dem Erstellen eines Kontos akzeptierst du die {terms} und die {privacy}.',
     title: 'Registrieren',
     username: 'Benutzername',
     password: 'Passwort',

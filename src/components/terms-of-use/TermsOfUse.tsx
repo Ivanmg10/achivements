@@ -3,8 +3,8 @@
 import { useLanguage } from '@/context/LanguageContext'
 import LegalDocument from '@/components/legal-document/LegalDocument'
 
-/** What the site keeps about people, why, and what they can do about it. */
-export default function PrivacyPolicy() {
+/** The rules for using the site, and what can happen to an account that breaks them. */
+export default function TermsOfUse() {
   const { T } = useLanguage()
-  return <LegalDocument doc={T.privacy} />
+  return <LegalDocument doc={T.terms} />
 }

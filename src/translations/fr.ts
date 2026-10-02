@@ -323,6 +323,13 @@ export const fr: Translations = {
         ],
       },
       {
+        heading: 'Administration',
+        body: [
+          'L’administrateur du site peut voir les données de votre compte (nom d’utilisateur, e-mail, pays et comptes liés) et peut les corriger, lier ou délier vos comptes RetroAchievements et Steam, ou supprimer le compte : pour vous aider, pour répondre à vos demandes ou en cas de non-respect des conditions d’utilisation. Chacune de ces actions est enregistrée avec son auteur et sa date, et l’enregistrement est conservé un an.',
+          'Si l’e-mail de votre compte change, quel que soit l’auteur du changement, l’ancienne adresse reçoit un avis.',
+        ],
+      },
+      {
         heading: 'Combien de temps',
         body: [
           'Les données du compte sont conservées jusqu’à sa suppression, et tout ce qui y est lié disparaît avec lui. Les liens de réinitialisation expirent au bout d’une heure, les journaux de sécurité au bout d’un jour.',
@@ -333,6 +340,51 @@ export const fr: Translations = {
         body: [
           'Vous pouvez accéder à vos données, les rectifier, les exporter ou les effacer, vous opposer à leur utilisation ou la limiter, et retirer votre consentement. L’essentiel se modifie depuis votre page de compte, où vous pouvez aussi le supprimer ; pour le reste, écrivez-nous.',
           'Si vous estimez que vos données n’ont pas été traitées correctement, vous pouvez saisir l’Agence espagnole de protection des données (aepd.es).',
+        ],
+      },
+    ],
+  },
+  terms: {
+    link: 'Conditions d’utilisation',
+    title: 'Conditions d’utilisation',
+    updated: 'Dernière mise à jour : 2 octobre 2026',
+    intro: 'Ces conditions s’appliquent à toute personne qui utilise CheevoVault. Utiliser le site vaut acceptation.',
+    back: 'Retour à CheevoVault',
+    sections: [
+      {
+        heading: 'Le service',
+        body: [
+          'CheevoVault est un projet personnel et gratuit qui réunit votre progression RetroAchievements et Steam. Il n’est pas affilié à RetroAchievements, Valve ou Sony. Il peut évoluer, être suspendu ou prendre fin à tout moment.',
+        ],
+      },
+      {
+        heading: 'Votre compte',
+        body: [
+          'Un compte par personne, avec vos propres informations. Gardez votre mot de passe pour vous : ce qui est fait avec votre compte relève de votre responsabilité. La clé RetroAchievements et le compte Steam que vous liez doivent être les vôtres.',
+        ],
+      },
+      {
+        heading: 'Usage acceptable',
+        body: [
+          'N’attaquez pas le site, ne le surchargez pas et n’essayez pas de contourner ses protections ; ne l’utilisez pas pour collecter les données d’autrui ; et ne mettez pas de contenu offensant ou illégal dans votre nom d’utilisateur, votre avatar ou vos groupes.',
+        ],
+      },
+      {
+        heading: 'Suspension et suppression',
+        body: [
+          'L’administrateur peut corriger, suspendre ou supprimer un compte qui enfreint ces conditions, ou à la demande de son titulaire. Vous pouvez supprimer votre compte à tout moment depuis votre page de compte.',
+        ],
+      },
+      {
+        heading: 'Aucune garantie',
+        body: [
+          'Le site est fourni tel quel et gratuitement, sans garantie qu’il soit toujours disponible ni que les données affichées — issues de RetroAchievements et de Steam — soient complètes ou exactes. Dans la mesure permise par la loi, nous déclinons toute responsabilité pour les préjudices liés à son utilisation.',
+        ],
+      },
+      {
+        heading: 'Modifications et droit applicable',
+        body: [
+          'Ces conditions peuvent évoluer ; la date en haut indique leur dernière modification, et continuer à utiliser le site ensuite vaut acceptation de la nouvelle version. Elles sont régies par le droit espagnol.',
         ],
       },
     ],
@@ -387,6 +439,7 @@ export const fr: Translations = {
     backToSignIn: 'Aller à la connexion',
   },
   registerForm: {
+    acceptTerms: 'En créant un compte, vous acceptez les {terms} et la {privacy}.',
     title: "S'inscrire",
     username: "Nom d'utilisateur",
     password: 'Mot de passe',

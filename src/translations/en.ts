@@ -321,6 +321,13 @@ export const en = {
         ],
       },
       {
+        heading: 'Administration',
+        body: [
+          'The site’s administrator can see your account details (username, email, country and linked accounts) and can correct them, link or unlink your RetroAchievements and Steam accounts, or delete the account: to give you support, to act on your requests, or when the terms of use are broken. Each of those actions is recorded with who did it and when, and the record is kept for a year.',
+          'If the email on your account changes, whoever changes it, the old address gets a notice.',
+        ],
+      },
+      {
         heading: 'How long',
         body: [
           'Account data stays until the account is deleted, and everything linked to it goes with it. Password reset links expire after an hour, security records after a day.',
@@ -331,6 +338,51 @@ export const en = {
         body: [
           'You can access, correct, export or delete your data, object to or restrict how it is used, and withdraw consent. Most of it can be edited from your account page, where you can also delete your account; for anything else, write to us.',
           'If you think your data has not been handled properly, you can complain to the Spanish Data Protection Agency (aepd.es).',
+        ],
+      },
+    ],
+  },
+  terms: {
+    link: 'Terms of use',
+    title: 'Terms of use',
+    updated: 'Last updated: 2 October 2026',
+    intro: 'These terms apply to anyone who uses CheevoVault. Using the site means accepting them.',
+    back: 'Back to CheevoVault',
+    sections: [
+      {
+        heading: 'The service',
+        body: [
+          'CheevoVault is a free, personal project that shows your RetroAchievements and Steam progress in one place. It is not affiliated with RetroAchievements, Valve or Sony. It may change, pause or end at any time.',
+        ],
+      },
+      {
+        heading: 'Your account',
+        body: [
+          'One account per person, with your own details. Keep your password to yourself: what is done with your account is your responsibility. The RetroAchievements key and the Steam account you link must be your own.',
+        ],
+      },
+      {
+        heading: 'Acceptable use',
+        body: [
+          'Do not attack the site, overload it or try to get around its protections; do not use it to collect other people’s data; and do not put offensive or illegal content in your username, avatar or groups.',
+        ],
+      },
+      {
+        heading: 'Suspension and deletion',
+        body: [
+          'The administrator may correct, suspend or delete an account that breaks these terms, or when its owner asks. You can delete your own account at any time from your account page.',
+        ],
+      },
+      {
+        heading: 'No guarantees',
+        body: [
+          'The site is offered as it is and for free, with no promise that it will always be available or that the data it shows — which comes from RetroAchievements and Steam — is complete or exact. As far as the law allows, we are not liable for losses arising from its use.',
+        ],
+      },
+      {
+        heading: 'Changes and law',
+        body: [
+          'These terms may change; the date at the top says when they last did, and using the site afterwards means accepting the new version. They are governed by Spanish law.',
         ],
       },
     ],
@@ -385,6 +437,7 @@ export const en = {
     backToSignIn: 'Go to sign in',
   },
   registerForm: {
+    acceptTerms: 'By creating an account you accept the {terms} and the {privacy}.',
     title: 'Register',
     username: 'Username',
     password: 'Password',

@@ -12,6 +12,7 @@ beforeEach(() => {
 test('links to the privacy policy and offers the cookie choice again', () => {
   render(<LegalLinks />)
   expect(screen.getByRole('link', { name: en.privacy.link })).toHaveAttribute('href', '/privacy')
+  expect(screen.getByRole('link', { name: en.terms.link })).toHaveAttribute('href', '/terms')
   expect(screen.getByRole('button', { name: en.cookies.settings })).toBeInTheDocument()
 })
 

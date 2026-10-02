@@ -323,6 +323,13 @@ export const es: Translations = {
         ],
       },
       {
+        heading: 'Administración',
+        body: [
+          'El administrador del sitio puede ver los datos de tu cuenta (nombre de usuario, correo, país y cuentas vinculadas) y puede corregirlos, vincular o desvincular tus cuentas de RetroAchievements y Steam, o eliminar la cuenta: para darte soporte, para atender tus peticiones o cuando se incumplen las condiciones de uso. Cada una de esas acciones queda registrada con quién la hizo y cuándo, y el registro se guarda un año.',
+          'Si cambia el correo de tu cuenta, lo cambie quien lo cambie, la dirección anterior recibe un aviso.',
+        ],
+      },
+      {
         heading: 'Cuánto tiempo',
         body: [
           'Los datos de la cuenta se guardan hasta que se elimina, y todo lo vinculado se borra con ella. Los enlaces de cambio de contraseña caducan en una hora y los registros de seguridad en un día.',
@@ -333,6 +340,51 @@ export const es: Translations = {
         body: [
           'Puedes acceder a tus datos, corregirlos, exportarlos o borrarlos, oponerte a su uso o limitarlo, y retirar tu consentimiento. Casi todo se puede editar desde tu página de cuenta, donde también puedes eliminarla; para lo demás, escríbenos.',
           'Si crees que tus datos no se han tratado como corresponde, puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).',
+        ],
+      },
+    ],
+  },
+  terms: {
+    link: 'Condiciones de uso',
+    title: 'Condiciones de uso',
+    updated: 'Última actualización: 2 de octubre de 2026',
+    intro: 'Estas condiciones se aplican a cualquiera que use CheevoVault. Usar la web supone aceptarlas.',
+    back: 'Volver a CheevoVault',
+    sections: [
+      {
+        heading: 'El servicio',
+        body: [
+          'CheevoVault es un proyecto personal y gratuito que reúne tu progreso de RetroAchievements y Steam en un solo sitio. No está afiliado a RetroAchievements, Valve ni Sony. Puede cambiar, pausarse o terminar en cualquier momento.',
+        ],
+      },
+      {
+        heading: 'Tu cuenta',
+        body: [
+          'Una cuenta por persona, con tus propios datos. No compartas tu contraseña: lo que se haga con tu cuenta es responsabilidad tuya. La clave de RetroAchievements y la cuenta de Steam que vincules tienen que ser tuyas.',
+        ],
+      },
+      {
+        heading: 'Uso aceptable',
+        body: [
+          'No ataques la web, no la sobrecargues ni intentes saltarte sus protecciones; no la uses para recopilar datos de otras personas, y no pongas contenido ofensivo o ilegal en tu nombre de usuario, tu avatar o tus grupos.',
+        ],
+      },
+      {
+        heading: 'Suspensión y eliminación',
+        body: [
+          'El administrador puede corregir, suspender o eliminar una cuenta que incumpla estas condiciones, o cuando su titular lo pida. Tú puedes eliminar tu cuenta cuando quieras desde tu página de cuenta.',
+        ],
+      },
+      {
+        heading: 'Sin garantías',
+        body: [
+          'La web se ofrece tal cual y gratis, sin garantía de que esté siempre disponible ni de que los datos que muestra —que vienen de RetroAchievements y Steam— sean completos o exactos. En la medida en que la ley lo permita, no respondemos de los perjuicios derivados de su uso.',
+        ],
+      },
+      {
+        heading: 'Cambios y ley aplicable',
+        body: [
+          'Estas condiciones pueden cambiar; la fecha de arriba indica cuándo lo hicieron por última vez, y seguir usando la web después supone aceptar la nueva versión. Se rigen por la ley española.',
         ],
       },
     ],
@@ -387,6 +439,7 @@ export const es: Translations = {
     backToSignIn: 'Ir a iniciar sesión',
   },
   registerForm: {
+    acceptTerms: 'Al crear una cuenta aceptas las {terms} y la {privacy}.',
     title: 'Registro',
     username: 'Nombre de usuario',
     password: 'Contraseña',
