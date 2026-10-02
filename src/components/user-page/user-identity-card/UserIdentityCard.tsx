@@ -3,8 +3,11 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { signOut, useSession } from 'next-auth/react'
-import { IconAlertTriangle, IconLock, IconLogout, IconPencil } from '@tabler/icons-react'
+import { IconAlertTriangle, IconCircleCheck, IconDeviceGamepad2, IconFolders, IconLock, IconLogout, IconPencil, IconPin, IconPlayerPlay, IconShield } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
+import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
+import UserVaultStat from '@/components/user-page/user-vault-stat/UserVaultStat'
+import AdminPanelModal from '@/components/admin-panel/admin-panel-modal/AdminPanelModal'
 import EmailVerificationNotice from '@/components/user-page/email-verification-notice/EmailVerificationNotice'
 import EditProfileModal, { EditProfileField } from '@/components/edit-profile-modal/EditProfileModal'
 import ChangePasswordModal from '@/components/change-password-modal/ChangePasswordModal'
@@ -33,6 +36,7 @@ export default function UserIdentityCard() {
   const { groups } = useGroups()
   const [passwordOpen, setPasswordOpen] = useState(false)
   const [locationOpen, setLocationOpen] = useState(false)
+  const [adminOpen, setAdminOpen] = useState(false)
   const [edit, setEdit] = useState<{ field: EditProfileField; value: string } | null>(null)
 
   const user = session?.user
@@ -46,17 +50,20 @@ export default function UserIdentityCard() {
   ).size
 
   const totals = [
-    { label: T.userStats.games, value: all.length + steam.totalGames, accent: 'text-text-main' },
-    { label: T.userStats.inProgress, value: inProgress.length + steam.playing, accent: 'text-amber-400' },
-    { label: T.groups.filter100, value: completedRa + steam.perfect, accent: 'text-green-400' },
-    { label: T.groups.title, value: groups.length, accent: 'text-accent' },
-    { label: T.pinnedGames.title, value: pins.length, accent: 'text-blue-400' },
+    { label: T.userStats.games, value: all.length + steam.totalGames, accent: 'text-text-main', icon: <IconDeviceGamepad2 size={18} /> },
+    { label: T.userStats.inProgress, value: inProgress.length + steam.playing, accent: 'text-amber-400', icon: <IconPlayerPlay size={18} /> },
+    { label: T.groups.filter100, value: completedRa + steam.perfect, accent: 'text-green-400', icon: <IconCircleCheck size={18} /> },
+    { label: T.groups.title, value: groups.length, accent: 'text-accent', icon: <IconFolders size={18} /> },
+    { label: T.pinnedGames.title, value: pins.length, accent: 'text-blue-400', icon: <IconPin size={18} /> },
   ]
 
   return (
-    <section className="bg-bg-card rounded-3xl p-6 flex flex-col gap-5 h-full">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-5 min-w-0">
+    <section className="relative bg-bg-card rounded-3xl overflow-hidden flex flex-col h-full">
+      <UserProfileBanner avatar={user?.avatar} />
+
+      <div className="relative px-4 sm:px-6 pt-6 pb-6 flex flex-col gap-5 flex-1">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-4 sm:gap-5 min-w-0">
           <button
             onClick={() => setEdit({ field: 'avatar', value: user?.avatar ?? '' })}
             aria-label={T.userPage.editAvatar}
@@ -68,11 +75,11 @@ export default function UserIdentityCard() {
                 alt=""
                 width={112}
                 height={112}
-                className="rounded-full w-28 h-28 object-cover ring-2 ring-accent/40"
+                className="rounded-full w-24 h-24 sm:w-28 sm:h-28 object-cover ring-4 ring-bg-card shadow-xl shadow-black/40"
                 unoptimized
               />
             ) : (
-              <span className="rounded-full w-28 h-28 bg-bg-main flex items-center justify-center">
+              <span className="rounded-full w-24 h-24 sm:w-28 sm:h-28 bg-bg-main ring-4 ring-bg-card flex items-center justify-center">
                 <IconPencil size={24} className="text-text-secondary" aria-hidden="true" />
               </span>
             )}
@@ -84,9 +91,9 @@ export default function UserIdentityCard() {
             </span>
           </button>
 
-          <div className="flex flex-col gap-1.5 min-w-0">
+          <div className="flex flex-col gap-1 min-w-0 pb-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-3xl font-bold truncate">{user?.name}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate">{user?.name}</h1>
               {user?.admin && (
                 <span className="text-xs bg-accent text-bg-main font-bold px-2 py-0.5 rounded-full">
                   {T.userData.admin}
@@ -97,7 +104,18 @@ export default function UserIdentityCard() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          {/* The flag in the session decides the button; the panel itself asks the DB and a password. */}
+          {user?.admin && (
+            <button
+              onClick={() => setAdminOpen(true)}
+              aria-haspopup="dialog"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-accent/15 text-accent hover:bg-accent/25 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            >
+              <IconShield size={13} aria-hidden="true" />
+              Admin panel
+            </button>
+          )}
           <button
             onClick={() => setPasswordOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
@@ -168,17 +186,16 @@ export default function UserIdentityCard() {
         <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
           {T.userPage.library}
         </h2>
-        <dl className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+        <dl className="grid grid-cols-2 sm:grid-cols-5 gap-2 [&>*:last-child]:col-span-2 sm:[&>*:last-child]:col-span-1">
           {totals.map((total) => (
-            <div key={total.label} className="bg-bg-main rounded-2xl px-3 py-3 flex flex-col gap-0.5 min-w-0">
-              <dd className={`text-2xl font-bold tabular-nums ${total.accent}`}>{total.value.toLocaleString()}</dd>
-              <dt className="text-[11px] text-text-secondary truncate">{total.label}</dt>
-            </div>
+            <UserVaultStat key={total.label} {...total} />
           ))}
         </dl>
       </div>
+      </div>
 
       <ChangePasswordModal isOpen={passwordOpen} onClose={() => setPasswordOpen(false)} />
+      {user?.admin && <AdminPanelModal isOpen={adminOpen} onClose={() => setAdminOpen(false)} />}
       <LocationModal
         isOpen={locationOpen}
         onClose={() => setLocationOpen(false)}

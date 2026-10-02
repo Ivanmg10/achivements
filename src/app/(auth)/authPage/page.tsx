@@ -4,31 +4,17 @@ import LoginUserForm from '@/components/login-user-form/LoginUserForm'
 import RegisterUserForm from '@/components/register-user-form/RegisterUserForm'
 import LegalLinks from '@/components/legal-links/LegalLinks'
 import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
+import AuthBrand from '@/components/auth-brand/AuthBrand'
+import AuthFormCard from '@/components/auth-form-card/AuthFormCard'
+import AuthDesktopFormPanel from '@/components/auth-desktop-form-panel/AuthDesktopFormPanel'
 import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { formTransition } from '@/lib/animations'
-import { useLanguage } from '@/context/LanguageContext'
 
 const fromRight = { initial: { opacity: 0, x: 60 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: 60 } }
 const fromLeft  = { initial: { opacity: 0, x: -60 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -60 } }
 const SLIDE_T   = { duration: 0.32, ease: 'easeOut' as const }
-
-function AuthBrand() {
-  const { T } = useLanguage()
-  return (
-    <div className="text-center">
-      <h1 className="text-4xl font-extrabold text-text-main tracking-tight">{T.authPage.brand}</h1>
-      <div className="flex items-center justify-center gap-2 mt-3">
-        <span className="text-xs px-2.5 py-1 rounded-full bg-accent/15 text-accent border border-accent/25 font-medium">RetroAchievements</span>
-        <span className="text-xs px-2.5 py-1 rounded-full bg-accent/15 text-accent border border-accent/25 font-medium">Steam</span>
-        <span className="text-xs px-2.5 py-1 rounded-full bg-bg-tertiary text-text-secondary border border-white/10 font-medium">
-          PlayStation · {T.userData.comingSoon.toLowerCase()}
-        </span>
-      </div>
-    </div>
-  )
-}
 
 /** ?mode=register opens straight on the register form, for the landing button. */
 function AuthPageContent() {
@@ -37,25 +23,29 @@ function AuthPageContent() {
   const [hasRegister, setHasRegister] = useState(false)
 
   return (
-    <div className="relative bg-bg-main text-text-main h-screen overflow-hidden flex">
+    <div className="relative bg-bg-main text-text-main min-h-[100dvh] lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
 
-      {/* ── Mobile ── */}
-      <div className="lg:hidden flex-1 flex items-center justify-center relative px-6 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.18] pointer-events-none select-none">
+      {/* ── Mobile: the art wall behind, the form on a frosted card over it ── */}
+      <div className="lg:hidden flex-1 relative flex flex-col items-center justify-center gap-6 px-4 pt-10 pb-4">
+        <div aria-hidden="true" className="fixed inset-0 opacity-30 pointer-events-none select-none">
           <AuthCollagePanel />
         </div>
-        <div className="absolute inset-0 bg-linear-to-b from-bg-main/80 via-bg-main/20 to-bg-main/80 pointer-events-none" />
-        <div className="absolute top-12 left-0 right-0 flex justify-center pointer-events-none z-10">
+        <div aria-hidden="true" className="fixed inset-0 bg-linear-to-b from-bg-main/90 via-bg-main/40 to-bg-main/90 pointer-events-none" />
+        <div className="relative z-10">
           <AuthBrand />
         </div>
         <AnimatePresence mode="wait">
           {isLogin ? (
             <motion.div key="m-login" className="relative z-10 w-full" variants={formTransition} initial="hidden" animate="visible" exit="exit">
-              <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />
+              <AuthFormCard>
+                <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />
+              </AuthFormCard>
             </motion.div>
           ) : (
             <motion.div key="m-register" className="relative z-10 w-full" variants={formTransition} initial="hidden" animate="visible" exit="exit">
-              <RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setHasRegister} />
+              <AuthFormCard>
+                <RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setHasRegister} />
+              </AuthFormCard>
             </motion.div>
           )}
         </AnimatePresence>
@@ -66,12 +56,9 @@ function AuthPageContent() {
         <AnimatePresence mode="wait">
           {isLogin ? (
             <motion.div key="d-login" className="relative w-full h-full" {...fromLeft} transition={SLIDE_T}>
-              <div className="absolute top-12 left-0 right-0 flex justify-center">
-                <AuthBrand />
-              </div>
-              <div className="h-full flex items-center justify-center">
+              <AuthDesktopFormPanel>
                 <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />
-              </div>
+              </AuthDesktopFormPanel>
             </motion.div>
           ) : (
             <motion.div key="d-collage-l" className="absolute inset-0" {...fromLeft} transition={SLIDE_T}>
@@ -90,19 +77,16 @@ function AuthPageContent() {
             </motion.div>
           ) : (
             <motion.div key="d-register" className="relative z-10 w-full h-full" {...fromRight} transition={SLIDE_T}>
-              <div className="absolute top-12 left-0 right-0 flex justify-center">
-                <AuthBrand />
-              </div>
-              <div className="h-full flex items-center justify-center">
+              <AuthDesktopFormPanel>
                 <RegisterUserForm setIsLogin={setIsLogin} setIsRegister={setHasRegister} />
-              </div>
+              </AuthDesktopFormPanel>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
       {/* Signing up hands over data: what happens to it is one click away. */}
-      <div className="absolute bottom-4 inset-x-0 z-20 flex justify-center pointer-events-none">
+      <div className="relative pb-6 lg:pb-0 lg:absolute lg:bottom-4 lg:inset-x-0 z-20 flex justify-center pointer-events-none">
         <div className="pointer-events-auto text-xs bg-bg-main/80 backdrop-blur px-3 py-1.5 rounded-full border border-white/10">
           <LegalLinks />
         </div>

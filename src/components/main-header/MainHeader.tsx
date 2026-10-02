@@ -42,7 +42,7 @@ function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
 }
 
 export default function MainHeader() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const { T } = useLanguage()
   const { activeStreak } = useStreakData()
   const router = useRouter()
@@ -87,7 +87,16 @@ export default function MainHeader() {
 
   return (
     <>
-      <header className={`relative flex items-center text-text-main px-4 h-16 ${isGameInfo ? 'bg-transparent z-[1]' : 'bg-bg-card'}`}>
+      {/*
+        Floating bar: the wrapper keeps the 64px the game heroes are drawn
+        under (8px gap + 56px bar), so nothing below has to move.
+      */}
+      <div className="sticky top-0 z-40 h-16 shrink-0 px-2 sm:px-3 pt-2 pointer-events-none">
+      <header
+        className={`pointer-events-auto relative flex items-center text-text-main px-3 sm:px-4 h-14 rounded-2xl backdrop-blur-xl backdrop-saturate-150 ring-1 shadow-lg shadow-black/20 transition-colors ${
+          isGameInfo ? 'bg-black/25 ring-white/10' : 'bg-bg-card/80 ring-white/[0.06]'
+        }`}
+      >
         {/* Left: home + back + nav (desktop) / hamburguesa (mobile) */}
         <div className="flex items-center gap-1 shrink-0 z-10">
           <Link
@@ -199,6 +208,9 @@ export default function MainHeader() {
                 )}
               </Link>
             </>
+          ) : status === 'loading' ? (
+            // Still reading the session: a placeholder where the avatar goes, not a flash of "Sign in".
+            <span aria-hidden="true" className="w-36 h-11 rounded-full bg-bg-main/60 animate-pulse motion-reduce:animate-none" />
           ) : (
             <Link
               href="/authPage"
@@ -209,6 +221,7 @@ export default function MainHeader() {
           )}
         </div>
       </header>
+      </div>
 
       <SearchModal isOpen={searchOpen} onClose={closeSearch} initialQuery={initialQuery} />
       <MobileNavModal isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />

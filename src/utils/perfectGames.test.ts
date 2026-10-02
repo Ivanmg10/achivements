@@ -1,4 +1,4 @@
-import { applyPerfectOrder, buildPerfectGames, countPerfectGames } from './perfectGames'
+import { applyPerfectOrder, buildPerfectGames, countPerfectGames, latestPerfects } from './perfectGames'
 import type { RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 
@@ -59,5 +59,33 @@ describe('applyPerfectOrder', () => {
 
   test('ignores keys for games that are no longer perfect, and repeated keys', () => {
     expect(applyPerfectOrder(games, ['ra:999', 'ra:1', 'ra:1']).map((g) => g.key)).toEqual(['ra:1', 'ra:2', 'steam:620'])
+  })
+})
+
+describe('latestPerfects', () => {
+  const award = (id: number, date: string, extra = 1, type = 'Mastery/Completion') => ({
+    AwardedAt: date, AwardType: type, AwardData: id, AwardDataExtra: extra, Title: `Game ${id}`, ConsoleName: 'SNES', ImageIcon: `/Images/${id}.png`,
+  })
+
+  test('newest first across both platforms, three by default', () => {
+    const steamGames = [
+      steam(620, 'Portal 2', { lastPlayed: '2024-03-01T00:00:00Z' }),
+    ]
+    const result = latestPerfects(
+      [award(1, '2024-01-01T00:00:00Z'), award(2, '2024-05-01T00:00:00Z'), award(3, '2024-02-01T00:00:00Z')],
+      steamGames,
+    )
+    expect(result.map((r) => r.key)).toEqual(['ra:2', 'steam:620', 'ra:3'])
+  })
+
+  test('only masteries and completions count, not beaten awards', () => {
+    const result = latestPerfects([award(1, '2024-01-01T00:00:00Z', 1, 'Game Beaten')])
+    expect(result).toEqual([])
+  })
+
+  test('one entry per RA game, at its latest date, hardcore when the mastery is', () => {
+    const result = latestPerfects([award(1, '2024-01-01T00:00:00Z', 0), award(1, '2024-06-01T00:00:00Z', 1)])
+    expect(result).toHaveLength(1)
+    expect(result[0]).toMatchObject({ date: '2024-06-01T00:00:00Z', hardcore: true, iconUrl: 'https://retroachievements.org/Images/1.png' })
   })
 })

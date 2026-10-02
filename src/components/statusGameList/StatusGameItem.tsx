@@ -13,6 +13,8 @@ import { DualProgressBar } from '@/components/ui/DualProgressBar'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { SectionFallback } from '@/components/ui/SectionFallback'
+import { useSpotlight } from '@/hooks/useSpotlight'
+import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 
 function getGameId(g: CategoryGame): number | string {
   return g.ID ?? g.GameID!
@@ -41,6 +43,7 @@ export default function StatusGameItem({
 }) {
   const [open, setOpen] = useState(false)
   const { T } = useLanguage()
+  const onPointerMove = useSpotlight()
 
   const gameId = getGameId(game)
   // Asked for on first open; the hook keeps the result when the row closes again.
@@ -86,8 +89,10 @@ export default function StatusGameItem({
     <div
       ref={itemRef}
       style={style}
-      className="bg-bg-card rounded-xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow duration-150"
+      onPointerMove={onPointerMove}
+      className="spotlight bg-bg-card rounded-2xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow duration-150"
     >
+      <GameCardBackdrop src={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null} surface="card" />
       <div
         onClick={handleToggle}
         className="flex flex-row items-start gap-5 p-5 cursor-pointer hover:bg-bg-header/20 transition-colors select-none"

@@ -2,9 +2,8 @@
 
 import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
-import { fadeUp } from '@/lib/animations'
 
-import LoadingPage from '../loading-page/LoadingPage'
+import MainPageSkeleton from './main-page-skeleton/MainPageSkeleton'
 import MainPagePinnedGames from './main-page-pinned-games/MainPagePinnedGames'
 import MainPageProfile from './main-page-profile/MainPageProfile'
 import ConnectAccounts from '@/components/connect-accounts/ConnectAccounts'
@@ -19,8 +18,12 @@ export default function MainPage() {
   const { view } = useMainView()
   const raLinked = useRaLinked()
 
-  if (status === 'loading')
-    return <LoadingPage />
+  // Only the first read, while there is no session yet. update() (RaUserRefresher
+  // calls it on every visit) sets the status back to 'loading' for a moment with
+  // the session still in hand; swapping the page for the skeleton then made it
+  // jump down and back up.
+  if (status === 'loading' && !session)
+    return <MainPageSkeleton />
 
   if (status === 'authenticated' && !raLinked) {
     // Steam alone is enough for a main page; neither account gets the connect prompt.
@@ -30,9 +33,10 @@ export default function MainPage() {
   return (
     <motion.main
       className="flex flex-col min-h-full text-text-main"
-      variants={fadeUp}
-      initial="hidden"
-      animate="visible"
+      // Opacity only: content landing where the skeleton was, with no slide on top.
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
     >
       <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
         {/* Profile first in DOM → top on mobile; placed col-2 on desktop */}

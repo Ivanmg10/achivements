@@ -1,20 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievementsGameWithAchievements, RetroAchievement } from '@/types/types'
-import { CONSOLES } from '@/constants'
-import { formatDate } from '@/utils/utils'
 import { IconChevronLeft, IconDeviceGamepad2 } from '@tabler/icons-react'
-import { DualProgressBar } from '@/components/ui/DualProgressBar'
-import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
+import { notify } from '@/lib/notify'
+import RaGameItem from '@/components/ra-game-item/RaGameItem'
 import { MainViewToggle } from '@/components/main-view-toggle/MainViewToggle'
 import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-recently-played-expanded/RARecentlyPlayedExpanded'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import SteamGameItem from '@/components/steam/steam-game-item/SteamGameItem'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -28,13 +25,6 @@ const CARD_MOTION = {
   exit: { opacity: 0, y: -8, scaleY: 0.85, transition: { duration: 0.2 } },
   transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] as const },
   style: { originY: 0, flex: '1 1 0%' },
-}
-
-const CONSOLE_BY_NAME = new Map(CONSOLES.map((c) => [c.name, c.icon]))
-
-function pct(achieved: number, total: number) {
-  if (!total) return 0
-  return (achieved / total) * 100
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -69,10 +59,12 @@ export default function RARecentlyPlayed() {
       setLoadingId(gameId)
       try {
         const res = await fetch(`/api/getGameProgression?gameId=${gameId}`)
-        if (res.ok) {
-          const data: RetroAchievementsGameWithAchievements = await res.json()
-          setGameDataMap((prev) => new Map(prev).set(gameId, data))
-        }
+        if (!res.ok) throw new Error(`getGameProgression ${res.status}`)
+        const data: RetroAchievementsGameWithAchievements = await res.json()
+        setGameDataMap((prev) => new Map(prev).set(gameId, data))
+      } catch (err) {
+        console.error('[RARecentlyPlayed]', err)
+        notify.error(T.toast.loadAchievementsFailed)
       } finally {
         setLoadingId(null)
       }
@@ -107,9 +99,11 @@ export default function RARecentlyPlayed() {
       {/* Cards */}
       <div className="flex flex-col gap-1.5 flex-1 min-h-0">
         {isLoading ? (
-          Array.from({ length: MAX_GAMES }).map((_, i) => (
-            <div key={i} className="flex-1 bg-bg-main rounded-xl animate-pulse" />
-          ))
+          <div className="flex flex-col gap-1.5 animate-pulse motion-reduce:animate-none">
+            {Array.from({ length: MAX_GAMES }).map((_, i) => (
+              <GameRowSkeleton key={i} />
+            ))}
+          </div>
         ) : error && feed.length === 0 ? (
           <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>
         ) : feed.length === 0 ? (
@@ -142,7 +136,6 @@ export default function RARecentlyPlayed() {
               }
 
               const g = item.game
-              const consoleIcon = CONSOLE_BY_NAME.get(g.ConsoleName)
               const data = gameDataMap.get(g.GameID)
               const achievements = data
                 ? Object.values(data.Achievements ?? {})
@@ -150,115 +143,10 @@ export default function RARecentlyPlayed() {
                     .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
                 : []
 
-              const earnedAch = g.NumAchievedHardcore || g.NumAchieved
-              const earnedPts = g.ScoreAchievedHardcore || g.ScoreAchieved
-
               return (
-                <motion.div
-                  key={item.key}
-                  layout
-                  {...CARD_MOTION}
-                  className="bg-bg-main rounded-xl overflow-hidden flex flex-col min-h-0"
-                >
-                  {/* Card row — div+onClick avoids nested <button><a> invalid HTML */}
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => handleExpand(item)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleExpand(item)}
-                    className="flex items-center gap-3 px-3 py-3 w-full text-left hover:bg-white/5 transition-colors cursor-pointer focus-visible:outline-none shrink-0"
-                  >
-                    {/* Icon — link only on this element */}
-                    <Link
-                      href={`/gameInfo/${g.GameID}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="shrink-0 focus-visible:outline-none"
-                    >
-                      {g.ImageIcon ? (
-                        <Image
-                          src={`https://retroachievements.org${g.ImageIcon}`}
-                          alt={g.Title}
-                          width={56}
-                          height={56}
-                          className="rounded-xl object-cover w-14 h-14"
-                        />
-                      ) : (
-                        <div className="w-14 h-14 rounded-xl bg-white/10 shrink-0" />
-                      )}
-                    </Link>
-
-                    <div className="flex flex-col min-w-0 flex-1 gap-1">
-                      {/* Title — w-fit so link area = text area only */}
-                      <Link
-                        href={`/gameInfo/${g.GameID}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-fit max-w-full focus-visible:outline-none hover:underline underline-offset-2 decoration-white/40"
-                      >
-                        <span className="text-base font-bold block truncate leading-tight">
-                          {g.Title}
-                        </span>
-                      </Link>
-
-                      {/* Console + progress bar + chevron */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 shrink-0">
-                          {consoleIcon && (
-                            <Image
-                              src={consoleIcon}
-                              alt={g.ConsoleName}
-                              width={12}
-                              height={12}
-                              className="w-3 h-3 object-contain opacity-60 shrink-0"
-                            />
-                          )}
-                          <span className="text-xs text-text-secondary whitespace-nowrap">
-                            {g.ConsoleName}
-                          </span>
-                        </div>
-                        {g.NumPossibleAchievements > 0 && (
-                          <DualProgressBar
-                            softcorePct={pct(g.NumAchieved, g.NumPossibleAchievements)}
-                            hardcorePct={pct(g.NumAchievedHardcore, g.NumPossibleAchievements)}
-                            className="flex-1"
-                          />
-                        )}
-                        <PinToggleButton gameId={g.GameID} onClick={(e) => e.stopPropagation()} />
-                        <motion.span
-                          animate={{ rotate: isExp ? 180 : 0 }}
-                          transition={{ duration: 0.25 }}
-                          className="text-text-secondary/30 text-[10px] shrink-0"
-                        >
-                          ▼
-                        </motion.span>
-                      </div>
-
-                      {/* Stats + last played */}
-                      <div className="flex items-center gap-2 text-xs text-text-secondary/50">
-                        {g.NumPossibleAchievements > 0 && (
-                          <>
-                            <span>
-                              {earnedAch}/{g.NumPossibleAchievements} logros
-                            </span>
-                            <span className="opacity-40">·</span>
-                            <span>
-                              {earnedPts}/{g.PossibleScore} pts
-                            </span>
-                            <span className="opacity-40">·</span>
-                          </>
-                        )}
-                        <span>{formatDate(g.LastPlayed)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Expanded detail — only when expanded */}
-                  {isExp && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3, delay: 0.18 }}
-                      className="flex-1 overflow-y-auto px-3 pb-3 pt-3 min-h-0 w-full"
-                    >
+                <motion.div key={item.key} layout {...CARD_MOTION} className="flex flex-col min-h-0">
+                  <RaGameItem game={g} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1">
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.18 }}>
                       <RARecentlyPlayedExpanded
                         game={g}
                         achievements={achievements}
@@ -266,7 +154,7 @@ export default function RARecentlyPlayed() {
                         isLoading={loadingId === g.GameID}
                       />
                     </motion.div>
-                  )}
+                  </RaGameItem>
                 </motion.div>
               )
             })}

@@ -59,7 +59,8 @@ export default function SteamGameImage({
       alt={alt}
       width={size}
       height={size}
-      className={`object-cover ${className}`}
+      // A portrait cover cut to a square keeps its top, where the title is printed.
+      className={`object-cover ${asset === 'cover' && index === 0 ? 'object-top' : ''} ${className}`}
       onError={() => setIndex((i) => i + 1)}
       unoptimized
     />

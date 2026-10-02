@@ -7,6 +7,8 @@ import { CSS } from '@dnd-kit/utilities'
 import { IconGripVertical } from '@tabler/icons-react'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSpotlight } from '@/hooks/useSpotlight'
+import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { RetroAchievement } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
@@ -32,6 +34,7 @@ export default function PinnedGameRow({
   onToggle: () => void
 }) {
   const { T } = useLanguage()
+  const onPointerMove = useSpotlight()
   const { game, isLoading, error, refetch } = useGameProgression(String(gameId))
   // Keyed by platform too: pinned RA and Steam games share one sortable list.
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -65,8 +68,10 @@ export default function PinnedGameRow({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-bg-main rounded-xl overflow-hidden flex flex-col ${isDragging ? 'opacity-50 shadow-2xl relative z-10' : ''}`}
+      onPointerMove={onPointerMove}
+      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col ring-1 ring-white/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
+      <GameCardBackdrop src={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null} />
       <div
         role="button"
         tabIndex={0}

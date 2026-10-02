@@ -2,46 +2,33 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { IconPlus, IconFolder, IconTrash } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
-import { GameGroup } from '@/types/types'
 import type { GameCandidate } from '@/utils/gameCandidates'
 import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import GroupModal from '@/components/groups/GroupModal'
 import { relativeTime } from '@/utils/utils'
 import EmptyState from '@/components/empty-state/EmptyState'
+import GroupIcon from '@/components/groups/group-icon/GroupIcon'
+import MainPageGroupsRow from './main-page-groups-row/MainPageGroupsRow'
 import { notify } from '@/lib/notify'
 
-function isImageUrl(s: string) {
-  return s.startsWith('http://') || s.startsWith('https://')
-}
-
-function GroupIcon({ group }: { group: GameGroup }) {
-  const icon = group.icon
-  if (icon) {
-    if (isImageUrl(icon)) {
-      return (
-        <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 bg-bg-main">
-          <Image src={icon} alt={group.title} width={36} height={36} className="w-full h-full object-cover" unoptimized />
-        </div>
-      )
-    }
-    return (
-      <div className="w-9 h-9 rounded-lg bg-bg-main flex items-center justify-center shrink-0 text-xl leading-none">
-        {icon}
-      </div>
-    )
-  }
-  return (
-    <div className="w-9 h-9 rounded-lg bg-bg-main flex items-center justify-center shrink-0">
-      <IconFolder className="w-5 h-5 text-text-secondary" aria-hidden />
-    </div>
-  )
-}
-
-export default function MainPageGroups({ isLoading: externalLoading }: { isLoading?: boolean }) {
+/**
+ * The user's groups as a list, with creating and deleting at hand. Given
+ * `onSelect`, a row picks which group is shown in full beside it (the Groups
+ * section) instead of opening it, and every group is listed; without it,
+ * rows open their group and the list stops at four.
+ */
+export default function MainPageGroups({
+  isLoading: externalLoading,
+  selectedId,
+  onSelect,
+}: {
+  isLoading?: boolean
+  selectedId?: number | null
+  onSelect?: (id: number) => void
+}) {
   const { T } = useLanguage()
   const { groups, isLoading, createGroup, deleteGroup } = useGroups()
   const [modalOpen, setModalOpen] = useState(false)
@@ -128,7 +115,7 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
         </div>
       ) : (
         <div className="flex flex-col gap-2 flex-1">
-          {groups.slice(0, 4).map((group) => (
+          {(onSelect ? groups : groups.slice(0, 4)).map((group) => (
             <div key={group.id} className="group/card relative">
               {confirmingDelete === group.id ? (
                 <div className="flex items-center justify-between bg-bg-main rounded-lg p-2 gap-2">
@@ -150,9 +137,10 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
                 </div>
               ) : (
                 <>
-                  <Link
+                  <MainPageGroupsRow
                     href={`/groups/${group.id}`}
-                    className="flex items-center gap-2.5 bg-bg-main rounded-lg p-2 pr-8 hover:bg-white/5 transition-colors group/link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    onSelect={onSelect && (() => onSelect(group.id))}
+                    selected={selectedId === group.id}
                   >
                     <GroupIcon group={group} />
                     <div className="flex flex-col min-w-0 flex-1 gap-0.5">
@@ -172,7 +160,7 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
                         <span>{relativeTime(group.updated_at)}</span>
                       </div>
                     </div>
-                  </Link>
+                  </MainPageGroupsRow>
                   <button
                     onClick={() => setConfirmingDelete(group.id)}
                     className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-text-secondary hover:text-red-400 hover:bg-red-400/10 opacity-0 group-hover/card:opacity-100 transition-all focus:opacity-100"
@@ -184,7 +172,7 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
               )}
             </div>
           ))}
-          {groups.length > 4 ? (
+          {!onSelect && groups.length > 4 ? (
             <Link
               href="/groups"
               className="flex items-center gap-2.5 bg-bg-main rounded-lg p-2 hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
@@ -193,7 +181,7 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
                 <IconFolder className="w-4 h-4 text-text-secondary" aria-hidden />
               </div>
               <span className="text-xs text-text-secondary hover:text-text-main transition-colors">
-                +{groups.length - 4} {T.groups.title.toLowerCase()} más →
+                {T.cards.moreMatches.replace('{n}', String(groups.length - 4))} →
               </span>
             </Link>
           ) : groups.length < 10 && (
@@ -218,3 +206,4 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
     </div>
   )
 }
+

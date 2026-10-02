@@ -1,4 +1,5 @@
-import { measureHeatmapGrid, HEATMAP_MAX_DAYS, UNMEASURED } from './useHeatmapGrid'
+import { renderHook } from '@testing-library/react'
+import { measureHeatmapGrid, useHeatmapGrid, HEATMAP_MAX_DAYS, UNMEASURED } from './useHeatmapGrid'
 
 // A Wednesday, so the current week still has three days to run.
 const WEDNESDAY = 3
@@ -56,4 +57,30 @@ test('a phone-sized card still draws a readable grid', () => {
   const { weeks, cell } = measureHeatmapGrid(280, 150, WEDNESDAY)
   expect(weeks).toBeGreaterThanOrEqual(6)
   expect(cell).toBeGreaterThanOrEqual(7)
+})
+
+describe('useHeatmapGrid', () => {
+  beforeAll(() => {
+    global.ResizeObserver = class {
+      observe() {}
+      disconnect() {}
+    } as unknown as typeof ResizeObserver
+  })
+
+  function box(width: number, height: number) {
+    const el = document.createElement('div')
+    Object.defineProperty(el, 'clientWidth', { value: width })
+    Object.defineProperty(el, 'clientHeight', { value: height })
+    return { current: el }
+  }
+
+  test('sizes the grid to the box', () => {
+    const { result } = renderHook(() => useHeatmapGrid(box(320, 144)))
+    expect(result.current).toEqual(measureHeatmapGrid(320, 144, new Date().getDay()))
+  })
+
+  test('leaves the reserved rows out of the cells, so labels never spill out of a short box', () => {
+    const { result } = renderHook(() => useHeatmapGrid(box(320, 144), 36))
+    expect(result.current.cell * 7 + 6 * 3 + 36).toBeLessThanOrEqual(144)
+  })
 })

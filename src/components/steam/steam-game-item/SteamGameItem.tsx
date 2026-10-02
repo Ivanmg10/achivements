@@ -10,6 +10,9 @@ import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamRecentlyPlayedExpanded from '@/components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { formatPlaytime } from '@/utils/steamFeed'
+import { useSpotlight } from '@/hooks/useSpotlight'
+import { steamAssetUrl } from '@/lib/steamClient'
+import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/utils'
 import type { SteamGameProgress } from '@/types/steam'
 
@@ -38,6 +41,7 @@ export default function SteamGameItem({
 }) {
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
+  const onPointerMove = useSpotlight()
   const panelId = useId()
 
   const isExpanded = expanded ?? localExpanded
@@ -45,6 +49,7 @@ export default function SteamGameItem({
   const href = `/steamGame/${game.id}`
 
   const hasCounts = game.achievementsLoaded && game.maxPossible > 0
+  const perfect = hasCounts && game.numAwarded >= game.maxPossible
   const playtime = formatPlaytime(
     game.playtimeForever,
     { minutes: T.steam.minutesShort, hours: T.steam.hoursShort },
@@ -57,7 +62,12 @@ export default function SteamGameItem({
   else progressText = T.steam.progressUnknown
 
   return (
-    <div className={`bg-bg-main rounded-xl overflow-hidden flex flex-col min-h-0 ${className}`}>
+    <div
+      onPointerMove={onPointerMove}
+      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col min-h-0 ring-1 ring-white/[0.04] ${className}`}
+    >
+      <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} />
+
       <div className="flex items-center gap-3 px-3 py-3 shrink-0">
         {/* Same destination as the title link, so it is kept out of the tab order. */}
         <Link href={href} tabIndex={-1} aria-hidden="true" className="shrink-0">
@@ -65,7 +75,9 @@ export default function SteamGameItem({
             appId={game.id}
             iconUrl={game.imageIcon}
             size={56}
-            className="rounded-xl w-14 h-14 hover:ring-2 hover:ring-white/40 transition-shadow"
+            className={`rounded-xl w-14 h-14 sm:w-16 sm:h-16 shadow-md shadow-black/30 transition-transform duration-300 hover:scale-105 ${
+              perfect ? 'ring-2 ring-amber-400' : 'ring-1 ring-white/10'
+            }`}
           />
         </Link>
 
@@ -89,7 +101,14 @@ export default function SteamGameItem({
                 <SteamLogo size={12} className="opacity-60" aria-hidden="true" />
                 Steam
               </span>
-              {hasCounts && <SteamProgressBar pct={game.pctWon} label={game.title} className="flex-1" />}
+              {hasCounts && (
+                <>
+                  <SteamProgressBar pct={game.pctWon} label={game.title} className="flex-1" />
+                  <span className={`text-xs font-semibold tabular-nums shrink-0 ${perfect ? 'text-amber-400' : 'text-text-main'}`}>
+                    {Math.round(game.pctWon)}%
+                  </span>
+                </>
+              )}
               <IconChevronDown
                 size={14}
                 aria-hidden="true"
@@ -97,8 +116,8 @@ export default function SteamGameItem({
               />
             </span>
 
-            <span className="flex flex-wrap items-center gap-x-2 text-xs text-text-secondary/60">
-              <span>{progressText}</span>
+            <span className="flex flex-wrap items-center gap-x-2 text-xs text-text-secondary/70">
+              <span className="whitespace-nowrap">{progressText}</span>
               <span className="opacity-40" aria-hidden="true">·</span>
               <span className="flex items-center gap-1">
                 <IconClock size={12} aria-hidden="true" />

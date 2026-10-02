@@ -69,3 +69,9 @@ describe('with no platform linked', () => {
     expect(screen.queryByTestId('search-modal')).not.toBeInTheDocument()
   })
 })
+
+test('while the session loads, holds the place of the avatar instead of flashing Sign in', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: null, status: 'loading' })
+  render(<MainHeader />)
+  expect(screen.queryByText('Sign in')).not.toBeInTheDocument()
+})

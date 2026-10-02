@@ -1,5 +1,6 @@
 'use client'
 
+import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { modalOverlay, modalContent } from '@/lib/animations'
 
@@ -14,7 +15,11 @@ export default function CommonModal({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
+  // On <body>, so a modal opened from inside another animated box (the admin
+  // panel's own modals) is never positioned or clipped by that box.
+  if (typeof document === 'undefined') return null
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -37,6 +42,7 @@ export default function CommonModal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }

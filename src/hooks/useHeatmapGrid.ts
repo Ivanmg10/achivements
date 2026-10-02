@@ -51,8 +51,12 @@ export function measureHeatmapGrid(width: number, height: number, todayDow: numb
 /**
  * Keeps a heatmap sized to its box. The box is measured, never the grid, so
  * growing the grid can never grow the box that decides how big the grid is.
+ *
+ * `reserved` is the height drawn around the grid inside the same box (month
+ * names, legend): left out of the cells, or a short box overflows into the
+ * card's header.
  */
-export function useHeatmapGrid(ref: RefObject<HTMLElement | null>): HeatmapGrid {
+export function useHeatmapGrid(ref: RefObject<HTMLElement | null>, reserved = 0): HeatmapGrid {
   const [grid, setGrid] = useState<HeatmapGrid>(UNMEASURED)
 
   useEffect(() => {
@@ -61,7 +65,7 @@ export function useHeatmapGrid(ref: RefObject<HTMLElement | null>): HeatmapGrid 
 
     const measure = () =>
       setGrid((prev) => {
-        const next = measureHeatmapGrid(box.clientWidth, box.clientHeight, new Date().getDay())
+        const next = measureHeatmapGrid(box.clientWidth, box.clientHeight - reserved, new Date().getDay())
         return next.weeks === prev.weeks && next.cell === prev.cell ? prev : next
       })
 
@@ -69,7 +73,7 @@ export function useHeatmapGrid(ref: RefObject<HTMLElement | null>): HeatmapGrid 
     const observer = new ResizeObserver(measure)
     observer.observe(box)
     return () => observer.disconnect()
-  }, [ref])
+  }, [ref, reserved])
 
   return grid
 }

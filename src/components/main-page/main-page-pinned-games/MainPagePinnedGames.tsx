@@ -24,6 +24,7 @@ import PinGameCard from './pin-game-card/PinGameCard'
 import SteamPinnedGameRow from './steam-pinned-game-row/SteamPinnedGameRow'
 import { gameKey, GameRef } from '@/utils/gameRef'
 import { notify } from '@/lib/notify'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 export default function MainPagePinnedGames() {
   const { T } = useLanguage()
@@ -79,8 +80,8 @@ export default function MainPagePinnedGames() {
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="h-24 bg-bg-main rounded-xl animate-pulse" />
-            <div className="h-24 bg-bg-main rounded-xl animate-pulse" />
+            <GameRowSkeleton className="animate-pulse" />
+            <GameRowSkeleton className="animate-pulse" />
           </div>
         ) : expandedKey !== null && displayPins.some((p) => gameKey(p.source, p.id) === expandedKey) ? (
           renderRow(displayPins.find((p) => gameKey(p.source, p.id) === expandedKey)!, true)

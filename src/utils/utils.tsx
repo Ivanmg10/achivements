@@ -288,3 +288,76 @@ export function completionBuckets(fractions: number[]): number[] {
   }
   return counts
 }
+
+/** An RGB colour, 0–255 per channel. */
+export type Rgb = [number, number, number]
+
+/**
+ * The two colours that stand out in a picture, from its RGBA pixels: colours
+ * are grouped coarsely, each group weighted by how many pixels it has and how
+ * saturated it is (so a grey or black background does not win on size alone),
+ * and the second is the strongest group clearly different from the first.
+ * A one-colour picture gives that colour twice. Transparent pixels are skipped.
+ */
+export function dominantColors(pixels: Uint8ClampedArray): Rgb[] {
+  const groups = new Map<number, { n: number; r: number; g: number; b: number; weight: number }>()
+  for (let i = 0; i + 3 < pixels.length; i += 4) {
+    const [r, g, b, a] = [pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]]
+    if (a < 128) continue
+    const key = ((r >> 4) << 8) | ((g >> 4) << 4) | (b >> 4)
+    const saturation = (Math.max(r, g, b) - Math.min(r, g, b)) / 255
+    const group = groups.get(key) ?? { n: 0, r: 0, g: 0, b: 0, weight: 0 }
+    group.n++
+    group.r += r
+    group.g += g
+    group.b += b
+    group.weight += 0.25 + saturation
+    groups.set(key, group)
+  }
+  const ranked = [...groups.values()]
+    .sort((x, y) => y.weight - x.weight)
+    .map((x): Rgb => [Math.round(x.r / x.n), Math.round(x.g / x.n), Math.round(x.b / x.n)])
+  if (ranked.length === 0) return []
+  const [first] = ranked
+  const distance = (c: Rgb) => Math.hypot(c[0] - first[0], c[1] - first[1], c[2] - first[2])
+  return [first, ranked.find((c) => distance(c) > 64) ?? first]
+}
+
+export type DayBySource = { date: string; ra: number; steam: number; total: number }
+
+/**
+ * Unlocks per day over the last `days` days, ending today, split by
+ * platform: RA rows have no Source, Steam rows say 'steam'. Days with none
+ * are kept at zero, so a chart draws the whole stretch.
+ */
+export function groupByDaySource(achievements: RecentAchievement[], days = 7): DayBySource[] {
+  const rows = new Map<string, DayBySource>()
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const date = d.toISOString().split('T')[0]
+    rows.set(date, { date, ra: 0, steam: 0, total: 0 })
+  }
+  for (const a of Array.isArray(achievements) ? achievements : []) {
+    const row = rows.get(a.Date.split(' ')[0])
+    if (!row) continue
+    if (a.Source === 'steam') row.steam++
+    else row.ra++
+    row.total++
+  }
+  return [...rows.values()]
+}
+
+/** Shades a heatmap draws, past the empty one. */
+export const HEAT_LEVELS = 4
+
+/**
+ * How dark a heatmap day is, 0 (nothing) to HEAT_LEVELS, against the user's
+ * own busiest day rather than fixed thresholds: with a best day of 165, fixed
+ * steps put nearly every day in the same shade. A square-root scale keeps a
+ * small day visible next to a huge one; any day with an unlock is at least 1.
+ */
+export function heatLevel(count: number, max: number): number {
+  if (count <= 0 || max <= 0) return 0
+  return Math.min(HEAT_LEVELS, Math.max(1, Math.ceil(Math.sqrt(count / max) * HEAT_LEVELS)))
+}

@@ -72,7 +72,8 @@ test('omits the date when the game was never played', () => {
 
 test('shows the 600×900 cover rather than the 32×32 library icon', () => {
   const { container } = render(<SteamGameItem game={game()} />)
-  expect(container.querySelector('img')?.getAttribute('src')).toBe(
+  // The first image is the blurred backdrop; the cover is the one inside the link.
+  expect(container.querySelector('a img')?.getAttribute('src')).toBe(
     'https://cdn.akamai.steamstatic.com/steam/apps/620/library_600x900.jpg',
   )
 })

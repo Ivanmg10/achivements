@@ -117,3 +117,27 @@ describe('month labels', () => {
     expect(labels().length).toBeLessThanOrEqual(2)
   })
 })
+
+describe('the scale and the summary', () => {
+  test('shades against the user’s own busiest day: the busiest is the darkest', () => {
+    const busy = Array.from({ length: 20 }, (_, i) => unlock(today(1), `a${i}`))
+    render(<MainPageHeatmap achievements={[...busy, unlock(today(3), 'one')]} />)
+    const busiest = document.querySelector(`[data-date="${today(1)}"]`) as HTMLElement
+    const quiet = document.querySelector(`[data-date="${today(3)}"]`) as HTMLElement
+    expect(busiest.style.backgroundColor).toBe('rgb(var(--accent) / 0.95)')
+    expect(quiet.style.backgroundColor).not.toBe(busiest.style.backgroundColor)
+    expect(quiet.style.backgroundColor).not.toBe('rgb(var(--bg-header))')
+  })
+
+  test('marks today', () => {
+    render(<MainPageHeatmap achievements={[]} />)
+    expect(document.querySelector(`[data-date="${today(0)}"]`)).toHaveClass('ring-1')
+  })
+
+  test('sums up active days and the best day, and labels the legend in the app’s language', () => {
+    render(<MainPageHeatmap achievements={[unlock(today(1), 'a'), unlock(today(1), 'b'), unlock(today(2), 'c')]} />)
+    expect(screen.getByText(new RegExp(en.cards.activeDays.replace('{n}', '2')))).toHaveTextContent(en.lineChart.bestDay.replace('{n}', '2'))
+    expect(screen.getByText(en.cards.heatLess)).toBeInTheDocument()
+    expect(screen.getByText(en.cards.heatMore)).toBeInTheDocument()
+  })
+})

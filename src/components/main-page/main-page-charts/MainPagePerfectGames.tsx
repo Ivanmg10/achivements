@@ -2,23 +2,17 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { IconEdit, IconTrophy } from '@tabler/icons-react'
-import { RetroAchievementsGameCompleted } from '@/types/types'
+import { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePerfectGamesOrder } from '@/hooks/usePerfectGamesOrder'
-import { applyPerfectOrder, buildPerfectGames, countPerfectGames } from '@/utils/perfectGames'
+import { applyPerfectOrder, buildPerfectGames, countPerfectGames, latestPerfects } from '@/utils/perfectGames'
+import PerfectPodium from './perfect-podium/PerfectPodium'
+import PerfectGameTile from './perfect-game-tile/PerfectGameTile'
+import { gameKey } from '@/utils/gameRef'
 import PerfectGamesOrderModal from '@/components/main-page/perfect-games-order-modal/PerfectGamesOrderModal'
 import EmptyState from '@/components/empty-state/EmptyState'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
-
-/**
- * Tile side in px. Steam hands out its game icons at 32×32 and publishes no
- * bigger square: drawn any larger they are upscaled and look rough, so the
- * whole grid sticks to their native size.
- */
-const TILE = 32
 
 /**
  * Games with every achievement, from both platforms in one list, in the order
@@ -28,10 +22,13 @@ const TILE = 32
 export default function MainPagePerfectGames({
   games,
   steamGames = [],
+  awards = null,
   isLoading,
 }: {
   games: RetroAchievementsGameCompleted[]
   steamGames?: SteamGameProgress[]
+  /** RA awards: their dates say which games reached 100% last, for the podium. */
+  awards?: UserAwards | null
   isLoading?: boolean
 }) {
   const { T } = useLanguage()
@@ -41,6 +38,18 @@ export default function MainPagePerfectGames({
   const rawPerfects = useMemo(() => buildPerfectGames(games, steamGames), [games, steamGames])
   const perfects = useMemo(() => applyPerfectOrder(rawPerfects, order), [rawPerfects, order])
   const counts = useMemo(() => countPerfectGames(rawPerfects), [rawPerfects])
+  const latest = useMemo(() => latestPerfects(awards?.VisibleUserAwards, steamGames), [awards, steamGames])
+  // When each reached 100%, for the tooltips: RA from its awards, Steam its last session.
+  const dates = useMemo(() => {
+    const byKey = new Map<string, string>()
+    for (const a of awards?.VisibleUserAwards ?? []) {
+      if (a.AwardType !== 'Mastery/Completion') continue
+      const key = gameKey('ra', a.AwardData)
+      if ((byKey.get(key) ?? '') < a.AwardedAt) byKey.set(key, a.AwardedAt)
+    }
+    for (const g of steamGames) if (g.lastPlayed) byKey.set(gameKey('steam', g.id), g.lastPlayed)
+    return byKey
+  }, [awards, steamGames])
 
   if (isLoading) {
     return (
@@ -103,43 +112,12 @@ export default function MainPagePerfectGames({
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <PerfectPodium games={latest} />
+
+      {/* An even grid across the card's width, so the icons spread out instead of bunching at one side. */}
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(2.75rem,1fr))] gap-y-3 justify-items-center">
         {perfects.map((g) => (
-          <Link
-            key={g.key}
-            href={g.source === 'steam' ? `/steamGame/${g.id}` : `/gameInfo/${g.id}`}
-            title={`${g.title} — ${g.subtitle}`}
-            aria-label={`${g.title} — ${g.subtitle}`}
-            className="relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
-          >
-            {g.imageUrl ? (
-              <Image
-                src={g.imageUrl}
-                alt=""
-                width={TILE}
-                height={TILE}
-                className="rounded hover:scale-110 transition-transform"
-                unoptimized={g.source === 'steam'}
-              />
-            ) : (
-              <span className="block w-8 h-8 rounded bg-white/10" aria-hidden="true" />
-            )}
-            {g.source === 'steam' ? (
-              <span
-                className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-bg-card flex items-center justify-center"
-                aria-hidden="true"
-              >
-                <SteamLogo size={10} className="text-[#66c0f4]" />
-              </span>
-            ) : (
-              g.hardcore && (
-                <span
-                  className="absolute -top-1 -right-1 w-3 h-3 bg-warning rounded-full border border-bg-card"
-                  title="Hardcore"
-                />
-              )
-            )}
-          </Link>
+          <PerfectGameTile key={g.key} game={g} date={dates.get(g.key)} />
         ))}
       </div>
 

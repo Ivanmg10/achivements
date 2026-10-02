@@ -344,6 +344,46 @@
   border-color: rgb(240 80 100);
 }
 
+/*
+   Spotlight surface: a soft glow in the theme's accent that follows the
+   pointer (useSpotlight sets --spot-x/--spot-y). Hover devices only.
+*/
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    360px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgb(var(--accent) / 0.12),
+    transparent 60%
+  );
+}
+@media (hover: hover) {
+  .spotlight:hover::after {
+    opacity: 1;
+  }
+}
+
+/* Heatmap: the cells come in column by column, oldest week first (--col is the week). */
+@keyframes heat-in {
+  from { opacity: 0; transform: scale(0.4); }
+  to { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .heat-cell {
+    animation: heat-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--col, 0) * 12ms);
+  }
+}
+
 /* Auth collage: columns of game art drifting up and down, opposite ways. */
 @keyframes marquee-up {
   from { transform: translateY(0); }

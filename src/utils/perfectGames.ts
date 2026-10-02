@@ -1,6 +1,6 @@
 import { classifySteamGame } from '@/utils/steamFeed'
 import { gameKey } from '@/utils/gameRef'
-import type { RetroAchievementsGameCompleted } from '@/types/types'
+import type { RetroAchievementsGameCompleted, UserAward } from '@/types/types'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
 
 /**
@@ -86,4 +86,64 @@ export function applyPerfectOrder(games: PerfectGame[], savedOrder: string[]): P
 
   const rest = games.filter((g) => !seen.has(g.key)).sort((a, b) => a.title.localeCompare(b.title))
   return [...ordered, ...rest]
+}
+
+/** A game at 100%, with when it got there, for the podium of the latest ones. */
+export type LatestPerfect = {
+  key: string
+  source: GameSource
+  id: number
+  title: string
+  subtitle: string
+  /** RA icon, the fallback while (or if) the box art does not load. */
+  iconUrl?: string
+  /** ISO-ish date string; for Steam the last session, the closest it reports. */
+  date: string
+  hardcore: boolean
+}
+
+/**
+ * The most recent games taken to 100%, both platforms, newest first. RA dates
+ * come from its mastery and completion awards; Steam has no completion date,
+ * so a perfect game's last session stands in for it (for a finished game, the
+ * session that finished it). One entry per RA game: a mastery after an
+ * earlier completion is the same game, at its latest date.
+ */
+export function latestPerfects(
+  awards: UserAward[] = [],
+  steamGames: SteamGameProgress[] = [],
+  count = 3,
+): LatestPerfect[] {
+  const ra = new Map<number, LatestPerfect>()
+  for (const a of awards) {
+    if (a.AwardType !== 'Mastery/Completion') continue
+    const prev = ra.get(a.AwardData)
+    if (prev && prev.date >= a.AwardedAt) continue
+    ra.set(a.AwardData, {
+      key: gameKey('ra', a.AwardData),
+      source: 'ra',
+      id: a.AwardData,
+      title: a.Title,
+      subtitle: a.ConsoleName,
+      iconUrl: a.ImageIcon ? `https://retroachievements.org${a.ImageIcon}` : undefined,
+      date: a.AwardedAt,
+      hardcore: a.AwardDataExtra === 1,
+    })
+  }
+
+  const steam: LatestPerfect[] = steamGames
+    .filter((g) => classifySteamGame(g) === 'completed' && g.lastPlayed)
+    .map((g) => ({
+      key: gameKey('steam', g.id),
+      source: 'steam',
+      id: g.id,
+      title: g.title,
+      subtitle: g.consoleName,
+      date: g.lastPlayed!,
+      hardcore: false,
+    }))
+
+  return [...ra.values(), ...steam]
+    .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
+    .slice(0, count)
 }

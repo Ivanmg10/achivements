@@ -92,6 +92,10 @@ export async function POST(req: Request) {
     const resetVerified = field === 'email' ? ', email_verified_at = NULL' : ''
     await pool.query(`UPDATE users SET "${column}" = $1${resetVerified} WHERE id = $2`, [valueToStore, session.user.id])
     forgetUser(session.user.id)
+    if (field === 'avatar') {
+      // A link replaces any uploaded picture, which no longer has a reason to be kept.
+      await pool.query('DELETE FROM user_avatars WHERE user_id = $1', [session.user.id])
+    }
     if (field === 'email') {
       const username = session.user.name ?? ''
       after(() => sendVerificationEmail(session.user.id, username, trimmed))

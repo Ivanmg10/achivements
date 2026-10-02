@@ -23,3 +23,9 @@ test('children replace the plain value', () => {
   render(<ProfileField label="Theme" onEdit={jest.fn()}><span>dark</span></ProfileField>)
   expect(screen.getByText('dark')).toBeInTheDocument()
 })
+
+test('an icon sits before the label, hidden from assistive tech', () => {
+  render(<ProfileField label="Theme" value="Dark" icon={<svg data-testid="icon" />} onEdit={() => {}} />)
+  expect(screen.getByTestId('icon').closest('[aria-hidden="true"]')).not.toBeNull()
+  expect(screen.getByRole('button', { name: 'Theme: Dark' })).toBeInTheDocument()
+})

@@ -1,4 +1,4 @@
-import { calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets } from "./utils";
+import { calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, heatLevel } from "./utils";
 
 describe("getRandomGameIds", () => {
   test("returns correct count", () => {
@@ -303,3 +303,65 @@ describe("completionBuckets", () => {
     expect(completionBuckets([1.2])).toEqual([0, 0, 0, 0, 1]);
   });
 });
+
+describe('dominantColors', () => {
+  /** RGBA pixels: `count` of the given colour. */
+  const px = (count: number, r: number, g: number, b: number, a = 255) => Array.from({ length: count }, () => [r, g, b, a]).flat()
+
+  test('the two colours that stand out, most first', () => {
+    const pixels = new Uint8ClampedArray([...px(60, 30, 160, 60), ...px(30, 20, 60, 200)])
+    expect(dominantColors(pixels)).toEqual([[30, 160, 60], [20, 60, 200]])
+  })
+
+  test('a big grey background does not beat a smaller saturated colour', () => {
+    const pixels = new Uint8ClampedArray([...px(70, 20, 20, 20), ...px(30, 220, 40, 40)])
+    expect(dominantColors(pixels)[0]).toEqual([220, 40, 40])
+  })
+
+  test('the second colour is clearly different from the first, not a near shade', () => {
+    const pixels = new Uint8ClampedArray([...px(50, 200, 40, 40), ...px(40, 210, 50, 50), ...px(10, 40, 40, 200)])
+    expect(dominantColors(pixels)[1]).toEqual([40, 40, 200])
+  })
+
+  test('one colour comes back twice; transparent pixels are ignored; nothing gives nothing', () => {
+    expect(dominantColors(new Uint8ClampedArray([...px(10, 10, 200, 10), ...px(90, 255, 0, 0, 0)]))).toEqual([[10, 200, 10], [10, 200, 10]])
+    expect(dominantColors(new Uint8ClampedArray())).toEqual([])
+  })
+})
+
+describe('groupByDaySource', () => {
+  const day = (offset: number) => {
+    const d = new Date()
+    d.setDate(d.getDate() - offset)
+    return d.toISOString().split('T')[0]
+  }
+  const ach = (offset: number, source?: 'steam') => ({ Date: `${day(offset)} 12:00:00`, Source: source }) as never
+
+  test('one row per day, oldest first, ending today, split by platform', () => {
+    const rows = groupByDaySource([ach(0), ach(0, 'steam'), ach(2), ach(30)], 7)
+    expect(rows).toHaveLength(7)
+    expect(rows[6]).toEqual({ date: day(0), ra: 1, steam: 1, total: 2 })
+    expect(rows[4]).toEqual({ date: day(2), ra: 1, steam: 0, total: 1 })
+    expect(rows.reduce((s, r) => s + r.total, 0)).toBe(3)
+  })
+
+  test('copes with no data', () => {
+    expect(groupByDaySource(undefined as never, 3).map((r) => r.total)).toEqual([0, 0, 0])
+  })
+})
+
+describe('heatLevel', () => {
+  test('nothing is level 0, the busiest day is the top level', () => {
+    expect(heatLevel(0, 165)).toBe(0)
+    expect(heatLevel(165, 165)).toBe(4)
+  })
+
+  test('small days stay visible next to a huge one, and the steps spread out', () => {
+    expect(heatLevel(1, 165)).toBe(1)
+    expect([5, 20, 50, 100].map((n) => heatLevel(n, 165))).toEqual([1, 2, 3, 4])
+  })
+
+  test('no data at all is level 0', () => {
+    expect(heatLevel(3, 0)).toBe(0)
+  })
+})

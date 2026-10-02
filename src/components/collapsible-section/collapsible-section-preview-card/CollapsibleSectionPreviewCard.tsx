@@ -4,6 +4,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import { gameHref } from '@/utils/gameRef'
+import { steamAssetUrl } from '@/lib/steamClient'
+import { useSpotlight } from '@/hooks/useSpotlight'
+import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import type { PreviewGame } from '@/utils/sectionPreview'
 
 /**
@@ -13,13 +16,17 @@ import type { PreviewGame } from '@/utils/sectionPreview'
  */
 export default function CollapsibleSectionPreviewCard({ game }: { game: PreviewGame }) {
   const done = game.pct !== null && game.pct >= 100
+  const onPointerMove = useSpotlight()
+  const art = game.source === 'steam' ? steamAssetUrl(game.id, 'header') : game.imageRef ? `https://retroachievements.org${game.imageRef}` : null
   const barColor = game.source === 'steam' ? (done ? 'bg-[#a4d007]' : 'bg-[#66c0f4]') : done ? 'bg-warning' : 'bg-accent'
 
   return (
     <Link
       href={gameHref(game.source, game.id)}
-      className="group flex items-center gap-3 rounded-xl bg-bg-card p-2.5 pr-3 ring-1 ring-white/5 hover:ring-white/15 hover:bg-bg-card/80 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 min-w-0"
+      onPointerMove={onPointerMove}
+      className="spotlight group flex items-center gap-3 rounded-2xl bg-bg-card p-2.5 pr-3 ring-1 ring-white/5 hover:ring-white/15 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 min-w-0 overflow-hidden"
     >
+      <GameCardBackdrop src={art} surface="card" />
       {game.source === 'steam' ? (
         <SteamGameImage appId={game.id} iconUrl={game.imageRef} size={56} className="w-14 h-14 rounded-lg shrink-0" />
       ) : game.imageRef ? (

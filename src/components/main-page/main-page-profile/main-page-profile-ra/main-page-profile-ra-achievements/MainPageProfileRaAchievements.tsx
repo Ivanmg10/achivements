@@ -17,7 +17,10 @@ export default function MainPageProfileRaAchievements({
   const { T } = useLanguage()
 
   return (
-    <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2 min-h-[220px]">
+    // Room for the five rows it can hold, loading or loaded: the profile column
+    // sets the height of the home page's top row, so this box changing size as
+    // it filled made the whole page jump.
+    <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2 min-h-[264px]">
       <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileAchievements.recentAchievements}</p>
       {isLoading && achievements.length === 0 ? (
         <div className="flex flex-col gap-2 animate-pulse">

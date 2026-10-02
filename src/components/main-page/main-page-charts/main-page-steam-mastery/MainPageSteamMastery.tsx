@@ -6,12 +6,15 @@ import { useLanguage } from '@/context/LanguageContext'
 import { classifySteamGame, hasUnloadedProgress, summarizeSteamLibrary } from '@/utils/steamFeed'
 import CompletionDistribution from '@/components/completion-distribution/CompletionDistribution'
 import ClosestToComplete, { CLOSEST_SHOWN } from '../closest-to-complete/ClosestToComplete'
+import SteamMostPlayed from '../steam-most-played/SteamMostPlayed'
+import SteamRecentPerfects from '../steam-recent-perfects/SteamRecentPerfects'
 
 /**
  * Steam's side of the mastery card. Steam has no mastery or beaten awards, so
  * it sums up the library instead — perfect and in-progress games, unlocks,
- * average completion, games and playtime — and lists the started games
- * closest to perfect, where RA shows recent masteries.
+ * average completion, games and playtime. It is laid out like the RA card,
+ * part for part: most played where RA has by console, recently perfected
+ * where RA has recent masteries, and closest to perfect on both.
  */
 export default function MainPageSteamMastery({ games, isLoading }: { games: SteamGameProgress[]; isLoading?: boolean }) {
   const { T } = useLanguage()
@@ -62,9 +65,9 @@ export default function MainPageSteamMastery({ games, isLoading }: { games: Stea
           <div className="h-24 rounded bg-white/10 animate-pulse" />
         </div>
       ) : (
-        // Wide card: the summary sits beside the games closest to perfect, and
-        // spreads across the full width when there are none to show.
-        <div className={`grid gap-4 ${summary.closest.length > 0 ? 'lg:grid-cols-[3fr_2fr]' : ''}`}>
+        // Two columns from sm up, as on the RA card: the summary beside the most
+        // played, then recently perfected beside closest to perfect.
+        <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
           <div className="flex flex-col gap-4">
             {/* The headline: perfect games, against the library that could be perfect. */}
             <div className="flex items-baseline gap-2">
@@ -90,6 +93,8 @@ export default function MainPageSteamMastery({ games, isLoading }: { games: Stea
             </div>
           </div>
 
+          <SteamMostPlayed games={games} />
+          <SteamRecentPerfects games={games} />
           <ClosestToComplete games={summary.closest} statClassName="text-[#66c0f4]" />
         </div>
       )}

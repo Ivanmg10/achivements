@@ -1,4 +1,8 @@
 import { render, screen } from '@testing-library/react'
+
+// Both have their own tests; here they would add their own links to every count.
+jest.mock('../steam-most-played/SteamMostPlayed', () => ({ __esModule: true, default: () => <div data-testid="most-played" /> }))
+jest.mock('../steam-recent-perfects/SteamRecentPerfects', () => ({ __esModule: true, default: () => <div data-testid="recent-perfects" /> }))
 import MainPageSteamMastery from './MainPageSteamMastery'
 import { en } from '@/translations/en'
 import type { SteamGameProgress } from '@/types/steam'
@@ -71,9 +75,8 @@ test('shows a skeleton while the library loads, and no closest list for an empty
   expect(stat(en.cards.steamAvgCompletion)).toBe('0%')
 })
 
-test('drops the side column when no game is close to perfect', () => {
-  const { container, rerender } = render(<MainPageSteamMastery games={[game(1, { numAwarded: 10, pctWon: 100 })]} />)
-  expect(container.querySelector('[class*="grid-cols-[3fr_2fr]"]')).toBeNull()
-  rerender(<MainPageSteamMastery games={[game(1, { numAwarded: 5, pctWon: 50 })]} />)
-  expect(container.querySelector('[class*="grid-cols-[3fr_2fr]"]')).not.toBeNull()
+test('mirrors the RA card: most played and recently perfected sit beside the summary', () => {
+  render(<MainPageSteamMastery games={[game(1, { numAwarded: 10, pctWon: 100 })]} />)
+  expect(screen.getByTestId('most-played')).toBeInTheDocument()
+  expect(screen.getByTestId('recent-perfects')).toBeInTheDocument()
 })

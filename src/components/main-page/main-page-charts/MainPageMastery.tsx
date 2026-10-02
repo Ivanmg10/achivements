@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import ClosestToComplete, { CLOSEST_SHOWN } from './closest-to-complete/ClosestToComplete'
+import MasteryByConsole from './mastery-by-console/MasteryByConsole'
 
 export default function MainPageMastery({
   awards,
@@ -42,7 +43,11 @@ export default function MainPageMastery({
 
   if (!awards) return null
 
-  const mastered = awards.VisibleUserAwards?.filter((a) => a.AwardType === 'Mastery') ?? []
+  // RA sends masteries as 'Mastery/Completion', hardcore marked by AwardDataExtra 1.
+  // Filtering on 'Mastery' matched nothing, so this row never showed.
+  const mastered = [...(awards.VisibleUserAwards ?? [])]
+    .filter((a) => a.AwardType === 'Mastery/Completion' && a.AwardDataExtra === 1)
+    .sort((a, b) => Date.parse(b.AwardedAt) - Date.parse(a.AwardedAt))
   const recentCovers = mastered.slice(0, 8)
 
   const masteries = awards.MasteryAwardsCount ?? 0
@@ -84,19 +89,17 @@ export default function MainPageMastery({
       : []),
   ]
 
-  const sides = (recentCovers.length > 0 ? 1 : 0) + (closest.length > 0 ? 1 : 0)
-  const columns = sides === 2 ? 'lg:grid-cols-[3fr_2fr_2fr]' : sides === 1 ? 'lg:grid-cols-[3fr_2fr]' : ''
 
   return (
     <div className="flex flex-col gap-3">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.masteryAwards}</p>
 
       {/*
-        Wide card: the award totals sit beside what was mastered lately and
-        what is nearly there, and spread across the width of whichever of those
-        two there is nothing to show.
+        Two columns from sm up: the totals beside where they come from (by
+        console), then what was mastered lately beside what is nearly there.
+        A column with nothing to show is simply not drawn.
       */}
-      <div className={`grid gap-4 ${columns}`}>
+      <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
         <div className="flex flex-col gap-4">
           {/* The headline: masteries, against every award earned. */}
           <div className="flex items-baseline gap-2">
@@ -144,6 +147,8 @@ export default function MainPageMastery({
             ))}
           </div>
         </div>
+
+        <MasteryByConsole awards={awards.VisibleUserAwards ?? []} />
 
       {recentCovers.length > 0 && (
         <div className="flex flex-col gap-1.5">

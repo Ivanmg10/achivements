@@ -57,3 +57,13 @@ test('passes size and classes through', () => {
   expect(img(container)?.className).toContain('rounded-xl')
   expect(img(container)?.className).toContain('object-cover')
 })
+
+test('a portrait cover cut to a square keeps its top, where the title is', () => {
+  const { container } = render(<SteamGameImage appId={620} size={56} />)
+  expect(container.querySelector('img')).toHaveClass('object-top')
+})
+
+test('a landscape header is centred as before', () => {
+  const { container } = render(<SteamGameImage appId={620} asset="header" size={56} />)
+  expect(container.querySelector('img')).not.toHaveClass('object-top')
+})

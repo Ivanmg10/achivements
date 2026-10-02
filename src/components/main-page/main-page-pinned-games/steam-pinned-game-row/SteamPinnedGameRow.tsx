@@ -6,6 +6,9 @@ import { CSS } from '@dnd-kit/utilities'
 import { IconChevronDown, IconGripVertical } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSpotlight } from '@/hooks/useSpotlight'
+import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import { steamAssetUrl } from '@/lib/steamClient'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
@@ -30,6 +33,7 @@ export default function SteamPinnedGameRow({
   onToggle: () => void
 }) {
   const { T } = useLanguage()
+  const onPointerMove = useSpotlight()
   const { library, recent, libraryLoading } = useSteamGamesData()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: gameKey('steam', appId),
@@ -54,8 +58,10 @@ export default function SteamPinnedGameRow({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-bg-main rounded-xl overflow-hidden flex flex-col ${isDragging ? 'opacity-50 shadow-2xl relative z-10' : ''}`}
+      onPointerMove={onPointerMove}
+      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col ring-1 ring-white/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
+      <GameCardBackdrop src={steamAssetUrl(appId, 'header')} />
       <div className="flex items-center gap-3 px-3 py-3 w-full">
         <button
           {...attributes}
