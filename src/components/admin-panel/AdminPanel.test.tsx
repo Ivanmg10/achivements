@@ -1,7 +1,9 @@
+jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import AdminPanel from './AdminPanel'
 import { useSession } from 'next-auth/react'
 import { en } from '@/translations/en'
+import { notify } from '@/lib/notify'
 
 jest.mock('./AdminCreateUserModal', () => ({ __esModule: true, default: () => null }))
 jest.mock('./AdminEditUserModal', () => ({ __esModule: true, default: () => null }))
@@ -135,4 +137,13 @@ describe('the unlock', () => {
     expect(screen.queryByText('ivanxmarine')).not.toBeInTheDocument()
     expect(global.fetch).toHaveBeenCalledWith('/api/admin/unlock', { method: 'DELETE' })
   })
+})
+
+test('deleting a user says who went', async () => {
+  render(<AdminPanel />)
+  await screen.findByText('papucarrot')
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve({ ok: true }) })
+  fireEvent.click(screen.getByRole('button', { name: 'delete papucarrot' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Delete user' }))
+  await waitFor(() => expect(notify.success).toHaveBeenCalledWith('papucarrot deleted'))
 })

@@ -6,6 +6,7 @@ import { IconPlus, IconStarFilled } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievement } from '@/types/types'
 import { PinAchievementModal } from '@/components/pin-achievement-modal/PinAchievementModal'
+import { notify } from '@/lib/notify'
 
 type PinnedRow = { achievement_id: number; snapshot: RetroAchievement }
 
@@ -51,9 +52,10 @@ export function GamePinnedAchievements({
     try {
       const res = await fetch(`/api/favorites?achievementId=${achievementId}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Failed to unpin achievement')
+      notify.success(T.toast.achievementsUpdated)
     } catch {
       setPinned(prev)
-      setHasError(true)
+      notify.error(T.toast.achievementsFailed)
     }
   }
 

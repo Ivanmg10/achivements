@@ -11,6 +11,7 @@ import { candidateToGroupItemBody, searchCandidates, GameCandidate } from '@/uti
 import { gameKey } from '@/utils/gameRef'
 import GamePickerRow from '@/components/game-picker/game-picker-row/GamePickerRow'
 import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
+import { notify } from '@/lib/notify'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -131,6 +132,7 @@ export default function AddGameModal({
       setError(true)
       return
     }
+    notify.success(T.toast.gamesAdded)
     onClose()
   }
 

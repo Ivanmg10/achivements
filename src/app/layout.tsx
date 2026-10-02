@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import CookieBanner from '@/components/cookie-banner/CookieBanner'
+import Toaster from '@/components/toaster/Toaster'
 import GoogleAnalytics from '@/components/google-analytics/GoogleAnalytics'
 import "./globals.css";
 import Providers from "./providers";
@@ -37,6 +38,7 @@ export default function RootLayout({
         <Providers>
           {children}
           <CookieBanner />
+          <Toaster />
         </Providers>
         {/* Loads only after the visitor accepts cookies in the banner. */}
         <GoogleAnalytics />

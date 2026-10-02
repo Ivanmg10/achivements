@@ -36,15 +36,16 @@ test('getGamesInfo does not throw on error response', async () => {
 test('unlinkRaUser calls fetch and update', async () => {
   const update = jest.fn().mockResolvedValue(null)
   ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: true })
-  await unlinkRaUser(update)
+  await expect(unlinkRaUser(update)).resolves.toBe(true)
   expect(fetch).toHaveBeenCalledWith('/api/unlinkRaUser', expect.objectContaining({ method: 'POST' }))
   expect(update).toHaveBeenCalledWith()
 })
 
-test('unlinkRaUser does not throw on error', async () => {
+test('unlinkRaUser does not throw on error, and says it failed', async () => {
   const update = jest.fn()
   ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: false })
-  await expect(unlinkRaUser(update)).resolves.not.toThrow()
+  await expect(unlinkRaUser(update)).resolves.toBe(false)
+  expect(update).not.toHaveBeenCalled()
 })
 
 test('getWantGames calls setWantGames with shuffled results', async () => {

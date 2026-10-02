@@ -1,6 +1,9 @@
+jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { useRaFavoriteIds } from './useRaFavoriteIds'
 import type { RetroAchievement } from '@/types/types'
+import { en } from '@/translations/en'
+import { notify } from '@/lib/notify'
 
 const ACH = { ID: 7, Title: 'First blood' } as RetroAchievement
 const META = { gameTitle: 'Zelda', numDistinctPlayers: 10 }
@@ -63,4 +66,16 @@ test('undoes the unpin when the network fails', async () => {
   await act(() => result.current.toggleFavorite(ACH, META))
   expect(fetch).toHaveBeenLastCalledWith('/api/favorites?achievementId=7', { method: 'DELETE' })
   expect(result.current.favoritedIds.has(7)).toBe(true)
+})
+
+test('a saved pin is announced, a failed one too', async () => {
+  ;(fetch as jest.Mock).mockResolvedValueOnce(ok([])).mockResolvedValueOnce(ok())
+  const { result } = renderHook(() => useRaFavoriteIds(1))
+  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1))
+  await act(() => result.current.toggleFavorite(ACH, META))
+  expect(notify.success).toHaveBeenCalledWith(en.toast.achievementsUpdated)
+
+  ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 500, json: () => Promise.resolve({}) })
+  await act(() => result.current.toggleFavorite(ACH, META))
+  expect(notify.error).toHaveBeenCalledWith(en.toast.achievementsFailed)
 })

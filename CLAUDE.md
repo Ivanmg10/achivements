@@ -48,6 +48,20 @@ Keep inline ONLY if: <15 lines + purely presentational + single file.
 **Any JSX block added in a session that qualifies MUST be extracted before the task is considered done.**
 When in doubt, extract. Prefer more files over bloated components.
 
+## Telling the user how an action went — toasts
+
+`notify.success(T.toast.x)` / `notify.error(T.toast.y)` from `src/lib/notify.ts`,
+callable from components, hooks or contexts; `<Toaster />` (root layout) draws
+them bottom right: green with a check, red with an alert icon, gone after 4 s
+(errors 7 s), never while hovered or focused.
+
+- **Use a toast** for actions that happen outside a form — pin/unpin, reorder,
+  delete, unlink — and for the success of a modal that closes on save.
+- **Do not** for an error inside a modal that stays open: show it inline, next
+  to what needs fixing. And never both for the same outcome.
+- A silent failure is a bug: an optimistic update that rolls back must say so.
+- Texts live in `T.toast` (all languages). The admin panel's are in English.
+
 ## API calls — error handling MANDATORY
 Every API call added or modified must have its own error handling. No exceptions.
 

@@ -3,6 +3,7 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
+import { notify } from '@/lib/notify'
 
 type Platform = 'ra' | 'steam'
 
@@ -39,6 +40,7 @@ export default function AdminLinkedAccounts({
         return
       }
       onDone(data)
+      notify.success(`${user.username}: ${platform === 'ra' ? 'RetroAchievements' : 'Steam'} updated`)
     } catch {
       setErrors((e) => ({ ...e, [platform]: 'Something went wrong' }))
     } finally {

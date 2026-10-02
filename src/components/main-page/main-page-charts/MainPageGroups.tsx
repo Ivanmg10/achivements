@@ -12,6 +12,7 @@ import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import GroupModal from '@/components/groups/GroupModal'
 import { relativeTime } from '@/utils/utils'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { notify } from '@/lib/notify'
 
 function isImageUrl(s: string) {
   return s.startsWith('http://') || s.startsWith('https://')
@@ -47,8 +48,14 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
   const [confirmingDelete, setConfirmingDelete] = useState<number | null>(null)
 
   async function handleDelete(id: number) {
-    await deleteGroup(id)
-    setConfirmingDelete(null)
+    try {
+      await deleteGroup(id)
+      notify.success(T.toast.groupDeleted)
+    } catch {
+      notify.error(T.toast.groupDeleteFailed)
+    } finally {
+      setConfirmingDelete(null)
+    }
   }
 
   const loading = externalLoading || isLoading
@@ -67,7 +74,9 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
       is_public: data.is_public,
     })
 
-    if (data.initialGames?.length) await addGamesToGroup(group.id, data.initialGames)
+    const failed = data.initialGames?.length ? await addGamesToGroup(group.id, data.initialGames) : []
+    if (failed.length) notify.error(T.toast.someGamesFailed)
+    else notify.success(T.toast.groupCreated)
   }
 
   return (

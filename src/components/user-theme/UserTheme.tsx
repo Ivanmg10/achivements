@@ -2,6 +2,7 @@ import { useTheme } from '@/context/ThemeContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { Theme } from '@/types/types'
 import { useSession } from 'next-auth/react'
+import { notify } from '@/lib/notify'
 
 const THEMES: {
   id: Theme
@@ -34,8 +35,10 @@ export default function UserTheme() {
       })
       if (!res.ok) throw new Error('Failed to update theme')
       await update()
+      notify.success(T.toast.saved)
     } catch {
       setTheme(previous)
+      notify.error(T.toast.saveFailed)
     }
   }
 

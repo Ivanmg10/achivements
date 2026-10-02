@@ -13,6 +13,7 @@ import Spinner from '@/components/main-spinner/Spinner'
 import { normalizeTitle } from '@/utils/gameCandidates'
 import { ADMIN_LOCKED_EVENT, adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
+import { notify } from '@/lib/notify'
 
 export default function AdminPanel() {
   const { data: session } = useSession()
@@ -103,7 +104,12 @@ export default function AdminPanel() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: user.id, field: 'admin', value: next }),
     })
-    if (res.ok) handleUpdated(user.id, 'admin', next)
+    if (res.ok) {
+      handleUpdated(user.id, 'admin', next)
+      notify.success(next ? `${user.username} is now an admin` : `${user.username} is no longer an admin`)
+    } else {
+      notify.error(`Could not change ${user.username}'s role`)
+    }
   }
 
   const confirmDelete = async () => {
@@ -117,6 +123,7 @@ export default function AdminPanel() {
         return
       }
       setUsers((prev) => prev.filter((u) => u.id !== deleteUser.id))
+      notify.success(`${deleteUser.username} deleted`)
     } catch {
       setDeleteError('Failed to delete user')
     } finally {

@@ -20,6 +20,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { applyPerfectOrder, type PerfectGame } from '@/utils/perfectGames'
 import CommonModal from '@/components/common-modal/CommonModal'
 import PerfectGameOrderRow from './perfect-game-order-row/PerfectGameOrderRow'
+import { notify } from '@/lib/notify'
 
 export default function PerfectGamesOrderModal({
   isOpen,
@@ -59,6 +60,7 @@ export default function PerfectGamesOrderModal({
       await onSaveOrder(localList.map((g) => g.key))
     } catch (err) {
       console.error('Failed to save mastered games order', err)
+      notify.error(T.toast.orderFailed)
     } finally {
       onClose()
     }

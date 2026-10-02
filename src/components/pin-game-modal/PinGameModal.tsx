@@ -11,6 +11,7 @@ import { searchCandidates, GameCandidate } from '@/utils/gameCandidates'
 import { gameKey } from '@/utils/gameRef'
 import GamePickerRow from '@/components/game-picker/game-picker-row/GamePickerRow'
 import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
+import { notify } from '@/lib/notify'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -91,6 +92,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
         await pinGame(c.id, c.source)
       }
       setSaving(false)
+      notify.success(T.toast.pinsUpdated)
       onClose()
     } catch {
       setSaving(false)

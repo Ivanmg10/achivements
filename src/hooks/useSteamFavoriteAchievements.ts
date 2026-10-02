@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import type { SteamAchievementUnified } from '@/types/steam'
+import { useLanguage } from '@/context/LanguageContext'
+import { notify } from '@/lib/notify'
 
 /**
  * Which of a Steam game's achievements the user has pinned, and a toggle —
@@ -10,6 +12,7 @@ import type { SteamAchievementUnified } from '@/types/steam'
  * Toggling is optimistic and rolls back if the request fails.
  */
 export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
+  const { T } = useLanguage()
   const { status } = useSession()
   const [pinned, setPinned] = useState<Set<string>>(new Set())
   const [error, setError] = useState<string | null>(null)
@@ -65,13 +68,15 @@ export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
               }),
             })
         if (!res.ok) throw new Error(`Failed to update pin (${res.status})`)
+        notify.success(T.toast.achievementsUpdated)
       } catch (err) {
         console.error('[useSteamFavoriteAchievements] toggle', achievement.apiname, err)
         setPinned(flip)
         setError(err instanceof Error ? err.message : 'Unknown error')
+        notify.error(T.toast.achievementsFailed)
       }
     },
-    [pinned, appId, gameTitle],
+    [pinned, appId, gameTitle, T],
   )
 
   return { pinned, toggle, error, canPin: status === 'authenticated' }

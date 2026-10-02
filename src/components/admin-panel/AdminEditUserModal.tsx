@@ -8,6 +8,7 @@ import { adminFetch } from '@/utils/adminFetch'
 import { codeToFlag, findCountry, COUNTRIES } from '@/utils/countries'
 import type { Country } from '@/utils/countries'
 import type { AdminUser } from '@/types/user'
+import { notify } from '@/lib/notify'
 
 interface Props {
   isOpen: boolean
@@ -47,6 +48,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
         setErrors(e => ({ ...e, [field]: data.error ?? 'Error' }))
       } else {
         onUpdated(user.id, field, value)
+        notify.success(`${user.username}: ${field} saved`)
       }
     } catch {
       setErrors(e => ({ ...e, [field]: 'Something went wrong' }))

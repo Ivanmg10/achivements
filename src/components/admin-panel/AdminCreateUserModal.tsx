@@ -5,6 +5,7 @@ import { IconEye, IconEyeOff } from '@tabler/icons-react'
 import CommonModal from '../common-modal/CommonModal'
 import type { AdminUser } from '@/types/user'
 import { adminFetch } from '@/utils/adminFetch'
+import { notify } from '@/lib/notify'
 
 interface Props {
   isOpen: boolean
@@ -41,6 +42,7 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? 'Error creating user'); return }
       onCreated(data)
+      notify.success(`${data.username} created`)
       handleClose()
     } catch { setError('Something went wrong') }
     finally { setLoading(false) }

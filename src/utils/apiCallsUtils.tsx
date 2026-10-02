@@ -25,15 +25,18 @@ export const getGamesInfo = async (
   }
 };
 
+/** Unlinks the RA account; says whether it worked, so the caller can tell the user. */
 export const unlinkRaUser = async (
   update: () => Promise<Session | null>,
-) => {
+): Promise<boolean> => {
   try {
     const res = await fetch('/api/unlinkRaUser', { method: 'POST' })
     if (!res.ok) throw new Error('Failed to unlink RA user')
     await update()
+    return true
   } catch (err) {
     console.error('[unlinkRaUser]', err)
+    return false
   }
 };
 

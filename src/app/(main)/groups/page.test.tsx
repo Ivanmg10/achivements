@@ -8,7 +8,10 @@ const mockT = {
     noGroups: 'No groups yet',
     noGroupsSub: 'Create a group to organise your games',
   },
+  toast: { groupCreated: 'Group created', someGamesFailed: 'Some games failed' },
 }
+
+jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 
 jest.mock('@/context/LanguageContext', () => ({
   useLanguage: () => ({ T: mockT }),
@@ -46,6 +49,7 @@ jest.mock('@/components/empty-state/EmptyState', () => ({
 import { render, screen } from '@testing-library/react'
 import GroupsPage from './page'
 import { useGroups } from '@/hooks/useGroups'
+import { notify } from '@/lib/notify'
 
 const mockGroups = [
   { id: 1, title: 'Speedruns', game_count: 2, total_awarded: 5, total_possible: 20, is_public: true, updated_at: new Date().toISOString() },
@@ -96,4 +100,22 @@ test('creating a group adds its initial games, Steam ones with their platform', 
   const [url, init] = (global.fetch as jest.Mock).mock.calls[0]
   expect(url).toBe('/api/groups/7/games')
   expect(JSON.parse(init.body)).toMatchObject({ source: 'steam', game_id: 620, console_name: 'Steam', pct_won: 1 })
+  expect(notify.success).toHaveBeenCalledWith('Group created')
+})
+
+test('if some initial games cannot be added, it says so instead of "created"', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  const createGroup = jest.fn().mockResolvedValue({ id: 7 })
+  ;(useGroups as jest.Mock).mockReturnValue({ groups: [], isLoading: false, error: null, createGroup })
+  global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500 })
+  ;(notify.success as jest.Mock).mockClear()
+  render(<GroupsPage />)
+
+  await mockOnSave({
+    title: 'Mix', description: '', icon: '', is_public: false,
+    initialGames: [{ key: 'ra:1', source: 'ra', id: 1, title: 'Zelda', subtitle: 'NES', imageRef: '/z.png', pctWon: 0, numAwarded: 0, maxPossible: 5, status: 'in-progress' }],
+  })
+
+  expect(notify.error).toHaveBeenCalledWith('Some games failed')
+  expect(notify.success).not.toHaveBeenCalled()
 })

@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import CommonModal from '../common-modal/CommonModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { COUNTRIES, codeToFlag } from '@/utils/countries'
+import { notify } from '@/lib/notify'
 
 interface Props {
   isOpen: boolean
@@ -41,6 +42,7 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
       }
       await update()
       setSearch('')
+      notify.success(T.toast.saved)
       onClose()
     } catch {
       setError(T.editProfileModal.errorGeneric)
