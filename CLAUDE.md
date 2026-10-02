@@ -2,10 +2,10 @@
 
 ## Project
 Multi-user RetroAchievements companion. Public tracker with groups,
-stats, and personalization. Next.js 14 App Router + PostgreSQL + Tailwind v4.
+stats, and personalization. Next.js 16 App Router + PostgreSQL + Tailwind v4.
 
 ## Stack
-- Framework: Next.js 14 (App Router)
+- Framework: Next.js 16 (App Router; the auth gate is `src/proxy.ts`, the old middleware)
 - Auth: NextAuth.js
 - DB: PostgreSQL via `pg` pool
 - Styles: Tailwind CSS v4
@@ -118,10 +118,12 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 - To do a minor/major bump: edit `src/lib/version.ts` manually before committing — hook detects the change, skips auto-bump, and syncs `package.json`
 - Hook is activated via `npm run prepare` (already wired in `package.json`)
 
-**Current milestone targets:**
-- `0.8.x` — current: login/register polish + optimizations
-- `0.9.0` — stats page reorganization
-- `1.0.0` — Steam integration
+**Milestones:**
+- `0.8.x` — login/register polish + optimizations
+- `0.9.x` — stats page reorganization, Steam, email, analytics
+- `1.0.0` — current: Steam integration, every release gate below closed,
+  privacy policy and account deletion (2026-10-02)
+- `1.0.x` — fixes; `1.x.0` for new sections (see Roadmap)
 
 ## Release gates — things that must be true before 1.0
 
@@ -129,17 +131,20 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 release, or 'going live' while any of these is still open.** They asked for
 this reminder on purpose, because it is easy to forget.
 
-- [ ] **`cheevovault.com` verified in Resend, with `EMAIL_FROM` set on it.**
-      The domain was bought on 2026-09-28; owning it is not the same as Resend
-      being allowed to send from it. Until it is verified, password recovery
-      only reaches the Resend account owner, so every other user is one
-      forgotten password away from losing their account. This is the blocker:
-      a public site with no working recovery is not 1.0.
-- [ ] `NEXTAUTH_URL` set to `https://www.cheevovault.com` in Vercel. **www, not
+- [x] **`cheevovault.com` verified in Resend, with `EMAIL_FROM` set on it**
+      (2026-10-02). Password recovery reaches every user, not only the Resend
+      account owner.
+- [x] `NEXTAUTH_URL` set to `https://www.cheevovault.com` in Vercel. **www, not
       the apex**: the apex 308-redirects to www, so that is the host visitors
       are on. Reset links are built from it, NextAuth compares it against the
       real host when signing in, and Steam's return_to has to come back to the
       same host the session cookie belongs to.
+- [x] `migrations/018_unique_username_email.sql` run (2026-10-02). Two
+      sign-ups racing each other can no longer take the same username or
+      address, in any case.
+- [x] `NEXT_PUBLIC_CONTACT_EMAIL` set in Vercel (2026-10-02). `/privacy`
+      shows it, with the data controller from `src/lib/siteUrl.ts`, as the
+      address for data requests; the GDPR wants both on a public site.
 - [x] Email verification decided: shipped, soft. A banner on the account page
       for an unconfirmed address, with a resend button. Nothing is ever
       blocked — not sign-in, not a feature. See Email below.
@@ -209,6 +214,10 @@ it sets `users.email_verified_at` (`migrations/017_email_verification.sql`).
   in the DB (`src/lib/attemptLimit.ts`). Password rules: `PASSWORD_MIN` and
   `BCRYPT_COST` in `src/utils/authValidation.ts`.
 - Changing the email asks for the current password; it is the recovery address.
+  It also clears `email_verified_at` and mails a link to the new address.
+- Deleting the account (`DELETE /api/account`, from the account page) asks for
+  the current password too, and refuses to remove the last admin. Everything
+  the user owns cascades from the `users` row.
 
 ## Admin panel — read before touching `/api/admin/*`
 
@@ -253,8 +262,15 @@ Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — a
 - Spanish UI text is intentional — do not change it
 
 ## Roadmap (pending)
-- [ ] Steam integration
-- [ ] Public user profiles
+- [x] Steam integration
+- [x] Public user profiles
 - [ ] Group hardcore achievement tracking
 - [ ] Push notifications
 - [ ] 13 optimization fixes (cache stampede, Cache-Control headers, duplicate fetches, TTLs, error boundaries, lazy images)
+- [ ] After 1.0: clear the ~51 `react-hooks/set-state-in-effect` warnings
+      (a warning in `eslint.config.mjs`, not an error). None is a bug. Three
+      kinds: reading localStorage / the URL after mount (leave these: it is the
+      hydration-safe pattern), resetting a modal when it opens (move it to the
+      close handler or a `key`, and check the animation in the browser), and
+      data hooks/contexts resetting on a session change (one at a time, each
+      is its own loading state machine).
