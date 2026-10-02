@@ -1,9 +1,10 @@
 import { getServerSession } from 'next-auth'
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
 import { checkCurrentPassword } from '@/lib/currentPassword'
 import { forgetUser } from '@/lib/userRecord'
+import { sendVerificationEmail } from '@/lib/verificationEmail'
 
 const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location'] as const
 type AllowedField = (typeof ALLOWED_FIELDS)[number]
@@ -83,11 +84,20 @@ export async function POST(req: Request) {
 
     const column = field === 'username' ? 'username' : field
     const valueToStore = field === 'location' ? trimmed.toUpperCase() : trimmed
-    await pool.query(`UPDATE users SET "${column}" = $1 WHERE id = $2`, [valueToStore, session.user.id])
+    // A new address has not been confirmed yet, whatever the old one was.
+    const resetVerified = field === 'email' ? ', email_verified_at = NULL' : ''
+    await pool.query(`UPDATE users SET "${column}" = $1${resetVerified} WHERE id = $2`, [valueToStore, session.user.id])
     forgetUser(session.user.id)
+    if (field === 'email') {
+      after(() => sendVerificationEmail(session.user.id, session.user.name ?? '', trimmed))
+    }
 
     return NextResponse.json({ ok: true, field, value: trimmed })
   } catch (err) {
+    // Another account took the name or address between the check and the write.
+    if ((err as { code?: string }).code === '23505') {
+      return NextResponse.json({ error: 'Already in use' }, { status: 409 })
+    }
     console.error('[updateUserProfile POST]', err)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }

@@ -1,12 +1,13 @@
 import type { GameSource, SteamAchievementUnified } from '@/types/steam'
 
-export type Theme =
-  | 'dark'
-  | 'light'
-  | 'blue'
-  | 'purple'
-  | 'green'
-  | 'red';
+/** Every theme the app has a stylesheet for; the endpoints that store one accept only these. */
+const THEMES = ['dark', 'light', 'blue', 'purple', 'green', 'red'] as const
+
+export type Theme = (typeof THEMES)[number]
+
+export function isTheme(value: unknown): value is Theme {
+  return typeof value === 'string' && (THEMES as readonly string[]).includes(value)
+}
 
 type Nullable<T> = {
   [K in keyof T]: T[K] | null;
@@ -90,7 +91,7 @@ export type SubsetGame = {
   NumAchievements: number
 }
 
-export type RetroAchievementsGameWithAchievementsBase = {
+type RetroAchievementsGameWithAchievementsBase = {
   ID: number;
   Title: string;
 
@@ -152,12 +153,6 @@ export type WantToPlayGame = {
   AchievementsPublished: number;
   GameTitle: string;
   GameID?: number;
-};
-
-export type WantToPlayUser = {
-  Count: number;
-  Total: number;
-  Results: WantToPlayGame[];
 };
 
 export type RecentlyPlayedGame = {
@@ -253,22 +248,6 @@ export type RecentAchievement = {
   /** Full game image URL, used instead of RA's GameIcon path when set (Steam). */
   GameIconUrl?: string;
 };
-
-export type TopTenUser = {
-  1: string  // username
-  2: string  // total points
-  3: string  // total true points
-}
-
-export type PopularGame = {
-  ID: number
-  Title: string
-  ImageIcon: string
-  ConsoleID: number
-  ConsoleName: string
-  NumAchievements: number
-  Points: number
-}
 
 export type GameGroupItem = {
   id: number

@@ -7,6 +7,8 @@ import { cachedJson } from "@/lib/httpCache";
 import { getGameInfoAndUserProgress } from "@/lib/raClient";
 
 const TTL = 10 * 60 * 1000;
+// Each id is one RA call made with the user's key: cap how many one request can ask for.
+const MAX_GAMES = 100;
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -24,7 +26,10 @@ export async function GET(request: NextRequest) {
   const gameIdsParam = request.nextUrl.searchParams.get("gameIds");
   if (!gameIdsParam) return NextResponse.json({});
 
-  const gameIds = gameIdsParam.split(",").map(Number).filter(Boolean);
+  const gameIds = gameIdsParam.split(",").map(Number).filter(Number.isInteger).filter((n) => n > 0);
+  if (gameIds.length > MAX_GAMES) {
+    return NextResponse.json({ message: `At most ${MAX_GAMES} games` }, { status: 400 });
+  }
 
   async function fetchGame(gameId: number): Promise<[number, string | null]> {
     try {

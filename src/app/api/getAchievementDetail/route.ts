@@ -17,20 +17,25 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: 'achievementId required' }, { status: 400 })
   }
 
-  const data = await withCache(
-    `achievementDetail:${id}:${achievementId}`,
-    TTL,
-    async () => {
-      const [unlocks, comments] = await Promise.all([
-        getAchievementUnlocks(rausername, raid, achievementId).catch(() => null),
-        getAchievementComments(rausername, raid, achievementId).catch(() => null),
-      ])
+  try {
+    const data = await withCache(
+      `achievementDetail:${id}:${achievementId}`,
+      TTL,
+      async () => {
+        const [unlocks, comments] = await Promise.all([
+          getAchievementUnlocks(rausername, raid, achievementId).catch(() => null),
+          getAchievementComments(rausername, raid, achievementId).catch(() => null),
+        ])
 
-      return { unlocks, comments }
-    },
-    (d) => d !== null,
-  )
+        return { unlocks, comments }
+      },
+      (d) => d !== null,
+    )
 
-  if (!data) return NextResponse.json({ message: 'Not found' }, { status: 404 })
-  return cachedJson(data, TTL)
+    if (!data) return NextResponse.json({ message: 'Not found' }, { status: 404 })
+    return cachedJson(data, TTL)
+  } catch (err) {
+    console.error('[getAchievementDetail]', err)
+    return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
+  }
 }

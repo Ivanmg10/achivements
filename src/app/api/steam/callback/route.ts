@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
-import { verifyAssertion, extractSteamId, verifyState, siteOrigin } from '@/lib/steamOpenId'
+import { verifyAssertion, extractSteamId, verifyState, siteOrigin, returnsHere } from '@/lib/steamOpenId'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { forgetUser } from '@/lib/userRecord'
@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
   if (params.get('openid.mode') === 'cancel') return back(origin, 'cancelled')
 
   if (!verifyState(params.get('state'), session.user.id)) return back(origin, 'invalid_state')
+  if (!returnsHere(params, origin)) return back(origin, 'invalid_assertion')
 
   // Ask Steam to vouch for the signature before trusting any of these params.
   const verified = await verifyAssertion(params)
@@ -63,7 +64,10 @@ export async function GET(req: NextRequest) {
       [steamId, personaName, session.user.id],
     )
     forgetUser(session.user.id)
-  } catch {
+  } catch (err) {
+    // The unique index on steamid catches a link that raced the check above.
+    if ((err as { code?: string }).code === '23505') return back(origin, 'already_linked')
+    console.error('[steam/callback]', err)
     return back(origin, 'error')
   }
 

@@ -27,7 +27,7 @@ export default function MainPageAbandoned({
   playing,
   steamGames = [],
   isLoading,
-  now = Date.now(),
+  now: nowProp,
 }: {
   playing: RetroAchievementsGameCompleted[]
   steamGames?: SteamGameProgress[]
@@ -35,6 +35,9 @@ export default function MainPageAbandoned({
   now?: number
 }) {
   const { T } = useLanguage()
+  // Read once, when the page opens: render has to give the same answer every time.
+  const [mountedAt] = useState(Date.now)
+  const now = nowProp ?? mountedAt
   // Recently played games already carry a LastPlayed date and are fetched once
   // and shared app-wide — reuse it instead of a per-game RA call for every
   // "playing" game. Only games missing from that list (rare: very old, very
@@ -52,24 +55,29 @@ export default function MainPageAbandoned({
   )
 
   const missingIdsKey = useMemo(
-    () => playing.filter((g) => !lastPlayedMap.has(g.GameID)).map((g) => g.GameID).join(','),
+    // The endpoint answers for at most 100 games at a time; past that, the rest go without a date.
+    () => playing.filter((g) => !lastPlayedMap.has(g.GameID)).slice(0, 100).map((g) => g.GameID).join(','),
     [playing, lastPlayedMap]
   )
 
   const doFetch = useCallback((key: string) => {
-    if (!key) return
-    fetchWithRetry(`/api/getGamesLastPlayed?gameIds=${key}`)
-      .then((data) => {
-        if (typeof data === 'object' && data) {
-          setLastAchDates(data as Record<number, string>)
-          setFetchedKey(key)
-          attemptRef.current = 0
-        }
-      })
-      .catch((err) => {
-        // Giving up just leaves out the RA games with no known date; the rest still show.
-        if (!scheduleRetry(attemptRef, retryTimer, () => doFetch(key), err)) setFetchedKey(key)
-      })
+    // Named, so a retry can call it again.
+    const run = (key: string) => {
+      if (!key) return
+      fetchWithRetry(`/api/getGamesLastPlayed?gameIds=${key}`)
+        .then((data) => {
+          if (typeof data === 'object' && data) {
+            setLastAchDates(data as Record<number, string>)
+            setFetchedKey(key)
+            attemptRef.current = 0
+          }
+        })
+        .catch((err) => {
+          // Giving up just leaves out the RA games with no known date; the rest still show.
+          if (!scheduleRetry(attemptRef, retryTimer, () => run(key), err)) setFetchedKey(key)
+        })
+    }
+    run(key)
   }, [])
 
   useEffect(() => {

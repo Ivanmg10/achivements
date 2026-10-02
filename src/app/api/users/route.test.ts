@@ -105,3 +105,24 @@ test('POST refuses an email another account already has, whatever its case', asy
   expect(res.status).toBe(409)
   expect(res.data).toEqual({ error: 'email-taken' })
 })
+
+describe('two sign-ups racing past the checks', () => {
+  const raceOn = (constraint: string) =>
+    (pool.query as jest.Mock).mockImplementation((sql: string) => {
+      if (sql.startsWith('SELECT')) return Promise.resolve({ rows: [] })
+      return Promise.reject(Object.assign(new Error('duplicate key'), { code: '23505', constraint }))
+    })
+
+  test('the address index answers 409 email-taken', async () => {
+    raceOn('users_email_lower_key')
+    const res = await POST(makeReq({ username: 'ivan', password: 'pass1234', email: 'ivan@test.com' }))
+    expect(res.status).toBe(409)
+    expect((res as unknown as { data: unknown }).data).toEqual({ error: 'email-taken' })
+  })
+
+  test('the username index answers 409 too', async () => {
+    raceOn('users_username_lower_key')
+    const res = await POST(makeReq({ username: 'ivan', password: 'pass1234', email: 'ivan@test.com' }))
+    expect(res.status).toBe(409)
+  })
+})

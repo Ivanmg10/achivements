@@ -117,6 +117,23 @@ describe('PATCH', () => {
     expect(forgetUser).toHaveBeenCalledWith(11)
   })
 
+  test('a new email is no longer verified', async () => {
+    ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
+    expect((await PATCH(withBody('PATCH', { id: 11, field: 'email', value: 'new@test.com' }))).status).toBe(200)
+    const update = (pool.query as jest.Mock).mock.calls.find(([sql]) => String(sql).startsWith('UPDATE'))
+    expect(update[0]).toContain('email_verified_at = NULL')
+  })
+
+  test('other fields leave the verification alone', async () => {
+    await PATCH(withBody('PATCH', { id: 11, field: 'location', value: 'ES' }))
+    const update = (pool.query as jest.Mock).mock.calls.find(([sql]) => String(sql).startsWith('UPDATE'))
+    expect(update[0]).not.toContain('email_verified_at')
+  })
+
+  test('a non-numeric id is refused', async () => {
+    expect((await PATCH(withBody('PATCH', { id: 'abc', field: 'location', value: 'ES' }))).status).toBe(400)
+  })
+
   test('only listed fields can be written', async () => {
     expect((await PATCH(withBody('PATCH', { id: 11, field: 'password', value: 'x' }))).status).toBe(400)
   })

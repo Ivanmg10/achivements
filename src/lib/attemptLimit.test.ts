@@ -5,11 +5,15 @@ import pool from '@/lib/db'
 
 const query = pool.query as jest.Mock
 
-/** First call counts what is recent, second inserts, a third may clean up. */
+/** allowAttempt inserts first, may clean up, then counts what is recent, its own attempt included. */
 function recent(count: number) {
   query.mockReset()
-  query.mockResolvedValueOnce({ rows: [{ recent: count }] }).mockResolvedValue({ rows: [] })
+  query.mockImplementation((sql: string) =>
+    Promise.resolve(sql.includes('COUNT(*)') ? { rows: [{ recent: count }] } : { rows: [] }),
+  )
 }
+
+const countCall = () => query.mock.calls.find(([sql]) => String(sql).includes('COUNT(*)'))
 
 beforeEach(() => {
   jest.spyOn(Math, 'random').mockReturnValue(0.9) // skip the housekeeping delete
@@ -17,32 +21,32 @@ beforeEach(() => {
 
 afterEach(() => (Math.random as jest.Mock).mockRestore())
 
-test('allows an address under the limit, and records the attempt', async () => {
-  recent(4)
+test('records the attempt before counting, so a burst sees itself', async () => {
+  recent(5)
   await expect(allowAttempt('signup', '1.2.3.4')).resolves.toBe(true)
-  expect(query.mock.calls[1][0]).toContain('INSERT INTO signup_attempts')
-  expect(query.mock.calls[1][1]).toEqual(['signup', '1.2.3.4'])
+  expect(query.mock.calls[0][0]).toContain('INSERT INTO signup_attempts')
+  expect(query.mock.calls[0][1]).toEqual(['signup', '1.2.3.4'])
+  expect(query.mock.calls[1][0]).toContain('COUNT(*)')
 })
 
-test('stops an address that already made five in the window', async () => {
-  recent(5)
+test('stops the attempt past the limit', async () => {
+  recent(6)
   await expect(allowAttempt('signup', '1.2.3.4')).resolves.toBe(false)
-  expect(query).toHaveBeenCalledTimes(1)
 })
 
 test('counts only the last hour, for that address', async () => {
-  recent(0)
+  recent(1)
   await allowAttempt('signup', '1.2.3.4')
-  const [sql, params] = query.mock.calls[0]
+  const [sql, params] = countCall()!
   expect(sql).toContain('created_at > NOW()')
   expect(params).toEqual(['signup', '1.2.3.4', '60'])
 })
 
 test('clears out old rows now and then', async () => {
   ;(Math.random as jest.Mock).mockReturnValue(0.01)
-  recent(0)
+  recent(1)
   await allowAttempt('signup', '1.2.3.4')
-  expect(query.mock.calls[2][0]).toContain('DELETE FROM signup_attempts')
+  expect(query.mock.calls.some(([sql]) => String(sql).includes('DELETE FROM signup_attempts'))).toBe(true)
 })
 
 test('a database that will not answer does not block sign-ups', async () => {
@@ -64,9 +68,9 @@ describe('clientAddress', () => {
 })
 
 test('asking for a password reset has a tighter window of its own', async () => {
-  recent(0)
+  recent(1)
   await allowAttempt('reset', '1.2.3.4')
-  expect(query.mock.calls[0][1]).toEqual(['reset', '1.2.3.4', '15'])
+  expect(countCall()![1]).toEqual(['reset', '1.2.3.4', '15'])
 })
 
 describe('sign-in', () => {

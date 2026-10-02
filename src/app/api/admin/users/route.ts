@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt'
 import { authOptions } from '@/lib/authOptions'
 import { forgetUser, loadUser } from '@/lib/userRecord'
 import { BCRYPT_COST, PASSWORD_MIN } from '@/utils/authValidation'
+import { isTheme } from '@/types/types'
 
 /**
  * Asks the database, not the session: a session is re-read about once a
@@ -89,6 +90,9 @@ export async function POST(req: Request) {
     )
     return NextResponse.json(result.rows[0], { status: 201 })
   } catch (err) {
+    if ((err as { code?: string }).code === '23505') {
+      return NextResponse.json({ error: 'Username or email already in use' }, { status: 409 })
+    }
     console.error('[admin/users POST]', err)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
@@ -104,6 +108,9 @@ export async function PATCH(req: Request) {
 
     if (!id || !field) {
       return NextResponse.json({ error: 'id and field required' }, { status: 400 })
+    }
+    if (!/^\d+$/.test(String(id))) {
+      return NextResponse.json({ error: 'A numeric id is required' }, { status: 400 })
     }
 
     const ALLOWED = ['username', 'email', 'theme', 'admin', 'avatar', 'location'] as const
@@ -158,16 +165,20 @@ export async function PATCH(req: Request) {
     }
 
     if (field === 'theme') {
-      const THEMES = ['dark', 'light', 'blue', 'purple', 'red', 'green', 'yellow', 'teal']
-      if (typeof value !== 'string' || !THEMES.includes(value)) {
+      if (!isTheme(value)) {
         return NextResponse.json({ error: 'Invalid theme' }, { status: 400 })
       }
     }
 
-    await pool.query(`UPDATE users SET "${field}" = $1 WHERE id = $2`, [value, id])
+    // A new address has not been confirmed yet, whatever the old one was.
+    const resetVerified = field === 'email' ? ', email_verified_at = NULL' : ''
+    await pool.query(`UPDATE users SET "${field}" = $1${resetVerified} WHERE id = $2`, [value, id])
     forgetUser(id)
     return NextResponse.json({ ok: true })
   } catch (err) {
+    if ((err as { code?: string }).code === '23505') {
+      return NextResponse.json({ error: 'Username or email already in use' }, { status: 409 })
+    }
     console.error('[admin/users PATCH]', err)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
