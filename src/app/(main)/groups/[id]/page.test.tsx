@@ -2,7 +2,7 @@ jest.mock('next/navigation', () => ({
   useParams: () => ({ id: '5' }),
   useRouter: () => ({ push: jest.fn() }),
 }))
-jest.mock('@/hooks/useGroups', () => ({ useGroups: () => ({ updateGroup: jest.fn(), deleteGroup: jest.fn() }) }))
+jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 jest.mock('@/context/GamesDataContext', () => ({ useGamesData: () => ({ all: [] }) }))
 jest.mock('@/hooks/useRecentlyPlayedGames', () => ({ useRecentlyPlayedGames: () => ({ games: [] }) }))
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
@@ -15,6 +15,7 @@ jest.mock('@/components/groups/add-game-modal/AddGameModal', () => ({
 }))
 jest.mock('@/components/groups/delete-confirm-dialog/DeleteConfirmDialog', () => ({ __esModule: true, default: () => null }))
 jest.mock('@/components/groups/group-icon-display/GroupIconDisplay', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/context/LanguageContext', () => ({ useLanguage: () => ({ T: jest.requireActual('@/translations/en').en, lang: 'en' }) }))
 jest.mock('@/components/status-grid-control/StatusGridControl', () => ({ __esModule: true, default: () => null }))
 jest.mock('@/components/groups/sortable-item/SortableItem', () => ({
   __esModule: true,
@@ -29,7 +30,8 @@ jest.mock('@/components/groups/steam-sortable-item/SteamSortableItem', () => ({
   ),
 }))
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor, within } from '@testing-library/react'
+import { notify } from '@/lib/notify'
 import GroupDetailPage from './page'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { en } from '@/translations/en'
@@ -46,8 +48,8 @@ const GROUP = {
   items: [item(1, undefined, 620, 'Zelda'), item(2, 'steam', 620, 'Portal 2')],
 }
 
-function json(body: unknown, ok = true) {
-  return Promise.resolve({ ok, status: ok ? 200 : 500, json: () => Promise.resolve(body) })
+function json(body: unknown, ok = true, status = ok ? 200 : 500) {
+  return Promise.resolve({ ok, status, json: () => Promise.resolve(body) })
 }
 
 beforeEach(() => {
@@ -63,11 +65,12 @@ test('renders RA and Steam items with their own cards, even with the same game i
   expect(screen.getByTestId('add-modal')).toHaveTextContent('ra:620,steam:620')
 })
 
-test('looks up release years for RA items only', async () => {
+test('asks the server once for the release years it does not have yet', async () => {
   render(<GroupDetailPage />)
   await screen.findByText('ra-item Zelda')
   const urls = (global.fetch as jest.Mock).mock.calls.map(([u]) => u)
-  expect(urls.filter((u: string) => u.startsWith('/api/getGameData'))).toEqual(['/api/getGameData?gameId=620'])
+  expect(urls.filter((u: string) => u === '/api/groups/5/years')).toHaveLength(1)
+  expect(urls.some((u: string) => u.startsWith('/api/getGameData'))).toBe(false)
 })
 
 test('removing a Steam game deletes it by platform', async () => {
@@ -89,30 +92,59 @@ test('keeps the game when the delete fails', async () => {
   expect(screen.getByText('ra-item Zelda')).toBeInTheDocument()
 })
 
-test('warns that the decade filter excludes Steam games once year data loads', async () => {
+test('the decade filter shows once a year is known, for Steam games too', async () => {
   ;(global.fetch as jest.Mock).mockImplementation((url: string) =>
     url === '/api/groups/5'
       ? json(GROUP)
-      : url.startsWith('/api/getGameData')
-        ? json({ Released: '1998-11-21' })
+      : url === '/api/groups/5/years'
+        ? json({ years: [{ id: 1, release_year: 1998 }, { id: 2, release_year: 2011 }] })
         : json({}),
   )
   render(<GroupDetailPage />)
-  expect(await screen.findByText(en.groups.decadeFilterExcludesSteam)).toBeInTheDocument()
+  const decade = await screen.findByRole('group', { name: en.groups.filterDecadeLabel })
+  fireEvent.click(within(decade).getByRole('button', { name: "10's" }))
+  expect(screen.getByText('steam-item Portal 2')).toBeInTheDocument()
+  expect(screen.queryByText('ra-item Zelda')).not.toBeInTheDocument()
 })
 
-test('does not warn about the decade filter when the group has no Steam games', async () => {
-  const raOnlyGroup = { ...GROUP, items: [item(1, undefined, 620, 'Zelda')] }
-  ;(global.fetch as jest.Mock).mockImplementation((url: string) =>
+test('removing a game offers to undo it', async () => {
+  render(<GroupDetailPage />)
+  fireEvent.click(await screen.findByText('steam-item Portal 2'))
+  await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.gameRemoved, expect.objectContaining({ action: expect.objectContaining({ label: en.toast.undo }) })))
+})
+
+test('undo puts the removed game back where it was', async () => {
+  ;(global.fetch as jest.Mock).mockImplementation((url: string, init?: { method?: string }) =>
     url === '/api/groups/5'
-      ? json(raOnlyGroup)
-      : url.startsWith('/api/getGameData')
-        ? json({ Released: '1998-11-21' })
+      ? json(GROUP)
+      : init?.method === 'POST' && url === '/api/groups/5/games'
+        ? json({ ...item(9, 'steam', 620, 'Portal 2') }, true, 201)
         : json({}),
   )
   render(<GroupDetailPage />)
-  await screen.findByText('ra-item Zelda')
-  expect(screen.queryByText(en.groups.decadeFilterExcludesSteam)).not.toBeInTheDocument()
+  fireEvent.click(await screen.findByText('steam-item Portal 2'))
+  await waitFor(() => expect(notify.success).toHaveBeenCalled())
+  const { action } = (notify.success as jest.Mock).mock.calls[0][1]
+  await act(async () => { await action.onClick() })
+  expect(await screen.findByText('steam-item Portal 2')).toBeInTheDocument()
+  const post = (global.fetch as jest.Mock).mock.calls.find(([u, i]) => u === '/api/groups/5/games' && i?.method === 'POST')
+  expect(JSON.parse(post[1].body)).toMatchObject({ source: 'steam', game_id: 620, title: 'Portal 2' })
+  expect(notify.success).toHaveBeenCalledWith(en.toast.gameRestored)
+})
+
+test('a group that is gone or not yours says so, instead of leaving silently', async () => {
+  ;(global.fetch as jest.Mock).mockImplementation(() => json({}, false, 404))
+  render(<GroupDetailPage />)
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.groups.notFound)
+})
+
+test('a failed load can be retried', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  ;(global.fetch as jest.Mock).mockImplementationOnce(() => json({}, false, 500))
+  render(<GroupDetailPage />)
+  expect(await screen.findByRole('alert')).toHaveTextContent(en.groups.loadError)
+  fireEvent.click(screen.getByRole('button', { name: en.groups.retry }))
+  expect(await screen.findByText('ra-item Zelda')).toBeInTheDocument()
 })
 
 test('the completed filter uses live Steam progress', async () => {

@@ -34,6 +34,7 @@ export default function SteamCategorySection({
   title,
   className = '',
   query = '',
+  preview = { columns: 3, count: 3 },
 }: {
   category: string
   gridCols?: StatusGridCols
@@ -43,6 +44,8 @@ export default function SteamCategorySection({
   className?: string
   /** Title filter shared with the RA list, from the page's search box. */
   query?: string
+  /** The folded preview's size, decided by the page so all sections fill the screen together. */
+  preview?: { columns: number; count: number }
 }) {
   const { T } = useLanguage()
   const { games: allGames, isLinked, loading, error, progressTruncated, refetch } = useSteamGamesByCategory(category)
@@ -57,7 +60,7 @@ export default function SteamCategorySection({
       count={loading || error ? undefined : games.length}
       storageKey={`steam-section-open:${category}`}
       className={className}
-      preview={error ? null : <CollapsibleSectionPreview games={steamPreviewGames(games)} loading={loading} />}
+      preview={error ? null : <CollapsibleSectionPreview games={steamPreviewGames(games)} loading={loading} columns={preview.columns} count={preview.count} />}
     >
       {progressTruncated && category !== 'wantToPlay' && !loading && !error && (
         <p className="text-xs text-text-secondary">{T.steam.partialProgressNote}</p>

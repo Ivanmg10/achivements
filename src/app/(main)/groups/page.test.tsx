@@ -1,15 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let mockOnSave: (d: any) => Promise<void> = async () => {}
 
-const mockT = {
-  groups: {
-    title: 'Groups',
-    newGroup: 'New group',
-    noGroups: 'No groups yet',
-    noGroupsSub: 'Create a group to organise your games',
-  },
-  toast: { groupCreated: 'Group created', someGamesFailed: 'Some games failed' },
-}
+const mockT = jest.requireActual('@/translations/en').en
 
 jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 
@@ -46,7 +38,7 @@ jest.mock('@/components/empty-state/EmptyState', () => ({
   default: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
 }))
 
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import GroupsPage from './page'
 import { useGroups } from '@/hooks/useGroups'
 import { notify } from '@/lib/notify'
@@ -77,9 +69,12 @@ test('renders empty state when no groups', () => {
 })
 
 test('renders error message on fetch error', () => {
-  ;(useGroups as jest.Mock).mockReturnValue({ groups: [], isLoading: false, error: 'Error loading groups', createGroup: jest.fn() })
+  const fetchGroups = jest.fn()
+  ;(useGroups as jest.Mock).mockReturnValue({ groups: [], isLoading: false, error: 'Error loading groups', createGroup: jest.fn(), fetchGroups })
   render(<GroupsPage />)
-  expect(screen.getByText('Error loading groups')).toBeInTheDocument()
+  expect(screen.getByRole('alert')).toHaveTextContent(mockT.groups.listError)
+  fireEvent.click(screen.getByRole('button', { name: mockT.groups.retry }))
+  expect(fetchGroups).toHaveBeenCalled()
 })
 
 test('creating a group adds its initial games, Steam ones with their platform', async () => {
@@ -100,7 +95,7 @@ test('creating a group adds its initial games, Steam ones with their platform', 
   const [url, init] = (global.fetch as jest.Mock).mock.calls[0]
   expect(url).toBe('/api/groups/7/games')
   expect(JSON.parse(init.body)).toMatchObject({ source: 'steam', game_id: 620, console_name: 'Steam', pct_won: 1 })
-  expect(notify.success).toHaveBeenCalledWith('Group created')
+  expect(notify.success).toHaveBeenCalledWith(mockT.toast.groupCreated)
 })
 
 test('if some initial games cannot be added, it says so instead of "created"', async () => {
@@ -116,6 +111,6 @@ test('if some initial games cannot be added, it says so instead of "created"', a
     initialGames: [{ key: 'ra:1', source: 'ra', id: 1, title: 'Zelda', subtitle: 'NES', imageRef: '/z.png', pctWon: 0, numAwarded: 0, maxPossible: 5, status: 'in-progress' }],
   })
 
-  expect(notify.error).toHaveBeenCalledWith('Some games failed')
+  expect(notify.error).toHaveBeenCalledWith(mockT.toast.someGamesFailed)
   expect(notify.success).not.toHaveBeenCalled()
 })

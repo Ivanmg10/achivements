@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const data = await withCache(
-      `publicGameProgression:${username.toLowerCase()}:${gameId}`,
+      `publicGameProgression_v2:${username.toLowerCase()}:${gameId}`,
       TTL,
       () => getGameInfoAndUserProgress(username, auth.apiKey, gameId),
       (d) => d !== null && typeof d === 'object' && 'ID' in (d as object),

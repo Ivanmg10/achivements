@@ -11,21 +11,21 @@ export function formatDate(dateStr: string | null | undefined): string {
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
-export function relativeTime(dateStr: string | null | undefined): string {
+/**
+ * How long ago, in the given language ("2 hours ago", "hace 2 horas"), in the
+ * largest unit that fits. "—" when there is no date to tell.
+ */
+export function relativeTime(dateStr: string | null | undefined, lang = 'en'): string {
   if (!dateStr) return '—'
   const t = new Date(dateStr).getTime()
   if (isNaN(t)) return '—'
-  const diff = Date.now() - t
-  const mins = Math.floor(diff / 60000)
-  const hours = Math.floor(diff / 3600000)
-  const days = Math.floor(diff / 86400000)
-  const months = Math.floor(days / 30)
-  const years = Math.floor(days / 365)
-  if (mins < 60) return `${mins}m ago`
-  if (hours < 24) return `${hours}h ago`
-  if (days < 30) return `${days}d ago`
-  if (months < 12) return `${months}mo ago`
-  return `${years}y ago`
+  const secs = Math.round((t - Date.now()) / 1000)
+  const fmt = new Intl.RelativeTimeFormat(lang, { numeric: 'auto', style: 'short' })
+  const units: [Intl.RelativeTimeFormatUnit, number][] = [['year', 31536000], ['month', 2592000], ['day', 86400], ['hour', 3600], ['minute', 60]]
+  for (const [unit, size] of units) {
+    if (Math.abs(secs) >= size) return fmt.format(Math.trunc(secs / size), unit)
+  }
+  return fmt.format(0, 'minute')
 }
 
 export function getRandomGameIds(count: number = 5): string[] {
@@ -360,4 +360,64 @@ export const HEAT_LEVELS = 4
 export function heatLevel(count: number, max: number): number {
   if (count <= 0 || max <= 0) return 0
   return Math.min(HEAT_LEVELS, Math.max(1, Math.ceil(Math.sqrt(count / max) * HEAT_LEVELS)))
+}
+
+export type SpanLabels = { underMinute: string; minutes: string; hours: string; days: string; months: string }
+
+/**
+ * How long it took from the first unlock to the last, in the largest unit
+ * that fits ("{n}" in each label is the count). Null with fewer than two
+ * dated unlocks: there is no span to tell.
+ */
+export function unlockSpan(dates: (string | null | undefined)[], labels: SpanLabels): string | null {
+  const times = dates.filter((d): d is string => !!d).map((d) => new Date(d).getTime()).filter((t) => !Number.isNaN(t))
+  if (times.length < 2) return null
+  const mins = Math.floor((Math.max(...times) - Math.min(...times)) / 60000)
+  const hours = Math.floor(mins / 60)
+  const days = Math.floor(hours / 24)
+  if (mins < 1) return labels.underMinute
+  if (hours < 1) return labels.minutes.replace('{n}', String(mins))
+  if (days < 1) return labels.hours.replace('{n}', String(hours))
+  if (days < 30) return labels.days.replace('{n}', String(days))
+  return labels.months.replace('{n}', String(Math.floor(days / 30)))
+}
+
+/**
+ * The first `limit` items of a long list, unless it is only a little longer
+ * (within `slack`): cutting 61 down to 60 behind a "show all" helps no one.
+ */
+export function capList<T>(items: T[], limit: number, showAll: boolean, slack = 12): { visible: T[]; capped: boolean } {
+  const capped = items.length > limit + slack
+  return { visible: capped && !showAll ? items.slice(0, limit) : items, capped }
+}
+
+/**
+ * The year in a free-form release date ("2008-03-11", "9 NOV 2015",
+ * "March 2008"), or null when there is none.
+ */
+export function parseReleaseYear(date: string | null | undefined): number | null {
+  const m = date?.match(/\b(19[5-9]\d|20\d{2})\b/)
+  return m ? Number(m[1]) : null
+}
+
+/**
+ * `fn` over every item, at most `limit` at a time, results in input order.
+ * For calls to rate-limited services (RA, the Steam store), which a burst of
+ * dozens in parallel gets turned away by.
+ */
+export async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<PromiseSettledResult<R>[]> {
+  const results: PromiseSettledResult<R>[] = new Array(items.length)
+  let next = 0
+  async function worker() {
+    while (next < items.length) {
+      const i = next++
+      try {
+        results[i] = { status: 'fulfilled', value: await fn(items[i]) }
+      } catch (reason) {
+        results[i] = { status: 'rejected', reason }
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker))
+  return results
 }

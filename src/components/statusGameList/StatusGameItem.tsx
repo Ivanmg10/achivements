@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, type CSSProperties } from 'react'
+import { useId, useState, type CSSProperties } from 'react'
 import { RetroAchievement } from '@/types/types'
 import { CategoryGame } from '../../hooks/useGamesByCategory'
 import { GameExtraData } from './StatusGameList'
@@ -16,6 +16,10 @@ import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import { unlockSpan } from '@/utils/utils'
+
+// About three rows at two columns on a wide screen; the rest is a click away.
+const ACHIEVEMENT_LIMIT = 60
 
 function getGameId(g: CategoryGame): number | string {
   return g.ID ?? g.GameID!
@@ -43,7 +47,8 @@ export default function StatusGameItem({
   style?: CSSProperties
 }) {
   const [open, setOpen] = useState(false)
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
+  const panelId = useId()
   const onPointerMove = useSpotlight()
 
   const gameId = getGameId(game)
@@ -66,23 +71,15 @@ export default function StatusGameItem({
         .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
     : []
 
-  const completionDuration = gameData ? (() => {
-    const dates = achievements
-      .map((a) => a.DateEarnedHardcore ?? a.DateEarned)
-      .filter(Boolean)
-      .map((d) => new Date(d!).getTime())
-    if (dates.length < 2) return null
-    const diffMs = Math.max(...dates) - Math.min(...dates)
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-    const diffMins = Math.floor(diffMs / (1000 * 60))
-    if (diffMins < 1) return 'less than a minute'
-    if (diffHours < 1) return `${diffMins}m`
-    if (diffDays < 1) return `${diffHours}h`
-    if (diffDays < 30) return `${diffDays}d`
-    const months = Math.floor(diffDays / 30)
-    return `${months}mo`
-  })() : null
+  const completionDuration = gameData
+    ? unlockSpan(achievements.map((a) => a.DateEarnedHardcore ?? a.DateEarned), {
+        underMinute: T.statusGameItem.spanUnderMinute,
+        minutes: T.statusGameItem.spanMinutes,
+        hours: T.statusGameItem.spanHours,
+        days: T.statusGameItem.spanDays,
+        months: T.statusGameItem.spanMonths,
+      })
+    : null
 
   const isHardcore = 'HardcoreMode' in game && Number(game.HardcoreMode) === 1
 
@@ -94,15 +91,10 @@ export default function StatusGameItem({
       className="spotlight bg-bg-card rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow duration-150"
     >
       <GameCardBackdrop src={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null} surface="card" />
-      <div
-        onClick={handleToggle}
-        className="flex flex-row items-start gap-3 sm:gap-5 p-4 sm:p-5 cursor-pointer hover:bg-bg-header/20 transition-colors select-none"
-      >
-        <Link
-          href={`/gameInfo/${gameId}`}
-          onClick={(e) => e.stopPropagation()}
-          className="shrink-0"
-        >
+      {/* relative: the expand button stretches over this whole header (see the chevron). */}
+      <div className="relative flex flex-row items-start gap-3 sm:gap-5 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">
+        {/* Same destination as the title link, so it is kept out of the tab order. */}
+        <Link href={`/gameInfo/${gameId}`} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
           {game.ImageIcon && (
             <div
               className={`w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden transition-all duration-150 ${
@@ -111,7 +103,7 @@ export default function StatusGameItem({
             >
               <Image
                 src={`https://retroachievements.org${game.ImageIcon}`}
-                alt={game.Title}
+                alt=""
                 width={96}
                 height={96}
                 className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl object-cover block"
@@ -123,27 +115,26 @@ export default function StatusGameItem({
         <div className="flex flex-col flex-1 min-w-0 gap-1">
           <Link
             href={`/gameInfo/${gameId}`}
-            onClick={(e) => e.stopPropagation()}
-            className="self-start hover:underline decoration-ink/50 underline-offset-2"
+            className="relative z-10 self-start max-w-full min-w-0 hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
-            <p className="text-xl font-semibold leading-tight">{game.Title}</p>
+            <p title={game.Title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game.Title}</p>
           </Link>
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${consoleColor ?? 'bg-bg-main text-text-secondary/70'}`}>
               {consoleIcon && (
-                <Image src={consoleIcon} alt={game.ConsoleName} width={12} height={12} className="w-3 h-3 object-contain shrink-0" />
+                <Image src={consoleIcon} alt="" width={12} height={12} className="w-3 h-3 object-contain shrink-0" />
               )}
               {game.ConsoleName}
             </span>
             {extra?.awards.map((award, i) => {
-              const date = new Date(award.AwardedAt).toLocaleDateString()
+              const date = new Date(award.AwardedAt).toLocaleDateString(lang)
               if (award.AwardType === 'Mastery/Completion') {
                 const isHC = award.AwardDataExtra === 1
                 return (
                   <span key={i} className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full ${
                     isHC ? 'bg-warning/10 text-warning/90' : 'bg-success/10 text-success/90'
                   }`}>
-                    {isHC ? '★ Mastered' : '✓ Completed'} · {date}
+                    <span aria-hidden="true">{isHC ? '★' : '✓'}</span> {isHC ? T.statusGameItem.mastered : T.statusGameItem.completed} · {date}
                   </span>
                 )
               }
@@ -153,7 +144,7 @@ export default function StatusGameItem({
                   <span key={i} className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full ${
                     isHC ? 'bg-warning/10 text-warning/80' : 'bg-info/10 text-info/90'
                   }`}>
-                    ⚔ Beaten{isHC ? ' HC' : ''} · {date}
+                    <span aria-hidden="true">⚔</span> {isHC ? T.statusGameItem.beatenHardcore : T.statusGameItem.beaten} · {date}
                   </span>
                 )
               }
@@ -169,27 +160,32 @@ export default function StatusGameItem({
                 softcorePct={isHardcore ? 0 : Math.min(pct, 100)}
                 hardcorePct={isHardcore ? Math.min(pct, 100) : 0}
                 trackClass="bg-bg-main"
-                className="w-40"
+                className="flex-1"
               />
-              <span className="text-xs text-text-secondary/60 tabular-nums">{Math.round(pct)}%</span>
+              <span className="text-xs text-text-secondary tabular-nums">{Math.round(pct)}%</span>
             </div>
           )}
           {'AchievementsPublished' in game
             ? game.PointsTotal > 0 && (
-              <p className="text-xs text-text-secondary/60 mt-1">
+              <p className="text-xs text-text-secondary mt-1">
                 {game.PointsTotal} {T.statusGameItem.pointsTotal}
+                {extra?.lastPlayed && (
+                  <> · {T.statusGameItem.lastPlayed} {new Date(extra.lastPlayed).toLocaleDateString(lang)}</>
+                )}
               </p>
             )
-            : (
-              <p className="text-xs text-text-secondary/60 mt-1">
-                {extra?.possibleScore != null
-                  ? `${extra.scoreAchievedHardcore || extra.scoreAchieved || 0} / ${extra.possibleScore} ${T.statusGameItem.pointsEarned}`
-                  : '—'}
+            : extra?.possibleScore != null ? (
+              <p className="text-xs text-text-secondary mt-1">
+                {`${extra.scoreAchievedHardcore || extra.scoreAchieved || 0} / ${extra.possibleScore} ${T.statusGameItem.pointsEarned}`}
               </p>
+            ) : (
+              // No score to tell: the line stays, empty, so every closed card is
+              // the same height and the masonry columns stay level.
+              <p aria-hidden="true" className="text-xs mt-1">{'\u00a0'}</p>
             )}
-          {(extra || category === 'playing') && (
-            <p className="text-xs text-text-secondary/60 mt-1">
-              Last played · {extra?.lastPlayed ? new Date(extra.lastPlayed).toLocaleDateString() : 'a long time ago'}
+          {!('AchievementsPublished' in game) && (extra || category === 'playing') && (
+            <p className="text-xs text-text-secondary mt-1">
+              {T.statusGameItem.lastPlayed} · {extra?.lastPlayed ? new Date(extra.lastPlayed).toLocaleDateString(lang) : T.statusGameItem.longAgo}
             </p>
           )}
         </div>
@@ -200,22 +196,31 @@ export default function StatusGameItem({
             gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
             title={game.Title}
             image={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null}
+            className="relative z-10"
           />
-          <PinToggleButton
-            gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
-            onClick={(e) => e.stopPropagation()}
-          />
-          <span
-            className="text-text-secondary/50 text-xs transition-transform duration-300"
-            style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          <PinToggleButton gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId} className="relative z-10" />
+          {/* The expand control: a real button, its hit area stretched over the whole header. */}
+          <button
+            type="button"
+            onClick={handleToggle}
+            aria-expanded={open}
+            aria-controls={panelId}
+            aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.Title}`}
+            className="p-1.5 rounded-lg text-text-secondary/50 hover:text-text-secondary cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
-            ▼
-          </span>
+            <span
+              aria-hidden="true"
+              className="block text-xs transition-transform duration-300"
+              style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+            >
+              ▼
+            </span>
+          </button>
         </div>
       </div>
 
       {open && (
-        <div className="border-t border-bg-main px-4 py-4">
+        <div id={panelId} className="border-t border-bg-main px-4 py-4">
           {loading ? (
             <div className="flex flex-wrap gap-1">
               {Array.from({ length: total > 0 ? total : 12 }).map((_, i) => (
@@ -229,8 +234,8 @@ export default function StatusGameItem({
           ) : (
             <div className="flex flex-col gap-3">
               {completionDuration && (
-                <p className="text-xs text-text-secondary/60">
-                  First → last unlock: <span className="text-text-secondary/90 font-medium">{completionDuration}</span>
+                <p className="text-xs text-text-secondary">
+                  {T.statusGameItem.firstToLast} <span className="text-text-main font-medium">{completionDuration}</span>
                 </p>
               )}
               <AchievementGrid
@@ -240,6 +245,7 @@ export default function StatusGameItem({
                 gameId={gameId}
                 gameTitle={game.Title}
                 badgeSize={48}
+                limit={ACHIEVEMENT_LIMIT}
               />
             </div>
           )}

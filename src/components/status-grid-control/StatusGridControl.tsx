@@ -31,7 +31,7 @@ export default function StatusGridControl({
             aria-pressed={active}
             aria-label={T.statusGrid[`cols${optionCols}` as 'cols1' | 'cols2' | 'cols3']}
             onClick={() => onChange(optionCols)}
-            className={`flex items-center justify-center w-7 h-7 rounded-md transition-colors cursor-pointer ${
+            className={`flex items-center justify-center w-7 h-7 rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
               active ? 'bg-bg-main text-accent ring-1 ring-ink/10' : 'text-text-secondary hover:text-text-main'
             }`}
           >

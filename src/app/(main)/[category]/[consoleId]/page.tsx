@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useEffect, useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useGamesByCategory } from '../../../../hooks/useGamesByCategory'
 import { useGameExtraData } from '../../../../hooks/useGameExtraData'
 import { useConsoleFilter } from '../../../../hooks/useConsoleFilter'
@@ -30,9 +30,13 @@ export default function CategoryConsolePage() {
   const cat = category as string
   const [sortState, setSortState] = useState<StatusSortState>(() => defaultSortStateFor(cat))
 
-  useEffect(() => {
+  // A different category starts from its own default order; adjusted during
+  // render, so the old order is never shown for a frame.
+  const [sortFor, setSortFor] = useState(cat)
+  if (sortFor !== cat) {
+    setSortFor(cat)
     setSortState(defaultSortStateFor(cat))
-  }, [cat])
+  }
 
   const EMPTY_STATE: Record<string, { icon: string; title: string; sub: string }> = {
     wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay, sub: T.categoryPage.noWantToPlaySub },

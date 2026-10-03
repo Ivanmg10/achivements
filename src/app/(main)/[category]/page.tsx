@@ -30,7 +30,8 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import CategorySearch from '@/components/category-search/CategorySearch'
 import { titleMatches } from '@/utils/gameCandidates'
 import { useRaLinked } from '@/hooks/useRaLinked'
-import { useEffect, useMemo } from 'react'
+import { useMemo, useRef } from 'react'
+import { usePreviewLayout } from '@/hooks/usePreviewLayout'
 
 export default function CategoryPage() {
   const { category } = useParams()
@@ -48,9 +49,13 @@ export default function CategoryPage() {
   // No RA account, no RA section — not even an empty one.
   const showRa = useRaLinked()
 
-  useEffect(() => {
+  // A different category starts from its own default order; adjusted during
+  // render, so the old order is never shown for a frame.
+  const [sortFor, setSortFor] = useState(cat)
+  if (sortFor !== cat) {
+    setSortFor(cat)
     setSortState(defaultSortStateFor(cat))
-  }, [cat])
+  }
 
   const EMPTY_STATE: Record<string, { icon: string; title: string; sub: string }> = {
     wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay, sub: T.categoryPage.noWantToPlaySub },
@@ -66,6 +71,14 @@ export default function CategoryPage() {
   const [query, setQuery] = useState('')
   const visibleGames = useMemo(() => filteredGames.filter((g) => titleMatches(g.Title, query)), [filteredGames, query])
   const steamGames = useMemo(() => allSteamGames.filter((g) => titleMatches(g.title, query)), [allSteamGames, query])
+
+  // Folded previews fill the screen together: one entry per platform section
+  // on the page, in order. PSN and Xbox, when they arrive, add theirs here.
+  const pageRef = useRef<HTMLDivElement>(null)
+  const sectionGames = [...(showRa && steamLinked ? [visibleGames.length] : []), ...(steamLinked ? [steamGames.length] : [])]
+  const previews = usePreviewLayout(pageRef, sectionGames)
+  const raPreview = { columns: previews.columns, count: previews.counts[0] ?? 3 }
+  const steamPreview = { columns: previews.columns, count: previews.counts[showRa ? 1 : 0] ?? 3 }
 
   const selectedConsoleName =
     selected.size === 1 ? consolePills.find((c) => selected.has(c.id))?.name : undefined
@@ -100,7 +113,7 @@ export default function CategoryPage() {
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main">
-      <div className="w-full lg:max-w-[98%] flex flex-col gap-3">
+      <div ref={pageRef} className="w-full lg:max-w-[98%] flex flex-col gap-3">
         {!showRa ? null : loading ? (
           <StatusPageSkeleton cols={gridCols} />
         ) : error ? (
@@ -118,7 +131,7 @@ export default function CategoryPage() {
             <>
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <StatusPageHeader consoleName={selectedConsoleName} category={cat} gameCount={visibleGames.length} />
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
                   <CategorySearch value={query} onChange={setQuery} />
                   {raControls}
                   <StatusGridControl cols={gridCols} onChange={setGridCols} />
@@ -138,7 +151,7 @@ export default function CategoryPage() {
                 category={cat}
                 gameCount={visibleGames.length + steamGames.length}
               />
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
                 <CategorySearch value={query} onChange={setQuery} />
                 <StatusGridControl cols={gridCols} onChange={setGridCols} />
               </div>
@@ -148,7 +161,7 @@ export default function CategoryPage() {
               icon={<RaLogo height={20} />}
               count={visibleGames.length}
               storageKey={`ra-section-open:${cat}`}
-              preview={<CollapsibleSectionPreview games={raPreviewGames(visibleGames)} />}
+              preview={<CollapsibleSectionPreview games={raPreviewGames(visibleGames)} columns={raPreview.columns} count={raPreview.count} />}
             >
               {games.length === 0 ? (
                 <EmptyState
@@ -172,7 +185,7 @@ export default function CategoryPage() {
             <CategorySearch value={query} onChange={setQuery} />
           </div>
         )}
-        {(!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} query={query} />}
+        {(!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} query={query} preview={steamPreview} />}
       </div>
     </div>
   )

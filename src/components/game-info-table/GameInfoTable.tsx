@@ -5,7 +5,7 @@ import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
 import GameInfoAchievementCard from '../game-info-achivement/GameInfoAchievementCard'
 import AchievementModal from '../achievement-modal/AchievementModal'
 import { FadeImage } from '@/components/ui/FadeImage'
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useId } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
@@ -16,7 +16,6 @@ type Filter = 'all' | 'earned' | 'unearned'
 type SortDir = 'asc' | 'desc'
 
 const COLLAPSED_ROWS = 3
-const COLLAPSED_HEIGHT = COLLAPSED_ROWS * 82
 
 export default function GameInfoTable({
   gameData,
@@ -29,6 +28,7 @@ export default function GameInfoTable({
   const [selectedAchievement, setSelectedAchievement] = useState<RetroAchievement | null>(null)
   const [tableExpanded, setTableExpanded] = useState(true)
   const { T } = useLanguage()
+  const missableId = useId()
 
   const FILTER_LABELS: Record<Filter, string> = {
     all: T.gameInfoTable.filterAll,
@@ -103,6 +103,9 @@ export default function GameInfoTable({
   }
 
   const needsToggle = filtered.length > COLLAPSED_ROWS
+  // Folded, only the first rows exist: hidden ones are not rendered (nor
+  // reachable with Tab), as in the Steam table.
+  const shown = tableExpanded || !needsToggle ? filtered : filtered.slice(0, COLLAPSED_ROWS)
 
   return (
     <section className="bg-bg-card p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
@@ -111,26 +114,31 @@ export default function GameInfoTable({
         <div className="w-full border border-danger/40 rounded-xl overflow-hidden">
           <button
             onClick={() => setMissableOpen((o) => !o)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-danger/10 hover:bg-danger/15 transition-colors text-left"
+            aria-expanded={missableOpen}
+            aria-controls={missableId}
+            className="w-full flex items-center justify-between px-4 py-3 bg-danger/10 hover:bg-danger/15 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-danger/70"
           >
             <span className="text-danger font-semibold text-sm uppercase tracking-wide">
               {T.gameInfoTable.missableWarning} ({missableUnearned.length})
             </span>
-            <span className="text-danger text-xs">{missableOpen ? '▲' : '▼'}</span>
+            <IconChevronDown
+              className={`w-4 h-4 text-danger transition-transform duration-200 ${missableOpen ? 'rotate-180' : ''}`}
+              aria-hidden="true"
+            />
           </button>
 
           {missableOpen && (
-            <div className="flex flex-col gap-2 p-4 bg-danger/5">
+            <div id={missableId} className="flex flex-col gap-2 p-4 bg-danger/5">
               {missableUnearned.map((a) => (
                 <button
                   key={a.ID}
                   onClick={() => setSelectedAchievement(a)}
-                  className="flex items-center gap-3 opacity-80 hover:opacity-100 transition-opacity text-left w-full rounded-lg hover:bg-danger/10 p-1 -m-1"
+                  className="flex items-center gap-3 text-left w-full rounded-lg hover:bg-danger/10 p-1 -m-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
                 >
                   {a.BadgeName && (
                     <FadeImage
                       src={`https://media.retroachievements.org/Badge/${a.BadgeName}.png`}
-                      alt={a.Title}
+                      alt=""
                       width={40}
                       height={40}
                       className="w-10 h-10 rounded-lg shrink-0"
@@ -149,12 +157,13 @@ export default function GameInfoTable({
       )}
 
       {/* Filter buttons */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap" role="group" aria-label={T.gameInfoPage.achievements}>
         {(['all', 'earned', 'unearned'] as Filter[]).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+            aria-pressed={filter === f}
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
               filter === f
                 ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30'
                 : 'bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card'
@@ -169,7 +178,8 @@ export default function GameInfoTable({
       {gameData && needsToggle && (
         <button
           onClick={() => setTableExpanded((e) => !e)}
-          className="w-full flex items-center justify-between px-5 py-3 rounded-xl bg-bg-header/40 hover:bg-bg-header/60 backdrop-blur-sm border border-ink/5 transition-all group"
+          aria-expanded={tableExpanded}
+          className="w-full flex items-center justify-between px-5 py-3 rounded-xl bg-bg-header/40 hover:bg-bg-header/60 backdrop-blur-sm border border-ink/5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <span className="flex items-center gap-2 text-sm font-medium text-text-main">
             <span className={`inline-block transition-transform duration-300 ${tableExpanded ? 'rotate-180' : ''}`}>
@@ -187,10 +197,7 @@ export default function GameInfoTable({
         <>
           {/* Desktop table */}
           <div className="hidden sm:block w-full">
-            <div
-              className="relative"
-              style={!tableExpanded && needsToggle ? { maxHeight: `${COLLAPSED_HEIGHT}px`, overflow: 'hidden' } : undefined}
-            >
+            <div className="relative">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="text-sm border-b border-bg-header">
@@ -218,7 +225,7 @@ export default function GameInfoTable({
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((achievement) => (
+                  {shown.map((achievement) => (
                     <GameInfoAchivement
                       achievement={achievement}
                       numDistinctPlayers={numDistinctPlayers}
@@ -230,21 +237,13 @@ export default function GameInfoTable({
                   ))}
                 </tbody>
               </table>
-
-              {/* Fade overlay when collapsed */}
-              {!tableExpanded && needsToggle && (
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-bg-card via-bg-card/80 to-transparent pointer-events-none" />
-              )}
             </div>
           </div>
 
           {/* Mobile card list */}
           <div className="sm:hidden w-full">
-            <div
-              className="relative flex flex-col gap-2"
-              style={!tableExpanded && needsToggle ? { maxHeight: `${COLLAPSED_ROWS * 110}px`, overflow: 'hidden' } : undefined}
-            >
-              {filtered.map((achievement) => (
+            <div className="relative flex flex-col gap-2">
+              {shown.map((achievement) => (
                 <GameInfoAchievementCard
                   key={achievement.ID}
                   achievement={achievement}
@@ -254,11 +253,6 @@ export default function GameInfoTable({
                   onClick={() => setSelectedAchievement(achievement)}
                 />
               ))}
-
-              {/* Fade overlay when collapsed */}
-              {!tableExpanded && needsToggle && (
-                <div className="absolute bottom-0 left-0 right-0 h-24 bg-linear-to-t from-bg-card via-bg-card/80 to-transparent pointer-events-none" />
-              )}
             </div>
           </div>
 
@@ -266,16 +260,17 @@ export default function GameInfoTable({
           {needsToggle && (
             <button
               onClick={() => setTableExpanded((e) => !e)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-bg-header hover:bg-bg-header/80 text-text-secondary hover:text-text-main transition-colors self-center"
+              aria-expanded={tableExpanded}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-bg-header hover:bg-bg-header/80 text-text-secondary hover:text-text-main transition-colors self-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               {tableExpanded ? (
                 <>
-                  <IconChevronUp className="w-4 h-4" />
+                  <IconChevronUp className="w-4 h-4" aria-hidden="true" />
                   {T.gameInfoTable.collapseTable}
                 </>
               ) : (
                 <>
-                  <IconChevronDown className="w-4 h-4" />
+                  <IconChevronDown className="w-4 h-4" aria-hidden="true" />
                   {T.gameInfoTable.expandTable} ({filtered.length})
                 </>
               )}

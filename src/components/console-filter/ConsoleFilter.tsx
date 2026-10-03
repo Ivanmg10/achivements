@@ -1,7 +1,9 @@
 'use client'
 
 import Image from 'next/image'
+import { IconCheck } from '@tabler/icons-react'
 import { CONSOLES } from '@/constants'
+import { useLanguage } from '@/context/LanguageContext'
 
 export type ConsolePill = { id: number; name: string; icon?: string; color?: string }
 
@@ -33,10 +35,11 @@ export default function ConsoleFilter({
   onToggle: (id: number) => void
   onClear: () => void
 }) {
+  const { T } = useLanguage()
   if (pills.length === 0) return null
 
   return (
-    <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
+    <div role="group" aria-label={T.categoryPage.consoles} className="flex gap-1.5 flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] sm:flex-wrap sm:overflow-visible">
       {pills.map((c) => {
         const color = c.color ?? CONSOLE_COLOR_MAP.get(c.id)
         const isSelected = selected.has(c.id)
@@ -44,7 +47,8 @@ export default function ConsoleFilter({
           <button
             key={c.id}
             onClick={() => onToggle(c.id)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+            aria-pressed={isSelected}
+            className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
               isSelected
                 ? (color ?? 'bg-accent text-bg-main')
                 : 'bg-bg-main text-text-secondary hover:text-text-main'
@@ -53,22 +57,24 @@ export default function ConsoleFilter({
             {c.icon && (
               <Image
                 src={c.icon}
-                alt={c.name}
+                alt=""
                 width={14}
                 height={14}
                 className="object-contain shrink-0"
               />
             )}
             {c.name}
+            {/* Selected is said by more than the colour. */}
+            {isSelected && <IconCheck className="w-3 h-3 shrink-0" aria-hidden="true" />}
           </button>
         )
       })}
       {selected.size > 0 && (
         <button
           onClick={onClear}
-          className="px-2.5 py-1 rounded-lg text-xs text-text-secondary/60 hover:text-text-secondary transition-colors cursor-pointer"
+          className="shrink-0 whitespace-nowrap px-2.5 py-1 rounded-lg text-xs text-text-secondary hover:text-text-main transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
-          ✕ limpiar
+          <span aria-hidden="true">✕</span> {T.categoryPage.clearConsoles}
         </button>
       )}
     </div>

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const data = await withCache(
-      `gameProgression_v2:${id}:${gameId}`,
+      `gameProgression_v3:${id}:${gameId}`,
       TTL,
       () => getGameInfoAndUserProgress(rausername, raid, gameId),
       (d) => d !== null && typeof d === 'object' && 'ID' in d,

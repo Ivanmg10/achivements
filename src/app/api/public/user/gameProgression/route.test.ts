@@ -40,7 +40,7 @@ test('asks RA with the viewer key, caches per user in any case, and only private
   const res = await GET(request('u=Ivan&gameId=42'))
   expect(res.status).toBe(200)
   expect(getGameInfoAndUserProgress).toHaveBeenCalledWith('Ivan', 'viewer-key', '42')
-  expect((withCache as jest.Mock).mock.calls[0][0]).toBe('publicGameProgression:ivan:42')
+  expect((withCache as jest.Mock).mock.calls[0][0]).toBe('publicGameProgression_v2:ivan:42')
   expect(res.headers.get('Cache-Control')).toMatch(/^private/)
 })
 

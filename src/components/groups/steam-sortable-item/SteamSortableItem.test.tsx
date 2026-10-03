@@ -49,7 +49,7 @@ test('links to the Steam game page and shows live progress from the library', ()
   render(<SteamSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
   expect(screen.getByRole('link', { name: 'Portal 2' }).getAttribute('href')).toBe('/steamGame/620')
   expect(screen.getByText(`51 / 51 ${en.steam.achievements}`)).toBeInTheDocument()
-  expect(screen.getByText(`★ ${en.steam.perfect}`)).toBeInTheDocument()
+  expect(screen.getByText(en.steam.perfect, { exact: false })).toBeInTheDocument()
   expect(screen.getByRole('progressbar', { name: 'Portal 2' }).getAttribute('aria-valuenow')).toBe('100')
   expect(screen.getByText(`${en.steam.playtime} · 2 h`, { exact: false })).toBeInTheDocument()
 })
@@ -58,8 +58,8 @@ test('falls back to the counts stored with the item when the library lacks the g
   setLibrary([])
   render(<SteamSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
   expect(screen.getByText(`10 / 50 ${en.steam.achievements}`)).toBeInTheDocument()
-  expect(screen.queryByText(`★ ${en.steam.perfect}`)).not.toBeInTheDocument()
-  expect(screen.getByText(`${en.steam.lastPlayed} · ${en.steam.neverPlayed}`, { exact: false })).toBeInTheDocument()
+  expect(screen.queryByText(en.steam.perfect, { exact: false })).not.toBeInTheDocument()
+  expect(screen.getByText(en.groups.neverPlayed, { exact: false })).toBeInTheDocument()
 })
 
 test('says progress is unknown when nothing is known yet', () => {
@@ -79,7 +79,7 @@ test('has a labelled drag handle only when draggable', () => {
 test('removes by row id', () => {
   const onRemove = jest.fn()
   render(<SteamSortableItem item={ITEM} onRemove={onRemove} draggable />)
-  fireEvent.click(screen.getByRole('button', { name: `${en.groups.removeGame} Portal 2` }))
+  fireEvent.click(screen.getByRole('button', { name: `${en.groups.removeGame}: Portal 2` }))
   expect(onRemove).toHaveBeenCalledWith(42)
 })
 

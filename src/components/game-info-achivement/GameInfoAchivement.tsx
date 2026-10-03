@@ -1,8 +1,16 @@
+import { IconStar, IconStarFilled } from '@tabler/icons-react'
 import { RetroAchievement } from '@/types/types'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { useLanguage } from '@/context/LanguageContext'
-import { motion } from 'framer-motion'
 
+/**
+ * One achievement as a row of the RA game table. The title is the button that
+ * opens the achievement (so the keyboard reaches it), stretched over the whole
+ * row for the pointer; the favourite star sits above that.
+ *
+ * Unearned ones are told apart by a grey badge and the dash under "Earned",
+ * with their text kept at full contrast.
+ */
 export default function GameInfoAchivement({
   achievement,
   numDistinctPlayers,
@@ -16,7 +24,7 @@ export default function GameInfoAchivement({
   onToggleFavorite?: (achievement: RetroAchievement) => void
   onClick?: () => void
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   const TYPE_BADGES: Record<string, { label: string; className: string }> = {
     progression: { label: T.achievement.progression, className: 'bg-info/20 text-info' },
@@ -34,10 +42,10 @@ export default function GameInfoAchivement({
       : null
 
   const typeBadge = achievement.Type ? TYPE_BADGES[achievement.Type] : null
-  const fmt = (n: number) => n.toLocaleString()
+  const fmt = (n: number) => n.toLocaleString(lang)
 
   const earnedDate = achievement.DateEarned
-    ? new Date(achievement.DateEarned).toLocaleString(undefined, {
+    ? new Date(achievement.DateEarned).toLocaleString(lang, {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
@@ -47,25 +55,20 @@ export default function GameInfoAchivement({
     : null
 
   return (
-    <motion.tr
-      onClick={onClick}
-      className={`group border-b border-bg-header/60 cursor-pointer hover:bg-bg-header/30 transition-colors duration-150 ${
+    <tr
+      className={`relative group border-b border-bg-header/60 hover:bg-bg-header/30 transition-colors duration-150 ${
         isFavorited ? 'bg-warning/10' : ''
       }`}
-      initial={{ opacity: 0, y: 4 }}
-      whileInView={{ opacity: earned ? 1 : 0.4, y: 0 }}
-      viewport={{ once: true, margin: '-20px' }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
     >
       <td className="px-3 py-2 w-24 align-middle text-center">
         {achievement.BadgeName && (
           <FadeImage
             src={`https://media.retroachievements.org/Badge/${achievement.BadgeName}.png`}
-            alt="achievement icon"
+            alt=""
             width={80}
             height={80}
             className={`w-16 h-16 rounded-xl mx-auto ${earnedHardcore ? 'ring-2 ring-warning' : ''}`}
-            imgClassName={`w-full h-full object-cover ${earned ? '' : 'grayscale'}`}
+            imgClassName={`w-full h-full object-cover ${earned ? '' : 'grayscale opacity-60'}`}
           />
         )}
       </td>
@@ -74,33 +77,24 @@ export default function GameInfoAchivement({
         <div className="flex items-center gap-2 flex-wrap">
           {onToggleFavorite && (
             <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onToggleFavorite(achievement)
-              }}
+              onClick={() => onToggleFavorite(achievement)}
               aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
-              className={`shrink-0 transition-colors duration-150 ${
-                isFavorited
-                  ? 'text-warning hover:text-warning/80'
-                  : 'text-text-secondary/50 hover:text-warning'
+              aria-pressed={isFavorited}
+              className={`relative z-10 shrink-0 rounded transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+                isFavorited ? 'text-warning hover:text-warning/80' : 'text-text-secondary/50 hover:text-warning'
               }`}
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill={isFavorited ? 'currentColor' : 'none'}
-                stroke="currentColor"
-                strokeWidth={1.8}
-                className="w-4 h-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.562.562 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
-                />
-              </svg>
+              {isFavorited ? <IconStarFilled className="w-4 h-4" aria-hidden="true" /> : <IconStar className="w-4 h-4" aria-hidden="true" />}
             </button>
           )}
-          <h3 className="text-lg">{achievement.Title}</h3>
+          <h3 className={`text-lg ${earned ? '' : 'text-text-secondary'}`}>
+            <button
+              onClick={onClick}
+              className="text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            >
+              {achievement.Title}
+            </button>
+          </h3>
           {typeBadge && (
             <span className={`text-xs px-2 py-0.5 rounded-full ${typeBadge.className}`}>
               {typeBadge.label}
@@ -109,12 +103,12 @@ export default function GameInfoAchivement({
         </div>
         <p className="text-sm text-text-secondary">{achievement.Description}</p>
         {earnedDate && (
-          <p className="text-xs text-text-secondary/60 mt-0.5">
+          <p className="text-xs text-text-secondary mt-0.5">
             {T.achievement.earnedOn} {earnedDate}
           </p>
         )}
         {achievement.Author && (
-          <p className="text-xs text-text-secondary/40 mt-0.5">
+          <p className="text-xs text-text-secondary/70 mt-0.5">
             {T.achievement.by} {achievement.Author}
           </p>
         )}
@@ -123,14 +117,14 @@ export default function GameInfoAchivement({
       <td className="px-3 py-2 w-48 text-center align-middle tabular-nums hidden sm:table-cell">
         <p className="text-sm leading-snug">
           <span className="text-text-main font-medium">{fmt(achievement.NumAwarded)}</span>{' '}
-          <span className="text-text-secondary/70">{T.achievement.players}</span>
+          <span className="text-text-secondary">{T.achievement.players}</span>
         </p>
       </td>
 
       <td className="px-3 py-2 w-48 text-center align-middle tabular-nums hidden sm:table-cell">
         <p className="text-sm leading-snug">
           <span className="text-text-main font-medium">{fmt(achievement.NumAwardedHardcore)}</span>{' '}
-          <span className="text-text-secondary/70">{T.achievement.inHardcore}</span>
+          <span className="text-text-secondary">{T.achievement.inHardcore}</span>
         </p>
       </td>
 
@@ -138,7 +132,7 @@ export default function GameInfoAchivement({
         {rarityPct !== null ? (
           <p className="text-sm leading-snug">
             <span className="text-text-main font-medium">{rarityPct}</span>
-            <span className="text-text-secondary/70">{T.achievement.haveIt}</span>
+            <span className="text-text-secondary">{T.achievement.haveIt}</span>
           </p>
         ) : (
           <span className="text-sm text-text-secondary">—</span>
@@ -149,15 +143,14 @@ export default function GameInfoAchivement({
         {earned ? (
           <span className="text-success text-base">✓</span>
         ) : (
-          <span className="text-text-secondary/40 text-sm">—</span>
+          <span className="text-text-secondary text-sm">—</span>
         )}
       </td>
 
       <td className="px-3 py-2 w-28 text-center align-middle tabular-nums">
         <p className="text-sm text-text-main font-medium">{achievement.Points}</p>
-        <p className="text-xs text-text-secondary/60">pts</p>
+        <p className="text-xs text-text-secondary">pts</p>
       </td>
-
-    </motion.tr>
+    </tr>
   )
 }

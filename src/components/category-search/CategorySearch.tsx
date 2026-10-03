@@ -26,9 +26,11 @@ export default function CategorySearch({
       <input
         id={id}
         type="search"
+        autoComplete="off"
+        spellCheck={false}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={T.categoryPage.searchGames}
+        placeholder={`${T.categoryPage.searchGames}…`}
         className="flex-1 min-w-0 bg-transparent text-sm text-text-main outline-none placeholder:text-text-secondary/70"
       />
       {value && (

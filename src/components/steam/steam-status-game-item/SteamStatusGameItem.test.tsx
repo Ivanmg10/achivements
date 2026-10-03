@@ -54,14 +54,14 @@ test('says never played for an untouched game', () => {
 describe('a perfect game', () => {
   test('gets the Perfect chip, green counts and a green ring — not colour alone', () => {
     const { container } = render(<SteamStatusGameItem game={game(perfect)} />)
-    expect(screen.getByText(`★ ${en.steam.perfect}`)).toBeInTheDocument()
+    expect(screen.getByText(en.steam.perfect, { exact: false })).toBeInTheDocument()
     expect(screen.getByText(`84 / 84 ${en.steam.achievements}`).className).toContain('text-green-400')
     expect(container.querySelector('.ring-2')).not.toBeNull()
   })
 
   test('an unfinished game has neither', () => {
     render(<SteamStatusGameItem game={game(partial)} />)
-    expect(screen.queryByText(`★ ${en.steam.perfect}`)).not.toBeInTheDocument()
+    expect(screen.queryByText(en.steam.perfect, { exact: false })).not.toBeInTheDocument()
   })
 })
 

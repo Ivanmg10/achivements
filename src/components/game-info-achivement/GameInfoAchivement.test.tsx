@@ -53,3 +53,23 @@ test('renders nothing when no achievement', () => {
   const { container } = render(wrap(<GameInfoAchivement numDistinctPlayers={1000} />))
   expect(container.querySelector('tr')).toBeNull()
 })
+
+test('the title is a real button that opens the achievement, reachable by keyboard', () => {
+  const onClick = jest.fn()
+  render(wrap(<GameInfoAchivement achievement={mockAchievement as never} numDistinctPlayers={1000} onClick={onClick} />))
+  const open = screen.getByRole('button', { name: 'First Blood' })
+  open.focus()
+  expect(open).toHaveFocus()
+  open.click()
+  expect(onClick).toHaveBeenCalledTimes(1)
+})
+
+test('the favourite star toggles without opening the achievement and reports its state', () => {
+  const onClick = jest.fn()
+  const onToggleFavorite = jest.fn()
+  render(wrap(<GameInfoAchivement achievement={mockAchievement as never} numDistinctPlayers={1000} onClick={onClick} onToggleFavorite={onToggleFavorite} isFavorited />))
+  const star = screen.getByRole('button', { pressed: true })
+  star.click()
+  expect(onToggleFavorite).toHaveBeenCalledTimes(1)
+  expect(onClick).not.toHaveBeenCalled()
+})

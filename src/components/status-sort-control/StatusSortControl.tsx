@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useClickAway } from '@/hooks/useClickAway'
@@ -38,7 +38,20 @@ export default function StatusSortControl({
   const { T } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
   useClickAway(ref, isOpen, () => setIsOpen(false))
+
+  // Escape closes the list and hands the focus back to the button.
+  useEffect(() => {
+    if (!isOpen) return
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'Escape') return
+      setIsOpen(false)
+      triggerRef.current?.focus()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [isOpen])
 
   const keys = STATUS_SORT_KEYS_BY_CATEGORY[cat] ?? STATUS_SORT_KEYS_BY_CATEGORY.playing
   const arrow = sortState.dir === 'asc' ? '↑' : '↓'
@@ -55,14 +68,14 @@ export default function StatusSortControl({
   return (
     <div ref={ref} className="relative">
       <button
+        ref={triggerRef}
         type="button"
-        aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label={T.statusSort.label}
         onClick={() => setIsOpen((o) => !o)}
-        className="flex items-center gap-1.5 text-sm px-3 py-1 rounded-lg bg-bg-card text-text-secondary hover:text-text-main transition-colors cursor-pointer"
+        className="flex items-center gap-1.5 text-sm px-3 py-1 rounded-lg bg-bg-card text-text-secondary hover:text-text-main transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
-        {T.statusSort.label}: {T.statusSort[sortState.key]} {arrow}
+        {T.statusSort.label}: {T.statusSort[sortState.key]} <span aria-hidden="true">{arrow}</span>
         <IconChevronDown
           className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           aria-hidden
@@ -70,7 +83,6 @@ export default function StatusSortControl({
       </button>
       {isOpen && (
         <div
-          role="menu"
           className="absolute top-full right-0 mt-1 z-20 bg-bg-card rounded-lg shadow-lg py-1 min-w-40"
         >
           {keys.map((key) => {
@@ -79,13 +91,13 @@ export default function StatusSortControl({
               <button
                 key={key}
                 type="button"
-                role="menuitem"
+                aria-pressed={active}
                 onClick={() => handleSelect(key)}
-                className={`w-full text-left text-sm px-3 py-1.5 transition-colors cursor-pointer ${
+                className={`w-full text-left text-sm px-3 py-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:bg-ink/10 ${
                   active ? 'text-accent font-medium' : 'text-text-secondary hover:text-text-main'
                 }`}
               >
-                {T.statusSort[key]} {active ? arrow : ''}
+                {T.statusSort[key]} {active && <span aria-hidden="true">{arrow}</span>}
               </button>
             )
           })}

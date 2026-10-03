@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
   async function fetchGame(gameId: number): Promise<[number, string | null]> {
     try {
       const data = await withCache(
-        `gameProgression_v2:${id}:${gameId}`,
+        `gameProgression_v3:${id}:${gameId}`,
         TTL,
         () => getGameInfoAndUserProgress(username, apiKey, gameId),
         (d) => d !== null && typeof d === 'object' && 'ID' in d,

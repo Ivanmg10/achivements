@@ -29,7 +29,7 @@ export default function MainPageGroups({
   selectedId?: number | null
   onSelect?: (id: number) => void
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const { groups, isLoading, createGroup, deleteGroup } = useGroups()
   const [modalOpen, setModalOpen] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState<number | null>(null)
@@ -157,7 +157,7 @@ export default function MainPageGroups({
                           <span>{group.total_awarded}/{group.total_possible}</span>
                         )}
                         {group.total_possible > 0 && <span className="opacity-40">·</span>}
-                        <span>{relativeTime(group.updated_at)}</span>
+                        <span>{relativeTime(group.updated_at, lang)}</span>
                       </div>
                     </div>
                   </MainPageGroupsRow>

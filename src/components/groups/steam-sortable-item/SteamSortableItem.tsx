@@ -72,15 +72,15 @@ export default function SteamSortableItem({
     >
       {/* The same blurred art and pointer glow as the game cards in the status lists. */}
       <GameCardBackdrop src={steamAssetUrl(item.game_id, 'header')} surface="card" />
-      <div className="flex items-center gap-3 p-5">
+      <div className="relative flex items-center gap-3 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">
         {draggable && (
           <button
             {...attributes}
             {...listeners}
             aria-label={T.cards.dragToReorder}
-            className="text-text-secondary/30 hover:text-text-secondary/70 transition-colors cursor-grab active:cursor-grabbing shrink-0 touch-none self-stretch flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+            className="relative z-10 text-text-secondary/40 hover:text-text-secondary transition-colors cursor-grab active:cursor-grabbing shrink-0 touch-none self-stretch flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
           >
-            <IconGripVertical className="w-4 h-4" aria-hidden />
+            <IconGripVertical className="w-4 h-4" aria-hidden="true" />
           </button>
         )}
 
@@ -89,7 +89,7 @@ export default function SteamSortableItem({
           href={href}
           tabIndex={-1}
           aria-hidden="true"
-          className={`shrink-0 rounded-xl transition-all ${
+          className={`relative z-10 shrink-0 rounded-xl transition-all ${
             isComplete ? 'ring-2 ring-[#a4d007]/70 hover:ring-[#a4d007]' : 'hover:ring-2 hover:ring-ink/40'
           }`}
         >
@@ -98,87 +98,82 @@ export default function SteamSortableItem({
             asset="icon"
             iconUrl={game?.imageIcon ?? item.image_icon ?? ''}
             size={96}
-            className="w-24 h-24 rounded-xl block"
+            className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl block"
           />
         </Link>
 
         <div className="flex flex-col flex-1 min-w-0 gap-1">
           <Link
             href={href}
-            className="self-start hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+            className="relative z-10 self-start max-w-full hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
           >
-            <p className="text-xl font-semibold leading-tight">{game?.title ?? item.title}</p>
+            <p title={game?.title ?? item.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game?.title ?? item.title}</p>
           </Link>
+          <span className="flex items-center gap-1.5 flex-wrap">
+            <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium bg-[#1b2838] text-[#66c0f4]">
+              <SteamLogo size={12} aria-hidden="true" />
+              Steam
+            </span>
+            {isComplete && (
+              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[#a4d007]/10 text-[#a4d007]">
+                <span aria-hidden="true">★</span> {T.steam.perfect}
+              </span>
+            )}
+          </span>
+          <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>{progressText}</span>
+          {hasCounts && (
+            <span className="flex items-center gap-2 mt-1">
+              <SteamProgressBar pct={pct} label={item.title} trackClass="bg-bg-main" className="flex-1" />
+              <span className="text-xs text-text-secondary tabular-nums">{Math.round(pct)}%</span>
+            </span>
+          )}
+          {/* Kept when there is nothing to show, so every card is the same height. */}
+          <span aria-hidden={game ? undefined : true} className="flex items-center gap-1 text-xs text-text-secondary mt-1">
+            {game ? (
+              <>
+                <IconClock size={12} aria-hidden="true" />
+                {T.steam.playtime} ·{' '}
+                {formatPlaytime(game.playtimeForever, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+              </>
+            ) : (
+              '\u00a0'
+            )}
+          </span>
+          <span className="text-xs text-text-secondary mt-1">
+            {game?.lastPlayed ? T.groups.playedAgo.replace('{when}', relativeTime(game.lastPlayed, lang)) : T.groups.neverPlayed}
+            {' · '}
+            {T.groups.addedAgo.replace('{when}', relativeTime(item.added_at, lang))}
+          </span>
+        </div>
 
+        <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 shrink-0 self-start sm:self-center -mr-2 sm:mr-0">
           <button
+            onClick={() => onRemove(item.id)}
+            aria-label={`${T.groups.removeGame}: ${item.title}`}
+            className="relative z-10 p-2 rounded-lg text-text-secondary hover:text-danger hover:bg-danger/10 transition-all [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
+          >
+            <IconX className="w-4 h-4" aria-hidden="true" />
+          </button>
+          {/* The expand control: a real button, its hit area stretched over the whole header. */}
+          <button
+            type="button"
             onClick={() => setOpen((o) => !o)}
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${item.title}`}
-            className="flex items-center gap-3 w-full text-left rounded select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+            className="p-1.5 rounded-lg text-text-secondary/50 hover:text-text-secondary cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
           >
-            <span className="flex flex-col flex-1 min-w-0 gap-1">
-              <span className="flex items-center gap-1.5 flex-wrap">
-                <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium bg-[#1b2838] text-[#66c0f4]">
-                  <SteamLogo size={12} aria-hidden="true" />
-                  Steam
-                </span>
-                {isComplete && (
-                  <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[#a4d007]/10 text-[#a4d007]">
-                    ★ {T.steam.perfect}
-                  </span>
-                )}
-              </span>
-
-              <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>
-                {progressText}
-              </span>
-
-              {hasCounts && (
-                <span className="flex items-center gap-2 mt-1">
-                  <SteamProgressBar pct={pct} label={item.title} trackClass="bg-bg-main" className="w-40" />
-                  <span className="text-xs text-text-secondary/60 tabular-nums">{Math.round(pct)}%</span>
-                </span>
-              )}
-
-              {game && (
-                <span className="flex items-center gap-1 text-xs text-text-secondary/60 mt-1">
-                  <IconClock size={12} aria-hidden="true" />
-                  {T.steam.playtime} ·{' '}
-                  {formatPlaytime(game.playtimeForever, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
-                </span>
-              )}
-
-              <span className="text-xs text-text-secondary/60 mt-1">
-                {T.steam.lastPlayed} ·{' '}
-                {game?.lastPlayed ? new Date(game.lastPlayed).toLocaleDateString(lang) : T.steam.neverPlayed}
-                <span className="text-text-secondary/40"> · +{relativeTime(item.added_at)}</span>
-              </span>
-            </span>
-
-            <span
-              aria-hidden="true"
-              className="text-text-secondary/50 text-xs transition-transform duration-300 shrink-0 self-center"
-              style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
-            >
+            <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               ▼
             </span>
           </button>
         </div>
-
-        <button
-          onClick={() => onRemove(item.id)}
-          aria-label={`${T.groups.removeGame} ${item.title}`}
-          className="p-2 rounded-lg text-text-secondary hover:text-red-400 hover:bg-red-400/10 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all shrink-0"
-        >
-          <IconX className="w-4 h-4" aria-hidden />
-        </button>
       </div>
 
       {open && (
         <div id={panelId} className="border-t border-bg-main px-4 py-4">
           {hasStats ? (
-            <SteamGameItemAchievements appId={item.game_id} gameTitle={item.title} expectedCount={hasCounts ? total : undefined} badgeSize={48} />
+            <SteamGameItemAchievements appId={item.game_id} gameTitle={item.title} expectedCount={hasCounts ? total : undefined} badgeSize={48} limit={60} />
           ) : (
             <p className="text-center text-text-secondary text-sm py-2">{T.steam.noAchievements}</p>
           )}

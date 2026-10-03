@@ -10,6 +10,8 @@ import { formatDate } from '@/utils/utils'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import type { SteamAchievementUnified } from '@/types/steam'
+import ShowAllButton from '@/components/show-all-button/ShowAllButton'
+import { capList } from '@/utils/utils'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -41,17 +43,22 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
   gameTitle,
   achievements,
   badgeSize = 48,
+  limit,
 }: {
   appId: number
   gameTitle: string
   achievements: SteamAchievementUnified[]
   badgeSize?: 40 | 48
+  /** Show only this many until asked for the rest (a card on a list page). */
+  limit?: number
 }) {
   const { T } = useLanguage()
   const { pinned, toggle, canPin } = useSteamFavoriteAchievements(appId, gameTitle)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
   const size = SIZE_CLASSES[badgeSize]
+  const [showAll, setShowAll] = useState(false)
+  const { visible: shown, capped } = capList(achievements, limit ?? Infinity, showAll)
 
   function show(a: SteamAchievementUnified, x: number, y: number, delay = TOOLTIP_DELAY_MS) {
     clearTimeout(hoverTimeout.current)
@@ -70,7 +77,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
   return (
     <>
       <ul className="flex flex-wrap gap-1">
-        {achievements.map((a) => (
+        {shown.map((a) => (
           <li key={a.apiname} className="relative group/badge">
             <Link
               href={`/steamGame/${appId}#${achievementAnchor(a.apiname)}`}
@@ -113,6 +120,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
           </li>
         ))}
       </ul>
+      {capped && <ShowAllButton total={achievements.length} expanded={showAll} onToggle={() => setShowAll((v) => !v)} />}
 
       {/* Portal so the tooltip escapes any ancestor transform stacking context */}
       {tooltip &&

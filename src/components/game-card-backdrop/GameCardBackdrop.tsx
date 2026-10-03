@@ -17,10 +17,13 @@ const FADE = {
 export default function GameCardBackdrop({
   src,
   surface = 'main',
+  eager = false,
 }: {
   src?: string | null
   /** The card's own background, which the art fades into. */
   surface?: keyof typeof FADE
+  /** The first card on screen: its art is the page's largest paint, so it loads first. */
+  eager?: boolean
 }) {
   const [failed, setFailed] = useState(false)
   if (!src || failed) return null
@@ -33,6 +36,7 @@ export default function GameCardBackdrop({
         width={96}
         height={96}
         unoptimized
+        {...(eager ? { loading: 'eager' as const, fetchPriority: 'high' as const } : {})}
         onError={() => setFailed(true)}
         className="absolute -left-10 top-1/2 -translate-y-1/2 w-64 h-64 max-w-none object-cover blur-2xl saturate-150 opacity-30"
       />

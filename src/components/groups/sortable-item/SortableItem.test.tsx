@@ -16,12 +16,8 @@ jest.mock('@dnd-kit/utilities', () => ({
   CSS: { Transform: { toString: () => '' } },
 }))
 
-const mockT = {
-  statusGameItem: { noPublishedAchievements: 'No achievements' },
-  achievement: { notEarned: 'Not earned' },
-}
 jest.mock('@/context/LanguageContext', () => ({
-  useLanguage: () => ({ T: mockT }),
+  useLanguage: () => ({ T: jest.requireActual('@/translations/en').en, lang: 'en' }),
 }))
 
 jest.mock('next/image', () => ({ src, alt, ...props }: React.ComponentProps<'img'>) => (
@@ -110,7 +106,7 @@ describe('SortableItem', () => {
         draggable={false}
       />
     )
-    const removeBtn = screen.getByLabelText('Remove game')
+    const removeBtn = screen.getByLabelText('Remove: Test Game')
     fireEvent.click(removeBtn)
     expect(onRemove).toHaveBeenCalledWith(1)
   })

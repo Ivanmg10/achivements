@@ -7,7 +7,9 @@
  * Messages arrive already translated: the caller has the language.
  */
 type ToastKind = 'success' | 'error'
-export type Toast = { id: number; kind: ToastKind; message: string }
+/** A button in the toast that takes the action back (undo), or follows it up. */
+export type ToastAction = { label: string; onClick: () => void }
+export type Toast = { id: number; kind: ToastKind; message: string; action?: ToastAction }
 
 /** More than this and the oldest goes: a burst must not cover the page. */
 const MAX_TOASTS = 4
@@ -20,16 +22,16 @@ function emit() {
   for (const listener of listeners) listener()
 }
 
-function push(kind: ToastKind, message: string): number {
-  const toast = { id: nextId++, kind, message }
+function push(kind: ToastKind, message: string, action?: ToastAction): number {
+  const toast = { id: nextId++, kind, message, action }
   toasts = [...toasts, toast].slice(-MAX_TOASTS)
   emit()
   return toast.id
 }
 
 export const notify = {
-  success: (message: string) => push('success', message),
-  error: (message: string) => push('error', message),
+  success: (message: string, options?: { action?: ToastAction }) => push('success', message, options?.action),
+  error: (message: string, options?: { action?: ToastAction }) => push('error', message, options?.action),
 }
 
 export function dismissToast(id: number) {

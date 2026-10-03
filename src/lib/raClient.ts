@@ -26,8 +26,10 @@ export function getGame(gameId: string | number, apiKey: string) {
   return fetchRA(`${BASE}/API_GetGame.php?${qs({ i: gameId, y: apiKey })}`)
 }
 
+// a=1: include the user's highest award (HighestAwardKind), or the game page
+// can never tell a mastered game from one in progress.
 export function getGameInfoAndUserProgress(username: string, apiKey: string, gameId: string | number) {
-  return fetchRA(`${BASE}/API_GetGameInfoAndUserProgress.php?${qs({ u: username, y: apiKey, g: gameId })}`)
+  return fetchRA(`${BASE}/API_GetGameInfoAndUserProgress.php?${qs({ u: username, y: apiKey, g: gameId, a: 1 })}`)
 }
 
 export function getGameHashes(gameId: string | number, apiKey: string) {

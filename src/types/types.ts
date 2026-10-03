@@ -274,6 +274,8 @@ export type GameGroupItem = {
   max_points: number
   position: number
   added_at: string
+  /** Looked up once: null = not yet, 0 = no year known. */
+  release_year?: number | null
 }
 
 export type Streak = {
@@ -296,5 +298,7 @@ export type GameGroup = {
   steam_count: number
   total_awarded: number
   total_possible: number
+  /** The first four games, for the card's cover mosaic. */
+  covers?: { source: GameSource; game_id: number; image_icon: string | null }[]
   items?: GameGroupItem[]
 }

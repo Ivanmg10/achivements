@@ -12,10 +12,19 @@ type CtxType = {
   refetch: () => void
 }
 
-const Ctx = createContext<CtxType>({ achievements: [], isLoading: true, error: false, refetch: () => {} })
+type ProviderValue = CtxType & { request: () => void }
 
+const Ctx = createContext<ProviderValue>({ achievements: [], isLoading: true, error: false, refetch: () => {}, request: () => {} })
+
+/**
+ * The latest unlocks, shared by the home page and the account page. Loaded on
+ * first use rather than on every route: a game or status page never reads it,
+ * and should not wait on RA for it.
+ */
 export function RecentAchievementsProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
+  const [wanted, setWanted] = useState(false)
+  const request = useCallback(() => setWanted(true), [])
   const [achievements, setAchievements] = useState<RecentAchievement[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -56,10 +65,10 @@ export function RecentAchievementsProvider({ children }: { children: React.React
       return
     }
     if (!session?.user?.rausername) { setIsLoading(false); return }
-    if (hasFetched.current) return
+    if (!wanted || hasFetched.current) return
     hasFetched.current = true
     doFetch()
-  }, [session?.user?.rausername, status, doFetch])
+  }, [session?.user?.rausername, status, doFetch, wanted])
 
   useEffect(() => () => clearTimeout(retryTimer.current), [])
 
@@ -70,7 +79,12 @@ export function RecentAchievementsProvider({ children }: { children: React.React
     doFetch()
   }, [doFetch])
 
-  return <Ctx.Provider value={{ achievements, isLoading, error, refetch }}>{children}</Ctx.Provider>
+  return <Ctx.Provider value={{ achievements, isLoading, error, refetch, request }}>{children}</Ctx.Provider>
 }
 
-export const useRecentAchievements = () => useContext(Ctx)
+/** Reading the list is what asks for it: the first reader starts the load. */
+export function useRecentAchievements(): CtxType {
+  const { request, ...value } = useContext(Ctx)
+  useEffect(request, [request])
+  return value
+}
