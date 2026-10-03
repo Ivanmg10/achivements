@@ -164,7 +164,8 @@ describe('enrichWithAchievementCounts', () => {
 
     expect(complete).toBe(true)
     expect(out).toMatchObject({ achievementsLoaded: true, maxPossible: 4, numAwarded: 3, pctWon: 75 })
-    expect(writeCache).toHaveBeenCalledWith(progressCacheKey('765', g), list(3, 4), TTL.settledProgress, '7')
+    // Only the counts are stored, never Steam's whole list.
+    expect(writeCache).toHaveBeenCalledWith(progressCacheKey('765', g), { total: 4, awarded: 3 }, TTL.settledProgress, '7')
   })
 
   test('reads every cached game in one query and spends no Steam call on hits', async () => {
@@ -220,9 +221,28 @@ describe('enrichWithAchievementCounts', () => {
 
     expect(out.achievementsLoaded).toBe(false)
     expect(complete).toBe(true)
-    expect(writeCache).toHaveBeenCalledWith(expect.any(String), [], TTL.achievements, '7')
+    expect(writeCache).toHaveBeenCalledWith(expect.any(String), { total: 0, awarded: 0 }, TTL.achievements, '7')
   })
 
+  test('cached counts fill the game without calling Steam', async () => {
+    const g = game(1)
+    ;(readCacheMany as jest.Mock).mockResolvedValue(new Map([[progressCacheKey('765', g), { total: 4, awarded: 1 }]]))
+
+    const { games: [out] } = await enrichWithAchievementCounts([g], AUTH, 10)
+    expect(getPlayerAchievements).not.toHaveBeenCalled()
+    expect(out).toMatchObject({ achievementsLoaded: true, maxPossible: 4, numAwarded: 1, pctWon: 25 })
+  })
+
+  test('cached zero counts (private profile) are a hit that leaves the game unloaded', async () => {
+    const g = game(1)
+    ;(readCacheMany as jest.Mock).mockResolvedValue(new Map([[progressCacheKey('765', g), { total: 0, awarded: 0 }]]))
+
+    const { games: [out] } = await enrichWithAchievementCounts([g], AUTH, 10)
+    expect(getPlayerAchievements).not.toHaveBeenCalled()
+    expect(out.achievementsLoaded).toBe(false)
+  })
+
+  // Rows written before counts hold the whole list; they must keep working until they expire.
   test('a cached empty list counts as a hit — no refetch on every page load', async () => {
     const g = game(1)
     ;(readCacheMany as jest.Mock).mockResolvedValue(new Map([[progressCacheKey('765', g), []]]))

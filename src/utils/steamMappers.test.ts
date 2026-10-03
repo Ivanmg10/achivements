@@ -3,7 +3,8 @@ import {
   toSteamGameProgress,
   withAchievementCounts,
   toSteamAchievements,
-  withPlayerAchievementCounts,
+  countUnlocks,
+  withUnlockCounts,
   toGlobalPctMap,
   toSteamGameDetails,
   STEAM_PLATFORM,
@@ -169,20 +170,21 @@ describe('toSteamAchievements', () => {
   })
 })
 
-describe('withPlayerAchievementCounts', () => {
+describe('countUnlocks / withUnlockCounts', () => {
   const base = toSteamGameProgress(GAME)
 
   test('counts from the unlock list alone', () => {
-    const result = withPlayerAchievementCounts(base, [
+    const counts = countUnlocks([
       { apiname: 'A', achieved: 1, unlocktime: 1 },
       { apiname: 'B', achieved: 0, unlocktime: 0 },
       { apiname: 'C', achieved: 1, unlocktime: 1 },
     ])
-    expect(result).toMatchObject({ maxPossible: 3, numAwarded: 2, pctWon: 66.67, achievementsLoaded: true })
+    expect(counts).toEqual({ total: 3, awarded: 2 })
+    expect(withUnlockCounts(base, counts)).toMatchObject({ maxPossible: 3, numAwarded: 2, pctWon: 66.67, achievementsLoaded: true })
   })
 
   test('leaves the game unloaded on an empty list — unknown, not zero', () => {
-    expect(withPlayerAchievementCounts(base, [])).toBe(base)
+    expect(withUnlockCounts(base, countUnlocks([]))).toBe(base)
   })
 })
 

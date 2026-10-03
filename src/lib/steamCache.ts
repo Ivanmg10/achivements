@@ -132,13 +132,12 @@ export async function clearUserCache(userId: string): Promise<void> {
   }
 }
 
-/** Deletes expired rows. Nothing depends on this running — reads filter on expiry. */
+/**
+ * Deletes expired rows; run daily by /api/cron/sweepCache. Reads filter on
+ * expiry, so a missed run costs only disk. Throws, so the cron run shows as
+ * failed instead of quietly deleting nothing.
+ */
 export async function sweepExpired(): Promise<number> {
-  try {
-    const result = await pool.query('DELETE FROM steam_cache WHERE expires_at <= NOW()')
-    return result.rowCount ?? 0
-  } catch (err) {
-    console.error('[steamCache] sweepExpired', err)
-    return 0
-  }
+  const result = await pool.query('DELETE FROM steam_cache WHERE expires_at <= NOW()')
+  return result.rowCount ?? 0
 }

@@ -1,6 +1,6 @@
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
 import { getGlobalAchievementPercentages, getOwnedGames, getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
-import { toGlobalPctMap, withPlayerAchievementCounts } from '@/utils/steamMappers'
+import { countUnlocks, toGlobalPctMap, withUnlockCounts } from '@/utils/steamMappers'
 import type {
   SteamGameProgress,
   SteamGlobalPercentagesResponse,
@@ -9,6 +9,7 @@ import type {
   SteamPlayerAchievementsResponse,
   SteamSchemaAchievement,
   SteamSchemaResponse,
+  SteamUnlockCounts,
 } from '@/types/steam'
 
 /** Parallel Steam calls per enrichment — keeps a burst well under the rate limit. */
@@ -31,8 +32,16 @@ export type SteamAuth = { id: string; steamid: string; apiKey: string }
 export const NO_STATS = { noStats: true } as const
 export type PlayerUnlocks = SteamPlayerAchievement[] | typeof NO_STATS
 
-export function isNoStats(unlocks: PlayerUnlocks): unlocks is typeof NO_STATS {
-  return !Array.isArray(unlocks) && unlocks?.noStats === true
+/**
+ * What the library cache keeps per game: the counts, not Steam's whole list —
+ * a list is ~2 KB a row and only its two numbers were ever read. Lists still
+ * come back from rows written before this; they are counted on read until
+ * they expire.
+ */
+export type CachedUnlocks = SteamUnlockCounts | typeof NO_STATS | SteamPlayerAchievement[]
+
+export function isNoStats(unlocks: CachedUnlocks): unlocks is typeof NO_STATS {
+  return !Array.isArray(unlocks) && 'noStats' in Object(unlocks)
 }
 
 /**
@@ -57,9 +66,13 @@ export async function fetchPlayerAchievements(auth: SteamAuth, appId: number): P
 }
 
 /** Applies unlocks to a game: counts, or "has no achievements" for NO_STATS. */
-export function applyUnlocks(game: SteamGameProgress, unlocks: PlayerUnlocks): SteamGameProgress {
+export function applyUnlocks(game: SteamGameProgress, unlocks: CachedUnlocks): SteamGameProgress {
   if (isNoStats(unlocks)) return { ...game, hasStats: false }
-  return withPlayerAchievementCounts(game, unlocks)
+  return withUnlockCounts(game, Array.isArray(unlocks) ? countUnlocks(unlocks) : unlocks)
+}
+
+export function toCachedUnlocks(unlocks: PlayerUnlocks): CachedUnlocks {
+  return isNoStats(unlocks) ? unlocks : countUnlocks(unlocks)
 }
 
 /** The unlock list for one game's detail view, cached per player for an hour. */
@@ -132,7 +145,7 @@ export async function enrichWithAchievementCounts(
 ): Promise<{ games: SteamGameProgress[]; complete: boolean }> {
   const countable = games.filter(isCountable)
   const keyOf = new Map(countable.map((g) => [g.id, progressCacheKey(auth.steamid, g)]))
-  const cached = await readCacheMany<PlayerUnlocks>([...keyOf.values()])
+  const cached = await readCacheMany<CachedUnlocks>([...keyOf.values()])
 
   const misses = countable.filter((g) => !cached.has(keyOf.get(g.id)!))
   const toFetch = new Set(misses.slice(0, maxFetches).map((g) => g.id))
@@ -152,7 +165,7 @@ export async function enrichWithAchievementCounts(
       // or every page load would re-fetch it — but not for a month either, so
       // making the profile public takes effect. NO_STATS is final.
       const unknown = Array.isArray(unlocks) && unlocks.length === 0
-      await writeCache(key, unlocks, unknown ? TTL.achievements : progressTtl(game), auth.id)
+      await writeCache(key, toCachedUnlocks(unlocks), unknown ? TTL.achievements : progressTtl(game), auth.id)
       return applyUnlocks(game, unlocks)
     } catch (err) {
       console.error('[steamProgress] enrich', game.id, err)

@@ -18,6 +18,12 @@ module.exports = {
     "^recharts$": "<rootDir>/__mocks__/recharts.js",
     "^framer-motion$": "<rootDir>/__mocks__/framer-motion.js",
   },
+  // One worker per core (15 on a 16-thread machine), each with jsdom and coverage,
+  // ran out of RAM next to the dev server and VS Code: "Jest worker encountered 2
+  // child process exceptions". Half the cores, and a worker that grows past 1 GB
+  // is restarted between files instead of crashing mid-file.
+  maxWorkers: "50%",
+  workerIdleMemoryLimit: "1GB",
   collectCoverage: true,
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",

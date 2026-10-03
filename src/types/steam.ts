@@ -78,6 +78,9 @@ export type SteamPlayerAchievement = {
   description?: string
 }
 
+/** A player's progress in one game, reduced to the two numbers the library shows. */
+export type SteamUnlockCounts = { total: number; awarded: number }
+
 export type SteamPlayerAchievementsResponse = {
   playerstats: {
     steamID?: string
