@@ -25,14 +25,12 @@ import MainPagePointsStats from './MainPagePointsStats'
 import MainPageRarest from './MainPageRarest'
 import MainPageAbandoned from './MainPageAbandoned'
 import MainPageTopGames from './MainPageTopGames'
-import MainPageMastery from './MainPageMastery'
-import MainPagePerfectGames from './MainPagePerfectGames'
 import MainPageBestPeriod from './MainPageBestPeriod'
 import MainPageFavorites from '../main-page-favorites/MainPageFavorites'
 import MainPageSteamStats from './main-page-steam-stats/MainPageSteamStats'
-import MainPageSteamMastery from './main-page-steam-mastery/MainPageSteamMastery'
 import MainPageStatsRail, { StatsSection } from '../main-page-stats-rail/MainPageStatsRail'
 import MainPageBrowse from '../main-page-browse/MainPageBrowse'
+import MainPageCollection from '../main-page-collection/MainPageCollection'
 import MainPageGroupsSection from '../main-page-groups-section/MainPageGroupsSection'
 
 /**
@@ -53,11 +51,11 @@ export default function MainPageCharts() {
   // the streak already loads — both platforms, and no call of its own.
   const { achievements: year, isLoading: yearLoading, error: yearError, refetch: refetchYear } = useActivityHeatmapYear()
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
-  const { all, hardcore, softcore, inProgress, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()
+  const { all, inProgress, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()
   const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
   const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
   const { platform } = useMainPlatform()
-  const { isLinked: steamLinked, library, libraryLoading } = useSteamGamesData()
+  const { isLinked: steamLinked, library } = useSteamGamesData()
   const isSteam = platform === 'steam'
   const { achievements: steamActivity, isLoading: steamLoading } = useSteamRecentAchievements(steamLinked ? 'activity' : null)
 
@@ -145,28 +143,15 @@ export default function MainPageCharts() {
       </div>
     ),
     collection: (
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
-        <ChartCard>
-          <SectionFallback error={gamesError} onRefresh={refetchGames}>
-            <MainPagePerfectGames games={all} steamGames={library} awards={awards} isLoading={gamesLoading} />
-          </SectionFallback>
-        </ChartCard>
-        <ChartCard>
-          {isSteam ? (
-            <MainPageSteamMastery games={library} isLoading={libraryLoading} />
-          ) : (
-            <SectionFallback error={awardsError} onRefresh={refetchAwards}>
-              <MainPageMastery
-                awards={awards}
-                isLoading={awardsLoading}
-                unlockedHC={hardcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
-                unlockedSC={softcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
-                inProgress={inProgress}
-              />
-            </SectionFallback>
-          )}
-        </ChartCard>
-      </div>
+      <SectionFallback
+        error={gamesError || awardsError}
+        onRefresh={() => {
+          if (gamesError) refetchGames()
+          if (awardsError) refetchAwards()
+        }}
+      >
+        <MainPageCollection games={all} steamGames={library} awards={awards} inProgress={inProgress} isLoading={gamesLoading || awardsLoading} />
+      </SectionFallback>
     ),
     groups: <MainPageGroupsSection />,
     browse: <MainPageBrowse />,

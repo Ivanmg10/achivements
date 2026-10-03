@@ -1,4 +1,4 @@
-import { applyPerfectOrder, buildPerfectGames, countPerfectGames, latestPerfects } from './perfectGames'
+import { applyPerfectOrder, buildPerfectGames, countPerfectGames, filterPerfects, groupPerfectsByYear, latestPerfects, perfectDates } from './perfectGames'
 import type { RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 
@@ -87,5 +87,38 @@ describe('latestPerfects', () => {
     const result = latestPerfects([award(1, '2024-01-01T00:00:00Z', 0), award(1, '2024-06-01T00:00:00Z', 1)])
     expect(result).toHaveLength(1)
     expect(result[0]).toMatchObject({ date: '2024-06-01T00:00:00Z', hardcore: true, iconUrl: 'https://retroachievements.org/Images/1.png' })
+  })
+})
+
+describe('collection helpers', () => {
+  const award = (id: number, date: string, extra = 1) => ({
+    AwardedAt: date, AwardType: 'Mastery/Completion', AwardData: id, AwardDataExtra: extra, Title: `G${id}`, ConsoleName: 'SNES', ImageIcon: '',
+  })
+  const games = buildPerfectGames([ra(1, 'A'), ra(2, 'B', { HardcoreMode: '0' }), ra(3, 'C')], [steam(620, 'Portal 2')])
+
+  test('perfectDates: RA from its latest award, Steam from its last session', () => {
+    const dates = perfectDates([award(1, '2024-01-01T00:00:00Z'), award(1, '2025-03-01T00:00:00Z')], [steam(620, 'Portal 2', { lastPlayed: '2023-05-01T00:00:00Z' })])
+    expect(dates.get('ra:1')).toBe('2025-03-01T00:00:00Z')
+    expect(dates.get('steam:620')).toBe('2023-05-01T00:00:00Z')
+  })
+
+  test('filterPerfects picks one kind', () => {
+    expect(filterPerfects(games, 'raHc').map((g) => g.key)).toEqual(['ra:1', 'ra:3'])
+    expect(filterPerfects(games, 'raSc').map((g) => g.key)).toEqual(['ra:2'])
+    expect(filterPerfects(games, 'steam').map((g) => g.key)).toEqual(['steam:620'])
+    expect(filterPerfects(games, 'all')).toHaveLength(4)
+  })
+
+  test('groupPerfectsByYear: newest year first, newest game first, undated last', () => {
+    const dates = new Map([
+      ['ra:1', '2024-02-01T00:00:00Z'],
+      ['ra:3', '2024-09-01T00:00:00Z'],
+      ['steam:620', '2025-01-10T00:00:00Z'],
+    ])
+    expect(groupPerfectsByYear(games, dates).map((g) => [g.year, g.games.map((x) => x.key)])).toEqual([
+      [2025, ['steam:620']],
+      [2024, ['ra:3', 'ra:1']],
+      [null, ['ra:2']],
+    ])
   })
 })

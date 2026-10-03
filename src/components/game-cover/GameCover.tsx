@@ -27,15 +27,18 @@ export default function GameCover({
   const art = source === 'ra' ? boxArt[id] ?? iconUrl : undefined
   const img = 'h-full w-auto max-w-full object-contain rounded-lg ring-1 ring-white/10 shadow-xl shadow-black/40'
 
+  const picture =
+    source === 'steam' ? (
+      <SteamGameImage appId={id} size={240} className={img} />
+    ) : art ? (
+      <Image src={art} alt="" width={240} height={320} unoptimized className={img} />
+    ) : (
+      <span className="h-full aspect-[3/4] rounded-lg bg-bg-main" />
+    )
+
   return (
-    <span className={`${className} max-w-full flex items-end justify-center`}>
-      {source === 'steam' ? (
-        <SteamGameImage appId={id} size={240} className={img} />
-      ) : art ? (
-        <Image src={art} alt="" width={240} height={320} unoptimized className={img} />
-      ) : (
-        <span className="h-full aspect-[3/4] rounded-lg bg-bg-main" />
-      )}
+    <span className={`${className} relative max-w-full flex items-end justify-center`}>
+      {picture}
     </span>
   )
 }

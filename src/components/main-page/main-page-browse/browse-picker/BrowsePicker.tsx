@@ -83,7 +83,7 @@ export default function BrowsePicker({ pool }: { pool: LibraryGame[] }) {
     <div className="flex flex-col gap-4 h-full">
       {header}
 
-      <div className="flex-1 flex flex-col items-center justify-center gap-2 min-h-48 text-center">
+      <div className="flex-1 flex flex-col items-center justify-center gap-2 min-h-72 text-center">
         <AnimatePresence mode="wait" initial={false}>
           {picked ? (
             <motion.div
@@ -94,9 +94,9 @@ export default function BrowsePicker({ pool }: { pool: LibraryGame[] }) {
               exit={{ opacity: 0 }}
               transition={{ type: 'spring', stiffness: 260, damping: 22 }}
             >
-              <GameCover source={picked.source} id={picked.id} iconUrl={picked.iconUrl} className="h-32 sm:h-36" />
+              <GameCover source={picked.source} id={picked.id} iconUrl={picked.iconUrl} className="h-56 sm:h-64" />
               <div className="flex flex-col min-w-0 w-full" aria-live="polite">
-                <span className="text-sm font-semibold truncate">{picked.title}</span>
+                <span className="text-base font-semibold truncate">{picked.title}</span>
                 <span className="text-xs text-text-secondary truncate">
                   {picked.subtitle} · {T.categories[picked.status]}
                 </span>
@@ -104,7 +104,7 @@ export default function BrowsePicker({ pool }: { pool: LibraryGame[] }) {
             </motion.div>
           ) : spinning ? (
             <motion.div key="rolling" className="flex flex-col items-center gap-3 w-full" exit={{ opacity: 0 }}>
-              <span className="h-32 sm:h-36 aspect-[3/4] rounded-lg bg-bg-main ring-1 ring-white/10 animate-pulse" />
+              <span className="h-56 sm:h-64 aspect-[3/4] rounded-lg bg-bg-main ring-1 ring-white/10 animate-pulse" />
               <span className="text-sm font-semibold truncate w-full text-text-secondary">{rolling.title}</span>
             </motion.div>
           ) : (

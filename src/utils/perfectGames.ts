@@ -147,3 +147,52 @@ export function latestPerfects(
     .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
     .slice(0, count)
 }
+
+/**
+ * When each perfect game got to 100%, by key: RA from its latest mastery or
+ * completion award, Steam from its last session (Steam keeps no completion
+ * date; for a finished game that session is the one that finished it).
+ */
+export function perfectDates(awards: UserAward[] = [], steamGames: SteamGameProgress[] = []): Map<string, string> {
+  const byKey = new Map<string, string>()
+  for (const a of awards) {
+    if (a.AwardType !== 'Mastery/Completion') continue
+    const key = gameKey('ra', a.AwardData)
+    if ((byKey.get(key) ?? '') < a.AwardedAt) byKey.set(key, a.AwardedAt)
+  }
+  for (const g of steamGames) if (g.lastPlayed) byKey.set(gameKey('steam', g.id), g.lastPlayed)
+  return byKey
+}
+
+export type PerfectFilter = 'all' | 'raHc' | 'raSc' | 'steam'
+
+/** The perfect games of one kind: RA hardcore, RA softcore, Steam, or all of them. */
+export function filterPerfects(games: PerfectGame[], filter: PerfectFilter): PerfectGame[] {
+  if (filter === 'raHc') return games.filter((g) => g.source === 'ra' && g.hardcore)
+  if (filter === 'raSc') return games.filter((g) => g.source === 'ra' && !g.hardcore)
+  if (filter === 'steam') return games.filter((g) => g.source === 'steam')
+  return games
+}
+
+/**
+ * Perfect games grouped by the year they got to 100%, newest year first and
+ * newest game first inside it. Games with no known date go last, in a group
+ * of their own (year null), in the order given.
+ */
+export function groupPerfectsByYear(
+  games: PerfectGame[],
+  dates: Map<string, string>,
+): { year: number | null; games: PerfectGame[] }[] {
+  const byYear = new Map<number | null, PerfectGame[]>()
+  for (const g of games) {
+    const date = dates.get(g.key)
+    const year = date ? new Date(date.replace(' ', 'T')).getFullYear() : null
+    const key = year !== null && !isNaN(year) ? year : null
+    if (!byYear.has(key)) byYear.set(key, [])
+    byYear.get(key)!.push(g)
+  }
+  const time = (g: PerfectGame) => Date.parse((dates.get(g.key) ?? '').replace(' ', 'T')) || 0
+  return [...byYear]
+    .sort(([a], [b]) => (a === null ? 1 : b === null ? -1 : b - a))
+    .map(([year, list]) => ({ year, games: year === null ? list : [...list].sort((x, y) => time(y) - time(x)) }))
+}

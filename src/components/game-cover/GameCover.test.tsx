@@ -31,3 +31,4 @@ test('the caller sets the height', () => {
   const { container } = render(<GameCover source="steam" id={620} className="h-48" />)
   expect(container.firstElementChild).toHaveClass('h-48')
 })
+

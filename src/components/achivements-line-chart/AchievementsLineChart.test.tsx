@@ -19,20 +19,18 @@ const recentAchievements = [
   { Date: recentDate(2) } as never,
 ]
 
-test('renders the week as bars, with its total and its best day', () => {
+test('renders the week as a line, with its total and its best day', () => {
   render(<AchievementsLineChart achievements={recentAchievements} />)
   expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
-  expect(screen.getByTestId('BarChart')).toBeInTheDocument()
+  expect(screen.getByTestId('AreaChart')).toBeInTheDocument()
   expect(screen.getByText('3')).toBeInTheDocument()
   expect(screen.getByText(en.lineChart.bestDay.replace('{n}', '1'))).toBeInTheDocument()
 })
 
-test('stacks RA and Steam, and names both only when Steam is there', () => {
-  const { rerender } = render(<AchievementsLineChart achievements={recentAchievements} />)
-  expect(screen.queryByText('Steam')).not.toBeInTheDocument()
-  rerender(<AchievementsLineChart achievements={[...recentAchievements, { Date: recentDate(0), Source: 'steam' } as never]} />)
-  expect(screen.getByText('Steam')).toBeInTheDocument()
-  expect(screen.getAllByTestId('Bar')).toHaveLength(2)
+test('RA and Steam make one line; the split is in the tooltip', () => {
+  render(<AchievementsLineChart achievements={[...recentAchievements, { Date: recentDate(0), Source: 'steam' } as never]} />)
+  expect(screen.getAllByTestId('Area')).toHaveLength(1)
+  expect(screen.getByText('4')).toBeInTheDocument()
 })
 
 test('still renders the chart, flat at 0, with no achievements', () => {

@@ -24,15 +24,13 @@ jest.mock('@/components/achivements-line-chart/AchievementsLineChart', () => moc
 jest.mock('./MainPagePointsStats', () => mockProbe('points'))
 jest.mock('./MainPageRarest', () => mockProbe('rarest'))
 jest.mock('./MainPageAbandoned', () => mockProbe('abandoned'))
-jest.mock('./MainPageMastery', () => mockProbe('mastery'))
-jest.mock('./MainPagePerfectGames', () => mockProbe('perfect'))
+jest.mock('../main-page-collection/MainPageCollection', () => mockProbe('collection'))
 jest.mock('./MainPageBestPeriod', () => mockProbe('best'))
 jest.mock('./MainPageConsoleNav', () => mockProbe('nav'))
 jest.mock('../main-page-groups-section/MainPageGroupsSection', () => mockProbe('groups'))
 jest.mock('../main-page-favorites/MainPageFavorites', () => mockProbe('favorites'))
 jest.mock('./main-page-steam-stats/MainPageSteamStats', () => mockProbe('steam-stats'))
 jest.mock('./main-page-steam-nav/MainPageSteamNav', () => mockProbe('steam-nav'))
-jest.mock('./main-page-steam-mastery/MainPageSteamMastery', () => mockProbe('steam-mastery'))
 
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import MainPageCharts from './MainPageCharts'
@@ -90,9 +88,9 @@ function cardsAcrossSections() {
   return seen
 }
 
-const RA_ONLY = ['points', 'nav', 'mastery']
-const STEAM_ONLY = ['steam-stats', 'steam-nav', 'steam-mastery']
-const SHARED = ['heatmap', 'daily', 'top-games', 'rarest', 'abandoned', 'perfect', 'groups', 'favorites', 'best']
+const RA_ONLY = ['points', 'nav']
+const STEAM_ONLY = ['steam-stats', 'steam-nav']
+const SHARED = ['heatmap', 'daily', 'top-games', 'rarest', 'abandoned', 'collection', 'groups', 'favorites', 'best']
 
 test('the shared cards are there whichever platform is selected', () => {
   platform('steam')
@@ -161,6 +159,6 @@ describe('sections', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Collection' }))
     const panel = screen.getByRole('tabpanel')
     expect(panel).toHaveAccessibleName('Collection')
-    expect(screen.getByTestId('perfect')).toBeInTheDocument()
+    expect(screen.getByTestId('collection')).toBeInTheDocument()
   })
 })

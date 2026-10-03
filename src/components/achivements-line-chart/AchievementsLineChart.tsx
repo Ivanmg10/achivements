@@ -1,23 +1,19 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { AnimatePresence, useReducedMotion } from 'framer-motion'
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { RecentAchievement } from '@/types/types'
 import { groupByDaySource } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import AchivementsLineChartTooltip from './achivements-line-chart-tooltip/AchivementsLineChartTooltip'
 
-const STEAM = '#66c0f4'
-
 /**
- * The last seven days of unlocks, one bar per day, RA and Steam stacked in
- * their own colours (a day's count is a count, so bars, not a curve that
- * would invent values between days). Above it the week's total and its best
- * day. Clicking a day opens what was unlocked on it.
- *
- * The name is historical: it was a line chart, and three pages import it.
+ * The last seven days of unlocks as a line in the theme's accent, with a soft
+ * fill fading down from it. A dot marks each day that had any; the tooltip
+ * splits a day into RA and Steam. Above it the week's total and its best day.
+ * Clicking a day opens what was unlocked on it.
  */
 export default function AchievementsLineChart({
   achievements,
@@ -33,7 +29,7 @@ export default function AchievementsLineChart({
   const data = useMemo(() => groupByDaySource(achievements, 7), [achievements])
   const total = data.reduce((sum, d) => sum + d.total, 0)
   const best = Math.max(...data.map((d) => d.total))
-  const hasSteam = data.some((d) => d.steam > 0)
+  const fillId = `daily-fill-${useId().replace(/:/g, '')}`
   const today = data[data.length - 1]?.date
 
   const tick = (date: string) =>
@@ -55,12 +51,6 @@ export default function AchievementsLineChart({
         </p>
         <div className="flex items-center gap-3 text-[11px] text-text-secondary">
           {best > 0 && <span>{T.lineChart.bestDay.replace('{n}', String(best))}</span>}
-          {hasSteam && (
-            <span className="flex items-center gap-2">
-              <span className="flex items-center gap-1"><span aria-hidden="true" className="w-2 h-2 rounded-sm bg-chart-2" />RA</span>
-              <span className="flex items-center gap-1"><span aria-hidden="true" className="w-2 h-2 rounded-sm bg-[#66c0f4]" />Steam</span>
-            </span>
-          )}
         </div>
       </div>
 
@@ -79,7 +69,13 @@ export default function AchievementsLineChart({
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={data} margin={{ top: 4, right: 4, left: -24, bottom: 0 }} onClick={handleChartClick} style={{ cursor: 'pointer' }} barCategoryGap="22%">
+          <AreaChart data={data} margin={{ top: 8, right: 8, left: -24, bottom: 0 }} onClick={handleChartClick} style={{ cursor: 'pointer' }}>
+            <defs>
+              <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgb(var(--accent))" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="rgb(var(--accent))" stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <CartesianGrid vertical={false} strokeDasharray="3 4" stroke="rgb(var(--text-secondary) / 0.15)" />
             <XAxis
               dataKey="date"
@@ -97,10 +93,27 @@ export default function AchievementsLineChart({
               allowDecimals={false}
               domain={total === 0 ? [0, 1] : [0, 'auto']}
             />
-            <Tooltip cursor={{ fill: 'rgb(var(--text-secondary) / 0.08)', radius: 8 }} content={<AchivementsLineChartTooltip />} />
-            <Bar dataKey="ra" stackId="day" fill="rgb(var(--chart-2))" radius={hasSteam ? [0, 0, 0, 0] : [6, 6, 0, 0]} isAnimationActive={!reduce} />
-            <Bar dataKey="steam" stackId="day" fill={STEAM} radius={[6, 6, 0, 0]} isAnimationActive={!reduce} />
-          </BarChart>
+            <Tooltip
+              cursor={{ stroke: 'rgb(var(--text-secondary) / 0.35)', strokeDasharray: '3 3' }}
+              content={<AchivementsLineChartTooltip />}
+            />
+            <Area
+              type="monotone"
+              dataKey="total"
+              stroke="rgb(var(--accent))"
+              strokeWidth={2.5}
+              fill={`url(#${fillId})`}
+              dot={/* istanbul ignore next */ (p: { cx?: number; cy?: number; payload?: { total: number }; index?: number }) =>
+                p.payload && p.payload.total > 0 ? (
+                  <circle key={p.index} cx={p.cx} cy={p.cy} r={4} fill="rgb(var(--accent))" stroke="rgb(var(--bg-card))" strokeWidth={2} />
+                ) : (
+                  <g key={p.index} />
+                )
+              }
+              activeDot={{ r: 6, fill: 'rgb(var(--accent))', stroke: 'rgb(var(--bg-card))', strokeWidth: 2 }}
+              isAnimationActive={!reduce}
+            />
+          </AreaChart>
         </ResponsiveContainer>
       )}
 
