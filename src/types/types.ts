@@ -1,12 +1,19 @@
 import type { GameSource, SteamAchievementUnified } from '@/types/steam'
 
 /** Every theme the app has a stylesheet for; the endpoints that store one accept only these. */
-export const THEMES = ['dark', 'light', 'blue', 'purple', 'green', 'red', 'synthwave', 'catppuccin', 'gruvbox', 'rose-pine', 'oled', 'ocean', 'terminal', 'sakura', 'arctic'] as const
+export const THEMES = ['dark', 'light', 'blue', 'purple', 'green', 'red', 'synthwave', 'catppuccin', 'gruvbox', 'rose-pine', 'oled', 'ocean', 'terminal', 'sakura', 'arctic', 'daxter', 'bentley', 'clank', 'black-ops-2', 'san-andreas', 'snake-eater'] as const
 
 /** Where the browser keeps the last theme, so the page is painted in it before React loads. */
 export const THEME_STORAGE_KEY = 'app-theme'
 
 export type Theme = (typeof THEMES)[number]
+
+/** How the theme picker sorts them; every theme sits in exactly one group. */
+export const THEME_GROUPS: { id: 'base' | 'palettes' | 'games'; themes: Theme[] }[] = [
+  { id: 'base', themes: ['dark', 'light', 'blue', 'purple', 'green', 'red', 'synthwave'] },
+  { id: 'palettes', themes: ['catppuccin', 'gruvbox', 'rose-pine', 'oled', 'ocean', 'terminal', 'sakura', 'arctic'] },
+  { id: 'games', themes: ['daxter', 'bentley', 'clank', 'black-ops-2', 'san-andreas', 'snake-eater'] },
+]
 
 export function isTheme(value: unknown): value is Theme {
   return typeof value === 'string' && (THEMES as readonly string[]).includes(value)

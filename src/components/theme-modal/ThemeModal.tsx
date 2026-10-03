@@ -2,13 +2,12 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { IconCheck } from '@tabler/icons-react'
 import CommonModal from '../common-modal/CommonModal'
 import { useTheme } from '@/context/ThemeContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { Theme, THEMES } from '@/types/types'
+import { Theme, THEME_GROUPS } from '@/types/types'
 import { notify } from '@/lib/notify'
-import ThemePreview from '../theme-preview/ThemePreview'
+import ThemeModalOption from './theme-modal-option/ThemeModalOption'
 
 interface Props {
   isOpen: boolean
@@ -45,30 +44,19 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
 
   return (
     <CommonModal isOpen={isOpen} onClose={onClose} className="mx-4 sm:max-w-2xl max-h-[90dvh] overflow-y-auto justify-start!">
-      <h2 className="text-xl font-bold mb-4">{T.userTheme.theme}</h2>
-      <div
-        role="radiogroup"
-        aria-label={T.userTheme.theme}
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
-      >
-        {THEMES.map((id) => (
-          <button
-            key={id}
-            onClick={() => handleSelect(id)}
-            role="radio"
-            aria-checked={theme === id}
-            className={`theme-button rounded-xl p-2 border-2 transition-all text-left ${
-              theme === id
-                ? 'border-accent ring-2 ring-accent/30'
-                : 'border-bg-header hover:border-accent/50'
-            }`}
-          >
-            <ThemePreview theme={id} />
-            <span className="mt-2 flex items-center justify-center gap-1.5 text-xs font-medium text-text-main">
-              {theme === id && <IconCheck size={12} aria-hidden="true" />}
-              {T.userTheme[`name_${id}`]}
-            </span>
-          </button>
+      <h2 className="text-xl font-bold">{T.userTheme.theme}</h2>
+      <div role="radiogroup" aria-label={T.userTheme.theme} className="flex flex-col gap-5">
+        {THEME_GROUPS.map((group) => (
+          <section key={group.id} aria-labelledby={`theme-group-${group.id}`} className="flex flex-col gap-2">
+            <h3 id={`theme-group-${group.id}`} className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              {T.userTheme[`group_${group.id}`]}
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {group.themes.map((id) => (
+                <ThemeModalOption key={id} theme={id} checked={theme === id} onSelect={handleSelect} />
+              ))}
+            </div>
+          </section>
         ))}
       </div>
       {saveError && (

@@ -465,6 +465,144 @@
 }
 
 /* ============================================
+   DAXTER (Jak and Daxter): ottsel orange on warm brown; blue and green eco
+   ============================================ */
+[data-theme="daxter"] {
+  --bg-main: 27 17 11;
+  --bg-header: 20 12 7;
+  --bg-card: 40 27 18;
+  --bg-tertiary: 60 41 28;
+
+  --text-main: 250 236 214;
+  --text-secondary: 196 164 128;
+
+  --accent: 255 155 55;
+  --accent-hover: 255 178 96;
+  --accent-muted: 255 155 55;
+
+  --success: 132 220 80;
+  --warning: 250 204 21;
+  --info: 90 180 255;
+  --danger: 248 113 113;
+  --chart-2: 90 180 255;
+}
+
+/* ============================================
+   BENTLEY (Sly Cooper): turtle green on midnight navy noir
+   ============================================ */
+[data-theme="bentley"] {
+  --bg-main: 13 17 32;
+  --bg-header: 9 12 24;
+  --bg-card: 21 27 48;
+  --bg-tertiary: 33 41 68;
+
+  --text-main: 226 232 244;
+  --text-secondary: 140 152 180;
+
+  --accent: 160 208 90;
+  --accent-hover: 184 226 120;
+  --accent-muted: 160 208 90;
+
+  --success: 45 212 191;
+  --warning: 251 191 36;
+  --info: 129 140 248;
+  --danger: 248 113 113;
+  --chart-2: 251 191 36;
+}
+
+/* ============================================
+   CLANK (Ratchet & Clank): gunmetal body, green eyes, red antenna light
+   ============================================ */
+[data-theme="clank"] {
+  --bg-main: 22 25 30;
+  --bg-header: 16 18 22;
+  --bg-card: 33 38 46;
+  --bg-tertiary: 48 55 66;
+
+  --text-main: 222 228 236;
+  --text-secondary: 150 160 174;
+
+  --accent: 110 231 150;
+  --accent-hover: 150 240 180;
+  --accent-muted: 110 231 150;
+
+  --success: 56 189 248;
+  --warning: 251 191 36;
+  --info: 165 180 252;
+  --danger: 255 95 95;
+  --chart-2: 251 191 36;
+}
+
+/* ============================================
+   BLACK OPS II: hot safety orange on cold near-black
+   ============================================ */
+[data-theme="black-ops-2"] {
+  --bg-main: 9 10 12;
+  --bg-header: 5 6 7;
+  --bg-card: 20 22 25;
+  --bg-tertiary: 34 37 42;
+
+  --text-main: 236 238 240;
+  --text-secondary: 150 154 160;
+
+  --accent: 255 102 0;
+  --accent-hover: 255 133 51;
+  --accent-muted: 255 102 0;
+
+  --success: 34 197 94;
+  --warning: 250 204 21;
+  --info: 96 165 250;
+  --danger: 248 113 113;
+  --chart-2: 250 204 21;
+}
+
+/* ============================================
+   SAN ANDREAS: Grove Street green on smoggy Los Santos sepia
+   ============================================ */
+[data-theme="san-andreas"] {
+  --bg-main: 23 19 13;
+  --bg-header: 17 14 9;
+  --bg-card: 35 29 20;
+  --bg-tertiary: 54 45 31;
+
+  --text-main: 240 230 210;
+  --text-secondary: 176 160 130;
+
+  --accent: 88 190 90;
+  --accent-hover: 120 210 120;
+  --accent-muted: 88 190 90;
+
+  --success: 56 189 248;
+  --warning: 250 204 21;
+  --info: 147 197 253;
+  --danger: 248 113 113;
+  --chart-2: 250 204 21;
+}
+
+/* ============================================
+   SNAKE EATER (Metal Gear Solid 3): olive drab, khaki and tan; codec green
+   ============================================ */
+[data-theme="snake-eater"] {
+  --bg-main: 21 23 15;
+  --bg-header: 15 17 10;
+  --bg-card: 32 35 23;
+  --bg-tertiary: 48 52 35;
+
+  --text-main: 226 220 196;
+  --text-secondary: 160 156 128;
+
+  --accent: 204 172 112;
+  --accent-hover: 222 194 140;
+  --accent-muted: 204 172 112;
+
+  --success: 132 204 22;
+  --warning: 251 146 60;
+  --info: 110 220 190;
+  --danger: 248 113 113;
+  --chart-2: 110 220 190;
+}
+
+/* ============================================
    UTILITY CLASSES — Botones de tema
    ============================================ */
 
