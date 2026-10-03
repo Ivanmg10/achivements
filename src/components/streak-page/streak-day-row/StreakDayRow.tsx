@@ -83,7 +83,7 @@ export default function StreakDayRow({ date, achievements, awards = [] }: Props)
           <button
             onClick={() => setModalOpen(true)}
             aria-label={`+${overflow} ${T.streak.achievements}`}
-            className="w-10 h-10 rounded-lg bg-bg-main ring-1 ring-white/10 flex items-center justify-center shrink-0 cursor-pointer hover:ring-accent/40 hover:bg-accent/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 group"
+            className="w-10 h-10 rounded-lg bg-bg-main ring-1 ring-ink/10 flex items-center justify-center shrink-0 cursor-pointer hover:ring-accent/40 hover:bg-accent/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 group"
           >
             <span className="text-[10px] font-bold text-text-secondary group-hover:text-accent transition-colors leading-none">
               +{overflow}

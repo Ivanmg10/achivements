@@ -104,7 +104,7 @@ export default function BrowsePicker({ pool }: { pool: LibraryGame[] }) {
             </motion.div>
           ) : spinning ? (
             <motion.div key="rolling" className="flex flex-col items-center gap-3 w-full" exit={{ opacity: 0 }}>
-              <span className="h-56 sm:h-64 aspect-[3/4] rounded-lg bg-bg-main ring-1 ring-white/10 animate-pulse" />
+              <span className="h-56 sm:h-64 aspect-[3/4] rounded-lg bg-bg-main ring-1 ring-ink/10 animate-pulse" />
               <span className="text-sm font-semibold truncate w-full text-text-secondary">{rolling.title}</span>
             </motion.div>
           ) : (
@@ -127,7 +127,7 @@ export default function BrowsePicker({ pool }: { pool: LibraryGame[] }) {
         {picked && (
           <Link
             href={picked.href}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-bg-main ring-1 ring-white/10 text-sm font-medium hover:ring-white/25 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-bg-main ring-1 ring-ink/10 text-sm font-medium hover:ring-ink/25 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             {T.cards.pickOpen}
             <IconArrowRight size={16} aria-hidden="true" />

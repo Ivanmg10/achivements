@@ -104,7 +104,7 @@ export default function UserIdentityCard() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           {/* The flag in the session decides the button; the panel itself asks the DB and a password. */}
           {user?.admin && (
             <button

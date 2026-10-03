@@ -28,7 +28,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
             type="button"
             onClick={onClose}
             aria-label={T.userPage.close}
-            className="p-1.5 rounded-lg text-text-secondary hover:text-text-main hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1.5 rounded-lg text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <IconX size={18} aria-hidden="true" />
           </button>
@@ -43,7 +43,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
                 {g.image ? (
                   <Image src={g.image} alt="" width={40} height={40} unoptimized className="w-10 h-10 rounded-lg object-cover shrink-0" />
                 ) : (
-                  <span aria-hidden="true" className="w-10 h-10 rounded-lg bg-white/10 shrink-0" />
+                  <span aria-hidden="true" className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" />
                 )}
                 <span className="flex flex-col min-w-0 flex-1">
                   <span className="text-sm font-medium truncate">{g.title}</span>
@@ -60,7 +60,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
                   type="button"
                   onClick={() => showGame(g.id, g.source)}
                   aria-label={T.userPage.showGame.replace('{title}', g.title)}
-                  className="p-2 rounded-lg text-text-secondary hover:text-accent hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="p-2 rounded-lg text-text-secondary hover:text-accent hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 >
                   <IconEye size={18} aria-hidden="true" />
                 </button>

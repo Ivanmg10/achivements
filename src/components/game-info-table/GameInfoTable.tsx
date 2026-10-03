@@ -169,7 +169,7 @@ export default function GameInfoTable({
       {gameData && needsToggle && (
         <button
           onClick={() => setTableExpanded((e) => !e)}
-          className="w-full flex items-center justify-between px-5 py-3 rounded-xl bg-bg-header/40 hover:bg-bg-header/60 backdrop-blur-sm border border-white/5 transition-all group"
+          className="w-full flex items-center justify-between px-5 py-3 rounded-xl bg-bg-header/40 hover:bg-bg-header/60 backdrop-blur-sm border border-ink/5 transition-all group"
         >
           <span className="flex items-center gap-2 text-sm font-medium text-text-main">
             <span className={`inline-block transition-transform duration-300 ${tableExpanded ? 'rotate-180' : ''}`}>

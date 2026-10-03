@@ -467,16 +467,16 @@ export default function GroupDetailPage() {
     return (
       <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4">
         <div className="w-full lg:max-w-[98%] flex flex-col gap-3 animate-pulse">
-          <div className="h-6 w-24 rounded bg-white/10" />
+          <div className="h-6 w-24 rounded bg-ink/10" />
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-white/10 shrink-0" />
+            <div className="w-14 h-14 rounded-xl bg-ink/10 shrink-0" />
             <div className="flex flex-col gap-2 flex-1">
-              <div className="h-6 w-48 rounded bg-white/10" />
-              <div className="h-3 w-32 rounded bg-white/10" />
+              <div className="h-6 w-48 rounded bg-ink/10" />
+              <div className="h-3 w-32 rounded bg-ink/10" />
             </div>
           </div>
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-32 rounded-xl bg-white/10" />
+            <div key={i} className="h-32 rounded-xl bg-ink/10" />
           ))}
         </div>
       </div>
@@ -487,7 +487,7 @@ export default function GroupDetailPage() {
 
   return (
     <motion.div
-      className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white"
+      className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main"
       variants={fadeUp}
       initial="hidden"
       animate="visible"

@@ -35,7 +35,7 @@ export default function MainPageMastery({
         </div>
         <div className="grid grid-cols-4 gap-1.5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="aspect-square rounded bg-white/10 animate-pulse" />
+            <div key={i} className="aspect-square rounded bg-ink/10 animate-pulse" />
           ))}
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function MainPageMastery({
                     className="w-full aspect-square object-cover rounded hover:scale-105 transition-transform"
                   />
                 ) : (
-                  <div className="w-full aspect-square rounded bg-white/10" />
+                  <div className="w-full aspect-square rounded bg-ink/10" />
                 )}
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-warning rounded-full border border-bg-card" aria-hidden="true" />
               </Link>

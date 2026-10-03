@@ -11,7 +11,7 @@ import CompletionDistribution from '@/components/completion-distribution/Complet
 import MasteryMix from '@/components/main-page/main-page-charts/mastery-mix/MasteryMix'
 import ClosestToComplete, { CLOSEST_SHOWN, ClosestGame } from '@/components/main-page/main-page-charts/closest-to-complete/ClosestToComplete'
 
-const BLOCK = 'flex flex-col gap-3 pt-4 border-t border-white/[0.06] first:pt-0 first:border-t-0'
+const BLOCK = 'flex flex-col gap-3 pt-4 border-t border-ink/[0.06] first:pt-0 first:border-t-0'
 
 /**
  * The numbers behind the collection, both platforms at once (they no longer

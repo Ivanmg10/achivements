@@ -80,7 +80,7 @@ export default function StreakList({ selectedStreak }: Props) {
 
       <div className="flex flex-col">
         {allDays.map(date => (
-          <div key={date} className="pt-6 pb-6 border-b border-white/5 last:border-none last:pb-0 first:pt-0">
+          <div key={date} className="pt-6 pb-6 border-b border-ink/5 last:border-none last:pb-0 first:pt-0">
             <StreakDayRow
               date={date}
               achievements={byDate[date] ?? []}

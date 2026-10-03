@@ -99,7 +99,7 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
         </div>
 
         {totalAch > 0 && (
-          <p className="text-xs text-text-secondary text-right pt-2 border-t border-white/5 shrink-0">
+          <p className="text-xs text-text-secondary text-right pt-2 border-t border-ink/5 shrink-0">
             {totalAch} {T.dayModal.achievements}{hasPoints && ` · ${totalPts.toLocaleString()}pts`}
           </p>
         )}

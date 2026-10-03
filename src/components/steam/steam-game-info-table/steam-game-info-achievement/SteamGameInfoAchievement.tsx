@@ -47,7 +47,7 @@ export default function SteamGameInfoAchievement({
             unoptimized
           />
         ) : (
-          <div className="w-16 h-16 rounded-xl bg-white/10 mx-auto" aria-hidden="true" />
+          <div className="w-16 h-16 rounded-xl bg-ink/10 mx-auto" aria-hidden="true" />
         )}
       </td>
 

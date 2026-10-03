@@ -29,7 +29,7 @@ export default function AdminUserCard({
   const country = user.location ? findCountry(user.location) : null
 
   return (
-    <li className="bg-bg-card rounded-2xl p-4 flex flex-col gap-3 ring-1 ring-white/5 hover:ring-white/15 transition-shadow">
+    <li className="bg-bg-card rounded-2xl p-4 flex flex-col gap-3 ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow">
       <div className="flex items-start gap-3">
         {user.avatar ? (
           <Image

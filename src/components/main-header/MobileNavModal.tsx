@@ -87,12 +87,12 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
         >
           <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-full max-w-sm px-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl overflow-hidden border border-white/5"
+              className="bg-bg-card rounded-2xl shadow-2xl overflow-hidden border border-ink/5"
               variants={contentVariants}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/5">
+              <div className="flex items-center justify-between px-4 py-3.5 border-b border-ink/5">
                 <span className="text-sm font-medium text-text-main">Menú</span>
                 <button
                   onClick={onClose}

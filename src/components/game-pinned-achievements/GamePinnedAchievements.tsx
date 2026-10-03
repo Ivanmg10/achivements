@@ -75,12 +75,12 @@ export function GamePinnedAchievements({
         <div className="flex flex-col gap-2 animate-pulse">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-2 py-1.5">
-              <div className="w-9 h-9 rounded-lg bg-white/10 shrink-0" />
+              <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
               <div className="flex flex-col gap-1.5 flex-1">
-                <div className="h-2.5 w-28 rounded bg-white/10" />
-                <div className="h-2 w-20 rounded bg-white/10" />
+                <div className="h-2.5 w-28 rounded bg-ink/10" />
+                <div className="h-2 w-20 rounded bg-ink/10" />
               </div>
-              <div className="w-6 h-4 rounded bg-white/10 shrink-0" />
+              <div className="w-6 h-4 rounded bg-ink/10 shrink-0" />
             </div>
           ))}
         </div>
@@ -89,7 +89,7 @@ export function GamePinnedAchievements({
           <button
             onClick={() => setModalOpen(true)}
             aria-label={T.gameExpanded.pinAchievementAria}
-            className="w-full flex-1 rounded-lg border-2 border-dashed border-white/15 flex flex-col items-center justify-center gap-1.5 text-text-secondary/50 hover:text-text-main hover:border-white/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="w-full flex-1 rounded-lg border-2 border-dashed border-ink/15 flex flex-col items-center justify-center gap-1.5 text-text-secondary/50 hover:text-text-main hover:border-ink/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <IconPlus className="w-6 h-6" aria-hidden />
             <span className="text-xs">{T.gameExpanded.pinAchievementAria}</span>
@@ -119,7 +119,7 @@ export function GamePinnedAchievements({
                       unoptimized
                     />
                   ) : (
-                    <div className="w-9 h-9 rounded-lg bg-white/10 shrink-0" />
+                    <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
                   )}
                   <div className="flex flex-col min-w-0 flex-1">
                     <p className="text-xs font-medium truncate">{row.snapshot.Title}</p>
@@ -147,7 +147,7 @@ export function GamePinnedAchievements({
             <button
               onClick={() => setModalOpen(true)}
               aria-label={T.gameExpanded.pinAchievementAria}
-              className="w-full rounded-lg border-2 border-dashed border-white/15 flex items-center justify-center gap-1.5 py-2 text-text-secondary/50 hover:text-text-main hover:border-white/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="w-full rounded-lg border-2 border-dashed border-ink/15 flex items-center justify-center gap-1.5 py-2 text-text-secondary/50 hover:text-text-main hover:border-ink/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <IconPlus className="w-4 h-4" aria-hidden />
               <span className="text-xs">{T.gameExpanded.pinAchievementAria}</span>

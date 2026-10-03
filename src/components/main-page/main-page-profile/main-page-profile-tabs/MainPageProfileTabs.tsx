@@ -52,7 +52,7 @@ export default function MainPageProfileTabs<T extends string>({
     <div
       role="tablist"
       aria-label={T.steam.profileTabsLabel}
-      className="flex items-center gap-4 w-full px-1 border-b border-white/5"
+      className="flex items-center gap-4 w-full px-1 border-b border-ink/5"
     >
       {tabs.map((tab, i) => {
         const active = tab.id === selected

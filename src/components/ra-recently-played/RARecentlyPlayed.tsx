@@ -86,7 +86,7 @@ export default function RARecentlyPlayed() {
               exit={{ opacity: 0, x: -8 }}
               transition={{ duration: 0.2 }}
               onClick={() => setExpanded(null)}
-              className="p-1 rounded-lg hover:bg-white/10 transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none"
+              className="p-1 rounded-lg hover:bg-ink/10 transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none"
             >
               <IconChevronLeft className="w-4 h-4" />
             </motion.button>

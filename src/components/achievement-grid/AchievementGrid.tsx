@@ -83,7 +83,7 @@ export const AchievementGrid = memo(function AchievementGrid({
     return (
       <div className="flex flex-wrap gap-1">
         {Array.from({ length: Math.min(total, 30) }).map((_, i) => (
-          <div key={i} className={`${size.badge} rounded-lg bg-white/10 animate-pulse`} />
+          <div key={i} className={`${size.badge} rounded-lg bg-ink/10 animate-pulse`} />
         ))}
       </div>
     )
@@ -127,7 +127,7 @@ export const AchievementGrid = memo(function AchievementGrid({
                   unoptimized
                 />
               ) : (
-                <div className={`${size.badge} rounded-lg bg-white/10 ${earnedAny ? '' : 'opacity-40'}`} />
+                <div className={`${size.badge} rounded-lg bg-ink/10 ${earnedAny ? '' : 'opacity-40'}`} />
               )}
             </div>
           )

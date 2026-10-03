@@ -23,7 +23,7 @@ export function GameListRow({
   return (
     <Link
       href={href}
-      className="flex items-center gap-2 bg-bg-main rounded-lg p-2 hover:bg-white/5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="flex items-center gap-2 bg-bg-main rounded-lg p-2 hover:bg-ink/5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       {imageUrl && (
         <Image

@@ -30,7 +30,7 @@ export function CircularProgress({
             cy={size / 2}
             r={radius}
             strokeWidth={strokeWidth}
-            className="fill-none stroke-white/10"
+            className="fill-none stroke-ink/10"
           />
           <circle
             cx={size / 2}

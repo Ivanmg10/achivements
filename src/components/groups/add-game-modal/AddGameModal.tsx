@@ -151,11 +151,11 @@ export default function AddGameModal({
         >
           <div className="absolute top-[12%] left-1/2 -translate-x-1/2 w-full max-w-2xl px-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl border border-white/5 flex flex-col overflow-hidden"
+              className="bg-bg-card rounded-2xl shadow-2xl border border-ink/5 flex flex-col overflow-hidden"
               variants={spotlightVariants}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center gap-3 px-4 py-3.5 border-b border-white/5 shrink-0">
+              <div className="flex items-center gap-3 px-4 py-3.5 border-b border-ink/5 shrink-0">
                 <IconSearch className="w-5 h-5 text-text-secondary shrink-0" aria-hidden />
                 <input
                   ref={inputRef}
@@ -183,7 +183,7 @@ export default function AddGameModal({
                     <button
                       onClick={() => addDirectById(directGameId)}
                       aria-pressed={selected.has(directKey)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-t border-white/5 ${selected.has(directKey) ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
+                      className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-t border-ink/5 ${selected.has(directKey) ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
                     >
                       <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">
                         ID
@@ -196,7 +196,7 @@ export default function AddGameModal({
                       </div>
                       <div
                         aria-hidden="true"
-                        className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected.has(directKey) ? 'bg-accent border-accent' : 'border-white/20'}`}
+                        className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected.has(directKey) ? 'bg-accent border-accent' : 'border-ink/20'}`}
                       >
                         {selected.has(directKey) && <IconCheck className="w-3 h-3 text-bg-main" />}
                       </div>
@@ -206,7 +206,7 @@ export default function AddGameModal({
               )}
 
               {selected.size > 0 && (
-                <div className="border-t border-white/5 px-4 py-3 flex flex-col gap-3 shrink-0">
+                <div className="border-t border-ink/5 px-4 py-3 flex flex-col gap-3 shrink-0">
                   <div className="flex flex-wrap gap-1.5">
                     {Array.from(selected.values()).map((c) => (
                       <GamePickerChip key={c.key} candidate={c} removeLabel={`${T.groups.removeGame} ${c.title}`} onRemove={() => toggle(c)} />

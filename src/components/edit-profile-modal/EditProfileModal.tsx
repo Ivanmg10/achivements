@@ -104,9 +104,9 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
         <>
           <AvatarUpload onDone={handleClose} />
           <div className="flex items-center gap-3 text-xs text-text-secondary">
-            <span aria-hidden="true" className="h-px flex-1 bg-white/10" />
+            <span aria-hidden="true" className="h-px flex-1 bg-ink/10" />
             {T.editProfileModal.uploadOr}
-            <span aria-hidden="true" className="h-px flex-1 bg-white/10" />
+            <span aria-hidden="true" className="h-px flex-1 bg-ink/10" />
           </div>
         </>
       )}

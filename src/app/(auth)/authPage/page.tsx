@@ -87,7 +87,7 @@ function AuthPageContent() {
 
       {/* Signing up hands over data: what happens to it is one click away. */}
       <div className="relative pb-6 lg:pb-0 lg:absolute lg:bottom-4 lg:inset-x-0 z-20 flex justify-center pointer-events-none">
-        <div className="pointer-events-auto text-xs bg-bg-main/80 backdrop-blur px-3 py-1.5 rounded-full border border-white/10">
+        <div className="pointer-events-auto text-xs bg-bg-main/80 backdrop-blur px-3 py-1.5 rounded-full border border-ink/10">
           <LegalLinks />
         </div>
       </div>

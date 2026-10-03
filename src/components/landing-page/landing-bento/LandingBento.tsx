@@ -42,7 +42,7 @@ export default function LandingBento() {
               alt=""
               loading="lazy"
               decoding="async"
-              className="absolute bottom-0 w-24 h-32 sm:w-32 sm:h-44 object-cover rounded-2xl ring-1 ring-white/10 shadow-2xl shadow-black/50 transition-transform duration-500"
+              className="absolute bottom-0 w-24 h-32 sm:w-32 sm:h-44 object-cover rounded-2xl ring-1 ring-ink/10 shadow-2xl shadow-black/50 transition-transform duration-500"
               style={{
                 transform: `translateX(calc(var(--fan) * ${FAN[i]})) rotate(${FAN[i]}deg) translateY(${Math.abs(FAN[i]) * 0.8}px)`,
                 zIndex: 10 - Math.abs(FAN[i]),
@@ -50,7 +50,7 @@ export default function LandingBento() {
             />
           ))}
         </div>
-        <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 pt-4 border-t border-white/5 text-sm text-text-secondary">
+        <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 pt-4 border-t border-ink/5 text-sm text-text-secondary">
           <li className="text-xs uppercase tracking-widest text-text-secondary/60">{T.landing.platformsLead}</li>
           <li className="flex items-center gap-2">
             <RaLogo height={14} />

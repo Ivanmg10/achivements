@@ -61,26 +61,26 @@ export default function SteamStatusGameItem({
       ref={itemRef}
       style={style}
       onPointerMove={onPointerMove}
-      className="spotlight bg-bg-card rounded-2xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow duration-150"
+      className="spotlight bg-bg-card rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow duration-150"
     >
       {/* The same blurred art and pointer glow as the RA card beside it. */}
       <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} surface="card" />
-      <div className="flex flex-row items-start gap-5 p-5">
+      <div className="flex flex-row items-start gap-3 sm:gap-5 p-4 sm:p-5">
         {/* Same destination as the title link, so it is kept out of the tab order. */}
         <Link href={href} tabIndex={-1} aria-hidden="true" className="shrink-0">
           <div
-            className={`w-24 h-24 rounded-xl overflow-hidden transition-all duration-150 ${
-              isComplete ? 'ring-2 ring-[#a4d007]/70 hover:ring-[#a4d007]' : 'hover:ring-2 hover:ring-white/40'
+            className={`w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden transition-all duration-150 ${
+              isComplete ? 'ring-2 ring-[#a4d007]/70 hover:ring-[#a4d007]' : 'hover:ring-2 hover:ring-ink/40'
             }`}
           >
-            <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageIcon} size={96} className="w-24 h-24 block" />
+            <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageIcon} size={96} className="w-16 h-16 sm:w-24 sm:h-24 block" />
           </div>
         </Link>
 
         <div className="flex flex-col flex-1 min-w-0 gap-1">
           <Link
             href={href}
-            className="self-start hover:underline decoration-white/50 underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
+            className="self-start hover:underline decoration-ink/50 underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
           >
             <p className="text-xl font-semibold leading-tight">{game.title}</p>
           </Link>
@@ -137,7 +137,7 @@ export default function SteamStatusGameItem({
           </button>
         </div>
 
-        <span className="flex items-center gap-1 self-center">
+        <span className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 shrink-0 self-start sm:self-center -mr-2 sm:mr-0">
           <HideGameButton source="steam" gameId={game.id} title={game.title} image={steamAssetUrl(game.id, 'header')} />
           <PinToggleButton gameId={game.id} source="steam" />
         </span>

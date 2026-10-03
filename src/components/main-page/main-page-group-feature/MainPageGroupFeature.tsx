@@ -66,14 +66,14 @@ export default function MainPageGroupFeature({ group }: { group: GameGroup }) {
               <li key={item.id}>
                 <Link
                   href={itemHref(item)}
-                  className="flex items-center gap-3 rounded-xl bg-bg-main p-2.5 hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 min-w-0"
+                  className="flex items-center gap-3 rounded-xl bg-bg-main p-2.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 min-w-0"
                 >
                   {item.source === 'steam' ? (
                     <SteamGameImage appId={item.game_id} asset="icon" iconUrl={item.image_icon ?? undefined} size={40} className="w-10 h-10 rounded-lg object-cover shrink-0" />
                   ) : item.image_icon ? (
                     <Image src={`https://retroachievements.org${item.image_icon}`} alt="" width={40} height={40} className="w-10 h-10 rounded-lg object-cover shrink-0" />
                   ) : (
-                    <span aria-hidden="true" className="w-10 h-10 rounded-lg bg-white/10 shrink-0" />
+                    <span aria-hidden="true" className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" />
                   )}
                   <span className="flex flex-col min-w-0 flex-1 gap-1">
                     <span className="text-sm font-semibold truncate">{item.title}</span>
@@ -81,7 +81,7 @@ export default function MainPageGroupFeature({ group }: { group: GameGroup }) {
                       <span className="text-[11px] text-text-secondary truncate shrink-0 max-w-[45%]">
                         {item.source === 'steam' ? 'Steam' : item.console_name}
                       </span>
-                      <span aria-hidden="true" className="h-1 flex-1 rounded-full bg-white/[0.06] overflow-hidden">
+                      <span aria-hidden="true" className="h-1 flex-1 rounded-full bg-ink/[0.06] overflow-hidden">
                         <span
                           className={`block h-full rounded-full ${item.source === 'steam' ? 'bg-[#66c0f4]' : 'bg-warning'}`}
                           style={{ width: `${pct}%` }}

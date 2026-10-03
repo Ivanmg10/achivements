@@ -33,7 +33,7 @@ export default function MainPageFavoritesSteamRow({ fav, onUnpin }: { fav: Steam
             unoptimized
           />
         ) : (
-          <div className="w-9 h-9 rounded-lg bg-white/10 shrink-0" aria-hidden="true" />
+          <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
         )}
         <div className="flex flex-col min-w-0 flex-1">
           <p className="text-xs font-medium truncate">{title}</p>

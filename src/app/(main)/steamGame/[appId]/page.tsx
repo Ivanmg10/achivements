@@ -83,7 +83,7 @@ export default function SteamGamePage() {
             <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
             <button
               onClick={retry}
-              className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-white/10 transition-colors"
+              className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-ink/10 transition-colors"
             >
               {T.steam.retry}
             </button>

@@ -35,7 +35,7 @@ export function FadeImage({
 
   return (
     <span
-      className={`relative block overflow-hidden ${state === 'loaded' ? '' : `bg-white/[0.06] ${placeholderClassName}`} ${state === 'loading' ? 'animate-pulse motion-reduce:animate-none' : ''} ${className}`}
+      className={`relative block overflow-hidden ${state === 'loaded' ? '' : `bg-ink/[0.06] ${placeholderClassName}`} ${state === 'loading' ? 'animate-pulse motion-reduce:animate-none' : ''} ${className}`}
     >
       {state !== 'failed' && (
         <Image

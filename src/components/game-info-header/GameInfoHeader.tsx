@@ -122,7 +122,7 @@ export default function GameInfoHeader({
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => setHashesOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
               >
                 <IconHash className="w-3.5 h-3.5" />
                 {T.gameInfoPage.hashesCompatible}
@@ -131,7 +131,7 @@ export default function GameInfoHeader({
                 href={`https://retroachievements.org/game/${gameData.ID}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
               >
                 <IconExternalLink className="w-3.5 h-3.5" />
                 {T.profileRa.viewOnRA}

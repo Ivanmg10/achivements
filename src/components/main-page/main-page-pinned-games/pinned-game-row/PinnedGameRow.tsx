@@ -69,7 +69,7 @@ export default function PinnedGameRow({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col ring-1 ring-white/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
+      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
       <GameCardBackdrop src={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null} />
       <div
@@ -77,7 +77,7 @@ export default function PinnedGameRow({
         tabIndex={0}
         onClick={onToggle}
         onKeyDown={(e) => e.key === 'Enter' && onToggle()}
-        className="flex items-center gap-3 px-3 py-3 w-full text-left hover:bg-white/5 transition-colors cursor-pointer focus-visible:outline-none"
+        className="flex items-center gap-3 px-3 py-3 w-full text-left hover:bg-ink/5 transition-colors cursor-pointer focus-visible:outline-none"
       >
         <button
           {...attributes}
@@ -103,7 +103,7 @@ export default function PinnedGameRow({
               className="rounded-xl object-cover w-14 h-14"
             />
           ) : (
-            <div className="w-14 h-14 rounded-xl bg-white/10 shrink-0" />
+            <div className="w-14 h-14 rounded-xl bg-ink/10 shrink-0" />
           )}
         </Link>
 
@@ -111,7 +111,7 @@ export default function PinnedGameRow({
           <Link
             href={`/gameInfo/${gameId}`}
             onClick={(e) => e.stopPropagation()}
-            className="w-fit max-w-full focus-visible:outline-none hover:underline underline-offset-2 decoration-white/40"
+            className="w-fit max-w-full focus-visible:outline-none hover:underline underline-offset-2 decoration-ink/40"
           >
             <span className="text-base font-bold block truncate leading-tight">{game.Title}</span>
           </Link>

@@ -30,7 +30,7 @@ export default function BrowseConsoles({ consoles }: { consoles: ConsoleSummary[
               <Link
                 href={`/playing/${c.consoleId}`}
                 onPointerMove={onPointerMove}
-                className="spotlight flex flex-col gap-2 h-full rounded-xl bg-bg-main ring-1 ring-white/[0.04] p-3 hover:ring-white/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="spotlight flex flex-col gap-2 h-full rounded-xl bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 <span className="flex items-center gap-2 min-w-0">
                   {icon && <Image src={icon} alt="" width={20} height={20} className="w-5 h-5 object-contain shrink-0" />}
@@ -40,7 +40,7 @@ export default function BrowseConsoles({ consoles }: { consoles: ConsoleSummary[
                   <span className="text-[11px] text-text-secondary">{c.games === 1 ? T.cards.oneGame : T.cards.nGames.replace('{n}', String(c.games))}</span>
                   <span className="text-sm font-bold tabular-nums text-warning">{c.pct}%</span>
                 </span>
-                <span aria-hidden="true" className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                <span aria-hidden="true" className="h-1 rounded-full bg-ink/[0.06] overflow-hidden">
                   <span className="block h-full rounded-full bg-warning" style={{ width: `${c.pct}%` }} />
                 </span>
               </Link>

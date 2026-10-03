@@ -105,7 +105,7 @@ export default function SortableItem({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       {/* The same blurred art and pointer glow as the game cards in the status lists. */}
       <GameCardBackdrop src={item.image_icon ? `https://retroachievements.org${item.image_icon}` : null} surface="card" />
@@ -129,7 +129,7 @@ export default function SortableItem({
         <Link
           href={`/gameInfo/${item.game_id}`}
           onClick={(e) => e.stopPropagation()}
-          className="shrink-0 rounded-xl hover:ring-2 hover:ring-white/40 transition-all"
+          className="shrink-0 rounded-xl hover:ring-2 hover:ring-ink/40 transition-all"
         >
           {item.image_icon ? (
             <Image
@@ -149,7 +149,7 @@ export default function SortableItem({
           <Link
             href={`/gameInfo/${item.game_id}`}
             onClick={(e) => e.stopPropagation()}
-            className="self-start hover:underline decoration-white/50 underline-offset-2"
+            className="self-start hover:underline decoration-ink/50 underline-offset-2"
           >
             <p className="text-xl font-semibold leading-tight">{item.title}</p>
           </Link>

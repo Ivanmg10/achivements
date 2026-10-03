@@ -42,7 +42,7 @@ export default function SteamGameInfoAchievementCard({
           unoptimized
         />
       ) : (
-        <div className="w-12 h-12 rounded-lg bg-white/10 shrink-0" aria-hidden="true" />
+        <div className="w-12 h-12 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
       )}
 
       <div className="flex flex-col min-w-0 flex-1 gap-0.5">

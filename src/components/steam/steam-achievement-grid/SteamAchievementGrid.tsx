@@ -96,7 +96,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
                   unoptimized
                 />
               ) : (
-                <div className={`${size.badge} bg-white/10 ${a.earned ? '' : 'opacity-40'}`} aria-hidden="true" />
+                <div className={`${size.badge} bg-ink/10 ${a.earned ? '' : 'opacity-40'}`} aria-hidden="true" />
               )}
             </Link>
             {canPin && (

@@ -14,7 +14,7 @@ export default function PinGameCard() {
       <button
         onClick={() => setOpen(true)}
         aria-label={T.pinnedGames.addAria}
-        className="bg-bg-main rounded-xl min-h-20 flex items-center justify-center text-text-secondary/50 hover:text-text-main hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="bg-bg-main rounded-xl min-h-20 flex items-center justify-center text-text-secondary/50 hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
         <IconPlus className="w-6 h-6" aria-hidden />
       </button>

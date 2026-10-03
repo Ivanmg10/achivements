@@ -71,7 +71,7 @@ export default function SteamGameImage({
       height={size}
       // A portrait cover cut to a square keeps its top, where the title is printed.
       ref={ref}
-      className={`object-cover ${art === 'cover' && sources[index] === steamAssetUrl(appId, 'cover') ? 'object-top' : ''} ${loaded ? '' : 'bg-white/[0.06] animate-pulse motion-reduce:animate-none'} ${className}`}
+      className={`object-cover ${art === 'cover' && sources[index] === steamAssetUrl(appId, 'cover') ? 'object-top' : ''} ${loaded ? '' : 'bg-ink/[0.06] animate-pulse motion-reduce:animate-none'} ${className}`}
       onLoad={() => setLoaded(true)}
       onError={() => {
         setLoaded(false)

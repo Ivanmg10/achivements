@@ -6,12 +6,17 @@ import GoogleAnalytics from '@/components/google-analytics/GoogleAnalytics'
 import "./globals.css";
 import Providers from "./providers";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from '@/lib/siteUrl'
+import { THEMES, THEME_STORAGE_KEY } from '@/types/types'
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
 })
+
+// Paints the last theme this browser used before the first frame; without it
+// every load flashes dark until the session says otherwise.
+const THEME_SCRIPT = `try{var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(${JSON.stringify(THEMES)}.indexOf(t)>-1)document.documentElement.dataset.theme=t}catch(e){}`
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -33,7 +38,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-theme="dark" className={`${inter.variable} bg-bg-header`}>
+    <html lang="en" data-theme="dark" className={`${inter.variable} bg-bg-header`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className="text-text-main bg-bg-main">
         <Providers>
           {children}

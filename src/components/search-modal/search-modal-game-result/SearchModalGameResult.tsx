@@ -44,7 +44,7 @@ export default function SearchModalGameResult({
       {icon ? (
         <Image src={icon} alt="" width={32} height={32} className="w-8 h-8 rounded object-cover shrink-0" unoptimized />
       ) : (
-        <div className="w-8 h-8 rounded bg-white/10 shrink-0" aria-hidden="true" />
+        <div className="w-8 h-8 rounded bg-ink/10 shrink-0" aria-hidden="true" />
       )}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-text-main line-clamp-1">{game.title}</p>

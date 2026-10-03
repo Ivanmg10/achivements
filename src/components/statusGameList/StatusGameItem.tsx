@@ -91,12 +91,12 @@ export default function StatusGameItem({
       ref={itemRef}
       style={style}
       onPointerMove={onPointerMove}
-      className="spotlight bg-bg-card rounded-2xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow duration-150"
+      className="spotlight bg-bg-card rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow duration-150"
     >
       <GameCardBackdrop src={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null} surface="card" />
       <div
         onClick={handleToggle}
-        className="flex flex-row items-start gap-5 p-5 cursor-pointer hover:bg-bg-header/20 transition-colors select-none"
+        className="flex flex-row items-start gap-3 sm:gap-5 p-4 sm:p-5 cursor-pointer hover:bg-bg-header/20 transition-colors select-none"
       >
         <Link
           href={`/gameInfo/${gameId}`}
@@ -105,8 +105,8 @@ export default function StatusGameItem({
         >
           {game.ImageIcon && (
             <div
-              className={`w-24 h-24 rounded-xl overflow-hidden transition-all duration-150 ${
-                isHardcore ? 'ring-2 ring-yellow-400/70 hover:ring-yellow-400' : 'hover:ring-2 hover:ring-white/40'
+              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden transition-all duration-150 ${
+                isHardcore ? 'ring-2 ring-yellow-400/70 hover:ring-yellow-400' : 'hover:ring-2 hover:ring-ink/40'
               }`}
             >
               <Image
@@ -114,7 +114,7 @@ export default function StatusGameItem({
                 alt={game.Title}
                 width={96}
                 height={96}
-                className="w-24 h-24 rounded-xl object-cover block"
+                className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl object-cover block"
               />
             </div>
           )}
@@ -124,7 +124,7 @@ export default function StatusGameItem({
           <Link
             href={`/gameInfo/${gameId}`}
             onClick={(e) => e.stopPropagation()}
-            className="self-start hover:underline decoration-white/50 underline-offset-2"
+            className="self-start hover:underline decoration-ink/50 underline-offset-2"
           >
             <p className="text-xl font-semibold leading-tight">{game.Title}</p>
           </Link>
@@ -194,7 +194,7 @@ export default function StatusGameItem({
           )}
         </div>
 
-        <div className="flex items-center gap-1 shrink-0 self-center">
+        <div className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 shrink-0 self-start sm:self-center -mr-2 sm:mr-0">
           <HideGameButton
             source="ra"
             gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}

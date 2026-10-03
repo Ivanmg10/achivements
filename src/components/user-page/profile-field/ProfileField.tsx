@@ -52,7 +52,7 @@ export default function ProfileField({
 
   const content = icon ? (
     <span className="flex items-center gap-3 min-w-0">
-      <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-xl bg-bg-card ring-1 ring-white/[0.06] flex items-center justify-center text-text-secondary">
+      <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-xl bg-bg-card ring-1 ring-ink/[0.06] flex items-center justify-center text-text-secondary">
         {icon}
       </span>
       <span className="flex flex-col gap-0.5 min-w-0">{text}</span>
@@ -67,7 +67,7 @@ export default function ProfileField({
     <button
       onClick={onEdit}
       aria-label={`${label}: ${value || empty || '—'}`}
-      className="group flex flex-col gap-0.5 min-w-0 text-left rounded-xl px-2 -mx-1 py-1.5 hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="group flex flex-col gap-0.5 min-w-0 text-left rounded-xl px-2 -mx-1 py-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       {content}
     </button>

@@ -53,7 +53,7 @@ export default function AdminPanelModal({ isOpen, onClose }: { isOpen: boolean; 
             role="dialog"
             aria-modal="true"
             aria-label="Admin panel"
-            className={`relative w-full ${wide ? 'max-w-6xl' : 'max-w-md'} max-h-[92dvh] sm:max-h-[85dvh] overflow-y-auto bg-bg-header text-text-main rounded-t-3xl sm:rounded-3xl ring-1 ring-white/10 shadow-2xl shadow-black/50 px-4 sm:px-6`}
+            className={`relative w-full ${wide ? 'max-w-6xl' : 'max-w-md'} max-h-[92dvh] sm:max-h-[85dvh] overflow-y-auto bg-bg-header text-text-main rounded-t-3xl sm:rounded-3xl ring-1 ring-ink/10 shadow-2xl shadow-black/50 px-4 sm:px-6`}
             variants={modalContent}
             initial="hidden"
             animate="visible"
@@ -66,7 +66,7 @@ export default function AdminPanelModal({ isOpen, onClose }: { isOpen: boolean; 
                 <button
                   onClick={onClose}
                   aria-label="Close admin panel"
-                  className="p-2 rounded-xl text-text-secondary hover:text-text-main hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="p-2 rounded-xl text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 >
                   <IconX size={18} aria-hidden="true" />
                 </button>

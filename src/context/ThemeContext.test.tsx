@@ -61,3 +61,34 @@ test("useTheme throws outside provider", () => {
   );
   consoleError.mockRestore();
 });
+
+test("remembers the theme in the browser for the next first paint", () => {
+  (useSession as jest.Mock).mockReturnValue({ data: { user: { theme: "light" } }, status: "authenticated" });
+  render(
+    <ThemeProvider>
+      <TestConsumer />
+    </ThemeProvider>,
+  );
+  expect(localStorage.getItem("app-theme")).toBe("light");
+});
+
+test("leaves the painted theme alone while the session loads", () => {
+  document.documentElement.dataset.theme = "purple";
+  (useSession as jest.Mock).mockReturnValue({ data: null, status: "loading" });
+  render(
+    <ThemeProvider>
+      <TestConsumer />
+    </ThemeProvider>,
+  );
+  expect(document.documentElement.dataset.theme).toBe("purple");
+});
+
+test("ignores a theme the app has no stylesheet for", () => {
+  (useSession as jest.Mock).mockReturnValue({ data: { user: { theme: "neon" } }, status: "authenticated" });
+  render(
+    <ThemeProvider>
+      <TestConsumer />
+    </ThemeProvider>,
+  );
+  expect(screen.getByTestId("theme").textContent).toBe("dark");
+});

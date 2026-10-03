@@ -25,11 +25,11 @@ export default function CollectionTile({ game, date }: { game: PerfectGame; date
     >
       <span className="relative w-14 h-14 shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5">
         {game.source === 'steam' ? (
-          <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageUrl} size={56} className="w-14 h-14 rounded-lg ring-1 ring-white/10" />
+          <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageUrl} size={56} className="w-14 h-14 rounded-lg ring-1 ring-ink/10" />
         ) : game.imageUrl ? (
-          <Image src={game.imageUrl} alt="" width={56} height={56} className="w-14 h-14 rounded-lg object-cover ring-1 ring-white/10" />
+          <Image src={game.imageUrl} alt="" width={56} height={56} className="w-14 h-14 rounded-lg object-cover ring-1 ring-ink/10" />
         ) : (
-          <span aria-hidden="true" className="block w-14 h-14 rounded-lg bg-white/10" />
+          <span aria-hidden="true" className="block w-14 h-14 rounded-lg bg-ink/10" />
         )}
         {game.source === 'steam' ? (
           <span aria-hidden="true" className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-bg-card flex items-center justify-center">

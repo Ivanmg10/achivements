@@ -321,7 +321,7 @@ export default function AuthCollagePanel() {
                       }deg)`,
                     }}
                   >
-                    <div className="bg-bg-tertiary p-1.5 rounded-xl shadow-2xl border border-white/10 hover:scale-110 hover:shadow-accent/25 transition-transform duration-200">
+                    <div className="bg-bg-tertiary p-1.5 rounded-xl shadow-2xl border border-ink/10 hover:scale-110 hover:shadow-accent/25 transition-transform duration-200">
                       <img
                         src={src}
                         alt=""

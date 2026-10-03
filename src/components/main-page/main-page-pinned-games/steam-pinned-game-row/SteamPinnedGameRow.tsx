@@ -59,7 +59,7 @@ export default function SteamPinnedGameRow({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col ring-1 ring-white/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
+      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
       <GameCardBackdrop src={steamAssetUrl(appId, 'header')} />
       <div className="flex items-center gap-3 px-3 py-3 w-full">
@@ -80,7 +80,7 @@ export default function SteamPinnedGameRow({
         <div className="flex flex-col min-w-0 flex-1 gap-1">
           <Link
             href={href}
-            className="w-fit max-w-full hover:underline underline-offset-2 decoration-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
+            className="w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
           >
             <span className="text-base font-bold block truncate leading-tight">{game.title}</span>
           </Link>

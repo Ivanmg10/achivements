@@ -141,3 +141,14 @@ describe('the scale and the summary', () => {
     expect(screen.getByText(en.cards.heatMore)).toBeInTheDocument()
   })
 })
+
+test('while loading, the empty grid carries the wave, each cell placed on the diagonal', () => {
+  render(<MainPageHeatmap achievements={[]} isLoading />)
+  const all = cells()
+  expect(all).toHaveLength(WEEKS * 7)
+  const cell = all[8] as HTMLElement // week 1, day 1
+  expect(cell).toHaveClass('heat-loading')
+  expect(cell).not.toHaveClass('heat-cell')
+  expect(cell.style.getPropertyValue('--col')).toBe('1')
+  expect(cell.style.getPropertyValue('--row')).toBe('1')
+})

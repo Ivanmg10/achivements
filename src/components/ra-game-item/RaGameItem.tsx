@@ -57,7 +57,7 @@ export default function RaGameItem({
   return (
     <div
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col min-h-0 ring-1 ring-white/[0.04] ${className}`}
+      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={art} />
 
@@ -71,14 +71,14 @@ export default function RaGameItem({
               width={64}
               height={64}
               className={`rounded-xl object-cover w-14 h-14 sm:w-16 sm:h-16 shadow-md shadow-black/30 transition-transform duration-300 hover:scale-105 ${
-                mastered ? 'ring-2 ring-amber-400' : 'ring-1 ring-white/10'
+                mastered ? 'ring-2 ring-amber-400' : 'ring-1 ring-ink/10'
               }`}
             />
           ) : (
-            <span className="block w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-white/10" />
+            <span className="block w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-ink/10" />
           )}
           {consoleIcon && (
-            <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-md bg-bg-card ring-1 ring-white/10 flex items-center justify-center">
+            <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-md bg-bg-card ring-1 ring-ink/10 flex items-center justify-center">
               <Image src={consoleIcon} alt="" width={12} height={12} className="w-3 h-3 object-contain" />
             </span>
           )}
@@ -87,7 +87,7 @@ export default function RaGameItem({
         <div className="flex flex-col min-w-0 flex-1 gap-1">
           <Link
             href={href}
-            className="w-fit max-w-full hover:underline underline-offset-2 decoration-white/40 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <span className="text-base font-bold block truncate leading-tight">{game.Title}</span>
           </Link>

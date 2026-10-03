@@ -154,12 +154,12 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
         >
           <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-full max-w-2xl px-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl overflow-hidden border border-white/5"
+              className="bg-bg-card rounded-2xl shadow-2xl overflow-hidden border border-ink/5"
               variants={contentVariants}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Input row */}
-              <div className="flex items-center gap-3 px-4 py-3.5 border-b border-white/5">
+              <div className="flex items-center gap-3 px-4 py-3.5 border-b border-ink/5">
                 {tab === 'users'
                   ? <IconUser className="w-5 h-5 text-text-secondary shrink-0" aria-hidden />
                   : <IconSearch className="w-5 h-5 text-text-secondary shrink-0" aria-hidden />
@@ -184,7 +184,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
               {/* Tab toggle — the users tab searches RA, so without RA there is
                   only one tab and nothing to toggle */}
               {raLinked && (
-              <div className="flex border-b border-white/5 px-4 gap-4">
+              <div className="flex border-b border-ink/5 px-4 gap-4">
                 {(['games', 'users'] as SearchTab[]).map((t) => (
                   <button
                     key={t}
@@ -200,7 +200,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
 
               {/* Platform filter — only worth showing once both platforms are in the library */}
               {tab === 'games' && hasBothPlatforms && (
-                <div className="flex items-center gap-3 px-4 py-2 border-b border-white/5" role="group" aria-label={T.search.platformAll}>
+                <div className="flex items-center gap-3 px-4 py-2 border-b border-ink/5" role="group" aria-label={T.search.platformAll}>
                   {(
                     [
                       { value: 'all' as PlatformFilter, label: T.search.platformAll, icon: null },
@@ -258,7 +258,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                         {directGameId && !results.find((r) => r.source === 'ra' && r.id === directGameId) && (
                           <motion.li variants={resultVariants}>
                             <button
-                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer border-t border-white/5"
+                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer border-t border-ink/5"
                               onClick={() => handleSelect({ source: 'ra', id: directGameId })}
                             >
                               <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-text-secondary text-xs font-bold">
@@ -301,8 +301,8 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                   <div className="max-h-105 overflow-y-auto">
                     {userLoading ? (
                       <div className="flex items-center gap-3 px-4 py-3">
-                        <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse shrink-0" />
-                        <div className="h-4 bg-white/10 rounded animate-pulse w-32" />
+                        <div className="w-8 h-8 rounded-full bg-ink/10 animate-pulse shrink-0" />
+                        <div className="h-4 bg-ink/10 rounded animate-pulse w-32" />
                       </div>
                     ) : userResult ? (
                       <motion.div initial="hidden" animate="visible" variants={resultVariants}>

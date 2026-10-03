@@ -26,7 +26,7 @@ export default function AchivementsLineChartTooltip({
   ].filter((r) => r.value > 0)
 
   return (
-    <div className="rounded-xl bg-bg-header ring-1 ring-white/10 shadow-xl shadow-black/40 px-3 py-2 text-xs flex flex-col gap-1">
+    <div className="rounded-xl bg-bg-header ring-1 ring-ink/10 shadow-xl shadow-black/40 px-3 py-2 text-xs flex flex-col gap-1">
       <span className="font-semibold text-text-main capitalize">{date}</span>
       {rows.length === 0 ? (
         <span className="text-text-secondary">{count(0)}</span>

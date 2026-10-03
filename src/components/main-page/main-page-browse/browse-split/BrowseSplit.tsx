@@ -40,7 +40,7 @@ export default function BrowseSplit({ ra, steam }: { ra: PlatformTotals; steam: 
                   { name: 'Steam', value: steam[key], bar: 'bg-[#66c0f4]' },
                 ].map((p) => (
                   <span key={p.name} className="grid grid-cols-[1fr_auto] items-center gap-2">
-                    <span className="h-2 rounded-full bg-white/[0.05] overflow-hidden" aria-hidden="true">
+                    <span className="h-2 rounded-full bg-ink/[0.05] overflow-hidden" aria-hidden="true">
                       <span className={`block h-full rounded-full ${p.bar}`} style={{ width: `${(p.value / max) * 100}%` }} />
                     </span>
                     <span className="text-xs tabular-nums font-semibold w-14 text-right">

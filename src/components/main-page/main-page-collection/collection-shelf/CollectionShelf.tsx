@@ -15,8 +15,8 @@ const MEDALS = [
   'bg-linear-to-b from-amber-200 to-amber-500 text-amber-950',
   'bg-linear-to-b from-zinc-100 to-zinc-400 text-zinc-900',
   'bg-linear-to-b from-orange-300 to-orange-600 text-orange-950',
-  'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-white/10',
-  'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-white/10',
+  'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-ink/10',
+  'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-ink/10',
 ]
 
 /**
@@ -66,7 +66,7 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
               <Link
                 href={game.source === 'steam' ? `/steamGame/${game.id}` : `/gameInfo/${game.id}`}
                 onPointerMove={onPointerMove}
-                className="spotlight group relative flex flex-col items-center gap-3 h-full rounded-xl bg-bg-main ring-1 ring-white/[0.04] p-3 hover:ring-white/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="spotlight group relative flex flex-col items-center gap-3 h-full rounded-xl bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 <span className={`absolute top-2 left-2 z-10 w-6 h-6 rounded-full text-[11px] font-extrabold flex items-center justify-center shadow-md shadow-black/40 ${MEDALS[i]}`}>
                   {i + 1}

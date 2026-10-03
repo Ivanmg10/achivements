@@ -58,12 +58,12 @@ export default function AchievementsLineChart({
         <div className="px-1 h-64 flex flex-col justify-end gap-1 animate-pulse">
           <div className="flex items-end gap-2 h-56">
             {[45, 70, 30, 90, 55, 20, 80].map((h, i) => (
-              <div key={i} className="flex-1 bg-white/10 rounded-t-md" style={{ height: `${h}%` }} />
+              <div key={i} className="flex-1 bg-ink/10 rounded-t-md" style={{ height: `${h}%` }} />
             ))}
           </div>
           <div className="flex gap-2">
             {Array.from({ length: 7 }).map((_, i) => (
-              <div key={i} className="flex-1 h-3 bg-white/10 rounded" />
+              <div key={i} className="flex-1 h-3 bg-ink/10 rounded" />
             ))}
           </div>
         </div>

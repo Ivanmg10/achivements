@@ -166,7 +166,7 @@ export default function MainPageHeatmap({
               {/* tooltip */}
               <div
                 ref={tooltipRef}
-                className="pointer-events-none absolute z-10 px-2 py-1 rounded text-[11px] text-white whitespace-nowrap"
+                className="pointer-events-none absolute z-10 px-2 py-1 rounded text-[11px] text-text-main whitespace-nowrap"
                 style={{
                   display: 'none',
                   backgroundColor: 'rgb(var(--bg-card))',
@@ -192,11 +192,14 @@ export default function MainPageHeatmap({
                 ))}
               </div>
 
-              {/* cells — loading draws the same grid, so nothing shifts when it fills */}
+              {/*
+                cells — loading draws the same grid, so nothing shifts when it
+                fills, with a wave of the accent running across it diagonally
+                (oldest corner to today); then the real cells come in.
+              */}
               <div
                 onMouseMove={isLoading ? undefined : handleMouseMove}
                 onMouseLeave={isLoading ? undefined : handleMouseLeave}
-                className={isLoading ? 'animate-pulse' : ''}
                 style={{ ...gridStyle, gridTemplateRows: `repeat(7, ${cell}px)`, gridAutoFlow: 'column' }}
               >
                 {Array.from({ length: weeks }).flatMap((_, wi) =>
@@ -207,8 +210,12 @@ export default function MainPageHeatmap({
                     return (
                       <div
                         key={`${wi}-${di}`}
-                        className={`heat-cell rounded-[3px] transition-transform${count > 0 ? ' cursor-pointer hover:scale-125 hover:ring-1 hover:ring-text-main/40' : ''}${isToday ? ' ring-1 ring-text-main/70' : ''}`}
-                        style={{ backgroundColor: LEVEL_BG[heatLevel(count, best)], '--col': wi } as React.CSSProperties}
+                        className={
+                          isLoading
+                            ? 'heat-loading rounded-[3px]'
+                            : `heat-cell rounded-[3px] transition-transform${count > 0 ? ' cursor-pointer hover:scale-125 hover:ring-1 hover:ring-text-main/40' : ''}${isToday ? ' ring-1 ring-text-main/70' : ''}`
+                        }
+                        style={{ backgroundColor: isLoading ? undefined : LEVEL_BG[heatLevel(count, best)], '--col': wi, '--row': di } as React.CSSProperties}
                         data-date={day?.date}
                         data-count={count}
                         onClick={() => day && count > 0 && setSelectedDate(day.date)}

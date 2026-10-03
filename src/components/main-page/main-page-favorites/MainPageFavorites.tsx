@@ -34,12 +34,12 @@ export default function MainPageFavorites() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 animate-pulse" aria-busy="true">
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="flex items-center gap-3 px-2 py-1.5">
-              <div className="w-9 h-9 rounded-lg bg-white/10 shrink-0" />
+              <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
               <div className="flex flex-col gap-1.5 flex-1">
-                <div className="h-2.5 w-28 rounded bg-white/10" />
-                <div className="h-2 w-20 rounded bg-white/10" />
+                <div className="h-2.5 w-28 rounded bg-ink/10" />
+                <div className="h-2 w-20 rounded bg-ink/10" />
               </div>
-              <div className="w-6 h-4 rounded bg-white/10 shrink-0" />
+              <div className="w-6 h-4 rounded bg-ink/10 shrink-0" />
             </div>
           ))}
         </div>

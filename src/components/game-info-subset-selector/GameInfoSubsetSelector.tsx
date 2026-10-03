@@ -24,8 +24,8 @@ export default function GameInfoSubsetSelector({
   if (isLoading) {
     return (
       <div aria-hidden="true" className="flex gap-2 mt-3 animate-pulse motion-reduce:animate-none">
-        <span className="w-12 h-12 rounded-lg bg-white/[0.07]" />
-        <span className="w-12 h-12 rounded-lg bg-white/[0.05]" />
+        <span className="w-12 h-12 rounded-lg bg-ink/[0.07]" />
+        <span className="w-12 h-12 rounded-lg bg-ink/[0.05]" />
       </div>
     )
   }
@@ -47,14 +47,14 @@ export default function GameInfoSubsetSelector({
             title={tab.label}
             className={`relative shrink-0 rounded-lg overflow-hidden transition-all duration-150 ${
               isActive
-                ? 'ring-2 ring-white/60 scale-105'
-                : 'opacity-50 hover:opacity-100 hover:ring-2 hover:ring-white/30'
+                ? 'ring-2 ring-ink/60 scale-105'
+                : 'opacity-50 hover:opacity-100 hover:ring-2 hover:ring-ink/30'
             }`}
           >
             {tab.icon ? (
               <FadeImage src={`https://retroachievements.org${tab.icon}`} alt={tab.label} width={48} height={48} className="w-12 h-12" />
             ) : (
-              <span aria-hidden="true" className="block w-12 h-12 bg-white/[0.06]" />
+              <span aria-hidden="true" className="block w-12 h-12 bg-ink/[0.06]" />
             )}
           </Link>
         )

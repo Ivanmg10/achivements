@@ -61,7 +61,7 @@ export default function UserPlatformCard({
           </span>
           <span
             className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-              connected && !soon ? 'bg-green-500/20 text-green-400' : 'bg-white/5 text-text-secondary'
+              connected && !soon ? 'bg-green-500/20 text-green-400' : 'bg-ink/5 text-text-secondary'
             }`}
           >
             {soon ? T.userData.comingSoon : connected ? T.userData.connected : T.userData.notConnected}

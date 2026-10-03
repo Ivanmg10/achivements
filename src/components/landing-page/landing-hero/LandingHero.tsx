@@ -47,7 +47,7 @@ export default function LandingHero() {
         initial={reduce ? false : { opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, delay: 0.1, ease: EASE }}
-        className="relative h-72 sm:h-96 lg:h-[540px] rounded-[2rem] overflow-hidden ring-1 ring-white/10 bg-bg-card shadow-2xl shadow-black/40 pointer-events-none select-none"
+        className="relative h-72 sm:h-96 lg:h-[540px] rounded-[2rem] overflow-hidden ring-1 ring-ink/10 bg-bg-card shadow-2xl shadow-black/40 pointer-events-none select-none"
       >
         <AuthCollagePanel />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgb(var(--bg-main)/0.85))]" />

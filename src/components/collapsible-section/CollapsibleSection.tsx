@@ -70,7 +70,7 @@ export default function CollapsibleSection({
   return (
     <section
       aria-labelledby={titleId}
-      className={`w-full flex flex-col rounded-2xl border border-white/5 bg-bg-header/70 p-3 sm:p-4 ${className}`}
+      className={`w-full flex flex-col rounded-2xl border border-ink/5 bg-bg-header/70 p-3 sm:p-4 ${className}`}
     >
       <h2 className="text-lg sm:text-xl font-bold">
         <button
@@ -82,13 +82,13 @@ export default function CollapsibleSection({
           {icon}
           <span id={titleId}>{title}</span>
           {count !== undefined && (
-            <span className="text-xs font-semibold text-text-secondary tabular-nums bg-white/5 rounded-full px-2 py-0.5">
+            <span className="text-xs font-semibold text-text-secondary tabular-nums bg-ink/5 rounded-full px-2 py-0.5">
               {count}
             </span>
           )}
           <span
             aria-hidden="true"
-            className="ml-auto flex items-center justify-center w-8 h-8 rounded-full bg-white/5 text-text-secondary group-hover:bg-white/10 group-hover:text-text-main transition-colors"
+            className="ml-auto flex items-center justify-center w-8 h-8 rounded-full bg-ink/5 text-text-secondary group-hover:bg-ink/10 group-hover:text-text-main transition-colors"
           >
             <IconChevronDown size={18} className={`transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
           </span>
@@ -104,7 +104,7 @@ export default function CollapsibleSection({
           {preview}
           <button
             onClick={() => setAndRemember(true)}
-            className="self-center flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-text-secondary hover:text-text-main hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="self-center flex items-center gap-1.5 rounded-full border border-ink/10 bg-ink/5 px-4 py-1.5 text-xs font-medium text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             {showAllLabel}
             <IconChevronDown size={14} aria-hidden="true" />

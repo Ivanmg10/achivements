@@ -25,7 +25,7 @@ export default function GroupCard({
     <div ref={itemRef} style={style}>
       <Link
         href={`/groups/${group.id}`}
-        className="flex items-center gap-4 bg-bg-card rounded-xl p-4 hover:bg-white/5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="flex items-center gap-4 bg-bg-card rounded-xl p-4 hover:bg-ink/5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
         <GroupIcon group={group} />
         <div className="flex flex-col min-w-0 flex-1 gap-1">

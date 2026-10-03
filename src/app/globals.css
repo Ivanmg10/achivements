@@ -7,31 +7,24 @@
 
   --color-bg-main: rgb(var(--bg-main));
   --color-bg-header: rgb(var(--bg-header));
-  --color-bg-deep: rgb(var(--bg-deep));
   --color-bg-card: rgb(var(--bg-card));
   --color-bg-tertiary: rgb(var(--bg-tertiary));
 
   --color-text-main: rgb(var(--text-main));
   --color-text-secondary: rgb(var(--text-secondary));
-  --color-text-accent: rgb(var(--text-accent));
+
+  /* Overlays, hairlines and tints: white on the dark themes, ink on the light one. */
+  --color-ink: rgb(var(--ink));
 
   --color-accent: rgb(var(--accent));
   --color-accent-hover: rgb(var(--accent-hover));
-  --color-accent-secondary: rgb(var(--accent-secondary));
   --color-accent-muted: rgb(var(--accent-muted));
-
-  --color-btn-primary: rgb(var(--btn-primary));
-  --color-btn-primary-text: rgb(var(--btn-primary-text));
-  --color-btn-danger: rgb(var(--btn-danger));
-  --color-btn-danger-text: rgb(var(--btn-danger-text));
 
   --color-success: rgb(var(--success));
   --color-warning: rgb(var(--warning));
   --color-info: rgb(var(--info));
   --color-danger: rgb(var(--danger));
-  --color-metric-1: rgb(var(--metric-1));
 
-  --color-chart-1: rgb(var(--chart-1));
   --color-chart-2: rgb(var(--chart-2));
 }
 
@@ -40,32 +33,23 @@
    ============================================ */
 
 :root {
+  --ink: 255 255 255;
   --bg-main: 15 16 20;
   --bg-header: 10 10 14;
-  --bg-deep: 12 14 22;
-  --bg-card: 20 20 26;
+  --bg-card: 23 24 30;
   --bg-tertiary: 35 36 46;
 
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
-  --text-accent: 250 250 255;
 
   --accent: 180 185 200;
   --accent-hover: 200 205 220;
-  --accent-secondary: 148 153 168;
   --accent-muted: 180 185 200;
-
-  --btn-primary: 80 80 90;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 180 40 40;
-  --btn-danger-text: 255 255 255;
 
   --success: 34 197 94;
   --warning: 245 158 11;
   --info: 96 165 250;
   --danger: 239 68 68;
-  --metric-1: 180 185 200;
-  --chart-1: 59 130 246;
   --chart-2: 245 158 11;
 }
 
@@ -75,30 +59,20 @@
 [data-theme="dark"] {
   --bg-main: 15 16 20;
   --bg-header: 10 10 14;
-  --bg-deep: 12 14 22;
-  --bg-card: 20 20 26;
+  --bg-card: 23 24 30;
   --bg-tertiary: 35 36 46;
 
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
-  --text-accent: 250 250 255;
 
   --accent: 180 185 200;
   --accent-hover: 200 205 220;
-  --accent-secondary: 148 153 168;
   --accent-muted: 180 185 200;
-
-  --btn-primary: 80 80 90;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 180 40 40;
-  --btn-danger-text: 255 255 255;
 
   --success: 34 197 94;
   --warning: 245 158 11;
   --info: 96 165 250;
   --danger: 239 68 68;
-  --metric-1: 180 185 200;
-  --chart-1: 59 130 246;
   --chart-2: 245 158 11;
 }
 
@@ -106,44 +80,81 @@
    LIGHT — Neutro suave
    ============================================ */
 [data-theme="light"] {
-  --bg-main: 230 232 236;
-  --bg-header: 224 226 230;
-  --bg-deep: 220 222 226;
-  --bg-card: 238 240 244;
+  --ink: 20 22 28;
+  --bg-main: 229 231 235;
+  --bg-header: 236 238 242;
+  --bg-card: 246 247 250;
   --bg-tertiary: 218 220 224;
 
-  --text-main: 50 52 58;
-  --text-secondary: 100 102 110;
-  --text-accent: 255 255 255;
+  --text-main: 32 34 40;
+  --text-secondary: 88 92 102;
 
   --accent: 70 75 85;
   --accent-hover: 55 60 68;
-  --accent-secondary: 110 115 125;
   --accent-muted: 70 75 85;
 
-  --btn-primary: 65 70 80;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 200 40 40;
-  --btn-danger-text: 255 255 255;
-
-  --success: 25 150 75;
-  --warning: 195 110 15;
-  --info: 40 100 200;
-  --danger: 195 40 40;
-  --metric-1: 95 100 108;
-  --chart-1: 70 75 85;
-  --chart-2: 195 110 15;
+  --success: 22 101 52;
+  --warning: 146 64 14;
+  --info: 29 78 216;
+  --danger: 185 28 28;
+  --chart-2: 180 83 9;
 }
 
-.button-light {
-  background-color: rgb(230 232 236);
-  border: 1px solid rgb(70 75 85);
-  color: rgb(50 52 58);
-}
-.button-light:hover {
-  border-color: rgb(55 60 68);
-  background-color: rgb(224 226 230);
-}
+/*
+   Light theme: the fixed palette colours in the code (hardcore gold, ratio
+   green, error red...) are tuned for dark surfaces. On the light one, the same
+   classes take a darker shade so they still pass AA. Text only: bars and tints
+   keep their colour.
+*/
+[data-theme="light"] .text-red-200 { @apply text-red-700; }
+[data-theme="light"] .text-red-300 { @apply text-red-700; }
+[data-theme="light"] .text-red-400 { @apply text-red-700; }
+[data-theme="light"] .text-yellow-200 { @apply text-yellow-700; }
+[data-theme="light"] .text-yellow-300 { @apply text-yellow-700; }
+[data-theme="light"] .text-yellow-400 { @apply text-yellow-700; }
+[data-theme="light"] .text-green-200 { @apply text-green-700; }
+[data-theme="light"] .text-green-300 { @apply text-green-700; }
+[data-theme="light"] .text-green-400 { @apply text-green-700; }
+[data-theme="light"] .text-amber-200 { @apply text-amber-700; }
+[data-theme="light"] .text-amber-300 { @apply text-amber-700; }
+[data-theme="light"] .text-amber-400 { @apply text-amber-700; }
+[data-theme="light"] .text-orange-200 { @apply text-orange-700; }
+[data-theme="light"] .text-orange-300 { @apply text-orange-700; }
+[data-theme="light"] .text-orange-400 { @apply text-orange-700; }
+[data-theme="light"] .text-purple-200 { @apply text-purple-700; }
+[data-theme="light"] .text-purple-300 { @apply text-purple-700; }
+[data-theme="light"] .text-purple-400 { @apply text-purple-700; }
+[data-theme="light"] .text-violet-200 { @apply text-violet-700; }
+[data-theme="light"] .text-violet-300 { @apply text-violet-700; }
+[data-theme="light"] .text-violet-400 { @apply text-violet-700; }
+[data-theme="light"] .text-blue-200 { @apply text-blue-700; }
+[data-theme="light"] .text-blue-300 { @apply text-blue-700; }
+[data-theme="light"] .text-blue-400 { @apply text-blue-700; }
+[data-theme="light"] .text-sky-200 { @apply text-sky-700; }
+[data-theme="light"] .text-sky-300 { @apply text-sky-700; }
+[data-theme="light"] .text-sky-400 { @apply text-sky-700; }
+[data-theme="light"] .text-teal-200 { @apply text-teal-700; }
+[data-theme="light"] .text-teal-300 { @apply text-teal-700; }
+[data-theme="light"] .text-teal-400 { @apply text-teal-700; }
+[data-theme="light"] .text-rose-200 { @apply text-rose-700; }
+[data-theme="light"] .text-rose-300 { @apply text-rose-700; }
+[data-theme="light"] .text-rose-400 { @apply text-rose-700; }
+[data-theme="light"] .text-pink-200 { @apply text-pink-700; }
+[data-theme="light"] .text-pink-300 { @apply text-pink-700; }
+[data-theme="light"] .text-pink-400 { @apply text-pink-700; }
+[data-theme="light"] .text-indigo-200 { @apply text-indigo-700; }
+[data-theme="light"] .text-indigo-300 { @apply text-indigo-700; }
+[data-theme="light"] .text-indigo-400 { @apply text-indigo-700; }
+[data-theme="light"] .text-cyan-200 { @apply text-cyan-700; }
+[data-theme="light"] .text-cyan-300 { @apply text-cyan-700; }
+[data-theme="light"] .text-cyan-400 { @apply text-cyan-700; }
+[data-theme="light"] .text-lime-200 { @apply text-lime-700; }
+[data-theme="light"] .text-lime-300 { @apply text-lime-700; }
+[data-theme="light"] .text-lime-400 { @apply text-lime-700; }
+[data-theme="light"] .text-gray-200 { @apply text-gray-600; }
+[data-theme="light"] .text-gray-300 { @apply text-gray-600; }
+[data-theme="light"] .text-gray-400 { @apply text-gray-600; }
+[data-theme="light"] .text-gray-500 { @apply text-gray-600; }
 
 /* ============================================
    BLUE
@@ -151,30 +162,20 @@
 [data-theme="blue"] {
   --bg-main: 10 15 28;
   --bg-header: 15 20 35;
-  --bg-deep: 8 12 22;
-  --bg-card: 18 24 42;
+  --bg-card: 20 27 47;
   --bg-tertiary: 28 38 58;
 
   --text-main: 218 228 245;
   --text-secondary: 125 140 170;
-  --text-accent: 250 252 255;
 
   --accent: 59 130 246;
   --accent-hover: 96 165 250;
-  --accent-secondary: 147 197 253;
   --accent-muted: 59 130 246;
-
-  --btn-primary: 59 130 246;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 239 68 68;
-  --btn-danger-text: 255 255 255;
 
   --success: 34 197 94;
   --warning: 245 158 11;
   --info: 59 130 246;
   --danger: 239 68 68;
-  --metric-1: 147 197 253;
-  --chart-1: 59 130 246;
   --chart-2: 245 158 11;
 }
 
@@ -184,30 +185,20 @@
 [data-theme="purple"] {
   --bg-main: 18 12 32;
   --bg-header: 12 8 24;
-  --bg-deep: 10 6 18;
-  --bg-card: 24 16 40;
+  --bg-card: 28 19 46;
   --bg-tertiary: 38 26 62;
 
   --text-main: 225 220 242;
   --text-secondary: 155 148 185;
-  --text-accent: 248 248 255;
 
   --accent: 168 85 247;
   --accent-hover: 192 110 255;
-  --accent-secondary: 196 181 251;
   --accent-muted: 168 85 247;
-
-  --btn-primary: 168 85 247;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 248 113 113;
-  --btn-danger-text: 255 255 255;
 
   --success: 52 211 153;
   --warning: 251 191 36;
   --info: 168 85 247;
   --danger: 248 113 113;
-  --metric-1: 196 181 251;
-  --chart-1: 168 85 247;
   --chart-2: 251 191 36;
 }
 
@@ -217,30 +208,20 @@
 [data-theme="green"] {
   --bg-main: 10 18 10;
   --bg-header: 6 12 6;
-  --bg-deep: 8 15 8;
-  --bg-card: 14 26 14;
+  --bg-card: 17 30 17;
   --bg-tertiary: 24 40 24;
 
   --text-main: 212 224 212;
   --text-secondary: 125 152 128;
-  --text-accent: 248 252 248;
 
   --accent: 132 184 80;
   --accent-hover: 152 204 100;
-  --accent-secondary: 180 210 140;
   --accent-muted: 132 184 80;
-
-  --btn-primary: 132 184 80;
-  --btn-primary-text: 18 24 14;
-  --btn-danger: 210 80 70;
-  --btn-danger-text: 255 255 255;
 
   --success: 74 175 80;
   --warning: 188 184 56;
   --info: 132 184 80;
   --danger: 210 80 70;
-  --metric-1: 168 205 140;
-  --chart-1: 132 184 80;
   --chart-2: 188 184 56;
 }
 
@@ -250,30 +231,20 @@
 [data-theme="red"] {
   --bg-main: 28 12 14;
   --bg-header: 20 8 10;
-  --bg-deep: 14 6 8;
-  --bg-card: 36 16 18;
+  --bg-card: 40 18 21;
   --bg-tertiary: 55 28 32;
 
   --text-main: 248 232 232;
   --text-secondary: 185 155 158;
-  --text-accent: 255 252 252;
 
-  --accent: 224 60 80;
-  --accent-hover: 240 80 100;
-  --accent-secondary: 244 140 155;
-  --accent-muted: 224 60 80;
-
-  --btn-primary: 224 60 80;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 160 40 50;
-  --btn-danger-text: 255 255 255;
+  --accent: 236 84 102;
+  --accent-hover: 246 104 120;
+  --accent-muted: 236 84 102;
 
   --success: 52 211 153;
   --warning: 251 191 36;
   --info: 99 160 255;
   --danger: 224 60 80;
-  --metric-1: 244 160 170;
-  --chart-1: 224 60 80;
   --chart-2: 251 191 36;
 }
 
@@ -287,61 +258,6 @@
 }
 .theme-button:hover {
   transform: scale(1.05);
-}
-
-.button-dark {
-  background-color: rgb(15 16 20);
-  border: 1px solid rgb(80 80 90);
-  color: rgb(225 228 235);
-}
-.button-dark:hover {
-  border-color: rgb(100 100 110);
-  background-color: rgb(20 21 26);
-}
-
-.button-light {
-  background-color: rgb(225 235 238);
-  border: 1px solid rgb(45 130 145);
-  color: rgb(30 35 45);
-}
-.button-light:hover {
-  border-color: rgb(35 115 130);
-}
-
-.button-blue {
-  background-color: rgb(10 15 28);
-  border: 1px solid rgb(59 130 246);
-  color: rgb(218 228 245);
-}
-.button-blue:hover {
-  border-color: rgb(96 165 250);
-}
-
-.button-purple {
-  background-color: rgb(18 12 32);
-  border: 1px solid rgb(168 85 247);
-  color: rgb(225 220 242);
-}
-.button-purple:hover {
-  border-color: rgb(192 110 255);
-}
-
-.button-green {
-  background-color: rgb(10 18 10);
-  border: 1px solid rgb(132 184 80);
-  color: rgb(212 224 212);
-}
-.button-green:hover {
-  border-color: rgb(152 204 100);
-}
-
-.button-red {
-  background-color: rgb(28 12 14);
-  border: 1px solid rgb(224 60 80);
-  color: rgb(248 232 232);
-}
-.button-red:hover {
-  border-color: rgb(240 80 100);
 }
 
 /*
@@ -381,6 +297,25 @@
   .heat-cell {
     animation: heat-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: calc(var(--col, 0) * 12ms);
+  }
+}
+
+/*
+   Heatmap loading: a wave of the theme's accent sweeping the empty grid
+   diagonally, oldest corner to today (--col is the week, --row the day).
+   Still under reduced motion.
+*/
+.heat-loading {
+  background-color: rgb(var(--bg-header));
+}
+@keyframes heat-wave {
+  0%, 60%, 100% { background-color: rgb(var(--bg-header)); }
+  25% { background-color: rgb(var(--accent) / 0.45); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .heat-loading {
+    animation: heat-wave 2.2s ease-in-out infinite;
+    animation-delay: calc((var(--col, 0) + var(--row, 0)) * 45ms);
   }
 }
 

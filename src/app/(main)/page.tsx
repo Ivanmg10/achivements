@@ -34,8 +34,10 @@ export default async function Home() {
     );
   }
 
+  // No overflow here: the page scrolls, and an overflow box would stop the
+  // sticky section strip from sticking.
   return (
-    <div className="flex-1 min-h-0 flex flex-col overflow-y-auto bg-bg-main text-text-main">
+    <div className="flex-1 min-h-0 flex flex-col bg-bg-main text-text-main">
       <MainPage />
     </div>
   );

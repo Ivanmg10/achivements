@@ -17,7 +17,7 @@ export default function UserVaultStat({
   accent: string
 }) {
   return (
-    <div className="bg-bg-main rounded-2xl px-3 py-3 flex flex-col gap-1.5 min-w-0 ring-1 ring-white/[0.04]">
+    <div className="bg-bg-main rounded-2xl px-3 py-3 flex flex-col gap-1.5 min-w-0 ring-1 ring-ink/[0.04]">
       <span aria-hidden="true" className={`${accent} opacity-80`}>
         {icon}
       </span>

@@ -78,14 +78,14 @@ export default function AvatarUpload({ onDone }: { onDone: () => void }) {
         {preview ? (
           <Image src={preview} alt={T.editProfileModal.avatarPreview} width={72} height={72} unoptimized className="w-18 h-18 rounded-full object-cover ring-2 ring-accent/40" />
         ) : (
-          <span aria-hidden="true" className="w-18 h-18 rounded-full bg-bg-main ring-1 ring-white/10 flex items-center justify-center text-text-secondary">
+          <span aria-hidden="true" className="w-18 h-18 rounded-full bg-bg-main ring-1 ring-ink/10 flex items-center justify-center text-text-secondary">
             <IconPhotoUp size={26} />
           </span>
         )}
         <div className="flex flex-col gap-1.5 min-w-0">
           <label
             htmlFor={inputId}
-            className="self-start cursor-pointer px-3 py-2 rounded-xl bg-bg-main ring-1 ring-white/10 text-sm font-medium hover:ring-white/25 transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/70"
+            className="self-start cursor-pointer px-3 py-2 rounded-xl bg-bg-main ring-1 ring-ink/10 text-sm font-medium hover:ring-ink/25 transition has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/70"
           >
             {preview ? T.editProfileModal.uploadChoose : T.editProfileModal.uploadButton}
             <input

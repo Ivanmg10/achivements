@@ -21,7 +21,7 @@ export default function AllGamesPage() {
 
   return (
     <motion.div
-      className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white"
+      className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main"
       variants={fadeUp}
       initial="hidden"
       animate="visible"

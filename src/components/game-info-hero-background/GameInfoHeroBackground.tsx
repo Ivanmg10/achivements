@@ -24,7 +24,7 @@ export default function GameInfoHeroBackground({ imagePath }: { imagePath: strin
         style={{ filter: 'blur(16px)' }}
       />
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-bg-main/60 to-bg-main" />
-      <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-b from-black/40 via-black/15 to-transparent" />
+      <div className="absolute top-0 left-0 w-full h-24 bg-linear-to-b from-bg-main/40 via-bg-main/15 to-transparent" />
     </div>
   )
 }

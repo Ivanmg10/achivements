@@ -82,7 +82,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                     key={`${award.AwardType}-${award.AwardData}`}
                     href={`/gameInfo/${award.AwardData}`}
                     onClick={onClose}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-bg-main hover:bg-bg-card transition-colors group ring-1 ring-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-bg-main hover:bg-bg-card transition-colors group ring-1 ring-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                   >
                     <div className="relative shrink-0">
                       {award.ImageIcon ? (
@@ -95,7 +95,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                           unoptimized
                         />
                       ) : (
-                        <div className="w-9 h-9 rounded-lg bg-white/5" />
+                        <div className="w-9 h-9 rounded-lg bg-ink/5" />
                       )}
                       <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${isMastery ? 'bg-yellow-400' : 'bg-green-500'}`}>
                         {isMastery
@@ -117,7 +117,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                   </Link>
                 )
               })}
-              {dayAchs.length > 0 && <div className="border-t border-white/5 mt-1" />}
+              {dayAchs.length > 0 && <div className="border-t border-ink/5 mt-1" />}
             </div>
           )}
 
@@ -134,7 +134,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
         </div>
 
         {(dayAchs.length > 0 || dayAwards.length > 0) && (
-          <p className="text-xs text-text-secondary text-right pt-2 border-t border-white/5 shrink-0">
+          <p className="text-xs text-text-secondary text-right pt-2 border-t border-ink/5 shrink-0">
             {dayAchs.length} {T.dayModal.achievements}
             {dayAwards.length > 0 && ` · ${dayAwards.length} ${T.streak.completions.split(' ')[0].toLowerCase()}`}
           </p>

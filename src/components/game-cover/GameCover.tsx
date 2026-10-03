@@ -25,7 +25,7 @@ export default function GameCover({
 }) {
   const boxArt = useRaBoxArt(source === 'ra' ? [id] : [])
   const art = source === 'ra' ? boxArt[id] ?? iconUrl : undefined
-  const img = 'h-full w-auto max-w-full object-contain rounded-lg ring-1 ring-white/10 shadow-xl shadow-black/40'
+  const img = 'h-full w-auto max-w-full object-contain rounded-lg ring-1 ring-ink/10 shadow-xl shadow-black/40'
 
   const picture =
     source === 'steam' ? (

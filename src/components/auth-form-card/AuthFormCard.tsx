@@ -7,7 +7,7 @@ import type { ReactNode } from 'react'
  */
 export default function AuthFormCard({ children }: { children: ReactNode }) {
   return (
-    <div className="w-full max-w-md mx-auto rounded-3xl bg-bg-card/75 backdrop-blur-xl ring-1 ring-white/[0.07] shadow-2xl shadow-black/40 px-5 py-7 sm:px-8 sm:py-9 motion-safe:transition-shadow contrast-more:bg-bg-card [@media(prefers-reduced-transparency:reduce)]:bg-bg-card">
+    <div className="w-full max-w-md mx-auto rounded-3xl bg-bg-card/75 backdrop-blur-xl ring-1 ring-ink/[0.07] shadow-2xl shadow-black/40 px-5 py-7 sm:px-8 sm:py-9 motion-safe:transition-shadow contrast-more:bg-bg-card [@media(prefers-reduced-transparency:reduce)]:bg-bg-card">
       {children}
     </div>
   )

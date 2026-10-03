@@ -23,7 +23,7 @@ export function GameAchievementsProgressChart({
     <div className="w-full flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2 px-1">
         <p className="text-text-secondary text-sm">{T.gameExpanded.achievementsOverTime}</p>
-        <div role="tablist" className="flex items-center gap-0.5 p-0.5 rounded-full bg-white/5 shrink-0">
+        <div role="tablist" className="flex items-center gap-0.5 p-0.5 rounded-full bg-ink/5 shrink-0">
           <button
             role="tab"
             aria-selected={period === 'week'}
@@ -31,7 +31,7 @@ export function GameAchievementsProgressChart({
             className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
               period === 'week'
                 ? 'bg-accent text-bg-main'
-                : 'text-text-secondary hover:text-text-main hover:bg-white/8'
+                : 'text-text-secondary hover:text-text-main hover:bg-ink/8'
             }`}
           >
             {T.gameExpanded.weekly}
@@ -43,7 +43,7 @@ export function GameAchievementsProgressChart({
             className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
               period === 'month'
                 ? 'bg-accent text-bg-main'
-                : 'text-text-secondary hover:text-text-main hover:bg-white/8'
+                : 'text-text-secondary hover:text-text-main hover:bg-ink/8'
             }`}
           >
             {T.gameExpanded.monthly}
@@ -55,7 +55,7 @@ export function GameAchievementsProgressChart({
         <div className="px-1 h-52 flex flex-col justify-end gap-1 animate-pulse">
           <div className="flex items-end gap-2 h-44">
             {[45, 70, 30, 90, 55, 20, 80, 60].map((h, i) => (
-              <div key={i} className="flex-1 bg-white/10 rounded-t-sm" style={{ height: `${h}%` }} />
+              <div key={i} className="flex-1 bg-ink/10 rounded-t-sm" style={{ height: `${h}%` }} />
             ))}
           </div>
         </div>

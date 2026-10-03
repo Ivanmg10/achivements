@@ -90,10 +90,10 @@ export default function MainPageGroups({
         <div className="flex flex-col gap-2 animate-pulse">
           {[0, 1, 2].map((i) => (
             <div key={i} className="flex items-center gap-2 bg-bg-main rounded-lg p-2">
-              <div className="w-9 h-9 rounded-lg bg-white/10 shrink-0" />
+              <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
               <div className="flex flex-col flex-1 gap-1.5">
-                <div className="h-2.5 w-28 rounded bg-white/10" />
-                <div className="h-2 w-16 rounded bg-white/10" />
+                <div className="h-2.5 w-28 rounded bg-ink/10" />
+                <div className="h-2 w-16 rounded bg-ink/10" />
               </div>
             </div>
           ))}
@@ -175,7 +175,7 @@ export default function MainPageGroups({
           {!onSelect && groups.length > 4 ? (
             <Link
               href="/groups"
-              className="flex items-center gap-2.5 bg-bg-main rounded-lg p-2 hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="flex items-center gap-2.5 bg-bg-main rounded-lg p-2 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <div className="w-9 h-9 rounded-lg bg-bg-card flex items-center justify-center shrink-0">
                 <IconFolder className="w-4 h-4 text-text-secondary" aria-hidden />
@@ -187,7 +187,7 @@ export default function MainPageGroups({
           ) : groups.length < 10 && (
             <button
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 bg-bg-main/50 border border-dashed border-white/10 rounded-lg p-2 hover:border-accent/40 hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70"
+              className="flex items-center gap-2 bg-bg-main/50 border border-dashed border-ink/10 rounded-lg p-2 hover:border-accent/40 hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70"
             >
               <div className="w-9 h-9 rounded-lg bg-bg-card flex items-center justify-center shrink-0">
                 <IconPlus className="w-4 h-4" aria-hidden />

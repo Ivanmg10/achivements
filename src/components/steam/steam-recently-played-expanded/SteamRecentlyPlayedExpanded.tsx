@@ -49,7 +49,7 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
         {isLoading ? (
           <ul aria-busy="true" className="flex flex-wrap gap-1">
             {Array.from({ length: Math.min(total || SKELETON_BADGES, 60) }).map((_, i) => (
-              <li key={i} className="w-10 h-10 rounded-lg bg-white/10 animate-pulse" />
+              <li key={i} className="w-10 h-10 rounded-lg bg-ink/10 animate-pulse" />
             ))}
           </ul>
         ) : error ? (
@@ -60,7 +60,7 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
             <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
             <button
               onClick={retry}
-              className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-white/10 transition-colors"
+              className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors"
             >
               {T.steam.retry}
             </button>

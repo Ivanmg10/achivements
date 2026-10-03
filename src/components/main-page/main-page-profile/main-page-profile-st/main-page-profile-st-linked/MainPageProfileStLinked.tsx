@@ -47,7 +47,7 @@ export default function MainPageProfileStLinked({
         <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
         <button
           onClick={onRetry}
-          className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-white/10 transition-colors"
+          className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors"
         >
           {T.steam.retry}
         </button>
@@ -76,7 +76,7 @@ export default function MainPageProfileStLinked({
           href={profile.profileurl}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[#66c0f4]"
+          className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[#66c0f4]"
         >
           <IconExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
           {T.steam.viewOnSteam}

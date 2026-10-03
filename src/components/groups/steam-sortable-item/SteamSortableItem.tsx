@@ -68,7 +68,7 @@ export default function SteamSortableItem({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       {/* The same blurred art and pointer glow as the game cards in the status lists. */}
       <GameCardBackdrop src={steamAssetUrl(item.game_id, 'header')} surface="card" />
@@ -90,7 +90,7 @@ export default function SteamSortableItem({
           tabIndex={-1}
           aria-hidden="true"
           className={`shrink-0 rounded-xl transition-all ${
-            isComplete ? 'ring-2 ring-[#a4d007]/70 hover:ring-[#a4d007]' : 'hover:ring-2 hover:ring-white/40'
+            isComplete ? 'ring-2 ring-[#a4d007]/70 hover:ring-[#a4d007]' : 'hover:ring-2 hover:ring-ink/40'
           }`}
         >
           <SteamGameImage
@@ -105,7 +105,7 @@ export default function SteamSortableItem({
         <div className="flex flex-col flex-1 min-w-0 gap-1">
           <Link
             href={href}
-            className="self-start hover:underline decoration-white/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+            className="self-start hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
           >
             <p className="text-xl font-semibold leading-tight">{game?.title ?? item.title}</p>
           </Link>

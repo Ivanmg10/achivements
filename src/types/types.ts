@@ -1,7 +1,10 @@
 import type { GameSource, SteamAchievementUnified } from '@/types/steam'
 
 /** Every theme the app has a stylesheet for; the endpoints that store one accept only these. */
-const THEMES = ['dark', 'light', 'blue', 'purple', 'green', 'red'] as const
+export const THEMES = ['dark', 'light', 'blue', 'purple', 'green', 'red'] as const
+
+/** Where the browser keeps the last theme, so the page is painted in it before React loads. */
+export const THEME_STORAGE_KEY = 'app-theme'
 
 export type Theme = (typeof THEMES)[number]
 

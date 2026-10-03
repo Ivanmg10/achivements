@@ -19,7 +19,7 @@ export function StatPill({
   href?: string
   onClick?: () => void
 }) {
-  const interactiveCls = 'text-left hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+  const interactiveCls = 'text-left hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
   if (size === 'sm') {
     const inner = (

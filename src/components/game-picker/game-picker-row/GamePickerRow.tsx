@@ -30,7 +30,7 @@ export default function GamePickerRow({
       {icon ? (
         <Image src={icon} alt="" width={32} height={32} className="w-8 h-8 rounded object-cover shrink-0" unoptimized />
       ) : (
-        <div className="w-8 h-8 rounded bg-white/10 shrink-0" aria-hidden="true" />
+        <div className="w-8 h-8 rounded bg-ink/10 shrink-0" aria-hidden="true" />
       )}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-text-main truncate">{c.title}</p>
@@ -41,7 +41,7 @@ export default function GamePickerRow({
       </div>
       <div
         aria-hidden="true"
-        className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected ? 'bg-accent border-accent' : 'border-white/20'}`}
+        className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected ? 'bg-accent border-accent' : 'border-ink/20'}`}
       >
         {selected && <IconCheck className="w-3 h-3 text-bg-main" />}
       </div>

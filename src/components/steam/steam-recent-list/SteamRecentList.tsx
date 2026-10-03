@@ -39,7 +39,7 @@ export default function SteamRecentList() {
           <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
           <button
             onClick={refetch}
-            className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-white/10 transition-colors"
+            className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors"
           >
             {T.steam.retry}
           </button>

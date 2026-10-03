@@ -69,10 +69,10 @@ export default function GroupsPage() {
         <div className="flex flex-col gap-3 animate-pulse">
           {[0, 1, 2].map((i) => (
             <div key={i} className="flex items-center gap-4 bg-bg-card rounded-xl p-4">
-              <div className="w-14 h-14 rounded-xl bg-white/10 shrink-0" />
+              <div className="w-14 h-14 rounded-xl bg-ink/10 shrink-0" />
               <div className="flex flex-col gap-2 flex-1">
-                <div className="h-3.5 w-40 rounded bg-white/10" />
-                <div className="h-2.5 w-24 rounded bg-white/10" />
+                <div className="h-3.5 w-40 rounded bg-ink/10" />
+                <div className="h-2.5 w-24 rounded bg-ink/10" />
               </div>
             </div>
           ))}
@@ -101,7 +101,7 @@ export default function GroupsPage() {
           {groups.length < 10 && (
             <button
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-4 bg-bg-card/50 border border-dashed border-white/10 rounded-xl p-4 hover:border-accent/40 hover:bg-bg-card transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70"
+              className="flex items-center gap-4 bg-bg-card/50 border border-dashed border-ink/10 rounded-xl p-4 hover:border-accent/40 hover:bg-bg-card transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70"
             >
               <div className="w-14 h-14 rounded-xl bg-bg-main flex items-center justify-center shrink-0">
                 <IconPlus className="w-6 h-6" aria-hidden />

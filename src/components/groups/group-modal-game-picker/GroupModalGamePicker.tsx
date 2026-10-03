@@ -114,7 +114,7 @@ export default function GroupModalGamePicker({
                 key={c.key}
                 type="button"
                 onClick={() => add(c)}
-                className="flex items-center gap-2 bg-bg-main hover:bg-white/5 rounded-lg px-2.5 py-1.5 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="flex items-center gap-2 bg-bg-main hover:bg-ink/5 rounded-lg px-2.5 py-1.5 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 {icon && <Image src={icon} alt="" width={20} height={20} className="rounded shrink-0" unoptimized />}
                 <span className="flex flex-col min-w-0 flex-1">
@@ -133,7 +133,7 @@ export default function GroupModalGamePicker({
             <button
               type="button"
               onClick={() => addById(directGameId)}
-              className="flex items-center gap-2 bg-bg-main hover:bg-white/5 rounded-lg px-2.5 py-1.5 transition-colors text-left border border-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="flex items-center gap-2 bg-bg-main hover:bg-ink/5 rounded-lg px-2.5 py-1.5 transition-colors text-left border border-ink/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <span
                 aria-hidden="true"

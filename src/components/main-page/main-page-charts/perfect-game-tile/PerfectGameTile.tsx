@@ -42,7 +42,7 @@ export default function PerfectGameTile({ game, date }: { game: PerfectGame; dat
           unoptimized={game.source === 'steam'}
         />
       ) : (
-        <span className="block w-8 h-8 rounded bg-white/10" aria-hidden="true" />
+        <span className="block w-8 h-8 rounded bg-ink/10" aria-hidden="true" />
       )}
       {game.source === 'steam' ? (
         <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-bg-card flex items-center justify-center" aria-hidden="true">
@@ -55,7 +55,7 @@ export default function PerfectGameTile({ game, date }: { game: PerfectGame; dat
       <span
         id={tipId}
         role="tooltip"
-        className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 w-max max-w-56 rounded-lg bg-bg-header ring-1 ring-white/10 shadow-xl shadow-black/40 px-2.5 py-1.5 text-left opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-visible:opacity-100 group-focus-visible:translate-y-0 transition duration-150"
+        className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 w-max max-w-56 rounded-lg bg-bg-header ring-1 ring-ink/10 shadow-xl shadow-black/40 px-2.5 py-1.5 text-left opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-visible:opacity-100 group-focus-visible:translate-y-0 transition duration-150"
       >
         <span className="block text-xs font-semibold text-text-main truncate">{game.title}</span>
         <span className="block text-[10px] text-text-secondary truncate">

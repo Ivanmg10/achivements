@@ -267,7 +267,7 @@ export default function AchievementModal({
                                   className="w-7 h-7 rounded-full object-cover"
                                 />
                               ) : (
-                                <div className="w-7 h-7 rounded-full bg-white/10 shrink-0" />
+                                <div className="w-7 h-7 rounded-full bg-ink/10 shrink-0" />
                               )}
                               <p className="text-sm">{u.User}</p>
                               {u.HardcoreMode === '1' && (
@@ -327,7 +327,7 @@ export default function AchievementModal({
                               className="w-8 h-8 rounded-full object-cover shrink-0"
                             />
                           ) : (
-                            <div className="w-8 h-8 rounded-full bg-white/10 shrink-0" />
+                            <div className="w-8 h-8 rounded-full bg-ink/10 shrink-0" />
                           )}
                           <div className="flex flex-col gap-0.5 flex-1 min-w-0">
                             <div className="flex items-baseline gap-2">
