@@ -61,9 +61,10 @@ export default function RaGameItem({
     >
       <GameCardBackdrop src={art} />
 
-      <div className="flex items-center gap-3 px-3 py-3 shrink-0">
+      {/* relative: the expand button stretches over this whole row (see below). */}
+      <div className="relative flex items-center gap-3 px-3 py-3 shrink-0">
         {/* Same destination as the title link, so it is kept out of the tab order. */}
-        <Link href={href} tabIndex={-1} aria-hidden="true" className="relative shrink-0">
+        <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
           {art ? (
             <Image
               src={art}
@@ -87,7 +88,7 @@ export default function RaGameItem({
         <div className="flex flex-col min-w-0 flex-1 gap-1">
           <Link
             href={href}
-            className="w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="relative z-10 w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <span className="text-base font-bold block truncate leading-tight">{game.Title}</span>
           </Link>
@@ -97,7 +98,7 @@ export default function RaGameItem({
             aria-expanded={expanded}
             aria-controls={panelId}
             aria-label={`${expanded ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.Title}`}
-            className="flex flex-col gap-1 w-full text-left rounded group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="flex flex-col gap-1 w-full text-left rounded group cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <span className="flex items-center gap-2 w-full">
               <span className="text-xs text-text-secondary truncate max-w-[45%] shrink-0">{game.ConsoleName}</span>
@@ -138,8 +139,8 @@ export default function RaGameItem({
           </button>
         </div>
 
-        {/* Outside the expand button: a button inside a button is invalid HTML. */}
-        <PinToggleButton gameId={game.GameID} className="self-center" />
+        {/* Outside the expand button (a button inside a button is invalid HTML), and above its stretched hit area. */}
+        <PinToggleButton gameId={game.GameID} className="self-center relative z-10" />
       </div>
 
       {expanded && (

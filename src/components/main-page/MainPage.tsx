@@ -32,19 +32,19 @@ export default function MainPage() {
 
   return (
     <motion.main
-      className="flex flex-col min-h-full text-text-main"
+      className="home-fit flex flex-col min-h-full text-text-main"
       // Opacity only: content landing where the skeleton was, with no slide on top.
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
     >
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
+      <div className="home-fit-top flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
         {/* Profile first in DOM → top on mobile; placed col-2 on desktop */}
-        <div className="lg:col-start-2 lg:row-start-1">
+        <div className="home-fit-side min-h-0 flex flex-col lg:col-start-2 lg:row-start-1">
           <MainPageProfile />
         </div>
         {/* Left column: either pinned games or recently played */}
-        <div className="flex flex-col min-h-0 lg:col-start-1 lg:row-start-1">
+        <div className="home-fit-main flex flex-col min-h-0 lg:col-start-1 lg:row-start-1">
           {view === 'pinned' ? (
             <MainPagePinnedGames />
           ) : (

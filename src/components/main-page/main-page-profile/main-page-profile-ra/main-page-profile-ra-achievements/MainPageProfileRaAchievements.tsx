@@ -17,14 +17,14 @@ export default function MainPageProfileRaAchievements({
   const { T } = useLanguage()
 
   return (
-    // Room for the five rows it can hold, loading or loaded: the profile column
+    // Room for the three rows it can hold, loading or loaded: the profile column
     // sets the height of the home page's top row, so this box changing size as
     // it filled made the whole page jump.
-    <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2 min-h-[264px]">
+    <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2 flex-1 min-h-[176px]">
       <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileAchievements.recentAchievements}</p>
       {isLoading && achievements.length === 0 ? (
         <div className="flex flex-col gap-2 animate-pulse">
-          {Array.from({ length: 5 }).map((_, i) => (
+          {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex gap-2 items-center p-1">
               <div className="w-9 h-9 rounded bg-ink/10 shrink-0" />
               <div className="flex flex-col gap-1.5 flex-1 min-w-0">
@@ -39,7 +39,7 @@ export default function MainPageProfileRaAchievements({
         <EmptyState icon={<IconTrophy className="w-6 h-6" />} title={T.cards.noEarned} size="compact" className="flex-1" />
       ) : (
       <div className="flex flex-col gap-2">
-        {achievements.slice(0, 5).map((ach) => (
+        {achievements.slice(0, 3).map((ach) => (
           <Link
             key={ach.AchievementID}
             href={`/gameInfo/${ach.GameID}`}

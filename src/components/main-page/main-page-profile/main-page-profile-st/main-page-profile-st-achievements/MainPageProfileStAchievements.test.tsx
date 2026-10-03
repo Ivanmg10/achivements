@@ -43,9 +43,9 @@ test('shows badge, title, game and unlock date, linking to the achievement', () 
   expect(screen.getByRole('link').getAttribute('href')).toBe('/steamGame/377160#ach-A1')
 })
 
-test('lists at most five', () => {
+test('lists at most three', () => {
   renderIt({ achievements: Array.from({ length: 8 }, (_, i) => ach(i)) })
-  expect(screen.getAllByRole('link')).toHaveLength(5)
+  expect(screen.getAllByRole('link')).toHaveLength(3)
 })
 
 test('shows a skeleton while loading', () => {

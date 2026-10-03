@@ -27,11 +27,11 @@ export default function MainPageProfileStAchievements({
   const { T, lang } = useLanguage()
 
   return (
-    <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2 min-h-[220px]">
+    <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2 flex-1 min-h-[148px]">
       <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileAchievements.recentAchievements}</p>
       {isLoading && achievements.length === 0 ? (
         <div aria-busy="true" className="flex flex-col gap-2 animate-pulse">
-          {Array.from({ length: 5 }).map((_, i) => (
+          {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex gap-2 items-center p-1">
               <div className="w-9 h-9 rounded bg-ink/10 shrink-0" />
               <div className="flex flex-col gap-1.5 flex-1 min-w-0">
@@ -58,7 +58,7 @@ export default function MainPageProfileStAchievements({
         <EmptyState icon={<IconTrophy className="w-6 h-6" />} title={T.cards.noEarned} size="compact" className="flex-1" />
       ) : (
         <ol className="flex flex-col gap-2">
-          {achievements.slice(0, 5).map((a) => (
+          {achievements.slice(0, 3).map((a) => (
             <li key={`${a.appId}:${a.apiname}`}>
               <Link
                 href={`/steamGame/${a.appId}#${achievementAnchor(a.apiname)}`}

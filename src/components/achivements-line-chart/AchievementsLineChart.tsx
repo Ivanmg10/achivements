@@ -55,7 +55,7 @@ export default function AchievementsLineChart({
       </div>
 
       {isLoading ? (
-        <div className="px-1 h-64 flex flex-col justify-end gap-1 animate-pulse">
+        <div className="home-fit-chart px-1 h-64 flex flex-col justify-end gap-1 animate-pulse">
           <div className="flex items-end gap-2 h-56">
             {[45, 70, 30, 90, 55, 20, 80].map((h, i) => (
               <div key={i} className="flex-1 bg-ink/10 rounded-t-md" style={{ height: `${h}%` }} />
@@ -68,7 +68,8 @@ export default function AchievementsLineChart({
           </div>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={260}>
+        <div className="home-fit-chart h-[260px]">
+        <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 8, right: 8, left: -24, bottom: 0 }} onClick={handleChartClick} style={{ cursor: 'pointer' }}>
             <defs>
               <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
@@ -115,6 +116,7 @@ export default function AchievementsLineChart({
             />
           </AreaChart>
         </ResponsiveContainer>
+        </div>
       )}
 
       <AnimatePresence>

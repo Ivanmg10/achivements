@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievementsGameWithAchievements, RetroAchievement } from '@/types/types'
@@ -17,19 +17,23 @@ import SteamGameItem from '@/components/steam/steam-game-item/SteamGameItem'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { mergeRecentFeeds, RecentFeedItem } from '@/utils/steamFeed'
 
-const MAX_GAMES = 7
+const MAX_GAMES = 6
 
-const CARD_MOTION = {
-  initial: { opacity: 0, y: 6 },
+// The list and an open card are two views. One leaves before the other comes
+// in, so a card never grows over the others while they are still fading out.
+const VIEW_MOTION = {
+  initial: { opacity: 0, y: 8 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -8, scaleY: 0.85, transition: { duration: 0.2 } },
-  transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] as const },
-  style: { originY: 0, flex: '1 1 0%' },
+  exit: { opacity: 0, y: -6 },
 }
+const VIEW_EASE = [0.4, 0, 0.2, 1] as const
+// Rows share the column's height; an open card takes all of it.
+const ROW_STYLE = { flex: '1 1 0%' }
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function RARecentlyPlayed() {
   const { T } = useLanguage()
+  const reduce = useReducedMotion()
   const { games, isLoading, error, refetch } = useRecentlyPlayedGames()
   const { recent: steamRecent } = useSteamGamesData()
   // One feed across platforms, newest first. Steam entries merge in when they
@@ -97,7 +101,7 @@ export default function RARecentlyPlayed() {
       </div>
 
       {/* Cards */}
-      <div className="flex flex-col gap-1.5 flex-1 min-h-0">
+      <div className="flex flex-col flex-1 min-h-0">
         {isLoading ? (
           <div className="flex flex-col gap-1.5 animate-pulse motion-reduce:animate-none">
             {Array.from({ length: MAX_GAMES }).map((_, i) => (
@@ -113,25 +117,26 @@ export default function RARecentlyPlayed() {
             subtitle={T.mainPage.noGamesInProgressSub}
           />
         ) : (
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={expanded ?? 'list'}
+              {...VIEW_MOTION}
+              transition={{ duration: reduce ? 0 : 0.18, ease: VIEW_EASE }}
+              className="home-fit-scroll flex flex-col gap-1.5 flex-1 min-h-0"
+            >
             {displayedItems.map((item) => {
               const isExp = expanded === item.key
 
               if (item.source === 'steam') {
                 return (
-                  <motion.div
-                    key={item.key}
-                    layout
-                    {...CARD_MOTION}
-                    className="flex flex-col min-h-0"
-                  >
+                  <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
                     <SteamGameItem
                       game={item.game}
                       expanded={isExp}
                       onToggle={() => handleExpand(item)}
                       className="flex-1"
                     />
-                  </motion.div>
+                  </div>
                 )
               }
 
@@ -144,9 +149,9 @@ export default function RARecentlyPlayed() {
                 : []
 
               return (
-                <motion.div key={item.key} layout {...CARD_MOTION} className="flex flex-col min-h-0">
+                <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
                   <RaGameItem game={g} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1">
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.18 }}>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? 0 : 0.25, delay: reduce ? 0 : 0.1 }}>
                       <RARecentlyPlayedExpanded
                         game={g}
                         achievements={achievements}
@@ -155,9 +160,10 @@ export default function RARecentlyPlayed() {
                       />
                     </motion.div>
                   </RaGameItem>
-                </motion.div>
+                </div>
               )
             })}
+            </motion.div>
           </AnimatePresence>
         )}
       </div>

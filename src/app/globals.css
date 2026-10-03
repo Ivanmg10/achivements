@@ -642,6 +642,25 @@
   }
 }
 
+/*
+   Home on a tall desktop screen, Overview open: exactly one screen. Stats
+   keeps its size; Recently played and the profile share what is left, and
+   Recently played scrolls inside if it runs short. Other sections, shorter
+   screens and phones keep the page scrolling as usual.
+*/
+@media (min-width: 1024px) and (min-height: 1000px) {
+  .home-fit:has([data-stats-section="overview"]) { height: calc(100dvh - 4rem); }
+  .home-fit:has([data-stats-section="overview"]) > .home-fit-top { grid-template-rows: minmax(0, 1fr); }
+  .home-fit:has([data-stats-section="overview"]) .home-fit-side > * { flex: 1 1 0%; }
+  .home-fit:has([data-stats-section="overview"]) .home-fit-scroll { overflow-y: auto; }
+  /* The daily chart sets the height of the charts row (the heatmap follows its box): scaled to the screen here. */
+  .home-fit:has([data-stats-section="overview"]) .home-fit-chart { height: clamp(160px, 20dvh, 260px); }
+  /* The rows carry flex: 1 1 0 inline (ROW_STYLE). Here they may grow to share spare height but never shrink: short of room, the list scrolls. */
+  .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * { flex: 1 0 auto !important; }
+  /* A row taller than its content keeps the content in the middle, not stuck to the top. */
+  .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * > * { justify-content: center; }
+}
+
 /* Heatmap: the cells come in column by column, oldest week first (--col is the week). */
 @keyframes heat-in {
   from { opacity: 0; transform: scale(0.4); }

@@ -68,9 +68,10 @@ export default function SteamGameItem({
     >
       <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} />
 
-      <div className="flex items-center gap-3 px-3 py-3 shrink-0">
+      {/* relative: the expand button stretches over this whole row (see below). */}
+      <div className="relative flex items-center gap-3 px-3 py-3 shrink-0">
         {/* Same destination as the title link, so it is kept out of the tab order. */}
-        <Link href={href} tabIndex={-1} aria-hidden="true" className="shrink-0">
+        <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
           <SteamGameImage
             appId={game.id}
             asset="icon"
@@ -85,7 +86,7 @@ export default function SteamGameItem({
         <div className="flex flex-col min-w-0 flex-1 gap-1">
           <Link
             href={href}
-            className="w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
+            className="relative z-10 w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
           >
             <span className="text-base font-bold block truncate leading-tight">{game.title}</span>
           </Link>
@@ -95,7 +96,7 @@ export default function SteamGameItem({
             aria-expanded={isExpanded}
             aria-controls={panelId}
             aria-label={`${isExpanded ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.title}`}
-            className="flex flex-col gap-1 w-full text-left rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] group"
+            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] group"
           >
             <span className="flex items-center gap-2 w-full">
               <span className="flex items-center gap-1 shrink-0 text-xs text-text-secondary">
@@ -135,8 +136,8 @@ export default function SteamGameItem({
           </button>
         </div>
 
-        {/* Outside the expand button: a button inside a button is invalid HTML. */}
-        <PinToggleButton gameId={game.id} source="steam" className="self-center" />
+        {/* Outside the expand button (a button inside a button is invalid HTML), and above its stretched hit area. */}
+        <PinToggleButton gameId={game.id} source="steam" className="self-center relative z-10" />
       </div>
 
       {isExpanded && (

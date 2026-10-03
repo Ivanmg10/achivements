@@ -158,7 +158,7 @@ export default function MainPageCharts() {
   }
 
   return (
-    <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-labelledby={`${idPrefix}-title`}>
+    <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-labelledby={`${idPrefix}-title`} data-stats-section={section}>
       <h2 id={`${idPrefix}-title`} className="text-xl font-semibold text-text-main">{T.cards.statsActivity}</h2>
 
       {/*
