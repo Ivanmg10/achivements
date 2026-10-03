@@ -1,4 +1,4 @@
-import { gameIconUrl, gameLogoUrl, steamAssetUrl } from '@/lib/steamClient'
+import { gameIconUrl, gameLogoUrl } from '@/lib/steamClient'
 import type { RecentAchievement } from '@/types/types'
 import type {
   SteamOwnedGame,
@@ -38,7 +38,7 @@ export function toSteamGameProgress(game: SteamOwnedGame): SteamGameProgress {
     _source: 'steam',
     id: game.appid,
     title: game.name ?? `App ${game.appid}`,
-    imageIcon: gameIconUrl(game.appid, game.img_icon_url),
+    imageIcon: gameIconUrl(game.appid),
     consoleName: STEAM_PLATFORM,
     maxPossible: 0,
     numAwarded: 0,
@@ -184,6 +184,6 @@ export function toRecentAchievement(a: SteamRecentAchievement, index: number): R
     ConsoleName: STEAM_PLATFORM,
     Source: 'steam',
     BadgeUrl: a.badgeUrl,
-    GameIconUrl: steamAssetUrl(a.appId, 'header'),
+    GameIconUrl: gameIconUrl(a.appId),
   }
 }

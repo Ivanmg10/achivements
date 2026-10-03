@@ -4,7 +4,7 @@ import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types
 import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
 import GameInfoAchievementCard from '../game-info-achivement/GameInfoAchievementCard'
 import AchievementModal from '../achievement-modal/AchievementModal'
-import Image from 'next/image'
+import { FadeImage } from '@/components/ui/FadeImage'
 import { useState, useMemo, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
@@ -128,12 +128,13 @@ export default function GameInfoTable({
                   className="flex items-center gap-3 opacity-80 hover:opacity-100 transition-opacity text-left w-full rounded-lg hover:bg-danger/10 p-1 -m-1"
                 >
                   {a.BadgeName && (
-                    <Image
+                    <FadeImage
                       src={`https://media.retroachievements.org/Badge/${a.BadgeName}.png`}
                       alt={a.Title}
                       width={40}
                       height={40}
-                      className="w-10 h-10 rounded-lg object-cover shrink-0 grayscale"
+                      className="w-10 h-10 rounded-lg shrink-0"
+                      imgClassName="w-full h-full object-cover grayscale"
                     />
                   )}
                   <div className="flex flex-col">

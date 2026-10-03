@@ -15,7 +15,7 @@ import StatusSortControl, {
   defaultSortStateFor,
 } from '@/components/status-sort-control/StatusSortControl'
 import EmptyState from '../../../../components/empty-state/EmptyState'
-import LoadingPage from '../../../../components/loading-page/LoadingPage'
+import StatusPageSkeleton from '@/components/status-page-skeleton/StatusPageSkeleton'
 import { useLanguage } from '@/context/LanguageContext'
 
 export default function CategoryConsolePage() {
@@ -47,10 +47,7 @@ export default function CategoryConsolePage() {
     <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white">
       <div className="w-full lg:max-w-[98%] flex flex-col gap-3">
         {loading ? (
-          <LoadingPage subtitle={
-            { wantToPlay: T.loadingPage.wantToPlay, playing: T.loadingPage.playing, completed: T.loadingPage.completed }[cat]
-            ?? T.loadingPage.subtitle
-          } />
+          <StatusPageSkeleton />
         ) : error ? (
           <p className="text-red-400 text-sm text-center mt-10">{error}</p>
         ) : games.length === 0 ? (

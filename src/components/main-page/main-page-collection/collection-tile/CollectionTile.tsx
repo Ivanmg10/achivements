@@ -25,7 +25,7 @@ export default function CollectionTile({ game, date }: { game: PerfectGame; date
     >
       <span className="relative w-14 h-14 shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5">
         {game.source === 'steam' ? (
-          <SteamGameImage appId={game.id} iconUrl={game.imageUrl} size={56} className="w-14 h-14 rounded-lg ring-1 ring-white/10" />
+          <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageUrl} size={56} className="w-14 h-14 rounded-lg ring-1 ring-white/10" />
         ) : game.imageUrl ? (
           <Image src={game.imageUrl} alt="" width={56} height={56} className="w-14 h-14 rounded-lg object-cover ring-1 ring-white/10" />
         ) : (

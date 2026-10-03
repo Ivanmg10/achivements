@@ -1,5 +1,5 @@
 import { RetroAchievement } from '@/types/types'
-import Image from 'next/image'
+import { FadeImage } from '@/components/ui/FadeImage'
 import { useLanguage } from '@/context/LanguageContext'
 import { motion } from 'framer-motion'
 
@@ -59,14 +59,13 @@ export default function GameInfoAchivement({
     >
       <td className="px-3 py-2 w-24 align-middle text-center">
         {achievement.BadgeName && (
-          <Image
+          <FadeImage
             src={`https://media.retroachievements.org/Badge/${achievement.BadgeName}.png`}
             alt="achievement icon"
             width={80}
             height={80}
-            className={`w-16 h-16 rounded-xl object-cover block mx-auto ${
-              earnedHardcore ? 'ring-2 ring-warning' : ''
-            } ${earned ? '' : 'grayscale'}`}
+            className={`w-16 h-16 rounded-xl mx-auto ${earnedHardcore ? 'ring-2 ring-warning' : ''}`}
+            imgClassName={`w-full h-full object-cover ${earned ? '' : 'grayscale'}`}
           />
         )}
       </td>

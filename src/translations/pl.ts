@@ -162,6 +162,12 @@ export const pl: Translations = {
     raConnectHint: 'Połącz RetroAchievements, aby śledzić tu swoje gry retro.',
     steamConnectHint: 'Połącz Steam, aby śledzić tu swoją bibliotekę i osiągnięcia.',
     psnHint: 'Obsługa PlayStation Network jest w drodze.',
+    hiddenGames: 'Ukryte gry',
+    hiddenCount: 'Ukryte: {n}',
+    hiddenNone: 'Brak',
+    hiddenEmpty: 'Nie ukryto żadnej gry. Użyj oka przy grze na liście, aby ją ukryć.',
+    showGame: 'Pokaż ponownie {title}',
+    close: 'Zamknij',
   },
   userStats: {
     globalRank: 'Globalny ranking',
@@ -288,6 +294,10 @@ export const pl: Translations = {
     raUnlinked: 'Konto RetroAchievements odłączone',
     unlinkFailed: 'Nie udało się odłączyć konta',
     loadAchievementsFailed: 'Nie udało się wczytać osiągnięć',
+    gameHidden: 'Gra ukryta na listach',
+    gameHideFailed: 'Nie udało się ukryć gry',
+    gameShown: 'Gra znów jest widoczna',
+    gameShowFailed: 'Nie udało się ponownie pokazać gry',
   },
   cookies: {
     title: 'Pliki cookie',
@@ -591,10 +601,6 @@ export const pl: Translations = {
   },
   loadingPage: {
     title: 'Ładowanie osiągnięć',
-    subtitle: 'Pobieranie danych gry...',
-    wantToPlay: 'Ładowanie listy życzeń...',
-    playing: 'Ładowanie aktywnych gier...',
-    completed: 'Ładowanie ukończonych gier...',
     game: 'Ładowanie danych gry...',
   },
   search: {
@@ -710,6 +716,11 @@ export const pl: Translations = {
     filterRaSc: 'RA softcore',
     collectionView: 'Widok',
     yourNumbers: 'Twoje liczby',
+    hideGame: 'Ukryj grę',
+    hideGameTitle: 'Ukryć tę grę?',
+    hideGameText: '{title} nie będzie już widoczna na listach. Możesz ją przywrócić w koncie: Preferencje › Ukryte gry.',
+    hideConfirm: 'Ukryj',
+    cancel: 'Anuluj',
   },
   groups: {
     title: 'Grupy',

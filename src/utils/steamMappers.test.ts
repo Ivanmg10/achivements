@@ -40,7 +40,7 @@ describe('toSteamGameProgress', () => {
       _source: 'steam',
       id: 730,
       title: 'Counter-Strike 2',
-      imageIcon: 'https://media.steampowered.com/steamcommunity/public/images/apps/730/iconhash.jpg',
+      imageIcon: '/api/steam/icon?appid=730',
       consoleName: STEAM_PLATFORM,
       maxPossible: 0,
       numAwarded: 0,
@@ -57,7 +57,7 @@ describe('toSteamGameProgress', () => {
   test('fills in defaults when Steam omits optional fields', () => {
     const sparse = toSteamGameProgress({ appid: 999, playtime_forever: 0 })
     expect(sparse.title).toBe('App 999')
-    expect(sparse.imageIcon).toBe('')
+    expect(sparse.imageIcon).toBe('/api/steam/icon?appid=999')
     expect(sparse.imgLogoUrl).toBe('')
     expect(sparse.playtime2Weeks).toBe(0)
     expect(sparse.lastPlayed).toBeNull()
@@ -279,6 +279,6 @@ describe('toRecentAchievement', () => {
       Source: 'steam',
       BadgeUrl: 'https://cdn/win.jpg',
     })
-    expect(mapped.GameIconUrl).toContain('/620/header.jpg')
+    expect(mapped.GameIconUrl).toBe('/api/steam/icon?appid=620')
   })
 })

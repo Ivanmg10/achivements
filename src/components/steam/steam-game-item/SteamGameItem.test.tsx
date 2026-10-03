@@ -70,12 +70,10 @@ test('omits the date when the game was never played', () => {
   expect(screen.queryByText('15 Jan 2024')).not.toBeInTheDocument()
 })
 
-test('shows the 600×900 cover rather than the 32×32 library icon', () => {
+test('shows the square desktop icon rather than the 32×32 library icon', () => {
   const { container } = render(<SteamGameItem game={game()} />)
-  // The first image is the blurred backdrop; the cover is the one inside the link.
-  expect(container.querySelector('a img')?.getAttribute('src')).toBe(
-    'https://cdn.akamai.steamstatic.com/steam/apps/620/library_600x900.jpg',
-  )
+  // The first image is the blurred backdrop; the icon is the one inside the link.
+  expect(container.querySelector('a img')?.getAttribute('src')).toBe('/api/steam/icon?appid=620')
 })
 
 describe('links to the game page', () => {

@@ -69,7 +69,7 @@ export default function MainPageGroupFeature({ group }: { group: GameGroup }) {
                   className="flex items-center gap-3 rounded-xl bg-bg-main p-2.5 hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 min-w-0"
                 >
                   {item.source === 'steam' ? (
-                    <SteamGameImage appId={item.game_id} iconUrl={item.image_icon ?? undefined} size={40} className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                    <SteamGameImage appId={item.game_id} asset="icon" iconUrl={item.image_icon ?? undefined} size={40} className="w-10 h-10 rounded-lg object-cover shrink-0" />
                   ) : item.image_icon ? (
                     <Image src={`https://retroachievements.org${item.image_icon}`} alt="" width={40} height={40} className="w-10 h-10 rounded-lg object-cover shrink-0" />
                   ) : (

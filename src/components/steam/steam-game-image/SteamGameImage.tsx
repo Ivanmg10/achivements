@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import Image from 'next/image'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
-import { steamAssetUrl, SteamAsset } from '@/lib/steamClient'
+import { steamAssetUrl, gameIconUrl, SteamAsset } from '@/lib/steamClient'
 
 /**
  * Official Steam artwork for a game, falling back when an asset is missing.
@@ -23,7 +23,8 @@ export default function SteamGameImage({
   className = '',
 }: {
   appId: number
-  asset?: SteamAsset
+  /** 'icon' is the square desktop icon, falling back to the cover. */
+  asset?: SteamAsset | 'icon'
   /** The 32×32 library icon — last resort before the placeholder. */
   iconUrl?: string
   alt?: string
@@ -31,12 +32,21 @@ export default function SteamGameImage({
   size: number
   className?: string
 }) {
-  const sources = [
-    steamAssetUrl(appId, asset),
-    ...(asset !== 'header' ? [steamAssetUrl(appId, 'header')] : []),
+  const art = asset === 'icon' ? 'cover' : asset
+  // A Set, because iconUrl is often the same icon route requested first.
+  const sources = [...new Set([
+    ...(asset === 'icon' ? [gameIconUrl(appId)] : []),
+    steamAssetUrl(appId, art),
+    ...(art !== 'header' ? [steamAssetUrl(appId, 'header')] : []),
     ...(iconUrl ? [iconUrl] : []),
-  ]
+  ])]
   const [index, setIndex] = useState(0)
+  // Until a source has loaded, the box shows a pulsing placeholder in its own shape.
+  const [loaded, setLoaded] = useState(false)
+  // A cached image can finish before React attaches onLoad: check on mount.
+  const ref = useCallback((img: HTMLImageElement | null) => {
+    if (img?.complete && img.naturalWidth > 0) setLoaded(true)
+  }, [])
 
   if (index >= sources.length) {
     return (
@@ -60,8 +70,13 @@ export default function SteamGameImage({
       width={size}
       height={size}
       // A portrait cover cut to a square keeps its top, where the title is printed.
-      className={`object-cover ${asset === 'cover' && index === 0 ? 'object-top' : ''} ${className}`}
-      onError={() => setIndex((i) => i + 1)}
+      ref={ref}
+      className={`object-cover ${art === 'cover' && sources[index] === steamAssetUrl(appId, 'cover') ? 'object-top' : ''} ${loaded ? '' : 'bg-white/[0.06] animate-pulse motion-reduce:animate-none'} ${className}`}
+      onLoad={() => setLoaded(true)}
+      onError={() => {
+        setLoaded(false)
+        setIndex((i) => i + 1)
+      }}
       unoptimized
     />
   )

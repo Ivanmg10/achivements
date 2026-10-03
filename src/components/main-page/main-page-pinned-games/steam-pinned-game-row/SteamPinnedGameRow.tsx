@@ -74,7 +74,7 @@ export default function SteamPinnedGameRow({
 
         {/* Same destination as the title link, so it is kept out of the tab order. */}
         <Link href={href} tabIndex={-1} aria-hidden="true" className="shrink-0">
-          <SteamGameImage appId={appId} iconUrl={game.imageIcon} size={56} className="rounded-xl w-14 h-14" />
+          <SteamGameImage appId={appId} asset="icon" iconUrl={game.imageIcon} size={56} className="rounded-xl w-14 h-14" />
         </Link>
 
         <div className="flex flex-col min-w-0 flex-1 gap-1">

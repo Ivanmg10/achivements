@@ -160,6 +160,12 @@ export const en = {
     raConnectHint: 'Connect RetroAchievements to track your retro games here.',
     steamConnectHint: 'Connect Steam to track your library and achievements here.',
     psnHint: 'PlayStation Network support is on the way.',
+    hiddenGames: 'Hidden games',
+    hiddenCount: '{n} hidden',
+    hiddenNone: 'None',
+    hiddenEmpty: 'You have not hidden any game. Use the eye on a game in your lists to hide it.',
+    showGame: 'Show {title} again',
+    close: 'Close',
   },
   userStats: {
     globalRank: 'Global rank',
@@ -286,6 +292,10 @@ export const en = {
     raUnlinked: 'RetroAchievements account unlinked',
     unlinkFailed: 'Could not unlink the account',
     loadAchievementsFailed: 'Could not load the achievements',
+    gameHidden: 'Game hidden from your lists',
+    gameHideFailed: 'Could not hide the game',
+    gameShown: 'Game shown again',
+    gameShowFailed: 'Could not show the game again',
   },
   cookies: {
     title: 'Cookies',
@@ -589,10 +599,6 @@ export const en = {
   },
   loadingPage: {
     title: 'Loading your achievements',
-    subtitle: 'Fetching your game data...',
-    wantToPlay: 'Loading your wishlist...',
-    playing: 'Loading your active games...',
-    completed: 'Loading your completions...',
     game: 'Loading game data...',
   },
   search: {
@@ -708,6 +714,11 @@ export const en = {
     filterRaSc: 'RA softcore',
     collectionView: 'View',
     yourNumbers: 'Your numbers',
+    hideGame: 'Hide game',
+    hideGameTitle: 'Hide this game?',
+    hideGameText: '{title} will no longer appear in your lists. You can show it again from your account, in Preferences › Hidden games.',
+    hideConfirm: 'Hide',
+    cancel: 'Cancel',
   },
   groups: {
     title: 'Groups',

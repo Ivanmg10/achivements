@@ -67,3 +67,13 @@ test('a landscape header is centred as before', () => {
   const { container } = render(<SteamGameImage appId={620} asset="header" size={56} />)
   expect(container.querySelector('img')).not.toHaveClass('object-top')
 })
+
+test('the square icon comes first and falls back to the cover', () => {
+  const { container } = render(<SteamGameImage appId={620} asset="icon" size={56} />)
+  expect(img(container)?.getAttribute('src')).toBe('/api/steam/icon?appid=620')
+  expect(img(container)).not.toHaveClass('object-top')
+
+  fireEvent.error(img(container)!)
+  expect(img(container)?.getAttribute('src')).toBe(`${CDN}/library_600x900.jpg`)
+  expect(img(container)).toHaveClass('object-top')
+})

@@ -4,7 +4,8 @@
  * The blurred artwork behind an RA game page, as the Steam page does with its
  * library banner. Takes the game's title/in-game screenshot path already
  * resolved by the caller, and simply drops out if there is none — it is
- * decoration.
+ * decoration. It fades in once loaded, so the page never flashes a half-drawn
+ * picture behind its header.
  */
 export default function GameInfoHeroBackground({ imagePath }: { imagePath: string | null }) {
   if (!imagePath) return null
@@ -18,7 +19,8 @@ export default function GameInfoHeroBackground({ imagePath }: { imagePath: strin
       <img
         src={`https://retroachievements.org${imagePath}`}
         alt=""
-        className="w-full h-full object-cover object-top opacity-60 scale-110"
+        onLoad={(e) => e.currentTarget.classList.replace('opacity-0', 'opacity-60')}
+        className="w-full h-full object-cover object-top opacity-0 scale-110 transition-opacity duration-700"
         style={{ filter: 'blur(16px)' }}
       />
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-bg-main/60 to-bg-main" />

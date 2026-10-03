@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useRaLinked } from '@/hooks/useRaLinked'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 type ValidCategory = 'wantToPlay' | 'playing' | 'completed'
 
@@ -66,5 +67,12 @@ export function useGamesByCategory(category: string, consoleId?: string) {
 
   const loading = category === 'wantToPlay' ? wantLoading || completedLoading : completedLoading
 
-  return { games, loading, error }
+  // Games the user hid from their lists stay out of every list.
+  const { isHidden } = useHiddenGames()
+  const visible = useMemo(
+    () => games.filter((g) => !isHidden('GameID' in g && g.GameID ? g.GameID : (g as WantToPlayGame).ID, 'ra')),
+    [games, isHidden],
+  )
+
+  return { games: visible, loading, error }
 }

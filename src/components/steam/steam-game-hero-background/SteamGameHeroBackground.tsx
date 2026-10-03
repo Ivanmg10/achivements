@@ -25,7 +25,8 @@ export default function SteamGameHeroBackground({ appId }: { appId: number }) {
         src={sources[index]}
         alt=""
         onError={() => setIndex((i) => i + 1)}
-        className="w-full h-full object-cover object-top opacity-60 scale-110"
+        onLoad={(e) => e.currentTarget.classList.replace('opacity-0', 'opacity-60')}
+        className="w-full h-full object-cover object-top opacity-0 scale-110 transition-opacity duration-700"
         style={{ filter: 'blur(16px)' }}
       />
       <div className="absolute inset-0 bg-linear-to-b from-transparent via-bg-main/60 to-bg-main" />

@@ -33,7 +33,7 @@ export default function MainPageProfileStGame({
         {playingNow ? T.profileRa.playingNow : T.steam.lastPlayed}
       </p>
       <div className="flex gap-3 items-center">
-        <SteamGameImage appId={game.id} iconUrl={game.imageIcon} size={50} className="w-12.5 h-12.5 rounded-lg shrink-0" />
+        <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageIcon} size={50} className="w-12.5 h-12.5 rounded-lg shrink-0" />
         <div className="flex flex-col gap-1 min-w-0">
           <span className="text-sm font-semibold truncate">{game.title}</span>
           <span className="text-xs text-gray-400">

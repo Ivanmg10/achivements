@@ -13,9 +13,9 @@ jest.mock('@/components/game-info-subset-selector/GameInfoSubsetSelector', () =>
   default: () => <div data-testid="subset-selector" />,
 }))
 
-jest.mock('@/components/loading-page/LoadingPage', () => ({
+jest.mock('@/components/game-info-skeleton/GameInfoSkeleton', () => ({
   __esModule: true,
-  default: ({ subtitle }: { subtitle?: string }) => <div data-testid="loading-page">{subtitle}</div>,
+  default: () => <div data-testid="loading-page" />,
 }))
 
 global.fetch = jest.fn()
@@ -33,13 +33,13 @@ beforeEach(() => {
   })
 })
 
-test('renders loading page while gameData is null', () => {
+test('shows the page skeleton while the game loads', () => {
   ;(useSession as jest.Mock).mockReturnValue({ data: null, status: 'loading' })
   render(<GameInfo />)
   expect(screen.getByTestId('loading-page')).toBeInTheDocument()
 })
 
-test('renders loading page with session before fetch resolves', () => {
+test('shows the page skeleton, not a full-screen loader, until the game is in', () => {
   ;(fetch as jest.Mock).mockReturnValue(new Promise(() => {}))
   ;(useSession as jest.Mock).mockReturnValue({
     data: { user: { rausername: 'ivan', raLinked: true } },

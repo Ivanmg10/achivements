@@ -28,7 +28,7 @@ export default function CollapsibleSectionPreviewCard({ game }: { game: PreviewG
     >
       <GameCardBackdrop src={art} surface="card" />
       {game.source === 'steam' ? (
-        <SteamGameImage appId={game.id} iconUrl={game.imageRef} size={56} className="w-14 h-14 rounded-lg shrink-0" />
+        <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageRef} size={56} className="w-14 h-14 rounded-lg shrink-0" />
       ) : game.imageRef ? (
         <Image
           src={`https://retroachievements.org${game.imageRef}`}

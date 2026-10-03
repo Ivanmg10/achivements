@@ -3,13 +3,15 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
-import { IconLanguage, IconPalette } from '@tabler/icons-react'
+import { IconEyeOff, IconLanguage, IconPalette } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import FavoriteGameModal, { FavoriteGame } from '@/components/favorite-game-modal/FavoriteGameModal'
 import LanguageModal from '@/components/language-modal/LanguageModal'
 import ThemeModal from '@/components/theme-modal/ThemeModal'
+import HiddenGamesModal from '@/components/hidden-games-modal/HiddenGamesModal'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { candidateIconUrl } from '@/utils/gameCandidates'
@@ -53,6 +55,8 @@ export default function UserPreferencesCard() {
   const [themeOpen, setThemeOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const [favoriteOpen, setFavoriteOpen] = useState<GameSource | null>(null)
+  const [hiddenOpen, setHiddenOpen] = useState(false)
+  const { hidden } = useHiddenGames()
 
   const user = session?.user
   const raFavorite = user?.favorite_game ?? null
@@ -89,9 +93,18 @@ export default function UserPreferencesCard() {
         <ProfileField label={T.userPage.favoriteSteamGame} icon={<SteamLogo size={18} className="text-[#66c0f4]" aria-hidden="true" />} onEdit={() => setFavoriteOpen('steam')}>
           <FavoriteValue game={steamFavorite} source="steam" empty={T.userData.notSet} />
         </ProfileField>
+
+        <ProfileField
+          label={T.userPage.hiddenGames}
+          icon={<IconEyeOff size={18} />}
+          value={hidden.length > 0 ? T.userPage.hiddenCount.replace('{n}', String(hidden.length)) : null}
+          empty={T.userPage.hiddenNone}
+          onEdit={() => setHiddenOpen(true)}
+        />
       </div>
 
       <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
+      <HiddenGamesModal isOpen={hiddenOpen} onClose={() => setHiddenOpen(false)} />
       <LanguageModal isOpen={langOpen} onClose={() => setLangOpen(false)} />
       <FavoriteGameModal
         isOpen={favoriteOpen !== null}

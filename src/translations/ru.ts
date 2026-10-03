@@ -162,6 +162,12 @@ export const ru: Translations = {
     raConnectHint: 'Подключите RetroAchievements, чтобы следить здесь за ретро-играми.',
     steamConnectHint: 'Подключите Steam, чтобы следить здесь за библиотекой и достижениями.',
     psnHint: 'Поддержка PlayStation Network скоро появится.',
+    hiddenGames: 'Скрытые игры',
+    hiddenCount: 'Скрыто: {n}',
+    hiddenNone: 'Нет',
+    hiddenEmpty: 'Вы не скрыли ни одной игры. Нажмите на глаз у игры в списке, чтобы скрыть её.',
+    showGame: 'Снова показать {title}',
+    close: 'Закрыть',
   },
   userStats: {
     globalRank: 'Глобальный рейтинг',
@@ -288,6 +294,10 @@ export const ru: Translations = {
     raUnlinked: 'Аккаунт RetroAchievements отвязан',
     unlinkFailed: 'Не удалось отвязать аккаунт',
     loadAchievementsFailed: 'Не удалось загрузить достижения',
+    gameHidden: 'Игра скрыта из списков',
+    gameHideFailed: 'Не удалось скрыть игру',
+    gameShown: 'Игра снова показана',
+    gameShowFailed: 'Не удалось снова показать игру',
   },
   cookies: {
     title: 'Файлы cookie',
@@ -591,10 +601,6 @@ export const ru: Translations = {
   },
   loadingPage: {
     title: 'Загрузка достижений',
-    subtitle: 'Получение данных об игре...',
-    wantToPlay: 'Загрузка списка желаемого...',
-    playing: 'Загрузка активных игр...',
-    completed: 'Загрузка завершённых игр...',
     game: 'Загрузка данных об игре...',
   },
   search: {
@@ -710,6 +716,11 @@ export const ru: Translations = {
     filterRaSc: 'RA софткор',
     collectionView: 'Вид',
     yourNumbers: 'Ваши цифры',
+    hideGame: 'Скрыть игру',
+    hideGameTitle: 'Скрыть эту игру?',
+    hideGameText: '{title} больше не будет отображаться в списках. Вернуть её можно в аккаунте: Настройки › Скрытые игры.',
+    hideConfirm: 'Скрыть',
+    cancel: 'Отмена',
   },
   groups: {
     title: 'Группы',

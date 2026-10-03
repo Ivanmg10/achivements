@@ -73,6 +73,7 @@ export default function SteamGameItem({
         <Link href={href} tabIndex={-1} aria-hidden="true" className="shrink-0">
           <SteamGameImage
             appId={game.id}
+            asset="icon"
             iconUrl={game.imageIcon}
             size={56}
             className={`rounded-xl w-14 h-14 sm:w-16 sm:h-16 shadow-md shadow-black/30 transition-transform duration-300 hover:scale-105 ${

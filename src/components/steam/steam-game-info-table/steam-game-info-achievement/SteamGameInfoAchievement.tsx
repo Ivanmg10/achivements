@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import { FadeImage } from '@/components/ui/FadeImage'
 import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatRarity, formatUnlock } from '@/utils/steamFeed'
@@ -37,14 +37,13 @@ export default function SteamGameInfoAchievement({
     >
       <td className="px-3 py-2 w-24 align-middle text-center">
         {a.badgeUrl ? (
-          <Image
+          <FadeImage
             src={a.badgeUrl}
             alt=""
             width={64}
             height={64}
-            className={`w-16 h-16 rounded-xl object-cover block mx-auto ${
-              a.earned ? 'ring-2 ring-[#66c0f4]' : 'grayscale opacity-50'
-            }`}
+            className={`w-16 h-16 rounded-xl mx-auto ${a.earned ? 'ring-2 ring-[#66c0f4]' : ''}`}
+            imgClassName={`w-full h-full object-cover ${a.earned ? '' : 'grayscale opacity-50'}`}
             unoptimized
           />
         ) : (

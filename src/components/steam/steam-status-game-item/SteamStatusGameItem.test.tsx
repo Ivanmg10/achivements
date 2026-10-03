@@ -30,7 +30,8 @@ const perfect = { achievementsLoaded: true, maxPossible: 84, numAwarded: 84, pct
 test('lays out like an RA card: cover, title, Steam chip, counts, bar with %', () => {
   const { container } = render(<SteamStatusGameItem game={game(partial)} />)
 
-  expect(container.querySelector('img')?.getAttribute('src')).toContain('/377160/library_600x900.jpg')
+  // The first image is the blurred backdrop; the cover is the one inside the link.
+  expect(container.querySelector('a img')?.getAttribute('src')).toBe('/api/steam/icon?appid=377160')
   expect(screen.getByText('Fallout 4')).toBeInTheDocument()
   expect(screen.getByText('Steam')).toBeInTheDocument()
   expect(screen.getByText(`42 / 84 ${en.steam.achievements}`)).toBeInTheDocument()

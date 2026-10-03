@@ -2,6 +2,7 @@
 
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import Image from 'next/image'
+import { FadeImage } from '@/components/ui/FadeImage'
 import { ReactNode, useMemo, useState } from 'react'
 import GameInfoProgressionHeader from './game-info-header-progression/GameInfoProgressionHeader'
 import GameHashesModal from './GameHashesModal'
@@ -56,12 +57,14 @@ export default function GameInfoHeader({
       {/* Content — above background layers */}
       <div className="relative z-10 flex flex-row items-start gap-5">
         {gameData?.ImageBoxArt && (
-          <Image
+          <FadeImage
             src={`https://retroachievements.org${gameData.ImageBoxArt}`}
             alt="game icon"
             width={150}
             height={150}
-            className="w-28 lg:w-50 rounded-xl"
+            className="w-28 lg:w-50 rounded-xl shrink-0"
+            imgClassName="w-full h-auto"
+            placeholderClassName="aspect-[3/4]"
           />
         )}
         <div className="flex flex-col flex-1 min-w-0 gap-3">
@@ -154,24 +157,24 @@ export default function GameInfoHeader({
           <div className="grid grid-cols-2 gap-2 w-full max-w-sm lg:max-w-none">
             {gameData.ImageTitle && (
               <div className="flex flex-col gap-0.5">
-                <Image
+                <FadeImage
                   src={`https://retroachievements.org${gameData.ImageTitle}`}
                   alt="Title screen"
                   width={200}
                   height={150}
-                  className="w-full rounded-md object-cover aspect-4/3"
+                  className="w-full rounded-md aspect-4/3"
                 />
                 <span className="text-[10px] text-text-secondary text-center">Title Screen</span>
               </div>
             )}
             {gameData.ImageIngame && (
               <div className="flex flex-col gap-0.5">
-                <Image
+                <FadeImage
                   src={`https://retroachievements.org${gameData.ImageIngame}`}
                   alt="In game screenshot"
                   width={200}
                   height={150}
-                  className="w-full rounded-md object-cover aspect-4/3"
+                  className="w-full rounded-md aspect-4/3"
                 />
                 <span className="text-[10px] text-text-secondary text-center">In Game</span>
               </div>

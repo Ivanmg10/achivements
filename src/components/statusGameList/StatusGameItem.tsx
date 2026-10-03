@@ -12,6 +12,7 @@ import { CONSOLES } from '@/constants'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
+import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
@@ -194,6 +195,12 @@ export default function StatusGameItem({
         </div>
 
         <div className="flex items-center gap-1 shrink-0 self-center">
+          <HideGameButton
+            source="ra"
+            gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
+            title={game.Title}
+            image={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null}
+          />
           <PinToggleButton
             gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
             onClick={(e) => e.stopPropagation()}

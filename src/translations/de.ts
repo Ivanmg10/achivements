@@ -162,6 +162,12 @@ export const de: Translations = {
     raConnectHint: 'Verbinde RetroAchievements, um deine Retro-Spiele hier zu verfolgen.',
     steamConnectHint: 'Verbinde Steam, um deine Bibliothek und Erfolge hier zu verfolgen.',
     psnHint: 'PlayStation Network folgt in Kürze.',
+    hiddenGames: 'Ausgeblendete Spiele',
+    hiddenCount: '{n} ausgeblendet',
+    hiddenNone: 'Keine',
+    hiddenEmpty: 'Du hast kein Spiel ausgeblendet. Nutze das Auge bei einem Spiel in deinen Listen.',
+    showGame: '{title} wieder anzeigen',
+    close: 'Schließen',
   },
   userStats: {
     globalRank: 'Globaler Rang',
@@ -288,6 +294,10 @@ export const de: Translations = {
     raUnlinked: 'RetroAchievements-Konto getrennt',
     unlinkFailed: 'Das Konto konnte nicht getrennt werden',
     loadAchievementsFailed: 'Die Erfolge konnten nicht geladen werden',
+    gameHidden: 'Spiel aus deinen Listen ausgeblendet',
+    gameHideFailed: 'Das Spiel konnte nicht ausgeblendet werden',
+    gameShown: 'Spiel wird wieder angezeigt',
+    gameShowFailed: 'Das Spiel konnte nicht wieder angezeigt werden',
   },
   cookies: {
     title: 'Cookies',
@@ -591,10 +601,6 @@ export const de: Translations = {
   },
   loadingPage: {
     title: 'Lade deine Errungenschaften',
-    subtitle: 'Spieldaten werden abgerufen...',
-    wantToPlay: 'Lade deine Wunschliste...',
-    playing: 'Lade deine aktiven Spiele...',
-    completed: 'Lade deine Abschlüsse...',
     game: 'Spieldaten werden geladen...',
   },
   search: {
@@ -710,6 +716,11 @@ export const de: Translations = {
     filterRaSc: 'RA Softcore',
     collectionView: 'Ansicht',
     yourNumbers: 'Deine Zahlen',
+    hideGame: 'Spiel ausblenden',
+    hideGameTitle: 'Dieses Spiel ausblenden?',
+    hideGameText: '{title} erscheint nicht mehr in deinen Listen. Du kannst es in deinem Konto unter Einstellungen › Ausgeblendete Spiele wieder anzeigen.',
+    hideConfirm: 'Ausblenden',
+    cancel: 'Abbrechen',
   },
   groups: {
     title: 'Gruppen',

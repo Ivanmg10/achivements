@@ -7,6 +7,7 @@ import { GamesDataProvider } from '@/context/GamesDataContext'
 import { MainViewProvider } from '@/context/MainViewContext'
 import { MainPlatformProvider } from '@/context/MainPlatformContext'
 import { PinnedGamesProvider } from '@/context/PinnedGamesContext'
+import { HiddenGamesProvider } from '@/context/HiddenGamesContext'
 import { SteamGamesDataProvider } from '@/context/SteamGamesDataContext'
 
 export function MainProviders({ children }: { children: React.ReactNode }) {
@@ -17,12 +18,14 @@ export function MainProviders({ children }: { children: React.ReactNode }) {
           <ActivityHeatmapYearProvider>
             <GamesDataProvider>
               <PinnedGamesProvider>
+                <HiddenGamesProvider>
                 <SteamGamesDataProvider>
                   {/* Inside Steam's provider: it falls back to RA when Steam is not linked. */}
                   <MainPlatformProvider>
                     {children}
                   </MainPlatformProvider>
                 </SteamGamesDataProvider>
+                </HiddenGamesProvider>
               </PinnedGamesProvider>
             </GamesDataProvider>
           </ActivityHeatmapYearProvider>

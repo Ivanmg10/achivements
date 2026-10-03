@@ -1,3 +1,4 @@
+import { upgradeLegacyIconUrl } from '@/lib/steamClient'
 import { gameKey } from '@/utils/gameRef'
 import { classifySteamGame } from '@/utils/steamFeed'
 import type { RecentlyPlayedGame, RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
@@ -107,7 +108,7 @@ export function buildSteamCandidates(library: SteamGameProgress[]): GameCandidat
 /** Where to load a candidate's small icon from. */
 export function candidateIconUrl(c: Pick<GameCandidate, 'source' | 'imageRef'>): string {
   if (!c.imageRef) return ''
-  return c.source === 'ra' ? `https://retroachievements.org${c.imageRef}` : c.imageRef
+  return c.source === 'ra' ? `https://retroachievements.org${c.imageRef}` : upgradeLegacyIconUrl(c.imageRef)
 }
 
 /** Case- and accent-insensitive, so "pokemon" finds "Pokémon". */

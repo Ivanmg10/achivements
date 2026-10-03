@@ -42,7 +42,7 @@ jest.mock('../../../../components/empty-state/EmptyState', () => ({
   default: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
 }))
 
-jest.mock('../../../../components/loading-page/LoadingPage', () => ({
+jest.mock('@/components/status-page-skeleton/StatusPageSkeleton', () => ({
   __esModule: true,
   default: () => <div data-testid="loading-page" />,
 }))

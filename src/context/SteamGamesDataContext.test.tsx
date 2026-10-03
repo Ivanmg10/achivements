@@ -3,8 +3,8 @@ import { render, renderHook, waitFor, act } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { SteamGamesDataProvider, useSteamGamesData } from './SteamGamesDataContext'
 
-const RECENT = [{ _source: 'steam', id: 1, title: 'Recent' }]
-const LIBRARY = [{ _source: 'steam', id: 2, title: 'Owned' }]
+const RECENT = [{ _source: 'steam', id: 1, title: 'Recent', hasStats: true }]
+const LIBRARY = [{ _source: 'steam', id: 2, title: 'Owned', hasStats: true }]
 
 function setSteamId(steamid: string | null) {
   ;(useSession as jest.Mock).mockReturnValue({
@@ -158,18 +158,18 @@ test('drops a response that arrives after the account changed', async () => {
   ;(global.fetch as jest.Mock)
     .mockImplementationOnce(() => new Promise((r) => { releaseOld = r }))
     .mockImplementation(async (url: string) =>
-      ok(url.includes('recently') ? [{ id: 99, title: 'New account' }] : []),
+      ok(url.includes('recently') ? [{ id: 99, title: 'New account', hasStats: true }] : []),
     )
 
   const { result, rerender } = renderHook(() => useSteamGamesData(), { wrapper })
 
   setSteamId('999')
   rerender()
-  await waitFor(() => expect(result.current.recent).toEqual([{ id: 99, title: 'New account' }]))
+  await waitFor(() => expect(result.current.recent).toEqual([{ id: 99, title: 'New account', hasStats: true }]))
 
   // The first account's recent feed finally lands — it must not overwrite.
-  await act(async () => { releaseOld(ok([{ id: 1, title: 'Old account' }])) })
-  expect(result.current.recent).toEqual([{ id: 99, title: 'New account' }])
+  await act(async () => { releaseOld(ok([{ id: 1, title: 'Old account', hasStats: true }])) })
+  expect(result.current.recent).toEqual([{ id: 99, title: 'New account', hasStats: true }])
 })
 
 describe('filling achievement counts in the background', () => {
@@ -289,4 +289,16 @@ test('always asks the server, never a browser-cached copy', async () => {
   for (const call of (fetch as jest.Mock).mock.calls) {
     expect(call[1]).toEqual({ cache: 'no-store' })
   }
+})
+
+test('games with no achievements at all are left out of both lists', async () => {
+  setSteamId('765')
+  mockRoutes(
+    ok([...RECENT, { _source: 'steam', id: 9, title: 'Tool', hasStats: false }]),
+    ok([...LIBRARY, { _source: 'steam', id: 8, title: 'No achievements', hasStats: false }]),
+  )
+  const { result } = renderHook(() => useSteamGamesData(), { wrapper })
+  await waitFor(() => expect(result.current.library).toHaveLength(1))
+  expect(result.current.library.map((g) => g.id)).toEqual([2])
+  expect(result.current.recent.map((g) => g.id)).toEqual([1])
 })

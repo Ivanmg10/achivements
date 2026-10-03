@@ -19,6 +19,8 @@ import { CONSOLES } from '@/constants'
 import { DualProgressBar } from '@/components/ui/DualProgressBar'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
+import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import { useSpotlight } from '@/hooks/useSpotlight'
 
 export default function SortableItem({
   item,
@@ -36,6 +38,7 @@ export default function SortableItem({
   lastPlayed?: string
 }) {
   const { T } = useLanguage()
+  const onPointerMove = useSpotlight()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: !draggable,
@@ -101,8 +104,11 @@ export default function SortableItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-bg-card w-full rounded-xl overflow-hidden hover:ring-1 hover:ring-white/10 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      onPointerMove={onPointerMove}
+      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
+      {/* The same blurred art and pointer glow as the game cards in the status lists. */}
+      <GameCardBackdrop src={item.image_icon ? `https://retroachievements.org${item.image_icon}` : null} surface="card" />
       {/* Main row — clickable to expand */}
       <div
         onClick={handleToggle}

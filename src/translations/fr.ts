@@ -162,6 +162,12 @@ export const fr: Translations = {
     raConnectHint: 'Connecte RetroAchievements pour suivre tes jeux rétro ici.',
     steamConnectHint: 'Connecte Steam pour suivre ta bibliothèque et tes succès ici.',
     psnHint: 'PlayStation Network arrive bientôt.',
+    hiddenGames: 'Jeux masqués',
+    hiddenCount: '{n} masqués',
+    hiddenNone: 'Aucun',
+    hiddenEmpty: 'Tu n’as masqué aucun jeu. Utilise l’œil d’un jeu dans tes listes pour le masquer.',
+    showGame: 'Afficher de nouveau {title}',
+    close: 'Fermer',
   },
   userStats: {
     globalRank: 'Classement mondial',
@@ -288,6 +294,10 @@ export const fr: Translations = {
     raUnlinked: 'Compte RetroAchievements délié',
     unlinkFailed: 'Impossible de délier le compte',
     loadAchievementsFailed: 'Impossible de charger les succès',
+    gameHidden: 'Jeu masqué de tes listes',
+    gameHideFailed: 'Impossible de masquer le jeu',
+    gameShown: 'Le jeu est de nouveau affiché',
+    gameShowFailed: 'Impossible d’afficher de nouveau le jeu',
   },
   cookies: {
     title: 'Cookies',
@@ -591,10 +601,6 @@ export const fr: Translations = {
   },
   loadingPage: {
     title: 'Chargement de vos succès',
-    subtitle: 'Récupération des données de jeu...',
-    wantToPlay: 'Chargement de votre liste de souhaits...',
-    playing: 'Chargement de vos jeux en cours...',
-    completed: 'Chargement de vos jeux terminés...',
     game: 'Chargement des données du jeu...',
   },
   search: {
@@ -710,6 +716,11 @@ export const fr: Translations = {
     filterRaSc: 'RA softcore',
     collectionView: 'Vue',
     yourNumbers: 'Tes chiffres',
+    hideGame: 'Masquer le jeu',
+    hideGameTitle: 'Masquer ce jeu ?',
+    hideGameText: '{title} n’apparaîtra plus dans tes listes. Tu peux l’afficher de nouveau depuis ton compte, dans Préférences › Jeux masqués.',
+    hideConfirm: 'Masquer',
+    cancel: 'Annuler',
   },
   groups: {
     title: 'Groupes',

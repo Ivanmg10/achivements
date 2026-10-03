@@ -10,6 +10,10 @@ import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
+import HideGameButton from '@/components/hide-game-button/HideGameButton'
+import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import { useSpotlight } from '@/hooks/useSpotlight'
+import { steamAssetUrl } from '@/lib/steamClient'
 import type { SteamGameProgress } from '@/types/steam'
 
 /**
@@ -35,6 +39,7 @@ export default function SteamStatusGameItem({
 }) {
   const { T, lang } = useLanguage()
   const [open, setOpen] = useState(false)
+  const onPointerMove = useSpotlight()
   const panelId = useId()
   const href = `/steamGame/${game.id}`
 
@@ -55,8 +60,11 @@ export default function SteamStatusGameItem({
     <div
       ref={itemRef}
       style={style}
-      className="bg-bg-card rounded-xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow duration-150"
+      onPointerMove={onPointerMove}
+      className="spotlight bg-bg-card rounded-2xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow duration-150"
     >
+      {/* The same blurred art and pointer glow as the RA card beside it. */}
+      <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} surface="card" />
       <div className="flex flex-row items-start gap-5 p-5">
         {/* Same destination as the title link, so it is kept out of the tab order. */}
         <Link href={href} tabIndex={-1} aria-hidden="true" className="shrink-0">
@@ -65,7 +73,7 @@ export default function SteamStatusGameItem({
               isComplete ? 'ring-2 ring-[#a4d007]/70 hover:ring-[#a4d007]' : 'hover:ring-2 hover:ring-white/40'
             }`}
           >
-            <SteamGameImage appId={game.id} iconUrl={game.imageIcon} size={96} className="w-24 h-24 block" />
+            <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageIcon} size={96} className="w-24 h-24 block" />
           </div>
         </Link>
 
@@ -129,7 +137,10 @@ export default function SteamStatusGameItem({
           </button>
         </div>
 
-        <PinToggleButton gameId={game.id} source="steam" className="self-center" />
+        <span className="flex items-center gap-1 self-center">
+          <HideGameButton source="steam" gameId={game.id} title={game.title} image={steamAssetUrl(game.id, 'header')} />
+          <PinToggleButton gameId={game.id} source="steam" />
+        </span>
       </div>
 
       {open && (

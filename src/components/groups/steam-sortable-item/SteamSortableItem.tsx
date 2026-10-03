@@ -12,6 +12,9 @@ import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
 import { formatPlaytime } from '@/utils/steamFeed'
+import { useSpotlight } from '@/hooks/useSpotlight'
+import { steamAssetUrl } from '@/lib/steamClient'
+import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { relativeTime } from '@/utils/utils'
 import type { GameGroupItem } from '@/types/types'
 
@@ -37,6 +40,7 @@ export default function SteamSortableItem({
   const { library, recent } = useSteamGamesData()
   const [open, setOpen] = useState(false)
   const panelId = useId()
+  const onPointerMove = useSpotlight()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: !draggable,
@@ -63,8 +67,11 @@ export default function SteamSortableItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-bg-card w-full rounded-xl overflow-hidden hover:ring-1 hover:ring-white/10 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      onPointerMove={onPointerMove}
+      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-white/5 hover:ring-white/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
+      {/* The same blurred art and pointer glow as the game cards in the status lists. */}
+      <GameCardBackdrop src={steamAssetUrl(item.game_id, 'header')} surface="card" />
       <div className="flex items-center gap-3 p-5">
         {draggable && (
           <button
@@ -88,6 +95,7 @@ export default function SteamSortableItem({
         >
           <SteamGameImage
             appId={item.game_id}
+            asset="icon"
             iconUrl={game?.imageIcon ?? item.image_icon ?? ''}
             size={96}
             className="w-24 h-24 rounded-xl block"

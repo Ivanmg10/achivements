@@ -9,6 +9,16 @@ import type { SteamGameProgress } from '@/types/steam'
 export type SteamCategory = 'wantToPlay' | 'playing' | 'completed'
 
 /**
+ * Whether a Steam game has achievements at all. Steam lists every game owned,
+ * tools and achievement-less games included; an achievement tracker has
+ * nothing to say about those, so the app leaves them out everywhere.
+ * A game whose counts are still loading has stats, and stays.
+ */
+export function hasSteamAchievements(game: SteamGameProgress): boolean {
+  return game.hasStats
+}
+
+/**
  * Buckets a Steam game the same way RA's category pages bucket RA games, so
  * the two lists mean the same thing side by side:
  *

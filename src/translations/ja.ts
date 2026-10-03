@@ -162,6 +162,12 @@ export const ja: Translations = {
     raConnectHint: 'RetroAchievementsを連携すると、レトロゲームをここで管理できます。',
     steamConnectHint: 'Steamを連携すると、ライブラリと実績をここで管理できます。',
     psnHint: 'PlayStation Networkへの対応は準備中です。',
+    hiddenGames: '非表示のゲーム',
+    hiddenCount: '{n} 件',
+    hiddenNone: 'なし',
+    hiddenEmpty: '非表示のゲームはありません。リストのゲームの目のアイコンで非表示にできます。',
+    showGame: '{title} を再表示',
+    close: '閉じる',
   },
   userStats: {
     globalRank: 'グローバルランク',
@@ -288,6 +294,10 @@ export const ja: Translations = {
     raUnlinked: 'RetroAchievementsアカウントの連携を解除しました',
     unlinkFailed: 'アカウントの連携を解除できませんでした',
     loadAchievementsFailed: '実績を読み込めませんでした',
+    gameHidden: 'リストからゲームを非表示にしました',
+    gameHideFailed: 'ゲームを非表示にできませんでした',
+    gameShown: 'ゲームを再表示しました',
+    gameShowFailed: 'ゲームを再表示できませんでした',
   },
   cookies: {
     title: 'Cookie',
@@ -591,10 +601,6 @@ export const ja: Translations = {
   },
   loadingPage: {
     title: '実績を読み込み中',
-    subtitle: 'ゲームデータを取得中...',
-    wantToPlay: 'ウィッシュリストを読み込み中...',
-    playing: 'アクティブなゲームを読み込み中...',
-    completed: '完了したゲームを読み込み中...',
     game: 'ゲームデータを読み込み中...',
   },
   search: {
@@ -710,6 +716,11 @@ export const ja: Translations = {
     filterRaSc: 'RA ソフトコア',
     collectionView: '表示',
     yourNumbers: 'あなたの数字',
+    hideGame: 'ゲームを非表示',
+    hideGameTitle: 'このゲームを非表示にしますか？',
+    hideGameText: '{title} はリストに表示されなくなります。アカウントの「設定 › 非表示のゲーム」から再表示できます。',
+    hideConfirm: '非表示',
+    cancel: 'キャンセル',
   },
   groups: {
     title: 'グループ',
