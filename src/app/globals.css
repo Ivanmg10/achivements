@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
-/* tokens que Tailwind convierte en utilidades */
+/*
+   Tokens que Tailwind convierte en utilidades. Inline: cada utilidad lleva
+   rgb(var(--x)) dentro, así que un elemento con su propio data-theme (la vista
+   previa del selector) se pinta con los colores de ese tema.
+*/
 
-@theme {
+@theme inline {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   --color-bg-main: rgb(var(--bg-main));
@@ -32,7 +36,8 @@
    VARIABLES BASE — fallback
    ============================================ */
 
-:root {
+:root,
+[data-theme] {
   --ink: 255 255 255;
   --bg-main: 15 16 20;
   --bg-header: 10 10 14;
@@ -42,9 +47,9 @@
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
 
-  --accent: 180 185 200;
-  --accent-hover: 200 205 220;
-  --accent-muted: 180 185 200;
+  --accent: 225 228 235;
+  --accent-hover: 245 246 250;
+  --accent-muted: 225 228 235;
 
   --success: 34 197 94;
   --warning: 245 158 11;
@@ -65,9 +70,9 @@
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
 
-  --accent: 180 185 200;
-  --accent-hover: 200 205 220;
-  --accent-muted: 180 185 200;
+  --accent: 225 228 235;
+  --accent-hover: 245 246 250;
+  --accent-muted: 225 228 235;
 
   --success: 34 197 94;
   --warning: 245 158 11;
@@ -89,9 +94,9 @@
   --text-main: 32 34 40;
   --text-secondary: 88 92 102;
 
-  --accent: 70 75 85;
-  --accent-hover: 55 60 68;
-  --accent-muted: 70 75 85;
+  --accent: 79 70 229;
+  --accent-hover: 67 56 202;
+  --accent-muted: 79 70 229;
 
   --success: 22 101 52;
   --warning: 146 64 14;
@@ -160,21 +165,22 @@
    BLUE
    ============================================ */
 [data-theme="blue"] {
-  --bg-main: 10 15 28;
-  --bg-header: 15 20 35;
-  --bg-card: 20 27 47;
-  --bg-tertiary: 28 38 58;
+  --bg-main: 11 16 26;
+  --bg-header: 8 12 20;
+  --bg-card: 19 26 40;
+  --bg-tertiary: 30 40 60;
 
-  --text-main: 218 228 245;
-  --text-secondary: 125 140 170;
+  --text-main: 220 228 240;
+  --text-secondary: 128 142 168;
 
-  --accent: 59 130 246;
-  --accent-hover: 96 165 250;
-  --accent-muted: 59 130 246;
+  /* Cobalt, not sky: sky blue is Steam and True points. */
+  --accent: 96 125 255;
+  --accent-hover: 124 148 255;
+  --accent-muted: 96 125 255;
 
   --success: 34 197 94;
   --warning: 245 158 11;
-  --info: 59 130 246;
+  --info: 56 189 248;
   --danger: 239 68 68;
   --chart-2: 245 158 11;
 }
@@ -183,21 +189,21 @@
    PURPLE
    ============================================ */
 [data-theme="purple"] {
-  --bg-main: 18 12 32;
-  --bg-header: 12 8 24;
-  --bg-card: 28 19 46;
-  --bg-tertiary: 38 26 62;
+  --bg-main: 20 14 30;
+  --bg-header: 14 9 22;
+  --bg-card: 30 22 44;
+  --bg-tertiary: 44 33 64;
 
-  --text-main: 225 220 242;
-  --text-secondary: 155 148 185;
+  --text-main: 228 222 242;
+  --text-secondary: 158 150 186;
 
-  --accent: 168 85 247;
-  --accent-hover: 192 110 255;
-  --accent-muted: 168 85 247;
+  --accent: 150 110 250;
+  --accent-hover: 172 140 252;
+  --accent-muted: 150 110 250;
 
   --success: 52 211 153;
   --warning: 251 191 36;
-  --info: 168 85 247;
+  --info: 96 165 250;
   --danger: 248 113 113;
   --chart-2: 251 191 36;
 }
@@ -206,23 +212,24 @@
    GREEN
    ============================================ */
 [data-theme="green"] {
-  --bg-main: 10 18 10;
-  --bg-header: 6 12 6;
-  --bg-card: 17 30 17;
-  --bg-tertiary: 24 40 24;
+  --bg-main: 13 17 10;
+  --bg-header: 9 12 7;
+  --bg-card: 21 28 17;
+  --bg-tertiary: 32 42 26;
 
-  --text-main: 212 224 212;
-  --text-secondary: 125 152 128;
+  --text-main: 214 224 208;
+  --text-secondary: 130 152 122;
 
   --accent: 132 184 80;
   --accent-hover: 152 204 100;
   --accent-muted: 132 184 80;
 
-  --success: 74 175 80;
-  --warning: 188 184 56;
-  --info: 132 184 80;
-  --danger: 210 80 70;
-  --chart-2: 188 184 56;
+  /* Teal, so "completed" is not mistaken for the accent. */
+  --success: 45 212 191;
+  --warning: 234 179 8;
+  --info: 96 165 250;
+  --danger: 239 90 80;
+  --chart-2: 234 179 8;
 }
 
 /* ============================================
@@ -244,8 +251,31 @@
   --success: 52 211 153;
   --warning: 251 191 36;
   --info: 99 160 255;
-  --danger: 224 60 80;
+  --danger: 251 146 60;
   --chart-2: 251 191 36;
+}
+
+/* ============================================
+   SYNTHWAVE: hot pink on night indigo, cyan for info
+   ============================================ */
+[data-theme="synthwave"] {
+  --bg-main: 14 10 26;
+  --bg-header: 9 6 18;
+  --bg-card: 24 17 42;
+  --bg-tertiary: 38 28 64;
+
+  --text-main: 236 228 255;
+  --text-secondary: 165 150 200;
+
+  --accent: 255 92 190;
+  --accent-hover: 255 128 206;
+  --accent-muted: 255 92 190;
+
+  --success: 52 211 153;
+  --warning: 251 191 36;
+  --info: 34 211 238;
+  --danger: 251 113 133;
+  --chart-2: 34 211 238;
 }
 
 /* ============================================

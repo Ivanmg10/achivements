@@ -101,6 +101,13 @@ export const it: Translations = {
   userTheme: {
     theme: 'Tema',
     saveError: 'Impossibile salvare il tema. Riprova.',
+    name_dark: 'Scuro',
+    name_light: 'Chiaro',
+    name_blue: 'Blu',
+    name_purple: 'Viola',
+    name_green: 'Verde',
+    name_red: 'Rosso',
+    name_synthwave: 'Synthwave',
   },
   userConfig: {
     accountSettings: 'Impostazioni account',

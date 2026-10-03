@@ -78,7 +78,7 @@ export default function UserPreferencesCard() {
         <ProfileField label={T.userTheme.theme} icon={<IconPalette size={18} />} onEdit={() => setThemeOpen(true)}>
           <span className="flex items-center gap-2 min-w-0">
             <span aria-hidden="true" className="w-4 h-4 rounded-full bg-accent shrink-0" />
-            <span className="text-base font-medium capitalize truncate">{theme}</span>
+            <span className="text-base font-medium truncate">{T.userTheme[`name_${theme}`]}</span>
           </span>
         </ProfileField>
 

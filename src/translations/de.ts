@@ -101,6 +101,13 @@ export const de: Translations = {
   userTheme: {
     theme: 'Thema',
     saveError: 'Das Design konnte nicht gespeichert werden. Versuche es erneut.',
+    name_dark: 'Dunkel',
+    name_light: 'Hell',
+    name_blue: 'Blau',
+    name_purple: 'Violett',
+    name_green: 'Grün',
+    name_red: 'Rot',
+    name_synthwave: 'Synthwave',
   },
   userConfig: {
     accountSettings: 'Kontoeinstellungen',

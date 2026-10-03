@@ -34,7 +34,7 @@ beforeEach(() => {
 test('lists theme, language and a favourite per platform', () => {
   render(<UserPreferencesCard />)
   expect(screen.getByText(en.userPage.preferences)).toBeInTheDocument()
-  expect(screen.getByText('dark')).toBeInTheDocument()
+  expect(screen.getByText(en.userTheme.name_dark)).toBeInTheDocument()
   expect(screen.getByText('Zelda')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteSteamGame) })).toHaveTextContent(
     en.userData.notSet,

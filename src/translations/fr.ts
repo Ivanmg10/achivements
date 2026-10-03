@@ -101,6 +101,13 @@ export const fr: Translations = {
   userTheme: {
     theme: 'Thème',
     saveError: 'Impossible d’enregistrer le thème. Réessayez.',
+    name_dark: 'Sombre',
+    name_light: 'Clair',
+    name_blue: 'Bleu',
+    name_purple: 'Violet',
+    name_green: 'Vert',
+    name_red: 'Rouge',
+    name_synthwave: 'Synthwave',
   },
   userConfig: {
     accountSettings: 'Paramètres du compte',

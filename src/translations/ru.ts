@@ -101,6 +101,13 @@ export const ru: Translations = {
   userTheme: {
     theme: 'Тема',
     saveError: 'Не удалось сохранить тему. Попробуйте ещё раз.',
+    name_dark: 'Тёмная',
+    name_light: 'Светлая',
+    name_blue: 'Синяя',
+    name_purple: 'Фиолетовая',
+    name_green: 'Зелёная',
+    name_red: 'Красная',
+    name_synthwave: 'Синтвейв',
   },
   userConfig: {
     accountSettings: 'Настройки аккаунта',

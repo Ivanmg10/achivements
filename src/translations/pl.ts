@@ -101,6 +101,13 @@ export const pl: Translations = {
   userTheme: {
     theme: 'Motyw',
     saveError: 'Nie udało się zapisać motywu. Spróbuj ponownie.',
+    name_dark: 'Ciemny',
+    name_light: 'Jasny',
+    name_blue: 'Niebieski',
+    name_purple: 'Fioletowy',
+    name_green: 'Zielony',
+    name_red: 'Czerwony',
+    name_synthwave: 'Synthwave',
   },
   userConfig: {
     accountSettings: 'Ustawienia konta',

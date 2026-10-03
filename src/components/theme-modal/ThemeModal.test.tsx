@@ -39,3 +39,12 @@ test('puts the old theme back and says so when saving fails', async () => {
   expect(update).not.toHaveBeenCalled()
   expect(onClose).not.toHaveBeenCalled()
 })
+
+test('offers every theme, the current one checked, each drawn in its own colours', () => {
+  const { container } = render(<ThemeModal isOpen onClose={jest.fn()} />)
+  const radios = screen.getAllByRole('radio')
+  expect(radios).toHaveLength(7)
+  expect(screen.getByRole('radio', { name: en.userTheme.name_dark })).toHaveAttribute('aria-checked', 'true')
+  expect(screen.getByRole('radio', { name: en.userTheme.name_synthwave })).toHaveAttribute('aria-checked', 'false')
+  expect(container.ownerDocument.querySelector('[data-theme="synthwave"]')).not.toBeNull()
+})

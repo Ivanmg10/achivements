@@ -101,6 +101,13 @@ export const ja: Translations = {
   userTheme: {
     theme: 'テーマ',
     saveError: 'テーマを保存できませんでした。もう一度お試しください。',
+    name_dark: 'ダーク',
+    name_light: 'ライト',
+    name_blue: 'ブルー',
+    name_purple: 'パープル',
+    name_green: 'グリーン',
+    name_red: 'レッド',
+    name_synthwave: 'シンセウェイブ',
   },
   userConfig: {
     accountSettings: 'アカウント設定',

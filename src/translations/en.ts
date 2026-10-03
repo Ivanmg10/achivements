@@ -99,6 +99,13 @@ export const en = {
   userTheme: {
     theme: 'Theme',
     saveError: 'Could not save your theme. Try again.',
+    name_dark: 'Dark',
+    name_light: 'Light',
+    name_blue: 'Blue',
+    name_purple: 'Purple',
+    name_green: 'Green',
+    name_red: 'Red',
+    name_synthwave: 'Synthwave',
   },
   userConfig: {
     accountSettings: 'Account settings',
