@@ -44,12 +44,12 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose}>
+    <CommonModal isOpen={isOpen} onClose={onClose} className="mx-4 sm:max-w-2xl max-h-[90dvh] overflow-y-auto justify-start!">
       <h2 className="text-xl font-bold mb-4">{T.userTheme.theme}</h2>
       <div
         role="radiogroup"
         aria-label={T.userTheme.theme}
-        className="grid grid-cols-2 sm:grid-cols-3 gap-3"
+        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"
       >
         {THEMES.map((id) => (
           <button
