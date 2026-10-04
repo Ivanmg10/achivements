@@ -450,3 +450,35 @@ export function daysBetween(start: string, end: string): string[] {
   }
   return out
 }
+
+/** Achievements per calendar day ("YYYY-MM-DD" → count). */
+export function countByDay(achievements: RecentAchievement[]): Record<string, number> {
+  const out: Record<string, number> = {}
+  for (const a of achievements) {
+    const d = a.Date.split(' ')[0]
+    out[d] = (out[d] ?? 0) + 1
+  }
+  return out
+}
+
+/**
+ * The year at a glance, for the streak page: days with any achievement, the
+ * average streak, days since the last achievement (0 = today), the longest
+ * run of days without one, and achievements per weekday (Monday first).
+ */
+export function streakInsights(byDay: Record<string, number>, streaks: { days: number }[], today: string) {
+  const active = Object.keys(byDay).filter((d) => byDay[d] > 0).sort()
+  const dayMs = 86400000
+  const diff = (a: string, b: string) => Math.round((new Date(`${b}T00:00:00`).getTime() - new Date(`${a}T00:00:00`).getTime()) / dayMs)
+  let longestGap = 0
+  for (let i = 1; i < active.length; i++) longestGap = Math.max(longestGap, diff(active[i - 1], active[i]) - 1)
+  const weekdays = [0, 0, 0, 0, 0, 0, 0]
+  for (const d of active) weekdays[(new Date(`${d}T00:00:00`).getDay() + 6) % 7] += byDay[d]
+  return {
+    activeDays: active.length,
+    avgStreak: streaks.length ? streaks.reduce((s, x) => s + x.days, 0) / streaks.length : 0,
+    daysSinceLast: active.length ? Math.max(0, diff(active[active.length - 1], today)) : null,
+    longestGap,
+    weekdays,
+  }
+}
