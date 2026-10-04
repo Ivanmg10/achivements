@@ -76,3 +76,10 @@ test('while the session loads, holds the place of the avatar instead of flashing
   render(<MainHeader />)
   expect(screen.queryByText('Sign in')).not.toBeInTheDocument()
 })
+
+test('the streak page is always one click away, even with no streak going', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', rausername: 'Ivan' } } })
+  render(<MainHeader />)
+  const link = screen.getByRole('link', { name: new RegExp(`^${en.streak.title}:`) })
+  expect(link).toHaveAttribute('href', '/racha')
+})

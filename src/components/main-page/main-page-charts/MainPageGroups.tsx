@@ -8,7 +8,7 @@ import { useGroups } from '@/hooks/useGroups'
 import type { GameCandidate } from '@/utils/gameCandidates'
 import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import GroupModal from '@/components/groups/GroupModal'
-import { relativeTime } from '@/utils/utils'
+import { relativeTime, plural } from '@/utils/utils'
 import EmptyState from '@/components/empty-state/EmptyState'
 import GroupIcon from '@/components/groups/group-icon/GroupIcon'
 import MainPageGroupsRow from './main-page-groups-row/MainPageGroupsRow'
@@ -149,7 +149,7 @@ export default function MainPageGroups({
                       </span>
                       <div className="flex items-center gap-1.5">
                         <span className="text-[10px] text-text-secondary shrink-0">
-                          {group.game_count} {T.groups.games}
+                          {plural(group.game_count, T.plurals.games, lang)}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 text-[10px] text-text-secondary">

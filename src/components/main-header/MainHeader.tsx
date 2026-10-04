@@ -11,6 +11,7 @@ import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconMenu } from '@tab
 import SearchModal from '@/components/search-modal/SearchModal'
 import MobileNavModal from './MobileNavModal'
 import StatusNavDropdown from './status-nav-dropdown/StatusNavDropdown'
+import { plural } from '@/utils/utils'
 
 function NavLink({ href, label, active, glass }: { href: string; label: string; active: boolean; glass?: boolean }) {
   return (
@@ -27,16 +28,20 @@ function NavLink({ href, label, active, glass }: { href: string; label: string; 
   )
 }
 
+/**
+ * The way to the streak page, always there: the current streak in days, or a
+ * dimmed 0 when there is none, so the page can still be reached to look back.
+ */
 function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
-  if (streak === 0) return null
+  const { T, lang } = useLanguage()
   return (
     <Link
       href="/racha"
-      aria-label={`Racha: ${streak} días`}
+      aria-label={`${T.streak.title}: ${plural(streak, T.plurals.days, lang)}`}
       className={`flex items-center gap-1 ${glass ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-bg-main hover:bg-bg-main/80'} px-3 py-1.5 rounded-full shrink-0 ring-1 ring-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
     >
-      <IconFlame className="w-3.5 h-3.5 text-orange-400" aria-hidden />
-      <span className="text-xs font-bold text-text-main">{streak}d</span>
+      <IconFlame className={`w-3.5 h-3.5 ${streak > 0 ? 'text-orange-400' : 'text-text-secondary'}`} aria-hidden="true" />
+      <span className={`text-xs font-bold ${streak > 0 ? 'text-text-main' : 'text-text-secondary'}`}>{streak}d</span>
     </Link>
   )
 }

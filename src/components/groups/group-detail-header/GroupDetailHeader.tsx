@@ -5,6 +5,7 @@ import type { Counts } from '@/utils/groupItems'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
 import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgressBar'
 import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
+import { plural } from '@/utils/utils'
 
 const ACTION = 'p-2 rounded-lg transition-colors text-text-secondary focus-visible:outline-none focus-visible:ring-2'
 
@@ -32,7 +33,7 @@ export default function GroupDetailHeader({
   onEdit: () => void
   onDelete: () => void
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const Privacy = group.is_public ? IconWorld : IconLock
 
   return (
@@ -55,7 +56,7 @@ export default function GroupDetailHeader({
           </div>
           {group.description && <p className="text-sm text-text-secondary">{group.description}</p>}
           <p className="text-xs text-text-secondary">
-            {gameCount} {T.groups.games}
+            {plural(gameCount, T.plurals.games, lang)}
             {summary.total > 0 && (
               <>
                 {' · '}

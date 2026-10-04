@@ -1,66 +1,58 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
+import { IconFlame } from '@tabler/icons-react'
 import { useStreakData } from '@/hooks/useStreakData'
 import { useLanguage } from '@/context/LanguageContext'
+import { fadeUp } from '@/lib/animations'
 import { Streak } from '@/types/types'
-import Spinner from '@/components/main-spinner/Spinner'
 import { SectionFallback } from '@/components/ui/SectionFallback'
+import EmptyState from '@/components/empty-state/EmptyState'
 import StreakStatsBanner from './streak-stats-banner/StreakStatsBanner'
 import StreakChart from './streak-chart/StreakChart'
 import StreakList from './streak-list/StreakList'
+import StreakPageSkeleton from './streak-page-skeleton/StreakPageSkeleton'
 
+/**
+ * The streak page: the streak going now and the record, the longest streaks
+ * as bars, and the picked one day by day. On a wide screen the overview and
+ * the day by day sit side by side.
+ */
 export default function StreakPage() {
   const { streaks, activeStreak, bestStreak, isLoading, error, refetch } = useStreakData()
   const { T } = useLanguage()
-  const [selectedStreak, setSelectedStreak] = useState<Streak | null>(null)
+  const [picked, setPicked] = useState<Streak | null>(null)
+  // The picked streak, or the one going now, or the best: never empty once there are streaks.
+  const selectedStreak = picked ?? activeStreak ?? bestStreak
+  const lastActiveDay = useMemo(() => streaks.reduce<string | null>((last, s) => (!last || s.end > last ? s.end : last), null), [streaks])
 
-  useEffect(() => {
-    if (streaks.length && !selectedStreak) {
-      setSelectedStreak(activeStreak ?? bestStreak)
-    }
-  // only run when streaks first populate
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [streaks.length])
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Spinner size={45} />
+  let body: React.ReactNode
+  if (isLoading) body = <StreakPageSkeleton />
+  else if (error) body = <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>
+  else if (!streaks.length)
+    body = <EmptyState icon={<IconFlame className="w-7 h-7" />} title={T.streak.noData} subtitle={T.streak.noDataSub} className="min-h-[50vh]" />
+  else
+    body = (
+      <div className="grid gap-5 xl:grid-cols-2 xl:items-start">
+        <div className="flex flex-col gap-5 min-w-0">
+          <StreakStatsBanner activeStreak={activeStreak} bestStreak={bestStreak} totalStreaks={streaks.length} lastActiveDay={lastActiveDay} />
+          <StreakChart streaks={streaks} selectedStreak={selectedStreak} onSelect={setPicked} />
+        </div>
+        <div className="min-w-0 xl:sticky xl:top-20">
+          {/* Keyed by streak: picking another one starts its calendar on its last day. */}
+          <StreakList key={selectedStreak?.start ?? 'none'} selectedStreak={selectedStreak} />
+        </div>
       </div>
     )
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col justify-center min-h-[60vh] px-4">
-        <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>
-      </div>
-    )
-  }
-
-  if (!streaks.length) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-2">
-        <p className="text-text-main text-lg font-semibold">{T.streak.noData}</p>
-        <p className="text-text-secondary text-sm">{T.streak.noDataSub}</p>
-      </div>
-    )
-  }
 
   return (
-    <div className="flex flex-col gap-5 px-4 max-w-7xl mx-auto w-full py-6">
-      <StreakStatsBanner
-        activeStreak={activeStreak}
-        bestStreak={bestStreak}
-        totalStreaks={streaks.length}
-      />
-      <StreakChart
-        streaks={streaks}
-        selectedStreak={selectedStreak}
-        onSelect={setSelectedStreak}
-      />
-      <StreakList selectedStreak={selectedStreak} />
-    </div>
+    <motion.div className="flex flex-col gap-5 px-4 py-6 w-full lg:max-w-[98%] mx-auto" variants={fadeUp} initial="hidden" animate="visible">
+      <header className="flex flex-col gap-1">
+        <h1 className="text-2xl font-bold text-text-main">{T.streak.title}</h1>
+        <p className="text-sm text-text-secondary">{T.streak.pageSub}</p>
+      </header>
+      {body}
+    </motion.div>
   )
 }

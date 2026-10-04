@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
 import { RecentAchievement, UserAward } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { achievementBadgeUrl } from '@/utils/utils'
+import { achievementBadgeUrl, formatDay, plural } from '@/utils/utils'
 import { gameHref } from '@/utils/gameRef'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import StreakCompletionCard from '../streak-completion-card/StreakCompletionCard'
@@ -19,17 +19,9 @@ interface Props {
   awards?: UserAward[]
 }
 
-function formatDateFull(dateStr: string) {
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString('default', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
 
 export default function StreakDayRow({ date, achievements, awards = [] }: Props) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const [modalOpen, setModalOpen] = useState(false)
   const visible = achievements.slice(0, MAX_BADGES)
   const overflow = achievements.length - MAX_BADGES
@@ -37,9 +29,9 @@ export default function StreakDayRow({ date, achievements, awards = [] }: Props)
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-text-main capitalize">{formatDateFull(date)}</p>
+        <h3 className="text-sm font-semibold text-text-main capitalize">{formatDay(date, lang, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</h3>
         <span className="text-xs text-text-secondary shrink-0 ml-2">
-          {achievements.length} {T.streak.achievements}
+          {plural(achievements.length, T.plurals.achievements, lang)}
         </span>
       </div>
 
@@ -66,7 +58,7 @@ export default function StreakDayRow({ date, achievements, awards = [] }: Props)
               {badge ? (
                 <Image
                   src={badge}
-                  alt={ach.Title}
+                  alt=""
                   width={40}
                   height={40}
                   className="w-10 h-10 object-cover"
@@ -82,7 +74,7 @@ export default function StreakDayRow({ date, achievements, awards = [] }: Props)
         {overflow > 0 && (
           <button
             onClick={() => setModalOpen(true)}
-            aria-label={`+${overflow} ${T.streak.achievements}`}
+            aria-label={`+${plural(overflow, T.plurals.achievements, lang)}`}
             className="w-10 h-10 rounded-lg bg-bg-main ring-1 ring-ink/10 flex items-center justify-center shrink-0 cursor-pointer hover:ring-accent/40 hover:bg-accent/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 group"
           >
             <span className="text-[10px] font-bold text-text-secondary group-hover:text-accent transition-colors leading-none">

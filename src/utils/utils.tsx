@@ -421,3 +421,32 @@ export async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) =>
   await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker))
   return results
 }
+
+/**
+ * A counted noun in the right plural form for the language ("1 game",
+ * "5 games", "5 игр"), with the number formatted for it too.
+ */
+export function plural(n: number, forms: { zero?: string; one?: string; two?: string; few?: string; many?: string; other: string }, lang = 'en'): string {
+  const form = forms[new Intl.PluralRules(lang).select(n)] ?? forms.other
+  return form.replace('{n}', n.toLocaleString(lang))
+}
+
+/**
+ * A calendar day ("2026-06-05") in the app's language, read as a local date:
+ * parsed as UTC it can land on the day before west of Greenwich.
+ */
+export function formatDay(day: string, lang: string, options: Intl.DateTimeFormatOptions): string {
+  return new Date(`${day}T00:00:00`).toLocaleDateString(lang, options)
+}
+
+/** Every day from `start` to `end` (inclusive), as "YYYY-MM-DD", local time. */
+export function daysBetween(start: string, end: string): string[] {
+  const out: string[] = []
+  const d = new Date(`${start}T00:00:00`)
+  const last = new Date(`${end}T00:00:00`)
+  while (d <= last) {
+    out.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+    d.setDate(d.getDate() + 1)
+  }
+  return out
+}

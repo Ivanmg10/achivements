@@ -52,7 +52,7 @@ export default function GroupDetailPage() {
 
   if (status === 'missing' || status === 'error') {
     return (
-      <main className={`${PAGE} justify-center gap-3 text-center`}>
+      <div className={`${PAGE} justify-center gap-3 text-center`}>
         <p role="alert" className="text-text-secondary">{status === 'missing' ? T.groups.notFound : T.groups.loadError}</p>
         {status === 'error' ? (
           <button onClick={retry} className="text-sm text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded">
@@ -63,12 +63,12 @@ export default function GroupDetailPage() {
             {T.groups.backToGroups}
           </Link>
         )}
-      </main>
+      </div>
     )
   }
 
   return (
-    <motion.main className={PAGE} variants={fadeUp} initial="hidden" animate="visible">
+    <motion.div className={PAGE} variants={fadeUp} initial="hidden" animate="visible">
       <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
         {!group ? (
           <GroupDetailSkeleton />
@@ -132,6 +132,6 @@ export default function GroupDetailPage() {
       <AddGameModal isOpen={addGameOpen} onClose={() => setAddGameOpen(false)} groupId={groupId} existingKeys={existingKeys} onAdded={addItems} />
       {group && <GroupModal isOpen={editOpen} onClose={() => setEditOpen(false)} group={group} onSave={edit} />}
       <DeleteConfirmDialog isOpen={confirmDelete} onClose={() => setConfirmDelete(false)} onConfirm={handleDelete} />
-    </motion.main>
+    </motion.div>
   )
 }

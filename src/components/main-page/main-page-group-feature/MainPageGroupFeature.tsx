@@ -10,6 +10,7 @@ import GroupIcon from '@/components/groups/group-icon/GroupIcon'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
+import { plural } from '@/utils/utils'
 
 /** Games listed before "N more": enough to see the group, short enough to scan. */
 const SHOWN = 6
@@ -21,7 +22,7 @@ const itemHref = (i: GameGroupItem) => (i.source === 'steam' ? `/steamGame/${i.g
  * games as a list, each with its progress, in the order the user keeps them.
  */
 export default function MainPageGroupFeature({ group }: { group: GameGroup }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const { group: detail, isLoading, error } = useGroupDetail(group.id)
   const items = detail?.items ?? []
   const overall = group.total_possible > 0 ? Math.round((group.total_awarded / group.total_possible) * 100) : null
@@ -40,7 +41,7 @@ export default function MainPageGroupFeature({ group }: { group: GameGroup }) {
             </Link>
           </h3>
           <p className="text-xs text-text-secondary truncate">
-            {group.game_count} {T.groups.games}
+            {plural(group.game_count, T.plurals.games, lang)}
             {group.total_possible > 0 && ` · ${group.total_awarded.toLocaleString()}/${group.total_possible.toLocaleString()}`}
           </p>
         </div>

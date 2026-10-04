@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { IconLock, IconWorld } from '@tabler/icons-react'
 import { GameGroup } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { relativeTime } from '@/utils/utils'
+import { relativeTime, plural } from '@/utils/utils'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import GroupCoverMosaic from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
@@ -34,7 +34,7 @@ export default function GroupCard({ group }: { group: GameGroup }) {
 
         <div className="flex items-center gap-2 text-xs text-text-secondary">
           <span className="shrink-0">
-            {group.game_count} {T.groups.games}
+            {plural(group.game_count, T.plurals.games, lang)}
           </span>
           {isMixed && (
             <span className="flex items-center gap-1.5 shrink-0" role="img" aria-label={T.groups.mixedPlatforms}>

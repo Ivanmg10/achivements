@@ -1,3 +1,6 @@
+/** The forms a counted noun takes; which one applies comes from Intl.PluralRules. */
+export type PluralForms = { zero?: string; one?: string; two?: string; few?: string; many?: string; other: string }
+
 export const en = {
   header: {
     signIn: 'Sign in',
@@ -821,18 +824,22 @@ export const en = {
     currentStreak: 'Current streak',
     bestStreak: 'Best streak',
     totalStreaks: 'Total streaks',
-    days: 'days',
     noStreak: 'No active streak',
     noStreakSub: 'Unlock achievements every day to start a streak',
     noData: 'No streak data yet',
     noDataSub: 'Come back once you have some achievements',
-    achievements: 'achievements',
-    andMore: '+{n} more',
     chartTitle: 'Best streaks',
     listTitle: 'Daily breakdown',
     mastery: 'Mastery',
     beaten: 'Beaten',
     completions: 'Completions during this streak',
+    pageSub: 'Days in a row with at least one achievement, on every platform.',
+    lastActive: 'Last achievement: {date}',
+    toBeatRecord: '{days} more to beat your record',
+    newRecord: 'Your best streak yet',
+    topN: 'Your {n} longest',
+    calendarTitle: 'Day by day',
+    calendarHint: 'Pick a day to see what you unlocked.',
   },
   pointsStats: {
     today: 'Today',
@@ -921,6 +928,12 @@ export const en = {
     steamOnlyHint: 'Link RetroAchievements too to unlock stats and charts',
     connectRa: 'Connect RetroAchievements',
     recentEmpty: 'No recently played Steam games',
+  },
+  // Counted nouns: one phrase per plural form (Intl.PluralRules), "{n}" is the number.
+  plurals: {
+    games: { one: '{n} game', other: '{n} games' } as PluralForms,
+    achievements: { one: '{n} achievement', other: '{n} achievements' } as PluralForms,
+    days: { one: '{n} day', other: '{n} days' } as PluralForms,
   },
 }
 

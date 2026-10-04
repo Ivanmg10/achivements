@@ -1,14 +1,12 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { Streak, UserAward } from '@/types/types'
 import { useUserAwards } from '@/hooks/useUserAwards'
+import { formatDay, plural } from '@/utils/utils'
 import StreakDayRow from '../streak-day-row/StreakDayRow'
-
-interface Props {
-  selectedStreak: Streak | null
-}
+import StreakCalendar from '../streak-calendar/StreakCalendar'
 
 const COMPLETION_TYPES = new Set(['Mastery/Completion', 'Game Beaten'])
 
@@ -16,33 +14,39 @@ function awardDate(awardedAt: string): string {
   return new Date(awardedAt).toISOString().split('T')[0]
 }
 
-function formatDateShort(dateStr: string) {
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString('default', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
-
-export default function StreakList({ selectedStreak }: Props) {
-  const { T } = useLanguage()
+/**
+ * A streak day by day: a calendar of its days, shaded by how much was
+ * unlocked, and what was unlocked on the day picked (the last one to begin
+ * with). Rendered with the streak as key, so picking another streak starts
+ * again from its last day.
+ */
+export default function StreakList({ selectedStreak }: { selectedStreak: Streak | null }) {
+  const { T, lang } = useLanguage()
   const { awards } = useUserAwards()
+  const [day, setDay] = useState<string | null>(null)
 
   const streakAwards = useMemo((): Record<string, UserAward[]> => {
     if (!selectedStreak || !awards?.VisibleUserAwards) return {}
     const { start, end } = selectedStreak
-    const relevant = awards.VisibleUserAwards.filter(a => {
+    return awards.VisibleUserAwards.filter((a) => {
       if (!COMPLETION_TYPES.has(a.AwardType)) return false
       const d = awardDate(a.AwardedAt)
       return d >= start && d <= end
-    })
-    return relevant.reduce<Record<string, UserAward[]>>((acc, a) => {
+    }).reduce<Record<string, UserAward[]>>((acc, a) => {
       const d = awardDate(a.AwardedAt)
-      if (!acc[d]) acc[d] = []
-      acc[d].push(a)
+      ;(acc[d] ??= []).push(a)
       return acc
     }, {})
   }, [selectedStreak, awards])
+
+  const byDate = useMemo(
+    () =>
+      (selectedStreak?.achievements ?? []).reduce<Record<string, Streak['achievements']>>((acc, a) => {
+        ;(acc[a.Date.split(' ')[0]] ??= []).push(a)
+        return acc
+      }, {}),
+    [selectedStreak],
+  )
 
   if (!selectedStreak) {
     return (
@@ -52,43 +56,33 @@ export default function StreakList({ selectedStreak }: Props) {
     )
   }
 
-  const byDate = selectedStreak.achievements.reduce<Record<string, typeof selectedStreak.achievements[0][]>>(
-    (acc, a) => {
-      const d = a.Date.split(' ')[0]
-      if (!acc[d]) acc[d] = []
-      acc[d].push(a)
-      return acc
-    },
-    {}
-  )
-
-  // Merge all days (achievements + award-only days)
-  const allDays = [...new Set([...Object.keys(byDate), ...Object.keys(streakAwards)])].sort(
-    (a, b) => b.localeCompare(a)
-  )
+  const counts = Object.fromEntries(Object.entries(byDate).map(([d, list]) => [d, list.length]))
+  const shown = day ?? selectedStreak.end
 
   return (
-    <div className="bg-bg-card rounded-2xl p-5 flex flex-col gap-6">
+    <section aria-labelledby="streak-days-title" className="bg-bg-card rounded-2xl p-5 flex flex-col gap-5">
       <div className="flex items-baseline gap-2 flex-wrap">
-        <h2 className="text-sm uppercase tracking-widest text-text-secondary">{T.streak.listTitle}</h2>
+        <h2 id="streak-days-title" className="text-sm uppercase tracking-widest text-text-secondary">
+          {T.streak.listTitle}
+        </h2>
         <span className="text-xs text-text-secondary">
-          {formatDateShort(selectedStreak.start)} – {formatDateShort(selectedStreak.end)}
+          {formatDay(selectedStreak.start, lang, { day: 'numeric', month: 'short', year: 'numeric' })} –{' '}
+          {formatDay(selectedStreak.end, lang, { day: 'numeric', month: 'short', year: 'numeric' })}
           {' · '}
-          {selectedStreak.days} {T.streak.days}
+          {plural(selectedStreak.days, T.plurals.days, lang)}
         </span>
       </div>
 
-      <div className="flex flex-col">
-        {allDays.map(date => (
-          <div key={date} className="pt-6 pb-6 border-b border-ink/5 last:border-none last:pb-0 first:pt-0">
-            <StreakDayRow
-              date={date}
-              achievements={byDate[date] ?? []}
-              awards={streakAwards[date]}
-            />
-          </div>
-        ))}
+      {/* Calendar and the picked day side by side when there is room; stacked otherwise. */}
+      <div className="grid gap-5 2xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] 2xl:items-start">
+        <div className="flex flex-col gap-2 w-full max-w-sm">
+          <StreakCalendar start={selectedStreak.start} end={selectedStreak.end} counts={counts} selected={shown} onSelect={setDay} />
+          <p className="text-xs text-text-secondary">{T.streak.calendarHint}</p>
+        </div>
+        <div className="border-t border-ink/5 pt-5 2xl:border-t-0 2xl:pt-0 2xl:border-l 2xl:pl-5 min-w-0">
+          <StreakDayRow date={shown} achievements={byDate[shown] ?? []} awards={streakAwards[shown]} />
+        </div>
       </div>
-    </div>
+    </section>
   )
 }

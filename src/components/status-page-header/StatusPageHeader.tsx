@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
+import { plural } from '@/utils/utils'
 
 const CATEGORY_STYLES: Record<string, string> = {
   playing:    'bg-blue-900/50 text-blue-300',
@@ -17,7 +18,7 @@ export default function StatusPageHeader({
   category: string
   gameCount: number
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   const CATEGORY_LABELS: Record<string, string> = {
     playing:    T.mainPage.playing,
@@ -36,7 +37,7 @@ export default function StatusPageHeader({
           <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${style}`}>{label}</span>
         )}
       </div>
-      <p className="text-sm text-text-secondary">{gameCount} {gameCount === 1 ? 'game' : 'games'}</p>
+      <p className="text-sm text-text-secondary">{plural(gameCount, T.plurals.games, lang)}</p>
     </div>
   )
 }
