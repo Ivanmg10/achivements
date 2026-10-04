@@ -40,7 +40,12 @@ export const AchievementGrid = memo(function AchievementGrid({
   const { T } = useLanguage()
   const [tooltip, setTooltip] = useState<TooltipData | null>(null)
   const [selected, setSelected] = useState<RetroAchievement | null>(null)
-  const [allLoaded, setAllLoaded] = useState(false)
+  // The badge set whose images have loaded. Keyed by the badges, not the array:
+  // a parent re-rendering hands over a new array of the same achievements, and
+  // treating that as new sent the grid back to its skeleton, over and over.
+  const badgeKey = achievements.map((a) => a.BadgeName).join(',')
+  const [loadedKey, setLoadedKey] = useState<string | null>(null)
+  const allLoaded = achievements.length === 0 || loadedKey === badgeKey
   const [showAll, setShowAll] = useState(false)
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
   const size = SIZE_CLASSES[badgeSize]
@@ -51,25 +56,29 @@ export const AchievementGrid = memo(function AchievementGrid({
     toggleFavorite(achievement, { gameTitle, numDistinctPlayers })
 
   useEffect(() => {
-    if (achievements.length === 0) {
-      setAllLoaded(true)
-      return
-    }
-    setAllLoaded(false)
+    if (!badgeKey) return
+    const names = badgeKey.split(',')
     let count = 0
+    let cancelled = false
+    const finish = () => {
+      if (!cancelled) setLoadedKey(badgeKey)
+    }
     const done = () => {
       count++
-      if (count >= achievements.length) setAllLoaded(true)
+      if (count >= names.length) finish()
     }
-    achievements.forEach((a) => {
+    names.forEach((name) => {
       const img = new window.Image()
       img.onload = done
       img.onerror = done
-      img.src = `https://media.retroachievements.org/Badge/${a.BadgeName}.png`
+      img.src = `https://media.retroachievements.org/Badge/${name}.png`
     })
-    const timeout = setTimeout(() => setAllLoaded(true), 1500)
-    return () => clearTimeout(timeout)
-  }, [achievements])
+    const timeout = setTimeout(finish, 1500)
+    return () => {
+      cancelled = true
+      clearTimeout(timeout)
+    }
+  }, [badgeKey])
 
   const TYPE_BADGES: Record<string, { label: string; className: string }> = {
     progression: { label: T.achievement.progression, className: 'bg-info/20 text-info' },

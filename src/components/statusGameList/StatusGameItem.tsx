@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useId, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { RetroAchievement } from '@/types/types'
 import { CategoryGame } from '../../hooks/useGamesByCategory'
 import { GameExtraData } from './StatusGameList'
@@ -62,11 +62,15 @@ export default function StatusGameItem({
     setOpen((o) => !o)
   }
 
-  const achievements = gameData
-    ? Object.values(gameData.Achievements ?? {})
-        .filter((a): a is RetroAchievement => !!a)
-        .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
-    : []
+  const achievements = useMemo(
+    () =>
+      gameData
+        ? Object.values(gameData.Achievements ?? {})
+            .filter((a): a is RetroAchievement => !!a)
+            .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
+        : [],
+    [gameData],
+  )
 
   const completionDuration = gameData
     ? unlockSpan(achievements.map((a) => a.DateEarnedHardcore ?? a.DateEarned), {

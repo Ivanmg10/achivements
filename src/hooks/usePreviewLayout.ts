@@ -15,7 +15,13 @@ export function usePreviewLayout(ref: RefObject<HTMLElement | null>, gameCounts:
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const measure = () => setBox({ width: el.clientWidth - SECTION_INSET, height: window.innerHeight })
+    // Same size as before: no new state, or every resize of the page (a card
+    // opening) re-rendered the whole list.
+    const measure = () => {
+      const width = el.clientWidth - SECTION_INSET
+      const height = window.innerHeight
+      setBox((prev) => (prev.width === width && prev.height === height ? prev : { width, height }))
+    }
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(el)

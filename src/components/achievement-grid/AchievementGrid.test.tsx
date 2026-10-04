@@ -122,3 +122,17 @@ test('shows a tooltip with type badge after hovering', async () => {
   fireEvent.mouseLeave(badge)
   jest.useRealTimers()
 })
+
+test('a new array of the same achievements does not send the grid back to its skeleton', () => {
+  jest.useFakeTimers()
+  const props = { total: 2, gameId: 1, gameTitle: 'G', numDistinctPlayers: 10 }
+  const { rerender, container } = render(<AchievementGrid achievements={[earnedAchievement, unearnedAchievement]} {...props} />)
+  act(() => {
+    jest.advanceTimersByTime(1500)
+  })
+  expect(container.querySelector('.animate-pulse')).toBeNull()
+  // The parent re-renders and hands over a fresh array with the same badges.
+  rerender(<AchievementGrid achievements={[{ ...earnedAchievement }, { ...unearnedAchievement }]} {...props} />)
+  expect(container.querySelector('.animate-pulse')).toBeNull()
+  jest.useRealTimers()
+})
