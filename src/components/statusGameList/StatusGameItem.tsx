@@ -120,7 +120,7 @@ export default function StatusGameItem({
             <p title={game.Title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game.Title}</p>
           </Link>
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${consoleColor ?? 'bg-bg-main text-text-secondary/70'}`}>
+            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${consoleColor ?? 'bg-bg-main text-text-secondary'}`}>
               {consoleIcon && (
                 <Image src={consoleIcon} alt="" width={12} height={12} className="w-3 h-3 object-contain shrink-0" />
               )}
@@ -206,7 +206,7 @@ export default function StatusGameItem({
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.Title}`}
-            className="p-1.5 rounded-lg text-text-secondary/50 hover:text-text-secondary cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <span
               aria-hidden="true"

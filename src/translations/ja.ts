@@ -874,6 +874,8 @@ export const ja: Translations = {
     searchUsersHint: 'Type the exact RA username (min. 3 characters)',
     noSpaces: 'RA usernames have no spaces',
     searchOnRA: 'Search on RetroAchievements',
+    loadError: 'RetroAchievementsから応答がありません。現在プロフィールを読み込めません。',
+    retry: '再試行',
   },
   steam: {
     level: 'レベル',

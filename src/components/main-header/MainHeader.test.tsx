@@ -1,3 +1,4 @@
+import { en } from '@/translations/en'
 import { fireEvent, render, screen } from '@testing-library/react'
 import MainHeader from './MainHeader'
 import { useSession } from 'next-auth/react'
@@ -60,7 +61,7 @@ describe('with no platform linked', () => {
   test('keeps the way home and the way to the account', () => {
     render(<MainHeader />)
     expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Profile' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: en.sidePanel.userSettings })).toBeInTheDocument()
   })
 
   test('typing no longer opens a search over nothing', () => {

@@ -118,7 +118,7 @@ export default function MainPageProfileStLinked({
             </span>
           </div>
           {(memberYear || country) && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-text-secondary">
               {memberYear && `${T.profileRa.memberSince} ${memberYear}`}
               {memberYear && country && ' · '}
               {country && (

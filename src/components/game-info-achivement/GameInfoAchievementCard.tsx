@@ -72,7 +72,7 @@ export default function GameInfoAchievementCard({
                 onClick={(e) => { e.stopPropagation(); onToggleFavorite(achievement) }}
                 aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
                 aria-pressed={isFavorited}
-                className={`relative z-10 shrink-0 transition-colors ${isFavorited ? 'text-warning' : 'text-text-secondary/50 hover:text-warning'}`}
+                className={`relative z-10 shrink-0 transition-colors ${isFavorited ? 'text-warning' : 'text-text-secondary hover:text-warning'}`}
               >
                 {isFavorited ? <IconStarFilled className="w-3.5 h-3.5" aria-hidden="true" /> : <IconStar className="w-3.5 h-3.5" aria-hidden="true" />}
               </button>
@@ -93,7 +93,7 @@ export default function GameInfoAchievementCard({
         <p className="text-xs text-text-secondary mt-0.5 line-clamp-2">{achievement.Description}</p>
 
         {/* Stats row */}
-        <div className="flex items-center gap-3 mt-1.5 text-xs text-text-secondary/70 flex-wrap">
+        <div className="flex items-center gap-3 mt-1.5 text-xs text-text-secondary flex-wrap">
           {rarityPct !== null && (
             <span>{rarityPct}{T.achievement.haveIt}</span>
           )}
@@ -102,7 +102,7 @@ export default function GameInfoAchievementCard({
         </div>
 
         {achievement.Author && (
-          <p className="text-[10px] text-text-secondary/40 mt-1">
+          <p className="text-[10px] text-text-secondary mt-1">
             {T.achievement.by} {achievement.Author}
           </p>
         )}

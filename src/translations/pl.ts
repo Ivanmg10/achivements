@@ -874,6 +874,8 @@ export const pl: Translations = {
     searchUsersHint: 'Type the exact RA username (min. 3 characters)',
     noSpaces: 'RA usernames have no spaces',
     searchOnRA: 'Search on RetroAchievements',
+    loadError: 'RetroAchievements nie odpowiada. Nie udało się teraz wczytać profilu.',
+    retry: 'Spróbuj ponownie',
   },
   steam: {
     level: 'Poziom',

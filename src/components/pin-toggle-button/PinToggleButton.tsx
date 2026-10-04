@@ -48,7 +48,7 @@ export function PinToggleButton({
             ? 'text-danger'
             : pinned
               ? 'text-accent hover:text-accent/80'
-              : 'text-text-secondary/50 hover:text-text-main'
+              : 'text-text-secondary hover:text-text-main'
         } ${className}`}
       >
         {pinned ? <IconPinFilled className="w-4 h-4" aria-hidden /> : <IconPin className="w-4 h-4" aria-hidden />}

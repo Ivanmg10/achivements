@@ -78,7 +78,7 @@ export default function MainPageConsoleNav() {
                     {label}
                   </span>
                 </div>
-                <span className="text-[10px] text-text-secondary/50 group-hover:text-accent transition-colors">→</span>
+                <span className="text-[10px] text-text-secondary group-hover:text-accent transition-colors">→</span>
               </Link>
 
               <div className="flex flex-wrap gap-1.5">
@@ -94,7 +94,7 @@ export default function MainPageConsoleNav() {
                       className={`items-center gap-1.5 rounded-md px-2 py-1.5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
                         active
                           ? `flex ${def.color} hover:brightness-125`
-                          : 'hidden sm:flex bg-bg-card/40 text-text-secondary/30 hover:bg-bg-card hover:text-text-secondary'
+                          : 'hidden sm:flex bg-bg-card/40 text-text-secondary hover:bg-bg-card hover:text-text-secondary'
                       }`}
                     >
                       <Image

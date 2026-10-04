@@ -24,7 +24,7 @@ export default function MainFooter() {
         </span>
 
         <div className="flex items-center gap-3">
-          <span className="text-text-secondary/50">{T.mainFooter.poweredBy}</span>
+          <span className="text-text-secondary">{T.mainFooter.poweredBy}</span>
           {PLATFORMS.map(({ name, href }, i) => (
             <span key={name} className="flex items-center gap-3">
               {i > 0 && <span className="text-ink/20" aria-hidden="true">·</span>}

@@ -81,7 +81,7 @@ export default function GameInfoAchivement({
               aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
               aria-pressed={isFavorited}
               className={`relative z-10 shrink-0 rounded transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-                isFavorited ? 'text-warning hover:text-warning/80' : 'text-text-secondary/50 hover:text-warning'
+                isFavorited ? 'text-warning hover:text-warning/80' : 'text-text-secondary hover:text-warning'
               }`}
             >
               {isFavorited ? <IconStarFilled className="w-4 h-4" aria-hidden="true" /> : <IconStar className="w-4 h-4" aria-hidden="true" />}
@@ -108,7 +108,7 @@ export default function GameInfoAchivement({
           </p>
         )}
         {achievement.Author && (
-          <p className="text-xs text-text-secondary/70 mt-0.5">
+          <p className="text-xs text-text-secondary mt-0.5">
             {T.achievement.by} {achievement.Author}
           </p>
         )}

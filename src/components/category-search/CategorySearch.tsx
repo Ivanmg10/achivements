@@ -31,7 +31,7 @@ export default function CategorySearch({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={`${T.categoryPage.searchGames}…`}
-        className="flex-1 min-w-0 bg-transparent text-sm text-text-main outline-none placeholder:text-text-secondary/70"
+        className="flex-1 min-w-0 bg-transparent text-sm text-text-main outline-none placeholder:text-text-secondary"
       />
       {value && (
         <button

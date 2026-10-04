@@ -152,7 +152,7 @@ export default function MainPageGroups({
                           {group.game_count} {T.groups.games}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-[10px] text-text-secondary/50">
+                      <div className="flex items-center gap-1.5 text-[10px] text-text-secondary">
                         {group.total_possible > 0 && (
                           <span>{group.total_awarded}/{group.total_possible}</span>
                         )}

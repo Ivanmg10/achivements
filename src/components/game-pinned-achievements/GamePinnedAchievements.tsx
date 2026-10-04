@@ -89,14 +89,14 @@ export function GamePinnedAchievements({
           <button
             onClick={() => setModalOpen(true)}
             aria-label={T.gameExpanded.pinAchievementAria}
-            className="w-full flex-1 rounded-lg border-2 border-dashed border-ink/15 flex flex-col items-center justify-center gap-1.5 text-text-secondary/50 hover:text-text-main hover:border-ink/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="w-full flex-1 rounded-lg border-2 border-dashed border-ink/15 flex flex-col items-center justify-center gap-1.5 text-text-secondary hover:text-text-main hover:border-ink/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <IconPlus className="w-6 h-6" aria-hidden />
             <span className="text-xs">{T.gameExpanded.pinAchievementAria}</span>
           </button>
         ) : (
           <div className="flex-1 flex items-center justify-center">
-            <p className="text-xs text-text-secondary/50 italic text-center">{T.gameExpanded.noUnearned}</p>
+            <p className="text-xs text-text-secondary italic text-center">{T.gameExpanded.noUnearned}</p>
           </div>
         )
       ) : (
@@ -147,7 +147,7 @@ export function GamePinnedAchievements({
             <button
               onClick={() => setModalOpen(true)}
               aria-label={T.gameExpanded.pinAchievementAria}
-              className="w-full rounded-lg border-2 border-dashed border-ink/15 flex items-center justify-center gap-1.5 py-2 text-text-secondary/50 hover:text-text-main hover:border-ink/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="w-full rounded-lg border-2 border-dashed border-ink/15 flex items-center justify-center gap-1.5 py-2 text-text-secondary hover:text-text-main hover:border-ink/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <IconPlus className="w-4 h-4" aria-hidden />
               <span className="text-xs">{T.gameExpanded.pinAchievementAria}</span>

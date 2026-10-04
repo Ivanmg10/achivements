@@ -164,7 +164,7 @@ export default function AchievementModal({
                   aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
                   aria-pressed={isFavorited}
                   className={`shrink-0 rounded transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-                    isFavorited ? 'text-warning hover:text-warning/80' : 'text-text-secondary/50 hover:text-warning'
+                    isFavorited ? 'text-warning hover:text-warning/80' : 'text-text-secondary hover:text-warning'
                   }`}
                 >
                   {isFavorited ? <IconStarFilled className="w-5 h-5" aria-hidden="true" /> : <IconStar className="w-5 h-5" aria-hidden="true" />}
@@ -193,7 +193,7 @@ export default function AchievementModal({
             </div>
             <p className="text-sm text-text-secondary">{achievement.Description}</p>
             {earnedDate && (
-              <p className="text-xs text-text-secondary/60 mt-1">{T.achievement.earnedOn} {earnedDate}</p>
+              <p className="text-xs text-text-secondary mt-1">{T.achievement.earnedOn} {earnedDate}</p>
             )}
           </div>
           <button
@@ -290,7 +290,7 @@ export default function AchievementModal({
                                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-900/60 text-yellow-300">HC</span>
                               )}
                             </div>
-                            <p className="text-xs text-text-secondary/60 tabular-nums">
+                            <p className="text-xs text-text-secondary tabular-nums">
                               {new Date(u.DateAwarded).toLocaleDateString(undefined, {
                                 day: '2-digit', month: 'short', year: '2-digit',
                               })}
@@ -348,7 +348,7 @@ export default function AchievementModal({
                           <div className="flex flex-col gap-0.5 flex-1 min-w-0">
                             <div className="flex items-baseline gap-2">
                               <p className="text-sm font-medium">{c.User}</p>
-                              <p className="text-xs text-text-secondary/60">
+                              <p className="text-xs text-text-secondary">
                                 {new Date(c.Submitted).toLocaleDateString(undefined, {
                                   day: '2-digit', month: 'short', year: '2-digit',
                                 })}
@@ -361,7 +361,7 @@ export default function AchievementModal({
                     </div>
                   </div>
                 ) : (
-                  <p className="text-sm text-text-secondary/50 text-center py-2">{T.achievement.noComments}</p>
+                  <p className="text-sm text-text-secondary text-center py-2">{T.achievement.noComments}</p>
                 )}
               </>
             )

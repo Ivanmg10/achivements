@@ -26,7 +26,7 @@ export default function PerfectGameOrderRow({ game }: { game: PerfectGame }) {
         {...attributes}
         {...listeners}
         aria-label={`${T.cards.dragToReorder}: ${game.title}`}
-        className="text-text-secondary/30 hover:text-text-secondary/70 cursor-grab active:cursor-grabbing touch-none shrink-0"
+        className="text-text-secondary/30 hover:text-text-secondary cursor-grab active:cursor-grabbing touch-none shrink-0"
       >
         <IconGripVertical className="w-4 h-4" aria-hidden />
       </button>

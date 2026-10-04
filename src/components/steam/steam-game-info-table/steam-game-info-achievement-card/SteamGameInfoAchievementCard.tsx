@@ -57,13 +57,13 @@ export default function SteamGameInfoAchievementCard({
               {a.dateEarned ? formatUnlock(a.dateEarned, lang) : T.steam.earned}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-text-secondary/60">
+            <span className="inline-flex items-center gap-1 text-text-secondary">
               <IconLock size={12} aria-hidden="true" />
               {T.steam.locked}
             </span>
           )}
           {a.globalPct !== null && (
-            <span className="text-text-secondary/60">
+            <span className="text-text-secondary">
               {formatRarity(a.globalPct)}
               {T.achievement.haveIt}
             </span>

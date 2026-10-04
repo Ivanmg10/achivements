@@ -38,7 +38,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer className="mt-auto px-6 py-6 flex flex-col items-center gap-2 text-center text-xs text-text-secondary/60">
+      <footer className="mt-auto px-6 py-6 flex flex-col items-center gap-2 text-center text-xs text-text-secondary">
         <span>{T.landing.footer}</span>
         <LegalLinks />
       </footer>

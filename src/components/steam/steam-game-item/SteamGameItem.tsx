@@ -118,7 +118,7 @@ export default function SteamGameItem({
               />
             </span>
 
-            <span className="flex flex-wrap items-center gap-x-2 text-xs text-text-secondary/70">
+            <span className="flex flex-wrap items-center gap-x-2 text-xs text-text-secondary">
               <span className="whitespace-nowrap">{progressText}</span>
               <span className="opacity-40" aria-hidden="true">·</span>
               <span className="flex items-center gap-1">

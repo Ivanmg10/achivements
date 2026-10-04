@@ -119,7 +119,7 @@ export default function MainPageMastery({
 
       {recentCovers.length > 0 && (
         <div className="flex flex-col gap-1.5">
-          <p className="text-[10px] text-text-secondary/60 uppercase tracking-widest">{T.cards.recentMasteries}</p>
+          <p className="text-[10px] text-text-secondary uppercase tracking-widest">{T.cards.recentMasteries}</p>
           <div className="grid grid-cols-4 gap-1.5">
             {recentCovers.map((a, i) => (
               <Link

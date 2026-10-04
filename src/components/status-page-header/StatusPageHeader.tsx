@@ -36,7 +36,7 @@ export default function StatusPageHeader({
           <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${style}`}>{label}</span>
         )}
       </div>
-      <p className="text-sm text-text-secondary/60">{gameCount} {gameCount === 1 ? 'game' : 'games'}</p>
+      <p className="text-sm text-text-secondary">{gameCount} {gameCount === 1 ? 'game' : 'games'}</p>
     </div>
   )
 }

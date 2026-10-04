@@ -187,7 +187,7 @@ export default function GameInfoTable({
             </span>
             {tableExpanded ? T.gameInfoTable.collapseTable : `${T.gameInfoTable.expandTable} (${filtered.length})`}
           </span>
-          <span className="text-xs text-text-secondary/60 bg-bg-main/30 px-2 py-0.5 rounded-full tabular-nums">
+          <span className="text-xs text-text-secondary bg-bg-main/30 px-2 py-0.5 rounded-full tabular-nums">
             {filtered.length} / {achievements.length}
           </span>
         </button>

@@ -17,9 +17,8 @@ import StatusSortControl, {
   defaultSortStateFor,
 } from '@/components/status-sort-control/StatusSortControl'
 import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
-import EmptyState from '../../../components/empty-state/EmptyState'
+import StatusEmptyState from '@/components/status-empty-state/StatusEmptyState'
 import StatusPageSkeleton from '@/components/status-page-skeleton/StatusPageSkeleton'
-import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import SteamCategorySection from '@/components/steam/steam-category-section/SteamCategorySection'
 import CollapsibleSection from '@/components/collapsible-section/CollapsibleSection'
@@ -37,7 +36,6 @@ export default function CategoryPage() {
   const { category } = useParams()
   const { games, loading, error } = useGamesByCategory(category as string)
   const extraData = useGameExtraData()
-  const { T } = useLanguage()
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
   const { selected, toggle, clear } = useConsoleFilter()
   const cat = category as string
@@ -57,11 +55,6 @@ export default function CategoryPage() {
     setSortState(defaultSortStateFor(cat))
   }
 
-  const EMPTY_STATE: Record<string, { icon: string; title: string; sub: string }> = {
-    wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay, sub: T.categoryPage.noWantToPlaySub },
-    playing: { icon: '🎮', title: T.categoryPage.noPlaying, sub: T.categoryPage.noPlayingSub },
-    completed: { icon: '🏆', title: T.categoryPage.noCompleted, sub: T.categoryPage.noCompletedSub },
-  }
 
   const consolePills = useMemo(() => buildConsolePills(games), [games])
   const filteredGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
@@ -99,12 +92,7 @@ export default function CategoryPage() {
         </div>
       )}
       {visibleGames.length === 0 ? (
-        <EmptyState
-          icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-          title={EMPTY_STATE[cat]?.title ?? ''}
-          subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-          className="min-h-[40vh]"
-        />
+        <StatusEmptyState category={cat} className="min-h-[40vh]" />
       ) : (
         <StatusGameList games={visibleGames} extraData={extraData} category={cat} gridCols={gridCols} />
       )}
@@ -121,12 +109,7 @@ export default function CategoryPage() {
         ) : !steamLinked ? (
           // RA only: the page as it always was.
           games.length === 0 ? (
-            <EmptyState
-              icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-              title={EMPTY_STATE[cat]?.title ?? ''}
-              subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-              className="min-h-[60vh]"
-            />
+            <StatusEmptyState category={cat} className="min-h-[60vh]" />
           ) : (
             <>
               <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -164,12 +147,7 @@ export default function CategoryPage() {
               preview={<CollapsibleSectionPreview games={raPreviewGames(visibleGames)} columns={raPreview.columns} count={raPreview.count} />}
             >
               {games.length === 0 ? (
-                <EmptyState
-                  icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-                  title={EMPTY_STATE[cat]?.title ?? ''}
-                  subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-                  className="min-h-[20vh]"
-                />
+                <StatusEmptyState category={cat} className="min-h-[20vh]" />
               ) : (
                 <>
                   <div className="flex items-center gap-2 flex-wrap">{raControls}</div>

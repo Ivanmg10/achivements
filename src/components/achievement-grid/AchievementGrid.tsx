@@ -182,11 +182,11 @@ export const AchievementGrid = memo(function AchievementGrid({
                 </span>
               )}
               {!tooltip.achievement.DateEarned && !tooltip.achievement.DateEarnedHardcore && (
-                <span className="text-xs text-text-secondary/60">{T.achievement.notEarned}</span>
+                <span className="text-xs text-text-secondary">{T.achievement.notEarned}</span>
               )}
             </div>
             {(tooltip.achievement.DateEarnedHardcore ?? tooltip.achievement.DateEarned) && (
-              <p className="text-xs text-text-secondary/60 mt-1">
+              <p className="text-xs text-text-secondary mt-1">
                 {new Date(
                   (tooltip.achievement.DateEarnedHardcore ?? tooltip.achievement.DateEarned)!,
                 ).toLocaleDateString()}

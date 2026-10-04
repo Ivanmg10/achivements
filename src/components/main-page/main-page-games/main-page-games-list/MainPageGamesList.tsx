@@ -90,7 +90,7 @@ export default function MainPageGamesList({
               {game?.GameTitle ? game?.GameTitle : game?.Title}
             </p>
             <div className="flex flex-row items-center gap-1">
-              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${consoleDef?.color ?? 'text-gray-400'}`}>
+              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${consoleDef?.color ?? 'text-text-secondary'}`}>
                 {consoleDef?.icon && (
                   <Image
                     src={consoleDef.icon}
@@ -111,10 +111,10 @@ export default function MainPageGamesList({
             {badge && (
               <>
                 <span className="text-sm font-bold text-gray-300">{badge.top}</span>
-                <span className="text-xs text-gray-500">{badge.bottom}</span>
+                <span className="text-xs text-text-secondary">{badge.bottom}</span>
               </>
             )}
-            {pointsLabel && <span className="text-[10px] text-gray-500/80">{pointsLabel}</span>}
+            {pointsLabel && <span className="text-[10px] text-text-secondary/80">{pointsLabel}</span>}
           </div>
         )}
       </Link>

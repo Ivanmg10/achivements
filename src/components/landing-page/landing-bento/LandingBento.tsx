@@ -51,7 +51,7 @@ export default function LandingBento() {
           ))}
         </div>
         <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 pt-4 border-t border-ink/5 text-sm text-text-secondary">
-          <li className="text-xs uppercase tracking-widest text-text-secondary/60">{T.landing.platformsLead}</li>
+          <li className="text-xs uppercase tracking-widest text-text-secondary">{T.landing.platformsLead}</li>
           <li className="flex items-center gap-2">
             <RaLogo height={14} />
             RetroAchievements
@@ -60,7 +60,7 @@ export default function LandingBento() {
             <SteamLogo size={15} className="text-[#66c0f4]" aria-hidden="true" />
             Steam
           </li>
-          <li className="flex items-center gap-2 text-text-secondary/60">
+          <li className="flex items-center gap-2 text-text-secondary">
             <PlaystationLogo size={15} aria-hidden="true" />
             {T.landing.psnSoon}
           </li>

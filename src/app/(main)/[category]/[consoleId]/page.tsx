@@ -14,15 +14,13 @@ import StatusSortControl, {
   StatusSortState,
   defaultSortStateFor,
 } from '@/components/status-sort-control/StatusSortControl'
-import EmptyState from '../../../../components/empty-state/EmptyState'
+import StatusEmptyState from '@/components/status-empty-state/StatusEmptyState'
 import StatusPageSkeleton from '@/components/status-page-skeleton/StatusPageSkeleton'
-import { useLanguage } from '@/context/LanguageContext'
 
 export default function CategoryConsolePage() {
   const { consoleId, category } = useParams()
   const { games, loading, error } = useGamesByCategory(category as string)
   const extraData = useGameExtraData()
-  const { T } = useLanguage()
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
   const { selected, toggle, clear } = useConsoleFilter(
     consoleId ? [Number(consoleId)] : undefined
@@ -38,11 +36,6 @@ export default function CategoryConsolePage() {
     setSortState(defaultSortStateFor(cat))
   }
 
-  const EMPTY_STATE: Record<string, { icon: string; title: string; sub: string }> = {
-    wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay, sub: T.categoryPage.noWantToPlaySub },
-    playing: { icon: '🎮', title: T.categoryPage.noPlaying, sub: T.categoryPage.noPlayingSub },
-    completed: { icon: '🏆', title: T.categoryPage.noCompleted, sub: T.categoryPage.noCompletedSub },
-  }
 
   const consolePills = useMemo(() => buildConsolePills(games), [games])
   const visibleGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
@@ -55,12 +48,7 @@ export default function CategoryConsolePage() {
         ) : error ? (
           <p className="text-red-400 text-sm text-center mt-10">{error}</p>
         ) : games.length === 0 ? (
-          <EmptyState
-            icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-            title={EMPTY_STATE[cat]?.title ?? ''}
-            subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-            className="min-h-[60vh]"
-          />
+          <StatusEmptyState category={cat} className="min-h-[60vh]" />
         ) : (
           <>
             <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -91,12 +79,7 @@ export default function CategoryConsolePage() {
             )}
 
             {visibleGames.length === 0 ? (
-              <EmptyState
-                icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-                title={EMPTY_STATE[cat]?.title ?? ''}
-                subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-                className="min-h-[40vh]"
-              />
+              <StatusEmptyState category={cat} className="min-h-[40vh]" />
             ) : (
               <StatusGameList games={visibleGames} extraData={extraData} category={cat} />
             )}

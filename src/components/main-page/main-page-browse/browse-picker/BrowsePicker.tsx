@@ -64,7 +64,7 @@ export default function BrowsePicker({ pool }: { pool: LibraryGame[] }) {
   const header = (
     <div className="flex flex-col gap-0.5">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.pickTitle}</p>
-      <p className="text-xs text-text-secondary/70">{T.cards.pickHint}</p>
+      <p className="text-xs text-text-secondary">{T.cards.pickHint}</p>
     </div>
   )
 

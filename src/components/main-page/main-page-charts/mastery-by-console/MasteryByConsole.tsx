@@ -34,7 +34,7 @@ export default function MasteryByConsole({ awards }: { awards: UserAward[] }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[10px] text-text-secondary/60 uppercase tracking-widest">{T.cards.awardsByConsole}</p>
+      <p className="text-[10px] text-text-secondary uppercase tracking-widest">{T.cards.awardsByConsole}</p>
       <ul className="flex flex-col gap-1.5">
         {rows.map(({ console, count }) => {
           const icon = ICON_BY_NAME.get(console)

@@ -23,7 +23,7 @@ interface PublicUserPageProps {
 
 export default function PublicUserPage({ raUsername }: PublicUserPageProps) {
   const { T } = useLanguage()
-  const { profile, isLoading: profileLoading, error } = usePublicUserProfile(raUsername)
+  const { profile, isLoading: profileLoading, error, retry } = usePublicUserProfile(raUsername)
   const { achievements, isLoading: achLoading } = usePublicUserAchievements(raUsername)
   const { rank, isLoading: rankLoading } = usePublicUserRank(raUsername)
   const { awards, isLoading: awardsLoading } = usePublicUserAwards(raUsername)
@@ -41,9 +41,16 @@ export default function PublicUserPage({ raUsername }: PublicUserPageProps) {
 
   if (error && !profileLoading) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 py-24 text-text-secondary">
-        <IconUserOff className="w-10 h-10 opacity-40" aria-hidden />
-        <p className="text-sm">{T.publicProfile.notFound.replace('{u}', raUsername)}</p>
+      <div className="flex flex-col items-center justify-center gap-3 py-24 text-text-secondary text-center px-4">
+        <IconUserOff className="w-10 h-10" aria-hidden="true" />
+        <p role="alert" className="text-sm">
+          {error === 'missing' ? T.publicProfile.notFound.replace('{u}', raUsername) : T.publicProfile.loadError}
+        </p>
+        {error === 'failed' && (
+          <button onClick={retry} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+            {T.publicProfile.retry}
+          </button>
+        )}
       </div>
     )
   }

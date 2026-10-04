@@ -144,7 +144,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                 <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
                   <IconHash className="w-8 h-8 text-text-secondary opacity-30" />
                   <p className="text-sm text-text-secondary">Sin hashes registrados</p>
-                  <p className="text-xs text-text-secondary/60">No hay ROMs verificadas para este juego</p>
+                  <p className="text-xs text-text-secondary">No hay ROMs verificadas para este juego</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
@@ -169,7 +169,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                         )}
                       </div>
                       <div className="flex items-center gap-1 bg-bg-card rounded-lg px-2.5 py-1.5">
-                        <code className="text-[11px] text-text-secondary/80 font-mono flex-1 select-all">{h.MD5}</code>
+                        <code className="text-[11px] text-text-secondary font-mono flex-1 select-all">{h.MD5}</code>
                         <CopyButton text={h.MD5} />
                       </div>
                       {h.PatchUrl && (

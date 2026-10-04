@@ -1,33 +1,45 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { RetroAchievementsUserProfile } from '@/types/types'
 
+/**
+ * Someone's RA profile, for their public page. `error` tells apart a user RA
+ * does not know ('missing') from RA not answering ('failed', worth a retry):
+ * saying "not found" when RA was only down sends visitors away for nothing.
+ */
 export function usePublicUserProfile(raUsername: string) {
   const [profile, setProfile] = useState<RetroAchievementsUserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState<'missing' | 'failed' | null>(null)
   const fetchedFor = useRef<string | null>(null)
 
-  useEffect(() => {
-    if (!raUsername || fetchedFor.current === raUsername) return
-    fetchedFor.current = raUsername
+  const load = useCallback((u: string) => {
     setProfile(null)
-    setError(false)
+    setError(null)
     setIsLoading(true)
-    fetch(`/api/public/user/profile?u=${encodeURIComponent(raUsername)}`)
+    fetch(`/api/public/user/profile?u=${encodeURIComponent(u)}`)
       .then((r) => {
-        if (!r.ok) throw new Error('Failed')
+        if (r.status === 404) return null
+        if (!r.ok) throw new Error(`profile ${r.status}`)
         return r.json()
       })
       .then((data) => {
         if (data?.User) setProfile(data)
-        else setError(true)
-        setIsLoading(false)
+        else setError('missing')
       })
-      .catch(() => {
-        setError(true)
-        setIsLoading(false)
+      .catch((err) => {
+        console.error('[usePublicUserProfile]', err)
+        setError('failed')
       })
-  }, [raUsername])
+      .finally(() => setIsLoading(false))
+  }, [])
 
-  return { profile, isLoading, error }
+  useEffect(() => {
+    if (!raUsername || fetchedFor.current === raUsername) return
+    fetchedFor.current = raUsername
+    load(raUsername)
+  }, [raUsername, load])
+
+  const retry = useCallback(() => load(raUsername), [load, raUsername])
+
+  return { profile, isLoading, error, retry }
 }

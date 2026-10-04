@@ -28,7 +28,7 @@ export default function MainPageProfileStAchievements({
 
   return (
     <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2 flex-1 min-h-[148px]">
-      <p className="text-xs text-gray-400 uppercase tracking-wider">{T.profileAchievements.recentAchievements}</p>
+      <p className="text-xs text-text-secondary uppercase tracking-wider">{T.profileAchievements.recentAchievements}</p>
       {isLoading && achievements.length === 0 ? (
         <div aria-busy="true" className="flex flex-col gap-2 animate-pulse">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -71,7 +71,7 @@ export default function MainPageProfileStAchievements({
                 )}
                 <div className="flex flex-col min-w-0">
                   <span className="text-xs font-semibold truncate group-hover:text-accent transition-colors">{a.title}</span>
-                  <span className="text-xs text-gray-500 truncate">{a.gameTitle}</span>
+                  <span className="text-xs text-text-secondary truncate">{a.gameTitle}</span>
                 </div>
                 <time dateTime={a.unlockedAt} className="text-xs ml-auto shrink-0 text-[#66c0f4]">
                   {new Date(a.unlockedAt).toLocaleDateString(lang, { day: 'numeric', month: 'short' })}

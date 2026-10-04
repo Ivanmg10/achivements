@@ -76,7 +76,7 @@ export default function CompletionDistribution({
             ))}
           </ul>
 
-          {note && <p className="text-[10px] text-text-secondary/60">{note}</p>}
+          {note && <p className="text-[10px] text-text-secondary">{note}</p>}
         </>
       )}
     </div>

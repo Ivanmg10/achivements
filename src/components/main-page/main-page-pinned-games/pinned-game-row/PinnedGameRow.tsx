@@ -84,7 +84,7 @@ export default function PinnedGameRow({
           {...listeners}
           aria-label={T.cards.dragToReorder}
           onClick={(e) => e.stopPropagation()}
-          className="text-text-secondary/30 hover:text-text-secondary/70 cursor-grab active:cursor-grabbing touch-none shrink-0 focus-visible:outline-none"
+          className="text-text-secondary/30 hover:text-text-secondary cursor-grab active:cursor-grabbing touch-none shrink-0 focus-visible:outline-none"
         >
           <IconGripVertical className="w-4 h-4" aria-hidden />
         </button>
@@ -146,7 +146,7 @@ export default function PinnedGameRow({
           </div>
 
           {total > 0 && (
-            <div className="flex items-center gap-2 text-xs text-text-secondary/50">
+            <div className="flex items-center gap-2 text-xs text-text-secondary">
               <span>
                 {earned}/{total} {T.statusGameItem.achievements}
               </span>

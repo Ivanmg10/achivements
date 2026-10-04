@@ -221,7 +221,7 @@ export default function PublicRecentlyPlayed({
                         </motion.span>
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs text-text-secondary/50">
+                      <div className="flex items-center gap-2 text-xs text-text-secondary">
                         {g.NumPossibleAchievements > 0 && (
                           <>
                             <span>{earnedAch}/{g.NumPossibleAchievements} logros</span>

@@ -59,7 +59,7 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
             >
               <span className={`absolute inset-y-0 left-0 rounded-full ${barColor}`} style={{ width: `${game.pct}%` }} />
             </span>
-            <span className="text-[10px] tabular-nums text-text-secondary/70">{Math.round(game.pct)}%</span>
+            <span className="text-[10px] tabular-nums text-text-secondary">{Math.round(game.pct)}%</span>
           </span>
         )}
       </div>

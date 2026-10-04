@@ -121,7 +121,7 @@ export default function RaGameItem({
               />
             </span>
 
-            <span className="flex flex-wrap items-center gap-x-2 text-xs text-text-secondary/70">
+            <span className="flex flex-wrap items-center gap-x-2 text-xs text-text-secondary">
               {total > 0 && (
                 <>
                   <span className="whitespace-nowrap">

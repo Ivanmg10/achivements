@@ -70,7 +70,7 @@ export default function SteamGameInfoAchievement({
             {a.dateEarned ? formatUnlock(a.dateEarned, lang) : T.steam.earned}
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1 text-text-secondary/60">
+          <span className="inline-flex items-center gap-1 text-text-secondary">
             <IconLock size={14} aria-hidden="true" />
             {T.steam.locked}
           </span>

@@ -70,7 +70,7 @@ export default function MainPageProfileTabs<T extends string>({
             className={`-mb-px flex items-center gap-1.5 px-0.5 pb-1.5 pt-0.5 text-xs border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-t ${
               active
                 ? 'border-accent text-text-main font-semibold'
-                : 'border-transparent text-text-secondary/70 hover:text-text-secondary font-medium'
+                : 'border-transparent text-text-secondary hover:text-text-main font-medium'
             }`}
           >
             {tab.icon}

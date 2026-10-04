@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { IconPlus } from '@tabler/icons-react'
+import { IconFolder, IconPlus } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
 import type { GameCandidate } from '@/utils/gameCandidates'
@@ -90,7 +90,7 @@ export default function GroupsPage() {
       ) : groups.length === 0 ? (
         <>
           <EmptyState
-            icon="📁"
+            icon={<IconFolder className="w-7 h-7" />}
             title={T.groups.noGroups}
             subtitle={T.groups.noGroupsSub}
             className="min-h-[40vh]"

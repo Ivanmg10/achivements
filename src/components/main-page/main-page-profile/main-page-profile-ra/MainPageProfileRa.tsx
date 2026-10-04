@@ -72,12 +72,12 @@ export default function MainPageProfileRa({
             <div className="flex flex-col gap-1 min-w-0 w-full">
               <p className="text-xl lg:text-2xl font-bold leading-tight truncate">{user.User}</p>
               {user.Motto && (
-                <p className="text-xs text-gray-400 italic line-clamp-2">
+                <p className="text-xs text-text-secondary italic line-clamp-2">
                   &ldquo;{user.Motto}&rdquo;
                 </p>
               )}
               {memberYear && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-text-secondary">
                   {T.profileRa.memberSince} {memberYear}
                 </p>
               )}
@@ -107,7 +107,7 @@ export default function MainPageProfileRa({
 
           {hasContribs && (
             <div className="flex flex-col gap-2 bg-bg-main rounded-lg p-3">
-              <p className="text-xs text-gray-400 uppercase tracking-wider">
+              <p className="text-xs text-text-secondary uppercase tracking-wider">
                 {T.profileRa.contributions}
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -115,13 +115,13 @@ export default function MainPageProfileRa({
                   <span className="text-lg font-bold text-purple-400">
                     {(user.ContribCount ?? 0).toLocaleString()}
                   </span>
-                  <span className="text-xs text-gray-400">{T.profileRa.achievementsCreated}</span>
+                  <span className="text-xs text-text-secondary">{T.profileRa.achievementsCreated}</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-lg font-bold text-pink-400">
                     {(user.ContribYield ?? 0).toLocaleString()}
                   </span>
-                  <span className="text-xs text-gray-400">{T.profileRa.pointsContributed}</span>
+                  <span className="text-xs text-text-secondary">{T.profileRa.pointsContributed}</span>
                 </div>
               </div>
             </div>

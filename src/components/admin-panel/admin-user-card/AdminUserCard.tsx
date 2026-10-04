@@ -67,13 +67,13 @@ export default function AdminUserCard({
       <ul className="flex flex-col gap-1 text-xs">
         <li className="flex items-center gap-1.5 min-w-0">
           <RaLogo height={11} className={user.rausername ? '' : 'opacity-30 grayscale'} />
-          <span className={`truncate ${user.rausername ? 'text-text-secondary' : 'text-text-secondary/40'}`}>
+          <span className={`truncate ${user.rausername ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
             {user.ra_display ?? user.rausername ?? '—'}
           </span>
         </li>
         <li className="flex items-center gap-1.5 min-w-0">
           <SteamLogo size={11} className={user.steamusername ? 'text-[#66c0f4]' : 'text-text-secondary/30'} />
-          <span className={`truncate ${user.steamusername ? 'text-text-secondary' : 'text-text-secondary/40'}`}>
+          <span className={`truncate ${user.steamusername ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
             {user.steamusername ?? '—'}
           </span>
         </li>

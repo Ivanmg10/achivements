@@ -215,7 +215,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                       className={`flex items-center gap-1.5 pb-1 text-[11px] font-medium border-b-2 transition-colors ${
                         platformFilter === opt.value
                           ? 'border-accent text-text-main'
-                          : 'border-transparent text-text-secondary/70 hover:text-text-secondary'
+                          : 'border-transparent text-text-secondary hover:text-text-main'
                       }`}
                     >
                       {opt.icon}
@@ -232,7 +232,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                     {results.length === 0 && !directGameId ? (
                       <div className="flex flex-col items-center gap-2 py-8 px-4">
                         <p className="text-text-secondary text-sm">{T.search.noResults}</p>
-                        <p className="text-text-secondary/50 text-xs text-center">{T.search.libraryOnly}</p>
+                        <p className="text-text-secondary text-xs text-center">{T.search.libraryOnly}</p>
                         {raLinked && (
                           <a
                             href={`https://retroachievements.org/searchresults.php?s=${encodeURIComponent(query.trim())}`}
@@ -291,7 +291,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                     <div className="flex flex-col items-center gap-1.5 py-6 px-4">
                       <p className="text-text-secondary text-xs text-center">{T.publicProfile.searchUsersHint}</p>
                       {hasSpace && (
-                        <p className="text-text-secondary/60 text-[10px] text-center">{T.publicProfile.noSpaces}</p>
+                        <p className="text-text-secondary text-[10px] text-center">{T.publicProfile.noSpaces}</p>
                       )}
                     </div>
                   )

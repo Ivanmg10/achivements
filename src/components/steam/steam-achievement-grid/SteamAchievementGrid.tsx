@@ -146,12 +146,12 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
                   {T.steam.earned}
                 </span>
               ) : (
-                <span className="text-xs text-text-secondary/60">{T.achievement.notEarned}</span>
+                <span className="text-xs text-text-secondary">{T.achievement.notEarned}</span>
               )}
               {tooltip.achievement.likelyOnline && <SteamOnlineBadge />}
             </div>
             {tooltip.achievement.dateEarned && (
-              <p className="text-xs text-text-secondary/60 mt-1">{formatDate(tooltip.achievement.dateEarned)}</p>
+              <p className="text-xs text-text-secondary mt-1">{formatDate(tooltip.achievement.dateEarned)}</p>
             )}
           </div>,
           document.body,

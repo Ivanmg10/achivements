@@ -184,7 +184,7 @@ export default function MainHeader() {
               <StreakBadge streak={streak} glass={isGameInfo} />
               <Link
                 href="/user"
-                aria-label="Profile"
+                aria-label={T.sidePanel.userSettings}
                 className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ring-1 ring-ink/10 ${isGameInfo ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-bg-main hover:bg-ink/5'}`}
               >
                 <span className="text-sm font-medium hidden sm:block text-text-main leading-none">
@@ -196,7 +196,7 @@ export default function MainHeader() {
                     width={64}
                     height={64}
                     src={avatarSrc}
-                    alt={session.user?.name ?? 'User'}
+                    alt=""
                     unoptimized
                   />
                 ) : (

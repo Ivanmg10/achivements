@@ -67,7 +67,7 @@ export default function SteamPinnedGameRow({
           {...attributes}
           {...listeners}
           aria-label={T.cards.dragToReorder}
-          className="text-text-secondary/30 hover:text-text-secondary/70 cursor-grab active:cursor-grabbing touch-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
+          className="text-text-secondary/30 hover:text-text-secondary cursor-grab active:cursor-grabbing touch-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
         >
           <IconGripVertical className="w-4 h-4" aria-hidden />
         </button>
@@ -107,7 +107,7 @@ export default function SteamPinnedGameRow({
           </div>
 
           {hasCounts && (
-            <div className="flex items-center gap-2 text-xs text-text-secondary/50">
+            <div className="flex items-center gap-2 text-xs text-text-secondary">
               <span>
                 {game.numAwarded}/{game.maxPossible} {T.statusGameItem.achievements}
               </span>
