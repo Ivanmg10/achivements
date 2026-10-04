@@ -5,6 +5,8 @@ import { toSteamGameProgress } from '@/utils/steamMappers'
 import type { SteamGameProgress } from '@/types/steam'
 
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
+const mockIsHidden = jest.fn((id: number, source: string) => false && id && source)
+jest.mock('@/context/HiddenGamesContext', () => ({ useHiddenGames: () => ({ isHidden: mockIsHidden }) }))
 
 function game(id: number, title: string, overrides: Partial<SteamGameProgress> = {}): SteamGameProgress {
   return {
@@ -101,4 +103,12 @@ test('exposes the shared refetch', () => {
   const { result } = renderHook(() => useSteamGamesByCategory('playing'))
   result.current.refetch()
   expect(refetch).toHaveBeenCalledTimes(1)
+})
+
+test('a game the user hid is left out of its list', () => {
+  setContext()
+  mockIsHidden.mockImplementation((id: number, source: string) => source === 'steam' && id === 4)
+  const { result } = renderHook(() => useSteamGamesByCategory('playing'))
+  expect(result.current.games.map((g) => g.id)).toEqual([3])
+  mockIsHidden.mockImplementation(() => false)
 })

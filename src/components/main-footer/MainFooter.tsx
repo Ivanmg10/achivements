@@ -15,7 +15,7 @@ export default function MainFooter() {
   const { T } = useLanguage()
 
   return (
-    <footer className="bg-bg-card border-t border-white/5 text-text-secondary text-xs">
+    <footer className="bg-bg-card border-t border-ink/5 text-text-secondary text-xs">
       <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
 
         <span className="font-semibold text-text-main tracking-wide">
@@ -24,10 +24,10 @@ export default function MainFooter() {
         </span>
 
         <div className="flex items-center gap-3">
-          <span className="text-text-secondary/50">{T.mainFooter.poweredBy}</span>
+          <span className="text-text-secondary">{T.mainFooter.poweredBy}</span>
           {PLATFORMS.map(({ name, href }, i) => (
             <span key={name} className="flex items-center gap-3">
-              {i > 0 && <span className="text-white/20" aria-hidden="true">·</span>}
+              {i > 0 && <span className="text-ink/20" aria-hidden="true">·</span>}
               <a href={href} target="_blank" rel="noopener noreferrer" className={LINK}>{name}</a>
             </span>
           ))}

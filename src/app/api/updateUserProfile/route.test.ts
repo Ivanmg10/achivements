@@ -111,3 +111,14 @@ test('a name taken by someone else between the check and the write is a 409, not
     .mockRejectedValueOnce(Object.assign(new Error('duplicate key'), { code: '23505' }))
   expect((await POST(request({ field: 'username', value: 'ivan2' }))).status).toBe(409)
 })
+
+test('an avatar link replaces, and deletes, any uploaded picture', async () => {
+  await POST(request({ field: 'avatar', value: 'https://x.test/a.png' }))
+  expect(pool.query).toHaveBeenCalledWith('DELETE FROM user_avatars WHERE user_id = $1', ['1'])
+})
+
+test('other fields leave the uploaded picture alone', async () => {
+  await POST(request({ field: 'location', value: 'es' }))
+  const sql = (pool.query as jest.Mock).mock.calls.map(([q]) => String(q))
+  expect(sql.some((q) => q.includes('user_avatars'))).toBe(false)
+})

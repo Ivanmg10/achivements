@@ -6,6 +6,8 @@ const mock = (name) => ({ children, data, ...props }) =>
 module.exports = {
   ResponsiveContainer: mock("ResponsiveContainer"),
   LineChart: mock("LineChart"),
+  AreaChart: mock("AreaChart"),
+  Area: mock("Area"),
   Line: mock("Line"),
   BarChart: mock("BarChart"),
   Bar: mock("Bar"),

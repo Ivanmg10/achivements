@@ -132,9 +132,9 @@ describe('sweepExpired', () => {
     await expect(sweepExpired()).resolves.toBe(0)
   })
 
-  test('returns 0 on failure', async () => {
+  test('lets a failure through, so the cron run reports it', async () => {
     query.mockRejectedValue(new Error('db down'))
-    await expect(sweepExpired()).resolves.toBe(0)
+    await expect(sweepExpired()).rejects.toThrow('db down')
   })
 })
 

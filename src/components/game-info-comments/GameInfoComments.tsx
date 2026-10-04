@@ -63,7 +63,7 @@ export default function GameInfoComments({ gameId }: { gameId: number }) {
         <IconMessageCircle className="w-4 h-4 text-text-secondary" aria-hidden="true" />
         <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">
           {T.gameComments.title}
-          <span className="ml-2 text-text-secondary/60 font-normal normal-case">({total})</span>
+          <span className="ml-2 text-text-secondary font-normal normal-case">({total})</span>
         </h2>
       </div>
 
@@ -126,7 +126,7 @@ function CommentRow({ comment }: { comment: GameComment }) {
           >
             {comment.User}
           </Link>
-          <span className="text-xs text-text-secondary/60">{date}</span>
+          <span className="text-xs text-text-secondary">{date}</span>
         </div>
         <p className="text-sm text-text-secondary mt-0.5 wrap-break-word">{comment.CommentText}</p>
       </div>

@@ -36,7 +36,8 @@ test('shows a dash when rarity is unknown', () => {
 test('an earned achievement shows its unlock time and a coloured, ringed badge', () => {
   const { container } = renderRow(ach({ earned: true, dateEarned: '2024-01-15T12:00:00.000Z' }))
   const img = container.querySelector('img')!
-  expect(img.className).toContain('ring-2')
+  // The ring is on the badge's box, so it shows while the picture loads too.
+  expect(img.parentElement!.className).toContain('ring-2')
   expect(img.className).not.toContain('grayscale')
   expect(screen.getByText(/2024/)).toBeInTheDocument()
 })

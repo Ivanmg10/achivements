@@ -2,47 +2,34 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { IconPlus, IconFolder, IconTrash } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
-import { GameGroup } from '@/types/types'
 import type { GameCandidate } from '@/utils/gameCandidates'
 import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import GroupModal from '@/components/groups/GroupModal'
-import { relativeTime } from '@/utils/utils'
+import { relativeTime, plural } from '@/utils/utils'
 import EmptyState from '@/components/empty-state/EmptyState'
+import GroupIcon from '@/components/groups/group-icon/GroupIcon'
+import MainPageGroupsRow from './main-page-groups-row/MainPageGroupsRow'
 import { notify } from '@/lib/notify'
 
-function isImageUrl(s: string) {
-  return s.startsWith('http://') || s.startsWith('https://')
-}
-
-function GroupIcon({ group }: { group: GameGroup }) {
-  const icon = group.icon
-  if (icon) {
-    if (isImageUrl(icon)) {
-      return (
-        <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 bg-bg-main">
-          <Image src={icon} alt={group.title} width={36} height={36} className="w-full h-full object-cover" unoptimized />
-        </div>
-      )
-    }
-    return (
-      <div className="w-9 h-9 rounded-lg bg-bg-main flex items-center justify-center shrink-0 text-xl leading-none">
-        {icon}
-      </div>
-    )
-  }
-  return (
-    <div className="w-9 h-9 rounded-lg bg-bg-main flex items-center justify-center shrink-0">
-      <IconFolder className="w-5 h-5 text-text-secondary" aria-hidden />
-    </div>
-  )
-}
-
-export default function MainPageGroups({ isLoading: externalLoading }: { isLoading?: boolean }) {
-  const { T } = useLanguage()
+/**
+ * The user's groups as a list, with creating and deleting at hand. Given
+ * `onSelect`, a row picks which group is shown in full beside it (the Groups
+ * section) instead of opening it, and every group is listed; without it,
+ * rows open their group and the list stops at four.
+ */
+export default function MainPageGroups({
+  isLoading: externalLoading,
+  selectedId,
+  onSelect,
+}: {
+  isLoading?: boolean
+  selectedId?: number | null
+  onSelect?: (id: number) => void
+}) {
+  const { T, lang } = useLanguage()
   const { groups, isLoading, createGroup, deleteGroup } = useGroups()
   const [modalOpen, setModalOpen] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState<number | null>(null)
@@ -103,10 +90,10 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
         <div className="flex flex-col gap-2 animate-pulse">
           {[0, 1, 2].map((i) => (
             <div key={i} className="flex items-center gap-2 bg-bg-main rounded-lg p-2">
-              <div className="w-9 h-9 rounded-lg bg-white/10 shrink-0" />
+              <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
               <div className="flex flex-col flex-1 gap-1.5">
-                <div className="h-2.5 w-28 rounded bg-white/10" />
-                <div className="h-2 w-16 rounded bg-white/10" />
+                <div className="h-2.5 w-28 rounded bg-ink/10" />
+                <div className="h-2 w-16 rounded bg-ink/10" />
               </div>
             </div>
           ))}
@@ -128,7 +115,7 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
         </div>
       ) : (
         <div className="flex flex-col gap-2 flex-1">
-          {groups.slice(0, 4).map((group) => (
+          {(onSelect ? groups : groups.slice(0, 4)).map((group) => (
             <div key={group.id} className="group/card relative">
               {confirmingDelete === group.id ? (
                 <div className="flex items-center justify-between bg-bg-main rounded-lg p-2 gap-2">
@@ -150,9 +137,10 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
                 </div>
               ) : (
                 <>
-                  <Link
+                  <MainPageGroupsRow
                     href={`/groups/${group.id}`}
-                    className="flex items-center gap-2.5 bg-bg-main rounded-lg p-2 pr-8 hover:bg-white/5 transition-colors group/link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    onSelect={onSelect && (() => onSelect(group.id))}
+                    selected={selectedId === group.id}
                   >
                     <GroupIcon group={group} />
                     <div className="flex flex-col min-w-0 flex-1 gap-0.5">
@@ -161,18 +149,18 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
                       </span>
                       <div className="flex items-center gap-1.5">
                         <span className="text-[10px] text-text-secondary shrink-0">
-                          {group.game_count} {T.groups.games}
+                          {plural(group.game_count, T.plurals.games, lang)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-[10px] text-text-secondary/50">
+                      <div className="flex items-center gap-1.5 text-[10px] text-text-secondary">
                         {group.total_possible > 0 && (
                           <span>{group.total_awarded}/{group.total_possible}</span>
                         )}
                         {group.total_possible > 0 && <span className="opacity-40">·</span>}
-                        <span>{relativeTime(group.updated_at)}</span>
+                        <span>{relativeTime(group.updated_at, lang)}</span>
                       </div>
                     </div>
-                  </Link>
+                  </MainPageGroupsRow>
                   <button
                     onClick={() => setConfirmingDelete(group.id)}
                     className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-text-secondary hover:text-red-400 hover:bg-red-400/10 opacity-0 group-hover/card:opacity-100 transition-all focus:opacity-100"
@@ -184,22 +172,22 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
               )}
             </div>
           ))}
-          {groups.length > 4 ? (
+          {!onSelect && groups.length > 4 ? (
             <Link
               href="/groups"
-              className="flex items-center gap-2.5 bg-bg-main rounded-lg p-2 hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="flex items-center gap-2.5 bg-bg-main rounded-lg p-2 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <div className="w-9 h-9 rounded-lg bg-bg-card flex items-center justify-center shrink-0">
                 <IconFolder className="w-4 h-4 text-text-secondary" aria-hidden />
               </div>
               <span className="text-xs text-text-secondary hover:text-text-main transition-colors">
-                +{groups.length - 4} {T.groups.title.toLowerCase()} más →
+                {T.cards.moreMatches.replace('{n}', String(groups.length - 4))} →
               </span>
             </Link>
           ) : groups.length < 10 && (
             <button
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 bg-bg-main/50 border border-dashed border-white/10 rounded-lg p-2 hover:border-accent/40 hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70"
+              className="flex items-center gap-2 bg-bg-main/50 border border-dashed border-ink/10 rounded-lg p-2 hover:border-accent/40 hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70"
             >
               <div className="w-9 h-9 rounded-lg bg-bg-card flex items-center justify-center shrink-0">
                 <IconPlus className="w-4 h-4" aria-hidden />
@@ -218,3 +206,4 @@ export default function MainPageGroups({ isLoading: externalLoading }: { isLoadi
     </div>
   )
 }
+

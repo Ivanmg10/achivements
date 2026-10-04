@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { en } from '@/translations/en'
 import StatusGameItem from './StatusGameItem'
 import type { CategoryGame } from '@/hooks/useGamesByCategory'
 
@@ -50,10 +51,10 @@ test('prefers hardcore score over softcore score when both are present', () => {
   expect(screen.getByText(/200 \/ 200/)).toBeInTheDocument()
 })
 
-test('shows a placeholder instead of hiding the points line when extra data has no possibleScore', () => {
+test('without a possible score there is no points line, not a stray dash', () => {
   render(<StatusGameItem game={completedGame} extra={{ awards: [] }} category="completed" />)
-  expect(screen.queryByText((_, el) => el?.textContent === '150 / 200 points earned')).not.toBeInTheDocument()
-  expect(screen.getByText('—')).toBeInTheDocument()
+  expect(screen.queryByText(/points earned/)).not.toBeInTheDocument()
+  expect(screen.queryByText('—')).not.toBeInTheDocument()
 })
 
 test('renders total points only for a want-to-play game', () => {
@@ -64,4 +65,29 @@ test('renders total points only for a want-to-play game', () => {
 test('hides the want-to-play points line when PointsTotal is zero', () => {
   render(<StatusGameItem game={{ ...wantToPlayGame, PointsTotal: 0 }} category="wantToPlay" />)
   expect(screen.queryByText(/450/)).not.toBeInTheDocument()
+})
+
+test('the achievements open from a real button that says whether it is open', () => {
+  render(<StatusGameItem game={completedGame} extra={{ awards: [] }} category="completed" />)
+  const toggle = screen.getByRole('button', { expanded: false })
+  expect(toggle).toHaveAccessibleName(/Sly Cooper/)
+  fireEvent.click(toggle)
+  expect(screen.getByRole('button', { expanded: true })).toBe(toggle)
+})
+
+test('the cover is not a second tab stop to the same page', () => {
+  render(<StatusGameItem game={completedGame} extra={{ awards: [] }} category="completed" />)
+  expect(screen.getAllByRole('link', { name: 'Sly Cooper' })).toHaveLength(1)
+})
+
+test('awards and the last-played line come from the translations', () => {
+  render(
+    <StatusGameItem
+      game={completedGame}
+      extra={{ awards: [{ AwardType: 'Mastery/Completion', AwardDataExtra: 1, AwardedAt: '2026-01-01T00:00:00Z' } as never] }}
+      category="playing"
+    />,
+  )
+  expect(screen.getByText(en.statusGameItem.mastered, { exact: false })).toBeInTheDocument()
+  expect(screen.getByText(new RegExp(en.statusGameItem.longAgo))).toBeInTheDocument()
 })

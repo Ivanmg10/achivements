@@ -5,14 +5,17 @@ import { IconPencil } from '@tabler/icons-react'
 
 /**
  * One editable line of the account page: a label, the current value, and a
- * pencil that appears on hover or focus. The whole row is the button, so it
+ * pencil that appears on hover or focus (and stays, faint, on touch screens,
+ * where there is no hover to reveal it). The whole row is the button, so it
  * is reachable by keyboard and reads as "Edit <label>" to a screen reader.
+ * An optional `icon` sits in a chip before the label.
  */
 export default function ProfileField({
   label,
   value,
   empty,
   onEdit,
+  icon,
   children,
 }: {
   label: string
@@ -21,6 +24,8 @@ export default function ProfileField({
   /** Shown in place of a missing value. */
   empty?: string
   onEdit?: () => void
+  /** Decorative icon in a chip before the label. */
+  icon?: ReactNode
   children?: ReactNode
 }) {
   const body = children ?? (
@@ -29,7 +34,7 @@ export default function ProfileField({
     </span>
   )
 
-  const content = (
+  const text = (
     <>
       <span className="text-xs text-text-secondary">{label}</span>
       <span className="flex items-center gap-2 min-w-0">
@@ -38,11 +43,22 @@ export default function ProfileField({
           <IconPencil
             size={13}
             aria-hidden="true"
-            className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"
+            className="shrink-0 text-text-secondary opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 [@media(hover:none)]:opacity-60 transition-opacity"
           />
         )}
       </span>
     </>
+  )
+
+  const content = icon ? (
+    <span className="flex items-center gap-3 min-w-0">
+      <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-xl bg-bg-card ring-1 ring-ink/[0.06] flex items-center justify-center text-text-secondary">
+        {icon}
+      </span>
+      <span className="flex flex-col gap-0.5 min-w-0">{text}</span>
+    </span>
+  ) : (
+    text
   )
 
   if (!onEdit) return <div className="flex flex-col gap-0.5 min-w-0">{content}</div>
@@ -51,7 +67,7 @@ export default function ProfileField({
     <button
       onClick={onEdit}
       aria-label={`${label}: ${value || empty || '—'}`}
-      className="group flex flex-col gap-0.5 min-w-0 text-left rounded-lg px-1 -mx-1 py-0.5 hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="group flex flex-col gap-0.5 min-w-0 text-left rounded-xl px-2 -mx-1 py-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       {content}
     </button>

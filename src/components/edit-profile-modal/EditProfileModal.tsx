@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
 import CommonModal from '../common-modal/CommonModal'
+import AvatarUpload from '@/components/avatar-upload/AvatarUpload'
+import { isUploadedAvatar } from '@/lib/avatarImage'
 import { useLanguage } from '@/context/LanguageContext'
 
 export type EditProfileField = 'name' | 'email' | 'avatar'
@@ -97,6 +99,18 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
         {T.editProfileModal.title} {label}
       </h2>
 
+      {/* A picture from the device first; a link stays possible below it. */}
+      {field === 'avatar' && (
+        <>
+          <AvatarUpload onDone={handleClose} />
+          <div className="flex items-center gap-3 text-xs text-text-secondary">
+            <span aria-hidden="true" className="h-px flex-1 bg-ink/10" />
+            {T.editProfileModal.uploadOr}
+            <span aria-hidden="true" className="h-px flex-1 bg-ink/10" />
+          </div>
+        </>
+      )}
+
       {/* Current value */}
       <div className="flex flex-col gap-1">
         <label className="text-xs text-text-secondary uppercase tracking-wider">
@@ -112,7 +126,10 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
               className="rounded-full w-12 h-12 object-cover"
               unoptimized
             />
-            <span className="text-sm text-text-secondary font-mono break-all">{currentValue}</span>
+            {/* An uploaded picture's address is ours and means nothing to the user. */}
+            {!isUploadedAvatar(currentValue) && (
+              <span className="text-sm text-text-secondary font-mono break-all">{currentValue}</span>
+            )}
           </div>
         ) : (
           <div className="bg-bg-main rounded-xl px-4 py-3 text-text-secondary font-mono text-sm">
@@ -134,7 +151,7 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
           placeholder={field === 'avatar' ? 'https://...' : ''}
           className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
           disabled={loading || success}
-          autoFocus
+          autoFocus={field !== 'avatar'}
         />
       </div>
 

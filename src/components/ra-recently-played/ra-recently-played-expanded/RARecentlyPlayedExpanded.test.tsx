@@ -56,7 +56,7 @@ test('renders the circular ring, progress chart and achievement grid for the gam
   )
   expect(screen.getByRole('img', { name: /4 \/ 10/ })).toBeInTheDocument()
   expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
-  await waitFor(() => expect(screen.getByAltText('First blood')).toBeInTheDocument())
+  await waitFor(() => expect(screen.getByRole('button', { name: /First blood/ })).toBeInTheDocument())
 })
 
 test('passes an empty achievement list to the grid while loading', () => {

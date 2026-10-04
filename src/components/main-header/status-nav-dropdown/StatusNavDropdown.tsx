@@ -30,8 +30,8 @@ export default function StatusNavDropdown({
         onClick={() => setIsOpen((o) => !o)}
         className={`flex items-center gap-1 px-3.5 py-1.5 text-sm rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 whitespace-nowrap cursor-pointer ${
           active
-            ? `text-accent font-medium ${glass ? 'bg-white/10 backdrop-blur-sm' : 'bg-bg-main'} ring-1 ring-white/10`
-            : `text-text-secondary hover:text-text-main ${glass ? 'hover:bg-white/10' : 'hover:bg-bg-main/60'}`
+            ? `text-accent font-medium ${glass ? 'bg-ink/10 backdrop-blur-sm' : 'bg-bg-main'} ring-1 ring-ink/10`
+            : `text-text-secondary hover:text-text-main ${glass ? 'hover:bg-ink/10' : 'hover:bg-bg-main/60'}`
         }`}
       >
         {label}
@@ -43,7 +43,7 @@ export default function StatusNavDropdown({
       {isOpen && (
         <div
           role="menu"
-          className="absolute top-full left-0 mt-1 z-20 bg-bg-card rounded-xl shadow-2xl ring-1 ring-white/10 py-1 min-w-40"
+          className="absolute top-full left-0 mt-1 z-20 bg-bg-card rounded-xl shadow-2xl ring-1 ring-ink/10 py-1 min-w-40"
         >
           {items.map((item) => (
             <Link

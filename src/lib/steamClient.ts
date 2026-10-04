@@ -63,9 +63,19 @@ export function getGlobalAchievementPercentages(appId: string | number) {
 
 const MEDIA_BASE = 'https://media.steampowered.com/steamcommunity/public/images/apps'
 
-/** Steam gives image *hashes*, not URLs — they only resolve with the appid. */
-export function gameIconUrl(appId: number, imgIconUrl?: string): string {
-  return imgIconUrl ? `${MEDIA_BASE}/${appId}/${imgIconUrl}.jpg` : ''
+/**
+ * The game's square icon. Not the 32×32 `img_icon_url` the game list carries:
+ * /api/steam/icon redirects to the desktop icon (up to 256px), or to the
+ * cover when the game has none.
+ */
+export function gameIconUrl(appId: number): string {
+  return `/api/steam/icon?appid=${appId}`
+}
+
+/** Old icon URLs saved before gameIconUrl changed (favourites), upgraded on read. */
+export function upgradeLegacyIconUrl(url: string): string {
+  const legacy = url.match(/^https:\/\/media\.steampowered\.com\/steamcommunity\/public\/images\/apps\/(\d+)\/[a-f0-9]+\.jpg$/)
+  return legacy ? gameIconUrl(Number(legacy[1])) : url
 }
 
 export function gameLogoUrl(appId: number, imgLogoUrl?: string): string {
@@ -111,6 +121,22 @@ const ASSET_FILES: Record<SteamAsset, string> = {
 
 export function steamAssetUrl(appId: number, asset: SteamAsset): string {
   return `${APP_ASSETS}/${appId}/${ASSET_FILES[asset]}`
+}
+
+/**
+ * PICS app info through steamcmd.net (unofficial; Steam's Web API does not
+ * expose it). Only read for `common.clienticon`, so callers must cache.
+ */
+export function getAppInfo(appId: string | number) {
+  return fetchSteam(`https://api.steamcmd.net/v1/info/${appId}`)
+}
+
+/**
+ * The desktop-shortcut icon: a square .ico, up to 256px for most games
+ * (Portal 2, Elden Ring), though some stop at 64 (Fallout 4).
+ */
+export function clientIconUrl(appId: number, hash: string): string {
+  return `https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/${appId}/${hash}.ico`
 }
 
 /** The game's page on the Steam store. */

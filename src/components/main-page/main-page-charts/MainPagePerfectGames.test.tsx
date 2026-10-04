@@ -6,6 +6,9 @@ jest.mock('@/hooks/usePerfectGamesOrder', () => ({
   usePerfectGamesOrder: jest.fn(),
 }))
 
+// The podium has its own tests; here it would add links and images to every count.
+jest.mock('./perfect-podium/PerfectPodium', () => ({ __esModule: true, default: () => null }))
+
 jest.mock('@/components/main-page/perfect-games-order-modal/PerfectGamesOrderModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="order-modal" /> : null),

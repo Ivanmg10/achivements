@@ -48,8 +48,9 @@ test('successful login closes modal', async () => {
 
 test('closes modal via backdrop (onClose)', () => {
   const setIsOpen = jest.fn()
-  const { container } = render(<RaLoginModal isOpen={true} setIsOpen={setIsOpen} />)
-  fireEvent.click(container.firstChild!)
+  render(<RaLoginModal isOpen={true} setIsOpen={setIsOpen} />)
+  // The modal renders on <body>: its backdrop is the last thing there.
+  fireEvent.click(document.body.lastElementChild!)
   expect(setIsOpen).toHaveBeenCalledWith(false)
 })
 

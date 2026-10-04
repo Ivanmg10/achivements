@@ -33,13 +33,8 @@ test('shows identity, preferences, the platforms and deleting the account, in th
   expect(order).toEqual(['identity', 'preferences', 'platforms', 'delete-account'])
 })
 
-test('the admin panel is only for admins, just before deleting the account', () => {
-  ;(useSession as jest.Mock).mockReturnValue({ data: { user: {} } })
-  const { rerender, container } = render(<UserPage />)
-  expect(screen.queryByTestId('admin-panel')).not.toBeInTheDocument()
-
+test('the admin panel is not laid out on the page, even for admins: it opens from the top card', () => {
   ;(useSession as jest.Mock).mockReturnValue({ data: { user: { admin: true } } })
-  rerender(<UserPage />)
-  const ids = Array.from(container.querySelectorAll('[data-testid]')).map((el) => el.getAttribute('data-testid'))
-  expect(ids.slice(-2)).toEqual(['admin-panel', 'delete-account'])
+  render(<UserPage />)
+  expect(screen.queryByTestId('admin-panel')).not.toBeInTheDocument()
 })

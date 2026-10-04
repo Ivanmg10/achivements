@@ -30,7 +30,7 @@ function AchievementGrid({
     return (
       <div className="flex flex-wrap gap-1">
         {Array.from({ length: Math.min(total, 30) }).map((_, i) => (
-          <div key={i} className="w-10 h-10 rounded-lg bg-white/10 animate-pulse" />
+          <div key={i} className="w-10 h-10 rounded-lg bg-ink/10 animate-pulse" />
         ))}
       </div>
     )
@@ -59,7 +59,7 @@ function AchievementGrid({
                 unoptimized
               />
             ) : (
-              <div className="w-10 h-10 bg-white/10" />
+              <div className="w-10 h-10 bg-ink/10" />
             )}
           </div>
         )
@@ -116,7 +116,7 @@ export default function PublicRecentlyPlayed({
               exit={{ opacity: 0, x: -8 }}
               transition={{ duration: 0.2 }}
               onClick={() => setExpanded(null)}
-              className="p-1 rounded-lg hover:bg-white/10 transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none"
+              className="p-1 rounded-lg hover:bg-ink/10 transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none"
             >
               <IconChevronLeft className="w-4 h-4" />
             </motion.button>
@@ -162,7 +162,7 @@ export default function PublicRecentlyPlayed({
                     tabIndex={0}
                     onClick={() => handleExpand(g.GameID)}
                     onKeyDown={(e) => e.key === 'Enter' && handleExpand(g.GameID)}
-                    className="flex items-center gap-3 px-3 py-3 w-full text-left hover:bg-white/5 transition-colors cursor-pointer focus-visible:outline-none shrink-0"
+                    className="flex items-center gap-3 px-3 py-3 w-full text-left hover:bg-ink/5 transition-colors cursor-pointer focus-visible:outline-none shrink-0"
                   >
                     <Link
                       href={`/gameInfo/${g.GameID}`}
@@ -179,7 +179,7 @@ export default function PublicRecentlyPlayed({
                           unoptimized
                         />
                       ) : (
-                        <div className="w-14 h-14 rounded-xl bg-white/10 shrink-0" />
+                        <div className="w-14 h-14 rounded-xl bg-ink/10 shrink-0" />
                       )}
                     </Link>
 
@@ -187,7 +187,7 @@ export default function PublicRecentlyPlayed({
                       <Link
                         href={`/gameInfo/${g.GameID}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-fit max-w-full focus-visible:outline-none hover:underline underline-offset-2 decoration-white/40"
+                        className="w-fit max-w-full focus-visible:outline-none hover:underline underline-offset-2 decoration-ink/40"
                       >
                         <span className="text-base font-bold block truncate leading-tight">{g.Title}</span>
                       </Link>
@@ -221,7 +221,7 @@ export default function PublicRecentlyPlayed({
                         </motion.span>
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs text-text-secondary/50">
+                      <div className="flex items-center gap-2 text-xs text-text-secondary">
                         {g.NumPossibleAchievements > 0 && (
                           <>
                             <span>{earnedAch}/{g.NumPossibleAchievements} logros</span>

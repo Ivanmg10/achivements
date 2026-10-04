@@ -1,7 +1,7 @@
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
 jest.mock('@/hooks/useSteamAchievements', () => ({ useSteamAchievements: jest.fn() }))
 jest.mock('@/hooks/useSteamGameDetails', () => ({ useSteamGameDetails: jest.fn() }))
-jest.mock('@/components/loading-page/LoadingPage', () => ({
+jest.mock('@/components/game-info-skeleton/GameInfoSkeleton', () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
 }))

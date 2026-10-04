@@ -83,3 +83,9 @@ test("uses the localized hashes label instead of a hardcoded Spanish string", ()
   render(<GameInfoHeader gameData={mockGameData} />);
   expect(screen.getByRole("button", { name: "Compatible hashes" })).toBeInTheDocument();
 });
+
+test("a mastered game says so instead of 'in progress'", () => {
+  render(<GameInfoHeader gameData={{ ...mockGameData, NumAwardedToUser: 10, HighestAwardKind: 'mastered' } as never} />);
+  expect(screen.queryByText(/in progress/i)).not.toBeInTheDocument();
+  expect(screen.getByText(/mastered/i)).toBeInTheDocument();
+});

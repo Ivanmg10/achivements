@@ -17,9 +17,8 @@ import StatusSortControl, {
   defaultSortStateFor,
 } from '@/components/status-sort-control/StatusSortControl'
 import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
-import EmptyState from '../../../components/empty-state/EmptyState'
-import LoadingPage from '../../../components/loading-page/LoadingPage'
-import { useLanguage } from '@/context/LanguageContext'
+import StatusEmptyState from '@/components/status-empty-state/StatusEmptyState'
+import StatusPageSkeleton from '@/components/status-page-skeleton/StatusPageSkeleton'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import SteamCategorySection from '@/components/steam/steam-category-section/SteamCategorySection'
 import CollapsibleSection from '@/components/collapsible-section/CollapsibleSection'
@@ -30,13 +29,13 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import CategorySearch from '@/components/category-search/CategorySearch'
 import { titleMatches } from '@/utils/gameCandidates'
 import { useRaLinked } from '@/hooks/useRaLinked'
-import { useEffect, useMemo } from 'react'
+import { useMemo, useRef } from 'react'
+import { usePreviewLayout } from '@/hooks/usePreviewLayout'
 
 export default function CategoryPage() {
   const { category } = useParams()
   const { games, loading, error } = useGamesByCategory(category as string)
   const extraData = useGameExtraData()
-  const { T } = useLanguage()
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
   const { selected, toggle, clear } = useConsoleFilter()
   const cat = category as string
@@ -48,15 +47,14 @@ export default function CategoryPage() {
   // No RA account, no RA section — not even an empty one.
   const showRa = useRaLinked()
 
-  useEffect(() => {
+  // A different category starts from its own default order; adjusted during
+  // render, so the old order is never shown for a frame.
+  const [sortFor, setSortFor] = useState(cat)
+  if (sortFor !== cat) {
+    setSortFor(cat)
     setSortState(defaultSortStateFor(cat))
-  }, [cat])
-
-  const EMPTY_STATE: Record<string, { icon: string; title: string; sub: string }> = {
-    wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay, sub: T.categoryPage.noWantToPlaySub },
-    playing: { icon: '🎮', title: T.categoryPage.noPlaying, sub: T.categoryPage.noPlayingSub },
-    completed: { icon: '🏆', title: T.categoryPage.noCompleted, sub: T.categoryPage.noCompletedSub },
   }
+
 
   const consolePills = useMemo(() => buildConsolePills(games), [games])
   const filteredGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
@@ -66,6 +64,14 @@ export default function CategoryPage() {
   const [query, setQuery] = useState('')
   const visibleGames = useMemo(() => filteredGames.filter((g) => titleMatches(g.Title, query)), [filteredGames, query])
   const steamGames = useMemo(() => allSteamGames.filter((g) => titleMatches(g.title, query)), [allSteamGames, query])
+
+  // Folded previews fill the screen together: one entry per platform section
+  // on the page, in order. PSN and Xbox, when they arrive, add theirs here.
+  const pageRef = useRef<HTMLDivElement>(null)
+  const sectionGames = [...(showRa && steamLinked ? [visibleGames.length] : []), ...(steamLinked ? [steamGames.length] : [])]
+  const previews = usePreviewLayout(pageRef, sectionGames)
+  const raPreview = { columns: previews.columns, count: previews.counts[0] ?? 3 }
+  const steamPreview = { columns: previews.columns, count: previews.counts[showRa ? 1 : 0] ?? 3 }
 
   const selectedConsoleName =
     selected.size === 1 ? consolePills.find((c) => selected.has(c.id))?.name : undefined
@@ -86,12 +92,7 @@ export default function CategoryPage() {
         </div>
       )}
       {visibleGames.length === 0 ? (
-        <EmptyState
-          icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-          title={EMPTY_STATE[cat]?.title ?? ''}
-          subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-          className="min-h-[40vh]"
-        />
+        <StatusEmptyState category={cat} className="min-h-[40vh]" />
       ) : (
         <StatusGameList games={visibleGames} extraData={extraData} category={cat} gridCols={gridCols} />
       )}
@@ -99,34 +100,21 @@ export default function CategoryPage() {
   )
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white">
-      <div className="w-full lg:max-w-[98%] flex flex-col gap-3">
+    <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main">
+      <div ref={pageRef} className="w-full lg:max-w-[98%] flex flex-col gap-3">
         {!showRa ? null : loading ? (
-          <LoadingPage
-            subtitle={
-              {
-                wantToPlay: T.loadingPage.wantToPlay,
-                playing: T.loadingPage.playing,
-                completed: T.loadingPage.completed,
-              }[cat] ?? T.loadingPage.subtitle
-            }
-          />
+          <StatusPageSkeleton cols={gridCols} />
         ) : error ? (
           <p className="text-red-400 text-sm text-center mt-10">{error}</p>
         ) : !steamLinked ? (
           // RA only: the page as it always was.
           games.length === 0 ? (
-            <EmptyState
-              icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-              title={EMPTY_STATE[cat]?.title ?? ''}
-              subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-              className="min-h-[60vh]"
-            />
+            <StatusEmptyState category={cat} className="min-h-[60vh]" />
           ) : (
             <>
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <StatusPageHeader consoleName={selectedConsoleName} category={cat} gameCount={visibleGames.length} />
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
                   <CategorySearch value={query} onChange={setQuery} />
                   {raControls}
                   <StatusGridControl cols={gridCols} onChange={setGridCols} />
@@ -146,7 +134,7 @@ export default function CategoryPage() {
                 category={cat}
                 gameCount={visibleGames.length + steamGames.length}
               />
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
                 <CategorySearch value={query} onChange={setQuery} />
                 <StatusGridControl cols={gridCols} onChange={setGridCols} />
               </div>
@@ -156,15 +144,10 @@ export default function CategoryPage() {
               icon={<RaLogo height={20} />}
               count={visibleGames.length}
               storageKey={`ra-section-open:${cat}`}
-              preview={<CollapsibleSectionPreview games={raPreviewGames(visibleGames)} />}
+              preview={<CollapsibleSectionPreview games={raPreviewGames(visibleGames)} columns={raPreview.columns} count={raPreview.count} />}
             >
               {games.length === 0 ? (
-                <EmptyState
-                  icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-                  title={EMPTY_STATE[cat]?.title ?? ''}
-                  subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-                  className="min-h-[20vh]"
-                />
+                <StatusEmptyState category={cat} className="min-h-[20vh]" />
               ) : (
                 <>
                   <div className="flex items-center gap-2 flex-wrap">{raControls}</div>
@@ -180,7 +163,7 @@ export default function CategoryPage() {
             <CategorySearch value={query} onChange={setQuery} />
           </div>
         )}
-        {(!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} query={query} />}
+        {(!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} query={query} preview={steamPreview} />}
       </div>
     </div>
   )

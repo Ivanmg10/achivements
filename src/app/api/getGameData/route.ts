@@ -25,7 +25,9 @@ export async function GET(request: NextRequest) {
       `gameData_v2:${gameId}`,
       TTL,
       () => getGame(gameId, auth.apiKey),
-      (d) => d !== null && typeof d === 'object' && 'ID' in d,
+      // API_GetGame answers with Title, ImageBoxArt, Released… but no ID field:
+      // checking for 'ID' threw every real answer away and returned 503.
+      (d) => d !== null && typeof d === 'object' && 'Title' in d,
     );
     return cachedJson(data, TTL);
   } catch {

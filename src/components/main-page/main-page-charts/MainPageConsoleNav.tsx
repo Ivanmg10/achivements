@@ -37,14 +37,14 @@ export default function MainPageConsoleNav() {
   if (loading) {
     return (
       <div className="flex flex-col gap-3 animate-pulse">
-        <div className="h-2 w-20 rounded bg-white/10" />
+        <div className="h-2 w-20 rounded bg-ink/10" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {[0, 1, 2].map((i) => (
             <div key={i} className="bg-bg-main rounded-lg p-3 flex flex-col gap-2">
-              <div className="h-3 w-24 rounded bg-white/10" />
+              <div className="h-3 w-24 rounded bg-ink/10" />
               <div className="flex flex-wrap gap-1.5">
                 {[0, 1, 2, 3].map((j) => (
-                  <div key={j} className="h-7 w-20 rounded-lg bg-white/10" />
+                  <div key={j} className="h-7 w-20 rounded-lg bg-ink/10" />
                 ))}
               </div>
             </div>
@@ -78,7 +78,7 @@ export default function MainPageConsoleNav() {
                     {label}
                   </span>
                 </div>
-                <span className="text-[10px] text-text-secondary/50 group-hover:text-accent transition-colors">→</span>
+                <span className="text-[10px] text-text-secondary group-hover:text-accent transition-colors">→</span>
               </Link>
 
               <div className="flex flex-wrap gap-1.5">
@@ -90,10 +90,11 @@ export default function MainPageConsoleNav() {
                       key={con.id}
                       href={`/${slug}/${con.id}`}
                       title={con.name}
-                      className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+                      // On a phone only the consoles with games: the greyed-out rest made each list very long.
+                      className={`items-center gap-1.5 rounded-md px-2 py-1.5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
                         active
-                          ? `${def.color} hover:brightness-125`
-                          : 'bg-bg-card/40 text-text-secondary/30 hover:bg-bg-card hover:text-text-secondary'
+                          ? `flex ${def.color} hover:brightness-125`
+                          : 'hidden sm:flex bg-bg-card/40 text-text-secondary hover:bg-bg-card hover:text-text-secondary'
                       }`}
                     >
                       <Image

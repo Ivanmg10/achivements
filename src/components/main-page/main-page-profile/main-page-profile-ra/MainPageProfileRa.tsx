@@ -52,7 +52,7 @@ export default function MainPageProfileRa({
             href={`https://retroachievements.org/user/${user.User}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
+            className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
             aria-label={T.profileRa.viewOnRA}
           >
             <IconExternalLink className="w-3.5 h-3.5" />
@@ -72,12 +72,12 @@ export default function MainPageProfileRa({
             <div className="flex flex-col gap-1 min-w-0 w-full">
               <p className="text-xl lg:text-2xl font-bold leading-tight truncate">{user.User}</p>
               {user.Motto && (
-                <p className="text-xs text-gray-400 italic line-clamp-2">
+                <p className="text-xs text-text-secondary italic line-clamp-2">
                   &ldquo;{user.Motto}&rdquo;
                 </p>
               )}
               {memberYear && (
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-text-secondary">
                   {T.profileRa.memberSince} {memberYear}
                 </p>
               )}
@@ -88,16 +88,16 @@ export default function MainPageProfileRa({
 
           {gameLoading && !game ? (
             <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 animate-pulse">
-              <div className="h-3 w-20 bg-white/10 rounded" />
-              <div className="h-3 w-40 bg-white/10 rounded" />
+              <div className="h-3 w-20 bg-ink/10 rounded" />
+              <div className="h-3 w-40 bg-ink/10 rounded" />
               <div className="flex gap-3 items-center">
-                <div className="w-12.5 h-12.5 rounded-lg bg-white/10 shrink-0" />
+                <div className="w-12.5 h-12.5 rounded-lg bg-ink/10 shrink-0" />
                 <div className="flex flex-col gap-1.5 flex-1">
-                  <div className="h-3.5 bg-white/10 rounded w-3/4" />
-                  <div className="h-3 bg-white/10 rounded w-1/3" />
+                  <div className="h-3.5 bg-ink/10 rounded w-3/4" />
+                  <div className="h-3 bg-ink/10 rounded w-1/3" />
                 </div>
               </div>
-              <div className="h-2 bg-white/10 rounded" />
+              <div className="h-2 bg-ink/10 rounded" />
             </div>
           ) : game ? (
             <MainPageProfileRaGame game={game} richPresenceMsg={user?.RichPresenceMsg} />
@@ -107,7 +107,7 @@ export default function MainPageProfileRa({
 
           {hasContribs && (
             <div className="flex flex-col gap-2 bg-bg-main rounded-lg p-3">
-              <p className="text-xs text-gray-400 uppercase tracking-wider">
+              <p className="text-xs text-text-secondary uppercase tracking-wider">
                 {T.profileRa.contributions}
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -115,13 +115,13 @@ export default function MainPageProfileRa({
                   <span className="text-lg font-bold text-purple-400">
                     {(user.ContribCount ?? 0).toLocaleString()}
                   </span>
-                  <span className="text-xs text-gray-400">{T.profileRa.achievementsCreated}</span>
+                  <span className="text-xs text-text-secondary">{T.profileRa.achievementsCreated}</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-lg font-bold text-pink-400">
                     {(user.ContribYield ?? 0).toLocaleString()}
                   </span>
-                  <span className="text-xs text-gray-400">{T.profileRa.pointsContributed}</span>
+                  <span className="text-xs text-text-secondary">{T.profileRa.pointsContributed}</span>
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 export function DualProgressBar({
   softcorePct,
   hardcorePct,
-  trackClass = 'bg-white/10',
+  trackClass = 'bg-ink/10',
   height = 'h-1.5',
   className = '',
 }: {

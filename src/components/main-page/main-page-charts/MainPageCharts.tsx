@@ -1,6 +1,9 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useId, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { IconActivity, IconAward, IconCompass, IconFolders, IconLayoutDashboard } from '@tabler/icons-react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
@@ -22,15 +25,13 @@ import MainPagePointsStats from './MainPagePointsStats'
 import MainPageRarest from './MainPageRarest'
 import MainPageAbandoned from './MainPageAbandoned'
 import MainPageTopGames from './MainPageTopGames'
-import MainPageMastery from './MainPageMastery'
-import MainPagePerfectGames from './MainPagePerfectGames'
 import MainPageBestPeriod from './MainPageBestPeriod'
 import MainPageFavorites from '../main-page-favorites/MainPageFavorites'
-import MainPageConsoleNav from './MainPageConsoleNav'
-import MainPageGroups from './MainPageGroups'
 import MainPageSteamStats from './main-page-steam-stats/MainPageSteamStats'
-import MainPageSteamNav from './main-page-steam-nav/MainPageSteamNav'
-import MainPageSteamMastery from './main-page-steam-mastery/MainPageSteamMastery'
+import MainPageStatsRail, { StatsSection } from '../main-page-stats-rail/MainPageStatsRail'
+import MainPageBrowse from '../main-page-browse/MainPageBrowse'
+import MainPageCollection from '../main-page-collection/MainPageCollection'
+import MainPageGroupsSection from '../main-page-groups-section/MainPageGroupsSection'
 
 /**
  * Stats & Activity. Cards whose idea carries over between platforms —
@@ -41,17 +42,20 @@ import MainPageSteamMastery from './main-page-steam-mastery/MainPageSteamMastery
  */
 export default function MainPageCharts() {
   const { T } = useLanguage()
+  const [section, setSection] = useState('overview')
+  const idPrefix = useId().replace(/:/g, '')
+  const reduceMotion = useReducedMotion()
   const { achievements, isLoading: achLoading, error: achError, refetch: refetchAch } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()
   // The heatmap draws as far back as the card is wide, so it reads the year
   // the streak already loads — both platforms, and no call of its own.
   const { achievements: year, isLoading: yearLoading, error: yearError, refetch: refetchYear } = useActivityHeatmapYear()
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
-  const { all, hardcore, softcore, inProgress, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()
+  const { all, inProgress, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()
   const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
   const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
   const { platform } = useMainPlatform()
-  const { isLinked: steamLinked, library, libraryLoading } = useSteamGamesData()
+  const { isLinked: steamLinked, library } = useSteamGamesData()
   const isSteam = platform === 'steam'
   const { achievements: steamActivity, isLoading: steamLoading } = useSteamRecentAchievements(steamLinked ? 'activity' : null)
 
@@ -69,12 +73,17 @@ export default function MainPageCharts() {
     if (rankError) refetchRank()
   }
 
-  return (
-    <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-label={T.cards.statsActivity}>
-      <h2 className="text-xl font-semibold text-text-main">{T.cards.statsActivity}</h2>
+  const sections: StatsSection[] = [
+    { id: 'overview', label: T.cards.sectionOverview, icon: <IconLayoutDashboard size={18} /> },
+    { id: 'activity', label: T.cards.sectionActivity, icon: <IconActivity size={18} /> },
+    { id: 'collection', label: T.cards.sectionCollection, icon: <IconAward size={18} /> },
+    { id: 'groups', label: T.cards.sectionGroups, icon: <IconFolders size={18} /> },
+    { id: 'browse', label: T.cards.sectionBrowse, icon: <IconCompass size={18} /> },
+  ]
 
-      <div className="flex flex-col gap-4">
-        {/* Stats pills */}
+  const panels: Record<string, ReactNode> = {
+    overview: (
+      <>
         {isSteam ? (
           <MainPageSteamStats achievements={steamRecent} games={library} isLoading={steamLoading} />
         ) : (
@@ -87,11 +96,8 @@ export default function MainPageCharts() {
             />
           </SectionFallback>
         )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-          {/* Row 1: Heatmap | Daily | Groups placeholder */}
-          <ChartCard>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          <ChartCard className="xl:col-span-2">
             <SectionFallback error={yearError} onRefresh={refetchYear}>
               <MainPageHeatmap achievements={year} isLoading={yearLoading} />
             </SectionFallback>
@@ -104,72 +110,95 @@ export default function MainPageCharts() {
               </div>
             </SectionFallback>
           </ChartCard>
-          <ChartCard className="flex-1">
-            <MainPageGroups />
-          </ChartCard>
-
-          {/* Row 2: [Active | Rarest | Abandoned] | [col3: Perfect alone] */}
-          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
-            <ChartCard>
-              <SectionFallback error={achError} onRefresh={refetchAch}>
-                <MainPageTopGames achievements={recent} isLoading={achLoading} />
-              </SectionFallback>
-            </ChartCard>
-            <ChartCard>
-              <SectionFallback error={achError} onRefresh={refetchAch}>
-                <MainPageRarest achievements={achievements} steamAchievements={steamActivity} isLoading={achLoading} />
-              </SectionFallback>
-            </ChartCard>
-            <ChartCard>
-              <SectionFallback error={gamesError} onRefresh={refetchGames}>
-                <MainPageAbandoned playing={playing} steamGames={library} isLoading={playingLoading} />
-              </SectionFallback>
-            </ChartCard>
-          </div>
-          <ChartCard>
-            <SectionFallback error={gamesError} onRefresh={refetchGames}>
-              <MainPagePerfectGames games={all} steamGames={library} isLoading={gamesLoading} />
-            </SectionFallback>
-          </ChartCard>
-
         </div>
+      </>
+    ),
+    // What was played and unlocked lately: the games, then the achievements.
+    activity: (
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
+        <ChartCard>
+          <SectionFallback error={achError} onRefresh={refetchAch}>
+            <MainPageTopGames achievements={recent} isLoading={achLoading} />
+          </SectionFallback>
+        </ChartCard>
+        <ChartCard>
+          <SectionFallback error={gamesError} onRefresh={refetchGames}>
+            <MainPageAbandoned playing={playing} steamGames={library} isLoading={playingLoading} />
+          </SectionFallback>
+        </ChartCard>
+        <ChartCard className="md:col-span-2 xl:col-span-1">
+          <SectionFallback error={bestPeriodError} onRefresh={refetchHeatmap}>
+            <MainPageBestPeriod achievements={bestPeriodData} isLoading={bestPeriodLoading} />
+          </SectionFallback>
+        </ChartCard>
+        <ChartCard className="md:col-span-2 xl:col-span-1">
+          <SectionFallback error={achError} onRefresh={refetchAch}>
+            <MainPageRarest achievements={achievements} steamAchievements={steamActivity} isLoading={achLoading} />
+          </SectionFallback>
+        </ChartCard>
+        {/* Pinned achievements beside it, across the rest: the list can run long. */}
+        <ChartCard className="md:col-span-2">
+          <MainPageFavorites />
+        </ChartCard>
+      </div>
+    ),
+    collection: (
+      <SectionFallback
+        error={gamesError || awardsError}
+        onRefresh={() => {
+          if (gamesError) refetchGames()
+          if (awardsError) refetchAwards()
+        }}
+      >
+        <MainPageCollection games={all} steamGames={library} awards={awards} inProgress={inProgress} isLoading={gamesLoading || awardsLoading} />
+      </SectionFallback>
+    ),
+    groups: <MainPageGroupsSection />,
+    browse: <MainPageBrowse />,
+  }
 
-        {/*
-          Last band on its own grid, aligned to the top: how much these hold
-          swings with the account (no masteries yet, dozens of pins), so a card
-          ends where its content ends instead of stretching to the tallest one.
-        */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
-          {/* Navigation across the full width — it is a row of sections, not a card */}
-          <ChartCard className="lg:col-span-3">
-            {isSteam ? <MainPageSteamNav /> : <MainPageConsoleNav />}
-          </ChartCard>
+  return (
+    <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-labelledby={`${idPrefix}-title`} data-stats-section={section}>
+      <h2 id={`${idPrefix}-title`} className="text-xl font-semibold text-text-main">{T.cards.statsActivity}</h2>
 
-          <ChartCard className="lg:col-span-2">
-            {isSteam ? (
-              <MainPageSteamMastery games={library} isLoading={libraryLoading} />
-            ) : (
-              <SectionFallback error={awardsError} onRefresh={refetchAwards}>
-                <MainPageMastery
-                  awards={awards}
-                  isLoading={awardsLoading}
-                  unlockedHC={hardcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
-                  unlockedSC={softcore.reduce((sum, g) => sum + g.NumAwarded, 0)}
-                  inProgress={inProgress}
-                />
-              </SectionFallback>
-            )}
-          </ChartCard>
-          <ChartCard>
-            <SectionFallback error={bestPeriodError} onRefresh={refetchHeatmap}>
-              <MainPageBestPeriod achievements={bestPeriodData} isLoading={bestPeriodLoading} />
-            </SectionFallback>
-          </ChartCard>
+      {/*
+        One section at a time instead of every card stacked: on a phone the
+        old wall ran to some 6000px. Every hook above still loads up front,
+        so switching sections never waits on the network.
 
-          {/* Pinned closes the page across the full width: the list can run long. */}
-          <ChartCard className="lg:col-span-3">
-            <MainPageFavorites />
-          </ChartCard>
+        Only the open section is laid out (the others stay mounted, hidden, so
+        what they hold survives a switch): the area is as tall as that section,
+        and the rail beside it runs exactly that height.
+      */}
+      <div className="flex flex-col lg:grid lg:grid-cols-[minmax(180px,220px)_1fr] gap-4 lg:items-start">
+        <MainPageStatsRail
+          sections={sections}
+          active={section}
+          onChange={setSection}
+          label={T.cards.sectionsLabel}
+          idPrefix={idPrefix}
+        />
+
+        <div className="grid w-full min-w-0">
+          {sections.map(({ id }) => {
+            const open = id === section
+            return (
+              <motion.div
+                key={id}
+                role="tabpanel"
+                id={`${idPrefix}-panel-${id}`}
+                aria-labelledby={`${idPrefix}-tab-${id}`}
+                aria-hidden={!open}
+                inert={!open}
+                className={`min-w-0 flex-col gap-4 ${open ? 'flex' : 'hidden'}`}
+                initial={false}
+                animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: reduceMotion ? 0 : 6 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {panels[id]}
+              </motion.div>
+            )
+          })}
         </div>
       </div>
     </section>

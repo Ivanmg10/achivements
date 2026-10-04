@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import ClosestToComplete, { CLOSEST_SHOWN } from './closest-to-complete/ClosestToComplete'
+import MasteryByConsole from './mastery-by-console/MasteryByConsole'
+import MasteryMix from './mastery-mix/MasteryMix'
 
 export default function MainPageMastery({
   awards,
@@ -33,7 +35,7 @@ export default function MainPageMastery({
         </div>
         <div className="grid grid-cols-4 gap-1.5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="aspect-square rounded bg-white/10 animate-pulse" />
+            <div key={i} className="aspect-square rounded bg-ink/10 animate-pulse" />
           ))}
         </div>
       </div>
@@ -42,7 +44,11 @@ export default function MainPageMastery({
 
   if (!awards) return null
 
-  const mastered = awards.VisibleUserAwards?.filter((a) => a.AwardType === 'Mastery') ?? []
+  // RA sends masteries as 'Mastery/Completion', hardcore marked by AwardDataExtra 1.
+  // Filtering on 'Mastery' matched nothing, so this row never showed.
+  const mastered = [...(awards.VisibleUserAwards ?? [])]
+    .filter((a) => a.AwardType === 'Mastery/Completion' && a.AwardDataExtra === 1)
+    .sort((a, b) => Date.parse(b.AwardedAt) - Date.parse(a.AwardedAt))
   const recentCovers = mastered.slice(0, 8)
 
   const masteries = awards.MasteryAwardsCount ?? 0
@@ -62,18 +68,11 @@ export default function MainPageMastery({
       percent: parseFloat(game.PctWon) * 100,
     }))
 
-  /**
-   * The award mix as parts of one whole, in fixed order. The four hues were
-   * checked with the palette validator: they clear the colourblind and
-   * lightness bands on both themes, and every band is labelled besides.
-   */
-  const mix = [
-    { value: masteries, label: T.cards.mastered, color: 'bg-[#D97706]' },
-    { value: awards.CompletionAwardsCount ?? 0, label: T.cards.completedSC, color: 'bg-[#2563EB]' },
-    { value: awards.BeatenHardcoreAwardsCount ?? 0, label: T.userStats.beatenHC, color: 'bg-[#15803D]' },
-    { value: awards.BeatenSoftcoreAwardsCount ?? 0, label: T.userStats.beatenSC, color: 'bg-[#9333EA]' },
-  ]
-  const mixTotal = mix.reduce((sum, m) => sum + m.value, 0)
+  const mixTotal =
+    masteries +
+    (awards.CompletionAwardsCount ?? 0) +
+    (awards.BeatenHardcoreAwardsCount ?? 0) +
+    (awards.BeatenSoftcoreAwardsCount ?? 0)
 
   // Supporting numbers: they explain the headline, they do not compete with it.
   const stats = [
@@ -84,19 +83,17 @@ export default function MainPageMastery({
       : []),
   ]
 
-  const sides = (recentCovers.length > 0 ? 1 : 0) + (closest.length > 0 ? 1 : 0)
-  const columns = sides === 2 ? 'lg:grid-cols-[3fr_2fr_2fr]' : sides === 1 ? 'lg:grid-cols-[3fr_2fr]' : ''
 
   return (
     <div className="flex flex-col gap-3">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.masteryAwards}</p>
 
       {/*
-        Wide card: the award totals sit beside what was mastered lately and
-        what is nearly there, and spread across the width of whichever of those
-        two there is nothing to show.
+        Two columns from sm up: the totals beside where they come from (by
+        console), then what was mastered lately beside what is nearly there.
+        A column with nothing to show is simply not drawn.
       */}
-      <div className={`grid gap-4 ${columns}`}>
+      <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2">
         <div className="flex flex-col gap-4">
           {/* The headline: masteries, against every award earned. */}
           <div className="flex items-baseline gap-2">
@@ -106,34 +103,7 @@ export default function MainPageMastery({
             </span>
           </div>
 
-          {mixTotal > 0 && (
-            <div className="flex flex-col gap-2">
-              <div
-                className="flex gap-0.5 h-2.5"
-                role="img"
-                aria-label={mix.map((m) => `${m.label}: ${m.value}`).join(', ')}
-              >
-                {mix.map((m) => (
-                  m.value > 0 && (
-                    <div
-                      key={m.label}
-                      className={`${m.color} first:rounded-l-full last:rounded-r-full`}
-                      style={{ width: `${(m.value / mixTotal) * 100}%` }}
-                    />
-                  )
-                ))}
-              </div>
-              <ul className="flex flex-wrap gap-x-3 gap-y-1">
-                {mix.map((m) => (
-                  <li key={m.label} className="flex items-center gap-1.5 text-[10px] text-text-secondary">
-                    <span className={`w-2 h-2 rounded-sm shrink-0 ${m.color}`} aria-hidden="true" />
-                    {m.label}
-                    <span className="text-text-main tabular-nums">{m.value}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <MasteryMix awards={awards} />
 
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             {stats.map(({ value, label }) => (
@@ -145,9 +115,11 @@ export default function MainPageMastery({
           </div>
         </div>
 
+        <MasteryByConsole awards={awards.VisibleUserAwards ?? []} />
+
       {recentCovers.length > 0 && (
         <div className="flex flex-col gap-1.5">
-          <p className="text-[10px] text-text-secondary/60 uppercase tracking-widest">{T.cards.recentMasteries}</p>
+          <p className="text-[10px] text-text-secondary uppercase tracking-widest">{T.cards.recentMasteries}</p>
           <div className="grid grid-cols-4 gap-1.5">
             {recentCovers.map((a, i) => (
               <Link
@@ -165,7 +137,7 @@ export default function MainPageMastery({
                     className="w-full aspect-square object-cover rounded hover:scale-105 transition-transform"
                   />
                 ) : (
-                  <div className="w-full aspect-square rounded bg-white/10" />
+                  <div className="w-full aspect-square rounded bg-ink/10" />
                 )}
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-warning rounded-full border border-bg-card" aria-hidden="true" />
               </Link>

@@ -18,7 +18,7 @@ jest.mock('@/components/main-page/main-page-steam-only/MainPageSteamOnly', () =>
   default: () => <div data-testid="steam-only">SteamOnly</div>,
 }))
 
-jest.mock('@/components/loading-page/LoadingPage', () => ({
+jest.mock('@/components/main-page/main-page-skeleton/MainPageSkeleton', () => ({
   __esModule: true,
   default: () => <div data-testid="loading">Loading</div>,
 }))
@@ -60,7 +60,7 @@ test('renders the pinned games section when view is "pinned"', () => {
   expect(screen.getByTestId('pinned-games')).toBeInTheDocument()
 })
 
-test('renders loading page when status is loading', () => {
+test('shows the page skeleton, not a full-screen loader, while the session loads', () => {
   ;(useSession as jest.Mock).mockReturnValue({ status: 'loading', data: null })
   render(<MainPage />)
   expect(screen.getByTestId('loading')).toBeInTheDocument()
@@ -93,4 +93,10 @@ test('keeps the full RA page when both accounts are linked', () => {
   render(<MainPage />)
   expect(screen.getByTestId('profile')).toBeInTheDocument()
   expect(screen.queryByTestId('steam-only')).not.toBeInTheDocument()
+})
+
+test('a session refresh does not swap the page back to the skeleton', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'loading', data: { user: { name: 'Ivan', rausername: 'Ivan' } } })
+  render(<MainPage />)
+  expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
 })

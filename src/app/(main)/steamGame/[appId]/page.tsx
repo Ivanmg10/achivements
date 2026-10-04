@@ -8,7 +8,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
 import { useSteamGameDetails } from '@/hooks/useSteamGameDetails'
-import LoadingPage from '@/components/loading-page/LoadingPage'
+import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
+import GameInfoSkeletonTable from '@/components/game-info-skeleton/game-info-skeleton-table/GameInfoSkeletonTable'
 import SteamGameHeroBackground from '@/components/steam/steam-game-hero-background/SteamGameHeroBackground'
 import SteamGameInfoHeader from '@/components/steam/steam-game-info-header/SteamGameInfoHeader'
 import SteamGameInfoTable from '@/components/steam/steam-game-info-table/SteamGameInfoTable'
@@ -52,7 +53,7 @@ export default function SteamGamePage() {
 
   // Nothing to title the page with yet.
   if (!game && !details && (libraryLoading || detailsLoading)) {
-    return <LoadingPage subtitle={T.loadingPage.game} />
+    return <GameInfoSkeleton />
   }
 
   const title = game?.title ?? details?.name ?? `App ${appId}`
@@ -70,11 +71,10 @@ export default function SteamGamePage() {
         <SteamGameInfoHeader appId={appId} title={title} game={game} details={details} counts={counts} />
 
         {achievementsLoading ? (
-          <section aria-busy="true" className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 flex flex-col gap-2">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-20 bg-bg-main rounded-xl animate-pulse" />
-            ))}
-          </section>
+          <div role="status" aria-busy="true" className="w-full flex flex-col items-center">
+            <span className="sr-only">{T.loadingPage.game}</span>
+            <GameInfoSkeletonTable />
+          </div>
         ) : achievementsError ? (
           <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 flex flex-col items-center gap-2 text-center">
             <p role="alert" className="text-red-400">
@@ -83,7 +83,7 @@ export default function SteamGamePage() {
             <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
             <button
               onClick={retry}
-              className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-white/10 transition-colors"
+              className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-ink/10 transition-colors"
             >
               {T.steam.retry}
             </button>

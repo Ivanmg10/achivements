@@ -39,9 +39,9 @@ export default function CompletionDistribution({
   if (isLoading) {
     return (
       <div className="flex flex-col gap-2 animate-pulse" aria-busy="true">
-        <div className="h-2 w-32 rounded bg-white/10" />
-        <div className="h-2.5 w-full rounded-full bg-white/10" />
-        <div className="h-2 w-40 rounded bg-white/10" />
+        <div className="h-2 w-32 rounded bg-ink/10" />
+        <div className="h-2.5 w-full rounded-full bg-ink/10" />
+        <div className="h-2 w-40 rounded bg-ink/10" />
       </div>
     )
   }
@@ -76,7 +76,7 @@ export default function CompletionDistribution({
             ))}
           </ul>
 
-          {note && <p className="text-[10px] text-text-secondary/60">{note}</p>}
+          {note && <p className="text-[10px] text-text-secondary">{note}</p>}
         </>
       )}
     </div>

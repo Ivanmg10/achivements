@@ -21,13 +21,24 @@ test("renders children when open", () => {
 
 test("calls onClose when backdrop clicked", () => {
   const onClose = jest.fn();
-  const { container } = render(
+  render(
     <CommonModal isOpen={true} onClose={onClose}>
       <p>Content</p>
     </CommonModal>,
   );
-  fireEvent.click(container.firstChild!);
+  // Rendered on <body>: the backdrop is the content's grandparent.
+  fireEvent.click(screen.getByText("Content").parentElement!.parentElement!);
   expect(onClose).toHaveBeenCalled();
+});
+
+test("renders on <body>, outside the component that opens it", () => {
+  const { container } = render(
+    <CommonModal isOpen={true} onClose={jest.fn()}>
+      <p>Content</p>
+    </CommonModal>,
+  );
+  expect(container).toBeEmptyDOMElement();
+  expect(document.body).toContainElement(screen.getByText("Content"));
 });
 
 test("does not call onClose when inner div clicked", () => {

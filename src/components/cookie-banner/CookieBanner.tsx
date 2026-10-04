@@ -23,14 +23,14 @@ export default function CookieBanner() {
       aria-label={T.cookies.title}
       className="fixed inset-x-0 bottom-0 z-50 p-4 sm:bottom-4 sm:left-4 sm:right-auto sm:max-w-md"
     >
-      <div className="flex flex-col gap-3 bg-bg-card border border-white/10 rounded-2xl p-4 shadow-2xl">
+      <div className="flex flex-col gap-3 bg-bg-card border border-ink/10 rounded-2xl p-4 shadow-2xl">
         <p className="text-sm font-semibold text-text-main">{T.cookies.title}</p>
         <p className="text-xs text-text-secondary">
           {T.cookies.text}{' '}
           <Link href="/privacy" className="text-accent underline-offset-2 hover:underline">{T.privacy.link}</Link>
         </p>
         <div className="flex gap-2">
-          <button onClick={() => choose('denied')} className={`${BUTTON} bg-white/10 text-text-main hover:bg-white/15`}>
+          <button onClick={() => choose('denied')} className={`${BUTTON} bg-ink/10 text-text-main hover:bg-ink/15`}>
             {T.cookies.reject}
           </button>
           <button onClick={() => choose('granted')} className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}>

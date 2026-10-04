@@ -1,6 +1,6 @@
 "use client";
 
-import { Theme } from "@/types/types";
+import { Theme, THEME_STORAGE_KEY, isTheme } from "@/types/types";
 import { useSession } from "next-auth/react";
 import {
   createContext,
@@ -24,20 +24,29 @@ export function ThemeProvider({
   children: ReactNode;
   defaultTheme?: Theme;
 }) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [syncedTheme, setSyncedTheme] = useState<string | undefined>(undefined);
 
-  // console.log("Current theme:", session?.user.theme);
+  // The account's theme is taken during render, not in an effect, so the page
+  // is never repainted in the default for a frame before it arrives.
+  const sessionTheme = session?.user?.theme;
+  if (sessionTheme !== syncedTheme) {
+    setSyncedTheme(sessionTheme);
+    if (isTheme(sessionTheme)) setTheme(sessionTheme);
+  }
 
   useEffect(() => {
-    if (session?.user?.theme) {
-      setTheme(session.user.theme as Theme);
-    }
-  }, [session?.user?.theme]);
-
-  useEffect(() => {
+    // While the session loads, the theme painted by the script in the root
+    // layout (the last one this browser used) stays on screen.
+    if (status === "loading") return;
     document.documentElement.dataset.theme = theme;
-  }, [theme]);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+      // Storage blocked: the next load starts dark, as before.
+    }
+  }, [theme, status]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>

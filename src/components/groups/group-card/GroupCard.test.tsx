@@ -2,9 +2,8 @@ import { render, screen } from '@testing-library/react'
 import GroupCard from './GroupCard'
 import { GameGroup } from '@/types/types'
 
-const mockT = { groups: { games: 'games', mixedPlatforms: 'Includes RetroAchievements and Steam games' } }
 jest.mock('@/context/LanguageContext', () => ({
-  useLanguage: () => ({ T: mockT }),
+  useLanguage: () => ({ T: jest.requireActual('@/translations/en').en, lang: 'en' }),
 }))
 
 jest.mock('next/link', () => ({ children, ...props }: React.ComponentProps<'a'>) => (
@@ -36,17 +35,18 @@ describe('GroupCard', () => {
 
   it('shows public icon for public groups', () => {
     render(<GroupCard group={baseGroup} />)
-    expect(screen.getByLabelText('Public')).toBeInTheDocument()
+    expect(screen.getByText('Public')).toBeInTheDocument()
   })
 
   it('shows private icon for private groups', () => {
     render(<GroupCard group={{ ...baseGroup, is_public: false }} />)
-    expect(screen.getByLabelText('Private')).toBeInTheDocument()
+    expect(screen.getByText('Private')).toBeInTheDocument()
   })
 
   it('omits achievement totals when total_possible is 0', () => {
     render(<GroupCard group={{ ...baseGroup, total_possible: 0 }} />)
-    expect(screen.queryByText(/logros/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/10\/40/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
   })
 
   it('shows a mixed-platform badge when the group has both RA and Steam games', () => {

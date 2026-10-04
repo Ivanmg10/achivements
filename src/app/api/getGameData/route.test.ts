@@ -51,8 +51,8 @@ test('GET returns 503 when fetchRA throws', async () => {
   expect(res.status).toBe(503)
 })
 
-test('GET returns 503 when RA returns no ID field', async () => {
-  ;(fetchRA as jest.Mock).mockResolvedValueOnce({ Title: 'No ID' })
+test('GET returns 503 when RA returns something that is not a game', async () => {
+  ;(fetchRA as jest.Mock).mockResolvedValueOnce({ error: 'Not found' })
   const req = new NextRequest('http://localhost/api/getGameData?gameId=123')
   const res = await GET(req)
   expect(res.status).toBe(503)
@@ -73,4 +73,10 @@ test('GET hands back whatever the key check refuses with, without calling RA', a
   const res = await GET(req)
   expect(res.status).toBe(503)
   expect(fetchRA).not.toHaveBeenCalled()
+})
+
+test('GET accepts the real game shape RA sends, which has no ID field', async () => {
+  ;(fetchRA as jest.Mock).mockResolvedValueOnce({ Title: 'Ratchet & Clank: Size Matters', ImageBoxArt: '/Images/box.png' })
+  const res = await GET(new NextRequest('http://localhost/api/getGameData?gameId=19108'))
+  expect(res.status).toBe(200)
 })

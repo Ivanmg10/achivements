@@ -74,8 +74,8 @@ test('renders the badge grid once achievements are provided', async () => {
   await act(async () => {
     jest.advanceTimersByTime(1500)
   })
-  expect(screen.getByAltText('First blood')).toBeInTheDocument()
-  expect(screen.getByAltText('Second win')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /First blood/ })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /Second win/ })).toBeInTheDocument()
   jest.useRealTimers()
 })
 
@@ -96,7 +96,7 @@ test('opens the achievement modal on click', async () => {
   })
   jest.useRealTimers()
 
-  fireEvent.click(screen.getByAltText('First blood').closest('div')!)
+  fireEvent.click(screen.getByRole('button', { name: /First blood/ }))
   expect(screen.getByTestId('achievement-modal')).toBeInTheDocument()
 
   fireEvent.click(screen.getByText('close'))
@@ -112,7 +112,7 @@ test('shows a tooltip with type badge after hovering', async () => {
     jest.advanceTimersByTime(1500)
   })
 
-  const badge = screen.getByAltText('First blood').closest('div')!
+  const badge = screen.getByRole('button', { name: /First blood/ })
   fireEvent.mouseEnter(badge, { clientX: 10, clientY: 20 })
   act(() => {
     jest.advanceTimersByTime(450)
@@ -120,5 +120,19 @@ test('shows a tooltip with type badge after hovering', async () => {
   expect(screen.getByText('Earn your first point')).toBeInTheDocument()
 
   fireEvent.mouseLeave(badge)
+  jest.useRealTimers()
+})
+
+test('a new array of the same achievements does not send the grid back to its skeleton', () => {
+  jest.useFakeTimers()
+  const props = { total: 2, gameId: 1, gameTitle: 'G', numDistinctPlayers: 10 }
+  const { rerender, container } = render(<AchievementGrid achievements={[earnedAchievement, unearnedAchievement]} {...props} />)
+  act(() => {
+    jest.advanceTimersByTime(1500)
+  })
+  expect(container.querySelector('.animate-pulse')).toBeNull()
+  // The parent re-renders and hands over a fresh array with the same badges.
+  rerender(<AchievementGrid achievements={[{ ...earnedAchievement }, { ...unearnedAchievement }]} {...props} />)
+  expect(container.querySelector('.animate-pulse')).toBeNull()
   jest.useRealTimers()
 })

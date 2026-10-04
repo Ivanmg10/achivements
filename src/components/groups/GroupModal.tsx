@@ -167,7 +167,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                   role="switch"
                   aria-checked={isPublic}
                   onClick={() => setIsPublic((p) => !p)}
-                  className={`w-10 h-5 rounded-full transition-colors relative focus:outline-none focus:ring-2 focus:ring-accent/70 ${isPublic ? 'bg-accent' : 'bg-white/10'}`}
+                  className={`w-10 h-5 rounded-full transition-colors relative focus:outline-none focus:ring-2 focus:ring-accent/70 ${isPublic ? 'bg-accent' : 'bg-ink/10'}`}
                 >
                   <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${isPublic ? 'translate-x-5' : 'translate-x-0.5'}`} />
                 </button>

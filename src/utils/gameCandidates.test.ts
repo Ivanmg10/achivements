@@ -73,7 +73,7 @@ describe('buildSteamCandidates', () => {
   test('maps library games, keyed apart from RA ids', () => {
     const [c] = buildSteamCandidates([{ ...base, achievementsLoaded: true, maxPossible: 50, numAwarded: 25, pctWon: 50 }])
     expect(c).toMatchObject({ key: 'steam:620', source: 'steam', subtitle: 'Steam', pctWon: 0.5, numAwarded: 25, maxPossible: 50, status: 'in-progress' })
-    expect(c.imageRef).toContain('/620/hash.jpg')
+    expect(c.imageRef).toBe('/api/steam/icon?appid=620')
   })
 
   test('uses the Steam categories for status', () => {
@@ -89,6 +89,8 @@ describe('buildSteamCandidates', () => {
 test('candidateIconUrl resolves RA paths and passes Steam URLs through', () => {
   expect(candidateIconUrl({ source: 'ra', imageRef: '/Images/1.png' })).toBe('https://retroachievements.org/Images/1.png')
   expect(candidateIconUrl({ source: 'steam', imageRef: 'https://x/icon.jpg' })).toBe('https://x/icon.jpg')
+  // A favourite saved before the square icons still gets one.
+  expect(candidateIconUrl({ source: 'steam', imageRef: 'https://media.steampowered.com/steamcommunity/public/images/apps/620/abc.jpg' })).toBe('/api/steam/icon?appid=620')
   expect(candidateIconUrl({ source: 'steam', imageRef: '' })).toBe('')
 })
 

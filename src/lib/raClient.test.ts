@@ -20,7 +20,7 @@ test('getGame builds the expected URL', () => {
 test('getGameInfoAndUserProgress builds the expected URL', () => {
   raClient.getGameInfoAndUserProgress('ivan', 'key', 456)
   expect(fetchRA).toHaveBeenCalledWith(
-    'https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=ivan&y=key&g=456',
+    'https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?u=ivan&y=key&g=456&a=1',
   )
 })
 

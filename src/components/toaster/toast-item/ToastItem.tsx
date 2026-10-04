@@ -47,6 +47,17 @@ export default function ToastItem({ toast }: { toast: Toast }) {
     >
       <Icon size={20} className="shrink-0 mt-px" aria-hidden="true" />
       <p className="flex-1 min-w-0 break-words">{toast.message}</p>
+      {toast.action && (
+        <button
+          onClick={() => {
+            toast.action!.onClick()
+            dismissToast(toast.id)
+          }}
+          className="shrink-0 -my-0.5 px-2 py-0.5 rounded-md font-semibold underline underline-offset-2 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        >
+          {toast.action.label}
+        </button>
+      )}
       <button
         onClick={() => dismissToast(toast.id)}
         aria-label={T.toast.close}

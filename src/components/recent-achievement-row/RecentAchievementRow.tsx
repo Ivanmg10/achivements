@@ -21,7 +21,7 @@ export default function RecentAchievementRow({ ach, onNavigate }: { ach: RecentA
       {badge ? (
         <Image src={badge} alt={ach.Title} width={36} height={36} className="rounded shrink-0" unoptimized={isSteam} />
       ) : (
-        <div className="w-9 h-9 rounded bg-white/10 shrink-0" />
+        <div className="w-9 h-9 rounded bg-ink/10 shrink-0" />
       )}
       <div className="flex flex-col min-w-0 flex-1 gap-0.5">
         <span className="text-xs font-semibold text-text-main group-hover:text-accent transition-colors line-clamp-2">

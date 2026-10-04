@@ -4,6 +4,10 @@ import { useSession, signOut } from 'next-auth/react'
 import { en } from '@/translations/en'
 
 jest.mock('@/components/location-modal/LocationModal', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/admin-panel/admin-panel-modal/AdminPanelModal', () => ({
+  __esModule: true,
+  default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div role="dialog" aria-label="Admin panel" /> : null),
+}))
 jest.mock('@/components/change-password-modal/ChangePasswordModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="password-modal" /> : null),
@@ -83,4 +87,18 @@ test('an address nobody has confirmed is flagged, without blocking anything', ()
   expect(screen.getByRole('alert')).toHaveTextContent(en.passwordReset.verifyTitle)
   // The card itself still works: a notice, not a gate.
   expect(screen.getByRole('button', { name: en.userData.changePassword })).toBeInTheDocument()
+})
+
+test('admins get an Admin panel button beside change password, which opens the panel', () => {
+  setUser({ ...USER, admin: true })
+  render(<UserIdentityCard />)
+  expect(screen.queryByRole('dialog', { name: 'Admin panel' })).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'Admin panel' }))
+  expect(screen.getByRole('dialog', { name: 'Admin panel' })).toBeInTheDocument()
+})
+
+test('everyone else gets no Admin panel button', () => {
+  setUser(USER)
+  render(<UserIdentityCard />)
+  expect(screen.queryByRole('button', { name: 'Admin panel' })).not.toBeInTheDocument()
 })

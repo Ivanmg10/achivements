@@ -99,12 +99,12 @@ export default function MainPageBestPeriod({
         <div className="flex flex-col gap-2 animate-pulse">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="bg-bg-main rounded-lg px-3 py-2.5 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/10 shrink-0" />
+              <div className="w-8 h-8 rounded-lg bg-ink/10 shrink-0" />
               <div className="flex flex-col gap-1.5 flex-1">
-                <div className="h-2 w-16 bg-white/10 rounded" />
-                <div className="h-2 w-28 bg-white/10 rounded" />
+                <div className="h-2 w-16 bg-ink/10 rounded" />
+                <div className="h-2 w-28 bg-ink/10 rounded" />
               </div>
-              <div className="h-5 w-10 bg-white/10 rounded" />
+              <div className="h-5 w-10 bg-ink/10 rounded" />
             </div>
           ))}
         </div>
@@ -154,7 +154,7 @@ export default function MainPageBestPeriod({
               <AnimatePresence>
                 {expandedMonth === bestMonth[0] && monthDays.length > 0 && (
                   <motion.div
-                    className="flex flex-col mt-1 ml-2 border-l-2 border-white/10 pl-2 gap-0.5 overflow-hidden"
+                    className="flex flex-col mt-1 ml-2 border-l-2 border-ink/10 pl-2 gap-0.5 overflow-hidden"
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}

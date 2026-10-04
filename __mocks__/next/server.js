@@ -41,7 +41,7 @@ class NextResponse {
   }
 
   static redirect(url, init = {}) {
-    const res = new NextResponse(null, { status: init.status || 307 })
+    const res = new NextResponse(null, { status: init.status || 307, headers: init.headers })
     res.headers.set('location', String(url))
     res.url = String(url)
     return res

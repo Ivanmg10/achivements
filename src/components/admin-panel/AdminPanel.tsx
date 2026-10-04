@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import type { ReactNode } from 'react'
 import { IconLock, IconPlus, IconSearch, IconShield } from '@tabler/icons-react'
 import { useSession } from 'next-auth/react'
 import AdminCreateUserModal from './AdminCreateUserModal'
@@ -15,7 +16,17 @@ import { ADMIN_LOCKED_EVENT, adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
 
-export default function AdminPanel() {
+/** What the panel is showing, for a container that sizes itself to it. */
+export type AdminPanelMode = 'loading' | 'locked' | 'open'
+
+export default function AdminPanel({
+  headerEnd,
+  onModeChange,
+}: {
+  /** Rendered at the end of the header row, e.g. the modal's close button. */
+  headerEnd?: ReactNode
+  onModeChange?: (mode: AdminPanelMode) => void
+} = {}) {
   const { data: session } = useSession()
   const [users, setUsers] = useState<AdminUser[]>([])
   const [loading, setLoading] = useState(true)
@@ -29,6 +40,11 @@ export default function AdminPanel() {
   const [locked, setLocked] = useState(false)
 
   const currentAdminId = Number(session?.user?.id)
+
+  const mode: AdminPanelMode = locked ? 'locked' : loading && users.length === 0 ? 'loading' : 'open'
+  useEffect(() => {
+    onModeChange?.(mode)
+  }, [mode, onModeChange])
 
   // Name, email, id or a linked account — whatever an admin has to hand.
   const visible = useMemo(() => {
@@ -132,8 +148,9 @@ export default function AdminPanel() {
   }
 
   return (
-    <section className="w-full pb-6 flex flex-col gap-4 mt-1">
-      <div className="flex items-center justify-between">
+    <section className="w-full pb-6 flex flex-col gap-4">
+      {/* Sticks to the top of the modal, so search, lock and close stay at hand in a long list. */}
+      <div className="sticky top-0 z-10 -mx-1 px-1 pt-5 pb-3 bg-bg-header flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <IconShield size={18} className="text-accent" />
           <h2 className="text-lg font-bold">Admin panel</h2>
@@ -143,7 +160,8 @@ export default function AdminPanel() {
             </span>
           )}
         </div>
-        {!locked && <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap ml-auto">
+        {!locked && <>
           <div className="relative">
             <IconSearch
               size={15}
@@ -172,7 +190,9 @@ export default function AdminPanel() {
             <IconLock size={14} aria-hidden="true" />
             Lock
           </button>
-        </div>}
+        </>}
+        {headerEnd}
+        </div>
       </div>
 
       {locked ? <AdminUnlock onUnlocked={handleUnlocked} /> : <>

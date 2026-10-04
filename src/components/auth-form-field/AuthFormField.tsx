@@ -55,7 +55,7 @@ export default function AuthFormField({
         />
       </div>
       {note && (
-        <p id={noteId} className={`text-xs ${error ? 'text-danger' : 'text-text-secondary/70'}`}>
+        <p id={noteId} className={`text-xs ${error ? 'text-danger' : 'text-text-secondary'}`}>
           {note}
         </p>
       )}

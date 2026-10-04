@@ -1,7 +1,7 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useEffect, useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useGamesByCategory } from '../../../../hooks/useGamesByCategory'
 import { useGameExtraData } from '../../../../hooks/useGameExtraData'
 import { useConsoleFilter } from '../../../../hooks/useConsoleFilter'
@@ -14,15 +14,13 @@ import StatusSortControl, {
   StatusSortState,
   defaultSortStateFor,
 } from '@/components/status-sort-control/StatusSortControl'
-import EmptyState from '../../../../components/empty-state/EmptyState'
-import LoadingPage from '../../../../components/loading-page/LoadingPage'
-import { useLanguage } from '@/context/LanguageContext'
+import StatusEmptyState from '@/components/status-empty-state/StatusEmptyState'
+import StatusPageSkeleton from '@/components/status-page-skeleton/StatusPageSkeleton'
 
 export default function CategoryConsolePage() {
   const { consoleId, category } = useParams()
   const { games, loading, error } = useGamesByCategory(category as string)
   const extraData = useGameExtraData()
-  const { T } = useLanguage()
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
   const { selected, toggle, clear } = useConsoleFilter(
     consoleId ? [Number(consoleId)] : undefined
@@ -30,36 +28,27 @@ export default function CategoryConsolePage() {
   const cat = category as string
   const [sortState, setSortState] = useState<StatusSortState>(() => defaultSortStateFor(cat))
 
-  useEffect(() => {
+  // A different category starts from its own default order; adjusted during
+  // render, so the old order is never shown for a frame.
+  const [sortFor, setSortFor] = useState(cat)
+  if (sortFor !== cat) {
+    setSortFor(cat)
     setSortState(defaultSortStateFor(cat))
-  }, [cat])
-
-  const EMPTY_STATE: Record<string, { icon: string; title: string; sub: string }> = {
-    wantToPlay: { icon: '🔖', title: T.categoryPage.noWantToPlay, sub: T.categoryPage.noWantToPlaySub },
-    playing: { icon: '🎮', title: T.categoryPage.noPlaying, sub: T.categoryPage.noPlayingSub },
-    completed: { icon: '🏆', title: T.categoryPage.noCompleted, sub: T.categoryPage.noCompletedSub },
   }
+
 
   const consolePills = useMemo(() => buildConsolePills(games), [games])
   const visibleGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-white">
+    <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main">
       <div className="w-full lg:max-w-[98%] flex flex-col gap-3">
         {loading ? (
-          <LoadingPage subtitle={
-            { wantToPlay: T.loadingPage.wantToPlay, playing: T.loadingPage.playing, completed: T.loadingPage.completed }[cat]
-            ?? T.loadingPage.subtitle
-          } />
+          <StatusPageSkeleton />
         ) : error ? (
           <p className="text-red-400 text-sm text-center mt-10">{error}</p>
         ) : games.length === 0 ? (
-          <EmptyState
-            icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-            title={EMPTY_STATE[cat]?.title ?? ''}
-            subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-            className="min-h-[60vh]"
-          />
+          <StatusEmptyState category={cat} className="min-h-[60vh]" />
         ) : (
           <>
             <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -90,12 +79,7 @@ export default function CategoryConsolePage() {
             )}
 
             {visibleGames.length === 0 ? (
-              <EmptyState
-                icon={EMPTY_STATE[cat]?.icon ?? '🎮'}
-                title={EMPTY_STATE[cat]?.title ?? ''}
-                subtitle={EMPTY_STATE[cat]?.sub ?? ''}
-                className="min-h-[40vh]"
-              />
+              <StatusEmptyState category={cat} className="min-h-[40vh]" />
             ) : (
               <StatusGameList games={visibleGames} extraData={extraData} category={cat} />
             )}

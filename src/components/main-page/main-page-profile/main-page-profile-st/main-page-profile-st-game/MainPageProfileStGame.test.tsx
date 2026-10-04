@@ -27,7 +27,7 @@ test('is labelled "playing now" or "last played"', () => {
 
 test('shows cover, title and playtime', () => {
   const { container } = render(<MainPageProfileStGame game={GAME} playingNow={false} />)
-  expect(container.querySelector('img')?.getAttribute('src')).toContain('/311210/library_600x900.jpg')
+  expect(container.querySelector('img')?.getAttribute('src')).toBe('/api/steam/icon?appid=311210')
   expect(screen.getByText('Black Ops III')).toBeInTheDocument()
   expect(screen.getByText(`Steam · ${en.steam.playtime}: 20 h`)).toBeInTheDocument()
 })

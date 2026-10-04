@@ -1,4 +1,4 @@
-import { gameIconUrl, gameLogoUrl, steamAssetUrl } from '@/lib/steamClient'
+import { gameIconUrl, gameLogoUrl } from '@/lib/steamClient'
 import type { RecentAchievement } from '@/types/types'
 import type {
   SteamOwnedGame,
@@ -10,6 +10,7 @@ import type {
   SteamAppDetailsResponse,
   SteamGameDetails,
   SteamRecentAchievement,
+  SteamUnlockCounts,
 } from '@/types/steam'
 
 /**
@@ -38,7 +39,7 @@ export function toSteamGameProgress(game: SteamOwnedGame): SteamGameProgress {
     _source: 'steam',
     id: game.appid,
     title: game.name ?? `App ${game.appid}`,
-    imageIcon: gameIconUrl(game.appid, game.img_icon_url),
+    imageIcon: gameIconUrl(game.appid),
     consoleName: STEAM_PLATFORM,
     maxPossible: 0,
     numAwarded: 0,
@@ -144,13 +145,15 @@ export function toSteamGameDetails(
  * An empty list is not "zero achievements": for a game that has stats it means
  * the data was unavailable (private profile), so the game stays unloaded.
  */
-export function withPlayerAchievementCounts(
-  game: SteamGameProgress,
-  player: SteamPlayerAchievement[],
-): SteamGameProgress {
-  if (player.length === 0) return game
-  const maxPossible = player.length
-  const numAwarded = player.filter((p) => p.achieved === 1).length
+export function countUnlocks(player: SteamPlayerAchievement[]): SteamUnlockCounts {
+  return { total: player.length, awarded: player.filter((p) => p.achieved === 1).length }
+}
+
+/** Applies counts from countUnlocks. A total of 0 leaves the game unloaded, as above. */
+export function withUnlockCounts(game: SteamGameProgress, counts: SteamUnlockCounts): SteamGameProgress {
+  if (counts.total === 0) return game
+  const maxPossible = counts.total
+  const numAwarded = counts.awarded
   return {
     ...game,
     maxPossible,
@@ -184,6 +187,6 @@ export function toRecentAchievement(a: SteamRecentAchievement, index: number): R
     ConsoleName: STEAM_PLATFORM,
     Source: 'steam',
     BadgeUrl: a.badgeUrl,
-    GameIconUrl: steamAssetUrl(a.appId, 'header'),
+    GameIconUrl: gameIconUrl(a.appId),
   }
 }

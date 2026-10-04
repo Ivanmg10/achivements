@@ -1,8 +1,8 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { countLoadedProgress, hasUnloadedProgress } from '@/utils/steamFeed'
+import { countLoadedProgress, hasSteamAchievements, hasUnloadedProgress } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
 
 /** Follow-up library requests while the server is still filling counts. */
@@ -167,14 +167,18 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
     if (steamid) load(steamid)
   }, [steamid, load])
 
+  // Games with no achievements at all are left out of every list (see hasSteamAchievements).
+  const withAchievementsRecent = useMemo(() => recent.filter(hasSteamAchievements), [recent])
+  const withAchievementsLibrary = useMemo(() => library.filter(hasSteamAchievements), [library])
+
   return (
     <Ctx.Provider
       value={{
         isLinked: Boolean(steamid),
-        recent,
+        recent: withAchievementsRecent,
         recentLoading,
         recentError,
-        library,
+        library: withAchievementsLibrary,
         libraryLoading,
         libraryError,
         refetch,

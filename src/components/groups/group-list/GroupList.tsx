@@ -1,37 +1,23 @@
 import { GameGroup } from '@/types/types'
-import { useMasonryLayout } from '@/hooks/useMasonryLayout'
 import { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import GroupCard from '@/components/groups/group-card/GroupCard'
 
-const MASONRY_GAP = 12
+// The layout control as density: one per row, or as many as fit at a size.
+const COLUMNS: Record<StatusGridCols, string> = {
+  1: 'grid-cols-1',
+  2: 'grid-cols-[repeat(auto-fill,minmax(min(100%,420px),1fr))]',
+  3: 'grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))]',
+}
 
-export default function GroupList({
-  groups,
-  gridCols = 2,
-}: {
-  groups: GameGroup[]
-  gridCols?: StatusGridCols
-}) {
-  const { containerRef, setItemRef, positions, containerHeight } = useMasonryLayout(
-    groups.length,
-    gridCols,
-    MASONRY_GAP,
-  )
-
+/** The user's groups, in their order, as many to a row as the screen fits. */
+export default function GroupList({ groups, gridCols = 2 }: { groups: GameGroup[]; gridCols?: StatusGridCols }) {
   return (
-    <div ref={containerRef} className="relative w-full" style={{ height: containerHeight }}>
-      {groups.map((group, i) => (
-        <GroupCard
-          key={group.id}
-          group={group}
-          itemRef={setItemRef(i)}
-          style={
-            positions[i]
-              ? { position: 'absolute', top: positions[i].top, left: positions[i].left, width: positions[i].width }
-              : { position: 'absolute', top: 0, left: 0, width: 0, visibility: 'hidden' }
-          }
-        />
+    <ul className={`grid gap-3 ${COLUMNS[gridCols]}`}>
+      {groups.map((group) => (
+        <li key={group.id} className="min-w-0">
+          <GroupCard group={group} />
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }

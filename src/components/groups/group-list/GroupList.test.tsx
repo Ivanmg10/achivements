@@ -23,7 +23,9 @@ test('renders without crashing with empty list', () => {
   expect(container.firstChild).toBeInTheDocument()
 })
 
-test('positions items absolutely within a relatively-positioned container', () => {
-  const { container } = render(<GroupList groups={mockGroups} gridCols={3} />)
-  expect(container.firstChild).toHaveClass('relative')
+test('one per row in list mode, as many as fit otherwise', () => {
+  const { container, rerender } = render(<GroupList groups={mockGroups} gridCols={1} />)
+  expect(container.firstChild).toHaveClass('grid-cols-1')
+  rerender(<GroupList groups={mockGroups} gridCols={3} />)
+  expect((container.firstChild as HTMLElement).className).toMatch(/auto-fill/)
 })

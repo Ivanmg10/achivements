@@ -30,3 +30,10 @@ test('placeholders while loading, nothing when empty', () => {
   rerender(<CollapsibleSectionPreview games={[]} />)
   expect(container.innerHTML).toBe('')
 })
+
+test('shows as many as the page allows, in the columns it asks for', () => {
+  const games = Array.from({ length: 30 }, (_, i) => ({ key: `ra:${i}`, source: 'ra' as const, id: i, title: `G${i}`, subtitle: 'SNES', imageRef: '/i.png', pct: 10 }))
+  const { container } = render(<CollapsibleSectionPreview games={games} columns={7} count={21} />)
+  expect(container.querySelectorAll('li')).toHaveLength(21)
+  expect(container.querySelector('ul')).toHaveStyle({ gridTemplateColumns: 'repeat(7, minmax(0, 1fr))' })
+})

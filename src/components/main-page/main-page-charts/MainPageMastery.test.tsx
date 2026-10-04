@@ -51,9 +51,9 @@ test('keeps unlocked totals as supporting numbers, and events only when there ar
   expect(screen.getByText(en.userStats.events)).toBeInTheDocument()
 })
 
-test('shows recent masteries when RA reports any', () => {
+test('shows recent masteries when RA reports any (it sends them as Mastery/Completion)', () => {
   const mastery = {
-    AwardedAt: '2024-01-01T00:00:00Z', AwardType: 'Mastery', AwardData: 5, AwardDataExtra: 1,
+    AwardedAt: '2024-01-01T00:00:00Z', AwardType: 'Mastery/Completion', AwardData: 5, AwardDataExtra: 1,
     Title: 'Zelda', ConsoleName: 'SNES', ImageIcon: '/Images/1.png',
   }
   const { rerender } = render(<MainPageMastery {...props()} />)
@@ -102,4 +102,23 @@ test('a game on the list links to its RA page', () => {
 test('nothing started means no list at all, rather than an empty heading', () => {
   render(<MainPageMastery {...props()} />)
   expect(screen.queryByText(en.cards.closestToPerfect)).not.toBeInTheDocument()
+})
+
+test('a softcore completion is not shown as a mastery', () => {
+  const completion = {
+    AwardedAt: '2024-01-01T00:00:00Z', AwardType: 'Mastery/Completion', AwardData: 6, AwardDataExtra: 0,
+    Title: 'Metroid', ConsoleName: 'SNES', ImageIcon: '/Images/2.png',
+  }
+  render(<MainPageMastery {...props({ awards: awards({ VisibleUserAwards: [completion] }) })} />)
+  expect(screen.queryByText(en.cards.recentMasteries)).not.toBeInTheDocument()
+})
+
+test('counts finished games per console', () => {
+  const a = (id: number, consoleName: string, type = 'Mastery/Completion') => ({
+    AwardedAt: '2024-01-01T00:00:00Z', AwardType: type, AwardData: id, AwardDataExtra: 1, Title: `G${id}`, ConsoleName: consoleName, ImageIcon: '',
+  })
+  render(<MainPageMastery {...props({ awards: awards({ VisibleUserAwards: [a(1, 'SNES'), a(2, 'SNES', 'Game Beaten'), a(3, 'Nintendo DS')] }) })} />)
+  expect(screen.getByText(en.cards.awardsByConsole)).toBeInTheDocument()
+  const rows = screen.getAllByRole('listitem').filter((li) => /SNES|Nintendo DS/.test(li.textContent ?? ''))
+  expect(rows.map((r) => r.textContent)).toEqual(expect.arrayContaining(['SNES2', 'Nintendo DS1']))
 })

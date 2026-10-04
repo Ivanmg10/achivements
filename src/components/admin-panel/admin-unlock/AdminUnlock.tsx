@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { IconLock } from '@tabler/icons-react'
 import PasswordInput from '@/components/password-input/PasswordInput'
+import Spinner from '@/components/main-spinner/Spinner'
 
 const MESSAGES: Record<string, string> = {
   'wrong-password': 'That password is incorrect.',
@@ -43,22 +44,36 @@ export default function AdminUnlock({ onUnlocked }: { onUnlocked: () => void }) 
   }
 
   return (
-    <form onSubmit={unlock} className="bg-bg-card rounded-2xl p-5 flex flex-col gap-4 max-w-md">
-      <div className="flex items-center gap-2">
-        <IconLock size={18} className="text-accent" aria-hidden="true" />
-        <h3 className="font-semibold">Unlock the admin panel</h3>
+    <form onSubmit={unlock} className="w-full max-w-sm mx-auto flex flex-col items-center text-center gap-4 py-4">
+      <span
+        aria-hidden="true"
+        className="w-14 h-14 rounded-2xl bg-accent/10 ring-1 ring-accent/20 text-accent flex items-center justify-center"
+      >
+        <IconLock size={26} />
+      </span>
+      <div className="flex flex-col gap-1.5">
+        <h3 className="text-lg font-semibold">Unlock the admin panel</h3>
+        <p className="text-sm text-text-secondary text-balance">
+          Type your password to see and change other users&apos; accounts. It stays unlocked for 15 minutes.
+        </p>
       </div>
-      <p className="text-sm text-text-secondary">
-        Type your password to see and change other users&apos; accounts. It stays unlocked for 15 minutes.
-      </p>
-      <PasswordInput id="admin-unlock-password" label="Your password" value={password} onChange={(v) => { setPassword(v); setError(null) }} disabled={loading} />
-      {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
+      <div className="w-full text-left">
+        <PasswordInput id="admin-unlock-password" label="Your password" value={password} onChange={(v) => { setPassword(v); setError(null) }} disabled={loading} />
+      </div>
+      {error && <p role="alert" className="w-full text-left text-sm text-red-400">{error}</p>}
       <button
         type="submit"
         disabled={!password || loading}
-        className="self-start px-4 py-2 bg-accent text-bg-main text-sm font-bold rounded-xl hover:opacity-90 disabled:opacity-40"
+        className="w-full flex items-center justify-center gap-2 py-3 bg-accent text-bg-main text-sm font-bold rounded-xl hover:bg-accent-hover active:scale-[0.98] transition disabled:opacity-40 disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-header"
       >
-        {loading ? 'Unlocking…' : 'Unlock'}
+        {loading ? (
+          <>
+            <Spinner size={16} />
+            Unlocking…
+          </>
+        ) : (
+          'Unlock'
+        )}
       </button>
     </form>
   )

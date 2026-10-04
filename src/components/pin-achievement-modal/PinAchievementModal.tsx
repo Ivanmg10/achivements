@@ -83,11 +83,11 @@ export function PinAchievementModal({
         >
           <div className="absolute top-[12%] left-1/2 -translate-x-1/2 w-full max-w-lg px-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl border border-white/5 flex flex-col overflow-hidden max-h-[70vh]"
+              className="bg-bg-card rounded-2xl shadow-2xl border border-ink/5 flex flex-col overflow-hidden max-h-[70vh]"
               variants={spotlightVariants}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/5 shrink-0">
+              <div className="flex items-center justify-between px-4 py-3.5 border-b border-ink/5 shrink-0">
                 <p className="text-sm font-semibold text-text-main">
                   {T.gameExpanded.pinAchievementModalTitle}
                 </p>
@@ -129,7 +129,7 @@ export function PinAchievementModal({
                           unoptimized
                         />
                       ) : (
-                        <div className="w-9 h-9 rounded-lg bg-white/10 shrink-0" />
+                        <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-text-main truncate">{a.Title}</p>

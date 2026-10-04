@@ -8,6 +8,8 @@ import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
+import ShowAllButton from '@/components/show-all-button/ShowAllButton'
+import { capList } from '@/utils/utils'
 
 type TooltipData = { achievement: RetroAchievement; x: number; y: number }
 
@@ -24,6 +26,7 @@ export const AchievementGrid = memo(function AchievementGrid({
   gameTitle,
   numDistinctPlayers,
   badgeSize = 40,
+  limit,
 }: {
   achievements: RetroAchievement[]
   total: number
@@ -31,38 +34,51 @@ export const AchievementGrid = memo(function AchievementGrid({
   gameTitle: string
   numDistinctPlayers: number
   badgeSize?: 40 | 48
+  /** Show only this many until asked for the rest (a card on a list page). */
+  limit?: number
 }) {
   const { T } = useLanguage()
   const [tooltip, setTooltip] = useState<TooltipData | null>(null)
   const [selected, setSelected] = useState<RetroAchievement | null>(null)
-  const [allLoaded, setAllLoaded] = useState(false)
+  // The badge set whose images have loaded. Keyed by the badges, not the array:
+  // a parent re-rendering hands over a new array of the same achievements, and
+  // treating that as new sent the grid back to its skeleton, over and over.
+  const badgeKey = achievements.map((a) => a.BadgeName).join(',')
+  const [loadedKey, setLoadedKey] = useState<string | null>(null)
+  const allLoaded = achievements.length === 0 || loadedKey === badgeKey
+  const [showAll, setShowAll] = useState(false)
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
   const size = SIZE_CLASSES[badgeSize]
+  const { visible: shown, capped } = capList(achievements, limit ?? Infinity, showAll)
 
   const { favoritedIds, toggleFavorite } = useRaFavoriteIds(gameId)
   const handleToggleFavorite = (achievement: RetroAchievement) =>
     toggleFavorite(achievement, { gameTitle, numDistinctPlayers })
 
   useEffect(() => {
-    if (achievements.length === 0) {
-      setAllLoaded(true)
-      return
-    }
-    setAllLoaded(false)
+    if (!badgeKey) return
+    const names = badgeKey.split(',')
     let count = 0
+    let cancelled = false
+    const finish = () => {
+      if (!cancelled) setLoadedKey(badgeKey)
+    }
     const done = () => {
       count++
-      if (count >= achievements.length) setAllLoaded(true)
+      if (count >= names.length) finish()
     }
-    achievements.forEach((a) => {
+    names.forEach((name) => {
       const img = new window.Image()
       img.onload = done
       img.onerror = done
-      img.src = `https://media.retroachievements.org/Badge/${a.BadgeName}.png`
+      img.src = `https://media.retroachievements.org/Badge/${name}.png`
     })
-    const timeout = setTimeout(() => setAllLoaded(true), 1500)
-    return () => clearTimeout(timeout)
-  }, [achievements])
+    const timeout = setTimeout(finish, 1500)
+    return () => {
+      cancelled = true
+      clearTimeout(timeout)
+    }
+  }, [badgeKey])
 
   const TYPE_BADGES: Record<string, { label: string; className: string }> = {
     progression: { label: T.achievement.progression, className: 'bg-info/20 text-info' },
@@ -83,7 +99,7 @@ export const AchievementGrid = memo(function AchievementGrid({
     return (
       <div className="flex flex-wrap gap-1">
         {Array.from({ length: Math.min(total, 30) }).map((_, i) => (
-          <div key={i} className={`${size.badge} rounded-lg bg-white/10 animate-pulse`} />
+          <div key={i} className={`${size.badge} rounded-lg bg-ink/10 animate-pulse`} />
         ))}
       </div>
     )
@@ -93,46 +109,56 @@ export const AchievementGrid = memo(function AchievementGrid({
     <>
       {!allLoaded && (
         <div className="flex flex-wrap gap-1">
-          {achievements.map((_, i) => (
+          {shown.map((_, i) => (
             <div key={i} className={`${size.badge} rounded-lg bg-bg-main animate-pulse`} />
           ))}
         </div>
       )}
       <div className={allLoaded ? 'flex flex-wrap gap-1' : 'hidden'}>
-        {achievements.map((a) => {
+        {shown.map((a) => {
           const isHardcore = !!a.DateEarnedHardcore
           const isSoftcore = !!a.DateEarned && !a.DateEarnedHardcore
           const earnedAny = isHardcore || isSoftcore
 
           return (
-            <div
+            <button
+              type="button"
               key={a.ID}
+              aria-label={`${a.Title}, ${earnedAny ? T.steam.earned : T.steam.locked}`}
               onMouseEnter={(e) => handleEnter(a, e.clientX, e.clientY)}
               onMouseLeave={handleLeave}
+              onFocus={(e) => {
+                const r = e.currentTarget.getBoundingClientRect()
+                handleEnter(a, r.right, r.top)
+              }}
+              onBlur={handleLeave}
               onClick={() => {
                 handleLeave()
                 setSelected(a)
               }}
-              className={`rounded-lg overflow-hidden shrink-0 cursor-pointer transition-transform duration-100 hover:scale-110 hover:z-10 relative ${
+              className={`block rounded-lg overflow-hidden shrink-0 cursor-pointer transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                 isHardcore ? 'ring-2 ring-yellow-400' : isSoftcore ? 'ring-2 ring-blue-400' : ''
               }`}
             >
               {a.BadgeName ? (
                 <Image
                   src={`https://media.retroachievements.org/Badge/${a.BadgeName}.png`}
-                  alt={a.Title}
+                  alt=""
                   width={size.img}
                   height={size.img}
                   className={`${size.badge} object-cover ${earnedAny ? '' : 'grayscale opacity-40'}`}
                   unoptimized
                 />
               ) : (
-                <div className={`${size.badge} rounded-lg bg-white/10 ${earnedAny ? '' : 'opacity-40'}`} />
+                <div className={`${size.badge} rounded-lg bg-ink/10 ${earnedAny ? '' : 'opacity-40'}`} />
               )}
-            </div>
+            </button>
           )
         })}
       </div>
+      {allLoaded && capped && (
+        <ShowAllButton total={achievements.length} expanded={showAll} onToggle={() => setShowAll((s) => !s)} />
+      )}
 
       {/* Portal so the tooltip escapes any ancestor Framer Motion transform stacking context */}
       {tooltip &&
@@ -165,11 +191,11 @@ export const AchievementGrid = memo(function AchievementGrid({
                 </span>
               )}
               {!tooltip.achievement.DateEarned && !tooltip.achievement.DateEarnedHardcore && (
-                <span className="text-xs text-text-secondary/60">{T.achievement.notEarned}</span>
+                <span className="text-xs text-text-secondary">{T.achievement.notEarned}</span>
               )}
             </div>
             {(tooltip.achievement.DateEarnedHardcore ?? tooltip.achievement.DateEarned) && (
-              <p className="text-xs text-text-secondary/60 mt-1">
+              <p className="text-xs text-text-secondary mt-1">
                 {new Date(
                   (tooltip.achievement.DateEarnedHardcore ?? tooltip.achievement.DateEarned)!,
                 ).toLocaleDateString()}

@@ -30,7 +30,8 @@ const perfect = { achievementsLoaded: true, maxPossible: 84, numAwarded: 84, pct
 test('lays out like an RA card: cover, title, Steam chip, counts, bar with %', () => {
   const { container } = render(<SteamStatusGameItem game={game(partial)} />)
 
-  expect(container.querySelector('img')?.getAttribute('src')).toContain('/377160/library_600x900.jpg')
+  // The first image is the blurred backdrop; the cover is the one inside the link.
+  expect(container.querySelector('a img')?.getAttribute('src')).toBe('/api/steam/icon?appid=377160')
   expect(screen.getByText('Fallout 4')).toBeInTheDocument()
   expect(screen.getByText('Steam')).toBeInTheDocument()
   expect(screen.getByText(`42 / 84 ${en.steam.achievements}`)).toBeInTheDocument()
@@ -53,14 +54,14 @@ test('says never played for an untouched game', () => {
 describe('a perfect game', () => {
   test('gets the Perfect chip, green counts and a green ring — not colour alone', () => {
     const { container } = render(<SteamStatusGameItem game={game(perfect)} />)
-    expect(screen.getByText(`★ ${en.steam.perfect}`)).toBeInTheDocument()
+    expect(screen.getByText(en.steam.perfect, { exact: false })).toBeInTheDocument()
     expect(screen.getByText(`84 / 84 ${en.steam.achievements}`).className).toContain('text-green-400')
     expect(container.querySelector('.ring-2')).not.toBeNull()
   })
 
   test('an unfinished game has neither', () => {
     render(<SteamStatusGameItem game={game(partial)} />)
-    expect(screen.queryByText(`★ ${en.steam.perfect}`)).not.toBeInTheDocument()
+    expect(screen.queryByText(en.steam.perfect, { exact: false })).not.toBeInTheDocument()
   })
 })
 
@@ -120,14 +121,6 @@ describe('expanding', () => {
   })
 })
 
-test('takes a ref and style so a masonry list can position it', () => {
-  const ref = jest.fn()
-  const { container } = render(
-    <SteamStatusGameItem game={game()} itemRef={ref} style={{ position: 'absolute', top: 12 }} />,
-  )
-  expect(ref).toHaveBeenCalledWith(container.firstChild)
-  expect((container.firstChild as HTMLElement).style.top).toBe('12px')
-})
 
 test('can be pinned as a Steam game, like RA cards', () => {
   render(<SteamStatusGameItem game={game()} />)

@@ -1,9 +1,19 @@
 import type { GameSource, SteamAchievementUnified } from '@/types/steam'
 
 /** Every theme the app has a stylesheet for; the endpoints that store one accept only these. */
-const THEMES = ['dark', 'light', 'blue', 'purple', 'green', 'red'] as const
+export const THEMES = ['dark', 'light', 'blue', 'purple', 'green', 'red', 'synthwave', 'catppuccin', 'gruvbox', 'rose-pine', 'oled', 'ocean', 'terminal', 'sakura', 'arctic', 'daxter', 'bentley', 'clank', 'black-ops-2', 'san-andreas', 'snake-eater'] as const
+
+/** Where the browser keeps the last theme, so the page is painted in it before React loads. */
+export const THEME_STORAGE_KEY = 'app-theme'
 
 export type Theme = (typeof THEMES)[number]
+
+/** How the theme picker sorts them; every theme sits in exactly one group. */
+export const THEME_GROUPS: { id: 'base' | 'palettes' | 'games'; themes: Theme[] }[] = [
+  { id: 'base', themes: ['dark', 'light', 'blue', 'purple', 'green', 'red', 'synthwave'] },
+  { id: 'palettes', themes: ['catppuccin', 'gruvbox', 'rose-pine', 'oled', 'ocean', 'terminal', 'sakura', 'arctic'] },
+  { id: 'games', themes: ['daxter', 'bentley', 'clank', 'black-ops-2', 'san-andreas', 'snake-eater'] },
+]
 
 export function isTheme(value: unknown): value is Theme {
   return typeof value === 'string' && (THEMES as readonly string[]).includes(value)
@@ -264,6 +274,8 @@ export type GameGroupItem = {
   max_points: number
   position: number
   added_at: string
+  /** Looked up once: null = not yet, 0 = no year known. */
+  release_year?: number | null
 }
 
 export type Streak = {
@@ -286,5 +298,7 @@ export type GameGroup = {
   steam_count: number
   total_awarded: number
   total_possible: number
+  /** The first four games, for the card's cover mosaic. */
+  covers?: { source: GameSource; game_id: number; image_icon: string | null }[]
   items?: GameGroupItem[]
 }

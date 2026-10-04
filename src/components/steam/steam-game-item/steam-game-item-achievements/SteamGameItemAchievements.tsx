@@ -16,12 +16,14 @@ export default function SteamGameItemAchievements({
   gameTitle,
   expectedCount,
   badgeSize = 48,
+  limit,
 }: {
   appId: number
   gameTitle: string
   /** Known achievement count, so the loading skeleton has the right size. */
   expectedCount?: number
   badgeSize?: 40 | 48
+  limit?: number
 }) {
   const { T } = useLanguage()
   const { achievements, isLoading, error, retry } = useSteamAchievements(appId)
@@ -46,7 +48,7 @@ export default function SteamGameItemAchievements({
         <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
         <button
           onClick={retry}
-          className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-white/10 transition-colors"
+          className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors"
         >
           {T.steam.retry}
         </button>
@@ -58,5 +60,5 @@ export default function SteamGameItemAchievements({
     return <p className="text-sm text-text-secondary text-center py-2">{T.steam.noAchievements}</p>
   }
 
-  return <SteamAchievementGrid appId={appId} gameTitle={gameTitle} achievements={achievements} badgeSize={badgeSize} />
+  return <SteamAchievementGrid appId={appId} gameTitle={gameTitle} achievements={achievements} badgeSize={badgeSize} limit={limit} />
 }

@@ -76,3 +76,14 @@ test('the close button removes it at once', () => {
   fireEvent.click(screen.getByRole('button', { name: en.toast.close }))
   expect(screen.queryByText('ko')).not.toBeInTheDocument()
 })
+
+test('a toast can carry an action (undo): pressing it runs it and closes the toast', () => {
+  const undo = jest.fn()
+  render(<Toaster />)
+  act(() => {
+    notify.success('Game removed', { action: { label: 'Undo', onClick: undo } })
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Undo' }))
+  expect(undo).toHaveBeenCalledTimes(1)
+  expect(screen.queryByText('Game removed')).not.toBeInTheDocument()
+})

@@ -20,5 +20,5 @@ test('renders a loading skeleton instead of the empty state while loading with n
 test('renders a reserved-height empty state instead of collapsing when there is no data', () => {
   const { container } = render(<MainPageProfileRaAchievements achievements={[]} isLoading={false} />)
   expect(screen.getByText('No achievements earned yet')).toBeInTheDocument()
-  expect(container.firstChild).toHaveClass('min-h-[220px]')
+  expect(container.firstChild).toHaveClass('min-h-[176px]')
 })

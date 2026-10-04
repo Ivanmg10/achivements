@@ -6,6 +6,8 @@ import { useGamesByCategory } from './useGamesByCategory'
 import { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 
 jest.mock('@/context/GamesDataContext', () => ({ useGamesData: jest.fn() }))
+const mockIsHidden = jest.fn((id: number, source: string) => false && id && source)
+jest.mock('@/context/HiddenGamesContext', () => ({ useHiddenGames: () => ({ isHidden: mockIsHidden }) }))
 jest.mock('@/lib/fetchWithRetry', () => ({
   ...jest.requireActual('@/lib/fetchWithRetry'),
   fetchWithRetry: jest.fn(),
@@ -69,4 +71,12 @@ test('with no RA account the want-to-play list is never asked for', async () => 
   const { result } = renderHook(() => useGamesByCategory('wantToPlay'))
   await waitFor(() => expect(result.current.loading).toBe(false))
   expect(fetchWithRetry).not.toHaveBeenCalled()
+})
+
+test('a game the user hid is left out of the list', async () => {
+  mockIsHidden.mockImplementation((id: number, source: string) => source === 'ra' && id === 2)
+  const { result } = renderHook(() => useGamesByCategory('completed'))
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(result.current.games).toEqual([])
+  mockIsHidden.mockImplementation(() => false)
 })

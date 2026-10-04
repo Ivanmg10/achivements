@@ -12,6 +12,7 @@ import {
   getSchemaForGame,
   getGlobalAchievementPercentages,
   gameIconUrl,
+  upgradeLegacyIconUrl,
   gameLogoUrl,
   getAppDetails,
   steamAssetUrl,
@@ -91,17 +92,25 @@ test('getGlobalAchievementPercentages sends no API key', async () => {
 })
 
 describe('image URLs', () => {
-  test('builds icon and logo URLs from the appid and hash', () => {
-    expect(gameIconUrl(730, 'abc123')).toBe(
-      'https://media.steampowered.com/steamcommunity/public/images/apps/730/abc123.jpg',
+  test('the icon is the square-icon route, keyed by appid alone', () => {
+    expect(gameIconUrl(730)).toBe('/api/steam/icon?appid=730')
+  })
+
+  test('upgrades an icon URL saved in the old 32×32 form, and leaves others alone', () => {
+    expect(upgradeLegacyIconUrl('https://media.steampowered.com/steamcommunity/public/images/apps/730/abc123.jpg')).toBe(
+      '/api/steam/icon?appid=730',
     )
+    expect(upgradeLegacyIconUrl('/api/steam/icon?appid=730')).toBe('/api/steam/icon?appid=730')
+    expect(upgradeLegacyIconUrl('https://x/icon.jpg')).toBe('https://x/icon.jpg')
+  })
+
+  test('builds logo URLs from the appid and hash', () => {
     expect(gameLogoUrl(730, 'def456')).toBe(
       'https://media.steampowered.com/steamcommunity/public/images/apps/730/def456.jpg',
     )
   })
 
   test('returns an empty string when Steam gave no hash', () => {
-    expect(gameIconUrl(730, undefined)).toBe('')
     expect(gameLogoUrl(730, undefined)).toBe('')
   })
 })

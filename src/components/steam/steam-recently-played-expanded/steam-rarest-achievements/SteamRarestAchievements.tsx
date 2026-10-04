@@ -38,7 +38,7 @@ export default function SteamRarestAchievements({
       {isLoading ? (
         <ul aria-busy="true" className="flex flex-col gap-2">
           {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-            <li key={i} className="h-12 bg-white/5 rounded-lg animate-pulse" />
+            <li key={i} className="h-12 bg-ink/5 rounded-lg animate-pulse" />
           ))}
         </ul>
       ) : rarest.length === 0 ? (
@@ -51,7 +51,7 @@ export default function SteamRarestAchievements({
             <li key={a.apiname}>
               <Link
                 href={`/steamGame/${appId}#${achievementAnchor(a.apiname)}`}
-                className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+                className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
               >
                 {a.badgeUrl ? (
                   <Image
@@ -63,7 +63,7 @@ export default function SteamRarestAchievements({
                     unoptimized
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-white/10 shrink-0" aria-hidden="true" />
+                  <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
                 )}
                 <span className="flex flex-col min-w-0">
                   <span className="text-sm font-semibold truncate">{a.title}</span>

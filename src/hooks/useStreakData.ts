@@ -19,5 +19,5 @@ export function useStreakData() {
 
   const bestStreak = streaks[0] ?? null
 
-  return { streaks, activeStreak, bestStreak, isLoading, error, refetch }
+  return { achievements, streaks, activeStreak, bestStreak, now, isLoading, error, refetch }
 }

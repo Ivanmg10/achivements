@@ -101,14 +101,14 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
             aria-label="Cerrar modal"
           />
           <motion.div
-            className="relative bg-bg-card border border-white/10 rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col"
+            className="relative bg-bg-card border border-ink/10 rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col"
             variants={contentVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
           >
             {/* Header */}
-            <div className="flex items-center gap-3 p-5 border-b border-white/8 shrink-0">
+            <div className="flex items-center gap-3 p-5 border-b border-ink/8 shrink-0">
               <div className="w-9 h-9 rounded-lg bg-bg-main flex items-center justify-center shrink-0">
                 <IconHash className="w-4.5 h-4.5 text-accent" />
               </div>
@@ -118,7 +118,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-white/8 text-text-secondary hover:text-text-main transition-colors"
+                className="p-1.5 rounded-lg hover:bg-ink/8 text-text-secondary hover:text-text-main transition-colors"
                 aria-label="Cerrar"
               >
                 <IconX className="w-4 h-4" />
@@ -131,8 +131,8 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                 <div className="flex flex-col gap-3 animate-pulse">
                   {[0, 1, 2].map((i) => (
                     <div key={i} className="bg-bg-main rounded-xl p-4 flex flex-col gap-2">
-                      <div className="h-3 w-48 rounded bg-white/10" />
-                      <div className="h-2.5 w-64 rounded bg-white/10" />
+                      <div className="h-3 w-48 rounded bg-ink/10" />
+                      <div className="h-2.5 w-64 rounded bg-ink/10" />
                     </div>
                   ))}
                 </div>
@@ -144,7 +144,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                 <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
                   <IconHash className="w-8 h-8 text-text-secondary opacity-30" />
                   <p className="text-sm text-text-secondary">Sin hashes registrados</p>
-                  <p className="text-xs text-text-secondary/60">No hay ROMs verificadas para este juego</p>
+                  <p className="text-xs text-text-secondary">No hay ROMs verificadas para este juego</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-3">
@@ -160,7 +160,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                             {h.Labels.map((label) => (
                               <span
                                 key={label}
-                                className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border font-semibold ${LABEL_COLORS[label] ?? 'bg-white/10 text-text-secondary border-white/10'}`}
+                                className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border font-semibold ${LABEL_COLORS[label] ?? 'bg-ink/10 text-text-secondary border-ink/10'}`}
                               >
                                 {label}
                               </span>
@@ -169,7 +169,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                         )}
                       </div>
                       <div className="flex items-center gap-1 bg-bg-card rounded-lg px-2.5 py-1.5">
-                        <code className="text-[11px] text-text-secondary/80 font-mono flex-1 select-all">{h.MD5}</code>
+                        <code className="text-[11px] text-text-secondary font-mono flex-1 select-all">{h.MD5}</code>
                         <CopyButton text={h.MD5} />
                       </div>
                       {h.PatchUrl && (

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { IconPlus } from '@tabler/icons-react'
+import { IconFolder, IconPlus } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
 import type { GameCandidate } from '@/utils/gameCandidates'
@@ -11,10 +11,12 @@ import GroupList from '@/components/groups/group-list/GroupList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import { notify } from '@/lib/notify'
+import { GROUPS_PER_USER_MAX } from '@/utils/groupValidation'
 
 export default function GroupsPage() {
   const { T } = useLanguage()
-  const { groups, isLoading, error, createGroup } = useGroups()
+  const { groups, isLoading, error, createGroup, fetchGroups } = useGroups()
+  const canCreate = groups.length < GROUPS_PER_USER_MAX
   const [modalOpen, setModalOpen] = useState(false)
   const [gridCols, setGridCols] = useState<StatusGridCols>(2)
 
@@ -46,18 +48,18 @@ export default function GroupsPage() {
           <h1 className="text-2xl font-bold text-text-main">{T.groups.title}</h1>
           {groups.length > 0 && (
             <p className="text-sm text-text-secondary mt-0.5">
-              {groups.length}/10 {T.groups.title.toLowerCase()}
+              {groups.length}/{GROUPS_PER_USER_MAX} {T.groups.title.toLowerCase()}
             </p>
           )}
         </div>
         <div className="flex items-center gap-2">
           {groups.length > 0 && <StatusGridControl cols={gridCols} onChange={setGridCols} />}
-          {groups.length < 10 && (
+          {canCreate && (
             <button
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
-              <IconPlus className="w-4 h-4" aria-hidden />
+              <IconPlus className="w-4 h-4" aria-hidden="true" />
               {T.groups.newGroup}
             </button>
           )}
@@ -66,50 +68,42 @@ export default function GroupsPage() {
 
       {/* Content */}
       {isLoading ? (
-        <div className="flex flex-col gap-3 animate-pulse">
+        <div role="status" aria-busy="true" className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(100%,420px),1fr))] animate-pulse motion-reduce:animate-none">
+          <span className="sr-only">{T.loadingPage.title}</span>
           {[0, 1, 2].map((i) => (
-            <div key={i} className="flex items-center gap-4 bg-bg-card rounded-xl p-4">
-              <div className="w-14 h-14 rounded-xl bg-white/10 shrink-0" />
+            <div key={i} aria-hidden="true" className="flex items-center gap-4 bg-bg-card rounded-2xl p-3">
+              <div className="w-24 h-24 rounded-xl bg-ink/10 shrink-0" />
               <div className="flex flex-col gap-2 flex-1">
-                <div className="h-3.5 w-40 rounded bg-white/10" />
-                <div className="h-2.5 w-24 rounded bg-white/10" />
+                <div className="h-3.5 w-40 rounded bg-ink/10" />
+                <div className="h-2.5 w-24 rounded bg-ink/10" />
               </div>
             </div>
           ))}
         </div>
       ) : error ? (
-        <p className="text-red-400 text-sm text-center mt-10">{error}</p>
+        <div className="flex flex-col items-center gap-2 mt-10 text-center">
+          <p role="alert" className="text-sm text-text-secondary">{T.groups.listError}</p>
+          <button onClick={fetchGroups} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+            {T.groups.retry}
+          </button>
+        </div>
       ) : groups.length === 0 ? (
         <>
           <EmptyState
-            icon="📁"
+            icon={<IconFolder className="w-7 h-7" />}
             title={T.groups.noGroups}
             subtitle={T.groups.noGroupsSub}
             className="min-h-[40vh]"
           />
           <button
             onClick={() => setModalOpen(true)}
-            className="mx-auto px-5 py-2.5 rounded-xl bg-accent text-bg-main font-medium hover:bg-accent/90 transition-colors"
+            className="mx-auto px-5 py-2.5 rounded-xl bg-accent text-bg-main font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             {T.groups.newGroup}
           </button>
         </>
       ) : (
-        <div className="flex flex-col gap-3">
-          <GroupList groups={groups} gridCols={gridCols} />
-
-          {groups.length < 10 && (
-            <button
-              onClick={() => setModalOpen(true)}
-              className="flex items-center gap-4 bg-bg-card/50 border border-dashed border-white/10 rounded-xl p-4 hover:border-accent/40 hover:bg-bg-card transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70"
-            >
-              <div className="w-14 h-14 rounded-xl bg-bg-main flex items-center justify-center shrink-0">
-                <IconPlus className="w-6 h-6" aria-hidden />
-              </div>
-              <span className="text-sm font-medium">{T.groups.newGroup}</span>
-            </button>
-          )}
-        </div>
+        <GroupList groups={groups} gridCols={gridCols} />
       )}
 
       <GroupModal

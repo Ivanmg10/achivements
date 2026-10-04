@@ -1,3 +1,4 @@
+import { en } from '@/translations/en'
 import { fireEvent, render, screen } from '@testing-library/react'
 import MainHeader from './MainHeader'
 import { useSession } from 'next-auth/react'
@@ -60,7 +61,7 @@ describe('with no platform linked', () => {
   test('keeps the way home and the way to the account', () => {
     render(<MainHeader />)
     expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Profile' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: en.sidePanel.userSettings })).toBeInTheDocument()
   })
 
   test('typing no longer opens a search over nothing', () => {
@@ -68,4 +69,17 @@ describe('with no platform linked', () => {
     fireEvent.keyDown(document, { key: 'a' })
     expect(screen.queryByTestId('search-modal')).not.toBeInTheDocument()
   })
+})
+
+test('while the session loads, holds the place of the avatar instead of flashing Sign in', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: null, status: 'loading' })
+  render(<MainHeader />)
+  expect(screen.queryByText('Sign in')).not.toBeInTheDocument()
+})
+
+test('the streak page is always one click away, even with no streak going', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', rausername: 'Ivan' } } })
+  render(<MainHeader />)
+  const link = screen.getByRole('link', { name: new RegExp(`^${en.streak.title}:`) })
+  expect(link).toHaveAttribute('href', '/racha')
 })

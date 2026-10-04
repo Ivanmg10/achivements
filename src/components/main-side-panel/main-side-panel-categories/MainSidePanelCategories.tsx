@@ -47,7 +47,7 @@ export default function MainSidePanelCategories() {
                   {label}
                 </span>
                 <span
-                  className={`ml-auto text-gray-400 text-xs transition-transform duration-300 ease-in-out ${
+                  className={`ml-auto text-text-secondary text-xs transition-transform duration-300 ease-in-out ${
                     isOpen ? 'rotate-180' : 'rotate-0'
                   }`}
                 >
@@ -70,7 +70,7 @@ export default function MainSidePanelCategories() {
                       <li key={con.id}>
                         <Link
                           href={`/${category.slug}/${con.id}`}
-                          className={`inline-flex items-center gap-1.5 text-sm px-2 py-1 rounded-md transition-colors hover:brightness-125 ${con.color ?? 'text-gray-400'}`}
+                          className={`inline-flex items-center gap-1.5 text-sm px-2 py-1 rounded-md transition-colors hover:brightness-125 ${con.color ?? 'text-text-secondary'}`}
                         >
                           <Image
                             src={con.icon}

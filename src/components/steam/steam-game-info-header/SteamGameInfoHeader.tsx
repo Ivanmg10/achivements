@@ -108,7 +108,7 @@ export default function SteamGameInfoHeader({
               href={steamStoreUrl(appId)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[#66c0f4]"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[#66c0f4]"
             >
               <IconExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
               {T.steam.viewOnSteam}

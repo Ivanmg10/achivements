@@ -69,7 +69,7 @@ export default function AdminActionLog() {
           {!error && entries === null && <p className="text-sm text-text-secondary">Loading…</p>}
           {entries?.length === 0 && <p className="text-sm text-text-secondary">Nothing yet.</p>}
           {entries && entries.length > 0 && (
-            <ol className="flex flex-col divide-y divide-white/5 text-sm">
+            <ol className="flex flex-col divide-y divide-ink/5 text-sm">
               {entries.map((entry) => {
                 const what = describe(entry)
                 return (

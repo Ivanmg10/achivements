@@ -50,10 +50,10 @@ export default function MainPageSteamNav() {
 
               {loading ? (
                 <div className="flex gap-1.5 animate-pulse" aria-busy="true">
-                  {[0, 1, 2, 3].map((i) => <div key={i} className="w-8 h-8 rounded bg-white/10" />)}
+                  {[0, 1, 2, 3].map((i) => <div key={i} className="w-8 h-8 rounded bg-ink/10" />)}
                 </div>
               ) : games.length === 0 ? (
-                <p className="text-[10px] text-text-secondary/60">{T.steam.noGamesInCategory}</p>
+                <p className="text-[10px] text-text-secondary">{T.steam.noGamesInCategory}</p>
               ) : (
                 <div className="flex flex-wrap gap-1.5">
                   {games.slice(0, PREVIEW).map((g) => (
@@ -67,7 +67,7 @@ export default function MainPageSteamNav() {
                       {g.imageIcon ? (
                         <Image src={g.imageIcon} alt="" width={32} height={32} className="rounded hover:scale-110 transition-transform" />
                       ) : (
-                        <span className="block w-8 h-8 rounded bg-white/10" aria-hidden="true" />
+                        <span className="block w-8 h-8 rounded bg-ink/10" aria-hidden="true" />
                       )}
                     </Link>
                   ))}

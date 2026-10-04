@@ -18,7 +18,7 @@ export default function StreakCompletionCard({ award }: Props) {
   return (
     <Link
       href={`/gameInfo/${award.AwardData}`}
-      className="flex items-center gap-3 p-3 rounded-xl bg-bg-main hover:bg-white/5 transition-colors group ring-1 ring-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="flex items-center gap-3 p-3 rounded-xl bg-bg-main hover:bg-ink/5 transition-colors group ring-1 ring-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       <div className="relative shrink-0">
         {award.ImageIcon ? (
@@ -31,7 +31,7 @@ export default function StreakCompletionCard({ award }: Props) {
             unoptimized
           />
         ) : (
-          <div className="w-10 h-10 rounded-lg bg-white/5" />
+          <div className="w-10 h-10 rounded-lg bg-ink/5" />
         )}
         <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${isMastery ? 'bg-yellow-400' : 'bg-green-500'}`}>
           {isMastery

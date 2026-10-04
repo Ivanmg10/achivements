@@ -2,6 +2,7 @@
 
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import Image from 'next/image'
+import { FadeImage } from '@/components/ui/FadeImage'
 import { ReactNode, useMemo, useState } from 'react'
 import GameInfoProgressionHeader from './game-info-header-progression/GameInfoProgressionHeader'
 import GameHashesModal from './GameHashesModal'
@@ -56,12 +57,14 @@ export default function GameInfoHeader({
       {/* Content — above background layers */}
       <div className="relative z-10 flex flex-row items-start gap-5">
         {gameData?.ImageBoxArt && (
-          <Image
+          <FadeImage
             src={`https://retroachievements.org${gameData.ImageBoxArt}`}
-            alt="game icon"
+            alt={gameData.Title ?? ''}
             width={150}
             height={150}
-            className="w-28 lg:w-50 rounded-xl"
+            className="w-28 lg:w-50 rounded-xl shrink-0"
+            imgClassName="w-full h-auto"
+            placeholderClassName="aspect-[3/4]"
           />
         )}
         <div className="flex flex-col flex-1 min-w-0 gap-3">
@@ -119,18 +122,18 @@ export default function GameInfoHeader({
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => setHashesOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
-                <IconHash className="w-3.5 h-3.5" />
+                <IconHash className="w-3.5 h-3.5" aria-hidden="true" />
                 {T.gameInfoPage.hashesCompatible}
               </button>
               <a
                 href={`https://retroachievements.org/game/${gameData.ID}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
-                <IconExternalLink className="w-3.5 h-3.5" />
+                <IconExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
                 {T.profileRa.viewOnRA}
               </a>
             </div>
@@ -154,26 +157,26 @@ export default function GameInfoHeader({
           <div className="grid grid-cols-2 gap-2 w-full max-w-sm lg:max-w-none">
             {gameData.ImageTitle && (
               <div className="flex flex-col gap-0.5">
-                <Image
+                <FadeImage
                   src={`https://retroachievements.org${gameData.ImageTitle}`}
-                  alt="Title screen"
+                  alt={T.gameInfoPage.titleScreen}
                   width={200}
                   height={150}
-                  className="w-full rounded-md object-cover aspect-4/3"
+                  className="w-full rounded-md aspect-4/3"
                 />
-                <span className="text-[10px] text-text-secondary text-center">Title Screen</span>
+                <span className="text-[10px] text-text-secondary text-center">{T.gameInfoPage.titleScreen}</span>
               </div>
             )}
             {gameData.ImageIngame && (
               <div className="flex flex-col gap-0.5">
-                <Image
+                <FadeImage
                   src={`https://retroachievements.org${gameData.ImageIngame}`}
-                  alt="In game screenshot"
+                  alt={T.gameInfoPage.inGame}
                   width={200}
                   height={150}
-                  className="w-full rounded-md object-cover aspect-4/3"
+                  className="w-full rounded-md aspect-4/3"
                 />
-                <span className="text-[10px] text-text-secondary text-center">In Game</span>
+                <span className="text-[10px] text-text-secondary text-center">{T.gameInfoPage.inGame}</span>
               </div>
             )}
           </div>

@@ -13,7 +13,7 @@ function ArcTrack({ size, strokeWidth }: { size: number; strokeWidth: number }) 
       r={r}
       fill="none"
       strokeWidth={strokeWidth}
-      stroke="var(--color-accent)"
+      stroke="rgb(var(--accent))"
       strokeLinecap="round"
       strokeDasharray={`${arc} ${c - arc}`}
       opacity={0.12}
@@ -33,7 +33,7 @@ export default function Spinner({ size = 45 }: { size?: number }) {
           width: size,
           height: size,
           border: `${sw}px solid transparent`,
-          borderTopColor: 'var(--color-accent)',
+          borderTopColor: 'rgb(var(--accent))',
           borderRightColor: 'rgba(var(--text-secondary), 0.25)',
         }}
       />
@@ -74,7 +74,7 @@ export default function Spinner({ size = 45 }: { size?: number }) {
             width={dotR * 2}
             height={dotR * 2}
             rx={dotR * 0.45}
-            fill="var(--color-accent)"
+            fill="rgb(var(--accent))"
             animate={{ opacity: [0.1, 1, 0.1] }}
             transition={{ duration: waveDuration, repeat: Infinity, delay, ease: 'easeInOut' }}
           />
@@ -84,7 +84,7 @@ export default function Spinner({ size = 45 }: { size?: number }) {
             cx={x}
             cy={y}
             r={dotR}
-            fill="var(--color-accent)"
+            fill="rgb(var(--accent))"
             animate={{ opacity: [0.1, 1, 0.1] }}
             transition={{ duration: waveDuration, repeat: Infinity, delay, ease: 'easeInOut' }}
           />
@@ -99,7 +99,7 @@ export default function Spinner({ size = 45 }: { size?: number }) {
           textAnchor="middle"
           dominantBaseline="central"
           fontSize={size * 0.27}
-          fill="var(--color-accent)"
+          fill="rgb(var(--accent))"
           style={{ userSelect: 'none' }}
           animate={{ opacity: [0.4, 1, 0.4], scale: [0.88, 1.08, 0.88] }}
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}

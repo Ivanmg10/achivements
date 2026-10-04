@@ -92,7 +92,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: { isOpen: boole
             role="dialog"
             aria-modal="true"
             aria-label={T.passwordReset.forgotTitle}
-            className="bg-bg-card rounded-2xl w-full max-w-sm p-6 flex flex-col gap-4 shadow-2xl border border-white/5"
+            className="bg-bg-card rounded-2xl w-full max-w-sm p-6 flex flex-col gap-4 shadow-2xl border border-ink/5"
             variants={contentVariants}
             onClick={(e) => e.stopPropagation()}
           >

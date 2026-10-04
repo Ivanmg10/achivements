@@ -1,37 +1,34 @@
 @import "tailwindcss";
 
-/* tokens que Tailwind convierte en utilidades */
+/*
+   Tokens que Tailwind convierte en utilidades. Inline: cada utilidad lleva
+   rgb(var(--x)) dentro, así que un elemento con su propio data-theme (la vista
+   previa del selector) se pinta con los colores de ese tema.
+*/
 
-@theme {
+@theme inline {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   --color-bg-main: rgb(var(--bg-main));
   --color-bg-header: rgb(var(--bg-header));
-  --color-bg-deep: rgb(var(--bg-deep));
   --color-bg-card: rgb(var(--bg-card));
   --color-bg-tertiary: rgb(var(--bg-tertiary));
 
   --color-text-main: rgb(var(--text-main));
   --color-text-secondary: rgb(var(--text-secondary));
-  --color-text-accent: rgb(var(--text-accent));
+
+  /* Overlays, hairlines and tints: white on the dark themes, ink on the light one. */
+  --color-ink: rgb(var(--ink));
 
   --color-accent: rgb(var(--accent));
   --color-accent-hover: rgb(var(--accent-hover));
-  --color-accent-secondary: rgb(var(--accent-secondary));
   --color-accent-muted: rgb(var(--accent-muted));
-
-  --color-btn-primary: rgb(var(--btn-primary));
-  --color-btn-primary-text: rgb(var(--btn-primary-text));
-  --color-btn-danger: rgb(var(--btn-danger));
-  --color-btn-danger-text: rgb(var(--btn-danger-text));
 
   --color-success: rgb(var(--success));
   --color-warning: rgb(var(--warning));
   --color-info: rgb(var(--info));
   --color-danger: rgb(var(--danger));
-  --color-metric-1: rgb(var(--metric-1));
 
-  --color-chart-1: rgb(var(--chart-1));
   --color-chart-2: rgb(var(--chart-2));
 }
 
@@ -39,33 +36,25 @@
    VARIABLES BASE — fallback
    ============================================ */
 
-:root {
+:root,
+[data-theme] {
+  --ink: 255 255 255;
   --bg-main: 15 16 20;
   --bg-header: 10 10 14;
-  --bg-deep: 12 14 22;
-  --bg-card: 20 20 26;
+  --bg-card: 23 24 30;
   --bg-tertiary: 35 36 46;
 
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
-  --text-accent: 250 250 255;
 
-  --accent: 180 185 200;
-  --accent-hover: 200 205 220;
-  --accent-secondary: 148 153 168;
-  --accent-muted: 180 185 200;
-
-  --btn-primary: 80 80 90;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 180 40 40;
-  --btn-danger-text: 255 255 255;
+  --accent: 225 228 235;
+  --accent-hover: 245 246 250;
+  --accent-muted: 225 228 235;
 
   --success: 34 197 94;
   --warning: 245 158 11;
   --info: 96 165 250;
   --danger: 239 68 68;
-  --metric-1: 180 185 200;
-  --chart-1: 59 130 246;
   --chart-2: 245 158 11;
 }
 
@@ -75,30 +64,20 @@
 [data-theme="dark"] {
   --bg-main: 15 16 20;
   --bg-header: 10 10 14;
-  --bg-deep: 12 14 22;
-  --bg-card: 20 20 26;
+  --bg-card: 23 24 30;
   --bg-tertiary: 35 36 46;
 
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
-  --text-accent: 250 250 255;
 
-  --accent: 180 185 200;
-  --accent-hover: 200 205 220;
-  --accent-secondary: 148 153 168;
-  --accent-muted: 180 185 200;
-
-  --btn-primary: 80 80 90;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 180 40 40;
-  --btn-danger-text: 255 255 255;
+  --accent: 225 228 235;
+  --accent-hover: 245 246 250;
+  --accent-muted: 225 228 235;
 
   --success: 34 197 94;
   --warning: 245 158 11;
   --info: 96 165 250;
   --danger: 239 68 68;
-  --metric-1: 180 185 200;
-  --chart-1: 59 130 246;
   --chart-2: 245 158 11;
 }
 
@@ -106,75 +85,103 @@
    LIGHT — Neutro suave
    ============================================ */
 [data-theme="light"] {
-  --bg-main: 230 232 236;
-  --bg-header: 224 226 230;
-  --bg-deep: 220 222 226;
-  --bg-card: 238 240 244;
+  --ink: 20 22 28;
+  --bg-main: 229 231 235;
+  --bg-header: 236 238 242;
+  --bg-card: 246 247 250;
   --bg-tertiary: 218 220 224;
 
-  --text-main: 50 52 58;
-  --text-secondary: 100 102 110;
-  --text-accent: 255 255 255;
+  --text-main: 32 34 40;
+  --text-secondary: 88 92 102;
 
-  --accent: 70 75 85;
-  --accent-hover: 55 60 68;
-  --accent-secondary: 110 115 125;
-  --accent-muted: 70 75 85;
+  --accent: 79 70 229;
+  --accent-hover: 67 56 202;
+  --accent-muted: 79 70 229;
 
-  --btn-primary: 65 70 80;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 200 40 40;
-  --btn-danger-text: 255 255 255;
-
-  --success: 25 150 75;
-  --warning: 195 110 15;
-  --info: 40 100 200;
-  --danger: 195 40 40;
-  --metric-1: 95 100 108;
-  --chart-1: 70 75 85;
-  --chart-2: 195 110 15;
+  --success: 22 101 52;
+  --warning: 146 64 14;
+  --info: 29 78 216;
+  --danger: 185 28 28;
+  --chart-2: 180 83 9;
 }
 
-.button-light {
-  background-color: rgb(230 232 236);
-  border: 1px solid rgb(70 75 85);
-  color: rgb(50 52 58);
-}
-.button-light:hover {
-  border-color: rgb(55 60 68);
-  background-color: rgb(224 226 230);
-}
+/*
+   Light themes: the fixed palette colours in the code (hardcore gold, ratio
+   green, error red...) are tuned for dark surfaces. On a light one, the same
+   classes take a darker shade so they still pass AA. Text only: bars and tints
+   keep their colour.
+*/
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-200 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-300 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-400 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-200 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-300 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-400 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-200 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-300 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-400 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-200 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-300 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-400 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-200 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-300 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-400 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-200 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-300 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-400 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-200 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-300 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-400 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-200 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-300 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-400 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-200 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-300 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-400 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-200 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-300 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-400 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-200 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-300 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-400 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-200 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-300 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-400 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-200 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-300 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-400 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-200 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-300 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-400 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-200 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-300 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-400 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-200 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-300 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-400 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-500 { @apply text-gray-600; }
 
 /* ============================================
    BLUE
    ============================================ */
 [data-theme="blue"] {
-  --bg-main: 10 15 28;
-  --bg-header: 15 20 35;
-  --bg-deep: 8 12 22;
-  --bg-card: 18 24 42;
-  --bg-tertiary: 28 38 58;
+  --bg-main: 11 16 26;
+  --bg-header: 8 12 20;
+  --bg-card: 19 26 40;
+  --bg-tertiary: 30 40 60;
 
-  --text-main: 218 228 245;
-  --text-secondary: 125 140 170;
-  --text-accent: 250 252 255;
+  --text-main: 220 228 240;
+  --text-secondary: 128 142 168;
 
-  --accent: 59 130 246;
-  --accent-hover: 96 165 250;
-  --accent-secondary: 147 197 253;
-  --accent-muted: 59 130 246;
-
-  --btn-primary: 59 130 246;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 239 68 68;
-  --btn-danger-text: 255 255 255;
+  /* Cobalt, not sky: sky blue is Steam and True points. */
+  --accent: 96 125 255;
+  --accent-hover: 124 148 255;
+  --accent-muted: 96 125 255;
 
   --success: 34 197 94;
   --warning: 245 158 11;
-  --info: 59 130 246;
+  --info: 56 189 248;
   --danger: 239 68 68;
-  --metric-1: 147 197 253;
-  --chart-1: 59 130 246;
   --chart-2: 245 158 11;
 }
 
@@ -182,32 +189,22 @@
    PURPLE
    ============================================ */
 [data-theme="purple"] {
-  --bg-main: 18 12 32;
-  --bg-header: 12 8 24;
-  --bg-deep: 10 6 18;
-  --bg-card: 24 16 40;
-  --bg-tertiary: 38 26 62;
+  --bg-main: 20 14 30;
+  --bg-header: 14 9 22;
+  --bg-card: 30 22 44;
+  --bg-tertiary: 44 33 64;
 
-  --text-main: 225 220 242;
-  --text-secondary: 155 148 185;
-  --text-accent: 248 248 255;
+  --text-main: 228 222 242;
+  --text-secondary: 158 150 186;
 
-  --accent: 168 85 247;
-  --accent-hover: 192 110 255;
-  --accent-secondary: 196 181 251;
-  --accent-muted: 168 85 247;
-
-  --btn-primary: 168 85 247;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 248 113 113;
-  --btn-danger-text: 255 255 255;
+  --accent: 150 110 250;
+  --accent-hover: 172 140 252;
+  --accent-muted: 150 110 250;
 
   --success: 52 211 153;
   --warning: 251 191 36;
-  --info: 168 85 247;
+  --info: 96 165 250;
   --danger: 248 113 113;
-  --metric-1: 196 181 251;
-  --chart-1: 168 85 247;
   --chart-2: 251 191 36;
 }
 
@@ -215,33 +212,24 @@
    GREEN
    ============================================ */
 [data-theme="green"] {
-  --bg-main: 10 18 10;
-  --bg-header: 6 12 6;
-  --bg-deep: 8 15 8;
-  --bg-card: 14 26 14;
-  --bg-tertiary: 24 40 24;
+  --bg-main: 13 17 10;
+  --bg-header: 9 12 7;
+  --bg-card: 21 28 17;
+  --bg-tertiary: 32 42 26;
 
-  --text-main: 212 224 212;
-  --text-secondary: 125 152 128;
-  --text-accent: 248 252 248;
+  --text-main: 214 224 208;
+  --text-secondary: 130 152 122;
 
   --accent: 132 184 80;
   --accent-hover: 152 204 100;
-  --accent-secondary: 180 210 140;
   --accent-muted: 132 184 80;
 
-  --btn-primary: 132 184 80;
-  --btn-primary-text: 18 24 14;
-  --btn-danger: 210 80 70;
-  --btn-danger-text: 255 255 255;
-
-  --success: 74 175 80;
-  --warning: 188 184 56;
-  --info: 132 184 80;
-  --danger: 210 80 70;
-  --metric-1: 168 205 140;
-  --chart-1: 132 184 80;
-  --chart-2: 188 184 56;
+  /* Teal, so "completed" is not mistaken for the accent. */
+  --success: 45 212 191;
+  --warning: 234 179 8;
+  --info: 96 165 250;
+  --danger: 239 90 80;
+  --chart-2: 234 179 8;
 }
 
 /* ============================================
@@ -250,31 +238,368 @@
 [data-theme="red"] {
   --bg-main: 28 12 14;
   --bg-header: 20 8 10;
-  --bg-deep: 14 6 8;
-  --bg-card: 36 16 18;
+  --bg-card: 40 18 21;
   --bg-tertiary: 55 28 32;
 
   --text-main: 248 232 232;
   --text-secondary: 185 155 158;
-  --text-accent: 255 252 252;
 
-  --accent: 224 60 80;
-  --accent-hover: 240 80 100;
-  --accent-secondary: 244 140 155;
-  --accent-muted: 224 60 80;
-
-  --btn-primary: 224 60 80;
-  --btn-primary-text: 255 255 255;
-  --btn-danger: 160 40 50;
-  --btn-danger-text: 255 255 255;
+  --accent: 236 84 102;
+  --accent-hover: 246 104 120;
+  --accent-muted: 236 84 102;
 
   --success: 52 211 153;
   --warning: 251 191 36;
   --info: 99 160 255;
-  --danger: 224 60 80;
-  --metric-1: 244 160 170;
-  --chart-1: 224 60 80;
+  --danger: 251 146 60;
   --chart-2: 251 191 36;
+}
+
+/* ============================================
+   SYNTHWAVE: hot pink on night indigo, cyan for info
+   ============================================ */
+[data-theme="synthwave"] {
+  --bg-main: 14 10 26;
+  --bg-header: 9 6 18;
+  --bg-card: 24 17 42;
+  --bg-tertiary: 38 28 64;
+
+  --text-main: 236 228 255;
+  --text-secondary: 165 150 200;
+
+  --accent: 255 92 190;
+  --accent-hover: 255 128 206;
+  --accent-muted: 255 92 190;
+
+  --success: 52 211 153;
+  --warning: 251 191 36;
+  --info: 34 211 238;
+  --danger: 251 113 133;
+  --chart-2: 34 211 238;
+}
+
+/* ============================================
+   CATPPUCCIN (Mocha): pastel lavender on soft navy
+   ============================================ */
+[data-theme="catppuccin"] {
+  --bg-main: 30 30 46;
+  --bg-header: 24 24 37;
+  --bg-card: 37 37 56;
+  --bg-tertiary: 49 50 68;
+
+  --text-main: 205 214 244;
+  --text-secondary: 166 173 200;
+
+  --accent: 180 190 254;
+  --accent-hover: 200 207 255;
+  --accent-muted: 180 190 254;
+
+  --success: 166 227 161;
+  --warning: 249 226 175;
+  --info: 116 199 236;
+  --danger: 243 139 168;
+  --chart-2: 249 226 175;
+}
+
+/* ============================================
+   GRUVBOX: retro warm, orange on charcoal
+   ============================================ */
+[data-theme="gruvbox"] {
+  --bg-main: 40 40 40;
+  --bg-header: 29 32 33;
+  --bg-card: 50 48 47;
+  --bg-tertiary: 80 73 69;
+
+  --text-main: 235 219 178;
+  --text-secondary: 168 153 132;
+
+  --accent: 254 128 25;
+  --accent-hover: 255 152 64;
+  --accent-muted: 254 128 25;
+
+  --success: 184 187 38;
+  --warning: 250 189 47;
+  --info: 131 165 152;
+  --danger: 255 110 90;
+  --chart-2: 250 189 47;
+}
+
+/* ============================================
+   ROSÉ PINE: dusty rose on pine night
+   ============================================ */
+[data-theme="rose-pine"] {
+  --bg-main: 25 23 36;
+  --bg-header: 21 19 31;
+  --bg-card: 31 29 46;
+  --bg-tertiary: 38 35 58;
+
+  --text-main: 224 222 244;
+  --text-secondary: 144 140 170;
+
+  --accent: 235 188 186;
+  --accent-hover: 242 205 203;
+  --accent-muted: 235 188 186;
+
+  --success: 52 211 153;
+  --warning: 246 193 119;
+  --info: 156 207 216;
+  --danger: 235 111 146;
+  --chart-2: 246 193 119;
+}
+
+/* ============================================
+   OLED: near-black for OLED screens, neutral accent
+   ============================================ */
+[data-theme="oled"] {
+  --bg-main: 3 3 4;
+  --bg-header: 2 2 3;
+  --bg-card: 12 12 15;
+  --bg-tertiary: 26 26 32;
+
+  --text-main: 235 236 240;
+  --text-secondary: 150 152 160;
+
+  --accent: 235 236 240;
+  --accent-hover: 250 250 252;
+  --accent-muted: 235 236 240;
+
+  --success: 34 197 94;
+  --warning: 245 158 11;
+  --info: 96 165 250;
+  --danger: 239 68 68;
+  --chart-2: 245 158 11;
+}
+
+/* ============================================
+   OCEAN: aqua on deep sea; success is lime, not the accent
+   ============================================ */
+[data-theme="ocean"] {
+  --bg-main: 7 22 28;
+  --bg-header: 4 16 21;
+  --bg-card: 12 32 40;
+  --bg-tertiary: 20 48 58;
+
+  --text-main: 214 236 240;
+  --text-secondary: 128 162 170;
+
+  --accent: 45 212 191;
+  --accent-hover: 94 234 212;
+  --accent-muted: 45 212 191;
+
+  --success: 163 230 53;
+  --warning: 251 191 36;
+  --info: 125 211 252;
+  --danger: 251 113 133;
+  --chart-2: 251 191 36;
+}
+
+/* ============================================
+   TERMINAL: phosphor green on black; success is cyan
+   ============================================ */
+[data-theme="terminal"] {
+  --bg-main: 5 10 7;
+  --bg-header: 2 6 4;
+  --bg-card: 10 20 14;
+  --bg-tertiary: 18 34 24;
+
+  --text-main: 190 240 200;
+  --text-secondary: 110 160 125;
+
+  --accent: 74 222 128;
+  --accent-hover: 134 239 172;
+  --accent-muted: 74 222 128;
+
+  --success: 34 211 238;
+  --warning: 250 204 21;
+  --info: 147 197 253;
+  --danger: 248 113 113;
+  --chart-2: 250 204 21;
+}
+
+/* ============================================
+   SAKURA (light): cherry pink on blossom white
+   ============================================ */
+[data-theme="sakura"] {
+  --ink: 40 20 30;
+  --bg-main: 250 238 243;
+  --bg-header: 253 244 248;
+  --bg-card: 255 250 252;
+  --bg-tertiary: 244 222 232;
+
+  --text-main: 52 30 40;
+  --text-secondary: 120 85 100;
+
+  --accent: 190 24 93;
+  --accent-hover: 157 23 77;
+  --accent-muted: 190 24 93;
+
+  --success: 22 101 52;
+  --warning: 146 64 14;
+  --info: 29 78 216;
+  --danger: 185 28 28;
+  --chart-2: 180 83 9;
+}
+
+/* ============================================
+   ARCTIC (light): deep teal on ice
+   ============================================ */
+[data-theme="arctic"] {
+  --ink: 15 25 35;
+  --bg-main: 232 240 245;
+  --bg-header: 240 246 250;
+  --bg-card: 248 251 253;
+  --bg-tertiary: 214 226 234;
+
+  --text-main: 20 34 46;
+  --text-secondary: 76 98 114;
+
+  --accent: 15 118 110;
+  --accent-hover: 17 94 89;
+  --accent-muted: 15 118 110;
+
+  --success: 22 101 52;
+  --warning: 146 64 14;
+  --info: 29 78 216;
+  --danger: 185 28 28;
+  --chart-2: 180 83 9;
+}
+
+/* ============================================
+   DAXTER (Jak and Daxter): ottsel orange on warm brown; blue and green eco
+   ============================================ */
+[data-theme="daxter"] {
+  --bg-main: 27 17 11;
+  --bg-header: 20 12 7;
+  --bg-card: 40 27 18;
+  --bg-tertiary: 60 41 28;
+
+  --text-main: 250 236 214;
+  --text-secondary: 196 164 128;
+
+  --accent: 255 155 55;
+  --accent-hover: 255 178 96;
+  --accent-muted: 255 155 55;
+
+  --success: 132 220 80;
+  --warning: 250 204 21;
+  --info: 90 180 255;
+  --danger: 248 113 113;
+  --chart-2: 90 180 255;
+}
+
+/* ============================================
+   BENTLEY (Sly Cooper): turtle green on midnight navy noir
+   ============================================ */
+[data-theme="bentley"] {
+  --bg-main: 13 17 32;
+  --bg-header: 9 12 24;
+  --bg-card: 21 27 48;
+  --bg-tertiary: 33 41 68;
+
+  --text-main: 226 232 244;
+  --text-secondary: 140 152 180;
+
+  --accent: 160 208 90;
+  --accent-hover: 184 226 120;
+  --accent-muted: 160 208 90;
+
+  --success: 45 212 191;
+  --warning: 251 191 36;
+  --info: 129 140 248;
+  --danger: 248 113 113;
+  --chart-2: 251 191 36;
+}
+
+/* ============================================
+   CLANK (Ratchet & Clank): gunmetal body, green eyes, red antenna light
+   ============================================ */
+[data-theme="clank"] {
+  --bg-main: 22 25 30;
+  --bg-header: 16 18 22;
+  --bg-card: 33 38 46;
+  --bg-tertiary: 48 55 66;
+
+  --text-main: 222 228 236;
+  --text-secondary: 150 160 174;
+
+  --accent: 110 231 150;
+  --accent-hover: 150 240 180;
+  --accent-muted: 110 231 150;
+
+  --success: 56 189 248;
+  --warning: 251 191 36;
+  --info: 165 180 252;
+  --danger: 255 95 95;
+  --chart-2: 251 191 36;
+}
+
+/* ============================================
+   BLACK OPS II: hot safety orange on cold near-black
+   ============================================ */
+[data-theme="black-ops-2"] {
+  --bg-main: 9 10 12;
+  --bg-header: 5 6 7;
+  --bg-card: 20 22 25;
+  --bg-tertiary: 34 37 42;
+
+  --text-main: 236 238 240;
+  --text-secondary: 150 154 160;
+
+  --accent: 255 102 0;
+  --accent-hover: 255 133 51;
+  --accent-muted: 255 102 0;
+
+  --success: 34 197 94;
+  --warning: 250 204 21;
+  --info: 96 165 250;
+  --danger: 248 113 113;
+  --chart-2: 250 204 21;
+}
+
+/* ============================================
+   SAN ANDREAS: Grove Street green on smoggy Los Santos sepia
+   ============================================ */
+[data-theme="san-andreas"] {
+  --bg-main: 23 19 13;
+  --bg-header: 17 14 9;
+  --bg-card: 35 29 20;
+  --bg-tertiary: 54 45 31;
+
+  --text-main: 240 230 210;
+  --text-secondary: 176 160 130;
+
+  --accent: 88 190 90;
+  --accent-hover: 120 210 120;
+  --accent-muted: 88 190 90;
+
+  --success: 56 189 248;
+  --warning: 250 204 21;
+  --info: 147 197 253;
+  --danger: 248 113 113;
+  --chart-2: 250 204 21;
+}
+
+/* ============================================
+   SNAKE EATER (Metal Gear Solid 3): olive drab, khaki and tan; codec green
+   ============================================ */
+[data-theme="snake-eater"] {
+  --bg-main: 21 23 15;
+  --bg-header: 15 17 10;
+  --bg-card: 32 35 23;
+  --bg-tertiary: 48 52 35;
+
+  --text-main: 226 220 196;
+  --text-secondary: 160 156 128;
+
+  --accent: 204 172 112;
+  --accent-hover: 222 194 140;
+  --accent-muted: 204 172 112;
+
+  --success: 132 204 22;
+  --warning: 251 146 60;
+  --info: 110 220 190;
+  --danger: 248 113 113;
+  --chart-2: 110 220 190;
 }
 
 /* ============================================
@@ -289,59 +614,82 @@
   transform: scale(1.05);
 }
 
-.button-dark {
-  background-color: rgb(15 16 20);
-  border: 1px solid rgb(80 80 90);
-  color: rgb(225 228 235);
+/*
+   Spotlight surface: a soft glow in the theme's accent that follows the
+   pointer (useSpotlight sets --spot-x/--spot-y). Hover devices only.
+*/
+.spotlight {
+  position: relative;
+  isolation: isolate;
 }
-.button-dark:hover {
-  border-color: rgb(100 100 110);
-  background-color: rgb(20 21 26);
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    360px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgb(var(--accent) / 0.12),
+    transparent 60%
+  );
 }
-
-.button-light {
-  background-color: rgb(225 235 238);
-  border: 1px solid rgb(45 130 145);
-  color: rgb(30 35 45);
-}
-.button-light:hover {
-  border-color: rgb(35 115 130);
-}
-
-.button-blue {
-  background-color: rgb(10 15 28);
-  border: 1px solid rgb(59 130 246);
-  color: rgb(218 228 245);
-}
-.button-blue:hover {
-  border-color: rgb(96 165 250);
-}
-
-.button-purple {
-  background-color: rgb(18 12 32);
-  border: 1px solid rgb(168 85 247);
-  color: rgb(225 220 242);
-}
-.button-purple:hover {
-  border-color: rgb(192 110 255);
+@media (hover: hover) {
+  .spotlight:hover::after {
+    opacity: 1;
+  }
 }
 
-.button-green {
-  background-color: rgb(10 18 10);
-  border: 1px solid rgb(132 184 80);
-  color: rgb(212 224 212);
-}
-.button-green:hover {
-  border-color: rgb(152 204 100);
+/*
+   Home on a tall desktop screen, Overview open: exactly one screen. Stats
+   keeps its size; Recently played and the profile share what is left, and
+   Recently played scrolls inside if it runs short. Other sections, shorter
+   screens and phones keep the page scrolling as usual.
+*/
+@media (min-width: 1024px) and (min-height: 1000px) {
+  .home-fit:has([data-stats-section="overview"]) { height: calc(100dvh - 4rem); }
+  .home-fit:has([data-stats-section="overview"]) > .home-fit-top { grid-template-rows: minmax(0, 1fr); }
+  .home-fit:has([data-stats-section="overview"]) .home-fit-side > * { flex: 1 1 0%; }
+  .home-fit:has([data-stats-section="overview"]) .home-fit-scroll { overflow-y: auto; }
+  /* The daily chart sets the height of the charts row (the heatmap follows its box): scaled to the screen here. */
+  .home-fit:has([data-stats-section="overview"]) .home-fit-chart { height: clamp(160px, 20dvh, 260px); }
+  /* The rows carry flex: 1 1 0 inline (ROW_STYLE). Here they may grow to share spare height but never shrink: short of room, the list scrolls. */
+  .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * { flex: 1 0 auto !important; }
+  /* A row taller than its content keeps the content in the middle, not stuck to the top. */
+  .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * > * { justify-content: center; }
 }
 
-.button-red {
-  background-color: rgb(28 12 14);
-  border: 1px solid rgb(224 60 80);
-  color: rgb(248 232 232);
+/* Heatmap: the cells come in column by column, oldest week first (--col is the week). */
+@keyframes heat-in {
+  from { opacity: 0; transform: scale(0.4); }
+  to { opacity: 1; transform: scale(1); }
 }
-.button-red:hover {
-  border-color: rgb(240 80 100);
+@media (prefers-reduced-motion: no-preference) {
+  .heat-cell {
+    animation: heat-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--col, 0) * 12ms);
+  }
+}
+
+/*
+   Heatmap loading: a wave of the theme's accent sweeping the empty grid
+   diagonally, oldest corner to today (--col is the week, --row the day).
+   Still under reduced motion.
+*/
+.heat-loading {
+  background-color: rgb(var(--bg-header));
+}
+@keyframes heat-wave {
+  0%, 60%, 100% { background-color: rgb(var(--bg-header)); }
+  25% { background-color: rgb(var(--accent) / 0.45); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .heat-loading {
+    animation: heat-wave 2.2s ease-in-out infinite;
+    animation-delay: calc((var(--col, 0) + var(--row, 0)) * 45ms);
+  }
 }
 
 /* Auth collage: columns of game art drifting up and down, opposite ways. */

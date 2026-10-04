@@ -25,7 +25,7 @@ test('an RA badge links to its RA page', () => {
 
   const link = screen.getByRole('link', { name: 'Beat it — Zelda' })
   expect(link).toHaveAttribute('href', '/gameInfo/1')
-  expect(screen.getByAltText('Beat it')).toHaveAttribute('src', 'https://media.retroachievements.org/Badge/12345.png')
+  expect(screen.getByRole('link', { name: /Beat it/ }).querySelector('img')).toHaveAttribute('src', 'https://media.retroachievements.org/Badge/12345.png')
 })
 
 test('a Steam badge links to its Steam page and uses the URL it carries', () => {
@@ -33,7 +33,7 @@ test('a Steam badge links to its Steam page and uses the URL it carries', () => 
 
   const link = screen.getByRole('link', { name: 'Win — Portal 2' })
   expect(link).toHaveAttribute('href', '/steamGame/620')
-  expect(screen.getByAltText('Win')).toHaveAttribute('src', 'https://cdn/win.jpg')
+  expect(screen.getByRole('link', { name: /Win/ }).querySelector('img')).toHaveAttribute('src', 'https://cdn/win.jpg')
 })
 
 test('both platforms on one day render side by side', () => {
@@ -41,5 +41,5 @@ test('both platforms on one day render side by side', () => {
   render(<StreakDayRow date="2024-03-02" achievements={[RA, { ...STEAM, AchievementID: 7 }]} />)
 
   expect(screen.getAllByRole('link')).toHaveLength(2)
-  expect(screen.getByText(`2 ${en.streak.achievements}`)).toBeInTheDocument()
+  expect(screen.getByText("2 achievements")).toBeInTheDocument()
 })

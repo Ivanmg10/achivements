@@ -57,3 +57,23 @@ test('passes size and classes through', () => {
   expect(img(container)?.className).toContain('rounded-xl')
   expect(img(container)?.className).toContain('object-cover')
 })
+
+test('a portrait cover cut to a square keeps its top, where the title is', () => {
+  const { container } = render(<SteamGameImage appId={620} size={56} />)
+  expect(container.querySelector('img')).toHaveClass('object-top')
+})
+
+test('a landscape header is centred as before', () => {
+  const { container } = render(<SteamGameImage appId={620} asset="header" size={56} />)
+  expect(container.querySelector('img')).not.toHaveClass('object-top')
+})
+
+test('the square icon comes first and falls back to the cover', () => {
+  const { container } = render(<SteamGameImage appId={620} asset="icon" size={56} />)
+  expect(img(container)?.getAttribute('src')).toBe('/api/steam/icon?appid=620')
+  expect(img(container)).not.toHaveClass('object-top')
+
+  fireEvent.error(img(container)!)
+  expect(img(container)?.getAttribute('src')).toBe(`${CDN}/library_600x900.jpg`)
+  expect(img(container)).toHaveClass('object-top')
+})

@@ -14,8 +14,11 @@ import pool from '@/lib/db'
  * 'password-check' counts wrong current passwords typed by someone already
  * signed in (changing the password or the email), keyed by the account: it
  * stops a stolen session from guessing its way to the password.
+ *
+ * 'avatar' counts uploads per account: an avatar is small, but each one is a
+ * write of up to 512 KB to the database.
  */
-export type AttemptScope = 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check'
+export type AttemptScope = 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'avatar'
 
 const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   signup: { max: 5, windowMinutes: 60 },
@@ -23,6 +26,7 @@ const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   login: { max: 10, windowMinutes: 15 },
   'login-ip': { max: 50, windowMinutes: 15 },
   'password-check': { max: 10, windowMinutes: 15 },
+  avatar: { max: 20, windowMinutes: 60 },
 }
 
 type HeaderSource = Headers | Record<string, string | string[] | undefined>

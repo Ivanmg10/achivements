@@ -3,7 +3,8 @@ import {
   toSteamGameProgress,
   withAchievementCounts,
   toSteamAchievements,
-  withPlayerAchievementCounts,
+  countUnlocks,
+  withUnlockCounts,
   toGlobalPctMap,
   toSteamGameDetails,
   STEAM_PLATFORM,
@@ -40,7 +41,7 @@ describe('toSteamGameProgress', () => {
       _source: 'steam',
       id: 730,
       title: 'Counter-Strike 2',
-      imageIcon: 'https://media.steampowered.com/steamcommunity/public/images/apps/730/iconhash.jpg',
+      imageIcon: '/api/steam/icon?appid=730',
       consoleName: STEAM_PLATFORM,
       maxPossible: 0,
       numAwarded: 0,
@@ -57,7 +58,7 @@ describe('toSteamGameProgress', () => {
   test('fills in defaults when Steam omits optional fields', () => {
     const sparse = toSteamGameProgress({ appid: 999, playtime_forever: 0 })
     expect(sparse.title).toBe('App 999')
-    expect(sparse.imageIcon).toBe('')
+    expect(sparse.imageIcon).toBe('/api/steam/icon?appid=999')
     expect(sparse.imgLogoUrl).toBe('')
     expect(sparse.playtime2Weeks).toBe(0)
     expect(sparse.lastPlayed).toBeNull()
@@ -169,20 +170,21 @@ describe('toSteamAchievements', () => {
   })
 })
 
-describe('withPlayerAchievementCounts', () => {
+describe('countUnlocks / withUnlockCounts', () => {
   const base = toSteamGameProgress(GAME)
 
   test('counts from the unlock list alone', () => {
-    const result = withPlayerAchievementCounts(base, [
+    const counts = countUnlocks([
       { apiname: 'A', achieved: 1, unlocktime: 1 },
       { apiname: 'B', achieved: 0, unlocktime: 0 },
       { apiname: 'C', achieved: 1, unlocktime: 1 },
     ])
-    expect(result).toMatchObject({ maxPossible: 3, numAwarded: 2, pctWon: 66.67, achievementsLoaded: true })
+    expect(counts).toEqual({ total: 3, awarded: 2 })
+    expect(withUnlockCounts(base, counts)).toMatchObject({ maxPossible: 3, numAwarded: 2, pctWon: 66.67, achievementsLoaded: true })
   })
 
   test('leaves the game unloaded on an empty list — unknown, not zero', () => {
-    expect(withPlayerAchievementCounts(base, [])).toBe(base)
+    expect(withUnlockCounts(base, countUnlocks([]))).toBe(base)
   })
 })
 
@@ -279,6 +281,6 @@ describe('toRecentAchievement', () => {
       Source: 'steam',
       BadgeUrl: 'https://cdn/win.jpg',
     })
-    expect(mapped.GameIconUrl).toContain('/620/header.jpg')
+    expect(mapped.GameIconUrl).toBe('/api/steam/icon?appid=620')
   })
 })

@@ -104,11 +104,11 @@ export default function FavoriteGameModal({
         >
           <div className="absolute top-[12%] left-1/2 -translate-x-1/2 w-full max-w-xl px-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl overflow-hidden border border-white/5"
+              className="bg-bg-card rounded-2xl shadow-2xl overflow-hidden border border-ink/5"
               variants={contentVariants}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center gap-3 px-4 py-3.5 border-b border-white/5">
+              <div className="flex items-center gap-3 px-4 py-3.5 border-b border-ink/5">
                 <IconSearch className="w-5 h-5 text-text-secondary shrink-0" aria-hidden />
                 <input
                   ref={inputRef}
@@ -129,7 +129,7 @@ export default function FavoriteGameModal({
               </div>
 
               {current && (
-                <div className="flex items-center gap-3 px-4 py-2.5 border-b border-white/5 bg-accent/5">
+                <div className="flex items-center gap-3 px-4 py-2.5 border-b border-ink/5 bg-accent/5">
                   {current.imageIcon ? (
                     <Image
                       src={candidateIconUrl({ source, imageRef: current.imageIcon })}
@@ -140,7 +140,7 @@ export default function FavoriteGameModal({
                       unoptimized
                     />
                   ) : (
-                    <div className="w-7 h-7 rounded bg-white/10 shrink-0" aria-hidden="true" />
+                    <div className="w-7 h-7 rounded bg-ink/10 shrink-0" aria-hidden="true" />
                   )}
                   <span className="flex-1 text-sm font-medium text-accent line-clamp-1">{current.title}</span>
                   <button
@@ -154,7 +154,7 @@ export default function FavoriteGameModal({
               )}
 
               {error && (
-                <p role="alert" className="px-4 py-2 text-xs text-red-400 border-b border-white/5">
+                <p role="alert" className="px-4 py-2 text-xs text-red-400 border-b border-ink/5">
                   {T.userData.favoriteGameError}
                 </p>
               )}

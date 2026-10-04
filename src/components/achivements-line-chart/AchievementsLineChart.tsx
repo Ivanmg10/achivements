@@ -1,22 +1,20 @@
 'use client'
 
-import { useState } from 'react'
-import { AnimatePresence } from 'framer-motion'
+import { useId, useMemo, useState } from 'react'
+import { AnimatePresence, useReducedMotion } from 'framer-motion'
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { RecentAchievement } from '@/types/types'
-import { groupByDay } from '@/utils/utils'
+import { groupByDaySource } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
+import AchivementsLineChartTooltip from './achivements-line-chart-tooltip/AchivementsLineChartTooltip'
 
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
-
+/**
+ * The last seven days of unlocks as a line in the theme's accent, with a soft
+ * fill fading down from it. A dot marks each day that had any; the tooltip
+ * splits a day into RA and Steam. Above it the week's total and its best day.
+ * Clicking a day opens what was unlocked on it.
+ */
 export default function AchievementsLineChart({
   achievements,
   isLoading,
@@ -24,10 +22,20 @@ export default function AchievementsLineChart({
   achievements: RecentAchievement[]
   isLoading?: boolean
 }) {
-  const data = groupByDay(achievements)
-  const total = data.reduce((sum, d) => sum + d.count, 0)
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
+  const reduce = useReducedMotion()
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+
+  const data = useMemo(() => groupByDaySource(achievements, 7), [achievements])
+  const total = data.reduce((sum, d) => sum + d.total, 0)
+  const best = Math.max(...data.map((d) => d.total))
+  const fillId = `daily-fill-${useId().replace(/:/g, '')}`
+  const today = data[data.length - 1]?.date
+
+  const tick = (date: string) =>
+    date === today
+      ? T.lineChart.today
+      : new Date(date + 'T00:00:00').toLocaleDateString(lang, { weekday: 'short', day: 'numeric' })
 
   function handleChartClick(payload: { activeLabel?: string | number } | null) {
     const label = payload?.activeLabel
@@ -35,69 +43,85 @@ export default function AchievementsLineChart({
   }
 
   return (
-    <div className="w-full">
-      <p className="text-text-secondary text-sm px-4 pb-3">
-        {T.lineChart.achievementsLast7Days.replace('{total}', String(total))}
-      </p>
+    <div className="w-full flex flex-col gap-3">
+      <div className="flex items-end justify-between gap-3 flex-wrap px-1">
+        <p className="flex items-baseline gap-2">
+          <span className="text-3xl font-bold tabular-nums leading-none text-text-main">{total}</span>
+          <span className="text-xs text-text-secondary">{total === 1 ? T.lineChart.last7DaysOne : T.lineChart.last7Days}</span>
+        </p>
+        <div className="flex items-center gap-3 text-[11px] text-text-secondary">
+          {best > 0 && <span>{T.lineChart.bestDay.replace('{n}', String(best))}</span>}
+        </div>
+      </div>
+
       {isLoading ? (
-        <div className="px-4 h-85 flex flex-col justify-end gap-1 animate-pulse">
-          <div className="flex items-end gap-2 h-70">
+        <div className="home-fit-chart px-1 h-64 flex flex-col justify-end gap-1 animate-pulse">
+          <div className="flex items-end gap-2 h-56">
             {[45, 70, 30, 90, 55, 20, 80].map((h, i) => (
-              <div key={i} className="flex-1 bg-white/10 rounded-t-sm" style={{ height: `${h}%` }} />
+              <div key={i} className="flex-1 bg-ink/10 rounded-t-md" style={{ height: `${h}%` }} />
             ))}
           </div>
           <div className="flex gap-2">
             {Array.from({ length: 7 }).map((_, i) => (
-              <div key={i} className="flex-1 h-3 bg-white/10 rounded" />
+              <div key={i} className="flex-1 h-3 bg-ink/10 rounded" />
             ))}
           </div>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={340}>
-          <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }} onClick={handleChartClick} style={{ cursor: 'pointer' }}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="rgb(var(--bg-header))"
-            />
+        <div className="home-fit-chart h-[260px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={data} margin={{ top: 8, right: 8, left: -24, bottom: 0 }} onClick={handleChartClick} style={{ cursor: 'pointer' }}>
+            <defs>
+              <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgb(var(--accent))" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="rgb(var(--accent))" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} strokeDasharray="3 4" stroke="rgb(var(--text-secondary) / 0.15)" />
             <XAxis
               dataKey="date"
-              tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 12 }}
-              tickFormatter={/* istanbul ignore next */ (val: string) => val.slice(5)}
+              tickLine={false}
+              axisLine={false}
+              tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 11 }}
+              tickFormatter={/* istanbul ignore next */ tick}
             />
             {/* A flat 0 week still needs a real 0–1 axis, not an empty band. */}
             <YAxis
-              tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 12 }}
+              tickLine={false}
+              axisLine={false}
+              width={48}
+              tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 11 }}
               allowDecimals={false}
-              domain={total === 0 ? [0, 1] : undefined}
+              domain={total === 0 ? [0, 1] : [0, 'auto']}
             />
             <Tooltip
-              contentStyle={{
-                backgroundColor: 'rgb(var(--bg-card))',
-                border: '1px solid rgb(var(--bg-header))',
-                borderRadius: '8px',
-              }}
-              labelStyle={{ color: 'rgb(var(--text-main))' }}
-              formatter={/* istanbul ignore next */ (value) => [`${value} ${T.lineChart.achievements}`, '']}
+              cursor={{ stroke: 'rgb(var(--text-secondary) / 0.35)', strokeDasharray: '3 3' }}
+              content={<AchivementsLineChartTooltip />}
             />
-            <Line
+            <Area
               type="monotone"
-              dataKey="count"
+              dataKey="total"
               stroke="rgb(var(--accent))"
-              strokeWidth={2}
-              dot={{ fill: 'rgb(var(--accent))', r: 4 }}
-              activeDot={{ r: 6 }}
+              strokeWidth={2.5}
+              fill={`url(#${fillId})`}
+              dot={/* istanbul ignore next */ (p: { cx?: number; cy?: number; payload?: { total: number }; index?: number }) =>
+                p.payload && p.payload.total > 0 ? (
+                  <circle key={p.index} cx={p.cx} cy={p.cy} r={4} fill="rgb(var(--accent))" stroke="rgb(var(--bg-card))" strokeWidth={2} />
+                ) : (
+                  <g key={p.index} />
+                )
+              }
+              activeDot={{ r: 6, fill: 'rgb(var(--accent))', stroke: 'rgb(var(--bg-card))', strokeWidth: 2 }}
+              isAnimationActive={!reduce}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
+        </div>
       )}
 
       <AnimatePresence>
         {selectedDate && (
-          <DayAchievementsModal
-            date={selectedDate}
-            achievements={achievements}
-            onClose={() => setSelectedDate(null)}
-          />
+          <DayAchievementsModal date={selectedDate} achievements={achievements} onClose={() => setSelectedDate(null)} />
         )}
       </AnimatePresence>
     </div>
