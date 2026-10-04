@@ -60,7 +60,7 @@ export default function StreakList({ selectedStreak }: { selectedStreak: Streak 
   const shown = day ?? selectedStreak.end
 
   return (
-    <section aria-labelledby="streak-days-title" className="bg-bg-card rounded-2xl p-5 flex flex-col gap-5">
+    <section aria-labelledby="streak-days-title" className="flex-1 bg-bg-card rounded-2xl p-5 flex flex-col gap-5">
       <div className="flex items-baseline gap-2 flex-wrap">
         <h2 id="streak-days-title" className="text-sm uppercase tracking-widest text-text-secondary">
           {T.streak.listTitle}
@@ -74,12 +74,12 @@ export default function StreakList({ selectedStreak }: { selectedStreak: Streak 
       </div>
 
       {/* Calendar and the picked day side by side when there is room; stacked otherwise. */}
-      <div className="grid gap-5 2xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] 2xl:items-start">
-        <div className="flex flex-col gap-2 w-full max-w-sm">
+      <div className="flex flex-col md:flex-row gap-5 md:items-start">
+        <div className="flex flex-col gap-2 shrink-0">
           <StreakCalendar start={selectedStreak.start} end={selectedStreak.end} counts={counts} selected={shown} onSelect={setDay} />
           <p className="text-xs text-text-secondary">{T.streak.calendarHint}</p>
         </div>
-        <div className="border-t border-ink/5 pt-5 2xl:border-t-0 2xl:pt-0 2xl:border-l 2xl:pl-5 min-w-0">
+        <div className="flex-1 border-t border-ink/5 pt-5 md:border-t-0 md:pt-0 md:border-l md:pl-5 min-w-0">
           <StreakDayRow date={shown} achievements={byDate[shown] ?? []} awards={streakAwards[shown]} />
         </div>
       </div>

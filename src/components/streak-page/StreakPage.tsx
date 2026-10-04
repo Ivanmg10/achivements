@@ -34,12 +34,12 @@ export default function StreakPage() {
     body = <EmptyState icon={<IconFlame className="w-7 h-7" />} title={T.streak.noData} subtitle={T.streak.noDataSub} className="min-h-[50vh]" />
   else
     body = (
-      <div className="grid gap-5 xl:grid-cols-2 xl:items-start">
+      <div className="grid gap-5 xl:grid-cols-2">
         <div className="flex flex-col gap-5 min-w-0">
           <StreakStatsBanner activeStreak={activeStreak} bestStreak={bestStreak} totalStreaks={streaks.length} lastActiveDay={lastActiveDay} />
           <StreakChart streaks={streaks} selectedStreak={selectedStreak} onSelect={setPicked} />
         </div>
-        <div className="min-w-0 xl:sticky xl:top-20">
+        <div className="min-w-0 flex flex-col">
           {/* Keyed by streak: picking another one starts its calendar on its last day. */}
           <StreakList key={selectedStreak?.start ?? 'none'} selectedStreak={selectedStreak} />
         </div>

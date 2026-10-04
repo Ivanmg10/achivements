@@ -1,6 +1,10 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { daysBetween, formatDay, plural } from '@/utils/utils'
 
+// A day's square: fixed, so a long streak grows the calendar down, never wide.
+const CELL = '2.5rem'
+const COLUMNS = { gridTemplateColumns: `repeat(7, ${CELL})` }
+
 // Mondays first; 2026-06-01 is a Monday, so these seven days name the columns.
 const WEEK = ['2026-06-01', '2026-06-02', '2026-06-03', '2026-06-04', '2026-06-05', '2026-06-06', '2026-06-07']
 
@@ -30,14 +34,14 @@ export default function StreakCalendar({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="grid grid-cols-7 gap-1.5" aria-hidden="true">
+      <div className="grid gap-1.5" style={COLUMNS} aria-hidden="true">
         {WEEK.map((d) => (
           <span key={d} className="text-[10px] uppercase tracking-wider text-text-secondary text-center">
             {formatDay(d, lang, { weekday: 'narrow' })}
           </span>
         ))}
       </div>
-      <div role="group" aria-label={T.streak.calendarTitle} className="grid grid-cols-7 gap-1.5">
+      <div role="group" aria-label={T.streak.calendarTitle} className="grid gap-1.5" style={COLUMNS}>
         {Array.from({ length: lead }).map((_, i) => (
           <span key={`lead-${i}`} />
         ))}
@@ -55,7 +59,7 @@ export default function StreakCalendar({
               aria-pressed={isSelected}
               aria-label={`${formatDay(day, lang, { weekday: 'long', day: 'numeric', month: 'long' })}: ${plural(n, T.plurals.achievements, lang)}`}
               title={plural(n, T.plurals.achievements, lang)}
-              className={`aspect-square rounded-lg flex items-center justify-center text-xs font-semibold tabular-nums transition-[box-shadow,transform] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+              className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs font-semibold tabular-nums transition-[box-shadow,transform] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
                 isSelected ? 'ring-2 ring-accent' : ''
               } ${alpha > 0.5 ? 'text-bg-main' : 'text-text-main'}`}
               style={{ backgroundColor: `rgb(var(--accent) / ${alpha})` }}
