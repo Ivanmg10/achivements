@@ -47,3 +47,7 @@ test('only preview deployments let in Vercel’s toolbar', async () => {
   expect(csp).toContain('frame-src https://vercel.live')
   delete process.env.VERCEL_ENV
 })
+
+test('builds never reuse Turbopack’s file-system cache (it shipped a stale globals.css)', () => {
+  expect(nextConfig.experimental?.turbopackFileSystemCacheForBuild).toBe(false)
+})

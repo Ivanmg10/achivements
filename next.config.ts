@@ -47,6 +47,13 @@ const nextConfig: NextConfig = {
   // The build type-checks the app, not the tests: from Next 16.3 it would check
   // everything tsconfig.json includes, and the tests are Jest's to run.
   typescript: { tsconfigPath: "tsconfig.build.json" },
+  experimental: {
+    // Off: Vercel restores .next/cache between deploys, and Turbopack's build
+    // cache served a stale globals.css from it. Production shipped without the
+    // newer theme tokens (every ring-ink/* utility missing, so card outlines
+    // fell back to solid white). A clean build produces the right CSS.
+    turbopackFileSystemCacheForBuild: false,
+  },
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },
