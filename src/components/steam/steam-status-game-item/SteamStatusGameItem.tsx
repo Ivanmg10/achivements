@@ -15,6 +15,7 @@ import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import { steamAssetUrl } from '@/lib/steamClient'
 import type { SteamGameProgress } from '@/types/steam'
+import ExpandPanel from '@/components/expand-panel/ExpandPanel'
 
 /**
  * A Steam game on a category page, laid out like RA's StatusGameItem so the
@@ -131,8 +132,8 @@ export default function SteamStatusGameItem({
         </span>
       </div>
 
-      {open && (
-        <div id={panelId} className="border-t border-bg-main px-4 py-4">
+      <ExpandPanel open={open} id={panelId}>
+        <div className="border-t border-bg-main px-4 py-4">
           {game.hasStats ? (
             <SteamGameItemAchievements
               appId={game.id}
@@ -145,7 +146,7 @@ export default function SteamStatusGameItem({
             <p className="text-center text-text-secondary text-sm py-2">{T.steam.noAchievements}</p>
           )}
         </div>
-      )}
+      </ExpandPanel>
     </div>
   )
 }

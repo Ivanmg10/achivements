@@ -17,6 +17,7 @@ import { SectionFallback } from '@/components/ui/SectionFallback'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { unlockSpan } from '@/utils/utils'
+import ExpandPanel from '@/components/expand-panel/ExpandPanel'
 
 // About three rows at two columns on a wide screen; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
@@ -219,8 +220,8 @@ export default function StatusGameItem({
         </div>
       </div>
 
-      {open && (
-        <div id={panelId} className="border-t border-bg-main px-4 py-4">
+      <ExpandPanel open={open} id={panelId}>
+        <div className="border-t border-bg-main px-4 py-4">
           {loading ? (
             <div className="flex flex-wrap gap-1">
               {Array.from({ length: total > 0 ? total : 12 }).map((_, i) => (
@@ -250,7 +251,7 @@ export default function StatusGameItem({
             </div>
           )}
         </div>
-      )}
+      </ExpandPanel>
     </div>
   )
 }

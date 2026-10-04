@@ -16,6 +16,7 @@ export function useMasonryLayout(itemCount: number, requestedColumns: number, ga
   const itemRefs = useRef<(HTMLDivElement | null)[]>([])
   const [positions, setPositions] = useState<MasonryPosition[]>([])
   const [containerHeight, setContainerHeight] = useState(0)
+  const assignment = useRef<{ key: string; cols: number[]; measured: boolean } | null>(null)
 
   const setItemRef = useCallback(
     (index: number) => (el: HTMLDivElement | null) => {
@@ -31,17 +32,30 @@ export function useMasonryLayout(itemCount: number, requestedColumns: number, ga
     const columns = effectiveColumns(containerWidth, requestedColumns)
     const colWidth = columns > 0 ? (containerWidth - gap * (columns - 1)) / columns : 0
     const colHeights = new Array(columns).fill(0)
+    const heights = Array.from({ length: itemCount }, (_, i) => itemRefs.current[i]?.offsetHeight ?? 0)
 
+    // Each item keeps its column while only heights change (a card opening or
+    // closing): re-picking the shortest column on every frame of that made
+    // cards hop between columns mid-animation. Columns are chosen again when
+    // the list or the column count changes, or once every item has a height.
+    const key = `${itemCount}:${columns}`
+    const kept = assignment.current
+    const reuse = kept && kept.key === key && kept.measured
+    const cols: number[] = reuse ? kept.cols : []
     const next: MasonryPosition[] = []
     for (let i = 0; i < itemCount; i++) {
-      const height = itemRefs.current[i]?.offsetHeight ?? 0
-      let col = 0
-      for (let c = 1; c < columns; c++) {
-        if (colHeights[c] < colHeights[col]) col = c
+      let col = cols[i]
+      if (!reuse) {
+        col = 0
+        for (let c = 1; c < columns; c++) {
+          if (colHeights[c] < colHeights[col]) col = c
+        }
+        cols[i] = col
       }
       next.push({ top: colHeights[col], left: col * (colWidth + gap), width: colWidth })
-      colHeights[col] += height + gap
+      colHeights[col] += heights[i] + gap
     }
+    if (!reuse) assignment.current = { key, cols, measured: heights.every((h) => h > 0) }
 
     setPositions(next)
     setContainerHeight(itemCount === 0 ? 0 : Math.max(0, ...colHeights) - gap)
@@ -57,29 +71,23 @@ export function useMasonryLayout(itemCount: number, requestedColumns: number, ga
     )
     if (targets.length === 0) return
 
-    // A resizing item (e.g. an expanding achievement grid) fires this on every
-    // animation frame. Recalculating — and retargeting every card's Framer
-    // layout animation — on each of those frames is what causes the stutter,
-    // so we only react once at the start of the resize and once after it settles.
-    let settleTimeout: ReturnType<typeof setTimeout> | null = null
-    let isResizing = false
+    // A card opening or closing resizes on every animation frame; the cards
+    // below follow it frame by frame (at most one layout pass per frame), so
+    // they slide along instead of jumping when it settles or overlapping it.
+    let frame = 0
     const handleResize = () => {
-      if (!isResizing) {
-        isResizing = true
+      if (frame) return
+      frame = requestAnimationFrame(() => {
+        frame = 0
         recalculate()
-      }
-      if (settleTimeout) clearTimeout(settleTimeout)
-      settleTimeout = setTimeout(() => {
-        isResizing = false
-        recalculate()
-      }, 120)
+      })
     }
 
     const observer = new ResizeObserver(handleResize)
     targets.forEach((el) => observer.observe(el))
     return () => {
       observer.disconnect()
-      if (settleTimeout) clearTimeout(settleTimeout)
+      cancelAnimationFrame(frame)
     }
   }, [recalculate, itemCount])
 
