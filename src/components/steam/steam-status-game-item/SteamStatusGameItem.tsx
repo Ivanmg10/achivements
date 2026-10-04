@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState, type CSSProperties } from 'react'
+import { useId, useState } from 'react'
 import Link from 'next/link'
 import { IconClock } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
@@ -27,16 +27,11 @@ import ExpandPanel from '@/components/expand-panel/ExpandPanel'
  *
  * Cover and title open the game page; everything else in the card is the
  * expand button (RA's card is a clickable div — here it is a real button).
- * `itemRef`/`style` let a masonry list position it, as with RA cards.
  */
 export default function SteamStatusGameItem({
   game,
-  itemRef,
-  style,
 }: {
   game: SteamGameProgress
-  itemRef?: (el: HTMLDivElement | null) => void
-  style?: CSSProperties
 }) {
   const { T, lang } = useLanguage()
   const [open, setOpen] = useState(false)
@@ -59,8 +54,6 @@ export default function SteamStatusGameItem({
 
   return (
     <div
-      ref={itemRef}
-      style={style}
       onPointerMove={onPointerMove}
       className="spotlight bg-bg-card rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow duration-150"
     >

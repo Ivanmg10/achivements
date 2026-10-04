@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useId, useState, type CSSProperties } from 'react'
+import { useId, useState } from 'react'
 import { RetroAchievement } from '@/types/types'
 import { CategoryGame } from '../../hooks/useGamesByCategory'
 import { GameExtraData } from './StatusGameList'
@@ -38,14 +38,10 @@ export default function StatusGameItem({
   game,
   extra,
   category,
-  itemRef,
-  style,
 }: {
   game: CategoryGame
   extra?: GameExtraData
   category?: string
-  itemRef?: (el: HTMLDivElement | null) => void
-  style?: CSSProperties
 }) {
   const [open, setOpen] = useState(false)
   const { T, lang } = useLanguage()
@@ -86,8 +82,6 @@ export default function StatusGameItem({
 
   return (
     <div
-      ref={itemRef}
-      style={style}
       onPointerMove={onPointerMove}
       className="spotlight bg-bg-card rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow duration-150"
     >

@@ -121,14 +121,6 @@ describe('expanding', () => {
   })
 })
 
-test('takes a ref and style so a masonry list can position it', () => {
-  const ref = jest.fn()
-  const { container } = render(
-    <SteamStatusGameItem game={game()} itemRef={ref} style={{ position: 'absolute', top: 12 }} />,
-  )
-  expect(ref).toHaveBeenCalledWith(container.firstChild)
-  expect((container.firstChild as HTMLElement).style.top).toBe('12px')
-})
 
 test('can be pinned as a Steam game, like RA cards', () => {
   render(<SteamStatusGameItem game={game()} />)

@@ -1,6 +1,5 @@
 import { CategoryGame } from '../../hooks/useGamesByCategory'
 import { UserAward } from '@/types/types'
-import { useMasonryLayout } from '@/hooks/useMasonryLayout'
 import StatusGameItem from './StatusGameItem'
 import { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 
@@ -12,8 +11,19 @@ export type GameExtraData = {
   scoreAchievedHardcore?: number
 }
 
-const MASONRY_GAP = 12
+// Columns the grid control asks for, fewer on narrower screens.
+export const STATUS_GRID_COLS: Record<StatusGridCols, string> = {
+  1: 'grid-cols-1',
+  2: 'grid-cols-1 md:grid-cols-2',
+  3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+}
 
+/**
+ * A status list as a plain grid, in reading order. Closed cards are all the
+ * same height, so rows line up; an opened card grows its own row, and the
+ * cards beside it stay where they are (aligned to the top) rather than being
+ * moved around while it animates.
+ */
 export default function StatusGameList({
   games,
   extraData,
@@ -25,27 +35,10 @@ export default function StatusGameList({
   category?: string
   gridCols?: StatusGridCols
 }) {
-  const { containerRef, setItemRef, positions, containerHeight } = useMasonryLayout(
-    games.length,
-    gridCols,
-    MASONRY_GAP,
-  )
-
   return (
-    <div ref={containerRef} className="relative w-full" style={{ height: containerHeight }}>
-      {games.map((g, i) => (
-        <StatusGameItem
-          key={g.ID ?? g.GameID}
-          game={g}
-          extra={extraData?.get(g.GameID ?? (g.ID as number))}
-          category={category}
-          itemRef={setItemRef(i)}
-          style={
-            positions[i]
-              ? { position: 'absolute', top: positions[i].top, left: positions[i].left, width: positions[i].width }
-              : { position: 'absolute', top: 0, left: 0, width: 0, visibility: 'hidden' }
-          }
-        />
+    <div className={`grid gap-3 items-start w-full ${STATUS_GRID_COLS[gridCols]}`}>
+      {games.map((g) => (
+        <StatusGameItem key={g.ID ?? g.GameID} game={g} extra={extraData?.get(g.GameID ?? (g.ID as number))} category={category} />
       ))}
     </div>
   )

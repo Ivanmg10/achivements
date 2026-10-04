@@ -22,7 +22,8 @@ test('renders without crashing with empty list', () => {
   expect(container.firstChild).toBeInTheDocument()
 })
 
-test('positions items absolutely within a relatively-positioned container', () => {
+test('a plain grid in reading order, as many columns as asked for', () => {
   const { container } = render(<StatusGameList games={mockGames} gridCols={3} />)
-  expect(container.firstChild).toHaveClass('relative')
+  expect(container.firstChild).toHaveClass('grid', 'lg:grid-cols-3', 'items-start')
+  expect([...(container.firstChild as HTMLElement).children].map((c) => c.textContent)).toEqual(['Sly Cooper', 'Jak 2'])
 })
