@@ -4,6 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { useSession } from 'next-auth/react'
 import { psnErrorFrom, type PsnError } from '@/hooks/usePsnLink'
 import type { PsnGameProgress } from '@/types/psn'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 type PsnGamesCtx = {
   isLinked: boolean
@@ -30,6 +32,7 @@ const Ctx = createContext<PsnGamesCtx>({
  */
 export function PsnGamesDataProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
+  const subject = useSubject()
   const accountId = session?.user?.psnaccountid ?? null
 
   const [library, setLibrary] = useState<PsnGameProgress[]>([])
@@ -45,7 +48,7 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
     setLibraryLoading(true)
     setLibraryError(null)
     try {
-      const res = await fetch('/api/psn/titles', { cache: 'no-store' })
+      const res = await fetch(withSubject('/api/psn/titles', subject), { cache: 'no-store' })
       if (gen !== generation.current) return
       if (!res.ok) {
         setLibraryError(await psnErrorFrom(res))
@@ -64,7 +67,7 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
         setLoadedFor(forId)
       }
     }
-  }, [])
+  }, [subject])
 
   useEffect(() => {
     if (!accountId) {

@@ -8,6 +8,8 @@ import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { toRecentAchievement } from '@/utils/steamMappers'
 import { usePsnRecentTrophies } from '@/hooks/usePsnRecentTrophies'
 import { psnToRecentAchievement } from '@/utils/psnMappers'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 type CtxType = {
   achievements: RecentAchievement[]
@@ -30,6 +32,7 @@ const byDateDesc = (a: RecentAchievement, b: RecentAchievement) => b.Date.locale
  */
 export function ActivityHeatmapYearProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
+  const subject = useSubject()
   const rausername = session?.user?.rausername
   const steamid = session?.user?.steamid
   const [raAchievements, setRaAchievements] = useState<RecentAchievement[]>([])
@@ -54,7 +57,7 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setRaError(true); setRaLoading(false) }
       }
-      fetchWithRetry('/api/getActivityHeatmapYear')
+      fetchWithRetry(withSubject('/api/getActivityHeatmapYear', subject))
         .then((data) => {
           if (!Array.isArray(data)) return onFail()
           setRaAchievements(data as RecentAchievement[])
@@ -64,7 +67,7 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
         .catch(onFail)
     }
     run()
-  }, [rausername])
+  }, [rausername, subject])
 
   useEffect(() => {
     if (!rausername) { setRaLoading(false); return }

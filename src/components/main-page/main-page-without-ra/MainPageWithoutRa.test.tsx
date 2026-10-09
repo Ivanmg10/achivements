@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react'
 import MainPageWithoutRa from './MainPageWithoutRa'
-import { en } from '@/translations/en'
 
 jest.mock('@/components/recent-games-list/RecentGamesList', () => ({
   __esModule: true,
@@ -10,16 +9,20 @@ jest.mock('../main-page-profile/MainPageProfile', () => ({
   __esModule: true,
   default: () => <div data-testid="steam-profile">profile</div>,
 }))
+jest.mock('../main-page-charts/MainPageCharts', () => ({
+  __esModule: true,
+  default: () => <div data-testid="charts">charts</div>,
+}))
+
+test('shows the stats section below, so PSN or Steam alone gets stats', () => {
+  render(<MainPageWithoutRa />)
+  expect(screen.getByTestId('charts')).toBeInTheDocument()
+})
 
 test('shows the recent feed and the profile column', () => {
   render(<MainPageWithoutRa />)
   expect(screen.getByTestId('steam-recent')).toBeInTheDocument()
   expect(screen.getByTestId('steam-profile')).toBeInTheDocument()
-})
-
-test('links RetroAchievements right there, without going to settings', () => {
-  render(<MainPageWithoutRa />)
-  expect(screen.getByRole('button', { name: new RegExp(en.steam.connectRa) })).toBeInTheDocument()
 })
 
 test('puts the profile first in the DOM so it tops the page on mobile', () => {

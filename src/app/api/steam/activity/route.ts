@@ -8,7 +8,7 @@ import type { SteamRecentAchievement } from '@/types/steam'
 
 /** Every Steam unlock of the last 60 days — the main page's activity charts in Steam mode. */
 export async function GET(req: NextRequest) {
-  const auth = await requireSteamSession()
+  const auth = await requireSteamSession(req)
   if (!auth.ok) return auth.response
   const { id, steamid } = auth.session
   const lang = parseSteamLanguage(req.nextUrl.searchParams.get('lang'))

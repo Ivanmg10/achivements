@@ -31,7 +31,8 @@ export default function CollectionGrid({
   allGames: PerfectGame[]
   dates: Map<string, string>
   order: string[]
-  onSaveOrder: (order: string[]) => Promise<void>
+  /** Absent when the order is someone else's: it can be read, not changed. */
+  onSaveOrder?: (order: string[]) => Promise<void>
 }) {
   const { T } = useLanguage()
   const [filter, setFilter] = useState<PerfectFilter>('all')
@@ -58,7 +59,7 @@ export default function CollectionGrid({
               { value: 'order', label: T.cards.viewMyOrder },
             ]}
           />
-          {view === 'order' && (
+          {view === 'order' && onSaveOrder && (
             <button
               onClick={() => setEditOpen(true)}
               aria-label={T.cards.reorderMasteredAria}
@@ -114,7 +115,9 @@ export default function CollectionGrid({
         </div>
       )}
 
-      <PerfectGamesOrderModal isOpen={editOpen} onClose={() => setEditOpen(false)} games={allGames} order={order} onSaveOrder={onSaveOrder} />
+      {onSaveOrder && (
+        <PerfectGamesOrderModal isOpen={editOpen} onClose={() => setEditOpen(false)} games={allGames} order={order} onSaveOrder={onSaveOrder} />
+      )}
     </div>
   )
 }

@@ -3,6 +3,8 @@ import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { toSteamLanguage } from '@/utils/steamLanguage'
 import type { SteamRecentAchievement } from '@/types/steam'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 const ENDPOINTS = {
   recent: 'recentAchievements',
@@ -21,6 +23,7 @@ export type SteamUnlockScope = keyof typeof ENDPOINTS
 export function useSteamRecentAchievements(scope: SteamUnlockScope | null = 'recent') {
   const endpoint = scope ? ENDPOINTS[scope] : null
   const { data: session } = useSession()
+  const subject = useSubject()
   const steamid = session?.user?.steamid ?? null
   const { lang } = useLanguage()
   const steamLang = toSteamLanguage(lang)
@@ -33,7 +36,7 @@ export function useSteamRecentAchievements(scope: SteamUnlockScope | null = 'rec
     setIsLoading(true)
     setError(null)
     try {
-      const res = await fetch(`/api/steam/${endpoint}?lang=${language}`, { cache: 'no-store' })
+      const res = await fetch(withSubject(`/api/steam/${endpoint}?lang=${language}`, subject), { cache: 'no-store' })
       if (!res.ok) throw new Error(`Failed to load recent achievements (${res.status})`)
       const data = await res.json()
       if (!Array.isArray(data)) throw new Error('Unexpected recent achievements response')
@@ -44,7 +47,7 @@ export function useSteamRecentAchievements(scope: SteamUnlockScope | null = 'rec
     } finally {
       if (isCurrent()) setIsLoading(false)
     }
-  }, [endpoint])
+  }, [endpoint, subject])
 
   useEffect(() => {
     setAchievements([])

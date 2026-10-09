@@ -19,7 +19,7 @@ import type { SteamAppDetailsResponse, SteamSchemaAchievement } from '@/types/st
  * rarity for everyone (24h), unlock state per player (1h).
  */
 export async function GET(req: NextRequest) {
-  const auth = await requireSteamSession()
+  const auth = await requireSteamSession(req)
   if (!auth.ok) return auth.response
   const { apiKey } = auth.session
 

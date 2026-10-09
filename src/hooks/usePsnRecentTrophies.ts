@@ -3,6 +3,8 @@ import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { psnErrorFrom, type PsnError } from '@/hooks/usePsnLink'
 import type { PsnRecentTrophy } from '@/types/psn'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 export type PsnTrophyScope = 'recent' | 'activity' | 'year'
 
@@ -14,6 +16,7 @@ export type PsnTrophyScope = 'recent' | 'activity' | 'year'
  */
 export function usePsnRecentTrophies(scope: PsnTrophyScope | null = 'recent') {
   const { data: session } = useSession()
+  const subject = useSubject()
   const accountId = session?.user?.psnaccountid ?? null
   const { lang } = useLanguage()
   const key = accountId && scope ? `${accountId}:${scope}:${lang}` : null
@@ -30,7 +33,7 @@ export function usePsnRecentTrophies(scope: PsnTrophyScope | null = 'recent') {
       setError(null)
       try {
         const [, forScope, forLang] = forKey.split(':')
-        const res = await fetch(`/api/psn/recentTrophies?scope=${forScope}&lang=${forLang}`, { cache: 'no-store' })
+        const res = await fetch(withSubject(`/api/psn/recentTrophies?scope=${forScope}&lang=${forLang}`, subject), { cache: 'no-store' })
         if (!isCurrent()) return
         if (!res.ok) {
           setError(await psnErrorFrom(res))
@@ -49,7 +52,7 @@ export function usePsnRecentTrophies(scope: PsnTrophyScope | null = 'recent') {
         }
       }
     },
-    [],
+    [subject],
   )
 
   useEffect(() => {

@@ -21,7 +21,7 @@ const GAMES = 80
  * game, so this is the expensive one and it is cached for half an hour.
  */
 export async function GET(req: NextRequest) {
-  const auth = await requireSteamSession()
+  const auth = await requireSteamSession(req)
   if (!auth.ok) return auth.response
   const { id, steamid } = auth.session
   const lang = parseSteamLanguage(req.nextUrl.searchParams.get('lang'))

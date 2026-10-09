@@ -2,14 +2,11 @@ import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
-import { loadUser } from '@/lib/userRecord'
 import { parseAvatarSegment } from '@/lib/avatarImage'
 
 /**
- * An uploaded avatar. Seen by its owner, and by admins (the panel lists
- * users with their pictures); anyone else gets the same 404 as for an id
- * with no picture, so ids cannot be walked to collect them. The admin flag
- * is read fresh from the database, as every admin check is.
+ * An uploaded avatar. Any signed-in user may see it, since it is part of the
+ * profile they can search for and open; signed out gets a 401.
  *
  * Served as the raster type its bytes were checked to be on upload, with
  * nosniff, so a browser never reads it as anything else; the site-wide CSP
@@ -25,11 +22,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ file: s
     const session = await getServerSession(authOptions)
     const viewerId = session?.user?.id
     if (!viewerId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    if (String(ownerId) !== String(viewerId)) {
-      const viewer = await loadUser(viewerId, { fresh: true })
-      if (!viewer?.admin) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-    }
 
     const { rows } = await pool.query('SELECT image, mime FROM user_avatars WHERE user_id = $1', [ownerId])
     if (!rows[0]) return NextResponse.json({ error: 'Not found' }, { status: 404 })

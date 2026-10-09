@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { toSteamLanguage } from '@/utils/steamLanguage'
 import type { SteamAchievementUnified } from '@/types/steam'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 /**
  * Achievements for one Steam game, loaded on demand (when a card is expanded
@@ -13,6 +15,7 @@ import type { SteamAchievementUnified } from '@/types/steam'
  */
 export function useSteamAchievements(appId: number | null) {
   const { lang } = useLanguage()
+  const subject = useSubject()
   const steamLang = toSteamLanguage(lang)
   const key = appId === null ? null : `${appId}|${steamLang}`
 
@@ -32,7 +35,7 @@ export function useSteamAchievements(appId: number | null) {
       return next
     })
     try {
-      const res = await fetch(`/api/steam/achievements?appid=${id}&lang=${language}`)
+      const res = await fetch(withSubject(`/api/steam/achievements?appid=${id}&lang=${language}`, subject))
       if (!res.ok) throw new Error(`Failed to load achievements (${res.status})`)
       const data = await res.json()
       if (!Array.isArray(data)) throw new Error('Unexpected achievements response')
@@ -44,7 +47,7 @@ export function useSteamAchievements(appId: number | null) {
       inFlight.current.delete(k)
       setLoadingKey((current) => (current === k ? null : current))
     }
-  }, [])
+  }, [subject])
 
   useEffect(() => {
     if (appId === null || key === null || byKey.has(key) || errors.has(key)) return

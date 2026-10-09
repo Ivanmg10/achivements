@@ -13,8 +13,8 @@ function byLastPlayedDesc(a: SteamGameProgress, b: SteamGameProgress) {
   return (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? '')
 }
 
-export async function GET() {
-  const auth = await requireSteamSession()
+export async function GET(req?: Request) {
+  const auth = await requireSteamSession(req)
   if (!auth.ok) return auth.response
   const { id, steamid, apiKey } = auth.session
 

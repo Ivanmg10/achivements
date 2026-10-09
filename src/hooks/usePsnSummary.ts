@@ -2,10 +2,13 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { psnErrorFrom, type PsnError } from '@/hooks/usePsnLink'
 import type { PsnSummary } from '@/lib/psnClient'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 /** The linked PSN account's headline numbers: avatar, level, trophies by grade, games. */
 export function usePsnSummary() {
   const { data: session } = useSession()
+  const subject = useSubject()
   const accountId = session?.user?.psnaccountid ?? null
 
   const [summary, setSummary] = useState<PsnSummary | null>(null)
@@ -17,7 +20,7 @@ export function usePsnSummary() {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/psn/summary')
+      const res = await fetch(withSubject('/api/psn/summary', subject))
       if (!res.ok) {
         setError(await psnErrorFrom(res))
         return
@@ -29,7 +32,7 @@ export function usePsnSummary() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [subject])
 
   useEffect(() => {
     if (!accountId) {

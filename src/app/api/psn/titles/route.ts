@@ -3,8 +3,8 @@ import { requirePsnSession } from '@/lib/apiAuth'
 import { psnFailure, psnTitles } from '@/lib/psnClient'
 
 /** Every game in the signed-in user's PSN trophy list. */
-export async function GET() {
-  const auth = await requirePsnSession()
+export async function GET(req?: Request) {
+  const auth = await requirePsnSession(req)
   if (!auth.ok) return auth.response
 
   try {

@@ -3,6 +3,7 @@
 import { createContext, useContext, useMemo } from 'react'
 import { useStoredChoice } from '@/hooks/useStoredChoice'
 import { useRaLinked } from '@/hooks/useRaLinked'
+import { useSubject } from '@/context/SubjectContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 
@@ -26,7 +27,9 @@ const MainPlatformContext = createContext<{
  * linked one, RA first (and RA when nothing is linked at all).
  */
 export function MainPlatformProvider({ children }: { children: React.ReactNode }) {
-  const [stored, setPlatform] = useStoredChoice<MainPlatform>('main-profile-tab', PLATFORMS, 'ra')
+  // On someone else's page the tab is its own choice: it must not change the viewer's.
+  const subject = useSubject()
+  const [stored, setPlatform] = useStoredChoice<MainPlatform>(subject ? 'public-profile-tab' : 'main-profile-tab', PLATFORMS, 'ra')
   const raLinked = useRaLinked()
   const { isLinked: steamLinked } = useSteamGamesData()
   const { isLinked: psnLinked } = usePsnGamesData()

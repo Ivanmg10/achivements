@@ -11,7 +11,7 @@ const DAYS = { activity: 60, year: 366 } as const
  * `year` — the last year, for the streak and the heatmap.
  */
 export async function GET(req: NextRequest) {
-  const auth = await requirePsnSession()
+  const auth = await requirePsnSession(req)
   if (!auth.ok) return auth.response
   const { id, psnaccountid } = auth.session
 

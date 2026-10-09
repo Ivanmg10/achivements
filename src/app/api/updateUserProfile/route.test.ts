@@ -153,3 +153,18 @@ describe('description and gender', () => {
     expect((await POST(request({ field: 'location', value: '' }))).status).toBe(400)
   })
 })
+
+describe('profilePublic', () => {
+  test('is stored as a boolean, in its own column', async () => {
+    expect((await POST(request({ field: 'profilePublic', value: 'false' }))).status).toBe(200)
+    expect(updates()[0][0]).toContain('"profile_public"')
+    expect(updates()[0][1]).toEqual([false, '1'])
+    await POST(request({ field: 'profilePublic', value: 'true' }))
+    expect(updates()[1][1]).toEqual([true, '1'])
+  })
+
+  test('anything but true or false is refused', async () => {
+    expect((await POST(request({ field: 'profilePublic', value: 'maybe' }))).status).toBe(400)
+    expect(updates()).toHaveLength(0)
+  })
+})

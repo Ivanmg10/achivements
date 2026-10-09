@@ -8,7 +8,7 @@ import { getGameInfoAndUserProgress } from "@/lib/raClient";
 const TTL = 10 * 60 * 1000;
 
 export async function GET(request: NextRequest) {
-  const auth = await requireRaSession();
+  const auth = await requireRaSession(request);
   if (!auth.ok) return auth.response;
   const { id, rausername, raid } = auth.session;
 

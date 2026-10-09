@@ -7,7 +7,7 @@ import { forgetUser, loadUser } from '@/lib/userRecord'
 import { sendVerificationEmail } from '@/lib/verificationEmail'
 import { sendEmailChangedNotice } from '@/lib/emailChangedNotice'
 
-const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location', 'description', 'gender'] as const
+const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location', 'description', 'gender', 'profilePublic'] as const
 type AllowedField = (typeof ALLOWED_FIELDS)[number]
 
 const DESCRIPTION_MAX = 280
@@ -95,12 +95,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `Description must be ${DESCRIPTION_MAX} characters or fewer` }, { status: 400 })
     }
 
+    if (field === 'profilePublic' && trimmed !== 'true' && trimmed !== 'false') {
+      return NextResponse.json({ error: 'profilePublic must be true or false' }, { status: 400 })
+    }
+
     if (field === 'gender' && trimmed && !GENDERS.includes(trimmed)) {
       return NextResponse.json({ error: 'Invalid gender' }, { status: 400 })
     }
 
-    const column = field === 'username' ? 'username' : field
-    const valueToStore = field === 'location' ? trimmed.toUpperCase() : trimmed || null
+    const column = field === 'profilePublic' ? 'profile_public' : field
+    const valueToStore = field === 'location' ? trimmed.toUpperCase() : field === 'profilePublic' ? trimmed === 'true' : trimmed || null
     // A new address has not been confirmed yet, whatever the old one was.
     const resetVerified = field === 'email' ? ', email_verified_at = NULL' : ''
     await pool.query(`UPDATE users SET "${column}" = $1${resetVerified} WHERE id = $2`, [valueToStore, session.user.id])

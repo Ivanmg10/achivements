@@ -18,6 +18,8 @@ import PsnGameItem from '@/components/psn/psn-game-item/PsnGameItem'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { mergeRecentFeeds, RecentFeedItem } from '@/utils/steamFeed'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 const MAX_GAMES = 6
 
@@ -35,6 +37,7 @@ const ROW_STYLE = { flex: '1 1 0%' }
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function RARecentlyPlayed() {
   const { T } = useLanguage()
+  const subject = useSubject()
   const reduce = useReducedMotion()
   const { games, isLoading, error, refetch } = useRecentlyPlayedGames()
   const { recent: steamRecent } = useSteamGamesData()
@@ -65,7 +68,7 @@ export default function RARecentlyPlayed() {
     if (!gameDataMap.has(gameId)) {
       setLoadingId(gameId)
       try {
-        const res = await fetch(`/api/getGameProgression?gameId=${gameId}`)
+        const res = await fetch(withSubject(`/api/getGameProgression?gameId=${gameId}`, subject))
         if (!res.ok) throw new Error(`getGameProgression ${res.status}`)
         const data: RetroAchievementsGameWithAchievements = await res.json()
         setGameDataMap((prev) => new Map(prev).set(gameId, data))
@@ -100,7 +103,8 @@ export default function RARecentlyPlayed() {
           )}
         </AnimatePresence>
         <p className="text-2xl font-bold flex-1">{T.cards.recentlyPlayed}</p>
-        <MainViewToggle />
+        {/* Pinned games are the viewer's own, so another user's page has no such view. */}
+        {!subject && <MainViewToggle />}
       </div>
 
       {/* Cards */}

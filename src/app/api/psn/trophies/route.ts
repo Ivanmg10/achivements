@@ -10,7 +10,7 @@ import { isPsnTitleId } from '@/utils/psnTitles'
  * last changed — the cache key. Texts come in the app's language.
  */
 export async function GET(req: NextRequest) {
-  const auth = await requirePsnSession()
+  const auth = await requirePsnSession(req)
   if (!auth.ok) return auth.response
   const { id: userId, psnaccountid } = auth.session
 

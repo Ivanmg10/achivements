@@ -12,7 +12,7 @@ test('fetches the profile for the given username', async () => {
   const { result } = renderHook(() => usePublicUserProfile('alice'))
 
   await waitFor(() => expect(result.current.profile?.User).toBe('alice'))
-  expect(fetch).toHaveBeenCalledWith('/api/public/user/profile?u=alice')
+  expect(fetch).toHaveBeenCalledWith('/api/public/user/profile?user=alice')
 })
 
 test('refetches and clears stale data when the username changes', async () => {

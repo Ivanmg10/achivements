@@ -14,6 +14,7 @@ import { useUserAwards } from '@/hooks/useUserAwards'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { useLanguage } from '@/context/LanguageContext'
 import { useMainPlatform } from '@/context/MainPlatformContext'
+import { useSubject } from '@/context/SubjectContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { usePsnRecentTrophies } from '@/hooks/usePsnRecentTrophies'
@@ -46,6 +47,8 @@ import MainPageGroupsSection from '../main-page-groups-section/MainPageGroupsSec
  */
 export default function MainPageCharts() {
   const { T } = useLanguage()
+  // Someone else's page: their numbers, without the viewer's own pins, groups and library browser.
+  const visitor = useSubject() !== null
   const [section, setSection] = useState('overview')
   const idPrefix = useId().replace(/:/g, '')
   const reduceMotion = useReducedMotion()
@@ -88,8 +91,12 @@ export default function MainPageCharts() {
     { id: 'overview', label: T.cards.sectionOverview, icon: <IconLayoutDashboard size={18} /> },
     { id: 'activity', label: T.cards.sectionActivity, icon: <IconActivity size={18} /> },
     { id: 'collection', label: T.cards.sectionCollection, icon: <IconAward size={18} /> },
-    { id: 'groups', label: T.cards.sectionGroups, icon: <IconFolders size={18} /> },
-    { id: 'browse', label: T.cards.sectionBrowse, icon: <IconCompass size={18} /> },
+    ...(visitor
+      ? []
+      : [
+          { id: 'groups', label: T.cards.sectionGroups, icon: <IconFolders size={18} /> },
+          { id: 'browse', label: T.cards.sectionBrowse, icon: <IconCompass size={18} /> },
+        ]),
   ]
 
   const panels: Record<string, ReactNode> = {
@@ -151,9 +158,11 @@ export default function MainPageCharts() {
           </SectionFallback>
         </ChartCard>
         {/* Pinned achievements beside it, across the rest: the list can run long. */}
-        <ChartCard className="md:col-span-2">
-          <MainPageFavorites />
-        </ChartCard>
+        {!visitor && (
+          <ChartCard className="md:col-span-2">
+            <MainPageFavorites />
+          </ChartCard>
+        )}
       </div>
     ),
     collection: (

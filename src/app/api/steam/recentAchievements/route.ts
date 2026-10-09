@@ -8,7 +8,7 @@ import type { SteamRecentAchievement } from '@/types/steam'
 
 /** The player's latest Steam unlocks, for the profile column — like RA's recent achievements. */
 export async function GET(req: NextRequest) {
-  const auth = await requireSteamSession()
+  const auth = await requireSteamSession(req)
   if (!auth.ok) return auth.response
   const { id, steamid } = auth.session
   const lang = parseSteamLanguage(req.nextUrl.searchParams.get('lang'))

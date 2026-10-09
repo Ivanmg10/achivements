@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { psnErrorFrom, type PsnError } from '@/hooks/usePsnLink'
 import type { PsnTrophy, PsnTrophyGroup } from '@/types/psn'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 /**
  * One PSN game's trophies and trophy groups (base game, each DLC) for the
@@ -10,6 +12,7 @@ import type { PsnTrophy, PsnTrophyGroup } from '@/types/psn'
  */
 export function usePsnTrophies(titleId: string | null) {
   const { lang } = useLanguage()
+  const subject = useSubject()
   const key = titleId ? `${titleId}:${lang}` : null
   const [trophies, setTrophies] = useState<PsnTrophy[]>([])
   const [groups, setGroups] = useState<PsnTrophyGroup[]>([])
@@ -24,7 +27,7 @@ export function usePsnTrophies(titleId: string | null) {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await fetch(`/api/psn/trophies?id=${encodeURIComponent(titleId)}&lang=${lang}`)
+      const res = await fetch(withSubject(`/api/psn/trophies?id=${encodeURIComponent(titleId)}&lang=${lang}`, subject))
       if (!res.ok) {
         setError(await psnErrorFrom(res))
         return
@@ -40,7 +43,7 @@ export function usePsnTrophies(titleId: string | null) {
       setIsLoading(false)
       setLoadedFor(`${titleId}:${lang}`)
     }
-  }, [titleId, lang])
+  }, [titleId, lang, subject])
 
   useEffect(() => {
     if (!key || hasFetched.current === key) return

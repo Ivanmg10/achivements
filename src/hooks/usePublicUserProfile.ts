@@ -2,11 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { RetroAchievementsUserProfile } from '@/types/types'
 
 /**
- * Someone's RA profile, for their public page. `error` tells apart a user RA
+ * A CheevoVault user's RA profile, for their public page. `error` tells apart a user RA
  * does not know ('missing') from RA not answering ('failed', worth a retry):
  * saying "not found" when RA was only down sends visitors away for nothing.
  */
-export function usePublicUserProfile(raUsername: string) {
+export function usePublicUserProfile(username: string) {
   const [profile, setProfile] = useState<RetroAchievementsUserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<'missing' | 'failed' | null>(null)
@@ -16,7 +16,7 @@ export function usePublicUserProfile(raUsername: string) {
     setProfile(null)
     setError(null)
     setIsLoading(true)
-    fetch(`/api/public/user/profile?u=${encodeURIComponent(u)}`)
+    fetch(`/api/public/user/profile?user=${encodeURIComponent(u)}`)
       .then((r) => {
         if (r.status === 404) return null
         if (!r.ok) throw new Error(`profile ${r.status}`)
@@ -34,12 +34,12 @@ export function usePublicUserProfile(raUsername: string) {
   }, [])
 
   useEffect(() => {
-    if (!raUsername || fetchedFor.current === raUsername) return
-    fetchedFor.current = raUsername
-    load(raUsername)
-  }, [raUsername, load])
+    if (!username || fetchedFor.current === username) return
+    fetchedFor.current = username
+    load(username)
+  }, [username, load])
 
-  const retry = useCallback(() => load(raUsername), [load, raUsername])
+  const retry = useCallback(() => load(username), [load, username])
 
   return { profile, isLoading, error, retry }
 }

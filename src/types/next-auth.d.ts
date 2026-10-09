@@ -29,6 +29,8 @@ type SessionUserFields = {
   raUser?: RetroAchievementsUserProfile | null;
   location?: string | null;
   description?: string | null;
+  /** Whether other users may find and open this profile. */
+  profilePublic?: boolean;
   gender?: 'male' | 'female' | 'neutral' | null;
   favorite_game?: SavedGame;
   favorite_steam_game?: SavedGame;

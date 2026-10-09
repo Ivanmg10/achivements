@@ -1,26 +1,19 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { IconPlugConnected } from '@tabler/icons-react'
 import { fadeUp } from '@/lib/animations'
-import { useState } from 'react'
-import { useLanguage } from '@/context/LanguageContext'
-import RaLoginModal from '@/components/ra-login-modal/RaLoginModal'
-import RaLogo from '@/components/ra-logo/RaLogo'
 import RecentGamesList from '@/components/recent-games-list/RecentGamesList'
 import MainPageProfile from '../main-page-profile/MainPageProfile'
+import MainPageCharts from '../main-page-charts/MainPageCharts'
 
 /**
- * Main page for a user with Steam or PSN linked but no RA account. The regular
- * main page is built on RA data throughout (charts, progression, pinned
- * games), so rather than a page of empty RA widgets this shows what Steam and
- * PSN can back — the recent feed and their profiles, as tabs when both are
- * linked — plus a pointer to link RA as well.
+ * Main page for a user with Steam or PSN linked but no RA account. The top is
+ * the recent feed and the profiles (tabs when both are linked); below it, the
+ * same stats section as everyone's. Its RA hooks stay empty without an account
+ * and the platform selector falls back to the linked one, so what shows is
+ * Steam's or PSN's.
  */
 export default function MainPageWithoutRa() {
-  const { T } = useLanguage()
-  const [raModalOpen, setRaModalOpen] = useState(false)
-
   return (
     <motion.main
       className="flex flex-col min-h-full text-text-main"
@@ -32,17 +25,6 @@ export default function MainPageWithoutRa() {
         {/* Profile first in DOM → top on mobile; placed col-2 on desktop */}
         <div className="lg:col-start-2 lg:row-start-1 m-3 flex flex-col gap-3">
           <MainPageProfile />
-          <div className="flex flex-col items-start gap-2 p-4 bg-bg-card rounded-xl">
-            <IconPlugConnected className="w-6 h-6 text-text-secondary" aria-hidden="true" />
-            <p className="text-sm text-text-secondary">{T.steam.steamOnlyHint}</p>
-            <button
-              onClick={() => setRaModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-1.5 bg-accent text-bg-main font-semibold rounded-xl hover:bg-accent-hover transition-colors text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-            >
-              <RaLogo height={13} />
-              {T.steam.connectRa}
-            </button>
-          </div>
         </div>
 
         <div className="flex flex-col min-h-0 lg:col-start-1 lg:row-start-1">
@@ -52,7 +34,7 @@ export default function MainPageWithoutRa() {
         </div>
       </div>
 
-      <RaLoginModal isOpen={raModalOpen} setIsOpen={setRaModalOpen} />
+      <MainPageCharts />
     </motion.main>
   )
 }

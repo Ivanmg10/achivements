@@ -34,6 +34,7 @@ function tokenFields(row: UserRecord) {
     location: row.location ?? null,
     description: row.description ?? null,
     gender: row.gender ?? null,
+    profilePublic: row.profile_public !== false,
     favorite_game: row.favorite_game ?? null,
     favorite_steam_game: row.favorite_steam_game ?? null,
     favorite_psn_game: row.favorite_psn_game ?? null,
@@ -128,6 +129,7 @@ export const authOptions: NextAuthOptions = {
         session.user.location = token.location;
         session.user.description = token.description;
         session.user.gender = token.gender;
+        session.user.profilePublic = token.profilePublic;
         session.user.favorite_game = token.favorite_game;
         session.user.favorite_steam_game = token.favorite_steam_game;
         session.user.favorite_psn_game = token.favorite_psn_game;

@@ -105,7 +105,9 @@ function CommentRow({ comment }: { comment: GameComment }) {
   return (
     <div className="flex items-start gap-3">
       <Link
-        href={`/user/${comment.User}`}
+        href={`https://retroachievements.org/user/${encodeURIComponent(comment.User)}`}
+        target="_blank"
+        rel="noopener noreferrer"
         className="shrink-0"
         tabIndex={-1}
         aria-hidden="true"
@@ -121,7 +123,9 @@ function CommentRow({ comment }: { comment: GameComment }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
           <Link
-            href={`/user/${comment.User}`}
+            href={`https://retroachievements.org/user/${encodeURIComponent(comment.User)}`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-sm font-medium hover:underline"
           >
             {comment.User}

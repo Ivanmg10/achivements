@@ -2,9 +2,12 @@ import { UserRankAndScore } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 export function useUserRank() {
   const { data: session } = useSession()
+  const subject = useSubject()
   const [rank, setRank] = useState<UserRankAndScore | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -21,7 +24,7 @@ export function useUserRank() {
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
-      fetchWithRetry('/api/getUserRankAndScore')
+      fetchWithRetry(withSubject('/api/getUserRankAndScore', subject))
         .then((data) => {
           if (!data || typeof data !== 'object' || Array.isArray(data) || !('Rank' in data)) return onFail()
           setRank(data as UserRankAndScore)
@@ -31,7 +34,7 @@ export function useUserRank() {
         .catch(onFail)
     }
     run()
-  }, [session?.user?.rausername])
+  }, [session?.user?.rausername, subject])
 
   useEffect(() => {
     if (!session?.user?.rausername) { setIsLoading(false); return }
