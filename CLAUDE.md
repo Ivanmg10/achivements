@@ -243,6 +243,24 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
 - The privacy policy (`/privacy`) says all of this; `/terms` says when an
   account may be suspended or deleted. Change the policy if the panel changes.
 
+## RetroAchievements (RA) — read before touching its calls
+
+- **The cache already lives in Postgres.** `withCache` (`src/lib/raCache.ts`)
+  keeps memory as a first level and `steam_cache` as the second, under `ra:`
+  keys, so a cold start or another instance does not ask RA again. Skipped in
+  development, where memory is cleared on purpose. Bump a key's `_vN` when the
+  shape of what it returns changes.
+- **A 429 waits.** `fetchRA` honours `Retry-After` up to `MAX_RETRY_AFTER`
+  (5 s) and retries; a longer ask is thrown. Other 4xx are never retried.
+- **Whose key.** Never a shared app key (see the roadmap). On the user's own
+  page the call uses their `raid`; `requireViewerApiKey` never falls back to
+  another key. On someone else's page `dataOwner` (`src/lib/apiAuth.ts`) signs
+  with the **viewer's** key when they have one, and otherwise with the **page
+  owner's**, so a viewer with no RA account still sees it. That last case
+  spends one user's key on other people's visits; it is an open question for RA,
+  not something settled. `raid` stays server-only either way.
+- The user search (`/api/users/search`) only reads our database; it never calls RA.
+
 ## PlayStation (PSN) — read before touching it
 
 Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient.ts`.
@@ -304,13 +322,14 @@ Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — a
       link or SteamID64 (`src/lib/steamAccount.ts`), no OpenID, and no
       "already linked elsewhere" check (`migrations/028`), so one person can
       have several CheevoVault accounts. The profile has to be public.
-- [ ] RA by name too, through one app key (`RA_API_KEY`) instead of each
-      user's. **Not before** RA's cache moves to the DB (it is per-instance
-      memory now, so every cold start asks RA again) and a 429 waits for
-      `Retry-After`: every user's calls would come out of one key, and RA's
-      limit is unpublished. Ask in RA's Discord `#coders` before opening it up.
-      Until then the RA modal says why the key is asked for. Then one search
-      box that looks a name up on all three.
+- [ ] RA: wait for the API v2 with OAuth before changing how accounts are
+      linked ([RAWeb releases](https://github.com/RetroAchievements/RAWeb/releases)).
+      **RA's answer was clear: each user with their own key.** No shared app
+      key and no looking names up with one — `requireViewerApiKey` never falls
+      back to one, and its test says so. The RA modal explains why the key is
+      asked for. **Open:** a viewer with no RA account is served with the page
+      owner's key (see RetroAchievements above); ask RA whether that counts, and
+      if not, ask the viewer to link their own. Revisit when OAuth lands.
 - [ ] Later, optional: a "verified" badge per linked account — the app gives
       a code, the user puts it for a few minutes in their RA motto / Steam
       summary / PSN About me, the app reads it. Only if public profiles or

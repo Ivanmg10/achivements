@@ -610,6 +610,8 @@ export const ja: Translations = {
     signIn: 'RetroAchievementsでログイン',
     playingNow: '現在プレイ中',
     viewOnRA: 'RAで見る',
+    refreshData: 'データを更新',
+    refreshFailed: '更新できませんでした。もう一度お試しください。',
   },
   lineChart: {
     achievementsLast7Days: '過去7日間で{total}件の実績',

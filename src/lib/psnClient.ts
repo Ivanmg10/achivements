@@ -252,7 +252,7 @@ export async function psnSummary(accountId: string, userId: string | null = null
         games: titles.totalItemCount ?? 0,
       }
     },
-    { userId },
+    { userId, refreshable: true },
   )
 }
 
@@ -501,7 +501,7 @@ export async function psnTitles(accountId: string, userId: string | null = null)
       }
       return withIgdbArt(await withBaseGameProgress(accountId, list, userId))
     },
-    { userId },
+    { userId, refreshable: true },
   )
 }
 

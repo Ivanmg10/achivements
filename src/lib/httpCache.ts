@@ -13,6 +13,7 @@ import { NextResponse } from 'next/server'
 export function cachedJson<T>(data: T, ttlMs: number): NextResponse {
   const maxAge = Math.max(0, Math.floor(ttlMs / 1000))
   return NextResponse.json(data, {
-    headers: { 'Cache-Control': `private, max-age=${maxAge}` },
+    // Vary: the refresh button sets a cookie, and its refetch must not be answered from this copy.
+    headers: { 'Cache-Control': `private, max-age=${maxAge}`, Vary: 'Cookie' },
   })
 }

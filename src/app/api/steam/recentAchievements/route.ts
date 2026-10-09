@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
       `steamRecentAch:${steamid}:${lang}`,
       TTL.recentlyPlayed,
       () => loadRecentAchievements(auth.session, lang),
-      { userId: id },
+      { userId: id, refreshable: true },
     )
     // Not browser-cached, like the other Steam lists; the DB cache keeps it cheap.
     return cachedJson(achievements, 0)

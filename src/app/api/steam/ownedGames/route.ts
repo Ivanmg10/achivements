@@ -41,7 +41,7 @@ export async function GET(req?: Request) {
         return result.games.sort((a, b) => b.playtimeForever - a.playtimeForever)
       },
       // An unfinished fill is not cached, so the next request carries on with it.
-      { userId: id, shouldCache: () => complete },
+      { userId: id, shouldCache: () => complete, refreshable: true },
     )
 
     // No browser caching: the list changes as counts fill in, and a copy held

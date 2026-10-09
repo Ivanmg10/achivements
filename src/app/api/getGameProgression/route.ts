@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
       TTL,
       () => getGameInfoAndUserProgress(rausername, raid, gameId),
       (d) => d !== null && typeof d === 'object' && 'ID' in d,
+      { refreshable: true },
     );
 
     if (!data || typeof data !== 'object' || !('ID' in data)) {

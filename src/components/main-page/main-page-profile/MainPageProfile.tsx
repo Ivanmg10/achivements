@@ -9,6 +9,7 @@ import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useMainPlatform, MainPlatform } from '@/context/MainPlatformContext'
+import { useSubject } from '@/context/SubjectContext'
 
 import MainPageProfileRa from './main-page-profile-ra/MainPageProfileRa'
 import MainPageProfileSt from './main-page-profile-st/MainPageProfileSt'
@@ -24,11 +25,26 @@ const TABS: Record<MainPlatform, ProfileTab<MainPlatform>> = {
 }
 
 export default function MainPageProfile() {
-  const { data: session } = useSession()
+  const { data: session, update } = useSession()
+  const subject = useSubject()
   const { platform: tab, setPlatform: setTab, linked } = useMainPlatform()
   const lastGameId = session?.user?.raUser?.LastGameID?.toString() ?? null
-  const { game, isLoading: gameLoading } = useGameProgression(lastGameId)
-  const { achievements: recentAchievements, isLoading: achievementsLoading } = useRecentAchievements()
+  const { game, isLoading: gameLoading, refetch: refetchGame } = useGameProgression(lastGameId)
+  const {
+    achievements: recentAchievements,
+    isLoading: achievementsLoading,
+    refetch: refetchAchievements,
+  } = useRecentAchievements()
+
+  // Points and picture live on the user's row: the server re-reads them from RA,
+  // then update() brings the session up to date. Throws, so the button can say so.
+  const refreshRa = async () => {
+    refetchGame()
+    refetchAchievements()
+    const res = await fetch('/api/updateRaUser', { method: 'PUT' })
+    if (!res.ok) throw new Error(`Failed to refresh RA profile (${res.status})`)
+    await update()
+  }
 
   const profiles: Record<MainPlatform, ReactNode> = {
     ra: (
@@ -38,6 +54,8 @@ export default function MainPageProfile() {
         gameLoading={gameLoading}
         recentAchievements={recentAchievements}
         achievementsLoading={achievementsLoading}
+        // Someone else's page has nothing of the viewer's to refresh.
+        onRefresh={subject ? undefined : refreshRa}
       />
     ),
     steam: <MainPageProfileSt />,

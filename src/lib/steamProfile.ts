@@ -33,6 +33,6 @@ export function loadSteamProfile(steamid: string, apiKey: string, userId: string
       const player = firstPlayer(summaries)
       return player ? { ...player, level } : null
     },
-    { userId, shouldCache: (p) => p !== null },
+    { userId, shouldCache: (p) => p !== null, refreshable: true },
   )
 }

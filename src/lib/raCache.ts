@@ -1,10 +1,18 @@
-type Entry = { data: unknown; expiresAt: number }
+import { readCache, writeCache } from './steamCache'
+import { MIN_REFRESH_AGE_MS, wantsFresh } from './wantsFresh'
+
+type Entry = { data: unknown; expiresAt: number; storedAt: number }
 
 const store = new Map<string, Entry>()
 const inFlight = new Map<string, Promise<unknown>>()
 
 export const MAX_CACHE_ENTRIES = 5000
 const SWEEP_INTERVAL_MS = 10 * 60 * 1000
+const MEMORY_REUSE_MS = 60 * 1000
+const DB_PREFIX = 'ra:'
+// Development clears memory on purpose (a route's transform may have changed);
+// the shared table would hand back the old shape, so it is skipped there.
+const USE_DB = process.env.NODE_ENV !== 'development'
 
 if (process.env.NODE_ENV === 'development') {
   store.clear()
@@ -50,29 +58,40 @@ export async function withCache<T>(
   ttlMs: number,
   fetcher: () => Promise<T>,
   shouldCache?: (data: T) => boolean,
+  options: { refreshable?: boolean } = {},
 ): Promise<T> {
+  // The refresh button may replace an entry older than MIN_REFRESH_AGE_MS; see wantsFresh.
+  const maxAge = options.refreshable && (await wantsFresh()) ? MIN_REFRESH_AGE_MS : undefined
   const hit = store.get(key)
-  if (hit && Date.now() < hit.expiresAt) return hit.data as T
+  if (hit && Date.now() < hit.expiresAt && (maxAge === undefined || Date.now() - hit.storedAt < maxAge)) {
+    return hit.data as T
+  }
 
   // Stampede prevention: reuse in-flight promise for concurrent requests
   const existing = inFlight.get(key)
   if (existing) return existing as Promise<T>
 
-  const promise = fetcher()
-    .then((data) => {
-      if (shouldCache && !shouldCache(data)) {
-        inFlight.delete(key)
-        throw Object.assign(new Error('RA_VALIDATION_FAILED'), { code: 'RA_VALIDATION_FAILED' })
+  const promise = (async () => {
+    // Second level: Postgres, shared by every instance and surviving cold starts.
+    if (USE_DB) {
+      const shared = await readCache<T>(DB_PREFIX + key, maxAge)
+      if (shared !== null) {
+        // ponytail: the row's remaining life is unknown here, so memory holds it
+        // briefly (worst case it lives MEMORY_REUSE_MS past expiry); read it if that matters.
+        store.set(key, { data: shared, expiresAt: Date.now() + Math.min(ttlMs, MEMORY_REUSE_MS), storedAt: Date.now() })
+        enforceCap()
+        return shared
       }
-      store.set(key, { data, expiresAt: Date.now() + ttlMs })
-      enforceCap()
-      inFlight.delete(key)
-      return data
-    })
-    .catch((err) => {
-      inFlight.delete(key)
-      throw err
-    })
+    }
+    const data = await fetcher()
+    if (shouldCache && !shouldCache(data)) {
+      throw Object.assign(new Error('RA_VALIDATION_FAILED'), { code: 'RA_VALIDATION_FAILED' })
+    }
+    store.set(key, { data, expiresAt: Date.now() + ttlMs, storedAt: Date.now() })
+    enforceCap()
+    if (USE_DB) await writeCache(DB_PREFIX + key, data, ttlMs)
+    return data
+  })().finally(() => inFlight.delete(key))
 
   inFlight.set(key, promise as Promise<unknown>)
   return promise

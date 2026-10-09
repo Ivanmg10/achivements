@@ -127,6 +127,7 @@ test('sums up level, trophies, games and the largest avatar', async () => {
   })
   expect(withSteamCache).toHaveBeenCalledWith('psn:summary:v3:42', expect.any(Number), expect.any(Function), {
     userId: '7',
+    refreshable: true,
   })
 })
 
