@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { IconPencil, IconShield, IconShieldOff, IconTrash, IconUser } from '@tabler/icons-react'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
+import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { codeToFlag, findCountry } from '@/utils/countries'
 import type { AdminUser } from '@/types/user'
 
@@ -75,6 +76,12 @@ export default function AdminUserCard({
           <SteamLogo size={11} className={user.steamusername ? 'text-[#66c0f4]' : 'text-text-secondary/30'} />
           <span className={`truncate ${user.steamusername ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
             {user.steamusername ?? '—'}
+          </span>
+        </li>
+        <li className="flex items-center gap-1.5 min-w-0">
+          <PlaystationLogo size={11} className={user.psnusername ? 'text-[#0070d1]' : 'text-text-secondary/30'} />
+          <span className={`truncate ${user.psnusername ? 'text-text-secondary' : 'text-text-secondary italic'}`}>
+            {user.psnusername ?? '—'}
           </span>
         </li>
       </ul>

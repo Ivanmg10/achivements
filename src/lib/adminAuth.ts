@@ -104,6 +104,8 @@ export type AdminAction =
   | 'unlink-ra'
   | 'link-steam'
   | 'unlink-steam'
+  | 'link-psn'
+  | 'unlink-psn'
   | 'psn-token'
 
 /** How long the action log is kept. */

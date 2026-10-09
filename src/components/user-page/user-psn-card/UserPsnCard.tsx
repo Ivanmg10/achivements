@@ -55,7 +55,7 @@ export default function UserPsnCard() {
   return (
     <UserPlatformCard
       name="PlayStation Network"
-      href={onlineId ? `https://psnprofiles.com/${encodeURIComponent(onlineId)}` : undefined}
+      href={onlineId ? `https://profile.playstation.com/${encodeURIComponent(onlineId)}` : undefined}
       logo={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />}
       bigLogo={<PlaystationLogo size={40} className="text-[#0070d1]" aria-hidden="true" />}
       gradient="from-[#0070d1] via-[#0070d1]/40 to-[#003791]"
