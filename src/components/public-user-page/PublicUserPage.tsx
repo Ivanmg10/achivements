@@ -11,11 +11,13 @@ import { usePublicUserAwards } from '@/hooks/usePublicUserAwards'
 import { usePublicUserCompleted } from '@/hooks/usePublicUserCompleted'
 import { usePublicUserRecentlyPlayed } from '@/hooks/usePublicUserRecentlyPlayed'
 import { usePublicGameProgression } from '@/hooks/usePublicGameProgression'
+import { usePublicUserPsn } from '@/hooks/usePublicUserPsn'
 import { IconUserOff } from '@tabler/icons-react'
 
 import MainPageProfileRa from '@/components/main-page/main-page-profile/main-page-profile-ra/MainPageProfileRa'
 import PublicRecentlyPlayed from './public-recently-played/PublicRecentlyPlayed'
 import PublicUserStats from './public-user-stats/PublicUserStats'
+import PublicPsnCard from './public-psn-card/PublicPsnCard'
 
 interface PublicUserPageProps {
   raUsername: string
@@ -32,6 +34,7 @@ export default function PublicUserPage({ raUsername }: PublicUserPageProps) {
   // Use first recently-played game ID — recentGames loads reliably and is the same game as LastGameID
   const lastGameId = recentGames[0]?.GameID ?? null
   const { game: lastGame } = usePublicGameProgression(raUsername, lastGameId)
+  const { summary: psn } = usePublicUserPsn(raUsername)
 
   // Sort achievements desc for profile recent achievements section
   const recentAchievements = useMemo(
@@ -72,6 +75,7 @@ export default function PublicUserPage({ raUsername }: PublicUserPageProps) {
               recentAchievements={recentAchievements}
             />
           </section>
+          {psn && <PublicPsnCard summary={psn} />}
         </div>
 
         {/* Left: recently played */}
