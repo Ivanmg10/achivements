@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 import pool from '@/lib/db'
 import { sendEmail } from '@/lib/email'
 import { daysLeft, loadPsnCredentials, markPsnWarned, npssoExpiry, savePsnNpsso } from '@/lib/psnCredentials'
-import { siteOrigin } from '@/lib/steamOpenId'
+import { siteOrigin } from '@/lib/siteUrl'
 
 /** Start warning this many days before the NPSSO dies. */
 const WARN_DAYS = 7

@@ -5,16 +5,16 @@ import { fetchRaProfile, validRaCredentials } from '@/lib/raProfile'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { clearUserCache } from '@/lib/steamCache'
 import { getPlayerSummaries } from '@/lib/steamClient'
-import { readSteamId } from '@/lib/steamOpenId'
+import { readSteamId } from '@/lib/steamAccount'
 import { forgetUser } from '@/lib/userRecord'
 
 /**
  * An admin linking or unlinking a user's RetroAchievements or Steam account,
  * for support. The same checks as when users do it themselves: an RA account
  * is only stored if RA accepts that username and key, and a Steam ID only if
- * Steam knows the profile. What it cannot check is that the account is the
- * user's own — users prove that through Steam's sign-in; here the admin is
- * vouching for it, which is why each link and unlink goes in the action log.
+ * Steam knows the profile. Neither proves the account is the user's own (users
+ * link Steam by name too), which is why each link and unlink goes in the
+ * action log.
  */
 
 type Target = { id: number; username: string }
@@ -77,14 +77,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Steam is unavailable, try again' }, { status: 502 })
       }
 
-      try {
-        await pool.query('UPDATE users SET steamid = $1, steamusername = $2 WHERE id = $3', [steamid, persona, target.id])
-      } catch (err) {
-        if ((err as { code?: string }).code === '23505') {
-          return NextResponse.json({ error: 'That Steam account is linked to another user' }, { status: 409 })
-        }
-        throw err
-      }
+      // One Steam account may be linked to several users, as users can do themselves.
+      await pool.query('UPDATE users SET steamid = $1, steamusername = $2 WHERE id = $3', [steamid, persona, target.id])
       await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-steam', target, { steamid, steamusername: persona })

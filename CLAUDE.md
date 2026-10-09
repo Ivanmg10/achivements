@@ -136,9 +136,8 @@ this reminder on purpose, because it is easy to forget.
       account owner.
 - [x] `NEXTAUTH_URL` set to `https://www.cheevovault.com` in Vercel. **www, not
       the apex**: the apex 308-redirects to www, so that is the host visitors
-      are on. Reset links are built from it, NextAuth compares it against the
-      real host when signing in, and Steam's return_to has to come back to the
-      same host the session cookie belongs to.
+      are on. Reset links are built from it, and NextAuth compares it against
+      the real host when signing in.
 - [x] `migrations/018_unique_username_email.sql` run (2026-10-02). Two
       sign-ups racing each other can no longer take the same username or
       address, in any case.
@@ -239,8 +238,8 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   the address, then reset the password.
 - Admins can create users (for odd cases; sign-up is open), edit, delete, and
   link/unlink RA (checked against RA with the user's key) and Steam (checked to
-  exist through the Steam API). Linking Steam here skips the OpenID proof of
-  ownership — the admin vouches for it, and the log records it.
+  exist through the Steam API). Neither proves ownership — users link Steam by
+  name too — so the log records who linked what.
 - The privacy policy (`/privacy`) says all of this; `/terms` says when an
   account may be suspended or deleted. Change the policy if the panel changes.
 
@@ -301,6 +300,21 @@ Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — a
 - [x] Public user profiles
 - [ ] Group hardcore achievement tracking
 - [ ] Push notifications
+- [x] Steam linked by name, like PSN (2026-10-09): custom URL name, profile
+      link or SteamID64 (`src/lib/steamAccount.ts`), no OpenID, and no
+      "already linked elsewhere" check (`migrations/028`), so one person can
+      have several CheevoVault accounts. The profile has to be public.
+- [ ] RA by name too, through one app key (`RA_API_KEY`) instead of each
+      user's. **Not before** RA's cache moves to the DB (it is per-instance
+      memory now, so every cold start asks RA again) and a 429 waits for
+      `Retry-After`: every user's calls would come out of one key, and RA's
+      limit is unpublished. Ask in RA's Discord `#coders` before opening it up.
+      Until then the RA modal says why the key is asked for. Then one search
+      box that looks a name up on all three.
+- [ ] Later, optional: a "verified" badge per linked account — the app gives
+      a code, the user puts it for a few minutes in their RA motto / Steam
+      summary / PSN About me, the app reads it. Only if public profiles or
+      group comparisons come to need proof of ownership.
 - [ ] 13 optimization fixes (cache stampede, Cache-Control headers, duplicate fetches, TTLs, error boundaries, lazy images)
 - [ ] After 1.0: clear the ~51 `react-hooks/set-state-in-effect` warnings
       (a warning in `eslint.config.mjs`, not an error). None is a bug. Three

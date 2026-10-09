@@ -117,12 +117,12 @@ describe('Steam', () => {
     expect(updates()).toHaveLength(0)
   })
 
-  test('a Steam account linked to someone else is a 409', async () => {
+  test('a Steam account linked to someone else links here too', async () => {
     ;(getPlayerSummaries as jest.Mock).mockResolvedValue({ response: { players: [{ personaname: 'Bobby' }] } })
     ;(pool.query as jest.Mock).mockImplementation((sql: string) =>
-      sql.startsWith('SELECT') ? Promise.resolve({ rows: [BOB] }) : Promise.reject(Object.assign(new Error('dup'), { code: '23505' })),
+      sql.startsWith('SELECT') ? Promise.resolve({ rows: [BOB] }) : Promise.resolve({ rowCount: 1 }),
     )
-    expect((await POST(post({ id: 11, platform: 'steam', steamid: STEAM_ID }))).status).toBe(409)
+    expect((await POST(post({ id: 11, platform: 'steam', steamid: STEAM_ID }))).status).toBe(200)
   })
 
   test('without a Steam API key it cannot check, so it does not link', async () => {

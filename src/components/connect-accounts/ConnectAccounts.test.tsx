@@ -7,6 +7,10 @@ jest.mock('@/components/user-page/user-psn-card/UserPsnCard', () => ({
   __esModule: true,
   default: () => <section aria-label="PlayStation Network" />,
 }))
+jest.mock('@/components/user-page/user-steam-card/UserSteamCard', () => ({
+  __esModule: true,
+  default: () => <section aria-label="Steam" />,
+}))
 jest.mock('@/components/ra-login-modal/RaLoginModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="ra-modal" /> : null),
@@ -25,7 +29,6 @@ test('says what to do and what each platform costs to connect', () => {
   render(<ConnectAccounts />)
   expect(screen.getByRole('heading', { level: 1, name: en.connect.title })).toBeInTheDocument()
   expect(screen.getByText(en.connect.raPitch)).toBeInTheDocument()
-  expect(screen.getByText(en.connect.steamPitch)).toBeInTheDocument()
 })
 
 test('never shows made-up games in place of a library', () => {
@@ -40,11 +43,10 @@ test('connects RetroAchievements without leaving the page', () => {
   expect(screen.getByTestId('ra-modal')).toBeInTheDocument()
 })
 
-test('sends to Steam’s own sign-in for the one-click path', () => {
+test('Steam connects right there, with its own card — no Steam sign-in', () => {
   render(<ConnectAccounts />)
-  expect(
-    screen.getByRole('link', { name: new RegExp(en.userData.steamConnect) }).getAttribute('href'),
-  ).toContain('/api/steam/link')
+  expect(screen.getByRole('region', { name: 'Steam' })).toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: new RegExp(en.userData.steamConnect) })).not.toBeInTheDocument()
 })
 
 test('PlayStation connects right there, with its own card', () => {

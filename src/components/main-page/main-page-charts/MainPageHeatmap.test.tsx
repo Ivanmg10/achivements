@@ -97,7 +97,11 @@ describe('month labels', () => {
 
     expect(placed.length).toBeGreaterThan(1)
     // Inside a cell the name would be clipped to the cell's width; these are not.
-    for (const { left } of placed) expect(left % (CELL + 3)).toBe(0)
+    // The last one may instead be held back from the right edge (early in a
+    // month it starts in the last column), so it is only checked to come last.
+    const last = placed[placed.length - 1]
+    for (const { left } of placed.slice(0, -1)) expect(left % (CELL + 3)).toBe(0)
+    expect(last.left).toBeGreaterThan(placed[placed.length - 2].left)
   })
 
   test('two months never print on top of each other', () => {

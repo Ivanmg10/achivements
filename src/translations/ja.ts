@@ -74,10 +74,6 @@ export const ja: Translations = {
     steamConnect: 'Steam と連携',
     steamDisconnect: 'Steam の連携を解除',
     steamDisconnecting: '解除中…',
-    steamLinked: 'Steam アカウントを連携しました',
-    steamAlreadyLinked: 'その Steam アカウントは既に別のユーザーと連携されています',
-    steamCancelled: 'Steam のサインインをキャンセルしました',
-    steamFailed: 'Steam アカウントを連携できませんでした。もう一度お試しください。',
     gamesTracked: '追跡中のゲーム',
     inProgress: '進行中',
     completedSC: '完了SC',
@@ -184,7 +180,7 @@ export const ja: Translations = {
     editName: 'ユーザー名を変更',
     username: 'ユーザー名',
     raConnectHint: 'RetroAchievementsを連携すると、レトロゲームをここで管理できます。',
-    steamConnectHint: 'Steamを連携すると、ライブラリと実績をここで管理できます。',
+    steamConnectHint: 'SteamのカスタムURL名を入力するか、プロフィールのリンクを貼り付けてください。プロフィールとゲームの詳細を公開にしておく必要があります。',
     hiddenGames: '非表示のゲーム',
     hiddenCount: '{n} 件',
     hiddenNone: 'なし',
@@ -265,6 +261,7 @@ export const ja: Translations = {
     error: 'RetroAchievementsアカウントを接続できませんでした。もう一度お試しください。',
     invalid: 'RetroAchievementsがそのユーザー名とキーを受け付けませんでした。両方を確認してもう一度お試しください。',
     keyInUse: 'そのAPIキーは既にここで別のアカウントにリンクされています。',
+    whyKey: 'RetroAchievementsでは、Web APIキーがないとデータを読み取れません。キーはあなた自身の進捗を読むためだけに使い、サーバーに保管され、表示されることはありません。',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -274,7 +271,6 @@ export const ja: Translations = {
     title: 'アカウントを連携して始めましょう',
     subtitle: 'CheevoVaultは連携したプラットフォームから実績を読み込みます。すべて連携することもできます。',
     raPitch: 'RetroAchievementsのユーザー名とWeb APIキーが必要です。',
-    steamPitch: 'Steamでワンクリック。パスワードの入力は不要です。',
     whatYouGet: '連携すると表示されるもの',
     raKeyHelp: 'キーはどこにありますか?',
     raKeyPath: 'RetroAchievements: Settings → Keys → Web API Key',
@@ -317,6 +313,8 @@ export const ja: Translations = {
     unlinkFailed: 'アカウントの連携を解除できませんでした',
     psnLinked: 'PlayStationアカウントを連携しました',
     psnUnlinked: 'PlayStationアカウントの連携を解除しました',
+    steamLinked: 'Steamアカウントを連携しました',
+    steamUnlinked: 'Steamアカウントの連携を解除しました',
     loadAchievementsFailed: '実績を読み込めませんでした',
     gameHidden: 'リストからゲームを非表示にしました',
     gameHideFailed: 'ゲームを非表示にできませんでした',
@@ -366,7 +364,7 @@ export const ja: Translations = {
         body: [
           'アカウント：ユーザー名、パスワードのハッシュ（パスワードそのものは保存しません）、メールアドレス。メールアドレスはアカウントの復旧と本人確認にのみ使用します。',
           'あなたが追加するもの：アバター（リンク、またはアップロードした画像。差し替えるかアカウントを削除するまで保存します）、国、お気に入り・ピン留めしたゲームと実績、グループ。',
-          '連携アカウント：RetroAchievementsのユーザー名とWeb APIキー、SteamのIDと表示名。進捗を取得するために使います。APIキーがサーバーの外に出ることはありません。',
+          '連携アカウント：RetroAchievementsのユーザー名とWeb APIキー、SteamのIDと表示名。進捗を取得するために使います。APIキーがサーバーの外に出ることはありません。Steamの連携では、プロフィールが存在し公開されていることだけを確認します。アカウントがあなたのものであることは証明されません。',
           'PlayStation（連携した場合）：PSNのオンラインIDとアカウント番号。連携時に確認するのは、アカウントが存在しトロフィーを公開していることだけで、そのアカウントがあなたのものであることは証明されません。トロフィー、およびゲーム履歴が公開されている場合はプレイ時間とゲーム画像を、サイト自身のPlayStationアカウントでSonyから読み込み、自動的に期限切れになるキャッシュに保存します。',
           'セキュリティ記録：失敗したログイン・登録・パスワード再設定リクエストのIPアドレス（ログインの場合はユーザー名も）を、不正利用を防ぐために1日間保存します。',
         ],
@@ -429,7 +427,7 @@ export const ja: Translations = {
       {
         heading: 'アカウント',
         body: [
-          'アカウントは1人1つ、あなた自身の情報で作成してください。パスワードは他人に教えないでください。アカウントで行われたことはあなたの責任です。連携するRetroAchievementsのキー、SteamおよびPlayStationのアカウントは、あなた自身のものでなければなりません。',
+          'あなた自身の情報を使用してください。複数のアカウントを持つこともできます。パスワードは他人に教えないでください。アカウントで行われたことはあなたの責任です。連携するRetroAchievementsのキー、SteamおよびPlayStationのアカウントは、あなた自身のものでなければなりません。',
         ],
       },
       {
@@ -630,7 +628,7 @@ export const ja: Translations = {
     remaining: '残り',
   },
   profileSt: {
-    signIn: 'Steamでログイン',
+    signIn: 'Steamを連携',
   },
   gamesList: {
     achievements: '実績',
@@ -941,6 +939,18 @@ export const ja: Translations = {
     recentEmpty: '最近プレイした Steam ゲームはありません',
   },
   // Counted nouns: one phrase per plural form (Intl.PluralRules), "{n}" is the number.
+  steamLink: {
+    label: 'Steamプロフィール',
+    placeholder: 'カスタムURL名、プロフィールのリンク、またはSteamID64',
+    connecting: '連携中…',
+    errors: {
+      'invalid-query': 'カスタムURL名（steamcommunity.com/id/…）、プロフィールのリンク、またはSteamID64を入力してください。',
+      'not-found': 'その名前のプロフィールはSteamにありません。カスタムURLを設定していない場合は、プロフィールのリンクを貼り付けてください。',
+      private: 'そのプロフィールは非公開です。Steamでプロフィールとゲームの詳細を公開にしてから、もう一度お試しください。',
+      'not-configured': '現在Steamを利用できません。',
+      failed: 'Steamに接続できませんでした。もう一度お試しください。',
+    },
+  },
   psn: {
     connect: 'PSNを連携',
     connecting: '連携中…',

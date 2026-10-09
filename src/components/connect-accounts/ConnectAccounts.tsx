@@ -7,9 +7,9 @@ import UserPlatformCard from '@/components/user-page/user-platform-card/UserPlat
 import RaLoginModal from '@/components/ra-login-modal/RaLoginModal'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
+import UserSteamCard from '@/components/user-page/user-steam-card/UserSteamCard'
 import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
 import { useLanguage } from '@/context/LanguageContext'
-import { STEAM_LINK_URL } from '@/hooks/useSteamLink'
 
 const ACTION =
   'w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-accent text-bg-main font-semibold text-sm hover:bg-accent-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
@@ -63,22 +63,8 @@ export default function ConnectAccounts() {
             />
           )}
 
-          {!steamLinked && (
-            <UserPlatformCard
-              name="Steam"
-              logo={<SteamLogo size={18} className="text-[#66c0f4]" aria-hidden="true" />}
-              bigLogo={<SteamLogo size={40} className="text-[#66c0f4]" aria-hidden="true" />}
-              gradient="from-[#66c0f4] via-[#2a475e] to-[#1b2838]"
-              connected={false}
-              hint={T.connect.steamPitch}
-              action={
-                <a href={STEAM_LINK_URL} className={ACTION}>
-                  <SteamLogo size={16} aria-hidden="true" />
-                  {T.userData.steamConnect}
-                </a>
-              }
-            />
-          )}
+          {/* The account page's own Steam card: the name is typed right here. */}
+          {!steamLinked && <UserSteamCard />}
 
           {/* The account page's own PSN card: the online ID is typed right here. */}
           {!psnLinked && <UserPsnCard />}

@@ -74,10 +74,6 @@ export const es: Translations = {
     steamConnect: 'Conectar Steam',
     steamDisconnect: 'Desconectar Steam',
     steamDisconnecting: 'Desconectando…',
-    steamLinked: 'Cuenta de Steam vinculada',
-    steamAlreadyLinked: 'Esa cuenta de Steam ya está vinculada a otro usuario',
-    steamCancelled: 'Inicio de sesión en Steam cancelado',
-    steamFailed: 'No se pudo vincular tu cuenta de Steam. Inténtalo de nuevo.',
     gamesTracked: 'Juegos registrados',
     inProgress: 'En progreso',
     completedSC: 'Completados SC',
@@ -184,7 +180,7 @@ export const es: Translations = {
     editName: 'Cambiar nombre de usuario',
     username: 'Nombre de usuario',
     raConnectHint: 'Conecta RetroAchievements para seguir aquí tus juegos retro.',
-    steamConnectHint: 'Conecta Steam para seguir aquí tu biblioteca y tus logros.',
+    steamConnectHint: 'Escribe el nombre de tu URL personalizada de Steam o pega el enlace a tu perfil. Tu perfil y los detalles de juego tienen que ser públicos.',
     hiddenGames: 'Juegos ocultos',
     hiddenCount: '{n} ocultos',
     hiddenNone: 'Ninguno',
@@ -265,6 +261,7 @@ export const es: Translations = {
     error: 'No se pudo conectar tu cuenta de RetroAchievements. Inténtalo de nuevo.',
     invalid: 'RetroAchievements no aceptó ese usuario y clave. Revisa ambos y vuelve a intentarlo.',
     keyInUse: 'Esa clave de API ya está vinculada a otra cuenta aquí.',
+    whyKey: 'RetroAchievements solo deja leer tus datos con tu clave de API web. La usamos únicamente para leer tu propio progreso: se queda en nuestro servidor y nunca se muestra.',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -274,7 +271,6 @@ export const es: Translations = {
     title: 'Conecta una cuenta para empezar',
     subtitle: 'CheevoVault lee tus logros de las plataformas que enlaces. Puedes enlazarlas todas.',
     raPitch: 'Necesitas tu usuario y tu clave de API de RetroAchievements.',
-    steamPitch: 'Un clic a través de Steam. Sin escribir contraseñas.',
     whatYouGet: 'Lo que verás al conectar',
     raKeyHelp: '¿Dónde encuentro mi clave?',
     raKeyPath: 'En RetroAchievements: Settings → Keys → Web API Key',
@@ -317,6 +313,8 @@ export const es: Translations = {
     unlinkFailed: 'No se pudo desvincular la cuenta',
     psnLinked: 'Cuenta de PlayStation vinculada',
     psnUnlinked: 'Cuenta de PlayStation desvinculada',
+    steamLinked: 'Cuenta de Steam vinculada',
+    steamUnlinked: 'Cuenta de Steam desvinculada',
     loadAchievementsFailed: 'No se pudieron cargar los logros',
     gameHidden: 'Juego ocultado de tus listas',
     gameHideFailed: 'No se pudo ocultar el juego',
@@ -366,7 +364,7 @@ export const es: Translations = {
         body: [
           'Tu cuenta: un nombre de usuario, un hash de tu contraseña (nunca la contraseña en sí) y tu correo, que solo se usa para recuperar la cuenta y confirmar que es tuya.',
           'Lo que decides añadir: un avatar (un enlace, o una imagen que subes y que guardamos hasta que la cambies o borres tu cuenta), tu país, juegos y logros favoritos y fijados, y tus grupos.',
-          'Cuentas vinculadas: tu usuario y clave Web API de RetroAchievements, y tu Steam ID y nombre visible, para poder consultar tu progreso. La clave nunca sale de nuestro servidor.',
+          'Cuentas vinculadas: tu usuario y clave Web API de RetroAchievements, y tu Steam ID y nombre visible, para poder consultar tu progreso. La clave nunca sale de nuestro servidor. Vincular Steam solo comprueba que el perfil existe y es público; no demuestra que la cuenta sea tuya.',
           'PlayStation, si la vinculas: tu ID online de PSN y tu número de cuenta. Vincularla solo comprueba que la cuenta existe y muestra sus trofeos en público; no demuestra que la cuenta sea tuya. Tus trofeos, y tu tiempo de juego y las imágenes de tus juegos si tu historial de juego es público, se leen de Sony con la cuenta de PlayStation de la propia web y se guardan en una caché que caduca sola.',
           'Registros de seguridad: la IP (y el usuario, en los inicios de sesión) de los inicios de sesión fallidos, registros y peticiones de cambio de contraseña, durante un día, para frenar abusos.',
         ],
@@ -429,7 +427,7 @@ export const es: Translations = {
       {
         heading: 'Tu cuenta',
         body: [
-          'Una cuenta por persona, con tus propios datos. Guarda tu contraseña para ti: lo que se haga con tu cuenta es responsabilidad tuya. La clave de RetroAchievements, y las cuentas de Steam y PlayStation que vincules, deben ser tuyas.',
+          'Usa tus propios datos; puedes tener más de una cuenta. Guarda tu contraseña para ti: lo que se haga con tu cuenta es responsabilidad tuya. La clave de RetroAchievements, y las cuentas de Steam y PlayStation que vincules, deben ser tuyas.',
         ],
       },
       {
@@ -630,7 +628,7 @@ export const es: Translations = {
     remaining: 'Restantes',
   },
   profileSt: {
-    signIn: 'Iniciar sesion con Steam',
+    signIn: 'Conectar Steam',
   },
   gamesList: {
     achievements: 'logros',
@@ -941,6 +939,18 @@ export const es: Translations = {
     recentEmpty: 'No hay juegos de Steam jugados recientemente',
   },
   // Counted nouns: one phrase per plural form (Intl.PluralRules), "{n}" is the number.
+  steamLink: {
+    label: 'Perfil de Steam',
+    placeholder: 'URL personalizada, enlace al perfil o SteamID64',
+    connecting: 'Conectando…',
+    errors: {
+      'invalid-query': 'Escribe el nombre de tu URL personalizada (steamcommunity.com/id/…), el enlace a tu perfil o tu SteamID64.',
+      'not-found': 'Steam no tiene ningún perfil con ese nombre. Si nunca pusiste una URL personalizada, pega el enlace a tu perfil.',
+      private: 'Ese perfil es privado. Haz públicos tu perfil y los detalles de juego en Steam y vuelve a intentarlo.',
+      'not-configured': 'Steam no está disponible ahora mismo.',
+      failed: 'No se pudo contactar con Steam. Inténtalo de nuevo.',
+    },
+  },
   psn: {
     connect: 'Conectar PSN',
     connecting: 'Conectando…',

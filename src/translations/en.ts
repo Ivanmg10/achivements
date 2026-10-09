@@ -75,10 +75,6 @@ export const en = {
     steamConnect: 'Connect Steam',
     steamDisconnect: 'Disconnect Steam',
     steamDisconnecting: 'Disconnecting…',
-    steamLinked: 'Steam account linked',
-    steamAlreadyLinked: 'That Steam account is already linked to another user',
-    steamCancelled: 'Steam sign-in cancelled',
-    steamFailed: 'Could not link your Steam account. Please try again.',
     gamesTracked: 'Games tracked',
     inProgress: 'In progress',
     completedSC: 'Completed SC',
@@ -185,7 +181,7 @@ export const en = {
     editName: 'Change username',
     username: 'Username',
     raConnectHint: 'Connect RetroAchievements to track your retro games here.',
-    steamConnectHint: 'Connect Steam to track your library and achievements here.',
+    steamConnectHint: 'Type your Steam custom URL name or paste your profile link. Your profile and game details have to be public.',
     hiddenGames: 'Hidden games',
     hiddenCount: '{n} hidden',
     hiddenNone: 'None',
@@ -266,6 +262,7 @@ export const en = {
     error: 'Could not connect your RetroAchievements account. Try again.',
     invalid: 'RetroAchievements did not accept that username and key. Check both and try again.',
     keyInUse: 'That API key is already linked to another account here.',
+    whyKey: 'RetroAchievements only lets apps read your data with your Web API key. It is used only to read your own progress: it stays on our server and is never shown.',
   },
   authPage: {
     brand: 'CheevoVault',
@@ -275,7 +272,6 @@ export const en = {
     title: 'Connect an account to get started',
     subtitle: 'CheevoVault reads your achievements from the platforms you link. You can link all of them.',
     raPitch: 'Needs your RetroAchievements username and Web API key.',
-    steamPitch: 'One click through Steam. No password to type.',
     whatYouGet: 'What shows up once you connect',
     raKeyHelp: 'Where do I find my key?',
     raKeyPath: 'On RetroAchievements: Settings → Keys → Web API Key',
@@ -318,6 +314,8 @@ export const en = {
     unlinkFailed: 'Could not unlink the account',
     psnLinked: 'PlayStation account linked',
     psnUnlinked: 'PlayStation account unlinked',
+    steamLinked: 'Steam account linked',
+    steamUnlinked: 'Steam account unlinked',
     loadAchievementsFailed: 'Could not load the achievements',
     gameHidden: 'Game hidden from your lists',
     gameHideFailed: 'Could not hide the game',
@@ -367,7 +365,7 @@ export const en = {
         body: [
           'Your account: a username, a hash of your password (never the password itself) and your email address, which is used only to recover the account and to confirm it is yours.',
           'What you choose to add: an avatar (a link, or a picture you upload, which we store until you replace it or delete your account), your country, favourite and pinned games and achievements, and your groups.',
-          'Linked accounts: your RetroAchievements username and Web API key, and your Steam ID and display name, so your progress can be fetched. The API key never leaves our server.',
+          'Linked accounts: your RetroAchievements username and Web API key, and your Steam ID and display name, so your progress can be fetched. The API key never leaves our server. Linking Steam only checks that the profile exists and is public — it does not prove the account is yours.',
           'PlayStation, if you link it: your PSN online ID and account number. Linking only checks that the account exists and shows its trophies publicly — it does not prove the account is yours. Your trophies, and your play time and game art if your gaming history is public, are read from Sony with the site’s own PlayStation account and kept in a cache that expires on its own.',
           'Security records: the IP address (and username, for sign-ins) of failed sign-ins, sign-ups and password reset requests, kept for one day to stop abuse.',
         ],
@@ -430,7 +428,7 @@ export const en = {
       {
         heading: 'Your account',
         body: [
-          'One account per person, with your own details. Keep your password to yourself: what is done with your account is your responsibility. The RetroAchievements key, and the Steam and PlayStation accounts you link, must be your own.',
+          'Use your own details; you may have more than one account. Keep your password to yourself: what is done with your account is your responsibility. The RetroAchievements key, and the Steam and PlayStation accounts you link, must be your own.',
         ],
       },
       {
@@ -631,7 +629,7 @@ export const en = {
     remaining: 'Remaining',
   },
   profileSt: {
-    signIn: 'Sign in with Steam',
+    signIn: 'Connect Steam',
   },
   gamesList: {
     achievements: 'achievements',
@@ -942,6 +940,18 @@ export const en = {
     recentEmpty: 'No recently played Steam games',
   },
   // Counted nouns: one phrase per plural form (Intl.PluralRules), "{n}" is the number.
+  steamLink: {
+    label: 'Steam profile',
+    placeholder: 'Custom URL name, profile link or SteamID64',
+    connecting: 'Connecting…',
+    errors: {
+      'invalid-query': 'Type your custom URL name (steamcommunity.com/id/…), your profile link or your SteamID64.',
+      'not-found': 'Steam has no profile with that name. If you never set a custom URL, paste your profile link.',
+      private: 'That profile is private. Make your profile and game details public on Steam, then try again.',
+      'not-configured': 'Steam is not available right now.',
+      failed: 'Could not reach Steam. Try again.',
+    },
+  },
   psn: {
     connect: 'Connect PSN',
     connecting: 'Connecting…',
