@@ -4,6 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useSession } from 'next-auth/react'
 import { countLoadedProgress, hasSteamAchievements, hasUnloadedProgress } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 /** Follow-up library requests while the server is still filling counts. */
 const MAX_FILL_PASSES = 10
@@ -61,6 +63,7 @@ async function fetchGames(url: string): Promise<SteamGameProgress[]> {
  */
 export function SteamGamesDataProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
+  const subject = useSubject()
   const steamid = session?.user?.steamid ?? null
 
   const [recent, setRecent] = useState<SteamGameProgress[]>([])
@@ -83,7 +86,7 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
     setLibraryError(null)
 
     try {
-      const games = await fetchGames('/api/steam/recentlyPlayed')
+      const games = await fetchGames(withSubject('/api/steam/recentlyPlayed', subject))
       if (!current()) return
       setRecent(games)
     } catch (err) {
@@ -96,7 +99,7 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
 
     let games: SteamGameProgress[]
     try {
-      games = await fetchGames('/api/steam/ownedGames')
+      games = await fetchGames(withSubject('/api/steam/ownedGames', subject))
       if (!current()) return
       setLibrary(games)
     } catch (err) {
@@ -117,7 +120,7 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
       if (!current()) return
       let next: SteamGameProgress[]
       try {
-        next = await fetchGames('/api/steam/ownedGames')
+        next = await fetchGames(withSubject('/api/steam/ownedGames', subject))
       } catch (err) {
         // Keep what is already shown; the list is just less complete.
         console.error('[SteamGamesData] library fill', forId, err)
@@ -129,7 +132,7 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
       games = next
       if (!progressed) return
     }
-  }, [])
+  }, [subject])
 
   useEffect(() => {
     if (!steamid) {

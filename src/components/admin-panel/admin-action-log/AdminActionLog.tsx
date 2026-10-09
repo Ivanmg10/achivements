@@ -20,6 +20,9 @@ const LABELS: Record<string, string> = {
   'unlink-ra': 'unlinked RA from',
   'link-steam': 'linked Steam for',
   'unlink-steam': 'unlinked Steam from',
+  'link-psn': 'linked PSN for',
+  'unlink-psn': 'unlinked PSN from',
+  'psn-token': 'renewed the PSN token',
 }
 
 /** What changed, in a few words: the field for an edit, the account for a link. */
@@ -29,6 +32,8 @@ function describe(entry: Entry): string | null {
   if (entry.action === 'update-user') return `${d.field}: ${d.from ?? '—'} → ${d.to ?? '—'}`
   if (entry.action === 'link-ra') return String(d.rausername ?? '')
   if (entry.action === 'link-steam') return String(d.steamusername ?? d.steamid ?? '')
+  if (entry.action === 'link-psn') return String(d.psnusername ?? d.psnaccountid ?? '')
+  if (entry.action === 'psn-token' && typeof d.expiresAt === 'string') return `valid until ${d.expiresAt.slice(0, 10)}`
   return null
 }
 

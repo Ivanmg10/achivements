@@ -1,6 +1,7 @@
 import { gameKey } from '@/utils/gameRef'
 import type { GameGroupItem, RecentlyPlayedGame, RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
+import type { PsnGameProgress } from '@/types/psn'
 
 export type PctFilter = 'all' | '0' | 'progress' | '100'
 export type DecadeFilter = 'all' | '80s' | '90s' | '00s' | '10s' | '20s'
@@ -62,23 +63,38 @@ export function raProgressMaps(recentlyPlayed: RecentlyPlayedGame[], allGames: R
   return { ach, pts, lastPlayed }
 }
 
-/** Steam progress straight from the library, live, by appid. */
-export function steamProgressMap(library: SteamGameProgress[]): Map<number, Counts> {
-  const map = new Map<number, Counts>()
-  for (const g of library) if (g.achievementsLoaded && g.maxPossible > 0) map.set(g.id, { earned: g.numAwarded, total: g.maxPossible })
+/** Live progress (counts, and completion 0–1) by game key. */
+export type LiveProgress = Map<string, Counts & { pct: number }>
+
+/**
+ * Steam and PSN progress straight from their libraries, live, keyed by
+ * "steam:620" / "psn:2018800": the two number spaces overlap, so a bare id
+ * would let a PSN game read a Steam app's numbers. PSN's completion is
+ * Sony's own (it weighs trophies by grade).
+ */
+export function liveProgressMap(steam: SteamGameProgress[], psn: PsnGameProgress[] = []): LiveProgress {
+  const map: LiveProgress = new Map()
+  for (const g of steam) {
+    if (g.achievementsLoaded && g.maxPossible > 0) {
+      map.set(gameKey('steam', g.id), { earned: g.numAwarded, total: g.maxPossible, pct: g.numAwarded / g.maxPossible })
+    }
+  }
+  for (const g of psn) {
+    if (g.maxPossible > 0) map.set(gameKey('psn', g.id), { earned: g.numAwarded, total: g.maxPossible, pct: g.pctWon / 100 })
+  }
   return map
 }
 
-/** Completion 0–1: Steam live from the library, RA from the stored fraction. */
-export function itemPct(item: GameGroupItem, steam: Map<number, Counts>): number {
-  const live = isRa(item) ? undefined : steam.get(item.game_id)
-  return live ? live.earned / live.total : parseFloat(item.pct_won) || 0
+/** Completion 0–1: Steam and PSN live from their libraries, RA from the stored fraction. */
+export function itemPct(item: GameGroupItem, live: LiveProgress): number {
+  const now = isRa(item) ? undefined : live.get(itemKey(item))
+  return now ? now.pct : parseFloat(item.pct_won) || 0
 }
 
-export function filterGroupItems(items: GameGroupItem[], filters: GroupFilters, steam: Map<number, Counts>): GameGroupItem[] {
+export function filterGroupItems(items: GameGroupItem[], filters: GroupFilters, live: LiveProgress): GameGroupItem[] {
   return items.filter((item) => {
     if (filters.consoles.size > 0 && (!item.console_name || !filters.consoles.has(item.console_name))) return false
-    const pct = itemPct(item, steam)
+    const pct = itemPct(item, live)
     if (filters.pct === '0' && pct !== 0) return false
     if (filters.pct === 'progress' && !(pct > 0 && pct < 1)) return false
     if (filters.pct === '100' && pct < 1) return false
@@ -92,10 +108,10 @@ export function filterGroupItems(items: GameGroupItem[], filters: GroupFilters, 
 
 /**
  * The whole group's achievements, earned and total: each game counted once,
- * from the freshest numbers there are (live RA progress, the Steam library),
- * falling back to the counts stored on the item.
+ * from the freshest numbers there are (live RA progress, the Steam and PSN
+ * libraries), falling back to the counts stored on the item.
  */
-export function groupSummary(items: GameGroupItem[], ra: Map<number, AchStats>, steam: Map<number, Counts>): Counts {
+export function groupSummary(items: GameGroupItem[], ra: Map<number, AchStats>, live: LiveProgress): Counts {
   let earned = 0
   let total = 0
   for (const item of items) {
@@ -107,10 +123,10 @@ export function groupSummary(items: GameGroupItem[], ra: Map<number, AchStats>, 
         continue
       }
     } else {
-      const live = steam.get(item.game_id)
-      if (live) {
-        earned += live.earned
-        total += live.total
+      const now = live.get(itemKey(item))
+      if (now) {
+        earned += now.earned
+        total += now.total
         continue
       }
     }

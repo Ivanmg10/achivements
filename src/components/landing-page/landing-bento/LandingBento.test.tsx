@@ -16,5 +16,5 @@ test('the covers are decoration; the platforms are named in text', () => {
     expect(img.closest('[aria-hidden="true"]') ?? img).toBeTruthy()
   }
   expect(screen.getByText('RetroAchievements')).toBeInTheDocument()
-  expect(screen.getByText(en.landing.psnSoon)).toBeInTheDocument()
+  expect(screen.getByText('PlayStation')).toBeInTheDocument()
 })

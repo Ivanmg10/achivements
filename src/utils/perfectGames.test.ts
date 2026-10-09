@@ -42,7 +42,7 @@ describe('buildPerfectGames', () => {
 describe('countPerfectGames', () => {
   test('counts RA hardcore, RA softcore and Steam apart', () => {
     const games = buildPerfectGames([ra(1, 'A'), ra(2, 'B', { HardcoreMode: '0' })], [steam(620, 'C')])
-    expect(countPerfectGames(games)).toEqual({ hc: 1, sc: 1, steam: 1 })
+    expect(countPerfectGames(games)).toEqual({ hc: 1, sc: 1, steam: 1, psn: 0 })
   })
 })
 
@@ -120,5 +120,29 @@ describe('collection helpers', () => {
       [2024, ['ra:3', 'ra:1']],
       [null, ['ra:2']],
     ])
+  })
+})
+
+const psnGame = (id: number, pctWon: number, lastPlayed = '2024-01-02T00:00:00.000Z') => ({
+  _source: 'psn' as const, id, titleId: `NPWR${String(Math.floor(id / 100)).padStart(5, '0')}_${String(id % 100).padStart(2, '0')}`,
+  service: 'trophy2' as const, title: `PS ${id}`, imageIcon: `https://psn/${id}.png`, consoleName: 'PS5',
+  maxPossible: 10, numAwarded: Math.round(pctWon / 10), pctWon, lastPlayed,
+  earned: { bronze: 1, silver: 0, gold: 0, platinum: pctWon >= 100 ? 1 : 0 },
+  defined: { bronze: 9, silver: 0, gold: 0, platinum: 1 },
+  lastTrophyAt: lastPlayed, playtimeMinutes: null, playedAs: [] as string[], playCount: null, coverUrl: null, heroUrl: null,
+})
+
+describe('PSN', () => {
+  test('a PSN game at 100% is perfect, dated by its last trophy', () => {
+    const games = buildPerfectGames([], [], [psnGame(100, 100), psnGame(200, 50)])
+    expect(games.map((g) => g.key)).toEqual(['psn:100'])
+    expect(countPerfectGames(games)).toEqual({ hc: 0, sc: 0, steam: 0, psn: 1 })
+    expect(filterPerfects(games, 'psn')).toHaveLength(1)
+    expect(perfectDates([], [], [psnGame(100, 100)]).get('psn:100')).toBe('2024-01-02T00:00:00.000Z')
+  })
+
+  test('the latest perfects take PSN in date order', () => {
+    const latest = latestPerfects([], [], 3, [psnGame(100, 100, '2024-01-01T00:00:00Z'), psnGame(200, 100, '2024-02-01T00:00:00Z')])
+    expect(latest.map((g) => g.key)).toEqual(['psn:200', 'psn:100'])
   })
 })

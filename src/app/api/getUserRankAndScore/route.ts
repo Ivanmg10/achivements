@@ -6,8 +6,8 @@ import { getUserRankAndScore } from '@/lib/raClient'
 
 const TTL = 15 * 60 * 1000
 
-export async function GET() {
-  const auth = await requireRaSession()
+export async function GET(req?: Request) {
+  const auth = await requireRaSession(req)
   if (!auth.ok) return auth.response
   const { id, rausername, raid } = auth.session
 

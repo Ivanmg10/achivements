@@ -8,6 +8,7 @@ const REPO_URL = 'https://github.com/Ivanmg10/achivements'
 const PLATFORMS = [
   { name: 'RetroAchievements', href: 'https://retroachievements.org' },
   { name: 'Steam', href: 'https://store.steampowered.com' },
+  { name: 'PlayStation', href: 'https://www.playstation.com' },
 ]
 const LINK = 'text-text-secondary hover:text-accent transition-colors'
 

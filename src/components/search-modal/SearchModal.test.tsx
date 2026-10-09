@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import SearchModal from './SearchModal'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { useRaLinked } from '@/hooks/useRaLinked'
@@ -11,9 +11,9 @@ jest.mock('@/hooks/useGameCandidates', () => ({ useGameCandidates: jest.fn() }))
 jest.mock('@/hooks/useRaLinked', () => ({ useRaLinked: jest.fn() }))
 jest.mock('next/image', () => ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />)
 
-function candidate(source: 'ra' | 'steam', id: number, title: string): GameCandidate {
+function candidate(source: 'ra' | 'steam' | 'psn', id: number, title: string): GameCandidate {
   return {
-    key: `${source}:${id}`, source, id, title, subtitle: source === 'ra' ? 'SNES' : 'Steam',
+    key: `${source}:${id}`, source, id, title, subtitle: source === 'ra' ? 'SNES' : source === 'steam' ? 'Steam' : 'PlayStation',
     imageRef: '', pctWon: 0, numAwarded: 0, maxPossible: 0, status: 'in-progress',
   }
 }
@@ -101,11 +101,76 @@ test('the selected tab is announced', () => {
   expect(screen.getByRole('button', { name: en.publicProfile.userTab }).getAttribute('aria-pressed')).toBe('true')
 })
 
-test('with no RA account there is no users tab and no RA lookup by id', () => {
+test('with no RA account the users tab is still there, but a game id is not looked up', () => {
   ;(useRaLinked as jest.Mock).mockReturnValue(false)
   render(<SearchModal isOpen onClose={jest.fn()} />)
-  expect(screen.queryByRole('button', { name: en.publicProfile.userTab })).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: en.publicProfile.userTab })).toBeInTheDocument()
 
   type('620')
   expect(screen.queryByText(en.search.openById)).not.toBeInTheDocument()
+})
+
+describe('users tab', () => {
+  const open = () => {
+    render(<SearchModal isOpen onClose={onClose} />)
+    fireEvent.click(screen.getByRole('button', { name: en.publicProfile.userTab }))
+  }
+  const onClose = jest.fn()
+
+  beforeEach(() => {
+    jest.useFakeTimers()
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve([{ username: 'ivan_mg', avatar: null, ra: true, steam: false, psn: true }]),
+    })
+  })
+  afterEach(() => jest.useRealTimers())
+
+  test('asks for at least three letters before searching', () => {
+    open()
+    expect(screen.getByText(en.publicProfile.searchUsersHint)).toBeInTheDocument()
+    fireEvent.change(screen.getByPlaceholderText(en.publicProfile.searchUsersPlaceholder), { target: { value: 'i' } })
+    act(() => { jest.advanceTimersByTime(500) })
+    expect(global.fetch).not.toHaveBeenCalled()
+  })
+
+  test('lists the CheevoVault users found, and opens the profile of the one picked', async () => {
+    open()
+    fireEvent.change(screen.getByPlaceholderText(en.publicProfile.searchUsersPlaceholder), { target: { value: 'ivan' } })
+    await act(async () => { jest.advanceTimersByTime(500) })
+    expect(global.fetch).toHaveBeenCalledWith('/api/users/search?q=ivan')
+    fireEvent.click(await screen.findByRole('button', { name: /ivan_mg/ }))
+    expect(mockPush).toHaveBeenCalledWith('/user/ivan_mg')
+    expect(onClose).toHaveBeenCalled()
+  })
+
+  test('says so when nobody matches', async () => {
+    ;(global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: () => Promise.resolve([]) })
+    open()
+    fireEvent.change(screen.getByPlaceholderText(en.publicProfile.searchUsersPlaceholder), { target: { value: 'zzz' } })
+    await act(async () => { jest.advanceTimersByTime(500) })
+    expect(await screen.findByText(en.publicProfile.noUserFound)).toBeInTheDocument()
+  })
+
+  test('a failed search is an error, not an empty list', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 })
+    open()
+    fireEvent.change(screen.getByPlaceholderText(en.publicProfile.searchUsersPlaceholder), { target: { value: 'zzz' } })
+    await act(async () => { jest.advanceTimersByTime(500) })
+    expect(await screen.findByRole('alert')).toHaveTextContent(en.publicProfile.userLoadError)
+  })
+})
+
+test('a PlayStation filter shows up once PSN games are in the results, opening their PSN page', () => {
+  ;(useGameCandidates as jest.Mock).mockReturnValue([candidate('ra', 620, 'Zelda'), candidate('psn', 2018800, 'Astro Bot')])
+  const onClose = jest.fn()
+  render(<SearchModal isOpen onClose={onClose} />)
+  type('a')
+  // Only the platforms in the results get a chip: no Steam here.
+  expect(screen.queryByRole('button', { name: en.search.platformSteam })).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'PlayStation' }))
+  expect(screen.queryByRole('button', { name: /Zelda/ })).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: /Astro Bot/ }))
+  expect(onClose).toHaveBeenCalled()
 })

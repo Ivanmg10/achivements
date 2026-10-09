@@ -18,7 +18,7 @@ beforeEach(() => {
 test('renders categories and consoles', () => {
   ;(useSession as jest.Mock).mockReturnValue({ data: null })
   render(<MainSidePanel />)
-  expect(screen.getByText('Want to play')).toBeInTheDocument()
+  expect(screen.getByText('No achievements')).toBeInTheDocument()
 })
 
 test('renders user welcome when raUser present', () => {

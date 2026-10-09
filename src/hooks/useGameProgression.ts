@@ -2,9 +2,12 @@ import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { scheduleRetry } from '@/lib/fetchWithRetry'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 export function useGameProgression(gameId: string | null) {
   const { status } = useSession()
+  const subject = useSubject()
   const [game, setGame] = useState<RetroAchievementsGameWithAchievements | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(false)
@@ -22,7 +25,7 @@ export function useGameProgression(gameId: string | null) {
         const onFail = (err?: unknown) => {
           if (!scheduleRetry(attemptRef, retryTimer, () => run(id), err)) { setError(true); setIsLoading(false) }
         }
-        fetch(`/api/getGameProgression?gameId=${id}`)
+        fetch(withSubject(`/api/getGameProgression?gameId=${id}`, subject))
           .then((r) => {
             if (!r.ok) throw new Error(`HTTP ${r.status}`)
             return r.json()
@@ -37,7 +40,7 @@ export function useGameProgression(gameId: string | null) {
       }
       run(id)
     },
-    [status],
+    [status, subject],
   )
 
   useEffect(() => {

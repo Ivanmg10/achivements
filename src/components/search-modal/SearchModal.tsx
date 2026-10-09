@@ -6,14 +6,14 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { IconSearch, IconX, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { RetroAchievementsUserProfile } from '@/types/types'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { useRaLinked } from '@/hooks/useRaLinked'
+import { useUserSearch } from '@/hooks/useUserSearch'
 import { searchCandidates } from '@/utils/gameCandidates'
-import { gameHref, GameRef } from '@/utils/gameRef'
-import RaLogo from '@/components/ra-logo/RaLogo'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
+import { GAME_SOURCES, gameHref, GameRef } from '@/utils/gameRef'
 import SearchModalGameResult from './search-modal-game-result/SearchModalGameResult'
+import PlatformLogo from '@/components/platform-logo/PlatformLogo'
+import type { GameSource } from '@/types/steam'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -33,7 +33,7 @@ const resultVariants: Variants = {
 }
 
 type SearchTab = 'games' | 'users'
-type PlatformFilter = 'all' | 'ra' | 'steam'
+type PlatformFilter = 'all' | GameSource
 
 interface SearchModalProps {
   isOpen: boolean
@@ -49,10 +49,6 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   const [tab, setTab] = useState<SearchTab>('games')
   const [platformFilter, setPlatformFilter] = useState<PlatformFilter>('all')
   const [query, setQuery] = useState('')
-  const [userResult, setUserResult] = useState<RetroAchievementsUserProfile | null>(null)
-  const [userLoading, setUserLoading] = useState(false)
-  const [userError, setUserError] = useState(false)
-  const userDebounce = useRef<ReturnType<typeof setTimeout>>(undefined)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -64,8 +60,6 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
       setQuery('')
       setTab('games')
       setPlatformFilter('all')
-      setUserResult(null)
-      setUserError(false)
     }
   }, [isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -78,41 +72,15 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
     return () => window.removeEventListener('keydown', handler)
   }, [isOpen, onClose])
 
-  useEffect(() => {
-    if (tab !== 'users' || !raLinked) return
-    const q = query.trim()
-    setUserResult(null)
-    setUserError(false)
-    // RA API requires exact username — spaces are invalid, min 3 chars
-    if (q.length < 3 || q.includes(' ')) return
-    clearTimeout(userDebounce.current)
-    userDebounce.current = setTimeout(() => {
-      setUserLoading(true)
-      fetch(`/api/public/user/search?u=${encodeURIComponent(q)}`)
-        .then((r) => {
-          if (!r.ok) throw new Error('Not found')
-          return r.json()
-        })
-        .then((data) => {
-          setUserResult(data?.User ? data : null)
-          setUserError(!data?.User)
-          setUserLoading(false)
-        })
-        .catch(() => {
-          setUserResult(null)
-          setUserError(true)
-          setUserLoading(false)
-        })
-    }, 400)
-    return () => clearTimeout(userDebounce.current)
-  }, [query, tab, raLinked])
+  const users = useUserSearch(query, isOpen && tab === 'users')
 
   const allResults = useMemo(() => searchCandidates(candidates, query), [candidates, query])
   const results = useMemo(
     () => (platformFilter === 'all' ? allResults : allResults.filter((r) => r.source === platformFilter)),
     [allResults, platformFilter],
   )
-  const hasBothPlatforms = allResults.some((r) => r.source === 'ra') && allResults.some((r) => r.source === 'steam')
+  const platforms = useMemo(() => GAME_SOURCES.filter((s) => allResults.some((r) => r.source === s)), [allResults])
+  const hasSeveralPlatforms = platforms.length > 1
 
   const directGameId = useMemo(() => {
     if (!raLinked) return null
@@ -130,6 +98,8 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
     },
     [router, onClose],
   )
+
+  const platformLabel: Record<GameSource, string> = { ra: T.search.platformRa, steam: T.search.platformSteam, psn: 'PlayStation' }
 
   const placeholder = tab === 'users' ? T.publicProfile.searchUsersPlaceholder : T.search.placeholder
 
@@ -181,9 +151,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                 </button>
               </div>
 
-              {/* Tab toggle — the users tab searches RA, so without RA there is
-                  only one tab and nothing to toggle */}
-              {raLinked && (
+              {/* Tab toggle */}
               <div className="flex border-b border-ink/5 px-4 gap-4">
                 {(['games', 'users'] as SearchTab[]).map((t) => (
                   <button
@@ -196,16 +164,18 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                   </button>
                 ))}
               </div>
-              )}
 
-              {/* Platform filter — only worth showing once both platforms are in the library */}
-              {tab === 'games' && hasBothPlatforms && (
+              {/* Platform filter — only worth showing once results come from more than one platform */}
+              {tab === 'games' && hasSeveralPlatforms && (
                 <div className="flex items-center gap-3 px-4 py-2 border-b border-ink/5" role="group" aria-label={T.search.platformAll}>
                   {(
                     [
                       { value: 'all' as PlatformFilter, label: T.search.platformAll, icon: null },
-                      { value: 'ra' as PlatformFilter, label: T.search.platformRa, icon: <RaLogo height={11} /> },
-                      { value: 'steam' as PlatformFilter, label: T.search.platformSteam, icon: <SteamLogo size={12} className="text-[#66c0f4]" aria-hidden="true" /> },
+                      ...platforms.map((source) => ({
+                        value: source as PlatformFilter,
+                        label: platformLabel[source],
+                        icon: <PlatformLogo source={source} size={12} />,
+                      })),
                     ]
                   ).map((opt) => (
                     <button
@@ -280,67 +250,47 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
               )}
 
               {/* Results — Users */}
-              {tab === 'users' && (() => {
-                const q = query.trim()
-                const tooShort = q.length < 3
-                const hasSpace = q.includes(' ')
-                const searching = !tooShort && !hasSpace
-
-                if (!searching) {
-                  return (
-                    <div className="flex flex-col items-center gap-1.5 py-6 px-4">
-                      <p className="text-text-secondary text-xs text-center">{T.publicProfile.searchUsersHint}</p>
-                      {hasSpace && (
-                        <p className="text-text-secondary text-[10px] text-center">{T.publicProfile.noSpaces}</p>
-                      )}
+              {tab === 'users' && (
+                <div className="max-h-105 overflow-y-auto">
+                  {!users.active ? (
+                    <p className="text-text-secondary text-xs text-center py-6 px-4">{T.publicProfile.searchUsersHint}</p>
+                  ) : users.isLoading ? (
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <div className="w-8 h-8 rounded-full bg-ink/10 animate-pulse shrink-0" />
+                      <div className="h-4 bg-ink/10 rounded animate-pulse w-32" />
                     </div>
-                  )
-                }
-
-                return (
-                  <div className="max-h-105 overflow-y-auto">
-                    {userLoading ? (
-                      <div className="flex items-center gap-3 px-4 py-3">
-                        <div className="w-8 h-8 rounded-full bg-ink/10 animate-pulse shrink-0" />
-                        <div className="h-4 bg-ink/10 rounded animate-pulse w-32" />
-                      </div>
-                    ) : userResult ? (
-                      <motion.div initial="hidden" animate="visible" variants={resultVariants}>
-                        <button
-                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer"
-                          onClick={() => handleUserSelect(userResult.User)}
-                        >
-                          <Image
-                            src={`https://retroachievements.org${userResult.UserPic}`}
-                            alt={userResult.User}
-                            width={32}
-                            height={32}
-                            className="w-8 h-8 rounded-full object-cover shrink-0"
-                            unoptimized
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-text-main">{userResult.User}</p>
-                            <p className="text-xs text-text-secondary">{(userResult.TotalPoints ?? 0).toLocaleString()} pts</p>
-                          </div>
-                          <span className="text-[10px] text-text-secondary">→</span>
-                        </button>
-                      </motion.div>
-                    ) : userError ? (
-                      <div className="flex flex-col items-center gap-3 py-8 px-4">
-                        <p className="text-text-secondary text-sm text-center">{T.publicProfile.noUserFound}</p>
-                        <a
-                          href={`https://retroachievements.org/userList.php?s=${encodeURIComponent(q)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-accent hover:underline"
-                        >
-                          {T.publicProfile.searchOnRA} →
-                        </a>
-                      </div>
-                    ) : null}
-                  </div>
-                )
-              })()}
+                  ) : users.error ? (
+                    <p role="alert" className="text-red-400 text-sm text-center py-8 px-4">{T.publicProfile.userLoadError}</p>
+                  ) : users.results.length === 0 ? (
+                    <p className="text-text-secondary text-sm text-center py-8 px-4">{T.publicProfile.noUserFound}</p>
+                  ) : (
+                    <motion.ul initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.04 } } }}>
+                      {users.results.map((u) => (
+                        <motion.li key={u.username} variants={resultVariants}>
+                          <button
+                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer"
+                            onClick={() => handleUserSelect(u.username)}
+                          >
+                            {u.avatar ? (
+                              <Image src={u.avatar} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover shrink-0" unoptimized />
+                            ) : (
+                              <span aria-hidden="true" className="w-8 h-8 rounded-full bg-bg-main flex items-center justify-center shrink-0">
+                                <IconUser className="w-4 h-4 text-text-secondary" />
+                              </span>
+                            )}
+                            <p className="flex-1 min-w-0 truncate text-sm font-medium text-text-main">{u.username}</p>
+                            <span className="flex items-center gap-1.5 shrink-0">
+                              {(['ra', 'steam', 'psn'] as GameSource[]).filter((p) => u[p]).map((p) => (
+                                <PlatformLogo key={p} source={p} size={12} />
+                              ))}
+                            </span>
+                          </button>
+                        </motion.li>
+                      ))}
+                    </motion.ul>
+                  )}
+                </div>
+              )}
             </motion.div>
           </div>
         </motion.div>

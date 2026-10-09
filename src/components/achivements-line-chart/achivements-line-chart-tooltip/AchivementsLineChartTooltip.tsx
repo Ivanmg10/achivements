@@ -4,7 +4,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { DayBySource } from '@/utils/utils'
 
 /**
- * The day under the pointer: its date written out, then RA and Steam with
+ * The day under the pointer: its date written out, then RA, Steam and PSN with
  * their own swatches and counts. A platform with nothing that day is left out.
  */
 export default function AchivementsLineChartTooltip({
@@ -23,6 +23,7 @@ export default function AchivementsLineChartTooltip({
   const rows = [
     { name: 'RetroAchievements', value: day.ra, swatch: 'bg-chart-2' },
     { name: 'Steam', value: day.steam, swatch: 'bg-[#66c0f4]' },
+    { name: 'PlayStation', value: day.psn, swatch: 'bg-[#0070d1]' },
   ].filter((r) => r.value > 0)
 
   return (

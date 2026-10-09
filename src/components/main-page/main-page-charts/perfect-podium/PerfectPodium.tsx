@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatDate } from '@/utils/utils'
 import type { LatestPerfect } from '@/utils/perfectGames'
+import { gameHref } from '@/utils/gameRef'
 import GameCover from '@/components/game-cover/GameCover'
 
 /**
@@ -38,7 +39,7 @@ export default function PerfectPodium({ games }: { games: LatestPerfect[] }) {
       <ol className="grid grid-cols-3 items-end gap-2 sm:gap-3 max-w-md mx-auto w-full">
         {games.map((game, i) => {
           const s = STEPS[i]
-          const href = game.source === 'steam' ? `/steamGame/${game.id}` : `/gameInfo/${game.id}`
+          const href = gameHref(game.source, game.id)
           return (
             <motion.li
               key={game.key}

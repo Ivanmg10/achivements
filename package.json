@@ -1,6 +1,6 @@
 {
   "name": "cheevovault",
-  "version": "1.0.18",
+  "version": "1.2.7",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -20,6 +20,7 @@
     "next": "^16.3.6",
     "next-auth": "^4.24.15",
     "pg": "^8.19.0",
+    "psn-api": "^2.18.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "recharts": "^3.8.1"

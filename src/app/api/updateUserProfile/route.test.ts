@@ -122,3 +122,49 @@ test('other fields leave the uploaded picture alone', async () => {
   const sql = (pool.query as jest.Mock).mock.calls.map(([q]) => String(q))
   expect(sql.some((q) => q.includes('user_avatars'))).toBe(false)
 })
+
+describe('description and gender', () => {
+  test('a description is saved, and can be cleared to NULL', async () => {
+    expect((await POST(request({ field: 'description', value: ' Hi ' }))).status).toBe(200)
+    expect(updates()[0][1]).toEqual(['Hi', '1'])
+    expect((await POST(request({ field: 'description', value: '' }))).status).toBe(200)
+    expect(updates()[1][1]).toEqual([null, '1'])
+  })
+
+  test('a description over 280 characters is refused', async () => {
+    const res = await POST(request({ field: 'description', value: 'x'.repeat(281) }))
+    expect(res.status).toBe(400)
+    expect(updates()).toHaveLength(0)
+  })
+
+  test('gender takes male, female or neutral, or empty to clear', async () => {
+    for (const value of ['male', 'female', 'neutral', '']) {
+      expect((await POST(request({ field: 'gender', value }))).status).toBe(200)
+    }
+    expect(updates()[3][1]).toEqual([null, '1'])
+  })
+
+  test('any other gender is refused', async () => {
+    expect((await POST(request({ field: 'gender', value: 'robot' }))).status).toBe(400)
+    expect(updates()).toHaveLength(0)
+  })
+
+  test('other fields still need a value', async () => {
+    expect((await POST(request({ field: 'location', value: '' }))).status).toBe(400)
+  })
+})
+
+describe('profilePublic', () => {
+  test('is stored as a boolean, in its own column', async () => {
+    expect((await POST(request({ field: 'profilePublic', value: 'false' }))).status).toBe(200)
+    expect(updates()[0][0]).toContain('"profile_public"')
+    expect(updates()[0][1]).toEqual([false, '1'])
+    await POST(request({ field: 'profilePublic', value: 'true' }))
+    expect(updates()[1][1]).toEqual([true, '1'])
+  })
+
+  test('anything but true or false is refused', async () => {
+    expect((await POST(request({ field: 'profilePublic', value: 'maybe' }))).status).toBe(400)
+    expect(updates()).toHaveLength(0)
+  })
+})

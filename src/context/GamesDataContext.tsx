@@ -4,6 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 type CtxType = {
   all: RetroAchievementsGameCompleted[]
@@ -27,6 +29,7 @@ function isRealGame(g: RetroAchievementsGameCompleted) {
 
 export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
+  const subject = useSubject()
   const rausername = session?.user?.rausername
   const [all, setAll] = useState<RetroAchievementsGameCompleted[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -45,7 +48,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
-      fetchWithRetry('/api/getGamesCompleted')
+      fetchWithRetry(withSubject('/api/getGamesCompleted', subject))
         .then((data) => {
           if (!Array.isArray(data)) return onFail()
           setAll((data as RetroAchievementsGameCompleted[]).filter(isRealGame))
@@ -55,7 +58,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
         .catch(onFail)
     }
     run()
-  }, [status, rausername])
+  }, [status, rausername, subject])
 
   useEffect(() => {
     if (status === 'loading') return

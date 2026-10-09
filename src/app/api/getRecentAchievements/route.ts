@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
+import { dataOwner } from '@/lib/apiAuth'
 import { withCache } from '@/lib/raCache'
 import { cachedJson } from '@/lib/httpCache'
 import { getUserRecentAchievements } from '@/lib/raClient'
@@ -23,13 +22,13 @@ function normalizeRaw(raw: unknown): { Date: string }[] {
   return []
 }
 
-export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) {
+export async function GET(req?: Request) {
+  const owner = await dataOwner(req)
+  if (!owner) {
     return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
   }
 
-  const { rausername, raid, id } = session.user
+  const { rausername, raid, id } = owner
   if (!rausername || !raid) {
     return NextResponse.json([])
   }

@@ -1,4 +1,5 @@
 import {
+  buildPsnCandidates,
   buildRaCandidates,
   buildSteamCandidates,
   candidateIconUrl,
@@ -163,4 +164,21 @@ describe('titleMatches', () => {
     expect(titleMatches('Anything', '')).toBe(true)
     expect(titleMatches('Anything', '   ')).toBe(true)
   })
+})
+
+const psnGame = (id: number, pctWon: number, lastPlayed = '2024-01-02T00:00:00.000Z') => ({
+  _source: 'psn' as const, id, titleId: `NPWR${String(Math.floor(id / 100)).padStart(5, '0')}_${String(id % 100).padStart(2, '0')}`,
+  service: 'trophy2' as const, title: `PS ${id}`, imageIcon: `https://psn/${id}.png`, consoleName: 'PS5',
+  maxPossible: 10, numAwarded: Math.round(pctWon / 10), pctWon, lastPlayed,
+  earned: { bronze: 1, silver: 0, gold: 0, platinum: pctWon >= 100 ? 1 : 0 },
+  defined: { bronze: 9, silver: 0, gold: 0, platinum: 1 },
+  lastTrophyAt: lastPlayed, playtimeMinutes: null, playedAs: [] as string[], playCount: null, coverUrl: null, heroUrl: null,
+})
+
+test('PSN candidates: completed is perfect, started is in progress, nothing earned is want-to-play', () => {
+  const [done, playing, launched] = buildPsnCandidates([psnGame(100, 100), psnGame(200, 50), psnGame(300, 0)] as never)
+  expect(done).toMatchObject({ key: 'psn:100', source: 'psn', subtitle: 'PlayStation', status: 'perfect', pctWon: 1 })
+  expect(playing.status).toBe('in-progress')
+  expect(launched.status).toBe('want-to-play')
+  expect(candidateIconUrl(done)).toBe('https://psn/100.png')
 })

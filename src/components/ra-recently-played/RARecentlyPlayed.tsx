@@ -14,8 +14,12 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import SteamGameItem from '@/components/steam/steam-game-item/SteamGameItem'
+import PsnGameItem from '@/components/psn/psn-game-item/PsnGameItem'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
+import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { mergeRecentFeeds, RecentFeedItem } from '@/utils/steamFeed'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 const MAX_GAMES = 6
 
@@ -33,12 +37,14 @@ const ROW_STYLE = { flex: '1 1 0%' }
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function RARecentlyPlayed() {
   const { T } = useLanguage()
+  const subject = useSubject()
   const reduce = useReducedMotion()
   const { games, isLoading, error, refetch } = useRecentlyPlayedGames()
   const { recent: steamRecent } = useSteamGamesData()
-  // One feed across platforms, newest first. Steam entries merge in when they
-  // arrive rather than holding the RA feed back while Steam loads.
-  const feed = mergeRecentFeeds(games, steamRecent, MAX_GAMES)
+  const { library: psnLibrary } = usePsnGamesData()
+  // One feed across platforms, newest first. Steam and PSN entries merge in
+  // when they arrive rather than holding the RA feed back while they load.
+  const feed = mergeRecentFeeds(games, steamRecent, MAX_GAMES, psnLibrary)
 
   // Keyed by feed key, not game id: RA game 730 and Steam app 730 are different games.
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -55,14 +61,14 @@ export default function RARecentlyPlayed() {
 
     setExpanded(item.key)
 
-    // Steam cards load their own achievements when opened.
-    if (item.source === 'steam') return
+    // Steam and PSN cards load their own achievements when opened.
+    if (item.source !== 'ra') return
 
     const gameId = item.game.GameID
     if (!gameDataMap.has(gameId)) {
       setLoadingId(gameId)
       try {
-        const res = await fetch(`/api/getGameProgression?gameId=${gameId}`)
+        const res = await fetch(withSubject(`/api/getGameProgression?gameId=${gameId}`, subject))
         if (!res.ok) throw new Error(`getGameProgression ${res.status}`)
         const data: RetroAchievementsGameWithAchievements = await res.json()
         setGameDataMap((prev) => new Map(prev).set(gameId, data))
@@ -97,7 +103,8 @@ export default function RARecentlyPlayed() {
           )}
         </AnimatePresence>
         <p className="text-2xl font-bold flex-1">{T.cards.recentlyPlayed}</p>
-        <MainViewToggle />
+        {/* Pinned games are the viewer's own, so another user's page has no such view. */}
+        {!subject && <MainViewToggle />}
       </div>
 
       {/* Cards */}
@@ -126,6 +133,14 @@ export default function RARecentlyPlayed() {
             >
             {displayedItems.map((item) => {
               const isExp = expanded === item.key
+
+              if (item.source === 'psn') {
+                return (
+                  <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
+                    <PsnGameItem game={item.game} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1" />
+                  </div>
+                )
+              }
 
               if (item.source === 'steam') {
                 return (

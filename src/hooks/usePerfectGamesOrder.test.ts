@@ -1,6 +1,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
+import { createElement, type ReactNode } from 'react'
 import { usePerfectGamesOrder } from './usePerfectGamesOrder'
+import { SubjectContext } from '@/context/SubjectContext'
 
 global.fetch = jest.fn()
 
@@ -54,7 +56,7 @@ test('saveOrder PUTs the new order and updates state optimistically', async () =
   await waitFor(() => expect(result.current.isLoading).toBe(false))
 
   await act(async () => {
-    await result.current.saveOrder(['ra:30', 'steam:10', 'ra:20'])
+    await result.current.saveOrder!(['ra:30', 'steam:10', 'ra:20'])
   })
 
   expect(fetch).toHaveBeenLastCalledWith('/api/perfectGamesOrder', {
@@ -75,6 +77,18 @@ test('saveOrder throws when the PUT response is not ok', async () => {
   await waitFor(() => expect(result.current.isLoading).toBe(false))
 
   await act(async () => {
-    await expect(result.current.saveOrder(['ra:1'])).rejects.toThrow('Error saving order')
+    await expect(result.current.saveOrder!(['ra:1'])).rejects.toThrow('Error saving order')
+  })
+})
+
+describe('on someone else\'s page', () => {
+  test('reads their order, and has no way to save one', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve([{ game_id: 5, source: 'ra', position: 0 }]) })
+    ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated' })
+    const wrapper = ({ children }: { children: ReactNode }) => createElement(SubjectContext.Provider, { value: 'bob' }, children)
+    const { result } = renderHook(() => usePerfectGamesOrder(), { wrapper })
+    await waitFor(() => expect(result.current.order).toEqual(['ra:5']))
+    expect(global.fetch).toHaveBeenCalledWith('/api/perfectGamesOrder?user=bob')
+    expect(result.current.saveOrder).toBeUndefined()
   })
 })

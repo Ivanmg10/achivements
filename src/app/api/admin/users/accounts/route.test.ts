@@ -4,6 +4,12 @@ jest.mock('@/lib/raProfile', () => ({ ...jest.requireActual('@/lib/raProfile'), 
 jest.mock('@/lib/steamClient', () => ({ getPlayerSummaries: jest.fn() }))
 jest.mock('@/lib/steamCache', () => ({ clearUserCache: jest.fn() }))
 jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))
+jest.mock('@/lib/psnClient', () => ({
+  findPsnAccount: jest.fn(),
+  psnConfigured: jest.fn(),
+  psnSummary: jest.fn(),
+  psnFailure: jest.fn(() => jest.requireActual('next/server').NextResponse.json({ error: 'private' }, { status: 403 })),
+}))
 
 import { DELETE, POST } from './route'
 import { NextRequest, NextResponse } from 'next/server'
@@ -13,6 +19,7 @@ import { fetchRaProfile } from '@/lib/raProfile'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { clearUserCache } from '@/lib/steamCache'
 import { forgetUser } from '@/lib/userRecord'
+import { findPsnAccount, psnConfigured, psnSummary } from '@/lib/psnClient'
 
 const ADMIN = { id: '3', username: 'boss', pwv: 'v1' }
 const BOB = { id: 11, username: 'bob' }
@@ -117,12 +124,12 @@ describe('Steam', () => {
     expect(updates()).toHaveLength(0)
   })
 
-  test('a Steam account linked to someone else is a 409', async () => {
+  test('a Steam account linked to someone else links here too', async () => {
     ;(getPlayerSummaries as jest.Mock).mockResolvedValue({ response: { players: [{ personaname: 'Bobby' }] } })
     ;(pool.query as jest.Mock).mockImplementation((sql: string) =>
-      sql.startsWith('SELECT') ? Promise.resolve({ rows: [BOB] }) : Promise.reject(Object.assign(new Error('dup'), { code: '23505' })),
+      sql.startsWith('SELECT') ? Promise.resolve({ rows: [BOB] }) : Promise.resolve({ rowCount: 1 }),
     )
-    expect((await POST(post({ id: 11, platform: 'steam', steamid: STEAM_ID }))).status).toBe(409)
+    expect((await POST(post({ id: 11, platform: 'steam', steamid: STEAM_ID }))).status).toBe(200)
   })
 
   test('without a Steam API key it cannot check, so it does not link', async () => {
@@ -135,5 +142,51 @@ describe('Steam', () => {
     expect(updates()[0][0]).toContain('steamid = NULL')
     expect(clearUserCache).toHaveBeenCalledWith('11')
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-steam', BOB)
+  })
+})
+
+describe('PSN', () => {
+  beforeEach(() => {
+    ;(psnConfigured as jest.Mock).mockResolvedValue(true)
+    ;(findPsnAccount as jest.Mock).mockResolvedValue({ accountId: '123', onlineId: 'BobPS' })
+    ;(psnSummary as jest.Mock).mockResolvedValue({})
+  })
+
+  test('links an online ID Sony knows and whose trophies are readable, and logs it', async () => {
+    const res = await POST(post({ id: 11, platform: 'psn', username: ' BobPS ' }))
+    expect(res.status).toBe(200)
+    expect(findPsnAccount).toHaveBeenCalledWith('BobPS')
+    expect(updates()[0][1]).toEqual(['123', 'BobPS', 11])
+    expect(clearUserCache).toHaveBeenCalledWith('11')
+    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'link-psn', BOB, { psnaccountid: '123', psnusername: 'BobPS' })
+  })
+
+  test('a malformed online ID is refused before asking Sony', async () => {
+    expect((await POST(post({ id: 11, platform: 'psn', username: 'a b' }))).status).toBe(400)
+    expect(findPsnAccount).not.toHaveBeenCalled()
+  })
+
+  test('an unknown online ID is a 404 and nothing is stored', async () => {
+    ;(findPsnAccount as jest.Mock).mockResolvedValue(null)
+    expect((await POST(post({ id: 11, platform: 'psn', username: 'Nobody' }))).status).toBe(404)
+    expect(updates()).toHaveLength(0)
+  })
+
+  test('private trophies are refused and nothing is stored', async () => {
+    ;(psnSummary as jest.Mock).mockRejectedValue(new Error('private'))
+    expect((await POST(post({ id: 11, platform: 'psn', username: 'BobPS' }))).status).toBe(403)
+    expect(updates()).toHaveLength(0)
+  })
+
+  test('without PSN configured it cannot check, so it does not link', async () => {
+    ;(psnConfigured as jest.Mock).mockResolvedValue(false)
+    expect((await POST(post({ id: 11, platform: 'psn', username: 'BobPS' }))).status).toBe(503)
+  })
+
+  test('unlinking clears the account and its cache, and logs it', async () => {
+    expect((await DELETE(del('id=11&platform=psn'))).status).toBe(200)
+    expect(updates()[0][0]).toContain('psnaccountid = NULL')
+    expect(clearUserCache).toHaveBeenCalledWith('11')
+    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-psn', BOB)
   })
 })

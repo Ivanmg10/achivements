@@ -22,11 +22,11 @@ test('offers both ways in, pointing at the auth page', () => {
   expect(screen.getByRole('link', { name: en.landing.signIn }).getAttribute('href')).toBe('/authPage')
 })
 
-test('names the platforms it follows, PlayStation as still coming', () => {
+test('names the platforms it follows', () => {
   render(<LandingPage />)
   expect(screen.getByText('RetroAchievements')).toBeInTheDocument()
   expect(screen.getByText('Steam')).toBeInTheDocument()
-  expect(screen.getByText(en.landing.psnSoon)).toBeInTheDocument()
+  expect(screen.getByText('PlayStation')).toBeInTheDocument()
 })
 
 test('lists what you get, one card each', () => {

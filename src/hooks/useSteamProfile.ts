@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import type { SteamProfile } from '@/types/steam'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 /** The linked Steam profile (persona, avatar, level, what they are playing right now). */
 export function useSteamProfile() {
   const { data: session } = useSession()
+  const subject = useSubject()
   const steamid = session?.user?.steamid ?? null
 
   const [profile, setProfile] = useState<SteamProfile | null>(null)
@@ -16,7 +19,7 @@ export function useSteamProfile() {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/steam/profile')
+      const res = await fetch(withSubject('/api/steam/profile', subject))
       if (!res.ok) throw new Error(`Failed to load Steam profile (${res.status})`)
       setProfile((await res.json()) as SteamProfile)
     } catch (err) {
@@ -25,7 +28,7 @@ export function useSteamProfile() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [subject])
 
   useEffect(() => {
     if (!steamid) {

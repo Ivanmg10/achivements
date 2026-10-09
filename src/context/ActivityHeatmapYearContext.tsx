@@ -6,6 +6,10 @@ import { RecentAchievement } from '@/types/types'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { toRecentAchievement } from '@/utils/steamMappers'
+import { usePsnRecentTrophies } from '@/hooks/usePsnRecentTrophies'
+import { psnToRecentAchievement } from '@/utils/psnMappers'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 type CtxType = {
   achievements: RecentAchievement[]
@@ -23,11 +27,12 @@ const byDateDesc = (a: RecentAchievement, b: RecentAchievement) => b.Date.locale
  * from, here and not in the hook so the three places that read it (the header
  * badge, the side panel, the streak page) share one load.
  *
- * Both platforms together is the point: a day spent on Steam is a day played,
- * and leaving it out broke streaks that never happened.
+ * Every platform together is the point: a day spent on Steam or PlayStation is
+ * a day played, and leaving it out broke streaks that never happened.
  */
 export function ActivityHeatmapYearProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
+  const subject = useSubject()
   const rausername = session?.user?.rausername
   const steamid = session?.user?.steamid
   const [raAchievements, setRaAchievements] = useState<RecentAchievement[]>([])
@@ -40,6 +45,8 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
   // A year of Steam has to be assembled game by game, so it comes from its own
   // endpoint; the hook already handles the language and the account changing.
   const steam = useSteamRecentAchievements(steamid ? 'year' : null)
+  // PSN the same way: Sony has no feed, the server assembles it per game.
+  const psn = usePsnRecentTrophies('year')
 
   const doFetch = useCallback(() => {
     // Named, so a retry can call it again.
@@ -50,7 +57,7 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setRaError(true); setRaLoading(false) }
       }
-      fetchWithRetry('/api/getActivityHeatmapYear')
+      fetchWithRetry(withSubject('/api/getActivityHeatmapYear', subject))
         .then((data) => {
           if (!Array.isArray(data)) return onFail()
           setRaAchievements(data as RecentAchievement[])
@@ -60,7 +67,7 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
         .catch(onFail)
     }
     run()
-  }, [rausername])
+  }, [rausername, subject])
 
   useEffect(() => {
     if (!rausername) { setRaLoading(false); return }
@@ -76,9 +83,11 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
     [steam.achievements],
   )
 
+  const psnAchievements = useMemo(() => psn.trophies.map(psnToRecentAchievement), [psn.trophies])
+
   const achievements = useMemo(
-    () => [...raAchievements, ...steamAchievements].sort(byDateDesc),
-    [raAchievements, steamAchievements],
+    () => [...raAchievements, ...steamAchievements, ...psnAchievements].sort(byDateDesc),
+    [raAchievements, steamAchievements, psnAchievements],
   )
 
   const refetch = useCallback(() => {
@@ -87,12 +96,13 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
     setRaAchievements([])
     doFetch()
     steam.retry()
-  }, [doFetch, steam])
+    psn.retry()
+  }, [doFetch, steam, psn])
 
   // One platform failing is not the streak failing: it only counts as an error
-  // when nothing came back at all, so a Steam outage does not hide RA's year.
-  const isLoading = raLoading || steam.isLoading
-  const error = (raError || Boolean(steam.error)) && achievements.length === 0
+  // when nothing came back at all, so a Steam or PSN outage does not hide RA's year.
+  const isLoading = raLoading || steam.isLoading || psn.isLoading
+  const error = (raError || Boolean(steam.error) || Boolean(psn.error)) && achievements.length === 0
 
   const value = useMemo(
     () => ({ achievements, isLoading, error, refetch }),

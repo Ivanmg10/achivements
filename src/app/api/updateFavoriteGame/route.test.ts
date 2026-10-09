@@ -37,7 +37,7 @@ test('no source means the RA favourite, as before', async () => {
 })
 
 test('rejects an unknown platform and incomplete games', async () => {
-  expect((await POST(post({ id: 1, title: 'Zelda', source: 'psn' }))).status).toBe(400)
+  expect((await POST(post({ id: 1, title: 'Zelda', source: 'xbox' }))).status).toBe(400)
   expect((await POST(post({ title: 'Zelda' }))).status).toBe(400)
   expect(pool.query).not.toHaveBeenCalled()
 })
@@ -57,7 +57,7 @@ test('delete clears the column of the given platform', async () => {
 })
 
 test('delete rejects an unknown platform', async () => {
-  expect((await DELETE(del('psn'))).status).toBe(400)
+  expect((await DELETE(del('xbox'))).status).toBe(400)
 })
 
 test('a database error is a 500, not a crash', async () => {

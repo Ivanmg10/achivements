@@ -1,3 +1,4 @@
+import { en } from '@/translations/en'
 import { render, screen } from '@testing-library/react'
 import MainPageProfileSt from './MainPageProfileSt'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -36,7 +37,7 @@ describe('when Steam is not linked', () => {
 
   test('links to the settings page to connect', () => {
     render(<MainPageProfileSt />)
-    const link = screen.getByRole('link', { name: 'Sign in with Steam' })
+    const link = screen.getByRole('link', { name: en.profileSt.signIn })
     expect(link.getAttribute('href')).toBe('/user')
   })
 })
@@ -46,5 +47,5 @@ test('shows the linked profile once Steam is connected', () => {
   render(<MainPageProfileSt />)
 
   expect(screen.getByTestId('linked')).toHaveTextContent('Ivan false')
-  expect(screen.queryByRole('link', { name: 'Sign in with Steam' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: en.profileSt.signIn })).not.toBeInTheDocument()
 })

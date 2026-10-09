@@ -5,8 +5,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatDate } from '@/utils/utils'
+import { gameHref } from '@/utils/gameRef'
 import type { PerfectGame } from '@/utils/perfectGames'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
+import PlatformMark from '@/components/platform-mark/PlatformMark'
 
 /**
  * Tile side in px. Steam hands out its game icons at 32×32 and publishes no
@@ -27,7 +28,7 @@ export default function PerfectGameTile({ game, date }: { game: PerfectGame; dat
 
   return (
     <Link
-      href={game.source === 'steam' ? `/steamGame/${game.id}` : `/gameInfo/${game.id}`}
+      href={gameHref(game.source, game.id)}
       aria-label={game.title}
       aria-describedby={tipId}
       className="relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
@@ -39,17 +40,15 @@ export default function PerfectGameTile({ game, date }: { game: PerfectGame; dat
           width={TILE}
           height={TILE}
           className="rounded group-hover:scale-110 transition-transform"
-          unoptimized={game.source === 'steam'}
+          unoptimized={game.source !== 'ra'}
         />
       ) : (
         <span className="block w-8 h-8 rounded bg-ink/10" aria-hidden="true" />
       )}
-      {game.source === 'steam' ? (
-        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-bg-card flex items-center justify-center" aria-hidden="true">
-          <SteamLogo size={10} className="text-[#66c0f4]" />
-        </span>
-      ) : (
+      {game.source === 'ra' ? (
         game.hardcore && <span className="absolute -top-1 -right-1 w-3 h-3 bg-warning rounded-full border border-bg-card" aria-hidden="true" />
+      ) : (
+        <PlatformMark source={game.source} size={10} />
       )}
 
       <span

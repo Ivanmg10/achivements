@@ -100,3 +100,15 @@ describe('with Steam games', () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument()
   })
 })
+
+test('a PSN game untouched for a month counts too, by its last trophy', async () => {
+  const old = new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString()
+  const psn = {
+    _source: 'psn' as const, id: 2018800, titleId: 'NPWR20188_00', service: 'trophy2' as const, title: 'Idle PS', imageIcon: '',
+    consoleName: 'PS5', maxPossible: 10, numAwarded: 3, pctWon: 30, lastPlayed: old,
+    earned: { bronze: 3, silver: 0, gold: 0, platinum: 0 }, defined: { bronze: 9, silver: 0, gold: 0, platinum: 1 },
+  }
+  render(<MainPageAbandoned playing={[]} psnGames={[psn]} />)
+  await waitFor(() => expect(screen.getByText('Idle PS')).toBeInTheDocument())
+  expect(screen.getByRole('link', { name: /Idle PS/ })).toHaveAttribute('href', '/psnGame/NPWR20188_00')
+})

@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
+import { dataOwner } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { gameKey, parseGameKey } from '@/utils/gameRef'
 
-export async function GET() {
+export async function GET(req?: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    const owner = await dataOwner(req)
+    if (!owner) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
     }
 
     const result = await pool.query(
       'SELECT source, game_id, position FROM perfect_games_order WHERE user_id = $1 ORDER BY position ASC',
-      [session.user.id],
+      [owner.id],
     )
     return NextResponse.json(result.rows)
   } catch (err) {

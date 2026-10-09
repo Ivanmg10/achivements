@@ -38,8 +38,8 @@ export function heatmapBuckets(nowSeconds: number): HeatmapBucket[] {
   return buckets
 }
 
-export async function GET() {
-  const auth = await requireRaSession()
+export async function GET(req?: Request) {
+  const auth = await requireRaSession(req)
   if (!auth.ok) return auth.response
   const { id, rausername, raid } = auth.session
 

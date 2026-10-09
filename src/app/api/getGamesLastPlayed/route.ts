@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { dataOwner } from "@/lib/apiAuth";
 import { withCache } from "@/lib/raCache";
 import { cachedJson } from "@/lib/httpCache";
 import { getGameInfoAndUserProgress } from "@/lib/raClient";
@@ -11,12 +10,12 @@ const TTL = 10 * 60 * 1000;
 const MAX_GAMES = 100;
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
+  const owner = await dataOwner(request);
+  if (!owner) {
     return NextResponse.json({ message: "No autorizado" }, { status: 401 });
   }
 
-  const { rausername, raid, id } = session.user;
+  const { rausername, raid, id } = owner;
   if (!rausername || !raid) {
     return NextResponse.json({});
   }

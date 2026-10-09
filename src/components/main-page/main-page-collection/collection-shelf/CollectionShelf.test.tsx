@@ -11,7 +11,7 @@ jest.mock('@/components/game-cover/GameCover', () => ({
 const game = (id: number, source: 'ra' | 'steam' = 'ra'): LatestPerfect => ({
   key: `${source}:${id}`, source, id, title: `Game ${id}`, subtitle: 'SNES', date: '2026-08-09T10:00:00Z', hardcore: true,
 })
-const counts = { hc: 7, sc: 2, steam: 15 }
+const counts = { hc: 7, sc: 2, steam: 15, psn: 0 }
 
 test('the latest games, newest first, each with its place, cover and link', () => {
   render(<CollectionShelf games={[game(1), game(620, 'steam'), game(3)]} counts={counts} />)
@@ -31,7 +31,7 @@ test('the counts of each kind sit by the title', () => {
 })
 
 test('nothing at 100% yet says so', () => {
-  render(<CollectionShelf games={[]} counts={{ hc: 0, sc: 0, steam: 0 }} />)
+  render(<CollectionShelf games={[]} counts={{ hc: 0, sc: 0, steam: 0, psn: 0 }} />)
   expect(screen.getByText(en.cards.noCompletedGames)).toBeInTheDocument()
   expect(screen.queryByRole('listitem')).not.toBeInTheDocument()
 })

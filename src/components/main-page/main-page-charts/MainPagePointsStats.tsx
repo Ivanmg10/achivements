@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { RecentAchievement, UserRankAndScore } from '@/types/types'
-import { calcStreak, calcAvgPerDay, calcThisMonth } from '@/utils/utils'
+import { calcAvgPerDay, calcThisMonth } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
@@ -12,11 +12,14 @@ import PeriodAchievementsModal from '@/components/period-achievements-modal/Peri
 export default function MainPagePointsStats({
   achievements,
   heatmapAchievements,
+  streak = 0,
   rank,
   isLoading,
 }: {
   achievements: RecentAchievement[]
   heatmapAchievements: RecentAchievement[]
+  /** Current streak in days, the top bar's. */
+  streak?: number
   rank: UserRankAndScore | null
   isLoading?: boolean
 }) {
@@ -54,7 +57,6 @@ export default function MainPagePointsStats({
 
   const pts7d = weekAchievements.reduce((s, a) => s + a.Points, 0)
   const monthAchievements = safeHeatmap.filter((a) => a.Date.slice(0, 7) === monthKey)
-  const streak = calcStreak(heatmapAchievements)
   const thisMonth = calcThisMonth(safeHeatmap)
   const avgPerDay = calcAvgPerDay(safeHeatmap, 30)
   const todaySub = ptsToday === 0 ? T.pointsStats.noActivity : `${achToday} ${T.lineChart.achievements}`

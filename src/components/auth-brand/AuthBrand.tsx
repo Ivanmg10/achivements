@@ -9,8 +9,7 @@ const CHIP = 'flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full ring-1 
 
 /**
  * The name over the sign-in forms, the line that says what it is, and the
- * platforms it reads, each with its own mark. PlayStation is greyed and says
- * it is coming, in words as well as in tone.
+ * platforms it reads, each with its own mark.
  */
 export default function AuthBrand() {
   const { T } = useLanguage()
@@ -27,9 +26,9 @@ export default function AuthBrand() {
           <SteamLogo size={12} className="text-[#66c0f4]" aria-hidden="true" />
           Steam
         </li>
-        <li className={`${CHIP} bg-bg-tertiary/50 text-text-secondary ring-ink/5`}>
-          <PlaystationLogo size={12} aria-hidden="true" />
-          PlayStation · {T.userData.comingSoon.toLowerCase()}
+        <li className={`${CHIP} bg-bg-card/70 text-text-main ring-ink/10`}>
+          <PlaystationLogo size={12} className="text-[#0070d1]" aria-hidden="true" />
+          PlayStation
         </li>
       </ul>
     </div>

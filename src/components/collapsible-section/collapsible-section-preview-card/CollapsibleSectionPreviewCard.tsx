@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
+import GameIcon from '@/components/game-icon/GameIcon'
 import { gameHref } from '@/utils/gameRef'
 import { steamAssetUrl } from '@/lib/steamClient'
 import { useSpotlight } from '@/hooks/useSpotlight'
@@ -17,8 +18,20 @@ import type { PreviewGame } from '@/utils/sectionPreview'
 export default function CollapsibleSectionPreviewCard({ game, eager = false }: { game: PreviewGame; eager?: boolean }) {
   const done = game.pct !== null && game.pct >= 100
   const onPointerMove = useSpotlight()
-  const art = game.source === 'steam' ? steamAssetUrl(game.id, 'header') : game.imageRef ? `https://retroachievements.org${game.imageRef}` : null
-  const barColor = game.source === 'steam' ? (done ? 'bg-[#a4d007]' : 'bg-[#66c0f4]') : done ? 'bg-warning' : 'bg-accent'
+  const art =
+    game.source === 'steam'
+      ? steamAssetUrl(game.id, 'header')
+      : game.source === 'psn'
+        ? game.imageRef || null
+        : game.imageRef
+          ? `https://retroachievements.org${game.imageRef}`
+          : null
+  const barColor =
+    game.source === 'steam'
+      ? done ? 'bg-[#a4d007]' : 'bg-[#66c0f4]'
+      : game.source === 'psn'
+        ? done ? 'bg-sky-300' : 'bg-[#0070d1]'
+        : done ? 'bg-warning' : 'bg-accent'
 
   return (
     <Link
@@ -29,6 +42,8 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
       <GameCardBackdrop src={art} surface="card" eager={eager} />
       {game.source === 'steam' ? (
         <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageRef} size={56} className="w-14 h-14 rounded-lg shrink-0" />
+      ) : game.source === 'psn' ? (
+        <GameIcon source="psn" id={game.id} imageUrl={game.imageRef} size={56} className="w-14 h-14 rounded-lg shrink-0" />
       ) : game.imageRef ? (
         <Image
           src={`https://retroachievements.org${game.imageRef}`}

@@ -16,7 +16,7 @@ const GRID = 'grid grid-cols-[repeat(auto-fill,minmax(4.75rem,1fr))] gap-x-2 gap
  * Every game at 100%, as covers with their names. By default in the user's
  * own order, editable as before; "by year" groups them by the year each got
  * there, newest first, with the dates on show. Chips narrow it to RA
- * hardcore, RA softcore or Steam.
+ * hardcore, RA softcore, Steam or PlayStation.
  */
 export default function CollectionGrid({
   games,
@@ -31,7 +31,8 @@ export default function CollectionGrid({
   allGames: PerfectGame[]
   dates: Map<string, string>
   order: string[]
-  onSaveOrder: (order: string[]) => Promise<void>
+  /** Absent when the order is someone else's: it can be read, not changed. */
+  onSaveOrder?: (order: string[]) => Promise<void>
 }) {
   const { T } = useLanguage()
   const [filter, setFilter] = useState<PerfectFilter>('all')
@@ -58,7 +59,7 @@ export default function CollectionGrid({
               { value: 'order', label: T.cards.viewMyOrder },
             ]}
           />
-          {view === 'order' && (
+          {view === 'order' && onSaveOrder && (
             <button
               onClick={() => setEditOpen(true)}
               aria-label={T.cards.reorderMasteredAria}
@@ -79,6 +80,7 @@ export default function CollectionGrid({
           { value: 'raHc', label: `${T.cards.filterRaHc} ${count('raHc')}` },
           { value: 'raSc', label: `${T.cards.filterRaSc} ${count('raSc')}` },
           { value: 'steam', label: `Steam ${count('steam')}` },
+          { value: 'psn', label: `PlayStation ${count('psn')}` },
         ]}
       />
 
@@ -113,7 +115,9 @@ export default function CollectionGrid({
         </div>
       )}
 
-      <PerfectGamesOrderModal isOpen={editOpen} onClose={() => setEditOpen(false)} games={allGames} order={order} onSaveOrder={onSaveOrder} />
+      {onSaveOrder && (
+        <PerfectGamesOrderModal isOpen={editOpen} onClose={() => setEditOpen(false)} games={allGames} order={order} onSaveOrder={onSaveOrder} />
+      )}
     </div>
   )
 }

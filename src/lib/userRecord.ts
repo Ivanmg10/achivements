@@ -15,18 +15,24 @@ export type UserRecord = {
   rausername: string | null
   steamid: string | null
   steamusername: string | null
+  psnaccountid: string | null
+  psnusername: string | null
   email: string | null
   /** When the address was confirmed. Null means it never was; nothing is blocked either way. */
   email_verified_at: string | null
   admin: boolean | null
   raUser: RetroAchievementsUserProfile | null
   location: string | null
+  description: string | null
+  profile_public: boolean
+  gender: 'male' | 'female' | 'neutral' | null
   favorite_game: SavedGame
   favorite_steam_game: SavedGame
+  favorite_psn_game: SavedGame
 }
 
 const COLUMNS = `id, username, password, theme, avatar, raid, rausername, steamid, steamusername,
-  email, email_verified_at, admin, "raUser", location, favorite_game, favorite_steam_game`
+  psnaccountid, psnusername, email, email_verified_at, admin, "raUser", location, description, gender, profile_public, favorite_game, favorite_steam_game, favorite_psn_game`
 
 // Every API call re-reads the signed-in user (see authOptions' jwt callback); a
 // short cache keeps that to about one query per user per minute. A session

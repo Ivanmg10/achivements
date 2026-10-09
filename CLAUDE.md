@@ -136,9 +136,8 @@ this reminder on purpose, because it is easy to forget.
       account owner.
 - [x] `NEXTAUTH_URL` set to `https://www.cheevovault.com` in Vercel. **www, not
       the apex**: the apex 308-redirects to www, so that is the host visitors
-      are on. Reset links are built from it, NextAuth compares it against the
-      real host when signing in, and Steam's return_to has to come back to the
-      same host the session cookie belongs to.
+      are on. Reset links are built from it, and NextAuth compares it against
+      the real host when signing in.
 - [x] `migrations/018_unique_username_email.sql` run (2026-10-02). Two
       sign-ups racing each other can no longer take the same username or
       address, in any case.
@@ -239,10 +238,45 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   the address, then reset the password.
 - Admins can create users (for odd cases; sign-up is open), edit, delete, and
   link/unlink RA (checked against RA with the user's key) and Steam (checked to
-  exist through the Steam API). Linking Steam here skips the OpenID proof of
-  ownership — the admin vouches for it, and the log records it.
+  exist through the Steam API). Neither proves ownership — users link Steam by
+  name too — so the log records who linked what.
 - The privacy policy (`/privacy`) says all of this; `/terms` says when an
   account may be suspended or deleted. Change the policy if the panel changes.
+
+## PlayStation (PSN) — read before touching it
+
+Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient.ts`.
+
+- **One app account, not the user's.** Every call is made as the PSN account
+  whose NPSSO the app holds; it can read any profile with public trophies.
+  Users link by typing their online ID — nothing proves it is theirs, so
+  `psnaccountid` is deliberately **not unique** (a squatter must not lock the
+  owner out). `/privacy` and `/terms` say so.
+- **The NPSSO dies 60 days after sign-in, and nothing extends it** (measured:
+  refreshing returns the same 10-day refresh token; psn-api issue #171; Sony's
+  sign-in has a captcha). It lives encrypted in `psn_credentials`
+  (`migrations/026`, `src/lib/psnCredentials.ts`, `secretBox`), is renewed by
+  pasting a new one in the admin panel, and `/api/cron/psnToken` mails the
+  admins from 7 days before. `PSN_NPSSO` only seeds the first setup.
+  **Do not** try to automate Sony's sign-in.
+- **Games are keyed like RA and Steam**: source `'psn'`, and the trophy set's
+  number as id (`NPWR20188_00` ↔ `2018800`, `psnNumericId`/`psnTitleId`).
+- **A game with DLC counts by its base game** (the `default` trophy group):
+  the main fields are the base game's, `full` has the whole set. That is what
+  makes a platinum "completed".
+- **Two lists, merged**: the trophy list (`getUserTitles`) and the played-games
+  list (play time, last session, store art, PS4/PS5 only, its own privacy
+  setting). `lastTrophyAt` is the trophy list's date and keys every trophy
+  cache; `lastPlayed` is the last session when known.
+- **Caches** live in `steam_cache` under `psn:` keys. When the shape of a
+  cached value changes, bump its key's version (`psn:titles:vN`) in the same
+  change — a dev server will otherwise serve the old shape.
+- **PS3/Vita games** have no play data and no Store page: their cover,
+  backdrop and release year come from IGDB (`src/lib/igdbClient.ts`, a Twitch
+  app in `TWITCH_CLIENT_ID`/`TWITCH_CLIENT_SECRET`), matched by title and
+  platform, cached half a year. Without the keys they keep the trophy icon.
+- Sony returns errors as bodies, not throws: every response goes through
+  `unwrap()`. `psnFailure()` maps them to 503 / 403 (private) / 502.
 
 ## Registration
 
@@ -266,6 +300,21 @@ Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — a
 - [x] Public user profiles
 - [ ] Group hardcore achievement tracking
 - [ ] Push notifications
+- [x] Steam linked by name, like PSN (2026-10-09): custom URL name, profile
+      link or SteamID64 (`src/lib/steamAccount.ts`), no OpenID, and no
+      "already linked elsewhere" check (`migrations/028`), so one person can
+      have several CheevoVault accounts. The profile has to be public.
+- [ ] RA by name too, through one app key (`RA_API_KEY`) instead of each
+      user's. **Not before** RA's cache moves to the DB (it is per-instance
+      memory now, so every cold start asks RA again) and a 429 waits for
+      `Retry-After`: every user's calls would come out of one key, and RA's
+      limit is unpublished. Ask in RA's Discord `#coders` before opening it up.
+      Until then the RA modal says why the key is asked for. Then one search
+      box that looks a name up on all three.
+- [ ] Later, optional: a "verified" badge per linked account — the app gives
+      a code, the user puts it for a few minutes in their RA motto / Steam
+      summary / PSN About me, the app reads it. Only if public profiles or
+      group comparisons come to need proof of ownership.
 - [ ] 13 optimization fixes (cache stampede, Cache-Control headers, duplicate fetches, TTLs, error boundaries, lazy images)
 - [ ] After 1.0: clear the ~51 `react-hooks/set-state-in-effect` warnings
       (a warning in `eslint.config.mjs`, not an error). None is a bug. Three

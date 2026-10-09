@@ -12,7 +12,7 @@ import AchivementsLineChartTooltip from './achivements-line-chart-tooltip/Achive
 /**
  * The last seven days of unlocks as a line in the theme's accent, with a soft
  * fill fading down from it. A dot marks each day that had any; the tooltip
- * splits a day into RA and Steam. Above it the week's total and its best day.
+ * splits a day into RA, Steam and PSN. Above it the week's total and its best day.
  * Clicking a day opens what was unlocked on it.
  */
 export default function AchievementsLineChart({

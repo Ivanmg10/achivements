@@ -4,10 +4,13 @@ import { useMemo, useEffect, useRef, useState, useCallback } from 'react'
 import { IconMoodEmpty } from '@tabler/icons-react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
+import type { PsnGameProgress } from '@/types/psn'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { classifySteamGame } from '@/utils/steamFeed'
+import { classifyPsnGame } from '@/utils/psnTitles'
+import { gameHref } from '@/utils/gameRef'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
@@ -18,19 +21,22 @@ const DAY_MS = 1000 * 60 * 60 * 24
 type Row = { key: string; href: string; imageUrl?: string; title: string; subtitle: string; daysAgo: number; pct: number }
 
 /**
- * Games in progress on either platform, untouched for 30+ days, longest idle
- * first. Steam games come from the library, which already carries the
- * last-played date and counts, so they need none of RA's extra lookups.
+ * Games in progress on any platform, untouched for 30+ days, longest idle
+ * first. Steam and PSN games come from their libraries, which already carry
+ * the last-played date and counts, so they need none of RA's extra lookups.
+ * (For PSN, "last played" is the last trophy — the closest Sony says.)
  */
 
 export default function MainPageAbandoned({
   playing,
   steamGames = [],
+  psnGames = [],
   isLoading,
   now: nowProp,
 }: {
   playing: RetroAchievementsGameCompleted[]
   steamGames?: SteamGameProgress[]
+  psnGames?: PsnGameProgress[]
   isLoading?: boolean
   now?: number
 }) {
@@ -121,8 +127,19 @@ export default function MainPageAbandoned({
         daysAgo: Math.floor((now - new Date(g.lastPlayed!).getTime()) / DAY_MS),
         pct: Math.round(g.pctWon),
       }))
-    return [...ra, ...steam].filter((g) => g.daysAgo >= ABANDONED_DAYS).sort((a, b) => b.daysAgo - a.daysAgo)
-  }, [playing, steamGames, lastPlayedMap, lastAchDates, now])
+    const psn: Row[] = psnGames
+      .filter((g) => classifyPsnGame(g) === 'playing' && g.lastPlayed)
+      .map((g) => ({
+        key: `psn:${g.id}`,
+        href: gameHref('psn', g.id),
+        imageUrl: g.imageIcon || undefined,
+        title: g.title,
+        subtitle: g.consoleName,
+        daysAgo: Math.floor((now - new Date(g.lastPlayed!).getTime()) / DAY_MS),
+        pct: Math.round(g.pctWon),
+      }))
+    return [...ra, ...steam, ...psn].filter((g) => g.daysAgo >= ABANDONED_DAYS).sort((a, b) => b.daysAgo - a.daysAgo)
+  }, [playing, steamGames, psnGames, lastPlayedMap, lastAchDates, now])
 
   const datesNotReady = recentlyPlayedLoading || (missingIdsKey !== '' && fetchedKey !== missingIdsKey)
   const loading = isLoading || datesNotReady

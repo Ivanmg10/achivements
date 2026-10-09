@@ -1,6 +1,9 @@
 import { upgradeLegacyIconUrl } from '@/lib/steamClient'
 import { gameKey } from '@/utils/gameRef'
 import { classifySteamGame } from '@/utils/steamFeed'
+import { classifyPsnGame } from '@/utils/psnTitles'
+import { PSN_PLATFORM } from '@/utils/psnMappers'
+import type { PsnGameProgress } from '@/types/psn'
 import type { RecentlyPlayedGame, RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
 
@@ -18,9 +21,9 @@ export type GameCandidate = {
   source: GameSource
   id: number
   title: string
-  /** Console name for RA, "Steam" for Steam. */
+  /** Console name for RA, "Steam" / "PlayStation" for the others. */
   subtitle: string
-  /** What to store as the game's image: RA's path, or Steam's icon URL. */
+  /** What to store as the game's image: RA's path, or Steam's / PSN's icon URL. */
   imageRef: string
   /** Completion as a 0–1 fraction, as group items store it. */
   pctWon: number
@@ -101,6 +104,18 @@ export function buildSteamCandidates(library: SteamGameProgress[]): GameCandidat
       key: gameKey('steam', g.id), source: 'steam', id: g.id, title: g.title, subtitle: 'Steam',
       imageRef: g.imageIcon, pctWon: g.pctWon / 100, numAwarded: g.numAwarded, maxPossible: g.maxPossible,
       status: category ? STEAM_STATUS[category] : null,
+    }
+  })
+}
+
+/** PSN candidates, with the same statuses as Steam's. */
+export function buildPsnCandidates(library: PsnGameProgress[]): GameCandidate[] {
+  return library.map((g) => {
+    const category = classifyPsnGame(g)
+    return {
+      key: gameKey('psn', g.id), source: 'psn', id: g.id, title: g.title, subtitle: PSN_PLATFORM,
+      imageRef: g.imageIcon, pctWon: g.pctWon / 100, numAwarded: g.numAwarded, maxPossible: g.maxPossible,
+      status: category === 'completed' ? 'perfect' : category === 'playing' ? 'in-progress' : 'want-to-play',
     }
   })
 }

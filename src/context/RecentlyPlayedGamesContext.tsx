@@ -4,6 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { useSession } from 'next-auth/react'
 import { RecentlyPlayedGame } from '@/types/types'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 type CtxType = {
   games: RecentlyPlayedGame[]
@@ -16,6 +18,7 @@ const Ctx = createContext<CtxType>({ games: [], isLoading: true, error: false, r
 
 export function RecentlyPlayedGamesProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
+  const subject = useSubject()
   // No RetroAchievements account means nothing to ask for.
   const rausername = session?.user?.rausername
   const [games, setGames] = useState<RecentlyPlayedGame[]>([])
@@ -34,7 +37,7 @@ export function RecentlyPlayedGamesProvider({ children }: { children: React.Reac
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
-      fetchWithRetry('/api/getRecentlyPlayedGames')
+      fetchWithRetry(withSubject('/api/getRecentlyPlayedGames', subject))
         .then((data) => {
           if (!Array.isArray(data)) return onFail()
           setGames(data as RecentlyPlayedGame[])
@@ -44,7 +47,7 @@ export function RecentlyPlayedGamesProvider({ children }: { children: React.Reac
         .catch(onFail)
     }
     run()
-  }, [status, rausername])
+  }, [status, rausername, subject])
 
   useEffect(() => {
     if (status === 'unauthenticated' || (status === 'authenticated' && !rausername)) {

@@ -148,3 +148,8 @@ export function steamStoreUrl(appId: number): string {
 export function getSteamLevel(steamId: string, apiKey: string) {
   return fetchSteam(`${STEAM_API_BASE}/IPlayerService/GetSteamLevel/v1/?${qs({ key: apiKey, steamid: steamId })}`)
 }
+
+/** A custom profile URL's name (steamcommunity.com/id/<name>) to its SteamID64: `{ response: { success: 1, steamid } }`, success 42 when none. */
+export function resolveVanityUrl(vanity: string, apiKey: string) {
+  return fetchSteam(`${STEAM_API_BASE}/ISteamUser/ResolveVanityURL/v1/?${qs({ key: apiKey, vanityurl: vanity })}`)
+}

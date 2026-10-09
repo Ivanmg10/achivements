@@ -26,7 +26,7 @@ export default function OpengraphImage() {
         <div style={{ fontSize: 44, marginTop: 24, color: 'rgb(180 185 200)', maxWidth: 900 }}>
           Every achievement you have earned, in one place
         </div>
-        <div style={{ fontSize: 32, marginTop: 56, color: 'rgb(148 153 168)' }}>RetroAchievements · Steam</div>
+        <div style={{ fontSize: 32, marginTop: 56, color: 'rgb(148 153 168)' }}>RetroAchievements · Steam · PlayStation</div>
       </div>
     ),
     size,

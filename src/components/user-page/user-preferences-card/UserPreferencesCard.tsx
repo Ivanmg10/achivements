@@ -3,11 +3,14 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
-import { IconEyeOff, IconLanguage, IconPalette } from '@tabler/icons-react'
+import { IconEyeOff, IconGenderBigender, IconLanguage, IconPalette } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
+import UserProfilePublicToggle from '@/components/user-page/user-profile-public-toggle/UserProfilePublicToggle'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
+import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import FavoriteGameModal, { FavoriteGame } from '@/components/favorite-game-modal/FavoriteGameModal'
+import GenderModal from '@/components/gender-modal/GenderModal'
 import LanguageModal from '@/components/language-modal/LanguageModal'
 import ThemeModal from '@/components/theme-modal/ThemeModal'
 import HiddenGamesModal from '@/components/hidden-games-modal/HiddenGamesModal'
@@ -17,6 +20,8 @@ import { useTheme } from '@/context/ThemeContext'
 import { candidateIconUrl } from '@/utils/gameCandidates'
 import type { GameSource } from '@/types/steam'
 import { notify } from '@/lib/notify'
+
+const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
 
 /** Saves the favourite game for one platform and refreshes the session. */
 async function saveFavorite(source: GameSource, game: FavoriteGame | null) {
@@ -56,11 +61,14 @@ export default function UserPreferencesCard() {
   const [langOpen, setLangOpen] = useState(false)
   const [favoriteOpen, setFavoriteOpen] = useState<GameSource | null>(null)
   const [hiddenOpen, setHiddenOpen] = useState(false)
+  const [genderOpen, setGenderOpen] = useState(false)
   const { hidden } = useHiddenGames()
 
   const user = session?.user
   const raFavorite = user?.favorite_game ?? null
   const steamFavorite = user?.favorite_steam_game ?? null
+  const psnFavorite = user?.favorite_psn_game ?? null
+  const favorites: Record<GameSource, FavoriteGame | null> = { ra: raFavorite, steam: steamFavorite, psn: psnFavorite }
 
   async function handleSave(source: GameSource, game: FavoriteGame | null) {
     await saveFavorite(source, game)
@@ -86,12 +94,26 @@ export default function UserPreferencesCard() {
           <span className="text-base font-medium uppercase">{lang}</span>
         </ProfileField>
 
+        <ProfileField
+          label={T.userData.gender}
+          icon={<IconGenderBigender size={18} />}
+          value={user?.gender ? T.userData[GENDER_KEYS[user.gender]] : null}
+          empty={T.userData.notSet}
+          onEdit={() => setGenderOpen(true)}
+        />
+
+        <UserProfilePublicToggle />
+
         <ProfileField label={T.userPage.favoriteRaGame} icon={<RaLogo height={11} />} onEdit={() => setFavoriteOpen('ra')}>
           <FavoriteValue game={raFavorite} source="ra" empty={T.userData.notSet} />
         </ProfileField>
 
         <ProfileField label={T.userPage.favoriteSteamGame} icon={<SteamLogo size={18} className="text-[#66c0f4]" aria-hidden="true" />} onEdit={() => setFavoriteOpen('steam')}>
           <FavoriteValue game={steamFavorite} source="steam" empty={T.userData.notSet} />
+        </ProfileField>
+
+        <ProfileField label={T.userPage.favoritePsnGame} icon={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />} onEdit={() => setFavoriteOpen('psn')}>
+          <FavoriteValue game={psnFavorite} source="psn" empty={T.userData.notSet} />
         </ProfileField>
 
         <ProfileField
@@ -106,10 +128,11 @@ export default function UserPreferencesCard() {
       <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
       <HiddenGamesModal isOpen={hiddenOpen} onClose={() => setHiddenOpen(false)} />
       <LanguageModal isOpen={langOpen} onClose={() => setLangOpen(false)} />
+      <GenderModal isOpen={genderOpen} onClose={() => setGenderOpen(false)} current={user?.gender} />
       <FavoriteGameModal
         isOpen={favoriteOpen !== null}
         source={favoriteOpen ?? 'ra'}
-        current={favoriteOpen === 'steam' ? steamFavorite : raFavorite}
+        current={favorites[favoriteOpen ?? 'ra']}
         onClose={() => setFavoriteOpen(null)}
         onSave={(game) => handleSave(favoriteOpen ?? 'ra', game)}
       />

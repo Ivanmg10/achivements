@@ -12,10 +12,11 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import MainPageFavoritesRaRow from './main-page-favorites-ra-row/MainPageFavoritesRaRow'
 import MainPageFavoritesSteamRow from './main-page-favorites-steam-row/MainPageFavoritesSteamRow'
+import MainPageFavoritesPsnRow from './main-page-favorites-psn-row/MainPageFavoritesPsnRow'
 
 type RaPin = Extract<PinnedAchievement, { source: 'ra' }>
 
-/** The main page's pinned achievements from RA and Steam together, newest first. */
+/** The main page's pinned achievements from RA, Steam and PSN together, newest first. */
 export default function MainPageFavorites() {
   const { T } = useLanguage()
   const { pinned, isLoading, error, refetch, unpin } = usePinnedAchievements()
@@ -60,7 +61,9 @@ export default function MainPageFavorites() {
         // Across the card's full width, so a long list grows in columns rather than down.
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-1">
           {pinned.map((fav) =>
-            fav.source === 'steam' ? (
+            fav.source === 'psn' ? (
+              <MainPageFavoritesPsnRow key={pinnedKey(fav)} fav={fav} onUnpin={() => unpin(fav)} />
+            ) : fav.source === 'steam' ? (
               <MainPageFavoritesSteamRow key={pinnedKey(fav)} fav={fav} onUnpin={() => unpin(fav)} />
             ) : (
               <MainPageFavoritesRaRow

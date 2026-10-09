@@ -1,5 +1,7 @@
 import type { CategoryGame } from '@/hooks/useGamesByCategory'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
+import type { PsnGameProgress } from '@/types/psn'
+import { PSN_PLATFORM } from '@/utils/psnMappers'
 
 /**
  * A game shown in a folded section's preview: enough to draw a small card
@@ -11,7 +13,7 @@ export type PreviewGame = {
   id: number
   title: string
   subtitle: string
-  /** RA: image path on retroachievements.org. Steam: library icon URL (fallback art). */
+  /** RA: image path on retroachievements.org. Steam: library icon URL (fallback art). PSN: icon URL. */
   imageRef: string
   /** 0–100, or null when there is no progress to show (want-to-play, unknown). */
   pct: number | null
@@ -53,6 +55,18 @@ export function steamPreviewGames(games: SteamGameProgress[], count = PREVIEW_MA
     subtitle: 'Steam',
     imageRef: g.imageIcon,
     pct: g.achievementsLoaded && g.maxPossible > 0 ? g.pctWon : null,
+  }))).slice(0, count)
+}
+
+export function psnPreviewGames(games: PsnGameProgress[], count = PREVIEW_MAX): PreviewGame[] {
+  return byProgress(games.map((g): PreviewGame => ({
+    key: `psn:${g.id}`,
+    source: 'psn',
+    id: g.id,
+    title: g.title,
+    subtitle: PSN_PLATFORM,
+    imageRef: g.imageIcon,
+    pct: g.pctWon,
   }))).slice(0, count)
 }
 

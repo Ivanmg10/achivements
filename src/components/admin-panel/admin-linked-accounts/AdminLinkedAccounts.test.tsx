@@ -66,3 +66,32 @@ test('Link stays disabled until there is something to link', () => {
   render(<AdminLinkedAccounts user={BOB} onUpdated={jest.fn()} />)
   for (const button of screen.getAllByRole('button', { name: 'Link' })) expect(button).toBeDisabled()
 })
+
+test('links PSN from an online ID', async () => {
+  respond(true, { ok: true, psnaccountid: '123', psnusername: 'BobPS' })
+  const onUpdated = jest.fn()
+  render(<AdminLinkedAccounts user={BOB} onUpdated={onUpdated} />)
+  fireEvent.change(screen.getByLabelText('PSN online ID'), { target: { value: 'BobPS' } })
+  fireEvent.click(screen.getAllByRole('button', { name: 'Link' })[2])
+  await waitFor(() => expect(onUpdated).toHaveBeenCalledWith(11, { psnaccountid: '123', psnusername: 'BobPS' }))
+  expect(global.fetch).toHaveBeenCalledWith('/api/admin/users/accounts', expect.objectContaining({
+    body: JSON.stringify({ id: 11, platform: 'psn', username: 'BobPS' }),
+  }))
+})
+
+test('a private PSN profile is explained', async () => {
+  respond(false, { error: 'private' })
+  render(<AdminLinkedAccounts user={BOB} onUpdated={jest.fn()} />)
+  fireEvent.change(screen.getByLabelText('PSN online ID'), { target: { value: 'BobPS' } })
+  fireEvent.click(screen.getAllByRole('button', { name: 'Link' })[2])
+  expect(await screen.findByRole('alert')).toHaveTextContent('keeps its trophies private')
+})
+
+test('unlinks PSN', async () => {
+  respond(true, { ok: true })
+  const onUpdated = jest.fn()
+  render(<AdminLinkedAccounts user={{ ...BOB, psnaccountid: '123', psnusername: 'BobPS' }} onUpdated={onUpdated} />)
+  fireEvent.click(screen.getByRole('button', { name: 'Unlink' }))
+  await waitFor(() => expect(onUpdated).toHaveBeenCalledWith(11, { psnaccountid: null, psnusername: null }))
+  expect(global.fetch).toHaveBeenCalledWith('/api/admin/users/accounts?id=11&platform=psn', { method: 'DELETE' })
+})

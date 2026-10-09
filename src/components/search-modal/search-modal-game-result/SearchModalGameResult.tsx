@@ -1,10 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import RaLogo from '@/components/ra-logo/RaLogo'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { candidateIconUrl, CandidateStatus, GameCandidate } from '@/utils/gameCandidates'
+import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 
 const STATUS_CLASSES: Record<CandidateStatus, string> = {
   'completed-hc': 'bg-amber-500/20 text-amber-400',
@@ -49,11 +48,7 @@ export default function SearchModalGameResult({
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-text-main line-clamp-1">{game.title}</p>
         <p className="text-xs text-text-secondary line-clamp-1 flex items-center gap-1">
-          {game.source === 'steam' ? (
-            <SteamLogo size={14} className="text-[#66c0f4] shrink-0" aria-hidden="true" />
-          ) : (
-            <RaLogo height={12} className="opacity-60 shrink-0" />
-          )}
+          <PlatformLogo source={game.source} size={13} className={game.source === 'ra' ? 'opacity-60' : ''} />
           {game.subtitle}
         </p>
       </div>

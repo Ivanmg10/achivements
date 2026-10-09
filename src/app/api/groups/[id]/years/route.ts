@@ -6,9 +6,12 @@ import { withCache } from '@/lib/raCache'
 import { getGame } from '@/lib/raClient'
 import { withSteamCache, TTL } from '@/lib/steamCache'
 import { getAppDetails } from '@/lib/steamClient'
+import { psnReleaseYear, psnTitles } from '@/lib/psnClient'
+import { igdbArt } from '@/lib/igdbClient'
+import type { PsnGameProgress } from '@/types/psn'
 import { toSteamGameDetails } from '@/utils/steamMappers'
 import { mapLimit, parseReleaseYear } from '@/utils/utils'
-import type { SteamAppDetailsResponse, SteamGameDetails } from '@/types/steam'
+import type { GameSource, SteamAppDetailsResponse, SteamGameDetails } from '@/types/steam'
 
 const RA_TTL = 4 * 60 * 60 * 1000
 /** Lookups at a time: RA and the Steam store both turn away bursts. */
@@ -16,7 +19,7 @@ const CONCURRENCY = 4
 /** A visit fills at most this many; the next visit carries on. */
 const BATCH = 40
 
-type Row = { id: number; source: 'ra' | 'steam'; game_id: number }
+type Row = { id: number; source: GameSource; game_id: number }
 
 /**
  * Fills in the release year of a group's games that have none yet, for the
@@ -42,10 +45,27 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
       [groupId, BATCH],
     )
     const raKey = session.user.raid
-    const rows = (pending.rows as Row[]).filter((r) => r.source === 'steam' || raKey)
+    const rows = (pending.rows as Row[]).filter((r) => r.source !== 'ra' || raKey)
     if (!rows.length) return NextResponse.json({ years: [] })
 
+    // The owner's PSN games, for their Store concepts or titles; read once, and only if a PSN row needs it.
+    const accountId = session.user.psnaccountid
+    let psnGames: Promise<Map<number, PsnGameProgress> | null> | null = null
+    const ownPsnGames = () =>
+      (psnGames ??= accountId
+        ? psnTitles(accountId, session.user.id).then((games) => new Map(games.map((g) => [g.id, g])))
+        : Promise.resolve(null))
+
     const results = await mapLimit(rows, CONCURRENCY, async (row) => {
+      // Sony's trophy data has no release date: it comes from the game's
+      // PlayStation Store page, or for PS3/Vita (no Store page) from IGDB.
+      // Neither knows it: no year known (0).
+      if (row.source === 'psn') {
+        const game = (await ownPsnGames())?.get(row.game_id)
+        if (!game) return { id: row.id, year: 0 }
+        if (game.conceptId) return { id: row.id, year: (await psnReleaseYear(game.conceptId)) ?? 0 }
+        return { id: row.id, year: (await igdbArt(game.title, game.consoleName))?.releaseYear ?? 0 }
+      }
       if (row.source === 'steam') {
         const details = await withSteamCache<SteamGameDetails | null>(
           `steamStore:${row.game_id}:english`,

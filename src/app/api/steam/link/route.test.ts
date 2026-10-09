@@ -1,69 +1,77 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
+jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
+jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))
+jest.mock('@/lib/fetchSteam', () => ({ steamApiKey: jest.fn(() => 'key') }))
+jest.mock('@/lib/steamAccount', () => ({
+  ...jest.requireActual('@/lib/steamAccount'),
+  findSteamAccount: jest.fn(),
+}))
 
-import { GET } from './route'
+import { NextRequest } from 'next/server'
+import { POST } from './route'
 import { getServerSession } from 'next-auth'
-import { verifyState } from '@/lib/steamOpenId'
+import pool from '@/lib/db'
+import { forgetUser } from '@/lib/userRecord'
+import { steamApiKey } from '@/lib/fetchSteam'
+import { findSteamAccount } from '@/lib/steamAccount'
+
+const ID = '76561197960287930'
+
+async function call(body: unknown) {
+  const req = new NextRequest('http://localhost/api/steam/link', { method: 'POST', body: JSON.stringify(body) }) as unknown as Request
+  const res = await POST(req)
+  return { status: res.status, body: (res as unknown as { data: unknown }).data }
+}
 
 beforeEach(() => {
   jest.clearAllMocks()
-  process.env.NEXTAUTH_SECRET = 'test-secret'
-  process.env.NEXTAUTH_URL = 'http://localhost:3000'
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7' } })
+  ;(steamApiKey as jest.Mock).mockReturnValue('key')
+  ;(findSteamAccount as jest.Mock).mockResolvedValue({ steamid: ID, personaname: 'Gabe', isPublic: true })
+  ;(pool.query as jest.Mock).mockResolvedValue({ rowCount: 1 })
 })
 
-const linkRequest = (origin = 'http://localhost:3000') => ({ url: `${origin}/api/steam/link` }) as Request
+afterEach(() => (console.error as jest.Mock).mockRestore())
 
-function locationOf(res: { headers: Map<string, string> }) {
-  return new URL(res.headers.get('location') as string)
-}
-
-test('redirects an anonymous visitor to the sign-in page', async () => {
+test('401 when not signed in', async () => {
   ;(getServerSession as jest.Mock).mockResolvedValue(null)
-  const res = await GET(linkRequest())
-  expect(locationOf(res as never).pathname).toBe('/authPage')
+  expect((await call({ query: 'gabe' })).status).toBe(401)
 })
 
-test('returns 503 when NEXTAUTH_URL is not configured', async () => {
-  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7' } })
-  delete process.env.NEXTAUTH_URL
-  const res = await GET(linkRequest())
-  expect((res as { status: number }).status).toBe(503)
+test('503 without a Steam API key', async () => {
+  ;(steamApiKey as jest.Mock).mockReturnValue(null)
+  expect(await call({ query: 'gabe' })).toEqual({ status: 503, body: { error: 'not-configured' } })
 })
 
-test('redirects to Steam with a return_to carrying a state bound to this user', async () => {
-  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7' } })
-  const res = await GET(linkRequest())
-  const url = locationOf(res as never)
-
-  expect(url.origin + url.pathname).toBe('https://steamcommunity.com/openid/login')
-  expect(url.searchParams.get('openid.mode')).toBe('checkid_setup')
-  expect(url.searchParams.get('openid.realm')).toBe('http://localhost:3000/')
-
-  const returnTo = new URL(url.searchParams.get('openid.return_to') as string)
-  expect(returnTo.pathname).toBe('/api/steam/callback')
-
-  const state = returnTo.searchParams.get('state')
-  expect(verifyState(state, '7')).toBe(true)
-  expect(verifyState(state, '8')).toBe(false)
+test('400 for something that names no Steam account', async () => {
+  expect(await call({ query: 'has spaces' })).toEqual({ status: 400, body: { error: 'invalid-query' } })
+  expect(findSteamAccount).not.toHaveBeenCalled()
 })
 
-describe('on a preview deployment, where NEXTAUTH_URL points at production', () => {
-  beforeEach(() => {
-    process.env.NEXTAUTH_URL = 'https://achivements-pi.vercel.app'
-    process.env.VERCEL_BRANCH_URL = 'achivements-git-feature-x.vercel.app'
-    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7' } })
-  })
-  afterEach(() => delete process.env.VERCEL_BRANCH_URL)
+test('links a custom URL name, saving the id and display name', async () => {
+  expect(await call({ query: 'https://steamcommunity.com/id/gabe/' })).toEqual({ status: 200, body: { steamid: ID, steamusername: 'Gabe' } })
+  expect(findSteamAccount).toHaveBeenCalledWith({ vanity: 'gabe' }, 'key')
+  expect(pool.query).toHaveBeenCalledWith('UPDATE users SET steamid = $1, steamusername = $2 WHERE id = $3', [ID, 'Gabe', '7'])
+  expect(forgetUser).toHaveBeenCalledWith('7')
+})
 
-  test('Steam is sent back to the preview the visitor left from, where their session cookie lives', async () => {
-    const url = locationOf((await GET(linkRequest('https://achivements-git-feature-x.vercel.app'))) as never)
-    expect(url.searchParams.get('openid.realm')).toBe('https://achivements-git-feature-x.vercel.app/')
-    expect(new URL(url.searchParams.get('openid.return_to') as string).origin).toBe(
-      'https://achivements-git-feature-x.vercel.app',
-    )
-  })
+test('no "already linked elsewhere" check: an account linked to another user links again', async () => {
+  await call({ query: ID })
+  expect((pool.query as jest.Mock).mock.calls).toHaveLength(1)
+})
 
-  test('a host that is not one of the project’s own is ignored', async () => {
-    const url = locationOf((await GET(linkRequest('https://evil.example'))) as never)
-    expect(new URL(url.searchParams.get('openid.return_to') as string).origin).toBe('https://achivements-pi.vercel.app')
-  })
+test('404 when Steam has no such account, 403 when it is private — nothing saved', async () => {
+  ;(findSteamAccount as jest.Mock).mockResolvedValueOnce(null)
+  expect(await call({ query: 'nobody' })).toEqual({ status: 404, body: { error: 'not-found' } })
+  ;(findSteamAccount as jest.Mock).mockResolvedValueOnce({ steamid: ID, personaname: 'Gabe', isPublic: false })
+  expect(await call({ query: 'gabe' })).toEqual({ status: 403, body: { error: 'private' } })
+  expect(pool.query).not.toHaveBeenCalled()
+})
+
+test('502 when Steam cannot be reached, 500 when saving fails', async () => {
+  ;(findSteamAccount as jest.Mock).mockRejectedValueOnce(new Error('down'))
+  expect(await call({ query: 'gabe' })).toEqual({ status: 502, body: { error: 'failed' } })
+  ;(pool.query as jest.Mock).mockRejectedValueOnce(new Error('db'))
+  expect(await call({ query: 'gabe' })).toEqual({ status: 500, body: { error: 'failed' } })
 })

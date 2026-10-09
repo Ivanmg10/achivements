@@ -7,8 +7,11 @@ import { forgetUser, loadUser } from '@/lib/userRecord'
 import { sendVerificationEmail } from '@/lib/verificationEmail'
 import { sendEmailChangedNotice } from '@/lib/emailChangedNotice'
 
-const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location'] as const
+const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location', 'description', 'gender', 'profilePublic'] as const
 type AllowedField = (typeof ALLOWED_FIELDS)[number]
+
+const DESCRIPTION_MAX = 280
+const GENDERS = ['male', 'female', 'neutral']
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -40,7 +43,9 @@ export async function POST(req: Request) {
 
     const trimmed = typeof value === 'string' ? value.trim() : ''
     let previousEmail: string | null = null
-    if (!trimmed) {
+    // A description and a gender can be cleared; everything else needs a value.
+    const clearable = field === 'description' || field === 'gender'
+    if (!trimmed && !clearable) {
       return NextResponse.json({ error: 'Value is required' }, { status: 400 })
     }
 
@@ -86,8 +91,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Location must be a valid 2-letter country code' }, { status: 400 })
     }
 
-    const column = field === 'username' ? 'username' : field
-    const valueToStore = field === 'location' ? trimmed.toUpperCase() : trimmed
+    if (field === 'description' && trimmed.length > DESCRIPTION_MAX) {
+      return NextResponse.json({ error: `Description must be ${DESCRIPTION_MAX} characters or fewer` }, { status: 400 })
+    }
+
+    if (field === 'profilePublic' && trimmed !== 'true' && trimmed !== 'false') {
+      return NextResponse.json({ error: 'profilePublic must be true or false' }, { status: 400 })
+    }
+
+    if (field === 'gender' && trimmed && !GENDERS.includes(trimmed)) {
+      return NextResponse.json({ error: 'Invalid gender' }, { status: 400 })
+    }
+
+    const column = field === 'profilePublic' ? 'profile_public' : field
+    const valueToStore = field === 'location' ? trimmed.toUpperCase() : field === 'profilePublic' ? trimmed === 'true' : trimmed || null
     // A new address has not been confirmed yet, whatever the old one was.
     const resetVerified = field === 'email' ? ', email_verified_at = NULL' : ''
     await pool.query(`UPDATE users SET "${column}" = $1${resetVerified} WHERE id = $2`, [valueToStore, session.user.id])

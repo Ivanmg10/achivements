@@ -1,17 +1,20 @@
 import { useState } from 'react'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
+import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
 
-type Platform = 'ra' | 'steam'
+type Platform = 'ra' | 'steam' | 'psn'
+
+const PLATFORM_NAMES: Record<Platform, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PSN' }
 
 const INPUT = 'bg-bg-main rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent w-full'
 const BUTTON = 'shrink-0 text-xs font-bold px-3 py-2 rounded-xl disabled:opacity-40'
 
 /**
- * Links or unlinks a user's RetroAchievements and Steam accounts, for support.
+ * Links or unlinks a user's RetroAchievements, Steam and PSN accounts, for support.
  * RA needs the user's own username and Web API key (RA checks them); Steam a
  * SteamID64 or profile link (Steam checks it exists). Each change is logged.
  */
@@ -25,6 +28,7 @@ export default function AdminLinkedAccounts({
   const [raUsername, setRaUsername] = useState('')
   const [raKey, setRaKey] = useState('')
   const [steamId, setSteamId] = useState('')
+  const [psnName, setPsnName] = useState('')
   const [busy, setBusy] = useState<Platform | null>(null)
   const [errors, setErrors] = useState<Partial<Record<Platform, string>>>({})
 
@@ -35,12 +39,18 @@ export default function AdminLinkedAccounts({
       const res = await request()
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        const message = data.error === 'ra-invalid' ? 'RA refused that username or key' : data.error
+        const known: Record<string, string> = {
+          'ra-invalid': 'RA refused that username or key',
+          private: 'That PSN profile keeps its trophies private',
+          'not-configured': 'PSN is not configured on the server',
+          failed: 'Sony is not answering, try again',
+        }
+        const message = known[data.error] ?? data.error
         setErrors((e) => ({ ...e, [platform]: message ?? 'Something went wrong' }))
         return
       }
       onDone(data)
-      notify.success(`${user.username}: ${platform === 'ra' ? 'RetroAchievements' : 'Steam'} updated`)
+      notify.success(`${user.username}: ${PLATFORM_NAMES[platform]} updated`)
     } catch {
       setErrors((e) => ({ ...e, [platform]: 'Something went wrong' }))
     } finally {
@@ -135,6 +145,42 @@ export default function AdminLinkedAccounts({
           </div>
         )}
         {errors.steam && <span role="alert" className="text-xs text-red-400">{errors.steam}</span>}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-sm">
+          <PlaystationLogo size={12} className="text-[#0070d1]" />
+          {user.psnaccountid ? (
+            <>
+              <span className="font-medium flex-1 truncate">{user.psnusername ?? user.psnaccountid}</span>
+              <button
+                onClick={() => unlink('psn', { psnaccountid: null, psnusername: null })}
+                disabled={busy !== null}
+                className={`${BUTTON} text-red-400 hover:bg-red-500/10`}
+              >
+                Unlink
+              </button>
+            </>
+          ) : (
+            <span className="text-text-secondary italic">Not linked</span>
+          )}
+        </div>
+        {!user.psnaccountid && (
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input aria-label="PSN online ID" placeholder="PSN online ID" value={psnName} onChange={(e) => setPsnName(e.target.value)} className={INPUT} />
+            <button
+              onClick={() => link('psn', { username: psnName }, (data) => {
+                setPsnName('')
+                onUpdated(user.id, { psnaccountid: data.psnaccountid as string, psnusername: data.psnusername as string })
+              })}
+              disabled={busy !== null || !psnName.trim()}
+              className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}
+            >
+              {busy === 'psn' ? '…' : 'Link'}
+            </button>
+          </div>
+        )}
+        {errors.psn && <span role="alert" className="text-xs text-red-400">{errors.psn}</span>}
       </div>
     </div>
   )

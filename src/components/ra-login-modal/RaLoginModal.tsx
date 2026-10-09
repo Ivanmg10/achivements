@@ -58,7 +58,9 @@ export default function RaLoginModal({
 
   return (
     <CommonModal isOpen={isOpen} onClose={() => setIsOpen(false)}>
-      <h2 className="text-2xl mb-5">{T.raLoginModal.title}</h2>
+      <h2 className="text-2xl mb-2">{T.raLoginModal.title}</h2>
+      {/* Steam and PSN link by name alone; say why RA still asks for the key. */}
+      <p className="text-sm text-text-secondary mb-5">{T.raLoginModal.whyKey}</p>
       <form className="flex flex-col gap-5" onSubmit={handleLogin}>
         <input
           type="text"

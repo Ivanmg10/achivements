@@ -1,50 +1,47 @@
 'use client'
 
-import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp } from '@/lib/animations'
-import { useLanguage } from '@/context/LanguageContext'
-import { usePublicUserProfile } from '@/hooks/usePublicUserProfile'
-import { usePublicUserAchievements } from '@/hooks/usePublicUserAchievements'
-import { usePublicUserRank } from '@/hooks/usePublicUserRank'
-import { usePublicUserAwards } from '@/hooks/usePublicUserAwards'
-import { usePublicUserCompleted } from '@/hooks/usePublicUserCompleted'
-import { usePublicUserRecentlyPlayed } from '@/hooks/usePublicUserRecentlyPlayed'
-import { usePublicGameProgression } from '@/hooks/usePublicGameProgression'
 import { IconUserOff } from '@tabler/icons-react'
+import { useLanguage } from '@/context/LanguageContext'
+import { useCheevoUser, type CheevoUser } from '@/hooks/useCheevoUser'
+import { useRaLinked } from '@/hooks/useRaLinked'
+import SubjectProviders from '@/components/subject-providers/SubjectProviders'
+import { MainPageBody } from '@/components/main-page/MainPage'
+import MainPageWithoutRa from '@/components/main-page/main-page-without-ra/MainPageWithoutRa'
+import PublicUserHeader from './public-user-header/PublicUserHeader'
 
-import MainPageProfileRa from '@/components/main-page/main-page-profile/main-page-profile-ra/MainPageProfileRa'
-import PublicRecentlyPlayed from './public-recently-played/PublicRecentlyPlayed'
-import PublicUserStats from './public-user-stats/PublicUserStats'
+/** What the main page would show for this user: RA's layout, or the Steam/PSN one without it. */
+function UserPage({ user }: { user: CheevoUser }) {
+  const { T } = useLanguage()
+  // Inside SubjectProviders: true only when the user has RA AND the viewer can read it.
+  const raLinked = useRaLinked()
 
-interface PublicUserPageProps {
-  raUsername: string
+  if (raLinked) {
+    return (
+      <motion.main className="home-fit flex flex-col min-h-full text-text-main" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, ease: 'easeOut' }}>
+        <MainPageBody />
+      </motion.main>
+    )
+  }
+  if (user.steam || user.psn) return <MainPageWithoutRa />
+  return <p className="py-16 text-center text-sm text-text-secondary">{T.publicProfile.noAccounts}</p>
 }
 
-export default function PublicUserPage({ raUsername }: PublicUserPageProps) {
+/**
+ * A CheevoVault user's page: who they are, and then the main page as that
+ * user sees it — the same profile column, recent games and stats, for every
+ * platform they have linked.
+ */
+export default function PublicUserPage({ username }: { username: string }) {
   const { T } = useLanguage()
-  const { profile, isLoading: profileLoading, error, retry } = usePublicUserProfile(raUsername)
-  const { achievements, isLoading: achLoading } = usePublicUserAchievements(raUsername)
-  const { rank, isLoading: rankLoading } = usePublicUserRank(raUsername)
-  const { awards, isLoading: awardsLoading } = usePublicUserAwards(raUsername)
-  const { completed, isLoading: completedLoading } = usePublicUserCompleted(raUsername)
-  const { games: recentGames, isLoading: recentLoading } = usePublicUserRecentlyPlayed(raUsername)
-  // Use first recently-played game ID — recentGames loads reliably and is the same game as LastGameID
-  const lastGameId = recentGames[0]?.GameID ?? null
-  const { game: lastGame } = usePublicGameProgression(raUsername, lastGameId)
+  const { user, isLoading, error, retry } = useCheevoUser(username)
 
-  // Sort achievements desc for profile recent achievements section
-  const recentAchievements = useMemo(
-    () => [...achievements].sort((a, b) => new Date(b.Date).getTime() - new Date(a.Date).getTime()).slice(0, 20),
-    [achievements],
-  )
-
-  if (error && !profileLoading) {
+  if (error) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-24 text-text-secondary text-center px-4">
         <IconUserOff className="w-10 h-10" aria-hidden="true" />
         <p role="alert" className="text-sm">
-          {error === 'missing' ? T.publicProfile.notFound.replace('{u}', raUsername) : T.publicProfile.loadError}
+          {error === 'missing' ? T.publicProfile.userNotFound.replace('{u}', username) : T.publicProfile.userLoadError}
         </p>
         {error === 'failed' && (
           <button onClick={retry} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
@@ -55,42 +52,16 @@ export default function PublicUserPage({ raUsername }: PublicUserPageProps) {
     )
   }
 
+  if (isLoading || !user) {
+    return <p role="status" className="py-24 text-center text-sm text-text-secondary">{T.cards.loading}</p>
+  }
+
   return (
-    <motion.main
-      className="flex flex-col min-h-full text-text-main"
-      variants={fadeUp}
-      initial="hidden"
-      animate="visible"
-    >
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
-        {/* Right: profile card — col-2 on desktop, first in DOM */}
-        <div className="lg:col-start-2 lg:row-start-1">
-          <section className="main-content text-text-main m-3 rounded-xl flex flex-col items-center overflow-y-auto">
-            <MainPageProfileRa
-              user={profile}
-              game={lastGame}
-              recentAchievements={recentAchievements}
-            />
-          </section>
-        </div>
-
-        {/* Left: recently played */}
-        <div className="flex flex-col min-h-0 lg:col-start-1 lg:row-start-1">
-          <div className="m-3 bg-bg-card rounded-xl p-4 flex flex-col flex-1 min-h-0">
-            <PublicRecentlyPlayed raUsername={raUsername} games={recentGames} isLoading={recentLoading || profileLoading} />
-          </div>
-        </div>
-      </div>
-
-      <PublicUserStats
-        achievements={achievements}
-        rank={rank}
-        awards={awards}
-        completed={completed}
-        isLoading={achLoading || rankLoading}
-        awardsLoading={awardsLoading}
-        completedLoading={completedLoading}
-      />
-    </motion.main>
+    <div className="flex flex-col min-h-full text-text-main">
+      <PublicUserHeader user={user} />
+      <SubjectProviders user={user}>
+        <UserPage user={user} />
+      </SubjectProviders>
+    </div>
   )
 }

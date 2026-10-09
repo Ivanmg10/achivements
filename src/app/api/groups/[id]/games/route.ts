@@ -39,7 +39,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const body = await req.json().catch(() => null)
     const source = readSource(body?.source)
     if (!source) {
-      return NextResponse.json({ message: 'source debe ser ra o steam' }, { status: 400 })
+      return NextResponse.json({ message: 'source debe ser ra, steam o psn' }, { status: 400 })
     }
     const fields = readItemFields(body)
     if (!fields.ok) return NextResponse.json({ message: fields.message }, { status: 400 })
@@ -94,7 +94,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       return NextResponse.json({ message: 'Falta gameId' }, { status: 400 })
     }
     if (!source) {
-      return NextResponse.json({ message: 'source debe ser ra o steam' }, { status: 400 })
+      return NextResponse.json({ message: 'source debe ser ra, steam o psn' }, { status: 400 })
     }
 
     await pool.query(

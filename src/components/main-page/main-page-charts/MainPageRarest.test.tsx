@@ -48,3 +48,14 @@ test('says so when nothing has rarity, and shows a skeleton while loading', () =
   rerender(<MainPageRarest achievements={[]} isLoading />)
   expect(screen.queryByText(en.cards.rarestUnlocks)).not.toBeInTheDocument()
 })
+
+test('PSN trophies join with their own rarity, rarest first, linking to the trophy', () => {
+  const trophy = (id: number, rarity: number | null) => ({
+    gameId: 2018800, titleId: 'NPWR20188_00', gameTitle: 'Astro Bot', gameIconUrl: '', trophyId: id,
+    name: `Trophy ${id}`, iconUrl: null, type: 'gold' as const, earnedAt: '2024-01-15T12:00:00Z', rarity,
+  })
+  render(<MainPageRarest achievements={[]} psnTrophies={[trophy(1, 40), trophy(2, 0.5), trophy(3, null)]} />)
+  const links = screen.getAllByRole('link')
+  expect(links.map((l) => l.textContent?.startsWith('Trophy') && l.textContent.slice(0, 8))).toEqual(['Trophy 2', 'Trophy 1'])
+  expect(links[0]).toHaveAttribute('href', '/psnGame/NPWR20188_00#trophy-2')
+})

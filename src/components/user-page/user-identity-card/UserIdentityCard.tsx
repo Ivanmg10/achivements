@@ -11,6 +11,7 @@ import AdminPanelModal from '@/components/admin-panel/admin-panel-modal/AdminPan
 import EmailVerificationNotice from '@/components/user-page/email-verification-notice/EmailVerificationNotice'
 import EditProfileModal, { EditProfileField } from '@/components/edit-profile-modal/EditProfileModal'
 import ChangePasswordModal from '@/components/change-password-modal/ChangePasswordModal'
+import UserDescriptionField from '@/components/user-page/user-description-field/UserDescriptionField'
 import LocationModal from '@/components/location-modal/LocationModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGamesData } from '@/context/GamesDataContext'
@@ -180,6 +181,9 @@ export default function UserIdentityCard() {
             <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
           )}
         </ProfileField>
+        <div className="sm:col-span-3">
+          <UserDescriptionField />
+        </div>
       </div>
 
       <div className="flex flex-col gap-2 mt-auto">

@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 
 /**
- * The user's pinned achievements across RA and Steam, newest first — what the
+ * The user's pinned achievements across RA, Steam and PSN, newest first — what the
  * main page's pinned card lists, whichever platform is selected.
  *
  * A load that still fails after fetchWithRetry's own attempts is retried in
@@ -68,7 +68,9 @@ export function usePinnedAchievements() {
     const url =
       fav.source === 'steam'
         ? `/api/favorites?steamApiname=${encodeURIComponent(fav.steam_apiname)}&gameId=${fav.game_id}`
-        : `/api/favorites?achievementId=${fav.achievement_id}`
+        : fav.source === 'psn'
+          ? `/api/favorites?psnTrophyId=${fav.psn_trophy_id}&gameId=${fav.game_id}`
+          : `/api/favorites?achievementId=${fav.achievement_id}`
     try {
       const res = await fetch(url, { method: 'DELETE' })
       if (!res.ok) throw new Error(`Failed to unpin (${res.status})`)

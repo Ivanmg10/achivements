@@ -21,10 +21,12 @@ import StatusEmptyState from '@/components/status-empty-state/StatusEmptyState'
 import StatusPageSkeleton from '@/components/status-page-skeleton/StatusPageSkeleton'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import SteamCategorySection from '@/components/steam/steam-category-section/SteamCategorySection'
+import PsnCategorySection from '@/components/psn/psn-category-section/PsnCategorySection'
 import CollapsibleSection from '@/components/collapsible-section/CollapsibleSection'
 import CollapsibleSectionPreview from '@/components/collapsible-section/collapsible-section-preview/CollapsibleSectionPreview'
 import { raPreviewGames } from '@/utils/sectionPreview'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
+import { usePsnGamesByCategory } from '@/hooks/usePsnGamesByCategory'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import CategorySearch from '@/components/category-search/CategorySearch'
 import { titleMatches } from '@/utils/gameCandidates'
@@ -59,19 +61,33 @@ export default function CategoryPage() {
   const consolePills = useMemo(() => buildConsolePills(games), [games])
   const filteredGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
   const { games: allSteamGames } = useSteamGamesByCategory(cat)
+  const { games: allPsnGames, isLinked: psnLinked } = usePsnGamesByCategory(cat)
+  const psnShown = psnLinked
+  // Another platform beside RA: each one gets a section that folds away.
+  const othersLinked = steamLinked || psnShown
 
-  // One search box for both platforms: a game is found without knowing which it is on.
+  // One search box for every platform: a game is found without knowing which it is on.
   const [query, setQuery] = useState('')
   const visibleGames = useMemo(() => filteredGames.filter((g) => titleMatches(g.Title, query)), [filteredGames, query])
   const steamGames = useMemo(() => allSteamGames.filter((g) => titleMatches(g.title, query)), [allSteamGames, query])
+  const psnGames = useMemo(() => allPsnGames.filter((g) => titleMatches(g.title, query)), [allPsnGames, query])
 
   // Folded previews fill the screen together: one entry per platform section
-  // on the page, in order. PSN and Xbox, when they arrive, add theirs here.
+  // on the page, in order (RA, Steam, PSN). Xbox, when it arrives, adds its own.
   const pageRef = useRef<HTMLDivElement>(null)
-  const sectionGames = [...(showRa && steamLinked ? [visibleGames.length] : []), ...(steamLinked ? [steamGames.length] : [])]
-  const previews = usePreviewLayout(pageRef, sectionGames)
-  const raPreview = { columns: previews.columns, count: previews.counts[0] ?? 3 }
-  const steamPreview = { columns: previews.columns, count: previews.counts[showRa ? 1 : 0] ?? 3 }
+  const sections = [
+    ...(showRa && othersLinked ? [{ id: 'ra', games: visibleGames.length }] : []),
+    ...(steamLinked ? [{ id: 'steam', games: steamGames.length }] : []),
+    ...(psnShown ? [{ id: 'psn', games: psnGames.length }] : []),
+  ]
+  const previews = usePreviewLayout(pageRef, sections.map((s) => s.games))
+  const previewFor = (id: string) => {
+    const i = sections.findIndex((s) => s.id === id)
+    return { columns: previews.columns, count: previews.counts[i] ?? 3 }
+  }
+  const raPreview = previewFor('ra')
+  const steamPreview = previewFor('steam')
+  const psnPreview = previewFor('psn')
 
   const selectedConsoleName =
     selected.size === 1 ? consolePills.find((c) => selected.has(c.id))?.name : undefined
@@ -106,7 +122,7 @@ export default function CategoryPage() {
           <StatusPageSkeleton cols={gridCols} />
         ) : error ? (
           <p className="text-red-400 text-sm text-center mt-10">{error}</p>
-        ) : !steamLinked ? (
+        ) : !othersLinked ? (
           // RA only: the page as it always was.
           games.length === 0 ? (
             <StatusEmptyState category={cat} className="min-h-[60vh]" />
@@ -124,15 +140,15 @@ export default function CategoryPage() {
             </>
           )
         ) : (
-          // RA and Steam: shared header (the grid control drives both lists),
+          // RA and others: shared header (the grid control drives every list),
           // then each platform in a section that folds away, so reaching Steam
-          // does not mean scrolling past the whole RA list.
+          // or PSN does not mean scrolling past the whole RA list.
           <>
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <StatusPageHeader
                 consoleName={selectedConsoleName}
                 category={cat}
-                gameCount={visibleGames.length + steamGames.length}
+                gameCount={visibleGames.length + steamGames.length + (psnShown ? psnGames.length : 0)}
               />
               <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
                 <CategorySearch value={query} onChange={setQuery} />
@@ -164,6 +180,7 @@ export default function CategoryPage() {
           </div>
         )}
         {(!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} query={query} preview={steamPreview} />}
+        {(!showRa || !loading) && <PsnCategorySection category={cat} gridCols={gridCols} query={query} preview={psnPreview} />}
       </div>
     </div>
   )

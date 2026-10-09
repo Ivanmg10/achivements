@@ -6,6 +6,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import CommonModal from '@/components/common-modal/CommonModal'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
+import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import { PLATFORM_NAME } from '@/utils/gameRef'
 import RaLogo from '@/components/ra-logo/RaLogo'
 
 /**
@@ -50,10 +52,12 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
                   <span className="flex items-center gap-1.5 text-[11px] text-text-secondary">
                     {g.source === 'steam' ? (
                       <SteamLogo size={11} className="text-[#66c0f4]" aria-hidden="true" />
+                    ) : g.source === 'psn' ? (
+                      <PlaystationLogo size={11} className="text-[#0070d1]" aria-hidden="true" />
                     ) : (
                       <RaLogo height={9} />
                     )}
-                    {g.source === 'steam' ? 'Steam' : 'RetroAchievements'}
+                    {PLATFORM_NAME[g.source]}
                   </span>
                 </span>
                 <button

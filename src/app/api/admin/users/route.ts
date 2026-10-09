@@ -33,7 +33,7 @@ export async function GET(req: Request) {
     if (!auth.ok) return auth.response
 
     const result = await pool.query(
-      `SELECT id, username, email, theme, avatar, admin, rausername, steamid, steamusername, location,
+      `SELECT id, username, email, theme, avatar, admin, rausername, steamid, steamusername, psnaccountid, psnusername, location,
               "raUser"->>'User' AS ra_display
        FROM users ORDER BY id ASC`
     )
@@ -81,7 +81,7 @@ export async function POST(req: Request) {
     const result = await pool.query(
       `INSERT INTO users (username, email, password, theme, admin)
        VALUES ($1, $2, $3, 'dark', $4)
-       RETURNING id, username, email, theme, avatar, admin, rausername, steamid, steamusername, location`,
+       RETURNING id, username, email, theme, avatar, admin, rausername, steamid, steamusername, psnaccountid, psnusername, location`,
       [username, address, hashed, admin === true]
     )
     const created = result.rows[0]

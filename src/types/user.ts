@@ -10,4 +10,6 @@ export interface AdminUser {
   location: string | null;
   steamid?: string | null;
   steamusername?: string | null;
+  psnaccountid?: string | null;
+  psnusername?: string | null;
 }

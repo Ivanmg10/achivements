@@ -4,6 +4,8 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { RecentAchievement } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 type CtxType = {
   achievements: RecentAchievement[]
@@ -23,6 +25,7 @@ const Ctx = createContext<ProviderValue>({ achievements: [], isLoading: true, er
  */
 export function RecentAchievementsProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
+  const subject = useSubject()
   const [wanted, setWanted] = useState(false)
   const request = useCallback(() => setWanted(true), [])
   const [achievements, setAchievements] = useState<RecentAchievement[]>([])
@@ -41,7 +44,7 @@ export function RecentAchievementsProvider({ children }: { children: React.React
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
-      fetchWithRetry('/api/getRecentAchievements')
+      fetchWithRetry(withSubject('/api/getRecentAchievements', subject))
         .then((data) => {
           if (!Array.isArray(data)) return onFail()
           setAchievements([...data].sort(
@@ -53,7 +56,7 @@ export function RecentAchievementsProvider({ children }: { children: React.React
         .catch(onFail)
     }
     run()
-  }, [session?.user?.rausername])
+  }, [session?.user?.rausername, subject])
 
   useEffect(() => {
     if (status === 'unauthenticated') {

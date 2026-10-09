@@ -1,9 +1,15 @@
 'use client'
 
 import { ReactNode } from 'react'
+import { IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
 export type PlatformStat = { label: string; value: string; accent?: string }
+
+export const DISCONNECT_CLASS =
+  'w-full py-2 rounded-xl bg-red-500/15 text-red-400 font-semibold text-sm hover:bg-red-500/25 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70'
+export const CONNECT_CLASS =
+  'w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-accent text-bg-main font-semibold text-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
 /**
  * One platform on the account page: its logo, whether it is connected, the
@@ -17,11 +23,11 @@ export type PlatformStat = { label: string; value: string; accent?: string }
  */
 export default function UserPlatformCard({
   name,
+  href,
   logo,
   bigLogo,
   gradient,
   connected,
-  soon = false,
   status,
   identity,
   hint,
@@ -29,13 +35,14 @@ export default function UserPlatformCard({
   action,
 }: {
   name: string
+  /** The user's own page on the platform; the name links to it once connected. */
+  href?: string
   logo: ReactNode
   /** The same logo, larger, for the disconnected state. */
   bigLogo?: ReactNode
   /** Gradient stops for the card's outline, e.g. "from-[#66c0f4] to-[#1b2838]". */
   gradient: string
   connected: boolean
-  soon?: boolean
   /** A message about the last connection attempt. */
   status?: ReactNode
   /** Account details once connected. */
@@ -49,7 +56,7 @@ export default function UserPlatformCard({
   const { T } = useLanguage()
 
   return (
-    <div className={`rounded-3xl p-px bg-gradient-to-br ${gradient} ${soon ? 'opacity-70' : ''}`}>
+    <div className={`rounded-3xl p-px bg-gradient-to-br ${gradient}`}>
       <section
         aria-label={name}
         className="relative h-full bg-bg-card rounded-[calc(1.5rem-1px)] p-5 flex flex-col gap-4 overflow-hidden"
@@ -57,14 +64,27 @@ export default function UserPlatformCard({
         <div className="relative flex items-center justify-between gap-2">
           <span className="flex items-center gap-2 min-w-0">
             {logo}
-            <span className="font-semibold truncate">{name}</span>
+            {connected && href ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${name} — ${T.userData.openProfile}`}
+                className="font-semibold truncate inline-flex items-center gap-1 hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              >
+                {name}
+                <IconExternalLink size={13} aria-hidden="true" className="shrink-0 text-text-secondary" />
+              </a>
+            ) : (
+              <span className="font-semibold truncate">{name}</span>
+            )}
           </span>
           <span
             className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-              connected && !soon ? 'bg-green-500/20 text-green-400' : 'bg-ink/5 text-text-secondary'
+              connected ? 'bg-green-500/20 text-green-400' : 'bg-ink/5 text-text-secondary'
             }`}
           >
-            {soon ? T.userData.comingSoon : connected ? T.userData.connected : T.userData.notConnected}
+            {connected ? T.userData.connected : T.userData.notConnected}
           </span>
         </div>
 

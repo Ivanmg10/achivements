@@ -5,16 +5,18 @@ import { fetchRaProfile, validRaCredentials } from '@/lib/raProfile'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { clearUserCache } from '@/lib/steamCache'
 import { getPlayerSummaries } from '@/lib/steamClient'
-import { readSteamId } from '@/lib/steamOpenId'
+import { readSteamId } from '@/lib/steamAccount'
+import { findPsnAccount, psnConfigured, psnFailure, psnSummary } from '@/lib/psnClient'
 import { forgetUser } from '@/lib/userRecord'
 
 /**
- * An admin linking or unlinking a user's RetroAchievements or Steam account,
+ * An admin linking or unlinking a user's RetroAchievements, Steam or PSN account,
  * for support. The same checks as when users do it themselves: an RA account
  * is only stored if RA accepts that username and key, and a Steam ID only if
- * Steam knows the profile. What it cannot check is that the account is the
- * user's own — users prove that through Steam's sign-in; here the admin is
- * vouching for it, which is why each link and unlink goes in the action log.
+ * Steam knows the profile, a PSN one only if Sony knows the online ID and its
+ * trophies are public. None proves the account is the user's own (users
+ * link Steam by name too), which is why each link and unlink goes in the
+ * action log.
  */
 
 type Target = { id: number; username: string }
@@ -25,7 +27,7 @@ async function findUser(id: unknown): Promise<Target | null | 'bad-id'> {
   return rows[0] ?? null
 }
 
-// POST { id, platform: 'ra', username, apiKey } | { id, platform: 'steam', steamid }
+// POST { id, platform: 'ra', username, apiKey } | { id, platform: 'steam', steamid } | { id, platform: 'psn', username }
 export async function POST(req: Request) {
   try {
     const auth = await requireAdmin(req)
@@ -77,28 +79,45 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Steam is unavailable, try again' }, { status: 502 })
       }
 
-      try {
-        await pool.query('UPDATE users SET steamid = $1, steamusername = $2 WHERE id = $3', [steamid, persona, target.id])
-      } catch (err) {
-        if ((err as { code?: string }).code === '23505') {
-          return NextResponse.json({ error: 'That Steam account is linked to another user' }, { status: 409 })
-        }
-        throw err
-      }
+      // One Steam account may be linked to several users, as users can do themselves.
+      await pool.query('UPDATE users SET steamid = $1, steamusername = $2 WHERE id = $3', [steamid, persona, target.id])
       await clearUserCache(String(target.id))
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-steam', target, { steamid, steamusername: persona })
       return NextResponse.json({ ok: true, steamid, steamusername: persona })
     }
 
-    return NextResponse.json({ error: 'platform must be ra or steam' }, { status: 400 })
+    if (body.platform === 'psn') {
+      const name = typeof body.username === 'string' ? body.username.trim() : ''
+      if (!/^[A-Za-z0-9_-]{3,16}$/.test(name)) {
+        return NextResponse.json({ error: 'A PSN online ID (3–16 letters, digits, - or _) is required' }, { status: 400 })
+      }
+      if (!(await psnConfigured())) return NextResponse.json({ error: 'not-configured' }, { status: 503 })
+
+      let account: { accountId: string; onlineId: string } | null
+      try {
+        account = await findPsnAccount(name)
+        if (!account) return NextResponse.json({ error: 'Sony has no account with that online ID' }, { status: 404 })
+        await psnSummary(account.accountId, String(target.id))
+      } catch (err) {
+        return psnFailure(err, 'admin/users/accounts psn')
+      }
+
+      await pool.query('UPDATE users SET psnaccountid = $1, psnusername = $2 WHERE id = $3', [account.accountId, account.onlineId, target.id])
+      await clearUserCache(String(target.id))
+      forgetUser(target.id)
+      await logAdminAction(auth.admin, 'link-psn', target, { psnaccountid: account.accountId, psnusername: account.onlineId })
+      return NextResponse.json({ ok: true, psnaccountid: account.accountId, psnusername: account.onlineId })
+    }
+
+    return NextResponse.json({ error: 'platform must be ra, steam or psn' }, { status: 400 })
   } catch (err) {
     console.error('[admin/users/accounts POST]', err)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }
 
-// DELETE ?id=<user>&platform=ra|steam
+// DELETE ?id=<user>&platform=ra|steam|psn
 export async function DELETE(req: Request) {
   try {
     const auth = await requireAdmin(req)
@@ -106,8 +125,8 @@ export async function DELETE(req: Request) {
 
     const params = new URL(req.url).searchParams
     const platform = params.get('platform')
-    if (platform !== 'ra' && platform !== 'steam') {
-      return NextResponse.json({ error: 'platform must be ra or steam' }, { status: 400 })
+    if (platform !== 'ra' && platform !== 'steam' && platform !== 'psn') {
+      return NextResponse.json({ error: 'platform must be ra, steam or psn' }, { status: 400 })
     }
     const target = await findUser(params.get('id'))
     if (target === 'bad-id') return NextResponse.json({ error: 'A numeric id is required' }, { status: 400 })
@@ -115,12 +134,15 @@ export async function DELETE(req: Request) {
 
     if (platform === 'ra') {
       await pool.query('UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL WHERE id = $1', [target.id])
-    } else {
+    } else if (platform === 'steam') {
       await pool.query('UPDATE users SET steamid = NULL, steamusername = NULL WHERE id = $1', [target.id])
+      await clearUserCache(String(target.id))
+    } else {
+      await pool.query('UPDATE users SET psnaccountid = NULL, psnusername = NULL WHERE id = $1', [target.id])
       await clearUserCache(String(target.id))
     }
     forgetUser(target.id)
-    await logAdminAction(auth.admin, platform === 'ra' ? 'unlink-ra' : 'unlink-steam', target)
+    await logAdminAction(auth.admin, `unlink-${platform}`, target)
 
     return NextResponse.json({ ok: true })
   } catch (err) {

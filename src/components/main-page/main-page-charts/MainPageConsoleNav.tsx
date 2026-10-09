@@ -11,8 +11,8 @@ import { SectionFallback } from '@/components/ui/SectionFallback'
 const CONSOLE_MAP = new Map(CONSOLES.map((c) => [c.id, c]))
 
 const SECTION_SLUGS = [
-  { slug: 'playing',    emoji: '🎮', key: 'playing'    as const },
   { slug: 'wantToPlay', emoji: '🔖', key: 'wantToPlay' as const },
+  { slug: 'playing',    emoji: '🎮', key: 'playing'    as const },
   { slug: 'completed',  emoji: '🏆', key: 'completed'  as const },
 ] satisfies { slug: string; emoji: string; key: 'playing' | 'wantToPlay' | 'completed' }[]
 

@@ -2,9 +2,12 @@ import { RecentAchievement } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 export function useActivityHeatmap() {
   const { data: session } = useSession()
+  const subject = useSubject()
   const [achievements, setAchievements] = useState<RecentAchievement[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -21,7 +24,7 @@ export function useActivityHeatmap() {
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
-      fetchWithRetry('/api/getActivityHeatmap')
+      fetchWithRetry(withSubject('/api/getActivityHeatmap', subject))
         .then((data) => {
           if (!Array.isArray(data)) return onFail()
           setAchievements(data as RecentAchievement[])
@@ -31,7 +34,7 @@ export function useActivityHeatmap() {
         .catch(onFail)
     }
     run()
-  }, [session?.user?.rausername])
+  }, [session?.user?.rausername, subject])
 
   useEffect(() => {
     if (!session?.user?.rausername) { setIsLoading(false); return }

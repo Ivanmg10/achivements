@@ -12,7 +12,7 @@ import BrowseSearchChips from '../browse-search-chips/BrowseSearchChips'
 const SHOWN = 4
 
 /**
- * Search across both libraries, with the platform and status a tap away.
+ * Search across every library, with the platform and status a tap away.
  * Shows the first matches as rows that open the game; says how many more.
  */
 export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
@@ -46,6 +46,7 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
             { value: 'all', label: T.cards.filterAll },
             { value: 'ra', label: 'RetroAchievements' },
             { value: 'steam', label: 'Steam' },
+            { value: 'psn', label: 'PlayStation' },
           ]}
         />
         <BrowseSearchChips<LibraryStatus | 'all'>
@@ -54,8 +55,8 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
           onChange={(status) => setFilter((f) => ({ ...f, status }))}
           options={[
             { value: 'all', label: T.cards.filterAll },
-            { value: 'playing', label: T.categories.playing },
             { value: 'wantToPlay', label: T.categories.wantToPlay },
+            { value: 'playing', label: T.categories.playing },
             { value: 'completed', label: T.categories.completed },
           ]}
         />
