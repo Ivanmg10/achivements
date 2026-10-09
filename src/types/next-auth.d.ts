@@ -28,6 +28,8 @@ type SessionUserFields = {
   admin?: boolean;
   raUser?: RetroAchievementsUserProfile | null;
   location?: string | null;
+  description?: string | null;
+  gender?: 'male' | 'female' | 'neutral' | null;
   favorite_game?: SavedGame;
   favorite_steam_game?: SavedGame;
   favorite_psn_game?: SavedGame;

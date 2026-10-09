@@ -23,13 +23,15 @@ export type UserRecord = {
   admin: boolean | null
   raUser: RetroAchievementsUserProfile | null
   location: string | null
+  description: string | null
+  gender: 'male' | 'female' | 'neutral' | null
   favorite_game: SavedGame
   favorite_steam_game: SavedGame
   favorite_psn_game: SavedGame
 }
 
 const COLUMNS = `id, username, password, theme, avatar, raid, rausername, steamid, steamusername,
-  psnaccountid, psnusername, email, email_verified_at, admin, "raUser", location, favorite_game, favorite_steam_game, favorite_psn_game`
+  psnaccountid, psnusername, email, email_verified_at, admin, "raUser", location, description, gender, favorite_game, favorite_steam_game, favorite_psn_game`
 
 // Every API call re-reads the signed-in user (see authOptions' jwt callback); a
 // short cache keeps that to about one query per user per minute. A session

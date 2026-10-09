@@ -50,3 +50,15 @@ test('shows a link status message', () => {
   )
   expect(screen.getByRole('alert')).toHaveTextContent('failed')
 })
+
+test('connected with an href: the name links to the account on the platform', () => {
+  render(<UserPlatformCard name="Steam" href="https://steamcommunity.com/profiles/1" logo={null} gradient="" connected />)
+  const link = screen.getByRole('link', { name: new RegExp(en.userData.openProfile) })
+  expect(link).toHaveAttribute('href', 'https://steamcommunity.com/profiles/1')
+  expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'))
+})
+
+test('not connected: no link even with an href', () => {
+  render(<UserPlatformCard name="Steam" href="https://steamcommunity.com/profiles/1" logo={null} gradient="" connected={false} />)
+  expect(screen.queryByRole('link')).not.toBeInTheDocument()
+})

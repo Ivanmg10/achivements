@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
+import { IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
 export type PlatformStat = { label: string; value: string; accent?: string }
@@ -22,6 +23,7 @@ export const CONNECT_CLASS =
  */
 export default function UserPlatformCard({
   name,
+  href,
   logo,
   bigLogo,
   gradient,
@@ -33,6 +35,8 @@ export default function UserPlatformCard({
   action,
 }: {
   name: string
+  /** The user's own page on the platform; the name links to it once connected. */
+  href?: string
   logo: ReactNode
   /** The same logo, larger, for the disconnected state. */
   bigLogo?: ReactNode
@@ -60,7 +64,20 @@ export default function UserPlatformCard({
         <div className="relative flex items-center justify-between gap-2">
           <span className="flex items-center gap-2 min-w-0">
             {logo}
-            <span className="font-semibold truncate">{name}</span>
+            {connected && href ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${name} — ${T.userData.openProfile}`}
+                className="font-semibold truncate inline-flex items-center gap-1 hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              >
+                {name}
+                <IconExternalLink size={13} aria-hidden="true" className="shrink-0 text-text-secondary" />
+              </a>
+            ) : (
+              <span className="font-semibold truncate">{name}</span>
+            )}
           </span>
           <span
             className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${

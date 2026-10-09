@@ -62,6 +62,7 @@ export default function UserPlatforms() {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <UserPlatformCard
         name="RetroAchievements"
+        href={raUser?.User ? `https://retroachievements.org/user/${encodeURIComponent(raUser.User)}` : undefined}
         logo={<RaLogo height={18} />}
         bigLogo={<RaLogo height={40} />}
         gradient="from-[#2a80c7] via-[#2a80c7]/40 to-[#e5b53f]"
