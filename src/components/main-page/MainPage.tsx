@@ -7,7 +7,7 @@ import MainPageSkeleton from './main-page-skeleton/MainPageSkeleton'
 import MainPagePinnedGames from './main-page-pinned-games/MainPagePinnedGames'
 import MainPageProfile from './main-page-profile/MainPageProfile'
 import ConnectAccounts from '@/components/connect-accounts/ConnectAccounts'
-import MainPageSteamOnly from './main-page-steam-only/MainPageSteamOnly'
+import MainPageWithoutRa from './main-page-without-ra/MainPageWithoutRa'
 import MainPageCharts from './main-page-charts/MainPageCharts'
 import RARecentlyPlayed from '@/components/ra-recently-played/RARecentlyPlayed'
 import { useMainView } from '@/context/MainViewContext'
@@ -26,8 +26,8 @@ export default function MainPage() {
     return <MainPageSkeleton />
 
   if (status === 'authenticated' && !raLinked) {
-    // Steam alone is enough for a main page; neither account gets the connect prompt.
-    return session?.user?.steamid ? <MainPageSteamOnly /> : <ConnectAccounts />
+    // Steam or PSN alone is enough for a main page; no account at all gets the connect prompt.
+    return session?.user?.steamid || session?.user?.psnaccountid ? <MainPageWithoutRa /> : <ConnectAccounts />
   }
 
   return (

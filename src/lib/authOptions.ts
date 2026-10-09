@@ -25,6 +25,8 @@ function tokenFields(row: UserRecord) {
     raLinked: Boolean(row.rausername && row.raid),
     steamid: row.steamid ?? undefined,
     steamusername: row.steamusername ?? undefined,
+    psnaccountid: row.psnaccountid ?? undefined,
+    psnusername: row.psnusername ?? undefined,
     email: row.email ?? undefined,
     emailVerified: Boolean(row.email_verified_at),
     admin: row.admin === true,
@@ -32,6 +34,7 @@ function tokenFields(row: UserRecord) {
     location: row.location ?? null,
     favorite_game: row.favorite_game ?? null,
     favorite_steam_game: row.favorite_steam_game ?? null,
+    favorite_psn_game: row.favorite_psn_game ?? null,
     pwv: passwordVersion(row.password),
   };
 }
@@ -114,6 +117,8 @@ export const authOptions: NextAuthOptions = {
         session.user.raLinked = token.raLinked === true;
         session.user.steamid = token.steamid;
         session.user.steamusername = token.steamusername;
+        session.user.psnaccountid = token.psnaccountid;
+        session.user.psnusername = token.psnusername;
         session.user.email = token.email ?? undefined;
         session.user.emailVerified = token.emailVerified === true;
         session.user.admin = token.admin;
@@ -121,6 +126,7 @@ export const authOptions: NextAuthOptions = {
         session.user.location = token.location;
         session.user.favorite_game = token.favorite_game;
         session.user.favorite_steam_game = token.favorite_steam_game;
+        session.user.favorite_psn_game = token.favorite_psn_game;
       }
       return session;
     },

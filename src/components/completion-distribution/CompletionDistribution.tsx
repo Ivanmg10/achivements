@@ -8,11 +8,12 @@ const BAND_LABELS = ['<25%', '25–49%', '50–74%', '75–99%', '100%']
 const TONES = {
   ra: ['bg-accent/20', 'bg-accent/35', 'bg-accent/55', 'bg-accent/75', 'bg-accent'],
   steam: ['bg-[#66c0f4]/20', 'bg-[#66c0f4]/35', 'bg-[#66c0f4]/55', 'bg-[#66c0f4]/75', 'bg-[#66c0f4]'],
+  psn: ['bg-[#0070d1]/20', 'bg-[#0070d1]/35', 'bg-[#0070d1]/55', 'bg-[#0070d1]/75', 'bg-[#0070d1]'],
 } as const
 
 /**
  * How a library splits across completion bands, as one stacked bar plus its
- * counts. Both platforms use the same bands and the same shape, so the card
+ * counts. Every platform uses the same bands and the same shape, so the card
  * reads the same whichever is selected; only the hue says which one it is.
  *
  * Every band is labelled with its range and count, so the bar never carries

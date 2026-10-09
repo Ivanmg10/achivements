@@ -1,4 +1,4 @@
-import { filterGroupItems, getDecade, groupSummary, itemKey, raProgressMaps, steamProgressMap } from './groupItems'
+import { filterGroupItems, getDecade, groupSummary, itemKey, liveProgressMap, raProgressMaps } from './groupItems'
 import type { GameGroupItem } from '@/types/types'
 
 const item = (over: Partial<GameGroupItem>): GameGroupItem => ({
@@ -33,9 +33,9 @@ test('filters by console, progress (Steam live) and decade (unknown years left o
     item({ id: 3, source: 'steam', game_id: 9, pct_won: '0', release_year: 2015, console_name: 'Steam' }),
     item({ id: 4, pct_won: '1', release_year: 0 }),
   ]
-  const steam = steamProgressMap([{ id: 9, achievementsLoaded: true, maxPossible: 4, numAwarded: 4 } as never])
+  const live = liveProgressMap([{ id: 9, achievementsLoaded: true, maxPossible: 4, numAwarded: 4 } as never])
   const ids = (f: Partial<Parameters<typeof filterGroupItems>[1]>) =>
-    filterGroupItems(items, { consoles: new Set(), pct: 'all', decade: 'all', ...f }, steam).map((i) => i.id)
+    filterGroupItems(items, { consoles: new Set(), pct: 'all', decade: 'all', ...f }, live).map((i) => i.id)
   expect(ids({ consoles: new Set(['PS2']) })).toEqual([2])
   expect(ids({ pct: '100' })).toEqual([3, 4])
   expect(ids({ pct: '0' })).toEqual([1])
@@ -71,6 +71,23 @@ test('the group summary takes live numbers where there are any, stored ones othe
     item({ id: 3, source: 'steam', game_id: 9 }),
   ]
   const ra = new Map([[1, { scEarned: 4, hcEarned: 6, total: 10 }]])
-  const steam = new Map([[9, { earned: 1, total: 5 }]])
-  expect(groupSummary(items, ra, steam)).toEqual({ earned: 6 + 2 + 1, total: 10 + 8 + 5 })
+  const live = new Map([['steam:9', { earned: 1, total: 5, pct: 0.2 }]])
+  expect(groupSummary(items, ra, live)).toEqual({ earned: 6 + 2 + 1, total: 10 + 8 + 5 })
+})
+
+test('PSN progress is live too, and never read from a Steam app with the same number', () => {
+  const items = [
+    item({ id: 1, source: 'psn', game_id: 620, pct_won: '0', num_awarded: 0, max_possible: 10 }),
+    item({ id: 2, source: 'steam', game_id: 620, pct_won: '0', num_awarded: 0, max_possible: 10 }),
+  ]
+  const live = liveProgressMap(
+    [{ id: 620, achievementsLoaded: true, maxPossible: 50, numAwarded: 50 } as never],
+    [{ id: 620, maxPossible: 10, numAwarded: 4, pctWon: 30 } as never],
+  )
+  expect(groupSummary(items, new Map(), live)).toEqual({ earned: 4 + 50, total: 10 + 50 })
+  // Sony's own percentage, which weighs trophies by grade.
+  const ids = (pct: '100' | 'progress') =>
+    filterGroupItems(items, { consoles: new Set(), pct, decade: 'all' }, live).map((i) => i.id)
+  expect(ids('progress')).toEqual([1])
+  expect(ids('100')).toEqual([2])
 })

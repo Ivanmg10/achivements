@@ -15,7 +15,10 @@ import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { useLanguage } from '@/context/LanguageContext'
 import { useMainPlatform } from '@/context/MainPlatformContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
+import { usePsnGamesData } from '@/context/PsnGamesDataContext'
+import { usePsnRecentTrophies } from '@/hooks/usePsnRecentTrophies'
 import { toRecentAchievement } from '@/utils/steamMappers'
+import { psnToRecentAchievement } from '@/utils/psnMappers'
 import { ChartCard } from '@/components/ui/ChartCard'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 
@@ -28,6 +31,7 @@ import MainPageTopGames from './MainPageTopGames'
 import MainPageBestPeriod from './MainPageBestPeriod'
 import MainPageFavorites from '../main-page-favorites/MainPageFavorites'
 import MainPageSteamStats from './main-page-steam-stats/MainPageSteamStats'
+import MainPagePsnStats from './main-page-psn-stats/MainPagePsnStats'
 import MainPageStatsRail, { StatsSection } from '../main-page-stats-rail/MainPageStatsRail'
 import MainPageBrowse from '../main-page-browse/MainPageBrowse'
 import MainPageCollection from '../main-page-collection/MainPageCollection'
@@ -36,9 +40,9 @@ import MainPageGroupsSection from '../main-page-groups-section/MainPageGroupsSec
 /**
  * Stats & Activity. Cards whose idea carries over between platforms —
  * activity, daily, most active, rarest, abandoned, mastered & completed,
- * groups and pinned — always show RA and Steam together. The ones built on
- * RA-only concepts (points, consoles, awards) switch to a Steam version with
- * the selector at the top of the page, as does best performance.
+ * groups and pinned — always show RA, Steam and PSN together. The ones built
+ * on RA-only concepts (points, consoles, awards) switch to a Steam or PSN
+ * version with the selector at the top of the page, as does best performance.
  */
 export default function MainPageCharts() {
   const { T } = useLanguage()
@@ -56,18 +60,23 @@ export default function MainPageCharts() {
   const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
   const { platform } = useMainPlatform()
   const { isLinked: steamLinked, library } = useSteamGamesData()
-  const isSteam = platform === 'steam'
   const { achievements: steamActivity, isLoading: steamLoading } = useSteamRecentAchievements(steamLinked ? 'activity' : null)
+  const { library: psnLibrary } = usePsnGamesData()
+  const { trophies: psnActivity, isLoading: psnLoading } = usePsnRecentTrophies('activity')
 
-  // Steam unlocks in RA's shape, so the shared cards render both platforms as one list.
+  // Steam and PSN unlocks in RA's shape, so the shared cards render every platform as one list.
   const steamRecent = useMemo(() => steamActivity.map(toRecentAchievement), [steamActivity])
+  const psnRecent = useMemo(() => psnActivity.map(psnToRecentAchievement), [psnActivity])
   const byDateDesc = (a: { Date: string }, b: { Date: string }) => b.Date.localeCompare(a.Date)
-  const recent = useMemo(() => [...achievements, ...steamRecent].sort(byDateDesc), [achievements, steamRecent])
+  const recent = useMemo(
+    () => [...achievements, ...steamRecent, ...psnRecent].sort(byDateDesc),
+    [achievements, steamRecent, psnRecent],
+  )
 
-  // Best performance follows the selector: points (RA) and unlocks (Steam) do not add up.
-  const bestPeriodData = isSteam ? steamRecent : heatmapData
-  const bestPeriodLoading = isSteam ? steamLoading : heatmapLoading
-  const bestPeriodError = !isSteam && heatmapError
+  // Best performance follows the selector: points (RA) and unlocks (Steam, PSN) do not add up.
+  const bestPeriodData = platform === 'steam' ? steamRecent : platform === 'psn' ? psnRecent : heatmapData
+  const bestPeriodLoading = platform === 'steam' ? steamLoading : platform === 'psn' ? psnLoading : heatmapLoading
+  const bestPeriodError = platform === 'ra' && heatmapError
   const refetchStats = () => {
     if (achError) refetchAch()
     if (rankError) refetchRank()
@@ -84,8 +93,10 @@ export default function MainPageCharts() {
   const panels: Record<string, ReactNode> = {
     overview: (
       <>
-        {isSteam ? (
+        {platform === 'steam' ? (
           <MainPageSteamStats achievements={steamRecent} games={library} isLoading={steamLoading} />
+        ) : platform === 'psn' ? (
+          <MainPagePsnStats achievements={psnRecent} isLoading={psnLoading} />
         ) : (
           <SectionFallback error={achError || rankError} onRefresh={refetchStats}>
             <MainPagePointsStats
@@ -123,7 +134,7 @@ export default function MainPageCharts() {
         </ChartCard>
         <ChartCard>
           <SectionFallback error={gamesError} onRefresh={refetchGames}>
-            <MainPageAbandoned playing={playing} steamGames={library} isLoading={playingLoading} />
+            <MainPageAbandoned playing={playing} steamGames={library} psnGames={psnLibrary} isLoading={playingLoading} />
           </SectionFallback>
         </ChartCard>
         <ChartCard className="md:col-span-2 xl:col-span-1">
@@ -133,7 +144,7 @@ export default function MainPageCharts() {
         </ChartCard>
         <ChartCard className="md:col-span-2 xl:col-span-1">
           <SectionFallback error={achError} onRefresh={refetchAch}>
-            <MainPageRarest achievements={achievements} steamAchievements={steamActivity} isLoading={achLoading} />
+            <MainPageRarest achievements={achievements} steamAchievements={steamActivity} psnTrophies={psnActivity} isLoading={achLoading} />
           </SectionFallback>
         </ChartCard>
         {/* Pinned achievements beside it, across the rest: the list can run long. */}
@@ -150,7 +161,7 @@ export default function MainPageCharts() {
           if (awardsError) refetchAwards()
         }}
       >
-        <MainPageCollection games={all} steamGames={library} awards={awards} inProgress={inProgress} isLoading={gamesLoading || awardsLoading} />
+        <MainPageCollection games={all} steamGames={library} psnGames={psnLibrary} awards={awards} inProgress={inProgress} isLoading={gamesLoading || awardsLoading} />
       </SectionFallback>
     ),
     groups: <MainPageGroupsSection />,

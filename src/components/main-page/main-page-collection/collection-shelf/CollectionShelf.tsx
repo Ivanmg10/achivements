@@ -6,7 +6,8 @@ import { IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import { formatDate } from '@/utils/utils'
-import type { LatestPerfect } from '@/utils/perfectGames'
+import { gameHref } from '@/utils/gameRef'
+import type { LatestPerfect, PerfectCounts } from '@/utils/perfectGames'
 import GameCover from '@/components/game-cover/GameCover'
 import EmptyState from '@/components/empty-state/EmptyState'
 
@@ -26,7 +27,7 @@ const MEDALS = [
  * on a medal and name, console and date under it. On a phone the row scrolls
  * sideways.
  */
-export default function CollectionShelf({ games, counts }: { games: LatestPerfect[]; counts: { hc: number; sc: number; steam: number } }) {
+export default function CollectionShelf({ games, counts }: { games: LatestPerfect[]; counts: PerfectCounts }) {
   const { T } = useLanguage()
   const reduce = useReducedMotion()
   const onPointerMove = useSpotlight()
@@ -48,6 +49,12 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
               <span className="text-[#66c0f4] font-semibold">{counts.steam} Steam</span>
             </>
           )}
+          {counts.psn > 0 && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span className="text-[#0070d1] font-semibold">{counts.psn} PlayStation</span>
+            </>
+          )}
         </p>
       </div>
 
@@ -64,7 +71,7 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
               transition={{ duration: 0.4, delay: reduce ? 0 : 0.06 * i, ease: [0.16, 1, 0.3, 1] }}
             >
               <Link
-                href={game.source === 'steam' ? `/steamGame/${game.id}` : `/gameInfo/${game.id}`}
+                href={gameHref(game.source, game.id)}
                 onPointerMove={onPointerMove}
                 className="spotlight group relative flex flex-col items-center gap-3 h-full rounded-xl bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >

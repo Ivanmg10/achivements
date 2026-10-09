@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
 
-function parseSource(req: NextRequest): 'ra' | 'steam' {
-  return req.nextUrl.searchParams.get('source') === 'steam' ? 'steam' : 'ra'
+function parseSource(req: NextRequest): 'ra' | 'steam' | 'psn' {
+  const source = req.nextUrl.searchParams.get('source')
+  return source === 'steam' || source === 'psn' ? source : 'ra'
 }
 
 export async function GET(req: NextRequest) {
@@ -16,10 +17,10 @@ export async function GET(req: NextRequest) {
 
     const gameId = req.nextUrl.searchParams.get('gameId')
 
-    // Every pin across both platforms, newest first: the main page's pinned card.
+    // Every pin across every platform, newest first: the main page's pinned card.
     if (req.nextUrl.searchParams.get('source') === 'all') {
       const result = await pool.query(
-        `SELECT achievement_id, steam_apiname, game_id, game_title, snapshot, num_distinct_players, source, created_at
+        `SELECT achievement_id, steam_apiname, psn_trophy_id, game_id, game_title, snapshot, num_distinct_players, source, created_at
          FROM pinned_achievements
          WHERE user_id = $1
          ORDER BY created_at DESC`,
@@ -30,11 +31,11 @@ export async function GET(req: NextRequest) {
 
     const source = parseSource(req)
     const query = gameId
-      ? `SELECT achievement_id, steam_apiname, game_id, game_title, snapshot, num_distinct_players, source, created_at
+      ? `SELECT achievement_id, steam_apiname, psn_trophy_id, game_id, game_title, snapshot, num_distinct_players, source, created_at
          FROM pinned_achievements
          WHERE user_id = $1 AND source = $2 AND game_id = $3
          ORDER BY created_at DESC`
-      : `SELECT achievement_id, steam_apiname, game_id, game_title, snapshot, num_distinct_players, source, created_at
+      : `SELECT achievement_id, steam_apiname, psn_trophy_id, game_id, game_title, snapshot, num_distinct_players, source, created_at
          FROM pinned_achievements
          WHERE user_id = $1 AND source = $2
          ORDER BY created_at DESC`
@@ -59,7 +60,20 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { gameId, gameTitle, numDistinctPlayers } = body
 
-    if (body.source === 'steam') {
+    if (body.source === 'psn') {
+      const { psnTrophyId, achievement } = body
+      if (!Number.isInteger(psnTrophyId) || !Number.isInteger(gameId)) {
+        return NextResponse.json({ message: 'Datos incompletos' }, { status: 400 })
+      }
+      await pool.query(
+        `INSERT INTO pinned_achievements
+           (user_id, source, psn_trophy_id, game_id, game_title, snapshot, num_distinct_players)
+         VALUES ($1, 'psn', $2, $3, $4, $5, 0)
+         ON CONFLICT (user_id, game_id, psn_trophy_id) WHERE source = 'psn'
+         DO UPDATE SET snapshot = $5, game_title = $4`,
+        [session.user.id, psnTrophyId, gameId, gameTitle, JSON.stringify(achievement ?? {})],
+      )
+    } else if (body.source === 'steam') {
       const { steamApiname, achievement } = body
       if (!steamApiname || !gameId) {
         return NextResponse.json({ message: 'Datos incompletos' }, { status: 400 })
@@ -103,6 +117,7 @@ export async function DELETE(req: NextRequest) {
 
     const achievementId = req.nextUrl.searchParams.get('achievementId')
     const steamApiname = req.nextUrl.searchParams.get('steamApiname')
+    const psnTrophyId = req.nextUrl.searchParams.get('psnTrophyId')
     const gameId = req.nextUrl.searchParams.get('gameId')
 
     if (achievementId) {
@@ -110,13 +125,18 @@ export async function DELETE(req: NextRequest) {
         `DELETE FROM pinned_achievements WHERE user_id = $1 AND achievement_id = $2 AND source = 'ra'`,
         [session.user.id, achievementId],
       )
+    } else if (psnTrophyId && gameId) {
+      await pool.query(
+        `DELETE FROM pinned_achievements WHERE user_id = $1 AND game_id = $2 AND psn_trophy_id = $3 AND source = 'psn'`,
+        [session.user.id, gameId, psnTrophyId],
+      )
     } else if (steamApiname && gameId) {
       await pool.query(
         `DELETE FROM pinned_achievements WHERE user_id = $1 AND game_id = $2 AND steam_apiname = $3 AND source = 'steam'`,
         [session.user.id, gameId, steamApiname],
       )
     } else {
-      return NextResponse.json({ message: 'Falta achievementId o steamApiname/gameId' }, { status: 400 })
+      return NextResponse.json({ message: 'Falta achievementId, steamApiname/gameId o psnTrophyId/gameId' }, { status: 400 })
     }
 
     return NextResponse.json({ ok: true })

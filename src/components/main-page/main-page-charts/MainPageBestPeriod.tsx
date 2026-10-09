@@ -51,8 +51,8 @@ export default function MainPageBestPeriod({
   const [selectedWeek, setSelectedWeek] = useState<string | null>(null)
   const [expandedMonth, setExpandedMonth] = useState<string | null>(null)
 
-  // Steam has no points: its best periods are the ones with the most unlocks.
-  const isSteam = achievements.some((a) => a.Source === 'steam')
+  // Steam and PSN have no points: their best periods are the ones with the most unlocks.
+  const isSteam = achievements.some((a) => a.Source === 'steam' || a.Source === 'psn')
   const metric: Metric = isSteam ? 'ach' : 'pts'
 
   const { bestDay, bestWeek, bestMonth } = useMemo(() => ({

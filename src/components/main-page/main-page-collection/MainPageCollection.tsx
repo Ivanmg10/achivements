@@ -3,6 +3,7 @@
 import { useMemo } from 'react'
 import type { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
+import type { PsnGameProgress } from '@/types/psn'
 import { usePerfectGamesOrder } from '@/hooks/usePerfectGamesOrder'
 import { applyPerfectOrder, buildPerfectGames, countPerfectGames, latestPerfects, perfectDates } from '@/utils/perfectGames'
 import { ChartCard } from '@/components/ui/ChartCard'
@@ -22,22 +23,27 @@ const SHELF = 5
 export default function MainPageCollection({
   games,
   steamGames = [],
+  psnGames = [],
   awards,
   inProgress = [],
   isLoading,
 }: {
   games: RetroAchievementsGameCompleted[]
   steamGames?: SteamGameProgress[]
+  psnGames?: PsnGameProgress[]
   awards: UserAwards | null
   inProgress?: RetroAchievementsGameCompleted[]
   isLoading?: boolean
 }) {
   const { order, saveOrder } = usePerfectGamesOrder()
-  const raw = useMemo(() => buildPerfectGames(games, steamGames), [games, steamGames])
+  const raw = useMemo(() => buildPerfectGames(games, steamGames, psnGames), [games, steamGames, psnGames])
   const ordered = useMemo(() => applyPerfectOrder(raw, order), [raw, order])
   const counts = useMemo(() => countPerfectGames(raw), [raw])
-  const dates = useMemo(() => perfectDates(awards?.VisibleUserAwards, steamGames), [awards, steamGames])
-  const latest = useMemo(() => latestPerfects(awards?.VisibleUserAwards, steamGames, SHELF), [awards, steamGames])
+  const dates = useMemo(() => perfectDates(awards?.VisibleUserAwards, steamGames, psnGames), [awards, steamGames, psnGames])
+  const latest = useMemo(
+    () => latestPerfects(awards?.VisibleUserAwards, steamGames, SHELF, psnGames),
+    [awards, steamGames, psnGames],
+  )
 
   if (isLoading) {
     return (
@@ -61,7 +67,7 @@ export default function MainPageCollection({
           <CollectionGrid games={ordered} allGames={raw} dates={dates} order={order} onSaveOrder={saveOrder} />
         </ChartCard>
         <ChartCard>
-          <CollectionNumbers awards={awards} inProgress={inProgress} steamGames={steamGames} />
+          <CollectionNumbers awards={awards} inProgress={inProgress} steamGames={steamGames} psnGames={psnGames} />
         </ChartCard>
       </div>
     </div>

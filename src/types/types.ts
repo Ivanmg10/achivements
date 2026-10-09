@@ -1,4 +1,5 @@
 import type { GameSource, SteamAchievementUnified } from '@/types/steam'
+import type { PsnTrophy } from '@/types/psn'
 
 /** Every theme the app has a stylesheet for; the endpoints that store one accept only these. */
 export const THEMES = ['dark', 'light', 'blue', 'purple', 'green', 'red', 'synthwave', 'catppuccin', 'gruvbox', 'rose-pine', 'oled', 'ocean', 'terminal', 'sakura', 'arctic', 'daxter', 'bentley', 'clank', 'black-ops-2', 'san-andreas', 'snake-eater'] as const
@@ -237,6 +238,14 @@ export type PinnedAchievement =
       snapshot: SteamAchievementUnified
       num_distinct_players: number
     }
+  | {
+      source: 'psn'
+      psn_trophy_id: number
+      game_id: number
+      game_title: string
+      snapshot: PsnTrophy
+      num_distinct_players: number
+    }
 
 export type RecentAchievement = {
   Date: string; // "2024-01-15 20:30:00"
@@ -296,6 +305,7 @@ export type GameGroup = {
   updated_at: string
   game_count: number
   steam_count: number
+  psn_count: number
   total_awarded: number
   total_possible: number
   /** The first four games, for the card's cover mosaic. */

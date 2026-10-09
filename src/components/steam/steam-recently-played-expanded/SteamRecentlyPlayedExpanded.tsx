@@ -14,7 +14,8 @@ const SKELETON_BADGES = 24
 /**
  * An expanded Steam game in the recent feed, laid out exactly like RA's
  * RARecentlyPlayedExpanded: progress ring (+ stats on small screens), the
- * achievements-over-time chart, the full badge grid, and a side panel —
+ * achievements-over-time chart and a side panel on top, the full badge grid
+ * across the card below —
  * the player's rarest unlocks where RA shows pinned achievements.
  *
  * Achievements load when this mounts, i.e. when the card is opened. Until
@@ -44,7 +45,7 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
         />
       </div>
 
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:col-start-1 lg:col-span-2 lg:row-start-2">
+      <div className="bg-bg-header/40 rounded-xl p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
         <p className="text-xs text-text-secondary mb-2">{T.gameExpanded.allAchievements}</p>
         {isLoading ? (
           <ul aria-busy="true" className="flex flex-wrap gap-1">
@@ -76,7 +77,7 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
         <GameAchievementsProgressChart achievements={unlocks} isLoading={isLoading} />
       </div>
 
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-3 lg:row-start-1 lg:row-span-2">
+      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-3 lg:row-start-1">
         <SteamRarestAchievements appId={game.id} achievements={achievements} isLoading={isLoading} />
       </div>
     </div>

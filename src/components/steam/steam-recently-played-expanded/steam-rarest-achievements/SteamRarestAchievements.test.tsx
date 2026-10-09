@@ -11,7 +11,7 @@ function ach(apiname: string, overrides: Partial<SteamAchievementUnified> = {}):
   }
 }
 
-test('lists earned achievements rarest first, capped at five', () => {
+test('lists earned achievements rarest first, capped at four', () => {
   const list = [
     ach('COMMON', { globalPct: 80 }),
     ach('RARE', { globalPct: 0.5 }),
@@ -25,14 +25,15 @@ test('lists earned achievements rarest first, capped at five', () => {
   render(<SteamRarestAchievements appId={620} achievements={list} isLoading={false} />)
 
   const titles = screen.getAllByRole('listitem').map((li) => li.textContent)
-  expect(titles).toHaveLength(5)
+  expect(titles).toHaveLength(4)
   expect(titles[0]).toContain('RARE')
   expect(titles[0]).toContain(`0.50${en.achievement.haveIt}`)
   // Locked ones and ones without rarity are not "your rarest".
   expect(titles.join()).not.toContain('LOCKED')
   expect(titles.join()).not.toContain('NO_RARITY')
-  // The five rarest of the six eligible: the most common one drops off.
+  // The four rarest of the six eligible: the two most common drop off.
   expect(titles.join()).not.toContain('COMMON')
+  expect(titles.join()).not.toContain('C60')
 })
 
 test('each links to that achievement on the game page', () => {

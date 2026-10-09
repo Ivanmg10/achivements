@@ -7,8 +7,8 @@ test('names the app and says what it is for', () => {
   expect(screen.getByText('Every achievement you have earned, in one place')).toBeInTheDocument()
 })
 
-test('lists the platforms, PlayStation marked as coming in words', () => {
+test('lists the platforms it reads', () => {
   render(<AuthBrand />)
   const items = screen.getAllByRole('listitem').map((li) => li.textContent)
-  expect(items).toEqual(['RetroAchievements', 'Steam', 'PlayStation · coming soon'])
+  expect(items).toEqual(['RetroAchievements', 'Steam', 'PlayStation'])
 })

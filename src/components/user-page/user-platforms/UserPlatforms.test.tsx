@@ -18,6 +18,10 @@ jest.mock('@/hooks/useUserRank', () => ({ useUserRank: () => ({ rank: { Rank: 16
 jest.mock('@/hooks/useUserAwards', () => ({ useUserAwards: () => ({ awards: { MasteryAwardsCount: 12 }, isLoading: false }) }))
 jest.mock('@/context/GamesDataContext', () => ({ useGamesData: () => ({ all: [{}, {}], inProgress: [{}], hardcore: [], softcore: [] }) }))
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: () => ({ library: [], libraryLoading: false }) }))
+jest.mock('@/components/user-page/user-psn-card/UserPsnCard', () => ({
+  __esModule: true,
+  default: () => <section aria-label="PlayStation Network" />,
+}))
 jest.mock('@/components/ra-login-modal/RaLoginModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="ra-modal" /> : null),
@@ -46,13 +50,11 @@ beforeEach(() => {
   setSteam()
 })
 
-test('one card per platform, PlayStation not ready yet', () => {
+test('one card per platform', () => {
   render(<UserPlatforms />)
   expect(screen.getByRole('region', { name: 'RetroAchievements' })).toBeInTheDocument()
   expect(screen.getByRole('region', { name: 'Steam' })).toBeInTheDocument()
-  const psn = screen.getByRole('region', { name: 'PlayStation Network' })
-  expect(psn).toHaveTextContent(en.userData.comingSoon)
-  expect(screen.getByRole('button', { name: en.userData.comingSoon })).toBeDisabled()
+  expect(screen.getByRole('region', { name: 'PlayStation Network' })).toBeInTheDocument()
 })
 
 test('a connected platform shows the account it is connected as', () => {

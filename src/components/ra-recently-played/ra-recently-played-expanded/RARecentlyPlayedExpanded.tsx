@@ -50,7 +50,7 @@ export function RARecentlyPlayedExpanded({
           remaining={remaining}
         />
       </div>
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:col-start-1 lg:col-span-2 lg:row-start-2">
+      <div className="bg-bg-header/40 rounded-xl p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
         <p className="text-xs text-text-secondary mb-2">{T.gameExpanded.allAchievements}</p>
         <AchievementGrid
           achievements={isLoading ? [] : achievements}
@@ -63,7 +63,7 @@ export function RARecentlyPlayedExpanded({
       <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-2 lg:row-start-1">
         <GameAchievementsProgressChart achievements={achievements} isLoading={isLoading} />
       </div>
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-3 lg:row-start-1 lg:row-span-2">
+      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-3 lg:row-start-1">
         <GamePinnedAchievements
           gameId={game.GameID}
           gameTitle={game.Title}

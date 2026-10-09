@@ -13,6 +13,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import MainPageProfileRaAchievements from './main-page-profile-ra-achievements/MainPageProfileRaAchievements'
 import MainPageProfileRaGame from './main-page-profile-ra-game/MainPageProfileRaGame'
 import MainPageProfileRaStats from './main-page-profile-ra-stats/MainPageProfileRaStats'
+import MainPageProfileGameSkeleton from '../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
 
 export default function MainPageProfileRa({
   user,
@@ -87,18 +88,7 @@ export default function MainPageProfileRa({
           <MainPageProfileRaStats user={user} hardcoreRatio={hardcoreRatio} />
 
           {gameLoading && !game ? (
-            <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 animate-pulse">
-              <div className="h-3 w-20 bg-ink/10 rounded" />
-              <div className="h-3 w-40 bg-ink/10 rounded" />
-              <div className="flex gap-3 items-center">
-                <div className="w-12.5 h-12.5 rounded-lg bg-ink/10 shrink-0" />
-                <div className="flex flex-col gap-1.5 flex-1">
-                  <div className="h-3.5 bg-ink/10 rounded w-3/4" />
-                  <div className="h-3 bg-ink/10 rounded w-1/3" />
-                </div>
-              </div>
-              <div className="h-2 bg-ink/10 rounded" />
-            </div>
+            <MainPageProfileGameSkeleton />
           ) : game ? (
             <MainPageProfileRaGame game={game} richPresenceMsg={user?.RichPresenceMsg} />
           ) : null}

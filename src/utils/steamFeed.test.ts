@@ -34,8 +34,8 @@ describe('classifySteamGame', () => {
     expect(classifySteamGame(steam({ ...loaded, numAwarded: 3 }))).toBe('playing')
   })
 
-  test('played with nothing earned yet is left out — matches RA, which needs PctWon > 0', () => {
-    expect(classifySteamGame(steam({ ...loaded, numAwarded: 0 }))).toBeNull()
+  test('played with nothing earned yet is "no achievements", like a game never launched', () => {
+    expect(classifySteamGame(steam({ ...loaded, numAwarded: 0 }))).toBe('wantToPlay')
   })
 
   test('played but counts not loaded is left out rather than guessed', () => {
@@ -172,4 +172,23 @@ describe('formatUnlock', () => {
     )
     expect(formatUnlock(iso, 'es')).not.toBe(formatUnlock(iso, 'en'))
   })
+})
+
+const psnGame = (id: number, pctWon: number, lastPlayed = '2024-01-02T00:00:00.000Z') => ({
+  _source: 'psn' as const, id, titleId: `NPWR${String(Math.floor(id / 100)).padStart(5, '0')}_${String(id % 100).padStart(2, '0')}`,
+  service: 'trophy2' as const, title: `PS ${id}`, imageIcon: `https://psn/${id}.png`, consoleName: 'PS5',
+  maxPossible: 10, numAwarded: Math.round(pctWon / 10), pctWon, lastPlayed,
+  earned: { bronze: 1, silver: 0, gold: 0, platinum: pctWon >= 100 ? 1 : 0 },
+  defined: { bronze: 9, silver: 0, gold: 0, platinum: 1 },
+  lastTrophyAt: lastPlayed, playtimeMinutes: null, playedAs: [] as string[], playCount: null, coverUrl: null, heroUrl: null,
+})
+
+test('PSN games join the recent feed by their last trophy', () => {
+  const merged = mergeRecentFeeds(
+    [ra(1, '2024-01-01 00:00:00')],
+    [steam({ id: 2, lastPlayed: '2024-01-03T00:00:00.000Z' })],
+    10,
+    [psnGame(300, 50, '2024-01-02T00:00:00.000Z') as never],
+  )
+  expect(merged.map((i) => i.key)).toEqual(['steam:2', 'psn:300', 'ra:1'])
 })

@@ -113,6 +113,25 @@ describe('POST', () => {
     expect(params).toEqual(['1', 'ACH_WIN', 620, 'Portal 2', JSON.stringify({ apiname: 'ACH_WIN', title: 'Win' }), 0])
   })
 
+  test('returns 400 without an integer psnTrophyId for PSN', async () => {
+    const res = await POST(makeRequest('POST', 'http://localhost/api/favorites', { source: 'psn', psnTrophyId: 'x', gameId: 2018800 }))
+    expect(res.status).toBe(400)
+    expect(pool.query).not.toHaveBeenCalled()
+  })
+
+  test('pins a PSN trophy', async () => {
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
+    const res = await POST(
+      makeRequest('POST', 'http://localhost/api/favorites', {
+        source: 'psn', psnTrophyId: 4, achievement: { id: 4, name: 'Bot Master' }, gameId: 2018800, gameTitle: 'Astro Bot',
+      }),
+    )
+    expect(res.status).toBe(200)
+    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    expect(sql).toContain("'psn'")
+    expect(params).toEqual(['1', 4, 2018800, 'Astro Bot', JSON.stringify({ id: 4, name: 'Bot Master' })])
+  })
+
   test('returns 500 when the insert fails', async () => {
     jest.spyOn(console, 'error').mockImplementation(() => {})
     ;(pool.query as jest.Mock).mockRejectedValueOnce(new Error('db down'))
@@ -153,6 +172,15 @@ describe('DELETE', () => {
     const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
     expect(sql).toContain("source = 'steam'")
     expect(params).toEqual(['1', '620', 'ACH_WIN'])
+  })
+
+  test('unpins a PSN trophy by id + gameId', async () => {
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
+    const res = await DELETE(makeRequest('DELETE', 'http://localhost/api/favorites?psnTrophyId=4&gameId=2018800'))
+    expect(res.status).toBe(200)
+    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    expect(sql).toContain("source = 'psn'")
+    expect(params).toEqual(['1', '2018800', '4'])
   })
 
   test('returns 500 when the delete fails', async () => {

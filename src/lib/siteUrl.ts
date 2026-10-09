@@ -21,4 +21,4 @@ export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() ?? ''
 export const SITE_TITLE = 'CheevoVault · RetroAchievements & Steam achievement tracker'
 
 export const SITE_DESCRIPTION =
-  'Track your RetroAchievements and Steam achievements in one place: completion, streaks, rarest unlocks and what is left to hunt.'
+  'Track your RetroAchievements, Steam and PlayStation achievements in one place: completion, streaks, rarest unlocks and what is left to hunt.'

@@ -4,9 +4,13 @@ import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
+import type { PsnGameProgress } from '@/types/psn'
 import { classifySteamGame, hasUnloadedProgress, summarizeSteamLibrary } from '@/utils/steamFeed'
+import { classifyPsnGame } from '@/utils/psnTitles'
+import { gameHref } from '@/utils/gameRef'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
+import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import CompletionDistribution from '@/components/completion-distribution/CompletionDistribution'
 import MasteryMix from '@/components/main-page/main-page-charts/mastery-mix/MasteryMix'
 import ClosestToComplete, { CLOSEST_SHOWN, ClosestGame } from '@/components/main-page/main-page-charts/closest-to-complete/ClosestToComplete'
@@ -14,19 +18,21 @@ import ClosestToComplete, { CLOSEST_SHOWN, ClosestGame } from '@/components/main
 const BLOCK = 'flex flex-col gap-3 pt-4 border-t border-ink/[0.06] first:pt-0 first:border-t-0'
 
 /**
- * The numbers behind the collection, both platforms at once (they no longer
- * swap with the platform selector): RA's masteries and award mix, Steam's
- * perfect games and how far along the rest are, and the games nearest 100%
- * on either.
+ * The numbers behind the collection, every platform at once (they no longer
+ * swap with the platform selector): RA's masteries and award mix, Steam's and
+ * PSN's perfect games and how far along the rest are, and the games nearest
+ * 100% on any of them.
  */
 export default function CollectionNumbers({
   awards,
   inProgress = [],
   steamGames = [],
+  psnGames = [],
 }: {
   awards: UserAwards | null
   inProgress?: RetroAchievementsGameCompleted[]
   steamGames?: SteamGameProgress[]
+  psnGames?: PsnGameProgress[]
 }) {
   const { T } = useLanguage()
 
@@ -35,6 +41,8 @@ export default function CollectionNumbers({
     () => steamGames.filter((g) => g.achievementsLoaded && g.maxPossible > 0).map((g) => g.numAwarded / g.maxPossible),
     [steamGames],
   )
+  const psnPerfect = useMemo(() => psnGames.filter((g) => classifyPsnGame(g) === 'completed').length, [psnGames])
+  const psnFractions = useMemo(() => psnGames.map((g) => g.pctWon / 100), [psnGames])
   // The started games nearest 100%, whichever platform they are on.
   const closest = useMemo<ClosestGame[]>(() => {
     const ra = inProgress.map((g) => ({
@@ -57,8 +65,19 @@ export default function CollectionNumbers({
         total: g.maxPossible,
         percent: g.pctWon,
       }))
-    return [...ra, ...st].sort((a, b) => b.percent - a.percent).slice(0, CLOSEST_SHOWN)
-  }, [inProgress, steamGames])
+    const ps = psnGames
+      .filter((g) => classifyPsnGame(g) === 'playing')
+      .map((g) => ({
+        key: `psn:${g.id}`,
+        href: gameHref('psn', g.id),
+        title: g.title,
+        imageUrl: g.imageIcon || undefined,
+        done: g.numAwarded,
+        total: g.maxPossible,
+        percent: g.pctWon,
+      }))
+    return [...ra, ...st, ...ps].sort((a, b) => b.percent - a.percent).slice(0, CLOSEST_SHOWN)
+  }, [inProgress, steamGames, psnGames])
 
   return (
     <div className="flex flex-col gap-4">
@@ -93,6 +112,21 @@ export default function CollectionNumbers({
               </span>
             </p>
             <CompletionDistribution fractions={fractions} tone="steam" note={hasUnloadedProgress(steamGames) ? T.steam.partialProgressNote : undefined} />
+          </section>
+        )}
+
+        {psnGames.length > 0 && (
+          <section className={BLOCK} aria-label="PlayStation">
+            <span className="flex items-center gap-2 text-xs text-text-secondary">
+              <PlaystationLogo size={12} className="text-[#0070d1]" aria-hidden="true" /> PlayStation
+            </span>
+            <p className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-[#0070d1] tabular-nums leading-none">{psnPerfect}</span>
+              <span className="text-xs text-text-secondary">
+                {T.steam.statPerfect} · {psnGames.length} {T.steam.statGames.toLowerCase()}
+              </span>
+            </p>
+            <CompletionDistribution fractions={psnFractions} tone="psn" />
           </section>
         )}
 

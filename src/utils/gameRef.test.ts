@@ -18,12 +18,14 @@ test.each(['730', 'epic:730', 'ra:', 'ra:abc', 'ra:-3', 'ra:1.5', ''])('rejects 
 test('each platform has its own game page', () => {
   expect(gameHref('ra', 1)).toBe('/gameInfo/1')
   expect(gameHref('steam', 730)).toBe('/steamGame/730')
+  expect(gameHref('psn', 2018800)).toBe('/psnGame/NPWR20188_00')
 })
 
 test('recognises only known sources', () => {
-  expect(GAME_SOURCES).toEqual(['ra', 'steam'])
+  expect(GAME_SOURCES).toEqual(['ra', 'steam', 'psn'])
   expect(isGameSource('ra')).toBe(true)
   expect(isGameSource('steam')).toBe(true)
+  expect(isGameSource('psn')).toBe(true)
   expect(isGameSource('epic')).toBe(false)
   expect(isGameSource(undefined)).toBe(false)
 })

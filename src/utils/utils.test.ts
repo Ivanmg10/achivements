@@ -270,6 +270,7 @@ describe('pinnedKey', () => {
   test('keys RA pins by achievement id and Steam pins by game + apiname', () => {
     expect(pinnedKey({ source: 'ra', achievement_id: 5 } as never)).toBe('ra:5')
     expect(pinnedKey({ source: 'steam', game_id: 620, steam_apiname: 'WIN' } as never)).toBe('steam:620:WIN')
+    expect(pinnedKey({ source: 'psn', game_id: 2018800, psn_trophy_id: 4 } as never)).toBe('psn:2018800:4')
   })
 })
 
@@ -335,14 +336,14 @@ describe('groupByDaySource', () => {
     d.setDate(d.getDate() - offset)
     return d.toISOString().split('T')[0]
   }
-  const ach = (offset: number, source?: 'steam') => ({ Date: `${day(offset)} 12:00:00`, Source: source }) as never
+  const ach = (offset: number, source?: 'steam' | 'psn') => ({ Date: `${day(offset)} 12:00:00`, Source: source }) as never
 
   test('one row per day, oldest first, ending today, split by platform', () => {
-    const rows = groupByDaySource([ach(0), ach(0, 'steam'), ach(2), ach(30)], 7)
+    const rows = groupByDaySource([ach(0), ach(0, 'steam'), ach(0, 'psn'), ach(2), ach(30)], 7)
     expect(rows).toHaveLength(7)
-    expect(rows[6]).toEqual({ date: day(0), ra: 1, steam: 1, total: 2 })
-    expect(rows[4]).toEqual({ date: day(2), ra: 1, steam: 0, total: 1 })
-    expect(rows.reduce((s, r) => s + r.total, 0)).toBe(3)
+    expect(rows[6]).toEqual({ date: day(0), ra: 1, steam: 1, psn: 1, total: 3 })
+    expect(rows[4]).toEqual({ date: day(2), ra: 1, steam: 0, psn: 0, total: 1 })
+    expect(rows.reduce((s, r) => s + r.total, 0)).toBe(4)
   })
 
   test('copes with no data', () => {

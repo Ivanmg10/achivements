@@ -21,6 +21,7 @@ const baseGroup: GameGroup = {
   updated_at: new Date().toISOString(),
   game_count: 3,
   steam_count: 0,
+  psn_count: 0,
   total_awarded: 10,
   total_possible: 40,
 } as GameGroup
@@ -51,16 +52,26 @@ describe('GroupCard', () => {
 
   it('shows a mixed-platform badge when the group has both RA and Steam games', () => {
     render(<GroupCard group={{ ...baseGroup, game_count: 5, steam_count: 2 }} />)
-    expect(screen.getByLabelText('Includes RetroAchievements and Steam games')).toBeInTheDocument()
+    expect(screen.getByLabelText('Includes games from several platforms')).toBeInTheDocument()
   })
 
   it('omits the mixed-platform badge for a single-platform group', () => {
     render(<GroupCard group={{ ...baseGroup, game_count: 3, steam_count: 0 }} />)
-    expect(screen.queryByLabelText('Includes RetroAchievements and Steam games')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Includes games from several platforms')).not.toBeInTheDocument()
   })
 
   it('omits the mixed-platform badge when every game is Steam', () => {
     render(<GroupCard group={{ ...baseGroup, game_count: 3, steam_count: 3 }} />)
-    expect(screen.queryByLabelText('Includes RetroAchievements and Steam games')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Includes games from several platforms')).not.toBeInTheDocument()
+  })
+
+  it('counts PSN as a platform of its own', () => {
+    render(<GroupCard group={{ ...baseGroup, game_count: 3, steam_count: 0, psn_count: 3 }} />)
+    expect(screen.queryByLabelText('Includes games from several platforms')).not.toBeInTheDocument()
+  })
+
+  it('a group of Steam and PSN games is mixed', () => {
+    render(<GroupCard group={{ ...baseGroup, game_count: 4, steam_count: 2, psn_count: 2 }} />)
+    expect(screen.getByLabelText('Includes games from several platforms')).toBeInTheDocument()
   })
 })

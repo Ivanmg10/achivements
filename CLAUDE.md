@@ -244,6 +244,41 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
 - The privacy policy (`/privacy`) says all of this; `/terms` says when an
   account may be suspended or deleted. Change the policy if the panel changes.
 
+## PlayStation (PSN) — read before touching it
+
+Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient.ts`.
+
+- **One app account, not the user's.** Every call is made as the PSN account
+  whose NPSSO the app holds; it can read any profile with public trophies.
+  Users link by typing their online ID — nothing proves it is theirs, so
+  `psnaccountid` is deliberately **not unique** (a squatter must not lock the
+  owner out). `/privacy` and `/terms` say so.
+- **The NPSSO dies 60 days after sign-in, and nothing extends it** (measured:
+  refreshing returns the same 10-day refresh token; psn-api issue #171; Sony's
+  sign-in has a captcha). It lives encrypted in `psn_credentials`
+  (`migrations/026`, `src/lib/psnCredentials.ts`, `secretBox`), is renewed by
+  pasting a new one in the admin panel, and `/api/cron/psnToken` mails the
+  admins from 7 days before. `PSN_NPSSO` only seeds the first setup.
+  **Do not** try to automate Sony's sign-in.
+- **Games are keyed like RA and Steam**: source `'psn'`, and the trophy set's
+  number as id (`NPWR20188_00` ↔ `2018800`, `psnNumericId`/`psnTitleId`).
+- **A game with DLC counts by its base game** (the `default` trophy group):
+  the main fields are the base game's, `full` has the whole set. That is what
+  makes a platinum "completed".
+- **Two lists, merged**: the trophy list (`getUserTitles`) and the played-games
+  list (play time, last session, store art, PS4/PS5 only, its own privacy
+  setting). `lastTrophyAt` is the trophy list's date and keys every trophy
+  cache; `lastPlayed` is the last session when known.
+- **Caches** live in `steam_cache` under `psn:` keys. When the shape of a
+  cached value changes, bump its key's version (`psn:titles:vN`) in the same
+  change — a dev server will otherwise serve the old shape.
+- **PS3/Vita games** have no play data and no Store page: their cover,
+  backdrop and release year come from IGDB (`src/lib/igdbClient.ts`, a Twitch
+  app in `TWITCH_CLIENT_ID`/`TWITCH_CLIENT_SECRET`), matched by title and
+  platform, cached half a year. Without the keys they keep the trophy icon.
+- Sony returns errors as bodies, not throws: every response goes through
+  `unwrap()`. `psnFailure()` maps them to 503 / 403 (private) / 502.
+
 ## Registration
 
 Public and open: anyone can sign up with a username, a password and an **email,

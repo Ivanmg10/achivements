@@ -60,3 +60,15 @@ test('selects on click', () => {
   fireEvent.click(screen.getByRole('button', { name: /Zelda/ }))
   expect(onSelect).toHaveBeenCalled()
 })
+
+test('a PSN game reads PlayStation, with its own logo', () => {
+  const { container } = render(
+    <SearchModalGameResult
+      game={{ ...BASE, key: 'psn:2018800', source: 'psn', id: 2018800, title: 'Astro Bot', subtitle: 'PlayStation', imageRef: 'https://psn/a.png', status: 'in-progress' }}
+      onSelect={jest.fn()}
+    />,
+  )
+  expect(screen.getByText('PlayStation')).toBeInTheDocument()
+  expect(container.querySelector('img')?.getAttribute('src')).toBe('https://psn/a.png')
+  expect(container.querySelector('svg[aria-hidden="true"]')).toBeInTheDocument()
+})

@@ -44,11 +44,6 @@ test('disconnected: says so, and shows no numbers', () => {
   expect(document.querySelector('dl')).toBeNull()
 })
 
-test('a platform that is not ready yet says so', () => {
-  render(<UserPlatformCard name="PlayStation Network" logo={null} accent="" connected={false} soon />)
-  expect(screen.getByText(en.userData.comingSoon)).toBeInTheDocument()
-})
-
 test('shows a link status message', () => {
   render(
     <UserPlatformCard name="Steam" logo={null} accent="" connected={false} status={<p role="alert">failed</p>} />,

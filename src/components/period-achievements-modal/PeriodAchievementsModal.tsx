@@ -17,7 +17,7 @@ interface Props {
 export default function PeriodAchievementsModal({ title, achievements, onClose }: Props) {
   const { T } = useLanguage()
   // Steam unlocks have no points; a mixed list still totals the RA ones.
-  const hasPoints = achievements.some(a => a.Source !== 'steam')
+  const hasPoints = achievements.some(a => !a.Source || a.Source === 'ra')
 
   const days = useMemo(() => {
     const byDay: Record<string, RecentAchievement[]> = {}

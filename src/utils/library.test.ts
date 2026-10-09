@@ -59,3 +59,22 @@ test('summarizeConsoles counts games once each and the share at 100%', () => {
     { consoleId: 18, console: 'Nintendo DS', games: 1, completed: 1, pct: 100 },
   ])
 })
+
+const psnGame = (id: number, pctWon: number, lastPlayed = '2024-01-02T00:00:00.000Z') => ({
+  _source: 'psn' as const, id, titleId: `NPWR${String(Math.floor(id / 100)).padStart(5, '0')}_${String(id % 100).padStart(2, '0')}`,
+  service: 'trophy2' as const, title: `PS ${id}`, imageIcon: `https://psn/${id}.png`, consoleName: 'PS5',
+  maxPossible: 10, numAwarded: Math.round(pctWon / 10), pctWon, lastPlayed,
+  earned: { bronze: 1, silver: 0, gold: 0, platinum: pctWon >= 100 ? 1 : 0 },
+  defined: { bronze: 9, silver: 0, gold: 0, platinum: 1 },
+  lastTrophyAt: lastPlayed, playtimeMinutes: null, playedAs: [] as string[], playCount: null, coverUrl: null, heroUrl: null,
+})
+
+test('PSN games join the library with their own status and page', () => {
+  const lib = buildLibrary({ playing: [], completed: [], wantToPlay: [] }, [], [psnGame(100, 100), psnGame(200, 40), psnGame(300, 0)])
+  expect(lib.map((g) => [g.key, g.status, g.href])).toEqual([
+    ['psn:100', 'completed', '/psnGame/NPWR00001_00'],
+    ['psn:200', 'playing', '/psnGame/NPWR00002_00'],
+    ['psn:300', 'wantToPlay', '/psnGame/NPWR00003_00'],
+  ])
+  expect(filterLibrary(lib, { query: '', source: 'psn', status: 'all' })).toHaveLength(3)
+})

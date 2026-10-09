@@ -3,11 +3,15 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
-import UserPlatformCard, { PlatformStat } from '@/components/user-page/user-platform-card/UserPlatformCard'
+import UserPlatformCard, {
+  CONNECT_CLASS,
+  DISCONNECT_CLASS,
+  PlatformStat,
+} from '@/components/user-page/user-platform-card/UserPlatformCard'
+import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
 import RaLoginModal from '@/components/ra-login-modal/RaLoginModal'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
-import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -24,11 +28,6 @@ import { notify } from '@/lib/notify'
 function isLinkError(status: SteamLinkStatus) {
   return status !== null && status !== 'linked'
 }
-
-const DISCONNECT_CLASS =
-  'w-full py-2 rounded-xl bg-red-500/15 text-red-400 font-semibold text-sm hover:bg-red-500/25 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70'
-const CONNECT_CLASS =
-  'w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-accent text-bg-main font-semibold text-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
 /** A dash rather than a zero while the numbers are still loading. */
 const pending = (loading: boolean, value: number | null | undefined) =>
@@ -194,20 +193,7 @@ export default function UserPlatforms() {
         }
       />
 
-      <UserPlatformCard
-        name="PlayStation Network"
-        logo={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />}
-        bigLogo={<PlaystationLogo size={40} className="text-[#0070d1]" aria-hidden="true" />}
-        gradient="from-[#0070d1] via-[#0070d1]/40 to-[#003791]"
-        connected={false}
-        soon
-        hint={T.userPage.psnHint}
-        action={
-          <button disabled className={`${CONNECT_CLASS} opacity-50 cursor-not-allowed`}>
-            {T.userData.comingSoon}
-          </button>
-        }
-      />
+      <UserPsnCard />
 
       <RaLoginModal isOpen={raModalOpen} setIsOpen={setRaModalOpen} />
     </div>

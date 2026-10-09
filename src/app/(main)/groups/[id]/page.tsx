@@ -9,9 +9,10 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
+import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { useGroupPage } from '@/hooks/useGroupPage'
 import { useGroupFilters } from '@/hooks/useGroupFilters'
-import { filterGroupItems, groupSummary, itemKey, raProgressMaps, steamProgressMap } from '@/utils/groupItems'
+import { filterGroupItems, groupSummary, itemKey, liveProgressMap, raProgressMaps } from '@/utils/groupItems'
 import GroupModal from '@/components/groups/GroupModal'
 import AddGameModal from '@/components/groups/add-game-modal/AddGameModal'
 import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
@@ -32,6 +33,7 @@ export default function GroupDetailPage() {
   const { all: allGames } = useGamesData()
   const { games: recentlyPlayed } = useRecentlyPlayedGames()
   const { library: steamLibrary } = useSteamGamesData()
+  const { library: psnLibrary } = usePsnGamesData()
   const { group, status, retry, reorder, removeGame, addItems, edit, remove } = useGroupPage(groupId, recentlyPlayed)
   const { filters, active: filtersActive, setPct, setDecade, toggleConsole, clearConsoles, clear } = useGroupFilters()
   const [editOpen, setEditOpen] = useState(false)
@@ -40,10 +42,10 @@ export default function GroupDetailPage() {
   const [gridCols, setGridCols] = useState<StatusGridCols>(1)
 
   const ra = useMemo(() => raProgressMaps(recentlyPlayed, allGames), [recentlyPlayed, allGames])
-  const steam = useMemo(() => steamProgressMap(steamLibrary), [steamLibrary])
+  const live = useMemo(() => liveProgressMap(steamLibrary, psnLibrary), [steamLibrary, psnLibrary])
   const items = useMemo(() => group?.items ?? [], [group])
-  const filtered = useMemo(() => filterGroupItems(items, filters, steam), [items, filters, steam])
-  const summary = useMemo(() => groupSummary(items, ra.ach, steam), [items, ra.ach, steam])
+  const filtered = useMemo(() => filterGroupItems(items, filters, live), [items, filters, live])
+  const summary = useMemo(() => groupSummary(items, ra.ach, live), [items, ra.ach, live])
   const existingKeys = useMemo(() => new Set(items.map(itemKey)), [items])
 
   async function handleDelete() {

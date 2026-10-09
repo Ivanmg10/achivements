@@ -7,7 +7,7 @@ import { achievementAnchor } from '@/components/steam/steam-achievement-grid/Ste
 import { formatRarity } from '@/utils/steamFeed'
 import type { SteamAchievementUnified } from '@/types/steam'
 
-const SHOWN = 5
+const SHOWN = 4
 const SKELETON_ROWS = 4
 
 /**

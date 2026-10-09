@@ -10,6 +10,8 @@ import { codeToFlag, findCountry } from '@/utils/countries'
 import MainPageProfileStStats from '../main-page-profile-st-stats/MainPageProfileStStats'
 import MainPageProfileStGame from '../main-page-profile-st-game/MainPageProfileStGame'
 import MainPageProfileStAchievements from '../main-page-profile-st-achievements/MainPageProfileStAchievements'
+import MainPageProfileSkeleton from '../../main-page-profile-skeleton/MainPageProfileSkeleton'
+import MainPageProfileGameSkeleton from '../../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
 import type { SteamProfile } from '@/types/steam'
 
 /**
@@ -35,7 +37,7 @@ export default function MainPageProfileStLinked({
   const recentAchievements = useSteamRecentAchievements()
 
   if (isLoading) {
-    return <div aria-busy="true" className="w-full h-full min-h-32 bg-bg-card rounded-xl animate-pulse" />
+    return <MainPageProfileSkeleton label={T.cards.loading} />
   }
 
   if (error || !profile) {
@@ -134,7 +136,11 @@ export default function MainPageProfileStLinked({
 
       <MainPageProfileStStats library={library} isLoading={libraryLoading} />
 
-      {featured && <MainPageProfileStGame game={featured} playingNow={featured === running} />}
+      {featured ? (
+        <MainPageProfileStGame game={featured} playingNow={featured === running} />
+      ) : (
+        libraryLoading && <MainPageProfileGameSkeleton />
+      )}
 
       <MainPageProfileStAchievements
         achievements={recentAchievements.achievements}

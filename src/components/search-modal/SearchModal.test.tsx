@@ -11,9 +11,9 @@ jest.mock('@/hooks/useGameCandidates', () => ({ useGameCandidates: jest.fn() }))
 jest.mock('@/hooks/useRaLinked', () => ({ useRaLinked: jest.fn() }))
 jest.mock('next/image', () => ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />)
 
-function candidate(source: 'ra' | 'steam', id: number, title: string): GameCandidate {
+function candidate(source: 'ra' | 'steam' | 'psn', id: number, title: string): GameCandidate {
   return {
-    key: `${source}:${id}`, source, id, title, subtitle: source === 'ra' ? 'SNES' : 'Steam',
+    key: `${source}:${id}`, source, id, title, subtitle: source === 'ra' ? 'SNES' : source === 'steam' ? 'Steam' : 'PlayStation',
     imageRef: '', pctWon: 0, numAwarded: 0, maxPossible: 0, status: 'in-progress',
   }
 }
@@ -108,4 +108,17 @@ test('with no RA account there is no users tab and no RA lookup by id', () => {
 
   type('620')
   expect(screen.queryByText(en.search.openById)).not.toBeInTheDocument()
+})
+
+test('a PlayStation filter shows up once PSN games are in the results, opening their PSN page', () => {
+  ;(useGameCandidates as jest.Mock).mockReturnValue([candidate('ra', 620, 'Zelda'), candidate('psn', 2018800, 'Astro Bot')])
+  const onClose = jest.fn()
+  render(<SearchModal isOpen onClose={onClose} />)
+  type('a')
+  // Only the platforms in the results get a chip: no Steam here.
+  expect(screen.queryByRole('button', { name: en.search.platformSteam })).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'PlayStation' }))
+  expect(screen.queryByRole('button', { name: /Zelda/ })).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: /Astro Bot/ }))
+  expect(onClose).toHaveBeenCalled()
 })

@@ -5,6 +5,11 @@ import { useLanguage } from '@/context/LanguageContext'
 
 export type PlatformStat = { label: string; value: string; accent?: string }
 
+export const DISCONNECT_CLASS =
+  'w-full py-2 rounded-xl bg-red-500/15 text-red-400 font-semibold text-sm hover:bg-red-500/25 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70'
+export const CONNECT_CLASS =
+  'w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-accent text-bg-main font-semibold text-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+
 /**
  * One platform on the account page: its logo, whether it is connected, the
  * account it is connected as, its headline numbers, and the one button that
@@ -21,7 +26,6 @@ export default function UserPlatformCard({
   bigLogo,
   gradient,
   connected,
-  soon = false,
   status,
   identity,
   hint,
@@ -35,7 +39,6 @@ export default function UserPlatformCard({
   /** Gradient stops for the card's outline, e.g. "from-[#66c0f4] to-[#1b2838]". */
   gradient: string
   connected: boolean
-  soon?: boolean
   /** A message about the last connection attempt. */
   status?: ReactNode
   /** Account details once connected. */
@@ -49,7 +52,7 @@ export default function UserPlatformCard({
   const { T } = useLanguage()
 
   return (
-    <div className={`rounded-3xl p-px bg-gradient-to-br ${gradient} ${soon ? 'opacity-70' : ''}`}>
+    <div className={`rounded-3xl p-px bg-gradient-to-br ${gradient}`}>
       <section
         aria-label={name}
         className="relative h-full bg-bg-card rounded-[calc(1.5rem-1px)] p-5 flex flex-col gap-4 overflow-hidden"
@@ -61,10 +64,10 @@ export default function UserPlatformCard({
           </span>
           <span
             className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-              connected && !soon ? 'bg-green-500/20 text-green-400' : 'bg-ink/5 text-text-secondary'
+              connected ? 'bg-green-500/20 text-green-400' : 'bg-ink/5 text-text-secondary'
             }`}
           >
-            {soon ? T.userData.comingSoon : connected ? T.userData.connected : T.userData.notConnected}
+            {connected ? T.userData.connected : T.userData.notConnected}
           </span>
         </div>
 

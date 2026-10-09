@@ -2,6 +2,13 @@ jest.mock("@/components/main-page/main-page-profile/main-page-profile-st/MainPag
   __esModule: true,
   default: () => <div data-testid="profile-st">ProfileSt</div>,
 }));
+jest.mock("@/components/main-page/main-page-profile/main-page-profile-psn/MainPageProfilePsn", () => ({
+  __esModule: true,
+  default: () => <div data-testid="profile-psn">ProfilePsn</div>,
+}));
+jest.mock("@/context/PsnGamesDataContext", () => ({
+  usePsnGamesData: jest.fn(() => ({ isLinked: false })),
+}));
 jest.mock("@/context/SteamGamesDataContext", () => ({
   useSteamGamesData: jest.fn(() => ({ isLinked: false })),
 }));
@@ -14,6 +21,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import MainPageProfile from "./MainPageProfile";
 import { useSession } from "next-auth/react";
 import { useSteamGamesData } from "@/context/SteamGamesDataContext";
+import { usePsnGamesData } from "@/context/PsnGamesDataContext";
 import { MainPlatformProvider } from "@/context/MainPlatformContext";
 
 function renderProfile() {
@@ -26,7 +34,7 @@ function renderProfile() {
 
 test("renders profile sub-components", () => {
   (useSession as jest.Mock).mockReturnValue({
-    data: { user: { raUser: { User: "Ivan", LastGameID: 19010 } } },
+    data: { user: { raLinked: true, raUser: { User: "Ivan", LastGameID: 19010 } } },
   });
   renderProfile();
   expect(screen.getByTestId("profile-ra")).toBeInTheDocument();
@@ -34,7 +42,7 @@ test("renders profile sub-components", () => {
 
 test("renders without raUser", () => {
   (useSession as jest.Mock).mockReturnValue({
-    data: { user: { raUser: null } },
+    data: { user: { raLinked: true, raUser: null } },
   });
   renderProfile();
   expect(screen.getByTestId("profile-ra")).toBeInTheDocument();
@@ -42,7 +50,7 @@ test("renders without raUser", () => {
 
 describe("RA / Steam tabs", () => {
   function bothAccounts() {
-    (useSession as jest.Mock).mockReturnValue({ data: { user: { raUser: { User: "Ivan" } } } });
+    (useSession as jest.Mock).mockReturnValue({ data: { user: { raLinked: true, raUser: { User: "Ivan" } } } });
     (useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true });
   }
 
@@ -82,10 +90,24 @@ describe("RA / Steam tabs", () => {
   });
 
   test("with RA only there are no tabs — and no connect prompt either", () => {
-    (useSession as jest.Mock).mockReturnValue({ data: { user: { raUser: { User: "Ivan" } } } });
+    (useSession as jest.Mock).mockReturnValue({ data: { user: { raLinked: true, raUser: { User: "Ivan" } } } });
     renderProfile();
     expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
     expect(screen.getByTestId("profile-ra")).toBeInTheDocument();
     expect(screen.queryByTestId("profile-st")).not.toBeInTheDocument();
+  });
+});
+
+describe("PlayStation tab", () => {
+  beforeEach(() => window.localStorage.clear());
+
+  test("with PSN linked too, its tab joins the others and shows its profile", () => {
+    (useSession as jest.Mock).mockReturnValue({ data: { user: { raLinked: true, raUser: { User: "Ivan" } } } });
+    (usePsnGamesData as jest.Mock).mockReturnValue({ isLinked: true });
+    renderProfile();
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["RetroAchievements", "PlayStation"]);
+    fireEvent.click(screen.getByRole("tab", { name: "PlayStation" }));
+    expect(screen.getByTestId("profile-psn")).toBeInTheDocument();
+    (usePsnGamesData as jest.Mock).mockReturnValue({ isLinked: false });
   });
 });

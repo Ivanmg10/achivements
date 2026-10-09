@@ -3,12 +3,12 @@
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import { IconSearch, IconTrash } from '@tabler/icons-react'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { fetchRaCandidateById } from '@/utils/apiCallsUtils'
 import { candidateIconUrl, searchCandidates, GameCandidate } from '@/utils/gameCandidates'
-import { gameKey } from '@/utils/gameRef'
+import { gameKey, PLATFORM_NAME } from '@/utils/gameRef'
+import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 
 const MAX_RESULTS = 8
 
@@ -71,9 +71,7 @@ export default function GroupModalGamePicker({
               <li key={g.key} className="flex items-center gap-2 bg-bg-main rounded-lg px-2.5 py-1.5">
                 {icon && <Image src={icon} alt="" width={20} height={20} className="rounded shrink-0" unoptimized />}
                 <span className="text-xs flex-1 line-clamp-1">{g.title}</span>
-                {g.source === 'steam' && (
-                  <SteamLogo size={12} className="text-[#66c0f4] shrink-0" aria-label="Steam" />
-                )}
+                {g.source !== 'ra' && <PlatformLogo source={g.source} size={12} label={PLATFORM_NAME[g.source]} />}
                 <button
                   type="button"
                   onClick={() => onChange(selected.filter((s) => s.key !== g.key))}
@@ -120,9 +118,7 @@ export default function GroupModalGamePicker({
                 <span className="flex flex-col min-w-0 flex-1">
                   <span className="text-xs line-clamp-1">{c.title}</span>
                   <span className="text-[10px] text-text-secondary flex items-center gap-1">
-                    {c.source === 'steam' && (
-                      <SteamLogo size={10} className="text-[#66c0f4] shrink-0" aria-hidden="true" />
-                    )}
+                    {c.source !== 'ra' && <PlatformLogo source={c.source} size={10} />}
                     {c.subtitle}
                   </span>
                 </span>

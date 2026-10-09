@@ -1,4 +1,6 @@
 import { classifySteamGame } from '@/utils/steamFeed'
+import { classifyPsnGame } from '@/utils/psnTitles'
+import type { PsnGameProgress } from '@/types/psn'
 import { gameKey } from '@/utils/gameRef'
 import type { RetroAchievementsGameCompleted, UserAward } from '@/types/types'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
@@ -8,7 +10,7 @@ import type { GameSource, SteamGameProgress } from '@/types/steam'
  * the "Mastered & Completed" card lists and what its custom order sorts.
  */
 export type PerfectGame = {
-  /** "ra:123" / "steam:620" — the id the saved order stores. */
+  /** "ra:123" / "steam:620" / "psn:2018800" — the id the saved order stores. */
   key: string
   source: GameSource
   id: number
@@ -20,12 +22,13 @@ export type PerfectGame = {
 }
 
 /**
- * Every perfect game across both platforms. An RA game can appear twice
+ * Every perfect game across all platforms. An RA game can appear twice
  * (softcore and hardcore rows); hardcore wins, as the card's counts do.
  */
 export function buildPerfectGames(
   raGames: RetroAchievementsGameCompleted[],
   steamGames: SteamGameProgress[] = [],
+  psnGames: PsnGameProgress[] = [],
 ): PerfectGame[] {
   const byId = new Map<number, PerfectGame>()
   for (const g of raGames) {
@@ -55,15 +58,30 @@ export function buildPerfectGames(
       hardcore: false,
     }))
 
-  return [...byId.values(), ...steam]
+  const psn: PerfectGame[] = psnGames
+    .filter((g) => classifyPsnGame(g) === 'completed')
+    .map((g) => ({
+      key: gameKey('psn', g.id),
+      source: 'psn',
+      id: g.id,
+      title: g.title,
+      imageUrl: g.imageIcon || undefined,
+      subtitle: g.consoleName,
+      hardcore: false,
+    }))
+
+  return [...byId.values(), ...steam, ...psn]
 }
 
-/** Counts for the card's header: RA hardcore, RA softcore, Steam. */
-export function countPerfectGames(games: PerfectGame[]): { hc: number; sc: number; steam: number } {
+export type PerfectCounts = { hc: number; sc: number; steam: number; psn: number }
+
+/** Counts for the card's header: RA hardcore, RA softcore, Steam, PSN. */
+export function countPerfectGames(games: PerfectGame[]): PerfectCounts {
   return {
     hc: games.filter((g) => g.source === 'ra' && g.hardcore).length,
     sc: games.filter((g) => g.source === 'ra' && !g.hardcore).length,
     steam: games.filter((g) => g.source === 'steam').length,
+    psn: games.filter((g) => g.source === 'psn').length,
   }
 }
 
@@ -97,22 +115,24 @@ export type LatestPerfect = {
   subtitle: string
   /** RA icon, the fallback while (or if) the box art does not load. */
   iconUrl?: string
-  /** ISO-ish date string; for Steam the last session, the closest it reports. */
+  /** ISO-ish date string; for Steam the last session, the closest it reports; for PSN the last trophy. */
   date: string
   hardcore: boolean
 }
 
 /**
- * The most recent games taken to 100%, both platforms, newest first. RA dates
+ * The most recent games taken to 100%, every platform, newest first. RA dates
  * come from its mastery and completion awards; Steam has no completion date,
  * so a perfect game's last session stands in for it (for a finished game, the
- * session that finished it). One entry per RA game: a mastery after an
- * earlier completion is the same game, at its latest date.
+ * session that finished it); PSN's last trophy is, at 100%, the one that
+ * finished it. One entry per RA game: a mastery after an earlier completion
+ * is the same game, at its latest date.
  */
 export function latestPerfects(
   awards: UserAward[] = [],
   steamGames: SteamGameProgress[] = [],
   count = 3,
+  psnGames: PsnGameProgress[] = [],
 ): LatestPerfect[] {
   const ra = new Map<number, LatestPerfect>()
   for (const a of awards) {
@@ -143,7 +163,20 @@ export function latestPerfects(
       hardcore: false,
     }))
 
-  return [...ra.values(), ...steam]
+  const psn: LatestPerfect[] = psnGames
+    .filter((g) => classifyPsnGame(g) === 'completed' && g.lastTrophyAt)
+    .map((g) => ({
+      key: gameKey('psn', g.id),
+      source: 'psn',
+      id: g.id,
+      title: g.title,
+      subtitle: g.consoleName,
+      iconUrl: g.coverUrl ?? (g.imageIcon || undefined),
+      date: g.lastTrophyAt!,
+      hardcore: false,
+    }))
+
+  return [...ra.values(), ...steam, ...psn]
     .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
     .slice(0, count)
 }
@@ -151,9 +184,14 @@ export function latestPerfects(
 /**
  * When each perfect game got to 100%, by key: RA from its latest mastery or
  * completion award, Steam from its last session (Steam keeps no completion
- * date; for a finished game that session is the one that finished it).
+ * date; for a finished game that session is the one that finished it), PSN
+ * from its last trophy.
  */
-export function perfectDates(awards: UserAward[] = [], steamGames: SteamGameProgress[] = []): Map<string, string> {
+export function perfectDates(
+  awards: UserAward[] = [],
+  steamGames: SteamGameProgress[] = [],
+  psnGames: PsnGameProgress[] = [],
+): Map<string, string> {
   const byKey = new Map<string, string>()
   for (const a of awards) {
     if (a.AwardType !== 'Mastery/Completion') continue
@@ -161,16 +199,18 @@ export function perfectDates(awards: UserAward[] = [], steamGames: SteamGameProg
     if ((byKey.get(key) ?? '') < a.AwardedAt) byKey.set(key, a.AwardedAt)
   }
   for (const g of steamGames) if (g.lastPlayed) byKey.set(gameKey('steam', g.id), g.lastPlayed)
+  for (const g of psnGames) if (g.lastTrophyAt) byKey.set(gameKey('psn', g.id), g.lastTrophyAt)
   return byKey
 }
 
-export type PerfectFilter = 'all' | 'raHc' | 'raSc' | 'steam'
+export type PerfectFilter = 'all' | 'raHc' | 'raSc' | 'steam' | 'psn'
 
-/** The perfect games of one kind: RA hardcore, RA softcore, Steam, or all of them. */
+/** The perfect games of one kind: RA hardcore, RA softcore, Steam, PSN, or all of them. */
 export function filterPerfects(games: PerfectGame[], filter: PerfectFilter): PerfectGame[] {
   if (filter === 'raHc') return games.filter((g) => g.source === 'ra' && g.hardcore)
   if (filter === 'raSc') return games.filter((g) => g.source === 'ra' && !g.hardcore)
   if (filter === 'steam') return games.filter((g) => g.source === 'steam')
+  if (filter === 'psn') return games.filter((g) => g.source === 'psn')
   return games
 }
 

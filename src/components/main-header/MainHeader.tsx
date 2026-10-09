@@ -83,8 +83,8 @@ export default function MainHeader() {
   }, [searchOpen, hasPlatform])
 
   const statusItems = [
-    { href: '/playing', label: T.mainPage.playing },
     { href: '/wantToPlay', label: T.mainPage.wantToPlay },
+    { href: '/playing', label: T.mainPage.playing },
     { href: '/completed', label: T.mainPage.completed },
   ]
   const navItems = [{ href: '/groups', label: T.groups.title }]

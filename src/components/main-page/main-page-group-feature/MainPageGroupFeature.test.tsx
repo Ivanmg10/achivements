@@ -8,7 +8,7 @@ jest.mock('@/hooks/useGroupDetail', () => ({ useGroupDetail: jest.fn() }))
 
 const group = (over: Partial<GameGroup> = {}): GameGroup => ({
   id: 4, title: 'Pokémon', description: null, icon: null, is_public: false, position: 0, created_at: '', updated_at: '',
-  game_count: 8, steam_count: 1, total_awarded: 531, total_possible: 2691, ...over,
+  game_count: 8, steam_count: 1, psn_count: 0, total_awarded: 531, total_possible: 2691, ...over,
 })
 const item = (id: number, over: Partial<GameGroupItem> = {}): GameGroupItem => ({
   id, source: 'ra', game_id: 100 + id, title: `Game ${id}`, image_icon: null, console_name: 'GBA', pct_won: '0.5',
@@ -55,4 +55,12 @@ test('the group’s name opens its page', () => {
   ;(useGroupDetail as jest.Mock).mockReturnValue({ group: { items: [] }, isLoading: false, error: false })
   render(<MainPageGroupFeature group={group()} />)
   expect(screen.getByRole('link', { name: 'Pokémon' })).toHaveAttribute('href', '/groups/4')
+})
+
+test('a PSN game links to its PSN page and says PlayStation', () => {
+  const items = [item(1, { source: 'psn', game_id: 2018800, title: 'Astro Bot', image_icon: 'https://psn/a.png', console_name: 'PlayStation' })]
+  ;(useGroupDetail as jest.Mock).mockReturnValue({ group: { items }, isLoading: false, error: false })
+  render(<MainPageGroupFeature group={group()} />)
+  expect(screen.getByRole('link', { name: /Astro Bot/ })).toHaveAttribute('href', '/psnGame/NPWR20188_00')
+  expect(screen.getByText('PlayStation')).toBeInTheDocument()
 })

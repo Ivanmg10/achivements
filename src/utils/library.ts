@@ -1,20 +1,25 @@
 import { classifySteamGame } from '@/utils/steamFeed'
-import { gameKey } from '@/utils/gameRef'
+import { gameHref, gameKey } from '@/utils/gameRef'
+import { classifyPsnGame } from '@/utils/psnTitles'
+import { PSN_PLATFORM } from '@/utils/psnMappers'
+import type { PsnGameProgress } from '@/types/psn'
 import { normalizeTitle } from '@/utils/gameCandidates'
 import type { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
 
 export type LibraryStatus = 'playing' | 'wantToPlay' | 'completed'
 
-/** One game of either platform, in the shape Browse lists, searches and picks from. */
+/** One game of any platform, in the shape Browse lists, searches and picks from. */
 export type LibraryGame = {
   key: string
   source: GameSource
   id: number
   title: string
-  /** Console for RA, "Steam" for Steam. */
+  /** Console for RA, "Steam" / "PlayStation" for the others. */
   subtitle: string
   iconUrl?: string
+  /** Box art where it differs from the icon (PSN's store art); the picker shows it. */
+  coverUrl?: string
   status: LibraryStatus
   /** 0–100; 0 for a game not started. */
   pct: number
@@ -24,13 +29,14 @@ export type LibraryGame = {
 const raIcon = (path?: string) => (path ? `https://retroachievements.org${path}` : undefined)
 
 /**
- * Both libraries as one list, one entry per game. RA's started games can come
+ * Every library as one list, one entry per game. RA's started games can come
  * twice (softcore and hardcore rows): the higher progress wins. Steam games
  * with no achievement data yet are left out, since they have no status.
  */
 export function buildLibrary(
   ra: { playing: RetroAchievementsGameCompleted[]; completed: RetroAchievementsGameCompleted[]; wantToPlay: WantToPlayGame[] },
   steam: SteamGameProgress[] = [],
+  psn: PsnGameProgress[] = [],
 ): LibraryGame[] {
   const byKey = new Map<string, LibraryGame>()
   const put = (g: LibraryGame) => {
@@ -60,6 +66,13 @@ export function buildLibrary(
     put({
       key: gameKey('steam', g.id), source: 'steam', id: g.id, title: g.title, subtitle: 'Steam',
       iconUrl: g.imageIcon || undefined, status, pct: Math.round(g.pctWon), href: `/steamGame/${g.id}`,
+    })
+  }
+  for (const g of psn) {
+    const status = classifyPsnGame(g)
+    put({
+      key: gameKey('psn', g.id), source: 'psn', id: g.id, title: g.title, subtitle: PSN_PLATFORM,
+      iconUrl: g.imageIcon || undefined, coverUrl: g.coverUrl ?? undefined, status, pct: Math.round(g.pctWon), href: gameHref('psn', g.id),
     })
   }
   return [...byKey.values()]

@@ -36,7 +36,7 @@ test('POST drops an image that is not https or a site path', async () => {
 })
 
 test('POST refuses a bad source, id or title', async () => {
-  expect(status(await POST(post({ source: 'psn', gameId: 1, title: 'x' })))).toBe(400)
+  expect(status(await POST(post({ source: 'xbox', gameId: 1, title: 'x' })))).toBe(400)
   expect(status(await POST(post({ source: 'ra', gameId: '1', title: 'x' })))).toBe(400)
   expect(status(await POST(post({ source: 'ra', gameId: 1, title: '' })))).toBe(400)
   expect(status(await POST(post({ source: 'ra', gameId: 1, title: 'x'.repeat(301) })))).toBe(400)

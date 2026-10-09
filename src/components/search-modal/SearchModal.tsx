@@ -10,10 +10,10 @@ import { RetroAchievementsUserProfile } from '@/types/types'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { useRaLinked } from '@/hooks/useRaLinked'
 import { searchCandidates } from '@/utils/gameCandidates'
-import { gameHref, GameRef } from '@/utils/gameRef'
-import RaLogo from '@/components/ra-logo/RaLogo'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
+import { GAME_SOURCES, gameHref, GameRef } from '@/utils/gameRef'
 import SearchModalGameResult from './search-modal-game-result/SearchModalGameResult'
+import PlatformLogo from '@/components/platform-logo/PlatformLogo'
+import type { GameSource } from '@/types/steam'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -33,7 +33,7 @@ const resultVariants: Variants = {
 }
 
 type SearchTab = 'games' | 'users'
-type PlatformFilter = 'all' | 'ra' | 'steam'
+type PlatformFilter = 'all' | GameSource
 
 interface SearchModalProps {
   isOpen: boolean
@@ -112,7 +112,8 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
     () => (platformFilter === 'all' ? allResults : allResults.filter((r) => r.source === platformFilter)),
     [allResults, platformFilter],
   )
-  const hasBothPlatforms = allResults.some((r) => r.source === 'ra') && allResults.some((r) => r.source === 'steam')
+  const platforms = useMemo(() => GAME_SOURCES.filter((s) => allResults.some((r) => r.source === s)), [allResults])
+  const hasSeveralPlatforms = platforms.length > 1
 
   const directGameId = useMemo(() => {
     if (!raLinked) return null
@@ -130,6 +131,8 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
     },
     [router, onClose],
   )
+
+  const platformLabel: Record<GameSource, string> = { ra: T.search.platformRa, steam: T.search.platformSteam, psn: 'PlayStation' }
 
   const placeholder = tab === 'users' ? T.publicProfile.searchUsersPlaceholder : T.search.placeholder
 
@@ -198,14 +201,17 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
               </div>
               )}
 
-              {/* Platform filter — only worth showing once both platforms are in the library */}
-              {tab === 'games' && hasBothPlatforms && (
+              {/* Platform filter — only worth showing once results come from more than one platform */}
+              {tab === 'games' && hasSeveralPlatforms && (
                 <div className="flex items-center gap-3 px-4 py-2 border-b border-ink/5" role="group" aria-label={T.search.platformAll}>
                   {(
                     [
                       { value: 'all' as PlatformFilter, label: T.search.platformAll, icon: null },
-                      { value: 'ra' as PlatformFilter, label: T.search.platformRa, icon: <RaLogo height={11} /> },
-                      { value: 'steam' as PlatformFilter, label: T.search.platformSteam, icon: <SteamLogo size={12} className="text-[#66c0f4]" aria-hidden="true" /> },
+                      ...platforms.map((source) => ({
+                        value: source as PlatformFilter,
+                        label: platformLabel[source],
+                        icon: <PlatformLogo source={source} size={12} />,
+                      })),
                     ]
                   ).map((opt) => (
                     <button

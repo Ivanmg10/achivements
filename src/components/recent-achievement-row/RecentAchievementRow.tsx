@@ -11,7 +11,8 @@ import { gameHref } from '@/utils/gameRef'
  */
 export default function RecentAchievementRow({ ach, onNavigate }: { ach: RecentAchievement; onNavigate: () => void }) {
   const badge = achievementBadgeUrl(ach)
-  const isSteam = ach.Source === 'steam'
+  // Steam and PSN unlocks have no points.
+  const isSteam = ach.Source === 'steam' || ach.Source === 'psn'
   return (
     <Link
       href={gameHref(ach.Source ?? 'ra', ach.GameID)}

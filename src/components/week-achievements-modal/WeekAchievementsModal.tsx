@@ -17,7 +17,7 @@ interface Props {
 export default function WeekAchievementsModal({ startDate, achievements, onClose }: Props) {
   const { T } = useLanguage()
   // Steam unlocks have no points; a mixed list still totals the RA ones.
-  const hasPoints = achievements.some(a => a.Source !== 'steam')
+  const hasPoints = achievements.some(a => !a.Source || a.Source === 'ra')
 
   const monday = useMemo(() => new Date(startDate + 'T00:00:00'), [startDate])
 

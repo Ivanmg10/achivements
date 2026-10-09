@@ -1,5 +1,6 @@
 import type { RecentlyPlayedGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
+import type { PsnGameProgress } from '@/types/psn'
 
 /**
  * Pure helpers for putting Steam games next to RA ones: category rules, the
@@ -23,21 +24,21 @@ export function hasSteamAchievements(game: SteamGameProgress): boolean {
  * the two lists mean the same thing side by side:
  *
  * - completed  — every achievement earned (RA: PctWon >= 1)
- * - playing    — some but not all earned  (RA: 0 < PctWon < 1)
- * - wantToPlay — owned but never launched. RA's version is an explicit list;
- *                the Steam equivalent is the untouched backlog. A game with
- *                hours in it but no achievements is not "want to play".
+ * - playing    — some but not all earned  ("In progress"; RA: 0 < PctWon < 1)
+ * - wantToPlay — no achievement earned yet ("No achievements"): never
+ *                launched, or played without earning one. RA's version is
+ *                its want-to-play list.
  *
- * Anything else returns null and is left out: played but no achievements yet,
- * no achievements at all, or counts not loaded — progress unknown, so placing
- * it in playing/completed would be a guess.
+ * Anything else returns null and is left out: no achievements at all, or a
+ * played game whose counts have not loaded — progress unknown, so placing it
+ * would be a guess.
  */
 export function classifySteamGame(game: SteamGameProgress): SteamCategory | null {
   if (game.playtimeForever === 0) return 'wantToPlay'
   if (!game.achievementsLoaded || game.maxPossible === 0) return null
   if (game.numAwarded >= game.maxPossible) return 'completed'
   if (game.numAwarded > 0) return 'playing'
-  return null
+  return 'wantToPlay'
 }
 
 /**
@@ -53,11 +54,12 @@ export function raDateToIso(raDate: string | null | undefined): string | null {
 export type RecentFeedItem =
   | { source: 'ra'; key: string; lastPlayed: string | null; game: RecentlyPlayedGame }
   | { source: 'steam'; key: string; lastPlayed: string | null; game: SteamGameProgress }
+  | { source: 'psn'; key: string; lastPlayed: string | null; game: PsnGameProgress }
 
 /**
- * One recent feed across both platforms, newest first. Keys are namespaced by
- * source because RA game ids and Steam appids share a number space — RA game
- * 730 and Steam app 730 are different games.
+ * One recent feed across every platform, newest first. Keys are namespaced by
+ * source because RA game ids, Steam appids and PSN numbers share a number
+ * space — RA game 730 and Steam app 730 are different games.
  *
  * Undated entries sort last. The sort is stable, so each platform's own order
  * survives among ties.
@@ -66,6 +68,7 @@ export function mergeRecentFeeds(
   ra: RecentlyPlayedGame[],
   steam: SteamGameProgress[],
   limit: number,
+  psn: PsnGameProgress[] = [],
 ): RecentFeedItem[] {
   const items: RecentFeedItem[] = [
     ...ra.map((game) => ({
@@ -77,6 +80,12 @@ export function mergeRecentFeeds(
     ...steam.map((game) => ({
       source: 'steam' as const,
       key: `steam:${game.id}`,
+      lastPlayed: game.lastPlayed,
+      game,
+    })),
+    ...psn.map((game) => ({
+      source: 'psn' as const,
+      key: `psn:${game.id}`,
       lastPlayed: game.lastPlayed,
       game,
     })),

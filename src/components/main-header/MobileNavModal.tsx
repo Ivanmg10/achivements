@@ -42,8 +42,8 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
   const [statusOpen, setStatusOpen] = useState(false)
 
   const statusItems = [
-    { href: '/playing', label: T.mainPage.playing, icon: IconPlayerPlay },
     { href: '/wantToPlay', label: T.mainPage.wantToPlay, icon: IconHeart },
+    { href: '/playing', label: T.mainPage.playing, icon: IconPlayerPlay },
     { href: '/completed', label: T.mainPage.completed, icon: IconCheck },
   ]
   const groupsItem = { href: '/groups', label: T.groups.title, icon: IconFolder }

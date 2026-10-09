@@ -13,7 +13,7 @@ jest.mock('@/components/connect-accounts/ConnectAccounts', () => ({
   default: () => <div data-testid="connect">NoRa</div>,
 }))
 
-jest.mock('@/components/main-page/main-page-steam-only/MainPageSteamOnly', () => ({
+jest.mock('@/components/main-page/main-page-without-ra/MainPageWithoutRa', () => ({
   __esModule: true,
   default: () => <div data-testid="steam-only">SteamOnly</div>,
 }))

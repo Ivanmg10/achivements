@@ -3,14 +3,15 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
+import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
-import { buildRaCandidates, buildSteamCandidates, GameCandidate } from '@/utils/gameCandidates'
+import { buildPsnCandidates, buildRaCandidates, buildSteamCandidates, GameCandidate } from '@/utils/gameCandidates'
 import type { WantToPlayGame } from '@/types/types'
 
 /**
- * Every game the user can pick from, RA and Steam, for the pin, add-to-group
- * and search pickers. RA comes from the shared completion and recent lists
- * plus the want-to-play list; Steam from the shared library.
+ * Every game the user can pick from, RA, Steam and PSN, for the pin,
+ * add-to-group and search pickers. RA comes from the shared completion and
+ * recent lists plus the want-to-play list; Steam and PSN from their libraries.
  *
  * The want-to-play list is the only thing fetched here, and only once a
  * picker is first opened (`enabled`) — as the pickers did before.
@@ -21,6 +22,7 @@ export function useGameCandidates(enabled: boolean): GameCandidate[] {
   const { all } = useGamesData()
   const { games: recent } = useRecentlyPlayedGames()
   const { library } = useSteamGamesData()
+  const { library: psnLibrary } = usePsnGamesData()
   const [wantToPlay, setWantToPlay] = useState<WantToPlayGame[]>([])
   const wantFetched = useRef(false)
 
@@ -36,7 +38,11 @@ export function useGameCandidates(enabled: boolean): GameCandidate[] {
   }, [enabled, rausername])
 
   return useMemo(
-    () => [...buildRaCandidates(all ?? [], recent ?? [], wantToPlay), ...buildSteamCandidates(library ?? [])],
-    [all, recent, wantToPlay, library],
+    () => [
+      ...buildRaCandidates(all ?? [], recent ?? [], wantToPlay),
+      ...buildSteamCandidates(library ?? []),
+      ...buildPsnCandidates(psnLibrary ?? []),
+    ],
+    [all, recent, wantToPlay, library, psnLibrary],
   )
 }

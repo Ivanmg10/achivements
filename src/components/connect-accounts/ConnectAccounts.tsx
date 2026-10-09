@@ -7,7 +7,7 @@ import UserPlatformCard from '@/components/user-page/user-platform-card/UserPlat
 import RaLoginModal from '@/components/ra-login-modal/RaLoginModal'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
-import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
 import { useLanguage } from '@/context/LanguageContext'
 import { STEAM_LINK_URL } from '@/hooks/useSteamLink'
 
@@ -29,6 +29,7 @@ export default function ConnectAccounts() {
 
   const raLinked = Boolean(session?.user?.rausername)
   const steamLinked = Boolean(session?.user?.steamid)
+  const psnLinked = Boolean(session?.user?.psnaccountid)
 
   const perks = [
     { icon: <IconLibrary size={20} />, text: T.landing.libraryTitle },
@@ -79,20 +80,8 @@ export default function ConnectAccounts() {
             />
           )}
 
-          <UserPlatformCard
-            name="PlayStation Network"
-            logo={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />}
-            bigLogo={<PlaystationLogo size={40} className="text-[#0070d1]" aria-hidden="true" />}
-            gradient="from-[#0070d1] via-[#0070d1]/40 to-[#003791]"
-            connected={false}
-            soon
-            hint={T.userPage.psnHint}
-            action={
-              <button disabled className={`${ACTION} opacity-50 cursor-not-allowed`}>
-                {T.userData.comingSoon}
-              </button>
-            }
-          />
+          {/* The account page's own PSN card: the online ID is typed right here. */}
+          {!psnLinked && <UserPsnCard />}
         </div>
 
         <section className="flex flex-col items-center gap-3">

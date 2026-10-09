@@ -4,6 +4,9 @@ import { useMemo } from 'react'
 import { IconSparkles } from '@tabler/icons-react'
 import { RecentAchievement } from '@/types/types'
 import type { SteamRecentAchievement } from '@/types/steam'
+import type { PsnRecentTrophy } from '@/types/psn'
+import { gameHref } from '@/utils/gameRef'
+import { psnTrophyAnchor } from '@/utils/psnTitles'
 import { useLanguage } from '@/context/LanguageContext'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import { GameListRow } from '@/components/ui/GameListRow'
@@ -15,17 +18,20 @@ const SHOWN = 6
 type Row = { key: string; href: string; imageUrl?: string; title: string; subtitle: string; stat: string; statLabel: string }
 
 /**
- * The rarest recent unlocks from both platforms. RA ranks by TrueRatio and
- * Steam by the share of players who have it — the two do not compare, so the
- * list alternates between each platform's rarest, each with its own measure.
+ * The rarest recent unlocks from every platform. RA ranks by TrueRatio,
+ * Steam and PSN by the share of players who have it — they do not compare
+ * (different player bases), so the list takes each platform's rarest in turn,
+ * each with its own measure.
  */
 export default function MainPageRarest({
   achievements,
   steamAchievements = [],
+  psnTrophies = [],
   isLoading,
 }: {
   achievements: RecentAchievement[]
   steamAchievements?: SteamRecentAchievement[]
+  psnTrophies?: PsnRecentTrophy[]
   isLoading?: boolean
 }) {
   const { T } = useLanguage()
@@ -54,13 +60,25 @@ export default function MainPageRarest({
         stat: `${a.globalPct.toFixed(1)}%`,
         statLabel: T.cards.steamRarityLabel,
       }))
+    const psn: Row[] = psnTrophies
+      .filter((t): t is PsnRecentTrophy & { rarity: number } => typeof t.rarity === 'number')
+      .sort((a, b) => a.rarity - b.rarity)
+      .map((t) => ({
+        key: `psn:${t.gameId}:${t.trophyId}`,
+        href: `${gameHref('psn', t.gameId)}#${psnTrophyAnchor(t.trophyId)}`,
+        imageUrl: t.iconUrl || undefined,
+        title: t.name,
+        subtitle: t.gameTitle,
+        stat: `${t.rarity.toFixed(1)}%`,
+        statLabel: T.cards.steamRarityLabel,
+      }))
+    const lists = [ra, steam, psn]
     const merged: Row[] = []
-    for (let i = 0; merged.length < SHOWN && (i < ra.length || i < steam.length); i++) {
-      if (i < ra.length) merged.push(ra[i])
-      if (i < steam.length && merged.length < SHOWN) merged.push(steam[i])
+    for (let i = 0; merged.length < SHOWN && lists.some((l) => i < l.length); i++) {
+      for (const list of lists) if (i < list.length && merged.length < SHOWN) merged.push(list[i])
     }
     return merged
-  }, [achievements, steamAchievements, T])
+  }, [achievements, steamAchievements, psnTrophies, T])
 
   if (isLoading) return <SkeletonGameList count={4} />
 

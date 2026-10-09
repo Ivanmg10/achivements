@@ -88,3 +88,26 @@ export async function requireSteamSession(): Promise<SteamSessionResult> {
 
   return { ok: true, session: { id, steamid, apiKey } }
 }
+
+type PsnSession = { id: string; psnaccountid: string }
+export type PsnSessionResult = { ok: true; session: PsnSession } | { ok: false; response: NextResponse }
+
+/**
+ * Requires a signed-in user with a linked PSN account. Whether the app's PSN
+ * credentials are set up is the PSN call's to find out: it fails with a
+ * PsnError that psnFailure turns into 503 not-configured.
+ */
+export async function requirePsnSession(): Promise<PsnSessionResult> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return { ok: false, response: NextResponse.json({ error: 'unauthorized' }, { status: 401 }) }
+  }
+
+  const { id, psnaccountid } = session.user
+  if (!psnaccountid) {
+    return { ok: false, response: NextResponse.json({ error: 'not-linked' }, { status: 400 }) }
+  }
+
+
+  return { ok: true, session: { id, psnaccountid } }
+}

@@ -1,3 +1,4 @@
+jest.mock('./admin-psn-token/AdminPsnToken', () => ({ __esModule: true, default: () => null }))
 jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import AdminPanel from './AdminPanel'

@@ -3,6 +3,10 @@ import ConnectAccounts from './ConnectAccounts'
 import { useSession } from 'next-auth/react'
 import { en } from '@/translations/en'
 
+jest.mock('@/components/user-page/user-psn-card/UserPsnCard', () => ({
+  __esModule: true,
+  default: () => <section aria-label="PlayStation Network" />,
+}))
 jest.mock('@/components/ra-login-modal/RaLoginModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="ra-modal" /> : null),
@@ -43,10 +47,15 @@ test('sends to Steam’s own sign-in for the one-click path', () => {
   ).toContain('/api/steam/link')
 })
 
-test('PlayStation is shown as not ready, and cannot be clicked', () => {
+test('PlayStation connects right there, with its own card', () => {
   render(<ConnectAccounts />)
   expect(screen.getByRole('region', { name: 'PlayStation Network' })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: en.userData.comingSoon })).toBeDisabled()
+})
+
+test('a linked PlayStation is not offered again', () => {
+  setUser({ psnaccountid: '42' })
+  render(<ConnectAccounts />)
+  expect(screen.queryByRole('region', { name: 'PlayStation Network' })).not.toBeInTheDocument()
 })
 
 test('a platform already linked is not offered again', () => {

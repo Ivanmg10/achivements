@@ -94,7 +94,7 @@ export default function BrowsePicker({ pool }: { pool: LibraryGame[] }) {
               exit={{ opacity: 0 }}
               transition={{ type: 'spring', stiffness: 260, damping: 22 }}
             >
-              <GameCover source={picked.source} id={picked.id} iconUrl={picked.iconUrl} className="h-56 sm:h-64" />
+              <GameCover source={picked.source} id={picked.id} iconUrl={picked.coverUrl ?? picked.iconUrl} className="h-56 sm:h-64" />
               <div className="flex flex-col min-w-0 w-full" aria-live="polite">
                 <span className="text-base font-semibold truncate">{picked.title}</span>
                 <span className="text-xs text-text-secondary truncate">

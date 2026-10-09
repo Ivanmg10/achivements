@@ -8,8 +8,8 @@ import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 const PREVIEW = 6
 
 const SECTIONS = [
-  { slug: 'playing', emoji: '🎮' },
   { slug: 'wantToPlay', emoji: '🔖' },
+  { slug: 'playing', emoji: '🎮' },
   { slug: 'completed', emoji: '🏆' },
 ] as const
 

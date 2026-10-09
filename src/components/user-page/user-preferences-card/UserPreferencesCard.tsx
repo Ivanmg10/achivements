@@ -7,6 +7,7 @@ import { IconEyeOff, IconLanguage, IconPalette } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
+import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import FavoriteGameModal, { FavoriteGame } from '@/components/favorite-game-modal/FavoriteGameModal'
 import LanguageModal from '@/components/language-modal/LanguageModal'
 import ThemeModal from '@/components/theme-modal/ThemeModal'
@@ -61,6 +62,8 @@ export default function UserPreferencesCard() {
   const user = session?.user
   const raFavorite = user?.favorite_game ?? null
   const steamFavorite = user?.favorite_steam_game ?? null
+  const psnFavorite = user?.favorite_psn_game ?? null
+  const favorites: Record<GameSource, FavoriteGame | null> = { ra: raFavorite, steam: steamFavorite, psn: psnFavorite }
 
   async function handleSave(source: GameSource, game: FavoriteGame | null) {
     await saveFavorite(source, game)
@@ -94,6 +97,10 @@ export default function UserPreferencesCard() {
           <FavoriteValue game={steamFavorite} source="steam" empty={T.userData.notSet} />
         </ProfileField>
 
+        <ProfileField label={T.userPage.favoritePsnGame} icon={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />} onEdit={() => setFavoriteOpen('psn')}>
+          <FavoriteValue game={psnFavorite} source="psn" empty={T.userData.notSet} />
+        </ProfileField>
+
         <ProfileField
           label={T.userPage.hiddenGames}
           icon={<IconEyeOff size={18} />}
@@ -109,7 +116,7 @@ export default function UserPreferencesCard() {
       <FavoriteGameModal
         isOpen={favoriteOpen !== null}
         source={favoriteOpen ?? 'ra'}
-        current={favoriteOpen === 'steam' ? steamFavorite : raFavorite}
+        current={favorites[favoriteOpen ?? 'ra']}
         onClose={() => setFavoriteOpen(null)}
         onSave={(game) => handleSave(favoriteOpen ?? 'ra', game)}
       />
