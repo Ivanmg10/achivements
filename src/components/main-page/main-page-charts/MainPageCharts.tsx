@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { IconActivity, IconAward, IconCompass, IconFolders, IconLayoutDashboard } from '@tabler/icons-react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
-import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
+import { useStreakData } from '@/hooks/useStreakData'
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useUserRank } from '@/hooks/useUserRank'
@@ -53,7 +53,9 @@ export default function MainPageCharts() {
   const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()
   // The heatmap draws as far back as the card is wide, so it reads the year
   // the streak already loads — both platforms, and no call of its own.
-  const { achievements: year, isLoading: yearLoading, error: yearError, refetch: refetchYear } = useActivityHeatmapYear()
+  const { achievements: year, activeStreak, isLoading: yearLoading, error: yearError, refetch: refetchYear } = useStreakData()
+  // The same streak the top bar shows: one source, so they cannot disagree.
+  const streak = activeStreak?.days ?? 0
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
   const { all, inProgress, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()
   const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
@@ -94,12 +96,13 @@ export default function MainPageCharts() {
     overview: (
       <>
         {platform === 'steam' ? (
-          <MainPageSteamStats achievements={steamRecent} games={library} isLoading={steamLoading} />
+          <MainPageSteamStats streak={streak} achievements={steamRecent} games={library} isLoading={steamLoading} />
         ) : platform === 'psn' ? (
-          <MainPagePsnStats achievements={psnRecent} isLoading={psnLoading} />
+          <MainPagePsnStats streak={streak} achievements={psnRecent} isLoading={psnLoading} />
         ) : (
           <SectionFallback error={achError || rankError} onRefresh={refetchStats}>
             <MainPagePointsStats
+              streak={streak}
               achievements={achievements}
               heatmapAchievements={heatmapData}
               rank={rank}

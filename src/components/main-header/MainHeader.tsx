@@ -55,6 +55,7 @@ export default function MainHeader() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [initialQuery, setInitialQuery] = useState('')
+  const [scrolled, setScrolled] = useState(false)
 
   const streak = activeStreak?.days ?? 0
   // With no platform linked there is nothing to search, sort or count: the
@@ -66,6 +67,14 @@ export default function MainHeader() {
 
   const openSearch = useCallback(() => { setInitialQuery(''); setSearchOpen(true) }, [])
   const closeSearch = useCallback(() => setSearchOpen(false), [])
+
+  // Floating only at the very top; once scrolled it grows to the full width.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -96,11 +105,11 @@ export default function MainHeader() {
         Floating bar: the wrapper keeps the 64px the game heroes are drawn
         under (8px gap + 56px bar), so nothing below has to move.
       */}
-      <div className="sticky top-0 z-40 h-16 shrink-0 px-2 sm:px-3 pt-2 pointer-events-none">
+      <div className={`sticky top-0 z-40 h-16 shrink-0 pointer-events-none transition-[padding] duration-300 motion-reduce:transition-none ${scrolled ? 'px-0 pt-0' : 'px-2 sm:px-3 pt-2'}`}>
       <header
-        className={`pointer-events-auto relative flex items-center text-text-main px-3 sm:px-4 h-14 rounded-2xl backdrop-blur-xl backdrop-saturate-150 ring-1 shadow-lg shadow-black/20 transition-colors ${
-          isGameInfo ? 'bg-bg-main/30 ring-ink/10' : 'bg-bg-card/80 ring-ink/[0.06]'
-        }`}
+        className={`pointer-events-auto relative flex items-center text-text-main px-3 sm:px-4 backdrop-blur-xl backdrop-saturate-150 ring-1 shadow-lg shadow-black/20 transition-all duration-300 motion-reduce:transition-none ${
+          scrolled ? 'h-16 rounded-none' : 'h-14 rounded-2xl'
+        } ${isGameInfo ? 'bg-bg-main/30 ring-ink/10' : 'bg-bg-card/80 ring-ink/[0.06]'}`}
       >
         {/* Left: home + back + nav (desktop) / hamburguesa (mobile) */}
         <div className="flex items-center gap-1 shrink-0 z-10">

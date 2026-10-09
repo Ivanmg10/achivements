@@ -14,13 +14,13 @@ beforeEach(() => {
 })
 
 test("today's trophies, the level and the platinums", () => {
-  render(<MainPagePsnStats achievements={[unlock(today), unlock(today)]} />)
+  render(<MainPagePsnStats streak={0} achievements={[unlock(today), unlock(today)]} />)
   expect(screen.getByText(en.pointsStats.today).parentElement).toHaveTextContent('2')
   expect(screen.getByText('209')).toBeInTheDocument()
   expect(screen.getByText('8')).toBeInTheDocument()
 })
 
 test('placeholders while loading', () => {
-  render(<MainPagePsnStats achievements={[]} isLoading />)
+  render(<MainPagePsnStats streak={0} achievements={[]} isLoading />)
   expect(screen.getAllByText('—').length).toBeGreaterThan(3)
 })

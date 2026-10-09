@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion'
 import type { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnSummary } from '@/hooks/usePsnSummary'
-import { calcAvgPerDay, calcStreak } from '@/utils/utils'
+import { calcAvgPerDay } from '@/utils/utils'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
@@ -20,10 +20,13 @@ const DAY_MS = 86_400_000
  */
 export default function MainPagePsnStats({
   achievements,
+  streak,
   isLoading,
 }: {
   /** The last 60 days of trophies, in RA's shape (psnToRecentAchievement). */
   achievements: RecentAchievement[]
+  /** Current streak in days, the top bar's. */
+  streak: number
   isLoading?: boolean
 }) {
   const { T } = useLanguage()
@@ -42,7 +45,6 @@ export default function MainPagePsnStats({
       today: achievements.filter((a) => a.Date.startsWith(todayKey)),
       week: achievements.filter((a) => new Date(a.Date.replace(' ', 'T')).getTime() >= weekAgo),
       month: achievements.filter((a) => a.Date.slice(0, 7) === monthKey),
-      streak: calcStreak(achievements),
       avg: calcAvgPerDay(achievements, 30),
     }
   }, [achievements])
@@ -73,9 +75,9 @@ export default function MainPagePsnStats({
       {summary && <StatPill label={T.psn.level} value={summary.trophyLevel} sub="PlayStation" accent="text-[#0070d1]" />}
       <StatPill
         label={T.streak.title}
-        value={`${stats.streak}d`}
-        sub={stats.streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
-        accent={stats.streak >= 7 ? 'text-warning' : stats.streak > 0 ? 'text-success' : undefined}
+        value={`${streak}d`}
+        sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
+        accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined}
         href="/racha"
       />
       {summary && <StatPill label={T.psn.platinum} value={summary.earned.platinum} sub={T.psn.total} accent="text-sky-300" />}

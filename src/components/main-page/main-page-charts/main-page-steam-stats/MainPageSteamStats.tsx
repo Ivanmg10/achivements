@@ -6,7 +6,7 @@ import type { RecentAchievement } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamProfile } from '@/hooks/useSteamProfile'
-import { calcAvgPerDay, calcStreak } from '@/utils/utils'
+import { calcAvgPerDay } from '@/utils/utils'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
@@ -21,10 +21,13 @@ const DAY_MS = 86_400_000
  */
 export default function MainPageSteamStats({
   achievements,
+  streak,
   games,
   isLoading,
 }: {
   achievements: RecentAchievement[]
+  /** Current streak in days, the top bar's. */
+  streak: number
   games: SteamGameProgress[]
   isLoading?: boolean
 }) {
@@ -45,7 +48,6 @@ export default function MainPageSteamStats({
       today: achievements.filter((a) => a.Date.startsWith(todayKey)),
       week: achievements.filter((a) => new Date(a.Date.replace(' ', 'T')).getTime() >= weekAgo),
       month: achievements.filter((a) => a.Date.slice(0, 7) === monthKey),
-      streak: calcStreak(achievements),
       avg: calcAvgPerDay(achievements, 30),
       hours2w: Math.round(minutes2w / 60),
     }
@@ -77,9 +79,9 @@ export default function MainPageSteamStats({
       {profile?.level != null && <StatPill label={T.steam.level} value={profile.level} sub="Steam" accent="text-[#66c0f4]" />}
       <StatPill
         label={T.streak.title}
-        value={`${stats.streak}d`}
-        sub={stats.streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
-        accent={stats.streak >= 7 ? 'text-warning' : stats.streak > 0 ? 'text-success' : undefined}
+        value={`${streak}d`}
+        sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
+        accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined}
         href="/racha"
       />
       <StatPill label={T.steam.last2Weeks} value={`${stats.hours2w}${T.steam.hoursShort}`} sub={T.steam.playtime} accent="text-accent" />

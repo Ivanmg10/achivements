@@ -38,7 +38,7 @@ beforeEach(() => {
 })
 
 test('counts unlocks today, this week and this month, with the Steam level and playtime', () => {
-  render(<MainPageSteamStats achievements={[unlock(daysAgo(0)), unlock(daysAgo(0)), unlock(daysAgo(3))]} games={GAMES} />)
+  render(<MainPageSteamStats streak={1} achievements={[unlock(daysAgo(0)), unlock(daysAgo(0)), unlock(daysAgo(3))]} games={GAMES} />)
   expect(pill(en.pointsStats.today)).toHaveTextContent('2')
   expect(pill(en.pointsStats.thisWeek)).toHaveTextContent('3')
   expect(pill(en.steam.level)).toHaveTextContent('42')
@@ -47,7 +47,7 @@ test('counts unlocks today, this week and this month, with the Steam level and p
 })
 
 test('opens the day and period modals from the pills', () => {
-  render(<MainPageSteamStats achievements={[unlock(daysAgo(0))]} games={[]} />)
+  render(<MainPageSteamStats streak={0} achievements={[unlock(daysAgo(0))]} games={[]} />)
   fireEvent.click(pill(en.pointsStats.today))
   expect(screen.getByTestId('day-modal')).toHaveTextContent(new Date().toISOString().split('T')[0])
   fireEvent.click(pill(en.pointsStats.thisWeek))
@@ -56,12 +56,12 @@ test('opens the day and period modals from the pills', () => {
 
 test('says there is no activity today, and leaves the level out until the profile loads', () => {
   ;(useSteamProfile as jest.Mock).mockReturnValue({ profile: null })
-  render(<MainPageSteamStats achievements={[]} games={[]} />)
+  render(<MainPageSteamStats streak={0} achievements={[]} games={[]} />)
   expect(pill(en.pointsStats.today)).toHaveTextContent(en.pointsStats.noActivity)
   expect(screen.queryByText(en.steam.level)).not.toBeInTheDocument()
 })
 
 test('shows placeholders while loading', () => {
-  render(<MainPageSteamStats achievements={[]} games={[]} isLoading />)
+  render(<MainPageSteamStats streak={0} achievements={[]} games={[]} isLoading />)
   expect(pill(en.pointsStats.today)).toHaveTextContent('—')
 })
