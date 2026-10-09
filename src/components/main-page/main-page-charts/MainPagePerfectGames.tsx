@@ -102,13 +102,16 @@ export default function MainPagePerfectGames({
               <span className="text-[#66c0f4] font-semibold">{counts.steam} Steam</span>
             </>
           )}
-          <button
-            onClick={() => setEditOpen(true)}
-            aria-label={T.cards.reorderMasteredAria}
-            className="p-1 rounded hover:bg-bg-card transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70 cursor-pointer"
-          >
-            <IconEdit className="w-3.5 h-3.5" aria-hidden />
-          </button>
+          {/* Someone else's order can be read, not changed: there is no way to save it. */}
+          {saveOrder && (
+            <button
+              onClick={() => setEditOpen(true)}
+              aria-label={T.cards.reorderMasteredAria}
+              className="p-1 rounded hover:bg-bg-card transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70 cursor-pointer"
+            >
+              <IconEdit className="w-3.5 h-3.5" aria-hidden />
+            </button>
+          )}
         </div>
       </div>
 
@@ -121,13 +124,15 @@ export default function MainPagePerfectGames({
         ))}
       </div>
 
-      <PerfectGamesOrderModal
-        isOpen={editOpen}
-        onClose={() => setEditOpen(false)}
-        games={rawPerfects}
-        order={order}
-        onSaveOrder={saveOrder}
-      />
+      {saveOrder && (
+        <PerfectGamesOrderModal
+          isOpen={editOpen}
+          onClose={() => setEditOpen(false)}
+          games={rawPerfects}
+          order={order}
+          onSaveOrder={saveOrder}
+        />
+      )}
     </div>
   )
 }
