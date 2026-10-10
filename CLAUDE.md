@@ -363,6 +363,8 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
   `chore` (tooling, deps, config), `build`, `ci`, `revert`.
 - Body (optional) explains **why**, not what. Breaking change: `!` after the scope
   (`feat(auth)!: …`) plus a `BREAKING CHANGE:` line.
+- The `commit-msg` hook (`.githooks/commit-msg`) rejects any first line that is not
+  `type(scope): summary`. Do not bypass it with `--no-verify`; fix the message.
 - One logical change per commit; do not mix a refactor with a feature.
 - A migration goes in the same commit as the code that needs it.
 - The `pre-commit` hook bumps the patch version on its own; do not edit
