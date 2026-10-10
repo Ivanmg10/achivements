@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 export type UserSearchResult = { username: string; avatar: string | null; ra: boolean; steam: boolean; psn: boolean }
 
@@ -16,14 +17,15 @@ export function useUserSearch(query: string, enabled: boolean) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(false)
 
-  useEffect(() => {
+  // A new query starts over; state, so while rendering. The debounced search is the effect.
+  useWhenChanged([q, active], () => {
     setResults([])
     setError(false)
-    if (!active) {
-      setIsLoading(false)
-      return
-    }
-    setIsLoading(true)
+    setIsLoading(active)
+  })
+
+  useEffect(() => {
+    if (!active) return
     let stale = false
     const timer = setTimeout(() => {
       fetch(`/api/users/search?q=${encodeURIComponent(q)}`)

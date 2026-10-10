@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { IconX, IconHash, IconCopy, IconCheck } from '@tabler/icons-react'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useIsClient } from '@/hooks/useIsClient'
 
 type GameHash = {
   MD5: string
@@ -65,22 +67,32 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
   const [hashes, setHashes] = useState<GameHash[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  // The portal goes into document.body, which the server does not have.
+  const mounted = useIsClient()
 
-  useEffect(() => { setMounted(true) }, [])
+  // Opening (or another game) starts the load over; state, so while rendering. The fetch is the effect.
+  useWhenChanged([isOpen, gameId], () => {
+    if (isOpen) {
+      setLoading(true)
+      setError(false)
+    }
+  })
 
   useEffect(() => {
     if (!isOpen) return
-    setLoading(true)
-    setError(false)
+    // Closing, or another game, before the answer arrives must not let it land.
+    let current = true
     fetch(`/api/getGameHashes?gameId=${gameId}`)
       .then((r) => {
         if (!r.ok) throw new Error('Failed to load hashes')
         return r.json()
       })
-      .then((data) => setHashes(data.Results ?? []))
-      .catch(() => { setHashes([]); setError(true) })
-      .finally(() => setLoading(false))
+      .then((data) => { if (current) setHashes(data.Results ?? []) })
+      .catch(() => { if (current) { setHashes([]); setError(true) } })
+      .finally(() => { if (current) setLoading(false) })
+    return () => {
+      current = false
+    }
   }, [isOpen, gameId])
 
   if (!mounted) return null

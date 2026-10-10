@@ -1,19 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { setAnalyticsEnabled } from '@/lib/analytics'
+import { useStorageValue } from '@/hooks/useStorageValue'
 
 export type Consent = 'granted' | 'denied'
 
 const STORAGE_KEY = 'cookie-consent'
-const EVENT = 'cookie-consent-change'
-
-function readConsent(): Consent | null {
-  try {
-    const saved = window.localStorage.getItem(STORAGE_KEY)
-    return saved === 'granted' || saved === 'denied' ? saved : null
-  } catch {
-    return null
-  }
-}
 
 /**
  * The visitor's cookie choice, shared by every component that asks.
@@ -22,26 +13,16 @@ function readConsent(): Consent | null {
  * once and the banner comes back.
  */
 export function useCookieConsent() {
-  const [consent, setConsent] = useState<Consent | null | undefined>(undefined)
-
-  useEffect(() => {
-    setConsent(readConsent())
-    const sync = (e: Event) => setConsent((e as CustomEvent<Consent | null>).detail)
-    window.addEventListener(EVENT, sync)
-    return () => window.removeEventListener(EVENT, sync)
-  }, [])
+  const [saved, save] = useStorageValue(STORAGE_KEY)
+  const consent: Consent | null | undefined =
+    saved === undefined ? undefined : saved === 'granted' || saved === 'denied' ? saved : null
 
   const choose = useCallback((next: Consent | null) => {
-    try {
-      if (next) window.localStorage.setItem(STORAGE_KEY, next)
-      else window.localStorage.removeItem(STORAGE_KEY)
-    } catch {
-      // Not remembered — the choice still applies until the page is left.
-    }
+    // Not remembered if storage is blocked — the choice still applies until the page is left.
+    save(next)
     // Withdrawing (null) stops analytics too: until asked again, nothing is granted.
     setAnalyticsEnabled(next === 'granted')
-    window.dispatchEvent(new CustomEvent(EVENT, { detail: next }))
-  }, [])
+  }, [save])
 
   return { consent, choose }
 }

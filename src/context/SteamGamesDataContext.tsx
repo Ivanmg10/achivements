@@ -6,6 +6,7 @@ import { countLoadedProgress, hasSteamAchievements, hasUnloadedProgress } from '
 import type { SteamGameProgress } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 /** Follow-up library requests while the server is still filling counts. */
 const MAX_FILL_PASSES = 10
@@ -80,11 +81,6 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
     const gen = ++generation.current
     const current = () => gen === generation.current
 
-    setRecentLoading(true)
-    setRecentError(null)
-    setLibraryLoading(true)
-    setLibraryError(null)
-
     try {
       const games = await fetchGames(withSubject('/api/steam/recentlyPlayed', subject))
       if (!current()) return
@@ -134,23 +130,26 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
     }
   }, [subject])
 
+  // A new account (or none) starts the lists over. State, so it happens while
+  // rendering; the refs and the load stay in the effect below.
+  useWhenChanged([steamid, subject], () => {
+    setRecent([])
+    setLibrary([])
+    setRecentLoading(Boolean(steamid))
+    setLibraryLoading(Boolean(steamid))
+    setRecentError(null)
+    setLibraryError(null)
+  })
+
   useEffect(() => {
     if (!steamid) {
-      // Unlinked (or signed out): drop anything from a previous account.
+      // Unlinked (or signed out): end any load in progress.
       generation.current++
       loadedFor.current = null
-      setRecent([])
-      setLibrary([])
-      setRecentLoading(false)
-      setLibraryLoading(false)
-      setRecentError(null)
-      setLibraryError(null)
       return
     }
     if (loadedFor.current === steamid) return
     loadedFor.current = steamid
-    setRecent([])
-    setLibrary([])
     load(steamid)
     // The ref objects themselves: the cleanup must bump whatever load is live then.
     const gen = generation
@@ -167,7 +166,12 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
   }, [steamid, load])
 
   const refetch = useCallback(() => {
-    if (steamid) load(steamid)
+    if (!steamid) return
+    setRecentLoading(true)
+    setRecentError(null)
+    setLibraryLoading(true)
+    setLibraryError(null)
+    load(steamid)
   }, [steamid, load])
 
   // Games with no achievements at all are left out of every list (see hasSteamAchievements).

@@ -7,6 +7,7 @@ import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievement } from '@/types/types'
 import { notify } from '@/lib/notify'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -40,10 +41,16 @@ export function PinAchievementModal({
   const [pinningId, setPinningId] = useState<number | null>(null)
   const [error, setError] = useState(false)
 
+  // Opening starts it over; state, so while rendering.
+  useWhenChanged([isOpen], () => {
+    if (isOpen) {
+      setError(false)
+      setPinningId(null)
+    }
+  })
+
   useEffect(() => {
     if (!isOpen) return
-    setError(false)
-    setPinningId(null)
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }

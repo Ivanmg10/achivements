@@ -14,6 +14,8 @@ import PsnGameInfoTrophyCard from './psn-game-info-trophy-card/PsnGameInfoTrophy
 import PsnTrophyGroupTabs, { type GroupTab } from './psn-trophy-group-tabs/PsnTrophyGroupTabs'
 import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy, PsnTrophyGroup } from '@/types/psn'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useLocationHash } from '@/hooks/useLocationHash'
 
 type Filter = 'all' | 'earned' | 'unearned'
 
@@ -81,25 +83,30 @@ export default function PsnGameInfoTable({
     unearned: T.gameInfoTable.filterUnearned,
   }
 
-  // Deep link from a trophy: scroll to the visible copy (row on desktop, card on phones).
-  useEffect(() => {
-    if (trophies.length === 0) return
-    const hash = window.location.hash
-    if (!hash.startsWith(ANCHOR)) return
-    const id = Number(hash.slice(ANCHOR.length))
-    if (!trophies.some((t) => t.id === id)) return
+  // Deep link from a trophy: show it (state, so while rendering), then scroll to
+  // the visible copy (row on desktop, card on phones) and light it up for a moment.
+  const hash = useLocationHash()
+  const linkedId = hash.startsWith(ANCHOR) ? Number(hash.slice(ANCHOR.length)) : null
+  const linked = linkedId !== null && trophies.some((t) => t.id === linkedId)
 
+  useWhenChanged([linked ? linkedId : null, trophies], () => {
+    if (!linked) return
     setFilter('all')
     setGroupTab('all')
     setExpanded(true)
-    setHighlighted(id)
+    setHighlighted(linkedId)
+  })
+
+  useEffect(() => {
+    if (!linked) return
+    const id = linkedId
     const target = [...document.querySelectorAll<HTMLElement>('[data-trophy]')].find(
       (el) => el.dataset.trophy === String(id) && el.offsetParent !== null,
     )
     target?.scrollIntoView?.({ block: 'center', behavior: 'smooth' })
     const timer = setTimeout(() => setHighlighted(null), HIGHLIGHT_MS)
     return () => clearTimeout(timer)
-  }, [trophies])
+  }, [linked, linkedId, trophies])
 
   const filtered = useMemo(() => {
     const inGroup = groupTab === 'all' ? trophies : trophies.filter((t) => t.groupId === groupTab)

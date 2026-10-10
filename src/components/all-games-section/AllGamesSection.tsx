@@ -62,6 +62,7 @@ export default function AllGamesSection({
       {/* Section header */}
       <button
         onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
         className="w-full flex items-center gap-3 px-5 py-4 hover:bg-bg-header/30 transition-colors cursor-pointer text-left select-none"
       >
         <span className="text-xl">{meta.icon}</span>

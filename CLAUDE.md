@@ -48,6 +48,28 @@ Keep inline ONLY if: <15 lines + purely presentational + single file.
 **Any JSX block added in a session that qualifies MUST be extracted before the task is considered done.**
 When in doubt, extract. Prefer more files over bloated components.
 
+## State and effects
+
+`react-hooks/set-state-in-effect` is an **error**: an effect must not call
+setState in its body (nor through a function it calls before its first await).
+What to use instead:
+
+- **State that starts over when something changes** (a modal opening, a session
+  ending, another game): `useWhenChanged(deps, () => { setX(…) })`
+  (`src/hooks/useWhenChanged.ts`). It runs while rendering, the React-endorsed
+  alternative. Only setState of that component goes in it; timers, focus and
+  fetches stay in an effect.
+- **What the browser holds** (localStorage, sessionStorage): `useStorageValue`
+  (`undefined` on the server and while hydrating, so there is no mismatch).
+  `useStoredChoice`, `useCookieConsent` and the language sit on it.
+- **"Only in the browser"**: `useIsClient` (a portal into `document.body`, a
+  random hand), `useLocationHash` (the `#fragment`).
+- **A fetch**: the effect only starts it; the answer is applied in the `.then`.
+  Loading is derived (`answered !== wanted`) or reset in `useWhenChanged`, not
+  set at the start of the effect. A request function that returns its outcome
+  and a separate `settle` is what the compiler accepts for an `async` load.
+- A retry button is a handler, so it can set state before it asks again.
+
 ## Telling the user how an action went — toasts
 
 `notify.success(T.toast.x)` / `notify.error(T.toast.y)` from `src/lib/notify.ts`,
@@ -293,8 +315,12 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   backdrop and release year come from IGDB (`src/lib/igdbClient.ts`, a Twitch
   app in `TWITCH_CLIENT_ID`/`TWITCH_CLIENT_SECRET`), matched by title and
   platform, cached half a year. Without the keys they keep the trophy icon.
-- Sony returns errors as bodies, not throws: every response goes through
-  `unwrap()`. `psnFailure()` maps them to 503 / 403 (private) / 502.
+- Sony returns errors as bodies, not throws: every call goes through
+  `psnCall()` (`unwrap()` plus one retry after 2 s when Sony says "too many
+  requests" — psn-api hides the HTTP status and `Retry-After`, so it goes by
+  the message). `psnFailure()` maps them to 503 / 403 (private) / 429 (rate
+  limited, with `Retry-After: 60`) / 502. The client reads a 429 as a plain
+  failure with a retry button.
 
 ## Registration
 
@@ -335,10 +361,5 @@ Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — a
       summary / PSN About me, the app reads it. Only if public profiles or
       group comparisons come to need proof of ownership.
 - [ ] 13 optimization fixes (cache stampede, Cache-Control headers, duplicate fetches, TTLs, error boundaries, lazy images)
-- [ ] After 1.0: clear the ~51 `react-hooks/set-state-in-effect` warnings
-      (a warning in `eslint.config.mjs`, not an error). None is a bug. Three
-      kinds: reading localStorage / the URL after mount (leave these: it is the
-      hydration-safe pattern), resetting a modal when it opens (move it to the
-      close handler or a `key`, and check the animation in the browser), and
-      data hooks/contexts resetting on a session change (one at a time, each
-      is its own loading state machine).
+- [x] The ~51 `react-hooks/set-state-in-effect` warnings are gone (2026-10-09)
+      and the rule is now an error. See State and effects above.

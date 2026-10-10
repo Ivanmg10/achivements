@@ -13,6 +13,8 @@ import {
   STEAM_DEFAULT_DIRS,
 } from './steam-sortable-header/SteamSortableHeader'
 import type { SteamAchievementUnified } from '@/types/steam'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useLocationHash } from '@/hooks/useLocationHash'
 
 type Filter = 'all' | 'earned' | 'unearned'
 
@@ -72,18 +74,22 @@ export default function SteamGameInfoTable({
     unearned: T.gameInfoTable.filterUnearned,
   }
 
-  // Deep link from a badge: scroll to the visible copy (table row on desktop,
-  // card on phones) once the list is there.
-  useEffect(() => {
-    if (achievements.length === 0) return
-    const hash = window.location.hash
-    if (!hash.startsWith('#ach-')) return
-    const apiname = decodeURIComponent(hash.slice('#ach-'.length))
-    if (!achievements.some((a) => a.apiname === apiname)) return
+  // Deep link from a badge: show it (state, so while rendering), then scroll to
+  // the visible copy (table row on desktop, card on phones) once the list is there.
+  const hash = useLocationHash()
+  const linkedApiname = hash.startsWith('#ach-') ? decodeURIComponent(hash.slice('#ach-'.length)) : null
+  const linked = linkedApiname !== null && achievements.some((a) => a.apiname === linkedApiname)
 
+  useWhenChanged([linked ? linkedApiname : null, achievements], () => {
+    if (!linked) return
     setFilter('all')
     setExpanded(true)
-    setHighlighted(apiname)
+    setHighlighted(linkedApiname)
+  })
+
+  useEffect(() => {
+    if (!linked || linkedApiname === null) return
+    const apiname = linkedApiname
     // Compare the attribute rather than build a selector from the URL: no
     // escaping to get wrong, whatever characters an apiname holds.
     const target = [...document.querySelectorAll<HTMLElement>('[data-ach]')].find(
@@ -92,7 +98,7 @@ export default function SteamGameInfoTable({
     target?.scrollIntoView?.({ block: 'center', behavior: 'smooth' })
     const timer = setTimeout(() => setHighlighted(null), HIGHLIGHT_MS)
     return () => clearTimeout(timer)
-  }, [achievements])
+  }, [linked, linkedApiname, achievements])
 
   const filtered = useMemo(() => {
     const list =

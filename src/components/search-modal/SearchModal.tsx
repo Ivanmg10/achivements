@@ -14,6 +14,7 @@ import { GAME_SOURCES, gameHref, GameRef } from '@/utils/gameRef'
 import SearchModalGameResult from './search-modal-game-result/SearchModalGameResult'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import type { GameSource } from '@/types/steam'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -51,17 +52,23 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
+  // Opening seeds the search, closing clears it; state, so while rendering. Only
+  // `isOpen` matters: a different initialQuery while open must not wipe what was typed.
+  useWhenChanged([isOpen], () => {
     if (isOpen) {
       setQuery(initialQuery)
-      const t = setTimeout(() => inputRef.current?.focus(), 50)
-      return () => clearTimeout(t)
     } else {
       setQuery('')
       setTab('games')
       setPlatformFilter('all')
     }
-  }, [isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
+  })
+
+  useEffect(() => {
+    if (!isOpen) return
+    const t = setTimeout(() => inputRef.current?.focus(), 50)
+    return () => clearTimeout(t)
+  }, [isOpen])
 
   useEffect(() => {
     if (!isOpen) return

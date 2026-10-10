@@ -6,7 +6,6 @@ import { IconChartHistogram, IconLayoutGrid, IconLibrary } from '@tabler/icons-r
 import UserPlatformCard from '@/components/user-page/user-platform-card/UserPlatformCard'
 import RaLoginModal from '@/components/ra-login-modal/RaLoginModal'
 import RaLogo from '@/components/ra-logo/RaLogo'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
 import UserSteamCard from '@/components/user-page/user-steam-card/UserSteamCard'
 import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
 import { useLanguage } from '@/context/LanguageContext'

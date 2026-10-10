@@ -6,6 +6,7 @@ import { GameComment } from '@/app/api/getGameComments/route'
 import Image from 'next/image'
 import Link from 'next/link'
 import { IconMessageCircle, IconChevronDown, IconChevronUp } from '@tabler/icons-react'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 const PREVIEW_COUNT = 5
 
@@ -17,24 +18,35 @@ export default function GameInfoComments({ gameId }: { gameId: number }) {
   const [error, setError] = useState(false)
   const [expanded, setExpanded] = useState(false)
 
-  useEffect(() => {
+  // Another game starts the load over; state, so while rendering. The fetch is the effect.
+  useWhenChanged([gameId], () => {
     setLoading(true)
     setError(false)
+  })
+
+  useEffect(() => {
+    // An answer for the previous game must not land on this one.
+    let current = true
     fetch(`/api/getGameComments?gameId=${gameId}`)
       .then((r) => {
         if (!r.ok) throw new Error('Failed')
         return r.json()
       })
       .then((data) => {
+        if (!current) return
         const results: GameComment[] = data.Results ?? []
         setComments([...results].reverse())
         setTotal(data.Total ?? 0)
         setLoading(false)
       })
       .catch(() => {
+        if (!current) return
         setError(true)
         setLoading(false)
       })
+    return () => {
+      current = false
+    }
   }, [gameId])
 
   if (loading) {

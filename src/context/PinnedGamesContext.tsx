@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useSession } from 'next-auth/react'
 import { gameKey, isGameSource, GameRef } from '@/utils/gameRef'
 import type { GameSource } from '@/types/steam'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 type CtxType = {
   /** Pinned games in display order, RA and Steam mixed. */
@@ -38,10 +39,7 @@ export function PinnedGamesProvider({ children }: { children: React.ReactNode })
   const fetched = useRef(false)
 
   const fetchPinned = useCallback(async () => {
-    if (status !== 'authenticated') {
-      setIsLoading(false)
-      return
-    }
+    if (status !== 'authenticated') return
     try {
       const res = await fetch('/api/pinnedGames')
       if (!res.ok) throw new Error('fetch failed')
@@ -54,18 +52,26 @@ export function PinnedGamesProvider({ children }: { children: React.ReactNode })
     }
   }, [status])
 
-  useEffect(() => {
-    if (status === 'loading') return
-    if (status === 'unauthenticated') {
-      fetched.current = false
+  const signedOut = status === 'unauthenticated'
+
+  // Starting over is state, so it happens while rendering; the ref and the fetch stay in the effect.
+  useWhenChanged([signedOut], () => {
+    if (signedOut) {
       setPins([])
       setIsLoading(false)
+    }
+  })
+
+  useEffect(() => {
+    if (status === 'loading') return
+    if (signedOut) {
+      fetched.current = false
       return
     }
     if (fetched.current) return
     fetched.current = true
     fetchPinned()
-  }, [status, fetchPinned])
+  }, [status, signedOut, fetchPinned])
 
   const pinnedKeys = useMemo(() => new Set(pins.map((p) => gameKey(p.source, p.id))), [pins])
 

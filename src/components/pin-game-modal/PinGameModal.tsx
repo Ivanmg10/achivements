@@ -12,6 +12,7 @@ import { gameKey } from '@/utils/gameRef'
 import GamePickerRow from '@/components/game-picker/game-picker-row/GamePickerRow'
 import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
 import { notify } from '@/lib/notify'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -37,12 +38,19 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
 
   const pinnedKeys = useMemo(() => new Set(pins.map((p) => gameKey(p.source, p.id))), [pins])
 
+  // Opening starts it over; state, so while rendering. Focus is a side effect, so below.
+  useWhenChanged([isOpen], () => {
+    if (isOpen) {
+      setQuery('')
+      setSelected(new Map())
+      setError(false)
+    }
+  })
+
   useEffect(() => {
     if (!isOpen) return
-    setTimeout(() => inputRef.current?.focus(), 50)
-    setQuery('')
-    setSelected(new Map())
-    setError(false)
+    const t = setTimeout(() => inputRef.current?.focus(), 50)
+    return () => clearTimeout(t)
   }, [isOpen])
 
   useEffect(() => {

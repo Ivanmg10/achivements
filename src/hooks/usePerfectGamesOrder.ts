@@ -17,7 +17,7 @@ export function usePerfectGamesOrder() {
   const fetched = useRef(false)
 
   const fetchOrder = useCallback(async () => {
-    if (status !== 'authenticated') { setIsLoading(false); return }
+    if (status !== 'authenticated') return
     try {
       const res = await fetch(withSubject('/api/perfectGamesOrder', subject))
       if (!res.ok) throw new Error('fetch failed')
@@ -32,9 +32,7 @@ export function usePerfectGamesOrder() {
   }, [status, subject])
 
   useEffect(() => {
-    if (status === 'loading') return
-    if (status === 'unauthenticated') { setIsLoading(false); return }
-    if (fetched.current) return
+    if (status !== 'authenticated' || fetched.current) return
     fetched.current = true
     fetchOrder()
   }, [status, fetchOrder])
@@ -50,5 +48,6 @@ export function usePerfectGamesOrder() {
   }, [])
 
   // Someone else's order is theirs to change: there it can only be read.
-  return { order, isLoading, saveOrder: subject ? undefined : saveOrder }
+  // Signed out there is nothing to wait for.
+  return { order, isLoading: isLoading && status !== 'unauthenticated', saveOrder: subject ? undefined : saveOrder }
 }

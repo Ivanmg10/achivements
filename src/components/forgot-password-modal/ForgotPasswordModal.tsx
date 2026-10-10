@@ -6,6 +6,7 @@ import { IconMail, IconX } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
 import { useLanguage } from '@/context/LanguageContext'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -33,13 +34,15 @@ export default function ForgotPasswordModal({ isOpen, onClose }: { isOpen: boole
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (isOpen) return
-    setEmail('')
-    setSent(false)
-    setError('')
-    setSubmitting(false)
-  }, [isOpen])
+  // Closing starts it over; state, so while rendering.
+  useWhenChanged([isOpen], () => {
+    if (!isOpen) {
+      setEmail('')
+      setSent(false)
+      setError('')
+      setSubmitting(false)
+    }
+  })
 
   useEffect(() => {
     if (!isOpen) return

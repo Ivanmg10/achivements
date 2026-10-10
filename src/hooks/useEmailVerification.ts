@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 /** What following a verification link ended in, as the route reports it. */
 export type VerificationOutcome = 'verified' | 'expired' | 'mismatch'
@@ -30,15 +31,17 @@ export function useEmailVerification() {
 
   const param = searchParams.get('email')
 
+  // What the link ended in is state, so it is read while rendering; the rest is the effect.
+  useWhenChanged([param], () => {
+    if (param && OUTCOMES.includes(param as VerificationOutcome)) setOutcome(param as VerificationOutcome)
+  })
+
   useEffect(() => {
     if (!param || handled.current) return
     handled.current = true
 
-    if (OUTCOMES.includes(param as VerificationOutcome)) {
-      setOutcome(param as VerificationOutcome)
-      // The address was confirmed in the database; pull the fresh row in.
-      if (param === 'verified') update()
-    }
+    // The address was confirmed in the database; pull the fresh row in.
+    if (param === 'verified') update()
     // Drop ?email= so a refresh does not replay the message.
     router.replace(pathname)
   }, [param, pathname, router, update])

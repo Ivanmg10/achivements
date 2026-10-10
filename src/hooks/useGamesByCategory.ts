@@ -26,11 +26,9 @@ export function useGamesByCategory(category: string, consoleId?: string) {
   const fetchedRef = useRef(false)
 
   useEffect(() => {
-    if (status === 'loading') return
-    if (status === 'unauthenticated' || !raLinked || category !== 'wantToPlay') { setWantLoading(false); return }
+    if (status === 'loading' || status === 'unauthenticated' || !raLinked || category !== 'wantToPlay') return
     if (fetchedRef.current) return
     fetchedRef.current = true
-    setWantLoading(true)
     fetchWithRetry('/api/getWantPlayGames')
       .then((data) => {
         setWantToPlay((data as { Results?: WantToPlayGame[] })?.Results ?? [])
@@ -65,7 +63,9 @@ export function useGamesByCategory(category: string, consoleId?: string) {
     return Array.from(best.values())
   }, [category, id, allCompleted, wantToPlay])
 
-  const loading = category === 'wantToPlay' ? wantLoading || completedLoading : completedLoading
+  // The list is only waited for while it is going to be asked for: not signed out, not without RA.
+  const wantPending = wantLoading && (status === 'loading' || (status !== 'unauthenticated' && raLinked))
+  const loading = category === 'wantToPlay' ? wantPending || completedLoading : completedLoading
 
   // Games the user hid from their lists stay out of every list.
   const { isHidden } = useHiddenGames()

@@ -5,6 +5,7 @@ import { RecentAchievement } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { withSubject } from '@/utils/withSubject'
 
 type CtxType = {
@@ -38,9 +39,7 @@ export function RecentAchievementsProvider({ children }: { children: React.React
   const doFetch = useCallback(() => {
     // Named, so a retry can call it again.
     const run = () => {
-      if (!session?.user?.rausername) { setIsLoading(false); return }
-      setIsLoading(true)
-      setError(false)
+      if (!session?.user?.rausername) return
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
@@ -58,20 +57,33 @@ export function RecentAchievementsProvider({ children }: { children: React.React
     run()
   }, [session?.user?.rausername, subject])
 
+  const signedOut = status === 'unauthenticated'
+  const rausername = session?.user?.rausername
+
+  // Starting over is state, so it happens while rendering; the refs and the fetch stay in the effect.
+  useWhenChanged([signedOut, rausername], () => {
+    if (signedOut) {
+      setAchievements([])
+      setIsLoading(false)
+    } else if (!rausername) {
+      setIsLoading(false)
+    } else {
+      setIsLoading(true)
+      setError(false)
+    }
+  })
+
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (signedOut) {
       hasFetched.current = false
       clearTimeout(retryTimer.current)
       attemptRef.current = 0
-      setAchievements([])
-      setIsLoading(false)
       return
     }
-    if (!session?.user?.rausername) { setIsLoading(false); return }
-    if (!wanted || hasFetched.current) return
+    if (!rausername || !wanted || hasFetched.current) return
     hasFetched.current = true
     doFetch()
-  }, [session?.user?.rausername, status, doFetch, wanted])
+  }, [rausername, signedOut, doFetch, wanted])
 
   useEffect(() => () => clearTimeout(retryTimer.current), [])
 
@@ -79,6 +91,8 @@ export function RecentAchievementsProvider({ children }: { children: React.React
     clearTimeout(retryTimer.current)
     attemptRef.current = 0
     setAchievements([])
+    setIsLoading(true)
+    setError(false)
     doFetch()
   }, [doFetch])
 

@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { steamAssetUrl } from '@/lib/steamClient'
+import { useIsClient } from '@/hooks/useIsClient'
 
 const RA_IMAGES: string[] = [
   'https://media.retroachievements.org/Images/122047.png',
@@ -275,11 +276,14 @@ function intoColumns(images: string[]): string[][] {
 export default function AuthCollagePanel() {
   // A fixed order first, so the server and the first paint agree; a different
   // draw once mounted, so no two visits look the same.
-  const [images, setImages] = useState(() => dealBothPlatforms(RA_IMAGES, STEAM_IMAGES, TILES_SHOWN))
-
-  useEffect(() => {
-    setImages(dealBothPlatforms(shuffle(RA_IMAGES), shuffle(STEAM_IMAGES), TILES_SHOWN))
-  }, [])
+  const client = useIsClient()
+  const images = useMemo(
+    () =>
+      client
+        ? dealBothPlatforms(shuffle(RA_IMAGES), shuffle(STEAM_IMAGES), TILES_SHOWN)
+        : dealBothPlatforms(RA_IMAGES, STEAM_IMAGES, TILES_SHOWN),
+    [client],
+  )
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-bg-card [--zig:1.2rem] md:[--zig:2rem] xl:[--zig:3.6rem]">

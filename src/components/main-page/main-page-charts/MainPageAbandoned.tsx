@@ -14,6 +14,7 @@ import { gameHref } from '@/utils/gameRef'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 const ABANDONED_DAYS = 30
 const DAY_MS = 1000 * 60 * 60 * 24
@@ -86,16 +87,18 @@ export default function MainPageAbandoned({
     run(key)
   }, [])
 
+  // A new set of games to look up starts over; state, so while rendering. The lookup is the effect.
+  useWhenChanged([missingIdsKey, recentlyPlayedLoading], () => {
+    if (recentlyPlayedLoading) return
+    if (!missingIdsKey) setLastAchDates({})
+    setFetchedKey('')
+  })
+
   useEffect(() => {
     if (recentlyPlayedLoading) return
     clearTimeout(retryTimer.current)
     attemptRef.current = 0
-    if (!missingIdsKey) {
-      setLastAchDates({})
-      setFetchedKey('')
-      return
-    }
-    setFetchedKey('')
+    if (!missingIdsKey) return
     doFetch(missingIdsKey)
   }, [missingIdsKey, recentlyPlayedLoading, doFetch])
 

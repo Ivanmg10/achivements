@@ -12,7 +12,7 @@ export function useGroups() {
   const fetched = useRef(false)
 
   const fetchGroups = useCallback(async () => {
-    if (status !== 'authenticated') { setIsLoading(false); return }
+    if (status !== 'authenticated') return
     try {
       const res = await fetch('/api/groups')
       if (!res.ok) throw new Error('fetch failed')
@@ -27,9 +27,7 @@ export function useGroups() {
   }, [status])
 
   useEffect(() => {
-    if (status === 'loading') return
-    if (status === 'unauthenticated') { setIsLoading(false); return }
-    if (fetched.current) return
+    if (status !== 'authenticated' || fetched.current) return
     fetched.current = true
     fetchGroups()
   }, [status, fetchGroups])
@@ -80,5 +78,6 @@ export function useGroups() {
     setGroups((prev) => prev.filter((g) => g.id !== id))
   }, [])
 
-  return { groups, isLoading, error, fetchGroups, createGroup, updateGroup, deleteGroup, setGroups }
+  // Signed out there is nothing to wait for.
+  return { groups, isLoading: isLoading && status !== 'unauthenticated', error, fetchGroups, createGroup, updateGroup, deleteGroup, setGroups }
 }
