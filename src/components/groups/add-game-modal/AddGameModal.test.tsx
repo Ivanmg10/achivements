@@ -123,3 +123,16 @@ test('a pasted RA id offers that RA game', async () => {
   expect(await screen.findByText('Metroid')).toBeInTheDocument()
   expect(fetchRaCandidateById).toHaveBeenCalledWith(1234)
 })
+
+test('opening it again starts over: no search and nothing selected from last time', () => {
+  const props = { onClose: jest.fn(), groupId: 3, existingKeys: new Set<string>(), onAdded: jest.fn() }
+  const { rerender } = render(<AddGameModal isOpen {...props} />)
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'zel' } })
+  fireEvent.click(screen.getByRole('button', { name: /Zelda/ }))
+  expect(screen.getByText(`${en.groups.addGame} (1)`)).toBeInTheDocument()
+
+  rerender(<AddGameModal isOpen={false} {...props} />)
+  rerender(<AddGameModal isOpen {...props} />)
+  expect(screen.getByRole('textbox')).toHaveValue('')
+  expect(screen.queryByText(`${en.groups.addGame} (1)`)).not.toBeInTheDocument()
+})

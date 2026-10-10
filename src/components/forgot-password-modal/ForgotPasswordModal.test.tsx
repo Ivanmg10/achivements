@@ -68,3 +68,15 @@ test('closes on escape and on the close button', () => {
   fireEvent.keyDown(window, { key: 'Escape' })
   expect(onClose).toHaveBeenCalledTimes(2)
 })
+
+test('closing it forgets the address and the outcome, so it opens fresh', async () => {
+  const onClose = jest.fn()
+  const { rerender } = render(<ForgotPasswordModal isOpen onClose={onClose} />)
+  ask()
+  await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent(en.passwordReset.sent))
+
+  rerender(<ForgotPasswordModal isOpen={false} onClose={onClose} />)
+  rerender(<ForgotPasswordModal isOpen onClose={onClose} />)
+  expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  expect(screen.getByLabelText(en.passwordReset.email)).toHaveValue('')
+})

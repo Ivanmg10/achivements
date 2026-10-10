@@ -1,6 +1,7 @@
 import { buildLibrary, filterLibrary, summarizeConsoles } from './library'
 import type { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
+import { psnGameFixture } from '@/test-utils/psnFixtures'
 
 const ra = (id: number, pct: string, over: Partial<RetroAchievementsGameCompleted> = {}): RetroAchievementsGameCompleted => ({
   GameID: id, Title: `Pokémon ${id}`, ImageIcon: `/Images/${id}.png`, ConsoleID: 5, ConsoleName: 'Game Boy Advance',
@@ -60,13 +61,13 @@ test('summarizeConsoles counts games once each and the share at 100%', () => {
   ])
 })
 
-const psnGame = (id: number, pctWon: number, lastPlayed = '2024-01-02T00:00:00.000Z') => ({
-  _source: 'psn' as const, id, titleId: `NPWR${String(Math.floor(id / 100)).padStart(5, '0')}_${String(id % 100).padStart(2, '0')}`,
-  service: 'trophy2' as const, title: `PS ${id}`, imageIcon: `https://psn/${id}.png`, consoleName: 'PS5',
+const psnGame = (id: number, pctWon: number, lastPlayed = '2024-01-02T00:00:00.000Z') => psnGameFixture({
+  id, titleId: `NPWR${String(Math.floor(id / 100)).padStart(5, '0')}_${String(id % 100).padStart(2, '0')}`,
+  service: 'trophy2', title: `PS ${id}`, imageIcon: `https://psn/${id}.png`, consoleName: 'PS5',
   maxPossible: 10, numAwarded: Math.round(pctWon / 10), pctWon, lastPlayed,
   earned: { bronze: 1, silver: 0, gold: 0, platinum: pctWon >= 100 ? 1 : 0 },
   defined: { bronze: 9, silver: 0, gold: 0, platinum: 1 },
-  lastTrophyAt: lastPlayed, playtimeMinutes: null, playedAs: [] as string[], playCount: null, coverUrl: null, heroUrl: null,
+  lastTrophyAt: lastPlayed, playtimeMinutes: null, playedAs: [], playCount: null, coverUrl: null, heroUrl: null,
 })
 
 test('PSN games join the library with their own status and page', () => {

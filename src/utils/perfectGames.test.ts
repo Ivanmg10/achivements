@@ -1,6 +1,7 @@
 import { applyPerfectOrder, buildPerfectGames, countPerfectGames, filterPerfects, groupPerfectsByYear, latestPerfects, perfectDates } from './perfectGames'
 import type { RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
+import { psnGameFixture } from '@/test-utils/psnFixtures'
 
 function ra(id: number, title: string, over: Partial<RetroAchievementsGameCompleted> = {}): RetroAchievementsGameCompleted {
   return {
@@ -123,13 +124,13 @@ describe('collection helpers', () => {
   })
 })
 
-const psnGame = (id: number, pctWon: number, lastPlayed = '2024-01-02T00:00:00.000Z') => ({
-  _source: 'psn' as const, id, titleId: `NPWR${String(Math.floor(id / 100)).padStart(5, '0')}_${String(id % 100).padStart(2, '0')}`,
-  service: 'trophy2' as const, title: `PS ${id}`, imageIcon: `https://psn/${id}.png`, consoleName: 'PS5',
+const psnGame = (id: number, pctWon: number, lastPlayed = '2024-01-02T00:00:00.000Z') => psnGameFixture({
+  id, titleId: `NPWR${String(Math.floor(id / 100)).padStart(5, '0')}_${String(id % 100).padStart(2, '0')}`,
+  service: 'trophy2', title: `PS ${id}`, imageIcon: `https://psn/${id}.png`, consoleName: 'PS5',
   maxPossible: 10, numAwarded: Math.round(pctWon / 10), pctWon, lastPlayed,
   earned: { bronze: 1, silver: 0, gold: 0, platinum: pctWon >= 100 ? 1 : 0 },
   defined: { bronze: 9, silver: 0, gold: 0, platinum: 1 },
-  lastTrophyAt: lastPlayed, playtimeMinutes: null, playedAs: [] as string[], playCount: null, coverUrl: null, heroUrl: null,
+  lastTrophyAt: lastPlayed, playtimeMinutes: null, playedAs: [], playCount: null, coverUrl: null, heroUrl: null,
 })
 
 describe('PSN', () => {

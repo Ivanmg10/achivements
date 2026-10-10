@@ -108,3 +108,21 @@ test('does not retry a 4xx, and refetch clears the error once it works', async (
   await waitFor(() => expect(result.current.all).toHaveLength(1))
   expect(result.current.error).toBe(false)
 })
+
+test('session.update() flips the status to loading and back: a finished load is not started again, nor left loading', async () => {
+  const games = [{ GameID: 1, Title: 'Sly Cooper', ConsoleID: 4, HardcoreMode: '0', PctWon: '0.5' }]
+  const signedIn = { status: 'authenticated', data: { user: { rausername: 'Ivan' } } }
+  ;(fetchWithRetry as jest.Mock).mockResolvedValue(games)
+  ;(useSession as jest.Mock).mockReturnValue(signedIn)
+  const { result, rerender } = renderHook(() => useGamesData(), { wrapper })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+
+  ;(useSession as jest.Mock).mockReturnValue({ ...signedIn, status: 'loading' })
+  rerender()
+  ;(useSession as jest.Mock).mockReturnValue(signedIn)
+  rerender()
+
+  expect(result.current.isLoading).toBe(false)
+  expect(result.current.all).toHaveLength(1)
+  expect(fetchWithRetry).toHaveBeenCalledTimes(1)
+})

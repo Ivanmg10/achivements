@@ -117,3 +117,15 @@ test('closes on escape key', () => {
   fireEvent.keyDown(window, { key: 'Escape' })
   expect(onClose).toHaveBeenCalled()
 })
+
+test('a failure from last time is not still showing when it opens again', async () => {
+  ;(fetch as jest.Mock).mockResolvedValue({ ok: false })
+  const props = { onClose: jest.fn(), achievements: [unearned], gameId: 1, gameTitle: 'Game', numDistinctPlayers: 1, onPinned: jest.fn() }
+  const { rerender } = render(<PinAchievementModal isOpen {...props} />)
+  fireEvent.click(screen.getByText('Locked achievement'))
+  await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
+
+  rerender(<PinAchievementModal isOpen={false} {...props} />)
+  rerender(<PinAchievementModal isOpen {...props} />)
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+})

@@ -86,3 +86,22 @@ test('still closes when saving the order fails', async () => {
   expect(onClose).toHaveBeenCalled()
   ;(console.error as jest.Mock).mockRestore()
 })
+
+test('opening it lists the games in the saved order, and a new order while open is followed', () => {
+  const rows = () => screen.getAllByText(/Sly Cooper|Portal 2/).map((n) => n.textContent)
+  const { rerender } = render(
+    <PerfectGamesOrderModal isOpen onClose={jest.fn()} games={games} order={['steam:620', 'ra:1']} onSaveOrder={jest.fn()} />,
+  )
+  expect(rows()).toEqual(['Portal 2', 'Sly Cooper'])
+
+  rerender(<PerfectGamesOrderModal isOpen onClose={jest.fn()} games={games} order={['ra:1', 'steam:620']} onSaveOrder={jest.fn()} />)
+  expect(rows()).toEqual(['Sly Cooper', 'Portal 2'])
+})
+
+test('closed, it keeps nothing: the next opening reads the order again', () => {
+  const props = { onClose: jest.fn(), games, onSaveOrder: jest.fn() }
+  const { rerender } = render(<PerfectGamesOrderModal isOpen order={['steam:620', 'ra:1']} {...props} />)
+  rerender(<PerfectGamesOrderModal isOpen={false} order={['steam:620', 'ra:1']} {...props} />)
+  rerender(<PerfectGamesOrderModal isOpen order={['ra:1', 'steam:620']} {...props} />)
+  expect(screen.getAllByText(/Sly Cooper|Portal 2/).map((n) => n.textContent)).toEqual(['Sly Cooper', 'Portal 2'])
+})

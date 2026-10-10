@@ -84,7 +84,7 @@ describe('filter', () => {
   })
 
   test('says so when a filter leaves nothing', () => {
-    render(<SteamGameInfoTable achievements={[ach('A')]} />)
+    render(<SteamGameInfoTable appId={730} gameTitle="Game" achievements={[ach('A')]} />)
     fireEvent.click(filters().getByRole('button', { name: en.gameInfoTable.filterEarned }))
     expect(screen.getByText(en.steam.noAchievements)).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
@@ -143,7 +143,7 @@ test('folds to the first rows and unfolds again', () => {
 })
 
 test('offers no fold for a short list', () => {
-  render(<SteamGameInfoTable achievements={LIST.slice(0, 3)} />)
+  render(<SteamGameInfoTable appId={730} gameTitle="Game" achievements={LIST.slice(0, 3)} />)
   expect(screen.queryByRole('button', { name: en.gameInfoTable.collapseTable })).not.toBeInTheDocument()
 })
 

@@ -74,3 +74,15 @@ test('a failed save stays open and says so', async () => {
   expect(await screen.findByRole('alert')).toHaveTextContent(en.userData.favoriteGameError)
   expect(onClose).not.toHaveBeenCalled()
 })
+
+test('closing it clears the search, so the next opening starts from the suggestions', () => {
+  const props = { source: 'ra' as const, current: null, onClose: jest.fn(), onSave: jest.fn() }
+  const { rerender } = render(<FavoriteGameModal isOpen {...props} />)
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'xyz' } })
+  expect(screen.getByText(en.userData.favoriteGameNoResults)).toBeInTheDocument()
+
+  rerender(<FavoriteGameModal isOpen={false} {...props} />)
+  rerender(<FavoriteGameModal isOpen {...props} />)
+  expect(screen.getByRole('textbox')).toHaveValue('')
+  expect(screen.getByRole('button', { name: /Zelda/ })).toBeInTheDocument()
+})

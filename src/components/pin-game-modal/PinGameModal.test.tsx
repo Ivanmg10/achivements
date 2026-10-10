@@ -192,3 +192,15 @@ test('a pasted RA game URL is treated as its id, and a chip can be removed', asy
   fireEvent.click(screen.getByRole('button', { name: 'Remove From URL' }))
   expect(screen.queryByText('From URL')).not.toBeInTheDocument()
 })
+
+test('opening it again starts over: the search and the chosen games are gone', () => {
+  const { rerender } = render(<PinGameModal isOpen={true} onClose={jest.fn()} />)
+  fireEvent.change(screen.getByPlaceholderText('Search a game to pin…'), { target: { value: 'sly' } })
+  fireEvent.click(screen.getByText('Sly Cooper'))
+  expect(screen.getByText('Pin (1)')).toBeInTheDocument()
+
+  rerender(<PinGameModal isOpen={false} onClose={jest.fn()} />)
+  rerender(<PinGameModal isOpen={true} onClose={jest.fn()} />)
+  expect(screen.getByPlaceholderText('Search a game to pin…')).toHaveValue('')
+  expect(screen.queryByText('Pin (1)')).not.toBeInTheDocument()
+})

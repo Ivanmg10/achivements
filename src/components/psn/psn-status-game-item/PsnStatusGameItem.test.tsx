@@ -9,9 +9,9 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import PsnStatusGameItem from './PsnStatusGameItem'
 import { en } from '@/translations/en'
 import type { PsnGameProgress } from '@/types/psn'
+import { psnGameFixture } from '@/test-utils/psnFixtures'
 
-const GAME: PsnGameProgress = {
-  _source: 'psn',
+const GAME: PsnGameProgress = psnGameFixture({
   id: 100,
   titleId: 'NPWR00001_00',
   service: 'trophy2',
@@ -25,7 +25,7 @@ const GAME: PsnGameProgress = {
   earned: { bronze: 30, silver: 10, gold: 4, platinum: 1 },
   defined: { bronze: 30, silver: 10, gold: 4, platinum: 1 },
   lastTrophyAt: '2026-01-02T00:00:00Z', playtimeMinutes: null, playedAs: [], playCount: null, coverUrl: null, heroUrl: null,
-}
+})
 
 test('links to the game page and shows its progress', () => {
   render(<PsnStatusGameItem game={GAME} />)

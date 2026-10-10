@@ -7,7 +7,7 @@ import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy } from '@/types/psn'
 
 const trophy = (overrides: Partial<PsnTrophy>): PsnTrophy => ({
-  id: 0, name: 'Name', detail: 'Detail', iconUrl: 'https://i.png', type: 'bronze',
+  id: 0, name: 'Name', detail: 'Detail', iconUrl: 'https://i.png', type: 'bronze', groupId: 'default',
   hidden: false, earned: false, earnedAt: null, rarity: null, ...overrides,
 })
 
@@ -30,7 +30,7 @@ const GROUPS = [
 const WITH_DLC = [trophy({ id: 0, name: 'Base one', groupId: 'default' }), trophy({ id: 1, name: 'DLC one', groupId: '001' })]
 
 test('each trophy links to its row on the game page, saying its grade and state', () => {
-  render(<PsnTrophyGrid gameId={2018800} trophies={TROPHIES} />)
+  render(<PsnTrophyGrid gameId={2018800} gameTitle="Game" trophies={TROPHIES} />)
   const earned = screen.getByRole('link', { name: `All of them — ${en.psn.platinum}, ${en.psn.earned}` })
   expect(earned).toHaveAttribute('href', '/psnGame/NPWR20188_00#trophy-0')
   // A hidden trophy keeps its name secret until earned.
@@ -39,7 +39,7 @@ test('each trophy links to its row on the game page, saying its grade and state'
 })
 
 test('focusing a trophy shows its details at once', () => {
-  render(<PsnTrophyGrid gameId={100} trophies={TROPHIES} />)
+  render(<PsnTrophyGrid gameId={100} gameTitle="Game" trophies={TROPHIES} />)
   jest.useFakeTimers()
   fireEvent.focus(screen.getAllByRole('link')[0])
   act(() => jest.runAllTimers())
@@ -54,7 +54,7 @@ test('focusing a trophy shows its details at once', () => {
 
 test('a long set shows the first few until asked for the rest', () => {
   const many = Array.from({ length: 20 }, (_, i) => trophy({ id: i, name: `T${i}` }))
-  render(<PsnTrophyGrid gameId={100} trophies={many} limit={5} />)
+  render(<PsnTrophyGrid gameId={100} gameTitle="Game" trophies={many} limit={5} />)
   expect(screen.getAllByRole('link')).toHaveLength(5)
 })
 

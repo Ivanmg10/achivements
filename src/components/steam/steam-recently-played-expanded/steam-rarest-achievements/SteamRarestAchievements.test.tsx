@@ -6,7 +6,7 @@ import type { SteamAchievementUnified } from '@/types/steam'
 function ach(apiname: string, overrides: Partial<SteamAchievementUnified> = {}): SteamAchievementUnified {
   return {
     _source: 'steam', id: apiname, apiname, title: apiname, description: '', earned: true, dateEarned: null,
-    badgeUrl: `${apiname}.jpg`, displayOrder: 0, hidden: false, globalPct: 50,
+    badgeUrl: `${apiname}.jpg`, displayOrder: 0, hidden: false, globalPct: 50, likelyOnline: false,
     ...overrides,
   }
 }
