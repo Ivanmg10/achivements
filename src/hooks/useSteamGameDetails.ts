@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { toSteamLanguage } from '@/utils/steamLanguage'
 import type { SteamGameDetails } from '@/types/steam'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 /**
  * Store details for one Steam game page, in the app's language. A 404 means
@@ -16,41 +17,51 @@ export function useSteamGameDetails(appId: number | null) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const load = useCallback(async (id: number, language: string, isCurrent: () => boolean = () => true) => {
-    setIsLoading(true)
-    setError(null)
+  /** Asks the server; what came back, not yet applied. A 404 is no details, not an error. */
+  const request = useCallback(async (id: number, language: string): Promise<{ details: SteamGameDetails | null } | { error: string }> => {
     try {
       const res = await fetch(`/api/steam/gameDetails?appid=${id}&lang=${language}`)
-      if (res.status === 404) {
-        if (isCurrent()) setDetails(null)
-        return
-      }
+      if (res.status === 404) return { details: null }
       if (!res.ok) throw new Error(`Failed to load game details (${res.status})`)
-      const data = (await res.json()) as SteamGameDetails
-      if (isCurrent()) setDetails(data)
+      return { details: (await res.json()) as SteamGameDetails }
     } catch (err) {
       console.error('[useSteamGameDetails]', id, err)
-      if (isCurrent()) setError(err instanceof Error ? err.message : 'Unknown error')
-    } finally {
-      if (isCurrent()) setIsLoading(false)
+      return { error: err instanceof Error ? err.message : 'Unknown error' }
     }
   }, [])
 
-  useEffect(() => {
+  const settle = useCallback((outcome: { details: SteamGameDetails | null } | { error: string }) => {
+    if ('error' in outcome) setError(outcome.error)
+    else setDetails(outcome.details)
+    setIsLoading(false)
+  }, [])
+
+  // Another game or language starts over; state, so while rendering. The load is the effect.
+  useWhenChanged([appId, steamLang], () => {
     setDetails(null)
+    setError(null)
+    setIsLoading(appId !== null)
+  })
+
+  useEffect(() => {
     if (appId === null) return
     // Moving to another game (or language) before this one answers must not
     // leave the previous game's details on screen.
     let current = true
-    load(appId, steamLang, () => current)
+    request(appId, steamLang).then((outcome) => {
+      if (current) settle(outcome)
+    })
     return () => {
       current = false
     }
-  }, [appId, steamLang, load])
+  }, [appId, steamLang, request, settle])
 
   const retry = useCallback(() => {
-    if (appId !== null) load(appId, steamLang)
-  }, [appId, steamLang, load])
+    if (appId === null) return
+    setIsLoading(true)
+    setError(null)
+    request(appId, steamLang).then(settle)
+  }, [appId, steamLang, request, settle])
 
   return { details, isLoading, error, retry }
 }

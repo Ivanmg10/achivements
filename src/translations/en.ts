@@ -611,6 +611,8 @@ export const en = {
     signIn: 'Sign in with RetroAchievements',
     playingNow: 'Playing now',
     viewOnRA: 'View on RA',
+    refreshData: 'Refresh data',
+    refreshFailed: 'Could not refresh. Try again.',
   },
   lineChart: {
     achievementsLast7Days: '{total} achievements in the last 7 days',

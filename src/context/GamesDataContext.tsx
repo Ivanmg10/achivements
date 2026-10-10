@@ -5,6 +5,7 @@ import { RetroAchievementsGameCompleted } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { withSubject } from '@/utils/withSubject'
 
 type CtxType = {
@@ -41,10 +42,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   const doFetch = useCallback(() => {
     // Named, so a retry can call it again.
     const run = () => {
-      if (status !== 'authenticated') { setIsLoading(false); return }
-      if (!rausername) { setIsLoading(false); return }
-      setIsLoading(true)
-      setError(false)
+      if (status !== 'authenticated' || !rausername) return
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
@@ -60,21 +58,36 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     run()
   }, [status, rausername, subject])
 
+  const signedOut = status === 'unauthenticated'
+  const unlinked = status === 'authenticated' && !rausername
+  const canFetch = status === 'authenticated' && Boolean(rausername)
+
+  // Starting over is state, so it happens while rendering; the refs and the fetch stay in the effect.
+  // Not keyed on canFetch: session.update() makes status flip to 'loading' and back, and that must
+  // not start a load the effect (it fetches once per sign-in) will never answer.
+  useWhenChanged([signedOut, unlinked], () => {
+    if (signedOut) {
+      setAll([])
+      setIsLoading(false)
+    } else if (unlinked) {
+      setIsLoading(false)
+    } else {
+      setIsLoading(true)
+      setError(false)
+    }
+  })
+
   useEffect(() => {
-    if (status === 'loading') return
-    if (status === 'unauthenticated') {
+    if (signedOut) {
       hasFetched.current = false
       clearTimeout(retryTimer.current)
       attemptRef.current = 0
-      setAll([])
-      setIsLoading(false)
       return
     }
-    if (!rausername) { setIsLoading(false); return }
-    if (hasFetched.current) return
+    if (!canFetch || hasFetched.current) return
     hasFetched.current = true
     doFetch()
-  }, [status, rausername, doFetch])
+  }, [signedOut, canFetch, doFetch])
 
   useEffect(() => () => clearTimeout(retryTimer.current), [])
 
@@ -82,6 +95,8 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     clearTimeout(retryTimer.current)
     attemptRef.current = 0
     setAll([])
+    setIsLoading(true)
+    setError(false)
     doFetch()
   }, [doFetch])
 

@@ -9,6 +9,7 @@ import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { candidateIconUrl, searchCandidates } from '@/utils/gameCandidates'
 import GamePickerRow from '@/components/game-picker/game-picker-row/GamePickerRow'
 import type { GameSource } from '@/types/steam'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 export type FavoriteGame = { id: number; title: string; imageIcon: string }
 
@@ -50,12 +51,16 @@ export default function FavoriteGameModal({
   const [error, setError] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
+  // Closing starts it over; state, so while rendering. Focus is a side effect, so below.
+  useWhenChanged([isOpen], () => {
     if (!isOpen) {
       setQuery('')
       setError(false)
-      return
     }
+  })
+
+  useEffect(() => {
+    if (!isOpen) return
     const t = setTimeout(() => inputRef.current?.focus(), 50)
     return () => clearTimeout(t)
   }, [isOpen])

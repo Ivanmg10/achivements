@@ -17,8 +17,9 @@ import { notify } from '@/lib/notify'
 export function usePinnedAchievements() {
   const { T } = useLanguage()
   const [pinned, setPinned] = useState<PinnedAchievement[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(false)
+  /** Which load the answer (data or final failure) belongs to; loading is any other being asked for. */
+  const [loadedKey, setLoadedKey] = useState<number | null>(null)
+  const [failed, setFailed] = useState(false)
   const [reloadKey, setReloadKey] = useState(0)
   const attemptRef = useRef(0)
 
@@ -27,24 +28,22 @@ export function usePinnedAchievements() {
     // This run's own retry timer, cleared when the run is replaced or unmounted.
     const retryTimer: { current: ReturnType<typeof setTimeout> | undefined } = { current: undefined }
     attemptRef.current = 0
-    setIsLoading(true)
-    setError(false)
-    setPinned([])
 
     function load() {
       fetchWithRetry('/api/favorites?source=all')
         .then((data) => {
           if (!current) return
           setPinned(Array.isArray(data) ? (data as PinnedAchievement[]) : [])
-          setIsLoading(false)
+          setFailed(false)
+          setLoadedKey(reloadKey)
           attemptRef.current = 0
         })
         .catch((err) => {
           if (!current) return
           console.error('[usePinnedAchievements]', err)
           if (!scheduleRetry(attemptRef, retryTimer, load, err)) {
-            setError(true)
-            setIsLoading(false)
+            setFailed(true)
+            setLoadedKey(reloadKey)
           }
         })
     }
@@ -56,7 +55,11 @@ export function usePinnedAchievements() {
     }
   }, [reloadKey])
 
-  const refetch = useCallback(() => setReloadKey((k) => k + 1), [])
+  const refetch = useCallback(() => {
+    setPinned([])
+    setFailed(false)
+    setReloadKey((k) => k + 1)
+  }, [])
 
   const unpin = useCallback(async (fav: PinnedAchievement) => {
     const key = pinnedKey(fav)
@@ -87,5 +90,6 @@ export function usePinnedAchievements() {
     }
   }, [T])
 
-  return { pinned, isLoading, error, refetch, unpin }
+  const answered = loadedKey === reloadKey
+  return { pinned, isLoading: !answered, error: answered && failed, refetch, unpin }
 }

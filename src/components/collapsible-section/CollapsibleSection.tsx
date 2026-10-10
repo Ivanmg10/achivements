@@ -1,8 +1,9 @@
 'use client'
 
-import { ReactNode, useEffect, useId, useState } from 'react'
+import { ReactNode, useId, useState } from 'react'
 import { IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useStorageValue } from '@/hooks/useStorageValue'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 
 /**
@@ -41,29 +42,16 @@ export default function CollapsibleSection({
 }) {
   const { T } = useLanguage()
   const reduce = useReducedMotion()
-  const [open, setOpen] = useState(defaultOpen)
+  // Remembered for the tab when there is a key, else plain state. The default until the browser's value is read.
+  const [saved, save] = useStorageValue(storageKey ?? null, 'session')
+  const [localOpen, setLocalOpen] = useState(defaultOpen)
+  const open = storageKey ? (saved === 'open' ? true : saved === 'closed' ? false : defaultOpen) : localOpen
   const titleId = useId()
   const panelId = useId()
 
-  // Read after mount, not during render, so server and client render the same.
-  useEffect(() => {
-    if (!storageKey) return
-    try {
-      const saved = window.sessionStorage.getItem(storageKey)
-      if (saved === 'open' || saved === 'closed') setOpen(saved === 'open')
-    } catch {
-      // Storage unavailable (private mode, blocked): keep the default.
-    }
-  }, [storageKey])
-
   function setAndRemember(next: boolean) {
-    setOpen(next)
-    if (!storageKey) return
-    try {
-      window.sessionStorage.setItem(storageKey, next ? 'open' : 'closed')
-    } catch {
-      // Not remembered — the toggle itself still works.
-    }
+    if (storageKey) save(next ? 'open' : 'closed')
+    else setLocalOpen(next)
   }
 
   const showAllLabel = count !== undefined ? T.categoryPage.showAllGames.replace('{n}', String(count)) : T.categoryPage.showAll

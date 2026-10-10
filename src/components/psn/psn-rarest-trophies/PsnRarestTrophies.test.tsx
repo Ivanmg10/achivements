@@ -4,7 +4,7 @@ import { en } from '@/translations/en'
 import type { PsnTrophy } from '@/types/psn'
 
 const trophy = (overrides: Partial<PsnTrophy>): PsnTrophy => ({
-  id: 0, name: 'Name', detail: '', iconUrl: null, type: 'bronze',
+  id: 0, name: 'Name', detail: '', iconUrl: null, type: 'bronze', groupId: 'default',
   hidden: false, earned: true, earnedAt: '2026-01-01T00:00:00Z', rarity: 50, ...overrides,
 })
 

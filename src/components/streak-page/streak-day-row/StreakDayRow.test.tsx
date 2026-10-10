@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import StreakDayRow from './StreakDayRow'
 import { RecentAchievement } from '@/types/types'
-import { en } from '@/translations/en'
 
 jest.mock('next/image', () => {
   const NextImage = ({ src, alt }: { src: string; alt: string }) =>

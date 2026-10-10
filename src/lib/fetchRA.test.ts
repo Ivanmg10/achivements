@@ -1,6 +1,6 @@
 global.fetch = jest.fn()
 
-import { fetchRA } from './fetchRA'
+import { fetchRA, MAX_RETRY_AFTER } from './fetchRA'
 
 beforeEach(() => {
   ;(fetch as jest.Mock).mockReset()
@@ -16,6 +16,25 @@ test('returns parsed JSON on a successful response', async () => {
 test('does not retry a 4xx response — throws immediately with the status', async () => {
   ;(fetch as jest.Mock).mockResolvedValue({ ok: false, status: 404 })
   await expect(fetchRA('https://retroachievements.org/API/x.php')).rejects.toMatchObject({ status: 404 })
+  expect(fetch).toHaveBeenCalledTimes(1)
+})
+
+test('waits for Retry-After on a 429, then succeeds', async () => {
+  ;(fetch as jest.Mock)
+    .mockResolvedValueOnce({ ok: false, status: 429, headers: { get: () => '0' } })
+    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: 4 }) })
+
+  expect(await fetchRA('https://retroachievements.org/API/x.php')).toEqual({ id: 4 })
+  expect(fetch).toHaveBeenCalledTimes(2)
+})
+
+test('a 429 asking for longer than MAX_RETRY_AFTER throws at once', async () => {
+  ;(fetch as jest.Mock).mockResolvedValue({
+    ok: false,
+    status: 429,
+    headers: { get: () => String(MAX_RETRY_AFTER / 1000 + 1) },
+  })
+  await expect(fetchRA('https://retroachievements.org/API/x.php')).rejects.toMatchObject({ status: 429 })
   expect(fetch).toHaveBeenCalledTimes(1)
 })
 

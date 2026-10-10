@@ -3,6 +3,7 @@ import { useSession } from 'next-auth/react'
 import type { SteamProfile } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 /** The linked Steam profile (persona, avatar, level, what they are playing right now). */
 export function useSteamProfile() {
@@ -16,8 +17,6 @@ export function useSteamProfile() {
   const hasFetched = useRef<string | null>(null)
 
   const load = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
     try {
       const res = await fetch(withSubject('/api/steam/profile', subject))
       if (!res.ok) throw new Error(`Failed to load Steam profile (${res.status})`)
@@ -30,11 +29,16 @@ export function useSteamProfile() {
     }
   }, [subject])
 
+  // A new account (or none) starts over; state, so while rendering. The load is the effect.
+  useWhenChanged([steamid], () => {
+    if (!steamid) setProfile(null)
+    setError(null)
+    setIsLoading(Boolean(steamid))
+  })
+
   useEffect(() => {
     if (!steamid) {
       hasFetched.current = null
-      setProfile(null)
-      setError(null)
       return
     }
     if (hasFetched.current === steamid) return
@@ -42,5 +46,11 @@ export function useSteamProfile() {
     load()
   }, [steamid, load])
 
-  return { profile, isLoading, error, retry: load }
+  const retry = useCallback(() => {
+    setIsLoading(true)
+    setError(null)
+    load()
+  }, [load])
+
+  return { profile, isLoading, error, retry }
 }

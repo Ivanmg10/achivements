@@ -3,6 +3,7 @@ import { useSession } from 'next-auth/react'
 import type { SteamAchievementUnified } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 /**
  * Which of a Steam game's achievements the user has pinned, and a toggle —
@@ -17,11 +18,17 @@ export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
   const [pinned, setPinned] = useState<Set<string>>(new Set())
   const [error, setError] = useState<string | null>(null)
 
+  // Another game (or signing in) starts over; state, so while rendering. The load is the effect.
+  useWhenChanged([appId, status], () => {
+    if (status === 'authenticated') {
+      setPinned(new Set())
+      setError(null)
+    }
+  })
+
   useEffect(() => {
     if (status !== 'authenticated') return
     let current = true
-    setPinned(new Set())
-    setError(null)
     fetch(`/api/favorites?source=steam&gameId=${appId}`)
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to load pinned achievements (${res.status})`)

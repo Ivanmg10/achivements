@@ -47,7 +47,7 @@ test('returns the recent unlocks in the requested language, cached per player an
   const [key, ttl, , options] = (withSteamCache as jest.Mock).mock.calls[0]
   expect(key).toBe('steamRecentAch:765:spanish')
   expect(ttl).toBe(5 * 60 * 1000)
-  expect(options).toEqual({ userId: '7' })
+  expect(options).toEqual({ userId: '7', refreshable: true })
 })
 
 test('defaults to English and is never browser-cached', async () => {

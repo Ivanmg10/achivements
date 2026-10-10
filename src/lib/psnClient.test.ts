@@ -51,6 +51,7 @@ import {
   PsnError,
   withPlayData,
 } from './psnClient'
+import { psnGameFixture } from '@/test-utils/psnFixtures'
 
 const mock = (fn: unknown) => fn as jest.Mock
 
@@ -127,6 +128,7 @@ test('sums up level, trophies, games and the largest avatar', async () => {
   })
   expect(withSteamCache).toHaveBeenCalledWith('psn:summary:v3:42', expect.any(Number), expect.any(Function), {
     userId: '7',
+    refreshable: true,
   })
 })
 
@@ -252,6 +254,49 @@ test('the latest trophies look at the last few games with something earned, howe
   expect(latest.map((t) => t.titleId)).toEqual(['NPWR00001_00'])
 })
 
+describe('when Sony says too many requests', () => {
+  const tooMany = { error: { code: 1, message: 'Too many requests' } }
+  const waitOut = () => jest.advanceTimersByTimeAsync(2_000)
+
+  beforeEach(() => jest.useFakeTimers())
+  afterEach(() => jest.useRealTimers())
+
+  test('it waits and asks once more, and the second answer is used', async () => {
+    // Anything after the refusal falls through to the suite's default answer.
+    mock(psn.getUserTitles).mockResolvedValueOnce(tooMany as never)
+    const pending = psnSummary('42', '7')
+    await waitOut()
+    await expect(pending).resolves.toMatchObject({ onlineId: 'Hakoom' })
+    expect(mock(psn.getUserTitles)).toHaveBeenCalledTimes(2)
+  })
+
+  test('a second refusal is thrown, and psnFailure answers 429 with a Retry-After', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    mock(psn.getUserTitles).mockResolvedValue(tooMany as never)
+    const pending = psnSummary('42', '7').catch((e) => e)
+    await waitOut()
+    const err = await pending
+    expect(err).toBeInstanceOf(PsnError)
+    expect(err.isRateLimited).toBe(true)
+    const res = psnFailure(err, 'test')
+    expect(res.status).toBe(429)
+    expect(res.headers.get('Retry-After')).toBe('60')
+    ;(console.error as jest.Mock).mockRestore()
+  })
+
+  test('a hidden profile is not retried', async () => {
+    mock(psn.getUserTrophyProfileSummary).mockResolvedValue({ error: { code: 2240526, message: 'Not permitted by access control' } } as never)
+    await expect(psnSummary('42', '7')).rejects.toMatchObject({ isPrivate: true })
+    expect(mock(psn.getUserTrophyProfileSummary)).toHaveBeenCalledTimes(1)
+  })
+
+  test('only the wording of a rate limit counts as one', () => {
+    expect(new PsnError('Too many requests').isRateLimited).toBe(true)
+    expect(new PsnError('Rate limit exceeded').isRateLimited).toBe(true)
+    expect(new PsnError('Internal').isRateLimited).toBe(false)
+  })
+})
+
 test('psnFailure: 403 for a hidden profile, 502 otherwise', () => {
   jest.spyOn(console, 'error').mockImplementation(() => {})
   expect(psnFailure(new PsnError('x', 2240526), 'test').status).toBe(403)
@@ -325,17 +370,17 @@ test('a hidden played-games list leaves the trophies as they are', async () => {
 })
 
 test('a collection puts its time on each of its trophy lists; two versions of one game add up', () => {
-  const base = {
-    _source: 'psn' as const, service: 'trophy' as const, title: '', imageIcon: '', consoleName: 'PS4', maxPossible: 1, numAwarded: 0,
+  const base = psnGameFixture({
+    service: 'trophy', title: '', imageIcon: '', consoleName: 'PS4', maxPossible: 1, numAwarded: 0,
     pctWon: 0, lastPlayed: null, earned: { bronze: 0, silver: 0, gold: 0, platinum: 0 }, defined: { bronze: 1, silver: 0, gold: 0, platinum: 0 },
     lastTrophyAt: null, playtimeMinutes: null, playedAs: [], playCount: null, coverUrl: null, heroUrl: null,
-  }
+  })
   const games = withPlayData(
     [{ ...base, id: 1, titleId: 'NPWR00000_01' }, { ...base, id: 2, titleId: 'NPWR00000_02' }, { ...base, id: 3, titleId: 'NPWR00000_03' }],
     [
-      { titleId: 'COLL', lastPlayed: '2026-01-01T00:00:00Z', playtimeMinutes: 100, playCount: 1, coverUrl: null, heroUrl: null },
-      { titleId: 'PS4V', lastPlayed: '2026-01-01T00:00:00Z', playtimeMinutes: 30, playCount: 1, coverUrl: null, heroUrl: null },
-      { titleId: 'PS5V', lastPlayed: '2026-02-01T00:00:00Z', playtimeMinutes: 20, playCount: 2, coverUrl: 'c', heroUrl: null },
+      { titleId: 'COLL', lastPlayed: '2026-01-01T00:00:00Z', playtimeMinutes: 100, playCount: 1, coverUrl: null, heroUrl: null, conceptId: null },
+      { titleId: 'PS4V', lastPlayed: '2026-01-01T00:00:00Z', playtimeMinutes: 30, playCount: 1, coverUrl: null, heroUrl: null, conceptId: null },
+      { titleId: 'PS5V', lastPlayed: '2026-02-01T00:00:00Z', playtimeMinutes: 20, playCount: 2, coverUrl: 'c', heroUrl: null, conceptId: null },
     ],
     new Map([['COLL', ['NPWR00000_01', 'NPWR00000_02']], ['PS4V', ['NPWR00000_03']], ['PS5V', ['NPWR00000_03']]]),
   )

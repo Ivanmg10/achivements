@@ -1,4 +1,5 @@
 import pool from '@/lib/db'
+import { MIN_REFRESH_AGE_MS, wantsFresh } from '@/lib/wantsFresh'
 
 /**
  * DB-backed cache for Steam Web API responses.
@@ -38,11 +39,15 @@ export const TTL = {
 /** Dedupes concurrent misses within one process before they reach Steam. */
 const inFlight = new Map<string, Promise<unknown>>()
 
-export async function readCache<T>(key: string): Promise<T | null> {
+/** `maxAgeMs` turns an entry older than that into a miss — what the refresh button asks for. */
+export async function readCache<T>(key: string, maxAgeMs?: number): Promise<T | null> {
   try {
     const result = await pool.query(
-      'SELECT cache_data FROM steam_cache WHERE cache_key = $1 AND expires_at > NOW()',
-      [key],
+      maxAgeMs === undefined
+        ? 'SELECT cache_data FROM steam_cache WHERE cache_key = $1 AND expires_at > NOW()'
+        : `SELECT cache_data FROM steam_cache WHERE cache_key = $1 AND expires_at > NOW()
+             AND created_at > NOW() - ($2 || ' milliseconds')::interval`,
+      maxAgeMs === undefined ? [key] : [key, String(maxAgeMs)],
     )
     return result.rows[0] ? (result.rows[0].cache_data as T) : null
   } catch (err) {
@@ -85,7 +90,8 @@ export async function writeCache(
        ON CONFLICT (cache_key) DO UPDATE
          SET cache_data = EXCLUDED.cache_data,
              expires_at = EXCLUDED.expires_at,
-             user_id    = EXCLUDED.user_id`,
+             user_id    = EXCLUDED.user_id,
+             created_at = NOW()`,
       [key, userId, JSON.stringify(data), String(ttlMs)],
     )
   } catch (err) {
@@ -96,15 +102,18 @@ export async function writeCache(
 /**
  * Returns the cached value, or fetches, stores and returns a fresh one.
  * `shouldCache` rejects error-shaped payloads (a private profile, say) so they
- * are not stored for an hour.
+ * are not stored for an hour. `refreshable` lets the refresh button replace an
+ * entry older than MIN_REFRESH_AGE_MS: only for cheap, top-level keys, never
+ * the per-game ones a whole library is built from.
  */
 export async function withSteamCache<T>(
   key: string,
   ttlMs: number,
   fetcher: () => Promise<T>,
-  options: { userId?: string | null; shouldCache?: (data: T) => boolean } = {},
+  options: { userId?: string | null; shouldCache?: (data: T) => boolean; refreshable?: boolean } = {},
 ): Promise<T> {
-  const hit = await readCache<T>(key)
+  const maxAge = options.refreshable && (await wantsFresh()) ? MIN_REFRESH_AGE_MS : undefined
+  const hit = await readCache<T>(key, maxAge)
   if (hit !== null) return hit
 
   const existing = inFlight.get(key)

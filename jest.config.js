@@ -30,12 +30,12 @@ module.exports = {
     "!src/**/*.test.{ts,tsx}",
     "!src/**/*.d.ts",
     "!src/types/**",
+    "!src/test-utils/**",
     "!src/**/*.css",
   ],
-  // ponytail: repo-wide coverage never actually reached 100% (most components sit at 0%,
-  // pre-existing, unrelated to this branch). Threshold set as a floor at current real
-  // coverage so it fails on regression, not on inherited debt. Raise it as real tests land.
+  // A floor, not a goal: a little under what the suite really reaches (93 / 86 / 89 / 95 on
+  // 2026-10-09), so it fails on a real regression and not on noise. Raise it as tests land.
   coverageThreshold: {
-    global: { statements: 56, branches: 53, functions: 53, lines: 58 },
+    global: { statements: 90, branches: 83, functions: 86, lines: 92 },
   },
 };

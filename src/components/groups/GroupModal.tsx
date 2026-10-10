@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useId, useState } from 'react'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import Image from 'next/image'
 import { IconX } from '@tabler/icons-react'
@@ -8,6 +8,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { GameGroup, GameGroupItem } from '@/types/types'
 import type { GameCandidate } from '@/utils/gameCandidates'
 import GroupModalGamePicker from '@/components/groups/group-modal-game-picker/GroupModalGamePicker'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -39,6 +40,9 @@ function isImageUrl(s: string) {
 
 export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
   const { T } = useLanguage()
+  const titleId = useId()
+  const descriptionId = useId()
+  const iconId = useId()
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -50,7 +54,8 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
 
   const isEditing = !!group
 
-  useEffect(() => {
+  // Opening (or switching to another group) fills the form; state, so while rendering.
+  useWhenChanged([isOpen, group], () => {
     if (isOpen) {
       setTitle(group?.title ?? '')
       setDescription(group?.description ?? '')
@@ -59,7 +64,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
       setError('')
       setSelectedGames([])
     }
-  }, [isOpen, group])
+  })
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -112,8 +117,9 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 px-5 pb-5 overflow-y-auto">
               {/* Title */}
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] uppercase tracking-widest text-text-secondary">{T.groups.groupTitle}</label>
+                <label htmlFor={titleId} className="text-[10px] uppercase tracking-widest text-text-secondary">{T.groups.groupTitle}</label>
                 <input
+                  id={titleId}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={T.groups.groupTitlePlaceholder}
@@ -125,8 +131,9 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
 
               {/* Description */}
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] uppercase tracking-widest text-text-secondary">{T.groups.description}</label>
+                <label htmlFor={descriptionId} className="text-[10px] uppercase tracking-widest text-text-secondary">{T.groups.description}</label>
                 <input
+                  id={descriptionId}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={T.groups.descriptionPlaceholder}
@@ -137,7 +144,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
 
               {/* Icon */}
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] uppercase tracking-widest text-text-secondary">{T.groups.icon}</label>
+                <label htmlFor={iconId} className="text-[10px] uppercase tracking-widest text-text-secondary">{T.groups.icon}</label>
                 <div className="flex items-center gap-2">
                   <div className="w-9 h-9 rounded-lg bg-bg-main flex items-center justify-center shrink-0 overflow-hidden">
                     {icon ? (
@@ -151,6 +158,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                     )}
                   </div>
                   <input
+                    id={iconId}
                     value={icon}
                     onChange={(e) => setIcon(e.target.value)}
                     placeholder={T.groups.iconPlaceholder}
@@ -165,6 +173,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                 <button
                   type="button"
                   role="switch"
+                  aria-label={T.groups.isPublic}
                   aria-checked={isPublic}
                   onClick={() => setIsPublic((p) => !p)}
                   className={`w-10 h-5 rounded-full transition-colors relative focus:outline-none focus:ring-2 focus:ring-accent/70 ${isPublic ? 'bg-accent' : 'bg-ink/10'}`}

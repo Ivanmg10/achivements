@@ -3,6 +3,7 @@ import CollectionNumbers from './CollectionNumbers'
 import { en } from '@/translations/en'
 import type { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
+import { psnGameFixture } from '@/test-utils/psnFixtures'
 
 jest.mock('@/components/main-page/main-page-charts/closest-to-complete/ClosestToComplete', () => ({
   __esModule: true,
@@ -39,8 +40,8 @@ test('a platform with nothing to say is left out', () => {
 })
 
 test('PSN gets its own block when linked, and its started games join the closest to 100%', () => {
-  const psn = (id: number, pctWon: number) => ({
-    _source: 'psn' as const, id, titleId: 'NPWR00001_00', service: 'trophy2' as const, title: `PS ${id}`, imageIcon: '',
+  const psn = (id: number, pctWon: number) => psnGameFixture({
+    id, titleId: 'NPWR00001_00', service: 'trophy2', title: `PS ${id}`, imageIcon: '',
     consoleName: 'PS5', maxPossible: 10, numAwarded: 1, pctWon, lastPlayed: null,
     earned: { bronze: 1, silver: 0, gold: 0, platinum: 0 }, defined: { bronze: 9, silver: 0, gold: 0, platinum: 1 },
   })

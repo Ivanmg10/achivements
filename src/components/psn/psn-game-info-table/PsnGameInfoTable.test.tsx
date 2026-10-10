@@ -7,7 +7,7 @@ import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy } from '@/types/psn'
 
 const trophy = (overrides: Partial<PsnTrophy>): PsnTrophy => ({
-  id: 0, name: 'Name', detail: 'Detail', iconUrl: 'https://i.png', type: 'bronze',
+  id: 0, name: 'Name', detail: 'Detail', iconUrl: 'https://i.png', type: 'bronze', groupId: 'default',
   hidden: false, earned: false, earnedAt: null, rarity: null, ...overrides,
 })
 
@@ -38,7 +38,7 @@ const names = () =>
     .map((h) => h.textContent)
 
 test('every trophy in game order, hidden ones kept secret', () => {
-  render(<PsnGameInfoTable trophies={TROPHIES} />)
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
   expect(names()).toEqual(['Platinum one', 'Common', 'Locked', en.psn.hiddenTrophy])
   expect(screen.queryByText('The ending')).not.toBeInTheDocument()
   expect(screen.getAllByText(en.psn.locked).length).toBeGreaterThan(0)
@@ -48,7 +48,7 @@ const filter = (name: string) => within(screen.getByRole('group')).getByRole('bu
 const column = (name: string) => within(screen.getByRole('table')).getByRole('button', { name })
 
 test('filters earned and unearned', () => {
-  render(<PsnGameInfoTable trophies={TROPHIES} />)
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
   fireEvent.click(filter(en.gameInfoTable.filterEarned))
   expect(names()).toEqual(['Platinum one', 'Common'])
   fireEvent.click(filter(en.gameInfoTable.filterUnearned))
@@ -56,7 +56,7 @@ test('filters earned and unearned', () => {
 })
 
 test('sorts by rarity and by when earned, newest first, locked last', () => {
-  render(<PsnGameInfoTable trophies={TROPHIES} />)
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
   fireEvent.click(column(en.gameInfoTable.headerRarity))
   expect(names()).toEqual(['Platinum one', 'Locked', 'Common', en.psn.hiddenTrophy])
   fireEvent.click(column(en.gameInfoTable.headerEarned))
@@ -64,7 +64,7 @@ test('sorts by rarity and by when earned, newest first, locked last', () => {
 })
 
 test('each row carries the anchor its links point at', () => {
-  const { container } = render(<PsnGameInfoTable trophies={TROPHIES} />)
+  const { container } = render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
   expect(container.querySelector('#trophy-2')).toHaveTextContent('Locked')
 })
 

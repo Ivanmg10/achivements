@@ -31,7 +31,7 @@ const pending = (loading: boolean, value: number | null | undefined) =>
  */
 export default function UserPlatforms() {
   const { data: session, update } = useSession()
-  const { T, lang } = useLanguage()
+  const { T } = useLanguage()
   const { all, inProgress } = useGamesData()
   const { rank, isLoading: rankLoading } = useUserRank()
   const { awards, isLoading: awardsLoading } = useUserAwards()

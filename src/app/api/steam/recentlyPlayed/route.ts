@@ -45,7 +45,7 @@ export async function GET(req?: Request) {
         // The initial feed: counts for every recent game (≤20 calls, shared with the library cache).
         return (await enrichWithAchievementCounts(mapped, auth.session, COUNT)).games
       },
-      { userId: id },
+      { userId: id, refreshable: true },
     )
 
     // Not browser-cached — see ownedGames; the DB cache keeps it cheap.

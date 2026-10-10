@@ -3,6 +3,7 @@ import MainPageProfileStLinked from './MainPageProfileStLinked'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { en } from '@/translations/en'
+import { SubjectContext } from '@/context/SubjectContext'
 import type { SteamProfile } from '@/types/steam'
 
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
@@ -164,4 +165,31 @@ test('announces an error with the privacy hint and a retry', () => {
 test('treats a missing profile with no error as an error, not a blank card', () => {
   renderIt({ profile: null })
   expect(screen.getByRole('alert')).toBeInTheDocument()
+})
+
+describe('the refresh button', () => {
+  const refreshName = en.profileRa.refreshData
+
+  test('on the own page it refetches the profile, the recent unlocks and the library together', () => {
+    const recentRetry = jest.fn()
+    const refetch = jest.fn()
+    const onRetry = jest.fn()
+    setup({ refetch })
+    ;(useSteamRecentAchievements as jest.Mock).mockReturnValue({ achievements: [], isLoading: false, error: null, retry: recentRetry })
+    renderIt({ onRetry })
+    fireEvent.click(screen.getByRole('button', { name: refreshName }))
+    expect(onRetry).toHaveBeenCalledTimes(1)
+    expect(recentRetry).toHaveBeenCalledTimes(1)
+    expect(refetch).toHaveBeenCalledTimes(1)
+  })
+
+  test('on someone else page there is nothing of the viewer to refresh', () => {
+    render(
+      <SubjectContext.Provider value="someone">
+        <MainPageProfileStLinked profile={PROFILE} isLoading={false} error={null} onRetry={retry} />
+      </SubjectContext.Provider>,
+    )
+    expect(screen.queryByRole('button', { name: refreshName })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: en.steam.viewOnSteam })).toBeInTheDocument()
+  })
 })

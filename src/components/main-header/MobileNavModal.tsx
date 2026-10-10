@@ -14,6 +14,7 @@ import {
   IconChevronDown,
 } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 interface MobileNavModalProps {
   isOpen: boolean
@@ -61,9 +62,10 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
     return () => window.removeEventListener('keydown', handler)
   }, [isOpen, onClose])
 
-  useEffect(() => {
+  // Closing folds the status list again; state, so while rendering.
+  useWhenChanged([isOpen], () => {
     if (!isOpen) setStatusOpen(false)
-  }, [isOpen])
+  })
 
   const handleNavigate = (href: string) => {
     if (!session) {

@@ -42,6 +42,7 @@ export async function GET(req?: Request) {
         return normalizeRaw(raw)
       },
       (d) => Array.isArray(d),
+      { refreshable: true },
     )
     return cachedJson(data, TTL)
   } catch {

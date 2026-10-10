@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import type { RetroAchievementsGameWithAchievements, SubsetGame } from '@/types/types'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 type State = {
   game: RetroAchievementsGameWithAchievements | null
@@ -31,13 +32,17 @@ export function useGameInfo(gameId: string | null) {
   const [state, setState] = useState<State>(EMPTY)
   const [attempt, setAttempt] = useState(0)
 
+  // Another game, or asking again, starts the page data over; state, so while rendering. The load is the effect.
+  useWhenChanged([gameId, status, attempt], () => {
+    if (status === 'authenticated' && gameId) setState(EMPTY)
+  })
+
   useEffect(() => {
     if (status !== 'authenticated' || !gameId) return
     let cancelled = false
     const set = (patch: Partial<State>) => {
       if (!cancelled) setState((s) => ({ ...s, ...patch }))
     }
-    setState(EMPTY)
 
     ;(async () => {
       let game: RetroAchievementsGameWithAchievements

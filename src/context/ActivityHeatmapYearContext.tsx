@@ -51,9 +51,7 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
   const doFetch = useCallback(() => {
     // Named, so a retry can call it again.
     const run = () => {
-      if (!rausername) { setRaLoading(false); return }
-      setRaLoading(true)
-      setRaError(false)
+      if (!rausername) return
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setRaError(true); setRaLoading(false) }
       }
@@ -70,8 +68,7 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
   }, [rausername, subject])
 
   useEffect(() => {
-    if (!rausername) { setRaLoading(false); return }
-    if (hasFetched.current) return
+    if (!rausername || hasFetched.current) return
     hasFetched.current = true
     doFetch()
   }, [rausername, doFetch])
@@ -94,6 +91,8 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
     clearTimeout(retryTimer.current)
     attemptRef.current = 0
     setRaAchievements([])
+    setRaLoading(true)
+    setRaError(false)
     doFetch()
     steam.retry()
     psn.retry()
@@ -101,7 +100,8 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
 
   // One platform failing is not the streak failing: it only counts as an error
   // when nothing came back at all, so a Steam or PSN outage does not hide RA's year.
-  const isLoading = raLoading || steam.isLoading || psn.isLoading
+  // Without an RA account there is nothing of RA's to wait for.
+  const isLoading = (Boolean(rausername) && raLoading) || steam.isLoading || psn.isLoading
   const error = (raError || Boolean(steam.error) || Boolean(psn.error)) && achievements.length === 0
 
   const value = useMemo(

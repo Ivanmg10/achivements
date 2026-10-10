@@ -610,6 +610,8 @@ export const it: Translations = {
     signIn: 'Accedi con RetroAchievements',
     playingNow: 'Sta giocando ora',
     viewOnRA: 'Vedi su RA',
+    refreshData: 'Aggiorna i dati',
+    refreshFailed: 'Impossibile aggiornare. Riprova.',
   },
   lineChart: {
     achievementsLast7Days: '{total} obiettivi negli ultimi 7 giorni',

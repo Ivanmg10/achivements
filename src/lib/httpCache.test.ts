@@ -15,3 +15,7 @@ test('never emits a negative max-age', () => {
   const res = cachedJson({}, -1000)
   expect(res.headers.get('Cache-Control')).toBe('private, max-age=0')
 })
+
+test('varies on the cookie, so the refresh button is not answered from the browser copy', () => {
+  expect(cachedJson({}, 1000).headers.get('Vary')).toBe('Cookie')
+})

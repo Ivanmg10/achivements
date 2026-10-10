@@ -1,7 +1,10 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
 import pool from '@/lib/db'
+import { wantsFresh } from '@/lib/wantsFresh'
 import { readCache, readCacheMany, writeCache, withSteamCache, clearUserCache, sweepExpired, TTL } from './steamCache'
+
+jest.mock('@/lib/wantsFresh', () => ({ MIN_REFRESH_AGE_MS: 60000, wantsFresh: jest.fn() }))
 
 const query = pool.query as jest.Mock
 
@@ -167,5 +170,41 @@ describe('readCacheMany', () => {
   test('degrades to all misses when the DB is down', async () => {
     query.mockRejectedValue(new Error('db down'))
     await expect(readCacheMany(['a'])).resolves.toEqual(new Map())
+  })
+})
+
+describe('refreshing', () => {
+  test('readCache with a max age also filters on when the row was written', async () => {
+    query.mockResolvedValue({ rows: [] })
+    await readCache('k', 60000)
+    expect(query.mock.calls[0][0]).toContain('created_at >')
+    expect(query.mock.calls[0][1]).toEqual(['k', '60000'])
+  })
+
+  test('readCache without one is the same query as ever', async () => {
+    query.mockResolvedValue({ rows: [] })
+    await readCache('k')
+    expect(query.mock.calls[0][0]).not.toContain('created_at')
+    expect(query.mock.calls[0][1]).toEqual(['k'])
+  })
+
+  test('a rewrite stamps the row as new, or it would look old forever', async () => {
+    query.mockResolvedValue({})
+    await writeCache('k', {}, 1)
+    expect(query.mock.calls[0][0]).toContain('created_at = NOW()')
+  })
+
+  test('a refreshable key asked to refresh only accepts a minute-old entry', async () => {
+    ;(wantsFresh as jest.Mock).mockResolvedValue(true)
+    query.mockResolvedValue({ rows: [] })
+    await withSteamCache('k', 1000, async () => 'x', { refreshable: true })
+    expect(query.mock.calls[0][1]).toEqual(['k', '60000'])
+  })
+
+  test('a key that is not refreshable ignores the signal', async () => {
+    ;(wantsFresh as jest.Mock).mockResolvedValue(true)
+    query.mockResolvedValue({ rows: [] })
+    await withSteamCache('k', 1000, async () => 'x')
+    expect(query.mock.calls[0][1]).toEqual(['k'])
   })
 })

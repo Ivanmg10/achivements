@@ -13,7 +13,7 @@ jest.mock('next/navigation', () => ({
 const replace = jest.fn()
 const update = jest.fn()
 
-function setup({ param = null, email = 'ivan@test.com', emailVerified = false } = {}) {
+function setup({ param = null as string | null, email = 'ivan@test.com', emailVerified = false } = {}) {
   ;(useSearchParams as jest.Mock).mockReturnValue({ get: () => param })
   ;(useSession as jest.Mock).mockReturnValue({ data: { user: { email, emailVerified } }, update })
   return renderHook(() => useEmailVerification())

@@ -48,6 +48,28 @@ Keep inline ONLY if: <15 lines + purely presentational + single file.
 **Any JSX block added in a session that qualifies MUST be extracted before the task is considered done.**
 When in doubt, extract. Prefer more files over bloated components.
 
+## State and effects
+
+`react-hooks/set-state-in-effect` is an **error**: an effect must not call
+setState in its body (nor through a function it calls before its first await).
+What to use instead:
+
+- **State that starts over when something changes** (a modal opening, a session
+  ending, another game): `useWhenChanged(deps, () => { setX(…) })`
+  (`src/hooks/useWhenChanged.ts`). It runs while rendering, the React-endorsed
+  alternative. Only setState of that component goes in it; timers, focus and
+  fetches stay in an effect.
+- **What the browser holds** (localStorage, sessionStorage): `useStorageValue`
+  (`undefined` on the server and while hydrating, so there is no mismatch).
+  `useStoredChoice`, `useCookieConsent` and the language sit on it.
+- **"Only in the browser"**: `useIsClient` (a portal into `document.body`, a
+  random hand), `useLocationHash` (the `#fragment`).
+- **A fetch**: the effect only starts it; the answer is applied in the `.then`.
+  Loading is derived (`answered !== wanted`) or reset in `useWhenChanged`, not
+  set at the start of the effect. A request function that returns its outcome
+  and a separate `settle` is what the compiler accepts for an `async` load.
+- A retry button is a handler, so it can set state before it asks again.
+
 ## Telling the user how an action went — toasts
 
 `notify.success(T.toast.x)` / `notify.error(T.toast.y)` from `src/lib/notify.ts`,
@@ -243,6 +265,24 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
 - The privacy policy (`/privacy`) says all of this; `/terms` says when an
   account may be suspended or deleted. Change the policy if the panel changes.
 
+## RetroAchievements (RA) — read before touching its calls
+
+- **The cache already lives in Postgres.** `withCache` (`src/lib/raCache.ts`)
+  keeps memory as a first level and `steam_cache` as the second, under `ra:`
+  keys, so a cold start or another instance does not ask RA again. Skipped in
+  development, where memory is cleared on purpose. Bump a key's `_vN` when the
+  shape of what it returns changes.
+- **A 429 waits.** `fetchRA` honours `Retry-After` up to `MAX_RETRY_AFTER`
+  (5 s) and retries; a longer ask is thrown. Other 4xx are never retried.
+- **Whose key.** Never a shared app key (see the roadmap). On the user's own
+  page the call uses their `raid`; `requireViewerApiKey` never falls back to
+  another key. On someone else's page `dataOwner` (`src/lib/apiAuth.ts`) signs
+  with the **viewer's** key when they have one, and otherwise with the **page
+  owner's**, so a viewer with no RA account still sees it. That last case
+  spends one user's key on other people's visits; it is an open question for RA,
+  not something settled. `raid` stays server-only either way.
+- The user search (`/api/users/search`) only reads our database; it never calls RA.
+
 ## PlayStation (PSN) — read before touching it
 
 Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient.ts`.
@@ -275,8 +315,12 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   backdrop and release year come from IGDB (`src/lib/igdbClient.ts`, a Twitch
   app in `TWITCH_CLIENT_ID`/`TWITCH_CLIENT_SECRET`), matched by title and
   platform, cached half a year. Without the keys they keep the trophy icon.
-- Sony returns errors as bodies, not throws: every response goes through
-  `unwrap()`. `psnFailure()` maps them to 503 / 403 (private) / 502.
+- Sony returns errors as bodies, not throws: every call goes through
+  `psnCall()` (`unwrap()` plus one retry after 2 s when Sony says "too many
+  requests" — psn-api hides the HTTP status and `Retry-After`, so it goes by
+  the message). `psnFailure()` maps them to 503 / 403 (private) / 429 (rate
+  limited, with `Retry-After: 60`) / 502. The client reads a 429 as a plain
+  failure with a retry button.
 
 ## Registration
 
@@ -304,22 +348,18 @@ Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — a
       link or SteamID64 (`src/lib/steamAccount.ts`), no OpenID, and no
       "already linked elsewhere" check (`migrations/028`), so one person can
       have several CheevoVault accounts. The profile has to be public.
-- [ ] RA by name too, through one app key (`RA_API_KEY`) instead of each
-      user's. **Not before** RA's cache moves to the DB (it is per-instance
-      memory now, so every cold start asks RA again) and a 429 waits for
-      `Retry-After`: every user's calls would come out of one key, and RA's
-      limit is unpublished. Ask in RA's Discord `#coders` before opening it up.
-      Until then the RA modal says why the key is asked for. Then one search
-      box that looks a name up on all three.
+- [ ] RA: wait for the API v2 with OAuth before changing how accounts are
+      linked ([RAWeb releases](https://github.com/RetroAchievements/RAWeb/releases)).
+      **RA's answer was clear: each user with their own key.** No shared app
+      key and no looking names up with one — `requireViewerApiKey` never falls
+      back to one, and its test says so. The RA modal explains why the key is
+      asked for. **Open:** a viewer with no RA account is served with the page
+      owner's key (see RetroAchievements above); ask RA whether that counts, and
+      if not, ask the viewer to link their own. Revisit when OAuth lands.
 - [ ] Later, optional: a "verified" badge per linked account — the app gives
       a code, the user puts it for a few minutes in their RA motto / Steam
       summary / PSN About me, the app reads it. Only if public profiles or
       group comparisons come to need proof of ownership.
 - [ ] 13 optimization fixes (cache stampede, Cache-Control headers, duplicate fetches, TTLs, error boundaries, lazy images)
-- [ ] After 1.0: clear the ~51 `react-hooks/set-state-in-effect` warnings
-      (a warning in `eslint.config.mjs`, not an error). None is a bug. Three
-      kinds: reading localStorage / the URL after mount (leave these: it is the
-      hydration-safe pattern), resetting a modal when it opens (move it to the
-      close handler or a `key`, and check the animation in the browser), and
-      data hooks/contexts resetting on a session change (one at a time, each
-      is its own loading state machine).
+- [x] The ~51 `react-hooks/set-state-in-effect` warnings are gone (2026-10-09)
+      and the rule is now an error. See State and effects above.

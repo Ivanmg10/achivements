@@ -29,9 +29,7 @@ export function useAllGamesGlobal(): AllGamesGlobal {
   const doFetch = useCallback(() => {
     // Named, so a retry can call it again.
     const run = () => {
-      if (status !== 'authenticated' || !rausername) { setWantLoading(false); return }
-      setWantLoading(true)
-      setError(false)
+      if (status !== 'authenticated' || !rausername) return
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setWantLoading(false) }
       }
@@ -48,9 +46,7 @@ export function useAllGamesGlobal(): AllGamesGlobal {
   }, [status, rausername])
 
   useEffect(() => {
-    if (status === 'loading') return
-    if (status === 'unauthenticated') { setWantLoading(false); return }
-    if (fetched.current) return
+    if (status === 'loading' || status === 'unauthenticated' || fetched.current) return
     fetched.current = true
     doFetch()
   }, [status, doFetch])
@@ -60,6 +56,8 @@ export function useAllGamesGlobal(): AllGamesGlobal {
   const refetch = useCallback(() => {
     clearTimeout(retryTimer.current)
     attemptRef.current = 0
+    setWantLoading(true)
+    setError(false)
     doFetch()
     if (completedError) refetchCompleted()
   }, [doFetch, completedError, refetchCompleted])
@@ -96,5 +94,8 @@ export function useAllGamesGlobal(): AllGamesGlobal {
     return Array.from(best.values())
   }, [allCompleted])
 
-  return { wantToPlay: filteredWantToPlay, playing, completed, loading: wantLoading || completedLoading, error: error || completedError, refetch }
+  // Signed out, or with no RA account, there is no want-to-play list to wait for.
+  const noWantList = status === 'unauthenticated' || (status === 'authenticated' && !rausername)
+
+  return { wantToPlay: filteredWantToPlay, playing, completed, loading: (wantLoading && !noWantList) || completedLoading, error: error || completedError, refetch }
 }

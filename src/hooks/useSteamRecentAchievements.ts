@@ -5,6 +5,7 @@ import { toSteamLanguage } from '@/utils/steamLanguage'
 import type { SteamRecentAchievement } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 const ENDPOINTS = {
   recent: 'recentAchievements',
@@ -32,41 +33,51 @@ export function useSteamRecentAchievements(scope: SteamUnlockScope | null = 'rec
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const load = useCallback(async (language: string, isCurrent: () => boolean = () => true) => {
-    setIsLoading(true)
-    setError(null)
+  /** Asks the server; what came back, not yet applied. */
+  const request = useCallback(async (language: string): Promise<{ achievements: SteamRecentAchievement[] } | { error: string }> => {
     try {
       const res = await fetch(withSubject(`/api/steam/${endpoint}?lang=${language}`, subject), { cache: 'no-store' })
       if (!res.ok) throw new Error(`Failed to load recent achievements (${res.status})`)
       const data = await res.json()
       if (!Array.isArray(data)) throw new Error('Unexpected recent achievements response')
-      if (isCurrent()) setAchievements(data as SteamRecentAchievement[])
+      return { achievements: data as SteamRecentAchievement[] }
     } catch (err) {
       console.error('[useSteamRecentAchievements]', err)
-      if (isCurrent()) setError(err instanceof Error ? err.message : 'Unknown error')
-    } finally {
-      if (isCurrent()) setIsLoading(false)
+      return { error: err instanceof Error ? err.message : 'Unknown error' }
     }
   }, [endpoint, subject])
 
-  useEffect(() => {
+  const settle = useCallback((outcome: { achievements: SteamRecentAchievement[] } | { error: string }) => {
+    if ('error' in outcome) setError(outcome.error)
+    else setAchievements(outcome.achievements)
+    setIsLoading(false)
+  }, [])
+
+  // A new account, language or scope starts over; state, so while rendering. The load is the effect.
+  useWhenChanged([steamid, steamLang, endpoint], () => {
     setAchievements([])
-    if (!steamid || !endpoint) {
-      setError(null)
-      setIsLoading(false)
-      return
-    }
+    setError(null)
+    setIsLoading(Boolean(steamid && endpoint))
+  })
+
+  useEffect(() => {
+    if (!steamid || !endpoint) return
     // A slower answer for a previous account or language must not land on top.
     let current = true
-    load(steamLang, () => current)
+    request(steamLang).then((outcome) => {
+      if (current) settle(outcome)
+    })
     return () => {
       current = false
     }
-  }, [steamid, steamLang, endpoint, load])
+  }, [steamid, steamLang, endpoint, request, settle])
 
   const retry = useCallback(() => {
-    if (steamid && endpoint) load(steamLang)
-  }, [steamid, steamLang, endpoint, load])
+    if (!steamid || !endpoint) return
+    setIsLoading(true)
+    setError(null)
+    request(steamLang).then(settle)
+  }, [steamid, steamLang, endpoint, request, settle])
 
   return { achievements, isLoading, error, retry }
 }

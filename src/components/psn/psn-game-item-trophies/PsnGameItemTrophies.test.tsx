@@ -14,20 +14,20 @@ const set = (overrides: Record<string, unknown>) =>
 
 test('shows the grid once loaded', () => {
   set({ trophies: [{ id: 0 }, { id: 1 }] })
-  render(<PsnGameItemTrophies gameId={100} titleId="NPWR00001_00" />)
+  render(<PsnGameItemTrophies gameTitle="Game" gameId={100} titleId="NPWR00001_00" />)
   expect(usePsnTrophies).toHaveBeenCalledWith('NPWR00001_00')
   expect(screen.getByTestId('grid')).toHaveTextContent('2')
 })
 
 test('a skeleton the size of the set while loading', () => {
   set({ isLoading: true })
-  const { container } = render(<PsnGameItemTrophies gameId={100} titleId="NPWR00001_00" expectedCount={5} />)
+  const { container } = render(<PsnGameItemTrophies gameTitle="Game" gameId={100} titleId="NPWR00001_00" expectedCount={5} />)
   expect(container.querySelectorAll('li')).toHaveLength(5)
 })
 
 test('an error says why and retries', () => {
   set({ error: 'private' })
-  render(<PsnGameItemTrophies gameId={100} titleId="NPWR00001_00" />)
+  render(<PsnGameItemTrophies gameTitle="Game" gameId={100} titleId="NPWR00001_00" />)
   expect(screen.getByRole('alert')).toHaveTextContent(en.psn.trophiesError)
   expect(screen.getByText(en.psn.errors.private)).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: en.psn.retry }))
@@ -36,6 +36,6 @@ test('an error says why and retries', () => {
 
 test('says so when the game has none', () => {
   set({})
-  render(<PsnGameItemTrophies gameId={100} titleId="NPWR00001_00" />)
+  render(<PsnGameItemTrophies gameTitle="Game" gameId={100} titleId="NPWR00001_00" />)
   expect(screen.getByText(en.psn.noTrophies)).toBeInTheDocument()
 })

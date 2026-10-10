@@ -1,15 +1,18 @@
 const React = require('react')
 
+// One component per tag, kept: a new type on every access made React remount a modal's whole
+// content on each state change, which real framer-motion never does.
+const components = {}
 const motion = new Proxy(
   {},
   {
     get: (_, tag) =>
-      React.forwardRef(({ children, ...props }, ref) => {
+      (components[tag] ??= React.forwardRef(({ children, ...props }, ref) => {
         const filtered = Object.fromEntries(
           Object.entries(props).filter(([k]) => !['animate', 'initial', 'exit', 'variants', 'transition', 'whileHover', 'whileTap', 'layout', 'layoutId', 'whileInView', 'viewport'].includes(k))
         )
         return React.createElement(tag, { ...filtered, ref }, children)
-      }),
+      })),
   }
 )
 

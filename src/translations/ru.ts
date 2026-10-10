@@ -610,6 +610,8 @@ export const ru: Translations = {
     signIn: 'Войти через RetroAchievements',
     playingNow: 'Играет сейчас',
     viewOnRA: 'Смотреть на RA',
+    refreshData: 'Обновить данные',
+    refreshFailed: 'Не удалось обновить. Попробуйте снова.',
   },
   lineChart: {
     achievementsLast7Days: '{total} достижений за последние 7 дней',

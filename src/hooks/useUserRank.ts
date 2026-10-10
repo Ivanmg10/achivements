@@ -18,9 +18,7 @@ export function useUserRank() {
   const doFetch = useCallback(() => {
     // Named, so a retry can call it again.
     const run = () => {
-      if (!session?.user?.rausername) { setIsLoading(false); return }
-      setIsLoading(true)
-      setError(false)
+      if (!session?.user?.rausername) return
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
@@ -37,8 +35,7 @@ export function useUserRank() {
   }, [session?.user?.rausername, subject])
 
   useEffect(() => {
-    if (!session?.user?.rausername) { setIsLoading(false); return }
-    if (hasFetched.current) return
+    if (!session?.user?.rausername || hasFetched.current) return
     hasFetched.current = true
     doFetch()
   }, [session?.user?.rausername, doFetch])
@@ -49,8 +46,11 @@ export function useUserRank() {
     clearTimeout(retryTimer.current)
     attemptRef.current = 0
     setRank(null)
+    setIsLoading(true)
+    setError(false)
     doFetch()
   }, [doFetch])
 
-  return { rank, isLoading, error, refetch }
+  // Nobody to load for is not loading, whatever the last request left behind.
+  return { rank, isLoading: Boolean(session?.user?.rausername) && isLoading, error, refetch }
 }

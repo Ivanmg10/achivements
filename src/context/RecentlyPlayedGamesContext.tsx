@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { RecentlyPlayedGame } from '@/types/types'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { withSubject } from '@/utils/withSubject'
 
 type CtxType = {
@@ -32,8 +33,6 @@ export function RecentlyPlayedGamesProvider({ children }: { children: React.Reac
     // Named, so a retry can call it again.
     const run = () => {
       if (status !== 'authenticated' || !rausername) return
-      setIsLoading(true)
-      setError(false)
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
@@ -49,19 +48,33 @@ export function RecentlyPlayedGamesProvider({ children }: { children: React.Reac
     run()
   }, [status, rausername, subject])
 
+  const signedOut = status === 'unauthenticated' || (status === 'authenticated' && !rausername)
+  const canFetch = status === 'authenticated' && Boolean(rausername)
+
+  // Starting over is state, so it happens while rendering; the refs and the fetch stay in the effect.
+  // Keyed on signedOut alone: session.update() makes status flip to 'loading' and back, and that
+  // must not start a load the effect (it fetches once per sign-in) will never answer.
+  useWhenChanged([signedOut], () => {
+    if (signedOut) {
+      setGames([])
+      setIsLoading(false)
+    } else {
+      setIsLoading(true)
+      setError(false)
+    }
+  })
+
   useEffect(() => {
-    if (status === 'unauthenticated' || (status === 'authenticated' && !rausername)) {
+    if (signedOut) {
       hasFetched.current = false
       clearTimeout(retryTimer.current)
       attemptRef.current = 0
-      setGames([])
-      setIsLoading(false)
       return
     }
-    if (status !== 'authenticated' || !rausername || hasFetched.current) return
+    if (!canFetch || hasFetched.current) return
     hasFetched.current = true
     doFetch()
-  }, [status, rausername, doFetch])
+  }, [signedOut, canFetch, doFetch])
 
   useEffect(() => () => clearTimeout(retryTimer.current), [])
 
@@ -69,6 +82,8 @@ export function RecentlyPlayedGamesProvider({ children }: { children: React.Reac
     clearTimeout(retryTimer.current)
     attemptRef.current = 0
     setGames([])
+    setIsLoading(true)
+    setError(false)
     doFetch()
   }, [doFetch])
 

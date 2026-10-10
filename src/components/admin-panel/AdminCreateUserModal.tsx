@@ -6,6 +6,7 @@ import CommonModal from '../common-modal/CommonModal'
 import type { AdminUser } from '@/types/user'
 import { adminFetch } from '@/utils/adminFetch'
 import { notify } from '@/lib/notify'
+import { PASSWORD_MIN } from '@/utils/authValidation'
 
 interface Props {
   isOpen: boolean
@@ -22,7 +23,7 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const canSubmit = username.trim().length >= 3 && password.length >= 6 && !loading
+  const canSubmit = username.trim().length >= 3 && password.length >= PASSWORD_MIN && !loading
 
   const handleClose = () => {
     setUsername(''); setEmail(''); setPassword('')
@@ -77,8 +78,8 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
               {showPass ? <IconEyeOff size={16} aria-hidden="true" /> : <IconEye size={16} aria-hidden="true" />}
             </button>
           </div>
-          {password.length > 0 && password.length < 6 && (
-            <span className="text-xs text-text-secondary">Minimum 6 characters</span>
+          {password.length > 0 && password.length < PASSWORD_MIN && (
+            <span className="text-xs text-text-secondary">Minimum {PASSWORD_MIN} characters</span>
           )}
         </div>
         <div className="flex items-center gap-3">

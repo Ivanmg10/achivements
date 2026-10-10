@@ -72,7 +72,7 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
       />
 
       {error && (
-        <p className="text-sm text-danger bg-danger/10 rounded-xl px-4 py-2 mb-3">{error}</p>
+        <p role="alert" className="text-sm text-danger bg-danger/10 rounded-xl px-4 py-2 mb-3">{error}</p>
       )}
 
       <div className="grid grid-cols-3 gap-2 overflow-y-auto max-h-80">

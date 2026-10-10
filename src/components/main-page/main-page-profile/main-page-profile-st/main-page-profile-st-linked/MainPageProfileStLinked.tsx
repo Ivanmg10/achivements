@@ -1,12 +1,13 @@
 'use client'
 
 import Image from 'next/image'
-import { IconExternalLink } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
+import { useSubject } from '@/context/SubjectContext'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { codeToFlag, findCountry } from '@/utils/countries'
+import MainPageProfileActions from '../../main-page-profile-actions/MainPageProfileActions'
 import MainPageProfileStStats from '../main-page-profile-st-stats/MainPageProfileStStats'
 import MainPageProfileStGame from '../main-page-profile-st-game/MainPageProfileStGame'
 import MainPageProfileStAchievements from '../main-page-profile-st-achievements/MainPageProfileStAchievements'
@@ -33,8 +34,9 @@ export default function MainPageProfileStLinked({
   onRetry: () => void
 }) {
   const { T } = useLanguage()
-  const { library, libraryLoading, recent } = useSteamGamesData()
+  const { library, libraryLoading, recent, refetch } = useSteamGamesData()
   const recentAchievements = useSteamRecentAchievements()
+  const subject = useSubject()
 
   if (isLoading) {
     return <MainPageProfileSkeleton label={T.cards.loading} />
@@ -57,6 +59,15 @@ export default function MainPageProfileStLinked({
     )
   }
 
+  // Someone else's page has nothing of the viewer's to refresh.
+  const refresh = subject
+    ? undefined
+    : () => {
+        onRetry()
+        recentAchievements.retry()
+        refetch()
+      }
+
   // The game running right now if Steam says so, otherwise the last one played.
   const runningId = profile.gameid ? Number(profile.gameid) : null
   const running = runningId !== null ? [...recent, ...library].find((g) => g.id === runningId) : undefined
@@ -74,18 +85,15 @@ export default function MainPageProfileStLinked({
     // Fills the column like the RA card, so switching tabs does not resize it.
     <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
       {profile.profileurl && (
-        <a
+        <MainPageProfileActions
           href={profile.profileurl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[#66c0f4]"
-        >
-          <IconExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
-          {T.steam.viewOnSteam}
-        </a>
+          linkLabel={T.steam.viewOnSteam}
+          ringClass="focus:ring-[#66c0f4]"
+          onRefresh={refresh}
+        />
       )}
 
-      <div className="flex gap-3 items-center pr-28">
+      <div className={`flex gap-3 items-center ${refresh ? 'pr-40' : 'pr-28'}`}>
         {profile.avatarfull ? (
           <Image
             src={profile.avatarfull}

@@ -7,9 +7,9 @@ import {
 } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
-import { IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
+import MainPageProfileActions from '../main-page-profile-actions/MainPageProfileActions'
 import MainPageProfileRaAchievements from './main-page-profile-ra-achievements/MainPageProfileRaAchievements'
 import MainPageProfileRaGame from './main-page-profile-ra-game/MainPageProfileRaGame'
 import MainPageProfileRaStats from './main-page-profile-ra-stats/MainPageProfileRaStats'
@@ -21,12 +21,15 @@ export default function MainPageProfileRa({
   gameLoading,
   recentAchievements,
   achievementsLoading,
+  onRefresh,
 }: {
   user: RetroAchievementsUserProfile | null | undefined
   game: RetroAchievementsGameWithAchievements | null | undefined
   gameLoading?: boolean
   recentAchievements: RecentAchievement[]
   achievementsLoading?: boolean
+  /** Only on the signed-in user's own page. */
+  onRefresh?: () => void | Promise<void>
 }) {
   const { T } = useLanguage()
 
@@ -49,18 +52,14 @@ export default function MainPageProfileRa({
     <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
       {user?.User ? (
         <>
-          <a
+          <MainPageProfileActions
             href={`https://retroachievements.org/user/${user.User}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-accent/70"
-            aria-label={T.profileRa.viewOnRA}
-          >
-            <IconExternalLink className="w-3.5 h-3.5" />
-            {T.profileRa.viewOnRA}
-          </a>
+            linkLabel={T.profileRa.viewOnRA}
+            ringClass="focus:ring-accent/70"
+            onRefresh={onRefresh}
+          />
 
-          <div className="flex gap-3 items-center pr-24">
+          <div className={`flex gap-3 items-center ${onRefresh ? 'pr-36' : 'pr-24'}`}>
             {user?.UserPic && (
               <Image
                 src={`https://retroachievements.org${user.UserPic}`}

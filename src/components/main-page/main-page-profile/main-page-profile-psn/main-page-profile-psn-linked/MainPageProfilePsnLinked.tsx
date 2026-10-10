@@ -1,13 +1,14 @@
 'use client'
 
 import Image from 'next/image'
-import { IconExternalLink } from '@tabler/icons-react'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
+import { useSubject } from '@/context/SubjectContext'
 import { usePsnRecentTrophies } from '@/hooks/usePsnRecentTrophies'
 import type { PsnError } from '@/hooks/usePsnLink'
 import type { PsnSummary } from '@/lib/psnClient'
+import MainPageProfileActions from '../../main-page-profile-actions/MainPageProfileActions'
 import MainPageProfilePsnStats from '../main-page-profile-psn-stats/MainPageProfilePsnStats'
 import MainPageProfilePsnGame from '../main-page-profile-psn-game/MainPageProfilePsnGame'
 import MainPageProfilePsnTrophies from '../main-page-profile-psn-trophies/MainPageProfilePsnTrophies'
@@ -36,8 +37,9 @@ export default function MainPageProfilePsnLinked({
   onRetry: () => void
 }) {
   const { T } = useLanguage()
-  const { library, libraryLoading } = usePsnGamesData()
+  const { library, libraryLoading, refetch } = usePsnGamesData()
   const latest = usePsnRecentTrophies('recent')
+  const subject = useSubject()
 
   if (isLoading) {
     return <MainPageProfileSkeleton label={T.cards.loading} />
@@ -57,22 +59,28 @@ export default function MainPageProfilePsnLinked({
     )
   }
 
+  // Someone else's page has nothing of the viewer's to refresh.
+  const refresh = subject
+    ? undefined
+    : () => {
+        onRetry()
+        latest.retry()
+        refetch()
+      }
+
   const ring = TIER_RING[Math.min(Math.floor((summary.tier - 1) / 3), 3)]
 
   return (
     // Fills the column like the other cards, so switching tabs does not resize it.
     <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
-      <a
+      <MainPageProfileActions
         href={`https://profile.playstation.com/${encodeURIComponent(summary.onlineId)}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[#0070d1]"
-      >
-        <IconExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
-        {T.psn.viewOnPsn}
-      </a>
+        linkLabel={T.psn.viewOnPsn}
+        ringClass="focus:ring-[#0070d1]"
+        onRefresh={refresh}
+      />
 
-      <div className="flex gap-3 items-center pr-28">
+      <div className={`flex gap-3 items-center ${refresh ? 'pr-40' : 'pr-28'}`}>
         {summary.avatarUrl ? (
           <Image
             src={summary.avatarUrl}

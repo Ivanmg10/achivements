@@ -46,6 +46,8 @@ import type { PsnGameProgress, PsnRecentTrophy, PsnTrophy, PsnTrophyGroup, Troph
 
 /** Sony's code for "this profile hides its trophies". */
 const PRIVATE_CODE = 2240526
+/** How long a rate-limited call waits before its one retry. Sony sends no Retry-After that psn-api lets through. */
+const RATE_LIMIT_WAIT_MS = 2_000
 const MARGIN_MS = 60_000
 const SUMMARY_TTL_MS = 15 * 60 * 1000
 const TITLES_TTL_MS = 15 * 60 * 1000
@@ -96,6 +98,10 @@ export class PsnError extends Error {
   get isPrivate() {
     return this.code === PRIVATE_CODE || /access control|privacy/i.test(this.message)
   }
+  /** Sony's "too many requests". psn-api hides the HTTP status, so the message is all there is to go on. */
+  get isRateLimited() {
+    return /too many requests|rate limit/i.test(this.message)
+  }
 }
 
 // The tokens in use on this instance. The database keeps them too
@@ -124,6 +130,21 @@ function unwrap<T>(res: T): T {
   const error = (res as { error?: { message?: string; code?: number } } | null)?.error
   if (error) throw new PsnError(error.message ?? 'PSN error', error.code)
   return res
+}
+
+/**
+ * One Sony call, unwrapped. When Sony says "too many requests" it waits a
+ * moment and asks once more; a second refusal is thrown (psnFailure answers
+ * 429). Any other error is thrown at once: retrying a hidden profile helps no one.
+ */
+export async function psnCall<T>(call: () => Promise<T>): Promise<T> {
+  try {
+    return unwrap(await call())
+  } catch (err) {
+    if (!(err instanceof PsnError && err.isRateLimited)) throw err
+    await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_WAIT_MS))
+    return unwrap(await call())
+  }
 }
 
 function toTokens(res: AuthTokensResponse): PsnTokens {
@@ -202,7 +223,7 @@ function https(url: string): string {
 
 /** The account with exactly this online ID (any case), or null. */
 export async function findPsnAccount(username: string): Promise<{ accountId: string; onlineId: string } | null> {
-  const res = unwrap(await makeUniversalSearch(await authorization(), username, 'SocialAllAccounts'))
+  const res = await psnCall(async () => makeUniversalSearch(await authorization(), username, 'SocialAllAccounts'))
   const wanted = username.toLowerCase()
   const match = res.domainResponses?.[0]?.results?.find((r) => r.socialMetadata.onlineId.toLowerCase() === wanted)
   return match ? { accountId: match.socialMetadata.accountId, onlineId: match.socialMetadata.onlineId } : null
@@ -236,9 +257,9 @@ export async function psnSummary(accountId: string, userId: string | null = null
     async () => {
       const auth = await authorization()
       const [summary, titles, profile] = await Promise.all([
-        getUserTrophyProfileSummary(auth, accountId).then(unwrap),
-        getUserTitles(auth, accountId, { limit: 1 }).then(unwrap),
-        getProfileFromAccountId(auth, accountId).then(unwrap),
+        psnCall(() => getUserTrophyProfileSummary(auth, accountId)),
+        psnCall(() => getUserTitles(auth, accountId, { limit: 1 })),
+        psnCall(() => getProfileFromAccountId(auth, accountId)),
       ])
       return {
         onlineId: profile.onlineId,
@@ -252,7 +273,7 @@ export async function psnSummary(accountId: string, userId: string | null = null
         games: titles.totalItemCount ?? 0,
       }
     },
-    { userId },
+    { userId, refreshable: true },
   )
 }
 
@@ -354,7 +375,7 @@ async function trophySetsOf(accountId: string, titleIds: string[], userId: strin
   const batches: string[][] = []
   for (let i = 0; i < missing.length; i += LOOKUP_BATCH) batches.push(missing.slice(i, i + LOOKUP_BATCH))
   const answers = await mapLimit(batches, PARALLEL, async (batch) => {
-    const res = unwrap(await getUserTrophiesForSpecificTitle(auth, accountId, { npTitleIds: batch.join(',') }))
+    const res = await psnCall(() => getUserTrophiesForSpecificTitle(auth, accountId, { npTitleIds: batch.join(',') }))
     const answered = new Map((res.titles ?? []).map((t) => [t.npTitleId, (t.trophyTitles ?? []).map((tt) => tt.npCommunicationId)]))
     for (const id of batch) {
       const sets = answered.get(id) ?? []
@@ -418,8 +439,8 @@ export async function psnGameGroups(
     async () => {
       const auth = await authorization()
       const [defined, earned] = await Promise.all([
-        getTitleTrophyGroups(auth, game.titleId, { npServiceName: game.service, headerOverrides: { 'Accept-Language': language } }).then(unwrap),
-        getUserTrophyGroupEarningsForTitle(auth, accountId, game.titleId, { npServiceName: game.service }).then(unwrap),
+        psnCall(() => getTitleTrophyGroups(auth, game.titleId, { npServiceName: game.service, headerOverrides: { 'Accept-Language': language } })),
+        psnCall(() => getUserTrophyGroupEarningsForTitle(auth, accountId, game.titleId, { npServiceName: game.service })),
       ])
       const earnedById = new Map((earned.trophyGroups ?? []).map((g) => [g.trophyGroupId, g]))
       const none: TrophyCounts = { bronze: 0, silver: 0, gold: 0, platinum: 0 }
@@ -482,7 +503,7 @@ export async function psnTitles(accountId: string, userId: string | null = null)
       const auth = await authorization()
       const games: PsnGameProgress[] = []
       for (let offset = 0; ; offset += TITLES_PAGE) {
-        const page = unwrap(await getUserTitles(auth, accountId, { limit: TITLES_PAGE, offset }))
+        const page = await psnCall(() => getUserTitles(auth, accountId, { limit: TITLES_PAGE, offset }))
         const titles = page.trophyTitles ?? []
         for (const t of titles) {
           const game = toPsnGameProgress(t)
@@ -501,7 +522,7 @@ export async function psnTitles(accountId: string, userId: string | null = null)
       }
       return withIgdbArt(await withBaseGameProgress(accountId, list, userId))
     },
-    { userId },
+    { userId, refreshable: true },
   )
 }
 
@@ -544,8 +565,8 @@ export async function psnGameTrophies(
       const auth = await authorization()
       const options = { npServiceName: game.service }
       const [defined, earned] = await Promise.all([
-        getTitleTrophies(auth, game.titleId, 'all', { ...options, headerOverrides: { 'Accept-Language': language } }).then(unwrap),
-        getUserTrophiesEarnedForTitle(auth, accountId, game.titleId, 'all', options).then(unwrap),
+        psnCall(() => getTitleTrophies(auth, game.titleId, 'all', { ...options, headerOverrides: { 'Accept-Language': language } })),
+        psnCall(() => getUserTrophiesEarnedForTitle(auth, accountId, game.titleId, 'all', options)),
       ])
       const earnedById = new Map((earned.trophies ?? []).map((t) => [t.trophyId, t]))
       return (defined.trophies ?? []).map((t): PsnTrophy => {
@@ -675,13 +696,17 @@ export async function psnReleaseYear(conceptId: number): Promise<number | null> 
   )
 }
 
-/** The response for a PSN call that threw: 503 with no sign-in set up, 403 for a hidden profile, 502 for anything else. */
+/** The response for a PSN call that threw: 503 with no sign-in set up, 403 for a hidden profile, 429 when Sony is rate-limiting us, 502 for anything else. */
 export function psnFailure(err: unknown, where: string): NextResponse {
   if (err instanceof PsnError && err.notConfigured) {
     return NextResponse.json({ error: 'not-configured' }, { status: 503 })
   }
   if (err instanceof PsnError && err.isPrivate) {
     return NextResponse.json({ error: 'private' }, { status: 403 })
+  }
+  if (err instanceof PsnError && err.isRateLimited) {
+    // The client reads any unknown code as a plain failure with a retry button.
+    return NextResponse.json({ error: 'rate-limited' }, { status: 429, headers: { 'Retry-After': '60' } })
   }
   console.error(`[${where}]`, err)
   return NextResponse.json({ error: 'failed' }, { status: 502 })

@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievement } from '@/types/types'
 import { PinAchievementModal } from '@/components/pin-achievement-modal/PinAchievementModal'
 import { notify } from '@/lib/notify'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 type PinnedRow = { achievement_id: number; snapshot: RetroAchievement }
 
@@ -27,8 +28,7 @@ export function GamePinnedAchievements({
   const [hasError, setHasError] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
 
-  const load = useCallback(() => {
-    setIsLoading(true)
+  const fetchPinned = useCallback(() => {
     fetch(`/api/favorites?gameId=${gameId}`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to load pinned achievements')
@@ -42,9 +42,18 @@ export function GamePinnedAchievements({
       .finally(() => setIsLoading(false))
   }, [gameId])
 
+  // Another game starts the load over; state, so while rendering.
+  useWhenChanged([gameId], () => setIsLoading(true))
+
   useEffect(() => {
-    load()
-  }, [load])
+    fetchPinned()
+  }, [fetchPinned])
+
+  /** Asks again, after something was pinned. */
+  const load = () => {
+    setIsLoading(true)
+    fetchPinned()
+  }
 
   async function handleUnpin(achievementId: number) {
     const prev = pinned

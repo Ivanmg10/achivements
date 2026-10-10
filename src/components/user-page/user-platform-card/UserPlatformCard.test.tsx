@@ -12,7 +12,7 @@ test('connected: the account, its numbers and the disconnect button', () => {
     <UserPlatformCard
       name="Steam"
       logo={null}
-      accent="bg-blue-500"
+      gradient="bg-blue-500"
       connected
       identity={<p>ivanxmarine</p>}
       stats={STATS}
@@ -33,7 +33,7 @@ test('disconnected: says so, and shows no numbers', () => {
     <UserPlatformCard
       name="Steam"
       logo={null}
-      accent=""
+      gradient=""
       connected={false}
       identity={<p>Connect Steam to…</p>}
       action={<button>Connect</button>}
@@ -46,7 +46,7 @@ test('disconnected: says so, and shows no numbers', () => {
 
 test('shows a link status message', () => {
   render(
-    <UserPlatformCard name="Steam" logo={null} accent="" connected={false} status={<p role="alert">failed</p>} />,
+    <UserPlatformCard name="Steam" logo={null} gradient="" connected={false} status={<p role="alert">failed</p>} />,
   )
   expect(screen.getByRole('alert')).toHaveTextContent('failed')
 })

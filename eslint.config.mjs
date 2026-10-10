@@ -7,11 +7,10 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     rules: {
-      // New with eslint-config-next 16 (React Compiler rules). Its ~50 hits are
-      // working patterns — reading localStorage after mount, resetting a modal
-      // when it opens — to move off effects one by one; a warning keeps them
-      // visible without blocking the build.
-      "react-hooks/set-state-in-effect": "warn",
+      // React Compiler rule (eslint-config-next 16). Nothing trips it any more: state
+      // that starts over goes through useWhenChanged, what the browser holds through
+      // useStorageValue / useIsClient / useLocationHash. See CLAUDE.md, State and effects.
+      "react-hooks/set-state-in-effect": "error",
       // next.config sets images.unoptimized (avatars are links to any https
       // host), so next/image would render the same <img> with nothing gained.
       "@next/next/no-img-element": "off",
@@ -21,6 +20,16 @@ const eslintConfig = defineConfig([
     // Test doubles are components too, but nobody reads their display names.
     files: ["**/*.test.ts", "**/*.test.tsx"],
     rules: { "react/display-name": "off" },
+  },
+  {
+    // Jest module mocks are CommonJS on purpose (jest.mock loads them with require),
+    // and their stand-ins ignore the props they are handed.
+    files: ["__mocks__/**/*.js"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "react/display-name": "off",
+    },
   },
   globalIgnores([
     "node_modules/**",

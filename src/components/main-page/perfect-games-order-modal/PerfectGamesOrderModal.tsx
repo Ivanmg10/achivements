@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   DndContext,
   closestCenter,
@@ -21,6 +21,7 @@ import { applyPerfectOrder, type PerfectGame } from '@/utils/perfectGames'
 import CommonModal from '@/components/common-modal/CommonModal'
 import PerfectGameOrderRow from './perfect-game-order-row/PerfectGameOrderRow'
 import { notify } from '@/lib/notify'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 export default function PerfectGamesOrderModal({
   isOpen,
@@ -38,9 +39,10 @@ export default function PerfectGamesOrderModal({
   const { T } = useLanguage()
   const [localList, setLocalList] = useState<PerfectGame[]>([])
 
-  useEffect(() => {
+  // Opening (or a new list while open) starts the drag list from the saved order; state, so while rendering.
+  useWhenChanged([isOpen, games, order], () => {
     if (isOpen) setLocalList(applyPerfectOrder(games, order))
-  }, [isOpen, games, order])
+  })
 
   const sensors = useSensors(
     useSensor(PointerSensor),
