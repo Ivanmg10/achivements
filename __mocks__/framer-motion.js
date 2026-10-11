@@ -17,6 +17,7 @@ const motion = new Proxy(
 )
 
 const AnimatePresence = ({ children }) => children
+const LayoutGroup = ({ children }) => children
 const useAnimation = () => ({ start: jest.fn(), stop: jest.fn() })
 const useInView = () => true
 const useMotionValue = (v) => ({ get: () => v, set: jest.fn() })
@@ -25,4 +26,4 @@ const useSpring = (v) => v ?? { get: () => 0, set: jest.fn() }
 const useReducedMotion = () => false
 const animate = () => ({ stop: () => {} })
 
-module.exports = { motion, animate, AnimatePresence, useAnimation, useInView, useMotionValue, useTransform, useReducedMotion, useSpring }
+module.exports = { motion, animate, AnimatePresence, LayoutGroup, useAnimation, useInView, useMotionValue, useTransform, useReducedMotion, useSpring }

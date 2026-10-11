@@ -7,7 +7,7 @@ import { groupByDays, heatLevel, HEAT_LEVELS } from '@/utils/utils'
 import { IconRefresh } from '@tabler/icons-react'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import { useLanguage } from '@/context/LanguageContext'
-import { useHeatmapGrid, HEATMAP_GAP as GAP } from '@/hooks/useHeatmapGrid'
+import { useHeatmapGrid, HEATMAP_GAP as GAP, HEATMAP_MAX_DAYS } from '@/hooks/useHeatmapGrid'
 
 /** Empty, then the theme's accent at rising strength: one hue per theme, so every theme reads the same way. */
 const LEVEL_BG = [
@@ -30,10 +30,16 @@ export default function MainPageHeatmap({
   achievements,
   isLoading,
   onRefresh,
+  until,
+  title,
 }: {
   achievements: RecentAchievement[]
   isLoading?: boolean
   onRefresh?: () => void
+  /** The last day the grid shows, when it is not today: a game last played months ago ends where it did. */
+  until?: Date
+  /** Heading in place of "Activity", with no "last N days" after it. */
+  title?: string
 }) {
   const { T, lang } = useLanguage()
   const tooltipRef = useRef<HTMLDivElement>(null)
@@ -42,13 +48,16 @@ export default function MainPageHeatmap({
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
 
   // How many days fit is a question about the card, not about the data.
-  const { weeks, cell, days } = useHeatmapGrid(boxRef, MONTH_ROW + LEGEND_ROW + 2 * ROW_GAP)
-  const label = T.cards.activityLastDays.replace('{n}', String(days))
+  const grid = useHeatmapGrid(boxRef, MONTH_ROW + LEGEND_ROW + 2 * ROW_GAP)
+  const { weeks, cell } = grid
+  // The last column is the week the grid ends in: the days that fit depend on which weekday that is.
+  const days = until ? Math.min(HEATMAP_MAX_DAYS, weeks * 7 - (6 - until.getDay())) : grid.days
+  const label = title ?? T.cards.activityLastDays.replace('{n}', String(days))
 
   const { totalAch, activeDays, best, columns, monthLabels } = useMemo(() => {
     if (!weeks) return { totalAch: 0, activeDays: 0, best: 0, columns: [], monthLabels: [] }
 
-    const data = groupByDays(achievements, days)
+    const data = groupByDays(achievements, days, until)
     const totalAch = data.reduce((s, d) => s + d.count, 0)
     const activeDays = data.filter((d) => d.count > 0).length
     const best = Math.max(0, ...data.map((d) => d.count))
@@ -82,7 +91,7 @@ export default function MainPageHeatmap({
     )
 
     return { totalAch, activeDays, best, columns, monthLabels }
-  }, [achievements, weeks, days])
+  }, [achievements, weeks, days, until])
 
   const gridStyle = {
     display: 'grid',
@@ -122,12 +131,12 @@ export default function MainPageHeatmap({
     <div
       className="flex flex-col w-full flex-1 min-h-0"
       role="img"
-      aria-label={`${T.cards.activityLabel} — ${label}: ${totalAch} ${T.lineChart.achievements}`}
+      aria-label={`${title ?? `${T.cards.activityLabel} — ${label}`}: ${totalAch} ${T.lineChart.achievements}`}
     >
       {/* header */}
       <div className="flex items-center justify-between flex-wrap gap-1 shrink-0 mb-2">
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">
-          {T.cards.activityLabel} — {label}
+          {title ?? `${T.cards.activityLabel} — ${label}`}
         </p>
         <div className="flex items-center gap-3">
           {!isLoading && activeDays > 0 && (

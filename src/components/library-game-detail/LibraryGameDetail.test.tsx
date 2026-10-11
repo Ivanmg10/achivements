@@ -70,8 +70,10 @@ test('while loading it shows placeholders, and neither the grid nor computed fig
   expect(container.querySelectorAll('[aria-busy="true"]').length).toBeGreaterThan(0)
   expect(screen.getByTestId('chart')).toHaveTextContent('true')
   expect(screen.queryByTestId('grid')).not.toBeInTheDocument()
-  expect(screen.getByText('Playtime')).toBeInTheDocument()
+  // The figures and the panels under them are blocks of their height, so nothing below jumps when they arrive.
+  expect(screen.queryByText('Playtime')).not.toBeInTheDocument()
   expect(screen.queryByText(en.gameExpanded.remaining)).not.toBeInTheDocument()
+  expect(container.querySelectorAll('.h-72').length).toBe(2)
 })
 
 test('on error it shows what the platform gives, keeps the ring and drops the rest', () => {

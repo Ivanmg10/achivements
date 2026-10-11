@@ -8,6 +8,8 @@ import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import LibraryGameDetail, { type LibraryCategory } from '@/components/library-game-detail/LibraryGameDetail'
 import { fromRa } from '@/utils/gameInsights'
+import { parseReleaseYear } from '@/utils/utils'
+import type { InfoRow } from '@/components/library-game-detail/library-detail-info/LibraryDetailInfo'
 
 // About three rows at two columns on a wide screen; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
@@ -55,6 +57,19 @@ export default function RaLibraryDetail({
   const total = items.length > 0 ? items.length : known.total
   const earned = items.length > 0 ? items.filter((a) => a.earned).length : known.earned
 
+  // Who made it and when, as RA knows it; what it does not say is left out.
+  const L = T.libraryDetail
+  const year = parseReleaseYear(data?.Released)
+  const info: InfoRow[] = data
+    ? [
+        { label: L.console, value: data.ConsoleName ?? '' },
+        { label: L.developer, value: data.Developer ?? '' },
+        { label: L.publisher, value: data.Publisher ?? '' },
+        { label: L.genre, value: data.Genre ?? '' },
+        { label: L.released, value: year ? String(year) : '' },
+      ].filter((r) => r.value)
+    : []
+
   return (
     <LibraryGameDetail
       category={asCategory(category)}
@@ -62,6 +77,8 @@ export default function RaLibraryDetail({
       state={loading ? 'loading' : error && !data ? 'error' : 'ready'}
       errorNode={<SectionFallback error onRefresh={onRetry}>{null}</SectionFallback>}
       ring={{ earned, total, label: T.gameExpanded.allAchievements }}
+      game={{ source: 'ra', id: Number(gameId), title: game.Title, iconUrl: game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : undefined }}
+      info={info}
       facts={data ? [{ label: T.libraryDetail.players, value: (data.NumDistinctPlayers ?? 0).toLocaleString(lang) }] : []}
       empty={T.statusGameItem.noPublishedAchievements}
       grid={

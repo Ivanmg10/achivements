@@ -6,12 +6,17 @@ import { useLanguage } from '@/context/LanguageContext'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
 import {
-  beatenProgress, finishedAt, missablesLeft, nextTargets, paceEstimate, rarestEarned, type InsightAchievement,
+  beatenProgress, finishedAt, hardest, milestones, missablesLeft, nextTargets, paceEstimate, rarestEarned, recentEarned,
+  type InsightAchievement, type InsightGame,
 } from '@/utils/gameInsights'
 import { unlockSpan } from '@/utils/utils'
 import LibraryDetailList from './library-detail-list/LibraryDetailList'
 import LibraryDetailDifficulty from './library-detail-difficulty/LibraryDetailDifficulty'
 import LibraryDetailFacts, { type DetailFact } from './library-detail-facts/LibraryDetailFacts'
+import LibraryDetailCalendar from './library-detail-calendar/LibraryDetailCalendar'
+import LibraryDetailMilestones from './library-detail-milestones/LibraryDetailMilestones'
+import LibraryDetailInfo, { type InfoRow } from './library-detail-info/LibraryDetailInfo'
+import LibraryDetailSkeleton from '@/components/library-detail-skeleton/LibraryDetailSkeleton'
 
 export type LibraryCategory = 'wantToPlay' | 'playing' | 'completed'
 
@@ -46,6 +51,8 @@ export default function LibraryGameDetail({
   ring,
   ringExtra,
   facts = [],
+  game,
+  info = [],
   grid,
   empty,
 }: {
@@ -59,6 +66,10 @@ export default function LibraryGameDetail({
   ringExtra?: ReactNode
   /** The platform's own figures, shown before the computed ones. */
   facts?: DetailFact[]
+  /** Which game this is: what the calendar of its unlocks links back to. */
+  game?: InsightGame
+  /** What is known of the game itself (who made it, when), shown for one not yet played. */
+  info?: InfoRow[]
   grid: ReactNode
   /** Said in place of the grid when the game has no achievements. */
   empty: string
@@ -122,55 +133,102 @@ export default function LibraryGameDetail({
       <LibraryDetailList title={L.startWith} items={nextTargets(items)} empty={L.noTargets} isLoading={loading} />
     )
 
-  return (
-    <motion.div
-      variants={CONTAINER}
-      initial={reduce ? false : 'hidden'}
-      animate="show"
-      className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem] gap-3 w-full"
-    >
-      <motion.div variants={PANEL_IN} className={`${PANEL} p-4 lg:p-6 flex flex-col items-center justify-center gap-3`}>
-        <CircularProgress earned={ring.earned} total={ring.total} label={ring.label} size={130} />
-        {ringExtra}
-      </motion.div>
+  const steps = useMemo(() => milestones(items), [items])
+  const ago = (a: InsightAchievement) => (a.earnedAt ? <span>{new Date(a.earnedAt).toLocaleDateString(lang)}</span> : null)
 
-      {state === 'error' ? (
-        <motion.div variants={PANEL_IN} className={`${PANEL} lg:col-span-2`}>{errorNode}</motion.div>
-      ) : (
-        <>
+  // Under the figures, the part that is each list's own: what a game in progress, a finished one and
+  // a pending one each have to say, so no list's detail ends with empty space beside the next.
+  const more =
+    loading || state === 'error' ? null : category === 'playing' ? (
+      <>
+        {game && (
+          <motion.div variants={PANEL_IN} className={`${PANEL} @3xl:col-span-2`}>
+            <LibraryDetailCalendar items={items} game={game} />
+          </motion.div>
+        )}
+        <motion.div variants={PANEL_IN} className={PANEL}>
+          <LibraryDetailList title={L.recentTitle} items={recentEarned(items)} empty={L.noneEarned} meta={ago} />
+        </motion.div>
+      </>
+    ) : category === 'completed' ? (
+      <>
+        {game && (
+          <motion.div variants={PANEL_IN} className={`${PANEL} @3xl:col-span-2`}>
+            <LibraryDetailCalendar items={items} game={game} />
+          </motion.div>
+        )}
+        <motion.div variants={PANEL_IN} className={PANEL}>
+          <LibraryDetailMilestones steps={steps} />
+        </motion.div>
+      </>
+    ) : (
+      <>
+        <motion.div variants={PANEL_IN} className={`${PANEL} ${info.length > 0 ? '@3xl:col-span-2' : '@3xl:col-span-3'}`}>
+          <LibraryDetailList title={L.hardestTitle} items={hardest(items, 6)} empty={L.noTargets} columns={2} />
+        </motion.div>
+        {info.length > 0 && (
           <motion.div variants={PANEL_IN} className={PANEL}>
-            {category === 'wantToPlay' ? (
-              <LibraryDetailDifficulty items={items} isLoading={loading} />
+            <LibraryDetailInfo rows={info} />
+          </motion.div>
+        )}
+      </>
+    )
+
+  return (
+    <div className="@container w-full">
+      <motion.div
+        variants={CONTAINER}
+        initial={reduce ? false : 'hidden'}
+        animate="show"
+        className="grid grid-cols-1 @3xl:grid-cols-[190px_1.3fr_1fr] @3xl:grid-rows-[20rem] gap-3 w-full"
+      >
+        <motion.div variants={PANEL_IN} className={`${PANEL} p-4 @3xl:p-6 flex flex-col items-center justify-center gap-3`}>
+          <CircularProgress earned={ring.earned} total={ring.total} label={ring.label} size={130} />
+          {ringExtra}
+        </motion.div>
+
+        {state === 'error' ? (
+          <motion.div variants={PANEL_IN} className={`${PANEL} @3xl:col-span-2`}>{errorNode}</motion.div>
+        ) : (
+          <>
+            <motion.div variants={PANEL_IN} className={PANEL}>
+              {category === 'wantToPlay' ? (
+                <LibraryDetailDifficulty items={items} isLoading={loading} />
+              ) : (
+                <GameAchievementsProgressChart achievements={unlocks} isLoading={loading} />
+              )}
+            </motion.div>
+            <motion.div variants={PANEL_IN} className={PANEL}>{side}</motion.div>
+          </>
+        )}
+
+        {loading && <LibraryDetailSkeleton />}
+
+        {!loading && allFacts.length > 0 && (
+          <motion.div variants={PANEL_IN} className="@3xl:col-span-3">
+            <LibraryDetailFacts facts={allFacts} />
+          </motion.div>
+        )}
+
+        {more}
+
+        {state !== 'error' && (
+          <motion.div variants={PANEL_IN} className={`${PANEL} @3xl:col-span-3`}>
+            <p className="text-xs text-text-secondary mb-2">{ring.label}</p>
+            {loading ? (
+              <ul aria-busy="true" className="flex flex-wrap gap-1">
+                {Array.from({ length: Math.min(ring.total || SKELETON_BADGES, 60) }).map((_, i) => (
+                  <li key={i} className="w-10 h-10 rounded-lg bg-ink/10 animate-pulse" />
+                ))}
+              </ul>
+            ) : items.length === 0 ? (
+              <p className="text-center text-text-secondary text-sm py-2">{empty}</p>
             ) : (
-              <GameAchievementsProgressChart achievements={unlocks} isLoading={loading} />
+              grid
             )}
           </motion.div>
-          <motion.div variants={PANEL_IN} className={PANEL}>{side}</motion.div>
-        </>
-      )}
-
-      {allFacts.length > 0 && (
-        <motion.div variants={PANEL_IN} className="lg:col-span-3">
-          <LibraryDetailFacts facts={allFacts} />
-        </motion.div>
-      )}
-
-      {state !== 'error' && (
-        <motion.div variants={PANEL_IN} className={`${PANEL} lg:col-span-3`}>
-          <p className="text-xs text-text-secondary mb-2">{ring.label}</p>
-          {loading ? (
-            <ul aria-busy="true" className="flex flex-wrap gap-1">
-              {Array.from({ length: Math.min(ring.total || SKELETON_BADGES, 60) }).map((_, i) => (
-                <li key={i} className="w-10 h-10 rounded-lg bg-ink/10 animate-pulse" />
-              ))}
-            </ul>
-          ) : items.length === 0 ? (
-            <p className="text-center text-text-secondary text-sm py-2">{empty}</p>
-          ) : (
-            grid
-          )}
-        </motion.div>
-      )}
-    </motion.div>
+        )}
+      </motion.div>
+    </div>
   )
 }

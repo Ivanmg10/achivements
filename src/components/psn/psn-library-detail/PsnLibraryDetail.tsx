@@ -33,6 +33,8 @@ export default function PsnLibraryDetail({ game, category }: { game: PsnGameProg
   return (
     <LibraryGameDetail
       category={asCategory(category)}
+      game={{ source: 'psn', id: game.id, title: game.title, iconUrl: game.imageIcon || undefined }}
+      info={game.consoleName ? [{ label: T.libraryDetail.console, value: game.consoleName }] : []}
       items={items}
       state={isLoading ? 'loading' : error ? 'error' : 'ready'}
       errorNode={

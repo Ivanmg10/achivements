@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatRarity } from '@/utils/steamFeed'
 import type { InsightAchievement } from '@/utils/gameInsights'
@@ -18,12 +19,18 @@ export default function LibraryDetailList({
   items,
   empty,
   isLoading = false,
+  meta,
+  columns = 1,
 }: {
   title: string
   items: InsightAchievement[]
   /** Said when there is nothing to list. */
   empty: string
   isLoading?: boolean
+  /** What goes at the end of each row, in place of its rarity and points: a date, say. */
+  meta?: (a: InsightAchievement) => ReactNode
+  /** Two columns where there is room, for a list that has the width to itself. */
+  columns?: 1 | 2
 }) {
   const { T } = useLanguage()
 
@@ -40,7 +47,7 @@ export default function LibraryDetailList({
       ) : items.length === 0 ? (
         <p className="flex-1 flex items-center justify-center text-center text-sm text-text-secondary px-4 py-6">{empty}</p>
       ) : (
-        <ol className="flex flex-col gap-1.5">
+        <ol className={columns === 2 ? 'grid grid-cols-1 @xl:grid-cols-2 gap-x-4 gap-y-1.5' : 'flex flex-col gap-1.5'}>
           {items.map((a) => (
             <li key={a.id}>
               <Link
@@ -58,8 +65,14 @@ export default function LibraryDetailList({
                   <span className="text-xs text-text-secondary truncate">{a.description}</span>
                 </span>
                 <span className="flex flex-col items-end shrink-0 text-[11px] tabular-nums text-text-secondary">
-                  {a.rarity !== null && <span>{T.libraryDetail.rarityOf.replace('{n}', formatRarity(a.rarity))}</span>}
-                  {a.points !== null && <span className="text-text-main font-medium">{a.points} {T.libraryDetail.pointsShort}</span>}
+                  {meta ? (
+                    meta(a)
+                  ) : (
+                    <>
+                      {a.rarity !== null && <span>{T.libraryDetail.rarityOf.replace('{n}', formatRarity(a.rarity))}</span>}
+                      {a.points !== null && <span className="text-text-main font-medium">{a.points} {T.libraryDetail.pointsShort}</span>}
+                    </>
+                  )}
                 </span>
               </Link>
             </li>

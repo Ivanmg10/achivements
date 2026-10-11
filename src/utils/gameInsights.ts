@@ -1,9 +1,9 @@
-import type { RetroAchievement } from '@/types/types'
-import type { SteamAchievementUnified } from '@/types/steam'
+import type { RecentAchievement, RetroAchievement } from '@/types/types'
+import type { GameSource, SteamAchievementUnified } from '@/types/steam'
 import type { PsnTrophy } from '@/types/psn'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
-import { gameHref } from '@/utils/gameRef'
+import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
 
 /** An achievement or trophy of any platform, reduced to what a library card tells. */
 export type InsightAchievement = {
@@ -135,4 +135,74 @@ export function finishedAt(items: InsightAchievement[]): string | null {
   if (items.length === 0 || items.some((a) => !a.earned)) return null
   const times = items.map((a) => (a.earnedAt ? Date.parse(a.earnedAt) : NaN)).filter((t) => !Number.isNaN(t))
   return times.length ? new Date(Math.max(...times)).toISOString() : null
+}
+
+/** What was earned last, newest first. */
+export const recentEarned = (items: InsightAchievement[], n = 5) =>
+  items
+    .filter((a) => a.earned && a.earnedAt && !Number.isNaN(Date.parse(a.earnedAt)))
+    .sort((a, b) => Date.parse(b.earnedAt!) - Date.parse(a.earnedAt!))
+    .slice(0, n)
+
+/** The rarest of all, earned or not: what the game asks of whoever wants it complete. */
+export const hardest = (items: InsightAchievement[], n = 4) =>
+  items.filter((a) => a.rarity !== null).sort((a, b) => a.rarity! - b.rarity! || byTitle(a, b)).slice(0, n)
+
+/** A step on the way to 100%: the first achievement, then each quarter. `at` is when it was reached, null if not yet. */
+export type Milestone = { pct: number; at: string | null; left: number }
+
+export function milestones(items: InsightAchievement[]): Milestone[] {
+  const total = items.length
+  if (total === 0) return []
+  const dates = items
+    .filter((a) => a.earned && a.earnedAt && !Number.isNaN(Date.parse(a.earnedAt)))
+    .map((a) => a.earnedAt!)
+    .sort((a, b) => Date.parse(a) - Date.parse(b))
+  // pct 0 stands for "the first one". Steps that need the same count of achievements are one:
+  // the first stays the first, any other is the furthest of them (3 of 3 is 100%, not 75%).
+  const byNeeded = new Map<number, number>()
+  for (const pct of [0, 25, 50, 75, 100]) {
+    const needed = pct === 0 ? 1 : Math.ceil((total * pct) / 100)
+    if (needed !== 1 || !byNeeded.has(1)) byNeeded.set(needed, pct)
+  }
+  return [...byNeeded].map(([needed, pct]) => ({
+    pct,
+    at: dates.length >= needed ? dates[needed - 1] : null,
+    left: Math.max(0, needed - dates.length),
+  }))
+}
+
+/** The game a calendar or a list of unlocks is about, for the cards that link back to it. */
+export type InsightGame = { source: GameSource; id: number; title: string; iconUrl?: string }
+
+/** The unlocks in the shape the activity calendar and its day list already take (RA's), whichever platform they are from. */
+export function toRecentAchievements(items: InsightAchievement[], game: InsightGame): RecentAchievement[] {
+  return items
+    .filter((a) => a.earned && a.earnedAt && !Number.isNaN(Date.parse(a.earnedAt)))
+    .map((a) => ({
+      Date: a.earnedAt!.replace('T', ' ').slice(0, 19),
+      HardcoreMode: '0',
+      AchievementID: Number(a.id) || 0,
+      Title: a.title,
+      Description: a.description,
+      BadgeName: '',
+      Points: a.points ?? 0,
+      GameID: game.id,
+      GameTitle: game.title,
+      ConsoleName: PLATFORM_NAME[game.source],
+      Source: game.source === 'ra' ? undefined : game.source,
+      BadgeUrl: a.iconUrl ?? undefined,
+      GameIconUrl: game.iconUrl,
+    }))
+}
+
+/** Within this many days of today, a game's calendar ends today; before that, where its last unlock was. */
+const CALENDAR_RECENT_DAYS = 3
+
+/** The last day a game's calendar shows: today for a game played lately, else its last unlock. */
+export function calendarEnd(items: InsightAchievement[], now = Date.now()): Date | undefined {
+  const times = items.filter((a) => a.earned && a.earnedAt).map((a) => Date.parse(a.earnedAt!)).filter((t) => !Number.isNaN(t))
+  if (times.length === 0) return undefined
+  const last = Math.max(...times)
+  return now - last <= CALENDAR_RECENT_DAYS * DAY ? undefined : new Date(last)
 }

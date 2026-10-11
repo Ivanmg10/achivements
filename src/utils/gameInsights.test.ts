@@ -1,5 +1,5 @@
 import {
-  beatenProgress, finishedAt, fromPsn, fromRa, fromSteam, missablesLeft, nextTargets, paceEstimate, rarestEarned, rarityBands,
+  beatenProgress, finishedAt, fromPsn, fromRa, fromSteam, hardest, milestones, missablesLeft, nextTargets, paceEstimate, rarestEarned, rarityBands, recentEarned, calendarEnd, toRecentAchievements,
   type InsightAchievement,
 } from './gameInsights'
 
@@ -94,4 +94,63 @@ test('finishedAt is the last unlock, and only for a finished game', () => {
   expect(finishedAt([a('1', { earned: true, earnedAt: '2024-01-01T00:00:00Z' }), a('2')])).toBeNull()
   expect(finishedAt([])).toBeNull()
   expect(finishedAt([a('1', { earned: true })])).toBeNull()
+})
+
+describe('recentEarned and hardest', () => {
+  test('recentEarned: what was earned last, newest first, only with a date', () => {
+    const list = [a('old', { earned: true, earnedAt: '2024-01-01T00:00:00Z' }), a('new', { earned: true, earnedAt: '2024-06-01T00:00:00Z' }), a('undated', { earned: true }), a('no')]
+    expect(recentEarned(list).map((x) => x.id)).toEqual(['new', 'old'])
+    expect(recentEarned(list, 1).map((x) => x.id)).toEqual(['new'])
+  })
+  test('hardest: the rarest of all, whether earned or not, skipping unknown rarity', () => {
+    const list = [a('x', { rarity: 30 }), a('y', { rarity: 1, earned: true }), a('z', { rarity: 0.2 }), a('?', { rarity: null })]
+    expect(hardest(list).map((x) => x.id)).toEqual(['z', 'y', 'x'])
+  })
+})
+
+describe('milestones', () => {
+  const game = (total: number, done: number) =>
+    Array.from({ length: total }, (_, i) => a(`m${i}`, i < done ? { earned: true, earnedAt: new Date(Date.UTC(2024, 0, 1 + i)).toISOString() } : {}))
+
+  test('the first one, then each quarter, with the day it was reached', () => {
+    const m = milestones(game(8, 8))
+    expect(m.map((x) => x.pct)).toEqual([0, 25, 50, 75, 100])
+    // 25% of 8 is the 2nd, 50% the 4th, 75% the 6th, 100% the 8th.
+    expect(m.map((x) => x.at)).toEqual(['2024-01-01T00:00:00.000Z', '2024-01-02T00:00:00.000Z', '2024-01-04T00:00:00.000Z', '2024-01-06T00:00:00.000Z', '2024-01-08T00:00:00.000Z'])
+  })
+  test('what is not reached yet has no day and says how many are left', () => {
+    const m = milestones(game(8, 3))
+    expect(m.map((x) => [x.pct, x.at === null, x.left])).toEqual([[0, false, 0], [25, false, 0], [50, true, 1], [75, true, 3], [100, true, 5]])
+  })
+  test('a game with nothing earned has all of them ahead', () => {
+    expect(milestones(game(4, 0)).every((x) => x.at === null)).toBe(true)
+  })
+  test('a small game does not repeat a step: 25% of 3 is its first', () => {
+    expect(milestones(game(3, 3)).map((x) => x.pct)).toEqual([0, 50, 100])
+  })
+  test('nothing to say about a game with no achievements', () => {
+    expect(milestones([])).toEqual([])
+  })
+})
+
+describe('the calendar of a game', () => {
+  const game = { source: 'steam' as const, id: 7, title: 'Hades', iconUrl: 'https://img/i.png' }
+  const earned = (id: string, at: string | null) => a(id, { earned: at !== null, earnedAt: at, points: null, iconUrl: 'https://img/b.png' })
+
+  test('unlocks in the shape the calendar takes, as that platform\'s', () => {
+    const [r] = toRecentAchievements([earned('ACH_1', '2024-03-02T10:20:30.000Z'), earned('no', null)], game)
+    expect(r).toMatchObject({ Date: '2024-03-02 10:20:30', AchievementID: 0, GameID: 7, GameTitle: 'Hades', ConsoleName: 'Steam', Source: 'steam', BadgeUrl: 'https://img/b.png', GameIconUrl: 'https://img/i.png', Points: 0 })
+    expect(toRecentAchievements([earned('1', '2024-03-02 10:20:30')], { ...game, source: 'ra' })[0].Source).toBeUndefined()
+    expect(toRecentAchievements([earned('2', 'not a date')], game)).toEqual([])
+  })
+
+  test('it ends today for a game played lately, and at the last unlock for an old one', () => {
+    expect(calendarEnd([earned('1', daysAgo(1))], NOW)).toBeUndefined()
+    const end = calendarEnd([earned('1', daysAgo(10)), earned('2', daysAgo(200))], NOW)!
+    expect(end.toISOString()).toBe(daysAgo(10))
+  })
+
+  test('no end for a game with nothing unlocked', () => {
+    expect(calendarEnd([earned('1', null)], NOW)).toBeUndefined()
+  })
 })

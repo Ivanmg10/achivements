@@ -7,6 +7,9 @@ import type { StatusSortState } from '@/components/status-sort-control/StatusSor
 import { compareSortValues } from '@/utils/utils'
 
 export type QuickFilter = 'all' | 'almost' | 'stalled'
+
+/** The orders every platform can be sorted by: points are RA's alone, so the mixed list does not offer them. */
+export const MIXED_SORT_KEYS = ['name', 'lastPlayed', 'percent'] as const
 export const QUICK_FILTERS: readonly QuickFilter[] = ['all', 'almost', 'stalled']
 
 /** From this progress (and below 100) a game is "almost done". */

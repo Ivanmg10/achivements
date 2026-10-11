@@ -29,6 +29,7 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
   return (
     <LibraryGameDetail
       category={asCategory(category)}
+      game={{ source: 'steam', id: game.id, title: game.title, iconUrl: game.imageIcon || undefined }}
       items={items}
       state={isLoading ? 'loading' : error ? 'error' : 'ready'}
       errorNode={

@@ -38,11 +38,13 @@ import LibraryQuickFilters from '@/components/library-quick-filters/LibraryQuick
 import LibraryViewToggle from '@/components/library-view-toggle/LibraryViewToggle'
 import LibraryAllList from '@/components/library-all-list/LibraryAllList'
 import {
-  buildEntries, countQuick, matchesQuick, psnProgress, raProgress, sortEntries, steamProgress, type QuickFilter,
+  buildEntries, countQuick, matchesQuick, MIXED_SORT_KEYS, psnProgress, raProgress, sortEntries, steamProgress, type QuickFilter,
 } from '@/utils/libraryInsights'
-
-/** The mixed list cannot sort by points: only RA has them. */
-const MIXED_SORT_KEYS = ['name', 'lastPlayed', 'percent'] as const
+import LibraryExplorer from '@/components/library-explorer/LibraryExplorer'
+import LibraryExplorerSkeleton from '@/components/library-explorer-skeleton/LibraryExplorerSkeleton'
+import LibraryLayoutToggle, { type LibraryLayout } from '@/components/library-layout-toggle/LibraryLayoutToggle'
+import LibraryPlatformTabs, { type PlatformChoice } from '@/components/library-platform-tabs/LibraryPlatformTabs'
+import { countBySource } from '@/utils/libraryShelves'
 
 export default function CategoryPage() {
   const { category } = useParams()
@@ -55,7 +57,16 @@ export default function CategoryPage() {
   const { sortState, setSortState, allSortState, setAllSortState, gridCols, setGridCols, view, setView } = useLibraryPrefs(cat)
   // "Almost done" and "stalled" only make sense for games in progress; each category starts without one.
   const [quickChoice, setQuick] = useState<QuickFilter>('all')
-  useWhenChanged([cat], () => setQuick('all'))
+  // A list opens on its shelves, with nothing picked.
+  const [layout, setLayout] = useState<LibraryLayout>('shelves')
+  const [selectedKey, setSelectedKey] = useState<string | null>(null)
+  const [platform, setPlatform] = useState<PlatformChoice>('all')
+  useWhenChanged([cat], () => {
+    setQuick('all')
+    setLayout('shelves')
+    setSelectedKey(null)
+    setPlatform('all')
+  })
   const quick = cat === 'playing' ? quickChoice : 'all'
   const { isLinked: steamLinked } = useSteamGamesData()
   // A Steam-only user has no RA list to show — its empty state would tell them
@@ -83,6 +94,24 @@ export default function CategoryPage() {
   const platformCount = (showRa ? 1 : 0) + (steamLinked ? 1 : 0) + (psnShown ? 1 : 0)
   const mixed = platformCount > 1 && view === 'all'
   const mixedLoading = (showRa && loading) || (steamLinked && steamLoading) || (psnShown && psnLoading)
+  // Shelves and the list read every platform together; only the cards view keeps them apart.
+  const explorer = layout !== 'cards' && platformCount > 0
+  const explorerEntries = useMemo(
+    () => buildEntries(showRa ? games : [], extraData, steamLinked ? allSteamGames : [], psnShown ? allPsnGames : []),
+    [showRa, games, extraData, steamLinked, allSteamGames, psnShown, allPsnGames],
+  )
+  // One platform, or all: a chosen platform that has run out of games (hidden, say) is all again.
+  const perPlatform = useMemo(() => countBySource(explorerEntries), [explorerEntries])
+  const activePlatform = platform !== 'all' && perPlatform[platform] === 0 ? 'all' : platform
+  const platformEntries = useMemo(
+    () => (activePlatform === 'all' ? explorerEntries : explorerEntries.filter((e) => e.kind === activePlatform)),
+    [explorerEntries, activePlatform],
+  )
+  // Typing while on the shelves goes to the list, where the matches are.
+  function changeQuery(next: string) {
+    setQuery(next)
+    if (layout === 'shelves' && next.trim()) setLayout('list')
+  }
   const mixedEntries = useMemo(
     () =>
       buildEntries(
@@ -147,6 +176,7 @@ export default function CategoryPage() {
     </>
   )
 
+  const layoutToggle = platformCount > 0 && <LibraryLayoutToggle value={layout} onChange={setLayout} />
   const quickRow = cat === 'playing' && <LibraryQuickFilters value={quick} counts={quickCounts} onChange={setQuick} />
   const viewToggle = platformCount > 1 && <LibraryViewToggle value={view} onChange={setView} />
 
@@ -169,7 +199,48 @@ export default function CategoryPage() {
     <OpenCardProvider>
     <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main">
       <div ref={pageRef} className="w-full lg:max-w-[98%] flex flex-col gap-3">
-        {mixed ? (
+        {explorer ? (
+          mixedLoading ? (
+            <LibraryExplorerSkeleton layout={layout === 'list' ? 'list' : 'shelves'} />
+          ) : (
+            <>
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <StatusPageHeader category={cat} gameCount={platformEntries.length}>
+                  <LibraryPlatformTabs value={activePlatform} counts={perPlatform} onChange={setPlatform} />
+                </StatusPageHeader>
+                <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+                  <CategorySearch value={query} onChange={changeQuery} />
+                  {layoutToggle}
+                </div>
+              </div>
+              {(error || steamError || psnError) && (
+                <p role="alert" className="text-sm text-red-400">
+                  {[error, steamError && T.steam.gamesError, psnError && T.psn.gamesError].filter(Boolean).join(' · ')}
+                </p>
+              )}
+              {explorerEntries.length === 0 ? (
+                <StatusEmptyState category={cat} className="min-h-[40vh]" />
+              ) : (
+                <LibraryExplorer
+                  key={cat}
+                  category={cat}
+                  entries={platformEntries}
+                  platform={activePlatform}
+                  layout={layout === 'list' ? 'list' : 'shelves'}
+                  onLayout={setLayout}
+                  query={query}
+                  onQuery={setQuery}
+                  quick={quick}
+                  onQuick={setQuick}
+                  sort={allSortState}
+                  onSort={setAllSortState}
+                  selectedKey={selectedKey}
+                  onSelectKey={setSelectedKey}
+                />
+              )}
+            </>
+          )
+        ) : mixed ? (
           mixedLoading ? (
             <StatusPageSkeleton cols={gridCols} />
           ) : (
@@ -180,7 +251,7 @@ export default function CategoryPage() {
                   <CategorySearch value={query} onChange={setQuery} />
                   <StatusSortControl cat={cat} keys={[...MIXED_SORT_KEYS]} sortState={allSortState} onChange={setAllSortState} />
                   <StatusGridControl cols={gridCols} onChange={setGridCols} />
-                  {viewToggle}
+                  {viewToggle}{layoutToggle}
                 </div>
               </div>
               {quickRow}
@@ -208,6 +279,7 @@ export default function CategoryPage() {
                   <CategorySearch value={query} onChange={setQuery} />
                   {raControls}
                   <StatusGridControl cols={gridCols} onChange={setGridCols} />
+                  {layoutToggle}
                 </div>
               </div>
               {quickRow}
@@ -228,7 +300,7 @@ export default function CategoryPage() {
               <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
                 <CategorySearch value={query} onChange={setQuery} />
                 <StatusGridControl cols={gridCols} onChange={setGridCols} />
-                {viewToggle}
+                {viewToggle}{layoutToggle}
               </div>
             </div>
             {quickRow}
@@ -251,15 +323,15 @@ export default function CategoryPage() {
           </>
         )}
         {/* Steam alone: no RA header above, so the search box gets its own row. */}
-        {!showRa && !mixed && (
+        {!showRa && !mixed && !explorer && (
           <div className="flex items-center justify-end gap-2 flex-wrap">
             <CategorySearch value={query} onChange={setQuery} />
-            {viewToggle}
+            {viewToggle}{layoutToggle}
           </div>
         )}
-        {!showRa && !mixed && quickRow}
-        {!mixed && (!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} query={query} quick={quick} preview={steamPreview} />}
-        {!mixed && (!showRa || !loading) && <PsnCategorySection category={cat} gridCols={gridCols} query={query} quick={quick} preview={psnPreview} />}
+        {!showRa && !mixed && !explorer && quickRow}
+        {!mixed && !explorer && (!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} query={query} quick={quick} preview={steamPreview} />}
+        {!mixed && !explorer && (!showRa || !loading) && <PsnCategorySection category={cat} gridCols={gridCols} query={query} quick={quick} preview={psnPreview} />}
       </div>
     </div>
     </OpenCardProvider>
