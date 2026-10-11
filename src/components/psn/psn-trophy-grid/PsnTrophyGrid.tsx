@@ -10,6 +10,7 @@ import { gameHref } from '@/utils/gameRef'
 import { BASE_GROUP, psnTrophyAnchor, trophiesByGroup, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import PsnTrophyGridGroup from './psn-trophy-grid-group/PsnTrophyGridGroup'
+import PsnRevealTrophyButton from '@/components/psn/psn-reveal-trophy-button/PsnRevealTrophyButton'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy, PsnTrophyGroup, TrophyGrade } from '@/types/psn'
@@ -67,6 +68,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
   const size = SIZE_CLASSES[badgeSize]
   const [showAll, setShowAll] = useState(false)
+  const [revealedIds, setRevealedIds] = useState<ReadonlySet<number>>(new Set())
   const { visible: shown, capped } = capList(trophies, limit ?? Infinity, showAll)
   const grade: Record<TrophyGrade, string> = {
     platinum: T.psn.platinum,
@@ -85,8 +87,14 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
     setTooltip(null)
   }
 
-  // Sony keeps the text of hidden trophies secret until they are earned.
-  const concealed = (t: PsnTrophy) => t.hidden && !t.earned
+  // Sony sends hidden trophies' text, but it is kept secret until earned, or until the viewer asks.
+  const concealed = (t: PsnTrophy) => t.hidden && !t.earned && !revealedIds.has(t.id)
+  const toggleReveal = (id: number) =>
+    setRevealedIds((prev) => {
+      const next = new Set(prev)
+      if (!next.delete(id)) next.add(id)
+      return next
+    })
   const nameOf = (t: PsnTrophy) => (concealed(t) ? T.psn.hiddenTrophy : t.name)
   const sections = trophiesByGroup(shown, groups)
   const groupName = (id: string) => (id === BASE_GROUP ? T.psn.baseGame : (groups.find((g) => g.id === id)?.name ?? id))
@@ -125,6 +133,14 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
                     <div className={`${size.badge} bg-ink/10 ${t.earned ? '' : 'opacity-40'}`} aria-hidden="true" />
                   )}
                 </Link>
+                {t.hidden && !t.earned && (
+                  <PsnRevealTrophyButton
+                    revealed={revealedIds.has(t.id)}
+                    onToggle={() => toggleReveal(t.id)}
+                    size={12}
+                    className="absolute -top-1 -left-1 z-20 w-5 h-5 rounded-full bg-bg-card/90 flex items-center justify-center opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100"
+                  />
+                )}
                 {canPin && (
                   <SteamPinAchievementButton
                     pinned={pinned.has(t.id)}

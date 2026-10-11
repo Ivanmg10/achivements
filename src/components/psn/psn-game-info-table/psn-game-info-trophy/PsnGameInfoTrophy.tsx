@@ -2,6 +2,7 @@ import { FadeImage } from '@/components/ui/FadeImage'
 import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
+import PsnRevealTrophyButton from '@/components/psn/psn-reveal-trophy-button/PsnRevealTrophyButton'
 import { formatRarity, formatUnlock } from '@/utils/steamFeed'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import type { PsnTrophy, TrophyGrade } from '@/types/psn'
@@ -24,6 +25,7 @@ export default function PsnGameInfoTrophy({
   trophy: t,
   highlighted = false,
   revealed = false,
+  onToggleReveal,
   pinned,
   onTogglePin,
 }: {
@@ -31,6 +33,8 @@ export default function PsnGameInfoTrophy({
   highlighted?: boolean
   /** The viewer chose to see hidden trophies before earning them. */
   revealed?: boolean
+  /** Present for a hidden, unearned trophy: the eye that shows or hides it. */
+  onToggleReveal?: () => void
   /** Undefined for a signed-out visitor, who cannot pin. */
   pinned?: boolean
   onTogglePin?: () => void
@@ -64,7 +68,10 @@ export default function PsnGameInfoTrophy({
       </td>
 
       <td className={`px-3 py-2 ${t.earned ? '' : 'opacity-60'}`}>
-        <h3 className="text-lg">{concealed ? T.psn.hiddenTrophy : t.name}</h3>
+        <h3 className="text-lg flex items-center gap-2">
+          {concealed ? T.psn.hiddenTrophy : t.name}
+          {t.hidden && !t.earned && onToggleReveal && <PsnRevealTrophyButton revealed={revealed} onToggle={onToggleReveal} />}
+        </h3>
         <p className="text-sm text-text-secondary">{concealed ? T.psn.hiddenTrophyDesc : t.detail}</p>
       </td>
 

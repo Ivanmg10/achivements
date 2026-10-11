@@ -1060,6 +1060,8 @@ export const de: Translations = {
     hiddenTrophyDesc: 'Spiel weiter, um sie zu enthüllen',
     showHiddenTrophies: 'Versteckte Trophäen zeigen (Spoiler)',
     hideHiddenTrophies: 'Versteckte Trophäen verbergen',
+    revealTrophy: 'Diese Trophäe zeigen',
+    concealTrophy: 'Diese Trophäe verbergen',
     rarity: '{n}% der Spieler',
     trophiesError: 'Die Trophäen konnten nicht geladen werden',
     noTrophies: 'Dieses Spiel hat keine Trophäen',

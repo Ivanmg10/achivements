@@ -1060,6 +1060,8 @@ export const es: Translations = {
     hiddenTrophyDesc: 'Sigue jugando para descubrirlo',
     showHiddenTrophies: 'Mostrar trofeos ocultos (spoilers)',
     hideHiddenTrophies: 'Ocultar trofeos ocultos',
+    revealTrophy: 'Mostrar este trofeo',
+    concealTrophy: 'Ocultar este trofeo',
     rarity: '{n}% de jugadores',
     trophiesError: 'No se pudieron cargar los trofeos',
     noTrophies: 'Este juego no tiene trofeos',

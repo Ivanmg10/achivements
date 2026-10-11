@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
+import PsnRevealTrophyButton from '@/components/psn/psn-reveal-trophy-button/PsnRevealTrophyButton'
 import { formatRarity, formatUnlock } from '@/utils/steamFeed'
 import { TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import type { PsnTrophy } from '@/types/psn'
@@ -15,6 +16,7 @@ export default function PsnGameInfoTrophyCard({
   trophy: t,
   highlighted = false,
   revealed = false,
+  onToggleReveal,
   pinned,
   onTogglePin,
 }: {
@@ -22,6 +24,8 @@ export default function PsnGameInfoTrophyCard({
   highlighted?: boolean
   /** The viewer chose to see hidden trophies before earning them. */
   revealed?: boolean
+  /** Present for a hidden, unearned trophy: the eye that shows or hides it. */
+  onToggleReveal?: () => void
   /** Undefined for a signed-out visitor, who cannot pin. */
   pinned?: boolean
   onTogglePin?: () => void
@@ -72,6 +76,10 @@ export default function PsnGameInfoTrophyCard({
           )}
         </div>
       </div>
+
+      {t.hidden && !t.earned && onToggleReveal && (
+        <PsnRevealTrophyButton revealed={revealed} onToggle={onToggleReveal} size={18} className="shrink-0 mt-0.5" />
+      )}
 
       {pinned !== undefined && (
         <SteamPinAchievementButton
