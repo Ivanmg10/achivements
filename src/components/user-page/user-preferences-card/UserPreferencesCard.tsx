@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react'
 import { IconEyeOff, IconGenderBigender, IconLanguage, IconPalette } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import UserProfilePublicToggle from '@/components/user-page/user-profile-public-toggle/UserProfilePublicToggle'
+import UserPsnPlatinumToggle from '@/components/user-page/user-psn-platinum-toggle/UserPsnPlatinumToggle'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
@@ -103,6 +104,8 @@ export default function UserPreferencesCard() {
         />
 
         <UserProfilePublicToggle />
+
+        <UserPsnPlatinumToggle />
 
         <ProfileField label={T.userPage.favoriteRaGame} icon={<RaLogo height={11} />} onEdit={() => setFavoriteOpen('ra')}>
           <FavoriteValue game={raFavorite} source="ra" empty={T.userData.notSet} />

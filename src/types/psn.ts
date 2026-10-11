@@ -28,6 +28,8 @@ export type PsnGameProgress = GameProgressBase & {
   /** The whole set, DLC included, as Sony counts it. */
   earned: TrophyCounts
   defined: TrophyCounts
+  /** Set by the PSN data context when the user counts a platinum as completed and this game has one. */
+  platinumCompletes?: boolean
   /** The game has DLC trophy groups; they count like any other trophy, so a game is complete only with them. */
   hasDlc: boolean
   /** When the trophy list last changed (ISO) — what the trophy caches key on. */
