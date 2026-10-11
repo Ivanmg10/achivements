@@ -86,11 +86,11 @@ export const ja: Translations = {
     shelvesLabel: '棚',
     listLabel: 'リスト',
     cardsLabel: 'カード',
-    back: '棚に戻る',
     seeAll: '全{n}本を表示',
     seeShelf: '{n}本を表示',
     platformLabel: 'プラットフォーム',
     openGame: 'ゲームページを開く',
+    openInList: 'リストで表示',
     shelves: {
       continue: { title: '続きをプレイ', hint: '今週プレイしたもの' },
       almost: { title: 'もう少しでコンプリート', hint: '80%〜99%' },
@@ -1082,7 +1082,6 @@ export const ja: Translations = {
     },
     baseGame: '本編',
     allGroups: 'すべて',
-    withDlc: 'DLC込み',
   },
   plurals: {
     games: { other: '{n}本のゲーム' },

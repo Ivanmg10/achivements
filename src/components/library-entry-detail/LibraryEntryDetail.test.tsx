@@ -1,3 +1,7 @@
+jest.mock('@/components/library-detail-backdrop/LibraryDetailBackdrop', () => ({
+  __esModule: true,
+  default: ({ entry }: { entry: { key: string } }) => <div data-testid="backdrop">{entry.key}</div>,
+}))
 jest.mock('@/hooks/useGameProgression', () => ({ useGameProgression: jest.fn() }))
 jest.mock('@/components/pin-toggle-button/PinToggleButton', () => ({ PinToggleButton: ({ gameId, source }: { gameId: number; source: string }) => <span data-testid="pin">{source}:{gameId}</span> }))
 jest.mock('@/components/hide-game-button/HideGameButton', () => ({ __esModule: true, default: ({ gameId, source }: { gameId: number; source: string }) => <span data-testid="hide">{source}:{gameId}</span> }))
@@ -26,6 +30,15 @@ test('the name links to the game, with pin and hide for that game', () => {
   expect(screen.getByTestId('pin')).toHaveTextContent('steam:7')
   expect(screen.getByTestId('hide')).toHaveTextContent('steam:7')
   expect(screen.getByRole('region', { name: 'Hades' })).toBeInTheDocument()
+})
+
+test('the card has the art of its game, blurred, behind it, and is a box of its own for it', () => {
+  progression({})
+  render(<LibraryEntryDetail entry={libraryEntry('steam', 7, 'Hades')} category="playing" />)
+  expect(screen.getByTestId('backdrop')).toHaveTextContent('steam:7')
+  const card = screen.getByRole('region', { name: 'Hades' })
+  expect(card).toContainElement(screen.getByTestId('backdrop'))
+  expect(card).toHaveClass('relative', 'isolate', 'overflow-hidden', 'flex-1')
 })
 
 describe('RA', () => {

@@ -1,10 +1,10 @@
+jest.mock('@/hooks/useRaScreenshot', () => ({ useRaScreenshot: jest.fn(() => undefined) }))
+
 import { fireEvent, render, screen } from '@testing-library/react'
 import LibraryShelfCard from './library-shelf-card/LibraryShelfCard'
 import LibraryListRow from './library-list-row/LibraryListRow'
 import { libraryEntry } from '@/test-utils/libraryFixtures'
 import { en } from '@/translations/en'
-
-jest.mock('@/hooks/useRaScreenshot', () => ({ useRaScreenshot: jest.fn(() => undefined) }))
 
 const ra = libraryEntry('ra', 5, 'Sonic', { pct: 40 })
 const steam = libraryEntry('steam', 7, 'Hades')
@@ -16,12 +16,17 @@ const click = (el: Element) => {
   fireEvent.click(el)
 }
 
+/*
+ * A game in a shelf and a game in the list work the same way: the icon and the
+ * name open the game's own page, and the rest opens the game beside the list
+ * (from the shelves, the list itself). That rest is a button laid over the
+ * whole, with the two links above it.
+ */
 describe.each([
-  // How many links there are besides the title: the icon, and on a shelf the whole picture too.
-  ['a shelf card', 2, (onTake: jest.Mock, e = ra) => <LibraryShelfCard entry={e} onPick={onTake} />],
-  ['a list row', 1, (onTake: jest.Mock, e = ra) => <LibraryListRow entry={e} current={false} onSelect={onTake} />],
-])('%s', (_, pictures, draw) => {
-  test('its title is a link to the game of its platform', () => {
+  ['a card on a shelf', (onTake: jest.Mock, e = ra) => <LibraryShelfCard entry={e} onPick={onTake} />],
+  ['a row in the list', (onTake: jest.Mock, e = ra) => <LibraryListRow entry={e} current={false} onSelect={onTake} />],
+])('%s: only the icon and the name open the game', (_, draw) => {
+  test('the name is a link to the game of its platform', () => {
     render(draw(jest.fn(), ra))
     expect(screen.getByRole('link', { name: 'Sonic' })).toHaveAttribute('href', '/gameInfo/5')
     expect(screen.getByRole('link', { name: 'Sonic' })).toHaveAttribute('title', en.libraryLayout.openGame)
@@ -35,32 +40,35 @@ describe.each([
     expect(screen.getByRole('link', { name: 'Astro' }).getAttribute('href')).toMatch(/^\/psnGame\//)
   })
 
-  test('its pictures are links to the same page, out of the tab order since the title is there', () => {
+  test('the icon is the only other link, to the same page, out of the tab order since the name is there', () => {
     const { container } = render(draw(jest.fn(), ra))
     const links = container.querySelectorAll('a')
-    expect(links).toHaveLength(1 + pictures)
-    const hidden = [...links].filter((a) => a.getAttribute('aria-hidden') === 'true')
-    expect(hidden).toHaveLength(pictures)
-    hidden.forEach((a) => {
-      expect(a).toHaveAttribute('href', '/gameInfo/5')
-      expect(a).toHaveAttribute('tabindex', '-1')
-    })
+    expect(links).toHaveLength(2)
+    const icon = [...links].find((a) => a.getAttribute('aria-hidden') === 'true')!
+    expect(icon).toHaveAttribute('href', '/gameInfo/5')
+    expect(icon).toHaveAttribute('tabindex', '-1')
   })
 
-  test('the rest of it is a button laid over the whole, with no link inside it', () => {
+  test('the link of the name is not stretched: it is as wide as the name', () => {
+    render(draw(jest.fn(), ra))
+    expect(screen.getByRole('link', { name: 'Sonic' }).className).not.toMatch(/after:/)
+  })
+
+  test('the rest is one button laid over the whole, with no link inside it, under the links', () => {
     const { container } = render(draw(jest.fn()))
-    const button = screen.getByRole('button', { name: 'Sonic' })
-    expect(button).toHaveClass('absolute', 'inset-0')
-    expect(button.querySelector('a')).toBeNull()
-    // The links are above the button, so they get the clicks that fall on them.
+    const buttons = container.querySelectorAll('button')
+    expect(buttons).toHaveLength(1)
+    expect(buttons[0]).toHaveClass('absolute', 'inset-0')
+    expect(buttons[0].querySelector('a')).toBeNull()
     container.querySelectorAll('a').forEach((a) => expect(a.className).toMatch(/z-10/))
   })
 
-  test('the button picks the game; the title and the icon do not', () => {
+  test('the button picks the game; the name and the icon do not', () => {
     const onTake = jest.fn()
     const { container } = render(draw(onTake))
-    click(screen.getByRole('button', { name: 'Sonic' }))
+    click(container.querySelector('button')!)
     expect(onTake).toHaveBeenCalledTimes(1)
+    expect(onTake).toHaveBeenCalledWith(ra)
     onTake.mockClear()
     click(screen.getByRole('link', { name: 'Sonic' }))
     container.querySelectorAll('a[aria-hidden="true"]').forEach(click)
@@ -68,10 +76,12 @@ describe.each([
   })
 })
 
-test('on a shelf the whole picture across the top is a link, not only the icon on it', () => {
-  const { container } = render(<LibraryShelfCard entry={ra} onPick={jest.fn()} />)
-  const cover = [...container.querySelectorAll('a[aria-hidden="true"]')].find((a) => a.className.includes('inset-0'))!
-  expect(cover).toHaveAttribute('href', '/gameInfo/5')
-  // It sits over the art, which is what the card's own top is made of.
-  expect(cover.parentElement).toContainElement(container.querySelector('[aria-hidden="true"].overflow-hidden'))
+test('the button of a card on a shelf says what it does, by name', () => {
+  render(<LibraryShelfCard entry={ra} onPick={jest.fn()} />)
+  expect(screen.getByRole('button', { name: `${en.libraryLayout.openInList}: Sonic` })).toBeInTheDocument()
+})
+
+test('the button of a row says the game, which the list already shows', () => {
+  render(<LibraryListRow entry={ra} current={false} onSelect={jest.fn()} />)
+  expect(screen.getByRole('button', { name: 'Sonic' })).toBeInTheDocument()
 })

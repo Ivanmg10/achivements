@@ -21,11 +21,11 @@ const SIZES: Record<CardSize, { banner: string; icon: number; title: string }> =
  * One game on a shelf: the art across the top with its icon resting on the
  * edge, then the title, the progress and how far along and how long ago.
  *
- * The card has two kinds of click. The picture (the whole art across the top,
- * with the icon on it) and the title open the game's own page; anywhere else on
- * the card opens the list on this game. The second is a button stretched over
- * the whole card, with the links above it (as the cards of the lists do), so
- * nothing is a link inside a button.
+ * Two things on the card open the game's own page: its icon and its name.
+ * Everything else, the picture, the progress and the rest of the card, opens
+ * the list on this game. That is a button stretched over the whole card, with
+ * the two links above it (as the cards of the lists do), so no link is inside
+ * a button nor the other way round.
  */
 export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { entry: LibraryEntry; size?: CardSize; onPick: (entry: LibraryEntry) => void }) {
   const { T, lang } = useLanguage()
@@ -39,9 +39,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { 
     <div className="group relative flex flex-col w-full h-full rounded-2xl bg-bg-card ring-1 ring-ink/5 hover:ring-ink/15 focus-within:ring-2 focus-within:ring-accent/70 transition-shadow">
       <div className={`relative rounded-t-2xl ${banner}`}>
         <LibraryShelfBanner entry={entry} />
-        {/* The whole picture opens the game; like the icon, it is the title's twin, so out of the tab order. */}
-        <Link href={href} tabIndex={-1} aria-hidden="true" className="absolute inset-0 z-10 rounded-t-2xl" />
-        <span className="pointer-events-none absolute left-3 top-3 z-10">
+        <span className="absolute left-3 top-3">
           <LibraryPlatformBadge source={entry.kind} />
         </span>
         {/* Same destination as the title, so it is kept out of the tab order. */}
@@ -59,7 +57,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { 
           <Link
             href={href}
             title={T.libraryLayout.openGame}
-            className={`relative z-10 block font-bold leading-tight line-clamp-2 hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${title}`}
+            className={`relative z-10 block w-fit max-w-full font-bold leading-tight line-clamp-2 hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${title}`}
           >
             {entry.title}
           </Link>
@@ -75,7 +73,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { 
       <button
         type="button"
         onClick={() => onPick(entry)}
-        aria-label={entry.title}
+        aria-label={`${T.libraryLayout.openInList}: ${entry.title}`}
         className="absolute inset-0 z-[1] rounded-2xl cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       />
     </div>

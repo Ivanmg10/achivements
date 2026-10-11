@@ -6,6 +6,7 @@ import { useGameProgression } from '@/hooks/useGameProgression'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import LibraryPlatformBadge from '@/components/library-platform-badge/LibraryPlatformBadge'
+import LibraryDetailBackdrop from '@/components/library-detail-backdrop/LibraryDetailBackdrop'
 import { entryBackdrop } from '@/components/library-entry-cover/LibraryEntryCover'
 import RaLibraryDetail from '@/components/ra-library-detail/RaLibraryDetail'
 import SteamLibraryDetail from '@/components/steam/steam-library-detail/SteamLibraryDetail'
@@ -42,7 +43,8 @@ export default function LibraryEntryDetail({ entry, category }: { entry: Library
   const id = entryId(entry)
 
   return (
-    <section aria-label={entry.title} className="flex flex-col gap-3 rounded-2xl bg-bg-card p-4 ring-1 ring-accent/30 shadow-lg shadow-black/10">
+    <section aria-label={entry.title} className="relative isolate overflow-hidden flex flex-col gap-3 flex-1 rounded-2xl bg-bg-card p-4 ring-1 ring-accent/30 shadow-lg shadow-black/10">
+      <LibraryDetailBackdrop entry={entry} />
       <header className="flex items-center gap-2 min-w-0">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <Link

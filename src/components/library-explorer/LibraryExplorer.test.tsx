@@ -61,7 +61,6 @@ describe('shelves', () => {
   test('no filters on the shelves', () => {
     render(<LibraryExplorer {...make({ layout: 'shelves' })} />)
     expect(screen.queryByRole('group', { name: 'Quick filters' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Back to shelves' })).not.toBeInTheDocument()
   })
 })
 
@@ -113,17 +112,6 @@ describe('list', () => {
   test('the quick filters are for games in progress only', () => {
     render(<LibraryExplorer {...make({ category: 'completed' })} />)
     expect(screen.queryByRole('group', { name: 'Quick filters' })).not.toBeInTheDocument()
-  })
-
-  test('back goes to the shelves, where the page was', () => {
-    const p = make()
-    window.scrollTo = jest.fn()
-    jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => (cb(0), 0))
-    render(<LibraryExplorer {...p} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Back to shelves' }))
-    expect(p.onLayout).toHaveBeenCalledWith('shelves')
-    expect(p.onQuick).toHaveBeenCalledWith('all')
-    expect(window.scrollTo).toHaveBeenCalledWith(0, 0)
   })
 
   test('selecting a row reports its key', () => {

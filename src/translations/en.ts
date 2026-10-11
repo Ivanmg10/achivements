@@ -87,11 +87,11 @@ export const en = {
     shelvesLabel: 'Shelves',
     listLabel: 'List',
     cardsLabel: 'Cards',
-    back: 'Back to shelves',
     seeAll: 'See all {n} games',
     seeShelf: 'See {n}',
     platformLabel: 'Platform',
     openGame: 'Open game page',
+    openInList: 'Show in the list',
     shelves: {
       continue: { title: 'Keep playing', hint: 'Played this week' },
       almost: { title: 'Almost done', hint: '80% to 99%' },
@@ -1083,7 +1083,6 @@ export const en = {
     },
     baseGame: 'Base game',
     allGroups: 'All',
-    withDlc: 'With DLC',
   },
   plurals: {
     games: { one: '{n} game', other: '{n} games' } as PluralForms,

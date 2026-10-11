@@ -2,10 +2,9 @@
 
 import { useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { IconArrowLeft } from '@tabler/icons-react'
-import { useLanguage } from '@/context/LanguageContext'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useLibraryKeys } from '@/hooks/useLibraryKeys'
+import { useBackIntercept } from '@/hooks/useBackIntercept'
 import LibraryShelves from '@/components/library-shelves/LibraryShelves'
 import LibraryList from '@/components/library-list/LibraryList'
 import LibraryQuickFilters from '@/components/library-quick-filters/LibraryQuickFilters'
@@ -55,7 +54,6 @@ export default function LibraryExplorer({
   selectedKey: string | null
   onSelectKey: (key: string | null) => void
 }) {
-  const { T } = useLanguage()
   const wide = useMediaQuery('(min-width: 1024px)')
   const reduce = useReducedMotion()
   const scrollBack = useRef(0)
@@ -91,32 +89,31 @@ export default function LibraryExplorer({
     if (next) onSelectKey(next.key)
   }
 
+  // The list is a step on from the shelves: the back button of the top bar undoes it (and Escape does too).
+  useBackIntercept(layout === 'list' ? back : null)
+
   useLibraryKeys({ layout, hasQuery: query !== '', onClearQuery: () => onQuery(''), onBack: back, onMove: move, searchId: SEARCH_ID })
 
   return (
       <div className="flex flex-col gap-4">
         {layout === 'list' && (
           <div className="flex items-center gap-x-4 gap-y-2 flex-wrap">
-            <button
-              type="button"
-              onClick={back}
-              className="inline-flex items-center gap-1.5 text-sm px-3 py-1 rounded-lg bg-bg-card text-text-secondary hover:text-text-main transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-            >
-              <IconArrowLeft className="w-4 h-4" aria-hidden="true" />
-              {T.libraryLayout.back}
-            </button>
             {category === 'playing' && <LibraryQuickFilters value={quick} counts={quickCounts} onChange={onQuick} />}
             <StatusSortControl cat={category} keys={[...MIXED_SORT_KEYS]} sortState={sort} onChange={onSort} />
           </div>
         )}
 
-        {/* Changing the view or the platform swaps the whole thing: the old one leaves, the new one comes in. */}
-        <AnimatePresence mode="wait" initial={false}>
+        {/*
+          Changing the view or the platform swaps the whole thing: the old one leaves, the new one comes in.
+          Not initial={false}: that would also switch off the entrance of everything inside (the shelves
+          cascade) the first time the page loads, and leave it for the swaps only.
+        */}
+        <AnimatePresence mode="wait">
           <motion.div
             key={`${platform}:${layout}`}
-            initial={reduce ? false : { opacity: 0, y: 28, scale: 0.985 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -16, scale: 0.99 }}
+            initial={reduce ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -12 }}
             transition={{ duration: 0.26, ease: [0.2, 0.8, 0.2, 1] }}
           >
             {layout === 'shelves' ? (

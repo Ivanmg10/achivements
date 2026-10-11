@@ -16,7 +16,11 @@ const motion = new Proxy(
   }
 )
 
-const AnimatePresence = ({ children }) => children
+// Remembers the props it was given last, so a test can see what the presence was asked for.
+const AnimatePresence = (props) => {
+  AnimatePresence.lastProps = props
+  return props.children
+}
 const LayoutGroup = ({ children }) => children
 const useAnimation = () => ({ start: jest.fn(), stop: jest.fn() })
 const useInView = () => true

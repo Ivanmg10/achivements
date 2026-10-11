@@ -209,7 +209,7 @@ export default function CategoryPage() {
                   <LibraryPlatformTabs value={activePlatform} counts={perPlatform} onChange={setPlatform} />
                 </StatusPageHeader>
                 <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
-                  <CategorySearch value={query} onChange={changeQuery} />
+                  <CategorySearch value={query} onChange={changeQuery} shortcut />
                   {layoutToggle}
                 </div>
               </div>

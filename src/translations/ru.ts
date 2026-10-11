@@ -86,11 +86,11 @@ export const ru: Translations = {
     shelvesLabel: 'Полки',
     listLabel: 'Список',
     cardsLabel: 'Карточки',
-    back: 'Назад к полкам',
     seeAll: 'Показать все игры ({n})',
     seeShelf: 'Показать {n}',
     platformLabel: 'Платформа',
     openGame: 'Открыть страницу игры',
+    openInList: 'Показать в списке',
     shelves: {
       continue: { title: 'Продолжить играть', hint: 'Играли на этой неделе' },
       almost: { title: 'Почти пройдены', hint: 'От 80% до 99%' },
@@ -1082,7 +1082,6 @@ export const ru: Translations = {
     },
     baseGame: 'Основная игра',
     allGroups: 'Все',
-    withDlc: 'С DLC',
   },
   plurals: {
     games: { one: '{n} игра', few: '{n} игры', many: '{n} игр', other: '{n} игры' },

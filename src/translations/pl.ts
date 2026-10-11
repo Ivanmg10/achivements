@@ -86,11 +86,11 @@ export const pl: Translations = {
     shelvesLabel: 'Półki',
     listLabel: 'Lista',
     cardsLabel: 'Karty',
-    back: 'Wróć do półek',
     seeAll: 'Zobacz wszystkie gry ({n})',
     seeShelf: 'Zobacz {n}',
     platformLabel: 'Platforma',
     openGame: 'Otwórz stronę gry',
+    openInList: 'Pokaż na liście',
     shelves: {
       continue: { title: 'Graj dalej', hint: 'Grane w tym tygodniu' },
       almost: { title: 'Prawie ukończone', hint: 'Od 80% do 99%' },
@@ -1082,7 +1082,6 @@ export const pl: Translations = {
     },
     baseGame: 'Gra podstawowa',
     allGroups: 'Wszystko',
-    withDlc: 'Z DLC',
   },
   plurals: {
     games: { one: '{n} gra', few: '{n} gry', many: '{n} gier', other: '{n} gry' },
