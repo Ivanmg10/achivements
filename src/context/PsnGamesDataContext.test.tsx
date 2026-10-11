@@ -50,3 +50,17 @@ test('an unexpected answer is "failed"', async () => {
   const { result } = renderHook(() => usePsnGamesData(), { wrapper })
   await waitFor(() => expect(result.current.libraryError).toBe('failed'))
 })
+
+test('with "platinum completes" on, only games with a platinum are flagged', async () => {
+  window.localStorage.setItem('psn-completion', 'platinum')
+  setSession({ id: '7', psnaccountid: '42' })
+  const games = [
+    { id: 1, earned: { platinum: 1 } },
+    { id: 2, earned: { platinum: 0 } },
+  ]
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: true, status: 200, json: async () => games })
+  const { result } = renderHook(() => usePsnGamesData(), { wrapper })
+  await waitFor(() => expect(result.current.library).toHaveLength(2))
+  expect(result.current.library.map((g) => g.platinumCompletes)).toEqual([true, undefined])
+  window.localStorage.clear()
+})

@@ -81,3 +81,11 @@ test('psnPlatformChip colours each console its own way; a cross-buy list by its 
   expect(psnPlatformChip('PS3 · PS Vita')).toBe(psnPlatformChip('PS3'))
   expect(psnPlatformChip('PS4')).toContain('#003791')
 })
+
+describe('classifyPsnGame with platinumCompletes', () => {
+  test('a platinum counts as completed below 100% only when asked', () => {
+    expect(classifyPsnGame({ pctWon: 85 })).toBe('playing')
+    expect(classifyPsnGame({ pctWon: 85, platinumCompletes: true })).toBe('completed')
+    expect(classifyPsnGame({ pctWon: 100 })).toBe('completed')
+  })
+})
