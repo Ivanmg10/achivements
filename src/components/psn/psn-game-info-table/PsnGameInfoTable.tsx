@@ -15,6 +15,7 @@ import PsnTrophyGroupTabs, { type GroupTab } from './psn-trophy-group-tabs/PsnTr
 import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy, PsnTrophyGroup } from '@/types/psn'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
 import { useLocationHash } from '@/hooks/useLocationHash'
 
 type Filter = 'all' | 'earned' | 'unearned'
@@ -76,6 +77,7 @@ export default function PsnGameInfoTable({
   const [sortState, setSortState] = useState<SteamSortState>({ key: 'default', dir: 'asc' })
   const [expanded, setExpanded] = useState(true)
   const [highlighted, setHighlighted] = useState<number | null>(null)
+  const { isRevealed, toggle: toggleOne, setAll } = useRevealedTrophies()
 
   const FILTER_LABELS: Record<Filter, string> = {
     all: T.gameInfoTable.filterAll,
@@ -121,6 +123,8 @@ export default function PsnGameInfoTable({
     )
   }
 
+  const secrets = trophies.filter((t) => t.hidden && !t.earned)
+  const allRevealed = secrets.length > 0 && secrets.every((t) => isRevealed(t.id))
   const needsToggle = filtered.length > COLLAPSED_ROWS
   const shown = expanded || !needsToggle ? filtered : filtered.slice(0, COLLAPSED_ROWS)
 
@@ -142,6 +146,15 @@ export default function PsnGameInfoTable({
             {FILTER_LABELS[f]}
           </button>
         ))}
+        {secrets.length > 0 && (
+          <button
+            onClick={() => setAll(secrets.map((t) => t.id), !allRevealed)}
+            aria-pressed={allRevealed}
+            className="px-3 py-1 rounded-full text-xs font-medium bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
+          >
+            {allRevealed ? T.psn.hideHiddenTrophies : T.psn.showHiddenTrophies}
+          </button>
+        )}
       </div>
 
       {filtered.length === 0 ? (
@@ -173,6 +186,8 @@ export default function PsnGameInfoTable({
                     key={t.id}
                     trophy={t}
                     highlighted={highlighted === t.id}
+                    revealed={isRevealed(t.id)}
+                    onToggleReveal={() => toggleOne(t.id)}
                     pinned={canPin ? pinned.has(t.id) : undefined}
                     onTogglePin={() => toggle(t)}
                   />
@@ -188,6 +203,8 @@ export default function PsnGameInfoTable({
                 key={t.id}
                 trophy={t}
                 highlighted={highlighted === t.id}
+                revealed={isRevealed(t.id)}
+                onToggleReveal={() => toggleOne(t.id)}
                 pinned={canPin ? pinned.has(t.id) : undefined}
                 onTogglePin={() => toggle(t)}
               />
