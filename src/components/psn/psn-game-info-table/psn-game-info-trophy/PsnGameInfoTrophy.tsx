@@ -52,26 +52,33 @@ export default function PsnGameInfoTrophy({
       }`}
     >
       <td className="px-3 py-2 w-24 align-middle text-center">
+        <div className="relative group/badge w-16 h-16 mx-auto">
         {t.iconUrl && !concealed ? (
           <FadeImage
             src={t.iconUrl}
             alt=""
             width={64}
             height={64}
-            className={`w-16 h-16 rounded-xl mx-auto ${t.earned ? `ring-2 ${GRADE_RING[t.type]}` : ''}`}
+            className={`w-16 h-16 rounded-xl ${t.earned ? `ring-2 ${GRADE_RING[t.type]}` : ''}`}
             imgClassName={`w-full h-full object-cover ${t.earned ? '' : 'grayscale opacity-50'}`}
             unoptimized
           />
         ) : (
-          <div className="w-16 h-16 rounded-xl bg-ink/10 mx-auto" aria-hidden="true" />
+          <div className="w-16 h-16 rounded-xl bg-ink/10" aria-hidden="true" />
         )}
+        {t.hidden && !t.earned && onToggleReveal && (
+          <PsnRevealTrophyButton
+            revealed={revealed}
+            onToggle={onToggleReveal}
+            size={22}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-bg-card/90 text-text-main flex items-center justify-center opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100"
+          />
+        )}
+        </div>
       </td>
 
       <td className={`px-3 py-2 ${t.earned ? '' : 'opacity-60'}`}>
-        <h3 className="text-lg flex items-center gap-2">
-          {concealed ? T.psn.hiddenTrophy : t.name}
-          {t.hidden && !t.earned && onToggleReveal && <PsnRevealTrophyButton revealed={revealed} onToggle={onToggleReveal} />}
-        </h3>
+        <h3 className="text-lg">{concealed ? T.psn.hiddenTrophy : t.name}</h3>
         <p className="text-sm text-text-secondary">{concealed ? T.psn.hiddenTrophyDesc : t.detail}</p>
       </td>
 

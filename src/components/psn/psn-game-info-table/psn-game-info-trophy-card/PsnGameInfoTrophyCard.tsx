@@ -39,18 +39,29 @@ export default function PsnGameInfoTrophyCard({
       data-trophy={t.id}
       className={`flex items-start gap-3 rounded-xl p-3 transition-colors duration-500 ${highlighted ? 'bg-[#0070d1]/15' : 'bg-bg-main/40'}`}
     >
+      <div className="relative shrink-0">
       {t.iconUrl && !concealed ? (
         <Image
           src={t.iconUrl}
           alt=""
           width={48}
           height={48}
-          className={`w-12 h-12 rounded-lg object-cover shrink-0 ${t.earned ? 'ring-2 ring-[#0070d1]' : 'grayscale opacity-50'}`}
+          className={`w-12 h-12 rounded-lg object-cover ${t.earned ? 'ring-2 ring-[#0070d1]' : 'grayscale opacity-50'}`}
           unoptimized
         />
       ) : (
-        <div className="w-12 h-12 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+        <div className="w-12 h-12 rounded-lg bg-ink/10" aria-hidden="true" />
       )}
+      {t.hidden && !t.earned && onToggleReveal && (
+        // No hover on a phone: the eye is always there.
+        <PsnRevealTrophyButton
+          revealed={revealed}
+          onToggle={onToggleReveal}
+          size={20}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-bg-card/90 text-text-main flex items-center justify-center"
+        />
+      )}
+      </div>
 
       <div className="flex flex-col min-w-0 flex-1 gap-0.5">
         <h3 className={`text-sm font-semibold ${t.earned ? '' : 'text-text-secondary'}`}>{concealed ? T.psn.hiddenTrophy : t.name}</h3>
@@ -76,10 +87,6 @@ export default function PsnGameInfoTrophyCard({
           )}
         </div>
       </div>
-
-      {t.hidden && !t.earned && onToggleReveal && (
-        <PsnRevealTrophyButton revealed={revealed} onToggle={onToggleReveal} size={18} className="shrink-0 mt-0.5" />
-      )}
 
       {pinned !== undefined && (
         <SteamPinAchievementButton
