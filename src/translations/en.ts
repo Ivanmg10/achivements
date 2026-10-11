@@ -162,7 +162,7 @@ export const en = {
     profilePublic: 'Public profile',
     profilePublicOn: 'Other users can find and open your profile',
     profilePublicOff: 'Only you can see it',
-    psnSection: 'PlayStation',
+    psnSection: 'PSN preferences',
     psnHiddenTrophies: 'Hidden trophies',
     psnHiddenConceal: 'Keep them secret',
     psnHiddenReveal: 'Show them',

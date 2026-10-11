@@ -16,8 +16,6 @@ import ThemeModal from '@/components/theme-modal/ThemeModal'
 import PsnPreferencesModal from '@/components/psn-preferences-modal/PsnPreferencesModal'
 import HiddenGamesModal from '@/components/hidden-games-modal/HiddenGamesModal'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
-import { usePsnPlatinumCompletes } from '@/hooks/usePsnPlatinumCompletes'
-import { usePsnRevealHidden } from '@/hooks/usePsnRevealHidden'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { candidateIconUrl } from '@/utils/gameCandidates'
@@ -66,8 +64,6 @@ export default function UserPreferencesCard() {
   const [hiddenOpen, setHiddenOpen] = useState(false)
   const [genderOpen, setGenderOpen] = useState(false)
   const [psnOpen, setPsnOpen] = useState(false)
-  const [platinum] = usePsnPlatinumCompletes()
-  const [revealHidden] = usePsnRevealHidden()
   const { hidden } = useHiddenGames()
 
   const user = session?.user
@@ -133,9 +129,10 @@ export default function UserPreferencesCard() {
         <ProfileField
           label={T.userData.psnSection}
           icon={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />}
-          value={[platinum ? T.userData.psnPlatinumOn : T.userData.psnPlatinumOff, revealHidden ? T.userData.psnHiddenReveal : T.userData.psnHiddenConceal].join(" · ")}
           onEdit={() => setPsnOpen(true)}
-        />
+        >
+          <span className="text-base font-medium">{T.userData.psnSection}</span>
+        </ProfileField>
       </div>
 
       <PsnPreferencesModal isOpen={psnOpen} onClose={() => setPsnOpen(false)} />

@@ -161,7 +161,7 @@ export const de: Translations = {
     profilePublic: 'Öffentliches Profil',
     profilePublicOn: 'Andere Nutzer können dein Profil finden und öffnen',
     profilePublicOff: 'Nur du kannst es sehen',
-    psnSection: 'PlayStation',
+    psnSection: 'PSN-Einstellungen',
     psnHiddenTrophies: 'Versteckte Trophäen',
     psnHiddenConceal: 'Geheim halten',
     psnHiddenReveal: 'Anzeigen',

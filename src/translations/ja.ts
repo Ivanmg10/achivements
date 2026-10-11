@@ -161,7 +161,7 @@ export const ja: Translations = {
     profilePublic: '公開プロフィール',
     profilePublicOn: '他のユーザーがあなたのプロフィールを見つけて開けます',
     profilePublicOff: 'あなただけが見られます',
-    psnSection: 'PlayStation',
+    psnSection: 'PSN設定',
     psnHiddenTrophies: '隠しトロフィー',
     psnHiddenConceal: '非表示にする',
     psnHiddenReveal: '表示する',
