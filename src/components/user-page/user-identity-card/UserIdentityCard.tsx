@@ -152,7 +152,7 @@ export default function UserIdentityCard() {
         </div>
       )}
 
-      <div className="bg-bg-main rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="bg-bg-main rounded-2xl p-4 flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <ProfileField
           label={T.userPage.username}
           value={user?.name}
@@ -181,7 +181,7 @@ export default function UserIdentityCard() {
             <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
           )}
         </ProfileField>
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-3 flex flex-col">
           <UserDescriptionField />
         </div>
       </div>
