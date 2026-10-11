@@ -9,8 +9,8 @@ import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import PsnGameInfoHeaderProgression from './psn-game-info-header-progression/PsnGameInfoHeaderProgression'
+import { psnPlatformChip } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
-import { countTrophies, psnPlatformChip } from '@/utils/psnTitles'
 import type { PsnGameProgress } from '@/types/psn'
 
 /**
@@ -81,12 +81,6 @@ export default function PsnGameInfoHeader({ game }: { game: PsnGameProgress }) {
           <PsnGameInfoHeaderProgression pct={game.pctWon} earned={game.numAwarded} total={game.maxPossible} label={game.title} />
 
           <PsnTrophyCounts earned={game.earned} of={game.defined} className="text-sm" />
-
-          {game.hasDlc && (
-            <p className="text-xs text-text-secondary">
-              {T.psn.withDlc}: {countTrophies(game.full.earned)} / {countTrophies(game.full.defined)} · {game.full.pctWon}%
-            </p>
-          )}
 
           <ul className="flex flex-col gap-1 text-sm">
             {facts.map((f) => (

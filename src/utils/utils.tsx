@@ -69,10 +69,11 @@ export const groupByConsole = (games: RetroAchievementsGameCompleted[]) => {
   return Object.entries(grouped).map(([name, value]) => ({ name, value }))
 }
 
-export const groupByDays = (achievements: RecentAchievement[], totalDays: number) => {
+/** The last `totalDays` days up to `end` (today unless said otherwise), each with how many achievements fell on it. */
+export const groupByDays = (achievements: RecentAchievement[], totalDays: number, end: Date = new Date()) => {
   const days: string[] = []
   for (let i = totalDays - 1; i >= 0; i--) {
-    const d = new Date()
+    const d = new Date(end)
     d.setDate(d.getDate() - i)
     days.push(d.toISOString().split('T')[0])
   }
