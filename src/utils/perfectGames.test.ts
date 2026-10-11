@@ -103,6 +103,18 @@ describe('collection helpers', () => {
     expect(dates.get('steam:620')).toBe('2023-05-01T00:00:00Z')
   })
 
+  test('perfectDates: Steam prefers its last unlock over a later replay session', () => {
+    const g = steam(620, 'Portal 2', { lastPlayed: '2025-05-01T00:00:00Z', lastUnlock: '2022-03-01T00:00:00Z' })
+    expect(perfectDates([], [g]).get('steam:620')).toBe('2022-03-01T00:00:00Z')
+  })
+
+  test('groupPerfectsByYear: RA dates are UTC, so New Year does not shift the year', () => {
+    const one = buildPerfectGames([ra(1, 'A')])
+    const dates = new Map([['ra:1', '2024-12-31 23:30:00']])
+    const year = groupPerfectsByYear(one, dates)[0].year
+    expect(year).toBe(new Date(Date.UTC(2024, 11, 31, 23, 30)).getFullYear())
+  })
+
   test('filterPerfects picks one kind', () => {
     expect(filterPerfects(games, 'raHc').map((g) => g.key)).toEqual(['ra:1', 'ra:3'])
     expect(filterPerfects(games, 'raSc').map((g) => g.key)).toEqual(['ra:2'])
