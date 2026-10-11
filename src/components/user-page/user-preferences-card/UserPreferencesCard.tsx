@@ -13,7 +13,7 @@ import FavoriteGameModal, { FavoriteGame } from '@/components/favorite-game-moda
 import GenderModal from '@/components/gender-modal/GenderModal'
 import LanguageModal from '@/components/language-modal/LanguageModal'
 import ThemeModal from '@/components/theme-modal/ThemeModal'
-import PsnPreferencesModal from '@/components/psn-preferences-modal/PsnPreferencesModal'
+import UserPsnPreferences from '@/components/user-page/user-psn-preferences/UserPsnPreferences'
 import HiddenGamesModal from '@/components/hidden-games-modal/HiddenGamesModal'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
@@ -63,7 +63,6 @@ export default function UserPreferencesCard() {
   const [favoriteOpen, setFavoriteOpen] = useState<GameSource | null>(null)
   const [hiddenOpen, setHiddenOpen] = useState(false)
   const [genderOpen, setGenderOpen] = useState(false)
-  const [psnOpen, setPsnOpen] = useState(false)
   const { hidden } = useHiddenGames()
 
   const user = session?.user
@@ -106,6 +105,14 @@ export default function UserPreferencesCard() {
 
         <UserProfilePublicToggle />
 
+        <ProfileField
+          label={T.userPage.hiddenGames}
+          icon={<IconEyeOff size={18} />}
+          value={hidden.length > 0 ? T.userPage.hiddenCount.replace('{n}', String(hidden.length)) : null}
+          empty={T.userPage.hiddenNone}
+          onEdit={() => setHiddenOpen(true)}
+        />
+
         <ProfileField label={T.userPage.favoriteRaGame} icon={<RaLogo height={11} />} onEdit={() => setFavoriteOpen('ra')}>
           <FavoriteValue game={raFavorite} source="ra" empty={T.userData.notSet} />
         </ProfileField>
@@ -117,25 +124,10 @@ export default function UserPreferencesCard() {
         <ProfileField label={T.userPage.favoritePsnGame} icon={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />} onEdit={() => setFavoriteOpen('psn')}>
           <FavoriteValue game={psnFavorite} source="psn" empty={T.userData.notSet} />
         </ProfileField>
-
-        <ProfileField
-          label={T.userPage.hiddenGames}
-          icon={<IconEyeOff size={18} />}
-          value={hidden.length > 0 ? T.userPage.hiddenCount.replace('{n}', String(hidden.length)) : null}
-          empty={T.userPage.hiddenNone}
-          onEdit={() => setHiddenOpen(true)}
-        />
-
-        <ProfileField
-          label={T.userData.psnSection}
-          icon={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />}
-          onEdit={() => setPsnOpen(true)}
-        >
-          <span className="text-base font-medium">{T.userData.psnSection}</span>
-        </ProfileField>
       </div>
 
-      <PsnPreferencesModal isOpen={psnOpen} onClose={() => setPsnOpen(false)} />
+      <UserPsnPreferences />
+
       <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
       <HiddenGamesModal isOpen={hiddenOpen} onClose={() => setHiddenOpen(false)} />
       <LanguageModal isOpen={langOpen} onClose={() => setLangOpen(false)} />
