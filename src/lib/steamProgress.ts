@@ -113,7 +113,7 @@ export async function mapWithConcurrency<T, R>(
  */
 export function progressCacheKey(steamid: string, game: SteamGameProgress): string {
   const played = game.lastPlayed ? Date.parse(game.lastPlayed) : 0
-  return `steamProgress:${steamid}:${game.id}:${played}`
+  return `steamProgress2:${steamid}:${game.id}:${played}`
 }
 
 export function progressTtl(game: SteamGameProgress, now = Date.now()): number {

@@ -131,12 +131,12 @@ describe('progress cache key and TTL', () => {
   test('the key moves when the game is played again', () => {
     const before = progressCacheKey('765', game(1, { rtime_last_played: LONG_AGO }))
     const after = progressCacheKey('765', game(1, { rtime_last_played: LONG_AGO + 3600 }))
-    expect(before).toBe(`steamProgress:765:1:${LONG_AGO * 1000}`)
+    expect(before).toBe(`steamProgress2:765:1:${LONG_AGO * 1000}`)
     expect(after).not.toBe(before)
   })
 
   test('an undated game gets a stable key', () => {
-    expect(progressCacheKey('765', game(1, { rtime_last_played: undefined }))).toBe('steamProgress:765:1:0')
+    expect(progressCacheKey('765', game(1, { rtime_last_played: undefined }))).toBe('steamProgress2:765:1:0')
   })
 
   test('settled games keep counts for a month; ones played in the last 48h for an hour', () => {
@@ -165,7 +165,7 @@ describe('enrichWithAchievementCounts', () => {
     expect(complete).toBe(true)
     expect(out).toMatchObject({ achievementsLoaded: true, maxPossible: 4, numAwarded: 3, pctWon: 75 })
     // Only the counts are stored, never Steam's whole list.
-    expect(writeCache).toHaveBeenCalledWith(progressCacheKey('765', g), { total: 4, awarded: 3 }, TTL.settledProgress, '7')
+    expect(writeCache).toHaveBeenCalledWith(progressCacheKey('765', g), { total: 4, awarded: 3, lastUnlock: null }, TTL.settledProgress, '7')
   })
 
   test('reads every cached game in one query and spends no Steam call on hits', async () => {
@@ -221,7 +221,7 @@ describe('enrichWithAchievementCounts', () => {
 
     expect(out.achievementsLoaded).toBe(false)
     expect(complete).toBe(true)
-    expect(writeCache).toHaveBeenCalledWith(expect.any(String), { total: 0, awarded: 0 }, TTL.achievements, '7')
+    expect(writeCache).toHaveBeenCalledWith(expect.any(String), { total: 0, awarded: 0, lastUnlock: null }, TTL.achievements, '7')
   })
 
   test('cached counts fill the game without calling Steam', async () => {

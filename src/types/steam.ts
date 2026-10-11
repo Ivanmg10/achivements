@@ -79,7 +79,12 @@ export type SteamPlayerAchievement = {
 }
 
 /** A player's progress in one game, reduced to the two numbers the library shows. */
-export type SteamUnlockCounts = { total: number; awarded: number }
+export type SteamUnlockCounts = {
+  total: number
+  awarded: number
+  /** ISO date of the latest unlock — at 100%, the one that finished the game. */
+  lastUnlock?: string | null
+}
 
 export type SteamPlayerAchievementsResponse = {
   playerstats: {
@@ -174,6 +179,8 @@ export type SteamGameProgress = GameProgressBase & {
    * a game with no achievements would both look like 0/0.
    */
   achievementsLoaded: boolean
+  /** When the latest achievement was unlocked, once counts are loaded. */
+  lastUnlock?: string | null
 }
 
 type AchievementBase = {
