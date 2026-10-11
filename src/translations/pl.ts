@@ -1058,6 +1058,8 @@ export const pl: Translations = {
     locked: 'Zablokowane',
     hiddenTrophy: 'Ukryte trofeum',
     hiddenTrophyDesc: 'Graj dalej, aby je odkryć',
+    showHiddenTrophies: 'Pokaż ukryte trofea (spoilery)',
+    hideHiddenTrophies: 'Ukryj ukryte trofea',
     rarity: '{n}% graczy',
     trophiesError: 'Nie udało się wczytać trofeów',
     noTrophies: 'Ta gra nie ma trofeów',

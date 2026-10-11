@@ -1058,6 +1058,8 @@ export const it: Translations = {
     locked: 'Bloccato',
     hiddenTrophy: 'Trofeo nascosto',
     hiddenTrophyDesc: 'Continua a giocare per scoprirlo',
+    showHiddenTrophies: 'Mostra i trofei nascosti (spoiler)',
+    hideHiddenTrophies: 'Nascondi i trofei nascosti',
     rarity: '{n}% dei giocatori',
     trophiesError: 'Impossibile caricare i trofei',
     noTrophies: 'Questo gioco non ha trofei',

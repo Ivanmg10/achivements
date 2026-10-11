@@ -1058,6 +1058,8 @@ export const ru: Translations = {
     locked: 'Не получен',
     hiddenTrophy: 'Скрытый трофей',
     hiddenTrophyDesc: 'Продолжайте играть, чтобы открыть его',
+    showHiddenTrophies: 'Показать скрытые трофеи (спойлеры)',
+    hideHiddenTrophies: 'Скрыть скрытые трофеи',
     rarity: '{n}% игроков',
     trophiesError: 'Не удалось загрузить трофеи',
     noTrophies: 'В этой игре нет трофеев',

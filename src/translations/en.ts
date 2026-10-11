@@ -1059,6 +1059,8 @@ export const en = {
     locked: 'Locked',
     hiddenTrophy: 'Hidden trophy',
     hiddenTrophyDesc: 'Keep playing to reveal it',
+    showHiddenTrophies: 'Show hidden trophies (spoilers)',
+    hideHiddenTrophies: 'Hide hidden trophies',
     rarity: '{n}% of players',
     trophiesError: 'Could not load the trophies',
     noTrophies: 'This game has no trophies',

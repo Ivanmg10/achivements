@@ -1058,6 +1058,8 @@ export const fr: Translations = {
     locked: 'Verrouillé',
     hiddenTrophy: 'Trophée caché',
     hiddenTrophyDesc: 'Continue à jouer pour le révéler',
+    showHiddenTrophies: 'Afficher les trophées cachés (spoilers)',
+    hideHiddenTrophies: 'Masquer les trophées cachés',
     rarity: '{n} % des joueurs',
     trophiesError: 'Impossible de charger les trophées',
     noTrophies: 'Ce jeu n’a pas de trophées',

@@ -1058,6 +1058,8 @@ export const ja: Translations = {
     locked: '未獲得',
     hiddenTrophy: '隠しトロフィー',
     hiddenTrophyDesc: 'プレイを続けると表示されます',
+    showHiddenTrophies: '隠しトロフィーを表示（ネタバレ）',
+    hideHiddenTrophies: '隠しトロフィーを非表示',
     rarity: 'プレイヤーの{n}%',
     trophiesError: 'トロフィーを読み込めませんでした',
     noTrophies: 'このゲームにはトロフィーがありません',

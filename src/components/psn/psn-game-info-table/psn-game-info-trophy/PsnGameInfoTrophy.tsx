@@ -23,17 +23,20 @@ const GRADE_RING: Record<TrophyGrade, string> = {
 export default function PsnGameInfoTrophy({
   trophy: t,
   highlighted = false,
+  revealed = false,
   pinned,
   onTogglePin,
 }: {
   trophy: PsnTrophy
   highlighted?: boolean
+  /** The viewer chose to see hidden trophies before earning them. */
+  revealed?: boolean
   /** Undefined for a signed-out visitor, who cannot pin. */
   pinned?: boolean
   onTogglePin?: () => void
 }) {
   const { T, lang } = useLanguage()
-  const concealed = t.hidden && !t.earned
+  const concealed = t.hidden && !t.earned && !revealed
   const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }[t.type]
 
   return (
