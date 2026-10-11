@@ -137,8 +137,8 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
                   <PsnRevealTrophyButton
                     revealed={revealedIds.has(t.id)}
                     onToggle={() => toggleReveal(t.id)}
-                    size={12}
-                    className="absolute -top-1 -left-1 z-20 w-5 h-5 rounded-full bg-bg-card/90 flex items-center justify-center opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100"
+                    size={20}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-bg-card/90 text-text-main flex items-center justify-center opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100"
                   />
                 )}
                 {canPin && (
