@@ -4,10 +4,10 @@ import { en } from '@/translations/en'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 import type { SteamGameProgress } from '@/types/steam'
 
-jest.mock('@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements', () => ({
+jest.mock('@/components/steam/steam-library-detail/SteamLibraryDetail', () => ({
   __esModule: true,
-  default: ({ appId, expectedCount, badgeSize }: { appId: number; expectedCount?: number; badgeSize: number }) => (
-    <div data-testid="achievements">{appId}:{String(expectedCount)}:{badgeSize}</div>
+  default: ({ game, category }: { game: { id: number }; category?: string }) => (
+    <div data-testid="achievements">{game.id}:{category}</div>
   ),
 }))
 
@@ -100,13 +100,13 @@ describe('expanding', () => {
     expect(screen.queryByTestId('achievements')).not.toBeInTheDocument()
   })
 
-  test('opens the 48px badge grid, sized to the known count, and closes again', () => {
-    render(<SteamStatusGameItem game={game(partial)} />)
+  test('opens the detail for its list, and closes again', () => {
+    render(<SteamStatusGameItem game={game(partial)} category="playing" />)
     fireEvent.click(screen.getByRole('button', { name: /achievements: / }))
 
     const button = screen.getByRole('button', { name: `${en.steam.hideAchievements}: Fallout 4` })
     expect(button.getAttribute('aria-expanded')).toBe('true')
-    expect(screen.getByTestId('achievements')).toHaveTextContent('377160:84:48')
+    expect(screen.getByTestId('achievements')).toHaveTextContent('377160:playing')
     expect(document.getElementById(button.getAttribute('aria-controls')!)).not.toBeNull()
 
     fireEvent.click(button)

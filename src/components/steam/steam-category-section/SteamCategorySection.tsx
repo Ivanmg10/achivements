@@ -11,6 +11,7 @@ import SteamStatusGameList from '@/components/steam/steam-status-game-list/Steam
 import EmptyState from '@/components/empty-state/EmptyState'
 import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import { steamPreviewGames } from '@/utils/sectionPreview'
+import { matchesQuick, steamProgress, type QuickFilter } from '@/utils/libraryInsights'
 
 const SKELETON_CARDS = 4
 
@@ -34,6 +35,7 @@ export default function SteamCategorySection({
   title,
   className = '',
   query = '',
+  quick = 'all',
   preview = { columns: 3, count: 3 },
 }: {
   category: string
@@ -44,12 +46,14 @@ export default function SteamCategorySection({
   className?: string
   /** Title filter shared with the RA list, from the page's search box. */
   query?: string
+  /** The page's quick filter (almost done, stalled). */
+  quick?: QuickFilter
   /** The folded preview's size, decided by the page so all sections fill the screen together. */
   preview?: { columns: number; count: number }
 }) {
   const { T } = useLanguage()
   const { games: allGames, isLinked, loading, error, progressTruncated, refetch } = useSteamGamesByCategory(category)
-  const games = useMemo(() => allGames.filter((g) => titleMatches(g.title, query)), [allGames, query])
+  const games = useMemo(() => allGames.filter((g) => titleMatches(g.title, query) && matchesQuick(steamProgress(g), quick)), [allGames, query, quick])
 
   if (!isLinked) return null
 
@@ -89,11 +93,11 @@ export default function SteamCategorySection({
         <EmptyState
           size="compact"
           icon={<SteamLogo className="w-6 h-6" />}
-          title={query ? T.search.noResults : T.steam.noGamesInCategory}
+          title={query || quick !== 'all' ? T.search.noResults : T.steam.noGamesInCategory}
           className="py-6"
         />
       ) : (
-        <SteamStatusGameList games={games} gridCols={gridCols} />
+        <SteamStatusGameList games={games} gridCols={gridCols} category={category} />
       )}
     </CollapsibleSection>
   )

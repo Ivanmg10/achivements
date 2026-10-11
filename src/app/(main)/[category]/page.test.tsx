@@ -16,7 +16,7 @@ jest.mock('../../../hooks/useGamesByCategory', () => ({
 }))
 
 jest.mock('../../../hooks/useGameExtraData', () => ({
-  useGameExtraData: jest.fn(() => ({})),
+  useGameExtraData: jest.fn(() => new Map()),
 }))
 
 jest.mock('../../../hooks/useConsoleFilter', () => ({
@@ -58,6 +58,13 @@ jest.mock('../../../components/empty-state/EmptyState', () => ({
 jest.mock('@/components/status-page-skeleton/StatusPageSkeleton', () => ({
   __esModule: true,
   default: () => <div data-testid="loading-page" />,
+}))
+
+jest.mock('@/components/library-all-list/LibraryAllList', () => ({
+  __esModule: true,
+  default: ({ entries }: { entries: { key: string; title: string }[] }) => (
+    <ul>{entries.map((e) => <li key={e.key} data-testid="mixed-item">{e.title}</li>)}</ul>
+  ),
 }))
 
 jest.mock('@/hooks/useRaLinked', () => ({ useRaLinked: jest.fn() }))
@@ -253,5 +260,58 @@ describe('foldable RA and Steam sections', () => {
     fireEvent.click(screen.getByRole('button', { name: /RetroAchievements/ }))
     expect(screen.getByTestId('empty-state')).toBeInTheDocument()
     expect(screen.getByTestId('steam-section')).toBeInTheDocument()
+  })
+})
+
+describe('library filters and views', () => {
+  const ra = { GameID: 1, Title: 'Sly Cooper', ConsoleID: 21, ConsoleName: 'PS2', PctWon: '0.9' }
+  const steam = { id: 5, title: 'Hades', pctWon: 30, lastPlayed: '2020-01-01T00:00:00Z' }
+
+  beforeEach(() => {
+    localStorage.clear()
+    ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [ra], loading: false, error: undefined })
+    ;(useGameFiltering as jest.Mock).mockReturnValue([ra])
+  })
+
+  afterEach(() => {
+    ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false })
+    ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [] })
+  })
+
+  test('games in progress get quick filters with their counts', () => {
+    render(<CategoryPage />)
+    expect(screen.getByRole('button', { name: /Almost done 1/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Stalled 0/ })).toBeDisabled()
+  })
+
+  test('the other categories have none', () => {
+    ;(useParams as jest.Mock).mockReturnValue({ category: 'wantToPlay' })
+    render(<CategoryPage />)
+    expect(screen.queryByRole('group', { name: 'Quick filters' })).not.toBeInTheDocument()
+  })
+
+  test('there is no view toggle with one platform', () => {
+    render(<CategoryPage />)
+    expect(screen.queryByRole('group', { name: 'View' })).not.toBeInTheDocument()
+  })
+
+  test('with two platforms, "all together" mixes them into one list', () => {
+    ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true })
+    ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [steam], loading: false })
+    render(<CategoryPage />)
+    fireEvent.click(screen.getByRole('button', { name: 'All together' }))
+    expect(screen.getAllByTestId('mixed-item').map((n) => n.textContent)).toEqual(['Hades', 'Sly Cooper'])
+    expect(screen.queryByTestId('steam-section')).not.toBeInTheDocument()
+    // Last played first, games with no date after; and the choice is kept for the next visit.
+    expect(localStorage.getItem('library-view')).toBe('all')
+  })
+
+  test('the stalled filter keeps only games left untouched', () => {
+    ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true })
+    ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [steam], loading: false })
+    render(<CategoryPage />)
+    fireEvent.click(screen.getByRole('button', { name: 'All together' }))
+    fireEvent.click(screen.getByRole('button', { name: /Stalled 1/ }))
+    expect(screen.getAllByTestId('mixed-item').map((n) => n.textContent)).toEqual(['Hades'])
   })
 })

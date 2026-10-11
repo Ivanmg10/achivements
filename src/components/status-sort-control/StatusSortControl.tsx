@@ -30,8 +30,11 @@ export default function StatusSortControl({
   cat,
   sortState,
   onChange,
+  keys: only,
 }: {
   cat: string
+  /** Restrict the offered orders, for a list that cannot sort by all of them. */
+  keys?: StatusSortKey[]
   sortState: StatusSortState
   onChange: (s: StatusSortState) => void
 }) {
@@ -53,7 +56,7 @@ export default function StatusSortControl({
     return () => document.removeEventListener('keydown', onKey)
   }, [isOpen])
 
-  const keys = STATUS_SORT_KEYS_BY_CATEGORY[cat] ?? STATUS_SORT_KEYS_BY_CATEGORY.playing
+  const keys = only ?? STATUS_SORT_KEYS_BY_CATEGORY[cat] ?? STATUS_SORT_KEYS_BY_CATEGORY.playing
   const arrow = sortState.dir === 'asc' ? '↑' : '↓'
 
   function handleSelect(key: StatusSortKey) {

@@ -12,11 +12,8 @@ import CompletedFilter, {
   CompletedMode,
 } from '../../../components/completed-filter/CompletedFilter'
 import ConsoleFilter, { buildConsolePills } from '@/components/console-filter/ConsoleFilter'
-import StatusSortControl, {
-  StatusSortState,
-  defaultSortStateFor,
-} from '@/components/status-sort-control/StatusSortControl'
-import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
+import StatusSortControl from '@/components/status-sort-control/StatusSortControl'
+import StatusGridControl from '@/components/status-grid-control/StatusGridControl'
 import StatusEmptyState from '@/components/status-empty-state/StatusEmptyState'
 import StatusPageSkeleton from '@/components/status-page-skeleton/StatusPageSkeleton'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -33,6 +30,19 @@ import { titleMatches } from '@/utils/gameCandidates'
 import { useRaLinked } from '@/hooks/useRaLinked'
 import { useMemo, useRef } from 'react'
 import { usePreviewLayout } from '@/hooks/usePreviewLayout'
+import { useLibraryPrefs } from '@/hooks/useLibraryPrefs'
+import { OpenCardProvider } from '@/context/OpenCardContext'
+import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useLanguage } from '@/context/LanguageContext'
+import LibraryQuickFilters from '@/components/library-quick-filters/LibraryQuickFilters'
+import LibraryViewToggle from '@/components/library-view-toggle/LibraryViewToggle'
+import LibraryAllList from '@/components/library-all-list/LibraryAllList'
+import {
+  buildEntries, countQuick, matchesQuick, psnProgress, raProgress, sortEntries, steamProgress, type QuickFilter,
+} from '@/utils/libraryInsights'
+
+/** The mixed list cannot sort by points: only RA has them. */
+const MIXED_SORT_KEYS = ['name', 'lastPlayed', 'percent'] as const
 
 export default function CategoryPage() {
   const { category } = useParams()
@@ -41,36 +51,73 @@ export default function CategoryPage() {
   const [completedMode, setCompletedMode] = useState<CompletedMode>('all')
   const { selected, toggle, clear } = useConsoleFilter()
   const cat = category as string
-  const [sortState, setSortState] = useState<StatusSortState>(() => defaultSortStateFor(cat))
-  const [gridCols, setGridCols] = useState<StatusGridCols>(2)
+  const { T } = useLanguage()
+  const { sortState, setSortState, allSortState, setAllSortState, gridCols, setGridCols, view, setView } = useLibraryPrefs(cat)
+  // "Almost done" and "stalled" only make sense for games in progress; each category starts without one.
+  const [quickChoice, setQuick] = useState<QuickFilter>('all')
+  useWhenChanged([cat], () => setQuick('all'))
+  const quick = cat === 'playing' ? quickChoice : 'all'
   const { isLinked: steamLinked } = useSteamGamesData()
   // A Steam-only user has no RA list to show — its empty state would tell them
   // to go play on RetroAchievements. Without either account, keep the RA page.
   // No RA account, no RA section — not even an empty one.
   const showRa = useRaLinked()
 
-  // A different category starts from its own default order; adjusted during
-  // render, so the old order is never shown for a frame.
-  const [sortFor, setSortFor] = useState(cat)
-  if (sortFor !== cat) {
-    setSortFor(cat)
-    setSortState(defaultSortStateFor(cat))
-  }
 
 
   const consolePills = useMemo(() => buildConsolePills(games), [games])
   const filteredGames = useGameFiltering({ games, cat, extraData, selected, completedMode, sortState })
-  const { games: allSteamGames } = useSteamGamesByCategory(cat)
-  const { games: allPsnGames, isLinked: psnLinked } = usePsnGamesByCategory(cat)
+  const { games: allSteamGames, loading: steamLoading, error: steamError } = useSteamGamesByCategory(cat)
+  const { games: allPsnGames, isLinked: psnLinked, loading: psnLoading, error: psnError } = usePsnGamesByCategory(cat)
   const psnShown = psnLinked
   // Another platform beside RA: each one gets a section that folds away.
   const othersLinked = steamLinked || psnShown
 
   // One search box for every platform: a game is found without knowing which it is on.
   const [query, setQuery] = useState('')
-  const visibleGames = useMemo(() => filteredGames.filter((g) => titleMatches(g.Title, query)), [filteredGames, query])
-  const steamGames = useMemo(() => allSteamGames.filter((g) => titleMatches(g.title, query)), [allSteamGames, query])
-  const psnGames = useMemo(() => allPsnGames.filter((g) => titleMatches(g.title, query)), [allPsnGames, query])
+  const searchedGames = useMemo(() => filteredGames.filter((g) => titleMatches(g.Title, query)), [filteredGames, query])
+  const searchedSteam = useMemo(() => allSteamGames.filter((g) => titleMatches(g.title, query)), [allSteamGames, query])
+  const searchedPsn = useMemo(() => allPsnGames.filter((g) => titleMatches(g.title, query)), [allPsnGames, query])
+
+  // Platforms beside each other, or every game in one list: the choice only exists with 2+ platforms.
+  const platformCount = (showRa ? 1 : 0) + (steamLinked ? 1 : 0) + (psnShown ? 1 : 0)
+  const mixed = platformCount > 1 && view === 'all'
+  const mixedLoading = (showRa && loading) || (steamLinked && steamLoading) || (psnShown && psnLoading)
+  const mixedEntries = useMemo(
+    () =>
+      buildEntries(
+        mixed && showRa ? games.filter((g) => titleMatches(g.Title, query)) : [],
+        extraData,
+        mixed && steamLinked ? searchedSteam : [],
+        mixed && psnShown ? searchedPsn : [],
+      ),
+    [mixed, showRa, games, query, extraData, steamLinked, psnShown, searchedSteam, searchedPsn],
+  )
+
+  // Counts for the quick filters come from what the page lists before they apply.
+  const quickCounts = useMemo(
+    () =>
+      countQuick(
+        mixed
+          ? mixedEntries
+          : [
+              ...searchedGames.map((g) => raProgress(g, extraData.get('GameID' in g && g.GameID ? g.GameID : (g as { ID: number }).ID))),
+              ...searchedSteam.map(steamProgress),
+              ...searchedPsn.map(psnProgress),
+            ],
+      ),
+    [mixed, mixedEntries, searchedGames, searchedSteam, searchedPsn, extraData],
+  )
+  const visibleGames = useMemo(
+    () => searchedGames.filter((g) => matchesQuick(raProgress(g, extraData.get('GameID' in g && g.GameID ? g.GameID : (g as { ID: number }).ID)), quick)),
+    [searchedGames, extraData, quick],
+  )
+  const steamGames = useMemo(() => searchedSteam.filter((g) => matchesQuick(steamProgress(g), quick)), [searchedSteam, quick])
+  const psnGames = useMemo(() => searchedPsn.filter((g) => matchesQuick(psnProgress(g), quick)), [searchedPsn, quick])
+  const mixedList = useMemo(
+    () => sortEntries(mixedEntries.filter((e) => matchesQuick(e, quick)), allSortState),
+    [mixedEntries, quick, allSortState],
+  )
 
   // Folded previews fill the screen together: one entry per platform section
   // on the page, in order (RA, Steam, PSN). Xbox, when it arrives, adds its own.
@@ -100,6 +147,9 @@ export default function CategoryPage() {
     </>
   )
 
+  const quickRow = cat === 'playing' && <LibraryQuickFilters value={quick} counts={quickCounts} onChange={setQuick} />
+  const viewToggle = platformCount > 1 && <LibraryViewToggle value={view} onChange={setView} />
+
   const raBody = (
     <>
       {consolePills.length > 0 && (
@@ -116,9 +166,33 @@ export default function CategoryPage() {
   )
 
   return (
+    <OpenCardProvider>
     <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main">
       <div ref={pageRef} className="w-full lg:max-w-[98%] flex flex-col gap-3">
-        {!showRa ? null : loading ? (
+        {mixed ? (
+          mixedLoading ? (
+            <StatusPageSkeleton cols={gridCols} />
+          ) : (
+            <>
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <StatusPageHeader category={cat} gameCount={mixedList.length} />
+                <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+                  <CategorySearch value={query} onChange={setQuery} />
+                  <StatusSortControl cat={cat} keys={[...MIXED_SORT_KEYS]} sortState={allSortState} onChange={setAllSortState} />
+                  <StatusGridControl cols={gridCols} onChange={setGridCols} />
+                  {viewToggle}
+                </div>
+              </div>
+              {quickRow}
+              {(error || steamError || psnError) && (
+                <p role="alert" className="text-sm text-red-400">
+                  {[error, steamError && T.steam.gamesError, psnError && T.psn.gamesError].filter(Boolean).join(' · ')}
+                </p>
+              )}
+              <LibraryAllList entries={mixedList} category={cat} gridCols={gridCols} />
+            </>
+          )
+        ) : !showRa ? null : loading ? (
           <StatusPageSkeleton cols={gridCols} />
         ) : error ? (
           <p className="text-red-400 text-sm text-center mt-10">{error}</p>
@@ -136,6 +210,7 @@ export default function CategoryPage() {
                   <StatusGridControl cols={gridCols} onChange={setGridCols} />
                 </div>
               </div>
+              {quickRow}
               {raBody}
             </>
           )
@@ -153,8 +228,10 @@ export default function CategoryPage() {
               <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
                 <CategorySearch value={query} onChange={setQuery} />
                 <StatusGridControl cols={gridCols} onChange={setGridCols} />
+                {viewToggle}
               </div>
             </div>
+            {quickRow}
             <CollapsibleSection
               title="RetroAchievements"
               icon={<RaLogo height={20} />}
@@ -174,14 +251,17 @@ export default function CategoryPage() {
           </>
         )}
         {/* Steam alone: no RA header above, so the search box gets its own row. */}
-        {!showRa && (
-          <div className="flex justify-end">
+        {!showRa && !mixed && (
+          <div className="flex items-center justify-end gap-2 flex-wrap">
             <CategorySearch value={query} onChange={setQuery} />
+            {viewToggle}
           </div>
         )}
-        {(!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} query={query} preview={steamPreview} />}
-        {(!showRa || !loading) && <PsnCategorySection category={cat} gridCols={gridCols} query={query} preview={psnPreview} />}
+        {!showRa && !mixed && quickRow}
+        {!mixed && (!showRa || !loading) && <SteamCategorySection category={cat} gridCols={gridCols} query={query} quick={quick} preview={steamPreview} />}
+        {!mixed && (!showRa || !loading) && <PsnCategorySection category={cat} gridCols={gridCols} query={query} quick={quick} preview={psnPreview} />}
       </div>
     </div>
+    </OpenCardProvider>
   )
 }

@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { usePsnGamesByCategory } from '@/hooks/usePsnGamesByCategory'
 import { titleMatches } from '@/utils/gameCandidates'
 import { psnPreviewGames } from '@/utils/sectionPreview'
+import { matchesQuick, psnProgress, type QuickFilter } from '@/utils/libraryInsights'
 import CollapsibleSection from '@/components/collapsible-section/CollapsibleSection'
 import CollapsibleSectionPreview from '@/components/collapsible-section/collapsible-section-preview/CollapsibleSectionPreview'
 import PsnStatusGameItem from '@/components/psn/psn-status-game-item/PsnStatusGameItem'
@@ -31,18 +32,21 @@ export default function PsnCategorySection({
   category,
   gridCols = 2,
   query = '',
+  quick = 'all',
   preview = { columns: 3, count: 3 },
 }: {
   category: string
   gridCols?: StatusGridCols
   /** Title filter shared with the other lists, from the page's search box. */
   query?: string
+  /** The page's quick filter (almost done, stalled). */
+  quick?: QuickFilter
   /** The folded preview's size, decided by the page so all sections fill the screen together. */
   preview?: { columns: number; count: number }
 }) {
   const { T } = useLanguage()
   const { games: allGames, isLinked, loading, error, refetch } = usePsnGamesByCategory(category)
-  const games = useMemo(() => allGames.filter((g) => titleMatches(g.title, query)), [allGames, query])
+  const games = useMemo(() => allGames.filter((g) => titleMatches(g.title, query) && matchesQuick(psnProgress(g), quick)), [allGames, query, quick])
 
   if (!isLinked) return null
 
@@ -78,13 +82,13 @@ export default function PsnCategorySection({
         <EmptyState
           size="compact"
           icon={<PlaystationLogo size={24} aria-hidden="true" />}
-          title={query ? T.search.noResults : T.psn.noGamesInCategory}
+          title={query || quick !== 'all' ? T.search.noResults : T.psn.noGamesInCategory}
           className="py-6"
         />
       ) : (
         <div className={`grid gap-3 items-start w-full ${STATUS_GRID_COLS[gridCols]}`}>
           {games.map((g) => (
-            <PsnStatusGameItem key={g.id} game={g} />
+            <PsnStatusGameItem key={g.id} game={g} category={category} />
           ))}
         </div>
       )}
