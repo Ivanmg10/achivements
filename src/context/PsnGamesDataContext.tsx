@@ -1,9 +1,10 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { psnErrorFrom, type PsnError } from '@/hooks/usePsnLink'
 import type { PsnGameProgress } from '@/types/psn'
+import { usePsnPlatinumCompletes } from '@/hooks/usePsnPlatinumCompletes'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 
@@ -33,6 +34,7 @@ const Ctx = createContext<PsnGamesCtx>({
 export function PsnGamesDataProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
   const subject = useSubject()
+  const [platinumCompletes] = usePsnPlatinumCompletes()
   const accountId = session?.user?.psnaccountid ?? null
 
   const [library, setLibrary] = useState<PsnGameProgress[]>([])
@@ -85,12 +87,16 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
   }, [accountId, load])
 
   const current = Boolean(accountId) && loadedFor === accountId
+  const games = useMemo(
+    () => (platinumCompletes ? library.map((g) => (g.earned.platinum > 0 ? { ...g, platinumCompletes: true } : g)) : library),
+    [library, platinumCompletes],
+  )
 
   return (
     <Ctx.Provider
       value={{
         isLinked: Boolean(accountId),
-        library: current ? library : [],
+        library: current ? games : [],
         libraryLoading: Boolean(accountId) && (libraryLoading || !current),
         libraryError: current ? libraryError : null,
         refetch,

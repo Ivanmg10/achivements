@@ -4,11 +4,13 @@ import { en } from '@/translations/en'
 
 beforeEach(() => window.localStorage.clear())
 
-test('shows the current choice and saves the other one, closing', () => {
-  const onClose = jest.fn()
-  render(<PsnPreferencesModal isOpen onClose={onClose} />)
+test('both choices start on their defaults and save independently', () => {
+  render(<PsnPreferencesModal isOpen onClose={jest.fn()} />)
+  expect(screen.getByRole('radio', { name: en.userData.psnPlatinumOff })).toBeChecked()
   expect(screen.getByRole('radio', { name: en.userData.psnHiddenConceal })).toBeChecked()
   fireEvent.click(screen.getByRole('radio', { name: en.userData.psnHiddenReveal }))
   expect(window.localStorage.getItem('psn-hidden-trophies')).toBe('reveal')
-  expect(onClose).toHaveBeenCalled()
+  expect(window.localStorage.getItem('psn-completion')).toBeNull()
+  fireEvent.click(screen.getByRole('radio', { name: en.userData.psnPlatinumOn }))
+  expect(window.localStorage.getItem('psn-completion')).toBe('platinum')
 })
