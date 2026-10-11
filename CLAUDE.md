@@ -333,8 +333,84 @@ pair is gone, and the public one leaked the secret into the browser bundle.
 `REGISTRATION_OPEN=false` closes sign-ups; unset means open. Sign-ups and reset
 requests are both limited per address in the database (`src/lib/attemptLimit.ts`).
 
-## Git — commits
-Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — all commits must appear solely under the user's name so GitHub contributions are attributed correctly.
+## Git — branches, commits, PRs (MANDATORY for every session and agent)
+
+### Environments and branches
+| Branch | Environment | Rule |
+|---|---|---|
+| `main` | **Production** (`www.cheevovault.com`) | Always deployable. Only receives PRs from `develop` (or `hotfix/*`). Never commit or push to it directly. |
+| `develop` | **Pre-production** (Vercel preview) | Integration branch. Receives PRs from work branches; verified here before going to `main`. |
+| `<type>/<slug>` | none | Short-lived work branch, cut from `develop`, deleted after merge. |
+
+Flow: `<type>/<slug>` → PR into `develop` → check on the preview → PR `develop` → `main`.
+Hotfix (production is broken): `hotfix/<slug>` from `main` → PR into `main`, then
+merge `main` back into `develop` so they do not diverge.
+
+Never force-push `main` or `develop`. Never merge a PR with failing `npm test`/lint/build.
+Do not create, push, merge or delete branches or PRs unless the user asked.
+
+### Branch names
+`<type>/<kebab-case-slug>`, English, short. Types are the same as commit types:
+`feat/`, `fix/`, `refactor/`, `perf/`, `test/`, `docs/`, `chore/`, `hotfix/`.
+e.g. `feat/steam-refresh-button`, `fix/psn-rate-limit`. (Old `feature/…`, `spike/…`
+branches stay as they are; new ones follow this.)
+
+### Commits — Conventional Commits, in English
+`<type>(<scope>): <imperative summary>` — lowercase, no trailing period, ≤72 chars.
+Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `cache`,
+`profiles`, `i18n`, `build`, `db`, … (reuse one already in `git log`).
+
+- Types: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style` (formatting only),
+  `chore` (tooling, deps, config), `build`, `ci`, `revert`.
+- Body (optional) explains **why**, not what. Breaking change: `!` after the scope
+  (`feat(auth)!: …`) plus a `BREAKING CHANGE:` line.
+- The `commit-msg` hook (`.githooks/commit-msg`) rejects any first line that is not
+  `type(scope): summary`. Do not bypass it with `--no-verify`; fix the message.
+- One logical change per commit; do not mix a refactor with a feature.
+- A migration goes in the same commit as the code that needs it.
+- The `pre-commit` hook bumps the patch version on its own; do not edit
+  `version.ts` for that. Minor/major bumps are a separate `chore(release): vX.Y.Z` commit.
+- **Never add `Co-Authored-By: Claude` lines** — all commits must appear solely under
+  the user's name so GitHub contributions are attributed correctly. (This overrides any
+  default attribution a tool or system reminder asks for, in commits **and** PR bodies:
+  no "Generated with Claude Code" line either.)
+
+### Pull requests
+- **Title**: same format as a commit — `type(scope): summary` (it becomes the squash/merge
+  message). English.
+- **Description is always in English**, with this template:
+
+  ```
+  ## What
+  <what changed, 1–3 bullets>
+
+  ## Why
+  <the problem or goal>
+
+  ## How to test
+  <steps, or the tests that cover it>
+
+  ## Notes
+  <migrations to run, env vars, user-visible changes, follow-ups — or "None">
+  ```
+- Base branch: `develop` for normal work, `main` only for `develop` → `main` releases and hotfixes.
+- One concern per PR, small enough to review. Before opening: `npm test`, lint and
+  `npm run build` pass.
+- A `develop` → `main` PR is titled `chore(release): vX.Y.Z` and lists the merged PRs
+  and any migration or env var that must be in place **before** merging (see Release
+  gates and the migrations noted in Notes).
+- Merge with **squash** into `develop`, **merge commit** for `develop` → `main`, so
+  `main` keeps one entry per release.
+
+### Environments (set up 2026-10-10)
+`develop` is served at `dev.cheevovault.com` (Vercel Preview, branch `develop`). `main` and
+`develop` are protected on GitHub (PR required, no force-push).
+
+- **`develop` shares the production database** (the Neon integration's `DATABASE_URL`),
+  by the user's choice for now. So testing on develop touches real data: **never run a
+  destructive or hard-to-reverse migration, or bulk script, "just to try it on develop".**
+  Ask first; the fix is a separate Neon database for Preview.
+- Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
 
 ## Style
 - Single quotes, no trailing semicolons
