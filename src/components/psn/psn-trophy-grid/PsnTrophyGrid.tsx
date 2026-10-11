@@ -12,6 +12,7 @@ import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import PsnTrophyGridGroup from './psn-trophy-grid-group/PsnTrophyGridGroup'
 import PsnRevealTrophyButton from '@/components/psn/psn-reveal-trophy-button/PsnRevealTrophyButton'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
+import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
 import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy, PsnTrophyGroup, TrophyGrade } from '@/types/psn'
 
@@ -68,7 +69,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
   const size = SIZE_CLASSES[badgeSize]
   const [showAll, setShowAll] = useState(false)
-  const [revealedIds, setRevealedIds] = useState<ReadonlySet<number>>(new Set())
+  const { isRevealed, toggle: toggleReveal } = useRevealedTrophies()
   const { visible: shown, capped } = capList(trophies, limit ?? Infinity, showAll)
   const grade: Record<TrophyGrade, string> = {
     platinum: T.psn.platinum,
@@ -88,13 +89,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
   }
 
   // Sony sends hidden trophies' text, but it is kept secret until earned, or until the viewer asks.
-  const concealed = (t: PsnTrophy) => t.hidden && !t.earned && !revealedIds.has(t.id)
-  const toggleReveal = (id: number) =>
-    setRevealedIds((prev) => {
-      const next = new Set(prev)
-      if (!next.delete(id)) next.add(id)
-      return next
-    })
+  const concealed = (t: PsnTrophy) => t.hidden && !t.earned && !isRevealed(t.id)
   const nameOf = (t: PsnTrophy) => (concealed(t) ? T.psn.hiddenTrophy : t.name)
   const sections = trophiesByGroup(shown, groups)
   const groupName = (id: string) => (id === BASE_GROUP ? T.psn.baseGame : (groups.find((g) => g.id === id)?.name ?? id))
@@ -135,7 +130,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
                 </Link>
                 {t.hidden && !t.earned && (
                   <PsnRevealTrophyButton
-                    revealed={revealedIds.has(t.id)}
+                    revealed={isRevealed(t.id)}
                     onToggle={() => toggleReveal(t.id)}
                     size={20}
                     className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-bg-card/90 text-text-main flex items-center justify-center opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100"

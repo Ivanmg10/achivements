@@ -13,8 +13,10 @@ import FavoriteGameModal, { FavoriteGame } from '@/components/favorite-game-moda
 import GenderModal from '@/components/gender-modal/GenderModal'
 import LanguageModal from '@/components/language-modal/LanguageModal'
 import ThemeModal from '@/components/theme-modal/ThemeModal'
+import PsnPreferencesModal from '@/components/psn-preferences-modal/PsnPreferencesModal'
 import HiddenGamesModal from '@/components/hidden-games-modal/HiddenGamesModal'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
+import { usePsnRevealHidden } from '@/hooks/usePsnRevealHidden'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { candidateIconUrl } from '@/utils/gameCandidates'
@@ -62,6 +64,8 @@ export default function UserPreferencesCard() {
   const [favoriteOpen, setFavoriteOpen] = useState<GameSource | null>(null)
   const [hiddenOpen, setHiddenOpen] = useState(false)
   const [genderOpen, setGenderOpen] = useState(false)
+  const [psnOpen, setPsnOpen] = useState(false)
+  const [revealHidden] = usePsnRevealHidden()
   const { hidden } = useHiddenGames()
 
   const user = session?.user
@@ -123,8 +127,16 @@ export default function UserPreferencesCard() {
           empty={T.userPage.hiddenNone}
           onEdit={() => setHiddenOpen(true)}
         />
+
+        <ProfileField
+          label={`${T.userData.psnSection} · ${T.userData.psnHiddenTrophies}`}
+          icon={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />}
+          value={revealHidden ? T.userData.psnHiddenReveal : T.userData.psnHiddenConceal}
+          onEdit={() => setPsnOpen(true)}
+        />
       </div>
 
+      <PsnPreferencesModal isOpen={psnOpen} onClose={() => setPsnOpen(false)} />
       <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
       <HiddenGamesModal isOpen={hiddenOpen} onClose={() => setHiddenOpen(false)} />
       <LanguageModal isOpen={langOpen} onClose={() => setLangOpen(false)} />
