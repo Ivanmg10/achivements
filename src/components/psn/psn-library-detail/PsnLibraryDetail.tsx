@@ -7,7 +7,6 @@ import { PsnTrophyGrid } from '@/components/psn/psn-trophy-grid/PsnTrophyGrid'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
 import LibraryGameDetail, { type LibraryCategory } from '@/components/library-game-detail/LibraryGameDetail'
 import { fromPsn } from '@/utils/gameInsights'
-import { BASE_GROUP } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
 
@@ -24,10 +23,9 @@ export default function PsnLibraryDetail({ game, category }: { game: PsnGameProg
   const items = useMemo(() => fromPsn(trophies, game.id), [trophies, game.id])
 
   const loaded = trophies.length > 0
-  // The ring goes by the base game, as "completed" does; DLC shows in the grid below it.
-  const base = groups.length > 1 ? trophies.filter((t) => t.groupId === BASE_GROUP) : trophies
-  const total = loaded ? base.length : game.maxPossible
-  const earned = loaded ? base.filter((t) => t.earned).length : game.numAwarded
+  // The whole set, DLC included, as "completed" counts it.
+  const total = loaded ? trophies.length : game.maxPossible
+  const earned = loaded ? trophies.filter((t) => t.earned).length : game.numAwarded
   const units = { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }
 
   return (

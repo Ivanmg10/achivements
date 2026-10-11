@@ -23,7 +23,6 @@ export function psnGameFixture(overrides: Partial<PsnGameProgress> = {}): PsnGam
     earned: NONE,
     defined,
     hasDlc: false,
-    full: { earned: NONE, defined, pctWon: 0 },
     lastTrophyAt: null,
     playtimeMinutes: null,
     playedAs: [],

@@ -30,10 +30,10 @@ test('before the answer, the ring goes by the list\'s counts, with the trophies 
   expect(screen.getByTestId('counts')).toBeInTheDocument()
 })
 
-test('the ring goes by the base game when there is DLC, and the grid shows everything', () => {
+test('the ring counts the whole set, DLC trophies included, as the lists do: the platinum alone does not complete a game', () => {
   hook({ trophies: [t(1, true), t(2, false), t(3, true, '001')], groups: [{ id: 'default' }, { id: '001' }] })
   render(<PsnLibraryDetail game={GAME} category="completed" />)
-  expect(last()).toMatchObject({ state: 'ready', ring: { earned: 1, total: 2 } })
+  expect(last()).toMatchObject({ state: 'ready', ring: { earned: 2, total: 3 } })
   expect(last().items).toHaveLength(3)
   expect(screen.getByTestId('grid')).toBeInTheDocument()
 })

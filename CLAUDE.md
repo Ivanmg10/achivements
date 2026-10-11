@@ -301,9 +301,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   **Do not** try to automate Sony's sign-in.
 - **Games are keyed like RA and Steam**: source `'psn'`, and the trophy set's
   number as id (`NPWR20188_00` ↔ `2018800`, `psnNumericId`/`psnTitleId`).
-- **A game with DLC counts by its base game** (the `default` trophy group):
-  the main fields are the base game's, `full` has the whole set. That is what
-  makes a platinum "completed".
+- **A game counts by its whole set, DLC included**, as Sony's own title list
+  does: a platinum with DLC trophies still to earn is "in progress", not
+  "completed". (It used to count by the `default` group alone; it no longer
+  does, and no per-game lookup of the groups is made for the list.)
 - **Two lists, merged**: the trophy list (`getUserTitles`) and the played-games
   list (play time, last session, store art, PS4/PS5 only, its own privacy
   setting). `lastTrophyAt` is the trophy list's date and keys every trophy

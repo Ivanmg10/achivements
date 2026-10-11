@@ -25,9 +25,10 @@ export function isPsnTitleId(value: string): boolean {
 }
 
 /**
- * Where a PSN game goes among the category pages: completed at 100% (the base
- * game, for one with DLC), in progress with something earned, and "no
- * achievements" when it was launched but nothing earned yet.
+ * Where a PSN game goes among the category pages: completed at 100% (the
+ * whole set, so a game with DLC trophies still to earn is not complete yet), in
+ * progress with something earned, and "no achievements" when it was launched
+ * but nothing earned yet.
  */
 export function classifyPsnGame(game: Pick<PsnGameProgress, 'pctWon'>): PsnCategory {
   if (game.pctWon >= 100) return 'completed'
