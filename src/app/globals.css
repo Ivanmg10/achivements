@@ -649,8 +649,11 @@
    screens and phones keep the page scrolling as usual.
 */
 @media (min-width: 1024px) and (min-height: 1000px) {
-  .home-fit:has([data-stats-section="overview"]) { height: calc(100dvh - 4rem); }
-  .home-fit:has([data-stats-section="overview"]) > .home-fit-top { grid-template-rows: minmax(0, 1fr); }
+  .home-fit:has([data-stats-section="overview"]) { min-height: calc(100dvh - 4rem); }
+  /* The top row is never shorter than the profile: on a screen a little too low the page grows, instead of the profile being cut off behind its own scrollbar. */
+  .home-fit:has([data-stats-section="overview"]) > .home-fit-top { grid-template-rows: minmax(auto, 1fr); }
+  .home-fit:has([data-stats-section="overview"]) .home-fit-side { min-height: auto; }
+  .home-fit:has([data-stats-section="overview"]) .home-fit-side > section { overflow-y: visible; }
   .home-fit:has([data-stats-section="overview"]) .home-fit-side > * { flex: 1 1 0%; }
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll { overflow-y: auto; }
   /* The daily chart sets the height of the charts row (the heatmap follows its box): scaled to the screen here. */
