@@ -33,6 +33,18 @@ test('shows an empty state once loading finishes with no recently played games, 
   expect(container.querySelectorAll('.animate-pulse').length).toBe(0)
 })
 
+test('keeps the skeleton while Steam or PSN is still loading, RA games already in', () => {
+  ;(useRecentlyPlayedGames as jest.Mock).mockReturnValue({
+    games: [{ GameID: 1, Title: 'RA Only', ImageIcon: '', ConsoleName: 'SNES', LastPlayed: '2024-01-01 12:00:00' }],
+    isLoading: false,
+  })
+  ;(useSteamGamesData as jest.Mock).mockReturnValue({ recent: [], recentLoading: true })
+  const { container } = renderWithProviders()
+  expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
+  expect(screen.queryByText('RA Only')).not.toBeInTheDocument()
+  ;(useSteamGamesData as jest.Mock).mockReturnValue({ recent: [] })
+})
+
 describe('merged RA + Steam feed', () => {
   const RA_GAME = {
     GameID: 730, Title: 'RA Game', ImageIcon: '', ConsoleName: 'SNES', LastPlayed: '2024-01-01 12:00:00',

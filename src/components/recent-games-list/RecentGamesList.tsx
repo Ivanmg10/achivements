@@ -31,7 +31,7 @@ export default function RecentGamesList() {
     <div className="flex flex-col flex-1 min-h-0 gap-2">
       <h2 className="text-2xl font-bold shrink-0">{T.cards.recentlyPlayed}</h2>
 
-      {(recentLoading || psnLoading) && games.length === 0 ? (
+      {recentLoading || psnLoading ? (
         <div aria-busy="true" className="flex flex-col gap-1.5 flex-1">
           {Array.from({ length: MAX_GAMES }).map((_, i) => (
             <div key={i} className="h-20 bg-bg-main rounded-xl animate-pulse" />
