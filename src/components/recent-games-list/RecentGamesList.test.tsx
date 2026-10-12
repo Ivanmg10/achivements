@@ -1,9 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import RecentGamesList from './RecentGamesList'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
+import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { en } from '@/translations/en'
 
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
+jest.mock('@/context/PsnGamesDataContext', () => ({ usePsnGamesData: jest.fn() }))
 jest.mock('@/components/steam/steam-game-item/SteamGameItem', () => ({
   __esModule: true,
   default: ({ game, expanded, onToggle }: { game: { title: string }; expanded: boolean; onToggle: () => void }) => (
@@ -14,6 +16,7 @@ jest.mock('@/components/steam/steam-game-item/SteamGameItem', () => ({
 }))
 
 const refetch = jest.fn()
+const PSN_IDLE = { isLinked: true, library: [], libraryLoading: false, libraryError: null, refetch: jest.fn() }
 
 function setContext(overrides: Record<string, unknown> = {}) {
   ;(useSteamGamesData as jest.Mock).mockReturnValue({
@@ -31,6 +34,7 @@ function setContext(overrides: Record<string, unknown> = {}) {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  ;(usePsnGamesData as jest.Mock).mockReturnValue(PSN_IDLE)
   setContext()
 })
 
@@ -67,6 +71,13 @@ test('shows a busy skeleton while loading', () => {
   setContext({ recentLoading: true, recent: [] })
   const { container } = render(<RecentGamesList />)
   expect(container.querySelector('[aria-busy="true"]')).not.toBeNull()
+})
+
+test('keeps the skeleton while PSN loads, even with Steam games already in', () => {
+  (usePsnGamesData as jest.Mock).mockReturnValue({ ...PSN_IDLE, libraryLoading: true })
+  const { container } = render(<RecentGamesList />)
+  expect(container.querySelector('[aria-busy="true"]')).not.toBeNull()
+  expect(screen.queryByRole('button', { name: 'Portal 2' })).not.toBeInTheDocument()
 })
 
 test('announces an error with a retry', () => {
