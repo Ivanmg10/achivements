@@ -128,6 +128,9 @@ export const de: Translations = {
     confirmPin: 'Pin',
   },
   userData: {
+    genderPublic: 'Geschlecht im Profil',
+    genderPublicOn: 'Sichtbar für alle, die dein Profil öffnen',
+    genderPublicOff: 'Nur du siehst es',
     welcome: 'Willkommen',
     email: 'E-Mail',
     theme: 'Thema',
@@ -441,7 +444,7 @@ export const de: Translations = {
   privacy: {
     link: 'Datenschutz & Cookies',
     title: 'Datenschutz & Cookies',
-    updated: 'Zuletzt aktualisiert: 9. Oktober 2026',
+    updated: 'Zuletzt aktualisiert: 13. Oktober 2026',
     intro: 'CheevoVault verfolgt deine Erfolge auf RetroAchievements, Steam und PlayStation. Diese Seite erklärt, was über dich gespeichert wird, wozu, und was du dagegen tun kannst.',
     contact: 'Kontakt',
     controller: 'Verantwortlicher',
@@ -452,6 +455,7 @@ export const de: Translations = {
         body: [
           'Dein Konto: ein Benutzername, ein Hash deines Passworts (nie das Passwort selbst) und deine E-Mail-Adresse, die nur zur Wiederherstellung des Kontos und zur Bestätigung, dass es dir gehört, genutzt wird.',
           'Was du selbst hinzufügst: einen Avatar (einen Link oder ein hochgeladenes Bild, das wir speichern, bis du es ersetzt oder dein Konto löschst), dein Land, Lieblings- und angeheftete Spiele und Erfolge sowie deine Gruppen.',
+          'Dein öffentliches Profil zeigt angemeldeten Nutzern, solange es öffentlich ist, deinen Benutzernamen, Avatar, dein Land und deine Beschreibung, die verknüpften Plattformen und ihre Namen, deine Lieblingsspiele, dein Design, öffentliche Gruppen und angeheftete Erfolge sowie deinen Fortschritt und deine Aktivität, und lässt sie diese mit ihren eigenen vergleichen. Dein Geschlecht erscheint nur, wenn du es anzeigen lässt. Nie deine E-Mail oder deine Schlüssel. Du kannst das Profil jederzeit privat machen.',
           'Verknüpfte Konten: dein RetroAchievements-Benutzername und Web-API-Schlüssel sowie deine Steam-ID und dein Anzeigename, um deinen Fortschritt abzurufen, auch wenn jemand dein öffentliches Profil öffnet. Der Schlüssel verlässt nie unseren Server. Beim Verknüpfen von Steam wird nur geprüft, dass das Profil existiert und öffentlich ist – es beweist nicht, dass das Konto dir gehört.',
           'PlayStation, wenn du es verbindest: deine PSN-Online-ID und deine Kontonummer. Beim Verbinden wird nur geprüft, dass das Konto existiert und seine Trophäen öffentlich zeigt — es beweist nicht, dass das Konto dir gehört. Deine Trophäen und, wenn dein Spielverlauf öffentlich ist, Spielzeit und Spielbilder werden mit dem PlayStation-Konto der Seite bei Sony abgerufen und in einem Cache gespeichert, der von selbst abläuft.',
           'Sicherheitsprotokolle: die IP-Adresse (bei Anmeldungen auch der Benutzername) fehlgeschlagener Anmeldungen, Registrierungen und Passwort-Zurücksetzungen, einen Tag lang gespeichert, um Missbrauch zu bremsen.',

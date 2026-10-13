@@ -128,6 +128,9 @@ export const fr: Translations = {
     confirmPin: 'Pin',
   },
   userData: {
+    genderPublic: 'Genre sur ton profil',
+    genderPublicOn: 'Visible par quiconque ouvre ton profil',
+    genderPublicOff: 'Toi seul le vois',
     welcome: 'Bienvenue',
     email: 'E-mail',
     theme: 'Thème',
@@ -441,7 +444,7 @@ export const fr: Translations = {
   privacy: {
     link: 'Confidentialité et cookies',
     title: 'Confidentialité et cookies',
-    updated: 'Dernière mise à jour : 9 octobre 2026',
+    updated: 'Dernière mise à jour : 13 octobre 2026',
     intro: 'CheevoVault suit tes succès RetroAchievements, Steam et PlayStation. Cette page explique ce qu’il garde sur toi, pourquoi, et ce que tu peux y faire.',
     contact: 'Contact',
     controller: 'Responsable du traitement',
@@ -452,6 +455,7 @@ export const fr: Translations = {
         body: [
           'Votre compte : un nom d’utilisateur, un hash de votre mot de passe (jamais le mot de passe lui-même) et votre adresse e-mail, utilisée uniquement pour récupérer le compte et confirmer qu’il vous appartient.',
           'Ce que vous choisissez d’ajouter : un avatar (un lien, ou une image que vous importez et que nous conservons jusqu’à ce que vous la remplaciez ou supprimiez votre compte), votre pays, vos jeux et succès favoris et épinglés, et vos groupes.',
+          'Ton profil public, tant qu’il l’est, montre aux utilisateurs connectés ton nom d’utilisateur, ton avatar, ton pays et ta description, les plateformes liées et leurs noms, tes jeux favoris, ton thème, tes groupes publics et succès épinglés, ainsi que ta progression et ton activité, et leur permet de les comparer aux leurs. Ton genre n’apparaît que si tu choisis de l’afficher. Jamais ton e-mail ni tes clés. Tu peux rendre le profil privé à tout moment.',
           'Comptes liés : votre nom d’utilisateur et votre clé Web API RetroAchievements, ainsi que votre Steam ID et votre nom affiché, pour récupérer votre progression, y compris lorsque quelqu’un ouvre votre profil public. La clé ne quitte jamais notre serveur. Lier Steam vérifie seulement que le profil existe et est public ; cela ne prouve pas que le compte est le vôtre.',
           'PlayStation, si tu le relies : ton ID en ligne PSN et ton numéro de compte. Relier le compte vérifie seulement qu’il existe et affiche ses trophées publiquement — cela ne prouve pas que le compte est à toi. Tes trophées, et ton temps de jeu et les images de tes jeux si ton historique de jeu est public, sont lus chez Sony avec le compte PlayStation du site et gardés dans un cache qui expire tout seul.',
           'Journaux de sécurité : l’adresse IP (et le nom d’utilisateur, pour les connexions) des connexions échouées, inscriptions et demandes de réinitialisation, conservée un jour pour freiner les abus.',

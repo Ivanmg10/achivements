@@ -128,6 +128,9 @@ export const pl: Translations = {
     confirmPin: 'Pin',
   },
   userData: {
+    genderPublic: 'Płeć w profilu',
+    genderPublicOn: 'Widzi go każdy, kto otworzy twój profil',
+    genderPublicOff: 'Widzisz go tylko ty',
     welcome: 'Witaj',
     email: 'E-mail',
     theme: 'Motyw',
@@ -441,7 +444,7 @@ export const pl: Translations = {
   privacy: {
     link: 'Prywatność i cookies',
     title: 'Prywatność i cookies',
-    updated: 'Ostatnia aktualizacja: 9 października 2026',
+    updated: 'Ostatnia aktualizacja: 13 października 2026',
     intro: 'CheevoVault śledzi twoje osiągnięcia w RetroAchievements, Steam i PlayStation. Ta strona wyjaśnia, co o tobie przechowuje, w jakim celu i co możesz z tym zrobić.',
     contact: 'Kontakt',
     controller: 'Administrator danych',
@@ -452,6 +455,7 @@ export const pl: Translations = {
         body: [
           'Twoje konto: nazwę użytkownika, hash hasła (nigdy samo hasło) i adres e-mail, używany wyłącznie do odzyskania konta i potwierdzenia, że należy do Ciebie.',
           'To, co sam dodajesz: awatar (link albo przesłany obraz, który przechowujemy, dopóki go nie zmienisz lub nie usuniesz konta), kraj, ulubione i przypięte gry oraz osiągnięcia, a także Twoje grupy.',
+          'Twój profil publiczny, dopóki jest publiczny, pokazuje zalogowanym użytkownikom twoją nazwę użytkownika, awatar, kraj i opis, połączone platformy i ich nazwy, ulubione gry, motyw, publiczne grupy i przypięte osiągnięcia oraz twoje postępy i aktywność, i pozwala porównać je z ich własnymi. Płeć pojawia się tylko, jeśli zdecydujesz się ją pokazać. Nigdy twój e-mail ani klucze. Możesz w każdej chwili ustawić profil jako prywatny.',
           'Połączone konta: nazwę użytkownika i klucz Web API RetroAchievements oraz Steam ID i nazwę wyświetlaną, aby pobierać Twoje postępy, także gdy ktoś otwiera Twój publiczny profil. Klucz nigdy nie opuszcza naszego serwera. Łączenie Steam sprawdza tylko, czy profil istnieje i jest publiczny — nie dowodzi, że konto należy do ciebie.',
           'PlayStation, jeśli je połączysz: twoje ID online PSN i numer konta. Połączenie sprawdza tylko, czy konto istnieje i publicznie pokazuje trofea — nie dowodzi, że konto należy do ciebie. Twoje trofea, a jeśli historia gier jest publiczna, także czas gry i grafiki gier, są pobierane z Sony za pomocą konta PlayStation strony i przechowywane w pamięci podręcznej, która sama wygasa.',
           'Rejestry bezpieczeństwa: adres IP (a przy logowaniu także nazwę użytkownika) nieudanych logowań, rejestracji i próśb o reset hasła, przechowywany przez jeden dzień, aby ograniczać nadużycia.',

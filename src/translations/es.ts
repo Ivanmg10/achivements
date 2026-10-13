@@ -128,6 +128,9 @@ export const es: Translations = {
     confirmPin: 'Fijar',
   },
   userData: {
+    genderPublic: 'Género en tu perfil',
+    genderPublicOn: 'Lo ve quien abra tu perfil',
+    genderPublicOff: 'Solo lo ves tú',
     welcome: 'Bienvenido',
     email: 'Email',
     theme: 'Tema',
@@ -441,7 +444,7 @@ export const es: Translations = {
   privacy: {
     link: 'Privacidad y cookies',
     title: 'Privacidad y cookies',
-    updated: 'Última actualización: 9 de octubre de 2026',
+    updated: 'Última actualización: 13 de octubre de 2026',
     intro: 'CheevoVault sigue tus logros de RetroAchievements, Steam y PlayStation. Esta página explica qué guarda sobre ti, para qué y qué puedes hacer al respecto.',
     contact: 'Contacto',
     controller: 'Responsable del tratamiento',
@@ -452,6 +455,7 @@ export const es: Translations = {
         body: [
           'Tu cuenta: un nombre de usuario, un hash de tu contraseña (nunca la contraseña en sí) y tu correo, que solo se usa para recuperar la cuenta y confirmar que es tuya.',
           'Lo que decides añadir: un avatar (un enlace, o una imagen que subes y que guardamos hasta que la cambies o borres tu cuenta), tu país, juegos y logros favoritos y fijados, y tus grupos.',
+          'Tu perfil público, mientras lo sea, muestra a los usuarios con sesión tu nombre de usuario, avatar, país y descripción, las plataformas que vinculaste y sus nombres, tus juegos favoritos, tema, grupos públicos y logros fijados, y tu progreso y actividad, y les deja compararlos con los suyos. Tu género solo aparece si eliges mostrarlo. Nunca tu correo ni tus claves. Puedes hacer el perfil privado cuando quieras.',
           'Cuentas vinculadas: tu usuario y clave Web API de RetroAchievements, y tu Steam ID y nombre visible, para poder consultar tu progreso, también cuando alguien abre tu perfil público. La clave nunca sale de nuestro servidor. Vincular Steam solo comprueba que el perfil existe y es público; no demuestra que la cuenta sea tuya.',
           'PlayStation, si la vinculas: tu ID online de PSN y tu número de cuenta. Vincularla solo comprueba que la cuenta existe y muestra sus trofeos en público; no demuestra que la cuenta sea tuya. Tus trofeos, y tu tiempo de juego y las imágenes de tus juegos si tu historial de juego es público, se leen de Sony con la cuenta de PlayStation de la propia web y se guardan en una caché que caduca sola.',
           'Registros de seguridad: la IP (y el usuario, en los inicios de sesión) de los inicios de sesión fallidos, registros y peticiones de cambio de contraseña, durante un día, para frenar abusos.',

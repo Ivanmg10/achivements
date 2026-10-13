@@ -128,6 +128,9 @@ export const pt: Translations = {
     confirmPin: 'Pin',
   },
   userData: {
+    genderPublic: 'Género no teu perfil',
+    genderPublicOn: 'Visível para quem abrir o teu perfil',
+    genderPublicOff: 'Só tu o vês',
     welcome: 'Bem-vindo',
     email: 'E-mail',
     theme: 'Tema',
@@ -441,7 +444,7 @@ export const pt: Translations = {
   privacy: {
     link: 'Privacidade e cookies',
     title: 'Privacidade e cookies',
-    updated: 'Última atualização: 9 de outubro de 2026',
+    updated: 'Última atualização: 13 de outubro de 2026',
     intro: 'O CheevoVault acompanha as suas conquistas do RetroAchievements, do Steam e da PlayStation. Esta página explica que dados guarda sobre si, para quê e o que pode fazer em relação a isso.',
     contact: 'Contacto',
     controller: 'Responsável pelo tratamento',
@@ -452,6 +455,7 @@ export const pt: Translations = {
         body: [
           'A sua conta: um nome de utilizador, um hash da sua palavra-passe (nunca a palavra-passe em si) e o seu email, usado apenas para recuperar a conta e confirmar que é sua.',
           'O que decide adicionar: um avatar (um link, ou uma imagem que carrega e que guardamos até a substituir ou eliminar a conta), o seu país, jogos e conquistas favoritos e fixados, e os seus grupos.',
+          'O teu perfil público, enquanto o for, mostra aos utilizadores com sessão iniciada o teu nome de utilizador, avatar, país e descrição, as plataformas que ligaste e os seus nomes, os teus jogos favoritos, tema, grupos públicos e conquistas afixadas, e o teu progresso e atividade, e permite-lhes compará-los com os seus. O teu género só aparece se escolheres mostrá-lo. Nunca o teu email nem as tuas chaves. Podes tornar o perfil privado a qualquer momento.',
           'Contas ligadas: o seu utilizador e chave Web API do RetroAchievements, e o seu Steam ID e nome visível, para obter o seu progresso, também quando alguém abre o seu perfil público. A chave nunca sai do nosso servidor. Ligar a Steam apenas verifica que o perfil existe e é público; não prova que a conta é sua.',
           'PlayStation, se a ligar: o seu ID online da PSN e o número da conta. Ligar a conta apenas verifica que ela existe e mostra os troféus publicamente — não prova que a conta é sua. Os seus troféus, e o tempo de jogo e as imagens dos jogos se o seu histórico de jogo for público, são lidos da Sony com a conta PlayStation do próprio site e guardados numa cache que expira sozinha.',
           'Registos de segurança: o endereço IP (e o utilizador, nos inícios de sessão) de inícios de sessão falhados, registos e pedidos de redefinição de palavra-passe, guardados durante um dia para travar abusos.',

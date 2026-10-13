@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { GameGroup } from '@/types/types'
 
 /** What a CheevoVault user's public page knows about them; see /api/users/[username]. */
 export type CheevoUser = {
@@ -10,6 +11,18 @@ export type CheevoUser = {
   ra: string | null
   steam: boolean
   psn: boolean
+  /** Their names on Steam and PSN, when linked. */
+  steamName?: string | null
+  psnName?: string | null
+  /** The page is the viewer's own. */
+  isSelf?: boolean
+  theme?: string | null
+  /** Only when they chose to show it. */
+  gender?: 'male' | 'female' | 'neutral' | null
+  favorites?: Record<'ra' | 'steam' | 'psn', { id: number; title: string; imageIcon: string } | null>
+  /** "source:id" of the games they hid from their lists; their page leaves them out. */
+  hiddenGames?: string[]
+  groups?: GameGroup[]
 }
 
 /**

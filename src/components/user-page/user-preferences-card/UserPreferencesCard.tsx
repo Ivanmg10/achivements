@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
-import { IconEyeOff, IconGenderBigender, IconLanguage, IconPalette } from '@tabler/icons-react'
+import { IconEyeOff, IconGenderBigender, IconLanguage, IconPalette, IconUserShare, IconWorld } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
-import UserProfilePublicToggle from '@/components/user-page/user-profile-public-toggle/UserProfilePublicToggle'
+import UserProfileSwitch from '@/components/user-page/user-profile-switch/UserProfileSwitch'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
@@ -103,7 +103,25 @@ export default function UserPreferencesCard() {
           onEdit={() => setGenderOpen(true)}
         />
 
-        <UserProfilePublicToggle />
+        {user?.gender && (
+          <UserProfileSwitch
+            field="genderPublic"
+            checked={user.genderPublic === true}
+            label={T.userData.genderPublic}
+            onText={T.userData.genderPublicOn}
+            offText={T.userData.genderPublicOff}
+            icon={<IconUserShare size={18} />}
+          />
+        )}
+
+        <UserProfileSwitch
+          field="profilePublic"
+          checked={user?.profilePublic !== false}
+          label={T.userData.profilePublic}
+          onText={T.userData.profilePublicOn}
+          offText={T.userData.profilePublicOff}
+          icon={<IconWorld size={18} />}
+        />
 
         <ProfileField
           label={T.userPage.hiddenGames}

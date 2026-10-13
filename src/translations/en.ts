@@ -129,6 +129,9 @@ export const en = {
     confirmPin: 'Pin',
   },
   userData: {
+    genderPublic: 'Gender on your profile',
+    genderPublicOn: 'Shown to anyone who opens your profile',
+    genderPublicOff: 'Only you can see it',
     welcome: 'Welcome',
     email: 'Email',
     theme: 'Theme',
@@ -442,7 +445,7 @@ export const en = {
   privacy: {
     link: 'Privacy & cookies',
     title: 'Privacy & cookies',
-    updated: 'Last updated: 9 October 2026',
+    updated: 'Last updated: 13 October 2026',
     intro: 'CheevoVault tracks your RetroAchievements, Steam and PlayStation achievements. This page explains what it keeps about you, why, and what you can do about it.',
     contact: 'Contact',
     controller: 'Data controller',
@@ -453,6 +456,7 @@ export const en = {
         body: [
           'Your account: a username, a hash of your password (never the password itself) and your email address, which is used only to recover the account and to confirm it is yours.',
           'What you choose to add: an avatar (a link, or a picture you upload, which we store until you replace it or delete your account), your country, favourite and pinned games and achievements, and your groups.',
+          'Your public profile, while it is public, shows signed-in users your username, avatar, country and description, the platforms you linked and their names, your favourite games, theme, public groups and pinned achievements, and your progress and activity, and lets them compare it with their own. Your gender appears only if you choose to show it. Never your email or your keys. You can make the profile private at any time.',
           'Linked accounts: your RetroAchievements username and Web API key, and your Steam ID and display name, so your progress can be fetched, including when someone opens your public profile. The API key never leaves our server. Linking Steam only checks that the profile exists and is public — it does not prove the account is yours.',
           'PlayStation, if you link it: your PSN online ID and account number. Linking only checks that the account exists and shows its trophies publicly — it does not prove the account is yours. Your trophies, and your play time and game art if your gaming history is public, are read from Sony with the site’s own PlayStation account and kept in a cache that expires on its own.',
           'Security records: the IP address (and username, for sign-ins) of failed sign-ins, sign-ups and password reset requests, kept for one day to stop abuse.',
