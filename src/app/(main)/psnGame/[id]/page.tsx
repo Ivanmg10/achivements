@@ -14,6 +14,8 @@ import GameInfoSkeletonTable from '@/components/game-info-skeleton/game-info-ske
 import PsnGameHeroBackground from '@/components/psn/psn-game-hero-background/PsnGameHeroBackground'
 import PsnGameInfoHeader from '@/components/psn/psn-game-info-header/PsnGameInfoHeader'
 import PsnGameInfoTable from '@/components/psn/psn-game-info-table/PsnGameInfoTable'
+import GameAiExport from '@/components/game-ai-export/GameAiExport'
+import { psnAiSource } from '@/utils/aiExport'
 
 /**
  * A PSN game's page — the counterpart of /steamGame/[appId], built the same
@@ -59,6 +61,7 @@ export default function PsnGamePage() {
         <PsnGameInfoHeader
           game={game}
           details={details}
+          actions={trophies.length > 0 && <GameAiExport getSource={() => psnAiSource({ game, trophies, groups, details })} />}
         />
 
         {isLoading ? (

@@ -95,6 +95,14 @@ did not like it. Do not paint a bar in a platform's colour; those stay only in
 charts that compare platforms (BrowseSplit, CompletionDistribution, the line
 chart).
 
+## AI export (`src/utils/aiExport.ts`)
+
+The "Ask an AI" button on the three game pages builds a file for a chat AI:
+English instructions plus "Reply in <language>", pending in game order,
+earned oldest first. **Never put account data in it** (username, ids, keys):
+only the game and its achievements. The UI says so. Change the prompt there,
+with its tests; it is the part that decides whether the answers are any good.
+
 ## API calls — error handling MANDATORY
 Every API call added or modified must have its own error handling. No exceptions.
 

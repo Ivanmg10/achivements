@@ -36,9 +36,12 @@ function deriveStatus(gameData: RetroAchievementsGameWithAchievements): StatusKe
 export default function GameInfoHeader({
   gameData,
   children,
+  actions,
 }: {
   gameData?: RetroAchievementsGameWithAchievements | null
   children?: ReactNode
+  /** Extra buttons beside the links (the AI export). */
+  actions?: ReactNode
 }) {
   const { T } = useLanguage()
   const consoleDef = CONSOLES.find((c) => c.id === gameData?.ConsoleID)
@@ -136,6 +139,7 @@ export default function GameInfoHeader({
                 <IconExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
                 {T.profileRa.viewOnRA}
               </a>
+              {actions}
             </div>
           )}
         </div>
