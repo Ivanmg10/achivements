@@ -12,6 +12,11 @@ jest.mock('@/components/main-header/MainHeader', () => ({
   default: () => <header data-testid="header">Header</header>,
 }))
 
+jest.mock('@/components/navigation-progress/NavigationProgress', () => ({
+  __esModule: true,
+  default: () => null,
+}))
+
 jest.mock('@/components/ra-user-refresher/RaUserRefresher', () => ({
   __esModule: true,
   default: () => null,

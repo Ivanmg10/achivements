@@ -80,7 +80,7 @@ export default function LibraryExplorerSkeleton({ layout }: { layout: 'shelves' 
       <div aria-hidden="true" className="flex flex-col gap-4 animate-pulse motion-reduce:animate-none">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className={`${BLOCK} h-9 w-64 rounded-lg`} />
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <div className={`${BLOCK} h-9 w-48 rounded-xl`} />
             <div className={`${BLOCK} h-9 w-44 rounded-lg`} />
           </div>

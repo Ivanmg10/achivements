@@ -11,30 +11,30 @@ jest.mock('@/context/SteamGamesDataContext', () => ({
   useSteamGamesData: jest.fn(() => ({ isLinked: false })),
 }))
 
-jest.mock('../../../hooks/useGamesByCategory', () => ({
+jest.mock('@/hooks/useGamesByCategory', () => ({
   useGamesByCategory: jest.fn(),
 }))
 
-jest.mock('../../../hooks/useGameExtraData', () => ({
+jest.mock('@/hooks/useGameExtraData', () => ({
   useGameExtraData: jest.fn(() => new Map()),
 }))
 
-jest.mock('../../../hooks/useConsoleFilter', () => ({
+jest.mock('@/hooks/useConsoleFilter', () => ({
   useConsoleFilter: jest.fn(() => ({ selected: new Set(), toggle: jest.fn(), clear: jest.fn() })),
 }))
 
-jest.mock('../../../hooks/useGameFiltering', () => ({
+jest.mock('@/hooks/useGameFiltering', () => ({
   useGameFiltering: jest.fn((args: { games: unknown[] }) => args.games ?? []),
 }))
 
-jest.mock('../../../components/statusGameList/StatusGameList', () => ({
+jest.mock('@/components/statusGameList/StatusGameList', () => ({
   __esModule: true,
   default: ({ games }: { games: { GameTitle: string }[] }) => (
     <div data-testid="game-list">{games.map((g) => g.GameTitle).join(',')}</div>
   ),
 }))
 
-jest.mock('../../../components/status-page-header/StatusPageHeader', () => ({
+jest.mock('@/components/status-page-header/StatusPageHeader', () => ({
   __esModule: true,
   default: ({ gameCount, children }: { gameCount: number; children?: React.ReactNode }) => (
     <div data-testid="status-header">
@@ -44,7 +44,7 @@ jest.mock('../../../components/status-page-header/StatusPageHeader', () => ({
   ),
 }))
 
-jest.mock('../../../components/completed-filter/CompletedFilter', () => ({
+jest.mock('@/components/completed-filter/CompletedFilter', () => ({
   __esModule: true,
   default: () => <div data-testid="completed-filter" />,
 }))
@@ -55,7 +55,7 @@ jest.mock('@/components/console-filter/ConsoleFilter', () => ({
   buildConsolePills: jest.fn(() => []),
 }))
 
-jest.mock('../../../components/empty-state/EmptyState', () => ({
+jest.mock('@/components/empty-state/EmptyState', () => ({
   __esModule: true,
   default: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
 }))
@@ -87,8 +87,8 @@ jest.mock('@/hooks/useRaLinked', () => ({ useRaLinked: jest.fn() }))
 import { render, screen } from '@testing-library/react'
 import CategoryPage from './page'
 import { useParams } from 'next/navigation'
-import { useGamesByCategory } from '../../../hooks/useGamesByCategory'
-import { useGameFiltering } from '../../../hooks/useGameFiltering'
+import { useGamesByCategory } from '@/hooks/useGamesByCategory'
+import { useGameFiltering } from '@/hooks/useGameFiltering'
 import { useRaLinked } from '@/hooks/useRaLinked'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'

@@ -1,5 +1,6 @@
 'use client'
 
+import PublicUserSkeleton from './public-user-skeleton/PublicUserSkeleton'
 import { motion } from 'framer-motion'
 import { IconUserOff } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -53,7 +54,7 @@ export default function PublicUserPage({ username }: { username: string }) {
   }
 
   if (isLoading || !user) {
-    return <p role="status" className="py-24 text-center text-sm text-text-secondary">{T.cards.loading}</p>
+    return <PublicUserSkeleton />
   }
 
   return (

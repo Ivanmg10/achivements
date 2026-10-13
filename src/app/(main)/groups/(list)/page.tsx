@@ -7,6 +7,7 @@ import { useGroups } from '@/hooks/useGroups'
 import type { GameCandidate } from '@/utils/gameCandidates'
 import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import GroupModal from '@/components/groups/GroupModal'
+import GroupListSkeleton from '@/components/groups/group-list-skeleton/GroupListSkeleton'
 import GroupList from '@/components/groups/group-list/GroupList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
@@ -68,18 +69,7 @@ export default function GroupsPage() {
 
       {/* Content */}
       {isLoading ? (
-        <div role="status" aria-busy="true" className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(100%,420px),1fr))] animate-pulse motion-reduce:animate-none">
-          <span className="sr-only">{T.loadingPage.title}</span>
-          {[0, 1, 2].map((i) => (
-            <div key={i} aria-hidden="true" className="flex items-center gap-4 bg-bg-card rounded-2xl p-3">
-              <div className="w-24 h-24 rounded-xl bg-ink/10 shrink-0" />
-              <div className="flex flex-col gap-2 flex-1">
-                <div className="h-3.5 w-40 rounded bg-ink/10" />
-                <div className="h-2.5 w-24 rounded bg-ink/10" />
-              </div>
-            </div>
-          ))}
-        </div>
+        <GroupListSkeleton />
       ) : error ? (
         <div className="flex flex-col items-center gap-2 mt-10 text-center">
           <p role="alert" className="text-sm text-text-secondary">{T.groups.listError}</p>

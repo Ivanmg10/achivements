@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import MainFooter from "@/components/main-footer/MainFooter";
+import NavigationProgress from "@/components/navigation-progress/NavigationProgress";
 import MainHeader from "@/components/main-header/MainHeader";
 import RaUserRefresher from "@/components/ra-user-refresher/RaUserRefresher";
 import { MainProviders } from "@/components/main-providers/MainProviders";
@@ -19,6 +20,7 @@ export default async function MainLayout({
 
   return (
     <MainProviders>
+      <NavigationProgress />
       <div className="min-h-screen flex flex-col">
         <MainHeader />
         <RaUserRefresher />
