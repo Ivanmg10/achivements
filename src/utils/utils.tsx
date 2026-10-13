@@ -209,6 +209,28 @@ export function calcAvgPerDay(achievements: RecentAchievement[], days: number = 
   return count / days
 }
 
+export type ActivityKpis = { today: number; week: number; month: number; avgPerDay: number }
+
+/**
+ * Unlocks today, in the last 7 days, this calendar month and per day over the
+ * last 30, from any platform. Days are UTC, as everywhere else on the site.
+ */
+export function activityKpis(achievements: RecentAchievement[], now: number = Date.now()): ActivityKpis {
+  const todayKey = new Date(now).toISOString().slice(0, 10)
+  const monthKey = todayKey.slice(0, 7)
+  const weekAgo = now - 7 * 86400000
+  const monthAgo = now - 30 * 86400000
+  let today = 0, week = 0, month = 0, last30 = 0
+  for (const a of achievements) {
+    const t = Date.parse(a.Date.replace(' ', 'T'))
+    if (a.Date.startsWith(todayKey)) today++
+    if (a.Date.slice(0, 7) === monthKey) month++
+    if (t >= weekAgo) week++
+    if (t >= monthAgo) last30++
+  }
+  return { today, week, month, avgPerDay: last30 / 30 }
+}
+
 export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
   if (!achievements.length) return []
   const uniqueDays = [...new Set(achievements.map(a => a.Date.split(' ')[0]))].sort()
