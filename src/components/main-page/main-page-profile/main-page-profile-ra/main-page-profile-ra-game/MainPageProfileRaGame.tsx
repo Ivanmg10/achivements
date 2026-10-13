@@ -5,6 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { ProgressBar } from '@/components/ui/ProgressBar'
+import { useSubject } from '@/context/SubjectContext'
+import { gameHref } from '@/utils/gameRef'
 
 export default function MainPageProfileRaGame({
   game,
@@ -14,6 +16,7 @@ export default function MainPageProfileRaGame({
   richPresenceMsg?: string
 }) {
   const { T } = useLanguage()
+  const subject = useSubject()
 
   const scPct = parseFloat(game.UserCompletion ?? '0') || 0
   const hcPct = parseFloat(game.UserCompletionHardcore ?? '0') || 0
@@ -21,7 +24,7 @@ export default function MainPageProfileRaGame({
   return (
     <Link
       className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 w-full hover:scale-[1.005] transition-transform duration-200"
-      href={`/gameInfo/${game.ID}`}
+      href={gameHref('ra', game.ID ?? 0, subject)}
     >
       <p className="text-xs text-text-secondary uppercase tracking-wider">{T.profileRa.playingNow}</p>
       {richPresenceMsg && <p className="text-xs text-gray-300 italic">{richPresenceMsg}</p>}

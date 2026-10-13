@@ -52,6 +52,22 @@ describe('GET', () => {
     expect(res.data).toEqual([{ source: 'steam' }, { source: 'ra' }])
   })
 
+  test("with ?user= it lists that public profile's pins", async () => {
+    ;(pool.query as jest.Mock)
+      .mockResolvedValueOnce({ rows: [{ id: 9, username: 'bob', profilePublic: true }] })
+      .mockResolvedValueOnce({ rows: [{ source: 'ra' }] })
+    const res = await GET(makeRequest('GET', 'http://localhost/api/favorites?source=all&user=bob'))
+    expect((pool.query as jest.Mock).mock.calls[1][1]).toEqual(['9'])
+    expect(res.data).toEqual([{ source: 'ra' }])
+  })
+
+  test("a private profile's pins are not readable by name", async () => {
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [{ id: 9, username: 'bob', profilePublic: false }] })
+    const res = await GET(makeRequest('GET', 'http://localhost/api/favorites?source=all&user=bob'))
+    expect(res.status).toBe(401)
+    expect(pool.query).toHaveBeenCalledTimes(1)
+  })
+
   test('returns 500 when the query fails', async () => {
     jest.spyOn(console, 'error').mockImplementation(() => {})
     ;(pool.query as jest.Mock).mockRejectedValueOnce(new Error('db down'))

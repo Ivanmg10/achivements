@@ -7,6 +7,8 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { usePinnedAchievements } from './usePinnedAchievements'
 import type { PinnedAchievement } from '@/types/types'
+import { createElement, type ReactNode } from 'react'
+import { SubjectContext } from '@/context/SubjectContext'
 
 const RA = { source: 'ra', achievement_id: 5, game_id: 1, game_title: 'Zelda', snapshot: {}, num_distinct_players: 0 } as unknown as PinnedAchievement
 const RA2 = { ...RA, achievement_id: 6 } as PinnedAchievement
@@ -76,4 +78,12 @@ test('reports the error once the background retries run out, and refetch loads a
   act(() => result.current.refetch())
   await waitFor(() => expect(result.current.pinned).toEqual([RA]))
   expect(result.current.error).toBe(false)
+})
+
+test("on someone's profile it reads their pins", async () => {
+  ;(fetchWithRetry as jest.Mock).mockResolvedValue([RA])
+  const wrapper = ({ children }: { children: ReactNode }) => createElement(SubjectContext.Provider, { value: 'ivan' }, children)
+  const { result } = renderHook(() => usePinnedAchievements(), { wrapper })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  expect(fetchWithRetry).toHaveBeenCalledWith('/api/favorites?source=all&user=ivan')
 })

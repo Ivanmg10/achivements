@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { useSubject } from '@/context/SubjectContext'
 import type { SteamAchievementUnified } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
@@ -15,6 +16,8 @@ import { useWhenChanged } from '@/hooks/useWhenChanged'
 export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
   const { T } = useLanguage()
   const { status } = useSession()
+  // Pins are the viewer's own; on someone else's page they are not offered.
+  const subject = useSubject()
   const [pinned, setPinned] = useState<Set<string>>(new Set())
   const [error, setError] = useState<string | null>(null)
 
@@ -86,5 +89,5 @@ export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
     [pinned, appId, gameTitle, T],
   )
 
-  return { pinned, toggle, error, canPin: status === 'authenticated' }
+  return { pinned, toggle, error, canPin: status === 'authenticated' && !subject }
 }

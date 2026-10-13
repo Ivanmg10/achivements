@@ -6,6 +6,7 @@ import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { gameHref } from '@/utils/gameRef'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import MainPageFavoritesUnpinButton from '../main-page-favorites-unpin-button/MainPageFavoritesUnpinButton'
+import { useSubject } from '@/context/SubjectContext'
 
 type PsnPin = Extract<PinnedAchievement, { source: 'psn' }>
 
@@ -13,8 +14,9 @@ type PsnPin = Extract<PinnedAchievement, { source: 'psn' }>
  * A pinned PSN trophy, like the Steam row: links straight to it on the game
  * page, says its grade, and shows its rarity where RA rows show points.
  */
-export default function MainPageFavoritesPsnRow({ fav, onUnpin }: { fav: PsnPin; onUnpin: () => void }) {
+export default function MainPageFavoritesPsnRow({ fav, onUnpin }: { fav: PsnPin; onUnpin?: () => void }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const t = fav.snapshot
   const name = t.hidden && !t.earned ? T.psn.hiddenTrophy : t.name
   const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }[t.type]
@@ -22,7 +24,7 @@ export default function MainPageFavoritesPsnRow({ fav, onUnpin }: { fav: PsnPin;
   return (
     <div className="group flex items-center gap-2 hover:bg-bg-main/60 rounded-lg px-2 py-1.5 transition-colors">
       <Link
-        href={`${gameHref('psn', fav.game_id)}#${psnTrophyAnchor(fav.psn_trophy_id)}`}
+        href={`${gameHref('psn', fav.game_id, subject)}#${psnTrophyAnchor(fav.psn_trophy_id)}`}
         className="flex items-center gap-3 flex-1 min-w-0 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
         {t.iconUrl ? (
@@ -55,7 +57,7 @@ export default function MainPageFavoritesPsnRow({ fav, onUnpin }: { fav: PsnPin;
             {T.achievement.haveIt}
           </p>
         )}
-        <MainPageFavoritesUnpinButton onUnpin={onUnpin} />
+        {onUnpin && <MainPageFavoritesUnpinButton onUnpin={onUnpin} />}
       </div>
     </div>
   )

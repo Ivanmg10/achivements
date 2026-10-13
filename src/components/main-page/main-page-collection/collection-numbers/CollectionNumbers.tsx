@@ -14,6 +14,7 @@ import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import CompletionDistribution from '@/components/completion-distribution/CompletionDistribution'
 import MasteryMix from '@/components/main-page/main-page-charts/mastery-mix/MasteryMix'
 import ClosestToComplete, { CLOSEST_SHOWN, ClosestGame } from '@/components/main-page/main-page-charts/closest-to-complete/ClosestToComplete'
+import { useSubject } from '@/context/SubjectContext'
 
 const BLOCK = 'flex flex-col gap-3 pt-4 border-t border-ink/[0.06] first:pt-0 first:border-t-0'
 
@@ -35,6 +36,7 @@ export default function CollectionNumbers({
   psnGames?: PsnGameProgress[]
 }) {
   const { T } = useLanguage()
+  const subject = useSubject()
 
   const steam = useMemo(() => summarizeSteamLibrary(steamGames), [steamGames])
   const fractions = useMemo(
@@ -47,7 +49,7 @@ export default function CollectionNumbers({
   const closest = useMemo<ClosestGame[]>(() => {
     const ra = inProgress.map((g) => ({
       key: `ra:${g.GameID}`,
-      href: `/gameInfo/${g.GameID}`,
+      href: gameHref('ra', g.GameID, subject),
       title: g.Title,
       imageUrl: g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : undefined,
       done: g.NumAwarded,
@@ -58,7 +60,7 @@ export default function CollectionNumbers({
       .filter((g) => classifySteamGame(g) === 'playing')
       .map((g) => ({
         key: `steam:${g.id}`,
-        href: `/steamGame/${g.id}`,
+        href: gameHref('steam', g.id, subject),
         title: g.title,
         imageUrl: g.imageIcon || undefined,
         done: g.numAwarded,
@@ -69,7 +71,7 @@ export default function CollectionNumbers({
       .filter((g) => classifyPsnGame(g) === 'playing')
       .map((g) => ({
         key: `psn:${g.id}`,
-        href: gameHref('psn', g.id),
+        href: gameHref('psn', g.id, subject),
         title: g.title,
         imageUrl: g.imageIcon || undefined,
         done: g.numAwarded,
@@ -77,7 +79,7 @@ export default function CollectionNumbers({
         percent: g.pctWon,
       }))
     return [...ra, ...st, ...ps].sort((a, b) => b.percent - a.percent).slice(0, CLOSEST_SHOWN)
-  }, [inProgress, steamGames, psnGames])
+  }, [inProgress, steamGames, psnGames, subject])
 
   return (
     <div className="flex flex-col gap-4">

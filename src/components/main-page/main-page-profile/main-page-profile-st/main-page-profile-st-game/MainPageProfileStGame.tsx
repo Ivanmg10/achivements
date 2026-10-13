@@ -6,6 +6,8 @@ import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
+import { useSubject } from '@/context/SubjectContext'
+import { gameHref } from '@/utils/gameRef'
 
 /**
  * The game card in the Steam profile — MainPageProfileRaGame's counterpart:
@@ -21,12 +23,13 @@ export default function MainPageProfileStGame({
   playingNow: boolean
 }) {
   const { T, lang } = useLanguage()
+  const subject = useSubject()
   const hasCounts = game.achievementsLoaded && game.maxPossible > 0
   const playtime = formatPlaytime(game.playtimeForever, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)
 
   return (
     <Link
-      href={`/steamGame/${game.id}`}
+      href={gameHref('steam', game.id, subject)}
       className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 w-full hover:scale-[1.005] transition-transform duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
     >
       <p className="text-xs text-text-secondary uppercase tracking-wider">

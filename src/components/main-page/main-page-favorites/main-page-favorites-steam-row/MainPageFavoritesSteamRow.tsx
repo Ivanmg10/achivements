@@ -5,6 +5,8 @@ import { achievementAnchor } from '@/components/steam/steam-achievement-grid/Ste
 import type { PinnedAchievement } from '@/types/types'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import MainPageFavoritesUnpinButton from '../main-page-favorites-unpin-button/MainPageFavoritesUnpinButton'
+import { useSubject } from '@/context/SubjectContext'
+import { gameHref } from '@/utils/gameRef'
 
 type SteamPin = Extract<PinnedAchievement, { source: 'steam' }>
 
@@ -13,14 +15,15 @@ type SteamPin = Extract<PinnedAchievement, { source: 'steam' }>
  * has no detail modal, as in its badge grid) and shows its global rarity
  * where RA rows show points — Steam has no points.
  */
-export default function MainPageFavoritesSteamRow({ fav, onUnpin }: { fav: SteamPin; onUnpin: () => void }) {
+export default function MainPageFavoritesSteamRow({ fav, onUnpin }: { fav: SteamPin; onUnpin?: () => void }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const a = fav.snapshot
   const title = a.hidden && !a.earned ? T.steam.hiddenAchievement : a.title
   return (
     <div className="group flex items-center gap-2 hover:bg-bg-main/60 rounded-lg px-2 py-1.5 transition-colors">
       <Link
-        href={`/steamGame/${fav.game_id}#${achievementAnchor(fav.steam_apiname)}`}
+        href={`${gameHref('steam', fav.game_id, subject)}#${achievementAnchor(fav.steam_apiname)}`}
         className="flex items-center gap-3 flex-1 min-w-0 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
         {a.badgeUrl ? (
@@ -51,7 +54,7 @@ export default function MainPageFavoritesSteamRow({ fav, onUnpin }: { fav: Steam
             {T.achievement.haveIt}
           </p>
         )}
-        <MainPageFavoritesUnpinButton onUnpin={onUnpin} />
+        {onUnpin && <MainPageFavoritesUnpinButton onUnpin={onUnpin} />}
       </div>
     </div>
   )

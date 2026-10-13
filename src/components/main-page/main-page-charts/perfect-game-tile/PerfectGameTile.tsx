@@ -8,6 +8,7 @@ import { formatDate } from '@/utils/utils'
 import { gameHref } from '@/utils/gameRef'
 import type { PerfectGame } from '@/utils/perfectGames'
 import PlatformMark from '@/components/platform-mark/PlatformMark'
+import { useSubject } from '@/context/SubjectContext'
 
 /**
  * Tile side in px. Steam hands out its game icons at 32×32 and publishes no
@@ -23,12 +24,13 @@ const TILE = 32
  */
 export default function PerfectGameTile({ game, date }: { game: PerfectGame; date?: string }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const tipId = useId()
   const when = date ? (game.source === 'steam' ? T.cards.lastPlayedOn : T.cards.perfectOn).replace('{date}', formatDate(date)) : null
 
   return (
     <Link
-      href={gameHref(game.source, game.id)}
+      href={gameHref(game.source, game.id, subject)}
       aria-label={game.title}
       aria-describedby={tipId}
       className="relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"

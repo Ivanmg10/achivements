@@ -27,11 +27,16 @@ export function parseGameKey(key: string): GameRef | null {
   return { source, id }
 }
 
-/** Where a game's own page lives. */
-export function gameHref(source: GameSource, id: number): string {
-  if (source === 'steam') return `/steamGame/${id}`
-  if (source === 'psn') return `/psnGame/${psnTitleId(id)}`
-  return `/gameInfo/${id}`
+/**
+ * Where a game's own page lives. With `subject` (someone's public profile) it
+ * is that user's progress in it instead: /user/<name>/<source>/<id>.
+ */
+export function gameHref(source: GameSource, id: number, subject?: string | null): string {
+  const urlId = source === 'psn' ? psnTitleId(id) : String(id)
+  if (subject) return `/user/${encodeURIComponent(subject)}/${source}/${urlId}`
+  if (source === 'steam') return `/steamGame/${urlId}`
+  if (source === 'psn') return `/psnGame/${urlId}`
+  return `/gameInfo/${urlId}`
 }
 
 /** Each platform's name as the app writes it. */

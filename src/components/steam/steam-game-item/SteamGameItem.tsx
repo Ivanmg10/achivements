@@ -15,6 +15,8 @@ import { steamAssetUrl } from '@/lib/steamClient'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/utils'
 import type { SteamGameProgress } from '@/types/steam'
+import { useSubject } from '@/context/SubjectContext'
+import { gameHref } from '@/utils/gameRef'
 
 /**
  * One Steam game as a compact row card — the Steam counterpart of an RA card
@@ -39,6 +41,7 @@ export default function SteamGameItem({
   /** Extra classes for the root, e.g. to fill a flex slot in the recent feed. */
   className?: string
 }) {
+  const subject = useSubject()
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
   const onPointerMove = useSpotlight()
@@ -46,7 +49,7 @@ export default function SteamGameItem({
 
   const isExpanded = expanded ?? localExpanded
   const toggle = onToggle ?? (() => setLocalExpanded((v) => !v))
-  const href = `/steamGame/${game.id}`
+  const href = gameHref('steam', game.id, subject)
 
   const hasCounts = game.achievementsLoaded && game.maxPossible > 0
   const perfect = hasCounts && game.numAwarded >= game.maxPossible

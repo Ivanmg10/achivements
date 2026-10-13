@@ -16,6 +16,7 @@ import { gameHref } from '@/utils/gameRef'
 import { psnBackdrop } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
+import { useSubject } from '@/context/SubjectContext'
 
 /**
  * One PSN game as a compact row card — SteamGameItem's counterpart in the
@@ -37,6 +38,7 @@ export default function PsnGameItem({
   onToggle?: () => void
   className?: string
 }) {
+  const subject = useSubject()
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
   const onPointerMove = useSpotlight()
@@ -44,7 +46,7 @@ export default function PsnGameItem({
 
   const isExpanded = expanded ?? localExpanded
   const toggle = onToggle ?? (() => setLocalExpanded((v) => !v))
-  const href = gameHref('psn', game.id)
+  const href = gameHref('psn', game.id, subject)
   const perfect = game.pctWon >= 100
 
   return (

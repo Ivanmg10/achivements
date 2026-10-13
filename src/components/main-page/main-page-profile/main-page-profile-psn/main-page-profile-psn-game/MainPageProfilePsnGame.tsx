@@ -8,6 +8,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { gameHref } from '@/utils/gameRef'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
+import { useSubject } from '@/context/SubjectContext'
 
 /**
  * The game card in the PSN profile — the Steam one's counterpart: the last
@@ -16,10 +17,11 @@ import type { PsnGameProgress } from '@/types/psn'
  */
 export default function MainPageProfilePsnGame({ game }: { game: PsnGameProgress }) {
   const { T, lang } = useLanguage()
+  const subject = useSubject()
 
   return (
     <Link
-      href={gameHref('psn', game.id)}
+      href={gameHref('psn', game.id, subject)}
       className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 w-full hover:scale-[1.005] transition-transform duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
     >
       <p className="text-xs text-text-secondary uppercase tracking-wider">{T.steam.lastPlayed}</p>
