@@ -2,15 +2,15 @@
 
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
-import { useGamesByCategory } from '../../../hooks/useGamesByCategory'
-import { useGameExtraData } from '../../../hooks/useGameExtraData'
-import { useConsoleFilter } from '../../../hooks/useConsoleFilter'
-import { useGameFiltering } from '../../../hooks/useGameFiltering'
-import StatusGameList from '../../../components/statusGameList/StatusGameList'
-import StatusPageHeader from '../../../components/status-page-header/StatusPageHeader'
+import { useGamesByCategory } from '@/hooks/useGamesByCategory'
+import { useGameExtraData } from '@/hooks/useGameExtraData'
+import { useConsoleFilter } from '@/hooks/useConsoleFilter'
+import { useGameFiltering } from '@/hooks/useGameFiltering'
+import StatusGameList from '@/components/statusGameList/StatusGameList'
+import StatusPageHeader from '@/components/status-page-header/StatusPageHeader'
 import CompletedFilter, {
   CompletedMode,
-} from '../../../components/completed-filter/CompletedFilter'
+} from '@/components/completed-filter/CompletedFilter'
 import ConsoleFilter, { buildConsolePills } from '@/components/console-filter/ConsoleFilter'
 import StatusSortControl from '@/components/status-sort-control/StatusSortControl'
 import StatusGridControl from '@/components/status-grid-control/StatusGridControl'

@@ -713,3 +713,9 @@
     animation: none !important;
   }
 }
+
+/* The top line while a page is on its way (NavigationProgress): fills fast, then slows down and waits. */
+@keyframes nav-progress {
+  from { width: 0; }
+  to { width: 85%; }
+}
