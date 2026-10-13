@@ -34,7 +34,7 @@ export default function LibraryPlatformTabs({
   ]
 
   return (
-    <div role="group" aria-label={T.libraryLayout.platformLabel} className="flex items-center gap-0.5 bg-bg-card rounded-full p-1 max-w-full overflow-x-auto">
+    <div role="group" aria-label={T.libraryLayout.platformLabel} className="flex items-center gap-0.5 bg-bg-card rounded-full p-1 max-w-full overflow-x-auto [scrollbar-width:none]">
       {options.map((o) => {
         const active = value === o.value
         return (

@@ -111,7 +111,7 @@ export default function RARecentlyPlayed() {
       {/* Cards */}
       <div className="flex flex-col flex-1 min-h-0">
         {loading ? (
-          <div className="flex flex-col gap-1.5 animate-pulse motion-reduce:animate-none">
+          <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-hidden animate-pulse motion-reduce:animate-none">
             {Array.from({ length: MAX_GAMES }).map((_, i) => (
               <GameRowSkeleton key={i} />
             ))}

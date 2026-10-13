@@ -34,7 +34,7 @@ export default function StatusPageHeader({
   const style = CATEGORY_STYLES[category] ?? 'bg-bg-card text-text-secondary'
 
   return (
-    <div className="flex flex-col gap-1 pb-5 border-b border-bg-card mb-1">
+    <div className="flex flex-col gap-1 pb-5 border-b border-bg-card mb-1 min-w-0 max-w-full">
       <div className="flex items-center gap-3 flex-wrap">
         <h1 className="text-2xl font-bold">{consoleName ?? label}</h1>
         {consoleName && (
