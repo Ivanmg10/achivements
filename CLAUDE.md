@@ -143,15 +143,19 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 **Milestones:**
 - `0.8.x` — login/register polish + optimizations
 - `0.9.x` — stats page reorganization, Steam, email, analytics
-- `1.0.0` — current: Steam integration, every release gate below closed,
-  privacy policy and account deletion (2026-10-02)
-- `1.0.x` — fixes; `1.x.0` for new sections (see Roadmap)
+- `1.0.0` — released 2026-10-02: Steam integration, every release gate below
+  closed, privacy policy and account deletion
+- `1.x.0` — new sections (see Roadmap); `1.x.y` — fixes
+- `1.3.0` — current: a loading state on every route (its own skeleton, and a
+  thin line along the top while a page is on its way) and the functions in
+  `fra1`, next to the database
 
-## Release gates — things that must be true before 1.0
+## Release gates — what had to be true before 1.0 (all closed)
 
-**Warn the user, unprompted, whenever they talk about cutting 1.0, tagging a
-release, or 'going live' while any of these is still open.** They asked for
-this reminder on purpose, because it is easy to forget.
+All of these have been closed since 1.0.0 (2026-10-02). **Warn the user,
+unprompted, if one stops being true** (a variable removed from Vercel, the
+domain unverified in Resend) while they talk about a release or 'going live'.
+They asked for this reminder on purpose, because it is easy to forget.
 
 - [x] **`cheevovault.com` verified in Resend, with `EMAIL_FROM` set on it**
       (2026-10-02). Password recovery reaches every user, not only the Resend
