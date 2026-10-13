@@ -4,6 +4,8 @@ import { useLanguage } from '@/context/LanguageContext'
 
 const BLOCK = 'bg-ink/[0.06]'
 const ROWS = 8
+/** The first shelf runs over two rows of the widest grid, the next ones start below it. */
+const FIRST_SHELF_CARDS = 8
 const SHELF_CARDS = 4
 
 /** The list's own shape: icon, title, platform, bar. Same height as a real row. */
@@ -46,18 +48,22 @@ function Detail() {
   )
 }
 
-/** One shelf: its title and a row of cards. */
-function Shelf() {
+/** One shelf: its title and its cards. */
+function Shelf({ cards = SHELF_CARDS }: { cards?: number }) {
   return (
     <div className="flex flex-col gap-3">
       <div className={`${BLOCK} h-5 w-48 rounded`} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {Array.from({ length: SHELF_CARDS }, (_, i) => (
+        {Array.from({ length: cards }, (_, i) => (
           <div key={i} className="rounded-2xl bg-bg-card ring-1 ring-ink/5 overflow-hidden">
             <div className={`${BLOCK} aspect-video`} />
-            <div className="p-4 flex flex-col gap-3">
+            <div className="p-4 min-h-[7.25rem] flex flex-col justify-end gap-3">
               <div className={`${BLOCK} h-4 w-2/3 rounded`} />
               <div className={`${BLOCK} h-1.5 w-full rounded-full`} />
+              <div className="flex justify-between">
+                <div className={`${BLOCK} h-3 w-10 rounded`} />
+                <div className={`${BLOCK} h-3 w-12 rounded`} />
+              </div>
             </div>
           </div>
         ))}
@@ -78,12 +84,17 @@ export default function LibraryExplorerSkeleton({ layout }: { layout: 'shelves' 
     <div role="status" aria-busy="true" className="flex flex-col gap-4">
       <span className="sr-only">{T.loadingPage.title}</span>
       <div aria-hidden="true" className="flex flex-col gap-4 animate-pulse motion-reduce:animate-none">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className={`${BLOCK} h-9 w-64 rounded-lg`} />
-          <div className="flex gap-2 flex-wrap">
-            <div className={`${BLOCK} h-9 w-48 rounded-xl`} />
-            <div className={`${BLOCK} h-9 w-44 rounded-lg`} />
+        {/* The title with the platform tabs and the count, then the search and the view buttons: as the page lays them out. */}
+        <div className="flex flex-col gap-1 pb-5 border-b border-bg-card mb-1">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className={`${BLOCK} h-8 w-40 rounded-lg`} />
+            <div className={`${BLOCK} h-[38px] w-[26rem] max-w-full rounded-full`} />
           </div>
+          <div className={`${BLOCK} h-4 w-24 rounded mt-1`} />
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className={`${BLOCK} h-[34px] w-full sm:w-[30rem] rounded-xl`} />
+          <div className={`${BLOCK} h-8 w-[6.5rem] sm:w-[13.5rem] rounded-lg`} />
         </div>
         {layout === 'list' ? (
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(340px,5fr)_minmax(0,7fr)] gap-4 items-start">
@@ -98,7 +109,7 @@ export default function LibraryExplorerSkeleton({ layout }: { layout: 'shelves' 
           </div>
         ) : (
           <div className="flex flex-col gap-8">
-            <Shelf />
+            <Shelf cards={FIRST_SHELF_CARDS} />
             <Shelf />
           </div>
         )}
