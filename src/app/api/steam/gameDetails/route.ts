@@ -13,7 +13,8 @@ import type { SteamAppDetailsResponse, SteamGameDetails } from '@/types/steam'
  * per language — the store API is rate-limited harder than the Web API.
  */
 export async function GET(req: NextRequest) {
-  const auth = await requireSteamSession()
+  // `req`: on a public profile the viewer needs no Steam of their own, the profile's owner has it.
+  const auth = await requireSteamSession(req)
   if (!auth.ok) return auth.response
 
   const appIdRaw = req.nextUrl.searchParams.get('appid')

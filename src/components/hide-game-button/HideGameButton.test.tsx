@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import HideGameButton from './HideGameButton'
 import { en } from '@/translations/en'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
+import { SubjectContext } from '@/context/SubjectContext'
 
 jest.mock('@/context/HiddenGamesContext', () => ({ useHiddenGames: jest.fn() }))
 
@@ -43,4 +44,13 @@ test('the click does not reach the card around it', () => {
   fireEvent.click(screen.getByRole('button', { name: `${en.cards.hideGame}: Zelda` }))
   fireEvent.click(screen.getByRole('button', { name: en.cards.cancel }))
   expect(onCard).not.toHaveBeenCalled()
+})
+
+test("is not offered on someone else's page", () => {
+  render(
+    <SubjectContext.Provider value="ivan">
+      <HideGameButton source="ra" gameId={5} title="Zelda" />
+    </SubjectContext.Provider>,
+  )
+  expect(screen.queryByRole('button')).not.toBeInTheDocument()
 })

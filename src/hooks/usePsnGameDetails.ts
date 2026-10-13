@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { IgdbDetails } from '@/lib/igdbClient'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 type Outcome = { details: IgdbDetails | null } | { error: string }
 
@@ -11,13 +13,15 @@ type Outcome = { details: IgdbDetails | null } | { error: string }
  * without them: they are extras next to the trophies.
  */
 export function usePsnGameDetails(titleId: string | null) {
+  // Keyed by the title in the owner's list: on a profile, theirs.
+  const subject = useSubject()
   const [details, setDetails] = useState<IgdbDetails | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   /** Asks the server; what came back, not yet applied. */
   const request = useCallback(async (id: string): Promise<Outcome> => {
     try {
-      const res = await fetch(`/api/psn/details?id=${encodeURIComponent(id)}`)
+      const res = await fetch(withSubject(`/api/psn/details?id=${encodeURIComponent(id)}`, subject))
       if (res.status === 404) return { details: null }
       if (!res.ok) throw new Error(`Failed to load game details (${res.status})`)
       return { details: (await res.json()) as IgdbDetails }
@@ -25,7 +29,7 @@ export function usePsnGameDetails(titleId: string | null) {
       console.error('[usePsnGameDetails]', id, err)
       return { error: err instanceof Error ? err.message : 'Unknown error' }
     }
-  }, [])
+  }, [subject])
 
   // Another game starts over; state, so while rendering. The load is the effect.
   useWhenChanged([titleId], () => {

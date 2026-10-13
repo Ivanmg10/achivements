@@ -1,5 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { usePsnGameDetails } from './usePsnGameDetails'
+import { createElement, type ReactNode } from 'react'
+import { SubjectContext } from '@/context/SubjectContext'
 
 const DETAILS = { summary: 'x', developers: ['Treyarch'], publishers: [], genres: [], releaseDate: null, screenshots: [] }
 
@@ -45,4 +47,12 @@ test('another game clears the previous details', async () => {
   await waitFor(() => expect(result.current.details).toEqual(DETAILS))
   rerender({ id: 'NPWR00002_00' })
   expect(result.current.details).toBeNull()
+})
+
+test("on someone's profile it asks by the title in their list", async () => {
+  ;(fetch as jest.Mock).mockResolvedValue({ ok: true, status: 200, json: async () => DETAILS })
+  const wrapper = ({ children }: { children: ReactNode }) => createElement(SubjectContext.Provider, { value: 'ivan' }, children)
+  const { result } = renderHook(() => usePsnGameDetails('NPWR00001_00'), { wrapper })
+  await waitFor(() => expect(result.current.details).toEqual(DETAILS))
+  expect(fetch).toHaveBeenCalledWith('/api/psn/details?id=NPWR00001_00&user=ivan')
 })
