@@ -331,6 +331,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   backdrop and release year come from IGDB (`src/lib/igdbClient.ts`, a Twitch
   app in `TWITCH_CLIENT_ID`/`TWITCH_CLIENT_SECRET`), matched by title and
   platform, cached half a year. Without the keys they keep the trophy icon.
+  Every PSN game page also asks IGDB for its summary, studios, genres and
+  screenshots (`igdbDetails`, `GET /api/psn/details?id=`, keyed by Sony's
+  title from the user's list, never by text from the request). English only;
+  a 404 just means the page goes without them.
 - Sony returns errors as bodies, not throws: every call goes through
   `psnCall()` (`unwrap()` plus one retry after 2 s when Sony says "too many
   requests" — psn-api hides the HTTP status and `Retry-After`, so it goes by

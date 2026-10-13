@@ -55,7 +55,7 @@ test('carries its api name and the highlight', () => {
   renderCard(ach(), true)
   const li = screen.getByRole('listitem')
   expect(li.dataset.ach).toBe('WIN')
-  expect(li.className).toContain('bg-[#66c0f4]/15')
+  expect(li.className).toContain('bg-accent/15')
 })
 
 test('falls back to a placeholder badge', () => {

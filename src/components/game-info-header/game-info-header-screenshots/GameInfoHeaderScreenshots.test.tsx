@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import SteamGameInfoHeaderScreenshots from './SteamGameInfoHeaderScreenshots'
+import GameInfoHeaderScreenshots from './GameInfoHeaderScreenshots'
 import { en } from '@/translations/en'
 
 const SHOTS = [
@@ -8,9 +8,9 @@ const SHOTS = [
   { thumb: 't3.jpg', full: 'f3.jpg' },
 ]
 
-describe('SteamGameInfoHeaderScreenshots', () => {
+describe('GameInfoHeaderScreenshots', () => {
   test('shows the first two, each opening the full image', () => {
-    render(<SteamGameInfoHeaderScreenshots screenshots={SHOTS} title="Fallout 4" />)
+    render(<GameInfoHeaderScreenshots screenshots={SHOTS} title="Fallout 4" />)
     const imgs = screen.getAllByRole('img')
     expect(imgs).toHaveLength(2)
     expect(imgs[0].getAttribute('alt')).toBe(`Fallout 4 — ${en.steam.screenshot} 1`)
@@ -21,7 +21,7 @@ describe('SteamGameInfoHeaderScreenshots', () => {
   })
 
   test('renders nothing without screenshots', () => {
-    const { container } = render(<SteamGameInfoHeaderScreenshots screenshots={[]} title="x" />)
+    const { container } = render(<GameInfoHeaderScreenshots screenshots={[]} title="x" />)
     expect(container).toBeEmptyDOMElement()
   })
 })

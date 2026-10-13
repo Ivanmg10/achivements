@@ -46,3 +46,40 @@ test('the box art and play time when Sony has them, the trophy icon otherwise', 
   expect(container.querySelector('img[src="https://cover.png"]')).toBeNull()
   expect(screen.queryByText(en.steam.playtime)).not.toBeInTheDocument()
 })
+
+const DETAILS = {
+  summary: 'A gothic action RPG.',
+  developers: ['FromSoftware'],
+  publishers: ['Sony Interactive Entertainment'],
+  genres: ['Role-playing (RPG)'],
+  releaseDate: '2015-03-24',
+  screenshots: [
+    { thumb: 't1.jpg', full: 'f1.jpg' },
+    { thumb: 't2.jpg', full: 'f2.jpg' },
+  ],
+}
+
+test("IGDB's facts: summary, studios, genre, release date and two screenshots", () => {
+  render(<PsnGameInfoHeader game={GAME} details={DETAILS} />)
+  expect(screen.getByText('A gothic action RPG.')).toBeInTheDocument()
+  expect(screen.getByText('FromSoftware')).toBeInTheDocument()
+  expect(screen.getByText('Sony Interactive Entertainment')).toBeInTheDocument()
+  expect(screen.getByText('Role-playing (RPG)')).toBeInTheDocument()
+  // A date-only value, read as UTC: never a day early.
+  expect(screen.getByText(/March 24, 2015|24 March 2015/)).toBeInTheDocument()
+  expect(screen.getAllByRole('link').filter((a) => a.getAttribute('href')?.startsWith('f'))).toHaveLength(2)
+})
+
+test('without details, dashes, and no summary or screenshots', () => {
+  render(<PsnGameInfoHeader game={GAME} />)
+  expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(4)
+  expect(screen.queryByRole('list', { name: /screenshot/i })).toBeNull()
+})
+
+test('the PlayStation Store link when Sony has a concept, and extra actions beside it', () => {
+  const { rerender } = render(<PsnGameInfoHeader game={GAME} />)
+  expect(screen.queryByRole('link', { name: en.psn.viewOnStore })).toBeNull()
+  rerender(<PsnGameInfoHeader game={{ ...GAME, conceptId: 10001234 }} actions={<button>Ask</button>} />)
+  expect(screen.getByRole('link', { name: en.psn.viewOnStore })).toHaveAttribute('href', 'https://store.playstation.com/concept/10001234')
+  expect(screen.getByRole('button', { name: 'Ask' })).toBeInTheDocument()
+})

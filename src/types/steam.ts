@@ -206,4 +206,6 @@ export type SteamAchievementUnified = AchievementBase & {
   globalPct: number | null
   /** Probably needs online play — guessed from its description, Steam has no such flag. */
   likelyOnline: boolean
+  /** Its English name, when the page is in another language and it differs: guides go by it. */
+  titleEn?: string
 }

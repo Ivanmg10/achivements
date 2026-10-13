@@ -4,10 +4,10 @@ import { useLanguage } from '@/context/LanguageContext'
 const SHOWN = 2
 
 /**
- * Two store screenshots beside a Steam game's header, where the RA page shows
+ * Two screenshots beside a Steam or PSN game's header, where the RA page shows
  * its title screen and in-game shot. Each opens the full-size image.
  */
-export default function SteamGameInfoHeaderScreenshots({
+export default function GameInfoHeaderScreenshots({
   screenshots,
   title,
 }: {
@@ -26,7 +26,7 @@ export default function SteamGameInfoHeaderScreenshots({
             href={s.full}
             target="_blank"
             rel="noopener noreferrer"
-            className="block rounded-md overflow-hidden hover:ring-2 hover:ring-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] transition-shadow"
+            className="block rounded-md overflow-hidden hover:ring-2 hover:ring-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 transition-shadow"
           >
             <Image
               src={s.thumb}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
@@ -15,6 +16,11 @@ import {
 import type { SteamAchievementUnified } from '@/types/steam'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useLocationHash } from '@/hooks/useLocationHash'
+import { guideLinks } from '@/utils/guideLinks'
+import GameInfoTableFoldBar from '@/components/game-info-table-fold-bar/GameInfoTableFoldBar'
+import AchievementWarningPanel from '@/components/achievement-warning-panel/AchievementWarningPanel'
+import AchievementDetailModal from '@/components/achievement-detail-modal/AchievementDetailModal'
+import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 
 type Filter = 'all' | 'earned' | 'unearned'
 
@@ -50,7 +56,10 @@ function sortAchievements(list: SteamAchievementUnified[], { key, dir }: SteamSo
  *
  * Opening the page from a badge link (…#ach-<apiname>) scrolls to that
  * achievement and highlights it briefly. Each achievement can be pinned to
- * the main page, as RA's table does.
+ * the main page, as RA's table does, and pinned ones lead the list; each
+ * opens in a detail window with links to guides. The ones that likely need
+ * online play and are still locked are listed in a warning above, as RA
+ * lists its missables — servers close.
  */
 export default function SteamGameInfoTable({
   achievements,
@@ -67,6 +76,7 @@ export default function SteamGameInfoTable({
   const [sortState, setSortState] = useState<SteamSortState>({ key: 'default', dir: 'asc' })
   const [expanded, setExpanded] = useState(true)
   const [highlighted, setHighlighted] = useState<string | null>(null)
+  const [selected, setSelected] = useState<SteamAchievementUnified | null>(null)
 
   const FILTER_LABELS: Record<Filter, string> = {
     all: T.gameInfoTable.filterAll,
@@ -107,8 +117,12 @@ export default function SteamGameInfoTable({
         : filter === 'unearned'
           ? achievements.filter((a) => !a.earned)
           : achievements
-    return sortAchievements(list, sortState)
-  }, [achievements, filter, sortState])
+    const sorted = sortAchievements(list, sortState)
+    // Pinned first, each part in the chosen order — as RA's table does.
+    return canPin ? [...sorted.filter((a) => pinned.has(a.apiname)), ...sorted.filter((a) => !pinned.has(a.apiname))] : sorted
+  }, [achievements, filter, sortState, canPin, pinned])
+
+  const onlineLocked = useMemo(() => achievements.filter((a) => a.likelyOnline && !a.earned), [achievements])
 
   function handleSort(key: SteamSortKey) {
     setSortState((prev) =>
@@ -121,13 +135,25 @@ export default function SteamGameInfoTable({
 
   return (
     <section className="bg-bg-card p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
+      <AchievementWarningPanel
+        tone="warning"
+        label={T.steam.onlineWarning}
+        items={onlineLocked.map((a) => ({
+          key: a.apiname,
+          title: a.hidden ? T.steam.hiddenAchievement : a.title,
+          description: a.hidden ? T.steam.hiddenAchievementDesc : a.description,
+          iconUrl: a.badgeUrl || null,
+          onSelect: () => setSelected(a),
+        }))}
+      />
+
       <div className="flex gap-2 flex-wrap" role="group" aria-label={T.gameInfoPage.achievements}>
         {(['all', 'earned', 'unearned'] as Filter[]).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
             aria-pressed={filter === f}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] ${
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
               filter === f
                 ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30'
                 : 'bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card'
@@ -137,6 +163,10 @@ export default function SteamGameInfoTable({
           </button>
         ))}
       </div>
+
+      {needsToggle && (
+        <GameInfoTableFoldBar expanded={expanded} onToggle={() => setExpanded((e) => !e)} shown={filtered.length} total={achievements.length} />
+      )}
 
       {filtered.length === 0 ? (
         <p className="text-sm text-text-secondary self-center py-4">{T.steam.noAchievements}</p>
@@ -168,6 +198,7 @@ export default function SteamGameInfoTable({
                     highlighted={highlighted === a.apiname}
                     pinned={canPin ? pinned.has(a.apiname) : undefined}
                     onTogglePin={() => toggle(a)}
+                    onOpen={() => setSelected(a)}
                   />
                 ))}
               </tbody>
@@ -183,6 +214,7 @@ export default function SteamGameInfoTable({
                 highlighted={highlighted === a.apiname}
                 pinned={canPin ? pinned.has(a.apiname) : undefined}
                 onTogglePin={() => toggle(a)}
+                onOpen={() => setSelected(a)}
               />
             ))}
           </ul>
@@ -191,7 +223,7 @@ export default function SteamGameInfoTable({
             <button
               onClick={() => setExpanded((e) => !e)}
               aria-expanded={expanded}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-bg-header hover:bg-bg-header/80 text-text-secondary hover:text-text-main transition-colors self-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-bg-header hover:bg-bg-header/80 text-text-secondary hover:text-text-main transition-colors self-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               {expanded ? (
                 <>
@@ -208,6 +240,24 @@ export default function SteamGameInfoTable({
           )}
         </>
       )}
+
+      <AnimatePresence>
+        {selected && (
+          <AchievementDetailModal
+            title={selected.hidden && !selected.earned ? T.steam.hiddenAchievement : selected.title}
+            description={selected.hidden && !selected.earned ? T.steam.hiddenAchievementDesc : selected.description}
+            iconUrl={selected.badgeUrl || null}
+            earned={selected.earned}
+            earnedAt={selected.dateEarned}
+            rarity={selected.globalPct}
+            tags={selected.likelyOnline ? <SteamOnlineBadge /> : undefined}
+            guides={selected.hidden && !selected.earned ? [] : guideLinks('steam', { gameTitle, title: selected.titleEn ?? selected.title, appId })}
+            pinned={canPin ? pinned.has(selected.apiname) : undefined}
+            onTogglePin={() => toggle(selected)}
+            onClose={() => setSelected(null)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   )
 }
