@@ -84,6 +84,17 @@ them bottom right: green with a check, red with an alert icon, gone after 4 s
 - A silent failure is a bug: an optimistic update that rolls back must say so.
 - Texts live in `T.toast` (all languages). The admin panel's are in English.
 
+## Progress bars — in the theme's colours
+
+Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or
+`CircularProgress`: the theme's `--progress` (its accent), RA softcore a darker
+step of it (`bg-progress-soft`) under hardcore. A finished bar stays in the
+theme's colour and glows; **the green is only in the percentage beside it**
+(`text-success` at 100%), never on the bar — the user tried a green ring and
+did not like it. Do not paint a bar in a platform's colour; those stay only in
+charts that compare platforms (BrowseSplit, CompletionDistribution, the line
+chart).
+
 ## API calls — error handling MANDATORY
 Every API call added or modified must have its own error handling. No exceptions.
 

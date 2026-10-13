@@ -62,7 +62,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { 
             {entry.title}
           </Link>
         </div>
-        <LibraryEntryProgress source={entry.kind} pct={entry.pct} label={entry.title} />
+        <LibraryEntryProgress pct={entry.pct} label={entry.title} />
         <div className="flex items-baseline justify-between gap-2 text-xs text-text-secondary">
           <span className="tabular-nums">
             {counts ? `${counts.earned}/${counts.total}` : total > 0 ? `${total} ${T.statusGameItem.achievements}` : ''}

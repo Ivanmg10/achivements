@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import GameIcon from '@/components/game-icon/GameIcon'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
-import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import { gameHref } from '@/utils/gameRef'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
@@ -38,14 +38,14 @@ export default function MainPageProfilePsnGame({ game }: { game: PsnGameProgress
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between text-xs text-text-secondary">
           <span className="flex items-center gap-1.5">
-            <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full bg-[#0070d1]" />
-            {game.pctWon}%
+            <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full bg-progress" />
+            <span className={game.pctWon >= 100 ? 'text-success font-semibold' : ''}>{game.pctWon}%</span>
           </span>
           <span className="tabular-nums">
             {game.numAwarded} / {game.maxPossible}
           </span>
         </div>
-        <SteamProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-card" height="h-2" />
+        <ProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-card" height="h-2" />
         <PsnTrophyCounts earned={game.earned} of={game.defined} className="mt-1" />
       </div>
     </Link>

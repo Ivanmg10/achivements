@@ -11,7 +11,7 @@ import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { RetroAchievement } from '@/types/types'
 import { CONSOLES } from '@/constants'
-import { DualProgressBar } from '@/components/ui/DualProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-recently-played-expanded/RARecentlyPlayedExpanded'
@@ -130,9 +130,10 @@ export default function PinnedGameRow({
               <span className="text-xs text-text-secondary whitespace-nowrap">{game.ConsoleName}</span>
             </div>
             {total > 0 && (
-              <DualProgressBar
-                softcorePct={pct(earned, total)}
-                hardcorePct={pct(earnedHardcore, total)}
+              <ProgressBar
+                pct={pct(earnedHardcore, total)}
+                softPct={pct(earned, total)}
+                label={game.Title ?? ''}
                 className="flex-1"
               />
             )}

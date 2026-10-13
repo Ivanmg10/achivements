@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
-import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
 
@@ -45,14 +45,14 @@ export default function MainPageProfileStGame({
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between text-xs text-text-secondary">
             <span className="flex items-center gap-1.5">
-              <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full bg-[#66c0f4]" />
-              {Math.round(game.pctWon)}%
+              <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full bg-progress" />
+              <span className={game.pctWon >= 100 ? 'text-success font-semibold' : ''}>{Math.round(game.pctWon)}%</span>
             </span>
             <span className="tabular-nums">
               {game.numAwarded} / {game.maxPossible}
             </span>
           </div>
-          <SteamProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-card" height="h-2" />
+          <ProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-card" height="h-2" />
         </div>
       )}
     </Link>

@@ -4,7 +4,7 @@ import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
-import { DualProgressBar } from '@/components/ui/DualProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 
 export default function MainPageProfileRaGame({
   game,
@@ -44,17 +44,17 @@ export default function MainPageProfileRaGame({
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center gap-3 text-xs text-text-secondary">
             <span className="flex items-center gap-1.5">
-              <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />
-              {game.UserCompletion ?? '0%'}
+              <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full bg-progress-soft" />
+              <span className={scPct >= 100 ? 'text-success font-semibold' : ''}>{game.UserCompletion ?? '0%'}</span>
             </span>
             {hcPct > 0 && (
               <span className="flex items-center gap-1.5">
-                <span className="inline-block w-2 h-2 rounded-full bg-yellow-400" />
-                {game.UserCompletionHardcore}
+                <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full bg-progress" />
+                <span className={hcPct >= 100 ? 'text-success font-semibold' : ''}>{game.UserCompletionHardcore}</span>
               </span>
             )}
           </div>
-          <DualProgressBar softcorePct={scPct} hardcorePct={hcPct} trackClass="bg-bg-card" height="h-2" />
+          <ProgressBar pct={hcPct} softPct={scPct} label={game.Title ?? ''} trackClass="bg-bg-card" height="h-2" />
         </div>
       ) : null}
     </Link>

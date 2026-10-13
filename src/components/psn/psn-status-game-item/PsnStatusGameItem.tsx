@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { IconClock } from '@tabler/icons-react'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import GameIcon from '@/components/game-icon/GameIcon'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
 import PsnLibraryDetail from '@/components/psn/psn-library-detail/PsnLibraryDetail'
@@ -82,8 +82,8 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
             </span>
             <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>{progressText}</span>
             <span className="flex items-center gap-2 mt-1">
-              <SteamProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-main" className="flex-1" />
-              <span className="text-xs text-text-secondary tabular-nums">{game.pctWon}%</span>
+              <ProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-main" className="flex-1" />
+              <span className={`text-xs tabular-nums ${game.pctWon >= 100 ? 'text-success font-semibold' : 'text-text-secondary'}`}>{game.pctWon}%</span>
             </span>
             <PsnTrophyCounts earned={game.earned} of={game.defined} className="mt-1" />
             {game.playtimeMinutes !== null && (

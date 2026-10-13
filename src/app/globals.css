@@ -30,6 +30,10 @@
   --color-danger: rgb(var(--danger));
 
   --color-chart-2: rgb(var(--chart-2));
+
+  /* Progress bars: the theme's accent, and a darker step of it (RA softcore under hardcore). */
+  --color-progress: rgb(var(--progress));
+  --color-progress-soft: color-mix(in oklab, rgb(var(--progress)) 45%, rgb(var(--bg-card)));
 }
 
 /* ============================================
@@ -56,6 +60,9 @@
   --info: 96 165 250;
   --danger: 239 68 68;
   --chart-2: 245 158 11;
+
+  /* Resolved on each element, so it follows the theme that element is in. */
+  --progress: var(--accent);
 }
 
 /* ============================================

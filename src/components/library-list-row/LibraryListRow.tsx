@@ -41,7 +41,7 @@ export default function LibraryListRow({ entry, current, onSelect }: { entry: Li
           <LibraryPlatformBadge source={entry.kind} />
           {played && <span className="text-[11px] text-text-secondary truncate">{T.statusGameItem.lastPlayed} · {played}</span>}
         </div>
-        <LibraryEntryProgress source={entry.kind} pct={entry.pct} label={entry.title} />
+        <LibraryEntryProgress pct={entry.pct} label={entry.title} />
       </div>
       <button
         type="button"

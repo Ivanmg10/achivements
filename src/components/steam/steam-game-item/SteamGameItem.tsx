@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { IconChevronDown, IconClock } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamRecentlyPlayedExpanded from '@/components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
@@ -105,8 +105,8 @@ export default function SteamGameItem({
               </span>
               {hasCounts && (
                 <>
-                  <SteamProgressBar pct={game.pctWon} label={game.title} className="flex-1" />
-                  <span className={`text-xs font-semibold tabular-nums shrink-0 ${perfect ? 'text-amber-400' : 'text-text-main'}`}>
+                  <ProgressBar pct={game.pctWon} label={game.title} className="flex-1" />
+                  <span className={`text-xs font-semibold tabular-nums shrink-0 ${perfect ? 'text-success' : 'text-text-main'}`}>
                     {Math.round(game.pctWon)}%
                   </span>
                 </>
