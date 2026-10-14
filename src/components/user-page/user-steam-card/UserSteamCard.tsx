@@ -29,9 +29,9 @@ export default function UserSteamCard() {
 
   const stats: PlatformStat[] = [
     { label: T.userStats.games, value: pending(libraryLoading, steam.totalGames) },
-    { label: T.steam.perfect, value: pending(libraryLoading, steam.perfect), accent: 'text-[#a4d007]' },
-    { label: T.steam.achievements, value: pending(libraryLoading, steam.unlocked), accent: 'text-[#66c0f4]' },
-    { label: T.userStats.inProgress, value: pending(libraryLoading, steam.playing), accent: 'text-amber-400' },
+    { label: T.steam.perfect, value: pending(libraryLoading, steam.perfect), accent: 'text-success' },
+    { label: T.steam.achievements, value: pending(libraryLoading, steam.unlocked) },
+    { label: T.userStats.inProgress, value: pending(libraryLoading, steam.playing) },
     {
       label: T.steam.playtime,
       value: libraryLoading ? '—' : formatPlaytime(steam.totalMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang),

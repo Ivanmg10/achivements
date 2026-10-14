@@ -30,7 +30,7 @@ export default function UserPsnCard() {
   const value = (n: number | undefined) => (isLoading || n === undefined ? '—' : n.toLocaleString())
   const earned = summary?.earned
   const stats: PlatformStat[] = [
-    { label: T.psn.level, value: value(summary?.trophyLevel), accent: 'text-[#0070d1]' },
+    { label: T.psn.level, value: value(summary?.trophyLevel) },
     { label: T.userStats.games, value: value(summary?.games) },
     { label: T.psn.platinum, value: value(earned?.platinum), accent: 'text-sky-300' },
     {

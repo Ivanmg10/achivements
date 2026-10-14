@@ -53,7 +53,7 @@ export default function PublicUserPlatforms({ games, isLoading }: { games: Libra
                 </div>
                 <div className="flex flex-col-reverse">
                   <dt className="text-[10px] text-text-secondary">{T.userProfile.playing}</dt>
-                  <dd className="text-lg font-bold tabular-nums text-amber-400">{p.playing.toLocaleString()}</dd>
+                  <dd className="text-lg font-bold tabular-nums">{p.playing.toLocaleString()}</dd>
                 </div>
               </dl>
               <div className="flex items-center gap-2">

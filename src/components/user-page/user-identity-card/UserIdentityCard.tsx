@@ -53,10 +53,10 @@ export default function UserIdentityCard() {
 
   const totals = [
     { label: T.userStats.games, value: all.length + steam.totalGames, accent: 'text-text-main', icon: <IconDeviceGamepad2 size={18} /> },
-    { label: T.userStats.inProgress, value: inProgress.length + steam.playing, accent: 'text-amber-400', icon: <IconPlayerPlay size={18} /> },
-    { label: T.groups.filter100, value: completedRa + steam.perfect, accent: 'text-green-400', icon: <IconCircleCheck size={18} /> },
-    { label: T.groups.title, value: groups.length, accent: 'text-accent', icon: <IconFolders size={18} /> },
-    { label: T.pinnedGames.title, value: pins.length, accent: 'text-blue-400', icon: <IconPin size={18} /> },
+    { label: T.userStats.inProgress, value: inProgress.length + steam.playing, accent: 'text-text-main', icon: <IconPlayerPlay size={18} /> },
+    { label: T.groups.filter100, value: completedRa + steam.perfect, accent: 'text-success', icon: <IconCircleCheck size={18} /> },
+    { label: T.groups.title, value: groups.length, accent: 'text-text-main', icon: <IconFolders size={18} /> },
+    { label: T.pinnedGames.title, value: pins.length, accent: 'text-text-main', icon: <IconPin size={18} /> },
   ]
 
   return (
