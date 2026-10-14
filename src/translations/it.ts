@@ -383,6 +383,9 @@ export const it: Translations = {
     footer: 'Non affiliato a RetroAchievements, Valve o Sony.',
   },
   toast: {
+    followed: 'Ora segui {u}',
+    unfollowed: 'Non segui più {u}',
+    followFailed: 'Impossibile aggiornare i seguiti',
     profileLinkCopied: 'Link del profilo copiato',
     profileLinkFailed: 'Impossibile copiare il link',
     close: 'Chiudi',
@@ -458,6 +461,7 @@ export const it: Translations = {
           'Il tuo account: un nome utente, un hash della password (mai la password stessa) e il tuo indirizzo email, usato solo per recuperare l’account e confermare che è tuo.',
           'Ciò che scegli di aggiungere: un avatar (un link, o un’immagine che carichi e che conserviamo finché non la sostituisci o elimini l’account), il tuo paese, giochi e obiettivi preferiti e fissati, e i tuoi gruppi.',
           'Il tuo profilo pubblico, finché lo è, mostra agli utenti connessi il tuo nome utente, avatar, paese e descrizione, le piattaforme collegate e i loro nomi, i giochi preferiti, il tema, i gruppi pubblici e gli obiettivi fissati, oltre ai tuoi progressi e alla tua attività, e permette loro di confrontarli con i propri. Il genere appare solo se scegli di mostrarlo. Mai la tua email né le tue chiavi. Puoi rendere privato il profilo in qualsiasi momento.',
+          'Chi segui: conservato perché tu possa ritrovarli. Solo tu vedi quella lista; a nessuno viene mostrato chi lo segue.',
           'Account collegati: nome utente e chiave Web API di RetroAchievements, e il tuo Steam ID e nome visualizzato, per recuperare i tuoi progressi, anche quando qualcuno apre il tuo profilo pubblico. La chiave non lascia mai il nostro server. Collegare Steam verifica solo che il profilo esista e sia pubblico: non dimostra che l’account sia tuo.',
           'PlayStation, se la colleghi: il tuo ID online PSN e il tuo numero di account. Il collegamento controlla solo che l’account esista e mostri i trofei pubblicamente: non dimostra che l’account sia tuo. I tuoi trofei, e il tempo di gioco e le immagini dei giochi se la tua cronologia di gioco è pubblica, vengono letti da Sony con l’account PlayStation del sito e conservati in una cache che scade da sola.',
           'Registri di sicurezza: l’indirizzo IP (e il nome utente, per gli accessi) di accessi falliti, registrazioni e richieste di reimpostazione della password, conservati per un giorno per frenare gli abusi.',
@@ -1061,6 +1065,15 @@ export const it: Translations = {
     recent: 'Recenti',
     clearRecent: 'Cancella',
     resultsLabel: 'Utenti trovati',
+  },
+  following: {
+    title: 'Seguiti',
+    follow: 'Segui',
+    following: 'Segui già',
+    loading: 'Caricamento dei seguiti…',
+    loadError: 'Impossibile caricare i seguiti in questo momento.',
+    emptyTitle: 'Non segui ancora nessuno',
+    empty: 'Cerca utenti e premi Segui sul loro profilo.',
   },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',

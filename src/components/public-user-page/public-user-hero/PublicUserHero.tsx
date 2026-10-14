@@ -9,6 +9,7 @@ import { codeToFlag, findCountry } from '@/utils/countries'
 import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
 import PublicUserPlatformChips from '../public-user-platform-chips/PublicUserPlatformChips'
 import PublicUserShareButton from '../public-user-share-button/PublicUserShareButton'
+import PublicUserFollowButton from '../public-user-follow-button/PublicUserFollowButton'
 import PublicUserKpis from '../public-user-kpis/PublicUserKpis'
 
 /**
@@ -64,7 +65,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            {user.isSelf ? (
+            {user.isSelf && (
               <Link
                 href="/user"
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
@@ -72,7 +73,9 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
                 <IconPencil size={13} aria-hidden="true" />
                 {T.userProfile.editProfile}
               </Link>
-            ) : onCompare ? (
+            )}
+            {!user.isSelf && <PublicUserFollowButton username={user.username} initial={user.following === true} />}
+            {!user.isSelf && onCompare && (
               <button
                 type="button"
                 onClick={onCompare}
@@ -81,7 +84,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
                 <IconArrowsDiff size={13} aria-hidden="true" />
                 {T.userProfile.compareWithMe}
               </button>
-            ) : null}
+            )}
             <PublicUserShareButton />
           </div>
         </div>

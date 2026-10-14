@@ -4,6 +4,10 @@ import { en } from '@/translations/en'
 
 jest.mock('../public-user-kpis/PublicUserKpis', () => ({ __esModule: true, default: () => <div data-testid="kpis" /> }))
 jest.mock('@/components/user-page/user-profile-banner/UserProfileBanner', () => ({ __esModule: true, default: () => null }))
+jest.mock('../public-user-follow-button/PublicUserFollowButton', () => ({
+  __esModule: true,
+  default: ({ initial }: { initial: boolean }) => <span data-testid="follow" data-initial={String(initial)} />,
+}))
 
 const USER = { username: 'ivan', avatar: 'https://x/a.png', description: 'Hello there', location: 'ES', ra: 'IvanRA', steam: false, psn: false }
 
@@ -37,4 +41,12 @@ test('no avatar, no country, no platforms: a placeholder and no numbers', () => 
   expect(screen.queryByRole('img')).not.toBeInTheDocument()
   expect(screen.queryByTestId('kpis')).not.toBeInTheDocument()
   expect(screen.queryByRole('button', { name: en.userProfile.compareWithMe })).not.toBeInTheDocument()
+})
+
+test('follow someone else, starting from whether you already do; not yourself', () => {
+  const { unmount } = render(<PublicUserHero user={{ ...USER, following: true }} onCompare={jest.fn()} />)
+  expect(screen.getByTestId('follow')).toHaveAttribute('data-initial', 'true')
+  unmount()
+  render(<PublicUserHero user={{ ...USER, isSelf: true }} onCompare={jest.fn()} />)
+  expect(screen.queryByTestId('follow')).not.toBeInTheDocument()
 })

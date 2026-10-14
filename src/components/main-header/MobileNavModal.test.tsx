@@ -57,3 +57,10 @@ test('collapses the Status group again when isOpen becomes false and reopens', (
   rerender(<MobileNavModal isOpen={true} onClose={jest.fn()} />)
   expect(screen.queryByText('In progress')).not.toBeInTheDocument()
 })
+
+test('Following is a top-level item that opens who you follow', () => {
+  const onClose = jest.fn()
+  render(<MobileNavModal isOpen={true} onClose={onClose} />)
+  fireEvent.click(screen.getByText('Following'))
+  expect(push).toHaveBeenCalledWith('/following')
+})

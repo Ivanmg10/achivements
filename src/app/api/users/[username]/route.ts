@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { dataOwner } from '@/lib/apiAuth'
 import { findPublicUser, hiddenGameKeys } from '@/lib/publicUser'
 import { listGroups } from '@/lib/groupList'
+import pool from '@/lib/db'
 
 /**
  * A CheevoVault user's public profile: who they are, which platforms they
@@ -22,7 +23,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ usernam
       return NextResponse.json({ error: 'not-found' }, { status: 404 })
     }
 
-    const [hiddenGames, groups] = await Promise.all([hiddenGameKeys(user.id), listGroups(user.id, { publicOnly: true })])
+    const [hiddenGames, groups, follow] = await Promise.all([
+      hiddenGameKeys(user.id),
+      listGroups(user.id, { publicOnly: true }),
+      pool.query('SELECT 1 FROM follows WHERE follower_id = $1 AND followed_id = $2', [viewer.id, user.id]),
+    ])
 
     return NextResponse.json({
       username: user.username,
@@ -41,6 +46,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ usernam
       favorites: { ra: user.favorite_game, steam: user.favorite_steam_game, psn: user.favorite_psn_game },
       hiddenGames,
       groups,
+      // Whether the viewer follows them, for the Follow button.
+      following: follow.rows.length > 0,
     })
   } catch (err) {
     console.error('[users/[username] GET]', err)

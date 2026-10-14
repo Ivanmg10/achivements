@@ -383,6 +383,9 @@ export const pl: Translations = {
     footer: 'Bez związku z RetroAchievements, Valve ani Sony.',
   },
   toast: {
+    followed: 'Obserwujesz teraz: {u}',
+    unfollowed: 'Nie obserwujesz już: {u}',
+    followFailed: 'Nie udało się zaktualizować obserwowanych',
     profileLinkCopied: 'Skopiowano link do profilu',
     profileLinkFailed: 'Nie udało się skopiować linku',
     close: 'Zamknij',
@@ -458,6 +461,7 @@ export const pl: Translations = {
           'Twoje konto: nazwę użytkownika, hash hasła (nigdy samo hasło) i adres e-mail, używany wyłącznie do odzyskania konta i potwierdzenia, że należy do Ciebie.',
           'To, co sam dodajesz: awatar (link albo przesłany obraz, który przechowujemy, dopóki go nie zmienisz lub nie usuniesz konta), kraj, ulubione i przypięte gry oraz osiągnięcia, a także Twoje grupy.',
           'Twój profil publiczny, dopóki jest publiczny, pokazuje zalogowanym użytkownikom twoją nazwę użytkownika, awatar, kraj i opis, połączone platformy i ich nazwy, ulubione gry, motyw, publiczne grupy i przypięte osiągnięcia oraz twoje postępy i aktywność, i pozwala porównać je z ich własnymi. Płeć pojawia się tylko, jeśli zdecydujesz się ją pokazać. Nigdy twój e-mail ani klucze. Możesz w każdej chwili ustawić profil jako prywatny.',
+          'Kogo obserwujesz: zapisujemy, abyś mógł ich znowu znaleźć. Tę listę widzisz tylko ty; nikomu nie pokazujemy, kto go obserwuje.',
           'Połączone konta: nazwę użytkownika i klucz Web API RetroAchievements oraz Steam ID i nazwę wyświetlaną, aby pobierać Twoje postępy, także gdy ktoś otwiera Twój publiczny profil. Klucz nigdy nie opuszcza naszego serwera. Łączenie Steam sprawdza tylko, czy profil istnieje i jest publiczny — nie dowodzi, że konto należy do ciebie.',
           'PlayStation, jeśli je połączysz: twoje ID online PSN i numer konta. Połączenie sprawdza tylko, czy konto istnieje i publicznie pokazuje trofea — nie dowodzi, że konto należy do ciebie. Twoje trofea, a jeśli historia gier jest publiczna, także czas gry i grafiki gier, są pobierane z Sony za pomocą konta PlayStation strony i przechowywane w pamięci podręcznej, która sama wygasa.',
           'Rejestry bezpieczeństwa: adres IP (a przy logowaniu także nazwę użytkownika) nieudanych logowań, rejestracji i próśb o reset hasła, przechowywany przez jeden dzień, aby ograniczać nadużycia.',
@@ -1061,6 +1065,15 @@ export const pl: Translations = {
     recent: 'Ostatnie',
     clearRecent: 'Wyczyść',
     resultsLabel: 'Znalezieni użytkownicy',
+  },
+  following: {
+    title: 'Obserwowani',
+    follow: 'Obserwuj',
+    following: 'Obserwujesz',
+    loading: 'Wczytywanie obserwowanych…',
+    loadError: 'Nie udało się teraz wczytać obserwowanych.',
+    emptyTitle: 'Nikogo jeszcze nie obserwujesz',
+    empty: 'Wyszukaj użytkowników i naciśnij Obserwuj w ich profilu.',
   },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',

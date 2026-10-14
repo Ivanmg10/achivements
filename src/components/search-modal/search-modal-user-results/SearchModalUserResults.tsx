@@ -6,9 +6,7 @@ import { IconClock, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { UserSearchResult } from '@/hooks/useUserSearch'
 import type { RecentUser } from '@/hooks/useRecentUsers'
-import { codeToFlag, findCountry } from '@/utils/countries'
-import { PLATFORM_NAME } from '@/utils/gameRef'
-import PlatformLogo from '@/components/platform-logo/PlatformLogo'
+import UserSummary from '@/components/user-summary/UserSummary'
 
 const OPTION = 'w-full flex items-center gap-3 px-4 py-2.5 hover:bg-bg-main focus-visible:bg-bg-main transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/70'
 
@@ -109,35 +107,13 @@ export default function SearchModalUserResults({
 
   return (
     <ul ref={listRef} onKeyDown={onKeyDown} aria-label={T.userSearch.resultsLabel}>
-      {users.results.map((u) => {
-        const country = u.location ? findCountry(u.location) : null
-        const platforms = (['ra', 'steam', 'psn'] as const).filter((p) => u[p])
-        return (
-          <li key={u.username}>
-            <button type="button" data-user-option className={OPTION} onClick={() => onSelect(u)}>
-              <Avatar src={u.avatar} />
-              <span className="flex flex-col min-w-0 flex-1">
-                <span className="flex items-center gap-1.5 min-w-0">
-                  <span className="truncate text-sm font-medium text-text-main">{u.username}</span>
-                  {country && (
-                    <span className="text-sm leading-none" role="img" aria-label={country.name}>
-                      {codeToFlag(country.code)}
-                    </span>
-                  )}
-                </span>
-                {u.description && <span className="text-xs text-text-secondary truncate">{u.description}</span>}
-              </span>
-              {platforms.length > 0 && (
-                <span className="flex items-center gap-1.5 shrink-0">
-                  {platforms.map((p) => (
-                    <PlatformLogo key={p} source={p} size={12} label={PLATFORM_NAME[p]} />
-                  ))}
-                </span>
-              )}
-            </button>
-          </li>
-        )
-      })}
+      {users.results.map((u) => (
+        <li key={u.username}>
+          <button type="button" data-user-option className={OPTION} onClick={() => onSelect(u)}>
+            <UserSummary user={u} />
+          </button>
+        </li>
+      ))}
     </ul>
   )
 }

@@ -1,11 +1,13 @@
 jest.mock('@/lib/apiAuth', () => ({ dataOwner: jest.fn() }))
 jest.mock('@/lib/publicUser', () => ({ findPublicUser: jest.fn(), hiddenGameKeys: jest.fn() }))
 jest.mock('@/lib/groupList', () => ({ listGroups: jest.fn() }))
+jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
 import { GET } from './route'
 import { dataOwner } from '@/lib/apiAuth'
 import { findPublicUser, hiddenGameKeys } from '@/lib/publicUser'
 import { listGroups } from '@/lib/groupList'
+import pool from '@/lib/db'
 
 const get = (username = 'ivan') =>
   GET({} as Request, { params: Promise.resolve({ username }) })
@@ -24,6 +26,7 @@ beforeEach(() => {
   ;(findPublicUser as jest.Mock).mockResolvedValue(ROW)
   ;(hiddenGameKeys as jest.Mock).mockResolvedValue(['ra:9'])
   ;(listGroups as jest.Mock).mockResolvedValue([GROUP])
+  ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
 })
 
 const body = async (res: Promise<unknown>) => ((await res) as { data: Record<string, unknown> }).data
@@ -43,7 +46,7 @@ test('returns who they are and which platforms they have, and nothing private', 
     // A PSN name with no linked account is a leftover, not a link.
     steamName: 'ivan_st', psnName: null, isSelf: false, theme: 'dark', gender: null,
     favorites: { ra: ROW.favorite_game, steam: null, psn: null },
-    hiddenGames: ['ra:9'], groups: [GROUP],
+    hiddenGames: ['ra:9'], groups: [GROUP], following: false,
   })
 })
 
@@ -98,4 +101,10 @@ describe('a private profile', () => {
     ;(dataOwner as jest.Mock).mockResolvedValue({ id: '7', raid: 'my-key' })
     expect((await get()).status).toBe(200)
   })
+})
+
+test('says whether the viewer follows them', async () => {
+  ;(pool.query as jest.Mock).mockResolvedValue({ rows: [{ '?column?': 1 }] })
+  expect((await body(get())).following).toBe(true)
+  expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['1', 7])
 })

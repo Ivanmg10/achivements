@@ -23,6 +23,8 @@ export type CheevoUser = {
   /** "source:id" of the games they hid from their lists; their page leaves them out. */
   hiddenGames?: string[]
   groups?: GameGroup[]
+  /** Whether the viewer follows them. */
+  following?: boolean
 }
 
 /**

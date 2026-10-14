@@ -383,6 +383,9 @@ export const es: Translations = {
     footer: 'Sin relación con RetroAchievements, Valve ni Sony.',
   },
   toast: {
+    followed: 'Ahora sigues a {u}',
+    unfollowed: 'Ya no sigues a {u}',
+    followFailed: 'No se pudo actualizar a quién sigues',
     profileLinkCopied: 'Enlace del perfil copiado',
     profileLinkFailed: 'No se pudo copiar el enlace',
     close: 'Cerrar',
@@ -458,6 +461,7 @@ export const es: Translations = {
           'Tu cuenta: un nombre de usuario, un hash de tu contraseña (nunca la contraseña en sí) y tu correo, que solo se usa para recuperar la cuenta y confirmar que es tuya.',
           'Lo que decides añadir: un avatar (un enlace, o una imagen que subes y que guardamos hasta que la cambies o borres tu cuenta), tu país, juegos y logros favoritos y fijados, y tus grupos.',
           'Tu perfil público, mientras lo sea, muestra a los usuarios con sesión tu nombre de usuario, avatar, país y descripción, las plataformas que vinculaste y sus nombres, tus juegos favoritos, tema, grupos públicos y logros fijados, y tu progreso y actividad, y les deja compararlos con los suyos. Tu género solo aparece si eliges mostrarlo. Nunca tu correo ni tus claves. Puedes hacer el perfil privado cuando quieras.',
+          'A quién sigues: lo guardamos para que los encuentres de nuevo. Esa lista solo la ves tú; a nadie se le muestra quién le sigue.',
           'Cuentas vinculadas: tu usuario y clave Web API de RetroAchievements, y tu Steam ID y nombre visible, para poder consultar tu progreso, también cuando alguien abre tu perfil público. La clave nunca sale de nuestro servidor. Vincular Steam solo comprueba que el perfil existe y es público; no demuestra que la cuenta sea tuya.',
           'PlayStation, si la vinculas: tu ID online de PSN y tu número de cuenta. Vincularla solo comprueba que la cuenta existe y muestra sus trofeos en público; no demuestra que la cuenta sea tuya. Tus trofeos, y tu tiempo de juego y las imágenes de tus juegos si tu historial de juego es público, se leen de Sony con la cuenta de PlayStation de la propia web y se guardan en una caché que caduca sola.',
           'Registros de seguridad: la IP (y el usuario, en los inicios de sesión) de los inicios de sesión fallidos, registros y peticiones de cambio de contraseña, durante un día, para frenar abusos.',
@@ -1061,6 +1065,15 @@ export const es: Translations = {
     recent: 'Recientes',
     clearRecent: 'Borrar',
     resultsLabel: 'Usuarios encontrados',
+  },
+  following: {
+    title: 'Siguiendo',
+    follow: 'Seguir',
+    following: 'Siguiendo',
+    loading: 'Cargando a quién sigues…',
+    loadError: 'No se pudo cargar a quién sigues ahora mismo.',
+    emptyTitle: 'Aún no sigues a nadie',
+    empty: 'Busca usuarios en el buscador y pulsa Seguir en su perfil.',
   },
   publicProfile: {
     notFound: 'Usuario "{u}" no encontrado en RetroAchievements',

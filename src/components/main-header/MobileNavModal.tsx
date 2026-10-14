@@ -10,6 +10,7 @@ import {
   IconHeart,
   IconCheck,
   IconFolder,
+  IconUsers,
   IconListDetails,
   IconChevronDown,
 } from '@tabler/icons-react'
@@ -47,7 +48,10 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
     { href: '/playing', label: T.mainPage.playing, icon: IconPlayerPlay },
     { href: '/completed', label: T.mainPage.completed, icon: IconCheck },
   ]
-  const groupsItem = { href: '/groups', label: T.groups.title, icon: IconFolder }
+  const navItems = [
+    { href: '/groups', label: T.groups.title, icon: IconFolder },
+    { href: '/following', label: T.following.title, icon: IconUsers },
+  ]
   const router = useRouter()
   const pathname = usePathname()
   const { data: session } = useSession()
@@ -161,19 +165,21 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
                     )}
                   </AnimatePresence>
                 </motion.li>
-                <motion.li variants={itemVariants}>
-                  <button
-                    onClick={() => handleNavigate(groupsItem.href)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left cursor-pointer ${
-                      pathname === groupsItem.href
-                        ? 'bg-bg-main text-accent'
-                        : 'text-text-secondary hover:text-text-main hover:bg-bg-main/60'
-                    }`}
-                  >
-                    <IconFolder className="w-5 h-5 shrink-0" aria-hidden />
-                    <span className="text-sm font-medium">{groupsItem.label}</span>
-                  </button>
-                </motion.li>
+                {navItems.map(({ href, label, icon: Icon }) => (
+                  <motion.li key={href} variants={itemVariants}>
+                    <button
+                      onClick={() => handleNavigate(href)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left cursor-pointer ${
+                        pathname === href
+                          ? 'bg-bg-main text-accent'
+                          : 'text-text-secondary hover:text-text-main hover:bg-bg-main/60'
+                      }`}
+                    >
+                      <Icon className="w-5 h-5 shrink-0" aria-hidden />
+                      <span className="text-sm font-medium">{label}</span>
+                    </button>
+                  </motion.li>
+                ))}
               </motion.ul>
             </motion.div>
           </div>

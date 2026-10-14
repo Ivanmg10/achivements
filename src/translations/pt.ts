@@ -383,6 +383,9 @@ export const pt: Translations = {
     footer: 'Sem ligação ao RetroAchievements, à Valve ou à Sony.',
   },
   toast: {
+    followed: 'Agora segues {u}',
+    unfollowed: 'Já não segues {u}',
+    followFailed: 'Não foi possível atualizar quem segues',
     profileLinkCopied: 'Ligação do perfil copiada',
     profileLinkFailed: 'Não foi possível copiar a ligação',
     close: 'Fechar',
@@ -458,6 +461,7 @@ export const pt: Translations = {
           'A sua conta: um nome de utilizador, um hash da sua palavra-passe (nunca a palavra-passe em si) e o seu email, usado apenas para recuperar a conta e confirmar que é sua.',
           'O que decide adicionar: um avatar (um link, ou uma imagem que carrega e que guardamos até a substituir ou eliminar a conta), o seu país, jogos e conquistas favoritos e fixados, e os seus grupos.',
           'O teu perfil público, enquanto o for, mostra aos utilizadores com sessão iniciada o teu nome de utilizador, avatar, país e descrição, as plataformas que ligaste e os seus nomes, os teus jogos favoritos, tema, grupos públicos e conquistas afixadas, e o teu progresso e atividade, e permite-lhes compará-los com os seus. O teu género só aparece se escolheres mostrá-lo. Nunca o teu email nem as tuas chaves. Podes tornar o perfil privado a qualquer momento.',
+          'Quem segues: guardado para que os voltes a encontrar. Só tu vês essa lista; a ninguém é mostrado quem o segue.',
           'Contas ligadas: o seu utilizador e chave Web API do RetroAchievements, e o seu Steam ID e nome visível, para obter o seu progresso, também quando alguém abre o seu perfil público. A chave nunca sai do nosso servidor. Ligar a Steam apenas verifica que o perfil existe e é público; não prova que a conta é sua.',
           'PlayStation, se a ligar: o seu ID online da PSN e o número da conta. Ligar a conta apenas verifica que ela existe e mostra os troféus publicamente — não prova que a conta é sua. Os seus troféus, e o tempo de jogo e as imagens dos jogos se o seu histórico de jogo for público, são lidos da Sony com a conta PlayStation do próprio site e guardados numa cache que expira sozinha.',
           'Registos de segurança: o endereço IP (e o utilizador, nos inícios de sessão) de inícios de sessão falhados, registos e pedidos de redefinição de palavra-passe, guardados durante um dia para travar abusos.',
@@ -1061,6 +1065,15 @@ export const pt: Translations = {
     recent: 'Recentes',
     clearRecent: 'Limpar',
     resultsLabel: 'Utilizadores encontrados',
+  },
+  following: {
+    title: 'A seguir',
+    follow: 'Seguir',
+    following: 'A seguir',
+    loading: 'A carregar quem segues…',
+    loadError: 'Não foi possível carregar quem segues agora.',
+    emptyTitle: 'Ainda não segues ninguém',
+    empty: 'Procura utilizadores e carrega em Seguir no perfil deles.',
   },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',
