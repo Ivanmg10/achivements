@@ -122,6 +122,29 @@ Every new feature, hook, or utility must include tests. Tests live alongside the
 - Run `npm test` before marking any task done
 - Do not leave untested code — if it's complex enough to extract, it's complex enough to test
 
+## Documentation — MANDATORY (every session and agent)
+
+The next agent starts with no memory of this one. What is not written down is
+lost. Index of the docs: `docs/README.md`.
+
+- **Start of a session:** read the top entries of `docs/worklog.md` to pick up
+  what was done last, what was decided, and what was left open.
+- **End of every task that changes the repo** (code, config, migrations, docs):
+  add an entry at the top of `docs/worklog.md` — did / why / decisions / open /
+  watch out, as its template says. It goes in the same branch and PR as the work,
+  before the last commit. A task is not done without it.
+- **A rule or invariant changed or was learned** (a "never do X", how a
+  platform must be called, a new env var, a migration that must run, a release
+  gate) → update the matching section of this file in the same change. Do not
+  leave a section that says the opposite of the code.
+- **The layout changed** (new folder, route area, cache, data path) → update
+  `docs/architecture.md`.
+- **User-visible features, setup or env vars changed** → update `README.md`
+  (and `.env.example` for a variable).
+- Write for someone who has not seen the conversation: name files, say why,
+  give absolute dates (not "yesterday"). No secrets, keys or user data in any doc.
+- If the user said not to, or the task touched nothing, skip it and say so.
+
 ## Non-negotiable standards (apply to ALL work)
 
 ### 1. Responsive
@@ -467,3 +490,13 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
 - [ ] 13 optimization fixes (cache stampede, Cache-Control headers, duplicate fetches, TTLs, error boundaries, lazy images)
 - [x] The ~51 `react-hooks/set-state-in-effect` warnings are gone (2026-10-09)
       and the rule is now an error. See State and effects above.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
