@@ -296,7 +296,6 @@ export function toPsnGameProgress(t: TrophyTitle): PsnGameProgress | null {
     earned: t.earnedTrophies,
     defined: t.definedTrophies,
     hasDlc: t.hasTrophyGroups === true,
-    full: { earned: t.earnedTrophies, defined: t.definedTrophies, pctWon: t.progress },
     lastTrophyAt: t.lastUpdatedDateTime ?? null,
     playtimeMinutes: null,
     playedAs: [],
@@ -461,43 +460,14 @@ export async function psnGameGroups(
 }
 
 /**
- * For games with DLC, puts the base game's numbers in the main fields — what
- * "completed" goes by, so a game with its platinum is complete whatever its
- * DLC — and keeps the whole set in `full`. One cached lookup per such game,
- * a few at a time; a game whose lookup fails keeps the whole-set numbers.
- */
-async function withBaseGameProgress(accountId: string, games: PsnGameProgress[], userId: string | null): Promise<PsnGameProgress[]> {
-  const withDlc = games.filter((g) => g.hasDlc)
-  const results = await mapLimit(withDlc, PARALLEL, (g) => psnGameGroups(accountId, g, userId))
-  const base = new Map<string, PsnTrophyGroup>()
-  results.forEach((r, i) => {
-    const group = r.status === 'fulfilled' ? r.value.find((x) => x.id === 'default') : undefined
-    if (group) base.set(withDlc[i].titleId, group)
-    else if (r.status === 'rejected') console.error('[psn] base-game progress', withDlc[i].titleId, r.reason)
-  })
-  return games.map((g) => {
-    const group = base.get(g.titleId)
-    if (!group) return g
-    return {
-      ...g,
-      earned: group.earned,
-      defined: group.defined,
-      numAwarded: countTrophies(group.earned),
-      maxPossible: countTrophies(group.defined),
-      pctWon: group.progress,
-    }
-  })
-}
-
-/**
  * Every game in an account's trophy list, most recently played first, with
  * play time and store art from its played-games list where Sony has them.
  * That list is a separate privacy setting: hidden, the trophies still show,
- * just without the play data. Games with DLC count by their base game.
+ * just without the play data. A game's trophies are the whole set, DLC included.
  */
 export async function psnTitles(accountId: string, userId: string | null = null): Promise<PsnGameProgress[]> {
   return withSteamCache(
-    `psn:titles:v8:${accountId}`,
+    `psn:titles:v9:${accountId}`,
     TITLES_TTL_MS,
     async () => {
       const auth = await authorization()
@@ -520,7 +490,7 @@ export async function psnTitles(accountId: string, userId: string | null = null)
       } catch (err) {
         console.error('[psn] played games unavailable, trophies only', err)
       }
-      return withIgdbArt(await withBaseGameProgress(accountId, list, userId))
+      return withIgdbArt(list)
     },
     { userId, refreshable: true },
   )
@@ -627,7 +597,7 @@ export async function psnLatestTrophies(
   language = DEFAULT_LANGUAGE,
 ): Promise<PsnRecentTrophy[]> {
   const games = (await psnTitles(accountId, userId))
-    .filter((g) => g.full.earned && countTrophies(g.full.earned) > 0)
+    .filter((g) => countTrophies(g.earned) > 0)
     .sort((a, b) => (b.lastTrophyAt ?? '').localeCompare(a.lastTrophyAt ?? ''))
     .slice(0, LATEST_GAMES)
   return earnedSince(accountId, games, '', userId, language)

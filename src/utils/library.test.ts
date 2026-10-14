@@ -1,4 +1,4 @@
-import { buildLibrary, filterLibrary, summarizeConsoles } from './library'
+import { buildLibrary, filterLibrary, profileLibrary, sharedGames, summarizeByPlatform, summarizeConsoles, type LibraryGame } from './library'
 import type { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import { psnGameFixture } from '@/test-utils/psnFixtures'
@@ -78,4 +78,44 @@ test('PSN games join the library with their own status and page', () => {
     ['psn:300', 'wantToPlay', '/psnGame/NPWR00003_00'],
   ])
   expect(filterLibrary(lib, { query: '', source: 'psn', status: 'all' })).toHaveLength(3)
+})
+
+describe('profileLibrary', () => {
+  const steamGame = (id: number, numAwarded: number, playtimeForever = 60) =>
+    ({ id, title: `S${id}`, imageIcon: '', playtimeForever, achievementsLoaded: true, maxPossible: 10, numAwarded, pctWon: numAwarded * 10, lastPlayed: null }) as unknown as SteamGameProgress
+
+  test("lists their played games, less the hidden ones, each opening their progress", () => {
+    const games = profileLibrary([ra(1, '1'), ra(2, '0.5')], [steamGame(7, 3), steamGame(8, 0)], [], ['ra:2'], 'ivan')
+    expect(games.map((g) => g.key)).toEqual(['ra:1', 'steam:7'])
+    expect(games[0]).toMatchObject({ status: 'completed', href: '/user/ivan/ra/1' })
+    expect(games[1]).toMatchObject({ status: 'playing', href: '/user/ivan/steam/7' })
+  })
+
+  test("without a subject a game opens its own page", () => {
+    expect(profileLibrary([ra(1, '0.2')])[0].href).toBe('/gameInfo/1')
+  })
+
+  test('keeps PSN games at 0%: their trophy list only has games they played', () => {
+    expect(profileLibrary([], [], [psnGameFixture({ id: 5, pctWon: 0 })])).toHaveLength(1)
+  })
+})
+
+const lib = (key: string, pct: number, status: LibraryGame['status'] = pct >= 100 ? 'completed' : 'playing'): LibraryGame => {
+  const [source, id] = key.split(':')
+  return { key, source: source as LibraryGame['source'], id: Number(id), title: key, subtitle: '', status, pct, href: '' }
+}
+
+test('summarizes each platform that has games, in the usual order', () => {
+  expect(summarizeByPlatform([lib('psn:1', 50), lib('ra:1', 100), lib('ra:2', 40)])).toEqual([
+    { source: 'ra', games: 2, completed: 1, playing: 1, avgPct: 70 },
+    { source: 'psn', games: 1, completed: 0, playing: 1, avgPct: 50 },
+  ])
+})
+
+test('shared games are the ones in both lists, furthest along together first', () => {
+  const shared = sharedGames([lib('ra:1', 10), lib('ra:2', 90), lib('steam:2', 50)], [lib('ra:2', 40), lib('ra:1', 100), lib('psn:9', 1)])
+  expect(shared.map((g) => [g.key, g.theirPct, g.myPct])).toEqual([
+    ['ra:2', 90, 40],
+    ['ra:1', 10, 100],
+  ])
 })

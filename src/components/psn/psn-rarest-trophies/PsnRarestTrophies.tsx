@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { gameHref } from '@/utils/gameRef'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import type { PsnTrophy } from '@/types/psn'
+import { useSubject } from '@/context/SubjectContext'
 
 const SHOWN = 4
 const SKELETON_ROWS = 4
@@ -24,6 +25,7 @@ export default function PsnRarestTrophies({
   isLoading: boolean
 }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }
 
   const rarest = trophies
@@ -50,7 +52,7 @@ export default function PsnRarestTrophies({
           {rarest.map((t) => (
             <li key={t.id}>
               <Link
-                href={`${gameHref('psn', gameId)}#${psnTrophyAnchor(t.id)}`}
+                href={`${gameHref('psn', gameId, subject)}#${psnTrophyAnchor(t.id)}`}
                 className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
               >
                 {t.iconUrl ? (

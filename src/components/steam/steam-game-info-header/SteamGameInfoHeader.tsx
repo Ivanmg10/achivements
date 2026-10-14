@@ -1,14 +1,16 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { IconExternalLink } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import GameInfoHeaderStatsBadge from '@/components/game-info-header/game-info-header-stats-badge/GameInfoHeaderStatsBadge'
 import SteamGameInfoHeaderProgression from './steam-game-info-header-progression/SteamGameInfoHeaderProgression'
-import SteamGameInfoHeaderScreenshots from './steam-game-info-header-screenshots/SteamGameInfoHeaderScreenshots'
-import { steamStoreUrl } from '@/lib/steamClient'
+import GameInfoHeaderScreenshots from '@/components/game-info-header/game-info-header-screenshots/GameInfoHeaderScreenshots'
+import { steamAssetUrl, steamStoreUrl } from '@/lib/steamClient'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
+import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameDetails, SteamGameProgress } from '@/types/steam'
 
@@ -28,12 +30,15 @@ export default function SteamGameInfoHeader({
   game,
   details,
   counts,
+  actions,
 }: {
   appId: number
   title: string
   game: SteamGameProgress | null
   details: SteamGameDetails | null
   counts: { earned: number; total: number } | null
+  /** Extra buttons beside the store link (the AI export). */
+  actions?: ReactNode
 }) {
   const { T, lang } = useLanguage()
 
@@ -69,7 +74,7 @@ export default function SteamGameInfoHeader({
               Steam
             </span>
             {isPerfect && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-[#a4d007]/20 text-[#a4d007]">
+              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-warning/20 text-warning">
                 ★ {T.steam.perfect}
               </span>
             )}
@@ -84,6 +89,7 @@ export default function SteamGameInfoHeader({
               </span>
             )}
             <PinToggleButton gameId={appId} source="steam" />
+            {game && <HideGameButton source="steam" gameId={appId} title={title} image={steamAssetUrl(appId, 'header')} />}
           </div>
 
           {details?.description && (
@@ -108,11 +114,12 @@ export default function SteamGameInfoHeader({
               href={steamStoreUrl(appId)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-[#66c0f4]"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <IconExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
               {T.steam.viewOnSteam}
             </a>
+            {actions}
           </div>
         </div>
       </div>
@@ -134,7 +141,7 @@ export default function SteamGameInfoHeader({
             />
           )}
         </div>
-        {details && <SteamGameInfoHeaderScreenshots screenshots={details.screenshots} title={title} />}
+        {details && <GameInfoHeaderScreenshots screenshots={details.screenshots} title={title} />}
       </div>
     </section>
   )

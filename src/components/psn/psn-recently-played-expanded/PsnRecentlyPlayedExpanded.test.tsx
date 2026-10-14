@@ -56,7 +56,7 @@ test('while loading, a skeleton the size of the set', () => {
   expect(container.querySelectorAll('[aria-busy="true"] li')).toHaveLength(10)
 })
 
-test('with DLC, the ring counts the base game only, as "completed" does', () => {
+test('with DLC, the ring counts the whole set, as "completed" does', () => {
   setTrophies({
     trophies: [
       { id: 0, earned: true, groupId: 'default' },
@@ -66,5 +66,5 @@ test('with DLC, the ring counts the base game only, as "completed" does', () => 
     groups: [{ id: 'default' }, { id: '001' }],
   })
   render(<PsnRecentlyPlayedExpanded game={GAME} />)
-  expect(screen.getByText('2/2', { exact: false })).toBeInTheDocument()
+  expect(screen.getByText('2/3', { exact: false })).toBeInTheDocument()
 })

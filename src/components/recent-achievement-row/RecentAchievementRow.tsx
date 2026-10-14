@@ -3,6 +3,7 @@ import Link from 'next/link'
 import type { RecentAchievement } from '@/types/types'
 import { achievementBadgeUrl } from '@/utils/utils'
 import { gameHref } from '@/utils/gameRef'
+import { useSubject } from '@/context/SubjectContext'
 
 /**
  * One unlock in the day / week / period modals: badge, title, game, and RA's
@@ -10,12 +11,13 @@ import { gameHref } from '@/utils/gameRef'
  * platform; Steam unlocks have no points, so none are shown.
  */
 export default function RecentAchievementRow({ ach, onNavigate }: { ach: RecentAchievement; onNavigate: () => void }) {
+  const subject = useSubject()
   const badge = achievementBadgeUrl(ach)
   // Steam and PSN unlocks have no points.
   const isSteam = ach.Source === 'steam' || ach.Source === 'psn'
   return (
     <Link
-      href={gameHref(ach.Source ?? 'ra', ach.GameID)}
+      href={gameHref(ach.Source ?? 'ra', ach.GameID, subject)}
       onClick={onNavigate}
       className="flex gap-2 items-center p-3 rounded-xl bg-bg-main hover:bg-bg-card transition-colors group min-w-0"
     >

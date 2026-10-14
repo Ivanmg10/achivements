@@ -168,3 +168,16 @@ describe('profilePublic', () => {
     expect(updates()).toHaveLength(0)
   })
 })
+
+describe('genderPublic', () => {
+  test('is stored as a boolean, in its own column', async () => {
+    expect((await POST(request({ field: 'genderPublic', value: 'true' }))).status).toBe(200)
+    expect(updates()[0][0]).toContain('"gender_public"')
+    expect(updates()[0][1]).toEqual([true, '1'])
+  })
+
+  test('anything but true or false is refused', async () => {
+    expect((await POST(request({ field: 'genderPublic', value: 'yes' }))).status).toBe(400)
+    expect(updates()).toHaveLength(0)
+  })
+})

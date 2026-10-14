@@ -13,6 +13,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import MainPageFavorites from './MainPageFavorites'
 import { usePinnedAchievements } from '@/hooks/usePinnedAchievements'
 import { en } from '@/translations/en'
+import { SubjectContext } from '@/context/SubjectContext'
 
 const RA = {
   source: 'ra', achievement_id: 5, game_id: 1, game_title: 'Zelda', num_distinct_players: 3,
@@ -91,4 +92,15 @@ test('counts the pins and lays a long list out in columns, with no inner scroll'
   expect(screen.getAllByText(/^Pin \d+$/)).toHaveLength(20)
   expect(container.querySelector('.overflow-y-auto')).toBeNull()
   expect(container.querySelector('[class*="xl:grid-cols-3"]')).not.toBeNull()
+})
+
+test("someone else's pins are shown, with nothing to unpin", () => {
+  state({ pinned: [RA, STEAM] })
+  render(
+    <SubjectContext.Provider value="ivan">
+      <MainPageFavorites />
+    </SubjectContext.Provider>,
+  )
+  expect(screen.getByText('Triforce')).toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: en.favorites.removeFavorite })).not.toBeInTheDocument()
 })

@@ -1,4 +1,4 @@
-import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 
 /**
  * The completion bar under a Steam game's title — the Steam counterpart of
@@ -20,14 +20,14 @@ export default function SteamGameInfoHeaderProgression({
     <div className="flex flex-col gap-1.5 w-full max-w-xs">
       <div className="flex justify-between text-xs text-text-secondary">
         <span className="flex items-center gap-2">
-          <span aria-hidden="true" className={`inline-block w-2 h-2 rounded-full ${pct >= 100 ? 'bg-[#a4d007]' : 'bg-[#66c0f4]'}`} />
-          <span className="tabular-nums">{pct.toFixed(pct >= 100 || pct === 0 ? 0 : 1)}%</span>
+          <span aria-hidden="true" className={`inline-block w-2 h-2 rounded-full bg-progress`} />
+          <span className={`tabular-nums ${pct >= 100 ? 'text-success font-semibold' : ''}`}>{pct.toFixed(pct >= 100 || pct === 0 ? 0 : 1)}%</span>
         </span>
         <span className="tabular-nums">
           {earned} / {total}
         </span>
       </div>
-      <SteamProgressBar pct={pct} label={label} trackClass="bg-bg-card" />
+      <ProgressBar pct={pct} label={label} trackClass="bg-bg-card" />
     </div>
   )
 }

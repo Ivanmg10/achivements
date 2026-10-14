@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { plural } from '@/utils/utils'
 
@@ -13,10 +14,13 @@ export default function StatusPageHeader({
   consoleName,
   category,
   gameCount,
+  children,
 }: {
   consoleName?: string
   category: string
   gameCount: number
+  /** Beside the title: a control that belongs to it, such as which platform to show. */
+  children?: ReactNode
 }) {
   const { T, lang } = useLanguage()
 
@@ -30,12 +34,13 @@ export default function StatusPageHeader({
   const style = CATEGORY_STYLES[category] ?? 'bg-bg-card text-text-secondary'
 
   return (
-    <div className="flex flex-col gap-1 pb-5 border-b border-bg-card mb-1">
+    <div className="flex flex-col gap-1 pb-5 border-b border-bg-card mb-1 min-w-0 max-w-full">
       <div className="flex items-center gap-3 flex-wrap">
         <h1 className="text-2xl font-bold">{consoleName ?? label}</h1>
         {consoleName && (
           <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${style}`}>{label}</span>
         )}
+        {children}
       </div>
       <p className="text-sm text-text-secondary">{plural(gameCount, T.plurals.games, lang)}</p>
     </div>

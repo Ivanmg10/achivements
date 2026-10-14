@@ -40,6 +40,14 @@ test('returns matching users, searching by prefix with the exact name as the tie
   expect(params).toEqual(['ivan', 'ivan', '1'])
 })
 
+test('says who each one is, briefly, and never their email', async () => {
+  await GET(get('q=ivan'))
+  const sql = (pool.query as jest.Mock).mock.calls[0][0] as string
+  expect(sql).toContain('location')
+  expect(sql).toContain('LEFT(description, 120)')
+  expect(sql).not.toMatch(/email/)
+})
+
 test('LIKE wildcards in the query are escaped, so "_" does not match any letter', async () => {
   await GET(get('q=a_b%25'))
   expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['a\\_b\\%', 'a_b%', '1'])

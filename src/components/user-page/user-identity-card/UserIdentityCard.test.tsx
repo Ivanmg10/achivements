@@ -3,6 +3,7 @@ import UserIdentityCard from './UserIdentityCard'
 import { useSession, signOut } from 'next-auth/react'
 import { en } from '@/translations/en'
 
+jest.mock('@/components/user-page/user-follow-stats/UserFollowStats', () => ({ __esModule: true, default: () => <div data-testid="follow-stats" /> }))
 jest.mock('@/components/location-modal/LocationModal', () => ({ __esModule: true, default: () => null }))
 jest.mock('@/components/admin-panel/admin-panel-modal/AdminPanelModal', () => ({
   __esModule: true,
@@ -101,4 +102,9 @@ test('everyone else gets no Admin panel button', () => {
   setUser(USER)
   render(<UserIdentityCard />)
   expect(screen.queryByRole('button', { name: 'Admin panel' })).not.toBeInTheDocument()
+})
+
+test('shows how many you follow and how many follow you', () => {
+  render(<UserIdentityCard />)
+  expect(screen.getByTestId('follow-stats')).toBeInTheDocument()
 })

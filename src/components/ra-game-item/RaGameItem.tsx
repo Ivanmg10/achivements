@@ -9,9 +9,11 @@ import { useSpotlight } from '@/hooks/useSpotlight'
 import { RecentlyPlayedGame } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { formatDate } from '@/utils/utils'
-import { DualProgressBar } from '@/components/ui/DualProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import { useSubject } from '@/context/SubjectContext'
+import { gameHref } from '@/utils/gameRef'
 
 const CONSOLE_BY_NAME = new Map(CONSOLES.map((c) => [c.name, c.icon]))
 
@@ -41,11 +43,12 @@ export default function RaGameItem({
   children?: React.ReactNode
   className?: string
 }) {
+  const subject = useSubject()
   const { T } = useLanguage()
   const onPointerMove = useSpotlight()
   const panelId = useId()
 
-  const href = `/gameInfo/${game.GameID}`
+  const href = gameHref('ra', game.GameID, subject)
   const art = game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null
   const consoleIcon = CONSOLE_BY_NAME.get(game.ConsoleName)
   const total = game.NumPossibleAchievements
@@ -104,12 +107,13 @@ export default function RaGameItem({
               <span className="text-xs text-text-secondary truncate max-w-[45%] shrink-0">{game.ConsoleName}</span>
               {total > 0 && (
                 <>
-                  <DualProgressBar
-                    softcorePct={pct(game.NumAchieved, total)}
-                    hardcorePct={pct(game.NumAchievedHardcore, total)}
+                  <ProgressBar
+                    pct={pct(game.NumAchievedHardcore, total)}
+                    softPct={pct(game.NumAchieved, total)}
+                    label={game.Title}
                     className="flex-1"
                   />
-                  <span className={`text-xs font-semibold tabular-nums shrink-0 ${mastered ? 'text-amber-400' : 'text-text-main'}`}>
+                  <span className={`text-xs font-semibold tabular-nums shrink-0 ${progress >= 100 ? 'text-success' : 'text-text-main'}`}>
                     {progress}%
                   </span>
                 </>

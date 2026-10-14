@@ -1,6 +1,8 @@
-jest.mock('@/components/psn/psn-game-item-trophies/PsnGameItemTrophies', () => ({
+jest.mock('@/components/psn/psn-library-detail/PsnLibraryDetail', () => ({
   __esModule: true,
-  default: ({ titleId }: { titleId: string }) => <div data-testid="trophies">{titleId}</div>,
+  default: ({ game, category }: { game: { titleId: string }; category?: string }) => (
+    <div data-testid="trophies">{game.titleId}:{category}</div>
+  ),
 }))
 jest.mock('@/components/pin-toggle-button/PinToggleButton', () => ({ PinToggleButton: () => <span data-testid="pin" /> }))
 jest.mock('@/components/hide-game-button/HideGameButton', () => ({ __esModule: true, default: () => <span data-testid="hide" /> }))
@@ -44,13 +46,13 @@ test('a platinum earned gets its chip; none without', () => {
   expect(container.textContent).not.toContain('★')
 })
 
-test('expands to its trophies, loaded only then', () => {
-  render(<PsnStatusGameItem game={GAME} />)
+test('expands to its detail for the list it is in, loaded only then', () => {
+  render(<PsnStatusGameItem game={GAME} category="completed" />)
   const toggle = screen.getByRole('button', { name: `${en.psn.showTrophies}: Astro Bot` })
   expect(toggle).toHaveAttribute('aria-expanded', 'false')
   fireEvent.click(toggle)
   expect(toggle).toHaveAttribute('aria-expanded', 'true')
-  expect(screen.getByTestId('trophies')).toHaveTextContent('NPWR00001_00')
+  expect(screen.getByTestId('trophies')).toHaveTextContent('NPWR00001_00:completed')
 })
 
 test('play time and the last session, where Sony has them', () => {
@@ -59,4 +61,15 @@ test('play time and the last session, where Sony has them', () => {
   expect(screen.getByText(new RegExp(en.steam.lastPlayed))).toBeInTheDocument()
   rerender(<PsnStatusGameItem game={GAME} />)
   expect(screen.queryByText(new RegExp(`${en.steam.playtime} ·`))).not.toBeInTheDocument()
+})
+
+test('the opened detail is its own full-width row beside the card, not inside it, and the card is marked', () => {
+  const { container } = render(<PsnStatusGameItem game={GAME} category="playing" />)
+  const toggle = screen.getByRole('button', { name: `${en.psn.showTrophies}: Astro Bot` })
+  fireEvent.click(toggle)
+  const row = document.getElementById(toggle.getAttribute('aria-controls')!)!
+  expect(row).toHaveClass('col-span-full')
+  const card = container.firstElementChild!
+  expect(card).not.toContainElement(row)
+  expect(card).toHaveClass('ring-2')
 })

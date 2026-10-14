@@ -11,8 +11,9 @@ import type { SteamAppDetailsResponse, SteamSchemaAchievement } from '@/types/st
 
 /**
  * Achievements for one game: the schema (names, badges — localised) joined
- * with the player's unlock state, global rarity, and a guess at which need
- * online play.
+ * with the player's unlock state, global rarity, a guess at which need
+ * online play, and — on a page in another language — each one's English
+ * name, which guides (and the AI export) go by.
  *
  * The three parts cache separately because they change at different rates
  * and for different audiences: the schema per language for everyone (24h),
@@ -36,12 +37,14 @@ export async function GET(req: NextRequest) {
     // A game with no achievements at all needs no per-player call.
     if (schema.length === 0) return cachedJson([], TTL.schema)
 
-    const [player, globalPct, online] = await Promise.all([
+    const [player, globalPct, english] = await Promise.all([
       loadPlayerAchievements(auth.session, appId),
       loadGlobalPct(appId),
-      loadLikelyOnline(appId, apiKey, lang, schema),
+      lang === 'english' ? schema : loadEnglishSchema(appId, apiKey),
     ])
-    return cachedJson(toSteamAchievements(schema, player, globalPct, online), TTL.achievements)
+    const online = await loadLikelyOnline(appId, english)
+    const englishTitles = lang === 'english' ? undefined : new Map(english.map((a) => [a.name, a.displayName]))
+    return cachedJson(toSteamAchievements(schema, player, globalPct, online, englishTitles), TTL.achievements)
   } catch (err) {
     console.error('[steam/achievements]', appId, err)
     return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })
@@ -49,22 +52,23 @@ export async function GET(req: NextRequest) {
 }
 
 /**
- * Which achievements probably need online play. The guess reads English text,
- * so a localised page loads the English schema too (cached like any schema).
- * Also a nice-to-have: on failure no achievement is marked.
+ * The English schema, for a page in another language (cached like any schema):
+ * the online guess reads English text, and guides go by English names. A
+ * nice-to-have: on failure it is empty, so nothing is marked or named.
  */
-async function loadLikelyOnline(
-  appId: number,
-  apiKey: string,
-  lang: string,
-  schema: SteamSchemaAchievement[],
-): Promise<Set<string>> {
+async function loadEnglishSchema(appId: number, apiKey: string): Promise<SteamSchemaAchievement[]> {
   try {
-    const [english, gameIsOnline] = await Promise.all([
-      lang === 'english' ? schema : loadSchema(appId, apiKey, 'english'),
-      loadOnlineModes(appId),
-    ])
-    return likelyOnlineNames(english, gameIsOnline)
+    return await loadSchema(appId, apiKey, 'english')
+  } catch (err) {
+    console.error('[steam/achievements] english schema', appId, err)
+    return []
+  }
+}
+
+/** Which achievements probably need online play, from their English text. On failure none is marked. */
+async function loadLikelyOnline(appId: number, english: SteamSchemaAchievement[]): Promise<Set<string>> {
+  try {
+    return likelyOnlineNames(english, await loadOnlineModes(appId))
   } catch (err) {
     console.error('[steam/achievements] online guess', appId, err)
     return new Set()

@@ -23,7 +23,7 @@ export default function UserDescriptionField() {
   }
 
   return (
-    <div className="flex flex-col gap-2 min-w-0">
+    <div className="flex flex-col gap-2 min-w-0 flex-1">
       <label htmlFor="user-description" className="text-xs text-text-secondary">
         {T.userData.description}
       </label>
@@ -34,7 +34,7 @@ export default function UserDescriptionField() {
         maxLength={DESCRIPTION_MAX}
         rows={3}
         placeholder={T.userData.descriptionPlaceholder}
-        className="bg-bg-card rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent w-full resize-y"
+        className="bg-bg-card rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent w-full flex-1 min-h-20 resize-y"
       />
       {error && <p role="alert" className="text-xs text-red-400">{error}</p>}
       <div className="flex items-center justify-between gap-3">

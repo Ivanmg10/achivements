@@ -79,6 +79,7 @@ export function toSteamAchievements(
   player: SteamPlayerAchievement[],
   globalPct: Map<string, number> = new Map(),
   likelyOnline: Set<string> = new Set(),
+  englishTitles: Map<string, string> = new Map(),
 ): SteamAchievementUnified[] {
   const unlocked = new Map(player.map((p) => [p.apiname, p]))
 
@@ -100,6 +101,7 @@ export function toSteamAchievements(
       hidden: def.hidden === 1,
       globalPct: globalPct.get(def.name) ?? null,
       likelyOnline: likelyOnline.has(def.name),
+      ...(englishTitles.get(def.name) && englishTitles.get(def.name) !== def.displayName && { titleEn: englishTitles.get(def.name) }),
     }
   })
 }
@@ -146,7 +148,8 @@ export function toSteamGameDetails(
  * the data was unavailable (private profile), so the game stays unloaded.
  */
 export function countUnlocks(player: SteamPlayerAchievement[]): SteamUnlockCounts {
-  return { total: player.length, awarded: player.filter((p) => p.achieved === 1).length }
+  const latest = Math.max(0, ...player.filter((p) => p.achieved === 1).map((p) => p.unlocktime || 0))
+  return { total: player.length, awarded: player.filter((p) => p.achieved === 1).length, lastUnlock: unixToIso(latest) }
 }
 
 /** Applies counts from countUnlocks. A total of 0 leaves the game unloaded, as above. */
@@ -160,6 +163,7 @@ export function withUnlockCounts(game: SteamGameProgress, counts: SteamUnlockCou
     numAwarded,
     pctWon: Math.round((numAwarded / maxPossible) * 10000) / 100,
     achievementsLoaded: true,
+    lastUnlock: counts.lastUnlock ?? null,
   }
 }
 

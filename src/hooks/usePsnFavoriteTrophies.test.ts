@@ -3,6 +3,8 @@ import { useSession } from 'next-auth/react'
 import { usePsnFavoriteTrophies } from './usePsnFavoriteTrophies'
 import { notify } from '@/lib/notify'
 import type { PsnTrophy } from '@/types/psn'
+import { createElement, type ReactNode } from 'react'
+import { SubjectContext } from '@/context/SubjectContext'
 
 jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 
@@ -68,4 +70,12 @@ test('rolls back, and says so, when the pin request fails', async () => {
   expect(result.current.pinned.has(3)).toBe(false)
   expect(result.current.error).not.toBeNull()
   expect(notify.error).toHaveBeenCalled()
+})
+
+test("pinning is not offered on someone else's page", () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { id: '1' } }, status: 'authenticated' })
+  global.fetch = jest.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve([]) })) as unknown as typeof fetch
+  const wrapper = ({ children }: { children: ReactNode }) => createElement(SubjectContext.Provider, { value: 'ivan' }, children)
+  const { result } = renderHook(() => usePsnFavoriteTrophies(2018800, 'Bloodborne'), { wrapper })
+  expect(result.current.canPin).toBe(false)
 })

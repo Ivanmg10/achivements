@@ -10,6 +10,7 @@ import { gameHref } from '@/utils/gameRef'
 import type { LatestPerfect, PerfectCounts } from '@/utils/perfectGames'
 import GameCover from '@/components/game-cover/GameCover'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { useSubject } from '@/context/SubjectContext'
 
 /** Medal per place, metal-like; the number on it says the place too, so colour is never the only cue. */
 const MEDALS = [
@@ -29,6 +30,7 @@ const MEDALS = [
  */
 export default function CollectionShelf({ games, counts }: { games: LatestPerfect[]; counts: PerfectCounts }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const reduce = useReducedMotion()
   const onPointerMove = useSpotlight()
 
@@ -71,7 +73,7 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
               transition={{ duration: 0.4, delay: reduce ? 0 : 0.06 * i, ease: [0.16, 1, 0.3, 1] }}
             >
               <Link
-                href={gameHref(game.source, game.id)}
+                href={gameHref(game.source, game.id, subject)}
                 onPointerMove={onPointerMove}
                 className="spotlight group relative flex flex-col items-center gap-3 h-full rounded-xl bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >

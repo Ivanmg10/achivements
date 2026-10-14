@@ -15,6 +15,7 @@ import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useSubject } from '@/context/SubjectContext'
 
 const ABANDONED_DAYS = 30
 const DAY_MS = 1000 * 60 * 60 * 24
@@ -42,6 +43,7 @@ export default function MainPageAbandoned({
   now?: number
 }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   // Read once, when the page opens: render has to give the same answer every time.
   const [mountedAt] = useState(Date.now)
   const now = nowProp ?? mountedAt
@@ -111,7 +113,7 @@ export default function MainPageAbandoned({
       const daysAgo = Math.floor((now - new Date(dateStr.replace(' ', 'T')).getTime()) / DAY_MS)
       return [{
         key: `ra:${g.GameID}`,
-        href: `/gameInfo/${g.GameID}`,
+        href: gameHref('ra', g.GameID, subject),
         imageUrl: g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : undefined,
         title: g.Title,
         subtitle: g.ConsoleName,
@@ -123,7 +125,7 @@ export default function MainPageAbandoned({
       .filter((g) => classifySteamGame(g) === 'playing' && g.lastPlayed)
       .map((g) => ({
         key: `steam:${g.id}`,
-        href: `/steamGame/${g.id}`,
+        href: gameHref('steam', g.id, subject),
         imageUrl: g.imageIcon || undefined,
         title: g.title,
         subtitle: g.consoleName,
@@ -134,7 +136,7 @@ export default function MainPageAbandoned({
       .filter((g) => classifyPsnGame(g) === 'playing' && g.lastPlayed)
       .map((g) => ({
         key: `psn:${g.id}`,
-        href: gameHref('psn', g.id),
+        href: gameHref('psn', g.id, subject),
         imageUrl: g.imageIcon || undefined,
         title: g.title,
         subtitle: g.consoleName,
@@ -142,7 +144,7 @@ export default function MainPageAbandoned({
         pct: Math.round(g.pctWon),
       }))
     return [...ra, ...steam, ...psn].filter((g) => g.daysAgo >= ABANDONED_DAYS).sort((a, b) => b.daysAgo - a.daysAgo)
-  }, [playing, steamGames, psnGames, lastPlayedMap, lastAchDates, now])
+  }, [playing, steamGames, psnGames, lastPlayedMap, lastAchDates, now, subject])
 
   const datesNotReady = recentlyPlayedLoading || (missingIdsKey !== '' && fetchedKey !== missingIdsKey)
   const loading = isLoading || datesNotReady

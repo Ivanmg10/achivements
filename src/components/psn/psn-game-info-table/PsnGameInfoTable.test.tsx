@@ -86,3 +86,58 @@ test('signed in, each row can be pinned', () => {
   fireEvent.click(within(screen.getByRole('table')).getByRole('switch', { name: `${en.favorites.addFavorite}: Common` }))
   expect(toggle).toHaveBeenCalledWith(TROPHIES[1])
 })
+
+test('unearned hidden trophies can be revealed, and hidden again', () => {
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
+  expect(screen.queryByText('The ending')).not.toBeInTheDocument()
+  const button = screen.getByRole('button', { name: en.psn.showHiddenTrophies })
+  fireEvent.click(button)
+  expect(names()).toContain('Spoiler')
+  expect(screen.getAllByText('The ending').length).toBeGreaterThan(0)
+  fireEvent.click(screen.getByRole('button', { name: en.psn.hideHiddenTrophies }))
+  expect(names()).toContain(en.psn.hiddenTrophy)
+})
+
+test('no reveal button when no hidden trophy is left to earn', () => {
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={[trophy({ id: 1, hidden: true, earned: true })]} />)
+  expect(screen.queryByRole('button', { name: en.psn.showHiddenTrophies })).not.toBeInTheDocument()
+})
+
+
+test('each hidden trophy has its own eye, and the global switch follows them', () => {
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
+  const eye = within(screen.getByRole('table')).getByRole('button', { name: en.psn.revealTrophy })
+  fireEvent.click(eye)
+  expect(names()).toContain('Spoiler')
+  expect(screen.getByRole('button', { name: en.psn.hideHiddenTrophies })).toHaveAttribute('aria-pressed', 'true')
+  fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: en.psn.concealTrophy }))
+  expect(names()).toContain(en.psn.hiddenTrophy)
+})
+
+test('pinned trophies lead the list, highlighted', () => {
+  ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set<number>([2]), toggle, canPin: true })
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
+  expect(names()).toEqual(['Locked', 'Platinum one', 'Common', en.psn.hiddenTrophy])
+  expect(screen.getByRole('table').querySelector('[data-trophy="2"]')!.className).toContain('bg-warning/10')
+})
+
+test('a trophy opens in a detail window with its grade, its DLC and guide links', () => {
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={WITH_DLC} groups={GROUPS} />)
+  fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'DLC one' }))
+  const dialog = screen.getByRole('dialog', { name: 'DLC one' })
+  expect(within(dialog).getByText(en.psn.bronze)).toBeInTheDocument()
+  expect(within(dialog).getByText('DLC · Winter Wonder')).toBeInTheDocument()
+  expect(within(dialog).getByRole('link', { name: en.achievementDetail.psnProfiles })).toHaveAttribute(
+    'href',
+    'https://psnprofiles.com/search/games?q=Bloodborne',
+  )
+  expect(within(dialog).getByRole('link', { name: en.achievementDetail.youtube }).getAttribute('href')).toContain('DLC%20one')
+})
+
+test('a hidden trophy still secret opens without its text or guide links', () => {
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
+  fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: en.psn.hiddenTrophy }))
+  const dialog = screen.getByRole('dialog', { name: en.psn.hiddenTrophy })
+  expect(within(dialog).queryByText('The ending')).toBeNull()
+  expect(within(dialog).queryByRole('link')).toBeNull()
+})

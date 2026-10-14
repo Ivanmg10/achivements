@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { IconChevronDown, IconClock } from '@tabler/icons-react'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import GameIcon from '@/components/game-icon/GameIcon'
 import PsnRecentlyPlayedExpanded from '@/components/psn/psn-recently-played-expanded/PsnRecentlyPlayedExpanded'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
@@ -16,6 +16,7 @@ import { gameHref } from '@/utils/gameRef'
 import { psnBackdrop } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
+import { useSubject } from '@/context/SubjectContext'
 
 /**
  * One PSN game as a compact row card — SteamGameItem's counterpart in the
@@ -37,6 +38,7 @@ export default function PsnGameItem({
   onToggle?: () => void
   className?: string
 }) {
+  const subject = useSubject()
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
   const onPointerMove = useSpotlight()
@@ -44,7 +46,7 @@ export default function PsnGameItem({
 
   const isExpanded = expanded ?? localExpanded
   const toggle = onToggle ?? (() => setLocalExpanded((v) => !v))
-  const href = gameHref('psn', game.id)
+  const href = gameHref('psn', game.id, subject)
   const perfect = game.pctWon >= 100
 
   return (
@@ -89,8 +91,8 @@ export default function PsnGameItem({
                 <PlaystationLogo size={12} className="opacity-60" aria-hidden="true" />
                 {game.consoleName}
               </span>
-              <SteamProgressBar pct={game.pctWon} label={game.title} className="flex-1" />
-              <span className={`text-xs font-semibold tabular-nums shrink-0 ${perfect ? 'text-sky-300' : 'text-text-main'}`}>
+              <ProgressBar pct={game.pctWon} label={game.title} className="flex-1" />
+              <span className={`text-xs font-semibold tabular-nums shrink-0 ${perfect ? 'text-success' : 'text-text-main'}`}>
                 {game.pctWon}%
               </span>
               <IconChevronDown

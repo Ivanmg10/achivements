@@ -5,6 +5,7 @@ import { RecentlyPlayedGamesProvider } from '@/context/RecentlyPlayedGamesContex
 import { ActivityHeatmapYearProvider } from '@/context/ActivityHeatmapYearContext'
 import { GamesDataProvider } from '@/context/GamesDataContext'
 import { MainViewProvider } from '@/context/MainViewContext'
+import { BackInterceptProvider } from '@/context/BackInterceptContext'
 import { MainPlatformProvider } from '@/context/MainPlatformContext'
 import { PinnedGamesProvider } from '@/context/PinnedGamesContext'
 import { HiddenGamesProvider } from '@/context/HiddenGamesContext'
@@ -14,6 +15,7 @@ import { PsnGamesDataProvider } from '@/context/PsnGamesDataContext'
 export function MainProviders({ children }: { children: React.ReactNode }) {
   return (
     <MainViewProvider>
+      <BackInterceptProvider>
       <RecentAchievementsProvider>
         <RecentlyPlayedGamesProvider>
           <ActivityHeatmapYearProvider>
@@ -34,6 +36,7 @@ export function MainProviders({ children }: { children: React.ReactNode }) {
           </ActivityHeatmapYearProvider>
         </RecentlyPlayedGamesProvider>
       </RecentAchievementsProvider>
+      </BackInterceptProvider>
     </MainViewProvider>
   )
 }

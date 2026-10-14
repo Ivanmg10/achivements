@@ -1,3 +1,6 @@
+jest.mock('@/components/hide-game-button/HideGameButton', () => ({ __esModule: true, default: () => <span data-testid="hide" /> }))
+jest.mock('@/components/pin-toggle-button/PinToggleButton', () => ({ PinToggleButton: () => <span data-testid="pin" /> }))
+
 import { render, screen } from '@testing-library/react'
 import SteamGameInfoHeader from './SteamGameInfoHeader'
 import { en } from '@/translations/en'
@@ -110,5 +113,19 @@ describe('SteamGameInfoHeader', () => {
     expect(link.getAttribute('href')).toBe('https://store.steampowered.com/app/377160')
     expect(link.getAttribute('target')).toBe('_blank')
     expect(link.getAttribute('rel')).toContain('noopener')
+  })
+})
+
+describe('SteamGameInfoHeader — library and extras', () => {
+  test('a game in the library can be hidden; one outside it cannot', () => {
+    const { rerender } = renderHeader()
+    expect(screen.getByTestId('hide')).toBeInTheDocument()
+    rerender(<SteamGameInfoHeader appId={377160} title="Fallout 4" game={null} details={DETAILS} counts={null} />)
+    expect(screen.queryByTestId('hide')).toBeNull()
+  })
+
+  test('extra actions sit beside the store link', () => {
+    renderHeader({ actions: <button>Ask</button> })
+    expect(screen.getByRole('button', { name: 'Ask' })).toBeInTheDocument()
   })
 })

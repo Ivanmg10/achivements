@@ -1,4 +1,5 @@
-import { calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, heatLevel } from "./utils";
+import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, heatLevel } from "./utils";
+import type { RecentAchievement } from '@/types/types'
 
 describe("getRandomGameIds", () => {
   test("returns correct count", () => {
@@ -364,5 +365,23 @@ describe('heatLevel', () => {
 
   test('no data at all is level 0', () => {
     expect(heatLevel(3, 0)).toBe(0)
+  })
+})
+
+describe('activityKpis', () => {
+  const NOW = Date.parse('2026-10-13T12:00:00Z')
+  const at = (Date: string) => ({ Date }) as RecentAchievement
+
+  test('counts unlocks today, in the last week, this month and per day over 30 days', () => {
+    const kpis = activityKpis(
+      [at('2026-10-13 08:00:00'), at('2026-10-13 09:00:00'), at('2026-10-10 10:00:00'), at('2026-10-01 10:00:00'), at('2026-09-20 10:00:00'), at('2025-01-01 10:00:00')],
+      NOW,
+    )
+    expect(kpis).toMatchObject({ today: 2, week: 3, month: 4 })
+    expect(kpis.avgPerDay).toBeCloseTo(5 / 30)
+  })
+
+  test('nothing is all zeros', () => {
+    expect(activityKpis([], NOW)).toEqual({ today: 0, week: 0, month: 0, avgPerDay: 0 })
   })
 })

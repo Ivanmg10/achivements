@@ -1,6 +1,7 @@
 import {
   classifyPsnGame,
   countTrophies,
+  dlcShortName,
   isPsnTitleId,
   psnBackdrop,
   psnNumericId,
@@ -80,4 +81,34 @@ test('psnPlatformChip colours each console its own way; a cross-buy list by its 
   expect(new Set(chips).size).toBe(4)
   expect(psnPlatformChip('PS3 · PS Vita')).toBe(psnPlatformChip('PS3'))
   expect(psnPlatformChip('PS4')).toContain('#003791')
+})
+
+describe('classifyPsnGame with platinumCompletes', () => {
+  test('a platinum counts as completed below 100% only when asked', () => {
+    expect(classifyPsnGame({ pctWon: 85 })).toBe('playing')
+    expect(classifyPsnGame({ pctWon: 85, platinumCompletes: true })).toBe('completed')
+    expect(classifyPsnGame({ pctWon: 100 })).toBe('completed')
+  })
+})
+
+describe('dlcShortName', () => {
+  const BO2 = 'Call of Duty®: Black Ops II'
+  test.each([
+    ['Call of Duty: Black Ops II: Revolution', 'Revolution'],
+    ['Call of Duty: Black Ops II Uprising', 'Uprising'],
+    ['CALL OF DUTY®: BLACK OPS II - Apocalypse', 'Apocalypse'],
+    ['Winter Wonder', 'Winter Wonder'],
+  ])('%s → %s', (name, short) => {
+    expect(dlcShortName(name, BO2)).toBe(short)
+  })
+
+  test('whole words only, and never an empty name', () => {
+    expect(dlcShortName('Halogen Pack', 'Halo')).toBe('Halogen Pack')
+    expect(dlcShortName('Astro Bot', 'Astro Bot')).toBe('Astro Bot')
+    expect(dlcShortName('Astro Bot', '')).toBe('Astro Bot')
+  })
+
+  test('accented titles', () => {
+    expect(dlcShortName('Pokémon Café: Remix', 'Pokémon Café')).toBe('Remix')
+  })
 })

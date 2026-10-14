@@ -28,9 +28,10 @@ const mockT = {
   userStats: { globalRank: 'Global rank' },
   streak: { title: 'Streak' },
   lineChart: { achievements: 'achievements' },
+  plurals: { achievements: { one: '{n} achievement', other: '{n} achievements' } },
 }
 jest.mock('@/context/LanguageContext', () => ({
-  useLanguage: () => ({ T: mockT }),
+  useLanguage: () => ({ T: mockT, lang: 'en' }),
 }))
 
 function daysAgo(n: number) {
@@ -131,4 +132,11 @@ describe('MainPagePointsStats', () => {
     fireEvent.click(screen.getByText('This month').closest('button')!)
     expect(screen.getByTestId('period-modal')).toHaveTextContent('This month:1')
   })
+})
+
+test('one achievement is singular, as in "1 achievement"', () => {
+  const today = new Date().toISOString().split('T')[0]
+  const one = [{ Date: `${today} 10:00:00`, Points: 5, HardcoreMode: '1' }] as unknown as RecentAchievement[]
+  render(<MainPagePointsStats achievements={one} heatmapAchievements={one} rank={null} />)
+  expect(screen.getAllByText('1 achievement').length).toBeGreaterThan(0)
 })

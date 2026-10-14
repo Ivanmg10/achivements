@@ -7,6 +7,7 @@ import { formatDate } from '@/utils/utils'
 import type { LatestPerfect } from '@/utils/perfectGames'
 import { gameHref } from '@/utils/gameRef'
 import GameCover from '@/components/game-cover/GameCover'
+import { useSubject } from '@/context/SubjectContext'
 
 /**
  * Where each finisher stands, by recency (index 0 is the newest): the newest
@@ -29,6 +30,7 @@ const STEPS = [
  */
 export default function PerfectPodium({ games }: { games: LatestPerfect[] }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const reduce = useReducedMotion()
 
   if (games.length === 0) return null
@@ -39,7 +41,7 @@ export default function PerfectPodium({ games }: { games: LatestPerfect[] }) {
       <ol className="grid grid-cols-3 items-end gap-2 sm:gap-3 max-w-md mx-auto w-full">
         {games.map((game, i) => {
           const s = STEPS[i]
-          const href = gameHref(game.source, game.id)
+          const href = gameHref(game.source, game.id, subject)
           return (
             <motion.li
               key={game.key}

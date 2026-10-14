@@ -69,10 +69,11 @@ export const groupByConsole = (games: RetroAchievementsGameCompleted[]) => {
   return Object.entries(grouped).map(([name, value]) => ({ name, value }))
 }
 
-export const groupByDays = (achievements: RecentAchievement[], totalDays: number) => {
+/** The last `totalDays` days up to `end` (today unless said otherwise), each with how many achievements fell on it. */
+export const groupByDays = (achievements: RecentAchievement[], totalDays: number, end: Date = new Date()) => {
   const days: string[] = []
   for (let i = totalDays - 1; i >= 0; i--) {
-    const d = new Date()
+    const d = new Date(end)
     d.setDate(d.getDate() - i)
     days.push(d.toISOString().split('T')[0])
   }
@@ -206,6 +207,28 @@ export function calcAvgPerDay(achievements: RecentAchievement[], days: number = 
   const cutoff = Date.now() - days * 86400000
   const count = achievements.filter((a) => new Date(a.Date.replace(' ', 'T')).getTime() >= cutoff).length
   return count / days
+}
+
+export type ActivityKpis = { today: number; week: number; month: number; avgPerDay: number }
+
+/**
+ * Unlocks today, in the last 7 days, this calendar month and per day over the
+ * last 30, from any platform. Days are UTC, as everywhere else on the site.
+ */
+export function activityKpis(achievements: RecentAchievement[], now: number = Date.now()): ActivityKpis {
+  const todayKey = new Date(now).toISOString().slice(0, 10)
+  const monthKey = todayKey.slice(0, 7)
+  const weekAgo = now - 7 * 86400000
+  const monthAgo = now - 30 * 86400000
+  let today = 0, week = 0, month = 0, last30 = 0
+  for (const a of achievements) {
+    const t = Date.parse(a.Date.replace(' ', 'T'))
+    if (a.Date.startsWith(todayKey)) today++
+    if (a.Date.slice(0, 7) === monthKey) month++
+    if (t >= weekAgo) week++
+    if (t >= monthAgo) last30++
+  }
+  return { today, week, month, avgPerDay: last30 / 30 }
 }
 
 export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {

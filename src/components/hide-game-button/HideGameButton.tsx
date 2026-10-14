@@ -5,6 +5,7 @@ import type { MouseEvent } from 'react'
 import { IconEyeOff } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
+import { useSubject } from '@/context/SubjectContext'
 import type { GameSource } from '@/types/steam'
 import CommonModal from '@/components/common-modal/CommonModal'
 
@@ -28,6 +29,7 @@ export default function HideGameButton({
   className?: string
 }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const { hideGame } = useHiddenGames()
   const [open, setOpen] = useState(false)
 
@@ -40,6 +42,9 @@ export default function HideGameButton({
     setOpen(false)
     await hideGame({ source, id: gameId, title, image: image ?? null })
   }
+
+  // Hiding tidies the viewer's own lists: not on someone else's page.
+  if (subject) return null
 
   return (
     <>

@@ -40,10 +40,11 @@ export default function RARecentlyPlayed() {
   const subject = useSubject()
   const reduce = useReducedMotion()
   const { games, isLoading, error, refetch } = useRecentlyPlayedGames()
-  const { recent: steamRecent } = useSteamGamesData()
-  const { library: psnLibrary } = usePsnGamesData()
-  // One feed across platforms, newest first. Steam and PSN entries merge in
-  // when they arrive rather than holding the RA feed back while they load.
+  const { recent: steamRecent, recentLoading: steamLoading } = useSteamGamesData()
+  const { library: psnLibrary, libraryLoading: psnLoading } = usePsnGamesData()
+  // One feed across platforms, newest first. It shows once every linked
+  // platform has answered, so games never pop in (and reorder) a moment later.
+  const loading = isLoading || steamLoading || psnLoading
   const feed = mergeRecentFeeds(games, steamRecent, MAX_GAMES, psnLibrary)
 
   // Keyed by feed key, not game id: RA game 730 and Steam app 730 are different games.
@@ -109,8 +110,8 @@ export default function RARecentlyPlayed() {
 
       {/* Cards */}
       <div className="flex flex-col flex-1 min-h-0">
-        {isLoading ? (
-          <div className="flex flex-col gap-1.5 animate-pulse motion-reduce:animate-none">
+        {loading ? (
+          <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-hidden animate-pulse motion-reduce:animate-none">
             {Array.from({ length: MAX_GAMES }).map((_, i) => (
               <GameRowSkeleton key={i} />
             ))}

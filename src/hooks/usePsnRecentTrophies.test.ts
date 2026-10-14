@@ -1,6 +1,8 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { usePsnRecentTrophies } from './usePsnRecentTrophies'
+import { createElement, type ReactNode } from 'react'
+import { SubjectContext } from '@/context/SubjectContext'
 
 function setSession(user: Record<string, unknown>) {
   ;(useSession as jest.Mock).mockReturnValue({ data: { user }, status: 'authenticated', update: jest.fn() })
@@ -39,4 +41,12 @@ test('keeps the reason a load failed', async () => {
   const { result } = renderHook(() => usePsnRecentTrophies())
   await waitFor(() => expect(result.current.error).toBe('failed'))
   expect(result.current.isLoading).toBe(false)
+})
+
+test("on a public profile (an account id with a colon in it) it still asks for the right scope, as them", async () => {
+  setSession({ id: 'subject:ivan', psnaccountid: 'subject:ivan' })
+  const wrapper = ({ children }: { children: ReactNode }) => createElement(SubjectContext.Provider, { value: 'ivan' }, children)
+  const { result } = renderHook(() => usePsnRecentTrophies('year'), { wrapper })
+  await waitFor(() => expect(result.current.trophies).toEqual(TROPHIES))
+  expect(global.fetch).toHaveBeenCalledWith('/api/psn/recentTrophies?scope=year&lang=en&user=ivan', { cache: 'no-store' })
 })

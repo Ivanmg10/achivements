@@ -66,13 +66,13 @@ export default function MainPagePsnStats({
         label={T.pointsStats.today}
         value={stats.today.length}
         sub={stats.today.length ? trophies : T.pointsStats.noActivity}
-        accent="text-purple-400"
+       
         onClick={() => setSelectedDay(stats.todayKey)}
       />
-      <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={trophies} accent="text-yellow-400" onClick={() => setWeekOpen(true)} />
-      <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={trophies} accent="text-red-400" onClick={() => setMonthOpen(true)} />
-      <StatPill label={T.pointsStats.avgPerDay} value={stats.avg.toFixed(1)} sub={T.pointsStats.perDay} accent="text-info" />
-      {summary && <StatPill label={T.psn.level} value={summary.trophyLevel} sub="PlayStation" accent="text-[#0070d1]" />}
+      <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={trophies} onClick={() => setWeekOpen(true)} />
+      <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={trophies} onClick={() => setMonthOpen(true)} />
+      <StatPill label={T.pointsStats.avgPerDay} value={stats.avg.toFixed(1)} sub={T.pointsStats.perDay} />
+      {summary && <StatPill label={T.psn.level} value={summary.trophyLevel} sub="PlayStation" />}
       <StatPill
         label={T.streak.title}
         value={`${streak}d`}

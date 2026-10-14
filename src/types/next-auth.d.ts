@@ -32,6 +32,8 @@ type SessionUserFields = {
   /** Whether other users may find and open this profile. */
   profilePublic?: boolean;
   gender?: 'male' | 'female' | 'neutral' | null;
+  /** Whether the gender shows on the public profile. */
+  genderPublic?: boolean;
   favorite_game?: SavedGame;
   favorite_steam_game?: SavedGame;
   favorite_psn_game?: SavedGame;

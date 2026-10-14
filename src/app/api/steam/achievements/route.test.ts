@@ -194,3 +194,38 @@ describe('online guess', () => {
     expect(online(data(res))).toEqual(['ACH_RANK'])
   })
 })
+
+describe('English names', () => {
+  const EN = [{ name: 'ACH_WIN', defaultvalue: 0, displayName: 'Win', description: 'Win a match', hidden: 0, icon: 'i', icongray: 'g' }]
+  const ES = [{ name: 'ACH_WIN', defaultvalue: 0, displayName: 'Victoria', description: 'Gana una partida', hidden: 0, icon: 'i', icongray: 'g' }]
+
+  test('a page in another language carries each English name, for guides', async () => {
+    ;(getSchemaForGame as jest.Mock).mockImplementation(async (_id: number, _key: string, lang: string) => ({
+      game: { availableGameStats: { achievements: lang === 'english' ? EN : ES } },
+    }))
+    const url = new URL('http://localhost:3000/api/steam/achievements?appid=730&lang=spanish')
+    const [a] = data(await GET(new NextRequest(url.toString())))
+    expect(a).toMatchObject({ title: 'Victoria', titleEn: 'Win' })
+  })
+
+  test('an English page, or a name that is the same, carries none', async () => {
+    ;(getSchemaForGame as jest.Mock).mockResolvedValue({ game: { availableGameStats: { achievements: EN } } })
+    const [en] = data(await GET(makeRequest('730')))
+    expect(en.titleEn).toBeUndefined()
+    const url = new URL('http://localhost:3000/api/steam/achievements?appid=730&lang=spanish')
+    const [same] = data(await GET(new NextRequest(url.toString())))
+    expect(same.titleEn).toBeUndefined()
+  })
+
+  test('the English schema failing still returns the achievements', async () => {
+    ;(getSchemaForGame as jest.Mock).mockImplementation(async (_id: number, _key: string, lang: string) => {
+      if (lang === 'english') throw new Error('steam down')
+      return { game: { availableGameStats: { achievements: ES } } }
+    })
+    const url = new URL('http://localhost:3000/api/steam/achievements?appid=730&lang=spanish')
+    const res = await GET(new NextRequest(url.toString()))
+    expect(res.status).toBe(200)
+    expect(data(res)[0]).toMatchObject({ title: 'Victoria', likelyOnline: false })
+    expect(data(res)[0].titleEn).toBeUndefined()
+  })
+})

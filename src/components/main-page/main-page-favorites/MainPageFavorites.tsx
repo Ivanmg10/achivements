@@ -6,6 +6,7 @@ import { IconStar } from '@tabler/icons-react'
 import type { PinnedAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePinnedAchievements } from '@/hooks/usePinnedAchievements'
+import { useSubject } from '@/context/SubjectContext'
 import { pinnedKey } from '@/utils/utils'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import EmptyState from '@/components/empty-state/EmptyState'
@@ -16,10 +17,15 @@ import MainPageFavoritesPsnRow from './main-page-favorites-psn-row/MainPageFavor
 
 type RaPin = Extract<PinnedAchievement, { source: 'ra' }>
 
-/** The main page's pinned achievements from RA, Steam and PSN together, newest first. */
+/**
+ * The main page's pinned achievements from RA, Steam and PSN together, newest
+ * first. On someone's public profile it lists theirs, with nothing to unpin.
+ */
 export default function MainPageFavorites() {
   const { T } = useLanguage()
+  const visitor = useSubject() !== null
   const { pinned, isLoading, error, refetch, unpin } = usePinnedAchievements()
+  const unpinOf = (fav: PinnedAchievement) => (visitor ? undefined : () => unpin(fav))
   const [selected, setSelected] = useState<RaPin | null>(null)
 
   return (
@@ -62,15 +68,15 @@ export default function MainPageFavorites() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-1">
           {pinned.map((fav) =>
             fav.source === 'psn' ? (
-              <MainPageFavoritesPsnRow key={pinnedKey(fav)} fav={fav} onUnpin={() => unpin(fav)} />
+              <MainPageFavoritesPsnRow key={pinnedKey(fav)} fav={fav} onUnpin={unpinOf(fav)} />
             ) : fav.source === 'steam' ? (
-              <MainPageFavoritesSteamRow key={pinnedKey(fav)} fav={fav} onUnpin={() => unpin(fav)} />
+              <MainPageFavoritesSteamRow key={pinnedKey(fav)} fav={fav} onUnpin={unpinOf(fav)} />
             ) : (
               <MainPageFavoritesRaRow
                 key={pinnedKey(fav)}
                 fav={fav}
                 onOpen={() => setSelected(fav)}
-                onUnpin={() => unpin(fav)}
+                onUnpin={unpinOf(fav)}
               />
             ),
           )}
@@ -84,11 +90,15 @@ export default function MainPageFavorites() {
             numDistinctPlayers={selected.num_distinct_players}
             onClose={() => setSelected(null)}
             gameId={selected.game_id}
-            isFavorited={true}
-            onToggleFavorite={() => {
-              unpin(selected)
-              setSelected(null)
-            }}
+            isFavorited={!visitor}
+            onToggleFavorite={
+              visitor
+                ? undefined
+                : () => {
+                    unpin(selected)
+                    setSelected(null)
+                  }
+            }
           />
         )}
       </AnimatePresence>

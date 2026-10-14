@@ -75,3 +75,19 @@ test('a failed save does not touch the session', async () => {
   await waitFor(() => expect(global.fetch).toHaveBeenCalled())
   expect(update).not.toHaveBeenCalled()
 })
+
+test('the public profile switch reads the session, on unless turned off', () => {
+  render(<UserPreferencesCard />)
+  expect(screen.getByRole('switch', { name: en.userData.profilePublic })).toBeChecked()
+})
+
+test('whether the gender shows on the profile is offered only once there is a gender', () => {
+  const { unmount } = render(<UserPreferencesCard />)
+  expect(screen.queryByRole('switch', { name: en.userData.genderPublic })).not.toBeInTheDocument()
+  unmount()
+
+  setUser({ gender: 'female', genderPublic: false })
+  render(<UserPreferencesCard />)
+  expect(screen.getByRole('switch', { name: en.userData.genderPublic })).not.toBeChecked()
+  expect(screen.getByText(en.userData.genderPublicOff)).toBeInTheDocument()
+})

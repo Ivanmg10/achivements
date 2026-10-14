@@ -5,18 +5,16 @@ import { IconArrowRight, IconFolder } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroupDetail } from '@/hooks/useGroupDetail'
 import type { GameGroup, GameGroupItem } from '@/types/types'
-import type { GameSource } from '@/types/steam'
 import GroupIcon from '@/components/groups/group-icon/GroupIcon'
 import GameIcon from '@/components/game-icon/GameIcon'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 import { plural } from '@/utils/utils'
 import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 
 /** Games listed before "N more": enough to see the group, short enough to scan. */
 const SHOWN = 6
-
-const BAR: Record<GameSource, string> = { ra: 'bg-warning', steam: 'bg-[#66c0f4]', psn: 'bg-[#0070d1]' }
 
 /** RA stores an icon path on retroachievements.org; Steam and PSN store full URLs. */
 const iconUrl = (i: GameGroupItem) =>
@@ -82,15 +80,10 @@ export default function MainPageGroupFeature({ group }: { group: GameGroup }) {
                       <span className="text-[11px] text-text-secondary truncate shrink-0 max-w-[45%]">
                         {source === 'ra' ? item.console_name : PLATFORM_NAME[source]}
                       </span>
-                      <span aria-hidden="true" className="h-1 flex-1 rounded-full bg-ink/[0.06] overflow-hidden">
-                        <span
-                          className={`block h-full rounded-full ${BAR[source]}`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </span>
+                      <ProgressBar pct={pct} label={item.title} height="h-1" className="flex-1" />
                     </span>
                   </span>
-                  <span className={`text-xs font-semibold tabular-nums shrink-0 ${pct >= 100 ? 'text-warning' : 'text-text-main'}`}>{pct}%</span>
+                  <span className={`text-xs font-semibold tabular-nums shrink-0 ${pct >= 100 ? 'text-success' : 'text-text-main'}`}>{pct}%</span>
                 </Link>
               </li>
             )

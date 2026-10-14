@@ -70,13 +70,13 @@ export default function MainPageSteamStats({
         label={T.pointsStats.today}
         value={stats.today.length}
         sub={stats.today.length ? unlocks : T.pointsStats.noActivity}
-        accent="text-purple-400"
+       
         onClick={() => setSelectedDay(stats.todayKey)}
       />
-      <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={unlocks} accent="text-yellow-400" onClick={() => setWeekOpen(true)} />
-      <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={unlocks} accent="text-red-400" onClick={() => setMonthOpen(true)} />
-      <StatPill label={T.pointsStats.avgPerDay} value={stats.avg.toFixed(1)} sub={T.pointsStats.perDay} accent="text-info" />
-      {profile?.level != null && <StatPill label={T.steam.level} value={profile.level} sub="Steam" accent="text-[#66c0f4]" />}
+      <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={unlocks} onClick={() => setWeekOpen(true)} />
+      <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={unlocks} onClick={() => setMonthOpen(true)} />
+      <StatPill label={T.pointsStats.avgPerDay} value={stats.avg.toFixed(1)} sub={T.pointsStats.perDay} />
+      {profile?.level != null && <StatPill label={T.steam.level} value={profile.level} sub="Steam" />}
       <StatPill
         label={T.streak.title}
         value={`${streak}d`}
@@ -84,7 +84,7 @@ export default function MainPageSteamStats({
         accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined}
         href="/racha"
       />
-      <StatPill label={T.steam.last2Weeks} value={`${stats.hours2w}${T.steam.hoursShort}`} sub={T.steam.playtime} accent="text-accent" />
+      <StatPill label={T.steam.last2Weeks} value={`${stats.hours2w}${T.steam.hoursShort}`} sub={T.steam.playtime} />
 
       <AnimatePresence>
         {selectedDay && (

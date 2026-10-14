@@ -15,10 +15,10 @@ export default function MainPageProfileRaStats({
 
   return (
     <div className="grid grid-cols-2 gap-2">
-      <StatCard label={T.profileStats.hardcorePoints} value={user.TotalPoints ?? 0} accent="text-yellow-400" />
-      <StatCard label={T.profileStats.truePoints} value={user.TotalTruePoints ?? 0} accent="text-blue-400" />
+      <StatCard label={T.profileStats.hardcorePoints} value={user.TotalPoints ?? 0} accent="text-warning" />
+      <StatCard label={T.profileStats.truePoints} value={user.TotalTruePoints ?? 0} />
       <StatCard label={T.profileStats.softcorePoints} value={user.TotalSoftcorePoints ?? 0} />
-      <StatCard label={T.profileStats.hardcoreRatio} value={`${hardcoreRatio}%`} accent="text-green-400" />
+      <StatCard label={T.profileStats.hardcoreRatio} value={`${hardcoreRatio}%`} />
     </div>
   )
 }

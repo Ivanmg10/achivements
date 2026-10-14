@@ -2,6 +2,8 @@ import { renderHook, waitFor, act } from '@testing-library/react'
 import { useSteamGameDetails } from './useSteamGameDetails'
 import { useLanguage } from '@/context/LanguageContext'
 import { en } from '@/translations/en'
+import { createElement, type ReactNode } from 'react'
+import { SubjectContext } from '@/context/SubjectContext'
 
 const DETAILS = { appId: 620, name: 'Portal 2', developers: ['Valve'], publishers: [], genres: [], releaseDate: null, description: null, screenshots: [] }
 
@@ -78,4 +80,13 @@ test('a slow answer for the previous game does not overwrite the current one', a
   await act(async () => { releases['1']({ ok: true, status: 200, json: async () => ({ ...DETAILS, appId: 1 }) }) })
 
   expect(result.current.details?.appId).toBe(2)
+})
+
+test("on someone's profile it asks as them, so the viewer needs no Steam", async () => {
+  ;(useLanguage as jest.Mock).mockReturnValue({ lang: 'en', setLang: jest.fn(), T: en })
+  ;(fetch as jest.Mock).mockResolvedValue({ ok: true, status: 200, json: async () => DETAILS })
+  const wrapper = ({ children }: { children: ReactNode }) => createElement(SubjectContext.Provider, { value: 'ivan' }, children)
+  const { result } = renderHook(() => useSteamGameDetails(620), { wrapper })
+  await waitFor(() => expect(result.current.details).toEqual(DETAILS))
+  expect(fetch).toHaveBeenCalledWith('/api/steam/gameDetails?appid=620&lang=english&user=ivan')
 })

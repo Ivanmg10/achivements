@@ -1,5 +1,6 @@
 jest.mock('@/context/PsnGamesDataContext', () => ({ usePsnGamesData: jest.fn() }))
 jest.mock('@/hooks/usePsnTrophies', () => ({ usePsnTrophies: jest.fn() }))
+jest.mock('@/hooks/usePsnGameDetails', () => ({ usePsnGameDetails: () => ({ details: null, error: null }) }))
 jest.mock('@/components/game-info-skeleton/GameInfoSkeleton', () => ({
   __esModule: true,
   default: () => <div data-testid="loading" />,
@@ -29,7 +30,7 @@ function setup({
   linked = true,
   library = [GAME] as unknown[],
   libraryLoading = false,
-  trophies = { trophies: [{ id: 0 }, { id: 1 }], isLoading: false, error: null as string | null },
+  trophies = { trophies: [{ id: 0 }, { id: 1 }], groups: [], isLoading: false, error: null as string | null },
 } = {}) {
   ;(useParams as jest.Mock).mockReturnValue({ id })
   ;(usePsnGamesData as jest.Mock).mockReturnValue({ isLinked: linked, library, libraryLoading })
@@ -69,7 +70,7 @@ test('a skeleton while the list loads', () => {
 })
 
 test('a failed load says so and can be retried', () => {
-  setup({ trophies: { trophies: [], isLoading: false, error: 'private' } })
+  setup({ trophies: { trophies: [], groups: [], isLoading: false, error: 'private' } })
   render(<PsnGamePage />)
   expect(screen.getByRole('alert')).toHaveTextContent(en.psn.trophiesError)
   expect(screen.getByText(en.psn.errors.private)).toBeInTheDocument()
@@ -78,7 +79,7 @@ test('a failed load says so and can be retried', () => {
 })
 
 test('a game without trophies says so', () => {
-  setup({ trophies: { trophies: [], isLoading: false, error: null } })
+  setup({ trophies: { trophies: [], groups: [], isLoading: false, error: null } })
   render(<PsnGamePage />)
   expect(screen.getByText(en.psn.noTrophies)).toBeInTheDocument()
 })

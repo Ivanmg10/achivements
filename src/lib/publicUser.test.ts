@@ -1,7 +1,7 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
 import pool from '@/lib/db'
-import { findPublicUser, findSubject } from './publicUser'
+import { findPublicUser, findSubject, hiddenGameKeys } from './publicUser'
 
 const query = pool.query as jest.Mock
 const ROW = { id: 7, username: 'Ivan', avatar: null, description: null, location: 'ES', rausername: 'ivan', steamid: null, psnaccountid: null, hasRaKey: true, profilePublic: true }
@@ -67,4 +67,16 @@ test('the subject row does carry the key, for reading their data server-side', a
   await expect(findSubject('ivan')).resolves.toMatchObject({ raid: 'secret-key' })
   const selected = (query.mock.calls[0][0] as string).replace(/\(raid IS NOT NULL\) AS "hasRaKey"/, '')
   expect(selected).toMatch(/\braid\b/)
+})
+
+test('the public row reads the gender together with whether it may be shown', async () => {
+  query.mockResolvedValue({ rows: [] })
+  await findPublicUser('ivan')
+  expect(query.mock.calls[0][0]).toContain('gender_public AS "genderPublic"')
+})
+
+test('hidden games come back as keys, leaving out unknown sources', async () => {
+  query.mockResolvedValue({ rows: [{ source: 'ra', game_id: 1 }, { source: 'psn', game_id: 2 }, { source: 'xbox', game_id: 3 }] })
+  await expect(hiddenGameKeys(7)).resolves.toEqual(['ra:1', 'psn:2'])
+  expect(query.mock.calls[0][1]).toEqual([7])
 })

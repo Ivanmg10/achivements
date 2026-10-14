@@ -3,6 +3,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { toSteamLanguage } from '@/utils/steamLanguage'
 import type { SteamGameDetails } from '@/types/steam'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useSubject } from '@/context/SubjectContext'
+import { withSubject } from '@/utils/withSubject'
 
 /**
  * Store details for one Steam game page, in the app's language. A 404 means
@@ -12,6 +14,7 @@ import { useWhenChanged } from '@/hooks/useWhenChanged'
 export function useSteamGameDetails(appId: number | null) {
   const { lang } = useLanguage()
   const steamLang = toSteamLanguage(lang)
+  const subject = useSubject()
 
   const [details, setDetails] = useState<SteamGameDetails | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -20,7 +23,7 @@ export function useSteamGameDetails(appId: number | null) {
   /** Asks the server; what came back, not yet applied. A 404 is no details, not an error. */
   const request = useCallback(async (id: number, language: string): Promise<{ details: SteamGameDetails | null } | { error: string }> => {
     try {
-      const res = await fetch(`/api/steam/gameDetails?appid=${id}&lang=${language}`)
+      const res = await fetch(withSubject(`/api/steam/gameDetails?appid=${id}&lang=${language}`, subject))
       if (res.status === 404) return { details: null }
       if (!res.ok) throw new Error(`Failed to load game details (${res.status})`)
       return { details: (await res.json()) as SteamGameDetails }
@@ -28,7 +31,7 @@ export function useSteamGameDetails(appId: number | null) {
       console.error('[useSteamGameDetails]', id, err)
       return { error: err instanceof Error ? err.message : 'Unknown error' }
     }
-  }, [])
+  }, [subject])
 
   const settle = useCallback((outcome: { details: SteamGameDetails | null } | { error: string }) => {
     if ('error' in outcome) setError(outcome.error)

@@ -9,6 +9,7 @@ import { steamAssetUrl } from '@/lib/steamClient'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import type { PreviewGame } from '@/utils/sectionPreview'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 
 /**
  * One game in a folded section's preview: art, title, platform line and a
@@ -16,7 +17,6 @@ import type { PreviewGame } from '@/utils/sectionPreview'
  * card — a teaser, not the list.
  */
 export default function CollapsibleSectionPreviewCard({ game, eager = false }: { game: PreviewGame; eager?: boolean }) {
-  const done = game.pct !== null && game.pct >= 100
   const onPointerMove = useSpotlight()
   const art =
     game.source === 'steam'
@@ -26,12 +26,6 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
         : game.imageRef
           ? `https://retroachievements.org${game.imageRef}`
           : null
-  const barColor =
-    game.source === 'steam'
-      ? done ? 'bg-[#a4d007]' : 'bg-[#66c0f4]'
-      : game.source === 'psn'
-        ? done ? 'bg-sky-300' : 'bg-[#0070d1]'
-        : done ? 'bg-warning' : 'bg-accent'
 
   return (
     <Link
@@ -64,17 +58,8 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
         <span className="text-xs text-text-secondary truncate">{game.subtitle}</span>
         {game.pct !== null && (
           <span className="flex items-center gap-2">
-            <span
-              role="progressbar"
-              aria-label={game.title}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={Math.round(game.pct)}
-              className="relative h-1 flex-1 rounded-full bg-ink/10 overflow-hidden"
-            >
-              <span className={`absolute inset-y-0 left-0 rounded-full ${barColor}`} style={{ width: `${game.pct}%` }} />
-            </span>
-            <span className="text-[10px] tabular-nums text-text-secondary">{Math.round(game.pct)}%</span>
+            <ProgressBar pct={game.pct} label={game.title} height="h-1" className="flex-1" />
+            <span className={`text-[10px] tabular-nums ${game.pct >= 100 ? 'text-success font-semibold' : 'text-text-secondary'}`}>{Math.round(game.pct)}%</span>
           </span>
         )}
       </div>

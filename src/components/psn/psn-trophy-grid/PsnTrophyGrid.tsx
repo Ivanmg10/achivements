@@ -10,9 +10,12 @@ import { gameHref } from '@/utils/gameRef'
 import { BASE_GROUP, psnTrophyAnchor, trophiesByGroup, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import PsnTrophyGridGroup from './psn-trophy-grid-group/PsnTrophyGridGroup'
+import PsnRevealTrophyButton from '@/components/psn/psn-reveal-trophy-button/PsnRevealTrophyButton'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
+import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
 import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy, PsnTrophyGroup, TrophyGrade } from '@/types/psn'
+import { useSubject } from '@/context/SubjectContext'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -62,11 +65,13 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
   limit?: number
 }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const { pinned, toggle, canPin } = usePsnFavoriteTrophies(gameId, gameTitle)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
   const size = SIZE_CLASSES[badgeSize]
   const [showAll, setShowAll] = useState(false)
+  const { isRevealed, toggle: toggleReveal } = useRevealedTrophies()
   const { visible: shown, capped } = capList(trophies, limit ?? Infinity, showAll)
   const grade: Record<TrophyGrade, string> = {
     platinum: T.psn.platinum,
@@ -85,8 +90,8 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
     setTooltip(null)
   }
 
-  // Sony keeps the text of hidden trophies secret until they are earned.
-  const concealed = (t: PsnTrophy) => t.hidden && !t.earned
+  // Sony sends hidden trophies' text, but it is kept secret until earned, or until the viewer asks.
+  const concealed = (t: PsnTrophy) => t.hidden && !t.earned && !isRevealed(t.id)
   const nameOf = (t: PsnTrophy) => (concealed(t) ? T.psn.hiddenTrophy : t.name)
   const sections = trophiesByGroup(shown, groups)
   const groupName = (id: string) => (id === BASE_GROUP ? T.psn.baseGame : (groups.find((g) => g.id === id)?.name ?? id))
@@ -99,7 +104,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
             {section.trophies.map((t) => (
               <li key={t.id} className="relative group/badge">
                 <Link
-                  href={`${gameHref('psn', gameId)}#${psnTrophyAnchor(t.id)}`}
+                  href={`${gameHref('psn', gameId, subject)}#${psnTrophyAnchor(t.id)}`}
                   aria-label={`${nameOf(t)} — ${grade[t.type]}, ${t.earned ? T.psn.earned : T.psn.locked}`}
                   onMouseEnter={(e) => show(t, e.clientX, e.clientY)}
                   onMouseLeave={hide}
@@ -125,6 +130,14 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
                     <div className={`${size.badge} bg-ink/10 ${t.earned ? '' : 'opacity-40'}`} aria-hidden="true" />
                   )}
                 </Link>
+                {t.hidden && !t.earned && (
+                  <PsnRevealTrophyButton
+                    revealed={isRevealed(t.id)}
+                    onToggle={() => toggleReveal(t.id)}
+                    size={20}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-bg-card/90 text-text-main flex items-center justify-center opacity-0 group-hover/badge:opacity-100 focus-visible:opacity-100"
+                  />
+                )}
                 {canPin && (
                   <SteamPinAchievementButton
                     pinned={pinned.has(t.id)}

@@ -2,7 +2,7 @@ import type { GameSource, SteamAchievementUnified } from '@/types/steam'
 import type { PsnTrophy } from '@/types/psn'
 
 /** Every theme the app has a stylesheet for; the endpoints that store one accept only these. */
-export const THEMES = ['dark', 'light', 'blue', 'purple', 'green', 'red', 'synthwave', 'catppuccin', 'gruvbox', 'rose-pine', 'oled', 'ocean', 'terminal', 'sakura', 'arctic', 'daxter', 'bentley', 'clank', 'black-ops-2', 'san-andreas', 'snake-eater'] as const
+export const THEMES = ['dark', 'light', 'dark-red', 'dark-green', 'light-red', 'light-green', 'blue', 'purple', 'green', 'red', 'synthwave', 'catppuccin', 'gruvbox', 'rose-pine', 'oled', 'ocean', 'terminal', 'sakura', 'arctic', 'daxter', 'bentley', 'clank', 'black-ops-2', 'san-andreas', 'snake-eater'] as const
 
 /** Where the browser keeps the last theme, so the page is painted in it before React loads. */
 export const THEME_STORAGE_KEY = 'app-theme'
@@ -10,8 +10,10 @@ export const THEME_STORAGE_KEY = 'app-theme'
 export type Theme = (typeof THEMES)[number]
 
 /** How the theme picker sorts them; every theme sits in exactly one group. */
-export const THEME_GROUPS: { id: 'base' | 'palettes' | 'games'; themes: Theme[] }[] = [
-  { id: 'base', themes: ['dark', 'light', 'blue', 'purple', 'green', 'red', 'synthwave'] },
+export const THEME_GROUPS: { id: 'base' | 'tinted' | 'palettes' | 'games'; themes: Theme[] }[] = [
+  // Neutral dark and light, each with a violet, red or green accent.
+  { id: 'base', themes: ['dark', 'dark-red', 'dark-green', 'light', 'light-red', 'light-green'] },
+  { id: 'tinted', themes: ['purple', 'red', 'green', 'blue', 'synthwave'] },
   { id: 'palettes', themes: ['catppuccin', 'gruvbox', 'rose-pine', 'oled', 'ocean', 'terminal', 'sakura', 'arctic'] },
   { id: 'games', themes: ['daxter', 'bentley', 'clank', 'black-ops-2', 'san-andreas', 'snake-eater'] },
 ]

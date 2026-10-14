@@ -156,10 +156,10 @@ describe('opened from a badge link', () => {
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
 
     const row = screen.getByRole('table').querySelector('[data-ach="THIRD"]')!
-    expect(row.className).toContain('bg-[#66c0f4]/15')
+    expect(row.className).toContain('bg-accent/15')
 
     act(() => { jest.advanceTimersByTime(2500) })
-    expect(row.className).not.toContain('bg-[#66c0f4]/15')
+    expect(row.className).not.toContain('bg-accent/15')
   })
 
   test('unfolds and clears the filter so the achievement is visible', () => {
@@ -171,13 +171,13 @@ describe('opened from a badge link', () => {
   test('ignores a link to an achievement the game does not have', () => {
     window.history.replaceState(null, '', '/steamGame/620#ach-NOPE')
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    expect(screen.getByRole('table').querySelector('.bg-\\[\\#66c0f4\\]\\/15')).toBeNull()
+    expect(screen.getByRole('table').querySelector('.bg-accent\\/15')).toBeNull()
   })
 
   test('ignores unrelated hashes', () => {
     window.history.replaceState(null, '', '/steamGame/620#comments')
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    expect(screen.getByRole('table').querySelector('.bg-\\[\\#66c0f4\\]\\/15')).toBeNull()
+    expect(screen.getByRole('table').querySelector('.bg-accent\\/15')).toBeNull()
   })
 })
 
@@ -202,5 +202,55 @@ describe('pinning', () => {
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
     const star = screen.getAllByRole('switch', { name: new RegExp(en.favorites.removeFavorite) })[0]
     expect(star.getAttribute('aria-checked')).toBe('true')
+  })
+})
+
+describe('polish shared with RA', () => {
+  test('pinned achievements lead the list, highlighted', () => {
+    pins(true, ['THIRD'])
+    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
+    expect(rowOrder()).toEqual(['THIRD', 'FIRST', 'SECOND', 'FOURTH'])
+    expect(screen.getByRole('table').querySelector('[data-ach="THIRD"]')!.className).toContain('bg-warning/10')
+  })
+
+  test('the fold bar on top shows how many the filter leaves', () => {
+    render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
+    const [bar] = screen.getAllByRole('button', { name: new RegExp(en.gameInfoTable.collapseTable) })
+    expect(bar).toHaveAttribute('aria-expanded', 'true')
+    expect(bar).toHaveTextContent('4 / 4')
+  })
+
+  test('an achievement opens in a detail window with guide links, and closes', () => {
+    render(<SteamGameInfoTable achievements={[ach('WIN', { title: 'Victoria', titleEn: 'Win', globalPct: 12.5 })]} appId={620} gameTitle="Portal 2" />)
+    fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'Victoria' }))
+
+    const dialog = screen.getByRole('dialog', { name: 'Victoria' })
+    expect(within(dialog).getByText('12.5%')).toBeInTheDocument()
+    // Guides are searched by the English name.
+    expect(within(dialog).getByRole('link', { name: en.achievementDetail.steamGuides })).toHaveAttribute(
+      'href',
+      'https://steamcommunity.com/app/620/guides/?searchText=Win',
+    )
+    fireEvent.click(within(dialog).getByRole('button', { name: en.achievementDetail.close }))
+  })
+
+  test('a secret one still locked gets no guide links: a search would give it away', () => {
+    render(<SteamGameInfoTable achievements={[ach('SECRET', { hidden: true })]} appId={620} gameTitle="Portal 2" />)
+    fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: en.steam.hiddenAchievement }))
+    expect(within(screen.getByRole('dialog')).queryByRole('link')).toBeNull()
+  })
+
+  test('locked ones that may need online play are listed in a warning, which opens them', () => {
+    render(
+      <SteamGameInfoTable
+        achievements={[ach('MP', { title: 'Win online', likelyOnline: true }), ach('DONE', { likelyOnline: true, earned: true }), ach('SP')]}
+        appId={620}
+        gameTitle="Portal 2"
+      />,
+    )
+    const warning = screen.getByRole('button', { name: `${en.steam.onlineWarning} (1)` })
+    fireEvent.click(warning)
+    fireEvent.click(screen.getAllByRole('button', { name: /Win online/ })[0])
+    expect(screen.getByRole('dialog', { name: 'Win online' })).toBeInTheDocument()
   })
 })

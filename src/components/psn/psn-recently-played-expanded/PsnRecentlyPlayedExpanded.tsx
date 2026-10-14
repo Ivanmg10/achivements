@@ -7,7 +7,6 @@ import { GameAchievementsProgressChart } from '@/components/game-achievements-pr
 import { PsnTrophyGrid } from '@/components/psn/psn-trophy-grid/PsnTrophyGrid'
 import PsnRarestTrophies from '@/components/psn/psn-rarest-trophies/PsnRarestTrophies'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
-import { BASE_GROUP } from '@/utils/psnTitles'
 import type { PsnGameProgress } from '@/types/psn'
 
 const SKELETON_BADGES = 24
@@ -24,10 +23,9 @@ export default function PsnRecentlyPlayedExpanded({ game }: { game: PsnGameProgr
   const { trophies, groups, isLoading, error, retry } = usePsnTrophies(game.titleId)
 
   const loaded = trophies.length > 0
-  // The ring goes by the base game, as "completed" does; DLC shows in the grid below it.
-  const base = groups.length > 1 ? trophies.filter((t) => t.groupId === BASE_GROUP) : trophies
-  const total = loaded ? base.length : game.maxPossible
-  const earned = loaded ? base.filter((t) => t.earned).length : game.numAwarded
+  // The whole set, DLC included, as "completed" counts it.
+  const total = loaded ? trophies.length : game.maxPossible
+  const earned = loaded ? trophies.filter((t) => t.earned).length : game.numAwarded
 
   // The chart only reads earn dates; PSN has no hardcore.
   const unlocks = trophies.map((t) => ({ DateEarned: t.earnedAt, DateEarnedHardcore: null }))
