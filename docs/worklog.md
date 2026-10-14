@@ -45,7 +45,7 @@ opened on the web start from the same template. And
 `.github/workflows/pr-description.yml`, the first GitHub Action in the repo: it
 fails a PR whose description is missing a section or leaves one blank.
 **Watch out** — For the check to block merging it must be added as a required
-status check in the branch protection of `develop` and `main` (GitHub settings,
+status check, named `pr-description`, in a ruleset on `develop` and `main` (GitHub settings,
 not code). The body reaches the script through `env`, never `${{ }}` inside
 `run:`, so a PR description cannot inject shell.
 **Open** — Nothing from this session.

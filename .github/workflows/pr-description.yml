@@ -9,7 +9,7 @@ on:
 permissions: {}
 
 jobs:
-  check:
+  pr-description:
     runs-on: ubuntu-latest
     steps:
       - name: Every section of the template is filled in
