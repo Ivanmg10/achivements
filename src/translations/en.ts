@@ -777,7 +777,7 @@ export const en = {
     achievements: 'achievements',
   },
   cards: {
-    sectionFriends: 'Friends',
+    sectionFriends: 'Following',
     statsActivity: 'Stats & Activity',
     dailyAchievements: 'Daily achievements — last 7 days',
     activityLabel: 'Activity',
@@ -1096,7 +1096,7 @@ export const en = {
     windowNote: 'Activity from the last {n} days.',
     limitNote: 'Ranks your {n} newest follows.',
     partialNote: 'Some data could not be read',
-    feed: 'Latest from your friends',
+    feed: 'Latest from who you follow',
     feedEmpty: 'Nothing unlocked lately',
     shared: 'Games you play together',
     sharedEmpty: 'No games in common yet',
@@ -1106,7 +1106,7 @@ export const en = {
     noPins: 'No pinned achievements',
     publicGroups: '{n} public groups',
     weekUnlocks: '{n} unlocks this week',
-    loading: 'Loading your friends…',
+    loading: 'Loading who you follow…',
   },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',

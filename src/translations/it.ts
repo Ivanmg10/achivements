@@ -776,7 +776,7 @@ export const it: Translations = {
     achievements: 'obiettivi',
   },
   cards: {
-    sectionFriends: 'Amici',
+    sectionFriends: 'Seguiti',
     statsActivity: 'Statistiche & Attività',
     dailyAchievements: 'Obiettivi giornalieri — ultimi 7 giorni',
     activityLabel: 'Attività',
@@ -1095,7 +1095,7 @@ export const it: Translations = {
     windowNote: 'Attività degli ultimi {n} giorni.',
     limitNote: 'Include i tuoi {n} seguiti più recenti.',
     partialNote: 'Alcuni dati non sono stati letti',
-    feed: 'Le ultime dei tuoi amici',
+    feed: 'Le ultime da chi segui',
     feedEmpty: 'Niente sbloccato di recente',
     shared: 'Giochi in comune',
     sharedEmpty: 'Ancora nessun gioco in comune',
@@ -1105,7 +1105,7 @@ export const it: Translations = {
     noPins: 'Nessun obiettivo fissato',
     publicGroups: '{n} gruppi pubblici',
     weekUnlocks: '{n} obiettivi questa settimana',
-    loading: 'Caricamento degli amici…',
+    loading: 'Caricamento dei seguiti…',
   },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',

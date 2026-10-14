@@ -776,7 +776,7 @@ export const ja: Translations = {
     achievements: '実績',
   },
   cards: {
-    sectionFriends: 'フレンド',
+    sectionFriends: 'フォロー中',
     statsActivity: '統計 & アクティビティ',
     dailyAchievements: 'デイリー実績 — 直近7日間',
     activityLabel: 'アクティビティ',
@@ -1095,7 +1095,7 @@ export const ja: Translations = {
     windowNote: '過去{n}日間のアクティビティ。',
     limitNote: '最近フォローした{n}人が対象です。',
     partialNote: '一部のデータを読み込めませんでした',
-    feed: 'フレンドの最新の実績',
+    feed: 'フォロー中のユーザーの最新の実績',
     feedEmpty: '最近の解除はありません',
     shared: '共通のゲーム',
     sharedEmpty: '共通のゲームはまだありません',
@@ -1105,7 +1105,7 @@ export const ja: Translations = {
     noPins: 'ピン留めした実績はありません',
     publicGroups: '公開グループ {n}',
     weekUnlocks: '今週の実績 {n}',
-    loading: 'フレンドを読み込み中…',
+    loading: 'フォロー中のユーザーを読み込み中…',
   },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',

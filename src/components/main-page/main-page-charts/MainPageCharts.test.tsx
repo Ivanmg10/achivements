@@ -166,11 +166,11 @@ describe('sections', () => {
     expect(screen.getByTestId('collection')).toBeInTheDocument()
   })
 
-  test('Friends is a section of its own, told when it is open so it loads only then', () => {
+  test('Following is a section of its own, told when it is open so it loads only then', () => {
     platform('ra')
     render(<MainPageCharts />)
     expect(screen.getByTestId('friends')).toHaveAttribute('data-active', 'false')
-    fireEvent.click(screen.getByRole('tab', { name: 'Friends' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Following' }))
     expect(screen.getByTestId('friends')).toHaveAttribute('data-active', 'true')
   })
 })

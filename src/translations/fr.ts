@@ -776,7 +776,7 @@ export const fr: Translations = {
     achievements: 'succès',
   },
   cards: {
-    sectionFriends: 'Amis',
+    sectionFriends: 'Abonnements',
     statsActivity: 'Statistiques & Activité',
     dailyAchievements: 'Succès quotidiens — 7 derniers jours',
     activityLabel: 'Activité',
@@ -1095,7 +1095,7 @@ export const fr: Translations = {
     windowNote: 'Activité des {n} derniers jours.',
     limitNote: 'Inclut tes {n} abonnements les plus récents.',
     partialNote: 'Certaines données n’ont pas pu être lues',
-    feed: 'Les dernières de tes amis',
+    feed: 'Les dernières de tes abonnements',
     feedEmpty: 'Rien de débloqué ces derniers temps',
     shared: 'Jeux en commun',
     sharedEmpty: 'Pas encore de jeux en commun',
@@ -1105,7 +1105,7 @@ export const fr: Translations = {
     noPins: 'Aucun succès épinglé',
     publicGroups: '{n} groupes publics',
     weekUnlocks: '{n} succès cette semaine',
-    loading: 'Chargement de tes amis…',
+    loading: 'Chargement de tes abonnements…',
   },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',

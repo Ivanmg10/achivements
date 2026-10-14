@@ -776,7 +776,7 @@ export const ru: Translations = {
     achievements: 'достижений',
   },
   cards: {
-    sectionFriends: 'Друзья',
+    sectionFriends: 'Подписки',
     statsActivity: 'Статистика & Активность',
     dailyAchievements: 'Ежедневные достижения — последние 7 дней',
     activityLabel: 'Активность',
@@ -1095,7 +1095,7 @@ export const ru: Translations = {
     windowNote: 'Активность за последние {n} дней.',
     limitNote: 'Учитываются {n} последних подписок.',
     partialNote: 'Часть данных не удалось прочитать',
-    feed: 'Последнее от друзей',
+    feed: 'Последнее от ваших подписок',
     feedEmpty: 'В последнее время ничего не открыто',
     shared: 'Общие игры',
     sharedEmpty: 'Общих игр пока нет',
@@ -1105,7 +1105,7 @@ export const ru: Translations = {
     noPins: 'Нет закреплённых достижений',
     publicGroups: 'Публичных групп: {n}',
     weekUnlocks: 'Достижений за неделю: {n}',
-    loading: 'Загрузка друзей…',
+    loading: 'Загрузка подписок…',
   },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',

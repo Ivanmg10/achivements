@@ -776,7 +776,7 @@ export const pt: Translations = {
     achievements: 'conquistas',
   },
   cards: {
-    sectionFriends: 'Amigos',
+    sectionFriends: 'A seguir',
     statsActivity: 'Estatísticas & Atividade',
     dailyAchievements: 'Conquistas diárias — últimos 7 dias',
     activityLabel: 'Atividade',
@@ -1095,7 +1095,7 @@ export const pt: Translations = {
     windowNote: 'Atividade dos últimos {n} dias.',
     limitNote: 'Inclui os teus {n} seguidos mais recentes.',
     partialNote: 'Alguns dados não puderam ser lidos',
-    feed: 'O mais recente dos teus amigos',
+    feed: 'O mais recente de quem segues',
     feedEmpty: 'Nada desbloqueado ultimamente',
     shared: 'Jogos em comum',
     sharedEmpty: 'Ainda sem jogos em comum',
@@ -1105,7 +1105,7 @@ export const pt: Translations = {
     noPins: 'Sem conquistas afixadas',
     publicGroups: '{n} grupos públicos',
     weekUnlocks: '{n} conquistas esta semana',
-    loading: 'A carregar os teus amigos…',
+    loading: 'A carregar quem segues…',
   },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',
