@@ -31,7 +31,8 @@ export function usePsnRecentTrophies(scope: PsnTrophyScope | null = 'recent') {
   const request = useCallback(
     async (forKey: string): Promise<{ trophies: PsnRecentTrophy[] } | { error: PsnError }> => {
       try {
-        const [, forScope, forLang] = forKey.split(':')
+        // From the end: on a public profile the account part is "subject:<name>", colon included.
+        const [forScope, forLang] = forKey.split(':').slice(-2)
         const res = await fetch(withSubject(`/api/psn/recentTrophies?scope=${forScope}&lang=${forLang}`, subject), { cache: 'no-store' })
         if (!res.ok) return { error: await psnErrorFrom(res) }
         const data = await res.json()
