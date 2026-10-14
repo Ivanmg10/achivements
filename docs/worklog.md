@@ -25,6 +25,19 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-14 — Release v1.4.0 (`chore/release-v1.4.0`)
+
+**Did** — Bumped to 1.4.0 and opened the `develop` → `main` PR. Updated the
+milestones in `CLAUDE.md`.
+**Why** — `main` was still on 1.2.12; `develop` had 1.3.0 plus public
+profiles, follows and the Following section, which are new sections, so a
+minor bump per the versioning scheme.
+**Decisions** — 1.4.0 rather than shipping as 1.3.x (the user's call).
+Checked before opening: `main` has nothing `develop` lacks; migrations 031 and
+032 are applied (read-only query on the shared DB); no new required env var.
+**Open** — Merge the release PR with a **merge commit**, then check
+www.cheevovault.com.
+
 ## 2026-10-14 — README and internal docs (`docs/readme-and-agent-docs`)
 
 **Did** — Rewrote `README.md` (it still described Next 14, Steam over OpenID,
