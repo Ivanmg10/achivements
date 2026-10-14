@@ -3,7 +3,7 @@
 import { useId, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { IconActivity, IconAward, IconCompass, IconFolders, IconLayoutDashboard } from '@tabler/icons-react'
+import { IconActivity, IconAward, IconCompass, IconFolders, IconLayoutDashboard, IconUsers } from '@tabler/icons-react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useStreakData } from '@/hooks/useStreakData'
@@ -37,6 +37,7 @@ import MainPageStatsRail, { StatsSection } from '../main-page-stats-rail/MainPag
 import MainPageBrowse from '../main-page-browse/MainPageBrowse'
 import MainPageCollection from '../main-page-collection/MainPageCollection'
 import MainPageGroupsSection from '../main-page-groups-section/MainPageGroupsSection'
+import MainPageFriends from '../main-page-friends/MainPageFriends'
 
 /**
  * Stats & Activity. Cards whose idea carries over between platforms —
@@ -95,6 +96,7 @@ export default function MainPageCharts() {
       ? []
       : [
           { id: 'groups', label: T.cards.sectionGroups, icon: <IconFolders size={18} /> },
+          { id: 'friends', label: T.cards.sectionFriends, icon: <IconUsers size={18} /> },
           { id: 'browse', label: T.cards.sectionBrowse, icon: <IconCompass size={18} /> },
         ]),
   ]
@@ -177,6 +179,8 @@ export default function MainPageCharts() {
       </SectionFallback>
     ),
     groups: <MainPageGroupsSection />,
+    // Loads only once opened: each friend costs a few platform calls.
+    friends: <MainPageFriends active={section === 'friends'} myRecent={recent} />,
     browse: <MainPageBrowse />,
   }
 

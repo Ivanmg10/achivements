@@ -28,6 +28,10 @@ jest.mock('../main-page-collection/MainPageCollection', () => mockProbe('collect
 jest.mock('./MainPageBestPeriod', () => mockProbe('best'))
 jest.mock('./MainPageConsoleNav', () => mockProbe('nav'))
 jest.mock('../main-page-groups-section/MainPageGroupsSection', () => mockProbe('groups'))
+jest.mock('../main-page-friends/MainPageFriends', () => ({
+  __esModule: true,
+  default: ({ active }: { active: boolean }) => <div data-testid="friends" data-active={String(active)} />,
+}))
 jest.mock('../main-page-favorites/MainPageFavorites', () => mockProbe('favorites'))
 jest.mock('./main-page-steam-stats/MainPageSteamStats', () => mockProbe('steam-stats'))
 jest.mock('./main-page-steam-nav/MainPageSteamNav', () => mockProbe('steam-nav'))
@@ -146,10 +150,10 @@ describe('sections', () => {
     platform('ra')
     render(<MainPageCharts />)
     const panels = document.querySelectorAll('[role="tabpanel"]')
-    expect(panels).toHaveLength(5)
+    expect(panels).toHaveLength(6)
     for (const p of panels) if (p.getAttribute('aria-hidden') === 'true') expect(p).toHaveClass('hidden')
     const closed = [...panels].filter((p) => p.getAttribute('aria-hidden') === 'true')
-    expect(closed).toHaveLength(4)
+    expect(closed).toHaveLength(5)
     for (const p of closed) expect(p).toHaveAttribute('inert')
   })
 
@@ -160,5 +164,13 @@ describe('sections', () => {
     const panel = screen.getByRole('tabpanel')
     expect(panel).toHaveAccessibleName('Collection')
     expect(screen.getByTestId('collection')).toBeInTheDocument()
+  })
+
+  test('Friends is a section of its own, told when it is open so it loads only then', () => {
+    platform('ra')
+    render(<MainPageCharts />)
+    expect(screen.getByTestId('friends')).toHaveAttribute('data-active', 'false')
+    fireEvent.click(screen.getByRole('tab', { name: 'Friends' }))
+    expect(screen.getByTestId('friends')).toHaveAttribute('data-active', 'true')
   })
 })
