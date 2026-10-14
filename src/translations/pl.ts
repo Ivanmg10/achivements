@@ -1067,6 +1067,8 @@ export const pl: Translations = {
     resultsLabel: 'Znalezieni użytkownicy',
   },
   following: {
+    followers: 'Obserwujący',
+    countsError: 'Nie udało się policzyć obserwowanych i obserwujących.',
     title: 'Obserwowani',
     follow: 'Obserwuj',
     following: 'Obserwujesz',

@@ -7,6 +7,7 @@ import { IconAlertTriangle, IconCircleCheck, IconDeviceGamepad2, IconFolders, Ic
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
 import UserVaultStat from '@/components/user-page/user-vault-stat/UserVaultStat'
+import UserFollowStats from '@/components/user-page/user-follow-stats/UserFollowStats'
 import AdminPanelModal from '@/components/admin-panel/admin-panel-modal/AdminPanelModal'
 import EmailVerificationNotice from '@/components/user-page/email-verification-notice/EmailVerificationNotice'
 import EditProfileModal, { EditProfileField } from '@/components/edit-profile-modal/EditProfileModal'
@@ -181,6 +182,9 @@ export default function UserIdentityCard() {
             <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
           )}
         </ProfileField>
+        <div className="sm:col-span-3">
+          <UserFollowStats />
+        </div>
         <div className="sm:col-span-3 flex flex-col">
           <UserDescriptionField />
         </div>

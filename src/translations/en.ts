@@ -1068,6 +1068,8 @@ export const en = {
     resultsLabel: 'Users found',
   },
   following: {
+    followers: 'Followers',
+    countsError: 'Could not count who you follow and who follows you.',
     title: 'Following',
     follow: 'Follow',
     following: 'Following',

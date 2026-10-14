@@ -1067,6 +1067,8 @@ export const ru: Translations = {
     resultsLabel: 'Найденные пользователи',
   },
   following: {
+    followers: 'Подписчики',
+    countsError: 'Не удалось посчитать подписки и подписчиков.',
     title: 'Подписки',
     follow: 'Подписаться',
     following: 'Вы подписаны',

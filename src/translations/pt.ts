@@ -1067,6 +1067,8 @@ export const pt: Translations = {
     resultsLabel: 'Utilizadores encontrados',
   },
   following: {
+    followers: 'Seguidores',
+    countsError: 'Não foi possível contar quem segues e quem te segue.',
     title: 'A seguir',
     follow: 'Seguir',
     following: 'A seguir',

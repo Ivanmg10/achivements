@@ -1067,6 +1067,8 @@ export const ja: Translations = {
     resultsLabel: '見つかったユーザー',
   },
   following: {
+    followers: 'フォロワー',
+    countsError: 'フォロー数とフォロワー数を取得できませんでした。',
     title: 'フォロー中',
     follow: 'フォロー',
     following: 'フォロー中',
