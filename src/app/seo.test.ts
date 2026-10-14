@@ -35,7 +35,8 @@ test('the manifest names the app and points at both icons', () => {
 
 test('the iOS icon is a 180px square with the same CH as the favicon', () => {
   expect(size).toEqual({ width: 180, height: 180 })
-  const icon = AppleIcon() as unknown as { element: { props: { children: string } }; options: unknown }
-  expect(icon.element.props.children).toBe('CH')
+  const icon = AppleIcon() as unknown as { element: { props: { children: [string, { props: { children: string } }] } }; options: unknown }
+  const [c, h] = icon.element.props.children
+  expect(c + h.props.children).toBe('CH')
   expect(icon.options).toEqual(size)
 })

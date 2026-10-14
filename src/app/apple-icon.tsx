@@ -16,14 +16,13 @@ export default function AppleIcon() {
           justifyContent: 'center',
           background: '#0f1014',
           color: '#fafaff',
-          fontSize: 84,
-          fontWeight: 800,
-          letterSpacing: -3,
+          fontSize: 80,
+          fontWeight: 600,
+          letterSpacing: 2,
           fontFamily: 'sans-serif',
-          borderBottom: '10px solid #3ddc84',
         }}
       >
-        CH
+        C<span style={{ color: '#3ddc84' }}>H</span>
       </div>
     ),
     size,
