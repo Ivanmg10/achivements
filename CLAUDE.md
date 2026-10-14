@@ -122,6 +122,29 @@ Every new feature, hook, or utility must include tests. Tests live alongside the
 - Run `npm test` before marking any task done
 - Do not leave untested code — if it's complex enough to extract, it's complex enough to test
 
+## Documentation — MANDATORY (every session and agent)
+
+The next agent starts with no memory of this one. What is not written down is
+lost. Index of the docs: `docs/README.md`.
+
+- **Start of a session:** read the top entries of `docs/worklog.md` to pick up
+  what was done last, what was decided, and what was left open.
+- **End of every task that changes the repo** (code, config, migrations, docs):
+  add an entry at the top of `docs/worklog.md` — did / why / decisions / open /
+  watch out, as its template says. It goes in the same branch and PR as the work,
+  before the last commit. A task is not done without it.
+- **A rule or invariant changed or was learned** (a "never do X", how a
+  platform must be called, a new env var, a migration that must run, a release
+  gate) → update the matching section of this file in the same change. Do not
+  leave a section that says the opposite of the code.
+- **The layout changed** (new folder, route area, cache, data path) → update
+  `docs/architecture.md`.
+- **User-visible features, setup or env vars changed** → update `README.md`
+  (and `.env.example` for a variable).
+- Write for someone who has not seen the conversation: name files, say why,
+  give absolute dates (not "yesterday"). No secrets, keys or user data in any doc.
+- If the user said not to, or the task touched nothing, skip it and say so.
+
 ## Non-negotiable standards (apply to ALL work)
 
 ### 1. Responsive
@@ -420,6 +443,21 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
   ## Notes
   <migrations to run, env vars, user-visible changes, follow-ups — or "None">
   ```
+  The same template is in `.github/pull_request_template.md`, so GitHub fills it in
+  for a PR opened from the web.
+- **Never open a PR with an empty or placeholder description.** Whoever opens it
+  (agent or `gh pr create`) writes the full template from the branch's commits and
+  diff (`git log develop..HEAD`, `git diff develop...HEAD --stat`), not from memory.
+- **Keep it current.** Every time more commits are pushed to a branch with an open
+  PR, reread the description and update it (`gh pr edit <n> --body-file …`) if the
+  change moved what, why, how to test or notes — a new migration or env var always
+  does. The title too, if the scope changed. The description must describe the
+  final diff, since it is what gets reviewed and what the squash message is read
+  against.
+- **Enforced in CI**: `.github/workflows/pr-description.yml` fails the PR while any
+  of the four sections is missing or empty (the template's `<!-- -->` hints do not
+  count; `None` does). It reruns when the description is edited — fix the text, not
+  the workflow, and never merge with it red.
 - Base branch: `develop` for normal work, `main` only for `develop` → `main` releases and hotfixes.
 - One concern per PR, small enough to review. Before opening: `npm test`, lint and
   `npm run build` pass.
@@ -431,7 +469,18 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
 
 ### Environments (set up 2026-10-10)
 `develop` is served at `dev.cheevovault.com` (Vercel Preview, branch `develop`). `main` and
-`develop` are protected on GitHub (PR required, no force-push).
+`develop` are protected on GitHub (PR required, no force-push). A third ruleset,
+`pr description` (2026-10-14), requires the `pr-description` check to pass **and the
+branch to be up to date with its base** before merging, on both.
+
+- **Before merging, bring the branch up to date**: `git fetch` and `git merge
+  origin/develop` (or the "Update branch" button), push, wait for the checks again.
+  Merge, not rebase — a rebase would need a force-push.
+- **`src/lib/version.ts` and `package.json` will conflict** on that merge whenever
+  `develop` moved, since every commit bumps the patch. Keep the **higher** version
+  in both; never go back below what `develop` already has.
+- A `develop` → `main` PR needs `develop` to contain `main`; after a hotfix, merge
+  `main` back into `develop` first (as the flow above already says).
 
 - **`develop` shares the production database** (the Neon integration's `DATABASE_URL`),
   by the user's choice for now. So testing on develop touches real data: **never run a
@@ -467,3 +516,13 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
 - [ ] 13 optimization fixes (cache stampede, Cache-Control headers, duplicate fetches, TTLs, error boundaries, lazy images)
 - [x] The ~51 `react-hooks/set-state-in-effect` warnings are gone (2026-10-09)
       and the rule is now an error. See State and effects above.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

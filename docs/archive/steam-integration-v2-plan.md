@@ -1,3 +1,8 @@
+> **Archived (2026-10-14).** The plan written before the Steam work. Much of it no
+> longer holds: Steam is linked by name, not OpenID (`src/lib/steamAccount.ts`),
+> the app is on Next.js 16, and `REGISTER_TOKEN` is gone. Kept for the reasoning;
+> `CLAUDE.md` is what is true now.
+
 # Steam Integration — v2 Plan
 
 ## Resumen
