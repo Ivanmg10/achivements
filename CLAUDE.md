@@ -188,9 +188,13 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 - `1.0.0` — released 2026-10-02: Steam integration, every release gate below
   closed, privacy policy and account deletion
 - `1.x.0` — new sections (see Roadmap); `1.x.y` — fixes
-- `1.3.0` — current: a loading state on every route (its own skeleton, and a
-  thin line along the top while a page is on its way) and the functions in
-  `fra1`, next to the database
+- `1.3.0` — a loading state on every route (its own skeleton, and a thin line
+  along the top while a page is on its way) and the functions in `fra1`, next
+  to the database. Never reached `main` on its own; it shipped inside 1.4.0
+- `1.4.0` — current, released to `main` 2026-10-14: public profiles rebuilt
+  (hero with tabs, opt-in gender, open and compare a user's game), follows and
+  the Following section, theme accents reworked, "Ask an AI" export, internal
+  docs and the PR description check
 
 ## Release gates — what had to be true before 1.0 (all closed)
 
