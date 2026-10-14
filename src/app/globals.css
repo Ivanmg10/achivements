@@ -51,10 +51,10 @@
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
 
-  /* The light theme's indigo, a step lighter so it stands out on a dark surface. */
-  --accent: 129 140 248;
-  --accent-hover: 165 180 252;
-  --accent-muted: 129 140 248;
+  /* Violet, a step lighter than the light theme's so it stands out on a dark surface. */
+  --accent: 167 139 250;
+  --accent-hover: 196 181 253;
+  --accent-muted: 167 139 250;
 
   --success: 34 197 94;
   --warning: 245 158 11;
@@ -78,10 +78,10 @@
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
 
-  /* The light theme's indigo, a step lighter so it stands out on a dark surface. */
-  --accent: 129 140 248;
-  --accent-hover: 165 180 252;
-  --accent-muted: 129 140 248;
+  /* Violet, a step lighter than the light theme's so it stands out on a dark surface. */
+  --accent: 167 139 250;
+  --accent-hover: 196 181 253;
+  --accent-muted: 167 139 250;
 
   --success: 34 197 94;
   --warning: 245 158 11;
@@ -103,9 +103,9 @@
   --text-main: 32 34 40;
   --text-secondary: 88 92 102;
 
-  --accent: 79 70 229;
-  --accent-hover: 67 56 202;
-  --accent-muted: 79 70 229;
+  --accent: 124 58 237;
+  --accent-hover: 109 40 217;
+  --accent-muted: 124 58 237;
 
   --success: 22 101 52;
   --warning: 146 64 14;
@@ -189,7 +189,7 @@
 
   --success: 34 197 94;
   --warning: 245 158 11;
-  --info: 56 189 248;
+  --info: 34 211 238;
   --danger: 239 68 68;
   --chart-2: 245 158 11;
 }
@@ -299,9 +299,9 @@
   --text-main: 205 214 244;
   --text-secondary: 166 173 200;
 
-  --accent: 180 190 254;
-  --accent-hover: 200 207 255;
-  --accent-muted: 180 190 254;
+  --accent: 203 166 247;
+  --accent-hover: 218 190 250;
+  --accent-muted: 203 166 247;
 
   --success: 166 227 161;
   --warning: 249 226 175;
@@ -368,9 +368,9 @@
   --text-main: 235 236 240;
   --text-secondary: 150 152 160;
 
-  --accent: 235 236 240;
-  --accent-hover: 250 250 252;
-  --accent-muted: 235 236 240;
+  --accent: 167 139 250;
+  --accent-hover: 196 181 253;
+  --accent-muted: 167 139 250;
 
   --success: 34 197 94;
   --warning: 245 158 11;
@@ -411,7 +411,7 @@
   --bg-card: 10 20 14;
   --bg-tertiary: 18 34 24;
 
-  --text-main: 190 240 200;
+  --text-main: 205 224 210;
   --text-secondary: 110 160 125;
 
   --accent: 74 222 128;
@@ -600,9 +600,9 @@
   --text-main: 226 220 196;
   --text-secondary: 160 156 128;
 
-  --accent: 204 172 112;
-  --accent-hover: 222 194 140;
-  --accent-muted: 204 172 112;
+  --accent: 222 176 72;
+  --accent-hover: 236 196 100;
+  --accent-muted: 222 176 72;
 
   --success: 132 204 22;
   --warning: 251 146 60;

@@ -128,7 +128,7 @@ describe('the scale and the summary', () => {
     render(<MainPageHeatmap achievements={[...busy, unlock(today(3), 'one')]} />)
     const busiest = document.querySelector(`[data-date="${today(1)}"]`) as HTMLElement
     const quiet = document.querySelector(`[data-date="${today(3)}"]`) as HTMLElement
-    expect(busiest.style.backgroundColor).toBe('rgb(var(--accent) / 0.95)')
+    expect(busiest.style.backgroundColor).toBe('color-mix(in oklab, rgb(var(--accent)) 78%, rgb(var(--ink)))')
     expect(quiet.style.backgroundColor).not.toBe(busiest.style.backgroundColor)
     expect(quiet.style.backgroundColor).not.toBe('rgb(var(--bg-header))')
   })
