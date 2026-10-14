@@ -1057,6 +1057,11 @@ export const en = {
     linkToCompare: 'Link your {platform} account to compare.',
     linkAccount: 'Link it',
   },
+  userSearch: {
+    recent: 'Recent',
+    clearRecent: 'Clear',
+    resultsLabel: 'Users found',
+  },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',
     recentActivity: 'Recent activity',

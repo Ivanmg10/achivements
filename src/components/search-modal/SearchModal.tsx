@@ -3,15 +3,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { IconSearch, IconX, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { useRaLinked } from '@/hooks/useRaLinked'
 import { useUserSearch } from '@/hooks/useUserSearch'
+import { useRecentUsers, type RecentUser } from '@/hooks/useRecentUsers'
 import { searchCandidates } from '@/utils/gameCandidates'
 import { GAME_SOURCES, gameHref, GameRef } from '@/utils/gameRef'
 import SearchModalGameResult from './search-modal-game-result/SearchModalGameResult'
+import SearchModalUserResults from './search-modal-user-results/SearchModalUserResults'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import type { GameSource } from '@/types/steam'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
@@ -51,6 +52,8 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   const [platformFilter, setPlatformFilter] = useState<PlatformFilter>('all')
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const userListRef = useRef<HTMLUListElement>(null)
+  const { recent, remember, clear: clearRecent } = useRecentUsers()
 
   // Opening seeds the search, closing clears it; state, so while rendering. Only
   // `isOpen` matters: a different initialQuery while open must not wipe what was typed.
@@ -111,11 +114,12 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   const placeholder = tab === 'users' ? T.publicProfile.searchUsersPlaceholder : T.search.placeholder
 
   const handleUserSelect = useCallback(
-    (username: string) => {
-      router.push(`/user/${encodeURIComponent(username)}`)
+    (user: RecentUser) => {
+      remember(user)
+      router.push(`/user/${encodeURIComponent(user.username)}`)
       onClose()
     },
-    [router, onClose],
+    [router, onClose, remember],
   )
 
   return (
@@ -145,6 +149,14 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                   ref={inputRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    // ↓ goes into the users found (or the recent ones).
+                    if (tab !== 'users' || e.key !== 'ArrowDown') return
+                    const first = userListRef.current?.querySelector<HTMLButtonElement>('button[data-user-option]')
+                    if (!first) return
+                    e.preventDefault()
+                    first.focus()
+                  }}
                   placeholder={placeholder}
                   className="flex-1 bg-transparent text-text-main text-base outline-none placeholder:text-text-secondary"
                   aria-label={placeholder}
@@ -259,43 +271,14 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
               {/* Results — Users */}
               {tab === 'users' && (
                 <div className="max-h-105 overflow-y-auto">
-                  {!users.active ? (
-                    <p className="text-text-secondary text-xs text-center py-6 px-4">{T.publicProfile.searchUsersHint}</p>
-                  ) : users.isLoading ? (
-                    <div className="flex items-center gap-3 px-4 py-3">
-                      <div className="w-8 h-8 rounded-full bg-ink/10 animate-pulse shrink-0" />
-                      <div className="h-4 bg-ink/10 rounded animate-pulse w-32" />
-                    </div>
-                  ) : users.error ? (
-                    <p role="alert" className="text-red-400 text-sm text-center py-8 px-4">{T.publicProfile.userLoadError}</p>
-                  ) : users.results.length === 0 ? (
-                    <p className="text-text-secondary text-sm text-center py-8 px-4">{T.publicProfile.noUserFound}</p>
-                  ) : (
-                    <motion.ul initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.04 } } }}>
-                      {users.results.map((u) => (
-                        <motion.li key={u.username} variants={resultVariants}>
-                          <button
-                            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer"
-                            onClick={() => handleUserSelect(u.username)}
-                          >
-                            {u.avatar ? (
-                              <Image src={u.avatar} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover shrink-0" unoptimized />
-                            ) : (
-                              <span aria-hidden="true" className="w-8 h-8 rounded-full bg-bg-main flex items-center justify-center shrink-0">
-                                <IconUser className="w-4 h-4 text-text-secondary" />
-                              </span>
-                            )}
-                            <p className="flex-1 min-w-0 truncate text-sm font-medium text-text-main">{u.username}</p>
-                            <span className="flex items-center gap-1.5 shrink-0">
-                              {(['ra', 'steam', 'psn'] as GameSource[]).filter((p) => u[p]).map((p) => (
-                                <PlatformLogo key={p} source={p} size={12} />
-                              ))}
-                            </span>
-                          </button>
-                        </motion.li>
-                      ))}
-                    </motion.ul>
-                  )}
+                  <SearchModalUserResults
+                    users={users}
+                    recent={recent}
+                    onClearRecent={clearRecent}
+                    onSelect={handleUserSelect}
+                    listRef={userListRef}
+                    inputRef={inputRef}
+                  />
                 </div>
               )}
             </motion.div>

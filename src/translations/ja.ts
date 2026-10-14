@@ -1056,6 +1056,11 @@ export const ja: Translations = {
     linkToCompare: '比較するには{platform}アカウントを連携してください。',
     linkAccount: '連携する',
   },
+  userSearch: {
+    recent: '最近',
+    clearRecent: '消去',
+    resultsLabel: '見つかったユーザー',
+  },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',
     recentActivity: 'Recent activity',

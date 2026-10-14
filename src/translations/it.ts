@@ -1056,6 +1056,11 @@ export const it: Translations = {
     linkToCompare: 'Collega il tuo account {platform} per confrontare.',
     linkAccount: 'Collega',
   },
+  userSearch: {
+    recent: 'Recenti',
+    clearRecent: 'Cancella',
+    resultsLabel: 'Utenti trovati',
+  },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',
     recentActivity: 'Recent activity',

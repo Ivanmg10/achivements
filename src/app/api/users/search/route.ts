@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const { rows } = await pool.query(
-      `SELECT username, avatar,
+      `SELECT username, avatar, location, LEFT(description, 120) AS description,
               rausername IS NOT NULL AS ra, steamid IS NOT NULL AS steam, psnaccountid IS NOT NULL AS psn
        FROM users
        WHERE username ILIKE $1 || '%' AND (profile_public OR id = $3::int)

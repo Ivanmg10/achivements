@@ -1056,6 +1056,11 @@ export const ru: Translations = {
     linkToCompare: 'Привяжите аккаунт {platform}, чтобы сравнить.',
     linkAccount: 'Привязать',
   },
+  userSearch: {
+    recent: 'Недавние',
+    clearRecent: 'Очистить',
+    resultsLabel: 'Найденные пользователи',
+  },
   publicProfile: {
     notFound: 'User "{u}" not found on RetroAchievements',
     recentActivity: 'Recent activity',

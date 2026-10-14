@@ -1,7 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 
-export type UserSearchResult = { username: string; avatar: string | null; ra: boolean; steam: boolean; psn: boolean }
+export type UserSearchResult = {
+  username: string
+  avatar: string | null
+  /** Country code. */
+  location?: string | null
+  /** The start of what they wrote about themselves. */
+  description?: string | null
+  ra: boolean
+  steam: boolean
+  psn: boolean
+}
 
 export const USER_SEARCH_MIN = 3
 const DEBOUNCE_MS = 300
