@@ -973,6 +973,7 @@ export const de: Translations = {
     consoleBreakdownTitle: 'Rank by console',
   },
   userProfile: {
+    noGroupsHint: 'Gruppen, die öffentlich gemacht werden, erscheinen hier',
     sectionsLabel: 'Profilbereiche',
     tabOverview: 'Übersicht',
     tabGames: 'Spiele',

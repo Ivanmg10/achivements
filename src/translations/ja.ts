@@ -973,6 +973,7 @@ export const ja: Translations = {
     consoleBreakdownTitle: 'Rank by console',
   },
   userProfile: {
+    noGroupsHint: '公開されたグループはここに表示されます',
     sectionsLabel: 'プロフィールのセクション',
     tabOverview: '概要',
     tabGames: 'ゲーム',

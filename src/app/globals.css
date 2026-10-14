@@ -726,3 +726,11 @@
   from { width: 0; }
   to { width: 85%; }
 }
+
+/*
+   A user's profile, Overview: Recently played sits beside their platform
+   profile, as tall as that column. Its rows (flex: 1 1 0 inline, ROW_STYLE)
+   may grow to share the spare height but never shrink below their content.
+*/
+.profile-recent .home-fit-scroll > * { flex: 1 0 auto !important; }
+.profile-recent .home-fit-scroll > * > * { justify-content: center; }

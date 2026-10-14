@@ -27,15 +27,15 @@ export default function PublicUserShowcase() {
   const latest = useMemo(() => latestPerfects(awards?.VisibleUserAwards, steam, SHELF, psn), [awards, steam, psn])
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 items-start">
-      <ChartCard className="xl:col-span-3">
+    <div className="flex flex-col gap-4">
+      <ChartCard>
         {gamesLoading || awardsLoading ? (
           <div aria-busy="true" className="h-60 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
         ) : (
           <CollectionShelf games={latest} counts={counts} />
         )}
       </ChartCard>
-      <ChartCard className="xl:col-span-2">
+      <ChartCard>
         <MainPageFavorites />
       </ChartCard>
     </div>

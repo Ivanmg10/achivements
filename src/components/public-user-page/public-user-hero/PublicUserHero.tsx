@@ -76,7 +76,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
               <button
                 type="button"
                 onClick={onCompare}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-accent/15 text-accent hover:bg-accent/25 transition-colors font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-accent text-bg-main hover:bg-accent/85 shadow-lg shadow-black/20 transition-colors font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 <IconArrowsDiff size={13} aria-hidden="true" />
                 {T.userProfile.compareWithMe}

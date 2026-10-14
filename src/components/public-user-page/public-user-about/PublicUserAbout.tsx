@@ -11,6 +11,7 @@ import type { GameSource } from '@/types/steam'
 import { candidateIconUrl } from '@/utils/gameCandidates'
 import { gameHref } from '@/utils/gameRef'
 import GroupCard from '@/components/groups/group-card/GroupCard'
+import EmptyState from '@/components/empty-state/EmptyState'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
@@ -51,7 +52,7 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
   const groups = user.groups ?? []
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <section aria-labelledby="public-user-preferences" className="bg-bg-card rounded-xl p-4 flex flex-col gap-4">
         <h2 id="public-user-preferences" className="text-[10px] uppercase tracking-widest text-text-secondary">
           {T.userProfile.preferences}
@@ -103,7 +104,7 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
           {T.userProfile.publicGroups}
         </h2>
         {groups.length === 0 ? (
-          <p className="text-xs text-text-secondary italic">{T.userProfile.noGroups}</p>
+          <EmptyState icon={<IconFolders className="w-6 h-6" />} title={T.userProfile.noGroups} subtitle={T.userProfile.noGroupsHint} className="py-8" />
         ) : (
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {groups.map((g) => (

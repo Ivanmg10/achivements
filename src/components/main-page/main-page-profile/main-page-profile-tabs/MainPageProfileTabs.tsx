@@ -58,7 +58,7 @@ export default function MainPageProfileTabs<T extends string>({
     <div
       role="tablist"
       aria-label={label ?? T.steam.profileTabsLabel}
-      className={`flex items-center w-full px-1 border-b border-ink/5 ${size === 'md' ? 'gap-5 overflow-x-auto' : 'gap-4'}`}
+      className={`flex items-center w-full px-1 border-b border-ink/5 ${size === 'md' ? 'gap-5 overflow-x-auto overflow-y-hidden' : 'gap-4'}`}
     >
       {tabs.map((tab, i) => {
         const active = tab.id === selected

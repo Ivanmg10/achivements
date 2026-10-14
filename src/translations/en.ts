@@ -974,6 +974,7 @@ export const en = {
     consoleBreakdownTitle: 'Rank by console',
   },
   userProfile: {
+    noGroupsHint: 'Groups they make public will show here',
     sectionsLabel: 'Profile sections',
     tabOverview: 'Overview',
     tabGames: 'Games',
