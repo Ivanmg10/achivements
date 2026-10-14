@@ -7,6 +7,7 @@ import { IconAlertTriangle, IconCircleCheck, IconDeviceGamepad2, IconFolders, Ic
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
 import UserVaultStat from '@/components/user-page/user-vault-stat/UserVaultStat'
+import UserFollowStats from '@/components/user-page/user-follow-stats/UserFollowStats'
 import AdminPanelModal from '@/components/admin-panel/admin-panel-modal/AdminPanelModal'
 import EmailVerificationNotice from '@/components/user-page/email-verification-notice/EmailVerificationNotice'
 import EditProfileModal, { EditProfileField } from '@/components/edit-profile-modal/EditProfileModal'
@@ -52,10 +53,10 @@ export default function UserIdentityCard() {
 
   const totals = [
     { label: T.userStats.games, value: all.length + steam.totalGames, accent: 'text-text-main', icon: <IconDeviceGamepad2 size={18} /> },
-    { label: T.userStats.inProgress, value: inProgress.length + steam.playing, accent: 'text-amber-400', icon: <IconPlayerPlay size={18} /> },
-    { label: T.groups.filter100, value: completedRa + steam.perfect, accent: 'text-green-400', icon: <IconCircleCheck size={18} /> },
-    { label: T.groups.title, value: groups.length, accent: 'text-accent', icon: <IconFolders size={18} /> },
-    { label: T.pinnedGames.title, value: pins.length, accent: 'text-blue-400', icon: <IconPin size={18} /> },
+    { label: T.userStats.inProgress, value: inProgress.length + steam.playing, accent: 'text-text-main', icon: <IconPlayerPlay size={18} /> },
+    { label: T.groups.filter100, value: completedRa + steam.perfect, accent: 'text-success', icon: <IconCircleCheck size={18} /> },
+    { label: T.groups.title, value: groups.length, accent: 'text-text-main', icon: <IconFolders size={18} /> },
+    { label: T.pinnedGames.title, value: pins.length, accent: 'text-text-main', icon: <IconPin size={18} /> },
   ]
 
   return (
@@ -181,6 +182,9 @@ export default function UserIdentityCard() {
             <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
           )}
         </ProfileField>
+        <div className="sm:col-span-3">
+          <UserFollowStats />
+        </div>
         <div className="sm:col-span-3 flex flex-col">
           <UserDescriptionField />
         </div>

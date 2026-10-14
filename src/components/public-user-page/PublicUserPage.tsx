@@ -1,68 +1,65 @@
 'use client'
 
-import PublicUserSkeleton from './public-user-skeleton/PublicUserSkeleton'
-import { motion } from 'framer-motion'
-import { IconUserOff } from '@tabler/icons-react'
+import { useMemo } from 'react'
+import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useCheevoUser, type CheevoUser } from '@/hooks/useCheevoUser'
-import { useRaLinked } from '@/hooks/useRaLinked'
+import { useCheevoUser } from '@/hooks/useCheevoUser'
+import { useProfileLibrary } from '@/hooks/useProfileLibrary'
+import { useStreakData } from '@/hooks/useStreakData'
 import SubjectProviders from '@/components/subject-providers/SubjectProviders'
-import { MainPageBody } from '@/components/main-page/MainPage'
-import MainPageWithoutRa from '@/components/main-page/main-page-without-ra/MainPageWithoutRa'
-import PublicUserHeader from './public-user-header/PublicUserHeader'
-
-/** What the main page would show for this user: RA's layout, or the Steam/PSN one without it. */
-function UserPage({ user }: { user: CheevoUser }) {
-  const { T } = useLanguage()
-  // Inside SubjectProviders: true only when the user has RA AND the viewer can read it.
-  const raLinked = useRaLinked()
-
-  if (raLinked) {
-    return (
-      <motion.main className="home-fit flex flex-col min-h-full text-text-main" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, ease: 'easeOut' }}>
-        <MainPageBody />
-      </motion.main>
-    )
-  }
-  if (user.steam || user.psn) return <MainPageWithoutRa />
-  return <p className="py-16 text-center text-sm text-text-secondary">{T.publicProfile.noAccounts}</p>
-}
+import PublicUserSkeleton from './public-user-skeleton/PublicUserSkeleton'
+import PublicUserError from './public-user-error/PublicUserError'
+import PublicUserBody from './public-user-body/PublicUserBody'
+import PublicUserHero from './public-user-hero/PublicUserHero'
+import type { ViewerStats } from './public-user-compare/PublicUserCompare'
 
 /**
- * A CheevoVault user's page: who they are, and then the main page as that
- * user sees it — the same profile column, recent games and stats, for every
- * platform they have linked.
+ * A CheevoVault user's page: who they are, their pace, games and stats on
+ * every platform they linked, and how they compare with you.
+ *
+ * Everything inside SubjectProviders is read as them. Your own numbers, for
+ * the comparison, are read here, outside it, from what the app already holds.
  */
 export default function PublicUserPage({ username }: { username: string }) {
   const { T } = useLanguage()
+  const { data: session } = useSession()
   const { user, isLoading, error, retry } = useCheevoUser(username)
+  const mine = useProfileLibrary()
+  const myYear = useStreakData()
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-3 py-24 text-text-secondary text-center px-4">
-        <IconUserOff className="w-10 h-10" aria-hidden="true" />
-        <p role="alert" className="text-sm">
-          {error === 'missing' ? T.publicProfile.userNotFound.replace('{u}', username) : T.publicProfile.userLoadError}
-        </p>
-        {error === 'failed' && (
-          <button onClick={retry} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
-            {T.publicProfile.retry}
-          </button>
-        )}
-      </div>
-    )
-  }
+  const viewer: ViewerStats = useMemo(
+    () => ({
+      name: session?.user?.name ?? '',
+      avatar: session?.user?.avatar ?? null,
+      games: mine.games,
+      year: myYear.achievements,
+      activeStreak: myYear.activeStreak,
+      bestStreak: myYear.bestStreak,
+      isLoading: mine.isLoading || myYear.isLoading,
+    }),
+    [session?.user?.name, session?.user?.avatar, mine.games, mine.isLoading, myYear.achievements, myYear.activeStreak, myYear.bestStreak, myYear.isLoading],
+  )
+
+  if (error) return <PublicUserError username={username} error={error} onRetry={retry} />
 
   if (isLoading || !user) {
     return <PublicUserSkeleton />
   }
 
   return (
-    <div className="flex flex-col min-h-full text-text-main">
-      <PublicUserHeader user={user} />
-      <SubjectProviders user={user}>
-        <UserPage user={user} />
-      </SubjectProviders>
+    <div className="min-h-full text-text-main flex flex-col items-center py-4 sm:py-6 px-4">
+      <div className="w-full lg:max-w-[95%] min-w-0">
+        <SubjectProviders user={user}>
+          {user.ra || user.steam || user.psn ? (
+            <PublicUserBody user={user} viewer={viewer} />
+          ) : (
+            <div className="flex flex-col gap-4">
+              <PublicUserHero user={user} />
+              <p className="py-12 text-center text-sm text-text-secondary">{T.publicProfile.noAccounts}</p>
+            </div>
+          )}
+        </SubjectProviders>
+      </div>
     </div>
   )
 }

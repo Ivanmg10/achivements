@@ -1,3 +1,7 @@
+/**
+ * A ring of progress in the theme's colour, earned/total in the middle; a
+ * finished one glows, like ProgressBar, and its count turns the "done" colour.
+ */
 export function CircularProgress({
   earned,
   total,
@@ -22,9 +26,16 @@ export function CircularProgress({
         role="img"
         aria-label={`${earned} / ${total}`}
         className="relative inline-flex items-center justify-center shrink-0"
+        data-complete={isComplete || undefined}
         style={{ width: size, height: size }}
       >
-        <svg width={size} height={size} className="-rotate-90" aria-hidden="true">
+        <svg
+          width={size}
+          height={size}
+          className="-rotate-90"
+          aria-hidden="true"
+          style={isComplete ? { filter: 'drop-shadow(0 0 6px rgb(var(--progress) / 0.6))' } : undefined}
+        >
           <circle
             cx={size / 2}
             cy={size / 2}
@@ -40,9 +51,7 @@ export function CircularProgress({
             strokeDasharray={circumference}
             strokeDashoffset={circumference * (1 - pct)}
             strokeLinecap="round"
-            className={`fill-none transition-[stroke-dashoffset] duration-700 ease-out ${
-              isComplete ? 'stroke-success' : 'stroke-accent'
-            }`}
+            className="fill-none stroke-progress transition-[stroke-dashoffset] duration-700 ease-out"
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">

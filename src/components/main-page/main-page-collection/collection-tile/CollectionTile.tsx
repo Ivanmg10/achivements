@@ -7,6 +7,7 @@ import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
 import type { PerfectGame } from '@/utils/perfectGames'
 import GameIcon from '@/components/game-icon/GameIcon'
 import PlatformMark from '@/components/platform-mark/PlatformMark'
+import { useSubject } from '@/context/SubjectContext'
 
 /**
  * One game at 100% in the collection: its cover at 56px with the name under
@@ -16,11 +17,12 @@ import PlatformMark from '@/components/platform-mark/PlatformMark'
  */
 export default function CollectionTile({ game, date }: { game: PerfectGame; date?: string }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const when = date ? (game.source === 'steam' ? T.cards.lastPlayedOn : T.cards.perfectOn).replace('{date}', formatDate(date)) : null
 
   return (
     <Link
-      href={gameHref(game.source, game.id)}
+      href={gameHref(game.source, game.id, subject)}
       className="group flex flex-col items-center gap-1.5 min-w-0 rounded-lg p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       <span className="relative w-14 h-14 shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5">

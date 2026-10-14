@@ -30,6 +30,10 @@
   --color-danger: rgb(var(--danger));
 
   --color-chart-2: rgb(var(--chart-2));
+
+  /* Progress bars: the theme's accent, and a darker step of it (RA softcore under hardcore). */
+  --color-progress: rgb(var(--progress));
+  --color-progress-soft: color-mix(in oklab, rgb(var(--progress)) 45%, rgb(var(--bg-card)));
 }
 
 /* ============================================
@@ -47,21 +51,27 @@
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
 
-  --accent: 225 228 235;
-  --accent-hover: 245 246 250;
-  --accent-muted: 225 228 235;
+  /* Violet, a step lighter than the light theme's so it stands out on a dark surface. */
+  --accent: 167 139 250;
+  --accent-hover: 196 181 253;
+  --accent-muted: 167 139 250;
 
   --success: 34 197 94;
   --warning: 245 158 11;
   --info: 96 165 250;
   --danger: 239 68 68;
   --chart-2: 245 158 11;
+
+  /* Resolved on each element, so it follows the theme that element is in. */
+  --progress: var(--accent);
 }
 
 /* ============================================
    DARK
    ============================================ */
-[data-theme="dark"] {
+[data-theme="dark"],
+[data-theme="dark-red"],
+[data-theme="dark-green"] {
   --bg-main: 15 16 20;
   --bg-header: 10 10 14;
   --bg-card: 23 24 30;
@@ -70,9 +80,10 @@
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
 
-  --accent: 225 228 235;
-  --accent-hover: 245 246 250;
-  --accent-muted: 225 228 235;
+  /* Violet, a step lighter than the light theme's so it stands out on a dark surface. */
+  --accent: 167 139 250;
+  --accent-hover: 196 181 253;
+  --accent-muted: 167 139 250;
 
   --success: 34 197 94;
   --warning: 245 158 11;
@@ -84,7 +95,9 @@
 /* ============================================
    LIGHT — Neutro suave
    ============================================ */
-[data-theme="light"] {
+[data-theme="light"],
+[data-theme="light-red"],
+[data-theme="light-green"] {
   --ink: 20 22 28;
   --bg-main: 229 231 235;
   --bg-header: 236 238 242;
@@ -94,9 +107,9 @@
   --text-main: 32 34 40;
   --text-secondary: 88 92 102;
 
-  --accent: 79 70 229;
-  --accent-hover: 67 56 202;
-  --accent-muted: 79 70 229;
+  --accent: 124 58 237;
+  --accent-hover: 109 40 217;
+  --accent-muted: 124 58 237;
 
   --success: 22 101 52;
   --warning: 146 64 14;
@@ -106,60 +119,91 @@
 }
 
 /*
+   The same dark and light, with a red or a green accent instead of violet.
+   Where the accent takes a colour that already means something, that meaning
+   moves: errors go orange beside a red accent, "completed" goes teal beside a
+   green one, so a bar never reads as an error or as finished.
+*/
+[data-theme="dark-red"] {
+  --accent: 248 113 113;
+  --accent-hover: 252 165 165;
+  --accent-muted: 248 113 113;
+  --danger: 251 146 60;
+}
+[data-theme="dark-green"] {
+  --accent: 74 222 128;
+  --accent-hover: 134 239 172;
+  --accent-muted: 74 222 128;
+  --success: 45 212 191;
+}
+[data-theme="light-red"] {
+  --accent: 185 28 28;
+  --accent-hover: 153 27 27;
+  --accent-muted: 185 28 28;
+  --danger: 154 52 18;
+}
+[data-theme="light-green"] {
+  --accent: 22 101 52;
+  --accent-hover: 20 83 45;
+  --accent-muted: 22 101 52;
+  --success: 15 118 110;
+}
+
+/*
    Light themes: the fixed palette colours in the code (hardcore gold, ratio
    green, error red...) are tuned for dark surfaces. On a light one, the same
    classes take a darker shade so they still pass AA. Text only: bars and tints
    keep their colour.
 */
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-200 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-300 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-400 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-200 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-300 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-400 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-200 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-300 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-400 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-200 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-300 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-400 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-200 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-300 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-400 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-200 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-300 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-400 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-200 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-300 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-400 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-200 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-300 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-400 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-200 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-300 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-400 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-200 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-300 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-400 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-200 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-300 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-400 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-200 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-300 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-400 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-200 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-300 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-400 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-200 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-300 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-400 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-200 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-300 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-400 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-200 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-300 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-400 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-500 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-200 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-300 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-400 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-200 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-300 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-400 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-200 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-300 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-400 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-200 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-300 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-400 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-200 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-300 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-400 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-200 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-300 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-400 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-200 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-300 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-400 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-200 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-300 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-400 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-200 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-300 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-400 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-200 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-300 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-400 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-200 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-300 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-400 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-200 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-300 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-400 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-200 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-300 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-400 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-200 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-300 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-400 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-200 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-300 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-400 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-200 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-300 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-400 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-500 { @apply text-gray-600; }
 
 /* ============================================
    BLUE
@@ -180,7 +224,7 @@
 
   --success: 34 197 94;
   --warning: 245 158 11;
-  --info: 56 189 248;
+  --info: 34 211 238;
   --danger: 239 68 68;
   --chart-2: 245 158 11;
 }
@@ -290,9 +334,9 @@
   --text-main: 205 214 244;
   --text-secondary: 166 173 200;
 
-  --accent: 180 190 254;
-  --accent-hover: 200 207 255;
-  --accent-muted: 180 190 254;
+  --accent: 203 166 247;
+  --accent-hover: 218 190 250;
+  --accent-muted: 203 166 247;
 
   --success: 166 227 161;
   --warning: 249 226 175;
@@ -359,9 +403,9 @@
   --text-main: 235 236 240;
   --text-secondary: 150 152 160;
 
-  --accent: 235 236 240;
-  --accent-hover: 250 250 252;
-  --accent-muted: 235 236 240;
+  --accent: 167 139 250;
+  --accent-hover: 196 181 253;
+  --accent-muted: 167 139 250;
 
   --success: 34 197 94;
   --warning: 245 158 11;
@@ -402,7 +446,7 @@
   --bg-card: 10 20 14;
   --bg-tertiary: 18 34 24;
 
-  --text-main: 190 240 200;
+  --text-main: 205 224 210;
   --text-secondary: 110 160 125;
 
   --accent: 74 222 128;
@@ -591,9 +635,9 @@
   --text-main: 226 220 196;
   --text-secondary: 160 156 128;
 
-  --accent: 204 172 112;
-  --accent-hover: 222 194 140;
-  --accent-muted: 204 172 112;
+  --accent: 222 176 72;
+  --accent-hover: 236 196 100;
+  --accent-muted: 222 176 72;
 
   --success: 132 204 22;
   --warning: 251 146 60;
@@ -719,3 +763,11 @@
   from { width: 0; }
   to { width: 85%; }
 }
+
+/*
+   A user's profile, Overview: Recently played sits beside their platform
+   profile, as tall as that column. Its rows (flex: 1 1 0 inline, ROW_STYLE)
+   may grow to share the spare height but never shrink below their content.
+*/
+.profile-recent .home-fit-scroll > * { flex: 1 0 auto !important; }
+.profile-recent .home-fit-scroll > * > * { justify-content: center; }

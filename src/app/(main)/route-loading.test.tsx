@@ -9,6 +9,7 @@ import UserLoading from './user/(account)/loading'
 import PublicUserLoading from './user/[username]/loading'
 import AllGamesLoading from './allGames/loading'
 import RachaLoading from './racha/loading'
+import FollowingLoading from './following/loading'
 import CategoryLoading from './[category]/(list)/loading'
 import CategoryConsoleLoading from './[category]/[consoleId]/loading'
 
@@ -23,6 +24,7 @@ test.each([
   ['another user', PublicUserLoading],
   ['all games', AllGamesLoading],
   ['the streak', RachaLoading],
+  ['who you follow', FollowingLoading],
   ['a category', CategoryLoading],
   ['a category by console', CategoryConsoleLoading],
 ])('%s shows its own skeleton, announced as loading', (_name, Loading) => {

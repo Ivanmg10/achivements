@@ -8,7 +8,7 @@ import { IconClock, IconGripVertical, IconX } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
-import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
 import { formatPlaytime } from '@/utils/steamFeed'
@@ -123,8 +123,8 @@ export default function SteamSortableItem({
           <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>{progressText}</span>
           {hasCounts && (
             <span className="flex items-center gap-2 mt-1">
-              <SteamProgressBar pct={pct} label={item.title} trackClass="bg-bg-main" className="flex-1" />
-              <span className="text-xs text-text-secondary tabular-nums">{Math.round(pct)}%</span>
+              <ProgressBar pct={pct} label={item.title} trackClass="bg-bg-main" className="flex-1" />
+              <span className={`text-xs tabular-nums ${pct >= 100 ? 'text-success font-semibold' : 'text-text-secondary'}`}>{Math.round(pct)}%</span>
             </span>
           )}
           {/* Kept when there is nothing to show, so every card is the same height. */}

@@ -11,6 +11,8 @@ import GameInfoHeader from '@/components/game-info-header/GameInfoHeader'
 import GameInfoTable from '@/components/game-info-table/GameInfoTable'
 import GameInfoSubsetSelector from '@/components/game-info-subset-selector/GameInfoSubsetSelector'
 import GameInfoComments from '@/components/game-info-comments/GameInfoComments'
+import GameAiExport from '@/components/game-ai-export/GameAiExport'
+import { raAiSource } from '@/utils/aiExport'
 
 /**
  * An RA game's page. While the game loads it shows the page's own skeleton
@@ -44,7 +46,7 @@ export default function GameInfo() {
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <GameInfoHeroBackground imagePath={heroImage} />
       <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
-        <GameInfoHeader gameData={game}>
+        <GameInfoHeader gameData={game} actions={(game.NumAchievements ?? 0) > 0 && <GameAiExport getSource={() => raAiSource(game)} />}>
           {showSelector && (
             <GameInfoSubsetSelector
               currentId={game.ID!}

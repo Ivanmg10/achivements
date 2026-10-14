@@ -34,7 +34,7 @@ export function SteamSortableHeader({
     <th aria-sort={ariaSort} className={`px-3 py-2 ${className}`}>
       <button
         onClick={() => onSort(sortKey)}
-        className={`select-none transition-colors hover:text-text-main rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] ${
+        className={`select-none transition-colors hover:text-text-main rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
           active ? 'text-text-main' : 'text-text-secondary'
         }`}
       >

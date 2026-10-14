@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { useSubject } from '@/context/SubjectContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import type { PsnTrophy } from '@/types/psn'
@@ -13,6 +14,8 @@ import type { PsnTrophy } from '@/types/psn'
 export function usePsnFavoriteTrophies(gameId: number, gameTitle: string) {
   const { T } = useLanguage()
   const { status } = useSession()
+  // Pins are the viewer's own; on someone else's page they are not offered.
+  const subject = useSubject()
   const [pinned, setPinned] = useState<Set<number>>(new Set())
   const [error, setError] = useState<string | null>(null)
 
@@ -67,5 +70,5 @@ export function usePsnFavoriteTrophies(gameId: number, gameTitle: string) {
     [pinned, gameId, gameTitle, T],
   )
 
-  return { pinned, toggle, error, canPin: status === 'authenticated' }
+  return { pinned, toggle, error, canPin: status === 'authenticated' && !subject }
 }

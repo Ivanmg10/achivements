@@ -84,6 +84,25 @@ them bottom right: green with a check, red with an alert icon, gone after 4 s
 - A silent failure is a bug: an optimistic update that rolls back must say so.
 - Texts live in `T.toast` (all languages). The admin panel's are in English.
 
+## Progress bars — in the theme's colours
+
+Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or
+`CircularProgress`: the theme's `--progress` (its accent), RA softcore a darker
+step of it (`bg-progress-soft`) under hardcore. A finished bar stays in the
+theme's colour and glows; **the green is only in the percentage beside it**
+(`text-success` at 100%), never on the bar — the user tried a green ring and
+did not like it. Do not paint a bar in a platform's colour; those stay only in
+charts that compare platforms (CompletionDistribution, the line
+chart).
+
+## AI export (`src/utils/aiExport.ts`)
+
+The "Ask an AI" button on the three game pages builds a file for a chat AI:
+English instructions plus "Reply in <language>", pending in game order,
+earned oldest first. **Never put account data in it** (username, ids, keys):
+only the game and its achievements. The UI says so. Change the prompt there,
+with its tests; it is the part that decides whether the answers are any good.
+
 ## API calls — error handling MANDATORY
 Every API call added or modified must have its own error handling. No exceptions.
 
@@ -143,15 +162,19 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 **Milestones:**
 - `0.8.x` — login/register polish + optimizations
 - `0.9.x` — stats page reorganization, Steam, email, analytics
-- `1.0.0` — current: Steam integration, every release gate below closed,
-  privacy policy and account deletion (2026-10-02)
-- `1.0.x` — fixes; `1.x.0` for new sections (see Roadmap)
+- `1.0.0` — released 2026-10-02: Steam integration, every release gate below
+  closed, privacy policy and account deletion
+- `1.x.0` — new sections (see Roadmap); `1.x.y` — fixes
+- `1.3.0` — current: a loading state on every route (its own skeleton, and a
+  thin line along the top while a page is on its way) and the functions in
+  `fra1`, next to the database
 
-## Release gates — things that must be true before 1.0
+## Release gates — what had to be true before 1.0 (all closed)
 
-**Warn the user, unprompted, whenever they talk about cutting 1.0, tagging a
-release, or 'going live' while any of these is still open.** They asked for
-this reminder on purpose, because it is easy to forget.
+All of these have been closed since 1.0.0 (2026-10-02). **Warn the user,
+unprompted, if one stops being true** (a variable removed from Vercel, the
+domain unverified in Resend) while they talk about a release or 'going live'.
+They asked for this reminder on purpose, because it is easy to forget.
 
 - [x] **`cheevovault.com` verified in Resend, with `EMAIL_FROM` set on it**
       (2026-10-02). Password recovery reaches every user, not only the Resend
@@ -316,6 +339,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   backdrop and release year come from IGDB (`src/lib/igdbClient.ts`, a Twitch
   app in `TWITCH_CLIENT_ID`/`TWITCH_CLIENT_SECRET`), matched by title and
   platform, cached half a year. Without the keys they keep the trophy icon.
+  Every PSN game page also asks IGDB for its summary, studios, genres and
+  screenshots (`igdbDetails`, `GET /api/psn/details?id=`, keyed by Sony's
+  title from the user's list, never by text from the request). English only;
+  a 404 just means the page goes without them.
 - Sony returns errors as bodies, not throws: every call goes through
   `psnCall()` (`unwrap()` plus one retry after 2 s when Sony says "too many
   requests" — psn-api hides the HTTP status and `Retry-After`, so it goes by

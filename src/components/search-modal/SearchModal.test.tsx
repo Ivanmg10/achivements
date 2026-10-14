@@ -144,6 +144,19 @@ describe('users tab', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
+  test('↓ from the search box goes to the first user, and a profile opened is remembered as recent', async () => {
+    localStorage.clear()
+    open()
+    const input = screen.getByPlaceholderText(en.publicProfile.searchUsersPlaceholder)
+    fireEvent.change(input, { target: { value: 'ivan' } })
+    await act(async () => { jest.advanceTimersByTime(500) })
+    const user = await screen.findByRole('button', { name: /ivan_mg/ })
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+    expect(user).toHaveFocus()
+    fireEvent.click(user)
+    expect(JSON.parse(localStorage.getItem('recent-user-searches')!)).toEqual([{ username: 'ivan_mg', avatar: null }])
+  })
+
   test('says so when nobody matches', async () => {
     ;(global.fetch as jest.Mock).mockResolvedValue({ ok: true, json: () => Promise.resolve([]) })
     open()

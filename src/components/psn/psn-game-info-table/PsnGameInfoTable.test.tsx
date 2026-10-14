@@ -113,3 +113,31 @@ test('each hidden trophy has its own eye, and the global switch follows them', (
   fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: en.psn.concealTrophy }))
   expect(names()).toContain(en.psn.hiddenTrophy)
 })
+
+test('pinned trophies lead the list, highlighted', () => {
+  ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set<number>([2]), toggle, canPin: true })
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
+  expect(names()).toEqual(['Locked', 'Platinum one', 'Common', en.psn.hiddenTrophy])
+  expect(screen.getByRole('table').querySelector('[data-trophy="2"]')!.className).toContain('bg-warning/10')
+})
+
+test('a trophy opens in a detail window with its grade, its DLC and guide links', () => {
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={WITH_DLC} groups={GROUPS} />)
+  fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'DLC one' }))
+  const dialog = screen.getByRole('dialog', { name: 'DLC one' })
+  expect(within(dialog).getByText(en.psn.bronze)).toBeInTheDocument()
+  expect(within(dialog).getByText('DLC · Winter Wonder')).toBeInTheDocument()
+  expect(within(dialog).getByRole('link', { name: en.achievementDetail.psnProfiles })).toHaveAttribute(
+    'href',
+    'https://psnprofiles.com/search/games?q=Bloodborne',
+  )
+  expect(within(dialog).getByRole('link', { name: en.achievementDetail.youtube }).getAttribute('href')).toContain('DLC%20one')
+})
+
+test('a hidden trophy still secret opens without its text or guide links', () => {
+  render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
+  fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: en.psn.hiddenTrophy }))
+  const dialog = screen.getByRole('dialog', { name: en.psn.hiddenTrophy })
+  expect(within(dialog).queryByText('The ending')).toBeNull()
+  expect(within(dialog).queryByRole('link')).toBeNull()
+})

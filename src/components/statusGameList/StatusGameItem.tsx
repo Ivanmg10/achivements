@@ -9,7 +9,7 @@ import { useGameProgression } from '@/hooks/useGameProgression'
 import { useExclusiveOpen } from '@/hooks/useExclusiveOpen'
 import { useLanguage } from '@/context/LanguageContext'
 import { CONSOLES } from '@/constants'
-import { DualProgressBar } from '@/components/ui/DualProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import { useSpotlight } from '@/hooks/useSpotlight'
@@ -127,13 +127,14 @@ export default function StatusGameItem({
             </p>
             {pct !== null && (
               <div className="flex items-center gap-2 mt-1">
-                <DualProgressBar
-                  softcorePct={isHardcore ? 0 : Math.min(pct, 100)}
-                  hardcorePct={isHardcore ? Math.min(pct, 100) : 0}
+                <ProgressBar
+                  pct={isHardcore ? pct : 0}
+                  softPct={isHardcore ? 0 : pct}
+                  label={game.Title}
                   trackClass="bg-bg-main"
                   className="flex-1"
                 />
-                <span className="text-xs text-text-secondary tabular-nums">{Math.round(pct)}%</span>
+                <span className={`text-xs tabular-nums ${pct >= 100 ? 'text-success font-semibold' : 'text-text-secondary'}`}>{Math.round(pct)}%</span>
               </div>
             )}
             {'AchievementsPublished' in game

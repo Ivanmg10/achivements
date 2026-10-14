@@ -47,7 +47,7 @@ export default function LibraryDetailDifficulty({ items, isLoading = false }: { 
                 </span>
               </div>
               <div className="h-2 rounded-full bg-ink/10 overflow-hidden" style={{ width: `${(b.total / widest) * 100}%` }}>
-                <div className="h-full rounded-full bg-accent" style={{ width: `${b.total ? (b.earned / b.total) * 100 : 0}%` }} />
+                <div className="h-full rounded-full bg-progress" style={{ width: `${b.total ? (b.earned / b.total) * 100 : 0}%` }} />
               </div>
             </li>
           ))}

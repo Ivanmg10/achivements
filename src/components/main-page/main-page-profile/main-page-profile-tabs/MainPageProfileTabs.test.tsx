@@ -79,3 +79,9 @@ test('renders tab icons when given', () => {
   )
   expect(screen.getByTestId('icon')).toBeInTheDocument()
 })
+
+test("a page's own sections get their own name and the larger size", () => {
+  render(<MainPageProfileTabs tabs={TABS} selected="ra" onSelect={jest.fn()} idPrefix="p" label="Sections" size="md" />)
+  expect(screen.getByRole('tablist', { name: 'Sections' })).toBeInTheDocument()
+  expect(screen.getByRole('tab', { name: 'RetroAchievements' })).toHaveClass('text-sm')
+})

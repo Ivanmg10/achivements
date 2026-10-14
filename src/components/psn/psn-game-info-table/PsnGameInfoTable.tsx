@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useId, useMemo, useState } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import {
@@ -17,6 +18,10 @@ import type { PsnTrophy, PsnTrophyGroup } from '@/types/psn'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
 import { useLocationHash } from '@/hooks/useLocationHash'
+import { guideLinks } from '@/utils/guideLinks'
+import { BASE_GROUP, dlcShortName, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
+import GameInfoTableFoldBar from '@/components/game-info-table-fold-bar/GameInfoTableFoldBar'
+import AchievementDetailModal from '@/components/achievement-detail-modal/AchievementDetailModal'
 
 type Filter = 'all' | 'earned' | 'unearned'
 
@@ -56,7 +61,9 @@ function sortTrophies(list: PsnTrophy[], { key, dir }: SteamSortState): PsnTroph
  * each DLC.
  *
  * Opening the page from a trophy link (…#trophy-<id>) scrolls to that trophy
- * and highlights it briefly. Each trophy can be pinned to the main page.
+ * and highlights it briefly. Each trophy can be pinned to the main page, and
+ * pinned ones lead the list; each opens in a detail window with links to
+ * guides.
  */
 export default function PsnGameInfoTable({
   trophies,
@@ -77,6 +84,7 @@ export default function PsnGameInfoTable({
   const [sortState, setSortState] = useState<SteamSortState>({ key: 'default', dir: 'asc' })
   const [expanded, setExpanded] = useState(true)
   const [highlighted, setHighlighted] = useState<number | null>(null)
+  const [selected, setSelected] = useState<PsnTrophy | null>(null)
   const { isRevealed, toggle: toggleOne, setAll } = useRevealedTrophies()
 
   const FILTER_LABELS: Record<Filter, string> = {
@@ -114,8 +122,10 @@ export default function PsnGameInfoTable({
     const inGroup = groupTab === 'all' ? trophies : trophies.filter((t) => t.groupId === groupTab)
     const list =
       filter === 'earned' ? inGroup.filter((t) => t.earned) : filter === 'unearned' ? inGroup.filter((t) => !t.earned) : inGroup
-    return sortTrophies(list, sortState)
-  }, [trophies, filter, sortState, groupTab])
+    const sorted = sortTrophies(list, sortState)
+    // Pinned first, each part in the chosen order — as RA's table does.
+    return canPin ? [...sorted.filter((t) => pinned.has(t.id)), ...sorted.filter((t) => !pinned.has(t.id))] : sorted
+  }, [trophies, filter, sortState, groupTab, canPin, pinned])
 
   function handleSort(key: SteamSortKey) {
     setSortState((prev) =>
@@ -123,6 +133,7 @@ export default function PsnGameInfoTable({
     )
   }
 
+  const GRADE_LABEL = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }
   const secrets = trophies.filter((t) => t.hidden && !t.earned)
   const allRevealed = secrets.length > 0 && secrets.every((t) => isRevealed(t.id))
   const needsToggle = filtered.length > COLLAPSED_ROWS
@@ -130,14 +141,14 @@ export default function PsnGameInfoTable({
 
   return (
     <section className="bg-bg-card p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
-      {groups.length > 1 && <PsnTrophyGroupTabs groups={groups} selected={groupTab} onSelect={setGroupTab} panelId={panelId} />}
+      {groups.length > 1 && <PsnTrophyGroupTabs groups={groups} selected={groupTab} onSelect={setGroupTab} panelId={panelId} gameTitle={gameTitle} />}
       <div className="flex gap-2 flex-wrap" role="group" aria-label={T.psn.trophies}>
         {(['all', 'earned', 'unearned'] as Filter[]).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
             aria-pressed={filter === f}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] ${
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
               filter === f
                 ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30'
                 : 'bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card'
@@ -150,12 +161,16 @@ export default function PsnGameInfoTable({
           <button
             onClick={() => setAll(secrets.map((t) => t.id), !allRevealed)}
             aria-pressed={allRevealed}
-            className="px-3 py-1 rounded-full text-xs font-medium bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
+            className="px-3 py-1 rounded-full text-xs font-medium bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             {allRevealed ? T.psn.hideHiddenTrophies : T.psn.showHiddenTrophies}
           </button>
         )}
       </div>
+
+      {needsToggle && (
+        <GameInfoTableFoldBar expanded={expanded} onToggle={() => setExpanded((e) => !e)} shown={filtered.length} total={trophies.length} />
+      )}
 
       {filtered.length === 0 ? (
         <p className="text-sm text-text-secondary self-center py-4">{T.psn.noTrophies}</p>
@@ -190,6 +205,7 @@ export default function PsnGameInfoTable({
                     onToggleReveal={() => toggleOne(t.id)}
                     pinned={canPin ? pinned.has(t.id) : undefined}
                     onTogglePin={() => toggle(t)}
+                    onOpen={() => setSelected(t)}
                   />
                 ))}
               </tbody>
@@ -207,6 +223,7 @@ export default function PsnGameInfoTable({
                 onToggleReveal={() => toggleOne(t.id)}
                 pinned={canPin ? pinned.has(t.id) : undefined}
                 onTogglePin={() => toggle(t)}
+                onOpen={() => setSelected(t)}
               />
             ))}
           </ul>
@@ -215,7 +232,7 @@ export default function PsnGameInfoTable({
             <button
               onClick={() => setExpanded((e) => !e)}
               aria-expanded={expanded}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-bg-header hover:bg-bg-header/80 text-text-secondary hover:text-text-main transition-colors self-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-bg-header hover:bg-bg-header/80 text-text-secondary hover:text-text-main transition-colors self-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               {expanded ? (
                 <>
@@ -232,6 +249,34 @@ export default function PsnGameInfoTable({
           )}
         </>
       )}
+
+      <AnimatePresence>
+        {selected && (() => {
+          const concealed = selected.hidden && !selected.earned && !isRevealed(selected.id)
+          const group = groups.length > 1 ? groups.find((g) => g.id === selected.groupId && g.id !== BASE_GROUP) : undefined
+          return (
+            <AchievementDetailModal
+              key={selected.id}
+              title={concealed ? T.psn.hiddenTrophy : selected.name}
+              description={concealed ? T.psn.hiddenTrophyDesc : selected.detail}
+              iconUrl={concealed ? null : selected.iconUrl}
+              earned={selected.earned}
+              earnedAt={selected.earnedAt}
+              rarity={selected.rarity}
+              tags={
+                <>
+                  <span className={`font-semibold ${TROPHY_GRADE_COLOR[selected.type]}`}>{GRADE_LABEL[selected.type]}</span>
+                  {group && <span className="px-2 py-0.5 rounded-full bg-ink/10 text-text-secondary">DLC · {dlcShortName(group.name, gameTitle)}</span>}
+                </>
+              }
+              guides={concealed ? [] : guideLinks('psn', { gameTitle, title: selected.name })}
+              pinned={canPin ? pinned.has(selected.id) : undefined}
+              onTogglePin={() => toggle(selected)}
+              onClose={() => setSelected(null)}
+            />
+          )
+        })()}
+      </AnimatePresence>
     </section>
   )
 }

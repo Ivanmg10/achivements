@@ -108,3 +108,52 @@ export function summarizeConsoles(games: RetroAchievementsGameCompleted[]): Cons
     })
     .sort((a, b) => b.games - a.games || a.console.localeCompare(b.console))
 }
+
+/**
+ * Someone's played games for their profile: RA's started ones, Steam's with
+ * progress and PSN's trophy list, less the ones they hid. With `subject` each
+ * opens that user's progress in the game; without, the game's own page.
+ */
+export function profileLibrary(
+  ra: RetroAchievementsGameCompleted[],
+  steam: SteamGameProgress[] = [],
+  psn: PsnGameProgress[] = [],
+  hidden: string[] = [],
+  subject: string | null = null,
+): LibraryGame[] {
+  const hide = new Set(hidden)
+  const done = (g: RetroAchievementsGameCompleted) => parseFloat(g.PctWon) >= 1
+  return buildLibrary({ playing: ra.filter((g) => !done(g)), completed: ra.filter(done), wantToPlay: [] }, steam, psn)
+    // A Steam game with nothing unlocked is just owned, not played.
+    .filter((g) => !hide.has(g.key) && !(g.source === 'steam' && g.status === 'wantToPlay'))
+    .map((g) => ({ ...g, href: gameHref(g.source, g.id, subject) }))
+}
+
+export type PlatformSummary = { source: GameSource; games: number; completed: number; playing: number; avgPct: number }
+
+/** Per platform with games, in the app's order: how many, at 100%, under way, and the average progress. */
+export function summarizeByPlatform(games: LibraryGame[]): PlatformSummary[] {
+  return (['ra', 'steam', 'psn'] as const)
+    .map((source) => {
+      const own = games.filter((g) => g.source === source)
+      return {
+        source,
+        games: own.length,
+        completed: own.filter((g) => g.status === 'completed').length,
+        playing: own.filter((g) => g.status === 'playing').length,
+        avgPct: own.length ? Math.round(own.reduce((sum, g) => sum + g.pct, 0) / own.length) : 0,
+      }
+    })
+    .filter((s) => s.games > 0)
+}
+
+export type SharedGame = { key: string; source: GameSource; id: number; title: string; subtitle: string; iconUrl?: string; theirPct: number; myPct: number }
+
+/** The games both have played, furthest along together first. */
+export function sharedGames(theirs: LibraryGame[], mine: LibraryGame[]): SharedGame[] {
+  const myPct = new Map(mine.map((g) => [g.key, g.pct]))
+  return theirs
+    .filter((g) => myPct.has(g.key))
+    .map((g) => ({ key: g.key, source: g.source, id: g.id, title: g.title, subtitle: g.subtitle, iconUrl: g.iconUrl, theirPct: g.pct, myPct: myPct.get(g.key)! }))
+    .sort((a, b) => b.theirPct + b.myPct - (a.theirPct + a.myPct) || a.title.localeCompare(b.title))
+}

@@ -2,16 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
+import { dataOwner } from '@/lib/apiAuth'
 
 function parseSource(req: NextRequest): 'ra' | 'steam' | 'psn' {
   const source = req.nextUrl.searchParams.get('source')
   return source === 'steam' || source === 'psn' ? source : 'ra'
 }
 
+/** The user's pins — or, with `?user=`, that public profile's (see dataOwner). */
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
+    const owner = await dataOwner(req)
+    if (!owner) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
     }
 
@@ -24,7 +26,7 @@ export async function GET(req: NextRequest) {
          FROM pinned_achievements
          WHERE user_id = $1
          ORDER BY created_at DESC`,
-        [session.user.id],
+        [owner.id],
       )
       return NextResponse.json(result.rows)
     }
@@ -40,7 +42,7 @@ export async function GET(req: NextRequest) {
          WHERE user_id = $1 AND source = $2
          ORDER BY created_at DESC`
 
-    const params = gameId ? [session.user.id, source, gameId] : [session.user.id, source]
+    const params = gameId ? [owner.id, source, gameId] : [owner.id, source]
     const result = await pool.query(query, params)
 
     return NextResponse.json(result.rows)

@@ -18,7 +18,7 @@ export default function ThemePreview({ theme }: { theme: Theme }) {
           <div className="h-1.5 w-4/5 rounded-full bg-text-main/80" />
           <div className="h-1 w-1/2 rounded-full bg-text-secondary/70" />
           <div className="h-1 w-full rounded-full bg-ink/10 overflow-hidden">
-            <div className="h-full w-2/3 rounded-full bg-accent" />
+            <div className="h-full w-2/3 rounded-full bg-progress" />
           </div>
         </div>
       </div>

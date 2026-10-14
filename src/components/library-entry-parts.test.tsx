@@ -41,14 +41,14 @@ test('the platform badge says the platform in words', () => {
 
 describe('progress', () => {
   test('a bar with its percentage, kept between 0 and 100', () => {
-    const { rerender } = render(<LibraryEntryProgress source="steam" pct={42.4} label="Hades" />)
+    const { rerender } = render(<LibraryEntryProgress pct={42.4} label="Hades" />)
     expect(screen.getByRole('progressbar', { name: 'Hades' })).toHaveAttribute('aria-valuenow', '42')
     expect(screen.getByText('42%')).toBeInTheDocument()
-    rerender(<LibraryEntryProgress source="steam" pct={250} label="Hades" />)
+    rerender(<LibraryEntryProgress pct={250} label="Hades" />)
     expect(screen.getByText('100%')).toBeInTheDocument()
   })
   test('nothing for a game with no progress to tell', () => {
-    const { container } = render(<LibraryEntryProgress source="ra" pct={null} label="x" />)
+    const { container } = render(<LibraryEntryProgress pct={null} label="x" />)
     expect(container).toBeEmptyDOMElement()
   })
 })
@@ -121,5 +121,14 @@ describe('shelf banner', () => {
   test('hidden from assistive technology: the card names the game', () => {
     const { container } = render(<LibraryShelfBanner entry={ra} />)
     expect(container.firstElementChild).toHaveAttribute('aria-hidden', 'true')
+  })
+})
+
+describe('progress percentage', () => {
+  test('turns the "done" colour at 100%, and only then', () => {
+    const { rerender } = render(<LibraryEntryProgress pct={99.6} label="Hades" />)
+    expect(screen.getByText('100%').className).not.toContain('text-success')
+    rerender(<LibraryEntryProgress pct={100} label="Hades" />)
+    expect(screen.getByText('100%').className).toContain('text-success')
   })
 })

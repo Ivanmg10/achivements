@@ -18,7 +18,7 @@ function setup(selected = 'all') {
 test('everything, the base game, then each DLC by name, with its progress', () => {
   setup()
   const tabs = screen.getAllByRole('tab')
-  expect(tabs.map((t) => t.textContent)).toEqual([en.psn.allGroups, `${en.psn.baseGame}10/10`, 'Winter Wonder1/4'])
+  expect(tabs.map((t) => t.textContent)).toEqual([`${en.psn.allGroups}11/14`, `${en.psn.baseGame}10/10`, 'Winter Wonder1/4'])
   expect(tabs[0]).toHaveAttribute('aria-selected', 'true')
   expect(tabs[0]).toHaveAttribute('aria-controls', 'panel')
 })
@@ -43,4 +43,25 @@ test('arrow keys, Home and End move between tabs, wrapping around', () => {
   expect(onSelect).toHaveBeenLastCalledWith('001')
   fireEvent.keyDown(last, { key: 'Home' })
   expect(onSelect).toHaveBeenLastCalledWith('all')
+})
+
+test("a DLC's name loses the game's title in front, which stays in the tooltip", () => {
+  const groups: PsnTrophyGroup[] = [
+    GROUPS[0],
+    { ...GROUPS[1], name: 'Call of Duty: Black Ops II: Revolution' },
+  ]
+  render(<PsnTrophyGroupTabs groups={groups} selected="all" onSelect={jest.fn()} panelId="panel" gameTitle="Call of Duty®: Black Ops II" />)
+  const dlc = screen.getAllByRole('tab')[2]
+  expect(dlc).toHaveTextContent('Revolution1/4')
+  expect(dlc).toHaveAttribute('title', 'Call of Duty: Black Ops II: Revolution')
+  expect(dlc.querySelector('img')).toBeNull()
+})
+
+test('a complete group shows its count in the "done" colour; the selected one is filled', () => {
+  setup('001')
+  const [, base, dlc] = screen.getAllByRole('tab')
+  expect(base.querySelector('.tabular-nums')!.className).toContain('text-success')
+  expect(dlc.querySelector('.tabular-nums')!.className).not.toContain('text-success')
+  expect(dlc.className).toContain('font-semibold')
+  expect(base.className).not.toContain('font-semibold')
 })

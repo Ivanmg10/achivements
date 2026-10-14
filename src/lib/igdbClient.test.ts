@@ -96,3 +96,62 @@ test('a revoked token is renewed once; IGDB down throws, so nothing is cached', 
   ;(global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 500 })
   await expect(igdb.igdbArt('Jak 3', 'PS3')).rejects.toThrow('IGDB answered 500')
 })
+
+test('every PlayStation maps to its IGDB id for the details lookup', () => {
+  expect(igdb.igdbPsnPlatforms('PS5')).toEqual([167])
+  expect(igdb.igdbPsnPlatforms('PS4')).toEqual([48])
+  expect(igdb.igdbPsnPlatforms('PS3 · PS Vita')).toEqual([9, 46])
+  expect(igdb.igdbPsnPlatforms('PC')).toEqual([])
+})
+
+const DETAILED = {
+  name: 'Call of Duty: Black Ops II',
+  summary: '  Set in 2025…  ',
+  first_release_date: 1352764800, // 2012-11-13
+  genres: [{ name: 'Shooter' }],
+  involved_companies: [
+    { developer: true, publisher: false, company: { name: 'Treyarch' } },
+    { developer: false, publisher: true, company: { name: 'Activision' } },
+    { developer: false, publisher: false },
+  ],
+  screenshots: [{ image_id: 'sc1' }],
+}
+
+test('toIgdbDetails reads studios by role, genres, the date and the screenshots', () => {
+  expect(igdb.toIgdbDetails('Call of Duty: Black Ops II', [{ name: 'Other' }, DETAILED])).toEqual({
+    summary: 'Set in 2025…',
+    developers: ['Treyarch'],
+    publishers: ['Activision'],
+    genres: ['Shooter'],
+    releaseDate: '2012-11-13',
+    screenshots: [
+      {
+        thumb: 'https://images.igdb.com/igdb/image/upload/t_screenshot_med/sc1.jpg',
+        full: 'https://images.igdb.com/igdb/image/upload/t_1080p/sc1.jpg',
+      },
+    ],
+  })
+  expect(igdb.toIgdbDetails('x', [{ name: 'x' }])).toEqual({
+    summary: null, developers: [], publishers: [], genres: [], releaseDate: null, screenshots: [],
+  })
+  expect(igdb.toIgdbDetails('x', [])).toBeNull()
+})
+
+test('igdbDetails searches every platform of the game and caches under its own key', async () => {
+  ;(global.fetch as jest.Mock)
+    .mockResolvedValueOnce(ok({ access_token: 'tok', expires_in: 5_000_000 }))
+    .mockResolvedValue(ok([DETAILED]))
+  expect(await igdb.igdbDetails('Call of Duty®: Black Ops II', 'PS3')).toMatchObject({ developers: ['Treyarch'] })
+  const [, init] = (global.fetch as jest.Mock).mock.calls[1]
+  expect(init.body).toContain('search "Call of Duty: Black Ops II"')
+  expect(init.body).toContain('involved_companies.company.name')
+  expect(init.body).toContain('where platforms = (9)')
+  expect(withSteamCache).toHaveBeenCalledWith('igdb:details:v1:9:call of duty black ops ii', expect.any(Number), expect.any(Function))
+})
+
+test('igdbDetails asks nothing without a Twitch app', async () => {
+  delete process.env.TWITCH_CLIENT_ID
+  expect(await igdb.igdbDetails('Astro Bot', 'PS5')).toBeNull()
+  expect(global.fetch).not.toHaveBeenCalled()
+  process.env.TWITCH_CLIENT_ID = 'client'
+})

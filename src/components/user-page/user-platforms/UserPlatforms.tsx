@@ -45,16 +45,15 @@ export default function UserPlatforms() {
     {
       label: T.userStats.globalRank,
       value: rankLoading ? '…' : rank?.Rank ? `#${rank.Rank.toLocaleString()}` : '—',
-      accent: 'text-accent',
     },
     {
       label: T.profileStats.hardcorePoints,
       value: (raUser?.TotalPoints ?? 0).toLocaleString(),
-      accent: 'text-yellow-400',
+      accent: 'text-warning',
     },
-    { label: T.userStats.masteries, value: pending(awardsLoading, awards?.MasteryAwardsCount), accent: 'text-orange-400' },
+    { label: T.userStats.masteries, value: pending(awardsLoading, awards?.MasteryAwardsCount), accent: 'text-success' },
     { label: T.userStats.games, value: all.length.toLocaleString() },
-    { label: T.userStats.inProgress, value: inProgress.length.toLocaleString(), accent: 'text-amber-400' },
+    { label: T.userStats.inProgress, value: inProgress.length.toLocaleString() },
   ]
 
 

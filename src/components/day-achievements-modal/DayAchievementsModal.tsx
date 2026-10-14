@@ -10,6 +10,8 @@ import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchi
 import Image from 'next/image'
 import Link from 'next/link'
 import { IconX, IconStar, IconCheck } from '@tabler/icons-react'
+import { useSubject } from '@/context/SubjectContext'
+import { gameHref } from '@/utils/gameRef'
 
 interface Props {
   date: string
@@ -25,6 +27,7 @@ function awardDate(awardedAt: string): string {
 
 export default function DayAchievementsModal({ date, achievements, onClose }: Props) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const { awards } = useUserAwards()
   const dayAchs = achievements.filter(a => a.Date.startsWith(date))
   const formatted = new Date(date + 'T00:00:00').toLocaleDateString('default', {
@@ -80,7 +83,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                 return (
                   <Link
                     key={`${award.AwardType}-${award.AwardData}`}
-                    href={`/gameInfo/${award.AwardData}`}
+                    href={gameHref('ra', award.AwardData, subject)}
                     onClick={onClose}
                     className="flex items-center gap-3 p-3 rounded-xl bg-bg-main hover:bg-bg-card transition-colors group ring-1 ring-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                   >

@@ -4,6 +4,7 @@ import { useState, type MouseEvent } from 'react'
 import { IconPin, IconPinFilled } from '@tabler/icons-react'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSubject } from '@/context/SubjectContext'
 import type { GameSource } from '@/types/steam'
 import { notify } from '@/lib/notify'
 
@@ -22,6 +23,7 @@ export function PinToggleButton({
   const { T } = useLanguage()
   const { isPinned, pinGame, unpinGame } = usePinnedGames()
   const [hasError, setHasError] = useState(false)
+  const subject = useSubject()
   const pinned = isPinned(gameId, source)
 
   async function handleClick(e: MouseEvent) {
@@ -36,6 +38,9 @@ export function PinToggleButton({
       notify.error(T.toast.pinsFailed)
     }
   }
+
+  // Pins are the viewer's own: someone else's page has none of theirs to change.
+  if (subject) return null
 
   return (
     <>

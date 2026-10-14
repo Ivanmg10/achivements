@@ -1,5 +1,7 @@
+import { ProgressBar } from '@/components/ui/ProgressBar'
+
 /**
- * A group's overall progress: a bar in the theme's accent with the share as
+ * A group's overall progress: the shared bar with the share as
  * text beside it, so the number is read, not guessed from the length.
  */
 export default function GroupProgressBar({ earned, total, label, className = '' }: { earned: number; total: number; label: string; className?: string }) {
@@ -8,17 +10,8 @@ export default function GroupProgressBar({ earned, total, label, className = '' 
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <div
-        role="progressbar"
-        aria-label={label}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={pct}
-        className="relative h-1.5 flex-1 rounded-full bg-ink/10 overflow-hidden"
-      >
-        <div className="absolute inset-y-0 left-0 rounded-full bg-accent" style={{ width: `${pct}%` }} />
-      </div>
-      <span className="text-xs tabular-nums text-text-secondary shrink-0">{pct}%</span>
+      <ProgressBar pct={pct} label={label} className="flex-1" />
+      <span className={`text-xs tabular-nums shrink-0 ${pct >= 100 ? 'text-success font-semibold' : 'text-text-secondary'}`}>{pct}%</span>
     </div>
   )
 }

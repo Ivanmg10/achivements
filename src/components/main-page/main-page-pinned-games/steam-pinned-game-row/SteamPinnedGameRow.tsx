@@ -10,7 +10,7 @@ import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { steamAssetUrl } from '@/lib/steamClient'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
-import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamRecentlyPlayedExpanded from '@/components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded'
@@ -90,7 +90,7 @@ export default function SteamPinnedGameRow({
               <SteamLogo size={12} className="opacity-60" aria-hidden="true" />
               Steam
             </span>
-            {hasCounts && <SteamProgressBar pct={game.pctWon} label={game.title} className="flex-1" />}
+            {hasCounts && <ProgressBar pct={game.pctWon} label={game.title} className="flex-1" />}
             <PinToggleButton gameId={appId} source="steam" className="ml-auto" />
             <button
               onClick={onToggle}

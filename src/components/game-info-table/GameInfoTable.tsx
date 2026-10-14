@@ -4,8 +4,9 @@ import { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types
 import GameInfoAchivement from '../game-info-achivement/GameInfoAchivement'
 import GameInfoAchievementCard from '../game-info-achivement/GameInfoAchievementCard'
 import AchievementModal from '../achievement-modal/AchievementModal'
-import { FadeImage } from '@/components/ui/FadeImage'
-import { useState, useMemo, useCallback, useId } from 'react'
+import AchievementWarningPanel from '../achievement-warning-panel/AchievementWarningPanel'
+import GameInfoTableFoldBar from '../game-info-table-fold-bar/GameInfoTableFoldBar'
+import { useState, useMemo, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
@@ -24,11 +25,9 @@ export default function GameInfoTable({
 }) {
   const [filter, setFilter] = useState<Filter>('all')
   const [sortState, setSortState] = useState<SortState>({ key: 'default', dir: 'asc' })
-  const [missableOpen, setMissableOpen] = useState(false)
   const [selectedAchievement, setSelectedAchievement] = useState<RetroAchievement | null>(null)
   const [tableExpanded, setTableExpanded] = useState(true)
   const { T } = useLanguage()
-  const missableId = useId()
 
   const FILTER_LABELS: Record<Filter, string> = {
     all: T.gameInfoTable.filterAll,
@@ -109,52 +108,16 @@ export default function GameInfoTable({
 
   return (
     <section className="bg-bg-card p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
-      {/* Missable warning */}
-      {missableUnearned.length > 0 && (
-        <div className="w-full border border-danger/40 rounded-xl overflow-hidden">
-          <button
-            onClick={() => setMissableOpen((o) => !o)}
-            aria-expanded={missableOpen}
-            aria-controls={missableId}
-            className="w-full flex items-center justify-between px-4 py-3 bg-danger/10 hover:bg-danger/15 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-danger/70"
-          >
-            <span className="text-danger font-semibold text-sm uppercase tracking-wide">
-              {T.gameInfoTable.missableWarning} ({missableUnearned.length})
-            </span>
-            <IconChevronDown
-              className={`w-4 h-4 text-danger transition-transform duration-200 ${missableOpen ? 'rotate-180' : ''}`}
-              aria-hidden="true"
-            />
-          </button>
-
-          {missableOpen && (
-            <div id={missableId} className="flex flex-col gap-2 p-4 bg-danger/5">
-              {missableUnearned.map((a) => (
-                <button
-                  key={a.ID}
-                  onClick={() => setSelectedAchievement(a)}
-                  className="flex items-center gap-3 text-left w-full rounded-lg hover:bg-danger/10 p-1 -m-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
-                >
-                  {a.BadgeName && (
-                    <FadeImage
-                      src={`https://media.retroachievements.org/Badge/${a.BadgeName}.png`}
-                      alt=""
-                      width={40}
-                      height={40}
-                      className="w-10 h-10 rounded-lg shrink-0"
-                      imgClassName="w-full h-full object-cover grayscale"
-                    />
-                  )}
-                  <div className="flex flex-col">
-                    <p className="text-sm font-medium">{a.Title}</p>
-                    <p className="text-xs text-text-secondary">{a.Description}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      <AchievementWarningPanel
+        label={T.gameInfoTable.missableWarning}
+        items={missableUnearned.map((a) => ({
+          key: String(a.ID),
+          title: a.Title,
+          description: a.Description,
+          iconUrl: a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : null,
+          onSelect: () => setSelectedAchievement(a),
+        }))}
+      />
 
       {/* Filter buttons */}
       <div className="flex gap-2 flex-wrap" role="group" aria-label={T.gameInfoPage.achievements}>
@@ -176,21 +139,12 @@ export default function GameInfoTable({
 
       {/* Top collapse toggle */}
       {gameData && needsToggle && (
-        <button
-          onClick={() => setTableExpanded((e) => !e)}
-          aria-expanded={tableExpanded}
-          className="w-full flex items-center justify-between px-5 py-3 rounded-xl bg-bg-header/40 hover:bg-bg-header/60 backdrop-blur-sm border border-ink/5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-        >
-          <span className="flex items-center gap-2 text-sm font-medium text-text-main">
-            <span className={`inline-block transition-transform duration-300 ${tableExpanded ? 'rotate-180' : ''}`}>
-              <IconChevronDown className="w-4 h-4 text-accent" aria-hidden />
-            </span>
-            {tableExpanded ? T.gameInfoTable.collapseTable : `${T.gameInfoTable.expandTable} (${filtered.length})`}
-          </span>
-          <span className="text-xs text-text-secondary bg-bg-main/30 px-2 py-0.5 rounded-full tabular-nums">
-            {filtered.length} / {achievements.length}
-          </span>
-        </button>
+        <GameInfoTableFoldBar
+          expanded={tableExpanded}
+          onToggle={() => setTableExpanded((e) => !e)}
+          shown={filtered.length}
+          total={achievements.length}
+        />
       )}
 
       {gameData && (

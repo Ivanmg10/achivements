@@ -26,13 +26,15 @@ export type UserRecord = {
   description: string | null
   profile_public: boolean
   gender: 'male' | 'female' | 'neutral' | null
+  /** Whether the gender shows on the public profile. */
+  gender_public: boolean
   favorite_game: SavedGame
   favorite_steam_game: SavedGame
   favorite_psn_game: SavedGame
 }
 
 const COLUMNS = `id, username, password, theme, avatar, raid, rausername, steamid, steamusername,
-  psnaccountid, psnusername, email, email_verified_at, admin, "raUser", location, description, gender, profile_public, favorite_game, favorite_steam_game, favorite_psn_game`
+  psnaccountid, psnusername, email, email_verified_at, admin, "raUser", location, description, gender, gender_public, profile_public, favorite_game, favorite_steam_game, favorite_psn_game`
 
 // Every API call re-reads the signed-in user (see authOptions' jwt callback); a
 // short cache keeps that to about one query per user per minute. A session

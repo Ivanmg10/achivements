@@ -10,12 +10,17 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useHeatmapGrid, HEATMAP_GAP as GAP, HEATMAP_MAX_DAYS } from '@/hooks/useHeatmapGrid'
 
 /** Empty, then the theme's accent at rising strength: one hue per theme, so every theme reads the same way. */
+/*
+ * One hue in clear steps of lightness, so a busy day reads apart from a quiet
+ * one: the accent mixed into the card more and more, and the busiest days
+ * pushed past it towards --ink (lighter on a dark theme, darker on a light one).
+ */
 const LEVEL_BG = [
   'rgb(var(--bg-header))',
-  'rgb(var(--accent) / 0.22)',
-  'rgb(var(--accent) / 0.42)',
-  'rgb(var(--accent) / 0.68)',
-  'rgb(var(--accent) / 0.95)',
+  'color-mix(in oklab, rgb(var(--accent)) 30%, rgb(var(--bg-card)))',
+  'color-mix(in oklab, rgb(var(--accent)) 55%, rgb(var(--bg-card)))',
+  'color-mix(in oklab, rgb(var(--accent)) 82%, rgb(var(--bg-card)))',
+  'color-mix(in oklab, rgb(var(--accent)) 78%, rgb(var(--ink)))',
 ]
 
 const MONTH_ROW = 14

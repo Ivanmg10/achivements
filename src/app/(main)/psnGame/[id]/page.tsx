@@ -7,12 +7,15 @@ import { fadeUp } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { usePsnTrophies } from '@/hooks/usePsnTrophies'
+import { usePsnGameDetails } from '@/hooks/usePsnGameDetails'
 import { isPsnTitleId, psnBackdrop } from '@/utils/psnTitles'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
 import GameInfoSkeletonTable from '@/components/game-info-skeleton/game-info-skeleton-table/GameInfoSkeletonTable'
 import PsnGameHeroBackground from '@/components/psn/psn-game-hero-background/PsnGameHeroBackground'
 import PsnGameInfoHeader from '@/components/psn/psn-game-info-header/PsnGameInfoHeader'
 import PsnGameInfoTable from '@/components/psn/psn-game-info-table/PsnGameInfoTable'
+import GameAiExport from '@/components/game-ai-export/GameAiExport'
+import { psnAiSource } from '@/utils/aiExport'
 
 /**
  * A PSN game's page — the counterpart of /steamGame/[appId], built the same
@@ -29,6 +32,7 @@ export default function PsnGamePage() {
   const { T } = useLanguage()
   const { isLinked, library, libraryLoading } = usePsnGamesData()
   const { trophies, groups, isLoading, error, retry } = usePsnTrophies(isLinked ? titleId : null)
+  const { details } = usePsnGameDetails(isLinked ? titleId : null)
 
   if (titleId === null) notFound()
 
@@ -54,7 +58,11 @@ export default function PsnGamePage() {
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <PsnGameHeroBackground src={psnBackdrop(game)} />
       <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
-        <PsnGameInfoHeader game={game} />
+        <PsnGameInfoHeader
+          game={game}
+          details={details}
+          actions={trophies.length > 0 && <GameAiExport getSource={() => psnAiSource({ game, trophies, groups, details })} />}
+        />
 
         {isLoading ? (
           <div role="status" aria-busy="true" className="w-full flex flex-col items-center">

@@ -1,0 +1,119 @@
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLanguage } from '@/context/LanguageContext'
+import type { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
+import type { SteamGameProgress, SteamRecentAchievement } from '@/types/steam'
+import type { PsnGameProgress, PsnRecentTrophy } from '@/types/psn'
+import type { FriendOverview } from '@/utils/friends'
+import { profileLibrary, type LibraryGame } from '@/utils/library'
+import { toRecentAchievement } from '@/utils/steamMappers'
+import { psnToRecentAchievement } from '@/utils/psnMappers'
+import { toSteamLanguage } from '@/utils/steamLanguage'
+import { mapLimit } from '@/utils/utils'
+
+/** How many friends get their activity and games read: the newest follows. Each costs a few cached platform calls. */
+export const DETAIL_LIMIT = 10
+const AT_ONCE = 2
+/** RA's own system "consoles" (events, hubs) are not games. */
+const RA_SYSTEM_CONSOLES = new Set([100, 101])
+
+export type FriendDetails = {
+  recent: RecentAchievement[]
+  games: LibraryGame[]
+  /** Something could not be read (a private profile, a platform down): the numbers may be short. */
+  partial: boolean
+}
+
+async function readList<T>(url: string): Promise<T[]> {
+  const res = await fetch(url, { cache: 'no-store' })
+  if (!res.ok) throw new Error(`${url.split('?')[0]} ${res.status}`)
+  const data = await res.json()
+  if (!Array.isArray(data)) throw new Error(`${url.split('?')[0]}: not a list`)
+  return data as T[]
+}
+
+/** One friend's recent unlocks and games, through the same routes their profile uses (`?user=`). */
+export async function loadFriendDetails(friend: FriendOverview, lang: string): Promise<FriendDetails> {
+  const user = `user=${encodeURIComponent(friend.username)}`
+  const steamLang = toSteamLanguage(lang)
+  const none = Promise.resolve([] as never[])
+  const calls = await Promise.allSettled([
+    friend.ra ? readList<RecentAchievement>(`/api/getRecentAchievements?${user}`) : none,
+    friend.steam ? readList<SteamRecentAchievement>(`/api/steam/activity?lang=${steamLang}&${user}`) : none,
+    friend.psn ? readList<PsnRecentTrophy>(`/api/psn/recentTrophies?scope=activity&lang=${lang}&${user}`) : none,
+    friend.ra ? readList<RetroAchievementsGameCompleted>(`/api/getGamesCompleted?${user}`) : none,
+    friend.steam ? readList<SteamGameProgress>(`/api/steam/ownedGames?${user}`) : none,
+    friend.psn ? readList<PsnGameProgress>(`/api/psn/titles?${user}`) : none,
+  ])
+  const failed = calls.filter((c) => c.status === 'rejected')
+  for (const f of failed) console.error('[useFriendsData]', friend.username, (f as PromiseRejectedResult).reason)
+  const [raRecent, steamRecent, psnRecent, raGames, steamGames, psnGames] = calls.map((c) => (c.status === 'fulfilled' ? c.value : []))
+
+  const recent = [
+    ...(raRecent as RecentAchievement[]),
+    ...(steamRecent as SteamRecentAchievement[]).map(toRecentAchievement),
+    ...(psnRecent as PsnRecentTrophy[]).map(psnToRecentAchievement),
+  ].sort((a, b) => b.Date.localeCompare(a.Date))
+  const games = profileLibrary(
+    (raGames as RetroAchievementsGameCompleted[]).filter((g) => !RA_SYSTEM_CONSOLES.has(g.ConsoleID)),
+    steamGames as SteamGameProgress[],
+    psnGames as PsnGameProgress[],
+    [],
+    friend.username,
+  )
+  return { recent, games, partial: failed.length > 0 }
+}
+
+/**
+ * The Friends section's data: everyone you follow from our own database (cheap,
+ * all of them), then the activity and games of the newest DETAIL_LIMIT, two at
+ * a time, each filled in as it arrives. Nothing is asked until `enabled` first
+ * turns true — the section is opened — and it is kept after.
+ */
+export function useFriendsData(enabled: boolean) {
+  const { lang } = useLanguage()
+  const [friends, setFriends] = useState<FriendOverview[] | null>(null)
+  const [details, setDetails] = useState<Record<string, FriendDetails>>({})
+  const [error, setError] = useState(false)
+  const [attempt, setAttempt] = useState(0)
+  const started = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (!enabled || started.current === attempt) return
+    started.current = attempt
+    let current = true
+    readList<FriendOverview>('/api/follows/overview')
+      .then(async (list) => {
+        if (!current) return
+        setFriends(list)
+        await mapLimit(list.slice(0, DETAIL_LIMIT), AT_ONCE, async (friend) => {
+          const d = await loadFriendDetails(friend, lang)
+          if (current) setDetails((prev) => ({ ...prev, [friend.username]: d }))
+        })
+      })
+      .catch((err) => {
+        console.error('[useFriendsData]', err)
+        if (current) setError(true)
+      })
+    return () => {
+      current = false
+    }
+  }, [enabled, attempt, lang])
+
+  const retry = useCallback(() => {
+    setError(false)
+    setFriends(null)
+    setDetails({})
+    setAttempt((n) => n + 1)
+  }, [])
+
+  const detailed = friends ? friends.slice(0, DETAIL_LIMIT) : []
+  return {
+    friends,
+    details,
+    /** The overview is in, and every friend whose details are read has answered. */
+    isLoading: friends === null && !error,
+    detailsLoading: detailed.some((f) => !details[f.username]),
+    error,
+    retry,
+  }
+}

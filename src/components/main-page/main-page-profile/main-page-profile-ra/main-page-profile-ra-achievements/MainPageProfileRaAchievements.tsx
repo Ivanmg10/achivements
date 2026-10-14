@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { useSubject } from '@/context/SubjectContext'
+import { gameHref } from '@/utils/gameRef'
 
 export default function MainPageProfileRaAchievements({
   achievements,
@@ -15,6 +17,7 @@ export default function MainPageProfileRaAchievements({
   isLoading?: boolean
 }) {
   const { T } = useLanguage()
+  const subject = useSubject()
 
   return (
     // Room for the three rows it can hold, loading or loaded: the profile column
@@ -42,7 +45,7 @@ export default function MainPageProfileRaAchievements({
         {achievements.slice(0, 3).map((ach) => (
           <Link
             key={ach.AchievementID}
-            href={`/gameInfo/${ach.GameID}`}
+            href={gameHref('ra', ach.GameID, subject)}
             className="flex gap-2 items-center rounded-lg hover:bg-ink/5 transition-colors group p-1 -mx-1"
           >
             <Image

@@ -5,6 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useSubject } from '@/context/SubjectContext'
+import { gameHref } from '@/utils/gameRef'
 import { motion } from 'framer-motion'
 import { IconStar, IconStarFilled } from '@tabler/icons-react'
 import { modalOverlay, modalContent } from '@/lib/animations'
@@ -64,6 +66,7 @@ export default function AchievementModal({
   onToggleFavorite?: () => void
 }) {
   const { T, lang } = useLanguage()
+  const subject = useSubject()
   const titleId = useId()
   const dialogRef = useRef<HTMLDivElement>(null)
   const [detail, setDetail] = useState<AchievementDetail | null>(null)
@@ -173,7 +176,7 @@ export default function AchievementModal({
               {gameId ? (
                 <Link
                   id={titleId}
-                  href={`/gameInfo/${gameId}`}
+                  href={gameHref('ra', gameId, subject)}
                   onClick={onClose}
                   className="text-xl font-semibold hover:underline underline-offset-2"
                 >

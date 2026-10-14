@@ -15,6 +15,7 @@ import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-
 import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
 import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy, PsnTrophyGroup, TrophyGrade } from '@/types/psn'
+import { useSubject } from '@/context/SubjectContext'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -64,6 +65,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
   limit?: number
 }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const { pinned, toggle, canPin } = usePsnFavoriteTrophies(gameId, gameTitle)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -102,7 +104,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
             {section.trophies.map((t) => (
               <li key={t.id} className="relative group/badge">
                 <Link
-                  href={`${gameHref('psn', gameId)}#${psnTrophyAnchor(t.id)}`}
+                  href={`${gameHref('psn', gameId, subject)}#${psnTrophyAnchor(t.id)}`}
                   aria-label={`${nameOf(t)} — ${grade[t.type]}, ${t.earned ? T.psn.earned : T.psn.locked}`}
                   onMouseEnter={(e) => show(t, e.clientX, e.clientY)}
                   onMouseLeave={hide}

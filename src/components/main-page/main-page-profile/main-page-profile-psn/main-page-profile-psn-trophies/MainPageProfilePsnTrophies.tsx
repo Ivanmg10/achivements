@@ -9,6 +9,7 @@ import { gameHref } from '@/utils/gameRef'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import type { PsnError } from '@/hooks/usePsnLink'
 import type { PsnRecentTrophy } from '@/types/psn'
+import { useSubject } from '@/context/SubjectContext'
 
 /**
  * The player's latest trophies — the Steam list's counterpart, same layout,
@@ -27,6 +28,7 @@ export default function MainPageProfilePsnTrophies({
   onRetry: () => void
 }) {
   const { T, lang } = useLanguage()
+  const subject = useSubject()
   const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }
 
   return (
@@ -64,7 +66,7 @@ export default function MainPageProfilePsnTrophies({
           {trophies.slice(0, 3).map((t) => (
             <li key={`${t.gameId}:${t.trophyId}`} className="w-full">
               <Link
-                href={`${gameHref('psn', t.gameId)}#${psnTrophyAnchor(t.trophyId)}`}
+                href={`${gameHref('psn', t.gameId, subject)}#${psnTrophyAnchor(t.trophyId)}`}
                 className="flex gap-2 items-center rounded-lg hover:bg-ink/5 transition-colors group p-1 -mx-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
               >
                 {t.iconUrl ? (

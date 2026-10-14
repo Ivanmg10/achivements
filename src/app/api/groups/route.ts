@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
+import { listGroups } from '@/lib/groupList'
 import { GROUPS_PER_USER_MAX, readGroupFields } from '@/utils/groupValidation'
 
 export async function GET() {
@@ -11,28 +12,7 @@ export async function GET() {
       return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
     }
 
-    const result = await pool.query(
-      `SELECT g.id, g.title, g.description, g.icon, g.is_public, g.position, g.created_at, g.updated_at,
-              COUNT(i.id)::int                                          AS game_count,
-              COUNT(i.id) FILTER (WHERE i.source = 'steam')::int        AS steam_count,
-              COUNT(i.id) FILTER (WHERE i.source = 'psn')::int          AS psn_count,
-              COALESCE(SUM(i.num_awarded), 0)::int    AS total_awarded,
-              COALESCE(SUM(i.max_possible), 0)::int   AS total_possible,
-              -- The first four games' art, for the card's cover mosaic.
-              COALESCE((
-                SELECT json_agg(json_build_object('source', c.source, 'game_id', c.game_id, 'image_icon', c.image_icon) ORDER BY c.position)
-                  FROM (SELECT source, game_id, image_icon, position FROM game_group_items
-                         WHERE group_id = g.id ORDER BY position LIMIT 4) c
-              ), '[]'::json) AS covers
-       FROM game_groups g
-       LEFT JOIN game_group_items i ON i.group_id = g.id
-       WHERE g.user_id = $1
-       GROUP BY g.id
-       ORDER BY g.position ASC, g.created_at ASC`,
-      [session.user.id],
-    )
-
-    return NextResponse.json(result.rows)
+    return NextResponse.json(await listGroups(session.user.id))
   } catch (err) {
     console.error('[groups GET]', err)
     return NextResponse.json({ message: 'Error interno' }, { status: 500 })

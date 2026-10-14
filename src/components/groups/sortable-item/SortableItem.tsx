@@ -12,7 +12,7 @@ import { useGameProgression } from '@/hooks/useGameProgression'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import { RetroAchievement, GameGroupItem } from '@/types/types'
 import { CONSOLES } from '@/constants'
-import { DualProgressBar } from '@/components/ui/DualProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
@@ -121,13 +121,8 @@ export default function SortableItem({
           </p>
           {achTotal > 0 && (
             <div className="flex items-center gap-2 mt-1">
-              <DualProgressBar
-                softcorePct={isComplete ? 0 : scPct}
-                hardcorePct={isComplete ? 0 : hcPct}
-                trackClass={isComplete ? 'bg-green-500/20' : 'bg-bg-main'}
-                className="flex-1"
-              />
-              <span className="text-xs text-text-secondary tabular-nums">{pct}%</span>
+              <ProgressBar pct={hcPct} softPct={scPct} label={item.title} trackClass="bg-bg-main" className="flex-1" />
+              <span className={`text-xs tabular-nums ${isComplete ? 'text-success font-semibold' : 'text-text-secondary'}`}>{pct}%</span>
             </div>
           )}
           {/* Kept when there is nothing to show, so every card is the same height. */}

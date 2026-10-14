@@ -24,7 +24,8 @@ export default async function MainLayout({
       <div className="min-h-screen flex flex-col">
         <MainHeader />
         <RaUserRefresher />
-        <main className="flex-1">{children}</main>
+        {/* Clip, not hide: the game pages' 100vw backdrops would otherwise add a sideways scroll the width of the scrollbar. */}
+        <main className="flex-1 overflow-x-clip">{children}</main>
         <MainFooter />
       </div>
       <VersionBadge />

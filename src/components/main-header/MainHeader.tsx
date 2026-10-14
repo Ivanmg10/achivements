@@ -98,7 +98,10 @@ export default function MainHeader() {
     { href: '/playing', label: T.mainPage.playing },
     { href: '/completed', label: T.mainPage.completed },
   ]
-  const navItems = [{ href: '/groups', label: T.groups.title }]
+  const navItems = [
+    { href: '/groups', label: T.groups.title },
+    { href: '/following', label: T.following.title },
+  ]
   const isStatusActive = statusItems.some(({ href }) => pathname === href)
 
   return (
