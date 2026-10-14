@@ -5,3 +5,13 @@ test('every theme sits in exactly one picker group', () => {
   expect([...grouped].sort()).toEqual([...THEMES].sort())
   expect(new Set(grouped).size).toBe(grouped.length)
 })
+
+test('every theme has its colours in globals.css', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const css: string = require('fs').readFileSync(require('path').join(__dirname, '../app/globals.css'), 'utf8')
+  for (const theme of THEMES) expect(css).toContain(`[data-theme="${theme}"]`)
+})
+
+test('dark and light come with a violet, a red and a green accent, first in the picker', () => {
+  expect(THEME_GROUPS[0]).toEqual({ id: 'base', themes: ['dark', 'dark-red', 'dark-green', 'light', 'light-red', 'light-green'] })
+})

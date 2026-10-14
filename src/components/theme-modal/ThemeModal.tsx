@@ -51,7 +51,8 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
             <h3 id={`theme-group-${group.id}`} className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
               {T.userTheme[`group_${group.id}`]}
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {/* Base in threes: a row of dark, a row of light, the same accents in the same columns. */}
+            <div className={`grid grid-cols-2 sm:grid-cols-3 gap-3 ${group.id === 'base' ? '' : 'md:grid-cols-4'}`}>
               {group.themes.map((id) => (
                 <ThemeModalOption key={id} theme={id} checked={theme === id} onSelect={handleSelect} />
               ))}

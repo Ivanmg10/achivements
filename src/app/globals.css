@@ -69,7 +69,9 @@
 /* ============================================
    DARK
    ============================================ */
-[data-theme="dark"] {
+[data-theme="dark"],
+[data-theme="dark-red"],
+[data-theme="dark-green"] {
   --bg-main: 15 16 20;
   --bg-header: 10 10 14;
   --bg-card: 23 24 30;
@@ -93,7 +95,9 @@
 /* ============================================
    LIGHT — Neutro suave
    ============================================ */
-[data-theme="light"] {
+[data-theme="light"],
+[data-theme="light-red"],
+[data-theme="light-green"] {
   --ink: 20 22 28;
   --bg-main: 229 231 235;
   --bg-header: 236 238 242;
@@ -115,60 +119,91 @@
 }
 
 /*
+   The same dark and light, with a red or a green accent instead of violet.
+   Where the accent takes a colour that already means something, that meaning
+   moves: errors go orange beside a red accent, "completed" goes teal beside a
+   green one, so a bar never reads as an error or as finished.
+*/
+[data-theme="dark-red"] {
+  --accent: 248 113 113;
+  --accent-hover: 252 165 165;
+  --accent-muted: 248 113 113;
+  --danger: 251 146 60;
+}
+[data-theme="dark-green"] {
+  --accent: 74 222 128;
+  --accent-hover: 134 239 172;
+  --accent-muted: 74 222 128;
+  --success: 45 212 191;
+}
+[data-theme="light-red"] {
+  --accent: 185 28 28;
+  --accent-hover: 153 27 27;
+  --accent-muted: 185 28 28;
+  --danger: 154 52 18;
+}
+[data-theme="light-green"] {
+  --accent: 22 101 52;
+  --accent-hover: 20 83 45;
+  --accent-muted: 22 101 52;
+  --success: 15 118 110;
+}
+
+/*
    Light themes: the fixed palette colours in the code (hardcore gold, ratio
    green, error red...) are tuned for dark surfaces. On a light one, the same
    classes take a darker shade so they still pass AA. Text only: bars and tints
    keep their colour.
 */
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-200 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-300 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-400 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-200 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-300 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-400 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-200 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-300 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-400 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-200 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-300 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-400 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-200 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-300 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-400 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-200 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-300 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-400 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-200 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-300 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-400 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-200 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-300 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-400 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-200 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-300 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-400 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-200 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-300 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-400 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-200 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-300 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-400 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-200 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-300 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-400 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-200 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-300 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-400 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-200 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-300 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-400 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-200 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-300 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-400 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-200 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-300 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-400 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-500 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-200 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-300 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-400 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-200 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-300 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-400 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-200 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-300 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-400 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-200 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-300 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-400 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-200 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-300 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-400 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-200 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-300 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-400 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-200 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-300 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-400 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-200 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-300 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-400 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-200 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-300 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-400 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-200 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-300 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-400 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-200 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-300 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-400 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-200 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-300 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-400 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-200 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-300 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-400 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-200 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-300 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-400 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-200 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-300 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-400 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-200 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-300 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-400 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-500 { @apply text-gray-600; }
 
 /* ============================================
    BLUE
