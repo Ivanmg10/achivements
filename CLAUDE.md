@@ -92,7 +92,7 @@ step of it (`bg-progress-soft`) under hardcore. A finished bar stays in the
 theme's colour and glows; **the green is only in the percentage beside it**
 (`text-success` at 100%), never on the bar — the user tried a green ring and
 did not like it. Do not paint a bar in a platform's colour; those stay only in
-charts that compare platforms (BrowseSplit, CompletionDistribution, the line
+charts that compare platforms (CompletionDistribution, the line
 chart).
 
 ## AI export (`src/utils/aiExport.ts`)
