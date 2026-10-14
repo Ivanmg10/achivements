@@ -22,7 +22,7 @@ export default function AppleIcon() {
           fontFamily: 'sans-serif',
         }}
       >
-        C<span style={{ color: '#3ddc84' }}>H</span>
+        CH
       </div>
     ),
     size,
