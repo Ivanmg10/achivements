@@ -7,8 +7,9 @@ import { getToken } from 'next-auth/jwt'
  * signed out it shows the landing page, which is what tells a visitor what
  * CheevoVault is before asking them to sign up.
  */
-// /opengraph-image is the link preview: the sites that fetch it never have a session.
-const PUBLIC_PATHS = ['/', '/authPage', '/resetPassword', '/privacy', '/terms', '/opengraph-image']
+// /opengraph-image is the link preview and /apple-icon the iOS home-screen icon:
+// whoever fetches them (other sites, a phone saving the page) has no session.
+const PUBLIC_PATHS = ['/', '/authPage', '/resetPassword', '/privacy', '/terms', '/opengraph-image', '/apple-icon']
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl

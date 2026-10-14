@@ -8,8 +8,8 @@ const request = (path: string) => new NextRequest(`http://localhost:3000${path}`
 
 beforeEach(() => jest.clearAllMocks())
 
-test('the landing, the auth page and the legal pages are open to anyone', async () => {
-  for (const path of ['/', '/authPage', '/privacy', '/terms']) {
+test('the landing, the auth page, the legal pages and the images other sites fetch are open to anyone', async () => {
+  for (const path of ['/', '/authPage', '/privacy', '/terms', '/opengraph-image', '/apple-icon']) {
     const res = await proxy(request(path))
     expect(res.status).toBe(200)
   }

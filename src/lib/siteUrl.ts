@@ -16,9 +16,13 @@ export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() ?? ''
 /**
  * The title search results and link previews show. The name alone is no use
  * while nobody is searching for the name: what people type is what the site
- * does, and the two platforms it does it for.
+ * does, and the platforms it does it for. Kept near 60 characters, where
+ * Google cuts titles off.
  */
-export const SITE_TITLE = 'CheevoVault · RetroAchievements & Steam achievement tracker'
+export const SITE_TITLE = 'CheevoVault · RetroAchievements, Steam & PSN tracker'
+
+/** The dark theme's background: the browser bar and the installed app's splash. */
+export const THEME_COLOR = '#0f1014'
 
 export const SITE_DESCRIPTION =
   'Track your RetroAchievements, Steam and PlayStation achievements in one place: completion, streaks, rarest unlocks and what is left to hunt.'
