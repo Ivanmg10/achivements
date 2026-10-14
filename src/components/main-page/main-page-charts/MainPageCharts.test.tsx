@@ -173,4 +173,17 @@ describe('sections', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Following' }))
     expect(screen.getByTestId('friends')).toHaveAttribute('data-active', 'true')
   })
+
+  test('opening a section brings it into view, smoothly, top first', () => {
+    platform('ra')
+    const scroll = jest.fn()
+    Element.prototype.scrollIntoView = scroll
+    jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => { cb(0); return 0 })
+    render(<MainPageCharts />)
+    expect(scroll).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('tab', { name: 'Collection' }))
+    expect(scroll).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' })
+    expect(scroll.mock.contexts[0]).toBe(document.querySelector('[data-stats-section]'))
+    ;(window.requestAnimationFrame as jest.Mock).mockRestore()
+  })
 })

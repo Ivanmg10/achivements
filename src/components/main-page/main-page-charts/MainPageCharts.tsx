@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useMemo, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { IconActivity, IconAward, IconCompass, IconFolders, IconLayoutDashboard, IconUsers } from '@tabler/icons-react'
@@ -53,6 +53,15 @@ export default function MainPageCharts() {
   const [section, setSection] = useState('overview')
   const idPrefix = useId().replace(/:/g, '')
   const reduceMotion = useReducedMotion()
+  const sectionRef = useRef<HTMLElement>(null)
+
+  // Opening a section brings the whole of it into view, its top just under the
+  // sticky header (scroll-mt), gliding unless the user asked for less motion.
+  // On the next frame, once the new panel is laid out.
+  const openSection = (id: string) => {
+    setSection(id)
+    requestAnimationFrame(() => sectionRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }))
+  }
   const { achievements, isLoading: achLoading, error: achError, refetch: refetchAch } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()
   // The heatmap draws as far back as the card is wide, so it reads the year
@@ -185,7 +194,7 @@ export default function MainPageCharts() {
   }
 
   return (
-    <section className="p-4 flex flex-col gap-4 bg-bg-main" aria-labelledby={`${idPrefix}-title`} data-stats-section={section}>
+    <section ref={sectionRef} className="p-4 flex flex-col gap-4 bg-bg-main scroll-mt-16" aria-labelledby={`${idPrefix}-title`} data-stats-section={section}>
       <h2 id={`${idPrefix}-title`} className="text-xl font-semibold text-text-main">{T.cards.statsActivity}</h2>
 
       {/*
@@ -201,7 +210,7 @@ export default function MainPageCharts() {
         <MainPageStatsRail
           sections={sections}
           active={section}
-          onChange={setSection}
+          onChange={openSection}
           label={T.cards.sectionsLabel}
           idPrefix={idPrefix}
         />
