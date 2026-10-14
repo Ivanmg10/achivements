@@ -22,15 +22,15 @@ export default function StreakQuickStats({
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <StatPill className={CARD} label={T.streak.activeDays} value={activeDays.toLocaleString(lang)} sub={T.streak.inLastYear} accent="text-accent" />
-      <StatPill className={CARD} label={T.streak.avgStreak} value={days(Math.round(avgStreak * 10) / 10)} accent="text-info" />
+      <StatPill className={CARD} label={T.streak.activeDays} value={activeDays.toLocaleString(lang)} sub={T.streak.inLastYear} />
+      <StatPill className={CARD} label={T.streak.avgStreak} value={days(Math.round(avgStreak * 10) / 10)} />
       <StatPill
         className={CARD}
         label={T.streak.sinceLast}
         value={daysSinceLast === null ? '—' : daysSinceLast === 0 ? T.streak.today : days(daysSinceLast)}
         accent={daysSinceLast === 0 ? 'text-success' : 'text-text-main'}
       />
-      <StatPill className={CARD} label={T.streak.longestGap} value={days(longestGap)} accent="text-warning" />
+      <StatPill className={CARD} label={T.streak.longestGap} value={days(longestGap)} />
     </div>
   )
 }

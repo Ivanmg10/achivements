@@ -33,16 +33,16 @@ export default function PublicUserKpis() {
 
   return (
     <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-      <UserVaultStat icon={<IconCalendarEvent size={18} />} label={T.userProfile.today} value={kpis.today} accent="text-accent" />
-      <UserVaultStat icon={<IconCalendarWeek size={18} />} label={T.userProfile.week} value={kpis.week} accent="text-amber-400" />
-      <UserVaultStat icon={<IconCalendarMonth size={18} />} label={T.userProfile.month} value={kpis.month} accent="text-red-400" />
+      <UserVaultStat icon={<IconCalendarEvent size={18} />} label={T.userProfile.today} value={kpis.today} accent="text-text-main" />
+      <UserVaultStat icon={<IconCalendarWeek size={18} />} label={T.userProfile.week} value={kpis.week} accent="text-text-main" />
+      <UserVaultStat icon={<IconCalendarMonth size={18} />} label={T.userProfile.month} value={kpis.month} accent="text-text-main" />
       <UserVaultStat
         icon={<IconChartLine size={18} />}
         label={T.userProfile.perDay}
         value={kpis.avgPerDay}
         display={kpis.avgPerDay.toLocaleString(lang, { maximumFractionDigits: 1 })}
         sub={T.userProfile.last30Days}
-        accent="text-info"
+        accent="text-text-main"
       />
       <UserVaultStat
         icon={<IconFlame size={18} />}
