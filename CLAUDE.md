@@ -443,6 +443,17 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
   ## Notes
   <migrations to run, env vars, user-visible changes, follow-ups — or "None">
   ```
+  The same template is in `.github/pull_request_template.md`, so GitHub fills it in
+  for a PR opened from the web.
+- **Never open a PR with an empty or placeholder description.** Whoever opens it
+  (agent or `gh pr create`) writes the full template from the branch's commits and
+  diff (`git log develop..HEAD`, `git diff develop...HEAD --stat`), not from memory.
+- **Keep it current.** Every time more commits are pushed to a branch with an open
+  PR, reread the description and update it (`gh pr edit <n> --body-file …`) if the
+  change moved what, why, how to test or notes — a new migration or env var always
+  does. The title too, if the scope changed. The description must describe the
+  final diff, since it is what gets reviewed and what the squash message is read
+  against.
 - Base branch: `develop` for normal work, `main` only for `develop` → `main` releases and hotfixes.
 - One concern per PR, small enough to review. Before opening: `npm test`, lint and
   `npm run build` pass.

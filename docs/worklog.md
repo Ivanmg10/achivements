@@ -38,4 +38,8 @@ to leave a written record of what it did.
 context); the README is for people landing on the repo and points there
 instead of copying the Email/Sessions sections, which had gone stale twice.
 The worklog is one file, newest first, so reading the top is enough.
+Then, on the same branch: a rule in `CLAUDE.md` → Pull requests that a PR is
+never opened without its full description and that it is updated whenever more
+commits change what it says, plus `.github/pull_request_template.md` so PRs
+opened on the web start from the same template.
 **Open** — Nothing from this session.
