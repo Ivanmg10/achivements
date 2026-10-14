@@ -41,5 +41,11 @@ The worklog is one file, newest first, so reading the top is enough.
 Then, on the same branch: a rule in `CLAUDE.md` → Pull requests that a PR is
 never opened without its full description and that it is updated whenever more
 commits change what it says, plus `.github/pull_request_template.md` so PRs
-opened on the web start from the same template.
+opened on the web start from the same template. And
+`.github/workflows/pr-description.yml`, the first GitHub Action in the repo: it
+fails a PR whose description is missing a section or leaves one blank.
+**Watch out** — For the check to block merging it must be added as a required
+status check in the branch protection of `develop` and `main` (GitHub settings,
+not code). The body reaches the script through `env`, never `${{ }}` inside
+`run:`, so a PR description cannot inject shell.
 **Open** — Nothing from this session.

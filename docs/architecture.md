@@ -87,6 +87,8 @@ Change the shape of a cached value â†’ bump its key's version (`gameData_v2:` â†
 
 - `.githooks/pre-commit` bumps the patch in `src/lib/version.ts` and syncs
   `package.json`; `.githooks/commit-msg` enforces Conventional Commits.
+- `.github/workflows/pr-description.yml` fails a PR whose description leaves a
+  section of the template blank.
 - Tests sit next to the file they cover (`*.test.ts(x)`); fixtures in
   `src/test-utils/`.
 - `graphify-out/` is a generated knowledge graph of the code (the `/graphify`

@@ -454,6 +454,10 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
   does. The title too, if the scope changed. The description must describe the
   final diff, since it is what gets reviewed and what the squash message is read
   against.
+- **Enforced in CI**: `.github/workflows/pr-description.yml` fails the PR while any
+  of the four sections is missing or empty (the template's `<!-- -->` hints do not
+  count; `None` does). It reruns when the description is edited — fix the text, not
+  the workflow, and never merge with it red.
 - Base branch: `develop` for normal work, `main` only for `develop` → `main` releases and hotfixes.
 - One concern per PR, small enough to review. Before opening: `npm test`, lint and
   `npm run build` pass.
