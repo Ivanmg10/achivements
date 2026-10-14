@@ -469,7 +469,18 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
 
 ### Environments (set up 2026-10-10)
 `develop` is served at `dev.cheevovault.com` (Vercel Preview, branch `develop`). `main` and
-`develop` are protected on GitHub (PR required, no force-push).
+`develop` are protected on GitHub (PR required, no force-push). A third ruleset,
+`pr description` (2026-10-14), requires the `pr-description` check to pass **and the
+branch to be up to date with its base** before merging, on both.
+
+- **Before merging, bring the branch up to date**: `git fetch` and `git merge
+  origin/develop` (or the "Update branch" button), push, wait for the checks again.
+  Merge, not rebase — a rebase would need a force-push.
+- **`src/lib/version.ts` and `package.json` will conflict** on that merge whenever
+  `develop` moved, since every commit bumps the patch. Keep the **higher** version
+  in both; never go back below what `develop` already has.
+- A `develop` → `main` PR needs `develop` to contain `main`; after a hotfix, merge
+  `main` back into `develop` first (as the flow above already says).
 
 - **`develop` shares the production database** (the Neon integration's `DATABASE_URL`),
   by the user's choice for now. So testing on develop touches real data: **never run a

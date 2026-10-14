@@ -46,6 +46,10 @@ opened on the web start from the same template. And
 fails a PR whose description is missing a section or leaves one blank.
 **Watch out** — For the check to block merging it must be added as a required
 status check, named `pr-description`, in a ruleset on `develop` and `main` (GitHub settings,
-not code). The body reaches the script through `env`, never `${{ }}` inside
-`run:`, so a PR description cannot inject shell.
+not code). The user created it as `pr description`, **with "require branches to be
+up to date" on, by choice**: every PR now has to merge its base in before it can
+merge, and `version.ts`/`package.json` will conflict when the base moved (keep the
+higher version). Written down in `CLAUDE.md` → Environments. The body reaches
+the script through `env`, never `${{ }}` inside `run:`, so a PR description
+cannot inject shell.
 **Open** — Nothing from this session.
