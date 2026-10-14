@@ -43,7 +43,7 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose} className="mx-4 sm:max-w-2xl max-h-[90dvh] overflow-y-auto justify-start!">
+    <CommonModal isOpen={isOpen} onClose={onClose} className="mx-3 sm:mx-4 p-4! sm:p-6! sm:max-w-3xl lg:max-w-5xl max-h-[90dvh] overflow-y-auto justify-start!">
       <h2 className="text-xl font-bold">{T.userTheme.theme}</h2>
       <div role="radiogroup" aria-label={T.userTheme.theme} className="flex flex-col gap-5">
         {THEME_GROUPS.map((group) => (
@@ -51,8 +51,9 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
             <h3 id={`theme-group-${group.id}`} className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
               {T.userTheme[`group_${group.id}`]}
             </h3>
-            {/* Base in threes: a row of dark, a row of light, the same accents in the same columns. */}
-            <div className={`grid grid-cols-2 sm:grid-cols-3 gap-3 ${group.id === 'base' ? '' : 'md:grid-cols-4'}`}>
+            {/* One grid for every group, so the previews are the same size throughout. In threes the
+                base themes sit a row of dark over a row of light; in sixes, all on one row. */}
+            <div className="grid grid-cols-2 min-[400px]:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
               {group.themes.map((id) => (
                 <ThemeModalOption key={id} theme={id} checked={theme === id} onSelect={handleSelect} />
               ))}
