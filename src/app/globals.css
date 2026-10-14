@@ -51,9 +51,10 @@
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
 
-  --accent: 225 228 235;
-  --accent-hover: 245 246 250;
-  --accent-muted: 225 228 235;
+  /* The light theme's indigo, a step lighter so it stands out on a dark surface. */
+  --accent: 129 140 248;
+  --accent-hover: 165 180 252;
+  --accent-muted: 129 140 248;
 
   --success: 34 197 94;
   --warning: 245 158 11;
@@ -77,9 +78,10 @@
   --text-main: 225 228 235;
   --text-secondary: 140 145 155;
 
-  --accent: 225 228 235;
-  --accent-hover: 245 246 250;
-  --accent-muted: 225 228 235;
+  /* The light theme's indigo, a step lighter so it stands out on a dark surface. */
+  --accent: 129 140 248;
+  --accent-hover: 165 180 252;
+  --accent-muted: 129 140 248;
 
   --success: 34 197 94;
   --warning: 245 158 11;
