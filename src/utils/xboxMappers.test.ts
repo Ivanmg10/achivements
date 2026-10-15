@@ -1,0 +1,135 @@
+import {
+  sortByLastPlayed,
+  toXbox360Achievement,
+  toXboxAchievement,
+  toXboxGame,
+  toXboxProfile,
+  xboxPlatforms,
+} from './xboxMappers'
+import { RAW_360_ACHIEVEMENT, RAW_360_TITLE, RAW_ACHIEVED, RAW_LOCKED, RAW_MODERN_TITLE, RAW_PROFILE, xboxGameFixture } from '@/test-utils/xboxFixtures'
+
+describe('toXboxProfile', () => {
+  test('reads the settings list, with the avatar over https and the score as a number', () => {
+    expect(toXboxProfile(RAW_PROFILE)).toEqual({
+      xuid: '2535400000000001',
+      gamertag: 'TestPlayer',
+      avatarUrl: 'https://images-eds-ssl.xboxlive.com/image?url=abc&format=png',
+      gamerscore: 10242,
+      tier: 'Silver',
+    })
+  })
+
+  test('no user, or one without a gamertag, is no profile', () => {
+    expect(toXboxProfile(undefined)).toBeNull()
+    expect(toXboxProfile({ id: '1', settings: [{ id: 'Gamerscore', value: '5' }] })).toBeNull()
+  })
+
+  test('a missing or unreadable score is 0', () => {
+    const p = toXboxProfile({ id: '1', settings: [{ id: 'Gamertag', value: 'A' }, { id: 'Gamerscore', value: 'x' }] })
+    expect(p).toMatchObject({ gamerscore: 0, tier: '', avatarUrl: null })
+  })
+})
+
+describe('toXboxGame', () => {
+  test('a modern game: an achievement total of 0 is unknown, not zero, and PC is listed once', () => {
+    expect(toXboxGame(RAW_MODERN_TITLE)).toEqual({
+      titleId: '1738914043',
+      name: 'Modern Game',
+      imageUrl: 'https://images-eds.xboxlive.com/image?url=modern',
+      platforms: ['Xbox Series', 'PC'],
+      is360: false,
+      earnedAchievements: 15,
+      totalAchievements: null,
+      earnedGamerscore: 200,
+      totalGamerscore: 1345,
+      progress: 14,
+      lastPlayed: '2026-10-15T15:07:05.562Z',
+    })
+  })
+
+  test('an Xbox 360 game is flagged, and keeps its real total', () => {
+    expect(toXboxGame(RAW_360_TITLE)).toMatchObject({ is360: true, totalAchievements: 50, imageUrl: null, platforms: ['Xbox 360'] })
+  })
+
+  test('a game also on a newer console is not an Xbox 360 game', () => {
+    expect(toXboxGame({ ...RAW_360_TITLE, devices: ['Xbox360', 'XboxOne'] }).is360).toBe(false)
+  })
+
+  test('a title with no achievement block is empty, and "never played" is no date', () => {
+    expect(toXboxGame({ titleId: '5', name: 'Bare', achievement: null, titleHistory: { lastTimePlayed: '0001-01-01T00:00:00Z' } })).toMatchObject({
+      earnedAchievements: 0, totalAchievements: null, earnedGamerscore: 0, totalGamerscore: 0, progress: 0, lastPlayed: null,
+    })
+  })
+})
+
+describe('toXboxAchievement', () => {
+  test('an earned one: its date, score, icon, rarity and secrecy', () => {
+    expect(toXboxAchievement(RAW_ACHIEVED)).toEqual({
+      id: '1',
+      name: 'Prologue',
+      description: 'Complete the Prologue',
+      iconUrl: 'https://images-eds-ssl.xboxlive.com/image?url=icon',
+      gamerscore: 10,
+      unlocked: true,
+      unlockedAt: '2026-01-06T18:20:22.7030000Z',
+      secret: true,
+      rarity: 80.46,
+      rarityCategory: 'Common',
+    })
+  })
+
+  test('a locked one has no date, shows its locked text, and no rarity when Xbox sends none', () => {
+    expect(toXboxAchievement(RAW_LOCKED)).toMatchObject({
+      unlocked: false,
+      unlockedAt: null,
+      description: 'Keep playing the main story',
+      gamerscore: 25,
+      iconUrl: null,
+      rarity: null,
+      rarityCategory: null,
+      secret: false,
+    })
+  })
+
+  test('a reward that is not gamerscore is not counted', () => {
+    expect(toXboxAchievement({ id: '9', rewards: [{ type: 'Art', value: '7' }] }).gamerscore).toBe(0)
+  })
+})
+
+describe('toXbox360Achievement', () => {
+  test('maps the flat 360 shape', () => {
+    expect(toXbox360Achievement(RAW_360_ACHIEVEMENT)).toEqual({
+      id: '49',
+      name: 'Award',
+      description: 'Got a 100 note streak',
+      iconUrl: null,
+      gamerscore: 30,
+      unlocked: true,
+      unlockedAt: '2026-10-09T21:22:41.5300000Z',
+      secret: false,
+      rarity: 24.73,
+      rarityCategory: 'Common',
+    })
+  })
+
+  test('a locked one shows the locked text and no date', () => {
+    expect(toXbox360Achievement({ ...RAW_360_ACHIEVEMENT, unlocked: false, timeUnlocked: '0001-01-01T00:00:00Z' })).toMatchObject({
+      unlocked: false, unlockedAt: null, description: 'Get a 100 note streak',
+    })
+  })
+})
+
+test('xboxPlatforms names the consoles and drops repeats', () => {
+  expect(xboxPlatforms(['XboxOne', 'PC', 'Win32', 'Mystery'])).toEqual(['Xbox One', 'PC', 'Mystery'])
+  expect(xboxPlatforms(undefined)).toEqual([])
+})
+
+test('sortByLastPlayed puts the latest first and the never-played last, without mutating', () => {
+  const games = [
+    xboxGameFixture({ titleId: '1', lastPlayed: null }),
+    xboxGameFixture({ titleId: '2', lastPlayed: '2026-01-01T00:00:00Z' }),
+    xboxGameFixture({ titleId: '3', lastPlayed: '2026-06-01T00:00:00Z' }),
+  ]
+  expect(sortByLastPlayed(games).map((g) => g.titleId)).toEqual(['3', '2', '1'])
+  expect(games.map((g) => g.titleId)).toEqual(['1', '2', '3'])
+})

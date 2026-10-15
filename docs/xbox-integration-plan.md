@@ -1,18 +1,17 @@
 # Xbox integration — análisis y plan
 
-Rama: `feat/xbox-integration` (cortada de `develop`). Estado: **análisis + plan, sin código todavía**.
+Rama: `feat/xbox-integration` (cortada de `develop`). Estado: **análisis, spike hecho y explorador de administrador**; el resto del plan, pendiente.
 
-> **En pausa (2026-10-11).** Bloqueado en la Fase 0: xbl.io exige verificar un móvil para activar la
-> key y el número español del dueño es rechazado ("Failed to send verification code"); no se paga
-> ningún plan por ahora. Para retomar: conseguir la key (soporte de OpenXBL, otro móvil de un
-> operador grande, o plan de pago) y guardarla como `OPENXBL_API_KEY` en `.env.local`. Plan B si
-> OpenXBL no funciona: autenticar contra Microsoft directamente (más trabajo, tokens que caducan).
+> **Estado (2026-10-15).** Fase 0 hecha con una key real (ver sección 6). Está implementado un
+> **explorador solo para administradores** en el panel de admin (sin migraciones, sin vincular
+> usuarios). Falta decidir el siguiente paso con lo medido. *(Estuvo en pausa del 11 al 15 de octubre
+> por la verificación del teléfono de xbl.io.)*
 
 > Fuente del análisis: la web de OpenXBL (xbl.io), el SDK Go no oficial `wolveix/openxbl-go`
 > (structs con sus tags JSON) y el código de PSN de este repo. **La documentación pública de
 > OpenXBL es muy escasa** (la página `/console` redirige a un `/docs` vacío), así que los mocks de
-> abajo están reconstruidos a partir de los structs del SDK, **no de respuestas reales**. Todo lo
-> marcado ⚠️ hay que confirmarlo con una llamada real en la Fase 0.
+> las secciones 2 y 3 se reconstruyeron a partir de los structs del SDK. **La sección 6 los corrige
+> con respuestas reales**; donde discrepan, manda la 6.
 
 ---
 
@@ -204,3 +203,47 @@ página de juego con logros (rareza y fecha si existen) · feed reciente · pins
 2. ¿Aceptas depender de OpenXBL (tercero no oficial)? La alternativa es autenticar contra Microsoft
    directamente: sin intermediario, pero con tokens que caducan y mucho más trabajo.
 3. ¿Xbox 360 fuera de la v1?
+
+---
+
+## 6. Resultados de la Fase 0 (respuestas reales, 2026-10-15)
+
+Probado con una cuenta de 135 juegos. Base real: `https://api.xbl.io/v2/` (no `xbl.io/api/v2`).
+
+| Pregunta | Resultado |
+|---|---|
+| ¿Biblioteca en una llamada? | **Sí.** `GET titles/{xuid}`: 135 juegos, 131 KB, sin paginación. Incluye juegos de Xbox 360. |
+| ¿Gamertag → XUID? | **Sí, en 1 llamada**: `GET friends/search?gt=` devuelve el perfil completo (avatar, gamerscore, tier). `GET account` igual, para la cuenta de la key. |
+| Forma del perfil | **No** es el objeto plano del SDK: es `profileUsers[0].settings[]`, pares `{id, value}`, con el gamerscore como texto. |
+| ¿Logros de un juego? | **Sí, 1 llamada**: `achievements/player/{xuid}/{titleId}`, 75 logros en 90 KB, con **rareza** (`rarity.currentPercentage` y categoría), **fecha** (`progression.timeUnlocked`; `0001-…` = sin desbloquear) y gamerscore en `rewards`. |
+| ¿Xbox 360? | Endpoint propio `achievements/x360/{xuid}/title/{titleId}`, forma plana (`unlocked`, `gamerscore`, `timeUnlocked`, `rarity`). **También trae rareza y fecha**; solo falta la URL del icono. |
+| ¿Tiempo jugado? | `POST player/stats` con `MinutesPlayed`: funciona (3409 min en un juego) pero algunos juegos no traen valor. **Sin cablear todavía.** |
+| ¿`titleId` > 2³¹? | Máximo visto: 2.142.392.202, **por debajo** de 2.147.483.647. El INTEGER aguanta con esta cuenta; no está garantizado para todas. |
+| Errores | **HTTP 200 con el error en el cuerpo** (`{"code":400}`). Hay que mirar el cuerpo. |
+| Cabeceras | `Accept-Language: *` (el de Node por defecto) se rechaza: hay que mandar un idioma. |
+| Límite | `X-RateLimit-Remaining` / `-Limit` (150) en cada respuesta. |
+
+### Dos trampas en los datos
+
+1. **Totales de logros poco fiables en juegos modernos** (`sourceVersion: 2`, 65 de 135): 49 traen
+   `totalAchievements: 0` aunque sí tienen `totalGamerscore` y `progressPercentage` correctos. Hay
+   que medir el progreso **por gamerscore**; el total de logros solo sale con la llamada del juego.
+2. **107 de 135 juegos no tienen logros** en el resumen (58 con `sourceVersion: 0`); no son un error.
+
+### Coste real por perfil en frío: ≈ 3 llamadas
+
+Búsqueda (1) + biblioteca (1) + logros de un juego (1 por juego abierto). Mejor que el ≈ 7 estimado:
+con la caché de Postgres, el plan Free aguanta **unos 50 perfiles en frío por hora**.
+
+### Sigue sin verificar
+
+- **Qué devuelve un perfil privado** (¿403, lista vacía?) y **un gamertag inexistente** (el código lo
+  trata como 404 y lo anota en `CLAUDE.md`). Hace falta una cuenta ajena con privacidad cerrada.
+- Límite real de `player/stats` por llamada, y si un perfil público de alguien que no es amigo se lee.
+
+### Qué se construyó (solo administradores)
+
+Explorador en el panel de admin: gamertag → perfil, biblioteca con progreso y gamerscore, y logros de
+cada juego al abrirlo (con las llamadas que quedan esta hora). `src/lib/xboxClient.ts`,
+`src/utils/xboxMappers.ts`, `/api/admin/xbox` y `/api/admin/xbox/achievements`, cada búsqueda queda en
+el registro de admin (`xbox-lookup`). Sin migraciones: no toca la base de datos compartida con producción.

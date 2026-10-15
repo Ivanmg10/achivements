@@ -31,6 +31,7 @@ page (src/app/(main)/…)            client component
 | RetroAchievements | `get*` (gameData, recentAchievements, activityHeatmap…), `updateRaUser`, `unlinkRaUser` | Older flat names; keep them, the client calls them |
 | Steam | `steam/*` (link, ownedGames, achievements, recentlyPlayed…) | Linked by name (`src/lib/steamAccount.ts`) |
 | PlayStation | `psn/*` (link, titles, trophies, details…) | One app account, `src/lib/psnClient.ts` |
+| Xbox | `admin/xbox`, `admin/xbox/achievements` | Admin-only explorer over OpenXBL, `src/lib/xboxClient.ts`; no user linking yet |
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
 | Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | |

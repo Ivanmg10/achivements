@@ -333,6 +333,35 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   not something settled. `raid` stays server-only either way.
 - The user search (`/api/users/search`) only reads our database; it never calls RA.
 
+## Xbox (OpenXBL) — admin-only for now, read before touching it
+
+Read through OpenXBL (xbl.io, an unofficial proxy over Xbox Live), all in
+`src/lib/xboxClient.ts`. **Only the admin panel's Xbox explorer uses it**
+(`/api/admin/xbox`, `/api/admin/xbox/achievements`): no user can link Xbox yet,
+no migration exists, nothing is saved. Plan and measured findings:
+`docs/xbox-integration-plan.md`.
+
+- **One app key, not the user's** (`OPENXBL_API_KEY`, server-only, never
+  `NEXT_PUBLIC_`), like PSN's NPSSO. Without it the routes answer
+  `503 not-configured`; a refused key answers `503 unauthorized`.
+- **150 calls an hour for the whole app** on the free plan. Everything is cached
+  in `steam_cache` under `xbox:` keys; a profile costs ~3 calls cold (search,
+  library, one game's achievements). Bump a key's `_vN` when its value's shape changes.
+- **OpenXBL answers errors with HTTP 200** and the real status in the body
+  (`{ code: 400 }`): `xboxCall` checks both. It also refuses
+  `Accept-Language: *`, which Node's fetch sends by default, so a language is
+  always sent.
+- **Data shape:** gamerscore, not trophy grades; no DLC groups. Newer games report
+  `totalAchievements: 0` while their gamerscore total is real, so progress goes
+  by gamerscore and the achievement total may be `null`. Xbox 360 games use
+  another endpoint and shape (`is360`). `titleId` is a decimal string; the largest
+  seen is under 2^31 (the `game_id` columns are INTEGER), but check before storing it.
+- **Unverified:** what a private profile returns (`403 → private` is a guess), an
+  unknown gamertag, and play time (`POST player/stats` with `MinutesPlayed` works
+  but is not wired).
+- Every explorer lookup is logged (`xbox-lookup`). Do not add a user-facing Xbox
+  route or a second Xbox provider without asking.
+
 ## PlayStation (PSN) — read before touching it
 
 Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient.ts`.

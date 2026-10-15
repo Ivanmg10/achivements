@@ -25,6 +25,36 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-15 — Xbox via OpenXBL, admin-only explorer (`feat/xbox-integration`)
+
+**Did** — Analysed OpenXBL (xbl.io) against the PSN integration
+(`docs/xbox-integration-plan.md`), ran the Phase 0 spike with a real key, and
+built an **admin-only Xbox explorer**: gamertag → profile, library with
+progress and gamerscore, and each game's achievements (rarity, unlock dates).
+`src/lib/xboxClient.ts`, `src/utils/xboxMappers.ts`, `src/types/xbox.ts`,
+`/api/admin/xbox` and `/api/admin/xbox/achievements`, two hooks, and
+`admin-xbox/AdminXbox.tsx` + `AdminXboxGame.tsx` in the admin panel. New admin
+action `xbox-lookup`. Added the Xbox section to `CLAUDE.md`, a row in
+`docs/architecture.md`, `OPENXBL_API_KEY` in README and `.env.example`.
+**Why** — The user wants Xbox next to RA, Steam and PSN, and asked to try it
+admin-only first, with few calls, before opening it to users.
+**Decisions** — No migration and no user linking: nothing is stored, so the
+shared production database is untouched. Progress goes by gamerscore because
+modern games report `totalAchievements: 0`. Xbox 360 stays in the library list
+and uses its own achievements endpoint. `Xbox` is not added to `GameSource` yet:
+that would touch ~50 files and belongs to the user-facing phase.
+**Open** — What a private profile and an unknown gamertag return (needs
+someone else's account); play time (`MinutesPlayed`) is proven but not wired;
+the user-facing phases (link by gamertag, library pages, pins/groups/feed) are
+not started and need the user's go-ahead; whether the free plan's 150 calls an
+hour is enough once users link. Ask first whether to rotate the API key: it was
+pasted in the chat once.
+**Watch out** — OpenXBL answers errors with HTTP 200 and the code in the body,
+and refuses `Accept-Language: *` (Node's fetch default). The base URL is
+`https://api.xbl.io/v2/`. The first spike found the SDK's field names wrong for
+the profile (it is a `settings[]` list), so trust `docs/xbox-integration-plan.md`
+section 6 over the SDK.
+
 ## 2026-10-14 — Release v1.4.0 (`chore/release-v1.4.0`)
 
 **Did** — Bumped to 1.4.0 and opened the `develop` → `main` PR. Updated the
