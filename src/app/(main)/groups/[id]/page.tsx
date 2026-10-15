@@ -10,6 +10,7 @@ import { useGamesData } from '@/context/GamesDataContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
+import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useGroupPage } from '@/hooks/useGroupPage'
 import { useGroupFilters } from '@/hooks/useGroupFilters'
 import { filterGroupItems, groupSummary, itemKey, liveProgressMap, raProgressMaps } from '@/utils/groupItems'
@@ -34,6 +35,7 @@ export default function GroupDetailPage() {
   const { games: recentlyPlayed } = useRecentlyPlayedGames()
   const { library: steamLibrary } = useSteamGamesData()
   const { library: psnLibrary } = usePsnGamesData()
+  const { library: xboxLibrary } = useXboxGamesData()
   const { group, status, retry, reorder, removeGame, addItems, edit, remove } = useGroupPage(groupId, recentlyPlayed)
   const { filters, active: filtersActive, setPct, setDecade, toggleConsole, clearConsoles, clear } = useGroupFilters()
   const [editOpen, setEditOpen] = useState(false)
@@ -42,7 +44,7 @@ export default function GroupDetailPage() {
   const [gridCols, setGridCols] = useState<StatusGridCols>(1)
 
   const ra = useMemo(() => raProgressMaps(recentlyPlayed, allGames), [recentlyPlayed, allGames])
-  const live = useMemo(() => liveProgressMap(steamLibrary, psnLibrary), [steamLibrary, psnLibrary])
+  const live = useMemo(() => liveProgressMap(steamLibrary, psnLibrary, xboxLibrary), [steamLibrary, psnLibrary, xboxLibrary])
   const items = useMemo(() => group?.items ?? [], [group])
   const filtered = useMemo(() => filterGroupItems(items, filters, live), [items, filters, live])
   const summary = useMemo(() => groupSummary(items, ra.ach, live), [items, ra.ach, live])

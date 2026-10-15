@@ -11,6 +11,7 @@ import { entryBackdrop } from '@/components/library-entry-cover/LibraryEntryCove
 import RaLibraryDetail from '@/components/ra-library-detail/RaLibraryDetail'
 import SteamLibraryDetail from '@/components/steam/steam-library-detail/SteamLibraryDetail'
 import PsnLibraryDetail from '@/components/psn/psn-library-detail/PsnLibraryDetail'
+import XboxLibraryDetail from '@/components/xbox/xbox-library-detail/XboxLibraryDetail'
 import { entryHref, entryId } from '@/utils/libraryShelves'
 import type { LibraryEntry } from '@/utils/libraryInsights'
 
@@ -67,8 +68,10 @@ export default function LibraryEntryDetail({ entry, category }: { entry: Library
         ) : (
           <p className="text-center text-text-secondary text-sm py-2">{T.steam.noAchievements}</p>
         )
-      ) : (
+      ) : entry.kind === 'psn' ? (
         <PsnLibraryDetail game={entry.game} category={category} />
+      ) : (
+        <XboxLibraryDetail game={entry.game} category={category} />
       )}
     </section>
   )

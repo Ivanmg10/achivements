@@ -5,12 +5,15 @@ import { useAllGamesGlobal } from '@/hooks/useAllGamesGlobal'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
+import { useXboxGamesData } from '@/context/XboxGamesDataContext'
+import { xboxHasAchievements } from '@/utils/xboxTitles'
 import { useMainPlatform } from '@/context/MainPlatformContext'
 import { buildLibrary, summarizeConsoles } from '@/utils/library'
 import { ChartCard } from '@/components/ui/ChartCard'
 import MainPageConsoleNav from '@/components/main-page/main-page-charts/MainPageConsoleNav'
 import MainPageSteamNav from '@/components/main-page/main-page-charts/main-page-steam-nav/MainPageSteamNav'
 import MainPagePsnNav from '@/components/main-page/main-page-charts/main-page-psn-nav/MainPagePsnNav'
+import MainPageXboxNav from '@/components/main-page/main-page-charts/main-page-xbox-nav/MainPageXboxNav'
 import BrowseSearch from './browse-search/BrowseSearch'
 import BrowseConsoles from './browse-consoles/BrowseConsoles'
 
@@ -25,11 +28,12 @@ export default function MainPageBrowse() {
   const { all } = useGamesData()
   const { library: steam } = useSteamGamesData()
   const { library: psn } = usePsnGamesData()
+  const { library: xbox } = useXboxGamesData()
   const { platform } = useMainPlatform()
 
   const library = useMemo(
-    () => buildLibrary({ playing, completed, wantToPlay }, steam, psn),
-    [playing, completed, wantToPlay, steam, psn],
+    () => buildLibrary({ playing, completed, wantToPlay }, steam, psn, xbox.filter(xboxHasAchievements)),
+    [playing, completed, wantToPlay, steam, psn, xbox],
   )
   const consoles = useMemo(() => summarizeConsoles(all), [all])
   const showConsoles = platform === 'ra' && consoles.length > 0
@@ -37,7 +41,7 @@ export default function MainPageBrowse() {
   return (
     <div className="flex flex-col gap-4">
       <ChartCard>
-        {platform === 'steam' ? <MainPageSteamNav /> : platform === 'psn' ? <MainPagePsnNav /> : <MainPageConsoleNav />}
+        {platform === 'steam' ? <MainPageSteamNav /> : platform === 'psn' ? <MainPagePsnNav /> : platform === 'xbox' ? <MainPageXboxNav /> : <MainPageConsoleNav />}
       </ChartCard>
 
       <ChartCard>

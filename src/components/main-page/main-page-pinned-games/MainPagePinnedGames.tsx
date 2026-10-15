@@ -23,6 +23,7 @@ import PinnedGameRow from './pinned-game-row/PinnedGameRow'
 import PinGameCard from './pin-game-card/PinGameCard'
 import SteamPinnedGameRow from './steam-pinned-game-row/SteamPinnedGameRow'
 import PsnPinnedGameRow from './psn-pinned-game-row/PsnPinnedGameRow'
+import XboxPinnedGameRow from './xbox-pinned-game-row/XboxPinnedGameRow'
 import { gameKey, GameRef } from '@/utils/gameRef'
 import { notify } from '@/lib/notify'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
@@ -44,6 +45,7 @@ export default function MainPagePinnedGames() {
     const key = gameKey(pin.source, pin.id)
     const onToggle = () => toggleExpand(key)
     if (pin.source === 'psn') return <PsnPinnedGameRow key={key} gameId={pin.id} isOpen={isOpen} onToggle={onToggle} />
+    if (pin.source === 'xbox') return <XboxPinnedGameRow key={key} gameId={pin.id} isOpen={isOpen} onToggle={onToggle} />
     return pin.source === 'steam' ? (
       <SteamPinnedGameRow key={key} appId={pin.id} isOpen={isOpen} onToggle={onToggle} />
     ) : (

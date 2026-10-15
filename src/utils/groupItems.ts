@@ -2,6 +2,8 @@ import { gameKey } from '@/utils/gameRef'
 import type { GameGroupItem, RecentlyPlayedGame, RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
+import type { XboxGameProgress } from '@/types/xbox'
+import { xboxHasAchievements } from '@/utils/xboxTitles'
 
 export type PctFilter = 'all' | '0' | 'progress' | '100'
 export type DecadeFilter = 'all' | '80s' | '90s' | '00s' | '10s' | '20s'
@@ -72,7 +74,7 @@ export type LiveProgress = Map<string, Counts & { pct: number }>
  * would let a PSN game read a Steam app's numbers. PSN's completion is
  * Sony's own (it weighs trophies by grade).
  */
-export function liveProgressMap(steam: SteamGameProgress[], psn: PsnGameProgress[] = []): LiveProgress {
+export function liveProgressMap(steam: SteamGameProgress[], psn: PsnGameProgress[] = [], xbox: XboxGameProgress[] = []): LiveProgress {
   const map: LiveProgress = new Map()
   for (const g of steam) {
     if (g.achievementsLoaded && g.maxPossible > 0) {
@@ -81,6 +83,10 @@ export function liveProgressMap(steam: SteamGameProgress[], psn: PsnGameProgress
   }
   for (const g of psn) {
     if (g.maxPossible > 0) map.set(gameKey('psn', g.id), { earned: g.numAwarded, total: g.maxPossible, pct: g.pctWon / 100 })
+  }
+  // Xbox's completion is by gamerscore. A modern game's achievement total can be unknown (0): its completion is still live, its counts are not (see groupSummary).
+  for (const g of xbox) {
+    if (xboxHasAchievements(g)) map.set(gameKey('xbox', g.id), { earned: g.numAwarded, total: g.maxPossible, pct: g.pctWon / 100 })
   }
   return map
 }
@@ -124,7 +130,8 @@ export function groupSummary(items: GameGroupItem[], ra: Map<number, AchStats>, 
       }
     } else {
       const now = live.get(itemKey(item))
-      if (now) {
+      // A live entry with no total (an Xbox game whose count Xbox does not say) has no counts to give.
+      if (now && now.total > 0) {
         earned += now.earned
         total += now.total
         continue

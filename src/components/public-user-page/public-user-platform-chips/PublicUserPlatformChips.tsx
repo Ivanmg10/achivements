@@ -7,6 +7,7 @@ import type { CheevoUser } from '@/hooks/useCheevoUser'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
 
 const CHIP = 'flex items-center gap-1.5 rounded-full bg-bg-main/80 ring-1 ring-ink/[0.06] px-2.5 py-1 text-xs font-medium min-w-0'
 
@@ -42,7 +43,7 @@ function Chip({ icon, name, href, opens }: { icon: ReactNode; name: string; href
  */
 export default function PublicUserPlatformChips({ user }: { user: CheevoUser }) {
   const { T } = useLanguage()
-  if (!user.ra && !user.steam && !user.psn) return null
+  if (!user.ra && !user.steam && !user.psn && !user.xbox) return null
 
   return (
     <ul aria-label={T.userProfile.platformsLabel} className="flex flex-wrap gap-1.5">
@@ -59,6 +60,9 @@ export default function PublicUserPlatformChips({ user }: { user: CheevoUser }) 
       )}
       {user.psn && (
         <Chip icon={<PlaystationLogo size={13} className="text-[#0070d1] shrink-0" aria-hidden="true" />} name={user.psnName || 'PlayStation'} opens="" />
+      )}
+      {user.xbox && (
+        <Chip icon={<XboxLogo size={13} className="text-[#107c10] shrink-0" aria-hidden="true" />} name={user.xboxName || 'Xbox'} opens="" />
       )}
     </ul>
   )

@@ -6,6 +6,7 @@ import { relativeTime, plural } from '@/utils/utils'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import GroupCoverMosaic from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgressBar'
 
@@ -17,8 +18,9 @@ import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgre
 export default function GroupCard({ group }: { group: GameGroup }) {
   const { T, lang } = useLanguage()
   const psnCount = group.psn_count ?? 0
-  const raCount = group.game_count - group.steam_count - psnCount
-  const isMixed = [raCount, group.steam_count, psnCount].filter((n) => n > 0).length > 1
+  const xboxCount = group.xbox_count ?? 0
+  const raCount = group.game_count - group.steam_count - psnCount - xboxCount
+  const isMixed = [raCount, group.steam_count, psnCount, xboxCount].filter((n) => n > 0).length > 1
   const Privacy = group.is_public ? IconWorld : IconLock
 
   return (
@@ -43,6 +45,7 @@ export default function GroupCard({ group }: { group: GameGroup }) {
               {raCount > 0 && <RaLogo height={11} className="opacity-70" />}
               {group.steam_count > 0 && <SteamLogo size={11} className="text-[#66c0f4]/80" />}
               {psnCount > 0 && <PlaystationLogo size={11} className="text-[#0070d1]" />}
+              {xboxCount > 0 && <XboxLogo size={11} className="text-[#107c10]" />}
             </span>
           )}
         </div>

@@ -3,6 +3,7 @@
 import GameIcon from '@/components/game-icon/GameIcon'
 import { steamAssetUrl } from '@/lib/steamClient'
 import { psnBackdrop } from '@/utils/psnTitles'
+import { xboxBackdrop } from '@/utils/xboxTitles'
 import { entryId } from '@/utils/libraryShelves'
 import type { LibraryEntry } from '@/utils/libraryInsights'
 
@@ -16,6 +17,7 @@ export function entryIcon(e: LibraryEntry): string | null {
 export function entryBackdrop(e: LibraryEntry): string | null {
   if (e.kind === 'steam') return steamAssetUrl(e.game.id, 'header')
   if (e.kind === 'psn') return psnBackdrop(e.game)
+  if (e.kind === 'xbox') return xboxBackdrop(e.game)
   return entryIcon(e)
 }
 

@@ -9,6 +9,7 @@ const TONES = {
   ra: ['bg-accent/20', 'bg-accent/35', 'bg-accent/55', 'bg-accent/75', 'bg-accent'],
   steam: ['bg-[#66c0f4]/20', 'bg-[#66c0f4]/35', 'bg-[#66c0f4]/55', 'bg-[#66c0f4]/75', 'bg-[#66c0f4]'],
   psn: ['bg-[#0070d1]/20', 'bg-[#0070d1]/35', 'bg-[#0070d1]/55', 'bg-[#0070d1]/75', 'bg-[#0070d1]'],
+  xbox: ['bg-green-500/20', 'bg-green-500/35', 'bg-green-500/55', 'bg-green-500/75', 'bg-green-500'],
 } as const
 
 /**

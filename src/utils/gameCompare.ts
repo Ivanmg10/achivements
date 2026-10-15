@@ -2,6 +2,8 @@ import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/
 import type { SteamAchievementUnified } from '@/types/steam'
 import type { PsnTrophy, TrophyGrade } from '@/types/psn'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
+import { xboxAchievementAnchor } from '@/utils/xboxTitles'
+import type { XboxAchievement } from '@/types/xbox'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 
 /** One achievement of a game as someone has it, the same for RA, Steam and PSN. */
@@ -14,6 +16,8 @@ export type CompareAchievement = {
   points?: number
   /** PSN's grade. */
   grade?: TrophyGrade
+  /** Xbox's gamerscore for it. */
+  gamerscore?: number
   /** Share of players who have it, 0–100; null when the platform does not say. */
   rarity: number | null
   /** Where a link to it lands on the page (Steam and PSN deep links use it). */
@@ -79,6 +83,20 @@ export function psnCompareList(trophies: PsnTrophy[]): CompareAchievement[] {
     anchor: psnTrophyAnchor(t.id),
     earned: t.earned,
     earnedAt: t.earnedAt,
+  }))
+}
+
+export function xboxCompareList(achievements: XboxAchievement[]): CompareAchievement[] {
+  return achievements.map((a) => ({
+    id: a.id,
+    title: a.name,
+    description: a.description,
+    iconUrl: a.iconUrl,
+    gamerscore: a.gamerscore,
+    rarity: a.rarity,
+    anchor: xboxAchievementAnchor(a.id),
+    earned: a.unlocked,
+    earnedAt: a.unlockedAt,
   }))
 }
 

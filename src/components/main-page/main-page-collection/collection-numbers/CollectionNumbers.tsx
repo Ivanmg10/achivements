@@ -5,12 +5,15 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
+import type { XboxGameProgress } from '@/types/xbox'
 import { classifySteamGame, hasUnloadedProgress, summarizeSteamLibrary } from '@/utils/steamFeed'
 import { classifyPsnGame } from '@/utils/psnTitles'
+import { classifyXboxGame, xboxHasAchievements } from '@/utils/xboxTitles'
 import { gameHref } from '@/utils/gameRef'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import CompletionDistribution from '@/components/completion-distribution/CompletionDistribution'
 import MasteryMix from '@/components/main-page/main-page-charts/mastery-mix/MasteryMix'
 import ClosestToComplete, { CLOSEST_SHOWN, ClosestGame } from '@/components/main-page/main-page-charts/closest-to-complete/ClosestToComplete'
@@ -29,11 +32,13 @@ export default function CollectionNumbers({
   inProgress = [],
   steamGames = [],
   psnGames = [],
+  xboxGames = [],
 }: {
   awards: UserAwards | null
   inProgress?: RetroAchievementsGameCompleted[]
   steamGames?: SteamGameProgress[]
   psnGames?: PsnGameProgress[]
+  xboxGames?: XboxGameProgress[]
 }) {
   const { T } = useLanguage()
   const subject = useSubject()
@@ -45,6 +50,10 @@ export default function CollectionNumbers({
   )
   const psnPerfect = useMemo(() => psnGames.filter((g) => classifyPsnGame(g) === 'completed').length, [psnGames])
   const psnFractions = useMemo(() => psnGames.map((g) => g.pctWon / 100), [psnGames])
+  // A game with no achievements is just owned: it has no place in a completion count.
+  const xboxPlayable = useMemo(() => xboxGames.filter(xboxHasAchievements), [xboxGames])
+  const xboxPerfect = useMemo(() => xboxPlayable.filter((g) => classifyXboxGame(g) === 'completed').length, [xboxPlayable])
+  const xboxFractions = useMemo(() => xboxPlayable.map((g) => g.pctWon / 100), [xboxPlayable])
   // The started games nearest 100%, whichever platform they are on.
   const closest = useMemo<ClosestGame[]>(() => {
     const ra = inProgress.map((g) => ({
@@ -78,8 +87,20 @@ export default function CollectionNumbers({
         total: g.maxPossible,
         percent: g.pctWon,
       }))
-    return [...ra, ...st, ...ps].sort((a, b) => b.percent - a.percent).slice(0, CLOSEST_SHOWN)
-  }, [inProgress, steamGames, psnGames, subject])
+    const xb = xboxPlayable
+      .filter((g) => classifyXboxGame(g) === 'playing')
+      .map((g) => ({
+        key: `xbox:${g.id}`,
+        href: gameHref('xbox', g.id, subject),
+        title: g.title,
+        imageUrl: g.imageIcon || undefined,
+        done: g.numAwarded,
+        // Newer games do not say how many achievements they have: the count shows by what is earned.
+        total: g.maxPossible,
+        percent: g.pctWon,
+      }))
+    return [...ra, ...st, ...ps, ...xb].sort((a, b) => b.percent - a.percent).slice(0, CLOSEST_SHOWN)
+  }, [inProgress, steamGames, psnGames, xboxPlayable, subject])
 
   return (
     <div className="flex flex-col gap-4">
@@ -129,6 +150,21 @@ export default function CollectionNumbers({
               </span>
             </p>
             <CompletionDistribution fractions={psnFractions} tone="psn" />
+          </section>
+        )}
+
+        {xboxPlayable.length > 0 && (
+          <section className={BLOCK} aria-label="Xbox">
+            <span className="flex items-center gap-2 text-xs text-text-secondary">
+              <XboxLogo size={12} className="text-green-500" aria-hidden="true" /> Xbox
+            </span>
+            <p className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-green-500 tabular-nums leading-none">{xboxPerfect}</span>
+              <span className="text-xs text-text-secondary">
+                {T.steam.statPerfect} · {xboxPlayable.length} {T.steam.statGames.toLowerCase()}
+              </span>
+            </p>
+            <CompletionDistribution fractions={xboxFractions} tone="xbox" />
           </section>
         )}
 

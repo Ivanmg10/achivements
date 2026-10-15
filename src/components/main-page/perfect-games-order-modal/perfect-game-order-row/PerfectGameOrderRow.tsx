@@ -8,6 +8,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { PerfectGame } from '@/utils/perfectGames'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
 
 /** One draggable game in the reorder list — RA and Steam games alike. */
 export default function PerfectGameOrderRow({ game }: { game: PerfectGame }) {
@@ -46,6 +47,8 @@ export default function PerfectGameOrderRow({ game }: { game: PerfectGame }) {
         <SteamLogo size={12} className="text-[#66c0f4] shrink-0" aria-label="Steam" />
       ) : game.source === 'psn' ? (
         <PlaystationLogo size={12} className="text-[#0070d1] shrink-0" aria-label="PlayStation" />
+      ) : game.source === 'xbox' ? (
+        <XboxLogo size={12} className="text-[#107c10] shrink-0" aria-label="Xbox" />
       ) : (
         game.hardcore && <span className="w-2 h-2 bg-warning rounded-full shrink-0" title="Hardcore" />
       )}

@@ -3,10 +3,12 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress, SteamRecentAchievement } from '@/types/steam'
 import type { PsnGameProgress, PsnRecentTrophy } from '@/types/psn'
+import type { XboxGameProgress, XboxRecentAchievement } from '@/types/xbox'
 import type { FriendOverview } from '@/utils/friends'
 import { profileLibrary, type LibraryGame } from '@/utils/library'
 import { toRecentAchievement } from '@/utils/steamMappers'
 import { psnToRecentAchievement } from '@/utils/psnMappers'
+import { xboxToRecentAchievement } from '@/utils/xboxMappers'
 import { toSteamLanguage } from '@/utils/steamLanguage'
 import { mapLimit } from '@/utils/utils'
 
@@ -43,15 +45,19 @@ export async function loadFriendDetails(friend: FriendOverview, lang: string): P
     friend.ra ? readList<RetroAchievementsGameCompleted>(`/api/getGamesCompleted?${user}`) : none,
     friend.steam ? readList<SteamGameProgress>(`/api/steam/ownedGames?${user}`) : none,
     friend.psn ? readList<PsnGameProgress>(`/api/psn/titles?${user}`) : none,
+    // Only a viewer who may see Xbox is told the friend has it (see /api/follows/overview).
+    friend.xbox ? readList<XboxRecentAchievement>(`/api/xbox/recentAchievements?scope=activity&lang=${lang}&${user}`) : none,
+    friend.xbox ? readList<XboxGameProgress>(`/api/xbox/titles?${user}`) : none,
   ])
   const failed = calls.filter((c) => c.status === 'rejected')
   for (const f of failed) console.error('[useFriendsData]', friend.username, (f as PromiseRejectedResult).reason)
-  const [raRecent, steamRecent, psnRecent, raGames, steamGames, psnGames] = calls.map((c) => (c.status === 'fulfilled' ? c.value : []))
+  const [raRecent, steamRecent, psnRecent, raGames, steamGames, psnGames, xboxRecent, xboxGames] = calls.map((c) => (c.status === 'fulfilled' ? c.value : []))
 
   const recent = [
     ...(raRecent as RecentAchievement[]),
     ...(steamRecent as SteamRecentAchievement[]).map(toRecentAchievement),
     ...(psnRecent as PsnRecentTrophy[]).map(psnToRecentAchievement),
+    ...(xboxRecent as XboxRecentAchievement[]).map(xboxToRecentAchievement),
   ].sort((a, b) => b.Date.localeCompare(a.Date))
   const games = profileLibrary(
     (raGames as RetroAchievementsGameCompleted[]).filter((g) => !RA_SYSTEM_CONSOLES.has(g.ConsoleID)),
@@ -59,6 +65,7 @@ export async function loadFriendDetails(friend: FriendOverview, lang: string): P
     psnGames as PsnGameProgress[],
     [],
     friend.username,
+    xboxGames as XboxGameProgress[],
   )
   return { recent, games, partial: failed.length > 0 }
 }

@@ -14,6 +14,9 @@ import GenderModal from '@/components/gender-modal/GenderModal'
 import LanguageModal from '@/components/language-modal/LanguageModal'
 import ThemeModal from '@/components/theme-modal/ThemeModal'
 import UserPsnPreferences from '@/components/user-page/user-psn-preferences/UserPsnPreferences'
+import UserXboxPreferences from '@/components/user-page/user-xbox-preferences/UserXboxPreferences'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
+import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import HiddenGamesModal from '@/components/hidden-games-modal/HiddenGamesModal'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
@@ -64,12 +67,14 @@ export default function UserPreferencesCard() {
   const [hiddenOpen, setHiddenOpen] = useState(false)
   const [genderOpen, setGenderOpen] = useState(false)
   const { hidden } = useHiddenGames()
+  const xboxEnabled = useXboxEnabled()
 
   const user = session?.user
   const raFavorite = user?.favorite_game ?? null
   const steamFavorite = user?.favorite_steam_game ?? null
   const psnFavorite = user?.favorite_psn_game ?? null
-  const favorites: Record<GameSource, FavoriteGame | null> = { ra: raFavorite, steam: steamFavorite, psn: psnFavorite }
+  const xboxFavorite = user?.favorite_xbox_game ?? null
+  const favorites: Record<GameSource, FavoriteGame | null> = { ra: raFavorite, steam: steamFavorite, psn: psnFavorite, xbox: xboxFavorite }
 
   async function handleSave(source: GameSource, game: FavoriteGame | null) {
     await saveFavorite(source, game)
@@ -142,9 +147,16 @@ export default function UserPreferencesCard() {
         <ProfileField label={T.userPage.favoritePsnGame} icon={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />} onEdit={() => setFavoriteOpen('psn')}>
           <FavoriteValue game={psnFavorite} source="psn" empty={T.userData.notSet} />
         </ProfileField>
+
+        {xboxEnabled && (
+          <ProfileField label={T.userPage.favoriteXboxGame} icon={<XboxLogo size={18} className="text-[#107c10]" aria-hidden="true" />} onEdit={() => setFavoriteOpen('xbox')}>
+            <FavoriteValue game={xboxFavorite} source="xbox" empty={T.userData.notSet} />
+          </ProfileField>
+        )}
       </div>
 
       <UserPsnPreferences />
+      <UserXboxPreferences />
 
       <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
       <HiddenGamesModal isOpen={hiddenOpen} onClose={() => setHiddenOpen(false)} />

@@ -5,6 +5,7 @@ import { isRa, type AchStats, type PtsStats } from '@/utils/groupItems'
 import SortableItem from '@/components/groups/sortable-item/SortableItem'
 import SteamSortableItem from '@/components/groups/steam-sortable-item/SteamSortableItem'
 import PsnSortableItem from '@/components/groups/psn-sortable-item/PsnSortableItem'
+import XboxSortableItem from '@/components/groups/xbox-sortable-item/XboxSortableItem'
 import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 
 const GRID_COLS_CLASS: Record<StatusGridCols, string> = {
@@ -14,7 +15,7 @@ const GRID_COLS_CLASS: Record<StatusGridCols, string> = {
 }
 
 /**
- * A group's games as cards, RA, Steam and PSN side by side. With no filter on they
+ * A group's games as cards, RA, Steam, PSN and Xbox side by side. With no filter on they
  * can be dragged (or moved with the keyboard) into a new order; a filtered
  * view is not the whole list, so it cannot be reordered.
  */
@@ -54,6 +55,8 @@ export default function GroupGameGrid({
           />
         ) : item.source === 'psn' ? (
           <PsnSortableItem key={item.id} item={item} onRemove={onRemove} draggable={draggable} />
+        ) : item.source === 'xbox' ? (
+          <XboxSortableItem key={item.id} item={item} onRemove={onRemove} draggable={draggable} />
         ) : (
           <SteamSortableItem key={item.id} item={item} onRemove={onRemove} draggable={draggable} />
         ),

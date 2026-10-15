@@ -6,9 +6,10 @@ import { useRaLinked } from '@/hooks/useRaLinked'
 import { useSubject } from '@/context/SubjectContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
+import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 
-export type MainPlatform = 'ra' | 'steam' | 'psn'
-const PLATFORMS: readonly MainPlatform[] = ['ra', 'steam', 'psn']
+export type MainPlatform = 'ra' | 'steam' | 'psn' | 'xbox'
+const PLATFORMS: readonly MainPlatform[] = ['ra', 'steam', 'psn', 'xbox']
 
 const MainPlatformContext = createContext<{
   platform: MainPlatform
@@ -33,9 +34,10 @@ export function MainPlatformProvider({ children }: { children: React.ReactNode }
   const raLinked = useRaLinked()
   const { isLinked: steamLinked } = useSteamGamesData()
   const { isLinked: psnLinked } = usePsnGamesData()
+  const { isLinked: xboxLinked } = useXboxGamesData()
   const linked = useMemo(
-    () => PLATFORMS.filter((p) => (p === 'ra' ? raLinked : p === 'steam' ? steamLinked : psnLinked)),
-    [raLinked, steamLinked, psnLinked],
+    () => PLATFORMS.filter((p) => (p === 'ra' ? raLinked : p === 'steam' ? steamLinked : p === 'psn' ? psnLinked : xboxLinked)),
+    [raLinked, steamLinked, psnLinked, xboxLinked],
   )
   const platform: MainPlatform = linked.includes(stored) ? stored : linked[0] ?? 'ra'
   return (

@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
 
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
@@ -14,6 +15,7 @@ import { useSubject } from '@/context/SubjectContext'
 import MainPageProfileRa from './main-page-profile-ra/MainPageProfileRa'
 import MainPageProfileSt from './main-page-profile-st/MainPageProfileSt'
 import MainPageProfilePsn from './main-page-profile-psn/MainPageProfilePsn'
+import MainPageProfileXbox from './main-page-profile-xbox/MainPageProfileXbox'
 import MainPageProfileTabs, { ProfileTab, profilePanelId, profileTabId } from './main-page-profile-tabs/MainPageProfileTabs'
 
 const ID_PREFIX = 'main-profile'
@@ -22,6 +24,7 @@ const TABS: Record<MainPlatform, ProfileTab<MainPlatform>> = {
   ra: { id: 'ra', label: 'RetroAchievements', icon: <RaLogo height={11} /> },
   steam: { id: 'steam', label: 'Steam', icon: <SteamLogo size={13} aria-hidden="true" /> },
   psn: { id: 'psn', label: 'PlayStation', icon: <PlaystationLogo size={13} aria-hidden="true" /> },
+  xbox: { id: 'xbox', label: 'Xbox', icon: <XboxLogo size={13} aria-hidden="true" /> },
 }
 
 export default function MainPageProfile() {
@@ -60,6 +63,7 @@ export default function MainPageProfile() {
     ),
     steam: <MainPageProfileSt />,
     psn: <MainPageProfilePsn />,
+    xbox: <MainPageProfileXbox />,
   }
 
   // One account: the column as it always was — no switch with a single option.

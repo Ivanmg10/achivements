@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import LibraryPlatformTabs from './LibraryPlatformTabs'
 
-const counts = { ra: 12, steam: 30, psn: 0 }
+const counts = { ra: 12, steam: 30, psn: 0, xbox: 0 }
 
 test('all, and each platform that has games, with how many', () => {
   render(<LibraryPlatformTabs value="all" counts={counts} onChange={jest.fn()} />)
@@ -23,6 +23,6 @@ test('marks the one chosen and reports a change', () => {
 })
 
 test('nothing to choose with a single platform', () => {
-  const { container } = render(<LibraryPlatformTabs value="all" counts={{ ra: 0, steam: 5, psn: 0 }} onChange={jest.fn()} />)
+  const { container } = render(<LibraryPlatformTabs value="all" counts={{ ra: 0, steam: 5, psn: 0, xbox: 0 }} onChange={jest.fn()} />)
   expect(container).toBeEmptyDOMElement()
 })

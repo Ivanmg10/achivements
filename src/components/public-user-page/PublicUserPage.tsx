@@ -50,7 +50,7 @@ export default function PublicUserPage({ username }: { username: string }) {
     <div className="min-h-full text-text-main flex flex-col items-center py-4 sm:py-6 px-4">
       <div className="w-full lg:max-w-[95%] min-w-0">
         <SubjectProviders user={user}>
-          {user.ra || user.steam || user.psn ? (
+          {user.ra || user.steam || user.psn || user.xbox ? (
             <PublicUserBody user={user} viewer={viewer} />
           ) : (
             <div className="flex flex-col gap-4">

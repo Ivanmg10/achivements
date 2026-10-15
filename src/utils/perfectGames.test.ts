@@ -43,7 +43,7 @@ describe('buildPerfectGames', () => {
 describe('countPerfectGames', () => {
   test('counts RA hardcore, RA softcore and Steam apart', () => {
     const games = buildPerfectGames([ra(1, 'A'), ra(2, 'B', { HardcoreMode: '0' })], [steam(620, 'C')])
-    expect(countPerfectGames(games)).toEqual({ hc: 1, sc: 1, steam: 1, psn: 0 })
+    expect(countPerfectGames(games)).toEqual({ hc: 1, sc: 1, steam: 1, psn: 0, xbox: 0 })
   })
 })
 
@@ -149,7 +149,7 @@ describe('PSN', () => {
   test('a PSN game at 100% is perfect, dated by its last trophy', () => {
     const games = buildPerfectGames([], [], [psnGame(100, 100), psnGame(200, 50)])
     expect(games.map((g) => g.key)).toEqual(['psn:100'])
-    expect(countPerfectGames(games)).toEqual({ hc: 0, sc: 0, steam: 0, psn: 1 })
+    expect(countPerfectGames(games)).toEqual({ hc: 0, sc: 0, steam: 0, psn: 1, xbox: 0 })
     expect(filterPerfects(games, 'psn')).toHaveLength(1)
     expect(perfectDates([], [], [psnGame(100, 100)]).get('psn:100')).toBe('2024-01-02T00:00:00.000Z')
   })

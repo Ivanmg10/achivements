@@ -13,6 +13,7 @@ import RARecentlyPlayed from '@/components/ra-recently-played/RARecentlyPlayed'
 import { useMainView } from '@/context/MainViewContext'
 import { useSubject } from '@/context/SubjectContext'
 import { useRaLinked } from '@/hooks/useRaLinked'
+import { canUseXbox } from '@/utils/xboxAccess'
 
 export default function MainPage() {
   const { status, data: session } = useSession()
@@ -26,8 +27,9 @@ export default function MainPage() {
     return <MainPageSkeleton />
 
   if (status === 'authenticated' && !raLinked) {
-    // Steam or PSN alone is enough for a main page; no account at all gets the connect prompt.
-    return session?.user?.steamid || session?.user?.psnaccountid ? <MainPageWithoutRa /> : <ConnectAccounts />
+    // Steam, PSN or Xbox alone is enough for a main page; no account at all gets the connect prompt.
+    const xbox = Boolean(session?.user?.xboxxuid) && canUseXbox(session?.user?.admin)
+    return session?.user?.steamid || session?.user?.psnaccountid || xbox ? <MainPageWithoutRa /> : <ConnectAccounts />
   }
 
   return (

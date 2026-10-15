@@ -1,6 +1,7 @@
 import type { RetroAchievementsGameWithAchievements } from '@/types/types'
 import type { SteamAchievementUnified, SteamGameDetails } from '@/types/steam'
 import type { PsnGameProgress, PsnTrophy, PsnTrophyGroup } from '@/types/psn'
+import type { XboxAchievement, XboxGameProgress } from '@/types/xbox'
 import type { IgdbDetails } from '@/lib/igdbClient'
 import { BASE_GROUP } from '@/utils/psnTitles'
 
@@ -16,7 +17,7 @@ import { BASE_GROUP } from '@/utils/psnTitles'
  * goes in: no username, no ids — only the game and its achievements.
  */
 
-type Platform = 'ra' | 'steam' | 'psn'
+type Platform = 'ra' | 'steam' | 'psn' | 'xbox'
 
 /** One achievement, the same for every platform; platform-only fields are left out when absent. */
 export type AiAchievement = {
@@ -36,6 +37,8 @@ export type AiAchievement = {
   dlc?: string
   /** Steam */
   mayNeedOnline?: boolean
+  /** Xbox */
+  gamerscore?: number
 }
 
 export type AiExportSource = {
@@ -55,10 +58,12 @@ export type AiExportSource = {
   achievements: AiAchievement[]
   /** PSN: trophies by grade, earned of total. */
   byGrade?: Record<'platinum' | 'gold' | 'silver' | 'bronze', { earned: number; total: number }>
+  /** Xbox: gamerscore earned of total. */
+  gamerscore?: { earned: number; total: number }
 }
 
-const PLATFORM_NAME: Record<Platform, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PlayStation Network' }
-const NOUN: Record<Platform, string> = { ra: 'achievements', steam: 'achievements', psn: 'trophies' }
+const PLATFORM_NAME: Record<Platform, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PlayStation Network', xbox: 'Xbox' }
+const NOUN: Record<Platform, string> = { ra: 'achievements', steam: 'achievements', psn: 'trophies', xbox: 'achievements' }
 
 const round1 = (n: number) => Math.round(n * 10) / 10
 /** Drops empty fields so the file holds only what is known. */
@@ -187,6 +192,39 @@ export function psnAiSource({
   }
 }
 
+export function xboxAiSource({
+  game,
+  achievements,
+  details,
+}: {
+  game: XboxGameProgress
+  achievements: XboxAchievement[]
+  details: IgdbDetails | null
+}): AiExportSource {
+  return {
+    platform: 'xbox',
+    game: compact({
+      title: game.title,
+      console: game.consoleName,
+      developer: joined(details?.developers),
+      publisher: joined(details?.publishers),
+      genre: joined(details?.genres),
+      released: details?.releaseDate ?? undefined,
+    }),
+    // Xbox sends them in the game's own order.
+    achievements: achievements.map((a) => ({
+      name: a.name,
+      description: a.description || null,
+      earned: a.unlocked,
+      earnedAt: a.unlockedAt,
+      rarityPercent: a.rarity !== null ? round1(a.rarity) : null,
+      hidden: a.secret,
+      gamerscore: a.gamerscore,
+    })),
+    gamerscore: { earned: game.earnedGamerscore, total: game.totalGamerscore },
+  }
+}
+
 // ---------------------------------------------------------------------------
 // The instructions
 // ---------------------------------------------------------------------------
@@ -207,6 +245,13 @@ function platformNotes(source: AiExportSource): string[] {
       '"hidden": true marks a secret achievement. Steam does not reveal a hidden achievement\'s description until it is unlocked, so "description" may be missing: identify it by its name, and say so if you cannot.',
       '"mayNeedOnline": true is only a guess made from the description (Steam has no such flag), so it can be wrong either way. For online or multiplayer achievements, say whether the official servers are likely still up (or not, if you know they were shut down), whether they need other players, and any offline or private-match alternative.',
       '"playtimeHours" is how long the player has played the game, a hint of how far they are.',
+    ]
+  }
+  if (source.platform === 'xbox') {
+    return [
+      'These are the game\'s Xbox achievements. "gamerscore" is the points each one gives (the G of Xbox); it is a rough sign of difficulty. "progress.gamerscore" shows how much of the total the player already has, and the completion percentage Xbox shows is by gamerscore, not by count.',
+      '"hidden": true marks a secret achievement: the player can see its name and description here, but keep story spoilers out of the explanation.',
+      'Some achievements are tied to online play, to a specific difficulty or to a single playthrough and cannot be undone once missed; say so when you know it. Xbox 360 games and newer ones list their achievements the same way here.',
     ]
   }
   return [
@@ -281,6 +326,7 @@ export function buildAiExport(source: AiExportSource, { lang, question = '', now
         hardcore: source.platform === 'ra' ? a.hardcore : undefined,
         grade: a.grade,
         dlc: a.dlc,
+        gamerscore: a.gamerscore,
       }),
     )
   const pending = all
@@ -295,6 +341,7 @@ export function buildAiExport(source: AiExportSource, { lang, question = '', now
         points: a.points,
         grade: a.grade,
         dlc: a.dlc,
+        gamerscore: a.gamerscore,
         hidden: a.hidden,
         mayNeedOnline: a.mayNeedOnline,
       }),
@@ -316,6 +363,7 @@ export function buildAiExport(source: AiExportSource, { lang, question = '', now
       pointsEarned: source.platform === 'ra' ? points(all.filter((a) => a.earned)) : undefined,
       pointsTotal: source.platform === 'ra' ? points(all) : undefined,
       byGrade: source.byGrade,
+      gamerscore: source.gamerscore,
     }),
     pending,
     earned,

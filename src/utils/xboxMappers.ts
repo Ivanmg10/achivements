@@ -1,5 +1,9 @@
 import { xboxNumericId } from '@/utils/xboxTitles'
-import type { XboxAchievement, XboxGameProgress, XboxProfile } from '@/types/xbox'
+import type { RecentAchievement } from '@/types/types'
+import type { XboxAchievement, XboxGameProgress, XboxProfile, XboxRecentAchievement } from '@/types/xbox'
+
+/** The console slot for Xbox rows in the unified model. */
+export const XBOX_PLATFORM = 'Xbox'
 
 /** The parts of OpenXBL's answers the app reads. Everything else is ignored. */
 export type RawProfileUser = { id: string; settings?: Array<{ id: string; value: string }> }
@@ -148,4 +152,27 @@ export function toXbox360Achievement(a: Raw360Achievement): XboxAchievement {
 /** Most recently played first; games never played go last. */
 export function sortByLastPlayed(games: XboxGameProgress[]): XboxGameProgress[] {
   return [...games].sort((a, b) => (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? ''))
+}
+
+/**
+ * An Xbox achievement in RA's RecentAchievement shape, like psnToRecentAchievement:
+ * so the streak, the heatmap and the shared activity cards take every platform as
+ * one list. Gamerscore is not RA's points, so Points stays 0 and RA's totals are untouched.
+ */
+export function xboxToRecentAchievement(a: XboxRecentAchievement): RecentAchievement {
+  return {
+    Date: a.earnedAt.replace('T', ' ').slice(0, 19),
+    HardcoreMode: '0',
+    AchievementID: Number(a.achievementId) || 0,
+    Title: a.name,
+    Description: '',
+    BadgeName: '',
+    Points: 0,
+    GameID: a.gameId,
+    GameTitle: a.gameTitle,
+    ConsoleName: XBOX_PLATFORM,
+    Source: 'xbox',
+    BadgeUrl: a.iconUrl ?? undefined,
+    GameIconUrl: a.gameIconUrl,
+  }
 }

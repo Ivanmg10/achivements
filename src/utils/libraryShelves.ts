@@ -92,7 +92,7 @@ export function filterEntries(entries: LibraryEntry[], { query, source, quick }:
 
 /** How many games each platform has among these, for the chips. */
 export function countBySource(entries: LibraryEntry[]): Record<GameSource, number> {
-  const out: Record<GameSource, number> = { ra: 0, steam: 0, psn: 0 }
+  const out: Record<GameSource, number> = { ra: 0, steam: 0, psn: 0, xbox: 0 }
   for (const e of entries) out[e.kind]++
   return out
 }

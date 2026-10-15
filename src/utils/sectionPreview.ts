@@ -2,6 +2,8 @@ import type { CategoryGame } from '@/hooks/useGamesByCategory'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
 import { PSN_PLATFORM } from '@/utils/psnMappers'
+import type { XboxGameProgress } from '@/types/xbox'
+import { XBOX_PLATFORM } from '@/utils/xboxMappers'
 
 /**
  * A game shown in a folded section's preview: enough to draw a small card
@@ -65,6 +67,18 @@ export function psnPreviewGames(games: PsnGameProgress[], count = PREVIEW_MAX): 
     id: g.id,
     title: g.title,
     subtitle: PSN_PLATFORM,
+    imageRef: g.imageIcon,
+    pct: g.pctWon,
+  }))).slice(0, count)
+}
+
+export function xboxPreviewGames(games: XboxGameProgress[], count = PREVIEW_MAX): PreviewGame[] {
+  return byProgress(games.map((g): PreviewGame => ({
+    key: `xbox:${g.id}`,
+    source: 'xbox',
+    id: g.id,
+    title: g.title,
+    subtitle: XBOX_PLATFORM,
     imageRef: g.imageIcon,
     pct: g.pctWon,
   }))).slice(0, count)

@@ -19,7 +19,7 @@ describe('the platform badge', () => {
 })
 
 describe('the platform tabs', () => {
-  const counts = { ra: 12, steam: 30, psn: 4 }
+  const counts = { ra: 12, steam: 30, psn: 4, xbox: 0 }
 
   test('every platform carries its logo, and "all" has none', () => {
     render(<LibraryPlatformTabs value="all" counts={counts} onChange={jest.fn()} />)

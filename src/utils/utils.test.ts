@@ -342,8 +342,8 @@ describe('groupByDaySource', () => {
   test('one row per day, oldest first, ending today, split by platform', () => {
     const rows = groupByDaySource([ach(0), ach(0, 'steam'), ach(0, 'psn'), ach(2), ach(30)], 7)
     expect(rows).toHaveLength(7)
-    expect(rows[6]).toEqual({ date: day(0), ra: 1, steam: 1, psn: 1, total: 3 })
-    expect(rows[4]).toEqual({ date: day(2), ra: 1, steam: 0, psn: 0, total: 1 })
+    expect(rows[6]).toEqual({ date: day(0), ra: 1, steam: 1, psn: 1, xbox: 0, total: 3 })
+    expect(rows[4]).toEqual({ date: day(2), ra: 1, steam: 0, psn: 0, xbox: 0, total: 1 })
     expect(rows.reduce((s, r) => s + r.total, 0)).toBe(4)
   })
 

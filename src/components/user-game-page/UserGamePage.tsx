@@ -14,8 +14,9 @@ import UserGamePageNotice from './user-game-page-notice/UserGamePageNotice'
 import UserGamePageRa from './user-game-page-ra/UserGamePageRa'
 import UserGamePageSteam from './user-game-page-steam/UserGamePageSteam'
 import UserGamePagePsn from './user-game-page-psn/UserGamePagePsn'
+import UserGamePageXbox from './user-game-page-xbox/UserGamePageXbox'
 
-const BODIES = { ra: UserGamePageRa, steam: UserGamePageSteam, psn: UserGamePagePsn }
+const BODIES = { ra: UserGamePageRa, steam: UserGamePageSteam, psn: UserGamePagePsn, xbox: UserGamePageXbox }
 
 /**
  * A game as one user has it, at /user/<name>/<platform>/<id>: their progress
@@ -34,7 +35,7 @@ export default function UserGamePage({ username, source, id }: { username: strin
   if (error) return <PublicUserError username={username} error={error} onRetry={retry} />
   if (isLoading || !user) return <GameInfoSkeleton />
 
-  const linked = source === 'ra' ? Boolean(user.ra) : source === 'steam' ? user.steam : user.psn
+  const linked = source === 'ra' ? Boolean(user.ra) : source === 'steam' ? user.steam : source === 'psn' ? user.psn : user.xbox === true
   const gamePageHref = source === 'psn' ? `/psnGame/${id}` : gameHref(source, Number(id))
   const banner = (
     <UserGamePageBanner

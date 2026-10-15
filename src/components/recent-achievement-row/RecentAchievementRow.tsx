@@ -13,8 +13,8 @@ import { useSubject } from '@/context/SubjectContext'
 export default function RecentAchievementRow({ ach, onNavigate }: { ach: RecentAchievement; onNavigate: () => void }) {
   const subject = useSubject()
   const badge = achievementBadgeUrl(ach)
-  // Steam and PSN unlocks have no points.
-  const isSteam = ach.Source === 'steam' || ach.Source === 'psn'
+  // Steam, PSN and Xbox unlocks have no points.
+  const isSteam = ach.Source === 'steam' || ach.Source === 'psn' || ach.Source === 'xbox'
   return (
     <Link
       href={gameHref(ach.Source ?? 'ra', ach.GameID, subject)}

@@ -11,11 +11,13 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
 
 const LOGOS: Record<GameSource, ReactNode> = {
   ra: <RaLogo height={11} />,
   steam: <SteamLogo size={14} className="text-[#66c0f4]" aria-hidden="true" />,
   psn: <PlaystationLogo size={14} className="text-[#0070d1]" aria-hidden="true" />,
+  xbox: <XboxLogo size={14} className="text-[#107c10]" aria-hidden="true" />,
 }
 
 /** Games played on each platform: how many, at 100%, under way, and how far along on average. */

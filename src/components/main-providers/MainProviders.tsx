@@ -11,6 +11,7 @@ import { PinnedGamesProvider } from '@/context/PinnedGamesContext'
 import { HiddenGamesProvider } from '@/context/HiddenGamesContext'
 import { SteamGamesDataProvider } from '@/context/SteamGamesDataContext'
 import { PsnGamesDataProvider } from '@/context/PsnGamesDataContext'
+import { XboxGamesDataProvider } from '@/context/XboxGamesDataContext'
 
 export function MainProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -24,10 +25,12 @@ export function MainProviders({ children }: { children: React.ReactNode }) {
                 <HiddenGamesProvider>
                 <SteamGamesDataProvider>
                 <PsnGamesDataProvider>
-                  {/* Inside the Steam and PSN providers: it falls back to a linked platform. */}
+                <XboxGamesDataProvider>
+                  {/* Inside the Steam, PSN and Xbox providers: it falls back to a linked platform. */}
                   <MainPlatformProvider>
                     {children}
                   </MainPlatformProvider>
+                </XboxGamesDataProvider>
                 </PsnGamesDataProvider>
                 </SteamGamesDataProvider>
                 </HiddenGamesProvider>

@@ -10,7 +10,7 @@ import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-
 import { formatRarity } from '@/utils/steamFeed'
 import type { GuideLink } from '@/utils/guideLinks'
 
-const GUIDE_ICON = { youtube: IconBrandYoutube, steamGuides: IconBook2, psnProfiles: IconBook2 }
+const GUIDE_ICON = { youtube: IconBrandYoutube, steamGuides: IconBook2, psnProfiles: IconBook2, trueAchievements: IconBook2 }
 
 /**
  * One Steam achievement or PSN trophy, opened from its game page — the
@@ -70,7 +70,7 @@ export default function AchievementDetailModal({
   const when = earnedAt
     ? new Date(earnedAt).toLocaleString(lang, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     : null
-  const guideLabel = { youtube: T.achievementDetail.youtube, steamGuides: T.achievementDetail.steamGuides, psnProfiles: T.achievementDetail.psnProfiles }
+  const guideLabel = { youtube: T.achievementDetail.youtube, steamGuides: T.achievementDetail.steamGuides, psnProfiles: T.achievementDetail.psnProfiles, trueAchievements: T.achievementDetail.trueAchievements }
 
   return (
     <motion.div
