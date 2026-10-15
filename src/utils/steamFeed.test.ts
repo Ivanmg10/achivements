@@ -192,3 +192,20 @@ test('PSN games join the recent feed by their last trophy', () => {
   )
   expect(merged.map((i) => i.key)).toEqual(['steam:2', 'psn:300', 'ra:1'])
 })
+
+describe('Xbox in the recent feed', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { mergeRecentFeeds } = require('./steamFeed') as typeof import('./steamFeed')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxGameFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  test('an Xbox game is merged by its last session, keyed apart', () => {
+    const feed = mergeRecentFeeds([], [], 5, [], [
+      xboxGameFixture({ id: 1, lastPlayed: '2026-01-01T00:00:00Z' }),
+      xboxGameFixture({ id: 2, lastPlayed: '2026-02-01T00:00:00Z' }),
+      xboxGameFixture({ id: 3, lastPlayed: null }),
+    ])
+    expect(feed.map((f: { key: string }) => f.key)).toEqual(['xbox:2', 'xbox:1', 'xbox:3'])
+    expect(feed[0].source).toBe('xbox')
+  })
+})

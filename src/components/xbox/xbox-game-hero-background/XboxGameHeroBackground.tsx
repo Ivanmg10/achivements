@@ -13,7 +13,6 @@ export default function XboxGameHeroBackground({ src }: { src: string }) {
       className="absolute pointer-events-none overflow-hidden"
       style={{ top: '-64px', left: '50%', transform: 'translateX(-50%)', width: '100vw', height: '900px' }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt=""

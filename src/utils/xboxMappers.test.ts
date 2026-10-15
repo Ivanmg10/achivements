@@ -145,3 +145,34 @@ test('sortByLastPlayed puts the latest first and the never-played last, without 
   expect(sortByLastPlayed(games).map((g) => g.titleId)).toEqual(['3', '2', '1'])
   expect(games.map((g) => g.titleId)).toEqual(['1', '2', '3'])
 })
+
+describe('xboxToRecentAchievement', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxToRecentAchievement, XBOX_PLATFORM } = require('./xboxMappers') as typeof import('./xboxMappers')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxRecentFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  test("an Xbox unlock in RA's shape: no points, its own source, art and game", () => {
+    expect(xboxToRecentAchievement(xboxRecentFixture({ achievementId: '49', earnedAt: '2026-10-09T21:22:41.5300000Z', gamerscore: 30 }))).toEqual({
+      Date: '2026-10-09 21:22:41',
+      HardcoreMode: '0',
+      AchievementID: 49,
+      Title: 'Prologue',
+      Description: '',
+      BadgeName: '',
+      Points: 0,
+      GameID: 1738914043,
+      GameTitle: 'Modern Game',
+      ConsoleName: XBOX_PLATFORM,
+      Source: 'xbox',
+      BadgeUrl: undefined,
+      GameIconUrl: 'https://images-eds.xboxlive.com/image?url=modern',
+    })
+  })
+
+  test('an id that is not a number does not become NaN, and the badge is kept when there is one', () => {
+    const a = xboxToRecentAchievement(xboxRecentFixture({ achievementId: 'abc', iconUrl: 'https://x/i.png' }))
+    expect(a.AchievementID).toBe(0)
+    expect(a.BadgeUrl).toBe('https://x/i.png')
+  })
+})

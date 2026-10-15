@@ -385,3 +385,18 @@ describe('activityKpis', () => {
     expect(activityKpis([], NOW)).toEqual({ today: 0, week: 0, month: 0, avgPerDay: 0 })
   })
 })
+
+describe('Xbox pins and days', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const u = require('./utils') as typeof import('./utils')
+
+  test('a pinned Xbox achievement is identified by its game and its own id', () => {
+    expect(u.pinnedKey({ source: 'xbox', xbox_achievement_id: '49', game_id: 730 } as never)).toBe('xbox:730:49')
+  })
+
+  test('Xbox unlocks count as their own platform in a day', () => {
+    const today = new Date().toISOString().split('T')[0]
+    const rows = u.groupByDaySource([{ Date: today + ' 10:00:00', Source: 'xbox' } as never, { Date: today + ' 11:00:00', Source: 'psn' } as never], 1)
+    expect(rows[0]).toMatchObject({ xbox: 1, psn: 1, ra: 0, steam: 0, total: 2 })
+  })
+})

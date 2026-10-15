@@ -20,7 +20,7 @@ import XboxLogo from '@/components/xbox-logo/XboxLogo'
  * Xbox is admin-only; to anyone else this renders nothing at all.
  */
 export default function UserXboxCard() {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const { enabled, xuid, gamertag, isLinked, link, isLinking, error: linkError, unlink, isUnlinking } = useXboxLink()
   const { summary, isLoading, error: summaryError } = useXboxSummary()
   const { library } = useXboxGamesData()
@@ -28,7 +28,7 @@ export default function UserXboxCard() {
   if (!enabled) return null
 
   const name = summary?.gamertag || gamertag
-  const value = (n: number | undefined) => (isLoading || n === undefined ? '—' : n.toLocaleString())
+  const value = (n: number | undefined) => (isLoading || n === undefined ? '—' : n.toLocaleString(lang))
   const stats: PlatformStat[] = [
     { label: T.xbox.gamerscore, value: value(summary?.gamerscore), accent: 'text-green-500' },
     { label: T.userStats.games, value: value(summary?.games) },
