@@ -1257,6 +1257,7 @@ export const pl: Translations = {
     rarity: '{n}% graczy',
     achievementsError: 'Nie udało się wczytać osiągnięć',
     noAchievements: 'Ta gra nie ma osiągnięć',
+    partialList: 'Xbox podaje dla tej gry tylko odblokowane osiągnięcia, więc zablokowane nie są wyświetlane.',
     retry: 'Spróbuj ponownie',
     profileError: 'Nie udało się wczytać Twojego profilu Xbox',
     viewOnXbox: 'Zobacz na Xbox',

@@ -1257,6 +1257,7 @@ export const de: Translations = {
     rarity: '{n}% der Spieler',
     achievementsError: 'Die Erfolge konnten nicht geladen werden',
     noAchievements: 'Dieses Spiel hat keine Erfolge',
+    partialList: 'Xbox meldet für dieses Spiel nur freigeschaltete Erfolge, gesperrte werden daher nicht aufgelistet.',
     retry: 'Erneut versuchen',
     profileError: 'Dein Xbox-Profil konnte nicht geladen werden',
     viewOnXbox: 'Auf Xbox ansehen',

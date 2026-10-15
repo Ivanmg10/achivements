@@ -38,7 +38,7 @@ describe('toXboxGame', () => {
       id: 1738914043,
       titleId: '1738914043',
       title: 'Modern Game',
-      imageIcon: 'https://images-eds.xboxlive.com/image?url=modern',
+      imageIcon: 'https://images-eds-ssl.xboxlive.com/image?url=modern',
       consoleName: 'Xbox Series · PC',
       platforms: ['Xbox Series', 'PC'],
       is360: false,
@@ -53,7 +53,12 @@ describe('toXboxGame', () => {
     })
   })
 
-  test('an Xbox 360 game is flagged, and keeps its real total', () => {
+  test('the cover of an Xbox 360 game comes from the host that has a certificate', () => {
+  expect(toXboxGame({ ...RAW_360_TITLE, displayImage: 'http://images-eds.xboxlive.com/image?url=x' })?.imageIcon).toBe('https://images-eds-ssl.xboxlive.com/image?url=x')
+  expect(toXboxGame({ ...RAW_360_TITLE, displayImage: 'https://image.xboxlive.com/a.png' })?.imageIcon).toBe('https://image-ssl.xboxlive.com/a.png')
+})
+
+test('an Xbox 360 game is flagged, and keeps its real total', () => {
     expect(toXboxGame(RAW_360_TITLE)).toMatchObject({ is360: true, maxPossible: 50, totalKnown: true, imageIcon: '', platforms: ['Xbox 360'] })
   })
 
@@ -114,7 +119,7 @@ describe('toXbox360Achievement', () => {
       id: '49',
       name: 'Award',
       description: 'Got a 100 note streak',
-      iconUrl: null,
+      iconUrl: 'https://image-ssl.xboxlive.com/global/t.415607e7/ach/0/36',
       gamerscore: 30,
       unlocked: true,
       unlockedAt: '2026-10-09T21:22:41.5300000Z',
@@ -122,6 +127,10 @@ describe('toXbox360Achievement', () => {
       rarity: 24.73,
       rarityCategory: 'Common',
     })
+  })
+
+  test('without the numbers for its icon, it has none', () => {
+    expect(toXbox360Achievement({ ...RAW_360_ACHIEVEMENT, imageId: undefined }).iconUrl).toBeNull()
   })
 
   test('a locked one shows the locked text and no date', () => {

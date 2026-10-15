@@ -15,6 +15,7 @@ import GameInfoSkeletonTable from '@/components/game-info-skeleton/game-info-ske
 import XboxGameHeroBackground from '@/components/xbox/xbox-game-hero-background/XboxGameHeroBackground'
 import XboxGameInfoHeader from '@/components/xbox/xbox-game-info-header/XboxGameInfoHeader'
 import XboxGameInfoTable from '@/components/xbox/xbox-game-info-table/XboxGameInfoTable'
+import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPartialListNote'
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { xboxAiSource } from '@/utils/aiExport'
 
@@ -87,7 +88,10 @@ export default function XboxGamePage() {
             <p className="text-text-secondary">{T.xbox.noAchievements}</p>
           </section>
         ) : (
-          <XboxGameInfoTable achievements={achievements} gameId={game.id} gameTitle={game.title} />
+          <>
+            <XboxPartialListNote game={game} listed={achievements.length} />
+            <XboxGameInfoTable achievements={achievements} gameId={game.id} gameTitle={game.title} />
+          </>
         )}
       </motion.div>
     </main>

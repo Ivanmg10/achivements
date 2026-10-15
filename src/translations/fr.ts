@@ -1257,6 +1257,7 @@ export const fr: Translations = {
     rarity: '{n}% des joueurs',
     achievementsError: 'Impossible de charger les succès',
     noAchievements: 'Ce jeu n\'a pas de succès',
+    partialList: 'Xbox ne communique que les succès débloqués de ce jeu ; les succès verrouillés ne sont donc pas listés.',
     retry: 'Réessayer',
     profileError: 'Impossible de charger ton profil Xbox',
     viewOnXbox: 'Voir sur Xbox',

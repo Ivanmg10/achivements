@@ -7,6 +7,7 @@ import { GameAchievementsProgressChart } from '@/components/game-achievements-pr
 import { XboxAchievementGrid } from '@/components/xbox/xbox-achievement-grid/XboxAchievementGrid'
 import XboxRarestAchievements from '@/components/xbox/xbox-rarest-achievements/XboxRarestAchievements'
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
+import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPartialListNote'
 import type { XboxGameProgress } from '@/types/xbox'
 
 const SKELETON_BADGES = 24
@@ -23,8 +24,8 @@ export default function XboxRecentlyPlayedExpanded({ game }: { game: XboxGamePro
   const { achievements, isLoading, error, retry } = useXboxAchievements(game.titleId)
 
   const loaded = achievements.length > 0
-  // The list can lack a total; the loaded game never does.
-  const total = loaded ? achievements.length : game.maxPossible
+  // The list can lack a total, and Xbox 360 lists only what was unlocked: the game's own total wins.
+  const total = loaded && !game.totalKnown ? achievements.length : Math.max(game.maxPossible, achievements.length)
   const earned = loaded ? achievements.filter((a) => a.unlocked).length : game.numAwarded
 
   // The chart only reads earn dates; Xbox has no hardcore.
@@ -56,7 +57,10 @@ export default function XboxRecentlyPlayedExpanded({ game }: { game: XboxGamePro
             </button>
           </div>
         ) : loaded ? (
-          <XboxAchievementGrid gameId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={40} />
+          <>
+            <XboxAchievementGrid gameId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={40} />
+            <XboxPartialListNote game={game} listed={achievements.length} />
+          </>
         ) : (
           <p className="text-sm text-text-secondary">{T.xbox.noAchievements}</p>
         )}

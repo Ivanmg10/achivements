@@ -1257,6 +1257,7 @@ export const es: Translations = {
     rarity: '{n}% de los jugadores',
     achievementsError: 'No se pudieron cargar los logros',
     noAchievements: 'Este juego no tiene logros',
+    partialList: 'Xbox solo informa de los logros desbloqueados de este juego, así que los bloqueados no aparecen.',
     retry: 'Reintentar',
     profileError: 'No se pudo cargar tu perfil de Xbox',
     viewOnXbox: 'Ver en Xbox',

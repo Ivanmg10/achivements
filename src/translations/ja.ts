@@ -1257,6 +1257,7 @@ export const ja: Translations = {
     rarity: 'プレイヤーの {n}%',
     achievementsError: '実績を読み込めませんでした',
     noAchievements: 'このゲームには実績がありません',
+    partialList: 'Xbox はこのゲームの解除済みの実績のみを返すため、未解除の実績は表示されません。',
     retry: '再試行',
     profileError: 'Xbox のプロフィールを読み込めませんでした',
     viewOnXbox: 'Xbox で見る',

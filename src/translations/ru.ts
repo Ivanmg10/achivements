@@ -1257,6 +1257,7 @@ export const ru: Translations = {
     rarity: '{n}% игроков',
     achievementsError: 'Не удалось загрузить достижения',
     noAchievements: 'В этой игре нет достижений',
+    partialList: 'Xbox сообщает для этой игры только полученные достижения, поэтому закрытые не показываются.',
     retry: 'Повторить',
     profileError: 'Не удалось загрузить ваш профиль Xbox',
     viewOnXbox: 'Открыть в Xbox',

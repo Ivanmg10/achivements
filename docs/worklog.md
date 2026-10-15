@@ -25,6 +25,21 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-15 — Xbox 360 covers, icons and partial lists (`feat/xbox-integration`)
+
+**Did** — Fixed Xbox 360 games (seen in the browser: Guitar Hero II): the cover
+and the achievement icons did not load, and only 14 of 50 achievements showed.
+Covers: Xbox's plain image hosts fail over https, so `https()` in
+`xboxMappers.ts` now swaps them for the `-ssl` hosts. Icons: built from
+`titleId`/`imageId` in hex. List: OpenXBL's 360 endpoint returns only unlocked
+achievements, no call returns the locked ones (tried `achievements/title`,
+`achievements/player/{xuid}/{titleId}`), so a note says so
+(`XboxPartialListNote`, all 9 languages) and the ring uses the game's total.
+Cache keys bumped to `xbox:titles:v3` and `xbox:achievements:v3`.
+**Open** — Locked 360 achievements cannot be shown unless another source exists.
+**Watch out** — Bump the cache version whenever a mapper's output changes: the
+achievements are cached for 30 days.
+
 ## 2026-10-15 — Xbox integration 1:1 with PSN, admin-only (`feat/xbox-integration`)
 
 **Did** — Replaced the explorer-only scope with the full PSN-equivalent Xbox

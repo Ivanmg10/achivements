@@ -1257,6 +1257,7 @@ export const it: Translations = {
     rarity: '{n}% dei giocatori',
     achievementsError: 'Impossibile caricare gli obiettivi',
     noAchievements: 'Questo gioco non ha obiettivi',
+    partialList: 'Xbox segnala solo gli obiettivi sbloccati di questo gioco, quindi quelli bloccati non compaiono.',
     retry: 'Riprova',
     profileError: 'Impossibile caricare il tuo profilo Xbox',
     viewOnXbox: 'Vedi su Xbox',

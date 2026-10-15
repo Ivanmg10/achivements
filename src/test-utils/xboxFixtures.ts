@@ -63,6 +63,8 @@ export const RAW_LOCKED: RawAchievement = {
 
 export const RAW_360_ACHIEVEMENT: Raw360Achievement = {
   id: 49,
+  titleId: 1096157159,
+  imageId: 54,
   name: 'Award',
   description: 'Got a 100 note streak',
   lockedDescription: 'Get a 100 note streak',

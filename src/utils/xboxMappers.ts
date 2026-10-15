@@ -35,6 +35,8 @@ export type RawAchievement = {
 }
 export type Raw360Achievement = {
   id: number
+  titleId?: number
+  imageId?: number
   name?: string
   description?: string
   lockedDescription?: string
@@ -45,9 +47,18 @@ export type Raw360Achievement = {
   rarity?: { currentCategory?: string; currentPercentage?: number } | null
 }
 
-/** Xbox's images come as http:// at times, which the site's CSP (and any https page) refuses. */
+/**
+ * Xbox's images come as http:// at times, which the site's CSP (and any https
+ * page) refuses. Their plain hosts have no certificate for https, so they are
+ * swapped for the `-ssl` twins that serve the very same files.
+ */
 function https(url: string | null | undefined): string | null {
-  return url ? url.replace(/^http:\/\//, 'https://') : null
+  return url
+    ? url
+        .replace(/^https?:\/\/images-eds\.xboxlive\.com/, 'https://images-eds-ssl.xboxlive.com')
+        .replace(/^https?:\/\/image\.xboxlive\.com/, 'https://image-ssl.xboxlive.com')
+        .replace(/^http:\/\//, 'https://')
+    : null
 }
 
 /** Xbox writes "never" as year 1; that is no date. */
@@ -131,14 +142,20 @@ export function toXboxAchievement(a: RawAchievement): XboxAchievement {
   }
 }
 
-/** An Xbox 360 achievement: a flatter shape, with no icon URL (Xbox sends an image number only). */
+/** An Xbox 360 icon is not sent as a URL, only as numbers: both go in hex into Xbox's classic image path. */
+function xbox360Icon(a: Raw360Achievement): string | null {
+  if (a.titleId == null || a.imageId == null) return null
+  return `https://image-ssl.xboxlive.com/global/t.${a.titleId.toString(16)}/ach/0/${a.imageId.toString(16)}`
+}
+
+/** An Xbox 360 achievement: a flatter shape, and the icon built from its numbers. */
 export function toXbox360Achievement(a: Raw360Achievement): XboxAchievement {
   const unlocked = a.unlocked === true
   return {
     id: String(a.id),
     name: a.name ?? '',
     description: (unlocked ? a.description : a.lockedDescription || a.description) ?? '',
-    iconUrl: null,
+    iconUrl: xbox360Icon(a),
     gamerscore: a.gamerscore ?? 0,
     unlocked,
     unlockedAt: unlocked ? realDate(a.timeUnlocked) : null,

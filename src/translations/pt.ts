@@ -1257,6 +1257,7 @@ export const pt: Translations = {
     rarity: '{n}% dos jogadores',
     achievementsError: 'Não foi possível carregar as conquistas',
     noAchievements: 'Este jogo não tem conquistas',
+    partialList: 'A Xbox só informa as conquistas desbloqueadas deste jogo, por isso as bloqueadas não aparecem.',
     retry: 'Tentar novamente',
     profileError: 'Não foi possível carregar o teu perfil Xbox',
     viewOnXbox: 'Ver no Xbox',

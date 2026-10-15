@@ -1258,6 +1258,7 @@ export const en = {
     rarity: '{n}% of players',
     achievementsError: 'Could not load the achievements',
     noAchievements: 'This game has no achievements',
+    partialList: 'Xbox only reports the achievements you have unlocked for this game, so the locked ones are not listed.',
     retry: 'Retry',
     profileError: 'Could not load your Xbox profile',
     viewOnXbox: 'View on Xbox',

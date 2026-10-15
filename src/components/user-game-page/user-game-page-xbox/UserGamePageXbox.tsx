@@ -13,6 +13,7 @@ import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
 import GameInfoSkeletonTable from '@/components/game-info-skeleton/game-info-skeleton-table/GameInfoSkeletonTable'
 import XboxGameHeroBackground from '@/components/xbox/xbox-game-hero-background/XboxGameHeroBackground'
 import XboxGameInfoHeader from '@/components/xbox/xbox-game-info-header/XboxGameInfoHeader'
+import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPartialListNote'
 import GameCompareTable from '@/components/game-compare-table/GameCompareTable'
 import type { UserGamePlatformProps } from '../user-game-page-ra/UserGamePageRa'
 
@@ -60,7 +61,10 @@ export default function UserGamePageXbox({ id, username, banner, comparing, mine
               </button>
             </section>
           ) : (
-            <GameCompareTable theirs={theirs} mine={mine} username={username} comparing={comparing} mineLoading={mineLoading} notice={notice} />
+            <>
+              <XboxPartialListNote game={game} listed={achievements.length} />
+              <GameCompareTable theirs={theirs} mine={mine} username={username} comparing={comparing} mineLoading={mineLoading} notice={notice} />
+            </>
           )}
         </div>
       </motion.div>
