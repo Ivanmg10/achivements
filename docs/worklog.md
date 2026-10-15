@@ -25,6 +25,26 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-15 — Xbox integration 1:1 with PSN, admin-only (`feat/xbox-integration`)
+
+**Did** — Replaced the explorer-only scope with the full PSN-equivalent Xbox
+integration: link by gamertag, summary, library and categories, `/xboxGame/[id]`,
+recent/year feeds, pins, favorites, groups, collection and stats, friends,
+public profiles, admin linking. `'xbox'` is now a `GameSource`; migrations
+033–035 (applied to the shared DB 2026-10-15, with the user's OK). Tests for the
+new hooks, utils, routes and components; whole suite, `tsc`, lint and build pass.
+**Why** — The user asked for "1:1 with PSN, but only available and visible to admins".
+**Decisions** — One switch (`XBOX_ADMIN_ONLY`) plus server 403s, hidden UI and
+filtering of other users' Xbox data. Progress by gamerscore (`totalKnown` flag)
+because modern games report no achievement total. Achievements are cached by
+`lastPlayed`, feed scans are capped, to live within 150 calls/hour.
+**Open** — Never checked in a real browser (needs an admin login). Private
+profile / unknown gamertag responses and play time (`MinutesPlayed`) are
+unverified. Cold year feed can spend up to ~40 calls. Rotate the API key: it was
+pasted in the chat. Several edited existing components have no new xbox cases yet.
+**Watch out** — A new place that lists games or accounts must filter Xbox for
+non-admins (see CLAUDE.md). Repo files are CRLF.
+
 ## 2026-10-15 — Xbox via OpenXBL, admin-only explorer (`feat/xbox-integration`)
 
 **Did** — Analysed OpenXBL (xbl.io) against the PSN integration

@@ -61,7 +61,7 @@ missing:
 |---|---|
 | `STEAM_API_KEY` | Steam linking and data |
 | `PSN_NPSSO` | PSN linking answers `not-configured` |
-| `OPENXBL_API_KEY` | The admin Xbox explorer answers `not-configured` |
+| `OPENXBL_API_KEY` | Xbox (admin-only for now) answers `not-configured` |
 | `TWITCH_CLIENT_ID` / `_SECRET` | PS3/Vita games keep their trophy icon, no IGDB details |
 | `RESEND_API_KEY` (+ `EMAIL_FROM`) | Password recovery and verification mail — see `CLAUDE.md` → Email |
 | `CRON_SECRET` | The cron routes refuse to run |

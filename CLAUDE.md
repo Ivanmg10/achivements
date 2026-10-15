@@ -336,10 +336,26 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
 ## Xbox (OpenXBL) — admin-only for now, read before touching it
 
 Read through OpenXBL (xbl.io, an unofficial proxy over Xbox Live), all in
-`src/lib/xboxClient.ts`. **Only the admin panel's Xbox explorer uses it**
-(`/api/admin/xbox`, `/api/admin/xbox/achievements`): no user can link Xbox yet,
-no migration exists, nothing is saved. Plan and measured findings:
+`src/lib/xboxClient.ts`. It is a 1:1 of PSN's integration (link by gamertag,
+summary, library and categories, `/xboxGame/[id]`, feeds, pins, favorites,
+groups, collection, friends, public profiles, admin linking) **but only admins
+see or use it**. Migrations 033–035 (xbox columns, `'xbox'` game source, pinned
+achievements) were applied 2026-10-15. Plan and measured findings:
 `docs/xbox-integration-plan.md`.
+
+- **The gate is one switch**: `XBOX_ADMIN_ONLY` in `src/utils/xboxAccess.ts`
+  (`canUseXbox(admin)`, `sourceAllowed(source, admin)`). To open Xbox to everyone,
+  set it to `false`; nothing else needs to change. It is enforced in three
+  places and all three must keep holding: the routes (`requireXboxUser` /
+  `requireXboxSession` answer 401/403; every pin, hide, favorite, group and
+  order route calls `sourceAllowed`), the UI (`useXboxEnabled`), and the paths
+  that show *other* people's data (public profile, follows, search, groups,
+  favorites) which drop Xbox rows and fields for a non-admin viewer. A new
+  place that lists games or accounts must filter Xbox the same way.
+- `users.xboxxuid`/`xboxgamertag` are in the session (`xboxxuid`); users link by
+  typing a gamertag, which nothing proves is theirs (like PSN), so no uniqueness.
+- Secret achievements stay concealed until the viewer reveals them
+  (`useRevealedAchievements`); the Ask-an-AI export uses gamerscore.
 
 - **One app key, not the user's** (`OPENXBL_API_KEY`, server-only, never
   `NEXT_PUBLIC_`), like PSN's NPSSO. Without it the routes answer
@@ -359,8 +375,8 @@ no migration exists, nothing is saved. Plan and measured findings:
 - **Unverified:** what a private profile returns (`403 → private` is a guess), an
   unknown gamertag, and play time (`POST player/stats` with `MinutesPlayed` works
   but is not wired).
-- Every explorer lookup is logged (`xbox-lookup`). Do not add a user-facing Xbox
-  route or a second Xbox provider without asking.
+- Admin explorer lookups and linking are logged (`xbox-lookup`, `link-xbox`,
+  `unlink-xbox`). Do not add a second Xbox provider without asking.
 
 ## PlayStation (PSN) — read before touching it
 
