@@ -165,6 +165,18 @@ export function toXbox360Achievement(a: Raw360Achievement): XboxAchievement {
   }
 }
 
+/**
+ * A 360 game's full list: Xbox sends the title's achievements (all locked) and,
+ * apart, the ones the account unlocked. The unlocked version wins; one the title
+ * list lacks is kept rather than lost.
+ */
+export function merge360Achievements(all: Raw360Achievement[], earned: Raw360Achievement[]): XboxAchievement[] {
+  const unlocked = new Map(earned.map((a) => [a.id, toXbox360Achievement(a)]))
+  const merged = all.map((a) => unlocked.get(a.id) ?? toXbox360Achievement(a))
+  const listed = new Set(all.map((a) => a.id))
+  return [...merged, ...earned.filter((a) => !listed.has(a.id)).map(toXbox360Achievement)]
+}
+
 /** Most recently played first; games never played go last. */
 /** Most recently played first; games never played go last. */
 export function sortByLastPlayed(games: XboxGameProgress[]): XboxGameProgress[] {

@@ -1,6 +1,7 @@
 import {
   sortByLastPlayed,
   toXbox360Achievement,
+  merge360Achievements,
   toXboxAchievement,
   toXboxGame,
   toXboxProfile,
@@ -137,6 +138,21 @@ describe('toXbox360Achievement', () => {
     expect(toXbox360Achievement({ ...RAW_360_ACHIEVEMENT, unlocked: false, timeUnlocked: '0001-01-01T00:00:00Z' })).toMatchObject({
       unlocked: false, unlockedAt: null, description: 'Get a 100 note streak',
     })
+  })
+})
+
+describe('merge360Achievements', () => {
+  const locked = (id: number) => ({ ...RAW_360_ACHIEVEMENT, id, unlocked: false, timeUnlocked: '2002-11-15T00:00:00Z' })
+
+  test('the unlocked version wins, in the title list order, and the rest stay locked', () => {
+    const list = merge360Achievements([locked(1), locked(49), locked(2)], [RAW_360_ACHIEVEMENT])
+    expect(list.map((a) => [a.id, a.unlocked])).toEqual([['1', false], ['49', true], ['2', false]])
+    expect(list[0].unlockedAt).toBeNull()
+  })
+
+  test('an unlocked one the title list lacks is kept, and an empty title list leaves the unlocked ones', () => {
+    expect(merge360Achievements([locked(1)], [RAW_360_ACHIEVEMENT]).map((a) => a.id)).toEqual(['1', '49'])
+    expect(merge360Achievements([], [RAW_360_ACHIEVEMENT]).map((a) => a.id)).toEqual(['49'])
   })
 })
 

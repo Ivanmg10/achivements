@@ -370,10 +370,11 @@ achievements) were applied 2026-10-15. Plan and measured findings:
 - **Data shape:** gamerscore, not trophy grades; no DLC groups. Newer games report
   `totalAchievements: 0` while their gamerscore total is real, so progress goes
   by gamerscore and the achievement total may be `null`. Xbox 360 games use
-  another endpoint and shape (`is360`) that **lists only the unlocked
-  achievements** (OpenXBL has no call for the locked ones; measured 2026-10-15),
-  so those pages show a note (`XboxPartialListNote`) and the counts come from the
-  game, not the list. Their icons are not URLs: they are built from `titleId`
+  another endpoint and shape (`is360`), and take **two calls**: the title's whole
+  list (`achievements/player/{xuid}/title/{titleId}`, all locked) and what the
+  account unlocked (`achievements/x360/…`), joined by `merge360Achievements`
+  (measured 2026-10-15; the x360 one alone lists only the unlocked). If a list
+  still comes up short, `XboxPartialListNote` says so. Their icons are not URLs: they are built from `titleId`
   and `imageId` in hex (`xbox360Icon`).
 - **Image hosts:** `images-eds.xboxlive.com` and `image.xboxlive.com` have no
   certificate for https; `xboxMappers.https()` swaps them for the `-ssl` twins.

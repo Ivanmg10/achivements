@@ -4,7 +4,7 @@ import { mapLimit } from '@/utils/utils'
 import { isXboxTitleId } from '@/utils/xboxTitles'
 import {
   sortByLastPlayed,
-  toXbox360Achievement,
+  merge360Achievements,
   toXboxAchievement,
   toXboxGame,
   toXboxProfile,
@@ -223,7 +223,7 @@ export async function xboxSummary(xuid: string, gamertag: string, userId: string
 
 /**
  * A game's achievements with what the account earned of them, in one call
- * (Xbox 360 games use another endpoint with another shape), its texts in
+ * (Xbox 360 games take two, with another shape), its texts in
  * `language`. Cached until the game is played again (see SETTLED_ACHIEVEMENTS_TTL_MS).
  */
 export async function xboxGameAchievements(
@@ -233,12 +233,16 @@ export async function xboxGameAchievements(
   language = DEFAULT_LANGUAGE,
 ): Promise<XboxAchievement[]> {
   return withSteamCache(
-    `xbox:achievements:v3:${xuid}:${game.titleId}:${game.lastPlayed ?? ''}:${language}`,
+    `xbox:achievements:v4:${xuid}:${game.titleId}:${game.lastPlayed ?? ''}:${language}`,
     SETTLED_ACHIEVEMENTS_TTL_MS,
     async () => {
       if (game.is360) {
-        const res = await xboxCall<{ achievements?: Raw360Achievement[] }>(`achievements/x360/${xuid}/title/${game.titleId}`, { language })
-        return (res?.achievements ?? []).map(toXbox360Achievement)
+        // Two calls: the title's whole list, and what the account unlocked of it.
+        const [all, earned] = await Promise.all([
+          xboxCall<{ achievements?: Raw360Achievement[] }>(`achievements/player/${xuid}/title/${game.titleId}`, { language }),
+          xboxCall<{ achievements?: Raw360Achievement[] }>(`achievements/x360/${xuid}/title/${game.titleId}`, { language }),
+        ])
+        return merge360Achievements(all?.achievements ?? [], earned?.achievements ?? [])
       }
       const res = await xboxCall<{ achievements?: RawAchievement[] }>(`achievements/player/${xuid}/${game.titleId}`, { language })
       return (res?.achievements ?? []).map(toXboxAchievement)

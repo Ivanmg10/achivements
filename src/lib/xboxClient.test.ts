@@ -257,11 +257,17 @@ describe('xboxGameAchievements', () => {
     expect(fetchMock.mock.calls[0][1].headers['Accept-Language']).toBe('es-ES')
   })
 
-  test('an Xbox 360 game uses its own endpoint and shape', async () => {
-    fetchMock.mockResolvedValue(answer({ achievements: [RAW_360_ACHIEVEMENT] }))
+  test('an Xbox 360 game joins the title list with what the account unlocked', async () => {
+    const locked = { ...RAW_360_ACHIEVEMENT, id: 50, name: 'Locked one', unlocked: false, timeUnlocked: '2002-11-15T00:00:00Z' }
+    const titleList = { ...RAW_360_ACHIEVEMENT, unlocked: false, timeUnlocked: '2002-11-15T00:00:00Z' }
+    routes({
+      [`achievements/player/${XUID}/title/1096157159`]: answer({ achievements: [titleList, locked] }),
+      [`achievements/x360/${XUID}/title/1096157159`]: answer({ achievements: [RAW_360_ACHIEVEMENT] }),
+    })
     const list = await xboxGameAchievements(XUID, { titleId: '1096157159', is360: true, lastPlayed: null })
-    expect(list[0]).toMatchObject({ id: '49', gamerscore: 30, unlocked: true })
-    expect(fetchMock.mock.calls[0][0]).toBe(`https://api.xbl.io/v2/achievements/x360/${XUID}/title/1096157159`)
+    expect(list).toHaveLength(2)
+    expect(list[0]).toMatchObject({ id: '49', gamerscore: 30, unlocked: true, unlockedAt: RAW_360_ACHIEVEMENT.timeUnlocked })
+    expect(list[1]).toMatchObject({ id: '50', unlocked: false, unlockedAt: null })
   })
 
   test('the cache key changes with the last session and the language, so a played game is asked again', async () => {
@@ -272,7 +278,7 @@ describe('xboxGameAchievements', () => {
     await xboxGameAchievements(XUID, { ...base, lastPlayed: 'A' }, null, 'es-ES')
     const keys = (withSteamCache as jest.Mock).mock.calls.map((c) => c[0])
     expect(new Set(keys).size).toBe(3)
-    expect(keys[0]).toBe(`xbox:achievements:v3:${XUID}:5:A:en-US`)
+    expect(keys[0]).toBe(`xbox:achievements:v4:${XUID}:5:A:en-US`)
   })
 
   test('a game with none is an empty list', async () => {
