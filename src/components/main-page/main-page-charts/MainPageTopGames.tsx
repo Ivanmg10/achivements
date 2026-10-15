@@ -9,9 +9,11 @@ import { gameHref } from '@/utils/gameRef'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { useSubject } from '@/context/SubjectContext'
 
 export default function MainPageTopGames({ achievements, isLoading }: { achievements: RecentAchievement[]; isLoading?: boolean }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const data = useMemo(() => {
     const cutoff = new Date()
     cutoff.setDate(cutoff.getDate() - 30)
@@ -23,7 +25,7 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
         // RA game ids and Steam appids share a number space: key by both.
         const key = `${a.Source ?? 'ra'}:${a.GameID}`
         if (!acc[key]) {
-          acc[key] = { count: 0, name: a.GameTitle, href: gameHref(a.Source ?? 'ra', a.GameID), icon: achievementGameIconUrl(a), console: a.ConsoleName }
+          acc[key] = { count: 0, name: a.GameTitle, href: gameHref(a.Source ?? 'ra', a.GameID, subject), icon: achievementGameIconUrl(a), console: a.ConsoleName }
         }
         acc[key].count++
         return acc
@@ -32,7 +34,7 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
     return Object.values(byGame)
       .sort((a, b) => b.count - a.count)
       .slice(0, 6)
-  }, [achievements])
+  }, [achievements, subject])
 
   if (isLoading) return <SkeletonGameList count={4} />
 

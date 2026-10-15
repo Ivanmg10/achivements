@@ -2,6 +2,8 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { useSteamFavoriteAchievements } from './useSteamFavoriteAchievements'
 import type { SteamAchievementUnified } from '@/types/steam'
+import { createElement, type ReactNode } from 'react'
+import { SubjectContext } from '@/context/SubjectContext'
 
 const ACH = { apiname: 'ACH_WIN', title: 'Win' } as SteamAchievementUnified
 
@@ -71,4 +73,12 @@ test('rolls back when the pin request fails', async () => {
 
   expect(result.current.pinned.has('ACH_WIN')).toBe(false)
   expect(result.current.error).not.toBeNull()
+})
+
+test("pinning is not offered on someone else's page", () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { id: '1' } }, status: 'authenticated' })
+  global.fetch = jest.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve([]) })) as unknown as typeof fetch
+  const wrapper = ({ children }: { children: ReactNode }) => createElement(SubjectContext.Provider, { value: 'ivan' }, children)
+  const { result } = renderHook(() => useSteamFavoriteAchievements(620, 'Portal 2'), { wrapper })
+  expect(result.current.canPin).toBe(false)
 })

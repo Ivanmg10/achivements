@@ -25,12 +25,14 @@ export function isPsnTitleId(value: string): boolean {
 }
 
 /**
- * Where a PSN game goes among the category pages: completed at 100% (the base
- * game, for one with DLC), in progress with something earned, and "no
- * achievements" when it was launched but nothing earned yet.
+ * Where a PSN game goes among the category pages: completed at 100% (the
+ * whole set, so a game with DLC trophies still to earn is not complete yet), in
+ * progress with something earned (a game whose platinum is earned is complete
+ * too when the user chose that: see `platinumCompletes`), and "no achievements" when it was launched
+ * but nothing earned yet.
  */
-export function classifyPsnGame(game: Pick<PsnGameProgress, 'pctWon'>): PsnCategory {
-  if (game.pctWon >= 100) return 'completed'
+export function classifyPsnGame(game: Pick<PsnGameProgress, 'pctWon' | 'platinumCompletes'>): PsnCategory {
+  if (game.pctWon >= 100 || game.platinumCompletes) return 'completed'
   if (game.pctWon > 0) return 'playing'
   return 'wantToPlay'
 }
@@ -48,6 +50,14 @@ export const TROPHY_GRADE_COLOR: Record<(typeof TROPHY_GRADES)[number], string> 
   gold: 'text-yellow-400',
   silver: 'text-zinc-400',
   bronze: 'text-orange-400',
+}
+
+/** Ring colour around an earned trophy's icon, per grade. */
+export const TROPHY_GRADE_RING: Record<(typeof TROPHY_GRADES)[number], string> = {
+  platinum: 'ring-sky-300',
+  gold: 'ring-yellow-400',
+  silver: 'ring-zinc-400',
+  bronze: 'ring-orange-400',
 }
 
 /** The widest art there is for a game's backdrop: store hero art, then box art, then the trophy icon. */
@@ -98,6 +108,23 @@ export function totalPlaytime(games: Pick<PsnGameProgress, 'playtimeMinutes' | '
     minutes += g.playtimeMinutes
   }
   return minutes
+}
+
+/**
+ * A DLC's name without the game's title in front, which Sony usually repeats:
+ * "Call of Duty: Black Ops II: Revolution" in "Call of Duty®: Black Ops II"
+ * → "Revolution". Case, ®/™ and punctuation are ignored when matching. The
+ * full name when the title is not at its start, or nothing would be left.
+ */
+export function dlcShortName(name: string, gameTitle: string): string {
+  // Letters and digits only, so the words need no escaping in the pattern.
+  const words = gameTitle.split(/[^\p{L}\p{N}]+/u).filter(Boolean)
+  if (words.length === 0) return name
+  const SEP = '[^\\p{L}\\p{N}]'
+  // Whole words only, so "Halo" is not cut from "Halogen".
+  const lead = new RegExp(`^${SEP}*${words.join(`${SEP}+`)}(?![\\p{L}\\p{N}])${SEP}*`, 'iu')
+  const rest = name.replace(lead, '').trim()
+  return rest || name
 }
 
 /** The base game's group; every other group is a DLC. */

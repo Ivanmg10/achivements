@@ -4,6 +4,7 @@ import { PinToggleButton } from './PinToggleButton'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { en } from '@/translations/en'
 import { notify } from '@/lib/notify'
+import { SubjectContext } from '@/context/SubjectContext'
 
 jest.mock('@/context/PinnedGamesContext', () => ({
   usePinnedGames: jest.fn(),
@@ -96,4 +97,14 @@ test('says so when the pin is saved, and when it is not', async () => {
   pinGame.mockRejectedValueOnce(new Error('down'))
   fireEvent.click(screen.getByRole('button'))
   await waitFor(() => expect(notify.error).toHaveBeenCalledWith(en.toast.pinsFailed))
+})
+
+test("is not offered on someone else's page: pins are the viewer's own", () => {
+  ;(usePinnedGames as jest.Mock).mockReturnValue({ isPinned: () => false, pinGame, unpinGame })
+  render(
+    <SubjectContext.Provider value="ivan">
+      <PinToggleButton gameId={1} />
+    </SubjectContext.Provider>,
+  )
+  expect(screen.queryByRole('button')).not.toBeInTheDocument()
 })

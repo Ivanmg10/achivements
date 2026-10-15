@@ -7,6 +7,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import EmptyState from '@/components/empty-state/EmptyState'
 import type { SteamRecentAchievement } from '@/types/steam'
+import { useSubject } from '@/context/SubjectContext'
+import { gameHref } from '@/utils/gameRef'
 
 /**
  * The player's latest Steam unlocks — MainPageProfileRaAchievements'
@@ -25,6 +27,7 @@ export default function MainPageProfileStAchievements({
   onRetry: () => void
 }) {
   const { T, lang } = useLanguage()
+  const subject = useSubject()
 
   return (
     <div className="bg-bg-main rounded-lg p-3 flex flex-col gap-2 flex-1 min-h-[148px]">
@@ -61,7 +64,7 @@ export default function MainPageProfileStAchievements({
           {achievements.slice(0, 3).map((a) => (
             <li key={`${a.appId}:${a.apiname}`}>
               <Link
-                href={`/steamGame/${a.appId}#${achievementAnchor(a.apiname)}`}
+                href={`${gameHref('steam', a.appId, subject)}#${achievementAnchor(a.apiname)}`}
                 className="flex gap-2 items-center rounded-lg hover:bg-ink/5 transition-colors group p-1 -mx-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
               >
                 {a.badgeUrl ? (

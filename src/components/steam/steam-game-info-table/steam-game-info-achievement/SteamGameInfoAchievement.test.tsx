@@ -73,7 +73,7 @@ test('carries its api name for deep links and shows the highlight when asked', (
   const { container } = renderRow(ach(), true)
   const row = container.querySelector('tr')!
   expect(row.dataset.ach).toBe('WIN')
-  expect(row.className).toContain('bg-[#66c0f4]/15')
+  expect(row.className).toContain('bg-accent/15')
 })
 
 test('falls back to a placeholder badge', () => {

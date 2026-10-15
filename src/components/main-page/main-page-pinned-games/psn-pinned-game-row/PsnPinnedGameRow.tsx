@@ -10,7 +10,7 @@ import { useSpotlight } from '@/hooks/useSpotlight'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import GameIcon from '@/components/game-icon/GameIcon'
-import { SteamProgressBar } from '@/components/ui/SteamProgressBar'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import PsnRecentlyPlayedExpanded from '@/components/psn/psn-recently-played-expanded/PsnRecentlyPlayedExpanded'
 import { gameHref, gameKey } from '@/utils/gameRef'
@@ -82,7 +82,7 @@ export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId:
               <PlaystationLogo size={12} className="opacity-60" aria-hidden="true" />
               {game.consoleName}
             </span>
-            <SteamProgressBar pct={game.pctWon} label={game.title} className="flex-1" />
+            <ProgressBar pct={game.pctWon} label={game.title} className="flex-1" />
             <PinToggleButton gameId={gameId} source="psn" className="ml-auto" />
             <button
               onClick={onToggle}

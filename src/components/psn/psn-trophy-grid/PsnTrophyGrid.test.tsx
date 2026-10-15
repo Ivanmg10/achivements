@@ -85,3 +85,13 @@ test('signed in, a star pins a trophy; no star when signed out', () => {
   fireEvent.click(screen.getByRole('switch', { name: `${en.favorites.addFavorite}: ${en.psn.hiddenTrophy}` }))
   expect(toggle).toHaveBeenCalledWith(TROPHIES[1])
 })
+
+test('an eye on a hidden, unearned badge reveals just that trophy, and hides it again', () => {
+  render(<PsnTrophyGrid gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
+  expect(screen.queryByRole('link', { name: new RegExp(`^Spoiler`) })).not.toBeInTheDocument()
+  expect(screen.getAllByRole('button', { name: en.psn.revealTrophy })).toHaveLength(1)
+  fireEvent.click(screen.getByRole('button', { name: en.psn.revealTrophy }))
+  expect(screen.getByRole('link', { name: /^Spoiler/ })).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: en.psn.concealTrophy }))
+  expect(screen.queryByRole('link', { name: /^Spoiler/ })).not.toBeInTheDocument()
+})

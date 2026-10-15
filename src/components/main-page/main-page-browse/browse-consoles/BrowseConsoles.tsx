@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import { CONSOLES } from '@/constants'
 import type { ConsoleSummary } from '@/utils/library'
+import { ProgressBar } from '@/components/ui/ProgressBar'
 
 const ICON_BY_ID = new Map(CONSOLES.map((c) => [c.id, c.icon]))
 
@@ -38,11 +39,9 @@ export default function BrowseConsoles({ consoles }: { consoles: ConsoleSummary[
                 </span>
                 <span className="flex items-baseline justify-between gap-2">
                   <span className="text-[11px] text-text-secondary">{c.games === 1 ? T.cards.oneGame : T.cards.nGames.replace('{n}', String(c.games))}</span>
-                  <span className="text-sm font-bold tabular-nums text-warning">{c.pct}%</span>
+                  <span className={`text-sm font-bold tabular-nums ${c.pct >= 100 ? 'text-success' : 'text-warning'}`}>{c.pct}%</span>
                 </span>
-                <span aria-hidden="true" className="h-1 rounded-full bg-ink/[0.06] overflow-hidden">
-                  <span className="block h-full rounded-full bg-warning" style={{ width: `${c.pct}%` }} />
-                </span>
+                <ProgressBar pct={c.pct} label={c.console} height="h-1" />
               </Link>
             </li>
           )

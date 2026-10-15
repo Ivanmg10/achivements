@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
+import { useBackRegistry } from '@/context/BackInterceptContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useStreakData } from '@/hooks/useStreakData'
 import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconMenu } from '@tabler/icons-react'
@@ -51,6 +52,7 @@ export default function MainHeader() {
   const { T } = useLanguage()
   const { activeStreak } = useStreakData()
   const router = useRouter()
+  const { tryHandleBack } = useBackRegistry()
   const pathname = usePathname()
   const [searchOpen, setSearchOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -96,7 +98,10 @@ export default function MainHeader() {
     { href: '/playing', label: T.mainPage.playing },
     { href: '/completed', label: T.mainPage.completed },
   ]
-  const navItems = [{ href: '/groups', label: T.groups.title }]
+  const navItems = [
+    { href: '/groups', label: T.groups.title },
+    { href: '/following', label: T.following.title },
+  ]
   const isStatusActive = statusItems.some(({ href }) => pathname === href)
 
   return (
@@ -122,7 +127,7 @@ export default function MainHeader() {
           </Link>
           {!isHome && (
             <button
-              onClick={() => router.back()}
+              onClick={() => { if (!tryHandleBack()) router.back() }}
               aria-label="Go back"
               className={`p-1.5 rounded-lg transition-colors text-text-secondary hover:text-text-main cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0 ${isGameInfo ? 'hover:bg-ink/10' : 'hover:bg-bg-main'}`}
             >

@@ -179,7 +179,7 @@ describe('countUnlocks / withUnlockCounts', () => {
       { apiname: 'B', achieved: 0, unlocktime: 0 },
       { apiname: 'C', achieved: 1, unlocktime: 1 },
     ])
-    expect(counts).toEqual({ total: 3, awarded: 2 })
+    expect(counts).toEqual({ total: 3, awarded: 2, lastUnlock: "1970-01-01T00:00:01.000Z" })
     expect(withUnlockCounts(base, counts)).toMatchObject({ maxPossible: 3, numAwarded: 2, pctWon: 66.67, achievementsLoaded: true })
   })
 

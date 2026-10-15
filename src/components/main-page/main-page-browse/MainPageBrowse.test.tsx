@@ -11,21 +11,20 @@ jest.mock('@/context/GamesDataContext', () => ({
   }),
 }))
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: () => ({ library: [] }) }))
+jest.mock('@/context/PsnGamesDataContext', () => ({ usePsnGamesData: () => ({ library: [] }) }))
 jest.mock('@/context/MainPlatformContext', () => ({ useMainPlatform: jest.fn() }))
 jest.mock('@/components/main-page/main-page-charts/MainPageConsoleNav', () => ({ __esModule: true, default: () => <div data-testid="nav" /> }))
 jest.mock('@/components/main-page/main-page-charts/main-page-steam-nav/MainPageSteamNav', () => ({
   __esModule: true,
   default: () => <div data-testid="steam-nav" />,
 }))
-jest.mock('./browse-picker/BrowsePicker', () => ({ __esModule: true, default: () => <div data-testid="picker" /> }))
 jest.mock('./browse-search/BrowseSearch', () => ({ __esModule: true, default: () => <div data-testid="search" /> }))
-jest.mock('./browse-split/BrowseSplit', () => ({ __esModule: true, default: () => <div data-testid="split" /> }))
 jest.mock('./browse-consoles/BrowseConsoles', () => ({ __esModule: true, default: () => <div data-testid="consoles" /> }))
 
-test('RA mode: console nav and console tiles, with the picker, search and comparison', () => {
+test('RA mode: console nav, the search and console tiles', () => {
   ;(useMainPlatform as jest.Mock).mockReturnValue({ platform: 'ra' })
   render(<MainPageBrowse />)
-  for (const id of ['nav', 'picker', 'search', 'split', 'consoles']) expect(screen.getByTestId(id)).toBeInTheDocument()
+  for (const id of ['nav', 'search', 'consoles']) expect(screen.getByTestId(id)).toBeInTheDocument()
   expect(screen.queryByTestId('steam-nav')).not.toBeInTheDocument()
 })
 
@@ -34,5 +33,5 @@ test('Steam mode: its own nav, and no console tiles (Steam has no consoles)', ()
   render(<MainPageBrowse />)
   expect(screen.getByTestId('steam-nav')).toBeInTheDocument()
   expect(screen.queryByTestId('consoles')).not.toBeInTheDocument()
-  expect(screen.getByTestId('picker')).toBeInTheDocument()
+  expect(screen.getByTestId('search')).toBeInTheDocument()
 })

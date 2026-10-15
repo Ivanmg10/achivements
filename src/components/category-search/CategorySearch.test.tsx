@@ -24,3 +24,19 @@ test('ties its label to the input, so several boxes can share a page', () => {
   render(<CategorySearch value="" onChange={jest.fn()} id="steam-only-search" />)
   expect(screen.getByLabelText(en.categoryPage.searchGames).getAttribute('id')).toBe('steam-only-search')
 })
+
+test('names the key that jumps to it, only where it does, and only while it is empty', () => {
+  const { container, rerender } = render(<CategorySearch value="" onChange={jest.fn()} />)
+  expect(container.querySelector('kbd')).toBeNull()
+  rerender(<CategorySearch value="" onChange={jest.fn()} shortcut />)
+  expect(container.querySelector('kbd')).toHaveTextContent('/')
+  expect(container.querySelector('kbd')).toHaveAttribute('aria-hidden', 'true')
+  rerender(<CategorySearch value="zelda" onChange={jest.fn()} shortcut />)
+  expect(container.querySelector('kbd')).toBeNull()
+})
+
+test('is a field that can be seen: long and round like the one of the top bar, outlined, and not tall', () => {
+  const { container } = render(<CategorySearch value="" onChange={jest.fn()} />)
+  expect(container.firstElementChild).toHaveClass('rounded-full', 'ring-1', 'sm:w-96', 'lg:w-[30rem]', 'py-1.5')
+  expect(screen.getByLabelText(en.categoryPage.searchGames)).toHaveClass('text-sm')
+})

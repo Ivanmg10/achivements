@@ -1,238 +1,128 @@
-# Achievements Tracker
+# CheevoVault
 
-> Multi-user RetroAchievements companion — track games, logros, and hardcore progress with rich stats, custom groups, and full personalization.
+> One place for your achievements from **RetroAchievements**, **Steam** and
+> **PlayStation** — library, stats, groups, public profiles and themes.
 
----
-
-## Features
-
-### Authentication
-- Username / password login and registration, open to anyone
-- Email required on sign-up — the only way to recover an account later
-- Password recovery by email through Resend — **works today only for the Resend account owner, until a domain is verified (see [Email](#email))**
-- Five sign-ups and five reset requests per address per hour, counted in the database
-- RetroAchievements account linking with a Web API key
-- Steam account linking via OpenID
-- PlayStation Network *(coming soon)*
-- Admin panel for admin users: search, edit, promote and delete accounts
+Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
+[dev.cheevovault.com](https://dev.cheevovault.com) · version in
+[`src/lib/version.ts`](src/lib/version.ts).
 
 ---
 
-### Dashboard
+## What it does
 
-**Games panel** (left column, switchable views)
-- **Recently Played** — default view; expandable game cards with full achievement grids
-- **Playing** — in-progress games sorted by last played date
-- **Want to Play** — wishlist preview
-- **Completed** — finished games preview
+- **Accounts** — open sign-up (username, password, required email), password
+  recovery and a soft email verification by mail, account deletion. Admin panel
+  behind a second password check, with every action logged.
+- **Three platforms, linked by the user**
+  - *RetroAchievements* — with the user's own Web API key (never a shared one).
+  - *Steam* — by custom URL name, profile link or SteamID64; the profile must be public.
+  - *PlayStation* — by online ID, read through one app PSN account; PS3/Vita art from IGDB.
+- **Library** — recently played, playing, want to play, completed, all games;
+  filters by console/platform, hidden games, pinned games.
+- **Game pages** for each platform — achievement/trophy grid with rarity,
+  progress, hashes (RA), subsets, and an "Ask an AI" export of the game's
+  achievements (no account data in it).
+- **Stats & activity** — heatmaps, streaks, best periods, rarest unlocks,
+  perfect/almost-there/abandoned games, completion distribution.
+- **Groups** — named collections of games, public or private, shareable.
+- **Social** — public profiles (opt-in), follow users, a following feed and
+  user search, compare a game with someone else's progress.
+- **Personalization** — 25 themes (`THEMES` in `src/types/types.ts`), 9 UI
+  languages (en, es, de, fr, it, ja, pl, pt, ru), country with flag.
 
-**Profile sidebar** (right column)
-- RA stats: member since, hardcore / softcore / true points, hardcore ratio %, contributions and achievements created, global rank
-- Steam profile *(coming soon)*
-
-**Stats & Activity section** — scrollable card grid:
-
-| Card | What it shows |
-|---|---|
-| Points Stats | Total hardcore + softcore points, global rank |
-| Activity Heatmap | 7-day achievement calendar |
-| Daily Achievements | Line chart — last 7 days |
-| Groups | Quick access to created groups |
-| Most Active Games | Top 3 games (last 30 days) |
-| Rarest Recent Unlocks | Achievement rarity stats |
-| Abandoned Games | Games idle for extended periods |
-| Perfect Games | 100% completed games |
-| Almost There | Games at 75–99% completion |
-| Mastered & Awards | Mastery badges and special awards |
-| Best Performance | Best week / month / year + yearly heatmap |
-| Console Navigation | Click-through to console-filtered views |
-| Pinned Achievements | Manually favorited achievements |
-
----
-
-### Game Library Pages
-- **All Games** — global view of all tracked games across every status
-- **Want to Play**, **Playing**, **Completed** — dedicated category pages
-- Console filtering on every category page
-- Softcore / hardcore completion toggle on Completed view
-
----
-
-### Game Info Page
-- Blurred title screen as section background
-- Achievement grid — rarity %, hardcore / softcore unlock counts, earned date, ring indicators (gold HC / blue SC)
-- Achievement type badges: progression, win condition, missable
-- Game subset selector for DLC / multi-version games
-- Parent game navigation
-- Game hashes modal — REDUMP / NO-INTRO / TOSEC labels, one-click MD5 copy, patch links
-- Direct link to RetroAchievements page
-
----
-
-### Groups
-- Up to 4 named groups with emoji or image icon + optional description
-- Public / private visibility toggle
-- Per-game achievement count and points tracked, synced in background
-- Add games from completed list; reorder via drag-and-drop
-- Filter group games by console, completion % (not started / in progress / completed), release decade (80s–20s)
-- Shareable public group URLs
-
----
-
-### Modals & Dialogs
-- **Achievement detail** — icon, points, earned date, rarity, favorite/pin toggle, missable warning
-- **Day Achievements** — all achievements earned on a selected date
-- **Game Hashes** — emulator ROM identifiers
-- **Search** — query-based library search or direct Game ID entry, multi-select
-- **Group create / edit** — title, description, icon, visibility, initial game selection
-- **Edit profile** — username, email, avatar URL with preview
-- **Change password**
-- **Language selector**
-- **Location / country picker** — with flag emoji
-- **Theme picker**
-- **RA login** — connect / disconnect RA account
-
----
-
-### Progress Bars
-- Unified dual bar (blue = softcore, yellow = hardcore) across the whole app
-- Per-game softcore and hardcore percentages tracked separately
-
----
-
-### Personalization
-- 8 color themes
-- 9 UI languages: English, Spanish, German, French, Italian, Japanese, Polish, Portuguese, Russian
-- Country / region with flag display
-- Persistent preferences stored per user
-
----
-
-### Search
-- Global game search across full library
-- Filter results by status and console
-- Direct Game ID lookup
-
----
-
-### Streak Counter
-- Tracks consecutive days with at least one achievement earned
-
----
-
-## Tech stack
+## Stack
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 14 (App Router) |
-| Auth | NextAuth.js |
-| Database | PostgreSQL (via `pg` pool) |
-| Styles | Tailwind CSS v4 |
-| Animations | Framer Motion |
-| Icons | Tabler Icons |
-| Data | RetroAchievements API |
-
----
+| Framework | Next.js 16 (App Router, Turbopack; auth gate in `src/proxy.ts`) |
+| UI | React 19, Tailwind CSS v4, Framer Motion, Tabler Icons, Recharts |
+| Auth | NextAuth.js v4 (credentials, JWT rebuilt from the DB) |
+| Database | PostgreSQL on Neon, via a `pg` pool (`src/lib/db.js`) |
+| Data | RetroAchievements API, Steam Web API, `psn-api`, IGDB |
+| Email | Resend (REST, no SDK) |
+| Hosting | Vercel, functions in `fra1`, two daily crons (`vercel.json`) |
+| Tests | Jest + Testing Library |
 
 ## Getting started
 
 ```bash
-npm install
+npm install              # also runs `prepare`, which enables .githooks
 cp .env.example .env.local
 npm run dev
 ```
 
-Required env vars:
+**Every variable is explained in [`.env.example`](.env.example).** The minimum
+to boot is `NEXTAUTH_URL`, `NEXTAUTH_SECRET` and `DATABASE_URL`; each
+integration switches itself off (and says so in the UI) when its keys are
+missing:
 
-```
-NEXTAUTH_URL=           # also used to build password-reset links
-NEXTAUTH_SECRET=
-DATABASE_URL=
-STEAM_API_KEY=          # Steam Web API key, for the Steam integration
-```
+| Without | What stops working |
+|---|---|
+| `STEAM_API_KEY` | Steam linking and data |
+| `PSN_NPSSO` | PSN linking answers `not-configured` |
+| `TWITCH_CLIENT_ID` / `_SECRET` | PS3/Vita games keep their trophy icon, no IGDB details |
+| `RESEND_API_KEY` (+ `EMAIL_FROM`) | Password recovery and verification mail — see `CLAUDE.md` → Email |
+| `CRON_SECRET` | The cron routes refuse to run |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | `/privacy` has no contact address (required before going public) |
+| `NEXT_PUBLIC_GA_ID` | No analytics and no cookie banner (that is fine) |
 
-Optional:
+### Database
 
-```
-RESEND_API_KEY=         # see Email below — without it, password recovery stays off
-EMAIL_FROM=             # e.g. CheevoVault <no-reply@yourdomain.com>
-REGISTRATION_OPEN=false # closes sign-ups; registration is open when unset
-```
-
-Run every migration in `migrations/` in order before first boot:
+Run every file in [`migrations/`](migrations) in order on a fresh database:
 
 ```bash
 for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 ```
 
-> `011_drop_sourceless_game_keys.sql` is the exception: only run it once the
-> Steam branch is deployed, since the old constraints are what the previous
-> code relies on.
+> `develop` and production share one database. Never run a destructive
+> migration "just to try it" on develop.
 
----
+### Scripts
 
-## Email
-
-Password recovery sends one message through [Resend](https://resend.com), over
-their REST API (no SDK). Everything is wired up: request form, hashed
-single-use token, reset page.
-
-**What works depends on what is set:**
-
-| Env | What happens |
+| Command | What |
 |---|---|
-| Nothing | `POST /api/auth/forgotPassword` answers `503 { error: 'email-not-configured' }` and the UI says so. No message is sent, none is promised. |
-| `RESEND_API_KEY` only | Sends from Resend's shared address. **Delivers only to the Resend account owner's own address** — enough to try the flow end to end, useless for other people. |
-| `RESEND_API_KEY` + `EMAIL_FROM` on a verified domain | Delivers to everyone. This is the finished state. |
+| `npm run dev` | Dev server (Turbopack) |
+| `npm test` | Jest |
+| `npm run lint` | ESLint (`react-hooks/set-state-in-effect` is an error) |
+| `npm run build` | Production build |
 
-**To reach everyone:**
+## Project layout
 
-The domain is `cheevovault.com`, bought on 2026-09-28. Owning it is not the
-same as Resend being allowed to send from it, which is what the steps below do.
+```
+src/
+  app/            routes (App Router) and API handlers (app/api/**/route.ts)
+  components/     one folder per component, kebab-case/PascalCase.tsx
+  context/        React contexts (library data per platform, theme, language…)
+  hooks/          every custom hook (useXxx.ts)
+  lib/            server code: auth, DB, RA/Steam/PSN/IGDB clients, caches, email
+  utils/          pure transforms and helpers
+  translations/   one file per language
+  types/          shared types and constants
+migrations/       numbered SQL migrations
+docs/             internal docs — start at docs/README.md
+```
 
-1. Verify `cheevovault.com` (or a subdomain, e.g. `mail.cheevovault.com`) in
-   Resend and add the DNS records it asks for. They are Resend's own records —
-   separate from whatever points the domain at Vercel.
-2. Set both variables and redeploy:
+A longer map with the data flow is in [`docs/architecture.md`](docs/architecture.md).
 
-   ```
-   RESEND_API_KEY=re_xxxxxxxx
-   EMAIL_FROM=CheevoVault <no-reply@cheevovault.com>
-   ```
+## Contributing
 
-3. Make sure `NEXTAUTH_URL` is `https://www.cheevovault.com` — the reset link
-   is built from it, and a stale value sends people to localhost.
+Short version — the full rules are in [`CLAUDE.md`](CLAUDE.md) → Git:
 
-No code change is needed; the sender is read from the environment.
+- Branch `<type>/<slug>` from `develop`, PR into `develop`, then `develop` → `main`.
+- Conventional Commits in English (`feat(steam): …`), enforced by `.githooks/commit-msg`.
+- The `pre-commit` hook bumps the patch version; minor/major is a manual `chore(release)`.
+- `npm test`, `npm run lint` and `npm run build` pass before a PR.
+- New user-facing strings go in every file under `src/translations/`.
+- **Write down what you did** in [`docs/worklog.md`](docs/worklog.md), and
+  update `CLAUDE.md` when a rule or invariant changes.
 
-| Piece | Where |
+## Documentation
+
+| File | For |
 |---|---|
-| Sending | `src/lib/email.ts` |
-| Tokens (hashed, one hour, single use) | `src/lib/passwordReset.ts` |
-| Request / reset endpoints | `src/app/api/auth/forgotPassword`, `src/app/api/auth/resetPassword` |
-| UI | `src/components/forgot-password-modal`, `src/components/reset-password-form`, `/resetPassword` |
-| Table | `migrations/016_password_resets.sql` |
-
-**Not done yet:** email verification. When a domain is in place, the plan is a
-soft one — the account works straight away and an unverified address only earns
-a banner, never a locked door.
-
----
-
-## Before 1.0
-
-- [ ] **Verify a domain in Resend and set `EMAIL_FROM`.** Password recovery
-      currently only reaches the Resend account owner; everyone else would lose
-      their account on a forgotten password.
-- [ ] `NEXTAUTH_URL` pointing at the public URL in production.
-- [ ] Decide on email verification (soft banner, or deliberately skipped).
-- [ ] Run `migrations/011_drop_sourceless_game_keys.sql` once the Steam work is deployed.
-
----
-
-## Roadmap
-
-- [ ] Steam integration
-- [ ] Public user profiles
-- [ ] Group hardcore achievement tracking (requires DB migration)
-- [ ] Push notifications for new achievements
+| [`CLAUDE.md`](CLAUDE.md) | Rules and invariants: auth, email, admin, each platform, git. Read before touching any of them. |
+| [`docs/README.md`](docs/README.md) | Index of internal docs |
+| [`docs/architecture.md`](docs/architecture.md) | How the code is laid out and how data flows |
+| [`docs/worklog.md`](docs/worklog.md) | What each session did, why, and what it left open |
+| [`/privacy`](src/app/privacy), [`/terms`](src/app/terms) | Public policy; change them when data handling changes |

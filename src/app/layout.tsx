@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import CookieBanner from '@/components/cookie-banner/CookieBanner'
 import Toaster from '@/components/toaster/Toaster'
 import GoogleAnalytics from '@/components/google-analytics/GoogleAnalytics'
 import "./globals.css";
 import Providers from "./providers";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from '@/lib/siteUrl'
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL, THEME_COLOR } from '@/lib/siteUrl'
 import { THEMES, THEME_STORAGE_KEY } from '@/types/types'
 
 const inter = Inter({
@@ -30,6 +30,14 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
   },
   twitter: { card: 'summary_large_image', title: SITE_TITLE, description: SITE_DESCRIPTION },
+  // Search Console's HTML-tag check, when the token is set; a DNS check needs nothing here.
+  ...(process.env.GOOGLE_SITE_VERIFICATION?.trim() && {
+    verification: { google: process.env.GOOGLE_SITE_VERIFICATION.trim() },
+  }),
+}
+
+export const viewport: Viewport = {
+  themeColor: THEME_COLOR,
 }
 
 export default function RootLayout({

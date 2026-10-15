@@ -21,6 +21,13 @@ test('each platform has its own game page', () => {
   expect(gameHref('psn', 2018800)).toBe('/psnGame/NPWR20188_00')
 })
 
+test("on someone's profile a game opens their progress in it", () => {
+  expect(gameHref('ra', 1, 'ivan')).toBe('/user/ivan/ra/1')
+  expect(gameHref('steam', 730, 'ivan')).toBe('/user/ivan/steam/730')
+  expect(gameHref('psn', 2018800, 'a b')).toBe('/user/a%20b/psn/NPWR20188_00')
+  expect(gameHref('ra', 1, null)).toBe('/gameInfo/1')
+})
+
 test('recognises only known sources', () => {
   expect(GAME_SOURCES).toEqual(['ra', 'steam', 'psn'])
   expect(isGameSource('ra')).toBe(true)

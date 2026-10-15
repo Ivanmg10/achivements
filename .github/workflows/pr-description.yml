@@ -1,0 +1,30 @@
+# Fails a PR whose description is empty or leaves a section of the template
+# (CLAUDE.md → Pull requests) blank. Reruns when the description is edited.
+name: PR description
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions: {}
+
+jobs:
+  pr-description:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every section of the template is filled in
+        env:
+          # Through env, never ${{ }} inside the script: the body is user text.
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          missing=$(printf '%s\n' "$BODY" | tr -d '\r' | sed 's/<!--.*-->//g' | awk '
+            BEGIN { n = split("What|Why|How to test|Notes", want, "|") }
+            /^## / { cur = substr($0, 4); sub(/[ \t]+$/, "", cur); next }
+            cur != "" && /[^[:space:]]/ { filled[cur] = 1 }
+            END { for (i = 1; i <= n; i++) if (!filled[want[i]]) print want[i] }')
+          if [ -n "$missing" ]; then
+            echo "::error::The PR description leaves these sections empty or missing. Fill them in (template in CLAUDE.md → Pull requests); \"None\" is fine for Notes."
+            echo "$missing" | sed 's/^/  ## /'
+            exit 1
+          fi
+          echo "Description complete."

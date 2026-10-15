@@ -185,7 +185,6 @@ test('walks every page of the trophy list, into the unified game model', async (
     earned: { bronze: 1, silver: 0, gold: 0, platinum: 0 },
     defined: { bronze: 2, silver: 0, gold: 0, platinum: 0 },
     hasDlc: false,
-    full: { earned: { bronze: 1, silver: 0, gold: 0, platinum: 0 }, defined: { bronze: 2, silver: 0, gold: 0, platinum: 0 }, pctWon: 50 },
     lastTrophyAt: '2026-01-01T00:00:00Z',
     playtimeMinutes: null,
     playedAs: [],
@@ -472,23 +471,20 @@ describe('DLC', () => {
     expect(mock(psn.getTitleTrophyGroups).mock.calls[0][2]).toEqual({ npServiceName: 'trophy', headerOverrides: { 'Accept-Language': 'es-ES' } })
   })
 
-  test('a game with DLC counts by its base game: the platinum makes it complete', async () => {
-    groups()
+  test('a game with DLC counts by its whole set: with DLC trophies still to earn it is not complete, platinum or not', async () => {
     mock(psn.getUserTitles).mockResolvedValue({
       trophyTitles: [{ ...title('NPWR07410_00'), hasTrophyGroups: true, progress: 80, earnedTrophies: { bronze: 10, silver: 2, gold: 1, platinum: 1 }, definedTrophies: { bronze: 15, silver: 2, gold: 1, platinum: 1 } }],
     })
     const [game] = await psnTitles('42')
-    expect(game).toMatchObject({ hasDlc: true, pctWon: 100, numAwarded: 14, maxPossible: 14 })
-    expect(game.full).toEqual({ earned: { bronze: 10, silver: 2, gold: 1, platinum: 1 }, defined: { bronze: 15, silver: 2, gold: 1, platinum: 1 }, pctWon: 80 })
+    expect(game).toMatchObject({ hasDlc: true, pctWon: 80, numAwarded: 14, maxPossible: 19 })
+    expect(game.earned).toEqual({ bronze: 10, silver: 2, gold: 1, platinum: 1 })
+    expect(game.defined).toEqual({ bronze: 15, silver: 2, gold: 1, platinum: 1 })
   })
 
-  test('a failed group lookup keeps the whole-set numbers', async () => {
-    jest.spyOn(console, 'error').mockImplementation(() => {})
-    mock(psn.getTitleTrophyGroups).mockResolvedValue({ error: { code: 500, message: 'down' } })
+  test('the groups of a game are not asked for to list it: one call less per game with DLC', async () => {
     mock(psn.getUserTitles).mockResolvedValue({ trophyTitles: [{ ...title('NPWR07410_00'), hasTrophyGroups: true, progress: 80 }] })
-    const [game] = await psnTitles('42')
-    expect(game.pctWon).toBe(80)
-    ;(console.error as jest.Mock).mockRestore()
+    await psnTitles('42')
+    expect(mock(psn.getTitleTrophyGroups)).not.toHaveBeenCalled()
   })
 })
 

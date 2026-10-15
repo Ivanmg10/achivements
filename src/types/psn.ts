@@ -25,13 +25,13 @@ export type PsnGameProgress = GameProgressBase & {
   titleId: string
   /** "trophy2" for PS5, "trophy" for PS3/PS4/Vita; the trophy calls need it. */
   service: 'trophy' | 'trophy2'
-  /** For a game with DLC, the base game's; `full` has the whole set. */
+  /** The whole set, DLC included, as Sony counts it. */
   earned: TrophyCounts
   defined: TrophyCounts
-  /** The game has DLC trophy groups; its main numbers are the base game's. */
+  /** Set by the PSN data context when the user counts a platinum as completed and this game has one. */
+  platinumCompletes?: boolean
+  /** The game has DLC trophy groups; they count like any other trophy, so a game is complete only with them. */
   hasDlc: boolean
-  /** The whole set, base game and DLC, as Sony counts it. */
-  full: { earned: TrophyCounts; defined: TrophyCounts; pctWon: number }
   /** When the trophy list last changed (ISO) — what the trophy caches key on. */
   lastTrophyAt: string | null
   playtimeMinutes: number | null

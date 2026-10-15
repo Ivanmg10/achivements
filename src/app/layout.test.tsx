@@ -9,7 +9,7 @@ jest.mock("@/app/providers", () => ({
 import { render, screen } from "@testing-library/react";
 import GoogleAnalytics from "@/components/google-analytics/GoogleAnalytics";
 import CookieBanner from "@/components/cookie-banner/CookieBanner";
-import RootLayout, { metadata } from "./layout";
+import RootLayout, { metadata, viewport } from "./layout";
 import { SITE_NAME } from "@/lib/siteUrl";
 
 const consoleError = jest.spyOn(console, "error").mockImplementation(() => {});
@@ -27,6 +27,14 @@ test("mounts the cookie banner and analytics on every page", () => {
   expect(GoogleAnalytics).toHaveBeenCalled();
 });
 
+test("the browser bar takes the dark theme's colour", () => {
+  expect(viewport.themeColor).toBe('#0f1014');
+});
+
+test("no Search Console tag unless its token is set", () => {
+  expect(metadata.verification).toBeUndefined();
+});
+
 describe("metadata", () => {
   const title = metadata.title as { default: string; template: string };
 
@@ -35,6 +43,7 @@ describe("metadata", () => {
     expect(title.default).toContain(SITE_NAME);
     expect(title.default).toMatch(/RetroAchievements/i);
     expect(title.default).toMatch(/Steam/i);
+    expect(title.default).toMatch(/PSN|PlayStation/i);
   });
 
   test("the title stays short enough for a result to show it whole", () => {

@@ -15,15 +15,18 @@ export default function ExpandPanel({
   open,
   id,
   className = '',
+  duration: seconds = 0.3,
   children,
 }: {
   open: boolean
   id?: string
   className?: string
+  /** Seconds the slide takes. */
+  duration?: number
   children: ReactNode
 }) {
   const reduce = useReducedMotion()
-  const duration = reduce ? 0 : 0.3
+  const duration = reduce ? 0 : seconds
 
   return (
     <AnimatePresence initial={false}>

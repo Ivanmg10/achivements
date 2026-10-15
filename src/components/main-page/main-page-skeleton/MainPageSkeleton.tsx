@@ -52,7 +52,7 @@ export default function MainPageSkeleton() {
       <div aria-hidden="true" className="p-4 flex flex-col gap-4">
         <div className="h-6 w-40 rounded-full bg-ink/[0.08]" />
         <div className="flex flex-col lg:grid lg:grid-cols-[minmax(180px,220px)_1fr] gap-4">
-          <div className="flex lg:flex-col gap-1 lg:bg-bg-card lg:rounded-2xl lg:p-2">
+          <div className="flex lg:flex-col gap-1 overflow-hidden lg:overflow-visible lg:bg-bg-card lg:rounded-2xl lg:p-2">
             {Array.from({ length: SECTIONS }, (_, i) => (
               <div key={i} className="h-10 w-28 lg:w-full rounded-xl bg-ink/[0.05] shrink-0" />
             ))}

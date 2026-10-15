@@ -12,6 +12,8 @@ import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-
 import type { SteamAchievementUnified } from '@/types/steam'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import { capList } from '@/utils/utils'
+import { useSubject } from '@/context/SubjectContext'
+import { gameHref } from '@/utils/gameRef'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -53,6 +55,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
   limit?: number
 }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const { pinned, toggle, canPin } = useSteamFavoriteAchievements(appId, gameTitle)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -80,7 +83,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
         {shown.map((a) => (
           <li key={a.apiname} className="relative group/badge">
             <Link
-              href={`/steamGame/${appId}#${achievementAnchor(a.apiname)}`}
+              href={`${gameHref('steam', appId, subject)}#${achievementAnchor(a.apiname)}`}
               aria-label={`${titleOf(a)} — ${a.earned ? T.steam.earned : T.steam.locked}`}
               onMouseEnter={(e) => show(a, e.clientX, e.clientY)}
               onMouseLeave={hide}

@@ -8,19 +8,22 @@ import type { SteamAchievementUnified } from '@/types/steam'
 
 /**
  * One achievement as a card, for the phone layout of the Steam game page —
- * the counterpart of RA's GameInfoAchievementCard.
+ * the counterpart of RA's GameInfoAchievementCard. The whole card opens the
+ * achievement, through a button stretched over it; the pin sits above that.
  */
 export default function SteamGameInfoAchievementCard({
   achievement: a,
   highlighted = false,
   pinned,
   onTogglePin,
+  onOpen,
 }: {
   achievement: SteamAchievementUnified
   highlighted?: boolean
   /** Undefined for a signed-out visitor, who cannot pin. */
   pinned?: boolean
   onTogglePin?: () => void
+  onOpen?: () => void
 }) {
   const { T, lang } = useLanguage()
   const concealed = a.hidden && !a.earned
@@ -28,17 +31,23 @@ export default function SteamGameInfoAchievementCard({
   return (
     <li
       data-ach={a.apiname}
-      className={`flex items-start gap-3 rounded-xl p-3 transition-colors duration-500 ${
-        highlighted ? 'bg-[#66c0f4]/15' : 'bg-bg-main/40'
+      className={`relative flex items-start gap-3 rounded-xl p-3 transition-colors duration-500 ${
+        highlighted ? 'bg-accent/15' : pinned ? 'bg-warning/10' : 'bg-bg-main/40'
       }`}
     >
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={concealed ? T.steam.hiddenAchievement : a.title}
+        className="absolute inset-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      />
       {a.badgeUrl ? (
         <Image
           src={a.badgeUrl}
           alt=""
           width={48}
           height={48}
-          className={`w-12 h-12 rounded-lg object-cover shrink-0 ${a.earned ? 'ring-2 ring-[#66c0f4]' : 'grayscale opacity-50'}`}
+          className={`w-12 h-12 rounded-lg object-cover shrink-0 ${a.earned ? 'ring-2 ring-accent' : 'grayscale opacity-50'}`}
           unoptimized
         />
       ) : (
@@ -52,7 +61,7 @@ export default function SteamGameInfoAchievementCard({
         <p className="text-xs text-text-secondary">{concealed ? T.steam.hiddenAchievementDesc : a.description}</p>
         <div className="flex items-center gap-2 flex-wrap text-[11px] mt-1">
           {a.earned ? (
-            <span className="inline-flex items-center gap-1 text-[#66c0f4]">
+            <span className="inline-flex items-center gap-1 text-success">
               <IconCheck size={12} aria-hidden="true" />
               {a.dateEarned ? formatUnlock(a.dateEarned, lang) : T.steam.earned}
             </span>
@@ -77,7 +86,7 @@ export default function SteamGameInfoAchievementCard({
           pinned={pinned}
           title={concealed ? T.steam.hiddenAchievement : a.title}
           onToggle={() => onTogglePin?.()}
-          className="shrink-0 mt-0.5"
+          className="relative z-10 shrink-0 mt-0.5"
         />
       )}
     </li>

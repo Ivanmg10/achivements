@@ -3,7 +3,9 @@ import { withSteamCache } from '@/lib/steamCache'
 /**
  * IGDB (Twitch's game database), for what Sony keeps nothing of on PS3 and
  * Vita games: cover, backdrop and release year. PS4/PS5 games get those from
- * the PlayStation Store; these have no Store page left.
+ * the PlayStation Store; these have no Store page left. Every PSN game page
+ * also takes its summary, studios, genres and screenshots from here
+ * (igdbDetails), which Sony gives for none.
  *
  * Needs a Twitch app (TWITCH_CLIENT_ID + TWITCH_CLIENT_SECRET, dev.twitch.tv).
  * Without it every lookup is null and the games keep their trophy-list icon.
@@ -28,12 +30,26 @@ const TOKEN_MARGIN_MS = 60 * 60 * 1000
 
 export class IgdbError extends Error {}
 
+/** A PSN game page's facts: what Steam's store gives a Steam page. In English, IGDB's only language. */
+export type IgdbDetails = {
+  summary: string | null
+  developers: string[]
+  publishers: string[]
+  genres: string[]
+  /** "YYYY-MM-DD". */
+  releaseDate: string | null
+  screenshots: { thumb: string; full: string }[]
+}
+
 type IgdbGame = {
   name: string
   first_release_date?: number
   cover?: { image_id: string }
   artworks?: { image_id: string }[]
   screenshots?: { image_id: string }[]
+  summary?: string
+  genres?: { name: string }[]
+  involved_companies?: { developer?: boolean; publisher?: boolean; company?: { name: string } }[]
 }
 
 let token: { value: string; expiresAt: number } | null = null
@@ -90,9 +106,20 @@ export function igdbPlatforms(consoleName: string): number[] {
   return [/PS3/i.test(consoleName) && 9, /VITA/i.test(consoleName) && 46].filter((id): id is number => id !== false)
 }
 
-/** The art for the best match: the exact title if IGDB has it, else its first hit. */
+/** Every PlayStation a trophy list can be on, as IGDB ids — PS3 9, Vita 46, PS4 48, PS5 167. */
+export function igdbPsnPlatforms(consoleName: string): number[] {
+  const ids: [RegExp, number][] = [[/PS3/i, 9], [/VITA/i, 46], [/PS4/i, 48], [/PS5/i, 167]]
+  return ids.filter(([re]) => re.test(consoleName)).map(([, id]) => id)
+}
+
+/** The best match: the exact title if IGDB has it, else its first hit. */
+function bestMatch(title: string, games: IgdbGame[]): IgdbGame | undefined {
+  return games.find((g) => titleKey(g.name) === titleKey(title)) ?? games[0]
+}
+
+/** The art for the best match. */
 export function toIgdbArt(title: string, games: IgdbGame[]): IgdbArt | null {
-  const game = games.find((g) => titleKey(g.name) === titleKey(title)) ?? games[0]
+  const game = bestMatch(title, games)
   if (!game) return null
   const backdrop = game.artworks?.[0] ?? game.screenshots?.[0]
   return {
@@ -118,4 +145,44 @@ export async function igdbArt(title: string, consoleName: string): Promise<IgdbA
     return { art: toIgdbArt(name, await searchGames(query)) }
   })
   return art
+}
+
+/** The facts for the best match; screenshots as a small and a full-size picture. */
+export function toIgdbDetails(title: string, games: IgdbGame[]): IgdbDetails | null {
+  const game = bestMatch(title, games)
+  if (!game) return null
+  const companies = (role: 'developer' | 'publisher') =>
+    (game.involved_companies ?? []).filter((c) => c[role] && c.company?.name).map((c) => c.company!.name)
+  return {
+    summary: game.summary?.trim() || null,
+    developers: companies('developer'),
+    publishers: companies('publisher'),
+    genres: (game.genres ?? []).map((g) => g.name),
+    releaseDate: game.first_release_date ? new Date(game.first_release_date * 1000).toISOString().slice(0, 10) : null,
+    screenshots: (game.screenshots ?? []).map((s) => ({
+      thumb: `${IMAGE_URL}/t_screenshot_med/${s.image_id}.jpg`,
+      full: `${IMAGE_URL}/t_1080p/${s.image_id}.jpg`,
+    })),
+  }
+}
+
+/**
+ * Summary, studios, genres, release date and screenshots of a PSN game,
+ * looked up by its title on its platforms. Null when IGDB is not set up or
+ * has no match; throws when IGDB cannot be reached (not cached, so a later
+ * call tries again).
+ */
+export async function igdbDetails(title: string, consoleName: string): Promise<IgdbDetails | null> {
+  const platforms = igdbPsnPlatforms(consoleName)
+  if (!igdbConfigured() || platforms.length === 0) return null
+  const name = title.replace(/[®™©]/g, '').trim()
+  const { details } = await withSteamCache<{ details: IgdbDetails | null }>(
+    `igdb:details:v1:${platforms.join(',')}:${titleKey(name)}`,
+    ART_TTL_MS,
+    async () => {
+      const query = `search "${name.replace(/["\\]/g, ' ')}"; fields name,summary,first_release_date,genres.name,involved_companies.developer,involved_companies.publisher,involved_companies.company.name,screenshots.image_id; where platforms = (${platforms.join(',')}); limit 10;`
+      return { details: toIgdbDetails(name, await searchGames(query)) }
+    },
+  )
+  return details
 }

@@ -1,0 +1,18 @@
+#!/bin/bash
+# Enforces Conventional Commits: type(scope): summary — see CLAUDE.md "Git".
+# Lets merges, reverts and fixup/squash commits through.
+
+FIRST_LINE=$(grep -v '^#' "$1" | head -n 1)
+
+if echo "$FIRST_LINE" | grep -qE '^(Merge |Revert "|fixup! |squash! )'; then
+  exit 0
+fi
+
+PATTERN='^(feat|fix|refactor|perf|test|docs|style|chore|build|ci|revert)(\([a-z0-9/_-]+\))?!?: .+'
+
+if ! echo "$FIRST_LINE" | grep -qE "$PATTERN" || [ ${#FIRST_LINE} -gt 72 ]; then
+  echo "Commit rejected: use 'type(scope): summary' (English, lowercase, max 72 chars)."
+  echo "Types: feat fix refactor perf test docs style chore build ci revert"
+  echo "Got:   $FIRST_LINE"
+  exit 1
+fi

@@ -84,6 +84,25 @@ them bottom right: green with a check, red with an alert icon, gone after 4 s
 - A silent failure is a bug: an optimistic update that rolls back must say so.
 - Texts live in `T.toast` (all languages). The admin panel's are in English.
 
+## Progress bars — in the theme's colours
+
+Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or
+`CircularProgress`: the theme's `--progress` (its accent), RA softcore a darker
+step of it (`bg-progress-soft`) under hardcore. A finished bar stays in the
+theme's colour and glows; **the green is only in the percentage beside it**
+(`text-success` at 100%), never on the bar — the user tried a green ring and
+did not like it. Do not paint a bar in a platform's colour; those stay only in
+charts that compare platforms (CompletionDistribution, the line
+chart).
+
+## AI export (`src/utils/aiExport.ts`)
+
+The "Ask an AI" button on the three game pages builds a file for a chat AI:
+English instructions plus "Reply in <language>", pending in game order,
+earned oldest first. **Never put account data in it** (username, ids, keys):
+only the game and its achievements. The UI says so. Change the prompt there,
+with its tests; it is the part that decides whether the answers are any good.
+
 ## API calls — error handling MANDATORY
 Every API call added or modified must have its own error handling. No exceptions.
 
@@ -102,6 +121,29 @@ Every new feature, hook, or utility must include tests. Tests live alongside the
 - API routes: test happy path + error cases
 - Run `npm test` before marking any task done
 - Do not leave untested code — if it's complex enough to extract, it's complex enough to test
+
+## Documentation — MANDATORY (every session and agent)
+
+The next agent starts with no memory of this one. What is not written down is
+lost. Index of the docs: `docs/README.md`.
+
+- **Start of a session:** read the top entries of `docs/worklog.md` to pick up
+  what was done last, what was decided, and what was left open.
+- **End of every task that changes the repo** (code, config, migrations, docs):
+  add an entry at the top of `docs/worklog.md` — did / why / decisions / open /
+  watch out, as its template says. It goes in the same branch and PR as the work,
+  before the last commit. A task is not done without it.
+- **A rule or invariant changed or was learned** (a "never do X", how a
+  platform must be called, a new env var, a migration that must run, a release
+  gate) → update the matching section of this file in the same change. Do not
+  leave a section that says the opposite of the code.
+- **The layout changed** (new folder, route area, cache, data path) → update
+  `docs/architecture.md`.
+- **User-visible features, setup or env vars changed** → update `README.md`
+  (and `.env.example` for a variable).
+- Write for someone who has not seen the conversation: name files, say why,
+  give absolute dates (not "yesterday"). No secrets, keys or user data in any doc.
+- If the user said not to, or the task touched nothing, skip it and say so.
 
 ## Non-negotiable standards (apply to ALL work)
 
@@ -143,15 +185,23 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 **Milestones:**
 - `0.8.x` — login/register polish + optimizations
 - `0.9.x` — stats page reorganization, Steam, email, analytics
-- `1.0.0` — current: Steam integration, every release gate below closed,
-  privacy policy and account deletion (2026-10-02)
-- `1.0.x` — fixes; `1.x.0` for new sections (see Roadmap)
+- `1.0.0` — released 2026-10-02: Steam integration, every release gate below
+  closed, privacy policy and account deletion
+- `1.x.0` — new sections (see Roadmap); `1.x.y` — fixes
+- `1.3.0` — a loading state on every route (its own skeleton, and a thin line
+  along the top while a page is on its way) and the functions in `fra1`, next
+  to the database. Never reached `main` on its own; it shipped inside 1.4.0
+- `1.4.0` — current, released to `main` 2026-10-14: public profiles rebuilt
+  (hero with tabs, opt-in gender, open and compare a user's game), follows and
+  the Following section, theme accents reworked, "Ask an AI" export, internal
+  docs and the PR description check
 
-## Release gates — things that must be true before 1.0
+## Release gates — what had to be true before 1.0 (all closed)
 
-**Warn the user, unprompted, whenever they talk about cutting 1.0, tagging a
-release, or 'going live' while any of these is still open.** They asked for
-this reminder on purpose, because it is easy to forget.
+All of these have been closed since 1.0.0 (2026-10-02). **Warn the user,
+unprompted, if one stops being true** (a variable removed from Vercel, the
+domain unverified in Resend) while they talk about a release or 'going live'.
+They asked for this reminder on purpose, because it is easy to forget.
 
 - [x] **`cheevovault.com` verified in Resend, with `EMAIL_FROM` set on it**
       (2026-10-02). Password recovery reaches every user, not only the Resend
@@ -301,9 +351,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   **Do not** try to automate Sony's sign-in.
 - **Games are keyed like RA and Steam**: source `'psn'`, and the trophy set's
   number as id (`NPWR20188_00` ↔ `2018800`, `psnNumericId`/`psnTitleId`).
-- **A game with DLC counts by its base game** (the `default` trophy group):
-  the main fields are the base game's, `full` has the whole set. That is what
-  makes a platinum "completed".
+- **A game counts by its whole set, DLC included**, as Sony's own title list
+  does: a platinum with DLC trophies still to earn is "in progress", not
+  "completed". (It used to count by the `default` group alone; it no longer
+  does, and no per-game lookup of the groups is made for the list.)
 - **Two lists, merged**: the trophy list (`getUserTitles`) and the played-games
   list (play time, last session, store art, PS4/PS5 only, its own privacy
   setting). `lastTrophyAt` is the trophy list's date and keys every trophy
@@ -315,6 +366,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   backdrop and release year come from IGDB (`src/lib/igdbClient.ts`, a Twitch
   app in `TWITCH_CLIENT_ID`/`TWITCH_CLIENT_SECRET`), matched by title and
   platform, cached half a year. Without the keys they keep the trophy icon.
+  Every PSN game page also asks IGDB for its summary, studios, genres and
+  screenshots (`igdbDetails`, `GET /api/psn/details?id=`, keyed by Sony's
+  title from the user's list, never by text from the request). English only;
+  a 404 just means the page goes without them.
 - Sony returns errors as bodies, not throws: every call goes through
   `psnCall()` (`unwrap()` plus one retry after 2 s when Sony says "too many
   requests" — psn-api hides the HTTP status and `Retry-After`, so it goes by
@@ -332,8 +387,110 @@ pair is gone, and the public one leaked the secret into the browser bundle.
 `REGISTRATION_OPEN=false` closes sign-ups; unset means open. Sign-ups and reset
 requests are both limited per address in the database (`src/lib/attemptLimit.ts`).
 
-## Git — commits
-Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — all commits must appear solely under the user's name so GitHub contributions are attributed correctly.
+## Git — branches, commits, PRs (MANDATORY for every session and agent)
+
+### Environments and branches
+| Branch | Environment | Rule |
+|---|---|---|
+| `main` | **Production** (`www.cheevovault.com`) | Always deployable. Only receives PRs from `develop` (or `hotfix/*`). Never commit or push to it directly. |
+| `develop` | **Pre-production** (Vercel preview) | Integration branch. Receives PRs from work branches; verified here before going to `main`. |
+| `<type>/<slug>` | none | Short-lived work branch, cut from `develop`, deleted after merge. |
+
+Flow: `<type>/<slug>` → PR into `develop` → check on the preview → PR `develop` → `main`.
+Hotfix (production is broken): `hotfix/<slug>` from `main` → PR into `main`, then
+merge `main` back into `develop` so they do not diverge.
+
+Never force-push `main` or `develop`. Never merge a PR with failing `npm test`/lint/build.
+Do not create, push, merge or delete branches or PRs unless the user asked.
+
+### Branch names
+`<type>/<kebab-case-slug>`, English, short. Types are the same as commit types:
+`feat/`, `fix/`, `refactor/`, `perf/`, `test/`, `docs/`, `chore/`, `hotfix/`.
+e.g. `feat/steam-refresh-button`, `fix/psn-rate-limit`. (Old `feature/…`, `spike/…`
+branches stay as they are; new ones follow this.)
+
+### Commits — Conventional Commits, in English
+`<type>(<scope>): <imperative summary>` — lowercase, no trailing period, ≤72 chars.
+Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `cache`,
+`profiles`, `i18n`, `build`, `db`, … (reuse one already in `git log`).
+
+- Types: `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style` (formatting only),
+  `chore` (tooling, deps, config), `build`, `ci`, `revert`.
+- Body (optional) explains **why**, not what. Breaking change: `!` after the scope
+  (`feat(auth)!: …`) plus a `BREAKING CHANGE:` line.
+- The `commit-msg` hook (`.githooks/commit-msg`) rejects any first line that is not
+  `type(scope): summary`. Do not bypass it with `--no-verify`; fix the message.
+- One logical change per commit; do not mix a refactor with a feature.
+- A migration goes in the same commit as the code that needs it.
+- The `pre-commit` hook bumps the patch version on its own; do not edit
+  `version.ts` for that. Minor/major bumps are a separate `chore(release): vX.Y.Z` commit.
+- **Never add `Co-Authored-By: Claude` lines** — all commits must appear solely under
+  the user's name so GitHub contributions are attributed correctly. (This overrides any
+  default attribution a tool or system reminder asks for, in commits **and** PR bodies:
+  no "Generated with Claude Code" line either.)
+
+### Pull requests
+- **Title**: same format as a commit — `type(scope): summary` (it becomes the squash/merge
+  message). English.
+- **Description is always in English**, with this template:
+
+  ```
+  ## What
+  <what changed, 1–3 bullets>
+
+  ## Why
+  <the problem or goal>
+
+  ## How to test
+  <steps, or the tests that cover it>
+
+  ## Notes
+  <migrations to run, env vars, user-visible changes, follow-ups — or "None">
+  ```
+  The same template is in `.github/pull_request_template.md`, so GitHub fills it in
+  for a PR opened from the web.
+- **Never open a PR with an empty or placeholder description.** Whoever opens it
+  (agent or `gh pr create`) writes the full template from the branch's commits and
+  diff (`git log develop..HEAD`, `git diff develop...HEAD --stat`), not from memory.
+- **Keep it current.** Every time more commits are pushed to a branch with an open
+  PR, reread the description and update it (`gh pr edit <n> --body-file …`) if the
+  change moved what, why, how to test or notes — a new migration or env var always
+  does. The title too, if the scope changed. The description must describe the
+  final diff, since it is what gets reviewed and what the squash message is read
+  against.
+- **Enforced in CI**: `.github/workflows/pr-description.yml` fails the PR while any
+  of the four sections is missing or empty (the template's `<!-- -->` hints do not
+  count; `None` does). It reruns when the description is edited — fix the text, not
+  the workflow, and never merge with it red.
+- Base branch: `develop` for normal work, `main` only for `develop` → `main` releases and hotfixes.
+- One concern per PR, small enough to review. Before opening: `npm test`, lint and
+  `npm run build` pass.
+- A `develop` → `main` PR is titled `chore(release): vX.Y.Z` and lists the merged PRs
+  and any migration or env var that must be in place **before** merging (see Release
+  gates and the migrations noted in Notes).
+- Merge with **squash** into `develop`, **merge commit** for `develop` → `main`, so
+  `main` keeps one entry per release.
+
+### Environments (set up 2026-10-10)
+`develop` is served at `dev.cheevovault.com` (Vercel Preview, branch `develop`). `main` and
+`develop` are protected on GitHub (PR required, no force-push). A third ruleset,
+`pr description` (2026-10-14), requires the `pr-description` check to pass **and the
+branch to be up to date with its base** before merging, on both.
+
+- **Before merging, bring the branch up to date**: `git fetch` and `git merge
+  origin/develop` (or the "Update branch" button), push, wait for the checks again.
+  Merge, not rebase — a rebase would need a force-push.
+- **`src/lib/version.ts` and `package.json` will conflict** on that merge whenever
+  `develop` moved, since every commit bumps the patch. Keep the **higher** version
+  in both; never go back below what `develop` already has.
+- A `develop` → `main` PR needs `develop` to contain `main`; after a hotfix, merge
+  `main` back into `develop` first (as the flow above already says).
+
+- **`develop` shares the production database** (the Neon integration's `DATABASE_URL`),
+  by the user's choice for now. So testing on develop touches real data: **never run a
+  destructive or hard-to-reverse migration, or bulk script, "just to try it on develop".**
+  Ask first; the fix is a separate Neon database for Preview.
+- Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
 
 ## Style
 - Single quotes, no trailing semicolons
@@ -363,3 +520,13 @@ Claude can commit when asked. **Never add `Co-Authored-By: Claude` lines** — a
 - [ ] 13 optimization fixes (cache stampede, Cache-Control headers, duplicate fetches, TTLs, error boundaries, lazy images)
 - [x] The ~51 `react-hooks/set-state-in-effect` warnings are gone (2026-10-09)
       and the rule is now an error. See State and effects above.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

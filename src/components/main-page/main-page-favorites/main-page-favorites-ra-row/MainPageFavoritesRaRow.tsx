@@ -3,6 +3,8 @@ import Link from 'next/link'
 import type { PinnedAchievement } from '@/types/types'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import MainPageFavoritesUnpinButton from '../main-page-favorites-unpin-button/MainPageFavoritesUnpinButton'
+import { useSubject } from '@/context/SubjectContext'
+import { gameHref } from '@/utils/gameRef'
 
 type RaPin = Extract<PinnedAchievement, { source: 'ra' }>
 
@@ -14,8 +16,10 @@ export default function MainPageFavoritesRaRow({
 }: {
   fav: RaPin
   onOpen: () => void
-  onUnpin: () => void
+  /** Absent on someone else's page: their pins are not the viewer's to change. */
+  onUnpin?: () => void
 }) {
+  const subject = useSubject()
   const earned = !!fav.snapshot.DateEarned
   return (
     <div className="group flex items-center gap-2 hover:bg-bg-main/60 rounded-lg px-2 py-1.5 transition-colors">
@@ -32,7 +36,7 @@ export default function MainPageFavoritesRaRow({
         <div className="flex flex-col min-w-0 flex-1">
           <p className="text-xs font-medium truncate">{fav.snapshot.Title}</p>
           <Link
-            href={`/gameInfo/${fav.game_id}`}
+            href={gameHref('ra', fav.game_id, subject)}
             onClick={(e) => e.stopPropagation()}
             className="flex items-center gap-1 text-[10px] text-text-secondary hover:text-text-main transition-colors w-fit max-w-full"
           >
@@ -47,7 +51,7 @@ export default function MainPageFavoritesRaRow({
           <p className="text-xs font-semibold tabular-nums">{fav.snapshot.Points}</p>
           <p className="text-[10px] text-text-secondary">pts</p>
         </div>
-        <MainPageFavoritesUnpinButton onUnpin={onUnpin} />
+        {onUnpin && <MainPageFavoritesUnpinButton onUnpin={onUnpin} />}
       </div>
     </div>
   )

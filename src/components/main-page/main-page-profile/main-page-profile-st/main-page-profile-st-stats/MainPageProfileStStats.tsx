@@ -29,16 +29,15 @@ export default function MainPageProfileStStats({
 
   return (
     <div className="grid grid-cols-2 gap-2">
-      <StatCard label={T.steam.statGames} value={value(library.length.toLocaleString(lang))} accent="text-[#66c0f4]" />
+      <StatCard label={T.steam.statGames} value={value(library.length.toLocaleString(lang))} />
       <StatCard
         label={T.steam.totalPlaytime}
         value={value(formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang))}
       />
-      <StatCard label={T.steam.statPerfect} value={value(`${perfect.toLocaleString(lang)}${partial}`)} accent="text-[#a4d007]" />
+      <StatCard label={T.steam.statPerfect} value={value(`${perfect.toLocaleString(lang)}${partial}`)} accent="text-success" />
       <StatCard
         label={T.steam.statAchievements}
         value={value(`${unlocked.toLocaleString(lang)}${partial}`)}
-        accent="text-yellow-400"
       />
     </div>
   )

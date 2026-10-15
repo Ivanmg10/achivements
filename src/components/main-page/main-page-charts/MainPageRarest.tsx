@@ -12,6 +12,7 @@ import { achievementAnchor } from '@/components/steam/steam-achievement-grid/Ste
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { useSubject } from '@/context/SubjectContext'
 
 const SHOWN = 6
 
@@ -35,13 +36,14 @@ export default function MainPageRarest({
   isLoading?: boolean
 }) {
   const { T } = useLanguage()
+  const subject = useSubject()
   const rows = useMemo(() => {
     const ra: Row[] = achievements
       .filter((a) => a.TrueRatio !== undefined && a.TrueRatio > a.Points)
       .sort((a, b) => (b.TrueRatio ?? 0) - (a.TrueRatio ?? 0))
       .map((a) => ({
         key: `ra:${a.AchievementID}`,
-        href: a.GameID ? `/gameInfo/${a.GameID}` : '#',
+        href: a.GameID ? gameHref('ra', a.GameID, subject) : '#',
         imageUrl: `https://media.retroachievements.org/Badge/${a.BadgeName}.png`,
         title: a.Title,
         subtitle: a.GameTitle,
@@ -53,7 +55,7 @@ export default function MainPageRarest({
       .sort((a, b) => a.globalPct - b.globalPct)
       .map((a) => ({
         key: `steam:${a.appId}:${a.apiname}`,
-        href: `/steamGame/${a.appId}#${achievementAnchor(a.apiname)}`,
+        href: `${gameHref('steam', a.appId, subject)}#${achievementAnchor(a.apiname)}`,
         imageUrl: a.badgeUrl || undefined,
         title: a.title,
         subtitle: a.gameTitle,
@@ -65,7 +67,7 @@ export default function MainPageRarest({
       .sort((a, b) => a.rarity - b.rarity)
       .map((t) => ({
         key: `psn:${t.gameId}:${t.trophyId}`,
-        href: `${gameHref('psn', t.gameId)}#${psnTrophyAnchor(t.trophyId)}`,
+        href: `${gameHref('psn', t.gameId, subject)}#${psnTrophyAnchor(t.trophyId)}`,
         imageUrl: t.iconUrl || undefined,
         title: t.name,
         subtitle: t.gameTitle,
@@ -78,7 +80,7 @@ export default function MainPageRarest({
       for (const list of lists) if (i < list.length && merged.length < SHOWN) merged.push(list[i])
     }
     return merged
-  }, [achievements, steamAchievements, psnTrophies, T])
+  }, [achievements, steamAchievements, psnTrophies, T, subject])
 
   if (isLoading) return <SkeletonGameList count={4} />
 

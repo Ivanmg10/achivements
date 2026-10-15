@@ -45,6 +45,12 @@ test('Status dropdown links use the real routes when signed in', () => {
   expect(screen.getByRole('menuitem', { name: 'In progress' })).toHaveAttribute('href', '/playing')
 })
 
+test('who you follow is one click away in the bar', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', avatar: null, steamid: '765' } } })
+  render(<MainHeader />)
+  expect(screen.getByRole('link', { name: en.following.title })).toHaveAttribute('href', '/following')
+})
+
 describe('with no platform linked', () => {
   beforeEach(() => {
     ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', avatar: null } } })

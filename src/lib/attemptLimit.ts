@@ -16,12 +16,13 @@ import pool from '@/lib/db'
  * stops a stolen session from guessing its way to the password.
  *
  * 'user-search' counts searches for other users per account: it stops a
- * signed-up account from walking the whole user list.
+ * signed-up account from walking the whole user list. 'follow' counts follows
+ * per account, for the same reason: a follow also says whether a name exists.
  *
  * 'avatar' counts uploads per account: an avatar is small, but each one is a
  * write of up to 512 KB to the database.
  */
-export type AttemptScope = 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'avatar' | 'user-search'
+export type AttemptScope = 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'avatar' | 'user-search' | 'follow'
 
 const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   signup: { max: 5, windowMinutes: 60 },
@@ -31,6 +32,7 @@ const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   'password-check': { max: 10, windowMinutes: 15 },
   avatar: { max: 20, windowMinutes: 60 },
   'user-search': { max: 60, windowMinutes: 5 },
+  follow: { max: 60, windowMinutes: 5 },
 }
 
 type HeaderSource = Headers | Record<string, string | string[] | undefined>

@@ -13,6 +13,8 @@ import GameInfoSkeletonTable from '@/components/game-info-skeleton/game-info-ske
 import SteamGameHeroBackground from '@/components/steam/steam-game-hero-background/SteamGameHeroBackground'
 import SteamGameInfoHeader from '@/components/steam/steam-game-info-header/SteamGameInfoHeader'
 import SteamGameInfoTable from '@/components/steam/steam-game-info-table/SteamGameInfoTable'
+import GameAiExport from '@/components/game-ai-export/GameAiExport'
+import { steamAiSource } from '@/utils/aiExport'
 
 /**
  * A Steam game's page — the counterpart of /gameInfo/[gameId] for RA, built
@@ -68,7 +70,20 @@ export default function SteamGamePage() {
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <SteamGameHeroBackground appId={appId} />
       <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
-        <SteamGameInfoHeader appId={appId} title={title} game={game} details={details} counts={counts} />
+        <SteamGameInfoHeader
+          appId={appId}
+          title={title}
+          game={game}
+          details={details}
+          counts={counts}
+          actions={
+            achievements.length > 0 && (
+              <GameAiExport
+                getSource={() => steamAiSource({ appId, title, achievements, details, playtimeMinutes: game?.playtimeForever ?? null })}
+              />
+            )
+          }
+        />
 
         {achievementsLoading ? (
           <div role="status" aria-busy="true" className="w-full flex flex-col items-center">
