@@ -22,6 +22,8 @@ const LABELS: Record<string, string> = {
   'unlink-steam': 'unlinked Steam from',
   'link-psn': 'linked PSN for',
   'unlink-psn': 'unlinked PSN from',
+  'link-xbox': 'linked Xbox for',
+  'unlink-xbox': 'unlinked Xbox from',
   'psn-token': 'renewed the PSN token',
   'xbox-lookup': 'looked up Xbox gamertag',
 }
@@ -34,6 +36,7 @@ function describe(entry: Entry): string | null {
   if (entry.action === 'link-ra') return String(d.rausername ?? '')
   if (entry.action === 'link-steam') return String(d.steamusername ?? d.steamid ?? '')
   if (entry.action === 'link-psn') return String(d.psnusername ?? d.psnaccountid ?? '')
+  if (entry.action === 'link-xbox') return String(d.xboxgamertag ?? d.xboxxuid ?? '')
   if (entry.action === 'xbox-lookup') return String(d.gamertag ?? '')
   if (entry.action === 'psn-token' && typeof d.expiresAt === 'string') return `valid until ${d.expiresAt.slice(0, 10)}`
   return null

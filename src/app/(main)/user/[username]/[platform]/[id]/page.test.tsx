@@ -20,7 +20,7 @@ test('opens the game of a known platform, with the names decoded', async () => {
 })
 
 test('anything else is not found', async () => {
-  await expect(route('ivan', 'xbox', '1')).rejects.toThrow('NEXT_NOT_FOUND')
+  await expect(route('ivan', 'switch', '1')).rejects.toThrow('NEXT_NOT_FOUND')
   await expect(route('ivan', 'ra', 'abc')).rejects.toThrow('NEXT_NOT_FOUND')
   await expect(route('ivan', 'psn', '123')).rejects.toThrow('NEXT_NOT_FOUND')
 })

@@ -206,3 +206,58 @@ describe('DELETE', () => {
     expect(res.status).toBe(500)
   })
 })
+
+describe('Xbox', () => {
+  const url = 'http://localhost/api/favorites'
+  const achievement = { id: '49', name: 'Award', iconUrl: 'https://x/i.png' }
+
+  test('a non-admin cannot pin an Xbox achievement', async () => {
+    const res = await POST(makeRequest('POST', url, { source: 'xbox', xboxAchievementId: '49', gameId: 1738914043, achievement }))
+    expect(res.status).toBe(403)
+    expect(pool.query).not.toHaveBeenCalled()
+  })
+
+  test('an admin pins one, by its own id', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
+    const res = await POST(makeRequest('POST', url, { source: 'xbox', xboxAchievementId: '49', gameId: 1738914043, gameTitle: 'Halo', achievement }))
+    expect(res.status).toBe(200)
+    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    expect(sql).toContain("'xbox'")
+    expect(sql).toContain('xbox_achievement_id')
+    expect(params).toEqual(['1', '49', 1738914043, 'Halo', JSON.stringify(achievement)])
+  })
+
+  test('an Xbox pin needs its id and an integer game', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+    expect((await POST(makeRequest('POST', url, { source: 'xbox', gameId: 1 }))).status).toBe(400)
+    expect((await POST(makeRequest('POST', url, { source: 'xbox', xboxAchievementId: 49, gameId: 1 }))).status).toBe(400)
+    expect((await POST(makeRequest('POST', url, { source: 'xbox', xboxAchievementId: '49', gameId: 'x' }))).status).toBe(400)
+    expect(pool.query).not.toHaveBeenCalled()
+  })
+
+  test('unpins one by its id and game', async () => {
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
+    const res = await DELETE(makeRequest('DELETE', `${url}?xboxAchievementId=49&gameId=1738914043`))
+    expect(res.status).toBe(200)
+    const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+    expect(sql).toContain("source = 'xbox'")
+    expect(params).toEqual(['1', '1738914043', '49'])
+  })
+
+  test('the pins list leaves Xbox ones out for a non-admin, and keeps them for an admin', async () => {
+    const rows = [{ source: 'ra' }, { source: 'xbox' }]
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows })
+    expect((await GET(makeRequest('GET', `${url}?source=all`))).data).toEqual([{ source: 'ra' }])
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows })
+    expect((await GET(makeRequest('GET', `${url}?source=all`))).data).toEqual(rows)
+  })
+
+  test('the Xbox pins of a game are listed by source', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] })
+    await GET(makeRequest('GET', `${url}?source=xbox&gameId=1738914043`))
+    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['1', 'xbox', '1738914043'])
+  })
+})

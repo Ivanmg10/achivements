@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
 import { isGameSource } from '@/utils/gameRef'
+import { sourceAllowed } from '@/utils/xboxAccess'
 
 /**
  * Games the user has hidden from their status lists, RA or Steam. A hidden
@@ -36,7 +37,8 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json().catch(() => null)
     const { source, gameId, title, image } = body ?? {}
-    if (!isGameSource(source)) return NextResponse.json({ message: 'source debe ser ra o steam' }, { status: 400 })
+    if (!isGameSource(source)) return NextResponse.json({ message: 'source debe ser ra, steam, psn o xbox' }, { status: 400 })
+    if (!sourceAllowed(source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     if (typeof gameId !== 'number' || !Number.isInteger(gameId) || gameId <= 0) {
       return NextResponse.json({ message: 'gameId debe ser un número' }, { status: 400 })
     }

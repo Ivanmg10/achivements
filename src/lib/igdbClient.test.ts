@@ -155,3 +155,39 @@ test('igdbDetails asks nothing without a Twitch app', async () => {
   expect(global.fetch).not.toHaveBeenCalled()
   process.env.TWITCH_CLIENT_ID = 'client'
 })
+
+test("an Xbox library's platform names map to IGDB's ids", () => {
+  expect(igdb.igdbXboxPlatforms('Xbox 360')).toEqual([12])
+  expect(igdb.igdbXboxPlatforms('Xbox One')).toEqual([49])
+  expect(igdb.igdbXboxPlatforms('Xbox Series · PC')).toEqual([169, 6])
+  expect(igdb.igdbXboxPlatforms('Xbox One · Xbox Series')).toEqual([49, 169])
+  expect(igdb.igdbXboxPlatforms('PS5')).toEqual([])
+  expect(igdb.igdbXboxPlatforms('PCSX')).toEqual([])
+})
+
+test("an Xbox game's art is looked up on its own platforms, apart from a PlayStation game's", async () => {
+  ;(global.fetch as jest.Mock)
+    .mockResolvedValueOnce(ok({ access_token: 'tok', expires_in: 5_000_000 }))
+    .mockResolvedValue(ok([GAME]))
+  expect(await igdb.igdbXboxArt('Jak II™', 'Xbox One · Xbox Series')).toMatchObject({ releaseYear: 2003 })
+  const [, init] = (global.fetch as jest.Mock).mock.calls[1]
+  expect(init.body).toContain('where platforms = (49,169)')
+  expect(withSteamCache).toHaveBeenCalledWith('igdb:art:v2:49,169:jak ii', expect.any(Number), expect.any(Function))
+})
+
+test('with no Xbox platform, or without a Twitch app, an Xbox game asks nothing', async () => {
+  expect(await igdb.igdbXboxArt('Astro Bot', 'PS5')).toBeNull()
+  expect(await igdb.igdbXboxDetails('Astro Bot', 'PS5')).toBeNull()
+  delete process.env.TWITCH_CLIENT_SECRET
+  expect(await igdb.igdbXboxArt('Halo', 'Xbox 360')).toBeNull()
+  expect(global.fetch).not.toHaveBeenCalled()
+})
+
+test("an Xbox game's details come from its own platforms too", async () => {
+  ;(global.fetch as jest.Mock)
+    .mockResolvedValueOnce(ok({ access_token: 'tok', expires_in: 5_000_000 }))
+    .mockResolvedValue(ok([{ name: 'Halo 3', summary: 'Finish the fight', first_release_date: 1190678400 }]))
+  expect(await igdb.igdbXboxDetails('Halo 3', 'Xbox 360')).toMatchObject({ summary: 'Finish the fight', releaseDate: '2007-09-25' })
+  expect((global.fetch as jest.Mock).mock.calls[1][1].body).toContain('where platforms = (12)')
+  expect(withSteamCache).toHaveBeenCalledWith('igdb:details:v1:12:halo 3', expect.any(Number), expect.any(Function))
+})

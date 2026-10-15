@@ -1,7 +1,7 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 
 import { getServerSession } from 'next-auth'
-import { requireRaSession, requireViewerApiKey, requireSession, requireSteamSession } from './apiAuth'
+import { requireRaSession, requireViewerApiKey, requireSession, requireSteamSession, requireXboxSession, requireXboxUser } from './apiAuth'
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -110,5 +110,48 @@ describe('requireSteamSession', () => {
     ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', steamid: '765' } })
     const result = await requireSteamSession()
     expect(result).toEqual({ ok: true, session: { id: '1', steamid: '765', apiKey: 'steam-key' } })
+  })
+})
+
+describe('requireXboxUser', () => {
+  const status = (r: Awaited<ReturnType<typeof requireXboxUser>>) => (r.ok ? 200 : (r.response as unknown as { status: number }).status)
+
+  test('401 when there is no session', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue(null)
+    expect(status(await requireXboxUser())).toBe(401)
+  })
+
+  test('403 for a user who is not an admin: Xbox is not theirs while it is admin-only', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: false } })
+    expect(status(await requireXboxUser())).toBe(403)
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1' } })
+    expect(status(await requireXboxUser())).toBe(403)
+  })
+
+  test('an admin is let in', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+    expect(await requireXboxUser()).toEqual({ ok: true, id: '1' })
+  })
+})
+
+describe('requireXboxSession', () => {
+  const failure = async () => {
+    const result = await requireXboxSession()
+    return result.ok ? 200 : (result.response as unknown as { status: number }).status
+  }
+
+  test('403 for a non-admin even when they have an account linked', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', xboxxuid: '25354', xboxgamertag: 'TestPlayer' } })
+    expect(await failure()).toBe(403)
+  })
+
+  test('400 when an admin has no Xbox account linked', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+    expect(await failure()).toBe(400)
+  })
+
+  test('the session, with the account and the gamertag it was linked under', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true, xboxxuid: '25354', xboxgamertag: 'TestPlayer' } })
+    expect(await requireXboxSession()).toEqual({ ok: true, session: { id: '1', xboxxuid: '25354', xboxgamertag: 'TestPlayer' } })
   })
 })

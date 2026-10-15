@@ -15,31 +15,24 @@ beforeEach(() => {
 afterEach(() => (console.error as jest.Mock).mockRestore())
 
 test('nothing is asked until load()', () => {
-  const { result } = renderHook(() => useAdminXboxAchievements(XUID, { titleId: '1', is360: false }))
+  const { result } = renderHook(() => useAdminXboxAchievements(XUID, '1'))
   expect(adminFetch).not.toHaveBeenCalled()
   expect(result.current.achievements).toBeNull()
 })
 
-test('loads a modern game by xuid and title', async () => {
+test('loads a game by xuid and title', async () => {
   const achievements = [xboxAchievementFixture()]
   ;(adminFetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({ achievements }) })
-  const { result } = renderHook(() => useAdminXboxAchievements(XUID, { titleId: '1738914043', is360: false }))
+  const { result } = renderHook(() => useAdminXboxAchievements(XUID, '1738914043'))
   await act(async () => result.current.load())
   expect(adminFetch).toHaveBeenCalledWith(`/api/admin/xbox/achievements?xuid=${XUID}&titleId=1738914043`)
   expect(result.current.achievements).toEqual(achievements)
   expect(result.current.error).toBe(false)
 })
 
-test('an Xbox 360 game says so', async () => {
-  ;(adminFetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({ achievements: [] }) })
-  const { result } = renderHook(() => useAdminXboxAchievements(XUID, { titleId: '1096157159', is360: true }))
-  await act(async () => result.current.load())
-  expect(adminFetch).toHaveBeenCalledWith(`/api/admin/xbox/achievements?xuid=${XUID}&titleId=1096157159&is360=1`)
-})
-
 test('a failed answer sets the error, and a retry can recover', async () => {
   ;(adminFetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 502, json: async () => ({}) })
-  const { result } = renderHook(() => useAdminXboxAchievements(XUID, { titleId: '1', is360: false }))
+  const { result } = renderHook(() => useAdminXboxAchievements(XUID, '1'))
   await act(async () => result.current.load())
   expect(result.current.error).toBe(true)
   expect(result.current.achievements).toBeNull()
@@ -51,7 +44,7 @@ test('a failed answer sets the error, and a retry can recover', async () => {
 
 test('a network failure sets the error too', async () => {
   ;(adminFetch as jest.Mock).mockRejectedValue(new Error('offline'))
-  const { result } = renderHook(() => useAdminXboxAchievements(XUID, { titleId: '1', is360: false }))
+  const { result } = renderHook(() => useAdminXboxAchievements(XUID, '1'))
   await act(async () => result.current.load())
   expect(result.current.error).toBe(true)
   expect(result.current.loading).toBe(false)

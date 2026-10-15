@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { adminFetch } from '@/utils/adminFetch'
-import type { XboxGame, XboxProfile } from '@/types/xbox'
+import type { XboxGameProgress, XboxProfile } from '@/types/xbox'
 
 /** Why a lookup failed, as /api/admin/xbox says it. */
 export type XboxLookupError =
@@ -14,7 +14,7 @@ export type XboxLookupError =
 
 export type XboxRateLimit = { remaining: number; limit: number } | null
 
-export type XboxLookup = { profile: XboxProfile; games: XboxGame[]; rateLimit: XboxRateLimit }
+export type XboxLookup = { profile: XboxProfile; games: XboxGameProgress[]; rateLimit: XboxRateLimit }
 
 const KNOWN: XboxLookupError[] = ['invalid-gamertag', 'not-found', 'private', 'not-configured', 'unauthorized', 'rate-limited']
 

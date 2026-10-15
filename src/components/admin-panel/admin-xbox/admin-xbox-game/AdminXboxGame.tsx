@@ -4,16 +4,16 @@ import { useState } from 'react'
 import { IconChevronDown } from '@tabler/icons-react'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { useAdminXboxAchievements } from '@/hooks/useAdminXboxAchievements'
-import type { XboxGame } from '@/types/xbox'
+import type { XboxGameProgress } from '@/types/xbox'
 
 /** Admin panel text is English (exempt from i18n). */
 
 /** One game of the explorer's library; opening it loads its achievements. */
-export default function AdminXboxGame({ xuid, game }: { xuid: string; game: XboxGame }) {
+export default function AdminXboxGame({ xuid, game }: { xuid: string; game: XboxGameProgress }) {
   const [open, setOpen] = useState(false)
-  const { achievements, error, loading, load } = useAdminXboxAchievements(xuid, game)
+  const { achievements, error, loading, load } = useAdminXboxAchievements(xuid, game.titleId)
   const panelId = `xbox-game-${game.titleId}`
-  const counts = game.totalAchievements === null ? `${game.earnedAchievements}` : `${game.earnedAchievements}/${game.totalAchievements}`
+  const counts = game.totalKnown ? `${game.numAwarded}/${game.maxPossible}` : `${game.numAwarded}`
 
   function toggle() {
     const next = !open
@@ -30,21 +30,21 @@ export default function AdminXboxGame({ xuid, game }: { xuid: string; game: Xbox
         aria-controls={panelId}
         className="w-full flex items-center gap-3 p-3 text-left rounded-xl focus-visible:ring-2 focus-visible:ring-accent/70 outline-none"
       >
-        {game.imageUrl ? (
-          <img src={game.imageUrl} alt="" width={40} height={40} className="size-10 rounded-md object-cover shrink-0" />
+        {game.imageIcon ? (
+          <img src={game.imageIcon} alt="" width={40} height={40} className="size-10 rounded-md object-cover shrink-0" />
         ) : (
           <span className="size-10 rounded-md bg-ink/10 shrink-0" aria-hidden="true" />
         )}
         <span className="flex-1 min-w-0">
-          <span className="block text-sm font-semibold truncate">{game.name}</span>
+          <span className="block text-sm font-semibold truncate">{game.title}</span>
           <span className="block text-xs text-text-secondary truncate">
             {game.platforms.join(' · ') || 'Unknown platform'}
             {game.lastPlayed && ` · played ${new Date(game.lastPlayed).toLocaleDateString()}`}
           </span>
-          <ProgressBar pct={game.progress} label={`${game.name} progress`} className="mt-1.5" />
+          <ProgressBar pct={game.pctWon} label={`${game.title} progress`} className="mt-1.5" />
         </span>
         <span className="text-right text-xs text-text-secondary shrink-0">
-          <span className="block font-semibold text-text-main">{game.progress}%</span>
+          <span className="block font-semibold text-text-main">{game.pctWon}%</span>
           <span className="block">{counts} ach.</span>
           <span className="block">
             {game.earnedGamerscore}/{game.totalGamerscore} G

@@ -2,19 +2,20 @@ import { useState } from 'react'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
 
-type Platform = 'ra' | 'steam' | 'psn'
+type Platform = 'ra' | 'steam' | 'psn' | 'xbox'
 
-const PLATFORM_NAMES: Record<Platform, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PSN' }
+const PLATFORM_NAMES: Record<Platform, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
 
 const INPUT = 'bg-bg-main rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent w-full'
 const BUTTON = 'shrink-0 text-xs font-bold px-3 py-2 rounded-xl disabled:opacity-40'
 
 /**
- * Links or unlinks a user's RetroAchievements, Steam and PSN accounts, for support.
+ * Links or unlinks a user's RetroAchievements, Steam, PSN and Xbox accounts, for support.
  * RA needs the user's own username and Web API key (RA checks them); Steam a
  * SteamID64 or profile link (Steam checks it exists). Each change is logged.
  */
@@ -29,6 +30,7 @@ export default function AdminLinkedAccounts({
   const [raKey, setRaKey] = useState('')
   const [steamId, setSteamId] = useState('')
   const [psnName, setPsnName] = useState('')
+  const [xboxName, setXboxName] = useState('')
   const [busy, setBusy] = useState<Platform | null>(null)
   const [errors, setErrors] = useState<Partial<Record<Platform, string>>>({})
 
@@ -41,9 +43,9 @@ export default function AdminLinkedAccounts({
       if (!res.ok) {
         const known: Record<string, string> = {
           'ra-invalid': 'RA refused that username or key',
-          private: 'That PSN profile keeps its trophies private',
-          'not-configured': 'PSN is not configured on the server',
-          failed: 'Sony is not answering, try again',
+          private: platform === 'xbox' ? 'That Xbox profile keeps its games private' : 'That PSN profile keeps its trophies private',
+          'not-configured': `${PLATFORM_NAMES[platform]} is not configured on the server`,
+          failed: platform === 'xbox' ? 'Xbox (OpenXBL) is not answering, try again' : 'Sony is not answering, try again',
         }
         const message = known[data.error] ?? data.error
         setErrors((e) => ({ ...e, [platform]: message ?? 'Something went wrong' }))
@@ -181,6 +183,42 @@ export default function AdminLinkedAccounts({
           </div>
         )}
         {errors.psn && <span role="alert" className="text-xs text-red-400">{errors.psn}</span>}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-sm">
+          <XboxLogo size={12} className="text-[#107c10]" />
+          {user.xboxxuid ? (
+            <>
+              <span className="font-medium flex-1 truncate">{user.xboxgamertag ?? user.xboxxuid}</span>
+              <button
+                onClick={() => unlink('xbox', { xboxxuid: null, xboxgamertag: null })}
+                disabled={busy !== null}
+                className={`${BUTTON} text-red-400 hover:bg-red-500/10`}
+              >
+                Unlink
+              </button>
+            </>
+          ) : (
+            <span className="text-text-secondary italic">Not linked</span>
+          )}
+        </div>
+        {!user.xboxxuid && (
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input aria-label="Xbox gamertag" placeholder="Xbox gamertag" value={xboxName} onChange={(e) => setXboxName(e.target.value)} className={INPUT} />
+            <button
+              onClick={() => link('xbox', { gamertag: xboxName }, (data) => {
+                setXboxName('')
+                onUpdated(user.id, { xboxxuid: data.xboxxuid as string, xboxgamertag: data.xboxgamertag as string })
+              })}
+              disabled={busy !== null || !xboxName.trim()}
+              className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}
+            >
+              {busy === 'xbox' ? '…' : 'Link'}
+            </button>
+          </div>
+        )}
+        {errors.xbox && <span role="alert" className="text-xs text-red-400">{errors.xbox}</span>}
       </div>
     </div>
   )

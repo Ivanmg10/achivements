@@ -12,4 +12,6 @@ export interface AdminUser {
   steamusername?: string | null;
   psnaccountid?: string | null;
   psnusername?: string | null;
+  xboxxuid?: string | null;
+  xboxgamertag?: string | null;
 }

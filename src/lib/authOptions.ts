@@ -27,6 +27,8 @@ function tokenFields(row: UserRecord) {
     steamusername: row.steamusername ?? undefined,
     psnaccountid: row.psnaccountid ?? undefined,
     psnusername: row.psnusername ?? undefined,
+    xboxxuid: row.xboxxuid ?? undefined,
+    xboxgamertag: row.xboxgamertag ?? undefined,
     email: row.email ?? undefined,
     emailVerified: Boolean(row.email_verified_at),
     admin: row.admin === true,
@@ -39,6 +41,7 @@ function tokenFields(row: UserRecord) {
     favorite_game: row.favorite_game ?? null,
     favorite_steam_game: row.favorite_steam_game ?? null,
     favorite_psn_game: row.favorite_psn_game ?? null,
+    favorite_xbox_game: row.favorite_xbox_game ?? null,
     pwv: passwordVersion(row.password),
   };
 }
@@ -123,6 +126,8 @@ export const authOptions: NextAuthOptions = {
         session.user.steamusername = token.steamusername;
         session.user.psnaccountid = token.psnaccountid;
         session.user.psnusername = token.psnusername;
+        session.user.xboxxuid = token.xboxxuid;
+        session.user.xboxgamertag = token.xboxgamertag;
         session.user.email = token.email ?? undefined;
         session.user.emailVerified = token.emailVerified === true;
         session.user.admin = token.admin;
@@ -135,6 +140,7 @@ export const authOptions: NextAuthOptions = {
         session.user.favorite_game = token.favorite_game;
         session.user.favorite_steam_game = token.favorite_steam_game;
         session.user.favorite_psn_game = token.favorite_psn_game;
+        session.user.favorite_xbox_game = token.favorite_xbox_game;
       }
       return session;
     },

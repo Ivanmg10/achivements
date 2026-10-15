@@ -5,7 +5,8 @@ jest.mock('@/lib/raClient', () => ({ getGame: jest.fn() }))
 jest.mock('@/lib/steamCache', () => ({ TTL: { schema: 1 }, withSteamCache: jest.fn((_k: string, _t: number, fn: () => unknown) => fn()) }))
 jest.mock('@/lib/steamClient', () => ({ getAppDetails: jest.fn() }))
 jest.mock('@/lib/psnClient', () => ({ psnTitles: jest.fn(), psnReleaseYear: jest.fn() }))
-jest.mock('@/lib/igdbClient', () => ({ igdbArt: jest.fn() }))
+jest.mock('@/lib/igdbClient', () => ({ igdbArt: jest.fn(), igdbXboxArt: jest.fn() }))
+jest.mock('@/lib/xboxClient', () => ({ xboxLibrary: jest.fn() }))
 
 import { POST } from './route'
 import { getServerSession } from 'next-auth'
@@ -13,7 +14,8 @@ import pool from '@/lib/db'
 import { getGame } from '@/lib/raClient'
 import { getAppDetails } from '@/lib/steamClient'
 import { psnReleaseYear, psnTitles } from '@/lib/psnClient'
-import { igdbArt } from '@/lib/igdbClient'
+import { igdbArt, igdbXboxArt } from '@/lib/igdbClient'
+import { xboxLibrary } from '@/lib/xboxClient'
 import { NextRequest } from 'next/server'
 
 const params = (id = '5') => ({ params: Promise.resolve({ id }) })
@@ -110,4 +112,37 @@ test('a PS3/Vita game (no Store page) takes its year from IGDB, by title and pla
   expect(data(res).years).toEqual([{ id: 8, release_year: 2003 }])
   expect(igdbArt).toHaveBeenCalledWith('Jak II', 'PS3')
   expect(psnReleaseYear).not.toHaveBeenCalled()
+})
+
+describe('Xbox games', () => {
+  const rows = (pool.query as jest.Mock)
+  const setUp = () => {
+    rows
+      .mockResolvedValueOnce({ rows: [{ id: 5 }] })
+      .mockResolvedValueOnce({ rows: [{ id: 1, source: 'xbox', game_id: 1738914043 }] })
+      .mockResolvedValueOnce({ rows: [] })
+  }
+
+  test("an admin's Xbox game gets its year from IGDB, by its title and platforms", async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true, xboxxuid: '25354' } })
+    setUp()
+    ;(xboxLibrary as jest.Mock).mockResolvedValue([{ id: 1738914043, title: 'Halo Infinite', consoleName: 'Xbox Series · PC' }])
+    ;(igdbXboxArt as jest.Mock).mockResolvedValue({ releaseYear: 2021 })
+    const res = await call()
+    expect(data(res).years).toEqual([{ id: 1, release_year: 2021 }])
+    expect(igdbXboxArt).toHaveBeenCalledWith('Halo Infinite', 'Xbox Series · PC')
+    expect(xboxLibrary).toHaveBeenCalledWith('25354', '1')
+  })
+
+  test('a game that is not in their library, or a user who may not use Xbox, has no year (0)', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true, xboxxuid: '25354' } })
+    setUp()
+    ;(xboxLibrary as jest.Mock).mockResolvedValue([])
+    expect(data(await call()).years).toEqual([{ id: 1, release_year: 0 }])
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', xboxxuid: '25354' } })
+    setUp()
+    ;(xboxLibrary as jest.Mock).mockClear()
+    expect(data(await call()).years).toEqual([{ id: 1, release_year: 0 }])
+    expect(xboxLibrary).not.toHaveBeenCalled()
+  })
 })

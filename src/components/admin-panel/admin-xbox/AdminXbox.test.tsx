@@ -1,7 +1,7 @@
 jest.mock('@/hooks/useAdminXbox', () => ({ useAdminXbox: jest.fn() }))
 jest.mock('./admin-xbox-game/AdminXboxGame', () => ({
   __esModule: true,
-  default: ({ game }: { game: { name: string } }) => <li>{game.name}</li>,
+  default: ({ game }: { game: { title: string } }) => <li>{game.title}</li>,
 }))
 
 import { render, screen, fireEvent } from '@testing-library/react'
@@ -56,7 +56,7 @@ test('shows the profile, how many calls are left, and every game', () => {
   set({
     result: {
       profile: xboxProfileFixture({ gamerscore: 10242 }),
-      games: [xboxGameFixture({ titleId: '1', name: 'One' }), xboxGameFixture({ titleId: '2', name: 'Two' })],
+      games: [xboxGameFixture({ titleId: '1', title: 'One' }), xboxGameFixture({ titleId: '2', title: 'Two' })],
       rateLimit: { remaining: 140, limit: 150 },
     },
   })

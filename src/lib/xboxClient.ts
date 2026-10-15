@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { withSteamCache } from '@/lib/steamCache'
+import { mapLimit } from '@/utils/utils'
+import { isXboxTitleId } from '@/utils/xboxTitles'
 import {
   sortByLastPlayed,
   toXbox360Achievement,
@@ -11,7 +13,7 @@ import {
   type RawProfileUser,
   type RawTitle,
 } from '@/utils/xboxMappers'
-import type { XboxAchievement, XboxGame, XboxProfile } from '@/types/xbox'
+import type { XboxAchievement, XboxGameProgress, XboxProfile, XboxRecentAchievement, XboxSummary } from '@/types/xbox'
 
 /**
  * Xbox Live through OpenXBL (xbl.io), an unofficial proxy. Every call is made
@@ -26,19 +28,43 @@ import type { XboxAchievement, XboxGame, XboxProfile } from '@/types/xbox'
  * - It answers errors with HTTP 200 and the real status inside the body
  *   (`{ "code": 400, "content": … }`), so the body's code is checked too.
  * - It refuses `Accept-Language: *`, which is what Node's fetch sends by
- *   default, so a language is always sent.
+ *   default, so a language is always sent. It also translates achievement
+ *   texts by it.
  */
 
 const BASE_URL = 'https://api.xbl.io/v2'
-const LANGUAGE = 'en-US'
+const DEFAULT_LANGUAGE = 'en-US'
+/** The language tags for the app's languages. */
+const LANGUAGES: Record<string, string> = {
+  en: 'en-US', es: 'es-ES', de: 'de-DE', fr: 'fr-FR', it: 'it-IT', ja: 'ja-JP', pl: 'pl-PL', pt: 'pt-PT', ru: 'ru-RU',
+}
 const PROFILE_TTL_MS = 60 * 60 * 1000
+const SUMMARY_TTL_MS = 15 * 60 * 1000
 const LIBRARY_TTL_MS = 15 * 60 * 1000
-const ACHIEVEMENTS_TTL_MS = 30 * 60 * 1000
+/**
+ * A game's achievements are keyed by when it was last played: they can only
+ * change when it is, which changes the key. So an entry for a game not played
+ * since is still right a month later — the same idea as PSN's settled trophies.
+ */
+const SETTLED_ACHIEVEMENTS_TTL_MS = 30 * 24 * 60 * 60 * 1000
+const DAY_MS = 24 * 60 * 60 * 1000
+/**
+ * How many games are asked of OpenXBL at once when a feed is built game by game.
+ * Few: the hour's 150 calls are for the whole app.
+ */
+const PARALLEL = 3
+/** How many of the latest games the profile column's "recent achievements" look through. */
+const LATEST_GAMES = 3
+/**
+ * The most games a time window scans cold (one call each). Past it the oldest
+ * are left out, so one page load cannot spend the hour's calls; once a game is
+ * cached it costs nothing until it is played again.
+ */
+const MAX_SCAN_GAMES = { activity: 20, year: 40 } as const
 
 /** Modern gamertags are 12 characters, old ones 15; letters, digits and spaces, with an optional #1234 suffix. */
 const GAMERTAG = /^[A-Za-z0-9 ]{1,15}(#\d{1,4})?$/
 const XUID = /^\d{10,20}$/
-const TITLE_ID = /^\d{1,10}$/
 
 export function isGamertag(value: unknown): value is string {
   return typeof value === 'string' && GAMERTAG.test(value.trim())
@@ -47,7 +73,12 @@ export function isXuid(value: unknown): value is string {
   return typeof value === 'string' && XUID.test(value)
 }
 export function isTitleId(value: unknown): value is string {
-  return typeof value === 'string' && TITLE_ID.test(value)
+  return isXboxTitleId(typeof value === 'string' ? value : '')
+}
+
+/** The Accept-Language OpenXBL is asked in, from the app's language code. Unknown codes get English. */
+export function xboxLanguage(lang: string | null | undefined): string {
+  return (lang && LANGUAGES[lang]) || DEFAULT_LANGUAGE
 }
 
 export type XboxErrorKind = 'not-configured' | 'unauthorized' | 'private' | 'not-found' | 'rate-limited' | 'failed'
@@ -79,7 +110,10 @@ function kindOf(status: number): XboxErrorKind {
 }
 
 /** One OpenXBL call, unwrapped. Throws an XboxError for anything but a real answer. */
-export async function xboxCall<T>(path: string, init: { method?: 'GET' | 'POST'; body?: unknown } = {}): Promise<T> {
+export async function xboxCall<T>(
+  path: string,
+  init: { method?: 'GET' | 'POST'; body?: unknown; language?: string } = {},
+): Promise<T> {
   const key = process.env.OPENXBL_API_KEY?.trim()
   if (!key) throw new XboxError('not-configured', 'OPENXBL_API_KEY is not set')
 
@@ -90,7 +124,7 @@ export async function xboxCall<T>(path: string, init: { method?: 'GET' | 'POST';
       headers: {
         'X-Authorization': key,
         Accept: 'application/json',
-        'Accept-Language': LANGUAGE,
+        'Accept-Language': init.language ?? DEFAULT_LANGUAGE,
         ...(init.body ? { 'Content-Type': 'application/json' } : {}),
       },
       body: init.body ? JSON.stringify(init.body) : undefined,
@@ -116,7 +150,7 @@ export async function xboxCall<T>(path: string, init: { method?: 'GET' | 'POST';
 export async function findXboxAccount(gamertag: string): Promise<XboxProfile | null> {
   const name = gamertag.trim()
   return withSteamCache<XboxProfile | null>(
-    `xbox:account:v1:${name.toLowerCase()}`,
+    `xbox:account:v2:${name.toLowerCase()}`,
     PROFILE_TTL_MS,
     async () => {
       const res = await xboxCall<{ profileUsers?: RawProfileUser[] }>(`friends/search?gt=${encodeURIComponent(name)}`)
@@ -127,36 +161,163 @@ export async function findXboxAccount(gamertag: string): Promise<XboxProfile | n
   )
 }
 
-/** Every game in an account's library, most recently played first. One call, no paging (135 games in one answer). */
-export async function xboxLibrary(xuid: string): Promise<XboxGame[]> {
+export type XboxLibraryData = { games: XboxGameProgress[]; achievementsUnlocked: number }
+
+/**
+ * Every game in an account's library, most recently played first, with how
+ * many achievements the whole library has unlocked. One call, no paging (135
+ * games in one answer).
+ */
+export async function xboxLibraryData(xuid: string, userId: string | null = null): Promise<XboxLibraryData> {
   return withSteamCache(
-    `xbox:titles:v1:${xuid}`,
+    `xbox:titles:v2:${xuid}`,
     LIBRARY_TTL_MS,
     async () => {
-      const res = await xboxCall<{ titles?: RawTitle[] }>(`titles/${xuid}`)
-      return sortByLastPlayed((res?.titles ?? []).map(toXboxGame))
+      const res = await xboxCall<{ titles?: RawTitle[]; achievementSummary?: { totalAchievementsUnlocked?: number } }>(`titles/${xuid}`)
+      const games: XboxGameProgress[] = []
+      for (const t of res?.titles ?? []) {
+        const game = toXboxGame(t)
+        if (game) games.push(game)
+      }
+      return { games: sortByLastPlayed(games), achievementsUnlocked: res?.achievementSummary?.totalAchievementsUnlocked ?? 0 }
     },
-    { refreshable: true },
+    { userId, refreshable: true },
+  )
+}
+
+export async function xboxLibrary(xuid: string, userId: string | null = null): Promise<XboxGameProgress[]> {
+  return (await xboxLibraryData(xuid, userId)).games
+}
+
+/** A game of the account's by its title id, or null when it is not in their library. */
+export async function findXboxGame(xuid: string, titleId: string, userId: string | null = null): Promise<XboxGameProgress | null> {
+  return (await xboxLibrary(xuid, userId)).find((g) => g.titleId === titleId) ?? null
+}
+
+/**
+ * The headline numbers for one account. The gamertag is the one saved when the
+ * account was linked; if its owner has renamed since, the search finds someone
+ * else (or no one) and the summary says not-found rather than showing the wrong person.
+ */
+export async function xboxSummary(xuid: string, gamertag: string, userId: string | null = null): Promise<XboxSummary> {
+  return withSteamCache(
+    `xbox:summary:v1:${xuid}`,
+    SUMMARY_TTL_MS,
+    async () => {
+      const profile = await findXboxAccount(gamertag)
+      if (!profile || profile.xuid !== xuid) throw new XboxError('not-found', `No account ${xuid} under the gamertag ${gamertag}`)
+      const library = await xboxLibraryData(xuid, userId)
+      return {
+        gamertag: profile.gamertag,
+        avatarUrl: profile.avatarUrl,
+        bio: profile.bio,
+        tier: profile.tier,
+        gamerscore: profile.gamerscore,
+        achievementsUnlocked: library.achievementsUnlocked,
+        games: library.games.length,
+      }
+    },
+    { userId, refreshable: true },
   )
 }
 
 /**
  * A game's achievements with what the account earned of them, in one call
- * (Xbox 360 games use another endpoint with another shape).
+ * (Xbox 360 games use another endpoint with another shape), its texts in
+ * `language`. Cached until the game is played again (see SETTLED_ACHIEVEMENTS_TTL_MS).
  */
-export async function xboxAchievements(xuid: string, titleId: string, is360: boolean): Promise<XboxAchievement[]> {
+export async function xboxGameAchievements(
+  xuid: string,
+  game: Pick<XboxGameProgress, 'titleId' | 'is360' | 'lastPlayed'>,
+  userId: string | null = null,
+  language = DEFAULT_LANGUAGE,
+): Promise<XboxAchievement[]> {
   return withSteamCache(
-    `xbox:achievements:v1:${xuid}:${titleId}:${is360 ? '360' : 'one'}`,
-    ACHIEVEMENTS_TTL_MS,
+    `xbox:achievements:v2:${xuid}:${game.titleId}:${game.lastPlayed ?? ''}:${language}`,
+    SETTLED_ACHIEVEMENTS_TTL_MS,
     async () => {
-      if (is360) {
-        const res = await xboxCall<{ achievements?: Raw360Achievement[] }>(`achievements/x360/${xuid}/title/${titleId}`)
+      if (game.is360) {
+        const res = await xboxCall<{ achievements?: Raw360Achievement[] }>(`achievements/x360/${xuid}/title/${game.titleId}`, { language })
         return (res?.achievements ?? []).map(toXbox360Achievement)
       }
-      const res = await xboxCall<{ achievements?: RawAchievement[] }>(`achievements/player/${xuid}/${titleId}`)
+      const res = await xboxCall<{ achievements?: RawAchievement[] }>(`achievements/player/${xuid}/${game.titleId}`, { language })
       return (res?.achievements ?? []).map(toXboxAchievement)
     },
+    { userId },
   )
+}
+
+function toRecent(game: XboxGameProgress, a: XboxAchievement & { unlockedAt: string }): XboxRecentAchievement {
+  return {
+    gameId: game.id,
+    titleId: game.titleId,
+    gameTitle: game.title,
+    gameIconUrl: game.imageIcon,
+    achievementId: a.id,
+    name: a.name,
+    iconUrl: a.iconUrl,
+    gamerscore: a.gamerscore,
+    earnedAt: a.unlockedAt,
+    rarity: a.rarity,
+  }
+}
+
+/** Achievements earned on or after `since` (ISO; '' for all) across `games`, newest first, a few games at a time. */
+async function earnedSince(
+  xuid: string,
+  games: XboxGameProgress[],
+  since: string,
+  userId: string | null,
+  language: string,
+): Promise<XboxRecentAchievement[]> {
+  const lists = await mapLimit(games, PARALLEL, (game) => xboxGameAchievements(xuid, game, userId, language))
+  const unlocks: XboxRecentAchievement[] = []
+  lists.forEach((list, i) => {
+    // One game failing leaves it out of the feed rather than failing the feed.
+    if (list.status === 'rejected') return console.error('[xbox] achievements for the feed', games[i].titleId, list.reason)
+    for (const a of list.value) {
+      if (a.unlocked && a.unlockedAt && a.unlockedAt >= since) unlocks.push(toRecent(games[i], { ...a, unlockedAt: a.unlockedAt }))
+    }
+  })
+  // Nothing at all came back: that is a failure, not an empty feed.
+  if (games.length > 0 && lists.every((l) => l.status === 'rejected')) throw (lists[0] as PromiseRejectedResult).reason
+  return unlocks.sort((a, b) => b.earnedAt.localeCompare(a.earnedAt))
+}
+
+/** Only games with something earned can hold a recent achievement. */
+const hasEarned = (g: XboxGameProgress) => g.numAwarded > 0 || g.earnedGamerscore > 0
+
+/**
+ * The latest achievements, however long ago they were earned — from the last
+ * few games played, for the profile column. Newest first.
+ */
+export async function xboxLatestAchievements(
+  xuid: string,
+  userId: string | null = null,
+  language = DEFAULT_LANGUAGE,
+): Promise<XboxRecentAchievement[]> {
+  const games = (await xboxLibrary(xuid, userId)).filter(hasEarned).slice(0, LATEST_GAMES)
+  return earnedSince(xuid, games, '', userId, language)
+}
+
+/**
+ * Every achievement earned in the last `days` days, newest first. Xbox has no
+ * feed for this, so it is built from the games played in the window: one call
+ * per such game (at most MAX_SCAN_GAMES of the most recent), each cached until
+ * that game is played again.
+ */
+export async function xboxRecentAchievements(
+  xuid: string,
+  scope: keyof typeof MAX_SCAN_GAMES,
+  days: number,
+  userId: string | null = null,
+  language = DEFAULT_LANGUAGE,
+): Promise<XboxRecentAchievement[]> {
+  const since = new Date(Date.now() - days * DAY_MS).toISOString()
+  const games = (await xboxLibrary(xuid, userId))
+    .filter((g) => hasEarned(g) && g.lastPlayed && g.lastPlayed >= since)
+    .slice(0, MAX_SCAN_GAMES[scope])
+  return earnedSince(xuid, games, since, userId, language)
 }
 
 /** The response for an Xbox call that threw: 503 with no key (or a refused one), 403 hidden, 404 no such gamertag, 429 over the hour's limit, 502 anything else. */

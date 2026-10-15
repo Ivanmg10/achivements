@@ -14,6 +14,7 @@ describe('toXboxProfile', () => {
       xuid: '2535400000000001',
       gamertag: 'TestPlayer',
       avatarUrl: 'https://images-eds-ssl.xboxlive.com/image?url=abc&format=png',
+      bio: 'Plays everything',
       gamerscore: 10242,
       tier: 'Silver',
     })
@@ -24,41 +25,52 @@ describe('toXboxProfile', () => {
     expect(toXboxProfile({ id: '1', settings: [{ id: 'Gamerscore', value: '5' }] })).toBeNull()
   })
 
-  test('a missing or unreadable score is 0', () => {
+  test('a missing or unreadable score is 0, a missing bio is empty', () => {
     const p = toXboxProfile({ id: '1', settings: [{ id: 'Gamertag', value: 'A' }, { id: 'Gamerscore', value: 'x' }] })
-    expect(p).toMatchObject({ gamerscore: 0, tier: '', avatarUrl: null })
+    expect(p).toMatchObject({ gamerscore: 0, tier: '', avatarUrl: null, bio: '' })
   })
 })
 
 describe('toXboxGame', () => {
   test('a modern game: an achievement total of 0 is unknown, not zero, and PC is listed once', () => {
     expect(toXboxGame(RAW_MODERN_TITLE)).toEqual({
+      _source: 'xbox',
+      id: 1738914043,
       titleId: '1738914043',
-      name: 'Modern Game',
-      imageUrl: 'https://images-eds.xboxlive.com/image?url=modern',
+      title: 'Modern Game',
+      imageIcon: 'https://images-eds.xboxlive.com/image?url=modern',
+      consoleName: 'Xbox Series · PC',
       platforms: ['Xbox Series', 'PC'],
       is360: false,
-      earnedAchievements: 15,
-      totalAchievements: null,
+      maxPossible: 0,
+      numAwarded: 15,
+      totalKnown: false,
       earnedGamerscore: 200,
       totalGamerscore: 1345,
-      progress: 14,
+      pctWon: 14,
       lastPlayed: '2026-10-15T15:07:05.562Z',
+      playtimeMinutes: null,
     })
   })
 
   test('an Xbox 360 game is flagged, and keeps its real total', () => {
-    expect(toXboxGame(RAW_360_TITLE)).toMatchObject({ is360: true, totalAchievements: 50, imageUrl: null, platforms: ['Xbox 360'] })
+    expect(toXboxGame(RAW_360_TITLE)).toMatchObject({ is360: true, maxPossible: 50, totalKnown: true, imageIcon: '', platforms: ['Xbox 360'] })
   })
 
   test('a game also on a newer console is not an Xbox 360 game', () => {
-    expect(toXboxGame({ ...RAW_360_TITLE, devices: ['Xbox360', 'XboxOne'] }).is360).toBe(false)
+    expect(toXboxGame({ ...RAW_360_TITLE, devices: ['Xbox360', 'XboxOne'] })?.is360).toBe(false)
   })
 
-  test('a title with no achievement block is empty, and "never played" is no date', () => {
+  test('a title with no achievement block has none: its total of 0 is real, and "never played" is no date', () => {
     expect(toXboxGame({ titleId: '5', name: 'Bare', achievement: null, titleHistory: { lastTimePlayed: '0001-01-01T00:00:00Z' } })).toMatchObject({
-      earnedAchievements: 0, totalAchievements: null, earnedGamerscore: 0, totalGamerscore: 0, progress: 0, lastPlayed: null,
+      numAwarded: 0, maxPossible: 0, totalKnown: true, earnedGamerscore: 0, totalGamerscore: 0, pctWon: 0, lastPlayed: null,
     })
+  })
+
+  test('an id the app cannot key is no game', () => {
+    expect(toXboxGame({ ...RAW_MODERN_TITLE, titleId: 'abc' })).toBeNull()
+    expect(toXboxGame({ ...RAW_MODERN_TITLE, titleId: '4294836177' })).toBeNull()
+    expect(toXboxGame({ ...RAW_MODERN_TITLE, titleId: '0' })).toBeNull()
   })
 })
 

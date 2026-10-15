@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react'
 import { adminFetch } from '@/utils/adminFetch'
-import type { XboxAchievement, XboxGame } from '@/types/xbox'
+import type { XboxAchievement } from '@/types/xbox'
 
 /** One game's achievements in the admin Xbox explorer, asked for when its row is opened. */
-export function useAdminXboxAchievements(xuid: string, game: Pick<XboxGame, 'titleId' | 'is360'>) {
+export function useAdminXboxAchievements(xuid: string, titleId: string) {
   const [achievements, setAchievements] = useState<XboxAchievement[] | null>(null)
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -12,7 +12,7 @@ export function useAdminXboxAchievements(xuid: string, game: Pick<XboxGame, 'tit
     setLoading(true)
     setError(false)
     try {
-      const params = new URLSearchParams({ xuid, titleId: game.titleId, ...(game.is360 ? { is360: '1' } : {}) })
+      const params = new URLSearchParams({ xuid, titleId })
       const res = await adminFetch(`/api/admin/xbox/achievements?${params}`)
       if (!res.ok) throw new Error(`Xbox achievements ${res.status}`)
       setAchievements(((await res.json()) as { achievements: XboxAchievement[] }).achievements)
@@ -22,7 +22,7 @@ export function useAdminXboxAchievements(xuid: string, game: Pick<XboxGame, 'tit
     } finally {
       setLoading(false)
     }
-  }, [xuid, game.titleId, game.is360])
+  }, [xuid, titleId])
 
   return { achievements, error, loading, load }
 }

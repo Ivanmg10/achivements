@@ -308,6 +308,7 @@ export type GameGroup = {
   game_count: number
   steam_count: number
   psn_count: number
+  xbox_count?: number
   total_awarded: number
   total_possible: number
   /** The first four games, for the card's cover mosaic. */

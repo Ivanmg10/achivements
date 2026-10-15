@@ -27,12 +27,12 @@ test('shows the game, its platforms, progress and gamerscore; the unknown total 
 })
 
 test('a known total is shown as earned/total', () => {
-  render(<ul><AdminXboxGame xuid="1" game={xboxGameFixture({ totalAchievements: 50 })} /></ul>)
+  render(<ul><AdminXboxGame xuid="1" game={xboxGameFixture({ maxPossible: 50, totalKnown: true })} /></ul>)
   expect(screen.getByText('15/50 ach.')).toBeInTheDocument()
 })
 
 test('a game without art or a last session still renders', () => {
-  render(<ul><AdminXboxGame xuid="1" game={xboxGameFixture({ imageUrl: null, lastPlayed: null, platforms: [] })} /></ul>)
+  render(<ul><AdminXboxGame xuid="1" game={xboxGameFixture({ imageIcon: '', lastPlayed: null, platforms: [] })} /></ul>)
   expect(screen.getByText('Unknown platform')).toBeInTheDocument()
 })
 

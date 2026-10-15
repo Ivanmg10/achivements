@@ -4,6 +4,7 @@ import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
 import { forgetUser } from '@/lib/userRecord'
 import { isGameSource } from '@/utils/gameRef'
+import { sourceAllowed } from '@/utils/xboxAccess'
 import type { GameSource } from '@/types/steam'
 
 /** One favourite per platform, each in its own column. No source means RA. */
@@ -11,6 +12,7 @@ const COLUMN: Record<GameSource, string> = {
   ra: 'favorite_game',
   steam: 'favorite_steam_game',
   psn: 'favorite_psn_game',
+  xbox: 'favorite_xbox_game',
 }
 
 function readColumn(value: unknown): string | null {
@@ -33,7 +35,8 @@ export async function POST(req: Request) {
     const column = readColumn(source)
 
     if (!id || !title) return NextResponse.json({ error: 'id and title required' }, { status: 400 })
-    if (!column) return NextResponse.json({ error: 'source must be ra, steam or psn' }, { status: 400 })
+    if (!column) return NextResponse.json({ error: 'source must be ra, steam, psn or xbox' }, { status: 400 })
+    if (!sourceAllowed(source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 
     const value = JSON.stringify({ id, title, imageIcon: imageIcon ?? '' })
     await pool.query(`UPDATE users SET ${column} = $1 WHERE id = $2`, [value, session.user.id])

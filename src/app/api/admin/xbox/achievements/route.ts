@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/adminAuth'
-import { isTitleId, isXuid, xboxAchievements, xboxFailure, xboxRateLimit } from '@/lib/xboxClient'
+import { findXboxGame, isTitleId, isXuid, xboxFailure, xboxGameAchievements, xboxRateLimit } from '@/lib/xboxClient'
 
 /** Admin-only: one game's achievements for an account, from the explorer. */
 export async function GET(req: Request) {
@@ -13,7 +13,10 @@ export async function GET(req: Request) {
   if (!isXuid(xuid) || !isTitleId(titleId)) return NextResponse.json({ error: 'invalid-request' }, { status: 400 })
 
   try {
-    const achievements = await xboxAchievements(xuid, titleId, params.get('is360') === '1')
+    // From the library, which says which endpoint the game is on and when it was last played (the cache key).
+    const game = await findXboxGame(xuid, titleId)
+    if (!game) return NextResponse.json({ error: 'not-in-library' }, { status: 404 })
+    const achievements = await xboxGameAchievements(xuid, game)
     return NextResponse.json({ achievements, rateLimit: xboxRateLimit() })
   } catch (err) {
     return xboxFailure(err, 'admin/xbox/achievements')

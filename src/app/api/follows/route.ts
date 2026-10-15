@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
+import { authOptions } from '@/lib/authOptions'
 import { requireSession } from '@/lib/apiAuth'
 import { allowAttempt } from '@/lib/attemptLimit'
 import { findPublicUser } from '@/lib/publicUser'
+import { canUseXbox } from '@/utils/xboxAccess'
 
 /** Enough for anyone; a cap so one account cannot fill the table. */
 const FOLLOWS_MAX = 500
@@ -19,11 +22,13 @@ export async function GET() {
   try {
     const { rows } = await pool.query(
       `SELECT u.username, u.avatar, u.location, LEFT(u.description, 120) AS description,
-              u.rausername IS NOT NULL AS ra, u.steamid IS NOT NULL AS steam, u.psnaccountid IS NOT NULL AS psn
+              u.rausername IS NOT NULL AS ra, u.steamid IS NOT NULL AS steam, u.psnaccountid IS NOT NULL AS psn,
+              (u.xboxxuid IS NOT NULL AND $2::boolean) AS xbox
        FROM follows f JOIN users u ON u.id = f.followed_id
        WHERE f.follower_id = $1 AND u.profile_public
        ORDER BY f.created_at DESC`,
-      [auth.id],
+      // Xbox is admin-only for now: to anyone else it is not there at all (see canUseXbox).
+      [auth.id, canUseXbox((await getServerSession(authOptions))?.user?.admin)],
     )
     return NextResponse.json(rows)
   } catch (err) {

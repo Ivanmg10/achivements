@@ -1,4 +1,5 @@
-import type { XboxAchievement, XboxGame, XboxProfile } from '@/types/xbox'
+import { xboxNumericId } from '@/utils/xboxTitles'
+import type { XboxAchievement, XboxGameProgress, XboxProfile } from '@/types/xbox'
 
 /** The parts of OpenXBL's answers the app reads. Everything else is ignored. */
 export type RawProfileUser = { id: string; settings?: Array<{ id: string; value: string }> }
@@ -73,27 +74,39 @@ export function toXboxProfile(user: RawProfileUser | undefined): XboxProfile | n
     xuid: String(user.id),
     gamertag,
     avatarUrl: https(settings.get('GameDisplayPicRaw')),
+    bio: settings.get('Bio') ?? '',
     gamerscore: Number(settings.get('Gamerscore')) || 0,
     tier: settings.get('AccountTier') ?? '',
   }
 }
 
-export function toXboxGame(t: RawTitle): XboxGame {
+/** One of Xbox's titles in the unified game model. Null for an id the app cannot key (never seen, but not trusted). */
+export function toXboxGame(t: RawTitle): XboxGameProgress | null {
+  const id = xboxNumericId(String(t.titleId))
+  if (id === null) return null
   const a = t.achievement ?? {}
-  const devices = xboxPlatforms(t.devices)
+  const platforms = xboxPlatforms(t.devices)
   const total = a.totalAchievements ?? 0
+  const totalGamerscore = a.totalGamerscore ?? 0
+  const lastPlayed = realDate(t.titleHistory?.lastTimePlayed)
   return {
+    _source: 'xbox',
+    id,
     titleId: String(t.titleId),
-    name: t.name,
-    imageUrl: https(t.displayImage),
-    platforms: devices,
-    is360: devices.length === 1 && devices[0] === 'Xbox 360',
-    earnedAchievements: a.currentAchievements ?? 0,
-    totalAchievements: total > 0 ? total : null,
+    title: t.name,
+    imageIcon: https(t.displayImage) ?? '',
+    consoleName: platforms.join(' · '),
+    platforms,
+    is360: platforms.length === 1 && platforms[0] === 'Xbox 360',
+    maxPossible: total,
+    numAwarded: a.currentAchievements ?? 0,
+    // A game with no gamerscore has no achievements: its total of 0 is real.
+    totalKnown: total > 0 || totalGamerscore === 0,
     earnedGamerscore: a.currentGamerscore ?? 0,
-    totalGamerscore: a.totalGamerscore ?? 0,
-    progress: a.progressPercentage ?? 0,
-    lastPlayed: realDate(t.titleHistory?.lastTimePlayed),
+    totalGamerscore,
+    pctWon: a.progressPercentage ?? 0,
+    lastPlayed,
+    playtimeMinutes: null,
   }
 }
 
@@ -132,6 +145,7 @@ export function toXbox360Achievement(a: Raw360Achievement): XboxAchievement {
 }
 
 /** Most recently played first; games never played go last. */
-export function sortByLastPlayed(games: XboxGame[]): XboxGame[] {
+/** Most recently played first; games never played go last. */
+export function sortByLastPlayed(games: XboxGameProgress[]): XboxGameProgress[] {
   return [...games].sort((a, b) => (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? ''))
 }

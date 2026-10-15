@@ -106,6 +106,8 @@ export type AdminAction =
   | 'unlink-steam'
   | 'link-psn'
   | 'unlink-psn'
+  | 'link-xbox'
+  | 'unlink-xbox'
   | 'psn-token'
   | 'xbox-lookup'
 

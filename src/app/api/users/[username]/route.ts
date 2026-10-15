@@ -3,6 +3,7 @@ import { dataOwner } from '@/lib/apiAuth'
 import { findPublicUser, hiddenGameKeys } from '@/lib/publicUser'
 import { listGroups } from '@/lib/groupList'
 import pool from '@/lib/db'
+import { canUseXbox } from '@/utils/xboxAccess'
 
 /**
  * A CheevoVault user's public profile: who they are, which platforms they
@@ -23,9 +24,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ usernam
       return NextResponse.json({ error: 'not-found' }, { status: 404 })
     }
 
+    // Xbox is admin-only for now: to anyone else it is not there at all.
+    const xbox = canUseXbox(viewer.admin)
     const [hiddenGames, groups, follow] = await Promise.all([
       hiddenGameKeys(user.id),
-      listGroups(user.id, { publicOnly: true }),
+      listGroups(user.id, { publicOnly: true, xbox }),
       pool.query('SELECT 1 FROM follows WHERE follower_id = $1 AND followed_id = $2', [viewer.id, user.id]),
     ])
 
@@ -38,12 +41,14 @@ export async function GET(_req: Request, { params }: { params: Promise<{ usernam
       ra: user.rausername && (viewer.raid || user.hasRaKey) ? user.rausername : null,
       steam: Boolean(user.steamid),
       psn: Boolean(user.psnaccountid),
+      xbox: xbox && Boolean(user.xboxxuid),
       steamName: user.steamid ? user.steamusername : null,
       psnName: user.psnaccountid ? user.psnusername : null,
+      xboxName: xbox && user.xboxxuid ? user.xboxgamertag : null,
       isSelf: String(user.id) === String(viewer.id),
       theme: user.theme,
       gender: user.genderPublic ? user.gender : null,
-      favorites: { ra: user.favorite_game, steam: user.favorite_steam_game, psn: user.favorite_psn_game },
+      favorites: { ra: user.favorite_game, steam: user.favorite_steam_game, psn: user.favorite_psn_game, xbox: xbox ? user.favorite_xbox_game : null },
       hiddenGames,
       groups,
       // Whether the viewer follows them, for the Follow button.
