@@ -63,7 +63,17 @@ test('an Xbox 360 game is flagged, and keeps its real total', () => {
     expect(toXboxGame(RAW_360_TITLE)).toMatchObject({ is360: true, maxPossible: 50, totalKnown: true, imageIcon: '', platforms: ['Xbox 360'] })
   })
 
-  test('a game also on a newer console is not an Xbox 360 game', () => {
+  test('a backward-compatible 360 game, also on newer consoles, is still a 360 game by its media type', () => {
+  const retro = { ...RAW_360_TITLE, devices: ['Xbox360', 'XboxOne', 'XboxSeries'], mediaItemType: 'Xbox360Game' }
+  expect(toXboxGame(retro)).toMatchObject({ is360: true, platforms: ['Xbox 360', 'Xbox One', 'Xbox Series'] })
+  expect(toXboxGame({ ...retro, mediaItemType: 'XboxArcadeGame' })?.is360).toBe(true)
+})
+
+test('a modern title is never a 360 one, whatever its devices say', () => {
+  expect(toXboxGame({ ...RAW_360_TITLE, devices: ['Xbox360', 'XboxOne'], mediaItemType: 'Application' })?.is360).toBe(false)
+})
+
+test('a game also on a newer console, with no media type, is not an Xbox 360 game', () => {
     expect(toXboxGame({ ...RAW_360_TITLE, devices: ['Xbox360', 'XboxOne'] })?.is360).toBe(false)
   })
 

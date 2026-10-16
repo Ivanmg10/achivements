@@ -25,6 +25,22 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-16 — Xbox 360 backward-compatible games had no achievements (`feat/xbox-integration`)
+
+**Did** — 9 of the 12 Xbox 360 games in the library (Modern Warfare 3, Black
+Ops II, Skate 3, Tekken 6…) showed "This game has no achievements": they list
+Xbox One/Series among their devices, so `is360` was false and the modern
+endpoint (which answers them with an empty list) was used. `is360` now comes
+from `mediaItemType` (`Xbox360Game`/`XboxArcadeGame`); devices only decide when
+the type is missing. Cache keys bumped to `xbox:titles:v4` and
+`xbox:achievements:v5` (the empty lists were cached up to 30 days).
+Checked on real data: both 360 lists agree on ids, scores and icons, and the
+icon URLs load for locked and unlocked ones.
+**Watch out** — A 360 game costs 2 calls, so feed scans that touch many of them
+spend more of the 150 calls an hour.
+
+---
+
 ## 2026-10-15 — Xbox 360 covers, icons and partial lists (`feat/xbox-integration`)
 
 **Did** — Fixed Xbox 360 games (seen in the browser: Guitar Hero II): the cover

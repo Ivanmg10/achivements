@@ -12,6 +12,8 @@ export type RawTitle = {
   name: string
   displayImage?: string | null
   devices?: string[]
+  /** 'Xbox360Game' / 'XboxArcadeGame' for 360 titles (also the ones that run on newer consoles), 'Application' for the rest. */
+  mediaItemType?: string | null
   achievement?: {
     currentAchievements?: number
     totalAchievements?: number
@@ -95,6 +97,19 @@ export function toXboxProfile(user: RawProfileUser | undefined): XboxProfile | n
   }
 }
 
+const XBOX_360_MEDIA = new Set(['Xbox360Game', 'XboxArcadeGame'])
+
+/**
+ * A title whose achievements live on the Xbox 360 endpoints. Backward-compatible
+ * games list newer consoles among their devices too, so the devices alone say
+ * nothing: Xbox's own media type does (the modern endpoint answers such a game
+ * with no achievements at all). The devices decide only when the type is missing.
+ */
+function isXbox360Title(t: RawTitle, platforms: string[]): boolean {
+  if (t.mediaItemType) return XBOX_360_MEDIA.has(t.mediaItemType)
+  return platforms.length === 1 && platforms[0] === 'Xbox 360'
+}
+
 /** One of Xbox's titles in the unified game model. Null for an id the app cannot key (never seen, but not trusted). */
 export function toXboxGame(t: RawTitle): XboxGameProgress | null {
   const id = xboxNumericId(String(t.titleId))
@@ -112,7 +127,7 @@ export function toXboxGame(t: RawTitle): XboxGameProgress | null {
     imageIcon: https(t.displayImage) ?? '',
     consoleName: platforms.join(' · '),
     platforms,
-    is360: platforms.length === 1 && platforms[0] === 'Xbox 360',
+    is360: isXbox360Title(t, platforms),
     maxPossible: total,
     numAwarded: a.currentAchievements ?? 0,
     // A game with no gamerscore has no achievements: its total of 0 is real.

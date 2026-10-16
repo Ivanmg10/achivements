@@ -170,7 +170,7 @@ export type XboxLibraryData = { games: XboxGameProgress[]; achievementsUnlocked:
  */
 export async function xboxLibraryData(xuid: string, userId: string | null = null): Promise<XboxLibraryData> {
   return withSteamCache(
-    `xbox:titles:v3:${xuid}`,
+    `xbox:titles:v4:${xuid}`,
     LIBRARY_TTL_MS,
     async () => {
       const res = await xboxCall<{ titles?: RawTitle[]; achievementSummary?: { totalAchievementsUnlocked?: number } }>(`titles/${xuid}`)
@@ -233,7 +233,7 @@ export async function xboxGameAchievements(
   language = DEFAULT_LANGUAGE,
 ): Promise<XboxAchievement[]> {
   return withSteamCache(
-    `xbox:achievements:v4:${xuid}:${game.titleId}:${game.lastPlayed ?? ''}:${language}`,
+    `xbox:achievements:v5:${xuid}:${game.titleId}:${game.lastPlayed ?? ''}:${language}`,
     SETTLED_ACHIEVEMENTS_TTL_MS,
     async () => {
       if (game.is360) {

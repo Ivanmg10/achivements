@@ -278,7 +278,7 @@ describe('xboxGameAchievements', () => {
     await xboxGameAchievements(XUID, { ...base, lastPlayed: 'A' }, null, 'es-ES')
     const keys = (withSteamCache as jest.Mock).mock.calls.map((c) => c[0])
     expect(new Set(keys).size).toBe(3)
-    expect(keys[0]).toBe(`xbox:achievements:v4:${XUID}:5:A:en-US`)
+    expect(keys[0]).toBe(`xbox:achievements:v5:${XUID}:5:A:en-US`)
   })
 
   test('a game with none is an empty list', async () => {

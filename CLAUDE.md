@@ -370,7 +370,10 @@ achievements) were applied 2026-10-15. Plan and measured findings:
 - **Data shape:** gamerscore, not trophy grades; no DLC groups. Newer games report
   `totalAchievements: 0` while their gamerscore total is real, so progress goes
   by gamerscore and the achievement total may be `null`. Xbox 360 games use
-  another endpoint and shape (`is360`), and take **two calls**: the title's whole
+  another endpoint and shape (`is360`: Xbox's `mediaItemType` is `Xbox360Game`
+  or `XboxArcadeGame`; **not** "devices is only Xbox 360", because backward-
+  compatible games list newer consoles too and the modern endpoint answers them
+  with no achievements), and take **two calls**: the title's whole
   list (`achievements/player/{xuid}/title/{titleId}`, all locked) and what the
   account unlocked (`achievements/x360/…`), joined by `merge360Achievements`
   (measured 2026-10-15; the x360 one alone lists only the unlocked). If a list
