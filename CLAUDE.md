@@ -191,10 +191,15 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 - `1.3.0` — a loading state on every route (its own skeleton, and a thin line
   along the top while a page is on its way) and the functions in `fra1`, next
   to the database. Never reached `main` on its own; it shipped inside 1.4.0
-- `1.4.0` — current, released to `main` 2026-10-14: public profiles rebuilt
+- `1.4.0` — released to `main` 2026-10-14: public profiles rebuilt
   (hero with tabs, opt-in gender, open and compare a user's game), follows and
   the Following section, theme accents reworked, "Ask an AI" export, internal
   docs and the PR description check
+- `1.5.0` — current on `develop` (not yet on `main`): Xbox through OpenXBL, 1:1 with
+  PSN but **admin-only** (see the Xbox section), a preference per platform to choose
+  which consoles show, preferences that follow the account (`migrations/033`–`036`),
+  account preferences in tabs, the library layout remembered, total play time, and
+  a stricter reading of private profiles and refused keys on every platform
 
 ## Release gates — what had to be true before 1.0 (all closed)
 
