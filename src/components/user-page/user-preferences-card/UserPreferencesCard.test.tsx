@@ -25,20 +25,55 @@ function setUser(user: Record<string, unknown> = {}) {
   ;(useSession as jest.Mock).mockReturnValue({ data: { user }, update })
 }
 
+const tab = (name: string | RegExp) => fireEvent.click(screen.getByRole('tab', { name }))
+
 beforeEach(() => {
+  window.localStorage.clear()
   jest.clearAllMocks()
   global.fetch = jest.fn().mockResolvedValue({ ok: true })
   setUser({ location: 'ES', favorite_game: { id: 1, title: 'Zelda', imageIcon: '/z.png' } })
 })
 
-test('lists theme, language and a favourite per platform', () => {
+test('opens on General: theme and language, with a tab for each platform', () => {
   render(<UserPreferencesCard />)
   expect(screen.getByText(en.userPage.preferences)).toBeInTheDocument()
+  expect(screen.getByRole('tab', { name: en.userData.prefsGeneral })).toHaveAttribute('aria-selected', 'true')
   expect(screen.getByText(en.userTheme.name_dark)).toBeInTheDocument()
+  expect(screen.getAllByRole('tab').map((t) => t.textContent)).toEqual([en.userData.prefsGeneral, 'RetroAchievements', 'Steam', 'PlayStation'])
+  expect(screen.queryByText('Zelda')).not.toBeInTheDocument()
+})
+
+test('each platform tab has its favourite, and the last tab is remembered', () => {
+  const { unmount } = render(<UserPreferencesCard />)
+  tab('RetroAchievements')
   expect(screen.getByText('Zelda')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteSteamGame) })).toHaveTextContent(
-    en.userData.notSet,
-  )
+  tab('Steam')
+  expect(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteSteamGame) })).toHaveTextContent(en.userData.notSet)
+  expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-labelledby', screen.getByRole('tab', { name: 'Steam' }).id)
+  unmount()
+
+  render(<UserPreferencesCard />)
+  expect(screen.getByRole('tab', { name: 'Steam' })).toHaveAttribute('aria-selected', 'true')
+})
+
+test('an unknown remembered tab falls back to General', () => {
+  window.localStorage.setItem('account-preferences-tab', 'bogus')
+  render(<UserPreferencesCard />)
+  expect(screen.getByRole('tab', { name: en.userData.prefsGeneral })).toHaveAttribute('aria-selected', 'true')
+})
+
+test('a remembered Xbox tab for someone who may not see Xbox falls back to General', () => {
+  window.localStorage.setItem('account-preferences-tab', 'xbox')
+  render(<UserPreferencesCard />)
+  expect(screen.getByRole('tab', { name: en.userData.prefsGeneral })).toHaveAttribute('aria-selected', 'true')
+  expect(screen.queryByRole('tab', { name: 'Xbox' })).not.toBeInTheDocument()
+})
+
+test('an admin gets the Xbox tab', () => {
+  setUser({ admin: true })
+  render(<UserPreferencesCard />)
+  tab('Xbox')
+  expect(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteXboxGame) })).toBeInTheDocument()
 })
 
 test('each line opens its own picker', () => {
@@ -49,6 +84,7 @@ test('each line opens its own picker', () => {
 
 test('saves the Steam favourite under its own platform and refreshes the session', async () => {
   render(<UserPreferencesCard />)
+  tab('Steam')
   fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteSteamGame) }))
   expect(screen.getByTestId('fav-modal')).toHaveTextContent('steam')
 
@@ -62,6 +98,7 @@ test('saves the Steam favourite under its own platform and refreshes the session
 
 test('saving the RA favourite keeps the RA field', async () => {
   render(<UserPreferencesCard />)
+  tab('RetroAchievements')
   fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteRaGame) }))
   fireEvent.click(screen.getByTestId('fav-modal'))
   await waitFor(() => expect(update).toHaveBeenCalledWith())
@@ -70,6 +107,7 @@ test('saving the RA favourite keeps the RA field', async () => {
 test('a failed save does not touch the session', async () => {
   ;(global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 })
   render(<UserPreferencesCard />)
+  tab('RetroAchievements')
   fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteRaGame) }))
   fireEvent.click(screen.getByTestId('fav-modal'))
   await waitFor(() => expect(global.fetch).toHaveBeenCalled())

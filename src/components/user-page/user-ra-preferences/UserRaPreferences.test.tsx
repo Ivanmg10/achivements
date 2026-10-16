@@ -8,7 +8,7 @@ import { en } from '@/translations/en'
 test('lists the consoles of the library', () => {
   ;(useGamesData as jest.Mock).mockReturnValue({ consoles: [{ name: 'SNES', count: 4 }, { name: 'GameCube', count: 2 }] })
   render(<UserRaPreferences />)
-  expect(screen.getByRole('heading', { name: en.userData.raSection })).toBeInTheDocument()
+  expect(screen.getByRole('group', { name: en.userData.consoles })).toBeInTheDocument()
   expect(screen.getByLabelText(/SNES/)).toBeChecked()
 })
 

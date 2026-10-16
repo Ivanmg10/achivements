@@ -6,7 +6,6 @@ beforeEach(() => window.localStorage.clear())
 
 test('two switches, each saving its own choice', () => {
   render(<UserPsnPreferences />)
-  expect(screen.getByRole('heading', { name: en.userData.psnSection })).toBeInTheDocument()
   fireEvent.click(screen.getByRole('switch', { name: en.userData.psnPlatinum }))
   expect(window.localStorage.getItem('psn-completion')).toBe('platinum')
   expect(window.localStorage.getItem('psn-hidden-trophies')).toBeNull()

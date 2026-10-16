@@ -25,6 +25,23 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-16 — Account preferences in tabs (`feat/xbox-integration`)
+
+**Did** — The preferences card was one long column (it grew with every platform
+and stretched the identity card beside it, leaving big empty gaps). It is now
+tabs, reusing `MainPageProfileTabs`: General (theme, language, gender, public
+profile, hidden games) and one per platform (favourite game + that platform's
+choices + its consoles). New `UserPreferencesGeneral` and
+`UserPreferencesPlatform`; the PSN/Xbox/RA preference blocks lost their own
+headings (the tab names them) and the console list is always open inside its tab.
+Last tab remembered in the browser. Translations: `prefsGeneral`,
+`prefsTabsLabel`; the unused `*Section` headings were removed.
+**Why** — The user asked to redesign that part of the account page.
+**Open** — Not looked at in a browser. The identity card can still leave gaps
+when it is taller than the preferences (it stretches to the row).
+
+---
+
 ## 2026-10-16 — Choose which consoles show, per platform (`feat/xbox-integration`)
 
 **Did** — A "Consoles" preference under RA, PSN and Xbox in the account page:

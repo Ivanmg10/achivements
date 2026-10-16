@@ -435,7 +435,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
 
 ## Consoles to show — a preference per platform
 
-RA, PSN and Xbox each have, in the account page's preferences, a folded list of
+The account page's preferences are in tabs (`UserPreferencesCard`): General, then
+one per platform with its favourite game and its own choices; the tab last open
+is remembered (`account-preferences-tab`). A new platform preference goes in its
+platform's tab, not in a new card. RA, PSN and Xbox each have, in their tab, the list of
 the consoles in the user's library with a tick each (`UserConsolesPreference`;
 Steam has none). Unticked consoles leave the lists, collection and stats, and
 nothing is deleted.
