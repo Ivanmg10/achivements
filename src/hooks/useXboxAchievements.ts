@@ -4,6 +4,7 @@ import { xboxErrorFrom, type XboxLinkError } from '@/hooks/useXboxLink'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import type { XboxAchievement } from '@/types/xbox'
+import { fetchShared } from '@/lib/fetchShared'
 
 /**
  * One Xbox game's achievements for the signed-in user, by Xbox's title id
@@ -25,7 +26,7 @@ export function useXboxAchievements(titleId: string | null) {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await fetch(withSubject(`/api/xbox/achievements?id=${encodeURIComponent(titleId)}&lang=${lang}`, subject))
+      const res = await fetchShared(withSubject(`/api/xbox/achievements?id=${encodeURIComponent(titleId)}&lang=${lang}`, subject))
       if (!res.ok) {
         setError(await xboxErrorFrom(res))
         return

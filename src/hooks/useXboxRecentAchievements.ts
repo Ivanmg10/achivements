@@ -6,6 +6,7 @@ import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import type { XboxRecentAchievement } from '@/types/xbox'
+import { fetchShared } from '@/lib/fetchShared'
 
 export type XboxAchievementScope = 'recent' | 'activity' | 'year'
 
@@ -35,7 +36,7 @@ export function useXboxRecentAchievements(scope: XboxAchievementScope | null = '
       try {
         // From the end: on a public profile the account part is "subject:<name>", colon included.
         const [forScope, forLang] = forKey.split(':').slice(-2)
-        const res = await fetch(withSubject(`/api/xbox/recentAchievements?scope=${forScope}&lang=${forLang}`, subject), { cache: 'no-store' })
+        const res = await fetchShared(withSubject(`/api/xbox/recentAchievements?scope=${forScope}&lang=${forLang}`, subject), { cache: 'no-store' })
         if (!res.ok) return { error: await xboxErrorFrom(res) }
         const data = await res.json()
         if (!Array.isArray(data)) throw new Error('Unexpected Xbox response')

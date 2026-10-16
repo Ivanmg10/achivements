@@ -3,6 +3,7 @@ import type { IgdbDetails } from '@/lib/igdbClient'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { fetchShared } from '@/lib/fetchShared'
 
 /** IGDB's facts, and a wide picture for the page's backdrop when it has one. */
 export type XboxGameDetails = IgdbDetails & { heroUrl?: string | null }
@@ -25,7 +26,7 @@ export function useXboxGameDetails(titleId: string | null) {
   /** Asks the server; what came back, not yet applied. */
   const request = useCallback(async (id: string): Promise<Outcome> => {
     try {
-      const res = await fetch(withSubject(`/api/xbox/details?id=${encodeURIComponent(id)}`, subject))
+      const res = await fetchShared(withSubject(`/api/xbox/details?id=${encodeURIComponent(id)}`, subject))
       if (res.status === 404) return { details: null }
       if (!res.ok) throw new Error(`Failed to load game details (${res.status})`)
       return { details: (await res.json()) as XboxGameDetails }

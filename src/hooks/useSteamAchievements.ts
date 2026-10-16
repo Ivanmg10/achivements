@@ -4,6 +4,7 @@ import { toSteamLanguage } from '@/utils/steamLanguage'
 import type { SteamAchievementUnified } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { fetchShared } from '@/lib/fetchShared'
 
 /**
  * Achievements for one Steam game, loaded on demand (when a card is expanded
@@ -35,7 +36,7 @@ export function useSteamAchievements(appId: number | null) {
       return next
     })
     try {
-      const res = await fetch(withSubject(`/api/steam/achievements?appid=${id}&lang=${language}`, subject))
+      const res = await fetchShared(withSubject(`/api/steam/achievements?appid=${id}&lang=${language}`, subject))
       if (!res.ok) throw new Error(`Failed to load achievements (${res.status})`)
       const data = await res.json()
       if (!Array.isArray(data)) throw new Error('Unexpected achievements response')

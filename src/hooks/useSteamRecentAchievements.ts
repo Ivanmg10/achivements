@@ -6,6 +6,7 @@ import type { SteamRecentAchievement } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { fetchShared } from '@/lib/fetchShared'
 
 const ENDPOINTS = {
   recent: 'recentAchievements',
@@ -36,7 +37,7 @@ export function useSteamRecentAchievements(scope: SteamUnlockScope | null = 'rec
   /** Asks the server; what came back, not yet applied. */
   const request = useCallback(async (language: string): Promise<{ achievements: SteamRecentAchievement[] } | { error: string }> => {
     try {
-      const res = await fetch(withSubject(`/api/steam/${endpoint}?lang=${language}`, subject), { cache: 'no-store' })
+      const res = await fetchShared(withSubject(`/api/steam/${endpoint}?lang=${language}`, subject), { cache: 'no-store' })
       if (!res.ok) throw new Error(`Failed to load recent achievements (${res.status})`)
       const data = await res.json()
       if (!Array.isArray(data)) throw new Error('Unexpected recent achievements response')

@@ -5,6 +5,7 @@ import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import type { XboxSummary } from '@/types/xbox'
+import { fetchShared } from '@/lib/fetchShared'
 
 /** The linked Xbox account's headline numbers: avatar, gamerscore, achievements unlocked, games. */
 export function useXboxSummary() {
@@ -22,7 +23,7 @@ export function useXboxSummary() {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await fetch(withSubject('/api/xbox/summary', subject))
+      const res = await fetchShared(withSubject('/api/xbox/summary', subject))
       if (!res.ok) {
         setError(await xboxErrorFrom(res))
         return
