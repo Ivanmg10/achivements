@@ -8,6 +8,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { capList, formatDate } from '@/utils/utils'
 import { gameHref } from '@/utils/gameRef'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
+import ConcealedBadge from '@/components/concealed-badge/ConcealedBadge'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import XboxRevealAchievementButton from '@/components/xbox/xbox-reveal-achievement-button/XboxRevealAchievementButton'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
@@ -15,6 +16,7 @@ import { useRevealedAchievements } from '@/hooks/useRevealedAchievements'
 import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements'
 import { useSubject } from '@/context/SubjectContext'
 import type { XboxAchievement } from '@/types/xbox'
+import { tooltipStyle } from '@/utils/tooltipStyle'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -102,7 +104,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
                   unoptimized
                 />
               ) : (
-                <div className={`${size.badge} bg-ink/10 ${a.unlocked ? '' : 'opacity-40'}`} aria-hidden="true" />
+                <ConcealedBadge sizeClass={size.badge} dim={!a.unlocked} />
               )}
             </Link>
             {a.secret && !a.unlocked && (
@@ -135,7 +137,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
           <div
             role="tooltip"
             className="fixed z-50 pointer-events-none bg-bg-card border border-bg-header/80 rounded-xl shadow-2xl p-3 max-w-65"
-            style={{ left: tooltip.x + 14, top: tooltip.y - 10 }}
+            style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
           >
             <p className="text-sm font-semibold text-text-main">{nameOf(tooltip.achievement)}</p>
             <p className="text-xs text-text-secondary mt-1 leading-snug">

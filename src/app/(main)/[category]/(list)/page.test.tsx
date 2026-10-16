@@ -107,6 +107,8 @@ const mockGames = [
 ]
 
 beforeEach(() => {
+  // The layout is remembered in the browser: every test starts from a clean one.
+  localStorage.clear()
   ;(useParams as jest.Mock).mockReturnValue({ category: 'playing' })
   ;(useRaLinked as jest.Mock).mockReturnValue(true)
 })
@@ -362,6 +364,23 @@ describe('shelves and list', () => {
     expect(explorer).toHaveAttribute('data-layout', 'shelves')
     expect(explorer).toHaveTextContent('ra:1,steam:5')
     expect(screen.queryByTestId('steam-section')).not.toBeInTheDocument()
+  })
+
+  test('the layout left is the one it opens on next time, whatever the category', () => {
+    const { unmount } = render(<CategoryPage />)
+    fireEvent.click(screen.getByRole('button', { name: 'List' }))
+    expect(localStorage.getItem('library-layout')).toBe('list')
+    unmount()
+    ;(useParams as jest.Mock).mockReturnValue({ category: 'completed' })
+    render(<CategoryPage />)
+    expect(screen.getByTestId('explorer')).toHaveAttribute('data-layout', 'list')
+  })
+
+  test('a search that moves the shelves to the list does not overwrite the saved layout', () => {
+    render(<CategoryPage />)
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'had' } })
+    expect(screen.getByTestId('explorer')).toHaveAttribute('data-layout', 'list')
+    expect(localStorage.getItem('library-layout')).toBeNull()
   })
 
   test('typing in the search while on the shelves goes to the list', () => {

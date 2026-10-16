@@ -56,16 +56,22 @@ export default function CategoryPage() {
   const { selected, toggle, clear } = useConsoleFilter()
   const cat = category as string
   const { T } = useLanguage()
-  const { sortState, setSortState, allSortState, setAllSortState, gridCols, setGridCols, view, setView } = useLibraryPrefs(cat)
+  const { sortState, setSortState, allSortState, setAllSortState, gridCols, setGridCols, view, setView, layout: savedLayout, setLayout: saveLayout } = useLibraryPrefs(cat)
   // "Almost done" and "stalled" only make sense for games in progress; each category starts without one.
   const [quickChoice, setQuick] = useState<QuickFilter>('all')
-  // A list opens on its shelves, with nothing picked.
-  const [layout, setLayout] = useState<LibraryLayout>('shelves')
+  // The layout the user left is the one it opens on (remembered across visits); typing a search on the
+  // shelves moves to the list only for as long as the search is there, without overwriting the choice.
+  const [searchedToList, setSearchedToList] = useState(false)
+  const layout: LibraryLayout = savedLayout === 'shelves' && searchedToList ? 'list' : savedLayout
+  const setLayout = (next: LibraryLayout) => {
+    setSearchedToList(false)
+    saveLayout(next)
+  }
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const [platform, setPlatform] = useState<PlatformChoice>('all')
   useWhenChanged([cat], () => {
     setQuick('all')
-    setLayout('shelves')
+    setSearchedToList(false)
     setSelectedKey(null)
     setPlatform('all')
   })
@@ -114,7 +120,7 @@ export default function CategoryPage() {
   // Typing while on the shelves goes to the list, where the matches are.
   function changeQuery(next: string) {
     setQuery(next)
-    if (layout === 'shelves' && next.trim()) setLayout('list')
+    if (layout === 'shelves' && next.trim()) setSearchedToList(true)
   }
   const mixedEntries = useMemo(
     () =>

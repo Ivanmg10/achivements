@@ -25,6 +25,25 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-16 — Library layout remembered; tooltips that fit; concealed tiles (`feat/xbox-integration`)
+
+**Did** — (1) The library's Shelves / List / Cards choice is now saved in the
+browser (`library-layout` in `useLibraryPrefs`, one choice for every category) and
+the list opens on it; it used to go back to shelves on every visit and category.
+A search typed on the shelves still moves to the list, but only while it is
+there and without overwriting the saved choice. (2) Achievement/trophy
+tooltips ran off the right edge on the last badges: `tooltipStyle` (new util)
+flips them left/up when they would not fit, in the four grids (RA, Steam, PSN,
+Xbox). (3) Secret achievements/trophies showed as an empty dark square that
+looked like a broken image; `ConcealedBadge` puts a question mark in it (Xbox
+and PSN grids). The three blanks in Guitar Hero III were its three secret
+achievements — all 59 icons exist on Xbox's CDN.
+**Decisions** — Saved in the browser like the other library prefs, not in the DB.
+**Watch out** — The saved layout is read after hydration, so the first paint is
+the default for a moment.
+
+---
+
 ## 2026-10-16 — Xbox gaps against PSN: public profile, play time, backdrop, privacy (`feat/xbox-integration`)
 
 **Did** — An audit of PSN-only code found and closed: (1) `useProfileLibrary`

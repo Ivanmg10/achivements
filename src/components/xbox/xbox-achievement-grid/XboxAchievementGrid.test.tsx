@@ -85,3 +85,12 @@ test('an achievement with no icon still renders as a grey square', () => {
   expect(container.querySelector('img')).toBeNull()
   expect(screen.getAllByRole('link')).toHaveLength(1)
 })
+
+test('a tooltip that would run off the right edge opens to the left of the pointer', () => {
+  render(<XboxAchievementGrid gameId={100} gameTitle="Game" achievements={ACHIEVEMENTS} />)
+  jest.useFakeTimers()
+  fireEvent.mouseEnter(screen.getAllByRole('link')[0], { clientX: window.innerWidth - 20, clientY: 100 })
+  act(() => jest.runAllTimers())
+  jest.useRealTimers()
+  expect(screen.getByRole('tooltip').style.transform).toBe('translate(-100%, 0)')
+})
