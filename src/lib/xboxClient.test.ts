@@ -199,14 +199,21 @@ describe('the library', () => {
     expect(fetchMock.mock.calls[0][0]).toBe(`https://api.xbl.io/v2/titles/${XUID}`)
   })
 
-  test('an account with no titles is an empty library', async () => {
-    fetchMock.mockResolvedValue(answer({}))
+  test('a public account with no games is an empty library', async () => {
+    fetchMock.mockResolvedValue(answer({ titles: [], achievementSummary: { totalAchievementsUnlocked: 0 } }))
     expect(await xboxLibrary(XUID)).toEqual([])
     expect((await xboxLibraryData(XUID)).achievementsUnlocked).toBe(0)
   })
 
+  test('a library that answers like one that does not exist (no titles, no summary) is private', async () => {
+    fetchMock.mockResolvedValue(answer({ xuid: XUID, titles: [] }))
+    await expect(xboxLibraryData(XUID)).rejects.toMatchObject({ kind: 'private' })
+    fetchMock.mockResolvedValue(answer({}))
+    await expect(xboxLibraryData(XUID)).rejects.toMatchObject({ kind: 'private' })
+  })
+
   test('the refresh button may replace it, and it is kept for the user', async () => {
-    fetchMock.mockResolvedValue(answer({ titles: [] }))
+    fetchMock.mockResolvedValue(answer({ titles: [], achievementSummary: {} }))
     await xboxLibraryData(XUID, '7')
     expect((withSteamCache as jest.Mock).mock.calls[0][3]).toEqual({ userId: '7', refreshable: true })
   })
@@ -249,6 +256,18 @@ describe('the library', () => {
       routes({ titles: answer({ titles: many }), 'player/stats': stats() })
       await xboxLibrary(XUID)
       expect(fetchMock.mock.calls.filter((c) => String(c[0]).endsWith('player/stats'))).toHaveLength(2)
+    })
+
+    test('only the 300 most recently played games are asked for', async () => {
+      const many = Array.from({ length: 320 }, (_, i) => ({ ...RAW_MODERN_TITLE, titleId: String(1000 + i), titleHistory: { lastTimePlayed: new Date(Date.UTC(2020, 0, 1 + i)).toISOString() } }))
+      routes({ titles: answer({ titles: many, achievementSummary: {} }), 'player/stats': stats() })
+      await xboxLibrary(XUID)
+      const asked = fetchMock.mock.calls
+        .filter((c) => String(c[0]).endsWith('player/stats'))
+        .flatMap((c) => JSON.parse(c[1].body).stats.map((s: { titleId: string }) => s.titleId))
+      expect(asked).toHaveLength(300)
+      expect(asked).toContain('1319')
+      expect(asked).not.toContain('1000')
     })
 
     test('a library with only 360 games that have no newer id asks for nothing', async () => {

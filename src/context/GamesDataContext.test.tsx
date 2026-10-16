@@ -102,11 +102,14 @@ test('does not retry a 4xx, and refetch clears the error once it works', async (
   const { result } = renderHook(() => useGamesData(), { wrapper })
   await waitFor(() => expect(result.current.error).toBe(true))
   expect(fetchWithRetry).toHaveBeenCalledTimes(1)
+  // A 403 from the RA routes means RA refuses the key.
+  expect(result.current.keyInvalid).toBe(true)
 
   ;(fetchWithRetry as jest.Mock).mockResolvedValueOnce([{ GameID: 3, ConsoleID: 1, HardcoreMode: '0', PctWon: '1' }])
   act(() => result.current.refetch())
   await waitFor(() => expect(result.current.all).toHaveLength(1))
   expect(result.current.error).toBe(false)
+  expect(result.current.keyInvalid).toBe(false)
 })
 
 test('session.update() flips the status to loading and back: a finished load is not started again, nor left loading', async () => {

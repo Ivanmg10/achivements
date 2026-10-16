@@ -289,6 +289,8 @@ export const de: Translations = {
     hiddenGames: 'Ausgeblendete Spiele',
     hiddenCount: '{n} ausgeblendet',
     hiddenNone: 'Keine',
+    raKeyInvalid: 'RetroAchievements akzeptiert deinen API-Schlüssel nicht mehr – möglicherweise wurde er widerrufen oder neu erzeugt. Verbinde dein Konto erneut, um deine Daten zurückzubekommen.',
+    raKeyInvalidAction: 'Zu deinem Konto',
     hiddenEmpty: 'Du hast kein Spiel ausgeblendet. Nutze das Auge bei einem Spiel in deinen Listen.',
     showGame: '{title} wieder anzeigen',
     close: 'Schließen',

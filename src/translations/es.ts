@@ -289,6 +289,8 @@ export const es: Translations = {
     hiddenGames: 'Juegos ocultos',
     hiddenCount: '{n} ocultos',
     hiddenNone: 'Ninguno',
+    raKeyInvalid: 'RetroAchievements ya no acepta tu clave de API: puede que la hayas revocado o regenerado. Vuelve a conectar tu cuenta para recuperar tus datos.',
+    raKeyInvalidAction: 'Ir a tu cuenta',
     hiddenEmpty: 'No has ocultado ningún juego. Usa el ojo de un juego en tus listas para ocultarlo.',
     showGame: 'Volver a mostrar {title}',
     close: 'Cerrar',

@@ -343,6 +343,14 @@ see or use it**. Migrations 033–035 (xbox columns, `'xbox'` game source, pinne
 achievements) were applied 2026-10-15. Plan and measured findings:
 `docs/xbox-integration-plan.md`.
 
+- **Xbox stays admin-only on purpose (decided 2026-10-16), and the reason is money.**
+  OpenXBL's free plan is 150 calls an hour for the whole app, and one new user costs
+  ~4 calls (library, play time, summary, the first game's achievements) plus 2 per
+  Xbox 360 game opened. The user does not want to pay for a plan yet, so **do not set
+  `XBOX_ADMIN_ONLY` to `false`, and do not suggest it as a next step**, until they
+  say they will pay for a plan (or accept limiting cold loads). When it does open:
+  upgrade the plan, then update the landing text, site title and meta description
+  (they still list three platforms) and the terms.
 - **The gate is one switch**: `XBOX_ADMIN_ONLY` in `src/utils/xboxAccess.ts`
   (`canUseXbox(admin)`, `sourceAllowed(source, admin)`). To open Xbox to everyone,
   set it to `false`; nothing else needs to change. It is enforced in three
@@ -391,8 +399,13 @@ achievements) were applied 2026-10-15. Plan and measured findings:
 - **Backdrop:** a game page's wide picture is IGDB's (`heroUrl` in
   `/api/xbox/details`), fetched when the page opens; lists keep Xbox's own tile.
   Do not enrich the whole library from IGDB at load (135 searches).
-- **Unverified:** what a private profile returns (`403 → private` is a guess) and an
-  unknown gamertag.
+- **Measured 2026-10-16:** an unknown gamertag answers HTTP 200 with `code: 404` in
+  the body (→ `not-found`). A library the viewer cannot read answers like a
+  nonexistent xuid, `titles: []` with **no `achievementSummary`**, while a public
+  account with no games has the summary: that is how `xboxLibraryData` tells
+  `private` from empty. A public non-friend's library and achievements read fine
+  (one was 1000 titles, 1 MB), so play time is only asked for the 300 most recently
+  played games.
 - `/privacy` says what Xbox keeps and who receives it (gamertag, XUID, OpenXBL, Microsoft)
   in all 9 languages; the landing text, site title and meta description still say
   "RetroAchievements, Steam and PlayStation" on purpose: change them when Xbox opens to everyone.
@@ -442,6 +455,20 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   the message). `psnFailure()` maps them to 503 / 403 (private) / 429 (rate
   limited, with `Retry-After: 60`) / 502. The client reads a 429 as a plain
   failure with a retry button.
+
+## How each platform fails — keep these distinct (audited 2026-10-16)
+
+A person must be able to tell "nothing here" from "I cannot read it" from "try later".
+
+| | Unknown account | Private / unreadable | Credential refused | Busy |
+|---|---|---|---|---|
+| **RA** | RA says 401 for a bad key, for any username | n/a (profiles are public) | `raUnavailable()` → `403 ra-key-invalid`, not retried; `RaKeyInvalidNotice` | 429 waits `Retry-After`, then 503 (retried) |
+| **Steam** | link: `not-found`; ids that do not exist answer 400 | link: `403 private`; **after linking**, `{ response: {} }` → `ownedGames` answers `403 private` (not an empty library) and the list page says so | key is the app's | 503 |
+| **PSN** | link: not found | `psnFailure` → 403 | NPSSO expiry, admin panel | 429 + `Retry-After: 60` |
+| **Xbox** | `code: 404` in the body → `not-found` | no titles and no `achievementSummary` → `private` | app key: `503 unauthorized` | 429 |
+
+An error that asking again will not fix must be a 4xx: the client retries 5xx
+(`fetchWithRetry`, then `scheduleRetry`) and never a 4xx.
 
 ## Consoles to show — a preference per platform
 

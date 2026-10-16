@@ -93,6 +93,7 @@ import { useRaLinked } from '@/hooks/useRaLinked'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import { fireEvent } from '@testing-library/react'
+import { en } from '@/translations/en'
 
 /** The page opens on its shelves; most of these tests are about the cards, so go there first. */
 function renderCards() {
@@ -137,6 +138,20 @@ test('renders error message on fetch error', () => {
   ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: 'Network error' })
   renderCards()
   expect(screen.getByText('Network error')).toBeInTheDocument()
+})
+
+test('a Steam profile that turned private says so, and any other Steam failure is the generic one', () => {
+  ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: mockGames, loading: false, error: null })
+  ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true })
+  ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [], error: 'private' })
+  const { unmount } = render(<CategoryPage />)
+  expect(screen.getByText(new RegExp(en.steamLink.errors.private.slice(0, 20)))).toBeInTheDocument()
+  unmount()
+  ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [], error: 'Steam request failed (503)' })
+  render(<CategoryPage />)
+  expect(screen.getByText(new RegExp(en.steam.gamesError))).toBeInTheDocument()
+  ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false })
+  ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [] })
 })
 
 test('passes a default lastPlayed sort state for playing/completed categories', () => {

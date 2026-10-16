@@ -9,6 +9,7 @@ import MainPageProfile from './main-page-profile/MainPageProfile'
 import ConnectAccounts from '@/components/connect-accounts/ConnectAccounts'
 import MainPageWithoutRa from './main-page-without-ra/MainPageWithoutRa'
 import MainPageCharts from './main-page-charts/MainPageCharts'
+import RaKeyInvalidNotice from '@/components/ra-key-invalid-notice/RaKeyInvalidNotice'
 import RARecentlyPlayed from '@/components/ra-recently-played/RARecentlyPlayed'
 import { useMainView } from '@/context/MainViewContext'
 import { useSubject } from '@/context/SubjectContext'
@@ -40,6 +41,7 @@ export default function MainPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
     >
+      <RaKeyInvalidNotice />
       <MainPageBody />
     </motion.main>
   )

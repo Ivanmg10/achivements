@@ -20,12 +20,14 @@ type CtxType = {
   inProgress: RetroAchievementsGameCompleted[]
   isLoading: boolean
   error: boolean
+  /** RetroAchievements does not accept the saved API key (revoked or regenerated): linking again is the fix, not waiting. */
+  keyInvalid: boolean
   refetch: () => void
 }
 
 const Ctx = createContext<CtxType>({
   all: [], consoles: [], softcore: [], hardcore: [], inProgress: [],
-  isLoading: true, error: false, refetch: () => {},
+  isLoading: true, error: false, keyInvalid: false, refetch: () => {},
 })
 
 const RA_SYSTEM_CONSOLE_IDS = new Set([100, 101])
@@ -41,6 +43,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   const [loaded, setAll] = useState<RetroAchievementsGameCompleted[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [keyInvalid, setKeyInvalid] = useState(false)
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -50,6 +53,8 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     const run = () => {
       if (status !== 'authenticated' || !rausername) return
       const onFail = (err?: unknown) => {
+        // The routes answer 403 only for a key RA refuses (see raUnavailable).
+        if ((err as { status?: number } | undefined)?.status === 403) setKeyInvalid(true)
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
       fetchWithRetry(withSubject('/api/getGamesCompleted', subject))
@@ -80,6 +85,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     } else {
       setIsLoading(true)
       setError(false)
+      setKeyInvalid(false)
     }
   })
 
@@ -103,6 +109,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     setAll([])
     setIsLoading(true)
     setError(false)
+    setKeyInvalid(false)
     doFetch()
   }, [doFetch])
 
@@ -120,7 +127,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <Ctx.Provider value={{ all, consoles, softcore, hardcore, inProgress, isLoading, error, refetch }}>
+    <Ctx.Provider value={{ all, consoles, softcore, hardcore, inProgress, isLoading, error, keyInvalid, refetch }}>
       {children}
     </Ctx.Provider>
   )

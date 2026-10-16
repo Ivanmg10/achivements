@@ -47,8 +47,16 @@ test('sorts the library by playtime, most played first', async () => {
   expect(data(await GET()).map((g) => g.title)).toEqual(['Most', 'Middle', 'Little'])
 })
 
-test('returns an empty list for a private profile', async () => {
+test('a private profile (an empty answer) is a 403 private, not an empty library', async () => {
   ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: {} })
+  const res = await GET()
+  expect(res.status).toBe(403)
+  expect((res as unknown as { data: unknown }).data).toEqual({ error: 'private' })
+  expect(console.error).not.toHaveBeenCalled()
+})
+
+test('a public account with no games is an empty library', async () => {
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { game_count: 0 } })
   expect(data(await GET())).toEqual([])
 })
 

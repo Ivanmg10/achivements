@@ -230,7 +230,7 @@ export default function CategoryPage() {
               </div>
               {(error || steamError || psnError || xboxError) && (
                 <p role="alert" className="text-sm text-red-400">
-                  {[error, steamError && T.steam.gamesError, psnError && T.psn.gamesError, xboxError && T.xbox.gamesError].filter(Boolean).join(' · ')}
+                  {[error, steamError && (steamError === 'private' ? T.steamLink.errors.private : T.steam.gamesError), psnError && T.psn.gamesError, xboxError && T.xbox.gamesError].filter(Boolean).join(' · ')}
                 </p>
               )}
               {explorerEntries.length === 0 ? (
@@ -272,7 +272,7 @@ export default function CategoryPage() {
               {quickRow}
               {(error || steamError || psnError || xboxError) && (
                 <p role="alert" className="text-sm text-red-400">
-                  {[error, steamError && T.steam.gamesError, psnError && T.psn.gamesError, xboxError && T.xbox.gamesError].filter(Boolean).join(' · ')}
+                  {[error, steamError && (steamError === 'private' ? T.steamLink.errors.private : T.steam.gamesError), psnError && T.psn.gamesError, xboxError && T.xbox.gamesError].filter(Boolean).join(' · ')}
                 </p>
               )}
               <LibraryAllList entries={mixedList} category={cat} gridCols={gridCols} />

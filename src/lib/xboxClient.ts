@@ -165,6 +165,12 @@ export async function findXboxAccount(gamertag: string): Promise<XboxProfile | n
 
 /** OpenXBL took 135 titles in one stats call; a bigger library is split so no call is ever refused for its size. */
 const STATS_CHUNK = 150
+/**
+ * Play time is asked for the most recently played games only: a library can hold
+ * 1000 titles (a public one was measured at that), which would be 7 calls of the
+ * hour's 150 for hours nobody looks at. Older games just show none.
+ */
+const MAX_STATS_TITLES = 300
 
 /**
  * Minutes played per game (by its own title id), in one stats call per 150
@@ -173,7 +179,10 @@ const STATS_CHUNK = 150
  */
 async function xboxPlaytimes(xuid: string, titles: RawTitle[]): Promise<Map<string, number>> {
   const owners = new Map<string, string[]>()
-  for (const t of titles) {
+  const recent = [...titles]
+    .sort((a, b) => (b.titleHistory?.lastTimePlayed ?? '').localeCompare(a.titleHistory?.lastTimePlayed ?? ''))
+    .slice(0, MAX_STATS_TITLES)
+  for (const t of recent) {
     const statsId = xboxStatsTitleId(t)
     if (statsId) owners.set(statsId, [...(owners.get(statsId) ?? []), String(t.titleId)])
   }
@@ -209,6 +218,9 @@ export async function xboxLibraryData(xuid: string, userId: string | null = null
     async () => {
       const res = await xboxCall<{ titles?: RawTitle[]; achievementSummary?: { totalAchievementsUnlocked?: number } }>(`titles/${xuid}`)
       const titles = res?.titles ?? []
+      // Measured 2026-10-16: a library the viewer cannot read answers like an account that does not exist,
+      // `titles: []` with no `achievementSummary`; a public account with no games still has the summary.
+      if (titles.length === 0 && !res?.achievementSummary) throw new XboxError('private', `The library of ${xuid} is not readable`)
       const minutes = await xboxPlaytimes(xuid, titles)
       const games: XboxGameProgress[] = []
       for (const t of titles) {

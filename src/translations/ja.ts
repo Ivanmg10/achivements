@@ -289,6 +289,8 @@ export const ja: Translations = {
     hiddenGames: '非表示のゲーム',
     hiddenCount: '{n} 件',
     hiddenNone: 'なし',
+    raKeyInvalid: 'RetroAchievements があなたのAPIキーを受け付けなくなりました（無効化または再生成された可能性があります）。アカウントを再接続するとデータが戻ります。',
+    raKeyInvalidAction: 'アカウントへ',
     hiddenEmpty: '非表示のゲームはありません。リストのゲームの目のアイコンで非表示にできます。',
     showGame: '{title} を再表示',
     close: '閉じる',

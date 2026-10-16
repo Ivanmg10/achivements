@@ -289,6 +289,8 @@ export const ru: Translations = {
     hiddenGames: 'Скрытые игры',
     hiddenCount: 'Скрыто: {n}',
     hiddenNone: 'Нет',
+    raKeyInvalid: 'RetroAchievements больше не принимает ваш API-ключ — возможно, он был отозван или создан заново. Подключите аккаунт снова, чтобы вернуть данные.',
+    raKeyInvalidAction: 'Перейти к аккаунту',
     hiddenEmpty: 'Вы не скрыли ни одной игры. Нажмите на глаз у игры в списке, чтобы скрыть её.',
     showGame: 'Снова показать {title}',
     close: 'Закрыть',

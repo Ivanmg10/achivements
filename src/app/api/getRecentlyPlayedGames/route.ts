@@ -1,3 +1,4 @@
+import { raUnavailable } from '@/lib/raFailure'
 import { NextResponse } from 'next/server'
 import { dataOwner } from '@/lib/apiAuth'
 import { withCache } from '@/lib/raCache'
@@ -25,7 +26,7 @@ export async function GET(req?: Request) {
       (d) => Array.isArray(d),
     )
     return cachedJson(data, TTL)
-  } catch {
-    return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
+  } catch (err) {
+    return raUnavailable(err)
   }
 }

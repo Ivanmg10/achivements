@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { raUnavailable } from '@/lib/raFailure'
 import { withCache } from '@/lib/raCache'
 import { cachedJson } from '@/lib/httpCache'
 import { requireRaSession } from '@/lib/apiAuth'
@@ -72,6 +72,6 @@ export async function GET(req?: Request) {
     // Rather than draw a hole: the buckets that did load stay cached, so the
     // client's retry only costs the one that failed.
     console.error('[getActivityHeatmapYear]', err)
-    return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
+    return raUnavailable(err)
   }
 }
