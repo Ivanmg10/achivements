@@ -407,6 +407,7 @@ export const es: Translations = {
     close: 'Cerrar',
     saved: 'Cambios guardados',
     saveFailed: 'No se pudieron guardar los cambios',
+    prefsSyncFailed: 'No se pudieron guardar tus preferencias en tu cuenta. Se quedan en este dispositivo.',
     pinsUpdated: 'Juegos fijados actualizados',
     pinsFailed: 'No se pudieron actualizar tus juegos fijados',
     orderFailed: 'No se pudo guardar el nuevo orden',
@@ -478,6 +479,7 @@ export const es: Translations = {
         body: [
           'Tu cuenta: un nombre de usuario, un hash de tu contraseña (nunca la contraseña en sí) y tu correo, que solo se usa para recuperar la cuenta y confirmar que es tuya.',
           'Lo que decides añadir: un avatar (un enlace, o una imagen que subes y que guardamos hasta que la cambies o borres tu cuenta), tu país, juegos y logros favoritos y fijados, y tus grupos.',
+          'Preferencias de visualización: qué consolas se muestran, cómo se organiza tu biblioteca y algunos interruptores, guardados en tu cuenta para que te sigan entre dispositivos. Solo tú los ves.',
           'Tu perfil público, mientras lo sea, muestra a los usuarios con sesión tu nombre de usuario, avatar, país y descripción, las plataformas que vinculaste y sus nombres, tus juegos favoritos, tema, grupos públicos y logros fijados, y tu progreso y actividad, y les deja compararlos con los suyos. Tu género solo aparece si eliges mostrarlo. Nunca tu correo ni tus claves. Puedes hacer el perfil privado cuando quieras.',
           'A quién sigues: lo guardamos para que los encuentres de nuevo. Esa lista solo la ves tú; a nadie se le muestra quién le sigue.',
           'Cuentas vinculadas: tu usuario y clave Web API de RetroAchievements, y tu Steam ID y nombre visible, para poder consultar tu progreso, también cuando alguien abre tu perfil público. La clave nunca sale de nuestro servidor. Vincular Steam solo comprueba que el perfil existe y es público; no demuestra que la cuenta sea tuya.',

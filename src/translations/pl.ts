@@ -407,6 +407,7 @@ export const pl: Translations = {
     close: 'Zamknij',
     saved: 'Zmiany zapisane',
     saveFailed: 'Nie udało się zapisać zmian',
+    prefsSyncFailed: 'Nie udało się zapisać twoich ustawień na koncie. Zostają na tym urządzeniu.',
     pinsUpdated: 'Przypięte gry zaktualizowane',
     pinsFailed: 'Nie udało się zaktualizować przypiętych gier',
     orderFailed: 'Nie udało się zapisać nowej kolejności',
@@ -478,6 +479,7 @@ export const pl: Translations = {
         body: [
           'Twoje konto: nazwę użytkownika, hash hasła (nigdy samo hasło) i adres e-mail, używany wyłącznie do odzyskania konta i potwierdzenia, że należy do Ciebie.',
           'To, co sam dodajesz: awatar (link albo przesłany obraz, który przechowujemy, dopóki go nie zmienisz lub nie usuniesz konta), kraj, ulubione i przypięte gry oraz osiągnięcia, a także Twoje grupy.',
+          'Ustawienia wyświetlania: które konsole są widoczne, jak ułożona jest twoja biblioteka i kilka przełączników, zapisane na koncie, by podążały za tobą między urządzeniami. Widzisz je tylko ty.',
           'Twój profil publiczny, dopóki jest publiczny, pokazuje zalogowanym użytkownikom twoją nazwę użytkownika, awatar, kraj i opis, połączone platformy i ich nazwy, ulubione gry, motyw, publiczne grupy i przypięte osiągnięcia oraz twoje postępy i aktywność, i pozwala porównać je z ich własnymi. Płeć pojawia się tylko, jeśli zdecydujesz się ją pokazać. Nigdy twój e-mail ani klucze. Możesz w każdej chwili ustawić profil jako prywatny.',
           'Kogo obserwujesz: zapisujemy, abyś mógł ich znowu znaleźć. Tę listę widzisz tylko ty; nikomu nie pokazujemy, kto go obserwuje.',
           'Połączone konta: nazwę użytkownika i klucz Web API RetroAchievements oraz Steam ID i nazwę wyświetlaną, aby pobierać Twoje postępy, także gdy ktoś otwiera Twój publiczny profil. Klucz nigdy nie opuszcza naszego serwera. Łączenie Steam sprawdza tylko, czy profil istnieje i jest publiczny — nie dowodzi, że konto należy do ciebie.',

@@ -456,6 +456,24 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   limited, with `Retry-After: 60`) / 502. The client reads a 429 as a plain
   failure with a retry button.
 
+## Preferences that follow the account
+
+The display preferences (which consoles show, library layout/view/columns/sort,
+and the PSN/Xbox switches) are kept in the browser (`useStorageValue`) **and**
+mirrored in `users.preferences` (`migrations/036_user_preferences.sql`, a jsonb of
+short strings), so they follow the person between devices.
+
+- **The list of keys is fixed in code** (`src/utils/syncedPreferences.ts`,
+  `isSyncedKey`); `/api/preferences` refuses anything else whole. A device-bound
+  value (language, cookie choice, the last tab, folded sections) stays in the
+  browser. **To sync a new preference, add its key there**; nothing else.
+- `usePreferencesSync` (mounted by `MainProviders`): on sign-in the account's values
+  are applied to the browser (the account wins) and what only the browser has goes up
+  once; then each change is sent after 800 ms. Changes made by the sync itself are not
+  sent back (`applyStoredValue`). A failed save toasts; a failed read only logs.
+- Not mounted on someone else's page, and never exposed on public profiles
+  (`publicUser` selects explicit columns: keep it that way).
+
 ## How each platform fails — keep these distinct (audited 2026-10-16)
 
 A person must be able to tell "nothing here" from "I cannot read it" from "try later".
@@ -480,8 +498,8 @@ the consoles in the user's library with a tick each (`UserConsolesPreference`;
 Steam has none). Unticked consoles leave the lists, collection and stats, and
 nothing is deleted.
 
-- Stored **in the browser** (`useHiddenConsoles`, key `hidden-consoles:<source>`),
-  as the *unticked* names, so a console that appears later starts shown.
+- Stored under `hidden-consoles:<source>` (`useHiddenConsoles`; in the browser and,
+  see "Preferences that follow the account", on the account), as the *unticked* names, so a console that appears later starts shown.
 - Applied **in the data contexts** (`GamesDataContext`, `PsnGamesDataContext`,
   `XboxGamesDataContext`): `library`/`all` is filtered, `fullLibrary` (PSN, Xbox)
   and `consoles` (the options) are not. **Anything that looks a game up by id**

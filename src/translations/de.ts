@@ -407,6 +407,7 @@ export const de: Translations = {
     close: 'Schließen',
     saved: 'Änderungen gespeichert',
     saveFailed: 'Änderungen konnten nicht gespeichert werden',
+    prefsSyncFailed: 'Deine Einstellungen konnten nicht in deinem Konto gespeichert werden. Sie bleiben auf diesem Gerät.',
     pinsUpdated: 'Angeheftete Spiele aktualisiert',
     pinsFailed: 'Deine angehefteten Spiele konnten nicht aktualisiert werden',
     orderFailed: 'Die neue Reihenfolge konnte nicht gespeichert werden',
@@ -478,6 +479,7 @@ export const de: Translations = {
         body: [
           'Dein Konto: ein Benutzername, ein Hash deines Passworts (nie das Passwort selbst) und deine E-Mail-Adresse, die nur zur Wiederherstellung des Kontos und zur Bestätigung, dass es dir gehört, genutzt wird.',
           'Was du selbst hinzufügst: einen Avatar (einen Link oder ein hochgeladenes Bild, das wir speichern, bis du es ersetzt oder dein Konto löschst), dein Land, Lieblings- und angeheftete Spiele und Erfolge sowie deine Gruppen.',
+          'Anzeigeeinstellungen: welche Konsolen angezeigt werden, wie deine Bibliothek aufgebaut ist und ein paar Schalter, in deinem Konto gespeichert, damit sie dir auf allen Geräten folgen. Nur du siehst sie.',
           'Dein öffentliches Profil zeigt angemeldeten Nutzern, solange es öffentlich ist, deinen Benutzernamen, Avatar, dein Land und deine Beschreibung, die verknüpften Plattformen und ihre Namen, deine Lieblingsspiele, dein Design, öffentliche Gruppen und angeheftete Erfolge sowie deinen Fortschritt und deine Aktivität, und lässt sie diese mit ihren eigenen vergleichen. Dein Geschlecht erscheint nur, wenn du es anzeigen lässt. Nie deine E-Mail oder deine Schlüssel. Du kannst das Profil jederzeit privat machen.',
           'Wem du folgst: gespeichert, damit du sie wiederfindest. Nur du siehst diese Liste; niemandem wird gezeigt, wer ihm folgt.',
           'Verknüpfte Konten: dein RetroAchievements-Benutzername und Web-API-Schlüssel sowie deine Steam-ID und dein Anzeigename, um deinen Fortschritt abzurufen, auch wenn jemand dein öffentliches Profil öffnet. Der Schlüssel verlässt nie unseren Server. Beim Verknüpfen von Steam wird nur geprüft, dass das Profil existiert und öffentlich ist – es beweist nicht, dass das Konto dir gehört.',

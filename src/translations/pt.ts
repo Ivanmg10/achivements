@@ -407,6 +407,7 @@ export const pt: Translations = {
     close: 'Fechar',
     saved: 'Alterações guardadas',
     saveFailed: 'Não foi possível guardar as alterações',
+    prefsSyncFailed: 'Não foi possível guardar as suas preferências na conta. Ficam neste dispositivo.',
     pinsUpdated: 'Jogos fixados atualizados',
     pinsFailed: 'Não foi possível atualizar os seus jogos fixados',
     orderFailed: 'Não foi possível guardar a nova ordem',
@@ -478,6 +479,7 @@ export const pt: Translations = {
         body: [
           'A sua conta: um nome de utilizador, um hash da sua palavra-passe (nunca a palavra-passe em si) e o seu email, usado apenas para recuperar a conta e confirmar que é sua.',
           'O que decide adicionar: um avatar (um link, ou uma imagem que carrega e que guardamos até a substituir ou eliminar a conta), o seu país, jogos e conquistas favoritos e fixados, e os seus grupos.',
+          'Preferências de visualização: que consoles aparecem, como a sua biblioteca está organizada e alguns interruptores, guardados na sua conta para o acompanharem entre dispositivos. Só você as vê.',
           'O teu perfil público, enquanto o for, mostra aos utilizadores com sessão iniciada o teu nome de utilizador, avatar, país e descrição, as plataformas que ligaste e os seus nomes, os teus jogos favoritos, tema, grupos públicos e conquistas afixadas, e o teu progresso e atividade, e permite-lhes compará-los com os seus. O teu género só aparece se escolheres mostrá-lo. Nunca o teu email nem as tuas chaves. Podes tornar o perfil privado a qualquer momento.',
           'Quem segues: guardado para que os voltes a encontrar. Só tu vês essa lista; a ninguém é mostrado quem o segue.',
           'Contas ligadas: o seu utilizador e chave Web API do RetroAchievements, e o seu Steam ID e nome visível, para obter o seu progresso, também quando alguém abre o seu perfil público. A chave nunca sai do nosso servidor. Ligar a Steam apenas verifica que o perfil existe e é público; não prova que a conta é sua.',

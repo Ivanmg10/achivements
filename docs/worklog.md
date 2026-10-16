@@ -25,6 +25,30 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-16 — Platform failures audited, play time, feeds, preferences on the account (`feat/xbox-integration`)
+
+**Did** — (1) Audited how each platform reports "unknown / private / key refused /
+busy" and wrote the table in `CLAUDE.md` ("How each platform fails"). Fixed what
+was wrong: RA's refused key was a retried 503 (now `403 ra-key-invalid` + a notice),
+a Steam profile made private after linking showed as empty (now `403 private`),
+Xbox private libraries are detected (measured: `titles: []` and no
+`achievementSummary`). (2) Total play time on the Xbox cards and across Steam/PSN/Xbox
+in the collection numbers. (3) The consoles unticked in preferences now also leave
+the feeds, the streak, the heatmap and the charts (`useConsoleVisibility`).
+(4) Preferences follow the account: `migrations/036_user_preferences.sql`,
+`/api/preferences`, `usePreferencesSync`, a fixed list of keys. Privacy text updated.
+**Why** — The user asked for all of the above, and not to open Xbox to everyone yet
+(OpenXBL's free plan, 150 calls an hour, would not hold it; recorded in `CLAUDE.md`).
+**Decisions** — Xbox stays admin-only until the user decides to pay for a plan.
+Preferences stay in the browser too (instant, works signed out) and mirror to the
+account; the account wins on sign-in.
+**Open** — `migrations/036` must run before this is deployed: without the column
+`/api/preferences` answers 500 and every preference change toasts an error.
+`develop` shares the production database, so it was run only with the user's OK.
+**Watch out** — A new feed of unlocks must filter through `useConsoleVisibility`.
+
+---
+
 ## 2026-10-16 — Library layout remembered; tooltips that fit; concealed tiles (`feat/xbox-integration`)
 
 **Did** — (1) The library's Shelves / List / Cards choice is now saved in the

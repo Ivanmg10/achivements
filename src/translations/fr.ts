@@ -407,6 +407,7 @@ export const fr: Translations = {
     close: 'Fermer',
     saved: 'Modifications enregistrées',
     saveFailed: 'Impossible d’enregistrer les modifications',
+    prefsSyncFailed: 'Impossible d’enregistrer tes préférences sur ton compte. Elles restent sur cet appareil.',
     pinsUpdated: 'Jeux épinglés mis à jour',
     pinsFailed: 'Impossible de mettre à jour vos jeux épinglés',
     orderFailed: 'Impossible d’enregistrer le nouvel ordre',
@@ -478,6 +479,7 @@ export const fr: Translations = {
         body: [
           'Votre compte : un nom d’utilisateur, un hash de votre mot de passe (jamais le mot de passe lui-même) et votre adresse e-mail, utilisée uniquement pour récupérer le compte et confirmer qu’il vous appartient.',
           'Ce que vous choisissez d’ajouter : un avatar (un lien, ou une image que vous importez et que nous conservons jusqu’à ce que vous la remplaciez ou supprimiez votre compte), votre pays, vos jeux et succès favoris et épinglés, et vos groupes.',
+          'Préférences d’affichage : quelles consoles s’affichent, comment ta bibliothèque est présentée et quelques réglages, enregistrés sur ton compte pour te suivre d’un appareil à l’autre. Toi seul(e) les vois.',
           'Ton profil public, tant qu’il l’est, montre aux utilisateurs connectés ton nom d’utilisateur, ton avatar, ton pays et ta description, les plateformes liées et leurs noms, tes jeux favoris, ton thème, tes groupes publics et succès épinglés, ainsi que ta progression et ton activité, et leur permet de les comparer aux leurs. Ton genre n’apparaît que si tu choisis de l’afficher. Jamais ton e-mail ni tes clés. Tu peux rendre le profil privé à tout moment.',
           'Qui tu suis : conservé pour que tu les retrouves. Toi seul vois cette liste ; personne ne voit qui le suit.',
           'Comptes liés : votre nom d’utilisateur et votre clé Web API RetroAchievements, ainsi que votre Steam ID et votre nom affiché, pour récupérer votre progression, y compris lorsque quelqu’un ouvre votre profil public. La clé ne quitte jamais notre serveur. Lier Steam vérifie seulement que le profil existe et est public ; cela ne prouve pas que le compte est le vôtre.',

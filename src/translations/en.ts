@@ -408,6 +408,7 @@ export const en = {
     close: 'Close',
     saved: 'Changes saved',
     saveFailed: 'Could not save the changes',
+    prefsSyncFailed: 'Could not save your preferences to your account. They stay on this device.',
     pinsUpdated: 'Pinned games updated',
     pinsFailed: 'Could not update your pinned games',
     orderFailed: 'Could not save the new order',
@@ -479,6 +480,7 @@ export const en = {
         body: [
           'Your account: a username, a hash of your password (never the password itself) and your email address, which is used only to recover the account and to confirm it is yours.',
           'What you choose to add: an avatar (a link, or a picture you upload, which we store until you replace it or delete your account), your country, favourite and pinned games and achievements, and your groups.',
+          'Display preferences: which consoles show, how your library is laid out and a few switches, saved on your account so they follow you between devices. Only you see them.',
           'Your public profile, while it is public, shows signed-in users your username, avatar, country and description, the platforms you linked and their names, your favourite games, theme, public groups and pinned achievements, and your progress and activity, and lets them compare it with their own. Your gender appears only if you choose to show it. Never your email or your keys. You can make the profile private at any time.',
           'Who you follow: kept so you can find them again. Only you see that list; nobody is shown who follows them.',
           'Linked accounts: your RetroAchievements username and Web API key, and your Steam ID and display name, so your progress can be fetched, including when someone opens your public profile. The API key never leaves our server. Linking Steam only checks that the profile exists and is public — it does not prove the account is yours.',

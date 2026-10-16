@@ -407,6 +407,7 @@ export const it: Translations = {
     close: 'Chiudi',
     saved: 'Modifiche salvate',
     saveFailed: 'Impossibile salvare le modifiche',
+    prefsSyncFailed: 'Non è stato possibile salvare le tue preferenze sul tuo account. Restano su questo dispositivo.',
     pinsUpdated: 'Giochi fissati aggiornati',
     pinsFailed: 'Impossibile aggiornare i tuoi giochi fissati',
     orderFailed: 'Impossibile salvare il nuovo ordine',
@@ -478,6 +479,7 @@ export const it: Translations = {
         body: [
           'Il tuo account: un nome utente, un hash della password (mai la password stessa) e il tuo indirizzo email, usato solo per recuperare l’account e confermare che è tuo.',
           'Ciò che scegli di aggiungere: un avatar (un link, o un’immagine che carichi e che conserviamo finché non la sostituisci o elimini l’account), il tuo paese, giochi e obiettivi preferiti e fissati, e i tuoi gruppi.',
+          'Preferenze di visualizzazione: quali console mostrare, come è organizzata la tua libreria e qualche interruttore, salvate sul tuo account per seguirti da un dispositivo all’altro. Le vedi solo tu.',
           'Il tuo profilo pubblico, finché lo è, mostra agli utenti connessi il tuo nome utente, avatar, paese e descrizione, le piattaforme collegate e i loro nomi, i giochi preferiti, il tema, i gruppi pubblici e gli obiettivi fissati, oltre ai tuoi progressi e alla tua attività, e permette loro di confrontarli con i propri. Il genere appare solo se scegli di mostrarlo. Mai la tua email né le tue chiavi. Puoi rendere privato il profilo in qualsiasi momento.',
           'Chi segui: conservato perché tu possa ritrovarli. Solo tu vedi quella lista; a nessuno viene mostrato chi lo segue.',
           'Account collegati: nome utente e chiave Web API di RetroAchievements, e il tuo Steam ID e nome visualizzato, per recuperare i tuoi progressi, anche quando qualcuno apre il tuo profilo pubblico. La chiave non lascia mai il nostro server. Collegare Steam verifica solo che il profilo esista e sia pubblico: non dimostra che l’account sia tuo.',

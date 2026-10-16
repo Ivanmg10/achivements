@@ -12,10 +12,12 @@ import { HiddenGamesProvider } from '@/context/HiddenGamesContext'
 import { SteamGamesDataProvider } from '@/context/SteamGamesDataContext'
 import { PsnGamesDataProvider } from '@/context/PsnGamesDataContext'
 import { XboxGamesDataProvider } from '@/context/XboxGamesDataContext'
+import PreferencesSync from '@/components/preferences-sync/PreferencesSync'
 
 export function MainProviders({ children }: { children: React.ReactNode }) {
   return (
     <MainViewProvider>
+      <PreferencesSync />
       <BackInterceptProvider>
       <RecentAchievementsProvider>
         <RecentlyPlayedGamesProvider>
