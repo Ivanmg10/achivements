@@ -2,12 +2,16 @@
 
 import { useId, useMemo, useState } from 'react'
 import { AnimatePresence, useReducedMotion } from 'framer-motion'
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import dynamic from 'next/dynamic'
 import { RecentAchievement } from '@/types/types'
 import { groupByDaySource } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
-import AchivementsLineChartTooltip from './achivements-line-chart-tooltip/AchivementsLineChartTooltip'
+
+// recharts is the heaviest thing on the page: it arrives after the page is up, in the room the chart keeps.
+const AchievementsLinePlot = dynamic(() => import('./achievements-line-plot/AchievementsLinePlot'), {
+  loading: () => <div aria-hidden="true" className="h-full animate-pulse rounded-lg bg-ink/5" />,
+})
 
 /**
  * The last seven days of unlocks as a line in the theme's accent, with a soft
@@ -69,53 +73,7 @@ export default function AchievementsLineChart({
         </div>
       ) : (
         <div className="home-fit-chart h-[260px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 8, right: 8, left: -24, bottom: 0 }} onClick={handleChartClick} style={{ cursor: 'pointer' }}>
-            <defs>
-              <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="rgb(var(--accent))" stopOpacity={0.35} />
-                <stop offset="100%" stopColor="rgb(var(--accent))" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false} strokeDasharray="3 4" stroke="rgb(var(--text-secondary) / 0.15)" />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 11 }}
-              tickFormatter={/* istanbul ignore next */ tick}
-            />
-            {/* A flat 0 week still needs a real 0–1 axis, not an empty band. */}
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              width={48}
-              tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 11 }}
-              allowDecimals={false}
-              domain={total === 0 ? [0, 1] : [0, 'auto']}
-            />
-            <Tooltip
-              cursor={{ stroke: 'rgb(var(--text-secondary) / 0.35)', strokeDasharray: '3 3' }}
-              content={<AchivementsLineChartTooltip />}
-            />
-            <Area
-              type="monotone"
-              dataKey="total"
-              stroke="rgb(var(--accent))"
-              strokeWidth={2.5}
-              fill={`url(#${fillId})`}
-              dot={/* istanbul ignore next */ (p: { cx?: number; cy?: number; payload?: { total: number }; index?: number }) =>
-                p.payload && p.payload.total > 0 ? (
-                  <circle key={p.index} cx={p.cx} cy={p.cy} r={4} fill="rgb(var(--accent))" stroke="rgb(var(--bg-card))" strokeWidth={2} />
-                ) : (
-                  <g key={p.index} />
-                )
-              }
-              activeDot={{ r: 6, fill: 'rgb(var(--accent))', stroke: 'rgb(var(--bg-card))', strokeWidth: 2 }}
-              isAnimationActive={!reduce}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        <AchievementsLinePlot data={data} total={total} fillId={fillId} tick={tick} animate={!reduce} onDayClick={handleChartClick} />
         </div>
       )}
 

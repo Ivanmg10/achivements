@@ -14,9 +14,10 @@ const earned = {
   DateEarnedHardcore: recentDate(1),
 } as RetroAchievement
 
-test('renders bar chart when there is earned achievement activity', () => {
+test('renders bar chart when there is earned achievement activity', async () => {
   render(<GameAchievementsProgressChart achievements={[earned]} />)
-  expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
+  // The plot (recharts) is loaded apart, only when there is something to draw.
+  expect(await screen.findByTestId('ResponsiveContainer')).toBeInTheDocument()
 })
 
 test('shows the empty state when nothing was earned in the period', () => {
@@ -37,4 +38,11 @@ test('toggles between weekly and monthly tabs', () => {
   fireEvent.click(monthTab)
   expect(monthTab).toHaveAttribute('aria-selected', 'true')
   expect(weekTab).toHaveAttribute('aria-selected', 'false')
+})
+
+test('draws no plot at all, so loads none, when there is nothing to draw or it is loading', () => {
+  const { rerender } = render(<GameAchievementsProgressChart achievements={[]} />)
+  expect(screen.queryByTestId('ResponsiveContainer')).not.toBeInTheDocument()
+  rerender(<GameAchievementsProgressChart achievements={[earned]} isLoading />)
+  expect(screen.queryByTestId('ResponsiveContainer')).not.toBeInTheDocument()
 })
