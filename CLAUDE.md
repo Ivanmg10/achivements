@@ -461,6 +461,27 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   limited, with `Retry-After: 60`) / 502. The client reads a 429 as a plain
   failure with a retry button.
 
+## Performance rules — keep these true (audited 2026-10-16)
+
+- **recharts is only loaded through the lazy plots** (`AchievementsLinePlot`,
+  `GameAchievementsProgressPlot`, via `next/dynamic`). Never import `recharts` in
+  a component that is part of a page's first render: it is ~390 KB.
+- **A modal is a `next/dynamic` import wrapped in `LazyWhenOpened`**, so it is
+  downloaded the first time it opens and stays mounted after (its exit animation
+  plays). Do not import a modal statically into a page or the header.
+  (A test waits for such a modal with `findBy…`; `__mocks__/next/dynamic.js`.)
+- **Several components asking for the same GET share one request while it is in
+  flight**: `fetchWithRetry` does it for you; for a raw `fetch` of a GET use
+  `fetchShared`. A shared answer is shared by reference: copy before changing it.
+- **Read routes that are expensive upstream send `cachedJson(data, ttl)`**
+  (private, `Vary: Cookie`): the PSN and Xbox reads (5 min per game, 2 min for
+  recent unlocks) as RA's and Steam's already did. Mutable data (groups, pins,
+  preferences) never does.
+- **A context value is memoized** when its provider reads the session (the session
+  updates on every visit and would re-render every consumer).
+- **A route group has an `error.tsx`** (`RouteError`), or its errors replace the
+  whole app (`global-error`).
+
 ## Preferences that follow the account
 
 The display preferences (which consoles show, library layout/view/columns/sort,
@@ -642,7 +663,11 @@ branch to be up to date with its base** before merging, on both.
 - [x] Steam integration
 - [x] Public user profiles
 - [ ] Group hardcore achievement tracking
-- [ ] Push notifications
+- [ ] Notifications — **an idea the user wants to expand before it is built; do not
+      start it, and do not assume it is push or email.** Ask what they have in mind
+      first. Known so far: friends completing games and a game's last chance (a
+      Game Pass title leaving) were floated, nothing decided. Needs a channel,
+      per-user subscriptions and a place to store them (a migration).
 - [x] Steam linked by name, like PSN (2026-10-09): custom URL name, profile
       link or SteamID64 (`src/lib/steamAccount.ts`), no OpenID, and no
       "already linked elsewhere" check (`migrations/028`), so one person can
@@ -659,7 +684,11 @@ branch to be up to date with its base** before merging, on both.
       a code, the user puts it for a few minutes in their RA motto / Steam
       summary / PSN About me, the app reads it. Only if public profiles or
       group comparisons come to need proof of ownership.
-- [ ] 13 optimization fixes (cache stampede, Cache-Control headers, duplicate fetches, TTLs, error boundaries, lazy images)
+- [x] The "13 optimization fixes" (2026-10-16). They were never written down, only
+      named, so they were re-derived by auditing each named area; see "Performance
+      rules" below for what was done and what must stay true. Already fine and left
+      alone: server cache stampede (`withSteamCache`, `withCache`), database indexes,
+      TTLs.
 - [x] The ~51 `react-hooks/set-state-in-effect` warnings are gone (2026-10-09)
       and the rule is now an error. See State and effects above.
 

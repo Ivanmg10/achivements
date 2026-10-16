@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -9,8 +10,11 @@ import { useBackRegistry } from '@/context/BackInterceptContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useStreakData } from '@/hooks/useStreakData'
 import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconMenu } from '@tabler/icons-react'
-import SearchModal from '@/components/search-modal/SearchModal'
-import MobileNavModal from './MobileNavModal'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+
+// Downloaded the first time it is opened, not with the page.
+const SearchModal = dynamic(() => import('@/components/search-modal/SearchModal'))
+const MobileNavModal = dynamic(() => import('./MobileNavModal'))
 import StatusNavDropdown from './status-nav-dropdown/StatusNavDropdown'
 import { plural } from '@/utils/utils'
 
@@ -242,8 +246,12 @@ export default function MainHeader() {
       </header>
       </div>
 
-      <SearchModal isOpen={searchOpen} onClose={closeSearch} initialQuery={initialQuery} />
-      <MobileNavModal isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      <LazyWhenOpened open={searchOpen}>
+        <SearchModal isOpen={searchOpen} onClose={closeSearch} initialQuery={initialQuery} />
+      </LazyWhenOpened>
+      <LazyWhenOpened open={mobileMenuOpen}>
+        <MobileNavModal isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      </LazyWhenOpened>
     </>
   )
 }

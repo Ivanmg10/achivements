@@ -62,7 +62,10 @@ test('renders RA and Steam items with their own cards, even with the same game i
   render(<GroupDetailPage />)
   expect(await screen.findByText('ra-item Zelda')).toBeInTheDocument()
   expect(screen.getByText('steam-item Portal 2')).toBeInTheDocument()
-  expect(screen.getByTestId('add-modal')).toHaveTextContent('ra:620,steam:620')
+  // The add-game modal is downloaded the first time it opens.
+  expect(screen.queryByTestId('add-modal')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: en.groups.addGame }))
+  expect(await screen.findByTestId('add-modal')).toHaveTextContent('ra:620,steam:620')
 })
 
 test('asks the server once for the release years it does not have yet', async () => {

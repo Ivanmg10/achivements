@@ -25,6 +25,31 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-16 — The "13 optimizations" (`feat/xbox-integration`)
+
+**Did** — The roadmap's "13 optimization fixes" were never itemised, only named
+(stampede, Cache-Control, duplicate fetches, TTLs, error boundaries, lazy images),
+so each area was audited and what was real got fixed. Server stampede,
+indexes and TTLs were already fine. Fixed: (1) `fetchWithRetry` shares one request
+per URL in flight (the awards were asked for by 6 components); (2) `fetchShared`
+does the same for the 12 PSN/Steam/Xbox hooks that use `fetch`; (3, 4) recharts
+(~390 KB, in every page that had a chart) loads lazily behind the two plots;
+(5) the account page's 9 modals and the admin panel load when first opened;
+(6) the header's search and mobile menu, the group, pin and password-reset modals
+too (`LazyWhenOpened`); (7) PSN and Xbox reads (6 routes) now send `Cache-Control`
+like RA's and Steam's; (8) 7 context values are memoized; (9) hero images decode
+async at low priority, admin avatars lazy; (10) `(auth)` got an error boundary
+(`RouteError`, shared with `(main)`). Rules in `CLAUDE.md` ("Performance rules").
+**Decisions** — Notifications stay a to-do the user wants to expand before it is
+built (written in the roadmap). No change to the database.
+**Open** — Not measured in a browser (no Lighthouse run): the evidence is that the
+recharts chunk is now only in the `react-loadable-manifest`s, not eagerly loaded.
+A first opening of a lazy modal costs one small download; if that is felt, preload
+it on hover of its button.
+**Watch out** — Tests of anything that opens a lazy modal wait for it (`findBy…`).
+
+---
+
 ## 2026-10-16 — Platform failures audited, play time, feeds, preferences on the account (`feat/xbox-integration`)
 
 **Did** — (1) Audited how each platform reports "unknown / private / key refused /

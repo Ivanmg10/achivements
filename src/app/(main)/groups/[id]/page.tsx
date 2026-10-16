@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -14,8 +15,11 @@ import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useGroupPage } from '@/hooks/useGroupPage'
 import { useGroupFilters } from '@/hooks/useGroupFilters'
 import { filterGroupItems, groupSummary, itemKey, liveProgressMap, raProgressMaps } from '@/utils/groupItems'
-import GroupModal from '@/components/groups/GroupModal'
-import AddGameModal from '@/components/groups/add-game-modal/AddGameModal'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+
+// Downloaded the first time it is opened, not with the page.
+const GroupModal = dynamic(() => import('@/components/groups/GroupModal'))
+const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'))
 import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
 import GroupDetailHeader from '@/components/groups/group-detail-header/GroupDetailHeader'
 import GroupFilters from '@/components/groups/group-filters/GroupFilters'
@@ -133,8 +137,14 @@ export default function GroupDetailPage() {
         )}
       </div>
 
-      <AddGameModal isOpen={addGameOpen} onClose={() => setAddGameOpen(false)} groupId={groupId} existingKeys={existingKeys} onAdded={addItems} />
-      {group && <GroupModal isOpen={editOpen} onClose={() => setEditOpen(false)} group={group} onSave={edit} />}
+      <LazyWhenOpened open={addGameOpen}>
+        <AddGameModal isOpen={addGameOpen} onClose={() => setAddGameOpen(false)} groupId={groupId} existingKeys={existingKeys} onAdded={addItems} />
+      </LazyWhenOpened>
+      {group && (
+        <LazyWhenOpened open={editOpen}>
+          <GroupModal isOpen={editOpen} onClose={() => setEditOpen(false)} group={group} onSave={edit} />
+        </LazyWhenOpened>
+      )}
       <DeleteConfirmDialog isOpen={confirmDelete} onClose={() => setConfirmDelete(false)} onConfirm={handleDelete} />
     </motion.div>
   )
