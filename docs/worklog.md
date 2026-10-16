@@ -42,9 +42,9 @@ the feeds, the streak, the heatmap and the charts (`useConsoleVisibility`).
 **Decisions** — Xbox stays admin-only until the user decides to pay for a plan.
 Preferences stay in the browser too (instant, works signed out) and mirror to the
 account; the account wins on sign-in.
-**Open** — `migrations/036` must run before this is deployed: without the column
+**Open** — `migrations/036` was run on the shared database on 2026-10-16, with the
+user's OK (`develop` shares the production database). Without the column
 `/api/preferences` answers 500 and every preference change toasts an error.
-`develop` shares the production database, so it was run only with the user's OK.
 **Watch out** — A new feed of unlocks must filter through `useConsoleVisibility`.
 
 ---
