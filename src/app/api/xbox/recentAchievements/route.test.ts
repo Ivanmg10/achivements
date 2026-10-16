@@ -61,3 +61,10 @@ test('failures are structured', async () => {
   ;(xboxLatestAchievements as jest.Mock).mockRejectedValueOnce(new Error('boom'))
   expect((await call()).status).toBe(502)
 })
+
+test('the browser may keep the answer for 2 minutes, privately, and a new session cookie asks again', async () => {
+  const res = await GET(new NextRequest('http://localhost/api/xbox/recentAchievements'))
+  expect(res.status).toBe(200)
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=120')
+  expect(res.headers.get('Vary')).toBe('Cookie')
+})

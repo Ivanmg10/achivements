@@ -66,3 +66,10 @@ test('a hidden profile is 403, anything else 502', async () => {
   ;(findXboxGame as jest.Mock).mockRejectedValueOnce(new Error('network'))
   expect((await call('id=1738914043')).status).toBe(502)
 })
+
+test('the browser may keep the answer for 5 minutes, privately, and a new session cookie asks again', async () => {
+  const res = await GET(new NextRequest('http://localhost/api/xbox/achievements?id=1738914043'))
+  expect(res.status).toBe(200)
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=300')
+  expect(res.headers.get('Vary')).toBe('Cookie')
+})

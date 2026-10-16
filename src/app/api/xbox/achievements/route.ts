@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cachedJson } from '@/lib/httpCache'
 import { requireXboxSession } from '@/lib/apiAuth'
 import { findXboxGame, isTitleId, xboxFailure, xboxGameAchievements, xboxLanguage } from '@/lib/xboxClient'
+
+/** How long the browser may keep an answer; the server's own cache is the longer one. Vary: Cookie (see cachedJson) lets the refresh button and a re-link through. */
+const BROWSER_TTL_MS = 5 * 60 * 1000
 
 /**
  * One game's achievements for the signed-in user: ?id=1738914043&lang=es. The
@@ -20,7 +24,7 @@ export async function GET(req: NextRequest) {
   try {
     const game = await findXboxGame(xboxxuid, titleId, userId)
     if (!game) return NextResponse.json({ error: 'not-in-library' }, { status: 404 })
-    return NextResponse.json({ achievements: await xboxGameAchievements(xboxxuid, game, userId, language) })
+    return cachedJson({ achievements: await xboxGameAchievements(xboxxuid, game, userId, language) }, BROWSER_TTL_MS)
   } catch (err) {
     return xboxFailure(err, 'xbox/achievements')
   }

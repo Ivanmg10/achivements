@@ -51,3 +51,9 @@ test('a hidden profile is 403, a rate limit is 429, anything else 502', async ()
   ;(xboxSummary as jest.Mock).mockRejectedValueOnce(new Error('network'))
   expect((await call()).status).toBe(502)
 })
+
+test('the browser may keep it for five minutes, privately, and a new session cookie asks again', async () => {
+  const res = await GET()
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=300')
+  expect(res.headers.get('Vary')).toBe('Cookie')
+})

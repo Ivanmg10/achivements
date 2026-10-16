@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cachedJson } from '@/lib/httpCache'
 import { requireXboxSession } from '@/lib/apiAuth'
 import { xboxFailure, xboxLanguage, xboxLatestAchievements, xboxRecentAchievements } from '@/lib/xboxClient'
+
+/** How long the browser may keep an answer: short, as these change as the person plays. */
+const BROWSER_TTL_MS = 2 * 60 * 1000
 
 /** Days each scope looks back — the same windows as Steam's and PSN's. */
 const DAYS = { activity: 60, year: 366 } as const
@@ -27,7 +31,7 @@ export async function GET(req: NextRequest) {
       scope === 'recent'
         ? await xboxLatestAchievements(xboxxuid, id, language)
         : await xboxRecentAchievements(xboxxuid, scope, DAYS[scope], id, language)
-    return NextResponse.json(achievements)
+    return cachedJson(achievements, BROWSER_TTL_MS)
   } catch (err) {
     return xboxFailure(err, 'xbox/recentAchievements')
   }
