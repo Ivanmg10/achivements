@@ -98,7 +98,11 @@ export function HiddenGamesProvider({ children }: { children: React.ReactNode })
     [hidden, T],
   )
 
-  return <Ctx.Provider value={{ hidden, isLoading, isHidden, hideGame, showGame }}>{children}</Ctx.Provider>
+  // One object per change of what it holds, so a re-render of the provider (the session updating)
+  // does not re-render everything that reads it.
+  const value = useMemo(() => ({ hidden, isLoading, isHidden, hideGame, showGame }), [hidden, isLoading, isHidden, hideGame, showGame])
+
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 
 export const useHiddenGames = () => useContext(Ctx)

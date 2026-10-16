@@ -126,8 +126,12 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     [all]
   )
 
+  // One object per change of what it holds, so a re-render of the provider (the session updating)
+  // does not re-render everything that reads it.
+  const value = useMemo(() => ({ all, consoles, softcore, hardcore, inProgress, isLoading, error, keyInvalid, refetch }), [all, consoles, softcore, hardcore, inProgress, isLoading, error, keyInvalid, refetch])
+
   return (
-    <Ctx.Provider value={{ all, consoles, softcore, hardcore, inProgress, isLoading, error, keyInvalid, refetch }}>
+    <Ctx.Provider value={value}>
       {children}
     </Ctx.Provider>
   )

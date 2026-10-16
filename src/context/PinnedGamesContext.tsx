@@ -118,8 +118,12 @@ export function PinnedGamesProvider({ children }: { children: React.ReactNode })
     if (!res.ok) throw new Error('Error saving order')
   }, [])
 
+  // One object per change of what it holds, so a re-render of the provider (the session updating)
+  // does not re-render everything that reads it.
+  const value = useMemo(() => ({ pins, isLoading, isPinned, pinGame, unpinGame, reorder }), [pins, isLoading, isPinned, pinGame, unpinGame, reorder])
+
   return (
-    <Ctx.Provider value={{ pins, isLoading, isPinned, pinGame, unpinGame, reorder }}>
+    <Ctx.Provider value={value}>
       {children}
     </Ctx.Provider>
   )

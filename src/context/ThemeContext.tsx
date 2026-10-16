@@ -7,6 +7,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useMemo,
   ReactNode,
 } from "react";
 
@@ -48,8 +49,11 @@ export function ThemeProvider({
     }
   }, [theme, status]);
 
+  // One object per change of theme: the session updating re-renders this provider, and everything that reads the theme with it.
+  const value = useMemo(() => ({ theme, setTheme }), [theme]);
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

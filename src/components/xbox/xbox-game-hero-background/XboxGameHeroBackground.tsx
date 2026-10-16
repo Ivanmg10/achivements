@@ -16,6 +16,8 @@ export default function XboxGameHeroBackground({ src }: { src: string }) {
       <img
         src={src}
         alt=""
+        decoding="async"
+        fetchPriority="low"
         onError={(e) => e.currentTarget.remove()}
         onLoad={(e) => e.currentTarget.classList.replace('opacity-0', 'opacity-50')}
         className="w-full h-full object-cover object-center opacity-0 scale-125 transition-opacity duration-700"

@@ -40,8 +40,12 @@ export function MainPlatformProvider({ children }: { children: React.ReactNode }
     [raLinked, steamLinked, psnLinked, xboxLinked],
   )
   const platform: MainPlatform = linked.includes(stored) ? stored : linked[0] ?? 'ra'
+  // One object per change of what it holds, so a re-render of the provider (the session updating)
+  // does not re-render everything that reads it.
+  const value = useMemo(() => ({ platform, setPlatform, linked }), [platform, setPlatform, linked])
+
   return (
-    <MainPlatformContext.Provider value={{ platform, setPlatform, linked }}>
+    <MainPlatformContext.Provider value={value}>
       {children}
     </MainPlatformContext.Provider>
   )

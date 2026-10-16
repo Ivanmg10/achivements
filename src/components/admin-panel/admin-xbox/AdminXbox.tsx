@@ -71,7 +71,7 @@ export default function AdminXbox() {
         <div className="flex flex-col gap-3">
           <p className="flex items-center gap-3 text-sm">
             {result.profile.avatarUrl && (
-              <img src={result.profile.avatarUrl} alt="" width={40} height={40} className="size-10 rounded-full" />
+              <img src={result.profile.avatarUrl} alt="" width={40} height={40} loading="lazy" decoding="async" className="size-10 rounded-full" />
             )}
             <span>
               <span className="font-semibold">{result.profile.gamertag}</span>
