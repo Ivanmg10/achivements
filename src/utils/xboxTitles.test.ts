@@ -2,6 +2,7 @@ import {
   classifyXboxGame,
   isXboxTitleId,
   totalGamerscore,
+  totalXboxPlaytime,
   xboxAchievementAnchor,
   xboxBackdrop,
   xboxHasAchievements,
@@ -57,4 +58,9 @@ test('the backdrop is the box art, the only art Xbox sends', () => {
 test('total gamerscore adds the library up', () => {
   expect(totalGamerscore([xboxGameFixture({ earnedGamerscore: 200 }), xboxGameFixture({ earnedGamerscore: 50 })])).toBe(250)
   expect(totalGamerscore([])).toBe(0)
+})
+
+test('total play time sums what Xbox gave, and counts a game with none as none', () => {
+  expect(totalXboxPlaytime([xboxGameFixture({ playtimeMinutes: 90 }), xboxGameFixture({ playtimeMinutes: null }), xboxGameFixture({ playtimeMinutes: 30 })])).toBe(120)
+  expect(totalXboxPlaytime([])).toBe(0)
 })

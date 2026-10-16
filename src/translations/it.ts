@@ -875,6 +875,7 @@ export const it: Translations = {
     filterRaSc: 'RA softcore',
     collectionView: 'Vista',
     yourNumbers: 'I tuoi numeri',
+    playtimeSources: 'Steam, PlayStation e Xbox',
     hideGame: 'Nascondi gioco',
     hideGameTitle: 'Nascondere questo gioco?',
     hideGameText: '{title} non comparirà più nelle tue liste. Puoi mostrarlo di nuovo dal tuo account, in Preferenze › Giochi nascosti.',

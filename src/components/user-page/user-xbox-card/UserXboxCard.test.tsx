@@ -76,7 +76,7 @@ test('linked: shows the account, that it is admin-only, and its numbers', () => 
   expect(screen.getByText('Silver')).toBeInTheDocument()
   expect(screen.getByText(en.xbox.adminOnly)).toBeInTheDocument()
   // One game under way of the three.
-  expect(screen.getByText(en.userStats.inProgress).previousElementSibling ?? screen.getByText(en.userStats.inProgress).parentElement).toHaveTextContent('1')
+  expect(screen.getByText(en.steam.playtime).parentElement).toHaveTextContent('—')
 })
 
 test('linked but unreadable: says why', () => {

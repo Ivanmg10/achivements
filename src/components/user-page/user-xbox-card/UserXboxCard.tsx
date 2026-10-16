@@ -6,7 +6,8 @@ import { useXboxSummary } from '@/hooks/useXboxSummary'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
-import { xboxHasAchievements } from '@/utils/xboxTitles'
+import { formatPlaytime } from '@/utils/steamFeed'
+import { totalXboxPlaytime } from '@/utils/xboxTitles'
 import UserPlatformCard, {
   DISCONNECT_CLASS,
   PlatformStat,
@@ -23,7 +24,7 @@ export default function UserXboxCard() {
   const { T, lang } = useLanguage()
   const { enabled, xuid, gamertag, isLinked, link, isLinking, error: linkError, unlink, isUnlinking } = useXboxLink()
   const { summary, isLoading, error: summaryError } = useXboxSummary()
-  const { library } = useXboxGamesData()
+  const { library, libraryLoading } = useXboxGamesData()
 
   if (!enabled) return null
 
@@ -34,7 +35,10 @@ export default function UserXboxCard() {
     { label: T.userStats.games, value: value(summary?.games) },
     { label: T.xbox.achievements, value: value(summary?.achievementsUnlocked) },
     { label: T.xbox.tier, value: isLoading ? '—' : summary?.tier || '—' },
-    { label: T.userStats.inProgress, value: value(library.filter((g) => xboxHasAchievements(g) && g.pctWon > 0 && g.pctWon < 100).length) },
+    {
+      label: T.steam.playtime,
+      value: libraryLoading || totalXboxPlaytime(library) === 0 ? '—' : formatPlaytime(totalXboxPlaytime(library), { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang),
+    },
   ]
 
   const handleLink = async (tag: string) => {

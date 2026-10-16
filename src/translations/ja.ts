@@ -875,6 +875,7 @@ export const ja: Translations = {
     filterRaSc: 'RA ソフトコア',
     collectionView: '表示',
     yourNumbers: 'あなたの数字',
+    playtimeSources: 'Steam、PlayStation、Xbox',
     hideGame: 'ゲームを非表示',
     hideGameTitle: 'このゲームを非表示にしますか？',
     hideGameText: '{title} はリストに表示されなくなります。アカウントの「設定 › 非表示のゲーム」から再表示できます。',

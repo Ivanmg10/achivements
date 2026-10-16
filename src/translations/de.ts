@@ -875,6 +875,7 @@ export const de: Translations = {
     filterRaSc: 'RA Softcore',
     collectionView: 'Ansicht',
     yourNumbers: 'Deine Zahlen',
+    playtimeSources: 'Steam, PlayStation und Xbox',
     hideGame: 'Spiel ausblenden',
     hideGameTitle: 'Dieses Spiel ausblenden?',
     hideGameText: '{title} erscheint nicht mehr in deinen Listen. Du kannst es in deinem Konto unter Einstellungen › Ausgeblendete Spiele wieder anzeigen.',

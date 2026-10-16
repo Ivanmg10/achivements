@@ -111,7 +111,7 @@ export default function MainPageProfileXboxLinked({
         </div>
       </div>
 
-      <MainPageProfileXboxStats summary={summary} />
+      <MainPageProfileXboxStats summary={summary} library={library} isLoading={libraryLoading} />
 
       {last ? <MainPageProfileXboxGame game={last} /> : libraryLoading && <MainPageProfileGameSkeleton />}
 

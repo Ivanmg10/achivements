@@ -876,6 +876,7 @@ export const en = {
     filterRaSc: 'RA softcore',
     collectionView: 'View',
     yourNumbers: 'Your numbers',
+    playtimeSources: 'Steam, PlayStation and Xbox',
     hideGame: 'Hide game',
     hideGameTitle: 'Hide this game?',
     hideGameText: '{title} will no longer appear in your lists. You can show it again from your account, in Preferences › Hidden games.',

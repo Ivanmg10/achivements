@@ -61,6 +61,11 @@ export function xboxBackdrop(game: Pick<XboxGameProgress, 'imageIcon'>): string 
   return game.imageIcon
 }
 
+/** Total play time across a library, in minutes; games Xbox gave none for count as none. */
+export function totalXboxPlaytime(games: Pick<XboxGameProgress, 'playtimeMinutes'>[]): number {
+  return games.reduce((sum, g) => sum + (g.playtimeMinutes ?? 0), 0)
+}
+
 /** Total gamerscore across a library. */
 export function totalGamerscore(games: Pick<XboxGameProgress, 'earnedGamerscore'>[]): number {
   return games.reduce((sum, g) => sum + g.earnedGamerscore, 0)

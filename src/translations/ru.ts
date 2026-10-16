@@ -875,6 +875,7 @@ export const ru: Translations = {
     filterRaSc: 'RA софткор',
     collectionView: 'Вид',
     yourNumbers: 'Ваши цифры',
+    playtimeSources: 'Steam, PlayStation и Xbox',
     hideGame: 'Скрыть игру',
     hideGameTitle: 'Скрыть эту игру?',
     hideGameText: '{title} больше не будет отображаться в списках. Вернуть её можно в аккаунте: Настройки › Скрытые игры.',

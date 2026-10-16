@@ -6,9 +6,9 @@ import type { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
 import type { XboxGameProgress } from '@/types/xbox'
-import { classifySteamGame, hasUnloadedProgress, summarizeSteamLibrary } from '@/utils/steamFeed'
-import { classifyPsnGame } from '@/utils/psnTitles'
-import { classifyXboxGame, xboxHasAchievements } from '@/utils/xboxTitles'
+import { classifySteamGame, formatPlaytime, hasUnloadedProgress, summarizeSteamLibrary } from '@/utils/steamFeed'
+import { classifyPsnGame, totalPlaytime } from '@/utils/psnTitles'
+import { classifyXboxGame, totalXboxPlaytime, xboxHasAchievements } from '@/utils/xboxTitles'
 import { gameHref } from '@/utils/gameRef'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
@@ -40,10 +40,15 @@ export default function CollectionNumbers({
   psnGames?: PsnGameProgress[]
   xboxGames?: XboxGameProgress[]
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
 
   const steam = useMemo(() => summarizeSteamLibrary(steamGames), [steamGames])
+  // RA does not report play time, so this is Steam's, PlayStation's and Xbox's.
+  const playtimeMinutes = useMemo(
+    () => steam.totalMinutes + totalPlaytime(psnGames) + totalXboxPlaytime(xboxGames),
+    [steam.totalMinutes, psnGames, xboxGames],
+  )
   const fractions = useMemo(
     () => steamGames.filter((g) => g.achievementsLoaded && g.maxPossible > 0).map((g) => g.numAwarded / g.maxPossible),
     [steamGames],
@@ -107,6 +112,19 @@ export default function CollectionNumbers({
       <h3 className="text-sm font-semibold text-text-main">{T.cards.yourNumbers}</h3>
 
       <div className="flex flex-col gap-4">
+        {playtimeMinutes > 0 && (
+          <section className={BLOCK} aria-label={T.steam.totalPlaytime}>
+            <p className="flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-text-main tabular-nums leading-none">
+                {formatPlaytime(playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+              </span>
+              <span className="text-xs text-text-secondary">
+                {T.steam.totalPlaytime} · {T.cards.playtimeSources}
+              </span>
+            </p>
+          </section>
+        )}
+
         {awards && (
           <section className={BLOCK} aria-label="RetroAchievements">
             <span className="flex items-center gap-2 text-xs text-text-secondary">
