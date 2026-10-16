@@ -26,11 +26,11 @@ import { xboxBackdrop } from '@/utils/xboxTitles'
 export default function XboxPinnedGameRow({ gameId, isOpen, onToggle }: { gameId: number; isOpen: boolean; onToggle: () => void }) {
   const { T } = useLanguage()
   const onPointerMove = useSpotlight()
-  const { library, libraryLoading } = useXboxGamesData()
+  const { fullLibrary, libraryLoading } = useXboxGamesData()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: gameKey('xbox', gameId) })
   const style = { transform: CSS.Transform.toString(transform), transition }
 
-  const game = library.find((g) => g.id === gameId)
+  const game = fullLibrary.find((g) => g.id === gameId)
 
   if (!game) {
     // Loading, or a pin for a game no longer in the library (Xbox unlinked): a placeholder that can still be unpinned.

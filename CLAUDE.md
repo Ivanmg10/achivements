@@ -433,6 +433,25 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   limited, with `Retry-After: 60`) / 502. The client reads a 429 as a plain
   failure with a retry button.
 
+## Consoles to show — a preference per platform
+
+RA, PSN and Xbox each have, in the account page's preferences, a folded list of
+the consoles in the user's library with a tick each (`UserConsolesPreference`;
+Steam has none). Unticked consoles leave the lists, collection and stats, and
+nothing is deleted.
+
+- Stored **in the browser** (`useHiddenConsoles`, key `hidden-consoles:<source>`),
+  as the *unticked* names, so a console that appears later starts shown.
+- Applied **in the data contexts** (`GamesDataContext`, `PsnGamesDataContext`,
+  `XboxGamesDataContext`): `library`/`all` is filtered, `fullLibrary` (PSN, Xbox)
+  and `consoles` (the options) are not. **Anything that looks a game up by id**
+  (its page, a pin, a group item) must use `fullLibrary`, or a game on an
+  unticked console 404s.
+- Only the viewer's **own** library: on someone else's page (`useSubject()`)
+  nothing is filtered. A game is hidden only when **all** its consoles are
+  unticked (`isConsoleShown`: "Xbox 360 · Xbox Series" stays with either ticked).
+- Feeds of recent achievements and the streak are not filtered.
+
 ## Registration
 
 Public and open: anyone can sign up with a username, a password and an **email,

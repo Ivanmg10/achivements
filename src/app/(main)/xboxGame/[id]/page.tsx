@@ -34,7 +34,7 @@ export default function XboxGamePage() {
   const titleId = typeof rawId === 'string' && isXboxTitleId(rawId) ? rawId : null
   const { T } = useLanguage()
   const enabled = useXboxEnabled()
-  const { isLinked, library, libraryLoading } = useXboxGamesData()
+  const { isLinked, fullLibrary, libraryLoading } = useXboxGamesData()
   const { achievements, isLoading, error, retry } = useXboxAchievements(isLinked ? titleId : null)
   const { details } = useXboxGameDetails(isLinked ? titleId : null)
 
@@ -54,7 +54,7 @@ export default function XboxGamePage() {
     )
   }
 
-  const game = library.find((g) => g.titleId === titleId) ?? null
+  const game = fullLibrary.find((g) => g.titleId === titleId) ?? null
   if (!game && libraryLoading) return <GameInfoSkeleton />
   if (!game) notFound()
 

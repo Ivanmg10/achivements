@@ -13,6 +13,7 @@ import FavoriteGameModal, { FavoriteGame } from '@/components/favorite-game-moda
 import GenderModal from '@/components/gender-modal/GenderModal'
 import LanguageModal from '@/components/language-modal/LanguageModal'
 import ThemeModal from '@/components/theme-modal/ThemeModal'
+import UserRaPreferences from '@/components/user-page/user-ra-preferences/UserRaPreferences'
 import UserPsnPreferences from '@/components/user-page/user-psn-preferences/UserPsnPreferences'
 import UserXboxPreferences from '@/components/user-page/user-xbox-preferences/UserXboxPreferences'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
@@ -155,6 +156,7 @@ export default function UserPreferencesCard() {
         )}
       </div>
 
+      <UserRaPreferences />
       <UserPsnPreferences />
       <UserXboxPreferences />
 

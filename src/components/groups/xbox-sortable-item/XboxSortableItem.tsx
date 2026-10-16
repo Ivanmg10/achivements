@@ -37,7 +37,7 @@ export default function XboxSortableItem({
   draggable: boolean
 }) {
   const { T, lang } = useLanguage()
-  const { library } = useXboxGamesData()
+  const { fullLibrary } = useXboxGamesData()
   const [open, setOpen] = useState(false)
   const panelId = useId()
   const onPointerMove = useSpotlight()
@@ -47,7 +47,7 @@ export default function XboxSortableItem({
   })
   const style = { transform: CSS.Transform.toString(transform), transition }
 
-  const game = library.find((g) => g.id === item.game_id) ?? null
+  const game = fullLibrary.find((g) => g.id === item.game_id) ?? null
   const href = gameHref('xbox', item.game_id)
   const earned = game ? game.numAwarded : item.num_awarded
   // A newer game may not say how many achievements it has; then only what is earned is written.

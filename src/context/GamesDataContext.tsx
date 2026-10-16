@@ -6,10 +6,15 @@ import { useSession } from 'next-auth/react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useHiddenConsoles } from '@/hooks/useHiddenConsoles'
+import { consoleOptions, filterByConsole, type ConsoleOption } from '@/utils/consoleFilter'
 import { withSubject } from '@/utils/withSubject'
 
 type CtxType = {
+  /** Every game, without the consoles unticked in preferences. */
   all: RetroAchievementsGameCompleted[]
+  /** The consoles in the list, for the preferences to tick. */
+  consoles: ConsoleOption[]
   softcore: RetroAchievementsGameCompleted[]
   hardcore: RetroAchievementsGameCompleted[]
   inProgress: RetroAchievementsGameCompleted[]
@@ -19,7 +24,7 @@ type CtxType = {
 }
 
 const Ctx = createContext<CtxType>({
-  all: [], softcore: [], hardcore: [], inProgress: [],
+  all: [], consoles: [], softcore: [], hardcore: [], inProgress: [],
   isLoading: true, error: false, refetch: () => {},
 })
 
@@ -32,7 +37,8 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const subject = useSubject()
   const rausername = session?.user?.rausername
-  const [all, setAll] = useState<RetroAchievementsGameCompleted[]>([])
+  const { hidden } = useHiddenConsoles('ra')
+  const [loaded, setAll] = useState<RetroAchievementsGameCompleted[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
   const hasFetched = useRef(false)
@@ -100,6 +106,9 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     doFetch()
   }, [doFetch])
 
+  // The preference is the viewer's own: someone else's list is shown whole.
+  const all = useMemo(() => (subject ? loaded : filterByConsole(loaded, (g) => g.ConsoleName, hidden)), [subject, loaded, hidden])
+  const consoles = useMemo(() => consoleOptions(loaded.map((g) => g.ConsoleName)), [loaded])
   const softcore = useMemo(() => all.filter((g) => g.HardcoreMode === '0'), [all])
   const hardcore = useMemo(() => all.filter((g) => g.HardcoreMode === '1'), [all])
   const inProgress = useMemo(
@@ -111,7 +120,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <Ctx.Provider value={{ all, softcore, hardcore, inProgress, isLoading, error, refetch }}>
+    <Ctx.Provider value={{ all, consoles, softcore, hardcore, inProgress, isLoading, error, refetch }}>
       {children}
     </Ctx.Provider>
   )

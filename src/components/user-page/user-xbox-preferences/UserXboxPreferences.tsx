@@ -2,19 +2,22 @@
 
 import { IconEyeOff } from '@tabler/icons-react'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
+import UserConsolesPreference from '@/components/user-page/user-consoles-preference/UserConsolesPreference'
 import PsnPreferenceSwitch from '@/components/user-page/user-psn-preferences/psn-preference-switch/PsnPreferenceSwitch'
 import { useLanguage } from '@/context/LanguageContext'
+import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useXboxRevealSecrets } from '@/hooks/useXboxRevealSecrets'
 
 /**
- * The Xbox preferences, under the PlayStation ones: one switch, saved in this
- * browser. Shown only to who may use Xbox (an admin, for now).
+ * The Xbox preferences, under the PlayStation ones: one switch and the consoles
+ * to show, saved in this browser. Shown only to who may use Xbox (an admin, for now).
  */
 export default function UserXboxPreferences() {
   const { T } = useLanguage()
   const enabled = useXboxEnabled()
   const [reveal, setReveal] = useXboxRevealSecrets()
+  const { consoles } = useXboxGamesData()
 
   if (!enabled) return null
 
@@ -32,6 +35,7 @@ export default function UserXboxPreferences() {
         checked={reveal}
         onChange={setReveal}
       />
+      <UserConsolesPreference source="xbox" consoles={consoles} />
     </section>
   )
 }

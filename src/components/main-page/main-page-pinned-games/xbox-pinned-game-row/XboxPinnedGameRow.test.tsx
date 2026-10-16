@@ -17,7 +17,7 @@ import { xboxGameFixture } from '@/test-utils/xboxFixtures'
 const GAME = xboxGameFixture({ id: 100, titleId: '100', title: 'Halo', consoleName: 'Xbox Series', maxPossible: 10, numAwarded: 4, totalKnown: true, pctWon: 40 })
 
 function setLibrary(library: unknown[], libraryLoading = false) {
-  ;(useXboxGamesData as jest.Mock).mockReturnValue({ library, libraryLoading })
+  ;(useXboxGamesData as jest.Mock).mockReturnValue({ fullLibrary: library, libraryLoading })
 }
 
 test('a pinned game with its progress, opening its dashboard', () => {

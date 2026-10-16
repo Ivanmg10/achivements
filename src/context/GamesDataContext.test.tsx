@@ -126,3 +126,21 @@ test('session.update() flips the status to loading and back: a finished load is 
   expect(result.current.all).toHaveLength(1)
   expect(fetchWithRetry).toHaveBeenCalledTimes(1)
 })
+
+test('the consoles unticked in preferences leave the list, and the options still count them', async () => {
+  window.localStorage.clear()
+  window.localStorage.setItem('hidden-consoles:ra', '["SNES"]')
+  const games = [
+    { GameID: 1, ConsoleID: 3, ConsoleName: 'SNES', HardcoreMode: '1', PctWon: '1' },
+    { GameID: 2, ConsoleID: 4, ConsoleName: 'GameCube', HardcoreMode: '1', PctWon: '1' },
+  ]
+  ;(fetchWithRetry as jest.Mock).mockResolvedValue(games)
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { id: '1', rausername: 'testuser' } }, status: 'authenticated' })
+
+  const { result } = renderHook(() => useGamesData(), { wrapper })
+
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  expect(result.current.all.map((g) => g.GameID)).toEqual([2])
+  expect(result.current.hardcore.map((g) => g.GameID)).toEqual([2])
+  expect(result.current.consoles.map((c) => c.name).sort()).toEqual(['GameCube', 'SNES'])
+})

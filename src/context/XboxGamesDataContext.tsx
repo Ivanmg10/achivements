@@ -1,17 +1,23 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { xboxErrorFrom, type XboxLinkError } from '@/hooks/useXboxLink'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
+import { useHiddenConsoles } from '@/hooks/useHiddenConsoles'
+import { consoleOptions, filterByConsole, type ConsoleOption } from '@/utils/consoleFilter'
 import type { XboxGameProgress } from '@/types/xbox'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 
 type XboxGamesCtx = {
   isLinked: boolean
-  /** Every game in the library, most recently played first. */
+  /** The library without the consoles unticked in preferences, most recently played first. */
   library: XboxGameProgress[]
+  /** Every game, ticked consoles or not: for what looks a game up by id (its page, a pin, a group). */
+  fullLibrary: XboxGameProgress[]
+  /** The consoles in the library, for the preferences to tick. */
+  consoles: ConsoleOption[]
   libraryLoading: boolean
   libraryError: XboxLinkError | null
   refetch: () => void
@@ -20,6 +26,8 @@ type XboxGamesCtx = {
 const Ctx = createContext<XboxGamesCtx>({
   isLinked: false,
   library: [],
+  fullLibrary: [],
+  consoles: [],
   libraryLoading: false,
   libraryError: null,
   refetch: () => {},
@@ -37,6 +45,7 @@ export function XboxGamesDataProvider({ children }: { children: React.ReactNode 
   const { data: session } = useSession()
   const enabled = useXboxEnabled()
   const subject = useSubject()
+  const { hidden } = useHiddenConsoles('xbox')
   const xuid = enabled ? (session?.user?.xboxxuid ?? null) : null
 
   const [library, setLibrary] = useState<XboxGameProgress[]>([])
@@ -89,12 +98,18 @@ export function XboxGamesDataProvider({ children }: { children: React.ReactNode 
   }, [xuid, load])
 
   const current = Boolean(xuid) && loadedFor === xuid
+  const fullLibrary = useMemo(() => (current ? library : []), [current, library])
+  // The preference is the viewer's own: someone else's library is shown whole.
+  const shown = useMemo(() => (subject ? fullLibrary : filterByConsole(fullLibrary, (g) => g.consoleName, hidden)), [subject, fullLibrary, hidden])
+  const consoles = useMemo(() => consoleOptions(fullLibrary.map((g) => g.consoleName)), [fullLibrary])
 
   return (
     <Ctx.Provider
       value={{
         isLinked: Boolean(xuid),
-        library: current ? library : [],
+        library: shown,
+        fullLibrary,
+        consoles,
         libraryLoading: Boolean(xuid) && (libraryLoading || !current),
         libraryError: current ? libraryError : null,
         refetch,

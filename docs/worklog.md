@@ -25,6 +25,26 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-16 — Choose which consoles show, per platform (`feat/xbox-integration`)
+
+**Did** — A "Consoles" preference under RA, PSN and Xbox in the account page:
+a tick per console in the user's library (with its game count). New
+`consoleFilter.ts`, `useHiddenConsoles`, `UserConsolesPreference`,
+`UserRaPreferences`; the three data contexts filter by it and expose `consoles`;
+PSN/Xbox expose `fullLibrary` too. Strings in all 9 languages. Rules in
+`CLAUDE.md` ("Consoles to show").
+**Why** — The user asked for a checkbox per console, per platform, to choose
+what shows.
+**Decisions** — Browser storage like the other PSN/Xbox preferences (no migration
+on the shared DB); it does not follow the account across devices. Stored as the
+unticked names. Filter in the contexts so every list, the collection and the
+stats agree. Steam skipped (no consoles). Feeds and streak left unfiltered.
+**Open** — If it should follow the account or show on public profiles, it needs a
+column. The home "recent achievements" still include unticked consoles.
+**Watch out** — Look games up by id in `fullLibrary`, never `library`.
+
+---
+
 ## 2026-10-16 — Xbox 360 backward-compatible games had no achievements (`feat/xbox-integration`)
 
 **Did** — 9 of the 12 Xbox 360 games in the library (Modern Warfare 3, Black

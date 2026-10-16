@@ -30,7 +30,7 @@ export default function PsnGamePage() {
   const { id: rawId } = useParams()
   const titleId = typeof rawId === 'string' && isPsnTitleId(rawId) ? rawId : null
   const { T } = useLanguage()
-  const { isLinked, library, libraryLoading } = usePsnGamesData()
+  const { isLinked, fullLibrary, libraryLoading } = usePsnGamesData()
   const { trophies, groups, isLoading, error, retry } = usePsnTrophies(isLinked ? titleId : null)
   const { details } = usePsnGameDetails(isLinked ? titleId : null)
 
@@ -50,7 +50,7 @@ export default function PsnGamePage() {
     )
   }
 
-  const game = library.find((g) => g.titleId === titleId) ?? null
+  const game = fullLibrary.find((g) => g.titleId === titleId) ?? null
   if (!game && libraryLoading) return <GameInfoSkeleton />
   if (!game) notFound()
 

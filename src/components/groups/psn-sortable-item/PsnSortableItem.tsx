@@ -37,7 +37,7 @@ export default function PsnSortableItem({
   draggable: boolean
 }) {
   const { T, lang } = useLanguage()
-  const { library } = usePsnGamesData()
+  const { fullLibrary } = usePsnGamesData()
   const [open, setOpen] = useState(false)
   const panelId = useId()
   const onPointerMove = useSpotlight()
@@ -47,7 +47,7 @@ export default function PsnSortableItem({
   })
   const style = { transform: CSS.Transform.toString(transform), transition }
 
-  const game = library.find((g) => g.id === item.game_id) ?? null
+  const game = fullLibrary.find((g) => g.id === item.game_id) ?? null
   const href = gameHref('psn', item.game_id)
   const earned = game ? game.numAwarded : item.num_awarded
   const total = game ? game.maxPossible : item.max_possible

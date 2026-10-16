@@ -3,15 +3,18 @@
 import { IconEyeOff, IconTrophy } from '@tabler/icons-react'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import PsnPreferenceSwitch from './psn-preference-switch/PsnPreferenceSwitch'
+import UserConsolesPreference from '@/components/user-page/user-consoles-preference/UserConsolesPreference'
+import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnPlatinumCompletes } from '@/hooks/usePsnPlatinumCompletes'
 import { usePsnRevealHidden } from '@/hooks/usePsnRevealHidden'
 
-/** The PlayStation preferences, under the general ones: two switches, saved in this browser. */
+/** The PlayStation preferences, under the general ones: two switches and the consoles to show, saved in this browser. */
 export default function UserPsnPreferences() {
   const { T } = useLanguage()
   const [platinum, setPlatinum] = usePsnPlatinumCompletes()
   const [reveal, setReveal] = usePsnRevealHidden()
+  const { consoles } = usePsnGamesData()
 
   return (
     <section aria-labelledby="psn-preferences" className="bg-bg-main rounded-2xl p-3 sm:p-4 flex flex-col gap-1">
@@ -35,6 +38,7 @@ export default function UserPsnPreferences() {
         checked={reveal}
         onChange={setReveal}
       />
+      <UserConsolesPreference source="psn" consoles={consoles} />
     </section>
   )
 }

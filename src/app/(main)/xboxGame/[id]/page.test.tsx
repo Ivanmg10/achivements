@@ -38,7 +38,7 @@ function setup({
 } = {}) {
   ;(useParams as jest.Mock).mockReturnValue({ id })
   ;(useXboxEnabled as jest.Mock).mockReturnValue(enabled)
-  ;(useXboxGamesData as jest.Mock).mockReturnValue({ isLinked: linked, library, libraryLoading })
+  ;(useXboxGamesData as jest.Mock).mockReturnValue({ isLinked: linked, fullLibrary: library, libraryLoading })
   ;(useXboxAchievements as jest.Mock).mockReturnValue({ ...achievements, retry })
 }
 
