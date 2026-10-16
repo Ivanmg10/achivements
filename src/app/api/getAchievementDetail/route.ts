@@ -1,3 +1,4 @@
+import { raUnavailable } from '@/lib/raFailure'
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 import { withCache } from '@/lib/raCache'
@@ -36,6 +37,6 @@ export async function GET(request: NextRequest) {
     return cachedJson(data, TTL)
   } catch (err) {
     console.error('[getAchievementDetail]', err)
-    return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
+    return raUnavailable(err)
   }
 }

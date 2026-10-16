@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { IconSearch } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { filterLibrary, LibraryFilter, LibraryGame, LibraryStatus } from '@/utils/library'
 import type { GameSource } from '@/types/steam'
 import BrowseSearchChips from '../browse-search-chips/BrowseSearchChips'
@@ -17,6 +18,7 @@ const SHOWN = 4
  */
 export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
   const { T } = useLanguage()
+  const xboxEnabled = useXboxEnabled()
   const inputId = useId()
   const [filter, setFilter] = useState<LibraryFilter>({ query: '', source: 'all', status: 'all' })
   const matches = useMemo(() => filterLibrary(library, filter), [library, filter])
@@ -47,6 +49,7 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
             { value: 'ra', label: 'RetroAchievements' },
             { value: 'steam', label: 'Steam' },
             { value: 'psn', label: 'PlayStation' },
+            ...(xboxEnabled ? [{ value: 'xbox' as const, label: 'Xbox' }] : []),
           ]}
         />
         <BrowseSearchChips<LibraryStatus | 'all'>

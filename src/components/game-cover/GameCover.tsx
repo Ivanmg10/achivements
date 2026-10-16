@@ -7,7 +7,7 @@ import type { GameSource } from '@/types/steam'
 
 /**
  * A game's cover as its game page shows it: RA box art, Steam's portrait,
- * PSN's trophy-set icon (Sony gives no box art through this API).
+ * PSN's trophy-set icon (Sony gives no box art through this API), Xbox's box art.
  * Kept at its own proportions (box art runs from tall cases to wide labels);
  * the caller sets the height through `className` and the width follows.
  * Falls back to the RA icon while, or if, the box art does not come.
@@ -25,7 +25,7 @@ export default function GameCover({
   className?: string
 }) {
   const boxArt = useRaBoxArt(source === 'ra' ? [id] : [])
-  const art = source === 'ra' ? boxArt[id] ?? iconUrl : source === 'psn' ? iconUrl : undefined
+  const art = source === 'ra' ? boxArt[id] ?? iconUrl : source === 'psn' || source === 'xbox' ? iconUrl : undefined
   const img = 'h-full w-auto max-w-full object-contain rounded-lg ring-1 ring-ink/10 shadow-xl shadow-black/40'
 
   const picture =

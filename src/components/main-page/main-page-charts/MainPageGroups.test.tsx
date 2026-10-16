@@ -56,14 +56,14 @@ test('an outer loading state also holds the skeleton', () => {
   expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
 })
 
-test('no groups: says so and offers to create the first', () => {
+test('no groups: says so and offers to create the first', async () => {
   state([])
   render(<MainPageGroups />)
   expect(screen.getByText(en.groups.noGroups)).toBeInTheDocument()
   // The "+" in the header and the button under the empty state both start it.
   expect(screen.getAllByRole('button', { name: en.groups.newGroup })).toHaveLength(2)
   fireEvent.click(screen.getAllByRole('button', { name: en.groups.newGroup })[1])
-  expect(screen.getByTestId('modal-save')).toBeInTheDocument()
+  expect(await screen.findByTestId('modal-save')).toBeInTheDocument()
 })
 
 test('lists each group as a link with its title, games and progress', () => {
@@ -135,14 +135,14 @@ describe('deleting', () => {
 })
 
 describe('creating', () => {
-  const open = () => {
+  const open = async () => {
     fireEvent.click(screen.getAllByRole('button', { name: en.groups.newGroup })[0])
-    fireEvent.click(screen.getByTestId('modal-save'))
+    fireEvent.click(await screen.findByTestId('modal-save'))
   }
 
   test('creates the group, leaving empty fields out, and says so', async () => {
     render(<MainPageGroups />)
-    open()
+    await open()
     await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.groupCreated))
     expect(createGroup).toHaveBeenCalledWith({ title: 'New', description: undefined, icon: undefined, is_public: false })
     expect(addGamesToGroup).not.toHaveBeenCalled()
@@ -151,7 +151,7 @@ describe('creating', () => {
   test('the games picked are added to it', async () => {
     ;(globalThis as { __games?: unknown[] }).__games = [{ id: 1 }, { id: 2 }]
     render(<MainPageGroups />)
-    open()
+    await open()
     await waitFor(() => expect(addGamesToGroup).toHaveBeenCalledWith(99, [{ id: 1 }, { id: 2 }]))
     expect(notify.success).toHaveBeenCalledWith(en.toast.groupCreated)
   })
@@ -160,7 +160,7 @@ describe('creating', () => {
     ;(globalThis as { __games?: unknown[] }).__games = [{ id: 1 }]
     ;(addGamesToGroup as jest.Mock).mockResolvedValue([{ id: 1 }])
     render(<MainPageGroups />)
-    open()
+    await open()
     await waitFor(() => expect(notify.error).toHaveBeenCalledWith(en.toast.someGamesFailed))
     expect(notify.success).not.toHaveBeenCalled()
   })

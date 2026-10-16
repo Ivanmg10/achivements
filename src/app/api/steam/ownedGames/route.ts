@@ -16,6 +16,12 @@ import type { SteamOwnedGamesResponse, SteamGameProgress } from '@/types/steam'
  */
 const MAX_FETCHES = 60
 
+class SteamPrivateError extends Error {
+  constructor() {
+    super('The Steam profile is not public')
+  }
+}
+
 function byLastPlayedDesc(a: SteamGameProgress, b: SteamGameProgress) {
   return (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? '')
 }
@@ -34,7 +40,12 @@ export async function GET(req?: Request) {
       TTL.ownedGames,
       async () => {
         const data = (await getOwnedGames(steamid, apiKey)) as SteamOwnedGamesResponse
-        // A private profile yields `{ response: {} }` rather than an error.
+        // A private or friends-only profile — or public with its game details private — yields
+        // `{ response: {} }` rather than an error (measured 2026-10-16); a public account with no
+        // games carries `game_count`. So a profile made private after it was linked is told apart
+        // from an empty library, and not cached as one.
+        // ponytail: a public account with no games and no game_count would read as private; unverified.
+        if (!data?.response?.games && typeof data?.response?.game_count !== 'number') throw new SteamPrivateError()
         const mapped = (data?.response?.games ?? []).map(toSteamGameProgress)
         // Newest first, so a partial fill covers what was played most recently.
         const result = await enrichWithAchievementCounts([...mapped].sort(byLastPlayedDesc), auth.session, MAX_FETCHES)
@@ -50,6 +61,7 @@ export async function GET(req?: Request) {
     // above is what keeps repeat requests cheap.
     return cachedJson(games, 0)
   } catch (err) {
+    if (err instanceof SteamPrivateError) return NextResponse.json({ error: 'private' }, { status: 403 })
     console.error('[steam/ownedGames]', err)
     return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })
   }

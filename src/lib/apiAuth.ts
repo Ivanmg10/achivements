@@ -1,9 +1,20 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
+import { canUseXbox } from '@/utils/xboxAccess'
 
 /** Whose data a read route answers for. For someone else's, `raid` is whichever key can read it: see dataOwner. */
-export type DataOwner = { id: string; rausername?: string; raid?: string; steamid?: string; psnaccountid?: string }
+export type DataOwner = {
+  id: string
+  rausername?: string
+  raid?: string
+  steamid?: string
+  psnaccountid?: string
+  xboxxuid?: string
+  xboxgamertag?: string
+  /** Only on the signed-in user's own: whether they are an admin (what Xbox is limited to for now). */
+  admin?: boolean
+}
 
 /**
  * The account a read route answers for: the signed-in user's own, or, when a
@@ -38,6 +49,8 @@ export async function dataOwner(req?: Request): Promise<DataOwner | null> {
     raid: me.raid ?? target.raid ?? undefined,
     steamid: target.steamid ?? undefined,
     psnaccountid: target.psnaccountid ?? undefined,
+    xboxxuid: target.xboxxuid ?? undefined,
+    xboxgamertag: target.xboxgamertag ?? undefined,
   }
 }
 
@@ -149,4 +162,41 @@ export async function requirePsnSession(req?: Request): Promise<PsnSessionResult
 
 
   return { ok: true, session: { id, psnaccountid } }
+}
+
+type XboxSession = { id: string; xboxxuid: string; xboxgamertag: string }
+export type XboxSessionResult = { ok: true; session: XboxSession } | { ok: false; response: NextResponse }
+export type XboxUserResult = { ok: true; id: string } | { ok: false; response: NextResponse }
+
+/**
+ * A signed-in user who may use Xbox: an admin while Xbox is admin-only (see
+ * canUseXbox). The admin flag is the session's, which is rebuilt from the
+ * users row on every read — a demoted admin loses Xbox with their next request.
+ * Anyone else gets 403, whatever they ask for.
+ */
+export async function requireXboxUser(): Promise<XboxUserResult> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) return { ok: false, response: NextResponse.json({ error: 'unauthorized' }, { status: 401 }) }
+  if (!canUseXbox(session.user.admin)) return { ok: false, response: NextResponse.json({ error: 'forbidden' }, { status: 403 }) }
+  return { ok: true, id: session.user.id }
+}
+
+/**
+ * A user who may use Xbox (see requireXboxUser) and whose data has a linked
+ * Xbox account: their own, or, when a GET names `?user=`, that user's — which
+ * only an admin viewer can read, since a non-admin cannot see Xbox at all.
+ * Whether the app's OpenXBL key is set is the call's to find out: it fails
+ * with an XboxError that xboxFailure turns into 503 not-configured.
+ */
+export async function requireXboxSession(req?: Request): Promise<XboxSessionResult> {
+  const user = await requireXboxUser()
+  if (!user.ok) return user
+
+  const owner = await dataOwner(req)
+  if (!owner) return { ok: false, response: NextResponse.json({ error: 'unauthorized' }, { status: 401 }) }
+
+  const { id, xboxxuid, xboxgamertag } = owner
+  if (!xboxxuid || !xboxgamertag) return { ok: false, response: NextResponse.json({ error: 'not-linked' }, { status: 400 }) }
+
+  return { ok: true, session: { id, xboxxuid, xboxgamertag } }
 }

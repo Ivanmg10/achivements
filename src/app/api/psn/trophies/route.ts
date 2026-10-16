@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cachedJson } from '@/lib/httpCache'
 import { requirePsnSession } from '@/lib/apiAuth'
 import { findPsnGame, psnFailure, psnGameGroups, psnGameTrophies, psnLanguage } from '@/lib/psnClient'
 import { isPsnTitleId } from '@/utils/psnTitles'
+
+/** How long the browser may keep an answer; the server's own cache is the longer one. Vary: Cookie (see cachedJson) lets the refresh button and a re-link through. */
+const BROWSER_TTL_MS = 5 * 60 * 1000
 
 /**
  * One game's trophies and trophy groups (base game, each DLC) for the
@@ -25,7 +29,7 @@ export async function GET(req: NextRequest) {
       psnGameGroups(psnaccountid, game, userId, language),
       psnGameTrophies(psnaccountid, game, userId, language),
     ])
-    return NextResponse.json({ groups, trophies })
+    return cachedJson({ groups, trophies }, BROWSER_TTL_MS)
   } catch (err) {
     return psnFailure(err, 'psn/trophies')
   }

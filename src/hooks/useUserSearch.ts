@@ -11,6 +11,8 @@ export type UserSearchResult = {
   ra: boolean
   steam: boolean
   psn: boolean
+  /** Only true for a searcher who may see Xbox (an admin, for now). */
+  xbox?: boolean
 }
 
 export const USER_SEARCH_MIN = 3

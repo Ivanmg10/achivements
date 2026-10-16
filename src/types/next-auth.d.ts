@@ -22,6 +22,9 @@ type SessionUserFields = {
   /** Typed in by username, not proven to be the user's; see migrations/024_psn_columns.sql. */
   psnaccountid?: string;
   psnusername?: string;
+  /** Typed in by gamertag, not proven to be the user's; see migrations/033_xbox_columns.sql. Admin-only for now. */
+  xboxxuid?: string;
+  xboxgamertag?: string;
   email?: string;
   /** The address has been confirmed. False blocks nothing — it only shows a banner. */
   emailVerified?: boolean;
@@ -37,6 +40,7 @@ type SessionUserFields = {
   favorite_game?: SavedGame;
   favorite_steam_game?: SavedGame;
   favorite_psn_game?: SavedGame;
+  favorite_xbox_game?: SavedGame;
 };
 
 declare module "next-auth" {

@@ -21,7 +21,7 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
   const art =
     game.source === 'steam'
       ? steamAssetUrl(game.id, 'header')
-      : game.source === 'psn'
+      : game.source === 'psn' || game.source === 'xbox'
         ? game.imageRef || null
         : game.imageRef
           ? `https://retroachievements.org${game.imageRef}`
@@ -36,8 +36,8 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
       <GameCardBackdrop src={art} surface="card" eager={eager} />
       {game.source === 'steam' ? (
         <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageRef} size={56} className="w-14 h-14 rounded-lg shrink-0" />
-      ) : game.source === 'psn' ? (
-        <GameIcon source="psn" id={game.id} imageUrl={game.imageRef} size={56} className="w-14 h-14 rounded-lg shrink-0" />
+      ) : game.source === 'psn' || game.source === 'xbox' ? (
+        <GameIcon source={game.source} id={game.id} imageUrl={game.imageRef} size={56} className="w-14 h-14 rounded-lg shrink-0" />
       ) : game.imageRef ? (
         <Image
           src={`https://retroachievements.org${game.imageRef}`}

@@ -4,6 +4,8 @@ import { en } from '@/translations/en'
 import type { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import { psnGameFixture } from '@/test-utils/psnFixtures'
+import { xboxGameFixture } from '@/test-utils/xboxFixtures'
+import { formatPlaytime } from '@/utils/steamFeed'
 
 jest.mock('@/components/main-page/main-page-charts/closest-to-complete/ClosestToComplete', () => ({
   __esModule: true,
@@ -48,4 +50,21 @@ test('PSN gets its own block when linked, and its started games join the closest
   render(<CollectionNumbers awards={null} psnGames={[psn(1, 100), psn(2, 95)]} />)
   expect(screen.getByRole('region', { name: 'PlayStation' })).toHaveTextContent('1')
   expect(screen.getByTestId('closest')).toHaveTextContent('PS 2')
+})
+
+test('one play-time total across Steam, PlayStation and Xbox, and none when none of them reports any', () => {
+  const { rerender } = render(
+    <CollectionNumbers
+      awards={awards}
+      steamGames={[steam(1, 10)]}
+      psnGames={[psnGameFixture({ playtimeMinutes: 120, playedAs: ['A'] })]}
+      xboxGames={[xboxGameFixture({ playtimeMinutes: 180 })]}
+    />,
+  )
+  // 60 + 120 + 180 minutes
+  const region = screen.getByRole('region', { name: en.steam.totalPlaytime })
+  expect(region).toHaveTextContent(formatPlaytime(360, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en'))
+  expect(region).toHaveTextContent(en.cards.playtimeSources)
+  rerender(<CollectionNumbers awards={awards} />)
+  expect(screen.queryByRole('region', { name: en.steam.totalPlaytime })).not.toBeInTheDocument()
 })

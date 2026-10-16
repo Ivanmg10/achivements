@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import type { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
+import type { XboxGameProgress } from '@/types/xbox'
 import { usePerfectGamesOrder } from '@/hooks/usePerfectGamesOrder'
 import { applyPerfectOrder, buildPerfectGames, countPerfectGames, latestPerfects, perfectDates } from '@/utils/perfectGames'
 import { ChartCard } from '@/components/ui/ChartCard'
@@ -24,6 +25,7 @@ export default function MainPageCollection({
   games,
   steamGames = [],
   psnGames = [],
+  xboxGames = [],
   awards,
   inProgress = [],
   isLoading,
@@ -31,18 +33,19 @@ export default function MainPageCollection({
   games: RetroAchievementsGameCompleted[]
   steamGames?: SteamGameProgress[]
   psnGames?: PsnGameProgress[]
+  xboxGames?: XboxGameProgress[]
   awards: UserAwards | null
   inProgress?: RetroAchievementsGameCompleted[]
   isLoading?: boolean
 }) {
   const { order, saveOrder } = usePerfectGamesOrder()
-  const raw = useMemo(() => buildPerfectGames(games, steamGames, psnGames), [games, steamGames, psnGames])
+  const raw = useMemo(() => buildPerfectGames(games, steamGames, psnGames, xboxGames), [games, steamGames, psnGames, xboxGames])
   const ordered = useMemo(() => applyPerfectOrder(raw, order), [raw, order])
   const counts = useMemo(() => countPerfectGames(raw), [raw])
-  const dates = useMemo(() => perfectDates(awards?.VisibleUserAwards, steamGames, psnGames), [awards, steamGames, psnGames])
+  const dates = useMemo(() => perfectDates(awards?.VisibleUserAwards, steamGames, psnGames, xboxGames), [awards, steamGames, psnGames, xboxGames])
   const latest = useMemo(
-    () => latestPerfects(awards?.VisibleUserAwards, steamGames, SHELF, psnGames),
-    [awards, steamGames, psnGames],
+    () => latestPerfects(awards?.VisibleUserAwards, steamGames, SHELF, psnGames, xboxGames),
+    [awards, steamGames, psnGames, xboxGames],
   )
 
   if (isLoading) {
@@ -67,7 +70,7 @@ export default function MainPageCollection({
           <CollectionGrid games={ordered} allGames={raw} dates={dates} order={order} onSaveOrder={saveOrder} />
         </ChartCard>
         <ChartCard>
-          <CollectionNumbers awards={awards} inProgress={inProgress} steamGames={steamGames} psnGames={psnGames} />
+          <CollectionNumbers awards={awards} inProgress={inProgress} steamGames={steamGames} psnGames={psnGames} xboxGames={xboxGames} />
         </ChartCard>
       </div>
     </div>

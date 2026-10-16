@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
 import { readGroupFields } from '@/utils/groupValidation'
+import { canUseXbox } from '@/utils/xboxAccess'
 
 async function ownsGroup(userId: string, groupId: number) {
   if (!Number.isInteger(groupId)) return false
@@ -38,9 +39,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const itemsRes = await pool.query(
       `SELECT id, source, game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points, position, added_at, release_year
        FROM game_group_items
-       WHERE group_id = $1
+       WHERE group_id = $1 AND ($2::boolean OR source <> 'xbox')
        ORDER BY position ASC`,
-      [groupId],
+      // Xbox games are admin-only for now: anyone else gets the group without them.
+      [groupId, canUseXbox(session?.user?.admin)],
     )
 
     return NextResponse.json({ ...group, items: itemsRes.rows })

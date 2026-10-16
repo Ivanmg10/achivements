@@ -1,6 +1,7 @@
 import type { RecentlyPlayedGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
+import type { XboxGameProgress } from '@/types/xbox'
 
 /**
  * Pure helpers for putting Steam games next to RA ones: category rules, the
@@ -55,6 +56,7 @@ export type RecentFeedItem =
   | { source: 'ra'; key: string; lastPlayed: string | null; game: RecentlyPlayedGame }
   | { source: 'steam'; key: string; lastPlayed: string | null; game: SteamGameProgress }
   | { source: 'psn'; key: string; lastPlayed: string | null; game: PsnGameProgress }
+  | { source: 'xbox'; key: string; lastPlayed: string | null; game: XboxGameProgress }
 
 /**
  * One recent feed across every platform, newest first. Keys are namespaced by
@@ -69,6 +71,7 @@ export function mergeRecentFeeds(
   steam: SteamGameProgress[],
   limit: number,
   psn: PsnGameProgress[] = [],
+  xbox: XboxGameProgress[] = [],
 ): RecentFeedItem[] {
   const items: RecentFeedItem[] = [
     ...ra.map((game) => ({
@@ -86,6 +89,12 @@ export function mergeRecentFeeds(
     ...psn.map((game) => ({
       source: 'psn' as const,
       key: `psn:${game.id}`,
+      lastPlayed: game.lastPlayed,
+      game,
+    })),
+    ...xbox.map((game) => ({
+      source: 'xbox' as const,
+      key: `xbox:${game.id}`,
       lastPlayed: game.lastPlayed,
       game,
     })),

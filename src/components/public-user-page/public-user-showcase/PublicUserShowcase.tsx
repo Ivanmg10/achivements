@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
+import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useUserAwards } from '@/hooks/useUserAwards'
 import { buildPerfectGames, countPerfectGames, latestPerfects } from '@/utils/perfectGames'
 import { ChartCard } from '@/components/ui/ChartCard'
@@ -21,10 +22,11 @@ export default function PublicUserShowcase() {
   const { all, isLoading: gamesLoading } = useGamesData()
   const { library: steam } = useSteamGamesData()
   const { library: psn } = usePsnGamesData()
+  const { library: xbox } = useXboxGamesData()
   const { awards, isLoading: awardsLoading } = useUserAwards()
 
-  const counts = useMemo(() => countPerfectGames(buildPerfectGames(all, steam, psn)), [all, steam, psn])
-  const latest = useMemo(() => latestPerfects(awards?.VisibleUserAwards, steam, SHELF, psn), [awards, steam, psn])
+  const counts = useMemo(() => countPerfectGames(buildPerfectGames(all, steam, psn, xbox)), [all, steam, psn, xbox])
+  const latest = useMemo(() => latestPerfects(awards?.VisibleUserAwards, steam, SHELF, psn, xbox), [awards, steam, psn, xbox])
 
   return (
     <div className="flex flex-col gap-4">

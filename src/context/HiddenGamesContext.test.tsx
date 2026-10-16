@@ -68,3 +68,12 @@ test('if the list cannot be read, every game stays visible', async () => {
   expect(result.current.hidden).toEqual([])
   expect(console.error).toHaveBeenCalled()
 })
+
+test('a re-render of the provider keeps the same value, so what reads it is not re-rendered for nothing', async () => {
+  fetchMock.mockImplementation(() => ok([]))
+  const { result, rerender } = renderHook(() => useHiddenGames(), { wrapper })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  const before = result.current
+  rerender()
+  expect(result.current).toBe(before)
+})

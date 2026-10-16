@@ -12,7 +12,7 @@ import PlatformLogo from '@/components/platform-logo/PlatformLogo'
  */
 export default function UserSummary({ user, size = 36 }: { user: UserSearchResult; size?: number }) {
   const country = user.location ? findCountry(user.location) : null
-  const platforms = (['ra', 'steam', 'psn'] as const).filter((p) => user[p])
+  const platforms = (['ra', 'steam', 'psn', 'xbox'] as const).filter((p) => user[p])
 
   return (
     <>

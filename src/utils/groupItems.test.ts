@@ -91,3 +91,27 @@ test('PSN progress is live too, and never read from a Steam app with the same nu
   expect(ids('progress')).toEqual([1])
   expect(ids('100')).toEqual([2])
 })
+
+describe('Xbox live progress', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { liveProgressMap, groupSummary } = require('./groupItems') as typeof import('./groupItems')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxGameFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  test('an Xbox game is keyed apart, and its completion is the gamerscore one', () => {
+    const map = liveProgressMap([], [], [xboxGameFixture({ id: 730, numAwarded: 20, maxPossible: 40, totalKnown: true, pctWon: 55 })])
+    expect(map.get('xbox:730')).toEqual({ earned: 20, total: 40, pct: 0.55 })
+  })
+
+  test('a game with no achievements has no live progress', () => {
+    const map = liveProgressMap([], [], [xboxGameFixture({ id: 9, totalGamerscore: 0, maxPossible: 0 })])
+    expect(map.size).toBe(0)
+  })
+
+  test('a game whose count Xbox does not say gives its completion but no counts: the stored ones stand', () => {
+    const map = liveProgressMap([], [], [xboxGameFixture({ id: 5, numAwarded: 15, maxPossible: 0, totalKnown: false, pctWon: 14 })])
+    expect(map.get('xbox:5')).toMatchObject({ total: 0, pct: 0.14 })
+    const item = { id: 1, source: 'xbox', game_id: 5, num_awarded: 3, max_possible: 50 } as never
+    expect(groupSummary([item], new Map(), map)).toEqual({ earned: 3, total: 50 })
+  })
+})

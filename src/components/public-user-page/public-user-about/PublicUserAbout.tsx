@@ -15,6 +15,7 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
 
 const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
 
@@ -22,6 +23,7 @@ const PLATFORM_ICONS: Record<GameSource, ReactNode> = {
   ra: <RaLogo height={10} />,
   steam: <SteamLogo size={14} className="text-[#66c0f4]" aria-hidden="true" />,
   psn: <PlaystationLogo size={14} className="text-[#0070d1]" aria-hidden="true" />,
+  xbox: <XboxLogo size={14} className="text-[#107c10]" aria-hidden="true" />,
 }
 
 function Fact({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
@@ -45,7 +47,7 @@ function Fact({ icon, label, children }: { icon: ReactNode; label: string; child
 export default function PublicUserAbout({ user }: { user: CheevoUser }) {
   const { T } = useLanguage()
   const subject = useSubject()
-  const favorites = (['ra', 'steam', 'psn'] as const)
+  const favorites = (['ra', 'steam', 'psn', 'xbox'] as const)
     .map((source) => ({ source, game: user.favorites?.[source] ?? null }))
     .filter((f) => f.game !== null)
   const themeName = user.theme ? (T.userTheme as Record<string, string>)[`name_${user.theme}`] ?? user.theme : null

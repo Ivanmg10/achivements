@@ -102,11 +102,14 @@ test('does not retry a 4xx, and refetch clears the error once it works', async (
   const { result } = renderHook(() => useGamesData(), { wrapper })
   await waitFor(() => expect(result.current.error).toBe(true))
   expect(fetchWithRetry).toHaveBeenCalledTimes(1)
+  // A 403 from the RA routes means RA refuses the key.
+  expect(result.current.keyInvalid).toBe(true)
 
   ;(fetchWithRetry as jest.Mock).mockResolvedValueOnce([{ GameID: 3, ConsoleID: 1, HardcoreMode: '0', PctWon: '1' }])
   act(() => result.current.refetch())
   await waitFor(() => expect(result.current.all).toHaveLength(1))
   expect(result.current.error).toBe(false)
+  expect(result.current.keyInvalid).toBe(false)
 })
 
 test('session.update() flips the status to loading and back: a finished load is not started again, nor left loading', async () => {
@@ -125,4 +128,22 @@ test('session.update() flips the status to loading and back: a finished load is 
   expect(result.current.isLoading).toBe(false)
   expect(result.current.all).toHaveLength(1)
   expect(fetchWithRetry).toHaveBeenCalledTimes(1)
+})
+
+test('the consoles unticked in preferences leave the list, and the options still count them', async () => {
+  window.localStorage.clear()
+  window.localStorage.setItem('hidden-consoles:ra', '["SNES"]')
+  const games = [
+    { GameID: 1, ConsoleID: 3, ConsoleName: 'SNES', HardcoreMode: '1', PctWon: '1' },
+    { GameID: 2, ConsoleID: 4, ConsoleName: 'GameCube', HardcoreMode: '1', PctWon: '1' },
+  ]
+  ;(fetchWithRetry as jest.Mock).mockResolvedValue(games)
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { id: '1', rausername: 'testuser' } }, status: 'authenticated' })
+
+  const { result } = renderHook(() => useGamesData(), { wrapper })
+
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  expect(result.current.all.map((g) => g.GameID)).toEqual([2])
+  expect(result.current.hardcore.map((g) => g.GameID)).toEqual([2])
+  expect(result.current.consoles.map((c) => c.name).sort()).toEqual(['GameCube', 'SNES'])
 })

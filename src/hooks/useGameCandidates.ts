@@ -4,14 +4,16 @@ import { useGamesData } from '@/context/GamesDataContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
+import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
-import { buildPsnCandidates, buildRaCandidates, buildSteamCandidates, GameCandidate } from '@/utils/gameCandidates'
+import { buildPsnCandidates, buildRaCandidates, buildSteamCandidates, buildXboxCandidates, GameCandidate } from '@/utils/gameCandidates'
+import { xboxHasAchievements } from '@/utils/xboxTitles'
 import type { WantToPlayGame } from '@/types/types'
 
 /**
- * Every game the user can pick from, RA, Steam and PSN, for the pin,
+ * Every game the user can pick from, RA, Steam, PSN and Xbox, for the pin,
  * add-to-group and search pickers. RA comes from the shared completion and
- * recent lists plus the want-to-play list; Steam and PSN from their libraries.
+ * recent lists plus the want-to-play list; Steam, PSN and Xbox from their libraries.
  *
  * The want-to-play list is the only thing fetched here, and only once a
  * picker is first opened (`enabled`) — as the pickers did before.
@@ -23,6 +25,7 @@ export function useGameCandidates(enabled: boolean): GameCandidate[] {
   const { games: recent } = useRecentlyPlayedGames()
   const { library } = useSteamGamesData()
   const { library: psnLibrary } = usePsnGamesData()
+  const { library: xboxLibrary } = useXboxGamesData()
   const [wantToPlay, setWantToPlay] = useState<WantToPlayGame[]>([])
   const wantFetched = useRef(false)
 
@@ -42,7 +45,8 @@ export function useGameCandidates(enabled: boolean): GameCandidate[] {
       ...buildRaCandidates(all ?? [], recent ?? [], wantToPlay),
       ...buildSteamCandidates(library ?? []),
       ...buildPsnCandidates(psnLibrary ?? []),
+      ...buildXboxCandidates((xboxLibrary ?? []).filter(xboxHasAchievements)),
     ],
-    [all, recent, wantToPlay, library, psnLibrary],
+    [all, recent, wantToPlay, library, psnLibrary, xboxLibrary],
   )
 }

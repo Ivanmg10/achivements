@@ -96,3 +96,24 @@ test('an unlock date reads in the given language, and nothing when there is none
   expect(formatUnlockDate(null, 'en')).toBeNull()
   expect(formatUnlockDate('garbage', 'en')).toBeNull()
 })
+
+describe('xboxCompareList', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxCompareList } = require('./gameCompare') as typeof import('./gameCompare')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxAchievementFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  test('maps an Xbox achievement: gamerscore, rarity, its anchor and when it was earned', () => {
+    expect(xboxCompareList([xboxAchievementFixture({ id: '7', name: 'Seven', gamerscore: 25, rarity: 3.2 })])).toEqual([
+      {
+        id: '7', title: 'Seven', description: 'Complete the Prologue', iconUrl: null, gamerscore: 25, rarity: 3.2,
+        anchor: 'achievement-7', earned: true, earnedAt: '2026-01-06T18:20:22.7030000Z',
+      },
+    ])
+  })
+
+  test('keeps Xbox'+"'"+'s own order', () => {
+    const list = xboxCompareList([xboxAchievementFixture({ id: '2' }), xboxAchievementFixture({ id: '1' })])
+    expect(list.map((a) => a.id)).toEqual(['2', '1'])
+  })
+})

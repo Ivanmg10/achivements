@@ -154,3 +154,23 @@ describe('the calendar of a game', () => {
     expect(calendarEnd([earned('1', null)], NOW)).toBeUndefined()
   })
 })
+
+describe('Xbox', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { fromXbox } = require('./gameInsights') as typeof import('./gameInsights')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxAchievementFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  test('an Xbox achievement carries its rarity, its date and a link to it on its game page', () => {
+    const [a] = fromXbox([xboxAchievementFixture({ id: '49', name: 'Award', rarity: 24.7, unlockedAt: '2026-01-01T00:00:00Z' })], 1738914043)
+    expect(a).toMatchObject({
+      id: '49', title: 'Award', earned: true, earnedAt: '2026-01-01T00:00:00Z', rarity: 24.7, points: null, kind: null,
+      href: '/xboxGame/1738914043#achievement-49',
+    })
+  })
+
+  test('a locked one is not earned, and a missing rarity stays missing', () => {
+    const [a] = fromXbox([xboxAchievementFixture({ unlocked: false, unlockedAt: null, rarity: null })], 5)
+    expect(a).toMatchObject({ earned: false, earnedAt: null, rarity: null })
+  })
+})

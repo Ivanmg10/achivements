@@ -4,6 +4,12 @@ jest.mock('@/lib/raProfile', () => ({ ...jest.requireActual('@/lib/raProfile'), 
 jest.mock('@/lib/steamClient', () => ({ getPlayerSummaries: jest.fn() }))
 jest.mock('@/lib/steamCache', () => ({ clearUserCache: jest.fn() }))
 jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))
+jest.mock('@/lib/xboxClient', () => ({
+  ...jest.requireActual('@/lib/xboxClient'),
+  findXboxAccount: jest.fn(),
+  xboxConfigured: jest.fn(),
+  xboxSummary: jest.fn(),
+}))
 jest.mock('@/lib/psnClient', () => ({
   findPsnAccount: jest.fn(),
   psnConfigured: jest.fn(),
@@ -20,6 +26,7 @@ import { getPlayerSummaries } from '@/lib/steamClient'
 import { clearUserCache } from '@/lib/steamCache'
 import { forgetUser } from '@/lib/userRecord'
 import { findPsnAccount, psnConfigured, psnSummary } from '@/lib/psnClient'
+import { XboxError, findXboxAccount, xboxConfigured, xboxSummary } from '@/lib/xboxClient'
 
 const ADMIN = { id: '3', username: 'boss', pwv: 'v1' }
 const BOB = { id: 11, username: 'bob' }
@@ -53,8 +60,8 @@ test('404 for a user that does not exist, 400 for a bad id or platform', async (
   ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
   expect((await POST(post({ id: 99, platform: 'ra', username: 'a', apiKey: 'b' }))).status).toBe(404)
   ;(pool.query as jest.Mock).mockResolvedValue({ rows: [BOB] })
-  expect((await POST(post({ id: 11, platform: 'xbox' }))).status).toBe(400)
-  expect((await DELETE(del('id=11&platform=xbox'))).status).toBe(400)
+  expect((await POST(post({ id: 11, platform: 'switch' }))).status).toBe(400)
+  expect((await DELETE(del('id=11&platform=switch'))).status).toBe(400)
 })
 
 describe('RetroAchievements', () => {
@@ -188,5 +195,59 @@ describe('PSN', () => {
     expect(updates()[0][0]).toContain('psnaccountid = NULL')
     expect(clearUserCache).toHaveBeenCalledWith('11')
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-psn', BOB)
+  })
+})
+
+describe('Xbox', () => {
+  const PROFILE = { xuid: '2535400000000001', gamertag: 'TestPlayer' }
+
+  beforeEach(() => {
+    ;(xboxConfigured as jest.Mock).mockReturnValue(true)
+    ;(findXboxAccount as jest.Mock).mockResolvedValue(PROFILE)
+    ;(xboxSummary as jest.Mock).mockResolvedValue({})
+  })
+
+  test('links an account Xbox knows, as it spells it, and logs it', async () => {
+    const res = await POST(post({ id: 11, platform: 'xbox', gamertag: ' testplayer ' }))
+    expect(res.status).toBe(200)
+    expect(findXboxAccount).toHaveBeenCalledWith('testplayer')
+    expect(xboxSummary).toHaveBeenCalledWith(PROFILE.xuid, 'TestPlayer', '11')
+    expect(updates()[0][1]).toEqual([PROFILE.xuid, 'TestPlayer', 11])
+    expect(clearUserCache).toHaveBeenCalledWith('11')
+    expect(forgetUser).toHaveBeenCalledWith(11)
+    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'link-xbox', BOB, { xboxxuid: PROFILE.xuid, xboxgamertag: 'TestPlayer' })
+  })
+
+  test('a gamertag Xbox would not allow is refused before asking', async () => {
+    expect((await POST(post({ id: 11, platform: 'xbox', gamertag: '../x' }))).status).toBe(400)
+    expect((await POST(post({ id: 11, platform: 'xbox' }))).status).toBe(400)
+    expect(findXboxAccount).not.toHaveBeenCalled()
+  })
+
+  test('no OpenXBL key is a 503', async () => {
+    ;(xboxConfigured as jest.Mock).mockReturnValue(false)
+    expect((await POST(post({ id: 11, platform: 'xbox', gamertag: 'TestPlayer' }))).status).toBe(503)
+  })
+
+  test('an account Xbox does not know is a 404 and nothing is stored', async () => {
+    ;(findXboxAccount as jest.Mock).mockResolvedValue(null)
+    expect((await POST(post({ id: 11, platform: 'xbox', gamertag: 'TestPlayer' }))).status).toBe(404)
+    expect(updates()).toHaveLength(0)
+  })
+
+  test('a hidden profile or an Xbox failure stops the link', async () => {
+    ;(xboxSummary as jest.Mock).mockRejectedValue(new XboxError('private', 'hidden'))
+    expect((await POST(post({ id: 11, platform: 'xbox', gamertag: 'TestPlayer' }))).status).toBe(403)
+    ;(findXboxAccount as jest.Mock).mockRejectedValue(new XboxError('failed', 'down'))
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    expect((await POST(post({ id: 11, platform: 'xbox', gamertag: 'TestPlayer' }))).status).toBe(502)
+    expect(updates()).toHaveLength(0)
+  })
+
+  test('unlinking clears the account and its cache, and logs it', async () => {
+    expect((await DELETE(del('id=11&platform=xbox'))).status).toBe(200)
+    expect(updates()[0][0]).toContain('xboxxuid = NULL')
+    expect(clearUserCache).toHaveBeenCalledWith('11')
+    expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'unlink-xbox', BOB)
   })
 })

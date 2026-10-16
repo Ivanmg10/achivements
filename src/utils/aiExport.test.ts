@@ -129,3 +129,43 @@ test('language names and file names', () => {
   expect(aiExportFileName('Call of Duty®: Black Ops II', 'psn')).toBe('call-of-duty-black-ops-ii-psn-ai.json')
   expect(aiExportFileName('ポケモン', 'ra')).toBe('game-ra-ai.json')
 })
+
+describe('Xbox', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxAiSource } = require('./aiExport') as typeof import('./aiExport')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const fx = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  const game = fx.xboxGameFixture({ title: 'Halo Infinite', consoleName: 'Xbox Series · PC', earnedGamerscore: 25, totalGamerscore: 1750 })
+  const achievements = [
+    fx.xboxAchievementFixture({ id: '2', name: 'Locked one', unlocked: false, unlockedAt: null, gamerscore: 50, rarity: 1.25, secret: true }),
+    fx.xboxAchievementFixture({ id: '1', name: 'First', gamerscore: 25, unlockedAt: '2026-01-01T00:00:00Z' }),
+  ]
+
+  test('pending with gamerscore and the secret flag, earned oldest first, and the gamerscore progress', () => {
+    const file = buildAiExport(xboxAiSource({ game, achievements, details: null }), { lang: 'en', now: NOW })
+    expect(file.pending).toEqual([{ name: 'Locked one', description: 'Complete the Prologue', rarityPercent: 1.3, gamerscore: 50, hidden: true }])
+    expect(file.earned).toEqual([{ name: 'First', description: 'Complete the Prologue', earnedAt: '2026-01-01T00:00:00Z', gamerscore: 25 }])
+    expect(file.progress.gamerscore).toEqual({ earned: 25, total: 1750 })
+    expect(file.game).toEqual({ platform: 'Xbox', title: 'Halo Infinite', console: 'Xbox Series · PC' })
+  })
+
+  test('the play time goes in as hours when Xbox gave it, and is left out when not', () => {
+    const played = buildAiExport(xboxAiSource({ game: { ...game, playtimeMinutes: 3409 }, achievements, details: null }), { lang: 'en', now: NOW })
+    expect(played.game).toMatchObject({ playtimeHours: 56.8 })
+    expect(buildAiExport(xboxAiSource({ game, achievements, details: null }), { lang: 'en', now: NOW }).game).not.toHaveProperty('playtimeHours')
+  })
+
+  test('the instructions talk about Xbox achievements and gamerscore, and carry nothing of the account', () => {
+    const file = buildAiExport(xboxAiSource({ game, achievements, details: null }), { lang: 'es', now: NOW })
+    const text = file.instructions.join('\n')
+    expect(text).toContain('Xbox achievements')
+    expect(text).toContain('gamerscore')
+    expect(text).toContain('Reply in Spanish.')
+    expect(JSON.stringify(file)).not.toMatch(/2535400000000001|TestPlayer/)
+  })
+
+  test('the file is named after the game and the platform', () => {
+    expect(aiExportFileName('Halo Infinite', 'xbox')).toBe('halo-infinite-xbox-ai.json')
+  })
+})

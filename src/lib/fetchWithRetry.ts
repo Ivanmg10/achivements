@@ -2,10 +2,7 @@ const BASE_DELAY = 800
 const TIMEOUT_MS = 20_000
 const MAX_ATTEMPTS = 4
 
-export async function fetchWithRetry(
-  url: string,
-  maxAttempts = MAX_ATTEMPTS,
-): Promise<unknown> {
+async function runWithRetry(url: string, maxAttempts: number): Promise<unknown> {
   let lastErr: unknown
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const controller = new AbortController()
@@ -29,6 +26,24 @@ export async function fetchWithRetry(
     }
   }
   throw lastErr
+}
+
+const inFlight = new Map<string, Promise<unknown>>()
+
+/**
+ * A GET with retries, and one request for the same URL at a time: when several
+ * components on a page ask for the same thing (the awards, the recent unlocks)
+ * they share the one answer instead of each paying for it. Only while it is in
+ * flight — a later call asks again, so a refetch is never answered from the past.
+ * The parsed answer is shared, so a caller must copy it before changing it.
+ */
+export function fetchWithRetry(url: string, maxAttempts = MAX_ATTEMPTS): Promise<unknown> {
+  const key = `${maxAttempts}:${url}`
+  const running = inFlight.get(key)
+  if (running) return running
+  const request = runWithRetry(url, maxAttempts).finally(() => inFlight.delete(key))
+  inFlight.set(key, request)
+  return request
 }
 
 const MAX_BACKGROUND_RETRIES = 5

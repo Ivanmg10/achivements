@@ -57,6 +57,12 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
               <span className="text-[#0070d1] font-semibold">{counts.psn} PlayStation</span>
             </>
           )}
+          {counts.xbox > 0 && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span className="text-green-500 font-semibold">{counts.xbox} Xbox</span>
+            </>
+          )}
         </p>
       </div>
 

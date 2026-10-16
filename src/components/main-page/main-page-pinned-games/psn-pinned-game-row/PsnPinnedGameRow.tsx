@@ -25,11 +25,11 @@ import { psnBackdrop } from '@/utils/psnTitles'
 export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId: number; isOpen: boolean; onToggle: () => void }) {
   const { T } = useLanguage()
   const onPointerMove = useSpotlight()
-  const { library, libraryLoading } = usePsnGamesData()
+  const { fullLibrary, libraryLoading } = usePsnGamesData()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: gameKey('psn', gameId) })
   const style = { transform: CSS.Transform.toString(transform), transition }
 
-  const game = library.find((g) => g.id === gameId)
+  const game = fullLibrary.find((g) => g.id === gameId)
 
   if (!game) {
     // Loading, or a pin for a game no longer in the list (PSN unlinked): a placeholder that can still be unpinned.

@@ -3,6 +3,8 @@ import type { GameSource, SteamAchievementUnified } from '@/types/steam'
 import type { PsnTrophy } from '@/types/psn'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
+import { xboxAchievementAnchor } from '@/utils/xboxTitles'
+import type { XboxAchievement } from '@/types/xbox'
 import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
 
 /** An achievement or trophy of any platform, reduced to what a library card tells. */
@@ -69,6 +71,20 @@ export const fromPsn = (list: PsnTrophy[], gameId: number): InsightAchievement[]
     kind: null,
     iconUrl: t.iconUrl,
     href: `${gameHref('psn', gameId)}#${psnTrophyAnchor(t.id)}`,
+  }))
+
+export const fromXbox = (list: XboxAchievement[], gameId: number): InsightAchievement[] =>
+  list.map((a) => ({
+    id: a.id,
+    title: a.name,
+    description: a.description,
+    earned: a.unlocked,
+    earnedAt: a.unlockedAt,
+    rarity: a.rarity,
+    points: null,
+    kind: null,
+    iconUrl: a.iconUrl,
+    href: `${gameHref('xbox', gameId)}#${xboxAchievementAnchor(a.id)}`,
   }))
 
 /** Most common first; a band holds everything from its floor up to the previous band's. */

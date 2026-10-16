@@ -7,6 +7,7 @@ import { clearUserCache } from '@/lib/steamCache'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { readSteamId } from '@/lib/steamAccount'
 import { findPsnAccount, psnConfigured, psnFailure, psnSummary } from '@/lib/psnClient'
+import { findXboxAccount, isGamertag, xboxConfigured, xboxFailure, xboxSummary } from '@/lib/xboxClient'
 import { forgetUser } from '@/lib/userRecord'
 
 /**
@@ -27,7 +28,7 @@ async function findUser(id: unknown): Promise<Target | null | 'bad-id'> {
   return rows[0] ?? null
 }
 
-// POST { id, platform: 'ra', username, apiKey } | { id, platform: 'steam', steamid } | { id, platform: 'psn', username }
+// POST { id, platform: 'ra', username, apiKey } | { id, platform: 'steam', steamid } | { id, platform: 'psn', username } | { id, platform: 'xbox', gamertag }
 export async function POST(req: Request) {
   try {
     const auth = await requireAdmin(req)
@@ -110,14 +111,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, psnaccountid: account.accountId, psnusername: account.onlineId })
     }
 
-    return NextResponse.json({ error: 'platform must be ra, steam or psn' }, { status: 400 })
+    if (body.platform === 'xbox') {
+      const gamertag = typeof body.gamertag === 'string' ? body.gamertag.trim() : ''
+      if (!isGamertag(gamertag)) return NextResponse.json({ error: 'An Xbox gamertag (up to 15 letters, digits or spaces) is required' }, { status: 400 })
+      if (!xboxConfigured()) return NextResponse.json({ error: 'not-configured' }, { status: 503 })
+
+      let account: Awaited<ReturnType<typeof findXboxAccount>>
+      try {
+        account = await findXboxAccount(gamertag)
+        if (!account) return NextResponse.json({ error: 'Xbox has no account with that gamertag' }, { status: 404 })
+        await xboxSummary(account.xuid, account.gamertag, String(target.id))
+      } catch (err) {
+        return xboxFailure(err, 'admin/users/accounts xbox')
+      }
+
+      await pool.query('UPDATE users SET xboxxuid = $1, xboxgamertag = $2 WHERE id = $3', [account.xuid, account.gamertag, target.id])
+      await clearUserCache(String(target.id))
+      forgetUser(target.id)
+      await logAdminAction(auth.admin, 'link-xbox', target, { xboxxuid: account.xuid, xboxgamertag: account.gamertag })
+      return NextResponse.json({ ok: true, xboxxuid: account.xuid, xboxgamertag: account.gamertag })
+    }
+
+    return NextResponse.json({ error: 'platform must be ra, steam, psn or xbox' }, { status: 400 })
   } catch (err) {
     console.error('[admin/users/accounts POST]', err)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
   }
 }
 
-// DELETE ?id=<user>&platform=ra|steam|psn
+// DELETE ?id=<user>&platform=ra|steam|psn|xbox
 export async function DELETE(req: Request) {
   try {
     const auth = await requireAdmin(req)
@@ -125,8 +147,8 @@ export async function DELETE(req: Request) {
 
     const params = new URL(req.url).searchParams
     const platform = params.get('platform')
-    if (platform !== 'ra' && platform !== 'steam' && platform !== 'psn') {
-      return NextResponse.json({ error: 'platform must be ra, steam or psn' }, { status: 400 })
+    if (platform !== 'ra' && platform !== 'steam' && platform !== 'psn' && platform !== 'xbox') {
+      return NextResponse.json({ error: 'platform must be ra, steam, psn or xbox' }, { status: 400 })
     }
     const target = await findUser(params.get('id'))
     if (target === 'bad-id') return NextResponse.json({ error: 'A numeric id is required' }, { status: 400 })
@@ -137,8 +159,11 @@ export async function DELETE(req: Request) {
     } else if (platform === 'steam') {
       await pool.query('UPDATE users SET steamid = NULL, steamusername = NULL WHERE id = $1', [target.id])
       await clearUserCache(String(target.id))
-    } else {
+    } else if (platform === 'psn') {
       await pool.query('UPDATE users SET psnaccountid = NULL, psnusername = NULL WHERE id = $1', [target.id])
+      await clearUserCache(String(target.id))
+    } else {
+      await pool.query('UPDATE users SET xboxxuid = NULL, xboxgamertag = NULL WHERE id = $1', [target.id])
       await clearUserCache(String(target.id))
     }
     forgetUser(target.id)

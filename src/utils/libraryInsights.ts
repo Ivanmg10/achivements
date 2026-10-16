@@ -3,6 +3,7 @@ import type { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import type { RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
+import type { XboxGameProgress } from '@/types/xbox'
 import type { StatusSortState } from '@/components/status-sort-control/StatusSortControl'
 import { compareSortValues } from '@/utils/utils'
 
@@ -45,12 +46,14 @@ export const raProgress = (g: CategoryGame, extra?: GameExtraData): Progress => 
 })
 export const steamProgress = (g: SteamGameProgress): Progress => ({ pct: g.pctWon, lastPlayed: g.lastPlayed })
 export const psnProgress = (g: PsnGameProgress): Progress => ({ pct: g.pctWon, lastPlayed: g.lastPlayed ?? g.lastTrophyAt })
+export const xboxProgress = (g: XboxGameProgress): Progress => ({ pct: g.pctWon, lastPlayed: g.lastPlayed })
 
 /** One game of any platform in the mixed list, with what the common sort reads. */
 export type LibraryEntry = Progress & { key: string; title: string } & (
   | { kind: 'ra'; game: CategoryGame; extra?: GameExtraData }
   | { kind: 'steam'; game: SteamGameProgress }
   | { kind: 'psn'; game: PsnGameProgress }
+  | { kind: 'xbox'; game: XboxGameProgress }
 )
 
 export function buildEntries(
@@ -58,6 +61,7 @@ export function buildEntries(
   extra: Map<number, GameExtraData>,
   steam: SteamGameProgress[],
   psn: PsnGameProgress[],
+  xbox: XboxGameProgress[] = [],
 ): LibraryEntry[] {
   return [
     ...ra.map((game): LibraryEntry => {
@@ -66,6 +70,7 @@ export function buildEntries(
     }),
     ...steam.map((game): LibraryEntry => ({ kind: 'steam', key: `steam:${game.id}`, title: game.title, game, ...steamProgress(game) })),
     ...psn.map((game): LibraryEntry => ({ kind: 'psn', key: `psn:${game.id}`, title: game.title, game, ...psnProgress(game) })),
+    ...xbox.map((game): LibraryEntry => ({ kind: 'xbox', key: `xbox:${game.id}`, title: game.title, game, ...xboxProgress(game) })),
   ]
 }
 

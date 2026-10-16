@@ -37,7 +37,7 @@ test('no source means the RA favourite, as before', async () => {
 })
 
 test('rejects an unknown platform and incomplete games', async () => {
-  expect((await POST(post({ id: 1, title: 'Zelda', source: 'xbox' }))).status).toBe(400)
+  expect((await POST(post({ id: 1, title: 'Zelda', source: 'switch' }))).status).toBe(400)
   expect((await POST(post({ title: 'Zelda' }))).status).toBe(400)
   expect(pool.query).not.toHaveBeenCalled()
 })
@@ -57,7 +57,7 @@ test('delete clears the column of the given platform', async () => {
 })
 
 test('delete rejects an unknown platform', async () => {
-  expect((await DELETE(del('xbox'))).status).toBe(400)
+  expect((await DELETE(del('switch'))).status).toBe(400)
 })
 
 test('a database error is a 500, not a crash', async () => {
@@ -65,4 +65,19 @@ test('a database error is a 500, not a crash', async () => {
   ;(pool.query as jest.Mock).mockRejectedValue(new Error('db down'))
   expect((await POST(post({ id: 1, title: 'Zelda' }))).status).toBe(500)
   expect((await DELETE(del())).status).toBe(500)
+})
+
+describe('Xbox is admin-only', () => {
+  test('a non-admin cannot set an Xbox favourite', async () => {
+    expect((await POST(post({ id: 1738914043, title: 'Halo', source: 'xbox' }))).status).toBe(403)
+    expect(pool.query).not.toHaveBeenCalled()
+  })
+
+  test('an admin gets it in its own column, and can clear it', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '3', admin: true } })
+    expect((await POST(post({ id: 1738914043, title: 'Halo', imageIcon: 'i.jpg', source: 'xbox' }))).status).toBe(200)
+    expect((pool.query as jest.Mock).mock.calls[0][0]).toContain('favorite_xbox_game')
+    expect((await DELETE(del('xbox'))).status).toBe(200)
+    expect((pool.query as jest.Mock).mock.calls[1][0]).toContain('favorite_xbox_game = NULL')
+  })
 })

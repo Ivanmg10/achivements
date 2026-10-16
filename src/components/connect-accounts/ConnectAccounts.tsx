@@ -8,6 +8,8 @@ import RaLoginModal from '@/components/ra-login-modal/RaLoginModal'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import UserSteamCard from '@/components/user-page/user-steam-card/UserSteamCard'
 import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
+import UserXboxCard from '@/components/user-page/user-xbox-card/UserXboxCard'
+import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useLanguage } from '@/context/LanguageContext'
 
 const ACTION =
@@ -29,6 +31,8 @@ export default function ConnectAccounts() {
   const raLinked = Boolean(session?.user?.rausername)
   const steamLinked = Boolean(session?.user?.steamid)
   const psnLinked = Boolean(session?.user?.psnaccountid)
+  const xboxEnabled = useXboxEnabled()
+  const xboxLinked = Boolean(session?.user?.xboxxuid)
 
   const perks = [
     { icon: <IconLibrary size={20} />, text: T.landing.libraryTitle },
@@ -44,7 +48,7 @@ export default function ConnectAccounts() {
           <p className="text-sm sm:text-base text-text-secondary max-w-xl">{T.connect.subtitle}</p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className={`grid grid-cols-1 gap-4 ${xboxEnabled ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
           {!raLinked && (
             <UserPlatformCard
               name="RetroAchievements"
@@ -67,6 +71,9 @@ export default function ConnectAccounts() {
 
           {/* The account page's own PSN card: the online ID is typed right here. */}
           {!psnLinked && <UserPsnCard />}
+
+          {/* Xbox, only for who may use it (an admin, for now): the card renders nothing for anyone else. */}
+          {!xboxLinked && <UserXboxCard />}
         </div>
 
         <section className="flex flex-col items-center gap-3">

@@ -38,6 +38,13 @@ test('GET returns empty when no rausername', async () => {
   expect(res.data).toEqual([])
 })
 
+test('GET returns 403 ra-key-invalid when RA refuses the key, which the client does not retry', async () => {
+  ;(fetchRA as jest.Mock).mockRejectedValueOnce(Object.assign(new Error('RA API error 401'), { status: 401 }))
+  const res = await GET()
+  expect(res.status).toBe(403)
+  expect(res.data).toEqual({ error: 'ra-key-invalid' })
+})
+
 test('GET returns 503 on fetchRA error', async () => {
   ;(fetchRA as jest.Mock).mockRejectedValueOnce(new Error('fail'))
   const res = await GET()

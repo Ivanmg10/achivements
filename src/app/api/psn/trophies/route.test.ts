@@ -60,3 +60,10 @@ test('403 for a hidden profile, 502 for anything else', async () => {
   ;(findPsnGame as jest.Mock).mockRejectedValueOnce(new Error('network'))
   expect((await call('id=NPWR00001_00')).status).toBe(502)
 })
+
+test('the browser may keep the answer for 5 minutes, privately, and a new session cookie asks again', async () => {
+  const res = await GET(new NextRequest('http://localhost/api/psn/trophies?id=NPWR00001_00'))
+  expect(res.status).toBe(200)
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=300')
+  expect(res.headers.get('Vary')).toBe('Cookie')
+})

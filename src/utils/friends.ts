@@ -9,7 +9,7 @@ export type FriendPin = { source: GameSource; gameId: number; gameTitle: string;
 
 /** Someone you follow, as /api/follows/overview gives them. */
 export type FriendOverview = UserSearchResult & {
-  favorites: Record<GameSource, SavedGame>
+  favorites: Partial<Record<GameSource, SavedGame>>
   publicGroups: number
   pins: FriendPin[]
 }

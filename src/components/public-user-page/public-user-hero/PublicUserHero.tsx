@@ -93,7 +93,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
           <p className="text-sm text-text-main whitespace-pre-line wrap-break-word max-w-3xl">{user.description}</p>
         )}
 
-        {(user.ra || user.steam || user.psn) && <PublicUserKpis />}
+        {(user.ra || user.steam || user.psn || user.xbox) && <PublicUserKpis />}
       </div>
     </section>
   )

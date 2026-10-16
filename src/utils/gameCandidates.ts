@@ -3,6 +3,9 @@ import { gameKey } from '@/utils/gameRef'
 import { classifySteamGame } from '@/utils/steamFeed'
 import { classifyPsnGame } from '@/utils/psnTitles'
 import { PSN_PLATFORM } from '@/utils/psnMappers'
+import { classifyXboxGame } from '@/utils/xboxTitles'
+import { XBOX_PLATFORM } from '@/utils/xboxMappers'
+import type { XboxGameProgress } from '@/types/xbox'
 import type { PsnGameProgress } from '@/types/psn'
 import type { RecentlyPlayedGame, RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
@@ -114,6 +117,18 @@ export function buildPsnCandidates(library: PsnGameProgress[]): GameCandidate[] 
     const category = classifyPsnGame(g)
     return {
       key: gameKey('psn', g.id), source: 'psn', id: g.id, title: g.title, subtitle: PSN_PLATFORM,
+      imageRef: g.imageIcon, pctWon: g.pctWon / 100, numAwarded: g.numAwarded, maxPossible: g.maxPossible,
+      status: category === 'completed' ? 'perfect' : category === 'playing' ? 'in-progress' : 'want-to-play',
+    }
+  })
+}
+
+/** Xbox candidates, with the same statuses as PSN's. */
+export function buildXboxCandidates(library: XboxGameProgress[]): GameCandidate[] {
+  return library.map((g) => {
+    const category = classifyXboxGame(g)
+    return {
+      key: gameKey('xbox', g.id), source: 'xbox', id: g.id, title: g.title, subtitle: XBOX_PLATFORM,
       imageRef: g.imageIcon, pctWon: g.pctWon / 100, numAwarded: g.numAwarded, maxPossible: g.maxPossible,
       status: category === 'completed' ? 'perfect' : category === 'playing' ? 'in-progress' : 'want-to-play',
     }

@@ -191,10 +191,15 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 - `1.3.0` — a loading state on every route (its own skeleton, and a thin line
   along the top while a page is on its way) and the functions in `fra1`, next
   to the database. Never reached `main` on its own; it shipped inside 1.4.0
-- `1.4.0` — current, released to `main` 2026-10-14: public profiles rebuilt
+- `1.4.0` — released to `main` 2026-10-14: public profiles rebuilt
   (hero with tabs, opt-in gender, open and compare a user's game), follows and
   the Following section, theme accents reworked, "Ask an AI" export, internal
   docs and the PR description check
+- `1.5.0` — current on `develop` (not yet on `main`): Xbox through OpenXBL, 1:1 with
+  PSN but **admin-only** (see the Xbox section), a preference per platform to choose
+  which consoles show, preferences that follow the account (`migrations/033`–`036`),
+  account preferences in tabs, the library layout remembered, total play time, and
+  a stricter reading of private profiles and refused keys on every platform
 
 ## Release gates — what had to be true before 1.0 (all closed)
 
@@ -333,6 +338,85 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   not something settled. `raid` stays server-only either way.
 - The user search (`/api/users/search`) only reads our database; it never calls RA.
 
+## Xbox (OpenXBL) — admin-only for now, read before touching it
+
+Read through OpenXBL (xbl.io, an unofficial proxy over Xbox Live), all in
+`src/lib/xboxClient.ts`. It is a 1:1 of PSN's integration (link by gamertag,
+summary, library and categories, `/xboxGame/[id]`, feeds, pins, favorites,
+groups, collection, friends, public profiles, admin linking) **but only admins
+see or use it**. Migrations 033–035 (xbox columns, `'xbox'` game source, pinned
+achievements) were applied 2026-10-15. Plan and measured findings:
+`docs/xbox-integration-plan.md`.
+
+- **Xbox stays admin-only on purpose (decided 2026-10-16), and the reason is money.**
+  OpenXBL's free plan is 150 calls an hour for the whole app, and one new user costs
+  ~4 calls (library, play time, summary, the first game's achievements) plus 2 per
+  Xbox 360 game opened. The user does not want to pay for a plan yet, so **do not set
+  `XBOX_ADMIN_ONLY` to `false`, and do not suggest it as a next step**, until they
+  say they will pay for a plan (or accept limiting cold loads). When it does open:
+  upgrade the plan, then update the landing text, site title and meta description
+  (they still list three platforms) and the terms.
+- **The gate is one switch**: `XBOX_ADMIN_ONLY` in `src/utils/xboxAccess.ts`
+  (`canUseXbox(admin)`, `sourceAllowed(source, admin)`). To open Xbox to everyone,
+  set it to `false`; nothing else needs to change. It is enforced in three
+  places and all three must keep holding: the routes (`requireXboxUser` /
+  `requireXboxSession` answer 401/403; every pin, hide, favorite, group and
+  order route calls `sourceAllowed`), the UI (`useXboxEnabled`), and the paths
+  that show *other* people's data (public profile, follows, search, groups,
+  favorites) which drop Xbox rows and fields for a non-admin viewer. A new
+  place that lists games or accounts must filter Xbox the same way.
+- `users.xboxxuid`/`xboxgamertag` are in the session (`xboxxuid`); users link by
+  typing a gamertag, which nothing proves is theirs (like PSN), so no uniqueness.
+- Secret achievements stay concealed until the viewer reveals them
+  (`useRevealedAchievements`); the Ask-an-AI export uses gamerscore.
+
+- **One app key, not the user's** (`OPENXBL_API_KEY`, server-only, never
+  `NEXT_PUBLIC_`), like PSN's NPSSO. Without it the routes answer
+  `503 not-configured`; a refused key answers `503 unauthorized`.
+- **150 calls an hour for the whole app** on the free plan. Everything is cached
+  in `steam_cache` under `xbox:` keys; a profile costs ~3 calls cold (search,
+  library, one game's achievements). Bump a key's `_vN` when its value's shape changes.
+- **OpenXBL answers errors with HTTP 200** and the real status in the body
+  (`{ code: 400 }`): `xboxCall` checks both. It also refuses
+  `Accept-Language: *`, which Node's fetch sends by default, so a language is
+  always sent.
+- **Data shape:** gamerscore, not trophy grades; no DLC groups. Newer games report
+  `totalAchievements: 0` while their gamerscore total is real, so progress goes
+  by gamerscore and the achievement total may be `null`. Xbox 360 games use
+  another endpoint and shape (`is360`: Xbox's `mediaItemType` is `Xbox360Game`
+  or `XboxArcadeGame`; **not** "devices is only Xbox 360", because backward-
+  compatible games list newer consoles too and the modern endpoint answers them
+  with no achievements), and take **two calls**: the title's whole
+  list (`achievements/player/{xuid}/title/{titleId}`, all locked) and what the
+  account unlocked (`achievements/x360/…`), joined by `merge360Achievements`
+  (measured 2026-10-15; the x360 one alone lists only the unlocked). If a list
+  still comes up short, `XboxPartialListNote` says so. Their icons are not URLs: they are built from `titleId`
+  and `imageId` in hex (`xbox360Icon`).
+- **Image hosts:** `images-eds.xboxlive.com` and `image.xboxlive.com` have no
+  certificate for https; `xboxMappers.https()` swaps them for the `-ssl` twins.
+  Keep every Xbox image going through it. `titleId` is a decimal string; the largest
+  seen is under 2^31 (the `game_id` columns are INTEGER), but check before storing it.
+- **Play time** comes from one `POST player/stats` (`MinutesPlayed`, up to 150
+  titles per call) made inside the cached library load (`xbox:titles:v5`); a
+  backward-compatible 360 game is asked under its `modernTitleId`
+  (`xboxStatsTitleId`). A failure leaves the library whole, without hours. Many
+  games simply have none.
+- **Backdrop:** a game page's wide picture is IGDB's (`heroUrl` in
+  `/api/xbox/details`), fetched when the page opens; lists keep Xbox's own tile.
+  Do not enrich the whole library from IGDB at load (135 searches).
+- **Measured 2026-10-16:** an unknown gamertag answers HTTP 200 with `code: 404` in
+  the body (→ `not-found`). A library the viewer cannot read answers like a
+  nonexistent xuid, `titles: []` with **no `achievementSummary`**, while a public
+  account with no games has the summary: that is how `xboxLibraryData` tells
+  `private` from empty. A public non-friend's library and achievements read fine
+  (one was 1000 titles, 1 MB), so play time is only asked for the 300 most recently
+  played games.
+- `/privacy` says what Xbox keeps and who receives it (gamertag, XUID, OpenXBL, Microsoft)
+  in all 9 languages; the landing text, site title and meta description still say
+  "RetroAchievements, Steam and PlayStation" on purpose: change them when Xbox opens to everyone.
+- Admin explorer lookups and linking are logged (`xbox-lookup`, `link-xbox`,
+  `unlink-xbox`). Do not add a second Xbox provider without asking.
+
 ## PlayStation (PSN) — read before touching it
 
 Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient.ts`.
@@ -376,6 +460,85 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   the message). `psnFailure()` maps them to 503 / 403 (private) / 429 (rate
   limited, with `Retry-After: 60`) / 502. The client reads a 429 as a plain
   failure with a retry button.
+
+## Performance rules — keep these true (audited 2026-10-16)
+
+- **recharts is only loaded through the lazy plots** (`AchievementsLinePlot`,
+  `GameAchievementsProgressPlot`, via `next/dynamic`). Never import `recharts` in
+  a component that is part of a page's first render: it is ~390 KB.
+- **A modal is a `next/dynamic` import wrapped in `LazyWhenOpened`**, so it is
+  downloaded the first time it opens and stays mounted after (its exit animation
+  plays). Do not import a modal statically into a page or the header.
+  (A test waits for such a modal with `findBy…`; `__mocks__/next/dynamic.js`.)
+- **Several components asking for the same GET share one request while it is in
+  flight**: `fetchWithRetry` does it for you; for a raw `fetch` of a GET use
+  `fetchShared`. A shared answer is shared by reference: copy before changing it.
+- **Read routes that are expensive upstream send `cachedJson(data, ttl)`**
+  (private, `Vary: Cookie`): the PSN and Xbox reads (5 min per game, 2 min for
+  recent unlocks) as RA's and Steam's already did. Mutable data (groups, pins,
+  preferences) never does.
+- **A context value is memoized** when its provider reads the session (the session
+  updates on every visit and would re-render every consumer).
+- **A route group has an `error.tsx`** (`RouteError`), or its errors replace the
+  whole app (`global-error`).
+
+## Preferences that follow the account
+
+The display preferences (which consoles show, library layout/view/columns/sort,
+and the PSN/Xbox switches) are kept in the browser (`useStorageValue`) **and**
+mirrored in `users.preferences` (`migrations/036_user_preferences.sql`, a jsonb of
+short strings), so they follow the person between devices.
+
+- **The list of keys is fixed in code** (`src/utils/syncedPreferences.ts`,
+  `isSyncedKey`); `/api/preferences` refuses anything else whole. A device-bound
+  value (language, cookie choice, the last tab, folded sections) stays in the
+  browser. **To sync a new preference, add its key there**; nothing else.
+- `usePreferencesSync` (mounted by `MainProviders`): on sign-in the account's values
+  are applied to the browser (the account wins) and what only the browser has goes up
+  once; then each change is sent after 800 ms. Changes made by the sync itself are not
+  sent back (`applyStoredValue`). A failed save toasts; a failed read only logs.
+- Not mounted on someone else's page, and never exposed on public profiles
+  (`publicUser` selects explicit columns: keep it that way).
+
+## How each platform fails — keep these distinct (audited 2026-10-16)
+
+A person must be able to tell "nothing here" from "I cannot read it" from "try later".
+
+| | Unknown account | Private / unreadable | Credential refused | Busy |
+|---|---|---|---|---|
+| **RA** | RA says 401 for a bad key, for any username | n/a (profiles are public) | `raUnavailable()` → `403 ra-key-invalid`, not retried; `RaKeyInvalidNotice` | 429 waits `Retry-After`, then 503 (retried) |
+| **Steam** | link: `not-found`; ids that do not exist answer 400 | link: `403 private`; **after linking**, `{ response: {} }` → `ownedGames` answers `403 private` (not an empty library) and the list page says so | key is the app's | 503 |
+| **PSN** | link: not found | `psnFailure` → 403 | NPSSO expiry, admin panel | 429 + `Retry-After: 60` |
+| **Xbox** | `code: 404` in the body → `not-found` | no titles and no `achievementSummary` → `private` | app key: `503 unauthorized` | 429 |
+
+An error that asking again will not fix must be a 4xx: the client retries 5xx
+(`fetchWithRetry`, then `scheduleRetry`) and never a 4xx.
+
+## Consoles to show — a preference per platform
+
+The account page's preferences are in tabs (`UserPreferencesCard`): General, then
+one per platform with its favourite game and its own choices; the tab last open
+is remembered (`account-preferences-tab`). A new platform preference goes in its
+platform's tab, not in a new card. RA, PSN and Xbox each have, in their tab, the list of
+the consoles in the user's library with a tick each (`UserConsolesPreference`;
+Steam has none). Unticked consoles leave the lists, collection and stats, and
+nothing is deleted.
+
+- Stored under `hidden-consoles:<source>` (`useHiddenConsoles`; in the browser and,
+  see "Preferences that follow the account", on the account), as the *unticked* names, so a console that appears later starts shown.
+- Applied **in the data contexts** (`GamesDataContext`, `PsnGamesDataContext`,
+  `XboxGamesDataContext`): `library`/`all` is filtered, `fullLibrary` (PSN, Xbox)
+  and `consoles` (the options) are not. **Anything that looks a game up by id**
+  (its page, a pin, a group item) must use `fullLibrary`, or a game on an
+  unticked console 404s.
+- Only the viewer's **own** library: on someone else's page (`useSubject()`)
+  nothing is filtered. A game is hidden only when **all** its consoles are
+  unticked (`isConsoleShown`: "Xbox 360 · Xbox Series" stays with either ticked).
+- **Feeds follow it too** (`useConsoleVisibility`: `isShown(unlock)` /
+  `isGameShown(source, id)`): the year feed behind the streak, the heatmap and the
+  charts, RA's recent unlocks, and the PSN/Xbox "latest" columns. So a day spent only
+  on a hidden console is not a day in the streak. A **new feed of unlocks must
+  filter through that hook**, or a hidden game comes back through it.
 
 ## Registration
 
@@ -500,7 +663,11 @@ branch to be up to date with its base** before merging, on both.
 - [x] Steam integration
 - [x] Public user profiles
 - [ ] Group hardcore achievement tracking
-- [ ] Push notifications
+- [ ] Notifications — **an idea the user wants to expand before it is built; do not
+      start it, and do not assume it is push or email.** Ask what they have in mind
+      first. Known so far: friends completing games and a game's last chance (a
+      Game Pass title leaving) were floated, nothing decided. Needs a channel,
+      per-user subscriptions and a place to store them (a migration).
 - [x] Steam linked by name, like PSN (2026-10-09): custom URL name, profile
       link or SteamID64 (`src/lib/steamAccount.ts`), no OpenID, and no
       "already linked elsewhere" check (`migrations/028`), so one person can
@@ -517,7 +684,11 @@ branch to be up to date with its base** before merging, on both.
       a code, the user puts it for a few minutes in their RA motto / Steam
       summary / PSN About me, the app reads it. Only if public profiles or
       group comparisons come to need proof of ownership.
-- [ ] 13 optimization fixes (cache stampede, Cache-Control headers, duplicate fetches, TTLs, error boundaries, lazy images)
+- [x] The "13 optimization fixes" (2026-10-16). They were never written down, only
+      named, so they were re-derived by auditing each named area; see "Performance
+      rules" below for what was done and what must stay true. Already fine and left
+      alone: server cache stampede (`withSteamCache`, `withCache`), database indexes,
+      TTLs.
 - [x] The ~51 `react-hooks/set-state-in-effect` warnings are gone (2026-10-09)
       and the rule is now an error. See State and effects above.
 

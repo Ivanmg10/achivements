@@ -6,6 +6,7 @@ import { STATUS_GRID_COLS } from '@/components/statusGameList/StatusGameList'
 import StatusGameItem from '@/components/statusGameList/StatusGameItem'
 import SteamStatusGameItem from '@/components/steam/steam-status-game-item/SteamStatusGameItem'
 import PsnStatusGameItem from '@/components/psn/psn-status-game-item/PsnStatusGameItem'
+import XboxStatusGameItem from '@/components/xbox/xbox-status-game-item/XboxStatusGameItem'
 import EmptyState from '@/components/empty-state/EmptyState'
 import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import { IconFilterOff } from '@tabler/icons-react'
@@ -33,8 +34,10 @@ export default function LibraryAllList({
           <StatusGameItem key={e.key} game={e.game} extra={e.extra} category={category} />
         ) : e.kind === 'steam' ? (
           <SteamStatusGameItem key={e.key} game={e.game} category={category} />
-        ) : (
+        ) : e.kind === 'psn' ? (
           <PsnStatusGameItem key={e.key} game={e.game} category={category} />
+        ) : (
+          <XboxStatusGameItem key={e.key} game={e.game} category={category} />
         ),
       )}
     </div>

@@ -19,32 +19,34 @@ const recentAchievements = [
   { Date: recentDate(2) } as never,
 ]
 
-test('renders the week as a line, with its total and its best day', () => {
+test('renders the week as a line, with its total and its best day', async () => {
   render(<AchievementsLineChart achievements={recentAchievements} />)
-  expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
+  // The plot (recharts) is loaded apart: the numbers are there at once, the line a moment later.
+  expect(screen.getByText('3')).toBeInTheDocument()
+  expect(await screen.findByTestId('ResponsiveContainer')).toBeInTheDocument()
   expect(screen.getByTestId('AreaChart')).toBeInTheDocument()
   expect(screen.getByText('3')).toBeInTheDocument()
   expect(screen.getByText(en.lineChart.bestDay.replace('{n}', '1'))).toBeInTheDocument()
 })
 
-test('RA and Steam make one line; the split is in the tooltip', () => {
+test('RA and Steam make one line; the split is in the tooltip', async () => {
   render(<AchievementsLineChart achievements={[...recentAchievements, { Date: recentDate(0), Source: 'steam' } as never]} />)
-  expect(screen.getAllByTestId('Area')).toHaveLength(1)
+  expect(await screen.findAllByTestId('Area')).toHaveLength(1)
   expect(screen.getByText('4')).toBeInTheDocument()
 })
 
-test('still renders the chart, flat at 0, with no achievements', () => {
+test('still renders the chart, flat at 0, with no achievements', async () => {
   render(<AchievementsLineChart achievements={[]} />)
-  expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
+  expect(await screen.findByTestId('ResponsiveContainer')).toBeInTheDocument()
   expect(screen.getByText('0')).toBeInTheDocument()
   expect(screen.getByText(en.lineChart.last7Days)).toBeInTheDocument()
   expect(screen.queryByText(en.lineChart.bestDay.replace('{n}', '0'))).not.toBeInTheDocument()
 })
 
-test('still renders the chart, flat at 0, with only old achievements', () => {
+test('still renders the chart, flat at 0, with only old achievements', async () => {
   const old = [{ Date: '2020-01-01 00:00:00' } as never]
   render(<AchievementsLineChart achievements={old} />)
-  expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
+  expect(await screen.findByTestId('ResponsiveContainer')).toBeInTheDocument()
 })
 
 test('one unlock is said in the singular', () => {

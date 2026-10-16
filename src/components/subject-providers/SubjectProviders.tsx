@@ -10,6 +10,7 @@ import { ActivityHeatmapYearProvider } from '@/context/ActivityHeatmapYearContex
 import { GamesDataProvider } from '@/context/GamesDataContext'
 import { SteamGamesDataProvider } from '@/context/SteamGamesDataContext'
 import { PsnGamesDataProvider } from '@/context/PsnGamesDataContext'
+import { XboxGamesDataProvider } from '@/context/XboxGamesDataContext'
 import { MainPlatformProvider } from '@/context/MainPlatformContext'
 import { usePublicUserProfile } from '@/hooks/usePublicUserProfile'
 import type { CheevoUser } from '@/hooks/useCheevoUser'
@@ -52,6 +53,8 @@ export default function SubjectProviders({ user, children }: { user: CheevoUser;
           raUser: showRa ? profile : null,
           steamid: user.steam ? key : undefined,
           psnaccountid: user.psn ? key : undefined,
+          // The server only says they have Xbox to a viewer who may see it.
+          xboxxuid: user.xbox ? key : undefined,
         },
       } as Session,
     }
@@ -66,7 +69,9 @@ export default function SubjectProviders({ user, children }: { user: CheevoUser;
               <GamesDataProvider>
                 <SteamGamesDataProvider>
                   <PsnGamesDataProvider>
-                    <MainPlatformProvider>{children}</MainPlatformProvider>
+                    <XboxGamesDataProvider>
+                      <MainPlatformProvider>{children}</MainPlatformProvider>
+                    </XboxGamesDataProvider>
                   </PsnGamesDataProvider>
                 </SteamGamesDataProvider>
               </GamesDataProvider>

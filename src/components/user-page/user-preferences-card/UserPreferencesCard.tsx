@@ -1,28 +1,38 @@
 'use client'
 
-import { useState } from 'react'
-import Image from 'next/image'
+import { useState, type ReactNode } from 'react'
+import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
-import { IconEyeOff, IconGenderBigender, IconLanguage, IconPalette, IconUserShare, IconWorld } from '@tabler/icons-react'
-import ProfileField from '@/components/user-page/profile-field/ProfileField'
-import UserProfileSwitch from '@/components/user-page/user-profile-switch/UserProfileSwitch'
+import { IconSettings } from '@tabler/icons-react'
+import MainPageProfileTabs, { profilePanelId, profileTabId, type ProfileTab } from '@/components/main-page/main-page-profile/main-page-profile-tabs/MainPageProfileTabs'
+import UserPreferencesGeneral from '@/components/user-page/user-preferences-general/UserPreferencesGeneral'
+import UserPreferencesPlatform from '@/components/user-page/user-preferences-platform/UserPreferencesPlatform'
+import UserRaPreferences from '@/components/user-page/user-ra-preferences/UserRaPreferences'
+import UserPsnPreferences from '@/components/user-page/user-psn-preferences/UserPsnPreferences'
+import UserXboxPreferences from '@/components/user-page/user-xbox-preferences/UserXboxPreferences'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
-import FavoriteGameModal, { FavoriteGame } from '@/components/favorite-game-modal/FavoriteGameModal'
-import GenderModal from '@/components/gender-modal/GenderModal'
-import LanguageModal from '@/components/language-modal/LanguageModal'
-import ThemeModal from '@/components/theme-modal/ThemeModal'
-import UserPsnPreferences from '@/components/user-page/user-psn-preferences/UserPsnPreferences'
-import HiddenGamesModal from '@/components/hidden-games-modal/HiddenGamesModal'
-import { useHiddenGames } from '@/context/HiddenGamesContext'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
+import type { FavoriteGame } from '@/components/favorite-game-modal/FavoriteGameModal'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { useLanguage } from '@/context/LanguageContext'
-import { useTheme } from '@/context/ThemeContext'
-import { candidateIconUrl } from '@/utils/gameCandidates'
+import { useStoredChoice } from '@/hooks/useStoredChoice'
+import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import type { GameSource } from '@/types/steam'
 import { notify } from '@/lib/notify'
 
-const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
+// Modals are downloaded the first time they are wanted, not with the page.
+const FavoriteGameModal = dynamic(() => import('@/components/favorite-game-modal/FavoriteGameModal'))
+const GenderModal = dynamic(() => import('@/components/gender-modal/GenderModal'))
+const LanguageModal = dynamic(() => import('@/components/language-modal/LanguageModal'))
+const ThemeModal = dynamic(() => import('@/components/theme-modal/ThemeModal'))
+const HiddenGamesModal = dynamic(() => import('@/components/hidden-games-modal/HiddenGamesModal'))
+
+type PrefTab = 'general' | GameSource
+
+const ID_PREFIX = 'account-preferences'
+const TAB_IDS: readonly PrefTab[] = ['general', 'ra', 'steam', 'psn', 'xbox']
 
 /** Saves the favourite game for one platform and refreshes the session. */
 async function saveFavorite(source: GameSource, game: FavoriteGame | null) {
@@ -36,40 +46,40 @@ async function saveFavorite(source: GameSource, game: FavoriteGame | null) {
   if (!res.ok) throw new Error(`Saving the favourite game failed (${res.status})`)
 }
 
-function FavoriteValue({ game, source, empty }: { game: FavoriteGame | null; source: GameSource; empty: string }) {
-  if (!game) return <span className="text-base text-text-secondary italic truncate">{empty}</span>
-  const icon = candidateIconUrl({ source, imageRef: game.imageIcon })
-  return (
-    <span className="flex items-center gap-1.5 min-w-0">
-      {icon && (
-        <Image src={icon} alt="" width={32} height={32} className="w-8 h-8 rounded-lg object-cover shrink-0" unoptimized />
-      )}
-      <span className="text-base font-medium truncate">{game.title}</span>
-    </span>
-  )
-}
-
 /**
- * How the app looks and what the user calls their own: theme, language and
- * a favourite game per platform. Each line opens the picker it belongs to;
- * nothing here is typed in directly.
+ * The account's preferences in tabs, so the card stays the same height however
+ * many platforms are linked: General (theme, language, profile, hidden games),
+ * then one tab per platform with its favourite game and its own choices. The
+ * tab last open is remembered in this browser.
  */
 export default function UserPreferencesCard() {
   const { data: session, update } = useSession()
-  const { lang, T } = useLanguage()
-  const { theme } = useTheme()
+  const { T } = useLanguage()
+  const xboxEnabled = useXboxEnabled()
+  const [saved, setTab] = useStoredChoice<PrefTab>('account-preferences-tab', TAB_IDS, 'general')
   const [themeOpen, setThemeOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const [favoriteOpen, setFavoriteOpen] = useState<GameSource | null>(null)
   const [hiddenOpen, setHiddenOpen] = useState(false)
   const [genderOpen, setGenderOpen] = useState(false)
-  const { hidden } = useHiddenGames()
 
   const user = session?.user
-  const raFavorite = user?.favorite_game ?? null
-  const steamFavorite = user?.favorite_steam_game ?? null
-  const psnFavorite = user?.favorite_psn_game ?? null
-  const favorites: Record<GameSource, FavoriteGame | null> = { ra: raFavorite, steam: steamFavorite, psn: psnFavorite }
+  const favorites: Record<GameSource, FavoriteGame | null> = {
+    ra: user?.favorite_game ?? null,
+    steam: user?.favorite_steam_game ?? null,
+    psn: user?.favorite_psn_game ?? null,
+    xbox: user?.favorite_xbox_game ?? null,
+  }
+
+  const tabs: ProfileTab<PrefTab>[] = [
+    { id: 'general', label: T.userData.prefsGeneral, icon: <IconSettings size={13} aria-hidden="true" /> },
+    { id: 'ra', label: 'RetroAchievements', icon: <RaLogo height={11} /> },
+    { id: 'steam', label: 'Steam', icon: <SteamLogo size={13} aria-hidden="true" /> },
+    { id: 'psn', label: 'PlayStation', icon: <PlaystationLogo size={13} aria-hidden="true" /> },
+    ...(xboxEnabled ? [{ id: 'xbox' as const, label: 'Xbox', icon: <XboxLogo size={13} aria-hidden="true" /> }] : []),
+  ]
+  // A remembered Xbox tab for someone who may no longer see Xbox falls back to General.
+  const tab = tabs.some((t) => t.id === saved) ? saved : 'general'
 
   async function handleSave(source: GameSource, game: FavoriteGame | null) {
     await saveFavorite(source, game)
@@ -77,86 +87,75 @@ export default function UserPreferencesCard() {
     notify.success(T.toast.saved)
   }
 
+  const platforms: Record<GameSource, { label: string; icon: ReactNode; extras?: ReactNode }> = {
+    ra: { label: T.userPage.favoriteRaGame, icon: <RaLogo height={11} />, extras: <UserRaPreferences /> },
+    steam: { label: T.userPage.favoriteSteamGame, icon: <SteamLogo size={18} className="text-[#66c0f4]" aria-hidden="true" /> },
+    psn: { label: T.userPage.favoritePsnGame, icon: <PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />, extras: <UserPsnPreferences /> },
+    xbox: { label: T.userPage.favoriteXboxGame, icon: <XboxLogo size={18} className="text-[#107c10]" aria-hidden="true" />, extras: <UserXboxPreferences /> },
+  }
+
   return (
-    <section className="bg-bg-card rounded-3xl p-6 flex flex-col gap-5 h-full">
+    <section className="bg-bg-card rounded-3xl p-6 flex flex-col gap-4 h-full">
       <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
         {T.userPage.preferences}
       </h2>
 
-      <div className="bg-bg-main rounded-2xl p-3 sm:p-4 flex flex-col gap-1 flex-1">
-        <ProfileField label={T.userTheme.theme} icon={<IconPalette size={18} />} onEdit={() => setThemeOpen(true)}>
-          <span className="flex items-center gap-2 min-w-0">
-            <span aria-hidden="true" className="w-4 h-4 rounded-full bg-accent shrink-0" />
-            <span className="text-base font-medium truncate">{T.userTheme[`name_${theme}`]}</span>
-          </span>
-        </ProfileField>
+      <MainPageProfileTabs<PrefTab>
+        idPrefix={ID_PREFIX}
+        label={T.userData.prefsTabsLabel}
+        tabs={tabs}
+        selected={tab}
+        onSelect={setTab}
+        size="md"
+      />
 
-        <ProfileField label={T.userConfig.language} icon={<IconLanguage size={18} />} onEdit={() => setLangOpen(true)}>
-          <span className="text-base font-medium uppercase">{lang}</span>
-        </ProfileField>
-
-        <ProfileField
-          label={T.userData.gender}
-          icon={<IconGenderBigender size={18} />}
-          value={user?.gender ? T.userData[GENDER_KEYS[user.gender]] : null}
-          empty={T.userData.notSet}
-          onEdit={() => setGenderOpen(true)}
-        />
-
-        {user?.gender && (
-          <UserProfileSwitch
-            field="genderPublic"
-            checked={user.genderPublic === true}
-            label={T.userData.genderPublic}
-            onText={T.userData.genderPublicOn}
-            offText={T.userData.genderPublicOff}
-            icon={<IconUserShare size={18} />}
+      <div
+        role="tabpanel"
+        id={profilePanelId(ID_PREFIX, tab)}
+        aria-labelledby={profileTabId(ID_PREFIX, tab)}
+        className="bg-bg-main rounded-2xl p-3 sm:p-4 flex-1"
+      >
+        {tab === 'general' ? (
+          <UserPreferencesGeneral
+            onOpenTheme={() => setThemeOpen(true)}
+            onOpenLanguage={() => setLangOpen(true)}
+            onOpenGender={() => setGenderOpen(true)}
+            onOpenHidden={() => setHiddenOpen(true)}
           />
+        ) : (
+          <UserPreferencesPlatform
+            source={tab}
+            label={platforms[tab].label}
+            icon={platforms[tab].icon}
+            favorite={favorites[tab]}
+            onEditFavorite={() => setFavoriteOpen(tab)}
+          >
+            {platforms[tab].extras}
+          </UserPreferencesPlatform>
         )}
-
-        <UserProfileSwitch
-          field="profilePublic"
-          checked={user?.profilePublic !== false}
-          label={T.userData.profilePublic}
-          onText={T.userData.profilePublicOn}
-          offText={T.userData.profilePublicOff}
-          icon={<IconWorld size={18} />}
-        />
-
-        <ProfileField
-          label={T.userPage.hiddenGames}
-          icon={<IconEyeOff size={18} />}
-          value={hidden.length > 0 ? T.userPage.hiddenCount.replace('{n}', String(hidden.length)) : null}
-          empty={T.userPage.hiddenNone}
-          onEdit={() => setHiddenOpen(true)}
-        />
-
-        <ProfileField label={T.userPage.favoriteRaGame} icon={<RaLogo height={11} />} onEdit={() => setFavoriteOpen('ra')}>
-          <FavoriteValue game={raFavorite} source="ra" empty={T.userData.notSet} />
-        </ProfileField>
-
-        <ProfileField label={T.userPage.favoriteSteamGame} icon={<SteamLogo size={18} className="text-[#66c0f4]" aria-hidden="true" />} onEdit={() => setFavoriteOpen('steam')}>
-          <FavoriteValue game={steamFavorite} source="steam" empty={T.userData.notSet} />
-        </ProfileField>
-
-        <ProfileField label={T.userPage.favoritePsnGame} icon={<PlaystationLogo size={18} className="text-[#0070d1]" aria-hidden="true" />} onEdit={() => setFavoriteOpen('psn')}>
-          <FavoriteValue game={psnFavorite} source="psn" empty={T.userData.notSet} />
-        </ProfileField>
       </div>
 
-      <UserPsnPreferences />
-
-      <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
-      <HiddenGamesModal isOpen={hiddenOpen} onClose={() => setHiddenOpen(false)} />
-      <LanguageModal isOpen={langOpen} onClose={() => setLangOpen(false)} />
-      <GenderModal isOpen={genderOpen} onClose={() => setGenderOpen(false)} current={user?.gender} />
-      <FavoriteGameModal
-        isOpen={favoriteOpen !== null}
-        source={favoriteOpen ?? 'ra'}
-        current={favorites[favoriteOpen ?? 'ra']}
-        onClose={() => setFavoriteOpen(null)}
-        onSave={(game) => handleSave(favoriteOpen ?? 'ra', game)}
-      />
+      <LazyWhenOpened open={themeOpen}>
+        <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
+      </LazyWhenOpened>
+      <LazyWhenOpened open={hiddenOpen}>
+        <HiddenGamesModal isOpen={hiddenOpen} onClose={() => setHiddenOpen(false)} />
+      </LazyWhenOpened>
+      <LazyWhenOpened open={langOpen}>
+        <LanguageModal isOpen={langOpen} onClose={() => setLangOpen(false)} />
+      </LazyWhenOpened>
+      <LazyWhenOpened open={genderOpen}>
+        <GenderModal isOpen={genderOpen} onClose={() => setGenderOpen(false)} current={user?.gender} />
+      </LazyWhenOpened>
+      <LazyWhenOpened open={favoriteOpen !== null}>
+        <FavoriteGameModal
+          isOpen={favoriteOpen !== null}
+          source={favoriteOpen ?? 'ra'}
+          current={favorites[favoriteOpen ?? 'ra']}
+          onClose={() => setFavoriteOpen(null)}
+          onSave={(game) => handleSave(favoriteOpen ?? 'ra', game)}
+        />
+      </LazyWhenOpened>
     </section>
   )
 }

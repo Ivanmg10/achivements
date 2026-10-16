@@ -1,11 +1,11 @@
 import type { GameSource } from '@/types/steam'
 
-export type GuideLink = { kind: 'youtube' | 'steamGuides' | 'psnProfiles'; href: string }
+export type GuideLink = { kind: 'youtube' | 'steamGuides' | 'psnProfiles' | 'trueAchievements'; href: string }
 
 /**
  * Where to look for help with one achievement or trophy: a YouTube search
  * for it (works for every game), plus the platform's own guides — Steam
- * Community guides for the game, PSNProfiles' search for it. RA's page
+ * Community guides for the game, PSNProfiles' and TrueAchievements' search for it. RA's page
  * already has its comments, so it gets no links here.
  */
 export function guideLinks(
@@ -21,6 +21,9 @@ export function guideLinks(
   ]
   if (source === 'steam' && appId !== undefined) {
     links.push({ kind: 'steamGuides', href: `https://steamcommunity.com/app/${appId}/guides/?searchText=${encodeURIComponent(title)}` })
+  }
+  if (source === 'xbox') {
+    links.push({ kind: 'trueAchievements', href: `https://www.trueachievements.com/searchresults.aspx?search=${encodeURIComponent(gameTitle)}` })
   }
   if (source === 'psn') {
     links.push({ kind: 'psnProfiles', href: `https://psnprofiles.com/search/games?q=${encodeURIComponent(gameTitle)}` })

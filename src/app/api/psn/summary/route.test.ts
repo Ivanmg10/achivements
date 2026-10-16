@@ -53,3 +53,9 @@ test('502 when PSN fails otherwise', async () => {
   ;(psnSummary as jest.Mock).mockRejectedValue(new Error('network'))
   expect(await call()).toEqual({ status: 502, body: { error: 'failed' } })
 })
+
+test('the browser may keep it for five minutes, privately, and a new session cookie asks again', async () => {
+  const res = await GET()
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=300')
+  expect(res.headers.get('Vary')).toBe('Cookie')
+})

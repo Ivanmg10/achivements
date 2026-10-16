@@ -11,6 +11,7 @@ export type PublicUserRow = {
   rausername: string | null
   steamid: string | null
   psnaccountid: string | null
+  xboxxuid: string | null
   /** Whether their RA key is stored, so their RA data can be read for them. Never the key itself. */
   hasRaKey: boolean
   /** Whether other users may find and open their profile. */
@@ -23,6 +24,7 @@ type SavedGame = { id: number; title: string; imageIcon: string } | null
 export type PublicProfileRow = PublicUserRow & {
   steamusername: string | null
   psnusername: string | null
+  xboxgamertag: string | null
   theme: string | null
   gender: 'male' | 'female' | 'neutral' | null
   /** Whether they chose to show the gender; when false it must not leave the server. */
@@ -30,14 +32,15 @@ export type PublicProfileRow = PublicUserRow & {
   favorite_game: SavedGame
   favorite_steam_game: SavedGame
   favorite_psn_game: SavedGame
+  favorite_xbox_game: SavedGame
 }
 
 /** A CheevoVault user by name, case-insensitively; null if there is none. */
 export async function findPublicUser(username: string): Promise<PublicProfileRow | null> {
   const { rows } = await pool.query(
-    `SELECT id, username, avatar, description, location, rausername, steamid, psnaccountid,
-            steamusername, psnusername, theme, gender, gender_public AS "genderPublic",
-            favorite_game, favorite_steam_game, favorite_psn_game,
+    `SELECT id, username, avatar, description, location, rausername, steamid, psnaccountid, xboxxuid,
+            steamusername, psnusername, xboxgamertag, theme, gender, gender_public AS "genderPublic",
+            favorite_game, favorite_steam_game, favorite_psn_game, favorite_xbox_game,
             (raid IS NOT NULL) AS "hasRaKey", profile_public AS "profilePublic"
      FROM users WHERE LOWER(username) = LOWER($1) LIMIT 1`,
     [username],
@@ -62,12 +65,12 @@ export async function hiddenGameKeys(userId: number): Promise<string[]> {
  * (see dataOwner). Server-side only: nothing built from this row may be sent
  * to a client.
  */
-export async function findSubject(username: string): Promise<(PublicUserRow & { raid: string | null }) | null> {
+export async function findSubject(username: string): Promise<(PublicUserRow & { raid: string | null; xboxgamertag: string | null }) | null> {
   const { rows } = await pool.query(
-    `SELECT id, username, avatar, description, location, rausername, steamid, psnaccountid, raid,
+    `SELECT id, username, avatar, description, location, rausername, steamid, psnaccountid, xboxxuid, xboxgamertag, raid,
             (raid IS NOT NULL) AS "hasRaKey", profile_public AS "profilePublic"
      FROM users WHERE LOWER(username) = LOWER($1) LIMIT 1`,
     [username],
   )
-  return (rows[0] as (PublicUserRow & { raid: string | null }) | undefined) ?? null
+  return (rows[0] as (PublicUserRow & { raid: string | null; xboxgamertag: string | null }) | undefined) ?? null
 }

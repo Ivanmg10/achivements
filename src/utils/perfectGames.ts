@@ -1,6 +1,8 @@
 import { classifySteamGame, raDateToIso } from '@/utils/steamFeed'
 import { classifyPsnGame } from '@/utils/psnTitles'
 import type { PsnGameProgress } from '@/types/psn'
+import { classifyXboxGame } from '@/utils/xboxTitles'
+import type { XboxGameProgress } from '@/types/xbox'
 import { gameKey } from '@/utils/gameRef'
 import type { RetroAchievementsGameCompleted, UserAward } from '@/types/types'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
@@ -29,6 +31,7 @@ export function buildPerfectGames(
   raGames: RetroAchievementsGameCompleted[],
   steamGames: SteamGameProgress[] = [],
   psnGames: PsnGameProgress[] = [],
+  xboxGames: XboxGameProgress[] = [],
 ): PerfectGame[] {
   const byId = new Map<number, PerfectGame>()
   for (const g of raGames) {
@@ -70,18 +73,31 @@ export function buildPerfectGames(
       hardcore: false,
     }))
 
-  return [...byId.values(), ...steam, ...psn]
+  const xbox: PerfectGame[] = xboxGames
+    .filter((g) => classifyXboxGame(g) === 'completed')
+    .map((g) => ({
+      key: gameKey('xbox', g.id),
+      source: 'xbox',
+      id: g.id,
+      title: g.title,
+      imageUrl: g.imageIcon || undefined,
+      subtitle: g.consoleName,
+      hardcore: false,
+    }))
+
+  return [...byId.values(), ...steam, ...psn, ...xbox]
 }
 
-export type PerfectCounts = { hc: number; sc: number; steam: number; psn: number }
+export type PerfectCounts = { hc: number; sc: number; steam: number; psn: number; xbox: number }
 
-/** Counts for the card's header: RA hardcore, RA softcore, Steam, PSN. */
+/** Counts for the card's header: RA hardcore, RA softcore, Steam, PSN, Xbox. */
 export function countPerfectGames(games: PerfectGame[]): PerfectCounts {
   return {
     hc: games.filter((g) => g.source === 'ra' && g.hardcore).length,
     sc: games.filter((g) => g.source === 'ra' && !g.hardcore).length,
     steam: games.filter((g) => g.source === 'steam').length,
     psn: games.filter((g) => g.source === 'psn').length,
+    xbox: games.filter((g) => g.source === 'xbox').length,
   }
 }
 
@@ -133,6 +149,7 @@ export function latestPerfects(
   steamGames: SteamGameProgress[] = [],
   count = 3,
   psnGames: PsnGameProgress[] = [],
+  xboxGames: XboxGameProgress[] = [],
 ): LatestPerfect[] {
   const ra = new Map<number, LatestPerfect>()
   for (const a of awards) {
@@ -176,7 +193,21 @@ export function latestPerfects(
       hardcore: false,
     }))
 
-  return [...ra.values(), ...steam, ...psn]
+  // Xbox has no completion date either: a finished game's last session is the one that finished it.
+  const xbox: LatestPerfect[] = xboxGames
+    .filter((g) => classifyXboxGame(g) === 'completed' && g.lastPlayed)
+    .map((g) => ({
+      key: gameKey('xbox', g.id),
+      source: 'xbox',
+      id: g.id,
+      title: g.title,
+      subtitle: g.consoleName,
+      iconUrl: g.imageIcon || undefined,
+      date: g.lastPlayed!,
+      hardcore: false,
+    }))
+
+  return [...ra.values(), ...steam, ...psn, ...xbox]
     .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
     .slice(0, count)
 }
@@ -191,6 +222,7 @@ export function perfectDates(
   awards: UserAward[] = [],
   steamGames: SteamGameProgress[] = [],
   psnGames: PsnGameProgress[] = [],
+  xboxGames: XboxGameProgress[] = [],
 ): Map<string, string> {
   const byKey = new Map<string, string>()
   for (const a of awards) {
@@ -203,10 +235,11 @@ export function perfectDates(
     if (date) byKey.set(gameKey('steam', g.id), date)
   }
   for (const g of psnGames) if (g.lastTrophyAt) byKey.set(gameKey('psn', g.id), g.lastTrophyAt)
+  for (const g of xboxGames) if (g.lastPlayed) byKey.set(gameKey('xbox', g.id), g.lastPlayed)
   return byKey
 }
 
-export type PerfectFilter = 'all' | 'raHc' | 'raSc' | 'steam' | 'psn'
+export type PerfectFilter = 'all' | 'raHc' | 'raSc' | 'steam' | 'psn' | 'xbox'
 
 /** The perfect games of one kind: RA hardcore, RA softcore, Steam, PSN, or all of them. */
 export function filterPerfects(games: PerfectGame[], filter: PerfectFilter): PerfectGame[] {
@@ -214,6 +247,7 @@ export function filterPerfects(games: PerfectGame[], filter: PerfectFilter): Per
   if (filter === 'raSc') return games.filter((g) => g.source === 'ra' && !g.hardcore)
   if (filter === 'steam') return games.filter((g) => g.source === 'steam')
   if (filter === 'psn') return games.filter((g) => g.source === 'psn')
+  if (filter === 'xbox') return games.filter((g) => g.source === 'xbox')
   return games
 }
 

@@ -279,10 +279,11 @@ export function sumAchievementPoints(
   return { earned, total }
 }
 
-/** Stable identity of a pinned achievement: RA by its global id, Steam by game + apiname, PSN by game + trophy. */
+/** Stable identity of a pinned achievement: RA by its global id, Steam by game + apiname, PSN by game + trophy, Xbox by game + achievement. */
 export function pinnedKey(fav: PinnedAchievement): string {
   if (fav.source === 'steam') return `steam:${fav.game_id}:${fav.steam_apiname}`
   if (fav.source === 'psn') return `psn:${fav.game_id}:${fav.psn_trophy_id}`
+  if (fav.source === 'xbox') return `xbox:${fav.game_id}:${fav.xbox_achievement_id}`
   return `ra:${fav.achievement_id}`
 }
 
@@ -348,7 +349,7 @@ export function dominantColors(pixels: Uint8ClampedArray): Rgb[] {
   return [first, ranked.find((c) => distance(c) > 64) ?? first]
 }
 
-export type DayBySource = { date: string; ra: number; steam: number; psn: number; total: number }
+export type DayBySource = { date: string; ra: number; steam: number; psn: number; xbox: number; total: number }
 
 /**
  * Unlocks per day over the last `days` days, ending today, split by
@@ -361,13 +362,14 @@ export function groupByDaySource(achievements: RecentAchievement[], days = 7): D
     const d = new Date()
     d.setDate(d.getDate() - i)
     const date = d.toISOString().split('T')[0]
-    rows.set(date, { date, ra: 0, steam: 0, psn: 0, total: 0 })
+    rows.set(date, { date, ra: 0, steam: 0, psn: 0, xbox: 0, total: 0 })
   }
   for (const a of Array.isArray(achievements) ? achievements : []) {
     const row = rows.get(a.Date.split(' ')[0])
     if (!row) continue
     if (a.Source === 'steam') row.steam++
     else if (a.Source === 'psn') row.psn++
+    else if (a.Source === 'xbox') row.xbox++
     else row.ra++
     row.total++
   }

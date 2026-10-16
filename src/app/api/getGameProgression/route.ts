@@ -1,3 +1,4 @@
+import { raUnavailable } from '@/lib/raFailure'
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { withCache } from "@/lib/raCache";
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: "Game not found" }, { status: 404 });
     }
     return cachedJson(data, TTL);
-  } catch {
-    return NextResponse.json({ message: "RA service unavailable" }, { status: 503 });
+  } catch (err) {
+    return raUnavailable(err)
   }
 }

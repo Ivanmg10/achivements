@@ -24,6 +24,7 @@ export default function AchivementsLineChartTooltip({
     { name: 'RetroAchievements', value: day.ra, swatch: 'bg-chart-2' },
     { name: 'Steam', value: day.steam, swatch: 'bg-[#66c0f4]' },
     { name: 'PlayStation', value: day.psn, swatch: 'bg-[#0070d1]' },
+    { name: 'Xbox', value: day.xbox, swatch: 'bg-green-500' },
   ].filter((r) => r.value > 0)
 
   return (

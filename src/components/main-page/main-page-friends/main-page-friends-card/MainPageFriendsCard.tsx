@@ -16,7 +16,7 @@ import UserSummary from '@/components/user-summary/UserSummary'
  */
 export default function MainPageFriendsCard({ friend, week }: { friend: FriendOverview; week: number | null }) {
   const { T, lang } = useLanguage()
-  const favorites = (['ra', 'steam', 'psn'] as const)
+  const favorites = (['ra', 'steam', 'psn', 'xbox'] as const)
     .map((source) => ({ source, game: friend.favorites?.[source] ?? null }))
     .filter((f) => f.game !== null)
 

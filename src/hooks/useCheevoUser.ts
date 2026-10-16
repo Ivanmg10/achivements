@@ -11,15 +11,18 @@ export type CheevoUser = {
   ra: string | null
   steam: boolean
   psn: boolean
-  /** Their names on Steam and PSN, when linked. */
+  /** Only true for a viewer who may see Xbox (an admin, for now). */
+  xbox?: boolean
+  /** Their names on Steam, PSN and Xbox, when linked. */
   steamName?: string | null
   psnName?: string | null
+  xboxName?: string | null
   /** The page is the viewer's own. */
   isSelf?: boolean
   theme?: string | null
   /** Only when they chose to show it. */
   gender?: 'male' | 'female' | 'neutral' | null
-  favorites?: Record<'ra' | 'steam' | 'psn', { id: number; title: string; imageIcon: string } | null>
+  favorites?: Partial<Record<'ra' | 'steam' | 'psn' | 'xbox', { id: number; title: string; imageIcon: string } | null>>
   /** "source:id" of the games they hid from their lists; their page leaves them out. */
   hiddenGames?: string[]
   groups?: GameGroup[]

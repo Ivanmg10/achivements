@@ -14,6 +14,7 @@ import { SectionFallback } from '@/components/ui/SectionFallback'
 import MainPageFavoritesRaRow from './main-page-favorites-ra-row/MainPageFavoritesRaRow'
 import MainPageFavoritesSteamRow from './main-page-favorites-steam-row/MainPageFavoritesSteamRow'
 import MainPageFavoritesPsnRow from './main-page-favorites-psn-row/MainPageFavoritesPsnRow'
+import MainPageFavoritesXboxRow from './main-page-favorites-xbox-row/MainPageFavoritesXboxRow'
 
 type RaPin = Extract<PinnedAchievement, { source: 'ra' }>
 
@@ -67,7 +68,9 @@ export default function MainPageFavorites() {
         // Across the card's full width, so a long list grows in columns rather than down.
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-1">
           {pinned.map((fav) =>
-            fav.source === 'psn' ? (
+            fav.source === 'xbox' ? (
+              <MainPageFavoritesXboxRow key={pinnedKey(fav)} fav={fav} onUnpin={unpinOf(fav)} />
+            ) : fav.source === 'psn' ? (
               <MainPageFavoritesPsnRow key={pinnedKey(fav)} fav={fav} onUnpin={unpinOf(fav)} />
             ) : fav.source === 'steam' ? (
               <MainPageFavoritesSteamRow key={pinnedKey(fav)} fav={fav} onUnpin={unpinOf(fav)} />

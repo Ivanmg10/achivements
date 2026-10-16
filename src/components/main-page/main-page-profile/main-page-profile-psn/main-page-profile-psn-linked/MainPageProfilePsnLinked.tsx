@@ -1,11 +1,13 @@
 'use client'
 
+import { useMemo } from 'react'
 import Image from 'next/image'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { useSubject } from '@/context/SubjectContext'
 import { usePsnRecentTrophies } from '@/hooks/usePsnRecentTrophies'
+import { useConsoleVisibility } from '@/hooks/useConsoleVisibility'
 import type { PsnError } from '@/hooks/usePsnLink'
 import type { PsnSummary } from '@/lib/psnClient'
 import MainPageProfileActions from '../../main-page-profile-actions/MainPageProfileActions'
@@ -39,6 +41,9 @@ export default function MainPageProfilePsnLinked({
   const { T } = useLanguage()
   const { library, libraryLoading, refetch } = usePsnGamesData()
   const latest = usePsnRecentTrophies('recent')
+  // Without the games on the consoles unticked in preferences.
+  const { isGameShown } = useConsoleVisibility()
+  const latestTrophies = useMemo(() => latest.trophies.filter((t) => isGameShown('psn', t.gameId)), [latest.trophies, isGameShown])
   const subject = useSubject()
 
   if (isLoading) {
@@ -122,7 +127,7 @@ export default function MainPageProfilePsnLinked({
       {library[0] ? <MainPageProfilePsnGame game={library[0]} /> : libraryLoading && <MainPageProfileGameSkeleton />}
 
       <MainPageProfilePsnTrophies
-        trophies={latest.trophies}
+        trophies={latestTrophies}
         isLoading={latest.isLoading}
         error={latest.error}
         onRetry={latest.retry}

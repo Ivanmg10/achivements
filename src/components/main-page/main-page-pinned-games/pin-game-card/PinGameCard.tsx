@@ -1,9 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { IconPlus } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import PinGameModal from '@/components/pin-game-modal/PinGameModal'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+
+// Downloaded the first time it is opened, not with the page.
+const PinGameModal = dynamic(() => import('@/components/pin-game-modal/PinGameModal'))
 
 export default function PinGameCard() {
   const { T } = useLanguage()
@@ -18,7 +22,9 @@ export default function PinGameCard() {
       >
         <IconPlus className="w-6 h-6" aria-hidden />
       </button>
-      <PinGameModal isOpen={open} onClose={() => setOpen(false)} />
+      <LazyWhenOpened open={open}>
+        <PinGameModal isOpen={open} onClose={() => setOpen(false)} />
+      </LazyWhenOpened>
     </>
   )
 }

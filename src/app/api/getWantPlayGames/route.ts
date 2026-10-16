@@ -1,3 +1,4 @@
+import { raUnavailable } from '@/lib/raFailure'
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
@@ -26,7 +27,7 @@ export async function GET() {
       (d) => d !== null && typeof d === 'object' && 'Results' in d && Array.isArray((d as { Results: unknown }).Results),
     )
     return cachedJson(data, TTL)
-  } catch {
-    return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
+  } catch (err) {
+    return raUnavailable(err)
   }
 }

@@ -29,7 +29,7 @@ test("on someone's profile a game opens their progress in it", () => {
 })
 
 test('recognises only known sources', () => {
-  expect(GAME_SOURCES).toEqual(['ra', 'steam', 'psn'])
+  expect(GAME_SOURCES).toEqual(['ra', 'steam', 'psn', 'xbox'])
   expect(isGameSource('ra')).toBe(true)
   expect(isGameSource('steam')).toBe(true)
   expect(isGameSource('psn')).toBe(true)

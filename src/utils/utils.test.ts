@@ -342,8 +342,8 @@ describe('groupByDaySource', () => {
   test('one row per day, oldest first, ending today, split by platform', () => {
     const rows = groupByDaySource([ach(0), ach(0, 'steam'), ach(0, 'psn'), ach(2), ach(30)], 7)
     expect(rows).toHaveLength(7)
-    expect(rows[6]).toEqual({ date: day(0), ra: 1, steam: 1, psn: 1, total: 3 })
-    expect(rows[4]).toEqual({ date: day(2), ra: 1, steam: 0, psn: 0, total: 1 })
+    expect(rows[6]).toEqual({ date: day(0), ra: 1, steam: 1, psn: 1, xbox: 0, total: 3 })
+    expect(rows[4]).toEqual({ date: day(2), ra: 1, steam: 0, psn: 0, xbox: 0, total: 1 })
     expect(rows.reduce((s, r) => s + r.total, 0)).toBe(4)
   })
 
@@ -383,5 +383,20 @@ describe('activityKpis', () => {
 
   test('nothing is all zeros', () => {
     expect(activityKpis([], NOW)).toEqual({ today: 0, week: 0, month: 0, avgPerDay: 0 })
+  })
+})
+
+describe('Xbox pins and days', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const u = require('./utils') as typeof import('./utils')
+
+  test('a pinned Xbox achievement is identified by its game and its own id', () => {
+    expect(u.pinnedKey({ source: 'xbox', xbox_achievement_id: '49', game_id: 730 } as never)).toBe('xbox:730:49')
+  })
+
+  test('Xbox unlocks count as their own platform in a day', () => {
+    const today = new Date().toISOString().split('T')[0]
+    const rows = u.groupByDaySource([{ Date: today + ' 10:00:00', Source: 'xbox' } as never, { Date: today + ' 11:00:00', Source: 'psn' } as never], 1)
+    expect(rows[0]).toMatchObject({ xbox: 1, psn: 1, ra: 0, steam: 0, total: 2 })
   })
 })

@@ -54,3 +54,20 @@ describe('mixed list', () => {
     expect(order('lastPlayed', 'asc')).toEqual(['Gamma', 'Beta', 'Alpha'])
   })
 })
+
+describe('Xbox entries', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { buildEntries, xboxProgress } = require('./libraryInsights') as typeof import('./libraryInsights')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxGameFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  test('progress is the gamerscore percentage and the last session', () => {
+    expect(xboxProgress(xboxGameFixture({ pctWon: 40, lastPlayed: '2026-01-01T00:00:00Z' }))).toEqual({ pct: 40, lastPlayed: '2026-01-01T00:00:00Z' })
+  })
+
+  test('the mixed list takes Xbox games, keyed apart from the other platforms', () => {
+    const entries = buildEntries([], new Map(), [], [], [xboxGameFixture({ id: 730, title: 'Halo' })])
+    expect(entries).toHaveLength(1)
+    expect(entries[0]).toMatchObject({ kind: 'xbox', key: 'xbox:730', title: 'Halo', pct: 14 })
+  })
+})

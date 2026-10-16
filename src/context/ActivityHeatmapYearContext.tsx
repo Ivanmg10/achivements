@@ -8,6 +8,8 @@ import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { toRecentAchievement } from '@/utils/steamMappers'
 import { usePsnRecentTrophies } from '@/hooks/usePsnRecentTrophies'
 import { psnToRecentAchievement } from '@/utils/psnMappers'
+import { useXboxRecentAchievements } from '@/hooks/useXboxRecentAchievements'
+import { xboxToRecentAchievement } from '@/utils/xboxMappers'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 
@@ -47,6 +49,8 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
   const steam = useSteamRecentAchievements(steamid ? 'year' : null)
   // PSN the same way: Sony has no feed, the server assembles it per game.
   const psn = usePsnRecentTrophies('year')
+  // And Xbox, which also assembles it per game (nothing is asked unless it is linked and allowed).
+  const xbox = useXboxRecentAchievements('year')
 
   const doFetch = useCallback(() => {
     // Named, so a retry can call it again.
@@ -82,9 +86,11 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
 
   const psnAchievements = useMemo(() => psn.trophies.map(psnToRecentAchievement), [psn.trophies])
 
+  const xboxAchievements = useMemo(() => xbox.achievements.map(xboxToRecentAchievement), [xbox.achievements])
+
   const achievements = useMemo(
-    () => [...raAchievements, ...steamAchievements, ...psnAchievements].sort(byDateDesc),
-    [raAchievements, steamAchievements, psnAchievements],
+    () => [...raAchievements, ...steamAchievements, ...psnAchievements, ...xboxAchievements].sort(byDateDesc),
+    [raAchievements, steamAchievements, psnAchievements, xboxAchievements],
   )
 
   const refetch = useCallback(() => {
@@ -96,13 +102,14 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
     doFetch()
     steam.retry()
     psn.retry()
-  }, [doFetch, steam, psn])
+    xbox.retry()
+  }, [doFetch, steam, psn, xbox])
 
   // One platform failing is not the streak failing: it only counts as an error
   // when nothing came back at all, so a Steam or PSN outage does not hide RA's year.
   // Without an RA account there is nothing of RA's to wait for.
-  const isLoading = (Boolean(rausername) && raLoading) || steam.isLoading || psn.isLoading
-  const error = (raError || Boolean(steam.error) || Boolean(psn.error)) && achievements.length === 0
+  const isLoading = (Boolean(rausername) && raLoading) || steam.isLoading || psn.isLoading || xbox.isLoading
+  const error = (raError || Boolean(steam.error) || Boolean(psn.error) || Boolean(xbox.error)) && achievements.length === 0
 
   const value = useMemo(
     () => ({ achievements, isLoading, error, refetch }),

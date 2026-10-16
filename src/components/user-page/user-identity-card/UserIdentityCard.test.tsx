@@ -53,27 +53,27 @@ test('the admin badge is only for admins', () => {
   expect(screen.getByText(en.userData.admin)).toBeInTheDocument()
 })
 
-test('avatar, name and email each open the edit modal for their own field', () => {
+test('avatar, name and email each open the edit modal for their own field', async () => {
   render(<UserIdentityCard />)
   fireEvent.click(screen.getByRole('button', { name: en.userPage.editAvatar }))
-  expect(screen.getByTestId('edit-modal')).toHaveTextContent('avatar')
+  expect(await screen.findByTestId('edit-modal')).toHaveTextContent('avatar')
 })
 
-test('change password opens its modal, sign out signs out', () => {
+test('change password opens its modal, sign out signs out', async () => {
   render(<UserIdentityCard />)
   fireEvent.click(screen.getByRole('button', { name: en.userData.changePassword }))
-  expect(screen.getByTestId('password-modal')).toBeInTheDocument()
+  expect(await screen.findByTestId('password-modal')).toBeInTheDocument()
 
   fireEvent.click(screen.getByRole('button', { name: en.userConfig.signOut }))
   expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/authPage' })
 })
 
-test('an account with no email is told why that matters', () => {
+test('an account with no email is told why that matters', async () => {
   setUser({ ...USER, email: undefined })
   render(<UserIdentityCard />)
   expect(screen.getByRole('alert')).toHaveTextContent(en.passwordReset.missingEmailTitle)
   fireEvent.click(screen.getByRole('button', { name: en.passwordReset.addEmail }))
-  expect(screen.getByTestId('edit-modal')).toHaveTextContent('email')
+  expect(await screen.findByTestId('edit-modal')).toHaveTextContent('email')
 })
 
 test('no warning once an address is set and confirmed', () => {
@@ -90,12 +90,12 @@ test('an address nobody has confirmed is flagged, without blocking anything', ()
   expect(screen.getByRole('button', { name: en.userData.changePassword })).toBeInTheDocument()
 })
 
-test('admins get an Admin panel button beside change password, which opens the panel', () => {
+test('admins get an Admin panel button beside change password, which opens the panel', async () => {
   setUser({ ...USER, admin: true })
   render(<UserIdentityCard />)
   expect(screen.queryByRole('dialog', { name: 'Admin panel' })).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: 'Admin panel' }))
-  expect(screen.getByRole('dialog', { name: 'Admin panel' })).toBeInTheDocument()
+  expect(await screen.findByRole('dialog', { name: 'Admin panel' })).toBeInTheDocument()
 })
 
 test('everyone else gets no Admin panel button', () => {
