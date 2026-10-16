@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
 import { IconSettings } from '@tabler/icons-react'
 import MainPageProfileTabs, { profilePanelId, profileTabId, type ProfileTab } from '@/components/main-page/main-page-profile/main-page-profile-tabs/MainPageProfileTabs'
@@ -13,16 +14,20 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
-import FavoriteGameModal, { FavoriteGame } from '@/components/favorite-game-modal/FavoriteGameModal'
-import GenderModal from '@/components/gender-modal/GenderModal'
-import LanguageModal from '@/components/language-modal/LanguageModal'
-import ThemeModal from '@/components/theme-modal/ThemeModal'
-import HiddenGamesModal from '@/components/hidden-games-modal/HiddenGamesModal'
+import type { FavoriteGame } from '@/components/favorite-game-modal/FavoriteGameModal'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { useLanguage } from '@/context/LanguageContext'
 import { useStoredChoice } from '@/hooks/useStoredChoice'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import type { GameSource } from '@/types/steam'
 import { notify } from '@/lib/notify'
+
+// Modals are downloaded the first time they are wanted, not with the page.
+const FavoriteGameModal = dynamic(() => import('@/components/favorite-game-modal/FavoriteGameModal'))
+const GenderModal = dynamic(() => import('@/components/gender-modal/GenderModal'))
+const LanguageModal = dynamic(() => import('@/components/language-modal/LanguageModal'))
+const ThemeModal = dynamic(() => import('@/components/theme-modal/ThemeModal'))
+const HiddenGamesModal = dynamic(() => import('@/components/hidden-games-modal/HiddenGamesModal'))
 
 type PrefTab = 'general' | GameSource
 
@@ -130,17 +135,27 @@ export default function UserPreferencesCard() {
         )}
       </div>
 
-      <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
-      <HiddenGamesModal isOpen={hiddenOpen} onClose={() => setHiddenOpen(false)} />
-      <LanguageModal isOpen={langOpen} onClose={() => setLangOpen(false)} />
-      <GenderModal isOpen={genderOpen} onClose={() => setGenderOpen(false)} current={user?.gender} />
-      <FavoriteGameModal
-        isOpen={favoriteOpen !== null}
-        source={favoriteOpen ?? 'ra'}
-        current={favorites[favoriteOpen ?? 'ra']}
-        onClose={() => setFavoriteOpen(null)}
-        onSave={(game) => handleSave(favoriteOpen ?? 'ra', game)}
-      />
+      <LazyWhenOpened open={themeOpen}>
+        <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
+      </LazyWhenOpened>
+      <LazyWhenOpened open={hiddenOpen}>
+        <HiddenGamesModal isOpen={hiddenOpen} onClose={() => setHiddenOpen(false)} />
+      </LazyWhenOpened>
+      <LazyWhenOpened open={langOpen}>
+        <LanguageModal isOpen={langOpen} onClose={() => setLangOpen(false)} />
+      </LazyWhenOpened>
+      <LazyWhenOpened open={genderOpen}>
+        <GenderModal isOpen={genderOpen} onClose={() => setGenderOpen(false)} current={user?.gender} />
+      </LazyWhenOpened>
+      <LazyWhenOpened open={favoriteOpen !== null}>
+        <FavoriteGameModal
+          isOpen={favoriteOpen !== null}
+          source={favoriteOpen ?? 'ra'}
+          current={favorites[favoriteOpen ?? 'ra']}
+          onClose={() => setFavoriteOpen(null)}
+          onSave={(game) => handleSave(favoriteOpen ?? 'ra', game)}
+        />
+      </LazyWhenOpened>
     </section>
   )
 }

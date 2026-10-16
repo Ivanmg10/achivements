@@ -76,19 +76,19 @@ test('an admin gets the Xbox tab', () => {
   expect(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteXboxGame) })).toBeInTheDocument()
 })
 
-test('each line opens its own picker', () => {
+test('each line opens its own picker', async () => {
   render(<UserPreferencesCard />)
   fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userTheme.theme) }))
-  expect(screen.getByTestId('theme-modal')).toBeInTheDocument()
+  expect(await screen.findByTestId('theme-modal')).toBeInTheDocument()
 })
 
 test('saves the Steam favourite under its own platform and refreshes the session', async () => {
   render(<UserPreferencesCard />)
   tab('Steam')
   fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteSteamGame) }))
-  expect(screen.getByTestId('fav-modal')).toHaveTextContent('steam')
+  expect(await screen.findByTestId('fav-modal')).toHaveTextContent('steam')
 
-  fireEvent.click(screen.getByTestId('fav-modal'))
+  fireEvent.click(await screen.findByTestId('fav-modal'))
 
   await waitFor(() => expect(update).toHaveBeenCalledWith())
   const [url, init] = (global.fetch as jest.Mock).mock.calls[0]
@@ -100,7 +100,7 @@ test('saving the RA favourite keeps the RA field', async () => {
   render(<UserPreferencesCard />)
   tab('RetroAchievements')
   fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteRaGame) }))
-  fireEvent.click(screen.getByTestId('fav-modal'))
+  fireEvent.click(await screen.findByTestId('fav-modal'))
   await waitFor(() => expect(update).toHaveBeenCalledWith())
 })
 
@@ -109,7 +109,7 @@ test('a failed save does not touch the session', async () => {
   render(<UserPreferencesCard />)
   tab('RetroAchievements')
   fireEvent.click(screen.getByRole('button', { name: new RegExp(en.userPage.favoriteRaGame) }))
-  fireEvent.click(screen.getByTestId('fav-modal'))
+  fireEvent.click(await screen.findByTestId('fav-modal'))
   await waitFor(() => expect(global.fetch).toHaveBeenCalled())
   expect(update).not.toHaveBeenCalled()
 })
