@@ -480,6 +480,7 @@ export const pt: Translations = {
           'Quem segues: guardado para que os voltes a encontrar. Só tu vês essa lista; a ninguém é mostrado quem o segue.',
           'Contas ligadas: o seu utilizador e chave Web API do RetroAchievements, e o seu Steam ID e nome visível, para obter o seu progresso, também quando alguém abre o seu perfil público. A chave nunca sai do nosso servidor. Ligar a Steam apenas verifica que o perfil existe e é público; não prova que a conta é sua.',
           'PlayStation, se a ligar: o seu ID online da PSN e o número da conta. Ligar a conta apenas verifica que ela existe e mostra os troféus publicamente — não prova que a conta é sua. Os seus troféus, e o tempo de jogo e as imagens dos jogos se o seu histórico de jogo for público, são lidos da Sony com a conta PlayStation do próprio site e guardados numa cache que expira sozinha.',
+          'Xbox, se a ligar (por agora só disponível para os administradores do site): o seu gamertag e o número da sua conta Xbox. Ligar só verifica que a conta existe: não prova que é sua. Os seus jogos, conquistas e tempo de jogo são lidos através do serviço OpenXBL e guardados numa cache que expira sozinha.',
           'Registos de segurança: o endereço IP (e o utilizador, nos inícios de sessão) de inícios de sessão falhados, registos e pedidos de redefinição de palavra-passe, guardados durante um dia para travar abusos.',
         ],
       },
@@ -501,6 +502,7 @@ export const pt: Translations = {
         body: [
           'A Vercel aloja o site, a Resend envia os nossos emails, a Google fornece a analítica (apenas com o seu consentimento) e o RetroAchievements e o Steam recebem os pedidos necessários para mostrar os seus dados. Alguns estão nos Estados Unidos; essas transferências baseiam-se no Quadro de Privacidade de Dados UE-EUA ou nas cláusulas contratuais-tipo da Comissão Europeia.',
           'A Sony Interactive Entertainment (PlayStation Network) recebe os pedidos necessários para mostrar os seus dados PlayStation, e à PlayStation Store são pedidas as datas de lançamento dos jogos.',
+          'A Microsoft (Xbox Live) e o OpenXBL, o serviço que lhe transmite os pedidos, recebem os pedidos necessários para mostrar os seus dados do Xbox.',
         ],
       },
       {

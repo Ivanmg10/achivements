@@ -2,6 +2,8 @@ import {
   sortByLastPlayed,
   toXbox360Achievement,
   merge360Achievements,
+  parseXboxMinutes,
+  xboxStatsTitleId,
   toXboxAchievement,
   toXboxGame,
   toXboxProfile,
@@ -148,6 +150,22 @@ describe('toXbox360Achievement', () => {
     expect(toXbox360Achievement({ ...RAW_360_ACHIEVEMENT, unlocked: false, timeUnlocked: '0001-01-01T00:00:00Z' })).toMatchObject({
       unlocked: false, unlockedAt: null, description: 'Get a 100 note streak',
     })
+  })
+})
+
+describe('play time ids and values', () => {
+  test('a modern game is kept under its own id, a 360 one under its newer id, or none', () => {
+    expect(xboxStatsTitleId(RAW_MODERN_TITLE)).toBe('1738914043')
+    expect(xboxStatsTitleId({ ...RAW_360_TITLE, mediaItemType: 'Xbox360Game', modernTitleId: '55' })).toBe('55')
+    expect(xboxStatsTitleId({ ...RAW_360_TITLE, mediaItemType: 'XboxArcadeGame', modernTitleId: null })).toBeNull()
+  })
+
+  test('reads the minutes, and skips what is missing, zero or not a number', () => {
+    const stat = (titleid: string, value: unknown, name = 'MinutesPlayed') => ({ titleid, name, value })
+    const content = { statlistscollection: [{ stats: [stat('1', '3409'), stat('2', null), stat('3', '0'), stat('4', 'x'), stat('5', '7', 'Other'), stat('6', 12)] }] }
+    expect([...parseXboxMinutes(content)]).toEqual([['1', 3409], ['6', 12]])
+    expect(parseXboxMinutes(null).size).toBe(0)
+    expect(parseXboxMinutes({}).size).toBe(0)
   })
 })
 

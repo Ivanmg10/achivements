@@ -60,7 +60,7 @@ export default function XboxGamePage() {
 
   return (
     <main className="flex-1 flex flex-col items-center text-text-main relative">
-      <XboxGameHeroBackground src={xboxBackdrop(game)} />
+      <XboxGameHeroBackground src={details?.heroUrl ?? xboxBackdrop(game)} />
       <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
         <XboxGameInfoHeader
           game={game}

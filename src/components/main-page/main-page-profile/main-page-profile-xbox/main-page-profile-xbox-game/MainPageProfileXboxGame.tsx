@@ -6,6 +6,7 @@ import GameIcon from '@/components/game-icon/GameIcon'
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { gameHref } from '@/utils/gameRef'
+import { formatPlaytime } from '@/utils/steamFeed'
 import type { XboxGameProgress } from '@/types/xbox'
 import { useSubject } from '@/context/SubjectContext'
 
@@ -29,6 +30,8 @@ export default function MainPageProfileXboxGame({ game }: { game: XboxGameProgre
           <span className="text-sm font-semibold truncate">{game.title}</span>
           <span className="text-xs text-text-secondary">
             {game.consoleName}
+            {game.playtimeMinutes !== null &&
+              ` · ${T.steam.playtime}: ${formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}`}
             {game.lastPlayed && ` · ${new Date(game.lastPlayed).toLocaleDateString(lang, { day: 'numeric', month: 'short' })}`}
           </span>
         </div>

@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import MainPageProfileXboxGame from './MainPageProfileXboxGame'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
+import { formatPlaytime } from '@/utils/steamFeed'
+import { en } from '@/translations/en'
 
 const GAME = xboxGameFixture({
   id: 1738914043, title: 'Halo', consoleName: 'Xbox Series', maxPossible: 45, numAwarded: 20, totalKnown: true, pctWon: 44,
@@ -25,4 +27,12 @@ test('a game whose total Xbox does not say shows only what is earned', () => {
 test('a finished game is marked in the "done" colour', () => {
   render(<MainPageProfileXboxGame game={{ ...GAME, pctWon: 100 }} />)
   expect(screen.getByText('100%')).toHaveClass('text-success')
+})
+
+const MINUTES = 3409
+const PLAYED = formatPlaytime(MINUTES, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en')
+
+test('the play time beside the console', () => {
+  render(<MainPageProfileXboxGame game={{ ...GAME, playtimeMinutes: MINUTES }} />)
+  expect(screen.getByText(new RegExp(`${en.steam.playtime}: ${PLAYED}`))).toBeInTheDocument()
 })

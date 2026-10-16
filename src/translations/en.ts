@@ -481,6 +481,7 @@ export const en = {
           'Who you follow: kept so you can find them again. Only you see that list; nobody is shown who follows them.',
           'Linked accounts: your RetroAchievements username and Web API key, and your Steam ID and display name, so your progress can be fetched, including when someone opens your public profile. The API key never leaves our server. Linking Steam only checks that the profile exists and is public — it does not prove the account is yours.',
           'PlayStation, if you link it: your PSN online ID and account number. Linking only checks that the account exists and shows its trophies publicly — it does not prove the account is yours. Your trophies, and your play time and game art if your gaming history is public, are read from Sony with the site’s own PlayStation account and kept in a cache that expires on its own.',
+          'Xbox, if you link it (for now only available to the site’s administrators): your gamertag and Xbox account number. Linking only checks that the account exists — it does not prove the account is yours. Your games, achievements and play time are read through the OpenXBL service and kept in a cache that expires on its own.',
           'Security records: the IP address (and username, for sign-ins) of failed sign-ins, sign-ups and password reset requests, kept for one day to stop abuse.',
         ],
       },
@@ -502,6 +503,7 @@ export const en = {
         body: [
           'Vercel hosts the site, Resend sends our emails, Google provides analytics (only with your consent), and RetroAchievements and Steam receive the requests needed to show your data. Some of them are in the United States; those transfers rely on the EU–US Data Privacy Framework or the European Commission’s standard contractual clauses.',
           'Sony Interactive Entertainment (PlayStation Network) receives the requests needed to show your PlayStation data, and the PlayStation Store is asked for games’ release dates.',
+          'Microsoft (Xbox Live) and OpenXBL, the service that relays the requests to it, receive the requests needed to show your Xbox data.',
         ],
       },
       {

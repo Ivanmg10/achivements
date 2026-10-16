@@ -480,6 +480,7 @@ export const de: Translations = {
           'Wem du folgst: gespeichert, damit du sie wiederfindest. Nur du siehst diese Liste; niemandem wird gezeigt, wer ihm folgt.',
           'Verknüpfte Konten: dein RetroAchievements-Benutzername und Web-API-Schlüssel sowie deine Steam-ID und dein Anzeigename, um deinen Fortschritt abzurufen, auch wenn jemand dein öffentliches Profil öffnet. Der Schlüssel verlässt nie unseren Server. Beim Verknüpfen von Steam wird nur geprüft, dass das Profil existiert und öffentlich ist – es beweist nicht, dass das Konto dir gehört.',
           'PlayStation, wenn du es verbindest: deine PSN-Online-ID und deine Kontonummer. Beim Verbinden wird nur geprüft, dass das Konto existiert und seine Trophäen öffentlich zeigt — es beweist nicht, dass das Konto dir gehört. Deine Trophäen und, wenn dein Spielverlauf öffentlich ist, Spielzeit und Spielbilder werden mit dem PlayStation-Konto der Seite bei Sony abgerufen und in einem Cache gespeichert, der von selbst abläuft.',
+          'Xbox, wenn du es verbindest (derzeit nur für die Administratoren der Seite verfügbar): dein Gamertag und deine Xbox-Kontonummer. Beim Verbinden wird nur geprüft, ob das Konto existiert – es beweist nicht, dass es deins ist. Deine Spiele, Erfolge und Spielzeit werden über den Dienst OpenXBL gelesen und in einem Cache gehalten, der von selbst abläuft.',
           'Sicherheitsprotokolle: die IP-Adresse (bei Anmeldungen auch der Benutzername) fehlgeschlagener Anmeldungen, Registrierungen und Passwort-Zurücksetzungen, einen Tag lang gespeichert, um Missbrauch zu bremsen.',
         ],
       },
@@ -501,6 +502,7 @@ export const de: Translations = {
         body: [
           'Vercel hostet die Seite, Resend verschickt unsere E-Mails, Google stellt die Analyse bereit (nur mit deiner Einwilligung), und RetroAchievements und Steam erhalten die Anfragen, die zur Anzeige deiner Daten nötig sind. Einige sitzen in den USA; diese Übermittlungen stützen sich auf das EU-US Data Privacy Framework oder die Standardvertragsklauseln der Europäischen Kommission.',
           'Sony Interactive Entertainment (PlayStation Network) erhält die Anfragen, die nötig sind, um deine PlayStation-Daten anzuzeigen, und der PlayStation Store wird nach den Erscheinungsdaten der Spiele gefragt.',
+          'Microsoft (Xbox Live) und OpenXBL, der Dienst, der die Anfragen weiterreicht, erhalten die Anfragen, die nötig sind, um deine Xbox-Daten anzuzeigen.',
         ],
       },
       {

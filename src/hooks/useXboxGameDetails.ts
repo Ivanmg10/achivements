@@ -4,7 +4,10 @@ import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 
-type Outcome = { details: IgdbDetails | null } | { error: string }
+/** IGDB's facts, and a wide picture for the page's backdrop when it has one. */
+export type XboxGameDetails = IgdbDetails & { heroUrl?: string | null }
+
+type Outcome = { details: XboxGameDetails | null } | { error: string }
 
 /**
  * IGDB's facts for one Xbox game page (summary, studios, genres, release date,
@@ -16,7 +19,7 @@ type Outcome = { details: IgdbDetails | null } | { error: string }
 export function useXboxGameDetails(titleId: string | null) {
   // Keyed by the title in the owner's library: on a profile, theirs.
   const subject = useSubject()
-  const [details, setDetails] = useState<IgdbDetails | null>(null)
+  const [details, setDetails] = useState<XboxGameDetails | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   /** Asks the server; what came back, not yet applied. */
@@ -25,7 +28,7 @@ export function useXboxGameDetails(titleId: string | null) {
       const res = await fetch(withSubject(`/api/xbox/details?id=${encodeURIComponent(id)}`, subject))
       if (res.status === 404) return { details: null }
       if (!res.ok) throw new Error(`Failed to load game details (${res.status})`)
-      return { details: (await res.json()) as IgdbDetails }
+      return { details: (await res.json()) as XboxGameDetails }
     } catch (err) {
       console.error('[useXboxGameDetails]', id, err)
       return { error: err instanceof Error ? err.message : 'Unknown error' }

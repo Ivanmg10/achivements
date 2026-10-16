@@ -15,8 +15,8 @@ test('shows the user, their country and the accounts they linked', () => {
   expect(screen.getByText('#11')).toBeInTheDocument()
   expect(screen.getByText('papu@test.com')).toBeInTheDocument()
   expect(screen.getByText('PapuRA')).toBeInTheDocument()
-  // Steam and PSN are not linked: a dash rather than a blank
-  expect(screen.getAllByText('—')).toHaveLength(2)
+  // Steam, PSN and Xbox are not linked: a dash rather than a blank
+  expect(screen.getAllByText('—')).toHaveLength(3)
 })
 
 test('grants and revokes admin', () => {
@@ -61,4 +61,9 @@ test('deletes, except your own account', () => {
 test('shows the PSN online ID once linked', () => {
   render(<AdminUserCard user={{ ...USER, psnusername: 'PapuPS' }} isSelf={false} onEdit={jest.fn()} onToggleAdmin={jest.fn()} onDelete={jest.fn()} />)
   expect(screen.getByText('PapuPS')).toBeInTheDocument()
+})
+
+test('shows the Xbox gamertag once linked', () => {
+  render(<AdminUserCard user={{ ...USER, xboxgamertag: 'PapuBox' }} isSelf={false} onEdit={jest.fn()} onToggleAdmin={jest.fn()} onDelete={jest.fn()} />)
+  expect(screen.getByText('PapuBox')).toBeInTheDocument()
 })

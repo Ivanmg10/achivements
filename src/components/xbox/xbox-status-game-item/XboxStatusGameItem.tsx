@@ -15,6 +15,8 @@ import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import { useExclusiveOpen } from '@/hooks/useExclusiveOpen'
 import { gameHref } from '@/utils/gameRef'
+import { formatPlaytime } from '@/utils/steamFeed'
+import { IconClock } from '@tabler/icons-react'
 import { xboxBackdrop, xboxPlatformChip } from '@/utils/xboxTitles'
 import type { XboxGameProgress } from '@/types/xbox'
 
@@ -84,6 +86,12 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
               <span className={`text-xs tabular-nums ${isComplete ? 'text-success font-semibold' : 'text-text-secondary'}`}>{game.pctWon}%</span>
             </span>
             <XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} className="mt-1" />
+            {game.playtimeMinutes !== null && (
+              <span className="flex items-center gap-1 text-xs text-text-secondary mt-1">
+                <IconClock size={12} aria-hidden="true" />
+                {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+              </span>
+            )}
             {game.lastPlayed && (
               <span className="text-xs text-text-secondary mt-1">
                 {T.steam.lastPlayed} · {new Date(game.lastPlayed).toLocaleDateString(lang)}

@@ -6,6 +6,7 @@ import XboxGameInfoHeader from './XboxGameInfoHeader'
 import XboxGameInfoHeaderProgression from './xbox-game-info-header-progression/XboxGameInfoHeaderProgression'
 import { en } from '@/translations/en'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
+import { formatPlaytime } from '@/utils/steamFeed'
 
 const GAME = xboxGameFixture({
   id: 1738914043, titleId: '1738914043', title: 'Halo Infinite', consoleName: 'Xbox Series · PC',
@@ -88,4 +89,15 @@ describe('XboxGameInfoHeaderProgression', () => {
     expect(screen.getByText('15')).toBeInTheDocument()
     expect(screen.queryByText(/\//)).not.toBeInTheDocument()
   })
+})
+
+const MINUTES = 3409
+const PLAYED = formatPlaytime(MINUTES, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en')
+
+test('a play-time badge when Xbox gave the time', () => {
+  const { rerender } = render(<XboxGameInfoHeader game={{ ...GAME, playtimeMinutes: MINUTES }} />)
+  expect(screen.getByText(en.steam.playtime)).toBeInTheDocument()
+  expect(screen.getByText(PLAYED)).toBeInTheDocument()
+  rerender(<XboxGameInfoHeader game={GAME} />)
+  expect(screen.queryByText(en.steam.playtime)).not.toBeInTheDocument()
 })

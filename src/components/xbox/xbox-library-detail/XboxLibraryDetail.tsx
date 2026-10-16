@@ -7,6 +7,7 @@ import { XboxAchievementGrid } from '@/components/xbox/xbox-achievement-grid/Xbo
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import LibraryGameDetail, { type LibraryCategory } from '@/components/library-game-detail/LibraryGameDetail'
 import { fromXbox } from '@/utils/gameInsights'
+import { formatPlaytime } from '@/utils/steamFeed'
 import type { XboxGameProgress } from '@/types/xbox'
 
 const asCategory = (c?: string): LibraryCategory => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
@@ -17,7 +18,7 @@ const asCategory = (c?: string): LibraryCategory => (c === 'wantToPlay' || c ===
  * the ring uses the counts the list already has.
  */
 export default function XboxLibraryDetail({ game, category }: { game: XboxGameProgress; category?: string }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const { achievements, isLoading, error, retry } = useXboxAchievements(game.titleId)
   const items = useMemo(() => fromXbox(achievements, game.id), [achievements, game.id])
 
@@ -44,7 +45,7 @@ export default function XboxLibraryDetail({ game, category }: { game: XboxGamePr
       }
       ring={{ earned, total, label: T.xbox.achievements }}
       ringExtra={<XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} />}
-      facts={[]}
+      facts={game.playtimeMinutes ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang), className: 'text-[#107c10]' }] : []}
       empty={T.xbox.noAchievements}
       grid={<XboxAchievementGrid gameId={game.id} gameTitle={game.title} achievements={achievements} badgeSize={48} limit={60} />}
     />

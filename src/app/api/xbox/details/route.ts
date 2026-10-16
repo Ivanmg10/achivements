@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireXboxSession } from '@/lib/apiAuth'
 import { findXboxGame, isTitleId, xboxFailure } from '@/lib/xboxClient'
-import { igdbXboxDetails } from '@/lib/igdbClient'
+import { igdbXboxArt, igdbXboxDetails } from '@/lib/igdbClient'
 import { cachedJson } from '@/lib/httpCache'
 import { TTL } from '@/lib/steamCache'
 
 /**
  * An Xbox game page's facts — summary, studios, genres, release date,
- * screenshots — from IGDB, since Xbox's library gives none: ?id=1738914043. The
+ * screenshots, and a wide picture for the backdrop — from IGDB, since Xbox's
+ * library gives none: ?id=1738914043. The
  * game is looked up in the user's library, so the title searched for is Xbox's,
  * not text from the request. 404 when IGDB is not set up or knows no match: the
  * page simply has no details.
@@ -31,7 +32,14 @@ export async function GET(req: NextRequest) {
   try {
     const details = await igdbXboxDetails(game.title, game.consoleName)
     if (!details) return NextResponse.json({ error: 'no-details' }, { status: 404 })
-    return cachedJson(details, TTL.schema)
+    // The backdrop is an extra: without it the page keeps the game's own tile.
+    const heroUrl = await igdbXboxArt(game.title, game.consoleName)
+      .then((art) => art?.heroUrl ?? null)
+      .catch((err) => {
+        console.error('[xbox/details] art', titleId, err)
+        return null
+      })
+    return cachedJson({ ...details, heroUrl }, TTL.schema)
   } catch (err) {
     console.error('[xbox/details]', titleId, err)
     return NextResponse.json({ error: 'details-unavailable' }, { status: 503 })

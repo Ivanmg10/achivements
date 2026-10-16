@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react'
 import Link from 'next/link'
-import { IconChevronDown } from '@tabler/icons-react'
+import { IconChevronDown, IconClock } from '@tabler/icons-react'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { ProgressBar } from '@/components/ui/ProgressBar'
@@ -13,6 +13,7 @@ import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/utils'
+import { formatPlaytime } from '@/utils/steamFeed'
 import { gameHref } from '@/utils/gameRef'
 import { xboxBackdrop } from '@/utils/xboxTitles'
 import type { XboxGameProgress } from '@/types/xbox'
@@ -38,7 +39,7 @@ export default function XboxGameItem({
   className?: string
 }) {
   const subject = useSubject()
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
   const onPointerMove = useSpotlight()
   const panelId = useId()
@@ -108,6 +109,16 @@ export default function XboxGameItem({
               <span className="whitespace-nowrap">{progressText}</span>
               <span className="opacity-40" aria-hidden="true">·</span>
               <XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} />
+              {game.playtimeMinutes !== null && (
+                <>
+                  <span className="opacity-40" aria-hidden="true">·</span>
+                  <span className="flex items-center gap-1">
+                    <IconClock size={12} aria-hidden="true" />
+                    <span className="sr-only">{T.steam.playtime}: </span>
+                    {formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+                  </span>
+                </>
+              )}
               {game.lastPlayed && (
                 <>
                   <span className="opacity-40" aria-hidden="true">·</span>

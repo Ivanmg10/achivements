@@ -480,6 +480,7 @@ export const fr: Translations = {
           'Qui tu suis : conservé pour que tu les retrouves. Toi seul vois cette liste ; personne ne voit qui le suit.',
           'Comptes liés : votre nom d’utilisateur et votre clé Web API RetroAchievements, ainsi que votre Steam ID et votre nom affiché, pour récupérer votre progression, y compris lorsque quelqu’un ouvre votre profil public. La clé ne quitte jamais notre serveur. Lier Steam vérifie seulement que le profil existe et est public ; cela ne prouve pas que le compte est le vôtre.',
           'PlayStation, si tu le relies : ton ID en ligne PSN et ton numéro de compte. Relier le compte vérifie seulement qu’il existe et affiche ses trophées publiquement — cela ne prouve pas que le compte est à toi. Tes trophées, et ton temps de jeu et les images de tes jeux si ton historique de jeu est public, sont lus chez Sony avec le compte PlayStation du site et gardés dans un cache qui expire tout seul.',
+          'Xbox, si tu le relies (pour l’instant réservé aux administrateurs du site) : ton gamertag et ton numéro de compte Xbox. La liaison vérifie seulement que le compte existe — elle ne prouve pas qu’il est à toi. Tes jeux, succès et temps de jeu sont lus via le service OpenXBL et gardés dans un cache qui expire de lui-même.',
           'Journaux de sécurité : l’adresse IP (et le nom d’utilisateur, pour les connexions) des connexions échouées, inscriptions et demandes de réinitialisation, conservée un jour pour freiner les abus.',
         ],
       },
@@ -501,6 +502,7 @@ export const fr: Translations = {
         body: [
           'Vercel héberge le site, Resend envoie nos e-mails, Google fournit la mesure d’audience (uniquement avec votre consentement), et RetroAchievements et Steam reçoivent les requêtes nécessaires pour afficher vos données. Certains sont aux États-Unis ; ces transferts reposent sur le cadre de protection des données UE–États-Unis ou sur les clauses contractuelles types de la Commission européenne.',
           'Sony Interactive Entertainment (PlayStation Network) reçoit les requêtes nécessaires pour afficher tes données PlayStation, et le PlayStation Store est interrogé pour les dates de sortie des jeux.',
+          'Microsoft (Xbox Live) et OpenXBL, le service qui lui transmet les requêtes, reçoivent les requêtes nécessaires pour afficher tes données Xbox.',
         ],
       },
       {

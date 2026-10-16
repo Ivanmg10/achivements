@@ -211,6 +211,53 @@ describe('the library', () => {
     expect((withSteamCache as jest.Mock).mock.calls[0][3]).toEqual({ userId: '7', refreshable: true })
   })
 
+  describe('play time', () => {
+    const retro = { ...RAW_360_TITLE, titleId: '1096157379', devices: ['Xbox360', 'XboxOne'], mediaItemType: 'Xbox360Game', modernTitleId: '1664492743' }
+    const stat = (titleid: string, value: string | null) => ({ titleid, name: 'MinutesPlayed', value })
+    const stats = (...list: unknown[]) => answer({ statlistscollection: [{ stats: list }] })
+
+    test('comes from one stats call for the whole library, a retro game under its newer id', async () => {
+      routes({
+        titles: answer({ titles: [RAW_MODERN_TITLE, retro, RAW_360_TITLE] }),
+        'player/stats': stats(stat('1738914043', '3409'), stat('1664492743', '66')),
+      })
+      const games = await xboxLibrary(XUID)
+      expect(Object.fromEntries(games.map((g) => [g.titleId, g.playtimeMinutes]))).toEqual({ '1738914043': 3409, '1096157379': 66, '1096157159': null })
+      const call = fetchMock.mock.calls.find((c) => String(c[0]).endsWith('player/stats'))!
+      expect(call[1].method).toBe('POST')
+      expect(JSON.parse(call[1].body)).toEqual({
+        xuids: [XUID],
+        stats: [{ name: 'MinutesPlayed', titleId: '1738914043' }, { name: 'MinutesPlayed', titleId: '1664492743' }],
+      })
+    })
+
+    test('a value that is missing or zero is no play time', async () => {
+      routes({ titles: answer({ titles: [RAW_MODERN_TITLE] }), 'player/stats': stats(stat('1738914043', null)) })
+      expect((await xboxLibrary(XUID))[0].playtimeMinutes).toBeNull()
+    })
+
+    test('a stats call that fails leaves the library whole, without play time, and says so in the log', async () => {
+      routes({ titles: answer({ titles: [RAW_MODERN_TITLE] }), 'player/stats': new Error('boom') })
+      const games = await xboxLibrary(XUID)
+      expect(games).toHaveLength(1)
+      expect(games[0].playtimeMinutes).toBeNull()
+      expect(console.error).toHaveBeenCalledWith('[xbox] play time', expect.anything())
+    })
+
+    test('a big library is split over several calls', async () => {
+      const many = Array.from({ length: 151 }, (_, i) => ({ ...RAW_MODERN_TITLE, titleId: String(1000 + i) }))
+      routes({ titles: answer({ titles: many }), 'player/stats': stats() })
+      await xboxLibrary(XUID)
+      expect(fetchMock.mock.calls.filter((c) => String(c[0]).endsWith('player/stats'))).toHaveLength(2)
+    })
+
+    test('a library with only 360 games that have no newer id asks for nothing', async () => {
+      routes({ titles: answer({ titles: [RAW_360_TITLE] }) })
+      await xboxLibrary(XUID)
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+  })
+
   test('a game is found by its title id, or is null', async () => {
     fetchMock.mockResolvedValue(library)
     expect((await findXboxGame(XUID, '1096157159'))?.title).toBe('Old Game')
@@ -359,7 +406,8 @@ describe('the feeds', () => {
   test('no game in the window is an empty feed with no calls for achievements', async () => {
     routes({ titles: answer({ titles: [title('1', { titleHistory: { lastTimePlayed: daysAgo(300) } })] }) })
     expect(await xboxRecentAchievements(XUID, 'activity', 60)).toEqual([])
-    expect(fetchMock).toHaveBeenCalledTimes(1)
+    // The library, and its play time; no achievements.
+    expect(fetchMock.mock.calls.map((c) => c[0])).toEqual([`https://api.xbl.io/v2/titles/${XUID}`, 'https://api.xbl.io/v2/player/stats'])
   })
 
   test('an achievement earned with no date is left out', async () => {

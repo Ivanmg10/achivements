@@ -210,6 +210,7 @@ export function xboxAiSource({
       publisher: joined(details?.publishers),
       genre: joined(details?.genres),
       released: details?.releaseDate ?? undefined,
+      playtimeHours: game.playtimeMinutes ? round1(game.playtimeMinutes / 60) : undefined,
     }),
     // Xbox sends them in the game's own order.
     achievements: achievements.map((a) => ({
@@ -252,6 +253,7 @@ function platformNotes(source: AiExportSource): string[] {
       'These are the game\'s Xbox achievements. "gamerscore" is the points each one gives (the G of Xbox); it is a rough sign of difficulty. "progress.gamerscore" shows how much of the total the player already has, and the completion percentage Xbox shows is by gamerscore, not by count.',
       '"hidden": true marks a secret achievement: the player can see its name and description here, but keep story spoilers out of the explanation.',
       'Some achievements are tied to online play, to a specific difficulty or to a single playthrough and cannot be undone once missed; say so when you know it. Xbox 360 games and newer ones list their achievements the same way here.',
+      '"playtimeHours" is how long the player has played the game, when Xbox reports it, a hint of how far they are.',
     ]
   }
   return [

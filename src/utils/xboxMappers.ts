@@ -14,6 +14,8 @@ export type RawTitle = {
   devices?: string[]
   /** 'Xbox360Game' / 'XboxArcadeGame' for 360 titles (also the ones that run on newer consoles), 'Application' for the rest. */
   mediaItemType?: string | null
+  /** The id the game has on newer consoles, which is the one its stats (play time) are kept under. */
+  modernTitleId?: string | null
   achievement?: {
     currentAchievements?: number
     totalAchievements?: number
@@ -108,6 +110,28 @@ const XBOX_360_MEDIA = new Set(['Xbox360Game', 'XboxArcadeGame'])
 function isXbox360Title(t: RawTitle, platforms: string[]): boolean {
   if (t.mediaItemType) return XBOX_360_MEDIA.has(t.mediaItemType)
   return platforms.length === 1 && platforms[0] === 'Xbox 360'
+}
+
+/**
+ * The id a title's play time is kept under: its own for a modern game, the
+ * newer-console one for a backward-compatible 360 game (none when it has none).
+ */
+export function xboxStatsTitleId(t: RawTitle): string | null {
+  if (!isXbox360Title(t, xboxPlatforms(t.devices))) return String(t.titleId)
+  return t.modernTitleId ? String(t.modernTitleId) : null
+}
+
+/** What `POST player/stats` answers for MinutesPlayed, as stats id → minutes. A missing or zero value is no play time. */
+export function parseXboxMinutes(content: unknown): Map<string, number> {
+  const minutes = new Map<string, number>()
+  const lists = (content as { statlistscollection?: Array<{ stats?: Array<{ titleid?: string; name?: string; value?: string | number | null }> }> } | null)?.statlistscollection
+  for (const list of lists ?? []) {
+    for (const stat of list.stats ?? []) {
+      const value = Number(stat.value)
+      if (stat.titleid && stat.name === 'MinutesPlayed' && Number.isFinite(value) && value > 0) minutes.set(String(stat.titleid), value)
+    }
+  }
+  return minutes
 }
 
 /** One of Xbox's titles in the unified game model. Null for an id the app cannot key (never seen, but not trusted). */

@@ -42,7 +42,7 @@ export default function UserGamePageXbox({ id, username, banner, comparing, mine
 
   return (
     <>
-      <XboxGameHeroBackground src={xboxBackdrop(game)} />
+      <XboxGameHeroBackground src={details?.heroUrl ?? xboxBackdrop(game)} />
       {banner}
       <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
         <XboxGameInfoHeader game={game} details={details} />

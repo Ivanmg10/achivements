@@ -8,6 +8,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import XboxGameItem from './XboxGameItem'
 import { en } from '@/translations/en'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
+import { formatPlaytime } from '@/utils/steamFeed'
 
 const GAME = xboxGameFixture({
   id: 1738914043, titleId: '1738914043', title: 'Halo', consoleName: 'Xbox Series', maxPossible: 50, numAwarded: 20, totalKnown: true,
@@ -48,4 +49,14 @@ test('a finished game is marked, and the link goes to the page of whoever is bei
   const { container } = render(<XboxGameItem game={{ ...GAME, pctWon: 100 }} />)
   expect(screen.getByText('100%')).toHaveClass('text-success')
   expect(container.querySelector('.ring-green-500')).toBeInTheDocument()
+})
+
+const MINUTES = 3409
+const PLAYED = formatPlaytime(MINUTES, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en')
+
+test('the play time, when Xbox gave it, and not otherwise', () => {
+  const { rerender } = render(<XboxGameItem game={{ ...GAME, playtimeMinutes: MINUTES }} />)
+  expect(screen.getByText(PLAYED)).toBeInTheDocument()
+  rerender(<XboxGameItem game={GAME} />)
+  expect(screen.queryByText(PLAYED)).not.toBeInTheDocument()
 })

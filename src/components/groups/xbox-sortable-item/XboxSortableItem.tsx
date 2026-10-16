@@ -16,6 +16,7 @@ import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import { gameHref } from '@/utils/gameRef'
 import { xboxBackdrop, xboxPlatformChip, xboxTitleId } from '@/utils/xboxTitles'
+import { formatPlaytime } from '@/utils/steamFeed'
 import { relativeTime } from '@/utils/utils'
 import type { GameGroupItem } from '@/types/types'
 
@@ -123,6 +124,7 @@ export default function XboxSortableItem({
           {game ? <XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} className="mt-1" /> : <span aria-hidden="true" className="text-xs mt-1">{' '}</span>}
           <span className="text-xs text-text-secondary mt-1">
             {game?.lastPlayed ? T.groups.playedAgo.replace('{when}', relativeTime(game.lastPlayed, lang)) : T.groups.neverPlayed}
+            {game?.playtimeMinutes != null && ` · ${T.steam.playtime} ${formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}`}
             {' · '}
             {T.groups.addedAgo.replace('{when}', relativeTime(item.added_at, lang))}
           </span>

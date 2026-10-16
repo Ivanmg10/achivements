@@ -53,7 +53,7 @@ export default function AdminPanel({
     const q = normalizeTitle(query.trim())
     if (!q) return users
     return users.filter((u) =>
-      [u.username, u.email, String(u.id), u.rausername, u.ra_display, u.steamusername, u.psnusername].some(
+      [u.username, u.email, String(u.id), u.rausername, u.ra_display, u.steamusername, u.psnusername, u.xboxgamertag].some(
         (field) => field && normalizeTitle(field).includes(q),
       ),
     )

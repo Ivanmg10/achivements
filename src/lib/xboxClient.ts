@@ -5,6 +5,8 @@ import { isXboxTitleId } from '@/utils/xboxTitles'
 import {
   sortByLastPlayed,
   merge360Achievements,
+  parseXboxMinutes,
+  xboxStatsTitleId,
   toXboxAchievement,
   toXboxGame,
   toXboxProfile,
@@ -161,6 +163,38 @@ export async function findXboxAccount(gamertag: string): Promise<XboxProfile | n
   )
 }
 
+/** OpenXBL took 135 titles in one stats call; a bigger library is split so no call is ever refused for its size. */
+const STATS_CHUNK = 150
+
+/**
+ * Minutes played per game (by its own title id), in one stats call per 150
+ * titles. Play time is an extra: if the call fails the library goes on without
+ * it (and says so in the log), rather than losing the whole list.
+ */
+async function xboxPlaytimes(xuid: string, titles: RawTitle[]): Promise<Map<string, number>> {
+  const owners = new Map<string, string[]>()
+  for (const t of titles) {
+    const statsId = xboxStatsTitleId(t)
+    if (statsId) owners.set(statsId, [...(owners.get(statsId) ?? []), String(t.titleId)])
+  }
+  const ids = [...owners.keys()]
+  const result = new Map<string, number>()
+  for (let i = 0; i < ids.length; i += STATS_CHUNK) {
+    try {
+      const content = await xboxCall<unknown>('player/stats', {
+        method: 'POST',
+        body: { xuids: [xuid], stats: ids.slice(i, i + STATS_CHUNK).map((titleId) => ({ name: 'MinutesPlayed', titleId })) },
+      })
+      for (const [statsId, minutes] of parseXboxMinutes(content)) {
+        for (const titleId of owners.get(statsId) ?? []) result.set(titleId, minutes)
+      }
+    } catch (err) {
+      console.error('[xbox] play time', err)
+    }
+  }
+  return result
+}
+
 export type XboxLibraryData = { games: XboxGameProgress[]; achievementsUnlocked: number }
 
 /**
@@ -170,14 +204,16 @@ export type XboxLibraryData = { games: XboxGameProgress[]; achievementsUnlocked:
  */
 export async function xboxLibraryData(xuid: string, userId: string | null = null): Promise<XboxLibraryData> {
   return withSteamCache(
-    `xbox:titles:v4:${xuid}`,
+    `xbox:titles:v5:${xuid}`,
     LIBRARY_TTL_MS,
     async () => {
       const res = await xboxCall<{ titles?: RawTitle[]; achievementSummary?: { totalAchievementsUnlocked?: number } }>(`titles/${xuid}`)
+      const titles = res?.titles ?? []
+      const minutes = await xboxPlaytimes(xuid, titles)
       const games: XboxGameProgress[] = []
-      for (const t of res?.titles ?? []) {
+      for (const t of titles) {
         const game = toXboxGame(t)
-        if (game) games.push(game)
+        if (game) games.push({ ...game, playtimeMinutes: minutes.get(game.titleId) ?? null })
       }
       return { games: sortByLastPlayed(games), achievementsUnlocked: res?.achievementSummary?.totalAchievementsUnlocked ?? 0 }
     },

@@ -150,6 +150,12 @@ describe('Xbox', () => {
     expect(file.game).toEqual({ platform: 'Xbox', title: 'Halo Infinite', console: 'Xbox Series · PC' })
   })
 
+  test('the play time goes in as hours when Xbox gave it, and is left out when not', () => {
+    const played = buildAiExport(xboxAiSource({ game: { ...game, playtimeMinutes: 3409 }, achievements, details: null }), { lang: 'en', now: NOW })
+    expect(played.game).toMatchObject({ playtimeHours: 56.8 })
+    expect(buildAiExport(xboxAiSource({ game, achievements, details: null }), { lang: 'en', now: NOW }).game).not.toHaveProperty('playtimeHours')
+  })
+
   test('the instructions talk about Xbox achievements and gamerscore, and carry nothing of the account', () => {
     const file = buildAiExport(xboxAiSource({ game, achievements, details: null }), { lang: 'es', now: NOW })
     const text = file.instructions.join('\n')

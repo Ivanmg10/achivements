@@ -25,6 +25,25 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-16 — Xbox gaps against PSN: public profile, play time, backdrop, privacy (`feat/xbox-integration`)
+
+**Did** — An audit of PSN-only code found and closed: (1) `useProfileLibrary`
+ignored Xbox, so public profiles and friend comparisons had no Xbox games;
+(2) play time: one `POST player/stats` inside the library load, shown in every
+card/header/detail/group row like PSN's and in the AI export; (3) a wide
+backdrop for the game page from IGDB (via `/api/xbox/details`, which also got
+the route test it was missing); (4) `/privacy` now covers Xbox (9 languages);
+(5) gamertag on the admin user card and in the admin search.
+**Decisions** — Backdrop only on the game page: enriching the whole library from
+IGDB would be ~135 searches on a cold load. The marketing texts (landing, site
+title, description) still list three platforms until Xbox opens to everyone.
+Retro 360 games report minutes under `modernTitleId` (measured: 5 of 9 had a value).
+**Open** — Private profile / unknown gamertag responses are still unmeasured.
+Library cache key is now `xbox:titles:v5`.
+**Watch out** — The stats call is one more OpenXBL call per library refresh.
+
+---
+
 ## 2026-10-16 — Account preferences in tabs (`feat/xbox-integration`)
 
 **Did** — The preferences card was one long column (it grew with every platform

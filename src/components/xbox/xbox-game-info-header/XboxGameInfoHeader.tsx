@@ -11,6 +11,7 @@ import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import XboxGameInfoHeaderProgression from './xbox-game-info-header-progression/XboxGameInfoHeaderProgression'
 import GameInfoHeaderScreenshots from '@/components/game-info-header/game-info-header-screenshots/GameInfoHeaderScreenshots'
 import { xboxPlatformChip } from '@/utils/xboxTitles'
+import { formatPlaytime } from '@/utils/steamFeed'
 import type { XboxGameProgress } from '@/types/xbox'
 import type { IgdbDetails } from '@/lib/igdbClient'
 
@@ -107,6 +108,13 @@ export default function XboxGameInfoHeader({
             done={isComplete}
           />
           <GameInfoHeaderStatsBadge label={T.xbox.gamerscore} value={`${game.earnedGamerscore} / ${game.totalGamerscore}`} done={isComplete} />
+          {game.playtimeMinutes !== null && (
+            <GameInfoHeaderStatsBadge
+              label={T.steam.playtime}
+              value={formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+              done={false}
+            />
+          )}
         </div>
         {details && (
           // Width 0 with min 100%: the screenshots take the column's width without widening it.

@@ -383,9 +383,19 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   certificate for https; `xboxMappers.https()` swaps them for the `-ssl` twins.
   Keep every Xbox image going through it. `titleId` is a decimal string; the largest
   seen is under 2^31 (the `game_id` columns are INTEGER), but check before storing it.
-- **Unverified:** what a private profile returns (`403 → private` is a guess), an
-  unknown gamertag, and play time (`POST player/stats` with `MinutesPlayed` works
-  but is not wired).
+- **Play time** comes from one `POST player/stats` (`MinutesPlayed`, up to 150
+  titles per call) made inside the cached library load (`xbox:titles:v5`); a
+  backward-compatible 360 game is asked under its `modernTitleId`
+  (`xboxStatsTitleId`). A failure leaves the library whole, without hours. Many
+  games simply have none.
+- **Backdrop:** a game page's wide picture is IGDB's (`heroUrl` in
+  `/api/xbox/details`), fetched when the page opens; lists keep Xbox's own tile.
+  Do not enrich the whole library from IGDB at load (135 searches).
+- **Unverified:** what a private profile returns (`403 → private` is a guess) and an
+  unknown gamertag.
+- `/privacy` says what Xbox keeps and who receives it (gamertag, XUID, OpenXBL, Microsoft)
+  in all 9 languages; the landing text, site title and meta description still say
+  "RetroAchievements, Steam and PlayStation" on purpose: change them when Xbox opens to everyone.
 - Admin explorer lookups and linking are logged (`xbox-lookup`, `link-xbox`,
   `unlink-xbox`). Do not add a second Xbox provider without asking.
 

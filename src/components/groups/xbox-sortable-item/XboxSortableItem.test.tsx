@@ -13,6 +13,7 @@ import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { en } from '@/translations/en'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
 import type { GameGroupItem } from '@/types/types'
+import { formatPlaytime } from '@/utils/steamFeed'
 
 const ITEM: GameGroupItem = {
   id: 7, source: 'xbox', game_id: 1738914043, title: 'Halo', image_icon: 'https://x/a.png', console_name: 'Xbox',
@@ -58,4 +59,13 @@ test('a finished game is marked', () => {
   ;(useXboxGamesData as jest.Mock).mockReturnValue({ fullLibrary: [xboxGameFixture({ id: 1738914043, pctWon: 100 })] })
   const { container } = render(<XboxSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
   expect(container.textContent).toContain(`★ ${en.steam.perfect}`)
+})
+
+const MINUTES = 3409
+const PLAYED = formatPlaytime(MINUTES, { minutes: en.steam.minutesShort, hours: en.steam.hoursShort }, 'en')
+
+test('the play time next to when it was last played', () => {
+  ;(useXboxGamesData as jest.Mock).mockReturnValue({ fullLibrary: [xboxGameFixture({ id: 1738914043, playtimeMinutes: MINUTES })] })
+  render(<XboxSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
+  expect(screen.getByText(new RegExp(`${en.steam.playtime} ${PLAYED}`))).toBeInTheDocument()
 })

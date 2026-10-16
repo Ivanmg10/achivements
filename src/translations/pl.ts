@@ -480,6 +480,7 @@ export const pl: Translations = {
           'Kogo obserwujesz: zapisujemy, abyś mógł ich znowu znaleźć. Tę listę widzisz tylko ty; nikomu nie pokazujemy, kto go obserwuje.',
           'Połączone konta: nazwę użytkownika i klucz Web API RetroAchievements oraz Steam ID i nazwę wyświetlaną, aby pobierać Twoje postępy, także gdy ktoś otwiera Twój publiczny profil. Klucz nigdy nie opuszcza naszego serwera. Łączenie Steam sprawdza tylko, czy profil istnieje i jest publiczny — nie dowodzi, że konto należy do ciebie.',
           'PlayStation, jeśli je połączysz: twoje ID online PSN i numer konta. Połączenie sprawdza tylko, czy konto istnieje i publicznie pokazuje trofea — nie dowodzi, że konto należy do ciebie. Twoje trofea, a jeśli historia gier jest publiczna, także czas gry i grafiki gier, są pobierane z Sony za pomocą konta PlayStation strony i przechowywane w pamięci podręcznej, która sama wygasa.',
+          'Xbox, jeśli go połączysz (na razie dostępny tylko dla administratorów serwisu): twój gamertag i numer konta Xbox. Połączenie tylko sprawdza, czy konto istnieje – nie dowodzi, że jest twoje. Twoje gry, osiągnięcia i czas gry są pobierane przez usługę OpenXBL i trzymane w pamięci podręcznej, która sama wygasa.',
           'Rejestry bezpieczeństwa: adres IP (a przy logowaniu także nazwę użytkownika) nieudanych logowań, rejestracji i próśb o reset hasła, przechowywany przez jeden dzień, aby ograniczać nadużycia.',
         ],
       },
@@ -501,6 +502,7 @@ export const pl: Translations = {
         body: [
           'Vercel hostuje stronę, Resend wysyła nasze e-maile, Google dostarcza analitykę (tylko za Twoją zgodą), a RetroAchievements i Steam otrzymują zapytania potrzebne do wyświetlenia Twoich danych. Niektórzy z nich są w Stanach Zjednoczonych; te transfery opierają się na Ramach ochrony danych UE–USA lub na standardowych klauzulach umownych Komisji Europejskiej.',
           'Sony Interactive Entertainment (PlayStation Network) otrzymuje zapytania potrzebne do pokazania twoich danych PlayStation, a PlayStation Store jest pytany o daty premier gier.',
+          'Microsoft (Xbox Live) i OpenXBL, usługa przekazująca do niego zapytania, otrzymują zapytania potrzebne do pokazania twoich danych z Xbox.',
         ],
       },
       {
