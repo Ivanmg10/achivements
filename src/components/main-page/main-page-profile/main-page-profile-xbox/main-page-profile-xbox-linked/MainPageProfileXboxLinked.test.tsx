@@ -8,7 +8,7 @@ jest.mock('../main-page-profile-xbox-game/MainPageProfileXboxGame', () => ({
 }))
 jest.mock('../main-page-profile-xbox-achievements/MainPageProfileXboxAchievements', () => ({
   __esModule: true,
-  default: () => <div data-testid="achievements" />,
+  default: ({ achievements }: { achievements: { gameId: number }[] }) => <div data-testid="achievements">{achievements.map((a) => a.gameId).join(',')}</div>,
 }))
 
 import { render, screen, fireEvent } from '@testing-library/react'
@@ -103,4 +103,15 @@ describe('the refresh button', () => {
     expect(screen.queryByRole('button', { name: refreshName })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: en.xbox.viewOnXbox })).toBeInTheDocument()
   })
+})
+
+test('the latest achievements leave out the games on the consoles unticked in preferences', () => {
+  window.localStorage.setItem('hidden-consoles:xbox', '["Xbox 360"]')
+  ;(useXboxGamesData as jest.Mock).mockReturnValue({
+    library: [], fullLibrary: [{ id: 1, consoleName: 'Xbox 360' }, { id: 2, consoleName: 'Xbox Series' }], libraryLoading: false,
+  })
+  ;(useXboxRecentAchievements as jest.Mock).mockReturnValue({ achievements: [{ gameId: 1 }, { gameId: 2 }], isLoading: false, error: null, retry: jest.fn() })
+  render(<MainPageProfileXboxLinked summary={SUMMARY} isLoading={false} error={null} onRetry={jest.fn()} />)
+  expect(screen.getByTestId('achievements')).toHaveTextContent(/^2$/)
+  window.localStorage.clear()
 })

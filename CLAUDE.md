@@ -490,7 +490,11 @@ nothing is deleted.
 - Only the viewer's **own** library: on someone else's page (`useSubject()`)
   nothing is filtered. A game is hidden only when **all** its consoles are
   unticked (`isConsoleShown`: "Xbox 360 · Xbox Series" stays with either ticked).
-- Feeds of recent achievements and the streak are not filtered.
+- **Feeds follow it too** (`useConsoleVisibility`: `isShown(unlock)` /
+  `isGameShown(source, id)`): the year feed behind the streak, the heatmap and the
+  charts, RA's recent unlocks, and the PSN/Xbox "latest" columns. So a day spent only
+  on a hidden console is not a day in the streak. A **new feed of unlocks must
+  filter through that hook**, or a hidden game comes back through it.
 
 ## Registration
 

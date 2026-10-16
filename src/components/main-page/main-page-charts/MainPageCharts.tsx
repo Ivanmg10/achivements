@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { IconActivity, IconAward, IconCompass, IconFolders, IconLayoutDashboard, IconUsers } from '@tabler/icons-react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
+import { useConsoleVisibility } from '@/hooks/useConsoleVisibility'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useStreakData } from '@/hooks/useStreakData'
 import { useGamesInProgressPreview } from '@/hooks/useGamesInProgressPreview'
@@ -87,8 +88,10 @@ export default function MainPageCharts() {
 
   // Steam and PSN unlocks in RA's shape, so the shared cards render every platform as one list.
   const steamRecent = useMemo(() => steamActivity.map(toRecentAchievement), [steamActivity])
-  const psnRecent = useMemo(() => psnActivity.map(psnToRecentAchievement), [psnActivity])
-  const xboxRecent = useMemo(() => xboxActivity.map(xboxToRecentAchievement), [xboxActivity])
+  // Without the games on the consoles unticked in preferences.
+  const { isShown } = useConsoleVisibility()
+  const psnRecent = useMemo(() => psnActivity.map(psnToRecentAchievement).filter(isShown), [psnActivity, isShown])
+  const xboxRecent = useMemo(() => xboxActivity.map(xboxToRecentAchievement).filter(isShown), [xboxActivity, isShown])
   const byDateDesc = (a: { Date: string }, b: { Date: string }) => b.Date.localeCompare(a.Date)
   const recent = useMemo(
     () => [...achievements, ...steamRecent, ...psnRecent, ...xboxRecent].sort(byDateDesc),

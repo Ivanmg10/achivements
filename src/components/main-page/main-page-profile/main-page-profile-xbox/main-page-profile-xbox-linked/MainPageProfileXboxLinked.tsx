@@ -1,11 +1,13 @@
 'use client'
 
+import { useMemo } from 'react'
 import Image from 'next/image'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useSubject } from '@/context/SubjectContext'
 import { useXboxRecentAchievements } from '@/hooks/useXboxRecentAchievements'
+import { useConsoleVisibility } from '@/hooks/useConsoleVisibility'
 import type { XboxLinkError } from '@/hooks/useXboxLink'
 import { xboxHasAchievements } from '@/utils/xboxTitles'
 import type { XboxSummary } from '@/types/xbox'
@@ -37,6 +39,9 @@ export default function MainPageProfileXboxLinked({
   const { T } = useLanguage()
   const { library, libraryLoading, refetch } = useXboxGamesData()
   const latest = useXboxRecentAchievements('recent')
+  // Without the games on the consoles unticked in preferences.
+  const { isGameShown } = useConsoleVisibility()
+  const latestAchievements = useMemo(() => latest.achievements.filter((a) => isGameShown('xbox', a.gameId)), [latest.achievements, isGameShown])
   const subject = useSubject()
 
   if (isLoading) {
@@ -116,7 +121,7 @@ export default function MainPageProfileXboxLinked({
       {last ? <MainPageProfileXboxGame game={last} /> : libraryLoading && <MainPageProfileGameSkeleton />}
 
       <MainPageProfileXboxAchievements
-        achievements={latest.achievements}
+        achievements={latestAchievements}
         isLoading={latest.isLoading}
         error={latest.error}
         onRetry={latest.retry}
