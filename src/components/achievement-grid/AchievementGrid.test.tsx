@@ -136,3 +136,31 @@ test('a new array of the same achievements does not send the grid back to its sk
   expect(container.querySelector('.animate-pulse')).toBeNull()
   jest.useRealTimers()
 })
+
+test('a missable not yet earned is marked in red, and the grid says how many are left', async () => {
+  jest.useFakeTimers()
+  const missable = { ...unearnedAchievement, ID: 3, Title: 'Last chance', Type: 'missable' }
+  const earnedMissable = { ...earnedAchievement, ID: 4, Title: 'Kept it', Type: 'missable' }
+  render(
+    <AchievementGrid achievements={[earnedAchievement, missable, earnedMissable]} total={3} gameId={1} gameTitle="Game" numDistinctPlayers={3} />,
+  )
+  await act(async () => {
+    jest.advanceTimersByTime(1500)
+  })
+  const marked = screen.getByRole('button', { name: /Last chance/ })
+  expect(marked).toHaveClass('ring-danger')
+  expect(marked).toHaveAccessibleName(/Missable/)
+  expect(screen.getByRole('button', { name: /Kept it/ })).not.toHaveClass('ring-danger')
+  expect(screen.getByText('Missable left: 1')).toBeInTheDocument()
+  jest.useRealTimers()
+})
+
+test('no missables left, no warning', async () => {
+  jest.useFakeTimers()
+  render(<AchievementGrid achievements={[earnedAchievement, unearnedAchievement]} total={2} gameId={1} gameTitle="Game" numDistinctPlayers={3} />)
+  await act(async () => {
+    jest.advanceTimersByTime(1500)
+  })
+  expect(screen.queryByText(/Missable left/)).not.toBeInTheDocument()
+  jest.useRealTimers()
+})

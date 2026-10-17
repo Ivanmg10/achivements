@@ -180,11 +180,13 @@ describe('reorder', () => {
     })
   })
 
-  test('throws when the PUT fails', async () => {
+  test('throws when the PUT fails, and puts the old order back', async () => {
     const { result } = await renderLoaded()
+    const before = result.current.pins
     ;(fetch as jest.Mock).mockResolvedValue({ ok: false })
     await act(async () => {
       await expect(result.current.reorder([])).rejects.toThrow('Error saving order')
     })
+    expect(result.current.pins).toEqual(before)
   })
 })

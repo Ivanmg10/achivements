@@ -303,6 +303,7 @@ export function toPsnGameProgress(t: TrophyTitle): PsnGameProgress | null {
     coverUrl: null,
     heroUrl: null,
     conceptId: null,
+    collection: null,
   }
 }
 
@@ -318,16 +319,20 @@ export function durationMinutes(iso: string | undefined): number | null {
 type PlayedGame = {
   /** The game's own id ("CUSA01106_00"), not its trophy set's. */
   titleId: string
+  name: string
   lastPlayed: string | null
   playtimeMinutes: number | null
   playCount: number
+  /** Sony's square store icon. The trophy set's icon is a 320×176 banner on PS4/PS3, cropped when shown square. */
+  iconUrl: string | null
   coverUrl: string | null
   heroUrl: string | null
   conceptId: number | null
 }
 
-const COVER_TYPES = ['PORTRAIT_BANNER', 'GAMEHUB_COVER_ART', 'MASTER']
-const HERO_TYPES = ['BACKGROUND_LAYER_ART', 'SIXTEEN_BY_NINE_BANNER', 'FOUR_BY_THREE_BANNER']
+// Only a portrait counts as a cover: most PS4 games have none, and their 16:9 hub art cropped to 2:3 was unreadable.
+const COVER_TYPES = ['PORTRAIT_BANNER']
+const HERO_TYPES = ['BACKGROUND_LAYER_ART', 'SIXTEEN_BY_NINE_BANNER', 'FOUR_BY_THREE_BANNER', 'GAMEHUB_COVER_ART']
 
 function pickImage(images: Array<{ url: string; type: string }>, types: string[]): string | null {
   const found = types.map((type) => images.find((i) => i.type === type)).find(Boolean)
@@ -345,9 +350,11 @@ async function playedGames(accountId: string): Promise<PlayedGame[]> {
       const images = t.concept?.media?.images ?? []
       games.push({
         titleId: t.titleId,
+        name: t.localizedName || t.name,
         lastPlayed: t.lastPlayedDateTime ?? null,
         playtimeMinutes: durationMinutes(t.playDuration),
         playCount: t.playCount ?? 0,
+        iconUrl: t.imageUrl ? https(t.imageUrl) : pickImage(images, ['MASTER']),
         coverUrl: pickImage(images, COVER_TYPES),
         heroUrl: pickImage(images, HERO_TYPES),
         conceptId: t.concept?.id ?? null,
@@ -391,24 +398,35 @@ async function trophySetsOf(accountId: string, titleIds: string[], userId: strin
  * Puts what the played-games list knows onto the trophy list: last session,
  * play time, times played and the store art. Several games can share a
  * trophy set (a PS4 and a PS5 version): their time adds up, the latest
- * session and its art win.
+ * session and its art win. A collection is one entry for several sets and
+ * Sony does not say which game was played, so its session goes only to the
+ * set with the newest trophy (its other games keep their own trophy date).
  */
 export function withPlayData(games: PsnGameProgress[], played: PlayedGame[], sets: Map<string, string[]>): PsnGameProgress[] {
   const bySet = new Map<string, PlayedGame[]>()
   for (const p of played) {
     for (const set of sets.get(p.titleId) ?? []) bySet.set(set, [...(bySet.get(set) ?? []), p])
   }
+  const lastTrophy = new Map(games.map((g) => [g.titleId, g.lastTrophyAt ?? '']))
+  const playing = (p: PlayedGame) =>
+    [...(sets.get(p.titleId) ?? [])].sort((a, b) => (lastTrophy.get(b) ?? '').localeCompare(lastTrophy.get(a) ?? ''))[0]
   return games
     .map((g) => {
       const plays = bySet.get(g.titleId)
       if (!plays) return g
       const latest = [...plays].sort((a, b) => (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? ''))[0]
-      const session = latest.lastPlayed
+      const session = plays.filter((p) => playing(p) === g.titleId).map((p) => p.lastPlayed ?? '').sort().at(-1) || null
+      const coll = plays
+        .filter((p) => (sets.get(p.titleId)?.length ?? 0) > 1)
+        .sort((a, b) => (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? ''))[0]
+      // A collection's icon is the collection's, so its games keep their own trophy icon.
+      const icon = [latest, ...plays].find((p) => p.iconUrl && sets.get(p.titleId)?.length === 1)?.iconUrl
       const minutes = plays.some((p) => p.playtimeMinutes !== null)
         ? plays.reduce((sum, p) => sum + (p.playtimeMinutes ?? 0), 0)
         : null
       return {
         ...g,
+        imageIcon: icon ?? g.imageIcon,
         lastPlayed: session && (!g.lastTrophyAt || session > g.lastTrophyAt) ? session : g.lastTrophyAt,
         playtimeMinutes: minutes,
         playedAs: plays.map((p) => p.titleId).sort(),
@@ -416,6 +434,9 @@ export function withPlayData(games: PsnGameProgress[], played: PlayedGame[], set
         coverUrl: plays.map((p) => p.coverUrl).find(Boolean) ?? null,
         heroUrl: plays.map((p) => p.heroUrl).find(Boolean) ?? null,
         conceptId: latest.conceptId,
+        collection: coll
+          ? { titleId: coll.titleId, title: coll.name, iconUrl: coll.iconUrl, heroUrl: coll.heroUrl, lastPlayed: coll.lastPlayed, playtimeMinutes: coll.playtimeMinutes }
+          : null,
       }
     })
     .sort((a, b) => (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? ''))
@@ -467,7 +488,7 @@ export async function psnGameGroups(
  */
 export async function psnTitles(accountId: string, userId: string | null = null): Promise<PsnGameProgress[]> {
   return withSteamCache(
-    `psn:titles:v9:${accountId}`,
+    `psn:titles:v12:${accountId}`,
     TITLES_TTL_MS,
     async () => {
       const auth = await authorization()

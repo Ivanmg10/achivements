@@ -28,5 +28,7 @@ export default function GameIcon({
     return <SteamGameImage appId={id} asset="icon" iconUrl={imageUrl ?? undefined} size={size} className={className} />
   }
   if (!imageUrl) return <span aria-hidden="true" className={`block bg-ink/10 ${className}`} />
-  return <Image src={imageUrl} alt="" width={size} height={size} className={`object-cover ${className}`} unoptimized />
+  // PSN's trophy icons are 320×176 banners on PS4/PS3: shown whole, not cropped. Square ones are unaffected.
+  const fit = source === 'psn' ? 'object-contain bg-ink/10' : 'object-cover'
+  return <Image src={imageUrl} alt="" width={size} height={size} className={`${fit} ${className}`} unoptimized />
 }

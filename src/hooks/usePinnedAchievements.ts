@@ -8,7 +8,7 @@ import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 
 /**
- * The user's pinned achievements across RA, Steam, PSN and Xbox, newest first — what the
+ * The user's pinned achievements across RA, Steam, PSN and Xbox, in their order — what the
  * main page's pinned card lists, whichever platform is selected.
  *
  * A load that still fails after fetchWithRetry's own attempts is retried in
@@ -96,6 +96,24 @@ export function usePinnedAchievements() {
     }
   }, [T])
 
+  /** Puts the pins in a new order at once, and back (saying so) if it could not be saved. */
+  const reorder = useCallback(async (next: PinnedAchievement[]) => {
+    const before = pinned
+    setPinned(next)
+    try {
+      const res = await fetch('/api/favorites', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: next.flatMap((p) => (p.id ? [p.id] : [])) }),
+      })
+      if (!res.ok) throw new Error(`Failed to save the order (${res.status})`)
+    } catch (err) {
+      console.error('[usePinnedAchievements] reorder', err)
+      notify.error(T.toast.orderFailed)
+      setPinned(before)
+    }
+  }, [pinned, T])
+
   const answered = loadedKey === reloadKey
-  return { pinned, isLoading: !answered, error: answered && failed, refetch, unpin }
+  return { pinned, isLoading: !answered, error: answered && failed, refetch, unpin, reorder }
 }

@@ -25,6 +25,190 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-17 — Checked in a real browser at 375 / 768 / 1440 px (`improvements_10`)
+
+**Did** — Walked the main page (Ezio collection card, Activity, Pinned, Collection,
+Following) in Playwright, signed in by the user, at phone, tablet and desktop widths;
+no horizontal scroll at any. Fixed what showed: the month labels broke mid-word on a
+phone (now hyphenated), the total play time split from its "h", best performance ran
+the whole width between 1280 and 1535px (now beside play habits from `xl`), and the
+weekday labels of the habits chart were cut at half width.
+**Watch out** — Cards fade in on scroll (`ChartCard`'s `whileInView`): an element
+screenshot of a section not scrolled through shows them blank. Reordering was not
+tried in the browser, since it would save to the shared (production) database.
+
+---
+
+## 2026-10-17 — Collection made shorter; Following without an empty column (`improvements_10`)
+
+**Did** — Collection: "Your numbers" (`CollectionNumbers`) is a strip across the page
+under the last five completed — total play time beside its heading, then one tile
+per platform side by side (4 columns from `2xl`, 2 below) — instead of a column ~700px
+tall beside a collection grid of ~250px. The bars keep their counts; only the
+repeated "completion distribution" heading is dropped (`CompletionDistribution`
+`showTitle`). "Closest to perfect" moved to its own `CollectionClosest`, beside the
+collection grid (same height); with nothing near 100% it renders nothing and the grid
+takes the row (`xl:last:col-span-3`). Following: with nothing unlocked lately (and
+done loading), the feed card stretches to the height of the column beside it
+(`xl:self-stretch`, not sticky) with its "Nothing unlocked these days" centred,
+instead of a short card over an empty column. (Hiding it was tried first; the user
+wanted it shown.)
+
+---
+
+## 2026-10-17 — Pinned achievements and games can be reordered (`improvements_10`)
+
+**Did** — In the Pinned section each tile has a grip (`MainPagePinnedSectionSortable`
++ `MainPagePinnedSectionSortableItem`, dnd-kit, pointer and keyboard). Achievements:
+`migrations/037_pinned_achievements_position.sql` adds a nullable `position`;
+`GET /api/favorites?source=all` returns the row `id` and orders by
+`position NULLS FIRST, created_at DESC`; `PUT /api/favorites { order: [ids] }` saves
+it (only the user's own rows); `usePinnedAchievements().reorder` is optimistic and
+rolls back with a toast. Games reuse `PUT /api/pinnedGames`; the context's `reorder`
+now also puts the old order back when the save fails.
+**Decisions** — NULL position = never placed, shown first, newest first: a list nobody
+reordered reads as before, and a pin made after a reorder appears on top.
+**Watch out** — **Run migration 037 before this code runs against a database**: the
+pins query orders by `position`, so without the column every pinned-achievements read
+(main page, Pinned section, public profile) answers 500. Additive, safe to run first.
+Applied to the shared database (production, which develop and local use) on
+2026-10-17, with the user's go-ahead: 9 existing pins, all with no position yet.
+
+---
+
+## 2026-10-17 — Pinning no longer scrolls the page up (`improvements_10`)
+
+**Did** — The four game tables (RA, Steam, PSN, Xbox) put pinned achievements first.
+Pinning one moved its row to the top with the focused star in it; React then gave
+the star its focus back, and `focus()` scrolled the page up to it. Each favourites
+hook now also returns the pins as they loaded (`leading` / `leadingIds`), and the
+tables order by that: a row pinned now stays where it is (still highlighted), and
+leads the list the next time the page opens.
+
+---
+
+## 2026-10-17 — Pinning a PSN trophy answered 500 (`improvements_10`)
+
+**Did** — `POST /api/favorites` for PSN listed `xbox_achievement_id` among its insert's
+columns (8 columns, 7 values), so Postgres refused every PSN pin. Removed; a test now
+checks, for each of the four sources, that the insert names as many columns as it
+gives values (it fails on the old line).
+**Why** — Slipped in with the Xbox data layer (`06be25b`); the route tests mock the
+pool and only compared parameters. Never reached `develop` or `main`.
+
+---
+
+## 2026-10-17 — Stats & Activity: the Activity tab reworked (`improvements_10`)
+
+**Did** — Three new cards, all read from the year of unlocks the streak already loads
+(`useStreakData`: every platform, hidden consoles left out, no new call):
+"This month vs last" (`MainPageMonthCompare`: achievements, games played, active
+days, month-to-date against the same days of last month), "Play habits"
+(`MainPageHabits`: bars by weekday and by hour of the day, the busiest day and three
+hours in full accent and written out; a weekday × hour heatmap was tried first and
+the user did not like it) and "Activity diary" (`MainPageJournal` +
+`MainPageJournalDay`: the last 4 days with unlocks and their games). Logic in
+`src/utils/activityInsights.ts`. Existing cards polished: "Most active" rows carry a
+bar against the busiest game, "Abandoned" rows a progress bar (`GameListRow` got
+`share` and `progress`). Order (2026-10-17, after seeing it): the month across the
+top; habits (3/4) beside best performance (1/4), two cards of the same height; then
+the four lists in one row (most active, diary, abandoned, rare) — 4 columns from
+`2xl`, 2 by 2 below. The diary shows 3 days of at most 2 games, as tall as the
+lists beside it. The pinned achievements left Activity (goals, not activity) for a
+section of their own in the rail, "Pinned" (own page only; on a public profile they
+stay in the showcase) — under Collection's numbers they went unseen. Best month opens
+its days in `PeriodAchievementsModal` like the day and week do, instead of unfolding
+and stretching the row. `GameListRow`'s icon is decorative (`alt=""`, grey behind it):
+with the title as alt, a broken icon printed the name inside its 28px box.
+The Pinned section was then redesigned (`MainPagePinnedSection`): the pinned
+achievements are its lead — a heading with "n of total earned" and its bar, then
+each as a tile (badge large with the platform in its corner, name, description, game,
+earned/locked with an icon, points/grade/gamerscore, rarity); `pinnedView`
+(`src/utils/pinnedView.ts`) puts the four platforms in one shape. Under them, the
+pinned games as compact tiles (icon, platform, progress), resolved through
+`useProfileLibrary`; the full cards with drag-to-reorder stay in Recently played's
+pinned view. `MainPageFavorites` (the list) is still what the public profile's
+showcase uses.
+**Why** — The user asked to polish the section and add something; they picked these
+three from four ideas (a per-platform split of unlocks was left out).
+**Decisions** — Unlock dates are UTC on every platform; the habits, month and diary
+count them in the browser's local time (`unlockTime`), or an evening in Madrid would
+show two hours early. The month compares the 1st–17th with the 1st–17th, not half a
+month against a whole one. Today/yesterday come from `Intl.RelativeTimeFormat`, weekday
+and month names from `Intl.DateTimeFormat`, so only 9 strings were added per language.
+**Open** — Not checked in a browser (every route needs a session).
+
+---
+
+## 2026-10-16 — RA missables marked in the badge grid; library backdrop band (`improvements_10`)
+
+**Did** — `AchievementGrid` (the main page's opened RA card, the library's detail
+panel, group cards) rings an unearned missable in red with a small warning triangle
+in its corner, says "Missable" in its accessible name, and heads the grid with
+"⚠ Missable left: N". `LibraryDetailBackdrop` is now `overflow-hidden`.
+**Why** — The user wanted missables visible at a glance outside the game page.
+The library panel showed a hard horizontal band across "Activity in this game": the
+backdrop's art is `scale-110 blur-lg`, and what spilled past the bottom of its 30rem
+box was outside the fade to `bg-card`, so the art's (dark) bottom edge showed cut off.
+**Decisions** — Earned missables are left alone (nothing left to lose). The triangle
+is there so the mark does not rely on colour alone.
+**Open** — Not checked in a browser. The PSN work below was carried onto this branch
+uncommitted from `feat/xbox-integration`; the branch name was chosen by the user.
+
+---
+
+## 2026-10-16 — PSN collections: one card in the recent feed (`feat/xbox-integration`)
+
+**Did** — `withPlayData` gives a collection's last session only to the trophy set with
+the newest trophy; the others keep their trophy date. Each game now carries its
+`collection` (`PsnCollection` in `types/psn.ts`), and "Recently played" folds a
+collection's games into one card (`psnFeed` in `utils/steamFeed.ts`,
+`PsnCollectionItem`): its name, store icon, session, hours and summed trophies.
+Opened, it looks like an opened game (`PsnCollectionExpanded`, trophies of every game
+loaded at once by `usePsnCollectionTrophies`): ring, chart and rarest across the
+collection, each game a fold of its trophies like BO2's DLC; the rarest link to
+their own game (`PsnRarestTrophies` takes a `gameId` per trophy). Cache
+`psn:titles:v10` → `v12`.
+**Why** — Only Brotherhood was played, yet AC II showed in "Recently played" on
+16 Oct with 76 h. Measured 2026-10-16: the played list has one entry, *The Ezio
+Collection* (`CUSA04893_00`, 75 h 43 min, last session 16 Oct), and it maps to both
+sets (`NPWR11436_00` Brotherhood, last trophy 6 Oct; `NPWR11435_00` AC II, last trophy
+2 Apr 2025). The session was stamped on both.
+**Decisions** — The user chose to fold only in the feed, with stats counting per
+trophy set as before (each game keeps its platinum); a collection page with its games
+as DLC-like sections was weighed and left out, since pins, groups, favorites and URLs
+are all per set. The per-set session rule alone was not enough: opening AC II without
+earning a trophy would still credit Brotherhood, and Sony gives nothing to tell them
+apart. The hours stay on every game's own page (the total counts them once through
+`playedAs`).
+**Open** — The library lists (categories, explorer) still show each game apart, on
+purpose: each completes on its own. Revelations is missing from the Ezio card: never
+started, so Sony has no trophy list for it (the set lookup for `CUSA04893_00` returns
+only AC II and Brotherhood). Not checked in a browser.
+**Watch out** — Sony's `lastUpdatedDateTime` for AC II is 2026-09-20 though its last
+trophy is from 2025: it moves without a trophy, so AC II still sorts at that date.
+
+---
+
+## 2026-10-16 — PSN icons: Sony's square store icon, not the PS4 trophy banner (`feat/xbox-integration`)
+
+**Did** — PSN games now take their icon from the played-games list (`imageUrl`, else
+`MASTER`) instead of the trophy set's (`withPlayData`, `psnClient.ts`); the cover is
+only `PORTRAIT_BANNER`, and `GAMEHUB_COVER_ART` moved to the backdrop list. `GameIcon`
+shows PSN icons with `object-contain`. A blurred copy filling the bands was tried and
+dropped: the user preferred the plain bands. Cache key `psn:titles:v9` → `v10`.
+**Why** — PS4 icons looked bad: measured 2026-10-16 on a real account, a PS4 trophy
+set's `trophyTitleIconUrl` is a 320×176 banner (PS5's are 512×512), cropped to a
+square ("SSASSIN CREED"). The played-games `imageUrl` is square (512/1024) on PS4 too.
+On the game page the "cover" of a PS4 game was its 16:9 hub art cropped to 2:3.
+**Decisions** — A collection (Ezio Collection → AC II, Brotherhood…) keeps each
+game's trophy icon, letterboxed, rather than the same collection icon on every game.
+PS3/Vita and games with a hidden played list also keep the (letterboxed) trophy icon.
+**Watch out** — Pins and group items store `image_icon` at pin time; they show the
+live library's icon when it is loaded, the stored one otherwise.
+
+---
+
 ## 2026-10-16 — The "13 optimizations" (`feat/xbox-integration`)
 
 **Did** — The roadmap's "13 optimization fixes" were never itemised, only named

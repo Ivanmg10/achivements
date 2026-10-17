@@ -1,6 +1,6 @@
 import type { RecentlyPlayedGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
-import type { PsnGameProgress } from '@/types/psn'
+import type { PsnCollection, PsnGameProgress } from '@/types/psn'
 import type { XboxGameProgress } from '@/types/xbox'
 
 /**
@@ -56,7 +56,25 @@ export type RecentFeedItem =
   | { source: 'ra'; key: string; lastPlayed: string | null; game: RecentlyPlayedGame }
   | { source: 'steam'; key: string; lastPlayed: string | null; game: SteamGameProgress }
   | { source: 'psn'; key: string; lastPlayed: string | null; game: PsnGameProgress }
+  | { source: 'psnCollection'; key: string; lastPlayed: string | null; collection: PsnCollection; games: PsnGameProgress[] }
   | { source: 'xbox'; key: string; lastPlayed: string | null; game: XboxGameProgress }
+
+/**
+ * PSN games, with those played through one collection folded into a single
+ * entry: Sony's session and hours are the collection's, not any one game's.
+ * A collection with only one of its games in the list stays that game.
+ */
+function psnFeed(psn: PsnGameProgress[]): RecentFeedItem[] {
+  const members = new Map<string, PsnGameProgress[]>()
+  for (const g of psn) if (g.collection) members.set(g.collection.titleId, [...(members.get(g.collection.titleId) ?? []), g])
+  return psn.flatMap((game): RecentFeedItem[] => {
+    const games = game.collection ? members.get(game.collection.titleId)! : []
+    if (games.length < 2) return [{ source: 'psn', key: `psn:${game.id}`, lastPlayed: game.lastPlayed, game }]
+    if (games[0] !== game) return []
+    const lastPlayed = [game.collection!.lastPlayed, ...games.map((g) => g.lastPlayed)].filter((d): d is string => !!d).sort().at(-1) ?? null
+    return [{ source: 'psnCollection', key: `psnc:${game.collection!.titleId}`, lastPlayed, collection: game.collection!, games }]
+  })
+}
 
 /**
  * One recent feed across every platform, newest first. Keys are namespaced by
@@ -86,12 +104,7 @@ export function mergeRecentFeeds(
       lastPlayed: game.lastPlayed,
       game,
     })),
-    ...psn.map((game) => ({
-      source: 'psn' as const,
-      key: `psn:${game.id}`,
-      lastPlayed: game.lastPlayed,
-      game,
-    })),
+    ...psnFeed(psn),
     ...xbox.map((game) => ({
       source: 'xbox' as const,
       key: `xbox:${game.id}`,

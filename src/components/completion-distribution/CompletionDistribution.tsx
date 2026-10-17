@@ -25,6 +25,7 @@ export default function CompletionDistribution({
   tone,
   note,
   isLoading,
+  showTitle = true,
 }: {
   /** Completion per game, 0–1. */
   fractions: number[]
@@ -32,6 +33,8 @@ export default function CompletionDistribution({
   /** Shown under the bar — e.g. that some games' progress has not loaded. */
   note?: string
   isLoading?: boolean
+  /** Its heading; left out where several sit side by side and it would repeat on each. */
+  showTitle?: boolean
 }) {
   const { T } = useLanguage()
   const counts = useMemo(() => completionBuckets(fractions), [fractions])
@@ -50,7 +53,7 @@ export default function CompletionDistribution({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.completionDistTitle}</p>
+      {showTitle && <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.completionDistTitle}</p>}
 
       {total === 0 ? (
         <p className="text-xs text-text-secondary">{T.cards.noData}</p>

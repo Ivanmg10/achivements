@@ -224,7 +224,8 @@ export type UserAwards = {
 }
 
 /** A user-pinned achievement — from RA (by its global id) or Steam (by apiname, scoped to its game). */
-export type PinnedAchievement =
+/** `id` is the row's, what the order is saved by (absent on pins read elsewhere). */
+export type PinnedAchievement = { id?: number } & (
   | {
       source: 'ra'
       achievement_id: number
@@ -257,6 +258,7 @@ export type PinnedAchievement =
       snapshot: XboxAchievement
       num_distinct_players: number
     }
+)
 
 export type RecentAchievement = {
   Date: string; // "2024-01-15 20:30:00"

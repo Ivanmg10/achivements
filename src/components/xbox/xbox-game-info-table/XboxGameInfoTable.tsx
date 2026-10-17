@@ -58,7 +58,7 @@ function sortAchievements(list: XboxAchievement[], { key, dir }: SteamSortState)
  *
  * Opening the page from an achievement link (…#achievement-<id>) scrolls to it
  * and highlights it briefly. Each achievement can be pinned to the main page,
- * and pinned ones lead the list; each opens in a detail window with links to
+ * and the ones pinned when it loaded lead the list; each opens in a detail window with links to
  * guides.
  */
 export default function XboxGameInfoTable({
@@ -71,7 +71,7 @@ export default function XboxGameInfoTable({
   gameTitle: string
 }) {
   const { T } = useLanguage()
-  const { pinned, toggle, canPin } = useXboxFavoriteAchievements(gameId, gameTitle)
+  const { pinned, leading, toggle, canPin } = useXboxFavoriteAchievements(gameId, gameTitle)
   const panelId = useId()
   const [filter, setFilter] = useState<Filter>('all')
   const [sortState, setSortState] = useState<SteamSortState>({ key: 'default', dir: 'asc' })
@@ -115,8 +115,8 @@ export default function XboxGameInfoTable({
       filter === 'earned' ? achievements.filter((a) => a.unlocked) : filter === 'unearned' ? achievements.filter((a) => !a.unlocked) : achievements
     const sorted = sortAchievements(list, sortState)
     // Pinned first, each part in the chosen order — as RA's table does.
-    return canPin ? [...sorted.filter((a) => pinned.has(a.id)), ...sorted.filter((a) => !pinned.has(a.id))] : sorted
-  }, [achievements, filter, sortState, canPin, pinned])
+    return canPin ? [...sorted.filter((a) => leading.has(a.id)), ...sorted.filter((a) => !leading.has(a.id))] : sorted
+  }, [achievements, filter, sortState, canPin, leading])
 
   function handleSort(key: SteamSortKey) {
     setSortState((prev) =>

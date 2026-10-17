@@ -187,12 +187,12 @@ export default function MainPageAbandoned({
               key={g.key}
               href={g.href}
               imageUrl={g.imageUrl}
-              imageAlt={g.title}
               title={g.title}
               subtitle={g.subtitle}
               stat={`${g.daysAgo}d`}
               statLabel={`${g.pct}%`}
               statClassName="text-orange-400"
+              progress={g.pct}
             />
           ))}
         </div>

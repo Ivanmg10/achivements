@@ -26,13 +26,16 @@ jest.mock('./MainPageRarest', () => mockProbe('rarest'))
 jest.mock('./MainPageAbandoned', () => mockProbe('abandoned'))
 jest.mock('../main-page-collection/MainPageCollection', () => mockProbe('collection'))
 jest.mock('./MainPageBestPeriod', () => mockProbe('best'))
+jest.mock('./main-page-month-compare/MainPageMonthCompare', () => mockProbe('month'))
+jest.mock('./main-page-habits/MainPageHabits', () => mockProbe('habits'))
+jest.mock('./main-page-journal/MainPageJournal', () => mockProbe('journal'))
 jest.mock('./MainPageConsoleNav', () => mockProbe('nav'))
 jest.mock('../main-page-groups-section/MainPageGroupsSection', () => mockProbe('groups'))
+jest.mock('../main-page-pinned-section/MainPagePinnedSection', () => mockProbe('favorites'))
 jest.mock('../main-page-friends/MainPageFriends', () => ({
   __esModule: true,
   default: ({ active }: { active: boolean }) => <div data-testid="friends" data-active={String(active)} />,
 }))
-jest.mock('../main-page-favorites/MainPageFavorites', () => mockProbe('favorites'))
 jest.mock('./main-page-steam-stats/MainPageSteamStats', () => mockProbe('steam-stats'))
 jest.mock('./main-page-steam-nav/MainPageSteamNav', () => mockProbe('steam-nav'))
 
@@ -75,6 +78,13 @@ test('feeds the shared activity cards both platforms, newest first', () => {
   expect(screen.getByTestId('top-games')).toHaveTextContent('Recent RA,Win')
 })
 
+test('the month, habits and diary read the year every platform already loads', () => {
+  platform('ra')
+  render(<MainPageCharts />)
+  fireEvent.click(screen.getByRole('tab', { name: 'Activity' }))
+  for (const id of ['month', 'habits', 'journal']) expect(screen.getByTestId(id)).toHaveTextContent('Year RA')
+})
+
 test('loads nothing from Steam without a linked account', () => {
   platform('ra')
   ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false, library: [], libraryLoading: false })
@@ -94,7 +104,7 @@ function cardsAcrossSections() {
 
 const RA_ONLY = ['points', 'nav']
 const STEAM_ONLY = ['steam-stats', 'steam-nav']
-const SHARED = ['heatmap', 'daily', 'top-games', 'rarest', 'abandoned', 'collection', 'groups', 'favorites', 'best']
+const SHARED = ['heatmap', 'daily', 'top-games', 'rarest', 'abandoned', 'collection', 'groups', 'favorites', 'best', 'month', 'habits', 'journal']
 
 test('the shared cards are there whichever platform is selected', () => {
   platform('steam')
@@ -120,7 +130,6 @@ test('in Steam mode, swaps them for the Steam versions and feeds best performanc
   for (const id of STEAM_ONLY) expect(cards).toContain(id)
   for (const id of RA_ONLY) expect(cards).not.toContain(id)
   expect(cards).toContain('groups')
-  expect(cards).toContain('favorites')
   fireEvent.click(screen.getByRole('tab', { name: 'Activity' }))
   expect(screen.getByTestId('best')).toHaveTextContent('Win')
 })
@@ -150,10 +159,10 @@ describe('sections', () => {
     platform('ra')
     render(<MainPageCharts />)
     const panels = document.querySelectorAll('[role="tabpanel"]')
-    expect(panels).toHaveLength(6)
+    expect(panels).toHaveLength(7)
     for (const p of panels) if (p.getAttribute('aria-hidden') === 'true') expect(p).toHaveClass('hidden')
     const closed = [...panels].filter((p) => p.getAttribute('aria-hidden') === 'true')
-    expect(closed).toHaveLength(5)
+    expect(closed).toHaveLength(6)
     for (const p of closed) expect(p).toHaveAttribute('inert')
   })
 
@@ -186,4 +195,11 @@ describe('sections', () => {
     expect(scroll.mock.contexts[0]).toBe(document.querySelector('[data-stats-section]'))
     ;(window.requestAnimationFrame as jest.Mock).mockRestore()
   })
+})
+
+test('the pinned achievements have a section of their own', () => {
+  platform('ra')
+  render(<MainPageCharts />)
+  fireEvent.click(screen.getByRole('tab', { name: 'Pinned' }))
+  expect(within(screen.getByRole('tabpanel')).getByTestId('favorites')).toBeInTheDocument()
 })

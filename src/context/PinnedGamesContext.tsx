@@ -108,15 +108,22 @@ export function PinnedGamesProvider({ children }: { children: React.ReactNode })
     }
   }, [])
 
+  // Optimistic: the new order at once, the old one back if it could not be saved (the caller says so).
   const reorder = useCallback(async (order: GameRef[]) => {
+    const before = pins
     setPins(order)
-    const res = await fetch('/api/pinnedGames', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order: order.map((p) => ({ source: p.source, gameId: p.id })) }),
-    })
-    if (!res.ok) throw new Error('Error saving order')
-  }, [])
+    try {
+      const res = await fetch('/api/pinnedGames', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: order.map((p) => ({ source: p.source, gameId: p.id })) }),
+      })
+      if (!res.ok) throw new Error('Error saving order')
+    } catch (err) {
+      setPins(before)
+      throw err
+    }
+  }, [pins])
 
   // One object per change of what it holds, so a re-render of the provider (the session updating)
   // does not re-render everything that reads it.

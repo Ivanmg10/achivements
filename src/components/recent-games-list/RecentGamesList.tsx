@@ -8,6 +8,7 @@ import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { mergeRecentFeeds } from '@/utils/steamFeed'
 import SteamGameItem from '@/components/steam/steam-game-item/SteamGameItem'
 import PsnGameItem from '@/components/psn/psn-game-item/PsnGameItem'
+import PsnCollectionItem from '@/components/psn/psn-collection-item/PsnCollectionItem'
 import XboxGameItem from '@/components/xbox/xbox-game-item/XboxGameItem'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import EmptyState from '@/components/empty-state/EmptyState'
@@ -65,6 +66,9 @@ export default function RecentGamesList() {
             const toggle = () => setExpanded((cur) => (cur === item.key ? null : item.key))
             if (item.source === 'psn') {
               return <PsnGameItem key={item.key} game={item.game} expanded={expanded === item.key} onToggle={toggle} />
+            }
+            if (item.source === 'psnCollection') {
+              return <PsnCollectionItem key={item.key} collection={item.collection} games={item.games} expanded={expanded === item.key} onToggle={toggle} />
             }
             if (item.source === 'xbox') {
               return <XboxGameItem key={item.key} game={item.game} expanded={expanded === item.key} onToggle={toggle} />
