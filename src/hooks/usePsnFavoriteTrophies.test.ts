@@ -79,3 +79,12 @@ test("pinning is not offered on someone else's page", () => {
   const { result } = renderHook(() => usePsnFavoriteTrophies(2018800, 'Bloodborne'), { wrapper })
   expect(result.current.canPin).toBe(false)
 })
+
+test('the list order is the pins as they loaded: pinning one now does not move it', async () => {
+  const { result } = renderHook(() => usePsnFavoriteTrophies(2018800, 'Astro Bot'))
+  await waitFor(() => expect(result.current.leading.has(1)).toBe(true))
+  ;(global.fetch as jest.Mock).mockImplementationOnce(() => json({ ok: true }))
+  await act(() => result.current.toggle(TROPHY))
+  expect(result.current.pinned.has(3)).toBe(true)
+  expect(result.current.leading.has(3)).toBe(false)
+})

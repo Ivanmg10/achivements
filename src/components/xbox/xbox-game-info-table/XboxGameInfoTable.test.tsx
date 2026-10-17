@@ -18,7 +18,7 @@ beforeEach(() => {
   jest.clearAllMocks()
   window.localStorage.clear()
   window.location.hash = ''
-  ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set<string>(), toggle, canPin: false })
+  ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set<string>(), leading: new Set<string>(), toggle, canPin: false })
 })
 
 /** The achievement names in the desktop table, in order. */
@@ -60,14 +60,14 @@ test('each row carries the anchor its links point at', () => {
 })
 
 test('signed in, each row can be pinned', () => {
-  ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set<string>(), toggle, canPin: true })
+  ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set<string>(), leading: new Set<string>(), toggle, canPin: true })
   render(<XboxGameInfoTable gameId={100} gameTitle="Halo" achievements={ACHIEVEMENTS} />)
   fireEvent.click(within(screen.getByRole('table')).getByRole('switch', { name: `${en.favorites.addFavorite}: Common` }))
   expect(toggle).toHaveBeenCalledWith(ACHIEVEMENTS[1])
 })
 
 test('pinned achievements lead the list, highlighted', () => {
-  ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set<string>(['12']), toggle, canPin: true })
+  ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set<string>(['12']), leading: new Set<string>(['12']), toggle, canPin: true })
   render(<XboxGameInfoTable gameId={100} gameTitle="Halo" achievements={ACHIEVEMENTS} />)
   expect(names()).toEqual(['Locked', 'Top one', 'Common', en.xbox.secretAchievement])
   expect(screen.getByRole('table').querySelector('[data-achievement="12"]')!.className).toContain('bg-warning/10')

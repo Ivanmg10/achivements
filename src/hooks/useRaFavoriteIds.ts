@@ -14,6 +14,8 @@ type FavoriteMeta = { gameTitle?: string | null; numDistinctPlayers: number }
 export function useRaFavoriteIds(gameId: number | string | null | undefined, enabled = true) {
   const { T } = useLanguage()
   const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set())
+  /** The pins as they loaded: what a list orders by, so pinning leaves the row (and the page) where it is. */
+  const [leadingIds, setLeadingIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     if (!gameId || !enabled) return
@@ -24,7 +26,10 @@ export function useRaFavoriteIds(gameId: number | string | null | undefined, ena
         return r.json()
       })
       .then((rows: { achievement_id: number }[]) => {
-        if (current) setFavoritedIds(new Set(rows.map((r) => r.achievement_id)))
+        if (!current) return
+        const ids = new Set(rows.map((r) => r.achievement_id))
+        setFavoritedIds(ids)
+        setLeadingIds(ids)
       })
       // Nothing to show but empty stars; the pins themselves are safe on the server.
       .catch((err) => console.error('[useRaFavoriteIds] load', err))
@@ -64,5 +69,5 @@ export function useRaFavoriteIds(gameId: number | string | null | undefined, ena
     [favoritedIds, gameId, T]
   )
 
-  return { favoritedIds, toggleFavorite }
+  return { favoritedIds, leadingIds, toggleFavorite }
 }

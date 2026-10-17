@@ -37,7 +37,7 @@ export default function GameInfoTable({
 
   const numDistinctPlayers = gameData?.NumDistinctPlayers ?? 1
 
-  const { favoritedIds, toggleFavorite } = useRaFavoriteIds(gameData?.ID)
+  const { favoritedIds, leadingIds, toggleFavorite } = useRaFavoriteIds(gameData?.ID)
   const handleToggleFavorite = useCallback(
     (achievement: RetroAchievement) =>
       toggleFavorite(achievement, { gameTitle: gameData?.Title, numDistinctPlayers }),
@@ -87,11 +87,12 @@ export default function GameInfoTable({
       return dir === 'desc' ? sorted.reverse() : sorted
     }
 
-    const favGroup = list.filter((a) => favoritedIds.has(a.ID))
-    const restGroup = list.filter((a) => !favoritedIds.has(a.ID))
+    // By the pins as they loaded: a row pinned now stays put instead of dragging the page up with it.
+    const favGroup = list.filter((a) => leadingIds.has(a.ID))
+    const restGroup = list.filter((a) => !leadingIds.has(a.ID))
 
     return [...sortGroup(favGroup), ...sortGroup(restGroup)]
-  }, [achievements, filter, sortState, numDistinctPlayers, favoritedIds])
+  }, [achievements, filter, sortState, numDistinctPlayers, leadingIds])
 
   function handleSort(key: SortKey) {
     setSortState((prev) =>

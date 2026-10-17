@@ -17,6 +17,12 @@ export function useXboxFavoriteAchievements(gameId: number, gameTitle: string) {
   // Pins are the viewer's own; on someone else's page they are not offered.
   const subject = useSubject()
   const [pinned, setPinned] = useState<Set<string>>(new Set())
+  /**
+   * The pins as they were when the page loaded: what a list orders by. Pinning
+   * then leaves the row where it is — moved to the top, it took the focused star
+   * with it, and the browser scrolled up after it.
+   */
+  const [leading, setLeading] = useState<Set<string>>(new Set())
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -28,7 +34,11 @@ export function useXboxFavoriteAchievements(gameId: number, gameTitle: string) {
         return res.json()
       })
       .then((rows: { xbox_achievement_id: string }[]) => {
-        if (current && Array.isArray(rows)) setPinned(new Set(rows.map((r) => r.xbox_achievement_id)))
+        if (current && Array.isArray(rows)) {
+          const ids = new Set(rows.map((r) => r.xbox_achievement_id))
+          setPinned(ids)
+          setLeading(ids)
+        }
       })
       .catch((err) => {
         console.error('[useXboxFavoriteAchievements]', gameId, err)
@@ -70,5 +80,5 @@ export function useXboxFavoriteAchievements(gameId: number, gameTitle: string) {
     [pinned, gameId, gameTitle, T],
   )
 
-  return { pinned, toggle, error, canPin: status === 'authenticated' && !subject }
+  return { pinned, leading, toggle, error, canPin: status === 'authenticated' && !subject }
 }
