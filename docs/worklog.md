@@ -25,6 +25,36 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-17 — Public comparison/how-to pages and a landing FAQ (`feat/seo-public-pages`)
+
+**Did** — Four public pages: `/compare/exophase`, `/compare/psnprofiles`,
+`/track/retroachievements-steam-playstation`, `/track/achievements-with-friends`
+(`SEO_PAGES` in `src/translations/seoPages.ts`, `SeoPage`, `SeoPageRoute`), each
+with a FAQ shown and sent as `FAQPage` JSON-LD. A five-question FAQ on the landing
+(`T.landing.faq`, 9 languages) with its JSON-LD on the home page. The landing's
+closing card and footer became `LandingClosing` and `PublicFooter`, shared with the
+new pages; the footer links every public page (`PublicPageLinks`). Sitemap lists them
+with their `updated` date; the proxy lets `/compare/` and `/track/` through.
+**Why** — The user saw a post about a SaaS getting half its sign-ups from ChatGPT
+recommending it off comparison posts. Before this, only 4 pages were public, so
+neither Google nor an AI had anything to read about what the app does.
+**Decisions** — Page prose in en/es only and outside `T`, since `T` is in every
+page's bundle (CLAUDE.md, "Public pages"). Sitemap's `priority`/`changeFrequency`
+left as they were: Google ignores them; what helps is more public pages.
+Comparisons are honest about where the other site wins. The FAQ is an accordion
+(`FaqListItem`, framer-motion height + fade, numbered, accent bar and a + that turns
+into ×); the answer stays mounted while closed (height 0, `inert`) instead of using
+`ExpandPanel`, which unmounts it, so every answer is in the HTML crawlers read.
+**Open** — Claims about Exophase (platform list, leaderboards) and PSNProfiles
+(guides, leaderboards) are from memory; their sites refuse automated reads, so the
+user should confirm them. Google Search Console / Bing Webmaster Tools not set up
+from here (dashboard work). Sign-ups are not tagged with their origin
+(`utm_source=chatgpt.com`), so whether this works cannot be measured yet.
+**Watch out** — Google shows FAQ rich results only for a few authority sites since
+2023; the JSON-LD is still read (Bing, AIs), but do not expect FAQ snippets.
+
+---
+
 ## 2026-10-17 — Checked in a real browser at 375 / 768 / 1440 px (`improvements_10`)
 
 **Did** — Walked the main page (Ezio collection card, Activity, Pinned, Collection,

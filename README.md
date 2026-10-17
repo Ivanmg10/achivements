@@ -28,6 +28,9 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
 - **Groups** — named collections of games, public or private, shareable.
 - **Social** — public profiles (opt-in), follow users, a following feed and
   user search, compare a game with someone else's progress.
+- **Public pages** — honest comparisons (vs Exophase, vs PSNProfiles) and
+  how-tos at `/compare/*` and `/track/*`, plus a FAQ on the landing, for
+  visitors and for what search engines and chat AIs read.
 - **Personalization** — 25 themes (`THEMES` in `src/types/types.ts`), 9 UI
   languages (en, es, de, fr, it, ja, pl, pt, ru), country with flag.
 

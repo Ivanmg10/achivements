@@ -16,6 +16,15 @@ test('the landing, the auth page, the legal pages and the images other sites fet
   expect(getToken).not.toHaveBeenCalled()
 })
 
+test('the comparison and how-to pages are open to anyone, but only under their prefixes', async () => {
+  for (const path of ['/compare/exophase', '/track/achievements-with-friends']) {
+    expect((await proxy(request(path))).status).toBe(200)
+  }
+  expect(getToken).not.toHaveBeenCalled()
+  ;(getToken as jest.Mock).mockResolvedValue(null)
+  expect((await proxy(request('/compare'))).status).toBe(307)
+})
+
 test('the app needs an account: a visitor is sent to sign in', async () => {
   ;(getToken as jest.Mock).mockResolvedValue(null)
   const res = await proxy(request('/groups'))

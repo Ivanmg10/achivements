@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/siteUrl";
+import { en } from "@/translations/en";
+import { faqJsonLd, jsonLdString } from "@/utils/seoPages";
 import MainPage from "@/components/main-page/MainPage";
 import LandingPage from "@/components/landing-page/LandingPage";
 
@@ -9,7 +11,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 }
 
-// What search engines read about the site: its name and that it is a free web app.
+// What search engines read about the site: its name and that it is a free web app,
+// and the landing's FAQ, in English like the HTML the server sends.
 const JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
@@ -29,6 +32,7 @@ export default async function Home() {
     return (
       <>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(faqJsonLd(en.landing.faq)) }} />
         <LandingPage />
       </>
     );

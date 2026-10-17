@@ -399,6 +399,18 @@ export const pt: Translations = {
     closingTitle: 'Traz os teus jogos',
     closingText: 'É grátis, e ligas as tuas contas quando quiseres.',
     footer: 'Sem ligação ao RetroAchievements, à Valve ou à Sony.',
+    faqLead: 'O que as pessoas perguntam antes de criar conta.',
+    faq: [
+      { q: 'O CheevoVault é grátis?', a: 'Sim. Todas as funções são grátis e não há nenhuma versão paga.' },
+      { q: 'Que plataformas acompanha?', a: 'RetroAchievements, Steam e PlayStation. Liga uma, duas ou as três.' },
+      { q: 'Preciso de uma chave de API do RetroAchievements?', a: 'Sim, a tua, da página de definições do RetroAchievements. O RetroAchievements pede que cada utilizador assine os pedidos com a sua própria chave, por isso o CheevoVault nunca usa uma partilhada.' },
+      { q: 'Muda alguma coisa nas minhas contas?', a: 'Não, só as lê. Steam e PlayStation ligam-se pelo nome: sem palavra-passe e sem iniciar sessão do lado deles.' },
+      { q: 'Posso apagar a minha conta?', a: 'Sim, na página da tua conta, com a tua palavra-passe. Os teus dados vão com ela, como explica a política de privacidade.' },
+    ],
+  },
+  publicPages: {
+    faqTitle: 'Perguntas frequentes',
+    more: 'Mais sobre o CheevoVault',
   },
   toast: {
     followed: 'Agora segues {u}',
