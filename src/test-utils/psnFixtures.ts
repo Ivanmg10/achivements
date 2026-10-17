@@ -28,6 +28,7 @@ export function psnGameFixture(overrides: Partial<PsnGameProgress> = {}): PsnGam
     playedAs: [],
     playCount: null,
     coverUrl: null,
+    collection: null,
     heroUrl: null,
     conceptId: null,
     ...overrides,

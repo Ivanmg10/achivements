@@ -9,6 +9,22 @@ export type TrophyCounts = Record<'bronze' | 'silver' | 'gold' | 'platinum', num
 export type TrophyGrade = keyof TrophyCounts
 
 /**
+ * One played game behind several trophy lists (The Ezio Collection → AC II,
+ * Brotherhood). Sony's play data is the collection's and does not say which of
+ * its games was played, so the recent feed shows the collection as one card.
+ */
+export type PsnCollection = {
+  /** The played game's own id, "CUSA04893_00". */
+  titleId: string
+  title: string
+  /** Square store icon. */
+  iconUrl: string | null
+  heroUrl: string | null
+  lastPlayed: string | null
+  playtimeMinutes: number | null
+}
+
+/**
  * A game in a PSN trophy list, in the unified model so the shared cards take
  * it like an RA or Steam game. `id` is the trophy set's number (see
  * psnNumericId); `titleId` keeps Sony's own form for calls and URLs.
@@ -48,6 +64,8 @@ export type PsnGameProgress = GameProgressBase & {
   heroUrl: string | null
   /** The game's PlayStation Store concept, where its release date is read from. Null for PS3/Vita. */
   conceptId: number | null
+  /** The collection it was played through, if any. */
+  collection: PsnCollection | null
 }
 
 /** One trophy of a game, with whether and when the account earned it. */

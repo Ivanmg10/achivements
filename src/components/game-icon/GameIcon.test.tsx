@@ -15,3 +15,10 @@ test("Steam draws from its own CDN; RA and PSN from the URL given; none is a gre
   expect(container.querySelector('img')).toBeNull()
   expect(container.querySelector('span[aria-hidden="true"]')).toHaveClass('w-8')
 })
+
+test("PSN's icon is shown whole (PS4's are 320×176 banners); the others fill the square", () => {
+  const { container, rerender } = render(<GameIcon source="psn" id={1} imageUrl="https://p.png" size={32} />)
+  expect(container.querySelector('img')).toHaveClass('object-contain')
+  rerender(<GameIcon source="xbox" id={1} imageUrl="https://x.png" size={32} />)
+  expect(container.querySelector('img')).toHaveClass('object-cover')
+})

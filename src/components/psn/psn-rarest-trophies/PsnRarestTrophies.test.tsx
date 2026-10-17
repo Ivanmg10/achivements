@@ -35,3 +35,14 @@ test('a skeleton while loading', () => {
   const { container } = render(<PsnRarestTrophies gameId={100} isLoading trophies={[]} />)
   expect(container.querySelector('[aria-busy="true"]')).toBeInTheDocument()
 })
+
+test("a collection's trophies link to their own game, even with the same id", () => {
+  render(
+    <PsnRarestTrophies
+      gameId={1143600}
+      isLoading={false}
+      trophies={[{ ...trophy({ id: 0, name: 'A', rarity: 1 }), gameId: 1143600 }, { ...trophy({ id: 0, name: 'B', rarity: 2 }), gameId: 1143500 }]}
+    />,
+  )
+  expect(screen.getAllByRole('link').map((l) => l.getAttribute('href')?.split('#')[0])).toEqual(['/psnGame/NPWR11436_00', '/psnGame/NPWR11435_00'])
+})

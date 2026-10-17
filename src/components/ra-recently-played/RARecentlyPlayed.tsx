@@ -15,6 +15,7 @@ import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import SteamGameItem from '@/components/steam/steam-game-item/SteamGameItem'
 import PsnGameItem from '@/components/psn/psn-game-item/PsnGameItem'
+import PsnCollectionItem from '@/components/psn/psn-collection-item/PsnCollectionItem'
 import XboxGameItem from '@/components/xbox/xbox-game-item/XboxGameItem'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -142,6 +143,14 @@ export default function RARecentlyPlayed() {
                 return (
                   <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
                     <PsnGameItem game={item.game} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1" />
+                  </div>
+                )
+              }
+
+              if (item.source === 'psnCollection') {
+                return (
+                  <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
+                    <PsnCollectionItem collection={item.collection} games={item.games} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1" />
                   </div>
                 )
               }
