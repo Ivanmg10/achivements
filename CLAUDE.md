@@ -439,6 +439,22 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   does: a platinum with DLC trophies still to earn is "in progress", not
   "completed". (It used to count by the `default` group alone; it no longer
   does, and no per-game lookup of the groups is made for the list.)
+- **Icons: the store's, not the trophy set's.** A PS4/PS3 trophy icon is a 320×176
+  banner (PS5's are square); the played-games `imageUrl` is square on PS4 too, so it
+  wins (`withPlayData`), except for a collection's games. The cover is only a
+  `PORTRAIT_BANNER`; PS4's 16:9 hub art is a backdrop. `GameIcon` letterboxes PSN
+  (no blurred fill: the user tried it and preferred plain bands).
+- **A collection is one played game for several trophy sets** (Ezio Collection →
+  AC II, Brotherhood), and Sony does not say which was played: its session goes only
+  to the set with the newest trophy, or every game in it shows as just played. Its
+  hours stay on each (the total counts them once, by `playedAs`). Each game carries
+  its `collection` (the played game's id, name, icon, session, hours), and the recent
+  feed folds a collection with 2+ games in the list into one card
+  (`psnFeed` in `steamFeed.ts`, `PsnCollectionItem`). Opened, it is laid out like an
+  opened game (`PsnCollectionExpanded`): ring, chart and rarest count the whole
+  collection, and each game is a fold of trophies, as DLC are. Only the feed folds:
+  stats, library, pins, pages and "completed" stay per trophy set (user's choice).
+  A game of the collection never started has no trophy list, so Sony lists it nowhere.
 - **Two lists, merged**: the trophy list (`getUserTitles`) and the played-games
   list (play time, last session, store art, PS4/PS5 only, its own privacy
   setting). `lastTrophyAt` is the trophy list's date and keys every trophy
@@ -680,6 +696,14 @@ branch to be up to date with its base** before merging, on both.
       asked for. **Open:** a viewer with no RA account is served with the page
       owner's key (see RetroAchievements above); ask RA whether that counts, and
       if not, ask the viewer to link their own. Revisit when OAuth lands.
+- [ ] Later: **community-flagged missables for PSN, Steam and Xbox.** Only RA says
+      which achievements are missable (`Type: 'missable'`, marked in red in
+      `AchievementGrid`); Sony, Steam and OpenXBL have no such field (checked
+      2026-10-16), and the sites that flag them (TrueAchievements/TrueTrophies,
+      PSNProfiles) have no API, so **do not scrape them**. Idea: users mark an
+      achievement as missable, and once enough of them agree it shows for everyone.
+      Needs a migration, a threshold and some moderation; only worth it with more
+      users. Not started.
 - [ ] Later, optional: a "verified" badge per linked account — the app gives
       a code, the user puts it for a few minutes in their RA motto / Steam
       summary / PSN About me, the app reads it. Only if public profiles or

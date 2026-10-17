@@ -25,6 +25,75 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-16 — RA missables marked in the badge grid; library backdrop band (`improvements_10`)
+
+**Did** — `AchievementGrid` (the main page's opened RA card, the library's detail
+panel, group cards) rings an unearned missable in red with a small warning triangle
+in its corner, says "Missable" in its accessible name, and heads the grid with
+"⚠ Missable left: N". `LibraryDetailBackdrop` is now `overflow-hidden`.
+**Why** — The user wanted missables visible at a glance outside the game page.
+The library panel showed a hard horizontal band across "Activity in this game": the
+backdrop's art is `scale-110 blur-lg`, and what spilled past the bottom of its 30rem
+box was outside the fade to `bg-card`, so the art's (dark) bottom edge showed cut off.
+**Decisions** — Earned missables are left alone (nothing left to lose). The triangle
+is there so the mark does not rely on colour alone.
+**Open** — Not checked in a browser. The PSN work below was carried onto this branch
+uncommitted from `feat/xbox-integration`; the branch name was chosen by the user.
+
+---
+
+## 2026-10-16 — PSN collections: one card in the recent feed (`feat/xbox-integration`)
+
+**Did** — `withPlayData` gives a collection's last session only to the trophy set with
+the newest trophy; the others keep their trophy date. Each game now carries its
+`collection` (`PsnCollection` in `types/psn.ts`), and "Recently played" folds a
+collection's games into one card (`psnFeed` in `utils/steamFeed.ts`,
+`PsnCollectionItem`): its name, store icon, session, hours and summed trophies.
+Opened, it looks like an opened game (`PsnCollectionExpanded`, trophies of every game
+loaded at once by `usePsnCollectionTrophies`): ring, chart and rarest across the
+collection, each game a fold of its trophies like BO2's DLC; the rarest link to
+their own game (`PsnRarestTrophies` takes a `gameId` per trophy). Cache
+`psn:titles:v10` → `v12`.
+**Why** — Only Brotherhood was played, yet AC II showed in "Recently played" on
+16 Oct with 76 h. Measured 2026-10-16: the played list has one entry, *The Ezio
+Collection* (`CUSA04893_00`, 75 h 43 min, last session 16 Oct), and it maps to both
+sets (`NPWR11436_00` Brotherhood, last trophy 6 Oct; `NPWR11435_00` AC II, last trophy
+2 Apr 2025). The session was stamped on both.
+**Decisions** — The user chose to fold only in the feed, with stats counting per
+trophy set as before (each game keeps its platinum); a collection page with its games
+as DLC-like sections was weighed and left out, since pins, groups, favorites and URLs
+are all per set. The per-set session rule alone was not enough: opening AC II without
+earning a trophy would still credit Brotherhood, and Sony gives nothing to tell them
+apart. The hours stay on every game's own page (the total counts them once through
+`playedAs`).
+**Open** — The library lists (categories, explorer) still show each game apart, on
+purpose: each completes on its own. Revelations is missing from the Ezio card: never
+started, so Sony has no trophy list for it (the set lookup for `CUSA04893_00` returns
+only AC II and Brotherhood). Not checked in a browser.
+**Watch out** — Sony's `lastUpdatedDateTime` for AC II is 2026-09-20 though its last
+trophy is from 2025: it moves without a trophy, so AC II still sorts at that date.
+
+---
+
+## 2026-10-16 — PSN icons: Sony's square store icon, not the PS4 trophy banner (`feat/xbox-integration`)
+
+**Did** — PSN games now take their icon from the played-games list (`imageUrl`, else
+`MASTER`) instead of the trophy set's (`withPlayData`, `psnClient.ts`); the cover is
+only `PORTRAIT_BANNER`, and `GAMEHUB_COVER_ART` moved to the backdrop list. `GameIcon`
+shows PSN icons with `object-contain`. A blurred copy filling the bands was tried and
+dropped: the user preferred the plain bands. Cache key `psn:titles:v9` → `v10`.
+**Why** — PS4 icons looked bad: measured 2026-10-16 on a real account, a PS4 trophy
+set's `trophyTitleIconUrl` is a 320×176 banner (PS5's are 512×512), cropped to a
+square ("SSASSIN CREED"). The played-games `imageUrl` is square (512/1024) on PS4 too.
+On the game page the "cover" of a PS4 game was its 16:9 hub art cropped to 2:3.
+**Decisions** — A collection (Ezio Collection → AC II, Brotherhood…) keeps each
+game's trophy icon, letterboxed, rather than the same collection icon on every game.
+PS3/Vita and games with a hidden played list also keep the (letterboxed) trophy icon.
+**Watch out** — Pins and group items store `image_icon` at pin time; they show the
+live library's icon when it is loaded, the stored one otherwise.
+
+---
+
 ## 2026-10-16 — The "13 optimizations" (`feat/xbox-integration`)
 
 **Did** — The roadmap's "13 optimization fixes" were never itemised, only named
