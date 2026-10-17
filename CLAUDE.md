@@ -199,7 +199,10 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
   PSN but **admin-only** (see the Xbox section), a preference per platform to choose
   which consoles show, preferences that follow the account (`migrations/033`–`036`),
   account preferences in tabs, the library layout remembered, total play time, and
-  a stricter reading of private profiles and refused keys on every platform
+  a stricter reading of private profiles and refused keys on every platform. On
+  `improvements_10`: `migrations/037_pinned_achievements_position.sql` (order of
+  pinned achievements), applied 2026-10-17; any other database needs it before that
+  code runs, or every pins read answers 500
 
 ## Release gates — what had to be true before 1.0 (all closed)
 
