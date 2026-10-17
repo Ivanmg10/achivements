@@ -42,8 +42,8 @@ export default function MainPageMonthCompare({ achievements, isLoading }: { achi
           const tone = delta > 0 ? 'text-success' : delta < 0 ? 'text-danger' : 'text-text-secondary'
           return (
             <div key={key} className="flex flex-col gap-1 rounded-lg bg-bg-main px-2.5 sm:px-3 py-2.5 min-w-0">
-              {/* Wraps rather than truncates: on a phone each of the three is ~90px wide. */}
-              <dt className="text-[10px] uppercase tracking-wider leading-tight text-text-secondary break-words">{label}</dt>
+              {/* Wraps (hyphenated, by the page language) rather than truncates: on a phone each of the three is ~90px wide. */}
+              <dt className="text-[10px] uppercase tracking-wider leading-tight text-text-secondary hyphens-auto break-words">{label}</dt>
               <dd className="flex flex-wrap items-baseline gap-x-2">
                 <span className="text-2xl font-bold tabular-nums">{isLoading ? '—' : value.toLocaleString(lang)}</span>
                 {!isLoading && (

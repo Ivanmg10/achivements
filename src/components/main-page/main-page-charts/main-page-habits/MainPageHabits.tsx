@@ -80,16 +80,16 @@ export default function MainPageHabits({ achievements, isLoading }: { achievemen
       </p>
 
       {/* The sentence above says what matters; the bars are its picture. */}
-      <div aria-hidden="true" className="grid grid-cols-1 sm:grid-cols-[2fr_5fr] gap-5">
+      <div aria-hidden="true" className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] gap-5">
         <div className="flex flex-col gap-1.5">
-          <div className="flex items-end gap-1.5 h-28">
+          <div className="flex items-end gap-1 h-28">
             {habits.byDay.map((count, d) => (
               <Bar key={d} count={count} max={dayMax} peak={d === day} title={`${days[d].long} · ${count}`} />
             ))}
           </div>
-          <div className="flex gap-1.5">
+          <div className="flex gap-1">
             {days.map((d, i) => (
-              <span key={i} className={`flex-1 text-center text-[10px] capitalize truncate ${i === day ? 'text-text-main font-semibold' : 'text-text-secondary'}`}>
+              <span key={i} className={`flex-1 text-center text-[10px] capitalize whitespace-nowrap ${i === day ? 'text-text-main font-semibold' : 'text-text-secondary'}`}>
                 {d.short}
               </span>
             ))}

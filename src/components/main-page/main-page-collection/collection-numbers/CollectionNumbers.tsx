@@ -78,7 +78,7 @@ export default function CollectionNumbers({
         {playtimeMinutes > 0 && (
           <section aria-label={T.steam.totalPlaytime}>
             <p className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-text-main tabular-nums leading-none">
+              <span className="text-2xl font-bold text-text-main tabular-nums leading-none whitespace-nowrap">
                 {formatPlaytime(playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
               </span>
               <span className="text-xs text-text-secondary">

@@ -171,12 +171,13 @@ export default function MainPageCharts() {
             <MainPageMonthCompare achievements={year} isLoading={yearLoading} />
           </SectionFallback>
         </ChartCard>
-        <ChartCard className="md:col-span-2 2xl:col-span-3">
+        {/* Side by side from xl (half each, then 3/4 + 1/4 at 2xl): across the whole width, best performance stretched thin. */}
+        <ChartCard className="md:col-span-2 xl:col-span-1 2xl:col-span-3">
           <SectionFallback error={yearError} onRefresh={refetchYear}>
             <MainPageHabits achievements={year} isLoading={yearLoading} />
           </SectionFallback>
         </ChartCard>
-        <ChartCard className="md:col-span-2 2xl:col-span-1">
+        <ChartCard className="md:col-span-2 xl:col-span-1 2xl:col-span-1">
           <SectionFallback error={bestPeriodError} onRefresh={refetchHeatmap}>
             <MainPageBestPeriod achievements={bestPeriodData} isLoading={bestPeriodLoading} />
           </SectionFallback>

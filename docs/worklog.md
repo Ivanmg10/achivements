@@ -25,6 +25,20 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-17 — Checked in a real browser at 375 / 768 / 1440 px (`improvements_10`)
+
+**Did** — Walked the main page (Ezio collection card, Activity, Pinned, Collection,
+Following) in Playwright, signed in by the user, at phone, tablet and desktop widths;
+no horizontal scroll at any. Fixed what showed: the month labels broke mid-word on a
+phone (now hyphenated), the total play time split from its "h", best performance ran
+the whole width between 1280 and 1535px (now beside play habits from `xl`), and the
+weekday labels of the habits chart were cut at half width.
+**Watch out** — Cards fade in on scroll (`ChartCard`'s `whileInView`): an element
+screenshot of a section not scrolled through shows them blank. Reordering was not
+tried in the browser, since it would save to the shared (production) database.
+
+---
+
 ## 2026-10-17 — Collection made shorter; Following without an empty column (`improvements_10`)
 
 **Did** — Collection: "Your numbers" (`CollectionNumbers`) is a strip across the page
