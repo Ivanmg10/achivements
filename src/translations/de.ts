@@ -399,6 +399,18 @@ export const de: Translations = {
     closingTitle: 'Hol deine Spiele her',
     closingText: 'Kostenlos, und du verbindest deine Konten, wann du willst.',
     footer: 'Nicht mit RetroAchievements, Valve oder Sony verbunden.',
+    faqLead: 'Was Leute fragen, bevor sie ein Konto erstellen.',
+    faq: [
+      { q: 'Ist CheevoVault kostenlos?', a: 'Ja. Alle Funktionen sind kostenlos, und es gibt keine Bezahlversion.' },
+      { q: 'Welche Plattformen werden unterstützt?', a: 'RetroAchievements, Steam und PlayStation. Verbinde eine, zwei oder alle drei.' },
+      { q: 'Brauche ich einen RetroAchievements-API-Schlüssel?', a: 'Ja, deinen eigenen, aus deinen RetroAchievements-Einstellungen. RetroAchievements verlangt, dass jeder Nutzer Anfragen mit seinem eigenen Schlüssel signiert, deshalb nutzt CheevoVault nie einen gemeinsamen.' },
+      { q: 'Ändert es etwas an meinen Konten?', a: 'Nein, es liest sie nur. Steam und PlayStation werden über den Namen verknüpft: kein Passwort und keine Anmeldung bei ihnen.' },
+      { q: 'Kann ich mein Konto löschen?', a: 'Ja, auf deiner Kontoseite, mit deinem Passwort. Deine Daten werden mitgelöscht, wie die Datenschutzerklärung erklärt.' },
+    ],
+  },
+  publicPages: {
+    faqTitle: 'Häufige Fragen',
+    more: 'Mehr über CheevoVault',
   },
   toast: {
     followed: 'Du folgst jetzt {u}',

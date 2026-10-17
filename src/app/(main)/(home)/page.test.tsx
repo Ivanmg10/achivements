@@ -12,6 +12,7 @@ jest.mock('@/components/landing-page/LandingPage', () => ({
 import { render, screen } from '@testing-library/react'
 import { getServerSession } from 'next-auth'
 import Home from './page'
+import { en } from '@/translations/en'
 
 test('signed in, the home page is the app', async () => {
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1' } })
@@ -25,4 +26,12 @@ test('signed out, it explains what the app is instead', async () => {
   render((await Home()) as React.ReactElement)
   expect(screen.getByTestId('landing')).toBeInTheDocument()
   expect(screen.queryByTestId('main-page')).not.toBeInTheDocument()
+})
+
+test('signed out, it tells search engines what the app is and answers its FAQ', async () => {
+  ;(getServerSession as jest.Mock).mockResolvedValue(null)
+  const { container } = render((await Home()) as React.ReactElement)
+  const ld = [...container.querySelectorAll('script[type="application/ld+json"]')].map((s) => JSON.parse(s.innerHTML))
+  expect(ld.map((d) => d['@type'])).toEqual(['WebApplication', 'FAQPage'])
+  expect(ld[1].mainEntity).toHaveLength(en.landing.faq.length)
 })

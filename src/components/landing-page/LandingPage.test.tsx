@@ -22,6 +22,14 @@ test('offers both ways in, pointing at the auth page', () => {
   expect(screen.getByRole('link', { name: en.landing.signIn }).getAttribute('href')).toBe('/authPage')
 })
 
+test('answers the first questions, and links the public pages and the legal ones', () => {
+  render(<LandingPage />)
+  expect(screen.getByRole('heading', { level: 2, name: en.publicPages.faqTitle })).toBeInTheDocument()
+  for (const item of en.landing.faq) expect(screen.getByText(item.q)).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'CheevoVault vs Exophase' })).toHaveAttribute('href', '/compare/exophase')
+  expect(screen.getByRole('link', { name: en.privacy.link })).toBeInTheDocument()
+})
+
 test('names the platforms it follows', () => {
   render(<LandingPage />)
   expect(screen.getByText('RetroAchievements')).toBeInTheDocument()

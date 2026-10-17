@@ -399,6 +399,18 @@ export const ja: Translations = {
     closingTitle: 'あなたのゲームを持ち込もう',
     closingText: '無料です。アカウントの連携はいつでもできます。',
     footer: 'RetroAchievements、Valve、Sonyとは無関係です。',
+    faqLead: 'アカウントを作る前によく聞かれること。',
+    faq: [
+      { q: 'CheevoVaultは無料ですか？', a: 'はい。すべての機能が無料で、有料プランはありません。' },
+      { q: 'どのプラットフォームに対応していますか？', a: 'RetroAchievements、Steam、PlayStationです。1つでも、2つでも、3つすべてでも連携できます。' },
+      { q: 'RetroAchievementsのAPIキーは必要ですか？', a: 'はい、RetroAchievementsの設定ページにあるご自身のキーが必要です。RetroAchievementsは各ユーザーが自分のキーでリクエストすることを求めているため、CheevoVaultは共有キーを使いません。' },
+      { q: 'アカウントに何か変更が加わりますか？', a: 'いいえ、読み取るだけです。SteamとPlayStationは名前で連携するので、パスワードも先方でのサインインも不要です。' },
+      { q: 'アカウントを削除できますか？', a: 'はい、アカウントページからパスワードを入力して削除できます。プライバシーポリシーにあるとおり、データも一緒に削除されます。' },
+    ],
+  },
+  publicPages: {
+    faqTitle: 'よくある質問',
+    more: 'CheevoVaultについてもっと',
   },
   toast: {
     followed: '{u}をフォローしました',
