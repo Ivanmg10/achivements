@@ -4,6 +4,7 @@ import { memo, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { createPortal } from 'react-dom'
 import { AnimatePresence } from 'framer-motion'
+import { IconAlertTriangle } from '@tabler/icons-react'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
@@ -51,6 +52,9 @@ export const AchievementGrid = memo(function AchievementGrid({
   const hoverTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
   const size = SIZE_CLASSES[badgeSize]
   const { visible: shown, capped } = capList(achievements, limit ?? Infinity, showAll)
+  // Missables not earned yet are marked, so they can be seen at a glance before it is too late.
+  const isMissable = (a: RetroAchievement) => a.Type === 'missable' && !a.DateEarned && !a.DateEarnedHardcore
+  const missables = achievements.filter(isMissable).length
 
   const { favoritedIds, toggleFavorite } = useRaFavoriteIds(gameId)
   const handleToggleFavorite = (achievement: RetroAchievement) =>
@@ -108,6 +112,12 @@ export const AchievementGrid = memo(function AchievementGrid({
 
   return (
     <>
+      {missables > 0 && (
+        <p className="flex items-center gap-1 text-xs font-medium text-danger mb-1.5">
+          <IconAlertTriangle size={14} aria-hidden="true" />
+          {T.libraryDetail.missable}: {missables}
+        </p>
+      )}
       {!allLoaded && (
         <div className="flex flex-wrap gap-1">
           {shown.map((_, i) => (
@@ -120,12 +130,13 @@ export const AchievementGrid = memo(function AchievementGrid({
           const isHardcore = !!a.DateEarnedHardcore
           const isSoftcore = !!a.DateEarned && !a.DateEarnedHardcore
           const earnedAny = isHardcore || isSoftcore
+          const missable = isMissable(a)
 
           return (
             <button
               type="button"
               key={a.ID}
-              aria-label={`${a.Title}, ${earnedAny ? T.steam.earned : T.steam.locked}`}
+              aria-label={`${a.Title}, ${missable ? `${T.achievement.missable}, ` : ''}${earnedAny ? T.steam.earned : T.steam.locked}`}
               onMouseEnter={(e) => handleEnter(a, e.clientX, e.clientY)}
               onMouseLeave={handleLeave}
               onFocus={(e) => {
@@ -138,7 +149,7 @@ export const AchievementGrid = memo(function AchievementGrid({
                 setSelected(a)
               }}
               className={`block rounded-lg overflow-hidden shrink-0 cursor-pointer transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                isHardcore ? 'ring-2 ring-yellow-400' : isSoftcore ? 'ring-2 ring-blue-400' : ''
+                isHardcore ? 'ring-2 ring-yellow-400' : isSoftcore ? 'ring-2 ring-blue-400' : missable ? 'ring-2 ring-danger' : ''
               }`}
             >
               {a.BadgeName ? (
@@ -152,6 +163,11 @@ export const AchievementGrid = memo(function AchievementGrid({
                 />
               ) : (
                 <div className={`${size.badge} rounded-lg bg-ink/10 ${earnedAny ? '' : 'opacity-40'}`} />
+              )}
+              {missable && (
+                <span aria-hidden="true" className="absolute bottom-0 right-0 flex items-center justify-center w-4 h-4 rounded-tl-md bg-danger text-white">
+                  <IconAlertTriangle size={11} stroke={2.5} />
+                </span>
               )}
             </button>
           )

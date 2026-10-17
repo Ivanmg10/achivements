@@ -10,6 +10,9 @@ import type { LibraryEntry } from '@/utils/libraryInsights'
  * so the picture can still be told). It fades into the card's colour toward the
  * bottom, so the card is the same all the way down however tall it is made.
  *
+ * Clipped to its own box: the art is scaled up and blurred, and what spilled
+ * past the bottom fade showed as a hard band across the card.
+ *
  * It fills the card it is in, which has to be a box of its own (`relative
  * isolate overflow-hidden`): a negative layer is then above the card's background and
  * below what is written on it. It answers no clicks. Decorative.
@@ -17,7 +20,7 @@ import type { LibraryEntry } from '@/utils/libraryInsights'
 export default function LibraryDetailBackdrop({ entry }: { entry: LibraryEntry }) {
   const reduce = useReducedMotion()
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[30rem] max-h-full">
+    <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[30rem] max-h-full overflow-hidden">
       <AnimatePresence>
         <motion.div
           key={entry.key}
