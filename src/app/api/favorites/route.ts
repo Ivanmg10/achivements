@@ -23,13 +23,14 @@ export async function GET(req: NextRequest) {
     const xboxVisible = canUseXbox((await getServerSession(authOptions))?.user?.admin)
     const visible = <T extends { source: string }>(rows: T[]) => (xboxVisible ? rows : rows.filter((r) => r.source !== 'xbox'))
 
-    // Every pin across every platform, newest first: the main page's pinned card.
+    // Every pin across every platform, in the user's order (migrations/037): the
+    // ones never placed first, newest first, then the placed ones.
     if (req.nextUrl.searchParams.get('source') === 'all') {
       const result = await pool.query(
-        `SELECT achievement_id, steam_apiname, psn_trophy_id, xbox_achievement_id, game_id, game_title, snapshot, num_distinct_players, source, created_at
+        `SELECT id, achievement_id, steam_apiname, psn_trophy_id, xbox_achievement_id, game_id, game_title, snapshot, num_distinct_players, source, created_at
          FROM pinned_achievements
          WHERE user_id = $1
-         ORDER BY created_at DESC`,
+         ORDER BY position ASC NULLS FIRST, created_at DESC`,
         [owner.id],
       )
       return NextResponse.json(visible(result.rows))
@@ -87,7 +88,7 @@ export async function POST(req: NextRequest) {
       }
       await pool.query(
         `INSERT INTO pinned_achievements
-           (user_id, source, psn_trophy_id, xbox_achievement_id, game_id, game_title, snapshot, num_distinct_players)
+           (user_id, source, psn_trophy_id, game_id, game_title, snapshot, num_distinct_players)
          VALUES ($1, 'psn', $2, $3, $4, $5, 0)
          ON CONFLICT (user_id, game_id, psn_trophy_id) WHERE source = 'psn'
          DO UPDATE SET snapshot = $5, game_title = $4`,
@@ -168,6 +169,45 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[favorites DELETE]', err)
+    return NextResponse.json({ message: 'Error interno' }, { status: 500 })
+  }
+}
+
+const MAX_ORDER = 1000
+
+/**
+ * Puts the user's pinned achievements in the order given, as their row ids
+ * (from GET ?source=all). Ids that are not the user's are ignored by the WHERE,
+ * so nobody can move someone else's pins.
+ */
+export async function PUT(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    }
+
+    const body = await req.json().catch(() => null)
+    const order = body?.order
+    if (
+      !Array.isArray(order) ||
+      order.length === 0 ||
+      order.length > MAX_ORDER ||
+      !order.every((id) => Number.isInteger(id) && id > 0) ||
+      new Set(order).size !== order.length
+    ) {
+      return NextResponse.json({ message: 'order debe ser un array de ids distintos' }, { status: 400 })
+    }
+
+    await pool.query(
+      `UPDATE pinned_achievements p SET position = v.pos - 1
+       FROM unnest($2::int[]) WITH ORDINALITY AS v(id, pos)
+       WHERE p.id = v.id AND p.user_id = $1`,
+      [session.user.id, order],
+    )
+    return NextResponse.json({ ok: true })
+  } catch (err) {
+    console.error('[favorites PUT]', err)
     return NextResponse.json({ message: 'Error interno' }, { status: 500 })
   }
 }

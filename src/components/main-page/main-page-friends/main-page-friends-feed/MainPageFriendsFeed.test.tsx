@@ -23,6 +23,8 @@ test('placeholders while loading, then a note when there is nothing', () => {
   unmount()
   render(<MainPageFriendsFeed items={[]} isLoading={false} />)
   expect(screen.getByText(en.friends.feedEmpty)).toBeInTheDocument()
+  // It fills the card's height, centred, when the card is stretched beside a taller column.
+  expect(screen.getByText(en.friends.feedEmpty).parentElement).toHaveClass('flex-1')
 })
 
 test('an unlock with no badge keeps its place', () => {

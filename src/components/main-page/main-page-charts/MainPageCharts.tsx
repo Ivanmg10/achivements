@@ -3,7 +3,7 @@
 import { useId, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { IconActivity, IconAward, IconCompass, IconFolders, IconLayoutDashboard, IconUsers } from '@tabler/icons-react'
+import { IconActivity, IconAward, IconCompass, IconFolders, IconLayoutDashboard, IconPin, IconUsers } from '@tabler/icons-react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useConsoleVisibility } from '@/hooks/useConsoleVisibility'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
@@ -33,13 +33,16 @@ import MainPagePointsStats from './MainPagePointsStats'
 import MainPageRarest from './MainPageRarest'
 import MainPageAbandoned from './MainPageAbandoned'
 import MainPageTopGames from './MainPageTopGames'
+import MainPageMonthCompare from './main-page-month-compare/MainPageMonthCompare'
+import MainPageHabits from './main-page-habits/MainPageHabits'
+import MainPageJournal from './main-page-journal/MainPageJournal'
 import MainPageBestPeriod from './MainPageBestPeriod'
-import MainPageFavorites from '../main-page-favorites/MainPageFavorites'
 import MainPageSteamStats from './main-page-steam-stats/MainPageSteamStats'
 import MainPagePsnStats from './main-page-psn-stats/MainPagePsnStats'
 import MainPageXboxStats from './main-page-xbox-stats/MainPageXboxStats'
 import MainPageStatsRail, { StatsSection } from '../main-page-stats-rail/MainPageStatsRail'
 import MainPageBrowse from '../main-page-browse/MainPageBrowse'
+import MainPagePinnedSection from '../main-page-pinned-section/MainPagePinnedSection'
 import MainPageCollection from '../main-page-collection/MainPageCollection'
 import MainPageGroupsSection from '../main-page-groups-section/MainPageGroupsSection'
 import MainPageFriends from '../main-page-friends/MainPageFriends'
@@ -114,6 +117,7 @@ export default function MainPageCharts() {
     ...(visitor
       ? []
       : [
+          { id: 'pinned', label: T.cards.sectionPinned, icon: <IconPin size={18} /> },
           { id: 'groups', label: T.cards.sectionGroups, icon: <IconFolders size={18} /> },
           { id: 'friends', label: T.cards.sectionFriends, icon: <IconUsers size={18} /> },
           { id: 'browse', label: T.cards.sectionBrowse, icon: <IconCompass size={18} /> },
@@ -157,12 +161,34 @@ export default function MainPageCharts() {
         </div>
       </>
     ),
-    // What was played and unlocked lately: the games, then the achievements.
+    // How the month is going and when the person plays, then four lists of the same
+    // build side by side (two by two on a narrower screen). Rows stretch to their
+    // tallest card, so cards of a row are paired by height and none leaves a hole.
     activity: (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-4 gap-4">
+        <ChartCard className="md:col-span-2 2xl:col-span-4">
+          <SectionFallback error={yearError} onRefresh={refetchYear}>
+            <MainPageMonthCompare achievements={year} isLoading={yearLoading} />
+          </SectionFallback>
+        </ChartCard>
+        <ChartCard className="md:col-span-2 2xl:col-span-3">
+          <SectionFallback error={yearError} onRefresh={refetchYear}>
+            <MainPageHabits achievements={year} isLoading={yearLoading} />
+          </SectionFallback>
+        </ChartCard>
+        <ChartCard className="md:col-span-2 2xl:col-span-1">
+          <SectionFallback error={bestPeriodError} onRefresh={refetchHeatmap}>
+            <MainPageBestPeriod achievements={bestPeriodData} isLoading={bestPeriodLoading} />
+          </SectionFallback>
+        </ChartCard>
         <ChartCard>
           <SectionFallback error={achError} onRefresh={refetchAch}>
             <MainPageTopGames achievements={recent} isLoading={achLoading} />
+          </SectionFallback>
+        </ChartCard>
+        <ChartCard>
+          <SectionFallback error={yearError} onRefresh={refetchYear}>
+            <MainPageJournal achievements={year} isLoading={yearLoading} />
           </SectionFallback>
         </ChartCard>
         <ChartCard>
@@ -170,22 +196,11 @@ export default function MainPageCharts() {
             <MainPageAbandoned playing={playing} steamGames={library} psnGames={psnLibrary} xboxGames={xboxLibrary} isLoading={playingLoading} />
           </SectionFallback>
         </ChartCard>
-        <ChartCard className="md:col-span-2 xl:col-span-1">
-          <SectionFallback error={bestPeriodError} onRefresh={refetchHeatmap}>
-            <MainPageBestPeriod achievements={bestPeriodData} isLoading={bestPeriodLoading} />
-          </SectionFallback>
-        </ChartCard>
-        <ChartCard className="md:col-span-2 xl:col-span-1">
+        <ChartCard>
           <SectionFallback error={achError} onRefresh={refetchAch}>
             <MainPageRarest achievements={achievements} steamAchievements={steamActivity} psnTrophies={psnActivity} xboxAchievements={xboxActivity} isLoading={achLoading} />
           </SectionFallback>
         </ChartCard>
-        {/* Pinned achievements beside it, across the rest: the list can run long. */}
-        {!visitor && (
-          <ChartCard className="md:col-span-2">
-            <MainPageFavorites />
-          </ChartCard>
-        )}
       </div>
     ),
     collection: (
@@ -199,6 +214,8 @@ export default function MainPageCharts() {
         <MainPageCollection games={all} steamGames={library} psnGames={psnLibrary} xboxGames={xboxLibrary} awards={awards} inProgress={inProgress} isLoading={gamesLoading || awardsLoading} />
       </SectionFallback>
     ),
+    // Goals, not activity: a section of their own, where they are seen (only on your own page).
+    pinned: <MainPagePinnedSection />,
     groups: <MainPageGroupsSection />,
     // Loads only once opened: each friend costs a few platform calls.
     friends: <MainPageFriends active={section === 'friends'} myRecent={recent} />,

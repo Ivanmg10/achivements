@@ -85,3 +85,18 @@ test('you on the board with the friends read so far; the rest pending; a card fo
   expect(screen.getByText(en.friends.limitNote.replace('{n}', '2'))).toBeInTheDocument()
   expect(screen.getByText(en.friends.partialNote)).toBeInTheDocument()
 })
+
+test('nothing unlocked lately: the feed still shows, stretched to the column beside it', () => {
+  setup({ friends: [friend('ana')], details: { ana: { recent: [], games: [], partial: false } }, detailsLoading: false })
+  render(<MainPageFriends active myRecent={[]} />)
+  expect(screen.getByTestId('feed')).toHaveAttribute('data-count', '0')
+  expect(screen.getByTestId('feed').parentElement).toHaveClass('xl:self-stretch')
+  expect(screen.getByTestId('feed').parentElement).not.toHaveClass('xl:sticky')
+})
+
+test('with something to show, the feed keeps to its height and follows the scroll', () => {
+  const details = { ana: { recent: [{ Date: new Date().toISOString().slice(0, 19).replace('T', ' '), Title: 'A', GameID: 1 }], games: [], partial: false } }
+  setup({ friends: [friend('ana')], details, detailsLoading: false })
+  render(<MainPageFriends active myRecent={[]} />)
+  expect(screen.getByTestId('feed').parentElement).toHaveClass('xl:sticky')
+})

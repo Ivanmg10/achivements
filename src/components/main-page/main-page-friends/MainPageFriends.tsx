@@ -92,6 +92,9 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
     )
   }
 
+  // Nothing unlocked lately: the feed still shows, saying so, but as tall as the column beside it, not a stub over a hole.
+  const quiet = !detailsLoading && feed.length === 0
+
   return (
     <div className="flex flex-col gap-4">
       {/* Left: where you stand and who they are; right: what they did lately. */}
@@ -125,7 +128,7 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
             </div>
           </ChartCard>
         </div>
-        <ChartCard className="h-auto! xl:sticky xl:top-20">
+        <ChartCard className={quiet ? 'xl:self-stretch' : 'h-auto! xl:sticky xl:top-20'}>
           <MainPageFriendsFeed items={feed} isLoading={detailsLoading} />
         </ChartCard>
       </div>

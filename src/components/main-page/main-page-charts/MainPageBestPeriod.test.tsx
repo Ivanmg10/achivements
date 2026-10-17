@@ -6,6 +6,10 @@ jest.mock('@/components/week-achievements-modal/WeekAchievementsModal', () => ({
   __esModule: true,
   default: ({ startDate }: { startDate: string }) => <div data-testid="week-modal">{startDate}</div>,
 }))
+jest.mock('@/components/period-achievements-modal/PeriodAchievementsModal', () => ({
+  __esModule: true,
+  default: ({ title, achievements }: { title: string; achievements: unknown[] }) => <div data-testid="month-modal">{`${title}:${achievements.length}`}</div>,
+}))
 
 import { render, screen, fireEvent } from '@testing-library/react'
 import MainPageBestPeriod from './MainPageBestPeriod'
@@ -40,14 +44,15 @@ test('Steam: the best periods are the ones with the most unlocks, shown as count
   expect(card(en.cards.bestMonth)).toHaveTextContent('2024-02')
 })
 
-test('opens the best day and week, and expands the best month into its days', () => {
-  render(<MainPageBestPeriod achievements={[ach('2024-01-10', 10), ach('2024-01-12', 5)]} />)
+test('opens the best day, week and month in a modal', () => {
+  render(<MainPageBestPeriod achievements={[ach('2024-01-10', 10), ach('2024-01-12', 5), ach('2023-12-01', 1)]} />)
   fireEvent.click(card(en.cards.bestDay))
   expect(screen.getByTestId('day-modal')).toHaveTextContent('2024-01-10')
   fireEvent.click(card(en.cards.bestWeek))
   expect(screen.getByTestId('week-modal')).toBeInTheDocument()
   fireEvent.click(card(en.cards.bestMonth))
-  expect(screen.getByText(/10pts/)).toBeInTheDocument()
+  // Only that month's unlocks, not December's.
+  expect(screen.getByTestId('month-modal')).toHaveTextContent(`${en.cards.bestMonth} · 2024-01:2`)
 })
 
 test('says so without data, and shows placeholders while loading', () => {
