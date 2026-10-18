@@ -750,6 +750,7 @@ export const ja: Translations = {
   gameExpanded: {
     weekly: '週間',
     monthly: '月間',
+    weekOf: '{date}の週',
     achievementsOverTime: '解除された実績',
     noActivity: 'この期間に解除された実績はありません',
     allAchievements: 'すべての実績',

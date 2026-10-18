@@ -25,6 +25,26 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-18 — Clicking the "Achievements unlocked" chart lists that period (`improvements_11`)
+
+**Did** — Clicking a point of a game's weekly/monthly chart (`GameAchievementsProgressChart`,
+in every opened Recently played card and the library's opened cards) opens
+`GameAchievementsProgressChartModal`: what was unlocked that week or month, newest first,
+each a link to the achievement (rows from `LibraryDetailList`). The chart now takes
+`InsightAchievement[]` (`fromRa`/`fromSteam`/`fromPsn`/`fromXbox`) instead of bare dates, and
+`groupGameAchievementsByPeriod` returns each bucket's items and start.
+**Why** — The user asked for it (the branch is for more improvements to come).
+**Decisions** — The modal is lazy (`next/dynamic` + `LazyWhenOpened`) and portalled to
+`<body>`, since the opened card animates. A point with no unlocks opens nothing.
+**Watch out** — The buckets were labelled with `toISOString()` of a local midnight: east of
+UTC the monthly view's last bucket was the previous month, and this month's unlocks fell in
+no bucket. They are now local (`localDay`). Collection trophies are keyed `gameId:trophyId`
+in the chart, since ids repeat across its games. The `fromX` links do not carry the profile
+being viewed (`useSubject`), as in the library; on someone else's page they open the game
+for the viewer.
+
+---
+
 ## 2026-10-17 — Recently played skeleton fills its card (`fix/recent-skeleton`)
 
 **Did** — The loading rows of "Recently played" (`RARecentlyPlayed`) sit in a

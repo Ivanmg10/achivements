@@ -750,6 +750,7 @@ export const es: Translations = {
   gameExpanded: {
     weekly: 'Semanal',
     monthly: 'Mensual',
+    weekOf: 'Semana del {date}',
     achievementsOverTime: 'Logros desbloqueados',
     noActivity: 'Sin logros desbloqueados en este periodo',
     allAchievements: 'Todos los logros',

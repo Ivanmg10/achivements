@@ -750,6 +750,7 @@ export const ru: Translations = {
   gameExpanded: {
     weekly: 'Понедельно',
     monthly: 'Помесячно',
+    weekOf: 'Неделя с {date}',
     achievementsOverTime: 'Открытые достижения',
     noActivity: 'За этот период достижения не открыты',
     allAchievements: 'Все достижения',

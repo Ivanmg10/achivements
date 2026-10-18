@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
+import { fromXbox } from '@/utils/gameInsights'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
 import { XboxAchievementGrid } from '@/components/xbox/xbox-achievement-grid/XboxAchievementGrid'
@@ -28,8 +29,7 @@ export default function XboxRecentlyPlayedExpanded({ game }: { game: XboxGamePro
   const total = loaded && !game.totalKnown ? achievements.length : Math.max(game.maxPossible, achievements.length)
   const earned = loaded ? achievements.filter((a) => a.unlocked).length : game.numAwarded
 
-  // The chart only reads earn dates; Xbox has no hardcore.
-  const unlocks = achievements.map((a) => ({ DateEarned: a.unlockedAt, DateEarnedHardcore: null }))
+  const unlocks = fromXbox(achievements, game.id)
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">

@@ -751,6 +751,7 @@ export const en = {
   gameExpanded: {
     weekly: 'Weekly',
     monthly: 'Monthly',
+    weekOf: 'Week of {date}',
     achievementsOverTime: 'Achievements unlocked',
     noActivity: 'No achievements unlocked in this period',
     allAchievements: 'All achievements',
