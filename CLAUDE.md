@@ -419,6 +419,10 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   "RetroAchievements, Steam and PlayStation" on purpose: change them when Xbox opens to everyone.
 - Admin explorer lookups and linking are logged (`xbox-lookup`, `link-xbox`,
   `unlink-xbox`). Do not add a second Xbox provider without asking.
+- **Open problem (2026-10-17, not fixed):** when `api.xbl.io` does not answer,
+  `xboxCall` has no timeout, failures are not cached and there is no stale fallback, so
+  every Xbox read waits ~11 s and "Recently played" waits with it. Diagnosis and the
+  proposed fix: `docs/xbox-integration-plan.md` §7. Read it before touching `xboxCall`.
 
 ## PlayStation (PSN) — read before touching it
 

@@ -247,3 +247,38 @@ Explorador en el panel de admin: gamertag → perfil, biblioteca con progreso y 
 cada juego al abrirlo (con las llamadas que quedan esta hora). `src/lib/xboxClient.ts`,
 `src/utils/xboxMappers.ts`, `/api/admin/xbox` y `/api/admin/xbox/achievements`, cada búsqueda queda en
 el registro de admin (`xbox-lookup`). Sin migraciones: no toca la base de datos compartida con producción.
+
+## 7. Problema abierto: OpenXBL inaccesible y la app esperando (2026-10-17)
+
+**Pendiente, sin arreglar.** El usuario decidió dejarlo para más adelante.
+
+### Qué se vio
+- En local, para un admin con Xbox vinculado, "Jugados recientemente" se quedó ~12 s en
+  esqueleto. `/api/xbox/titles` y `/api/xbox/recentAchievements` respondían **502 a los
+  ~11,5 s**.
+- Causa inmediata: `api.xbl.io` no aceptaba conexiones desde la máquina de desarrollo
+  (`UND_ERR_CONNECT_TIMEOUT`; `curl` sin respuesta en 20 s a 188.114.96.5 / 188.114.97.5,
+  IPs de Cloudflare), mientras `www.cloudflare.com` respondía en 0,3 s. No era la cuota
+  ni nuestro código.
+- Sospecha sin confirmar: el bloqueo de IPs de Cloudflare que hacen operadoras españolas
+  durante los partidos de LaLiga (era sábado). Para confirmarlo: probar con VPN. En
+  producción (Vercel, `fra1`) no debería pasar, pero OpenXBL también puede caerse.
+
+### Por qué duele tanto (lo que sí es nuestro)
+1. `xboxCall` (`src/lib/xboxClient.ts`) no tiene timeout: cada llamada espera lo que tarde
+   la red en rendirse (~10–11 s).
+2. Un fallo no se cachea y no hay *stale-if-error*: `withSteamCache` solo escribe lo que
+   sale bien, así que cada visita vuelve a llamar, vuelve a esperar y vuelve a gastar
+   cuota. Con la caché caducada, Xbox desaparece entero aunque la última biblioteca buena
+   siga en `steam_cache`.
+3. `RARecentlyPlayed` espera a todas las plataformas (`xboxLoading` incluido) antes de
+   pintar la lista, así que RA, Steam y PSN, ya cargados, esperan a Xbox.
+
+### Arreglo propuesto (rama `fix/xbox-unreachable`, sin empezar)
+- `signal: AbortSignal.timeout(~5 s)` en `xboxCall`; el aborto se trata como `failed` (502).
+- Si OpenXBL falla, servir la última copia buena de `steam_cache` aunque haya caducado
+  (necesita que `readCache` pueda leer filas caducadas).
+- Recordar ~60 s por instancia que OpenXBL no responde, para fallar al momento en vez de
+  esperar otra vez en cada llamada.
+- Que la lista de recientes espere a Xbox como mucho ~2 s y lo añada cuando llegue
+  (acepta que se reordene una vez).
