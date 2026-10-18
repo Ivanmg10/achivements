@@ -1,49 +1,23 @@
 'use client'
 
-import { useEffect } from 'react'
-import { LanguageProvider, useLanguage } from '@/context/LanguageContext'
+import { LanguageProvider } from '@/context/LanguageContext'
+import RouteError from '@/components/route-error/RouteError'
+import { inter } from '@/lib/fonts'
 import './globals.css'
 
 /**
  * Last resort, for an error in the root layout or in a page with no error.tsx
- * above it (the sign-in pages). It replaces the root layout, so it brings its
- * own <html>, styles and language provider.
+ * above it. It replaces the root layout, so it brings its own <html>, styles
+ * and language provider, and shows the same screen as a route's error, full screen.
  */
-export default function GlobalError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string }
-  reset: () => void
-}) {
-  useEffect(() => {
-    console.error(error)
-  }, [error])
-
+export default function GlobalError(props: { error: Error & { digest?: string }; retry: () => void }) {
   return (
-    <html lang="en" data-theme="dark">
+    <html lang="en" data-theme="dark" className={inter.variable}>
       <body className="bg-bg-main text-text-main">
         <LanguageProvider>
-          <GlobalErrorContent reset={reset} />
+          <RouteError {...props} fullScreen />
         </LanguageProvider>
       </body>
     </html>
-  )
-}
-
-function GlobalErrorContent({ reset }: { reset: () => void }) {
-  const { T } = useLanguage()
-
-  return (
-    <main role="alert" className="min-h-screen flex flex-col items-center justify-center gap-3 text-center px-6 py-20">
-      <h1 className="text-lg font-semibold">{T.errorBoundary.title}</h1>
-      <p className="text-sm text-text-secondary max-w-md">{T.errorBoundary.subtitle}</p>
-      <button
-        onClick={reset}
-        className="mt-2 px-4 py-2 rounded-lg bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-      >
-        {T.gameInfoPage.retry}
-      </button>
-    </main>
   )
 }

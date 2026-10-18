@@ -524,7 +524,19 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
 - **A context value is memoized** when its provider reads the session (the session
   updates on every visit and would re-render every consumer).
 - **A route group has an `error.tsx`** (`RouteError`), or its errors replace the
-  whole app (`global-error`).
+  whole app (`global-error`, which renders the same `RouteError` full screen).
+  Its `Reintentar` calls Next's **`retry()`**, not `reset()`: `reset()` only
+  re-renders, so a server error never recovers (measured 2026-10-18, Next 16.3).
+  `(main)/not-found.tsx` takes a `notFound()` inside the app **and most URLs that
+  match nothing** (`/foo` via `[category]`, even `/compare/x`); it reads the
+  session on the server: signed in, under the header (a game page names its
+  platform, Xbox only to whoever may see it); signed out, full screen. URLs of
+  three or more segments reach it through `[category]/[consoleId]/[...missing]`
+  (it cannot sit beside `[category]` or `[consoleId]`: Next refuses two dynamic
+  names on one level). A game 404 answers HTTP 200: those routes stream (a
+  `loading.tsx`, `notFound()` on the client), so the status is out first. The layout's
+  `<main>` is a block: these screens size themselves (`STATUS_SCREEN`) and are a
+  `<div>` inside it, a `<main>` only full screen.
 
 ## Preferences that follow the account
 

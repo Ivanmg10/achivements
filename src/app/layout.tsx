@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import CookieBanner from '@/components/cookie-banner/CookieBanner'
 import Toaster from '@/components/toaster/Toaster'
 import GoogleAnalytics from '@/components/google-analytics/GoogleAnalytics'
@@ -7,12 +6,7 @@ import "./globals.css";
 import Providers from "./providers";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL, THEME_COLOR } from '@/lib/siteUrl'
 import { THEMES, THEME_STORAGE_KEY } from '@/types/types'
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
+import { inter } from '@/lib/fonts'
 
 // Paints the last theme this browser used before the first frame; without it
 // every load flashes dark until the session says otherwise.
@@ -50,7 +44,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
-      <body className="text-text-main bg-bg-main">
+      <body className="min-h-screen text-text-main bg-bg-main">
         <Providers>
           {children}
           <CookieBanner />

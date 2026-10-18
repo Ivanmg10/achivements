@@ -1,4 +1,4 @@
-import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel } from "./utils";
+import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath } from "./utils";
 import type { RecentAchievement } from '@/types/types'
 
 describe("getRandomGameIds", () => {
@@ -426,5 +426,20 @@ describe('groupGameAchievementsByPeriod', () => {
   test('reads RA dates with a space and ignores ones out of range', () => {
     const old = { earnedAt: '2001-01-01 10:00:00' }
     expect(groupGameAchievementsByPeriod([old], 'week').every((w) => w.count === 0)).toBe(true)
+  })
+})
+
+describe('gameSourceFromPath', () => {
+  test('names the platform of a game page', () => {
+    expect(gameSourceFromPath('/psnGame/NPWR20188_00')).toBe('psn')
+    expect(gameSourceFromPath('/steamGame/abc')).toBe('steam')
+    expect(gameSourceFromPath('/xboxGame/123')).toBe('xbox')
+  })
+
+  test('is null anywhere else', () => {
+    expect(gameSourceFromPath('/user/ivan/psn/1')).toBeNull()
+    expect(gameSourceFromPath('/nope')).toBeNull()
+    expect(gameSourceFromPath('/')).toBeNull()
+    expect(gameSourceFromPath(null)).toBeNull()
   })
 })

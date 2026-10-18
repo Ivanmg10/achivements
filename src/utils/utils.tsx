@@ -3,6 +3,7 @@ import { PinnedAchievement, RecentAchievement, RetroAchievement, RetroAchievemen
 import { CategoryGame } from '@/hooks/useGamesByCategory'
 import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
+import type { GameSource } from '@/types/steam'
 
 export function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '—'
@@ -508,4 +509,11 @@ export function streakInsights(byDay: Record<string, number>, streaks: { days: n
     longestGap,
     weekdays,
   }
+}
+
+const GAME_ROUTES: Record<string, GameSource> = { psnGame: 'psn', steamGame: 'steam', xboxGame: 'xbox' }
+
+/** The platform of a game page's URL (/psnGame/…, /steamGame/…, /xboxGame/…), or null for any other page. */
+export function gameSourceFromPath(pathname: string | null): GameSource | null {
+  return GAME_ROUTES[pathname?.split('/')[1] ?? ''] ?? null
 }
