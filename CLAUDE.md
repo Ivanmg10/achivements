@@ -84,6 +84,26 @@ them bottom right: green with a check, red with an alert icon, gone after 4 s
 - A silent failure is a bug: an optimistic update that rolls back must say so.
 - Texts live in `T.toast` (all languages). The admin panel's are in English.
 
+## Public pages — what search engines and chat AIs read
+
+`/compare/<slug>` and `/track/<slug>` are public pages written to answer what
+people ask Google or a chat AI ("a PSNProfiles alternative that also tracks
+Steam"); the landing has a FAQ for the same reason. Added 2026-10-17.
+
+- **One list**: `SEO_PAGES` in `src/translations/seoPages.ts`. A new page is a new
+  entry there (with `updated`); the routes, the sitemap, the footer links and the
+  proxy prefixes (`src/proxy.ts`) already follow it. A new *section* (another prefix)
+  needs its route folder and a prefix in the proxy.
+- Its prose is **English and Spanish only**, outside `T` on purpose (every page
+  downloads `T`); other languages fall back to English. The shared bits (FAQ title,
+  the landing FAQ) are in `T`, in all 9 languages.
+- **Honest**: each comparison says where the other site is better. Do not claim
+  anything about another site that cannot be checked.
+- **No Xbox** in any of it while Xbox is admin-only; a test fails if it appears
+  (except as a platform Exophase has). Update these pages when Xbox opens.
+- The `FAQPage` JSON-LD (pages and landing) is built from the same English items
+  the server renders; keep them one list so the markup matches what is shown.
+
 ## Progress bars — in the theme's colours
 
 Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or
@@ -358,7 +378,8 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   `XBOX_ADMIN_ONLY` to `false`, and do not suggest it as a next step**, until they
   say they will pay for a plan (or accept limiting cold loads). When it does open:
   upgrade the plan, then update the landing text, site title and meta description
-  (they still list three platforms) and the terms.
+  (they still list three platforms), the public pages and landing FAQ (see Public
+  pages) and the terms.
 - **The gate is one switch**: `XBOX_ADMIN_ONLY` in `src/utils/xboxAccess.ts`
   (`canUseXbox(admin)`, `sourceAllowed(source, admin)`). To open Xbox to everyone,
   set it to `false`; nothing else needs to change. It is enforced in three

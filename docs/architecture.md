@@ -18,8 +18,9 @@ page (src/app/(main)/…)            client component
 ```
 
 - **Auth gate**: `src/proxy.ts` (Next 16's middleware) sends anyone without a
-  session to `/authPage`, except the public paths listed in it. API routes
-  check for themselves.
+  session to `/authPage`, except the public paths listed in it and anything
+  under `/compare/` and `/track/` (the public pages). API routes check for
+  themselves.
 - **Session**: NextAuth JWT, rebuilt from the `users` row on every read
   (`src/lib/authOptions.ts` + `src/lib/userRecord.ts`). Server code that needs
   the RA key uses `getServerSession(authOptions)`; the browser never sees it.
@@ -81,6 +82,12 @@ Change the shape of a cached value → bump its key's version (`gameData_v2:` �
 - **Utils** (`src/utils/`): pure functions — mappers per platform
   (`steamMappers`, `psnMappers`), library shelves and insights, `aiExport`.
 - **i18n**: `useLanguage()` gives `T`; strings in `src/translations/<lang>.ts`.
+  The public comparison/how-to pages keep their prose apart, in
+  `src/translations/seoPages.ts` (English and Spanish, others fall back to
+  English), so every other page does not download it.
+- **Public pages** (`/compare/[slug]`, `/track/[slug]`): one entry each in
+  `SEO_PAGES`; the routes, the sitemap and the footer links all read that list.
+  Rendered by `SeoPage`, with the FAQ as `FAQPage` JSON-LD from `SeoPageRoute`.
 - **Themes**: `THEMES` in `src/types/types.ts`, CSS variables in
   `src/app/globals.css`, applied before paint by a script in `src/app/layout.tsx`.
 
