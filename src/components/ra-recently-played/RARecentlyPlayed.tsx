@@ -115,9 +115,10 @@ export default function RARecentlyPlayed() {
       {/* Cards */}
       <div className="flex flex-col flex-1 min-h-0">
         {loading ? (
-          <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-hidden animate-pulse motion-reduce:animate-none">
+          // Sized like the loaded list (home-fit-scroll, rows sharing the height), so the rows fill the card and nothing jumps when it loads.
+          <div className="home-fit-scroll flex flex-col gap-1.5 flex-1 min-h-0 overflow-hidden animate-pulse motion-reduce:animate-none">
             {Array.from({ length: MAX_GAMES }).map((_, i) => (
-              <GameRowSkeleton key={i} />
+              <GameRowSkeleton key={i} className="flex-1" />
             ))}
           </div>
         ) : error && feed.length === 0 ? (

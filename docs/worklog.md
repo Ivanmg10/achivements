@@ -25,6 +25,20 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-17 — Recently played skeleton fills its card (`fix/recent-skeleton`)
+
+**Did** — The loading rows of "Recently played" (`RARecentlyPlayed`) sit in a
+`home-fit-scroll` list and grow (`flex-1`) like the loaded rows, which share the card's
+height (`ROW_STYLE` and the `.home-fit-scroll > *` rule in `globals.css`).
+**Why** — The skeleton rows kept their natural height: an empty band under them, and
+the list jumped when it loaded (seen by the user).
+**Watch out** — The list waits for every linked platform. On 2026-10-17 `api.xbl.io`
+did not answer from the dev machine (connection timeout after ~11 s, while the rest of
+Cloudflare answered), so for an admin with Xbox linked the skeleton stayed ~12 s.
+`xboxCall` has no timeout of its own and a failure is not cached, so every visit waits again.
+
+---
+
 ## 2026-10-17 — Public comparison/how-to pages and a landing FAQ (`feat/seo-public-pages`)
 
 **Did** — Four public pages: `/compare/exophase`, `/compare/psnprofiles`,
