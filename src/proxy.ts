@@ -10,10 +10,12 @@ import { getToken } from 'next-auth/jwt'
 // /opengraph-image is the link preview and /apple-icon the iOS home-screen icon:
 // whoever fetches them (other sites, a phone saving the page) has no session.
 const PUBLIC_PATHS = ['/', '/authPage', '/resetPassword', '/privacy', '/terms', '/opengraph-image', '/apple-icon']
+// The comparison and how-to pages (src/translations/seoPages.ts): written for visitors and crawlers.
+const PUBLIC_PREFIXES = ['/compare/', '/track/']
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
-  if (PUBLIC_PATHS.includes(pathname)) return NextResponse.next()
+  if (PUBLIC_PATHS.includes(pathname) || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) return NextResponse.next()
 
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
   if (token) return NextResponse.next()
