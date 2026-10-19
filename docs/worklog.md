@@ -25,6 +25,13 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Header for PSN-only accounts (`improvements_11`)
+
+**Did** — `MainHeader` decided "has a platform" from RA or Steam only, so an account with only
+PSN (or only Xbox, for an admin) got a bar with no search, no Library, Groups or Following.
+It now counts PSN, and Xbox when `canUseXbox`. Tests for both.
+**Watch out** — A new platform must be added to that check, or its users lose the bar.
+
 ## 2026-10-20 — Presence everywhere another user shows (`improvements_11`)
 
 **Did** — The green dot and "online / seen …" now follow every picture of another user, not

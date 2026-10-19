@@ -17,6 +17,7 @@ const SearchModal = dynamic(() => import('@/components/search-modal/SearchModal'
 const MobileNavModal = dynamic(() => import('./MobileNavModal'), { loading: () => null })
 import StatusNavDropdown from './status-nav-dropdown/StatusNavDropdown'
 import { plural } from '@/utils/utils'
+import { canUseXbox } from '@/utils/xboxAccess'
 
 function NavLink({ href, label, active, glass }: { href: string; label: string; active: boolean; glass?: boolean }) {
   return (
@@ -65,8 +66,12 @@ export default function MainHeader() {
 
   const streak = activeStreak?.days ?? 0
   // With no platform linked there is nothing to search, sort or count: the
-  // bar keeps only the way home and the way to the account.
-  const hasPlatform = Boolean(session?.user?.rausername || session?.user?.steamid)
+  // bar keeps only the way home and the way to the account. Any platform counts
+  // (Xbox only for who may see it, see canUseXbox): a PSN-only account has a library too.
+  const user = session?.user
+  const hasPlatform = Boolean(
+    user?.rausername || user?.steamid || user?.psnaccountid || (user?.xboxxuid && canUseXbox(user.admin)),
+  )
   const isHome = pathname === '/'
   const isGameInfo = pathname.startsWith('/gameInfo/')
   const avatarSrc = session?.user?.avatar ?? session?.user?.image ?? null
