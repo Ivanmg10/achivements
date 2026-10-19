@@ -16,9 +16,12 @@ const GameAchievementsProgressPlot = dynamic(
   () => import('./game-achievements-progress-plot/GameAchievementsProgressPlot'),
   { loading: () => <div aria-hidden="true" className={`${PLOT_HEIGHT} animate-pulse rounded-lg bg-ink/5`} /> },
 )
-// Downloaded the first time a point is clicked, not with the card.
+// Downloaded the first time a point is clicked, not with the card. `loading` gives it its
+// own Suspense boundary: without one the download suspends the whole page (the home
+// skeleton flashes).
 const GameAchievementsProgressChartModal = dynamic(
   () => import('./game-achievements-progress-chart-modal/GameAchievementsProgressChartModal'),
+  { loading: () => null },
 )
 
 /**

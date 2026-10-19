@@ -13,8 +13,8 @@ import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconMenu } from '@tab
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
 // Downloaded the first time it is opened, not with the page.
-const SearchModal = dynamic(() => import('@/components/search-modal/SearchModal'))
-const MobileNavModal = dynamic(() => import('./MobileNavModal'))
+const SearchModal = dynamic(() => import('@/components/search-modal/SearchModal'), { loading: () => null })
+const MobileNavModal = dynamic(() => import('./MobileNavModal'), { loading: () => null })
 import StatusNavDropdown from './status-nav-dropdown/StatusNavDropdown'
 import { plural } from '@/utils/utils'
 

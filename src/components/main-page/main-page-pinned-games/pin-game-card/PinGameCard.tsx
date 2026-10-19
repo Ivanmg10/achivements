@@ -7,7 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
 // Downloaded the first time it is opened, not with the page.
-const PinGameModal = dynamic(() => import('@/components/pin-game-modal/PinGameModal'))
+const PinGameModal = dynamic(() => import('@/components/pin-game-modal/PinGameModal'), { loading: () => null })
 
 export default function PinGameCard() {
   const { T } = useLanguage()

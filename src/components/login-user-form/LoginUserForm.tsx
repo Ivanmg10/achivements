@@ -11,7 +11,7 @@ import Spinner from '@/components/main-spinner/Spinner'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
 // Downloaded the first time it is opened, not with the page.
-const ForgotPasswordModal = dynamic(() => import('@/components/forgot-password-modal/ForgotPasswordModal'))
+const ForgotPasswordModal = dynamic(() => import('@/components/forgot-password-modal/ForgotPasswordModal'), { loading: () => null })
 
 export default function LoginUserForm({
   setIsLogin,

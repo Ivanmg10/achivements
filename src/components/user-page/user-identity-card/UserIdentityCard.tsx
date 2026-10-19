@@ -22,10 +22,10 @@ import { summarizeSteamLibrary } from '@/utils/steamFeed'
 import { codeToFlag, findCountry } from '@/utils/countries'
 
 // Modals are downloaded the first time they are wanted, not with the page — the admin panel above all.
-const AdminPanelModal = dynamic(() => import('@/components/admin-panel/admin-panel-modal/AdminPanelModal'))
-const EditProfileModal = dynamic(() => import('@/components/edit-profile-modal/EditProfileModal'))
-const ChangePasswordModal = dynamic(() => import('@/components/change-password-modal/ChangePasswordModal'))
-const LocationModal = dynamic(() => import('@/components/location-modal/LocationModal'))
+const AdminPanelModal = dynamic(() => import('@/components/admin-panel/admin-panel-modal/AdminPanelModal'), { loading: () => null })
+const EditProfileModal = dynamic(() => import('@/components/edit-profile-modal/EditProfileModal'), { loading: () => null })
+const ChangePasswordModal = dynamic(() => import('@/components/change-password-modal/ChangePasswordModal'), { loading: () => null })
+const LocationModal = dynamic(() => import('@/components/location-modal/LocationModal'), { loading: () => null })
 
 /**
  * Who you are on CheevoVault: avatar, username, email and country, with

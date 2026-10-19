@@ -92,6 +92,10 @@ no bucket. They are now local (`localDay`). Collection trophies are keyed `gameI
 in the chart, since ids repeat across its games. The `fromX` links do not carry the profile
 being viewed (`useSubject`), as in the library; on someone else's page they open the game
 for the viewer.
+**Fixed after** — The first click flashed the whole screen: a `next/dynamic` with no
+`loading` has no Suspense boundary of its own, so downloading the modal suspended the home
+page up to its `loading.tsx`. Every lazy modal (header, groups, pins, account page, login)
+now passes `{ loading: () => null }`; the rule is in CLAUDE.md, "Performance rules".
 
 ---
 

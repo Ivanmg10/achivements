@@ -514,6 +514,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   downloaded the first time it opens and stays mounted after (its exit animation
   plays). Do not import a modal statically into a page or the header.
   (A test waits for such a modal with `findBy…`; `__mocks__/next/dynamic.js`.)
+  **Always pass `{ loading: () => null }`** (or a real fallback): without `loading`,
+  `next/dynamic` adds no Suspense boundary, so the first download suspends up to the
+  route's `loading.tsx` and the whole page flashes its skeleton (seen 2026-10-18).
+  The jest mock always wraps one, so tests cannot catch it.
 - **Several components asking for the same GET share one request while it is in
   flight**: `fetchWithRetry` does it for you; for a raw `fetch` of a GET use
   `fetchShared`. A shared answer is shared by reference: copy before changing it.

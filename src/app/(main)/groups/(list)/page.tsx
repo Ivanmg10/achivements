@@ -10,7 +10,7 @@ import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
 // Downloaded the first time it is opened, not with the page.
-const GroupModal = dynamic(() => import('@/components/groups/GroupModal'))
+const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
 import GroupListSkeleton from '@/components/groups/group-list-skeleton/GroupListSkeleton'
 import GroupList from '@/components/groups/group-list/GroupList'
 import EmptyState from '@/components/empty-state/EmptyState'
