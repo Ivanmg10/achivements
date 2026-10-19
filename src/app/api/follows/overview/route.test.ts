@@ -28,6 +28,14 @@ test('the people you follow with their favourites, latest pins and public groups
   expect(params).toEqual(['3', false])
 })
 
+test('presence only for who shares it: online within 5 minutes, the time rounded to 5', async () => {
+  query.mockResolvedValue({ rows: [] })
+  await GET()
+  const [sql] = query.mock.calls[0]
+  expect(sql).toContain("COALESCE(u.show_presence AND u.last_seen_at > now() - interval '5 minutes', false) AS online")
+  expect(sql).toContain('CASE WHEN u.show_presence THEN to_timestamp(floor(extract(epoch FROM u.last_seen_at) / 300) * 300) END')
+})
+
 test('signed out, nothing; a failure is a 500', async () => {
   ;(requireSession as jest.Mock).mockResolvedValue({ ok: false, response: { status: 401 } })
   expect((await GET()).status).toBe(401)

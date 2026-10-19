@@ -4,6 +4,7 @@ jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn() }))
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 
 import { GET } from './route'
+import { presenceColumns } from '@/lib/presence'
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { requireSession } from '@/lib/apiAuth'
@@ -74,4 +75,9 @@ test('whether a result has Xbox is asked of the database only for an admin searc
   const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
   expect(sql).toContain('xboxxuid IS NOT NULL AND $4::boolean')
   expect(params[3]).toBe(true)
+})
+
+test('each one says whether they are online, by the shared presence rule', async () => {
+  await GET(get('q=ivan'))
+  expect((pool.query as jest.Mock).mock.calls[0][0]).toContain(presenceColumns())
 })

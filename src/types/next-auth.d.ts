@@ -34,6 +34,8 @@ type SessionUserFields = {
   description?: string | null;
   /** Whether other users may find and open this profile. */
   profilePublic?: boolean;
+  /** Whether others are told when this user was last seen. */
+  showPresence?: boolean;
   gender?: 'male' | 'female' | 'neutral' | null;
   /** Whether the gender shows on the public profile. */
   genderPublic?: boolean;

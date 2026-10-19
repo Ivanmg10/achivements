@@ -25,6 +25,45 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Presence everywhere another user shows (`improvements_11`)
+
+**Did** — The green dot and "online / seen …" now follow every picture of another user, not
+only the Following cards. Shared pieces: `presenceColumns()` (`src/lib/presence.ts`, the SQL
+rule, now used by the follows overview, `/api/users/search` and `findPublicUser`),
+`PresenceDot` and `PresenceLabel` (components). Placed in: Following hero faces, `UserSummary`
+(search results, the home's friend cards), the public profile hero (dot + line under the name,
+not on your own page), compare, someone's game page banner, the friends leaderboard and shared
+games. `/privacy` and the switch now say *signed-in users* see it (9 languages).
+**Why** — The user asked for the dot next to every online person's picture, and "last seen"
+everywhere else.
+**Decisions** — The dot speaks to screen readers (`announce`) only where no text beside it
+says so. Your own picture never gets it. Recent users in the search (kept in the browser)
+have no presence: they are not read from the server.
+**Open** — Nothing refreshes it while a page stays open (only on load).
+
+## 2026-10-19 — Online status and "last seen" (`improvements_11`)
+
+**Did** — Presence on the Following cards. `migrations/038_user_presence.sql`
+(`users.last_seen_at`, `users.show_presence` default true), **applied to the shared Neon
+database 2026-10-19**. `usePresenceHeartbeat` (via `PresenceHeartbeat` in `MainProviders`)
+posts `/api/presence` while the tab is visible; the route writes at most once a minute.
+`/api/follows/overview` returns `online` (seen < 5 min) and `lastSeenAt` (rounded to 5 min),
+both only for who shares it. The card shows a green dot and "Online", or "Seen 3 h ago" /
+"over a month ago", in place of the bio (`presenceOf` in `src/utils/friends.ts`); the hero
+says "n online now". A "Show when I am online" switch in Preferences → General
+(`showPresence`, same path as `profilePublic`). `/privacy` explains it, in 9 languages,
+dated 19 October 2026. Rules in CLAUDE.md → Presence.
+**Why** — The user asked for it; analysis and proposal first, then their choices.
+**Decisions** (the user's) — visible by default with an opt-out; not reciprocal; the status
+replaces the bio. A heartbeat only while visible rather than writing from the session, so a
+tab in the background does not count and no read path writes. Online is decided on the
+server, so the client's clock does not matter.
+**Checked** — in the browser: two beats on arrival (Strict Mode in dev), one row written;
+the card states and the switch with mocked follows.
+**Open** — what comes next is the user's call (CLAUDE.md roadmap): Steam "playing now" in
+one call for everyone, an "online" filter, refreshing without reloading, the public profile.
+**Watch out** — Any database without migration 038 breaks every signed-in request.
+
 ## 2026-10-19 — Following page restyled, room for rankings (`improvements_11`)
 
 **Did** — `/following` was a plain list of names. Now (`FollowingPage`):

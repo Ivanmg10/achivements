@@ -78,15 +78,15 @@ export function friendStats(recent: RecentAchievement[], games: LibraryGame[], n
   }
 }
 
-export type LeaderRow = { username: string; avatar: string | null; isMe: boolean; stats: FriendStats }
+export type LeaderRow = { username: string; avatar: string | null; online?: boolean; isMe: boolean; stats: FriendStats }
 
 /** Best first on the chosen measure; ties go to the longer streak, then by name. */
 export function rankBy(rows: LeaderRow[], key: StatKey): LeaderRow[] {
   return [...rows].sort((a, b) => b.stats[key] - a.stats[key] || b.stats.streak - a.stats.streak || a.username.localeCompare(b.username))
 }
 
-export type FriendGames = { username: string; avatar: string | null; games: LibraryGame[] }
-export type SharedGameRow = { game: LibraryGame; friends: { username: string; avatar: string | null; pct: number }[] }
+export type FriendGames = { username: string; avatar: string | null; online?: boolean; games: LibraryGame[] }
+export type SharedGameRow = { game: LibraryGame; friends: { username: string; avatar: string | null; online?: boolean; pct: number }[] }
 
 const unfinished = (row: SharedGameRow) => row.game.pct < 100 || row.friends.some((f) => f.pct < 100)
 
@@ -98,7 +98,7 @@ export function sharedWithFriends(mine: LibraryGame[], friends: FriendGames[], l
       game,
       friends: friends
         .filter((f) => byKey.get(f.username)!.has(game.key))
-        .map((f) => ({ username: f.username, avatar: f.avatar, pct: byKey.get(f.username)!.get(game.key)! })),
+        .map((f) => ({ username: f.username, avatar: f.avatar, online: f.online, pct: byKey.get(f.username)!.get(game.key)! })),
     }))
     .filter((row) => row.friends.length > 0)
     // Most shared first; then the ones somebody has still to finish, where there is a race to follow.
@@ -157,4 +157,18 @@ export function lastPlayedGame(
 /** A recent unlock in a pin's shape, so it can sit in the same row of badges. */
 export function recentAsBadge(a: RecentAchievement): FriendPin {
   return { source: a.Source ?? 'ra', gameId: a.GameID, gameTitle: a.GameTitle, title: a.Title, description: a.Description || null, badge: achievementBadgeUrl(a) ?? null }
+}
+
+/** Past this, "seen" no longer says how long ago: just that it was a while. */
+const SEEN_LONG_AGO_MS = 30 * 86400000
+
+export type Presence = { kind: 'online' } | { kind: 'seen'; at: string } | { kind: 'longAgo' }
+
+/** What to say about whether someone is around: online, seen a while ago, or nothing (never seen, or not shared). */
+export function presenceOf(friend: { online?: boolean; lastSeenAt?: string | null }, now: number = Date.now()): Presence | null {
+  if (friend.online) return { kind: 'online' }
+  if (!friend.lastSeenAt) return null
+  const at = Date.parse(friend.lastSeenAt)
+  if (Number.isNaN(at)) return null
+  return now - at > SEEN_LONG_AGO_MS ? { kind: 'longAgo' } : { kind: 'seen', at: friend.lastSeenAt }
 }

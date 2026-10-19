@@ -88,6 +88,13 @@ Change the shape of a cached value â†’ bump its key's version (`gameData_v2:` â†
 - **Public pages** (`/compare/[slug]`, `/track/[slug]`): one entry each in
   `SEO_PAGES`; the routes, the sitemap and the footer links all read that list.
   Rendered by `SeoPage`, with the FAQ as `FAQPage` JSON-LD from `SeoPageRoute`.
+- **Presence**: `PresenceHeartbeat` (mounted in `MainProviders`) runs
+  `usePresenceHeartbeat`: `POST /api/presence` on arrival, every 2 min and on
+  coming back to the tab, only while it is visible. The route writes
+  `users.last_seen_at` at most once a minute. `presenceColumns()`
+  (`src/lib/presence.ts`) turns it into `online` / `lastSeenAt` for whoever shares
+  it (`show_presence`), in every query that shows other users; `PresenceDot` and
+  `PresenceLabel` draw it.
 - **Themes**: `THEMES` in `src/types/types.ts`, CSS variables in
   `src/app/globals.css`, applied before paint by a script in `src/app/layout.tsx`.
 

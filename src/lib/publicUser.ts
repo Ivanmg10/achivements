@@ -1,5 +1,6 @@
 import pool from '@/lib/db'
 import { gameKey, isGameSource } from '@/utils/gameRef'
+import { presenceColumns } from '@/lib/presence'
 
 /** What another user may see of an account: no email, no keys, no hash. */
 export type PublicUserRow = {
@@ -22,6 +23,9 @@ type SavedGame = { id: number; title: string; imageIcon: string } | null
 
 /** What their public page shows besides: names on each platform and their preferences. */
 export type PublicProfileRow = PublicUserRow & {
+  /** Only for who shares it; see presenceColumns. */
+  online: boolean
+  lastSeenAt: string | null
   steamusername: string | null
   psnusername: string | null
   xboxgamertag: string | null
@@ -41,7 +45,8 @@ export async function findPublicUser(username: string): Promise<PublicProfileRow
     `SELECT id, username, avatar, description, location, rausername, steamid, psnaccountid, xboxxuid,
             steamusername, psnusername, xboxgamertag, theme, gender, gender_public AS "genderPublic",
             favorite_game, favorite_steam_game, favorite_psn_game, favorite_xbox_game,
-            (raid IS NOT NULL) AS "hasRaKey", profile_public AS "profilePublic"
+            (raid IS NOT NULL) AS "hasRaKey", profile_public AS "profilePublic",
+            ${presenceColumns()}
      FROM users WHERE LOWER(username) = LOWER($1) LIMIT 1`,
     [username],
   )
