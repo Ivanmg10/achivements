@@ -724,6 +724,11 @@ branch to be up to date with its base** before merging, on both.
       asked for. **Open:** a viewer with no RA account is served with the page
       owner's key (see RetroAchievements above); ask RA whether that counts, and
       if not, ask the viewer to link their own. Revisit when OAuth lands.
+- [ ] **Online status and "last seen"** on the Following cards (asked 2026-10-19, in
+      design on the A2 card). **Ask the user what it should become before building it**:
+      they said it will grow beyond the card. Needs a `last_seen_at` on `users` (a
+      migration) and a rule for "online"; and, being personal data, a line in `/privacy`
+      and probably an opt-out. Not started.
 - [ ] Later: **community-flagged missables for PSN, Steam and Xbox.** Only RA says
       which achievements are missable (`Type: 'missable'`, marked in red in
       `AchievementGrid`); Sony, Steam and OpenXBL have no such field (checked
