@@ -21,7 +21,8 @@ test('the people you follow with their favourites, latest pins and public groups
   const [sql, params] = query.mock.calls[0]
   expect(sql).toContain('u.profile_public')
   expect(sql).toContain('pinned_achievements')
-  expect(sql).toContain('LIMIT 3')
+  expect(sql).toContain('LIMIT 5')
+  expect(sql).toContain('AS description')
   expect(sql).toContain('g.is_public')
   expect(sql).not.toMatch(/\bemail\b|password|raid\b/)
   expect(params).toEqual(['3', false])
@@ -43,6 +44,7 @@ test('Xbox — the account, the favourite and the pins — is for an admin viewe
   expect(sql).toContain('u.xboxxuid IS NOT NULL AND $2::boolean')
   expect(sql).toContain("'xbox', CASE WHEN $2::boolean THEN u.favorite_xbox_game END")
   expect(sql).toContain("$2::boolean OR source <> 'xbox'")
+  expect(sql).toContain("'xbox', CASE WHEN $2::boolean THEN u.xboxgamertag END")
   expect(params).toEqual(['3', false])
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '3', admin: true } })
   await GET()

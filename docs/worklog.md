@@ -25,6 +25,45 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-19 — Following page restyled, room for rankings (`improvements_11`)
+
+**Did** — `/following` was a plain list of names. Now (`FollowingPage`):
+- `FollowingHero`: the title on a wash of the theme's accent, how many people you follow and
+  a stack of their avatars (+N).
+- `FollowingRankingsTeaser` beside it: "Rankings · Coming soon" with an empty podium. Not a
+  link yet; when the rankings page exists, this card becomes its link.
+- `FollowingToolbar`: search by name and a chip per platform (only those someone has, with
+  counts; `aria-pressed` plus a check, not colour alone). Platforms are multi-select and add
+  up: two chosen leave who has **both** (people link several accounts); "All" clears them.
+  Filtering is `filterFollowing` in `src/utils/friends.ts`.
+- Each person is a `FollowingCard` (design "A2", iterated with the user on a canvas of five
+  variants): a banner with the **last game played** (`FollowingCardBanner`: blurred, a Steam
+  header a little and an icon a lot; without one, the avatar colours via `UserProfileBanner`), who they are,
+  a chip per linked account with the name it goes by (`FollowingCardPlatforms`; the overview
+  now returns `accounts`, the names the public profile already shows, Xbox's only to an
+  admin), and up to **5 pinned badges** whose tooltip says game, name and description
+  (`FollowingCardBadges`, size `md`). At the foot, beside the groups, their last 5 unlocks in
+  the same row at size `sm` (`recentAsBadge` puts an unlock in a pin's shape). Favourite games
+  were dropped from the card on the user's choice.
+- The page now reads `useFriendsData(true)` (the home Friends section's hook): the overview
+  for everyone, and the platforms' games for the newest `DETAIL_LIMIT` (10) follows, from which
+  `lastPlayedGame` (`src/utils/friends.ts`) picks the newest; RA has no play date, so its latest
+  unlock stands in. `useFollowing` is gone. The overview now returns 5 pins with a
+  `description` (a secret Xbox one not yet earned keeps it hidden); the home card shows 3.
+- Fixed in `useFriendsData`: a page that wants it from its first render never loaded in dev
+  (Strict Mode ran the effect twice; the guard skipped the second run). Tested under StrictMode.
+New `T.following` keys in all 9 languages.
+**Why** — The user found the page boring and wants it ready for a rankings system that will
+have its own page.
+**Decisions** — Last played costs platform calls (cached, the same as the home section), so
+only the newest 10 follows get it and their latest unlocks; the rest show their avatar colours
+and no unlocks. Storing it in the DB
+when each user loads their own library was proposed, not done. The rankings themselves were
+not started: only the place they open from.
+**Open** — Online status / "last seen" (the line where the bio is now) is in the CLAUDE.md
+roadmap: ask the user first. "1 grupos públicos" (no singular form). `GET /api/follows` has no
+client left (POST/DELETE still used by `useFollow`); kept with its tests, can go.
+
 ## 2026-10-18 — New 404 and error screens (`improvements_11`)
 
 **Did** — Three screens, sharing `StatusBadge` (an achievement tile with a corner badge and a
