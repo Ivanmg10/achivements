@@ -13,11 +13,13 @@ import { SteamGamesDataProvider } from '@/context/SteamGamesDataContext'
 import { PsnGamesDataProvider } from '@/context/PsnGamesDataContext'
 import { XboxGamesDataProvider } from '@/context/XboxGamesDataContext'
 import PreferencesSync from '@/components/preferences-sync/PreferencesSync'
+import PresenceHeartbeat from '@/components/presence-heartbeat/PresenceHeartbeat'
 
 export function MainProviders({ children }: { children: React.ReactNode }) {
   return (
     <MainViewProvider>
       <PreferencesSync />
+      <PresenceHeartbeat />
       <BackInterceptProvider>
       <RecentAchievementsProvider>
         <RecentlyPlayedGamesProvider>

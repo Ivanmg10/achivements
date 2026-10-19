@@ -10,12 +10,15 @@ import { codeToFlag, findCountry } from '@/utils/countries'
 import FollowingCardBanner from '../following-card-banner/FollowingCardBanner'
 import FollowingCardBadges from '../following-card-badges/FollowingCardBadges'
 import FollowingCardPlatforms from '../following-card-platforms/FollowingCardPlatforms'
+import PresenceDot from '@/components/presence-dot/PresenceDot'
+import PresenceLabel from '@/components/presence-label/PresenceLabel'
 
 const RECENT_MAX = 5
 
 /**
  * Someone you follow: the last game they played across the top (or their
- * avatar's colours), who they are and where they play, their latest pinned
+ * avatar's colours), who they are — online, or when they were last seen, in
+ * place of their bio when they share it — and where they play, their latest pinned
  * achievements as badges
  * and, small at the foot, what they earned last. `lastPlayed` and `recent` are
  * undefined while unknown (not read yet, or beyond the follows whose games are
@@ -39,13 +42,17 @@ export default function FollowingCard({
 
       <div className="px-4 pb-4 flex flex-col gap-4 flex-1">
         <div className="relative flex items-end gap-3 -mt-7 min-w-0">
-          {friend.avatar ? (
-            <Image src={friend.avatar} alt="" width={60} height={60} className="w-15 h-15 rounded-full object-cover shrink-0 bg-bg-main ring-4 ring-bg-card" unoptimized />
-          ) : (
-            <span aria-hidden="true" className="w-15 h-15 rounded-full bg-bg-main ring-4 ring-bg-card flex items-center justify-center shrink-0">
-              <IconUser size={24} className="text-text-secondary" />
-            </span>
-          )}
+          <span className="relative shrink-0">
+            {friend.avatar ? (
+              <Image src={friend.avatar} alt="" width={60} height={60} className="w-15 h-15 rounded-full object-cover bg-bg-main ring-4 ring-bg-card" unoptimized />
+            ) : (
+              <span aria-hidden="true" className="w-15 h-15 rounded-full bg-bg-main ring-4 ring-bg-card flex items-center justify-center">
+                <IconUser size={24} className="text-text-secondary" />
+              </span>
+            )}
+            {/* The text below says it too: the dot is not the only sign. */}
+            <PresenceDot online={friend.online} />
+          </span>
           <div className="flex flex-col min-w-0 pb-0.5">
             <span className="flex items-center gap-1.5 min-w-0">
               <Link
@@ -60,7 +67,11 @@ export default function FollowingCard({
                 </span>
               )}
             </span>
-            {friend.description && <span className="text-xs text-text-secondary truncate">{friend.description}</span>}
+            <PresenceLabel
+              online={friend.online}
+              lastSeenAt={friend.lastSeenAt}
+              fallback={friend.description && <span className="text-xs text-text-secondary truncate">{friend.description}</span>}
+            />
           </div>
         </div>
 

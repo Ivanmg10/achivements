@@ -12,6 +12,7 @@ import { sharedGames, type LibraryGame } from '@/utils/library'
 import EmptyState from '@/components/empty-state/EmptyState'
 import PublicUserDuelRow from '../public-user-duel-row/PublicUserDuelRow'
 import PublicUserSharedGameRow from '../public-user-shared-game-row/PublicUserSharedGameRow'
+import PresenceDot from '@/components/presence-dot/PresenceDot'
 
 /** The signed-in viewer's own numbers, read outside the profile's providers. */
 export type ViewerStats = {
@@ -26,12 +27,17 @@ export type ViewerStats = {
 
 const SHARED_SHOWN = 24
 
-function Avatar({ src, name }: { src: string | null; name: string }) {
-  return src ? (
-    <Image src={src} alt="" width={56} height={56} className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover ring-2 ring-bg-card" unoptimized />
-  ) : (
-    <span aria-hidden="true" title={name} className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-bg-main flex items-center justify-center">
-      <IconUser size={22} className="text-text-secondary" />
+function Avatar({ src, name, online }: { src: string | null; name: string; online?: boolean }) {
+  return (
+    <span className="relative shrink-0">
+      {src ? (
+        <Image src={src} alt="" width={56} height={56} className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover ring-2 ring-bg-card" unoptimized />
+      ) : (
+        <span aria-hidden="true" title={name} className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-bg-main flex items-center justify-center">
+          <IconUser size={22} className="text-text-secondary" />
+        </span>
+      )}
+      <PresenceDot online={online} announce />
     </span>
   )
 }
@@ -86,7 +92,7 @@ export default function PublicUserCompare({
         </h2>
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <Avatar src={user.avatar} name={user.username} />
+            <Avatar src={user.avatar} name={user.username} online={user.online} />
             <span className="flex flex-col min-w-0">
               <span className="font-semibold truncate">{user.username}</span>
               {!loading && <span className="text-xs text-text-secondary">{T.userProfile.wins.replace('{n}', String(theirWins))}</span>}

@@ -59,3 +59,21 @@ test('their latest unlocks, small at the foot, up to five, each opening its game
   expect(first).toHaveAttribute('href', '/user/luna/ra/7')
   expect(first).toHaveAccessibleDescription(/Haz 1/)
 })
+
+test('online: a dot and the word, in place of the bio', () => {
+  render(<FollowingCard friend={friend({ online: true, lastSeenAt: new Date().toISOString() })} />)
+  expect(screen.getByText(en.following.online)).toBeInTheDocument()
+  expect(screen.queryByText('Hardcore o nada')).not.toBeInTheDocument()
+})
+
+test('offline: when they were last seen, or a while ago; nothing shared, the bio', () => {
+  const { unmount } = render(<FollowingCard friend={friend({ online: false, lastSeenAt: new Date(Date.now() - 3 * 3600e3).toISOString() })} />)
+  expect(screen.getByText(/^Seen .*3 hr/)).toBeInTheDocument()
+  unmount()
+  const old = render(<FollowingCard friend={friend({ online: false, lastSeenAt: '2020-01-01T00:00:00Z' })} />)
+  expect(screen.getByText(en.following.seenLongAgo)).toBeInTheDocument()
+  old.unmount()
+  render(<FollowingCard friend={friend({ online: false, lastSeenAt: null })} />)
+  expect(screen.getByText('Hardcore o nada')).toBeInTheDocument()
+  expect(screen.queryByText(en.following.online)).not.toBeInTheDocument()
+})

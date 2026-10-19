@@ -4,17 +4,20 @@ import Image from 'next/image'
 import { IconUser, IconUsers } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { FriendOverview } from '@/utils/friends'
+import PresenceDot from '@/components/presence-dot/PresenceDot'
 
 const STACK_MAX = 5
 
 /**
  * The top of the Following page: a wash of the theme's accent, the title, and
- * once the list is in, how many people you follow with a few of their faces.
+ * once the list is in, how many people you follow with a few of their faces,
+ * and how many of them are online now.
  */
 export default function FollowingHero({ users, className = '' }: { users: FriendOverview[]; className?: string }) {
   const { T, lang } = useLanguage()
   const stack = users.slice(0, STACK_MAX)
   const more = users.length - stack.length
+  const online = users.filter((u) => u.online).length
 
   return (
     <section aria-labelledby="following-title" className={`relative bg-bg-card rounded-3xl overflow-hidden ${className}`}>
@@ -39,21 +42,30 @@ export default function FollowingHero({ users, className = '' }: { users: Friend
               <span className="text-[10px] uppercase tracking-widest text-text-secondary mt-1">{T.following.people}</span>
             </p>
             <div aria-hidden="true" className="flex items-center -space-x-2 pb-0.5">
-              {stack.map((u) =>
-                u.avatar ? (
-                  <Image key={u.username} src={u.avatar} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover ring-2 ring-bg-card" unoptimized />
-                ) : (
-                  <span key={u.username} className="w-8 h-8 rounded-full bg-bg-main ring-2 ring-bg-card flex items-center justify-center">
-                    <IconUser size={14} className="text-text-secondary" />
-                  </span>
-                ),
-              )}
+              {stack.map((u) => (
+                <span key={u.username} className="relative">
+                  {u.avatar ? (
+                    <Image src={u.avatar} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover ring-2 ring-bg-card" unoptimized />
+                  ) : (
+                    <span className="w-8 h-8 rounded-full bg-bg-main ring-2 ring-bg-card flex items-center justify-center">
+                      <IconUser size={14} className="text-text-secondary" />
+                    </span>
+                  )}
+                  <PresenceDot online={u.online} size="xs" />
+                </span>
+              ))}
               {more > 0 && (
                 <span className="h-8 min-w-8 px-1.5 rounded-full bg-bg-main ring-2 ring-bg-card text-[11px] font-semibold text-text-secondary flex items-center justify-center tabular-nums">
                   +{more.toLocaleString(lang)}
                 </span>
               )}
             </div>
+            {online > 0 && (
+              <p className="flex items-center gap-1.5 pb-1.5 text-xs font-medium text-success">
+                <span aria-hidden="true" className="w-2 h-2 rounded-full bg-success" />
+                {T.following.onlineNow.replace('{n}', online.toLocaleString(lang))}
+              </p>
+            )}
           </div>
         )}
       </div>

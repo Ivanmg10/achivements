@@ -48,7 +48,7 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
     }
     const them = detailed
       .filter((f) => details[f.username])
-      .map((f) => ({ username: f.username, avatar: f.avatar, isMe: false, stats: friendStats(details[f.username].recent, details[f.username].games, now) }))
+      .map((f) => ({ username: f.username, avatar: f.avatar, online: f.online, isMe: false, stats: friendStats(details[f.username].recent, details[f.username].games, now) }))
     return [me, ...them]
   }, [session?.user?.name, session?.user?.avatar, T, myRecent, mine.games, now, detailed, details])
   const pending = detailed.filter((f) => !details[f.username]).map((f) => ({ username: f.username, avatar: f.avatar }))
@@ -57,7 +57,7 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
     [detailed, details],
   )
   const shared = useMemo(
-    () => sharedWithFriends(mine.games, detailed.filter((f) => details[f.username]).map((f) => ({ username: f.username, avatar: f.avatar, games: details[f.username].games }))),
+    () => sharedWithFriends(mine.games, detailed.filter((f) => details[f.username]).map((f) => ({ username: f.username, avatar: f.avatar, online: f.online, games: details[f.username].games }))),
     [mine.games, detailed, details],
   )
   const partial = detailed.some((f) => details[f.username]?.partial)

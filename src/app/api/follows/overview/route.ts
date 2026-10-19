@@ -3,11 +3,13 @@ import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
 import { requireSession } from '@/lib/apiAuth'
+import { presenceColumns } from '@/lib/presence'
 import { canUseXbox } from '@/utils/xboxAccess'
 
 /**
  * The people you follow as the Friends section's cards show them, from our
- * own database only (no platform calls): who they are, where they play (and as whom), their
+ * own database only (no platform calls): who they are, whether they are online or when
+ * they were last seen (if they share it), where they play (and as whom), their
  * favourite game per platform, their five latest pinned achievements and how
  * many public groups they keep. Newest follow first; private profiles left out.
  */
@@ -22,6 +24,7 @@ export async function GET() {
       `SELECT u.username, u.avatar, u.location, LEFT(u.description, 120) AS description,
               u.rausername IS NOT NULL AS ra, u.steamid IS NOT NULL AS steam, u.psnaccountid IS NOT NULL AS psn,
               (u.xboxxuid IS NOT NULL AND $2::boolean) AS xbox,
+              ${presenceColumns('u')},
               -- The names their accounts go by, as their public profile shows them.
               json_build_object('ra', u.rausername, 'steam', u.steamusername, 'psn', u.psnusername,
                                 'xbox', CASE WHEN $2::boolean THEN u.xboxgamertag END) AS accounts,

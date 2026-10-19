@@ -29,6 +29,12 @@ test('each user you follow is a card that opens their profile', () => {
   expect(screen.getByText(en.following.people)).toBeInTheDocument()
 })
 
+test('the hero says how many of them are online now', () => {
+  setup({ users: [person('ana', { online: true }), person('bob', { online: true }), person('cid')] })
+  render(<FollowingPage />)
+  expect(screen.getByText(en.following.onlineNow.replace('{n}', '2'))).toBeInTheDocument()
+})
+
 test('the rankings are announced as coming, with no link yet', () => {
   setup({})
   render(<FollowingPage />)

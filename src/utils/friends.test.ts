@@ -1,6 +1,6 @@
 import type { RecentAchievement } from '@/types/types'
 import type { LibraryGame } from '@/utils/library'
-import { friendStats, friendsFeed, rankBy, sharedWithFriends, type LeaderRow, filterFollowing, lastPlayedGame, recentAsBadge } from './friends'
+import { friendStats, friendsFeed, rankBy, sharedWithFriends, type LeaderRow, filterFollowing, lastPlayedGame, recentAsBadge, presenceOf } from './friends'
 
 const NOW = Date.parse('2026-10-14T12:00:00Z')
 const at = (Date: string, Title = 'A') => ({ Date, Title }) as RecentAchievement
@@ -106,4 +106,13 @@ test('a recent unlock becomes a badge like a pin', () => {
     source: 'ra', gameId: 1, gameTitle: 'Super Metroid', title: 'Sin daños', description: 'Sin recibir daño', badge: 'https://media.retroachievements.org/Badge/123.png',
   })
   expect(recentAsBadge({ ...ra, Source: 'steam', BadgeUrl: 'https://s/b.jpg', Description: '' } as RecentAchievement)).toMatchObject({ source: 'steam', badge: 'https://s/b.jpg', description: null })
+})
+
+test('presence: online, seen when, a while ago, or nothing', () => {
+  expect(presenceOf({ online: true, lastSeenAt: '2026-10-14T11:55:00Z' }, NOW)).toEqual({ kind: 'online' })
+  expect(presenceOf({ online: false, lastSeenAt: '2026-10-14T09:00:00Z' }, NOW)).toEqual({ kind: 'seen', at: '2026-10-14T09:00:00Z' })
+  expect(presenceOf({ online: false, lastSeenAt: '2026-08-01T09:00:00Z' }, NOW)).toEqual({ kind: 'longAgo' })
+  // Never seen, or not shared.
+  expect(presenceOf({ online: false, lastSeenAt: null }, NOW)).toBeNull()
+  expect(presenceOf({}, NOW)).toBeNull()
 })
