@@ -11,7 +11,7 @@ import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
 // Downloaded the first time it is opened, not with the page.
-const GroupModal = dynamic(() => import('@/components/groups/GroupModal'))
+const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
 import { relativeTime, plural } from '@/utils/utils'
 import EmptyState from '@/components/empty-state/EmptyState'
 import GroupIcon from '@/components/groups/group-icon/GroupIcon'

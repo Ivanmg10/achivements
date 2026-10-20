@@ -23,11 +23,11 @@ import type { GameSource } from '@/types/steam'
 import { notify } from '@/lib/notify'
 
 // Modals are downloaded the first time they are wanted, not with the page.
-const FavoriteGameModal = dynamic(() => import('@/components/favorite-game-modal/FavoriteGameModal'))
-const GenderModal = dynamic(() => import('@/components/gender-modal/GenderModal'))
-const LanguageModal = dynamic(() => import('@/components/language-modal/LanguageModal'))
-const ThemeModal = dynamic(() => import('@/components/theme-modal/ThemeModal'))
-const HiddenGamesModal = dynamic(() => import('@/components/hidden-games-modal/HiddenGamesModal'))
+const FavoriteGameModal = dynamic(() => import('@/components/favorite-game-modal/FavoriteGameModal'), { loading: () => null })
+const GenderModal = dynamic(() => import('@/components/gender-modal/GenderModal'), { loading: () => null })
+const LanguageModal = dynamic(() => import('@/components/language-modal/LanguageModal'), { loading: () => null })
+const ThemeModal = dynamic(() => import('@/components/theme-modal/ThemeModal'), { loading: () => null })
+const HiddenGamesModal = dynamic(() => import('@/components/hidden-games-modal/HiddenGamesModal'), { loading: () => null })
 
 type PrefTab = 'general' | GameSource
 

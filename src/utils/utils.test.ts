@@ -1,4 +1,4 @@
-import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, heatLevel } from "./utils";
+import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath } from "./utils";
 import type { RecentAchievement } from '@/types/types'
 
 describe("getRandomGameIds", () => {
@@ -398,5 +398,48 @@ describe('Xbox pins and days', () => {
     const today = new Date().toISOString().split('T')[0]
     const rows = u.groupByDaySource([{ Date: today + ' 10:00:00', Source: 'xbox' } as never, { Date: today + ' 11:00:00', Source: 'psn' } as never], 1)
     expect(rows[0]).toMatchObject({ xbox: 1, psn: 1, ra: 0, steam: 0, total: 2 })
+  })
+})
+
+describe('groupGameAchievementsByPeriod', () => {
+  const at = (d: Date) => ({ earnedAt: d.toISOString() })
+
+  test('puts an unlock of today in the last week and the current month, with its item', () => {
+    const today = at(new Date())
+    const weeks = groupGameAchievementsByPeriod([today, { earnedAt: null }], 'week')
+    expect(weeks).toHaveLength(8)
+    expect(weeks[7]).toMatchObject({ count: 1, items: [today] })
+    const months = groupGameAchievementsByPeriod([today], 'month')
+    expect(months).toHaveLength(6)
+    expect(months[5]).toMatchObject({ count: 1, items: [today] })
+  })
+
+  test('labels the month in local time, so the first of the month is not the month before', () => {
+    const now = new Date()
+    const first = new Date(now.getFullYear(), now.getMonth(), 1, 0, 30)
+    const months = groupGameAchievementsByPeriod([at(first)], 'month')
+    expect(months[5].label).toBe(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)
+    expect(months[5].count).toBe(1)
+    expect(months[5].start).toBe(new Date(now.getFullYear(), now.getMonth(), 1).getTime())
+  })
+
+  test('reads RA dates with a space and ignores ones out of range', () => {
+    const old = { earnedAt: '2001-01-01 10:00:00' }
+    expect(groupGameAchievementsByPeriod([old], 'week').every((w) => w.count === 0)).toBe(true)
+  })
+})
+
+describe('gameSourceFromPath', () => {
+  test('names the platform of a game page', () => {
+    expect(gameSourceFromPath('/psnGame/NPWR20188_00')).toBe('psn')
+    expect(gameSourceFromPath('/steamGame/abc')).toBe('steam')
+    expect(gameSourceFromPath('/xboxGame/123')).toBe('xbox')
+  })
+
+  test('is null anywhere else', () => {
+    expect(gameSourceFromPath('/user/ivan/psn/1')).toBeNull()
+    expect(gameSourceFromPath('/nope')).toBeNull()
+    expect(gameSourceFromPath('/')).toBeNull()
+    expect(gameSourceFromPath(null)).toBeNull()
   })
 })

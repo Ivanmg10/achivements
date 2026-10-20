@@ -3,6 +3,7 @@
 import type { PsnGameProgress, TrophyCounts } from '@/types/psn'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnCollectionTrophies } from '@/hooks/usePsnCollectionTrophies'
+import { fromPsn } from '@/utils/gameInsights'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
 import { PsnTrophyGrid } from '@/components/psn/psn-trophy-grid/PsnTrophyGrid'
@@ -31,7 +32,10 @@ export default function PsnCollectionExpanded({ games }: { games: PsnGameProgres
   const loaded = all.length > 0
   const total = loaded ? all.length : games.reduce((n, g) => n + g.maxPossible, 0)
   const earned = loaded ? all.filter((t) => t.earned).length : games.reduce((n, g) => n + g.numAwarded, 0)
-  const unlocks = all.map((t) => ({ DateEarned: t.earnedAt, DateEarnedHardcore: null }))
+  // Trophy ids repeat across the games, so each is keyed by its game too.
+  const unlocks = games.flatMap((g) =>
+    fromPsn(byGame[g.titleId]?.trophies ?? [], g.id).map((t) => ({ ...t, id: `${g.id}:${t.id}` })),
+  )
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">
