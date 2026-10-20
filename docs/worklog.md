@@ -25,6 +25,15 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Demo users on the preview database (`feat/social-rankings`)
+
+**Did** — The user created the Neon branch and set `PREVIEW_DATABASE_URL`; checked that local
+work reads it (a marker written only on pre showed on localhost; production unchanged; marker
+removed). Added `scripts/demo-rankings.mjs` (`seed` / `clear`, preview database only) and seeded
+40 `demo_*` users with scores, weeks, Monday ranks, presence and follows; `ivanxmarine` follows
+ten of them on pre. Checked the Following rankings in the browser.
+**Open** — `dev.cheevovault.com` uses pre only once this branch reaches `develop`.
+
 ## 2026-10-20 — A database of its own for pre (`feat/social-rankings`)
 
 **Did** — `src/lib/db.js` reads `PREVIEW_DATABASE_URL` before `DATABASE_URL`, except in production

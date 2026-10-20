@@ -87,8 +87,8 @@ Run every file in [`migrations/`](migrations) in order on a fresh database:
 for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 ```
 
-> `develop` and production share one database. Never run a destructive
-> migration "just to try it" on develop.
+> Pre (`develop` and local work) has its own database, a Neon branch of production,
+> through `PREVIEW_DATABASE_URL`. Every migration is applied to both.
 
 ### Scripts
 
@@ -98,6 +98,7 @@ for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 | `npm test` | Jest |
 | `npm run lint` | ESLint (`react-hooks/set-state-in-effect` is an error) |
 | `npm run build` | Production build |
+| `node scripts/demo-rankings.mjs seed 40 --follower=<you>` | Demo users with points, for trying the rankings. **Preview database only** (refuses otherwise); `clear` removes them |
 
 ## Project layout
 

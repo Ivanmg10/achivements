@@ -815,6 +815,10 @@ branch to be up to date with its base** before merging, on both.
   copies production again, losing what pre had); it is a copy of real data, so treat it like
   production. **Until the variable is set somewhere, that place still uses production**: check
   before running anything destructive.
+- **Demo users** for the rankings: `node scripts/demo-rankings.mjs seed [n] --follower=<username>`
+  (and `clear`). It writes only to `PREVIEW_DATABASE_URL` and refuses when that is missing or the
+  same host as `DATABASE_URL`. Never point it at production: `/rankings` is public. Seeded
+  2026-10-20 with 40 (`demo_*`, no sign-in, kept out of the score refresh).
 - Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
 
 ## Style
