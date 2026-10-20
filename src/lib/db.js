@@ -7,6 +7,8 @@ const { Pool } = pkg;
  * so a database of its own for Preview (develop) or local work goes in
  * PREVIEW_DATABASE_URL, which wins when set. Never in production, whatever is
  * set there: production always runs on DATABASE_URL.
+ *
+ * @param {Record<string, string | undefined>} [env]
  */
 export function databaseUrl(env = process.env) {
   if (env.VERCEL_ENV !== "production" && env.PREVIEW_DATABASE_URL) return env.PREVIEW_DATABASE_URL;
