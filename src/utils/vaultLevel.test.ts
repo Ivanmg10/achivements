@@ -1,4 +1,4 @@
-import { levelOf, levelProgress, monthStart, pointsForLevel, tierOf, weekStart } from './vaultLevel'
+import { lastWeeks, levelOf, levelProgress, monthStart, pointsForLevel, tierOf, weekStart } from './vaultLevel'
 
 describe('levels', () => {
   it('follows 60 × L^2.2 and settles on the thresholds', () => {
@@ -39,4 +39,8 @@ describe('periods', () => {
     expect(weekStart(new Date('2026-10-25T23:59:00Z'))).toBe('2026-10-19')
     expect(monthStart(new Date('2026-10-20T10:00:00Z'))).toBe('2026-10-01')
   })
+})
+
+test('the last weeks end with this one, oldest first', () => {
+  expect(lastWeeks(new Date('2026-10-21T10:00:00Z'), 3)).toEqual(['2026-10-05', '2026-10-12', '2026-10-19'])
 })

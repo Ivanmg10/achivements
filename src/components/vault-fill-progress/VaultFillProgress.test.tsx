@@ -36,9 +36,10 @@ test("a platform's card: calculating with a bar, then how many counted, or what 
   const { rerender } = render(<VaultFillLine source="steam" />)
   expect(screen.getByRole('status')).toHaveTextContent('152 of 190 games')
 
-  ;(useVaultFillState as jest.Mock).mockReturnValue(fill(false, { steam: { read: 190, total: 190, state: 'done' } }))
+  ;(useVaultFillState as jest.Mock).mockReturnValue(fill(false, { steam: { read: 188, total: 190, skipped: 2, state: 'done' } }))
   rerender(<VaultFillLine source="steam" />)
-  expect(screen.getByText('190 games counted')).toBeInTheDocument()
+  expect(screen.getByText('188 games counted')).toBeInTheDocument()
+  expect(screen.getByText(/2 the platform would not answer for/)).toBeInTheDocument()
 
   ;(useVaultFillState as jest.Mock).mockReturnValue(fill(false, { ra: { read: 0, total: 0, state: 'error', error: 'key' } }))
   rerender(<VaultFillLine source="ra" />)

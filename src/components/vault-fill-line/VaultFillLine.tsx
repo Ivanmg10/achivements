@@ -26,7 +26,13 @@ export default function VaultFillLine({ source }: { source: GameSource }) {
     )
   }
   if (p.state === 'done') {
-    return p.total > 0 ? <p className="text-xs text-success">{T.rankings.fillCounted.replace('{n}', n(p.total))}</p> : null
+    if (p.total === 0) return null
+    return (
+      <p className="text-xs">
+        <span className="text-success">{T.rankings.fillCounted.replace('{n}', n(p.read))}</span>
+        {(p.skipped ?? 0) > 0 && <span className="text-text-secondary"> · {T.rankings.fillSkipped.replace('{n}', n(p.skipped!))}</span>}
+      </p>
+    )
   }
   const games = T.rankings.fillGames.replace('{n}', n(p.read)).replace('{total}', n(p.total))
   return (

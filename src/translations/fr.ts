@@ -1476,6 +1476,9 @@ export const fr: Translations = {
     fillUnavailable: '{platform} n’a pas répondu. Nous réessaierons tout seuls.',
     fillShort: 'Calcul en cours',
     fillA11y: 'Calcul de tes Points Vault, {pct} %',
+    fillSkipped: '{n} sans réponse de la plateforme',
+    weeksTitle: 'Tes 12 dernières semaines',
+    weeksBar: 'Semaine du {date} : {n} PV',
     fillCounted: '{n} jeux comptés',
     tiers: {
       novice: 'Novice',

@@ -1476,6 +1476,9 @@ export const ru: Translations = {
     fillUnavailable: '{platform} не ответил. Мы попробуем снова сами.',
     fillShort: 'Подсчёт',
     fillA11y: 'Считаем ваши очки Vault, {pct} %',
+    fillSkipped: '{n} без ответа платформы',
+    weeksTitle: 'Ваши последние 12 недель',
+    weeksBar: 'Неделя с {date}: {n} VP',
     fillCounted: 'Учтено игр: {n}',
     tiers: {
       novice: 'Новичок',

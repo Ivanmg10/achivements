@@ -21,9 +21,9 @@ test('explains the system, with the real numbers of the formula', () => {
   expect(screen.getByText(g.faq[0].q)).toBeInTheDocument()
 })
 
-test('in Spanish when the viewer reads Spanish, in English otherwise', () => {
+test('in the viewer language, all nine of them', () => {
   ;(useLanguage as jest.Mock).mockReturnValueOnce({ lang: 'es', T: es, setLang: jest.fn() })
   render(<RankingsGuide />)
   expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(vaultGuideText('es').heading)
-  expect(vaultGuideText('ja')).toBe(vaultGuideText('en'))
+  for (const lang of ['de', 'fr', 'it', 'ja', 'pl', 'pt', 'ru'] as const) expect(vaultGuideText(lang).heading).not.toBe(vaultGuideText('en').heading)
 })

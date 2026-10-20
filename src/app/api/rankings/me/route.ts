@@ -5,7 +5,7 @@ import { queryRows } from '@/lib/queryRows'
 import { loadRanking } from '@/lib/rankings'
 import type { GameSource } from '@/types/steam'
 import { canUseXbox } from '@/utils/xboxAccess'
-import { monthStart, weekStart } from '@/utils/vaultLevel'
+import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
 
 export type VaultMe = {
   /** All time, every platform the viewer may see. */
@@ -22,7 +22,12 @@ export type VaultMe = {
   /** Games scored from their library progress, until their achievements are read. */
   provisional: number
   refreshedAt: string | null
+  /** Points earned each of the last WEEKS weeks, oldest first (Monday, UTC), zeros included. */
+  weeks: { start: string; points: number }[]
 }
+
+/** How many weeks the history goes back. */
+const WEEKS = 12
 
 /** The signed-in user's own Vault Points: for the header, the profile and the rankings panel. */
 export async function GET() {
@@ -33,7 +38,8 @@ export async function GET() {
 
   try {
     const now = new Date()
-    const [entries, user, periods, provisional] = await Promise.all([
+    const weeks = lastWeeks(now, WEEKS)
+    const [entries, user, periods, provisional, weekly] = await Promise.all([
       loadRanking({ scope: 'global', period: 'all', source: 'all', viewerId: id, xbox }),
       queryRows<{ show_in_rankings: boolean; profile_public: boolean; score_refreshed_at: string | null }>(
         'SELECT show_in_rankings, profile_public, score_refreshed_at FROM users WHERE id = $1',
@@ -47,7 +53,14 @@ export async function GET() {
         [id, weekStart(now), monthStart(now), xbox],
       ),
       queryRows<{ n: number }>(`SELECT COUNT(*)::int AS n FROM score_games WHERE user_id = $1 AND provisional AND ($2::boolean OR source <> 'xbox')`, [id, xbox]),
+      queryRows<{ start: string; points: number }>(
+        `SELECT to_char(start, 'YYYY-MM-DD') AS start, SUM(points)::int AS points FROM score_periods
+         WHERE user_id = $1 AND kind = 'w' AND start >= $2::date AND ($3::boolean OR source <> 'xbox')
+         GROUP BY start`,
+        [id, weeks[0], xbox],
+      ),
     ])
+    const byWeek = new Map(weekly.map((w) => [w.start, w.points]))
     const own = entries.find((e) => e.id === id)
     const row = user[0]
     const body: VaultMe = {
@@ -60,6 +73,7 @@ export async function GET() {
       showInRankings: row?.show_in_rankings !== false,
       provisional: provisional[0]?.n ?? 0,
       refreshedAt: row?.score_refreshed_at ? new Date(row.score_refreshed_at).toISOString() : null,
+      weeks: weeks.map((start) => ({ start, points: byWeek.get(start) ?? 0 })),
     }
     return NextResponse.json(body, { headers: { 'Cache-Control': 'private, no-store' } })
   } catch (err) {

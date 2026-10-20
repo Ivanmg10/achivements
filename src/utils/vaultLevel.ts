@@ -68,3 +68,13 @@ export function weekStart(date: Date): string {
 export function monthStart(date: Date): string {
   return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1)).toISOString().slice(0, 10)
 }
+
+/** The last `count` week starts (Monday, UTC, as YYYY-MM-DD), oldest first, ending with this week. */
+export function lastWeeks(now: Date, count: number): string[] {
+  const latest = new Date(`${weekStart(now)}T00:00:00Z`)
+  return Array.from({ length: count }, (_, i) => {
+    const d = new Date(latest)
+    d.setUTCDate(d.getUTCDate() - 7 * (count - 1 - i))
+    return d.toISOString().slice(0, 10)
+  })
+}

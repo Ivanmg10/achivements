@@ -59,7 +59,7 @@ export default function UserVaultLevel() {
         )}
       </Link>
       {/* How each platform is getting on while it is calculated, and what to do if one failed. */}
-      <VaultFillProgress />
+      <VaultFillProgress wide />
     </div>
   )
 }

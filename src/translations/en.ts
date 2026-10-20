@@ -1477,6 +1477,9 @@ export const en = {
     fillUnavailable: '{platform} did not answer. We will try again on our own.',
     fillShort: 'Calculating',
     fillA11y: 'Calculating your Vault Points, {pct} %',
+    fillSkipped: '{n} the platform would not answer for',
+    weeksTitle: 'Your last 12 weeks',
+    weeksBar: 'Week of {date}: {n} VP',
     fillCounted: '{n} games counted',
     tiers: {
       novice: 'Novice',

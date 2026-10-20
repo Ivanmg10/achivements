@@ -22,7 +22,7 @@ export function fillProgress(status: FillStatus | null | undefined): FillProgres
   let total = 0
   for (const [source, p] of Object.entries(status.platforms)) {
     if (!p || source === 'xbox' || p.state === 'error') continue
-    read += p.read
+    read += p.read + (p.skipped ?? 0)
     total += p.total
   }
   return { active: true, read, total, pct: total > 0 ? Math.min(99, Math.floor((read / total) * 100)) : 0 }

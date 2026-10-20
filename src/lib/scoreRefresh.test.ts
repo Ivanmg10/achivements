@@ -152,6 +152,25 @@ describe('refreshScore', () => {
     delete process.env.STEAM_API_KEY
   })
 
+  it('a game the platform will not answer for is skipped, and does not hold the fill up', async () => {
+    stored = []
+    userRow = user({ steamid: 's1' })
+    process.env.STEAM_API_KEY = 'key'
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: Array.from({ length: 6 }, (_, i) => ({ appid: i + 1, name: `G${i}`, playtime_forever: 5 })) } })
+    ;(fetchPlayerAchievements as jest.Mock).mockImplementation(async (_auth: unknown, appId: number) => {
+      if (appId === 2) throw Object.assign(new Error('Steam 500'), { status: 500 })
+      return [{ apiname: 'A', achieved: 1, unlocktime: 1_760_000_000 }]
+    })
+    const result = await refreshScore(7, Date.now() + 10_000)
+    expect(result.platforms.steam).toEqual({ read: 5, total: 6, skipped: 1, state: 'done' })
+    expect(result.complete).toBe(true)
+
+    // Every read failing is the platform down, not a few odd games.
+    ;(fetchPlayerAchievements as jest.Mock).mockRejectedValue(Object.assign(new Error('Steam 500'), { status: 500 }))
+    expect((await refreshScore(7, Date.now() + 10_000)).platforms.steam).toMatchObject({ state: 'error', error: 'unavailable' })
+    delete process.env.STEAM_API_KEY
+  })
+
   it('a Steam library that reads as empty is a private profile', async () => {
     userRow = user({ steamid: 's1' })
     process.env.STEAM_API_KEY = 'key'

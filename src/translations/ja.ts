@@ -1476,6 +1476,9 @@ export const ja: Translations = {
     fillUnavailable: '{platform}から応答がありません。自動で再試行します。',
     fillShort: '計算中',
     fillA11y: 'Vaultポイントを計算中、{pct} %',
+    fillSkipped: '{n}本はプラットフォームが応答せず',
+    weeksTitle: '直近12週間',
+    weeksBar: '{date}の週：{n} VP',
     fillCounted: '{n}本のゲームを集計',
     tiers: {
       novice: 'ビギナー',

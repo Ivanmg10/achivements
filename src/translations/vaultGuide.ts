@@ -1,10 +1,11 @@
 import type { Lang } from '@/context/LanguageContext'
+import { de, fr, it, ja, pl, pt, ru } from './vaultGuideMore'
 
 /**
  * "How Vault Points work" (/rankings/how), for users. Like the public pages in
  * seoPages.ts, kept out of the main translations on purpose (every page
- * downloads those, and this prose is read only here): English and Spanish,
- * other languages fall back to English. The numbers in its tables and examples
+ * downloads those, and this prose is read only here). In all nine languages:
+ * English and Spanish here, the rest in vaultGuideMore.ts. The numbers in its tables and examples
  * are worked out from the real formula (src/utils/vaultScore.ts), never typed
  * in, so they cannot drift from it. Keep it in step with docs/rankings-plan.md.
  */
@@ -184,9 +185,9 @@ const es: VaultGuideText = {
   ],
 }
 
-const GUIDE: { en: VaultGuideText } & Partial<Record<Lang, VaultGuideText>> = { en, es }
+const GUIDE: Record<Lang, VaultGuideText> = { en, es, de, fr, it, ja, pl, pt, ru }
 
-/** The guide in the viewer's language when it is written in it, otherwise English. */
+/** The guide in the viewer's language (English for anything unknown). */
 export function vaultGuideText(lang: Lang): VaultGuideText {
   return GUIDE[lang] ?? GUIDE.en
 }

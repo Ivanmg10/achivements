@@ -54,7 +54,17 @@ const FILL_TTL_MS = 24 * 60 * 60 * 1000
 export type FillState = 'reading' | 'done' | 'estimated' | 'error'
 /** private: the profile hides it; key: RA refused the key; busy: the platform asked us to slow down. */
 export type FillError = 'private' | 'key' | 'unavailable' | 'busy'
-export type FillPlatform = { read: number; total: number; state: FillState; error?: FillError }
+export type FillPlatform = {
+  read: number
+  total: number
+  state: FillState
+  error?: FillError
+  /**
+   * Games the platform would not answer for (Steam gives a 500 for some games with no
+   * achievements, measured 2026-10-20). They do not hold the fill up; the next refresh tries again.
+   */
+  skipped?: number
+}
 export type FillStatus = {
   /** Every platform read, or settled (estimated, or failed for a reason waiting will not fix). */
   complete: boolean
@@ -292,6 +302,7 @@ async function refreshSource(
   const pace = PACE[plan.source]
   const read = new Map<number, Write>()
   let next = 0
+  let skipped = 0
   let stopped = null as FillError | null
   const worker = async () => {
     while (next < todo.length && next < pace.perPass && !stopped && Date.now() < deadline) {
@@ -311,8 +322,14 @@ async function refreshSource(
         report({ ...progress })
       } catch (err) {
         console.error(`[scoreRefresh] ${plan.source} game`, userId, c.id, err)
-        // Asked to slow down: stop this platform for this pass rather than insist.
+        // Asked to slow down: stop this platform for this pass rather than insist. Anything
+        // else is this game alone: skip it, so one game cannot hold the whole fill up.
         if (classifyFailure(plan.source, err) === 'busy') stopped = 'busy'
+        else {
+          skipped++
+          progress.skipped = skipped
+          report({ ...progress })
+        }
       }
       if (pace.gapMs) await sleep(pace.gapMs)
     }
@@ -358,7 +375,10 @@ async function refreshSource(
     [userId, plan.source, JSON.stringify(kept.map((r, i) => ({ game_id: Number(r.game_id), f: factors[i] })))],
   )
 
-  const done = progress.read >= progress.total
+  // Every read failed: the platform is down, not a few odd games. Say so rather than call it done.
+  const readNow = read.size
+  if (skipped >= 4 && readNow === 0) return { ...progress, state: 'error', error: 'unavailable' }
+  const done = progress.read + skipped >= progress.total
   if (done) return { ...progress, state: 'done' }
   // Xbox's 150 calls an hour for the whole app: its gamerscore estimate is the settled state.
   if (plan.source === 'xbox' && !stopped) return { ...progress, state: 'estimated' }

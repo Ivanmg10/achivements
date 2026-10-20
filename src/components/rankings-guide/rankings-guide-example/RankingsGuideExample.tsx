@@ -25,8 +25,8 @@ export default function RankingsGuideExample({ text }: { text: VaultGuideText['e
       <p className="text-xs uppercase tracking-wider font-bold text-text-secondary">{text.aaa}</p>
       <ul className="flex flex-col gap-2.5">
         {rows.map((r, i) => (
-          <li key={r.label} className={`grid grid-cols-[minmax(0,11rem)_minmax(0,1fr)_4.5rem] items-center gap-3 text-sm ${i === 4 ? 'mt-2 pt-3 border-t border-ink/[0.07]' : ''}`}>
-            <span className="truncate">{r.label}</span>
+          <li key={r.label} className={`grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)_4.5rem] sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_4.5rem] items-center gap-3 text-sm ${i === 4 ? 'mt-2 pt-3 border-t border-ink/[0.07]' : ''}`}>
+            <span className="leading-tight">{r.label}</span>
             <span aria-hidden="true" className="h-2.5 rounded-full bg-ink/10 overflow-hidden">
               <span className={`block h-full rounded-full ${r.fill}`} style={{ width: `${(r.value / max) * 100}%` }} />
             </span>

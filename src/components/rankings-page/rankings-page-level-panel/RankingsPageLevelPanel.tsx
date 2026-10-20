@@ -6,6 +6,7 @@ import { useVaultFillState } from '@/context/VaultFillContext'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import VaultFillProgress from '@/components/vault-fill-progress/VaultFillProgress'
+import VaultWeeksChart from '@/components/vault-weeks-chart/VaultWeeksChart'
 import VaultPlatformSplit, { PLATFORM_FILL, PLATFORM_NAMES, PLATFORM_ORDER } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { levelProgress } from '@/utils/vaultLevel'
 
@@ -88,6 +89,7 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
               </div>
             ))}
           </dl>
+          {me.weeks?.length > 0 && <VaultWeeksChart weeks={me.weeks} />}
           {me.rank > 0 && (
             <p className="text-sm flex justify-between gap-2">
               <span className="text-text-secondary">{T.rankings.statRank}</span>

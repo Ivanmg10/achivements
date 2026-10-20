@@ -16,11 +16,19 @@ const GLOW: Record<number, string> = {
 /** The first three, on a podium: picture, name, level and points, with the place on each step. */
 export default function RankingsPagePodium({ rows, linked, approx = false }: { rows: RankRow[]; linked: boolean; approx?: boolean }) {
   const { T, lang } = useLanguage()
-  const order = [rows[1], rows[0], rows[2]].filter(Boolean)
+  // Second, first and third; a place nobody holds yet keeps its empty step, so first stays in the middle.
+  const order = [2, 1, 3].map((place) => ({ place, row: rows[place - 1] as RankRow | undefined }))
 
   return (
     <ol aria-label={T.rankings.title} className="grid grid-cols-3 gap-2 sm:gap-3 items-end">
-      {order.map((r) => (
+      {order.map(({ place, row: r }) =>
+        !r ? (
+          <li key={place} aria-hidden="true" className="flex flex-col items-center justify-end">
+            <span className={`w-full ${STEP[place]} rounded-t-xl bg-linear-to-b from-accent/15 to-transparent flex items-start justify-center pt-1.5 text-sm sm:text-base font-extrabold text-accent/50 tabular-nums`}>
+              {place}
+            </span>
+          </li>
+        ) : (
         <li
           key={r.username}
           className={`relative bg-bg-card rounded-2xl sm:rounded-3xl pt-4 sm:pt-5 px-2 sm:px-4 flex flex-col items-center gap-2 overflow-hidden ${r.isMe ? 'ring-2 ring-accent/50' : ''}`}
@@ -43,7 +51,8 @@ export default function RankingsPagePodium({ rows, linked, approx = false }: { r
             {r.rank}
           </span>
         </li>
-      ))}
+        ),
+      )}
     </ol>
   )
 }
