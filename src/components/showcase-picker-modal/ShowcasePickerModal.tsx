@@ -99,7 +99,7 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="bg-bg-main rounded-2xl w-full max-w-xl h-[85vh] flex flex-col overflow-hidden"
+            className="bg-bg-main rounded-2xl w-full max-w-xl lg:max-w-5xl h-[85vh] flex flex-col overflow-hidden"
             variants={modalContent}
             initial="hidden"
             animate="visible"

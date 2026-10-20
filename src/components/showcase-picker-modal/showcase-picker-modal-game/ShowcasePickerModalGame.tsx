@@ -32,7 +32,7 @@ export default function ShowcasePickerModalGame({
   return (
     <div className="overflow-y-auto overscroll-contain p-3 flex-1 flex flex-col gap-3">
       {isLoading ? (
-        <div aria-busy="true" className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+        <div aria-busy="true" className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
           {Array.from({ length: 8 }, (_, i) => (
             <div key={i} className="h-28 rounded-xl bg-bg-card animate-pulse motion-reduce:animate-none" />
           ))}
@@ -53,7 +53,7 @@ export default function ShowcasePickerModalGame({
           <p className="text-xs text-text-secondary tabular-nums">
             {T.showcase.earnedOf.replace('{n}', String(earned)).replace('{total}', String(choices.length))}
           </p>
-          <ul aria-label={T.showcase.achievementsLabel} className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          <ul aria-label={T.showcase.achievementsLabel} className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
             {choices.map((choice) => (
               <li key={choice.key}>
                 <ShowcasePickerModalAchievement
