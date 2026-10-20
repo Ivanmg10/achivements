@@ -592,7 +592,8 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   finished fill toasts "ready" (only a fill that was pending, never a routine refresh) and a
   platform that failed says why (private profile, refused key) and how to fix it.
 - **"How Vault Points work" (`/rankings/how`, public)** explains it to users. Its prose is in
-  `src/translations/vaultGuide.ts`, English and Spanish only like the public pages; every number
+  `src/translations/vaultGuide.ts` (+ `vaultGuideMore.ts`), in all nine languages but outside `T`
+  like the public pages (only this page loads it); every number
   on it (rarity and difficulty tables, examples, level thresholds) is computed from the formula
   and the examples are the same ones the balance tests use (`src/utils/vaultExamples.ts`). If the
   formula changes, reread its prose.

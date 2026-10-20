@@ -25,6 +25,23 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Fill stuck at 99 %, a history chart, the guide in nine languages (`feat/social-rankings`)
+
+**Did** — The user's fill stayed at "Calculating 99 %": Steam answers HTTP 500 every time for two
+games with no achievements (Pavlov VR, Lethal Company; checked live), so they were re-read each
+pass and the fill never ended. A game that fails on its own is now *skipped* (`FillPlatform.skipped`;
+it does not hold the fill up and is retried at the next refresh); if every read of a platform
+fails, it is `unavailable`, not done. The per-platform progress was redrawn as small cards (four
+in a row on the account page) instead of bars across the whole card; platform cards say how many
+games counted and how many were skipped. Added the weekly history (`weeks` in
+`/api/rankings/me`, `VaultWeeksChart`, plain SVG) to the rankings' level panel. "How Vault Points
+work" now in all nine languages (`vaultGuideMore.ts`). The podium keeps first in the middle when
+fewer than three people rank. Checked in the browser with the real account: guide, rankings,
+account page, header level.
+**Decisions** — No fake users in production: `/rankings` is public, so they would show to
+everyone (and in search, Following, profiles). Proposed instead: a Neon branch for a test copy.
+**Open** — Testing with many users needs that separate database.
+
 ## 2026-10-20 — Points at once when a platform is linked, and a guide (`feat/social-rankings`)
 
 **Did** — The fill of a new account no longer waits for heartbeats: `onPlatformLinked` (in the
