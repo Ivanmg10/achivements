@@ -79,8 +79,6 @@ export default function LibraryGameDetail({
   const loading = state === 'loading'
   const reduce = useReducedMotion()
 
-  const unlocks = useMemo(() => items.map((a) => ({ DateEarned: a.earnedAt, DateEarnedHardcore: null })), [items])
-
   const computed = useMemo<DetailFact[]>(() => {
     const out: DetailFact[] = []
     const left = items.filter((a) => !a.earned).length
@@ -195,7 +193,7 @@ export default function LibraryGameDetail({
               {category === 'wantToPlay' ? (
                 <LibraryDetailDifficulty items={items} isLoading={loading} />
               ) : (
-                <GameAchievementsProgressChart achievements={unlocks} isLoading={loading} />
+                <GameAchievementsProgressChart achievements={items} isLoading={loading} />
               )}
             </motion.div>
             <motion.div variants={PANEL_IN} className={PANEL}>{side}</motion.div>

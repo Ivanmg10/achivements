@@ -9,11 +9,25 @@ import type { groupGameAchievementsByPeriod } from '@/utils/utils'
  * (the heaviest thing on the page) is only downloaded when a card with unlocks
  * to draw is opened — see GameAchievementsProgressChart.
  */
-export default function GameAchievementsProgressPlot({ data }: { data: ReturnType<typeof groupGameAchievementsByPeriod> }) {
+export default function GameAchievementsProgressPlot({
+  data,
+  onSelect,
+}: {
+  data: ReturnType<typeof groupGameAchievementsByPeriod>
+  /** A point was clicked: the label of its week or month. */
+  onSelect: (label: string) => void
+}) {
   const { T } = useLanguage()
   return (
     <ResponsiveContainer width="100%" height={208}>
-      <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+      <LineChart
+        data={data}
+        margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+        onClick={/* istanbul ignore next */ (p: { activeLabel?: string | number } | null) => {
+          if (typeof p?.activeLabel === 'string') onSelect(p.activeLabel)
+        }}
+        style={{ cursor: 'pointer' }}
+      >
         <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--bg-header))" />
         <XAxis dataKey="label" tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 11 }} />
         <YAxis tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 11 }} allowDecimals={false} width={28} />

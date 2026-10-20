@@ -18,8 +18,8 @@ import { filterGroupItems, groupSummary, itemKey, liveProgressMap, raProgressMap
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
 // Downloaded the first time it is opened, not with the page.
-const GroupModal = dynamic(() => import('@/components/groups/GroupModal'))
-const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'))
+const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
+const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'), { loading: () => null })
 import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
 import GroupDetailHeader from '@/components/groups/group-detail-header/GroupDetailHeader'
 import GroupFilters from '@/components/groups/group-filters/GroupFilters'

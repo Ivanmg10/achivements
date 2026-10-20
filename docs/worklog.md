@@ -268,6 +268,98 @@ not started: only the place they open from.
 roadmap: ask the user first. "1 grupos públicos" (no singular form). `GET /api/follows` has no
 client left (POST/DELETE still used by `useFollow`); kept with its tests, can go.
 
+## 2026-10-20 — Following, presence and showcase moved out (`improvements_11`)
+
+**Did** — The Following restyle, presence ("online" / "last seen") and the achievement
+showcase now live in `feat/social-rankings`, with their own PR, where the rankings will be
+built. This branch keeps the progress chart periods, the 404/error screens, the lazy modal
+suspense fix and the PSN-only header. One commit takes the social work back out, so the branch
+did not need a force-push; its tree is the same as these four commits cherry-picked on
+`develop` (tested: jest, lint, build).
+**Watch out** — `migrations/038` and `039` are already applied to the shared database; this
+branch no longer uses them, which is harmless. Their notes in CLAUDE.md are in the other branch.
+
+## 2026-10-20 — Header for PSN-only accounts (`improvements_11`)
+
+**Did** — `MainHeader` decided "has a platform" from RA or Steam only, so an account with only
+PSN (or only Xbox, for an admin) got a bar with no search, no Library, Groups or Following.
+It now counts PSN, and Xbox when `canUseXbox`. Tests for both.
+**Watch out** — A new platform must be added to that check, or its users lose the bar.
+
+## 2026-10-18 — New 404 and error screens (`improvements_11`)
+
+**Did** — Three screens, sharing `StatusBadge` (an achievement tile with a corner badge and a
+slow glow), `STATUS_BUTTON` and `useRise` (the landing hero's entrance) / `useGoBack` (back,
+or home in a tab with no history):
+- **404** (`NotFoundScreen`): a hidden achievement nobody has unlocked — "?" with a lock,
+  "Hidden achievement · 404", "Explorer of the unknown", a card at 0 / 1 with 0.00 %
+  rarity (`NotFoundProgress`), home and back. The root `not-found.tsx` shows it full screen.
+- **404 inside the app** (`src/app/(main)/not-found.tsx`, new): a `notFound()` under `(main)`
+  now keeps the header. On `/psnGame|steamGame|xboxGame/…` (`gameSourceFromPath`) it shows
+  `NotFoundGame` (empty cover with the platform logo, "We could not find this game", library
+  and back); elsewhere (e.g. `/foo`, caught by `[category]/layout`) the hidden achievement.
+- **Errors** (`RouteError`, now also rendered by `global-error`): the 404's twin in red, an
+  unlock cut short — alert tile with a retry badge, a card with the bar stopped at 62 % in the
+  theme's colour and the `error.digest` with a copy button (`RouteErrorCard`), retry and home.
+`T.errorBoundary` and `T.notFound` gained their keys in all 9 languages.
+**Why** — The user wanted better 404 and error screens. Five variants were mocked up as an
+artifact, then three error variants; they picked "hidden achievement" (404), "unlock
+interrupted" (errors) and the in-app 404 with context.
+**Decisions** — The game 404 says "could not find" rather than "not in your library": Steam
+404s only on a malformed id (a game not owned still opens). An Xbox game URL gives a
+non-admin the plain 404, with no word of Xbox. The second action is back, not search: the
+search modal is local state of the header. Only the digest is shown, never the error message.
+**Checked in the browser** (dev server, signed in and in a fresh signed-out context, desktop
+and 390 px; temporary throwing pages, since deleted) and fixed what it showed:
+- Retry used `reset()`, which never re-asks the server: a server error could not recover.
+  Now `retry()` (Next 16.3, `error.tsx` props `{ error, retry }`); clicking it fetches anew.
+- The screens sat at the top: the layout's `<main>` is a block, so `flex-1` did nothing.
+  They now take `min-h-[calc(100dvh-7rem)]` (`STATUS_SCREEN`), measured header + footer.
+- Two `<main>` landmarks (the layout's and the screen's): inside the app they are a `<div>`.
+  `role="alert"` moved from the root to the message block (on a `<main>` it hid the landmark).
+- Signed out, Next renders `(main)/not-found` too, with no layout: the screen was short and
+  `<html>`'s darker background showed below. `(main)/not-found` is now a server component
+  that reads the session (signed out → full screen); the client part is `NotFoundInApp`.
+  The root layout's `<body>` got `min-h-screen`, so no short page shows that band.
+- `/a/b/c` got the root 404, without header: `[category]/[consoleId]/[...missing]/page.tsx`
+  now calls `notFound()`, so every unknown URL lands in `(main)/not-found` (checked: /a/b/c,
+  /playing/3/x, /groups/x/y with header; /playing/3 still works).
+- `global-error` (seen by making the root providers throw, since reverted) used the system
+  font: it replaces the root layout and lost Inter's class. The font is now `src/lib/fonts.ts`,
+  set by both.
+**Decisions** — Not fixed, on purpose: game 404s (and /playing/3/x) answer HTTP 200 because
+those routes stream (`loading.tsx`) and call `notFound()` on the client after the library
+loads; a real 404 would need the library on the server before rendering (PSN/Xbox calls per
+visit) or dropping the skeletons, for private pages no crawler sees. React's dev-only warning
+"Encountered a script tag" on 404 pages comes from the theme script in the root layout (a 404
+document is rendered on the client in dev); moving it to `next/script` risks a theme flash on
+every page, for a warning production never shows.
+**Watch out** — `global-error` is always dark (violet): it has no theme provider.
+
+## 2026-10-18 — Clicking the "Achievements unlocked" chart lists that period (`improvements_11`)
+
+**Did** — Clicking a point of a game's weekly/monthly chart (`GameAchievementsProgressChart`,
+in every opened Recently played card and the library's opened cards) opens
+`GameAchievementsProgressChartModal`: what was unlocked that week or month, newest first,
+each a link to the achievement (rows from `LibraryDetailList`). The chart now takes
+`InsightAchievement[]` (`fromRa`/`fromSteam`/`fromPsn`/`fromXbox`) instead of bare dates, and
+`groupGameAchievementsByPeriod` returns each bucket's items and start.
+**Why** — The user asked for it (the branch is for more improvements to come).
+**Decisions** — The modal is lazy (`next/dynamic` + `LazyWhenOpened`) and portalled to
+`<body>`, since the opened card animates. A point with no unlocks opens nothing.
+**Watch out** — The buckets were labelled with `toISOString()` of a local midnight: east of
+UTC the monthly view's last bucket was the previous month, and this month's unlocks fell in
+no bucket. They are now local (`localDay`). Collection trophies are keyed `gameId:trophyId`
+in the chart, since ids repeat across its games. The `fromX` links do not carry the profile
+being viewed (`useSubject`), as in the library; on someone else's page they open the game
+for the viewer.
+**Fixed after** — The first click flashed the whole screen: a `next/dynamic` with no
+`loading` has no Suspense boundary of its own, so downloading the modal suspended the home
+page up to its `loading.tsx`. Every lazy modal (header, groups, pins, account page, login)
+now passes `{ loading: () => null }`; the rule is in CLAUDE.md, "Performance rules".
+
+---
+
 ## 2026-10-17 — Recently played skeleton fills its card (`fix/recent-skeleton`)
 
 **Did** — The loading rows of "Recently played" (`RARecentlyPlayed`) sit in a

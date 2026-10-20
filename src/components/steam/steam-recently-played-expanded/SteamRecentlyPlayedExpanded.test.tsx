@@ -12,11 +12,12 @@ jest.mock('@/components/ui/CircularProgress', () => ({
   ),
 }))
 jest.mock('@/components/game-achievements-progress-chart/GameAchievementsProgressChart', () => ({
-  GameAchievementsProgressChart: ({ achievements, isLoading }: { achievements: { DateEarned: string | null }[]; isLoading: boolean }) => (
-    <div data-testid="chart">{isLoading ? 'loading' : achievements.map((a) => a.DateEarned ?? '-').join(',')}</div>
+  GameAchievementsProgressChart: ({ achievements, isLoading }: { achievements: { earnedAt: string | null }[]; isLoading: boolean }) => (
+    <div data-testid="chart">{isLoading ? 'loading' : achievements.map((a) => a.earnedAt ?? '-').join(',')}</div>
   ),
 }))
 jest.mock('@/components/steam/steam-achievement-grid/SteamAchievementGrid', () => ({
+  achievementAnchor: (apiname: string) => `ach-${apiname}`,
   SteamAchievementGrid: ({ achievements, badgeSize }: { achievements: unknown[]; badgeSize: number }) => (
     <div data-testid="grid">{achievements.length}:{badgeSize}</div>
   ),
