@@ -222,7 +222,8 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
   a stricter reading of private profiles and refused keys on every platform. On
   `improvements_10`: `migrations/037_pinned_achievements_position.sql` (order of
   pinned achievements), applied 2026-10-17; any other database needs it before that
-  code runs, or every pins read answers 500. On `improvements_11`:
+  code runs, or every pins read answers 500. On `feat/social-rankings` (split out of
+  `improvements_11` on 2026-10-20):
   `migrations/038_user_presence.sql` (presence), applied 2026-10-19; same warning,
   but worse: without it every signed-in request fails (see Presence). And
   `migrations/039_showcase_achievements.sql` (the achievement showcase), applied
@@ -782,6 +783,11 @@ branch to be up to date with its base** before merging, on both.
       asked for. **Open:** a viewer with no RA account is served with the page
       owner's key (see RetroAchievements above); ask RA whether that counts, and
       if not, ask the viewer to link their own. Revisit when OAuth lands.
+- [ ] **Vault Points, levels and rankings** (designed 2026-10-20, on `feat/social-rankings`):
+      one score worth the same on every platform, and a rankings page (Following and global;
+      all-time, month, week; public without a session). Plan, formula and decisions:
+      `docs/rankings-plan.md`. **Open: how Steam/PSN/Xbox ownership is verified** before
+      their points count in the global ranking (analysis in that file); ask the user.
 - [x] **Online status and "last seen"** on the Following cards (2026-10-19). See
       Presence above. The user said it will grow beyond the card: ask what next
       before extending it (proposed: Steam's "playing now" for everyone in one

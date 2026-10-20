@@ -25,6 +25,27 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Branch split, rankings designed (`feat/social-rankings`)
+
+**Did** — `improvements_11` held two unrelated sets of work. The social one (Following
+restyle, presence, achievement showcase: 7 commits) was cherry-picked onto `develop` as
+`feat/social-rankings`; `improvements_11` was rebuilt on `develop` with the rest (progress
+chart periods, 404/error screens, lazy modal suspense, PSN-only header) and force-pushed. The
+code of every commit is byte-for-byte the original; only worklog, version and conflicts in
+shared files were re-resolved. Added `docs/rankings-plan.md`: the Vault Points formula,
+levels, the user's decisions and the verification analysis.
+**Why** — The user wanted the friends/online work in its own PR, where the rankings will be
+built too.
+**Decisions** — The showcase went with the social branch: it changes `FollowingCard`, the
+follows overview and the friends card, all on top of the Following and presence commits, and it
+is what friends see. Older worklog entries keep saying `improvements_11`; read them as this
+branch for Following, presence and the showcase.
+**Open** — How ownership is verified (the user is weighing a return to sign-in per platform;
+see the plan). Rankings not started.
+**Watch out** — Both branches bumped the version from 1.5.18, so whichever merges second
+conflicts on `version.ts`/`package.json`: keep the higher. A local backup of the old branch is
+`backup/improvements_11-pre-split` (not pushed).
+
 ## 2026-10-20 — Showcase picker by game, multi-select (`improvements_11`)
 
 **Did** — `ShowcasePickerModal` rebuilt as two views: the user's games with an achievement
