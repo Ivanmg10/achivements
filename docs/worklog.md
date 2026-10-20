@@ -25,6 +25,29 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Demo personas with full profiles (`chore/demo-personas`)
+
+**Did** — The 45 `demo_*` users are now 30 hand-written personas (`scripts/demo-personas.mjs`:
+name, country, bio, theme, gender, hours they play, weekends only, presence, showcase size, the
+games they play and how far). `scripts/demo-rankings.mjs` builds their Steam and PSN libraries,
+recent unlocks, year feeds, each game's list and the PSN summary, and writes them into pre's
+`steam_cache` under their made-up accounts, never expiring; their Vault Points, weeks and
+showcase come from the same lists through the real formula (`vaultScore.ts`, imported by Node).
+Checked on localhost: spex_guy (Steam, 41-day streak, showcase, completed shelf), ratman (PSN,
+platinums, hours, Spanish trophies), a PSN and a Steam game page, the rankings.
+**Why** — The user wanted to review public profiles with data and the demo users to have personality.
+**Decisions** — No "demo mode" in app code: the app reads its cache as for anyone. Games are
+real ones whose definitions pre already had cached for real users (15 Steam, 27 PSN), so names,
+badges and rarity are real; only who earned what and when is invented. No RA (the dev server
+skips RA's DB cache; a made-up RA name may be a real person). PSN trophy lists in English and
+Spanish only (a copy per language; 12 MB in all). Online personas have `last_seen_at` in 2100.
+Monday's ranks are computed among real users too, so the arrows are right.
+**Open** — Check dev.cheevovault.com once merged (same database, so it should already show them).
+**Watch out** — "Ver en PSN" links to a PSN profile by the persona's name, which may be someone
+real. If pre loses the cached games (reset from production, an unlink of the user's accounts),
+re-seeding warns and leaves those games out. Steam game pages refetch the global schema from
+Steam when it has expired (slow first load, then cached).
+
 ## 2026-10-20 — Demo users on the preview database (`feat/social-rankings`)
 
 **Did** — The user created the Neon branch and set `PREVIEW_DATABASE_URL`; checked that local

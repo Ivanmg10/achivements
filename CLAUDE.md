@@ -831,11 +831,17 @@ branch to be up to date with its base** before merging, on both.
   copies production again, losing what pre had); it is a copy of real data, so treat it like
   production. **Until the variable is set somewhere, that place still uses production**: check
   before running anything destructive.
-- **Demo users** for the rankings: `node scripts/demo-rankings.mjs seed [n] --follower=<username>`
-  (and `clear`). It writes only to `PREVIEW_DATABASE_URL` and refuses when that is missing or the
-  same host as `DATABASE_URL`. Never point it at production: `/rankings` is public. Seeded
-  2026-10-20 with 45 (`demo_*` plus five named ones the user chose; no sign-in, kept out of the
-  score refresh). Demo users are found by their password mark (`MARK`), never by name.
+- **Demo users** for the rankings and public profiles: `node scripts/demo-rankings.mjs seed
+  --follower=<username>` (and `clear`). It writes only to `PREVIEW_DATABASE_URL` and refuses when
+  that is missing or the same host as `DATABASE_URL`. Never point it at production: `/rankings` is
+  public. 30 hand-written personas (`scripts/demo-personas.mjs`, 2026-10-20; the five names the
+  user chose stay): no sign-in, kept out of the score refresh, found by their password mark
+  (`MARK`), never by name. Their Steam/PSN accounts are made up, so their profiles work by
+  **seeding `steam_cache`** under those accounts (never expiring) with real games' definitions
+  taken from what pre already has cached for real users; points come from the real formula. If
+  pre loses those cached games (a reset from production, an unlink), games drop out of the seed
+  (it warns). No RA (the dev server does not read RA's DB cache; a made-up RA name may be real).
+  PSN trophy lists only in English and Spanish.
 - Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
 
 ## Style
