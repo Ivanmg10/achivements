@@ -42,7 +42,7 @@ export default function FollowingPage() {
 
   return (
     <div className="flex flex-col items-center py-6 px-4">
-      <div className="w-full max-w-6xl flex flex-col gap-4">
+      <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <FollowingHero users={users} className="lg:col-span-2" />
           <FollowingRankingsTeaser />
@@ -67,7 +67,7 @@ export default function FollowingPage() {
             {shown.length === 0 ? (
               <p role="status" className="bg-bg-card rounded-2xl py-10 text-center text-sm text-text-secondary">{T.following.noMatches}</p>
             ) : (
-              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[1800px]:grid-cols-5 gap-3">
                 {shown.map((u) => (
                   <li key={u.username} className="flex flex-col">
                     <FollowingCard friend={u} lastPlayed={details[u.username]?.lastPlayed} recent={details[u.username]?.recent} />
