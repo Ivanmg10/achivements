@@ -573,12 +573,16 @@ Two different things; do not mix them up again.
 - **Achievements to get** ("Logros por conseguir", the old "Logros fijados"): the user's
   own goals, `pinned_achievements`, `/api/favorites`. **Private**: GET ignores `?user=`,
   and nothing shows them to anyone else. Do not add a place that does.
-- Managed in the Pinned section (showcase block on top, `MainPagePinnedSectionShowcase`,
-  with the "+" picker of the year's unlocks, `ShowcasePickerModal`); added from any earned
+- Managed in the Pinned section (showcase block on top, `MainPagePinnedSectionShowcase`).
+  Its "+" opens `ShowcasePickerModal`: the user's games with something earned
+  (`useProfileLibrary`, those with an unlock this year first), then a game's achievements
+  (`useShowcaseGameChoices`, through the routes its game page uses; earned first, the rest
+  greyed, hidden unearned ones concealed), with a way back; the selection spans games and
+  goes in at once (`addMany`), never more than fits. Also added from any earned
   achievement through `ShowcaseToggleButton` in `AchievementModal` (RA) and
   `AchievementDetailModal` (Steam, PSN, Xbox). One shared state: `ShowcaseProvider`.
-- Unlocks carry `Key` (the platform's own id) so the picker can tell them apart; RA uses
-  `AchievementID`.
+- Unlocks carry `Key` (the platform's own id), so an unlock maps to a showcase entry
+  (`showcaseFromUnlock`); RA uses `AchievementID`.
 
 ## Preferences that follow the account
 

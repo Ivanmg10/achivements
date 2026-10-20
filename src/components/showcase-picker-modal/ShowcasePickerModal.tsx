@@ -2,36 +2,45 @@
 
 import { useEffect, useId, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { IconSearch, IconX } from '@tabler/icons-react'
+import { IconArrowLeft, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useActivityHeatmapYear } from '@/context/ActivityHeatmapYearContext'
 import { useOwnShowcase } from '@/context/ShowcaseContext'
+import { useProfileLibrary } from '@/hooks/useProfileLibrary'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { modalContent, modalOverlay } from '@/lib/animations'
-import { normalizeTitle } from '@/utils/gameCandidates'
-import { showcaseFromUnlock, showcaseKey, type ShowcaseEntry } from '@/utils/showcase'
-import ShowcasePickerModalRow from './showcase-picker-modal-row/ShowcasePickerModalRow'
-
-/** ponytail: a long year renders this many at most; the search narrows it. */
-const SHOWN_MAX = 120
+import { gameKey } from '@/utils/gameRef'
+import type { LibraryGame } from '@/utils/library'
+import { SHOWCASE_MAX, showcaseKey, type ShowcaseEntry } from '@/utils/showcase'
+import ShowcasePickerModalGames from './showcase-picker-modal-games/ShowcasePickerModalGames'
+import ShowcasePickerModalGame from './showcase-picker-modal-game/ShowcasePickerModalGame'
 
 /**
- * Picks achievements for the showcase from what the user earned in the last
- * year, on every platform (the same unlocks behind the streak): newest first,
- * searchable by name or game. It stays open, so several can go in at once.
- * Older ones are added from their game page.
+ * Picks achievements for the showcase: first the user's games with something
+ * earned (those played this year first), then a game's achievements, earned
+ * ones selectable and the rest greyed, with a way back to the games. The
+ * selection spans games — games holding selected achievements stand out — and
+ * goes into the showcase all at once, never more than fits.
  */
 export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { T } = useLanguage()
-  const { achievements } = useActivityHeatmapYear()
   const showcase = useOwnShowcase()
+  const { games, isLoading } = useProfileLibrary()
+  const { achievements: year } = useActivityHeatmapYear()
+  const [game, setGame] = useState<LibraryGame | null>(null)
   const [query, setQuery] = useState('')
+  const [selected, setSelected] = useState<ShowcaseEntry[]>([])
+  const [saving, setSaving] = useState(false)
   const titleId = useId()
-  const searchId = useId()
 
   // Opening starts it over; state, so while rendering.
   useWhenChanged([isOpen], () => {
-    if (isOpen) setQuery('')
+    if (isOpen) {
+      setGame(null)
+      setQuery('')
+      setSelected([])
+      setSaving(false)
+    }
   })
 
   useEffect(() => {
@@ -43,23 +52,37 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
     return () => document.removeEventListener('keydown', onKey)
   }, [isOpen, onClose])
 
-  const entries = useMemo(() => {
-    const seen = new Set<string>()
-    return achievements
-      .map(showcaseFromUnlock)
-      .filter((e): e is ShowcaseEntry => {
-        if (!e || seen.has(showcaseKey(e))) return false
-        seen.add(showcaseKey(e))
-        return true
-      })
-      .sort((a, b) => b.earnedAt.localeCompare(a.earnedAt))
-  }, [achievements])
+  // Games with something earned; the ones with an unlock this year first, latest first, then by name.
+  const withEarned = useMemo(() => {
+    const latest = new Map<string, string>()
+    for (const a of year) {
+      const k = gameKey(a.Source ?? 'ra', a.GameID)
+      if ((latest.get(k) ?? '') < a.Date) latest.set(k, a.Date)
+    }
+    return games
+      .filter((g) => g.pct > 0)
+      .sort((a, b) => (latest.get(b.key) ?? '').localeCompare(latest.get(a.key) ?? '') || a.title.localeCompare(b.title))
+  }, [games, year])
 
-  const shown = useMemo(() => {
-    const q = normalizeTitle(query.trim())
-    const matches = q ? entries.filter((e) => normalizeTitle(e.title).includes(q) || normalizeTitle(e.gameTitle).includes(q)) : entries
-    return matches.slice(0, SHOWN_MAX)
-  }, [entries, query])
+  const free = Math.max(0, SHOWCASE_MAX - (showcase?.items.length ?? 0))
+  const keys = useMemo(() => new Set(selected.map(showcaseKey)), [selected])
+  const perGame = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const e of selected) counts.set(gameKey(e.source, e.gameId), (counts.get(gameKey(e.source, e.gameId)) ?? 0) + 1)
+    return counts
+  }, [selected])
+
+  function toggle(entry: ShowcaseEntry) {
+    const k = showcaseKey(entry)
+    setSelected((prev) => (prev.some((e) => showcaseKey(e) === k) ? prev.filter((e) => showcaseKey(e) !== k) : prev.length < free ? [...prev, entry] : prev))
+  }
+
+  async function save() {
+    if (!showcase || selected.length === 0) return
+    setSaving(true)
+    await showcase.addMany(selected)
+    onClose()
+  }
 
   return (
     <AnimatePresence>
@@ -76,7 +99,7 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="bg-bg-main rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden"
+            className="bg-bg-main rounded-2xl w-full max-w-xl h-[85vh] flex flex-col overflow-hidden"
             variants={modalContent}
             initial="hidden"
             animate="visible"
@@ -85,10 +108,18 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
           >
             <div className="flex items-start justify-between gap-3 p-5 border-b border-bg-header">
               <div className="flex flex-col gap-1 min-w-0">
-                <h2 id={titleId} className="text-lg font-semibold">{T.showcase.pickerTitle}</h2>
-                <p className="text-xs text-text-secondary">
-                  {T.showcase.count.replace('{n}', String(showcase.items.length))} · {T.showcase.pickerHint}
-                </p>
+                {game && (
+                  <button
+                    type="button"
+                    onClick={() => setGame(null)}
+                    className="self-start flex items-center gap-1 text-xs text-text-secondary hover:text-text-main rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  >
+                    <IconArrowLeft size={14} aria-hidden="true" />
+                    {T.showcase.back}
+                  </button>
+                )}
+                <h2 id={titleId} className="text-lg font-semibold truncate">{game ? game.title : T.showcase.pickerTitle}</h2>
+                {!game && <p className="text-xs text-text-secondary">{T.showcase.pickerHint}</p>}
               </div>
               <button
                 type="button"
@@ -100,41 +131,38 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
               </button>
             </div>
 
-            <div className="p-3 border-b border-bg-header">
-              <label htmlFor={searchId} className="sr-only">{T.showcase.pickerSearch}</label>
-              <div className="relative">
-                <IconSearch size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
-                <input
-                  id={searchId}
-                  type="search"
-                  autoFocus
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={T.showcase.pickerSearch}
-                  className="w-full bg-bg-card rounded-xl pl-9 pr-3 py-2 text-sm placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-                />
-              </div>
-            </div>
+            {game ? (
+              <ShowcasePickerModalGame
+                game={game}
+                isSelected={(e) => keys.has(showcaseKey(e))}
+                inShowcase={(e) => showcase.has(e)}
+                blocked={selected.length >= free}
+                onToggle={toggle}
+              />
+            ) : (
+              <ShowcasePickerModalGames
+                games={withEarned}
+                isLoading={isLoading}
+                query={query}
+                onQuery={setQuery}
+                selectedIn={(k) => perGame.get(k) ?? 0}
+                onOpen={setGame}
+              />
+            )}
 
-            <div className="overflow-y-auto overscroll-contain p-2">
-              {entries.length === 0 ? (
-                <p className="py-10 text-center text-sm text-text-secondary">{T.showcase.pickerNone}</p>
-              ) : shown.length === 0 ? (
-                <p role="status" className="py-10 text-center text-sm text-text-secondary">{T.showcase.pickerNoMatch}</p>
-              ) : (
-                <ul className="flex flex-col gap-0.5">
-                  {shown.map((entry) => (
-                    <li key={showcaseKey(entry)}>
-                      <ShowcasePickerModalRow
-                        entry={entry}
-                        inShowcase={showcase.has(entry)}
-                        disabled={showcase.full}
-                        onPick={() => showcase.add(entry)}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              )}
+            <div className="flex items-center justify-between gap-3 p-4 border-t border-bg-header">
+              <p role="status" className="text-xs text-text-secondary tabular-nums">
+                {T.showcase.selected.replace('{n}', String(selected.length))} ·{' '}
+                {free - selected.length > 0 ? T.showcase.slotsLeft.replace('{n}', String(free - selected.length)) : T.showcase.noSlots}
+              </p>
+              <button
+                type="button"
+                onClick={save}
+                disabled={selected.length === 0 || saving}
+                className="shrink-0 px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 disabled:opacity-40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              >
+                {T.showcase.addSelected}
+              </button>
             </div>
           </motion.div>
         </motion.div>

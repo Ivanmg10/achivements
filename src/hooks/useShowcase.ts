@@ -61,38 +61,52 @@ export function useShowcase() {
 
   const has = useCallback((e: Pick<ShowcaseEntry, 'source' | 'gameId' | 'achievementKey'>) => items.some((i) => showcaseKey(i) === showcaseKey(e)), [items])
 
-  const add = useCallback(
-    async (entry: ShowcaseEntry) => {
-      if (items.some((i) => showcaseKey(i) === showcaseKey(entry))) return
+  /**
+   * Adds several at once (the picker's selection), in the order given and only as
+   * many as fit; each is saved in turn, and one message says how it went.
+   */
+  const addMany = useCallback(
+    async (entries: ShowcaseEntry[]) => {
+      const fresh = entries.filter((e, i) => !items.some((it) => showcaseKey(it) === showcaseKey(e)) && entries.findIndex((x) => showcaseKey(x) === showcaseKey(e)) === i)
+      if (fresh.length === 0) return
       if (items.length >= SHOWCASE_MAX) {
         notify.error(T.toast.showcaseFull)
         return
       }
-      const temp: ShowcaseItem = { ...entry, id: tempId.current-- }
-      setItems((prev) => [...prev, temp])
-      try {
-        const res = await fetch('/api/showcase', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(entry),
-        })
-        if (res.status === 409) {
-          setItems((prev) => prev.filter((i) => i.id !== temp.id))
-          notify.error(T.toast.showcaseFull)
-          return
+      const temps: ShowcaseItem[] = fresh.slice(0, SHOWCASE_MAX - items.length).map((e) => ({ ...e, id: tempId.current-- }))
+      setItems((prev) => [...prev, ...temps])
+      let full = false
+      let failed = false
+      for (const temp of temps) {
+        const { id: tempKey, ...entry } = temp
+        try {
+          const res = await fetch('/api/showcase', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(entry),
+          })
+          if (res.status === 409) {
+            full = true
+            setItems((prev) => prev.filter((i) => i.id !== tempKey))
+            continue
+          }
+          if (!res.ok) throw new Error(`Failed to add to the showcase (${res.status})`)
+          const saved = (await res.json()) as ShowcaseItem
+          setItems((prev) => prev.map((i) => (i.id === tempKey ? saved : i)))
+        } catch (err) {
+          console.error('[useShowcase] add', err)
+          failed = true
+          setItems((prev) => prev.filter((i) => i.id !== tempKey))
         }
-        if (!res.ok) throw new Error(`Failed to add to the showcase (${res.status})`)
-        const saved = (await res.json()) as ShowcaseItem
-        setItems((prev) => prev.map((i) => (i.id === temp.id ? saved : i)))
-        notify.success(T.toast.showcaseUpdated)
-      } catch (err) {
-        console.error('[useShowcase] add', err)
-        setItems((prev) => prev.filter((i) => i.id !== temp.id))
-        notify.error(T.toast.showcaseFailed)
       }
+      if (full) notify.error(T.toast.showcaseFull)
+      else if (failed) notify.error(T.toast.showcaseFailed)
+      else notify.success(T.toast.showcaseUpdated)
     },
     [items, T],
   )
+
+  const add = useCallback((entry: ShowcaseEntry) => addMany([entry]), [addMany])
 
   const remove = useCallback(
     async (item: ShowcaseItem) => {
@@ -132,5 +146,5 @@ export function useShowcase() {
   )
 
   const answered = loadedKey === reloadKey
-  return { items, isLoading: !answered, error: answered && failed, retry, has, add, remove, reorder, full: items.length >= SHOWCASE_MAX }
+  return { items, isLoading: !answered, error: answered && failed, retry, has, add, addMany, remove, reorder, full: items.length >= SHOWCASE_MAX }
 }

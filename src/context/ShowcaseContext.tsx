@@ -15,10 +15,10 @@ const Ctx = createContext<Showcase | null>(null)
  */
 export function ShowcaseProvider({ children }: { children: ReactNode }) {
   const showcase = useShowcase()
-  const { items, isLoading, error, retry, has, add, remove, reorder, full } = showcase
+  const { items, isLoading, error, retry, has, add, addMany, remove, reorder, full } = showcase
   const value = useMemo(
-    () => ({ items, isLoading, error, retry, has, add, remove, reorder, full }),
-    [items, isLoading, error, retry, has, add, remove, reorder, full],
+    () => ({ items, isLoading, error, retry, has, add, addMany, remove, reorder, full }),
+    [items, isLoading, error, retry, has, add, addMany, remove, reorder, full],
   )
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

@@ -25,6 +25,21 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Showcase picker by game, multi-select (`improvements_11`)
+
+**Did** — `ShowcasePickerModal` rebuilt as two views: the user's games with an achievement
+earned (`useProfileLibrary`, played this year first, searchable), then one game's
+achievements (`useShowcaseGameChoices` → RA `getGameProgression`, Steam `achievements`, PSN
+`trophies`, Xbox `achievements`, mapped by `showcaseChoices`: earned first, newest first; the
+rest greyed with a lock; hidden unearned ones concealed), with "back to the games". The
+selection spans games: a game holding selected achievements gets a ring and "n selected";
+selected achievements a ring and a tick; the footer says how many fit and adds them all at
+once (`useShowcase.addMany`, one message). The old one-list row is gone.
+**Why** — The user wanted to browse by game, see what is left, and pick from several games in
+one go.
+**Checked** — with the real account, nothing added: games list, a selection in one game and
+its badge back in the list; RA, PSN, Steam and Xbox games all load.
+
 ## 2026-10-20 — Achievement showcase, and "achievements to get" (`improvements_11`)
 
 **Did** — Split what used to be "pinned achievements" in two (rules in CLAUDE.md → Achievement

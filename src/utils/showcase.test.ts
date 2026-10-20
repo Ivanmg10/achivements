@@ -1,4 +1,4 @@
-import { parseShowcaseEntry, raShowcaseEntry, showcaseFromUnlock, showcaseKey } from './showcase'
+import { parseShowcaseEntry, raShowcaseEntry, showcaseChoices, showcaseFromUnlock, showcaseKey } from './showcase'
 import type { RecentAchievement } from '@/types/types'
 
 const NOW = Date.parse('2026-10-20T12:00:00Z')
@@ -49,4 +49,17 @@ test('an RA achievement is an entry only once earned, hardcore date first', () =
   expect(raShowcaseEntry(a, 3, 'Zelda')).toMatchObject({ source: 'ra', gameId: 3, achievementKey: '7', badge: 'https://media.retroachievements.org/Badge/9.png' })
   expect(raShowcaseEntry(a, 3, 'Zelda')!.earnedAt.slice(0, 10)).toBe('2026-10-02')
   expect(raShowcaseEntry({ ...a, DateEarned: null, DateEarnedHardcore: null }, 3, 'Zelda')).toBeNull()
+})
+
+test('a game’s achievements as choices: earned first, newest first, then the rest; hidden unearned ones concealed', () => {
+  const choices = showcaseChoices('steam', 620, 'Portal 2', [
+    { key: 'A', title: 'Old', badge: 'https://b/a.jpg', earnedAt: '2026-01-01T00:00:00Z' },
+    { key: 'B', title: 'Locked', badge: 'https://b/b.jpg', earnedAt: null },
+    { key: 'C', title: 'New', badge: 'https://b/c.jpg', earnedAt: '2026-10-01T00:00:00Z' },
+    { key: 'D', title: 'Secret', description: 'spoiler', badge: 'https://b/d.jpg', earnedAt: null, hidden: true },
+  ])
+  expect(choices.map((c) => c.key)).toEqual(['C', 'A', 'B', 'D'])
+  expect(choices[0].entry).toMatchObject({ source: 'steam', gameId: 620, achievementKey: 'C', gameTitle: 'Portal 2' })
+  expect(choices[2].entry).toBeNull()
+  expect(choices[3]).toMatchObject({ concealed: true, description: null, badge: null })
 })

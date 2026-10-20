@@ -6,15 +6,17 @@ import { en } from '@/translations/en'
 
 jest.mock('@/context/ShowcaseContext', () => ({ useOwnShowcase: jest.fn() }))
 jest.mock('@/context/ActivityHeatmapYearContext', () => ({ useActivityHeatmapYear: jest.fn() }))
+jest.mock('@/hooks/useProfileLibrary', () => ({ useProfileLibrary: () => ({ games: [], isLoading: false }) }))
 
 const item = (k: string, id: number) => ({
   id, source: 'ra', gameId: 1, achievementKey: k, gameTitle: 'Zelda', title: `Logro ${k}`, description: null, badge: null, earnedAt: '2026-10-01T00:00:00.000Z',
 })
 const remove = jest.fn()
 const add = jest.fn()
+const addMany = jest.fn()
 const setup = (items: ReturnType<typeof item>[], over: Record<string, unknown> = {}) =>
   (useOwnShowcase as jest.Mock).mockReturnValue({
-    items, isLoading: false, error: false, retry: jest.fn(), remove, add, reorder: jest.fn(), full: items.length >= 5, has: () => false, ...over,
+    items, isLoading: false, error: false, retry: jest.fn(), remove, add, addMany, reorder: jest.fn(), full: items.length >= 5, has: () => false, ...over,
   })
 
 beforeEach(() => {
@@ -34,15 +36,12 @@ test('the showcase, then an empty slot for each free place', () => {
   expect(remove).toHaveBeenCalledWith(item('1', 1))
 })
 
-test('a free slot opens the picker of the year’s achievements, which adds one', async () => {
+test('a free slot opens the picker', async () => {
   setup([])
   render(<MainPagePinnedSectionShowcase />)
   fireEvent.click(screen.getAllByRole('button', { name: en.showcase.addSlot })[0])
   const dialog = await screen.findByRole('dialog', { name: en.showcase.pickerTitle })
-  fireEvent.click(within(dialog).getByRole('button', { name: /Sin daños/ }))
-  expect(add).toHaveBeenCalledWith(expect.objectContaining({ source: 'ra', achievementKey: '42', gameTitle: 'Super Metroid' }))
-  fireEvent.change(within(dialog).getByLabelText(en.showcase.pickerSearch), { target: { value: 'zzz' } })
-  expect(within(dialog).getByRole('status')).toHaveTextContent(en.showcase.pickerNoMatch)
+  expect(within(dialog).getByText(en.showcase.pickerNone)).toBeInTheDocument()
 })
 
 test('full: no empty slot', () => {

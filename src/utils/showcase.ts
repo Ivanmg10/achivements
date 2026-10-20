@@ -95,3 +95,54 @@ export function raShowcaseEntry(
     earnedAt: new Date(at).toISOString(),
   }
 }
+
+/**
+ * One achievement of a game in the showcase picker: earned ones carry their
+ * `entry` (what the showcase would keep); the rest are shown, greyed, to see
+ * what is left. `concealed` is a hidden one not yet earned: no name or badge.
+ */
+export type ShowcaseChoice = {
+  key: string
+  title: string
+  description: string | null
+  badge: string | null
+  earnedAt: string | null
+  concealed: boolean
+  entry: ShowcaseEntry | null
+}
+
+type ChoiceInput = {
+  key: string
+  title: string
+  description?: string | null
+  badge?: string | null
+  earnedAt?: string | null
+  hidden?: boolean
+}
+
+const isoOf = (d: string | null | undefined) => {
+  if (!d) return null
+  const t = Date.parse(d.includes('T') ? d : d.replace(' ', 'T'))
+  return Number.isNaN(t) ? null : new Date(t).toISOString()
+}
+
+/** A game's achievements as picker choices, earned first (newest first), then the rest in the game's order. */
+export function showcaseChoices(source: ShowcaseEntry['source'], gameId: number, gameTitle: string, list: ChoiceInput[]): ShowcaseChoice[] {
+  const choices = list.map((a) => {
+    const earnedAt = isoOf(a.earnedAt)
+    const concealed = Boolean(a.hidden) && !earnedAt
+    return {
+      key: a.key,
+      title: a.title,
+      description: concealed ? null : a.description || null,
+      badge: concealed ? null : a.badge || null,
+      earnedAt,
+      concealed,
+      entry: earnedAt
+        ? { source, gameId, achievementKey: a.key, gameTitle, title: a.title, description: a.description || null, badge: a.badge || null, earnedAt }
+        : null,
+    }
+  })
+  const earned = choices.filter((c) => c.earnedAt).sort((a, b) => b.earnedAt!.localeCompare(a.earnedAt!))
+  return [...earned, ...choices.filter((c) => !c.earnedAt)]
+}

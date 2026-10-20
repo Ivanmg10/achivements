@@ -79,3 +79,15 @@ test('a failed remove or reorder goes back, saying so', async () => {
   await act(() => result.current.reorder([item('2', 2), item('1', 1)]))
   expect(JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body)).toEqual({ order: [2, 1] })
 })
+
+test('adds several at once, only as many as fit, with one message', async () => {
+  ;(fetchWithRetry as jest.Mock).mockResolvedValue(['1', '2', '3'].map((k, i) => item(k, i + 1)))
+  const { result } = renderHook(() => useShowcase())
+  await waitFor(() => expect(result.current.items).toHaveLength(3))
+  let id = 10
+  global.fetch = jest.fn().mockImplementation(async () => ({ ok: true, status: 200, json: async () => item(String(id), id++) })) as unknown as typeof fetch
+  await act(() => result.current.addMany([entry('4'), entry('5'), entry('6')]))
+  expect(global.fetch).toHaveBeenCalledTimes(2)
+  expect(result.current.items).toHaveLength(5)
+  expect(notify.success).toHaveBeenCalledTimes(1)
+})
