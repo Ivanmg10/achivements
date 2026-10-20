@@ -10,6 +10,7 @@ export function CircularProgress({
   label,
   center,
   ariaLabel,
+  animateIn = false,
 }: {
   earned: number
   total: number
@@ -20,6 +21,8 @@ export function CircularProgress({
   center?: React.ReactNode
   /** The ring's accessible name, when earned/total is not what it means. */
   ariaLabel?: string
+  /** Fill from empty when it first appears (not under reduced motion). */
+  animateIn?: boolean
 }) {
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
@@ -57,7 +60,8 @@ export function CircularProgress({
             strokeDasharray={circumference}
             strokeDashoffset={circumference * (1 - pct)}
             strokeLinecap="round"
-            className="fill-none stroke-progress transition-[stroke-dashoffset] duration-700 ease-out"
+            style={animateIn ? ({ '--ring-from': circumference } as React.CSSProperties) : undefined}
+            className={`fill-none stroke-progress transition-[stroke-dashoffset] duration-700 ease-out ${animateIn ? 'ring-in' : ''}`}
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">

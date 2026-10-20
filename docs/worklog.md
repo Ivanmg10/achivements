@@ -25,6 +25,22 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Rankings entry animation (`chore/demo-personas`)
+
+**Did** — `/rankings` comes in: the podium rises third, second, first, its steps grow and the
+points count up (`CountUp`, which gained `locale` and `delay`); table and list rows stagger in
+(capped after 14 rows); the side panel slides in, the level ring fills from empty
+(`CircularProgress animateIn`, CSS `ring-in` in `globals.css`) and the level counts up; your
+pinned bar rises from the bottom. Variants in `rankings-page/rankingsMotion.ts`;
+`MotionConfig reducedMotion="user"` leaves only the fades under reduced motion. The jest mock of
+framer-motion gained `MotionConfig` and drops `custom`.
+**Why** — The user asked for an entry animation.
+**Open** — Proposals for pagination at scale, "Tu zona" instead of "Rivales cercanos", the level
+panel beside the podium, and the row design are on a canvas for the user to choose; nothing of
+that is built yet.
+**Watch out** — Playwright's window here renders at ~2 fps (in the background), so animations
+cannot be judged from it; check them in a real browser.
+
 ## 2026-10-20 — Rankings avatars load gracefully (`chore/demo-personas`)
 
 **Did** — `RankingsPageUser` draws pictures through `FadeImage` (a pulse in the circle while

@@ -1,11 +1,13 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import type { RankRow } from '@/app/api/rankings/route'
 import { useLanguage } from '@/context/LanguageContext'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import VaultPlatformSplit from '@/components/vault-platform-split/VaultPlatformSplit'
 import RankingsPageUser from '../rankings-page-user/RankingsPageUser'
 import RankingsPageDelta from '../rankings-page-delta/RankingsPageDelta'
+import { ROW } from '../rankingsMotion'
 
 const TH = 'px-3 py-2.5 text-[10.5px] uppercase tracking-wider font-bold text-text-secondary text-left'
 
@@ -47,8 +49,8 @@ export default function RankingsPageTable({
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
-            <tr key={r.username} className={`border-b border-ink/[0.05] last:border-0 ${r.isMe ? 'bg-accent/10' : ''}`}>
+          {rows.map((r, i) => (
+            <motion.tr key={r.username} variants={ROW} custom={i} initial="hidden" animate="show" className={`border-b border-ink/[0.05] last:border-0 ${r.isMe ? 'bg-accent/10' : ''}`}>
               <td className={`px-3 py-2.5 font-extrabold tabular-nums ${r.isMe ? 'text-accent' : 'text-text-secondary'}`}>{r.rank}</td>
               <td className="px-3 py-2 max-w-0 w-[34%]">
                 <RankingsPageUser row={r} linked={linked} />
@@ -70,7 +72,7 @@ export default function RankingsPageTable({
                   <RankingsPageDelta delta={r.delta} />
                 </td>
               )}
-            </tr>
+            </motion.tr>
           ))}
         </tbody>
       </table>

@@ -4,6 +4,7 @@ import type { VaultMe } from '@/app/api/rankings/me/route'
 import { useLanguage } from '@/context/LanguageContext'
 import { useVaultFillState } from '@/context/VaultFillContext'
 import { CircularProgress } from '@/components/ui/CircularProgress'
+import { CountUp } from '@/components/ui/CountUp'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import VaultFillProgress from '@/components/vault-fill-progress/VaultFillProgress'
 import VaultWeeksChart from '@/components/vault-weeks-chart/VaultWeeksChart'
@@ -61,11 +62,12 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
               earned={p.into}
               total={p.span}
               size={128}
+              animateIn
               ariaLabel={T.rankings.toLevel.replace('{n}', n(p.span - p.into)).replace('{level}', String(p.level + 1))}
               center={
                 <span className="flex flex-col items-center leading-tight">
                   <span className="text-xs text-text-secondary">{T.rankings.colLevel}</span>
-                  <span className="text-3xl font-extrabold tabular-nums">{p.level}</span>
+                  <CountUp value={p.level} locale={lang} delay={0.25} className="text-3xl font-extrabold" />
                 </span>
               }
             />
