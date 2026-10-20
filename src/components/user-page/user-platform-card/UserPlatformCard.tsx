@@ -3,6 +3,8 @@
 import { ReactNode } from 'react'
 import { IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import type { GameSource } from '@/types/steam'
+import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
 
 export type PlatformStat = { label: string; value: string; accent?: string }
 
@@ -33,6 +35,7 @@ export default function UserPlatformCard({
   hint,
   stats = [],
   action,
+  source,
 }: {
   name: string
   /** The user's own page on the platform; the name links to it once connected. */
@@ -52,6 +55,8 @@ export default function UserPlatformCard({
   /** Four or five headline numbers, side by side. */
   stats?: PlatformStat[]
   action?: ReactNode
+  /** The platform, for its Vault Points being calculated right after it is linked. */
+  source?: GameSource
 }) {
   const { T } = useLanguage()
 
@@ -111,6 +116,7 @@ export default function UserPlatformCard({
                 ))}
               </dl>
             )}
+            {source && <VaultFillLine source={source} />}
           </>
         ) : (
           <div className="relative flex-1 flex flex-col items-center justify-center gap-3 text-center py-6">

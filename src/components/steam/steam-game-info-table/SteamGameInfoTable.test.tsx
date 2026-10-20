@@ -41,9 +41,10 @@ function rowOrder() {
 }
 
 const mockToggle = jest.fn()
-function pins(canPin: boolean, pinned: string[] = []) {
+/** `leading`: the pins when the page loaded, what the list orders by; the pins now by default. */
+function pins(canPin: boolean, pinned: string[] = [], leading: string[] = pinned) {
   ;(useSteamFavoriteAchievements as jest.Mock).mockReturnValue({
-    pinned: new Set(pinned), toggle: mockToggle, canPin, error: null,
+    pinned: new Set(pinned), leading: new Set(leading), toggle: mockToggle, canPin, error: null,
   })
 }
 

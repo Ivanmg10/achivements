@@ -3,11 +3,15 @@
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
-import ForgotPasswordModal from '@/components/forgot-password-modal/ForgotPasswordModal'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+
+// Downloaded the first time it is opened, not with the page.
+const ForgotPasswordModal = dynamic(() => import('@/components/forgot-password-modal/ForgotPasswordModal'), { loading: () => null })
 
 export default function LoginUserForm({
   setIsLogin,
@@ -136,7 +140,9 @@ export default function LoginUserForm({
         </button>
       </p>
 
-      <ForgotPasswordModal isOpen={forgotOpen} onClose={() => setForgotOpen(false)} />
+      <LazyWhenOpened open={forgotOpen}>
+        <ForgotPasswordModal isOpen={forgotOpen} onClose={() => setForgotOpen(false)} />
+      </LazyWhenOpened>
     </div>
   )
 }

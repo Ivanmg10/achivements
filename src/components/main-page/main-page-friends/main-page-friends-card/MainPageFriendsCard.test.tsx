@@ -11,7 +11,7 @@ const FRIEND: FriendOverview = {
   psn: false,
   favorites: { ra: { id: 1, title: 'Zelda', imageIcon: '/i.png' }, steam: { id: 7, title: 'Portal', imageIcon: '' }, psn: null },
   publicGroups: 2,
-  pins: [{ source: 'ra', gameId: 1, gameTitle: 'Zelda', title: 'Triforce', badge: 'https://x/b.png' }],
+  showcase: [{ source: 'ra', gameId: 1, gameTitle: 'Zelda', title: 'Triforce', badge: 'https://x/b.png' }],
 }
 
 test('who they are, their favourites opening their progress, their latest pins and counts', () => {
@@ -25,10 +25,10 @@ test('who they are, their favourites opening their progress, their latest pins a
 })
 
 test('no favourites, no pins and no activity yet: says so, shows nothing made up', () => {
-  render(<MainPageFriendsCard friend={{ ...FRIEND, favorites: { ra: null, steam: null, psn: null }, pins: [{ ...FRIEND.pins[0], title: null, badge: null }] }} week={null} />)
+  render(<MainPageFriendsCard friend={{ ...FRIEND, favorites: { ra: null, steam: null, psn: null }, showcase: [{ ...FRIEND.showcase[0], title: null, badge: null }] }} week={null} />)
   expect(screen.queryByRole('list', { name: en.userProfile.favoriteGames })).not.toBeInTheDocument()
   expect(screen.getByText('—')).toBeInTheDocument()
   expect(screen.queryByText(/this week/)).not.toBeInTheDocument()
-  render(<MainPageFriendsCard friend={{ ...FRIEND, pins: [] }} week={null} />)
-  expect(screen.getByText(en.friends.noPins)).toBeInTheDocument()
+  render(<MainPageFriendsCard friend={{ ...FRIEND, showcase: [] }} week={null} />)
+  expect(screen.getByText(en.friends.noShowcase)).toBeInTheDocument()
 })

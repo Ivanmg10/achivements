@@ -9,10 +9,12 @@ import MainPageProfile from './main-page-profile/MainPageProfile'
 import ConnectAccounts from '@/components/connect-accounts/ConnectAccounts'
 import MainPageWithoutRa from './main-page-without-ra/MainPageWithoutRa'
 import MainPageCharts from './main-page-charts/MainPageCharts'
+import RaKeyInvalidNotice from '@/components/ra-key-invalid-notice/RaKeyInvalidNotice'
 import RARecentlyPlayed from '@/components/ra-recently-played/RARecentlyPlayed'
 import { useMainView } from '@/context/MainViewContext'
 import { useSubject } from '@/context/SubjectContext'
 import { useRaLinked } from '@/hooks/useRaLinked'
+import { canUseXbox } from '@/utils/xboxAccess'
 
 export default function MainPage() {
   const { status, data: session } = useSession()
@@ -26,8 +28,9 @@ export default function MainPage() {
     return <MainPageSkeleton />
 
   if (status === 'authenticated' && !raLinked) {
-    // Steam or PSN alone is enough for a main page; no account at all gets the connect prompt.
-    return session?.user?.steamid || session?.user?.psnaccountid ? <MainPageWithoutRa /> : <ConnectAccounts />
+    // Steam, PSN or Xbox alone is enough for a main page; no account at all gets the connect prompt.
+    const xbox = Boolean(session?.user?.xboxxuid) && canUseXbox(session?.user?.admin)
+    return session?.user?.steamid || session?.user?.psnaccountid || xbox ? <MainPageWithoutRa /> : <ConnectAccounts />
   }
 
   return (
@@ -38,6 +41,7 @@ export default function MainPage() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
     >
+      <RaKeyInvalidNotice />
       <MainPageBody />
     </motion.main>
   )

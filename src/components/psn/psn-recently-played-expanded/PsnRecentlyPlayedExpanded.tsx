@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnTrophies } from '@/hooks/usePsnTrophies'
+import { fromPsn } from '@/utils/gameInsights'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
 import { PsnTrophyGrid } from '@/components/psn/psn-trophy-grid/PsnTrophyGrid'
@@ -27,8 +28,7 @@ export default function PsnRecentlyPlayedExpanded({ game }: { game: PsnGameProgr
   const total = loaded ? trophies.length : game.maxPossible
   const earned = loaded ? trophies.filter((t) => t.earned).length : game.numAwarded
 
-  // The chart only reads earn dates; PSN has no hardcore.
-  const unlocks = trophies.map((t) => ({ DateEarned: t.earnedAt, DateEarnedHardcore: null }))
+  const unlocks = fromPsn(trophies, game.id)
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">

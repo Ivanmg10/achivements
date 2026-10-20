@@ -55,7 +55,8 @@ test('renders the circular ring, progress chart and achievement grid for the gam
     />,
   )
   expect(screen.getByRole('img', { name: /4 \/ 10/ })).toBeInTheDocument()
-  expect(screen.getByTestId('ResponsiveContainer')).toBeInTheDocument()
+  // The line of unlocks is loaded apart (recharts): it comes a moment after the card.
+  expect(await screen.findByTestId('ResponsiveContainer')).toBeInTheDocument()
   await waitFor(() => expect(screen.getByRole('button', { name: /First blood/ })).toBeInTheDocument())
 })
 

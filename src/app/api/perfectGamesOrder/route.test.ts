@@ -101,3 +101,18 @@ describe('PUT', () => {
     expect(mockClient.release).toHaveBeenCalled()
   })
 })
+
+describe('Xbox is admin-only', () => {
+  test('a non-admin cannot put an Xbox game in the order', async () => {
+    const res = await PUT(makePutRequest({ order: ['ra:1', 'xbox:1738914043'] }))
+    expect(res.status).toBe(403)
+    expect(pool.connect).not.toHaveBeenCalled()
+  })
+
+  test('an admin can', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+    const res = await PUT(makePutRequest({ order: ['xbox:1738914043'] }))
+    expect(res.status).toBe(200)
+    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO perfect_games_order'), ['1', 'xbox', 1738914043, 0])
+  })
+})

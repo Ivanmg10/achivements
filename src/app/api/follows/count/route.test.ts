@@ -17,8 +17,9 @@ test('how many you follow and how many follow you, for your own account', async 
   const res = await GET()
   expect(res.data).toEqual({ following: 4, followers: 2 })
   const [sql, params] = query.mock.calls[0]
-  // The same people the Following list shows: public profiles.
-  expect(sql).toContain('u.profile_public')
+  // The same people the two lists show: public profiles, on both sides.
+  expect(sql.match(/u\.profile_public/g)).toHaveLength(2)
+  expect(sql).toContain('JOIN users u ON u.id = f.follower_id')
   expect(params).toEqual(['3'])
 })
 

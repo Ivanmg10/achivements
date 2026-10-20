@@ -19,7 +19,7 @@ const GAME = {
 }
 
 function setLibrary(library: unknown[], libraryLoading = false) {
-  ;(usePsnGamesData as jest.Mock).mockReturnValue({ library, libraryLoading })
+  ;(usePsnGamesData as jest.Mock).mockReturnValue({ fullLibrary: library, libraryLoading })
 }
 
 test('a pinned game with its progress, opening its dashboard', () => {

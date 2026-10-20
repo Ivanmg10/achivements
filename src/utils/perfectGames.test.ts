@@ -43,7 +43,7 @@ describe('buildPerfectGames', () => {
 describe('countPerfectGames', () => {
   test('counts RA hardcore, RA softcore and Steam apart', () => {
     const games = buildPerfectGames([ra(1, 'A'), ra(2, 'B', { HardcoreMode: '0' })], [steam(620, 'C')])
-    expect(countPerfectGames(games)).toEqual({ hc: 1, sc: 1, steam: 1, psn: 0 })
+    expect(countPerfectGames(games)).toEqual({ hc: 1, sc: 1, steam: 1, psn: 0, xbox: 0 })
   })
 })
 
@@ -149,7 +149,7 @@ describe('PSN', () => {
   test('a PSN game at 100% is perfect, dated by its last trophy', () => {
     const games = buildPerfectGames([], [], [psnGame(100, 100), psnGame(200, 50)])
     expect(games.map((g) => g.key)).toEqual(['psn:100'])
-    expect(countPerfectGames(games)).toEqual({ hc: 0, sc: 0, steam: 0, psn: 1 })
+    expect(countPerfectGames(games)).toEqual({ hc: 0, sc: 0, steam: 0, psn: 1, xbox: 0 })
     expect(filterPerfects(games, 'psn')).toHaveLength(1)
     expect(perfectDates([], [], [psnGame(100, 100)]).get('psn:100')).toBe('2024-01-02T00:00:00.000Z')
   })
@@ -157,5 +157,37 @@ describe('PSN', () => {
   test('the latest perfects take PSN in date order', () => {
     const latest = latestPerfects([], [], 3, [psnGame(100, 100, '2024-01-01T00:00:00Z'), psnGame(200, 100, '2024-02-01T00:00:00Z')])
     expect(latest.map((g) => g.key)).toEqual(['psn:200', 'psn:100'])
+  })
+})
+
+describe('Xbox', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const pg = require('./perfectGames') as typeof import('./perfectGames')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxGameFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  const done = xboxGameFixture({ id: 730, title: 'Halo', pctWon: 100, lastPlayed: '2026-03-01T00:00:00Z' })
+  const half = xboxGameFixture({ id: 731, title: 'Half', pctWon: 50 })
+
+  test('a game at 100 % is perfect, and counted as Xbox', () => {
+    const games = pg.buildPerfectGames([], [], [], [done, half])
+    expect(games).toHaveLength(1)
+    expect(games[0]).toMatchObject({ key: 'xbox:730', source: 'xbox', title: 'Halo', hardcore: false })
+    expect(pg.countPerfectGames(games)).toEqual({ hc: 0, sc: 0, steam: 0, psn: 0, xbox: 1 })
+  })
+
+  test('its last session stands in for the date it got to 100 %', () => {
+    expect(pg.perfectDates([], [], [], [done]).get('xbox:730')).toBe('2026-03-01T00:00:00Z')
+    expect(pg.latestPerfects([], [], 3, [], [done, half])).toMatchObject([{ key: 'xbox:730', date: '2026-03-01T00:00:00Z' }])
+  })
+
+  test('a perfect game with no known session is not in the latest', () => {
+    expect(pg.latestPerfects([], [], 3, [], [xboxGameFixture({ id: 1, pctWon: 100, lastPlayed: null })])).toEqual([])
+  })
+
+  test('the Xbox filter keeps only Xbox games', () => {
+    const games = pg.buildPerfectGames([], [], [], [done])
+    expect(pg.filterPerfects(games, 'xbox')).toHaveLength(1)
+    expect(pg.filterPerfects(games, 'psn')).toHaveLength(0)
   })
 })

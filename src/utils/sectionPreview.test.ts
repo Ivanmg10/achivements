@@ -57,3 +57,21 @@ test('PSN previews: furthest along first, with the PSN icon', () => {
   ])
   expect(games[0].imageRef).toBe('https://psn/200.png')
 })
+
+describe('xboxPreviewGames', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxPreviewGames } = require('./sectionPreview') as typeof import('./sectionPreview')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxGameFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  test('furthest along first, as Xbox games, with the platform as subtitle', () => {
+    const list = xboxPreviewGames([xboxGameFixture({ id: 1, title: 'Low', pctWon: 10 }), xboxGameFixture({ id: 2, title: 'High', pctWon: 90 })])
+    expect(list.map((g) => g.title)).toEqual(['High', 'Low'])
+    expect(list[0]).toMatchObject({ key: 'xbox:2', source: 'xbox', id: 2, subtitle: 'Xbox', pct: 90 })
+  })
+
+  test('at most the count asked', () => {
+    const games = [1, 2, 3].map((id) => xboxGameFixture({ id, pctWon: id }))
+    expect(xboxPreviewGames(games, 2)).toHaveLength(2)
+  })
+})

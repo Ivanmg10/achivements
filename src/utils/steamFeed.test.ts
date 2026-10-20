@@ -96,7 +96,7 @@ describe('mergeRecentFeeds', () => {
   test('carries the source so callers can branch on it', () => {
     const [item] = mergeRecentFeeds([], [steam({ id: 9 })], 5)
     expect(item.source).toBe('steam')
-    expect(item.game).toMatchObject({ id: 9 })
+    expect(item.source === 'steam' && item.game).toMatchObject({ id: 9 })
   })
 
   test('handles two empty feeds', () => {
@@ -180,7 +180,7 @@ const psnGame = (id: number, pctWon: number, lastPlayed = '2024-01-02T00:00:00.0
   maxPossible: 10, numAwarded: Math.round(pctWon / 10), pctWon, lastPlayed,
   earned: { bronze: 1, silver: 0, gold: 0, platinum: pctWon >= 100 ? 1 : 0 },
   defined: { bronze: 9, silver: 0, gold: 0, platinum: 1 },
-  lastTrophyAt: lastPlayed, playtimeMinutes: null, playedAs: [] as string[], playCount: null, coverUrl: null, heroUrl: null,
+  lastTrophyAt: lastPlayed, playtimeMinutes: null, playedAs: [] as string[], playCount: null, coverUrl: null, heroUrl: null, collection: null,
 })
 
 test('PSN games join the recent feed by their last trophy', () => {
@@ -191,4 +191,44 @@ test('PSN games join the recent feed by their last trophy', () => {
     [psnGame(300, 50, '2024-01-02T00:00:00.000Z') as never],
   )
   expect(merged.map((i) => i.key)).toEqual(['steam:2', 'psn:300', 'ra:1'])
+})
+
+describe('Xbox in the recent feed', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { mergeRecentFeeds } = require('./steamFeed') as typeof import('./steamFeed')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxGameFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  test('an Xbox game is merged by its last session, keyed apart', () => {
+    const feed = mergeRecentFeeds([], [], 5, [], [
+      xboxGameFixture({ id: 1, lastPlayed: '2026-01-01T00:00:00Z' }),
+      xboxGameFixture({ id: 2, lastPlayed: '2026-02-01T00:00:00Z' }),
+      xboxGameFixture({ id: 3, lastPlayed: null }),
+    ])
+    expect(feed.map((f: { key: string }) => f.key)).toEqual(['xbox:2', 'xbox:1', 'xbox:3'])
+    expect(feed[0].source).toBe('xbox')
+  })
+})
+
+describe('PSN collections in the recent feed', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { psnGameFixture } = require('@/test-utils/psnFixtures') as typeof import('@/test-utils/psnFixtures')
+  const ezio = { titleId: 'CUSA04893_00', title: 'Ezio Collection', iconUrl: null, heroUrl: null, lastPlayed: '2026-10-16T00:00:00Z', playtimeMinutes: 4543 }
+
+  test("a collection's games are one entry, dated by its session, where its first game was", () => {
+    const feed = mergeRecentFeeds([], [], 5, [
+      psnGameFixture({ id: 1, title: 'Brotherhood', lastPlayed: '2026-10-16T00:00:00Z', collection: ezio }),
+      psnGameFixture({ id: 3, title: 'Other', lastPlayed: '2026-10-10T00:00:00Z' }),
+      psnGameFixture({ id: 2, title: 'AC II', lastPlayed: '2025-04-02T00:00:00Z', collection: ezio }),
+    ])
+    expect(feed.map((f) => f.key)).toEqual(['psnc:CUSA04893_00', 'psn:3'])
+    const [coll] = feed
+    expect(coll).toMatchObject({ source: 'psnCollection', lastPlayed: '2026-10-16T00:00:00Z', collection: ezio })
+    expect(coll.source === 'psnCollection' && coll.games.map((g) => g.id)).toEqual([1, 2])
+  })
+
+  test('a collection with only one of its games in the list stays that game', () => {
+    const feed = mergeRecentFeeds([], [], 5, [psnGameFixture({ id: 1, lastPlayed: '2026-10-16T00:00:00Z', collection: ezio })])
+    expect(feed.map((f) => f.key)).toEqual(['psn:1'])
+  })
 })

@@ -109,7 +109,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
     [router, onClose],
   )
 
-  const platformLabel: Record<GameSource, string> = { ra: T.search.platformRa, steam: T.search.platformSteam, psn: 'PlayStation' }
+  const platformLabel: Record<GameSource, string> = { ra: T.search.platformRa, steam: T.search.platformSteam, psn: 'PlayStation', xbox: 'Xbox' }
 
   const placeholder = tab === 'users' ? T.publicProfile.searchUsersPlaceholder : T.search.placeholder
 

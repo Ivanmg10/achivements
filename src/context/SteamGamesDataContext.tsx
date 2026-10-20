@@ -45,6 +45,8 @@ const Ctx = createContext<SteamGamesCtx>(EMPTY)
  */
 async function fetchGames(url: string): Promise<SteamGameProgress[]> {
   const res = await fetch(url, { cache: 'no-store' })
+  // A profile made private after it was linked: the server says so, and the page can tell the person why.
+  if (res.status === 403) throw new Error('private')
   if (!res.ok) throw new Error(`Steam request failed (${res.status})`)
   const data = await res.json()
   if (!Array.isArray(data)) throw new Error('Unexpected Steam response')

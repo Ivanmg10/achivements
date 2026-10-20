@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -9,10 +10,15 @@ import { useBackRegistry } from '@/context/BackInterceptContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useStreakData } from '@/hooks/useStreakData'
 import { IconHome, IconChevronLeft, IconSearch, IconFlame, IconMenu } from '@tabler/icons-react'
-import SearchModal from '@/components/search-modal/SearchModal'
-import MobileNavModal from './MobileNavModal'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+
+// Downloaded the first time it is opened, not with the page.
+const SearchModal = dynamic(() => import('@/components/search-modal/SearchModal'), { loading: () => null })
+const MobileNavModal = dynamic(() => import('./MobileNavModal'), { loading: () => null })
 import StatusNavDropdown from './status-nav-dropdown/StatusNavDropdown'
+import MainHeaderLevel from './main-header-level/MainHeaderLevel'
 import { plural } from '@/utils/utils'
+import { canUseXbox } from '@/utils/xboxAccess'
 
 function NavLink({ href, label, active, glass }: { href: string; label: string; active: boolean; glass?: boolean }) {
   return (
@@ -61,8 +67,12 @@ export default function MainHeader() {
 
   const streak = activeStreak?.days ?? 0
   // With no platform linked there is nothing to search, sort or count: the
-  // bar keeps only the way home and the way to the account.
-  const hasPlatform = Boolean(session?.user?.rausername || session?.user?.steamid)
+  // bar keeps only the way home and the way to the account. Any platform counts
+  // (Xbox only for who may see it, see canUseXbox): a PSN-only account has a library too.
+  const user = session?.user
+  const hasPlatform = Boolean(
+    user?.rausername || user?.steamid || user?.psnaccountid || (user?.xboxxuid && canUseXbox(user.admin)),
+  )
   const isHome = pathname === '/'
   const isGameInfo = pathname.startsWith('/gameInfo/')
   const avatarSrc = session?.user?.avatar ?? session?.user?.image ?? null
@@ -101,6 +111,7 @@ export default function MainHeader() {
   const navItems = [
     { href: '/groups', label: T.groups.title },
     { href: '/following', label: T.following.title },
+    { href: '/rankings', label: T.rankings.title },
   ]
   const isStatusActive = statusItems.some(({ href }) => pathname === href)
 
@@ -200,6 +211,7 @@ export default function MainHeader() {
 
           {session ? (
             <>
+              <MainHeaderLevel glass={isGameInfo} />
               <StreakBadge streak={streak} glass={isGameInfo} />
               <Link
                 href="/user"
@@ -242,8 +254,12 @@ export default function MainHeader() {
       </header>
       </div>
 
-      <SearchModal isOpen={searchOpen} onClose={closeSearch} initialQuery={initialQuery} />
-      <MobileNavModal isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      <LazyWhenOpened open={searchOpen}>
+        <SearchModal isOpen={searchOpen} onClose={closeSearch} initialQuery={initialQuery} />
+      </LazyWhenOpened>
+      <LazyWhenOpened open={mobileMenuOpen}>
+        <MobileNavModal isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+      </LazyWhenOpened>
     </>
   )
 }

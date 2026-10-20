@@ -1,4 +1,5 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
+jest.mock('@/lib/scoreRefresh', () => ({ onPlatformLinked: jest.fn() }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))
 jest.mock('@/lib/fetchSteam', () => ({ steamApiKey: jest.fn(() => 'key') }))
@@ -14,6 +15,7 @@ import pool from '@/lib/db'
 import { forgetUser } from '@/lib/userRecord'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { findSteamAccount } from '@/lib/steamAccount'
+import { onPlatformLinked } from '@/lib/scoreRefresh'
 
 const ID = '76561197960287930'
 
@@ -54,6 +56,8 @@ test('links a custom URL name, saving the id and display name', async () => {
   expect(findSteamAccount).toHaveBeenCalledWith({ vanity: 'gabe' }, 'key')
   expect(pool.query).toHaveBeenCalledWith('UPDATE users SET steamid = $1, steamusername = $2 WHERE id = $3', [ID, 'Gabe', '7'])
   expect(forgetUser).toHaveBeenCalledWith('7')
+  // Its Vault Points start being worked out at once.
+  expect(onPlatformLinked).toHaveBeenCalledWith(7, 'steam')
 })
 
 test('no "already linked elsewhere" check: an account linked to another user links again', async () => {

@@ -48,7 +48,7 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
     }
     const them = detailed
       .filter((f) => details[f.username])
-      .map((f) => ({ username: f.username, avatar: f.avatar, isMe: false, stats: friendStats(details[f.username].recent, details[f.username].games, now) }))
+      .map((f) => ({ username: f.username, avatar: f.avatar, online: f.online, isMe: false, stats: friendStats(details[f.username].recent, details[f.username].games, now) }))
     return [me, ...them]
   }, [session?.user?.name, session?.user?.avatar, T, myRecent, mine.games, now, detailed, details])
   const pending = detailed.filter((f) => !details[f.username]).map((f) => ({ username: f.username, avatar: f.avatar }))
@@ -57,7 +57,7 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
     [detailed, details],
   )
   const shared = useMemo(
-    () => sharedWithFriends(mine.games, detailed.filter((f) => details[f.username]).map((f) => ({ username: f.username, avatar: f.avatar, games: details[f.username].games }))),
+    () => sharedWithFriends(mine.games, detailed.filter((f) => details[f.username]).map((f) => ({ username: f.username, avatar: f.avatar, online: f.online, games: details[f.username].games }))),
     [mine.games, detailed, details],
   )
   const partial = detailed.some((f) => details[f.username]?.partial)
@@ -94,10 +94,10 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Left: where you stand and who they are; right: what they did lately. */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
-        <div className="xl:col-span-2 flex flex-col gap-4 min-w-0">
-          <ChartCard className="h-auto!">
+      {/* Where you stand, and beside it what they did lately, as tall as it (scrolling inside); then who they are, across the width. */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div className="xl:col-span-2 flex flex-col min-w-0">
+          <ChartCard className="h-auto! flex-1">
             <MainPageFriendsLeaderboard rows={leaderRows} pending={pending} />
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-text-secondary">
               <span>{T.friends.windowNote.replace('{n}', String(ACTIVITY_DAYS))}</span>
@@ -110,25 +110,29 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
               )}
             </p>
           </ChartCard>
-          <ChartCard className="h-auto!">
-            <h3 className="text-[10px] uppercase tracking-widest text-text-secondary">
-              {T.friends.cards} <span className="tabular-nums">· {friends.length.toLocaleString(lang)}</span>
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {friends.map((f) => (
-                <MainPageFriendsCard
-                  key={f.username}
-                  friend={f}
-                  week={details[f.username] ? friendStats(details[f.username].recent, [], now).week : null}
-                />
-              ))}
-            </div>
+        </div>
+        {/* Out of the flow on xl, so a long feed never makes the row taller than the leaderboard. */}
+        <div className="relative min-w-0">
+          <ChartCard className="h-auto! xl:absolute xl:inset-0">
+            <MainPageFriendsFeed items={feed} isLoading={detailsLoading} />
           </ChartCard>
         </div>
-        <ChartCard className="h-auto! xl:sticky xl:top-20">
-          <MainPageFriendsFeed items={feed} isLoading={detailsLoading} />
-        </ChartCard>
       </div>
+
+      <ChartCard className="h-auto!">
+        <h3 className="text-[10px] uppercase tracking-widest text-text-secondary">
+          {T.friends.cards} <span className="tabular-nums">· {friends.length.toLocaleString(lang)}</span>
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+          {friends.map((f) => (
+            <MainPageFriendsCard
+              key={f.username}
+              friend={f}
+              week={details[f.username] ? friendStats(details[f.username].recent, [], now).week : null}
+            />
+          ))}
+        </div>
+      </ChartCard>
 
       <ChartCard>
         <MainPageFriendsShared rows={shared} isLoading={detailsLoading || mine.isLoading} />

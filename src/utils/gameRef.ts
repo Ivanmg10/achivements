@@ -9,10 +9,10 @@ import { psnTitleId } from '@/utils/psnTitles'
  */
 export type GameRef = { source: GameSource; id: number }
 
-export const GAME_SOURCES: readonly GameSource[] = ['ra', 'steam', 'psn']
+export const GAME_SOURCES: readonly GameSource[] = ['ra', 'steam', 'psn', 'xbox']
 
 export function isGameSource(value: unknown): value is GameSource {
-  return value === 'ra' || value === 'steam' || value === 'psn'
+  return value === 'ra' || value === 'steam' || value === 'psn' || value === 'xbox'
 }
 
 /** Stable string form, for Set/Map keys and drag-and-drop ids: "ra:123", "steam:730". */
@@ -36,6 +36,7 @@ export function gameHref(source: GameSource, id: number, subject?: string | null
   if (subject) return `/user/${encodeURIComponent(subject)}/${source}/${urlId}`
   if (source === 'steam') return `/steamGame/${urlId}`
   if (source === 'psn') return `/psnGame/${urlId}`
+  if (source === 'xbox') return `/xboxGame/${urlId}`
   return `/gameInfo/${urlId}`
 }
 
@@ -44,4 +45,5 @@ export const PLATFORM_NAME: Record<GameSource, string> = {
   ra: 'RetroAchievements',
   steam: 'Steam',
   psn: 'PlayStation',
+  xbox: 'Xbox',
 }

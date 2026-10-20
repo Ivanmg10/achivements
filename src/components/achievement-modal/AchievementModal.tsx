@@ -11,6 +11,8 @@ import { motion } from 'framer-motion'
 import { IconStar, IconStarFilled } from '@tabler/icons-react'
 import { modalOverlay, modalContent } from '@/lib/animations'
 import Spinner from '@/components/main-spinner/Spinner'
+import { raShowcaseEntry } from '@/utils/showcase'
+import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseToggleButton'
 
 interface AchievementUnlock {
   User: string
@@ -55,6 +57,7 @@ export default function AchievementModal({
   numDistinctPlayers,
   onClose,
   gameId,
+  gameTitle,
   isFavorited = false,
   onToggleFavorite,
 }: {
@@ -62,6 +65,8 @@ export default function AchievementModal({
   numDistinctPlayers: number
   onClose: () => void
   gameId?: number | null
+  /** With `gameId`, lets an earned achievement go into the showcase. */
+  gameTitle?: string | null
   isFavorited?: boolean
   onToggleFavorite?: () => void
 }) {
@@ -173,6 +178,7 @@ export default function AchievementModal({
                   {isFavorited ? <IconStarFilled className="w-5 h-5" aria-hidden="true" /> : <IconStar className="w-5 h-5" aria-hidden="true" />}
                 </button>
               )}
+              <ShowcaseToggleButton entry={gameId && gameTitle ? raShowcaseEntry(achievement, gameId, gameTitle) : null} size={20} />
               {gameId ? (
                 <Link
                   id={titleId}

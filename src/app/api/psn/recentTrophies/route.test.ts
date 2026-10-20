@@ -65,3 +65,10 @@ test("trophy names come in the app's language", async () => {
   await call('scope=year&lang=fr')
   expect(psnRecentTrophies).toHaveBeenCalledWith('42', 366, '7', 'fr-FR')
 })
+
+test('the browser may keep the answer for 2 minutes, privately, and a new session cookie asks again', async () => {
+  const res = await GET(new NextRequest('http://localhost/api/psn/recentTrophies'))
+  expect(res.status).toBe(200)
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=120')
+  expect(res.headers.get('Vary')).toBe('Cookie')
+})

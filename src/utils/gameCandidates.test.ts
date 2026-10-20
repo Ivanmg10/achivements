@@ -182,3 +182,20 @@ test('PSN candidates: completed is perfect, started is in progress, nothing earn
   expect(launched.status).toBe('want-to-play')
   expect(candidateIconUrl(done)).toBe('https://psn/100.png')
 })
+
+describe('buildXboxCandidates', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { buildXboxCandidates } = require('./gameCandidates') as typeof import('./gameCandidates')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxGameFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  test('the same statuses as PlayStation: perfect, in progress, want to play', () => {
+    const [done, mid, none] = buildXboxCandidates([
+      xboxGameFixture({ id: 1, pctWon: 100 }),
+      xboxGameFixture({ id: 2, pctWon: 30 }),
+      xboxGameFixture({ id: 3, pctWon: 0 }),
+    ])
+    expect([done.status, mid.status, none.status]).toEqual(['perfect', 'in-progress', 'want-to-play'])
+    expect(mid).toMatchObject({ key: 'xbox:2', source: 'xbox', subtitle: 'Xbox', pctWon: 0.3 })
+  })
+})

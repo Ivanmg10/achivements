@@ -28,3 +28,10 @@ test('a picture that fails leaves a still placeholder, not a broken icon', () =>
   expect(container.firstElementChild).not.toHaveClass('animate-pulse')
   expect(container.firstElementChild).toHaveClass('w-16', 'h-16')
 })
+
+test('a picture that fails shows the fallback in its place, when there is one', () => {
+  const { container } = render(<FadeImage src="https://example.com/broken.png" alt="" width={32} height={32} fallback={<span>A</span>} />)
+  fireEvent.error(container.querySelector('img')!)
+  expect(container.querySelector('img')).toBeNull()
+  expect(screen.getByText('A')).toBeInTheDocument()
+})

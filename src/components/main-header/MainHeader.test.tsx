@@ -51,6 +51,24 @@ test('who you follow is one click away in the bar', () => {
   expect(screen.getByRole('link', { name: en.following.title })).toHaveAttribute('href', '/following')
 })
 
+test('PSN alone is a platform: search and the sections are there', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', avatar: null, psnaccountid: '123' } } })
+  render(<MainHeader />)
+  expect(screen.getByRole('button', { name: 'Library' })).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: en.following.title })).toBeInTheDocument()
+  expect(screen.getAllByRole('button', { name: 'Search games' }).length).toBeGreaterThan(0)
+})
+
+test('Xbox alone counts only for who may see Xbox', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', avatar: null, xboxxuid: '9', admin: false } } })
+  const { unmount } = render(<MainHeader />)
+  expect(screen.queryByRole('button', { name: 'Library' })).not.toBeInTheDocument()
+  unmount()
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', avatar: null, xboxxuid: '9', admin: true } } })
+  render(<MainHeader />)
+  expect(screen.getByRole('button', { name: 'Library' })).toBeInTheDocument()
+})
+
 describe('with no platform linked', () => {
   beforeEach(() => {
     ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', avatar: null } } })

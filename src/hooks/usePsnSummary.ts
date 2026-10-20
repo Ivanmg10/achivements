@@ -4,6 +4,7 @@ import { psnErrorFrom, type PsnError } from '@/hooks/usePsnLink'
 import type { PsnSummary } from '@/lib/psnClient'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { fetchShared } from '@/lib/fetchShared'
 
 /** The linked PSN account's headline numbers: avatar, level, trophies by grade, games. */
 export function usePsnSummary() {
@@ -20,7 +21,7 @@ export function usePsnSummary() {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await fetch(withSubject('/api/psn/summary', subject))
+      const res = await fetchShared(withSubject('/api/psn/summary', subject))
       if (!res.ok) {
         setError(await psnErrorFrom(res))
         return

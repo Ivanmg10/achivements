@@ -4,12 +4,10 @@ import { pinnedKey } from '@/utils/utils'
 import type { PinnedAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
-import { useSubject } from '@/context/SubjectContext'
-import { withSubject } from '@/utils/withSubject'
 
 /**
- * The user's pinned achievements across RA, Steam and PSN, newest first — what the
- * main page's pinned card lists, whichever platform is selected.
+ * The user's own pinned achievements (their goals, "achievements to get") across RA,
+ * Steam, PSN and Xbox, in their order. Never someone else's: others see the showcase.
  *
  * A load that still fails after fetchWithRetry's own attempts is retried in
  * the background with a growing delay (see scheduleRetry); once that gives
@@ -18,8 +16,6 @@ import { withSubject } from '@/utils/withSubject'
  */
 export function usePinnedAchievements() {
   const { T } = useLanguage()
-  // On someone's public profile: their pins, read only.
-  const subject = useSubject()
   const [pinned, setPinned] = useState<PinnedAchievement[]>([])
   /** Which load the answer (data or final failure) belongs to; loading is any other being asked for. */
   const [loadedKey, setLoadedKey] = useState<number | null>(null)
@@ -34,7 +30,7 @@ export function usePinnedAchievements() {
     attemptRef.current = 0
 
     function load() {
-      fetchWithRetry(withSubject('/api/favorites?source=all', subject))
+      fetchWithRetry('/api/favorites?source=all')
         .then((data) => {
           if (!current) return
           setPinned(Array.isArray(data) ? (data as PinnedAchievement[]) : [])
@@ -57,7 +53,7 @@ export function usePinnedAchievements() {
       current = false
       clearTimeout(retryTimer.current)
     }
-  }, [reloadKey, subject])
+  }, [reloadKey])
 
   const refetch = useCallback(() => {
     setPinned([])
@@ -77,7 +73,9 @@ export function usePinnedAchievements() {
         ? `/api/favorites?steamApiname=${encodeURIComponent(fav.steam_apiname)}&gameId=${fav.game_id}`
         : fav.source === 'psn'
           ? `/api/favorites?psnTrophyId=${fav.psn_trophy_id}&gameId=${fav.game_id}`
-          : `/api/favorites?achievementId=${fav.achievement_id}`
+          : fav.source === 'xbox'
+            ? `/api/favorites?xboxAchievementId=${encodeURIComponent(fav.xbox_achievement_id)}&gameId=${fav.game_id}`
+            : `/api/favorites?achievementId=${fav.achievement_id}`
     try {
       const res = await fetch(url, { method: 'DELETE' })
       if (!res.ok) throw new Error(`Failed to unpin (${res.status})`)
@@ -94,6 +92,24 @@ export function usePinnedAchievements() {
     }
   }, [T])
 
+  /** Puts the pins in a new order at once, and back (saying so) if it could not be saved. */
+  const reorder = useCallback(async (next: PinnedAchievement[]) => {
+    const before = pinned
+    setPinned(next)
+    try {
+      const res = await fetch('/api/favorites', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: next.flatMap((p) => (p.id ? [p.id] : [])) }),
+      })
+      if (!res.ok) throw new Error(`Failed to save the order (${res.status})`)
+    } catch (err) {
+      console.error('[usePinnedAchievements] reorder', err)
+      notify.error(T.toast.orderFailed)
+      setPinned(before)
+    }
+  }, [pinned, T])
+
   const answered = loadedKey === reloadKey
-  return { pinned, isLoading: !answered, error: answered && failed, refetch, unpin }
+  return { pinned, isLoading: !answered, error: answered && failed, refetch, unpin, reorder }
 }

@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import AchivementsLineChartTooltip from './AchivementsLineChartTooltip'
 import { en } from '@/translations/en'
 
-const day = (ra: number, steam: number, psn = 0) => ({ payload: { date: '2026-09-29', ra, steam, psn, total: ra + steam + psn } })
+const day = (ra: number, steam: number, psn = 0, xbox = 0) => ({ payload: { date: '2026-09-29', ra, steam, psn, xbox, total: ra + steam + psn + xbox } })
 
 test('nothing while the pointer is not on a day', () => {
   const { container } = render(<AchivementsLineChartTooltip active={false} payload={[day(1, 0)]} />)
@@ -27,4 +27,10 @@ test('PSN gets its own line when it has trophies that day', () => {
   render(<AchivementsLineChartTooltip active payload={[day(0, 0, 5)]} />)
   expect(screen.getByText('PlayStation')).toBeInTheDocument()
   expect(screen.getByText('5')).toBeInTheDocument()
+})
+
+test('Xbox gets its own line when it has achievements that day', () => {
+  render(<AchivementsLineChartTooltip active payload={[day(0, 0, 0, 7)]} />)
+  expect(screen.getByText('Xbox')).toBeInTheDocument()
+  expect(screen.getByText('7')).toBeInTheDocument()
 })

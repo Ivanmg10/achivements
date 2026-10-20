@@ -36,7 +36,7 @@ test('POST drops an image that is not https or a site path', async () => {
 })
 
 test('POST refuses a bad source, id or title', async () => {
-  expect(status(await POST(post({ source: 'xbox', gameId: 1, title: 'x' })))).toBe(400)
+  expect(status(await POST(post({ source: 'switch', gameId: 1, title: 'x' })))).toBe(400)
   expect(status(await POST(post({ source: 'ra', gameId: '1', title: 'x' })))).toBe(400)
   expect(status(await POST(post({ source: 'ra', gameId: 1, title: '' })))).toBe(400)
   expect(status(await POST(post({ source: 'ra', gameId: 1, title: 'x'.repeat(301) })))).toBe(400)
@@ -62,4 +62,17 @@ test('a database failure is a 500', async () => {
   jest.spyOn(console, 'error').mockImplementation(() => {})
   ;(pool.query as jest.Mock).mockRejectedValue(new Error('down'))
   expect(status(await GET())).toBe(500)
+})
+
+describe('Xbox is admin-only', () => {
+  test('a non-admin cannot hide an Xbox game, and nothing is written', async () => {
+    expect(status(await POST(post({ source: 'xbox', gameId: 1738914043, title: 'Halo' })))).toBe(403)
+    expect(pool.query).not.toHaveBeenCalled()
+  })
+
+  test('an admin can', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7', admin: true } })
+    expect(status(await POST(post({ source: 'xbox', gameId: 1738914043, title: 'Halo' })))).toBe(200)
+    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['7', 'xbox', 1738914043, 'Halo', null])
+  })
 })

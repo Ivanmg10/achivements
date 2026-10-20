@@ -9,6 +9,8 @@ import UserPlatformCard, {
   PlatformStat,
 } from '@/components/user-page/user-platform-card/UserPlatformCard'
 import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
+import UserXboxCard from '@/components/user-page/user-xbox-card/UserXboxCard'
+import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import UserSteamCard from '@/components/user-page/user-steam-card/UserSteamCard'
 import RaLoginModal from '@/components/ra-login-modal/RaLoginModal'
 import RaLogo from '@/components/ra-logo/RaLogo'
@@ -25,7 +27,7 @@ const pending = (loading: boolean, value: number | null | undefined) =>
   loading || value === null || value === undefined ? '—' : value.toLocaleString()
 
 /**
- * The three platforms CheevoVault can track, side by side: who you are on
+ * The platforms CheevoVault can track, side by side: who you are on
  * each one, the five numbers worth knowing at a glance, and the button that
  * connects or disconnects it.
  */
@@ -36,6 +38,7 @@ export default function UserPlatforms() {
   const { rank, isLoading: rankLoading } = useUserRank()
   const { awards, isLoading: awardsLoading } = useUserAwards()
   const [raModalOpen, setRaModalOpen] = useState(false)
+  const xboxEnabled = useXboxEnabled()
 
   const raUser = session?.user?.raUser as RetroAchievementsUserProfile | null | undefined
   const raConnected = Boolean(session?.user?.rausername)
@@ -58,9 +61,11 @@ export default function UserPlatforms() {
 
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    // Xbox is a fourth card, only for who may use it (an admin, for now): three columns otherwise.
+    <div className={`grid grid-cols-1 gap-4 ${xboxEnabled ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
       <UserPlatformCard
         name="RetroAchievements"
+        source="ra"
         href={raUser?.User ? `https://retroachievements.org/user/${encodeURIComponent(raUser.User)}` : undefined}
         logo={<RaLogo height={18} />}
         bigLogo={<RaLogo height={40} />}
@@ -111,6 +116,8 @@ export default function UserPlatforms() {
       <UserSteamCard />
 
       <UserPsnCard />
+
+      <UserXboxCard />
 
       <RaLoginModal isOpen={raModalOpen} setIsOpen={setRaModalOpen} />
     </div>

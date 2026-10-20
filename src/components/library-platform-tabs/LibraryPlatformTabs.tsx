@@ -25,7 +25,7 @@ export default function LibraryPlatformTabs({
 }) {
   const { T } = useLanguage()
   const reduce = useReducedMotion()
-  const platforms = (['ra', 'steam', 'psn'] as const).filter((s) => counts[s] > 0)
+  const platforms = (['ra', 'steam', 'psn', 'xbox'] as const).filter((s) => counts[s] > 0)
   if (platforms.length < 2) return null
 
   const options: { value: PlatformChoice; label: string; n: number }[] = [

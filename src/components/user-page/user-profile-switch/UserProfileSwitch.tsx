@@ -14,6 +14,7 @@ export default function UserProfileSwitch({
   onText,
   offText,
   icon,
+  onSaved,
 }: {
   /** The profile field it saves, as "true" or "false". */
   field: string
@@ -22,6 +23,8 @@ export default function UserProfileSwitch({
   onText: string
   offText: string
   icon: ReactNode
+  /** For a setting the session does not carry: told the value once it is saved. */
+  onSaved?: (value: boolean) => void
 }) {
   const { save, saving, error } = useSaveProfileField()
   const labelId = useId()
@@ -41,7 +44,9 @@ export default function UserProfileSwitch({
           aria-checked={checked}
           aria-labelledby={labelId}
           disabled={saving}
-          onClick={() => save(field, String(!checked))}
+          onClick={async () => {
+            if (await save(field, String(!checked))) onSaved?.(!checked)
+          }}
           className={`relative shrink-0 w-11 h-6 rounded-full transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
             checked ? 'bg-accent' : 'bg-ink/20'
           }`}

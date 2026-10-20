@@ -203,3 +203,25 @@ describe('mixed RA and Steam order', () => {
     expect((pool.query as jest.Mock).mock.calls[0][0]).toContain('SELECT source, game_id, position')
   })
 })
+
+describe('Xbox is admin-only', () => {
+  test('a non-admin cannot pin an Xbox game', async () => {
+    const res = await POST(makeRequest('POST', { gameId: 1738914043, source: 'xbox' }))
+    expect(res.status).toBe(403)
+    expect(pool.query).not.toHaveBeenCalled()
+  })
+
+  test('nor put one in the order', async () => {
+    const res = await PUT(makeRequest('PUT', { order: [{ source: 'ra', gameId: 1 }, { source: 'xbox', gameId: 2 }] }))
+    expect(res.status).toBe(403)
+    expect(pool.connect).not.toHaveBeenCalled()
+  })
+
+  test('an admin can pin one', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+    ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
+    const res = await POST(makeRequest('POST', { gameId: 1738914043, source: 'xbox' }))
+    expect(res.status).toBe(200)
+    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['1', 'xbox', 1738914043])
+  })
+})

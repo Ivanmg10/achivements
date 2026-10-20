@@ -24,6 +24,8 @@ export default function SteamGameHeroBackground({ appId }: { appId: number }) {
         key={sources[index]}
         src={sources[index]}
         alt=""
+        decoding="async"
+        fetchPriority="low"
         onError={() => setIndex((i) => i + 1)}
         onLoad={(e) => e.currentTarget.classList.replace('opacity-0', 'opacity-60')}
         className="w-full h-full object-cover object-top opacity-0 scale-110 transition-opacity duration-700"

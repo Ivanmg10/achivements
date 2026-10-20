@@ -3,6 +3,9 @@ import { gameHref, gameKey } from '@/utils/gameRef'
 import { classifyPsnGame } from '@/utils/psnTitles'
 import { PSN_PLATFORM } from '@/utils/psnMappers'
 import type { PsnGameProgress } from '@/types/psn'
+import { classifyXboxGame, xboxHasAchievements } from '@/utils/xboxTitles'
+import { XBOX_PLATFORM } from '@/utils/xboxMappers'
+import type { XboxGameProgress } from '@/types/xbox'
 import { normalizeTitle } from '@/utils/gameCandidates'
 import type { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
@@ -37,6 +40,7 @@ export function buildLibrary(
   ra: { playing: RetroAchievementsGameCompleted[]; completed: RetroAchievementsGameCompleted[]; wantToPlay: WantToPlayGame[] },
   steam: SteamGameProgress[] = [],
   psn: PsnGameProgress[] = [],
+  xbox: XboxGameProgress[] = [],
 ): LibraryGame[] {
   const byKey = new Map<string, LibraryGame>()
   const put = (g: LibraryGame) => {
@@ -73,6 +77,12 @@ export function buildLibrary(
     put({
       key: gameKey('psn', g.id), source: 'psn', id: g.id, title: g.title, subtitle: PSN_PLATFORM,
       iconUrl: g.imageIcon || undefined, coverUrl: g.coverUrl ?? undefined, status, pct: Math.round(g.pctWon), href: gameHref('psn', g.id),
+    })
+  }
+  for (const g of xbox) {
+    put({
+      key: gameKey('xbox', g.id), source: 'xbox', id: g.id, title: g.title, subtitle: XBOX_PLATFORM,
+      iconUrl: g.imageIcon || undefined, status: classifyXboxGame(g), pct: Math.round(g.pctWon), href: gameHref('xbox', g.id),
     })
   }
   return [...byKey.values()]
@@ -120,10 +130,13 @@ export function profileLibrary(
   psn: PsnGameProgress[] = [],
   hidden: string[] = [],
   subject: string | null = null,
+  xbox: XboxGameProgress[] = [],
 ): LibraryGame[] {
   const hide = new Set(hidden)
   const done = (g: RetroAchievementsGameCompleted) => parseFloat(g.PctWon) >= 1
-  return buildLibrary({ playing: ra.filter((g) => !done(g)), completed: ra.filter(done), wantToPlay: [] }, steam, psn)
+  // An Xbox game with no achievements at all is just owned, so it is left out.
+  const xboxWithAchievements = xbox.filter(xboxHasAchievements)
+  return buildLibrary({ playing: ra.filter((g) => !done(g)), completed: ra.filter(done), wantToPlay: [] }, steam, psn, xboxWithAchievements)
     // A Steam game with nothing unlocked is just owned, not played.
     .filter((g) => !hide.has(g.key) && !(g.source === 'steam' && g.status === 'wantToPlay'))
     .map((g) => ({ ...g, href: gameHref(g.source, g.id, subject) }))
@@ -133,7 +146,7 @@ export type PlatformSummary = { source: GameSource; games: number; completed: nu
 
 /** Per platform with games, in the app's order: how many, at 100%, under way, and the average progress. */
 export function summarizeByPlatform(games: LibraryGame[]): PlatformSummary[] {
-  return (['ra', 'steam', 'psn'] as const)
+  return (['ra', 'steam', 'psn', 'xbox'] as const)
     .map((source) => {
       const own = games.filter((g) => g.source === source)
       return {

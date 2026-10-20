@@ -8,14 +8,15 @@ jest.mock('@/hooks/useFollowCounts', () => ({ useFollowCounts: jest.fn() }))
 const setup = (over: Record<string, unknown>) =>
   (useFollowCounts as jest.Mock).mockReturnValue({ counts: null, isLoading: false, error: false, ...over })
 
-test('both counts; Following opens the list, followers are only a number', () => {
+test('both counts, each opening its list', () => {
   setup({ counts: { following: 1234, followers: 2 } })
   render(<UserFollowStats />)
-  const link = screen.getByRole('link', { name: new RegExp(en.following.title) })
-  expect(link).toHaveAttribute('href', '/following')
-  expect(link).toHaveTextContent('1,234')
-  expect(screen.getByText(en.following.followers).parentElement).toHaveTextContent('2')
-  expect(screen.getAllByRole('link')).toHaveLength(1)
+  const following = screen.getByRole('link', { name: new RegExp(en.following.title) })
+  expect(following).toHaveAttribute('href', '/following')
+  expect(following).toHaveTextContent('1,234')
+  const followers = screen.getByRole('link', { name: new RegExp(en.following.followers) })
+  expect(followers).toHaveAttribute('href', '/following#followers')
+  expect(followers).toHaveTextContent('2')
 })
 
 test('a dash while loading; a failure says so', () => {

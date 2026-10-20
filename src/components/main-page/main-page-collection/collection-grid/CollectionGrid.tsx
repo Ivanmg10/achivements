@@ -16,7 +16,7 @@ const GRID = 'grid grid-cols-[repeat(auto-fill,minmax(4.75rem,1fr))] gap-x-2 gap
  * Every game at 100%, as covers with their names. By default in the user's
  * own order, editable as before; "by year" groups them by the year each got
  * there, newest first, with the dates on show. Chips narrow it to RA
- * hardcore, RA softcore, Steam or PlayStation.
+ * hardcore, RA softcore, Steam, PlayStation or Xbox.
  */
 export default function CollectionGrid({
   games,
@@ -81,6 +81,7 @@ export default function CollectionGrid({
           { value: 'raSc', label: `${T.cards.filterRaSc} ${count('raSc')}` },
           { value: 'steam', label: `Steam ${count('steam')}` },
           { value: 'psn', label: `PlayStation ${count('psn')}` },
+          ...(count('xbox') > 0 ? [{ value: 'xbox' as const, label: `Xbox ${count('xbox')}` }] : []),
         ]}
       />
 

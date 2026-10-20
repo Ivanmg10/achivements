@@ -4,27 +4,29 @@ import { useMemo } from 'react'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
+import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useUserAwards } from '@/hooks/useUserAwards'
 import { buildPerfectGames, countPerfectGames, latestPerfects } from '@/utils/perfectGames'
 import { ChartCard } from '@/components/ui/ChartCard'
 import CollectionShelf from '@/components/main-page/main-page-collection/collection-shelf/CollectionShelf'
-import MainPageFavorites from '@/components/main-page/main-page-favorites/MainPageFavorites'
+import PublicUserAchievementShowcase from '../public-user-achievement-showcase/PublicUserAchievementShowcase'
 
 const SHELF = 5
 
 /**
- * What a user shows off: their latest games at 100% on the trophy shelf, and
- * the achievements they pinned. Both are the main page's own cards, read as
- * that user (and with nothing of theirs to change).
+ * What a user shows off: their latest games at 100% on the trophy shelf (the
+ * main page's own card, read as that user) and their achievement showcase.
+ * Their pinned achievements are their own goals and are not shown here.
  */
 export default function PublicUserShowcase() {
   const { all, isLoading: gamesLoading } = useGamesData()
   const { library: steam } = useSteamGamesData()
   const { library: psn } = usePsnGamesData()
+  const { library: xbox } = useXboxGamesData()
   const { awards, isLoading: awardsLoading } = useUserAwards()
 
-  const counts = useMemo(() => countPerfectGames(buildPerfectGames(all, steam, psn)), [all, steam, psn])
-  const latest = useMemo(() => latestPerfects(awards?.VisibleUserAwards, steam, SHELF, psn), [awards, steam, psn])
+  const counts = useMemo(() => countPerfectGames(buildPerfectGames(all, steam, psn, xbox)), [all, steam, psn, xbox])
+  const latest = useMemo(() => latestPerfects(awards?.VisibleUserAwards, steam, SHELF, psn, xbox), [awards, steam, psn, xbox])
 
   return (
     <div className="flex flex-col gap-4">
@@ -36,7 +38,7 @@ export default function PublicUserShowcase() {
         )}
       </ChartCard>
       <ChartCard>
-        <MainPageFavorites />
+        <PublicUserAchievementShowcase />
       </ChartCard>
     </div>
   )

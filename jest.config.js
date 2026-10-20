@@ -7,6 +7,7 @@ module.exports = {
     "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/__mocks__/fileMock.js",
     "^@/context/LanguageContext$": "<rootDir>/__mocks__/context/LanguageContext.js",
     "^@/(.*)$": "<rootDir>/src/$1",
+    "^next/dynamic$": "<rootDir>/__mocks__/next/dynamic.js",
     "^next/image$": "<rootDir>/__mocks__/next/image.js",
     "^next/link$": "<rootDir>/__mocks__/next/link.js",
     "^next/navigation$": "<rootDir>/__mocks__/next/navigation.js",

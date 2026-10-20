@@ -1,12 +1,15 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/apiAuth', () => ({ requireSession: jest.fn() }))
 jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn() }))
+jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 
 import { GET } from './route'
+import { presenceColumns } from '@/lib/presence'
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { requireSession } from '@/lib/apiAuth'
 import { allowAttempt } from '@/lib/attemptLimit'
+import { getServerSession } from 'next-auth'
 
 const get = (query: string) => new NextRequest(`http://localhost/api/users/search?${query}`)
 
@@ -37,7 +40,7 @@ test('returns matching users, searching by prefix with the exact name as the tie
   expect(sql).toContain("ILIKE $1 || '%'")
   // Private profiles are left out, unless it is the searcher's own.
   expect(sql).toContain('profile_public OR id = $3')
-  expect(params).toEqual(['ivan', 'ivan', '1'])
+  expect(params).toEqual(['ivan', 'ivan', '1', false])
 })
 
 test('says who each one is, briefly, and never their email', async () => {
@@ -50,7 +53,7 @@ test('says who each one is, briefly, and never their email', async () => {
 
 test('LIKE wildcards in the query are escaped, so "_" does not match any letter', async () => {
   await GET(get('q=a_b%25'))
-  expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['a\\_b\\%', 'a_b%', '1'])
+  expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['a\\_b\\%', 'a_b%', '1', false])
 })
 
 test('a failing query is a 500', async () => {
@@ -64,4 +67,17 @@ test('searching too often is a 429, and the table is not touched', async () => {
   expect((await GET(get('q=ivan'))).status).toBe(429)
   expect(allowAttempt).toHaveBeenCalledWith('user-search', 'user:1')
   expect(pool.query).not.toHaveBeenCalled()
+})
+
+test('whether a result has Xbox is asked of the database only for an admin searcher', async () => {
+  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+  await GET(get('q=ivan'))
+  const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
+  expect(sql).toContain('xboxxuid IS NOT NULL AND $4::boolean')
+  expect(params[3]).toBe(true)
+})
+
+test('each one says whether they are online, by the shared presence rule', async () => {
+  await GET(get('q=ivan'))
+  expect((pool.query as jest.Mock).mock.calls[0][0]).toContain(presenceColumns())
 })

@@ -82,6 +82,9 @@ test('creating a group adds its initial games, Steam ones with their platform', 
   ;(useGroups as jest.Mock).mockReturnValue({ groups: [], isLoading: false, error: null, createGroup })
   global.fetch = jest.fn().mockResolvedValue({ ok: true })
   render(<GroupsPage />)
+  // The modal is downloaded the first time it opens, and is what hands over the save.
+  fireEvent.click(screen.getAllByRole('button', { name: mockT.groups.newGroup })[0])
+  await screen.findByTestId('group-modal')
 
   await mockOnSave({
     title: 'Mix', description: '', icon: '', is_public: false,
@@ -105,6 +108,8 @@ test('if some initial games cannot be added, it says so instead of "created"', a
   global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500 })
   ;(notify.success as jest.Mock).mockClear()
   render(<GroupsPage />)
+  fireEvent.click(screen.getAllByRole('button', { name: mockT.groups.newGroup })[0])
+  await screen.findByTestId('group-modal')
 
   await mockOnSave({
     title: 'Mix', description: '', icon: '', is_public: false,

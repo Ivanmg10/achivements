@@ -22,6 +22,9 @@ type SessionUserFields = {
   /** Typed in by username, not proven to be the user's; see migrations/024_psn_columns.sql. */
   psnaccountid?: string;
   psnusername?: string;
+  /** Typed in by gamertag, not proven to be the user's; see migrations/033_xbox_columns.sql. Admin-only for now. */
+  xboxxuid?: string;
+  xboxgamertag?: string;
   email?: string;
   /** The address has been confirmed. False blocks nothing — it only shows a banner. */
   emailVerified?: boolean;
@@ -31,12 +34,15 @@ type SessionUserFields = {
   description?: string | null;
   /** Whether other users may find and open this profile. */
   profilePublic?: boolean;
+  /** Whether others are told when this user was last seen. */
+  showPresence?: boolean;
   gender?: 'male' | 'female' | 'neutral' | null;
   /** Whether the gender shows on the public profile. */
   genderPublic?: boolean;
   favorite_game?: SavedGame;
   favorite_steam_game?: SavedGame;
   favorite_psn_game?: SavedGame;
+  favorite_xbox_game?: SavedGame;
 };
 
 declare module "next-auth" {

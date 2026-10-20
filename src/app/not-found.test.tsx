@@ -3,12 +3,12 @@ import { LanguageProvider } from '@/context/LanguageContext'
 import { en } from '@/translations/en'
 import NotFound from './not-found'
 
-test('says the page does not exist and links home', () => {
+test('shows the hidden-achievement 404, full screen', () => {
   render(
     <LanguageProvider>
       <NotFound />
     </LanguageProvider>,
   )
-  expect(screen.getByRole('heading', { name: en.notFound.title })).toBeInTheDocument()
-  expect(screen.getByRole('link', { name: en.notFound.home })).toHaveAttribute('href', '/')
+  expect(screen.getByRole('heading', { level: 1, name: en.notFound.title })).toBeInTheDocument()
+  expect(screen.getByRole('main')).toHaveClass('min-h-screen')
 })

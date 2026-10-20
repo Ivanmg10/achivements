@@ -1,13 +1,17 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { IconPlus, IconFolder, IconTrash } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
 import type { GameCandidate } from '@/utils/gameCandidates'
 import { addGamesToGroup } from '@/utils/apiCallsUtils'
-import GroupModal from '@/components/groups/GroupModal'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+
+// Downloaded the first time it is opened, not with the page.
+const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
 import { relativeTime, plural } from '@/utils/utils'
 import EmptyState from '@/components/empty-state/EmptyState'
 import GroupIcon from '@/components/groups/group-icon/GroupIcon'
@@ -198,11 +202,13 @@ export default function MainPageGroups({
         </div>
       )}
 
-      <GroupModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSave={handleCreate}
-      />
+      <LazyWhenOpened open={modalOpen}>
+        <GroupModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSave={handleCreate}
+        />
+      </LazyWhenOpened>
     </div>
   )
 }

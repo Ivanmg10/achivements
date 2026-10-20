@@ -3,6 +3,10 @@ import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 export type UserSearchResult = {
   username: string
+  /** Seen in the last 5 minutes; false too for who does not share it. */
+  online?: boolean
+  /** When last seen, rounded to 5 minutes; null if never, or not shared. */
+  lastSeenAt?: string | null
   avatar: string | null
   /** Country code. */
   location?: string | null
@@ -11,6 +15,8 @@ export type UserSearchResult = {
   ra: boolean
   steam: boolean
   psn: boolean
+  /** Only true for a searcher who may see Xbox (an admin, for now). */
+  xbox?: boolean
 }
 
 export const USER_SEARCH_MIN = 3

@@ -33,7 +33,7 @@ function setup({
   trophies = { trophies: [{ id: 0 }, { id: 1 }], groups: [], isLoading: false, error: null as string | null },
 } = {}) {
   ;(useParams as jest.Mock).mockReturnValue({ id })
-  ;(usePsnGamesData as jest.Mock).mockReturnValue({ isLinked: linked, library, libraryLoading })
+  ;(usePsnGamesData as jest.Mock).mockReturnValue({ isLinked: linked, fullLibrary: library, libraryLoading })
   ;(usePsnTrophies as jest.Mock).mockReturnValue({ ...trophies, retry })
 }
 

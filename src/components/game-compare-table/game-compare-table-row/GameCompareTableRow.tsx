@@ -50,6 +50,7 @@ export default function GameCompareTableRow({
         <p className="flex flex-wrap gap-x-2 text-[11px] text-text-secondary">
           {row.points !== undefined && <span>{row.points} pts</span>}
           {row.grade && <span>{T.psn[row.grade]}</span>}
+          {row.gamerscore !== undefined && <span>{row.gamerscore} G</span>}
           {row.rarity !== null && <span>{T.psn.rarity.replace('{n}', row.rarity.toFixed(1))}</span>}
         </p>
       </div>

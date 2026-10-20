@@ -15,6 +15,9 @@ import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import SteamGameItem from '@/components/steam/steam-game-item/SteamGameItem'
 import PsnGameItem from '@/components/psn/psn-game-item/PsnGameItem'
+import PsnCollectionItem from '@/components/psn/psn-collection-item/PsnCollectionItem'
+import XboxGameItem from '@/components/xbox/xbox-game-item/XboxGameItem'
+import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { mergeRecentFeeds, RecentFeedItem } from '@/utils/steamFeed'
@@ -42,10 +45,11 @@ export default function RARecentlyPlayed() {
   const { games, isLoading, error, refetch } = useRecentlyPlayedGames()
   const { recent: steamRecent, recentLoading: steamLoading } = useSteamGamesData()
   const { library: psnLibrary, libraryLoading: psnLoading } = usePsnGamesData()
+  const { library: xboxLibrary, libraryLoading: xboxLoading } = useXboxGamesData()
   // One feed across platforms, newest first. It shows once every linked
   // platform has answered, so games never pop in (and reorder) a moment later.
-  const loading = isLoading || steamLoading || psnLoading
-  const feed = mergeRecentFeeds(games, steamRecent, MAX_GAMES, psnLibrary)
+  const loading = isLoading || steamLoading || psnLoading || xboxLoading
+  const feed = mergeRecentFeeds(games, steamRecent, MAX_GAMES, psnLibrary, xboxLibrary)
 
   // Keyed by feed key, not game id: RA game 730 and Steam app 730 are different games.
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -62,7 +66,7 @@ export default function RARecentlyPlayed() {
 
     setExpanded(item.key)
 
-    // Steam and PSN cards load their own achievements when opened.
+    // Steam, PSN and Xbox cards load their own achievements when opened.
     if (item.source !== 'ra') return
 
     const gameId = item.game.GameID
@@ -111,9 +115,10 @@ export default function RARecentlyPlayed() {
       {/* Cards */}
       <div className="flex flex-col flex-1 min-h-0">
         {loading ? (
-          <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-hidden animate-pulse motion-reduce:animate-none">
+          // Sized like the loaded list (home-fit-scroll, rows sharing the height), so the rows fill the card and nothing jumps when it loads.
+          <div className="home-fit-scroll flex flex-col gap-1.5 flex-1 min-h-0 overflow-hidden animate-pulse motion-reduce:animate-none">
             {Array.from({ length: MAX_GAMES }).map((_, i) => (
-              <GameRowSkeleton key={i} />
+              <GameRowSkeleton key={i} className="flex-1" />
             ))}
           </div>
         ) : error && feed.length === 0 ? (
@@ -139,6 +144,22 @@ export default function RARecentlyPlayed() {
                 return (
                   <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
                     <PsnGameItem game={item.game} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1" />
+                  </div>
+                )
+              }
+
+              if (item.source === 'psnCollection') {
+                return (
+                  <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
+                    <PsnCollectionItem collection={item.collection} games={item.games} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1" />
+                  </div>
+                )
+              }
+
+              if (item.source === 'xbox') {
+                return (
+                  <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
+                    <XboxGameItem game={item.game} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1" />
                   </div>
                 )
               }

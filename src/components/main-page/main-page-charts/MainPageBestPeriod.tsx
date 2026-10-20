@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { IconCalendarEvent, IconCalendarMonth, IconCalendarWeek } from '@tabler/icons-react'
 import { RecentAchievement } from '@/types/types'
 import MainPageBestPeriodRow from './main-page-best-period-row/MainPageBestPeriodRow'
@@ -9,6 +9,7 @@ import { getBestMonth } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import WeekAchievementsModal from '@/components/week-achievements-modal/WeekAchievementsModal'
+import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
 
 type Metric = 'pts' | 'ach'
 
@@ -49,10 +50,10 @@ export default function MainPageBestPeriod({
 
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [selectedWeek, setSelectedWeek] = useState<string | null>(null)
-  const [expandedMonth, setExpandedMonth] = useState<string | null>(null)
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null)
 
-  // Steam and PSN have no points: their best periods are the ones with the most unlocks.
-  const isSteam = achievements.some((a) => a.Source === 'steam' || a.Source === 'psn')
+  // Steam, PSN and Xbox have no points: their best periods are the ones with the most unlocks.
+  const isSteam = achievements.some((a) => a.Source === 'steam' || a.Source === 'psn' || a.Source === 'xbox')
   const metric: Metric = isSteam ? 'ach' : 'pts'
 
   const { bestDay, bestWeek, bestMonth } = useMemo(() => ({
@@ -70,26 +71,10 @@ export default function MainPageBestPeriod({
   const when = (p: { pts: number; ach: number }, date: string) =>
     isSteam ? date : `${p.ach} ${T.lineChart.achievements} · ${date}`
 
-  const monthDays = useMemo(() => {
-    if (!expandedMonth || !achievements.length) return []
-    const byDay: Record<string, { pts: number; ach: number }> = {}
-    for (const a of achievements) {
-      const day = a.Date.split(' ')[0]
-      if (day.startsWith(expandedMonth)) {
-        if (!byDay[day]) byDay[day] = { pts: 0, ach: 0 }
-        byDay[day].pts += a.Points
-        byDay[day].ach++
-      }
-    }
-    return Object.entries(byDay).sort((a, b) => a[0].localeCompare(b[0]))
-  }, [expandedMonth, achievements])
-
   const closeDayModal = useCallback(() => setSelectedDay(null), [])
   const closeWeekModal = useCallback(() => setSelectedWeek(null), [])
 
-  const toggleMonth = useCallback((monthKey: string) => {
-    setExpandedMonth(prev => prev === monthKey ? null : monthKey)
-  }, [])
+  const closeMonthModal = useCallback(() => setSelectedMonth(null), [])
 
   return (
     <div className="flex flex-col gap-3">
@@ -139,48 +124,16 @@ export default function MainPageBestPeriod({
           )}
 
           {/* Best Month — red */}
+          {/* Its days open in a modal, like the day and the week: unfolded in place, the list pushed the card's row down. */}
           {bestMonth ? (
-            <div className="flex flex-col">
-              <MainPageBestPeriodRow
-                label={T.cards.bestMonth}
-                tone="red"
-                icon={<IconCalendarMonth className="w-4 h-4" />}
-                {...amount(bestMonth[1])}
-                when={when(bestMonth[1], bestMonth[0])}
-                onClick={() => toggleMonth(bestMonth[0])}
-                expanded={expandedMonth === bestMonth[0]}
-              />
-
-              <AnimatePresence>
-                {expandedMonth === bestMonth[0] && monthDays.length > 0 && (
-                  <motion.div
-                    className="flex flex-col mt-1 ml-2 border-l-2 border-ink/10 pl-2 gap-0.5 overflow-hidden"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {monthDays.map(([day, { pts, ach }]) => (
-                      <button
-                        key={day}
-                        onClick={() => setSelectedDay(day)}
-                        className="flex items-center justify-between p-2 rounded-lg bg-bg-main/50 hover:bg-bg-card text-left cursor-pointer transition-colors text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70"
-                      >
-                        <span className="text-red-300">
-                          {new Date(day + 'T00:00:00').toLocaleDateString('default', {
-                            weekday: 'short',
-                            day: 'numeric',
-                          })}
-                        </span>
-                        <span className="text-text-secondary">
-                          {!isSteam && `${pts.toLocaleString()}pts · `}{ach} {T.dayModal.achievements}
-                        </span>
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            <MainPageBestPeriodRow
+              label={T.cards.bestMonth}
+              tone="red"
+              icon={<IconCalendarMonth className="w-4 h-4" />}
+              {...amount(bestMonth[1])}
+              when={when(bestMonth[1], bestMonth[0])}
+              onClick={() => setSelectedMonth(bestMonth[0])}
+            />
           ) : (
             <div className="bg-bg-main rounded-lg p-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
@@ -201,6 +154,13 @@ export default function MainPageBestPeriod({
             startDate={selectedWeek}
             achievements={achievements}
             onClose={closeWeekModal}
+          />
+        )}
+        {selectedMonth && (
+          <PeriodAchievementsModal
+            title={`${T.cards.bestMonth} · ${selectedMonth}`}
+            achievements={achievements.filter((a) => a.Date.startsWith(selectedMonth))}
+            onClose={closeMonthModal}
           />
         )}
       </AnimatePresence>

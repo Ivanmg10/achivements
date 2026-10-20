@@ -56,7 +56,7 @@ function sortAchievements(list: SteamAchievementUnified[], { key, dir }: SteamSo
  *
  * Opening the page from a badge link (…#ach-<apiname>) scrolls to that
  * achievement and highlights it briefly. Each achievement can be pinned to
- * the main page, as RA's table does, and pinned ones lead the list; each
+ * the main page, as RA's table does, and the ones pinned when it loaded lead the list; each
  * opens in a detail window with links to guides. The ones that likely need
  * online play and are still locked are listed in a warning above, as RA
  * lists its missables — servers close.
@@ -71,7 +71,7 @@ export default function SteamGameInfoTable({
   gameTitle: string
 }) {
   const { T } = useLanguage()
-  const { pinned, toggle, canPin } = useSteamFavoriteAchievements(appId, gameTitle)
+  const { pinned, leading, toggle, canPin } = useSteamFavoriteAchievements(appId, gameTitle)
   const [filter, setFilter] = useState<Filter>('all')
   const [sortState, setSortState] = useState<SteamSortState>({ key: 'default', dir: 'asc' })
   const [expanded, setExpanded] = useState(true)
@@ -119,8 +119,8 @@ export default function SteamGameInfoTable({
           : achievements
     const sorted = sortAchievements(list, sortState)
     // Pinned first, each part in the chosen order — as RA's table does.
-    return canPin ? [...sorted.filter((a) => pinned.has(a.apiname)), ...sorted.filter((a) => !pinned.has(a.apiname))] : sorted
-  }, [achievements, filter, sortState, canPin, pinned])
+    return canPin ? [...sorted.filter((a) => leading.has(a.apiname)), ...sorted.filter((a) => !leading.has(a.apiname))] : sorted
+  }, [achievements, filter, sortState, canPin, leading])
 
   const onlineLocked = useMemo(() => achievements.filter((a) => a.likelyOnline && !a.earned), [achievements])
 
@@ -254,6 +254,11 @@ export default function SteamGameInfoTable({
             guides={selected.hidden && !selected.earned ? [] : guideLinks('steam', { gameTitle, title: selected.titleEn ?? selected.title, appId })}
             pinned={canPin ? pinned.has(selected.apiname) : undefined}
             onTogglePin={() => toggle(selected)}
+            showcase={
+              selected.earned && selected.dateEarned
+                ? { source: 'steam', gameId: appId, achievementKey: selected.apiname, gameTitle, title: selected.title, description: selected.description || null, badge: selected.badgeUrl || null, earnedAt: selected.dateEarned }
+                : null
+            }
             onClose={() => setSelected(null)}
           />
         )}

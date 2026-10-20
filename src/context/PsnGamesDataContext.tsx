@@ -5,13 +5,19 @@ import { useSession } from 'next-auth/react'
 import { psnErrorFrom, type PsnError } from '@/hooks/usePsnLink'
 import type { PsnGameProgress } from '@/types/psn'
 import { usePsnPlatinumCompletes } from '@/hooks/usePsnPlatinumCompletes'
+import { useHiddenConsoles } from '@/hooks/useHiddenConsoles'
+import { consoleOptions, filterByConsole, type ConsoleOption } from '@/utils/consoleFilter'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 
 type PsnGamesCtx = {
   isLinked: boolean
-  /** Every game in the trophy list, most recently played first. */
+  /** The trophy list without the consoles unticked in preferences, most recently played first. */
   library: PsnGameProgress[]
+  /** Every game, ticked consoles or not: for what looks a game up by id (its page, a pin, a group). */
+  fullLibrary: PsnGameProgress[]
+  /** The consoles in the list, for the preferences to tick. */
+  consoles: ConsoleOption[]
   libraryLoading: boolean
   libraryError: PsnError | null
   refetch: () => void
@@ -20,6 +26,8 @@ type PsnGamesCtx = {
 const Ctx = createContext<PsnGamesCtx>({
   isLinked: false,
   library: [],
+  fullLibrary: [],
+  consoles: [],
   libraryLoading: false,
   libraryError: null,
   refetch: () => {},
@@ -35,6 +43,7 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
   const { data: session } = useSession()
   const subject = useSubject()
   const [platinumCompletes] = usePsnPlatinumCompletes()
+  const { hidden } = useHiddenConsoles('psn')
   const accountId = session?.user?.psnaccountid ?? null
 
   const [library, setLibrary] = useState<PsnGameProgress[]>([])
@@ -91,12 +100,18 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
     () => (platinumCompletes ? library.map((g) => (g.earned.platinum > 0 ? { ...g, platinumCompletes: true } : g)) : library),
     [library, platinumCompletes],
   )
+  const fullLibrary = useMemo(() => (current ? games : []), [current, games])
+  // The preference is the viewer's own: someone else's list is shown whole.
+  const shown = useMemo(() => (subject ? fullLibrary : filterByConsole(fullLibrary, (g) => g.consoleName, hidden)), [subject, fullLibrary, hidden])
+  const consoles = useMemo(() => consoleOptions(fullLibrary.map((g) => g.consoleName)), [fullLibrary])
 
   return (
     <Ctx.Provider
       value={{
         isLinked: Boolean(accountId),
-        library: current ? games : [],
+        library: shown,
+        fullLibrary,
+        consoles,
         libraryLoading: Boolean(accountId) && (libraryLoading || !current),
         libraryError: current ? libraryError : null,
         refetch,

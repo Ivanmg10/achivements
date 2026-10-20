@@ -1,3 +1,4 @@
+jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 jest.mock('@/lib/fetchWithRetry', () => ({
   ...jest.requireActual('@/lib/fetchWithRetry'),
   fetchWithRetry: jest.fn(),
@@ -5,6 +6,7 @@ jest.mock('@/lib/fetchWithRetry', () => ({
 
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import { notify } from '@/lib/notify'
 import { usePinnedAchievements } from './usePinnedAchievements'
 import type { PinnedAchievement } from '@/types/types'
 import { createElement, type ReactNode } from 'react'
@@ -80,10 +82,35 @@ test('reports the error once the background retries run out, and refetch loads a
   expect(result.current.error).toBe(false)
 })
 
-test("on someone's profile it reads their pins", async () => {
+test("on someone's profile it still reads only the user's own pins", async () => {
   ;(fetchWithRetry as jest.Mock).mockResolvedValue([RA])
   const wrapper = ({ children }: { children: ReactNode }) => createElement(SubjectContext.Provider, { value: 'ivan' }, children)
   const { result } = renderHook(() => usePinnedAchievements(), { wrapper })
   await waitFor(() => expect(result.current.isLoading).toBe(false))
-  expect(fetchWithRetry).toHaveBeenCalledWith('/api/favorites?source=all&user=ivan')
+  expect(fetchWithRetry).toHaveBeenCalledWith('/api/favorites?source=all')
+})
+
+test('reorders at once and saves the order by row id', async () => {
+  const a = { ...RA, id: 11 } as PinnedAchievement
+  const b = { ...STEAM, id: 22 } as PinnedAchievement
+  ;(fetchWithRetry as jest.Mock).mockResolvedValue([a, b])
+  const { result } = renderHook(() => usePinnedAchievements())
+  await waitFor(() => expect(result.current.pinned).toEqual([a, b]))
+  await act(() => result.current.reorder([b, a]))
+  expect(result.current.pinned).toEqual([b, a])
+  expect(global.fetch).toHaveBeenCalledWith('/api/favorites', expect.objectContaining({ method: 'PUT', body: JSON.stringify({ order: [22, 11] }) }))
+  expect(notify.error).not.toHaveBeenCalled()
+})
+
+test('puts the old order back, and says so, when it cannot be saved', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  const a = { ...RA, id: 11 } as PinnedAchievement
+  const b = { ...STEAM, id: 22 } as PinnedAchievement
+  ;(fetchWithRetry as jest.Mock).mockResolvedValue([a, b])
+  ;(global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 500 })
+  const { result } = renderHook(() => usePinnedAchievements())
+  await waitFor(() => expect(result.current.pinned).toEqual([a, b]))
+  await act(() => result.current.reorder([b, a]))
+  expect(result.current.pinned).toEqual([a, b])
+  expect(notify.error).toHaveBeenCalled()
 })

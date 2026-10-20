@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { signOut, useSession } from 'next-auth/react'
 import { IconAlertTriangle, IconCircleCheck, IconDeviceGamepad2, IconFolders, IconLock, IconLogout, IconPencil, IconPin, IconPlayerPlay, IconShield } from '@tabler/icons-react'
@@ -8,12 +9,11 @@ import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
 import UserVaultStat from '@/components/user-page/user-vault-stat/UserVaultStat'
 import UserFollowStats from '@/components/user-page/user-follow-stats/UserFollowStats'
-import AdminPanelModal from '@/components/admin-panel/admin-panel-modal/AdminPanelModal'
+import UserVaultLevel from '@/components/user-page/user-vault-level/UserVaultLevel'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import EmailVerificationNotice from '@/components/user-page/email-verification-notice/EmailVerificationNotice'
-import EditProfileModal, { EditProfileField } from '@/components/edit-profile-modal/EditProfileModal'
-import ChangePasswordModal from '@/components/change-password-modal/ChangePasswordModal'
+import type { EditProfileField } from '@/components/edit-profile-modal/EditProfileModal'
 import UserDescriptionField from '@/components/user-page/user-description-field/UserDescriptionField'
-import LocationModal from '@/components/location-modal/LocationModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -21,6 +21,12 @@ import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { useGroups } from '@/hooks/useGroups'
 import { summarizeSteamLibrary } from '@/utils/steamFeed'
 import { codeToFlag, findCountry } from '@/utils/countries'
+
+// Modals are downloaded the first time they are wanted, not with the page — the admin panel above all.
+const AdminPanelModal = dynamic(() => import('@/components/admin-panel/admin-panel-modal/AdminPanelModal'), { loading: () => null })
+const EditProfileModal = dynamic(() => import('@/components/edit-profile-modal/EditProfileModal'), { loading: () => null })
+const ChangePasswordModal = dynamic(() => import('@/components/change-password-modal/ChangePasswordModal'), { loading: () => null })
+const LocationModal = dynamic(() => import('@/components/location-modal/LocationModal'), { loading: () => null })
 
 /**
  * Who you are on CheevoVault: avatar, username, email and country, with
@@ -182,8 +188,9 @@ export default function UserIdentityCard() {
             <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
           )}
         </ProfileField>
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-3 flex flex-col gap-3">
           <UserFollowStats />
+          <UserVaultLevel />
         </div>
         <div className="sm:col-span-3 flex flex-col">
           <UserDescriptionField />
@@ -202,13 +209,21 @@ export default function UserIdentityCard() {
       </div>
       </div>
 
-      <ChangePasswordModal isOpen={passwordOpen} onClose={() => setPasswordOpen(false)} />
-      {user?.admin && <AdminPanelModal isOpen={adminOpen} onClose={() => setAdminOpen(false)} />}
-      <LocationModal
-        isOpen={locationOpen}
-        onClose={() => setLocationOpen(false)}
-        currentCode={user?.location}
-      />
+      <LazyWhenOpened open={passwordOpen}>
+        <ChangePasswordModal isOpen={passwordOpen} onClose={() => setPasswordOpen(false)} />
+      </LazyWhenOpened>
+      {user?.admin && (
+        <LazyWhenOpened open={adminOpen}>
+          <AdminPanelModal isOpen={adminOpen} onClose={() => setAdminOpen(false)} />
+        </LazyWhenOpened>
+      )}
+      <LazyWhenOpened open={locationOpen}>
+        <LocationModal
+          isOpen={locationOpen}
+          onClose={() => setLocationOpen(false)}
+          currentCode={user?.location}
+        />
+      </LazyWhenOpened>
       {edit && (
         <EditProfileModal
           isOpen

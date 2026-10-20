@@ -52,16 +52,17 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mostActiveGames}</p>
       <div className="flex flex-col gap-2 flex-1">
         {data.map(({ name, count, href, icon, console: con }) => (
+          // The bar is each game against the busiest one, so the ranking reads at a glance.
           <GameListRow
             key={href}
             href={href}
             imageUrl={icon}
-            imageAlt={name}
             title={name}
             subtitle={con}
             stat={String(count)}
             statLabel={T.lineChart.achievements}
             statClassName="text-accent"
+            share={(count / data[0].count) * 100}
           />
         ))}
       </div>

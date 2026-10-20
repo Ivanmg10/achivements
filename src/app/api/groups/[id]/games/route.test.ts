@@ -71,7 +71,7 @@ describe('POST', () => {
 
   test('rejects an unknown source', async () => {
     ownsGroup()
-    const res = await POST(makeRequest('POST', { source: 'xbox', game_id: 1, title: 'x' }), params)
+    const res = await POST(makeRequest('POST', { source: 'switch', game_id: 1, title: 'x' }), params)
     expect(res.status).toBe(400)
   })
 
@@ -121,7 +121,7 @@ describe('DELETE', () => {
     ownsGroup()
     expect((await DELETE(makeRequest('DELETE'), params)).status).toBe(400)
     ownsGroup()
-    const bad = makeRequest('DELETE', undefined, 'http://localhost/api/groups/5/games?gameId=1&source=xbox')
+    const bad = makeRequest('DELETE', undefined, 'http://localhost/api/groups/5/games?gameId=1&source=switch')
     expect((await DELETE(bad, params)).status).toBe(400)
   })
 })
@@ -202,5 +202,25 @@ describe('PUT (reorder)', () => {
     ownsGroup()
     ;(pool.query as jest.Mock).mockRejectedValueOnce(new Error('db down'))
     expect((await PUT(makeRequest('PUT', { order: [1] }), params)).status).toBe(500)
+  })
+})
+
+describe('Xbox is admin-only', () => {
+  test('a non-admin cannot add an Xbox game to a group', async () => {
+    ownsGroup()
+    const res = await POST(makeRequest('POST', { source: 'xbox', game_id: 1738914043, title: 'Halo' }), params)
+    expect(res.status).toBe(403)
+    expect(pool.query).toHaveBeenCalledTimes(1)
+  })
+
+  test('an admin can', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+    ownsGroup()
+    ;(pool.query as jest.Mock)
+      .mockResolvedValueOnce({ rows: [{ next: 0, count: 0 }] })
+      .mockResolvedValueOnce({ rows: [{ id: 9, source: 'xbox' }] })
+    const res = await POST(makeRequest('POST', { source: 'xbox', game_id: 1738914043, title: 'Halo' }), params)
+    expect(res.status).toBe(201)
+    expect((pool.query as jest.Mock).mock.calls[2][1][1]).toBe('xbox')
   })
 })

@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useMemo } from 'react'
 import { useSession } from 'next-auth/react'
 import { RecentlyPlayedGame } from '@/types/types'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
@@ -87,7 +87,11 @@ export function RecentlyPlayedGamesProvider({ children }: { children: React.Reac
     doFetch()
   }, [doFetch])
 
-  return <Ctx.Provider value={{ games, isLoading, error, refetch }}>{children}</Ctx.Provider>
+  // One object per change of what it holds, so a re-render of the provider (the session updating)
+  // does not re-render everything that reads it.
+  const value = useMemo(() => ({ games, isLoading, error, refetch }), [games, isLoading, error, refetch])
+
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 
 export const useRecentlyPlayedGames = () => useContext(Ctx)

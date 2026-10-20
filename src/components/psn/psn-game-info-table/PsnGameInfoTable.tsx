@@ -62,7 +62,7 @@ function sortTrophies(list: PsnTrophy[], { key, dir }: SteamSortState): PsnTroph
  *
  * Opening the page from a trophy link (…#trophy-<id>) scrolls to that trophy
  * and highlights it briefly. Each trophy can be pinned to the main page, and
- * pinned ones lead the list; each opens in a detail window with links to
+ * the ones pinned when it loaded lead the list; each opens in a detail window with links to
  * guides.
  */
 export default function PsnGameInfoTable({
@@ -77,7 +77,7 @@ export default function PsnGameInfoTable({
   gameTitle: string
 }) {
   const { T } = useLanguage()
-  const { pinned, toggle, canPin } = usePsnFavoriteTrophies(gameId, gameTitle)
+  const { pinned, leading, toggle, canPin } = usePsnFavoriteTrophies(gameId, gameTitle)
   const panelId = useId()
   const [groupTab, setGroupTab] = useState<GroupTab>('all')
   const [filter, setFilter] = useState<Filter>('all')
@@ -124,8 +124,8 @@ export default function PsnGameInfoTable({
       filter === 'earned' ? inGroup.filter((t) => t.earned) : filter === 'unearned' ? inGroup.filter((t) => !t.earned) : inGroup
     const sorted = sortTrophies(list, sortState)
     // Pinned first, each part in the chosen order — as RA's table does.
-    return canPin ? [...sorted.filter((t) => pinned.has(t.id)), ...sorted.filter((t) => !pinned.has(t.id))] : sorted
-  }, [trophies, filter, sortState, groupTab, canPin, pinned])
+    return canPin ? [...sorted.filter((t) => leading.has(t.id)), ...sorted.filter((t) => !leading.has(t.id))] : sorted
+  }, [trophies, filter, sortState, groupTab, canPin, leading])
 
   function handleSort(key: SteamSortKey) {
     setSortState((prev) =>
@@ -272,6 +272,11 @@ export default function PsnGameInfoTable({
               guides={concealed ? [] : guideLinks('psn', { gameTitle, title: selected.name })}
               pinned={canPin ? pinned.has(selected.id) : undefined}
               onTogglePin={() => toggle(selected)}
+              showcase={
+                selected.earned && selected.earnedAt
+                  ? { source: 'psn', gameId, achievementKey: String(selected.id), gameTitle, title: selected.name, description: selected.detail || null, badge: selected.iconUrl, earnedAt: selected.earnedAt }
+                  : null
+              }
               onClose={() => setSelected(null)}
             />
           )

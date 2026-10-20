@@ -1,23 +1,59 @@
 'use client'
 
 import { useState } from 'react'
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { groupGameAchievementsByPeriod, DatedUnlock } from '@/utils/utils'
+import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
+import type { InsightAchievement } from '@/utils/gameInsights'
+import { groupGameAchievementsByPeriod } from '@/utils/utils'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
 type Period = 'week' | 'month'
 
+const PLOT_HEIGHT = 'h-[208px]'
+
+// recharts is the heaviest thing on the page: it arrives when there is a line to draw, with the room kept meanwhile.
+const GameAchievementsProgressPlot = dynamic(
+  () => import('./game-achievements-progress-plot/GameAchievementsProgressPlot'),
+  { loading: () => <div aria-hidden="true" className={`${PLOT_HEIGHT} animate-pulse rounded-lg bg-ink/5`} /> },
+)
+// Downloaded the first time a point is clicked, not with the card. `loading` gives it its
+// own Suspense boundary: without one the download suspends the whole page (the home
+// skeleton flashes).
+const GameAchievementsProgressChartModal = dynamic(
+  () => import('./game-achievements-progress-chart-modal/GameAchievementsProgressChartModal'),
+  { loading: () => null },
+)
+
+/**
+ * A game's unlocks per week or month. Clicking a point lists what was unlocked
+ * in that period.
+ */
 export function GameAchievementsProgressChart({
   achievements,
   isLoading,
 }: {
-  achievements: DatedUnlock[]
+  achievements: InsightAchievement[]
   isLoading?: boolean
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const [period, setPeriod] = useState<Period>('week')
+  // Kept after closing, so the modal still has its content while it animates out.
+  const [selected, setSelected] = useState<{ title: string; items: InsightAchievement[] } | null>(null)
+  const [open, setOpen] = useState(false)
   const data = groupGameAchievementsByPeriod(achievements, period)
   const total = data.reduce((sum, d) => sum + d.count, 0)
+
+  function handleSelect(label: string) {
+    const bucket = data.find((d) => d.label === label)
+    if (!bucket?.count) return
+    const start = new Date(bucket.start)
+    const title =
+      period === 'week'
+        ? T.gameExpanded.weekOf.replace('{date}', start.toLocaleDateString(lang, { day: 'numeric', month: 'short' }))
+        : start.toLocaleDateString(lang, { month: 'long', year: 'numeric' })
+    setSelected({ title, items: bucket.items })
+    setOpen(true)
+  }
 
   return (
     <div className="w-full flex flex-col gap-2">
@@ -64,31 +100,17 @@ export function GameAchievementsProgressChart({
           {T.gameExpanded.noActivity}
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={208}>
-          <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--bg-header))" />
-            <XAxis dataKey="label" tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 11 }} />
-            <YAxis tick={{ fill: 'rgb(var(--text-secondary))', fontSize: 11 }} allowDecimals={false} width={28} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'rgb(var(--bg-card))',
-                border: '1px solid rgb(var(--bg-header))',
-                borderRadius: '8px',
-              }}
-              labelStyle={{ color: 'rgb(var(--text-main))' }}
-              formatter={/* istanbul ignore next */ (value) => [`${value} ${T.lineChart.achievements}`, '']}
-            />
-            <Line
-              type="monotone"
-              dataKey="count"
-              stroke="rgb(var(--accent))"
-              strokeWidth={2}
-              dot={{ fill: 'rgb(var(--accent))', r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <GameAchievementsProgressPlot data={data} onSelect={handleSelect} />
       )}
+
+      <LazyWhenOpened open={open}>
+        <GameAchievementsProgressChartModal
+          isOpen={open}
+          title={selected?.title ?? ''}
+          items={selected?.items ?? []}
+          onClose={() => setOpen(false)}
+        />
+      </LazyWhenOpened>
     </div>
   )
 }

@@ -6,21 +6,28 @@ import { useSession } from 'next-auth/react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useHiddenConsoles } from '@/hooks/useHiddenConsoles'
+import { consoleOptions, filterByConsole, type ConsoleOption } from '@/utils/consoleFilter'
 import { withSubject } from '@/utils/withSubject'
 
 type CtxType = {
+  /** Every game, without the consoles unticked in preferences. */
   all: RetroAchievementsGameCompleted[]
+  /** The consoles in the list, for the preferences to tick. */
+  consoles: ConsoleOption[]
   softcore: RetroAchievementsGameCompleted[]
   hardcore: RetroAchievementsGameCompleted[]
   inProgress: RetroAchievementsGameCompleted[]
   isLoading: boolean
   error: boolean
+  /** RetroAchievements does not accept the saved API key (revoked or regenerated): linking again is the fix, not waiting. */
+  keyInvalid: boolean
   refetch: () => void
 }
 
 const Ctx = createContext<CtxType>({
-  all: [], softcore: [], hardcore: [], inProgress: [],
-  isLoading: true, error: false, refetch: () => {},
+  all: [], consoles: [], softcore: [], hardcore: [], inProgress: [],
+  isLoading: true, error: false, keyInvalid: false, refetch: () => {},
 })
 
 const RA_SYSTEM_CONSOLE_IDS = new Set([100, 101])
@@ -32,9 +39,11 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const subject = useSubject()
   const rausername = session?.user?.rausername
-  const [all, setAll] = useState<RetroAchievementsGameCompleted[]>([])
+  const { hidden } = useHiddenConsoles('ra')
+  const [loaded, setAll] = useState<RetroAchievementsGameCompleted[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [keyInvalid, setKeyInvalid] = useState(false)
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -44,6 +53,8 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     const run = () => {
       if (status !== 'authenticated' || !rausername) return
       const onFail = (err?: unknown) => {
+        // The routes answer 403 only for a key RA refuses (see raUnavailable).
+        if ((err as { status?: number } | undefined)?.status === 403) setKeyInvalid(true)
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
       fetchWithRetry(withSubject('/api/getGamesCompleted', subject))
@@ -74,6 +85,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     } else {
       setIsLoading(true)
       setError(false)
+      setKeyInvalid(false)
     }
   })
 
@@ -97,9 +109,13 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     setAll([])
     setIsLoading(true)
     setError(false)
+    setKeyInvalid(false)
     doFetch()
   }, [doFetch])
 
+  // The preference is the viewer's own: someone else's list is shown whole.
+  const all = useMemo(() => (subject ? loaded : filterByConsole(loaded, (g) => g.ConsoleName, hidden)), [subject, loaded, hidden])
+  const consoles = useMemo(() => consoleOptions(loaded.map((g) => g.ConsoleName)), [loaded])
   const softcore = useMemo(() => all.filter((g) => g.HardcoreMode === '0'), [all])
   const hardcore = useMemo(() => all.filter((g) => g.HardcoreMode === '1'), [all])
   const inProgress = useMemo(
@@ -110,8 +126,12 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
     [all]
   )
 
+  // One object per change of what it holds, so a re-render of the provider (the session updating)
+  // does not re-render everything that reads it.
+  const value = useMemo(() => ({ all, consoles, softcore, hardcore, inProgress, isLoading, error, keyInvalid, refetch }), [all, consoles, softcore, hardcore, inProgress, isLoading, error, keyInvalid, refetch])
+
   return (
-    <Ctx.Provider value={{ all, softcore, hardcore, inProgress, isLoading, error, refetch }}>
+    <Ctx.Provider value={value}>
       {children}
     </Ctx.Provider>
   )

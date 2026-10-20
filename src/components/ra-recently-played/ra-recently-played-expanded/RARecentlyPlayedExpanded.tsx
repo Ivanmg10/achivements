@@ -4,6 +4,7 @@ import { RecentlyPlayedGame, RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import { CircularProgress } from '@/components/ui/CircularProgress'
+import { fromRa } from '@/utils/gameInsights'
 import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
 import { GamePinnedAchievements } from '@/components/game-pinned-achievements/GamePinnedAchievements'
 import { GameExpandedMobileStats } from './game-expanded-mobile-stats/GameExpandedMobileStats'
@@ -61,7 +62,7 @@ export function RARecentlyPlayedExpanded({
         />
       </div>
       <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-2 lg:row-start-1">
-        <GameAchievementsProgressChart achievements={achievements} isLoading={isLoading} />
+        <GameAchievementsProgressChart achievements={fromRa(achievements, numDistinctPlayers, game.GameID)} isLoading={isLoading} />
       </div>
       <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-3 lg:row-start-1">
         <GamePinnedAchievements

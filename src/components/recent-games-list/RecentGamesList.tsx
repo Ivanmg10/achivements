@@ -8,12 +8,15 @@ import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { mergeRecentFeeds } from '@/utils/steamFeed'
 import SteamGameItem from '@/components/steam/steam-game-item/SteamGameItem'
 import PsnGameItem from '@/components/psn/psn-game-item/PsnGameItem'
+import PsnCollectionItem from '@/components/psn/psn-collection-item/PsnCollectionItem'
+import XboxGameItem from '@/components/xbox/xbox-game-item/XboxGameItem'
+import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import EmptyState from '@/components/empty-state/EmptyState'
 
 const MAX_GAMES = 7
 
 /**
- * Recently played Steam and PSN games, without RA — the main page feed for a
+ * Recently played Steam, PSN and Xbox games, without RA — the main page feed for a
  * user with no RA account. (With RA linked, they join the RA feed in
  * RARecentlyPlayed instead.) One game expanded at a time, like that feed.
  */
@@ -21,17 +24,18 @@ export default function RecentGamesList() {
   const { T } = useLanguage()
   const { isLinked: steamLinked, recent, recentLoading, recentError, refetch } = useSteamGamesData()
   const { library: psn, libraryLoading: psnLoading, libraryError: psnError, refetch: refetchPsn } = usePsnGamesData()
+  const { library: xbox, libraryLoading: xboxLoading, libraryError: xboxError, refetch: refetchXbox } = useXboxGamesData()
   const [expanded, setExpanded] = useState<string | null>(null)
 
-  const games = mergeRecentFeeds([], recent, MAX_GAMES, psn)
+  const games = mergeRecentFeeds([], recent, MAX_GAMES, psn, xbox)
   // Only an error when nothing could be shown: one platform failing leaves the other's games.
-  const failed = games.length === 0 && (recentError || psnError)
+  const failed = games.length === 0 && (recentError || psnError || xboxError)
 
   return (
     <div className="flex flex-col flex-1 min-h-0 gap-2">
       <h2 className="text-2xl font-bold shrink-0">{T.cards.recentlyPlayed}</h2>
 
-      {recentLoading || psnLoading ? (
+      {recentLoading || psnLoading || xboxLoading ? (
         <div aria-busy="true" className="flex flex-col gap-1.5 flex-1">
           {Array.from({ length: MAX_GAMES }).map((_, i) => (
             <div key={i} className="h-20 bg-bg-main rounded-xl animate-pulse" />
@@ -40,13 +44,14 @@ export default function RecentGamesList() {
       ) : failed ? (
         <div className="flex flex-col items-start gap-2">
           <p role="alert" className="text-sm text-red-400">
-            {recentError ? T.steam.gamesError : T.psn.gamesError}
+            {recentError ? T.steam.gamesError : psnError ? T.psn.gamesError : T.xbox.gamesError}
           </p>
-          <p className="text-xs text-text-secondary">{recentError ? T.steam.privateProfileHint : T.psn.errors.private}</p>
+          <p className="text-xs text-text-secondary">{recentError ? T.steam.privateProfileHint : psnError ? T.psn.errors.private : T.xbox.errors.private}</p>
           <button
             onClick={() => {
               if (recentError) refetch()
               if (psnError) refetchPsn()
+              if (xboxError) refetchXbox()
             }}
             className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors"
           >
@@ -61,6 +66,12 @@ export default function RecentGamesList() {
             const toggle = () => setExpanded((cur) => (cur === item.key ? null : item.key))
             if (item.source === 'psn') {
               return <PsnGameItem key={item.key} game={item.game} expanded={expanded === item.key} onToggle={toggle} />
+            }
+            if (item.source === 'psnCollection') {
+              return <PsnCollectionItem key={item.key} collection={item.collection} games={item.games} expanded={expanded === item.key} onToggle={toggle} />
+            }
+            if (item.source === 'xbox') {
+              return <XboxGameItem key={item.key} game={item.game} expanded={expanded === item.key} onToggle={toggle} />
             }
             if (item.source === 'steam') {
               return <SteamGameItem key={item.key} game={item.game} expanded={expanded === item.key} onToggle={toggle} />

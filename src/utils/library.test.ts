@@ -119,3 +119,34 @@ test('shared games are the ones in both lists, furthest along together first', (
     ['ra:1', 10, 100],
   ])
 })
+
+describe('Xbox in the library', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { buildLibrary, profileLibrary, summarizeByPlatform } = require('./library') as typeof import('./library')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { xboxGameFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
+
+  const none = { playing: [], completed: [], wantToPlay: [] }
+
+  test('an Xbox game is one entry, with its status, progress and page', () => {
+    const [g] = buildLibrary(none, [], [], [xboxGameFixture({ id: 730, title: 'Halo', pctWon: 100 })])
+    expect(g).toMatchObject({ key: 'xbox:730', source: 'xbox', title: 'Halo', subtitle: 'Xbox', status: 'completed', pct: 100, href: '/xboxGame/730' })
+  })
+
+  test("a profile leaves out Xbox games with no achievements, and opens the rest as that user's", () => {
+    const owned = xboxGameFixture({ id: 1, totalGamerscore: 0, maxPossible: 0, numAwarded: 0, pctWon: 0 })
+    const played = xboxGameFixture({ id: 2, pctWon: 20 })
+    const list = profileLibrary([], [], [], [], 'ivan', [owned, played])
+    expect(list.map((g: { id: number }) => g.id)).toEqual([2])
+    expect(list[0].href).toBe('/user/ivan/xbox/2')
+  })
+
+  test('hiding an Xbox game by its key works like the other platforms', () => {
+    expect(profileLibrary([], [], [], ['xbox:2'], null, [xboxGameFixture({ id: 2 })])).toEqual([])
+  })
+
+  test('the platform summary lists Xbox, in the app order, after PlayStation', () => {
+    const games = buildLibrary(none, [], [], [xboxGameFixture({ id: 1, pctWon: 100 })])
+    expect(summarizeByPlatform(games).map((s: { source: string }) => s.source)).toEqual(['xbox'])
+  })
+})

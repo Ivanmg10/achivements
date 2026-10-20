@@ -1,6 +1,7 @@
 import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import type { GameSource } from '@/types/steam'
 
 /**
@@ -21,6 +22,7 @@ export default function PlatformLogo({
 }) {
   if (source === 'steam') return <SteamLogo size={size} className={`text-[#66c0f4] ${className}`} aria-label={label} />
   if (source === 'psn') return <PlaystationLogo size={size} className={`text-[#0070d1] ${className}`} aria-label={label} />
+  if (source === 'xbox') return <XboxLogo size={size} className={`text-[#107c10] ${className}`} aria-label={label} />
   return (
     <span className={`inline-flex shrink-0 ${className}`} {...(label ? { role: 'img', 'aria-label': label } : {})}>
       <RaLogo height={Math.round(size * 0.85)} />

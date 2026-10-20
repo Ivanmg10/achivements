@@ -27,7 +27,18 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
   perfect/almost-there/abandoned games, completion distribution.
 - **Groups** — named collections of games, public or private, shareable.
 - **Social** — public profiles (opt-in), follow users, a following feed and
-  user search, compare a game with someone else's progress.
+  user search, compare a game with someone else's progress. An achievement
+  showcase (five earned achievements you choose) is what others see; your
+  achievements to get stay yours. The Following page shows each person's last
+  game, accounts, latest unlocks and showcase, and whether
+  they are online or when they were last seen (each user can stop sharing it).
+- **Rankings (beta)** — Vault Points, one score worth the same on every platform
+  (rarity inside each game decides the value), with levels and tiers; rankings
+  of everyone or of whom you follow, all time, this month or this week, public
+  at `/rankings`. Each user can leave them from Preferences.
+- **Public pages** — honest comparisons (vs Exophase, vs PSNProfiles) and
+  how-tos at `/compare/*` and `/track/*`, plus a FAQ on the landing, for
+  visitors and for what search engines and chat AIs read.
 - **Personalization** — 25 themes (`THEMES` in `src/types/types.ts`), 9 UI
   languages (en, es, de, fr, it, ja, pl, pt, ru), country with flag.
 
@@ -53,7 +64,7 @@ npm run dev
 ```
 
 **Every variable is explained in [`.env.example`](.env.example).** The minimum
-to boot is `NEXTAUTH_URL`, `NEXTAUTH_SECRET` and `DATABASE_URL`; each
+to boot is `NEXTAUTH_URL`, `NEXTAUTH_SECRET` and `DATABASE_URL` (or `PREVIEW_DATABASE_URL`, a Neon branch for pre and local work, which wins outside production); each
 integration switches itself off (and says so in the UI) when its keys are
 missing:
 
@@ -61,6 +72,7 @@ missing:
 |---|---|
 | `STEAM_API_KEY` | Steam linking and data |
 | `PSN_NPSSO` | PSN linking answers `not-configured` |
+| `OPENXBL_API_KEY` | Xbox (admin-only for now) answers `not-configured` |
 | `TWITCH_CLIENT_ID` / `_SECRET` | PS3/Vita games keep their trophy icon, no IGDB details |
 | `RESEND_API_KEY` (+ `EMAIL_FROM`) | Password recovery and verification mail — see `CLAUDE.md` → Email |
 | `CRON_SECRET` | The cron routes refuse to run |
@@ -75,8 +87,8 @@ Run every file in [`migrations/`](migrations) in order on a fresh database:
 for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 ```
 
-> `develop` and production share one database. Never run a destructive
-> migration "just to try it" on develop.
+> Pre (`develop` and local work) has its own database, a Neon branch of production,
+> through `PREVIEW_DATABASE_URL`. Every migration is applied to both.
 
 ### Scripts
 
@@ -86,6 +98,7 @@ for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 | `npm test` | Jest |
 | `npm run lint` | ESLint (`react-hooks/set-state-in-effect` is an error) |
 | `npm run build` | Production build |
+| `node scripts/demo-rankings.mjs seed --follower=<you>` | Demo users with points and full Steam/PSN profiles, for trying the rankings and public profiles. **Preview database only** (refuses otherwise); `clear` removes them |
 
 ## Project layout
 

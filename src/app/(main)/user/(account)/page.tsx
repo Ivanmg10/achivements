@@ -3,6 +3,7 @@
 import UserIdentityCard from '@/components/user-page/user-identity-card/UserIdentityCard'
 import UserPreferencesCard from '@/components/user-page/user-preferences-card/UserPreferencesCard'
 import UserPlatforms from '@/components/user-page/user-platforms/UserPlatforms'
+import RaKeyInvalidNotice from '@/components/ra-key-invalid-notice/RaKeyInvalidNotice'
 import DeleteAccountCard from '@/components/user-page/delete-account-card/DeleteAccountCard'
 
 /**
@@ -14,6 +15,7 @@ export default function UserPage() {
   return (
     <main className="min-h-screen bg-bg-main text-text-main flex flex-col items-center py-6 px-4">
       <div className="w-full lg:max-w-[95%] flex flex-col gap-4">
+        <RaKeyInvalidNotice />
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 items-start">
           <UserIdentityCard />
           <UserPreferencesCard />

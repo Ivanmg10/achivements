@@ -19,6 +19,48 @@ function read(kind: StorageKind, key: string): string | null {
   }
 }
 
+type WriteObserver = (key: string, value: string | null) => void
+const observers = new Set<WriteObserver>()
+/** True while a value that came from somewhere else (the account) is being applied: it must not be sent back. */
+let applying = false
+
+/** Hears every localStorage value the person changes; not the ones applied by `applyStoredValue`. */
+export function observeStoredWrites(observer: WriteObserver) {
+  observers.add(observer)
+  return () => {
+    observers.delete(observer)
+  }
+}
+
+/** Writes a value that came from the account, so every component showing it updates, without it being observed as a change. */
+export function applyStoredValue(key: string, value: string | null) {
+  applying = true
+  try {
+    write('local', key, value)
+  } finally {
+    applying = false
+  }
+}
+
+/** The localStorage keys with a value now (what is saved or kept unsaved). */
+export function storedKeys(): string[] {
+  const keys = new Set<string>()
+  try {
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const k = window.localStorage.key(i)
+      if (k) keys.add(k)
+    }
+  } catch {
+    // Storage blocked: only what was kept in memory.
+  }
+  for (const s of unsaved.keys()) if (s.startsWith('local:') && unsaved.get(s) !== null) keys.add(s.slice('local:'.length))
+  return [...keys]
+}
+
+export function readStoredValue(key: string): string | null {
+  return read('local', key)
+}
+
 function write(kind: StorageKind, key: string, value: string | null) {
   const s = slot(kind, key)
   try {
@@ -29,6 +71,7 @@ function write(kind: StorageKind, key: string, value: string | null) {
     unsaved.set(s, value)
   }
   listeners.forEach((l) => l())
+  if (kind === 'local' && !applying) observers.forEach((o) => o(key, value))
 }
 
 function subscribe(listener: () => void) {

@@ -5,11 +5,13 @@ import { IconMoodEmpty } from '@tabler/icons-react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
+import type { XboxGameProgress } from '@/types/xbox'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { classifySteamGame } from '@/utils/steamFeed'
 import { classifyPsnGame } from '@/utils/psnTitles'
+import { classifyXboxGame } from '@/utils/xboxTitles'
 import { gameHref } from '@/utils/gameRef'
 import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
@@ -33,12 +35,14 @@ export default function MainPageAbandoned({
   playing,
   steamGames = [],
   psnGames = [],
+  xboxGames = [],
   isLoading,
   now: nowProp,
 }: {
   playing: RetroAchievementsGameCompleted[]
   steamGames?: SteamGameProgress[]
   psnGames?: PsnGameProgress[]
+  xboxGames?: XboxGameProgress[]
   isLoading?: boolean
   now?: number
 }) {
@@ -143,8 +147,19 @@ export default function MainPageAbandoned({
         daysAgo: Math.floor((now - new Date(g.lastPlayed!).getTime()) / DAY_MS),
         pct: Math.round(g.pctWon),
       }))
-    return [...ra, ...steam, ...psn].filter((g) => g.daysAgo >= ABANDONED_DAYS).sort((a, b) => b.daysAgo - a.daysAgo)
-  }, [playing, steamGames, psnGames, lastPlayedMap, lastAchDates, now, subject])
+    const xbox: Row[] = xboxGames
+      .filter((g) => classifyXboxGame(g) === 'playing' && g.lastPlayed)
+      .map((g) => ({
+        key: `xbox:${g.id}`,
+        href: gameHref('xbox', g.id, subject),
+        imageUrl: g.imageIcon || undefined,
+        title: g.title,
+        subtitle: g.consoleName,
+        daysAgo: Math.floor((now - new Date(g.lastPlayed!).getTime()) / DAY_MS),
+        pct: Math.round(g.pctWon),
+      }))
+    return [...ra, ...steam, ...psn, ...xbox].filter((g) => g.daysAgo >= ABANDONED_DAYS).sort((a, b) => b.daysAgo - a.daysAgo)
+  }, [playing, steamGames, psnGames, xboxGames, lastPlayedMap, lastAchDates, now, subject])
 
   const datesNotReady = recentlyPlayedLoading || (missingIdsKey !== '' && fetchedKey !== missingIdsKey)
   const loading = isLoading || datesNotReady
@@ -172,12 +187,12 @@ export default function MainPageAbandoned({
               key={g.key}
               href={g.href}
               imageUrl={g.imageUrl}
-              imageAlt={g.title}
               title={g.title}
               subtitle={g.subtitle}
               stat={`${g.daysAgo}d`}
               statLabel={`${g.pct}%`}
               statClassName="text-orange-400"
+              progress={g.pct}
             />
           ))}
         </div>

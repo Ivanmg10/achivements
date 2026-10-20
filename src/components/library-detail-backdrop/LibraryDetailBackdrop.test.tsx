@@ -29,3 +29,8 @@ test('another game takes the place of the one before', () => {
   rerender(<LibraryDetailBackdrop entry={libraryEntry('ra', 5, 'Sonic')} />)
   expect(screen.getByTestId('banner')).toHaveTextContent('ra:5')
 })
+
+test('clips the scaled, blurred art to its box, so nothing spills past the fade as a hard band', () => {
+  const { container } = render(<LibraryDetailBackdrop entry={libraryEntry('steam', 7, 'Hades')} />)
+  expect(container.firstElementChild).toHaveClass('overflow-hidden')
+})

@@ -79,3 +79,12 @@ test('a saved pin is announced, a failed one too', async () => {
   await act(() => result.current.toggleFavorite(ACH, META))
   expect(notify.error).toHaveBeenCalledWith(en.toast.achievementsFailed)
 })
+
+test('the list order is the pins as they loaded: pinning one now does not move it', async () => {
+  ;(fetch as jest.Mock).mockResolvedValueOnce(ok([{ achievement_id: 9 }])).mockResolvedValueOnce(ok({ ok: true }))
+  const { result } = renderHook(() => useRaFavoriteIds(1))
+  await waitFor(() => expect(result.current.leadingIds.has(9)).toBe(true))
+  await act(() => result.current.toggleFavorite(ACH, META))
+  expect(result.current.favoritedIds.has(7)).toBe(true)
+  expect(result.current.leadingIds.has(7)).toBe(false)
+})

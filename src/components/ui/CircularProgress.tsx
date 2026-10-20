@@ -8,12 +8,21 @@ export function CircularProgress({
   size = 112,
   strokeWidth = 9,
   label,
+  center,
+  ariaLabel,
+  animateIn = false,
 }: {
   earned: number
   total: number
   size?: number
   strokeWidth?: number
   label?: string
+  /** What goes in the middle instead of earned/total (a level, for instance). */
+  center?: React.ReactNode
+  /** The ring's accessible name, when earned/total is not what it means. */
+  ariaLabel?: string
+  /** Fill from empty when it first appears (not under reduced motion). */
+  animateIn?: boolean
 }) {
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
@@ -24,7 +33,7 @@ export function CircularProgress({
     <div className="inline-flex flex-col items-center gap-2">
       <div
         role="img"
-        aria-label={`${earned} / ${total}`}
+        aria-label={ariaLabel ?? `${earned} / ${total}`}
         className="relative inline-flex items-center justify-center shrink-0"
         data-complete={isComplete || undefined}
         style={{ width: size, height: size }}
@@ -51,16 +60,19 @@ export function CircularProgress({
             strokeDasharray={circumference}
             strokeDashoffset={circumference * (1 - pct)}
             strokeLinecap="round"
-            className="fill-none stroke-progress transition-[stroke-dashoffset] duration-700 ease-out"
+            style={animateIn ? ({ '--ring-from': circumference } as React.CSSProperties) : undefined}
+            className={`fill-none stroke-progress transition-[stroke-dashoffset] duration-700 ease-out ${animateIn ? 'ring-in' : ''}`}
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span
-            className={`font-bold leading-tight ${isComplete ? 'text-success' : 'text-text-main'}`}
-            style={{ fontSize: size * 0.19 }}
-          >
-            {earned}/{total}
-          </span>
+          {center ?? (
+            <span
+              className={`font-bold leading-tight ${isComplete ? 'text-success' : 'text-text-main'}`}
+              style={{ fontSize: size * 0.19 }}
+            >
+              {earned}/{total}
+            </span>
+          )}
         </div>
       </div>
       {label && (

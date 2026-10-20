@@ -19,12 +19,19 @@ export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
   // Pins are the viewer's own; on someone else's page they are not offered.
   const subject = useSubject()
   const [pinned, setPinned] = useState<Set<string>>(new Set())
+  /**
+   * The pins as they were when the page loaded: what a list orders by. Pinning
+   * then leaves the row where it is — moved to the top, it took the focused star
+   * with it, and the browser scrolled up after it.
+   */
+  const [leading, setLeading] = useState<Set<string>>(new Set())
   const [error, setError] = useState<string | null>(null)
 
   // Another game (or signing in) starts over; state, so while rendering. The load is the effect.
   useWhenChanged([appId, status], () => {
     if (status === 'authenticated') {
       setPinned(new Set())
+      setLeading(new Set())
       setError(null)
     }
   })
@@ -38,7 +45,11 @@ export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
         return res.json()
       })
       .then((rows: { steam_apiname: string }[]) => {
-        if (current && Array.isArray(rows)) setPinned(new Set(rows.map((r) => r.steam_apiname)))
+        if (current && Array.isArray(rows)) {
+          const ids = new Set(rows.map((r) => r.steam_apiname))
+          setPinned(ids)
+          setLeading(ids)
+        }
       })
       .catch((err) => {
         console.error('[useSteamFavoriteAchievements]', appId, err)
@@ -89,5 +100,5 @@ export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
     [pinned, appId, gameTitle, T],
   )
 
-  return { pinned, toggle, error, canPin: status === 'authenticated' && !subject }
+  return { pinned, leading, toggle, error, canPin: status === 'authenticated' && !subject }
 }

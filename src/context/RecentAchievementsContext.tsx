@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, useMemo } from 'react'
 import { RecentAchievement } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
@@ -96,7 +96,11 @@ export function RecentAchievementsProvider({ children }: { children: React.React
     doFetch()
   }, [doFetch])
 
-  return <Ctx.Provider value={{ achievements, isLoading, error, refetch, request }}>{children}</Ctx.Provider>
+  // One object per change of what it holds, so a re-render of the provider (the session updating)
+  // does not re-render everything that reads it.
+  const value = useMemo(() => ({ achievements, isLoading, error, refetch, request }), [achievements, isLoading, error, refetch, request])
+
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 
 /** Reading the list is what asks for it: the first reader starts the load. */

@@ -192,6 +192,7 @@ test('walks every page of the trophy list, into the unified game model', async (
     coverUrl: null,
     heroUrl: null,
     conceptId: null,
+    collection: null,
   })
   expect(mock(psn.getUserTitles).mock.calls[1][2]).toEqual({ limit: 800, offset: 800 })
 })
@@ -314,8 +315,8 @@ test.each([
   expect(durationMinutes(iso)).toBe(minutes)
 })
 
-const played = (titleId: string, lastPlayedDateTime: string, playDuration: string, images: { type: string; url: string }[] = []) => ({
-  titleId, name: titleId, lastPlayedDateTime, playDuration, playCount: 3, concept: { media: { images } },
+const played = (titleId: string, lastPlayedDateTime: string, playDuration: string, images: { type: string; url: string }[] = [], imageUrl?: string) => ({
+  titleId, name: titleId, lastPlayedDateTime, playDuration, playCount: 3, imageUrl, concept: { media: { images } },
 })
 
 test('play time, last session and store art come from the played-games list, matched by trophy set', async () => {
@@ -325,7 +326,7 @@ test('play time, last session and store art come from the played-games list, mat
       played('CUSA1', '2026-06-01T00:00:00Z', 'PT10H', [
         { type: 'PORTRAIT_BANNER', url: 'http://cover.png' },
         { type: 'BACKGROUND_LAYER_ART', url: 'https://hero.png' },
-      ]),
+      ], 'http://square.png'),
     ],
   })
   mock(psn.getUserTrophiesForSpecificTitle).mockResolvedValue({
@@ -340,11 +341,27 @@ test('play time, last session and store art come from the played-games list, mat
     playtimeMinutes: 600,
     playCount: 3,
     playedAs: ['CUSA1'],
+    imageIcon: 'https://square.png',
     coverUrl: 'https://cover.png',
     heroUrl: 'https://hero.png',
   })
   expect(games[1].playtimeMinutes).toBeNull()
   expect(writeCache).toHaveBeenCalledWith('psn:sets:CUSA1', ['NPWR00001_00'], expect.any(Number), '7')
+})
+
+test('a PS4 game has no portrait: its 16:9 hub art is the backdrop, not the cover, and MASTER the icon', async () => {
+  mock(psn.getUserTitles).mockResolvedValue({ trophyTitles: [title('NPWR00001_00')] })
+  mock(psn.getUserPlayedGames).mockResolvedValue({
+    titles: [played('CUSA1', '2026-06-01T00:00:00Z', 'PT1H', [
+      { type: 'GAMEHUB_COVER_ART', url: 'https://hub.jpg' },
+      { type: 'MASTER', url: 'https://master.jpg' },
+    ])],
+  })
+  mock(psn.getUserTrophiesForSpecificTitle).mockResolvedValue({
+    titles: [{ npTitleId: 'CUSA1', trophyTitles: [{ npCommunicationId: 'NPWR00001_00' }] }],
+  })
+  const [game] = await psnTitles('42')
+  expect(game).toMatchObject({ coverUrl: null, heroUrl: 'https://hub.jpg', imageIcon: 'https://master.jpg' })
 })
 
 test('the trophy-set lookup goes five ids at a time, and skips what is cached', async () => {
@@ -368,6 +385,21 @@ test('a hidden played-games list leaves the trophies as they are', async () => {
   ;(console.error as jest.Mock).mockRestore()
 })
 
+test('a collection is one session for several games: only the one with the newest trophy takes it', () => {
+  const base = psnGameFixture({ consoleName: 'PS4', playtimeMinutes: null, playedAs: [], playCount: null })
+  const games = withPlayData(
+    [
+      { ...base, id: 1, titleId: 'NPWR11435_00', lastTrophyAt: '2025-04-02T00:00:00Z', lastPlayed: '2025-04-02T00:00:00Z' },
+      { ...base, id: 2, titleId: 'NPWR11436_00', lastTrophyAt: '2026-10-06T00:00:00Z', lastPlayed: '2026-10-06T00:00:00Z' },
+    ],
+    [{ titleId: 'CUSA04893_00', name: 'Ezio Collection', lastPlayed: '2026-10-16T00:00:00Z', playtimeMinutes: 4543, playCount: 1, iconUrl: null, coverUrl: null, heroUrl: null, conceptId: null }],
+    new Map([['CUSA04893_00', ['NPWR11436_00', 'NPWR11435_00']]]),
+  )
+  expect(games.map((g) => [g.id, g.lastPlayed])).toEqual([[2, '2026-10-16T00:00:00Z'], [1, '2025-04-02T00:00:00Z']])
+  // Both know the collection they came through, with its own session and hours, for the feed's card.
+  for (const g of games) expect(g.collection).toEqual({ titleId: 'CUSA04893_00', title: 'Ezio Collection', iconUrl: null, heroUrl: null, lastPlayed: '2026-10-16T00:00:00Z', playtimeMinutes: 4543 })
+})
+
 test('a collection puts its time on each of its trophy lists; two versions of one game add up', () => {
   const base = psnGameFixture({
     service: 'trophy', title: '', imageIcon: '', consoleName: 'PS4', maxPossible: 1, numAwarded: 0,
@@ -377,16 +409,18 @@ test('a collection puts its time on each of its trophy lists; two versions of on
   const games = withPlayData(
     [{ ...base, id: 1, titleId: 'NPWR00000_01' }, { ...base, id: 2, titleId: 'NPWR00000_02' }, { ...base, id: 3, titleId: 'NPWR00000_03' }],
     [
-      { titleId: 'COLL', lastPlayed: '2026-01-01T00:00:00Z', playtimeMinutes: 100, playCount: 1, coverUrl: null, heroUrl: null, conceptId: null },
-      { titleId: 'PS4V', lastPlayed: '2026-01-01T00:00:00Z', playtimeMinutes: 30, playCount: 1, coverUrl: null, heroUrl: null, conceptId: null },
-      { titleId: 'PS5V', lastPlayed: '2026-02-01T00:00:00Z', playtimeMinutes: 20, playCount: 2, coverUrl: 'c', heroUrl: null, conceptId: null },
+      { titleId: 'COLL', name: 'COLL', lastPlayed: '2026-01-01T00:00:00Z', playtimeMinutes: 100, playCount: 1, iconUrl: 'coll', coverUrl: null, heroUrl: null, conceptId: null },
+      { titleId: 'PS4V', name: 'PS4V', lastPlayed: '2026-01-01T00:00:00Z', playtimeMinutes: 30, playCount: 1, iconUrl: 'ps4', coverUrl: null, heroUrl: null, conceptId: null },
+      { titleId: 'PS5V', name: 'PS5V', lastPlayed: '2026-02-01T00:00:00Z', playtimeMinutes: 20, playCount: 2, iconUrl: null, coverUrl: 'c', heroUrl: null, conceptId: null },
     ],
     new Map([['COLL', ['NPWR00000_01', 'NPWR00000_02']], ['PS4V', ['NPWR00000_03']], ['PS5V', ['NPWR00000_03']]]),
   )
   const byId = new Map(games.map((g) => [g.id, g]))
-  expect(byId.get(1)).toMatchObject({ playtimeMinutes: 100, playedAs: ['COLL'] })
-  expect(byId.get(2)).toMatchObject({ playtimeMinutes: 100, playedAs: ['COLL'] })
-  expect(byId.get(3)).toMatchObject({ playtimeMinutes: 50, playCount: 3, lastPlayed: '2026-02-01T00:00:00Z', coverUrl: 'c', playedAs: ['PS4V', 'PS5V'] })
+  // The collection's icon would make its games look alike: they keep their own.
+  expect(byId.get(1)).toMatchObject({ playtimeMinutes: 100, playedAs: ['COLL'], imageIcon: '' })
+  expect(byId.get(2)).toMatchObject({ playtimeMinutes: 100, playedAs: ['COLL'], imageIcon: '' })
+  expect(byId.get(3)!.collection).toBeNull()
+  expect(byId.get(3)).toMatchObject({ playtimeMinutes: 50, playCount: 3, lastPlayed: '2026-02-01T00:00:00Z', coverUrl: 'c', playedAs: ['PS4V', 'PS5V'], imageIcon: 'ps4' })
 })
 
 describe('sign-in', () => {

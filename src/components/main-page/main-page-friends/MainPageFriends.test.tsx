@@ -85,3 +85,13 @@ test('you on the board with the friends read so far; the rest pending; a card fo
   expect(screen.getByText(en.friends.limitNote.replace('{n}', '2'))).toBeInTheDocument()
   expect(screen.getByText(en.friends.partialNote)).toBeInTheDocument()
 })
+
+test('the feed fills the height beside the leaderboard, never more; the cards take the whole width below', () => {
+  setup({ friends: [friend('ana')], details: { ana: { recent: [], games: [], partial: false } }, detailsLoading: false })
+  render(<MainPageFriends active myRecent={[]} />)
+  expect(screen.getByTestId('feed')).toHaveAttribute('data-count', '0')
+  expect(screen.getByTestId('feed').parentElement).toHaveClass('xl:absolute', 'xl:inset-0')
+  expect(screen.getByTestId('feed').parentElement?.parentElement).toHaveClass('relative')
+  // The cards are not in the leaderboard's column: their grid goes to three columns on wide screens.
+  expect(screen.getByTestId('card').parentElement).toHaveClass('xl:grid-cols-3')
+})

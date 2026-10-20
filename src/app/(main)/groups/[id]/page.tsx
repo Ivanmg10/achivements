@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -10,11 +11,15 @@ import { useGamesData } from '@/context/GamesDataContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
+import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useGroupPage } from '@/hooks/useGroupPage'
 import { useGroupFilters } from '@/hooks/useGroupFilters'
 import { filterGroupItems, groupSummary, itemKey, liveProgressMap, raProgressMaps } from '@/utils/groupItems'
-import GroupModal from '@/components/groups/GroupModal'
-import AddGameModal from '@/components/groups/add-game-modal/AddGameModal'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+
+// Downloaded the first time it is opened, not with the page.
+const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
+const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'), { loading: () => null })
 import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
 import GroupDetailHeader from '@/components/groups/group-detail-header/GroupDetailHeader'
 import GroupFilters from '@/components/groups/group-filters/GroupFilters'
@@ -34,6 +39,7 @@ export default function GroupDetailPage() {
   const { games: recentlyPlayed } = useRecentlyPlayedGames()
   const { library: steamLibrary } = useSteamGamesData()
   const { library: psnLibrary } = usePsnGamesData()
+  const { library: xboxLibrary } = useXboxGamesData()
   const { group, status, retry, reorder, removeGame, addItems, edit, remove } = useGroupPage(groupId, recentlyPlayed)
   const { filters, active: filtersActive, setPct, setDecade, toggleConsole, clearConsoles, clear } = useGroupFilters()
   const [editOpen, setEditOpen] = useState(false)
@@ -42,7 +48,7 @@ export default function GroupDetailPage() {
   const [gridCols, setGridCols] = useState<StatusGridCols>(1)
 
   const ra = useMemo(() => raProgressMaps(recentlyPlayed, allGames), [recentlyPlayed, allGames])
-  const live = useMemo(() => liveProgressMap(steamLibrary, psnLibrary), [steamLibrary, psnLibrary])
+  const live = useMemo(() => liveProgressMap(steamLibrary, psnLibrary, xboxLibrary), [steamLibrary, psnLibrary, xboxLibrary])
   const items = useMemo(() => group?.items ?? [], [group])
   const filtered = useMemo(() => filterGroupItems(items, filters, live), [items, filters, live])
   const summary = useMemo(() => groupSummary(items, ra.ach, live), [items, ra.ach, live])
@@ -131,8 +137,14 @@ export default function GroupDetailPage() {
         )}
       </div>
 
-      <AddGameModal isOpen={addGameOpen} onClose={() => setAddGameOpen(false)} groupId={groupId} existingKeys={existingKeys} onAdded={addItems} />
-      {group && <GroupModal isOpen={editOpen} onClose={() => setEditOpen(false)} group={group} onSave={edit} />}
+      <LazyWhenOpened open={addGameOpen}>
+        <AddGameModal isOpen={addGameOpen} onClose={() => setAddGameOpen(false)} groupId={groupId} existingKeys={existingKeys} onAdded={addItems} />
+      </LazyWhenOpened>
+      {group && (
+        <LazyWhenOpened open={editOpen}>
+          <GroupModal isOpen={editOpen} onClose={() => setEditOpen(false)} group={group} onSave={edit} />
+        </LazyWhenOpened>
+      )}
       <DeleteConfirmDialog isOpen={confirmDelete} onClose={() => setConfirmDelete(false)} onConfirm={handleDelete} />
     </motion.div>
   )

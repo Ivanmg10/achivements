@@ -25,6 +25,875 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — See who follows you (`feat/rankings-zone-and-personas`)
+
+**Did** — `/following` has tabs (`FollowingTabs`): Following and Followers (`#followers`, read
+when opened through `useFollowers` → `GET /api/follows/overview?who=followers`). The list, its
+search and its states moved to `FollowingList`, shared by both tabs. The account page's
+"Followers" count is now a link like "Following". Followers are counted and listed only when
+their profile is public, as the people you follow already were. The privacy policy's follows
+sentence changed in all nine languages: you see both lists, nobody else sees who follows whom.
+**Why** — The user wanted to see who follows them and to change the policy for it.
+**Decisions** — Only you see your followers; no follower list on public profiles. Added a
+"Follows" section to CLAUDE.md so that stays true.
+
+## 2026-10-20 — Following section: cards across the width (`chore/demo-personas`)
+
+**Did** — In the home's Following section (`MainPageFriends`), "Who you follow" left the
+leaderboard's column and spans the width (3 columns on xl); "Latest from who you follow" sits
+beside the leaderboard, exactly as tall (out of the flow on xl, its list scrolling inside with a
+thin scrollbar in the accent). The old sticky/stretched switch (`quiet`) is gone.
+**Why** — With 11 follows the cards made the left column long and left a blank hole under the feed.
+
+## 2026-10-20 — Rankings: 20 at a time, most active this week, 60 demo users (`chore/demo-personas`)
+
+**Did** — The list pages 20 at a time. `/api/rankings` adds `hot`, the five who earned most this
+week (global, every platform, whatever the view), shown under your level as `RankingsPageHot`
+with a button to the weekly ranking (strings `hotTitle`, `hotSee`, nine languages). The demo seed
+gives each persona a twin (`TWINS` in `demo-personas.mjs`: same tastes, another name and another
+of its badges as picture) and multiplies demo points by `SCALE` = 30, so the user (116 k) ranks
+about mid-table and "your zone" can be seen. Reseeded pre: 60 users, 24.7 MB of cache.
+**Why** — The user asked for 20 at a time, to see their zone, twice the users and something to
+fill the empty space under "Your level".
+**Watch out** — The pre-commit hook rewrites `package.json`; once, the dev server read it half
+written and kept failing with "Invalid package config" until restarted.
+
+## 2026-10-20 — Rankings: top 30, your zone and a trend per row (`chore/demo-personas`)
+
+**Did** — `/api/rankings` pages 30 at a time and returns `zone`/`zoneStart` (the viewer and who
+stands around them; `above`/`below`, 2 by default, up to 50) and each row's `trend` (last 8
+weeks, `weeklyTrend` in `src/lib/rankings.ts`); `near` is gone. The page shows `RankingsPageZone`
+below the list when you are not in it (each other row says how far ahead or behind you they are;
+"N more above/below" widen it through `useRankings().widen`, never past where it meets the list),
+and the table a Trend column (`VaultSparkline`, from lg up). "Close rivals" (`RankingsPageNear`)
+is removed; the pinned bar now shows only when you are not listed (it says why).
+**Why** — The user picked option A of the canvas (top 30 plus your zone), kept the level panel as
+it was and the rows as they were, plus the trend line of the third row design.
+**Decisions** — The ranking is still computed in memory per request (cached 5 min): fine now; a
+totals table indexed by points is the step for very many users (noted in `architecture.md`).
+Strings: `near` became `zone` (+ `zoneOf`, `zoneUp`, `zoneDown`, `colTrend`, `trendA11y`) in all nine.
+**Watch out** — Checked locally with the page size lowered to 5 for a moment (you rank #1 with
+30 personas): the zone met the list and offered "4 more below".
+
+## 2026-10-20 — Rankings entry animation (`chore/demo-personas`)
+
+**Did** — `/rankings` comes in: the podium rises third, second, first, its steps grow and the
+points count up (`CountUp`, which gained `locale` and `delay`); table and list rows stagger in
+(capped after 14 rows); the side panel slides in, the level ring fills from empty
+(`CircularProgress animateIn`, CSS `ring-in` in `globals.css`) and the level counts up; your
+pinned bar rises from the bottom. Variants in `rankings-page/rankingsMotion.ts`;
+`MotionConfig reducedMotion="user"` leaves only the fades under reduced motion. The jest mock of
+framer-motion gained `MotionConfig` and drops `custom`.
+**Why** — The user asked for an entry animation.
+**Open** — Proposals for pagination at scale, "Tu zona" instead of "Rivales cercanos", the level
+panel beside the podium, and the row design are on a canvas for the user to choose; nothing of
+that is built yet.
+**Watch out** — Playwright's window here renders at ~2 fps (in the background), so animations
+cannot be judged from it; check them in a real browser.
+
+## 2026-10-20 — Rankings avatars load gracefully (`chore/demo-personas`)
+
+**Did** — `RankingsPageUser` draws pictures through `FadeImage` (a pulse in the circle while
+loading, then a fade-in) and shows the user's initial, in the theme's accent, when there is no
+picture or it fails. `FadeImage` gained a `fallback` prop for that.
+**Why** — The user found the cold load cheap-looking: empty circles, then pictures popping in.
+Signed out, uploaded avatars (`/api/avatar/…`, sign-in only) answered 401 and stayed empty.
+**Open** — Other lists of users (Following, search, compare) still use a plain image; move them
+to the same pattern if the user wants it everywhere.
+
+## 2026-10-20 — Demo personas with full profiles (`chore/demo-personas`)
+
+**Did** — The 45 `demo_*` users are now 30 hand-written personas (`scripts/demo-personas.mjs`:
+name, country, bio, theme, gender, hours they play, weekends only, presence, showcase size, the
+games they play and how far). `scripts/demo-rankings.mjs` builds their Steam and PSN libraries,
+recent unlocks, year feeds, each game's list and the PSN summary, and writes them into pre's
+`steam_cache` under their made-up accounts, never expiring; their Vault Points, weeks and
+showcase come from the same lists through the real formula (`vaultScore.ts`, imported by Node).
+Checked on localhost: spex_guy (Steam, 41-day streak, showcase, completed shelf), ratman (PSN,
+platinums, hours, Spanish trophies), a PSN and a Steam game page, the rankings.
+**Why** — The user wanted to review public profiles with data and the demo users to have personality.
+**Decisions** — No "demo mode" in app code: the app reads its cache as for anyone. Games are
+real ones whose definitions pre already had cached for real users (15 Steam, 27 PSN), so names,
+badges and rarity are real; only who earned what and when is invented. No RA (the dev server
+skips RA's DB cache; a made-up RA name may be a real person). PSN trophy lists in English and
+Spanish only (a copy per language; 12 MB in all). Online personas have `last_seen_at` in 2100.
+Monday's ranks are computed among real users too, so the arrows are right.
+**Open** — Check dev.cheevovault.com once merged (same database, so it should already show them).
+**Watch out** — "Ver en PSN" links to a PSN profile by the persona's name, which may be someone
+real. If pre loses the cached games (reset from production, an unlink of the user's accounts),
+re-seeding warns and leaves those games out. Steam game pages refetch the global schema from
+Steam when it has expired (slow first load, then cached).
+
+## 2026-10-20 — Demo users on the preview database (`feat/social-rankings`)
+
+**Did** — The user created the Neon branch and set `PREVIEW_DATABASE_URL`; checked that local
+work reads it (a marker written only on pre showed on localhost; production unchanged; marker
+removed). Added `scripts/demo-rankings.mjs` (`seed` / `clear`, preview database only) and seeded
+40 `demo_*` users with scores, weeks, Monday ranks, presence and follows; `ivanxmarine` follows
+ten of them on pre. Checked the Following rankings in the browser.
+**Open** — `dev.cheevovault.com` uses pre only once this branch reaches `develop`.
+
+## 2026-10-20 — A database of its own for pre (`feat/social-rankings`)
+
+**Did** — `src/lib/db.js` reads `PREVIEW_DATABASE_URL` before `DATABASE_URL`, except in production
+(`VERCEL_ENV`), so `develop` and local work can use a Neon branch of production (`preview`).
+Documented in `.env.example`, README and CLAUDE.md (Environments).
+**Why** — The user wants a pre that does not touch production (and fake users to test the
+rankings with). The Neon integration owns `DATABASE_URL` for all environments, and Vercel refused
+a branch-scoped `DATABASE_URL` for `develop` ("already exists for production, preview, development").
+**Open** — The user creates the Neon branch and sets `PREVIEW_DATABASE_URL` (Vercel: Preview →
+develop; and `.env.local`), then redeploys develop. Until then nothing changes. Then: a seed
+script for demo users, run only against the branch.
+
+## 2026-10-20 — Fill stuck at 99 %, a history chart, the guide in nine languages (`feat/social-rankings`)
+
+**Did** — The user's fill stayed at "Calculating 99 %": Steam answers HTTP 500 every time for two
+games with no achievements (Pavlov VR, Lethal Company; checked live), so they were re-read each
+pass and the fill never ended. A game that fails on its own is now *skipped* (`FillPlatform.skipped`;
+it does not hold the fill up and is retried at the next refresh); if every read of a platform
+fails, it is `unavailable`, not done. The per-platform progress was redrawn as small cards (four
+in a row on the account page) instead of bars across the whole card; platform cards say how many
+games counted and how many were skipped. Added the weekly history (`weeks` in
+`/api/rankings/me`, `VaultWeeksChart`, plain SVG) to the rankings' level panel. "How Vault Points
+work" now in all nine languages (`vaultGuideMore.ts`). The podium keeps first in the middle when
+fewer than three people rank. Checked in the browser with the real account: guide, rankings,
+account page, header level.
+**Decisions** — No fake users in production: `/rankings` is public, so they would show to
+everyone (and in search, Following, profiles). Proposed instead: a Neon branch for a test copy.
+**Open** — Testing with many users needs that separate database.
+
+## 2026-10-20 — Points at once when a platform is linked, and a guide (`feat/social-rankings`)
+
+**Did** — The fill of a new account no longer waits for heartbeats: `onPlatformLinked` (in the
+RA, Steam, PSN and Xbox link routes) marks the platform "calculating" and runs a pass right after
+the answer; `useVaultFill` (`VaultFillProvider` in `MainProviders`) asks `POST /api/rankings/fill`
+for pass after pass until it is complete, polling `GET` for progress. Each platform is read at a
+measured pace (`PACE` in `scoreRefresh`; PSN gentle, with an app-wide `psn-score` budget in
+`attemptLimit`), and errors are classified (`private`, `key`, `busy`, `unavailable`). Progress
+shows in the header (a ring), each platform card (`VaultFillLine`), the account page and the
+rankings panel (`VaultFillProgress`); the viewer's points carry "≈"; toasts when ready or when a
+platform fails. Also fixed: the viewer's own rankings row is read fresh (it came from a 5-minute
+cache). New public page `/rankings/how` ("How Vault Points work", EN/ES in
+`src/translations/vaultGuide.ts`, numbers from the formula; examples shared with the balance
+tests in `src/utils/vaultExamples.ts`); the rankings' "how points work" now links to it (the
+modal is gone).
+**Why** — The user disliked a fill that took an hour unseen ("if I sign up I expect to be in the
+rankings at once"), asked to be careful with PSN, and wanted the explanation of the weighting
+for users.
+**Decisions** — Measured before choosing paces (numbers in the plan). Progress kept in
+`steam_cache` rather than a migration. "Ready" toasts only for a fill that was pending, never a
+6-hourly refresh. Xbox's estimate counts as settled. The guide follows the public pages' rule
+(EN/ES outside `T`).
+**Open** — Not tried in a browser. RA per-key vs per-IP limit unknown. If PSN starts answering
+"too many requests" in production, lower `PACE.psn` or the `psn-score` budget.
+
+## 2026-10-20 — Vault Points and the rankings, a beta (`feat/social-rankings`)
+
+**Did** — Built the whole plan in `docs/rankings-plan.md`:
+- Engine: `src/utils/vaultScore.ts` (formula, stacks, unlock-tool check), `vaultLevel.ts`
+  (levels, tiers, weeks/months), `vaultScoreInputs.ts` (per platform); `src/lib/scoreRefresh.ts`
+  (lists each library once, reads only games that moved, provisional scores meanwhile);
+  `src/lib/rankings.ts`; `migrations/040_vault_points.sql` (`score_games`, `score_periods`,
+  `score_snapshots`, `users.show_in_rankings`, `users.score_refreshed_at`).
+- Triggers: `after()` in `/api/presence` (6 h freshness) and `/api/cron/scores` (daily 05:00,
+  takes the Monday snapshot). Routes: `/api/rankings` (public), `/api/rankings/me`,
+  `/api/admin/rankings` (balance per platform, review of flagged Steam games).
+- UI: `/rankings` (public; design A with B's level panel and C's close rivals), "Beta" label,
+  "how points work" modal; level badge in the header, Following cards, home friend cards,
+  public profile hero and your account page; "Appear in the rankings" switch in Preferences;
+  the Following teaser is now its link; rankings in the nav; admin "Rankings balance".
+- 9 languages, `/privacy` paragraph (and its sitemap date), sitemap and proxy entry for `/rankings`.
+**Why** — The user asked for an internal score where every platform is worth the same, levels,
+and rankings of everyone and of whom you follow, all of it at once rather than in phases.
+**Decisions** (the user's) — no ownership verification for now ("trust people"; an account
+linked twice scores for both); periods all-time, month and week; public without a session;
+hidden games and consoles do not score; 1.6.0 with only the rankings marked beta.
+Mine: `show_in_rankings` kept out of the session so a missing migration breaks only the
+rankings; levels on cards read through `vaultTotalsOrNone` for the same reason; RA and Steam
+games read straight from the platform (their page caches can predate the unlock that moved
+the game); no per-platform factor until real data asks for one.
+**Open** — `migrations/040` applied to the shared database 2026-10-20 (with the user's OK).
+Watch the first refreshes (Vercel logs `[scoreRefresh]`) and the admin balance table; the formula was only tested on
+illustrative data. Not checked in a browser yet.
+**Watch out** — A first fill reads 25 RA / 40 Steam / 15 PSN / 5 Xbox games per run and comes
+back after 10 minutes while unfinished, so a big library takes a few visits (or days of cron)
+to settle; until then games count provisionally. RA refreshes spend the user's own key.
+
+## 2026-10-20 — Branch split, rankings designed (`feat/social-rankings`)
+
+**Did** — `improvements_11` held two unrelated sets of work. The social one (Following
+restyle, presence, achievement showcase: 7 commits) was cherry-picked onto `develop` as
+`feat/social-rankings`; `improvements_11` was rebuilt on `develop` with the rest (progress
+chart periods, 404/error screens, lazy modal suspense, PSN-only header) and force-pushed. The
+code of every commit is byte-for-byte the original; only worklog, version and conflicts in
+shared files were re-resolved. Added `docs/rankings-plan.md`: the Vault Points formula,
+levels, the user's decisions and the verification analysis.
+**Why** — The user wanted the friends/online work in its own PR, where the rankings will be
+built too.
+**Decisions** — The showcase went with the social branch: it changes `FollowingCard`, the
+follows overview and the friends card, all on top of the Following and presence commits, and it
+is what friends see. Older worklog entries keep saying `improvements_11`; read them as this
+branch for Following, presence and the showcase.
+**Open** — How ownership is verified (the user is weighing a return to sign-in per platform;
+see the plan). Rankings not started.
+**Watch out** — Both branches bumped the version from 1.5.18, so whichever merges second
+conflicts on `version.ts`/`package.json`: keep the higher. A local backup of the old branch is
+`backup/improvements_11-pre-split` (not pushed).
+
+## 2026-10-20 — Showcase picker by game, multi-select (`improvements_11`)
+
+**Did** — `ShowcasePickerModal` rebuilt as two views: the user's games with an achievement
+earned (`useProfileLibrary`, played this year first, searchable), then one game's
+achievements (`useShowcaseGameChoices` → RA `getGameProgression`, Steam `achievements`, PSN
+`trophies`, Xbox `achievements`, mapped by `showcaseChoices`: earned first, newest first; the
+rest greyed with a lock; hidden unearned ones concealed), with "back to the games". The
+selection spans games: a game holding selected achievements gets a ring and "n selected";
+selected achievements a ring and a tick; the footer says how many fit and adds them all at
+once (`useShowcase.addMany`, one message). The old one-list row is gone.
+**Why** — The user wanted to browse by game, see what is left, and pick from several games in
+one go.
+**Checked** — with the real account, nothing added: games list, a selection in one game and
+its badge back in the list; RA, PSN, Steam and Xbox games all load.
+
+## 2026-10-20 — Achievement showcase, and "achievements to get" (`improvements_11`)
+
+**Did** — Split what used to be "pinned achievements" in two (rules in CLAUDE.md → Achievement
+showcase):
+- **Showcase** ("Vitrina de logros"): `migrations/039_showcase_achievements.sql`, **applied to
+  the shared Neon database 2026-10-20**; `/api/showcase`; `useShowcase` + `ShowcaseProvider`;
+  a block on top of the Pinned section (5 slots, drag to reorder, × to remove, "+" opens
+  `ShowcasePickerModal` with the year's unlocks from every platform); `ShowcaseToggleButton` in
+  the RA and Steam/PSN/Xbox detail modals, only on earned achievements and only on your pages.
+  The public profile, Following cards and the home's friend cards show it.
+- **Achievements to get**: the old pinned achievements, renamed in all 9 languages
+  ("Logros por conseguir"; the 📌 is now "pin as a goal"). Now private: `/api/favorites` GET
+  ignores `?user=`; the public profile no longer shows them, so `MainPageFavorites` and its
+  four per-platform rows were deleted (the unpin button stays, the Pinned tiles use it).
+- Following card: the latest unlocks are now the large row ("Latest unlocks", or "nothing
+  earned lately"), the showcase small at the foot.
+- `RecentAchievement.Key` (Steam apiname, PSN trophy id, Xbox id) on the mapped unlocks.
+- `/privacy`: the public profile shows the showcase, never the goals (9 languages, dated 20 Oct).
+**Why** — The user wanted the "pins" on Following to be a showcase of earned achievements,
+apart from the goals, and the recent unlocks to lead the card.
+**Decisions** (the user's) — the showcase is managed in the Pinned section (they may move it
+to Preferences later); added from a button on each earned achievement *and* a picker; the
+public profile shows the showcase, not the goals; the goals are "Logros por conseguir".
+Mine: a new table with one shape rather than a flag on `pinned_achievements` (different
+meaning, no per-platform snapshot to decode); the button only in the detail modals (one place
+per platform family) rather than on every row; the picker reads the year's unlocks already
+loaded for the streak, so older achievements are added from their game page.
+**Checked** — in the browser with the real account: added one from the picker, saw the tile
+and the toast and the public profile section, then removed it (the showcase is empty again).
+The Following card with mocked follows.
+**Open** — "Earned" is trusted from the client (see `parseShowcaseEntry`). Steam/PSN/Xbox
+unlocks added from the picker have no description (the feed does not carry it); from the
+modal they do. A pinned goal that gets earned is not moved to the showcase automatically.
+
+## 2026-10-20 — Presence everywhere another user shows (`improvements_11`)
+
+**Did** — The green dot and "online / seen …" now follow every picture of another user, not
+only the Following cards. Shared pieces: `presenceColumns()` (`src/lib/presence.ts`, the SQL
+rule, now used by the follows overview, `/api/users/search` and `findPublicUser`),
+`PresenceDot` and `PresenceLabel` (components). Placed in: Following hero faces, `UserSummary`
+(search results, the home's friend cards), the public profile hero (dot + line under the name,
+not on your own page), compare, someone's game page banner, the friends leaderboard and shared
+games. `/privacy` and the switch now say *signed-in users* see it (9 languages).
+**Why** — The user asked for the dot next to every online person's picture, and "last seen"
+everywhere else.
+**Decisions** — The dot speaks to screen readers (`announce`) only where no text beside it
+says so. Your own picture never gets it. Recent users in the search (kept in the browser)
+have no presence: they are not read from the server.
+**Open** — Nothing refreshes it while a page stays open (only on load).
+
+## 2026-10-19 — Online status and "last seen" (`improvements_11`)
+
+**Did** — Presence on the Following cards. `migrations/038_user_presence.sql`
+(`users.last_seen_at`, `users.show_presence` default true), **applied to the shared Neon
+database 2026-10-19**. `usePresenceHeartbeat` (via `PresenceHeartbeat` in `MainProviders`)
+posts `/api/presence` while the tab is visible; the route writes at most once a minute.
+`/api/follows/overview` returns `online` (seen < 5 min) and `lastSeenAt` (rounded to 5 min),
+both only for who shares it. The card shows a green dot and "Online", or "Seen 3 h ago" /
+"over a month ago", in place of the bio (`presenceOf` in `src/utils/friends.ts`); the hero
+says "n online now". A "Show when I am online" switch in Preferences → General
+(`showPresence`, same path as `profilePublic`). `/privacy` explains it, in 9 languages,
+dated 19 October 2026. Rules in CLAUDE.md → Presence.
+**Why** — The user asked for it; analysis and proposal first, then their choices.
+**Decisions** (the user's) — visible by default with an opt-out; not reciprocal; the status
+replaces the bio. A heartbeat only while visible rather than writing from the session, so a
+tab in the background does not count and no read path writes. Online is decided on the
+server, so the client's clock does not matter.
+**Checked** — in the browser: two beats on arrival (Strict Mode in dev), one row written;
+the card states and the switch with mocked follows.
+**Open** — what comes next is the user's call (CLAUDE.md roadmap): Steam "playing now" in
+one call for everyone, an "online" filter, refreshing without reloading, the public profile.
+**Watch out** — Any database without migration 038 breaks every signed-in request.
+
+## 2026-10-19 — Following page restyled, room for rankings (`improvements_11`)
+
+**Did** — `/following` was a plain list of names. Now (`FollowingPage`):
+- `FollowingHero`: the title on a wash of the theme's accent, how many people you follow and
+  a stack of their avatars (+N).
+- `FollowingRankingsTeaser` beside it: "Rankings · Coming soon" with an empty podium. Not a
+  link yet; when the rankings page exists, this card becomes its link.
+- `FollowingToolbar`: search by name and a chip per platform (only those someone has, with
+  counts; `aria-pressed` plus a check, not colour alone). Platforms are multi-select and add
+  up: two chosen leave who has **both** (people link several accounts); "All" clears them.
+  Filtering is `filterFollowing` in `src/utils/friends.ts`.
+- Each person is a `FollowingCard` (design "A2", iterated with the user on a canvas of five
+  variants): a banner with the **last game played** (`FollowingCardBanner`: blurred, a Steam
+  header a little and an icon a lot; without one, the avatar colours via `UserProfileBanner`), who they are,
+  a chip per linked account with the name it goes by (`FollowingCardPlatforms`; the overview
+  now returns `accounts`, the names the public profile already shows, Xbox's only to an
+  admin), and up to **5 pinned badges** whose tooltip says game, name and description
+  (`FollowingCardBadges`, size `md`). At the foot, beside the groups, their last 5 unlocks in
+  the same row at size `sm` (`recentAsBadge` puts an unlock in a pin's shape). Favourite games
+  were dropped from the card on the user's choice.
+- The page now reads `useFriendsData(true)` (the home Friends section's hook): the overview
+  for everyone, and the platforms' games for the newest `DETAIL_LIMIT` (10) follows, from which
+  `lastPlayedGame` (`src/utils/friends.ts`) picks the newest; RA has no play date, so its latest
+  unlock stands in. `useFollowing` is gone. The overview now returns 5 pins with a
+  `description` (a secret Xbox one not yet earned keeps it hidden); the home card shows 3.
+- Fixed in `useFriendsData`: a page that wants it from its first render never loaded in dev
+  (Strict Mode ran the effect twice; the guard skipped the second run). Tested under StrictMode.
+New `T.following` keys in all 9 languages.
+**Why** — The user found the page boring and wants it ready for a rankings system that will
+have its own page.
+**Decisions** — Last played costs platform calls (cached, the same as the home section), so
+only the newest 10 follows get it and their latest unlocks; the rest show their avatar colours
+and no unlocks. Storing it in the DB
+when each user loads their own library was proposed, not done. The rankings themselves were
+not started: only the place they open from.
+**Open** — Online status / "last seen" (the line where the bio is now) is in the CLAUDE.md
+roadmap: ask the user first. "1 grupos públicos" (no singular form). `GET /api/follows` has no
+client left (POST/DELETE still used by `useFollow`); kept with its tests, can go.
+
+## 2026-10-20 — Following, presence and showcase moved out (`improvements_11`)
+
+**Did** — The Following restyle, presence ("online" / "last seen") and the achievement
+showcase now live in `feat/social-rankings`, with their own PR, where the rankings will be
+built. This branch keeps the progress chart periods, the 404/error screens, the lazy modal
+suspense fix and the PSN-only header. One commit takes the social work back out, so the branch
+did not need a force-push; its tree is the same as these four commits cherry-picked on
+`develop` (tested: jest, lint, build).
+**Watch out** — `migrations/038` and `039` are already applied to the shared database; this
+branch no longer uses them, which is harmless. Their notes in CLAUDE.md are in the other branch.
+
+## 2026-10-20 — Header for PSN-only accounts (`improvements_11`)
+
+**Did** — `MainHeader` decided "has a platform" from RA or Steam only, so an account with only
+PSN (or only Xbox, for an admin) got a bar with no search, no Library, Groups or Following.
+It now counts PSN, and Xbox when `canUseXbox`. Tests for both.
+**Watch out** — A new platform must be added to that check, or its users lose the bar.
+
+## 2026-10-18 — New 404 and error screens (`improvements_11`)
+
+**Did** — Three screens, sharing `StatusBadge` (an achievement tile with a corner badge and a
+slow glow), `STATUS_BUTTON` and `useRise` (the landing hero's entrance) / `useGoBack` (back,
+or home in a tab with no history):
+- **404** (`NotFoundScreen`): a hidden achievement nobody has unlocked — "?" with a lock,
+  "Hidden achievement · 404", "Explorer of the unknown", a card at 0 / 1 with 0.00 %
+  rarity (`NotFoundProgress`), home and back. The root `not-found.tsx` shows it full screen.
+- **404 inside the app** (`src/app/(main)/not-found.tsx`, new): a `notFound()` under `(main)`
+  now keeps the header. On `/psnGame|steamGame|xboxGame/…` (`gameSourceFromPath`) it shows
+  `NotFoundGame` (empty cover with the platform logo, "We could not find this game", library
+  and back); elsewhere (e.g. `/foo`, caught by `[category]/layout`) the hidden achievement.
+- **Errors** (`RouteError`, now also rendered by `global-error`): the 404's twin in red, an
+  unlock cut short — alert tile with a retry badge, a card with the bar stopped at 62 % in the
+  theme's colour and the `error.digest` with a copy button (`RouteErrorCard`), retry and home.
+`T.errorBoundary` and `T.notFound` gained their keys in all 9 languages.
+**Why** — The user wanted better 404 and error screens. Five variants were mocked up as an
+artifact, then three error variants; they picked "hidden achievement" (404), "unlock
+interrupted" (errors) and the in-app 404 with context.
+**Decisions** — The game 404 says "could not find" rather than "not in your library": Steam
+404s only on a malformed id (a game not owned still opens). An Xbox game URL gives a
+non-admin the plain 404, with no word of Xbox. The second action is back, not search: the
+search modal is local state of the header. Only the digest is shown, never the error message.
+**Checked in the browser** (dev server, signed in and in a fresh signed-out context, desktop
+and 390 px; temporary throwing pages, since deleted) and fixed what it showed:
+- Retry used `reset()`, which never re-asks the server: a server error could not recover.
+  Now `retry()` (Next 16.3, `error.tsx` props `{ error, retry }`); clicking it fetches anew.
+- The screens sat at the top: the layout's `<main>` is a block, so `flex-1` did nothing.
+  They now take `min-h-[calc(100dvh-7rem)]` (`STATUS_SCREEN`), measured header + footer.
+- Two `<main>` landmarks (the layout's and the screen's): inside the app they are a `<div>`.
+  `role="alert"` moved from the root to the message block (on a `<main>` it hid the landmark).
+- Signed out, Next renders `(main)/not-found` too, with no layout: the screen was short and
+  `<html>`'s darker background showed below. `(main)/not-found` is now a server component
+  that reads the session (signed out → full screen); the client part is `NotFoundInApp`.
+  The root layout's `<body>` got `min-h-screen`, so no short page shows that band.
+- `/a/b/c` got the root 404, without header: `[category]/[consoleId]/[...missing]/page.tsx`
+  now calls `notFound()`, so every unknown URL lands in `(main)/not-found` (checked: /a/b/c,
+  /playing/3/x, /groups/x/y with header; /playing/3 still works).
+- `global-error` (seen by making the root providers throw, since reverted) used the system
+  font: it replaces the root layout and lost Inter's class. The font is now `src/lib/fonts.ts`,
+  set by both.
+**Decisions** — Not fixed, on purpose: game 404s (and /playing/3/x) answer HTTP 200 because
+those routes stream (`loading.tsx`) and call `notFound()` on the client after the library
+loads; a real 404 would need the library on the server before rendering (PSN/Xbox calls per
+visit) or dropping the skeletons, for private pages no crawler sees. React's dev-only warning
+"Encountered a script tag" on 404 pages comes from the theme script in the root layout (a 404
+document is rendered on the client in dev); moving it to `next/script` risks a theme flash on
+every page, for a warning production never shows.
+**Watch out** — `global-error` is always dark (violet): it has no theme provider.
+
+## 2026-10-18 — Clicking the "Achievements unlocked" chart lists that period (`improvements_11`)
+
+**Did** — Clicking a point of a game's weekly/monthly chart (`GameAchievementsProgressChart`,
+in every opened Recently played card and the library's opened cards) opens
+`GameAchievementsProgressChartModal`: what was unlocked that week or month, newest first,
+each a link to the achievement (rows from `LibraryDetailList`). The chart now takes
+`InsightAchievement[]` (`fromRa`/`fromSteam`/`fromPsn`/`fromXbox`) instead of bare dates, and
+`groupGameAchievementsByPeriod` returns each bucket's items and start.
+**Why** — The user asked for it (the branch is for more improvements to come).
+**Decisions** — The modal is lazy (`next/dynamic` + `LazyWhenOpened`) and portalled to
+`<body>`, since the opened card animates. A point with no unlocks opens nothing.
+**Watch out** — The buckets were labelled with `toISOString()` of a local midnight: east of
+UTC the monthly view's last bucket was the previous month, and this month's unlocks fell in
+no bucket. They are now local (`localDay`). Collection trophies are keyed `gameId:trophyId`
+in the chart, since ids repeat across its games. The `fromX` links do not carry the profile
+being viewed (`useSubject`), as in the library; on someone else's page they open the game
+for the viewer.
+**Fixed after** — The first click flashed the whole screen: a `next/dynamic` with no
+`loading` has no Suspense boundary of its own, so downloading the modal suspended the home
+page up to its `loading.tsx`. Every lazy modal (header, groups, pins, account page, login)
+now passes `{ loading: () => null }`; the rule is in CLAUDE.md, "Performance rules".
+
+---
+
+## 2026-10-17 — Recently played skeleton fills its card (`fix/recent-skeleton`)
+
+**Did** — The loading rows of "Recently played" (`RARecentlyPlayed`) sit in a
+`home-fit-scroll` list and grow (`flex-1`) like the loaded rows, which share the card's
+height (`ROW_STYLE` and the `.home-fit-scroll > *` rule in `globals.css`).
+**Why** — The skeleton rows kept their natural height: an empty band under them, and
+the list jumped when it loaded (seen by the user).
+**Watch out** — The list waits for every linked platform. On 2026-10-17 `api.xbl.io`
+did not answer from the dev machine (connection timeout after ~11 s, while the rest of
+Cloudflare answered), so for an admin with Xbox linked the skeleton stayed ~12 s.
+`xboxCall` has no timeout of its own and a failure is not cached, so every visit waits again.
+
+---
+
+## 2026-10-17 — Public comparison/how-to pages and a landing FAQ (`feat/seo-public-pages`)
+
+**Did** — Four public pages: `/compare/exophase`, `/compare/psnprofiles`,
+`/track/retroachievements-steam-playstation`, `/track/achievements-with-friends`
+(`SEO_PAGES` in `src/translations/seoPages.ts`, `SeoPage`, `SeoPageRoute`), each
+with a FAQ shown and sent as `FAQPage` JSON-LD. A five-question FAQ on the landing
+(`T.landing.faq`, 9 languages) with its JSON-LD on the home page. The landing's
+closing card and footer became `LandingClosing` and `PublicFooter`, shared with the
+new pages; the footer links every public page (`PublicPageLinks`). Sitemap lists them
+with their `updated` date; the proxy lets `/compare/` and `/track/` through.
+**Why** — The user saw a post about a SaaS getting half its sign-ups from ChatGPT
+recommending it off comparison posts. Before this, only 4 pages were public, so
+neither Google nor an AI had anything to read about what the app does.
+**Decisions** — Page prose in en/es only and outside `T`, since `T` is in every
+page's bundle (CLAUDE.md, "Public pages"). Sitemap's `priority`/`changeFrequency`
+left as they were: Google ignores them; what helps is more public pages.
+Comparisons are honest about where the other site wins. The FAQ is an accordion
+(`FaqListItem`, framer-motion height + fade, numbered, accent bar and a + that turns
+into ×); the answer stays mounted while closed (height 0, `inert`) instead of using
+`ExpandPanel`, which unmounts it, so every answer is in the HTML crawlers read.
+**Open** — Claims about Exophase (platform list, leaderboards) and PSNProfiles
+(guides, leaderboards) are from memory; their sites refuse automated reads, so the
+user should confirm them. Google Search Console / Bing Webmaster Tools not set up
+from here (dashboard work). Sign-ups are not tagged with their origin
+(`utm_source=chatgpt.com`), so whether this works cannot be measured yet.
+**Watch out** — Google shows FAQ rich results only for a few authority sites since
+2023; the JSON-LD is still read (Bing, AIs), but do not expect FAQ snippets.
+
+---
+
+## 2026-10-17 — Checked in a real browser at 375 / 768 / 1440 px (`improvements_10`)
+
+**Did** — Walked the main page (Ezio collection card, Activity, Pinned, Collection,
+Following) in Playwright, signed in by the user, at phone, tablet and desktop widths;
+no horizontal scroll at any. Fixed what showed: the month labels broke mid-word on a
+phone (now hyphenated), the total play time split from its "h", best performance ran
+the whole width between 1280 and 1535px (now beside play habits from `xl`), and the
+weekday labels of the habits chart were cut at half width.
+**Watch out** — Cards fade in on scroll (`ChartCard`'s `whileInView`): an element
+screenshot of a section not scrolled through shows them blank. Reordering was not
+tried in the browser, since it would save to the shared (production) database.
+
+---
+
+## 2026-10-17 — Collection made shorter; Following without an empty column (`improvements_10`)
+
+**Did** — Collection: "Your numbers" (`CollectionNumbers`) is a strip across the page
+under the last five completed — total play time beside its heading, then one tile
+per platform side by side (4 columns from `2xl`, 2 below) — instead of a column ~700px
+tall beside a collection grid of ~250px. The bars keep their counts; only the
+repeated "completion distribution" heading is dropped (`CompletionDistribution`
+`showTitle`). "Closest to perfect" moved to its own `CollectionClosest`, beside the
+collection grid (same height); with nothing near 100% it renders nothing and the grid
+takes the row (`xl:last:col-span-3`). Following: with nothing unlocked lately (and
+done loading), the feed card stretches to the height of the column beside it
+(`xl:self-stretch`, not sticky) with its "Nothing unlocked these days" centred,
+instead of a short card over an empty column. (Hiding it was tried first; the user
+wanted it shown.)
+
+---
+
+## 2026-10-17 — Pinned achievements and games can be reordered (`improvements_10`)
+
+**Did** — In the Pinned section each tile has a grip (`MainPagePinnedSectionSortable`
++ `MainPagePinnedSectionSortableItem`, dnd-kit, pointer and keyboard). Achievements:
+`migrations/037_pinned_achievements_position.sql` adds a nullable `position`;
+`GET /api/favorites?source=all` returns the row `id` and orders by
+`position NULLS FIRST, created_at DESC`; `PUT /api/favorites { order: [ids] }` saves
+it (only the user's own rows); `usePinnedAchievements().reorder` is optimistic and
+rolls back with a toast. Games reuse `PUT /api/pinnedGames`; the context's `reorder`
+now also puts the old order back when the save fails.
+**Decisions** — NULL position = never placed, shown first, newest first: a list nobody
+reordered reads as before, and a pin made after a reorder appears on top.
+**Watch out** — **Run migration 037 before this code runs against a database**: the
+pins query orders by `position`, so without the column every pinned-achievements read
+(main page, Pinned section, public profile) answers 500. Additive, safe to run first.
+Applied to the shared database (production, which develop and local use) on
+2026-10-17, with the user's go-ahead: 9 existing pins, all with no position yet.
+
+---
+
+## 2026-10-17 — Pinning no longer scrolls the page up (`improvements_10`)
+
+**Did** — The four game tables (RA, Steam, PSN, Xbox) put pinned achievements first.
+Pinning one moved its row to the top with the focused star in it; React then gave
+the star its focus back, and `focus()` scrolled the page up to it. Each favourites
+hook now also returns the pins as they loaded (`leading` / `leadingIds`), and the
+tables order by that: a row pinned now stays where it is (still highlighted), and
+leads the list the next time the page opens.
+
+---
+
+## 2026-10-17 — Pinning a PSN trophy answered 500 (`improvements_10`)
+
+**Did** — `POST /api/favorites` for PSN listed `xbox_achievement_id` among its insert's
+columns (8 columns, 7 values), so Postgres refused every PSN pin. Removed; a test now
+checks, for each of the four sources, that the insert names as many columns as it
+gives values (it fails on the old line).
+**Why** — Slipped in with the Xbox data layer (`06be25b`); the route tests mock the
+pool and only compared parameters. Never reached `develop` or `main`.
+
+---
+
+## 2026-10-17 — Stats & Activity: the Activity tab reworked (`improvements_10`)
+
+**Did** — Three new cards, all read from the year of unlocks the streak already loads
+(`useStreakData`: every platform, hidden consoles left out, no new call):
+"This month vs last" (`MainPageMonthCompare`: achievements, games played, active
+days, month-to-date against the same days of last month), "Play habits"
+(`MainPageHabits`: bars by weekday and by hour of the day, the busiest day and three
+hours in full accent and written out; a weekday × hour heatmap was tried first and
+the user did not like it) and "Activity diary" (`MainPageJournal` +
+`MainPageJournalDay`: the last 4 days with unlocks and their games). Logic in
+`src/utils/activityInsights.ts`. Existing cards polished: "Most active" rows carry a
+bar against the busiest game, "Abandoned" rows a progress bar (`GameListRow` got
+`share` and `progress`). Order (2026-10-17, after seeing it): the month across the
+top; habits (3/4) beside best performance (1/4), two cards of the same height; then
+the four lists in one row (most active, diary, abandoned, rare) — 4 columns from
+`2xl`, 2 by 2 below. The diary shows 3 days of at most 2 games, as tall as the
+lists beside it. The pinned achievements left Activity (goals, not activity) for a
+section of their own in the rail, "Pinned" (own page only; on a public profile they
+stay in the showcase) — under Collection's numbers they went unseen. Best month opens
+its days in `PeriodAchievementsModal` like the day and week do, instead of unfolding
+and stretching the row. `GameListRow`'s icon is decorative (`alt=""`, grey behind it):
+with the title as alt, a broken icon printed the name inside its 28px box.
+The Pinned section was then redesigned (`MainPagePinnedSection`): the pinned
+achievements are its lead — a heading with "n of total earned" and its bar, then
+each as a tile (badge large with the platform in its corner, name, description, game,
+earned/locked with an icon, points/grade/gamerscore, rarity); `pinnedView`
+(`src/utils/pinnedView.ts`) puts the four platforms in one shape. Under them, the
+pinned games as compact tiles (icon, platform, progress), resolved through
+`useProfileLibrary`; the full cards with drag-to-reorder stay in Recently played's
+pinned view. `MainPageFavorites` (the list) is still what the public profile's
+showcase uses.
+**Why** — The user asked to polish the section and add something; they picked these
+three from four ideas (a per-platform split of unlocks was left out).
+**Decisions** — Unlock dates are UTC on every platform; the habits, month and diary
+count them in the browser's local time (`unlockTime`), or an evening in Madrid would
+show two hours early. The month compares the 1st–17th with the 1st–17th, not half a
+month against a whole one. Today/yesterday come from `Intl.RelativeTimeFormat`, weekday
+and month names from `Intl.DateTimeFormat`, so only 9 strings were added per language.
+**Open** — Not checked in a browser (every route needs a session).
+
+---
+
+## 2026-10-16 — RA missables marked in the badge grid; library backdrop band (`improvements_10`)
+
+**Did** — `AchievementGrid` (the main page's opened RA card, the library's detail
+panel, group cards) rings an unearned missable in red with a small warning triangle
+in its corner, says "Missable" in its accessible name, and heads the grid with
+"⚠ Missable left: N". `LibraryDetailBackdrop` is now `overflow-hidden`.
+**Why** — The user wanted missables visible at a glance outside the game page.
+The library panel showed a hard horizontal band across "Activity in this game": the
+backdrop's art is `scale-110 blur-lg`, and what spilled past the bottom of its 30rem
+box was outside the fade to `bg-card`, so the art's (dark) bottom edge showed cut off.
+**Decisions** — Earned missables are left alone (nothing left to lose). The triangle
+is there so the mark does not rely on colour alone.
+**Open** — Not checked in a browser. The PSN work below was carried onto this branch
+uncommitted from `feat/xbox-integration`; the branch name was chosen by the user.
+
+---
+
+## 2026-10-16 — PSN collections: one card in the recent feed (`feat/xbox-integration`)
+
+**Did** — `withPlayData` gives a collection's last session only to the trophy set with
+the newest trophy; the others keep their trophy date. Each game now carries its
+`collection` (`PsnCollection` in `types/psn.ts`), and "Recently played" folds a
+collection's games into one card (`psnFeed` in `utils/steamFeed.ts`,
+`PsnCollectionItem`): its name, store icon, session, hours and summed trophies.
+Opened, it looks like an opened game (`PsnCollectionExpanded`, trophies of every game
+loaded at once by `usePsnCollectionTrophies`): ring, chart and rarest across the
+collection, each game a fold of its trophies like BO2's DLC; the rarest link to
+their own game (`PsnRarestTrophies` takes a `gameId` per trophy). Cache
+`psn:titles:v10` → `v12`.
+**Why** — Only Brotherhood was played, yet AC II showed in "Recently played" on
+16 Oct with 76 h. Measured 2026-10-16: the played list has one entry, *The Ezio
+Collection* (`CUSA04893_00`, 75 h 43 min, last session 16 Oct), and it maps to both
+sets (`NPWR11436_00` Brotherhood, last trophy 6 Oct; `NPWR11435_00` AC II, last trophy
+2 Apr 2025). The session was stamped on both.
+**Decisions** — The user chose to fold only in the feed, with stats counting per
+trophy set as before (each game keeps its platinum); a collection page with its games
+as DLC-like sections was weighed and left out, since pins, groups, favorites and URLs
+are all per set. The per-set session rule alone was not enough: opening AC II without
+earning a trophy would still credit Brotherhood, and Sony gives nothing to tell them
+apart. The hours stay on every game's own page (the total counts them once through
+`playedAs`).
+**Open** — The library lists (categories, explorer) still show each game apart, on
+purpose: each completes on its own. Revelations is missing from the Ezio card: never
+started, so Sony has no trophy list for it (the set lookup for `CUSA04893_00` returns
+only AC II and Brotherhood). Not checked in a browser.
+**Watch out** — Sony's `lastUpdatedDateTime` for AC II is 2026-09-20 though its last
+trophy is from 2025: it moves without a trophy, so AC II still sorts at that date.
+
+---
+
+## 2026-10-16 — PSN icons: Sony's square store icon, not the PS4 trophy banner (`feat/xbox-integration`)
+
+**Did** — PSN games now take their icon from the played-games list (`imageUrl`, else
+`MASTER`) instead of the trophy set's (`withPlayData`, `psnClient.ts`); the cover is
+only `PORTRAIT_BANNER`, and `GAMEHUB_COVER_ART` moved to the backdrop list. `GameIcon`
+shows PSN icons with `object-contain`. A blurred copy filling the bands was tried and
+dropped: the user preferred the plain bands. Cache key `psn:titles:v9` → `v10`.
+**Why** — PS4 icons looked bad: measured 2026-10-16 on a real account, a PS4 trophy
+set's `trophyTitleIconUrl` is a 320×176 banner (PS5's are 512×512), cropped to a
+square ("SSASSIN CREED"). The played-games `imageUrl` is square (512/1024) on PS4 too.
+On the game page the "cover" of a PS4 game was its 16:9 hub art cropped to 2:3.
+**Decisions** — A collection (Ezio Collection → AC II, Brotherhood…) keeps each
+game's trophy icon, letterboxed, rather than the same collection icon on every game.
+PS3/Vita and games with a hidden played list also keep the (letterboxed) trophy icon.
+**Watch out** — Pins and group items store `image_icon` at pin time; they show the
+live library's icon when it is loaded, the stored one otherwise.
+
+---
+
+## 2026-10-16 — The "13 optimizations" (`feat/xbox-integration`)
+
+**Did** — The roadmap's "13 optimization fixes" were never itemised, only named
+(stampede, Cache-Control, duplicate fetches, TTLs, error boundaries, lazy images),
+so each area was audited and what was real got fixed. Server stampede,
+indexes and TTLs were already fine. Fixed: (1) `fetchWithRetry` shares one request
+per URL in flight (the awards were asked for by 6 components); (2) `fetchShared`
+does the same for the 12 PSN/Steam/Xbox hooks that use `fetch`; (3, 4) recharts
+(~390 KB, in every page that had a chart) loads lazily behind the two plots;
+(5) the account page's 9 modals and the admin panel load when first opened;
+(6) the header's search and mobile menu, the group, pin and password-reset modals
+too (`LazyWhenOpened`); (7) PSN and Xbox reads (6 routes) now send `Cache-Control`
+like RA's and Steam's; (8) 7 context values are memoized; (9) hero images decode
+async at low priority, admin avatars lazy; (10) `(auth)` got an error boundary
+(`RouteError`, shared with `(main)`). Rules in `CLAUDE.md` ("Performance rules").
+**Decisions** — Notifications stay a to-do the user wants to expand before it is
+built (written in the roadmap). No change to the database.
+**Open** — Not measured in a browser (no Lighthouse run): the evidence is that the
+recharts chunk is now only in the `react-loadable-manifest`s, not eagerly loaded.
+A first opening of a lazy modal costs one small download; if that is felt, preload
+it on hover of its button.
+**Watch out** — Tests of anything that opens a lazy modal wait for it (`findBy…`).
+
+---
+
+## 2026-10-16 — Platform failures audited, play time, feeds, preferences on the account (`feat/xbox-integration`)
+
+**Did** — (1) Audited how each platform reports "unknown / private / key refused /
+busy" and wrote the table in `CLAUDE.md` ("How each platform fails"). Fixed what
+was wrong: RA's refused key was a retried 503 (now `403 ra-key-invalid` + a notice),
+a Steam profile made private after linking showed as empty (now `403 private`),
+Xbox private libraries are detected (measured: `titles: []` and no
+`achievementSummary`). (2) Total play time on the Xbox cards and across Steam/PSN/Xbox
+in the collection numbers. (3) The consoles unticked in preferences now also leave
+the feeds, the streak, the heatmap and the charts (`useConsoleVisibility`).
+(4) Preferences follow the account: `migrations/036_user_preferences.sql`,
+`/api/preferences`, `usePreferencesSync`, a fixed list of keys. Privacy text updated.
+**Why** — The user asked for all of the above, and not to open Xbox to everyone yet
+(OpenXBL's free plan, 150 calls an hour, would not hold it; recorded in `CLAUDE.md`).
+**Decisions** — Xbox stays admin-only until the user decides to pay for a plan.
+Preferences stay in the browser too (instant, works signed out) and mirror to the
+account; the account wins on sign-in.
+**Open** — `migrations/036` was run on the shared database on 2026-10-16, with the
+user's OK (`develop` shares the production database). Without the column
+`/api/preferences` answers 500 and every preference change toasts an error.
+**Watch out** — A new feed of unlocks must filter through `useConsoleVisibility`.
+
+---
+
+## 2026-10-16 — Library layout remembered; tooltips that fit; concealed tiles (`feat/xbox-integration`)
+
+**Did** — (1) The library's Shelves / List / Cards choice is now saved in the
+browser (`library-layout` in `useLibraryPrefs`, one choice for every category) and
+the list opens on it; it used to go back to shelves on every visit and category.
+A search typed on the shelves still moves to the list, but only while it is
+there and without overwriting the saved choice. (2) Achievement/trophy
+tooltips ran off the right edge on the last badges: `tooltipStyle` (new util)
+flips them left/up when they would not fit, in the four grids (RA, Steam, PSN,
+Xbox). (3) Secret achievements/trophies showed as an empty dark square that
+looked like a broken image; `ConcealedBadge` puts a question mark in it (Xbox
+and PSN grids). The three blanks in Guitar Hero III were its three secret
+achievements — all 59 icons exist on Xbox's CDN.
+**Decisions** — Saved in the browser like the other library prefs, not in the DB.
+**Watch out** — The saved layout is read after hydration, so the first paint is
+the default for a moment.
+
+---
+
+## 2026-10-16 — Xbox gaps against PSN: public profile, play time, backdrop, privacy (`feat/xbox-integration`)
+
+**Did** — An audit of PSN-only code found and closed: (1) `useProfileLibrary`
+ignored Xbox, so public profiles and friend comparisons had no Xbox games;
+(2) play time: one `POST player/stats` inside the library load, shown in every
+card/header/detail/group row like PSN's and in the AI export; (3) a wide
+backdrop for the game page from IGDB (via `/api/xbox/details`, which also got
+the route test it was missing); (4) `/privacy` now covers Xbox (9 languages);
+(5) gamertag on the admin user card and in the admin search.
+**Decisions** — Backdrop only on the game page: enriching the whole library from
+IGDB would be ~135 searches on a cold load. The marketing texts (landing, site
+title, description) still list three platforms until Xbox opens to everyone.
+Retro 360 games report minutes under `modernTitleId` (measured: 5 of 9 had a value).
+**Open** — Private profile / unknown gamertag responses are still unmeasured.
+Library cache key is now `xbox:titles:v5`.
+**Watch out** — The stats call is one more OpenXBL call per library refresh.
+
+---
+
+## 2026-10-16 — Account preferences in tabs (`feat/xbox-integration`)
+
+**Did** — The preferences card was one long column (it grew with every platform
+and stretched the identity card beside it, leaving big empty gaps). It is now
+tabs, reusing `MainPageProfileTabs`: General (theme, language, gender, public
+profile, hidden games) and one per platform (favourite game + that platform's
+choices + its consoles). New `UserPreferencesGeneral` and
+`UserPreferencesPlatform`; the PSN/Xbox/RA preference blocks lost their own
+headings (the tab names them) and the console list is always open inside its tab.
+Last tab remembered in the browser. Translations: `prefsGeneral`,
+`prefsTabsLabel`; the unused `*Section` headings were removed.
+**Why** — The user asked to redesign that part of the account page.
+**Open** — Not looked at in a browser. The identity card can still leave gaps
+when it is taller than the preferences (it stretches to the row).
+
+---
+
+## 2026-10-16 — Choose which consoles show, per platform (`feat/xbox-integration`)
+
+**Did** — A "Consoles" preference under RA, PSN and Xbox in the account page:
+a tick per console in the user's library (with its game count). New
+`consoleFilter.ts`, `useHiddenConsoles`, `UserConsolesPreference`,
+`UserRaPreferences`; the three data contexts filter by it and expose `consoles`;
+PSN/Xbox expose `fullLibrary` too. Strings in all 9 languages. Rules in
+`CLAUDE.md` ("Consoles to show").
+**Why** — The user asked for a checkbox per console, per platform, to choose
+what shows.
+**Decisions** — Browser storage like the other PSN/Xbox preferences (no migration
+on the shared DB); it does not follow the account across devices. Stored as the
+unticked names. Filter in the contexts so every list, the collection and the
+stats agree. Steam skipped (no consoles). Feeds and streak left unfiltered.
+**Open** — If it should follow the account or show on public profiles, it needs a
+column. The home "recent achievements" still include unticked consoles.
+**Watch out** — Look games up by id in `fullLibrary`, never `library`.
+
+---
+
+## 2026-10-16 — Xbox 360 backward-compatible games had no achievements (`feat/xbox-integration`)
+
+**Did** — 9 of the 12 Xbox 360 games in the library (Modern Warfare 3, Black
+Ops II, Skate 3, Tekken 6…) showed "This game has no achievements": they list
+Xbox One/Series among their devices, so `is360` was false and the modern
+endpoint (which answers them with an empty list) was used. `is360` now comes
+from `mediaItemType` (`Xbox360Game`/`XboxArcadeGame`); devices only decide when
+the type is missing. Cache keys bumped to `xbox:titles:v4` and
+`xbox:achievements:v5` (the empty lists were cached up to 30 days).
+Checked on real data: both 360 lists agree on ids, scores and icons, and the
+icon URLs load for locked and unlocked ones.
+**Watch out** — A 360 game costs 2 calls, so feed scans that touch many of them
+spend more of the 150 calls an hour.
+
+---
+
+## 2026-10-15 — Xbox 360 covers, icons and partial lists (`feat/xbox-integration`)
+
+**Did** — Fixed Xbox 360 games (seen in the browser: Guitar Hero II): the cover
+and the achievement icons did not load, and only 14 of 50 achievements showed.
+Covers: Xbox's plain image hosts fail over https, so `https()` in
+`xboxMappers.ts` now swaps them for the `-ssl` hosts. Icons: built from
+`titleId`/`imageId` in hex. List: OpenXBL's 360 endpoint returns only unlocked
+achievements; the locked ones come from the other 360 endpoint, the title's
+whole list (`achievements/player/{xuid}/title/{titleId}`, found in
+`https://api.xbl.io/docs/json`), joined with `merge360Achievements`. A 360 game
+costs 2 calls. `XboxPartialListNote` stays as a net if a list still comes up
+short (all 9 languages). Cache keys bumped to `xbox:titles:v3` and
+`xbox:achievements:v4`.
+**Open** — Check on a real 360 game that the ring and the grid show all 50.
+**Watch out** — Bump the cache version whenever a mapper's output changes: the
+achievements are cached for 30 days.
+
+## 2026-10-15 — Xbox integration 1:1 with PSN, admin-only (`feat/xbox-integration`)
+
+**Did** — Replaced the explorer-only scope with the full PSN-equivalent Xbox
+integration: link by gamertag, summary, library and categories, `/xboxGame/[id]`,
+recent/year feeds, pins, favorites, groups, collection and stats, friends,
+public profiles, admin linking. `'xbox'` is now a `GameSource`; migrations
+033–035 (applied to the shared DB 2026-10-15, with the user's OK). Tests for the
+new hooks, utils, routes and components; whole suite, `tsc`, lint and build pass.
+**Why** — The user asked for "1:1 with PSN, but only available and visible to admins".
+**Decisions** — One switch (`XBOX_ADMIN_ONLY`) plus server 403s, hidden UI and
+filtering of other users' Xbox data. Progress by gamerscore (`totalKnown` flag)
+because modern games report no achievement total. Achievements are cached by
+`lastPlayed`, feed scans are capped, to live within 150 calls/hour.
+**Open** — Never checked in a real browser (needs an admin login). Private
+profile / unknown gamertag responses and play time (`MinutesPlayed`) are
+unverified. Cold year feed can spend up to ~40 calls. Rotate the API key: it was
+pasted in the chat. Several edited existing components have no new xbox cases yet.
+**Watch out** — A new place that lists games or accounts must filter Xbox for
+non-admins (see CLAUDE.md). Repo files are CRLF.
+
+## 2026-10-15 — Xbox via OpenXBL, admin-only explorer (`feat/xbox-integration`)
+
+**Did** — Analysed OpenXBL (xbl.io) against the PSN integration
+(`docs/xbox-integration-plan.md`), ran the Phase 0 spike with a real key, and
+built an **admin-only Xbox explorer**: gamertag → profile, library with
+progress and gamerscore, and each game's achievements (rarity, unlock dates).
+`src/lib/xboxClient.ts`, `src/utils/xboxMappers.ts`, `src/types/xbox.ts`,
+`/api/admin/xbox` and `/api/admin/xbox/achievements`, two hooks, and
+`admin-xbox/AdminXbox.tsx` + `AdminXboxGame.tsx` in the admin panel. New admin
+action `xbox-lookup`. Added the Xbox section to `CLAUDE.md`, a row in
+`docs/architecture.md`, `OPENXBL_API_KEY` in README and `.env.example`.
+**Why** — The user wants Xbox next to RA, Steam and PSN, and asked to try it
+admin-only first, with few calls, before opening it to users.
+**Decisions** — No migration and no user linking: nothing is stored, so the
+shared production database is untouched. Progress goes by gamerscore because
+modern games report `totalAchievements: 0`. Xbox 360 stays in the library list
+and uses its own achievements endpoint. `Xbox` is not added to `GameSource` yet:
+that would touch ~50 files and belongs to the user-facing phase.
+**Open** — What a private profile and an unknown gamertag return (needs
+someone else's account); play time (`MinutesPlayed`) is proven but not wired;
+the user-facing phases (link by gamertag, library pages, pins/groups/feed) are
+not started and need the user's go-ahead; whether the free plan's 150 calls an
+hour is enough once users link. Ask first whether to rotate the API key: it was
+pasted in the chat once.
+**Watch out** — OpenXBL answers errors with HTTP 200 and the code in the body,
+and refuses `Accept-Language: *` (Node's fetch default). The base URL is
+`https://api.xbl.io/v2/`. The first spike found the SDK's field names wrong for
+the profile (it is a `settings[]` list), so trust `docs/xbox-integration-plan.md`
+section 6 over the SDK.
+
 ## 2026-10-14 — Release v1.4.0 (`chore/release-v1.4.0`)
 
 **Did** — Bumped to 1.4.0 and opened the `develop` → `main` PR. Updated the

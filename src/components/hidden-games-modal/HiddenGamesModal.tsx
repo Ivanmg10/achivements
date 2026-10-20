@@ -7,6 +7,7 @@ import { useHiddenGames } from '@/context/HiddenGamesContext'
 import CommonModal from '@/components/common-modal/CommonModal'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { PLATFORM_NAME } from '@/utils/gameRef'
 import RaLogo from '@/components/ra-logo/RaLogo'
 
@@ -54,6 +55,8 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
                       <SteamLogo size={11} className="text-[#66c0f4]" aria-hidden="true" />
                     ) : g.source === 'psn' ? (
                       <PlaystationLogo size={11} className="text-[#0070d1]" aria-hidden="true" />
+                    ) : g.source === 'xbox' ? (
+                      <XboxLogo size={11} className="text-[#107c10]" aria-hidden="true" />
                     ) : (
                       <RaLogo height={9} />
                     )}

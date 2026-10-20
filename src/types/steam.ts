@@ -152,7 +152,7 @@ export type SteamSchemaResponse = {
 
 /* ---------- Unified model ---------- */
 
-export type GameSource = 'ra' | 'steam' | 'psn'
+export type GameSource = 'ra' | 'steam' | 'psn' | 'xbox'
 
 export type GameProgressBase = {
   _source: GameSource

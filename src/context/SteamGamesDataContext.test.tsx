@@ -93,6 +93,14 @@ test('surfaces a failed library', async () => {
   expect(result.current.recent).toEqual(RECENT)
 })
 
+test('a profile that turned private is reported as such, not as a generic failure', async () => {
+  setSteamId('765')
+  mockRoutes(ok(RECENT), { ok: false, status: 403, json: async () => ({ error: 'private' }) })
+  const { result } = renderHook(() => useSteamGamesData(), { wrapper })
+
+  await waitFor(() => expect(result.current.libraryError).toBe('private'))
+})
+
 test('rejects a non-array payload', async () => {
   setSteamId('765')
   mockRoutes(ok({ message: 'nope' }), ok(LIBRARY))

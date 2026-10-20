@@ -10,6 +10,8 @@ import AdminUserCard from './admin-user-card/AdminUserCard'
 import AdminUnlock from './admin-unlock/AdminUnlock'
 import AdminActionLog from './admin-action-log/AdminActionLog'
 import AdminPsnToken from './admin-psn-token/AdminPsnToken'
+import AdminXbox from './admin-xbox/AdminXbox'
+import AdminRankings from './admin-rankings/AdminRankings'
 import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
 import Spinner from '@/components/main-spinner/Spinner'
 import { normalizeTitle } from '@/utils/gameCandidates'
@@ -52,7 +54,7 @@ export default function AdminPanel({
     const q = normalizeTitle(query.trim())
     if (!q) return users
     return users.filter((u) =>
-      [u.username, u.email, String(u.id), u.rausername, u.ra_display, u.steamusername, u.psnusername].some(
+      [u.username, u.email, String(u.id), u.rausername, u.ra_display, u.steamusername, u.psnusername, u.xboxgamertag].some(
         (field) => field && normalizeTitle(field).includes(q),
       ),
     )
@@ -198,6 +200,8 @@ export default function AdminPanel({
 
       {locked ? <AdminUnlock onUnlocked={handleUnlocked} /> : <>
       <AdminPsnToken />
+      <AdminXbox />
+      <AdminRankings />
       <div>
         {loading && (
           <div className="flex items-center justify-center gap-3 py-12 text-text-secondary text-sm">

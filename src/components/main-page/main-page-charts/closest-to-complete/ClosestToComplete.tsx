@@ -44,7 +44,6 @@ export default function ClosestToComplete({
           key={game.key}
           href={game.href}
           imageUrl={game.imageUrl}
-          imageAlt={game.title}
           title={game.title}
           subtitle={`${game.done}/${game.total}`}
           stat={`${Math.round(game.percent)}%`}

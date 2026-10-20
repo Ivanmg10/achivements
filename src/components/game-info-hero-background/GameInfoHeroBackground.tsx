@@ -19,6 +19,8 @@ export default function GameInfoHeroBackground({ imagePath }: { imagePath: strin
       <img
         src={`https://retroachievements.org${imagePath}`}
         alt=""
+        decoding="async"
+        fetchPriority="low"
         onLoad={(e) => e.currentTarget.classList.replace('opacity-0', 'opacity-60')}
         className="w-full h-full object-cover object-top opacity-0 scale-110 transition-opacity duration-700"
         style={{ filter: 'blur(16px)' }}

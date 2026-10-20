@@ -1,59 +1,72 @@
 'use client'
 
-import Link from 'next/link'
-import { IconUsers } from '@tabler/icons-react'
+import { useMemo } from 'react'
+import { IconHeart, IconUsers } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useFollowing } from '@/hooks/useFollowing'
-import UserSummary from '@/components/user-summary/UserSummary'
-import EmptyState from '@/components/empty-state/EmptyState'
-import FollowingPageSkeleton from './following-page-skeleton/FollowingPageSkeleton'
+import { useFriendsData } from '@/hooks/useFriendsData'
+import { useFollowers } from '@/hooks/useFollowers'
+import { useFollowCounts } from '@/hooks/useFollowCounts'
+import { useLocationHash } from '@/hooks/useLocationHash'
+import FollowingHero from './following-hero/FollowingHero'
+import FollowingRankingsTeaser from './following-rankings-teaser/FollowingRankingsTeaser'
+import FollowingTabs, { type FollowingTab } from './following-tabs/FollowingTabs'
+import FollowingList from './following-list/FollowingList'
 
 /**
- * The people you follow, newest first: who they are on CheevoVault, each
- * opening their profile. Nothing is asked of RA, Steam or PSN here.
+ * The people you follow, newest first, each as a card that opens their
+ * profile: the last game they played, their accounts, their latest pins and
+ * unlocks, their public groups. Searchable by name and by the platforms they
+ * play on (all of those chosen). Beside the title, where the rankings will
+ * open from. The cards are our own data; the last game played and the unlocks
+ * are read for the newest follows only (DETAIL_LIMIT), as the home's Friends
+ * section does. A second tab (`#followers`) lists who follows you, the same
+ * cards, read when it is first opened; only you see it.
  */
 export default function FollowingPage() {
-  const { T, lang } = useLanguage()
-  const { users, isLoading, error, retry } = useFollowing()
+  const { T } = useLanguage()
+  const hash = useLocationHash()
+  const tab: FollowingTab = hash === '#followers' ? 'followers' : 'following'
+  const { friends, details, isLoading, error, retry } = useFriendsData(true)
+  const fans = useFollowers(tab === 'followers')
+  const { counts } = useFollowCounts()
+  const users = useMemo(() => friends ?? [], [friends])
+
+  // The tab lives in the address, so /user's "Followers" opens it and Back returns to the other.
+  const onTab = (next: FollowingTab) => {
+    window.location.hash = next
+  }
 
   return (
     <div className="flex flex-col items-center py-6 px-4">
-      <section aria-labelledby="following-title" className="w-full max-w-3xl flex flex-col gap-4">
-        <div className="flex items-baseline justify-between gap-3">
-          <h1 id="following-title" className="text-2xl font-bold">{T.following.title}</h1>
-          {!isLoading && !error && users.length > 0 && (
-            <span className="text-sm text-text-secondary tabular-nums">{users.length.toLocaleString(lang)}</span>
-          )}
+      <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <FollowingHero users={users} className="lg:col-span-2" />
+          <FollowingRankingsTeaser />
         </div>
 
-        <div className="bg-bg-card rounded-2xl p-2">
-          {isLoading ? (
-            <FollowingPageSkeleton />
-          ) : error ? (
-            <div className="flex flex-col items-center gap-2 py-10 text-center">
-              <p role="alert" className="text-sm text-red-400">{T.following.loadError}</p>
-              <button onClick={retry} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
-                {T.publicProfile.retry}
-              </button>
-            </div>
-          ) : users.length === 0 ? (
-            <EmptyState icon={<IconUsers className="w-6 h-6" />} title={T.following.emptyTitle} subtitle={T.following.empty} className="py-12" />
-          ) : (
-            <ul className="flex flex-col gap-1">
-              {users.map((u) => (
-                <li key={u.username}>
-                  <Link
-                    href={`/user/${encodeURIComponent(u.username)}`}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-bg-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-                  >
-                    <UserSummary user={u} size={40} />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </section>
+        <FollowingTabs tab={tab} onTab={onTab} counts={counts} />
+
+        {tab === 'following' ? (
+          <FollowingList
+            key="following"
+            users={users}
+            details={details}
+            isLoading={isLoading}
+            error={error}
+            onRetry={retry}
+            empty={{ icon: <IconUsers className="w-6 h-6" />, title: T.following.emptyTitle, subtitle: T.following.empty }}
+          />
+        ) : (
+          <FollowingList
+            key="followers"
+            users={fans.followers ?? []}
+            isLoading={fans.isLoading}
+            error={fans.error}
+            onRetry={fans.retry}
+            empty={{ icon: <IconHeart className="w-6 h-6" />, title: T.following.noFollowersTitle, subtitle: T.following.noFollowers }}
+          />
+        )}
+      </div>
     </div>
   )
 }

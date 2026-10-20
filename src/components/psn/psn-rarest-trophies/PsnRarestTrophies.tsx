@@ -21,7 +21,8 @@ export default function PsnRarestTrophies({
   isLoading,
 }: {
   gameId: number
-  trophies: PsnTrophy[]
+  /** A collection's trophies come from several games: each then says its own. */
+  trophies: (PsnTrophy & { gameId?: number })[]
   isLoading: boolean
 }) {
   const { T } = useLanguage()
@@ -29,7 +30,7 @@ export default function PsnRarestTrophies({
   const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }
 
   const rarest = trophies
-    .filter((t): t is PsnTrophy & { rarity: number } => t.earned && t.rarity !== null)
+    .filter((t): t is PsnTrophy & { gameId?: number; rarity: number } => t.earned && t.rarity !== null)
     .sort((a, b) => a.rarity - b.rarity)
     .slice(0, SHOWN)
 
@@ -50,9 +51,9 @@ export default function PsnRarestTrophies({
       ) : (
         <ol className="flex flex-col gap-2">
           {rarest.map((t) => (
-            <li key={t.id}>
+            <li key={`${t.gameId ?? gameId}:${t.id}`}>
               <Link
-                href={`${gameHref('psn', gameId, subject)}#${psnTrophyAnchor(t.id)}`}
+                href={`${gameHref('psn', t.gameId ?? gameId, subject)}#${psnTrophyAnchor(t.id)}`}
                 className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
               >
                 {t.iconUrl ? (

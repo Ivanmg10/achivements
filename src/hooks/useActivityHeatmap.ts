@@ -1,13 +1,15 @@
 import { RecentAchievement } from '@/types/types'
 import { useSession } from 'next-auth/react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { useConsoleVisibility } from '@/hooks/useConsoleVisibility'
 
 export function useActivityHeatmap() {
   const { data: session } = useSession()
   const subject = useSubject()
+  const { isShown, filtering } = useConsoleVisibility()
   const [achievements, setAchievements] = useState<RecentAchievement[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -52,5 +54,7 @@ export function useActivityHeatmap() {
   }, [doFetch])
 
   // Nobody to load for is not loading, whatever the last request left behind.
-  return { achievements, isLoading: Boolean(session?.user?.rausername) && isLoading, error, refetch }
+  // Without the games on the consoles unticked in preferences.
+  const shown = useMemo(() => (filtering ? achievements.filter(isShown) : achievements), [achievements, filtering, isShown])
+  return { achievements: shown, isLoading: Boolean(session?.user?.rausername) && isLoading, error, refetch }
 }

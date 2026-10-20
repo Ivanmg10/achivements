@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/authOptions'
 import { dataOwner } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { gameKey, parseGameKey } from '@/utils/gameRef'
+import { sourceAllowed } from '@/utils/xboxAccess'
 
 export async function GET(req?: Request) {
   try {
@@ -38,6 +39,10 @@ export async function PUT(req: NextRequest) {
       : null
     if (!refs || refs.some((ref) => ref === null)) {
       return NextResponse.json({ message: 'order debe ser un array de claves de juego' }, { status: 400 })
+    }
+
+    if (refs.some((ref) => !sourceAllowed(ref!.source, session.user.admin))) {
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
     const client = await pool.connect()

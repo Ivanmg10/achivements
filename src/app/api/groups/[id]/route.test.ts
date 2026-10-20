@@ -110,3 +110,28 @@ describe('DELETE', () => {
     expect((await DELETE(request('DELETE'), params())).status).toBe(500)
   })
 })
+
+describe('Xbox is admin-only', () => {
+  test('a visitor gets the group without its Xbox games', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '2' } })
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [group({ is_public: true })] }).mockResolvedValueOnce({ rows: [] })
+    await GET(request('GET'), params())
+    const [sql, values] = (pool.query as jest.Mock).mock.calls[1]
+    expect(sql).toContain("source <> 'xbox'")
+    expect(values).toEqual([5, false])
+  })
+
+  test('an admin gets them', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '2', admin: true } })
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [group({ is_public: true })] }).mockResolvedValueOnce({ rows: [] })
+    await GET(request('GET'), params())
+    expect((pool.query as jest.Mock).mock.calls[1][1]).toEqual([5, true])
+  })
+
+  test('a visitor with no session gets them left out too', async () => {
+    ;(getServerSession as jest.Mock).mockResolvedValue(null)
+    ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [group({ is_public: true })] }).mockResolvedValueOnce({ rows: [] })
+    await GET(request('GET'), params())
+    expect((pool.query as jest.Mock).mock.calls[1][1]).toEqual([5, false])
+  })
+})

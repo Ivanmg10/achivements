@@ -7,7 +7,10 @@ import { getGame } from '@/lib/raClient'
 import { withSteamCache, TTL } from '@/lib/steamCache'
 import { getAppDetails } from '@/lib/steamClient'
 import { psnReleaseYear, psnTitles } from '@/lib/psnClient'
-import { igdbArt } from '@/lib/igdbClient'
+import { igdbArt, igdbXboxArt } from '@/lib/igdbClient'
+import { xboxLibrary } from '@/lib/xboxClient'
+import { canUseXbox } from '@/utils/xboxAccess'
+import type { XboxGameProgress } from '@/types/xbox'
 import type { PsnGameProgress } from '@/types/psn'
 import { toSteamGameDetails } from '@/utils/steamMappers'
 import { mapLimit, parseReleaseYear } from '@/utils/utils'
@@ -56,7 +59,20 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
         ? psnTitles(accountId, session.user.id).then((games) => new Map(games.map((g) => [g.id, g])))
         : Promise.resolve(null))
 
+    // The owner's Xbox games: Xbox's library has no release year, so it comes from IGDB by title.
+    const xuid = canUseXbox(session.user.admin) ? session.user.xboxxuid : undefined
+    let xboxGames: Promise<Map<number, XboxGameProgress> | null> | null = null
+    const ownXboxGames = () =>
+      (xboxGames ??= xuid
+        ? xboxLibrary(xuid, session.user.id).then((games) => new Map(games.map((g) => [g.id, g])))
+        : Promise.resolve(null))
+
     const results = await mapLimit(rows, CONCURRENCY, async (row) => {
+      if (row.source === 'xbox') {
+        const game = (await ownXboxGames())?.get(row.game_id)
+        if (!game) return { id: row.id, year: 0 }
+        return { id: row.id, year: (await igdbXboxArt(game.title, game.consoleName))?.releaseYear ?? 0 }
+      }
       // Sony's trophy data has no release date: it comes from the game's
       // PlayStation Store page, or for PS3/Vita (no Store page) from IGDB.
       // Neither knows it: no year known (0).

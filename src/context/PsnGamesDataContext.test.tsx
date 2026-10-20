@@ -64,3 +64,24 @@ test('with "platinum completes" on, only games with a platinum are flagged', asy
   expect(result.current.library.map((g) => g.platinumCompletes)).toEqual([true, undefined])
   window.localStorage.clear()
 })
+
+describe('the consoles unticked in preferences', () => {
+  const MIXED = [
+    { id: 1, title: 'Old', consoleName: 'PS3', earned: { platinum: 0 } },
+    { id: 2, title: 'Both', consoleName: 'PS4 · PS5', earned: { platinum: 0 } },
+  ]
+
+  beforeEach(() => {
+    window.localStorage.clear()
+    setSession({ id: '7', psnaccountid: '42' })
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200, json: async () => MIXED })
+  })
+
+  test('leave the list, but not the full one, and the options count every game', async () => {
+    window.localStorage.setItem('hidden-consoles:psn', '["PS3","PS4"]')
+    const { result } = renderHook(() => usePsnGamesData(), { wrapper })
+    await waitFor(() => expect(result.current.fullLibrary).toHaveLength(2))
+    expect(result.current.library.map((g) => g.id)).toEqual([2])
+    expect(result.current.consoles.map((c) => c.name).sort()).toEqual(['PS3', 'PS4', 'PS5'])
+  })
+})

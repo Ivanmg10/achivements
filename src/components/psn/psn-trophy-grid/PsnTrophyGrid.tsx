@@ -4,6 +4,7 @@ import { memo, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createPortal } from 'react-dom'
+import ConcealedBadge from '@/components/concealed-badge/ConcealedBadge'
 import { useLanguage } from '@/context/LanguageContext'
 import { capList, formatDate } from '@/utils/utils'
 import { gameHref } from '@/utils/gameRef'
@@ -16,6 +17,7 @@ import { useRevealedTrophies } from '@/hooks/useRevealedTrophies'
 import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy, PsnTrophyGroup, TrophyGrade } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
+import { tooltipStyle } from '@/utils/tooltipStyle'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -127,7 +129,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
                       unoptimized
                     />
                   ) : (
-                    <div className={`${size.badge} bg-ink/10 ${t.earned ? '' : 'opacity-40'}`} aria-hidden="true" />
+                    <ConcealedBadge sizeClass={size.badge} dim={!t.earned} />
                   )}
                 </Link>
                 {t.hidden && !t.earned && (
@@ -174,7 +176,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
           <div
             role="tooltip"
             className="fixed z-50 pointer-events-none bg-bg-card border border-bg-header/80 rounded-xl shadow-2xl p-3 max-w-65"
-            style={{ left: tooltip.x + 14, top: tooltip.y - 10 }}
+            style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
           >
             <p className="text-sm font-semibold text-text-main">{nameOf(tooltip.trophy)}</p>
             <p className="text-xs text-text-secondary mt-1 leading-snug">

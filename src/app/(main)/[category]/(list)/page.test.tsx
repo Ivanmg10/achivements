@@ -93,6 +93,7 @@ import { useRaLinked } from '@/hooks/useRaLinked'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
 import { fireEvent } from '@testing-library/react'
+import { en } from '@/translations/en'
 
 /** The page opens on its shelves; most of these tests are about the cards, so go there first. */
 function renderCards() {
@@ -107,6 +108,8 @@ const mockGames = [
 ]
 
 beforeEach(() => {
+  // The layout is remembered in the browser: every test starts from a clean one.
+  localStorage.clear()
   ;(useParams as jest.Mock).mockReturnValue({ category: 'playing' })
   ;(useRaLinked as jest.Mock).mockReturnValue(true)
 })
@@ -135,6 +138,20 @@ test('renders error message on fetch error', () => {
   ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: [], loading: false, error: 'Network error' })
   renderCards()
   expect(screen.getByText('Network error')).toBeInTheDocument()
+})
+
+test('a Steam profile that turned private says so, and any other Steam failure is the generic one', () => {
+  ;(useGamesByCategory as jest.Mock).mockReturnValue({ games: mockGames, loading: false, error: null })
+  ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true })
+  ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [], error: 'private' })
+  const { unmount } = render(<CategoryPage />)
+  expect(screen.getByText(new RegExp(en.steamLink.errors.private.slice(0, 20)))).toBeInTheDocument()
+  unmount()
+  ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [], error: 'Steam request failed (503)' })
+  render(<CategoryPage />)
+  expect(screen.getByText(new RegExp(en.steam.gamesError))).toBeInTheDocument()
+  ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false })
+  ;(useSteamGamesByCategory as jest.Mock).mockReturnValue({ games: [] })
 })
 
 test('passes a default lastPlayed sort state for playing/completed categories', () => {
@@ -362,6 +379,23 @@ describe('shelves and list', () => {
     expect(explorer).toHaveAttribute('data-layout', 'shelves')
     expect(explorer).toHaveTextContent('ra:1,steam:5')
     expect(screen.queryByTestId('steam-section')).not.toBeInTheDocument()
+  })
+
+  test('the layout left is the one it opens on next time, whatever the category', () => {
+    const { unmount } = render(<CategoryPage />)
+    fireEvent.click(screen.getByRole('button', { name: 'List' }))
+    expect(localStorage.getItem('library-layout')).toBe('list')
+    unmount()
+    ;(useParams as jest.Mock).mockReturnValue({ category: 'completed' })
+    render(<CategoryPage />)
+    expect(screen.getByTestId('explorer')).toHaveAttribute('data-layout', 'list')
+  })
+
+  test('a search that moves the shelves to the list does not overwrite the saved layout', () => {
+    render(<CategoryPage />)
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'had' } })
+    expect(screen.getByTestId('explorer')).toHaveAttribute('data-layout', 'list')
+    expect(localStorage.getItem('library-layout')).toBeNull()
   })
 
   test('typing in the search while on the shelves goes to the list', () => {

@@ -20,7 +20,7 @@ const ITEM: GameGroupItem = {
 
 test('live numbers from the PSN list, linking to the PSN page', () => {
   ;(usePsnGamesData as jest.Mock).mockReturnValue({
-    library: [{ id: 2018800, title: 'Astro Bot', imageIcon: 'https://psn/a.png', consoleName: 'PS5', numAwarded: 8, maxPossible: 10,
+    fullLibrary: [{ id: 2018800, title: 'Astro Bot', imageIcon: 'https://psn/a.png', consoleName: 'PS5', numAwarded: 8, maxPossible: 10,
       pctWon: 75, earned: { platinum: 0 }, playtimeMinutes: 600, lastPlayed: '2026-01-02T00:00:00Z', heroUrl: null, coverUrl: null }],
   })
   render(<PsnSortableItem item={ITEM} onRemove={jest.fn()} draggable />)
@@ -32,14 +32,14 @@ test('live numbers from the PSN list, linking to the PSN page', () => {
 })
 
 test('the stored counts when the list does not have it', () => {
-  ;(usePsnGamesData as jest.Mock).mockReturnValue({ library: [] })
+  ;(usePsnGamesData as jest.Mock).mockReturnValue({ fullLibrary: [] })
   render(<PsnSortableItem item={ITEM} onRemove={jest.fn()} draggable={false} />)
   expect(screen.getByText('2 / 10 trophies')).toBeInTheDocument()
   expect(screen.queryByRole('button', { name: en.cards.dragToReorder })).not.toBeInTheDocument()
 })
 
 test('removes and expands to its trophies', () => {
-  ;(usePsnGamesData as jest.Mock).mockReturnValue({ library: [] })
+  ;(usePsnGamesData as jest.Mock).mockReturnValue({ fullLibrary: [] })
   const onRemove = jest.fn()
   render(<PsnSortableItem item={ITEM} onRemove={onRemove} draggable />)
   fireEvent.click(screen.getByRole('button', { name: `${en.groups.removeGame}: Astro Bot` }))

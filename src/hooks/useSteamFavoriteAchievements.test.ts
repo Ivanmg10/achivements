@@ -82,3 +82,12 @@ test("pinning is not offered on someone else's page", () => {
   const { result } = renderHook(() => useSteamFavoriteAchievements(620, 'Portal 2'), { wrapper })
   expect(result.current.canPin).toBe(false)
 })
+
+test('the list order is the pins as they loaded: pinning one now does not move it', async () => {
+  const { result } = renderHook(() => useSteamFavoriteAchievements(620, 'Portal 2'))
+  await waitFor(() => expect(result.current.leading.has('ACH_OLD')).toBe(true))
+  ;(global.fetch as jest.Mock).mockImplementationOnce(() => json({ ok: true }))
+  await act(() => result.current.toggle(ACH))
+  expect(result.current.pinned.has('ACH_WIN')).toBe(true)
+  expect(result.current.leading.has('ACH_WIN')).toBe(false)
+})

@@ -76,7 +76,7 @@ test('the public row reads the gender together with whether it may be shown', as
 })
 
 test('hidden games come back as keys, leaving out unknown sources', async () => {
-  query.mockResolvedValue({ rows: [{ source: 'ra', game_id: 1 }, { source: 'psn', game_id: 2 }, { source: 'xbox', game_id: 3 }] })
+  query.mockResolvedValue({ rows: [{ source: 'ra', game_id: 1 }, { source: 'psn', game_id: 2 }, { source: 'switch', game_id: 3 }] })
   await expect(hiddenGameKeys(7)).resolves.toEqual(['ra:1', 'psn:2'])
   expect(query.mock.calls[0][1]).toEqual([7])
 })

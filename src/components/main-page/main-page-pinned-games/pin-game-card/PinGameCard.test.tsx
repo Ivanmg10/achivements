@@ -17,15 +17,16 @@ test('renders the add button and no modal initially', () => {
   expect(screen.queryByTestId('pin-game-modal')).not.toBeInTheDocument()
 })
 
-test('opens the pin modal when clicked', () => {
+test('opens the pin modal when clicked', async () => {
   render(<PinGameCard />)
   fireEvent.click(screen.getByRole('button', { name: 'Pin a game' }))
-  expect(screen.getByTestId('pin-game-modal')).toBeInTheDocument()
+  // Downloaded the first time it opens.
+  expect(await screen.findByTestId('pin-game-modal')).toBeInTheDocument()
 })
 
-test('closes the modal', () => {
+test('closes the modal', async () => {
   render(<PinGameCard />)
   fireEvent.click(screen.getByRole('button', { name: 'Pin a game' }))
-  fireEvent.click(screen.getByText('close'))
+  fireEvent.click(await screen.findByText('close'))
   expect(screen.queryByTestId('pin-game-modal')).not.toBeInTheDocument()
 })

@@ -17,3 +17,10 @@ test('a PSN trophy: YouTube says "trophy", and PSNProfiles finds the game', () =
 test('no Steam guides without an app id', () => {
   expect(guideLinks('steam', { gameTitle: 'x', title: 'y' }).map((l) => l.kind)).toEqual(['youtube'])
 })
+
+test('Xbox gets a YouTube search and TrueAchievements for the game', () => {
+  const links = guideLinks('xbox', { gameTitle: 'Halo Infinite', title: 'Seven' })
+  expect(links.map((l) => l.kind)).toEqual(['youtube', 'trueAchievements'])
+  expect(links[0].href).toContain(encodeURIComponent('Halo Infinite Seven achievement guide'))
+  expect(links[1].href).toBe('https://www.trueachievements.com/searchresults.aspx?search=Halo%20Infinite')
+})

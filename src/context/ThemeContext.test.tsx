@@ -92,3 +92,19 @@ test("ignores a theme the app has no stylesheet for", () => {
   );
   expect(screen.getByTestId("theme").textContent).toBe("dark");
 });
+
+test("a re-render of the provider keeps the same value, so what reads the theme is not re-rendered for nothing", () => {
+  const seen: unknown[] = [];
+  function Probe() {
+    seen.push(useTheme());
+    return null;
+  }
+  const tree = (
+    <ThemeProvider defaultTheme="dark">
+      <Probe />
+    </ThemeProvider>
+  );
+  const { rerender } = render(tree);
+  rerender(<ThemeProvider defaultTheme="dark"><Probe /></ThemeProvider>);
+  expect(new Set(seen).size).toBe(1);
+});

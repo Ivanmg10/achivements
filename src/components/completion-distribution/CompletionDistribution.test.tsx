@@ -30,3 +30,9 @@ test('shows a placeholder while loading', () => {
   expect(container.querySelector('[aria-busy="true"]')).not.toBeNull()
   expect(screen.queryByText(en.charts.completionDistTitle)).not.toBeInTheDocument()
 })
+
+test('its heading can be left out where several sit side by side; the counts stay', () => {
+  render(<CompletionDistribution fractions={[1, 0.3]} tone="psn" showTitle={false} />)
+  expect(screen.queryByText(en.charts.completionDistTitle)).not.toBeInTheDocument()
+  expect(screen.getByRole('img')).toHaveAccessibleName(/100%: 1/)
+})

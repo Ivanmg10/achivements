@@ -71,7 +71,7 @@ describe('entries of any platform', () => {
     expect([entryTotal(ra), entryTotal(raWant), entryTotal(psn)]).toEqual([24, 40, 36])
   })
   test('counts by platform', () => {
-    expect(countBySource([ra, raWant, psn, steam('s', 1, 1)])).toEqual({ ra: 2, steam: 1, psn: 1 })
+    expect(countBySource([ra, raWant, psn, steam('s', 1, 1)])).toEqual({ ra: 2, steam: 1, psn: 1, xbox: 0 })
   })
 })
 

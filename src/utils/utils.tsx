@@ -3,6 +3,7 @@ import { PinnedAchievement, RecentAchievement, RetroAchievement, RetroAchievemen
 import { CategoryGame } from '@/hooks/useGamesByCategory'
 import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
+import type { GameSource } from '@/types/steam'
 
 export function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '—'
@@ -102,48 +103,47 @@ export function calcStreak(achievements: RecentAchievement[]): number {
 }
 
 
-/** Only unlock dates are read, so any platform's achievements can be grouped. */
-export type DatedUnlock = Pick<RetroAchievement, 'DateEarned' | 'DateEarnedHardcore'>
+/** Only the unlock date is read, so any platform's achievements can be grouped. */
+export type DatedUnlock = { earnedAt: string | null }
 
-export function groupGameAchievementsByPeriod(
-  achievements: DatedUnlock[],
+/** `YYYY-MM-DD` of a date in local time (toISOString would give the UTC day). */
+function localDay(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+/**
+ * A game's unlocks counted per week (the last 8) or month (the last 6), in local
+ * time, each bucket with its achievements and when it starts.
+ */
+export function groupGameAchievementsByPeriod<T extends DatedUnlock>(
+  achievements: T[],
   period: 'week' | 'month',
-): { label: string; count: number }[] {
+): { label: string; start: number; count: number; items: T[] }[] {
   const dated = achievements
-    .map((a) => a.DateEarnedHardcore ?? a.DateEarned)
-    .filter((d): d is string => !!d)
-    .map((d) => new Date(d.replace(' ', 'T')))
-    .filter((d) => !isNaN(d.getTime()))
+    .map((a) => ({ a, d: a.earnedAt ? new Date(a.earnedAt.replace(' ', 'T')) : null }))
+    .filter((x): x is { a: T; d: Date } => !!x.d && !isNaN(x.d.getTime()))
 
-  if (period === 'month') {
-    const months = 6
-    const now = new Date()
-    const buckets = Array.from({ length: months }, (_, i) =>
-      new Date(now.getFullYear(), now.getMonth() - (months - 1 - i), 1).toISOString().slice(0, 7),
-    )
-    const grouped = dated.reduce((acc, d) => {
-      const key = d.toISOString().slice(0, 7)
-      acc[key] = (acc[key] || 0) + 1
-      return acc
-    }, {} as Record<string, number>)
-    return buckets.map((label) => ({ label, count: grouped[label] || 0 }))
-  }
+  const ranges =
+    period === 'month'
+      ? Array.from({ length: 6 }, (_, i) => {
+          const now = new Date()
+          const start = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
+          const end = new Date(start.getFullYear(), start.getMonth() + 1, 1)
+          return { label: localDay(start).slice(0, 7), start: start.getTime(), end: end.getTime() - 1 }
+        })
+      : Array.from({ length: 8 }, (_, i) => {
+          const end = new Date()
+          end.setHours(0, 0, 0, 0)
+          end.setDate(end.getDate() - (7 - i) * 7)
+          const start = new Date(end)
+          start.setDate(start.getDate() - 6)
+          return { label: localDay(start).slice(5), start: start.getTime(), end: end.getTime() + 86399999 }
+        })
 
-  const weeks = 8
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const buckets = Array.from({ length: weeks }, (_, i) => {
-    const offset = weeks - 1 - i
-    const end = new Date(today)
-    end.setDate(end.getDate() - offset * 7)
-    const start = new Date(end)
-    start.setDate(start.getDate() - 6)
-    return { label: start.toISOString().slice(5, 10), start: start.getTime(), end: end.getTime() + 86399999 }
+  return ranges.map(({ label, start, end }) => {
+    const items = dated.filter(({ d }) => d.getTime() >= start && d.getTime() <= end).map(({ a }) => a)
+    return { label, start, count: items.length, items }
   })
-  return buckets.map(({ label, start, end }) => ({
-    label,
-    count: dated.filter((d) => d.getTime() >= start && d.getTime() <= end).length,
-  }))
 }
 
 export function getGameSortValue(
@@ -279,10 +279,11 @@ export function sumAchievementPoints(
   return { earned, total }
 }
 
-/** Stable identity of a pinned achievement: RA by its global id, Steam by game + apiname, PSN by game + trophy. */
+/** Stable identity of a pinned achievement: RA by its global id, Steam by game + apiname, PSN by game + trophy, Xbox by game + achievement. */
 export function pinnedKey(fav: PinnedAchievement): string {
   if (fav.source === 'steam') return `steam:${fav.game_id}:${fav.steam_apiname}`
   if (fav.source === 'psn') return `psn:${fav.game_id}:${fav.psn_trophy_id}`
+  if (fav.source === 'xbox') return `xbox:${fav.game_id}:${fav.xbox_achievement_id}`
   return `ra:${fav.achievement_id}`
 }
 
@@ -348,7 +349,7 @@ export function dominantColors(pixels: Uint8ClampedArray): Rgb[] {
   return [first, ranked.find((c) => distance(c) > 64) ?? first]
 }
 
-export type DayBySource = { date: string; ra: number; steam: number; psn: number; total: number }
+export type DayBySource = { date: string; ra: number; steam: number; psn: number; xbox: number; total: number }
 
 /**
  * Unlocks per day over the last `days` days, ending today, split by
@@ -361,13 +362,14 @@ export function groupByDaySource(achievements: RecentAchievement[], days = 7): D
     const d = new Date()
     d.setDate(d.getDate() - i)
     const date = d.toISOString().split('T')[0]
-    rows.set(date, { date, ra: 0, steam: 0, psn: 0, total: 0 })
+    rows.set(date, { date, ra: 0, steam: 0, psn: 0, xbox: 0, total: 0 })
   }
   for (const a of Array.isArray(achievements) ? achievements : []) {
     const row = rows.get(a.Date.split(' ')[0])
     if (!row) continue
     if (a.Source === 'steam') row.steam++
     else if (a.Source === 'psn') row.psn++
+    else if (a.Source === 'xbox') row.xbox++
     else row.ra++
     row.total++
   }
@@ -507,4 +509,11 @@ export function streakInsights(byDay: Record<string, number>, streaks: { days: n
     longestGap,
     weekdays,
   }
+}
+
+const GAME_ROUTES: Record<string, GameSource> = { psnGame: 'psn', steamGame: 'steam', xboxGame: 'xbox' }
+
+/** The platform of a game page's URL (/psnGame/…, /steamGame/…, /xboxGame/…), or null for any other page. */
+export function gameSourceFromPath(pathname: string | null): GameSource | null {
+  return GAME_ROUTES[pathname?.split('/')[1] ?? ''] ?? null
 }

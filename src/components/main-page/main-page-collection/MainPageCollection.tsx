@@ -4,12 +4,14 @@ import { useMemo } from 'react'
 import type { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
+import type { XboxGameProgress } from '@/types/xbox'
 import { usePerfectGamesOrder } from '@/hooks/usePerfectGamesOrder'
 import { applyPerfectOrder, buildPerfectGames, countPerfectGames, latestPerfects, perfectDates } from '@/utils/perfectGames'
 import { ChartCard } from '@/components/ui/ChartCard'
 import CollectionShelf from './collection-shelf/CollectionShelf'
 import CollectionGrid from './collection-grid/CollectionGrid'
 import CollectionNumbers from './collection-numbers/CollectionNumbers'
+import CollectionClosest from './collection-closest/CollectionClosest'
 
 /** Boxes on the shelf: enough to fill the card's width, few enough to read each one. */
 const SHELF = 5
@@ -24,6 +26,7 @@ export default function MainPageCollection({
   games,
   steamGames = [],
   psnGames = [],
+  xboxGames = [],
   awards,
   inProgress = [],
   isLoading,
@@ -31,27 +34,29 @@ export default function MainPageCollection({
   games: RetroAchievementsGameCompleted[]
   steamGames?: SteamGameProgress[]
   psnGames?: PsnGameProgress[]
+  xboxGames?: XboxGameProgress[]
   awards: UserAwards | null
   inProgress?: RetroAchievementsGameCompleted[]
   isLoading?: boolean
 }) {
   const { order, saveOrder } = usePerfectGamesOrder()
-  const raw = useMemo(() => buildPerfectGames(games, steamGames, psnGames), [games, steamGames, psnGames])
+  const raw = useMemo(() => buildPerfectGames(games, steamGames, psnGames, xboxGames), [games, steamGames, psnGames, xboxGames])
   const ordered = useMemo(() => applyPerfectOrder(raw, order), [raw, order])
   const counts = useMemo(() => countPerfectGames(raw), [raw])
-  const dates = useMemo(() => perfectDates(awards?.VisibleUserAwards, steamGames, psnGames), [awards, steamGames, psnGames])
+  const dates = useMemo(() => perfectDates(awards?.VisibleUserAwards, steamGames, psnGames, xboxGames), [awards, steamGames, psnGames, xboxGames])
   const latest = useMemo(
-    () => latestPerfects(awards?.VisibleUserAwards, steamGames, SHELF, psnGames),
-    [awards, steamGames, psnGames],
+    () => latestPerfects(awards?.VisibleUserAwards, steamGames, SHELF, psnGames, xboxGames),
+    [awards, steamGames, psnGames, xboxGames],
   )
 
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4 animate-pulse motion-reduce:animate-none" aria-busy="true">
         <div className="h-60 rounded-xl bg-bg-card" />
+        <div className="h-36 rounded-xl bg-bg-card" />
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <div className="h-80 rounded-xl bg-bg-card xl:col-span-2" />
-          <div className="h-80 rounded-xl bg-bg-card" />
+          <div className="h-64 rounded-xl bg-bg-card xl:col-span-2" />
+          <div className="h-64 rounded-xl bg-bg-card" />
         </div>
       </div>
     )
@@ -62,13 +67,16 @@ export default function MainPageCollection({
       <ChartCard>
         <CollectionShelf games={latest} counts={counts} />
       </ChartCard>
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
-        <ChartCard className="xl:col-span-2">
+      {/* The numbers as a strip across: stacked beside the collection they ran far taller than it. */}
+      <ChartCard>
+        <CollectionNumbers awards={awards} steamGames={steamGames} psnGames={psnGames} xboxGames={xboxGames} />
+      </ChartCard>
+      {/* What could join the collection next, beside it; with nothing near 100% the collection takes the row. */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <ChartCard className="xl:col-span-2 xl:last:col-span-3">
           <CollectionGrid games={ordered} allGames={raw} dates={dates} order={order} onSaveOrder={saveOrder} />
         </ChartCard>
-        <ChartCard>
-          <CollectionNumbers awards={awards} inProgress={inProgress} steamGames={steamGames} psnGames={psnGames} />
-        </ChartCard>
+        <CollectionClosest inProgress={inProgress} steamGames={steamGames} psnGames={psnGames} xboxGames={xboxGames} />
       </div>
     </div>
   )

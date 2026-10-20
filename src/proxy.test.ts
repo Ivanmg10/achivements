@@ -9,11 +9,20 @@ const request = (path: string) => new NextRequest(`http://localhost:3000${path}`
 beforeEach(() => jest.clearAllMocks())
 
 test('the landing, the auth page, the legal pages and the images other sites fetch are open to anyone', async () => {
-  for (const path of ['/', '/authPage', '/privacy', '/terms', '/opengraph-image', '/apple-icon']) {
+  for (const path of ['/', '/authPage', '/privacy', '/terms', '/opengraph-image', '/apple-icon', '/rankings', '/rankings/how']) {
     const res = await proxy(request(path))
     expect(res.status).toBe(200)
   }
   expect(getToken).not.toHaveBeenCalled()
+})
+
+test('the comparison and how-to pages are open to anyone, but only under their prefixes', async () => {
+  for (const path of ['/compare/exophase', '/track/achievements-with-friends']) {
+    expect((await proxy(request(path))).status).toBe(200)
+  }
+  expect(getToken).not.toHaveBeenCalled()
+  ;(getToken as jest.Mock).mockResolvedValue(null)
+  expect((await proxy(request('/compare'))).status).toBe(307)
 })
 
 test('the app needs an account: a visitor is sent to sign in', async () => {

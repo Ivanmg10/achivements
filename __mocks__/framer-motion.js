@@ -9,7 +9,7 @@ const motion = new Proxy(
     get: (_, tag) =>
       (components[tag] ??= React.forwardRef(({ children, ...props }, ref) => {
         const filtered = Object.fromEntries(
-          Object.entries(props).filter(([k]) => !['animate', 'initial', 'exit', 'variants', 'transition', 'whileHover', 'whileTap', 'layout', 'layoutId', 'whileInView', 'viewport'].includes(k))
+          Object.entries(props).filter(([k]) => !['animate', 'initial', 'exit', 'variants', 'transition', 'whileHover', 'whileTap', 'layout', 'layoutId', 'whileInView', 'viewport', 'custom'].includes(k))
         )
         return React.createElement(tag, { ...filtered, ref }, children)
       })),
@@ -22,6 +22,7 @@ const AnimatePresence = (props) => {
   return props.children
 }
 const LayoutGroup = ({ children }) => children
+const MotionConfig = ({ children }) => children
 const useAnimation = () => ({ start: jest.fn(), stop: jest.fn() })
 const useInView = () => true
 const useMotionValue = (v) => ({ get: () => v, set: jest.fn() })
@@ -30,4 +31,4 @@ const useSpring = (v) => v ?? { get: () => 0, set: jest.fn() }
 const useReducedMotion = () => false
 const animate = () => ({ stop: () => {} })
 
-module.exports = { motion, animate, AnimatePresence, LayoutGroup, useAnimation, useInView, useMotionValue, useTransform, useReducedMotion, useSpring }
+module.exports = { motion, animate, AnimatePresence, LayoutGroup, MotionConfig, useAnimation, useInView, useMotionValue, useTransform, useReducedMotion, useSpring }

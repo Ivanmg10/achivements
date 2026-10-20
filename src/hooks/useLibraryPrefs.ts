@@ -2,10 +2,12 @@ import { useCallback } from 'react'
 import { useStoredChoice } from '@/hooks/useStoredChoice'
 import { defaultSortStateFor, type SortDir, type StatusSortKey, type StatusSortState } from '@/components/status-sort-control/StatusSortControl'
 import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
+import type { LibraryLayout } from '@/components/library-layout-toggle/LibraryLayoutToggle'
 
 export type LibraryView = 'platform' | 'all'
 
 const VIEWS: readonly LibraryView[] = ['platform', 'all']
+const LAYOUTS: readonly LibraryLayout[] = ['shelves', 'list', 'cards']
 const COLS: readonly `${StatusGridCols}`[] = ['1', '2', '3']
 const SORTS = (['name', 'lastPlayed', 'percent', 'points'] as const).flatMap((k) => (['asc', 'desc'] as const).map((d) => `${k}:${d}` as const))
 
@@ -18,7 +20,8 @@ const decode = (s: string): StatusSortState => {
 /**
  * How a status page is laid out, remembered in this browser: the order per
  * category (one for each platform's own list, one for the mixed list), the
- * grid columns and whether platforms are shown apart or together.
+ * grid columns, whether platforms are shown apart or together, and whether the
+ * list reads as shelves, a list or cards (one choice for every category).
  */
 export function useLibraryPrefs(cat: string) {
   const fallback = encode(defaultSortStateFor(cat))
@@ -26,6 +29,7 @@ export function useLibraryPrefs(cat: string) {
   const [allSort, setAllSort] = useStoredChoice(`library-sort-all:${cat}`, SORTS, fallback)
   const [cols, setCols] = useStoredChoice('library-cols', COLS, '2')
   const [view, setView] = useStoredChoice<LibraryView>('library-view', VIEWS, 'platform')
+  const [layout, setLayout] = useStoredChoice<LibraryLayout>('library-layout', LAYOUTS, 'shelves')
 
   const saveSort = useCallback((s: StatusSortState) => setSort(encode(s)), [setSort])
   const saveAllSort = useCallback((s: StatusSortState) => setAllSort(encode(s)), [setAllSort])
@@ -36,5 +40,6 @@ export function useLibraryPrefs(cat: string) {
     allSortState: decode(allSort), setAllSortState: saveAllSort,
     gridCols: Number(cols) as StatusGridCols, setGridCols: saveCols,
     view, setView,
+    layout, setLayout,
   }
 }

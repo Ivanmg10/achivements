@@ -4,6 +4,7 @@ import { psnErrorFrom, type PsnError } from '@/hooks/usePsnLink'
 import type { PsnTrophy, PsnTrophyGroup } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { fetchShared } from '@/lib/fetchShared'
 
 /**
  * One PSN game's trophies and trophy groups (base game, each DLC) for the
@@ -27,7 +28,7 @@ export function usePsnTrophies(titleId: string | null) {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await fetch(withSubject(`/api/psn/trophies?id=${encodeURIComponent(titleId)}&lang=${lang}`, subject))
+      const res = await fetchShared(withSubject(`/api/psn/trophies?id=${encodeURIComponent(titleId)}&lang=${lang}`, subject))
       if (!res.ok) {
         setError(await psnErrorFrom(res))
         return

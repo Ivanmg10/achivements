@@ -34,7 +34,7 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
   // Another filter starts the list from its top again.
   useWhenChanged([query, source, status, sort], () => setShown(PAGE))
 
-  const platforms = (['ra', 'steam', 'psn'] as const).filter((s) => games.some((g) => g.source === s))
+  const platforms = (['ra', 'steam', 'psn', 'xbox'] as const).filter((s) => games.some((g) => g.source === s))
   const filtered = useMemo(() => {
     const list = filterLibrary(games, { query, source, status })
     return list.sort((a, b) => (sort === 'name' ? a.title.localeCompare(b.title, lang) : b.pct - a.pct || a.title.localeCompare(b.title, lang)))

@@ -4,6 +4,7 @@ import type { SteamProfile } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { fetchShared } from '@/lib/fetchShared'
 
 /** The linked Steam profile (persona, avatar, level, what they are playing right now). */
 export function useSteamProfile() {
@@ -18,7 +19,7 @@ export function useSteamProfile() {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch(withSubject('/api/steam/profile', subject))
+      const res = await fetchShared(withSubject('/api/steam/profile', subject))
       if (!res.ok) throw new Error(`Failed to load Steam profile (${res.status})`)
       setProfile((await res.json()) as SteamProfile)
     } catch (err) {

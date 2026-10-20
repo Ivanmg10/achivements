@@ -9,6 +9,7 @@ const TONES = {
   ra: ['bg-accent/20', 'bg-accent/35', 'bg-accent/55', 'bg-accent/75', 'bg-accent'],
   steam: ['bg-[#66c0f4]/20', 'bg-[#66c0f4]/35', 'bg-[#66c0f4]/55', 'bg-[#66c0f4]/75', 'bg-[#66c0f4]'],
   psn: ['bg-[#0070d1]/20', 'bg-[#0070d1]/35', 'bg-[#0070d1]/55', 'bg-[#0070d1]/75', 'bg-[#0070d1]'],
+  xbox: ['bg-green-500/20', 'bg-green-500/35', 'bg-green-500/55', 'bg-green-500/75', 'bg-green-500'],
 } as const
 
 /**
@@ -24,6 +25,7 @@ export default function CompletionDistribution({
   tone,
   note,
   isLoading,
+  showTitle = true,
 }: {
   /** Completion per game, 0–1. */
   fractions: number[]
@@ -31,6 +33,8 @@ export default function CompletionDistribution({
   /** Shown under the bar — e.g. that some games' progress has not loaded. */
   note?: string
   isLoading?: boolean
+  /** Its heading; left out where several sit side by side and it would repeat on each. */
+  showTitle?: boolean
 }) {
   const { T } = useLanguage()
   const counts = useMemo(() => completionBuckets(fractions), [fractions])
@@ -49,7 +53,7 @@ export default function CompletionDistribution({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.completionDistTitle}</p>
+      {showTitle && <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.charts.completionDistTitle}</p>}
 
       {total === 0 ? (
         <p className="text-xs text-text-secondary">{T.cards.noData}</p>

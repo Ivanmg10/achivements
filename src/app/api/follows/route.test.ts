@@ -2,6 +2,7 @@ jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }
 jest.mock('@/lib/apiAuth', () => ({ requireSession: jest.fn() }))
 jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn() }))
 jest.mock('@/lib/publicUser', () => ({ findPublicUser: jest.fn() }))
+jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 
 import { NextRequest } from 'next/server'
 import { GET, POST, DELETE } from './route'
@@ -9,6 +10,7 @@ import pool from '@/lib/db'
 import { requireSession } from '@/lib/apiAuth'
 import { allowAttempt } from '@/lib/attemptLimit'
 import { findPublicUser } from '@/lib/publicUser'
+import { getServerSession } from 'next-auth'
 
 const query = pool.query as jest.Mock
 const post = (body: unknown) => POST(new NextRequest('http://localhost/api/follows', { method: 'POST', body: JSON.stringify(body) }))
@@ -39,7 +41,8 @@ describe('GET', () => {
     expect(sql).toContain('u.profile_public')
     expect(sql).toContain('ORDER BY f.created_at DESC')
     expect(sql).not.toMatch(/\bemail\b|password|raid/)
-    expect(params).toEqual(['1'])
+    // The second is whether the viewer may see Xbox (an admin may; Xbox is admin-only for now).
+    expect(params).toEqual(['1', false])
   })
 
   test('a failure is a 500', async () => {
@@ -98,4 +101,11 @@ describe('DELETE', () => {
     query.mockRejectedValue(new Error('db down'))
     expect((await del('?username=ivan')).status).toBe(500)
   })
+})
+
+test('the list says who has Xbox only to an admin viewer', async () => {
+  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+  await GET()
+  expect(query.mock.calls[0][0]).toContain('xboxxuid IS NOT NULL AND $2::boolean')
+  expect(query.mock.calls[0][1]).toEqual(['1', true])
 })

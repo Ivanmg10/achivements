@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
 import { isGameSource } from '@/utils/gameRef'
+import { sourceAllowed } from '@/utils/xboxAccess'
 import type { GameSource } from '@/types/steam'
 
 /**
@@ -48,8 +49,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'gameId debe ser un número' }, { status: 400 })
     }
     if (!source) {
-      return NextResponse.json({ message: 'source debe ser ra o steam' }, { status: 400 })
+      return NextResponse.json({ message: 'source debe ser ra, steam, psn o xbox' }, { status: 400 })
     }
+    if (!sourceAllowed(source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 
     await pool.query(
       `INSERT INTO pinned_games (user_id, source, game_id, position)
@@ -124,6 +126,9 @@ export async function PUT(req: NextRequest) {
     const order = readOrder(body?.order)
     if (!order) {
       return NextResponse.json({ message: 'order debe ser un array de { source, gameId }' }, { status: 400 })
+    }
+    if (order.some((entry) => !sourceAllowed(entry.source, session.user.admin))) {
+      return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
     const client = await pool.connect()

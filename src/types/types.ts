@@ -1,5 +1,6 @@
 import type { GameSource, SteamAchievementUnified } from '@/types/steam'
 import type { PsnTrophy } from '@/types/psn'
+import type { XboxAchievement } from '@/types/xbox'
 
 /** Every theme the app has a stylesheet for; the endpoints that store one accept only these. */
 export const THEMES = ['dark', 'light', 'dark-red', 'dark-green', 'light-red', 'light-green', 'blue', 'purple', 'green', 'red', 'synthwave', 'catppuccin', 'gruvbox', 'rose-pine', 'oled', 'ocean', 'terminal', 'sakura', 'arctic', 'daxter', 'bentley', 'clank', 'black-ops-2', 'san-andreas', 'snake-eater'] as const
@@ -223,7 +224,8 @@ export type UserAwards = {
 }
 
 /** A user-pinned achievement — from RA (by its global id) or Steam (by apiname, scoped to its game). */
-export type PinnedAchievement =
+/** `id` is the row's, what the order is saved by (absent on pins read elsewhere). */
+export type PinnedAchievement = { id?: number } & (
   | {
       source: 'ra'
       achievement_id: number
@@ -248,6 +250,15 @@ export type PinnedAchievement =
       snapshot: PsnTrophy
       num_distinct_players: number
     }
+  | {
+      source: 'xbox'
+      xbox_achievement_id: string
+      game_id: number
+      game_title: string
+      snapshot: XboxAchievement
+      num_distinct_players: number
+    }
+)
 
 export type RecentAchievement = {
   Date: string; // "2024-01-15 20:30:00"
@@ -268,6 +279,8 @@ export type RecentAchievement = {
   BadgeUrl?: string;
   /** Full game image URL, used instead of RA's GameIcon path when set (Steam). */
   GameIconUrl?: string;
+  /** The platform's own id for the achievement, where AchievementID is not it (Steam's apiname, PSN's trophy id, Xbox's id). */
+  Key?: string;
 };
 
 export type GameGroupItem = {
@@ -308,6 +321,7 @@ export type GameGroup = {
   game_count: number
   steam_count: number
   psn_count: number
+  xbox_count?: number
   total_awarded: number
   total_possible: number
   /** The first four games, for the card's cover mosaic. */

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
 import { isGameSource } from '@/utils/gameRef'
+import { sourceAllowed } from '@/utils/xboxAccess'
 import type { GameSource } from '@/types/steam'
 import { GROUP_ITEMS_MAX, readItemCounts, readItemFields } from '@/utils/groupValidation'
 
@@ -39,8 +40,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const body = await req.json().catch(() => null)
     const source = readSource(body?.source)
     if (!source) {
-      return NextResponse.json({ message: 'source debe ser ra, steam o psn' }, { status: 400 })
+      return NextResponse.json({ message: 'source debe ser ra, steam, psn o xbox' }, { status: 400 })
     }
+    if (!sourceAllowed(source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     const fields = readItemFields(body)
     if (!fields.ok) return NextResponse.json({ message: fields.message }, { status: 400 })
     const { game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points } = fields.value

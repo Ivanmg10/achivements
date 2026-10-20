@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { raUnavailable } from '@/lib/raFailure'
 import { withCache } from '@/lib/raCache'
 import { cachedJson } from '@/lib/httpCache'
 import { requireRaSession } from '@/lib/apiAuth'
@@ -19,7 +19,7 @@ export async function GET(req?: Request) {
       (d) => d !== null && typeof d === 'object' && 'TotalAwardsCount' in d,
     )
     return cachedJson(data, TTL)
-  } catch {
-    return NextResponse.json({ message: 'RA service unavailable' }, { status: 503 })
+  } catch (err) {
+    return raUnavailable(err)
   }
 }

@@ -5,6 +5,7 @@ import type { SteamGameDetails } from '@/types/steam'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { fetchShared } from '@/lib/fetchShared'
 
 /**
  * Store details for one Steam game page, in the app's language. A 404 means
@@ -23,7 +24,7 @@ export function useSteamGameDetails(appId: number | null) {
   /** Asks the server; what came back, not yet applied. A 404 is no details, not an error. */
   const request = useCallback(async (id: number, language: string): Promise<{ details: SteamGameDetails | null } | { error: string }> => {
     try {
-      const res = await fetch(withSubject(`/api/steam/gameDetails?appid=${id}&lang=${language}`, subject))
+      const res = await fetchShared(withSubject(`/api/steam/gameDetails?appid=${id}&lang=${language}`, subject))
       if (res.status === 404) return { details: null }
       if (!res.ok) throw new Error(`Failed to load game details (${res.status})`)
       return { details: (await res.json()) as SteamGameDetails }

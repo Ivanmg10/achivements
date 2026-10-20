@@ -112,6 +112,15 @@ export function igdbPsnPlatforms(consoleName: string): number[] {
   return ids.filter(([re]) => re.test(consoleName)).map(([, id]) => id)
 }
 
+/**
+ * Every Xbox a library can be on, as IGDB ids — Xbox 360 12, Xbox One 49,
+ * Xbox Series X|S 169, PC 6 — from the names the library writes ("Xbox Series · PC").
+ */
+export function igdbXboxPlatforms(consoleName: string): number[] {
+  const ids: [RegExp, number][] = [[/Xbox 360/i, 12], [/Xbox One/i, 49], [/Xbox Series/i, 169], [/\bPC\b/, 6]]
+  return ids.filter(([re]) => re.test(consoleName)).map(([, id]) => id)
+}
+
 /** The best match: the exact title if IGDB has it, else its first hit. */
 function bestMatch(title: string, games: IgdbGame[]): IgdbGame | undefined {
   return games.find((g) => titleKey(g.name) === titleKey(title)) ?? games[0]
@@ -136,7 +145,15 @@ export function toIgdbArt(title: string, games: IgdbGame[]): IgdbArt | null {
  * later call tries again).
  */
 export async function igdbArt(title: string, consoleName: string): Promise<IgdbArt | null> {
-  const platforms = igdbPlatforms(consoleName)
+  return artOn(title, igdbPlatforms(consoleName))
+}
+
+/** The same lookup for an Xbox game: its cover, backdrop and release year, which Xbox's library has none of. */
+export async function igdbXboxArt(title: string, consoleName: string): Promise<IgdbArt | null> {
+  return artOn(title, igdbXboxPlatforms(consoleName))
+}
+
+async function artOn(title: string, platforms: number[]): Promise<IgdbArt | null> {
   if (!igdbConfigured() || platforms.length === 0) return null
   const name = title.replace(/[®™©]/g, '').trim()
   // A miss is cached too ({ art: null }): the cache reads a bare null as "not cached".
@@ -173,7 +190,15 @@ export function toIgdbDetails(title: string, games: IgdbGame[]): IgdbDetails | n
  * call tries again).
  */
 export async function igdbDetails(title: string, consoleName: string): Promise<IgdbDetails | null> {
-  const platforms = igdbPsnPlatforms(consoleName)
+  return detailsOn(title, igdbPsnPlatforms(consoleName))
+}
+
+/** The same for an Xbox game's page. */
+export async function igdbXboxDetails(title: string, consoleName: string): Promise<IgdbDetails | null> {
+  return detailsOn(title, igdbXboxPlatforms(consoleName))
+}
+
+async function detailsOn(title: string, platforms: number[]): Promise<IgdbDetails | null> {
   if (!igdbConfigured() || platforms.length === 0) return null
   const name = title.replace(/[®™©]/g, '').trim()
   const { details } = await withSteamCache<{ details: IgdbDetails | null }>(

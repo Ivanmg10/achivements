@@ -17,6 +17,8 @@ export type UserRecord = {
   steamusername: string | null
   psnaccountid: string | null
   psnusername: string | null
+  xboxxuid: string | null
+  xboxgamertag: string | null
   email: string | null
   /** When the address was confirmed. Null means it never was; nothing is blocked either way. */
   email_verified_at: string | null
@@ -25,16 +27,19 @@ export type UserRecord = {
   location: string | null
   description: string | null
   profile_public: boolean
+  /** Whether others are told when this user was last seen (migrations/038_user_presence.sql). */
+  show_presence: boolean
   gender: 'male' | 'female' | 'neutral' | null
   /** Whether the gender shows on the public profile. */
   gender_public: boolean
   favorite_game: SavedGame
   favorite_steam_game: SavedGame
   favorite_psn_game: SavedGame
+  favorite_xbox_game: SavedGame
 }
 
 const COLUMNS = `id, username, password, theme, avatar, raid, rausername, steamid, steamusername,
-  psnaccountid, psnusername, email, email_verified_at, admin, "raUser", location, description, gender, gender_public, profile_public, favorite_game, favorite_steam_game, favorite_psn_game`
+  psnaccountid, psnusername, email, email_verified_at, admin, "raUser", location, description, gender, gender_public, profile_public, show_presence, favorite_game, favorite_steam_game, favorite_psn_game, xboxxuid, xboxgamertag, favorite_xbox_game`
 
 // Every API call re-reads the signed-in user (see authOptions' jwt callback); a
 // short cache keeps that to about one query per user per minute. A session

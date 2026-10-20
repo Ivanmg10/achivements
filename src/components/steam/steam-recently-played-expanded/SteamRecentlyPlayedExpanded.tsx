@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
+import { fromSteam } from '@/utils/gameInsights'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
 import { SteamAchievementGrid } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
@@ -30,8 +31,7 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
   const earned = loaded ? achievements.filter((a) => a.earned).length : game.numAwarded
   const completionPct = total > 0 ? Math.round((earned / total) * 100) : 0
 
-  // The chart only reads unlock dates; Steam has no hardcore date.
-  const unlocks = achievements.map((a) => ({ DateEarned: a.dateEarned, DateEarnedHardcore: null }))
+  const unlocks = fromSteam(achievements, game.id)
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">
