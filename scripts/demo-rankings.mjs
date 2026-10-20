@@ -7,9 +7,10 @@
  *
  * Writes only to PREVIEW_DATABASE_URL (from .env.local), and refuses to run
  * when it is missing or points at the same host as DATABASE_URL (production).
- * Every demo user is named demo_*, cannot sign in (no real password hash),
- * and is kept out of the score refresh (their accounts are made up), so their
- * points stay as seeded. `clear` deletes them, and everything of theirs goes
+ * Demo users are named demo_* (and a few chosen names, FEATURED), cannot
+ * sign in (their password is the MARK below, not a hash), and are kept out of
+ * the score refresh (their accounts are made up), so their points stay as
+ * seeded. They are found by that MARK, never by name. `clear` deletes them, and everything of theirs goes
  * with them (scores, weeks, snapshots, follows). `--follower` makes a real
  * user follow ten of them, for the Following tab.
  */
@@ -17,6 +18,10 @@ import fs from 'node:fs'
 import pg from 'pg'
 
 const PREFIX = 'demo_'
+/** What tells a demo user apart: their password, which no sign-in can match. */
+const MARK = '!demo: no sign-in'
+/** Demo users with names of their own (no prefix), seeded first. */
+const FEATURED = ['spex_guy', 'ratman', 'lester_the_molester', 'rA9', 'bluesoul']
 const NAMES = [
   'retro_kaiser', 'lunapixel', 'hollowbit', 'saturnina', 'trophywolf', 'neomarlin', 'cartucho88', 'vespertine', 'mikado', 'ghostpepper',
   'ortiga', 'bitcrusher', 'lazypaladin', 'pumpernickel', 'akane_rx', 'zarzamora', 'kilowatt', 'n0va', 'brisacobalto', 'quietcomet',
@@ -88,8 +93,8 @@ function games(skill, count) {
 }
 
 async function seedDemo(client, count, follower) {
-  const people = NAMES.slice(0, count)
-  if (people.length < count) throw new Error(`At most ${NAMES.length} demo users.`)
+  const people = [...FEATURED, ...NAMES.map((n) => `${PREFIX}${n}`)].slice(0, count)
+  if (people.length < count) throw new Error(`At most ${FEATURED.length + NAMES.length} demo users.`)
   const created = []
 
   for (const name of people) {
@@ -97,7 +102,7 @@ async function seedDemo(client, count, follower) {
     const platforms = ['ra', 'steam', 'psn'].filter(() => rnd() < 0.65)
     if (platforms.length === 0) platforms.push(pick(['ra', 'steam', 'psn']))
     const accounts = {
-      ra: platforms.includes('ra') ? `${PREFIX}${name}` : null,
+      ra: platforms.includes('ra') ? name : null,
       steam: platforms.includes('steam') ? `7656119${digits(10)}` : null,
       psn: platforms.includes('psn') ? digits(19) : null,
     }
@@ -105,12 +110,12 @@ async function seedDemo(client, count, follower) {
     const { rows } = await client.query(
       `INSERT INTO users (username, password, location, description, rausername, steamid, steamusername, psnaccountid, psnusername,
                           profile_public, show_in_rankings, show_presence, last_seen_at, score_refreshed_at)
-       VALUES ($1, '!demo: no sign-in', $2, $3, $4, $5, $6, $7, $8, $9, $10, true, $11, '2100-01-01')
+       VALUES ($1, $12, $2, $3, $4, $5, $6, $7, $8, $9, $10, true, $11, '2100-01-01')
        RETURNING id`,
       [
-        `${PREFIX}${name}`, pick(COUNTRIES), 'Demo user for the rankings (preview database only).',
+        name, pick(COUNTRIES), 'Demo user for the rankings (preview database only).',
         accounts.ra, accounts.steam, accounts.steam ? name : null, accounts.psn, accounts.psn ? name : null,
-        rnd() > 0.06, rnd() > 0.06, online ? new Date() : new Date(Date.now() - between(1, 30 * 24) * 3_600_000),
+        rnd() > 0.06, rnd() > 0.06, online ? new Date() : new Date(Date.now() - between(1, 30 * 24) * 3_600_000), MARK,
       ],
     )
     const id = rows[0].id
@@ -188,7 +193,7 @@ async function main() {
   await client.connect()
   try {
     // Starting from a clean slate either way: seeding twice does not duplicate anyone.
-    const { rowCount } = await client.query(`DELETE FROM users WHERE username LIKE 'demo\\_%'`)
+    const { rowCount } = await client.query('DELETE FROM users WHERE password = $1', [MARK])
     console.log(`Removed ${rowCount} demo users.`)
     if (command === 'seed') {
       const count = Math.max(1, Math.min(NAMES.length, Number(countArg ?? 40)))
@@ -196,7 +201,7 @@ async function main() {
       const created = await seedDemo(client, count, follower)
       await client.query('COMMIT')
       const top = [...created].sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 3)
-      console.log(`Created ${created.length} demo users. Top: ${top.map((u) => `${PREFIX}${u.name} (${u.totalPoints})`).join(', ')}`)
+      console.log(`Created ${created.length} demo users. Top: ${top.map((u) => `${u.name} (${u.totalPoints})`).join(', ')}`)
       console.log('The rankings cache lists for up to 5 minutes: restart the dev server to see them at once.')
     }
   } catch (err) {

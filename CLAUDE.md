@@ -818,7 +818,8 @@ branch to be up to date with its base** before merging, on both.
 - **Demo users** for the rankings: `node scripts/demo-rankings.mjs seed [n] --follower=<username>`
   (and `clear`). It writes only to `PREVIEW_DATABASE_URL` and refuses when that is missing or the
   same host as `DATABASE_URL`. Never point it at production: `/rankings` is public. Seeded
-  2026-10-20 with 40 (`demo_*`, no sign-in, kept out of the score refresh).
+  2026-10-20 with 45 (`demo_*` plus five named ones the user chose; no sign-in, kept out of the
+  score refresh). Demo users are found by their password mark (`MARK`), never by name.
 - Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
 
 ## Style
