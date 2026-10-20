@@ -230,9 +230,8 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
   2026-10-20; without it the showcase, the follows overview and Following answer 500
 - `1.6.0` — on `feat/social-rankings`: the Following restyle, presence and the showcase
   (038, 039 above) and the **rankings, a beta** (Vault Points, see below), with
-  `migrations/040_vault_points.sql`. **040 was NOT applied by the session that wrote it**
-  (applying it to the shared database was refused to the agent): apply it before this code
-  runs anywhere, or the rankings, the header's level and the score refresh answer 500
+  `migrations/040_vault_points.sql`, applied 2026-10-20; any other database needs it before
+  this code runs, or the rankings, the header's level and the score refresh answer 500
   (Following and profiles still load, without levels)
 
 ## Release gates — what had to be true before 1.0 (all closed)

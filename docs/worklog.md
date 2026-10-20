@@ -50,9 +50,8 @@ Mine: `show_in_rankings` kept out of the session so a missing migration breaks o
 rankings; levels on cards read through `vaultTotalsOrNone` for the same reason; RA and Steam
 games read straight from the platform (their page caches can predate the unlock that moved
 the game); no per-platform factor until real data asks for one.
-**Open** — **`migrations/040` is not applied**: the agent was refused running it on the shared
-database. Apply it before testing anything on develop. Then watch the first refreshes (Vercel
-logs `[scoreRefresh]`) and the admin balance table; the formula was only tested on
+**Open** — `migrations/040` applied to the shared database 2026-10-20 (with the user's OK).
+Watch the first refreshes (Vercel logs `[scoreRefresh]`) and the admin balance table; the formula was only tested on
 illustrative data. Not checked in a browser yet.
 **Watch out** — A first fill reads 25 RA / 40 Steam / 15 PSN / 5 Xbox games per run and comes
 back after 10 minutes while unfinished, so a big library takes a few visits (or days of cron)
