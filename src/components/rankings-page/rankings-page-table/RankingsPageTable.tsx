@@ -14,7 +14,20 @@ const TH = 'px-3 py-2.5 text-[10.5px] uppercase tracking-wider font-bold text-te
  * come from, games at 100 %, achievements and, on the view that has them, the
  * places moved this week. Your row is tinted and says "You".
  */
-export default function RankingsPageTable({ rows, arrows, linked, caption }: { rows: RankRow[]; arrows: boolean; linked: boolean; caption: string }) {
+export default function RankingsPageTable({
+  rows,
+  arrows,
+  linked,
+  caption,
+  approx = false,
+}: {
+  rows: RankRow[]
+  arrows: boolean
+  linked: boolean
+  caption: string
+  /** The viewer's own points are still being calculated: theirs carry "≈". */
+  approx?: boolean
+}) {
   const { T, lang } = useLanguage()
 
   return (
@@ -43,7 +56,10 @@ export default function RankingsPageTable({ rows, arrows, linked, caption }: { r
               <td className="px-3 py-2">
                 <VaultLevelBadge points={r.totalPoints} />
               </td>
-              <td className="px-3 py-2 text-right font-bold tabular-nums whitespace-nowrap">{r.points.toLocaleString(lang)}</td>
+              <td className="px-3 py-2 text-right font-bold tabular-nums whitespace-nowrap">
+                {r.isMe && approx && <span className="text-warning" title={T.rankings.fillApprox}>≈ </span>}
+                {r.points.toLocaleString(lang)}
+              </td>
               <td className="px-3 py-2 hidden lg:table-cell">
                 <VaultPlatformSplit split={r.split} className="w-28" />
               </td>

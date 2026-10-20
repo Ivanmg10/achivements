@@ -14,7 +14,7 @@ const GLOW: Record<number, string> = {
 }
 
 /** The first three, on a podium: picture, name, level and points, with the place on each step. */
-export default function RankingsPagePodium({ rows, linked }: { rows: RankRow[]; linked: boolean }) {
+export default function RankingsPagePodium({ rows, linked, approx = false }: { rows: RankRow[]; linked: boolean; approx?: boolean }) {
   const { T, lang } = useLanguage()
   const order = [rows[1], rows[0], rows[2]].filter(Boolean)
 
@@ -32,6 +32,7 @@ export default function RankingsPagePodium({ rows, linked }: { rows: RankRow[]; 
               <VaultLevelBadge points={r.totalPoints} className="hidden sm:inline-flex" />
             </RankingsPageUser>
             <span className="text-lg sm:text-2xl font-extrabold tracking-tight tabular-nums">
+              {r.isMe && approx && <span className="text-warning" title={T.rankings.fillApprox}>≈ </span>}
               {r.points.toLocaleString(lang)} <span className="text-[11px] font-semibold text-text-secondary">{T.rankings.vp}</span>
             </span>
           </span>

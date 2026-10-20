@@ -21,8 +21,12 @@ import pool from '@/lib/db'
  *
  * 'avatar' counts uploads per account: an avatar is small, but each one is a
  * write of up to 512 KB to the database.
+ *
+ * 'psn-score' counts the PSN games read for Vault Points, for the whole app
+ * (address 'app'): PSN is one app account for everyone, so the score fill goes
+ * gently whoever it is for. 300 games is 600 calls to Sony in 15 minutes.
  */
-export type AttemptScope = 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'avatar' | 'user-search' | 'follow'
+export type AttemptScope = 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'avatar' | 'user-search' | 'follow' | 'psn-score'
 
 const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   signup: { max: 5, windowMinutes: 60 },
@@ -33,6 +37,7 @@ const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   avatar: { max: 20, windowMinutes: 60 },
   'user-search': { max: 60, windowMinutes: 5 },
   follow: { max: 60, windowMinutes: 5 },
+  'psn-score': { max: 300, windowMinutes: 15 },
 }
 
 type HeaderSource = Headers | Record<string, string | string[] | undefined>

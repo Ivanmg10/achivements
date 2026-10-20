@@ -53,6 +53,7 @@ export default function UserXboxCard() {
   return (
     <UserPlatformCard
       name="Xbox"
+      source="xbox"
       href={name ? `https://www.xbox.com/play/user/${encodeURIComponent(name)}` : undefined}
       logo={<XboxLogo size={18} className="text-[#107c10]" aria-hidden="true" />}
       bigLogo={<XboxLogo size={40} className="text-[#107c10]" aria-hidden="true" />}

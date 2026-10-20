@@ -91,8 +91,7 @@ test('loading, failure with retry, and an empty Following', () => {
   expect(screen.getByText(en.rankings.emptyFollowing)).toBeInTheDocument()
 })
 
-test('explains how points work', async () => {
+test('leads to how points work', () => {
   render(<RankingsPage signedIn />)
-  fireEvent.click(screen.getByRole('button', { name: en.rankings.how }))
-  expect(await screen.findByRole('dialog', { name: en.rankings.howTitle })).toHaveTextContent(en.rankings.howItems[0])
+  expect(screen.getByRole('link', { name: en.rankings.how })).toHaveAttribute('href', '/rankings/how')
 })

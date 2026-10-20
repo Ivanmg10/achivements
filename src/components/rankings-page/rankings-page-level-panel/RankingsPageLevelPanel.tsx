@@ -2,8 +2,10 @@
 
 import type { VaultMe } from '@/app/api/rankings/me/route'
 import { useLanguage } from '@/context/LanguageContext'
+import { useVaultFillState } from '@/context/VaultFillContext'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
+import VaultFillProgress from '@/components/vault-fill-progress/VaultFillProgress'
 import VaultPlatformSplit, { PLATFORM_FILL, PLATFORM_NAMES, PLATFORM_ORDER } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { levelProgress } from '@/utils/vaultLevel'
 
@@ -18,6 +20,7 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
   const n = (x: number) => x.toLocaleString(lang)
   const p = levelProgress(me.points)
   const total = Object.values(me.split).reduce((s, x) => s + (x ?? 0), 0)
+  const fill = useVaultFillState()
 
   return (
     <section aria-labelledby="rankings-level-title" className="bg-bg-card rounded-3xl p-5 flex flex-col gap-4">
@@ -25,7 +28,30 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
         {T.rankings.yourLevel}
       </h2>
 
-      {me.points === 0 ? (
+      {fill?.active ? (
+        // Being calculated: the ring counts games read, and each platform says how it is getting on.
+        <>
+          <div className="flex flex-col items-center gap-2">
+            <CircularProgress
+              earned={fill.read}
+              total={Math.max(1, fill.total)}
+              size={128}
+              ariaLabel={T.rankings.fillA11y.replace('{pct}', String(fill.pct))}
+              center={
+                <span className="flex flex-col items-center leading-tight">
+                  <span className="text-xs text-text-secondary">{T.rankings.fillShort}</span>
+                  <span className="text-2xl font-extrabold tabular-nums">{fill.pct} %</span>
+                </span>
+              }
+            />
+            <p className="text-sm text-center">
+              <span className="text-warning font-bold" title={T.rankings.fillApprox}>≈</span> <strong className="tabular-nums">{n(me.points)}</strong>{' '}
+              <span className="text-text-secondary">{T.rankings.vp}</span>
+            </p>
+          </div>
+          <VaultFillProgress />
+        </>
+      ) : me.points === 0 ? (
         <p role="status" className="text-sm text-text-secondary">{T.rankings.noScore}</p>
       ) : (
         <>
@@ -89,7 +115,9 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
         </>
       )}
 
-      {me.provisional > 0 && <p className="text-xs text-text-secondary">{T.rankings.provisional}</p>}
+      {/* A platform that failed (a private profile, a refused key) says so after the fill too. */}
+      {!fill?.active && <VaultFillProgress />}
+      {!fill?.active && me.provisional > 0 && <p className="text-xs text-text-secondary">{T.rankings.provisional}</p>}
     </section>
   )
 }

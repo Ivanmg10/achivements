@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useVaultFillState } from '@/context/VaultFillContext'
 import type { RankingsResponse, RankRow } from '@/app/api/rankings/route'
 import type { RankPeriod, RankScope, RankSource } from '@/lib/rankings'
 
@@ -33,6 +34,8 @@ export function useRankings(view: RankingsView, enabled = true) {
   const [moreFailed, setMoreFailed] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [attempt, setAttempt] = useState(0)
+  // After every pass of the viewer's fill, their row may have moved.
+  const fillVersion = useVaultFillState()?.version ?? 0
 
   // Another view: what was shown belongs to the old one.
   useWhenChanged([key], () => {
@@ -56,7 +59,7 @@ export function useRankings(view: RankingsView, enabled = true) {
     return () => {
       current = false
     }
-  }, [key, enabled, attempt])
+  }, [key, enabled, attempt, fillVersion])
 
   const retry = useCallback(() => {
     setAnswered(null)

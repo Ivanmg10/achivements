@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/terms`, lastModified: TERMS_UPDATED, changeFrequency: 'yearly', priority: 0.3 },
     // The global rankings: public, and they move every day.
     { url: `${SITE_URL}/rankings`, changeFrequency: 'daily', priority: 0.8 },
+    { url: `${SITE_URL}/rankings/how`, changeFrequency: 'monthly', priority: 0.6 },
     ...SEO_PAGES.map((page) => ({
       url: `${SITE_URL}${seoPath(page)}`,
       lastModified: new Date(page.updated),

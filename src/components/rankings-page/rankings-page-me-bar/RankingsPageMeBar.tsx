@@ -3,6 +3,7 @@
 import type { RankRow } from '@/app/api/rankings/route'
 import { useLanguage } from '@/context/LanguageContext'
 import { ProgressBar } from '@/components/ui/ProgressBar'
+import { useVaultFillState } from '@/context/VaultFillContext'
 import { levelProgress } from '@/utils/vaultLevel'
 import RankingsPageUser from '../rankings-page-user/RankingsPageUser'
 
@@ -24,7 +25,10 @@ export default function RankingsPageMeBar({
   const { T, lang } = useLanguage()
   const progress = levelProgress(me.totalPoints)
   const n = (x: number) => x.toLocaleString(lang)
-  const hint = !me.listed
+  const fill = useVaultFillState()
+  const hint = fill?.active
+    ? `${T.rankings.fillCalculating} ${T.rankings.fillGames.replace('{n}', n(fill.read)).replace('{total}', n(fill.total))}`
+    : !me.listed
     ? showInRankings
       ? T.rankings.privateNote
       : T.rankings.optedOutNote
@@ -45,9 +49,18 @@ export default function RankingsPageMeBar({
       </span>
       <span className="flex flex-col items-end gap-1 shrink-0">
         <span className="text-sm font-bold tabular-nums">
+          {fill?.active && (
+            <span className="text-warning" title={T.rankings.fillApprox}>
+              ≈{' '}
+            </span>
+          )}
           {n(me.points)} <span className="text-[11px] font-semibold text-text-secondary">{T.rankings.vp}</span>
         </span>
-        <ProgressBar pct={progress.pct} label={T.rankings.toLevel.replace('{n}', n(progress.span - progress.into)).replace('{level}', String(progress.level + 1))} className="w-20 sm:w-28" />
+        {fill?.active ? (
+          <ProgressBar pct={fill.pct} label={T.rankings.fillA11y.replace('{pct}', String(fill.pct))} className="w-20 sm:w-28" />
+        ) : (
+          <ProgressBar pct={progress.pct} label={T.rankings.toLevel.replace('{n}', n(progress.span - progress.into)).replace('{level}', String(progress.level + 1))} className="w-20 sm:w-28" />
+        )}
       </span>
     </section>
   )

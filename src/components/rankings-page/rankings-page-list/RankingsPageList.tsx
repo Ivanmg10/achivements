@@ -7,7 +7,7 @@ import RankingsPageUser from '../rankings-page-user/RankingsPageUser'
 import RankingsPageDelta from '../rankings-page-delta/RankingsPageDelta'
 
 /** The rankings on a phone: one row each, place, who with their level, and points. */
-export default function RankingsPageList({ rows, arrows, linked }: { rows: RankRow[]; arrows: boolean; linked: boolean }) {
+export default function RankingsPageList({ rows, arrows, linked, approx = false }: { rows: RankRow[]; arrows: boolean; linked: boolean; approx?: boolean }) {
   const { T, lang } = useLanguage()
 
   return (
@@ -26,6 +26,7 @@ export default function RankingsPageList({ rows, arrows, linked }: { rows: RankR
           </RankingsPageUser>
           <span className="flex flex-col items-end gap-0.5">
             <span className="font-extrabold tabular-nums">
+              {r.isMe && approx && <span className="text-warning" title={T.rankings.fillApprox}>≈ </span>}
               {r.points.toLocaleString(lang)} <span className="text-[10px] font-semibold text-text-secondary">{T.rankings.vp}</span>
             </span>
             {arrows && <RankingsPageDelta delta={r.delta} />}

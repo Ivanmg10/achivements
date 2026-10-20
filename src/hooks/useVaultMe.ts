@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { fetchShared } from '@/lib/fetchShared'
+import { useVaultFillState } from '@/context/VaultFillContext'
 import type { VaultMe } from '@/app/api/rankings/me/route'
 
 async function request(): Promise<VaultMe | null> {
@@ -28,6 +29,8 @@ export function useVaultMe() {
   const [me, setMe] = useState<VaultMe | null>(null)
   const [answered, setAnswered] = useState(false)
   const [attempt, setAttempt] = useState(0)
+  // After every pass of the fill, the points may have moved.
+  const fillVersion = useVaultFillState()?.version ?? 0
 
   useEffect(() => {
     if (!signedIn) return
@@ -40,7 +43,7 @@ export function useVaultMe() {
     return () => {
       current = false
     }
-  }, [signedIn, attempt])
+  }, [signedIn, attempt, fillVersion])
 
   const retry = useCallback(() => {
     setAnswered(false)

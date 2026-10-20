@@ -9,31 +9,25 @@ import {
   stackKey,
   type ScoreAchievement,
 } from './vaultScore'
+import { exampleScores } from './vaultExamples'
 
 const lin = (n: number, a: number, b: number) => Array.from({ length: n }, (_, i) => a + (b - a) * (n === 1 ? 0 : i / (n - 1)))
 const all = (list: { w: number; r: number }[], earnedAt = '2026-10-01T10:00:00Z'): ScoreAchievement[] =>
   list.map(({ w, r }) => ({ native: w, rarity: r, earned: true, earnedAt }))
 
-// The illustrative games of docs/rankings-plan.md: one AAA game as each platform would report it.
-const psnAAA = [{ w: 90, r: 8 }, ...lin(6, 30, 8).map((r) => ({ w: 90, r })), ...lin(12, 60, 20).map((r) => ({ w: 30, r })), ...lin(30, 95, 25).map((r) => ({ w: 15, r }))]
-const steamAAA = psnAAA.map((a) => ({ w: 1, r: a.r * 0.62 }))
-const xboxAAA = [...lin(7, 30, 8).map((r) => ({ w: 90, r })), ...lin(12, 60, 20).map((r) => ({ w: 20, r })), ...lin(30, 95, 25).map((r) => ({ w: 6, r }))]
-const raRetro = [...lin(6, 12, 2).map((r) => ({ w: 25, r })), ...lin(14, 30, 6).map((r) => ({ w: 10, r })), ...lin(20, 55, 15).map((r) => ({ w: 5, r }))]
-
 describe('scoreGame balance', () => {
+  const score = exampleScores()
+
   it('scores the same finished game within 10 % on every platform', () => {
-    const scores = [psnAAA, steamAAA, xboxAAA, raRetro].map((g) => scoreGame(all(g)).points)
-    const avg = scores.reduce((s, x) => s + x, 0) / scores.length
-    expect((Math.max(...scores) - Math.min(...scores)) / avg).toBeLessThanOrEqual(0.11)
+    const same = [score.psn, score.steam, score.xbox, score.ra]
+    const avg = same.reduce((s, x) => s + x, 0) / same.length
+    expect((Math.max(...same) - Math.min(...same)) / avg).toBeLessThanOrEqual(0.11)
   })
 
   it('gives an easy game about a third of a demanding one, and a 5000-achievement game no more', () => {
-    const aaa = scoreGame(all(psnAAA)).points
-    const quickPlatinum = scoreGame(all([{ w: 90, r: 45 }, { w: 90, r: 50 }, ...lin(10, 70, 55).map((r) => ({ w: 15, r }))])).points
-    const spam = scoreGame(all(lin(5000, 2.3, 1.9).map((r) => ({ w: 1, r })))).points
-    expect(quickPlatinum / aaa).toBeGreaterThan(0.25)
-    expect(quickPlatinum / aaa).toBeLessThan(0.45)
-    expect(spam / aaa).toBeLessThan(0.45)
+    expect(score.quick / score.psn).toBeGreaterThan(0.25)
+    expect(score.quick / score.psn).toBeLessThan(0.45)
+    expect(score.spam / score.psn).toBeLessThan(0.45)
   })
 })
 

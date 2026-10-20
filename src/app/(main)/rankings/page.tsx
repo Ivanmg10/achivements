@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import RankingsPage from '@/components/rankings-page/RankingsPage'
-import LandingNav from '@/components/landing-page/landing-nav/LandingNav'
-import PublicFooter from '@/components/public-footer/PublicFooter'
+import PublicShell from '@/components/public-shell/PublicShell'
 
 export const metadata: Metadata = {
   title: 'Rankings',
@@ -19,12 +18,8 @@ export default async function Rankings() {
   if (session) return <RankingsPage signedIn />
 
   return (
-    <div className="min-h-[100dvh] bg-bg-main text-text-main flex flex-col">
-      <LandingNav />
-      <main className="flex-1">
-        <RankingsPage signedIn={false} />
-      </main>
-      <PublicFooter current="/rankings" />
-    </div>
+    <PublicShell current="/rankings">
+      <RankingsPage signedIn={false} />
+    </PublicShell>
   )
 }

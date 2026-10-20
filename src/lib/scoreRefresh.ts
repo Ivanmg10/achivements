@@ -1,10 +1,12 @@
+import { after } from 'next/server'
 import pool from '@/lib/db'
 import { queryRows } from '@/lib/queryRows'
+import { allowAttempt } from '@/lib/attemptLimit'
 import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raClient'
 import { getOwnedGames } from '@/lib/steamClient'
-import { withSteamCache } from '@/lib/steamCache'
+import { readCache, withSteamCache, writeCache } from '@/lib/steamCache'
 import { fetchPlayerAchievements, isNoStats, loadGlobalPct } from '@/lib/steamProgress'
-import { psnGameTrophies, psnTitles } from '@/lib/psnClient'
+import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
 import { xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
 import type { GameSource, SteamOwnedGamesResponse } from '@/types/steam'
 import type { TrophyCounts } from '@/types/psn'
@@ -16,18 +18,52 @@ import { monthStart, weekStart } from '@/utils/vaultLevel'
 /**
  * Keeps a user's Vault Points up to date (docs/rankings-plan.md). Each
  * platform's library is listed once; only games whose last unlock moved since
- * they were scored are read again, a few per run, newest first. A game not
- * read yet scores provisionally from its progress in the list, so nobody sees
- * a zero while their library fills in. Nothing here throws to the caller.
+ * they were scored are read again, newest first, at the pace each platform
+ * stands (measured 2026-10-20, see PACE). A game not read yet scores
+ * provisionally from its progress in the list, so nobody sees a zero while
+ * their library fills in. How far the fill has got is kept (FillStatus) for
+ * the screens that show it. Nothing here throws to the caller.
  */
 
-/** How long a score counts as fresh, and how soon an unfinished fill comes back. */
+/** How long a complete score counts as fresh. */
 const FRESH_HOURS = 6
-const RETRY_MINUTES = 10
-/** Games read per platform per run. Xbox's whole app shares 150 calls an hour. */
-const READS: Record<GameSource, number> = { ra: 25, steam: 40, psn: 15, xbox: 5 }
+/** A pass holds the user's row this long; a second pass cannot start meanwhile. */
+const CLAIM_SECONDS = 120
+/** An unfinished fill that nobody continues is picked up by the heartbeat this soon. */
+const RESUME_MINUTES = 15
+
+/**
+ * How each platform is read, from what was measured: Steam took 8 at once with
+ * no error (29 games/s); RA allows a burst of ~7, then 429s with no Retry-After,
+ * and never failed one call every 250 ms; PSN read 4 at once without trouble,
+ * but it is one app account for everyone, so it goes gently (2 at once, 100 a
+ * pass, and PSN_BUDGET across the whole app); Xbox shares 150 calls an hour.
+ */
+export const PACE: Record<GameSource, { concurrency: number; gapMs: number; perPass: number }> = {
+  steam: { concurrency: 8, gapMs: 0, perPass: Infinity },
+  ra: { concurrency: 1, gapMs: 300, perPass: Infinity },
+  psn: { concurrency: 2, gapMs: 0, perPass: 100 },
+  xbox: { concurrency: 1, gapMs: 0, perPass: 5 },
+}
+
 const RA_PAGE = 500
 const STEAM_OWNED_TTL_MS = 60 * 60 * 1000
+const FILL_TTL_MS = 24 * 60 * 60 * 1000
+
+/** Where a platform's fill stands. 'estimated': only Xbox, scored from gamerscore until read. */
+export type FillState = 'reading' | 'done' | 'estimated' | 'error'
+/** private: the profile hides it; key: RA refused the key; busy: the platform asked us to slow down. */
+export type FillError = 'private' | 'key' | 'unavailable' | 'busy'
+export type FillPlatform = { read: number; total: number; state: FillState; error?: FillError }
+export type FillStatus = {
+  /** Every platform read, or settled (estimated, or failed for a reason waiting will not fix). */
+  complete: boolean
+  running: boolean
+  /** All-time total once the last pass ended. */
+  points: number
+  updatedAt: string
+  platforms: Partial<Record<GameSource, FillPlatform>>
+}
 
 type Candidate = {
   id: number
@@ -64,7 +100,11 @@ type UserRow = {
 
 type Plan = { source: GameSource; account: string; list: () => Promise<Candidate[]> }
 
+/** A Steam library that reads as no games at all: the profile or its game details are private. */
+class SteamLibraryPrivate extends Error {}
+
 const sum = (c: TrophyCounts) => c.bronze + c.silver + c.gold + c.platinum
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 function raPlan(username: string, apiKey: string): Plan {
   type Progress = { GameID: number; Title: string; ConsoleName: string; MaxPossible: number; NumAwarded: number; NumAwardedHardcore: number; MostRecentAwardedDate?: string | null }
@@ -116,10 +156,11 @@ function steamPlan(userId: number, steamid: string, apiKey: string): Plan {
         `score:steamOwned:${steamid}`,
         STEAM_OWNED_TTL_MS,
         async () => (await getOwnedGames(steamid, apiKey)) as SteamOwnedGamesResponse,
-        { userId: String(userId) },
+        // A private library is not cached: making it public takes effect on the next pass.
+        { userId: String(userId), shouldCache: (d) => Boolean(d?.response?.games) },
       )
       // A private library reads as no games: keep what was scored while it was public.
-      if (!data?.response?.games) throw new Error('steam library unreadable')
+      if (!data?.response?.games) throw new SteamLibraryPrivate('steam library unreadable')
       return data.response.games
         .filter((g) => g.has_community_visible_stats !== false && g.playtime_forever > 0)
         .map((g) => ({
@@ -191,20 +232,42 @@ function plansFor(user: UserRow): Plan[] {
   return plans
 }
 
+/** Why a platform could not be read, in terms the user can act on (or wait out). */
+export function classifyFailure(source: GameSource, err: unknown): FillError {
+  if (err instanceof SteamLibraryPrivate) return 'private'
+  if (err instanceof PsnError) return err.isPrivate ? 'private' : err.isRateLimited ? 'busy' : 'unavailable'
+  const status = (err as { status?: number } | null)?.status
+  if (status === 429) return 'busy'
+  if (source === 'ra' && (status === 401 || status === 403)) return 'key'
+  return 'unavailable'
+}
+
 type Write = { game_id: number; title: string; points: number; earned: number; total: number; completed: boolean; provisional: boolean; flag: string | null; change_key: string; unlocks: ScoreUnlock[] }
 
 function toWrite(c: Candidate, score: GameScore, provisional: boolean, flag: string | null): Write {
   return { game_id: c.id, title: c.title, points: score.points, earned: score.earned, total: score.total, completed: score.completed, provisional, flag, change_key: c.changeKey, unlocks: score.unlocks }
 }
 
-/** One platform: read what moved, store it, drop what left, and settle the stack factors. Whether everything got read. */
-async function refreshSource(userId: number, plan: Plan, hiddenGames: Set<string>, user: UserRow, deadline: number): Promise<boolean> {
+/**
+ * One platform: read what moved (at the platform's pace), store it, drop what
+ * left, settle the stack factors. Tells `report` how far it has got as it goes.
+ */
+async function refreshSource(
+  userId: number,
+  plan: Plan,
+  hiddenGames: Set<string>,
+  user: UserRow,
+  deadline: number,
+  report: (p: FillPlatform) => void,
+): Promise<FillPlatform> {
   let candidates: Candidate[]
   try {
     candidates = await plan.list()
   } catch (err) {
     console.error(`[scoreRefresh] ${plan.source} list`, userId, err)
-    return false
+    const error = classifyFailure(plan.source, err)
+    // Busy is waited out (the fill goes on); the rest need the user, or a later pass.
+    return { read: 0, total: 0, state: error === 'busy' ? 'reading' : 'error', error }
   }
 
   const hiddenConsoles = hiddenConsolesFrom(user.preferences, plan.source)
@@ -217,28 +280,50 @@ async function refreshSource(userId: number, plan: Plan, hiddenGames: Set<string
     [userId, plan.source],
   )
   const stored = new Map(rows.map((r) => [Number(r.game_id), r]))
-
-  const writes: Write[] = []
-  let reads = 0
-  let complete = true
-  for (const c of eligible) {
+  const isCurrent = (c: Candidate) => {
     const row = stored.get(c.id)
-    const same = row !== undefined && row.account === plan.account
-    if (same && row.change_key === c.changeKey && row.rules_version === RULES_VERSION && !row.provisional) continue
+    return row !== undefined && row.account === plan.account && row.change_key === c.changeKey && row.rules_version === RULES_VERSION && !row.provisional
+  }
+  const todo = eligible.filter((c) => !isCurrent(c))
+  const progress: FillPlatform = { read: eligible.length - todo.length, total: eligible.length, state: todo.length ? 'reading' : 'done' }
+  report({ ...progress })
 
-    if (reads < READS[plan.source] && Date.now() < deadline) {
-      reads++
+  // Read at the platform's pace: a few workers, a gap between calls, a cap per pass.
+  const pace = PACE[plan.source]
+  const read = new Map<number, Write>()
+  let next = 0
+  let stopped = null as FillError | null
+  const worker = async () => {
+    while (next < todo.length && next < pace.perPass && !stopped && Date.now() < deadline) {
+      const c = todo[next++]
+      // PSN is one app account for everyone: a brake across the whole app, counted in the database.
+      if (plan.source === 'psn' && !(await allowAttempt('psn-score', 'app'))) {
+        stopped = 'busy'
+        return
+      }
       try {
         const { score, suspect } = await c.read()
+        const row = stored.get(c.id)
         // An admin's "cleared" stands; otherwise a tool's mark flags the game.
-        const flag = same && row.flag === 'cleared' ? 'cleared' : suspect ? 'suspect' : null
-        writes.push(toWrite(c, score, false, flag))
-        continue
+        const flag = row?.account === plan.account && row.flag === 'cleared' ? 'cleared' : suspect ? 'suspect' : null
+        read.set(c.id, toWrite(c, score, false, flag))
+        progress.read++
+        report({ ...progress })
       } catch (err) {
         console.error(`[scoreRefresh] ${plan.source} game`, userId, c.id, err)
+        // Asked to slow down: stop this platform for this pass rather than insist.
+        if (classifyFailure(plan.source, err) === 'busy') stopped = 'busy'
       }
+      if (pace.gapMs) await sleep(pace.gapMs)
     }
-    complete = false
+  }
+  await Promise.all(Array.from({ length: Math.min(pace.concurrency, Math.max(1, todo.length)) }, worker))
+
+  const writes: Write[] = [...read.values()]
+  for (const c of todo) {
+    if (read.has(c.id)) continue
+    const row = stored.get(c.id)
+    const same = row !== undefined && row.account === plan.account
     // Not read this time: keep a real score that is merely out of date; otherwise stand in from the list.
     if (c.provisional && (!same || row.provisional)) writes.push(toWrite(c, c.provisional, true, same ? row.flag : null))
   }
@@ -266,14 +351,18 @@ async function refreshSource(userId: number, plan: Plan, hiddenGames: Set<string
     [userId, plan.source],
   )
   const factors = stackFactors(kept.map((r) => ({ key: stackKey(r.title), points: r.points })))
-  const changed = kept.map((r, i) => ({ game_id: Number(r.game_id), f: factors[i] }))
   await pool.query(
     `UPDATE score_games g SET stack_factor = v.f
      FROM jsonb_to_recordset($3::jsonb) AS v(game_id bigint, f real)
      WHERE g.user_id = $1 AND g.source = $2 AND g.game_id = v.game_id AND g.stack_factor <> v.f`,
-    [userId, plan.source, JSON.stringify(changed)],
+    [userId, plan.source, JSON.stringify(kept.map((r, i) => ({ game_id: Number(r.game_id), f: factors[i] })))],
   )
-  return complete
+
+  const done = progress.read >= progress.total
+  if (done) return { ...progress, state: 'done' }
+  // Xbox's 150 calls an hour for the whole app: its gamerscore estimate is the settled state.
+  if (plan.source === 'xbox' && !stopped) return { ...progress, state: 'estimated' }
+  return { ...progress, state: 'reading', ...(stopped ? { error: stopped } : {}) }
 }
 
 /** Weeks and months, per platform, rebuilt from the stored games. */
@@ -319,15 +408,27 @@ export async function rebuildPeriods(userId: number): Promise<void> {
   }
 }
 
-/** Refreshes one user's score until `deadline`. Whether every game got read. */
-export async function refreshScore(userId: number, deadline: number): Promise<boolean> {
+/** Every platform read or settled; 'busy' and plain 'reading' are not. */
+export function fillComplete(platforms: FillStatus['platforms']): boolean {
+  return Object.values(platforms).every((p) => p && (p.state === 'done' || p.state === 'estimated' || p.state === 'error'))
+}
+
+/**
+ * Refreshes one user's score until `deadline`, telling `report` how each
+ * platform is getting on. The platforms as they ended, and whether all are settled.
+ */
+export async function refreshScore(
+  userId: number,
+  deadline: number,
+  report: (source: GameSource, p: FillPlatform) => void = () => {},
+): Promise<{ complete: boolean; platforms: FillStatus['platforms'] }> {
   try {
     const rows = await queryRows<UserRow>(
       `SELECT id, rausername, raid, steamid, psnaccountid, xboxxuid, preferences FROM users WHERE id = $1`,
       [userId],
     )
     const user = rows[0]
-    if (!user) return true
+    if (!user) return { complete: true, platforms: {} }
 
     const plans = plansFor(user)
     // A platform unlinked takes its games with it.
@@ -336,42 +437,162 @@ export async function refreshScore(userId: number, deadline: number): Promise<bo
     const hidden = await queryRows<{ source: string; game_id: number }>('SELECT source, game_id FROM hidden_games WHERE user_id = $1', [userId])
     const hiddenGames = new Set(hidden.map((h) => `${h.source}:${h.game_id}`))
 
-    const done = await Promise.all(plans.map((p) => refreshSource(userId, p, hiddenGames, user, deadline).catch((err) => {
-      console.error(`[scoreRefresh] ${p.source}`, userId, err)
-      return false
-    })))
+    const ended = await Promise.all(
+      plans.map((p) =>
+        refreshSource(userId, p, hiddenGames, user, deadline, (progress) => report(p.source, progress)).catch((err): FillPlatform => {
+          console.error(`[scoreRefresh] ${p.source}`, userId, err)
+          return { read: 0, total: 0, state: 'reading', error: 'unavailable' }
+        }),
+      ),
+    )
     await rebuildPeriods(userId)
-    return done.every(Boolean)
+    const platforms = Object.fromEntries(plans.map((p, i) => [p.source, ended[i]])) as FillStatus['platforms']
+    return { complete: fillComplete(platforms), platforms }
   } catch (err) {
     console.error('[scoreRefresh]', userId, err)
-    return false
+    return { complete: false, platforms: {} }
   }
 }
 
-/** Refreshes and records when; an unfinished fill is asked to come back in minutes rather than hours. */
-async function refreshAndMark(userId: number, budgetMs: number): Promise<void> {
-  const complete = await refreshScore(userId, Date.now() + budgetMs)
-  if (!complete) {
-    await pool
-      .query(`UPDATE users SET score_refreshed_at = now() - make_interval(hours => $2) + make_interval(mins => $3) WHERE id = $1`, [userId, FRESH_HOURS, RETRY_MINUTES])
-      .catch((err: unknown) => console.error('[scoreRefresh] mark', userId, err))
+const fillKey = (userId: number) => `score:fill:${userId}`
+
+/** Where the user's fill stands, as the last pass left it; null before the first. */
+export async function readFillStatus(userId: number): Promise<FillStatus | null> {
+  try {
+    return await readCache<FillStatus>(fillKey(userId))
+  } catch (err) {
+    console.error('[scoreRefresh] read fill', userId, err)
+    return null
+  }
+}
+
+async function saveFillStatus(userId: number, status: FillStatus): Promise<void> {
+  try {
+    await writeCache(fillKey(userId), status, FILL_TTL_MS, String(userId))
+  } catch (err) {
+    console.error('[scoreRefresh] save fill', userId, err)
+  }
+}
+
+async function totalPoints(userId: number): Promise<number> {
+  const rows = await queryRows<{ points: number | null }>(
+    `SELECT SUM(points * stack_factor)::float AS points FROM score_games WHERE user_id = $1 AND flag IS DISTINCT FROM 'suspect'`,
+    [userId],
+  )
+  return Math.round(rows[0]?.points ?? 0)
+}
+
+/**
+ * Marks a platform as about to be read (just linked), so the screens say
+ * "calculating" at once and the next pass is not skipped as already complete.
+ */
+export async function markFillPending(userId: number, source: GameSource): Promise<void> {
+  const prev = await readFillStatus(userId)
+  await saveFillStatus(userId, {
+    complete: false,
+    running: prev?.running ?? false,
+    points: prev?.points ?? 0,
+    updatedAt: new Date().toISOString(),
+    platforms: { ...(prev?.platforms ?? {}), [source]: { read: 0, total: 0, state: 'reading' } },
+  })
+}
+
+/** Takes the user's row for a pass: only one at a time, whoever asks (heartbeat, fill, link, cron). */
+async function claim(userId: number, olderThan: string): Promise<boolean> {
+  const { rowCount } = await pool.query(
+    `UPDATE users SET score_refreshed_at = now()
+     WHERE id = $1 AND (score_refreshed_at IS NULL OR score_refreshed_at < now() - $2::interval)`,
+    [userId, olderThan],
+  )
+  return Boolean(rowCount)
+}
+
+/**
+ * One pass for a user already claimed, saving its progress as it goes (at
+ * most every 1.5 s). A finished pass marks the score fresh; an unfinished one
+ * leaves the row free for the next pass at once, or for the heartbeat later.
+ */
+export async function runScorePass(userId: number, budgetMs: number): Promise<FillStatus> {
+  const prev = await readFillStatus(userId)
+  const status: FillStatus = { complete: false, running: true, points: prev?.points ?? 0, updatedAt: new Date().toISOString(), platforms: { ...(prev?.platforms ?? {}) } }
+  let lastSave = 0
+  let saving: Promise<void> = Promise.resolve()
+  const save = (force = false) => {
+    if (!force && Date.now() - lastSave < 1_500) return saving
+    lastSave = Date.now()
+    status.updatedAt = new Date().toISOString()
+    saving = saving.then(() => saveFillStatus(userId, { ...status, platforms: { ...status.platforms } }))
+    return saving
+  }
+  await save(true)
+
+  const result = await refreshScore(userId, Date.now() + budgetMs, (source, p) => {
+    status.platforms[source] = p
+    void save()
+  })
+  status.platforms = result.platforms
+  status.complete = result.complete
+  status.running = false
+  status.points = await totalPoints(userId).catch(() => status.points)
+  await save(true)
+
+  await pool
+    .query(
+      status.complete
+        ? `UPDATE users SET score_refreshed_at = now() WHERE id = $1`
+        : `UPDATE users SET score_refreshed_at = now() - make_interval(hours => $2) + make_interval(mins => $3) WHERE id = $1`,
+      status.complete ? [userId] : [userId, FRESH_HOURS, RESUME_MINUTES],
+    )
+    .catch((err: unknown) => console.error('[scoreRefresh] mark', userId, err))
+  return status
+}
+
+/**
+ * The fill the screens drive (POST /api/rankings/fill): a pass when the score
+ * is unfinished or stale and no other pass is running; otherwise where it stands.
+ */
+export type FillAnswer = FillStatus & {
+  /** A pass ran for this answer (so there may be new points to show). */
+  ran: boolean
+  /** That pass finished a fill that was pending: the moment to say "your points are ready". */
+  finished: boolean
+}
+
+export async function continueFill(userId: number, budgetMs: number): Promise<FillAnswer | null> {
+  const status = await readFillStatus(userId)
+  const fresh = status?.complete && Date.now() - Date.parse(status.updatedAt) < FRESH_HOURS * 3_600_000
+  if (status && fresh) return { ...status, ran: false, finished: false }
+  if (!(await claim(userId, `${CLAIM_SECONDS} seconds`))) return status && { ...status, ran: false, finished: false }
+  const ended = await runScorePass(userId, budgetMs)
+  return { ...ended, ran: true, finished: ended.complete && !status?.complete }
+}
+
+/** Right after a platform is linked: one pass at once, if none is running. */
+export async function startFill(userId: number, budgetMs = 60_000): Promise<void> {
+  try {
+    if (await claim(userId, `${CLAIM_SECONDS} seconds`)) await runScorePass(userId, budgetMs)
+  } catch (err) {
+    console.error('[scoreRefresh] start fill', userId, err)
   }
 }
 
 /**
+ * A platform was just linked: the screens say "calculating" at once (before
+ * the answer), and a pass runs right after it, so the new account's points
+ * land in seconds rather than at the next heartbeat.
+ */
+export async function onPlatformLinked(userId: number, source: GameSource): Promise<void> {
+  await markFillPending(userId, source)
+  after(() => startFill(userId))
+}
+
+/**
  * The user is on the site (the presence heartbeat): refresh when the score is
- * older than FRESH_HOURS. The row is claimed first, so two tabs or instances
- * never refresh the same user at once.
+ * older than FRESH_HOURS (or an unfinished fill was left behind).
  */
 export async function refreshScoreIfStale(userId: string | number, budgetMs = 25_000): Promise<void> {
   try {
-    const { rowCount } = await pool.query(
-      `UPDATE users SET score_refreshed_at = now()
-       WHERE id = $1 AND (score_refreshed_at IS NULL OR score_refreshed_at < now() - make_interval(hours => $2))`,
-      [userId, FRESH_HOURS],
-    )
-    if (!rowCount) return
-    await refreshAndMark(Number(userId), budgetMs)
+    if (await claim(Number(userId), `${FRESH_HOURS} hours`)) await runScorePass(Number(userId), budgetMs)
   } catch (err) {
     console.error('[scoreRefresh] stale check', userId, err)
   }
@@ -398,7 +619,7 @@ export async function refreshDueScores(deadline: number): Promise<number> {
        RETURNING id`,
     )
     if (!rows[0]) break
-    await refreshAndMark(rows[0].id, Math.min(25_000, deadline - Date.now() - 2_000))
+    await runScorePass(rows[0].id, Math.min(25_000, deadline - Date.now() - 2_000))
     count++
   }
   return count

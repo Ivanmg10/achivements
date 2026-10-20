@@ -1,4 +1,5 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
+jest.mock('@/lib/scoreRefresh', () => ({ onPlatformLinked: jest.fn() }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/steamCache', () => ({ withSteamCache: jest.fn() }))
 jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))

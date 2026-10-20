@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { IconInfoCircle, IconTrophy, IconUsers } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRankings, type RankingsView } from '@/hooks/useRankings'
 import { useVaultMe } from '@/hooks/useVaultMe'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
+import { useVaultFillState } from '@/context/VaultFillContext'
 import EmptyState from '@/components/empty-state/EmptyState'
-import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import RankingsPageToolbar from './rankings-page-toolbar/RankingsPageToolbar'
 import RankingsPagePodium from './rankings-page-podium/RankingsPagePodium'
 import RankingsPageTable from './rankings-page-table/RankingsPageTable'
@@ -18,9 +18,6 @@ import RankingsPageLevelPanel from './rankings-page-level-panel/RankingsPageLeve
 import RankingsPageNear from './rankings-page-near/RankingsPageNear'
 import RankingsPageJoin from './rankings-page-join/RankingsPageJoin'
 import RankingsPageSkeleton from './rankings-page-skeleton/RankingsPageSkeleton'
-
-// Downloaded the first time it is opened, not with the page.
-const RankingsPageHow = dynamic(() => import('./rankings-page-how/RankingsPageHow'), { loading: () => null })
 
 /** Following someone's few people reads better as one plain list than as a podium. */
 const PODIUM_FROM = 15
@@ -36,9 +33,10 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
   const { T } = useLanguage()
   const xbox = useXboxEnabled()
   const [view, setView] = useState<RankingsView>({ scope: 'global', period: 'all', source: 'all' })
-  const [howOpen, setHowOpen] = useState(false)
   const { data, rows, isLoading, error, retry, more, hasMore, loadingMore, moreFailed } = useRankings(view)
   const { me: vault } = useVaultMe()
+  // While your points are being calculated, yours carry "≈" wherever they show.
+  const approx = useVaultFillState()?.active === true
 
   const total = data?.total ?? 0
   const podium = view.scope === 'global' || total >= PODIUM_FROM ? rows.slice(0, 3) : []
@@ -60,13 +58,13 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
             </h1>
             <p className="text-sm text-text-secondary">{T.rankings.intro}</p>
           </div>
-          <button
-            onClick={() => setHowOpen(true)}
+          <Link
+            href="/rankings/how"
             className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-bg-card text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <IconInfoCircle size={14} aria-hidden="true" />
             {T.rankings.how}
-          </button>
+          </Link>
         </header>
 
         <RankingsPageToolbar view={view} onChange={setView} signedIn={signedIn} xbox={xbox} />
@@ -93,14 +91,14 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
               </div>
             ) : (
               <>
-                {podium.length > 0 && <RankingsPagePodium rows={podium} linked={signedIn} />}
+                {podium.length > 0 && <RankingsPagePodium rows={podium} linked={signedIn} approx={approx} />}
                 {rest.length > 0 && (
                   <>
                     <div className="hidden md:block">
-                      <RankingsPageTable rows={rest} arrows={data?.arrows ?? false} linked={signedIn} caption={caption} />
+                      <RankingsPageTable rows={rest} arrows={data?.arrows ?? false} linked={signedIn} caption={caption} approx={approx} />
                     </div>
                     <div className="md:hidden">
-                      <RankingsPageList rows={rest} arrows={data?.arrows ?? false} linked={signedIn} />
+                      <RankingsPageList rows={rest} arrows={data?.arrows ?? false} linked={signedIn} approx={approx} />
                     </div>
                   </>
                 )}
@@ -132,10 +130,6 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
           </aside>
         </div>
       </div>
-
-      <LazyWhenOpened open={howOpen}>
-        <RankingsPageHow isOpen={howOpen} onClose={() => setHowOpen(false)} />
-      </LazyWhenOpened>
     </div>
   )
 }

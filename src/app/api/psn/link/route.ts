@@ -3,6 +3,7 @@ import pool from '@/lib/db'
 import { requireSession } from '@/lib/apiAuth'
 import { findPsnAccount, psnConfigured, psnFailure, psnSummary } from '@/lib/psnClient'
 import { forgetUser } from '@/lib/userRecord'
+import { onPlatformLinked } from '@/lib/scoreRefresh'
 
 /** PSN online IDs: 3–16 letters, digits, hyphens or underscores. */
 const ONLINE_ID = /^[A-Za-z0-9_-]{3,16}$/
@@ -49,5 +50,6 @@ export async function POST(req: Request) {
   }
 
   forgetUser(auth.id)
+  await onPlatformLinked(Number(auth.id), 'psn')
   return NextResponse.json({ psnaccountid: account.accountId, psnusername: account.onlineId })
 }

@@ -25,6 +25,7 @@ test('the sitemap lists only the public pages, as absolute URLs', () => {
     `${SITE_URL}/privacy`,
     `${SITE_URL}/terms`,
     `${SITE_URL}/rankings`,
+    `${SITE_URL}/rankings/how`,
     `${SITE_URL}/compare/exophase`,
     `${SITE_URL}/compare/psnprofiles`,
     `${SITE_URL}/track/retroachievements-steam-playstation`,

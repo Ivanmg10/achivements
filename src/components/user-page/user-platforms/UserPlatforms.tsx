@@ -65,6 +65,7 @@ export default function UserPlatforms() {
     <div className={`grid grid-cols-1 gap-4 ${xboxEnabled ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
       <UserPlatformCard
         name="RetroAchievements"
+        source="ra"
         href={raUser?.User ? `https://retroachievements.org/user/${encodeURIComponent(raUser.User)}` : undefined}
         logo={<RaLogo height={18} />}
         bigLogo={<RaLogo height={40} />}
