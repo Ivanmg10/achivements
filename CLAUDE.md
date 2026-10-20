@@ -806,8 +806,9 @@ branch to be up to date with its base** before merging, on both.
   `main` back into `develop` first (as the flow above already says).
 
 - **Pre has its own database (2026-10-20):** a Neon branch of production, `preview`, read through
-  `PREVIEW_DATABASE_URL` (`databaseUrl()` in `src/lib/db.js`), set in Vercel for Preview, branch
-  `develop`, and in `.env.local`. It exists because the Neon integration owns `DATABASE_URL` for
+  `PREVIEW_DATABASE_URL` (`databaseUrl()` in `src/lib/db.js`), set in Vercel for **all Preview
+  branches** (scoped to `develop` alone, a feature branch's preview would fall back to production)
+  and in `.env.local`. It exists because the Neon integration owns `DATABASE_URL` for
   every environment and Vercel refuses a branch-scoped second one. Production ignores it whatever
   is set (`VERCEL_ENV`). Consequences: **every migration is applied twice** (pre first, production
   when the work reaches `main`); the branch drifts from production (Neon's "Reset from parent"
