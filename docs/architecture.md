@@ -82,7 +82,12 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
    factor, unlocks by day), `score_periods` (weeks and months, rebuilt per user),
    `score_snapshots` (Monday ranks, for the arrows). `migrations/040`.
 4. **Reading** — `src/lib/rankings.ts`: `loadRanking` (global lists cached 5 min
-   per instance), `vaultTotals` for badges on cards and profiles, `presenceOf`.
+   per instance), `weeklyTrend` (each row's last 8 weeks, from `score_periods`), `vaultTotals`
+   for badges on cards and profiles, `presenceOf`. `GET /api/rankings` pages the list 30 at a
+   time (`offset`) and returns the viewer's zone (`above`/`below`, 2 each by default, up to 50).
+   Every request still ranks everyone in memory: fine for thousands of users; for far more, a
+   table of totals per user indexed by points (one migration) would let a page and a rank be
+   read straight from the database.
 
 ## Database
 

@@ -25,6 +25,23 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Rankings: top 30, your zone and a trend per row (`chore/demo-personas`)
+
+**Did** — `/api/rankings` pages 30 at a time and returns `zone`/`zoneStart` (the viewer and who
+stands around them; `above`/`below`, 2 by default, up to 50) and each row's `trend` (last 8
+weeks, `weeklyTrend` in `src/lib/rankings.ts`); `near` is gone. The page shows `RankingsPageZone`
+below the list when you are not in it (each other row says how far ahead or behind you they are;
+"N more above/below" widen it through `useRankings().widen`, never past where it meets the list),
+and the table a Trend column (`VaultSparkline`, from lg up). "Close rivals" (`RankingsPageNear`)
+is removed; the pinned bar now shows only when you are not listed (it says why).
+**Why** — The user picked option A of the canvas (top 30 plus your zone), kept the level panel as
+it was and the rows as they were, plus the trend line of the third row design.
+**Decisions** — The ranking is still computed in memory per request (cached 5 min): fine now; a
+totals table indexed by points is the step for very many users (noted in `architecture.md`).
+Strings: `near` became `zone` (+ `zoneOf`, `zoneUp`, `zoneDown`, `colTrend`, `trendA11y`) in all nine.
+**Watch out** — Checked locally with the page size lowered to 5 for a moment (you rank #1 with
+30 personas): the zone met the list and offered "4 more below".
+
 ## 2026-10-20 — Rankings entry animation (`chore/demo-personas`)
 
 **Did** — `/rankings` comes in: the podium rises third, second, first, its steps grow and the

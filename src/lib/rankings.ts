@@ -2,7 +2,7 @@ import pool from '@/lib/db'
 import { queryRows } from '@/lib/queryRows'
 import { presenceColumns } from '@/lib/presence'
 import type { GameSource } from '@/types/steam'
-import { monthStart, weekStart } from '@/utils/vaultLevel'
+import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
 
 /**
  * The rankings, read from the stored scores (scoreRefresh keeps them). Only
@@ -151,6 +151,29 @@ export async function loadRanking(opts: { scope: RankScope; period: RankPeriod; 
     periods && [...periods.filter((p) => p.id !== viewer), ...(ownPeriods ?? [])],
     source,
   )
+}
+
+/** How many weeks a row's trend goes back. */
+export const TREND_WEEKS = 8
+
+/** Points each user earned in each of the last TREND_WEEKS weeks, oldest first, zeros included, on the chosen platforms. */
+export async function weeklyTrend(userIds: number[], source: RankSource, xbox: boolean, now = new Date()): Promise<Map<number, number[]>> {
+  const weeks = lastWeeks(now, TREND_WEEKS)
+  const trend = new Map(userIds.map((id) => [id, weeks.map(() => 0)]))
+  if (userIds.length === 0) return trend
+  const rows = await queryRows<{ id: number; start: string; points: number }>(
+    `SELECT user_id AS id, to_char(start, 'YYYY-MM-DD') AS start, SUM(points)::int AS points FROM score_periods
+     WHERE kind = 'w' AND start >= $1::date AND user_id = ANY($2::int[])
+       AND ($3::text = 'all' OR source = $3) AND ($4::boolean OR source <> 'xbox')
+     GROUP BY user_id, start`,
+    [weeks[0], userIds, source, xbox],
+  )
+  for (const r of rows) {
+    const i = weeks.indexOf(r.start)
+    const list = trend.get(r.id)
+    if (list && i >= 0) list[i] = r.points
+  }
+  return trend
 }
 
 /** Where each listed user stood at the start of this week (global, all time, no Xbox). */

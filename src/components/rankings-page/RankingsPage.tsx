@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { MotionConfig, motion } from 'framer-motion'
 import { IconInfoCircle, IconTrophy, IconUsers } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useRankings, type RankingsView } from '@/hooks/useRankings'
+import { useRankings, ZONE_MAX, type RankingsView } from '@/hooks/useRankings'
 import { useVaultMe } from '@/hooks/useVaultMe'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useVaultFillState } from '@/context/VaultFillContext'
@@ -16,7 +16,7 @@ import RankingsPageTable from './rankings-page-table/RankingsPageTable'
 import RankingsPageList from './rankings-page-list/RankingsPageList'
 import RankingsPageMeBar from './rankings-page-me-bar/RankingsPageMeBar'
 import RankingsPageLevelPanel from './rankings-page-level-panel/RankingsPageLevelPanel'
-import RankingsPageNear from './rankings-page-near/RankingsPageNear'
+import RankingsPageZone from './rankings-page-zone/RankingsPageZone'
 import RankingsPageJoin from './rankings-page-join/RankingsPageJoin'
 import RankingsPageSkeleton from './rankings-page-skeleton/RankingsPageSkeleton'
 import { ME_BAR, SIDE } from './rankingsMotion'
@@ -27,15 +27,16 @@ const PODIUM_FROM = 15
 /**
  * The rankings in Vault Points (a beta): everyone, or you and whom you follow;
  * all time, this month or this week; every platform or one. A podium, then the
- * table (a list on phones), fifty at a time; your level and close rivals
- * beside it; and where you stand, pinned to the bottom. Signed out, only
- * everyone, and how to join.
+ * table (a list on phones), thirty at a time; below it, when you are not
+ * there, your zone (who is just above and below you, widened on demand); your
+ * level beside it. Not listed, a bar pinned to the bottom says where you would
+ * be and why you are not shown. Signed out, only everyone, and how to join.
  */
 export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
   const { T } = useLanguage()
   const xbox = useXboxEnabled()
   const [view, setView] = useState<RankingsView>({ scope: 'global', period: 'all', source: 'all' })
-  const { data, rows, isLoading, error, retry, more, hasMore, loadingMore, moreFailed } = useRankings(view)
+  const { data, rows, isLoading, error, retry, more, hasMore, loadingMore, moreFailed, widen, widening, zoneSize } = useRankings(view)
   const { me: vault } = useVaultMe()
   // While your points are being calculated, yours carry "≈" wherever they show.
   const approx = useVaultFillState()?.active === true
@@ -45,7 +46,13 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
   const rest = rows.slice(podium.length)
   const me = data?.me ?? null
   const meShown = me !== null && rows.some((r) => r.isMe)
-  const above = me ? ([...rows, ...(data?.near ?? [])].find((r) => r.rank === me.rank - 1) ?? null) : null
+  // Your zone, from where the list above it ends (it may have grown into it with "show more").
+  const zoneStart = data?.zoneStart ?? 0
+  const zoneAll = me?.listed && !meShown ? (data?.zone ?? []) : []
+  const zone = zoneAll.filter((_, k) => zoneStart + k >= rows.length)
+  const upLeft = zoneSize.above < ZONE_MAX ? zoneStart + (zoneAll.length - zone.length) - rows.length : 0
+  const downLeft = zoneSize.below < ZONE_MAX ? total - zoneStart - zoneAll.length : 0
+  const above = me ? ([...rows, ...zone].find((r) => r.rank === me.rank - 1) ?? null) : null
   const caption = `${view.scope === 'global' ? T.rankings.global : T.rankings.following} · ${T.rankings[view.period]}`
 
   return (
@@ -118,7 +125,23 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
                 </>
               )}
 
-              {me && !meShown && !isLoading && (
+              {me && zone.some((r) => r.isMe) && !isLoading && (
+                <motion.div variants={ME_BAR} initial="hidden" animate="show">
+                  <RankingsPageZone
+                    me={me}
+                    rows={zone}
+                    total={total}
+                    upLeft={Math.max(0, upLeft)}
+                    downLeft={Math.max(0, downLeft)}
+                    onWiden={widen}
+                    widening={widening}
+                    arrows={data?.arrows ?? false}
+                    linked={signedIn}
+                    approx={approx}
+                  />
+                </motion.div>
+              )}
+              {me && !meShown && !me.listed && !isLoading && (
                 <motion.div variants={ME_BAR} initial="hidden" animate="show" className="sticky bottom-3 z-20">
                   <RankingsPageMeBar me={me} above={above} showInRankings={vault?.showInRankings !== false} />
                 </motion.div>
@@ -129,7 +152,6 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
               {signedIn ? (
                 <>
                   {vault && <RankingsPageLevelPanel me={vault} />}
-                  {view.scope === 'global' && me && me.listed && (data?.near.length ?? 0) > 0 && <RankingsPageNear me={me} near={data?.near ?? []} />}
                 </>
               ) : (
                 <RankingsPageJoin />

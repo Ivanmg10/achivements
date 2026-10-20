@@ -9,7 +9,20 @@ import RankingsPageDelta from '../rankings-page-delta/RankingsPageDelta'
 import { ROW } from '../rankingsMotion'
 
 /** The rankings on a phone: one row each, place, who with their level, and points. */
-export default function RankingsPageList({ rows, arrows, linked, approx = false }: { rows: RankRow[]; arrows: boolean; linked: boolean; approx?: boolean }) {
+export default function RankingsPageList({
+  rows,
+  arrows,
+  linked,
+  approx = false,
+  gapFrom,
+}: {
+  rows: RankRow[]
+  arrows: boolean
+  linked: boolean
+  approx?: boolean
+  /** The viewer's points (your zone): each other row says how far ahead or behind they are. */
+  gapFrom?: number
+}) {
   const { T, lang } = useLanguage()
 
   return (
@@ -29,6 +42,11 @@ export default function RankingsPageList({ rows, arrows, linked, approx = false 
           </span>
           <RankingsPageUser row={r} size="md" linked={linked}>
             <VaultLevelBadge points={r.totalPoints} className="self-start" />
+            {gapFrom !== undefined && !r.isMe && (
+              <span className="text-[11px] text-text-secondary">
+                {(r.points >= gapFrom ? T.rankings.ahead : T.rankings.behind).replace('{n}', Math.abs(r.points - gapFrom).toLocaleString(lang))}
+              </span>
+            )}
           </RankingsPageUser>
           <span className="flex flex-col items-end gap-0.5">
             <span className="font-extrabold tabular-nums">
