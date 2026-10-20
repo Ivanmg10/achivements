@@ -25,6 +25,14 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Following section: cards across the width (`chore/demo-personas`)
+
+**Did** — In the home's Following section (`MainPageFriends`), "Who you follow" left the
+leaderboard's column and spans the width (3 columns on xl); "Latest from who you follow" sits
+beside the leaderboard, exactly as tall (out of the flow on xl, its list scrolling inside with a
+thin scrollbar in the accent). The old sticky/stretched switch (`quiet`) is gone.
+**Why** — With 11 follows the cards made the left column long and left a blank hole under the feed.
+
 ## 2026-10-20 — Rankings: 20 at a time, most active this week, 60 demo users (`chore/demo-personas`)
 
 **Did** — The list pages 20 at a time. `/api/rankings` adds `hot`, the five who earned most this
