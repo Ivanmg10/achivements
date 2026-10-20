@@ -188,7 +188,7 @@ export default function UserIdentityCard() {
             <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
           )}
         </ProfileField>
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-3 flex flex-col gap-3">
           <UserFollowStats />
           <UserVaultLevel />
         </div>
