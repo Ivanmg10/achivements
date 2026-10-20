@@ -30,6 +30,19 @@ test('the people you follow with their favourites, showcase and public groups, f
   expect(params).toEqual(['3', false])
 })
 
+test('?who=followers: the people who follow you, the same way, public profiles only', async () => {
+  query.mockResolvedValue({ rows: [{ id: 5, username: 'fan' }] })
+  const res = await GET({ url: 'http://x/api/follows/overview?who=followers' } as Request)
+  expect(res.data).toEqual([{ username: 'fan', vaultPoints: 900 }])
+  const [sql, params] = query.mock.calls[0]
+  expect(sql).toContain('JOIN users u ON u.id = f.follower_id')
+  expect(sql).toContain('WHERE f.followed_id = $1 AND u.profile_public')
+  expect(params).toEqual(['3', false])
+  // Anything else is the people you follow.
+  await GET({ url: 'http://x/api/follows/overview?who=all' } as Request)
+  expect(query.mock.calls[1][0]).toContain('JOIN users u ON u.id = f.followed_id')
+})
+
 test('presence only for who shares it: online within 5 minutes, the time rounded to 5', async () => {
   query.mockResolvedValue({ rows: [] })
   await GET()

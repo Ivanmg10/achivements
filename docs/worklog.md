@@ -25,6 +25,105 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — See who follows you (`feat/rankings-zone-and-personas`)
+
+**Did** — `/following` has tabs (`FollowingTabs`): Following and Followers (`#followers`, read
+when opened through `useFollowers` → `GET /api/follows/overview?who=followers`). The list, its
+search and its states moved to `FollowingList`, shared by both tabs. The account page's
+"Followers" count is now a link like "Following". Followers are counted and listed only when
+their profile is public, as the people you follow already were. The privacy policy's follows
+sentence changed in all nine languages: you see both lists, nobody else sees who follows whom.
+**Why** — The user wanted to see who follows them and to change the policy for it.
+**Decisions** — Only you see your followers; no follower list on public profiles. Added a
+"Follows" section to CLAUDE.md so that stays true.
+
+## 2026-10-20 — Following section: cards across the width (`chore/demo-personas`)
+
+**Did** — In the home's Following section (`MainPageFriends`), "Who you follow" left the
+leaderboard's column and spans the width (3 columns on xl); "Latest from who you follow" sits
+beside the leaderboard, exactly as tall (out of the flow on xl, its list scrolling inside with a
+thin scrollbar in the accent). The old sticky/stretched switch (`quiet`) is gone.
+**Why** — With 11 follows the cards made the left column long and left a blank hole under the feed.
+
+## 2026-10-20 — Rankings: 20 at a time, most active this week, 60 demo users (`chore/demo-personas`)
+
+**Did** — The list pages 20 at a time. `/api/rankings` adds `hot`, the five who earned most this
+week (global, every platform, whatever the view), shown under your level as `RankingsPageHot`
+with a button to the weekly ranking (strings `hotTitle`, `hotSee`, nine languages). The demo seed
+gives each persona a twin (`TWINS` in `demo-personas.mjs`: same tastes, another name and another
+of its badges as picture) and multiplies demo points by `SCALE` = 30, so the user (116 k) ranks
+about mid-table and "your zone" can be seen. Reseeded pre: 60 users, 24.7 MB of cache.
+**Why** — The user asked for 20 at a time, to see their zone, twice the users and something to
+fill the empty space under "Your level".
+**Watch out** — The pre-commit hook rewrites `package.json`; once, the dev server read it half
+written and kept failing with "Invalid package config" until restarted.
+
+## 2026-10-20 — Rankings: top 30, your zone and a trend per row (`chore/demo-personas`)
+
+**Did** — `/api/rankings` pages 30 at a time and returns `zone`/`zoneStart` (the viewer and who
+stands around them; `above`/`below`, 2 by default, up to 50) and each row's `trend` (last 8
+weeks, `weeklyTrend` in `src/lib/rankings.ts`); `near` is gone. The page shows `RankingsPageZone`
+below the list when you are not in it (each other row says how far ahead or behind you they are;
+"N more above/below" widen it through `useRankings().widen`, never past where it meets the list),
+and the table a Trend column (`VaultSparkline`, from lg up). "Close rivals" (`RankingsPageNear`)
+is removed; the pinned bar now shows only when you are not listed (it says why).
+**Why** — The user picked option A of the canvas (top 30 plus your zone), kept the level panel as
+it was and the rows as they were, plus the trend line of the third row design.
+**Decisions** — The ranking is still computed in memory per request (cached 5 min): fine now; a
+totals table indexed by points is the step for very many users (noted in `architecture.md`).
+Strings: `near` became `zone` (+ `zoneOf`, `zoneUp`, `zoneDown`, `colTrend`, `trendA11y`) in all nine.
+**Watch out** — Checked locally with the page size lowered to 5 for a moment (you rank #1 with
+30 personas): the zone met the list and offered "4 more below".
+
+## 2026-10-20 — Rankings entry animation (`chore/demo-personas`)
+
+**Did** — `/rankings` comes in: the podium rises third, second, first, its steps grow and the
+points count up (`CountUp`, which gained `locale` and `delay`); table and list rows stagger in
+(capped after 14 rows); the side panel slides in, the level ring fills from empty
+(`CircularProgress animateIn`, CSS `ring-in` in `globals.css`) and the level counts up; your
+pinned bar rises from the bottom. Variants in `rankings-page/rankingsMotion.ts`;
+`MotionConfig reducedMotion="user"` leaves only the fades under reduced motion. The jest mock of
+framer-motion gained `MotionConfig` and drops `custom`.
+**Why** — The user asked for an entry animation.
+**Open** — Proposals for pagination at scale, "Tu zona" instead of "Rivales cercanos", the level
+panel beside the podium, and the row design are on a canvas for the user to choose; nothing of
+that is built yet.
+**Watch out** — Playwright's window here renders at ~2 fps (in the background), so animations
+cannot be judged from it; check them in a real browser.
+
+## 2026-10-20 — Rankings avatars load gracefully (`chore/demo-personas`)
+
+**Did** — `RankingsPageUser` draws pictures through `FadeImage` (a pulse in the circle while
+loading, then a fade-in) and shows the user's initial, in the theme's accent, when there is no
+picture or it fails. `FadeImage` gained a `fallback` prop for that.
+**Why** — The user found the cold load cheap-looking: empty circles, then pictures popping in.
+Signed out, uploaded avatars (`/api/avatar/…`, sign-in only) answered 401 and stayed empty.
+**Open** — Other lists of users (Following, search, compare) still use a plain image; move them
+to the same pattern if the user wants it everywhere.
+
+## 2026-10-20 — Demo personas with full profiles (`chore/demo-personas`)
+
+**Did** — The 45 `demo_*` users are now 30 hand-written personas (`scripts/demo-personas.mjs`:
+name, country, bio, theme, gender, hours they play, weekends only, presence, showcase size, the
+games they play and how far). `scripts/demo-rankings.mjs` builds their Steam and PSN libraries,
+recent unlocks, year feeds, each game's list and the PSN summary, and writes them into pre's
+`steam_cache` under their made-up accounts, never expiring; their Vault Points, weeks and
+showcase come from the same lists through the real formula (`vaultScore.ts`, imported by Node).
+Checked on localhost: spex_guy (Steam, 41-day streak, showcase, completed shelf), ratman (PSN,
+platinums, hours, Spanish trophies), a PSN and a Steam game page, the rankings.
+**Why** — The user wanted to review public profiles with data and the demo users to have personality.
+**Decisions** — No "demo mode" in app code: the app reads its cache as for anyone. Games are
+real ones whose definitions pre already had cached for real users (15 Steam, 27 PSN), so names,
+badges and rarity are real; only who earned what and when is invented. No RA (the dev server
+skips RA's DB cache; a made-up RA name may be a real person). PSN trophy lists in English and
+Spanish only (a copy per language; 12 MB in all). Online personas have `last_seen_at` in 2100.
+Monday's ranks are computed among real users too, so the arrows are right.
+**Open** — Check dev.cheevovault.com once merged (same database, so it should already show them).
+**Watch out** — "Ver en PSN" links to a PSN profile by the persona's name, which may be someone
+real. If pre loses the cached games (reset from production, an unlink of the user's accounts),
+re-seeding warns and leaves those games out. Steam game pages refetch the global schema from
+Steam when it has expired (slow first load, then cached).
+
 ## 2026-10-20 — Demo users on the preview database (`feat/social-rankings`)
 
 **Did** — The user created the Neon branch and set `PREVIEW_DATABASE_URL`; checked that local

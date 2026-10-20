@@ -98,7 +98,7 @@ for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
 | `npm test` | Jest |
 | `npm run lint` | ESLint (`react-hooks/set-state-in-effect` is an error) |
 | `npm run build` | Production build |
-| `node scripts/demo-rankings.mjs seed 40 --follower=<you>` | Demo users with points, for trying the rankings. **Preview database only** (refuses otherwise); `clear` removes them |
+| `node scripts/demo-rankings.mjs seed --follower=<you>` | Demo users with points and full Steam/PSN profiles, for trying the rankings and public profiles. **Preview database only** (refuses otherwise); `clear` removes them |
 
 ## Project layout
 

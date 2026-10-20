@@ -1,9 +1,14 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import FollowingPage from './FollowingPage'
 import { useFriendsData } from '@/hooks/useFriendsData'
+import { useFollowers } from '@/hooks/useFollowers'
+import { useLocationHash } from '@/hooks/useLocationHash'
 import { en } from '@/translations/en'
 
 jest.mock('@/hooks/useFriendsData', () => ({ useFriendsData: jest.fn() }))
+jest.mock('@/hooks/useFollowers', () => ({ useFollowers: jest.fn() }))
+jest.mock('@/hooks/useFollowCounts', () => ({ useFollowCounts: () => ({ counts: { following: 1, followers: 2 }, isLoading: false, error: false }) }))
+jest.mock('@/hooks/useLocationHash', () => ({ useLocationHash: jest.fn(() => '') }))
 jest.mock('@/hooks/useRankings', () => ({
   useRankings: () => ({
     data: { total: 3, me: { rank: 2, listed: true } },
@@ -12,6 +17,10 @@ jest.mock('@/hooks/useRankings', () => ({
 }))
 
 const retry = jest.fn()
+beforeEach(() => {
+  ;(useFollowers as jest.Mock).mockReturnValue({ followers: null, isLoading: false, error: false, retry })
+  ;(useLocationHash as jest.Mock).mockReturnValue('')
+})
 const setup = ({ users = [], ...over }: Record<string, unknown>) =>
   (useFriendsData as jest.Mock).mockReturnValue({ friends: over.isLoading ? null : users, details: {}, isLoading: false, error: false, retry, ...over })
 const person = (username: string, over: Record<string, unknown> = {}) => ({
@@ -96,4 +105,25 @@ test('loading, then a failure with a retry', () => {
   expect(screen.getByRole('alert')).toHaveTextContent(en.following.loadError)
   fireEvent.click(screen.getByRole('button', { name: en.publicProfile.retry }))
   expect(retry).toHaveBeenCalled()
+})
+
+test('a second tab lists who follows you, read only when it is open', () => {
+  setup({ users: [person('ana')] })
+  const { rerender } = render(<FollowingPage />)
+  expect(useFollowers).toHaveBeenLastCalledWith(false)
+  const tab = screen.getByRole('tab', { name: new RegExp(en.following.followers) })
+  expect(tab).toHaveTextContent('2')
+  expect(screen.getByRole('tab', { name: new RegExp(en.following.title) })).toHaveAttribute('aria-selected', 'true')
+
+  ;(useLocationHash as jest.Mock).mockReturnValue('#followers')
+  ;(useFollowers as jest.Mock).mockReturnValue({ followers: [person('fan')], isLoading: false, error: false, retry })
+  rerender(<FollowingPage />)
+  expect(useFollowers).toHaveBeenLastCalledWith(true)
+  expect(screen.getByRole('tab', { name: new RegExp(en.following.followers) })).toHaveAttribute('aria-selected', 'true')
+  expect(screen.getByRole('link', { name: 'fan' })).toHaveAttribute('href', '/user/fan')
+  expect(screen.queryByRole('link', { name: 'ana' })).not.toBeInTheDocument()
+
+  ;(useFollowers as jest.Mock).mockReturnValue({ followers: [], isLoading: false, error: false, retry })
+  rerender(<FollowingPage />)
+  expect(screen.getByText(en.following.noFollowersTitle)).toBeInTheDocument()
 })

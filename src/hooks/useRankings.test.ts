@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { useRankings, type RankingsView } from './useRankings'
 
 const page = (offset: number, total = 3) => ({
-  scope: 'global', period: 'all', source: 'all', total, offset, arrows: false, me: null, near: [],
+  scope: 'global', period: 'all', source: 'all', total, offset, arrows: false, me: null, zone: [{ username: `z${offset}`, rank: 9 }], zoneStart: 8,
   rows: [{ username: `u${offset}`, rank: offset + 1, points: 10 }],
 })
 const view: RankingsView = { scope: 'global', period: 'all', source: 'all' }
@@ -19,12 +19,25 @@ test('reads the first page of a view, then the next on demand', async () => {
   const { result } = renderHook(() => useRankings(view))
   expect(result.current.isLoading).toBe(true)
   await waitFor(() => expect(result.current.isLoading).toBe(false))
-  expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('/api/rankings?scope=global&period=all&source=all&offset=0')
+  expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('/api/rankings?scope=global&period=all&source=all&offset=0&above=2&below=2')
   expect(result.current.hasMore).toBe(true)
 
   await act(() => result.current.more())
   expect((global.fetch as jest.Mock).mock.calls[1][0]).toContain('offset=1')
   expect(result.current.rows.map((r) => r.username)).toEqual(['u0', 'u1'])
+})
+
+test('your zone widens ten at a time on the side asked, and keeps the list', async () => {
+  ;(global.fetch as jest.Mock)
+    .mockResolvedValueOnce({ ok: true, json: async () => page(0) })
+    .mockResolvedValueOnce({ ok: true, json: async () => ({ ...page(0), rows: [], zone: [{ username: 'wide', rank: 1 }], zoneStart: 0 }) })
+  const { result } = renderHook(() => useRankings(view))
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  await act(() => result.current.widen('up'))
+  expect((global.fetch as jest.Mock).mock.calls[1][0]).toContain('above=12&below=2')
+  expect(result.current.zoneSize).toEqual({ above: 12, below: 2 })
+  expect(result.current.data?.zone.map((r) => r.username)).toEqual(['wide'])
+  expect(result.current.rows.map((r) => r.username)).toEqual(['u0'])
 })
 
 test('a failure is an error until retried', async () => {

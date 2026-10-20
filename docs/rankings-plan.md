@@ -128,7 +128,11 @@ verification. `/privacy` must say what is read during a check.
   platform; add a factor only if one drifts beyond ±10 % with real data.
 - **Arrows** (places moved since Monday) only on the global, all-time, every-platform view,
   and only once a Monday snapshot exists.
-- **Following without a podium** below 15 people; close rivals beside the global list.
+- **Following without a podium** below 15 people. The list shows 20 at a time; when you are not
+  in it, **your zone** below it (two above and below you, widened ten at a time) replaced the
+  "close rivals" panel (2026-10-20, the user's choice of three options). Each row has its last
+  8 weeks as a small line (`VaultSparkline`). Under your level, the five most active this week
+  (`RankingsPageHot`), with a way to the weekly ranking.
 - `show_in_rankings` is **not in the session** on purpose (unlike `show_presence`): it is read
   with the rankings, so a database without migration 040 breaks only the rankings.
 

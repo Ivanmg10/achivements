@@ -1,18 +1,19 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
-import { IconUser } from '@tabler/icons-react'
 import type { RankRow } from '@/app/api/rankings/route'
 import { useLanguage } from '@/context/LanguageContext'
+import { FadeImage } from '@/components/ui/FadeImage'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
 
 const SIZES = { sm: 'w-8 h-8', md: 'w-10 h-10', lg: 'w-14 h-14', xl: 'w-18 h-18' }
 const DOT = { sm: 'xs', md: 'sm', lg: 'md', xl: 'md' } as const
+const INITIAL = { sm: 'text-xs', md: 'text-sm', lg: 'text-lg', xl: 'text-2xl' }
 
 /**
  * Someone in the rankings: picture (with the green dot while they are online,
- * never on your own), name, and "You" in words on your own row. Signed in, the
+ * never on your own; a pulse while it loads, their initial without one or when
+ * it fails, as an uploaded one does signed out), name, and "You" in words on your own row. Signed in, the
  * name opens their profile; profiles need an account, so signed out it does not.
  */
 export default function RankingsPageUser({
@@ -39,15 +40,19 @@ export default function RankingsPageUser({
     </span>
   )
 
+  const initial = (
+    <span aria-hidden="true" className={`${SIZES[size]} ${INITIAL[size]} rounded-full bg-accent/15 text-accent font-bold ring-1 ring-accent/25 flex items-center justify-center select-none`}>
+      {row.username.charAt(0).toUpperCase()}
+    </span>
+  )
+
   return (
     <span className={`flex min-w-0 gap-2.5 ${stacked ? 'flex-col items-center text-center' : 'items-center'}`}>
       <span className="relative shrink-0">
         {row.avatar ? (
-          <Image src={row.avatar} alt="" width={72} height={72} className={`${SIZES[size]} rounded-full object-cover bg-bg-main`} unoptimized />
+          <FadeImage src={row.avatar} alt="" width={72} height={72} className={`${SIZES[size]} rounded-full`} fallback={initial} unoptimized />
         ) : (
-          <span aria-hidden="true" className={`${SIZES[size]} rounded-full bg-bg-main ring-1 ring-ink/10 flex items-center justify-center`}>
-            <IconUser size={16} className="text-text-secondary" />
-          </span>
+          initial
         )}
         {!row.isMe && <PresenceDot online={row.online} size={DOT[size]} announce />}
       </span>

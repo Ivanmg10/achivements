@@ -1,14 +1,22 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useVaultFillState } from '@/context/VaultFillContext'
 import type { RankingsResponse, RankRow } from '@/app/api/rankings/route'
 import type { RankPeriod, RankScope, RankSource } from '@/lib/rankings'
 
 export type RankingsView = { scope: RankScope; period: RankPeriod; source: RankSource }
+type ZoneSize = { above: number; below: number }
 
-async function request(view: RankingsView, offset: number): Promise<RankingsResponse | null> {
+/** "Your zone" starts with two on each side and widens ten at a time, up to fifty (the API's limit). */
+const ZONE: ZoneSize = { above: 2, below: 2 }
+const ZONE_STEP = 10
+export const ZONE_MAX = 50
+
+async function request(view: RankingsView, offset: number, zone: ZoneSize): Promise<RankingsResponse | null> {
   try {
-    const qs = new URLSearchParams({ scope: view.scope, period: view.period, source: view.source, offset: String(offset) })
+    const qs = new URLSearchParams({
+      scope: view.scope, period: view.period, source: view.source, offset: String(offset), above: String(zone.above), below: String(zone.below),
+    })
     const res = await fetch(`/api/rankings?${qs}`)
     if (!res.ok) throw new Error(`rankings ${res.status}`)
     const data = await res.json()
@@ -21,9 +29,10 @@ async function request(view: RankingsView, offset: number): Promise<RankingsResp
 }
 
 /**
- * One view of the rankings, fifty at a time: `more()` appends the next fifty.
- * Changing the view starts over. `error` when the first page could not be read;
- * a later page that fails only stops the list growing (and says so).
+ * One view of the rankings, twenty at a time: `more()` appends the next twenty,
+ * and `widen()` shows more of the viewer's zone above or below them. Changing
+ * the view starts over. `error` when the first page could not be read; a later
+ * page or a wider zone that fails only stops it growing (and says so).
  */
 export function useRankings(view: RankingsView, enabled = true) {
   const key = `${view.scope}|${view.period}|${view.source}`
@@ -34,6 +43,10 @@ export function useRankings(view: RankingsView, enabled = true) {
   const [moreFailed, setMoreFailed] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [attempt, setAttempt] = useState(0)
+  const [zoneSize, setZoneSize] = useState<ZoneSize>(ZONE)
+  const [widening, setWidening] = useState(false)
+  // The refresh after a fill keeps the zone as wide as it was, without asking again for every widening.
+  const zoneRef = useRef<ZoneSize>(ZONE)
   // After every pass of the viewer's fill, their row may have moved.
   const fillVersion = useVaultFillState()?.version ?? 0
 
@@ -43,13 +56,15 @@ export function useRankings(view: RankingsView, enabled = true) {
     setRows([])
     setFailed(false)
     setMoreFailed(false)
+    setZoneSize(ZONE)
   })
 
   useEffect(() => {
     if (!enabled) return
     let current = true
     const [scope, period, source] = key.split('|') as [RankScope, RankPeriod, RankSource]
-    request({ scope, period, source }, 0).then((res) => {
+    zoneRef.current = answered === key ? zoneRef.current : ZONE
+    request({ scope, period, source }, 0, zoneRef.current).then((res) => {
       if (!current) return
       setData(res)
       setRows(res?.rows ?? [])
@@ -59,6 +74,8 @@ export function useRankings(view: RankingsView, enabled = true) {
     return () => {
       current = false
     }
+    // `answered` only tells a refresh from a new view; it must not start a request of its own.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, enabled, attempt, fillVersion])
 
   const retry = useCallback(() => {
@@ -70,7 +87,7 @@ export function useRankings(view: RankingsView, enabled = true) {
     if (!data || loadingMore) return
     setLoadingMore(true)
     setMoreFailed(false)
-    const res = await request({ scope: data.scope, period: data.period, source: data.source }, rows.length)
+    const res = await request({ scope: data.scope, period: data.period, source: data.source }, rows.length, zoneRef.current)
     setLoadingMore(false)
     if (!res) {
       setMoreFailed(true)
@@ -78,6 +95,26 @@ export function useRankings(view: RankingsView, enabled = true) {
     }
     setRows((r) => [...r, ...res.rows])
   }, [data, rows.length, loadingMore])
+
+  const widen = useCallback(
+    async (side: 'up' | 'down') => {
+      if (!data || widening) return
+      const key = side === 'up' ? 'above' : 'below'
+      const next = { ...zoneRef.current, [key]: Math.min(ZONE_MAX, zoneRef.current[key] + ZONE_STEP) }
+      setWidening(true)
+      setMoreFailed(false)
+      const res = await request({ scope: data.scope, period: data.period, source: data.source }, 0, next)
+      setWidening(false)
+      if (!res) {
+        setMoreFailed(true)
+        return
+      }
+      zoneRef.current = next
+      setZoneSize(next)
+      setData((d) => (d ? { ...d, zone: res.zone, zoneStart: res.zoneStart } : d))
+    },
+    [data, widening],
+  )
 
   return {
     data,
@@ -89,5 +126,8 @@ export function useRankings(view: RankingsView, enabled = true) {
     hasMore: data !== null && rows.length < data.total,
     loadingMore,
     moreFailed,
+    widen,
+    widening,
+    zoneSize,
   }
 }

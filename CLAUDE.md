@@ -628,6 +628,16 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   or `CircularProgress` in the theme's colour; tiers have their own hue only on their badge.
 - Rankings are labelled **Beta** in the UI; drop the label when the user says so.
 
+## Follows: who you follow and who follows you (2026-10-20)
+
+- **Both lists are yours alone.** `/following` has two tabs, "Following" and "Followers"
+  (`#followers`, opened from the account page's counts); `GET /api/follows/overview?who=followers`
+  answers only for the signed-in user. Nobody else is ever shown who follows whom: do not add a
+  follower list or count to public profiles without asking. `/privacy` says so in all 9 languages
+  (changed 2026-10-20 at the user's request; before, followers were a number only).
+- **Public profiles only**, on both sides and in both counts (`/api/follows/count`): a private
+  profile drops out of the lists until it is public again.
+
 ## Achievement showcase vs achievements to get (2026-10-20)
 
 Two different things; do not mix them up again.
@@ -831,11 +841,18 @@ branch to be up to date with its base** before merging, on both.
   copies production again, losing what pre had); it is a copy of real data, so treat it like
   production. **Until the variable is set somewhere, that place still uses production**: check
   before running anything destructive.
-- **Demo users** for the rankings: `node scripts/demo-rankings.mjs seed [n] --follower=<username>`
-  (and `clear`). It writes only to `PREVIEW_DATABASE_URL` and refuses when that is missing or the
-  same host as `DATABASE_URL`. Never point it at production: `/rankings` is public. Seeded
-  2026-10-20 with 45 (`demo_*` plus five named ones the user chose; no sign-in, kept out of the
-  score refresh). Demo users are found by their password mark (`MARK`), never by name.
+- **Demo users** for the rankings and public profiles: `node scripts/demo-rankings.mjs seed
+  --follower=<username>` (and `clear`). It writes only to `PREVIEW_DATABASE_URL` and refuses when
+  that is missing or the same host as `DATABASE_URL`. Never point it at production: `/rankings` is
+  public. 30 hand-written personas (`scripts/demo-personas.mjs`, 2026-10-20; the five names the
+  user chose stay), each with a twin (another name and picture), so 60; their points are multiplied
+  by `SCALE` (30) so real users with big libraries are not all on top: no sign-in, kept out of the score refresh, found by their password mark
+  (`MARK`), never by name. Their Steam/PSN accounts are made up, so their profiles work by
+  **seeding `steam_cache`** under those accounts (never expiring) with real games' definitions
+  taken from what pre already has cached for real users; points come from the real formula. If
+  pre loses those cached games (a reset from production, an unlink), games drop out of the seed
+  (it warns). No RA (the dev server does not read RA's DB cache; a made-up RA name may be real).
+  PSN trophy lists only in English and Spanish.
 - Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
 
 ## Style

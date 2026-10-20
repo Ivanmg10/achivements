@@ -1,7 +1,10 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import type { RankRow } from '@/app/api/rankings/route'
 import { useLanguage } from '@/context/LanguageContext'
+import { PODIUM_CARD, PODIUM_DELAY, PODIUM_STEP } from '../rankingsMotion'
+import { CountUp } from '@/components/ui/CountUp'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import RankingsPageUser from '../rankings-page-user/RankingsPageUser'
 
@@ -20,17 +23,19 @@ export default function RankingsPagePodium({ rows, linked, approx = false }: { r
   const order = [2, 1, 3].map((place) => ({ place, row: rows[place - 1] as RankRow | undefined }))
 
   return (
-    <ol aria-label={T.rankings.title} className="grid grid-cols-3 gap-2 sm:gap-3 items-end">
+    <motion.ol initial="hidden" animate="show" aria-label={T.rankings.title} className="grid grid-cols-3 gap-2 sm:gap-3 items-end">
       {order.map(({ place, row: r }) =>
         !r ? (
           <li key={place} aria-hidden="true" className="flex flex-col items-center justify-end">
-            <span className={`w-full ${STEP[place]} rounded-t-xl bg-linear-to-b from-accent/15 to-transparent flex items-start justify-center pt-1.5 text-sm sm:text-base font-extrabold text-accent/50 tabular-nums`}>
+            <motion.span variants={PODIUM_STEP} custom={place} className={`w-full origin-bottom ${STEP[place]} rounded-t-xl bg-linear-to-b from-accent/15 to-transparent flex items-start justify-center pt-1.5 text-sm sm:text-base font-extrabold text-accent/50 tabular-nums`}>
               {place}
-            </span>
+            </motion.span>
           </li>
         ) : (
-        <li
+        <motion.li
           key={r.username}
+          variants={PODIUM_CARD}
+          custom={place}
           className={`relative bg-bg-card rounded-2xl sm:rounded-3xl pt-4 sm:pt-5 px-2 sm:px-4 flex flex-col items-center gap-2 overflow-hidden ${r.isMe ? 'ring-2 ring-accent/50' : ''}`}
         >
           <span aria-hidden="true" className={`absolute inset-0 pointer-events-none ${GLOW[r.rank] ?? GLOW[3]}`} />
@@ -41,18 +46,20 @@ export default function RankingsPagePodium({ rows, linked, approx = false }: { r
             </RankingsPageUser>
             <span className="text-lg sm:text-2xl font-extrabold tracking-tight tabular-nums">
               {r.isMe && approx && <span className="text-warning" title={T.rankings.fillApprox}>≈ </span>}
-              {r.points.toLocaleString(lang)} <span className="text-[11px] font-semibold text-text-secondary">{T.rankings.vp}</span>
+              <CountUp value={r.points} locale={lang} duration={1.2} delay={0.3 + (PODIUM_DELAY[place] ?? 0)} /> <span className="text-[11px] font-semibold text-text-secondary">{T.rankings.vp}</span>
             </span>
           </span>
-          <span
-            className={`relative w-full ${STEP[r.rank] ?? STEP[3]} rounded-t-xl bg-linear-to-b from-accent/30 to-accent/5 flex items-start justify-center pt-1.5 text-sm sm:text-base font-extrabold text-accent tabular-nums`}
+          <motion.span
+            variants={PODIUM_STEP}
+            custom={place}
+            className={`relative w-full origin-bottom ${STEP[r.rank] ?? STEP[3]} rounded-t-xl bg-linear-to-b from-accent/30 to-accent/5 flex items-start justify-center pt-1.5 text-sm sm:text-base font-extrabold text-accent tabular-nums`}
           >
             <span className="sr-only">{T.rankings.colRank}</span>
             {r.rank}
-          </span>
-        </li>
+          </motion.span>
+        </motion.li>
         ),
       )}
-    </ol>
+    </motion.ol>
   )
 }
