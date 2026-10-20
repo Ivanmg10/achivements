@@ -1,9 +1,11 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/apiAuth', () => ({ requireSession: jest.fn() }))
+jest.mock('@/lib/scoreRefresh', () => ({ refreshScoreIfStale: jest.fn() }))
 
 import { POST } from './route'
 import pool from '@/lib/db'
 import { requireSession } from '@/lib/apiAuth'
+import { refreshScoreIfStale } from '@/lib/scoreRefresh'
 
 const query = pool.query as jest.Mock
 
@@ -20,6 +22,12 @@ test('marks the signed-in user as seen now, at most once a minute', async () => 
   expect(sql).toContain('last_seen_at = now()')
   expect(sql).toContain("interval '1 minute'")
   expect(params).toEqual(['3'])
+})
+
+test('refreshes the Vault Points of whoever is on the site, after answering', async () => {
+  query.mockResolvedValue({ rowCount: 1 })
+  await POST()
+  expect(refreshScoreIfStale).toHaveBeenCalledWith('3')
 })
 
 test('signed out, nothing is written; a failure is a 500', async () => {

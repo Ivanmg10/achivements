@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/authOptions'
 import { requireSession } from '@/lib/apiAuth'
 import { presenceColumns } from '@/lib/presence'
 import { canUseXbox } from '@/utils/xboxAccess'
+import { vaultTotalsOrNone } from '@/lib/rankings'
 
 /**
  * The people you follow as the Friends section's cards show them, from our
@@ -21,7 +22,7 @@ export async function GET() {
     // Xbox is admin-only for now: to anyone else it is not there at all (see canUseXbox).
     const xbox = canUseXbox((await getServerSession(authOptions))?.user?.admin)
     const { rows } = await pool.query(
-      `SELECT u.username, u.avatar, u.location, LEFT(u.description, 120) AS description,
+      `SELECT u.id, u.username, u.avatar, u.location, LEFT(u.description, 120) AS description,
               u.rausername IS NOT NULL AS ra, u.steamid IS NOT NULL AS steam, u.psnaccountid IS NOT NULL AS psn,
               (u.xboxxuid IS NOT NULL AND $2::boolean) AS xbox,
               ${presenceColumns('u')},
@@ -43,7 +44,9 @@ export async function GET() {
        ORDER BY f.created_at DESC`,
       [auth.id, xbox],
     )
-    return NextResponse.json(rows)
+    // Their Vault Points, for the level on each card; ids stay on the server.
+    const vault = await vaultTotalsOrNone(rows.map((r: { id: number }) => r.id), xbox)
+    return NextResponse.json(rows.map(({ id, ...r }: { id: number }) => ({ ...r, vaultPoints: vault.get(id) ?? null })))
   } catch (err) {
     console.error('[follows/overview GET]', err)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })

@@ -2,6 +2,7 @@ jest.mock('@/lib/apiAuth', () => ({ dataOwner: jest.fn() }))
 jest.mock('@/lib/publicUser', () => ({ findPublicUser: jest.fn(), hiddenGameKeys: jest.fn() }))
 jest.mock('@/lib/groupList', () => ({ listGroups: jest.fn() }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
+jest.mock('@/lib/rankings', () => ({ vaultTotalsOrNone: jest.fn(async (ids: number[]) => new Map(ids.map((id) => [id, 1234]))) }))
 
 import { GET } from './route'
 import { dataOwner } from '@/lib/apiAuth'
@@ -46,7 +47,7 @@ test('returns who they are and which platforms they have, and nothing private', 
     // A PSN name with no linked account is a leftover, not a link.
     steamName: 'ivan_st', psnName: null, xboxName: null, isSelf: false, theme: 'dark', gender: null,
     favorites: { ra: ROW.favorite_game, steam: null, psn: null, xbox: null },
-    hiddenGames: ['ra:9'], groups: [GROUP], following: false,
+    hiddenGames: ['ra:9'], groups: [GROUP], following: false, vaultPoints: 1234,
   })
 })
 

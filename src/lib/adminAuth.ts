@@ -110,6 +110,7 @@ export type AdminAction =
   | 'unlink-xbox'
   | 'psn-token'
   | 'xbox-lookup'
+  | 'ranking-flag'
 
 /** How long the action log is kept. */
 const ACTION_LOG_DAYS = 365

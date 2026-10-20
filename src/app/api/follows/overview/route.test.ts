@@ -1,6 +1,7 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/apiAuth', () => ({ requireSession: jest.fn() }))
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
+jest.mock('@/lib/rankings', () => ({ vaultTotalsOrNone: jest.fn(async () => new Map([[5, 900]])) }))
 
 import { GET } from './route'
 import pool from '@/lib/db'
@@ -15,9 +16,10 @@ beforeEach(() => {
 })
 
 test('the people you follow with their favourites, showcase and public groups, from our data only', async () => {
-  query.mockResolvedValue({ rows: [{ username: 'ivan' }] })
+  query.mockResolvedValue({ rows: [{ id: 5, username: 'ivan' }, { id: 6, username: 'ana' }] })
   const res = await GET()
-  expect(res.data).toEqual([{ username: 'ivan' }])
+  // Their Vault Points ride along; their ids do not leave the server.
+  expect(res.data).toEqual([{ username: 'ivan', vaultPoints: 900 }, { username: 'ana', vaultPoints: null }])
   const [sql, params] = query.mock.calls[0]
   expect(sql).toContain('u.profile_public')
   // The showcase, never the pinned goals.

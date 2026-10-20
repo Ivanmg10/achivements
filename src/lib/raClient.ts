@@ -56,6 +56,12 @@ export function getUserCompletedGames(username: string, apiKey: string) {
   return fetchRA(`${BASE}/API_GetUserCompletedGames.php?${qs({ u: username, y: apiKey })}`)
 }
 
+// Every game the user has progress in, up to 500 a page, with the date of the
+// last unlock in each (MostRecentAwardedDate): what tells the score which games moved.
+export function getUserCompletionProgress(username: string, apiKey: string, offset = 0, count = 500) {
+  return fetchRA(`${BASE}/API_GetUserCompletionProgress.php?${qs({ u: username, y: apiKey, o: offset, c: count })}`)
+}
+
 export function getUserAwards(username: string, apiKey: string) {
   return fetchRA(`${BASE}/API_GetUserAwards.php?${qs({ u: username, y: apiKey })}`)
 }
