@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 import Image, { type ImageProps } from 'next/image'
 
 /**
@@ -12,12 +12,13 @@ import Image, { type ImageProps } from 'next/image'
  * picture fills it. `placeholderClassName` applies only while loading, for
  * images whose height comes from the picture itself (give them an aspect
  * ratio to stand in until then). An image that fails keeps the placeholder,
- * still, instead of a broken icon.
+ * still, instead of a broken icon, or shows `fallback` in its place if given.
  */
 export function FadeImage({
   className = '',
   imgClassName = 'w-full h-full object-cover',
   placeholderClassName = '',
+  fallback,
   alt,
   ...props
 }: Omit<ImageProps, 'className'> & {
@@ -25,6 +26,8 @@ export function FadeImage({
   /** Classes for the picture itself; it fills the box by default. */
   imgClassName?: string
   placeholderClassName?: string
+  /** Shown instead of the box when the picture fails (an avatar's initial, say). */
+  fallback?: ReactNode
 }) {
   const [state, setState] = useState<'loading' | 'loaded' | 'failed'>('loading')
 
@@ -32,6 +35,8 @@ export function FadeImage({
   const ref = useCallback((img: HTMLImageElement | null) => {
     if (img?.complete && img.naturalWidth > 0) setState('loaded')
   }, [])
+
+  if (state === 'failed' && fallback) return fallback
 
   return (
     <span

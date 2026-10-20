@@ -25,6 +25,16 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Rankings avatars load gracefully (`chore/demo-personas`)
+
+**Did** — `RankingsPageUser` draws pictures through `FadeImage` (a pulse in the circle while
+loading, then a fade-in) and shows the user's initial, in the theme's accent, when there is no
+picture or it fails. `FadeImage` gained a `fallback` prop for that.
+**Why** — The user found the cold load cheap-looking: empty circles, then pictures popping in.
+Signed out, uploaded avatars (`/api/avatar/…`, sign-in only) answered 401 and stayed empty.
+**Open** — Other lists of users (Following, search, compare) still use a plain image; move them
+to the same pattern if the user wants it everywhere.
+
 ## 2026-10-20 — Demo personas with full profiles (`chore/demo-personas`)
 
 **Did** — The 45 `demo_*` users are now 30 hand-written personas (`scripts/demo-personas.mjs`:
