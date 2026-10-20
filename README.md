@@ -64,7 +64,7 @@ npm run dev
 ```
 
 **Every variable is explained in [`.env.example`](.env.example).** The minimum
-to boot is `NEXTAUTH_URL`, `NEXTAUTH_SECRET` and `DATABASE_URL`; each
+to boot is `NEXTAUTH_URL`, `NEXTAUTH_SECRET` and `DATABASE_URL` (or `PREVIEW_DATABASE_URL`, a Neon branch for pre and local work, which wins outside production); each
 integration switches itself off (and says so in the UI) when its keys are
 missing:
 

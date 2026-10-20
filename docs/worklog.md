@@ -25,6 +25,18 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — A database of its own for pre (`feat/social-rankings`)
+
+**Did** — `src/lib/db.js` reads `PREVIEW_DATABASE_URL` before `DATABASE_URL`, except in production
+(`VERCEL_ENV`), so `develop` and local work can use a Neon branch of production (`preview`).
+Documented in `.env.example`, README and CLAUDE.md (Environments).
+**Why** — The user wants a pre that does not touch production (and fake users to test the
+rankings with). The Neon integration owns `DATABASE_URL` for all environments, and Vercel refused
+a branch-scoped `DATABASE_URL` for `develop` ("already exists for production, preview, development").
+**Open** — The user creates the Neon branch and sets `PREVIEW_DATABASE_URL` (Vercel: Preview →
+develop; and `.env.local`), then redeploys develop. Until then nothing changes. Then: a seed
+script for demo users, run only against the branch.
+
 ## 2026-10-20 — Fill stuck at 99 %, a history chart, the guide in nine languages (`feat/social-rankings`)
 
 **Did** — The user's fill stayed at "Calculating 99 %": Steam answers HTTP 500 every time for two

@@ -805,10 +805,15 @@ branch to be up to date with its base** before merging, on both.
 - A `develop` → `main` PR needs `develop` to contain `main`; after a hotfix, merge
   `main` back into `develop` first (as the flow above already says).
 
-- **`develop` shares the production database** (the Neon integration's `DATABASE_URL`),
-  by the user's choice for now. So testing on develop touches real data: **never run a
-  destructive or hard-to-reverse migration, or bulk script, "just to try it on develop".**
-  Ask first; the fix is a separate Neon database for Preview.
+- **Pre has its own database (2026-10-20):** a Neon branch of production, `preview`, read through
+  `PREVIEW_DATABASE_URL` (`databaseUrl()` in `src/lib/db.js`), set in Vercel for Preview, branch
+  `develop`, and in `.env.local`. It exists because the Neon integration owns `DATABASE_URL` for
+  every environment and Vercel refuses a branch-scoped second one. Production ignores it whatever
+  is set (`VERCEL_ENV`). Consequences: **every migration is applied twice** (pre first, production
+  when the work reaches `main`); the branch drifts from production (Neon's "Reset from parent"
+  copies production again, losing what pre had); it is a copy of real data, so treat it like
+  production. **Until the variable is set somewhere, that place still uses production**: check
+  before running anything destructive.
 - Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
 
 ## Style
