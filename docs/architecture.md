@@ -35,7 +35,7 @@ page (src/app/(main)/…)            client component
 | Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}`, `admin/xbox`, `admin/xbox/achievements` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
-| Rankings | `rankings` (public), `rankings/me`, `admin/rankings` | Read stored scores only; see Vault Points below |
+| Rankings | `rankings` (public), `rankings/me`, `rankings/fill`, `admin/rankings` | Read stored scores; `fill` runs a pass. See Vault Points below |
 | Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | |
 | Admin | `admin/*` | Every one starts with `requireAdmin(req)` |
 | Cron | `cron/sweepCache` (04:00), `cron/scores` (05:00), `cron/psnToken` (09:00) | Scheduled in `vercel.json`, need `CRON_SECRET` |
@@ -70,8 +70,12 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
    once (RA `GetUserCompletionProgress`, Steam owned games, `psnTitles`,
    `xboxLibrary`), and reads again only games whose last unlock moved
    (`change_key`), a few per run per platform (`READS`); the rest score
-   provisionally from the list. Triggered after the presence heartbeat when a
-   score is 6 h old (`after()` in `/api/presence`), and by `/api/cron/scores`.
+   provisionally from the list. Each platform at its measured pace (`PACE`; PSN
+   also under an app-wide budget in `attemptLimit`). Triggered when a platform is
+   linked (`onPlatformLinked`), by the client while the fill is unfinished
+   (`useVaultFill` in `VaultFillProvider` → `POST /api/rankings/fill`), after the
+   presence heartbeat when a score is 6 h old, and by `/api/cron/scores`. Progress
+   is kept in `steam_cache` (`score:fill:<user>`) for the screens.
 2. **Formula** — `src/utils/vaultScore.ts` (pure), fed by the per-platform
    mappers in `src/utils/vaultScoreInputs.ts`; levels in `src/utils/vaultLevel.ts`.
 3. **Storage** — `score_games` (one row per game, points before the stack

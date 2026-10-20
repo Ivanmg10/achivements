@@ -25,6 +25,31 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Points at once when a platform is linked, and a guide (`feat/social-rankings`)
+
+**Did** — The fill of a new account no longer waits for heartbeats: `onPlatformLinked` (in the
+RA, Steam, PSN and Xbox link routes) marks the platform "calculating" and runs a pass right after
+the answer; `useVaultFill` (`VaultFillProvider` in `MainProviders`) asks `POST /api/rankings/fill`
+for pass after pass until it is complete, polling `GET` for progress. Each platform is read at a
+measured pace (`PACE` in `scoreRefresh`; PSN gentle, with an app-wide `psn-score` budget in
+`attemptLimit`), and errors are classified (`private`, `key`, `busy`, `unavailable`). Progress
+shows in the header (a ring), each platform card (`VaultFillLine`), the account page and the
+rankings panel (`VaultFillProgress`); the viewer's points carry "≈"; toasts when ready or when a
+platform fails. Also fixed: the viewer's own rankings row is read fresh (it came from a 5-minute
+cache). New public page `/rankings/how` ("How Vault Points work", EN/ES in
+`src/translations/vaultGuide.ts`, numbers from the formula; examples shared with the balance
+tests in `src/utils/vaultExamples.ts`); the rankings' "how points work" now links to it (the
+modal is gone).
+**Why** — The user disliked a fill that took an hour unseen ("if I sign up I expect to be in the
+rankings at once"), asked to be careful with PSN, and wanted the explanation of the weighting
+for users.
+**Decisions** — Measured before choosing paces (numbers in the plan). Progress kept in
+`steam_cache` rather than a migration. "Ready" toasts only for a fill that was pending, never a
+6-hourly refresh. Xbox's estimate counts as settled. The guide follows the public pages' rule
+(EN/ES outside `T`).
+**Open** — Not tried in a browser. RA per-key vs per-IP limit unknown. If PSN starts answering
+"too many requests" in production, lower `PACE.psn` or the `psn-score` budget.
+
 ## 2026-10-20 — Vault Points and the rankings, a beta (`feat/social-rankings`)
 
 **Did** — Built the whole plan in `docs/rankings-plan.md`:

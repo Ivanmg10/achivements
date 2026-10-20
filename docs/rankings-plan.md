@@ -132,6 +132,19 @@ verification. `/privacy` must say what is read during a check.
 - `show_in_rankings` is **not in the session** on purpose (unlike `show_presence`): it is read
   with the rankings, so a database without migration 040 breaks only the rankings.
 
+## The first fill (2026-10-20, after the beta)
+
+The user wanted a new account to see itself in the rankings at once, and to be told what is
+happening. Measured that day with the user's own libraries (read-only): Steam 8 at once, 29
+games/s, no error; PSN 4 at once, 10 games/s, no error; RA a burst of ~7 then 429 without
+Retry-After, 0 errors at one call every 250 ms, 5 of 20 at every 120 ms. Hence `PACE` (PSN kept
+below what was measured: it is one account for everyone). A typical new account (190 Steam, 35
+RA, 21 PSN games) is fully read in ~15 s; 500 RA games take ~3.5 min, with "≈" estimates
+meanwhile. Mockups shared as a Claude artifact ("Cálculo de Puntos Vault").
+
+Open: whether RA's limit is per key or per IP (if per IP, fills running at once share it); PSN's
+real limit is unknown (the budget follows PSNAWP's self-imposed 300 calls / 15 min in spirit).
+
 ## Data and computation (summary)
 
 - `migrations/040`: `score_games` (user, source, game; points, provisional, completed, earned,

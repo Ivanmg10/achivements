@@ -574,16 +574,35 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   third of a demanding one) must keep passing. Change a number → bump `RULES_VERSION`.
   Do not weigh native values (gamerscore, grades, RA points) more than the 25 % they have:
   that is what made platforms unequal in the tests.
-- **Scores are computed ahead, never on a read.** `scoreRefresh` runs after the presence
-  heartbeat (6 h freshness) and from `/api/cron/scores` (daily, plus the Monday snapshot).
-  The rankings routes only read `score_games`/`score_periods`; do not call a platform from them.
+- **Scores are computed ahead, never on a read.** `scoreRefresh` runs right after a platform is
+  linked (`onPlatformLinked` in the four link routes), in back-to-back passes while the user has
+  the site open (`useVaultFill` → `POST /api/rankings/fill`, up to 90 s each), after the presence
+  heartbeat (6 h freshness) and from `/api/cron/scores` (daily, plus the Monday snapshot). One
+  pass at a time per user: every trigger claims `users.score_refreshed_at` first. The rankings
+  routes only read `score_games`/`score_periods`; do not call a platform from them.
+- **Each platform is read at the pace measured on 2026-10-20 (`PACE`), not faster:** Steam 8 at
+  once (29 games/s, no error); RA one at a time, 300 ms apart (a burst of ~7 gets 429 **with no
+  Retry-After**; one every 250 ms never failed); **PSN gently**, because it is one app account for
+  everyone: 2 at once, 100 games a pass, and 300 games every 15 minutes for the whole app
+  (`allowAttempt('psn-score', 'app')`), stopping the pass at Sony's "too many requests"; Xbox 5 a
+  pass (150 calls an hour for the app). Raising any of these needs a new measurement.
+- **The fill is shown, never silent.** Its progress per platform is kept in `steam_cache`
+  (`score:fill:<user>`; `FillStatus`, no migration); the header, the account page, each platform's
+  card (`VaultFillLine`) and the rankings show it, the viewer's own points carry "≈" until read, a
+  finished fill toasts "ready" (only a fill that was pending, never a routine refresh) and a
+  platform that failed says why (private profile, refused key) and how to fix it.
+- **"How Vault Points work" (`/rankings/how`, public)** explains it to users. Its prose is in
+  `src/translations/vaultGuide.ts`, English and Spanish only like the public pages; every number
+  on it (rarity and difficulty tables, examples, level thresholds) is computed from the formula
+  and the examples are the same ones the balance tests use (`src/utils/vaultExamples.ts`). If the
+  formula changes, reread its prose.
 - **Who is listed**: public profile and `show_in_rankings` (Preferences → General; not in the
   session on purpose, see the plan). Hidden games and unticked consoles do not score. A game
   counts only for the account linked now, never while flagged `suspect` (Steam unlock tool;
   admins review it in the panel, logged as `ranking-flag`). Xbox scores only for admins.
 - **No ownership verification, by the user's choice (2026-10-20)**: an account linked by two
   users scores for both. The analysis of how to verify is in the plan, for later.
-- **`/rankings` is public** (`PUBLIC_PATHS` in the proxy, in the sitemap). Signed out: the
+- **`/rankings` and `/rankings/how` are public** (`PUBLIC_PATHS` in the proxy, in the sitemap). Signed out: the
   global list only, no presence (the privacy policy promises it only to signed-in users),
   no profile links. Responses never carry user ids and are never shared-cached.
 - **A level shown for another user reads `vaultTotals`/`vaultTotalsOrNone`** (same rules as the
