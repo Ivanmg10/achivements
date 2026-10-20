@@ -64,14 +64,14 @@ async function gameRows(scope: RankScope | 'self', viewerId: number, xbox: boole
   )
 }
 
-async function periodRows(period: Exclude<RankPeriod, 'all'>, xbox: boolean, now: Date): Promise<PeriodRow[]> {
+async function periodRows(period: Exclude<RankPeriod, 'all'>, xbox: boolean, now: Date, userId?: number): Promise<PeriodRow[]> {
   const kind = period === 'week' ? 'w' : 'm'
   const start = period === 'week' ? weekStart(now) : monthStart(now)
   return queryRows<PeriodRow>(
     `SELECT user_id AS id, source, SUM(points)::int AS points FROM score_periods
-     WHERE kind = $1 AND start = $2::date AND ($3::boolean OR source <> 'xbox')
+     WHERE kind = $1 AND start = $2::date AND ($3::boolean OR source <> 'xbox') AND ($4::int IS NULL OR user_id = $4)
      GROUP BY user_id, source`,
-    [kind, start, xbox],
+    [kind, start, xbox, userId ?? null],
   )
 }
 
@@ -115,33 +115,42 @@ export function rankEntries(rows: GameRow[], periods: PeriodRow[] | null, source
   return [...ranked, ...list.filter((u) => !u.listed)]
 }
 
-/** Global lists are the same for everyone with the same view: kept briefly per instance. */
+/** What the global lists are built from, the same for everyone: kept briefly per instance. */
 const GLOBAL_TTL_MS = 5 * 60 * 1000
-const globalCache = new Map<string, { at: number; entries: RankEntry[] }>()
+const globalCache = new Map<string, { at: number; rows: unknown }>()
+
+async function cached<T>(key: string, load: () => Promise<T>): Promise<T> {
+  const hit = globalCache.get(key)
+  if (hit && Date.now() - hit.at < GLOBAL_TTL_MS) return hit.rows as T
+  const rows = await load()
+  globalCache.set(key, { at: Date.now(), rows })
+  return rows
+}
 
 export async function loadRanking(opts: { scope: RankScope; period: RankPeriod; source: RankSource; viewerId: number | null; xbox: boolean; now?: Date }): Promise<RankEntry[]> {
   const { scope, period, source, xbox } = opts
   const now = opts.now ?? new Date()
   const viewer = opts.viewerId ?? -1
-  const periods = period === 'all' ? null : periodRows(period, xbox, now)
 
-  if (scope === 'following') return rankEntries(await gameRows('following', viewer, xbox), periods && (await periods), source)
-
-  const key = `${period}|${source}|${xbox}|${period === 'week' ? weekStart(now) : monthStart(now)}`
-  const hit = globalCache.get(key)
-  let entries: RankEntry[]
-  if (hit && Date.now() - hit.at < GLOBAL_TTL_MS) entries = hit.entries
-  else {
-    entries = rankEntries(await gameRows('global', -1, xbox), periods && (await periods), source)
-    globalCache.set(key, { at: Date.now(), entries })
+  if (scope === 'following') {
+    const [rows, periods] = await Promise.all([gameRows('following', viewer, xbox), period === 'all' ? null : periodRows(period, xbox, now)])
+    return rankEntries(rows, periods, source)
   }
-  if (viewer < 0 || entries.some((e) => e.id === viewer)) return entries
-  // The viewer is not listed (private, opted out, or nothing scored yet): rank them apart.
-  const own = rankEntries(await gameRows('self', viewer, xbox), periods && (await periods), source).find((e) => e.id === viewer)
-  if (!own) return entries
-  const listed = own.listed && own.points > 0
-  const rank = own.points > 0 ? 1 + entries.filter((e) => e.points > own.points).length : 0
-  return [...entries, { ...own, listed, rank }]
+
+  const start = period === 'week' ? weekStart(now) : monthStart(now)
+  const [rows, periods] = await Promise.all([
+    cached(`g|${xbox}`, () => gameRows('global', -1, xbox)),
+    period === 'all' ? null : cached(`p|${period}|${start}|${xbox}`, () => periodRows(period, xbox, now)),
+  ])
+  if (viewer < 0) return rankEntries(rows, periods, source)
+  // Everyone else may be a few minutes old; the viewer's own row is always read now, so their
+  // points move as soon as a refresh lands (and an unlisted viewer still learns where they stand).
+  const [own, ownPeriods] = await Promise.all([gameRows('self', viewer, xbox), period === 'all' ? null : periodRows(period, xbox, now, viewer)])
+  return rankEntries(
+    [...rows.filter((r) => r.id !== viewer), ...own],
+    periods && [...periods.filter((p) => p.id !== viewer), ...(ownPeriods ?? [])],
+    source,
+  )
 }
 
 /** Where each listed user stood at the start of this week (global, all time, no Xbox). */

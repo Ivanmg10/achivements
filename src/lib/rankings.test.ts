@@ -64,7 +64,22 @@ describe('loadRanking', () => {
     const list = await loadRanking({ scope: 'following', period: 'week', source: 'all', viewerId: 1, xbox: false, now: new Date('2026-10-21T00:00:00Z') })
     expect(list[0].points).toBe(70)
     const periodCall = query.mock.calls.find(([sql]) => sql.includes('score_periods'))!
-    expect(periodCall[1]).toEqual(['w', '2026-10-19', false])
+    expect(periodCall[1]).toEqual(['w', '2026-10-19', false, null])
+  })
+})
+
+describe('loadRanking, global', () => {
+  it('keeps everyone else cached a few minutes, but reads the viewer anew every time', async () => {
+    query
+      .mockResolvedValueOnce({ rows: [row(1, 'ana', 'ra', 900), row(7, 'me', 'psn', 100)] })
+      .mockResolvedValueOnce({ rows: [row(7, 'me', 'psn', 100)] })
+      .mockResolvedValueOnce({ rows: [row(7, 'me', 'psn', 100), row(7, 'me', 'steam', 900)] })
+    const opts = { scope: 'global' as const, period: 'all' as const, source: 'all' as const, viewerId: 7, xbox: true, now: new Date('2031-01-01') }
+    expect((await loadRanking(opts)).find((e) => e.id === 7)?.points).toBe(100)
+    // Steam landed since: the global list comes from the cache, the viewer's row from the database.
+    const again = await loadRanking(opts)
+    expect(query).toHaveBeenCalledTimes(3)
+    expect(again.map((e) => [e.username, e.points, e.rank])).toEqual([['me', 1000, 1], ['ana', 900, 2]])
   })
 })
 
