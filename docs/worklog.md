@@ -25,6 +25,26 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — A profile's public card and link preview (`feat/profile-og-image`)
+
+**Did** — Signed out, `/user/<name>` shows a card (`ProfileTeaser`: picture or initial, level,
+Vault Points, split per platform, games at 100 %, achievements, "Create an account" and "See the
+rankings") inside `PublicShell`, and the link preview is a per-profile image
+(`user/[username]/opengraph-image.tsx`) plus title and description (`generateMetadata`). All of it
+from `profileTeaser` (`src/lib/rankings.ts`). The proxy opens `/user/<name>` and its image. Names in
+the signed-out rankings now link to that card. One string, `rankings.profileTeaser`, in 9 languages.
+**Why** — To promote the site: a shared profile link was redirected to `/authPage` (Discord's and
+Reddit's crawlers too), so every preview was the generic card.
+**Decisions** — The user chose a teaser over a fully public profile. It shows only what the
+public rankings already show and only for users listed there (public profile and
+`show_in_rankings`), so `/privacy` did not change; a private or opted-out user and a missing one
+both 404. Uploaded pictures stay signed-in only (the card shows the initial); the preview never
+fetches a pasted avatar link (SSRF), so it always shows the initial.
+**Open** — The route's `loading.tsx` (the full profile's skeleton) flashes before the card for a
+visitor; harmless, a lighter skeleton if it bothers. Check the preview on Discord or
+opengraph.xyz once deployed.
+---
+
 ## 2026-10-20 — See who follows you (`feat/rankings-zone-and-personas`)
 
 **Did** — `/following` has tabs (`FollowingTabs`): Following and Followers (`#followers`, read

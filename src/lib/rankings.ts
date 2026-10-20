@@ -1,6 +1,7 @@
 import pool from '@/lib/db'
 import { queryRows } from '@/lib/queryRows'
 import { presenceColumns } from '@/lib/presence'
+import { isUploadedAvatar } from '@/lib/avatarImage'
 import type { GameSource } from '@/types/steam'
 import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
 
@@ -222,6 +223,46 @@ export async function vaultTotalsOrNone(userIds: number[], xbox: boolean): Promi
     console.error('[rankings] totals', err)
     return new Map()
   }
+}
+
+export type ProfileTeaser = {
+  username: string
+  avatar: string | null
+  /** All time, without Xbox: what the level is read from. */
+  points: number
+  split: Partial<Record<GameSource, number>>
+  completed: number
+  achievements: number
+}
+
+/**
+ * What anyone, signed out, may see of a user: what the public rankings already
+ * show of them, so only someone listed there (public profile, not opted out).
+ * Null for anyone else, so a private profile and a missing one look the same.
+ */
+export async function profileTeaser(username: string): Promise<ProfileTeaser | null> {
+  const rows = await queryRows<{ username: string; avatar: string | null; source: GameSource | null; points: number | null; completed: number; achievements: number }>(
+    `SELECT u.username, u.avatar, g.source, SUM(g.points * g.stack_factor)::float AS points,
+            COUNT(g.*) FILTER (WHERE g.completed)::int AS completed, COALESCE(SUM(g.earned), 0)::int AS achievements
+     FROM users u
+     LEFT JOIN score_games g ON g.user_id = u.id AND g.flag IS DISTINCT FROM 'suspect' AND g.source <> 'xbox' AND ${LINKED_ACCOUNT}
+     WHERE LOWER(u.username) = LOWER($1) AND u.profile_public AND u.show_in_rankings
+     GROUP BY u.username, u.avatar, g.source`,
+    [username],
+  )
+  if (rows.length === 0) return null
+  // An uploaded picture is served only to signed-in users; the teaser is for those who are not.
+  const avatar = isUploadedAvatar(rows[0].avatar) ? null : rows[0].avatar
+  const teaser: ProfileTeaser = { username: rows[0].username, avatar, points: 0, split: {}, completed: 0, achievements: 0 }
+  for (const r of rows) {
+    if (!r.source) continue
+    teaser.split[r.source] = Math.round(r.points ?? 0)
+    teaser.points += r.points ?? 0
+    teaser.completed += r.completed
+    teaser.achievements += r.achievements
+  }
+  teaser.points = Math.round(teaser.points)
+  return teaser
 }
 
 export type Presence = { online: boolean; lastSeenAt: string | null }

@@ -13,8 +13,8 @@ const INITIAL = { sm: 'text-xs', md: 'text-sm', lg: 'text-lg', xl: 'text-2xl' }
 /**
  * Someone in the rankings: picture (with the green dot while they are online,
  * never on your own; a pulse while it loads, their initial without one or when
- * it fails, as an uploaded one does signed out), name, and "You" in words on your own row. Signed in, the
- * name opens their profile; profiles need an account, so signed out it does not.
+ * it fails, as an uploaded one does signed out), name, and "You" in words on your own row. The name
+ * opens their profile (signed out, its public card: ProfileTeaser).
  */
 export default function RankingsPageUser({
   row,

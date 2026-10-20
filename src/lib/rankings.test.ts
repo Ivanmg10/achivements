@@ -1,7 +1,7 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
 import pool from '@/lib/db'
-import { loadRanking, rankEntries, takeWeeklySnapshot, vaultTotals, vaultTotalsOrNone, weekStartRanks } from './rankings'
+import { loadRanking, profileTeaser, rankEntries, takeWeeklySnapshot, vaultTotals, vaultTotalsOrNone, weekStartRanks } from './rankings'
 
 const query = pool.query as jest.Mock
 
@@ -118,5 +118,31 @@ describe('vaultTotals', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {})
     query.mockRejectedValue(new Error('no table'))
     expect(await vaultTotalsOrNone([4], false)).toEqual(new Map())
+  })
+})
+
+describe('profileTeaser', () => {
+  it('adds up the platforms of a listed user', async () => {
+    query.mockResolvedValue({ rows: [
+      { username: 'Ana', avatar: null, source: 'ra', points: 100.4, completed: 2, achievements: 50 },
+      { username: 'Ana', avatar: null, source: 'psn', points: 20.4, completed: 1, achievements: 10 },
+    ] })
+    expect(await profileTeaser('ana')).toEqual({ username: 'Ana', avatar: null, points: 121, split: { ra: 100, psn: 20 }, completed: 3, achievements: 60 })
+    expect(query.mock.calls[0][0]).toContain('u.profile_public AND u.show_in_rankings')
+  })
+
+  it('shows a listed user with no points yet at zero', async () => {
+    query.mockResolvedValue({ rows: [{ username: 'Ana', avatar: null, source: null, points: null, completed: 0, achievements: 0 }] })
+    expect(await profileTeaser('ana')).toEqual({ username: 'Ana', avatar: null, points: 0, split: {}, completed: 0, achievements: 0 })
+  })
+
+  it('leaves out an uploaded picture, which a visitor without an account cannot load', async () => {
+    query.mockResolvedValue({ rows: [{ username: 'Ana', avatar: '/api/avatar/3-1', source: null, points: null, completed: 0, achievements: 0 }] })
+    expect((await profileTeaser('ana'))?.avatar).toBeNull()
+  })
+
+  it('is null for a private, opted-out or missing user', async () => {
+    query.mockResolvedValue({ rows: [] })
+    expect(await profileTeaser('ghost')).toBeNull()
   })
 })

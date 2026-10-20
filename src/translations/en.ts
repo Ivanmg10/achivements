@@ -1486,6 +1486,7 @@ export const en = {
     joinTitle: 'Want to be on this list?',
     joinText: 'Create an account and link your platforms: your achievements turn into Vault Points.',
     joinCta: 'Create an account',
+    profileTeaser: 'Create an account to see their games, achievements and activity, and to compare them with yours.',
     teaserRank: 'You are #{rank} of {total} among the people you follow',
     teaserEmpty: 'Compare yourself with the people you follow, and with everyone.',
     seeAll: 'See the rankings',
