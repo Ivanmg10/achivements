@@ -50,11 +50,3 @@ test('follow someone else, starting from whether you already do; not yourself', 
   render(<PublicUserHero user={{ ...USER, isSelf: true }} onCompare={jest.fn()} />)
   expect(screen.queryByTestId('follow')).not.toBeInTheDocument()
 })
-
-test('someone else online says so; on your own page it says nothing', () => {
-  const { unmount } = render(<PublicUserHero user={{ ...USER, online: true, lastSeenAt: new Date().toISOString() }} onCompare={jest.fn()} />)
-  expect(screen.getByText(en.following.online)).toBeInTheDocument()
-  unmount()
-  render(<PublicUserHero user={{ ...USER, isSelf: true, online: true, lastSeenAt: new Date().toISOString() }} />)
-  expect(screen.queryByText(en.following.online)).not.toBeInTheDocument()
-})

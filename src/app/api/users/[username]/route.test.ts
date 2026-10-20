@@ -139,10 +139,3 @@ describe('Xbox is admin-only', () => {
     expect(data.xboxName).toBeNull()
   })
 })
-
-test('whether they are online, and when they were last seen, as the query gives it', async () => {
-  ;(findPublicUser as jest.Mock).mockResolvedValue({ ...ROW, online: false, lastSeenAt: '2026-10-19T10:00:00Z' })
-  const data = await body(get())
-  expect(data.online).toBe(false)
-  expect(data.lastSeenAt).toBe('2026-10-19T10:00:00Z')
-})

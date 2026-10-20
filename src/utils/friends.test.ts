@@ -1,6 +1,6 @@
 import type { RecentAchievement } from '@/types/types'
 import type { LibraryGame } from '@/utils/library'
-import { friendStats, friendsFeed, rankBy, sharedWithFriends, type LeaderRow, filterFollowing, lastPlayedGame, recentAsBadge, presenceOf } from './friends'
+import { friendStats, friendsFeed, rankBy, sharedWithFriends, type LeaderRow } from './friends'
 
 const NOW = Date.parse('2026-10-14T12:00:00Z')
 const at = (Date: string, Title = 'A') => ({ Date, Title }) as RecentAchievement
@@ -70,49 +70,4 @@ test('the feed is everyone together, newest first, capped', () => {
 test('among games shared by as many, the ones still to finish come first', () => {
   const rows = sharedWithFriends([lib('ra:1', 100), lib('ra:2', 30)], [{ username: 'x', avatar: null, games: [lib('ra:1', 100), lib('ra:2', 100)] }])
   expect(rows.map((r) => r.game.key)).toEqual(['ra:2', 'ra:1'])
-})
-
-test('who you follow, filtered by name and by every platform chosen', () => {
-  const people = [
-    { username: 'Ana', avatar: null, ra: true, steam: false, psn: false },
-    { username: 'bob', avatar: null, ra: false, steam: true, psn: true },
-    { username: 'cid', avatar: null, ra: false, steam: true, psn: false },
-  ]
-  expect(filterFollowing(people, '', [])).toEqual(people)
-  expect(filterFollowing(people, ' an ', []).map((u) => u.username)).toEqual(['Ana'])
-  expect(filterFollowing(people, '', ['steam']).map((u) => u.username)).toEqual(['bob', 'cid'])
-  // Several platforms: someone with all of them.
-  expect(filterFollowing(people, '', ['steam', 'psn']).map((u) => u.username)).toEqual(['bob'])
-  expect(filterFollowing(people, 'ana', ['steam'])).toEqual([])
-})
-
-test('the last game played is the newest across platforms; RA goes by its latest unlock', () => {
-  const ra = [{ ...at('2026-10-14 09:00:00', 'x'), GameID: 1, GameTitle: 'Super Metroid', GameIcon: '/Images/1.png' }]
-  const steam = [{ id: 620, title: 'Portal 2', lastPlayed: '2026-10-14T10:00:00Z' }, { id: 1, title: 'Old', lastPlayed: null }]
-  const psn = [{ id: 7, title: 'Bloodborne', lastPlayed: '2026-10-01T10:00:00Z', heroUrl: 'https://hero', imageIcon: 'https://icon' }]
-  const last = lastPlayedGame(ra as never, steam as never, psn as never, [])
-  expect(last).toMatchObject({ source: 'steam', id: 620, title: 'Portal 2', wide: true })
-  expect(last!.image).toContain('/620/header.jpg')
-
-  expect(lastPlayedGame(ra as never, [], psn as never, [])).toMatchObject({ source: 'ra', image: 'https://retroachievements.org/Images/1.png', wide: false })
-  // A Steam unlock in the merged feed is not an RA game.
-  expect(lastPlayedGame([{ ...ra[0], Source: 'steam' }] as never, [], [], [])).toBeNull()
-  expect(lastPlayedGame([], [], [], [])).toBeNull()
-})
-
-test('a recent unlock becomes a badge like a pin', () => {
-  const ra = { ...at('2026-10-14 09:00:00', 'Sin daños'), Description: 'Sin recibir daño', BadgeName: '123', GameID: 1, GameTitle: 'Super Metroid' }
-  expect(recentAsBadge(ra as RecentAchievement)).toEqual({
-    source: 'ra', gameId: 1, gameTitle: 'Super Metroid', title: 'Sin daños', description: 'Sin recibir daño', badge: 'https://media.retroachievements.org/Badge/123.png',
-  })
-  expect(recentAsBadge({ ...ra, Source: 'steam', BadgeUrl: 'https://s/b.jpg', Description: '' } as RecentAchievement)).toMatchObject({ source: 'steam', badge: 'https://s/b.jpg', description: null })
-})
-
-test('presence: online, seen when, a while ago, or nothing', () => {
-  expect(presenceOf({ online: true, lastSeenAt: '2026-10-14T11:55:00Z' }, NOW)).toEqual({ kind: 'online' })
-  expect(presenceOf({ online: false, lastSeenAt: '2026-10-14T09:00:00Z' }, NOW)).toEqual({ kind: 'seen', at: '2026-10-14T09:00:00Z' })
-  expect(presenceOf({ online: false, lastSeenAt: '2026-08-01T09:00:00Z' }, NOW)).toEqual({ kind: 'longAgo' })
-  // Never seen, or not shared.
-  expect(presenceOf({ online: false, lastSeenAt: null }, NOW)).toBeNull()
-  expect(presenceOf({}, NOW)).toBeNull()
 })

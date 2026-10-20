@@ -181,16 +181,3 @@ describe('genderPublic', () => {
     expect(updates()).toHaveLength(0)
   })
 })
-
-describe('showPresence', () => {
-  test('is stored as a boolean, in its own column', async () => {
-    expect((await POST(request({ field: 'showPresence', value: 'false' }))).status).toBe(200)
-    expect(updates()[0][0]).toContain('"show_presence"')
-    expect(updates()[0][1]).toEqual([false, '1'])
-  })
-
-  test('anything but true or false is refused', async () => {
-    expect((await POST(request({ field: 'showPresence', value: 'off' }))).status).toBe(400)
-    expect(updates()).toHaveLength(0)
-  })
-})

@@ -4,7 +4,6 @@ import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
 import { requireSession } from '@/lib/apiAuth'
 import { allowAttempt } from '@/lib/attemptLimit'
-import { presenceColumns } from '@/lib/presence'
 import { canUseXbox } from '@/utils/xboxAccess'
 
 const MIN_QUERY = 3
@@ -33,8 +32,7 @@ export async function GET(req: NextRequest) {
     const { rows } = await pool.query(
       `SELECT username, avatar, location, LEFT(description, 120) AS description,
               rausername IS NOT NULL AS ra, steamid IS NOT NULL AS steam, psnaccountid IS NOT NULL AS psn,
-              (xboxxuid IS NOT NULL AND $4::boolean) AS xbox,
-              ${presenceColumns()}
+              (xboxxuid IS NOT NULL AND $4::boolean) AS xbox
        FROM users
        WHERE username ILIKE $1 || '%' AND (profile_public OR id = $3::int)
        ORDER BY (LOWER(username) = LOWER($2)) DESC, username ASC

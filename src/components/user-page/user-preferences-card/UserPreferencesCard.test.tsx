@@ -119,18 +119,6 @@ test('the public profile switch reads the session, on unless turned off', () => 
   expect(screen.getByRole('switch', { name: en.userData.profilePublic })).toBeChecked()
 })
 
-test('sharing when you are online is on unless turned off, and says what it means', () => {
-  const { unmount } = render(<UserPreferencesCard />)
-  expect(screen.getByRole('switch', { name: en.userData.showPresence })).toBeChecked()
-  expect(screen.getByText(en.userData.showPresenceOn)).toBeInTheDocument()
-  unmount()
-
-  setUser({ showPresence: false })
-  render(<UserPreferencesCard />)
-  expect(screen.getByRole('switch', { name: en.userData.showPresence })).not.toBeChecked()
-  expect(screen.getByText(en.userData.showPresenceOff)).toBeInTheDocument()
-})
-
 test('whether the gender shows on the profile is offered only once there is a gender', () => {
   const { unmount } = render(<UserPreferencesCard />)
   expect(screen.queryByRole('switch', { name: en.userData.genderPublic })).not.toBeInTheDocument()

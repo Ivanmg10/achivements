@@ -222,9 +222,7 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
   a stricter reading of private profiles and refused keys on every platform. On
   `improvements_10`: `migrations/037_pinned_achievements_position.sql` (order of
   pinned achievements), applied 2026-10-17; any other database needs it before that
-  code runs, or every pins read answers 500. On `improvements_11`:
-  `migrations/038_user_presence.sql` (presence), applied 2026-10-19; same warning,
-  but worse: without it every signed-in request fails (see Presence)
+  code runs, or every pins read answers 500
 
 ## Release gates — what had to be true before 1.0 (all closed)
 
@@ -544,34 +542,6 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   `<main>` is a block: these screens size themselves (`STATUS_SCREEN`) and are a
   `<div>` inside it, a `<main>` only full screen.
 
-## Presence — "online" and "last seen" (2026-10-19)
-
-`users.last_seen_at` and `users.show_presence` (`migrations/038_user_presence.sql`,
-applied 2026-10-19; **any other database needs it before this code runs**:
-`userRecord` reads `show_presence` on every session, so without it every
-signed-in request fails).
-
-- **Written only by the heartbeat**: `usePresenceHeartbeat` posts to
-  `/api/presence` while the tab is visible (arrival, every 2 min, back to the tab);
-  the route writes at most once a minute. Do not write it from the session or
-  another read path.
-- **Online = seen in the last 5 minutes**, decided on the server. `lastSeenAt` is
-  rounded down to 5 minutes: never send the exact time. Past 30 days it says only
-  "over a month ago". **One rule, one place**: every query that shows it selects
-  `presenceColumns()` (`src/lib/presence.ts`) — the follows overview, the user search
-  and `findPublicUser` (the public profile).
-- **`show_presence` is enforced in SQL** (on by default; the switch is in
-  Preferences → General). Off: `online` false and `lastSeenAt` null, to everyone.
-  Not reciprocal (hiding yours does not hide others'), by the user's choice.
-- **Wherever another user's picture shows, so does it** (2026-10-20, the user's ask):
-  `PresenceDot` on the picture (in a `relative` wrapper; `announce` when no text beside
-  it says so) and, where there is a line for it, `PresenceLabel` in place of the bio
-  (the bio is its fallback). Today: Following (cards, hero), user search and the home's
-  friend cards (`UserSummary`), the public profile hero (not on your own), compare,
-  someone's game page banner, the friends leaderboard and shared games. A new place
-  that shows other users must do the same. Never for your own picture.
-- `/privacy` says signed-in users who come across you see it; change it if that grows.
-
 ## Preferences that follow the account
 
 The display preferences (which consoles show, library layout/view/columns/sort,
@@ -770,10 +740,6 @@ branch to be up to date with its base** before merging, on both.
       asked for. **Open:** a viewer with no RA account is served with the page
       owner's key (see RetroAchievements above); ask RA whether that counts, and
       if not, ask the viewer to link their own. Revisit when OAuth lands.
-- [x] **Online status and "last seen"** on the Following cards (2026-10-19). See
-      Presence above. The user said it will grow beyond the card: ask what next
-      before extending it (proposed: Steam's "playing now" for everyone in one
-      call, an "online" filter, live refresh, the public profile).
 - [ ] Later: **community-flagged missables for PSN, Steam and Xbox.** Only RA says
       which achievements are missable (`Type: 'missable'`, marked in red in
       `AchievementGrid`); Sony, Steam and OpenXBL have no such field (checked

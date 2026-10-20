@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { useFriendsData, loadFriendDetails, DETAIL_LIMIT } from './useFriendsData'
 import type { FriendOverview } from '@/utils/friends'
@@ -35,8 +34,6 @@ describe('loadFriendDetails', () => {
     expect(d.recent).toHaveLength(1)
     // RA's system consoles are not games; each game opens their progress.
     expect(d.games.map((g) => g.href)).toEqual(['/user/a%20b/ra/1'])
-    // RA says nothing of play time: the game of the latest unlock is the last one played.
-    expect(d.lastPlayed).toMatchObject({ source: 'ra', at: '2026-10-14 08:00:00' })
     expect(d.partial).toBe(false)
   })
 
@@ -66,13 +63,6 @@ describe('useFriendsData', () => {
     await waitFor(() => expect(result.current.details.x).toBeDefined())
     expect(result.current.friends).toHaveLength(1)
     expect(result.current.detailsLoading).toBe(false)
-  })
-
-  test('wanted from the first render, it loads even under Strict Mode (the effect runs twice)', async () => {
-    respond({ '/api/follows/overview': [friend('x')], '/api/getRecentAchievements': RA_RECENT, '/api/getGamesCompleted': RA_GAMES })
-    const { result } = renderHook(() => useFriendsData(true), { wrapper: StrictMode })
-    await waitFor(() => expect(result.current.details.x).toBeDefined())
-    expect(result.current.friends).toHaveLength(1)
   })
 
   test('only the newest few get their details read', async () => {

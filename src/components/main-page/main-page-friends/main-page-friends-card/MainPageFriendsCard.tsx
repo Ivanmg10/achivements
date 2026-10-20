@@ -11,7 +11,7 @@ import UserSummary from '@/components/user-summary/UserSummary'
 
 /**
  * One person you follow, from our own data: who they are, their favourite
- * game on each platform, their three latest pinned achievements and how many public
+ * game on each platform, their latest pinned achievements and how many public
  * groups they keep, with their unlocks this week once known.
  */
 export default function MainPageFriendsCard({ friend, week }: { friend: FriendOverview; week: number | null }) {
@@ -62,7 +62,7 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
           <p className="text-xs text-text-secondary italic">{T.friends.noPins}</p>
         ) : (
           <ul className="flex flex-col gap-1">
-            {friend.pins.slice(0, 3).map((p, i) => (
+            {friend.pins.map((p, i) => (
               <li key={`${p.source}:${p.gameId}:${i}`} className="flex items-center gap-2 min-w-0">
                 {p.badge ? (
                   <Image src={p.badge} alt="" width={24} height={24} className="w-6 h-6 rounded object-cover shrink-0" unoptimized />

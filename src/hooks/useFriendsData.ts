@@ -4,7 +4,7 @@ import type { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/
 import type { SteamGameProgress, SteamRecentAchievement } from '@/types/steam'
 import type { PsnGameProgress, PsnRecentTrophy } from '@/types/psn'
 import type { XboxGameProgress, XboxRecentAchievement } from '@/types/xbox'
-import { lastPlayedGame, type FriendOverview, type LastPlayed } from '@/utils/friends'
+import type { FriendOverview } from '@/utils/friends'
 import { profileLibrary, type LibraryGame } from '@/utils/library'
 import { toRecentAchievement } from '@/utils/steamMappers'
 import { psnToRecentAchievement } from '@/utils/psnMappers'
@@ -21,7 +21,6 @@ const RA_SYSTEM_CONSOLES = new Set([100, 101])
 export type FriendDetails = {
   recent: RecentAchievement[]
   games: LibraryGame[]
-  lastPlayed: LastPlayed | null
   /** Something could not be read (a private profile, a platform down): the numbers may be short. */
   partial: boolean
 }
@@ -68,13 +67,7 @@ export async function loadFriendDetails(friend: FriendOverview, lang: string): P
     friend.username,
     xboxGames as XboxGameProgress[],
   )
-  const lastPlayed = lastPlayedGame(
-    raRecent as RecentAchievement[],
-    steamGames as SteamGameProgress[],
-    psnGames as PsnGameProgress[],
-    xboxGames as XboxGameProgress[],
-  )
-  return { recent, games, lastPlayed, partial: failed.length > 0 }
+  return { recent, games, partial: failed.length > 0 }
 }
 
 /**
@@ -95,7 +88,6 @@ export function useFriendsData(enabled: boolean) {
     if (!enabled || started.current === attempt) return
     started.current = attempt
     let current = true
-    let finished = false
     readList<FriendOverview>('/api/follows/overview')
       .then(async (list) => {
         if (!current) return
@@ -109,13 +101,8 @@ export function useFriendsData(enabled: boolean) {
         console.error('[useFriendsData]', err)
         if (current) setError(true)
       })
-      .finally(() => {
-        finished = true
-      })
     return () => {
       current = false
-      // Stopped halfway (a page that wants it from its first render, run twice by Strict Mode): the next run asks again.
-      if (!finished) started.current = null
     }
   }, [enabled, attempt, lang])
 

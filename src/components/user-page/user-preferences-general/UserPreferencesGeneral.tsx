@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { IconBroadcast, IconEyeOff, IconGenderBigender, IconLanguage, IconPalette, IconUserShare, IconWorld } from '@tabler/icons-react'
+import { IconEyeOff, IconGenderBigender, IconLanguage, IconPalette, IconUserShare, IconWorld } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import UserProfileSwitch from '@/components/user-page/user-profile-switch/UserProfileSwitch'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
@@ -71,15 +71,6 @@ export default function UserPreferencesGeneral({
         onText={T.userData.profilePublicOn}
         offText={T.userData.profilePublicOff}
         icon={<IconWorld size={18} />}
-      />
-
-      <UserProfileSwitch
-        field="showPresence"
-        checked={user?.showPresence !== false}
-        label={T.userData.showPresence}
-        onText={T.userData.showPresenceOn}
-        offText={T.userData.showPresenceOff}
-        icon={<IconBroadcast size={18} />}
       />
 
       <ProfileField

@@ -53,9 +53,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ usernam
       groups,
       // Whether the viewer follows them, for the Follow button.
       following: follow.rows.length > 0,
-      // Online, or when last seen: only if they share it (presenceColumns).
-      online: user.online,
-      lastSeenAt: user.lastSeenAt,
     })
   } catch (err) {
     console.error('[users/[username] GET]', err)
