@@ -13,6 +13,7 @@ import PublicUserFollowButton from '../public-user-follow-button/PublicUserFollo
 import PublicUserKpis from '../public-user-kpis/PublicUserKpis'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
 import PresenceLabel from '@/components/presence-label/PresenceLabel'
+import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 
 /**
  * The top of a user's page, in the account card's style: their avatar's
@@ -59,6 +60,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
                     {T.userProfile.yourProfile}
                   </span>
                 )}
+                {user.vaultPoints ? <VaultLevelBadge points={user.vaultPoints} /> : null}
               </div>
               {!user.isSelf && <PresenceLabel online={user.online} lastSeenAt={user.lastSeenAt} className="text-sm" />}
               {country && (

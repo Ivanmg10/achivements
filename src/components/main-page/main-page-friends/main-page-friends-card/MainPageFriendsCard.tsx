@@ -8,6 +8,7 @@ import type { FriendOverview } from '@/utils/friends'
 import { candidateIconUrl } from '@/utils/gameCandidates'
 import { gameHref } from '@/utils/gameRef'
 import UserSummary from '@/components/user-summary/UserSummary'
+import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 
 /**
  * One person you follow, from our own data: who they are, their favourite
@@ -22,12 +23,15 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
 
   return (
     <article className="bg-bg-main rounded-xl p-3 flex flex-col gap-3 min-w-0">
-      <Link
-        href={`/user/${encodeURIComponent(friend.username)}`}
-        className="flex items-center gap-3 rounded-lg -m-1 p-1 hover:bg-ink/[0.06] transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-      >
-        <UserSummary user={friend} size={40} />
-      </Link>
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <Link
+          href={`/user/${encodeURIComponent(friend.username)}`}
+          className="flex items-center gap-3 rounded-lg -m-1 p-1 hover:bg-ink/[0.06] transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        >
+          <UserSummary user={friend} size={40} />
+        </Link>
+        {friend.vaultPoints ? <VaultLevelBadge points={friend.vaultPoints} compact className="shrink-0" /> : null}
+      </div>
 
       {favorites.length > 0 && (
         <ul aria-label={T.userProfile.favoriteGames} className="flex gap-1.5">

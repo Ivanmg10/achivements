@@ -11,6 +11,7 @@ import FollowingCardBanner from '../following-card-banner/FollowingCardBanner'
 import FollowingCardBadges from '../following-card-badges/FollowingCardBadges'
 import FollowingCardPlatforms from '../following-card-platforms/FollowingCardPlatforms'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
+import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import PresenceLabel from '@/components/presence-label/PresenceLabel'
 
 const RECENT_MAX = 5
@@ -65,6 +66,7 @@ export default function FollowingCard({
                   {codeToFlag(country.code)}
                 </span>
               )}
+              {friend.vaultPoints ? <VaultLevelBadge points={friend.vaultPoints} compact /> : null}
             </span>
             <PresenceLabel
               online={friend.online}

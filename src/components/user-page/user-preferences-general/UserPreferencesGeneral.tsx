@@ -1,12 +1,13 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { IconBroadcast, IconEyeOff, IconGenderBigender, IconLanguage, IconPalette, IconUserShare, IconWorld } from '@tabler/icons-react'
+import { IconBroadcast, IconEyeOff, IconTrophy, IconGenderBigender, IconLanguage, IconPalette, IconUserShare, IconWorld } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import UserProfileSwitch from '@/components/user-page/user-profile-switch/UserProfileSwitch'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
+import { useVaultMe } from '@/hooks/useVaultMe'
 
 const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
 
@@ -30,6 +31,8 @@ export default function UserPreferencesGeneral({
   const { lang, T } = useLanguage()
   const { theme } = useTheme()
   const { hidden } = useHiddenGames()
+  // Not in the session on purpose: read with the rankings, so a database without it breaks only them.
+  const { me: vault, setShowInRankings } = useVaultMe()
   const user = session?.user
 
   return (
@@ -81,6 +84,18 @@ export default function UserPreferencesGeneral({
         offText={T.userData.showPresenceOff}
         icon={<IconBroadcast size={18} />}
       />
+
+      {vault && (
+        <UserProfileSwitch
+          field="showInRankings"
+          checked={vault.showInRankings}
+          label={T.rankings.showInRankings}
+          onText={T.rankings.showInRankingsOn}
+          offText={T.rankings.showInRankingsOff}
+          icon={<IconTrophy size={18} />}
+          onSaved={setShowInRankings}
+        />
+      )}
 
       <ProfileField
         label={T.userPage.hiddenGames}

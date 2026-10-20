@@ -16,6 +16,7 @@ import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 const SearchModal = dynamic(() => import('@/components/search-modal/SearchModal'))
 const MobileNavModal = dynamic(() => import('./MobileNavModal'))
 import StatusNavDropdown from './status-nav-dropdown/StatusNavDropdown'
+import MainHeaderLevel from './main-header-level/MainHeaderLevel'
 import { plural } from '@/utils/utils'
 
 function NavLink({ href, label, active, glass }: { href: string; label: string; active: boolean; glass?: boolean }) {
@@ -105,6 +106,7 @@ export default function MainHeader() {
   const navItems = [
     { href: '/groups', label: T.groups.title },
     { href: '/following', label: T.following.title },
+    { href: '/rankings', label: T.rankings.title },
   ]
   const isStatusActive = statusItems.some(({ href }) => pathname === href)
 
@@ -204,6 +206,7 @@ export default function MainHeader() {
 
           {session ? (
             <>
+              <MainHeaderLevel glass={isGameInfo} />
               <StreakBadge streak={streak} glass={isGameInfo} />
               <Link
                 href="/user"

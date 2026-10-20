@@ -4,6 +4,12 @@ import { useFriendsData } from '@/hooks/useFriendsData'
 import { en } from '@/translations/en'
 
 jest.mock('@/hooks/useFriendsData', () => ({ useFriendsData: jest.fn() }))
+jest.mock('@/hooks/useRankings', () => ({
+  useRankings: () => ({
+    data: { total: 3, me: { rank: 2, listed: true } },
+    rows: [{ username: 'ana', avatar: null, points: 900, isMe: false }, { username: 'me', avatar: null, points: 500, isMe: true }],
+  }),
+}))
 
 const retry = jest.fn()
 const setup = ({ users = [], ...over }: Record<string, unknown>) =>
@@ -35,11 +41,12 @@ test('the hero says how many of them are online now', () => {
   expect(screen.getByText(en.following.onlineNow.replace('{n}', '2'))).toBeInTheDocument()
 })
 
-test('the rankings are announced as coming, with no link yet', () => {
+test('the rankings card leads to the rankings, saying where you stand', () => {
   setup({})
   render(<FollowingPage />)
-  expect(screen.getByRole('heading', { name: en.following.rankingsTitle })).toBeInTheDocument()
-  expect(screen.getByText(en.following.rankingsSoon)).toBeInTheDocument()
+  const link = screen.getByRole('link', { name: new RegExp(en.following.rankingsTitle) })
+  expect(link).toHaveAttribute('href', '/rankings')
+  expect(screen.getByText(en.rankings.teaserRank.replace('{rank}', '2').replace('{total}', '3'))).toBeInTheDocument()
 })
 
 test('search by name, and platforms that add up', () => {

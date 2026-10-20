@@ -27,6 +27,8 @@ export type FriendOverview = UserSearchResult & {
   publicGroups: number
   /** Their achievement showcase, in their order (up to five, earned). */
   showcase: FriendPin[]
+  /** Their Vault Points, for the level on their card; null before they are scored. */
+  vaultPoints?: number | null
 }
 
 /**

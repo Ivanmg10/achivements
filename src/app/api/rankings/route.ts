@@ -76,8 +76,10 @@ export async function GET(req: Request) {
     const listed = entries.filter((e) => e.listed)
     const own = viewerId === null ? undefined : entries.find((e) => e.id === viewerId)
 
-    const arrows = scope === 'global' && period === 'all' && source === 'all'
-    const before = arrows ? await weekStartRanks() : null
+    const arrowView = scope === 'global' && period === 'all' && source === 'all'
+    const before = arrowView ? await weekStartRanks() : null
+    // Before the first Monday snapshot everyone would read as new: no arrows until there is one.
+    const arrows = arrowView && before !== null && before.size > 0
     const page = listed.slice(offset, offset + PAGE)
     const myIndex = own?.listed ? listed.indexOf(own) : own && own.rank > 0 ? own.rank - 1 : -1
     const near = myIndex < 0 ? [] : listed.slice(Math.max(0, myIndex - NEAR), myIndex + NEAR + 1).filter((e) => e !== own)

@@ -12,6 +12,7 @@ import {
   IconFolder,
   IconUsers,
   IconListDetails,
+  IconTrophy,
   IconChevronDown,
 } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -51,6 +52,7 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
   const navItems = [
     { href: '/groups', label: T.groups.title, icon: IconFolder },
     { href: '/following', label: T.following.title, icon: IconUsers },
+    { href: '/rankings', label: T.rankings.title, icon: IconTrophy },
   ]
   const router = useRouter()
   const pathname = usePathname()
