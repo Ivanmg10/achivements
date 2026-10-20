@@ -34,6 +34,9 @@ test('signed out: the global list, with arrows, no presence and no ids', async (
   // Each row carries its last weeks; a user with none has an empty list.
   expect(rows.map((r) => r.trend)).toEqual([[0, 5, 9], [], []])
   expect(res.data.zone).toEqual([])
+  // The most active this week, from the global weekly list whatever the view.
+  expect((res.data.hot as { username: string }[]).map((r) => r.username)).toEqual(['u1', 'u2', 'u3'])
+  expect(loadRanking).toHaveBeenCalledWith({ scope: 'global', period: 'week', source: 'all', viewerId: null, xbox: false })
   expect(rows[0]).not.toHaveProperty('id')
   expect(rows[0]).not.toHaveProperty('online')
   expect(res.data.me).toBeNull()

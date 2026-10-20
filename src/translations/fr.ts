@@ -1468,6 +1468,8 @@ export const fr: Translations = {
     zoneDown: '{n} de plus en dessous',
     colTrend: 'Tendance',
     trendA11y: 'Points par semaine, {n} dernières semaines : {list}',
+    hotTitle: 'Les plus actifs cette semaine',
+    hotSee: 'Voir le classement de la semaine',
     ahead: '{n} PV d’avance',
     behind: '{n} PV de retard',
     more: 'Voir plus',

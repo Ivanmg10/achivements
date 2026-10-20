@@ -1468,6 +1468,8 @@ export const ja: Translations = {
     zoneDown: '下をあと{n}人',
     colTrend: '推移',
     trendA11y: '週ごとのポイント、直近{n}週: {list}',
+    hotTitle: '今週もっともアクティブ',
+    hotSee: '今週のランキングを見る',
     ahead: '{n} VP リード',
     behind: '{n} VP 差',
     more: 'もっと見る',

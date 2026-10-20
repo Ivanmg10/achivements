@@ -16,7 +16,7 @@
  *
  * The first game of each platform is their favourite.
  */
-export const PERSONAS = [
+const ORIGINALS = [
   {
     name: 'spex_guy', country: 'ES', theme: 'terminal', gender: 'male', genderPublic: true,
     bio: 'Llevo una hoja de cálculo con cada logro. Si no está al 100 %, no está terminado. 🤓',
@@ -210,3 +210,12 @@ export const PERSONAS = [
     steam: [[1262540, 0.92, 2, 50], [2824660, 0.7, 30, 20]],
   },
 ]
+
+/** Names of the twins, one per original in order: the same person, another name and picture. */
+const TWINS = [
+  'pixel_nomad', 'duskrunner', 'frostbyte', 'lagartija', 'nebulosa', 'tostada', 'quasar', 'kitsune', 'marmota', 'byte_bandit',
+  'eclipse', 'gominola', 'turbo_abuela', 'sombra', 'neonwolf', 'cachalote', 'vortex', 'mermelada', 'glitchy', 'perezoso',
+  'starfall', 'chorizo', 'obsidian', 'pulpo_x', 'ramen', 'solstice', 'trasgo', 'zigzag', 'lemming', 'bonsai',
+]
+
+export const PERSONAS = [...ORIGINALS, ...ORIGINALS.map((p, i) => ({ ...p, name: TWINS[i], avatarIndex: 1 }))]

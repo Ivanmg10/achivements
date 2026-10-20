@@ -1468,6 +1468,8 @@ export const ru: Translations = {
     zoneDown: 'Ещё {n} ниже',
     colTrend: 'Динамика',
     trendA11y: 'Очки по неделям, последние {n} нед.: {list}',
+    hotTitle: 'Самые активные на этой неделе',
+    hotSee: 'Рейтинг этой недели',
     ahead: 'Впереди на {n} VP',
     behind: 'Позади на {n} VP',
     more: 'Показать ещё',

@@ -17,6 +17,7 @@ import RankingsPageList from './rankings-page-list/RankingsPageList'
 import RankingsPageMeBar from './rankings-page-me-bar/RankingsPageMeBar'
 import RankingsPageLevelPanel from './rankings-page-level-panel/RankingsPageLevelPanel'
 import RankingsPageZone from './rankings-page-zone/RankingsPageZone'
+import RankingsPageHot from './rankings-page-hot/RankingsPageHot'
 import RankingsPageJoin from './rankings-page-join/RankingsPageJoin'
 import RankingsPageSkeleton from './rankings-page-skeleton/RankingsPageSkeleton'
 import { ME_BAR, SIDE } from './rankingsMotion'
@@ -27,9 +28,9 @@ const PODIUM_FROM = 15
 /**
  * The rankings in Vault Points (a beta): everyone, or you and whom you follow;
  * all time, this month or this week; every platform or one. A podium, then the
- * table (a list on phones), thirty at a time; below it, when you are not
+ * table (a list on phones), twenty at a time; below it, when you are not
  * there, your zone (who is just above and below you, widened on demand); your
- * level beside it. Not listed, a bar pinned to the bottom says where you would
+ * level beside it, and who is most active this week. Not listed, a bar pinned to the bottom says where you would
  * be and why you are not shown. Signed out, only everyone, and how to join.
  */
 export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
@@ -53,6 +54,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
   const upLeft = zoneSize.above < ZONE_MAX ? zoneStart + (zoneAll.length - zone.length) - rows.length : 0
   const downLeft = zoneSize.below < ZONE_MAX ? total - zoneStart - zoneAll.length : 0
   const above = me ? ([...rows, ...zone].find((r) => r.rank === me.rank - 1) ?? null) : null
+  const weekView = view.scope === 'global' && view.period === 'week' && view.source === 'all'
   const caption = `${view.scope === 'global' ? T.rankings.global : T.rankings.following} · ${T.rankings[view.period]}`
 
   return (
@@ -149,12 +151,9 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
             </div>
 
             <motion.aside variants={SIDE} initial="hidden" animate="show" className="flex flex-col gap-4 lg:sticky lg:top-24">
-              {signedIn ? (
-                <>
-                  {vault && <RankingsPageLevelPanel me={vault} />}
-                </>
-              ) : (
-                <RankingsPageJoin />
+              {signedIn ? vault && <RankingsPageLevelPanel me={vault} /> : <RankingsPageJoin />}
+              {(data?.hot ?? []).length > 0 && (
+                <RankingsPageHot rows={data?.hot ?? []} linked={signedIn} onSeeWeek={weekView ? undefined : () => setView({ scope: 'global', period: 'week', source: 'all' })} />
               )}
             </motion.aside>
           </div>

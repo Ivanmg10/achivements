@@ -835,7 +835,8 @@ branch to be up to date with its base** before merging, on both.
   --follower=<username>` (and `clear`). It writes only to `PREVIEW_DATABASE_URL` and refuses when
   that is missing or the same host as `DATABASE_URL`. Never point it at production: `/rankings` is
   public. 30 hand-written personas (`scripts/demo-personas.mjs`, 2026-10-20; the five names the
-  user chose stay): no sign-in, kept out of the score refresh, found by their password mark
+  user chose stay), each with a twin (another name and picture), so 60; their points are multiplied
+  by `SCALE` (30) so real users with big libraries are not all on top: no sign-in, kept out of the score refresh, found by their password mark
   (`MARK`), never by name. Their Steam/PSN accounts are made up, so their profiles work by
   **seeding `steam_cache`** under those accounts (never expiring) with real games' definitions
   taken from what pre already has cached for real users; points come from the real formula. If

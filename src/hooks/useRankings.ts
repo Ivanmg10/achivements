@@ -29,7 +29,7 @@ async function request(view: RankingsView, offset: number, zone: ZoneSize): Prom
 }
 
 /**
- * One view of the rankings, thirty at a time: `more()` appends the next thirty,
+ * One view of the rankings, twenty at a time: `more()` appends the next twenty,
  * and `widen()` shows more of the viewer's zone above or below them. Changing
  * the view starts over. `error` when the first page could not be read; a later
  * page or a wider zone that fails only stops it growing (and says so).

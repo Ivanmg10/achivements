@@ -17,7 +17,7 @@ const more = jest.fn()
 const widen = jest.fn()
 const setup = (over: Record<string, unknown> = {}) =>
   (useRankings as jest.Mock).mockReturnValue({
-    data: { scope: 'global', period: 'all', source: 'all', total: 60, offset: 0, rows, me: null, zone: [], zoneStart: 0, arrows: true },
+    data: { scope: 'global', period: 'all', source: 'all', total: 60, offset: 0, rows, me: null, zone: [], zoneStart: 0, hot: [], arrows: true },
     rows, isLoading: false, error: false, retry, more, hasMore: true, loadingMore: false, moreFailed: false,
     widen, widening: false, zoneSize: { above: 2, below: 2 }, ...over,
   })
@@ -111,6 +111,18 @@ test('loading, failure with retry, and an empty Following', () => {
   rerender(<RankingsPage signedIn />)
   fireEvent.click(screen.getByRole('tab', { name: en.rankings.following }))
   expect(screen.getByText(en.rankings.emptyFollowing)).toBeInTheDocument()
+})
+
+test('beside your level, who is most active this week, and a way to that ranking', () => {
+  setup({ data: { total: 60, rows, me: null, zone: [], zoneStart: 0, arrows: true, hot: [row(1, 'blazing', { points: 677 })] } })
+  render(<RankingsPage signedIn />)
+  const hot = screen.getByRole('region', { name: en.rankings.hotTitle })
+  expect(hot).toHaveTextContent('blazing')
+  expect(hot).toHaveTextContent('+677')
+  fireEvent.click(screen.getByRole('button', { name: en.rankings.hotSee }))
+  expect(useRankings).toHaveBeenLastCalledWith({ scope: 'global', period: 'week', source: 'all' })
+  // Already on the weekly ranking: no way to it.
+  expect(screen.queryByRole('button', { name: en.rankings.hotSee })).not.toBeInTheDocument()
 })
 
 test('leads to how points work', () => {

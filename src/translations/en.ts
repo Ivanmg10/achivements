@@ -1469,6 +1469,8 @@ export const en = {
     zoneDown: '{n} more below',
     colTrend: 'Trend',
     trendA11y: 'Points per week, last {n} weeks: {list}',
+    hotTitle: 'Most active this week',
+    hotSee: "See this week's ranking",
     ahead: '{n} VP ahead',
     behind: '{n} VP behind',
     more: 'Show more',

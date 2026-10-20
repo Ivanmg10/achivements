@@ -25,6 +25,19 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Rankings: 20 at a time, most active this week, 60 demo users (`chore/demo-personas`)
+
+**Did** — The list pages 20 at a time. `/api/rankings` adds `hot`, the five who earned most this
+week (global, every platform, whatever the view), shown under your level as `RankingsPageHot`
+with a button to the weekly ranking (strings `hotTitle`, `hotSee`, nine languages). The demo seed
+gives each persona a twin (`TWINS` in `demo-personas.mjs`: same tastes, another name and another
+of its badges as picture) and multiplies demo points by `SCALE` = 30, so the user (116 k) ranks
+about mid-table and "your zone" can be seen. Reseeded pre: 60 users, 24.7 MB of cache.
+**Why** — The user asked for 20 at a time, to see their zone, twice the users and something to
+fill the empty space under "Your level".
+**Watch out** — The pre-commit hook rewrites `package.json`; once, the dev server read it half
+written and kept failing with "Invalid package config" until restarted.
+
 ## 2026-10-20 — Rankings: top 30, your zone and a trend per row (`chore/demo-personas`)
 
 **Did** — `/api/rankings` pages 30 at a time and returns `zone`/`zoneStart` (the viewer and who

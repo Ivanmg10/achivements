@@ -9,7 +9,7 @@
  * Writes only to PREVIEW_DATABASE_URL (from .env.local), and refuses to run
  * when it is missing or points at the same host as DATABASE_URL (production).
  *
- * Who they are is in demo-personas.mjs. Their Steam and PSN accounts are made
+ * Who they are is in demo-personas.mjs (each with a twin: same tastes, another name and picture). Their Steam and PSN accounts are made
  * up, so nothing can be asked of Steam or Sony for them: instead the answers
  * their profile asks for (library, recent unlocks, the year's feed, each
  * game's list, the PSN summary) are written into steam_cache under their fake
@@ -43,6 +43,13 @@ const STEAM_LANGS = ['english', 'spanish', 'portuguese', 'french', 'german', 'it
 const PSN_LANGS = ['en-US', 'es-ES']
 const PSN_POINTS = { bronze: 15, silver: 30, gold: 90, platinum: 300 }
 const DAY = 86_400
+/**
+ * Their Vault Points are multiplied by this. Each plays a handful of games and real users have
+ * hundreds, so without it every real user would sit above all of them; with it about half of
+ * them rank above a library of a few hundred games, and the page below the top can be tried.
+ */
+const SCALE = 30
+const scaled = (s) => ({ ...s, points: s.points * SCALE, unlocks: s.unlocks.map(([t, p]) => [t, p * SCALE]) })
 
 /** .env.local, read the way Next reads it (KEY=value, quotes stripped). */
 function readEnv() {
@@ -143,7 +150,7 @@ function steamGame(persona, pool, [appId, share, last, span]) {
   const minutes = earned.length * between(15, 70) + between(30, 300)
   return {
     source: 'steam', id: appId, title: def.title, def, player, when, lastUnlock,
-    score: scoreGame(steamScoreInputs(player, def.pct)),
+    score: scaled(scoreGame(steamScoreInputs(player, def.pct))),
     progress: {
       id: appId, title: def.title, pctWon: Math.round((earned.length / english.length) * 10000) / 100, _source: 'steam', hasStats: true,
       imageIcon: `/api/steam/icon?appid=${appId}`, imgLogoUrl: '', lastPlayed: iso(lastPlayed), lastUnlock: iso(lastUnlock),
@@ -187,7 +194,7 @@ function psnGame(persona, pool, [titleId, share, last, span]) {
   return {
     source: 'psn', id: psnNumericId(titleId), titleId, title: def.meta.title, trophies, lastUnlock, lastTrophyAt, earnedCounts: got,
     groups: Object.fromEntries(PSN_LANGS.map((l) => [l, groupsIn(l)])),
-    score: scoreGame(psnScoreInputs(trophies['en-US'])),
+    score: scaled(scoreGame(psnScoreInputs(trophies['en-US']))),
     progress: {
       ...def.meta, earned: got, defined, hasDlc: trophies['en-US'].some((t) => t.groupId !== 'default'),
       numAwarded: earned.length, maxPossible: trophies['en-US'].length, pctWon: Math.round(psnGradeShare(got, defined) * 100),
@@ -278,8 +285,9 @@ async function seedPersona(client, persona, pool) {
   const psn = (persona.psn ?? []).map((g) => psnGame(persona, pool, g)).filter(Boolean)
   const missing = (persona.steam?.length ?? 0) + (persona.psn?.length ?? 0) - steam.length - psn.length
   if (missing > 0) console.warn(`  ${persona.name}: ${missing} game(s) not in the cache, left out`)
-  const showcase = showcaseOf(steam, psn, Math.max(1, persona.showcase))
-  persona.avatar = showcase[0]?.badge ?? null
+  const showcase = showcaseOf(steam, psn, 5)
+  // A twin shows another of their badges as their picture.
+  persona.avatar = showcase[persona.avatarIndex ?? 0]?.badge ?? showcase[0]?.badge ?? null
 
   const seen = persona.seen === 'online' ? FOREVER : new Date(Date.now() - (persona.seen === 'hidden' ? 30 : persona.seen) * 3_600_000)
   const favorite = (g) => g && { id: g.id, title: g.title, imageIcon: g.progress.imageIcon }

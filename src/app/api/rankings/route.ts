@@ -16,8 +16,10 @@ import {
 } from '@/lib/rankings'
 import { canUseXbox } from '@/utils/xboxAccess'
 
-/** The list comes thirty at a time: the top, then more on demand. */
-const PAGE = 30
+/** The list comes twenty at a time: the top, then more on demand. */
+const PAGE = 20
+/** "Most active this week": how many of the global weekly list go beside your level. */
+const HOT = 5
 /** Places shown on each side of the viewer in "your zone" at first, and the most it can widen to. */
 const ZONE = 2
 const ZONE_MAX = 50
@@ -47,6 +49,8 @@ export type RankingsResponse = {
   zone: RankRow[]
   /** The place in the list (0-based) of the zone's first row, to tell where it meets the list above. */
   zoneStart: number
+  /** Who earned most this week, everyone and every platform, whatever the view: `points` is this week's. */
+  hot: RankRow[]
   /** Whether `delta` is filled in (only the global, all-time, every-platform view). */
   arrows: boolean
 }
@@ -90,6 +94,8 @@ export async function GET(req: Request) {
     if (source === 'xbox' && !xbox) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 
     const entries = await loadRanking({ scope, period, source, viewerId, xbox })
+    const weekly = scope === 'global' && period === 'week' && source === 'all' ? entries : await loadRanking({ scope: 'global', period: 'week', source: 'all', viewerId, xbox })
+    const hot = weekly.filter((e) => e.listed).slice(0, HOT)
     const listed = entries.filter((e) => e.listed)
     const own = viewerId === null ? undefined : entries.find((e) => e.id === viewerId)
 
@@ -102,7 +108,7 @@ export async function GET(req: Request) {
     const zoneStart = Math.max(0, myIndex - above)
     const zone = myIndex < 0 ? [] : listed.slice(zoneStart, myIndex + below + 1)
 
-    const shown = [...new Set([...page, ...zone, ...(own ? [own] : [])])]
+    const shown = [...new Set([...page, ...zone, ...hot, ...(own ? [own] : [])])]
     const [presence, trend] = await Promise.all([
       viewerId === null ? null : presenceOf(shown.filter((e) => e.id !== viewerId).map((e) => e.id)),
       weeklyTrend(shown.map((e) => e.id), source, xbox),
@@ -132,6 +138,7 @@ export async function GET(req: Request) {
       me: own && own.points > 0 ? { ...toRow(own), listed: own.listed } : null,
       zone: zone.map(toRow),
       zoneStart,
+      hot: hot.map((e) => ({ ...toRow(e), delta: null })),
       arrows,
     }
     // Never a shared cache: a signed-in answer carries the viewer and presence, and must not reach anyone else.
