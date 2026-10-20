@@ -32,6 +32,10 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
   achievements to get stay yours. The Following page shows each person's last
   game, accounts, latest unlocks and showcase, and whether
   they are online or when they were last seen (each user can stop sharing it).
+- **Rankings (beta)** — Vault Points, one score worth the same on every platform
+  (rarity inside each game decides the value), with levels and tiers; rankings
+  of everyone or of whom you follow, all time, this month or this week, public
+  at `/rankings`. Each user can leave them from Preferences.
 - **Public pages** — honest comparisons (vs Exophase, vs PSNProfiles) and
   how-tos at `/compare/*` and `/track/*`, plus a FAQ on the landing, for
   visitors and for what search engines and chat AIs read.

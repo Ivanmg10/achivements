@@ -228,6 +228,12 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
   but worse: without it every signed-in request fails (see Presence). And
   `migrations/039_showcase_achievements.sql` (the achievement showcase), applied
   2026-10-20; without it the showcase, the follows overview and Following answer 500
+- `1.6.0` — on `feat/social-rankings`: the Following restyle, presence and the showcase
+  (038, 039 above) and the **rankings, a beta** (Vault Points, see below), with
+  `migrations/040_vault_points.sql`. **040 was NOT applied by the session that wrote it**
+  (applying it to the shared database was refused to the agent): apply it before this code
+  runs anywhere, or the rankings, the header's level and the score refresh answer 500
+  (Following and profiles still load, without levels)
 
 ## Release gates — what had to be true before 1.0 (all closed)
 
@@ -559,6 +565,34 @@ signed-in request fails).
   that shows other users must do the same. Never for your own picture.
 - `/privacy` says signed-in users who come across you see it; change it if that grows.
 
+## Vault Points and the rankings (beta, 2026-10-20)
+
+One score worth the same on every platform, and rankings of it. Formula, balance tests and
+decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Points.
+
+- **The formula lives in `src/utils/vaultScore.ts`**, and its balance tests
+  (`vaultScore.test.ts`: the same game within ±10 % on every platform, easy games about a
+  third of a demanding one) must keep passing. Change a number → bump `RULES_VERSION`.
+  Do not weigh native values (gamerscore, grades, RA points) more than the 25 % they have:
+  that is what made platforms unequal in the tests.
+- **Scores are computed ahead, never on a read.** `scoreRefresh` runs after the presence
+  heartbeat (6 h freshness) and from `/api/cron/scores` (daily, plus the Monday snapshot).
+  The rankings routes only read `score_games`/`score_periods`; do not call a platform from them.
+- **Who is listed**: public profile and `show_in_rankings` (Preferences → General; not in the
+  session on purpose, see the plan). Hidden games and unticked consoles do not score. A game
+  counts only for the account linked now, never while flagged `suspect` (Steam unlock tool;
+  admins review it in the panel, logged as `ranking-flag`). Xbox scores only for admins.
+- **No ownership verification, by the user's choice (2026-10-20)**: an account linked by two
+  users scores for both. The analysis of how to verify is in the plan, for later.
+- **`/rankings` is public** (`PUBLIC_PATHS` in the proxy, in the sitemap). Signed out: the
+  global list only, no presence (the privacy policy promises it only to signed-in users),
+  no profile links. Responses never carry user ids and are never shared-cached.
+- **A level shown for another user reads `vaultTotals`/`vaultTotalsOrNone`** (same rules as the
+  rankings). Today: the rankings, Following cards, the home's friend cards, the public profile
+  hero, the header (yours) and your account page. Progress towards a level is a `ProgressBar`
+  or `CircularProgress` in the theme's colour; tiers have their own hue only on their badge.
+- Rankings are labelled **Beta** in the UI; drop the label when the user says so.
+
 ## Achievement showcase vs achievements to get (2026-10-20)
 
 Two different things; do not mix them up again.
@@ -783,11 +817,10 @@ branch to be up to date with its base** before merging, on both.
       asked for. **Open:** a viewer with no RA account is served with the page
       owner's key (see RetroAchievements above); ask RA whether that counts, and
       if not, ask the viewer to link their own. Revisit when OAuth lands.
-- [ ] **Vault Points, levels and rankings** (designed 2026-10-20, on `feat/social-rankings`):
-      one score worth the same on every platform, and a rankings page (Following and global;
-      all-time, month, week; public without a session). Plan, formula and decisions:
-      `docs/rankings-plan.md`. **Open: how Steam/PSN/Xbox ownership is verified** before
-      their points count in the global ranking (analysis in that file); ask the user.
+- [x] **Vault Points, levels and rankings** — a beta in 1.6.0 (2026-10-20). See "Vault Points
+      and the rankings". Later: ownership verification (the user found code-in-bio clumsy;
+      revisit with care), a history chart, and CheevoVault's own achievements (advice: they
+      should not give points).
 - [x] **Online status and "last seen"** on the Following cards (2026-10-19). See
       Presence above. The user said it will grow beyond the card: ask what next
       before extending it (proposed: Steam's "playing now" for everyone in one

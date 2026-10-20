@@ -1,9 +1,9 @@
 # Rankings plan — Vault Points, levels and a rankings page
 
-Status (2026-10-20): **designed, not started.** Analysis, balance tests and mockups were
-shared with the user as a page (Claude artifact "Puntos Vault y rankings"); this file keeps
-what was decided so the next session does not depend on that page. Work goes on
-`feat/social-rankings`, together with Following, presence and the showcase.
+Status (2026-10-20): **built, released as a beta in 1.6.0** on `feat/social-rankings`
+(together with Following, presence and the showcase). Analysis, balance tests and mockups
+were shared with the user as a page (Claude artifact "Puntos Vault y rankings"); this file
+keeps what was decided. Where the code differs from the first design, it says so below.
 
 ## Goal
 
@@ -59,8 +59,9 @@ PSN's words).
 
 ## Decisions taken (2026-10-20, the user)
 
-1. **Verification:** to be analysed first (below); the user is open to bringing back sign-in
-   per platform.
+1. **No verification for now** (decided after the analysis below): linking stays by name and
+   whoever links someone else's account is responsible for it. An account linked by two users
+   scores for both. To be revisited with more care later.
 2. **Design:** proposal A (podium + table) with B's "your level" panel on the right from `lg`,
    and C's "close rivals" list for Following when you follow few people.
 3. **Names** "Puntos Vault (PV)" and the tier names stay for now; a later spike may change them
@@ -72,7 +73,7 @@ PSN's words).
    a signed-out viewer is never an admin, so no Xbox; and **no presence dots for signed-out
    viewers** (`/privacy` says only signed-in users see presence).
 
-## Verification — analysis (pending the user's choice)
+## Verification — analysis (kept for later; not built)
 
 Steam, PSN and Xbox are linked by typing a name, nothing proves ownership, and on purpose they
 are not unique (`migrations/028`). In a public ranking anyone could link a famous hunter's
@@ -113,6 +114,23 @@ not verify. Effect: **only the global ranking requires it** (Steam/PSN/Xbox poin
 only when verified); Following counts everything and marks the unverified; the public profile
 shows a tick per verified platform. Nothing else is gated, in the spirit of the soft email
 verification. `/privacy` must say what is read during a check.
+
+## As built (2026-10-20), where it differs from the design
+
+- **RA rarity** uses everyone who loaded the game (`NumAwarded / NumDistinctPlayers`) for
+  hardcore and softcore alike; softcore unlocks are worth half. Rarity is relative to the
+  game's most common achievement, so the denominator cancels out anyway.
+- **Unlocks are stored by day** (`[unix day, points]`), enough for weeks and months.
+- **No `inputs` column:** a formula change bumps `RULES_VERSION` and games are read again
+  at the refresh's pace, from caches where the platform's own cache is keyed by activity
+  (PSN, Xbox). RA and Steam games are read straight from the platform.
+- **No per-platform factor yet:** the admin panel's "Rankings balance" shows the medians per
+  platform; add a factor only if one drifts beyond ±10 % with real data.
+- **Arrows** (places moved since Monday) only on the global, all-time, every-platform view,
+  and only once a Monday snapshot exists.
+- **Following without a podium** below 15 people; close rivals beside the global list.
+- `show_in_rankings` is **not in the session** on purpose (unlike `show_presence`): it is read
+  with the rankings, so a database without migration 040 breaks only the rankings.
 
 ## Data and computation (summary)
 

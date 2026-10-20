@@ -35,9 +35,10 @@ page (src/app/(main)/…)            client component
 | Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}`, `admin/xbox`, `admin/xbox/achievements` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
+| Rankings | `rankings` (public), `rankings/me`, `admin/rankings` | Read stored scores only; see Vault Points below |
 | Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | |
 | Admin | `admin/*` | Every one starts with `requireAdmin(req)` |
-| Cron | `cron/sweepCache` (04:00), `cron/psnToken` (09:00) | Scheduled in `vercel.json`, need `CRON_SECRET` |
+| Cron | `cron/sweepCache` (04:00), `cron/scores` (05:00), `cron/psnToken` (09:00) | Scheduled in `vercel.json`, need `CRON_SECRET` |
 
 Routes answer structured errors with real status codes (400 bad input, 401/403
 auth, 429 rate limited, 502/503 upstream).
@@ -59,6 +60,25 @@ auth, 429 rate limited, 502/503 upstream).
 
 Change the shape of a cached value → bump its key's version (`gameData_v2:` →
 `_v3`) in the same change.
+
+## Vault Points (rankings)
+
+Scores are worked out ahead of time, not when a page asks (plan and formula:
+`docs/rankings-plan.md`):
+
+1. **Refresh** — `src/lib/scoreRefresh.ts`. Lists each linked platform's library
+   once (RA `GetUserCompletionProgress`, Steam owned games, `psnTitles`,
+   `xboxLibrary`), and reads again only games whose last unlock moved
+   (`change_key`), a few per run per platform (`READS`); the rest score
+   provisionally from the list. Triggered after the presence heartbeat when a
+   score is 6 h old (`after()` in `/api/presence`), and by `/api/cron/scores`.
+2. **Formula** — `src/utils/vaultScore.ts` (pure), fed by the per-platform
+   mappers in `src/utils/vaultScoreInputs.ts`; levels in `src/utils/vaultLevel.ts`.
+3. **Storage** — `score_games` (one row per game, points before the stack
+   factor, unlocks by day), `score_periods` (weeks and months, rebuilt per user),
+   `score_snapshots` (Monday ranks, for the arrows). `migrations/040`.
+4. **Reading** — `src/lib/rankings.ts`: `loadRanking` (global lists cached 5 min
+   per instance), `vaultTotals` for badges on cards and profiles, `presenceOf`.
 
 ## Database
 

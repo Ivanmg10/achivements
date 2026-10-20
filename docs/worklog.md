@@ -25,6 +25,39 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Vault Points and the rankings, a beta (`feat/social-rankings`)
+
+**Did** — Built the whole plan in `docs/rankings-plan.md`:
+- Engine: `src/utils/vaultScore.ts` (formula, stacks, unlock-tool check), `vaultLevel.ts`
+  (levels, tiers, weeks/months), `vaultScoreInputs.ts` (per platform); `src/lib/scoreRefresh.ts`
+  (lists each library once, reads only games that moved, provisional scores meanwhile);
+  `src/lib/rankings.ts`; `migrations/040_vault_points.sql` (`score_games`, `score_periods`,
+  `score_snapshots`, `users.show_in_rankings`, `users.score_refreshed_at`).
+- Triggers: `after()` in `/api/presence` (6 h freshness) and `/api/cron/scores` (daily 05:00,
+  takes the Monday snapshot). Routes: `/api/rankings` (public), `/api/rankings/me`,
+  `/api/admin/rankings` (balance per platform, review of flagged Steam games).
+- UI: `/rankings` (public; design A with B's level panel and C's close rivals), "Beta" label,
+  "how points work" modal; level badge in the header, Following cards, home friend cards,
+  public profile hero and your account page; "Appear in the rankings" switch in Preferences;
+  the Following teaser is now its link; rankings in the nav; admin "Rankings balance".
+- 9 languages, `/privacy` paragraph (and its sitemap date), sitemap and proxy entry for `/rankings`.
+**Why** — The user asked for an internal score where every platform is worth the same, levels,
+and rankings of everyone and of whom you follow, all of it at once rather than in phases.
+**Decisions** (the user's) — no ownership verification for now ("trust people"; an account
+linked twice scores for both); periods all-time, month and week; public without a session;
+hidden games and consoles do not score; 1.6.0 with only the rankings marked beta.
+Mine: `show_in_rankings` kept out of the session so a missing migration breaks only the
+rankings; levels on cards read through `vaultTotalsOrNone` for the same reason; RA and Steam
+games read straight from the platform (their page caches can predate the unlock that moved
+the game); no per-platform factor until real data asks for one.
+**Open** — **`migrations/040` is not applied**: the agent was refused running it on the shared
+database. Apply it before testing anything on develop. Then watch the first refreshes (Vercel
+logs `[scoreRefresh]`) and the admin balance table; the formula was only tested on
+illustrative data. Not checked in a browser yet.
+**Watch out** — A first fill reads 25 RA / 40 Steam / 15 PSN / 5 Xbox games per run and comes
+back after 10 minutes while unfinished, so a big library takes a few visits (or days of cron)
+to settle; until then games count provisionally. RA refreshes spend the user's own key.
+
 ## 2026-10-20 — Branch split, rankings designed (`feat/social-rankings`)
 
 **Did** — `improvements_11` held two unrelated sets of work. The social one (Following
