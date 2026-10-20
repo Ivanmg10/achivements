@@ -25,6 +25,21 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Xbox shelf cards with sharp art (`fix/xbox-shelf-art`)
+
+**Did** — `LibraryShelfBanner` asks `/api/xbox/details` (through `useXboxGameDetails`) for an Xbox
+game's IGDB `heroUrl` and shows it sharp, as RA's screenshots; the shelf detail backdrop follows,
+since it draws the same banner. Test: `LibraryShelfBanner.test.tsx`.
+**Why** — The user saw every Xbox card in the library shelves blurred: Xbox sends only a square
+tile, and the banner blows a tile up and blurs it.
+**Decisions** — Reused the game page's route (cached half a year on the server, `cachedJson` in the
+browser) instead of a new art-only one. One request per visible card, so at most a shelf's worth.
+**Open** — Cold, the route makes two IGDB searches per game (details and art) and `searchGames`
+does not retry a 429, so a first load with many Xbox cards may leave a few blurred until the next
+visit. Games IGDB does not match stay blurred.
+
+---
+
 ## 2026-10-20 — See who follows you (`feat/rankings-zone-and-personas`)
 
 **Did** — `/following` has tabs (`FollowingTabs`): Following and Followers (`#followers`, read
