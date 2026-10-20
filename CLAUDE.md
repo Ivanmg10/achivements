@@ -628,6 +628,16 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   or `CircularProgress` in the theme's colour; tiers have their own hue only on their badge.
 - Rankings are labelled **Beta** in the UI; drop the label when the user says so.
 
+## Follows: who you follow and who follows you (2026-10-20)
+
+- **Both lists are yours alone.** `/following` has two tabs, "Following" and "Followers"
+  (`#followers`, opened from the account page's counts); `GET /api/follows/overview?who=followers`
+  answers only for the signed-in user. Nobody else is ever shown who follows whom: do not add a
+  follower list or count to public profiles without asking. `/privacy` says so in all 9 languages
+  (changed 2026-10-20 at the user's request; before, followers were a number only).
+- **Public profiles only**, on both sides and in both counts (`/api/follows/count`): a private
+  profile drops out of the lists until it is public again.
+
 ## Achievement showcase vs achievements to get (2026-10-20)
 
 Two different things; do not mix them up again.

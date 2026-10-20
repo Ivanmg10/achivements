@@ -13,14 +13,18 @@ import { vaultTotalsOrNone } from '@/lib/rankings'
  * they were last seen (if they share it), where they play (and as whom), their
  * favourite game per platform, their achievement showcase (up to five) and how
  * many public groups they keep. Their pinned achievements are their own goals: never here. Newest follow first; private profiles left out.
+ * `?who=followers`: the same for the people who follow you (only you ever see that list).
  */
-export async function GET() {
+export async function GET(req?: Request) {
   const auth = await requireSession()
   if (!auth.ok) return auth.response
 
   try {
     // Xbox is admin-only for now: to anyone else it is not there at all (see canUseXbox).
     const xbox = canUseXbox((await getServerSession(authOptions))?.user?.admin)
+    // Fixed strings, chosen by the parameter, never taken from it.
+    const followers = req ? new URL(req.url).searchParams.get('who') === 'followers' : false
+    const [them, you] = followers ? ['f.follower_id', 'f.followed_id'] : ['f.followed_id', 'f.follower_id']
     const { rows } = await pool.query(
       `SELECT u.id, u.username, u.avatar, u.location, LEFT(u.description, 120) AS description,
               u.rausername IS NOT NULL AS ra, u.steamid IS NOT NULL AS steam, u.psnaccountid IS NOT NULL AS psn,
@@ -39,8 +43,8 @@ export async function GET() {
                                 ORDER BY sc.position, sc.created_at)
                 FROM showcase_achievements sc WHERE sc.user_id = u.id AND ($2::boolean OR sc.source <> 'xbox')
               ), '[]'::json) AS showcase
-       FROM follows f JOIN users u ON u.id = f.followed_id
-       WHERE f.follower_id = $1 AND u.profile_public
+       FROM follows f JOIN users u ON u.id = ${them}
+       WHERE ${you} = $1 AND u.profile_public
        ORDER BY f.created_at DESC`,
       [auth.id, xbox],
     )

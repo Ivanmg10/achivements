@@ -25,6 +25,18 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — See who follows you (`feat/rankings-zone-and-personas`)
+
+**Did** — `/following` has tabs (`FollowingTabs`): Following and Followers (`#followers`, read
+when opened through `useFollowers` → `GET /api/follows/overview?who=followers`). The list, its
+search and its states moved to `FollowingList`, shared by both tabs. The account page's
+"Followers" count is now a link like "Following". Followers are counted and listed only when
+their profile is public, as the people you follow already were. The privacy policy's follows
+sentence changed in all nine languages: you see both lists, nobody else sees who follows whom.
+**Why** — The user wanted to see who follows them and to change the policy for it.
+**Decisions** — Only you see your followers; no follower list on public profiles. Added a
+"Follows" section to CLAUDE.md so that stays true.
+
 ## 2026-10-20 — Following section: cards across the width (`chore/demo-personas`)
 
 **Did** — In the home's Following section (`MainPageFriends`), "Who you follow" left the

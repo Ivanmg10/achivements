@@ -1,17 +1,16 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { IconUsers } from '@tabler/icons-react'
-import type { GameSource } from '@/types/steam'
+import { useMemo } from 'react'
+import { IconHeart, IconUsers } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useFriendsData } from '@/hooks/useFriendsData'
-import { filterFollowing } from '@/utils/friends'
-import EmptyState from '@/components/empty-state/EmptyState'
-import FollowingPageSkeleton from './following-page-skeleton/FollowingPageSkeleton'
+import { useFollowers } from '@/hooks/useFollowers'
+import { useFollowCounts } from '@/hooks/useFollowCounts'
+import { useLocationHash } from '@/hooks/useLocationHash'
 import FollowingHero from './following-hero/FollowingHero'
 import FollowingRankingsTeaser from './following-rankings-teaser/FollowingRankingsTeaser'
-import FollowingToolbar from './following-toolbar/FollowingToolbar'
-import FollowingCard from './following-card/FollowingCard'
+import FollowingTabs, { type FollowingTab } from './following-tabs/FollowingTabs'
+import FollowingList from './following-list/FollowingList'
 
 /**
  * The people you follow, newest first, each as a card that opens their
@@ -20,25 +19,22 @@ import FollowingCard from './following-card/FollowingCard'
  * play on (all of those chosen). Beside the title, where the rankings will
  * open from. The cards are our own data; the last game played and the unlocks
  * are read for the newest follows only (DETAIL_LIMIT), as the home's Friends
- * section does.
+ * section does. A second tab (`#followers`) lists who follows you, the same
+ * cards, read when it is first opened; only you see it.
  */
 export default function FollowingPage() {
   const { T } = useLanguage()
+  const hash = useLocationHash()
+  const tab: FollowingTab = hash === '#followers' ? 'followers' : 'following'
   const { friends, details, isLoading, error, retry } = useFriendsData(true)
+  const fans = useFollowers(tab === 'followers')
+  const { counts } = useFollowCounts()
   const users = useMemo(() => friends ?? [], [friends])
-  const [query, setQuery] = useState('')
-  const [platforms, setPlatforms] = useState<GameSource[]>([])
 
-  const counts = useMemo(
-    () => ({
-      ra: users.filter((u) => u.ra).length,
-      steam: users.filter((u) => u.steam).length,
-      psn: users.filter((u) => u.psn).length,
-      xbox: users.filter((u) => u.xbox).length,
-    }),
-    [users],
-  )
-  const shown = useMemo(() => filterFollowing(users, query, platforms), [users, query, platforms])
+  // The tab lives in the address, so /user's "Followers" opens it and Back returns to the other.
+  const onTab = (next: FollowingTab) => {
+    window.location.hash = next
+  }
 
   return (
     <div className="flex flex-col items-center py-6 px-4">
@@ -48,34 +44,27 @@ export default function FollowingPage() {
           <FollowingRankingsTeaser />
         </div>
 
-        {isLoading ? (
-          <FollowingPageSkeleton />
-        ) : error ? (
-          <div className="bg-bg-card rounded-2xl flex flex-col items-center gap-2 py-10 text-center">
-            <p role="alert" className="text-sm text-red-400">{T.following.loadError}</p>
-            <button onClick={retry} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
-              {T.publicProfile.retry}
-            </button>
-          </div>
-        ) : users.length === 0 ? (
-          <div className="bg-bg-card rounded-2xl">
-            <EmptyState icon={<IconUsers className="w-6 h-6" />} title={T.following.emptyTitle} subtitle={T.following.empty} className="py-12" />
-          </div>
+        <FollowingTabs tab={tab} onTab={onTab} counts={counts} />
+
+        {tab === 'following' ? (
+          <FollowingList
+            key="following"
+            users={users}
+            details={details}
+            isLoading={isLoading}
+            error={error}
+            onRetry={retry}
+            empty={{ icon: <IconUsers className="w-6 h-6" />, title: T.following.emptyTitle, subtitle: T.following.empty }}
+          />
         ) : (
-          <>
-            <FollowingToolbar query={query} onQuery={setQuery} platforms={platforms} onPlatforms={setPlatforms} total={users.length} counts={counts} />
-            {shown.length === 0 ? (
-              <p role="status" className="bg-bg-card rounded-2xl py-10 text-center text-sm text-text-secondary">{T.following.noMatches}</p>
-            ) : (
-              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[1800px]:grid-cols-5 gap-3">
-                {shown.map((u) => (
-                  <li key={u.username} className="flex flex-col">
-                    <FollowingCard friend={u} lastPlayed={details[u.username]?.lastPlayed} recent={details[u.username]?.recent} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </>
+          <FollowingList
+            key="followers"
+            users={fans.followers ?? []}
+            isLoading={fans.isLoading}
+            error={fans.error}
+            onRetry={fans.retry}
+            empty={{ icon: <IconHeart className="w-6 h-6" />, title: T.following.noFollowersTitle, subtitle: T.following.noFollowers }}
+          />
         )}
       </div>
     </div>
