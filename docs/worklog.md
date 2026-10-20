@@ -25,6 +25,249 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Demo users on the preview database (`feat/social-rankings`)
+
+**Did** — The user created the Neon branch and set `PREVIEW_DATABASE_URL`; checked that local
+work reads it (a marker written only on pre showed on localhost; production unchanged; marker
+removed). Added `scripts/demo-rankings.mjs` (`seed` / `clear`, preview database only) and seeded
+40 `demo_*` users with scores, weeks, Monday ranks, presence and follows; `ivanxmarine` follows
+ten of them on pre. Checked the Following rankings in the browser.
+**Open** — `dev.cheevovault.com` uses pre only once this branch reaches `develop`.
+
+## 2026-10-20 — A database of its own for pre (`feat/social-rankings`)
+
+**Did** — `src/lib/db.js` reads `PREVIEW_DATABASE_URL` before `DATABASE_URL`, except in production
+(`VERCEL_ENV`), so `develop` and local work can use a Neon branch of production (`preview`).
+Documented in `.env.example`, README and CLAUDE.md (Environments).
+**Why** — The user wants a pre that does not touch production (and fake users to test the
+rankings with). The Neon integration owns `DATABASE_URL` for all environments, and Vercel refused
+a branch-scoped `DATABASE_URL` for `develop` ("already exists for production, preview, development").
+**Open** — The user creates the Neon branch and sets `PREVIEW_DATABASE_URL` (Vercel: Preview →
+develop; and `.env.local`), then redeploys develop. Until then nothing changes. Then: a seed
+script for demo users, run only against the branch.
+
+## 2026-10-20 — Fill stuck at 99 %, a history chart, the guide in nine languages (`feat/social-rankings`)
+
+**Did** — The user's fill stayed at "Calculating 99 %": Steam answers HTTP 500 every time for two
+games with no achievements (Pavlov VR, Lethal Company; checked live), so they were re-read each
+pass and the fill never ended. A game that fails on its own is now *skipped* (`FillPlatform.skipped`;
+it does not hold the fill up and is retried at the next refresh); if every read of a platform
+fails, it is `unavailable`, not done. The per-platform progress was redrawn as small cards (four
+in a row on the account page) instead of bars across the whole card; platform cards say how many
+games counted and how many were skipped. Added the weekly history (`weeks` in
+`/api/rankings/me`, `VaultWeeksChart`, plain SVG) to the rankings' level panel. "How Vault Points
+work" now in all nine languages (`vaultGuideMore.ts`). The podium keeps first in the middle when
+fewer than three people rank. Checked in the browser with the real account: guide, rankings,
+account page, header level.
+**Decisions** — No fake users in production: `/rankings` is public, so they would show to
+everyone (and in search, Following, profiles). Proposed instead: a Neon branch for a test copy.
+**Open** — Testing with many users needs that separate database.
+
+## 2026-10-20 — Points at once when a platform is linked, and a guide (`feat/social-rankings`)
+
+**Did** — The fill of a new account no longer waits for heartbeats: `onPlatformLinked` (in the
+RA, Steam, PSN and Xbox link routes) marks the platform "calculating" and runs a pass right after
+the answer; `useVaultFill` (`VaultFillProvider` in `MainProviders`) asks `POST /api/rankings/fill`
+for pass after pass until it is complete, polling `GET` for progress. Each platform is read at a
+measured pace (`PACE` in `scoreRefresh`; PSN gentle, with an app-wide `psn-score` budget in
+`attemptLimit`), and errors are classified (`private`, `key`, `busy`, `unavailable`). Progress
+shows in the header (a ring), each platform card (`VaultFillLine`), the account page and the
+rankings panel (`VaultFillProgress`); the viewer's points carry "≈"; toasts when ready or when a
+platform fails. Also fixed: the viewer's own rankings row is read fresh (it came from a 5-minute
+cache). New public page `/rankings/how` ("How Vault Points work", EN/ES in
+`src/translations/vaultGuide.ts`, numbers from the formula; examples shared with the balance
+tests in `src/utils/vaultExamples.ts`); the rankings' "how points work" now links to it (the
+modal is gone).
+**Why** — The user disliked a fill that took an hour unseen ("if I sign up I expect to be in the
+rankings at once"), asked to be careful with PSN, and wanted the explanation of the weighting
+for users.
+**Decisions** — Measured before choosing paces (numbers in the plan). Progress kept in
+`steam_cache` rather than a migration. "Ready" toasts only for a fill that was pending, never a
+6-hourly refresh. Xbox's estimate counts as settled. The guide follows the public pages' rule
+(EN/ES outside `T`).
+**Open** — Not tried in a browser. RA per-key vs per-IP limit unknown. If PSN starts answering
+"too many requests" in production, lower `PACE.psn` or the `psn-score` budget.
+
+## 2026-10-20 — Vault Points and the rankings, a beta (`feat/social-rankings`)
+
+**Did** — Built the whole plan in `docs/rankings-plan.md`:
+- Engine: `src/utils/vaultScore.ts` (formula, stacks, unlock-tool check), `vaultLevel.ts`
+  (levels, tiers, weeks/months), `vaultScoreInputs.ts` (per platform); `src/lib/scoreRefresh.ts`
+  (lists each library once, reads only games that moved, provisional scores meanwhile);
+  `src/lib/rankings.ts`; `migrations/040_vault_points.sql` (`score_games`, `score_periods`,
+  `score_snapshots`, `users.show_in_rankings`, `users.score_refreshed_at`).
+- Triggers: `after()` in `/api/presence` (6 h freshness) and `/api/cron/scores` (daily 05:00,
+  takes the Monday snapshot). Routes: `/api/rankings` (public), `/api/rankings/me`,
+  `/api/admin/rankings` (balance per platform, review of flagged Steam games).
+- UI: `/rankings` (public; design A with B's level panel and C's close rivals), "Beta" label,
+  "how points work" modal; level badge in the header, Following cards, home friend cards,
+  public profile hero and your account page; "Appear in the rankings" switch in Preferences;
+  the Following teaser is now its link; rankings in the nav; admin "Rankings balance".
+- 9 languages, `/privacy` paragraph (and its sitemap date), sitemap and proxy entry for `/rankings`.
+**Why** — The user asked for an internal score where every platform is worth the same, levels,
+and rankings of everyone and of whom you follow, all of it at once rather than in phases.
+**Decisions** (the user's) — no ownership verification for now ("trust people"; an account
+linked twice scores for both); periods all-time, month and week; public without a session;
+hidden games and consoles do not score; 1.6.0 with only the rankings marked beta.
+Mine: `show_in_rankings` kept out of the session so a missing migration breaks only the
+rankings; levels on cards read through `vaultTotalsOrNone` for the same reason; RA and Steam
+games read straight from the platform (their page caches can predate the unlock that moved
+the game); no per-platform factor until real data asks for one.
+**Open** — `migrations/040` applied to the shared database 2026-10-20 (with the user's OK).
+Watch the first refreshes (Vercel logs `[scoreRefresh]`) and the admin balance table; the formula was only tested on
+illustrative data. Not checked in a browser yet.
+**Watch out** — A first fill reads 25 RA / 40 Steam / 15 PSN / 5 Xbox games per run and comes
+back after 10 minutes while unfinished, so a big library takes a few visits (or days of cron)
+to settle; until then games count provisionally. RA refreshes spend the user's own key.
+
+## 2026-10-20 — Branch split, rankings designed (`feat/social-rankings`)
+
+**Did** — `improvements_11` held two unrelated sets of work. The social one (Following
+restyle, presence, achievement showcase: 7 commits) was cherry-picked onto `develop` as
+`feat/social-rankings`; `improvements_11` was rebuilt on `develop` with the rest (progress
+chart periods, 404/error screens, lazy modal suspense, PSN-only header) and force-pushed. The
+code of every commit is byte-for-byte the original; only worklog, version and conflicts in
+shared files were re-resolved. Added `docs/rankings-plan.md`: the Vault Points formula,
+levels, the user's decisions and the verification analysis.
+**Why** — The user wanted the friends/online work in its own PR, where the rankings will be
+built too.
+**Decisions** — The showcase went with the social branch: it changes `FollowingCard`, the
+follows overview and the friends card, all on top of the Following and presence commits, and it
+is what friends see. Older worklog entries keep saying `improvements_11`; read them as this
+branch for Following, presence and the showcase.
+**Open** — How ownership is verified (the user is weighing a return to sign-in per platform;
+see the plan). Rankings not started.
+**Watch out** — Both branches bumped the version from 1.5.18, so whichever merges second
+conflicts on `version.ts`/`package.json`: keep the higher. A local backup of the old branch is
+`backup/improvements_11-pre-split` (not pushed).
+
+## 2026-10-20 — Showcase picker by game, multi-select (`improvements_11`)
+
+**Did** — `ShowcasePickerModal` rebuilt as two views: the user's games with an achievement
+earned (`useProfileLibrary`, played this year first, searchable), then one game's
+achievements (`useShowcaseGameChoices` → RA `getGameProgression`, Steam `achievements`, PSN
+`trophies`, Xbox `achievements`, mapped by `showcaseChoices`: earned first, newest first; the
+rest greyed with a lock; hidden unearned ones concealed), with "back to the games". The
+selection spans games: a game holding selected achievements gets a ring and "n selected";
+selected achievements a ring and a tick; the footer says how many fit and adds them all at
+once (`useShowcase.addMany`, one message). The old one-list row is gone.
+**Why** — The user wanted to browse by game, see what is left, and pick from several games in
+one go.
+**Checked** — with the real account, nothing added: games list, a selection in one game and
+its badge back in the list; RA, PSN, Steam and Xbox games all load.
+
+## 2026-10-20 — Achievement showcase, and "achievements to get" (`improvements_11`)
+
+**Did** — Split what used to be "pinned achievements" in two (rules in CLAUDE.md → Achievement
+showcase):
+- **Showcase** ("Vitrina de logros"): `migrations/039_showcase_achievements.sql`, **applied to
+  the shared Neon database 2026-10-20**; `/api/showcase`; `useShowcase` + `ShowcaseProvider`;
+  a block on top of the Pinned section (5 slots, drag to reorder, × to remove, "+" opens
+  `ShowcasePickerModal` with the year's unlocks from every platform); `ShowcaseToggleButton` in
+  the RA and Steam/PSN/Xbox detail modals, only on earned achievements and only on your pages.
+  The public profile, Following cards and the home's friend cards show it.
+- **Achievements to get**: the old pinned achievements, renamed in all 9 languages
+  ("Logros por conseguir"; the 📌 is now "pin as a goal"). Now private: `/api/favorites` GET
+  ignores `?user=`; the public profile no longer shows them, so `MainPageFavorites` and its
+  four per-platform rows were deleted (the unpin button stays, the Pinned tiles use it).
+- Following card: the latest unlocks are now the large row ("Latest unlocks", or "nothing
+  earned lately"), the showcase small at the foot.
+- `RecentAchievement.Key` (Steam apiname, PSN trophy id, Xbox id) on the mapped unlocks.
+- `/privacy`: the public profile shows the showcase, never the goals (9 languages, dated 20 Oct).
+**Why** — The user wanted the "pins" on Following to be a showcase of earned achievements,
+apart from the goals, and the recent unlocks to lead the card.
+**Decisions** (the user's) — the showcase is managed in the Pinned section (they may move it
+to Preferences later); added from a button on each earned achievement *and* a picker; the
+public profile shows the showcase, not the goals; the goals are "Logros por conseguir".
+Mine: a new table with one shape rather than a flag on `pinned_achievements` (different
+meaning, no per-platform snapshot to decode); the button only in the detail modals (one place
+per platform family) rather than on every row; the picker reads the year's unlocks already
+loaded for the streak, so older achievements are added from their game page.
+**Checked** — in the browser with the real account: added one from the picker, saw the tile
+and the toast and the public profile section, then removed it (the showcase is empty again).
+The Following card with mocked follows.
+**Open** — "Earned" is trusted from the client (see `parseShowcaseEntry`). Steam/PSN/Xbox
+unlocks added from the picker have no description (the feed does not carry it); from the
+modal they do. A pinned goal that gets earned is not moved to the showcase automatically.
+
+## 2026-10-20 — Presence everywhere another user shows (`improvements_11`)
+
+**Did** — The green dot and "online / seen …" now follow every picture of another user, not
+only the Following cards. Shared pieces: `presenceColumns()` (`src/lib/presence.ts`, the SQL
+rule, now used by the follows overview, `/api/users/search` and `findPublicUser`),
+`PresenceDot` and `PresenceLabel` (components). Placed in: Following hero faces, `UserSummary`
+(search results, the home's friend cards), the public profile hero (dot + line under the name,
+not on your own page), compare, someone's game page banner, the friends leaderboard and shared
+games. `/privacy` and the switch now say *signed-in users* see it (9 languages).
+**Why** — The user asked for the dot next to every online person's picture, and "last seen"
+everywhere else.
+**Decisions** — The dot speaks to screen readers (`announce`) only where no text beside it
+says so. Your own picture never gets it. Recent users in the search (kept in the browser)
+have no presence: they are not read from the server.
+**Open** — Nothing refreshes it while a page stays open (only on load).
+
+## 2026-10-19 — Online status and "last seen" (`improvements_11`)
+
+**Did** — Presence on the Following cards. `migrations/038_user_presence.sql`
+(`users.last_seen_at`, `users.show_presence` default true), **applied to the shared Neon
+database 2026-10-19**. `usePresenceHeartbeat` (via `PresenceHeartbeat` in `MainProviders`)
+posts `/api/presence` while the tab is visible; the route writes at most once a minute.
+`/api/follows/overview` returns `online` (seen < 5 min) and `lastSeenAt` (rounded to 5 min),
+both only for who shares it. The card shows a green dot and "Online", or "Seen 3 h ago" /
+"over a month ago", in place of the bio (`presenceOf` in `src/utils/friends.ts`); the hero
+says "n online now". A "Show when I am online" switch in Preferences → General
+(`showPresence`, same path as `profilePublic`). `/privacy` explains it, in 9 languages,
+dated 19 October 2026. Rules in CLAUDE.md → Presence.
+**Why** — The user asked for it; analysis and proposal first, then their choices.
+**Decisions** (the user's) — visible by default with an opt-out; not reciprocal; the status
+replaces the bio. A heartbeat only while visible rather than writing from the session, so a
+tab in the background does not count and no read path writes. Online is decided on the
+server, so the client's clock does not matter.
+**Checked** — in the browser: two beats on arrival (Strict Mode in dev), one row written;
+the card states and the switch with mocked follows.
+**Open** — what comes next is the user's call (CLAUDE.md roadmap): Steam "playing now" in
+one call for everyone, an "online" filter, refreshing without reloading, the public profile.
+**Watch out** — Any database without migration 038 breaks every signed-in request.
+
+## 2026-10-19 — Following page restyled, room for rankings (`improvements_11`)
+
+**Did** — `/following` was a plain list of names. Now (`FollowingPage`):
+- `FollowingHero`: the title on a wash of the theme's accent, how many people you follow and
+  a stack of their avatars (+N).
+- `FollowingRankingsTeaser` beside it: "Rankings · Coming soon" with an empty podium. Not a
+  link yet; when the rankings page exists, this card becomes its link.
+- `FollowingToolbar`: search by name and a chip per platform (only those someone has, with
+  counts; `aria-pressed` plus a check, not colour alone). Platforms are multi-select and add
+  up: two chosen leave who has **both** (people link several accounts); "All" clears them.
+  Filtering is `filterFollowing` in `src/utils/friends.ts`.
+- Each person is a `FollowingCard` (design "A2", iterated with the user on a canvas of five
+  variants): a banner with the **last game played** (`FollowingCardBanner`: blurred, a Steam
+  header a little and an icon a lot; without one, the avatar colours via `UserProfileBanner`), who they are,
+  a chip per linked account with the name it goes by (`FollowingCardPlatforms`; the overview
+  now returns `accounts`, the names the public profile already shows, Xbox's only to an
+  admin), and up to **5 pinned badges** whose tooltip says game, name and description
+  (`FollowingCardBadges`, size `md`). At the foot, beside the groups, their last 5 unlocks in
+  the same row at size `sm` (`recentAsBadge` puts an unlock in a pin's shape). Favourite games
+  were dropped from the card on the user's choice.
+- The page now reads `useFriendsData(true)` (the home Friends section's hook): the overview
+  for everyone, and the platforms' games for the newest `DETAIL_LIMIT` (10) follows, from which
+  `lastPlayedGame` (`src/utils/friends.ts`) picks the newest; RA has no play date, so its latest
+  unlock stands in. `useFollowing` is gone. The overview now returns 5 pins with a
+  `description` (a secret Xbox one not yet earned keeps it hidden); the home card shows 3.
+- Fixed in `useFriendsData`: a page that wants it from its first render never loaded in dev
+  (Strict Mode ran the effect twice; the guard skipped the second run). Tested under StrictMode.
+New `T.following` keys in all 9 languages.
+**Why** — The user found the page boring and wants it ready for a rankings system that will
+have its own page.
+**Decisions** — Last played costs platform calls (cached, the same as the home section), so
+only the newest 10 follows get it and their latest unlocks; the rest show their avatar colours
+and no unlocks. Storing it in the DB
+when each user loads their own library was proposed, not done. The rankings themselves were
+not started: only the place they open from.
+**Open** — Online status / "last seen" (the line where the bio is now) is in the CLAUDE.md
+roadmap: ask the user first. "1 grupos públicos" (no singular form). `GET /api/follows` has no
+client left (POST/DELETE still used by `useFollow`); kept with its tests, can go.
+
 ## 2026-10-20 — Following, presence and showcase moved out (`improvements_11`)
 
 **Did** — The Following restyle, presence ("online" / "last seen") and the achievement

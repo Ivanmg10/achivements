@@ -7,6 +7,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { modalOverlay, modalContent } from '@/lib/animations'
 import { FadeImage } from '@/components/ui/FadeImage'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
+import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseToggleButton'
+import type { ShowcaseEntry } from '@/utils/showcase'
 import { formatRarity } from '@/utils/steamFeed'
 import type { GuideLink } from '@/utils/guideLinks'
 
@@ -32,6 +34,7 @@ export default function AchievementDetailModal({
   guides,
   pinned,
   onTogglePin,
+  showcase,
   onClose,
 }: {
   title: string
@@ -47,6 +50,8 @@ export default function AchievementDetailModal({
   /** Undefined for a signed-out visitor, who cannot pin. */
   pinned?: boolean
   onTogglePin?: () => void
+  /** The achievement as the showcase would keep it, when earned; null or absent otherwise. */
+  showcase?: ShowcaseEntry | null
   onClose: () => void
 }) {
   const { T, lang } = useLanguage()
@@ -111,6 +116,7 @@ export default function AchievementDetailModal({
           <div className="flex flex-col gap-1.5 flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               {pinned !== undefined && onTogglePin && <SteamPinAchievementButton pinned={pinned} title={title} onToggle={onTogglePin} size={18} />}
+              {earned && <ShowcaseToggleButton entry={showcase ?? null} />}
               <h2 id={titleId} className="text-lg sm:text-xl font-semibold">
                 {title}
               </h2>

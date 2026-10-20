@@ -9,6 +9,7 @@ import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
 import UserVaultStat from '@/components/user-page/user-vault-stat/UserVaultStat'
 import UserFollowStats from '@/components/user-page/user-follow-stats/UserFollowStats'
+import UserVaultLevel from '@/components/user-page/user-vault-level/UserVaultLevel'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import EmailVerificationNotice from '@/components/user-page/email-verification-notice/EmailVerificationNotice'
 import type { EditProfileField } from '@/components/edit-profile-modal/EditProfileModal'
@@ -187,8 +188,9 @@ export default function UserIdentityCard() {
             <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
           )}
         </ProfileField>
-        <div className="sm:col-span-3">
+        <div className="sm:col-span-3 flex flex-col gap-3">
           <UserFollowStats />
+          <UserVaultLevel />
         </div>
         <div className="sm:col-span-3 flex flex-col">
           <UserDescriptionField />

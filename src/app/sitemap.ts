@@ -4,7 +4,7 @@ import { SEO_PAGES } from '@/translations/seoPages'
 import { seoPath } from '@/utils/seoPages'
 
 /** When each legal page last changed: the date its "Last updated" line shows. Move both together. */
-const PRIVACY_UPDATED = new Date('2026-10-13')
+const PRIVACY_UPDATED = new Date('2026-10-20')
 const TERMS_UPDATED = new Date('2026-10-09')
 
 /**
@@ -18,6 +18,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/authPage`, changeFrequency: 'yearly', priority: 0.5 },
     { url: `${SITE_URL}/privacy`, lastModified: PRIVACY_UPDATED, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${SITE_URL}/terms`, lastModified: TERMS_UPDATED, changeFrequency: 'yearly', priority: 0.3 },
+    // The global rankings: public, and they move every day.
+    { url: `${SITE_URL}/rankings`, changeFrequency: 'daily', priority: 0.8 },
+    { url: `${SITE_URL}/rankings/how`, changeFrequency: 'monthly', priority: 0.6 },
     ...SEO_PAGES.map((page) => ({
       url: `${SITE_URL}${seoPath(page)}`,
       lastModified: new Date(page.updated),

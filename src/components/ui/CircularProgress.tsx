@@ -8,12 +8,18 @@ export function CircularProgress({
   size = 112,
   strokeWidth = 9,
   label,
+  center,
+  ariaLabel,
 }: {
   earned: number
   total: number
   size?: number
   strokeWidth?: number
   label?: string
+  /** What goes in the middle instead of earned/total (a level, for instance). */
+  center?: React.ReactNode
+  /** The ring's accessible name, when earned/total is not what it means. */
+  ariaLabel?: string
 }) {
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
@@ -24,7 +30,7 @@ export function CircularProgress({
     <div className="inline-flex flex-col items-center gap-2">
       <div
         role="img"
-        aria-label={`${earned} / ${total}`}
+        aria-label={ariaLabel ?? `${earned} / ${total}`}
         className="relative inline-flex items-center justify-center shrink-0"
         data-complete={isComplete || undefined}
         style={{ width: size, height: size }}
@@ -55,12 +61,14 @@ export function CircularProgress({
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span
-            className={`font-bold leading-tight ${isComplete ? 'text-success' : 'text-text-main'}`}
-            style={{ fontSize: size * 0.19 }}
-          >
-            {earned}/{total}
-          </span>
+          {center ?? (
+            <span
+              className={`font-bold leading-tight ${isComplete ? 'text-success' : 'text-text-main'}`}
+              style={{ fontSize: size * 0.19 }}
+            >
+              {earned}/{total}
+            </span>
+          )}
         </div>
       </div>
       {label && (

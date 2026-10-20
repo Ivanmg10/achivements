@@ -3,6 +3,7 @@ import pool from '@/lib/db'
 import { requireXboxUser } from '@/lib/apiAuth'
 import { findXboxAccount, isGamertag, xboxConfigured, xboxFailure, xboxSummary } from '@/lib/xboxClient'
 import { forgetUser } from '@/lib/userRecord'
+import { onPlatformLinked } from '@/lib/scoreRefresh'
 
 /**
  * Links an Xbox account by its gamertag. Nothing proves the account is the
@@ -41,5 +42,6 @@ export async function POST(req: Request) {
   }
 
   forgetUser(auth.id)
+  await onPlatformLinked(Number(auth.id), 'xbox')
   return NextResponse.json({ xboxxuid: account.xuid, xboxgamertag: account.gamertag })
 }

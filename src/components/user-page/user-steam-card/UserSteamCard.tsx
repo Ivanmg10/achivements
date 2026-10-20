@@ -50,6 +50,7 @@ export default function UserSteamCard() {
   return (
     <UserPlatformCard
       name="Steam"
+      source="steam"
       href={steamId ? `https://steamcommunity.com/profiles/${encodeURIComponent(steamId)}` : undefined}
       logo={<SteamLogo size={18} className="text-[#66c0f4]" aria-hidden="true" />}
       bigLogo={<SteamLogo size={40} className="text-[#66c0f4]" aria-hidden="true" />}

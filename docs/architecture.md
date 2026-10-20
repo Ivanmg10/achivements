@@ -35,9 +35,10 @@ page (src/app/(main)/…)            client component
 | Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}`, `admin/xbox`, `admin/xbox/achievements` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
+| Rankings | `rankings` (public), `rankings/me`, `rankings/fill`, `admin/rankings` | Read stored scores; `fill` runs a pass. See Vault Points below |
 | Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | |
 | Admin | `admin/*` | Every one starts with `requireAdmin(req)` |
-| Cron | `cron/sweepCache` (04:00), `cron/psnToken` (09:00) | Scheduled in `vercel.json`, need `CRON_SECRET` |
+| Cron | `cron/sweepCache` (04:00), `cron/scores` (05:00), `cron/psnToken` (09:00) | Scheduled in `vercel.json`, need `CRON_SECRET` |
 
 Routes answer structured errors with real status codes (400 bad input, 401/403
 auth, 429 rate limited, 502/503 upstream).
@@ -59,6 +60,29 @@ auth, 429 rate limited, 502/503 upstream).
 
 Change the shape of a cached value → bump its key's version (`gameData_v2:` →
 `_v3`) in the same change.
+
+## Vault Points (rankings)
+
+Scores are worked out ahead of time, not when a page asks (plan and formula:
+`docs/rankings-plan.md`):
+
+1. **Refresh** — `src/lib/scoreRefresh.ts`. Lists each linked platform's library
+   once (RA `GetUserCompletionProgress`, Steam owned games, `psnTitles`,
+   `xboxLibrary`), and reads again only games whose last unlock moved
+   (`change_key`), a few per run per platform (`READS`); the rest score
+   provisionally from the list. Each platform at its measured pace (`PACE`; PSN
+   also under an app-wide budget in `attemptLimit`). Triggered when a platform is
+   linked (`onPlatformLinked`), by the client while the fill is unfinished
+   (`useVaultFill` in `VaultFillProvider` → `POST /api/rankings/fill`), after the
+   presence heartbeat when a score is 6 h old, and by `/api/cron/scores`. Progress
+   is kept in `steam_cache` (`score:fill:<user>`) for the screens.
+2. **Formula** — `src/utils/vaultScore.ts` (pure), fed by the per-platform
+   mappers in `src/utils/vaultScoreInputs.ts`; levels in `src/utils/vaultLevel.ts`.
+3. **Storage** — `score_games` (one row per game, points before the stack
+   factor, unlocks by day), `score_periods` (weeks and months, rebuilt per user),
+   `score_snapshots` (Monday ranks, for the arrows). `migrations/040`.
+4. **Reading** — `src/lib/rankings.ts`: `loadRanking` (global lists cached 5 min
+   per instance), `vaultTotals` for badges on cards and profiles, `presenceOf`.
 
 ## Database
 
@@ -88,6 +112,17 @@ Change the shape of a cached value → bump its key's version (`gameData_v2:` �
 - **Public pages** (`/compare/[slug]`, `/track/[slug]`): one entry each in
   `SEO_PAGES`; the routes, the sitemap and the footer links all read that list.
   Rendered by `SeoPage`, with the FAQ as `FAQPage` JSON-LD from `SeoPageRoute`.
+- **Showcase**: `ShowcaseProvider` (in `MainProviders`) holds the user's own
+  achievement showcase (`useShowcase` → `/api/showcase`, table
+  `showcase_achievements`); a public profile reads someone's with `useShowcase`
+  under `SubjectContext`. Pinned achievements (`/api/favorites`) are own-only.
+- **Presence**: `PresenceHeartbeat` (mounted in `MainProviders`) runs
+  `usePresenceHeartbeat`: `POST /api/presence` on arrival, every 2 min and on
+  coming back to the tab, only while it is visible. The route writes
+  `users.last_seen_at` at most once a minute. `presenceColumns()`
+  (`src/lib/presence.ts`) turns it into `online` / `lastSeenAt` for whoever shares
+  it (`show_presence`), in every query that shows other users; `PresenceDot` and
+  `PresenceLabel` draw it.
 - **Themes**: `THEMES` in `src/types/types.ts`, CSS variables in
   `src/app/globals.css`, applied before paint by a script in `src/app/layout.tsx`.
 

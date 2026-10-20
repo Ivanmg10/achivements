@@ -222,7 +222,17 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
   a stricter reading of private profiles and refused keys on every platform. On
   `improvements_10`: `migrations/037_pinned_achievements_position.sql` (order of
   pinned achievements), applied 2026-10-17; any other database needs it before that
-  code runs, or every pins read answers 500
+  code runs, or every pins read answers 500. On `feat/social-rankings` (split out of
+  `improvements_11` on 2026-10-20):
+  `migrations/038_user_presence.sql` (presence), applied 2026-10-19; same warning,
+  but worse: without it every signed-in request fails (see Presence). And
+  `migrations/039_showcase_achievements.sql` (the achievement showcase), applied
+  2026-10-20; without it the showcase, the follows overview and Following answer 500
+- `1.6.0` — on `feat/social-rankings`: the Following restyle, presence and the showcase
+  (038, 039 above) and the **rankings, a beta** (Vault Points, see below), with
+  `migrations/040_vault_points.sql`, applied 2026-10-20; any other database needs it before
+  this code runs, or the rankings, the header's level and the score refresh answer 500
+  (Following and profiles still load, without levels)
 
 ## Release gates — what had to be true before 1.0 (all closed)
 
@@ -542,6 +552,108 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   `<main>` is a block: these screens size themselves (`STATUS_SCREEN`) and are a
   `<div>` inside it, a `<main>` only full screen.
 
+## Presence — "online" and "last seen" (2026-10-19)
+
+`users.last_seen_at` and `users.show_presence` (`migrations/038_user_presence.sql`,
+applied 2026-10-19; **any other database needs it before this code runs**:
+`userRecord` reads `show_presence` on every session, so without it every
+signed-in request fails).
+
+- **Written only by the heartbeat**: `usePresenceHeartbeat` posts to
+  `/api/presence` while the tab is visible (arrival, every 2 min, back to the tab);
+  the route writes at most once a minute. Do not write it from the session or
+  another read path.
+- **Online = seen in the last 5 minutes**, decided on the server. `lastSeenAt` is
+  rounded down to 5 minutes: never send the exact time. Past 30 days it says only
+  "over a month ago". **One rule, one place**: every query that shows it selects
+  `presenceColumns()` (`src/lib/presence.ts`) — the follows overview, the user search
+  and `findPublicUser` (the public profile).
+- **`show_presence` is enforced in SQL** (on by default; the switch is in
+  Preferences → General). Off: `online` false and `lastSeenAt` null, to everyone.
+  Not reciprocal (hiding yours does not hide others'), by the user's choice.
+- **Wherever another user's picture shows, so does it** (2026-10-20, the user's ask):
+  `PresenceDot` on the picture (in a `relative` wrapper; `announce` when no text beside
+  it says so) and, where there is a line for it, `PresenceLabel` in place of the bio
+  (the bio is its fallback). Today: Following (cards, hero), user search and the home's
+  friend cards (`UserSummary`), the public profile hero (not on your own), compare,
+  someone's game page banner, the friends leaderboard and shared games. A new place
+  that shows other users must do the same. Never for your own picture.
+- `/privacy` says signed-in users who come across you see it; change it if that grows.
+
+## Vault Points and the rankings (beta, 2026-10-20)
+
+One score worth the same on every platform, and rankings of it. Formula, balance tests and
+decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Points.
+
+- **The formula lives in `src/utils/vaultScore.ts`**, and its balance tests
+  (`vaultScore.test.ts`: the same game within ±10 % on every platform, easy games about a
+  third of a demanding one) must keep passing. Change a number → bump `RULES_VERSION`.
+  Do not weigh native values (gamerscore, grades, RA points) more than the 25 % they have:
+  that is what made platforms unequal in the tests.
+- **Scores are computed ahead, never on a read.** `scoreRefresh` runs right after a platform is
+  linked (`onPlatformLinked` in the four link routes), in back-to-back passes while the user has
+  the site open (`useVaultFill` → `POST /api/rankings/fill`, up to 90 s each), after the presence
+  heartbeat (6 h freshness) and from `/api/cron/scores` (daily, plus the Monday snapshot). One
+  pass at a time per user: every trigger claims `users.score_refreshed_at` first. The rankings
+  routes only read `score_games`/`score_periods`; do not call a platform from them.
+- **Each platform is read at the pace measured on 2026-10-20 (`PACE`), not faster:** Steam 8 at
+  once (29 games/s, no error); RA one at a time, 300 ms apart (a burst of ~7 gets 429 **with no
+  Retry-After**; one every 250 ms never failed); **PSN gently**, because it is one app account for
+  everyone: 2 at once, 100 games a pass, and 300 games every 15 minutes for the whole app
+  (`allowAttempt('psn-score', 'app')`), stopping the pass at Sony's "too many requests"; Xbox 5 a
+  pass (150 calls an hour for the app). Raising any of these needs a new measurement.
+- **The fill is shown, never silent.** Its progress per platform is kept in `steam_cache`
+  (`score:fill:<user>`; `FillStatus`, no migration); the header, the account page, each platform's
+  card (`VaultFillLine`) and the rankings show it, the viewer's own points carry "≈" until read, a
+  finished fill toasts "ready" (only a fill that was pending, never a routine refresh) and a
+  platform that failed says why (private profile, refused key) and how to fix it.
+- **"How Vault Points work" (`/rankings/how`, public)** explains it to users. Its prose is in
+  `src/translations/vaultGuide.ts` (+ `vaultGuideMore.ts`), in all nine languages but outside `T`
+  like the public pages (only this page loads it); every number
+  on it (rarity and difficulty tables, examples, level thresholds) is computed from the formula
+  and the examples are the same ones the balance tests use (`src/utils/vaultExamples.ts`). If the
+  formula changes, reread its prose.
+- **Who is listed**: public profile and `show_in_rankings` (Preferences → General; not in the
+  session on purpose, see the plan). Hidden games and unticked consoles do not score. A game
+  counts only for the account linked now, never while flagged `suspect` (Steam unlock tool;
+  admins review it in the panel, logged as `ranking-flag`). Xbox scores only for admins.
+- **No ownership verification, by the user's choice (2026-10-20)**: an account linked by two
+  users scores for both. The analysis of how to verify is in the plan, for later.
+- **`/rankings` and `/rankings/how` are public** (`PUBLIC_PATHS` in the proxy, in the sitemap). Signed out: the
+  global list only, no presence (the privacy policy promises it only to signed-in users),
+  no profile links. Responses never carry user ids and are never shared-cached.
+- **A level shown for another user reads `vaultTotals`/`vaultTotalsOrNone`** (same rules as the
+  rankings). Today: the rankings, Following cards, the home's friend cards, the public profile
+  hero, the header (yours) and your account page. Progress towards a level is a `ProgressBar`
+  or `CircularProgress` in the theme's colour; tiers have their own hue only on their badge.
+- Rankings are labelled **Beta** in the UI; drop the label when the user says so.
+
+## Achievement showcase vs achievements to get (2026-10-20)
+
+Two different things; do not mix them up again.
+
+- **Showcase** ("Vitrina de logros"): up to **5 earned** achievements a user chooses to
+  show off. Its own table, `showcase_achievements` (`migrations/039`), one shape for every
+  platform (`achievement_key`: RA id, Steam apiname, PSN trophy id, Xbox id; text and
+  badge copied in). `/api/showcase` (GET own or `?user=`, POST adds while < 5 and answers
+  `409 showcase-full`, DELETE `?id=`, PUT order). Earned is the client's word plus a
+  required `earnedAt` (`parseShowcaseEntry`). **It is what others see**: the public
+  profile (`PublicUserAchievementShowcase`), Following cards and the home's friend cards
+  (overview → `showcase`).
+- **Achievements to get** ("Logros por conseguir", the old "Logros fijados"): the user's
+  own goals, `pinned_achievements`, `/api/favorites`. **Private**: GET ignores `?user=`,
+  and nothing shows them to anyone else. Do not add a place that does.
+- Managed in the Pinned section (showcase block on top, `MainPagePinnedSectionShowcase`).
+  Its "+" opens `ShowcasePickerModal`: the user's games with something earned
+  (`useProfileLibrary`, those with an unlock this year first), then a game's achievements
+  (`useShowcaseGameChoices`, through the routes its game page uses; earned first, the rest
+  greyed, hidden unearned ones concealed), with a way back; the selection spans games and
+  goes in at once (`addMany`), never more than fits. Also added from any earned
+  achievement through `ShowcaseToggleButton` in `AchievementModal` (RA) and
+  `AchievementDetailModal` (Steam, PSN, Xbox). One shared state: `ShowcaseProvider`.
+- Unlocks carry `Key` (the platform's own id), so an unlock maps to a showcase entry
+  (`showcaseFromUnlock`); RA uses `AchievementID`.
+
 ## Preferences that follow the account
 
 The display preferences (which consoles show, library layout/view/columns/sort,
@@ -709,10 +821,21 @@ branch to be up to date with its base** before merging, on both.
 - A `develop` → `main` PR needs `develop` to contain `main`; after a hotfix, merge
   `main` back into `develop` first (as the flow above already says).
 
-- **`develop` shares the production database** (the Neon integration's `DATABASE_URL`),
-  by the user's choice for now. So testing on develop touches real data: **never run a
-  destructive or hard-to-reverse migration, or bulk script, "just to try it on develop".**
-  Ask first; the fix is a separate Neon database for Preview.
+- **Pre has its own database (2026-10-20):** a Neon branch of production, `preview`, read through
+  `PREVIEW_DATABASE_URL` (`databaseUrl()` in `src/lib/db.js`), set in Vercel for **all Preview
+  branches** (scoped to `develop` alone, a feature branch's preview would fall back to production)
+  and in `.env.local`. It exists because the Neon integration owns `DATABASE_URL` for
+  every environment and Vercel refuses a branch-scoped second one. Production ignores it whatever
+  is set (`VERCEL_ENV`). Consequences: **every migration is applied twice** (pre first, production
+  when the work reaches `main`); the branch drifts from production (Neon's "Reset from parent"
+  copies production again, losing what pre had); it is a copy of real data, so treat it like
+  production. **Until the variable is set somewhere, that place still uses production**: check
+  before running anything destructive.
+- **Demo users** for the rankings: `node scripts/demo-rankings.mjs seed [n] --follower=<username>`
+  (and `clear`). It writes only to `PREVIEW_DATABASE_URL` and refuses when that is missing or the
+  same host as `DATABASE_URL`. Never point it at production: `/rankings` is public. Seeded
+  2026-10-20 with 45 (`demo_*` plus five named ones the user chose; no sign-in, kept out of the
+  score refresh). Demo users are found by their password mark (`MARK`), never by name.
 - Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
 
 ## Style
@@ -740,6 +863,14 @@ branch to be up to date with its base** before merging, on both.
       asked for. **Open:** a viewer with no RA account is served with the page
       owner's key (see RetroAchievements above); ask RA whether that counts, and
       if not, ask the viewer to link their own. Revisit when OAuth lands.
+- [x] **Vault Points, levels and rankings** — a beta in 1.6.0 (2026-10-20). See "Vault Points
+      and the rankings". Later: ownership verification (the user found code-in-bio clumsy;
+      revisit with care), a history chart, and CheevoVault's own achievements (advice: they
+      should not give points).
+- [x] **Online status and "last seen"** on the Following cards (2026-10-19). See
+      Presence above. The user said it will grow beyond the card: ask what next
+      before extending it (proposed: Steam's "playing now" for everyone in one
+      call, an "online" filter, live refresh, the public profile).
 - [ ] Later: **community-flagged missables for PSN, Steam and Xbox.** Only RA says
       which achievements are missable (`Type: 'missable'`, marked in red in
       `AchievementGrid`); Sony, Steam and OpenXBL have no such field (checked

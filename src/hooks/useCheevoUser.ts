@@ -28,6 +28,12 @@ export type CheevoUser = {
   groups?: GameGroup[]
   /** Whether the viewer follows them. */
   following?: boolean
+  /** Seen in the last 5 minutes; false too for who does not share it. */
+  online?: boolean
+  /** When last seen, rounded to 5 minutes; null if never, or not shared. */
+  lastSeenAt?: string | null
+  /** Their Vault Points, for the level on the hero; null before they are scored. */
+  vaultPoints?: number | null
 }
 
 /**

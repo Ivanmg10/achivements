@@ -4,6 +4,7 @@ import pool from "@/lib/db";
 import { authOptions } from "@/lib/authOptions";
 import { fetchRaProfile, validRaCredentials, type RaProfileResult } from "@/lib/raProfile";
 import { forgetUser } from "@/lib/userRecord";
+import { onPlatformLinked } from "@/lib/scoreRefresh";
 
 function refused(result: Extract<RaProfileResult, { ok: false }>) {
   return NextResponse.json({ error: result.error }, { status: result.status });
@@ -40,6 +41,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
   forgetUser(session.user.id);
+  await onPlatformLinked(Number(session.user.id), "ra");
 
   return NextResponse.json(profile);
 }

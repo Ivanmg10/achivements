@@ -9,14 +9,14 @@ import { useUserAwards } from '@/hooks/useUserAwards'
 import { buildPerfectGames, countPerfectGames, latestPerfects } from '@/utils/perfectGames'
 import { ChartCard } from '@/components/ui/ChartCard'
 import CollectionShelf from '@/components/main-page/main-page-collection/collection-shelf/CollectionShelf'
-import MainPageFavorites from '@/components/main-page/main-page-favorites/MainPageFavorites'
+import PublicUserAchievementShowcase from '../public-user-achievement-showcase/PublicUserAchievementShowcase'
 
 const SHELF = 5
 
 /**
- * What a user shows off: their latest games at 100% on the trophy shelf, and
- * the achievements they pinned. Both are the main page's own cards, read as
- * that user (and with nothing of theirs to change).
+ * What a user shows off: their latest games at 100% on the trophy shelf (the
+ * main page's own card, read as that user) and their achievement showcase.
+ * Their pinned achievements are their own goals and are not shown here.
  */
 export default function PublicUserShowcase() {
   const { all, isLoading: gamesLoading } = useGamesData()
@@ -38,7 +38,7 @@ export default function PublicUserShowcase() {
         )}
       </ChartCard>
       <ChartCard>
-        <MainPageFavorites />
+        <PublicUserAchievementShowcase />
       </ChartCard>
     </div>
   )

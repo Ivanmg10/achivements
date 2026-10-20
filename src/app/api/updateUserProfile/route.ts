@@ -7,13 +7,13 @@ import { forgetUser, loadUser } from '@/lib/userRecord'
 import { sendVerificationEmail } from '@/lib/verificationEmail'
 import { sendEmailChangedNotice } from '@/lib/emailChangedNotice'
 
-const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location', 'description', 'gender', 'profilePublic', 'genderPublic'] as const
+const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location', 'description', 'gender', 'profilePublic', 'genderPublic', 'showPresence', 'showInRankings'] as const
 type AllowedField = (typeof ALLOWED_FIELDS)[number]
 
 const DESCRIPTION_MAX = 280
 const GENDERS = ['male', 'female', 'neutral']
 /** On/off settings, and the column each is kept in. */
-const SWITCHES: Partial<Record<AllowedField, string>> = { profilePublic: 'profile_public', genderPublic: 'gender_public' }
+const SWITCHES: Partial<Record<AllowedField, string>> = { profilePublic: 'profile_public', genderPublic: 'gender_public', showPresence: 'show_presence', showInRankings: 'show_in_rankings' }
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)

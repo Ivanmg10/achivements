@@ -4,6 +4,7 @@ import { requireSession } from '@/lib/apiAuth'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { findSteamAccount, parseSteamQuery, type SteamAccount } from '@/lib/steamAccount'
 import { forgetUser } from '@/lib/userRecord'
+import { onPlatformLinked } from '@/lib/scoreRefresh'
 
 /**
  * Links a Steam account by what the user types: a custom URL name, a profile
@@ -50,5 +51,6 @@ export async function POST(req: Request) {
   }
 
   forgetUser(auth.id)
+  await onPlatformLinked(Number(auth.id), 'steam')
   return NextResponse.json({ steamid: account.steamid, steamusername: account.personaname })
 }

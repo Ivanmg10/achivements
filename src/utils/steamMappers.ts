@@ -192,5 +192,6 @@ export function toRecentAchievement(a: SteamRecentAchievement, index: number): R
     Source: 'steam',
     BadgeUrl: a.badgeUrl,
     GameIconUrl: gameIconUrl(a.appId),
+    Key: a.apiname,
   }
 }
