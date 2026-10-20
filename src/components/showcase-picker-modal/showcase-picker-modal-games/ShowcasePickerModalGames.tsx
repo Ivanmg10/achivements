@@ -49,7 +49,7 @@ export default function ShowcasePickerModalGames({
       </div>
       <div className="overflow-y-auto overscroll-contain p-2 flex-1">
         {isLoading ? (
-          <div aria-busy="true" className="grid grid-cols-1 lg:grid-cols-2 gap-1.5">
+          <div aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
             {[0, 1, 2, 3, 4].map((i) => (
               <div key={i} className="h-14 rounded-xl bg-bg-card animate-pulse motion-reduce:animate-none" />
             ))}
@@ -59,7 +59,7 @@ export default function ShowcasePickerModalGames({
         ) : shown.length === 0 ? (
           <p role="status" className="py-10 text-center text-sm text-text-secondary">{T.showcase.pickerNoMatch}</p>
         ) : (
-          <ul aria-label={T.showcase.gamesLabel} className="grid grid-cols-1 lg:grid-cols-2 gap-1">
+          <ul aria-label={T.showcase.gamesLabel} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1">
             {shown.map((game) => (
               <li key={game.key}>
                 <ShowcasePickerModalGameRow game={game} selected={selectedIn(game.key)} onOpen={() => onOpen(game)} />

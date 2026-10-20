@@ -81,3 +81,20 @@ test('never more than fits: with 4 in the showcase, one can be selected and the 
   fireEvent.click(screen.getByRole('button', { name: 'Zelda won' }))
   expect(screen.getByRole('button', { name: 'Zelda won too' })).toBeEnabled()
 })
+
+test('each achievement says what it asks for (shown on hover), but a hidden one not earned gives nothing away', () => {
+  setup()
+  ;(useShowcaseGameChoices as jest.Mock).mockReturnValue({
+    choices: showcaseChoices('ra', 2, 'Metroid', [
+      { key: '1', title: 'Fast', description: 'Beat it under 3 hours', earnedAt: '2026-10-01T00:00:00Z' },
+      { key: '2', title: 'Secret', description: 'Spoiler', earnedAt: null, hidden: true },
+    ]),
+    isLoading: false,
+    error: false,
+    retry: jest.fn(),
+  })
+  render(<ShowcasePickerModal isOpen onClose={jest.fn()} />)
+  fireEvent.click(screen.getByRole('button', { name: /Metroid/ }))
+  expect(screen.getByRole('button', { name: 'Fast' })).toHaveAccessibleDescription('Beat it under 3 hours')
+  expect(screen.queryByText('Spoiler')).not.toBeInTheDocument()
+})
