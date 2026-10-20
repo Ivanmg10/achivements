@@ -16,7 +16,7 @@ const person = (username: string, over: Record<string, unknown> = {}) => ({
   psn: false,
   favorites: {},
   publicGroups: 0,
-  pins: [],
+  showcase: [],
   ...over,
 })
 

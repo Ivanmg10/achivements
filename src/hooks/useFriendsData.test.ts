@@ -4,7 +4,7 @@ import { useFriendsData, loadFriendDetails, DETAIL_LIMIT } from './useFriendsDat
 import type { FriendOverview } from '@/utils/friends'
 
 const friend = (username: string, over: Partial<FriendOverview> = {}): FriendOverview => ({
-  username, avatar: null, ra: true, steam: false, psn: false, favorites: { ra: null, steam: null, psn: null }, publicGroups: 0, pins: [], ...over,
+  username, avatar: null, ra: true, steam: false, psn: false, favorites: { ra: null, steam: null, psn: null }, publicGroups: 0, showcase: [], ...over,
 })
 
 const RA_RECENT = [{ Date: '2026-10-14 08:00:00', Title: 'A' }]

@@ -4,12 +4,10 @@ import { pinnedKey } from '@/utils/utils'
 import type { PinnedAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
-import { useSubject } from '@/context/SubjectContext'
-import { withSubject } from '@/utils/withSubject'
 
 /**
- * The user's pinned achievements across RA, Steam, PSN and Xbox, in their order — what the
- * main page's pinned card lists, whichever platform is selected.
+ * The user's own pinned achievements (their goals, "achievements to get") across RA,
+ * Steam, PSN and Xbox, in their order. Never someone else's: others see the showcase.
  *
  * A load that still fails after fetchWithRetry's own attempts is retried in
  * the background with a growing delay (see scheduleRetry); once that gives
@@ -18,8 +16,6 @@ import { withSubject } from '@/utils/withSubject'
  */
 export function usePinnedAchievements() {
   const { T } = useLanguage()
-  // On someone's public profile: their pins, read only.
-  const subject = useSubject()
   const [pinned, setPinned] = useState<PinnedAchievement[]>([])
   /** Which load the answer (data or final failure) belongs to; loading is any other being asked for. */
   const [loadedKey, setLoadedKey] = useState<number | null>(null)
@@ -34,7 +30,7 @@ export function usePinnedAchievements() {
     attemptRef.current = 0
 
     function load() {
-      fetchWithRetry(withSubject('/api/favorites?source=all', subject))
+      fetchWithRetry('/api/favorites?source=all')
         .then((data) => {
           if (!current) return
           setPinned(Array.isArray(data) ? (data as PinnedAchievement[]) : [])
@@ -57,7 +53,7 @@ export function usePinnedAchievements() {
       current = false
       clearTimeout(retryTimer.current)
     }
-  }, [reloadKey, subject])
+  }, [reloadKey])
 
   const refetch = useCallback(() => {
     setPinned([])

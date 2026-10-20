@@ -10,10 +10,13 @@ function parseSource(req: NextRequest): 'ra' | 'steam' | 'psn' | 'xbox' {
   return source === 'steam' || source === 'psn' || source === 'xbox' ? source : 'ra'
 }
 
-/** The user's pins — or, with `?user=`, that public profile's (see dataOwner). */
+/**
+ * The user's own pins: their goals, "achievements to get". Only theirs: a
+ * `?user=` is ignored, since others see the showcase (/api/showcase), not this.
+ */
 export async function GET(req: NextRequest) {
   try {
-    const owner = await dataOwner(req)
+    const owner = await dataOwner()
     if (!owner) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
     }

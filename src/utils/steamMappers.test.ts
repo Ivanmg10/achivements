@@ -280,6 +280,8 @@ describe('toRecentAchievement', () => {
       ConsoleName: STEAM_PLATFORM,
       Source: 'steam',
       BadgeUrl: 'https://cdn/win.jpg',
+      // The apiname, so the showcase picker can tell it from any other.
+      Key: 'WIN',
     })
     expect(mapped.GameIconUrl).toBe('/api/steam/icon?appid=620')
   })

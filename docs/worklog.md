@@ -25,6 +25,40 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-20 — Achievement showcase, and "achievements to get" (`improvements_11`)
+
+**Did** — Split what used to be "pinned achievements" in two (rules in CLAUDE.md → Achievement
+showcase):
+- **Showcase** ("Vitrina de logros"): `migrations/039_showcase_achievements.sql`, **applied to
+  the shared Neon database 2026-10-20**; `/api/showcase`; `useShowcase` + `ShowcaseProvider`;
+  a block on top of the Pinned section (5 slots, drag to reorder, × to remove, "+" opens
+  `ShowcasePickerModal` with the year's unlocks from every platform); `ShowcaseToggleButton` in
+  the RA and Steam/PSN/Xbox detail modals, only on earned achievements and only on your pages.
+  The public profile, Following cards and the home's friend cards show it.
+- **Achievements to get**: the old pinned achievements, renamed in all 9 languages
+  ("Logros por conseguir"; the 📌 is now "pin as a goal"). Now private: `/api/favorites` GET
+  ignores `?user=`; the public profile no longer shows them, so `MainPageFavorites` and its
+  four per-platform rows were deleted (the unpin button stays, the Pinned tiles use it).
+- Following card: the latest unlocks are now the large row ("Latest unlocks", or "nothing
+  earned lately"), the showcase small at the foot.
+- `RecentAchievement.Key` (Steam apiname, PSN trophy id, Xbox id) on the mapped unlocks.
+- `/privacy`: the public profile shows the showcase, never the goals (9 languages, dated 20 Oct).
+**Why** — The user wanted the "pins" on Following to be a showcase of earned achievements,
+apart from the goals, and the recent unlocks to lead the card.
+**Decisions** (the user's) — the showcase is managed in the Pinned section (they may move it
+to Preferences later); added from a button on each earned achievement *and* a picker; the
+public profile shows the showcase, not the goals; the goals are "Logros por conseguir".
+Mine: a new table with one shape rather than a flag on `pinned_achievements` (different
+meaning, no per-platform snapshot to decode); the button only in the detail modals (one place
+per platform family) rather than on every row; the picker reads the year's unlocks already
+loaded for the streak, so older achievements are added from their game page.
+**Checked** — in the browser with the real account: added one from the picker, saw the tile
+and the toast and the public profile section, then removed it (the showcase is empty again).
+The Following card with mocked follows.
+**Open** — "Earned" is trusted from the client (see `parseShowcaseEntry`). Steam/PSN/Xbox
+unlocks added from the picker have no description (the feed does not carry it); from the
+modal they do. A pinned goal that gets earned is not moved to the showcase automatically.
+
 ## 2026-10-20 — Presence everywhere another user shows (`improvements_11`)
 
 **Did** — The green dot and "online / seen …" now follow every picture of another user, not

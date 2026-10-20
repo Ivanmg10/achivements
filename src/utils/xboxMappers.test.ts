@@ -218,6 +218,7 @@ describe('xboxToRecentAchievement', () => {
       GameTitle: 'Modern Game',
       ConsoleName: XBOX_PLATFORM,
       Source: 'xbox',
+      Key: '49',
       BadgeUrl: undefined,
       GameIconUrl: 'https://images-eds.xboxlive.com/image?url=modern',
     })

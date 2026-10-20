@@ -242,5 +242,6 @@ export function xboxToRecentAchievement(a: XboxRecentAchievement): RecentAchieve
     Source: 'xbox',
     BadgeUrl: a.iconUrl ?? undefined,
     GameIconUrl: a.gameIconUrl,
+    Key: a.achievementId,
   }
 }

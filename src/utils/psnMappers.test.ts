@@ -26,6 +26,7 @@ test("a trophy in RA's recent-achievement shape, marked as PSN", () => {
     GameTitle: 'Astro Bot',
     ConsoleName: PSN_PLATFORM,
     Source: 'psn',
+    Key: '3',
     BadgeUrl: 'https://t.png',
     GameIconUrl: 'https://g.png',
   })

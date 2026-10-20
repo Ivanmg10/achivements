@@ -27,8 +27,10 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
   perfect/almost-there/abandoned games, completion distribution.
 - **Groups** — named collections of games, public or private, shareable.
 - **Social** — public profiles (opt-in), follow users, a following feed and
-  user search, compare a game with someone else's progress. The Following page
-  shows each person's last game, accounts, pins and latest unlocks, and whether
+  user search, compare a game with someone else's progress. An achievement
+  showcase (five earned achievements you choose) is what others see; your
+  achievements to get stay yours. The Following page shows each person's last
+  game, accounts, latest unlocks and showcase, and whether
   they are online or when they were last seen (each user can stop sharing it).
 - **Public pages** — honest comparisons (vs Exophase, vs PSNProfiles) and
   how-tos at `/compare/*` and `/track/*`, plus a FAQ on the landing, for

@@ -14,7 +14,7 @@ const friend = (over: Partial<FriendOverview> = {}): FriendOverview => ({
   accounts: { ra: 'luna_ra', steam: null },
   favorites: {},
   publicGroups: 2,
-  pins: [],
+  showcase: [],
   ...over,
 })
 
@@ -30,7 +30,9 @@ test('who they are, their platforms and their groups; their name opens their pro
   expect(accounts).toHaveTextContent('Steam')
   expect(screen.getByRole('img', { name: 'RetroAchievements' })).toBeInTheDocument()
   expect(screen.getByText(en.friends.publicGroups.replace('{n}', '2'))).toBeInTheDocument()
-  expect(screen.getByText(en.friends.noPins)).toBeInTheDocument()
+  // Nothing in the showcase, and unlocks not read yet: neither says a wrong "none".
+  expect(screen.queryByRole('list', { name: en.friends.showcase })).not.toBeInTheDocument()
+  expect(screen.queryByText(en.following.recentUnlocks)).not.toBeInTheDocument()
   // Not known yet: no last game.
   expect(screen.queryByText(new RegExp(en.following.lastPlayed))).not.toBeInTheDocument()
 })
@@ -42,15 +44,16 @@ test('the last game played opens it on their page', () => {
   expect(link).toHaveTextContent(en.following.lastPlayed)
 })
 
-test('each pin is a badge opening its game, described by its tooltip', () => {
-  render(<FollowingCard friend={friend({ pins: [PIN, { ...PIN, gameId: 4, title: 'Velocista', description: null }] })} />)
+test('their showcase, small at the foot: each badge opens its game, described by its tooltip', () => {
+  render(<FollowingCard friend={friend({ showcase: [PIN, { ...PIN, gameId: 4, title: 'Velocista', description: null }] })} />)
+  expect(screen.getByRole('list', { name: en.friends.showcase }).querySelectorAll('li')).toHaveLength(2)
   const badge = screen.getByRole('link', { name: 'Sin daños · Super Metroid' })
   expect(badge).toHaveAttribute('href', '/user/luna/ra/3')
   expect(badge).toHaveAccessibleDescription(/Derrota a Ridley sin daño\./)
   expect(screen.getByRole('link', { name: 'Velocista · Super Metroid' })).not.toHaveAttribute('aria-describedby')
 })
 
-test('their latest unlocks, small at the foot, up to five, each opening its game', () => {
+test('their latest unlocks, large, up to five, each opening its game; none lately says so', () => {
   const unlock = (i: number) => ({ Date: '2026-10-19 10:00:00', HardcoreMode: '1', AchievementID: i, Title: `Logro ${i}`, Description: `Haz ${i}`, BadgeName: String(i), Points: 5, GameID: 7, GameTitle: 'Zelda', ConsoleName: 'SNES' })
   render(<FollowingCard friend={friend()} recent={[1, 2, 3, 4, 5, 6].map(unlock)} />)
   const row = screen.getByRole('list', { name: en.following.recentUnlocks })
@@ -58,6 +61,11 @@ test('their latest unlocks, small at the foot, up to five, each opening its game
   const first = screen.getByRole('link', { name: 'Logro 1 · Zelda' })
   expect(first).toHaveAttribute('href', '/user/luna/ra/7')
   expect(first).toHaveAccessibleDescription(/Haz 1/)
+})
+
+test('read, and nothing earned lately: says so', () => {
+  render(<FollowingCard friend={friend()} recent={[]} />)
+  expect(screen.getByText(en.following.noRecentUnlocks)).toBeInTheDocument()
 })
 
 test('online: a dot and the word, in place of the bio', () => {

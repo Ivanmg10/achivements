@@ -241,6 +241,7 @@ export default function GameInfoTable({
             numDistinctPlayers={numDistinctPlayers}
             onClose={() => setSelectedAchievement(null)}
             gameId={gameData?.ID}
+            gameTitle={gameData?.Title}
             isFavorited={favoritedIds.has(selectedAchievement.ID)}
             onToggleFavorite={() => handleToggleFavorite(selectedAchievement)}
           />

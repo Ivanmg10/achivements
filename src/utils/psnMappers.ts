@@ -24,5 +24,6 @@ export function psnToRecentAchievement(t: PsnRecentTrophy): RecentAchievement {
     Source: 'psn',
     BadgeUrl: t.iconUrl ?? undefined,
     GameIconUrl: t.gameIconUrl,
+    Key: String(t.trophyId),
   }
 }

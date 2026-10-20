@@ -10,8 +10,8 @@ import { canUseXbox } from '@/utils/xboxAccess'
  * The people you follow as the Friends section's cards show them, from our
  * own database only (no platform calls): who they are, whether they are online or when
  * they were last seen (if they share it), where they play (and as whom), their
- * favourite game per platform, their five latest pinned achievements and how
- * many public groups they keep. Newest follow first; private profiles left out.
+ * favourite game per platform, their achievement showcase (up to five) and how
+ * many public groups they keep. Their pinned achievements are their own goals: never here. Newest follow first; private profiles left out.
  */
 export async function GET() {
   const auth = await requireSession()
@@ -31,23 +31,13 @@ export async function GET() {
               json_build_object('ra', u.favorite_game, 'steam', u.favorite_steam_game, 'psn', u.favorite_psn_game,
                                 'xbox', CASE WHEN $2::boolean THEN u.favorite_xbox_game END) AS favorites,
               (SELECT COUNT(*) FROM game_groups g WHERE g.user_id = u.id AND g.is_public)::int AS "publicGroups",
+              -- Their achievement showcase (earned, chosen, in their order); never their pinned goals.
               COALESCE((
-                SELECT json_agg(p ORDER BY p.created_at DESC) FROM (
-                  SELECT source, game_id AS "gameId", game_title AS "gameTitle", created_at,
-                         COALESCE(snapshot->>'Title', snapshot->>'title', snapshot->>'name') AS title,
-                         -- A secret Xbox achievement not yet earned keeps its text hidden, as on its game page.
-                         CASE WHEN source = 'xbox' AND snapshot->>'secret' = 'true' AND snapshot->>'unlocked' IS DISTINCT FROM 'true' THEN NULL
-                              ELSE COALESCE(snapshot->>'Description', snapshot->>'description', snapshot->>'detail')
-                         END AS description,
-                         CASE source
-                           WHEN 'ra' THEN 'https://media.retroachievements.org/Badge/' || (snapshot->>'BadgeName') || '.png'
-                           WHEN 'steam' THEN snapshot->>'badgeUrl'
-                           ELSE snapshot->>'iconUrl'
-                         END AS badge
-                  FROM pinned_achievements WHERE user_id = u.id AND ($2::boolean OR source <> 'xbox')
-                  ORDER BY created_at DESC LIMIT 5
-                ) p
-              ), '[]'::json) AS pins
+                SELECT json_agg(json_build_object('source', sc.source, 'gameId', sc.game_id, 'gameTitle', sc.game_title,
+                                                  'title', sc.title, 'description', sc.description, 'badge', sc.badge)
+                                ORDER BY sc.position, sc.created_at)
+                FROM showcase_achievements sc WHERE sc.user_id = u.id AND ($2::boolean OR sc.source <> 'xbox')
+              ), '[]'::json) AS showcase
        FROM follows f JOIN users u ON u.id = f.followed_id
        WHERE f.follower_id = $1 AND u.profile_public
        ORDER BY f.created_at DESC`,

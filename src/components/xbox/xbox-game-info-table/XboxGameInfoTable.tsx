@@ -255,6 +255,11 @@ export default function XboxGameInfoTable({
               guides={concealed ? [] : guideLinks('xbox', { gameTitle, title: selected.name })}
               pinned={canPin ? pinned.has(selected.id) : undefined}
               onTogglePin={() => toggle(selected)}
+              showcase={
+                selected.unlocked && selected.unlockedAt
+                  ? { source: 'xbox', gameId, achievementKey: selected.id, gameTitle, title: selected.name, description: selected.description || null, badge: selected.iconUrl, earnedAt: selected.unlockedAt }
+                  : null
+              }
               onClose={() => setSelected(null)}
             />
           )

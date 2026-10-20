@@ -25,7 +25,8 @@ export type FriendOverview = UserSearchResult & {
   accounts?: Partial<Record<GameSource, string | null>>
   favorites: Partial<Record<GameSource, SavedGame>>
   publicGroups: number
-  pins: FriendPin[]
+  /** Their achievement showcase, in their order (up to five, earned). */
+  showcase: FriendPin[]
 }
 
 /**

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { IconFolders, IconUser } from '@tabler/icons-react'
+import { IconFolders, IconTrophy, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { RecentAchievement } from '@/types/types'
 import { recentAsBadge, type FriendOverview, type LastPlayed } from '@/utils/friends'
@@ -18,9 +18,8 @@ const RECENT_MAX = 5
 /**
  * Someone you follow: the last game they played across the top (or their
  * avatar's colours), who they are — online, or when they were last seen, in
- * place of their bio when they share it — and where they play, their latest pinned
- * achievements as badges
- * and, small at the foot, what they earned last. `lastPlayed` and `recent` are
+ * place of their bio when they share it — and where they play; then what they
+ * earned last, large, and small at the foot their achievement showcase. `lastPlayed` and `recent` are
  * undefined while unknown (not read yet, or beyond the follows whose games are
  * read); `lastPlayed` is null when they have played nothing.
  */
@@ -77,18 +76,24 @@ export default function FollowingCard({
 
         <FollowingCardPlatforms friend={friend} />
 
-        <div className="flex flex-col gap-2">
-          <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.friends.pins}</p>
-          {friend.pins.length === 0 ? (
-            <p className="text-xs text-text-secondary italic">{T.friends.noPins}</p>
-          ) : (
-            <FollowingCardBadges items={friend.pins} username={friend.username} label={T.friends.pins} />
-          )}
-        </div>
+        {/* Not known yet (or beyond the follows whose games are read): nothing, rather than a wrong "none". */}
+        {recent && (
+          <div className="flex flex-col gap-2">
+            <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.following.recentUnlocks}</p>
+            {recent.length === 0 ? (
+              <p className="text-xs text-text-secondary italic">{T.following.noRecentUnlocks}</p>
+            ) : (
+              <FollowingCardBadges items={recent.slice(0, RECENT_MAX).map(recentAsBadge)} username={friend.username} label={T.following.recentUnlocks} />
+            )}
+          </div>
+        )}
 
         <div className="mt-auto pt-3 border-t border-ink/5 flex items-center justify-between gap-2">
-          {recent && recent.length > 0 ? (
-            <FollowingCardBadges items={recent.slice(0, RECENT_MAX).map(recentAsBadge)} username={friend.username} label={T.following.recentUnlocks} size="sm" />
+          {friend.showcase.length > 0 ? (
+            <div className="flex items-center gap-1.5 min-w-0">
+              <IconTrophy size={13} className="text-text-secondary shrink-0" aria-hidden="true" />
+              <FollowingCardBadges items={friend.showcase} username={friend.username} label={T.friends.showcase} size="sm" />
+            </div>
           ) : (
             <span />
           )}

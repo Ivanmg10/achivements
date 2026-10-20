@@ -79,6 +79,7 @@ export default function MainPagePinnedSectionAchievements() {
             numDistinctPlayers={selected.num_distinct_players}
             onClose={() => setSelected(null)}
             gameId={selected.game_id}
+            gameTitle={selected.game_title}
             isFavorited
             onToggleFavorite={() => {
               unpin(selected)

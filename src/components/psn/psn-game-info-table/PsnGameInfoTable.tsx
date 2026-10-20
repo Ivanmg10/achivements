@@ -272,6 +272,11 @@ export default function PsnGameInfoTable({
               guides={concealed ? [] : guideLinks('psn', { gameTitle, title: selected.name })}
               pinned={canPin ? pinned.has(selected.id) : undefined}
               onTogglePin={() => toggle(selected)}
+              showcase={
+                selected.earned && selected.earnedAt
+                  ? { source: 'psn', gameId, achievementKey: String(selected.id), gameTitle, title: selected.name, description: selected.detail || null, badge: selected.iconUrl, earnedAt: selected.earnedAt }
+                  : null
+              }
               onClose={() => setSelected(null)}
             />
           )

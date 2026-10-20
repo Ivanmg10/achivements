@@ -14,15 +14,15 @@ beforeEach(() => {
   ;(requireSession as jest.Mock).mockResolvedValue({ ok: true, id: '3' })
 })
 
-test('the people you follow with their favourites, latest pins and public groups, from our data only', async () => {
+test('the people you follow with their favourites, showcase and public groups, from our data only', async () => {
   query.mockResolvedValue({ rows: [{ username: 'ivan' }] })
   const res = await GET()
   expect(res.data).toEqual([{ username: 'ivan' }])
   const [sql, params] = query.mock.calls[0]
   expect(sql).toContain('u.profile_public')
-  expect(sql).toContain('pinned_achievements')
-  expect(sql).toContain('LIMIT 5')
-  expect(sql).toContain('AS description')
+  // The showcase, never the pinned goals.
+  expect(sql).toContain('FROM showcase_achievements sc')
+  expect(sql).not.toContain('pinned_achievements')
   expect(sql).toContain('g.is_public')
   expect(sql).not.toMatch(/\bemail\b|password|raid\b/)
   expect(params).toEqual(['3', false])
@@ -51,7 +51,7 @@ test('Xbox — the account, the favourite and the pins — is for an admin viewe
   const [sql, params] = query.mock.calls[0]
   expect(sql).toContain('u.xboxxuid IS NOT NULL AND $2::boolean')
   expect(sql).toContain("'xbox', CASE WHEN $2::boolean THEN u.favorite_xbox_game END")
-  expect(sql).toContain("$2::boolean OR source <> 'xbox'")
+  expect(sql).toContain("$2::boolean OR sc.source <> 'xbox'")
   expect(sql).toContain("'xbox', CASE WHEN $2::boolean THEN u.xboxgamertag END")
   expect(params).toEqual(['3', false])
   ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '3', admin: true } })

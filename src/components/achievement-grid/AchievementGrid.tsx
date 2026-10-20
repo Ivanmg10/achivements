@@ -229,6 +229,7 @@ export const AchievementGrid = memo(function AchievementGrid({
             numDistinctPlayers={numDistinctPlayers}
             onClose={() => setSelected(null)}
             gameId={typeof gameId === 'string' ? parseInt(gameId) : gameId}
+            gameTitle={gameTitle}
             isFavorited={favoritedIds.has(selected.ID)}
             onToggleFavorite={() => handleToggleFavorite(selected)}
           />

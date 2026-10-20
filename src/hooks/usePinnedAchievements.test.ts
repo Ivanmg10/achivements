@@ -82,12 +82,12 @@ test('reports the error once the background retries run out, and refetch loads a
   expect(result.current.error).toBe(false)
 })
 
-test("on someone's profile it reads their pins", async () => {
+test("on someone's profile it still reads only the user's own pins", async () => {
   ;(fetchWithRetry as jest.Mock).mockResolvedValue([RA])
   const wrapper = ({ children }: { children: ReactNode }) => createElement(SubjectContext.Provider, { value: 'ivan' }, children)
   const { result } = renderHook(() => usePinnedAchievements(), { wrapper })
   await waitFor(() => expect(result.current.isLoading).toBe(false))
-  expect(fetchWithRetry).toHaveBeenCalledWith('/api/favorites?source=all&user=ivan')
+  expect(fetchWithRetry).toHaveBeenCalledWith('/api/favorites?source=all')
 })
 
 test('reorders at once and saves the order by row id', async () => {

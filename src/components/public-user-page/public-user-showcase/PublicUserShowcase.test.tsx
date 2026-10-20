@@ -11,11 +11,11 @@ jest.mock('@/components/main-page/main-page-collection/collection-shelf/Collecti
   __esModule: true,
   default: ({ games }: { games: { title: string }[] }) => <div data-testid="shelf">{games.map((g) => g.title).join(',')}</div>,
 }))
-jest.mock('@/components/main-page/main-page-favorites/MainPageFavorites', () => ({ __esModule: true, default: () => <div data-testid="pins" /> }))
+jest.mock('../public-user-achievement-showcase/PublicUserAchievementShowcase', () => ({ __esModule: true, default: () => <div data-testid="showcase" /> }))
 
 const MASTERED = { GameID: 1, Title: 'Zelda', ImageIcon: '', ConsoleID: 3, ConsoleName: 'SNES', MaxPossible: 5, NumAwarded: 5, PctWon: '1', HardcoreMode: '1' }
 
-test('the trophy shelf of their latest games at 100%, and their pinned achievements', () => {
+test('the trophy shelf of their latest games at 100%, and their achievement showcase', () => {
   ;(useGamesData as jest.Mock).mockReturnValue({ all: [MASTERED], isLoading: false })
   ;(useUserAwards as jest.Mock).mockReturnValue({
     awards: { VisibleUserAwards: [{ AwardType: 'Mastery/Completion', AwardData: 1, Title: 'Zelda', AwardedAt: '2026-10-01T00:00:00Z', ConsoleName: 'SNES', ImageIcon: '' }] },
@@ -23,7 +23,7 @@ test('the trophy shelf of their latest games at 100%, and their pinned achieveme
   })
   render(<PublicUserShowcase />)
   expect(screen.getByTestId('shelf')).toHaveTextContent('Zelda')
-  expect(screen.getByTestId('pins')).toBeInTheDocument()
+  expect(screen.getByTestId('showcase')).toBeInTheDocument()
 })
 
 test('a placeholder for the shelf while it loads', () => {

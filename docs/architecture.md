@@ -88,6 +88,10 @@ Change the shape of a cached value → bump its key's version (`gameData_v2:` �
 - **Public pages** (`/compare/[slug]`, `/track/[slug]`): one entry each in
   `SEO_PAGES`; the routes, the sitemap and the footer links all read that list.
   Rendered by `SeoPage`, with the FAQ as `FAQPage` JSON-LD from `SeoPageRoute`.
+- **Showcase**: `ShowcaseProvider` (in `MainProviders`) holds the user's own
+  achievement showcase (`useShowcase` → `/api/showcase`, table
+  `showcase_achievements`); a public profile reads someone's with `useShowcase`
+  under `SubjectContext`. Pinned achievements (`/api/favorites`) are own-only.
 - **Presence**: `PresenceHeartbeat` (mounted in `MainProviders`) runs
   `usePresenceHeartbeat`: `POST /api/presence` on arrival, every 2 min and on
   coming back to the tab, only while it is visible. The route writes

@@ -224,7 +224,9 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
   pinned achievements), applied 2026-10-17; any other database needs it before that
   code runs, or every pins read answers 500. On `improvements_11`:
   `migrations/038_user_presence.sql` (presence), applied 2026-10-19; same warning,
-  but worse: without it every signed-in request fails (see Presence)
+  but worse: without it every signed-in request fails (see Presence). And
+  `migrations/039_showcase_achievements.sql` (the achievement showcase), applied
+  2026-10-20; without it the showcase, the follows overview and Following answer 500
 
 ## Release gates — what had to be true before 1.0 (all closed)
 
@@ -555,6 +557,28 @@ signed-in request fails).
   someone's game page banner, the friends leaderboard and shared games. A new place
   that shows other users must do the same. Never for your own picture.
 - `/privacy` says signed-in users who come across you see it; change it if that grows.
+
+## Achievement showcase vs achievements to get (2026-10-20)
+
+Two different things; do not mix them up again.
+
+- **Showcase** ("Vitrina de logros"): up to **5 earned** achievements a user chooses to
+  show off. Its own table, `showcase_achievements` (`migrations/039`), one shape for every
+  platform (`achievement_key`: RA id, Steam apiname, PSN trophy id, Xbox id; text and
+  badge copied in). `/api/showcase` (GET own or `?user=`, POST adds while < 5 and answers
+  `409 showcase-full`, DELETE `?id=`, PUT order). Earned is the client's word plus a
+  required `earnedAt` (`parseShowcaseEntry`). **It is what others see**: the public
+  profile (`PublicUserAchievementShowcase`), Following cards and the home's friend cards
+  (overview → `showcase`).
+- **Achievements to get** ("Logros por conseguir", the old "Logros fijados"): the user's
+  own goals, `pinned_achievements`, `/api/favorites`. **Private**: GET ignores `?user=`,
+  and nothing shows them to anyone else. Do not add a place that does.
+- Managed in the Pinned section (showcase block on top, `MainPagePinnedSectionShowcase`,
+  with the "+" picker of the year's unlocks, `ShowcasePickerModal`); added from any earned
+  achievement through `ShowcaseToggleButton` in `AchievementModal` (RA) and
+  `AchievementDetailModal` (Steam, PSN, Xbox). One shared state: `ShowcaseProvider`.
+- Unlocks carry `Key` (the platform's own id) so the picker can tell them apart; RA uses
+  `AchievementID`.
 
 ## Preferences that follow the account
 

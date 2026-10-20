@@ -12,6 +12,7 @@ import { HiddenGamesProvider } from '@/context/HiddenGamesContext'
 import { SteamGamesDataProvider } from '@/context/SteamGamesDataContext'
 import { PsnGamesDataProvider } from '@/context/PsnGamesDataContext'
 import { XboxGamesDataProvider } from '@/context/XboxGamesDataContext'
+import { ShowcaseProvider } from '@/context/ShowcaseContext'
 import PreferencesSync from '@/components/preferences-sync/PreferencesSync'
 import PresenceHeartbeat from '@/components/presence-heartbeat/PresenceHeartbeat'
 
@@ -26,6 +27,7 @@ export function MainProviders({ children }: { children: React.ReactNode }) {
           <ActivityHeatmapYearProvider>
             <GamesDataProvider>
               <PinnedGamesProvider>
+                <ShowcaseProvider>
                 <HiddenGamesProvider>
                 <SteamGamesDataProvider>
                 <PsnGamesDataProvider>
@@ -38,6 +40,7 @@ export function MainProviders({ children }: { children: React.ReactNode }) {
                 </PsnGamesDataProvider>
                 </SteamGamesDataProvider>
                 </HiddenGamesProvider>
+                </ShowcaseProvider>
               </PinnedGamesProvider>
             </GamesDataProvider>
           </ActivityHeatmapYearProvider>

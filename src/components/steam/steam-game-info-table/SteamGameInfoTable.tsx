@@ -254,6 +254,11 @@ export default function SteamGameInfoTable({
             guides={selected.hidden && !selected.earned ? [] : guideLinks('steam', { gameTitle, title: selected.titleEn ?? selected.title, appId })}
             pinned={canPin ? pinned.has(selected.apiname) : undefined}
             onTogglePin={() => toggle(selected)}
+            showcase={
+              selected.earned && selected.dateEarned
+                ? { source: 'steam', gameId: appId, achievementKey: selected.apiname, gameTitle, title: selected.title, description: selected.description || null, badge: selected.badgeUrl || null, earnedAt: selected.dateEarned }
+                : null
+            }
             onClose={() => setSelected(null)}
           />
         )}

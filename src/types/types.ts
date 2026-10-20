@@ -279,6 +279,8 @@ export type RecentAchievement = {
   BadgeUrl?: string;
   /** Full game image URL, used instead of RA's GameIcon path when set (Steam). */
   GameIconUrl?: string;
+  /** The platform's own id for the achievement, where AchievementID is not it (Steam's apiname, PSN's trophy id, Xbox's id). */
+  Key?: string;
 };
 
 export type GameGroupItem = {
