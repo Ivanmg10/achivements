@@ -25,6 +25,19 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — PS3 and PS Vita always in the PSN consoles preference (`fix/psn-consoles-preference`)
+
+**Did** — `PsnGamesDataContext` lists PS3, PS Vita, PS4 and PS5 in the consoles preference always
+(`PSN_CONSOLES`, through a new `always` argument of `consoleOptions`), with 0 for a console the
+library does not have. Tests: `consoleFilter.test.ts`, `PsnGamesDataContext.test.tsx`.
+**Why** — The user wanted PS3 and Vita in the PSN tab to show or hide, like PS4/PS5 and Xbox's.
+**Decisions** — The list was already built from the library, so PS3/Vita showed only when the
+library had them; now the four are fixed. Nothing listed while the library is empty (loading).
+**Open** — Could not read the cache to check whether the user's library has PS3/Vita games at all
+(the `.env.local` database password was refused).
+
+---
+
 ## 2026-10-20 — Xbox shelf cards with sharp art (`fix/xbox-shelf-art`)
 
 **Did** — `LibraryShelfBanner` asks `/api/xbox/details` (through `useXboxGameDetails`) for an Xbox

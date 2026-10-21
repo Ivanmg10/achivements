@@ -10,9 +10,9 @@ export function consolesOf(consoleName: string | null | undefined): string[] {
     .filter(Boolean)
 }
 
-/** Every console in a list of games, with how many games are on it; the biggest first. */
-export function consoleOptions(consoleNames: string[]): ConsoleOption[] {
-  const counts = new Map<string, number>()
+/** Every console in a list of games, with how many games are on it; the biggest first. `always` are listed even with none. */
+export function consoleOptions(consoleNames: string[], always: readonly string[] = []): ConsoleOption[] {
+  const counts = new Map<string, number>(always.map((name) => [name, 0]))
   for (const label of consoleNames) {
     for (const name of consolesOf(label)) counts.set(name, (counts.get(name) ?? 0) + 1)
   }
