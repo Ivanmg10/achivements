@@ -29,6 +29,19 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — Opening a home section keeps its top in view while it loads (`feat/groups-redesign`)
+
+**Did** — New hook `useSectionScroll` (used by `MainPageCharts`): opening a stats section scrolls
+its top under the header as before, then keeps asking again while the section resizes, for up to
+`SETTLE_MS` (3 s), and lets go as soon as the user scrolls (wheel, touch, keys).
+**Why** — "Siguiendo" (Following) scrolled badly: it loads only once opened, so at the moment of
+the scroll the page held a short skeleton, could not scroll that far, and stopped short; the
+friends then arrived and nothing corrected it.
+**Decisions** — Rejected a minimum height on the panel area (always tall enough to scroll): it
+left a blank screen under every short section.
+
+---
+
 ## 2026-10-21 — More group icons; the edit preview shows the group (`feat/groups-redesign`)
 
 **Did** — `GroupModalIconPicker` offers 80 icons in five categories (`ICON_CATEGORIES`: games,
