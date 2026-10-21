@@ -1,3 +1,4 @@
+import { storedUnlocks } from '@/lib/steamUnlocks'
 import { loadGlobalPct, loadOwnedGames, loadPlayerAchievements, loadSchema, mapWithConcurrency, SteamAuth } from '@/lib/steamProgress'
 import { lastPlayedGames, unixToIso } from '@/utils/steamMappers'
 import type {
@@ -108,13 +109,11 @@ export async function loadRecentAchievements(
  * the streak needs over a year.
  *
  * "Recently played" only covers two weeks, so the games come from the library
- * instead: those with stats last played inside the window, the most recent
- * `maxGames` of them.
- *
- * ponytail: the cap is the ceiling — each game costs one unlock-list call, so a
- * player with more games than that in the window loses the least recently
- * played ones. Raise it, or keep a table of unlocks as they are seen, if that
- * starts mattering.
+ * instead: those with stats last played inside the window. The `maxGames` played
+ * last are read now (each costs an unlock-list call, cached per player); every
+ * other game of the window comes from the unlocks kept as they were read
+ * (steamUnlocks), which the background score refresh fills for every played
+ * game. A game never read yet by either is missing until it is.
  */
 export async function loadActivityAchievements(
   auth: SteamAuth,
@@ -125,12 +124,22 @@ export async function loadActivityAchievements(
 ): Promise<SteamRecentAchievement[]> {
   const cutoff = Math.floor(now / 1000) - days * 86_400
   const owned = await loadOwnedGames(auth)
-  const games = (owned?.response?.games ?? [])
+  const played = (owned?.response?.games ?? [])
     .filter((g) => g.has_community_visible_stats && (g.rtime_last_played ?? 0) >= cutoff)
     .sort((a, b) => (b.rtime_last_played ?? 0) - (a.rtime_last_played ?? 0))
-    .slice(0, maxGames)
+  const live = played.slice(0, maxGames)
+  // The rest of the window's games, from the unlocks kept as they were read (the score
+  // refresh reads every played game): only games the owned list still shows, so a
+  // profile made private shows nothing here either.
+  const rest = played.slice(maxGames)
+  const titles = new Map(rest.map((g) => [g.appid, g.name ?? `App ${g.appid}`]))
+  const [read, kept] = await Promise.all([
+    unlocksOf(auth, live),
+    storedUnlocks(auth.id, auth.steamid, [...titles.keys()], cutoff),
+  ])
+  const fromStore = kept.map((u) => ({ ...u, gameTitle: titles.get(u.appId)! }))
 
-  const inWindow = (await unlocksOf(auth, games))
+  const inWindow = [...read, ...fromStore]
     .filter((u) => u.unlocktime >= cutoff)
     .sort((a, b) => b.unlocktime - a.unlocktime)
   return describe(auth, lang, inWindow)

@@ -550,6 +550,12 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   games a call; 192 in 0.6 s measured 2026-10-22): only finished games are read one by one, for
   the date they were finished. The batch also answers for achievements Steam keeps private, so it
   is trusted only after one per-game read agrees they are public (`batchCountsFor`). Keep that probe.
+- **Every Steam unlock read is kept** in `steam_unlocks` (`migrations/042_steam_unlocks.sql`,
+  applied to pre 2026-10-22, **not yet to production**; without it the writes and reads only log,
+  nothing fails): `fetchPlayerAchievements` records them, so the score refresh (every played game)
+  fills it. The streak and activity read the `maxGames` played last live and the rest of the
+  window from the table, only for games the owned list still shows (a private profile shows none).
+  Unlinking Steam (user or admin) deletes the rows; `/privacy` says they are kept until then.
 - **Read routes that are expensive upstream send `cachedJson(data, ttl)`**
   (private, `Vary: Cookie`): the PSN and Xbox reads (5 min per game, 2 min for
   recent unlocks) as RA's and Steam's already did. Mutable data (groups, pins,

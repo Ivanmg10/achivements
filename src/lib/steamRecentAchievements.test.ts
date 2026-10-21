@@ -15,6 +15,7 @@ jest.mock('@/lib/steamClient', () => ({
 import { withSteamCache } from '@/lib/steamCache'
 import { getGlobalAchievementPercentages, getOwnedGames, getRecentlyPlayedGames, getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
 import { loadActivityAchievements, loadRecentAchievements } from './steamRecentAchievements'
+import pool from '@/lib/db'
 
 const AUTH = { id: '7', steamid: '765', apiKey: 'key' }
 
@@ -161,5 +162,23 @@ describe('loadActivityAchievements', () => {
   test('is empty when the library cannot be read as expected', async () => {
     ;(getOwnedGames as jest.Mock).mockResolvedValue({})
     expect(await loadActivityAchievements(AUTH, 'english', 60, NOW_MS)).toEqual([])
+  })
+
+  test('past the cap, games come from the kept unlocks instead of being lost', async () => {
+    // maxGames = 1: Hades (played last) is read now; Fallout 4 is not, its unlocks were kept.
+    ;(pool.query as jest.Mock).mockResolvedValue({ rows: [{ appid: 1, apiname: 'NEWEST', at: String(90 * DAY) }] })
+
+    const list = await loadActivityAchievements(AUTH, 'english', 60, NOW_MS, 1)
+
+    expect((getPlayerAchievements as jest.Mock).mock.calls.map(([, , appId]) => appId)).toEqual([2])
+    expect(list.map((a) => [a.gameTitle, a.apiname])).toEqual([['Fallout 4', 'NEWEST'], ['Hades', 'MIDDLE']])
+    const read = (pool.query as jest.Mock).mock.calls.find(([sql]) => String(sql).includes('FROM steam_unlocks'))
+    expect(read[1]).toEqual(['7', '765', [1], 40 * DAY])
+  })
+
+  test('every read keeps its dated unlocks', async () => {
+    await loadActivityAchievements(AUTH, 'english', 60, NOW_MS)
+    const writes = (pool.query as jest.Mock).mock.calls.filter(([sql]) => String(sql).includes('INSERT INTO steam_unlocks'))
+    expect(writes.map(([, params]) => [params[2], params[3]])).toEqual(expect.arrayContaining([[1, ['OLD', 'NEWEST']], [2, ['MIDDLE']]]))
   })
 })

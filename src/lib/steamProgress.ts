@@ -1,4 +1,5 @@
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
+import { recordUnlocks } from '@/lib/steamUnlocks'
 import { getGlobalAchievementPercentages, getOwnedGames, getPlayerAchievements, getSchemaForGame, getTopAchievementsForGames } from '@/lib/steamClient'
 import { countUnlocks, toGlobalPctMap, withUnlockCounts } from '@/utils/steamMappers'
 import type {
@@ -93,7 +94,10 @@ export function isNoStats(unlocks: CachedUnlocks): unlocks is typeof NO_STATS {
 export async function fetchPlayerAchievements(auth: SteamAuth, appId: number): Promise<PlayerUnlocks> {
   try {
     const data = (await getPlayerAchievements(auth.steamid, auth.apiKey, appId)) as SteamPlayerAchievementsResponse
-    return data?.playerstats?.success ? (data.playerstats.achievements ?? []) : []
+    const list = data?.playerstats?.success ? (data.playerstats.achievements ?? []) : []
+    // Every read keeps its dated unlocks: the streak counts games not read on its own page load.
+    await recordUnlocks(auth.id, auth.steamid, appId, list)
+    return list
   } catch (err) {
     const status = (err as { status?: number }).status
     if (status === 403) return []

@@ -59,6 +59,7 @@ auth, 429 rate limited, 502/503 upstream).
 |---|---|---|
 | Memory | `src/lib/raCache.ts` (`withCache`, LRU of 5000) | First level for RA, per instance |
 | Postgres | `steam_cache` table, `src/lib/steamCache.ts` | Second level for RA (`ra:` keys), Steam, PSN (`psn:`) and IGDB; swept daily |
+| Postgres | `steam_unlocks` table, `src/lib/steamUnlocks.ts` | Every Steam unlock read, dated, per user and Steam account: the streak and activity use it past the games read live. Not a cache: kept until Steam is unlinked |
 | HTTP | `src/lib/httpCache.ts` (`cachedJson`) | `Cache-Control` on the response |
 
 Change the shape of a cached value → bump its key's version (`gameData_v2:` →
