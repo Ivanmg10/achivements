@@ -29,6 +29,16 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — More group icons; the edit preview shows the group (`feat/groups-redesign`)
+
+**Did** — `GroupModalIconPicker` offers 80 icons in five categories (`ICON_CATEGORIES`: games,
+trophies, mood, lists, nature) and opens on the category of the current icon; the own-emoji/link
+field stays. Editing a group, `GroupModalPreview` now shows its own covers and game count (it said
+"0 games": it only counted the games picked while creating).
+**Why** — The user asked for a bigger icon choice, and to improve the edit modal.
+
+---
+
 ## 2026-10-21 — Edit a group from the home page (`feat/groups-redesign`)
 
 **Did** — The featured group on the home (`MainPageGroupFeature`) has an edit button that opens

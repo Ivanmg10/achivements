@@ -1023,6 +1023,11 @@ export const ru: Translations = {
     createWith: 'Создать: {games}',
     gamesLabel: 'Игры',
     gamesOptional: 'Необязательно: можно добавить позже',
+    iconGames: 'Игры',
+    iconTrophies: 'Трофеи',
+    iconMoods: 'Настроение',
+    iconLists: 'Списки',
+    iconNature: 'Природа',
   },
   streak: {
     title: 'Серия',

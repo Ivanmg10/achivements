@@ -107,11 +107,11 @@ test('switching to another group while open fills the form with that one', () =>
 
 test('the icon: one tap on a common one, or an image link of your own, shown in the preview', async () => {
   const { onSave } = setup()
-  fireEvent.click(screen.getByRole('button', { name: '🏆' }))
-  expect(screen.getByRole('button', { name: '🏆' })).toHaveAttribute('aria-pressed', 'true')
+  fireEvent.click(screen.getByRole('button', { name: '🎮' }))
+  expect(screen.getByRole('button', { name: '🎮' })).toHaveAttribute('aria-pressed', 'true')
   fireEvent.change(icon(), { target: { value: 'https://x.test/a.png' } })
   expect(document.querySelector('img[src="https://x.test/a.png"]')).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: '🏆' })).toHaveAttribute('aria-pressed', 'false')
+  expect(screen.getByRole('button', { name: '🎮' })).toHaveAttribute('aria-pressed', 'false')
   fireEvent.change(title(), { target: { value: 'X' } })
   fireEvent.click(screen.getByRole('button', { name: en.groups.create }))
   await waitFor(() => expect(onSave.mock.calls[0][0]).toMatchObject({ icon: 'https://x.test/a.png' }))

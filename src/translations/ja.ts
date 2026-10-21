@@ -1023,6 +1023,11 @@ export const ja: Translations = {
     createWith: '{games}で作成',
     gamesLabel: 'ゲーム',
     gamesOptional: '任意：あとから追加できます',
+    iconGames: 'ゲーム',
+    iconTrophies: 'トロフィー',
+    iconMoods: '気分',
+    iconLists: 'リスト',
+    iconNature: '自然',
   },
   streak: {
     title: 'ストリーク',

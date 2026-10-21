@@ -1023,6 +1023,11 @@ export const pl: Translations = {
     createWith: 'Utwórz z: {games}',
     gamesLabel: 'Gry',
     gamesOptional: 'Opcjonalnie: możesz dodać je później',
+    iconGames: 'Gry',
+    iconTrophies: 'Trofea',
+    iconMoods: 'Nastrój',
+    iconLists: 'Listy',
+    iconNature: 'Natura',
   },
   streak: {
     title: 'Seria',

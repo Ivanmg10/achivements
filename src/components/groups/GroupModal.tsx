@@ -14,6 +14,7 @@ import GroupModalGamePicker from '@/components/groups/group-modal-game-picker/Gr
 import GroupModalPreview from '@/components/groups/group-modal-preview/GroupModalPreview'
 import GroupModalIconPicker from '@/components/groups/group-modal-icon-picker/GroupModalIconPicker'
 import GroupModalVisibility from '@/components/groups/group-modal-visibility/GroupModalVisibility'
+import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -74,6 +75,9 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
   const [selectedGames, setSelectedGames] = useState<GameCandidate[]>([])
 
   const isEditing = !!group
+  // An existing group shows its own games in the preview.
+  const ownCovers = group ? (group.covers ?? group.items ?? []).map(coverSrc).filter((s): s is string => !!s) : undefined
+  const ownCount = group ? (group.items?.length ?? group.game_count) : undefined
 
   // Opening (or switching to another group) fills the form; state, so while rendering.
   useWhenChanged([isOpen, group], () => {
@@ -163,7 +167,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
             <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
               <div className={`flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 pb-5 grid gap-6 ${isEditing ? '' : 'md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]'}`}>
                 <div className="flex flex-col gap-4">
-                  <GroupModalPreview title={title} icon={icon} isPublic={isPublic} games={selectedGames} />
+                  <GroupModalPreview title={title} icon={icon} isPublic={isPublic} games={selectedGames} covers={ownCovers} gameCount={ownCount} />
 
                   <div className="flex flex-col gap-1">
                     <Counter htmlFor={titleId} label={T.groups.groupTitle} length={title.length} max={GROUP_TITLE_MAX} />

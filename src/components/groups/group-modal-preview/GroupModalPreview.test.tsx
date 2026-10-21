@@ -15,3 +15,9 @@ test('the name as typed (or the placeholder), the games and who sees it', () => 
   expect(screen.getByText(new RegExp(en.groups.public))).toBeInTheDocument()
   expect(container.querySelector('img[src="https://cdn/a.jpg"]')).toBeInTheDocument()
 })
+
+test('an existing group shows its own covers and game count', () => {
+  const { container } = render(<GroupModalPreview title="Old" icon="" isPublic={false} games={[]} covers={['https://a/1.png']} gameCount={12} />)
+  expect(screen.getByText(/12 games/)).toBeInTheDocument()
+  expect(container.querySelector('img[src="https://a/1.png"]')).toBeInTheDocument()
+})

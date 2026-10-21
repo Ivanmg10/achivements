@@ -7,12 +7,27 @@ import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDi
 
 /**
  * How the group will look as it is being made: the chosen games' covers behind,
- * its icon, its name (or the placeholder) and its privacy. Decorative copy of
- * the form, so hidden from screen readers.
+ * its icon, its name (or the placeholder) and its privacy. An existing group
+ * passes its own `covers` and `gameCount`. Decorative copy of the form, so
+ * hidden from screen readers.
  */
-export default function GroupModalPreview({ title, icon, isPublic, games }: { title: string; icon: string; isPublic: boolean; games: GameCandidate[] }) {
+export default function GroupModalPreview({
+  title,
+  icon,
+  isPublic,
+  games,
+  covers: own,
+  gameCount,
+}: {
+  title: string
+  icon: string
+  isPublic: boolean
+  games: GameCandidate[]
+  covers?: string[]
+  gameCount?: number
+}) {
   const { T, lang } = useLanguage()
-  const covers = games.map(candidateIconUrl).filter(Boolean).slice(0, 4)
+  const covers = (own ?? games.map(candidateIconUrl).filter(Boolean)).slice(0, 4)
   const Privacy = isPublic ? IconWorld : IconLock
 
   return (
@@ -32,7 +47,7 @@ export default function GroupModalPreview({ title, icon, isPublic, games }: { ti
         <div className="min-w-0">
           <p className={`text-lg font-bold truncate ${title.trim() ? 'text-text-main' : 'text-text-secondary'}`}>{title.trim() || T.groups.groupTitlePlaceholder}</p>
           <p className="flex items-center gap-1 text-xs text-text-secondary">
-            {plural(games.length, T.plurals.games, lang)} ·
+            {plural(gameCount ?? games.length, T.plurals.games, lang)} ·
             <Privacy className="w-3 h-3" />
             {isPublic ? T.groups.public : T.groups.private}
           </p>

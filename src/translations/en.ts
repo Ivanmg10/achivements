@@ -1024,6 +1024,11 @@ export const en = {
     createWith: 'Create with {games}',
     gamesLabel: 'Games',
     gamesOptional: 'Optional: you can add them later',
+    iconGames: 'Games',
+    iconTrophies: 'Trophies',
+    iconMoods: 'Mood',
+    iconLists: 'Lists',
+    iconNature: 'Nature',
   },
   streak: {
     title: 'Streak',
