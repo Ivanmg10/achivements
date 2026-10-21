@@ -149,7 +149,7 @@ export default function GroupDetailPage() {
       </div>
 
       <LazyWhenOpened open={addGameOpen}>
-        <AddGameModal isOpen={addGameOpen} onClose={() => setAddGameOpen(false)} groupId={groupId} existingKeys={existingKeys} onAdded={addItems} />
+        <AddGameModal isOpen={addGameOpen} onClose={() => setAddGameOpen(false)} groupId={groupId} groupTitle={group?.title} existingKeys={existingKeys} onAdded={addItems} />
       </LazyWhenOpened>
       {group && (
         <LazyWhenOpened open={editOpen}>

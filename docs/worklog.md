@@ -29,6 +29,22 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — A friendlier "add games" modal for groups (`feat/groups-redesign`)
+
+**Did** — `AddGameModal` rebuilt: a titled dialog ("Add games", "to <group>"), on `<body>`
+through a portal; it opens on **suggestions** (`suggestCandidates` in `gameCandidates.ts`: being
+played, closest to done first, then wanted, then the rest), narrows by title and by platform
+(`AddGameModalPlatforms`, only platforms the user has games on), and shows games as selectable
+covers (`GamePickerTile`, `aria-pressed`, a check besides the ring). "No games match" when a search
+finds nothing; the footer is always there (count, clear, "Add N games", disabled at 0). RA id/link
+lookup kept. Cover tiles on the group page now top out at 9rem (the user found 11rem still blurry).
+**Why** — The user asked for a friendlier modal: before, it showed nothing until typed, said
+nothing when a search failed, and the add button appeared only after a pick.
+**Decisions** — `GamePickerRow` stays for the pin and favourite pickers; only this modal moved
+to covers.
+
+---
+
 ## 2026-10-21 — Group page redesign: banner, one filter bar, covers or list (`feat/groups-redesign`)
 
 **Did** — `/groups/[id]` follows mock-up C. `GroupDetailHero` (replaces `GroupDetailHeader`): the
