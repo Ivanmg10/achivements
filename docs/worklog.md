@@ -29,6 +29,29 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Steam: batched library counts, the whole year's streak, "now playing" (`feat/steam-sign-in`)
+
+**Did** — (1) `fetchBatchCounts` (`GetTopAchievementsForGames`, 100 games a call) counts a
+library's in-progress and unstarted games at once; only finished games are read one by one, for
+their completion date. (2) `steam_unlocks` (`migrations/042`, `lib/steamUnlocks.ts`): every
+per-game read keeps its dated unlocks; the streak/activity read the `maxGames` played last live
+and the rest of the window from the table. Unlinking deletes them. (3) `/api/follows/playing` +
+`PresenceLabel`'s `playing`: "Now playing: <game>" on the Following and home friend cards.
+`/privacy` (9 languages) says both what is kept and who sees the game.
+**Why** — The user picked these from a list of Steam improvements (they declined refreshing the
+stored Steam name and a "verify with Steam" for old typed links).
+**Decisions** — Measured 2026-10-22: the batch returns exactly the unlocked achievements when
+`max_achievements` ≥ the total (40/50, 84/84, 43/43 against the per-game calls), 192 games in
+0.6 s, but **no unlock times**, and it answers even when Steam says "Profile is not public" per
+game; so a per-game probe must agree before it is used. The unlocks table is fed by the score
+refresh, which already reads every played game; no extra Steam calls. "Now playing" lives in its
+own route so the overview stays database-only.
+**Open** — **042 applied to pre only**; production needs it before `main` (without it the
+writes/reads just log). Days older than the table's first fill stay missing for games past the
+live cap until the score refresh reads them.
+
+---
+
 ## 2026-10-22 — Steam review: one owned-list read, private profiles said aloud (`feat/steam-sign-in`)
 
 **Did** — `loadOwnedGames` (`lib/steamProgress.ts`): Steam's owned list cached 5 min under
