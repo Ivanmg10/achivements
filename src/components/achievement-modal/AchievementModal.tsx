@@ -4,6 +4,7 @@ import { RetroAchievement } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
@@ -129,7 +130,8 @@ export default function AchievementModal({
       })
     : null
 
-  return (
+  // In body: a transformed ancestor (the home's sections) would otherwise trap it under later sections.
+  return createPortal(
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
       variants={modalOverlay}
@@ -377,6 +379,7 @@ export default function AchievementModal({
           })()}
         </div>
       </motion.div>
-    </motion.div>
+    </motion.div>,
+    document.body,
   )
 }

@@ -38,7 +38,10 @@ test('the card has the art of its game, blurred, behind it, and is a box of its 
   expect(screen.getByTestId('backdrop')).toHaveTextContent('steam:7')
   const card = screen.getByRole('region', { name: 'Hades' })
   expect(card).toContainElement(screen.getByTestId('backdrop'))
-  expect(card).toHaveClass('relative', 'isolate', 'overflow-hidden', 'flex-1')
+  expect(card).toHaveClass('relative', 'isolate', 'overflow-hidden', 'grow')
+  // Shrinking in the pinned column would clip it to that column's height, and leave nothing to scroll.
+  expect(card).toHaveClass('shrink-0')
+  expect(card).not.toHaveClass('flex-1')
 })
 
 describe('RA', () => {

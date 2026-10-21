@@ -25,6 +25,22 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — Library detail scrolls, modals above the heatmap (`fix/library-scroll-heatmap-layers`)
+
+**Did** — The list view's detail panel (`LibraryEntryDetail`) is `grow shrink-0` instead of `flex-1`,
+so it no longer shrinks to its sticky column and the column scrolls. `AchievementModal` and
+`AchievementDetailModal` render through `createPortal` into `document.body`.
+**Why** — The user could not scroll the right panel of the library lists (a long RA game cut off at
+the bottom), and an achievement opened from "Recently played" on the home was covered by the
+heatmap below it.
+**Decisions** — `flex-1` (basis 0, shrinkable) plus the card's `overflow-hidden` (which drops its
+min-height to 0) squeezed the card to the column and clipped the rest. The modals were trapped in a
+transformed ancestor's stacking context (framer-motion sections), so their `z-50` only counted
+inside it; a portal fixes it for every place they open from, as `CommonModal` already did.
+**Watch out** — Other hand-made modals (day/week/period achievements, showcase picker) still render
+in place; if one is ever opened from inside a transformed section and something later covers it,
+portal it the same way.
+
 ## 2026-10-20 — See who follows you (`feat/rankings-zone-and-personas`)
 
 **Did** — `/following` has tabs (`FollowingTabs`): Following and Followers (`#followers`, read

@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode, useEffect, useId, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { IconBrandYoutube, IconBook2, IconCheck, IconLock, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -77,7 +78,8 @@ export default function AchievementDetailModal({
     : null
   const guideLabel = { youtube: T.achievementDetail.youtube, steamGuides: T.achievementDetail.steamGuides, psnProfiles: T.achievementDetail.psnProfiles, trueAchievements: T.achievementDetail.trueAchievements }
 
-  return (
+  // In body: a transformed ancestor (the home's sections) would otherwise trap it under later sections.
+  return createPortal(
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
       variants={modalOverlay}
@@ -172,6 +174,7 @@ export default function AchievementDetailModal({
           </div>
         )}
       </motion.div>
-    </motion.div>
+    </motion.div>,
+    document.body,
   )
 }

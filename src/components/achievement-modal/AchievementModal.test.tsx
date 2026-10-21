@@ -44,3 +44,10 @@ test('closing gives the focus back to what opened it', () => {
   expect(opener).toHaveFocus()
   opener.remove()
 })
+
+test('opens in the body, out of any section that could cover it', () => {
+  const host = document.body.appendChild(document.createElement('div'))
+  render(<AchievementModal achievement={achievement} numDistinctPlayers={1000} onClose={jest.fn()} />, { container: host })
+  expect(host).not.toContainElement(screen.getByRole('dialog'))
+  expect(screen.getByRole('dialog').closest('.fixed')?.parentElement).toBe(document.body)
+})
