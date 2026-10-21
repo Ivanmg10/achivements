@@ -29,6 +29,32 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — Library detail scrolls, modals above the heatmap, home ends at the screen (`fix/library-scroll-heatmap-layers`)
+
+**Did** — The list view's detail panel (`LibraryEntryDetail`) is `grow shrink-0` instead of `flex-1`,
+so it no longer shrinks to its sticky column and the column scrolls. `AchievementModal` and
+`AchievementDetailModal` render through `createPortal` into `document.body`.
+**Why** — The user could not scroll the right panel of the library lists (a long RA game cut off at
+the bottom), and an achievement opened from "Recently played" on the home was covered by the
+heatmap below it.
+**Decisions** — `flex-1` (basis 0, shrinkable) plus the card's `overflow-hidden` (which drops its
+min-height to 0) squeezed the card to the column and clipped the rest. The modals were trapped in a
+transformed ancestor's stacking context (framer-motion sections), so their `z-50` only counted
+inside it; a portal fixes it for every place they open from, as `CommonModal` already did.
+**Also** — On the home's one-screen Overview (`home-fit`, ≥1024×1000), the profile column never
+shrinks, so a profile a little taller than its share made the page ~20 px longer than the screen and
+the end of the stats panel sat below the fold (the user wants the first view to end exactly at the
+panel's bottom, footer just below). `homeFit` (`src/lib/homeFit.ts`, a ref callback on the home's
+`<main>`) measures how far the box runs past the screen and takes it off the daily chart through
+`--home-fit-trim` (at most 100 px, the chart never under 160 px; the heatmap follows the chart's box).
+Rejected: letting the profile scroll again (that was the cut-off fixed before) and a smaller fixed chart
+height (only right for one profile and one screen).
+**Watch out** — Other hand-made modals (day/week/period achievements, showcase picker) still render
+in place; if one is ever opened from inside a transformed section and something later covers it,
+portal it the same way.
+
+---
+
 ## 2026-10-21 — An error card for a platform profile that does not load (`feat/platform-load-error`)
 
 **Did** — `MainPageProfileError` (`main-page-profile/main-page-profile-error/`): the error screens'

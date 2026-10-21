@@ -60,3 +60,10 @@ test('pins from inside when the viewer can, and not otherwise', () => {
   rerender(<AchievementDetailModal {...BASE} onClose={jest.fn()} />)
   expect(screen.queryByRole('switch')).toBeNull()
 })
+
+test('opens in the body, out of any section that could cover it', () => {
+  const host = document.body.appendChild(document.createElement('div'))
+  render(<AchievementDetailModal {...BASE} onClose={jest.fn()} />, { container: host })
+  expect(host).not.toContainElement(screen.getByRole('dialog'))
+  expect(screen.getByRole('dialog').closest('.fixed')?.parentElement).toBe(document.body)
+})
