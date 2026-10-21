@@ -31,6 +31,12 @@ const eslintConfig = defineConfig([
       "react/display-name": "off",
     },
   },
+  {
+    // Scripts git runs with plain node (merge drivers) are CommonJS: package.json has
+    // no "type", and Jest can require them.
+    files: ["scripts/**/*.js"],
+    rules: { "@typescript-eslint/no-require-imports": "off" },
+  },
   globalIgnores([
     "node_modules/**",
     ".next/**",
