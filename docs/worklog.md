@@ -20,6 +20,10 @@ Keep it short — a few lines per heading; leave out a heading with nothing in i
 **Watch out** — anything surprising the next person would trip on.
 ```
 
+Merges never conflict on this file: `.gitattributes` gives it git's `union` driver,
+which keeps both branches' entries. It can drop the `---` between two entries
+or put them in either order; that is cosmetic, fix it if you see it.
+
 Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 "added X to CLAUDE.md".
 
@@ -48,6 +52,73 @@ height (only right for one profile and one screen).
 **Watch out** — Other hand-made modals (day/week/period achievements, showcase picker) still render
 in place; if one is ever opened from inside a transformed section and something later covers it,
 portal it the same way.
+
+---
+
+## 2026-10-21 — An error card for a platform profile that does not load (`feat/platform-load-error`)
+
+**Did** — `MainPageProfileError` (`main-page-profile/main-page-profile-error/`): the error screens'
+`StatusBadge` (danger, a cloud-off icon, the platform's logo on its corner), the message and the
+platform's reason, and a Retry button (`STATUS_BUTTON.secondary`). Fills the profile column. Used by
+the Steam, PSN and Xbox profiles on the home in place of their red line and small pill.
+**Why** — The user saw the Xbox profile fail ("limited right now") as a bare line of red text and
+asked for a proper component for when a platform cannot load.
+**Decisions** — No new strings: each platform's `profileError`, reason (`errors.*`, Steam's private
+hint) and `retry` are reused. RA's profile on the home has no error state of its own, so it is untouched.
+
+---
+
+## 2026-10-21 — The worklog and the version no longer conflict on merge (`chore/worklog-union-merge`)
+
+**Did** — `.gitattributes`: `docs/worklog.md merge=union`. A rule for it in CLAUDE.md
+(Documentation) and a note in this file's instructions.
+**Why** — Every branch adds its entry at the top, so bringing any branch up to date with
+`develop` conflicted here (it happened twice on 2026-10-21, PR #41 among them).
+**Decisions** — Git's built-in `union` driver: no config, no script, works for every clone.
+Tested on a toy repo: both entries kept, the `---` between them lost (cosmetic). The version
+files (`package.json`, `version.ts`) get their own driver, `scripts/merge-version.js`: it
+sets both sides to the higher version, then lets git merge the rest of the file, so a real
+conflict elsewhere in `package.json` still shows. Registered by `npm run prepare` (a custom
+driver lives in `.git/config`, not in the repo). Tried on a real merge with
+`feat/platform-load-error`: no conflicts at all.
+**Watch out** — Run `npm run prepare` once in each clone, or the version still conflicts.
+GitHub's "Update branch" button does not run the version driver: merge locally.
+
+---
+
+## 2026-10-21 — PS3 and PS Vita always in the PSN consoles preference (`fix/psn-consoles-preference`)
+
+**Did** — `PsnGamesDataContext` lists PS3, PS Vita, PS4 and PS5 in the consoles preference always
+(`PSN_CONSOLES`, through a new `always` argument of `consoleOptions`), with 0 for a console the
+library does not have. Tests: `consoleFilter.test.ts`, `PsnGamesDataContext.test.tsx`.
+**Why** — The user wanted PS3 and Vita in the PSN tab to show or hide, like PS4/PS5 and Xbox's.
+**Decisions** — The list was already built from the library, so PS3/Vita showed only when the
+library had them; now the four are fixed. Nothing listed while the library is empty (loading).
+**Open** — Could not read the cache to check whether the user's library has PS3/Vita games at all
+(the `.env.local` database password was refused).
+
+---
+
+## 2026-10-20 — Xbox shelf cards with sharp art (`fix/xbox-shelf-art`)
+
+**Did** — `LibraryShelfBanner` asks `/api/xbox/details` (through `useXboxGameDetails`) for an Xbox
+game's IGDB `heroUrl` and shows it sharp, as RA's screenshots; the shelf detail backdrop follows,
+since it draws the same banner. Test: `LibraryShelfBanner.test.tsx`.
+**Why** — The user saw every Xbox card in the library shelves blurred: Xbox sends only a square
+tile, and the banner blows a tile up and blurs it.
+**Decisions** — Reused the game page's route (cached half a year on the server, `cachedJson` in the
+browser) instead of a new art-only one. One request per visible card, so at most a shelf's worth.
+**Open** — Cold, the route makes two IGDB searches per game (details and art) and `searchGames`
+does not retry a 429, so a first load with many Xbox cards may leave a few blurred until the next
+visit. Games IGDB does not match stay blurred.
+**Also fixed** — The 360 MW3 showed the 2023 game: Xbox names it "Modern Warfare® 3" and lists it on
+360, One and Series (backward compatible), so the IGDB search took the newer game. A game with
+Xbox 360 among its consoles is now searched on 360 alone (`igdbXboxPlatforms`), and `bestMatch`
+prefers a title that ends with the name ("Call of Duty: Modern Warfare 3") over IGDB's first hit,
+which on 360 alone was a DLC pack. Affects the game page's details too. New cache keys (the
+platform list is in them), so nothing to bump.
+
+---
 
 ## 2026-10-20 — See who follows you (`feat/rankings-zone-and-personas`)
 
