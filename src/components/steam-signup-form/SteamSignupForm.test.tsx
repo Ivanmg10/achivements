@@ -10,7 +10,7 @@ function hook(value: Partial<ReturnType<typeof useSteamSignup>>) {
   ;(useSteamSignup as jest.Mock).mockReturnValue({ submitting: false, submitError: null, register, ...value })
 }
 
-const PROFILE = { persona: 'Gabe Newell', avatar: 'https://avatars.steamstatic.com/a.jpg', username: 'Gabe_Newell' }
+const PROFILE = { persona: 'Gabe Newell', avatar: 'https://avatars.steamstatic.com/a.jpg', username: 'Gabe_Newell', isPublic: true }
 
 beforeEach(() => jest.clearAllMocks())
 
@@ -48,4 +48,17 @@ test('a refusal from the server shows next to the form', () => {
   hook({ state: { status: 'form', profile: PROFILE }, submitError: 'username-taken' })
   render(<SteamSignupForm outcome="1" />)
   expect(screen.getByRole('alert')).toHaveTextContent(en.steamAuth.usernameTaken)
+})
+
+test('a private Steam profile is warned about, and the account can still be made', () => {
+  hook({ state: { status: 'form', profile: { ...PROFILE, isPublic: false } } })
+  render(<SteamSignupForm outcome="1" />)
+  expect(screen.getByText(en.steam.privateProfileHint)).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: en.steamAuth.create })).toBeEnabled()
+})
+
+test('a public one is not', () => {
+  hook({ state: { status: 'form', profile: PROFILE } })
+  render(<SteamSignupForm outcome="1" />)
+  expect(screen.queryByText(en.steam.privateProfileHint)).not.toBeInTheDocument()
 })

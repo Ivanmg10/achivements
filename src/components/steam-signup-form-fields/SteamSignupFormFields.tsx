@@ -58,6 +58,12 @@ export default function SteamSignupFormFields({
 
       <p className="text-sm text-text-secondary mb-4">{T.steamAuth.lead}</p>
 
+      {!profile.isPublic && (
+        <p className="mb-4 text-xs text-warning bg-warning/10 border border-warning/30 rounded-xl p-3">
+          {T.steam.privateProfileHint}
+        </p>
+      )}
+
       {error && (
         <div role="alert" className="mb-4 bg-danger/20 border border-danger/40 rounded-xl p-3">
           <p className="text-sm text-danger">{error}</p>

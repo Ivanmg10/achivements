@@ -15,7 +15,7 @@ import { signTicket } from '@/lib/steamLogin'
 
 const query = pool.query as jest.Mock
 const ID = '76561197960287930'
-const PLAYER = { personaname: 'Gabe Newell', avatarfull: 'https://avatars.steamstatic.com/abc_full.jpg' }
+const PLAYER = { personaname: 'Gabe Newell', avatarfull: 'https://avatars.steamstatic.com/abc_full.jpg', communityvisibilitystate: 3 }
 
 function request(method: 'GET' | 'POST', { ticket = signTicket(ID), body }: { ticket?: string | null; body?: object } = {}) {
   return new NextRequest('https://www.cheevovault.com/api/auth/steam/register', {
@@ -51,7 +51,7 @@ describe('GET', () => {
     db()
     const res = await GET(request('GET'))
     expect(res.status).toBe(200)
-    expect(res.data).toEqual({ registered: false, persona: 'Gabe Newell', avatar: PLAYER.avatarfull, username: 'Gabe_Newell' })
+    expect(res.data).toEqual({ registered: false, persona: 'Gabe Newell', avatar: PLAYER.avatarfull, username: 'Gabe_Newell', isPublic: true })
   })
 
   test('a known Steam account is told to sign in', async () => {

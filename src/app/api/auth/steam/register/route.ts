@@ -10,7 +10,10 @@ import { onPlatformLinked } from '@/lib/scoreRefresh'
 import { sendVerificationEmail } from '@/lib/verificationEmail'
 import { BCRYPT_COST, checkEmail, checkUsername } from '@/utils/authValidation'
 
-type SteamPlayer = { personaname?: string; avatarfull?: string }
+type SteamPlayer = { personaname?: string; avatarfull?: string; communityvisibilitystate?: number }
+
+/** Steam's "public" community visibility state. */
+const PUBLIC = 3
 
 async function steamPlayer(steamid: string, key: string): Promise<SteamPlayer | null> {
   const data = (await getPlayerSummaries(steamid, key)) as { response?: { players?: SteamPlayer[] } }
@@ -42,6 +45,8 @@ export async function GET(req: NextRequest) {
       persona,
       avatar: player.avatarfull ?? null,
       username: usernameFromPersona(persona),
+      // The account is created either way; the form only warns that the games will not show.
+      isPublic: player.communityvisibilitystate === PUBLIC,
     })
   } catch (err) {
     console.error('[auth/steam/register GET]', err)

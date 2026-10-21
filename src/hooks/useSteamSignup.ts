@@ -5,7 +5,7 @@ import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 /** What the Steam sign-up form starts from (GET /api/auth/steam/register). */
-export type SteamSignupProfile = { persona: string; avatar: string | null; username: string }
+export type SteamSignupProfile = { persona: string; avatar: string | null; username: string; isPublic: boolean }
 
 export type SteamSignupState =
   | { status: 'loading' }

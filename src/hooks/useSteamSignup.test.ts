@@ -5,7 +5,7 @@ import { useSteamSignup } from './useSteamSignup'
 const mockPush = jest.fn()
 jest.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush, refresh: jest.fn() }) }))
 
-const PROFILE = { registered: false, persona: 'Gabe', avatar: null, username: 'Gabe' }
+const PROFILE = { registered: false, persona: 'Gabe', avatar: null, username: 'Gabe', isPublic: true }
 
 function answers(...responses: { ok: boolean; body: object }[]) {
   const fetchMock = jest.fn()
