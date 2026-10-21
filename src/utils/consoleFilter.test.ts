@@ -17,6 +17,15 @@ test('counts each console once per game, biggest first, ties by name', () => {
   expect(consoleOptions([])).toEqual([])
 })
 
+test('lists the consoles asked for even with no games, after the rest', () => {
+  expect(consoleOptions(['PS5', 'PS4 · PS5'], ['PS3', 'PS Vita', 'PS4', 'PS5'])).toEqual([
+    { name: 'PS5', count: 2 },
+    { name: 'PS4', count: 1 },
+    { name: 'PS Vita', count: 0 },
+    { name: 'PS3', count: 0 },
+  ])
+})
+
 test('a game stays while one of its consoles is ticked', () => {
   const hidden = new Set(['Xbox 360'])
   expect(isConsoleShown('Xbox 360', hidden)).toBe(false)
