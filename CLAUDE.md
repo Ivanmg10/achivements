@@ -754,7 +754,7 @@ requests are both limited per address in the database (`src/lib/attemptLimit.ts`
 "Continue with Steam" under both forms (`SteamSignInDivider`), and "Connect Steam" on the
 Steam card (`UserSteamCardLink`, `/api/auth/steam?intent=link&next=…`). Steam's OpenID 2.0, all
 in `src/lib/steamLogin.ts`; `migrations/041_steam_login.sql` (`users.steam_login_id`,
-unique) **must be applied before it is used** (pre, then production); nothing else
+unique) was applied to pre (2026-10-21) and production (2026-10-22); any other database needs it first; nothing else
 reads that column, so the rest of the app works without it.
 
 - `/api/auth/steam` → Steam → `/api/auth/steam/callback`, which asks Steam to confirm

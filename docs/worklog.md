@@ -94,7 +94,7 @@ picture), so the email is still asked for: it is the only recovery path. A new c
 `steamid`, because `steamid` is typed and unproven (migrations/028). Random password, so the
 account has none until "forgot password"; rejected a nullable password (every `passwordVersion`
 and current-password check assumes one). The ticket goes in an httpOnly cookie, not the URL.
-**Open** — 041 applied to pre (2026-10-21); production still needs it when this reaches `main`. No "link Steam sign-in" for existing accounts.
+**Open** — 041 applied to pre (2026-10-21) and production (2026-10-22). No "link Steam sign-in" for existing accounts.
 Changing the email or deleting the account asks for the current password, which a Steam-only
 user has to set through "forgot password" first. Not tried against real Steam yet: try it on the
 preview (Steam needs to reach `NEXTAUTH_URL`'s host, any public or localhost URL works as realm).
