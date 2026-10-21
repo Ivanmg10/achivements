@@ -36,6 +36,29 @@ library had them; now the four are fixed. Nothing listed while the library is em
 **Open** — Could not read the cache to check whether the user's library has PS3/Vita games at all
 (the `.env.local` database password was refused).
 
+---
+
+## 2026-10-20 — Xbox shelf cards with sharp art (`fix/xbox-shelf-art`)
+
+**Did** — `LibraryShelfBanner` asks `/api/xbox/details` (through `useXboxGameDetails`) for an Xbox
+game's IGDB `heroUrl` and shows it sharp, as RA's screenshots; the shelf detail backdrop follows,
+since it draws the same banner. Test: `LibraryShelfBanner.test.tsx`.
+**Why** — The user saw every Xbox card in the library shelves blurred: Xbox sends only a square
+tile, and the banner blows a tile up and blurs it.
+**Decisions** — Reused the game page's route (cached half a year on the server, `cachedJson` in the
+browser) instead of a new art-only one. One request per visible card, so at most a shelf's worth.
+**Open** — Cold, the route makes two IGDB searches per game (details and art) and `searchGames`
+does not retry a 429, so a first load with many Xbox cards may leave a few blurred until the next
+visit. Games IGDB does not match stay blurred.
+**Also fixed** — The 360 MW3 showed the 2023 game: Xbox names it "Modern Warfare® 3" and lists it on
+360, One and Series (backward compatible), so the IGDB search took the newer game. A game with
+Xbox 360 among its consoles is now searched on 360 alone (`igdbXboxPlatforms`), and `bestMatch`
+prefers a title that ends with the name ("Call of Duty: Modern Warfare 3") over IGDB's first hit,
+which on 360 alone was a DLC pack. Affects the game page's details too. New cache keys (the
+platform list is in them), so nothing to bump.
+
+---
+
 ## 2026-10-20 — See who follows you (`feat/rankings-zone-and-personas`)
 
 **Did** — `/following` has tabs (`FollowingTabs`): Following and Followers (`#followers`, read

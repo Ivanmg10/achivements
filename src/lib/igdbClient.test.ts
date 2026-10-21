@@ -53,6 +53,12 @@ test('toIgdbArt prefers the exact title, falls back to the first hit, and builds
   expect(igdb.toIgdbArt('Jak II', [])).toBeNull()
 })
 
+test('toIgdbArt takes a title that ends with the name before the first hit', () => {
+  const newer = { name: 'Call of Duty: Modern Warfare III', first_release_date: 1699574400 }
+  const older = { name: 'Call of Duty: Modern Warfare 3', first_release_date: 1320710400 }
+  expect(igdb.toIgdbArt('Modern Warfare 3', [newer, older])?.releaseYear).toBe(2011)
+})
+
 test('without a Twitch app, or for a PS4/PS5 game, nothing is asked', async () => {
   delete process.env.TWITCH_CLIENT_SECRET
   expect(await igdb.igdbArt('Jak II', 'PS3')).toBeNull()
@@ -161,6 +167,7 @@ test("an Xbox library's platform names map to IGDB's ids", () => {
   expect(igdb.igdbXboxPlatforms('Xbox One')).toEqual([49])
   expect(igdb.igdbXboxPlatforms('Xbox Series · PC')).toEqual([169, 6])
   expect(igdb.igdbXboxPlatforms('Xbox One · Xbox Series')).toEqual([49, 169])
+  expect(igdb.igdbXboxPlatforms('Xbox 360 · Xbox One · Xbox Series')).toEqual([12])
   expect(igdb.igdbXboxPlatforms('PS5')).toEqual([])
   expect(igdb.igdbXboxPlatforms('PCSX')).toEqual([])
 })
