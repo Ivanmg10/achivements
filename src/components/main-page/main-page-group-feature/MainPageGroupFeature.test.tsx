@@ -53,12 +53,18 @@ test('points to the game closest to done', () => {
   expect(screen.getByRole('link', { name: /1 left in Kirby/ })).toHaveAttribute('href', '/gameInfo/102')
 })
 
-test('shows its first six games as covers, each linking to its page, and says how many more', () => {
-  detail(Array.from({ length: 8 }, (_, i) => item(i)))
+test('a big group: its first eleven games as covers, each linking to its page, and a tile with the rest', () => {
+  detail(Array.from({ length: 14 }, (_, i) => item(i)))
   render(<MainPageGroupFeature group={group()} />)
-  expect(screen.getAllByRole('link', { name: /^Game \d/ })).toHaveLength(6)
+  expect(screen.getAllByRole('link', { name: /^Game \d/ })).toHaveLength(11)
   expect(screen.getByRole('link', { name: /^Game 0/ })).toHaveAttribute('href', '/gameInfo/100')
-  expect(screen.getByRole('link', { name: new RegExp(en.cards.viewGroup) })).toHaveTextContent(en.cards.moreMatches.replace('{n}', '2'))
+  expect(screen.getByRole('link', { name: '+3 more' })).toHaveAttribute('href', '/groups/4')
+})
+
+test('a small group has no "more" tile', () => {
+  detail([item(1), item(2)])
+  render(<MainPageGroupFeature group={group()} />)
+  expect(screen.queryByRole('link', { name: /more$/ })).not.toBeInTheDocument()
 })
 
 test('an empty group says so and can be filled from here', async () => {

@@ -22,13 +22,15 @@ import MainPageGroupFeatureGame from '@/components/main-page/main-page-group-fea
 // Downloaded the first time it is opened, not with the page.
 const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'), { loading: () => null })
 
-/** Games shown before "N more": one row of covers on a wide card. */
-const SHOWN = 6
+/** Covers shown before a "+N more" tile; small, so a big group still takes a row or two. */
+const SHOWN = 11
+// At most 88px a cover: RA's icons are 96px, so they are never blown up.
+const GRID = 'grid gap-3 grid-cols-[repeat(auto-fill,minmax(4.5rem,5.5rem))]'
 
 /**
  * The group shown in full: its covers faded behind a ring with how far along
  * it is, how many games are finished, started and not started, the game
- * closest to done, and its first games as covers. An empty one can be filled
+ * closest to done, and its first games as small covers (a tile says how many more). An empty one can be filled
  * from here. `onChanged` is told when games were added, to refresh the counts.
  */
 export default function MainPageGroupFeature({ group, onChanged }: { group: GameGroup; onChanged?: () => void }) {
@@ -111,8 +113,8 @@ export default function MainPageGroupFeature({ group, onChanged }: { group: Game
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 animate-pulse motion-reduce:animate-none" aria-busy="true">
-          {Array.from({ length: SHOWN }, (_, i) => (
+        <div className={`${GRID} animate-pulse motion-reduce:animate-none`} aria-busy="true">
+          {Array.from({ length: 6 }, (_, i) => (
             <div key={i} className="aspect-square rounded-xl bg-ink/10" />
           ))}
         </div>
@@ -131,12 +133,22 @@ export default function MainPageGroupFeature({ group, onChanged }: { group: Game
           </button>
         </div>
       ) : (
-        <ul className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+        <ul className={GRID}>
           {items.slice(0, SHOWN).map((item) => (
             <li key={item.id} className="min-w-0">
               <MainPageGroupFeatureGame item={item} progress={progress(item)} />
             </li>
           ))}
+          {items.length > SHOWN && (
+            <li>
+              <Link
+                href={`/groups/${group.id}`}
+                className="flex items-center justify-center aspect-square rounded-xl border-2 border-dashed border-ink/10 text-sm font-semibold text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              >
+                {T.groups.moreGames.replace('{n}', String(items.length - SHOWN))}
+              </Link>
+            </li>
+          )}
         </ul>
       )}
 
@@ -144,7 +156,7 @@ export default function MainPageGroupFeature({ group, onChanged }: { group: Game
         href={`/groups/${group.id}`}
         className="self-start flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-main transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
-        {items.length > SHOWN ? `${T.cards.viewGroup} (${T.cards.moreMatches.replace('{n}', String(items.length - SHOWN))})` : T.cards.viewGroup}
+        {T.cards.viewGroup}
         <IconArrowRight size={14} aria-hidden="true" />
       </Link>
 
