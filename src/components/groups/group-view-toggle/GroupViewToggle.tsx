@@ -1,20 +1,29 @@
-import { IconLayoutGrid, IconLayoutRows } from '@tabler/icons-react'
+import type { IconLayoutGrid } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
+/** The groups list: cover cards or shelves of games. */
 export const GROUP_VIEWS = ['covers', 'shelves'] as const
 export type GroupView = (typeof GROUP_VIEWS)[number]
+/** A group's page: a grid of covers or the detailed list. */
+export const GROUP_DETAIL_VIEWS = ['covers', 'list'] as const
+export type GroupDetailView = (typeof GROUP_DETAIL_VIEWS)[number]
 
-const OPTIONS = [
-  { view: 'covers', icon: IconLayoutGrid, label: 'viewCovers' },
-  { view: 'shelves', icon: IconLayoutRows, label: 'viewShelves' },
-] as const
+export type ViewOption<V extends string> = { value: V; label: string; icon: typeof IconLayoutGrid }
 
-/** The two ways to see the groups list: cover cards or shelves of games. */
-export default function GroupViewToggle({ value, onChange }: { value: GroupView; onChange: (view: GroupView) => void }) {
+/** A choice among a few ways to see the same games; the current one is pressed. */
+export default function GroupViewToggle<V extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: ViewOption<V>[]
+  value: V
+  onChange: (view: V) => void
+}) {
   const { T } = useLanguage()
   return (
     <div role="group" aria-label={T.groups.viewLabel} className="flex items-center gap-0.5 bg-bg-card rounded-lg p-0.5">
-      {OPTIONS.map(({ view, icon: Icon, label }) => {
+      {options.map(({ value: view, icon: Icon, label }) => {
         const active = value === view
         return (
           <button
@@ -27,7 +36,7 @@ export default function GroupViewToggle({ value, onChange }: { value: GroupView;
             }`}
           >
             <Icon className="w-4 h-4" aria-hidden="true" />
-            <span className="sr-only sm:not-sr-only">{T.groups[label]}</span>
+            <span className="sr-only sm:not-sr-only">{label}</span>
           </button>
         )
       })}

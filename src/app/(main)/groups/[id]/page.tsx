@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
@@ -14,22 +14,26 @@ import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useGroupPage } from '@/hooks/useGroupPage'
 import { useGroupFilters } from '@/hooks/useGroupFilters'
-import { filterGroupItems, groupSummary, itemKey, liveProgressMap, raProgressMaps } from '@/utils/groupItems'
+import { useStoredChoice } from '@/hooks/useStoredChoice'
+import { filterGroupItems, groupStateCounts, groupSummary, itemKey, itemProgress, liveProgressMap, raProgressMaps } from '@/utils/groupItems'
+import type { GameGroupItem } from '@/types/types'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
 // Downloaded the first time it is opened, not with the page.
 const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
 const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'), { loading: () => null })
 import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
-import GroupDetailHeader from '@/components/groups/group-detail-header/GroupDetailHeader'
-import GroupFilters from '@/components/groups/group-filters/GroupFilters'
+import GroupDetailHero from '@/components/groups/group-detail-hero/GroupDetailHero'
+import GroupToolbar from '@/components/groups/group-toolbar/GroupToolbar'
+import GroupCoverGrid from '@/components/groups/group-cover-grid/GroupCoverGrid'
+import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
+import { GROUP_DETAIL_VIEWS, type GroupDetailView } from '@/components/groups/group-view-toggle/GroupViewToggle'
 import GroupGameGrid from '@/components/groups/group-game-grid/GroupGameGrid'
 import GroupDetailSkeleton from '@/components/groups/group-detail-skeleton/GroupDetailSkeleton'
-import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 
 const PAGE = 'flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main'
 
-/** A group of games: its header and progress, filters, and its games in the order chosen. */
+/** A group of games: its banner and progress, one bar of filters, and its games (covers or a list) in the order chosen. */
 export default function GroupDetailPage() {
   const { id } = useParams()
   const groupId = parseInt(id as string)
@@ -45,13 +49,16 @@ export default function GroupDetailPage() {
   const [editOpen, setEditOpen] = useState(false)
   const [addGameOpen, setAddGameOpen] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [gridCols, setGridCols] = useState<StatusGridCols>(1)
+  const [view, setView] = useStoredChoice<GroupDetailView>('group-detail-view', GROUP_DETAIL_VIEWS, 'covers')
 
   const ra = useMemo(() => raProgressMaps(recentlyPlayed, allGames), [recentlyPlayed, allGames])
   const live = useMemo(() => liveProgressMap(steamLibrary, psnLibrary, xboxLibrary), [steamLibrary, psnLibrary, xboxLibrary])
   const items = useMemo(() => group?.items ?? [], [group])
-  const filtered = useMemo(() => filterGroupItems(items, filters, live), [items, filters, live])
+  const filtered = useMemo(() => filterGroupItems(items, filters, live, ra.ach), [items, filters, live, ra.ach])
   const summary = useMemo(() => groupSummary(items, ra.ach, live), [items, ra.ach, live])
+  const states = useMemo(() => groupStateCounts(items, live, ra.ach), [items, live, ra.ach])
+  const covers = useMemo(() => items.map(coverSrc).filter((s): s is string => !!s).slice(0, 8), [items])
+  const progress = useCallback((item: GameGroupItem) => itemProgress(item, live, ra.ach), [live, ra.ach])
   const existingKeys = useMemo(() => new Set(items.map(itemKey)), [items])
 
   async function handleDelete() {
@@ -77,26 +84,28 @@ export default function GroupDetailPage() {
 
   return (
     <motion.div className={PAGE} variants={fadeUp} initial="hidden" animate="visible">
-      <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
+      <div className="w-full lg:max-w-[98%] flex flex-col gap-5">
         {!group ? (
           <GroupDetailSkeleton />
         ) : (
           <>
-            <GroupDetailHeader
+            <GroupDetailHero
               group={group}
+              covers={covers}
               gameCount={items.length}
               summary={summary}
-              gridCols={gridCols}
-              onGridCols={setGridCols}
+              states={states}
               onAdd={() => setAddGameOpen(true)}
               onEdit={() => setEditOpen(true)}
               onDelete={() => setConfirmDelete(true)}
             />
 
             {items.length > 0 && (
-              <GroupFilters
+              <GroupToolbar
                 items={items}
                 filters={filters}
+                view={view}
+                onView={setView}
                 onPct={setPct}
                 onDecade={setDecade}
                 onToggleConsole={toggleConsole}
@@ -121,11 +130,13 @@ export default function GroupDetailPage() {
                   {T.groups.clearFilters}
                 </button>
               </div>
+            ) : view === 'covers' ? (
+              <GroupCoverGrid items={filtered} progress={progress} draggable={!filtersActive} onRemove={removeGame} onReorder={reorder} />
             ) : (
               <GroupGameGrid
                 items={filtered}
                 draggable={!filtersActive}
-                gridCols={gridCols}
+                gridCols={2}
                 ach={ra.ach}
                 pts={ra.pts}
                 lastPlayed={ra.lastPlayed}

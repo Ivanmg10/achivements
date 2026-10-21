@@ -29,6 +29,25 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — Group page redesign: banner, one filter bar, covers or list (`feat/groups-redesign`)
+
+**Did** — `/groups/[id]` follows mock-up C. `GroupDetailHero` (replaces `GroupDetailHeader`): the
+first covers faded behind, a progress ring, title, privacy, description, finished / started / not
+started counts, add-edit-delete. `GroupToolbar` (replaces `GroupFilters`): progress states as
+pressed buttons, consoles as a checkbox menu (`<details>`), decade as a `<select>`, and a view
+switch saved as `group-detail-view` (synced). **Covers** (default): `GroupCoverGrid` +
+`GroupCoverTile`, sortable like the list, each opening its game, a finished one ringed in the
+theme's colour. **List**: the old `GroupGameGrid` cards, two per row; the 1/2/3 control is gone.
+`itemProgress` / `groupStateCounts` in `groupItems.ts` give one reading of a game's progress (RA
+live, then the platform libraries, then what was stored) for the tiles, the counts and the filters;
+`GroupViewToggle` became generic (options passed in) for both pages. Skeleton reshaped.
+**Why** — The user picked option C for the group page after the list redesign.
+**Decisions** — The progress filter now reads RA's live progress too (before, only the stored
+fraction), so the filters, the counts and the tiles agree.
+**Watch out** — A Steam item's stored art can be a wide header; on a square tile it is cropped.
+
+---
+
 ## 2026-10-21 — Groups list: covers or shelves (`feat/groups-redesign`)
 
 **Did** — `/groups` has a view switch (`GroupViewToggle`, saved under `groups-view`, a synced

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { IconFolder, IconPlus } from '@tabler/icons-react'
+import { IconFolder, IconLayoutGrid, IconLayoutRows, IconPlus } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
 import { useStoredChoice } from '@/hooks/useStoredChoice'
@@ -59,7 +59,16 @@ export default function GroupsPage() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          {groups.length > 0 && <GroupViewToggle value={view} onChange={setView} />}
+          {groups.length > 0 && (
+            <GroupViewToggle
+              value={view}
+              onChange={setView}
+              options={[
+                { value: 'covers', label: T.groups.viewCovers, icon: IconLayoutGrid },
+                { value: 'shelves', label: T.groups.viewShelves, icon: IconLayoutRows },
+              ]}
+            />
+          )}
           {canCreate && (
             <button
               onClick={() => setModalOpen(true)}
