@@ -436,7 +436,10 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   (`xboxStatsTitleId`). A failure leaves the library whole, without hours. Many
   games simply have none.
 - **Backdrop:** a game page's wide picture is IGDB's (`heroUrl` in
-  `/api/xbox/details`), fetched when the page opens; lists keep Xbox's own tile.
+  `/api/xbox/details`), fetched when the page opens. The library's shelf cards
+  (`LibraryShelfBanner`) ask for the same, one card at a time as RA's screenshots,
+  so at most a shelf's worth (`SHELF_CAP`); until it arrives, or with no match, they
+  show the blurred tile. Lists and icons keep Xbox's own tile.
   Do not enrich the whole library from IGDB at load (135 searches).
 - **Measured 2026-10-16:** an unknown gamertag answers HTTP 200 with `code: 404` in
   the body (→ `not-found`). A library the viewer cannot read answers like a

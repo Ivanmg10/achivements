@@ -117,13 +117,16 @@ export function igdbPsnPlatforms(consoleName: string): number[] {
  * Xbox Series X|S 169, PC 6 — from the names the library writes ("Xbox Series · PC").
  */
 export function igdbXboxPlatforms(consoleName: string): number[] {
+  // A 360 game lists the newer consoles it runs on too; searching them finds the newer game of the same name (MW3 2011 → 2023).
+  if (/Xbox 360/i.test(consoleName)) return [12]
   const ids: [RegExp, number][] = [[/Xbox 360/i, 12], [/Xbox One/i, 49], [/Xbox Series/i, 169], [/\bPC\b/, 6]]
   return ids.filter(([re]) => re.test(consoleName)).map(([, id]) => id)
 }
 
-/** The best match: the exact title if IGDB has it, else its first hit. */
+/** The best match: the exact title if IGDB has it, else one that ends with it (Xbox's "Modern Warfare 3" is "Call of Duty: Modern Warfare 3"), else its first hit. */
 function bestMatch(title: string, games: IgdbGame[]): IgdbGame | undefined {
-  return games.find((g) => titleKey(g.name) === titleKey(title)) ?? games[0]
+  const key = titleKey(title)
+  return games.find((g) => titleKey(g.name) === key) ?? games.find((g) => titleKey(g.name).endsWith(` ${key}`)) ?? games[0]
 }
 
 /** The art for the best match. */
