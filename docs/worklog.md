@@ -29,6 +29,19 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — Xbox: a game's empty launcher twin no longer shows as a second game (`feat/groups-redesign`)
+
+**Did** — `foldTwinTitles` (`utils/xboxTitles.ts`), applied in `xboxLibraryData`: a title with no
+achievements that shares its name with one that has them is dropped, its last session and play
+time folded into the game. Library cache key bumped to `xbox:titles:v6`. CLAUDE.md (Xbox) says so.
+**Why** — "Minecraft: Xbox 360 Edition" showed twice in Recently played, once 5/93 and once 0/0.
+Read from pre's cache: Xbox lists two 360 titles with that name, 1480659447 (93 achievements) and
+1297287809 (0x4D53…, none), played six seconds apart: the game and what launches it.
+**Watch out** — Only same-name twins are folded; a game with no achievements and no twin stays.
+If the twin was ever pinned or put in a group, that row no longer finds its game.
+
+---
+
 ## 2026-10-21 — Opening a home section keeps its top in view while it loads (`feat/groups-redesign`)
 
 **Did** — New hook `useSectionScroll` (used by `MainPageCharts`): opening a stats section scrolls

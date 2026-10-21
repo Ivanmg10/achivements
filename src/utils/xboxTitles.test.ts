@@ -1,5 +1,6 @@
 import {
   classifyXboxGame,
+  foldTwinTitles,
   isXboxTitleId,
   totalGamerscore,
   totalXboxPlaytime,
@@ -11,6 +12,7 @@ import {
   xboxTitleId,
 } from './xboxTitles'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
+import type { XboxGameProgress } from '@/types/xbox'
 
 describe('xboxNumericId', () => {
   test('a title id is its own number, and goes back to its string', () => {
@@ -63,4 +65,23 @@ test('total gamerscore adds the library up', () => {
 test('total play time sums what Xbox gave, and counts a game with none as none', () => {
   expect(totalXboxPlaytime([xboxGameFixture({ playtimeMinutes: 90 }), xboxGameFixture({ playtimeMinutes: null }), xboxGameFixture({ playtimeMinutes: 30 })])).toBe(120)
   expect(totalXboxPlaytime([])).toBe(0)
+})
+
+describe('foldTwinTitles', () => {
+  const game = (titleId: string, title: string, over: Partial<XboxGameProgress> = {}) =>
+    ({ titleId, title, totalGamerscore: 0, maxPossible: 0, lastPlayed: null, playtimeMinutes: null, ...over }) as XboxGameProgress
+
+  test('drops the empty twin of a game, keeping its later session and its play time', () => {
+    const real = game('1480659447', 'Minecraft: Xbox 360 Edition', { maxPossible: 93, totalGamerscore: 2195, lastPlayed: '2026-10-20T14:35:08Z' })
+    const twin = game('1297287809', 'Minecraft: Xbox 360 Edition', { lastPlayed: '2026-10-20T14:35:14Z', playtimeMinutes: 90 })
+    const out = foldTwinTitles([twin, real])
+    expect(out).toHaveLength(1)
+    expect(out[0]).toMatchObject({ titleId: '1480659447', lastPlayed: '2026-10-20T14:35:14Z', playtimeMinutes: 90 })
+    expect(real.lastPlayed).toBe('2026-10-20T14:35:08Z')
+  })
+
+  test('keeps games with no achievements that have no twin, and games of other names', () => {
+    const list = [game('1', 'Minecraft Launcher'), game('2', 'Minecraft Dungeons', { totalGamerscore: 3000 })]
+    expect(foldTwinTitles(list).map((g) => g.titleId)).toEqual(['1', '2'])
+  })
 })
