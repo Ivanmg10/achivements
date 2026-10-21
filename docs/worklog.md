@@ -29,6 +29,21 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — Home page Groups section in the new style (`feat/groups-redesign`)
+
+**Did** — `MainPageGroupFeature`: covers faded behind a progress ring (was an amber `text-warning`
+number), finished / started / not started counts, a "Closest to done" link to that game
+(`closestItem`), the first six games as covers (`MainPageGroupFeatureGame`), and an empty group
+offers "Add games" (the new modal) right there. `MainPageGroups` (the list beside it): a progress
+bar and % per group, **no delete** any more (it is on the group page), and it takes the groups
+from `MainPageGroupsSection` instead of fetching them itself (it asked twice before). New hook
+`useGroupProgress(items)`: one reading of progress (RA live, the libraries, then stored) shared by
+the group page and the home, which used to show the stored `pct_won` and could disagree.
+**Why** — The user asked what to improve in the home's Groups section and approved the list.
+**Decisions** — Until the featured group's games load, its ring uses the stored totals from the list.
+
+---
+
 ## 2026-10-21 — A friendlier "add games" modal for groups (`feat/groups-redesign`)
 
 **Did** — `AddGameModal` rebuilt: a titled dialog ("Add games", "to <group>"), on `<body>`

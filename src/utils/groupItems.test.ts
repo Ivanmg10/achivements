@@ -1,4 +1,4 @@
-import { filterGroupItems, getDecade, groupStateCounts, groupSummary, itemKey, itemProgress, liveProgressMap, raProgressMaps } from './groupItems'
+import { filterGroupItems, getDecade, closestItem, groupStateCounts, groupSummary, itemKey, itemProgress, liveProgressMap, raProgressMaps } from './groupItems'
 import type { GameGroupItem } from '@/types/types'
 
 const item = (over: Partial<GameGroupItem>): GameGroupItem => ({
@@ -132,4 +132,10 @@ describe('itemProgress', () => {
 test('groupStateCounts sorts the games into finished, started and not started', () => {
   const items = [item({ id: 1, pct_won: '1' }), item({ id: 2, pct_won: '0.4' }), item({ id: 3 }), item({ id: 4 })]
   expect(groupStateCounts(items, new Map())).toEqual({ done: 1, started: 1, notStarted: 2 })
+})
+
+test('closestItem: the started, unfinished game with the largest share, and what it lacks', () => {
+  const items = [item({ id: 1, pct_won: '1', num_awarded: 10 }), item({ id: 2, pct_won: '0.6', num_awarded: 6 }), item({ id: 3, pct_won: '0.8', num_awarded: 8 }), item({ id: 4 })]
+  expect(closestItem(items, new Map())).toEqual({ item: items[2], left: 2 })
+  expect(closestItem([item({ id: 5 })], new Map())).toBeNull()
 })

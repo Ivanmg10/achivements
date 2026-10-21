@@ -1,22 +1,18 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { fadeUp } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
-import { useGamesData } from '@/context/GamesDataContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
-import { useSteamGamesData } from '@/context/SteamGamesDataContext'
-import { usePsnGamesData } from '@/context/PsnGamesDataContext'
-import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useGroupPage } from '@/hooks/useGroupPage'
 import { useGroupFilters } from '@/hooks/useGroupFilters'
 import { useStoredChoice } from '@/hooks/useStoredChoice'
-import { filterGroupItems, groupStateCounts, groupSummary, itemKey, itemProgress, liveProgressMap, raProgressMaps } from '@/utils/groupItems'
-import type { GameGroupItem } from '@/types/types'
+import { useGroupProgress } from '@/hooks/useGroupProgress'
+import { filterGroupItems, itemKey } from '@/utils/groupItems'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
 // Downloaded the first time it is opened, not with the page.
@@ -39,11 +35,7 @@ export default function GroupDetailPage() {
   const groupId = parseInt(id as string)
   const router = useRouter()
   const { T } = useLanguage()
-  const { all: allGames } = useGamesData()
   const { games: recentlyPlayed } = useRecentlyPlayedGames()
-  const { library: steamLibrary } = useSteamGamesData()
-  const { library: psnLibrary } = usePsnGamesData()
-  const { library: xboxLibrary } = useXboxGamesData()
   const { group, status, retry, reorder, removeGame, addItems, edit, remove } = useGroupPage(groupId, recentlyPlayed)
   const { filters, active: filtersActive, setPct, setDecade, toggleConsole, clearConsoles, clear } = useGroupFilters()
   const [editOpen, setEditOpen] = useState(false)
@@ -51,14 +43,10 @@ export default function GroupDetailPage() {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [view, setView] = useStoredChoice<GroupDetailView>('group-detail-view', GROUP_DETAIL_VIEWS, 'covers')
 
-  const ra = useMemo(() => raProgressMaps(recentlyPlayed, allGames), [recentlyPlayed, allGames])
-  const live = useMemo(() => liveProgressMap(steamLibrary, psnLibrary, xboxLibrary), [steamLibrary, psnLibrary, xboxLibrary])
   const items = useMemo(() => group?.items ?? [], [group])
+  const { ra, live, summary, states, progress } = useGroupProgress(items)
   const filtered = useMemo(() => filterGroupItems(items, filters, live, ra.ach), [items, filters, live, ra.ach])
-  const summary = useMemo(() => groupSummary(items, ra.ach, live), [items, ra.ach, live])
-  const states = useMemo(() => groupStateCounts(items, live, ra.ach), [items, live, ra.ach])
   const covers = useMemo(() => items.map(coverSrc).filter((s): s is string => !!s).slice(0, 8), [items])
-  const progress = useCallback((item: GameGroupItem) => itemProgress(item, live, ra.ach), [live, ra.ach])
   const existingKeys = useMemo(() => new Set(items.map(itemKey)), [items])
 
   async function handleDelete() {

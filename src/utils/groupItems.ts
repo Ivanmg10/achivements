@@ -133,6 +133,16 @@ export function groupStateCounts(items: GameGroupItem[], live: LiveProgress, ra?
   return counts
 }
 
+/** The started, unfinished game with the largest share earned, and how many achievements it lacks. */
+export function closestItem(items: GameGroupItem[], live: LiveProgress, ra?: Map<number, AchStats>): { item: GameGroupItem; left: number } | null {
+  let best: { item: GameGroupItem; left: number; pct: number } | null = null
+  for (const item of items) {
+    const p = itemProgress(item, live, ra)
+    if (p.total > 0 && p.pct > 0 && p.pct < 1 && (!best || p.pct > best.pct)) best = { item, left: p.total - p.earned, pct: p.pct }
+  }
+  return best && { item: best.item, left: best.left }
+}
+
 export function filterGroupItems(items: GameGroupItem[], filters: GroupFilters, live: LiveProgress, ra?: Map<number, AchStats>): GameGroupItem[] {
   return items.filter((item) => {
     if (filters.consoles.size > 0 && (!item.console_name || !filters.consoles.has(item.console_name))) return false
