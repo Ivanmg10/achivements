@@ -1,11 +1,12 @@
 import Image from 'next/image'
 import { IconFolder } from '@tabler/icons-react'
 import type { GameGroup } from '@/types/types'
+import type { GameSource } from '@/types/steam'
 
 const isUrl = (s: string) => /^https?:\/\//i.test(s)
 
 /** A cover as stored: RA art is a path on retroachievements.org, Steam art a link already. */
-function coverSrc(c: NonNullable<GameGroup['covers']>[number]): string | null {
+export function coverSrc(c: { source?: GameSource; image_icon: string | null }): string | null {
   if (!c.image_icon) return null
   return c.source === 'steam' || c.image_icon.startsWith('/api/') || isUrl(c.image_icon)
     ? c.image_icon

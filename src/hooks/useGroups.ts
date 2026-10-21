@@ -64,7 +64,7 @@ export function useGroups() {
       body: JSON.stringify(data),
     })
     if (!res.ok) {
-      const err = await res.json()
+      const err = await res.json().catch(() => ({}))
       throw new Error(err.message ?? 'Error')
     }
     const updated: GameGroup = await res.json()

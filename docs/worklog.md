@@ -29,6 +29,136 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — Xbox: a game's empty launcher twin no longer shows as a second game (`feat/groups-redesign`)
+
+**Did** — `foldTwinTitles` (`utils/xboxTitles.ts`), applied in `xboxLibraryData`: a title with no
+achievements that shares its name with one that has them is dropped, its last session and play
+time folded into the game. Library cache key bumped to `xbox:titles:v6`. CLAUDE.md (Xbox) says so.
+**Why** — "Minecraft: Xbox 360 Edition" showed twice in Recently played, once 5/93 and once 0/0.
+Read from pre's cache: Xbox lists two 360 titles with that name, 1480659447 (93 achievements) and
+1297287809 (0x4D53…, none), played six seconds apart: the game and what launches it.
+**Watch out** — Only same-name twins are folded; a game with no achievements and no twin stays.
+If the twin was ever pinned or put in a group, that row no longer finds its game.
+
+---
+
+## 2026-10-21 — Opening a home section keeps its top in view while it loads (`feat/groups-redesign`)
+
+**Did** — New hook `useSectionScroll` (used by `MainPageCharts`): opening a stats section scrolls
+its top under the header as before, then keeps asking again while the section resizes, for up to
+`SETTLE_MS` (3 s), and lets go as soon as the user scrolls (wheel, touch, keys).
+**Why** — "Siguiendo" (Following) scrolled badly: it loads only once opened, so at the moment of
+the scroll the page held a short skeleton, could not scroll that far, and stopped short; the
+friends then arrived and nothing corrected it.
+**Decisions** — Rejected a minimum height on the panel area (always tall enough to scroll): it
+left a blank screen under every short section.
+
+---
+
+## 2026-10-21 — More group icons; the edit preview shows the group (`feat/groups-redesign`)
+
+**Did** — `GroupModalIconPicker` offers 80 icons in five categories (`ICON_CATEGORIES`: games,
+trophies, mood, lists, nature) and opens on the category of the current icon; the own-emoji/link
+field stays. Editing a group, `GroupModalPreview` now shows its own covers and game count (it said
+"0 games": it only counted the games picked while creating).
+**Why** — The user asked for a bigger icon choice, and to improve the edit modal.
+
+---
+
+## 2026-10-21 — Edit a group from the home page (`feat/groups-redesign`)
+
+**Did** — The featured group on the home (`MainPageGroupFeature`) has an edit button that opens
+`GroupModal` with the group; saving goes through the section's `updateGroup` (so the list beside
+it updates too) and toasts "Group saved"; a refused save stays in the modal. `updateGroup` no
+longer throws a JSON parse error when an error answer has no JSON body.
+**Why** — The user asked for an edit button there.
+
+---
+
+## 2026-10-21 — A friendlier new-group modal (`feat/groups-redesign`)
+
+**Did** — `GroupModal` rebuilt: a titled dialog on `<body>` (portal), Escape closes it. Creating is
+two columns: a live preview (`GroupModalPreview`: chosen games' covers, icon, name, privacy),
+name and description with character counters (limits from `groupValidation`), the icon as a row
+of one-tap emoji plus "none" and a field for your own emoji or image link
+(`GroupModalIconPicker`), and private/public as two radio options that say who sees it
+(`GroupModalVisibility`, replaces the switch). The games column (`GroupModalGamePicker`) is now
+suggestions and matches as covers to tick (`GamePickerTile`, `suggestCandidates`), chosen games
+stay ticked in place. A missing name is an inline error on the field (it used to say only
+"Title"); the button reads "Create with N games". Editing keeps the first column only.
+**Why** — The user asked to improve the new-group modal after the add-games one.
+
+---
+
+## 2026-10-21 — Home page Groups section in the new style (`feat/groups-redesign`)
+
+**Did** — `MainPageGroupFeature`: covers faded behind a progress ring (was an amber `text-warning`
+number), finished / started / not started counts, a "Closest to done" link to that game
+(`closestItem`), the first six games as covers (`MainPageGroupFeatureGame`), and an empty group
+offers "Add games" (the new modal) right there. `MainPageGroups` (the list beside it): a progress
+bar and % per group, **no delete** any more (it is on the group page), and it takes the groups
+from `MainPageGroupsSection` instead of fetching them itself (it asked twice before). New hook
+`useGroupProgress(items)`: one reading of progress (RA live, the libraries, then stored) shared by
+the group page and the home, which used to show the stored `pct_won` and could disagree.
+**Why** — The user asked what to improve in the home's Groups section and approved the list.
+**Decisions** — Until the featured group's games load, its ring uses the stored totals from the list.
+
+---
+
+## 2026-10-21 — A friendlier "add games" modal for groups (`feat/groups-redesign`)
+
+**Did** — `AddGameModal` rebuilt: a titled dialog ("Add games", "to <group>"), on `<body>`
+through a portal; it opens on **suggestions** (`suggestCandidates` in `gameCandidates.ts`: being
+played, closest to done first, then wanted, then the rest), narrows by title and by platform
+(`AddGameModalPlatforms`, only platforms the user has games on), and shows games as selectable
+covers (`GamePickerTile`, `aria-pressed`, a check besides the ring). "No games match" when a search
+finds nothing; the footer is always there (count, clear, "Add N games", disabled at 0). RA id/link
+lookup kept. Cover tiles on the group page now top out at 9rem (the user found 11rem still blurry).
+**Why** — The user asked for a friendlier modal: before, it showed nothing until typed, said
+nothing when a search failed, and the add button appeared only after a pick.
+**Decisions** — `GamePickerRow` stays for the pin and favourite pickers; only this modal moved
+to covers.
+
+---
+
+## 2026-10-21 — Group page redesign: banner, one filter bar, covers or list (`feat/groups-redesign`)
+
+**Did** — `/groups/[id]` follows mock-up C. `GroupDetailHero` (replaces `GroupDetailHeader`): the
+first covers faded behind, a progress ring, title, privacy, description, finished / started / not
+started counts, add-edit-delete. `GroupToolbar` (replaces `GroupFilters`): progress states as
+pressed buttons, consoles as a checkbox menu (`<details>`), decade as a `<select>`, and a view
+switch saved as `group-detail-view` (synced). **Covers** (default): `GroupCoverGrid` +
+`GroupCoverTile`, sortable like the list, each opening its game, a finished one ringed in the
+theme's colour. **List**: the old `GroupGameGrid` cards, two per row; the 1/2/3 control is gone.
+`itemProgress` / `groupStateCounts` in `groupItems.ts` give one reading of a game's progress (RA
+live, then the platform libraries, then what was stored) for the tiles, the counts and the filters;
+`GroupViewToggle` became generic (options passed in) for both pages. Skeleton reshaped.
+**Why** — The user picked option C for the group page after the list redesign.
+**Decisions** — The progress filter now reads RA's live progress too (before, only the stored
+fraction), so the filters, the counts and the tiles agree.
+**Watch out** — A Steam item's stored art can be a wide header; on a square tile it is cropped.
+
+---
+
+## 2026-10-21 — Groups list: covers or shelves (`feat/groups-redesign`)
+
+**Did** — `/groups` has a view switch (`GroupViewToggle`, saved under `groups-view`, a synced
+preference): **Covers** (`GroupAlbumCard`: the first games as a banner, a progress ring, completed /
+in-progress counts) or **Shelves** (`GroupShelfRow`: progress, "closest to done", and the first five
+games each with its own bar and link). An empty group asks for games; a last tile (`GroupNewTile`)
+makes a new group while any fit. The old 1/2/3-column control is gone from the list. `listGroups`
+now returns five covers with title and progress, `completed_count`, `started_count` and `next_up`.
+`GroupPlatformLogos` was split out of `GroupCard` (still used on public profiles).
+**Why** — The user found the list plain. Mock-ups (canvas "Rediseño de Grupos", options E and F)
+were drawn first; the user picked both, with a switch between them.
+**Decisions** — Per-game progress in the list is the group's stored `num_awarded`/`max_possible`
+(what the old card's bar already used), not the live library values the group page reads. The
+"Add games" and "+N more" tiles open the group instead of the add modal on the list page.
+**Open** — The group page redesign (option C: banner, ring, one filter bar, cover grid) is chosen
+but not built. Reordering groups by drag is not offered (it never was).
+
+---
+
 ## 2026-10-21 — Library detail scrolls, modals above the heatmap, home ends at the screen (`fix/library-scroll-heatmap-layers`)
 
 **Did** — The list view's detail panel (`LibraryEntryDetail`) is `grow shrink-0` instead of `flex-1`,

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { withSteamCache } from '@/lib/steamCache'
 import { mapLimit } from '@/utils/utils'
-import { isXboxTitleId } from '@/utils/xboxTitles'
+import { foldTwinTitles, isXboxTitleId } from '@/utils/xboxTitles'
 import {
   sortByLastPlayed,
   merge360Achievements,
@@ -213,7 +213,7 @@ export type XboxLibraryData = { games: XboxGameProgress[]; achievementsUnlocked:
  */
 export async function xboxLibraryData(xuid: string, userId: string | null = null): Promise<XboxLibraryData> {
   return withSteamCache(
-    `xbox:titles:v5:${xuid}`,
+    `xbox:titles:v6:${xuid}`,
     LIBRARY_TTL_MS,
     async () => {
       const res = await xboxCall<{ titles?: RawTitle[]; achievementSummary?: { totalAchievementsUnlocked?: number } }>(`titles/${xuid}`)
@@ -227,7 +227,8 @@ export async function xboxLibraryData(xuid: string, userId: string | null = null
         const game = toXboxGame(t)
         if (game) games.push({ ...game, playtimeMinutes: minutes.get(game.titleId) ?? null })
       }
-      return { games: sortByLastPlayed(games), achievementsUnlocked: res?.achievementSummary?.totalAchievementsUnlocked ?? 0 }
+      // A launcher title beside its game (same name, no achievements) is not a second game.
+      return { games: sortByLastPlayed(foldTwinTitles(games)), achievementsUnlocked: res?.achievementSummary?.totalAchievementsUnlocked ?? 0 }
     },
     { userId, refreshable: true },
   )

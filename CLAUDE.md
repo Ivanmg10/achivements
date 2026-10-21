@@ -435,10 +435,14 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   Keep every Xbox image going through it. `titleId` is a decimal string; the largest
   seen is under 2^31 (the `game_id` columns are INTEGER), but check before storing it.
 - **Play time** comes from one `POST player/stats` (`MinutesPlayed`, up to 150
-  titles per call) made inside the cached library load (`xbox:titles:v5`); a
+  titles per call) made inside the cached library load (`xbox:titles:v6`); a
   backward-compatible 360 game is asked under its `modernTitleId`
   (`xboxStatsTitleId`). A failure leaves the library whole, without hours. Many
   games simply have none.
+- **Twin titles:** Xbox can list a game twice under one name, the game and a title with no
+  achievements that launches it (Minecraft: Xbox 360 Edition, measured 2026-10-21).
+  `foldTwinTitles` drops the empty twin in the library load and gives its session and play time
+  to the game; a game with no achievements and no twin stays.
 - **Backdrop:** a game page's wide picture is IGDB's (`heroUrl` in
   `/api/xbox/details`), fetched when the page opens. The library's shelf cards
   (`LibraryShelfBanner`) ask for the same, one card at a time as RA's screenshots,

@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { IconFolder, IconPlus } from '@tabler/icons-react'
+import { IconFolder, IconLayoutGrid, IconLayoutRows, IconPlus } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
+import { useStoredChoice } from '@/hooks/useStoredChoice'
 import type { GameCandidate } from '@/utils/gameCandidates'
 import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
@@ -14,7 +15,7 @@ const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loa
 import GroupListSkeleton from '@/components/groups/group-list-skeleton/GroupListSkeleton'
 import GroupList from '@/components/groups/group-list/GroupList'
 import EmptyState from '@/components/empty-state/EmptyState'
-import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
+import GroupViewToggle, { GROUP_VIEWS, type GroupView } from '@/components/groups/group-view-toggle/GroupViewToggle'
 import { notify } from '@/lib/notify'
 import { GROUPS_PER_USER_MAX } from '@/utils/groupValidation'
 
@@ -23,7 +24,7 @@ export default function GroupsPage() {
   const { groups, isLoading, error, createGroup, fetchGroups } = useGroups()
   const canCreate = groups.length < GROUPS_PER_USER_MAX
   const [modalOpen, setModalOpen] = useState(false)
-  const [gridCols, setGridCols] = useState<StatusGridCols>(2)
+  const [view, setView] = useStoredChoice<GroupView>('groups-view', GROUP_VIEWS, 'covers')
 
   async function handleCreate(data: {
     title: string
@@ -58,7 +59,16 @@ export default function GroupsPage() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          {groups.length > 0 && <StatusGridControl cols={gridCols} onChange={setGridCols} />}
+          {groups.length > 0 && (
+            <GroupViewToggle
+              value={view}
+              onChange={setView}
+              options={[
+                { value: 'covers', label: T.groups.viewCovers, icon: IconLayoutGrid },
+                { value: 'shelves', label: T.groups.viewShelves, icon: IconLayoutRows },
+              ]}
+            />
+          )}
           {canCreate && (
             <button
               onClick={() => setModalOpen(true)}
@@ -97,7 +107,12 @@ export default function GroupsPage() {
           </button>
         </>
       ) : (
-        <GroupList groups={groups} gridCols={gridCols} />
+        <GroupList
+          groups={groups}
+          view={view}
+          remaining={GROUPS_PER_USER_MAX - groups.length}
+          onCreate={() => setModalOpen(true)}
+        />
       )}
 
       <LazyWhenOpened open={modalOpen}>

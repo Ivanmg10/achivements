@@ -70,3 +70,29 @@ export function totalXboxPlaytime(games: Pick<XboxGameProgress, 'playtimeMinutes
 export function totalGamerscore(games: Pick<XboxGameProgress, 'earnedGamerscore'>[]): number {
   return games.reduce((sum, g) => sum + g.earnedGamerscore, 0)
 }
+
+const nameKey = (g: XboxGameProgress) => g.title.trim().toLowerCase()
+
+/**
+ * Xbox lists some games twice under one name: the game, and a title with no
+ * achievements that launches it (measured 2026-10-21: "Minecraft: Xbox 360
+ * Edition" is 1480659447 with 93 achievements, and 1297287809, 0x4D53…, with
+ * none, played seconds apart). The empty twin is dropped; its last session and
+ * play time go to the game. A game without achievements that has no such twin stays.
+ */
+export function foldTwinTitles(games: XboxGameProgress[]): XboxGameProgress[] {
+  const real = new Map<string, XboxGameProgress>()
+  for (const g of games) if (xboxHasAchievements(g) && !real.has(nameKey(g))) real.set(nameKey(g), { ...g })
+
+  const out: XboxGameProgress[] = []
+  for (const g of games) {
+    const game = real.get(nameKey(g))
+    if (!game) out.push(g)
+    else if (xboxHasAchievements(g)) out.push(game.titleId === g.titleId ? game : g)
+    else {
+      if (g.lastPlayed && (!game.lastPlayed || g.lastPlayed > game.lastPlayed)) game.lastPlayed = g.lastPlayed
+      if (game.playtimeMinutes == null && g.playtimeMinutes != null) game.playtimeMinutes = g.playtimeMinutes
+    }
+  }
+  return out
+}
