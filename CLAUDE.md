@@ -546,6 +546,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   shared): never call `getOwnedGames` from a route. A home page used to download it five times
   (2026-10-22). `scoreRefresh` keeps its own cache on purpose. "Recently played" is built from
   its `rtime_last_played`, not from `GetRecentlyPlayedGames` (two weeks only).
+- **Steam library counts come in batches** (`fetchBatchCounts`, `GetTopAchievementsForGames`, 100
+  games a call; 192 in 0.6 s measured 2026-10-22): only finished games are read one by one, for
+  the date they were finished. The batch also answers for achievements Steam keeps private, so it
+  is trusted only after one per-game read agrees they are public (`batchCountsFor`). Keep that probe.
 - **Read routes that are expensive upstream send `cachedJson(data, ttl)`**
   (private, `Vary: Cookie`): the PSN and Xbox reads (5 min per game, 2 min for
   recent unlocks) as RA's and Steam's already did. Mutable data (groups, pins,

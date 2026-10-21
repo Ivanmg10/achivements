@@ -7,6 +7,8 @@ jest.mock('@/lib/steamCache', () => ({
 }))
 jest.mock('@/lib/steamClient', () => ({
   ...jest.requireActual('@/lib/steamClient'),
+  // An empty batch: counts come from the per-game calls each test sets up.
+  getTopAchievementsForGames: jest.fn(async () => ({ response: { games: [] } })),
   getPlayerAchievements: jest.fn(),
   getSchemaForGame: jest.fn(),
   getGlobalAchievementPercentages: jest.fn(),
@@ -14,7 +16,7 @@ jest.mock('@/lib/steamClient', () => ({
 }))
 
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
-import { getPlayerAchievements, getSchemaForGame, getGlobalAchievementPercentages, getOwnedGames } from '@/lib/steamClient'
+import { getPlayerAchievements, getSchemaForGame, getGlobalAchievementPercentages, getOwnedGames, getTopAchievementsForGames } from '@/lib/steamClient'
 import {
   loadPlayerAchievements,
   fetchPlayerAchievements,
@@ -29,6 +31,7 @@ import {
   loadSchema,
   loadGlobalPct,
   loadOwnedGames,
+  fetchBatchCounts,
 } from './steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 
@@ -379,5 +382,74 @@ describe('loadOwnedGames', () => {
     expect(shouldCache({ response: {} })).toBe(false)
     expect(shouldCache({ response: { game_count: 0 } })).toBe(true)
     expect(shouldCache({ response: { games: [{ appid: 1 }] } })).toBe(true)
+  })
+})
+
+describe('batched counts', () => {
+  /** What GetTopAchievementsForGames answers: the total, and one entry per unlocked achievement. */
+  function batch(...games: [number, number, number][]) {
+    return { response: { games: games.map(([appid, earned, total]) => ({
+      appid, total_achievements: total, achievements: Array.from({ length: earned }, (_, i) => ({ name: `A${i}` })),
+    })) } }
+  }
+  const top = getTopAchievementsForGames as jest.Mock
+
+  test('games in progress are counted from one batch; only finished ones (for their date) and the probe go one by one', async () => {
+    top.mockResolvedValueOnce(batch([1, 3, 10], [2, 0, 5], [3, 4, 4], [4, 7, 9]))
+    ;(getPlayerAchievements as jest.Mock).mockImplementation(async (_s: string, _k: string, appId: number) =>
+      appId === 1 ? unlocks(3, 10) : unlocks(4, 4))
+    const games = [game(1), game(2), game(3), game(4)]
+
+    const { games: out, complete } = await enrichWithAchievementCounts(games, AUTH, 10)
+
+    expect(top).toHaveBeenCalledWith('765', 'key', [1, 2, 3, 4])
+    // 1 is the privacy probe, 3 is finished: the rest came from the batch.
+    expect((getPlayerAchievements as jest.Mock).mock.calls.map((c) => c[2]).sort()).toEqual([1, 3])
+    expect(out.map((g) => [g.numAwarded, g.maxPossible])).toEqual([[3, 10], [0, 5], [4, 4], [7, 9]])
+    expect(complete).toBe(true)
+    expect(writeCache).toHaveBeenCalledWith(progressCacheKey('765', games[3]), { total: 9, awarded: 7, lastUnlock: null }, TTL.settledProgress, '7')
+  })
+
+  test('the fetch cap now applies only to what the batch cannot answer', async () => {
+    top.mockResolvedValueOnce(batch([1, 1, 10], [2, 1, 10], [3, 1, 10], [4, 2, 2], [5, 3, 3]))
+    ;(getPlayerAchievements as jest.Mock).mockImplementation(async (_s: string, _k: string, appId: number) =>
+      appId === 1 ? unlocks(1, 10) : unlocks(2, 2))
+    const { games: out, complete } = await enrichWithAchievementCounts([1, 2, 3, 4, 5].map((id) => game(id)), AUTH, 1)
+
+    expect(out.map((g) => g.achievementsLoaded)).toEqual([true, true, true, true, false])
+    expect(complete).toBe(false)
+  })
+
+  test('achievements Steam keeps private stay private: the batch is dropped when the probe says so', async () => {
+    top.mockResolvedValueOnce(batch([1, 3, 10], [2, 5, 9]))
+    ;(getPlayerAchievements as jest.Mock).mockRejectedValue(Object.assign(new Error('private'), { status: 403 }))
+
+    const { games: out } = await enrichWithAchievementCounts([game(1), game(2)], AUTH, 10)
+
+    expect(out.some((g) => g.numAwarded > 0)).toBe(false)
+  })
+
+  test('a failed batch falls back to one call per game', async () => {
+    top.mockRejectedValueOnce(new Error('steam down'))
+    ;(getPlayerAchievements as jest.Mock).mockResolvedValue(unlocks(2, 4))
+
+    const { games: out, complete } = await enrichWithAchievementCounts([game(1), game(2)], AUTH, 10)
+
+    expect(getPlayerAchievements).toHaveBeenCalledTimes(2)
+    expect(out.map((g) => g.numAwarded)).toEqual([2, 2])
+    expect(complete).toBe(true)
+  })
+
+  test('no misses, no batch', async () => {
+    const g = game(1)
+    ;(readCacheMany as jest.Mock).mockResolvedValue(new Map([[progressCacheKey('765', g), list(1, 2)]]))
+    await enrichWithAchievementCounts([g], AUTH, 10)
+    expect(top).not.toHaveBeenCalled()
+  })
+
+  test('chunks of 100 games a call', async () => {
+    top.mockResolvedValue({ response: { games: [] } })
+    expect(await fetchBatchCounts(AUTH, Array.from({ length: 250 }, (_, i) => i + 1))).toEqual(new Map())
+    expect(top.mock.calls.map((c) => c[2].length)).toEqual([100, 100, 50])
   })
 })
