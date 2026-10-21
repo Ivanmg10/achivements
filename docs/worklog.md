@@ -44,6 +44,8 @@ driver lives in `.git/config`, not in the repo). Tried on a real merge with
 `feat/platform-load-error`: no conflicts at all.
 **Watch out** — Run `npm run prepare` once in each clone, or the version still conflicts.
 GitHub's "Update branch" button does not run the version driver: merge locally.
+n---
+
 ## 2026-10-21 — PS3 and PS Vita always in the PSN consoles preference (`fix/psn-consoles-preference`)
 
 **Did** — `PsnGamesDataContext` lists PS3, PS Vita, PS4 and PS5 in the consoles preference always
