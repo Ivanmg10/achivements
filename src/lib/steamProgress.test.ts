@@ -8,19 +8,17 @@ jest.mock('@/lib/steamCache', () => ({
 jest.mock('@/lib/steamClient', () => ({
   ...jest.requireActual('@/lib/steamClient'),
   getPlayerAchievements: jest.fn(),
-  getOwnedGames: jest.fn(),
   getSchemaForGame: jest.fn(),
   getGlobalAchievementPercentages: jest.fn(),
 }))
 
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
-import { getPlayerAchievements, getOwnedGames, getSchemaForGame, getGlobalAchievementPercentages } from '@/lib/steamClient'
+import { getPlayerAchievements, getSchemaForGame, getGlobalAchievementPercentages } from '@/lib/steamClient'
 import {
   loadPlayerAchievements,
   fetchPlayerAchievements,
   mapWithConcurrency,
   enrichWithAchievementCounts,
-  loadOwnedFacts,
   progressCacheKey,
   progressTtl,
   isCountable,
@@ -273,32 +271,6 @@ describe('enrichWithAchievementCounts', () => {
     expect(calls).toBe(3)
     expect(getPlayerAchievements).toHaveBeenCalledTimes(160)
     expect(result.games.filter((g) => g.numAwarded === g.maxPossible && g.achievementsLoaded)).toHaveLength(15)
-  })
-})
-
-describe('loadOwnedFacts', () => {
-  test('maps appid to the facts the recent list leaves out', async () => {
-    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
-      { appid: 1, playtime_forever: 5, rtime_last_played: 1700000000, has_community_visible_stats: true },
-      { appid: 2, playtime_forever: 0, rtime_last_played: 0, has_community_visible_stats: false },
-      { appid: 3, playtime_forever: 0 },
-    ] } })
-
-    const facts = await loadOwnedFacts(AUTH)
-    expect(facts.get(1)).toEqual({ rtime_last_played: 1700000000, has_community_visible_stats: true })
-    // A zero timestamp means never played, not 1970.
-    expect(facts.get(2)).toEqual({ rtime_last_played: undefined, has_community_visible_stats: false })
-    expect(facts.get(3)).toEqual({ rtime_last_played: undefined, has_community_visible_stats: undefined })
-  })
-
-  test('returns an empty map for a private profile', async () => {
-    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: {} })
-    await expect(loadOwnedFacts(AUTH)).resolves.toEqual(new Map())
-  })
-
-  test('returns an empty map instead of throwing when Steam fails', async () => {
-    ;(getOwnedGames as jest.Mock).mockRejectedValue(new Error('steam down'))
-    await expect(loadOwnedFacts(AUTH)).resolves.toEqual(new Map())
   })
 })
 

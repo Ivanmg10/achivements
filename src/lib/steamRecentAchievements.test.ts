@@ -31,9 +31,9 @@ function schema(...names: string[]) {
 beforeEach(() => {
   jest.clearAllMocks()
   ;(withSteamCache as jest.Mock).mockImplementation(async (_k, _t, fetcher) => fetcher())
-  ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: { games: [
-    { appid: 1, name: 'Fallout 4', playtime_forever: 10 },
-    { appid: 2, name: 'Hades', playtime_forever: 10 },
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
+    { appid: 1, name: 'Fallout 4', playtime_forever: 10, rtime_last_played: 1700000200, has_community_visible_stats: true },
+    { appid: 2, name: 'Hades', playtime_forever: 10, rtime_last_played: 1700000100, has_community_visible_stats: true },
   ] } })
   ;(getPlayerAchievements as jest.Mock).mockImplementation(async (_s: string, _k: string, appId: number) => ({
     playerstats: {
@@ -84,9 +84,17 @@ test('caps the list and fetches schemas only for games that made it', async () =
   expect(getSchemaForGame).toHaveBeenCalledWith(1, 'key', 'spanish')
 })
 
-test('scans the ten most recent games', async () => {
+test('scans the ten games played last, however long ago, and only those with stats', async () => {
+  // Someone who stopped months ago: Steam's two-week list would be empty.
+  const games = Array.from({ length: 12 }, (_, i) => ({
+    appid: 100 + i, playtime_forever: 1, rtime_last_played: 1600000000 + i, has_community_visible_stats: i !== 11,
+  }))
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games } })
   await loadRecentAchievements(AUTH, 'english')
-  expect(getRecentlyPlayedGames).toHaveBeenCalledWith('765', 'key', 10)
+
+  const scanned = (getPlayerAchievements as jest.Mock).mock.calls.map((c) => c[2]).sort()
+  expect(scanned).toEqual([101, 102, 103, 104, 105, 106, 107, 108, 109, 110])
+  expect(getRecentlyPlayedGames).not.toHaveBeenCalled()
 })
 
 test('skips a game whose unlocks fail instead of failing the list', async () => {
@@ -106,13 +114,13 @@ test('falls back to the api name when a schema cannot be loaded', async () => {
 })
 
 test('names a game without a title by its app id', async () => {
-  ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: { games: [{ appid: 1, playtime_forever: 1 }] } })
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [{ appid: 1, playtime_forever: 1, rtime_last_played: 1, has_community_visible_stats: true }] } })
   const [first] = await loadRecentAchievements(AUTH, 'english')
   expect(first.gameTitle).toBe('App 1')
 })
 
-test('returns nothing when nothing was played recently', async () => {
-  ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: {} })
+test('returns nothing when nothing was ever played', async () => {
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: {} })
   await expect(loadRecentAchievements(AUTH, 'english')).resolves.toEqual([])
 })
 

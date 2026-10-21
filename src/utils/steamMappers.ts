@@ -30,6 +30,18 @@ export function unixToIso(seconds?: number): string | null {
 }
 
 /**
+ * The `limit` games played last, newest first, from the owned list. Steam's
+ * "recently played" call only covers two weeks (empty for someone who stopped
+ * months ago); the owned list dates every game. Never-played games are left out.
+ */
+export function lastPlayedGames(games: SteamOwnedGame[], limit: number): SteamOwnedGame[] {
+  return games
+    .filter((g) => (g.rtime_last_played ?? 0) > 0)
+    .sort((a, b) => (b.rtime_last_played ?? 0) - (a.rtime_last_played ?? 0))
+    .slice(0, limit)
+}
+
+/**
  * Maps an owned/recently-played game. Achievement counts start at zero because
  * they cost one API call per game — the achievements route fills them in later,
  * so a game with stats is not the same as a game with zero achievements.

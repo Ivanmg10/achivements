@@ -1,17 +1,13 @@
 import { NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
 import { withSteamCache, TTL } from '@/lib/steamCache'
-import { getRecentlyPlayedGames } from '@/lib/steamClient'
-import { enrichWithAchievementCounts, loadOwnedFacts } from '@/lib/steamProgress'
-import { toSteamGameProgress } from '@/utils/steamMappers'
+import { getOwnedGames, getRecentlyPlayedGames } from '@/lib/steamClient'
+import { enrichWithAchievementCounts } from '@/lib/steamProgress'
+import { lastPlayedGames, toSteamGameProgress } from '@/utils/steamMappers'
 import { cachedJson } from '@/lib/httpCache'
-import type { SteamRecentlyPlayedResponse, SteamGameProgress } from '@/types/steam'
+import type { SteamOwnedGamesResponse, SteamRecentlyPlayedResponse, SteamGameProgress } from '@/types/steam'
 
 const COUNT = 20
-
-function byLastPlayedDesc(a: SteamGameProgress, b: SteamGameProgress) {
-  return (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? '')
-}
 
 export async function GET(req?: Request) {
   const auth = await requireSteamSession(req)
@@ -20,28 +16,27 @@ export async function GET(req?: Request) {
 
   try {
     const games = await withSteamCache<SteamGameProgress[]>(
-      `steamRecent:${steamid}`,
+      `steamRecent:v2:${steamid}`,
       TTL.recentlyPlayed,
       async () => {
-        // Recent games come without a last-played date or a stats flag, so both
-        // are looked up in the owned list — inside this 5-minute cache, so the
-        // dates stay fresh.
-        const [data, owned] = await Promise.all([
+        // The games come from the owned list, by its last-played dates: Steam's
+        // recent list covers only two weeks, so someone who stopped playing a
+        // while ago got nothing. The recent list still adds the games played
+        // lately that the owned list lacks (a family-shared game), at the end.
+        const [owned, recent] = await Promise.all([
+          // A failed owned lookup still leaves the recent list, undated.
+          (getOwnedGames(steamid, apiKey) as Promise<SteamOwnedGamesResponse>).catch((err) => {
+            console.error('[steam/recentlyPlayed] owned', err)
+            return null
+          }),
           getRecentlyPlayedGames(steamid, apiKey, COUNT) as Promise<SteamRecentlyPlayedResponse>,
-          loadOwnedFacts(auth.session),
         ])
-        // A player with nothing played in two weeks gets `{ response: {} }`.
-        const mapped = (data?.response?.games ?? [])
-          .map((g) => {
-            const facts = owned.get(g.appid)
-            return toSteamGameProgress({
-              ...g,
-              rtime_last_played: g.rtime_last_played ?? facts?.rtime_last_played,
-              has_community_visible_stats: g.has_community_visible_stats ?? facts?.has_community_visible_stats,
-            })
-          })
-          // Steam orders these by recent playtime, not by date.
-          .sort(byLastPlayedDesc)
+        const ownedGames = owned?.response?.games ?? []
+        const ownedIds = new Set(ownedGames.map((g) => g.appid))
+        const extra = (recent?.response?.games ?? []).filter((g) => !ownedIds.has(g.appid))
+        const mapped = [...lastPlayedGames(ownedGames, COUNT), ...extra]
+          .slice(0, COUNT)
+          .map(toSteamGameProgress)
         // The initial feed: counts for every recent game (≤20 calls, shared with the library cache).
         return (await enrichWithAchievementCounts(mapped, auth.session, COUNT)).games
       },

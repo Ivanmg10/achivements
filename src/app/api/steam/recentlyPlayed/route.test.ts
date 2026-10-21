@@ -111,12 +111,36 @@ describe('last played dates', () => {
     { appid: 377160, name: 'Fallout 4', playtime_forever: 100, playtime_2weeks: 50 },
   ] } }
 
+  test('someone who stopped playing months ago still gets their last games, newest first', async () => {
+    ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: {} })
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
+      { appid: 1, name: 'Old', playtime_forever: 50, rtime_last_played: 1600000000 },
+      { appid: 2, name: 'Never played', playtime_forever: 0, rtime_last_played: 0 },
+      { appid: 3, name: 'Older', playtime_forever: 50, rtime_last_played: 1500000000 },
+      { appid: 4, name: 'Last', playtime_forever: 50, rtime_last_played: 1650000000 },
+    ] } })
+
+    expect(data(await GET()).map((g) => g.title)).toEqual(['Last', 'Old', 'Older'])
+  })
+
+  test('keeps at most 20, the ones played last', async () => {
+    ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: {} })
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: Array.from({ length: 30 }, (_, i) => (
+      { appid: i + 1, name: `G${i + 1}`, playtime_forever: 1, rtime_last_played: 1600000000 + i }
+    )) } })
+
+    const games = data(await GET())
+    expect(games).toHaveLength(20)
+    expect(games[0].id).toBe(30)
+    expect(games[19].id).toBe(11)
+  })
+
   test('takes each date from the owned list and orders newest first', async () => {
     ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue(RECENT)
     ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
-      { appid: 12210, playtime_forever: 500, rtime_last_played: 1789324742 },
-      { appid: 311210, playtime_forever: 900, rtime_last_played: 1789808762 },
-      { appid: 377160, playtime_forever: 100, rtime_last_played: 1788802145 },
+      { appid: 12210, name: 'GTA IV', playtime_forever: 500, rtime_last_played: 1789324742 },
+      { appid: 311210, name: 'Black Ops III', playtime_forever: 900, rtime_last_played: 1789808762 },
+      { appid: 377160, name: 'Fallout 4', playtime_forever: 100, rtime_last_played: 1788802145 },
     ] } })
 
     const games = data(await GET())
@@ -136,7 +160,7 @@ describe('last played dates', () => {
   test('leaves a game undated when it is missing from the owned list (e.g. family sharing)', async () => {
     ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue(RECENT)
     ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
-      { appid: 12210, playtime_forever: 500, rtime_last_played: 1789324742 },
+      { appid: 12210, name: 'GTA IV', playtime_forever: 500, rtime_last_played: 1789324742 },
     ] } })
 
     const games = data(await GET())

@@ -1,10 +1,9 @@
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
-import { getGlobalAchievementPercentages, getOwnedGames, getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
+import { getGlobalAchievementPercentages, getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
 import { countUnlocks, toGlobalPctMap, withUnlockCounts } from '@/utils/steamMappers'
 import type {
   SteamGameProgress,
   SteamGlobalPercentagesResponse,
-  SteamOwnedGamesResponse,
   SteamPlayerAchievement,
   SteamPlayerAchievementsResponse,
   SteamSchemaAchievement,
@@ -175,38 +174,6 @@ export async function enrichWithAchievementCounts(
   })
 
   return { games: enriched, complete }
-}
-
-/** What the owned list knows about a game that the recent list leaves out. */
-export type OwnedFacts = { rtime_last_played?: number; has_community_visible_stats?: boolean }
-
-/**
- * appid → facts only GetOwnedGames returns.
- *
- * GetRecentlyPlayedGames (checked against the live API) returns neither
- * rtime_last_played nor has_community_visible_stats, and does not order its
- * games by date. Without the date, recent Steam games sort after every dated
- * RA game in the merged feed and never make the cut; without the stats flag,
- * every recent game looks achievement-less — no counts, no bar, and nothing
- * to load when a card is opened.
- *
- * Never throws: if the lookup fails the games are still worth showing.
- */
-export async function loadOwnedFacts(auth: SteamAuth): Promise<Map<number, OwnedFacts>> {
-  try {
-    const data = (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse
-    const facts = new Map<number, OwnedFacts>()
-    for (const g of data?.response?.games ?? []) {
-      facts.set(g.appid, {
-        rtime_last_played: g.rtime_last_played || undefined,
-        has_community_visible_stats: g.has_community_visible_stats,
-      })
-    }
-    return facts
-  } catch (err) {
-    console.error('[steamProgress] owned facts', err)
-    return new Map()
-  }
 }
 
 /**
