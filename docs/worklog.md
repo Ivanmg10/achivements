@@ -29,6 +29,24 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Steam review: one owned-list read, private profiles said aloud (`feat/steam-sign-in`)
+
+**Did** — `loadOwnedGames` (`lib/steamProgress.ts`): Steam's owned list cached 5 min under
+`steamOwnedRaw:<steamid>` (refreshable, a private answer not kept), now read by the library,
+recently played, recent unlocks, activity and the year's unlocks. `recentlyPlayed` answers
+`403 private` for a private profile (`isPrivateLibrary`, `SteamPrivateError`, shared with
+`ownedGames`), so the home's "recently played" says why it is empty. The Steam sign-up warns
+when the Steam profile is not public (`isPublic` from the summary it already reads).
+**Why** — The user asked to look for more ways to improve Steam. A home page load downloaded the
+whole owned list up to five times (one per route) against an app-wide budget of ~100–200 Steam
+calls per 5 minutes; and since linking no longer refuses private profiles, the home showed an
+empty list where it should say "private".
+**Open** — `scoreRefresh` still keeps its own owned-list cache (`score:steamOwned`, its own TTL);
+left alone, it runs in the background. The community visibility state says nothing about
+"game details" being private; only the owned list does.
+
+---
+
 ## 2026-10-21 — Users link Steam through Steam's sign-in (`feat/groups-redesign`, uncommitted)
 
 **Did** — The Steam card's typed box is replaced by "Connect Steam" (`UserSteamCardLink`) →

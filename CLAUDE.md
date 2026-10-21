@@ -542,6 +542,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
 - **Several components asking for the same GET share one request while it is in
   flight**: `fetchWithRetry` does it for you; for a raw `fetch` of a GET use
   `fetchShared`. A shared answer is shared by reference: copy before changing it.
+- **Steam's owned list is read through `loadOwnedGames`** (`src/lib/steamProgress.ts`, 5 min,
+  shared): never call `getOwnedGames` from a route. A home page used to download it five times
+  (2026-10-22). `scoreRefresh` keeps its own cache on purpose. "Recently played" is built from
+  its `rtime_last_played`, not from `GetRecentlyPlayedGames` (two weeks only).
 - **Read routes that are expensive upstream send `cachedJson(data, ttl)`**
   (private, `Vary: Cookie`): the PSN and Xbox reads (5 min per game, 2 min for
   recent unlocks) as RA's and Steam's already did. Mutable data (groups, pins,
