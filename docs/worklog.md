@@ -20,8 +20,30 @@ Keep it short — a few lines per heading; leave out a heading with nothing in i
 **Watch out** — anything surprising the next person would trip on.
 ```
 
+Merges never conflict on this file: `.gitattributes` gives it git's `union` driver,
+which keeps both branches' entries. It can drop the `---` between two entries
+or put them in either order; that is cosmetic, fix it if you see it.
+
 Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 "added X to CLAUDE.md".
+
+---
+
+## 2026-10-21 — The worklog and the version no longer conflict on merge (`chore/worklog-union-merge`)
+
+**Did** — `.gitattributes`: `docs/worklog.md merge=union`. A rule for it in CLAUDE.md
+(Documentation) and a note in this file's instructions.
+**Why** — Every branch adds its entry at the top, so bringing any branch up to date with
+`develop` conflicted here (it happened twice on 2026-10-21, PR #41 among them).
+**Decisions** — Git's built-in `union` driver: no config, no script, works for every clone.
+Tested on a toy repo: both entries kept, the `---` between them lost (cosmetic). The version
+files (`package.json`, `version.ts`) get their own driver, `scripts/merge-version.js`: it
+sets both sides to the higher version, then lets git merge the rest of the file, so a real
+conflict elsewhere in `package.json` still shows. Registered by `npm run prepare` (a custom
+driver lives in `.git/config`, not in the repo). Tried on a real merge with
+`feat/platform-load-error`: no conflicts at all.
+**Watch out** — Run `npm run prepare` once in each clone, or the version still conflicts.
+GitHub's "Update branch" button does not run the version driver: merge locally.
 
 ---
 
