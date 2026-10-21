@@ -27,3 +27,9 @@ test('the dot shows only while online, and speaks only when asked to', () => {
   rerender(<PresenceDot online announce />)
   expect(screen.getByRole('img', { name: en.following.online })).toBeInTheDocument()
 })
+
+test('a Steam game being played beats every other line', () => {
+  render(<PresenceLabel online lastSeenAt={new Date().toISOString()} playing="Hades" fallback="bio" />)
+  expect(screen.getByText(`${en.steam.nowPlaying}: Hades`)).toBeInTheDocument()
+  expect(screen.queryByText(en.following.online)).not.toBeInTheDocument()
+})

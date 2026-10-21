@@ -604,6 +604,11 @@ signed-in request fails).
   someone's game page banner, the friends leaderboard and shared games. A new place
   that shows other users must do the same. Never for your own picture.
 - `/privacy` says signed-in users who come across you see it; change it if that grows.
+- **"Now playing" on Steam** (2026-10-22, the user's ask): `/api/follows/playing` asks Steam, one
+  call per 100 accounts, cached a minute per viewer, for the people you follow who share their
+  presence and have a public profile; `useFriendsData` merges it after the overview (which stays
+  database-only, so cards never wait on Steam) and `PresenceLabel` shows it over "Online". Steam
+  only says it for a public Steam profile. `/privacy` says followers see it.
 
 ## Vault Points and the rankings (beta, 2026-10-20)
 
