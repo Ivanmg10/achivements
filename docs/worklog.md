@@ -46,7 +46,7 @@ stored Steam name and a "verify with Steam" for old typed links).
 game; so a per-game probe must agree before it is used. The unlocks table is fed by the score
 refresh, which already reads every played game; no extra Steam calls. "Now playing" lives in its
 own route so the overview stays database-only.
-**Open** — **042 applied to pre only**; production needs it before `main` (without it the
+**Open** — 042 applied to pre and production (2026-10-22); without it the
 writes/reads just log). Days older than the table's first fill stay missing for games past the
 live cap until the score refresh reads them.
 
