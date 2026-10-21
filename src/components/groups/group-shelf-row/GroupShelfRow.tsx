@@ -62,7 +62,7 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
         )}
       </div>
 
-      <ul className="grid grid-cols-3 sm:grid-cols-6 gap-3 content-start">
+      <ul className="grid gap-3 content-start grid-cols-[repeat(auto-fill,minmax(6rem,7.5rem))]">
         {games.map((g) => {
           const src = coverSrc(g)
           const total = g.max_possible ?? 0
