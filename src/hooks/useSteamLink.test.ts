@@ -1,6 +1,11 @@
-import { renderHook, act } from '@testing-library/react'
+import { renderHook, act, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
+import { usePathname } from 'next/navigation'
 import { useSteamLink } from './useSteamLink'
+import { notify } from '@/lib/notify'
+import { en } from '@/translations/en'
+
+jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
 
 const STEAM_ID = '76561198000000000'
 const mockUpdate = jest.fn()
@@ -26,52 +31,43 @@ test('reads the link from the session', () => {
   expect(result.current).toMatchObject({ steamId: STEAM_ID, steamUsername: 'Gabe', isLinked: true })
 })
 
-test('links by what was typed, then refreshes the session from the DB', async () => {
-  ;(global.fetch as jest.Mock).mockResolvedValue(json(200, { steamid: STEAM_ID, steamusername: 'Gabe' }))
-  mockUpdate.mockResolvedValue({ user: { steamid: STEAM_ID } })
+test('links through Steam, coming back to this page', () => {
+  ;(usePathname as jest.Mock).mockReturnValue('/user')
   const { result } = renderHook(() => useSteamLink())
-
-  let ok = false
-  await act(async () => {
-    ok = await result.current.link('gabelogannewell')
-  })
-
-  expect(ok).toBe(true)
-  expect(global.fetch).toHaveBeenCalledWith('/api/steam/link', expect.objectContaining({ method: 'POST', body: '{"query":"gabelogannewell"}' }))
-  expect(mockUpdate).toHaveBeenCalledWith()
-  expect(result.current.error).toBeNull()
+  expect(result.current.linkHref).toBe('/api/auth/steam?intent=link&next=%2Fuser')
 })
 
-test.each(['invalid-query', 'not-found', 'private', 'not-configured'] as const)('keeps the reason the server gave: %s', async (code) => {
-  ;(global.fetch as jest.Mock).mockResolvedValue(json(400, { error: code }))
-  const { result } = renderHook(() => useSteamLink())
-  await act(async () => {
-    expect(await result.current.link('x')).toBe(false)
-  })
-  expect(result.current.error).toBe(code)
-  expect(mockUpdate).not.toHaveBeenCalled()
-})
+describe('back from Steam', () => {
+  afterEach(() => window.history.replaceState(null, '', '/'))
 
-test('an unknown reason, a network error, or a session that did not take it is "failed"', async () => {
-  const { result } = renderHook(() => useSteamLink())
-  ;(global.fetch as jest.Mock).mockResolvedValueOnce(json(500, { error: 'weird' }))
-  await act(async () => {
-    await result.current.link('gabe')
-  })
-  expect(result.current.error).toBe('failed')
+  test('linked: the session is refreshed, it says so once, and the fragment goes', async () => {
+    window.history.replaceState(null, '', '/user#steam-linked')
+    mockUpdate.mockResolvedValue({ user: { steamid: STEAM_ID } })
+    const { rerender } = renderHook(() => useSteamLink())
+    rerender()
 
-  ;(global.fetch as jest.Mock).mockRejectedValueOnce(new Error('offline'))
-  await act(async () => {
-    await result.current.link('gabe')
+    await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.steamLinked))
+    expect(notify.success).toHaveBeenCalledTimes(1)
+    expect(mockUpdate).toHaveBeenCalledWith()
+    expect(window.location.hash).toBe('')
   })
-  expect(result.current.error).toBe('failed')
 
-  ;(global.fetch as jest.Mock).mockResolvedValueOnce(json(200, { steamid: STEAM_ID }))
-  mockUpdate.mockResolvedValueOnce(undefined)
-  await act(async () => {
-    expect(await result.current.link('gabe')).toBe(false)
+  test.each([
+    ['#steam-taken', en.toast.steamLinkTaken],
+    ['#steam-failed', en.toast.steamLinkFailed],
+  ])('%s says why', (hash, message) => {
+    window.history.replaceState(null, '', '/user' + hash)
+    renderHook(() => useSteamLink())
+    expect(notify.error).toHaveBeenCalledWith(message)
+    expect(mockUpdate).not.toHaveBeenCalled()
   })
-  expect(result.current.error).toBe('failed')
+
+  test('any other fragment is left alone', () => {
+    window.history.replaceState(null, '', '/user#followers')
+    renderHook(() => useSteamLink())
+    expect(notify.error).not.toHaveBeenCalled()
+    expect(window.location.hash).toBe('#followers')
+  })
 })
 
 test('unlinks, and fails loudly when the server or the session does not follow', async () => {

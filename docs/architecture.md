@@ -24,13 +24,16 @@ page (src/app/(main)/…)            client component
 - **Session**: NextAuth JWT, rebuilt from the `users` row on every read
   (`src/lib/authOptions.ts` + `src/lib/userRecord.ts`). Server code that needs
   the RA key uses `getServerSession(authOptions)`; the browser never sees it.
+  Two providers: `credentials` (username + password) and `steam` (Steam OpenID via
+  `src/lib/steamLogin.ts` and `api/auth/steam/*`: the callback leaves a signed ticket
+  cookie, the provider and the Steam sign-up read it; `users.steam_login_id`).
 
 ## API routes (`src/app/api/`)
 
 | Area | Routes | Notes |
 |---|---|---|
 | RetroAchievements | `get*` (gameData, recentAchievements, activityHeatmap…), `updateRaUser`, `unlinkRaUser` | Older flat names; keep them, the client calls them |
-| Steam | `steam/*` (link, ownedGames, achievements, recentlyPlayed…) | Linked by name (`src/lib/steamAccount.ts`) |
+| Steam | `steam/*` (ownedGames, achievements, recentlyPlayed…, unlink) | Linked through Steam sign-in (`auth/steam?intent=link`); admins by name (`src/lib/steamAccount.ts`) |
 | PlayStation | `psn/*` (link, titles, trophies, details…) | One app account, `src/lib/psnClient.ts` |
 | Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}`, `admin/xbox`, `admin/xbox/achievements` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |

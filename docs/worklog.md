@@ -29,6 +29,62 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — Users link Steam through Steam's sign-in (`feat/groups-redesign`, uncommitted)
+
+**Did** — The Steam card's typed box is replaced by "Connect Steam" (`UserSteamCardLink`) →
+`/api/auth/steam?intent=link&next=/user|/` → Steam → the callback links the proven account
+(`steamid`, `steamusername`, `steam_login_id`) and returns with `#steam-linked|taken|failed`,
+which `useSteamLink` toasts. `/api/steam/link` and `UserSteamCardForm` removed; the `steamLink`
+strings kept only `errors.private`. A random `state` (cookie + signed `return_to`) now guards
+both the sign-in and the link. Texts that said Steam is linked by name (account card hint, landing
+FAQ, privacy, the "track" SEO page) updated in every language they exist in.
+**Why** — The user signed up with Steam on a second account while their admin account had the
+same Steam typed in: nothing broke (separate columns), but a typed link proves nothing, so a
+Steam account could score on several users. They chose "only through Steam".
+**Decisions** — The three existing typed links (the user's test accounts) are left as they are,
+by the user's choice. Admins still link by typing (logged). A private profile is no longer refused
+at link time: ownership is proven, and the library page already says "private".
+**Watch out** — Without the `state` check, a callback URL made with another person's Steam would
+link it to whoever opens it, and then let that person sign in as them.
+
+---
+
+## 2026-10-21 — Steam "recently played" no longer limited to two weeks (`feat/groups-redesign`, uncommitted)
+
+**Did** — `/api/steam/recentlyPlayed` builds its list from the owned list's `rtime_last_played`
+(`lastPlayedGames` in `utils/steamMappers.ts`), the 20 played last; games only in Steam's recent
+list (family sharing) are appended. Cache key `steamRecent:v2`. `loadRecentAchievements` scans the
+10 games with stats played last, from the owned list too. `loadOwnedFacts` removed (unused).
+**Why** — Steam's `GetRecentlyPlayedGames` covers only the last two weeks: the user saw 4 games, and
+a user who had not played in months saw none after linking.
+**Watch out** — A failed owned lookup still falls back to Steam's recent list, undated.
+
+---
+
+## 2026-10-21 — Sign up and sign in with Steam (`feat/groups-redesign`, uncommitted)
+
+**Did** — "Continue with Steam" under the sign-in and register forms. Steam OpenID
+(`lib/steamLogin.ts`, `api/auth/steam`, `/callback`, `/register`), a second NextAuth provider
+`steam`, and `/authPage?steam=…` (`SteamSignupForm`, `useSteamSignup`): a known Steam account
+signs in at once; a new one picks a username (suggested from the Steam name) and an email, and
+gets Steam's picture as avatar and Steam linked. `migrations/041_steam_login.sql`. Privacy policy
+(9 languages) says what Steam sign-in keeps. CLAUDE.md → Registration.
+**Why** — The user asked for sign-up with Steam carrying over the Steam picture, name and email,
+as a first step of a larger integration.
+**Decisions** — Steam never shares an email (OpenID gives only the SteamID64; the Web API name and
+picture), so the email is still asked for: it is the only recovery path. A new column, not
+`steamid`, because `steamid` is typed and unproven (migrations/028). Random password, so the
+account has none until "forgot password"; rejected a nullable password (every `passwordVersion`
+and current-password check assumes one). The ticket goes in an httpOnly cookie, not the URL.
+**Open** — 041 applied to pre (2026-10-21); production still needs it when this reaches `main`. No "link Steam sign-in" for existing accounts.
+Changing the email or deleting the account asks for the current password, which a Steam-only
+user has to set through "forgot password" first. Not tried against real Steam yet: try it on the
+preview (Steam needs to reach `NEXTAUTH_URL`'s host, any public or localhost URL works as realm).
+**Watch out** — `return_to` is built from `NEXTAUTH_URL`; if it differs from the host the user is
+on, the ticket cookie lands on another host and every Steam sign-in "expires".
+
+---
+
 ## 2026-10-21 — Xbox: a game's empty launcher twin no longer shows as a second game (`feat/groups-redesign`)
 
 **Did** — `foldTwinTitles` (`utils/xboxTitles.ts`), applied in `xboxLibraryData`: a title with no
