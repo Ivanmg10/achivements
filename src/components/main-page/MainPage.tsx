@@ -15,6 +15,7 @@ import { useMainView } from '@/context/MainViewContext'
 import { useSubject } from '@/context/SubjectContext'
 import { useRaLinked } from '@/hooks/useRaLinked'
 import { canUseXbox } from '@/utils/xboxAccess'
+import { homeFit } from '@/lib/homeFit'
 
 export default function MainPage() {
   const { status, data: session } = useSession()
@@ -35,6 +36,7 @@ export default function MainPage() {
 
   return (
     <motion.main
+      ref={homeFit}
       className="home-fit flex flex-col min-h-full text-text-main"
       // Opacity only: content landing where the skeleton was, with no slide on top.
       initial={{ opacity: 0 }}
