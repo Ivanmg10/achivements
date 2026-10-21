@@ -1,20 +1,21 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import Image from 'next/image'
-import { IconSearch, IconTrash } from '@tabler/icons-react'
+import { IconSearch } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { fetchRaCandidateById } from '@/utils/apiCallsUtils'
-import { candidateIconUrl, searchCandidates, GameCandidate } from '@/utils/gameCandidates'
-import { gameKey, PLATFORM_NAME } from '@/utils/gameRef'
-import PlatformLogo from '@/components/platform-logo/PlatformLogo'
+import { searchCandidates, suggestCandidates, GameCandidate } from '@/utils/gameCandidates'
+import { gameKey } from '@/utils/gameRef'
+import GamePickerTile from '@/components/game-picker/game-picker-tile/GamePickerTile'
+import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
 
-const MAX_RESULTS = 8
+const RESULTS_MAX = 24
 
 /**
- * The "add games" part of the create-group form: the chosen games, a search
- * box, and matches from RA and Steam alike (or an RA game by pasted id).
+ * The "games" part of the create-group form: suggestions until something is
+ * typed (what is being played, then wanted), then matches from every platform
+ * (or an RA game by pasted id), all as covers to tick; the chosen ones above.
  * `enabled` delays loading the candidate lists until the form is open.
  */
 export default function GroupModalGamePicker({
@@ -40,57 +41,39 @@ export default function GroupModalGamePicker({
     return m ? parseInt(m[1]) : null
   }, [query])
 
-  const results = useMemo(
-    () => (directGameId ? [] : searchCandidates(candidates, query, selectedKeys, MAX_RESULTS)),
-    [candidates, query, selectedKeys, directGameId],
+  const searching = query.trim() !== ''
+  // Chosen games stay in the grid (ticked), so they can be unticked where they were picked.
+  const shown = useMemo(
+    () => (directGameId ? [] : searching ? searchCandidates(candidates, query, undefined, RESULTS_MAX) : suggestCandidates(candidates, undefined, RESULTS_MAX)),
+    [candidates, query, searching, directGameId],
   )
 
-  function add(c: GameCandidate) {
-    if (!selectedKeys.has(c.key)) onChange([...selected, c])
-    setQuery('')
+  function toggle(c: GameCandidate) {
+    onChange(selectedKeys.has(c.key) ? selected.filter((s) => s.key !== c.key) : [...selected, c])
   }
 
   async function addById(id: number) {
     setLookupFailed(false)
     const c = await fetchRaCandidateById(id)
-    if (c) add(c)
-    else setLookupFailed(true)
+    if (!c) {
+      setLookupFailed(true)
+      return
+    }
+    if (!selectedKeys.has(c.key)) onChange([...selected, c])
+    setQuery('')
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor="group-game-search" className="text-[10px] uppercase tracking-widest text-text-secondary">
-        {T.groups.addGame}
-      </label>
-
-      {selected.length > 0 && (
-        <ul className="flex flex-col gap-1.5">
-          {selected.map((g) => {
-            const icon = candidateIconUrl(g)
-            return (
-              <li key={g.key} className="flex items-center gap-2 bg-bg-main rounded-lg px-2.5 py-1.5">
-                {icon && <Image src={icon} alt="" width={20} height={20} className="rounded shrink-0" unoptimized />}
-                <span className="text-xs flex-1 line-clamp-1">{g.title}</span>
-                {g.source !== 'ra' && <PlatformLogo source={g.source} size={12} label={PLATFORM_NAME[g.source]} />}
-                <button
-                  type="button"
-                  onClick={() => onChange(selected.filter((s) => s.key !== g.key))}
-                  aria-label={`${T.groups.removeGame} ${g.title}`}
-                  className="text-text-secondary hover:text-red-400 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-                >
-                  <IconTrash className="w-3.5 h-3.5" aria-hidden />
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-      )}
+    <div className="flex flex-col gap-3 min-h-0">
+      <div>
+        <label htmlFor="group-game-search" className="text-[10px] uppercase tracking-widest text-text-secondary">
+          {T.groups.gamesLabel}
+        </label>
+        <p className="text-xs text-text-secondary">{T.groups.gamesOptional}</p>
+      </div>
 
       <div className="relative">
-        <IconSearch
-          className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-secondary pointer-events-none"
-          aria-hidden
-        />
+        <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary pointer-events-none" aria-hidden />
         <input
           id="group-game-search"
           value={query}
@@ -99,54 +82,48 @@ export default function GroupModalGamePicker({
             setLookupFailed(false)
           }}
           placeholder={T.groups.searchGames}
-          className="w-full bg-bg-main rounded-lg pl-8 pr-3 py-2 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70"
+          aria-describedby="group-game-search-hint"
+          className="w-full h-10 bg-bg-main rounded-xl pl-9 pr-3 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70"
         />
       </div>
+      <p id="group-game-search-hint" className="text-[11px] text-text-secondary -mt-2">{T.groups.searchHint}</p>
 
-      {(results.length > 0 || directGameId) && (
-        <div className="flex flex-col gap-1 max-h-40 overflow-y-auto">
-          {results.map((c) => {
-            const icon = candidateIconUrl(c)
-            return (
-              <button
-                key={c.key}
-                type="button"
-                onClick={() => add(c)}
-                className="flex items-center gap-2 bg-bg-main hover:bg-ink/5 rounded-lg px-2.5 py-1.5 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-              >
-                {icon && <Image src={icon} alt="" width={20} height={20} className="rounded shrink-0" unoptimized />}
-                <span className="flex flex-col min-w-0 flex-1">
-                  <span className="text-xs line-clamp-1">{c.title}</span>
-                  <span className="text-[10px] text-text-secondary flex items-center gap-1">
-                    {c.source !== 'ra' && <PlatformLogo source={c.source} size={10} />}
-                    {c.subtitle}
-                  </span>
-                </span>
-              </button>
-            )
-          })}
-          {directGameId && !selectedKeys.has(gameKey('ra', directGameId)) && (
-            <button
-              type="button"
-              onClick={() => addById(directGameId)}
-              className="flex items-center gap-2 bg-bg-main hover:bg-ink/5 rounded-lg px-2.5 py-1.5 transition-colors text-left border border-ink/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-            >
-              <span
-                aria-hidden="true"
-                className="w-5 h-5 rounded bg-bg-card flex items-center justify-center shrink-0 text-[9px] font-bold text-text-secondary"
-              >
-                ID
-              </span>
-              <span className="text-xs text-text-secondary">
-                {T.search.openById} #{directGameId}
-              </span>
-            </button>
-          )}
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {selected.map((g) => (
+            <GamePickerChip key={g.key} candidate={g} removeLabel={`${T.groups.removeGame} ${g.title}`} onRemove={() => toggle(g)} />
+          ))}
         </div>
       )}
 
+      {directGameId ? (
+        !selectedKeys.has(gameKey('ra', directGameId)) && (
+          <button
+            type="button"
+            onClick={() => addById(directGameId)}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl ring-1 ring-ink/10 hover:bg-bg-main transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          >
+            <span aria-hidden="true" className="w-8 h-8 rounded-lg bg-bg-main flex items-center justify-center shrink-0 text-[10px] font-bold text-text-secondary">ID</span>
+            <span className="text-sm text-text-main">{T.search.openById} #{directGameId}</span>
+          </button>
+        )
+      ) : shown.length > 0 ? (
+        <>
+          {!searching && <p className="text-xs font-semibold text-text-main">{T.groups.suggestions}</p>}
+          <ul className="grid gap-x-3 gap-y-4 grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))]">
+            {shown.map((c) => (
+              <li key={c.key} className="min-w-0 flex">
+                <GamePickerTile candidate={c} selected={selectedKeys.has(c.key)} onToggle={() => toggle(c)} />
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        searching && <p className="text-sm text-text-secondary text-center py-6">{T.groups.noMatches.replace('{q}', query.trim())}</p>
+      )}
+
       {lookupFailed && (
-        <p role="alert" className="text-xs text-red-400">
+        <p role="alert" className="text-xs text-danger">
           {T.search.noResults}
         </p>
       )}

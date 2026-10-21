@@ -31,28 +31,38 @@ test('loads candidates only while enabled', () => {
 
 test('the search box is labelled', () => {
   render(<GroupModalGamePicker enabled selected={[]} onChange={jest.fn()} />)
-  expect(screen.getByLabelText(en.groups.addGame)).toBeInTheDocument()
+  expect(screen.getByLabelText(en.groups.gamesLabel)).toBeInTheDocument()
 })
 
 test('picking a Steam match adds it', () => {
   const onChange = jest.fn()
   render(<GroupModalGamePicker enabled selected={[ZELDA]} onChange={onChange} />)
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'portal' } })
-  fireEvent.click(screen.getByRole('button', { name: /Portal 2/ }))
+  fireEvent.click(screen.getByRole('button', { name: /^Portal 2/ }))
   expect(onChange).toHaveBeenCalledWith([ZELDA, PORTAL])
 })
 
-test('chosen games are not offered again, even when the other platform has the same id', () => {
-  render(<GroupModalGamePicker enabled selected={[PORTAL]} onChange={jest.fn()} />)
+test('chosen games stay ticked where they are, even when the other platform has the same id', () => {
+  const onChange = jest.fn()
+  render(<GroupModalGamePicker enabled selected={[PORTAL]} onChange={onChange} />)
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'a' } })
-  expect(screen.getByRole('button', { name: /Zelda/ })).toBeInTheDocument()
-  expect(screen.queryByRole('button', { name: /Portal 2 Steam/ })).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /^Zelda/ })).toHaveAttribute('aria-pressed', 'false')
+  fireEvent.click(screen.getByRole('button', { name: /^Portal 2/, pressed: true }))
+  expect(onChange).toHaveBeenCalledWith([])
+})
+
+test('suggests games before anything is typed, and says when a search finds nothing', () => {
+  render(<GroupModalGamePicker enabled selected={[]} onChange={jest.fn()} />)
+  expect(screen.getByText(en.groups.suggestions)).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /^Zelda/ })).toBeInTheDocument()
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'xyz' } })
+  expect(screen.getByText('No games match “xyz”')).toBeInTheDocument()
 })
 
 test('a chosen game can be removed, and Steam ones are marked', () => {
   const onChange = jest.fn()
   render(<GroupModalGamePicker enabled selected={[ZELDA, PORTAL]} onChange={onChange} />)
-  expect(screen.getByLabelText('Steam')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /^Portal 2/ })).toHaveTextContent('Steam')
   fireEvent.click(screen.getByRole('button', { name: `${en.groups.removeGame} Portal 2` }))
   expect(onChange).toHaveBeenCalledWith([ZELDA])
 })

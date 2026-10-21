@@ -29,6 +29,21 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — A friendlier new-group modal (`feat/groups-redesign`)
+
+**Did** — `GroupModal` rebuilt: a titled dialog on `<body>` (portal), Escape closes it. Creating is
+two columns: a live preview (`GroupModalPreview`: chosen games' covers, icon, name, privacy),
+name and description with character counters (limits from `groupValidation`), the icon as a row
+of one-tap emoji plus "none" and a field for your own emoji or image link
+(`GroupModalIconPicker`), and private/public as two radio options that say who sees it
+(`GroupModalVisibility`, replaces the switch). The games column (`GroupModalGamePicker`) is now
+suggestions and matches as covers to tick (`GamePickerTile`, `suggestCandidates`), chosen games
+stay ticked in place. A missing name is an inline error on the field (it used to say only
+"Title"); the button reads "Create with N games". Editing keeps the first column only.
+**Why** — The user asked to improve the new-group modal after the add-games one.
+
+---
+
 ## 2026-10-21 — Home page Groups section in the new style (`feat/groups-redesign`)
 
 **Did** — `MainPageGroupFeature`: covers faded behind a progress ring (was an amber `text-warning`

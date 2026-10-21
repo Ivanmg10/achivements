@@ -1,14 +1,19 @@
 'use client'
 
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
-import Image from 'next/image'
 import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { GameGroup, GameGroupItem } from '@/types/types'
 import type { GameCandidate } from '@/utils/gameCandidates'
-import GroupModalGamePicker from '@/components/groups/group-modal-game-picker/GroupModalGamePicker'
+import { GROUP_DESCRIPTION_MAX, GROUP_TITLE_MAX } from '@/utils/groupValidation'
+import { plural } from '@/utils/utils'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import GroupModalGamePicker from '@/components/groups/group-modal-game-picker/GroupModalGamePicker'
+import GroupModalPreview from '@/components/groups/group-modal-preview/GroupModalPreview'
+import GroupModalIconPicker from '@/components/groups/group-modal-icon-picker/GroupModalIconPicker'
+import GroupModalVisibility from '@/components/groups/group-modal-visibility/GroupModalVisibility'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -20,6 +25,9 @@ const contentVariants: Variants = {
   visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
   exit: { opacity: 0, y: -8, scale: 0.97, transition: { duration: 0.15, ease: 'easeIn' } },
 }
+
+const LABEL = 'text-[10px] uppercase tracking-widest text-text-secondary'
+const FIELD = 'bg-bg-main rounded-lg px-3 py-2 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70'
 
 type Props = {
   isOpen: boolean
@@ -34,21 +42,34 @@ type Props = {
   }) => Promise<void>
 }
 
-function isImageUrl(s: string) {
-  return s.startsWith('http://') || s.startsWith('https://')
+/** A field's label with how much of its limit is used. */
+function Counter({ htmlFor, label, length, max }: { htmlFor: string; label: string; length: number; max: number }) {
+  return (
+    <div className="flex items-center justify-between">
+      <label htmlFor={htmlFor} className={LABEL}>{label}</label>
+      <span aria-hidden="true" className={`text-[10px] tabular-nums ${length >= max ? 'text-danger' : 'text-text-secondary'}`}>{length}/{max}</span>
+    </div>
+  )
 }
 
+/**
+ * Create or edit a group. Creating is two columns: a live preview, name,
+ * description, icon and who sees it on one side, the games to start with on
+ * the other; editing is the first column only.
+ */
 export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const titleId = useId()
   const descriptionId = useId()
-  const iconId = useId()
+  const headingId = useId()
+  const titleErrorId = useId()
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [icon, setIcon] = useState('')
   const [isPublic, setIsPublic] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [titleMissing, setTitleMissing] = useState(false)
   const [error, setError] = useState('')
   const [selectedGames, setSelectedGames] = useState<GameCandidate[]>([])
 
@@ -61,14 +82,27 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
       setDescription(group?.description ?? '')
       setIcon(group?.icon ?? '')
       setIsPublic(group?.is_public ?? false)
+      setTitleMissing(false)
       setError('')
       setSelectedGames([])
     }
   })
 
+  useEffect(() => {
+    if (!isOpen) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [isOpen, onClose])
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!title.trim()) { setError(T.groups.groupTitle); return }
+    if (!title.trim()) {
+      setTitleMissing(true)
+      return
+    }
     setSaving(true)
     setError('')
     try {
@@ -81,11 +115,20 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
     }
   }
 
-  return (
+  const submitLabel = isEditing
+    ? T.groups.save
+    : selectedGames.length > 0
+      ? T.groups.createWith.replace('{games}', plural(selectedGames.length, T.plurals.games, lang))
+      : T.groups.create
+
+  // On <body>, so an animated (transformed) page wrapper does not become its frame.
+  if (typeof document === 'undefined') return null
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 pt-16 px-4"
+          className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
           variants={overlayVariants}
           initial="hidden"
           animate="visible"
@@ -93,125 +136,106 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
           onClick={onClose}
         >
           <motion.div
-            className="bg-bg-card rounded-2xl w-full max-w-md flex flex-col text-text-main shadow-xl max-h-[80vh] overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={headingId}
+            className={`bg-bg-card w-full h-full sm:h-auto sm:max-h-[88vh] sm:rounded-2xl flex flex-col text-text-main shadow-2xl ring-1 ring-ink/5 overflow-hidden ${isEditing ? 'sm:max-w-md' : 'sm:max-w-4xl'}`}
             variants={contentVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-5 pb-3 shrink-0">
-              <h2 className="text-base font-semibold">
+            <div className="flex items-center justify-between px-5 sm:px-6 pt-5 pb-3 shrink-0">
+              <h2 id={headingId} className="text-lg font-bold">
                 {isEditing ? T.groups.editGroup : T.groups.newGroup}
               </h2>
               <button
+                type="button"
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-bg-main transition-colors text-text-secondary hover:text-text-main"
-                aria-label="Close"
+                className="p-2 -m-1 rounded-lg hover:bg-ink/5 transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                aria-label={T.groups.close}
               >
-                <IconX className="w-4 h-4" aria-hidden />
+                <IconX className="w-5 h-5" aria-hidden />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3 px-5 pb-5 overflow-y-auto">
-              {/* Title */}
-              <div className="flex flex-col gap-1">
-                <label htmlFor={titleId} className="text-[10px] uppercase tracking-widest text-text-secondary">{T.groups.groupTitle}</label>
-                <input
-                  id={titleId}
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder={T.groups.groupTitlePlaceholder}
-                  maxLength={60}
-                  className="bg-bg-main rounded-lg px-3 py-2 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70"
-                  autoFocus
-                />
-              </div>
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+              <div className={`flex-1 min-h-0 overflow-y-auto px-5 sm:px-6 pb-5 grid gap-6 ${isEditing ? '' : 'md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]'}`}>
+                <div className="flex flex-col gap-4">
+                  <GroupModalPreview title={title} icon={icon} isPublic={isPublic} games={selectedGames} />
 
-              {/* Description */}
-              <div className="flex flex-col gap-1">
-                <label htmlFor={descriptionId} className="text-[10px] uppercase tracking-widest text-text-secondary">{T.groups.description}</label>
-                <input
-                  id={descriptionId}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder={T.groups.descriptionPlaceholder}
-                  maxLength={200}
-                  className="bg-bg-main rounded-lg px-3 py-2 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70"
-                />
-              </div>
-
-              {/* Icon */}
-              <div className="flex flex-col gap-1">
-                <label htmlFor={iconId} className="text-[10px] uppercase tracking-widest text-text-secondary">{T.groups.icon}</label>
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-lg bg-bg-main flex items-center justify-center shrink-0 overflow-hidden">
-                    {icon ? (
-                      isImageUrl(icon) ? (
-                        <Image src={icon} alt={T.groups.icon} width={36} height={36} className="w-full h-full object-cover" unoptimized />
-                      ) : (
-                        <span className="text-xl leading-none">{icon}</span>
-                      )
-                    ) : (
-                      <span className="text-xl leading-none">📁</span>
+                  <div className="flex flex-col gap-1">
+                    <Counter htmlFor={titleId} label={T.groups.groupTitle} length={title.length} max={GROUP_TITLE_MAX} />
+                    <input
+                      id={titleId}
+                      value={title}
+                      onChange={(e) => {
+                        setTitle(e.target.value)
+                        if (e.target.value.trim()) setTitleMissing(false)
+                      }}
+                      placeholder={T.groups.groupTitlePlaceholder}
+                      maxLength={GROUP_TITLE_MAX}
+                      aria-invalid={titleMissing || undefined}
+                      aria-describedby={titleMissing ? titleErrorId : undefined}
+                      className={`${FIELD} ${titleMissing ? 'ring-2 ring-danger' : ''}`}
+                      autoFocus
+                    />
+                    {titleMissing && (
+                      <p id={titleErrorId} role="alert" className="text-xs text-danger">{T.groups.titleRequired}</p>
                     )}
                   </div>
-                  <input
-                    id={iconId}
-                    value={icon}
-                    onChange={(e) => setIcon(e.target.value)}
-                    placeholder={T.groups.iconPlaceholder}
-                    className="flex-1 bg-bg-main rounded-lg px-3 py-2 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70"
-                  />
+
+                  <div className="flex flex-col gap-1">
+                    <Counter htmlFor={descriptionId} label={T.groups.description} length={description.length} max={GROUP_DESCRIPTION_MAX} />
+                    <textarea
+                      id={descriptionId}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder={T.groups.descriptionPlaceholder}
+                      maxLength={GROUP_DESCRIPTION_MAX}
+                      rows={2}
+                      className={`${FIELD} resize-none`}
+                    />
+                  </div>
+
+                  <GroupModalIconPicker value={icon} onChange={setIcon} />
+                  <GroupModalVisibility isPublic={isPublic} onChange={setIsPublic} />
                 </div>
+
+                {!isEditing && (
+                  <div className="md:border-l md:border-ink/5 md:pl-6">
+                    <GroupModalGamePicker enabled={isOpen} selected={selectedGames} onChange={setSelectedGames} />
+                  </div>
+                )}
               </div>
 
-              {/* Public toggle */}
-              <div className="flex items-center justify-between bg-bg-main rounded-lg px-3 py-2.5">
-                <span className="text-sm text-text-main">{T.groups.isPublic}</span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-label={T.groups.isPublic}
-                  aria-checked={isPublic}
-                  onClick={() => setIsPublic((p) => !p)}
-                  className={`w-10 h-5 rounded-full transition-colors relative focus:outline-none focus:ring-2 focus:ring-accent/70 ${isPublic ? 'bg-accent' : 'bg-ink/10'}`}
-                >
-                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${isPublic ? 'translate-x-5' : 'translate-x-0.5'}`} />
-                </button>
-              </div>
-
-              {/* Game search — only when creating */}
-              {!isEditing && (
-                <GroupModalGamePicker enabled={isOpen} selected={selectedGames} onChange={setSelectedGames} />
-              )}
-
-              {error && (
-                <p role="alert" className="text-xs text-red-400">{error}</p>
-              )}
-
-              {/* Actions */}
-              <div className="flex gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="flex-1 px-4 py-2 rounded-lg bg-bg-main text-text-secondary text-sm hover:text-text-main transition-colors"
-                >
-                  {T.groups.cancel}
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1 px-4 py-2 rounded-lg bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
-                >
-                  {saving ? '…' : isEditing ? T.groups.save : T.groups.create}
-                </button>
+              <div className="border-t border-ink/5 px-5 sm:px-6 py-3 flex flex-col gap-2 shrink-0">
+                {error && (
+                  <p role="alert" className="text-xs text-danger">{error}</p>
+                )}
+                <div className="flex gap-2 justify-end">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="h-10 px-4 rounded-xl text-text-secondary text-sm hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  >
+                    {T.groups.cancel}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="h-10 px-5 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  >
+                    {saving ? '…' : submitLabel}
+                  </button>
+                </div>
               </div>
             </form>
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }
