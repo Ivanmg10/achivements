@@ -39,6 +39,9 @@ the Steam, PSN and Xbox profiles on the home in place of their red line and smal
 asked for a proper component for when a platform cannot load.
 **Decisions** — No new strings: each platform's `profileError`, reason (`errors.*`, Steam's private
 hint) and `retry` are reused. RA's profile on the home has no error state of its own, so it is untouched.
+
+---
+
 ## 2026-10-21 — The worklog and the version no longer conflict on merge (`chore/worklog-union-merge`)
 
 **Did** — `.gitattributes`: `docs/worklog.md merge=union`. A rule for it in CLAUDE.md
