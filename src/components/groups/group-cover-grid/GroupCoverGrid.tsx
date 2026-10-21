@@ -24,7 +24,7 @@ export default function GroupCoverGrid({
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
 
   const grid = (
-    <ul className="grid gap-x-4 gap-y-6 grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(9rem,11rem))]">
+    <ul className="grid gap-x-4 gap-y-6 grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(7.5rem,9rem))]">
       {items.map((item) => (
         <GroupCoverTile key={item.id} item={item} progress={progress(item)} draggable={draggable} onRemove={onRemove} />
       ))}
