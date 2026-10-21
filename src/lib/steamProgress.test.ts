@@ -10,10 +10,11 @@ jest.mock('@/lib/steamClient', () => ({
   getPlayerAchievements: jest.fn(),
   getSchemaForGame: jest.fn(),
   getGlobalAchievementPercentages: jest.fn(),
+  getOwnedGames: jest.fn(),
 }))
 
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
-import { getPlayerAchievements, getSchemaForGame, getGlobalAchievementPercentages } from '@/lib/steamClient'
+import { getPlayerAchievements, getSchemaForGame, getGlobalAchievementPercentages, getOwnedGames } from '@/lib/steamClient'
 import {
   loadPlayerAchievements,
   fetchPlayerAchievements,
@@ -27,6 +28,7 @@ import {
   NO_STATS,
   loadSchema,
   loadGlobalPct,
+  loadOwnedGames,
 } from './steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 
@@ -353,5 +355,29 @@ describe('loadGlobalPct', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {})
     ;(withSteamCache as jest.Mock).mockRejectedValue(new Error('down'))
     expect((await loadGlobalPct(620)).size).toBe(0)
+  })
+})
+
+describe('loadOwnedGames', () => {
+  test('one cached owned list per Steam account, refreshable, for everyone who reads it', async () => {
+    ;(withSteamCache as jest.Mock).mockImplementation(async (_k, _t, fetcher) => fetcher())
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { game_count: 1, games: [{ appid: 1 }] } })
+
+    expect(await loadOwnedGames(AUTH)).toEqual({ response: { game_count: 1, games: [{ appid: 1 }] } })
+    const [key, ttl, , options] = (withSteamCache as jest.Mock).mock.calls[0]
+    expect(key).toBe('steamOwnedRaw:765')
+    expect(ttl).toBe(TTL.recentlyPlayed)
+    expect(options).toMatchObject({ userId: '7', refreshable: true })
+    expect(getOwnedGames).toHaveBeenCalledWith('765', 'key')
+  })
+
+  test('a private answer is not kept; an empty public library is', async () => {
+    ;(withSteamCache as jest.Mock).mockImplementation(async (_k, _t, fetcher) => fetcher())
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: {} })
+    await loadOwnedGames(AUTH)
+    const { shouldCache } = (withSteamCache as jest.Mock).mock.calls[0][3]
+    expect(shouldCache({ response: {} })).toBe(false)
+    expect(shouldCache({ response: { game_count: 0 } })).toBe(true)
+    expect(shouldCache({ response: { games: [{ appid: 1 }] } })).toBe(true)
   })
 })

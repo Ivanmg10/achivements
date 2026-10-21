@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
 import { withSteamCache, TTL } from '@/lib/steamCache'
-import { getOwnedGames } from '@/lib/steamClient'
-import { enrichWithAchievementCounts } from '@/lib/steamProgress'
+import { enrichWithAchievementCounts, loadOwnedGames } from '@/lib/steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 import { cachedJson } from '@/lib/httpCache'
-import type { SteamOwnedGamesResponse, SteamGameProgress } from '@/types/steam'
+import type { SteamGameProgress } from '@/types/steam'
 
 /**
  * New Steam calls per request. Every played game with achievements gets
@@ -30,7 +29,7 @@ function byLastPlayedDesc(a: SteamGameProgress, b: SteamGameProgress) {
 export async function GET(req?: Request) {
   const auth = await requireSteamSession(req)
   if (!auth.ok) return auth.response
-  const { id, steamid, apiKey } = auth.session
+  const { id, steamid } = auth.session
 
   try {
     let complete = true
@@ -39,7 +38,7 @@ export async function GET(req?: Request) {
       `steamOwned2:${steamid}`,
       TTL.ownedGames,
       async () => {
-        const data = (await getOwnedGames(steamid, apiKey)) as SteamOwnedGamesResponse
+        const data = await loadOwnedGames(auth.session)
         // A private or friends-only profile — or public with its game details private — yields
         // `{ response: {} }` rather than an error (measured 2026-10-16); a public account with no
         // games carries `game_count`. So a profile made private after it was linked is told apart

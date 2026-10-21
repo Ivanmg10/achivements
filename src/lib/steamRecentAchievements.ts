@@ -1,8 +1,6 @@
-import { getOwnedGames } from '@/lib/steamClient'
-import { loadGlobalPct, loadPlayerAchievements, loadSchema, mapWithConcurrency, SteamAuth } from '@/lib/steamProgress'
+import { loadGlobalPct, loadOwnedGames, loadPlayerAchievements, loadSchema, mapWithConcurrency, SteamAuth } from '@/lib/steamProgress'
 import { lastPlayedGames, unixToIso } from '@/utils/steamMappers'
 import type {
-  SteamOwnedGamesResponse,
   SteamRecentAchievement,
   SteamSchemaAchievement,
 } from '@/types/steam'
@@ -93,7 +91,7 @@ export async function loadRecentAchievements(
 ): Promise<SteamRecentAchievement[]> {
   // The games played last, from the owned list: Steam's recent list covers two
   // weeks only, and someone who stopped a while ago would see no unlocks at all.
-  const owned = (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse
+  const owned = await loadOwnedGames(auth)
   const games = lastPlayedGames(
     (owned?.response?.games ?? []).filter((g) => g.has_community_visible_stats),
     GAMES_SCANNED,
@@ -126,7 +124,7 @@ export async function loadActivityAchievements(
   maxGames = ACTIVITY_GAMES_MAX,
 ): Promise<SteamRecentAchievement[]> {
   const cutoff = Math.floor(now / 1000) - days * 86_400
-  const owned = (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse
+  const owned = await loadOwnedGames(auth)
   const games = (owned?.response?.games ?? [])
     .filter((g) => g.has_community_visible_stats && (g.rtime_last_played ?? 0) >= cutoff)
     .sort((a, b) => (b.rtime_last_played ?? 0) - (a.rtime_last_played ?? 0))

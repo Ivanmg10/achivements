@@ -1,9 +1,10 @@
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
-import { getGlobalAchievementPercentages, getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
+import { getGlobalAchievementPercentages, getOwnedGames, getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
 import { countUnlocks, toGlobalPctMap, withUnlockCounts } from '@/utils/steamMappers'
 import type {
   SteamGameProgress,
   SteamGlobalPercentagesResponse,
+  SteamOwnedGamesResponse,
   SteamPlayerAchievement,
   SteamPlayerAchievementsResponse,
   SteamSchemaAchievement,
@@ -22,6 +23,26 @@ const CONCURRENCY = 4
 const ACTIVE_WINDOW_MS = 48 * 60 * 60 * 1000
 
 export type SteamAuth = { id: string; steamid: string; apiKey: string }
+
+/**
+ * Steam's owned list as it comes, shared by every read built from it (the
+ * library, recently played, recent unlocks, activity, the year's unlocks): a
+ * home page asked Steam for the same list up to five times. Five minutes, as
+ * fresh as "recently played" needs. A private answer (no games, no
+ * game_count) is not cached, so making the profile public shows at once.
+ */
+export function loadOwnedGames(auth: SteamAuth): Promise<SteamOwnedGamesResponse> {
+  return withSteamCache<SteamOwnedGamesResponse>(
+    `steamOwnedRaw:${auth.steamid}`,
+    TTL.recentlyPlayed,
+    async () => (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse,
+    {
+      userId: auth.id,
+      shouldCache: (d) => Boolean(d?.response?.games) || typeof d?.response?.game_count === 'number',
+      refreshable: true,
+    },
+  )
+}
 
 /**
  * Steam's answer for a game that has no achievements, even when the owned list

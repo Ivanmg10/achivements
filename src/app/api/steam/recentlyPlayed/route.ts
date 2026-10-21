@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
 import { withSteamCache, TTL } from '@/lib/steamCache'
-import { getOwnedGames, getRecentlyPlayedGames } from '@/lib/steamClient'
-import { enrichWithAchievementCounts } from '@/lib/steamProgress'
+import { getRecentlyPlayedGames } from '@/lib/steamClient'
+import { enrichWithAchievementCounts, loadOwnedGames } from '@/lib/steamProgress'
 import { lastPlayedGames, toSteamGameProgress } from '@/utils/steamMappers'
 import { cachedJson } from '@/lib/httpCache'
-import type { SteamOwnedGamesResponse, SteamRecentlyPlayedResponse, SteamGameProgress } from '@/types/steam'
+import type { SteamRecentlyPlayedResponse, SteamGameProgress } from '@/types/steam'
 
 const COUNT = 20
 
@@ -25,7 +25,7 @@ export async function GET(req?: Request) {
         // lately that the owned list lacks (a family-shared game), at the end.
         const [owned, recent] = await Promise.all([
           // A failed owned lookup still leaves the recent list, undated.
-          (getOwnedGames(steamid, apiKey) as Promise<SteamOwnedGamesResponse>).catch((err) => {
+          loadOwnedGames(auth.session).catch((err) => {
             console.error('[steam/recentlyPlayed] owned', err)
             return null
           }),
