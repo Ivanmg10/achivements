@@ -59,6 +59,14 @@ test('returns an empty list when nothing was played recently', async () => {
   expect(data(await GET())).toEqual([])
 })
 
+test('a private profile says so (403), rather than an empty list', async () => {
+  ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: {} })
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: {} })
+  const res = await GET()
+  expect(res.status).toBe(403)
+  expect((res as unknown as { data: unknown }).data).toEqual({ error: 'private' })
+})
+
 test('survives a completely empty Steam payload', async () => {
   ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue(null)
   expect(data(await GET())).toEqual([])

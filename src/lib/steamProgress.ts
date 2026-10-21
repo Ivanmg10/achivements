@@ -24,6 +24,22 @@ const ACTIVE_WINDOW_MS = 48 * 60 * 60 * 1000
 
 export type SteamAuth = { id: string; steamid: string; apiKey: string }
 
+/** A profile Steam will not show the games of: private, friends-only, or public with game details private. */
+export class SteamPrivateError extends Error {
+  constructor() {
+    super('The Steam profile is not public')
+  }
+}
+
+/**
+ * Such a profile's owned list reads `{ response: {} }`, not an error (measured
+ * 2026-10-16); a public account with no games still carries `game_count`.
+ * ponytail: a public account with no games and no game_count would read as private; unverified.
+ */
+export function isPrivateLibrary(data: SteamOwnedGamesResponse | null | undefined): boolean {
+  return !data?.response?.games && typeof data?.response?.game_count !== 'number'
+}
+
 /**
  * Steam's owned list as it comes, shared by every read built from it (the
  * library, recently played, recent unlocks, activity, the year's unlocks): a
@@ -38,7 +54,7 @@ export function loadOwnedGames(auth: SteamAuth): Promise<SteamOwnedGamesResponse
     async () => (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse,
     {
       userId: auth.id,
-      shouldCache: (d) => Boolean(d?.response?.games) || typeof d?.response?.game_count === 'number',
+      shouldCache: (d) => !isPrivateLibrary(d),
       refreshable: true,
     },
   )

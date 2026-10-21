@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
 import { withSteamCache, TTL } from '@/lib/steamCache'
 import { getRecentlyPlayedGames } from '@/lib/steamClient'
-import { enrichWithAchievementCounts, loadOwnedGames } from '@/lib/steamProgress'
+import { enrichWithAchievementCounts, isPrivateLibrary, loadOwnedGames, SteamPrivateError } from '@/lib/steamProgress'
 import { lastPlayedGames, toSteamGameProgress } from '@/utils/steamMappers'
 import { cachedJson } from '@/lib/httpCache'
 import type { SteamRecentlyPlayedResponse, SteamGameProgress } from '@/types/steam'
@@ -34,6 +34,9 @@ export async function GET(req?: Request) {
         const ownedGames = owned?.response?.games ?? []
         const ownedIds = new Set(ownedGames.map((g) => g.appid))
         const extra = (recent?.response?.games ?? []).filter((g) => !ownedIds.has(g.appid))
+        // A private profile, linked anyway (a link proves ownership, not visibility): say so,
+        // like the library does, instead of an empty list that looks like "nothing played".
+        if (owned && isPrivateLibrary(owned) && extra.length === 0) throw new SteamPrivateError()
         const mapped = [...lastPlayedGames(ownedGames, COUNT), ...extra]
           .slice(0, COUNT)
           .map(toSteamGameProgress)
@@ -46,6 +49,7 @@ export async function GET(req?: Request) {
     // Not browser-cached — see ownedGames; the DB cache keeps it cheap.
     return cachedJson(games, 0)
   } catch (err) {
+    if (err instanceof SteamPrivateError) return NextResponse.json({ error: 'private' }, { status: 403 })
     console.error('[steam/recentlyPlayed]', err)
     return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })
   }

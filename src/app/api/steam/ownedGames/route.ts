@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
 import { withSteamCache, TTL } from '@/lib/steamCache'
-import { enrichWithAchievementCounts, loadOwnedGames } from '@/lib/steamProgress'
+import { enrichWithAchievementCounts, isPrivateLibrary, loadOwnedGames, SteamPrivateError } from '@/lib/steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 import { cachedJson } from '@/lib/httpCache'
 import type { SteamGameProgress } from '@/types/steam'
@@ -14,12 +14,6 @@ import type { SteamGameProgress } from '@/types/steam'
  * call, so after the first fill only games played since are fetched.
  */
 const MAX_FETCHES = 60
-
-class SteamPrivateError extends Error {
-  constructor() {
-    super('The Steam profile is not public')
-  }
-}
 
 function byLastPlayedDesc(a: SteamGameProgress, b: SteamGameProgress) {
   return (b.lastPlayed ?? '').localeCompare(a.lastPlayed ?? '')
@@ -39,12 +33,8 @@ export async function GET(req?: Request) {
       TTL.ownedGames,
       async () => {
         const data = await loadOwnedGames(auth.session)
-        // A private or friends-only profile — or public with its game details private — yields
-        // `{ response: {} }` rather than an error (measured 2026-10-16); a public account with no
-        // games carries `game_count`. So a profile made private after it was linked is told apart
-        // from an empty library, and not cached as one.
-        // ponytail: a public account with no games and no game_count would read as private; unverified.
-        if (!data?.response?.games && typeof data?.response?.game_count !== 'number') throw new SteamPrivateError()
+        // A private profile is told apart from an empty library, and not cached as one.
+        if (isPrivateLibrary(data)) throw new SteamPrivateError()
         const mapped = (data?.response?.games ?? []).map(toSteamGameProgress)
         // Newest first, so a partial fill covers what was played most recently.
         const result = await enrichWithAchievementCounts([...mapped].sort(byLastPlayedDesc), auth.session, MAX_FETCHES)
