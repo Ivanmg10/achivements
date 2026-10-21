@@ -2,8 +2,8 @@ import pool from '@/lib/db'
 import type { GameGroup } from '@/types/types'
 
 /**
- * A user's groups as the group cards show them: counts, progress and the
- * first four covers. `publicOnly` is for someone else's profile.
+ * A user's groups as the group cards show them: counts, progress, the first
+ * five games (covers and progress) and the started game closest to done. `publicOnly` is for someone else's profile.
  */
 export async function listGroups(
   userId: string | number,
@@ -17,12 +17,21 @@ export async function listGroups(
             COUNT(i.id) FILTER (WHERE i.source = 'xbox')::int         AS xbox_count,
             COALESCE(SUM(i.num_awarded), 0)::int    AS total_awarded,
             COALESCE(SUM(i.max_possible), 0)::int   AS total_possible,
-            -- The first four games' art, for the card's cover mosaic.
+            COUNT(i.id) FILTER (WHERE i.max_possible > 0 AND i.num_awarded >= i.max_possible)::int AS completed_count,
+            COUNT(i.id) FILTER (WHERE i.num_awarded > 0 AND i.num_awarded < i.max_possible)::int   AS started_count,
+            -- The first five games, for the covers and the shelf.
             COALESCE((
-              SELECT json_agg(json_build_object('source', c.source, 'game_id', c.game_id, 'image_icon', c.image_icon) ORDER BY c.position)
-                FROM (SELECT source, game_id, image_icon, position FROM game_group_items
-                       WHERE group_id = g.id AND ($2::boolean OR source <> 'xbox') ORDER BY position LIMIT 4) c
-            ), '[]'::json) AS covers
+              SELECT json_agg(json_build_object('source', c.source, 'game_id', c.game_id, 'image_icon', c.image_icon,
+                                                'title', c.title, 'num_awarded', c.num_awarded, 'max_possible', c.max_possible) ORDER BY c.position)
+                FROM (SELECT source, game_id, image_icon, title, num_awarded, max_possible, position FROM game_group_items
+                       WHERE group_id = g.id AND ($2::boolean OR source <> 'xbox') ORDER BY position LIMIT 5) c
+            ), '[]'::json) AS covers,
+            -- The started, unfinished game with the largest share earned.
+            (SELECT json_build_object('title', n.title, 'left', n.max_possible - n.num_awarded)
+               FROM game_group_items n
+              WHERE n.group_id = g.id AND ($2::boolean OR n.source <> 'xbox')
+                AND n.num_awarded > 0 AND n.num_awarded < n.max_possible
+              ORDER BY n.num_awarded::float / n.max_possible DESC, n.position LIMIT 1) AS next_up
      FROM game_groups g
      LEFT JOIN game_group_items i ON i.group_id = g.id AND ($2::boolean OR i.source <> 'xbox')
      WHERE g.user_id = $1${publicOnly ? ' AND g.is_public' : ''}

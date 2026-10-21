@@ -29,6 +29,25 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — Groups list: covers or shelves (`feat/groups-redesign`)
+
+**Did** — `/groups` has a view switch (`GroupViewToggle`, saved under `groups-view`, a synced
+preference): **Covers** (`GroupAlbumCard`: the first games as a banner, a progress ring, completed /
+in-progress counts) or **Shelves** (`GroupShelfRow`: progress, "closest to done", and the first five
+games each with its own bar and link). An empty group asks for games; a last tile (`GroupNewTile`)
+makes a new group while any fit. The old 1/2/3-column control is gone from the list. `listGroups`
+now returns five covers with title and progress, `completed_count`, `started_count` and `next_up`.
+`GroupPlatformLogos` was split out of `GroupCard` (still used on public profiles).
+**Why** — The user found the list plain. Mock-ups (canvas "Rediseño de Grupos", options E and F)
+were drawn first; the user picked both, with a switch between them.
+**Decisions** — Per-game progress in the list is the group's stored `num_awarded`/`max_possible`
+(what the old card's bar already used), not the live library values the group page reads. The
+"Add games" and "+N more" tiles open the group instead of the add modal on the list page.
+**Open** — The group page redesign (option C: banner, ring, one filter bar, cover grid) is chosen
+but not built. Reordering groups by drag is not offered (it never was).
+
+---
+
 ## 2026-10-21 — Library detail scrolls, modals above the heatmap, home ends at the screen (`fix/library-scroll-heatmap-layers`)
 
 **Did** — The list view's detail panel (`LibraryEntryDetail`) is `grow shrink-0` instead of `flex-1`,
