@@ -3,6 +3,8 @@ import MainPageGroupFeature from './MainPageGroupFeature'
 import { en } from '@/translations/en'
 import { useGroupDetail } from '@/hooks/useGroupDetail'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
+import { notify } from '@/lib/notify'
+import { waitFor } from '@testing-library/react'
 import type { GameGroup, GameGroupItem } from '@/types/types'
 
 jest.mock('@/hooks/useGroupDetail', () => ({ useGroupDetail: jest.fn() }))
@@ -10,6 +12,13 @@ jest.mock('@/context/GamesDataContext', () => ({ useGamesData: () => ({ all: [] 
 jest.mock('@/hooks/useRecentlyPlayedGames', () => ({ useRecentlyPlayedGames: () => ({ games: [] }) }))
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
 jest.mock('next/image', () => ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />)
+jest.mock('@/lib/notify', () => ({ notify: { success: jest.fn(), error: jest.fn() } }))
+jest.mock('@/components/groups/GroupModal', () => ({
+  __esModule: true,
+  default: ({ group, onSave }: { group: { title: string }; onSave: (d: unknown) => Promise<void> }) => (
+    <button data-testid="edit-modal" onClick={() => onSave({ title: 'Renamed', description: '', icon: '', is_public: true })}>{group.title}</button>
+  ),
+}))
 jest.mock('@/components/groups/add-game-modal/AddGameModal', () => ({
   __esModule: true,
   default: ({ groupTitle }: { groupTitle: string }) => <div data-testid="add-modal">{groupTitle}</div>,
@@ -91,4 +100,20 @@ test('a PSN game links to its PSN page', () => {
   detail([item(1, { source: 'psn', game_id: 2018800, title: 'Astro Bot', image_icon: 'https://psn/a.png', console_name: 'PlayStation' })])
   render(<MainPageGroupFeature group={group()} />)
   expect(screen.getByRole('link', { name: /^Astro Bot/ })).toHaveAttribute('href', '/psnGame/NPWR20188_00')
+})
+
+test('the group can be edited from here, and saving says so', async () => {
+  detail([item(1)])
+  const onEdit = jest.fn().mockResolvedValue({})
+  render(<MainPageGroupFeature group={group()} onEdit={onEdit} />)
+  fireEvent.click(screen.getByRole('button', { name: en.groups.editGroup }))
+  fireEvent.click(await screen.findByTestId('edit-modal'))
+  await waitFor(() => expect(onEdit).toHaveBeenCalledWith({ title: 'Renamed', description: undefined, icon: undefined, is_public: true }))
+  await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.groupSaved))
+})
+
+test('no edit button without a way to save', () => {
+  detail([item(1)])
+  render(<MainPageGroupFeature group={group()} />)
+  expect(screen.queryByRole('button', { name: en.groups.editGroup })).not.toBeInTheDocument()
 })

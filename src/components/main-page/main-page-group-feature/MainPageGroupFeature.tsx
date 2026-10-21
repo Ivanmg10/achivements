@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import { IconArrowRight, IconFolder, IconPlus } from '@tabler/icons-react'
+import { IconArrowRight, IconEdit, IconFolder, IconPlus } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroupDetail } from '@/hooks/useGroupDetail'
 import { useGroupProgress } from '@/hooks/useGroupProgress'
@@ -12,6 +12,7 @@ import type { GameGroup, GameGroupItem } from '@/types/types'
 import { itemKey } from '@/utils/groupItems'
 import { gameHref } from '@/utils/gameRef'
 import { plural } from '@/utils/utils'
+import { notify } from '@/lib/notify'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import GroupIcon from '@/components/groups/group-icon/GroupIcon'
 import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
@@ -21,6 +22,7 @@ import MainPageGroupFeatureGame from '@/components/main-page/main-page-group-fea
 
 // Downloaded the first time it is opened, not with the page.
 const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'), { loading: () => null })
+const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
 
 /** Covers shown before a "+N more" tile; small, so a big group still takes a row or two. */
 const SHOWN = 11
@@ -31,13 +33,23 @@ const GRID = 'grid gap-3 grid-cols-[repeat(auto-fill,minmax(4.5rem,5.5rem))]'
  * The group shown in full: its covers faded behind a ring with how far along
  * it is, how many games are finished, started and not started, the game
  * closest to done, and its first games as small covers (a tile says how many more). An empty one can be filled
- * from here. `onChanged` is told when games were added, to refresh the counts.
+ * from here, and with `onEdit` its name, icon and privacy edited. `onChanged` is told when games
+ * were added, to refresh the counts.
  */
-export default function MainPageGroupFeature({ group, onChanged }: { group: GameGroup; onChanged?: () => void }) {
+export default function MainPageGroupFeature({
+  group,
+  onChanged,
+  onEdit,
+}: {
+  group: GameGroup
+  onChanged?: () => void
+  onEdit?: (data: { title: string; description?: string; icon?: string; is_public?: boolean }) => Promise<unknown>
+}) {
   const { T, lang } = useLanguage()
   const { group: detail, isLoading, error } = useGroupDetail(group.id)
   const [added, setAdded] = useState<GameGroupItem[]>([])
   const [adding, setAdding] = useState(false)
+  const [editing, setEditing] = useState(false)
   const items = useMemo(() => [...(detail?.items ?? []), ...added], [detail, added])
   const { summary, states, closest, progress } = useGroupProgress(items)
   const covers = useMemo(() => items.map(coverSrc).filter((s): s is string => !!s).slice(0, 6), [items])
@@ -46,6 +58,12 @@ export default function MainPageGroupFeature({ group, onChanged }: { group: Game
   // Until its games are read, the group's own stored totals.
   const counts = items.length > 0 ? summary : { earned: group.total_awarded, total: group.total_possible }
   const pct = counts.total > 0 ? Math.min(100, Math.round((counts.earned / counts.total) * 100)) : null
+
+  /** Errors are thrown back to the modal, which stays open and says why. */
+  async function handleEdit(data: { title: string; description: string; icon: string; is_public: boolean }) {
+    await onEdit?.({ title: data.title, description: data.description || undefined, icon: data.icon || undefined, is_public: data.is_public })
+    notify.success(T.toast.groupSaved)
+  }
 
   function handleAdded(newItems: GameGroupItem[]) {
     setAdded((prev) => [...prev, ...newItems])
@@ -97,6 +115,16 @@ export default function MainPageGroupFeature({ group, onChanged }: { group: Game
               </ul>
             )}
           </div>
+          {onEdit && (
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              aria-label={T.groups.editGroup}
+              className="self-start p-2 rounded-lg bg-bg-card/80 ring-1 ring-ink/10 text-text-secondary hover:text-text-main transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            >
+              <IconEdit className="w-4 h-4" aria-hidden="true" />
+            </button>
+          )}
         </div>
       </div>
       {group.description && <p className="text-sm text-text-secondary -mt-1">{group.description}</p>}
@@ -160,6 +188,11 @@ export default function MainPageGroupFeature({ group, onChanged }: { group: Game
         <IconArrowRight size={14} aria-hidden="true" />
       </Link>
 
+      {onEdit && (
+        <LazyWhenOpened open={editing}>
+          <GroupModal isOpen={editing} onClose={() => setEditing(false)} group={group} onSave={handleEdit} />
+        </LazyWhenOpened>
+      )}
       <LazyWhenOpened open={adding}>
         <AddGameModal isOpen={adding} onClose={() => setAdding(false)} groupId={group.id} groupTitle={group.title} existingKeys={existingKeys} onAdded={handleAdded} />
       </LazyWhenOpened>

@@ -12,7 +12,7 @@ import MainPageGroupFeature from '@/components/main-page/main-page-group-feature
  * create one; deleting is on the group's page). The groups are asked for once, here. It opens on the first group, in the user's order.
  */
 export default function MainPageGroupsSection() {
-  const { groups, isLoading, createGroup, fetchGroups } = useGroups()
+  const { groups, isLoading, createGroup, updateGroup, fetchGroups } = useGroups()
   const [picked, setPicked] = useState<number | null>(null)
   // The pick only counts while that group still exists (it may have just been deleted).
   const featured = groups.find((g) => g.id === picked) ?? groups[0] ?? null
@@ -21,7 +21,7 @@ export default function MainPageGroupsSection() {
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
       {featured && (
         <ChartCard className="xl:col-span-2">
-          <MainPageGroupFeature key={featured.id} group={featured} onChanged={fetchGroups} />
+          <MainPageGroupFeature key={featured.id} group={featured} onChanged={fetchGroups} onEdit={(data) => updateGroup(featured.id, data)} />
         </ChartCard>
       )}
       <ChartCard className={featured ? '' : 'xl:col-span-3'}>

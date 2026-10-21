@@ -29,6 +29,16 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — Edit a group from the home page (`feat/groups-redesign`)
+
+**Did** — The featured group on the home (`MainPageGroupFeature`) has an edit button that opens
+`GroupModal` with the group; saving goes through the section's `updateGroup` (so the list beside
+it updates too) and toasts "Group saved"; a refused save stays in the modal. `updateGroup` no
+longer throws a JSON parse error when an error answer has no JSON body.
+**Why** — The user asked for an edit button there.
+
+---
+
 ## 2026-10-21 — A friendlier new-group modal (`feat/groups-redesign`)
 
 **Did** — `GroupModal` rebuilt: a titled dialog on `<body>` (portal), Escape closes it. Creating is
