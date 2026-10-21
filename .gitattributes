@@ -1,0 +1,3 @@
+# Every branch adds its worklog entry at the top, so two branches always
+# touched the same lines. union keeps both entries instead of conflicting.
+docs/worklog.md merge=union

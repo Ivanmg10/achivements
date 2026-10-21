@@ -153,6 +153,9 @@ lost. Index of the docs: `docs/README.md`.
   add an entry at the top of `docs/worklog.md` — did / why / decisions / open /
   watch out, as its template says. It goes in the same branch and PR as the work,
   before the last commit. A task is not done without it.
+- **The worklog never conflicts**: `.gitattributes` merges `docs/worklog.md` with
+  git's `union` driver (both sides kept). Do not remove it. After a merge, glance
+  at the top entries: a `---` between two may be missing.
 - **A rule or invariant changed or was learned** (a "never do X", how a
   platform must be called, a new env var, a migration that must run, a release
   gate) → update the matching section of this file in the same change. Do not
