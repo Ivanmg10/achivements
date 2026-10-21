@@ -25,6 +25,17 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-21 — An error card for a platform profile that does not load (`feat/platform-load-error`)
+
+**Did** — `MainPageProfileError` (`main-page-profile/main-page-profile-error/`): the error screens'
+`StatusBadge` (danger, a cloud-off icon, the platform's logo on its corner), the message and the
+platform's reason, and a Retry button (`STATUS_BUTTON.secondary`). Fills the profile column. Used by
+the Steam, PSN and Xbox profiles on the home in place of their red line and small pill.
+**Why** — The user saw the Xbox profile fail ("limited right now") as a bare line of red text and
+asked for a proper component for when a platform cannot load.
+**Decisions** — No new strings: each platform's `profileError`, reason (`errors.*`, Steam's private
+hint) and `retry` are reused. RA's profile on the home has no error state of its own, so it is untouched.
+
 ## 2026-10-20 — See who follows you (`feat/rankings-zone-and-personas`)
 
 **Did** — `/following` has tabs (`FollowingTabs`): Following and Followers (`#followers`, read
