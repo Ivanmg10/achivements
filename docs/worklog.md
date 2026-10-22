@@ -34,7 +34,7 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 **Did** — `PLATFORM_STEPS` / `isPlatformStep` and `platformKicker` (the "n of total" count comes
 from the list, no longer a "3" in nine translations); CLAUDE.md lists what a new platform must
 touch in the welcome. Greetings made gender-neutral: the welcome's title ("Esta es tu bóveda",
-"Este é o seu cofre", "Questa è la tua cassaforte"), its giant word and Italian step name, a
+"Este é o seu cofre", "Questa è la tua cassaforte"), its giant word and the first step's name in the bar ("Hola", "Olá", "Ciao": the user still read "Bienvenida" as clashing with the title), a
 Polish line, and the app's "Bienvenido/Bem-vindo/Benvenuto + name" → "Hola/Olá/Ciao".
 **Why** — The user will add platforms and wants the welcome to always include them (and to
 follow changes to the site); they noticed "Bienvenida" in the bar against "Bienvenido" below.
