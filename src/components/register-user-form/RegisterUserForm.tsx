@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
 import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
+import WelcomeEntryCurtain from '@/components/welcome-entry-curtain/WelcomeEntryCurtain'
+import { useWelcomeEntry } from '@/hooks/useWelcomeEntry'
 import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 
 export default function RegisterUserForm({
@@ -25,7 +26,8 @@ export default function RegisterUserForm({
   const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string; email?: string }>({})
   const [submitting, setSubmitting] = useState(false)
   const { T } = useLanguage()
-  const router = useRouter()
+  const entry = useWelcomeEntry()
+  const [entering, setEntering] = useState(false)
 
   const usernameRule = T.registerForm.usernameRule
     .replace('{min}', String(USERNAME_MIN))
@@ -75,8 +77,9 @@ export default function RegisterUserForm({
       // exists all the same, so the login form says so and asks for it.
       const signedIn = await signIn('credentials', { username: username.trim(), password, redirect: false }).catch(() => null)
       if (signedIn?.ok) {
-        router.push('/welcome')
-        router.refresh()
+        // Into the welcome under the curtain; the button stays busy until the page goes.
+        setEntering(true)
+        entry.go()
         return
       }
       setIsLogin(true)
@@ -89,6 +92,7 @@ export default function RegisterUserForm({
 
   return (
     <div className="w-full max-w-sm mx-auto">
+      {entering && entry.animate && <WelcomeEntryCurtain phase="leaving" />}
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-text-main">{T.registerForm.title}</h1>
         <div className="mt-2 h-0.5 w-10 bg-accent mx-auto rounded-full" />

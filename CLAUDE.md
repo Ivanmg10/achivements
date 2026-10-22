@@ -122,7 +122,14 @@ reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there)
   own achievements are a future idea, written down in the plan. Linking toasts the usual
   `notify.success`.
 - The curtain between steps is decorative (`aria-hidden`); with reduced motion it is not
-  shown at all. The bar's pills say each step's state in words.
+  shown at all. The bar's pills say each step's state in words. It lasts 2.2 s
+  (`CURTAIN_MS`; 1.1 s felt rushed to the user) and also carries a new account in from
+  sign-up: the sign-up page plays it until covered and holds, the welcome finishes it
+  (`useWelcomeEntry` / `useWelcomeArrival`, flag `welcome-entry` in sessionStorage).
+- On big screens the welcome is scaled as a whole with CSS `zoom` (2xl and ≥2200 px), not
+  with separate text sizes: a 2560 px screen showed it tiny.
+- The avatar is edited in `AvatarModal` (account page and welcome), not `EditProfileModal`,
+  which is only for the username and email now.
 
 ## Language — the browser's until the person picks one (2026-10-22)
 

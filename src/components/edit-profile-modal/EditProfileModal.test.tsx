@@ -4,9 +4,9 @@ import { en } from '@/translations/en'
 import EditProfileModal from './EditProfileModal'
 
 const update = jest.fn()
-const label = (field: 'name' | 'email' | 'avatar') => en.editProfileModal.fields[field]
+const label = (field: 'name' | 'email') => en.editProfileModal.fields[field]
 
-function fill(field: 'name' | 'email' | 'avatar', value: string) {
+function fill(field: 'name' | 'email', value: string) {
   fireEvent.change(screen.getByLabelText(`${en.editProfileModal.newLabel} ${label(field)}`), { target: { value } })
   fireEvent.change(screen.getByLabelText(`${en.editProfileModal.confirmLabel} ${label(field)}`), { target: { value } })
 }
@@ -62,10 +62,3 @@ test('other fields do not ask for a password or send one', async () => {
   expect(JSON.parse(init.body)).toEqual({ field: 'username', value: 'ivan2' })
 })
 
-test('an http avatar gets no preview; only https ones do', () => {
-  render(<EditProfileModal isOpen onClose={jest.fn()} field="avatar" currentValue="" />)
-  fill('avatar', 'http://x.test/a.png')
-  expect(screen.queryByAltText(en.editProfileModal.avatarPreview)).toBeNull()
-  fill('avatar', 'https://x.test/a.png')
-  expect(screen.getByAltText(en.editProfileModal.avatarPreview)).toBeInTheDocument()
-})

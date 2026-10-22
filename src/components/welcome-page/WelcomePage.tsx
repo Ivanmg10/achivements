@@ -3,10 +3,12 @@
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { WELCOME_STEPS, useWelcomeSteps } from '@/hooks/useWelcomeSteps'
+import { useWelcomeArrival } from '@/hooks/useWelcomeEntry'
 import { useLanguage } from '@/context/LanguageContext'
 import { display } from '@/lib/fonts'
 import WelcomePageStepsBar, { type WelcomeStepState } from '@/components/welcome-page/welcome-page-steps-bar/WelcomePageStepsBar'
 import WelcomePageCurtain from '@/components/welcome-page/welcome-page-curtain/WelcomePageCurtain'
+import WelcomeEntryCurtain from '@/components/welcome-entry-curtain/WelcomeEntryCurtain'
 import WelcomePageIntro from '@/components/welcome-page/welcome-page-intro/WelcomePageIntro'
 import WelcomePageRa from '@/components/welcome-page/welcome-page-ra/WelcomePageRa'
 import WelcomePageSteam from '@/components/welcome-page/welcome-page-steam/WelcomePageSteam'
@@ -28,6 +30,8 @@ export default function WelcomePage() {
   const { data: session } = useSession()
   const router = useRouter()
   const steps = useWelcomeSteps()
+  // Fresh from sign-up: the curtain that started there finishes here.
+  const arriving = useWelcomeArrival()
   // The title takes the focus only once the person has moved, not on arrival.
   const focusTitle = steps.moved
 
@@ -49,7 +53,7 @@ export default function WelcomePage() {
   const nav = { onNext: steps.next, onSkip: steps.skip, onBack: steps.back, direction: steps.direction, focusTitle }
 
   return (
-    <div className={`${display.variable} relative min-h-dvh overflow-x-clip bg-bg-main text-text-main`}>
+    <div className={`${display.variable} relative min-h-dvh flex flex-col overflow-x-clip bg-bg-main text-text-main`}>
       <div aria-hidden="true" className="fixed inset-x-0 -bottom-8 overflow-hidden pointer-events-none select-none">
         <div className={`${styles.drift} whitespace-nowrap font-display italic font-extrabold text-[clamp(160px,24vw,300px)] leading-[0.9] text-text-main/[0.035]`}>
           {Array(4).fill(T.welcome.words[steps.step]).join(' · ')}
@@ -65,7 +69,9 @@ export default function WelcomePage() {
         onSkipAll={steps.skipAll}
       />
 
-      <main className="relative max-w-6xl mx-auto px-4 sm:px-8 pt-28 lg:pt-32 pb-16 min-h-dvh flex flex-col justify-center">
+      {/* Scaled as a whole on big screens (a 2560 px one showed it tiny): `zoom` keeps every
+          proportion of the design, which separate text sizes would not. */}
+      <main className="relative flex-1 w-full max-w-6xl mx-auto px-4 sm:px-8 pt-28 lg:pt-32 pb-16 flex flex-col justify-center 2xl:[zoom:1.2] min-[2200px]:[zoom:1.4]">
         {steps.ready && (
           <div key={steps.step}>
             {steps.step === 'intro' && <WelcomePageIntro onNext={steps.next} direction={steps.direction} focusTitle={focusTitle} />}
@@ -82,6 +88,7 @@ export default function WelcomePage() {
       </main>
 
       {steps.transition && <WelcomePageCurtain transition={steps.transition} />}
+      {arriving && <WelcomeEntryCurtain phase="arriving" />}
     </div>
   )
 }

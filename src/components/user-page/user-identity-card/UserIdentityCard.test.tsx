@@ -13,6 +13,10 @@ jest.mock('@/components/change-password-modal/ChangePasswordModal', () => ({
   __esModule: true,
   default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="password-modal" /> : null),
 }))
+jest.mock('@/components/avatar-modal/AvatarModal', () => ({
+  __esModule: true,
+  default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="avatar-modal" /> : null),
+}))
 jest.mock('@/components/edit-profile-modal/EditProfileModal', () => ({
   __esModule: true,
   default: ({ field }: { field: string }) => <div data-testid="edit-modal">{field}</div>,
@@ -56,7 +60,7 @@ test('the admin badge is only for admins', () => {
 test('avatar, name and email each open the edit modal for their own field', async () => {
   render(<UserIdentityCard />)
   fireEvent.click(screen.getByRole('button', { name: en.userPage.editAvatar }))
-  expect(await screen.findByTestId('edit-modal')).toHaveTextContent('avatar')
+  expect(await screen.findByTestId('avatar-modal')).toBeInTheDocument()
 })
 
 test('change password opens its modal, sign out signs out', async () => {

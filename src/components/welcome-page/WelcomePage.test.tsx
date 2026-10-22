@@ -108,3 +108,12 @@ test('says the giant word behind the step to no one', () => {
   const word = container.querySelector('[aria-hidden="true"]')
   expect(word).toHaveTextContent(T.words.intro)
 })
+
+test('fresh from sign-up, the curtain that started there finishes here', () => {
+  sessionStorage.setItem('welcome-entry', '1')
+  render(<WelcomePage />)
+  expect(screen.getByText(T.account)).toBeInTheDocument()
+  act(() => jest.advanceTimersByTime(CURTAIN_MS))
+  expect(screen.queryByText(T.account)).toBeNull()
+  expect(sessionStorage.getItem('welcome-entry')).toBeNull()
+})

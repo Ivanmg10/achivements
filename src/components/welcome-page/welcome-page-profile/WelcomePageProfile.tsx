@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
 import { IconArrowRight, IconGenderBigender, IconMapPin, IconPhoto, IconUserShare } from '@tabler/icons-react'
@@ -14,7 +15,7 @@ import WelcomePageProfilePreview from '@/components/welcome-page/welcome-page-pr
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from '@/components/welcome-page/welcomeArt'
 
 // The account page's own pickers, downloaded the first time they are opened.
-const EditProfileModal = dynamic(() => import('@/components/edit-profile-modal/EditProfileModal'), { loading: () => null })
+const AvatarModal = dynamic(() => import('@/components/avatar-modal/AvatarModal'), { loading: () => null })
 const LocationModal = dynamic(() => import('@/components/location-modal/LocationModal'), { loading: () => null })
 const GenderModal = dynamic(() => import('@/components/gender-modal/GenderModal'), { loading: () => null })
 
@@ -69,15 +70,22 @@ export default function WelcomePageProfile({
         </>
       }
     >
-      <div className="flex flex-col gap-3 max-w-lg">
+      <div className="flex flex-col gap-3 max-w-2xl">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-1">
           <ProfileField
             label={T.welcome.profile.photo}
             icon={<IconPhoto size={18} />}
-            value={user?.avatar ? T.welcome.done.profileDone : null}
+            value={user?.avatar ? T.userPage.editAvatar : null}
             empty={T.userData.notSet}
             onEdit={() => setOpen('avatar')}
-          />
+          >
+            {user?.avatar ? (
+              <span className="flex items-center gap-2 min-w-0">
+                <Image src={user.avatar} alt="" width={22} height={22} unoptimized className="w-5.5 h-5.5 rounded-full object-cover shrink-0" />
+                <span className="text-sm font-medium truncate">{T.userPage.editAvatar}</span>
+              </span>
+            ) : undefined}
+          </ProfileField>
           <ProfileField
             label={T.userData.location}
             icon={<IconMapPin size={18} />}
@@ -107,7 +115,7 @@ export default function WelcomePageProfile({
       </div>
 
       <LazyWhenOpened open={open === 'avatar'}>
-        <EditProfileModal isOpen={open === 'avatar'} onClose={close} field="avatar" currentValue={user?.avatar ?? ''} />
+        <AvatarModal isOpen={open === 'avatar'} onClose={close} current={user?.avatar} />
       </LazyWhenOpened>
       <LazyWhenOpened open={open === 'location'}>
         <LocationModal isOpen={open === 'location'} onClose={close} currentCode={user?.location} />

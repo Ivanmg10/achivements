@@ -29,6 +29,23 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome: bigger on big screens, slower curtain, a way in from sign-up, new avatar modal (`feat/welcome-onboarding`)
+
+**Did** — After the user tried `/welcome` on a 2560 px screen: content and bar scaled with CSS
+`zoom` on 2xl and ≥2200 px; curtain 2.2 s (was 1.1 s); the same curtain now runs from the
+sign-up page into the welcome (`WelcomeCurtain` shared, `useWelcomeEntry`/`useWelcomeArrival`);
+a new `AvatarModal` (big preview, pick or drop, link folded away) for the account page and the
+welcome, `AvatarUpload` turned into `useAvatarUpload`, the avatar taken out of `EditProfileModal`.
+**Why** — The user's four points: text tiny on 2K, change too fast, no feedback between sign-up
+and welcome, the avatar modal (a URL plus "confirm URL", the current address in mono) was poor.
+**Decisions** — `zoom` over per-element sizes (keeps the design's proportions; supported in all
+current browsers). The sign-up side holds the curtain once covered (`holdAtMs`), so a slow
+route load never shows the old page; the welcome restarts it at the same point with a negative
+`animation-delay`. No "confirm" field for an avatar link: the preview is the check.
+**Open** — Same as before: browser back between steps, first paint in the detected language.
+
+---
+
 ## 2026-10-22 — Welcome after sign-up, first integration, and the browser's language (`feat/welcome-onboarding`)
 
 **Did** — `/welcome` built from design v4: seven steps (intro, RA with the key guide, Steam,

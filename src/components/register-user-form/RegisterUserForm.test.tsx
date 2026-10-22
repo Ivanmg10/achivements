@@ -155,7 +155,9 @@ test('once the account exists it signs in with what was typed and goes to the we
   fill()
   submit()
 
-  await waitFor(() => expect(useRouter().push).toHaveBeenCalledWith('/welcome'))
+  // Under the curtain first: the page goes once it covers the screen.
+  await waitFor(() => expect(useRouter().push).toHaveBeenCalledWith('/welcome'), { timeout: 3000 })
+  expect(sessionStorage.getItem('welcome-entry')).toBe('1')
   expect(signIn).toHaveBeenCalledWith('credentials', { username: 'ivan', password: 'secret12', redirect: false })
   expect(setIsLogin).not.toHaveBeenCalled()
 })

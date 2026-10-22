@@ -6,9 +6,13 @@ import { useLocationHash } from '@/hooks/useLocationHash'
 export const WELCOME_STEPS = ['intro', 'ra', 'steam', 'psn', 'profile', 'prefs', 'done'] as const
 export type WelcomeStep = (typeof WELCOME_STEPS)[number]
 
-/** The curtain's length, and when the step changes under it (all of it hidden then). */
-export const CURTAIN_MS = 1100
-export const CURTAIN_SWAP_MS = 550
+/**
+ * The curtain's length (`--curtain` in WelcomeCurtain.module.css), and when the step
+ * changes under it, all of it covered then. 2.2 s: the game this is after takes 2.4–3.5 s;
+ * 1.1 s felt rushed (the user, 2026-10-22).
+ */
+export const CURTAIN_MS = 2200
+export const CURTAIN_SWAP_MS = 1100
 
 const STORAGE_KEY = 'welcome-progress'
 const LAST = WELCOME_STEPS.length - 1

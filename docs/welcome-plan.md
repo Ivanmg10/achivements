@@ -207,3 +207,19 @@ Left for later:
   saved language already did.
 - Nothing brings the welcome back once left; a "seen" flag is not needed yet.
 - Real games in the "how your library will look" cards (they are drawn samples, and say so).
+
+### After the first try (2026-10-22)
+
+The user tried it on a 2560 px screen and asked for four things; all done:
+1. **Too small on big screens** → the content and the bar are scaled with CSS `zoom` at
+   `2xl` (1.2 / 1.15) and from 2200 px (1.4 / 1.3), so every proportion of the design holds.
+2. **The change was too quick** → the curtain lasts 2.2 s (was 1.1 s); the step changes at
+   1.1 s, when it is all covered.
+3. **A way in from sign-up** → the same curtain, "Account" → "Welcome": the sign-up page
+   (form or Steam) plays it until covered and holds it while the welcome loads; the welcome
+   picks it up at the same point (a negative animation delay) and lets it go.
+4. **A better avatar modal** → `AvatarModal`: the picture big and round, upload by picking or
+   dropping a file, a preview before using it, and the link folded away with one field (no
+   "confirm" for a URL). It replaces the avatar part of `EditProfileModal` on the account page
+   too; `AvatarUpload` became the `useAvatarUpload` hook.
+Also: the photo field shows the picture instead of a truncated text.

@@ -1,0 +1,55 @@
+/*
+ * The curtain between the welcome's steps (after Inazuma Eleven: Victory Road's
+ * change of day, see docs/welcome-plan.md): a chevron-edged panel crossing the
+ * screen, with a band inside that travels from where the person was to where
+ * they go, its sky fading between the two. 2.2 s (`CURTAIN_MS`): in in the first
+ * 18 %, out in the last 18 %, all covered in between.
+ *
+ * `--curtain-offset` (negative) starts it part way through: the welcome picks the
+ * curtain up where the sign-up page left it. `.held` freezes it while covered.
+ */
+.root {
+  --curtain: 2.2s;
+  --curtain-offset: 0ms;
+}
+.held,
+.held * {
+  animation-play-state: paused !important;
+}
+
+.panel {
+  background: color-mix(in oklab, rgb(var(--accent)) 30%, #07060f);
+  animation: panel-forward var(--curtain) cubic-bezier(0.7, 0, 0.3, 1) var(--curtain-offset) both;
+  clip-path: polygon(70px 50%, 0 0, calc(100% - 70px) 0, 100% 50%, calc(100% - 70px) 100%, 0 100%);
+}
+.panelBack {
+  animation-name: panel-back;
+  clip-path: polygon(0 50%, 70px 0, 100% 0, calc(100% - 70px) 50%, 100% 100%, 70px 100%);
+}
+@keyframes panel-forward { 0% { transform: translateX(-104%); } 18%, 82% { transform: translateX(0); } 100% { transform: translateX(104%); } }
+@keyframes panel-back { 0% { transform: translateX(104%); } 18%, 82% { transform: translateX(0); } 100% { transform: translateX(-104%); } }
+
+.word {
+  color: color-mix(in oklab, rgb(var(--accent)) 40%, #07060f);
+  animation: word-forward var(--curtain) linear var(--curtain-offset) both;
+}
+.panelBack .word { animation-name: word-back; }
+@keyframes word-forward { from { transform: translateX(4%); } to { transform: translateX(-8%); } }
+@keyframes word-back { from { transform: translateX(-8%); } to { transform: translateX(4%); } }
+
+.band {
+  left: 0;
+  clip-path: polygon(0 0, calc(100% - 70px) 0, 100% 50%, calc(100% - 70px) 100%, 0 100%);
+  animation: band var(--curtain) cubic-bezier(0.4, 0, 0.2, 1) var(--curtain-offset) both;
+}
+.panelBack .band {
+  left: auto;
+  right: 0;
+  clip-path: polygon(70px 0, 100% 0, 100% 100%, 70px 100%, 0 50%);
+}
+.echo1 { --extra: 75px; animation-delay: calc(var(--curtain-offset) + 50ms); background: color-mix(in oklab, rgb(var(--accent)) 26%, transparent); }
+.echo2 { --extra: 150px; animation-delay: calc(var(--curtain-offset) + 100ms); background: color-mix(in oklab, rgb(var(--accent)) 16%, transparent); }
+@keyframes band { 0%, 26% { width: calc(34% + var(--extra, 0px)); } 56%, 100% { width: calc(68% + var(--extra, 0px)); } }
+
+.toSky { animation: to-sky var(--curtain) linear var(--curtain-offset) both; }
+@keyframes to-sky { 0%, 28% { opacity: 0; } 54%, 100% { opacity: 1; } }

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useWelcomeEntry } from '@/hooks/useWelcomeEntry'
 
 /** What the Steam sign-up form starts from (GET /api/auth/steam/register). */
 export type SteamSignupProfile = { persona: string; avatar: string | null; username: string; isPublic: boolean }
@@ -39,6 +40,7 @@ async function loadSteamSignup(): Promise<SteamSignupState> {
  */
 export function useSteamSignup(outcome: string) {
   const router = useRouter()
+  const { go: enterWelcome, animate } = useWelcomeEntry()
   const [state, setState] = useState<SteamSignupState>(() =>
     outcome === '1' ? { status: 'loading' } : { status: 'error', error: outcome },
   )
@@ -54,9 +56,11 @@ export function useSteamSignup(outcome: string) {
 
   useEffect(() => {
     if (state.status !== 'signed-in') return
-    router.push(state.next)
+    // A new account goes to the welcome under the curtain (`entering`); a known one straight in.
+    if (state.next === '/welcome') return enterWelcome()
+    router.push('/')
     router.refresh()
-  }, [state, router])
+  }, [state, router, enterWelcome])
 
   async function register(username: string, email: string) {
     setSubmitting(true)
@@ -85,5 +89,8 @@ export function useSteamSignup(outcome: string) {
     }
   }
 
-  return { state, submitting, submitError, register }
+  /** Showing the curtain into the welcome, for a new account. */
+  const entering = animate && state.status === 'signed-in' && state.next === '/welcome'
+
+  return { state, submitting, submitError, register, entering }
 }
