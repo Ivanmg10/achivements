@@ -1633,27 +1633,32 @@ export const en = {
     intro: {
       kicker: 'Account created',
       title: 'Welcome to your vault',
-      body: 'Every achievement, from every platform, in one place. Connect your accounts, make it yours, and you are in within two minutes.',
+      body: 'Thanks for choosing CheevoVault. Every achievement, from every platform, in one place: connect your accounts, make it yours, and you are in within two minutes.',
       perks: [
         {
           title: 'One library for everything',
           text: 'RetroAchievements, Steam and PlayStation together',
+          detail: 'Your games from RetroAchievements, Steam and PlayStation in one list, with your progress, hours played and when you last played. Filter by platform or console, hide what you do not want to see, and open any game for its achievements and how rare each one is.',
         },
         {
           title: 'Pin, group, collect',
           text: 'Your games and the achievements you are missing',
+          detail: 'Pin the games you are playing to the top of your home page, make groups of games (public or private, to share), keep a list of the achievements you are going for, and pick up to five you have earned as your showcase: it is what others see on your profile.',
         },
         {
           title: 'Streak and stats',
           text: 'Every day you play, on a map of the year',
+          detail: 'A map of the year with every day you earned something, your current and best streak, your best periods, your rarest unlocks, your perfect games and the ones you are close to finishing.',
         },
         {
           title: 'Vault Points and rankings',
           text: 'One score worth the same on every platform',
+          detail: 'Each achievement is worth points by how rare it is in its game, balanced so every platform counts the same. With levels, and rankings of everyone or of the people you follow: all time, this month or this week. You can stay out of them in Preferences.',
         },
         {
           title: 'Follow your friends',
           text: 'What they play and what they earn',
+          detail: 'Follow people with a public profile: see what they are playing, their latest unlocks and showcase, whether they are online, and compare any game with their progress. Only you see who you follow and who follows you.',
         },
       ],
     },

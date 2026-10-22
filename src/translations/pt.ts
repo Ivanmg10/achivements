@@ -1632,27 +1632,32 @@ export const pt: Translations = {
     intro: {
       kicker: 'Conta criada',
       title: 'Este é o seu cofre',
-      body: 'Todas as suas conquistas, de todas as plataformas, num só lugar. Conecte suas contas, deixe do seu jeito e em dois minutos você está dentro.',
+      body: 'Agradecemos por escolher o CheevoVault. Todas as suas conquistas, de todas as plataformas, num só lugar: conecte suas contas, deixe do seu jeito e em dois minutos você está dentro.',
       perks: [
         {
           title: 'Uma biblioteca para tudo',
           text: 'RetroAchievements, Steam e PlayStation juntos',
+          detail: 'Seus jogos do RetroAchievements, Steam e PlayStation numa só lista, com seu progresso, as horas jogadas e quando você jogou pela última vez. Filtre por plataforma ou console, oculte o que não quiser ver e abra qualquer jogo para ver as conquistas e a raridade de cada uma.',
         },
         {
           title: 'Fixe, agrupe, colecione',
           text: 'Seus jogos e as conquistas que faltam',
+          detail: 'Fixe no topo do início os jogos que está jogando, crie grupos de jogos (públicos ou privados, para compartilhar), guarde uma lista de conquistas a obter e escolha até cinco conquistas obtidas para sua vitrine: é o que os outros veem no seu perfil.',
         },
         {
           title: 'Sequência e estatísticas',
           text: 'Cada dia em que você joga, num mapa do ano',
+          detail: 'Um mapa do ano com cada dia em que você conquistou algo, sua sequência atual e a melhor, seus melhores períodos, suas conquistas mais raras, seus jogos perfeitos e os que estão quase lá.',
         },
         {
           title: 'Vault Points e rankings',
           text: 'Uma pontuação que vale igual em todas',
+          detail: 'Cada conquista vale pontos conforme sua raridade no jogo, equilibrado para que todas as plataformas contem igual. Com níveis e rankings de todos ou de quem você segue: de sempre, deste mês ou desta semana. Você pode ficar de fora nas Preferências.',
         },
         {
           title: 'Siga seus amigos',
           text: 'O que jogam e o que conquistam',
+          detail: 'Siga pessoas com perfil público: veja o que estão jogando, suas últimas conquistas e vitrine, se estão online, e compare qualquer jogo com o progresso delas. Só você vê quem você segue e quem te segue.',
         },
       ],
     },

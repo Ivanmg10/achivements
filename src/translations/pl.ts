@@ -1632,27 +1632,32 @@ export const pl: Translations = {
     intro: {
       kicker: 'Konto utworzone',
       title: 'Witaj w swoim sejfie',
-      body: 'Wszystkie twoje osiągnięcia ze wszystkich platform w jednym miejscu. Połącz konta, ustaw wszystko po swojemu i w dwie minuty jesteś w środku.',
+      body: 'Dziękujemy za wybranie CheevoVault. Wszystkie twoje osiągnięcia ze wszystkich platform w jednym miejscu: połącz konta, ustaw wszystko po swojemu i w dwie minuty jesteś w środku.',
       perks: [
         {
           title: 'Jedna biblioteka na wszystko',
           text: 'RetroAchievements, Steam i PlayStation razem',
+          detail: 'Twoje gry z RetroAchievements, Steam i PlayStation na jednej liście, z postępem, godzinami gry i datą ostatniej sesji. Filtruj według platformy lub konsoli, ukryj to, czego nie chcesz widzieć, i otwórz dowolną grę, by zobaczyć jej osiągnięcia i ich rzadkość.',
         },
         {
           title: 'Przypinaj, grupuj, kolekcjonuj',
           text: 'Twoje gry i brakujące osiągnięcia',
+          detail: 'Przypnij na górze strony głównej gry, w które grasz, twórz grupy gier (publiczne lub prywatne, do udostępniania), prowadź listę osiągnięć do zdobycia i wybierz do pięciu zdobytych do swojej gabloty: to ją widzą inni w twoim profilu.',
         },
         {
           title: 'Seria i statystyki',
           text: 'Każdy dzień grania na mapie roku',
+          detail: 'Mapa roku z każdym dniem, w którym coś wpadło, twoja obecna i najlepsza seria, najlepsze okresy, najrzadsze osiągnięcia, gry ukończone w 100% i te, którym niewiele brakuje.',
         },
         {
           title: 'Vault Points i rankingi',
           text: 'Jeden wynik, który wszędzie znaczy tyle samo',
+          detail: 'Każde osiągnięcie jest warte punkty zależnie od tego, jak rzadkie jest w swojej grze, wyważone tak, by każda platforma liczyła się tak samo. Z poziomami i rankingami wszystkich lub osób, które obserwujesz: od zawsze, z tego miesiąca lub tygodnia. Możesz się z nich wypisać w Ustawieniach.',
         },
         {
           title: 'Obserwuj znajomych',
           text: 'W co grają i co zdobywają',
+          detail: 'Obserwuj osoby z publicznym profilem: zobacz, w co grają, ich ostatnie osiągnięcia i gablotę, czy są online, i porównaj dowolną grę z ich postępem. Tylko ty widzisz, kogo obserwujesz i kto obserwuje ciebie.',
         },
       ],
     },

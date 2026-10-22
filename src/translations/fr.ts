@@ -1632,27 +1632,32 @@ export const fr: Translations = {
     intro: {
       kicker: 'Compte créé',
       title: 'Bienvenue dans votre coffre',
-      body: 'Tous vos succès, de toutes vos plateformes, au même endroit. Connectez vos comptes, faites-le à votre goût et vous y êtes en deux minutes.',
+      body: 'Merci d\'avoir choisi CheevoVault. Tous vos succès, de toutes vos plateformes, au même endroit : connectez vos comptes, faites-le à votre goût et vous y êtes en deux minutes.',
       perks: [
         {
           title: 'Une bibliothèque pour tout',
           text: 'RetroAchievements, Steam et PlayStation ensemble',
+          detail: 'Vos jeux RetroAchievements, Steam et PlayStation dans une seule liste, avec votre progression, vos heures de jeu et votre dernière session. Filtrez par plateforme ou console, masquez ce que vous ne voulez pas voir et ouvrez n\'importe quel jeu pour voir ses succès et leur rareté.',
         },
         {
           title: 'Épinglez, groupez, collectionnez',
           text: 'Vos jeux et les succès qui vous manquent',
+          detail: 'Épinglez en haut de l\'accueil les jeux en cours, créez des groupes de jeux (publics ou privés, à partager), gardez une liste de succès à obtenir et choisissez jusqu\'à cinq succès obtenus pour votre vitrine : c\'est ce que les autres voient sur votre profil.',
         },
         {
           title: 'Série et statistiques',
           text: 'Chaque jour de jeu, sur une carte de l\'année',
+          detail: 'Une carte de l\'année avec chaque jour où vous avez obtenu quelque chose, votre série actuelle et la meilleure, vos meilleures périodes, vos succès les plus rares, vos jeux parfaits et ceux presque terminés.',
         },
         {
           title: 'Vault Points et classements',
           text: 'Un score qui vaut autant partout',
+          detail: 'Chaque succès vaut des points selon sa rareté dans son jeu, équilibrés pour que toutes les plateformes comptent autant. Avec des niveaux et des classements de tout le monde ou des personnes que vous suivez : depuis toujours, ce mois-ci ou cette semaine. Vous pouvez en sortir dans les Préférences.',
         },
         {
           title: 'Suivez vos amis',
           text: 'À quoi ils jouent et ce qu\'ils obtiennent',
+          detail: 'Suivez des personnes au profil public : voyez à quoi elles jouent, leurs derniers succès et leur vitrine, si elles sont en ligne, et comparez n\'importe quel jeu avec leur progression. Personne d\'autre que vous ne voit qui vous suivez et qui vous suit.',
         },
       ],
     },

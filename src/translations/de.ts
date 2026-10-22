@@ -1632,27 +1632,32 @@ export const de: Translations = {
     intro: {
       kicker: 'Konto erstellt',
       title: 'Willkommen in deinem Tresor',
-      body: 'Alle deine Erfolge, von allen Plattformen, an einem Ort. Verbinde deine Konten, richte es nach deinem Geschmack ein und in zwei Minuten bist du drin.',
+      body: 'Danke, dass du dich für CheevoVault entschieden hast. Alle deine Erfolge, von allen Plattformen, an einem Ort: Verbinde deine Konten, richte es nach deinem Geschmack ein und in zwei Minuten bist du drin.',
       perks: [
         {
           title: 'Eine Bibliothek für alles',
           text: 'RetroAchievements, Steam und PlayStation zusammen',
+          detail: 'Deine Spiele von RetroAchievements, Steam und PlayStation in einer Liste, mit deinem Fortschritt, deinen Spielstunden und wann du zuletzt gespielt hast. Filtere nach Plattform oder Konsole, blende aus, was du nicht sehen willst, und öffne jedes Spiel für seine Erfolge und wie selten jeder ist.',
         },
         {
           title: 'Anheften, gruppieren, sammeln',
           text: 'Deine Spiele und die Erfolge, die dir fehlen',
+          detail: 'Hefte die Spiele, die du gerade spielst, oben auf deine Startseite, erstelle Spielegruppen (öffentlich oder privat, zum Teilen), führe eine Liste der Erfolge, die du holen willst, und wähle bis zu fünf erreichte Erfolge für deine Vitrine: Die sehen andere auf deinem Profil.',
         },
         {
           title: 'Serie und Statistiken',
           text: 'Jeder Spieltag auf einer Jahreskarte',
+          detail: 'Eine Jahreskarte mit jedem Tag, an dem du etwas erreicht hast, deine aktuelle und beste Serie, deine besten Phasen, deine seltensten Erfolge, deine perfekten Spiele und die, bei denen dir wenig fehlt.',
         },
         {
           title: 'Vault Points und Ranglisten',
           text: 'Eine Punktzahl, die überall gleich viel wert ist',
+          detail: 'Jeder Erfolg bringt Punkte danach, wie selten er in seinem Spiel ist, so ausgeglichen, dass jede Plattform gleich zählt. Mit Stufen und Ranglisten aller oder der Leute, denen du folgst: insgesamt, diesen Monat oder diese Woche. In den Einstellungen kannst du dich heraushalten.',
         },
         {
           title: 'Folge deinen Freunden',
           text: 'Was sie spielen und was sie erreichen',
+          detail: 'Folge Leuten mit öffentlichem Profil: Sieh, was sie spielen, ihre neuesten Erfolge und ihre Vitrine, ob sie online sind, und vergleiche jedes Spiel mit ihrem Fortschritt. Nur du siehst, wem du folgst und wer dir folgt.',
         },
       ],
     },

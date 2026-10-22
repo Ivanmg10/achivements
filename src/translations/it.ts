@@ -1632,27 +1632,32 @@ export const it: Translations = {
     intro: {
       kicker: 'Account creato',
       title: 'Questa è la tua cassaforte',
-      body: 'Tutti i tuoi obiettivi, da tutte le piattaforme, in un solo posto. Collega i tuoi account, sistemalo a modo tuo e in due minuti sei dentro.',
+      body: 'Grazie per aver scelto CheevoVault. Tutti i tuoi obiettivi, da tutte le piattaforme, in un solo posto: collega i tuoi account, sistemalo a modo tuo e in due minuti sei dentro.',
       perks: [
         {
           title: 'Una libreria per tutto',
           text: 'RetroAchievements, Steam e PlayStation insieme',
+          detail: 'I tuoi giochi di RetroAchievements, Steam e PlayStation in un\'unica lista, con i tuoi progressi, le ore di gioco e quando hai giocato l\'ultima volta. Filtra per piattaforma o console, nascondi ciò che non vuoi vedere e apri qualsiasi gioco per vederne gli obiettivi e quanto è raro ciascuno.',
         },
         {
           title: 'Fissa, raggruppa, colleziona',
           text: 'I tuoi giochi e gli obiettivi che ti mancano',
+          detail: 'Fissa in cima alla home i giochi a cui stai giocando, crea gruppi di giochi (pubblici o privati, da condividere), tieni una lista di obiettivi da ottenere e scegli fino a cinque obiettivi ottenuti per la tua vetrina: è ciò che gli altri vedono sul tuo profilo.',
         },
         {
           title: 'Serie e statistiche',
           text: 'Ogni giorno di gioco, su una mappa dell\'anno',
+          detail: 'Una mappa dell\'anno con ogni giorno in cui hai ottenuto qualcosa, la tua serie attuale e la migliore, i tuoi periodi migliori, gli obiettivi più rari, i giochi perfetti e quelli quasi completati.',
         },
         {
           title: 'Vault Points e classifiche',
           text: 'Un punteggio che vale lo stesso ovunque',
+          detail: 'Ogni obiettivo vale punti in base a quanto è raro nel suo gioco, bilanciati perché ogni piattaforma conti allo stesso modo. Con livelli e classifiche di tutti o delle persone che segui: di sempre, di questo mese o di questa settimana. Puoi restarne fuori dalle Preferenze.',
         },
         {
           title: 'Segui i tuoi amici',
           text: 'A cosa giocano e cosa ottengono',
+          detail: 'Segui le persone con profilo pubblico: vedi a cosa giocano, i loro ultimi obiettivi e la vetrina, se sono online, e confronta qualsiasi gioco con i loro progressi. Solo tu vedi chi segui e chi ti segue.',
         },
       ],
     },

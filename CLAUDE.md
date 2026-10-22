@@ -148,7 +148,8 @@ turns false). A new platform touches:
 
 The same goes for the rest of the site: **when a change adds or renames a feature, a profile
 field or a preference, check whether the welcome shows it** (intro perks, the profile and
-preferences steps, the done summary) and update it in the same change.
+preferences steps, the done summary) and update it in the same change. The intro's five
+points open to describe the features in detail (`T.welcome.intro.perks[].detail`): keep them true.
 
 ## Language — the browser's until the person picks one (2026-10-22)
 

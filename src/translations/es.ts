@@ -1632,27 +1632,32 @@ export const es: Translations = {
     intro: {
       kicker: 'Cuenta creada',
       title: 'Esta es tu bóveda',
-      body: 'Todos tus logros, de todas tus plataformas, en un sitio. Conecta tus cuentas, déjalo a tu gusto y en dos minutos estás dentro.',
+      body: 'Gracias por elegir CheevoVault. Todos tus logros, de todas tus plataformas, en un sitio: conecta tus cuentas, déjalo a tu gusto y en dos minutos estás dentro.',
       perks: [
         {
           title: 'Una biblioteca para todo',
           text: 'RetroAchievements, Steam y PlayStation juntos',
+          detail: 'Tus juegos de RetroAchievements, Steam y PlayStation en una sola lista, con tu progreso, las horas jugadas y cuándo jugaste por última vez. Filtra por plataforma o consola, oculta lo que no quieras ver y abre cualquier juego para ver sus logros y lo raro que es cada uno.',
         },
         {
           title: 'Fija, agrupa, colecciona',
           text: 'Tus juegos y los logros que te faltan',
+          detail: 'Fija arriba en tu inicio los juegos a los que estás jugando, crea grupos de juegos (públicos o privados, para compartir), guarda una lista de logros por conseguir y elige hasta cinco logros conseguidos para tu vitrina: es lo que ven los demás en tu perfil.',
         },
         {
           title: 'Racha y estadísticas',
           text: 'Cada día que juegas, en un mapa del año',
+          detail: 'Un mapa del año con cada día que conseguiste algo, tu racha actual y la mejor, tus mejores épocas, tus logros más raros, tus juegos perfectos y los que tienes a punto de terminar.',
         },
         {
           title: 'Vault Points y rankings',
           text: 'Una puntuación que vale igual en todas',
+          detail: 'Cada logro vale puntos según lo raro que es en su juego, equilibrado para que todas las plataformas cuenten igual. Con niveles y rankings de todo el mundo o de la gente a la que sigues: de siempre, de este mes o de esta semana. Puedes no aparecer desde Preferencias.',
         },
         {
           title: 'Sigue a tus amigos',
           text: 'Qué juegan y qué consiguen',
+          detail: 'Sigue a gente con perfil público: mira a qué juegan, sus últimos logros y su vitrina, si están en línea, y compara cualquier juego con su progreso. Solo tú ves a quién sigues y quién te sigue.',
         },
       ],
     },

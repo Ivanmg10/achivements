@@ -29,6 +29,18 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome intro: thanks, and points that open (`feat/welcome-onboarding`)
+
+**Did** — The intro's text now starts by thanking the person for choosing CheevoVault; each of
+its five points opens (`WelcomePageIntroPerk`, one at a time) to explain it in a few sentences:
+the library, pins/groups/achievements to get/showcase, streak and stats, Vault Points and
+rankings, following. Nine languages, gender-neutral.
+**Why** — The user's ask.
+**Watch out** — Those details describe real features: when one changes (or a platform is added),
+update its line (CLAUDE.md → Welcome).
+
+---
+
 ## 2026-10-22 — Welcome ready for more platforms; gender-neutral greetings (`feat/welcome-onboarding`)
 
 **Did** — `PLATFORM_STEPS` / `isPlatformStep` and `platformKicker` (the "n of total" count comes
