@@ -13,6 +13,7 @@ export default function WelcomePageCurtain({ transition }: { transition: Welcome
       to={stepNode(to, T)}
       word={T.welcome.words[to]}
       direction={transition.direction}
+      underBar
     />
   )
 }

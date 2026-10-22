@@ -29,6 +29,17 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome curtain on <body>, not inside the sign-up card (`feat/welcome-onboarding`)
+
+**Did** — `WelcomeCurtain` renders through a portal into `<body>`; `underBar` keeps the
+between-steps curtain under the welcome's bar (z-20), the one from sign-up covers all (z-50).
+**Why** — On sign-up the curtain showed inside the form card: the card's `backdrop-filter`
+(like any `transform`) makes `position: fixed` relative to it.
+**Watch out** — Anything meant to cover the screen from inside a card or an animated box needs
+a portal (as `CommonModal` already does).
+
+---
+
 ## 2026-10-22 — Welcome: bigger on big screens, slower curtain, a way in from sign-up, new avatar modal (`feat/welcome-onboarding`)
 
 **Did** — After the user tried `/welcome` on a 2560 px screen: content and bar scaled with CSS

@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import { useIsClient } from '@/hooks/useIsClient'
 import { display } from '@/lib/fonts'
 import styles from './WelcomeCurtain.module.css'
 
@@ -28,6 +30,10 @@ function Node({ node, at, reached }: { node: CurtainNode; at: string; reached: b
  * covered): the sign-up page holds it while the welcome loads, and the
  * welcome picks it up at the same point. Decorative: it says nothing to a
  * screen reader and takes no clicks.
+ *
+ * On <body>, through a portal: a `transform` or a `backdrop-filter` on any
+ * box around it (the sign-up card has one) would otherwise trap it inside
+ * that box instead of covering the screen.
  */
 export default function WelcomeCurtain({
   from,
@@ -36,6 +42,7 @@ export default function WelcomeCurtain({
   direction = 'forward',
   offsetMs = 0,
   holdAtMs,
+  underBar = false,
 }: {
   from: CurtainNode
   to: CurtainNode
@@ -43,8 +50,11 @@ export default function WelcomeCurtain({
   direction?: 'forward' | 'back'
   offsetMs?: number
   holdAtMs?: number
+  /** Between steps it passes under the welcome's step bar (z-30), so the step is seen changing; from sign-up it covers everything. */
+  underBar?: boolean
 }) {
   const [held, setHeld] = useState(false)
+  const isClient = useIsClient()
 
   useEffect(() => {
     if (holdAtMs === undefined) return
@@ -54,12 +64,13 @@ export default function WelcomeCurtain({
 
   const forward = direction === 'forward'
   const line = `${word} · ${word} · ${word}`
+  if (!isClient) return null
 
-  return (
+  return createPortal(
     <div
       aria-hidden="true"
       data-held={held || undefined}
-      className={`${display.variable} ${styles.root} ${held ? styles.held : ''} fixed inset-0 z-40 pointer-events-none overflow-hidden`}
+      className={`${display.variable} ${styles.root} ${held ? styles.held : ''} fixed inset-0 ${underBar ? 'z-20' : 'z-50'} pointer-events-none overflow-hidden`}
       style={{ '--curtain-offset': `${-offsetMs}ms` } as CSSProperties}
     >
       <div className={`${styles.panel} ${forward ? '' : styles.panelBack} absolute inset-y-0 -left-[70px] w-[calc(100%+140px)] overflow-hidden`}>
@@ -79,6 +90,7 @@ export default function WelcomeCurtain({
         <Node node={from} at={forward ? '32%' : '66%'} reached={false} />
         <Node node={to} at={forward ? '66%' : '32%'} reached />
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
