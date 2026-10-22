@@ -104,6 +104,36 @@ Steam"); the landing has a FAQ for the same reason. Added 2026-10-17.
 - The `FAQPage` JSON-LD (pages and landing) is built from the same English items
   the server renders; keep them one list so the markup matches what is shown.
 
+## Welcome after sign-up (`/welcome`, 2026-10-22)
+
+A new account (form or Steam) is signed in and sent to `/welcome`, not to the login form:
+intro, RetroAchievements, Steam, PlayStation, profile, preferences, done. Design and the
+reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there).
+
+- **Never blocks.** Every step has "Not now" / "Skip this step", "Skip all" is always in
+  the bar, and back works on every step. Do not add a required step.
+- **No Xbox** in it while Xbox is admin-only (a new account is not an admin).
+- **No app header** until the person leaves it: it lives in `src/app/welcome/`, outside
+  `(main)`, on purpose (the user's call).
+- **Linking reuses the account page's logic** (`useRaLink`, `useSteamLink`, `usePsnLink`);
+  do not add a second way to link. RA's step is a page of its own with the guide to the
+  Web API key, not the modal.
+- **No achievements** for linking (no unlock toasts, no "first achievement"): CheevoVault's
+  own achievements are a future idea, written down in the plan. Linking toasts the usual
+  `notify.success`.
+- The curtain between steps is decorative (`aria-hidden`); with reduced motion it is not
+  shown at all. The bar's pills say each step's state in words.
+
+## Language — the browser's until the person picks one (2026-10-22)
+
+`LanguageContext`: the saved choice, else the first of `navigator.languages` the app has
+(`pickLanguage` in `src/utils/languages.ts`: `es-MX` → es), else English. **The detected
+language is never saved**: only a person's pick is (`setLang`), so a browser that changes
+its language changes the app. Server and hydration render English (no mismatch); reading
+`Accept-Language` on the server would make the root layout dynamic, so it is not done.
+`fromBrowser` says when the language shown is the detected one (the welcome says so).
+The language list with native names is `LANGUAGES` there; do not keep another.
+
 ## Progress bars — in the theme's colours
 
 Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or
@@ -793,7 +823,7 @@ reads that column, so the rest of the app works without it.
   `/api/steam/link` are gone). A link sets `steamid`, `steamusername` and `steam_login_id`,
   so it also signs in with Steam; one Steam account to one user (another user's proven link
   answers `#steam-taken`). The outcome comes back as `#steam-linked|taken|failed` on the page
-  it started from (`/` or `/user`, `linkReturn`), toasted by `useSteamLink`.
+  it started from (`/`, `/user` or `/welcome`, `linkReturn`), toasted by `useSteamLink`.
 - `steam_login_id` is **separate from `steamid`**: links typed before 2026-10-21 (three, all
   the user's test accounts) keep `steamid` with no `steam_login_id` and were left as they are,
   by the user's choice; `steamid` stays not unique for them. Unlinking clears `steamid` only,

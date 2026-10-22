@@ -9,7 +9,8 @@ export type SteamSignupProfile = { persona: string; avatar: string | null; usern
 
 export type SteamSignupState =
   | { status: 'loading' }
-  | { status: 'signed-in' }
+  /** Where to go: the welcome for an account just made, the app for one that existed. */
+  | { status: 'signed-in'; next: '/' | '/welcome' }
   | { status: 'form'; profile: SteamSignupProfile }
   /** A server error code (`expired`, `failed`, `unavailable`…), shown by the form. */
   | { status: 'error'; error: string }
@@ -26,7 +27,7 @@ async function loadSteamSignup(): Promise<SteamSignupState> {
     const data = await res.json().catch(() => ({}))
     if (!res.ok) return { status: 'error', error: data.error ?? 'failed' }
     if (!data.registered) return { status: 'form', profile: data as SteamSignupProfile }
-    return (await signInWithSteam()) ? { status: 'signed-in' } : { status: 'error', error: 'failed' }
+    return (await signInWithSteam()) ? { status: 'signed-in', next: '/' } : { status: 'error', error: 'failed' }
   } catch {
     return { status: 'error', error: 'failed' }
   }
@@ -53,9 +54,9 @@ export function useSteamSignup(outcome: string) {
 
   useEffect(() => {
     if (state.status !== 'signed-in') return
-    router.push('/')
+    router.push(state.next)
     router.refresh()
-  }, [state.status, router])
+  }, [state, router])
 
   async function register(username: string, email: string) {
     setSubmitting(true)
@@ -73,7 +74,7 @@ export function useSteamSignup(outcome: string) {
         return
       }
       if (await signInWithSteam()) {
-        setState({ status: 'signed-in' })
+        setState({ status: 'signed-in', next: '/welcome' })
       } else {
         setSubmitError('failed')
         setSubmitting(false)

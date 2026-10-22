@@ -60,4 +60,6 @@ test('registering signs in once the account exists, and a refusal is kept to sho
   await act(() => result.current.register('gabe2', 'gabe@test.com'))
   expect(JSON.parse(fetchMock.mock.calls[2][1].body)).toEqual({ username: 'gabe2', email: 'gabe@test.com' })
   expect(result.current.state.status).toBe('signed-in')
+  // A new account goes to the welcome, not straight into the app.
+  await waitFor(() => expect(mockPush).toHaveBeenCalledWith('/welcome'))
 })

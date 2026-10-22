@@ -1,10 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { useSession } from 'next-auth/react'
 import CommonModal from '../common-modal/CommonModal'
-import { useTheme } from '@/context/ThemeContext'
 import { useLanguage } from '@/context/LanguageContext'
+import { useThemeChoice } from '@/hooks/useThemeChoice'
 import { Theme, THEME_GROUPS } from '@/types/types'
 import { notify } from '@/lib/notify'
 import ThemeModalOption from './theme-modal-option/ThemeModalOption'
@@ -15,31 +13,13 @@ interface Props {
 }
 
 export default function ThemeModal({ isOpen, onClose }: Props) {
-  const { theme, setTheme } = useTheme()
-  const { update } = useSession()
+  const { theme, choose, saveError } = useThemeChoice()
   const { T } = useLanguage()
-  const [saveError, setSaveError] = useState(false)
 
   const handleSelect = async (id: Theme) => {
-    const previous = theme
-    setTheme(id)
-    setSaveError(false)
-    try {
-      const res = await fetch('/api/updateTheme', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme: id }),
-      })
-      if (!res.ok) throw new Error(`updateTheme ${res.status}`)
-      await update()
-      notify.success(T.toast.saved)
-      onClose()
-    } catch (err) {
-      // Not saved: put the old theme back rather than show one that will vanish on reload.
-      console.error('[ThemeModal]', err)
-      setTheme(previous)
-      setSaveError(true)
-    }
+    if (!(await choose(id))) return
+    notify.success(T.toast.saved)
+    onClose()
   }
 
   return (

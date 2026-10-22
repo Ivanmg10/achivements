@@ -1,9 +1,13 @@
 # Welcome after sign-up — plan (not started)
 
 Written 2026-10-22 on `feat/welcome-onboarding` (cut from `feat/steam-sign-in`, PR #46,
-not merged yet). Design only; no code yet. **The design to build is v4** (below): concept E
-with a top step bar in the app's own header style, RA's step as its key guide, and the
-language detected from the browser. v1–v3 stay on the canvas for history.
+not merged yet). **The design built is v4** (below): concept E with a top step bar in the
+app's own header style, RA's step as its key guide, and the language detected from the
+browser. v1–v3 stay on the canvas for history.
+
+**Status (2026-10-22): first integration done** on the branch (`/welcome`, the sign-up
+redirects, the language detection); see "First integration" at the end for what is in and
+what is left.
 
 ## Goal
 
@@ -178,3 +182,28 @@ The user likes concept B and wants **internal CheevoVault achievements** in the 
   (CheevoVault + "Saltar todo").
 - Whether the language detection ships on its own first (it helps the landing and sign-up
   today) or with the welcome.
+
+## First integration (2026-10-22)
+
+Decided by the user: the language detection ships with this branch; no app header in the
+welcome (only its own step bar) until the person leaves it.
+
+In:
+- `/welcome` (`src/app/welcome/`), `WelcomePage` and one component per step under
+  `src/components/welcome-page/`, the state in `useWelcomeSteps` (sessionStorage), the
+  curtain and the RA guide in `WelcomePage.module.css`.
+- Sign-up → sign-in → `/welcome` (`RegisterUserForm`; a new Steam account in
+  `useSteamSignup`). An existing Steam account signing in still goes to `/`.
+- `useRaLink` (out of `RaLoginModal`) and `useThemeChoice` (out of `ThemeModal`), shared.
+- Language: `pickLanguage` / `LANGUAGES` in `src/utils/languages.ts`, used by
+  `LanguageContext` and `LanguageModal`.
+- Texts in `T.welcome`, all nine languages.
+
+Left for later:
+- Browser back between steps (the steps are not URL hashes: Steam's callback answers with
+  its own `#steam-…`, so the step lives in sessionStorage instead).
+- Server-side `Accept-Language` for the first paint (it would make the root layout
+  dynamic); today a first visit paints English for a moment, as returning users with a
+  saved language already did.
+- Nothing brings the welcome back once left; a "seen" flag is not needed yet.
+- Real games in the "how your library will look" cards (they are drawn samples, and say so).

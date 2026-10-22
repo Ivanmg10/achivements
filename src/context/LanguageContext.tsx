@@ -11,8 +11,9 @@ import { it } from '@/translations/it'
 import { ru } from '@/translations/ru'
 import { pl } from '@/translations/pl'
 import { ja } from '@/translations/ja'
+import { browserLanguages, isLang, pickLanguage, type Lang } from '@/utils/languages'
 
-export type Lang = 'en' | 'es' | 'pt' | 'fr' | 'de' | 'it' | 'ru' | 'pl' | 'ja'
+export type { Lang }
 
 const translations: Record<Lang, Translations> = { en, es, pt, fr, de, it, ru, pl, ja }
 
@@ -22,14 +23,20 @@ type LanguageContextType = {
   lang: Lang
   setLang: (lang: Lang) => void
   T: Translations
+  /** True while the language shown is the browser's, not one the person picked. */
+  fromBrowser: boolean
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  // English until the saved choice is read, so server and client render the same.
+  // `undefined` on the server and while hydrating: English then, as the server rendered it.
   const [saved, save] = useStorageValue(STORAGE_KEY)
-  const lang: Lang = saved && Object.hasOwn(translations, saved) ? (saved as Lang) : 'en'
+  const chosen = isLang(saved) ? saved : null
+  // Only once hydrated, so the server and the first client render agree. Never saved:
+  // what is stored is a person's choice, and the browser's can change.
+  const detected = saved === undefined || chosen ? null : pickLanguage(browserLanguages())
+  const lang: Lang = chosen ?? detected ?? 'en'
 
   // Screen readers pick their voice from <html lang>; keep it on the language actually shown.
   useEffect(() => {
@@ -39,7 +46,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const setLang = (next: Lang) => save(next)
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang, T: translations[lang] }}>
+    <LanguageContext.Provider value={{ lang, setLang, T: translations[lang], fromBrowser: !chosen && detected !== null }}>
       {children}
     </LanguageContext.Provider>
   )

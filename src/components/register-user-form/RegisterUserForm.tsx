@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
@@ -23,6 +25,7 @@ export default function RegisterUserForm({
   const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string; email?: string }>({})
   const [submitting, setSubmitting] = useState(false)
   const { T } = useLanguage()
+  const router = useRouter()
 
   const usernameRule = T.registerForm.usernameRule
     .replace('{min}', String(USERNAME_MIN))
@@ -68,6 +71,14 @@ export default function RegisterUserForm({
         return
       }
 
+      // Signed in at once and on to the welcome; if that sign-in fails, the account
+      // exists all the same, so the login form says so and asks for it.
+      const signedIn = await signIn('credentials', { username: username.trim(), password, redirect: false }).catch(() => null)
+      if (signedIn?.ok) {
+        router.push('/welcome')
+        router.refresh()
+        return
+      }
       setIsLogin(true)
       setIsRegister(true)
     } catch {

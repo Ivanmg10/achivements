@@ -1,4 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import RegisterUserForm from './RegisterUserForm'
 import { en } from '@/translations/en'
 
@@ -22,6 +24,7 @@ const submit = () => fireEvent.click(screen.getByRole('button', { name: new RegE
 
 beforeEach(() => {
   jest.clearAllMocks()
+  ;(signIn as jest.Mock).mockResolvedValue(undefined)
   global.fetch = jest.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ id: 1, username: 'ivan' }) })
 })
 
@@ -144,4 +147,25 @@ test('says that signing up accepts the terms and the privacy policy, and links b
   renderForm()
   expect(screen.getByRole('link', { name: en.terms.link })).toHaveAttribute('href', '/terms')
   expect(screen.getByRole('link', { name: en.privacy.link })).toHaveAttribute('href', '/privacy')
+})
+
+test('once the account exists it signs in with what was typed and goes to the welcome', async () => {
+  ;(signIn as jest.Mock).mockResolvedValue({ ok: true })
+  const { setIsLogin } = renderForm()
+  fill()
+  submit()
+
+  await waitFor(() => expect(useRouter().push).toHaveBeenCalledWith('/welcome'))
+  expect(signIn).toHaveBeenCalledWith('credentials', { username: 'ivan', password: 'secret12', redirect: false })
+  expect(setIsLogin).not.toHaveBeenCalled()
+})
+
+test('if that sign-in fails, the login form asks for it, as before', async () => {
+  ;(signIn as jest.Mock).mockRejectedValue(new Error('offline'))
+  const { setIsLogin, setIsRegister } = renderForm()
+  fill()
+  submit()
+
+  await waitFor(() => expect(setIsLogin).toHaveBeenCalledWith(true))
+  expect(setIsRegister).toHaveBeenCalledWith(true)
 })

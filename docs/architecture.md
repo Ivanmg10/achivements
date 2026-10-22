@@ -20,7 +20,7 @@ page (src/app/(main)/…)            client component
 - **Auth gate**: `src/proxy.ts` (Next 16's middleware) sends anyone without a
   session to `/authPage`, except the public paths listed in it and anything
   under `/compare/` and `/track/` (the public pages). API routes check for
-  themselves.
+  themselves. `/welcome` is signed-in only, like the rest.
 - **Session**: NextAuth JWT, rebuilt from the `users` row on every read
   (`src/lib/authOptions.ts` + `src/lib/userRecord.ts`). Server code that needs
   the RA key uses `getServerSession(authOptions)`; the browser never sees it.
@@ -134,6 +134,18 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   `PresenceLabel` draw it.
 - **Themes**: `THEMES` in `src/types/types.ts`, CSS variables in
   `src/app/globals.css`, applied before paint by a script in `src/app/layout.tsx`.
+- **Language**: `LanguageContext` shows the saved choice (`app-language`), else the
+  first of `navigator.languages` the app has (`pickLanguage`, `src/utils/languages.ts`),
+  else English. Server and hydration render English; the detected one is never saved.
+- **Welcome** (`/welcome`, `src/app/welcome/`, outside `(main)` so it has no app
+  header): `WelcomePage` and its steps in `src/components/welcome-page/`, the step
+  state in `useWelcomeSteps` (this tab's sessionStorage, `welcome-progress`, so Steam's
+  sign-in round trip lands back on its step). Linking reuses `useRaLink`, `useSteamLink`
+  (`next=/welcome` is an allowed return) and `usePsnLink`; the profile and preferences
+  reuse the account page's fields. Its motion is a CSS module (`WelcomePage.module.css`)
+  and its titles use the `font-display` face (Barlow Condensed, `display` in
+  `src/lib/fonts.ts`), loaded only there. Sign-up (`RegisterUserForm`, a new Steam
+  account in `useSteamSignup`) signs in and goes there.
 
 ## Tooling
 

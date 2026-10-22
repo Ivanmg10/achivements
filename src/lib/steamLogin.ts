@@ -108,7 +108,7 @@ export function ticketFromCookieHeader(header: string | null | undefined): strin
 }
 
 /** Where a link started from may be sent back to; anything else goes to the account page. */
-const LINK_RETURNS = ['/', '/user']
+const LINK_RETURNS = ['/', '/user', '/welcome']
 export function linkReturn(path: string | null | undefined): string {
   return path && LINK_RETURNS.includes(path) ? path : '/user'
 }

@@ -29,6 +29,30 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome after sign-up, first integration, and the browser's language (`feat/welcome-onboarding`)
+
+**Did** — `/welcome` built from design v4: seven steps (intro, RA with the key guide, Steam,
+PSN, profile, preferences, done) under the app-styled top bar, the Inazuma-style curtain
+between them, back on every step, skip everywhere. Sign-up now signs in and goes there (form
+and new Steam accounts). The language is taken from the browser (`navigator.languages`) until
+the person picks one. `useRaLink` and `useThemeChoice` pulled out of their modals so the
+welcome reuses them. Texts in all nine languages; tests for every new hook and component.
+Also fixed two visual bugs the user found in the prototype (a long description overflowing
+its preview, theme names wrapping).
+**Why** — The user wants new accounts to link platforms right away instead of meeting the
+login form again and then an empty `ConnectAccounts`.
+**Decisions** — No app header in the welcome (its own bar only), by the user's choice: the
+route is `src/app/welcome/`, outside `(main)`. Step kept in sessionStorage, not the URL hash,
+because Steam's callback answers with its own `#steam-…`. Detected language never saved; no
+server-side `Accept-Language` (would make the root layout dynamic). Theme picks in the
+welcome do not toast (the change is visible; a failure is said in place).
+**Open** — Browser back between steps; the first paint in the detected language. Not
+checked in a browser with a real account yet (needs signing up on pre).
+**Watch out** — `LanguageContext` no longer defaults to English for everyone: tests that
+expect English get it because jsdom's `navigator.languages` is `en-US`.
+
+---
+
 ## 2026-10-22 — Welcome v4: top bar in our style, RA guide page, browser language (`feat/welcome-onboarding`)
 
 **Did** — No code. v4 on the canvas (desktop, mobile, a notes board) and the plan updated:
