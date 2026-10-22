@@ -29,6 +29,22 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome after sign-up: design exploration (`feat/welcome-onboarding`)
+
+**Did** — No code. A design canvas with clickable prototypes (four concepts, a recommended
+mix, the RA step, mobile and a motion spec) and `docs/welcome-plan.md`: the reference
+analysed frame by frame, and how the welcome would be built.
+**Why** — The user wants a welcome after sign-up that explains the site and walks through
+linking each platform with animations, instead of sending people back to the login form and
+then to `ConnectAccounts`; the reference is Inazuma Eleven: Victory Road's day change.
+**Decisions** — Prototypes in a design canvas, not Figma: the Figma connector was not
+authorised in this session. Recommended concept E (A's curtain between steps + B's unlock on
+link). No Xbox in the welcome (admin-only). Branch cut from `feat/steam-sign-in` (PR #46, not
+merged), as the user asked; nothing pushed.
+**Open** — The user picks a concept; then build it as the plan says.
+
+---
+
 ## 2026-10-22 — Steam: batched library counts, the whole year's streak, "now playing" (`feat/steam-sign-in`)
 
 **Did** — (1) `fetchBatchCounts` (`GetTopAchievementsForGames`, 100 games a call) counts a
