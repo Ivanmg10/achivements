@@ -29,6 +29,19 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome v3: E as it was, with the side rail (`feat/welcome-onboarding`)
+
+**Did** — No code. v3 on the canvas (desktop and mobile prototypes) and the plan updated: it is
+now the design to build.
+**Why** — The user clarified that they liked E's look and animation as they were and only
+wanted its top step bar replaced; v2 had restyled everything.
+**Decisions** — Keep E entire (full-screen curtain, Barlow italic, giant word, preview cards);
+take from v2 only the side rail, back on every step, the profile and preferences steps, and no
+achievements.
+**Open** — The header question and RA inline vs modal (see the plan).
+
+---
+
 ## 2026-10-22 — Welcome v2: back, profile and preferences, the app's own step bar (`feat/welcome-onboarding`)
 
 **Did** — No code. v2 of the welcome on the design canvas (style audit and three step-bar

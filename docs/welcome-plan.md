@@ -1,8 +1,8 @@
 # Welcome after sign-up — plan (not started)
 
 Written 2026-10-22 on `feat/welcome-onboarding` (cut from `feat/steam-sign-in`, PR #46,
-not merged yet). Design only; no code yet. **The design to build is v2** (below); v1 is kept
-on the canvas for history.
+not merged yet). Design only; no code yet. **The design to build is v3** (below): concept E
+as it was, with the side rail of v2 as its step bar. v1 and v2 stay on the canvas for history.
 
 ## Goal
 
@@ -30,7 +30,22 @@ https://claude.ai/artifact/88tv7qpD6mktno2KYzkGob
   the prototype (Tweaks: registered with Steam, reduced motion, start step), mobile, and the
   motion spec (updated).
 
-## v2 — what changed from E, and why
+## v3 — the one to build (decided 2026-10-22)
+
+The user liked E's concept, look and animation as they were; their only objection to it was the
+top step bar. v2 restyled everything to the app's look, which went too far. v3 is **E unchanged**
+(full-screen curtain with the chevron band and the platform skies, Barlow Condensed italic
+headings, the giant tone-on-tone word drifting behind, "Así se verá" cards on the right) with
+**v2's side rail in place of the top timeline**, plus v2's other changes: back on every step
+(the curtain mirrors), the profile and preferences steps (each with a live preview on the
+right: "Así te verán", "Qué ven los demás"), and no achievements. On mobile the rail folds into
+"Paso n de 7" + a bottom sheet.
+
+The rail is the only part drawn in the app's own language (a `rounded-3xl` card, rows with an
+icon chip and the state written out, a thin accent bar), because it is the part that sits next
+to the rest of the app the longest. Everything else keeps E's game-like voice.
+
+## v2 — what changed from E, and why (the rail and points 1, 2, 4 still hold)
 
 1. **Back on every step.** "Atrás" in the footer of every step but the first; the rail jumps
    to any step already seen; each step is a URL hash, so the browser's back works too. Going
@@ -52,8 +67,8 @@ https://claude.ai/artifact/88tv7qpD6mktno2KYzkGob
    were drawn (underlined tabs, pills in a floating bar, a side rail); the **rail** won: seven
    steps fit with their state in words ("Conectado", "Para luego"), any seen step is one click
    away, and it is the account page's pattern. On mobile it folds into "Paso 3 de 7" + a thin
-   bar, and opens as a bottom sheet. What stays from Inazuma is the curtain, now inside the
-   content card, with Inter 800 as its texture.
+   bar, and opens as a bottom sheet. (v2 also moved the curtain inside the content card and
+   used Inter for it; v3 undoes that.)
 4. **No achievements.** Linking says so with the usual green toast (`notify.success`); an error
    stays inline in the step. See "Later: CheevoVault's own achievements".
 
