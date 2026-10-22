@@ -29,7 +29,7 @@ export default function WelcomePageIntro({ onNext, direction, focusTitle }: { on
             <li
               key={perk.title}
               className={`${styles.card} flex items-center gap-3.5 p-3.5 rounded-2xl bg-bg-card ring-1 ring-ink/[0.06]`}
-              style={{ animationDelay: `${220 + i * 70}ms` }}
+              style={{ animationDelay: `calc(var(--enter-delay, 0s) + ${220 + i * 70}ms)` }}
             >
               <span aria-hidden="true" className="w-10 h-10 shrink-0 rounded-xl bg-accent/15 text-accent flex items-center justify-center font-display italic font-extrabold text-lg">
                 {i + 1}

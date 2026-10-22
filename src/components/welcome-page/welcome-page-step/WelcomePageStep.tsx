@@ -1,11 +1,17 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 import { IconChevronLeft } from '@tabler/icons-react'
-import type { WelcomeDirection } from '@/hooks/useWelcomeSteps'
+import { CURTAIN_MS, CURTAIN_SWAP_MS, type WelcomeDirection } from '@/hooks/useWelcomeSteps'
 import { useLanguage } from '@/context/LanguageContext'
 import { QUIET_BUTTON } from '@/components/welcome-page/welcomeArt'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
 
 const ENTER: Record<WelcomeDirection, string | undefined> = { forward: undefined, back: styles.back, none: styles.calm }
+
+/**
+ * A step reached under the curtain mounts halfway through it (all covered) and
+ * comes in as the curtain starts to leave, at 74 % of it: seen arriving.
+ */
+const AFTER_CURTAIN = `${Math.round(CURTAIN_MS * 0.74 - CURTAIN_SWAP_MS)}ms`
 
 /**
  * One step of the welcome: "Back" by its label, the big italic title, what it
@@ -48,6 +54,7 @@ export default function WelcomePageStep({
 
   return (
     <div
+      style={direction === 'none' ? undefined : ({ '--enter-delay': AFTER_CURTAIN } as CSSProperties)}
       className={`${ENTER[direction] ?? ''} grid gap-10 lg:gap-12 items-center ${wideAside ? 'lg:grid-cols-[minmax(0,1fr)_480px]' : 'lg:grid-cols-[minmax(0,1fr)_380px]'}`}
     >
       <div className="flex flex-col gap-4 min-w-0">

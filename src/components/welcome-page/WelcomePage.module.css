@@ -12,8 +12,11 @@
 .card {
   animation: in-forward 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
-.in2 { animation-delay: 0.12s; }
-.in3 { animation-delay: 0.24s; }
+/* Reached under the curtain, it waits for the curtain to start leaving (`--enter-delay`),
+   so the step is seen arriving rather than found already there. */
+.in, .card { animation-delay: var(--enter-delay, 0s); }
+.in2 { animation-delay: calc(var(--enter-delay, 0s) + 0.12s); }
+.in3 { animation-delay: calc(var(--enter-delay, 0s) + 0.24s); }
 .back .in,
 .back .in2,
 .back .in3 {

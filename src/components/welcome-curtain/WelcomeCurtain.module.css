@@ -2,8 +2,13 @@
  * The curtain between the welcome's steps (after Inazuma Eleven: Victory Road's
  * change of day, see docs/welcome-plan.md): a chevron-edged panel crossing the
  * screen, with a band inside that travels from where the person was to where
- * they go, its sky fading between the two. 2.2 s (`CURTAIN_MS`): in in the first
- * 18 %, out in the last 18 %, all covered in between.
+ * they go, its sky fading between the two.
+ *
+ * 2.2 s (`CURTAIN_MS`). It glides in over the first 26 %, easing out so it lands
+ * softly, rests, and glides out over the last 26 %, easing in so it leaves softly;
+ * it covers everything from 26 % to 74 %, and the step changes at 50 %. Each
+ * stretch carries its own easing in the keyframes (the animation itself is linear).
+ * The user found the first version, 18 % in and out with a sharp curve, too abrupt.
  *
  * `--curtain-offset` (negative) starts it part way through: the welcome picks the
  * curtain up where the sign-up page left it. `.held` freezes it while covered.
@@ -19,15 +24,29 @@
 
 .panel {
   background: color-mix(in oklab, rgb(var(--accent)) 30%, #07060f);
-  animation: panel-forward var(--curtain) cubic-bezier(0.7, 0, 0.3, 1) var(--curtain-offset) both;
+  animation: panel-forward var(--curtain) linear var(--curtain-offset) both;
   clip-path: polygon(70px 50%, 0 0, calc(100% - 70px) 0, 100% 50%, calc(100% - 70px) 100%, 0 100%);
 }
 .panelBack {
   animation-name: panel-back;
   clip-path: polygon(0 50%, 70px 0, 100% 0, calc(100% - 70px) 50%, 100% 100%, 70px 100%);
 }
-@keyframes panel-forward { 0% { transform: translateX(-104%); } 18%, 82% { transform: translateX(0); } 100% { transform: translateX(104%); } }
-@keyframes panel-back { 0% { transform: translateX(104%); } 18%, 82% { transform: translateX(0); } 100% { transform: translateX(-104%); } }
+@keyframes panel-forward {
+  0% { transform: translateX(-104%); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+  26% { transform: translateX(0); animation-timing-function: linear; }
+  74% { transform: translateX(0); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+  100% { transform: translateX(104%); }
+}
+@keyframes panel-back {
+  0% { transform: translateX(104%); animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+  26% { transform: translateX(0); animation-timing-function: linear; }
+  74% { transform: translateX(0); animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0); }
+  100% { transform: translateX(-104%); }
+}
+
+/* What rides on the panel fades in as it arrives and out as it goes, so nothing pops. */
+.content { animation: content var(--curtain) linear var(--curtain-offset) both; }
+@keyframes content { 0%, 8% { opacity: 0; } 24%, 78% { opacity: 1; } 94%, 100% { opacity: 0; } }
 
 .word {
   color: color-mix(in oklab, rgb(var(--accent)) 40%, #07060f);
@@ -40,16 +59,19 @@
 .band {
   left: 0;
   clip-path: polygon(0 0, calc(100% - 70px) 0, 100% 50%, calc(100% - 70px) 100%, 0 100%);
-  animation: band var(--curtain) cubic-bezier(0.4, 0, 0.2, 1) var(--curtain-offset) both;
+  animation: band var(--curtain) linear var(--curtain-offset) both;
 }
 .panelBack .band {
   left: auto;
   right: 0;
   clip-path: polygon(70px 0, 100% 0, 100% 100%, 70px 100%, 0 50%);
 }
-.echo1 { --extra: 75px; animation-delay: calc(var(--curtain-offset) + 50ms); background: color-mix(in oklab, rgb(var(--accent)) 26%, transparent); }
-.echo2 { --extra: 150px; animation-delay: calc(var(--curtain-offset) + 100ms); background: color-mix(in oklab, rgb(var(--accent)) 16%, transparent); }
-@keyframes band { 0%, 26% { width: calc(34% + var(--extra, 0px)); } 56%, 100% { width: calc(68% + var(--extra, 0px)); } }
+.echo1 { --extra: 75px; animation-delay: calc(var(--curtain-offset) + 60ms); background: color-mix(in oklab, rgb(var(--accent)) 26%, transparent); }
+.echo2 { --extra: 150px; animation-delay: calc(var(--curtain-offset) + 120ms); background: color-mix(in oklab, rgb(var(--accent)) 16%, transparent); }
+@keyframes band {
+  0%, 30% { width: calc(34% + var(--extra, 0px)); animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1); }
+  62%, 100% { width: calc(68% + var(--extra, 0px)); }
+}
 
 .toSky { animation: to-sky var(--curtain) linear var(--curtain-offset) both; }
-@keyframes to-sky { 0%, 28% { opacity: 0; } 54%, 100% { opacity: 1; } }
+@keyframes to-sky { 0%, 32% { opacity: 0; } 60%, 100% { opacity: 1; } }

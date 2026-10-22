@@ -86,9 +86,11 @@ export default function WelcomeCurtain({
           <div className="absolute inset-0" style={{ background: from.sky }} />
           <div className={`${styles.toSky} absolute inset-0`} style={{ background: to.sky }} />
         </div>
-        <div className="absolute left-[70px] right-[70px] top-[52%] h-0.5 bg-white/60" />
-        <Node node={from} at={forward ? '32%' : '66%'} reached={false} />
-        <Node node={to} at={forward ? '66%' : '32%'} reached />
+        <div className={`${styles.content} absolute inset-0`}>
+          <div className="absolute left-[70px] right-[70px] top-[52%] h-0.5 bg-white/60" />
+          <Node node={from} at={forward ? '32%' : '66%'} reached={false} />
+          <Node node={to} at={forward ? '66%' : '32%'} reached />
+        </div>
       </div>
     </div>,
     document.body,

@@ -29,6 +29,18 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome curtain, smoother (`feat/welcome-onboarding`)
+
+**Did** — The curtain glides in over 26 % of its 2.2 s easing out and leaves over the last 26 %
+easing in (was 18 % each, one sharp curve); what rides on it (nodes, line) fades in and out with
+it; the band travels with an ease-in-out; the new step's content waits for the curtain to start
+leaving (`--enter-delay`, set by `WelcomePageStep`) instead of finishing hidden under it.
+**Why** — The user found the animation abrupt ("de golpe").
+**Decisions** — Same total length (2.2 s) and same swap point (50 %), so the sign-up hand-off
+and the hook's timers did not change; only the curves inside.
+
+---
+
 ## 2026-10-22 — Welcome curtain on <body>, not inside the sign-up card (`feat/welcome-onboarding`)
 
 **Did** — `WelcomeCurtain` renders through a portal into `<body>`; `underBar` keeps the

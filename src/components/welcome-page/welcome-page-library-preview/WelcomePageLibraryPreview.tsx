@@ -23,7 +23,7 @@ export default function WelcomePageLibraryPreview({ art }: { art: string }) {
           <div
             key={i}
             className={`${styles.card} flex items-center gap-3.5 p-3 rounded-2xl bg-bg-card ring-1 ring-ink/[0.06]`}
-            style={{ animationDelay: `${260 + i * 90}ms` }}
+            style={{ animationDelay: `calc(var(--enter-delay, 0s) + ${260 + i * 90}ms)` }}
           >
             <span className="w-14 h-14 shrink-0 rounded-xl" style={{ background: art }} />
             <span className="flex-1 flex flex-col gap-2">
