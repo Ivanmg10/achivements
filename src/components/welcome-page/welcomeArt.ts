@@ -34,6 +34,6 @@ export const QUIET_BUTTON =
   'inline-flex items-center gap-1 min-h-10 px-2 rounded-xl text-sm font-medium text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
 export const INPUT_CLASS =
-  'w-full h-12 px-3.5 rounded-xl bg-bg-card ring-1 ring-inset ring-ink/10 text-text-main text-[15px] outline-none focus-visible:ring-2 focus-visible:ring-accent'
+  'w-full h-12 px-3.5 rounded-xl bg-bg-card ring-1 ring-inset ring-ink/10 text-text-main text-[0.9375rem] outline-none focus-visible:ring-2 focus-visible:ring-accent'
 
 export const SECTION_LABEL = 'text-xs font-bold uppercase tracking-[0.12em] text-text-secondary'

@@ -29,6 +29,21 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome intro: points open over the whole step, with sketches (`feat/welcome-onboarding`)
+
+**Did** — A point's card now grows (Framer `layoutId`) into a panel over the whole step
+(`WelcomePageIntroDetail`): number and title, the full explanation, three highlights, a drawn
+sketch (`WelcomePageIntroArt`: library, pins/groups/showcase, streak map, level and ranking,
+friends online), arrows through the points, back/Escape (the card takes the focus again), and
+Start. Texts in nine languages. Big-screen scaling changed from CSS `zoom` to the root font size.
+**Why** — The user wanted an opened card to take the whole component, to explain better with
+images. `zoom` would have thrown the card-to-panel animation off.
+**Decisions** — Drawn sketches in the theme's colours, not screenshots (none in the repo; they
+would go stale and show someone's data); any can be swapped for an image later. Text sizes in
+the welcome are rem so the scaling reaches them.
+
+---
+
 ## 2026-10-22 — Welcome intro: thanks, and points that open (`feat/welcome-onboarding`)
 
 **Did** — The intro's text now starts by thanking the person for choosing CheevoVault; each of

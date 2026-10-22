@@ -126,8 +126,10 @@ reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there)
   (`CURTAIN_MS`; 1.1 s felt rushed to the user) and also carries a new account in from
   sign-up: the sign-up page plays it until covered and holds, the welcome finishes it
   (`useWelcomeEntry` / `useWelcomeArrival`, flag `welcome-entry` in sessionStorage).
-- On big screens the welcome is scaled as a whole with CSS `zoom` (2xl and ≥2200 px), not
-  with separate text sizes: a 2560 px screen showed it tiny.
+- On big screens the welcome is scaled as a whole by raising the root font size while it is
+  open (120 % from 1536 px, 140 % from 2200 px; a 2560 px screen showed it tiny). So **sizes in
+  it are in rem** (`text-[0.8125rem]`, not `text-[13px]`). **Never CSS `zoom`**: it throws Framer
+  Motion's layout animations off (the intro's cards grow into their detail with `layoutId`).
 - The avatar is edited in `AvatarModal` (account page and welcome), not `EditProfileModal`,
   which is only for the username and email now.
 
@@ -149,7 +151,8 @@ turns false). A new platform touches:
 The same goes for the rest of the site: **when a change adds or renames a feature, a profile
 field or a preference, check whether the welcome shows it** (intro perks, the profile and
 preferences steps, the done summary) and update it in the same change. The intro's five
-points open to describe the features in detail (`T.welcome.intro.perks[].detail`): keep them true.
+points open over the whole step (`WelcomePageIntroDetail`: `detail`, `highlights` and a drawn
+sketch per point in `WelcomePageIntroArt`): keep their text and sketches true to the features.
 
 ## Language — the browser's until the person picks one (2026-10-22)
 

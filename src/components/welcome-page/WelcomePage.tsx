@@ -18,6 +18,8 @@ import WelcomePagePreferences from '@/components/welcome-page/welcome-page-prefe
 import WelcomePageDone from '@/components/welcome-page/welcome-page-done/WelcomePageDone'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
 
+const SCALE_ON_BIG_SCREENS = '@media (min-width: 1536px) { html { font-size: 120%; } } @media (min-width: 2200px) { html { font-size: 140%; } }'
+
 /**
  * Where a new account lands after signing up: what CheevoVault does, then
  * RetroAchievements, Steam and PlayStation one at a time, the profile and the
@@ -70,9 +72,11 @@ export default function WelcomePage() {
         onSkipAll={steps.skipAll}
       />
 
-      {/* Scaled as a whole on big screens (a 2560 px one showed it tiny): `zoom` keeps every
-          proportion of the design, which separate text sizes would not. */}
-      <main className="relative flex-1 w-full max-w-6xl mx-auto px-4 sm:px-8 pt-28 lg:pt-32 pb-16 flex flex-col justify-center 2xl:[zoom:1.2] min-[2200px]:[zoom:1.4]">
+      {/* Bigger on big screens (a 2560 px one showed it tiny): the root font size grows while
+          the welcome is open, so everything in rem keeps its proportions. Not CSS `zoom`: it
+          throws Framer Motion's layout animations off (their offsets get zoomed again). */}
+      <style>{SCALE_ON_BIG_SCREENS}</style>
+      <main className="relative flex-1 w-full max-w-6xl mx-auto px-4 sm:px-8 pt-28 lg:pt-32 pb-16 flex flex-col justify-center">
         {steps.ready && (
           <div key={steps.step}>
             {steps.step === 'intro' && <WelcomePageIntro onNext={steps.next} direction={steps.direction} focusTitle={focusTitle} />}

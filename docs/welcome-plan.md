@@ -211,8 +211,9 @@ Left for later:
 ### After the first try (2026-10-22)
 
 The user tried it on a 2560 px screen and asked for four things; all done:
-1. **Too small on big screens** → the content and the bar are scaled with CSS `zoom` at
-   `2xl` (1.2 / 1.15) and from 2200 px (1.4 / 1.3), so every proportion of the design holds.
+1. **Too small on big screens** → the root font size grows while the welcome is open (120 %
+   from 1536 px, 140 % from 2200 px) and its sizes are in rem. (First done with CSS `zoom`,
+   dropped: it breaks Framer's layout animations.)
 2. **The change was too quick** → the curtain lasts 2.2 s (was 1.1 s); the step changes at
    1.1 s, when it is all covered.
 3. **A way in from sign-up** → the same curtain, "Account" → "Welcome": the sign-up page

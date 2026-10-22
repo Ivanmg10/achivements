@@ -32,7 +32,7 @@ export default function WelcomePageRaGuide() {
       </div>
       <ol className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         {t.guide.map((line, i) => (
-          <li key={line} className={`${STEP_CLASS[i]} flex sm:flex-col gap-2 sm:gap-0.5 p-2.5 rounded-xl bg-bg-main text-[13px] leading-snug`}>
+          <li key={line} className={`${STEP_CLASS[i]} flex sm:flex-col gap-2 sm:gap-0.5 p-2.5 rounded-xl bg-bg-main text-[0.8125rem] leading-snug`}>
             <span aria-hidden="true" className="font-display italic font-extrabold text-xl leading-none text-[#e5b53f]">{i + 1}</span>
             {line}
           </li>
@@ -43,7 +43,7 @@ export default function WelcomePageRaGuide() {
         <div className="h-10 flex items-center gap-2 px-3 bg-[#1d1e27] border-b border-[#2a2c3a]">
           <span className="w-2.5 h-2.5 rounded-full bg-[#3a3d4c]" />
           <span className="w-2.5 h-2.5 rounded-full bg-[#3a3d4c]" />
-          <span className="flex-1 ml-2 h-5.5 rounded-md bg-[#0f1014] text-[11px] text-[#8c919b] flex items-center px-2.5">retroachievements.org</span>
+          <span className="flex-1 ml-2 h-5.5 rounded-md bg-[#0f1014] text-[0.6875rem] text-[#8c919b] flex items-center px-2.5">retroachievements.org</span>
           <span className={`${styles.settings} px-2.5 py-1 rounded-md text-xs`}>Settings</span>
         </div>
         <div className={`${styles.page} absolute inset-x-0 top-10 bottom-0 flex`}>

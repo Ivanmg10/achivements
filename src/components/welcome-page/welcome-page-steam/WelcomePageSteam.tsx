@@ -45,7 +45,7 @@ export default function WelcomePageSteam({
             </span>
             <span className="flex flex-col gap-0.5 min-w-0">
               <span className="font-bold truncate">{steamUsername}</span>
-              <span className="text-[13px] text-text-secondary">{T.welcome.done.linked}</span>
+              <span className="text-[0.8125rem] text-text-secondary">{T.welcome.done.linked}</span>
             </span>
           </div>
         ) : (

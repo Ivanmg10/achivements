@@ -68,7 +68,7 @@ export default function WelcomePageStep({
               <span aria-hidden="true" className="w-px h-4 bg-ink/15" />
             </>
           )}
-          <span className="text-xs sm:text-[13px] font-bold uppercase tracking-[0.12em] text-accent">{kicker}</span>
+          <span className="text-xs sm:text-[0.8125rem] font-bold uppercase tracking-[0.12em] text-accent">{kicker}</span>
         </div>
         <h1
           ref={titleRef}

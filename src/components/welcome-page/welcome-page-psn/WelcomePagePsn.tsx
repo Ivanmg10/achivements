@@ -84,7 +84,7 @@ export default function WelcomePagePsn({
               {T.psn.errors[error]}
             </p>
           )}
-          <p id={`${INPUT_ID}-help`} className="text-[13px] text-text-secondary">{T.welcome.psn.help}</p>
+          <p id={`${INPUT_ID}-help`} className="text-[0.8125rem] text-text-secondary">{T.welcome.psn.help}</p>
         </form>
       )}
     </WelcomePageStep>

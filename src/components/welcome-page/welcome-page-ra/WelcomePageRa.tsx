@@ -104,7 +104,7 @@ export default function WelcomePageRa({
                 {error}
               </p>
             )}
-            <p id="welcome-ra-note" className="text-[13px] leading-snug text-text-secondary">{t.keyNote}</p>
+            <p id="welcome-ra-note" className="text-[0.8125rem] leading-snug text-text-secondary">{t.keyNote}</p>
           </div>
         </form>
       )}

@@ -46,9 +46,9 @@ export default function WelcomePageStepsBar({
 
   return (
     <header className="fixed top-2 inset-x-2 sm:top-3 sm:inset-x-4 z-30">
-      <div className="relative overflow-hidden rounded-2xl bg-bg-card/80 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-ink/[0.07] shadow-lg shadow-black/20 2xl:[zoom:1.15] min-[2200px]:[zoom:1.3]">
+      <div className="relative overflow-hidden rounded-2xl bg-bg-card/80 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-ink/[0.07] shadow-lg shadow-black/20">
         <div className="hidden lg:flex items-center gap-3 h-15 pl-5 pr-2.5">
-          <span className="font-extrabold text-[17px] tracking-tight shrink-0">
+          <span className="font-extrabold text-[1.0625rem] tracking-tight shrink-0">
             Cheevo<span className="text-accent">Vault</span>
           </span>
           <nav aria-label={T.welcome.stepsLabel} className="flex-1 flex justify-center min-w-0">
@@ -66,7 +66,7 @@ export default function WelcomePageStepsBar({
                         disabled={i > seen}
                         aria-current={state === 'current' ? 'step' : undefined}
                         aria-label={`${name}, ${T.welcome.state[state]}`}
-                        className={`inline-flex items-center gap-1.5 min-h-9 px-3 rounded-full text-[13px] whitespace-nowrap transition-colors disabled:opacity-45 disabled:cursor-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+                        className={`inline-flex items-center gap-1.5 min-h-9 px-3 rounded-full text-[0.8125rem] whitespace-nowrap transition-colors disabled:opacity-45 disabled:cursor-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
                           state === 'current'
                             ? 'text-accent font-semibold bg-accent/10 ring-1 ring-inset ring-ink/15'
                             : state === 'done' || state === 'linked'
@@ -85,7 +85,7 @@ export default function WelcomePageStepsBar({
               })}
             </ol>
           </nav>
-          <span className="text-[13px] text-text-secondary shrink-0 tabular-nums">{count(T.welcome.shortCount)}</span>
+          <span className="text-[0.8125rem] text-text-secondary shrink-0 tabular-nums">{count(T.welcome.shortCount)}</span>
           <button type="button" onClick={onSkipAll} className={QUIET_BUTTON}>
             {T.welcome.skipAll}
           </button>
@@ -104,7 +104,7 @@ export default function WelcomePageStepsBar({
             </button>
             <span className="flex-1 min-w-0 flex flex-col">
               <span className="text-xs text-text-secondary">{count(T.welcome.stepCount)}</span>
-              <span className="text-[15px] font-bold truncate">{T.welcome.steps[WELCOME_STEPS[index]]}</span>
+              <span className="text-[0.9375rem] font-bold truncate">{T.welcome.steps[WELCOME_STEPS[index]]}</span>
             </span>
             <button type="button" onClick={onSkipAll} className={QUIET_BUTTON}>
               {T.welcome.skipAll}

@@ -30,7 +30,7 @@ export default function WelcomePageLibraryPreview({ art }: { art: string }) {
               <span className="h-2.5 rounded-full bg-ink/15" style={{ width: row.name }} />
               <ProgressBar pct={row.progress} label={T.welcome.library.note} />
             </span>
-            <span className={`w-10 text-right text-[13px] font-semibold ${row.progress === 100 ? 'text-success' : 'text-text-secondary'}`}>{row.progress}%</span>
+            <span className={`w-10 text-right text-[0.8125rem] font-semibold ${row.progress === 100 ? 'text-success' : 'text-text-secondary'}`}>{row.progress}%</span>
           </div>
         ))}
       </div>

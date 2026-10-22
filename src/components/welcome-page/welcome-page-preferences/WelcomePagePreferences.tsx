@@ -116,7 +116,7 @@ export default function WelcomePagePreferences({
               <option key={l.id} value={l.id}>{l.label}</option>
             ))}
           </select>
-          <span id="welcome-language-hint" className="text-[13px] text-text-secondary">{fromBrowser ? t.detected : t.chosen}</span>
+          <span id="welcome-language-hint" className="text-[0.8125rem] text-text-secondary">{fromBrowser ? t.detected : t.chosen}</span>
         </div>
 
         <div className="flex flex-col gap-2">

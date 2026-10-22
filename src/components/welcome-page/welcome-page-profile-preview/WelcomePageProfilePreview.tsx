@@ -34,7 +34,7 @@ export default function WelcomePageProfilePreview() {
             </span>
           )}
           <span className="text-xl font-extrabold tracking-tight truncate">{user?.name}</span>
-          <span className="text-[13px] text-text-secondary">{meta}</span>
+          <span className="text-[0.8125rem] text-text-secondary">{meta}</span>
           <p className={`text-sm leading-relaxed [overflow-wrap:anywhere] line-clamp-4 ${user?.description ? 'text-text-main' : 'text-text-secondary italic'}`}>
             {user?.description || T.welcome.profile.noDescription}
           </p>
