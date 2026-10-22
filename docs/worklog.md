@@ -29,6 +29,22 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome v4: top bar in our style, RA guide page, browser language (`feat/welcome-onboarding`)
+
+**Did** — No code. v4 on the canvas (desktop, mobile, a notes board) and the plan updated:
+v4 is the design to build.
+**Why** — The user found flaws in v3, still did not like the side rail (wants a top bar as in
+E, styled like the app), wants RA's step to be a page explaining how to get the key, and wants
+the language taken from the browser when possible.
+**Decisions** — The bar is `MainHeader`'s floating bar with the steps as its nav pills and a
+2 px progress line. RA: the form beside an animated three-step guide, not the modal. Language:
+saved choice, else `navigator.languages`, else English; detection never saved as a choice;
+`Accept-Language` on the server for the first render. Found: today the app starts in English
+for everyone until they pick (`LanguageContext`).
+**Open** — The header question; whether language detection ships first on its own.
+
+---
+
 ## 2026-10-22 — Welcome v3: E as it was, with the side rail (`feat/welcome-onboarding`)
 
 **Did** — No code. v3 on the canvas (desktop and mobile prototypes) and the plan updated: it is

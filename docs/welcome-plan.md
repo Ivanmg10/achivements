@@ -1,8 +1,9 @@
 # Welcome after sign-up — plan (not started)
 
 Written 2026-10-22 on `feat/welcome-onboarding` (cut from `feat/steam-sign-in`, PR #46,
-not merged yet). Design only; no code yet. **The design to build is v3** (below): concept E
-as it was, with the side rail of v2 as its step bar. v1 and v2 stay on the canvas for history.
+not merged yet). Design only; no code yet. **The design to build is v4** (below): concept E
+with a top step bar in the app's own header style, RA's step as its key guide, and the
+language detected from the browser. v1–v3 stay on the canvas for history.
 
 ## Goal
 
@@ -30,7 +31,36 @@ https://claude.ai/artifact/88tv7qpD6mktno2KYzkGob
   the prototype (Tweaks: registered with Steam, reduced motion, start step), mobile, and the
   motion spec (updated).
 
-## v3 — the one to build (decided 2026-10-22)
+## v4 — the one to build (decided 2026-10-22)
+
+The user kept E and its animation but did not like the side rail of v3 either: they want the
+step bar **on top, as in E, but styled like CheevoVault**. And two more things.
+
+- **Top bar = the app's floating header** (`MainHeader`'s look: `rounded-2xl`, card background
+  with blur, 1 px ring). The seven steps are its nav pills; the current one ringed and in the
+  accent (as "Rankings" is on the rankings page), with `aria-current="step"`. Done: a check (a
+  linked platform shows its mark); skipped: a hollow dot; not reached: dimmed and disabled.
+  Small chevrons between pills; a 2 px accent progress line along its bottom edge; "n de 7"
+  and "Saltar todo" on the right. The bar stays above the curtain, so the step visibly changes
+  while it passes. On mobile: back icon, "Paso n de 7" + the step's name, "Saltar todo", and
+  seven 4 px segments underneath.
+- **RA's step is its own guide page**: the form on the left, "Cómo sacar tu clave" on the right
+  (three numbered steps that light up in turn, the animated browser of board E-Paso-RA, and
+  "Abrir RetroAchievements" to `retroachievements.org/settings` in a new tab). A refused key
+  is said under the field. Not the modal. On mobile the guide is a three-step list above the form.
+- **Language from the browser** (applies to the whole app, not only the welcome):
+  `LanguageContext` today uses the saved choice or English. New order: the saved choice; else
+  the first of `navigator.languages` whose root we support (`es-MX` → es, `pt-BR` → pt); else
+  English. What is detected is **not saved** as a choice (only a person's pick is). To avoid a
+  frame in English on the first visit, the server can read `Accept-Language` for the first
+  render. The welcome's Preferences step shows it as "Detectado de tu navegador", in a select
+  with each language's own name.
+- **Fixes over v3**: back moved up next to the step label (actions stay alone: connect + not
+  now); the label no longer repeats "Paso n de 7"; one title size; the giant word lower and
+  fainter, not behind the cards; theme names visible; Steam-from-sign-up shows the account, not
+  a sample library; "Listo" has no invented percentages.
+
+## v3 — E with the side rail (replaced by v4)
 
 The user liked E's concept, look and animation as they were; their only objection to it was the
 top step bar. v2 restyled everything to the app's look, which went too far. v3 is **E unchanged**
@@ -105,9 +135,9 @@ step should not make people wait.
   account (`register()`) goes to `/welcome`; an existing one signing in still goes to `/`.
   The Steam step shows as already done for them.
 - **Steps in this order**: welcome, RA, Steam, PSN, profile, preferences, done; back on all
-  but the first; the rail (`welcome-rail/…`) with each step's state written out.
-- **Linking reuses what exists**: RA through `RaLoginModal`'s logic (or the inline form of
-  board E-Paso-RA), Steam through `/api/auth/steam?intent=link&next=/welcome` (add
+  but the first; the top bar (`welcome-steps-bar/…`) with each step's state in its label.
+- **Linking reuses what exists**: RA through `RaLoginModal`'s logic, moved to a hook both
+  use, inside the guide page, Steam through `/api/auth/steam?intent=link&next=/welcome` (add
   `'/welcome'` to `LINK_RETURNS` in `src/lib/steamLogin.ts`), PSN through `UserPsnCard`'s
   logic. No new link endpoints.
 - **No Xbox**: it is admin-only and a new user is not an admin.
@@ -121,7 +151,8 @@ step should not make people wait.
   inside the step stays inline (CLAUDE.md, toasts). No achievement look for now.
 - **Profile and preferences** reuse the account page's pieces (`AvatarUpload`,
   `LocationModal`'s list, `UserDescriptionField`, `UserProfileSwitch`, `ThemeContext`,
-  `LanguageContext`). The theme is kept on the account; the language only in the browser.
+  `LanguageContext`). The theme is kept on the account; the language only in the browser,
+  detected as described in v4 until the person picks one (its own change, with tests).
 - **Colours**: the curtain from the theme accent; platform colours only inside the band and
   the logos, never on a progress bar.
 - **Texts** in `T.welcome`, all languages; components extracted per step; tests for the
@@ -145,5 +176,5 @@ The user likes concept B and wants **internal CheevoVault achievements** in the 
 
 - Whether `/welcome` shows the app header or only the minimal bar of the prototype
   (CheevoVault + "Saltar todo").
-- The RA step: an inline form (v2) or the existing `RaLoginModal`; inline reads better, but
-  its logic must be shared, not copied.
+- Whether the language detection ships on its own first (it helps the landing and sign-up
+  today) or with the welcome.
