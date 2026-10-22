@@ -60,7 +60,6 @@ export default function WelcomePageIntro({ onNext, direction, focusTitle }: { on
                   key={perk.title}
                   number={i + 1}
                   title={perk.title}
-                  text={perk.text}
                   layoutId={layoutId(i)}
                   onOpen={() => setOpen(i)}
                   delayMs={returnTo === null ? 220 + i * 70 : 0}

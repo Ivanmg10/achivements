@@ -4,15 +4,15 @@ import { IconArrowsDiagonal } from '@tabler/icons-react'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
 
 /**
- * One of the intro's numbered points, as a card: its title and one line. The
- * whole card is the button; pressing it grows the card (`layoutId`) into the
+ * One of the intro's numbered points, as a card: its number and title only, so the
+ * list stays short (its line is in the opened point). The whole card is the
+ * button; pressing it grows the card (`layoutId`) into the
  * point opened over the whole step (`WelcomePageIntroDetail`). Coming back,
  * the focus returns to it.
  */
 export default function WelcomePageIntroPerk({
   number,
   title,
-  text,
   layoutId,
   onOpen,
   delayMs,
@@ -20,7 +20,6 @@ export default function WelcomePageIntroPerk({
 }: {
   number: number
   title: string
-  text: string
   layoutId?: string
   onOpen: () => void
   delayMs: number
@@ -43,15 +42,12 @@ export default function WelcomePageIntroPerk({
         ref={buttonRef}
         type="button"
         onClick={onOpen}
-        className="group w-full flex items-center gap-3.5 p-3.5 text-left rounded-2xl hover:bg-ink/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="group w-full flex items-center gap-3 p-2.5 pr-3.5 text-left rounded-2xl hover:bg-ink/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
-        <span aria-hidden="true" className="w-10 h-10 shrink-0 rounded-xl bg-accent/15 text-accent flex items-center justify-center font-display italic font-extrabold text-lg">
+        <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-xl bg-accent/15 text-accent flex items-center justify-center font-display italic font-extrabold text-lg">
           {number}
         </span>
-        <span className="flex-1 flex flex-col gap-0.5 min-w-0">
-          <span className="font-bold text-[0.9375rem]">{title}</span>
-          <span className="text-[0.8125rem] text-text-secondary">{text}</span>
-        </span>
+        <span className="flex-1 min-w-0 font-bold text-[0.9375rem]">{title}</span>
         <IconArrowsDiagonal
           size={16}
           aria-hidden="true"

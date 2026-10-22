@@ -45,6 +45,21 @@ test('the arrows go through the points, and stop at the ends', () => {
   expect(screen.getByRole('button', { name: W.nextPoint })).toBeDisabled()
 })
 
+test('the ✕ closes it, as back and Escape do', () => {
+  renderIntro()
+  fireEvent.click(card(2))
+  fireEvent.click(screen.getByRole('button', { name: en.editProfileModal.close }))
+  expect(screen.getByRole('heading', { level: 1, name: t.title })).toBeInTheDocument()
+  expect(card(2)).toHaveFocus()
+})
+
+test('a card is just its number and title; its line is in the opened point', () => {
+  renderIntro()
+  expect(screen.queryByText(t.perks[0].text)).toBeNull()
+  fireEvent.click(card(0))
+  expect(screen.getByText(t.perks[0].text)).toBeInTheDocument()
+})
+
 test('back, or Escape, shrinks it into its card again, which takes the focus', () => {
   renderIntro()
   fireEvent.click(card(3))

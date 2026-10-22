@@ -29,6 +29,14 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome intro: shorter cards, a close button on the opened point (`feat/welcome-onboarding`)
+
+**Did** — The intro's cards show only their number and title (their line moved to the opened
+point); the opened point has a ✕ in its corner, besides Back and Escape.
+**Why** — The user's ask: cards less tall, and a clear way to close what opens.
+
+---
+
 ## 2026-10-22 — Welcome intro: points open over the whole step, with sketches (`feat/welcome-onboarding`)
 
 **Did** — A point's card now grows (Framer `layoutId`) into a panel over the whole step

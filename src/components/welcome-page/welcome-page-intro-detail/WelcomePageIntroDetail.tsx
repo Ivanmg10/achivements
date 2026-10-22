@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { IconArrowRight, IconCheck, IconChevronLeft, IconChevronRight } from '@tabler/icons-react'
+import { IconArrowRight, IconCheck, IconChevronLeft, IconChevronRight, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import WelcomePageIntroArt from '@/components/welcome-page/welcome-page-intro-art/WelcomePageIntroArt'
 import { PRIMARY_BUTTON, QUIET_BUTTON } from '@/components/welcome-page/welcomeArt'
@@ -13,8 +13,8 @@ const ICON_BUTTON =
 /**
  * One of the intro's points, opened over the whole step: its card grows into
  * this (`layoutId`), with room for the full explanation, its highlights and a
- * sketch of what it looks like. "Back" (or Escape) shrinks it back into its
- * card; the arrows go through the other points; "Start" goes on.
+ * sketch of what it looks like. The ✕, "Back" or Escape shrink it back into
+ * its card; the arrows go through the other points; "Start" goes on.
  */
 export default function WelcomePageIntroDetail({
   index,
@@ -48,8 +48,16 @@ export default function WelcomePageIntroDetail({
         if (e.key === 'Escape') onClose()
       }}
       transition={{ type: 'spring', stiffness: 260, damping: 32 }}
-      className="rounded-3xl bg-bg-card ring-1 ring-accent/30 shadow-2xl shadow-black/30 overflow-hidden"
+      className="relative rounded-3xl bg-bg-card ring-1 ring-accent/30 shadow-2xl shadow-black/30 overflow-hidden"
     >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label={T.editProfileModal.close}
+        className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 w-10 h-10 rounded-xl flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      >
+        <IconX size={20} aria-hidden="true" />
+      </button>
       <motion.div
         key={index}
         initial={{ opacity: 0, y: 12 }}
