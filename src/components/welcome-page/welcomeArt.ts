@@ -1,4 +1,5 @@
-import type { WelcomeStep } from '@/hooks/useWelcomeSteps'
+import { PLATFORM_STEPS, type PlatformStep, type WelcomeStep } from '@/hooks/useWelcomeSteps'
+import type { Translations } from '@/translations/en'
 
 /**
  * Each step's "sky" in the curtain's band, as the time of day is in the game
@@ -14,6 +15,13 @@ export const STEP_SKY: Record<WelcomeStep, string> = {
   profile: 'linear-gradient(135deg, rgb(var(--accent)), color-mix(in oklab, rgb(var(--accent)) 40%, #fff))',
   prefs: 'linear-gradient(135deg, rgb(var(--accent)), #f0abfc)',
   done: 'linear-gradient(135deg, rgb(var(--accent)), #fff)',
+}
+
+/** "Platforms · 2 of 3": counted from PLATFORM_STEPS, so a new platform needs no text change. */
+export function platformKicker(T: Translations, step: PlatformStep): string {
+  return T.welcome.platformsKicker
+    .replace('{n}', String(PLATFORM_STEPS.indexOf(step) + 1))
+    .replace('{total}', String(PLATFORM_STEPS.length))
 }
 
 export const PRIMARY_BUTTON =

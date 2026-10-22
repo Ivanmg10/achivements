@@ -1628,7 +1628,7 @@ export const ru: Translations = {
       later: 'на потом',
       pending: 'не сделано',
     },
-    platformsKicker: 'Платформы · {n} из 3',
+    platformsKicker: 'Платформы · {n} из {total}',
     intro: {
       kicker: 'Аккаунт создан',
       title: 'Добро пожаловать в хранилище',

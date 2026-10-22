@@ -7,7 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
 import WelcomePageRaGuide from '@/components/welcome-page/welcome-page-ra-guide/WelcomePageRaGuide'
-import { INPUT_CLASS, PRIMARY_BUTTON, SECONDARY_BUTTON } from '@/components/welcome-page/welcomeArt'
+import { INPUT_CLASS, PRIMARY_BUTTON, SECONDARY_BUTTON, platformKicker } from '@/components/welcome-page/welcomeArt'
 
 const FORM_ID = 'welcome-ra-form'
 
@@ -46,7 +46,7 @@ export default function WelcomePageRa({
 
   return (
     <WelcomePageStep
-      kicker={T.welcome.platformsKicker.replace('{n}', '1')}
+      kicker={platformKicker(T, 'ra')}
       title={T.welcome.steps.ra}
       body={linkedAs ? t.linkedAs.replace('{name}', linkedAs) : t.body}
       onBack={onBack}

@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
 import WelcomePageLibraryPreview from '@/components/welcome-page/welcome-page-library-preview/WelcomePageLibraryPreview'
-import { INPUT_CLASS, PRIMARY_BUTTON, SECONDARY_BUTTON, STEP_SKY } from '@/components/welcome-page/welcomeArt'
+import { INPUT_CLASS, PRIMARY_BUTTON, SECONDARY_BUTTON, STEP_SKY, platformKicker } from '@/components/welcome-page/welcomeArt'
 
 const FORM_ID = 'welcome-psn-form'
 const INPUT_ID = 'welcome-psn-id'
@@ -38,7 +38,7 @@ export default function WelcomePagePsn({
 
   return (
     <WelcomePageStep
-      kicker={T.welcome.platformsKicker.replace('{n}', '3')}
+      kicker={platformKicker(T, 'psn')}
       title={T.welcome.steps.psn}
       body={isLinked && linkedAs ? T.welcome.ra.linkedAs.replace('{name}', linkedAs) : T.welcome.psn.body}
       onBack={onBack}

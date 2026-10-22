@@ -6,7 +6,7 @@ export const es: Translations = {
     status: 'Biblioteca',
   },
   sidePanel: {
-    welcome: 'Bienvenido',
+    welcome: 'Hola',
     signIn: 'Iniciar sesión',
     userSettings: 'Ajustes de usuario',
     searchConsole: 'Buscar consola…',
@@ -133,7 +133,7 @@ export const es: Translations = {
     genderPublic: 'Género en tu perfil',
     genderPublicOn: 'Lo ve quien abra tu perfil',
     genderPublicOff: 'Solo lo ves tú',
-    welcome: 'Bienvenido',
+    welcome: 'Hola',
     email: 'Email',
     theme: 'Tema',
     totalPoints: 'Puntos totales',
@@ -828,7 +828,7 @@ export const es: Translations = {
     achievements: 'logros',
   },
   mainStart: {
-    welcome: 'Bienvenido',
+    welcome: 'Hola',
     description: 'Sigue tus logros en RetroAchievements, Steam y PlayStation desde un solo sitio.',
   },
   profileAchievements: {
@@ -1613,7 +1613,7 @@ export const es: Translations = {
       done: 'Listo',
     },
     words: {
-      intro: 'BIENVENIDO',
+      intro: 'BIENVENIDA',
       ra: 'RETRO',
       steam: 'STEAM',
       psn: 'PLAYSTATION',
@@ -1628,10 +1628,10 @@ export const es: Translations = {
       later: 'para luego',
       pending: 'pendiente',
     },
-    platformsKicker: 'Plataformas · {n} de 3',
+    platformsKicker: 'Plataformas · {n} de {total}',
     intro: {
       kicker: 'Cuenta creada',
-      title: 'Bienvenido a tu bóveda',
+      title: 'Esta es tu bóveda',
       body: 'Todos tus logros, de todas tus plataformas, en un sitio. Conecta tus cuentas, déjalo a tu gusto y en dos minutos estás dentro.',
       perks: [
         {

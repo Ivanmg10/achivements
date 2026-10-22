@@ -1628,7 +1628,7 @@ export const pl: Translations = {
       later: 'na później',
       pending: 'do zrobienia',
     },
-    platformsKicker: 'Platformy · {n} z 3',
+    platformsKicker: 'Platformy · {n} z {total}',
     intro: {
       kicker: 'Konto utworzone',
       title: 'Witaj w swoim sejfie',
@@ -1707,7 +1707,7 @@ export const pl: Translations = {
       kicker: 'Wszystko gotowe',
       title: 'Twój sejf jest gotowy',
       titleNone: 'Możesz połączyć później',
-      body: 'Twoje gry są w drodze. To, co zostawiłeś na później, ma tu swój przycisk, a także na koncie.',
+      body: 'Twoje gry są w drodze. Wszystko odłożone na później ma tu swój przycisk, a także na koncie.',
       bodyNone: 'Nic się nie stało: platformy są na stronie głównej i na koncie, kiedy zechcesz.',
       linked: 'Połączone',
       later: 'Na później',

@@ -5,7 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
 import WelcomePageLibraryPreview from '@/components/welcome-page/welcome-page-library-preview/WelcomePageLibraryPreview'
-import { PRIMARY_BUTTON, SECONDARY_BUTTON, STEP_SKY } from '@/components/welcome-page/welcomeArt'
+import { PRIMARY_BUTTON, SECONDARY_BUTTON, STEP_SKY, platformKicker } from '@/components/welcome-page/welcomeArt'
 
 /**
  * Steam is linked through Steam's own sign-in: a trip there and back to
@@ -30,7 +30,7 @@ export default function WelcomePageSteam({
 
   return (
     <WelcomePageStep
-      kicker={T.welcome.platformsKicker.replace('{n}', '2')}
+      kicker={platformKicker(T, 'steam')}
       title={T.welcome.steps.steam}
       body={isLinked ? T.welcome.steam.linked : T.welcome.steam.body}
       onBack={onBack}

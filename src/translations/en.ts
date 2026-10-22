@@ -1629,7 +1629,7 @@ export const en = {
       later: 'for later',
       pending: 'pending',
     },
-    platformsKicker: 'Platforms · {n} of 3',
+    platformsKicker: 'Platforms · {n} of {total}',
     intro: {
       kicker: 'Account created',
       title: 'Welcome to your vault',

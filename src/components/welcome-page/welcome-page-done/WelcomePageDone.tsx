@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useSession } from 'next-auth/react'
 import { IconAdjustmentsHorizontal, IconArrowRight, IconUser } from '@tabler/icons-react'
-import { WELCOME_STEPS, type WelcomeDirection, type WelcomeStep } from '@/hooks/useWelcomeSteps'
+import { WELCOME_STEPS, isPlatformStep, type PlatformStep, type WelcomeDirection, type WelcomeStep } from '@/hooks/useWelcomeSteps'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { LANGUAGES } from '@/utils/languages'
@@ -26,7 +26,7 @@ export default function WelcomePageDone({
   direction,
   focusTitle,
 }: {
-  linked: Record<'ra' | 'steam' | 'psn', boolean>
+  linked: Record<PlatformStep, boolean>
   onGoTo: (index: number) => void
   onFinish: () => void
   onBack: () => void
@@ -38,11 +38,11 @@ export default function WelcomePageDone({
   const { theme } = useTheme()
   const t = T.welcome.done
   const user = session?.user
-  const anyLinked = linked.ra || linked.steam || linked.psn
+  const anyLinked = Object.values(linked).some(Boolean)
   const profileFilled = Boolean(user?.avatar || user?.location || user?.description || user?.gender)
   const language = LANGUAGES.find((l) => l.id === lang)?.label ?? lang
 
-  const platform = (step: 'ra' | 'steam' | 'psn', mark: ReactNode): Row => ({
+  const platform = (step: PlatformStep, mark: ReactNode): Row => ({
     step,
     mark,
     text: linked[step] ? t.linked : t.later,
@@ -70,7 +70,7 @@ export default function WelcomePageDone({
       aside={
         <ul className="flex flex-col gap-2">
           {rows.map((row, i) => {
-            const isPlatform = row.step === 'ra' || row.step === 'steam' || row.step === 'psn'
+            const isPlatform = isPlatformStep(row.step)
             return (
               <li
                 key={row.step}

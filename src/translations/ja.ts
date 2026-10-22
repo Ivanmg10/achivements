@@ -1628,7 +1628,7 @@ export const ja: Translations = {
       later: 'あとで',
       pending: '未完了',
     },
-    platformsKicker: 'プラットフォーム · {n} / 3',
+    platformsKicker: 'プラットフォーム · {n} / {total}',
     intro: {
       kicker: 'アカウント作成完了',
       title: '保管庫へようこそ',

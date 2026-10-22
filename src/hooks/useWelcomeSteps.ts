@@ -7,6 +7,17 @@ export const WELCOME_STEPS = ['intro', 'ra', 'steam', 'psn', 'profile', 'prefs',
 export type WelcomeStep = (typeof WELCOME_STEPS)[number]
 
 /**
+ * The platforms the welcome links, in their order among the steps. A new platform is
+ * a new entry here and in WELCOME_STEPS (see CLAUDE.md → Welcome for everything else).
+ */
+export const PLATFORM_STEPS = ['ra', 'steam', 'psn'] as const satisfies readonly WelcomeStep[]
+export type PlatformStep = (typeof PLATFORM_STEPS)[number]
+
+export function isPlatformStep(step: WelcomeStep): step is PlatformStep {
+  return (PLATFORM_STEPS as readonly string[]).includes(step)
+}
+
+/**
  * The curtain's length (`--curtain` in WelcomeCurtain.module.css), and when the step
  * changes under it, all of it covered then. 2.2 s: the game this is after takes 2.4–3.5 s;
  * 1.1 s felt rushed (the user, 2026-10-22).

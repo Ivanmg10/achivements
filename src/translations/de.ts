@@ -1628,7 +1628,7 @@ export const de: Translations = {
       later: 'für später',
       pending: 'offen',
     },
-    platformsKicker: 'Plattformen · {n} von 3',
+    platformsKicker: 'Plattformen · {n} von {total}',
     intro: {
       kicker: 'Konto erstellt',
       title: 'Willkommen in deinem Tresor',

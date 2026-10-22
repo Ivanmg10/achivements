@@ -1628,7 +1628,7 @@ export const fr: Translations = {
       later: 'pour plus tard',
       pending: 'à faire',
     },
-    platformsKicker: 'Plateformes · {n} sur 3',
+    platformsKicker: 'Plateformes · {n} sur {total}',
     intro: {
       kicker: 'Compte créé',
       title: 'Bienvenue dans votre coffre',

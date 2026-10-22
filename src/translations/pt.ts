@@ -6,7 +6,7 @@ export const pt: Translations = {
     status: 'Biblioteca',
   },
   sidePanel: {
-    welcome: 'Bem-vindo',
+    welcome: 'Olá',
     signIn: 'Entrar',
     userSettings: 'Configurações do usuário',
     searchConsole: 'Buscar console…',
@@ -133,7 +133,7 @@ export const pt: Translations = {
     genderPublic: 'Género no teu perfil',
     genderPublicOn: 'Visível para quem abrir o teu perfil',
     genderPublicOff: 'Só tu o vês',
-    welcome: 'Bem-vindo',
+    welcome: 'Olá',
     email: 'E-mail',
     theme: 'Tema',
     totalPoints: 'Total de pontos',
@@ -828,7 +828,7 @@ export const pt: Translations = {
     achievements: 'conquistas',
   },
   mainStart: {
-    welcome: 'Bem-vindo',
+    welcome: 'Olá',
     description: 'Um app para rastrear suas conquistas e progresso no RetroAchievements, Steam e PlayStation',
   },
   profileAchievements: {
@@ -1613,7 +1613,7 @@ export const pt: Translations = {
       done: 'Pronto',
     },
     words: {
-      intro: 'BEM-VINDO',
+      intro: 'BOAS-VINDAS',
       ra: 'RETRO',
       steam: 'STEAM',
       psn: 'PLAYSTATION',
@@ -1628,10 +1628,10 @@ export const pt: Translations = {
       later: 'para depois',
       pending: 'pendente',
     },
-    platformsKicker: 'Plataformas · {n} de 3',
+    platformsKicker: 'Plataformas · {n} de {total}',
     intro: {
       kicker: 'Conta criada',
-      title: 'Bem-vindo ao seu cofre',
+      title: 'Este é o seu cofre',
       body: 'Todas as suas conquistas, de todas as plataformas, num só lugar. Conecte suas contas, deixe do seu jeito e em dois minutos você está dentro.',
       perks: [
         {

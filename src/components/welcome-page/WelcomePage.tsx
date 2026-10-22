@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { WELCOME_STEPS, useWelcomeSteps } from '@/hooks/useWelcomeSteps'
+import { WELCOME_STEPS, isPlatformStep, useWelcomeSteps, type PlatformStep } from '@/hooks/useWelcomeSteps'
 import { useWelcomeArrival } from '@/hooks/useWelcomeEntry'
 import { useLanguage } from '@/context/LanguageContext'
 import { display } from '@/lib/fonts'
@@ -36,10 +36,11 @@ export default function WelcomePage() {
   const focusTitle = steps.moved
 
   const user = session?.user
-  const linked = { ra: Boolean(user?.rausername), steam: Boolean(user?.steamid), psn: Boolean(user?.psnaccountid) }
+  // Each platform's own session field; a new platform adds its line here.
+  const linked: Record<PlatformStep, boolean> = { ra: Boolean(user?.rausername), steam: Boolean(user?.steamid), psn: Boolean(user?.psnaccountid) }
   const states: WelcomeStepState[] = WELCOME_STEPS.map((step, i) => {
     if (i === steps.index) return 'current'
-    if (step === 'ra' || step === 'steam' || step === 'psn') {
+    if (isPlatformStep(step)) {
       if (linked[step]) return 'linked'
     } else if (step !== 'done' && i < steps.seen && !steps.skipped.includes(step)) return 'done'
     return steps.skipped.includes(step) ? 'later' : 'pending'

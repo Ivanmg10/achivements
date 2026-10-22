@@ -6,7 +6,7 @@ export const it: Translations = {
     status: 'Libreria',
   },
   sidePanel: {
-    welcome: 'Benvenuto',
+    welcome: 'Ciao',
     signIn: 'Accedi',
     userSettings: 'Impostazioni utente',
     searchConsole: 'Cerca console…',
@@ -133,7 +133,7 @@ export const it: Translations = {
     genderPublic: 'Genere nel profilo',
     genderPublicOn: 'Visibile a chi apre il tuo profilo',
     genderPublicOff: 'Lo vedi solo tu',
-    welcome: 'Benvenuto',
+    welcome: 'Ciao',
     email: 'Email',
     theme: 'Tema',
     totalPoints: 'Punti totali',
@@ -828,7 +828,7 @@ export const it: Translations = {
     achievements: 'obiettivi',
   },
   mainStart: {
-    welcome: 'Benvenuto',
+    welcome: 'Ciao',
     description: "Un'app per tracciare i tuoi obiettivi e progressi su RetroAchievements, Steam e PlayStation",
   },
   profileAchievements: {
@@ -1604,7 +1604,7 @@ export const it: Translations = {
     goToVault: 'Vai alla mia cassaforte',
     account: 'Account',
     steps: {
-      intro: 'Benvenuto',
+      intro: 'Inizio',
       ra: 'RetroAchievements',
       steam: 'Steam',
       psn: 'PlayStation',
@@ -1613,7 +1613,7 @@ export const it: Translations = {
       done: 'Fatto',
     },
     words: {
-      intro: 'BENVENUTO',
+      intro: 'CIAO',
       ra: 'RETRO',
       steam: 'STEAM',
       psn: 'PLAYSTATION',
@@ -1628,10 +1628,10 @@ export const it: Translations = {
       later: 'per dopo',
       pending: 'da fare',
     },
-    platformsKicker: 'Piattaforme · {n} di 3',
+    platformsKicker: 'Piattaforme · {n} di {total}',
     intro: {
       kicker: 'Account creato',
-      title: 'Benvenuto nella tua cassaforte',
+      title: 'Questa è la tua cassaforte',
       body: 'Tutti i tuoi obiettivi, da tutte le piattaforme, in un solo posto. Collega i tuoi account, sistemalo a modo tuo e in due minuti sei dentro.',
       perks: [
         {

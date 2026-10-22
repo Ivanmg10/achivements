@@ -29,6 +29,20 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome ready for more platforms; gender-neutral greetings (`feat/welcome-onboarding`)
+
+**Did** — `PLATFORM_STEPS` / `isPlatformStep` and `platformKicker` (the "n of total" count comes
+from the list, no longer a "3" in nine translations); CLAUDE.md lists what a new platform must
+touch in the welcome. Greetings made gender-neutral: the welcome's title ("Esta es tu bóveda",
+"Este é o seu cofre", "Questa è la tua cassaforte"), its giant word and Italian step name, a
+Polish line, and the app's "Bienvenido/Bem-vindo/Benvenuto + name" → "Hola/Olá/Ciao".
+**Why** — The user will add platforms and wants the welcome to always include them (and to
+follow changes to the site); they noticed "Bienvenida" in the bar against "Bienvenido" below.
+**Decisions** — Two standing rules in CLAUDE.md: the welcome follows every new platform and
+feature; texts never assume the reader's gender.
+
+---
+
 ## 2026-10-22 — Welcome curtain, smoother (`feat/welcome-onboarding`)
 
 **Did** — The curtain glides in over 26 % of its 2.2 s easing out and leaves over the last 26 %

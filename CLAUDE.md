@@ -131,6 +131,25 @@ reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there)
 - The avatar is edited in `AvatarModal` (account page and welcome), not `EditProfileModal`,
   which is only for the username and email now.
 
+### The welcome follows the app — keep it current (the user's standing rule, 2026-10-22)
+
+More platforms will come. **Every platform a user can link must have its step in the welcome**,
+in the same change that makes it available to users (Xbox included, the day `XBOX_ADMIN_ONLY`
+turns false). A new platform touches:
+- `PLATFORM_STEPS` and `WELCOME_STEPS` (`src/hooks/useWelcomeSteps.ts`): its place in the order.
+  The "Platforms · n of total" count follows on its own.
+- Its step component in `src/components/welcome-page/welcome-page-<platform>/`, linking with the
+  platform's own hook (as RA, Steam and PSN do), with its tests.
+- `STEP_SKY` (`welcomeArt.ts`), its mark in `welcomeNodes.tsx` (curtain) and in the bar's
+  `PLATFORM_MARK`, its row in `WelcomePageDone`, and its session field in `WelcomePage`'s `linked`.
+- `T.welcome.steps` / `words` and its own texts, in all nine languages; the intro's first perk
+  ("RetroAchievements, Steam and PlayStation together") names the platforms.
+- `LINK_RETURNS` (`src/lib/steamLogin.ts`) if it links through a round trip, like Steam.
+
+The same goes for the rest of the site: **when a change adds or renames a feature, a profile
+field or a preference, check whether the welcome shows it** (intro perks, the profile and
+preferences steps, the done summary) and update it in the same change.
+
 ## Language — the browser's until the person picks one (2026-10-22)
 
 `LanguageContext`: the saved choice, else the first of `navigator.languages` the app has
@@ -221,6 +240,10 @@ Mobile-first. Tailwind sm/md/lg prefixes. No fixed widths that break mobile.
 
 ### 3. i18n
 - All user-facing strings via `T.*` from `useLanguage()` hook
+- **Gender-neutral wording** in every language: nothing that assumes the reader's gender
+  ("Bienvenido", "Bem-vindo", "Benvenuto", a Polish "zostawiłeś"…). Say "Hola", "Esta es tu
+  bóveda", or rephrase (the user's rule, 2026-10-22). The opt-in gender is for others' profiles,
+  not for addressing the reader.
 - New strings → add to both `src/translations/en.ts` and `src/translations/es.ts`
 - Admin panel exempt
 
