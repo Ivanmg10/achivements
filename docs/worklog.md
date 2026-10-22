@@ -29,6 +29,21 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome v2: back, profile and preferences, the app's own step bar (`feat/welcome-onboarding`)
+
+**Did** — No code. v2 of the welcome on the design canvas (style audit and three step-bar
+options, the 7 steps and what each saves, the prototype, mobile, updated motion spec) and
+`docs/welcome-plan.md` rewritten around it.
+**Why** — The user liked concept E and asked for: back on every step, profile and preferences
+in the welcome, a step bar that matches the app (v1's did not), and no achievements for now.
+**Decisions** — A side rail of steps like the account page's Preferences rows (tabs did not fit
+7 steps; pills looked like a second header). Platforms before profile/preferences so the games
+are read meanwhile. Back mirrors the curtain. CheevoVault's own achievements: a future idea,
+written down in the plan, not in the welcome.
+**Open** — The header question and RA inline vs modal (see the plan); then build it.
+
+---
+
 ## 2026-10-22 — Welcome after sign-up: design exploration (`feat/welcome-onboarding`)
 
 **Did** — No code. A design canvas with clickable prototypes (four concepts, a recommended
