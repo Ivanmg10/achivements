@@ -1604,7 +1604,7 @@ export const es: Translations = {
     goToVault: 'Ir a mi bóveda',
     account: 'Cuenta',
     steps: {
-      intro: 'Hola',
+      intro: 'Inicio',
       ra: 'RetroAchievements',
       steam: 'Steam',
       psn: 'PlayStation',
@@ -1613,7 +1613,7 @@ export const es: Translations = {
       done: 'Listo',
     },
     words: {
-      intro: 'HOLA',
+      intro: 'INICIO',
       ra: 'RETRO',
       steam: 'STEAM',
       psn: 'PLAYSTATION',
