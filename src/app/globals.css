@@ -35,6 +35,16 @@
   /* Progress bars: the theme's accent, and a darker step of it (RA softcore under hardcore). */
   --color-progress: rgb(var(--progress));
   --color-progress-soft: color-mix(in oklab, rgb(var(--progress)) 45%, rgb(var(--bg-card)));
+
+  /* RA's two modes, on rings and figures (the bars use progress / progress-soft). */
+  --color-hardcore: rgb(var(--hardcore));
+  --color-softcore: rgb(var(--softcore));
+
+  /* The component library's shapes (src/components/ui). */
+  --radius-chip: var(--r-chip);
+  --radius-control: var(--r-control);
+  --radius-field: var(--r-field);
+  --radius-card: var(--r-card);
 }
 
 /* ============================================
@@ -65,6 +75,38 @@
 
   /* Resolved on each element, so it follows the theme that element is in. */
   --progress: var(--accent);
+
+  --hardcore: 250 204 21;
+  --softcore: 96 165 250;
+
+  /*
+     The design: shapes, sizes and motion the components read. Every theme
+     shares them; a future site-wide design is another set of these values.
+  */
+  --slant-button: -12deg;
+  --slant-pill: -14deg;
+  --slant-line: -30deg;
+  --r-chip: 0.5rem;
+  --r-control: 0.75rem;
+  --r-field: 0.875rem;
+  --r-card: 1.25rem;
+  --h-control-sm: 2.25rem;
+  --h-control: 2.75rem;
+  --h-field: 3.25rem;
+  --motion-hover: 150ms;
+  --motion-open: 250ms;
+  --motion-indicator: 450ms;
+  --ease-spring: cubic-bezier(0.3, 1.2, 0.4, 1);
+}
+
+/* Light surfaces: the RA marks a step darker, so they still read. */
+[data-theme="light"],
+[data-theme="light-red"],
+[data-theme="light-green"],
+[data-theme="sakura"],
+[data-theme="arctic"] {
+  --hardcore: 161 98 7;
+  --softcore: 29 78 216;
 }
 
 /* ============================================
