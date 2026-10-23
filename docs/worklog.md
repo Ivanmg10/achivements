@@ -29,6 +29,24 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-23 — PSN improvements spike: scaling, a pool of service accounts, Exophase analysis (`docs/psn-improvements-spike`)
+
+**Did** — Seven research and planning docs on PSN, written by another agent (OpenCode, in its
+`happy-koala` worktree) and kept here at the user's request, indexed in `docs/README.md`: how the
+single NPSSO copes with sign-up peaks (`psn-scaling-and-rate-limits.md`), a pool of service
+accounts and the sync UX (`psn-multi-account-pool.md`), growth to 100k users
+(`psn-scale-roadmap.md`), operating up to 20 NPSSO with refresh and Telegram alerts
+(`psn-account-operations.md`), two implementation briefs (`psn-implementation-brief.md`,
+`psn-5-account-agent-brief.md`) and an analysis of Exophase's PSN model
+(`exophase-psn-analysis.md`).
+**Why** — A spike of PSN improvements the user wants to keep.
+**Decisions** — Docs only, no code. Copied as they were written; checked for secrets first (only
+empty or placeholder values).
+**Open** — Nothing in them is decided or built; read `CLAUDE.md` → PlayStation (one app account,
+"do not automate Sony's sign-in") against them before implementing anything.
+
+---
+
 ## 2026-10-21 — Xbox: a game's empty launcher twin no longer shows as a second game (`feat/groups-redesign`)
 
 **Did** — `foldTwinTitles` (`utils/xboxTitles.ts`), applied in `xboxLibraryData`: a title with no
