@@ -36,7 +36,7 @@ const PODIUM_FROM = 15
 export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
   const { T } = useLanguage()
   const xbox = useXboxEnabled()
-  const [view, setView] = useState<RankingsView>({ scope: 'global', period: 'all', source: 'all' })
+  const [view, setView] = useState<RankingsView>({ scope: 'global', period: 'all', source: 'all', sort: 'points' })
   const { data, rows, isLoading, error, retry, more, hasMore, loadingMore, moreFailed, widen, widening, zoneSize } = useRankings(view)
   const { me: vault } = useVaultMe()
   // While your points are being calculated, yours carry "≈" wherever they show.
@@ -54,7 +54,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
   const upLeft = zoneSize.above < ZONE_MAX ? zoneStart + (zoneAll.length - zone.length) - rows.length : 0
   const downLeft = zoneSize.below < ZONE_MAX ? total - zoneStart - zoneAll.length : 0
   const above = me ? ([...rows, ...zone].find((r) => r.rank === me.rank - 1) ?? null) : null
-  const weekView = view.scope === 'global' && view.period === 'week' && view.source === 'all'
+  const weekView = view.scope === 'global' && view.period === 'week' && view.source === 'all' && view.sort === 'points'
   const caption = `${view.scope === 'global' ? T.rankings.global : T.rankings.following} · ${T.rankings[view.period]}`
 
   return (
@@ -140,6 +140,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
                     arrows={data?.arrows ?? false}
                     linked
                     approx={approx}
+                    byPoints={view.sort === 'points'}
                   />
                 </motion.div>
               )}
@@ -153,7 +154,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
             <motion.aside variants={SIDE} initial="hidden" animate="show" className="flex flex-col gap-4 lg:sticky lg:top-24">
               {signedIn ? vault && <RankingsPageLevelPanel me={vault} /> : <RankingsPageJoin />}
               {(data?.hot ?? []).length > 0 && (
-                <RankingsPageHot rows={data?.hot ?? []} linked onSeeWeek={weekView ? undefined : () => setView({ scope: 'global', period: 'week', source: 'all' })} />
+                <RankingsPageHot rows={data?.hot ?? []} linked onSeeWeek={weekView ? undefined : () => setView({ scope: 'global', period: 'week', source: 'all', sort: 'points' })} />
               )}
             </motion.aside>
           </div>

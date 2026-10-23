@@ -29,6 +29,7 @@ export default function RankingsPageZone({
   arrows,
   linked,
   approx,
+  byPoints = true,
 }: {
   me: RankRow
   rows: RankRow[]
@@ -42,6 +43,8 @@ export default function RankingsPageZone({
   arrows: boolean
   linked: boolean
   approx: boolean
+  /** Ordered by a streak, how far ahead in points says nothing about the order: left out. */
+  byPoints?: boolean
 }) {
   const { T, lang } = useLanguage()
   const n = (x: number) => x.toLocaleString(lang)
@@ -65,10 +68,10 @@ export default function RankingsPageZone({
         )}
       </div>
       <div className="hidden md:block">
-        <RankingsPageTable rows={rows} arrows={arrows} linked={linked} caption={`${T.rankings.zone} · ${of}`} approx={approx} gapFrom={me.points} />
+        <RankingsPageTable rows={rows} arrows={arrows} linked={linked} caption={`${T.rankings.zone} · ${of}`} approx={approx} gapFrom={byPoints ? me.points : undefined} />
       </div>
       <div className="md:hidden p-2">
-        <RankingsPageList rows={rows} arrows={arrows} linked={linked} approx={approx} gapFrom={me.points} />
+        <RankingsPageList rows={rows} arrows={arrows} linked={linked} approx={approx} gapFrom={byPoints ? me.points : undefined} />
       </div>
       {downLeft > 0 && (
         <div className="flex justify-center px-4 py-3 border-t border-ink/[0.07]">

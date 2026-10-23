@@ -2,11 +2,13 @@
 
 import { IconCheck } from '@tabler/icons-react'
 import type { RankingsView } from '@/hooks/useRankings'
-import type { RankPeriod, RankScope, RankSource } from '@/lib/rankings'
+import type { RankPeriod, RankScope, RankSort, RankSource } from '@/lib/rankings'
 import { useLanguage } from '@/context/LanguageContext'
 import { PLATFORM_FILL, PLATFORM_NAMES } from '@/components/vault-platform-split/VaultPlatformSplit'
 
 const PERIODS: RankPeriod[] = ['all', 'month', 'week']
+const SORTS: RankSort[] = ['points', 'streak', 'best']
+const SORT_LABEL = { points: 'sortPoints', streak: 'sortStreak', best: 'sortBest' } as const
 
 const chip = (on: boolean) =>
   `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
@@ -15,7 +17,7 @@ const chip = (on: boolean) =>
 
 /**
  * Who to compare with (tabs: everyone, or you and whom you follow), over what
- * time, and on which platform. The chosen chip says so with a tick, not colour alone.
+ * time, on which platform, and ordered by points or by a streak. The chosen chip says so with a tick, not colour alone.
  */
 export default function RankingsPageToolbar({
   view,
@@ -71,6 +73,18 @@ export default function RankingsPageToolbar({
               {s === 'all' ? T.rankings.allPlatforms : PLATFORM_NAMES[s]}
             </button>
           ))}
+        </div>
+        <span aria-hidden="true" className="hidden sm:block w-px h-5 bg-ink/10 mx-1" />
+        <div role="group" aria-label={T.rankings.sort} className="flex flex-wrap gap-1.5">
+          {SORTS.map((s) => {
+            const on = (view.sort ?? 'points') === s
+            return (
+              <button key={s} aria-pressed={on} onClick={() => set({ sort: s })} className={chip(on)}>
+                {on && <IconCheck size={12} aria-hidden="true" />}
+                {T.rankings[SORT_LABEL[s]]}
+              </button>
+            )
+          })}
         </div>
       </div>
     </div>

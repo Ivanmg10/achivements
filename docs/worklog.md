@@ -29,6 +29,33 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-23 — Streaks in the rankings, and ordering by them (`feat/58-rankings-streaks`, #58)
+
+**Did** — Each rankings row (table, phone list, podium, your zone) shows the current streak and the
+longest one (`RankingsPageStreak`), and the toolbar orders by points, current streak or longest
+streak (`?sort=points|streak|best`). `streakOf`, `streaksOf` and `rankByStreak` in
+`src/lib/rankings.ts`; the route fills `streak`/`bestStreak` on every row. Texts in all nine languages.
+**Why** — The user asked for streaks in the leaderboard and in the Following rankings.
+**Decisions** — No migration and no platform call: the days come from `score_games.unlocks` (UTC
+days, the same data weeks and months use), read at request time. Ordered by points, only the rows
+shown are read; ordered by a streak, everyone in the view is. Ordered by a streak there are no
+weekly arrows and your zone does not say how far ahead in points the others are. The period chips
+still decide the points column and who is in the list.
+**Open** — Checked on the dev server against pre (all three orders answer; the demo users have
+no current streak, their data is old). If the list grows large, store the streaks per user at refresh instead of reading every day.
+The Following page's rankings teaser still shows points only.
+**Then (same day, from the user's screenshot)** — The table's level moved under the name (as on phones),
+columns grouped as points (points · platforms · trend) then play (streak · 100 % · achievements);
+the streak cell is a pill ("12d", lit flame while it runs) with the record beside it (crown, gold while
+the current streak is the record). The demo users got varied current streaks (`STREAKS` in
+`scripts/demo-personas.mjs`, one unlock a day on the favourite game) and pre was reseeded; the
+streaks often come out longer than asked, joined by other recent unlocks, and two are shorter (a
+favourite with few achievements).
+**Watch out** — These streaks follow the score refresh (up to 6 h behind) and count UTC days, so
+they can differ by a day from the streak page, which reads the live feed.
+
+---
+
 ## 2026-10-23 — Steam sign-up in the welcome, and the fill running there (`feat/welcome-onboarding`, committed locally, not pushed)
 
 **Did** — Ran the real flow on the dev server against pre (the Steam callback simulated with a

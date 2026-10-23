@@ -4,14 +4,18 @@ import { authOptions } from '@/lib/authOptions'
 import {
   RANK_PERIODS,
   RANK_SCOPES,
+  RANK_SORTS,
   RANK_SOURCES,
   loadRanking,
   presenceOf,
+  rankByStreak,
+  streaksOf,
   weekStartRanks,
   weeklyTrend,
   type RankEntry,
   type RankPeriod,
   type RankScope,
+  type RankSort,
   type RankSource,
 } from '@/lib/rankings'
 import { canUseXbox } from '@/utils/xboxAccess'
@@ -30,6 +34,9 @@ export type RankRow = Omit<RankEntry, 'id' | 'listed'> & {
   isMe: boolean
   /** Points in each of the last weeks (TREND_WEEKS), oldest first, on the chosen platforms. */
   trend: number[]
+  /** Days in a row with an unlock, up to today or yesterday (UTC), and the longest run, on the chosen platforms. */
+  streak: number
+  bestStreak: number
   /** Only for signed-in viewers, and never about the viewer themselves. */
   online?: boolean
   lastSeenAt?: string | null
@@ -39,6 +46,7 @@ export type RankingsResponse = {
   scope: RankScope
   period: RankPeriod
   source: RankSource
+  sort: RankSort
   /** How many are listed. */
   total: number
   offset: number
@@ -78,10 +86,11 @@ export async function GET(req: Request) {
   const scope = pick(params.get('scope'), RANK_SCOPES, 'global')
   const period = pick(params.get('period'), RANK_PERIODS, 'all')
   const source = pick(params.get('source'), RANK_SOURCES, 'all')
+  const sort = pick(params.get('sort'), RANK_SORTS, 'points')
   const offset = Number(params.get('offset') ?? 0)
   const above = count(params.get('above'), ZONE, ZONE_MAX)
   const below = count(params.get('below'), ZONE, ZONE_MAX)
-  if (!scope || !period || !source || !Number.isInteger(offset) || offset < 0 || above === null || below === null) {
+  if (!scope || !period || !source || !sort || !Number.isInteger(offset) || offset < 0 || above === null || below === null) {
     return NextResponse.json({ error: 'invalid-params' }, { status: 400 })
   }
 
@@ -94,12 +103,15 @@ export async function GET(req: Request) {
     if (source === 'xbox' && !xbox) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 
     const entries = await loadRanking({ scope, period, source, viewerId, xbox })
+    // Ordered by a streak, everyone's is needed to place them; ordered by points, only those shown.
+    const allStreaks = sort === 'points' ? null : await streaksOf(entries.map((e) => e.id), source, xbox)
+    const ordered = allStreaks ? rankByStreak(entries, allStreaks, sort === 'streak' ? 'current' : 'best') : entries
     const weekly = scope === 'global' && period === 'week' && source === 'all' ? entries : await loadRanking({ scope: 'global', period: 'week', source: 'all', viewerId, xbox })
     const hot = weekly.filter((e) => e.listed).slice(0, HOT)
-    const listed = entries.filter((e) => e.listed)
-    const own = viewerId === null ? undefined : entries.find((e) => e.id === viewerId)
+    const listed = ordered.filter((e) => e.listed)
+    const own = viewerId === null ? undefined : ordered.find((e) => e.id === viewerId)
 
-    const arrowView = scope === 'global' && period === 'all' && source === 'all'
+    const arrowView = scope === 'global' && period === 'all' && source === 'all' && sort === 'points'
     const before = arrowView ? await weekStartRanks() : null
     // Before the first Monday snapshot everyone would read as new: no arrows until there is one.
     const arrows = arrowView && before !== null && before.size > 0
@@ -109,9 +121,10 @@ export async function GET(req: Request) {
     const zone = myIndex < 0 ? [] : listed.slice(zoneStart, myIndex + below + 1)
 
     const shown = [...new Set([...page, ...zone, ...hot, ...(own ? [own] : [])])]
-    const [presence, trend] = await Promise.all([
+    const [presence, trend, streaks] = await Promise.all([
       viewerId === null ? null : presenceOf(shown.filter((e) => e.id !== viewerId).map((e) => e.id)),
       weeklyTrend(shown.map((e) => e.id), source, xbox),
+      allStreaks ?? streaksOf(shown.map((e) => e.id), source, xbox),
     ])
 
     const toRow = (e: RankEntry): RankRow => {
@@ -124,6 +137,8 @@ export async function GET(req: Request) {
         delta: arrows && e.listed ? (was === undefined ? null : was - e.rank) : null,
         isMe: id === viewerId,
         trend: trend.get(id) ?? [],
+        streak: streaks.get(id)?.current ?? 0,
+        bestStreak: streaks.get(id)?.best ?? 0,
         ...(p ? { online: p.online, lastSeenAt: p.lastSeenAt } : {}),
       }
     }
@@ -132,10 +147,11 @@ export async function GET(req: Request) {
       scope,
       period,
       source,
+      sort,
       total: listed.length,
       offset,
       rows: page.map(toRow),
-      me: own && own.points > 0 ? { ...toRow(own), listed: own.listed } : null,
+      me: own && own.points > 0 && own.rank > 0 ? { ...toRow(own), listed: own.listed } : null,
       zone: zone.map(toRow),
       zoneStart,
       hot: hot.map((e) => ({ ...toRow(e), delta: null })),

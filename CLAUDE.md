@@ -762,6 +762,9 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   rankings). Today: the rankings, Following cards, the home's friend cards, the public profile
   hero, the header (yours) and your account page. Progress towards a level is a `ProgressBar`
   or `CircularProgress` in the theme's colour; tiers have their own hue only on their badge.
+- **Streaks in the rankings (2026-10-23)** are read from `score_games.unlocks` (UTC days, `streaksOf`),
+  never from a platform: they lag the score refresh and may differ by a day from the streak page,
+  which reads the live feed. `?sort=streak|best` orders by them (no arrows, no points gap in the zone).
 - Rankings are labelled **Beta** in the UI; drop the label when the user says so.
 
 ## Follows: who you follow and who follows you (2026-10-20)
@@ -1061,7 +1064,8 @@ requires `linked-issue` (see Issues).
   taken from what pre already has cached for real users; points come from the real formula. If
   pre loses those cached games (a reset from production, an unlink), games drop out of the seed
   (it warns). No RA (the dev server does not read RA's DB cache; a made-up RA name may be real).
-  PSN trophy lists only in English and Spanish.
+  PSN trophy lists only in English and Spanish. Their current streaks are set in `STREAKS` (`demo-personas.mjs`):
+  reseed to bring them up to today, since a streak ends two days after the seed.
 - Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
 
 ## Style

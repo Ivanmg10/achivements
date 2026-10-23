@@ -7,6 +7,7 @@ import { PODIUM_CARD, PODIUM_DELAY, PODIUM_STEP } from '../rankingsMotion'
 import { CountUp } from '@/components/ui/CountUp'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import RankingsPageUser from '../rankings-page-user/RankingsPageUser'
+import RankingsPageStreak from '../rankings-page-streak/RankingsPageStreak'
 
 /** Second, first and third, as a podium stands: how tall each step is and how much the first glows. */
 const STEP: Record<number, string> = { 1: 'h-16 sm:h-20', 2: 'h-11 sm:h-14', 3: 'h-8 sm:h-10' }
@@ -16,7 +17,7 @@ const GLOW: Record<number, string> = {
   3: 'bg-[radial-gradient(ellipse_at_top,rgb(var(--accent)/0.1),transparent_70%)]',
 }
 
-/** The first three, on a podium: picture, name, level and points, with the place on each step. */
+/** The first three, on a podium: picture, name, level, points and streaks, with the place on each step. */
 export default function RankingsPagePodium({ rows, linked, approx = false }: { rows: RankRow[]; linked: boolean; approx?: boolean }) {
   const { T, lang } = useLanguage()
   // Second, first and third; a place nobody holds yet keeps its empty step, so first stays in the middle.
@@ -48,6 +49,7 @@ export default function RankingsPagePodium({ rows, linked, approx = false }: { r
               {r.isMe && approx && <span className="text-warning" title={T.rankings.fillApprox}>≈ </span>}
               <CountUp value={r.points} locale={lang} duration={1.2} delay={0.3 + (PODIUM_DELAY[place] ?? 0)} /> <span className="text-[11px] font-semibold text-text-secondary">{T.rankings.vp}</span>
             </span>
+            <RankingsPageStreak streak={r.streak} best={r.bestStreak} className="text-xs" />
           </span>
           <motion.span
             variants={PODIUM_STEP}

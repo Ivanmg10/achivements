@@ -1,7 +1,7 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
 import pool from '@/lib/db'
-import { loadRanking, profileTeaser, rankEntries, takeWeeklySnapshot, vaultTotals, vaultTotalsOrNone, weekStartRanks } from './rankings'
+import { loadRanking, profileTeaser, rankByStreak, rankEntries, streakOf, streaksOf, takeWeeklySnapshot, vaultTotals, vaultTotalsOrNone, weekStartRanks, type RankEntry } from './rankings'
 
 const query = pool.query as jest.Mock
 
@@ -34,6 +34,37 @@ describe('rankEntries', () => {
   it('tells an unlisted user where they would stand, without taking a place', () => {
     const list = rankEntries([row(1, 'ana', 'ra', 900), row(2, 'me', 'ra', 500, { listed: false }), row(3, 'cy', 'ra', 100)], null, 'all')
     expect(list.map((e) => [e.username, e.rank, e.listed])).toEqual([['ana', 1, true], ['cy', 2, true], ['me', 2, false]])
+  })
+})
+
+describe('streaks', () => {
+  it('counts the run up to today or yesterday, and the longest one', () => {
+    expect(streakOf([1, 2, 3, 7, 8], 9)).toEqual({ current: 2, best: 3 })
+    expect(streakOf([1, 2, 3, 7, 8], 8)).toEqual({ current: 2, best: 3 })
+    // Nothing yesterday or today: the run is over.
+    expect(streakOf([1, 2, 3], 5)).toEqual({ current: 0, best: 3 })
+    expect(streakOf([], 5)).toEqual({ current: 0, best: 0 })
+  })
+
+  it('reads UTC days from the stored unlocks, only linked accounts and unflagged games', async () => {
+    query.mockResolvedValue({ rows: [{ id: 4, days: [20381, 20382] }] })
+    const map = await streaksOf([4], 'psn', false, new Date('2025-10-21T12:00:00Z'))
+    expect(map.get(4)).toEqual({ current: 2, best: 2 })
+    const [sql, params] = query.mock.calls[0]
+    expect(sql).toContain("g.flag IS DISTINCT FROM 'suspect'")
+    expect(sql).toContain("WHEN 'psn' THEN u.psnaccountid")
+    expect(params).toEqual([[4], 'psn', false])
+    query.mockClear()
+    expect((await streaksOf([], 'all', false)).size).toBe(0)
+    expect(query).not.toHaveBeenCalled()
+  })
+
+  it('ranks by a streak, sharing a place on a tie, leaving out who has none', () => {
+    const e = (id: number, points: number, listed = true) => ({ id, username: `u${id}`, avatar: null, points, totalPoints: points, split: {}, completed: 0, achievements: 0, rank: 0, listed }) as RankEntry
+    const streaks = new Map([[1, { current: 3, best: 9 }], [2, { current: 3, best: 4 }], [4, { current: 5, best: 5 }]])
+    const list = rankByStreak([e(1, 100), e(2, 500), e(3, 900), e(4, 50, false)], streaks, 'current')
+    expect(list.map((x) => [x.username, x.rank])).toEqual([['u2', 1], ['u1', 1], ['u4', 1]])
+    expect(rankByStreak([e(1, 100), e(2, 500)], streaks, 'best').map((x) => x.username)).toEqual(['u1', 'u2'])
   })
 })
 
