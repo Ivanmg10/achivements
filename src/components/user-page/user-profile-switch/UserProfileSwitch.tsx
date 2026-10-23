@@ -2,6 +2,7 @@
 
 import { useId, type ReactNode } from 'react'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
+import Switch from '@/components/ui/Switch'
 
 /**
  * An on/off profile setting (public profile, gender on it…), saved on the
@@ -39,23 +40,14 @@ export default function UserProfileSwitch({
           <span id={labelId} className="text-xs text-text-secondary">{label}</span>
           <span className="text-sm font-medium">{checked ? onText : offText}</span>
         </span>
-        <button
-          role="switch"
-          aria-checked={checked}
+        <Switch
+          checked={checked}
           aria-labelledby={labelId}
           disabled={saving}
-          onClick={async () => {
-            if (await save(field, String(!checked))) onSaved?.(!checked)
+          onChange={async (next) => {
+            if (await save(field, String(next))) onSaved?.(next)
           }}
-          className={`relative shrink-0 w-11 h-6 rounded-full transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-            checked ? 'bg-accent' : 'bg-ink/20'
-          }`}
-        >
-          <span
-            aria-hidden="true"
-            className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-5' : ''}`}
-          />
-        </button>
+        />
       </div>
       {error && <p role="alert" className="text-xs text-red-400 px-2">{error}</p>}
     </div>

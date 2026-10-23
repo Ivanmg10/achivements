@@ -9,6 +9,7 @@ import { notify } from '@/lib/notify'
 import { PASSWORD_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
+import Switch from '@/components/ui/Switch'
 
 interface Props {
   isOpen: boolean
@@ -85,16 +86,7 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
           )}
         </div>
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            role="switch"
-            aria-checked={isAdmin}
-            onClick={() => setIsAdmin(v => !v)}
-            aria-label="Admin privileges"
-            className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${isAdmin ? 'bg-accent' : 'bg-bg-main'}`}
-          >
-            <div className={`w-4 h-4 rounded-full bg-white transition-transform ${isAdmin ? 'translate-x-4' : 'translate-x-0'}`} aria-hidden="true" />
-          </button>
+          <Switch checked={isAdmin} onChange={setIsAdmin} aria-label="Admin privileges" />
           <span className="text-sm">Admin</span>
         </div>
       </div>

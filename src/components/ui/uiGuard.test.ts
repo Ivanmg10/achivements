@@ -46,3 +46,13 @@ test('text fields come from the library (fieldClass, Input, Textarea, SearchInpu
 test('no native select: the library has its own', () => {
   expect(offenders(/<select[\s>]/)).toEqual([])
 })
+
+test('on/off switches come from Switch', () => {
+  // The Steam pin star is a toggle that reads as a switch; it becomes ToggleButton in PR 3.
+  const allowed = [path.join('components', 'steam', 'steam-pin-achievement-button', 'SteamPinAchievementButton.tsx')]
+  expect(offenders(/role="switch"/).filter((f) => !allowed.includes(f))).toEqual([])
+})
+
+test('checkboxes come from Checkbox', () => {
+  expect(offenders(/type="checkbox"/)).toEqual([])
+})

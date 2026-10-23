@@ -3,6 +3,7 @@
 import CommonModal from '../common-modal/CommonModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
+import { choiceClass } from '@/components/ui/ChoiceCards'
 
 export type Gender = 'male' | 'female' | 'neutral'
 
@@ -41,9 +42,7 @@ export default function GenderModal({ isOpen, onClose, current }: Props) {
               aria-checked={selected}
               disabled={saving}
               onClick={() => handleSelect(id)}
-              className={`px-3 py-3 rounded-xl text-sm font-medium transition-all disabled:opacity-50 ${
-                selected ? 'bg-accent text-bg-main' : 'bg-bg-main hover:bg-bg-card text-text-main'
-              }`}
+              className={choiceClass(selected, 'justify-center text-sm font-medium text-text-main')}
             >
               {label}
             </button>

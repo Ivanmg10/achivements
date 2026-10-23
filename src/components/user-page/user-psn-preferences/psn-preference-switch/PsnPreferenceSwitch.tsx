@@ -1,6 +1,7 @@
 'use client'
 
 import { useId, type ReactNode } from 'react'
+import Switch from '@/components/ui/Switch'
 
 /**
  * One on/off preference as a row: icon chip, label, the current state written
@@ -31,18 +32,7 @@ export default function PsnPreferenceSwitch({
         <span id={labelId} className="text-xs text-text-secondary">{label}</span>
         <span className="text-sm font-medium">{checked ? onText : offText}</span>
       </span>
-      <button
-        role="switch"
-        aria-checked={checked}
-        aria-labelledby={labelId}
-        onClick={() => onChange(!checked)}
-        className={`relative shrink-0 w-11 h-6 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${checked ? 'bg-accent' : 'bg-ink/20'}`}
-      >
-        <span
-          aria-hidden="true"
-          className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-5' : ''}`}
-        />
-      </button>
+      <Switch checked={checked} aria-labelledby={labelId} onChange={onChange} />
     </div>
   )
 }

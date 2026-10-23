@@ -11,6 +11,7 @@ import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
+import Switch from '@/components/ui/Switch'
 
 interface Props {
   isOpen: boolean
@@ -203,23 +204,15 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
             {user.id === currentAdminId && (
               <span className="text-xs text-text-secondary italic">Can&apos;t remove own admin</span>
             )}
-            <button
-              type="button"
-              role="switch"
-              aria-checked={values.admin as boolean}
+            <Switch
+              checked={values.admin as boolean}
               aria-label="Admin privileges"
               disabled={user.id === currentAdminId}
-              onClick={() => {
-                const next = !(values.admin as boolean)
+              onChange={(next) => {
                 setValues(v => ({ ...v, admin: next }))
                 patch('admin', next)
               }}
-              className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${
-                user.id === currentAdminId ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
-              } ${values.admin ? 'bg-accent' : 'bg-bg-main'}`}
-            >
-              <div className={`w-4 h-4 rounded-full bg-white transition-transform ${values.admin ? 'translate-x-4' : 'translate-x-0'}`} aria-hidden="true" />
-            </button>
+            />
           </div>
         </div>
 

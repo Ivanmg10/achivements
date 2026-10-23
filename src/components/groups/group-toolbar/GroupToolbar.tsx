@@ -5,6 +5,7 @@ import type { GameGroupItem } from '@/types/types'
 import { DECADES, type DecadeFilter, type GroupFilters as Filters, type PctFilter } from '@/utils/groupItems'
 import GroupViewToggle, { type GroupDetailView } from '@/components/groups/group-view-toggle/GroupViewToggle'
 import Select from '@/components/ui/Select'
+import Checkbox from '@/components/ui/Checkbox'
 
 const PILL = 'h-9 px-3 rounded-lg text-xs sm:text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 const MENU = `${PILL} inline-flex items-center gap-1.5 ring-1 ring-ink/10 text-text-main bg-transparent hover:ring-ink/25`
@@ -77,10 +78,9 @@ export default function GroupToolbar({
             {consoles.map((name, i) => {
               const id = `group-console-${i}`
               return (
-                <label key={name} htmlFor={id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm hover:bg-ink/5 cursor-pointer">
-                  <input id={id} type="checkbox" checked={filters.consoles.has(name)} onChange={() => onToggleConsole(name)} className="accent-[rgb(var(--accent))]" />
+                <Checkbox key={name} id={id} checked={filters.consoles.has(name)} onChange={() => onToggleConsole(name)} className="px-2 py-1.5 rounded-lg text-sm hover:bg-ink/5">
                   {name}
-                </label>
+                </Checkbox>
               )
             })}
             {picked > 0 && (
