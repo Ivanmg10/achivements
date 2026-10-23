@@ -42,6 +42,10 @@ describe('Button', () => {
     expect(buttonClass('quiet')).not.toContain('before:bg-accent')
   })
 
+  it('keeps the shape behind the text', () => {
+    expect(buttonClass().split(' ')).toEqual(expect.arrayContaining(['isolate', 'before:-z-10', 'before:rounded-control']))
+  })
+
   it('slants the shape, not the text', () => {
     expect(buttonClass()).toContain('before:skew-x-(--slant-button)')
     expect(buttonClass()).not.toMatch(/(^|\s)skew-x/)
