@@ -776,8 +776,8 @@ slug (`feat/123-steam-refresh-button`), the PR links the issue on its own (see I
   unless it names an open issue (not a PR) that exists. Skipped for releases (head
   `develop`), merges of `main` into `develop` and PRs from `main`. Fix the description,
   not the workflow.
-- **Issues close when their PR is merged into `develop`** (`issue-close.yml`), not when the
-  work reaches `main`: GitHub's own `Closes #` only works for PRs into the default branch.
+- **Issues close when their PR is merged into `develop`**, by GitHub itself (`Closes #` links
+  them; seen with #47 on 2026-10-23). A workflow that closed them was dropped as redundant.
 - The issues are collected on the repository's GitHub Project board (its built-in
   auto-add and "closed → Done" workflows, set up on GitHub, not in the repo).
 
@@ -850,9 +850,8 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
 `develop` is served at `dev.cheevovault.com` (Vercel Preview, branch `develop`). `main` and
 `develop` are protected on GitHub (PR required, no force-push). A third ruleset,
 `pr description` (2026-10-14), requires the `pr-description` check to pass **and the
-branch to be up to date with its base** before merging, on both. `linked-issue` (see Issues)
-is to be added to it as a required check too (pending on GitHub, 2026-10-23: update this line
-once done).
+branch to be up to date with its base** before merging, on both; since 2026-10-23 it also
+requires `linked-issue` (see Issues).
 
 - **Before merging, bring the branch up to date**: `git fetch` and `git merge
   origin/develop` (or the "Update branch" button), push, wait for the checks again.
