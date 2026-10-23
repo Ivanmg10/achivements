@@ -92,7 +92,7 @@ export default function SteamGamePage() {
           </div>
         ) : achievementsError ? (
           <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 flex flex-col items-center gap-2 text-center">
-            <p role="alert" className="text-red-400">
+            <p role="alert" className="text-danger">
               {T.steam.achievementsError}
             </p>
             <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>

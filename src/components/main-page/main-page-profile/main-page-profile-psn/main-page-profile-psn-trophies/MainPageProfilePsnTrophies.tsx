@@ -49,7 +49,7 @@ export default function MainPageProfilePsnTrophies({
         </div>
       ) : error ? (
         <div className="flex flex-col items-start gap-2 flex-1 justify-center">
-          <p role="alert" className="text-sm text-red-400">
+          <p role="alert" className="text-sm text-danger">
             {T.psn.trophiesError}
           </p>
           <button onClick={onRetry} className="text-xs bg-bg-card px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">

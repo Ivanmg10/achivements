@@ -49,7 +49,7 @@ export default function FollowingList({
   if (error) {
     return (
       <div className="bg-bg-card rounded-2xl flex flex-col items-center gap-2 py-10 text-center">
-        <p role="alert" className="text-sm text-red-400">{T.following.loadError}</p>
+        <p role="alert" className="text-sm text-danger">{T.following.loadError}</p>
         <button onClick={onRetry} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
           {T.publicProfile.retry}
         </button>

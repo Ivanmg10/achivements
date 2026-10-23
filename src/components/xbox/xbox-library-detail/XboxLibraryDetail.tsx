@@ -36,7 +36,7 @@ export default function XboxLibraryDetail({ game, category }: { game: XboxGamePr
       state={isLoading ? 'loading' : error ? 'error' : 'ready'}
       errorNode={
         <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-red-400">{T.xbox.achievementsError}</p>
+          <p role="alert" className="text-sm text-danger">{T.xbox.achievementsError}</p>
           {error === 'private' && <p className="text-xs text-text-secondary">{T.xbox.errors.private}</p>}
           <button onClick={retry} className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">
             {T.xbox.retry}

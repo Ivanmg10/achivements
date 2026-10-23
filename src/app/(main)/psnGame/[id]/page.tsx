@@ -71,7 +71,7 @@ export default function PsnGamePage() {
           </div>
         ) : error ? (
           <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 flex flex-col items-center gap-2 text-center">
-            <p role="alert" className="text-red-400">
+            <p role="alert" className="text-danger">
               {T.psn.trophiesError}
             </p>
             {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}

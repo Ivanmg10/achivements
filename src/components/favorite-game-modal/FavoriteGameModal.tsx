@@ -146,7 +146,7 @@ export default function FavoriteGameModal({
               )}
 
               {error && (
-                <p role="alert" className="px-4 py-2 text-xs text-red-400 border-b border-ink/5">
+                <p role="alert" className="px-4 py-2 text-xs text-danger border-b border-ink/5">
                   {T.userData.favoriteGameError}
                 </p>
               )}

@@ -65,7 +65,7 @@ export default function UserPsnCard() {
       status={
         isLinked &&
         summaryError && (
-          <p role="alert" className="text-xs text-red-400">
+          <p role="alert" className="text-xs text-danger">
             {T.psn.errors[summaryError]}
           </p>
         )

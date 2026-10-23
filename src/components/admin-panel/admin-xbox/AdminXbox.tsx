@@ -62,7 +62,7 @@ export default function AdminXbox() {
           </Button>
         </div>
         {error && (
-          <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-red-400">
+          <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-danger">
             {ERRORS[error]}
           </p>
         )}

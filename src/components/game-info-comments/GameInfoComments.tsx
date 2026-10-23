@@ -60,7 +60,7 @@ export default function GameInfoComments({ gameId }: { gameId: number }) {
   if (error) {
     return (
       <section className="bg-bg-card p-5 rounded-xl w-[95%] mb-5">
-        <p className="text-sm text-red-400" role="alert">{T.gameComments.error}</p>
+        <p className="text-sm text-danger" role="alert">{T.gameComments.error}</p>
       </section>
     )
   }

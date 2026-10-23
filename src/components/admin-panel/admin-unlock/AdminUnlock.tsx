@@ -61,7 +61,7 @@ export default function AdminUnlock({ onUnlocked }: { onUnlocked: () => void }) 
       <div className="w-full text-left">
         <PasswordInput label="Your password" value={password} onChange={(v) => { setPassword(v); setError(null) }} disabled={loading} />
       </div>
-      {error && <p role="alert" className="w-full text-left text-sm text-red-400">{error}</p>}
+      {error && <p role="alert" className="w-full text-left text-sm text-danger">{error}</p>}
       <Button
         type="submit"
         disabled={!password || loading}

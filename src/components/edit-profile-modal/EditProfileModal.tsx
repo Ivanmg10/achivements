@@ -6,6 +6,7 @@ import CommonModal from '../common-modal/CommonModal'
 import { useLanguage } from '@/context/LanguageContext'
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
+import Notice from '@/components/ui/Notice'
 
 /** The avatar has its own modal (`AvatarModal`). */
 export type EditProfileField = 'name' | 'email'
@@ -134,7 +135,7 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
           disabled={loading || success}
         />
         {mismatch && (
-          <span id="edit-mismatch-error" role="alert" className="text-xs text-red-400">{T.editProfileModal.mismatch}</span>
+          <span id="edit-mismatch-error" role="alert" className="text-xs text-danger">{T.editProfileModal.mismatch}</span>
         )}
       </div>
 
@@ -157,12 +158,12 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
 
       {/* Error */}
       {error && (
-        <p role="alert" className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>
+        <Notice tone="danger">{error}</Notice>
       )}
 
       {/* Success */}
       {success && (
-        <p role="status" className="text-sm text-green-400 bg-green-500/10 rounded-xl px-4 py-2">
+        <p role="status" className="text-sm text-success bg-success/10 ring-1 ring-inset ring-success/30 rounded-control px-4 py-2">
           {T.editProfileModal.success}
         </p>
       )}

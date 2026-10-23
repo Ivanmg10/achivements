@@ -7,6 +7,7 @@ import PasswordInput from '@/components/ui/PasswordInput'
 import { useLanguage } from '@/context/LanguageContext'
 import { PASSWORD_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
 
 interface Props {
   isOpen: boolean
@@ -93,10 +94,10 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
       />
 
       {error && (
-        <p role="alert" className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>
+        <Notice tone="danger">{error}</Notice>
       )}
       {success && (
-        <p role="status" className="text-sm text-green-400 bg-green-500/10 rounded-xl px-4 py-2">
+        <p role="status" className="text-sm text-success bg-success/10 ring-1 ring-inset ring-success/30 rounded-control px-4 py-2">
           {T.changePassword.changedSignIn}
         </p>
       )}

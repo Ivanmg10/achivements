@@ -19,7 +19,7 @@ export default function EmailVerificationNotice() {
 
   if (outcome === 'verified') {
     return (
-      <div role="status" className="flex items-center gap-3 bg-green-500/10 border border-green-500/30 rounded-2xl p-4">
+      <div role="status" className="flex items-center gap-3 bg-success/10 ring-1 ring-inset ring-success/30 rounded-control p-4">
         <IconCircleCheck size={18} className="text-green-400 shrink-0" aria-hidden="true" />
         <p className="text-sm font-medium text-green-300">{T.passwordReset.verifyDone}</p>
       </div>
@@ -35,7 +35,7 @@ export default function EmailVerificationNotice() {
     : T.passwordReset.verifyText
 
   return (
-    <div role="alert" className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
+    <div role="alert" className="flex items-start gap-3 bg-warning/10 ring-1 ring-inset ring-warning/30 rounded-control p-4">
       <IconMailExclamation size={18} className="text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
       <div className="flex flex-col gap-1 min-w-0">
         <p className="text-sm font-semibold text-amber-300">{T.passwordReset.verifyTitle}</p>

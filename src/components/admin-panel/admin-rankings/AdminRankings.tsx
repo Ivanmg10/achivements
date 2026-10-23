@@ -31,7 +31,7 @@ export default function AdminRankings() {
       </h3>
 
       {loadError ? (
-        <p role="alert" className="text-sm text-red-400">
+        <p role="alert" className="text-sm text-danger">
           Could not load the rankings.{' '}
           <button onClick={retry} className="underline hover:text-red-300">
             Retry

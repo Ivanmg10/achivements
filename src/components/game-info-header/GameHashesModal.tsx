@@ -122,7 +122,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                 </div>
               ) : error ? (
                 <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
-                  <p className="text-sm text-red-400" role="alert">Error al cargar hashes</p>
+                  <p className="text-sm text-danger" role="alert">Error al cargar hashes</p>
                 </div>
               ) : hashes.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">

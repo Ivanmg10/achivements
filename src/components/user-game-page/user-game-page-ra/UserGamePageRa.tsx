@@ -34,7 +34,7 @@ export default function UserGamePageRa({ id, username, banner, comparing, mine, 
       <>
         {banner}
         <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 flex flex-col items-center gap-2 text-center">
-          <p role="alert" className="text-red-400">{T.userGame.loadError.replace('{u}', username)}</p>
+          <p role="alert" className="text-danger">{T.userGame.loadError.replace('{u}', username)}</p>
           <button onClick={refetch} className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-ink/10 transition-colors">
             {T.publicProfile.retry}
           </button>

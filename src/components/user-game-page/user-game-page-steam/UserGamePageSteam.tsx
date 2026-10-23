@@ -49,7 +49,7 @@ export default function UserGamePageSteam({ id, username, banner, comparing, min
             </div>
           ) : error ? (
             <section className="bg-bg-card p-5 rounded-xl flex flex-col items-center gap-2 text-center">
-              <p role="alert" className="text-red-400">{T.userGame.loadError.replace('{u}', username)}</p>
+              <p role="alert" className="text-danger">{T.userGame.loadError.replace('{u}', username)}</p>
               <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
               <button onClick={retry} className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-ink/10 transition-colors">
                 {T.publicProfile.retry}

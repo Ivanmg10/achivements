@@ -48,7 +48,7 @@ export default function AdminPsnToken() {
       </h3>
 
       {loadError ? (
-        <p role="alert" className="text-sm text-red-400">
+        <p role="alert" className="text-sm text-danger">
           Could not load the PSN status.{' '}
           <button onClick={retry} className="underline hover:text-red-300">
             Retry
@@ -104,7 +104,7 @@ export default function AdminPsnToken() {
           </Button>
         </div>
         {saveError && (
-          <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-red-400">
+          <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-danger">
             {ERRORS[saveError]}
           </p>
         )}

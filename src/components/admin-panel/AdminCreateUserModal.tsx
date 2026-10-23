@@ -10,6 +10,7 @@ import { PASSWORD_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
 import Switch from '@/components/ui/Switch'
+import Notice from '@/components/ui/Notice'
 
 interface Props {
   isOpen: boolean
@@ -91,7 +92,7 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
         </div>
       </div>
 
-      {error && <p role="alert" className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>}
+      {error && <Notice tone="danger">{error}</Notice>}
 
       <div className="flex gap-3 mt-2">
         <button onClick={handleClose} className="flex-1 bg-bg-main text-text-secondary rounded-xl py-3 hover:text-text-main transition-colors">

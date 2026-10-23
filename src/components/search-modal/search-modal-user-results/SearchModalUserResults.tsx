@@ -102,7 +102,7 @@ export default function SearchModalUserResults({
       </div>
     )
   }
-  if (users.error) return <p role="alert" className="text-red-400 text-sm text-center py-8 px-4">{T.publicProfile.userLoadError}</p>
+  if (users.error) return <p role="alert" className="text-danger text-sm text-center py-8 px-4">{T.publicProfile.userLoadError}</p>
   if (users.results.length === 0) return <p className="text-text-secondary text-sm text-center py-8 px-4">{T.publicProfile.noUserFound}</p>
 
   return (

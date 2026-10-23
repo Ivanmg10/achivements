@@ -70,7 +70,7 @@ export default function PsnCategorySection({
         </div>
       ) : error ? (
         <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-red-400">
+          <p role="alert" className="text-sm text-danger">
             {T.psn.gamesError}
           </p>
           {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}

@@ -229,7 +229,7 @@ export default function CategoryPage() {
                 </div>
               </div>
               {(error || steamError || psnError || xboxError) && (
-                <p role="alert" className="text-sm text-red-400">
+                <p role="alert" className="text-sm text-danger">
                   {[error, steamError && (steamError === 'private' ? T.steamLink.errors.private : T.steam.gamesError), psnError && T.psn.gamesError, xboxError && T.xbox.gamesError].filter(Boolean).join(' · ')}
                 </p>
               )}
@@ -271,7 +271,7 @@ export default function CategoryPage() {
               </div>
               {quickRow}
               {(error || steamError || psnError || xboxError) && (
-                <p role="alert" className="text-sm text-red-400">
+                <p role="alert" className="text-sm text-danger">
                   {[error, steamError && (steamError === 'private' ? T.steamLink.errors.private : T.steam.gamesError), psnError && T.psn.gamesError, xboxError && T.xbox.gamesError].filter(Boolean).join(' · ')}
                 </p>
               )}

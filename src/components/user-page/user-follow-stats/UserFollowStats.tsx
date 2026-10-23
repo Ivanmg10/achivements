@@ -40,7 +40,7 @@ export default function UserFollowStats() {
         <Tile href="/following" icon={<IconUsers size={18} />} label={T.following.title} value={show(counts?.following)} />
         <Tile href="/following#followers" icon={<IconHeart size={18} />} label={T.following.followers} value={show(counts?.followers)} />
       </div>
-      {error && <p role="alert" className="text-xs text-red-400">{T.following.countsError}</p>}
+      {error && <p role="alert" className="text-xs text-danger">{T.following.countsError}</p>}
     </div>
   )
 }

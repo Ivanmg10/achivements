@@ -123,7 +123,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
       </label>
 
       {error && (
-        <p role="alert" className="text-sm text-danger bg-danger/10 rounded-xl px-4 py-2">
+        <p role="alert" className="text-sm text-danger bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control px-4 py-2">
           {error}
         </p>
       )}

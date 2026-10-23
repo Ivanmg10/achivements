@@ -231,7 +231,7 @@ export default function AdminPanel({
       </div>
 
       {deleteError && (
-        <p role="alert" className="text-sm text-red-400">
+        <p role="alert" className="text-sm text-danger">
           {deleteError}
         </p>
       )}

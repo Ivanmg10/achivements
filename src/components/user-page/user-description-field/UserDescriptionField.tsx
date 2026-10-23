@@ -38,7 +38,7 @@ export default function UserDescriptionField() {
         placeholder={T.userData.descriptionPlaceholder}
         className={fieldClass({}, 'h-auto! py-2.5 text-sm flex-1 min-h-20 resize-y')}
       />
-      {error && <p role="alert" className="text-xs text-red-400">{error}</p>}
+      {error && <p role="alert" className="text-xs text-danger">{error}</p>}
       <div className="flex items-center justify-between gap-3">
         <span className="text-xs text-text-secondary tabular-nums">{text.length}/{DESCRIPTION_MAX}</span>
         {dirty && (

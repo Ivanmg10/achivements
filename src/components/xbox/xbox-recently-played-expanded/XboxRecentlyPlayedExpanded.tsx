@@ -48,7 +48,7 @@ export default function XboxRecentlyPlayedExpanded({ game }: { game: XboxGamePro
           </ul>
         ) : error ? (
           <div className="flex flex-col items-start gap-2">
-            <p role="alert" className="text-sm text-red-400">
+            <p role="alert" className="text-sm text-danger">
               {T.xbox.achievementsError}
             </p>
             {error === 'private' && <p className="text-xs text-text-secondary">{T.xbox.errors.private}</p>}

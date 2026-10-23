@@ -6,6 +6,7 @@ import CommonModal from '@/components/common-modal/CommonModal'
 import PasswordInput from '@/components/ui/PasswordInput'
 import { useLanguage } from '@/context/LanguageContext'
 import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
 
 /** Asks for the password once more, then deletes the account and signs out. */
 export default function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -63,7 +64,7 @@ export default function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolea
         disabled={loading}
       />
 
-      {error && <p role="alert" className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>}
+      {error && <Notice tone="danger">{error}</Notice>}
 
       <div className="flex gap-3 mt-2">
         <Button

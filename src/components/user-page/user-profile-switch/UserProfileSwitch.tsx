@@ -49,7 +49,7 @@ export default function UserProfileSwitch({
           }}
         />
       </div>
-      {error && <p role="alert" className="text-xs text-red-400 px-2">{error}</p>}
+      {error && <p role="alert" className="text-xs text-danger px-2">{error}</p>}
     </div>
   )
 }

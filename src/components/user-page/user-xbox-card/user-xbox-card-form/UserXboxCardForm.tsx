@@ -49,7 +49,7 @@ export default function UserXboxCardForm({
         className={fieldClass({ size: 'sm', invalid: error !== null })}
       />
       {error && (
-        <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-red-400">
+        <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-danger">
           {T.xbox.errors[error]}
         </p>
       )}

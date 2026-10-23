@@ -111,7 +111,7 @@ export default function AdminLinkedAccounts({
             </button>
           </div>
         )}
-        {errors.ra && <span role="alert" className="text-xs text-red-400">{errors.ra}</span>}
+        {errors.ra && <span role="alert" className="text-xs text-danger">{errors.ra}</span>}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -147,7 +147,7 @@ export default function AdminLinkedAccounts({
             </button>
           </div>
         )}
-        {errors.steam && <span role="alert" className="text-xs text-red-400">{errors.steam}</span>}
+        {errors.steam && <span role="alert" className="text-xs text-danger">{errors.steam}</span>}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -183,7 +183,7 @@ export default function AdminLinkedAccounts({
             </button>
           </div>
         )}
-        {errors.psn && <span role="alert" className="text-xs text-red-400">{errors.psn}</span>}
+        {errors.psn && <span role="alert" className="text-xs text-danger">{errors.psn}</span>}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -219,7 +219,7 @@ export default function AdminLinkedAccounts({
             </button>
           </div>
         )}
-        {errors.xbox && <span role="alert" className="text-xs text-red-400">{errors.xbox}</span>}
+        {errors.xbox && <span role="alert" className="text-xs text-danger">{errors.xbox}</span>}
       </div>
     </div>
   )

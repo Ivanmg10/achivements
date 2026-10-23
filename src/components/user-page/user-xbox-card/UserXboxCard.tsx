@@ -63,7 +63,7 @@ export default function UserXboxCard() {
       status={
         isLinked &&
         summaryError && (
-          <p role="alert" className="text-xs text-red-400">
+          <p role="alert" className="text-xs text-danger">
             {T.xbox.errors[summaryError]}
           </p>
         )

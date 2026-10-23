@@ -64,7 +64,7 @@ export default function ResetPasswordForm() {
       </div>
 
       {!token ? (
-        <p role="alert" className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3 text-sm text-danger">
+        <p role="alert" className="mb-5 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3 text-sm text-danger">
           {T.passwordReset.missingToken}
         </p>
       ) : done ? (
@@ -74,7 +74,7 @@ export default function ResetPasswordForm() {
       ) : (
         <>
           {error && (
-            <p role="alert" className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3 text-sm text-danger">
+            <p role="alert" className="mb-5 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3 text-sm text-danger">
               {error}
             </p>
           )}

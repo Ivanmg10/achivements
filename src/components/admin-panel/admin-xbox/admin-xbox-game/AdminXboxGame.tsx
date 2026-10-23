@@ -57,7 +57,7 @@ export default function AdminXboxGame({ xuid, game }: { xuid: string; game: Xbox
         <div id={panelId} className="px-3 pb-3">
           {loading && <div aria-busy="true" className="h-5 w-40 rounded bg-ink/10 animate-pulse" />}
           {error && (
-            <p role="alert" className="text-sm text-red-400">
+            <p role="alert" className="text-sm text-danger">
               Could not load the achievements.{' '}
               <button type="button" onClick={() => void load()} className="underline hover:text-red-300">
                 Retry

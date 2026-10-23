@@ -22,7 +22,7 @@ export default function RaKeyInvalidNotice() {
   if (!keyInvalid || subject) return null
 
   return (
-    <div role="alert" className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 m-3">
+    <div role="alert" className="flex items-start gap-3 bg-warning/10 ring-1 ring-inset ring-warning/30 rounded-control p-4 m-3">
       <IconAlertTriangle size={18} className="text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
       <div className="flex flex-col gap-1 min-w-0">
         <p className="text-sm text-text-main">{T.userPage.raKeyInvalid}</p>
