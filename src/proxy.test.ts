@@ -25,6 +25,17 @@ test('the comparison and how-to pages are open to anyone, but only under their p
   expect((await proxy(request('/compare'))).status).toBe(307)
 })
 
+test('a profile and its preview image are open to anyone, but not the account page or a game in a profile', async () => {
+  for (const path of ['/user/ana', '/user/ana/opengraph-image', '/user/ana/opengraph-image-1a2b']) {
+    expect((await proxy(request(path))).status).toBe(200)
+  }
+  expect(getToken).not.toHaveBeenCalled()
+  ;(getToken as jest.Mock).mockResolvedValue(null)
+  for (const path of ['/user', '/user/ana/psn/123']) {
+    expect((await proxy(request(path))).status).toBe(307)
+  }
+})
+
 test('the app needs an account: a visitor is sent to sign in', async () => {
   ;(getToken as jest.Mock).mockResolvedValue(null)
   const res = await proxy(request('/groups'))

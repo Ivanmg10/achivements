@@ -297,6 +297,24 @@ authorised in this session. Recommended concept E (A's curtain between steps + B
 link). No Xbox in the welcome (admin-only). Branch cut from `feat/steam-sign-in` (PR #46, not
 merged), as the user asked; nothing pushed.
 **Open** — The user picks a concept; then build it as the plan says.
+## 2026-10-20 — A profile's public card and link preview (`feat/profile-og-image`)
+
+**Did** — Signed out, `/user/<name>` shows a card (`ProfileTeaser`: picture or initial, level,
+Vault Points, split per platform, games at 100 %, achievements, "Create an account" and "See the
+rankings") inside `PublicShell`, and the link preview is a per-profile image
+(`user/[username]/opengraph-image.tsx`) plus title and description (`generateMetadata`). All of it
+from `profileTeaser` (`src/lib/rankings.ts`). The proxy opens `/user/<name>` and its image. Names in
+the signed-out rankings now link to that card. One string, `rankings.profileTeaser`, in 9 languages.
+**Why** — To promote the site: a shared profile link was redirected to `/authPage` (Discord's and
+Reddit's crawlers too), so every preview was the generic card.
+**Decisions** — The user chose a teaser over a fully public profile. It shows only what the
+public rankings already show and only for users listed there (public profile and
+`show_in_rankings`), so `/privacy` did not change; a private or opted-out user and a missing one
+both 404. Uploaded pictures stay signed-in only (the card shows the initial); the preview never
+fetches a pasted avatar link (SSRF), so it always shows the initial.
+**Open** — The route's `loading.tsx` (the full profile's skeleton) flashes before the card for a
+visitor; harmless, a lighter skeleton if it bothers. Check the preview on Discord or
+opengraph.xyz once deployed.
 ## 2026-10-23 — Issues: drop the close workflow, `linked-issue` required (`chore/56-drop-issue-close`)
 
 **Did** — Removed `.github/workflows/issue-close.yml`; CLAUDE.md (Issues, Environments) and

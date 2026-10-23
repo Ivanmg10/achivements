@@ -749,8 +749,15 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   2026-10-21 a user's Steam link is proven by Steam (one user per Steam account); PSN and
   Xbox, typed, are still unproven.
 - **`/rankings` and `/rankings/how` are public** (`PUBLIC_PATHS` in the proxy, in the sitemap). Signed out: the
-  global list only, no presence (the privacy policy promises it only to signed-in users),
-  no profile links. Responses never carry user ids and are never shared-cached.
+  global list only, no presence (the privacy policy promises it only to signed-in users).
+  Responses never carry user ids and are never shared-cached.
+- **A profile's public card (2026-10-20):** signed out, `/user/<name>` shows `ProfileTeaser` and
+  its link preview (`opengraph-image.tsx`) shows the same, both from `profileTeaser` in
+  `src/lib/rankings.ts`: **only what the rankings already show** (name, level, points per
+  platform, games at 100 %, achievements), only for someone listed there, a 404 for anyone else.
+  Never presence, never an uploaded picture (served to signed-in users only), and the preview
+  never fetches a pasted avatar link (SSRF). The proxy opens `/user/<name>` and its image, not
+  `/user` nor a game inside a profile. Adding anything to the card means changing `/privacy`.
 - **A level shown for another user reads `vaultTotals`/`vaultTotalsOrNone`** (same rules as the
   rankings). Today: the rankings, Following cards, the home's friend cards, the public profile
   hero, the header (yours) and your account page. Progress towards a level is a `ProgressBar`
