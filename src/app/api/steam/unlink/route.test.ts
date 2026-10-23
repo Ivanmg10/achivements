@@ -27,6 +27,8 @@ test('clears both Steam columns for the signed-in user', async () => {
     'UPDATE users SET steamid = NULL, steamusername = NULL WHERE id = $1',
     ['7'],
   )
+  // The unlocks kept for the streak go with the link.
+  expect(pool.query).toHaveBeenCalledWith('DELETE FROM steam_unlocks WHERE user_id = $1', ['7'])
 })
 
 test('returns 500 when the DB write fails', async () => {

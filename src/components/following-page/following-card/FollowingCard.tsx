@@ -71,6 +71,7 @@ export default function FollowingCard({
             <PresenceLabel
               online={friend.online}
               lastSeenAt={friend.lastSeenAt}
+              playing={friend.playing}
               fallback={friend.description && <span className="text-xs text-text-secondary truncate">{friend.description}</span>}
             />
           </div>

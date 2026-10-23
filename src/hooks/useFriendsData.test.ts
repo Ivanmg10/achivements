@@ -93,4 +93,20 @@ describe('useFriendsData', () => {
     await waitFor(() => expect(result.current.friends).toEqual([]))
     expect(result.current.error).toBe(false)
   })
+  test('a friend in a Steam game right now carries its name; a failure shows none', async () => {
+    respond({
+      '/api/follows/overview': [friend('x', { ra: false, steam: true }), friend('y', { ra: false, steam: true })],
+      '/api/follows/playing': { x: { appId: 620, name: 'Portal 2' } },
+    })
+    const { result } = renderHook(() => useFriendsData(true))
+    await waitFor(() => expect(result.current.friends?.[0].playing).toBe('Portal 2'))
+    expect(result.current.friends?.[1].playing).toBeUndefined()
+  })
+
+  test('nobody on Steam, nobody asked about', async () => {
+    respond({ '/api/follows/overview': [friend('x', { ra: false })] })
+    const { result } = renderHook(() => useFriendsData(true))
+    await waitFor(() => expect(result.current.friends).toHaveLength(1))
+    expect((global.fetch as jest.Mock).mock.calls.map((c) => c[0])).not.toContain('/api/follows/playing')
+  })
 })

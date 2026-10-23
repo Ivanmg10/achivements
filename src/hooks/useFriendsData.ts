@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress, SteamRecentAchievement } from '@/types/steam'
 import type { PsnGameProgress, PsnRecentTrophy } from '@/types/psn'
 import type { XboxGameProgress, XboxRecentAchievement } from '@/types/xbox'
-import { lastPlayedGame, type FriendOverview, type LastPlayed } from '@/utils/friends'
+import { lastPlayedGame, withPlaying, type FriendOverview, type LastPlayed, type PlayingNow } from '@/utils/friends'
 import { profileLibrary, type LibraryGame } from '@/utils/library'
 import { toRecentAchievement } from '@/utils/steamMappers'
 import { psnToRecentAchievement } from '@/utils/psnMappers'
@@ -32,6 +32,18 @@ async function readList<T>(url: string): Promise<T[]> {
   const data = await res.json()
   if (!Array.isArray(data)) throw new Error(`${url.split('?')[0]}: not a list`)
   return data as T[]
+}
+
+/** Who is in a Steam game right now. A nice extra on the cards: a failure only logs and shows none. */
+export async function loadPlaying(): Promise<PlayingNow> {
+  try {
+    const res = await fetch('/api/follows/playing', { cache: 'no-store' })
+    if (!res.ok) throw new Error(`/api/follows/playing ${res.status}`)
+    return (await res.json()) as PlayingNow
+  } catch (err) {
+    console.error('[useFriendsData] playing', err)
+    return {}
+  }
 }
 
 /** One friend's recent unlocks and games, through the same routes their profile uses (`?user=`). */
@@ -87,6 +99,7 @@ export function useFriendsData(enabled: boolean) {
   const { lang } = useLanguage()
   const [friends, setFriends] = useState<FriendOverview[] | null>(null)
   const [details, setDetails] = useState<Record<string, FriendDetails>>({})
+  const [playing, setPlaying] = useState<PlayingNow>({})
   const [error, setError] = useState(false)
   const [attempt, setAttempt] = useState(0)
   const started = useRef<number | null>(null)
@@ -100,6 +113,11 @@ export function useFriendsData(enabled: boolean) {
       .then(async (list) => {
         if (!current) return
         setFriends(list)
+        if (list.some((f) => f.steam)) {
+          loadPlaying().then((p) => {
+            if (current) setPlaying(p)
+          })
+        }
         await mapLimit(list.slice(0, DETAIL_LIMIT), AT_ONCE, async (friend) => {
           const d = await loadFriendDetails(friend, lang)
           if (current) setDetails((prev) => ({ ...prev, [friend.username]: d }))
@@ -123,12 +141,14 @@ export function useFriendsData(enabled: boolean) {
     setError(false)
     setFriends(null)
     setDetails({})
+    setPlaying({})
     setAttempt((n) => n + 1)
   }, [])
 
+  const withGames = useMemo(() => (friends ? withPlaying(friends, playing) : null), [friends, playing])
   const detailed = friends ? friends.slice(0, DETAIL_LIMIT) : []
   return {
-    friends,
+    friends: withGames,
     details,
     /** The overview is in, and every friend whose details are read has answered. */
     isLoading: friends === null && !error,

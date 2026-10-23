@@ -7,6 +7,7 @@ import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
 import AuthBrand from '@/components/auth-brand/AuthBrand'
 import AuthFormCard from '@/components/auth-form-card/AuthFormCard'
 import AuthDesktopFormPanel from '@/components/auth-desktop-form-panel/AuthDesktopFormPanel'
+import SteamSignupForm from '@/components/steam-signup-form/SteamSignupForm'
 import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -18,7 +19,10 @@ const SLIDE_T   = { duration: 0.32, ease: 'easeOut' as const }
 
 /** ?mode=register opens straight on the register form, for the landing button. */
 function AuthPageContent() {
-  const wantsRegister = useSearchParams().get('mode') === 'register'
+  const params = useSearchParams()
+  const wantsRegister = params.get('mode') === 'register'
+  // Back from Steam's sign-in (api/auth/steam/callback): it takes the sign-in slot.
+  const steam = params.get('steam')
   const [isLogin, setIsLogin] = useState(!wantsRegister)
   const [hasRegister, setHasRegister] = useState(false)
 
@@ -38,7 +42,7 @@ function AuthPageContent() {
           {isLogin ? (
             <motion.div key="m-login" className="relative z-10 w-full" variants={formTransition} initial="hidden" animate="visible" exit="exit">
               <AuthFormCard>
-                <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />
+                {steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />}
               </AuthFormCard>
             </motion.div>
           ) : (
@@ -57,7 +61,7 @@ function AuthPageContent() {
           {isLogin ? (
             <motion.div key="d-login" className="relative w-full h-full" {...fromLeft} transition={SLIDE_T}>
               <AuthDesktopFormPanel>
-                <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />
+                {steam ? <SteamSignupForm outcome={steam} /> : <LoginUserForm setIsLogin={setIsLogin} isRegister={hasRegister} />}
               </AuthDesktopFormPanel>
             </motion.div>
           ) : (

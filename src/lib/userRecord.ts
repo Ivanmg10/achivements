@@ -77,6 +77,12 @@ export async function loadUserByUsername(username: string): Promise<UserRecord |
   return (rows[0] as UserRecord | undefined) ?? null
 }
 
+/** The user who signs in with this Steam account (migrations/041_steam_login.sql). */
+export async function loadUserBySteamLogin(steamid: string): Promise<UserRecord | null> {
+  const { rows } = await pool.query(`SELECT ${COLUMNS} FROM users WHERE steam_login_id = $1`, [steamid])
+  return (rows[0] as UserRecord | undefined) ?? null
+}
+
 /** Drop the cached row after changing it, so this instance sees the change at once. */
 export function forgetUser(id: string | number) {
   cache.delete(String(id))

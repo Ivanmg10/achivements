@@ -8,7 +8,7 @@ import { useSteamProfile } from '@/hooks/useSteamProfile'
 import { notify } from '@/lib/notify'
 import { formatPlaytime, summarizeSteamLibrary } from '@/utils/steamFeed'
 import UserPlatformCard, { DISCONNECT_CLASS, PlatformStat } from '@/components/user-page/user-platform-card/UserPlatformCard'
-import UserSteamCardForm from './user-steam-card-form/UserSteamCardForm'
+import UserSteamCardLink from './user-steam-card-link/UserSteamCardLink'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 
 /** A dash rather than a zero while the numbers are still loading. */
@@ -16,13 +16,12 @@ const pending = (loading: boolean, value: number | null | undefined) =>
   loading || value === null || value === undefined ? '—' : value.toLocaleString()
 
 /**
- * Steam on the account page and in onboarding. Linked by typing a custom URL
- * name, a profile link or a SteamID64 — like PSN, no Steam sign-in: the
- * profile only has to exist and be public.
+ * Steam on the account page and in onboarding. Linked through Steam's own
+ * sign-in, which proves the account is the user's (and lets it sign in with Steam).
  */
 export default function UserSteamCard() {
   const { T, lang } = useLanguage()
-  const { steamId, steamUsername, isLinked, link, isLinking, error, unlink, isUnlinking } = useSteamLink()
+  const { steamId, steamUsername, isLinked, linkHref, unlink, isUnlinking } = useSteamLink()
   const { library, libraryLoading } = useSteamGamesData()
   const { profile } = useSteamProfile()
   const steam = summarizeSteamLibrary(library)
@@ -37,10 +36,6 @@ export default function UserSteamCard() {
       value: libraryLoading ? '—' : formatPlaytime(steam.totalMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang),
     },
   ]
-
-  const handleLink = async (query: string) => {
-    if (await link(query)) notify.success(T.toast.steamLinked)
-  }
 
   const handleUnlink = async () => {
     if (await unlink()) notify.success(T.toast.steamUnlinked)
@@ -79,7 +74,7 @@ export default function UserSteamCard() {
             {isUnlinking ? T.userData.steamDisconnecting : T.userData.steamDisconnect}
           </button>
         ) : (
-          <UserSteamCardForm onSubmit={handleLink} isLinking={isLinking} error={error} />
+          <UserSteamCardLink href={linkHref} />
         )
       }
     />

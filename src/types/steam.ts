@@ -65,6 +65,11 @@ export type SteamOwnedGamesResponse = {
   response: { game_count?: number; games?: SteamOwnedGame[] }
 }
 
+/** GetTopAchievementsForGames: `achievements` are the unlocked ones (all of them, see steamClient). */
+export type SteamTopAchievementsResponse = {
+  response?: { games?: { appid: number; total_achievements?: number; achievements?: { name: string }[] }[] }
+}
+
 export type SteamRecentlyPlayedResponse = {
   response: { total_count?: number; games?: SteamOwnedGame[] }
 }

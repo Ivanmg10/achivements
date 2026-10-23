@@ -10,12 +10,12 @@ import { useSteamProfile } from '@/hooks/useSteamProfile'
 import { notify } from '@/lib/notify'
 import { en } from '@/translations/en'
 
-const link = jest.fn()
+const LINK_HREF = '/api/auth/steam?intent=link&next=%2Fuser'
 const unlink = jest.fn()
 
 function setSteam(overrides: Record<string, unknown> = {}) {
   ;(useSteamLink as jest.Mock).mockReturnValue({
-    steamId: '76561198000000000', steamUsername: 'ivan', isLinked: true, link, isLinking: false, error: null, unlink, isUnlinking: false,
+    steamId: '76561198000000000', steamUsername: 'ivan', isLinked: true, linkHref: LINK_HREF, unlink, isUnlinking: false,
     ...overrides,
   })
 }
@@ -46,26 +46,9 @@ test('shows the Steam profile picture and name once loaded', () => {
   expect(container.querySelector('img[src*="avatars.steamstatic.com"]')).not.toBeNull()
 })
 
-test('not linked: a box for the name, no Steam sign-in, and a toast when it links', async () => {
+test('not linked: a link that goes through Steam to connect', () => {
   setSteam({ isLinked: false, steamId: null })
-  link.mockResolvedValue(true)
   render(<UserSteamCard />)
-  expect(screen.queryByRole('link', { name: /Steam/ })).not.toBeInTheDocument()
-  fireEvent.change(screen.getByLabelText(en.steamLink.label), { target: { value: ' gabelogannewell ' } })
-  fireEvent.click(screen.getByRole('button', { name: en.userData.steamConnect }))
-  expect(link).toHaveBeenCalledWith('gabelogannewell')
-  await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.steamLinked))
-})
-
-test('a failed link is explained under the box', () => {
-  setSteam({ isLinked: false, error: 'private' })
-  render(<UserSteamCard />)
-  expect(screen.getByRole('alert')).toHaveTextContent(en.steamLink.errors.private)
-  expect(screen.getByLabelText(en.steamLink.label)).toHaveAttribute('aria-invalid', 'true')
-})
-
-test('while linking the button says so and cannot be pressed again', () => {
-  setSteam({ isLinked: false, isLinking: true })
-  render(<UserSteamCard />)
-  expect(screen.getByRole('button', { name: en.steamLink.connecting })).toBeDisabled()
+  expect(screen.getByRole('link', { name: en.userData.steamConnect })).toHaveAttribute('href', LINK_HREF)
+  expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
 })
