@@ -19,6 +19,9 @@ export type RankSource = 'all' | GameSource
 export const RANK_SCOPES: RankScope[] = ['global', 'following']
 export const RANK_PERIODS: RankPeriod[] = ['all', 'month', 'week']
 export const RANK_SOURCES: RankSource[] = ['all', 'ra', 'steam', 'psn', 'xbox']
+/** What the list is ordered by: points, the current streak, or the longest one. */
+export type RankSort = 'points' | 'streak' | 'best'
+export const RANK_SORTS: RankSort[] = ['points', 'streak', 'best']
 
 export type RankEntry = {
   id: number
@@ -175,6 +178,56 @@ export async function weeklyTrend(userIds: number[], source: RankSource, xbox: b
     if (list && i >= 0) list[i] = r.points
   }
   return trend
+}
+
+export type Streak = { current: number; best: number }
+
+const DAY_S = 86400
+
+/** Days in a row with an unlock, from sorted unique day numbers: the run up to today or yesterday, and the longest. */
+export function streakOf(days: number[], today: number): Streak {
+  let run = 0
+  let best = 0
+  days.forEach((d, i) => {
+    run = i > 0 && d === days[i - 1] + 1 ? run + 1 : 1
+    best = Math.max(best, run)
+  })
+  const last = days[days.length - 1]
+  return { current: last !== undefined && last >= today - 1 ? run : 0, best }
+}
+
+/**
+ * Each user's streaks on the chosen platforms, from the days stored with their scored games
+ * (UTC days, as weeks and months are), so no platform is asked. Games without dates
+ * (provisional) do not count; hidden games and unticked consoles are not stored at all.
+ */
+export async function streaksOf(userIds: number[], source: RankSource, xbox: boolean, now = new Date()): Promise<Map<number, Streak>> {
+  if (userIds.length === 0) return new Map()
+  // ponytail: reads every stored day of every user asked on each call; keep a per-user column if the list grows large.
+  const rows = await queryRows<{ id: number; days: number[] }>(
+    `SELECT g.user_id AS id, array_agg(DISTINCT ((x->>0)::bigint / ${DAY_S})::int ORDER BY ((x->>0)::bigint / ${DAY_S})::int) AS days
+     FROM score_games g JOIN users u ON u.id = g.user_id, jsonb_array_elements(g.unlocks) x
+     WHERE g.user_id = ANY($1::int[]) AND (x->>0)::bigint > 0 AND g.flag IS DISTINCT FROM 'suspect' AND ${LINKED_ACCOUNT}
+       AND ($2::text = 'all' OR g.source = $2) AND ($3::boolean OR g.source <> 'xbox')
+     GROUP BY g.user_id`,
+    [userIds, source, xbox],
+  )
+  const today = Math.floor(now.getTime() / 1000 / DAY_S)
+  return new Map(rows.map((r) => [r.id, streakOf(r.days, today)]))
+}
+
+/** The same users ordered by a streak (longer first, then points, then name), sharing a place on equal streaks; who has none is left out. */
+export function rankByStreak(entries: RankEntry[], streaks: Map<number, Streak>, key: keyof Streak): RankEntry[] {
+  const value = (e: RankEntry) => streaks.get(e.id)?.[key] ?? 0
+  const ranked = entries
+    .filter((e) => e.listed && value(e) > 0)
+    .sort((a, b) => value(b) - value(a) || b.points - a.points || a.username.localeCompare(b.username))
+    .map((e) => ({ ...e }))
+  ranked.forEach((u, i) => {
+    u.rank = i > 0 && value(ranked[i - 1]) === value(u) ? ranked[i - 1].rank : i + 1
+  })
+  const unlisted = entries.filter((e) => !e.listed).map((u) => ({ ...u, rank: value(u) > 0 ? 1 + ranked.filter((r) => value(r) > value(u)).length : 0 }))
+  return [...ranked, ...unlisted]
 }
 
 /** Where each listed user stood at the start of this week (global, all time, no Xbox). */

@@ -9,7 +9,7 @@ jest.mock('@/hooks/useVaultMe', () => ({ useVaultMe: jest.fn() }))
 jest.mock('@/hooks/useXboxEnabled', () => ({ useXboxEnabled: () => false }))
 
 const row = (rank: number, username: string, over: Record<string, unknown> = {}) => ({
-  username, avatar: null, rank, points: 10_000 - rank * 100, totalPoints: 10_000 - rank * 100, split: { ra: 100 }, completed: 3, achievements: 40, delta: null, isMe: false, trend: [], ...over,
+  username, avatar: null, rank, points: 10_000 - rank * 100, totalPoints: 10_000 - rank * 100, split: { ra: 100 }, completed: 3, achievements: 40, delta: null, isMe: false, trend: [], streak: 0, bestStreak: 0, ...over,
 })
 const rows = Array.from({ length: 6 }, (_, i) => row(i + 1, `user${i + 1}`))
 const retry = jest.fn()
@@ -44,10 +44,13 @@ test('a podium for the first three, then the table, and more on demand', () => {
 test('changing the view asks for it', () => {
   render(<RankingsPage signedIn />)
   fireEvent.click(screen.getByRole('tab', { name: en.rankings.following }))
-  expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toEqual({ scope: 'following', period: 'all', source: 'all' })
+  expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toEqual({ scope: 'following', period: 'all', source: 'all', sort: 'points' })
   fireEvent.click(screen.getByRole('button', { name: en.rankings.week }))
   expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toMatchObject({ period: 'week' })
   expect(screen.getByRole('button', { name: en.rankings.week })).toHaveAttribute('aria-pressed', 'true')
+  fireEvent.click(screen.getByRole('button', { name: en.rankings.sortBest }))
+  expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toMatchObject({ sort: 'best' })
+  expect(screen.getByRole('button', { name: en.rankings.sortBest })).toHaveAttribute('aria-pressed', 'true')
 })
 
 test('signed out: only the global list, names open their public card, and how to join', () => {
@@ -120,7 +123,7 @@ test('beside your level, who is most active this week, and a way to that ranking
   expect(hot).toHaveTextContent('blazing')
   expect(hot).toHaveTextContent('+677')
   fireEvent.click(screen.getByRole('button', { name: en.rankings.hotSee }))
-  expect(useRankings).toHaveBeenLastCalledWith({ scope: 'global', period: 'week', source: 'all' })
+  expect(useRankings).toHaveBeenLastCalledWith({ scope: 'global', period: 'week', source: 'all', sort: 'points' })
   // Already on the weekly ranking: no way to it.
   expect(screen.queryByRole('button', { name: en.rankings.hotSee })).not.toBeInTheDocument()
 })

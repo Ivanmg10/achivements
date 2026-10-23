@@ -762,6 +762,9 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   rankings). Today: the rankings, Following cards, the home's friend cards, the public profile
   hero, the header (yours) and your account page. Progress towards a level is a `ProgressBar`
   or `CircularProgress` in the theme's colour; tiers have their own hue only on their badge.
+- **Streaks in the rankings (2026-10-23)** are read from `score_games.unlocks` (UTC days, `streaksOf`),
+  never from a platform: they lag the score refresh and may differ by a day from the streak page,
+  which reads the live feed. `?sort=streak|best` orders by them (no arrows, no points gap in the zone).
 - Rankings are labelled **Beta** in the UI; drop the label when the user says so.
 
 ## Follows: who you follow and who follows you (2026-10-20)

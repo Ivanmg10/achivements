@@ -8,13 +8,14 @@ import VaultPlatformSplit from '@/components/vault-platform-split/VaultPlatformS
 import VaultSparkline from '@/components/vault-sparkline/VaultSparkline'
 import RankingsPageUser from '../rankings-page-user/RankingsPageUser'
 import RankingsPageDelta from '../rankings-page-delta/RankingsPageDelta'
+import RankingsPageStreak from '../rankings-page-streak/RankingsPageStreak'
 import { ROW } from '../rankingsMotion'
 
 const TH = 'px-3 py-2.5 text-[10.5px] uppercase tracking-wider font-bold text-text-secondary text-left'
 
 /**
  * The rankings as a table (from md up): place, who, level, points, where they
- * come from, their last weeks, games at 100 %, achievements and, on the view
+ * come from, their streaks (now and longest), their last weeks, games at 100 %, achievements and, on the view
  * that has them, the places moved this week. Your row is tinted and says "You".
  * Given `gapFrom` (your zone), each other name says how far ahead or behind you they are.
  */
@@ -47,6 +48,7 @@ export default function RankingsPageTable({
             <th scope="col" className={TH}>{T.rankings.colUser}</th>
             <th scope="col" className={TH}>{T.rankings.colLevel}</th>
             <th scope="col" className={`${TH} text-right`}>{T.rankings.colPoints}</th>
+            <th scope="col" className={TH}>{T.rankings.colStreak}</th>
             <th scope="col" className={`${TH} hidden lg:table-cell`}>{T.rankings.colPlatforms}</th>
             <th scope="col" className={`${TH} hidden lg:table-cell`}>{T.rankings.colTrend}</th>
             <th scope="col" className={`${TH} text-right hidden xl:table-cell`}>{T.rankings.colCompleted}</th>
@@ -73,6 +75,9 @@ export default function RankingsPageTable({
               <td className="px-3 py-2 text-right font-bold tabular-nums whitespace-nowrap">
                 {r.isMe && approx && <span className="text-warning" title={T.rankings.fillApprox}>≈ </span>}
                 {r.points.toLocaleString(lang)}
+              </td>
+              <td className="px-3 py-2">
+                <RankingsPageStreak streak={r.streak} best={r.bestStreak} />
               </td>
               <td className="px-3 py-2 hidden lg:table-cell">
                 <VaultPlatformSplit split={r.split} className="w-28" />

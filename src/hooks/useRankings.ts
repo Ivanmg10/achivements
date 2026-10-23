@@ -2,9 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useVaultFillState } from '@/context/VaultFillContext'
 import type { RankingsResponse, RankRow } from '@/app/api/rankings/route'
-import type { RankPeriod, RankScope, RankSource } from '@/lib/rankings'
+import type { RankPeriod, RankScope, RankSort, RankSource } from '@/lib/rankings'
 
-export type RankingsView = { scope: RankScope; period: RankPeriod; source: RankSource }
+/** `sort` left out is by points. */
+export type RankingsView = { scope: RankScope; period: RankPeriod; source: RankSource; sort?: RankSort }
 type ZoneSize = { above: number; below: number }
 
 /** "Your zone" starts with two on each side and widens ten at a time, up to fifty (the API's limit). */
@@ -17,6 +18,7 @@ async function request(view: RankingsView, offset: number, zone: ZoneSize): Prom
     const qs = new URLSearchParams({
       scope: view.scope, period: view.period, source: view.source, offset: String(offset), above: String(zone.above), below: String(zone.below),
     })
+    if (view.sort && view.sort !== 'points') qs.set('sort', view.sort)
     const res = await fetch(`/api/rankings?${qs}`)
     if (!res.ok) throw new Error(`rankings ${res.status}`)
     const data = await res.json()
@@ -35,7 +37,7 @@ async function request(view: RankingsView, offset: number, zone: ZoneSize): Prom
  * page or a wider zone that fails only stops it growing (and says so).
  */
 export function useRankings(view: RankingsView, enabled = true) {
-  const key = `${view.scope}|${view.period}|${view.source}`
+  const key = `${view.scope}|${view.period}|${view.source}|${view.sort ?? 'points'}`
   const [data, setData] = useState<RankingsResponse | null>(null)
   const [rows, setRows] = useState<RankRow[]>([])
   const [answered, setAnswered] = useState<string | null>(null)
@@ -62,9 +64,9 @@ export function useRankings(view: RankingsView, enabled = true) {
   useEffect(() => {
     if (!enabled) return
     let current = true
-    const [scope, period, source] = key.split('|') as [RankScope, RankPeriod, RankSource]
+    const [scope, period, source, sort] = key.split('|') as [RankScope, RankPeriod, RankSource, RankSort]
     zoneRef.current = answered === key ? zoneRef.current : ZONE
-    request({ scope, period, source }, 0, zoneRef.current).then((res) => {
+    request({ scope, period, source, sort }, 0, zoneRef.current).then((res) => {
       if (!current) return
       setData(res)
       setRows(res?.rows ?? [])
@@ -87,7 +89,7 @@ export function useRankings(view: RankingsView, enabled = true) {
     if (!data || loadingMore) return
     setLoadingMore(true)
     setMoreFailed(false)
-    const res = await request({ scope: data.scope, period: data.period, source: data.source }, rows.length, zoneRef.current)
+    const res = await request({ scope: data.scope, period: data.period, source: data.source, sort: data.sort }, rows.length, zoneRef.current)
     setLoadingMore(false)
     if (!res) {
       setMoreFailed(true)
@@ -103,7 +105,7 @@ export function useRankings(view: RankingsView, enabled = true) {
       const next = { ...zoneRef.current, [key]: Math.min(ZONE_MAX, zoneRef.current[key] + ZONE_STEP) }
       setWidening(true)
       setMoreFailed(false)
-      const res = await request({ scope: data.scope, period: data.period, source: data.source }, 0, next)
+      const res = await request({ scope: data.scope, period: data.period, source: data.source, sort: data.sort }, 0, next)
       setWidening(false)
       if (!res) {
         setMoreFailed(true)
