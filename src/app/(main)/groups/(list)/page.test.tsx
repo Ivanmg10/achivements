@@ -28,8 +28,9 @@ jest.mock('@/components/groups/group-list/GroupList', () => ({
   ),
 }))
 
-jest.mock('@/components/status-grid-control/StatusGridControl', () => ({
+jest.mock('@/components/groups/group-view-toggle/GroupViewToggle', () => ({
   __esModule: true,
+  GROUP_VIEWS: ['covers', 'shelves'],
   default: () => <div data-testid="grid-control" />,
 }))
 

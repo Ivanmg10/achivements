@@ -82,6 +82,6 @@ describe('the consoles unticked in preferences', () => {
     const { result } = renderHook(() => usePsnGamesData(), { wrapper })
     await waitFor(() => expect(result.current.fullLibrary).toHaveLength(2))
     expect(result.current.library.map((g) => g.id)).toEqual([2])
-    expect(result.current.consoles.map((c) => c.name).sort()).toEqual(['PS3', 'PS4', 'PS5'])
+    expect(result.current.consoles.map((c) => c.name).sort()).toEqual(['PS Vita', 'PS3', 'PS4', 'PS5'])
   })
 })

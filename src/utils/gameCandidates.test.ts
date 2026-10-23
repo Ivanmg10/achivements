@@ -6,6 +6,7 @@ import {
   candidateToGroupItemBody,
   normalizeTitle,
   searchCandidates,
+  suggestCandidates,
   titleMatches,
   GameCandidate,
 } from './gameCandidates'
@@ -198,4 +199,11 @@ describe('buildXboxCandidates', () => {
     expect([done.status, mid.status, none.status]).toEqual(['perfect', 'in-progress', 'want-to-play'])
     expect(mid).toMatchObject({ key: 'xbox:2', source: 'xbox', subtitle: 'Xbox', pctWon: 0.3 })
   })
+})
+
+test('suggestCandidates: being played (closest to done first), then wanted, then the rest; chosen ones left out', () => {
+  const c = (key: string, status: GameCandidate['status'], pctWon: number) => ({ key, status, pctWon }) as GameCandidate
+  const list = [c('done', 'perfect', 1), c('want', 'want-to-play', 0), c('half', 'in-progress', 0.5), c('near', 'in-progress', 0.9), c('mine', 'in-progress', 0.95)]
+  expect(suggestCandidates(list, new Set(['mine'])).map((x) => x.key)).toEqual(['near', 'half', 'want', 'done'])
+  expect(suggestCandidates(list, new Set(), 2)).toHaveLength(2)
 })

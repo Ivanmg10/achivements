@@ -324,7 +324,11 @@ export type GameGroup = {
   xbox_count?: number
   total_awarded: number
   total_possible: number
-  /** The first four games, for the card's cover mosaic. */
-  covers?: { source: GameSource; game_id: number; image_icon: string | null }[]
+  completed_count?: number
+  started_count?: number
+  /** The first five games, for the covers and the shelf (progress as stored in the group). */
+  covers?: { source: GameSource; game_id: number; image_icon: string | null; title?: string; num_awarded?: number; max_possible?: number }[]
+  /** The started game closest to done, and how many achievements it lacks. */
+  next_up?: { title: string; left: number } | null
   items?: GameGroupItem[]
 }

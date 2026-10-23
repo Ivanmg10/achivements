@@ -1,10 +1,11 @@
 'use client'
 
-import { useId, useMemo, useRef, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { IconActivity, IconAward, IconCompass, IconFolders, IconLayoutDashboard, IconPin, IconUsers } from '@tabler/icons-react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
+import { useSectionScroll } from '@/hooks/useSectionScroll'
 import { useConsoleVisibility } from '@/hooks/useConsoleVisibility'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useStreakData } from '@/hooks/useStreakData'
@@ -61,14 +62,13 @@ export default function MainPageCharts() {
   const [section, setSection] = useState('overview')
   const idPrefix = useId().replace(/:/g, '')
   const reduceMotion = useReducedMotion()
-  const sectionRef = useRef<HTMLElement>(null)
+  const { ref: sectionRef, scrollToTop } = useSectionScroll<HTMLElement>()
 
   // Opening a section brings the whole of it into view, its top just under the
-  // sticky header (scroll-mt), gliding unless the user asked for less motion.
-  // On the next frame, once the new panel is laid out.
+  // sticky header, and holds it there while a section that loads once opened grows.
   const openSection = (id: string) => {
     setSection(id)
-    requestAnimationFrame(() => sectionRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }))
+    scrollToTop()
   }
   const { achievements, isLoading: achLoading, error: achError, refetch: refetchAch } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()

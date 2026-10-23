@@ -11,6 +11,7 @@ import { useConsoleVisibility } from '@/hooks/useConsoleVisibility'
 import type { PsnError } from '@/hooks/usePsnLink'
 import type { PsnSummary } from '@/lib/psnClient'
 import MainPageProfileActions from '../../main-page-profile-actions/MainPageProfileActions'
+import MainPageProfileError from '../../main-page-profile-error/MainPageProfileError'
 import MainPageProfilePsnStats from '../main-page-profile-psn-stats/MainPageProfilePsnStats'
 import MainPageProfilePsnGame from '../main-page-profile-psn-game/MainPageProfilePsnGame'
 import MainPageProfilePsnTrophies from '../main-page-profile-psn-trophies/MainPageProfilePsnTrophies'
@@ -51,17 +52,7 @@ export default function MainPageProfilePsnLinked({
   }
 
   if (error || !summary) {
-    return (
-      <div className="flex flex-col items-start gap-2 p-3 bg-bg-card rounded-xl w-full">
-        <p role="alert" className="text-sm text-red-400">
-          {T.psn.profileError}
-        </p>
-        {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}
-        <button onClick={onRetry} className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">
-          {T.psn.retry}
-        </button>
-      </div>
-    )
+    return <MainPageProfileError logo={<PlaystationLogo size={16} aria-hidden="true" />} title={T.psn.profileError} detail={error === 'private' ? T.psn.errors.private : undefined} retryLabel={T.psn.retry} onRetry={onRetry} />
   }
 
   // Someone else's page has nothing of the viewer's to refresh.

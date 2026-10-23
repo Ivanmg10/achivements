@@ -20,6 +20,10 @@ Keep it short — a few lines per heading; leave out a heading with nothing in i
 **Watch out** — anything surprising the next person would trip on.
 ```
 
+Merges never conflict on this file: `.gitattributes` gives it git's `union` driver,
+which keeps both branches' entries. It can drop the `---` between two entries
+or put them in either order; that is cosmetic, fix it if you see it.
+
 Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 "added X to CLAUDE.md".
 
@@ -43,6 +47,225 @@ fetches a pasted avatar link (SSRF), so it always shows the initial.
 **Open** — The route's `loading.tsx` (the full profile's skeleton) flashes before the card for a
 visitor; harmless, a lighter skeleton if it bothers. Check the preview on Discord or
 opengraph.xyz once deployed.
+## 2026-10-21 — Xbox: a game's empty launcher twin no longer shows as a second game (`feat/groups-redesign`)
+
+**Did** — `foldTwinTitles` (`utils/xboxTitles.ts`), applied in `xboxLibraryData`: a title with no
+achievements that shares its name with one that has them is dropped, its last session and play
+time folded into the game. Library cache key bumped to `xbox:titles:v6`. CLAUDE.md (Xbox) says so.
+**Why** — "Minecraft: Xbox 360 Edition" showed twice in Recently played, once 5/93 and once 0/0.
+Read from pre's cache: Xbox lists two 360 titles with that name, 1480659447 (93 achievements) and
+1297287809 (0x4D53…, none), played six seconds apart: the game and what launches it.
+**Watch out** — Only same-name twins are folded; a game with no achievements and no twin stays.
+If the twin was ever pinned or put in a group, that row no longer finds its game.
+
+---
+
+## 2026-10-21 — Opening a home section keeps its top in view while it loads (`feat/groups-redesign`)
+
+**Did** — New hook `useSectionScroll` (used by `MainPageCharts`): opening a stats section scrolls
+its top under the header as before, then keeps asking again while the section resizes, for up to
+`SETTLE_MS` (3 s), and lets go as soon as the user scrolls (wheel, touch, keys).
+**Why** — "Siguiendo" (Following) scrolled badly: it loads only once opened, so at the moment of
+the scroll the page held a short skeleton, could not scroll that far, and stopped short; the
+friends then arrived and nothing corrected it.
+**Decisions** — Rejected a minimum height on the panel area (always tall enough to scroll): it
+left a blank screen under every short section.
+
+---
+
+## 2026-10-21 — More group icons; the edit preview shows the group (`feat/groups-redesign`)
+
+**Did** — `GroupModalIconPicker` offers 80 icons in five categories (`ICON_CATEGORIES`: games,
+trophies, mood, lists, nature) and opens on the category of the current icon; the own-emoji/link
+field stays. Editing a group, `GroupModalPreview` now shows its own covers and game count (it said
+"0 games": it only counted the games picked while creating).
+**Why** — The user asked for a bigger icon choice, and to improve the edit modal.
+
+---
+
+## 2026-10-21 — Edit a group from the home page (`feat/groups-redesign`)
+
+**Did** — The featured group on the home (`MainPageGroupFeature`) has an edit button that opens
+`GroupModal` with the group; saving goes through the section's `updateGroup` (so the list beside
+it updates too) and toasts "Group saved"; a refused save stays in the modal. `updateGroup` no
+longer throws a JSON parse error when an error answer has no JSON body.
+**Why** — The user asked for an edit button there.
+
+---
+
+## 2026-10-21 — A friendlier new-group modal (`feat/groups-redesign`)
+
+**Did** — `GroupModal` rebuilt: a titled dialog on `<body>` (portal), Escape closes it. Creating is
+two columns: a live preview (`GroupModalPreview`: chosen games' covers, icon, name, privacy),
+name and description with character counters (limits from `groupValidation`), the icon as a row
+of one-tap emoji plus "none" and a field for your own emoji or image link
+(`GroupModalIconPicker`), and private/public as two radio options that say who sees it
+(`GroupModalVisibility`, replaces the switch). The games column (`GroupModalGamePicker`) is now
+suggestions and matches as covers to tick (`GamePickerTile`, `suggestCandidates`), chosen games
+stay ticked in place. A missing name is an inline error on the field (it used to say only
+"Title"); the button reads "Create with N games". Editing keeps the first column only.
+**Why** — The user asked to improve the new-group modal after the add-games one.
+
+---
+
+## 2026-10-21 — Home page Groups section in the new style (`feat/groups-redesign`)
+
+**Did** — `MainPageGroupFeature`: covers faded behind a progress ring (was an amber `text-warning`
+number), finished / started / not started counts, a "Closest to done" link to that game
+(`closestItem`), the first six games as covers (`MainPageGroupFeatureGame`), and an empty group
+offers "Add games" (the new modal) right there. `MainPageGroups` (the list beside it): a progress
+bar and % per group, **no delete** any more (it is on the group page), and it takes the groups
+from `MainPageGroupsSection` instead of fetching them itself (it asked twice before). New hook
+`useGroupProgress(items)`: one reading of progress (RA live, the libraries, then stored) shared by
+the group page and the home, which used to show the stored `pct_won` and could disagree.
+**Why** — The user asked what to improve in the home's Groups section and approved the list.
+**Decisions** — Until the featured group's games load, its ring uses the stored totals from the list.
+
+---
+
+## 2026-10-21 — A friendlier "add games" modal for groups (`feat/groups-redesign`)
+
+**Did** — `AddGameModal` rebuilt: a titled dialog ("Add games", "to <group>"), on `<body>`
+through a portal; it opens on **suggestions** (`suggestCandidates` in `gameCandidates.ts`: being
+played, closest to done first, then wanted, then the rest), narrows by title and by platform
+(`AddGameModalPlatforms`, only platforms the user has games on), and shows games as selectable
+covers (`GamePickerTile`, `aria-pressed`, a check besides the ring). "No games match" when a search
+finds nothing; the footer is always there (count, clear, "Add N games", disabled at 0). RA id/link
+lookup kept. Cover tiles on the group page now top out at 9rem (the user found 11rem still blurry).
+**Why** — The user asked for a friendlier modal: before, it showed nothing until typed, said
+nothing when a search failed, and the add button appeared only after a pick.
+**Decisions** — `GamePickerRow` stays for the pin and favourite pickers; only this modal moved
+to covers.
+
+---
+
+## 2026-10-21 — Group page redesign: banner, one filter bar, covers or list (`feat/groups-redesign`)
+
+**Did** — `/groups/[id]` follows mock-up C. `GroupDetailHero` (replaces `GroupDetailHeader`): the
+first covers faded behind, a progress ring, title, privacy, description, finished / started / not
+started counts, add-edit-delete. `GroupToolbar` (replaces `GroupFilters`): progress states as
+pressed buttons, consoles as a checkbox menu (`<details>`), decade as a `<select>`, and a view
+switch saved as `group-detail-view` (synced). **Covers** (default): `GroupCoverGrid` +
+`GroupCoverTile`, sortable like the list, each opening its game, a finished one ringed in the
+theme's colour. **List**: the old `GroupGameGrid` cards, two per row; the 1/2/3 control is gone.
+`itemProgress` / `groupStateCounts` in `groupItems.ts` give one reading of a game's progress (RA
+live, then the platform libraries, then what was stored) for the tiles, the counts and the filters;
+`GroupViewToggle` became generic (options passed in) for both pages. Skeleton reshaped.
+**Why** — The user picked option C for the group page after the list redesign.
+**Decisions** — The progress filter now reads RA's live progress too (before, only the stored
+fraction), so the filters, the counts and the tiles agree.
+**Watch out** — A Steam item's stored art can be a wide header; on a square tile it is cropped.
+
+---
+
+## 2026-10-21 — Groups list: covers or shelves (`feat/groups-redesign`)
+
+**Did** — `/groups` has a view switch (`GroupViewToggle`, saved under `groups-view`, a synced
+preference): **Covers** (`GroupAlbumCard`: the first games as a banner, a progress ring, completed /
+in-progress counts) or **Shelves** (`GroupShelfRow`: progress, "closest to done", and the first five
+games each with its own bar and link). An empty group asks for games; a last tile (`GroupNewTile`)
+makes a new group while any fit. The old 1/2/3-column control is gone from the list. `listGroups`
+now returns five covers with title and progress, `completed_count`, `started_count` and `next_up`.
+`GroupPlatformLogos` was split out of `GroupCard` (still used on public profiles).
+**Why** — The user found the list plain. Mock-ups (canvas "Rediseño de Grupos", options E and F)
+were drawn first; the user picked both, with a switch between them.
+**Decisions** — Per-game progress in the list is the group's stored `num_awarded`/`max_possible`
+(what the old card's bar already used), not the live library values the group page reads. The
+"Add games" and "+N more" tiles open the group instead of the add modal on the list page.
+**Open** — The group page redesign (option C: banner, ring, one filter bar, cover grid) is chosen
+but not built. Reordering groups by drag is not offered (it never was).
+
+---
+
+## 2026-10-21 — Library detail scrolls, modals above the heatmap, home ends at the screen (`fix/library-scroll-heatmap-layers`)
+
+**Did** — The list view's detail panel (`LibraryEntryDetail`) is `grow shrink-0` instead of `flex-1`,
+so it no longer shrinks to its sticky column and the column scrolls. `AchievementModal` and
+`AchievementDetailModal` render through `createPortal` into `document.body`.
+**Why** — The user could not scroll the right panel of the library lists (a long RA game cut off at
+the bottom), and an achievement opened from "Recently played" on the home was covered by the
+heatmap below it.
+**Decisions** — `flex-1` (basis 0, shrinkable) plus the card's `overflow-hidden` (which drops its
+min-height to 0) squeezed the card to the column and clipped the rest. The modals were trapped in a
+transformed ancestor's stacking context (framer-motion sections), so their `z-50` only counted
+inside it; a portal fixes it for every place they open from, as `CommonModal` already did.
+**Also** — On the home's one-screen Overview (`home-fit`, ≥1024×1000), the profile column never
+shrinks, so a profile a little taller than its share made the page ~20 px longer than the screen and
+the end of the stats panel sat below the fold (the user wants the first view to end exactly at the
+panel's bottom, footer just below). `homeFit` (`src/lib/homeFit.ts`, a ref callback on the home's
+`<main>`) measures how far the box runs past the screen and takes it off the daily chart through
+`--home-fit-trim` (at most 100 px, the chart never under 160 px; the heatmap follows the chart's box).
+Rejected: letting the profile scroll again (that was the cut-off fixed before) and a smaller fixed chart
+height (only right for one profile and one screen).
+**Watch out** — Other hand-made modals (day/week/period achievements, showcase picker) still render
+in place; if one is ever opened from inside a transformed section and something later covers it,
+portal it the same way.
+
+---
+
+## 2026-10-21 — An error card for a platform profile that does not load (`feat/platform-load-error`)
+
+**Did** — `MainPageProfileError` (`main-page-profile/main-page-profile-error/`): the error screens'
+`StatusBadge` (danger, a cloud-off icon, the platform's logo on its corner), the message and the
+platform's reason, and a Retry button (`STATUS_BUTTON.secondary`). Fills the profile column. Used by
+the Steam, PSN and Xbox profiles on the home in place of their red line and small pill.
+**Why** — The user saw the Xbox profile fail ("limited right now") as a bare line of red text and
+asked for a proper component for when a platform cannot load.
+**Decisions** — No new strings: each platform's `profileError`, reason (`errors.*`, Steam's private
+hint) and `retry` are reused. RA's profile on the home has no error state of its own, so it is untouched.
+
+---
+
+## 2026-10-21 — The worklog and the version no longer conflict on merge (`chore/worklog-union-merge`)
+
+**Did** — `.gitattributes`: `docs/worklog.md merge=union`. A rule for it in CLAUDE.md
+(Documentation) and a note in this file's instructions.
+**Why** — Every branch adds its entry at the top, so bringing any branch up to date with
+`develop` conflicted here (it happened twice on 2026-10-21, PR #41 among them).
+**Decisions** — Git's built-in `union` driver: no config, no script, works for every clone.
+Tested on a toy repo: both entries kept, the `---` between them lost (cosmetic). The version
+files (`package.json`, `version.ts`) get their own driver, `scripts/merge-version.js`: it
+sets both sides to the higher version, then lets git merge the rest of the file, so a real
+conflict elsewhere in `package.json` still shows. Registered by `npm run prepare` (a custom
+driver lives in `.git/config`, not in the repo). Tried on a real merge with
+`feat/platform-load-error`: no conflicts at all.
+**Watch out** — Run `npm run prepare` once in each clone, or the version still conflicts.
+GitHub's "Update branch" button does not run the version driver: merge locally.
+
+---
+
+## 2026-10-21 — PS3 and PS Vita always in the PSN consoles preference (`fix/psn-consoles-preference`)
+
+**Did** — `PsnGamesDataContext` lists PS3, PS Vita, PS4 and PS5 in the consoles preference always
+(`PSN_CONSOLES`, through a new `always` argument of `consoleOptions`), with 0 for a console the
+library does not have. Tests: `consoleFilter.test.ts`, `PsnGamesDataContext.test.tsx`.
+**Why** — The user wanted PS3 and Vita in the PSN tab to show or hide, like PS4/PS5 and Xbox's.
+**Decisions** — The list was already built from the library, so PS3/Vita showed only when the
+library had them; now the four are fixed. Nothing listed while the library is empty (loading).
+**Open** — Could not read the cache to check whether the user's library has PS3/Vita games at all
+(the `.env.local` database password was refused).
+
+---
+
+## 2026-10-20 — Xbox shelf cards with sharp art (`fix/xbox-shelf-art`)
+
+**Did** — `LibraryShelfBanner` asks `/api/xbox/details` (through `useXboxGameDetails`) for an Xbox
+game's IGDB `heroUrl` and shows it sharp, as RA's screenshots; the shelf detail backdrop follows,
+since it draws the same banner. Test: `LibraryShelfBanner.test.tsx`.
+**Why** — The user saw every Xbox card in the library shelves blurred: Xbox sends only a square
+tile, and the banner blows a tile up and blurs it.
+**Decisions** — Reused the game page's route (cached half a year on the server, `cachedJson` in the
+browser) instead of a new art-only one. One request per visible card, so at most a shelf's worth.
+**Open** — Cold, the route makes two IGDB searches per game (details and art) and `searchGames`
+does not retry a 429, so a first load with many Xbox cards may leave a few blurred until the next
+visit. Games IGDB does not match stay blurred.
+**Also fixed** — The 360 MW3 showed the 2023 game: Xbox names it "Modern Warfare® 3" and lists it on
+360, One and Series (backward compatible), so the IGDB search took the newer game. A game with
+Xbox 360 among its consoles is now searched on 360 alone (`igdbXboxPlatforms`), and `bestMatch`
+prefers a title that ends with the name ("Call of Duty: Modern Warfare 3") over IGDB's first hit,
+which on 360 alone was a DLC pack. Affects the game page's details too. New cache keys (the
+platform list is in them), so nothing to bump.
+
 ---
 
 ## 2026-10-20 — See who follows you (`feat/rankings-zone-and-personas`)

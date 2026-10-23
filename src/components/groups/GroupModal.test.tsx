@@ -16,8 +16,9 @@ const GROUP = { id: 5, title: 'Speedruns', description: 'Fast ones', icon: '🏃
 
 const title = () => screen.getByLabelText(en.groups.groupTitle) as HTMLInputElement
 const description = () => screen.getByLabelText(en.groups.description) as HTMLInputElement
-const icon = () => screen.getByLabelText(en.groups.icon) as HTMLInputElement
-const isPublic = () => screen.getByRole('switch', { name: en.groups.isPublic })
+const icon = () => screen.getByLabelText(en.groups.customIcon) as HTMLInputElement
+const isPublic = () => screen.getByRole('radio', { name: new RegExp(`^${en.groups.public}`) })
+const isPrivate = () => screen.getByRole('radio', { name: new RegExp(`^${en.groups.private}`) })
 
 function setup(props: Partial<React.ComponentProps<typeof GroupModal>> = {}) {
   const onSave = jest.fn().mockResolvedValue(undefined)
@@ -35,13 +36,13 @@ test('a new group starts empty and private, and creates with what was typed and 
   const { onSave, onClose } = setup()
   expect(screen.getByRole('heading', { name: en.groups.newGroup })).toBeInTheDocument()
   expect(title()).toHaveValue('')
-  expect(isPublic()).toHaveAttribute('aria-checked', 'false')
+  expect(isPrivate()).toBeChecked()
 
   fireEvent.change(title(), { target: { value: '  Backlog  ' } })
   fireEvent.change(description(), { target: { value: 'Later' } })
   fireEvent.click(isPublic())
   fireEvent.click(screen.getByTestId('picker'))
-  fireEvent.click(screen.getByRole('button', { name: en.groups.create }))
+  fireEvent.click(screen.getByRole('button', { name: 'Create with 1 game' }))
 
   await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1))
   expect(onSave).toHaveBeenCalledWith({
@@ -60,7 +61,7 @@ test('editing starts from the group, offers no game picker, and saves without in
   expect(title()).toHaveValue('Speedruns')
   expect(description()).toHaveValue('Fast ones')
   expect(icon()).toHaveValue('🏃')
-  expect(isPublic()).toHaveAttribute('aria-checked', 'true')
+  expect(isPublic()).toBeChecked()
   expect(screen.queryByTestId('picker')).not.toBeInTheDocument()
 
   fireEvent.click(screen.getByRole('button', { name: en.groups.save }))
@@ -68,10 +69,11 @@ test('editing starts from the group, offers no game picker, and saves without in
   expect(onSave.mock.calls[0][0]).toMatchObject({ title: 'Speedruns', initialGames: undefined })
 })
 
-test('a title is required: nothing is saved and the field is named in an alert', () => {
+test('a title is required: nothing is saved and the field says so', () => {
   const { onSave } = setup()
   fireEvent.click(screen.getByRole('button', { name: en.groups.create }))
-  expect(screen.getByRole('alert')).toHaveTextContent(en.groups.groupTitle)
+  expect(screen.getByRole('alert')).toHaveTextContent(en.groups.titleRequired)
+  expect(title()).toHaveAttribute('aria-invalid', 'true')
   expect(onSave).not.toHaveBeenCalled()
 })
 
@@ -100,15 +102,32 @@ test('switching to another group while open fills the form with that one', () =>
   const { rerender } = render(<GroupModal isOpen group={GROUP} onClose={jest.fn()} onSave={onSave} />)
   rerender(<GroupModal isOpen group={other} onClose={jest.fn()} onSave={onSave} />)
   expect(title()).toHaveValue('Backlog')
-  expect(isPublic()).toHaveAttribute('aria-checked', 'false')
+  expect(isPrivate()).toBeChecked()
 })
 
-test('an image URL as the icon is shown as an image, anything else as text', () => {
-  setup()
+test('the icon: one tap on a common one, or an image link of your own, shown in the preview', async () => {
+  const { onSave } = setup()
+  fireEvent.click(screen.getByRole('button', { name: '🎮' }))
+  expect(screen.getByRole('button', { name: '🎮' })).toHaveAttribute('aria-pressed', 'true')
   fireEvent.change(icon(), { target: { value: 'https://x.test/a.png' } })
-  expect(screen.getByAltText(en.groups.icon)).toHaveAttribute('src', 'https://x.test/a.png')
-  fireEvent.change(icon(), { target: { value: '🎮' } })
-  expect(screen.queryByAltText(en.groups.icon)).not.toBeInTheDocument()
+  expect(document.querySelector('img[src="https://x.test/a.png"]')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '🎮' })).toHaveAttribute('aria-pressed', 'false')
+  fireEvent.change(title(), { target: { value: 'X' } })
+  fireEvent.click(screen.getByRole('button', { name: en.groups.create }))
+  await waitFor(() => expect(onSave.mock.calls[0][0]).toMatchObject({ icon: 'https://x.test/a.png' }))
+})
+
+test('the title and description say how much room is left', () => {
+  setup()
+  fireEvent.change(title(), { target: { value: 'Backlog' } })
+  expect(screen.getByText('7/60')).toBeInTheDocument()
+  expect(screen.getByText('0/200')).toBeInTheDocument()
+})
+
+test('Escape closes it', () => {
+  const { onClose } = setup()
+  fireEvent.keyDown(window, { key: 'Escape' })
+  expect(onClose).toHaveBeenCalled()
 })
 
 test('cancel closes without saving', () => {

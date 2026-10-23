@@ -153,6 +153,9 @@ lost. Index of the docs: `docs/README.md`.
   add an entry at the top of `docs/worklog.md` — did / why / decisions / open /
   watch out, as its template says. It goes in the same branch and PR as the work,
   before the last commit. A task is not done without it.
+- **The worklog never conflicts**: `.gitattributes` merges `docs/worklog.md` with
+  git's `union` driver (both sides kept). Do not remove it. After a merge, glance
+  at the top entries: a `---` between two may be missing.
 - **A rule or invariant changed or was learned** (a "never do X", how a
   platform must be called, a new env var, a migration that must run, a release
   gate) → update the matching section of this file in the same change. Do not
@@ -201,6 +204,7 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 - Every commit auto-bumps patch (`0.8.0` → `0.8.1`)
 - To do a minor/major bump: edit `src/lib/version.ts` manually before committing — hook detects the change, skips auto-bump, and syncs `package.json`
 - Hook is activated via `npm run prepare` (already wired in `package.json`)
+- Two branches never conflict on the version: see "Environments" in Git below
 
 **Milestones:**
 - `0.8.x` — login/register polish + optimizations
@@ -431,12 +435,19 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   Keep every Xbox image going through it. `titleId` is a decimal string; the largest
   seen is under 2^31 (the `game_id` columns are INTEGER), but check before storing it.
 - **Play time** comes from one `POST player/stats` (`MinutesPlayed`, up to 150
-  titles per call) made inside the cached library load (`xbox:titles:v5`); a
+  titles per call) made inside the cached library load (`xbox:titles:v6`); a
   backward-compatible 360 game is asked under its `modernTitleId`
   (`xboxStatsTitleId`). A failure leaves the library whole, without hours. Many
   games simply have none.
+- **Twin titles:** Xbox can list a game twice under one name, the game and a title with no
+  achievements that launches it (Minecraft: Xbox 360 Edition, measured 2026-10-21).
+  `foldTwinTitles` drops the empty twin in the library load and gives its session and play time
+  to the game; a game with no achievements and no twin stays.
 - **Backdrop:** a game page's wide picture is IGDB's (`heroUrl` in
-  `/api/xbox/details`), fetched when the page opens; lists keep Xbox's own tile.
+  `/api/xbox/details`), fetched when the page opens. The library's shelf cards
+  (`LibraryShelfBanner`) ask for the same, one card at a time as RA's screenshots,
+  so at most a shelf's worth (`SHELF_CAP`); until it arrives, or with no match, they
+  show the blurred tile. Lists and icons keep Xbox's own tile.
   Do not enrich the whole library from IGDB at load (135 searches).
 - **Measured 2026-10-16:** an unknown gamertag answers HTTP 200 with `code: 404` in
   the body (→ `not-found`). A library the viewer cannot read answers like a
@@ -832,9 +843,11 @@ branch to be up to date with its base** before merging, on both.
 - **Before merging, bring the branch up to date**: `git fetch` and `git merge
   origin/develop` (or the "Update branch" button), push, wait for the checks again.
   Merge, not rebase — a rebase would need a force-push.
-- **`src/lib/version.ts` and `package.json` will conflict** on that merge whenever
-  `develop` moved, since every commit bumps the patch. Keep the **higher** version
-  in both; never go back below what `develop` already has.
+- **`src/lib/version.ts` and `package.json` do not conflict on a local merge**: a
+  merge driver (`scripts/merge-version.js`, set in `.gitattributes`, registered by
+  `npm run prepare`) keeps the **higher** version on both sides. Run `npm run prepare`
+  once per clone. GitHub's "Update branch" button does not run it, so merge locally;
+  if it ever conflicts by hand, keep the higher version, never below `develop`'s.
 - A `develop` → `main` PR needs `develop` to contain `main`; after a hotfix, merge
   `main` back into `develop` first (as the flow above already says).
 

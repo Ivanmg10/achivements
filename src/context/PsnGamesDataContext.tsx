@@ -10,6 +10,9 @@ import { consoleOptions, filterByConsole, type ConsoleOption } from '@/utils/con
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 
+/** Every PlayStation with trophies, as `psnPlatformName` writes them: always in the preference, games or not. */
+const PSN_CONSOLES = ['PS3', 'PS Vita', 'PS4', 'PS5']
+
 type PsnGamesCtx = {
   isLinked: boolean
   /** The trophy list without the consoles unticked in preferences, most recently played first. */
@@ -103,7 +106,7 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
   const fullLibrary = useMemo(() => (current ? games : []), [current, games])
   // The preference is the viewer's own: someone else's list is shown whole.
   const shown = useMemo(() => (subject ? fullLibrary : filterByConsole(fullLibrary, (g) => g.consoleName, hidden)), [subject, fullLibrary, hidden])
-  const consoles = useMemo(() => consoleOptions(fullLibrary.map((g) => g.consoleName)), [fullLibrary])
+  const consoles = useMemo(() => fullLibrary.length ? consoleOptions(fullLibrary.map((g) => g.consoleName), PSN_CONSOLES) : [], [fullLibrary])
 
   return (
     <Ctx.Provider
