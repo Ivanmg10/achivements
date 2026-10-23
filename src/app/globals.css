@@ -818,6 +818,11 @@
   to { width: 85%; }
 }
 
+/* The library's Select list opening under its field. */
+@keyframes select-in {
+  from { opacity: 0; transform: translateY(-4px); }
+}
+
 /*
    A user's profile, Overview: Recently played sits beside their platform
    profile, as tall as that column. Its rows (flex: 1 1 0 inline, ROW_STYLE)

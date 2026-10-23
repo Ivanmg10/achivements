@@ -4,6 +4,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { GameGroupItem } from '@/types/types'
 import { DECADES, type DecadeFilter, type GroupFilters as Filters, type PctFilter } from '@/utils/groupItems'
 import GroupViewToggle, { type GroupDetailView } from '@/components/groups/group-view-toggle/GroupViewToggle'
+import Select from '@/components/ui/Select'
 
 const PILL = 'h-9 px-3 rounded-lg text-xs sm:text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 const MENU = `${PILL} inline-flex items-center gap-1.5 ring-1 ring-ink/10 text-text-main bg-transparent hover:ring-ink/25`
@@ -94,17 +95,16 @@ export default function GroupToolbar({
       {hasYears && (
         <>
           <label htmlFor="group-decade" className="sr-only">{T.groups.filterDecadeLabel}</label>
-          <select
+          <Select<DecadeFilter>
             id="group-decade"
+            size="sm"
             value={filters.decade}
-            onChange={(e) => onDecade(e.target.value as DecadeFilter)}
-            className={`${MENU} bg-bg-card`}
-          >
-            <option value="all">{T.groups.decadeAll}</option>
-            {DECADES.map((d) => (
-              <option key={d} value={d}>{`${d.slice(0, 2)}'s`}</option>
-            ))}
-          </select>
+            onChange={onDecade}
+            options={[
+              { value: 'all', label: T.groups.decadeAll },
+              ...DECADES.map((d) => ({ value: d as DecadeFilter, label: `${d.slice(0, 2)}'s` })),
+            ]}
+          />
         </>
       )}
 

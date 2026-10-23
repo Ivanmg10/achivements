@@ -27,10 +27,10 @@ beforeEach(() => {
 
 test('the language is the browser’s until picked, in a list of their own names', () => {
   renderStep(true)
-  const select = screen.getByLabelText(en.userConfig.language)
+  const select = screen.getByRole('combobox', { name: en.userConfig.language })
   expect(screen.getByText(T.prefs.detected)).toBeInTheDocument()
-  expect(screen.getByRole('option', { name: 'Español' })).toBeInTheDocument()
-  fireEvent.change(select, { target: { value: 'es' } })
+  fireEvent.click(select)
+  fireEvent.click(screen.getByRole('option', { name: 'Español' }))
   expect(setLang).toHaveBeenCalledWith('es')
 })
 

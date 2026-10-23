@@ -36,9 +36,13 @@ test('text fields come from the library (fieldClass, Input, Textarea, SearchInpu
       const el = m[0]
       if (/type="(checkbox|radio|file|hidden|range|color)"/.test(el)) continue
       // a bare input inside a box that is the field (the search panels) draws nothing itself
-      if (/fieldClass\(|INPUT_CLASS|bg-transparent|sr-only/.test(el)) continue
+      if (/fieldClass\(|bg-transparent|sr-only/.test(el)) continue
       bad.push(file)
     }
   }
   expect(bad).toEqual([])
+})
+
+test('no native select: the library has its own', () => {
+  expect(offenders(/<select[\s>]/)).toEqual([])
 })

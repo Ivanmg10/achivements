@@ -1,19 +1,20 @@
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
-import { IconArrowRight, IconBroadcast, IconChevronDown, IconTrophy, IconWorld } from '@tabler/icons-react'
+import { IconArrowRight, IconBroadcast, IconTrophy, IconWorld } from '@tabler/icons-react'
 import type { WelcomeDirection } from '@/hooks/useWelcomeSteps'
 import { useThemeChoice } from '@/hooks/useThemeChoice'
 import { useVaultMe } from '@/hooks/useVaultMe'
 import { useLanguage } from '@/context/LanguageContext'
-import { LANGUAGES, isLang } from '@/utils/languages'
+import { LANGUAGES, type Lang } from '@/utils/languages'
 import type { Theme } from '@/types/types'
 import ThemeModalOption from '@/components/theme-modal/theme-modal-option/ThemeModalOption'
 import UserProfileSwitch from '@/components/user-page/user-profile-switch/UserProfileSwitch'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
-import { INPUT_CLASS, PRIMARY_BUTTON, QUIET_BUTTON, SECONDARY_BUTTON, SECTION_LABEL } from '@/components/welcome-page/welcomeArt'
+import { PRIMARY_BUTTON, QUIET_BUTTON, SECONDARY_BUTTON, SECTION_LABEL } from '@/components/welcome-page/welcomeArt'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
+import Select from '@/components/ui/Select'
 
 const ThemeModal = dynamic(() => import('@/components/theme-modal/ThemeModal'), { loading: () => null })
 
@@ -105,21 +106,13 @@ export default function WelcomePagePreferences({
       <div className="flex flex-col gap-5 max-w-2xl">
         <div className="flex flex-col gap-1.5 max-w-xs">
           <label htmlFor="welcome-language" className="text-sm font-semibold">{T.userConfig.language}</label>
-          {/* Its own arrow, with room: the browser's sits against the edge, whatever the padding. */}
-          <div className="relative">
-            <select
-              id="welcome-language"
-              value={lang}
-              onChange={(e) => { if (isLang(e.target.value)) setLang(e.target.value) }}
-              aria-describedby="welcome-language-hint"
-              className={`${INPUT_CLASS} appearance-none pr-11 cursor-pointer`}
-            >
-              {LANGUAGES.map((l) => (
-                <option key={l.id} value={l.id}>{l.label}</option>
-              ))}
-            </select>
-            <IconChevronDown size={18} aria-hidden="true" className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary" />
-          </div>
+          <Select<Lang>
+            id="welcome-language"
+            value={lang}
+            onChange={setLang}
+            aria-describedby="welcome-language-hint"
+            options={LANGUAGES.map((l) => ({ value: l.id, label: l.label }))}
+          />
           <span id="welcome-language-hint" className="text-[0.8125rem] text-text-secondary">{fromBrowser ? t.detected : t.chosen}</span>
         </div>
 

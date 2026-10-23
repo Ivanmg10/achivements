@@ -10,6 +10,7 @@ import type { GameSource } from '@/types/steam'
 import EmptyState from '@/components/empty-state/EmptyState'
 import PublicUserGameRow from '../public-user-game-row/PublicUserGameRow'
 import { fieldClass } from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
 
 const PAGE = 30
 
@@ -77,15 +78,16 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
         </div>
         <div className="flex items-center gap-2">
           <label htmlFor={`${searchId}-sort`} className="text-xs text-text-secondary">{T.userProfile.sortBy}</label>
-          <select
+          <Select<Sort>
             id={`${searchId}-sort`}
+            size="sm"
             value={sort}
-            onChange={(e) => setSort(e.target.value as Sort)}
-            className="bg-bg-main rounded-xl px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            <option value="progress">{T.userProfile.sortProgress}</option>
-            <option value="name">{T.userProfile.sortName}</option>
-          </select>
+            onChange={setSort}
+            options={[
+              { value: 'progress', label: T.userProfile.sortProgress },
+              { value: 'name', label: T.userProfile.sortName },
+            ]}
+          />
         </div>
       </div>
 

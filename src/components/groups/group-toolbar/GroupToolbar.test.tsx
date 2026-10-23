@@ -37,7 +37,8 @@ test('no console or decade menus with one console and no years', () => {
 
 test('decade once a release year is known', () => {
   const h = setup([item({ release_year: 1994 })])
-  fireEvent.change(screen.getByLabelText('Decade'), { target: { value: '90s' } })
+  fireEvent.click(screen.getByRole('combobox', { name: 'Decade' }))
+  fireEvent.click(screen.getByRole('option', { name: "90's" }))
   expect(h.onDecade).toHaveBeenCalledWith('90s')
 })
 
