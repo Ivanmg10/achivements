@@ -14,6 +14,7 @@ import type { LibraryGame } from '@/utils/library'
 import { SHOWCASE_MAX, showcaseKey, type ShowcaseEntry } from '@/utils/showcase'
 import ShowcasePickerModalGames from './showcase-picker-modal-games/ShowcasePickerModalGames'
 import ShowcasePickerModalGame from './showcase-picker-modal-game/ShowcasePickerModalGame'
+import Button from '@/components/ui/Button'
 
 /**
  * Picks achievements for the showcase: first the user's games with something
@@ -155,14 +156,14 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
                 {T.showcase.selected.replace('{n}', String(selected.length))} ·{' '}
                 {free - selected.length > 0 ? T.showcase.slotsLeft.replace('{n}', String(free - selected.length)) : T.showcase.noSlots}
               </p>
-              <button
+              <Button
                 type="button"
                 onClick={save}
                 disabled={selected.length === 0 || saving}
-                className="shrink-0 px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 disabled:opacity-40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="shrink-0"
               >
                 {T.showcase.addSelected}
-              </button>
+              </Button>
             </div>
           </motion.div>
         </motion.div>

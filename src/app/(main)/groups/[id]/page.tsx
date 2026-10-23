@@ -26,6 +26,7 @@ import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosai
 import { GROUP_DETAIL_VIEWS, type GroupDetailView } from '@/components/groups/group-view-toggle/GroupViewToggle'
 import GroupGameGrid from '@/components/groups/group-game-grid/GroupGameGrid'
 import GroupDetailSkeleton from '@/components/groups/group-detail-skeleton/GroupDetailSkeleton'
+import Button from '@/components/ui/Button'
 
 const PAGE = 'flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main'
 
@@ -104,12 +105,11 @@ export default function GroupDetailPage() {
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
                 <p className="text-sm text-text-secondary">{T.groups.noGames}</p>
-                <button
+                <Button
                   onClick={() => setAddGameOpen(true)}
-                  className="px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 >
                   {T.groups.addGame}
-                </button>
+                </Button>
               </div>
             ) : filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">

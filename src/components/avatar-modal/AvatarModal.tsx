@@ -8,10 +8,11 @@ import Spinner from '@/components/main-spinner/Spinner'
 import { useAvatarUpload } from '@/hooks/useAvatarUpload'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
 import { useLanguage } from '@/context/LanguageContext'
+import { buttonClass } from '@/components/ui/Button'
 
-const BUTTON = 'flex-1 inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-xl text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 disabled:opacity-50'
-const PRIMARY = `${BUTTON} bg-accent text-bg-main hover:bg-accent-hover`
-const SECONDARY = `${BUTTON} bg-bg-main ring-1 ring-inset ring-ink/10 hover:ring-ink/25 cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/70`
+const BUTTON = 'flex-1'
+const PRIMARY = buttonClass('primary', 'md', BUTTON)
+const SECONDARY = buttonClass('secondary', 'md', `${BUTTON} cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/70`)
 
 /**
  * The profile picture, on its own: the picture as it will look, big and

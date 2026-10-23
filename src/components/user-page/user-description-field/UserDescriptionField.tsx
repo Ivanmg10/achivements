@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
+import Button from '@/components/ui/Button'
 
 export const DESCRIPTION_MAX = 280
 
@@ -40,13 +41,13 @@ export default function UserDescriptionField() {
       <div className="flex items-center justify-between gap-3">
         <span className="text-xs text-text-secondary tabular-nums">{text.length}/{DESCRIPTION_MAX}</span>
         {dirty && (
-          <button
+          <Button
             onClick={handleSave}
             disabled={saving}
-            className="px-3 py-1.5 text-xs rounded-xl bg-accent text-bg-main font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            size="sm"
           >
             {saving ? T.editProfileModal.saving : T.editProfileModal.save}
-          </button>
+          </Button>
         )}
       </div>
     </div>

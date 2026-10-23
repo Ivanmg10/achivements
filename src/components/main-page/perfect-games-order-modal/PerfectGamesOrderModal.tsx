@@ -22,6 +22,7 @@ import CommonModal from '@/components/common-modal/CommonModal'
 import PerfectGameOrderRow from './perfect-game-order-row/PerfectGameOrderRow'
 import { notify } from '@/lib/notify'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import Button from '@/components/ui/Button'
 
 export default function PerfectGamesOrderModal({
   isOpen,
@@ -80,12 +81,12 @@ export default function PerfectGamesOrderModal({
           </div>
         </SortableContext>
       </DndContext>
-      <button
+      <Button
         onClick={handleClose}
-        className="mt-4 self-end px-4 py-2 rounded-lg bg-accent text-bg-main text-sm font-medium cursor-pointer"
+        className="mt-4 self-end"
       >
         {T.cards.close}
-      </button>
+      </Button>
     </CommonModal>
   )
 }

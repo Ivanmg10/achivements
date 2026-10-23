@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { useCookieConsent } from '@/hooks/useCookieConsent'
 import { GA_ID } from '@/lib/analytics'
+import { buttonClass } from '@/components/ui/Button'
 
-const BUTTON =
-  'flex-1 sm:flex-none px-4 py-2 rounded-xl text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+const BUTTON = 'flex-1 sm:flex-none'
 
 /**
  * Asks before any analytics cookie is set. Rejecting is exactly as easy as
@@ -30,10 +30,10 @@ export default function CookieBanner() {
           <Link href="/privacy" className="text-accent underline-offset-2 hover:underline">{T.privacy.link}</Link>
         </p>
         <div className="flex gap-2">
-          <button onClick={() => choose('denied')} className={`${BUTTON} bg-ink/10 text-text-main hover:bg-ink/15`}>
+          <button onClick={() => choose('denied')} className={buttonClass('secondary', 'md', BUTTON)}>
             {T.cookies.reject}
           </button>
-          <button onClick={() => choose('granted')} className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}>
+          <button onClick={() => choose('granted')} className={buttonClass('primary', 'md', BUTTON)}>
             {T.cookies.accept}
           </button>
         </div>

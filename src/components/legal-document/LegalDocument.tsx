@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { CONTACT_EMAIL, DATA_CONTROLLER } from '@/lib/siteUrl'
+import Button from '@/components/ui/Button'
 
 export type LegalText = {
   title: string
@@ -46,12 +46,12 @@ export default function LegalDocument({ doc }: { doc: LegalText }) {
           )}
         </dl>
 
-        <Link
+        <Button
           href="/"
-          className="self-start px-4 py-2 rounded-lg bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="self-start"
         >
           {doc.back}
-        </Link>
+        </Button>
       </article>
     </main>
   )

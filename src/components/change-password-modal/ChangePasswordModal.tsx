@@ -6,6 +6,7 @@ import CommonModal from '../common-modal/CommonModal'
 import PasswordInput from '@/components/password-input/PasswordInput'
 import { useLanguage } from '@/context/LanguageContext'
 import { PASSWORD_MIN } from '@/utils/authValidation'
+import Button from '@/components/ui/Button'
 
 interface Props {
   isOpen: boolean
@@ -123,13 +124,13 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
         >
           {T.editProfileModal.cancel}
         </button>
-        <button
+        <Button
           onClick={handleSubmit}
           disabled={!canSubmit || success}
-          className="flex-1 bg-accent text-bg-main font-bold rounded-xl py-3 hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+          size="lg" className="flex-1"
         >
           {loading ? T.editProfileModal.saving : T.editProfileModal.save}
-        </button>
+        </Button>
       </div>
     </CommonModal>
   )

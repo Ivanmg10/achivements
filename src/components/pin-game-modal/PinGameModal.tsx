@@ -13,6 +13,7 @@ import GamePickerRow from '@/components/game-picker/game-picker-row/GamePickerRo
 import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
 import { notify } from '@/lib/notify'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import Button from '@/components/ui/Button'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -189,13 +190,13 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
                       {T.pinnedGames.error}
                     </p>
                   )}
-                  <button
+                  <Button
                     onClick={handleConfirm}
                     disabled={saving}
-                    className="w-full py-2.5 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
+                    className="w-full"
                   >
                     {saving ? '…' : `${T.pinnedGames.confirmPin} (${selected.size})`}
-                  </button>
+                  </Button>
                 </div>
               )}
 

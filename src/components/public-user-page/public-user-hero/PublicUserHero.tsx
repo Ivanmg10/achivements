@@ -14,6 +14,7 @@ import PublicUserKpis from '../public-user-kpis/PublicUserKpis'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
 import PresenceLabel from '@/components/presence-label/PresenceLabel'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
+import Button from '@/components/ui/Button'
 
 /**
  * The top of a user's page, in the account card's style: their avatar's
@@ -85,14 +86,14 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
             )}
             {!user.isSelf && <PublicUserFollowButton username={user.username} initial={user.following === true} />}
             {!user.isSelf && onCompare && (
-              <button
+              <Button
                 type="button"
                 onClick={onCompare}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-accent text-bg-main hover:bg-accent/85 shadow-lg shadow-black/20 transition-colors font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                size="sm" className="shadow-lg shadow-black/20"
               >
                 <IconArrowsDiff size={13} aria-hidden="true" />
                 {T.userProfile.compareWithMe}
-              </button>
+              </Button>
             )}
             <PublicUserShareButton />
           </div>

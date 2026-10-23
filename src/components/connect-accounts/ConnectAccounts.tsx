@@ -11,9 +11,9 @@ import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
 import UserXboxCard from '@/components/user-page/user-xbox-card/UserXboxCard'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useLanguage } from '@/context/LanguageContext'
+import { buttonClass } from '@/components/ui/Button'
 
-const ACTION =
-  'w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-accent text-bg-main font-semibold text-sm hover:bg-accent-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+const ACTION = buttonClass('primary', 'md', 'w-full')
 
 /**
  * What a new account sees before linking anything: the platforms, what each

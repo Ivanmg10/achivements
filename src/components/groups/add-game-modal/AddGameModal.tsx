@@ -17,6 +17,7 @@ import GamePickerTile from '@/components/game-picker/game-picker-tile/GamePicker
 import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
 import AddGameModalPlatforms from '@/components/groups/add-game-modal-platforms/AddGameModalPlatforms'
 import { notify } from '@/lib/notify'
+import Button from '@/components/ui/Button'
 
 const SOURCES: GameSource[] = ['ra', 'steam', 'psn', 'xbox']
 const RESULTS_MAX = 40
@@ -282,14 +283,13 @@ export default function AddGameModal({
                     {T.groups.clearSelection}
                   </button>
                 )}
-                <button
+                <Button
                   type="button"
                   onClick={handleConfirm}
                   disabled={saving || selected.size === 0}
-                  className="h-10 px-5 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 >
                   {saving ? '…' : selected.size > 0 ? T.groups.addSelected.replace('{games}', plural(selected.size, T.plurals.games, lang)) : T.groups.addGames}
-                </button>
+                </Button>
               </div>
             </div>
           </motion.div>

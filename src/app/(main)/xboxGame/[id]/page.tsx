@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { notFound, useParams } from 'next/navigation'
 import { fadeUp } from '@/lib/animations'
@@ -18,6 +17,7 @@ import XboxGameInfoTable from '@/components/xbox/xbox-game-info-table/XboxGameIn
 import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPartialListNote'
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { xboxAiSource } from '@/utils/aiExport'
+import Button from '@/components/ui/Button'
 
 /**
  * An Xbox game's page — the counterpart of /psnGame/[id], built the same way:
@@ -44,12 +44,12 @@ export default function XboxGamePage() {
     return (
       <main className="flex-1 flex flex-col justify-center items-center text-text-main gap-3 p-6 text-center">
         <p className="text-text-secondary">Xbox · {T.userData.notConnected}</p>
-        <Link
+        <Button
           href="/user"
-          className="px-4 py-1.5 bg-accent text-bg-main font-semibold rounded-xl hover:scale-[1.03] transition-transform duration-200 text-sm"
+          size="sm"
         >
           {T.xbox.connect}
-        </Link>
+        </Button>
       </main>
     )
   }

@@ -6,6 +6,7 @@ import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
+import { buttonClass } from '@/components/ui/Button'
 
 type Platform = 'ra' | 'steam' | 'psn' | 'xbox'
 
@@ -84,7 +85,7 @@ export default function AdminLinkedAccounts({
               <button
                 onClick={() => unlink('ra', { rausername: null, ra_display: null })}
                 disabled={busy !== null}
-                className={`${BUTTON} text-red-400 hover:bg-red-500/10`}
+                className={`${BUTTON} text-danger hover:bg-danger/10`}
               >
                 Unlink
               </button>
@@ -104,7 +105,7 @@ export default function AdminLinkedAccounts({
                 onUpdated(user.id, { rausername: data.rausername as string, ra_display: data.ra_display as string })
               })}
               disabled={busy !== null || !raUsername.trim() || !raKey.trim()}
-              className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}
+              className={buttonClass('primary', 'sm', 'shrink-0')}
             >
               {busy === 'ra' ? '…' : 'Link'}
             </button>
@@ -122,7 +123,7 @@ export default function AdminLinkedAccounts({
               <button
                 onClick={() => unlink('steam', { steamid: null, steamusername: null })}
                 disabled={busy !== null}
-                className={`${BUTTON} text-red-400 hover:bg-red-500/10`}
+                className={`${BUTTON} text-danger hover:bg-danger/10`}
               >
                 Unlink
               </button>
@@ -140,7 +141,7 @@ export default function AdminLinkedAccounts({
                 onUpdated(user.id, { steamid: data.steamid as string, steamusername: data.steamusername as string | null })
               })}
               disabled={busy !== null || !steamId.trim()}
-              className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}
+              className={buttonClass('primary', 'sm', 'shrink-0')}
             >
               {busy === 'steam' ? '…' : 'Link'}
             </button>
@@ -158,7 +159,7 @@ export default function AdminLinkedAccounts({
               <button
                 onClick={() => unlink('psn', { psnaccountid: null, psnusername: null })}
                 disabled={busy !== null}
-                className={`${BUTTON} text-red-400 hover:bg-red-500/10`}
+                className={`${BUTTON} text-danger hover:bg-danger/10`}
               >
                 Unlink
               </button>
@@ -176,7 +177,7 @@ export default function AdminLinkedAccounts({
                 onUpdated(user.id, { psnaccountid: data.psnaccountid as string, psnusername: data.psnusername as string })
               })}
               disabled={busy !== null || !psnName.trim()}
-              className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}
+              className={buttonClass('primary', 'sm', 'shrink-0')}
             >
               {busy === 'psn' ? '…' : 'Link'}
             </button>
@@ -194,7 +195,7 @@ export default function AdminLinkedAccounts({
               <button
                 onClick={() => unlink('xbox', { xboxxuid: null, xboxgamertag: null })}
                 disabled={busy !== null}
-                className={`${BUTTON} text-red-400 hover:bg-red-500/10`}
+                className={`${BUTTON} text-danger hover:bg-danger/10`}
               >
                 Unlink
               </button>
@@ -212,7 +213,7 @@ export default function AdminLinkedAccounts({
                 onUpdated(user.id, { xboxxuid: data.xboxxuid as string, xboxgamertag: data.xboxgamertag as string })
               })}
               disabled={busy !== null || !xboxName.trim()}
-              className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}
+              className={buttonClass('primary', 'sm', 'shrink-0')}
             >
               {busy === 'xbox' ? '…' : 'Link'}
             </button>

@@ -9,6 +9,7 @@ import type { SteamSignupProfile } from '@/hooks/useSteamSignup'
 import { checkEmail, checkUsername, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
+import Button from '@/components/ui/Button'
 
 /** The Steam account Steam confirmed, and the username and email it still needs. */
 export default function SteamSignupFormFields({
@@ -102,10 +103,10 @@ export default function SteamSignupFormFields({
           disabled={submitting}
         />
 
-        <button
+        <Button
           type="submit"
           disabled={submitting}
-          className="bg-accent text-bg-main w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main"
+          size="lg" className="w-full mt-2"
         >
           {submitting ? (
             <>
@@ -118,7 +119,7 @@ export default function SteamSignupFormFields({
               <IconArrowRight size={16} aria-hidden="true" />
             </>
           )}
-        </button>
+        </Button>
       </form>
 
       <p className="text-text-secondary text-xs text-center mt-4">{T.steamAuth.noPassword}</p>

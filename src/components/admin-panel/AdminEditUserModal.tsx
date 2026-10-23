@@ -9,6 +9,7 @@ import { codeToFlag, findCountry, COUNTRIES } from '@/utils/countries'
 import type { Country } from '@/utils/countries'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
+import Button from '@/components/ui/Button'
 
 interface Props {
   isOpen: boolean
@@ -234,10 +235,10 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
 
 function SaveButton({ saving, onClick }: { saving: boolean; onClick: () => void }) {
   return (
-    <button onClick={onClick} disabled={saving}
-      className="shrink-0 bg-accent text-bg-main text-xs font-bold px-3 py-2 rounded-xl hover:opacity-90 disabled:opacity-40">
+    <Button onClick={onClick} disabled={saving}
+      size="sm" className="shrink-0">
       {saving ? '...' : 'Save'}
-    </button>
+    </Button>
   )
 }
 

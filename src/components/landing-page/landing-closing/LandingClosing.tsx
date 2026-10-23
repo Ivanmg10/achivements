@@ -3,9 +3,9 @@
 import Link from 'next/link'
 import { IconArrowRight } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { buttonClass } from '@/components/ui/Button'
 
-const PRIMARY =
-  'inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-accent text-bg-main font-semibold hover:bg-accent-hover active:scale-[0.98] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main'
+const PRIMARY = buttonClass('primary', 'lg')
 
 /** The last thing a visitor reads: it is free, and the way to create an account. */
 export default function LandingClosing() {

@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { notFound, useParams } from 'next/navigation'
 import { fadeUp } from '@/lib/animations'
@@ -16,6 +15,7 @@ import PsnGameInfoHeader from '@/components/psn/psn-game-info-header/PsnGameInfo
 import PsnGameInfoTable from '@/components/psn/psn-game-info-table/PsnGameInfoTable'
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { psnAiSource } from '@/utils/aiExport'
+import Button from '@/components/ui/Button'
 
 /**
  * A PSN game's page — the counterpart of /steamGame/[appId], built the same
@@ -40,12 +40,12 @@ export default function PsnGamePage() {
     return (
       <main className="flex-1 flex flex-col justify-center items-center text-text-main gap-3 p-6 text-center">
         <p className="text-text-secondary">PlayStation Network · {T.userData.notConnected}</p>
-        <Link
+        <Button
           href="/user"
-          className="px-4 py-1.5 bg-accent text-bg-main font-semibold rounded-xl hover:scale-[1.03] transition-transform duration-200 text-sm"
+          size="sm"
         >
           {T.psn.connect}
-        </Link>
+        </Button>
       </main>
     )
   }

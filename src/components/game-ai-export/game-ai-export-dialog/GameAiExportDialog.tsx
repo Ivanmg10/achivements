@@ -6,6 +6,7 @@ import { IconCopy, IconDownload, IconSparkles, IconX } from '@tabler/icons-react
 import { useLanguage } from '@/context/LanguageContext'
 import { modalOverlay, modalContent } from '@/lib/animations'
 import { aiExportFileName, aiExportText, buildAiExport, type AiExportSource } from '@/utils/aiExport'
+import Button from '@/components/ui/Button'
 
 type CopyState = 'idle' | 'copied' | 'failed'
 
@@ -118,14 +119,14 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2">
-          <button
+          <Button
             type="button"
             onClick={copyText}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main"
+            className="flex-1"
           >
             <IconCopy className="w-4 h-4" aria-hidden="true" />
             {T.aiExport.copy}
-          </button>
+          </Button>
           <button
             type="button"
             onClick={download}

@@ -5,13 +5,13 @@ import { IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { GameSource } from '@/types/steam'
 import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
+import { buttonClass } from '@/components/ui/Button'
 
 export type PlatformStat = { label: string; value: string; accent?: string }
 
 export const DISCONNECT_CLASS =
   'w-full py-2 rounded-xl bg-red-500/15 text-red-400 font-semibold text-sm hover:bg-red-500/25 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70'
-export const CONNECT_CLASS =
-  'w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-accent text-bg-main font-semibold text-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+export const CONNECT_CLASS = buttonClass('primary', 'md', 'w-full')
 
 /**
  * One platform on the account page: its logo, whether it is connected, the

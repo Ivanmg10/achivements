@@ -19,6 +19,7 @@ import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosai
 import EmptyState from '@/components/empty-state/EmptyState'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import MainPageGroupFeatureGame from '@/components/main-page/main-page-group-feature-game/MainPageGroupFeatureGame'
+import Button from '@/components/ui/Button'
 
 // Downloaded the first time it is opened, not with the page.
 const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'), { loading: () => null })
@@ -151,14 +152,13 @@ export default function MainPageGroupFeature({
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center gap-2">
           <EmptyState icon={<IconFolder className="w-6 h-6" />} title={T.cards.groupEmpty} size="compact" />
-          <button
+          <Button
             type="button"
             onClick={() => setAdding(true)}
-            className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <IconPlus className="w-4 h-4" aria-hidden="true" />
             {T.groups.addGames}
-          </button>
+          </Button>
         </div>
       ) : (
         <ul className={GRID}>

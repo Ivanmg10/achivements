@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import CommonModal from '../common-modal/CommonModal'
 import { useLanguage } from '@/context/LanguageContext'
+import Button from '@/components/ui/Button'
 
 /** The avatar has its own modal (`AvatarModal`). */
 export type EditProfileField = 'name' | 'email'
@@ -176,13 +177,13 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
         >
           {T.editProfileModal.cancel}
         </button>
-        <button
+        <Button
           onClick={handleSubmit}
           disabled={!canSubmit || success}
-          className="flex-1 bg-accent text-bg-main font-bold rounded-xl py-3 hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+          size="lg" className="flex-1"
         >
           {loading ? T.editProfileModal.saving : T.editProfileModal.save}
-        </button>
+        </Button>
       </div>
     </CommonModal>
   )

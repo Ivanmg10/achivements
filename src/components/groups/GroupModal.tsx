@@ -15,6 +15,7 @@ import GroupModalPreview from '@/components/groups/group-modal-preview/GroupModa
 import GroupModalIconPicker from '@/components/groups/group-modal-icon-picker/GroupModalIconPicker'
 import GroupModalVisibility from '@/components/groups/group-modal-visibility/GroupModalVisibility'
 import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
+import Button from '@/components/ui/Button'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -226,13 +227,12 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                   >
                     {T.groups.cancel}
                   </button>
-                  <button
+                  <Button
                     type="submit"
                     disabled={saving}
-                    className="h-10 px-5 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                   >
                     {saving ? '…' : submitLabel}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </form>

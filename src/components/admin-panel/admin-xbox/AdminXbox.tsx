@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import AdminXboxGame from './admin-xbox-game/AdminXboxGame'
 import { useAdminXbox, type XboxLookupError } from '@/hooks/useAdminXbox'
+import Button from '@/components/ui/Button'
 
 const INPUT_ID = 'admin-xbox-gamertag'
 
@@ -52,13 +53,12 @@ export default function AdminXbox() {
             aria-describedby={error ? `${INPUT_ID}-error` : undefined}
             className="flex-1 min-w-0 bg-bg-main rounded-xl px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           />
-          <button
+          <Button
             type="submit"
             disabled={loading || !gamertag.trim()}
-            className="px-4 py-2 bg-accent text-bg-main text-sm font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {loading ? 'Looking up…' : 'Look up'}
-          </button>
+          </Button>
         </div>
         {error && (
           <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-red-400">

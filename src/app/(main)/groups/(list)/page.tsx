@@ -18,6 +18,7 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import GroupViewToggle, { GROUP_VIEWS, type GroupView } from '@/components/groups/group-view-toggle/GroupViewToggle'
 import { notify } from '@/lib/notify'
 import { GROUPS_PER_USER_MAX } from '@/utils/groupValidation'
+import Button from '@/components/ui/Button'
 
 export default function GroupsPage() {
   const { T } = useLanguage()
@@ -70,13 +71,12 @@ export default function GroupsPage() {
             />
           )}
           {canCreate && (
-            <button
+            <Button
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <IconPlus className="w-4 h-4" aria-hidden="true" />
               {T.groups.newGroup}
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -99,12 +99,12 @@ export default function GroupsPage() {
             subtitle={T.groups.noGroupsSub}
             className="min-h-[40vh]"
           />
-          <button
+          <Button
             onClick={() => setModalOpen(true)}
-            className="mx-auto px-5 py-2.5 rounded-xl bg-accent text-bg-main font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="mx-auto"
           >
             {T.groups.newGroup}
-          </button>
+          </Button>
         </>
       ) : (
         <GroupList

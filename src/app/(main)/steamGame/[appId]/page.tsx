@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { notFound, useParams } from 'next/navigation'
 import { fadeUp } from '@/lib/animations'
@@ -15,6 +14,7 @@ import SteamGameInfoHeader from '@/components/steam/steam-game-info-header/Steam
 import SteamGameInfoTable from '@/components/steam/steam-game-info-table/SteamGameInfoTable'
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { steamAiSource } from '@/utils/aiExport'
+import Button from '@/components/ui/Button'
 
 /**
  * A Steam game's page — the counterpart of /gameInfo/[gameId] for RA, built
@@ -41,12 +41,12 @@ export default function SteamGamePage() {
     return (
       <main className="flex-1 flex flex-col justify-center items-center text-text-main gap-3 p-6 text-center">
         <p className="text-text-secondary">Steam · {T.userData.notConnected}</p>
-        <Link
+        <Button
           href="/user"
-          className="px-4 py-1.5 bg-accent text-bg-main font-semibold rounded-xl hover:scale-[1.03] transition-transform duration-200 text-sm"
+          size="sm"
         >
           {T.userData.steamConnect}
-        </Link>
+        </Button>
       </main>
     )
   }

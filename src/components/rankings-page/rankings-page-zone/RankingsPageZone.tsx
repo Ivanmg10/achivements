@@ -5,12 +5,12 @@ import type { RankRow } from '@/app/api/rankings/route'
 import { useLanguage } from '@/context/LanguageContext'
 import RankingsPageTable from '../rankings-page-table/RankingsPageTable'
 import RankingsPageList from '../rankings-page-list/RankingsPageList'
+import { buttonClass } from '@/components/ui/Button'
 
 /** How many more rows one press of "more above/below" shows (the hook's step). */
 const STEP = 10
 
-const BUTTON =
-  'inline-flex items-center gap-1.5 min-h-9 px-3.5 rounded-full text-xs font-semibold bg-bg-main text-text-secondary hover:text-text-main ring-1 ring-ink/10 disabled:opacity-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+const BUTTON = buttonClass('secondary', 'sm')
 
 /**
  * Your zone, below the top of the list when you are not in it: you, and who

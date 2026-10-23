@@ -7,6 +7,7 @@ import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
 import { useLanguage } from '@/context/LanguageContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import Button from '@/components/ui/Button'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -135,10 +136,10 @@ export default function ForgotPasswordModal({ isOpen, onClose }: { isOpen: boole
                     required
                     disabled={submitting}
                   />
-                  <button
+                  <Button
                     type="submit"
                     disabled={submitting}
-                    className="bg-accent text-bg-main w-full py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    className="w-full"
                   >
                     {submitting ? (
                       <>
@@ -148,7 +149,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }: { isOpen: boole
                     ) : (
                       T.passwordReset.send
                     )}
-                  </button>
+                  </Button>
                 </form>
               </>
             )}

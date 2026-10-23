@@ -7,6 +7,7 @@ import type { AdminUser } from '@/types/user'
 import { adminFetch } from '@/utils/adminFetch'
 import { notify } from '@/lib/notify'
 import { PASSWORD_MIN } from '@/utils/authValidation'
+import Button from '@/components/ui/Button'
 
 interface Props {
   isOpen: boolean
@@ -103,10 +104,10 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
         <button onClick={handleClose} className="flex-1 bg-bg-main text-text-secondary rounded-xl py-3 hover:text-text-main transition-colors">
           Cancel
         </button>
-        <button onClick={handleSubmit} disabled={!canSubmit}
-          className="flex-1 bg-accent text-bg-main font-bold rounded-xl py-3 hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed">
+        <Button onClick={handleSubmit} disabled={!canSubmit}
+          size="lg" className="flex-1">
           {loading ? 'Creating...' : 'Create'}
-        </button>
+        </Button>
       </div>
     </CommonModal>
   )

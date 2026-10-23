@@ -5,6 +5,7 @@ import { IconExternalLink } from '@tabler/icons-react'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useAdminPsnToken, type PsnTokenError } from '@/hooks/useAdminPsnToken'
 import { notify } from '@/lib/notify'
+import Button from '@/components/ui/Button'
 
 const SSO_COOKIE_URL = 'https://ca.account.sony.com/api/v1/ssocookie'
 const INPUT_ID = 'admin-psn-npsso'
@@ -94,13 +95,12 @@ export default function AdminPsnToken() {
             aria-describedby={saveError ? `${INPUT_ID}-error` : undefined}
             className="flex-1 min-w-0 bg-bg-main rounded-xl px-3 py-2 text-sm font-mono outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           />
-          <button
+          <Button
             type="submit"
             disabled={saving || !npsso.trim()}
-            className="px-4 py-2 bg-accent text-bg-main text-sm font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {saving ? 'Checking…' : 'Save'}
-          </button>
+          </Button>
         </div>
         {saveError && (
           <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-red-400">

@@ -19,6 +19,7 @@ import StatusNavDropdown from './status-nav-dropdown/StatusNavDropdown'
 import MainHeaderLevel from './main-header-level/MainHeaderLevel'
 import { plural } from '@/utils/utils'
 import { canUseXbox } from '@/utils/xboxAccess'
+import Button from '@/components/ui/Button'
 
 function NavLink({ href, label, active, glass }: { href: string; label: string; active: boolean; glass?: boolean }) {
   return (
@@ -243,12 +244,12 @@ export default function MainHeader() {
             // Still reading the session: a placeholder where the avatar goes, not a flash of "Sign in".
             <span aria-hidden="true" className="w-36 h-11 rounded-full bg-bg-main/60 animate-pulse motion-reduce:animate-none" />
           ) : (
-            <Link
+            <Button
               href="/authPage"
-              className="px-4 py-1.5 rounded-full bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              size="sm"
             >
               {T.header.signIn}
-            </Link>
+            </Button>
           )}
         </div>
       </header>

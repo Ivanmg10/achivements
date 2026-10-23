@@ -8,6 +8,7 @@ import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useSubject } from '@/context/SubjectContext'
 import type { GameSource } from '@/types/steam'
 import CommonModal from '@/components/common-modal/CommonModal'
+import Button from '@/components/ui/Button'
 
 /**
  * The eye next to a game in a status list. It asks first, in a small popup
@@ -77,13 +78,12 @@ export default function HideGameButton({
             >
               {T.cards.cancel}
             </button>
-            <button
+            <Button
               type="button"
               onClick={confirm}
-              className="px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               {T.cards.hideConfirm}
-            </button>
+            </Button>
           </div>
         </div>
       </CommonModal>

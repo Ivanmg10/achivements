@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { IconLock } from '@tabler/icons-react'
 import PasswordInput from '@/components/password-input/PasswordInput'
 import Spinner from '@/components/main-spinner/Spinner'
+import Button from '@/components/ui/Button'
 
 const MESSAGES: Record<string, string> = {
   'wrong-password': 'That password is incorrect.',
@@ -61,10 +62,10 @@ export default function AdminUnlock({ onUnlocked }: { onUnlocked: () => void }) 
         <PasswordInput id="admin-unlock-password" label="Your password" value={password} onChange={(v) => { setPassword(v); setError(null) }} disabled={loading} />
       </div>
       {error && <p role="alert" className="w-full text-left text-sm text-red-400">{error}</p>}
-      <button
+      <Button
         type="submit"
         disabled={!password || loading}
-        className="w-full flex items-center justify-center gap-2 py-3 bg-accent text-bg-main text-sm font-bold rounded-xl hover:bg-accent-hover active:scale-[0.98] transition disabled:opacity-40 disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-header"
+        size="lg" className="w-full"
       >
         {loading ? (
           <>
@@ -74,7 +75,7 @@ export default function AdminUnlock({ onUnlocked }: { onUnlocked: () => void }) 
         ) : (
           'Unlock'
         )}
-      </button>
+      </Button>
     </form>
   )
 }

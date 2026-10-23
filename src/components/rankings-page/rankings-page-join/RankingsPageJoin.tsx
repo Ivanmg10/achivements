@@ -1,8 +1,8 @@
 'use client'
 
-import Link from 'next/link'
 import { IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import Button from '@/components/ui/Button'
 
 /** For a visitor without an account: how to get onto the list. */
 export default function RankingsPageJoin() {
@@ -15,12 +15,12 @@ export default function RankingsPageJoin() {
         {T.rankings.joinTitle}
       </h2>
       <p className="relative text-sm text-text-secondary">{T.rankings.joinText}</p>
-      <Link
+      <Button
         href="/authPage"
-        className="relative self-start px-4 py-2 rounded-full bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="relative self-start"
       >
         {T.rankings.joinCta}
-      </Link>
+      </Button>
     </section>
   )
 }

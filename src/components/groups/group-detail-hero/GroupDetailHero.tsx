@@ -7,6 +7,7 @@ import type { Counts } from '@/utils/groupItems'
 import { plural } from '@/utils/utils'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
+import Button from '@/components/ui/Button'
 
 const ACTION = 'flex items-center justify-center w-10 h-10 rounded-xl ring-1 ring-ink/10 bg-bg-card/80 text-text-secondary transition-colors focus-visible:outline-none focus-visible:ring-2'
 
@@ -108,14 +109,13 @@ export default function GroupDetailHero({
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <button
+            <Button
               type="button"
               onClick={onAdd}
-              className="flex items-center gap-1.5 h-10 px-4 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <IconPlus className="w-4 h-4" aria-hidden="true" />
               {T.groups.addGames}
-            </button>
+            </Button>
             <button type="button" onClick={onEdit} aria-label={T.groups.editGroup} className={`${ACTION} hover:text-text-main focus-visible:ring-accent/70`}>
               <IconEdit className="w-4 h-4" aria-hidden="true" />
             </button>

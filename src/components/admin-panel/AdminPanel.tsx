@@ -18,6 +18,7 @@ import { normalizeTitle } from '@/utils/gameCandidates'
 import { ADMIN_LOCKED_EVENT, adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
+import Button from '@/components/ui/Button'
 
 /** What the panel is showing, for a container that sizes itself to it. */
 export type AdminPanelMode = 'loading' | 'locked' | 'open'
@@ -179,13 +180,10 @@ export default function AdminPanel({
               className="bg-bg-card rounded-xl pl-9 pr-3 py-2 text-sm text-text-main placeholder:text-text-secondary outline-none focus-visible:ring-2 focus-visible:ring-accent/70 w-56"
             />
           </div>
-          <button
-            onClick={() => setCreateOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-accent text-bg-main text-sm font-bold rounded-xl hover:opacity-90 transition-opacity"
-          >
+          <Button size="sm" onClick={() => setCreateOpen(true)}>
             <IconPlus size={14} aria-hidden="true" />
             New user
-          </button>
+          </Button>
           <button
             onClick={lockNow}
             className="flex items-center gap-1.5 px-3 py-2 bg-bg-card text-text-secondary text-sm rounded-xl hover:text-text-main transition-colors"

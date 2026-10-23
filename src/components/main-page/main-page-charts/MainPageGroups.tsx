@@ -19,6 +19,7 @@ import GroupIcon from '@/components/groups/group-icon/GroupIcon'
 import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgressBar'
 import MainPageGroupsRow from './main-page-groups-row/MainPageGroupsRow'
 import { notify } from '@/lib/notify'
+import Button from '@/components/ui/Button'
 
 /**
  * The user's groups as a list, with creating one at hand (deleting is on the
@@ -102,12 +103,12 @@ export default function MainPageGroups({
             subtitle={T.groups.noGroupsSub}
             size="compact"
           />
-          <button
+          <Button
             onClick={() => setModalOpen(true)}
-            className="mt-1 px-3 py-1.5 rounded-lg bg-accent text-bg-main text-xs font-medium hover:bg-accent/90 transition-colors"
+            size="sm" className="mt-1"
           >
             {T.groups.newGroup}
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="flex flex-col gap-2 flex-1">
