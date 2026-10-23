@@ -98,7 +98,7 @@ export default function MainPagePinnedGames() {
                     {renderRow(pin, false)}
                   </ViewEntrance>
                 ))}
-                <ViewEntrance kind="tile" index={displayPins.length}>
+                <ViewEntrance kind="tile" index={displayPins.length} className="flex">
                   <PinGameCard />
                 </ViewEntrance>
               </div>
