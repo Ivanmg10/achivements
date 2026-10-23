@@ -22,6 +22,8 @@ design canvas (linked there).
   a static frame cannot do). Say which one is being used and why.
 - **Several concepts, not one**: four for the welcome (A–D), each with its own idea, plus the
   analysis of the reference as its own artboard. Recommend one and say why.
+- **Record it in `docs/designs.md`** as soon as it exists (date, link, what it is for), and keep
+  its entry current: versions, which one was agreed, which branch built it.
 - Prototypes use the app's real tokens (backgrounds, accent, Inter, radii) and real copy in the
   user's language (Spanish), not lorem ipsum. Tweaks for the scenarios that matter (registered
   with Steam, reduced motion, a refused key, the browser's language…).

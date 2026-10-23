@@ -224,3 +224,25 @@ The user tried it on a 2560 px screen and asked for four things; all done:
    "confirm" for a URL). It replaces the avatar part of `EditProfileModal` on the account page
    too; `AvatarUpload` became the `useAvatarUpload` hook.
 Also: the photo field shows the picture instead of a truncated text.
+
+## State on 2026-10-23 — what is left
+
+Built and committed on `feat/welcome-onboarding` (not pushed: the user pushes). Left:
+
+- **Not tried end to end with a real new account** on pre: the curtain from sign-up into the
+  welcome, the Steam round trip back to `/welcome#steam-…`, RA and PSN linking from their steps.
+- **Browser back between steps** (the step lives in sessionStorage; Steam answers with its own hash).
+- **First paint in the browser's language**: a first visit paints English for a moment
+  (server-side `Accept-Language` would make the root layout dynamic; not done on purpose).
+- **Version**: every commit bumped the patch (1.6.70 now); a new page is a minor bump by the
+  versioning rules (1.7.0, a `chore(release)` commit). Not done: the user's call.
+- **The PR**: the branch was cut from `feat/steam-sign-in` (PR #46, not merged), so its PR into
+  `develop` waits for #46, then needs the full description (see `CLAUDE.md` → Pull requests).
+- Small: the first point's detail says "hours played" for all three platforms, but
+  RetroAchievements gives none; the RA guide's sketch is hidden below 640 px (its steps stay);
+  the library preview cards are drawn samples (they say so).
+- **The canvas is behind the code** (slower curtain, sign-up entry, avatar modal, points that open
+  over the step): the code is the reference now (`docs/designs.md`).
+- **Language detection was checked (2026-10-23)**: it is this branch's (`c6ccf86`), no other
+  branch or agent had done it; the other `Accept-Language` in the code is the header sent to
+  Sony's and OpenXBL's APIs, unrelated.

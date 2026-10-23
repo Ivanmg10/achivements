@@ -113,7 +113,9 @@ version at a time (changing only what they asked), a plan doc, then build and fi
 from their screenshots (they use a 2560 px screen). The welcome's visual language (display
 italic titles, kickers, floating pill bar, curtain, cards that grow into their detail) is the
 one the user likes; an internal component library to make the whole site match it is an idea
-written up in `docs/ui-library-plan.md` (not started: design it first, then ask).
+written up in `docs/ui-library-and-designs-plan.md` (a separate development, not started: design
+it first, then ask). **Every design made (Figma or canvas) gets an entry in `docs/designs.md`**
+with its link, versions and what was built, so it can always be found again.
 
 ## Welcome after sign-up (`/welcome`, 2026-10-22)
 
@@ -1008,8 +1010,16 @@ branch to be up to date with its base** before merging, on both.
 - [x] Public user profiles
 - [ ] Group hardcore achievement tracking
 - [ ] **An internal component library** (buttons, inputs, selects, switches, modals, pills,
-      steps bar, curtain) in the welcome's style, for the whole site: `docs/ui-library-plan.md`.
-      An idea of the user's (2026-10-23); design it on a canvas and agree it before building.
+      steps bar, curtain) in the welcome's style, for the whole site, **and a record of every
+      design** (`docs/designs.md`, started): `docs/ui-library-and-designs-plan.md`. A separate
+      development, the user's idea (2026-10-23); design the library on a canvas and agree it first.
+- [ ] **More languages** (the user's wish, 2026-10-23). Today nine (`LANGUAGES` in
+      `src/utils/languages.ts`); the browser's language is taken when it is one of them, so a new
+      language reaches its speakers on its own. A new one needs: its `src/translations/<lang>.ts`
+      (typed as `Translations`, every key), its entry in `LANGUAGES` and in `LanguageContext`'s
+      map, the texts kept outside `T` (`vaultGuide.ts`, `vaultGuideMore.ts`; the public pages fall
+      back to English), plural rules if it has its own (`T.plurals`), and gender-neutral wording.
+      Not started; ask which languages first.
 - [ ] Notifications — **an idea the user wants to expand before it is built; do not
       start it, and do not assume it is push or email.** Ask what they have in mind
       first. Known so far: friends completing games and a game's last chance (a

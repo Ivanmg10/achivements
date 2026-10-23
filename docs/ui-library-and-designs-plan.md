@@ -1,9 +1,19 @@
-# An internal component library — plan (idea, not started)
+# Component library and a record of every design — plan (a separate development, not started)
 
-Written 2026-10-23 at the user's request: they liked the welcome's visual style and want, in
-time, **one set of components for the whole site so it looks and behaves the same everywhere**.
-Not started; to be designed the usual way first (`docs/design-process.md`). Nothing here is
-decided beyond the wish.
+Written 2026-10-23 at the user's request. **Its own development, on its own branch**, not part
+of the welcome. Two things the user wants:
+
+1. **An internal library of components** for the whole site, so it looks and behaves the same
+   everywhere, in the welcome's style (they liked it).
+2. **Every design that is made is recorded, so it can be found again**: each Figma file or
+   design canvas, with its link, what it is for, its versions and which one was built.
+
+Not started; the library is to be designed the usual way first (`docs/design-process.md`).
+Nothing here is decided beyond the wish.
+
+---
+
+# Part 1 — the component library
 
 ## Why
 
@@ -69,3 +79,30 @@ checked everywhere it shows.
   (welcome, rankings, empty states)?
 - Which pieces first? (Proposed: buttons, inputs/selects, switches, modals.)
 - A gallery page in the app (admin-only) or only the design canvas?
+
+---
+
+# Part 2 — a record of every design
+
+## What the user wants
+
+Any design made for CheevoVault (Figma, or a design canvas on claude.ai when Figma is not
+connected) must stay reachable: today a design lives only as a link in a chat, and is lost with it.
+
+## How
+
+- **`docs/designs.md`** is the register, one entry per design: date, title, link, what it is for,
+  the versions in it (and which one was built), the branch/PR that built it, its status
+  (exploring / agreed / built / replaced). **Started 2026-10-23 with the welcome's canvas**, so the
+  practice applies from now on (`CLAUDE.md` → How UI work is done).
+- Designs are private to the user's account: the register holds the link, never a copy of them.
+  Whoever opens it must be signed in as the user (or have it shared).
+- When the library exists, the register also points at the canvas (or Figma page) that shows
+  every component, so a change to one is checked against all the designs that use it.
+
+## Open questions
+
+- Figma as the home for designs from now on (needs its connector authorised), or the claude.ai
+  canvas, or both?
+- Export a picture of the agreed version next to each entry, so the register is readable without
+  opening the link? (Images of a design are fine; images of real user data are not.)

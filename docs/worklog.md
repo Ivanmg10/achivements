@@ -29,11 +29,27 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-23 — Design register started, library as its own development, more languages on the roadmap (`feat/welcome-onboarding`)
+
+**Did** — `docs/ui-library-plan.md` became `docs/ui-library-and-designs-plan.md`, a separate
+development with two parts: the component library and a record of every design. `docs/designs.md`
+started, with the welcome's canvas as its first entry; `CLAUDE.md` and `docs/design-process.md`
+now require an entry for every design. "More languages" added to the roadmap with what a new one
+needs. The welcome plan says what is left of this development.
+**Why** — The user wants every Figma/canvas design to stay findable, the library done apart, and
+more languages in the future.
+**Decisions** — The register holds links, never copies (the designs are private to the user's
+account). The browser-language detection was checked: it is this branch's own (`c6ccf86`); the
+`happy-koala` worktree is another agent's (PSN docs, uncommitted) and was left untouched.
+**Open** — See `docs/welcome-plan.md` → "State on 2026-10-23".
+
+---
+
 ## 2026-10-23 — How UI work is done, and the component library idea (`feat/welcome-onboarding`)
 
 **Did** — `docs/design-process.md` (idea → references → design canvas with several concepts →
 iterations → plan → build and fix from the user's screenshots, plus the lessons from the
-welcome); `docs/ui-library-plan.md` (an internal component library in the welcome's style:
+welcome); `docs/ui-library-and-designs-plan.md`, then `ui-library-plan.md` (an internal component library in the welcome's style:
 inventory of today's duplicates, the visual language, a first shape, how to migrate, open
 questions); both linked from `CLAUDE.md` (a section, and a roadmap item) and `docs/README.md`.
 **Why** — The user liked the welcome's style and the way it was reached, and wants future agents
