@@ -3,8 +3,8 @@ import { useRef } from 'react'
 export type Tab<V extends string> = {
   value: V
   label: React.ReactNode
-  /** A count beside the label. */
-  count?: number
+  /** A count beside the label, formatted by the caller. */
+  count?: number | string
 }
 
 /** The ids a tab and its panel share, so the panel can say which tab it belongs to. */

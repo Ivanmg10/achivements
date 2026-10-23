@@ -5,15 +5,14 @@ import type { RankingsView } from '@/hooks/useRankings'
 import type { RankPeriod, RankScope, RankSort, RankSource } from '@/lib/rankings'
 import { useLanguage } from '@/context/LanguageContext'
 import { PLATFORM_FILL, PLATFORM_NAMES } from '@/components/vault-platform-split/VaultPlatformSplit'
+import { pillClass } from '@/components/ui/Pill'
+import Tabs from '@/components/ui/Tabs'
 
 const PERIODS: RankPeriod[] = ['all', 'month', 'week']
 const SORTS: RankSort[] = ['points', 'streak', 'best']
 const SORT_LABEL = { points: 'sortPoints', streak: 'sortStreak', best: 'sortBest' } as const
 
-const chip = (on: boolean) =>
-  `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-    on ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30' : 'bg-bg-card text-text-secondary hover:text-text-main'
-  }`
+const chip = (on: boolean) => pillClass(on)
 
 /**
  * Who to compare with (tabs: everyone, or you and whom you follow), over what
@@ -39,21 +38,15 @@ export default function RankingsPageToolbar({
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       {scopes.length > 1 && (
-        <div role="tablist" aria-label={T.rankings.scope} className="inline-flex self-start bg-bg-card rounded-xl p-1 gap-0.5">
-          {scopes.map((s) => (
-            <button
-              key={s}
-              role="tab"
-              aria-selected={view.scope === s}
-              onClick={() => set({ scope: s })}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-                view.scope === s ? 'bg-bg-tertiary text-text-main' : 'text-text-secondary hover:text-text-main'
-              }`}
-            >
-              {s === 'global' ? T.rankings.global : T.rankings.following}
-            </button>
-          ))}
-        </div>
+        <Tabs
+          id="rankings-scope"
+          aria-label={T.rankings.scope}
+          size="sm"
+          className="self-start"
+          value={view.scope}
+          onChange={(scope) => set({ scope })}
+          tabs={scopes.map((s) => ({ value: s, label: s === 'global' ? T.rankings.global : T.rankings.following }))}
+        />
       )}
 
       <div className="flex flex-wrap items-center gap-1.5">

@@ -4,6 +4,7 @@ import AchievementsLineChart from '../achivements-line-chart/AchievementsLineCha
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useGamesData } from '@/context/GamesDataContext'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 
 export default function UserCharts() {
   const { T } = useLanguage()
@@ -16,20 +17,15 @@ export default function UserCharts() {
       <div className="flex flex-col items-center justify-center md:justify-start md:items-start pl-3">
         <div className="flex items-center gap-1 px-3 pt-3 pb-1">
           <h1 className="text-xl">{T.userCharts.games} {chartShown}</h1>
-          <div className="flex items-center">
-            <button
-              className={`text-sm px-3 py-1 cursor-pointer rounded-lg m-1 transition-colors ${chartShown === 'softcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
-              onClick={() => setChartShown('softcore')}
-            >
-              Softcore
-            </button>
-            <button
-              className={`text-sm px-3 py-1 cursor-pointer rounded-lg m-1 transition-colors ${chartShown === 'hardcore' ? 'bg-accent text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
-              onClick={() => setChartShown('hardcore')}
-            >
-              Hardcore
-            </button>
-          </div>
+          <SegmentedControl
+            aria-label={T.userCharts.games}
+            value={chartShown}
+            onChange={setChartShown}
+            options={[
+              { value: 'softcore', label: 'Softcore' },
+              { value: 'hardcore', label: 'Hardcore' },
+            ]}
+          />
         </div>
         <GamesPlayedPieChart games={chartShown === 'softcore' ? softcore : hardcore} />
       </div>
