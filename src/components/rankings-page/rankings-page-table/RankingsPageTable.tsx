@@ -50,7 +50,7 @@ export default function RankingsPageTable({
             <th scope="col" className={`${TH} text-right`}>{T.rankings.colPoints}</th>
             <th scope="col" className={`${TH} hidden lg:table-cell`}>{T.rankings.colPlatforms}</th>
             <th scope="col" className={`${TH} hidden lg:table-cell`}>{T.rankings.colTrend}</th>
-            <th scope="col" className={`${TH} border-l border-ink/[0.07]`}>{T.rankings.colStreak}</th>
+            <th scope="col" className={`${TH}`}>{T.rankings.colStreak}</th>
             <th scope="col" className={`${TH} text-right hidden xl:table-cell`}>{T.rankings.colCompleted}</th>
             <th scope="col" className={`${TH} text-right hidden xl:table-cell`}>{T.rankings.colAchievements}</th>
             {arrows && <th scope="col" className={`${TH} text-right`}>{T.rankings.colChange}</th>}
@@ -82,7 +82,7 @@ export default function RankingsPageTable({
               <td className="px-3 py-1.5 hidden lg:table-cell">
                 <VaultSparkline weeks={r.trend} />
               </td>
-              <td className="px-3 py-2 border-l border-ink/[0.07]">
+              <td className="px-3 py-2">
                 <RankingsPageStreak streak={r.streak} best={r.bestStreak} />
               </td>
               <td className="px-3 py-2 text-right tabular-nums hidden xl:table-cell">{r.completed.toLocaleString(lang)}</td>
