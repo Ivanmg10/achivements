@@ -24,6 +24,8 @@ export type ModalProps = {
   showClose?: boolean
   /** Names the dialog when there is no `title` (otherwise its first heading does). */
   'aria-label'?: string
+  /** Or the id of the element in the content that names it. */
+  'aria-labelledby'?: string
   /** Layout of the body only (gap, padding). */
   className?: string
 }
@@ -45,6 +47,7 @@ export default function Modal({
   tone = 'default',
   showClose = true,
   'aria-label': ariaLabel,
+  'aria-labelledby': labelledBy,
   className = 'gap-5',
 }: ModalProps) {
   const { T } = useLanguage()
@@ -63,17 +66,20 @@ export default function Modal({
     const back = document.activeElement as HTMLElement | null
     const panel = panelRef.current
     // Name it by its first heading when it has no title of its own.
-    if (panel && !title && !ariaLabel) {
+    if (panel && !title && !ariaLabel && !labelledBy) {
       const heading = panel.querySelector<HTMLElement>('h1, h2, h3')
       if (heading) {
         heading.id ||= `${titleId}-heading`
         panel.setAttribute('aria-labelledby', heading.id)
       }
     }
-    const first = panel?.querySelector<HTMLElement>('[autofocus]') ?? panel?.querySelector<HTMLElement>(FOCUSABLE)
-    ;(first ?? panel)?.focus()
+    // The dialog itself takes focus (its name is read first), or a field marked autoFocus.
+    ;(panel?.querySelector<HTMLElement>('[autofocus]') ?? panel)?.focus()
 
     function onKey(e: KeyboardEvent) {
+      // Only the dialog on top answers (one opened from another stays open under it).
+      const open = document.querySelectorAll('[role="dialog"], [role="alertdialog"]')
+      if (open.length && open[open.length - 1] !== panel) return
       if (e.key === 'Escape') {
         e.stopPropagation()
         closeRef.current()
@@ -100,7 +106,7 @@ export default function Modal({
       document.removeEventListener('keydown', onKey)
       back?.focus?.()
     }
-  }, [isOpen, title, ariaLabel, titleId])
+  }, [isOpen, title, ariaLabel, labelledBy, titleId])
 
   if (typeof document === 'undefined') return null
 
@@ -122,7 +128,7 @@ export default function Modal({
             role={tone === 'danger' ? 'alertdialog' : 'dialog'}
             aria-modal="true"
             aria-label={title ? undefined : ariaLabel}
-            aria-labelledby={title ? titleId : undefined}
+            aria-labelledby={title ? titleId : labelledBy}
             aria-describedby={hint ? hintId : undefined}
             tabIndex={-1}
             className={`relative w-full ${SIZES[size]} max-h-[92dvh] flex flex-col bg-bg-header text-text-main rounded-t-card sm:rounded-card ring-1 ring-ink/[0.08] shadow-2xl shadow-black/50 outline-none`}

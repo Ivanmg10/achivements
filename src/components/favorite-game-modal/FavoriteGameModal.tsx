@@ -10,14 +10,9 @@ import { candidateIconUrl, searchCandidates } from '@/utils/gameCandidates'
 import GamePickerRow from '@/components/game-picker/game-picker-row/GamePickerRow'
 import type { GameSource } from '@/types/steam'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import Modal from '@/components/ui/Modal'
 
 export type FavoriteGame = { id: number; title: string; imageIcon: string }
-
-const overlayVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.18 } },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
-}
 
 const contentVariants: Variants = {
   hidden: { opacity: 0, y: -14, scale: 0.97 },
@@ -99,15 +94,7 @@ export default function FavoriteGameModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          onClick={onClose}
-        >
-          <div className="absolute top-[12%] left-1/2 -translate-x-1/2 w-full max-w-xl px-4">
+        <Modal isOpen={isOpen} onClose={onClose} size="md" showClose={false} className="gap-4">
             <motion.div
               className="bg-bg-card rounded-2xl shadow-2xl overflow-hidden border border-ink/5"
               variants={contentVariants}
@@ -187,8 +174,7 @@ export default function FavoriteGameModal({
                 )}
               </div>
             </motion.div>
-          </div>
-        </motion.div>
+          </Modal>
       )}
     </AnimatePresence>
   )

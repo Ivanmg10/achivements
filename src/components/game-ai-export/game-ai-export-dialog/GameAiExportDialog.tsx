@@ -1,13 +1,12 @@
 'use client'
 
-import { useEffect, useId, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useId, useState } from 'react'
 import { IconCopy, IconDownload, IconSparkles, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { modalOverlay, modalContent } from '@/lib/animations'
 import { aiExportFileName, aiExportText, buildAiExport, type AiExportSource } from '@/utils/aiExport'
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
+import Modal from '@/components/ui/Modal'
 
 type CopyState = 'idle' | 'copied' | 'failed'
 
@@ -22,23 +21,8 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
   const { T, lang } = useLanguage()
   const [question, setQuestion] = useState('')
   const [copy, setCopy] = useState<CopyState>('idle')
-  const dialogRef = useRef<HTMLDivElement>(null)
   const titleId = useId()
   const questionId = useId()
-
-  useEffect(() => {
-    const opener = document.activeElement as HTMLElement | null
-    dialogRef.current?.focus()
-    return () => opener?.focus?.()
-  }, [])
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
 
   const build = () => buildAiExport(source, { lang, question })
 
@@ -63,27 +47,7 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
   }
 
   return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-      variants={modalOverlay}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      onClick={onClose}
-    >
-      <motion.div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        className="bg-bg-main rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto overscroll-contain flex flex-col gap-4 p-5 sm:p-6 focus:outline-none"
-        variants={modalContent}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="md" showClose={false} className="gap-4">
         <div className="flex items-start justify-between gap-3">
           <h2 id={titleId} className="text-lg sm:text-xl font-semibold flex items-center gap-2">
             <IconSparkles className="w-5 h-5 text-accent shrink-0" aria-hidden="true" />
@@ -151,7 +115,6 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
 
         <p className="text-xs text-text-secondary">{T.aiExport.howTo}</p>
         <p className="text-xs text-text-secondary">{T.aiExport.privacy}</p>
-      </motion.div>
-    </motion.div>
+      </Modal>
   )
 }

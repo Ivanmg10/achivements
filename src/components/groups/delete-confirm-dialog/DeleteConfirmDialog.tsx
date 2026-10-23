@@ -1,5 +1,6 @@
 import { useLanguage } from '@/context/LanguageContext'
 import Button from '@/components/ui/Button'
+import Modal from '@/components/ui/Modal'
 
 /** Asks before deleting something. Defaults to the wording for a group. */
 export default function DeleteConfirmDialog({
@@ -19,14 +20,7 @@ export default function DeleteConfirmDialog({
   if (!isOpen) return null
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-bg-card rounded-2xl p-6 w-full max-w-sm flex flex-col gap-4 shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Modal isOpen={isOpen} onClose={onClose} size="sm" showClose={false} className="gap-4">
         <p className="text-sm text-text-main">{message ?? T.groups.confirmDelete}</p>
         <div className="flex gap-2">
           <Button
@@ -42,7 +36,6 @@ export default function DeleteConfirmDialog({
             {confirmLabel ?? T.groups.deleteGroup}
           </Button>
         </div>
-      </div>
-    </div>
+      </Modal>
   )
 }

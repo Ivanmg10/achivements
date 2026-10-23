@@ -3,17 +3,16 @@
 import { RetroAchievement } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
-import { motion } from 'framer-motion'
 import { IconStar, IconStarFilled } from '@tabler/icons-react'
-import { modalOverlay, modalContent } from '@/lib/animations'
 import Spinner from '@/components/main-spinner/Spinner'
 import { raShowcaseEntry } from '@/utils/showcase'
 import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseToggleButton'
+import Modal from '@/components/ui/Modal'
 
 interface AchievementUnlock {
   User: string
@@ -74,7 +73,6 @@ export default function AchievementModal({
   const { T, lang } = useLanguage()
   const subject = useSubject()
   const titleId = useId()
-  const dialogRef = useRef<HTMLDivElement>(null)
   const [detail, setDetail] = useState<AchievementDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -107,22 +105,6 @@ export default function AchievementModal({
       .finally(() => setLoading(false))
   }, [achievement.ID])
 
-  // Focus moves into the dialog when it opens and back to where it was opened
-  // from when it closes, so a keyboard user is not left behind the overlay.
-  useEffect(() => {
-    const opener = document.activeElement as HTMLElement | null
-    dialogRef.current?.focus()
-    return () => opener?.focus?.()
-  }, [])
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
-
   const earnedDate = achievement.DateEarned
     ? new Date(achievement.DateEarned).toLocaleString(lang, {
         day: 'numeric', month: 'short', year: 'numeric',
@@ -132,27 +114,7 @@ export default function AchievementModal({
 
   // In body: a transformed ancestor (the home's sections) would otherwise trap it under later sections.
   return createPortal(
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-      variants={modalOverlay}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      onClick={onClose}
-    >
-      <motion.div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        className="bg-bg-main rounded-2xl w-full max-w-4xl max-h-[65vh] overflow-y-auto overscroll-contain flex flex-col focus:outline-none"
-        variants={modalContent}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="xl" showClose={false} className="gap-4">
         {/* Header */}
         <div className="flex items-start gap-4 p-6 border-b border-bg-header">
           {achievement.BadgeName && (
@@ -378,8 +340,7 @@ export default function AchievementModal({
             )
           })()}
         </div>
-      </motion.div>
-    </motion.div>,
+      </Modal>,
     document.body,
   )
 }

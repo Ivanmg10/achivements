@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion, type Variants } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { GameGroup, GameGroupItem } from '@/types/types'
@@ -17,17 +17,7 @@ import GroupModalVisibility from '@/components/groups/group-modal-visibility/Gro
 import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
-
-const overlayVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.18 } },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
-}
-const contentVariants: Variants = {
-  hidden: { opacity: 0, y: -14, scale: 0.97 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
-  exit: { opacity: 0, y: -8, scale: 0.97, transition: { duration: 0.15, ease: 'easeIn' } },
-}
+import Modal from '@/components/ui/Modal'
 
 const LABEL = 'text-[10px] uppercase tracking-widest text-text-secondary'
 
@@ -132,25 +122,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          onClick={onClose}
-        >
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={headingId}
-            className={`bg-bg-card w-full h-full sm:h-auto sm:max-h-[88vh] sm:rounded-2xl flex flex-col text-text-main shadow-2xl ring-1 ring-ink/5 overflow-hidden ${isEditing ? 'sm:max-w-md' : 'sm:max-w-4xl'}`}
-            variants={contentVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={headingId} size="md" showClose={false} className="gap-4">
             <div className="flex items-center justify-between px-5 sm:px-6 pt-5 pb-3 shrink-0">
               <h2 id={headingId} className="text-lg font-bold">
                 {isEditing ? T.groups.editGroup : T.groups.newGroup}
@@ -236,8 +208,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                 </div>
               </div>
             </form>
-          </motion.div>
-        </motion.div>
+          </Modal>
       )}
     </AnimatePresence>,
     document.body,

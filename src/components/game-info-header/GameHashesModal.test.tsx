@@ -82,6 +82,6 @@ test('closing with the X or the backdrop', async () => {
   const { onClose } = setup()
   await screen.findByText('Sonic (USA).md')
   fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Cerrar modal' }))
+  fireEvent.click(screen.getByRole('dialog').parentElement!)
   expect(onClose).toHaveBeenCalledTimes(2)
 })

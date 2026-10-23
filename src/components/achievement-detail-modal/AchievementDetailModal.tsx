@@ -1,17 +1,16 @@
 'use client'
 
-import { ReactNode, useEffect, useId, useRef } from 'react'
+import { ReactNode, useId } from 'react'
 import { createPortal } from 'react-dom'
-import { motion } from 'framer-motion'
 import { IconBrandYoutube, IconBook2, IconCheck, IconLock, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { modalOverlay, modalContent } from '@/lib/animations'
 import { FadeImage } from '@/components/ui/FadeImage'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseToggleButton'
 import type { ShowcaseEntry } from '@/utils/showcase'
 import { formatRarity } from '@/utils/steamFeed'
 import type { GuideLink } from '@/utils/guideLinks'
+import Modal from '@/components/ui/Modal'
 
 const GUIDE_ICON = { youtube: IconBrandYoutube, steamGuides: IconBook2, psnProfiles: IconBook2, trueAchievements: IconBook2 }
 
@@ -57,21 +56,6 @@ export default function AchievementDetailModal({
 }) {
   const { T, lang } = useLanguage()
   const titleId = useId()
-  const dialogRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const opener = document.activeElement as HTMLElement | null
-    dialogRef.current?.focus()
-    return () => opener?.focus?.()
-  }, [])
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
 
   const when = earnedAt
     ? new Date(earnedAt).toLocaleString(lang, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -80,27 +64,7 @@ export default function AchievementDetailModal({
 
   // In body: a transformed ancestor (the home's sections) would otherwise trap it under later sections.
   return createPortal(
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-      variants={modalOverlay}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      onClick={onClose}
-    >
-      <motion.div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        className="bg-bg-main rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto overscroll-contain flex flex-col focus:outline-none"
-        variants={modalContent}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="md" showClose={false} className="gap-4">
         <div className="flex items-start gap-4 p-5 sm:p-6 border-b border-bg-header">
           {iconUrl ? (
             <FadeImage
@@ -173,8 +137,7 @@ export default function AchievementDetailModal({
             </ul>
           </div>
         )}
-      </motion.div>
-    </motion.div>,
+      </Modal>,
     document.body,
   )
 }

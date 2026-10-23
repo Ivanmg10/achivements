@@ -56,3 +56,14 @@ test('on/off switches come from Switch', () => {
 test('checkboxes come from Checkbox', () => {
   expect(offenders(/type="checkbox"/)).toEqual([])
 })
+
+test('dialogs come from Modal', () => {
+  // Not dialogs: the sign-in backdrop, the welcome's curtain, the phone menu drawer, the search panel (PR 2 rebuilds it).
+  const allowed = [
+    path.join('app', '(auth)', 'authPage', 'page.tsx'),
+    path.join('components', 'welcome-curtain', 'WelcomeCurtain.tsx'),
+    path.join('components', 'main-header', 'MobileNavModal.tsx'),
+    path.join('components', 'search-modal', 'SearchModal.tsx'),
+  ]
+  expect(offenders(/className="fixed inset-0[^"]*bg-black/).filter((f) => !allowed.includes(f))).toEqual([])
+})

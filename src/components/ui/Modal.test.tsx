@@ -29,7 +29,7 @@ it('moves focus in and keeps Tab inside', () => {
   )
   const first = screen.getByRole('button', { name: 'First' })
   const last = screen.getByRole('button', { name: 'Last' })
-  expect(first).toHaveFocus()
+  expect(screen.getByRole('dialog')).toHaveFocus()
   last.focus()
   fireEvent.keyDown(document, { key: 'Tab' })
   expect(first).toHaveFocus()

@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion, type Variants } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { IconX, IconHash, IconCopy, IconCheck } from '@tabler/icons-react'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useIsClient } from '@/hooks/useIsClient'
+import Modal from '@/components/ui/Modal'
 
 type GameHash = {
   MD5: string
@@ -19,17 +20,6 @@ type Props = {
   onClose: () => void
   gameId: number
   gameTitle: string
-}
-
-const overlayVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.18 } },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
-}
-const contentVariants: Variants = {
-  hidden: { opacity: 0, y: -14, scale: 0.97 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
-  exit: { opacity: 0, y: -8, scale: 0.97, transition: { duration: 0.15 } },
 }
 
 const LABEL_COLORS: Record<string, string> = {
@@ -100,25 +90,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-        >
-          <button
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default"
-            onClick={onClose}
-            aria-label="Cerrar modal"
-          />
-          <motion.div
-            className="relative bg-bg-card border border-ink/10 rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col"
-            variants={contentVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
+        <Modal isOpen={isOpen} onClose={onClose} size="md" showClose={false} className="gap-4">
             {/* Header */}
             <div className="flex items-center gap-3 p-5 border-b border-ink/8 shrink-0">
               <div className="w-9 h-9 rounded-lg bg-bg-main flex items-center justify-center shrink-0">
@@ -199,8 +171,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                 </div>
               )}
             </div>
-          </motion.div>
-        </motion.div>
+          </Modal>
       )}
     </AnimatePresence>,
     document.body,

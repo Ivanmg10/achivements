@@ -61,7 +61,7 @@ test('Escape leaves it open while another dialog sits over it', () => {
 test('narrow while it is only the password door, wide once the panel is open', () => {
   render(<AdminPanelModal isOpen onClose={jest.fn()} />)
   act(() => reportMode('locked'))
-  expect(screen.getByRole('dialog')).toHaveClass('max-w-md')
+  expect(screen.getByRole('dialog')).toHaveClass('sm:max-w-[27.5rem]')
   act(() => reportMode('open'))
-  expect(screen.getByRole('dialog')).toHaveClass('max-w-6xl')
+  expect(screen.getByRole('dialog')).toHaveClass('sm:max-w-5xl')
 })
