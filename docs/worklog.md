@@ -47,6 +47,20 @@ fetches a pasted avatar link (SSRF), so it always shows the initial.
 **Open** — The route's `loading.tsx` (the full profile's skeleton) flashes before the card for a
 visitor; harmless, a lighter skeleton if it bothers. Check the preview on Discord or
 opengraph.xyz once deployed.
+## 2026-10-23 — Issues: drop the close workflow, `linked-issue` required (`chore/56-drop-issue-close`)
+
+**Did** — Removed `.github/workflows/issue-close.yml`; CLAUDE.md (Issues, Environments) and
+`docs/architecture.md` say GitHub closes the issues and that the ruleset requires `linked-issue`.
+**Why** — Merging #52 into `develop` showed GitHub closing #47 itself (`closedByPullRequestsReferences`),
+although `develop` is not the default branch. The workflow also failed: it read an example
+"closes #123" in #52's prose as an issue.
+**Decisions** — Deleted rather than fixed: GitHub does the job. The user added `linked-issue` to the
+`pr description` ruleset (develop and main).
+**Watch out** — `linked-issue` reads the first `Closes/Fixes/Resolves #n` anywhere in the
+description: keep example numbers out of the text, or in `<!-- -->`.
+
+---
+
 ## 2026-10-22 — Steam: batched library counts, the whole year's streak, "now playing" (`feat/steam-sign-in`)
 
 **Did** — (1) `fetchBatchCounts` (`GetTopAchievementsForGames`, 100 games a call) counts a

@@ -142,8 +142,8 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   `package.json`; `.githooks/commit-msg` enforces Conventional Commits.
 - `.github/workflows/pr-description.yml` fails a PR whose description leaves a
   section of the template blank; `pr-issue.yml` (`linked-issue`) fails one that
-  resolves no open issue, and `issue-close.yml` closes those issues when the PR is
-  merged into `develop`. Issue forms: `.github/ISSUE_TEMPLATE/`.
+  resolves no open issue (GitHub closes it when the PR is merged). Issue forms:
+  `.github/ISSUE_TEMPLATE/`.
 - Tests sit next to the file they cover (`*.test.ts(x)`); fixtures in
   `src/test-utils/`.
 - `graphify-out/` is a generated knowledge graph of the code (the `/graphify`
