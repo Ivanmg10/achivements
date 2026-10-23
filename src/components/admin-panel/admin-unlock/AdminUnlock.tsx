@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { IconLock } from '@tabler/icons-react'
-import PasswordInput from '@/components/password-input/PasswordInput'
+import PasswordInput from '@/components/ui/PasswordInput'
 import Spinner from '@/components/main-spinner/Spinner'
 import Button from '@/components/ui/Button'
 
@@ -59,7 +59,7 @@ export default function AdminUnlock({ onUnlocked }: { onUnlocked: () => void }) 
         </p>
       </div>
       <div className="w-full text-left">
-        <PasswordInput id="admin-unlock-password" label="Your password" value={password} onChange={(v) => { setPassword(v); setError(null) }} disabled={loading} />
+        <PasswordInput label="Your password" value={password} onChange={(v) => { setPassword(v); setError(null) }} disabled={loading} />
       </div>
       {error && <p role="alert" className="w-full text-left text-sm text-red-400">{error}</p>}
       <Button

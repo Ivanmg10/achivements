@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { signOut } from 'next-auth/react'
 import CommonModal from '@/components/common-modal/CommonModal'
-import PasswordInput from '@/components/password-input/PasswordInput'
+import PasswordInput from '@/components/ui/PasswordInput'
 import { useLanguage } from '@/context/LanguageContext'
 import Button from '@/components/ui/Button'
 
@@ -57,7 +57,6 @@ export default function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolea
       <p className="text-sm text-text-secondary">{D.confirmText}</p>
 
       <PasswordInput
-        id="delete-account-password"
         label={D.password}
         value={password}
         onChange={(v) => { setPassword(v); setError(null) }}

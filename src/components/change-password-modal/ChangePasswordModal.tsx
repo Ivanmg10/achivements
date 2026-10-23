@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { signOut } from 'next-auth/react'
 import CommonModal from '../common-modal/CommonModal'
-import PasswordInput from '@/components/password-input/PasswordInput'
+import PasswordInput from '@/components/ui/PasswordInput'
 import { useLanguage } from '@/context/LanguageContext'
 import { PASSWORD_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
@@ -70,42 +70,27 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
       <h2 className="text-xl font-bold">{T.userConfig.changePassword}</h2>
 
       <PasswordInput
-        id="pw-current"
         label={T.changePassword.current}
         value={current}
         onChange={(v) => { setCurrent(v); setError(null) }}
         disabled={loading || success}
       />
       <PasswordInput
-        id="pw-new"
         label={T.changePassword.new}
         autoComplete="new-password"
         value={next}
         onChange={(v) => { setNext(v); setError(null) }}
         disabled={loading || success}
       />
-      <div className="flex flex-col gap-1">
-        <label htmlFor="pw-confirm" className="text-xs text-text-secondary uppercase tracking-wider">
-          {T.changePassword.confirm}
-        </label>
-        <div className="relative">
-          <input
-            id="pw-confirm"
-            type="password"
-            value={confirm}
-            onChange={(e) => { setConfirm(e.target.value); setError(null) }}
-            disabled={loading || success}
-            aria-describedby={mismatch ? 'pw-mismatch-error' : undefined}
-            className={`bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 w-full transition-colors ${
-              mismatch ? 'ring-2 ring-red-500 focus:ring-red-500' : 'focus:ring-accent'
-            }`}
-          />
-        </div>
-        {mismatch && <span id="pw-mismatch-error" role="alert" className="text-xs text-red-400">{T.editProfileModal.mismatch}</span>}
-        {next.length > 0 && next.length < PASSWORD_MIN && (
-          <span className="text-xs text-text-secondary">{minLength}</span>
-        )}
-      </div>
+      <PasswordInput
+        label={T.changePassword.confirm}
+        autoComplete="new-password"
+        value={confirm}
+        onChange={(v) => { setConfirm(v); setError(null) }}
+        disabled={loading || success}
+        error={mismatch ? T.editProfileModal.mismatch : undefined}
+        hint={next.length > 0 && next.length < PASSWORD_MIN ? minLength : undefined}
+      />
 
       {error && (
         <p role="alert" className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>
