@@ -13,10 +13,15 @@ import { getToken } from 'next-auth/jwt'
 const PUBLIC_PATHS = ['/', '/authPage', '/resetPassword', '/privacy', '/terms', '/opengraph-image', '/apple-icon', '/rankings', '/rankings/how']
 // The comparison and how-to pages (src/translations/seoPages.ts): written for visitors and crawlers.
 const PUBLIC_PREFIXES = ['/compare/', '/track/']
+// A profile and its link preview: signed out, the page shows only what the rankings do (profileTeaser).
+// Not /user (your account) and not a game inside a profile.
+const PUBLIC_PROFILE = /^\/user\/[^/]+(\/opengraph-image[^/]*)?$/
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
-  if (PUBLIC_PATHS.includes(pathname) || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) return NextResponse.next()
+  if (PUBLIC_PATHS.includes(pathname) || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p)) || PUBLIC_PROFILE.test(pathname)) {
+    return NextResponse.next()
+  }
 
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
   if (token) return NextResponse.next()

@@ -1546,6 +1546,7 @@ export const ja: Translations = {
     joinTitle: 'このリストに載りたいですか？',
     joinText: 'アカウントを作成してプラットフォームを連携すると、実績がVaultポイントになります。',
     joinCta: 'アカウントを作成',
+    profileTeaser: 'アカウントを作成すると、このユーザーのゲーム・実績・アクティビティを見て、自分のものと比べられます。',
     teaserRank: 'フォロー中の {total} 人中 #{rank}',
     teaserEmpty: 'フォロー中の人や全員と比べてみましょう。',
     seeAll: 'ランキングを見る',

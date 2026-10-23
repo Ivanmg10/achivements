@@ -1546,6 +1546,7 @@ export const de: Translations = {
     joinTitle: 'Willst du auf dieser Liste stehen?',
     joinText: 'Erstelle ein Konto und verknüpfe deine Plattformen: Deine Erfolge werden zu Vault-Punkten.',
     joinCta: 'Konto erstellen',
+    profileTeaser: 'Erstelle ein Konto, um die Spiele, Erfolge und Aktivitäten zu sehen und mit deinen zu vergleichen.',
     teaserRank: 'Du bist Platz {rank} von {total} unter den Leuten, denen du folgst',
     teaserEmpty: 'Vergleiche dich mit den Leuten, denen du folgst, und mit allen.',
     seeAll: 'Zu den Ranglisten',

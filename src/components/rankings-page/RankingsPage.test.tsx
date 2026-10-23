@@ -50,10 +50,10 @@ test('changing the view asks for it', () => {
   expect(screen.getByRole('button', { name: en.rankings.week })).toHaveAttribute('aria-pressed', 'true')
 })
 
-test('signed out: only the global list, no profile links, and how to join', () => {
+test('signed out: only the global list, names open their public card, and how to join', () => {
   render(<RankingsPage signedIn={false} />)
   expect(screen.queryByRole('tab', { name: en.rankings.following })).not.toBeInTheDocument()
-  expect(screen.queryByRole('link', { name: 'user4' })).not.toBeInTheDocument()
+  expect(screen.getAllByRole('link', { name: 'user4' })[0]).toHaveAttribute('href', '/user/user4')
   expect(screen.getByRole('link', { name: en.rankings.joinCta })).toHaveAttribute('href', '/authPage')
 })
 
