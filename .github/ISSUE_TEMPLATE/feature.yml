@@ -1,0 +1,23 @@
+name: Feature
+description: A new feature, page or change to how something works
+labels: [enhancement]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What
+      description: What should exist or change, as the person using it would see it.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: The problem or the goal.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Platforms touched, designs (docs/designs.md), migrations, open questions.
