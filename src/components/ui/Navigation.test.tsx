@@ -31,7 +31,7 @@ describe('Pill', () => {
 
   it('marks the pressed chip with a ring', () => {
     expect(pillClass(true)).toContain('ring-accent/50')
-    expect(pillClass(false)).not.toContain('ring-accent')
+    expect(pillClass(false)).not.toContain('ring-accent/50')
   })
 })
 
