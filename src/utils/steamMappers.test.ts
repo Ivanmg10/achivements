@@ -1,4 +1,5 @@
 import {
+  lastPlayedGames,
   unixToIso,
   toSteamGameProgress,
   withAchievementCounts,
@@ -284,5 +285,18 @@ describe('toRecentAchievement', () => {
       Key: 'WIN',
     })
     expect(mapped.GameIconUrl).toBe('/api/steam/icon?appid=620')
+  })
+})
+
+describe('lastPlayedGames', () => {
+  const game = (appid: number, rtime_last_played?: number): SteamOwnedGame => ({ appid, playtime_forever: 1, rtime_last_played })
+
+  test('the games played last, newest first, however long ago', () => {
+    const games = [game(1, 1500000000), game(2, 1700000000), game(3, 1600000000)]
+    expect(lastPlayedGames(games, 2).map((g) => g.appid)).toEqual([2, 3])
+  })
+
+  test('leaves out games never played', () => {
+    expect(lastPlayedGames([game(1, 0), game(2), game(3, 1)], 5).map((g) => g.appid)).toEqual([3])
   })
 })

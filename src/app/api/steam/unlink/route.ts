@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { requireSession } from '@/lib/apiAuth'
 import { clearUserCache } from '@/lib/steamCache'
+import { forgetUnlocks } from '@/lib/steamUnlocks'
 import { forgetUser } from '@/lib/userRecord'
 
 export async function POST() {
@@ -19,6 +20,7 @@ export async function POST() {
 
   // Best effort: the link is already gone, so a stale cache row must not fail the request.
   await clearUserCache(auth.id)
+  await forgetUnlocks(auth.id)
   forgetUser(auth.id)
 
   return NextResponse.json({ ok: true })

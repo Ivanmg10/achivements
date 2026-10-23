@@ -6,6 +6,8 @@ jest.mock('@/lib/steamCache', () => ({
 }))
 jest.mock('@/lib/steamClient', () => ({
   ...jest.requireActual('@/lib/steamClient'),
+  // An empty batch: counts come from the per-game calls each test sets up.
+  getTopAchievementsForGames: jest.fn(async () => ({ response: { games: [] } })),
   getOwnedGames: jest.fn(),
   getPlayerAchievements: jest.fn(),
 }))
