@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
-import { IconArrowRight, IconBroadcast, IconTrophy, IconWorld } from '@tabler/icons-react'
+import { IconArrowRight, IconBroadcast, IconChevronDown, IconTrophy, IconWorld } from '@tabler/icons-react'
 import type { WelcomeDirection } from '@/hooks/useWelcomeSteps'
 import { useThemeChoice } from '@/hooks/useThemeChoice'
 import { useVaultMe } from '@/hooks/useVaultMe'
@@ -105,17 +105,21 @@ export default function WelcomePagePreferences({
       <div className="flex flex-col gap-5 max-w-2xl">
         <div className="flex flex-col gap-1.5 max-w-xs">
           <label htmlFor="welcome-language" className="text-sm font-semibold">{T.userConfig.language}</label>
-          <select
-            id="welcome-language"
-            value={lang}
-            onChange={(e) => { if (isLang(e.target.value)) setLang(e.target.value) }}
-            aria-describedby="welcome-language-hint"
-            className={INPUT_CLASS}
-          >
-            {LANGUAGES.map((l) => (
-              <option key={l.id} value={l.id}>{l.label}</option>
-            ))}
-          </select>
+          {/* Its own arrow, with room: the browser's sits against the edge, whatever the padding. */}
+          <div className="relative">
+            <select
+              id="welcome-language"
+              value={lang}
+              onChange={(e) => { if (isLang(e.target.value)) setLang(e.target.value) }}
+              aria-describedby="welcome-language-hint"
+              className={`${INPUT_CLASS} appearance-none pr-11 cursor-pointer`}
+            >
+              {LANGUAGES.map((l) => (
+                <option key={l.id} value={l.id}>{l.label}</option>
+              ))}
+            </select>
+            <IconChevronDown size={18} aria-hidden="true" className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-secondary" />
+          </div>
           <span id="welcome-language-hint" className="text-[0.8125rem] text-text-secondary">{fromBrowser ? t.detected : t.chosen}</span>
         </div>
 

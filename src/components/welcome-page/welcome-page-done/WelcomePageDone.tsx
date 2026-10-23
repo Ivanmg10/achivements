@@ -85,7 +85,7 @@ export default function WelcomePageDone({
                   {row.mark}
                 </span>
                 <span className="flex-1 min-w-0 flex flex-col gap-1">
-                  <span className="text-sm font-semibold">{T.welcome.steps[row.step]}</span>
+                  <span className="text-sm font-semibold truncate">{T.welcome.steps[row.step]}</span>
                   <span className="text-xs text-text-secondary truncate">{row.text}</span>
                   {row.reading && <span aria-hidden="true" className={`${styles.shimmer} block h-0.5 rounded-full`} />}
                 </span>
@@ -94,7 +94,7 @@ export default function WelcomePageDone({
                     type="button"
                     onClick={() => onGoTo(WELCOME_STEPS.indexOf(row.step))}
                     aria-label={`${row.action}: ${T.welcome.steps[row.step]}`}
-                    className={`${QUIET_BUTTON} text-accent! font-semibold`}
+                    className={`${QUIET_BUTTON} shrink-0 text-accent! font-semibold`}
                   >
                     {row.action}
                   </button>

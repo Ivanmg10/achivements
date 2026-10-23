@@ -29,6 +29,15 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-22 — Welcome: done-step row overlap, language select arrow (`feat/welcome-onboarding`)
+
+**Did** — In "Done", a long platform name ("RetroAchievements") truncates and its button no
+longer shrinks into it; the Preferences language select draws its own chevron with room
+(`appearance-none`, `pr-11`) instead of the browser's, which sat against the edge.
+**Why** — Two visual bugs the user found trying it.
+
+---
+
 ## 2026-10-22 — Welcome intro: shorter cards, a close button on the opened point (`feat/welcome-onboarding`)
 
 **Did** — The intro's cards show only their number and title (their line moved to the opened
