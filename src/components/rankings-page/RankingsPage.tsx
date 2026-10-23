@@ -103,14 +103,14 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
                 </div>
               ) : (
                 <>
-                  {podium.length > 0 && <RankingsPagePodium rows={podium} linked={signedIn} approx={approx} />}
+                  {podium.length > 0 && <RankingsPagePodium rows={podium} linked approx={approx} />}
                   {rest.length > 0 && (
                     <>
                       <div className="hidden md:block">
-                        <RankingsPageTable rows={rest} arrows={data?.arrows ?? false} linked={signedIn} caption={caption} approx={approx} />
+                        <RankingsPageTable rows={rest} arrows={data?.arrows ?? false} linked caption={caption} approx={approx} />
                       </div>
                       <div className="md:hidden">
-                        <RankingsPageList rows={rest} arrows={data?.arrows ?? false} linked={signedIn} approx={approx} />
+                        <RankingsPageList rows={rest} arrows={data?.arrows ?? false} linked approx={approx} />
                       </div>
                     </>
                   )}
@@ -138,7 +138,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
                     onWiden={widen}
                     widening={widening}
                     arrows={data?.arrows ?? false}
-                    linked={signedIn}
+                    linked
                     approx={approx}
                   />
                 </motion.div>
@@ -153,7 +153,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
             <motion.aside variants={SIDE} initial="hidden" animate="show" className="flex flex-col gap-4 lg:sticky lg:top-24">
               {signedIn ? vault && <RankingsPageLevelPanel me={vault} /> : <RankingsPageJoin />}
               {(data?.hot ?? []).length > 0 && (
-                <RankingsPageHot rows={data?.hot ?? []} linked={signedIn} onSeeWeek={weekView ? undefined : () => setView({ scope: 'global', period: 'week', source: 'all' })} />
+                <RankingsPageHot rows={data?.hot ?? []} linked onSeeWeek={weekView ? undefined : () => setView({ scope: 'global', period: 'week', source: 'all' })} />
               )}
             </motion.aside>
           </div>
