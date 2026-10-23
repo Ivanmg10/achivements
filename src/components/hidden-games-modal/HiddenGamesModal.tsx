@@ -20,8 +20,8 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
   const { hidden, showGame } = useHiddenGames()
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose} className="min-h-0 max-w-lg">
-      <div role="dialog" aria-modal="true" aria-labelledby="hidden-games-title" className="flex flex-col gap-4">
+    <CommonModal isOpen={isOpen} onClose={onClose} size="md" showClose={false}>
+      <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
           <h2 id="hidden-games-title" className="flex items-center gap-2 text-lg font-semibold">
             <IconEyeOff size={18} className="text-text-secondary" aria-hidden="true" />

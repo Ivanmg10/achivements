@@ -23,7 +23,7 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose} className="mx-3 sm:mx-4 p-4! sm:p-6! sm:max-w-3xl lg:max-w-5xl max-h-[90dvh] overflow-y-auto justify-start!">
+    <CommonModal isOpen={isOpen} onClose={onClose} size="xl">
       <h2 className="text-xl font-bold">{T.userTheme.theme}</h2>
       <div role="radiogroup" aria-label={T.userTheme.theme} className="flex flex-col gap-5">
         {THEME_GROUPS.map((group) => (

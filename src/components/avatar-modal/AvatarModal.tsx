@@ -55,7 +55,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={close} className="max-w-md min-h-0! justify-start! gap-5 p-5! sm:p-6!">
+    <CommonModal isOpen={isOpen} onClose={close} showClose={false}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h2 className="text-xl font-bold">{t.avatarTitle}</h2>

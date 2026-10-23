@@ -70,7 +70,7 @@ export default function PerfectGamesOrderModal({
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={handleClose} className="max-w-lg max-h-[80vh] overflow-y-auto">
+    <CommonModal isOpen={isOpen} onClose={handleClose} size="md">
       <h2 className="text-lg font-semibold">{T.cards.reorderMasteredTitle}</h2>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={localList.map((g) => g.key)} strategy={verticalListSortingStrategy}>

@@ -59,7 +59,7 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={handleClose} className="max-w-lg">
+    <CommonModal isOpen={isOpen} onClose={handleClose} size="md">
       <h2 className="text-xl font-bold mb-4">{T.userData.location}</h2>
 
       <input

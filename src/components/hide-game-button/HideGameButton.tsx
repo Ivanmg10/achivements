@@ -62,7 +62,7 @@ export default function HideGameButton({
       {/* React carries clicks out of a portal to the card around it: stop them here. */}
       <span className="contents" onClick={(e) => e.stopPropagation()}>
       <CommonModal isOpen={open} onClose={() => setOpen(false)} className="min-h-0">
-        <div role="dialog" aria-modal="true" aria-labelledby={`hide-${source}-${gameId}`} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           <span aria-hidden="true" className="w-12 h-12 rounded-2xl bg-accent/10 ring-1 ring-accent/20 text-accent flex items-center justify-center">
             <IconEyeOff size={22} />
           </span>
