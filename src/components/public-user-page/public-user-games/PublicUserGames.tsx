@@ -11,14 +11,13 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import PublicUserGameRow from '../public-user-game-row/PublicUserGameRow'
 import { fieldClass } from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
+import { pillClass } from '@/components/ui/Pill'
 
 const PAGE = 30
 
 type Sort = 'progress' | 'name'
 
-const CHIP = 'px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
-const chipClass = (on: boolean) =>
-  `${CHIP} ${on ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30' : 'bg-bg-main text-text-secondary hover:text-text-main'}`
+const chipClass = (on: boolean) => pillClass(on)
 
 /**
  * Every game a user has played, searchable and filtered by platform and

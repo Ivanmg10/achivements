@@ -34,7 +34,7 @@ export default function LibraryPlatformTabs({
   ]
 
   return (
-    <div role="group" aria-label={T.libraryLayout.platformLabel} className="flex items-center gap-0.5 bg-bg-card rounded-full p-1 max-w-full overflow-x-auto [scrollbar-width:none]">
+    <div role="group" aria-label={T.libraryLayout.platformLabel} className="flex items-center gap-0.5 bg-ink/[0.06] rounded-control p-[3px] max-w-full overflow-x-auto [scrollbar-width:none]">
       {options.map((o) => {
         const active = value === o.value
         return (
@@ -43,7 +43,7 @@ export default function LibraryPlatformTabs({
             type="button"
             aria-pressed={active}
             onClick={() => onChange(o.value)}
-            className={`relative shrink-0 rounded-full px-3.5 py-1.5 text-xs transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+            className={`relative shrink-0 rounded-chip px-3.5 h-8 text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
               active ? 'text-bg-main font-semibold' : 'text-text-secondary hover:text-text-main'
             }`}
           >
@@ -51,7 +51,7 @@ export default function LibraryPlatformTabs({
               <motion.span
                 layoutId="library-platform-pill"
                 aria-hidden="true"
-                className="absolute inset-0 rounded-full bg-accent"
+                className="absolute inset-y-0 inset-x-[3px] rounded-chip bg-accent skew-x-(--slant-pill)"
                 transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 32 }}
               />
             )}

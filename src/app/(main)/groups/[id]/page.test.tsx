@@ -106,7 +106,8 @@ test('the decade filter shows once a year is known, for Steam games too', async 
         : json({}),
   )
   render(<GroupDetailPage />)
-  fireEvent.change(await screen.findByLabelText(en.groups.filterDecadeLabel), { target: { value: '10s' } })
+  fireEvent.click(await screen.findByRole('combobox', { name: en.groups.filterDecadeLabel }))
+  fireEvent.click(screen.getByRole('option', { name: "10's" }))
   expect(screen.getByText('steam-item Portal 2')).toBeInTheDocument()
   expect(screen.queryByText('ra-item Zelda')).not.toBeInTheDocument()
 })

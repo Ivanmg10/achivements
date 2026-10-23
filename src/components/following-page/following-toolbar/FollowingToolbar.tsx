@@ -6,13 +6,9 @@ import type { GameSource } from '@/types/steam'
 import { PLATFORM_NAME } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { fieldClass } from '@/components/ui/Input'
+import { pillClass } from '@/components/ui/Pill'
 
 const PLATFORMS = ['ra', 'steam', 'psn', 'xbox'] as const
-
-const CHIP =
-  'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
-const ON = 'bg-accent/15 text-text-main ring-1 ring-accent font-semibold'
-const OFF = 'bg-bg-card text-text-secondary hover:text-text-main'
 
 /**
  * Narrows the people you follow: by name, and by the platforms they play on.
@@ -65,7 +61,7 @@ export default function FollowingToolbar({
 
       <div className="flex flex-wrap gap-2">
         {chips.map(({ key, on, onClick, logo, label, count }) => (
-          <button key={key} type="button" aria-pressed={on} onClick={onClick} className={`${CHIP} ${on ? ON : OFF}`}>
+          <button key={key} type="button" aria-pressed={on} onClick={onClick} className={pillClass(on)}>
             {on && <IconCheck size={12} aria-hidden="true" className="text-accent" />}
             {logo && <PlatformLogo source={logo} size={12} />}
             {label}
