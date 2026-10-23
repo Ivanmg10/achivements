@@ -1,4 +1,5 @@
 import { useLanguage } from '@/context/LanguageContext'
+import Button from '@/components/ui/Button'
 
 /** Asks before deleting something. Defaults to the wording for a group. */
 export default function DeleteConfirmDialog({
@@ -28,18 +29,18 @@ export default function DeleteConfirmDialog({
       >
         <p className="text-sm text-text-main">{message ?? T.groups.confirmDelete}</p>
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-lg bg-bg-main text-text-secondary text-sm hover:text-text-main transition-colors"
+            variant="secondary" className="flex-1"
           >
             {T.groups.cancel}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
-            className="flex-1 px-4 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+            variant="danger" className="flex-1"
           >
             {confirmLabel ?? T.groups.deleteGroup}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

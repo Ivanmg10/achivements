@@ -71,13 +71,13 @@ export default function HideGameButton({
           </h2>
           <p className="text-sm text-text-secondary">{T.cards.hideGameText.replace('{title}', title)}</p>
           <div className="flex gap-2 justify-end">
-            <button
+            <Button
               type="button"
               onClick={() => setOpen(false)}
-              className="px-4 py-2 rounded-xl bg-bg-main text-sm text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              variant="secondary"
             >
               {T.cards.cancel}
-            </button>
+            </Button>
             <Button
               type="button"
               onClick={confirm}

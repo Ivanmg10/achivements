@@ -4,9 +4,11 @@ type Variant = 'primary' | 'secondary' | 'quiet' | 'danger'
 type Size = 'sm' | 'md' | 'lg'
 
 // The shape sits on ::before, skewed by the design's slant; the text stays upright.
+// The shape is inset by what the slant adds on each side, so a full-width button
+// lines up with the fields above and below it.
 const BASE =
   'relative isolate inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none ' +
-  "before:content-[''] before:absolute before:inset-0 before:-z-10 before:rounded-control before:skew-x-(--slant-button) before:transition-colors before:duration-(--motion-hover) " +
+  "before:content-[''] before:absolute before:inset-y-0 before:inset-x-[5px] before:-z-10before:rounded-control before:skew-x-(--slant-button) before:transition-colors before:duration-(--motion-hover) " +
   'transition-colors duration-(--motion-hover) disabled:opacity-50 disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:pointer-events-none ' +
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main focus-visible:rounded-control'
 

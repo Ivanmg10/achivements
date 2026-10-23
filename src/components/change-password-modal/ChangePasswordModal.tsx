@@ -117,13 +117,13 @@ export default function ChangePasswordModal({ isOpen, onClose }: Props) {
       )}
 
       <div className="flex gap-3 mt-2">
-        <button
+        <Button
           onClick={handleClose}
           disabled={loading}
-          className="flex-1 bg-bg-main text-text-secondary rounded-xl py-3 hover:text-text-main transition-colors disabled:opacity-50"
+          variant="secondary" size="lg" className="flex-1"
         >
           {T.editProfileModal.cancel}
-        </button>
+        </Button>
         <Button
           onClick={handleSubmit}
           disabled={!canSubmit || success}

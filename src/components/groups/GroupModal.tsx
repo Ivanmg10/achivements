@@ -220,13 +220,13 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                   <p role="alert" className="text-xs text-danger">{error}</p>
                 )}
                 <div className="flex gap-2 justify-end">
-                  <button
+                  <Button
                     type="button"
                     onClick={onClose}
-                    className="h-10 px-4 rounded-xl text-text-secondary text-sm hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    variant="quiet"
                   >
                     {T.groups.cancel}
-                  </button>
+                  </Button>
                   <Button
                     type="submit"
                     disabled={saving}
