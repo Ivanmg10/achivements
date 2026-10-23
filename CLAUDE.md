@@ -119,7 +119,7 @@ with its link, versions and what was built, so it can always be found again.
 
 ## Welcome after sign-up (`/welcome`, 2026-10-22)
 
-A new account (form or Steam) is signed in and sent to `/welcome`, not to the login form:
+A new account (form, form with RetroAchievements, or Steam) is signed in and sent to `/welcome`, not to the login form:
 intro, RetroAchievements, Steam, PlayStation, profile, preferences, done. Design and the
 reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there).
 
@@ -853,6 +853,22 @@ There is no invite code; the old `REGISTER_TOKEN` / `NEXT_PUBLIC_REGISTER_TOKEN`
 pair is gone, and the public one leaked the secret into the browser bundle.
 `REGISTRATION_OPEN=false` closes sign-ups; unset means open. Sign-ups and reset
 requests are both limited per address in the database (`src/lib/attemptLimit.ts`).
+
+### Sign up with RetroAchievements (2026-10-23)
+
+"Create account with RetroAchievements" under the register form (`RegisterUserFormRa`): the RA
+username and Web API key are checked first (`POST /api/auth/ra/check`, signed out, limited per
+address as `ra-check`, refuses a key already in use), RA's name fills the username (unless one was
+typed, `suggestUsername`) and its picture becomes the avatar; then `POST /api/users` with `ra`
+asks RA again and creates the account already linked, as `/api/updateRaUser` would store it. The
+welcome's RA step then shows "linked as" (the user's choice: shown, not skipped).
+
+- **It is a sign-up, never a sign-in.** Measured 2026-10-23: a valid RA key reads *any* user's
+  profile and RA has no "whose key is this" call (no `u` → 422), so a key proves owning an RA
+  account, not which one, and people paste their key into other tools. **Do not add "sign in with
+  RA" by key.** The account still gets an email and a password. Revisit when RA ships OAuth (see
+  the roadmap): that is when it can become a "Continue with RetroAchievements" like Steam's.
+- The RA username is as unproven as when linking from the account page; `raid` stays unique.
 
 ### Steam: sign up, sign in and link, all through Steam (2026-10-21)
 

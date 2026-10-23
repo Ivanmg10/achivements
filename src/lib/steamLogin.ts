@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { suggestUsername } from '@/utils/authValidation'
 
 /**
  * Sign in with Steam: Steam's OpenID 2.0, which proves a SteamID64 and nothing
@@ -123,7 +124,4 @@ export function returnParams(query: URLSearchParams): URLSearchParams {
 }
 
 /** A Steam name as a CheevoVault username, when it can be one; '' to make the user choose. */
-export function usernameFromPersona(persona: string): string {
-  const name = persona.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '').slice(0, 20)
-  return name.length >= 3 ? name : ''
-}
+export const usernameFromPersona = suggestUsername

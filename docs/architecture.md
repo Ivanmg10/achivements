@@ -39,7 +39,7 @@ page (src/app/(main)/…)            client component
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
 | Rankings | `rankings` (public), `rankings/me`, `rankings/fill`, `admin/rankings` | Read stored scores; `fill` runs a pass. See Vault Points below |
-| Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | |
+| Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | `auth/ra/check`: an RA key checked before signing up with it (signed out, rate limited) |
 | Admin | `admin/*` | Every one starts with `requireAdmin(req)` |
 | Cron | `cron/sweepCache` (04:00), `cron/scores` (05:00), `cron/psnToken` (09:00) | Scheduled in `vercel.json`, need `CRON_SECRET` |
 

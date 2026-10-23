@@ -12,7 +12,8 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
 ## What it does
 
 - **Accounts** — open sign-up (username, password, required email) or with
-  Steam (Steam sign-in, then a username and email; Steam linked at once), password
+  Steam (Steam sign-in, then a username and email; Steam linked at once) or with
+  RetroAchievements (its username and Web API key; RA linked at once, name and picture filled in), password
   recovery and a soft email verification by mail, account deletion. Admin panel
   behind a second password check, with every action logged.
 - **Welcome** — after signing up, `/welcome` walks a new account through what the

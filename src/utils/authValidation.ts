@@ -36,3 +36,13 @@ export function checkPassword(value: string): FieldRule {
   if (value.length < PASSWORD_MIN) return 'shape'
   return null
 }
+
+/**
+ * A name from another site (a Steam or RetroAchievements name) as a username,
+ * when it can be one: spaces to underscores, other characters dropped, cut to
+ * USERNAME_MAX. '' when too little is left, so the person chooses one.
+ */
+export function suggestUsername(name: string): string {
+  const cleaned = name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '').slice(0, USERNAME_MAX)
+  return cleaned.length >= USERNAME_MIN ? cleaned : ''
+}

@@ -26,7 +26,7 @@ import pool from '@/lib/db'
  * (address 'app'): PSN is one app account for everyone, so the score fill goes
  * gently whoever it is for. 300 games is 600 calls to Sony in 15 minutes.
  */
-export type AttemptScope = 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'avatar' | 'user-search' | 'follow' | 'psn-score'
+export type AttemptScope = 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'avatar' | 'user-search' | 'follow' | 'psn-score' | 'ra-check'
 
 const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   signup: { max: 5, windowMinutes: 60 },
@@ -38,6 +38,8 @@ const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   'user-search': { max: 60, windowMinutes: 5 },
   follow: { max: 60, windowMinutes: 5 },
   'psn-score': { max: 300, windowMinutes: 15 },
+  // Checking an RA key before signing up: signed out, so per address, and few, or it would test stolen keys.
+  'ra-check': { max: 10, windowMinutes: 15 },
 }
 
 type HeaderSource = Headers | Record<string, string | string[] | undefined>

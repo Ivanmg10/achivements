@@ -29,6 +29,29 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-23 — Sign up with RetroAchievements (`feat/welcome-onboarding`, committed locally, not pushed)
+
+**Did** — "Create account with RetroAchievements" under the register form opens
+`RegisterUserFormRa`: RA username + Web API key, checked with `POST /api/auth/ra/check`
+(`useRaSignupCheck`; signed out, `ra-check` limit of 10 per 15 min per address, refuses a key in
+use), with the welcome's three key steps and RA's settings link in a fold. Checked, it shows the RA
+account, fills the username from RA's name (`suggestUsername`, now shared with Steam's sign-up)
+and a "change" / "sign up without RA" way out; the account button waits for the check.
+`POST /api/users` takes `ra`, asks RA again and inserts `rausername`, `raid`, `raUser` and RA's
+picture as avatar, then `onPlatformLinked`. Texts in nine languages; `/privacy` says it.
+**Why** — The user asked for an RA sign-up (option A of the proposal: more ways in) with the
+welcome's RA step showing "linked as", not skipped.
+**Decisions** — Measured 2026-10-23 against RA: any valid key reads any user's profile, and there
+is no "whose key is this" (no `u` → 422). So it is a sign-up only: the account still has an email
+and password, and there is no sign-in by RA key (keys get pasted into other tools). The RA
+username is as unproven as when linking later. The welcome's big key guide did not fit the auth
+card; its texts are reused in a `<details>`.
+**Open** — Try it on the preview with a real key. When RA ships OAuth, this can become a real
+"Continue with RetroAchievements". Still queued: Steam sign-up showing linked in the welcome
+(by the code it already does; check the real flow).
+
+---
+
 ## 2026-10-23 — Welcome: browser back through the steps; the app's first paint in the person's language (`feat/welcome-onboarding`)
 
 **Did** — Each welcome move is a browser history entry (its step in `history.state`, spread over
