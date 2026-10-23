@@ -29,6 +29,32 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-23 — Every PR resolves an issue (`chore/require-linked-issue`, committed locally, not pushed)
+
+**Did** — Issue forms (`.github/ISSUE_TEMPLATE/`: Feature, Bug, blank issues off); `## Issue` →
+`Closes #` at the top of the PR template; `pr-issue.yml` (check `linked-issue`): fails a PR that
+names no open issue, takes the number from a `type/123-slug` branch and writes `Closes #123` into
+the description; `issue-close.yml` closes the issues when the PR is merged into `develop`.
+CLAUDE.md → Git → Issues, and the template there; `docs/architecture.md` → Tooling.
+**Why** — The user wants every PR linked to a GitHub issue, automated.
+**Decisions** — `main` stays the default branch, so GitHub's own `Closes #` does nothing for PRs
+into `develop`: a workflow closes them instead (making `develop` the default was the other
+option). The branch-name fill edits the body through the API with `GITHUB_TOKEN`, which does not
+retrigger workflows, so no loop; it uses REST, not `gh pr edit` (which has broken on Actions'
+token over classic Projects). Releases and main → develop merges are skipped (a skipped required
+check counts as passed). The board is GitHub's own Project workflows, no Action and no PAT.
+**Open** — On GitHub, by the user (nothing of this works until then): (1) open an issue for this
+work and put `Closes #<n>` in this PR's description, or `linked-issue` fails on its own PR;
+(2) after merging, add `linked-issue` to the `pr description` ruleset's required checks
+(develop and main) and update the line in CLAUDE.md → Environments; (3) create a Project (board)
+linked to the repo, and in its Workflows turn on "Auto-add to project" (filter `is:issue,pr is:open`)
+and "Item closed" / "Pull request merged" → Done. Labels `bug` and `enhancement` are GitHub's
+defaults; recreate them if they were deleted.
+**Watch out** — The check reads only the first `Closes/Fixes/Resolves #n`; the close workflow
+closes all of them (but never a PR). Text inside `<!-- -->` is ignored by both.
+
+---
+
 ## 2026-10-21 — Xbox: a game's empty launcher twin no longer shows as a second game (`feat/groups-redesign`)
 
 **Did** — `foldTwinTitles` (`utils/xboxTitles.ts`), applied in `xboxLibraryData`: a title with no

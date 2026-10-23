@@ -1,3 +1,7 @@
+## Issue
+<!-- the issue this PR resolves; a branch named type/123-slug fills it in on its own -->
+Closes #
+
 ## What
 <!-- what changed, 1–3 bullets -->
 
