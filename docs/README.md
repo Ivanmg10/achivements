@@ -7,6 +7,8 @@ What to read, and when.
 | [`../CLAUDE.md`](../CLAUDE.md) | Always, first. The rules and invariants: code style, state and effects, auth, email, admin, each platform, git. |
 | [`architecture.md`](architecture.md) | When you need to find where something lives, or how a request travels from a page to RA/Steam/PSN and back. |
 | [`rankings-plan.md`](rankings-plan.md) | Before working on Vault Points, levels, the rankings page or account verification. |
+| [`design-process.md`](design-process.md) | Before any new page, section or visual rework: how UI work is done here (idea → design canvas → iterations → development), with the welcome as the example. |
+| [`ui-library-plan.md`](ui-library-plan.md) | Before touching shared UI pieces, or when the component library is picked up (an idea, not started). |
 | [`welcome-plan.md`](welcome-plan.md) | Before building the welcome shown after sign-up (designs, the Inazuma reference, how to build it). |
 | [`worklog.md`](worklog.md) | At the start of a session (the last few entries), and at the end (add yours). |
 | [`archive/`](archive) | Only for history. Plans and notes that are no longer true. |

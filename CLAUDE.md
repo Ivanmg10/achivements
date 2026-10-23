@@ -104,6 +104,17 @@ Steam"); the landing has a FAQ for the same reason. Added 2026-10-17.
 - The `FAQPage` JSON-LD (pages and landing) is built from the same English items
   the server renders; keep them one list so the markup matches what is shown.
 
+## How UI work is done — idea → design → iterations → development (2026-10-23)
+
+**Every new page, section or visual rework follows `docs/design-process.md`**, the way the
+welcome was made (the user's standing preference): study the reference, several clickable
+concepts on a design canvas (Figma when its connector is authorised), iterate with the user one
+version at a time (changing only what they asked), a plan doc, then build and fix in short rounds
+from their screenshots (they use a 2560 px screen). The welcome's visual language (display
+italic titles, kickers, floating pill bar, curtain, cards that grow into their detail) is the
+one the user likes; an internal component library to make the whole site match it is an idea
+written up in `docs/ui-library-plan.md` (not started: design it first, then ask).
+
 ## Welcome after sign-up (`/welcome`, 2026-10-22)
 
 A new account (form or Steam) is signed in and sent to `/welcome`, not to the login form:
@@ -996,6 +1007,9 @@ branch to be up to date with its base** before merging, on both.
 - [x] Steam integration
 - [x] Public user profiles
 - [ ] Group hardcore achievement tracking
+- [ ] **An internal component library** (buttons, inputs, selects, switches, modals, pills,
+      steps bar, curtain) in the welcome's style, for the whole site: `docs/ui-library-plan.md`.
+      An idea of the user's (2026-10-23); design it on a canvas and agree it before building.
 - [ ] Notifications — **an idea the user wants to expand before it is built; do not
       start it, and do not assume it is push or email.** Ask what they have in mind
       first. Known so far: friends completing games and a game's last chance (a

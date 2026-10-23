@@ -29,6 +29,19 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-23 — How UI work is done, and the component library idea (`feat/welcome-onboarding`)
+
+**Did** — `docs/design-process.md` (idea → references → design canvas with several concepts →
+iterations → plan → build and fix from the user's screenshots, plus the lessons from the
+welcome); `docs/ui-library-plan.md` (an internal component library in the welcome's style:
+inventory of today's duplicates, the visual language, a first shape, how to migrate, open
+questions); both linked from `CLAUDE.md` (a section, and a roadmap item) and `docs/README.md`.
+**Why** — The user liked the welcome's style and the way it was reached, and wants future agents
+to work the same way and, in time, make the whole site homogeneous.
+**Open** — The library is not started: design it on a canvas and agree it with the user first.
+
+---
+
 ## 2026-10-22 — Welcome: done-step row overlap, language select arrow (`feat/welcome-onboarding`)
 
 **Did** — In "Done", a long platform name ("RetroAchievements") truncates and its button no
