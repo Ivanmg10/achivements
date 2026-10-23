@@ -238,7 +238,7 @@ with its issue. Inside a PR, **one commit per kind of piece**: the component wit
 the site moved to it, then its part of the guard. Nothing changes a page's layout; where the
 canvas's final page differs from today, it is because a component changed, not the page.
 
-### PR 1 · Foundations and controls
+### PR 1 · Foundations and controls — built 2026-10-24 (`feat/63-ui-library`)
 
 1. **Tokens** in `src/app/globals.css`, defined for **every** theme (22 plus `black-ops-2`):
    `--hardcore` / `--softcore` (today fixed yellow-400 / blue-400 rings), the slant (`--slant-btn`

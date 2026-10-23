@@ -29,6 +29,29 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-24 — Component library, part 1: foundations and controls (`feat/63-ui-library`, #63)
+
+**Did** — Design tokens in `globals.css` (slants, radii, control heights, motion, `--hardcore` /
+`--softcore`, one set for every theme). In `src/components/ui`: `Button` / `IconButton`
+(slanted primary), the fields (`Input`, `Textarea`, `SearchInput`, `Field`, `PasswordInput`
+moved here), `Select` (own listbox), `Switch` (slanted), `Checkbox`, `ChoiceCards`,
+`SegmentedControl`, `Pill`, `Tabs`, each with tests. The whole site moved to them: every primary
+button and the cancel / delete beside them, every text field, the three native selects, the five
+hand-made switches, the console ticks, group visibility, the view / layout / grid toggles, the
+filter chips, the tab rows. `uiGuard.test.ts` refuses hand-drawn primary buttons, fields,
+selects, switches and checkboxes. CLAUDE.md has the rules ("The component library").
+**Why** — The agreed design (`docs/designs.md`), PR 1 of three.
+**Decisions** — The button's shape is a skewed `::before` inset by the slant (a full-width button
+lines up with the fields). The Steam pin star keeps `role="switch"` until PR 3's `ToggleButton`
+(allowed in the guard). The library's platform pill keeps its own Framer slide (labels of different
+widths). The search panels' bare inputs (header search, pin and favourite game) wait for PR 2.
+**Open** — A pass over the whole site with the user's screenshots (the user asked to build
+everything first, then fix). PR 2 and PR 3.
+**Watch out** — A missing space between two classes once put the button's shape over its label:
+`Button.test.tsx` now checks the shape stays behind.
+
+---
+
 ## 2026-10-24 — Component library designed and agreed; build plan (`feat/63-ui-library`, #63)
 
 **Did** — Designed the internal component library and every page in its style on the design canvas

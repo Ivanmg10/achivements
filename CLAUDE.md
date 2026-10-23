@@ -197,6 +197,27 @@ its language changes the app. `fromBrowser` says when the language shown is the 
   navigation (the usual way) they are already in the right language.
 - `/privacy` lists the cookie among the necessary ones, in all nine languages.
 
+## The component library — draw with it (`src/components/ui`, 2026-10-24)
+
+The site's controls come from the library, in the design agreed on the canvas
+(`docs/ui-library-and-designs-plan.md` → Build plan). **Never draw one by hand**; a
+guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside `ui/`:
+
+- **Buttons**: `Button` (`primary` slanted, `secondary`, `quiet`, `danger`; `size`; `loading`;
+  `href` for a link) and `IconButton` (needs `aria-label`). Where an element cannot be one,
+  `buttonClass(variant, size, layout)`.
+- **Fields**: `Input`, `Textarea`, `SearchInput`, `PasswordInput`, wrapped in `Field` (label,
+  aside, hint or error wired by id); or `fieldClass({ invalid, icon, size })` on a native input.
+- **`Select`** (own listbox, never a native `<select>`), **`Switch`** (slanted; say the state in
+  words beside it), **`Checkbox`**, **`ChoiceCards`** / `choiceClass`.
+- **`Tabs`** (slanted line, roving tabindex; the panel is the caller's, `tabIds`),
+  **`SegmentedControl`** (sliding slanted pill), **`Pill`** / `pillClass` for filter chips.
+- `className` on them is for layout only (margin, width, flex), never colours.
+- **The look lives in tokens** in `globals.css` (`--slant-*`, `--r-*`, `--h-*`, `--motion-*`,
+  `--hardcore`/`--softcore`), defined once for every theme (`designTokens.test.ts`): a future
+  site-wide design changes them, not the components.
+- PR 2 (overlays and feedback) and PR 3 (surfaces, data, the palette sweep) add the rest.
+
 ## Progress bars — in the theme's colours
 
 Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or
