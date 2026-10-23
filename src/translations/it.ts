@@ -498,7 +498,7 @@ export const it: Translations = {
   privacy: {
     link: 'Privacy e cookie',
     title: 'Privacy e cookie',
-    updated: 'Ultimo aggiornamento: 20 ottobre 2026',
+    updated: 'Ultimo aggiornamento: 23 ottobre 2026',
     intro: 'CheevoVault segue i tuoi obiettivi di RetroAchievements, Steam e PlayStation. Questa pagina spiega cosa conserva su di te, perché e cosa puoi fare al riguardo.',
     contact: 'Contatto',
     controller: 'Titolare del trattamento',
@@ -530,7 +530,7 @@ export const it: Translations = {
       {
         heading: 'Cookie e archiviazione locale',
         body: [
-          'Necessari, senza consenso: un cookie di sessione che ti mantiene connesso, e l’archiviazione locale per lingua, tema e scelta sui cookie.',
+          'Necessari, senza consenso: un cookie di sessione che mantiene attiva la tua sessione, un cookie con la lingua che scegli (perché le pagine arrivino già in quella lingua), e l’archiviazione locale per lingua, tema e scelta sui cookie.',
           'Analisi, solo se accetti: cookie di Google Analytics (_ga, _ga_*), che durano fino a due anni. A Google viene inviato solo il percorso della pagina, mai il resto dell’indirizzo. Puoi revocare il consenso in qualsiasi momento dalle impostazioni dei cookie in fondo alla pagina: l’analisi si ferma subito e i suoi cookie vengono eliminati.',
         ],
       },
@@ -1641,7 +1641,7 @@ export const it: Translations = {
         {
           title: 'Una libreria per tutto',
           text: 'RetroAchievements, Steam e PlayStation insieme',
-          detail: 'I tuoi giochi di RetroAchievements, Steam e PlayStation in un\'unica lista, con i tuoi progressi, le ore di gioco e quando hai giocato l\'ultima volta. Filtra per piattaforma o console, nascondi ciò che non vuoi vedere e apri qualsiasi gioco per vederne gli obiettivi e quanto è raro ciascuno.',
+          detail: 'I tuoi giochi di RetroAchievements, Steam e PlayStation in un\'unica lista, con i tuoi progressi, le ore di gioco (le forniscono Steam e PlayStation) e quando hai giocato l\'ultima volta. Filtra per piattaforma o console, nascondi ciò che non vuoi vedere e apri qualsiasi gioco per vederne gli obiettivi e quanto è raro ciascuno.',
           highlights: ['Filtra per piattaforma o console', 'Nascondi i giochi che non vuoi vedere', 'La rarità di ogni obiettivo'],
         },
         {

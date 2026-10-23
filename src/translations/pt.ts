@@ -498,7 +498,7 @@ export const pt: Translations = {
   privacy: {
     link: 'Privacidade e cookies',
     title: 'Privacidade e cookies',
-    updated: 'Última atualização: 20 de outubro de 2026',
+    updated: 'Última atualização: 23 de outubro de 2026',
     intro: 'O CheevoVault acompanha as suas conquistas do RetroAchievements, do Steam e da PlayStation. Esta página explica que dados guarda sobre si, para quê e o que pode fazer em relação a isso.',
     contact: 'Contacto',
     controller: 'Responsável pelo tratamento',
@@ -530,7 +530,7 @@ export const pt: Translations = {
       {
         heading: 'Cookies e armazenamento local',
         body: [
-          'Necessários, sem consentimento: um cookie de sessão que mantém a sessão iniciada, e armazenamento local para o idioma, o tema e a sua escolha de cookies.',
+          'Necessários, sem consentimento: um cookie de sessão que mantém a sessão iniciada, um cookie com o idioma que você escolhe (para que as páginas já cheguem nele), e armazenamento local para o idioma, o tema e a sua escolha de cookies.',
           'Analítica, apenas se aceitar: cookies do Google Analytics (_ga, _ga_*), que duram até dois anos. Ao Google só é enviado o caminho da página, nunca o resto do endereço. Pode retirar o consentimento a qualquer momento nas definições de cookies, no fundo da página: a analítica para de imediato e os seus cookies são apagados.',
         ],
       },
@@ -1641,7 +1641,7 @@ export const pt: Translations = {
         {
           title: 'Uma biblioteca para tudo',
           text: 'RetroAchievements, Steam e PlayStation juntos',
-          detail: 'Seus jogos do RetroAchievements, Steam e PlayStation numa só lista, com seu progresso, as horas jogadas e quando você jogou pela última vez. Filtre por plataforma ou console, oculte o que não quiser ver e abra qualquer jogo para ver as conquistas e a raridade de cada uma.',
+          detail: 'Seus jogos do RetroAchievements, Steam e PlayStation numa só lista, com seu progresso, as horas jogadas (Steam e PlayStation as informam) e quando você jogou pela última vez. Filtre por plataforma ou console, oculte o que não quiser ver e abra qualquer jogo para ver as conquistas e a raridade de cada uma.',
           highlights: ['Filtre por plataforma ou console', 'Oculte os jogos que não quiser ver', 'A raridade de cada conquista'],
         },
         {

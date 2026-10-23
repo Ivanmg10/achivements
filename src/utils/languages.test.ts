@@ -1,4 +1,4 @@
-import { browserLanguages, isLang, pickLanguage } from './languages'
+import { browserLanguages, isLang, languageCookie, parseAcceptLanguage, pickLanguage } from './languages'
 
 describe('pickLanguage', () => {
   test('takes the first language the app has, by its root', () => {
@@ -40,4 +40,26 @@ describe('browserLanguages', () => {
     Object.defineProperty(window.navigator, 'languages', { value: [], configurable: true })
     expect(browserLanguages()).toEqual([navigator.language])
   })
+})
+
+describe('parseAcceptLanguage', () => {
+  test('best first, by weight then by order', () => {
+    expect(parseAcceptLanguage('es-MX,es;q=0.9,en;q=0.8')).toEqual(['es-MX', 'es', 'en'])
+    expect(parseAcceptLanguage('en;q=0.5, fr, de;q=0.7')).toEqual(['fr', 'de', 'en'])
+  })
+
+  test('drops the wildcard, refused and broken entries', () => {
+    expect(parseAcceptLanguage('*, nl;q=0, pt;q=abc, it')).toEqual(['it'])
+    expect(parseAcceptLanguage('')).toEqual([])
+    expect(parseAcceptLanguage(null)).toEqual([])
+  })
+
+  test('feeds pickLanguage', () => {
+    expect(pickLanguage(parseAcceptLanguage('nl-NL,nl;q=0.9,de;q=0.8'))).toBe('de')
+  })
+})
+
+test('the language cookie lasts a year, for the whole site', () => {
+  expect(languageCookie('es', true)).toBe('app-language=es; Path=/; Max-Age=31536000; SameSite=Lax; Secure')
+  expect(languageCookie('ja', false)).not.toMatch(/Secure/)
 })

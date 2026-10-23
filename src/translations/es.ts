@@ -498,7 +498,7 @@ export const es: Translations = {
   privacy: {
     link: 'Privacidad y cookies',
     title: 'Privacidad y cookies',
-    updated: 'Última actualización: 20 de octubre de 2026',
+    updated: 'Última actualización: 23 de octubre de 2026',
     intro: 'CheevoVault sigue tus logros de RetroAchievements, Steam y PlayStation. Esta página explica qué guarda sobre ti, para qué y qué puedes hacer al respecto.',
     contact: 'Contacto',
     controller: 'Responsable del tratamiento',
@@ -530,7 +530,7 @@ export const es: Translations = {
       {
         heading: 'Cookies y almacenamiento local',
         body: [
-          'Necesarias, sin consentimiento: una cookie de sesión que mantiene tu sesión iniciada, y almacenamiento local para tu idioma, tema y elección de cookies.',
+          'Necesarias, sin consentimiento: una cookie de sesión que mantiene tu sesión iniciada, una cookie con el idioma que eliges (para que las páginas lleguen ya en él), y almacenamiento local para tu idioma, tema y elección de cookies.',
           'Analítica, solo si aceptas: cookies de Google Analytics (_ga, _ga_*), que duran hasta dos años. A Google solo se le envía la ruta de la página, nunca el resto de la dirección. Puedes retirar el consentimiento cuando quieras desde «Configurar cookies» al pie de la página: la analítica se detiene al momento y sus cookies se borran.',
         ],
       },
@@ -1641,7 +1641,7 @@ export const es: Translations = {
         {
           title: 'Una biblioteca para todo',
           text: 'RetroAchievements, Steam y PlayStation juntos',
-          detail: 'Tus juegos de RetroAchievements, Steam y PlayStation en una sola lista, con tu progreso, las horas jugadas y cuándo jugaste por última vez. Filtra por plataforma o consola, oculta lo que no quieras ver y abre cualquier juego para ver sus logros y lo raro que es cada uno.',
+          detail: 'Tus juegos de RetroAchievements, Steam y PlayStation en una sola lista, con tu progreso, las horas jugadas (las dan Steam y PlayStation) y cuándo jugaste por última vez. Filtra por plataforma o consola, oculta lo que no quieras ver y abre cualquier juego para ver sus logros y lo raro que es cada uno.',
           highlights: ['Filtra por plataforma o consola', 'Oculta los juegos que no quieras ver', 'La rareza de cada logro'],
         },
         {

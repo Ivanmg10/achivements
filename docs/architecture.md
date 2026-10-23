@@ -134,9 +134,12 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   `PresenceLabel` draw it.
 - **Themes**: `THEMES` in `src/types/types.ts`, CSS variables in
   `src/app/globals.css`, applied before paint by a script in `src/app/layout.tsx`.
-- **Language**: `LanguageContext` shows the saved choice (`app-language`), else the
-  first of `navigator.languages` the app has (`pickLanguage`, `src/utils/languages.ts`),
-  else English. Server and hydration render English; the detected one is never saved.
+- **Language**: `LanguageContext` shows the saved choice (`app-language`, in storage and in a
+  cookie of the same name), else the first of `navigator.languages` the app has (`pickLanguage`,
+  `src/utils/languages.ts`), else English; the detected one is never saved. `(main)/layout.tsx`
+  renders in the request's language from the server (`serverLanguage`: the cookie, else
+  `Accept-Language`) through a `LanguageProvider initial`; static pages render English until
+  they hydrate.
 - **Welcome** (`/welcome`, `src/app/welcome/`, outside `(main)` so it has no app
   header): `WelcomePage` and its steps in `src/components/welcome-page/`, the step
   state in `useWelcomeSteps` (this tab's sessionStorage, `welcome-progress`, so Steam's

@@ -499,7 +499,7 @@ export const en = {
   privacy: {
     link: 'Privacy & cookies',
     title: 'Privacy & cookies',
-    updated: 'Last updated: 20 October 2026',
+    updated: 'Last updated: 23 October 2026',
     intro: 'CheevoVault tracks your RetroAchievements, Steam and PlayStation achievements. This page explains what it keeps about you, why, and what you can do about it.',
     contact: 'Contact',
     controller: 'Data controller',
@@ -531,7 +531,7 @@ export const en = {
       {
         heading: 'Cookies and local storage',
         body: [
-          'Necessary, no consent needed: a session cookie that keeps you signed in, and local storage for your language, theme and cookie choice.',
+          'Necessary, no consent needed: a session cookie that keeps you signed in, a cookie with the language you choose (so pages arrive already in it), and local storage for your language, theme and cookie choice.',
           'Analytics, only if you accept: Google Analytics cookies (_ga, _ga_*), which last up to two years. Google is told the page path, never the rest of the address. You can withdraw consent at any time from "Cookie settings" at the bottom of the page: analytics stops at once and its cookies are deleted.',
         ],
       },
@@ -1642,7 +1642,7 @@ export const en = {
         {
           title: 'One library for everything',
           text: 'RetroAchievements, Steam and PlayStation together',
-          detail: 'Your games from RetroAchievements, Steam and PlayStation in one list, with your progress, hours played and when you last played. Filter by platform or console, hide what you do not want to see, and open any game for its achievements and how rare each one is.',
+          detail: 'Your games from RetroAchievements, Steam and PlayStation in one list, with your progress, hours played (Steam and PlayStation give them) and when you last played. Filter by platform or console, hide what you do not want to see, and open any game for its achievements and how rare each one is.',
           highlights: ['Filter by platform or console', 'Hide the games you do not want to see', 'The rarity of every achievement'],
         },
         {

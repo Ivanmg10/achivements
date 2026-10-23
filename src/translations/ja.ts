@@ -498,7 +498,7 @@ export const ja: Translations = {
   privacy: {
     link: 'プライバシーとCookie',
     title: 'プライバシーとCookie',
-    updated: '最終更新日：2026年10月20日',
+    updated: '最終更新日：2026年10月23日',
     intro: 'CheevoVaultはRetroAchievements、Steam、PlayStationの実績を記録します。このページでは、あなたについて何を保存するのか、その理由、そしてあなたにできることを説明します。',
     contact: 'お問い合わせ',
     controller: 'データ管理者',
@@ -530,7 +530,7 @@ export const ja: Translations = {
       {
         heading: 'Cookieとローカルストレージ',
         body: [
-          '必須（同意不要）：ログイン状態を保つセッションCookieと、言語・テーマ・Cookieの選択を保存するローカルストレージ。',
+          '必須（同意不要）：ログイン状態を保つセッションCookie、選んだ言語を保存するCookie（ページを最初からその言語で表示するため）、言語・テーマ・Cookieの選択を保存するローカルストレージ。',
           '分析（同意した場合のみ）：Google AnalyticsのCookie（_ga、_ga_*）。最長2年間保存されます。Googleに送るのはページのパスだけで、それ以外のアドレス部分は送りません。ページ下部のCookie設定からいつでも同意を撤回できます。撤回すると分析はすぐに停止し、そのCookieは削除されます。',
         ],
       },
@@ -1641,7 +1641,7 @@ export const ja: Translations = {
         {
           title: 'すべてをひとつのライブラリに',
           text: 'RetroAchievements、Steam、PlayStation をまとめて',
-          detail: 'RetroAchievements、Steam、PlayStation のゲームをひとつのリストに。進捗、プレイ時間、最後に遊んだ日も表示します。プラットフォームや機種で絞り込み、見たくないものは非表示にでき、どのゲームでも実績とそのレア度を確認できます。',
+          detail: 'RetroAchievements、Steam、PlayStation のゲームをひとつのリストに。進捗、プレイ時間（Steam と PlayStation）、最後に遊んだ日も表示します。プラットフォームや機種で絞り込み、見たくないものは非表示にでき、どのゲームでも実績とそのレア度を確認できます。',
           highlights: ['プラットフォームや機種で絞り込み', '見たくないゲームは非表示に', 'すべての実績のレア度'],
         },
         {

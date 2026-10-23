@@ -3,7 +3,10 @@ import { LanguageProvider, useLanguage } from './LanguageContext'
 
 const wrapper = ({ children }: { children: React.ReactNode }) => <LanguageProvider>{children}</LanguageProvider>
 
-beforeEach(() => localStorage.clear())
+beforeEach(() => {
+  localStorage.clear()
+  document.cookie = 'app-language=; Path=/; Max-Age=0'
+})
 
 test('<html lang> follows the language shown', () => {
   const { result } = renderHook(() => useLanguage(), { wrapper })
@@ -58,5 +61,30 @@ describe('with nothing saved, the browser decides', () => {
     expect(result.current.lang).toBe('de')
     expect(result.current.fromBrowser).toBe(false)
     expect(localStorage.getItem('app-language')).toBe('de')
+  })
+})
+
+describe('what the server rendered, and the cookie that tells it', () => {
+  const clearCookie = () => { document.cookie = 'app-language=; Path=/; Max-Age=0' }
+  beforeEach(clearCookie)
+  afterAll(clearCookie)
+
+  test('picking a language writes it to the cookie too', () => {
+    const { result } = renderHook(() => useLanguage(), { wrapper })
+    act(() => result.current.setLang('it'))
+    expect(document.cookie).toContain('app-language=it')
+  })
+
+  test('a choice saved before the cookie existed is copied into it', () => {
+    localStorage.setItem('app-language', 'pl')
+    renderHook(() => useLanguage(), { wrapper })
+    expect(document.cookie).toContain('app-language=pl')
+  })
+
+  test('with its storage lost, the cookie still holds the choice', () => {
+    document.cookie = 'app-language=ru; Path=/'
+    const { result } = renderHook(() => useLanguage(), { wrapper })
+    expect(result.current.lang).toBe('ru')
+    expect(result.current.fromBrowser).toBe(false)
   })
 })

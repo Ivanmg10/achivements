@@ -231,15 +231,16 @@ Built and committed on `feat/welcome-onboarding` (not pushed: the user pushes). 
 
 - **Not tried end to end with a real new account** on pre: the curtain from sign-up into the
   welcome, the Steam round trip back to `/welcome#steam-…`, RA and PSN linking from their steps.
-- **Browser back between steps** (the step lives in sessionStorage; Steam answers with its own hash).
-- **First paint in the browser's language**: a first visit paints English for a moment
-  (server-side `Accept-Language` would make the root layout dynamic; not done on purpose).
+- ~~Browser back between steps~~ — done 2026-10-23: each move is a history entry (`history.state`).
+- ~~First paint in the browser's language~~ — done 2026-10-23 for the landing and the app
+  (`serverLanguage` in `(main)/layout.tsx`, the `app-language` cookie); static pages, `/welcome`
+  included, still paint English until they hydrate (reached by client navigation they do not).
 - **Version**: every commit bumped the patch (1.6.70 now); a new page is a minor bump by the
   versioning rules (1.7.0, a `chore(release)` commit). Not done: the user's call.
 - **The PR**: the branch was cut from `feat/steam-sign-in` (PR #46, not merged), so its PR into
   `develop` waits for #46, then needs the full description (see `CLAUDE.md` → Pull requests).
-- Small: the first point's detail says "hours played" for all three platforms, but
-  RetroAchievements gives none; the RA guide's sketch is hidden below 640 px (its steps stay);
+- Small: ~~the first point's detail said "hours played" for all three platforms~~ (it now says
+  Steam and PlayStation give them, 2026-10-23); the RA guide's sketch is hidden below 640 px (its steps stay);
   the library preview cards are drawn samples (they say so).
 - **The canvas is behind the code** (slower curtain, sign-up entry, avatar modal, points that open
   over the step): the code is the reference now (`docs/designs.md`).

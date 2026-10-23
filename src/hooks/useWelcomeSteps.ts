@@ -26,6 +26,8 @@ export const CURTAIN_MS = 2200
 export const CURTAIN_SWAP_MS = 1100
 
 const STORAGE_KEY = 'welcome-progress'
+/** Each step's place in the browser's history, under Next's own state (which must be kept). */
+const HISTORY_KEY = 'welcomeStep'
 const LAST = WELCOME_STEPS.length - 1
 
 type Progress = { step: number; seen: number; skipped: WelcomeStep[] }
@@ -54,6 +56,10 @@ export function parseProgress(raw: string | null | undefined): Progress {
  * tab's sessionStorage so the round trip to Steam's sign-in lands back on the
  * same step. Moving runs the curtain (`transition`): the step changes halfway,
  * while it is all covered; with reduced motion it changes at once.
+ *
+ * Every move is also an entry in the browser's history, so its back and
+ * forward buttons go through the steps too (a step is in `history.state`, not
+ * in the URL: Steam's sign-in answers with its own `#steam-…`).
  */
 export function useWelcomeSteps() {
   const reducedMotion = useReducedMotion()
@@ -67,6 +73,24 @@ export function useWelcomeSteps() {
 
   useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
+  // The page's own entry says which step it shows, so coming back to it lands there.
+  const ready = stored !== undefined
+  useEffect(() => {
+    if (!ready || window.history.state?.[HISTORY_KEY] === progress.step) return
+    window.history.replaceState({ ...window.history.state, [HISTORY_KEY]: progress.step }, '')
+  }, [ready, progress.step])
+
+  // The browser's back and forward: to the step that entry was, under the curtain.
+  const goRef = useRef<(to: number) => void>(() => {})
+  useEffect(() => {
+    const onPopState = (e: PopStateEvent) => {
+      const to = e.state?.[HISTORY_KEY]
+      if (Number.isInteger(to)) goRef.current(to)
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
   // Back from Steam with this tab's progress lost (another tab, storage blocked): the Steam step.
   const steam = WELCOME_STEPS.indexOf('steam')
   useEffect(() => {
@@ -74,8 +98,9 @@ export function useWelcomeSteps() {
     store(JSON.stringify({ ...progress, step: steam, seen: Math.max(progress.seen, steam) }))
   }, [hash, stored, progress, steam, store])
 
-  function go(to: number, skipCurrent = false) {
+  function go(to: number, skipCurrent = false, fromHistory = false) {
     if (transition || to === progress.step || to < 0 || to > LAST) return
+    if (!fromHistory) window.history.pushState({ ...window.history.state, [HISTORY_KEY]: to }, '')
     const current = WELCOME_STEPS[progress.step]
     const skipped = skipCurrent
       ? [...progress.skipped.filter((s) => s !== current), current]
@@ -98,6 +123,10 @@ export function useWelcomeSteps() {
     )
   }
 
+  useEffect(() => {
+    goRef.current = (to: number) => go(to, false, true)
+  })
+
   return {
     index: progress.step,
     step: WELCOME_STEPS[progress.step],
@@ -109,7 +138,7 @@ export function useWelcomeSteps() {
     /** True once the person has moved, so a new step's title can take the focus (not on arrival). */
     moved,
     /** False on the server and while hydrating: the stored step is not known yet. */
-    ready: stored !== undefined,
+    ready,
     goTo: (to: number) => go(to),
     next: () => go(progress.step + 1),
     back: () => go(progress.step - 1),

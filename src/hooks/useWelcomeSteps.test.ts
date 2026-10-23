@@ -117,3 +117,41 @@ test('says it has moved only after a move', () => {
   act(() => result.current.next())
   expect(result.current.moved).toBe(true)
 })
+
+describe('the browser’s back and forward', () => {
+  test('every move is an entry in its history, keeping what was there', () => {
+    window.history.replaceState({ __NA: true }, '')
+    const { result } = renderHook(() => useWelcomeSteps())
+    expect(window.history.state).toEqual({ __NA: true, welcomeStep: 0 })
+    act(() => result.current.next())
+    expect(window.history.state).toEqual({ __NA: true, welcomeStep: 1 })
+  })
+
+  test('going back in the browser goes back a step, under the curtain', () => {
+    const { result } = renderHook(() => useWelcomeSteps())
+    act(() => result.current.next())
+    act(() => jest.advanceTimersByTime(CURTAIN_MS))
+    act(() => result.current.next())
+    act(() => jest.advanceTimersByTime(CURTAIN_MS))
+    expect(result.current.step).toBe('steam')
+    const entries = (window.history.length)
+
+    act(() => {
+      window.dispatchEvent(new PopStateEvent('popstate', { state: { welcomeStep: 1 } }))
+    })
+    expect(result.current.transition).toEqual({ from: 2, to: 1, direction: 'back' })
+    act(() => jest.advanceTimersByTime(CURTAIN_MS))
+    expect(result.current.step).toBe('ra')
+    // Following the history adds no entry of its own.
+    expect(window.history.length).toBe(entries)
+  })
+
+  test('an entry that is not a step is left alone', () => {
+    const { result } = renderHook(() => useWelcomeSteps())
+    act(() => {
+      window.dispatchEvent(new PopStateEvent('popstate', { state: null }))
+    })
+    expect(result.current.transition).toBeNull()
+    expect(result.current.step).toBe('intro')
+  })
+})

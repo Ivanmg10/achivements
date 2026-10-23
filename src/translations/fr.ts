@@ -498,7 +498,7 @@ export const fr: Translations = {
   privacy: {
     link: 'Confidentialité et cookies',
     title: 'Confidentialité et cookies',
-    updated: 'Dernière mise à jour : 20 octobre 2026',
+    updated: 'Dernière mise à jour : 23 octobre 2026',
     intro: 'CheevoVault suit tes succès RetroAchievements, Steam et PlayStation. Cette page explique ce qu’il garde sur toi, pourquoi, et ce que tu peux y faire.',
     contact: 'Contact',
     controller: 'Responsable du traitement',
@@ -530,7 +530,7 @@ export const fr: Translations = {
       {
         heading: 'Cookies et stockage local',
         body: [
-          'Nécessaires, sans consentement : un cookie de session qui vous garde connecté, et le stockage local pour votre langue, votre thème et votre choix de cookies.',
+          'Nécessaires, sans consentement : un cookie de session qui maintient votre session ouverte, un cookie avec la langue que vous choisissez (pour que les pages arrivent déjà dans cette langue), et le stockage local pour votre langue, votre thème et votre choix de cookies.',
           'Mesure d’audience, seulement si vous acceptez : cookies Google Analytics (_ga, _ga_*), conservés jusqu’à deux ans. Google ne reçoit que le chemin de la page, jamais le reste de l’adresse. Vous pouvez retirer votre consentement à tout moment depuis les paramètres des cookies en bas de page : la mesure s’arrête aussitôt et ses cookies sont supprimés.',
         ],
       },
@@ -1641,7 +1641,7 @@ export const fr: Translations = {
         {
           title: 'Une bibliothèque pour tout',
           text: 'RetroAchievements, Steam et PlayStation ensemble',
-          detail: 'Vos jeux RetroAchievements, Steam et PlayStation dans une seule liste, avec votre progression, vos heures de jeu et votre dernière session. Filtrez par plateforme ou console, masquez ce que vous ne voulez pas voir et ouvrez n\'importe quel jeu pour voir ses succès et leur rareté.',
+          detail: 'Vos jeux RetroAchievements, Steam et PlayStation dans une seule liste, avec votre progression, vos heures de jeu (fournies par Steam et PlayStation) et votre dernière session. Filtrez par plateforme ou console, masquez ce que vous ne voulez pas voir et ouvrez n\'importe quel jeu pour voir ses succès et leur rareté.',
           highlights: ['Filtrez par plateforme ou console', 'Masquez les jeux que vous ne voulez pas voir', 'La rareté de chaque succès'],
         },
         {

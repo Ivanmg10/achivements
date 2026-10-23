@@ -124,7 +124,9 @@ intro, RetroAchievements, Steam, PlayStation, profile, preferences, done. Design
 reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there).
 
 - **Never blocks.** Every step has "Not now" / "Skip this step", "Skip all" is always in
-  the bar, and back works on every step. Do not add a required step.
+  the bar, and back works on every step, the browser's back and forward too (each move is a
+  history entry, its step in `history.state` under Next's own state, which must be spread in,
+  never replaced). Do not add a required step.
 - **No Xbox** in it while Xbox is admin-only (a new account is not an admin).
 - **No app header** until the person leaves it: it lives in `src/app/welcome/`, outside
   `(main)`, on purpose (the user's call).
@@ -172,10 +174,21 @@ sketch per point in `WelcomePageIntroArt`): keep their text and sketches true to
 `LanguageContext`: the saved choice, else the first of `navigator.languages` the app has
 (`pickLanguage` in `src/utils/languages.ts`: `es-MX` → es), else English. **The detected
 language is never saved**: only a person's pick is (`setLang`), so a browser that changes
-its language changes the app. Server and hydration render English (no mismatch); reading
-`Accept-Language` on the server would make the root layout dynamic, so it is not done.
-`fromBrowser` says when the language shown is the detected one (the welcome says so).
-The language list with native names is `LANGUAGES` there; do not keep another.
+its language changes the app. `fromBrowser` says when the language shown is the detected one
+(the welcome says so). The language list with native names is `LANGUAGES` there; do not keep another.
+
+- **The first paint is already in the person's language on the app's pages (2026-10-23).** A
+  pick is also written to the `app-language` cookie (a year, `languageCookie`; a choice saved
+  before the cookie existed is copied into it). `(main)/layout.tsx`, which is dynamic anyway (it
+  reads the session), calls `serverLanguage()` (`src/lib/serverLanguage.ts`: the cookie, else
+  `Accept-Language`) and wraps the page in a `LanguageProvider initial={…}`, which renders that
+  language on the server and while hydrating, so they match. That covers the landing and the
+  whole signed-in app.
+- **Do not call `serverLanguage()` (or `headers()`/`cookies()`) in the root layout**: it would
+  make every page dynamic, the static ones too (`/privacy`, `/terms`, `/compare`, `/track`,
+  `/authPage`, `/welcome`). Those still paint English until they hydrate; reached by a client
+  navigation (the usual way) they are already in the right language.
+- `/privacy` lists the cookie among the necessary ones, in all nine languages.
 
 ## Progress bars — in the theme's colours
 

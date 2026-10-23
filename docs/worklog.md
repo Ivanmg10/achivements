@@ -29,6 +29,24 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-23 — Welcome: browser back through the steps; the app's first paint in the person's language (`feat/welcome-onboarding`)
+
+**Did** — Each welcome move is a browser history entry (its step in `history.state`, spread over
+Next's own), so the browser's back and forward go through the steps under the curtain. The
+language: a pick is also kept in the `app-language` cookie; `serverLanguage()` (cookie, else
+`Accept-Language`, parsed by `parseAcceptLanguage`) feeds a `LanguageProvider initial` in
+`(main)/layout.tsx`, so the landing and the whole app paint in the right language from the first
+byte. `/privacy` (nine languages, dated 23 October 2026) lists the cookie; while there, its
+French, Italian and Polish "keeps you signed in" became gender-neutral. The welcome's first point
+says only Steam and PlayStation give hours played.
+**Why** — The three "later" items the user asked to handle.
+**Decisions** — Not in the root layout: `headers()` there would make every static page dynamic;
+`(main)` is dynamic already. The cookie holds only a person's pick, as storage does.
+**Watch out** — Spread `window.history.state` into any `pushState`/`replaceState`: Next's app
+router reloads the page on a popstate whose state lost its own keys.
+
+---
+
 ## 2026-10-23 — Design register started, library as its own development, more languages on the roadmap (`feat/welcome-onboarding`)
 
 **Did** — `docs/ui-library-plan.md` became `docs/ui-library-and-designs-plan.md`, a separate

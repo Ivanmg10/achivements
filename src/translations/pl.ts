@@ -498,7 +498,7 @@ export const pl: Translations = {
   privacy: {
     link: 'Prywatność i cookies',
     title: 'Prywatność i cookies',
-    updated: 'Ostatnia aktualizacja: 20 października 2026',
+    updated: 'Ostatnia aktualizacja: 23 października 2026',
     intro: 'CheevoVault śledzi twoje osiągnięcia w RetroAchievements, Steam i PlayStation. Ta strona wyjaśnia, co o tobie przechowuje, w jakim celu i co możesz z tym zrobić.',
     contact: 'Kontakt',
     controller: 'Administrator danych',
@@ -530,7 +530,7 @@ export const pl: Translations = {
       {
         heading: 'Cookies i pamięć lokalna',
         body: [
-          'Niezbędne, bez zgody: cookie sesji, które utrzymuje Cię zalogowanym, oraz pamięć lokalna na język, motyw i Twój wybór dotyczący cookies.',
+          'Niezbędne, bez zgody: cookie sesji, które utrzymuje Twoją sesję, cookie z wybranym przez Ciebie językiem (aby strony od razu przychodziły w nim), oraz pamięć lokalna na język, motyw i Twój wybór dotyczący cookies.',
           'Analityka, tylko za Twoją zgodą: cookies Google Analytics (_ga, _ga_*), ważne do dwóch lat. Google otrzymuje tylko ścieżkę strony, nigdy resztę adresu. Zgodę możesz wycofać w każdej chwili w ustawieniach cookies na dole strony: analityka zatrzymuje się od razu, a jej cookies są usuwane.',
         ],
       },
@@ -1641,7 +1641,7 @@ export const pl: Translations = {
         {
           title: 'Jedna biblioteka na wszystko',
           text: 'RetroAchievements, Steam i PlayStation razem',
-          detail: 'Twoje gry z RetroAchievements, Steam i PlayStation na jednej liście, z postępem, godzinami gry i datą ostatniej sesji. Filtruj według platformy lub konsoli, ukryj to, czego nie chcesz widzieć, i otwórz dowolną grę, by zobaczyć jej osiągnięcia i ich rzadkość.',
+          detail: 'Twoje gry z RetroAchievements, Steam i PlayStation na jednej liście, z postępem, godzinami gry (podają je Steam i PlayStation) i datą ostatniej sesji. Filtruj według platformy lub konsoli, ukryj to, czego nie chcesz widzieć, i otwórz dowolną grę, by zobaczyć jej osiągnięcia i ich rzadkość.',
           highlights: ['Filtr według platformy lub konsoli', 'Ukryj gry, których nie chcesz widzieć', 'Rzadkość każdego osiągnięcia'],
         },
         {

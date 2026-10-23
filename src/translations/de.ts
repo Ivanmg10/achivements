@@ -498,7 +498,7 @@ export const de: Translations = {
   privacy: {
     link: 'Datenschutz & Cookies',
     title: 'Datenschutz & Cookies',
-    updated: 'Zuletzt aktualisiert: 20. Oktober 2026',
+    updated: 'Zuletzt aktualisiert: 23. Oktober 2026',
     intro: 'CheevoVault verfolgt deine Erfolge auf RetroAchievements, Steam und PlayStation. Diese Seite erklärt, was über dich gespeichert wird, wozu, und was du dagegen tun kannst.',
     contact: 'Kontakt',
     controller: 'Verantwortlicher',
@@ -530,7 +530,7 @@ export const de: Translations = {
       {
         heading: 'Cookies und lokaler Speicher',
         body: [
-          'Notwendig, ohne Einwilligung: ein Sitzungs-Cookie, das dich angemeldet hält, und lokaler Speicher für Sprache, Theme und deine Cookie-Auswahl.',
+          'Notwendig, ohne Einwilligung: ein Sitzungs-Cookie, das dich angemeldet hält, ein Cookie mit der Sprache, die du wählst (damit die Seiten gleich in ihr ankommen), und lokaler Speicher für Sprache, Theme und deine Cookie-Auswahl.',
           'Analyse, nur mit deiner Zustimmung: Google-Analytics-Cookies (_ga, _ga_*), die bis zu zwei Jahre gelten. Google erhält nur den Seitenpfad, nie den Rest der Adresse. Du kannst die Einwilligung jederzeit über die Cookie-Einstellungen unten auf der Seite widerrufen: Die Analyse stoppt sofort und ihre Cookies werden gelöscht.',
         ],
       },
@@ -1641,7 +1641,7 @@ export const de: Translations = {
         {
           title: 'Eine Bibliothek für alles',
           text: 'RetroAchievements, Steam und PlayStation zusammen',
-          detail: 'Deine Spiele von RetroAchievements, Steam und PlayStation in einer Liste, mit deinem Fortschritt, deinen Spielstunden und wann du zuletzt gespielt hast. Filtere nach Plattform oder Konsole, blende aus, was du nicht sehen willst, und öffne jedes Spiel für seine Erfolge und wie selten jeder ist.',
+          detail: 'Deine Spiele von RetroAchievements, Steam und PlayStation in einer Liste, mit deinem Fortschritt, deinen Spielstunden (von Steam und PlayStation) und wann du zuletzt gespielt hast. Filtere nach Plattform oder Konsole, blende aus, was du nicht sehen willst, und öffne jedes Spiel für seine Erfolge und wie selten jeder ist.',
           highlights: ['Nach Plattform oder Konsole filtern', 'Spiele ausblenden, die du nicht sehen willst', 'Die Seltenheit jedes Erfolgs'],
         },
         {
