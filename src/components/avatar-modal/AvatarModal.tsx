@@ -9,6 +9,7 @@ import { useAvatarUpload } from '@/hooks/useAvatarUpload'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
 import { useLanguage } from '@/context/LanguageContext'
 import { buttonClass } from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 const BUTTON = 'flex-1'
 const PRIMARY = buttonClass('primary', 'md', BUTTON)
@@ -165,7 +166,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
                   placeholder="https://…"
                   value={url}
                   onChange={(e) => { setUrl(e.target.value); setLinkBroken(false); link.clearError() }}
-                  className="flex-1 min-w-0 h-11 px-3 rounded-xl bg-bg-main text-sm outline-none ring-1 ring-inset ring-ink/10 focus-visible:ring-2 focus-visible:ring-accent"
+                  className={fieldClass({ size: 'sm' }, 'flex-1 min-w-0')}
                 />
                 <button type="submit" disabled={!linkValid || linkBroken || link.saving} className={`${PRIMARY} flex-none`}>
                   {link.saving ? t.saving : t.avatarLinkSave}

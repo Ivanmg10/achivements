@@ -6,6 +6,7 @@ import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useAdminPsnToken, type PsnTokenError } from '@/hooks/useAdminPsnToken'
 import { notify } from '@/lib/notify'
 import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 const SSO_COOKIE_URL = 'https://ca.account.sony.com/api/v1/ssocookie'
 const INPUT_ID = 'admin-psn-npsso'
@@ -93,7 +94,7 @@ export default function AdminPsnToken() {
             onChange={(e) => setNpsso(e.target.value)}
             aria-invalid={saveError !== null}
             aria-describedby={saveError ? `${INPUT_ID}-error` : undefined}
-            className="flex-1 min-w-0 bg-bg-main rounded-xl px-3 py-2 text-sm font-mono outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className={fieldClass({ size: 'sm', invalid: saveError !== null }, 'flex-1 min-w-0 font-mono')}
           />
           <Button
             type="submit"

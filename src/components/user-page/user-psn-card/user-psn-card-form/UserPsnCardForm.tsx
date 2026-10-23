@@ -5,6 +5,7 @@ import type { PsnError } from '@/hooks/usePsnLink'
 import { useLanguage } from '@/context/LanguageContext'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { CONNECT_CLASS } from '@/components/user-page/user-platform-card/UserPlatformCard'
+import { fieldClass } from '@/components/ui/Input'
 
 const INPUT_ID = 'psn-online-id'
 
@@ -46,7 +47,7 @@ export default function UserPsnCardForm({
         onChange={(e) => setUsername(e.target.value)}
         aria-invalid={error !== null}
         aria-describedby={error ? `${INPUT_ID}-error` : undefined}
-        className="rounded-xl bg-bg-main px-3 py-2 w-full text-sm"
+        className={fieldClass({ size: 'sm', invalid: error !== null })}
       />
       {error && (
         <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-red-400">

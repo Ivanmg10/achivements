@@ -5,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { GameSource } from '@/types/steam'
 import { PLATFORM_NAME } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
+import { fieldClass } from '@/components/ui/Input'
 
 const PLATFORMS = ['ra', 'steam', 'psn', 'xbox'] as const
 
@@ -58,7 +59,7 @@ export default function FollowingToolbar({
           value={query}
           onChange={(e) => onQuery(e.target.value)}
           placeholder={T.following.searchPlaceholder}
-          className="w-full bg-bg-card rounded-xl pl-9 pr-3 py-2 text-sm placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className={fieldClass({ size: 'sm', icon: true })}
         />
       </div>
 

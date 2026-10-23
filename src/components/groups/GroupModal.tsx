@@ -16,6 +16,7 @@ import GroupModalIconPicker from '@/components/groups/group-modal-icon-picker/Gr
 import GroupModalVisibility from '@/components/groups/group-modal-visibility/GroupModalVisibility'
 import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -29,7 +30,6 @@ const contentVariants: Variants = {
 }
 
 const LABEL = 'text-[10px] uppercase tracking-widest text-text-secondary'
-const FIELD = 'bg-bg-main rounded-lg px-3 py-2 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70'
 
 type Props = {
   isOpen: boolean
@@ -183,7 +183,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                       maxLength={GROUP_TITLE_MAX}
                       aria-invalid={titleMissing || undefined}
                       aria-describedby={titleMissing ? titleErrorId : undefined}
-                      className={`${FIELD} ${titleMissing ? 'ring-2 ring-danger' : ''}`}
+                      className={fieldClass({ size: 'sm', invalid: titleMissing })}
                       autoFocus
                     />
                     {titleMissing && (
@@ -200,7 +200,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                       placeholder={T.groups.descriptionPlaceholder}
                       maxLength={GROUP_DESCRIPTION_MAX}
                       rows={2}
-                      className={`${FIELD} resize-none`}
+                      className={fieldClass({ size: 'sm' }, 'h-auto! py-2 resize-none')}
                     />
                   </div>
 

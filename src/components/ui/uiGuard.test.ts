@@ -28,3 +28,17 @@ test('primary buttons come from Button / buttonClass', () => {
   // the accent fill with the dark text and a hover is a primary button
   expect(offenders(/["'`][^"'`]*\bbg-accent [^"'`]*text-bg-main[^"'`]*(?<![\w-])hover:[^"'`]*["'`]/)).toEqual([])
 })
+
+test('text fields come from the library (fieldClass, Input, Textarea, SearchInput, PasswordInput)', () => {
+  const bad: string[] = []
+  for (const { file, text } of FILES) {
+    for (const m of text.matchAll(/<(input|textarea)\b[\s\S]*?\/>/g)) {
+      const el = m[0]
+      if (/type="(checkbox|radio|file|hidden|range|color)"/.test(el)) continue
+      // a bare input inside a box that is the field (the search panels) draws nothing itself
+      if (/fieldClass\(|INPUT_CLASS|bg-transparent|sr-only/.test(el)) continue
+      bad.push(file)
+    }
+  }
+  expect(bad).toEqual([])
+})

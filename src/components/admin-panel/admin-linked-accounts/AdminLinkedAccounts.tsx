@@ -7,12 +7,12 @@ import { adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
 import { buttonClass } from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 type Platform = 'ra' | 'steam' | 'psn' | 'xbox'
 
 const PLATFORM_NAMES: Record<Platform, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
 
-const INPUT = 'bg-bg-main rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent w-full'
 const BUTTON = 'shrink-0 text-xs font-bold px-3 py-2 rounded-xl disabled:opacity-40'
 
 /**
@@ -96,8 +96,8 @@ export default function AdminLinkedAccounts({
         </div>
         {!user.rausername && (
           <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="RA username" placeholder="RA username" value={raUsername} onChange={(e) => setRaUsername(e.target.value)} className={INPUT} />
-            <input aria-label="RA Web API key" placeholder="Web API key" type="password" autoComplete="off" value={raKey} onChange={(e) => setRaKey(e.target.value)} className={INPUT} />
+            <input aria-label="RA username" placeholder="RA username" value={raUsername} onChange={(e) => setRaUsername(e.target.value)} className={fieldClass({ size: 'sm' })} />
+            <input aria-label="RA Web API key" placeholder="Web API key" type="password" autoComplete="off" value={raKey} onChange={(e) => setRaKey(e.target.value)} className={fieldClass({ size: 'sm' })} />
             <button
               onClick={() => link('ra', { username: raUsername, apiKey: raKey }, (data) => {
                 setRaUsername('')
@@ -134,7 +134,7 @@ export default function AdminLinkedAccounts({
         </div>
         {!user.steamid && (
           <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="SteamID64 or profile link" placeholder="SteamID64 or steamcommunity.com/profiles/…" value={steamId} onChange={(e) => setSteamId(e.target.value)} className={INPUT} />
+            <input aria-label="SteamID64 or profile link" placeholder="SteamID64 or steamcommunity.com/profiles/…" value={steamId} onChange={(e) => setSteamId(e.target.value)} className={fieldClass({ size: 'sm' })} />
             <button
               onClick={() => link('steam', { steamid: steamId }, (data) => {
                 setSteamId('')
@@ -170,7 +170,7 @@ export default function AdminLinkedAccounts({
         </div>
         {!user.psnaccountid && (
           <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="PSN online ID" placeholder="PSN online ID" value={psnName} onChange={(e) => setPsnName(e.target.value)} className={INPUT} />
+            <input aria-label="PSN online ID" placeholder="PSN online ID" value={psnName} onChange={(e) => setPsnName(e.target.value)} className={fieldClass({ size: 'sm' })} />
             <button
               onClick={() => link('psn', { username: psnName }, (data) => {
                 setPsnName('')
@@ -206,7 +206,7 @@ export default function AdminLinkedAccounts({
         </div>
         {!user.xboxxuid && (
           <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="Xbox gamertag" placeholder="Xbox gamertag" value={xboxName} onChange={(e) => setXboxName(e.target.value)} className={INPUT} />
+            <input aria-label="Xbox gamertag" placeholder="Xbox gamertag" value={xboxName} onChange={(e) => setXboxName(e.target.value)} className={fieldClass({ size: 'sm' })} />
             <button
               onClick={() => link('xbox', { gamertag: xboxName }, (data) => {
                 setXboxName('')

@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
 import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 export const DESCRIPTION_MAX = 280
 
@@ -35,7 +36,7 @@ export default function UserDescriptionField() {
         maxLength={DESCRIPTION_MAX}
         rows={3}
         placeholder={T.userData.descriptionPlaceholder}
-        className="bg-bg-card rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent w-full flex-1 min-h-20 resize-y"
+        className={fieldClass({}, 'h-auto! py-2.5 text-sm flex-1 min-h-20 resize-y')}
       />
       {error && <p role="alert" className="text-xs text-red-400">{error}</p>}
       <div className="flex items-center justify-between gap-3">

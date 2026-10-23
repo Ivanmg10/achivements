@@ -18,6 +18,7 @@ import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePicker
 import AddGameModalPlatforms from '@/components/groups/add-game-modal-platforms/AddGameModalPlatforms'
 import { notify } from '@/lib/notify'
 import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 const SOURCES: GameSource[] = ['ra', 'steam', 'psn', 'xbox']
 const RESULTS_MAX = 40
@@ -212,7 +213,7 @@ export default function AddGameModal({
                   placeholder={T.groups.searchGames}
                   aria-label={T.groups.searchGames}
                   aria-describedby={`${titleId}-hint`}
-                  className="w-full h-11 bg-bg-main rounded-xl pl-10 pr-3 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70"
+                  className={fieldClass({ size: 'sm', icon: true })}
                 />
               </div>
               <p id={`${titleId}-hint`} className="text-[11px] text-text-secondary -mt-1">{T.groups.searchHint}</p>

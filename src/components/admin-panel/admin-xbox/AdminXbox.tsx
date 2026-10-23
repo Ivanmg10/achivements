@@ -4,6 +4,7 @@ import { useState } from 'react'
 import AdminXboxGame from './admin-xbox-game/AdminXboxGame'
 import { useAdminXbox, type XboxLookupError } from '@/hooks/useAdminXbox'
 import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 const INPUT_ID = 'admin-xbox-gamertag'
 
@@ -51,7 +52,7 @@ export default function AdminXbox() {
             spellCheck={false}
             aria-invalid={error === 'invalid-gamertag'}
             aria-describedby={error ? `${INPUT_ID}-error` : undefined}
-            className="flex-1 min-w-0 bg-bg-main rounded-xl px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className={fieldClass({ size: 'sm', invalid: error === 'invalid-gamertag' }, 'flex-1 min-w-0')}
           />
           <Button
             type="submit"

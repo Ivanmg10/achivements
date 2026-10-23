@@ -7,7 +7,8 @@ import { notify } from '@/lib/notify'
 import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
 import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
 import WelcomePageLibraryPreview from '@/components/welcome-page/welcome-page-library-preview/WelcomePageLibraryPreview'
-import { INPUT_CLASS, PRIMARY_BUTTON, SECONDARY_BUTTON, STEP_SKY, platformKicker } from '@/components/welcome-page/welcomeArt'
+import { PRIMARY_BUTTON, SECONDARY_BUTTON, STEP_SKY, platformKicker } from '@/components/welcome-page/welcomeArt'
+import { fieldClass } from '@/components/ui/Input'
 
 const FORM_ID = 'welcome-psn-form'
 const INPUT_ID = 'welcome-psn-id'
@@ -78,7 +79,7 @@ export default function WelcomePagePsn({
             onChange={(e) => setUsername(e.target.value)}
             aria-invalid={error !== null}
             aria-describedby={error ? `${INPUT_ID}-error ${INPUT_ID}-help` : `${INPUT_ID}-help`}
-            className={`${INPUT_CLASS} ${error ? 'ring-2 ring-danger' : ''}`}
+            className={fieldClass({ invalid: error !== null })}
           />
           {error && (
             <p id={`${INPUT_ID}-error`} role="alert" className="text-sm text-danger">

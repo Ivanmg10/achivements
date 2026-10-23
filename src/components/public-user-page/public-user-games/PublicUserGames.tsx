@@ -9,6 +9,7 @@ import { PLATFORM_NAME } from '@/utils/gameRef'
 import type { GameSource } from '@/types/steam'
 import EmptyState from '@/components/empty-state/EmptyState'
 import PublicUserGameRow from '../public-user-game-row/PublicUserGameRow'
+import { fieldClass } from '@/components/ui/Input'
 
 const PAGE = 30
 
@@ -71,7 +72,7 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={T.userProfile.searchGames}
-            className="w-full bg-bg-main rounded-xl pl-9 pr-3 py-2 text-sm placeholder:text-text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className={fieldClass({ size: 'sm', icon: true })}
           />
         </div>
         <div className="flex items-center gap-2">

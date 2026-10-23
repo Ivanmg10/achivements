@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import CommonModal from '../common-modal/CommonModal'
 import { useLanguage } from '@/context/LanguageContext'
 import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 /** The avatar has its own modal (`AvatarModal`). */
 export type EditProfileField = 'name' | 'email'
@@ -112,7 +113,7 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
           type={field === 'email' ? 'email' : 'text'}
           value={newValue}
           onChange={(e) => { setNewValue(e.target.value); setError(null) }}
-          className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+          className={fieldClass()}
           disabled={loading || success}
           autoFocus
         />
@@ -129,9 +130,7 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
           value={confirmValue}
           onChange={(e) => { setConfirmValue(e.target.value); setError(null) }}
           aria-describedby={mismatch ? 'edit-mismatch-error' : undefined}
-          className={`bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 w-full transition-colors ${
-            mismatch ? 'ring-2 ring-red-500 focus:ring-red-500' : 'focus:ring-accent'
-          }`}
+          className={fieldClass({ invalid: mismatch })}
           disabled={loading || success}
         />
         {mismatch && (
@@ -150,7 +149,7 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
             autoComplete="current-password"
             value={password}
             onChange={(e) => { setPassword(e.target.value); setError(null) }}
-            className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+            className={fieldClass()}
             disabled={loading || success}
           />
         </div>

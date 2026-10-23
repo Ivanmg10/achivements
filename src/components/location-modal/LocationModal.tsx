@@ -6,6 +6,7 @@ import CommonModal from '../common-modal/CommonModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { COUNTRIES, codeToFlag } from '@/utils/countries'
 import { notify } from '@/lib/notify'
+import { fieldClass } from '@/components/ui/Input'
 
 interface Props {
   isOpen: boolean
@@ -67,7 +68,7 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
         onChange={(e) => setSearch(e.target.value)}
         placeholder={T.userData.searchCountry}
         aria-label={T.userData.searchCountry}
-        className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full mb-3"
+        className={fieldClass({ size: 'sm' }, 'mb-3')}
         autoFocus
       />
 

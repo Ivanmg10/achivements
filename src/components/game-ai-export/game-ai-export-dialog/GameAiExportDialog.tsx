@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { modalOverlay, modalContent } from '@/lib/animations'
 import { aiExportFileName, aiExportText, buildAiExport, type AiExportSource } from '@/utils/aiExport'
 import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 type CopyState = 'idle' | 'copied' | 'failed'
 
@@ -114,7 +115,7 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
             rows={3}
             maxLength={1000}
             placeholder={T.aiExport.questionPlaceholder}
-            className="w-full rounded-xl bg-bg-card px-3 py-2 text-sm placeholder:text-text-secondary/70 resize-y focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className={fieldClass({}, 'h-auto! py-2.5 text-sm resize-y')}
           />
         </div>
 

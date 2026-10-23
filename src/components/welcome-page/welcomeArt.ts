@@ -1,6 +1,7 @@
 import { PLATFORM_STEPS, type PlatformStep, type WelcomeStep } from '@/hooks/useWelcomeSteps'
 import type { Translations } from '@/translations/en'
 import { buttonClass } from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 /**
  * Each step's "sky" in the curtain's band, as the time of day is in the game
@@ -31,7 +32,6 @@ export const SECONDARY_BUTTON = buttonClass('secondary', 'lg')
 
 export const QUIET_BUTTON = buttonClass('quiet', 'sm')
 
-export const INPUT_CLASS =
-  'w-full h-12 px-3.5 rounded-xl bg-bg-card ring-1 ring-inset ring-ink/10 text-text-main text-[0.9375rem] outline-none focus-visible:ring-2 focus-visible:ring-accent'
+export const INPUT_CLASS = fieldClass()
 
 export const SECTION_LABEL = 'text-xs font-bold uppercase tracking-[0.12em] text-text-secondary'

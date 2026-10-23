@@ -10,6 +10,7 @@ import type { Country } from '@/utils/countries'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
 import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 interface Props {
   isOpen: boolean
@@ -95,7 +96,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
           <input
             value={values.username as string ?? ''}
             onChange={e => setValues(v => ({ ...v, username: e.target.value }))}
-            className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+            className={fieldClass({ size: 'sm' })}
           />
         </FieldRow>
 
@@ -111,7 +112,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
             type="email"
             value={values.email as string ?? ''}
             onChange={e => setValues(v => ({ ...v, email: e.target.value }))}
-            className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+            className={fieldClass({ size: 'sm' })}
           />
         </FieldRow>
 
@@ -127,7 +128,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
             <input
               value={values.avatar as string ?? ''}
               onChange={e => setValues(v => ({ ...v, avatar: e.target.value }))}
-              className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent flex-1"
+              className={fieldClass({ size: 'sm' }, 'flex-1')}
               placeholder="https://..."
             />
             {(values.avatar as string) && (
@@ -171,7 +172,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
                 value={countrySearch}
                 onChange={e => setCountrySearch(e.target.value)}
                 placeholder="Search country..."
-                className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+                className={fieldClass({ size: 'sm' })}
               />
               <div className="max-h-40 overflow-y-auto flex flex-col gap-0.5">
                 {filteredCountries.map((c: Country) => (

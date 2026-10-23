@@ -8,6 +8,7 @@ import { adminFetch } from '@/utils/adminFetch'
 import { notify } from '@/lib/notify'
 import { PASSWORD_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 interface Props {
   isOpen: boolean
@@ -59,19 +60,19 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
           <label htmlFor="create-username" className="text-xs text-text-secondary uppercase tracking-wider">Username *</label>
           <input id="create-username" value={username} onChange={e => { setUsername(e.target.value); setError(null) }}
             autoFocus
-            className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full" />
+            className={fieldClass()} />
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="create-email" className="text-xs text-text-secondary uppercase tracking-wider">Email</label>
           <input id="create-email" type="email" value={email} onChange={e => setEmail(e.target.value)}
-            className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full" />
+            className={fieldClass()} />
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="create-password" className="text-xs text-text-secondary uppercase tracking-wider">Password *</label>
           <div className="relative">
             <input id="create-password" type={showPass ? 'text' : 'password'} value={password}
               onChange={e => { setPassword(e.target.value); setError(null) }}
-              className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full pr-10" />
+              className={fieldClass({}, 'pr-10')} />
             <button type="button" onClick={() => setShowPass(s => !s)}
               aria-label={showPass ? 'Hide password' : 'Show password'}
               aria-pressed={showPass}
