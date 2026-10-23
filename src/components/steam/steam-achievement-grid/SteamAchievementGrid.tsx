@@ -15,6 +15,7 @@ import { capList } from '@/utils/utils'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import { tooltipStyle } from '@/utils/tooltipStyle'
+import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -131,7 +132,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
         createPortal(
           <div
             role="tooltip"
-            className="fixed z-50 pointer-events-none bg-bg-card border border-bg-header/80 rounded-xl shadow-2xl p-3 max-w-65"
+            className={`fixed z-50 pointer-events-none ${TOOLTIP_SURFACE} p-3 max-w-65`}
             style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
           >
             <p className="text-sm font-semibold text-text-main">{titleOf(tooltip.achievement)}</p>

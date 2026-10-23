@@ -12,6 +12,7 @@ import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import { capList } from '@/utils/utils'
 import { tooltipStyle } from '@/utils/tooltipStyle'
+import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 
 type TooltipData = { achievement: RetroAchievement; x: number; y: number }
 
@@ -181,7 +182,8 @@ export const AchievementGrid = memo(function AchievementGrid({
       {tooltip &&
         createPortal(
           <div
-            className="fixed z-50 pointer-events-none bg-bg-card border border-bg-header/80 rounded-xl shadow-2xl p-3 max-w-65"
+            role="tooltip"
+            className={`fixed z-50 pointer-events-none ${TOOLTIP_SURFACE} p-3 max-w-65`}
             style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
           >
             <p className="text-sm font-semibold text-text-main">{tooltip.achievement.Title}</p>

@@ -17,6 +17,7 @@ import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements
 import { useSubject } from '@/context/SubjectContext'
 import type { XboxAchievement } from '@/types/xbox'
 import { tooltipStyle } from '@/utils/tooltipStyle'
+import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -136,7 +137,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
         createPortal(
           <div
             role="tooltip"
-            className="fixed z-50 pointer-events-none bg-bg-card border border-bg-header/80 rounded-xl shadow-2xl p-3 max-w-65"
+            className={`fixed z-50 pointer-events-none ${TOOLTIP_SURFACE} p-3 max-w-65`}
             style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
           >
             <p className="text-sm font-semibold text-text-main">{nameOf(tooltip.achievement)}</p>

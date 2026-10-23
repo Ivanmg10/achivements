@@ -74,7 +74,8 @@ What to use instead:
 
 `notify.success(T.toast.x)` / `notify.error(T.toast.y)` from `src/lib/notify.ts`,
 callable from components, hooks or contexts; `<Toaster />` (root layout) draws
-them bottom right: green with a check, red with an alert icon, gone after 4 s
+them bottom right: a dark card with the tone on its edge and icon (a check for success, an
+alert for an error) and a line that runs out with the time, gone after 4 s
 (errors 7 s), never while hovered or focused.
 
 - **Use a toast** for actions that happen outside a form — pin/unpin, reorder,
