@@ -5,10 +5,11 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievementsGameWithAchievements, RetroAchievement } from '@/types/types'
-import { IconChevronLeft, IconDeviceGamepad2 } from '@tabler/icons-react'
+import { IconDeviceGamepad2 } from '@tabler/icons-react'
 import { notify } from '@/lib/notify'
 import RaGameItem from '@/components/ra-game-item/RaGameItem'
 import { MainViewToggle } from '@/components/main-view-toggle/MainViewToggle'
+import ViewEntrance from '@/components/view-entrance/ViewEntrance'
 import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-recently-played-expanded/RARecentlyPlayedExpanded'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
@@ -57,6 +58,8 @@ export default function RARecentlyPlayed() {
     Map<number, RetroAchievementsGameWithAchievements>
   >(new Map())
   const [loadingId, setLoadingId] = useState<number | null>(null)
+  // The rows' entrance plays once; rows that mount later (a platform answering late, back from an open card) just appear.
+  const [entered, setEntered] = useState(false)
 
   async function handleExpand(item: RecentFeedItem) {
     if (expanded === item.key) {
@@ -92,24 +95,8 @@ export default function RARecentlyPlayed() {
     <div className="flex flex-col flex-1 min-h-0 gap-2">
       {/* Header */}
       <div className="flex items-center gap-2 shrink-0">
-        <AnimatePresence>
-          {expanded !== null && (
-            <motion.button
-              key="back"
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => setExpanded(null)}
-              className="p-1 rounded-lg hover:bg-ink/10 transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none"
-            >
-              <IconChevronLeft className="w-4 h-4" />
-            </motion.button>
-          )}
-        </AnimatePresence>
-        <p className="text-2xl font-bold flex-1">{T.cards.recentlyPlayed}</p>
         {/* Pinned games are the viewer's own, so another user's page has no such view. */}
-        {!subject && <MainViewToggle />}
+        {subject ? <p className="text-2xl font-bold flex-1">{T.cards.recentlyPlayed}</p> : <MainViewToggle />}
       </div>
 
       {/* Cards */}
@@ -130,50 +117,53 @@ export default function RARecentlyPlayed() {
             subtitle={T.mainPage.noGamesInProgressSub}
           />
         ) : (
-          <AnimatePresence mode="wait" initial={false}>
+          // No initial={false}: it would reach the rows too and block their entrance.
+          <AnimatePresence mode="wait">
             <motion.div
               key={expanded ?? 'list'}
               {...VIEW_MOTION}
+              // The first time the list appears its rows make the entrance; the box only fades between views after that.
+              initial={entered ? VIEW_MOTION.initial : false}
               transition={{ duration: reduce ? 0 : 0.18, ease: VIEW_EASE }}
               className="home-fit-scroll flex flex-col gap-1.5 flex-1 min-h-0"
             >
-            {displayedItems.map((item) => {
+            {displayedItems.map((item, i) => {
               const isExp = expanded === item.key
 
               if (item.source === 'psn') {
                 return (
-                  <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
+                  <ViewEntrance key={item.key} kind="feed" index={i} play={!entered} onStart={i === 0 ? () => setEntered(true) : undefined} style={ROW_STYLE} className="flex flex-col min-h-0">
                     <PsnGameItem game={item.game} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1" />
-                  </div>
+                  </ViewEntrance>
                 )
               }
 
               if (item.source === 'psnCollection') {
                 return (
-                  <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
+                  <ViewEntrance key={item.key} kind="feed" index={i} play={!entered} onStart={i === 0 ? () => setEntered(true) : undefined} style={ROW_STYLE} className="flex flex-col min-h-0">
                     <PsnCollectionItem collection={item.collection} games={item.games} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1" />
-                  </div>
+                  </ViewEntrance>
                 )
               }
 
               if (item.source === 'xbox') {
                 return (
-                  <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
+                  <ViewEntrance key={item.key} kind="feed" index={i} play={!entered} onStart={i === 0 ? () => setEntered(true) : undefined} style={ROW_STYLE} className="flex flex-col min-h-0">
                     <XboxGameItem game={item.game} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1" />
-                  </div>
+                  </ViewEntrance>
                 )
               }
 
               if (item.source === 'steam') {
                 return (
-                  <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
+                  <ViewEntrance key={item.key} kind="feed" index={i} play={!entered} onStart={i === 0 ? () => setEntered(true) : undefined} style={ROW_STYLE} className="flex flex-col min-h-0">
                     <SteamGameItem
                       game={item.game}
                       expanded={isExp}
                       onToggle={() => handleExpand(item)}
                       className="flex-1"
                     />
-                  </div>
+                  </ViewEntrance>
                 )
               }
 
@@ -186,7 +176,7 @@ export default function RARecentlyPlayed() {
                 : []
 
               return (
-                <div key={item.key} style={ROW_STYLE} className="flex flex-col min-h-0">
+                <ViewEntrance key={item.key} kind="feed" index={i} play={!entered} onStart={i === 0 ? () => setEntered(true) : undefined} style={ROW_STYLE} className="flex flex-col min-h-0">
                   <RaGameItem game={g} expanded={isExp} onToggle={() => handleExpand(item)} className="flex-1">
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: reduce ? 0 : 0.25, delay: reduce ? 0 : 0.1 }}>
                       <RARecentlyPlayedExpanded
@@ -197,7 +187,7 @@ export default function RARecentlyPlayed() {
                       />
                     </motion.div>
                   </RaGameItem>
-                </div>
+                </ViewEntrance>
               )
             })}
             </motion.div>

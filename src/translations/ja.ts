@@ -120,8 +120,6 @@ export const ja: Translations = {
     title: 'Pinned games',
     emptyTitle: 'ピン留めしたゲームはありません',
     empty: '最近プレイしたゲームからピン留めすると、ここで追えます',
-    viewRecentAria: 'View recently played',
-    viewPinnedAria: 'View pinned games',
     pinAria: 'Pin game',
     unpinAria: 'Unpin game',
     error: "Couldn't update pin, please try again",

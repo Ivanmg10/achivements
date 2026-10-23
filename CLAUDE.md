@@ -1080,6 +1080,12 @@ requires `linked-issue` (see Issues).
       steps bar, curtain) in the welcome's style, for the whole site, **and a record of every
       design** (`docs/designs.md`, started): `docs/ui-library-and-designs-plan.md`. A separate
       development, the user's idea (2026-10-23); design the library on a canvas and agree it first.
+- [ ] **Entrance animations on every page and component** (the user's wish, 2026-10-23; issue #61).
+      The home has them (left card: `ViewEntrance`; profile column: `MainPageProfile.module.css`);
+      the rest of the site should get its own, each suited to what it shows. **CSS keyframes, not
+      Framer's `x`/`y`**, for anything that plays on a first load (Framer stutters while the page
+      mounts), and **never hide an element until a frame or idle callback** (it shows empty while the
+      main thread is busy). Reduced motion: a fade at most. Design it first (`docs/design-process.md`).
 - [ ] **More languages** (the user's wish, 2026-10-23). Today nine (`LANGUAGES` in
       `src/utils/languages.ts`); the browser's language is taken when it is one of them, so a new
       language reaches its speakers on its own. A new one needs: its `src/translations/<lang>.ts`

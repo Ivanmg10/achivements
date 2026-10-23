@@ -121,8 +121,6 @@ export const en = {
     title: 'Pinned games',
     emptyTitle: 'No pinned games',
     empty: 'Pin games from Recently played to follow them here',
-    viewRecentAria: 'View recently played',
-    viewPinnedAria: 'View pinned games',
     pinAria: 'Pin game',
     unpinAria: 'Unpin game',
     error: "Couldn't update pin, please try again",
