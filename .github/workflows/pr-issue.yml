@@ -1,0 +1,65 @@
+# Fails a PR that does not resolve an open issue (CLAUDE.md → Git → Issues).
+# The issue comes from "Closes #123" in the description, or else from a branch
+# named type/123-slug, which also writes "Closes #123" into the description.
+name: PR issue
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions: {}
+
+jobs:
+  linked-issue:
+    # Releases (develop → main) and merging main back into develop carry other PRs' issues.
+    if: >-
+      github.head_ref != 'develop' && github.head_ref != 'main' &&
+      !startsWith(github.head_ref, 'chore/merge-main-into-develop')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+      pull-requests: write
+    steps:
+      - name: The PR resolves an open issue
+        env:
+          # Through env, never ${{ }} inside the script: the body and branch are user text.
+          BODY: ${{ github.event.pull_request.body }}
+          HEAD: ${{ github.head_ref }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          body=$(printf '%s' "$BODY" | tr -d '\r')
+          n=$(printf '%s\n' "$body" | sed 's/<!--.*-->//g' \
+            | grep -oiE '(close[sd]?|fix(e[sd])?|resolve[sd]?):? +#[0-9]+' | grep -oE '[0-9]+$' | head -1 || true)
+          from_branch=
+          if [ -z "$n" ]; then
+            n=$(printf '%s' "$HEAD" | sed -nE 's#^[a-z]+/([0-9]+)-.*#\1#p')
+            from_branch=1
+          fi
+          if [ -z "$n" ]; then
+            echo "::error::Link the issue this PR resolves: \"Closes #123\" in the description, or a branch named type/123-slug. No issue yet? Open one first."
+            exit 1
+          fi
+
+          if ! state=$(gh api "repos/$REPO/issues/$n" --jq 'if .pull_request then "pull-request" else .state end'); then
+            echo "::error::#$n does not exist in $REPO."
+            exit 1
+          fi
+          if [ "$state" != open ]; then
+            echo "::error::#$n is not an open issue ($state)."
+            exit 1
+          fi
+
+          if [ -n "$from_branch" ]; then
+            # The template's empty "Closes #" line takes the number; without one it goes on top.
+            if printf '%s\n' "$body" | grep -qE '^Closes #[[:space:]]*$'; then
+              body=$(printf '%s\n' "$body" | sed -E "s/^Closes #[[:space:]]*\$/Closes #$n/")
+            else
+              body=$(printf 'Closes #%s\n\n%s' "$n" "$body")
+            fi
+            # An edit made with this token does not rerun the workflows: no loop.
+            gh api -X PATCH "repos/$REPO/pulls/$PR" -f body="$body" --silent
+            echo "Wrote \"Closes #$n\" (from the branch name) into the description."
+          fi
+          echo "Resolves #$n."
