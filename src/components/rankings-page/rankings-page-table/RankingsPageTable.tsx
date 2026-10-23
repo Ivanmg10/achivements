@@ -14,8 +14,9 @@ import { ROW } from '../rankingsMotion'
 const TH = 'px-3 py-2.5 text-[10.5px] uppercase tracking-wider font-bold text-text-secondary text-left'
 
 /**
- * The rankings as a table (from md up): place, who, level, points, where they
- * come from, their streaks (now and longest), their last weeks, games at 100 %, achievements and, on the view
+ * The rankings as a table (from md up): place, who with their level, then their
+ * points (how many, where they come from, their last weeks), then how they play
+ * (their streaks now and longest, games at 100 %, achievements) and, on the view
  * that has them, the places moved this week. Your row is tinted and says "You".
  * Given `gapFrom` (your zone), each other name says how far ahead or behind you they are.
  */
@@ -44,13 +45,12 @@ export default function RankingsPageTable({
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr className="border-b border-ink/[0.07]">
-            <th scope="col" className={`${TH} w-14`}>{T.rankings.colRank}</th>
+            <th scope="col" className={`${TH} w-12`}>{T.rankings.colRank}</th>
             <th scope="col" className={TH}>{T.rankings.colUser}</th>
-            <th scope="col" className={TH}>{T.rankings.colLevel}</th>
             <th scope="col" className={`${TH} text-right`}>{T.rankings.colPoints}</th>
-            <th scope="col" className={TH}>{T.rankings.colStreak}</th>
             <th scope="col" className={`${TH} hidden lg:table-cell`}>{T.rankings.colPlatforms}</th>
             <th scope="col" className={`${TH} hidden lg:table-cell`}>{T.rankings.colTrend}</th>
+            <th scope="col" className={`${TH} border-l border-ink/[0.07]`}>{T.rankings.colStreak}</th>
             <th scope="col" className={`${TH} text-right hidden xl:table-cell`}>{T.rankings.colCompleted}</th>
             <th scope="col" className={`${TH} text-right hidden xl:table-cell`}>{T.rankings.colAchievements}</th>
             {arrows && <th scope="col" className={`${TH} text-right`}>{T.rankings.colChange}</th>}
@@ -58,32 +58,32 @@ export default function RankingsPageTable({
         </thead>
         <tbody>
           {rows.map((r, i) => (
-            <motion.tr key={r.username} variants={ROW} custom={i} initial="hidden" animate="show" className={`border-b border-ink/[0.05] last:border-0 ${r.isMe ? 'bg-accent/10' : ''}`}>
+            <motion.tr key={r.username} variants={ROW} custom={i} initial="hidden" animate="show" className={`border-b border-ink/[0.05] last:border-0 hover:bg-ink/[0.02] transition-colors ${r.isMe ? 'bg-accent/10' : ''}`}>
               <td className={`px-3 py-2.5 font-extrabold tabular-nums ${r.isMe ? 'text-accent' : 'text-text-secondary'}`}>{r.rank}</td>
-              <td className="px-3 py-2 max-w-0 w-[34%]">
-                <RankingsPageUser row={r} linked={linked}>
-                  {gapFrom !== undefined && !r.isMe && (
-                    <span className="text-[11px] text-text-secondary">
-                      {(r.points >= gapFrom ? T.rankings.ahead : T.rankings.behind).replace('{n}', Math.abs(r.points - gapFrom).toLocaleString(lang))}
-                    </span>
-                  )}
+              <td className="px-3 py-2 max-w-0 w-[30%]">
+                <RankingsPageUser row={r} size="md" linked={linked}>
+                  <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                    <VaultLevelBadge points={r.totalPoints} />
+                    {gapFrom !== undefined && !r.isMe && (
+                      <span className="text-[11px] text-text-secondary">
+                        {(r.points >= gapFrom ? T.rankings.ahead : T.rankings.behind).replace('{n}', Math.abs(r.points - gapFrom).toLocaleString(lang))}
+                      </span>
+                    )}
+                  </span>
                 </RankingsPageUser>
               </td>
-              <td className="px-3 py-2">
-                <VaultLevelBadge points={r.totalPoints} />
-              </td>
-              <td className="px-3 py-2 text-right font-bold tabular-nums whitespace-nowrap">
+              <td className="px-3 py-2 text-right font-extrabold tabular-nums whitespace-nowrap">
                 {r.isMe && approx && <span className="text-warning" title={T.rankings.fillApprox}>≈ </span>}
-                {r.points.toLocaleString(lang)}
-              </td>
-              <td className="px-3 py-2">
-                <RankingsPageStreak streak={r.streak} best={r.bestStreak} />
+                {r.points.toLocaleString(lang)} <span className="text-[10px] font-semibold text-text-secondary">{T.rankings.vp}</span>
               </td>
               <td className="px-3 py-2 hidden lg:table-cell">
                 <VaultPlatformSplit split={r.split} className="w-28" />
               </td>
               <td className="px-3 py-1.5 hidden lg:table-cell">
                 <VaultSparkline weeks={r.trend} />
+              </td>
+              <td className="px-3 py-2 border-l border-ink/[0.07]">
+                <RankingsPageStreak streak={r.streak} best={r.bestStreak} />
               </td>
               <td className="px-3 py-2 text-right tabular-nums hidden xl:table-cell">{r.completed.toLocaleString(lang)}</td>
               <td className="px-3 py-2 text-right tabular-nums hidden xl:table-cell">{r.achievements.toLocaleString(lang)}</td>

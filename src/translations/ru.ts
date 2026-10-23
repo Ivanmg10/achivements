@@ -1526,7 +1526,6 @@ export const ru: Translations = {
     colCompleted: 'На 100%',
     colAchievements: 'Достижения',
     colStreak: 'Серия',
-    streakBest: 'рекорд {n}',
     streakLabel: 'Текущая серия: {n} · самая длинная: {best}',
     sort: 'Сортировать',
     sortPoints: 'Очки',

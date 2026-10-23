@@ -1064,7 +1064,8 @@ requires `linked-issue` (see Issues).
   taken from what pre already has cached for real users; points come from the real formula. If
   pre loses those cached games (a reset from production, an unlink), games drop out of the seed
   (it warns). No RA (the dev server does not read RA's DB cache; a made-up RA name may be real).
-  PSN trophy lists only in English and Spanish.
+  PSN trophy lists only in English and Spanish. Their current streaks are set in `STREAKS` (`demo-personas.mjs`):
+  reseed to bring them up to today, since a streak ends two days after the seed.
 - Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
 
 ## Style

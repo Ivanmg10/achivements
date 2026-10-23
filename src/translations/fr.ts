@@ -1526,7 +1526,6 @@ export const fr: Translations = {
     colCompleted: 'À 100 %',
     colAchievements: 'Succès',
     colStreak: 'Série',
-    streakBest: 'record {n}',
     streakLabel: 'Série en cours : {n} · la plus longue : {best}',
     sort: 'Trier par',
     sortPoints: 'Points',

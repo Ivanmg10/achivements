@@ -1526,7 +1526,6 @@ export const ja: Translations = {
     colCompleted: '100%',
     colAchievements: '実績',
     colStreak: '連続',
-    streakBest: '最長 {n}',
     streakLabel: '現在の連続: {n} · 最長: {best}',
     sort: '並び替え',
     sortPoints: 'ポイント',

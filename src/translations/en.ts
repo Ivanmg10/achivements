@@ -1527,7 +1527,6 @@ export const en = {
     colCompleted: 'At 100%',
     colAchievements: 'Achievements',
     colStreak: 'Streak',
-    streakBest: 'best {n}',
     streakLabel: 'Current streak: {n} · longest: {best}',
     sort: 'Order by',
     sortPoints: 'Points',

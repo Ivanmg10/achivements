@@ -44,6 +44,13 @@ still decide the points column and who is in the list.
 **Open** — Checked on the dev server against pre (all three orders answer; the demo users have
 no current streak, their data is old). If the list grows large, store the streaks per user at refresh instead of reading every day.
 The Following page's rankings teaser still shows points only.
+**Then (same day, from the user's screenshot)** — The table's level moved under the name (as on phones),
+columns grouped as points (points · platforms · trend) then play (streak · 100 % · achievements);
+the streak cell is a pill ("12d", lit flame while it runs) with the record beside it (crown, gold while
+the current streak is the record). The demo users got varied current streaks (`STREAKS` in
+`scripts/demo-personas.mjs`, one unlock a day on the favourite game) and pre was reseeded; the
+streaks often come out longer than asked, joined by other recent unlocks, and two are shorter (a
+favourite with few achievements).
 **Watch out** — These streaks follow the score refresh (up to 6 h behind) and count UTC days, so
 they can differ by a day from the streak page, which reads the live feed.
 
