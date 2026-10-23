@@ -120,8 +120,6 @@ export const ru: Translations = {
     title: 'Pinned games',
     emptyTitle: 'Нет закреплённых игр',
     empty: 'Закрепляйте игры в разделе «Недавно сыгранные», чтобы следить за ними здесь',
-    viewRecentAria: 'View recently played',
-    viewPinnedAria: 'View pinned games',
     pinAria: 'Pin game',
     unpinAria: 'Unpin game',
     error: "Couldn't update pin, please try again",

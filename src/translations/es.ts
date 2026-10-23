@@ -120,8 +120,6 @@ export const es: Translations = {
     title: 'Juegos fijados',
     emptyTitle: 'Sin juegos fijados',
     empty: 'Fija juegos desde Jugados recientemente para seguirlos aquí',
-    viewRecentAria: 'Ver jugados recientemente',
-    viewPinnedAria: 'Ver juegos fijados',
     pinAria: 'Fijar juego',
     unpinAria: 'Quitar fijado',
     error: 'No se pudo actualizar el fijado, inténtalo de nuevo',

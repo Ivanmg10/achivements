@@ -29,6 +29,21 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-23 — The home's Recent / Pinned switch is its title, and entrance animations (`feat/60-home-view-tabs`, #60)
+
+**Did** — `MainViewToggle` no longer draws two 28 px icon buttons beside the title: it *is* the title,
+"Recently played" and "Pinned games" side by side as tabs (bold, bright and an accent underline that
+slides with `layoutId` for the selected one; pinned shows its count). Roving tabindex and arrow keys
+(focus survives the header remount through a module flag). `RARecentlyPlayed` and
+`MainPagePinnedGames` render it in place of their `<p>` title; another user's page keeps the plain
+title. Switching animates: the underline springs to the other tab, and each view has its own entrance when its list appears, after loading too (`ViewEntrance`, CSS keyframes in `ViewEntrance.module.css`): recently played rows run in from the left one after another (once; rows that mount later just appear), pinned tiles rise and settle; a fade with reduced motion. **CSS on purpose**: Framer's `x`/`y` run on the main thread and stuttered on the first load, which is busy mounting the whole home. The class is on from the first render, like the heatmap's cells, so the compositor plays it while the first load keeps the main thread busy. **Never hide the rows until a frame or idle time**: both were tried and the card showed empty for a moment after loading (the main thread is blocked then, rAF and idle callbacks wait). A CSS module, not `globals.css`: the dev server kept serving a stale `globals.css` after the change (2026-10-23). Tabs are `text-xl`. The back arrow beside the title with a game open is gone (the user's ask): the card's own chevron closes it. `T.pinnedGames.viewRecentAria`/`viewPinnedAria` removed (the tabs have visible text).
+The profile column (right) got an entrance too, on load and on each platform tab: its card's blocks come down into place one after another (`MainPageProfile.module.css`, `.enter > * > *` staggered by `nth-child`; the panel is keyed by tab). CSS for the same reason as the left card.
+**Why** — The user asked to improve the switch: icon-only, tiny, far from the title, selection by colour only.
+**Decisions** — Option A of the design canvas (`docs/designs.md`), chosen over B (a segmented pill).
+**Open** — Check it at 2560 px and on a phone (the tabs wrap). The same kind of entrances for every other page and component: #61 (added to the roadmap in CLAUDE.md).
+
+---
+
 ## 2026-10-23 — Streaks in the rankings, and ordering by them (`feat/58-rankings-streaks`, #58)
 
 **Did** — Each rankings row (table, phone list, podium, your zone) shows the current streak and the

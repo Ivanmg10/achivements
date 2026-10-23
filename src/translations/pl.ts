@@ -120,8 +120,6 @@ export const pl: Translations = {
     title: 'Pinned games',
     emptyTitle: 'Brak przypiętych gier',
     empty: 'Przypinaj gry w sekcji Ostatnio grane, by śledzić je tutaj',
-    viewRecentAria: 'View recently played',
-    viewPinnedAria: 'View pinned games',
     pinAria: 'Pin game',
     unpinAria: 'Unpin game',
     error: "Couldn't update pin, please try again",

@@ -17,6 +17,7 @@ import MainPageProfileSt from './main-page-profile-st/MainPageProfileSt'
 import MainPageProfilePsn from './main-page-profile-psn/MainPageProfilePsn'
 import MainPageProfileXbox from './main-page-profile-xbox/MainPageProfileXbox'
 import MainPageProfileTabs, { ProfileTab, profilePanelId, profileTabId } from './main-page-profile-tabs/MainPageProfileTabs'
+import styles from './MainPageProfile.module.css'
 
 const ID_PREFIX = 'main-profile'
 
@@ -70,7 +71,7 @@ export default function MainPageProfile() {
   if (linked.length <= 1) {
     return (
       <section className="main-content text-text-main m-3 rounded-xl flex flex-col items-center overflow-y-auto">
-        {profiles[tab]}
+        <div className={`w-full flex-1 min-h-0 flex flex-col items-center ${styles.enter}`}>{profiles[tab]}</div>
       </section>
     )
   }
@@ -84,11 +85,13 @@ export default function MainPageProfile() {
         onSelect={setTab}
         tabs={linked.map((p) => TABS[p])}
       />
+      {/* Keyed by tab, so each platform makes its entrance. */}
       <div
+        key={tab}
         role="tabpanel"
         id={profilePanelId(ID_PREFIX, tab)}
         aria-labelledby={profileTabId(ID_PREFIX, tab)}
-        className="w-full flex-1 min-h-0 flex flex-col"
+        className={`w-full flex-1 min-h-0 flex flex-col ${styles.enter}`}
       >
         {profiles[tab]}
       </div>
