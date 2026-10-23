@@ -932,7 +932,23 @@ Do not create, push, merge or delete branches or PRs unless the user asked.
 `<type>/<kebab-case-slug>`, English, short. Types are the same as commit types:
 `feat/`, `fix/`, `refactor/`, `perf/`, `test/`, `docs/`, `chore/`, `hotfix/`.
 e.g. `feat/steam-refresh-button`, `fix/psn-rate-limit`. (Old `feature/…`, `spike/…`
-branches stay as they are; new ones follow this.)
+branches stay as they are; new ones follow this.) With its issue's number in front of the
+slug (`feat/123-steam-refresh-button`), the PR links the issue on its own (see Issues).
+
+### Issues — every PR resolves one (2026-10-23)
+- **No PR without an issue.** Before opening a PR, find its issue or open one
+  (`gh issue create`, from the forms in `.github/ISSUE_TEMPLATE/`: Feature or Bug, in
+  English; blank issues are off). Name the branch `<type>/<issue>-<slug>`.
+- The PR's description starts with `## Issue` → `Closes #123` (the template has it). With
+  a numbered branch and no `Closes #`, CI writes it in.
+- **Enforced in CI**: `.github/workflows/pr-issue.yml` (check `linked-issue`) fails the PR
+  unless it names an open issue (not a PR) that exists. Skipped for releases (head
+  `develop`), merges of `main` into `develop` and PRs from `main`. Fix the description,
+  not the workflow.
+- **Issues close when their PR is merged into `develop`** (`issue-close.yml`), not when the
+  work reaches `main`: GitHub's own `Closes #` only works for PRs into the default branch.
+- The issues are collected on the repository's GitHub Project board (its built-in
+  auto-add and "closed → Done" workflows, set up on GitHub, not in the repo).
 
 ### Commits — Conventional Commits, in English
 `<type>(<scope>): <imperative summary>` — lowercase, no trailing period, ≤72 chars.
@@ -960,6 +976,9 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
 - **Description is always in English**, with this template:
 
   ```
+  ## Issue
+  Closes #<the issue it resolves>
+
   ## What
   <what changed, 1–3 bullets>
 
@@ -1000,7 +1019,9 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
 `develop` is served at `dev.cheevovault.com` (Vercel Preview, branch `develop`). `main` and
 `develop` are protected on GitHub (PR required, no force-push). A third ruleset,
 `pr description` (2026-10-14), requires the `pr-description` check to pass **and the
-branch to be up to date with its base** before merging, on both.
+branch to be up to date with its base** before merging, on both. `linked-issue` (see Issues)
+is to be added to it as a required check too (pending on GitHub, 2026-10-23: update this line
+once done).
 
 - **Before merging, bring the branch up to date**: `git fetch` and `git merge
   origin/develop` (or the "Update branch" button), push, wait for the checks again.
