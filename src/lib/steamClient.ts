@@ -31,6 +31,17 @@ export function getOwnedGames(steamId: string, apiKey: string) {
   )
 }
 
+/**
+ * Each game's achievement total and the player's unlocked ones, for many games
+ * in one call (192 in 0.6 s, measured 2026-10-22). With `max_achievements` at
+ * least the game's total, the list it returns is exactly the unlocked ones;
+ * unlock times are not included.
+ */
+export function getTopAchievementsForGames(steamId: string, apiKey: string, appIds: number[]) {
+  const input = JSON.stringify({ steamid: steamId, language: 'english', max_achievements: 10000, appids: appIds })
+  return fetchSteam(`${STEAM_API_BASE}/IPlayerService/GetTopAchievementsForGames/v1/?${qs({ key: apiKey, input_json: input })}`)
+}
+
 export function getRecentlyPlayedGames(steamId: string, apiKey: string, count = 20) {
   return fetchSteam(
     `${STEAM_API_BASE}/IPlayerService/GetRecentlyPlayedGames/v1/?${qs({ key: apiKey, steamid: steamId, count })}`,

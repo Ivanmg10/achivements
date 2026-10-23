@@ -352,8 +352,8 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   the address, then reset the password.
 - Admins can create users (for odd cases; sign-up is open), edit, delete, and
   link/unlink RA (checked against RA with the user's key) and Steam (checked to
-  exist through the Steam API). Neither proves ownership — users link Steam by
-  name too — so the log records who linked what.
+  exist through the Steam API). Neither proves ownership (users now link Steam
+  through Steam, which does), so the log records who linked what.
 - The privacy policy (`/privacy`) says all of this; `/terms` says when an
   account may be suspended or deleted. Change the policy if the panel changes.
 
@@ -542,6 +542,20 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
 - **Several components asking for the same GET share one request while it is in
   flight**: `fetchWithRetry` does it for you; for a raw `fetch` of a GET use
   `fetchShared`. A shared answer is shared by reference: copy before changing it.
+- **Steam's owned list is read through `loadOwnedGames`** (`src/lib/steamProgress.ts`, 5 min,
+  shared): never call `getOwnedGames` from a route. A home page used to download it five times
+  (2026-10-22). `scoreRefresh` keeps its own cache on purpose. "Recently played" is built from
+  its `rtime_last_played`, not from `GetRecentlyPlayedGames` (two weeks only).
+- **Steam library counts come in batches** (`fetchBatchCounts`, `GetTopAchievementsForGames`, 100
+  games a call; 192 in 0.6 s measured 2026-10-22): only finished games are read one by one, for
+  the date they were finished. The batch also answers for achievements Steam keeps private, so it
+  is trusted only after one per-game read agrees they are public (`batchCountsFor`). Keep that probe.
+- **Every Steam unlock read is kept** in `steam_unlocks` (`migrations/042_steam_unlocks.sql`,
+  applied to pre and production 2026-10-22; any other database needs it, though without it they
+  only log and nothing fails): `fetchPlayerAchievements` records them, so the score refresh (every played game)
+  fills it. The streak and activity read the `maxGames` played last live and the rest of the
+  window from the table, only for games the owned list still shows (a private profile shows none).
+  Unlinking Steam (user or admin) deletes the rows; `/privacy` says they are kept until then.
 - **Read routes that are expensive upstream send `cachedJson(data, ttl)`**
   (private, `Vary: Cookie`): the PSN and Xbox reads (5 min per game, 2 min for
   recent unlocks) as RA's and Steam's already did. Mutable data (groups, pins,
@@ -590,6 +604,11 @@ signed-in request fails).
   someone's game page banner, the friends leaderboard and shared games. A new place
   that shows other users must do the same. Never for your own picture.
 - `/privacy` says signed-in users who come across you see it; change it if that grows.
+- **"Now playing" on Steam** (2026-10-22, the user's ask): `/api/follows/playing` asks Steam, one
+  call per 100 accounts, cached a minute per viewer, for the people you follow who share their
+  presence and have a public profile; `useFriendsData` merges it after the overview (which stays
+  database-only, so cards never wait on Steam) and `PresenceLabel` shows it over "Online". Steam
+  only says it for a public Steam profile. `/privacy` says followers see it.
 
 ## Vault Points and the rankings (beta, 2026-10-20)
 
@@ -629,7 +648,9 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   counts only for the account linked now, never while flagged `suspect` (Steam unlock tool;
   admins review it in the panel, logged as `ranking-flag`). Xbox scores only for admins.
 - **No ownership verification, by the user's choice (2026-10-20)**: an account linked by two
-  users scores for both. The analysis of how to verify is in the plan, for later.
+  users scores for both. The analysis of how to verify is in the plan, for later. Since
+  2026-10-21 a user's Steam link is proven by Steam (one user per Steam account); PSN and
+  Xbox, typed, are still unproven.
 - **`/rankings` and `/rankings/how` are public** (`PUBLIC_PATHS` in the proxy, in the sitemap). Signed out: the
   global list only, no presence (the privacy policy promises it only to signed-in users).
   Responses never carry user ids and are never shared-cached.
@@ -707,7 +728,7 @@ A person must be able to tell "nothing here" from "I cannot read it" from "try l
 | | Unknown account | Private / unreadable | Credential refused | Busy |
 |---|---|---|---|---|
 | **RA** | RA says 401 for a bad key, for any username | n/a (profiles are public) | `raUnavailable()` → `403 ra-key-invalid`, not retried; `RaKeyInvalidNotice` | 429 waits `Retry-After`, then 503 (retried) |
-| **Steam** | link: `not-found`; ids that do not exist answer 400 | link: `403 private`; **after linking**, `{ response: {} }` → `ownedGames` answers `403 private` (not an empty library) and the list page says so | key is the app's | 503 |
+| **Steam** | link goes through Steam (no unknown account); ids that do not exist answer 400 | a private profile links; **after linking**, `{ response: {} }` → `ownedGames` answers `403 private` (not an empty library) and the list page says so | key is the app's | 503 |
 | **PSN** | link: not found | `psnFailure` → 403 | NPSSO expiry, admin panel | 429 + `Retry-After: 60` |
 | **Xbox** | `code: 404` in the body → `not-found` | no titles and no `achievementSummary` → `private` | app key: `503 unauthorized` | 429 |
 
@@ -750,6 +771,41 @@ pair is gone, and the public one leaked the secret into the browser bundle.
 `REGISTRATION_OPEN=false` closes sign-ups; unset means open. Sign-ups and reset
 requests are both limited per address in the database (`src/lib/attemptLimit.ts`).
 
+### Steam: sign up, sign in and link, all through Steam (2026-10-21)
+
+"Continue with Steam" under both forms (`SteamSignInDivider`), and "Connect Steam" on the
+Steam card (`UserSteamCardLink`, `/api/auth/steam?intent=link&next=…`). Steam's OpenID 2.0, all
+in `src/lib/steamLogin.ts`; `migrations/041_steam_login.sql` (`users.steam_login_id`,
+unique) was applied to pre (2026-10-21) and production (2026-10-22); any other database needs it first; nothing else
+reads that column, so the rest of the app works without it.
+
+- `/api/auth/steam` → Steam → `/api/auth/steam/callback`, which asks Steam to confirm
+  its own signature (`check_authentication`) and checks the claimed id, `return_to`
+  (built from `NEXTAUTH_URL`) and that those fields were signed. **Never trust the
+  callback's query without that round trip.**
+- **A random `state`** rides on `return_to` (signed by Steam) and in an httpOnly cookie on
+  the callback path; the callback does nothing unless they match. Without it, a callback link
+  made with someone else's Steam account could link it to your account, and then sign them in
+  as you. Keep it on both flows.
+- The proven SteamID64 travels as a signed ticket (HMAC with `NEXTAUTH_SECRET`,
+  10 minutes) in an httpOnly cookie on `Path=/api/auth`. The `steam` NextAuth
+  provider reads it from the Cookie header, never from the request body; so does
+  `POST /api/auth/steam/register`.
+- **Steam gives no email**, so the sign-up still asks for one (required, as always)
+  and for a username (suggested from the Steam name). The Steam name and
+  `avatarfull` are copied in, `steamid`/`steamusername` are linked, and the password
+  is random: the user signs in with Steam, and "forgot password" sets a real one.
+  Same `REGISTRATION_OPEN` and `signup` rate limit as the normal sign-up.
+- **Users link Steam only through Steam** (decided 2026-10-21; the typed link and
+  `/api/steam/link` are gone). A link sets `steamid`, `steamusername` and `steam_login_id`,
+  so it also signs in with Steam; one Steam account to one user (another user's proven link
+  answers `#steam-taken`). The outcome comes back as `#steam-linked|taken|failed` on the page
+  it started from (`/` or `/user`, `linkReturn`), toasted by `useSteamLink`.
+- `steam_login_id` is **separate from `steamid`**: links typed before 2026-10-21 (three, all
+  the user's test accounts) keep `steamid` with no `steam_login_id` and were left as they are,
+  by the user's choice; `steamid` stays not unique for them. Unlinking clears `steamid` only,
+  so sign-in with Steam keeps working. Admins still link by typing (logged).
+
 ## Git — branches, commits, PRs (MANDATORY for every session and agent)
 
 ### Environments and branches
@@ -770,7 +826,23 @@ Do not create, push, merge or delete branches or PRs unless the user asked.
 `<type>/<kebab-case-slug>`, English, short. Types are the same as commit types:
 `feat/`, `fix/`, `refactor/`, `perf/`, `test/`, `docs/`, `chore/`, `hotfix/`.
 e.g. `feat/steam-refresh-button`, `fix/psn-rate-limit`. (Old `feature/…`, `spike/…`
-branches stay as they are; new ones follow this.)
+branches stay as they are; new ones follow this.) With its issue's number in front of the
+slug (`feat/123-steam-refresh-button`), the PR links the issue on its own (see Issues).
+
+### Issues — every PR resolves one (2026-10-23)
+- **No PR without an issue.** Before opening a PR, find its issue or open one
+  (`gh issue create`, from the forms in `.github/ISSUE_TEMPLATE/`: Feature or Bug, in
+  English; blank issues are off). Name the branch `<type>/<issue>-<slug>`.
+- The PR's description starts with `## Issue` → `Closes #123` (the template has it). With
+  a numbered branch and no `Closes #`, CI writes it in.
+- **Enforced in CI**: `.github/workflows/pr-issue.yml` (check `linked-issue`) fails the PR
+  unless it names an open issue (not a PR) that exists. Skipped for releases (head
+  `develop`), merges of `main` into `develop` and PRs from `main`. Fix the description,
+  not the workflow.
+- **Issues close when their PR is merged into `develop`** (`issue-close.yml`), not when the
+  work reaches `main`: GitHub's own `Closes #` only works for PRs into the default branch.
+- The issues are collected on the repository's GitHub Project board (its built-in
+  auto-add and "closed → Done" workflows, set up on GitHub, not in the repo).
 
 ### Commits — Conventional Commits, in English
 `<type>(<scope>): <imperative summary>` — lowercase, no trailing period, ≤72 chars.
@@ -798,6 +870,9 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
 - **Description is always in English**, with this template:
 
   ```
+  ## Issue
+  Closes #<the issue it resolves>
+
   ## What
   <what changed, 1–3 bullets>
 
@@ -838,7 +913,9 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
 `develop` is served at `dev.cheevovault.com` (Vercel Preview, branch `develop`). `main` and
 `develop` are protected on GitHub (PR required, no force-push). A third ruleset,
 `pr description` (2026-10-14), requires the `pr-description` check to pass **and the
-branch to be up to date with its base** before merging, on both.
+branch to be up to date with its base** before merging, on both. `linked-issue` (see Issues)
+is to be added to it as a required check too (pending on GitHub, 2026-10-23: update this line
+once done).
 
 - **Before merging, bring the branch up to date**: `git fetch` and `git merge
   origin/develop` (or the "Update branch" button), push, wait for the checks again.
@@ -892,6 +969,8 @@ branch to be up to date with its base** before merging, on both.
       link or SteamID64 (`src/lib/steamAccount.ts`), no OpenID, and no
       "already linked elsewhere" check (`migrations/028`), so one person can
       have several CheevoVault accounts. The profile has to be public.
+      **Replaced 2026-10-21**: users now link Steam through Steam's sign-in (see
+      Registration → Steam); only admins still link by typing.
 - [ ] RA: wait for the API v2 with OAuth before changing how accounts are
       linked ([RAWeb releases](https://github.com/RetroAchievements/RAWeb/releases)).
       **RA's answer was clear: each user with their own key.** No shared app

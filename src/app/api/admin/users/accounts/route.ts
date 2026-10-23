@@ -4,6 +4,7 @@ import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
 import { fetchRaProfile, validRaCredentials } from '@/lib/raProfile'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { clearUserCache } from '@/lib/steamCache'
+import { forgetUnlocks } from '@/lib/steamUnlocks'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { readSteamId } from '@/lib/steamAccount'
 import { findPsnAccount, psnConfigured, psnFailure, psnSummary } from '@/lib/psnClient'
@@ -159,6 +160,7 @@ export async function DELETE(req: Request) {
     } else if (platform === 'steam') {
       await pool.query('UPDATE users SET steamid = NULL, steamusername = NULL WHERE id = $1', [target.id])
       await clearUserCache(String(target.id))
+      await forgetUnlocks(String(target.id))
     } else if (platform === 'psn') {
       await pool.query('UPDATE users SET psnaccountid = NULL, psnusername = NULL WHERE id = $1', [target.id])
       await clearUserCache(String(target.id))

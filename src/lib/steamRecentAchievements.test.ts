@@ -15,6 +15,7 @@ jest.mock('@/lib/steamClient', () => ({
 import { withSteamCache } from '@/lib/steamCache'
 import { getGlobalAchievementPercentages, getOwnedGames, getRecentlyPlayedGames, getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
 import { loadActivityAchievements, loadRecentAchievements } from './steamRecentAchievements'
+import pool from '@/lib/db'
 
 const AUTH = { id: '7', steamid: '765', apiKey: 'key' }
 
@@ -31,9 +32,9 @@ function schema(...names: string[]) {
 beforeEach(() => {
   jest.clearAllMocks()
   ;(withSteamCache as jest.Mock).mockImplementation(async (_k, _t, fetcher) => fetcher())
-  ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: { games: [
-    { appid: 1, name: 'Fallout 4', playtime_forever: 10 },
-    { appid: 2, name: 'Hades', playtime_forever: 10 },
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
+    { appid: 1, name: 'Fallout 4', playtime_forever: 10, rtime_last_played: 1700000200, has_community_visible_stats: true },
+    { appid: 2, name: 'Hades', playtime_forever: 10, rtime_last_played: 1700000100, has_community_visible_stats: true },
   ] } })
   ;(getPlayerAchievements as jest.Mock).mockImplementation(async (_s: string, _k: string, appId: number) => ({
     playerstats: {
@@ -84,9 +85,17 @@ test('caps the list and fetches schemas only for games that made it', async () =
   expect(getSchemaForGame).toHaveBeenCalledWith(1, 'key', 'spanish')
 })
 
-test('scans the ten most recent games', async () => {
+test('scans the ten games played last, however long ago, and only those with stats', async () => {
+  // Someone who stopped months ago: Steam's two-week list would be empty.
+  const games = Array.from({ length: 12 }, (_, i) => ({
+    appid: 100 + i, playtime_forever: 1, rtime_last_played: 1600000000 + i, has_community_visible_stats: i !== 11,
+  }))
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games } })
   await loadRecentAchievements(AUTH, 'english')
-  expect(getRecentlyPlayedGames).toHaveBeenCalledWith('765', 'key', 10)
+
+  const scanned = (getPlayerAchievements as jest.Mock).mock.calls.map((c) => c[2]).sort()
+  expect(scanned).toEqual([101, 102, 103, 104, 105, 106, 107, 108, 109, 110])
+  expect(getRecentlyPlayedGames).not.toHaveBeenCalled()
 })
 
 test('skips a game whose unlocks fail instead of failing the list', async () => {
@@ -106,13 +115,13 @@ test('falls back to the api name when a schema cannot be loaded', async () => {
 })
 
 test('names a game without a title by its app id', async () => {
-  ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: { games: [{ appid: 1, playtime_forever: 1 }] } })
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [{ appid: 1, playtime_forever: 1, rtime_last_played: 1, has_community_visible_stats: true }] } })
   const [first] = await loadRecentAchievements(AUTH, 'english')
   expect(first.gameTitle).toBe('App 1')
 })
 
-test('returns nothing when nothing was played recently', async () => {
-  ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: {} })
+test('returns nothing when nothing was ever played', async () => {
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: {} })
   await expect(loadRecentAchievements(AUTH, 'english')).resolves.toEqual([])
 })
 
@@ -153,5 +162,23 @@ describe('loadActivityAchievements', () => {
   test('is empty when the library cannot be read as expected', async () => {
     ;(getOwnedGames as jest.Mock).mockResolvedValue({})
     expect(await loadActivityAchievements(AUTH, 'english', 60, NOW_MS)).toEqual([])
+  })
+
+  test('past the cap, games come from the kept unlocks instead of being lost', async () => {
+    // maxGames = 1: Hades (played last) is read now; Fallout 4 is not, its unlocks were kept.
+    ;(pool.query as jest.Mock).mockResolvedValue({ rows: [{ appid: 1, apiname: 'NEWEST', at: String(90 * DAY) }] })
+
+    const list = await loadActivityAchievements(AUTH, 'english', 60, NOW_MS, 1)
+
+    expect((getPlayerAchievements as jest.Mock).mock.calls.map(([, , appId]) => appId)).toEqual([2])
+    expect(list.map((a) => [a.gameTitle, a.apiname])).toEqual([['Fallout 4', 'NEWEST'], ['Hades', 'MIDDLE']])
+    const read = (pool.query as jest.Mock).mock.calls.find(([sql]) => String(sql).includes('FROM steam_unlocks'))
+    expect(read[1]).toEqual(['7', '765', [1], 40 * DAY])
+  })
+
+  test('every read keeps its dated unlocks', async () => {
+    await loadActivityAchievements(AUTH, 'english', 60, NOW_MS)
+    const writes = (pool.query as jest.Mock).mock.calls.filter(([sql]) => String(sql).includes('INSERT INTO steam_unlocks'))
+    expect(writes.map(([, params]) => [params[2], params[3]])).toEqual(expect.arrayContaining([[1, ['OLD', 'NEWEST']], [2, ['MIDDLE']]]))
   })
 })

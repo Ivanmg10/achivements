@@ -1,0 +1,23 @@
+name: Bug
+description: Something that does not work as it should
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reproduce
+      description: Steps, the page, the platform (RA, Steam, PSN), the environment (dev or www).
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Screenshots, logs, the version (footer or src/lib/version.ts).

@@ -7,6 +7,8 @@ export type UserSearchResult = {
   online?: boolean
   /** When last seen, rounded to 5 minutes; null if never, or not shared. */
   lastSeenAt?: string | null
+  /** The Steam game they are in right now (people you follow only, /api/follows/playing). */
+  playing?: string | null
   avatar: string | null
   /** Country code. */
   location?: string | null
