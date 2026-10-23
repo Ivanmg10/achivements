@@ -20,7 +20,7 @@ page (src/app/(main)/…)            client component
 - **Auth gate**: `src/proxy.ts` (Next 16's middleware) sends anyone without a
   session to `/authPage`, except the public paths listed in it and anything
   under `/compare/` and `/track/` (the public pages). API routes check for
-  themselves.
+  themselves. `/welcome` is signed-in only, like the rest.
 - **Session**: NextAuth JWT, rebuilt from the `users` row on every read
   (`src/lib/authOptions.ts` + `src/lib/userRecord.ts`). Server code that needs
   the RA key uses `getServerSession(authOptions)`; the browser never sees it.
@@ -39,7 +39,7 @@ page (src/app/(main)/…)            client component
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
 | Rankings | `rankings` (public), `rankings/me`, `rankings/fill`, `admin/rankings` | Read stored scores; `fill` runs a pass. See Vault Points below |
-| Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | |
+| Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | `auth/ra/check`: an RA key checked before signing up with it (signed out, rate limited) |
 | Admin | `admin/*` | Every one starts with `requireAdmin(req)` |
 | Cron | `cron/sweepCache` (04:00), `cron/scores` (05:00), `cron/psnToken` (09:00) | Scheduled in `vercel.json`, need `CRON_SECRET` |
 
@@ -135,6 +135,22 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   `PresenceLabel` draw it.
 - **Themes**: `THEMES` in `src/types/types.ts`, CSS variables in
   `src/app/globals.css`, applied before paint by a script in `src/app/layout.tsx`.
+- **Language**: `LanguageContext` shows the saved choice (`app-language`, in storage and in a
+  cookie of the same name), else the first of `navigator.languages` the app has (`pickLanguage`,
+  `src/utils/languages.ts`), else English; the detected one is never saved. `(main)/layout.tsx`
+  renders in the request's language from the server (`serverLanguage`: the cookie, else
+  `Accept-Language`) through a `LanguageProvider initial`; static pages render English until
+  they hydrate.
+- **Welcome** (`/welcome`, `src/app/welcome/`, outside `(main)` so it has no app
+  header): `WelcomePage` and its steps in `src/components/welcome-page/`, the step
+  state in `useWelcomeSteps` (this tab's sessionStorage, `welcome-progress`, so Steam's
+  sign-in round trip lands back on its step). Linking reuses `useRaLink`, `useSteamLink`
+  (`next=/welcome` is an allowed return) and `usePsnLink`; the profile and preferences
+  reuse the account page's fields. The curtain is `welcome-curtain/WelcomeCurtain` (shared with
+  the sign-up forms, which start it: `useWelcomeEntry`). The rest of its motion is a CSS module (`WelcomePage.module.css`)
+  and its titles use the `font-display` face (Barlow Condensed, `display` in
+  `src/lib/fonts.ts`), loaded only there. Sign-up (`RegisterUserForm`, a new Steam
+  account in `useSteamSignup`) signs in and goes there.
 
 ## Tooling
 

@@ -29,6 +29,274 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-23 — Steam sign-up in the welcome, and the fill running there (`feat/welcome-onboarding`, committed locally, not pushed)
+
+**Did** — Ran the real flow on the dev server against pre (the Steam callback simulated with a
+ticket cookie signed with `NEXTAUTH_SECRET`; the test account was deleted after): a Steam sign-up
+already reached `/welcome` linked: the bar's Steam pill, the Steam step's "Connected", the profile
+step's avatar from Steam, and "Connected" in the done summary. Added: `VaultFillProvider` in
+`src/app/welcome/page.tsx`, so the Vault Points fill runs during the welcome; `VaultFillLine` in
+the linked view of the Steam, RA and PSN steps ("21 games counted", or a private profile and how
+to fix it); the Steam picture on the Steam step's card. New `WelcomePageSteam.test.tsx`.
+**Why** — The user asked to integrate Steam (sign-up) with the welcome. The linked state already
+worked by the code; what was missing was the picture and saying how the account is being read
+(the test account's achievements are private on Steam while its profile reads as public, which
+only the fill can tell).
+**Watch out** — On the dev server, editing files while the page is open fills the log with
+Turbopack HMR "Cell … no longer exists" panics: noise, not the code. The local `.env.local` Resend
+key answers 401, so no mail leaves from local runs.
+
+---
+
+## 2026-10-23 — Sign up with RetroAchievements (`feat/welcome-onboarding`, committed locally, not pushed)
+
+**Did** — "Create account with RetroAchievements" under the register form opens
+`RegisterUserFormRa`: RA username + Web API key, checked with `POST /api/auth/ra/check`
+(`useRaSignupCheck`; signed out, `ra-check` limit of 10 per 15 min per address, refuses a key in
+use), with the welcome's three key steps and RA's settings link in a fold. Checked, it shows the RA
+account, fills the username from RA's name (`suggestUsername`, now shared with Steam's sign-up)
+and a "change" / "sign up without RA" way out; the account button waits for the check.
+`POST /api/users` takes `ra`, asks RA again and inserts `rausername`, `raid`, `raUser` and RA's
+picture as avatar, then `onPlatformLinked`. Texts in nine languages; `/privacy` says it.
+**Why** — The user asked for an RA sign-up (option A of the proposal: more ways in) with the
+welcome's RA step showing "linked as", not skipped.
+**Decisions** — Measured 2026-10-23 against RA: any valid key reads any user's profile, and there
+is no "whose key is this" (no `u` → 422). So it is a sign-up only: the account still has an email
+and password, and there is no sign-in by RA key (keys get pasted into other tools). The RA
+username is as unproven as when linking later. The welcome's big key guide did not fit the auth
+card; its texts are reused in a `<details>`.
+**Open** — Try it on the preview with a real key. When RA ships OAuth, this can become a real
+"Continue with RetroAchievements". Still queued: Steam sign-up showing linked in the welcome
+(by the code it already does; check the real flow).
+
+---
+
+## 2026-10-23 — Welcome: browser back through the steps; the app's first paint in the person's language (`feat/welcome-onboarding`)
+
+**Did** — Each welcome move is a browser history entry (its step in `history.state`, spread over
+Next's own), so the browser's back and forward go through the steps under the curtain. The
+language: a pick is also kept in the `app-language` cookie; `serverLanguage()` (cookie, else
+`Accept-Language`, parsed by `parseAcceptLanguage`) feeds a `LanguageProvider initial` in
+`(main)/layout.tsx`, so the landing and the whole app paint in the right language from the first
+byte. `/privacy` (nine languages, dated 23 October 2026) lists the cookie; while there, its
+French, Italian and Polish "keeps you signed in" became gender-neutral. The welcome's first point
+says only Steam and PlayStation give hours played.
+**Why** — The three "later" items the user asked to handle.
+**Decisions** — Not in the root layout: `headers()` there would make every static page dynamic;
+`(main)` is dynamic already. The cookie holds only a person's pick, as storage does.
+**Watch out** — Spread `window.history.state` into any `pushState`/`replaceState`: Next's app
+router reloads the page on a popstate whose state lost its own keys.
+
+---
+
+## 2026-10-23 — Design register started, library as its own development, more languages on the roadmap (`feat/welcome-onboarding`)
+
+**Did** — `docs/ui-library-plan.md` became `docs/ui-library-and-designs-plan.md`, a separate
+development with two parts: the component library and a record of every design. `docs/designs.md`
+started, with the welcome's canvas as its first entry; `CLAUDE.md` and `docs/design-process.md`
+now require an entry for every design. "More languages" added to the roadmap with what a new one
+needs. The welcome plan says what is left of this development.
+**Why** — The user wants every Figma/canvas design to stay findable, the library done apart, and
+more languages in the future.
+**Decisions** — The register holds links, never copies (the designs are private to the user's
+account). The browser-language detection was checked: it is this branch's own (`c6ccf86`); the
+`happy-koala` worktree is another agent's (PSN docs, uncommitted) and was left untouched.
+**Open** — See `docs/welcome-plan.md` → "State on 2026-10-23".
+
+---
+
+## 2026-10-23 — How UI work is done, and the component library idea (`feat/welcome-onboarding`)
+
+**Did** — `docs/design-process.md` (idea → references → design canvas with several concepts →
+iterations → plan → build and fix from the user's screenshots, plus the lessons from the
+welcome); `docs/ui-library-and-designs-plan.md`, then `ui-library-plan.md` (an internal component library in the welcome's style:
+inventory of today's duplicates, the visual language, a first shape, how to migrate, open
+questions); both linked from `CLAUDE.md` (a section, and a roadmap item) and `docs/README.md`.
+**Why** — The user liked the welcome's style and the way it was reached, and wants future agents
+to work the same way and, in time, make the whole site homogeneous.
+**Open** — The library is not started: design it on a canvas and agree it with the user first.
+
+---
+
+## 2026-10-22 — Welcome: done-step row overlap, language select arrow (`feat/welcome-onboarding`)
+
+**Did** — In "Done", a long platform name ("RetroAchievements") truncates and its button no
+longer shrinks into it; the Preferences language select draws its own chevron with room
+(`appearance-none`, `pr-11`) instead of the browser's, which sat against the edge.
+**Why** — Two visual bugs the user found trying it.
+
+---
+
+## 2026-10-22 — Welcome intro: shorter cards, a close button on the opened point (`feat/welcome-onboarding`)
+
+**Did** — The intro's cards show only their number and title (their line moved to the opened
+point); the opened point has a ✕ in its corner, besides Back and Escape.
+**Why** — The user's ask: cards less tall, and a clear way to close what opens.
+
+---
+
+## 2026-10-22 — Welcome intro: points open over the whole step, with sketches (`feat/welcome-onboarding`)
+
+**Did** — A point's card now grows (Framer `layoutId`) into a panel over the whole step
+(`WelcomePageIntroDetail`): number and title, the full explanation, three highlights, a drawn
+sketch (`WelcomePageIntroArt`: library, pins/groups/showcase, streak map, level and ranking,
+friends online), arrows through the points, back/Escape (the card takes the focus again), and
+Start. Texts in nine languages. Big-screen scaling changed from CSS `zoom` to the root font size.
+**Why** — The user wanted an opened card to take the whole component, to explain better with
+images. `zoom` would have thrown the card-to-panel animation off.
+**Decisions** — Drawn sketches in the theme's colours, not screenshots (none in the repo; they
+would go stale and show someone's data); any can be swapped for an image later. Text sizes in
+the welcome are rem so the scaling reaches them.
+
+---
+
+## 2026-10-22 — Welcome intro: thanks, and points that open (`feat/welcome-onboarding`)
+
+**Did** — The intro's text now starts by thanking the person for choosing CheevoVault; each of
+its five points opens (`WelcomePageIntroPerk`, one at a time) to explain it in a few sentences:
+the library, pins/groups/achievements to get/showcase, streak and stats, Vault Points and
+rankings, following. Nine languages, gender-neutral.
+**Why** — The user's ask.
+**Watch out** — Those details describe real features: when one changes (or a platform is added),
+update its line (CLAUDE.md → Welcome).
+
+---
+
+## 2026-10-22 — Welcome ready for more platforms; gender-neutral greetings (`feat/welcome-onboarding`)
+
+**Did** — `PLATFORM_STEPS` / `isPlatformStep` and `platformKicker` (the "n of total" count comes
+from the list, no longer a "3" in nine translations); CLAUDE.md lists what a new platform must
+touch in the welcome. Greetings made gender-neutral: the welcome's title ("Esta es tu bóveda",
+"Este é o seu cofre", "Questa è la tua cassaforte"), its giant word and the first step's name in the bar ("Inicio", "Início", "Inizio", the user's pick: "Bienvenida" still read as clashing with the title), a
+Polish line, and the app's "Bienvenido/Bem-vindo/Benvenuto + name" → "Hola/Olá/Ciao".
+**Why** — The user will add platforms and wants the welcome to always include them (and to
+follow changes to the site); they noticed "Bienvenida" in the bar against "Bienvenido" below.
+**Decisions** — Two standing rules in CLAUDE.md: the welcome follows every new platform and
+feature; texts never assume the reader's gender.
+
+---
+
+## 2026-10-22 — Welcome curtain, smoother (`feat/welcome-onboarding`)
+
+**Did** — The curtain glides in over 26 % of its 2.2 s easing out and leaves over the last 26 %
+easing in (was 18 % each, one sharp curve); what rides on it (nodes, line) fades in and out with
+it; the band travels with an ease-in-out; the new step's content waits for the curtain to start
+leaving (`--enter-delay`, set by `WelcomePageStep`) instead of finishing hidden under it.
+**Why** — The user found the animation abrupt ("de golpe").
+**Decisions** — Same total length (2.2 s) and same swap point (50 %), so the sign-up hand-off
+and the hook's timers did not change; only the curves inside.
+
+---
+
+## 2026-10-22 — Welcome curtain on <body>, not inside the sign-up card (`feat/welcome-onboarding`)
+
+**Did** — `WelcomeCurtain` renders through a portal into `<body>`; `underBar` keeps the
+between-steps curtain under the welcome's bar (z-20), the one from sign-up covers all (z-50).
+**Why** — On sign-up the curtain showed inside the form card: the card's `backdrop-filter`
+(like any `transform`) makes `position: fixed` relative to it.
+**Watch out** — Anything meant to cover the screen from inside a card or an animated box needs
+a portal (as `CommonModal` already does).
+
+---
+
+## 2026-10-22 — Welcome: bigger on big screens, slower curtain, a way in from sign-up, new avatar modal (`feat/welcome-onboarding`)
+
+**Did** — After the user tried `/welcome` on a 2560 px screen: content and bar scaled with CSS
+`zoom` on 2xl and ≥2200 px; curtain 2.2 s (was 1.1 s); the same curtain now runs from the
+sign-up page into the welcome (`WelcomeCurtain` shared, `useWelcomeEntry`/`useWelcomeArrival`);
+a new `AvatarModal` (big preview, pick or drop, link folded away) for the account page and the
+welcome, `AvatarUpload` turned into `useAvatarUpload`, the avatar taken out of `EditProfileModal`.
+**Why** — The user's four points: text tiny on 2K, change too fast, no feedback between sign-up
+and welcome, the avatar modal (a URL plus "confirm URL", the current address in mono) was poor.
+**Decisions** — `zoom` over per-element sizes (keeps the design's proportions; supported in all
+current browsers). The sign-up side holds the curtain once covered (`holdAtMs`), so a slow
+route load never shows the old page; the welcome restarts it at the same point with a negative
+`animation-delay`. No "confirm" field for an avatar link: the preview is the check.
+**Open** — Same as before: browser back between steps, first paint in the detected language.
+
+---
+
+## 2026-10-22 — Welcome after sign-up, first integration, and the browser's language (`feat/welcome-onboarding`)
+
+**Did** — `/welcome` built from design v4: seven steps (intro, RA with the key guide, Steam,
+PSN, profile, preferences, done) under the app-styled top bar, the Inazuma-style curtain
+between them, back on every step, skip everywhere. Sign-up now signs in and goes there (form
+and new Steam accounts). The language is taken from the browser (`navigator.languages`) until
+the person picks one. `useRaLink` and `useThemeChoice` pulled out of their modals so the
+welcome reuses them. Texts in all nine languages; tests for every new hook and component.
+Also fixed two visual bugs the user found in the prototype (a long description overflowing
+its preview, theme names wrapping).
+**Why** — The user wants new accounts to link platforms right away instead of meeting the
+login form again and then an empty `ConnectAccounts`.
+**Decisions** — No app header in the welcome (its own bar only), by the user's choice: the
+route is `src/app/welcome/`, outside `(main)`. Step kept in sessionStorage, not the URL hash,
+because Steam's callback answers with its own `#steam-…`. Detected language never saved; no
+server-side `Accept-Language` (would make the root layout dynamic). Theme picks in the
+welcome do not toast (the change is visible; a failure is said in place).
+**Open** — Browser back between steps; the first paint in the detected language. Not
+checked in a browser with a real account yet (needs signing up on pre).
+**Watch out** — `LanguageContext` no longer defaults to English for everyone: tests that
+expect English get it because jsdom's `navigator.languages` is `en-US`.
+
+---
+
+## 2026-10-22 — Welcome v4: top bar in our style, RA guide page, browser language (`feat/welcome-onboarding`)
+
+**Did** — No code. v4 on the canvas (desktop, mobile, a notes board) and the plan updated:
+v4 is the design to build.
+**Why** — The user found flaws in v3, still did not like the side rail (wants a top bar as in
+E, styled like the app), wants RA's step to be a page explaining how to get the key, and wants
+the language taken from the browser when possible.
+**Decisions** — The bar is `MainHeader`'s floating bar with the steps as its nav pills and a
+2 px progress line. RA: the form beside an animated three-step guide, not the modal. Language:
+saved choice, else `navigator.languages`, else English; detection never saved as a choice;
+`Accept-Language` on the server for the first render. Found: today the app starts in English
+for everyone until they pick (`LanguageContext`).
+**Open** — The header question; whether language detection ships first on its own.
+
+---
+
+## 2026-10-22 — Welcome v3: E as it was, with the side rail (`feat/welcome-onboarding`)
+
+**Did** — No code. v3 on the canvas (desktop and mobile prototypes) and the plan updated: it is
+now the design to build.
+**Why** — The user clarified that they liked E's look and animation as they were and only
+wanted its top step bar replaced; v2 had restyled everything.
+**Decisions** — Keep E entire (full-screen curtain, Barlow italic, giant word, preview cards);
+take from v2 only the side rail, back on every step, the profile and preferences steps, and no
+achievements.
+**Open** — The header question and RA inline vs modal (see the plan).
+
+---
+
+## 2026-10-22 — Welcome v2: back, profile and preferences, the app's own step bar (`feat/welcome-onboarding`)
+
+**Did** — No code. v2 of the welcome on the design canvas (style audit and three step-bar
+options, the 7 steps and what each saves, the prototype, mobile, updated motion spec) and
+`docs/welcome-plan.md` rewritten around it.
+**Why** — The user liked concept E and asked for: back on every step, profile and preferences
+in the welcome, a step bar that matches the app (v1's did not), and no achievements for now.
+**Decisions** — A side rail of steps like the account page's Preferences rows (tabs did not fit
+7 steps; pills looked like a second header). Platforms before profile/preferences so the games
+are read meanwhile. Back mirrors the curtain. CheevoVault's own achievements: a future idea,
+written down in the plan, not in the welcome.
+**Open** — The header question and RA inline vs modal (see the plan); then build it.
+
+---
+
+## 2026-10-22 — Welcome after sign-up: design exploration (`feat/welcome-onboarding`)
+
+**Did** — No code. A design canvas with clickable prototypes (four concepts, a recommended
+mix, the RA step, mobile and a motion spec) and `docs/welcome-plan.md`: the reference
+analysed frame by frame, and how the welcome would be built.
+**Why** — The user wants a welcome after sign-up that explains the site and walks through
+linking each platform with animations, instead of sending people back to the login form and
+then to `ConnectAccounts`; the reference is Inazuma Eleven: Victory Road's day change.
+**Decisions** — Prototypes in a design canvas, not Figma: the Figma connector was not
+authorised in this session. Recommended concept E (A's curtain between steps + B's unlock on
+link). No Xbox in the welcome (admin-only). Branch cut from `feat/steam-sign-in` (PR #46, not
+merged), as the user asked; nothing pushed.
+**Open** — The user picks a concept; then build it as the plan says.
 ## 2026-10-20 — A profile's public card and link preview (`feat/profile-og-image`)
 
 **Did** — Signed out, `/user/<name>` shows a card (`ProfileTeaser`: picture or initial, level,

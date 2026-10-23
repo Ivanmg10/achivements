@@ -12,9 +12,14 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
 ## What it does
 
 - **Accounts** — open sign-up (username, password, required email) or with
-  Steam (Steam sign-in, then a username and email; Steam linked at once), password
+  Steam (Steam sign-in, then a username and email; Steam linked at once) or with
+  RetroAchievements (its username and Web API key; RA linked at once, name and picture filled in), password
   recovery and a soft email verification by mail, account deletion. Admin panel
   behind a second password check, with every action logged.
+- **Welcome** — after signing up, `/welcome` walks a new account through what the
+  app does, linking RetroAchievements (with a guide to finding the key), Steam and
+  PlayStation, the profile and the preferences, one step at a time; every step can
+  be skipped or gone back to.
 - **Three platforms, linked by the user**
   - *RetroAchievements* — with the user's own Web API key (never a shared one).
   - *Steam* — by signing in on Steam (proves the account is yours; game details must be public).
@@ -41,7 +46,8 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
   how-tos at `/compare/*` and `/track/*`, plus a FAQ on the landing, for
   visitors and for what search engines and chat AIs read.
 - **Personalization** — 25 themes (`THEMES` in `src/types/types.ts`), 9 UI
-  languages (en, es, de, fr, it, ja, pl, pt, ru), country with flag.
+  languages (en, es, de, fr, it, ja, pl, pt, ru), taken from the browser until
+  the user picks one, country with flag.
 
 ## Stack
 

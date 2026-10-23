@@ -104,6 +104,99 @@ Steam"); the landing has a FAQ for the same reason. Added 2026-10-17.
 - The `FAQPage` JSON-LD (pages and landing) is built from the same English items
   the server renders; keep them one list so the markup matches what is shown.
 
+## How UI work is done — idea → design → iterations → development (2026-10-23)
+
+**Every new page, section or visual rework follows `docs/design-process.md`**, the way the
+welcome was made (the user's standing preference): study the reference, several clickable
+concepts on a design canvas (Figma when its connector is authorised), iterate with the user one
+version at a time (changing only what they asked), a plan doc, then build and fix in short rounds
+from their screenshots (they use a 2560 px screen). The welcome's visual language (display
+italic titles, kickers, floating pill bar, curtain, cards that grow into their detail) is the
+one the user likes; an internal component library to make the whole site match it is an idea
+written up in `docs/ui-library-and-designs-plan.md` (a separate development, not started: design
+it first, then ask). **Every design made (Figma or canvas) gets an entry in `docs/designs.md`**
+with its link, versions and what was built, so it can always be found again.
+
+## Welcome after sign-up (`/welcome`, 2026-10-22)
+
+A new account (form, form with RetroAchievements, or Steam) is signed in and sent to `/welcome`, not to the login form:
+intro, RetroAchievements, Steam, PlayStation, profile, preferences, done. Design and the
+reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there).
+
+- **Never blocks.** Every step has "Not now" / "Skip this step", "Skip all" is always in
+  the bar, and back works on every step, the browser's back and forward too (each move is a
+  history entry, its step in `history.state` under Next's own state, which must be spread in,
+  never replaced). Do not add a required step.
+- **No Xbox** in it while Xbox is admin-only (a new account is not an admin).
+- **No app header** until the person leaves it: it lives in `src/app/welcome/`, outside
+  `(main)`, on purpose (the user's call).
+- **Linking reuses the account page's logic** (`useRaLink`, `useSteamLink`, `usePsnLink`);
+  do not add a second way to link. RA's step is a page of its own with the guide to the
+  Web API key, not the modal.
+- **No achievements** for linking (no unlock toasts, no "first achievement"): CheevoVault's
+  own achievements are a future idea, written down in the plan. Linking toasts the usual
+  `notify.success`.
+- The curtain between steps is decorative (`aria-hidden`); with reduced motion it is not
+  shown at all. The bar's pills say each step's state in words. It lasts 2.2 s
+  (`CURTAIN_MS`; 1.1 s felt rushed to the user) and also carries a new account in from
+  sign-up: the sign-up page plays it until covered and holds, the welcome finishes it
+  (`useWelcomeEntry` / `useWelcomeArrival`, flag `welcome-entry` in sessionStorage).
+- On big screens the welcome is scaled as a whole by raising the root font size while it is
+  open (120 % from 1536 px, 140 % from 2200 px; a 2560 px screen showed it tiny). So **sizes in
+  it are in rem** (`text-[0.8125rem]`, not `text-[13px]`). **Never CSS `zoom`**: it throws Framer
+  Motion's layout animations off (the intro's cards grow into their detail with `layoutId`).
+- The avatar is edited in `AvatarModal` (account page and welcome), not `EditProfileModal`,
+  which is only for the username and email now.
+- **The Vault Points fill runs in the welcome** (`VaultFillProvider` in `src/app/welcome/page.tsx`,
+  since the app's providers are not mounted there): an account that came linked (signed up with
+  Steam or RetroAchievements) or links a platform on the way is read while the person goes
+  through the steps, so "your games are on their way" is true. Each linked platform step shows
+  its `VaultFillLine` (games counted, or why not: a private profile and how to fix it), and the
+  Steam card shows the Steam picture (`useSteamProfile`). Checked end to end 2026-10-23 with a
+  Steam sign-up: linked in the bar, the step, the profile's avatar and the done summary.
+
+### The welcome follows the app — keep it current (the user's standing rule, 2026-10-22)
+
+More platforms will come. **Every platform a user can link must have its step in the welcome**,
+in the same change that makes it available to users (Xbox included, the day `XBOX_ADMIN_ONLY`
+turns false). A new platform touches:
+- `PLATFORM_STEPS` and `WELCOME_STEPS` (`src/hooks/useWelcomeSteps.ts`): its place in the order.
+  The "Platforms · n of total" count follows on its own.
+- Its step component in `src/components/welcome-page/welcome-page-<platform>/`, linking with the
+  platform's own hook (as RA, Steam and PSN do), with its `VaultFillLine` when linked, and its tests.
+- `STEP_SKY` (`welcomeArt.ts`), its mark in `welcomeNodes.tsx` (curtain) and in the bar's
+  `PLATFORM_MARK`, its row in `WelcomePageDone`, and its session field in `WelcomePage`'s `linked`.
+- `T.welcome.steps` / `words` and its own texts, in all nine languages; the intro's first perk
+  ("RetroAchievements, Steam and PlayStation together") names the platforms.
+- `LINK_RETURNS` (`src/lib/steamLogin.ts`) if it links through a round trip, like Steam.
+
+The same goes for the rest of the site: **when a change adds or renames a feature, a profile
+field or a preference, check whether the welcome shows it** (intro perks, the profile and
+preferences steps, the done summary) and update it in the same change. The intro's five
+points open over the whole step (`WelcomePageIntroDetail`: `detail`, `highlights` and a drawn
+sketch per point in `WelcomePageIntroArt`): keep their text and sketches true to the features.
+
+## Language — the browser's until the person picks one (2026-10-22)
+
+`LanguageContext`: the saved choice, else the first of `navigator.languages` the app has
+(`pickLanguage` in `src/utils/languages.ts`: `es-MX` → es), else English. **The detected
+language is never saved**: only a person's pick is (`setLang`), so a browser that changes
+its language changes the app. `fromBrowser` says when the language shown is the detected one
+(the welcome says so). The language list with native names is `LANGUAGES` there; do not keep another.
+
+- **The first paint is already in the person's language on the app's pages (2026-10-23).** A
+  pick is also written to the `app-language` cookie (a year, `languageCookie`; a choice saved
+  before the cookie existed is copied into it). `(main)/layout.tsx`, which is dynamic anyway (it
+  reads the session), calls `serverLanguage()` (`src/lib/serverLanguage.ts`: the cookie, else
+  `Accept-Language`) and wraps the page in a `LanguageProvider initial={…}`, which renders that
+  language on the server and while hydrating, so they match. That covers the landing and the
+  whole signed-in app.
+- **Do not call `serverLanguage()` (or `headers()`/`cookies()`) in the root layout**: it would
+  make every page dynamic, the static ones too (`/privacy`, `/terms`, `/compare`, `/track`,
+  `/authPage`, `/welcome`). Those still paint English until they hydrate; reached by a client
+  navigation (the usual way) they are already in the right language.
+- `/privacy` lists the cookie among the necessary ones, in all nine languages.
+
 ## Progress bars — in the theme's colours
 
 Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or
@@ -184,6 +277,10 @@ Mobile-first. Tailwind sm/md/lg prefixes. No fixed widths that break mobile.
 
 ### 3. i18n
 - All user-facing strings via `T.*` from `useLanguage()` hook
+- **Gender-neutral wording** in every language: nothing that assumes the reader's gender
+  ("Bienvenido", "Bem-vindo", "Benvenuto", a Polish "zostawiłeś"…). Say "Hola", "Esta es tu
+  bóveda", or rephrase (the user's rule, 2026-10-22). The opt-in gender is for others' profiles,
+  not for addressing the reader.
 - New strings → add to both `src/translations/en.ts` and `src/translations/es.ts`
 - Admin panel exempt
 
@@ -771,6 +868,22 @@ pair is gone, and the public one leaked the secret into the browser bundle.
 `REGISTRATION_OPEN=false` closes sign-ups; unset means open. Sign-ups and reset
 requests are both limited per address in the database (`src/lib/attemptLimit.ts`).
 
+### Sign up with RetroAchievements (2026-10-23)
+
+"Create account with RetroAchievements" under the register form (`RegisterUserFormRa`): the RA
+username and Web API key are checked first (`POST /api/auth/ra/check`, signed out, limited per
+address as `ra-check`, refuses a key already in use), RA's name fills the username (unless one was
+typed, `suggestUsername`) and its picture becomes the avatar; then `POST /api/users` with `ra`
+asks RA again and creates the account already linked, as `/api/updateRaUser` would store it. The
+welcome's RA step then shows "linked as" (the user's choice: shown, not skipped).
+
+- **It is a sign-up, never a sign-in.** Measured 2026-10-23: a valid RA key reads *any* user's
+  profile and RA has no "whose key is this" call (no `u` → 422), so a key proves owning an RA
+  account, not which one, and people paste their key into other tools. **Do not add "sign in with
+  RA" by key.** The account still gets an email and a password. Revisit when RA ships OAuth (see
+  the roadmap): that is when it can become a "Continue with RetroAchievements" like Steam's.
+- The RA username is as unproven as when linking from the account page; `raid` stays unique.
+
 ### Steam: sign up, sign in and link, all through Steam (2026-10-21)
 
 "Continue with Steam" under both forms (`SteamSignInDivider`), and "Connect Steam" on the
@@ -800,7 +913,7 @@ reads that column, so the rest of the app works without it.
   `/api/steam/link` are gone). A link sets `steamid`, `steamusername` and `steam_login_id`,
   so it also signs in with Steam; one Steam account to one user (another user's proven link
   answers `#steam-taken`). The outcome comes back as `#steam-linked|taken|failed` on the page
-  it started from (`/` or `/user`, `linkReturn`), toasted by `useSteamLink`.
+  it started from (`/`, `/user` or `/welcome`, `linkReturn`), toasted by `useSteamLink`.
 - `steam_login_id` is **separate from `steamid`**: links typed before 2026-10-21 (three, all
   the user's test accounts) keep `steamid` with no `steam_login_id` and were left as they are,
   by the user's choice; `steamid` stays not unique for them. Unlinking clears `steamid` only,
@@ -959,6 +1072,17 @@ requires `linked-issue` (see Issues).
 - [x] Steam integration
 - [x] Public user profiles
 - [ ] Group hardcore achievement tracking
+- [ ] **An internal component library** (buttons, inputs, selects, switches, modals, pills,
+      steps bar, curtain) in the welcome's style, for the whole site, **and a record of every
+      design** (`docs/designs.md`, started): `docs/ui-library-and-designs-plan.md`. A separate
+      development, the user's idea (2026-10-23); design the library on a canvas and agree it first.
+- [ ] **More languages** (the user's wish, 2026-10-23). Today nine (`LANGUAGES` in
+      `src/utils/languages.ts`); the browser's language is taken when it is one of them, so a new
+      language reaches its speakers on its own. A new one needs: its `src/translations/<lang>.ts`
+      (typed as `Translations`, every key), its entry in `LANGUAGES` and in `LanguageContext`'s
+      map, the texts kept outside `T` (`vaultGuide.ts`, `vaultGuideMore.ts`; the public pages fall
+      back to English), plural rules if it has its own (`T.plurals`), and gender-neutral wording.
+      Not started; ask which languages first.
 - [ ] Notifications — **an idea the user wants to expand before it is built; do not
       start it, and do not assume it is push or email.** Ask what they have in mind
       first. Known so far: friends completing games and a game's last chance (a

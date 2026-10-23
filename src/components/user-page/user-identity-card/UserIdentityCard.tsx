@@ -25,6 +25,7 @@ import { codeToFlag, findCountry } from '@/utils/countries'
 // Modals are downloaded the first time they are wanted, not with the page — the admin panel above all.
 const AdminPanelModal = dynamic(() => import('@/components/admin-panel/admin-panel-modal/AdminPanelModal'), { loading: () => null })
 const EditProfileModal = dynamic(() => import('@/components/edit-profile-modal/EditProfileModal'), { loading: () => null })
+const AvatarModal = dynamic(() => import('@/components/avatar-modal/AvatarModal'), { loading: () => null })
 const ChangePasswordModal = dynamic(() => import('@/components/change-password-modal/ChangePasswordModal'), { loading: () => null })
 const LocationModal = dynamic(() => import('@/components/location-modal/LocationModal'), { loading: () => null })
 
@@ -46,6 +47,7 @@ export default function UserIdentityCard() {
   const [locationOpen, setLocationOpen] = useState(false)
   const [adminOpen, setAdminOpen] = useState(false)
   const [edit, setEdit] = useState<{ field: EditProfileField; value: string } | null>(null)
+  const [avatarOpen, setAvatarOpen] = useState(false)
 
   const user = session?.user
   const country = user?.location ? findCountry(user.location) : null
@@ -73,7 +75,7 @@ export default function UserIdentityCard() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-4 sm:gap-5 min-w-0">
           <button
-            onClick={() => setEdit({ field: 'avatar', value: user?.avatar ?? '' })}
+            onClick={() => setAvatarOpen(true)}
             aria-label={T.userPage.editAvatar}
             className="relative group shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
@@ -223,6 +225,9 @@ export default function UserIdentityCard() {
           onClose={() => setLocationOpen(false)}
           currentCode={user?.location}
         />
+      </LazyWhenOpened>
+      <LazyWhenOpened open={avatarOpen}>
+        <AvatarModal isOpen={avatarOpen} onClose={() => setAvatarOpen(false)} current={user?.avatar} />
       </LazyWhenOpened>
       {edit && (
         <EditProfileModal

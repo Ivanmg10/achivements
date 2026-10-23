@@ -58,6 +58,7 @@ test('what comes back is read from the return URL Steam signed', () => {
 test('a link only returns to the pages it starts from', () => {
   expect(linkReturn('/')).toBe('/')
   expect(linkReturn('/user')).toBe('/user')
+  expect(linkReturn('/welcome')).toBe('/welcome')
   expect(linkReturn('https://evil.example')).toBe('/user')
   expect(linkReturn('//evil.example')).toBe('/user')
   expect(linkReturn(null)).toBe('/user')

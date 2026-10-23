@@ -1,19 +1,8 @@
 'use client'
 
 import CommonModal from '../common-modal/CommonModal'
-import { useLanguage, Lang } from '@/context/LanguageContext'
-
-const LANGUAGES: { id: Lang; label: string; flag: string }[] = [
-  { id: 'en', label: 'English', flag: '🇬🇧' },
-  { id: 'es', label: 'Español', flag: '🇪🇸' },
-  { id: 'pt', label: 'Português', flag: '🇧🇷' },
-  { id: 'fr', label: 'Français', flag: '🇫🇷' },
-  { id: 'de', label: 'Deutsch', flag: '🇩🇪' },
-  { id: 'it', label: 'Italiano', flag: '🇮🇹' },
-  { id: 'ru', label: 'Русский', flag: '🇷🇺' },
-  { id: 'pl', label: 'Polski', flag: '🇵🇱' },
-  { id: 'ja', label: '日本語', flag: '🇯🇵' },
-]
+import { useLanguage } from '@/context/LanguageContext'
+import { LANGUAGES, type Lang } from '@/utils/languages'
 
 interface Props {
   isOpen: boolean

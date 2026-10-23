@@ -2,12 +2,18 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { signIn } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
 import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
-import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
+import WelcomeEntryCurtain from '@/components/welcome-entry-curtain/WelcomeEntryCurtain'
+import RegisterUserFormRa from '@/components/register-user-form/register-user-form-ra/RegisterUserFormRa'
+import RaLogo from '@/components/ra-logo/RaLogo'
+import { useWelcomeEntry } from '@/hooks/useWelcomeEntry'
+import type { RaSignupAccount } from '@/hooks/useRaSignupCheck'
+import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, suggestUsername, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 
 export default function RegisterUserForm({
   setIsLogin,
@@ -22,7 +28,12 @@ export default function RegisterUserForm({
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<{ username?: string; password?: string; email?: string }>({})
   const [submitting, setSubmitting] = useState(false)
+  // Signing up with RetroAchievements: the section is open, and the account it checked.
+  const [raOpen, setRaOpen] = useState(false)
+  const [raAccount, setRaAccount] = useState<RaSignupAccount | null>(null)
   const { T } = useLanguage()
+  const entry = useWelcomeEntry()
+  const [entering, setEntering] = useState(false)
 
   const usernameRule = T.registerForm.usernameRule
     .replace('{min}', String(USERNAME_MIN))
@@ -58,16 +69,36 @@ export default function RegisterUserForm({
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username.trim(), password, email: email.trim() }),
+        body: JSON.stringify({
+          username: username.trim(),
+          password,
+          email: email.trim(),
+          ...(raAccount ? { ra: { username: raAccount.username, apiKey: raAccount.apiKey } } : {}),
+        }),
       })
 
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        setError(data.error === 'email-taken' ? T.registerForm.emailTaken : data.error || T.registerForm.errorCreating)
+        const byCode: Record<string, string> = {
+          'email-taken': T.registerForm.emailTaken,
+          'key-in-use': T.raLoginModal.keyInUse,
+          'ra-invalid': T.raLoginModal.invalid,
+          'ra-unavailable': T.registerForm.raUnavailable,
+        }
+        setError(byCode[data.error] ?? (data.error || T.registerForm.errorCreating))
         setSubmitting(false)
         return
       }
 
+      // Signed in at once and on to the welcome; if that sign-in fails, the account
+      // exists all the same, so the login form says so and asks for it.
+      const signedIn = await signIn('credentials', { username: username.trim(), password, redirect: false }).catch(() => null)
+      if (signedIn?.ok) {
+        // Into the welcome under the curtain; the button stays busy until the page goes.
+        setEntering(true)
+        entry.go()
+        return
+      }
       setIsLogin(true)
       setIsRegister(true)
     } catch {
@@ -78,6 +109,7 @@ export default function RegisterUserForm({
 
   return (
     <div className="w-full max-w-sm mx-auto">
+      {entering && entry.animate && <WelcomeEntryCurtain phase="leaving" />}
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-text-main">{T.registerForm.title}</h1>
         <div className="mt-2 h-0.5 w-10 bg-accent mx-auto rounded-full" />
@@ -87,6 +119,22 @@ export default function RegisterUserForm({
         <div role="alert" className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3">
           <p className="text-sm text-danger">{error}</p>
         </div>
+      )}
+
+      {raOpen && (
+        <RegisterUserFormRa
+          account={raAccount}
+          onChange={(account) => {
+            setRaAccount(account)
+            // RA's name as the username, unless one was already typed.
+            if (account && !username.trim()) setUsername(suggestUsername(account.user))
+          }}
+          onClose={() => {
+            setRaOpen(false)
+            setRaAccount(null)
+          }}
+          disabled={submitting}
+        />
       )}
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
@@ -139,7 +187,8 @@ export default function RegisterUserForm({
 
         <button
           type="submit"
-          disabled={submitting}
+          // With the RA section open, its account is checked first (or the section closed).
+          disabled={submitting || (raOpen && !raAccount)}
           className="bg-accent text-bg-main w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main"
         >
           {submitting ? (
@@ -157,6 +206,17 @@ export default function RegisterUserForm({
       </form>
 
       <SteamSignInDivider />
+
+      {!raOpen && (
+        <button
+          type="button"
+          onClick={() => setRaOpen(true)}
+          className="mt-3 w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-bg-card text-text-main border border-ink/15 hover:border-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        >
+          <RaLogo height={16} />
+          {T.registerForm.raCta}
+        </button>
+      )}
 
       <p className="text-text-secondary text-xs text-center mt-4">
         {T.registerForm.acceptTerms.split(/(\{terms\}|\{privacy\})/).map((part, i) =>
