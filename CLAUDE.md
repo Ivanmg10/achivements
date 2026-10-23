@@ -108,13 +108,13 @@ Steam"); the landing has a FAQ for the same reason. Added 2026-10-17.
 
 **Every new page, section or visual rework follows `docs/design-process.md`**, the way the
 welcome was made (the user's standing preference): study the reference, several clickable
-concepts on a design canvas (Figma when its connector is authorised), iterate with the user one
+concepts on a claude.ai design canvas (the user calls it "Figma"; they mean the canvas), iterate with the user one
 version at a time (changing only what they asked), a plan doc, then build and fix in short rounds
 from their screenshots (they use a 2560 px screen). The welcome's visual language (display
 italic titles, kickers, floating pill bar, curtain, cards that grow into their detail) is the
-one the user likes; an internal component library to make the whole site match it is an idea
-written up in `docs/ui-library-and-designs-plan.md` (a separate development, not started: design
-it first, then ask). **Every design made (Figma or canvas) gets an entry in `docs/designs.md`**
+one the user likes; an internal component library to make the whole site match it was designed
+and agreed on 2026-10-24 and is being built in three PRs (`docs/ui-library-and-designs-plan.md`
+→ Build plan; components only, never page structure). **Every design made (canvas) gets an entry in `docs/designs.md`**
 with its link, versions and what was built, so it can always be found again.
 
 ## Welcome after sign-up (`/welcome`, 2026-10-22)
@@ -1079,13 +1079,22 @@ requires `linked-issue` (see Issues).
 - [ ] **An internal component library** (buttons, inputs, selects, switches, modals, pills,
       steps bar, curtain) in the welcome's style, for the whole site, **and a record of every
       design** (`docs/designs.md`, started): `docs/ui-library-and-designs-plan.md`. A separate
-      development, the user's idea (2026-10-23); design the library on a canvas and agree it first.
+      development, the user's idea (2026-10-23). Design agreed 2026-10-24; building in three PRs
+      (foundations and controls, overlays and feedback, surfaces / data / colour sweep).
 - [ ] **Entrance animations on every page and component** (the user's wish, 2026-10-23; issue #61).
       The home has them (left card: `ViewEntrance`; profile column: `MainPageProfile.module.css`);
       the rest of the site should get its own, each suited to what it shows. **CSS keyframes, not
       Framer's `x`/`y`**, for anything that plays on a first load (Framer stutters while the page
       mounts), and **never hide an element until a frame or idle callback** (it shows empty while the
       main thread is busy). Reduced motion: a fade at most. Design it first (`docs/design-process.md`).
+- [ ] **A shareable user card** for social networks (the user's wish, 2026-10-23). Concepts on the
+      component library's canvas (`docs/designs.md`). Only data that is already public (what
+      `profileTeaser` and the showcase show); anything more means changing `/privacy`. Not started.
+- [ ] **`/diario`, a day-by-day journal of play** (the user's wish, 2026-10-23): a new route from
+      home concept C. Mini concept on the component library's canvas (`docs/designs.md`). Not started.
+- [ ] **Styles to the user's taste** (the user's wish, 2026-10-23): the user chooses how parts of the
+      site look. The first one: the home layout (*Classic*, default, or *Portada*), planned with the
+      component library (`docs/ui-library-and-designs-plan.md`).
 - [ ] **More languages** (the user's wish, 2026-10-23). Today nine (`LANGUAGES` in
       `src/utils/languages.ts`); the browser's language is taken when it is one of them, so a new
       language reaches its speakers on its own. A new one needs: its `src/translations/<lang>.ts`

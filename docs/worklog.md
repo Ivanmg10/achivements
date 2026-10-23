@@ -29,6 +29,23 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-24 — Component library designed and agreed; build plan (`feat/63-ui-library`, #63)
+
+**Did** — Designed the internal component library and every page in its style on the design canvas
+(`docs/designs.md`), over several rounds with the user, then wrote the build plan
+(`docs/ui-library-and-designs-plan.md` → Build plan). The canvas's last section, "Todo lo acordado,
+página a página", holds the agreed version of each page. CLAUDE.md now says the design is agreed and
+being built; roadmap entries added for the shareable card, `/diario` and styles to taste.
+**Why** — The user wants the whole site drawn by its own components, homogeneous between them, so
+future visual designs only change tokens.
+**Decisions** — Components only, never page structure. Concept A (the welcome's), slanted primary
+button, slanted switch, own select, sunken fields, dark tooltip. Streaks in the theme's colour
+(amber only in the streak page's hero). The search opens on typing as today, no Ctrl+K. Tables align
+headers like their values; rarity is a tinted figure, no bar. The statistics section keeps today's
+layout. Three PRs: foundations and controls (#63), overlays and feedback, surfaces / data / colour sweep.
+**Open** — PR 1 code. Issues for PRs 2 and 3 to open when they start.
+**Watch out** — The canvas saves itself from the page: re-read `project/canvas.json` before publishing.
+
 ## 2026-10-23 — The home's Recent / Pinned switch is its title, and entrance animations (`feat/60-home-view-tabs`, #60)
 
 **Did** — `MainViewToggle` no longer draws two 28 px icon buttons beside the title: it *is* the title,
