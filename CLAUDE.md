@@ -147,6 +147,13 @@ reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there)
   Motion's layout animations off (the intro's cards grow into their detail with `layoutId`).
 - The avatar is edited in `AvatarModal` (account page and welcome), not `EditProfileModal`,
   which is only for the username and email now.
+- **The Vault Points fill runs in the welcome** (`VaultFillProvider` in `src/app/welcome/page.tsx`,
+  since the app's providers are not mounted there): an account that came linked (signed up with
+  Steam or RetroAchievements) or links a platform on the way is read while the person goes
+  through the steps, so "your games are on their way" is true. Each linked platform step shows
+  its `VaultFillLine` (games counted, or why not: a private profile and how to fix it), and the
+  Steam card shows the Steam picture (`useSteamProfile`). Checked end to end 2026-10-23 with a
+  Steam sign-up: linked in the bar, the step, the profile's avatar and the done summary.
 
 ### The welcome follows the app — keep it current (the user's standing rule, 2026-10-22)
 
@@ -156,7 +163,7 @@ turns false). A new platform touches:
 - `PLATFORM_STEPS` and `WELCOME_STEPS` (`src/hooks/useWelcomeSteps.ts`): its place in the order.
   The "Platforms · n of total" count follows on its own.
 - Its step component in `src/components/welcome-page/welcome-page-<platform>/`, linking with the
-  platform's own hook (as RA, Steam and PSN do), with its tests.
+  platform's own hook (as RA, Steam and PSN do), with its `VaultFillLine` when linked, and its tests.
 - `STEP_SKY` (`welcomeArt.ts`), its mark in `welcomeNodes.tsx` (curtain) and in the bar's
   `PLATFORM_MARK`, its row in `WelcomePageDone`, and its session field in `WelcomePage`'s `linked`.
 - `T.welcome.steps` / `words` and its own texts, in all nine languages; the intro's first perk

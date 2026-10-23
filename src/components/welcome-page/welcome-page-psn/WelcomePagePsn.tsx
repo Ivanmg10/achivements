@@ -4,6 +4,7 @@ import type { WelcomeDirection } from '@/hooks/useWelcomeSteps'
 import { usePsnLink } from '@/hooks/usePsnLink'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
+import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
 import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
 import WelcomePageLibraryPreview from '@/components/welcome-page/welcome-page-library-preview/WelcomePageLibraryPreview'
 import { INPUT_CLASS, PRIMARY_BUTTON, SECONDARY_BUTTON, STEP_SKY, platformKicker } from '@/components/welcome-page/welcomeArt'
@@ -86,6 +87,12 @@ export default function WelcomePagePsn({
           )}
           <p id={`${INPUT_ID}-help`} className="text-[0.8125rem] text-text-secondary">{T.welcome.psn.help}</p>
         </form>
+      )}
+      {/* Its trophies being read for Vault Points, or why they cannot be (private trophies). */}
+      {isLinked && (
+        <div className="max-w-md">
+          <VaultFillLine source="psn" />
+        </div>
       )}
     </WelcomePageStep>
   )

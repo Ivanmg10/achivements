@@ -29,6 +29,25 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-23 — Steam sign-up in the welcome, and the fill running there (`feat/welcome-onboarding`, committed locally, not pushed)
+
+**Did** — Ran the real flow on the dev server against pre (the Steam callback simulated with a
+ticket cookie signed with `NEXTAUTH_SECRET`; the test account was deleted after): a Steam sign-up
+already reached `/welcome` linked: the bar's Steam pill, the Steam step's "Connected", the profile
+step's avatar from Steam, and "Connected" in the done summary. Added: `VaultFillProvider` in
+`src/app/welcome/page.tsx`, so the Vault Points fill runs during the welcome; `VaultFillLine` in
+the linked view of the Steam, RA and PSN steps ("21 games counted", or a private profile and how
+to fix it); the Steam picture on the Steam step's card. New `WelcomePageSteam.test.tsx`.
+**Why** — The user asked to integrate Steam (sign-up) with the welcome. The linked state already
+worked by the code; what was missing was the picture and saying how the account is being read
+(the test account's achievements are private on Steam while its profile reads as public, which
+only the fill can tell).
+**Watch out** — On the dev server, editing files while the page is open fills the log with
+Turbopack HMR "Cell … no longer exists" panics: noise, not the code. The local `.env.local` Resend
+key answers 401, so no mail leaves from local runs.
+
+---
+
 ## 2026-10-23 — Sign up with RetroAchievements (`feat/welcome-onboarding`, committed locally, not pushed)
 
 **Did** — "Create account with RetroAchievements" under the register form opens

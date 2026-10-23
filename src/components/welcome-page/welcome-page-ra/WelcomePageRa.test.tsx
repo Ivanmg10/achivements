@@ -73,3 +73,9 @@ test('already linked, it says as whom and only goes on', () => {
   fireEvent.click(screen.getByRole('button', { name: new RegExp(T.next) }))
   expect(onNext).toHaveBeenCalled()
 })
+
+test('came linked (signed up with RA): says as whom, with no form', () => {
+  renderStep({ rausername: 'PalmeraMiami' })
+  expect(screen.getByText(T.ra.linkedAs.replace('{name}', 'PalmeraMiami'))).toBeInTheDocument()
+  expect(screen.queryByLabelText(T.ra.apiKey)).not.toBeInTheDocument()
+})

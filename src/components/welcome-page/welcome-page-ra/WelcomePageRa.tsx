@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
 import WelcomePageRaGuide from '@/components/welcome-page/welcome-page-ra-guide/WelcomePageRaGuide'
+import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
 import { INPUT_CLASS, PRIMARY_BUTTON, SECONDARY_BUTTON, platformKicker } from '@/components/welcome-page/welcomeArt'
 
 const FORM_ID = 'welcome-ra-form'
@@ -107,6 +108,12 @@ export default function WelcomePageRa({
             <p id="welcome-ra-note" className="text-[0.8125rem] leading-snug text-text-secondary">{t.keyNote}</p>
           </div>
         </form>
+      )}
+      {/* Came linked (signed up with RetroAchievements) or just linked: its games being read for Vault Points. */}
+      {linkedAs && (
+        <div className="max-w-md">
+          <VaultFillLine source="ra" />
+        </div>
       )}
     </WelcomePageStep>
   )
