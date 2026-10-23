@@ -198,7 +198,7 @@ export const SEO_PAGES: SeoPageEntry[] = [
   {
     section: 'track',
     slug: 'retroachievements-steam-playstation',
-    updated: '2026-10-17',
+    updated: '2026-10-21',
     text: {
       en: {
         link: 'RetroAchievements, Steam and PSN in one place',
@@ -221,7 +221,7 @@ export const SEO_PAGES: SeoPageEntry[] = [
             heading: 'Connecting each account',
             points: [
               'RetroAchievements: your username and your own API key, from your RetroAchievements settings page.',
-              'Steam: your custom URL name, profile link or SteamID64. The profile and its game details must be public.',
+              'Steam: sign in on Steam from CheevoVault (we never see your Steam password). Your game details must be public.',
               'PlayStation: your online ID, with your trophies visible.',
             ],
           },
@@ -253,7 +253,7 @@ export const SEO_PAGES: SeoPageEntry[] = [
             heading: 'Cómo se conecta cada cuenta',
             points: [
               'RetroAchievements: tu usuario y tu propia clave de API, de la página de ajustes de RetroAchievements.',
-              'Steam: tu nombre de URL personalizada, el enlace a tu perfil o tu SteamID64. El perfil y los detalles de juegos tienen que ser públicos.',
+              'Steam: inicias sesión en Steam desde CheevoVault (nunca vemos tu contraseña de Steam). Los detalles de juegos tienen que ser públicos.',
               'PlayStation: tu ID online, con los trofeos visibles.',
             ],
           },

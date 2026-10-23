@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 import type { NextAuthOptions, Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import { clientAddress, isLimited, recordAttempt } from "@/lib/attemptLimit";
-import { loadUserByUsername, loadUserSynced, passwordVersion, type UserRecord } from "@/lib/userRecord";
+import { readTicket, ticketFromCookieHeader } from "@/lib/steamLogin";
+import { loadUserBySteamLogin, loadUserByUsername, loadUserSynced, passwordVersion, type UserRecord } from "@/lib/userRecord";
 
 export const SESSION_REVOKED = "session-revoked";
 export const TOO_MANY_ATTEMPTS = "too-many-attempts";
@@ -77,6 +78,19 @@ export const authOptions: NextAuthOptions = {
         }
 
         return { ...tokenFields(user), syncedAt: Date.now() };
+      },
+    }),
+    // Sign in with Steam: the proof is the ticket cookie the Steam callback left
+    // (src/lib/steamLogin.ts), never anything the browser sends in the body.
+    CredentialsProvider({
+      id: "steam",
+      name: "Steam",
+      credentials: {},
+      async authorize(_credentials, req) {
+        const steamid = readTicket(ticketFromCookieHeader(req?.headers?.cookie));
+        if (!steamid) return null;
+        const user = await loadUserBySteamLogin(steamid);
+        return user ? { ...tokenFields(user), syncedAt: Date.now() } : null;
       },
     }),
   ],

@@ -43,6 +43,100 @@ description: keep example numbers out of the text, or in `<!-- -->`.
 
 ---
 
+## 2026-10-22 — Steam: batched library counts, the whole year's streak, "now playing" (`feat/steam-sign-in`)
+
+**Did** — (1) `fetchBatchCounts` (`GetTopAchievementsForGames`, 100 games a call) counts a
+library's in-progress and unstarted games at once; only finished games are read one by one, for
+their completion date. (2) `steam_unlocks` (`migrations/042`, `lib/steamUnlocks.ts`): every
+per-game read keeps its dated unlocks; the streak/activity read the `maxGames` played last live
+and the rest of the window from the table. Unlinking deletes them. (3) `/api/follows/playing` +
+`PresenceLabel`'s `playing`: "Now playing: <game>" on the Following and home friend cards.
+`/privacy` (9 languages) says both what is kept and who sees the game.
+**Why** — The user picked these from a list of Steam improvements (they declined refreshing the
+stored Steam name and a "verify with Steam" for old typed links).
+**Decisions** — Measured 2026-10-22: the batch returns exactly the unlocked achievements when
+`max_achievements` ≥ the total (40/50, 84/84, 43/43 against the per-game calls), 192 games in
+0.6 s, but **no unlock times**, and it answers even when Steam says "Profile is not public" per
+game; so a per-game probe must agree before it is used. The unlocks table is fed by the score
+refresh, which already reads every played game; no extra Steam calls. "Now playing" lives in its
+own route so the overview stays database-only.
+**Open** — 042 applied to pre and production (2026-10-22); without it the
+writes/reads just log. Days older than the table's first fill stay missing for games past the
+live cap until the score refresh reads them.
+
+---
+
+## 2026-10-22 — Steam review: one owned-list read, private profiles said aloud (`feat/steam-sign-in`)
+
+**Did** — `loadOwnedGames` (`lib/steamProgress.ts`): Steam's owned list cached 5 min under
+`steamOwnedRaw:<steamid>` (refreshable, a private answer not kept), now read by the library,
+recently played, recent unlocks, activity and the year's unlocks. `recentlyPlayed` answers
+`403 private` for a private profile (`isPrivateLibrary`, `SteamPrivateError`, shared with
+`ownedGames`), so the home's "recently played" says why it is empty. The Steam sign-up warns
+when the Steam profile is not public (`isPublic` from the summary it already reads).
+**Why** — The user asked to look for more ways to improve Steam. A home page load downloaded the
+whole owned list up to five times (one per route) against an app-wide budget of ~100–200 Steam
+calls per 5 minutes; and since linking no longer refuses private profiles, the home showed an
+empty list where it should say "private".
+**Open** — `scoreRefresh` still keeps its own owned-list cache (`score:steamOwned`, its own TTL);
+left alone, it runs in the background. The community visibility state says nothing about
+"game details" being private; only the owned list does.
+
+---
+
+## 2026-10-21 — Users link Steam through Steam's sign-in (`feat/groups-redesign`, uncommitted)
+
+**Did** — The Steam card's typed box is replaced by "Connect Steam" (`UserSteamCardLink`) →
+`/api/auth/steam?intent=link&next=/user|/` → Steam → the callback links the proven account
+(`steamid`, `steamusername`, `steam_login_id`) and returns with `#steam-linked|taken|failed`,
+which `useSteamLink` toasts. `/api/steam/link` and `UserSteamCardForm` removed; the `steamLink`
+strings kept only `errors.private`. A random `state` (cookie + signed `return_to`) now guards
+both the sign-in and the link. Texts that said Steam is linked by name (account card hint, landing
+FAQ, privacy, the "track" SEO page) updated in every language they exist in.
+**Why** — The user signed up with Steam on a second account while their admin account had the
+same Steam typed in: nothing broke (separate columns), but a typed link proves nothing, so a
+Steam account could score on several users. They chose "only through Steam".
+**Decisions** — The three existing typed links (the user's test accounts) are left as they are,
+by the user's choice. Admins still link by typing (logged). A private profile is no longer refused
+at link time: ownership is proven, and the library page already says "private".
+**Watch out** — Without the `state` check, a callback URL made with another person's Steam would
+link it to whoever opens it, and then let that person sign in as them.
+
+---
+
+## 2026-10-21 — Steam "recently played" no longer limited to two weeks (`feat/groups-redesign`, uncommitted)
+
+**Did** — `/api/steam/recentlyPlayed` builds its list from the owned list's `rtime_last_played`
+(`lastPlayedGames` in `utils/steamMappers.ts`), the 20 played last; games only in Steam's recent
+list (family sharing) are appended. Cache key `steamRecent:v2`. `loadRecentAchievements` scans the
+10 games with stats played last, from the owned list too. `loadOwnedFacts` removed (unused).
+**Why** — Steam's `GetRecentlyPlayedGames` covers only the last two weeks: the user saw 4 games, and
+a user who had not played in months saw none after linking.
+**Watch out** — A failed owned lookup still falls back to Steam's recent list, undated.
+
+---
+
+## 2026-10-21 — Sign up and sign in with Steam (`feat/groups-redesign`, uncommitted)
+
+**Did** — "Continue with Steam" under the sign-in and register forms. Steam OpenID
+(`lib/steamLogin.ts`, `api/auth/steam`, `/callback`, `/register`), a second NextAuth provider
+`steam`, and `/authPage?steam=…` (`SteamSignupForm`, `useSteamSignup`): a known Steam account
+signs in at once; a new one picks a username (suggested from the Steam name) and an email, and
+gets Steam's picture as avatar and Steam linked. `migrations/041_steam_login.sql`. Privacy policy
+(9 languages) says what Steam sign-in keeps. CLAUDE.md → Registration.
+**Why** — The user asked for sign-up with Steam carrying over the Steam picture, name and email,
+as a first step of a larger integration.
+**Decisions** — Steam never shares an email (OpenID gives only the SteamID64; the Web API name and
+picture), so the email is still asked for: it is the only recovery path. A new column, not
+`steamid`, because `steamid` is typed and unproven (migrations/028). Random password, so the
+account has none until "forgot password"; rejected a nullable password (every `passwordVersion`
+and current-password check assumes one). The ticket goes in an httpOnly cookie, not the URL.
+**Open** — 041 applied to pre (2026-10-21) and production (2026-10-22). No "link Steam sign-in" for existing accounts.
+Changing the email or deleting the account asks for the current password, which a Steam-only
+user has to set through "forgot password" first. Not tried against real Steam yet: try it on the
+preview (Steam needs to reach `NEXTAUTH_URL`'s host, any public or localhost URL works as realm).
+**Watch out** — `return_to` is built from `NEXTAUTH_URL`; if it differs from the host the user is
+on, the ticket cookie lands on another host and every Steam sign-in "expires".
 ## 2026-10-23 — Every PR resolves an issue (`chore/require-linked-issue`, committed locally, not pushed)
 
 **Did** — Issue forms (`.github/ISSUE_TEMPLATE/`: Feature, Bug, blank issues off); `## Issue` →

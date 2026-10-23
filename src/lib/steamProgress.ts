@@ -1,5 +1,6 @@
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
-import { getGlobalAchievementPercentages, getOwnedGames, getPlayerAchievements, getSchemaForGame } from '@/lib/steamClient'
+import { recordUnlocks } from '@/lib/steamUnlocks'
+import { getGlobalAchievementPercentages, getOwnedGames, getPlayerAchievements, getSchemaForGame, getTopAchievementsForGames } from '@/lib/steamClient'
 import { countUnlocks, toGlobalPctMap, withUnlockCounts } from '@/utils/steamMappers'
 import type {
   SteamGameProgress,
@@ -9,6 +10,7 @@ import type {
   SteamPlayerAchievementsResponse,
   SteamSchemaAchievement,
   SteamSchemaResponse,
+  SteamTopAchievementsResponse,
   SteamUnlockCounts,
 } from '@/types/steam'
 
@@ -23,6 +25,42 @@ const CONCURRENCY = 4
 const ACTIVE_WINDOW_MS = 48 * 60 * 60 * 1000
 
 export type SteamAuth = { id: string; steamid: string; apiKey: string }
+
+/** A profile Steam will not show the games of: private, friends-only, or public with game details private. */
+export class SteamPrivateError extends Error {
+  constructor() {
+    super('The Steam profile is not public')
+  }
+}
+
+/**
+ * Such a profile's owned list reads `{ response: {} }`, not an error (measured
+ * 2026-10-16); a public account with no games still carries `game_count`.
+ * ponytail: a public account with no games and no game_count would read as private; unverified.
+ */
+export function isPrivateLibrary(data: SteamOwnedGamesResponse | null | undefined): boolean {
+  return !data?.response?.games && typeof data?.response?.game_count !== 'number'
+}
+
+/**
+ * Steam's owned list as it comes, shared by every read built from it (the
+ * library, recently played, recent unlocks, activity, the year's unlocks): a
+ * home page asked Steam for the same list up to five times. Five minutes, as
+ * fresh as "recently played" needs. A private answer (no games, no
+ * game_count) is not cached, so making the profile public shows at once.
+ */
+export function loadOwnedGames(auth: SteamAuth): Promise<SteamOwnedGamesResponse> {
+  return withSteamCache<SteamOwnedGamesResponse>(
+    `steamOwnedRaw:${auth.steamid}`,
+    TTL.recentlyPlayed,
+    async () => (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse,
+    {
+      userId: auth.id,
+      shouldCache: (d) => !isPrivateLibrary(d),
+      refreshable: true,
+    },
+  )
+}
 
 /**
  * Steam's answer for a game that has no achievements, even when the owned list
@@ -56,7 +94,10 @@ export function isNoStats(unlocks: CachedUnlocks): unlocks is typeof NO_STATS {
 export async function fetchPlayerAchievements(auth: SteamAuth, appId: number): Promise<PlayerUnlocks> {
   try {
     const data = (await getPlayerAchievements(auth.steamid, auth.apiKey, appId)) as SteamPlayerAchievementsResponse
-    return data?.playerstats?.success ? (data.playerstats.achievements ?? []) : []
+    const list = data?.playerstats?.success ? (data.playerstats.achievements ?? []) : []
+    // Every read keeps its dated unlocks: the streak counts games not read on its own page load.
+    await recordUnlocks(auth.id, auth.steamid, appId, list)
+    return list
   } catch (err) {
     const status = (err as { status?: number }).status
     if (status === 403) return []
@@ -126,10 +167,63 @@ export function isCountable(game: SteamGameProgress): boolean {
   return game.hasStats && game.playtimeForever > 0
 }
 
+/** Games per batched count call (192 in one went fine, measured 2026-10-22). */
+const BATCH_SIZE = 100
+
+type BatchCounts = Map<number, { total: number; awarded: number }>
+
+/** Counts for many games, BATCH_SIZE a call. Null when Steam fails: the per-game path takes over. */
+export async function fetchBatchCounts(auth: SteamAuth, appIds: number[]): Promise<BatchCounts | null> {
+  try {
+    const counts: BatchCounts = new Map()
+    for (let i = 0; i < appIds.length; i += BATCH_SIZE) {
+      const data = (await getTopAchievementsForGames(
+        auth.steamid,
+        auth.apiKey,
+        appIds.slice(i, i + BATCH_SIZE),
+      )) as SteamTopAchievementsResponse
+      for (const g of data?.response?.games ?? []) {
+        counts.set(g.appid, { total: g.total_achievements ?? 0, awarded: g.achievements?.length ?? 0 })
+      }
+    }
+    return counts
+  } catch (err) {
+    console.error('[steamProgress] batch counts', err)
+    return null
+  }
+}
+
+/**
+ * Batched counts for the misses, trusted only when Steam's own per-game call
+ * agrees the achievements are public. The batch answers even for a profile
+ * whose achievements Steam keeps private (measured 2026-10-22: "Profile is not
+ * public" per game, the unlocks in the batch); that choice is the user's, so
+ * one game with unlocks is read on its own first, and an empty answer drops
+ * the batch. That probe's list is kept, so it costs nothing extra.
+ */
+async function batchCountsFor(
+  auth: SteamAuth,
+  misses: SteamGameProgress[],
+): Promise<{ counts: BatchCounts | null; probe: { appId: number; unlocks: PlayerUnlocks } | null }> {
+  if (misses.length === 0) return { counts: null, probe: null }
+  const counts = await fetchBatchCounts(auth, misses.map((g) => g.id))
+  const probeGame = counts && misses.find((g) => (counts.get(g.id)?.awarded ?? 0) > 0)
+  if (!counts || !probeGame) return { counts, probe: null }
+  try {
+    const unlocks = await fetchPlayerAchievements(auth, probeGame.id)
+    const isPrivate = Array.isArray(unlocks) && unlocks.length === 0
+    return { counts: isPrivate ? null : counts, probe: { appId: probeGame.id, unlocks } }
+  } catch (err) {
+    console.error('[steamProgress] batch probe', probeGame.id, err)
+    return { counts: null, probe: null }
+  }
+}
+
 /**
  * Fills achievement counts for every countable game. Cached counts come back
- * in one DB query; at most `maxFetches` misses go to Steam per call, in the
- * order given (so pass games newest first).
+ * in one DB query; the misses are counted in one batched call (`fetchBatchCounts`),
+ * and only finished games (and any the batch missed) go to Steam one by one, at
+ * most `maxFetches` per call, in the order given (so pass games newest first).
  *
  * `complete` is false when misses were left for a later call, or a fetch
  * failed — callers should not cache an incomplete result, so the next call
@@ -148,8 +242,25 @@ export async function enrichWithAchievementCounts(
   const cached = await readCacheMany<CachedUnlocks>([...keyOf.values()])
 
   const misses = countable.filter((g) => !cached.has(keyOf.get(g.id)!))
-  const toFetch = new Set(misses.slice(0, maxFetches).map((g) => g.id))
-  let complete = misses.length <= maxFetches
+  const { counts: batch, probe } = await batchCountsFor(auth, misses)
+  // A game in progress (or not started) is counted from the batch; a finished
+  // one still needs its own call, for the date it was finished (lastUnlock).
+  const fromBatch = (g: SteamGameProgress) => {
+    const b = batch?.get(g.id)
+    return b && b.total > 0 && b.awarded < b.total ? b : null
+  }
+  const needsFetch = misses.filter((g) => !fromBatch(g) && g.id !== probe?.appId)
+  const toFetch = new Set(needsFetch.slice(0, maxFetches).map((g) => g.id))
+  let complete = needsFetch.length <= maxFetches
+
+  async function keep(game: SteamGameProgress, key: string, unlocks: PlayerUnlocks) {
+    // An empty list (private profile) is cached briefly rather than skipped,
+    // or every page load would re-fetch it — but not for a month either, so
+    // making the profile public takes effect. NO_STATS is final.
+    const unknown = Array.isArray(unlocks) && unlocks.length === 0
+    await writeCache(key, toCachedUnlocks(unlocks), unknown ? TTL.achievements : progressTtl(game), auth.id)
+    return applyUnlocks(game, unlocks)
+  }
 
   const enriched = await mapWithConcurrency(games, CONCURRENCY, async (game) => {
     const key = keyOf.get(game.id)
@@ -157,16 +268,17 @@ export async function enrichWithAchievementCounts(
 
     const hit = cached.get(key)
     if (hit) return applyUnlocks(game, hit)
+    if (probe && probe.appId === game.id) return keep(game, key, probe.unlocks)
+    const counted = fromBatch(game)
+    if (counted) {
+      const counts: SteamUnlockCounts = { total: counted.total, awarded: counted.awarded, lastUnlock: null }
+      await writeCache(key, counts, progressTtl(game), auth.id)
+      return withUnlockCounts(game, counts)
+    }
     if (!toFetch.has(game.id)) return game
 
     try {
-      const unlocks = await fetchPlayerAchievements(auth, game.id)
-      // An empty list (private profile) is cached briefly rather than skipped,
-      // or every page load would re-fetch it — but not for a month either, so
-      // making the profile public takes effect. NO_STATS is final.
-      const unknown = Array.isArray(unlocks) && unlocks.length === 0
-      await writeCache(key, toCachedUnlocks(unlocks), unknown ? TTL.achievements : progressTtl(game), auth.id)
-      return applyUnlocks(game, unlocks)
+      return await keep(game, key, await fetchPlayerAchievements(auth, game.id))
     } catch (err) {
       console.error('[steamProgress] enrich', game.id, err)
       complete = false
@@ -175,38 +287,6 @@ export async function enrichWithAchievementCounts(
   })
 
   return { games: enriched, complete }
-}
-
-/** What the owned list knows about a game that the recent list leaves out. */
-export type OwnedFacts = { rtime_last_played?: number; has_community_visible_stats?: boolean }
-
-/**
- * appid → facts only GetOwnedGames returns.
- *
- * GetRecentlyPlayedGames (checked against the live API) returns neither
- * rtime_last_played nor has_community_visible_stats, and does not order its
- * games by date. Without the date, recent Steam games sort after every dated
- * RA game in the merged feed and never make the cut; without the stats flag,
- * every recent game looks achievement-less — no counts, no bar, and nothing
- * to load when a card is opened.
- *
- * Never throws: if the lookup fails the games are still worth showing.
- */
-export async function loadOwnedFacts(auth: SteamAuth): Promise<Map<number, OwnedFacts>> {
-  try {
-    const data = (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse
-    const facts = new Map<number, OwnedFacts>()
-    for (const g of data?.response?.games ?? []) {
-      facts.set(g.appid, {
-        rtime_last_played: g.rtime_last_played || undefined,
-        has_community_visible_stats: g.has_community_visible_stats,
-      })
-    }
-    return facts
-  } catch (err) {
-    console.error('[steamProgress] owned facts', err)
-    return new Map()
-  }
 }
 
 /**

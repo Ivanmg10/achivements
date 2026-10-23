@@ -31,6 +31,14 @@ export type FriendOverview = UserSearchResult & {
   vaultPoints?: number | null
 }
 
+/** What the people you follow are playing on Steam right now, by username (/api/follows/playing). */
+export type PlayingNow = Record<string, { appId: number; name: string }>
+
+/** Friends with the Steam game each is in right now, when there is one. */
+export function withPlaying(friends: FriendOverview[], playing: PlayingNow): FriendOverview[] {
+  return friends.map((f) => (playing[f.username] ? { ...f, playing: playing[f.username].name } : f))
+}
+
 /**
  * How far back the activity numbers can look: RA's recent unlocks cover two
  * weeks, the shortest of the three platforms, so every count uses that window.

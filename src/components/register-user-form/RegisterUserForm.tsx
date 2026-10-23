@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { IconUser, IconLock, IconMail, IconArrowRight } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
+import SteamSignInDivider from '@/components/steam-sign-in-divider/SteamSignInDivider'
 import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 
 export default function RegisterUserForm({
@@ -154,6 +155,8 @@ export default function RegisterUserForm({
           )}
         </button>
       </form>
+
+      <SteamSignInDivider />
 
       <p className="text-text-secondary text-xs text-center mt-4">
         {T.registerForm.acceptTerms.split(/(\{terms\}|\{privacy\})/).map((part, i) =>
