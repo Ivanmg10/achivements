@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { PLATFORM_FILL, PLATFORM_NAMES } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { pillClass } from '@/components/ui/Pill'
 import Tabs from '@/components/ui/Tabs'
+import Select from '@/components/ui/Select'
 
 const PERIODS: RankPeriod[] = ['all', 'month', 'week']
 const SORTS: RankSort[] = ['points', 'streak', 'best']
@@ -49,15 +50,15 @@ export default function RankingsPageToolbar({
         />
       )}
 
-      <div className="flex flex-wrap items-center gap-1.5">
-        <div role="group" aria-label={T.rankings.period} className="flex flex-wrap gap-1.5">
-          {PERIODS.map((p) => (
-            <button key={p} aria-pressed={view.period === p} onClick={() => set({ period: p })} className={chip(view.period === p)}>
-              {view.period === p && <IconCheck size={12} aria-hidden="true" />}
-              {T.rankings[p]}
-            </button>
-          ))}
-        </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <Select<RankPeriod>
+          aria-label={T.rankings.period}
+          size="sm"
+          className="w-40"
+          value={view.period}
+          onChange={(period) => set({ period })}
+          options={PERIODS.map((p) => ({ value: p, label: T.rankings[p] }))}
+        />
         <span aria-hidden="true" className="hidden sm:block w-px h-5 bg-ink/10 mx-1" />
         <div role="group" aria-label={T.rankings.platform} className="flex flex-wrap gap-1.5">
           {sources.map((s) => (
@@ -68,17 +69,14 @@ export default function RankingsPageToolbar({
           ))}
         </div>
         <span aria-hidden="true" className="hidden sm:block w-px h-5 bg-ink/10 mx-1" />
-        <div role="group" aria-label={T.rankings.sort} className="flex flex-wrap gap-1.5">
-          {SORTS.map((s) => {
-            const on = (view.sort ?? 'points') === s
-            return (
-              <button key={s} aria-pressed={on} onClick={() => set({ sort: s })} className={chip(on)}>
-                {on && <IconCheck size={12} aria-hidden="true" />}
-                {T.rankings[SORT_LABEL[s]]}
-              </button>
-            )
-          })}
-        </div>
+        <Select<RankSort>
+          aria-label={T.rankings.sort}
+          size="sm"
+          className="w-48"
+          value={view.sort ?? 'points'}
+          onChange={(sort) => set({ sort })}
+          options={SORTS.map((s) => ({ value: s, label: T.rankings[SORT_LABEL[s]] }))}
+        />
       </div>
     </div>
   )

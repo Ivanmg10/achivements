@@ -35,7 +35,7 @@ export default function NotFoundGame({ source }: { source: GameSource }) {
       </motion.div>
       <motion.div {...rise(0.06)} className="flex flex-col items-center gap-2">
         <p className="text-xs font-semibold tracking-[0.14em] uppercase text-accent">{T.notFound.gameEyebrow}</p>
-        <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1 text-balance">{T.notFound.gameTitle}</h1>
+        <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 text-balance">{T.notFound.gameTitle}</h1>
         <p className="text-sm text-text-secondary max-w-sm">
           {T.notFound.gameSubtitle.replace('{platform}', PLATFORM_NAMES[source])}
         </p>

@@ -103,7 +103,7 @@ export default function UserIdentityCard() {
 
           <div className="flex flex-col gap-1 min-w-0 pb-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1 truncate">{user?.name}</h1>
+              <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 truncate">{user?.name}</h1>
               {user?.admin && (
                 <span className="text-xs bg-accent text-bg-main font-bold px-2 py-0.5 rounded-full">
                   {T.userData.admin}

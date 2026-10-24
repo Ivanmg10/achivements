@@ -53,7 +53,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
 
             <div className="flex flex-col gap-1.5 min-w-0">
               <div className="flex items-center gap-2 flex-wrap min-w-0">
-                <h1 id="public-user-name" className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1 truncate">
+                <h1 id="public-user-name" className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 truncate">
                   {user.username}
                 </h1>
                 {user.isSelf && (

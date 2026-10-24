@@ -88,7 +88,7 @@ export default function GroupDetailHero({
                   <GroupIconDisplay icon={group.icon} />
                 </span>
               )}
-              <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1 text-text-main break-words">{group.title}</h1>
+              <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 text-text-main break-words">{group.title}</h1>
               <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-bg-main/70 text-text-secondary">
                 <Privacy className="w-3 h-3" aria-hidden="true" />
                 {group.is_public ? T.groups.public : T.groups.private}

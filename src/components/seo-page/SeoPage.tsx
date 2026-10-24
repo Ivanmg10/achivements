@@ -23,7 +23,7 @@ export default function SeoPage({ page }: { page: SeoPageEntry }) {
 
       <main className="max-w-3xl w-full mx-auto px-4 sm:px-6 py-12 sm:py-16 flex flex-col gap-10">
         <header className="flex flex-col gap-3">
-          <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1">{text.heading}</h1>
+          <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1">{text.heading}</h1>
           <p className="text-base sm:text-lg text-text-secondary leading-relaxed">{text.intro}</p>
         </header>
 

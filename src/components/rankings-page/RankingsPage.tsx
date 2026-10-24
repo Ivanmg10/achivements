@@ -63,7 +63,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
         <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
           <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
             <div className="flex flex-col gap-1">
-              <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1 flex items-center gap-2.5">
+              <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 flex items-center gap-2.5">
                 <IconTrophy size={26} className="text-accent" aria-hidden="true" />
                 {T.rankings.title}
                 <span className="text-[10px] uppercase tracking-wider font-bold bg-accent/15 text-accent px-2 py-0.5 rounded-full">{T.rankings.beta}</span>

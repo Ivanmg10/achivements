@@ -38,7 +38,7 @@ export default function RankingsGuide() {
           <IconArrowLeft size={15} aria-hidden="true" />
           {g.back}
         </Link>
-        <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1 flex items-center gap-2.5">
+        <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 flex items-center gap-2.5">
           <IconTrophy size={30} className="text-accent shrink-0" aria-hidden="true" />
           {g.heading}
           <span className="text-[10px] uppercase tracking-wider font-bold bg-accent/15 text-accent px-2 py-0.5 rounded-full">{T.rankings.beta}</span>
