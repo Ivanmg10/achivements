@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { IconChevronDown } from '@tabler/icons-react'
 import { useClickAway } from '@/hooks/useClickAway'
+import { MENU_SURFACE, menuItemClass } from '@/components/ui/menu'
 
 export default function StatusNavDropdown({
   items,
@@ -43,7 +44,7 @@ export default function StatusNavDropdown({
       {isOpen && (
         <div
           role="menu"
-          className="absolute top-full left-0 mt-1 z-20 bg-bg-card rounded-xl shadow-2xl ring-1 ring-ink/10 py-1 min-w-40"
+          className={`absolute top-full left-0 mt-1 z-20 min-w-40 ${MENU_SURFACE}`}
         >
           {items.map((item) => (
             <Link
@@ -51,7 +52,7 @@ export default function StatusNavDropdown({
               href={item.href}
               role="menuitem"
               onClick={() => setIsOpen(false)}
-              className="block px-3.5 py-2 text-sm text-text-secondary hover:text-text-main hover:bg-bg-main/60 transition-colors whitespace-nowrap"
+              className={menuItemClass()}
             >
               {item.label}
             </Link>

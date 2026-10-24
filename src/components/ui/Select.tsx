@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { IconCheck, IconChevronDown } from '@tabler/icons-react'
 import { fieldClass } from './Input'
+import { MENU_SURFACE } from './menu'
 
 export type SelectOption<V extends string> = {
   value: V
@@ -147,7 +148,7 @@ export default function Select<V extends string>({
           id={listId}
           role="listbox"
           aria-labelledby={buttonId}
-          className="absolute z-50 left-0 top-full mt-1.5 min-w-full max-h-72 overflow-y-auto p-1 rounded-control bg-bg-card ring-1 ring-ink/10 shadow-xl shadow-black/40 animate-[select-in_var(--motion-hover)_ease-out] motion-reduce:animate-none"
+          className={`absolute z-50 left-0 top-full mt-1.5 min-w-full max-h-72 overflow-y-auto ${MENU_SURFACE} animate-[select-in_var(--motion-hover)_ease-out] motion-reduce:animate-none`}
         >
           {options.map((o, i) => (
             <li
