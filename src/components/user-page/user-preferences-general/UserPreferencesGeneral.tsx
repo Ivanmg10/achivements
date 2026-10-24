@@ -37,7 +37,7 @@ export default function UserPreferencesGeneral({
   const user = session?.user
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col divide-y divide-ink/[0.06] [&>*]:py-1.5">
       <ProfileField label={T.userTheme.theme} icon={<IconPalette size={18} />} onEdit={onOpenTheme}>
         <span className="flex items-center gap-2 min-w-0">
           <span aria-hidden="true" className="w-4 h-4 rounded-full bg-accent shrink-0" />

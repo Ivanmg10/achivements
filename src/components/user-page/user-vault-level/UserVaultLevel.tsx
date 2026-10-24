@@ -22,7 +22,7 @@ export default function UserVaultLevel() {
   const toNext = T.rankings.toLevel.replace('{n}', n(p.span - p.into)).replace('{level}', String(p.level + 1))
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl bg-bg-card ring-1 ring-ink/[0.06] px-3 py-2.5">
+    <div className="flex flex-col gap-2 rounded-control bg-bg-main px-4 py-3">
       <Link
         href="/rankings"
         className="group flex flex-col gap-2 rounded-lg -m-1 p-1 hover:bg-ink/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
@@ -31,7 +31,7 @@ export default function UserVaultLevel() {
           <span className="flex items-center gap-2 min-w-0">
             <span className="text-xs text-text-secondary">{T.rankings.yourLevel}</span>
             {fill?.active ? (
-              <span className="text-[11px] font-semibold text-warning bg-warning/15 px-2 py-0.5 rounded-full tabular-nums">
+              <span className="text-[11px] font-bold text-warning bg-warning/15 h-5.5 inline-flex items-center px-2 rounded-chip tabular-nums">
                 {T.rankings.fillShort} · {fill.pct} %
               </span>
             ) : (

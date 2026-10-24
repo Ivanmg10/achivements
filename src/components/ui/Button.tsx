@@ -16,7 +16,7 @@ const VARIANTS: Record<Variant, string> = {
   primary: 'text-bg-main before:bg-accent hover:before:bg-accent-hover',
   secondary: 'text-text-main before:ring-1 before:ring-inset before:ring-ink/20 hover:before:bg-ink/[0.06]',
   quiet: 'text-text-secondary hover:text-text-main hover:before:bg-ink/[0.05]',
-  danger: 'text-bg-main before:bg-danger hover:before:bg-danger/85',
+  danger: 'text-danger before:bg-danger/12 before:ring-1 before:ring-inset before:ring-danger/45 hover:before:bg-danger/20',
 }
 
 const SIZES: Record<Size, string> = {

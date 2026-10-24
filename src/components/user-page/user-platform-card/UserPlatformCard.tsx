@@ -9,8 +9,7 @@ import { buttonClass } from '@/components/ui/Button'
 
 export type PlatformStat = { label: string; value: string; accent?: string }
 
-export const DISCONNECT_CLASS =
-  'w-full py-2 rounded-xl bg-danger/15 text-danger font-semibold text-sm hover:bg-danger/25 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70'
+export const DISCONNECT_CLASS = buttonClass('danger', 'md', 'w-full')
 export const CONNECT_CLASS = buttonClass('primary', 'md', 'w-full')
 
 /**
@@ -61,10 +60,10 @@ export default function UserPlatformCard({
   const { T } = useLanguage()
 
   return (
-    <div className={`rounded-3xl p-px bg-gradient-to-br ${gradient}`}>
+    <div className={`rounded-[calc(var(--r-card)+1px)] p-px bg-gradient-to-br ${gradient}`}>
       <section
         aria-label={name}
-        className="relative h-full bg-bg-card rounded-[calc(1.5rem-1px)] p-5 flex flex-col gap-4 overflow-hidden"
+        className="relative h-full bg-bg-card rounded-card p-5 flex flex-col gap-4 overflow-hidden"
       >
         <div className="relative flex items-center justify-between gap-2">
           <span className="flex items-center gap-2 min-w-0">
@@ -85,10 +84,9 @@ export default function UserPlatformCard({
             )}
           </span>
           <span
-            className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-              connected ? 'bg-success/20 text-success' : 'bg-ink/5 text-text-secondary'
-            }`}
+            className={`inline-flex items-center gap-1.5 text-xs font-bold shrink-0 ${connected ? 'text-success' : 'text-text-secondary'}`}
           >
+            <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-current" />
             {connected ? T.userData.connected : T.userData.notConnected}
           </span>
         </div>
@@ -104,7 +102,7 @@ export default function UserPlatformCard({
                   <div
                     key={stat.label}
                     /* An odd count leaves the last one alone on its row: let it fill it. */
-                    className={`bg-bg-main rounded-xl px-3 py-2.5 flex flex-col gap-0.5 min-w-0 ${
+                    className={`bg-bg-main rounded-control px-3 py-2.5 flex flex-col gap-0.5 min-w-0 ${
                       stats.length % 2 === 1 && i === stats.length - 1 ? 'col-span-2' : ''
                     }`}
                   >

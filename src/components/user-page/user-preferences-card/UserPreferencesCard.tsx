@@ -113,7 +113,7 @@ export default function UserPreferencesCard() {
         role="tabpanel"
         id={profilePanelId(ID_PREFIX, tab)}
         aria-labelledby={profileTabId(ID_PREFIX, tab)}
-        className="bg-bg-main rounded-2xl p-3 sm:p-4 flex-1"
+        className="flex-1"
       >
         {tab === 'general' ? (
           <UserPreferencesGeneral

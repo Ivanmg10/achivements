@@ -7,13 +7,13 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useFollowCounts } from '@/hooks/useFollowCounts'
 
 const TILE =
-  'group flex items-center gap-3 rounded-xl bg-bg-card ring-1 ring-ink/[0.06] px-3 py-2.5 min-w-0 hover:bg-ink/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+  'group flex items-center gap-3 rounded-control bg-bg-main px-3 py-2.5 min-w-0 hover:bg-ink/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
 /** One count that opens its list. */
 function Tile({ href, icon, label, value }: { href: string; icon: ReactNode; label: string; value: string }) {
   return (
     <Link href={href} className={TILE}>
-      <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-xl bg-bg-main flex items-center justify-center text-text-secondary">
+      <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-chip bg-ink/[0.06] flex items-center justify-center text-text-secondary">
         {icon}
       </span>
       <span className="flex flex-col min-w-0 flex-1">

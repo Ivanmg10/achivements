@@ -21,6 +21,7 @@ import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { useGroups } from '@/hooks/useGroups'
 import { summarizeSteamLibrary } from '@/utils/steamFeed'
 import { codeToFlag, findCountry } from '@/utils/countries'
+import Button from '@/components/ui/Button'
 
 // Modals are downloaded the first time they are wanted, not with the page — the admin panel above all.
 const AdminPanelModal = dynamic(() => import('@/components/admin-panel/admin-panel-modal/AdminPanelModal'), { loading: () => null })
@@ -105,7 +106,7 @@ export default function UserIdentityCard() {
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 truncate">{user?.name}</h1>
               {user?.admin && (
-                <span className="text-xs bg-accent text-bg-main font-bold px-2 py-0.5 rounded-full">
+                <span className="inline-flex items-center h-6 px-2 rounded-chip text-xs font-bold bg-warning/20 text-warning">
                   {T.userData.admin}
                 </span>
               )}
@@ -117,29 +118,19 @@ export default function UserIdentityCard() {
         <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
           {/* The flag in the session decides the button; the panel itself asks the DB and a password. */}
           {user?.admin && (
-            <button
-              onClick={() => setAdminOpen(true)}
-              aria-haspopup="dialog"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-accent/15 text-accent hover:bg-accent/25 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-            >
-              <IconShield size={13} aria-hidden="true" />
+            <Button variant="secondary" size="sm" onClick={() => setAdminOpen(true)} aria-haspopup="dialog">
+              <IconShield size={14} aria-hidden="true" />
               Admin panel
-            </button>
+            </Button>
           )}
-          <button
-            onClick={() => setPasswordOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            <IconLock size={13} aria-hidden="true" />
+          <Button variant="secondary" size="sm" onClick={() => setPasswordOpen(true)}>
+            <IconLock size={14} aria-hidden="true" />
             {T.userData.changePassword}
-          </button>
-          <button
-            onClick={() => signOut({ callbackUrl: '/authPage' })}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-danger/15 text-danger hover:bg-danger/25 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
-          >
-            <IconLogout size={13} aria-hidden="true" />
+          </Button>
+          <Button variant="danger" size="sm" onClick={() => signOut({ callbackUrl: '/authPage' })}>
+            <IconLogout size={14} aria-hidden="true" />
             {T.userConfig.signOut}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -161,19 +152,22 @@ export default function UserIdentityCard() {
         </div>
       )}
 
-      <div className="bg-bg-main rounded-2xl p-4 flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
         <ProfileField
+          sunken
           label={T.userPage.username}
           value={user?.name}
           onEdit={() => setEdit({ field: 'name', value: user?.name ?? '' })}
         />
         <ProfileField
+          sunken
           label={T.userData.email}
           value={user?.email}
           empty={T.userData.notSet}
           onEdit={() => setEdit({ field: 'email', value: user?.email ?? '' })}
         />
         <ProfileField
+          sunken
           label={T.userData.location}
           value={country?.name}
           empty={T.userData.notSet}
