@@ -16,6 +16,9 @@ import SearchModalUserResults from './search-modal-user-results/SearchModalUserR
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import type { GameSource } from '@/types/steam'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import IconButton from '@/components/ui/IconButton'
+import SegmentedControl from '@/components/ui/SegmentedControl'
+import { pillClass } from '@/components/ui/Pill'
 
 const overlayVariants: Variants = {
   hidden: { opacity: 0 },
@@ -135,12 +138,16 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
         >
           <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-full max-w-2xl px-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl overflow-hidden border border-ink/5"
+              role="dialog"
+              aria-modal="true"
+              aria-label={placeholder}
+              className="bg-bg-header rounded-card overflow-hidden ring-1 ring-ink/12 shadow-2xl shadow-black/50"
               variants={contentVariants}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Input row */}
-              <div className="flex items-center gap-3 px-4 py-3.5 border-b border-ink/5">
+              <div className="flex items-center gap-3 px-4 py-3.5 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.08)]">
+                <span aria-hidden="true" className="w-1 h-6 shrink-0 bg-accent skew-x-(--slant-line)" />
                 {tab === 'users'
                   ? <IconUser className="w-5 h-5 text-text-secondary shrink-0" aria-hidden />
                   : <IconSearch className="w-5 h-5 text-text-secondary shrink-0" aria-hidden />
@@ -161,32 +168,28 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                   className="flex-1 bg-transparent text-text-main text-base outline-none placeholder:text-text-secondary"
                   aria-label={placeholder}
                 />
-                <button
-                  onClick={onClose}
-                  aria-label="Close search"
-                  className="p-1 rounded-lg text-text-secondary hover:text-text-main transition-colors"
-                >
+                <IconButton onClick={onClose} aria-label={T.cards.close} size="sm">
                   <IconX className="w-4 h-4" aria-hidden />
-                </button>
+                </IconButton>
               </div>
 
-              {/* Tab toggle */}
-              <div className="flex border-b border-ink/5 px-4 gap-4">
-                {(['games', 'users'] as SearchTab[]).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => { setTab(t); setQuery('') }}
-                    aria-pressed={tab === t}
-                    className={`py-2 text-xs font-medium border-b-2 transition-colors ${tab === t ? 'border-accent text-text-main' : 'border-transparent text-text-secondary hover:text-text-main'}`}
-                  >
-                    {t === 'games' ? T.publicProfile.gamesTab : T.publicProfile.userTab}
-                  </button>
-                ))}
+              {/* Games or people */}
+              <div className="px-4 py-2.5 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.08)]">
+                <SegmentedControl<SearchTab>
+                  aria-label={T.search.placeholder}
+                  size="xs"
+                  value={tab}
+                  onChange={(t) => { setTab(t); setQuery('') }}
+                  options={[
+                    { value: 'games', label: T.publicProfile.gamesTab },
+                    { value: 'users', label: T.publicProfile.userTab },
+                  ]}
+                />
               </div>
 
               {/* Platform filter — only worth showing once results come from more than one platform */}
               {tab === 'games' && hasSeveralPlatforms && (
-                <div className="flex items-center gap-3 px-4 py-2 border-b border-ink/5" role="group" aria-label={T.search.platformAll}>
+                <div className="flex flex-wrap items-center gap-1.5 px-4 py-2.5 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.08)]" role="group" aria-label={T.search.platformAll}>
                   {(
                     [
                       { value: 'all' as PlatformFilter, label: T.search.platformAll, icon: null },
@@ -201,11 +204,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                       key={opt.value}
                       onClick={() => setPlatformFilter(opt.value)}
                       aria-pressed={platformFilter === opt.value}
-                      className={`flex items-center gap-1.5 pb-1 text-[11px] font-medium border-b-2 transition-colors ${
-                        platformFilter === opt.value
-                          ? 'border-accent text-text-main'
-                          : 'border-transparent text-text-secondary hover:text-text-main'
-                      }`}
+                      className={pillClass(platformFilter === opt.value)}
                     >
                       {opt.icon}
                       {opt.label}
@@ -247,7 +246,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
                         {directGameId && !results.find((r) => r.source === 'ra' && r.id === directGameId) && (
                           <motion.li variants={resultVariants}>
                             <button
-                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer border-t border-ink/5"
+                              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/[0.06] transition-colors text-left cursor-pointer shadow-[inset_0_1px_0_rgb(var(--ink)/0.06)] focus-visible:outline-none focus-visible:bg-accent/10"
                               onClick={() => handleSelect({ source: 'ra', id: directGameId })}
                             >
                               <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-text-secondary text-xs font-bold">
