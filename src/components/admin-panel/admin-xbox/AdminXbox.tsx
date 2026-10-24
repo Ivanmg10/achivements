@@ -34,7 +34,7 @@ export default function AdminXbox() {
   }
 
   return (
-    <section aria-labelledby="admin-xbox-title" className="bg-bg-card rounded-2xl p-4 flex flex-col gap-3">
+    <section aria-labelledby="admin-xbox-title" className="bg-bg-card rounded-card p-4 flex flex-col gap-3">
       <h3 id="admin-xbox-title" className="text-sm font-semibold">
         Xbox explorer
       </h3>

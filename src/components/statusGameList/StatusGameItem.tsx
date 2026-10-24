@@ -59,7 +59,7 @@ export default function StatusGameItem({
     <>
       <div
         onPointerMove={onPointerMove}
-        className={`spotlight bg-bg-card rounded-2xl overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
+        className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
         <GameCardBackdrop src={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null} surface="card" />
         {/* relative: the expand button stretches over this whole header (see the chevron). */}

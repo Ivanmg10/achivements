@@ -95,7 +95,7 @@ export default function UserPreferencesCard() {
   }
 
   return (
-    <section className="bg-bg-card rounded-3xl p-6 flex flex-col gap-4 h-full">
+    <section className="bg-bg-card rounded-card p-6 flex flex-col gap-4 h-full">
       <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
         {T.userPage.preferences}
       </h2>

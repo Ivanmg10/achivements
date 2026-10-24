@@ -24,7 +24,7 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
   return (
     <Link
       href={`/groups/${group.id}`}
-      className="spotlight group relative flex flex-col h-full bg-bg-card rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="spotlight group relative flex flex-col h-full bg-bg-card rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       <div className="relative h-36 sm:h-44 overflow-hidden" aria-hidden="true">
         {covers.length > 0 ? (

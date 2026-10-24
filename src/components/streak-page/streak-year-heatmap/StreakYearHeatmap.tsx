@@ -53,7 +53,7 @@ export default function StreakYearHeatmap({
 
 
   return (
-    <section aria-labelledby="streak-year-title" className="bg-bg-card rounded-2xl p-5 flex flex-col gap-3 min-w-0">
+    <section aria-labelledby="streak-year-title" className="bg-bg-card rounded-card p-5 flex flex-col gap-3 min-w-0">
       <div>
         <h2 id="streak-year-title" className="text-sm uppercase tracking-widest text-text-secondary">
           {T.streak.yearTitle}

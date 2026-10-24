@@ -35,7 +35,7 @@ export default function StreakStatsBanner({ activeStreak, bestStreak, totalStrea
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div className="bg-bg-card rounded-2xl p-5 flex items-center gap-4">
+      <div className="bg-bg-card rounded-card p-5 flex items-center gap-4">
         <div className={`flex items-center justify-center w-12 h-12 rounded-xl shrink-0 ${activeStreak ? 'bg-warning/10' : 'bg-ink/5'}`}>
           <IconFlame className={`w-6 h-6 ${activeStreak ? 'text-warning' : 'text-text-secondary'}`} aria-hidden="true" />
         </div>
@@ -56,7 +56,7 @@ export default function StreakStatsBanner({ activeStreak, bestStreak, totalStrea
         </div>
       </div>
 
-      <div className="bg-bg-card rounded-2xl p-5 flex items-center gap-4">
+      <div className="bg-bg-card rounded-card p-5 flex items-center gap-4">
         <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 shrink-0">
           <IconTrendingUp className="w-6 h-6 text-accent" aria-hidden="true" />
         </div>

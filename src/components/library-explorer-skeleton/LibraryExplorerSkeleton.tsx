@@ -11,7 +11,7 @@ const SHELF_CARDS = 4
 /** The list's own shape: icon, title, platform, bar. Same height as a real row. */
 function Row() {
   return (
-    <div className="rounded-2xl bg-bg-card ring-1 ring-ink/5 p-2 pr-3 grid grid-cols-[52px_1fr] items-center gap-3">
+    <div className="rounded-card bg-bg-card ring-1 ring-ink/5 p-2 pr-3 grid grid-cols-[52px_1fr] items-center gap-3">
       <div className={`${BLOCK} w-[52px] h-[52px] rounded-xl`} />
       <div className="flex flex-col gap-2">
         <div className={`${BLOCK} h-3.5 w-2/3 rounded`} />
@@ -25,7 +25,7 @@ function Row() {
 /** The open game's panel: its name and platform, the ring, the two panels beside it, the figures, the achievements. */
 function Detail() {
   return (
-    <div className="rounded-2xl bg-bg-card ring-1 ring-accent/30 p-4 flex flex-col gap-3">
+    <div className="rounded-card bg-bg-card ring-1 ring-accent/30 p-4 flex flex-col gap-3">
       <div className="flex items-center gap-3">
         <div className={`${BLOCK} h-9 w-1/2 rounded-lg`} />
         <div className={`${BLOCK} h-8 w-32 rounded-xl`} />
@@ -55,7 +55,7 @@ function Shelf({ cards = SHELF_CARDS }: { cards?: number }) {
       <div className={`${BLOCK} h-5 w-48 rounded`} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {Array.from({ length: cards }, (_, i) => (
-          <div key={i} className="rounded-2xl bg-bg-card ring-1 ring-ink/5 overflow-hidden">
+          <div key={i} className="rounded-card bg-bg-card ring-1 ring-ink/5 overflow-hidden">
             <div className={`${BLOCK} aspect-video`} />
             <div className="p-4 min-h-[7.25rem] flex flex-col justify-end gap-3">
               <div className={`${BLOCK} h-4 w-2/3 rounded`} />

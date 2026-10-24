@@ -61,7 +61,7 @@ export default function WelcomePagePreferences({
       aside={
         <>
           <span className={`${styles.in} ${SECTION_LABEL}`}>{t.others}</span>
-          <div className={`${styles.card} rounded-3xl bg-bg-card ring-1 ring-ink/[0.06] p-3 flex flex-col`}>
+          <div className={`${styles.card} rounded-card bg-bg-card ring-1 ring-ink/[0.06] p-3 flex flex-col`}>
             <UserProfileSwitch
               field="profilePublic"
               checked={user?.profilePublic !== false}

@@ -60,7 +60,7 @@ export default function SteamStatusGameItem({
     <>
       <div
         onPointerMove={onPointerMove}
-        className={`spotlight bg-bg-card rounded-2xl overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
+        className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
         {/* The same blurred art and pointer glow as the RA card beside it. */}
         <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} surface="card" />

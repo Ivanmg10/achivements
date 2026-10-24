@@ -48,7 +48,7 @@ export default function WelcomePageIntroDetail({
         if (e.key === 'Escape') onClose()
       }}
       transition={{ type: 'spring', stiffness: 260, damping: 32 }}
-      className="relative rounded-3xl bg-bg-card ring-1 ring-accent/30 shadow-2xl shadow-black/30 overflow-hidden"
+      className="relative rounded-card bg-bg-card ring-1 ring-accent/30 shadow-2xl shadow-black/30 overflow-hidden"
     >
       <button
         type="button"

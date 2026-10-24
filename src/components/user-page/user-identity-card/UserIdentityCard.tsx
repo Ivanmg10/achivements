@@ -68,7 +68,7 @@ export default function UserIdentityCard() {
   ]
 
   return (
-    <section className="relative bg-bg-card rounded-3xl overflow-hidden flex flex-col h-full">
+    <section className="relative bg-bg-card rounded-card overflow-hidden flex flex-col h-full">
       <UserProfileBanner avatar={user?.avatar} />
 
       <div className="relative px-4 sm:px-6 pt-6 pb-6 flex flex-col gap-5 flex-1">

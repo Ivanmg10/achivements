@@ -14,7 +14,7 @@ export default function RankingsPageHot({ rows, linked, onSeeWeek }: { rows: Ran
   const { T, lang } = useLanguage()
 
   return (
-    <section aria-labelledby="rankings-hot-title" className="bg-bg-card rounded-3xl p-5 flex flex-col gap-3">
+    <section aria-labelledby="rankings-hot-title" className="bg-bg-card rounded-card p-5 flex flex-col gap-3">
       <h2 id="rankings-hot-title" className="flex items-center gap-1.5 text-xs uppercase tracking-wider font-bold text-text-secondary">
         <IconFlame size={14} className="text-accent" aria-hidden="true" />
         {T.rankings.hotTitle}

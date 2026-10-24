@@ -35,7 +35,7 @@ export default function WelcomePageIntroPerk({
     <motion.li
       layoutId={layoutId}
       transition={{ type: 'spring', stiffness: 260, damping: 32 }}
-      className={`${styles.card} rounded-2xl bg-bg-card ring-1 ring-ink/[0.06]`}
+      className={`${styles.card} rounded-card bg-bg-card ring-1 ring-ink/[0.06]`}
       style={{ animationDelay: `calc(var(--enter-delay, 0s) + ${delayMs}ms)` }}
     >
       <button

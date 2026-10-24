@@ -27,7 +27,7 @@ export default function FollowingRankingsTeaser({ className = '' }: { className?
     <Link
       href="/rankings"
       aria-labelledby="following-rankings-title"
-      className={`group relative bg-bg-card rounded-3xl overflow-hidden p-5 flex flex-col gap-4 hover:ring-1 hover:ring-accent/40 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${className}`}
+      className={`group relative bg-bg-card rounded-card overflow-hidden p-5 flex flex-col gap-4 hover:ring-1 hover:ring-accent/40 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${className}`}
     >
       <span aria-hidden="true" className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_bottom_right,rgb(var(--accent)/0.18),transparent_65%)]" />
 

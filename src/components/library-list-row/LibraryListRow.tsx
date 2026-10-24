@@ -21,7 +21,7 @@ export default function LibraryListRow({ entry, current, onSelect }: { entry: Li
 
   return (
     <div
-      className={`relative w-full grid grid-cols-[52px_1fr] items-center gap-3 rounded-2xl bg-bg-card p-2 pr-3 ring-1 transition-shadow focus-within:ring-2 focus-within:ring-accent/70 ${
+      className={`relative w-full grid grid-cols-[52px_1fr] items-center gap-3 rounded-card bg-bg-card p-2 pr-3 ring-1 transition-shadow focus-within:ring-2 focus-within:ring-accent/70 ${
         current ? 'ring-2 ring-accent' : 'ring-ink/5 hover:ring-ink/15'
       }`}
     >

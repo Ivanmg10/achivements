@@ -48,7 +48,7 @@ export default function FollowingList({
   if (isLoading) return <FollowingPageSkeleton />
   if (error) {
     return (
-      <div className="bg-bg-card rounded-2xl flex flex-col items-center gap-2 py-10 text-center">
+      <div className="bg-bg-card rounded-card flex flex-col items-center gap-2 py-10 text-center">
         <p role="alert" className="text-sm text-danger">{T.following.loadError}</p>
         <button onClick={onRetry} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
           {T.publicProfile.retry}
@@ -58,7 +58,7 @@ export default function FollowingList({
   }
   if (users.length === 0) {
     return (
-      <div className="bg-bg-card rounded-2xl">
+      <div className="bg-bg-card rounded-card">
         <EmptyState icon={empty.icon} title={empty.title} subtitle={empty.subtitle} className="py-12" />
       </div>
     )
@@ -68,7 +68,7 @@ export default function FollowingList({
     <>
       <FollowingToolbar query={query} onQuery={setQuery} platforms={platforms} onPlatforms={setPlatforms} total={users.length} counts={counts} />
       {shown.length === 0 ? (
-        <p role="status" className="bg-bg-card rounded-2xl py-10 text-center text-sm text-text-secondary">{T.following.noMatches}</p>
+        <p role="status" className="bg-bg-card rounded-card py-10 text-center text-sm text-text-secondary">{T.following.noMatches}</p>
       ) : (
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[1800px]:grid-cols-5 gap-3">
           {shown.map((u) => (

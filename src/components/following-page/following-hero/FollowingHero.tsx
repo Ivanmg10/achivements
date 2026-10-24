@@ -20,7 +20,7 @@ export default function FollowingHero({ users, className = '' }: { users: Friend
   const online = users.filter((u) => u.online).length
 
   return (
-    <section aria-labelledby="following-title" className={`relative bg-bg-card rounded-3xl overflow-hidden ${className}`}>
+    <section aria-labelledby="following-title" className={`relative bg-bg-card rounded-card overflow-hidden ${className}`}>
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top_left,rgb(var(--accent)/0.25),transparent_60%)]" />
       <IconUsers aria-hidden="true" size={220} stroke={1} className="hidden sm:block absolute -right-10 -bottom-16 text-accent/10 pointer-events-none" />
 

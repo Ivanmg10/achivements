@@ -40,7 +40,7 @@ export default function RankingsPageTable({
   const { T, lang } = useLanguage()
 
   return (
-    <div className="bg-bg-card rounded-2xl overflow-x-auto">
+    <div className="bg-bg-card rounded-card overflow-x-auto">
       <table className="w-full text-sm border-collapse">
         <caption className="sr-only">{caption}</caption>
         <thead>

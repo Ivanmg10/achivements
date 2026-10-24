@@ -50,7 +50,7 @@ export default function GroupToolbar({
   ]
 
   return (
-    <div className="flex flex-wrap items-center gap-2 p-2 rounded-2xl bg-bg-card ring-1 ring-ink/5">
+    <div className="flex flex-wrap items-center gap-2 p-2 rounded-card bg-bg-card ring-1 ring-ink/5">
       <div role="group" aria-label={T.groups.filterProgressLabel} className="flex flex-wrap gap-1">
         {states.map((s) => (
           <button

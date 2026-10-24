@@ -44,7 +44,7 @@ export default function LibraryEntryDetail({ entry, category }: { entry: Library
   const id = entryId(entry)
 
   return (
-    <section aria-label={entry.title} className="relative isolate overflow-hidden flex flex-col gap-3 grow shrink-0 rounded-2xl bg-bg-card p-4 ring-1 ring-accent/30 shadow-lg shadow-black/10">
+    <section aria-label={entry.title} className="relative isolate overflow-hidden flex flex-col gap-3 grow shrink-0 rounded-card bg-bg-card p-4 ring-1 ring-accent/30 shadow-lg shadow-black/10">
       <LibraryDetailBackdrop entry={entry} />
       <header className="flex items-center gap-2 min-w-0">
         <div className="flex items-center gap-3 min-w-0 flex-1">

@@ -22,7 +22,7 @@ export default function StreakChart({ streaks, selectedStreak, onSelect }: Props
   const maxDays = top[0]?.days ?? 1
 
   return (
-    <div className="bg-bg-card rounded-2xl p-5">
+    <div className="bg-bg-card rounded-card p-5">
       <h2 className="text-sm uppercase tracking-widest text-text-secondary mb-6">{T.streak.chartTitle}</h2>
 
       <div className="flex items-end gap-2 sm:gap-3" style={{ height: BAR_HEIGHT + 56 }}>

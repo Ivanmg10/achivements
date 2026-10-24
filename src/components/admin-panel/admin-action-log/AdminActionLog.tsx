@@ -65,7 +65,7 @@ export default function AdminActionLog() {
   }
 
   return (
-    <section className="bg-bg-card rounded-2xl">
+    <section className="bg-bg-card rounded-card">
       <button
         onClick={toggle}
         aria-expanded={open}

@@ -86,14 +86,14 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
               {isLoading ? (
                 <RankingsPageSkeleton podium={view.scope === 'global'} />
               ) : error ? (
-                <div className="bg-bg-card rounded-2xl flex flex-col items-center gap-2 py-10 text-center">
+                <div className="bg-bg-card rounded-card flex flex-col items-center gap-2 py-10 text-center">
                   <p role="alert" className="text-sm text-danger">{T.rankings.loadError}</p>
                   <button onClick={retry} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
                     {T.rankings.retry}
                   </button>
                 </div>
               ) : rows.length === 0 ? (
-                <div className="bg-bg-card rounded-2xl">
+                <div className="bg-bg-card rounded-card">
                   <EmptyState
                     icon={view.scope === 'following' ? <IconUsers className="w-6 h-6" /> : <IconTrophy className="w-6 h-6" />}
                     title={T.rankings.empty}

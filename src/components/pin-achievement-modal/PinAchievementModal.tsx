@@ -78,7 +78,7 @@ export function PinAchievementModal({
       {isOpen && (
         <Modal isOpen={isOpen} onClose={onClose} size="md" showClose={false} className="gap-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl border border-ink/5 flex flex-col overflow-hidden max-h-[70vh]"
+              className="bg-bg-card rounded-card shadow-2xl border border-ink/5 flex flex-col overflow-hidden max-h-[70vh]"
               variants={spotlightVariants}
               onClick={(e) => e.stopPropagation()}
             >

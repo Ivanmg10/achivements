@@ -17,7 +17,7 @@ export default function WelcomePageRaGuide() {
   const t = T.welcome.ra
 
   return (
-    <div className={`${styles.card} rounded-3xl bg-bg-card ring-1 ring-ink/[0.06] p-4 sm:p-5 flex flex-col gap-3`}>
+    <div className={`${styles.card} rounded-card bg-bg-card ring-1 ring-ink/[0.06] p-4 sm:p-5 flex flex-col gap-3`}>
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-text-secondary">{t.guideTitle}</h2>
         <a

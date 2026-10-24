@@ -25,7 +25,7 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
   const fill = useVaultFillState()
 
   return (
-    <section aria-labelledby="rankings-level-title" className="bg-bg-card rounded-3xl p-5 flex flex-col gap-4">
+    <section aria-labelledby="rankings-level-title" className="bg-bg-card rounded-card p-5 flex flex-col gap-4">
       <h2 id="rankings-level-title" className="text-xs uppercase tracking-wider font-bold text-text-secondary">
         {T.rankings.yourLevel}
       </h2>

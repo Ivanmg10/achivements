@@ -37,7 +37,7 @@ export default function RankingsPagePodium({ rows, linked, approx = false }: { r
           key={r.username}
           variants={PODIUM_CARD}
           custom={place}
-          className={`relative bg-bg-card rounded-2xl sm:rounded-3xl pt-4 sm:pt-5 px-2 sm:px-4 flex flex-col items-center gap-2 overflow-hidden ${r.isMe ? 'ring-2 ring-accent/50' : ''}`}
+          className={`relative bg-bg-card rounded-card sm:rounded-3xl pt-4 sm:pt-5 px-2 sm:px-4 flex flex-col items-center gap-2 overflow-hidden ${r.isMe ? 'ring-2 ring-accent/50' : ''}`}
         >
           <span aria-hidden="true" className={`absolute inset-0 pointer-events-none ${GLOW[r.rank] ?? GLOW[3]}`} />
           <span className="relative flex flex-col items-center gap-1.5 min-w-0 w-full">

@@ -36,7 +36,7 @@ export default function StatusPageSkeleton({ cols = 2 }: { cols?: number }) {
         </div>
         <div className={`grid gap-2 ${GRID[cols] ?? GRID[2]}`}>
           {Array.from({ length: CARDS }, (_, i) => (
-            <div key={i} className="bg-bg-card rounded-2xl ring-1 ring-ink/5 p-4 sm:p-5 flex items-start gap-3 sm:gap-5">
+            <div key={i} className="bg-bg-card rounded-card ring-1 ring-ink/5 p-4 sm:p-5 flex items-start gap-3 sm:gap-5">
               <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl bg-ink/[0.07] shrink-0" />
               <div className="flex flex-col gap-2.5 flex-1 min-w-0 pt-1">
                 <div className="h-5 w-2/3 rounded-full bg-ink/[0.08]" />

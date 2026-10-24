@@ -112,7 +112,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
       {isOpen && (
         <Modal isOpen={isOpen} onClose={onClose} size="lg" showClose={false} className="gap-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl border border-ink/5 flex flex-col overflow-hidden"
+              className="bg-bg-card rounded-card shadow-2xl border border-ink/5 flex flex-col overflow-hidden"
               variants={spotlightVariants}
               onClick={(e) => e.stopPropagation()}
             >

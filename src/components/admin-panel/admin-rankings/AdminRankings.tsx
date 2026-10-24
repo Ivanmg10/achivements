@@ -24,7 +24,7 @@ export default function AdminRankings() {
   }
 
   return (
-    <section aria-labelledby="admin-rankings-title" className="bg-bg-card rounded-2xl p-4 flex flex-col gap-3">
+    <section aria-labelledby="admin-rankings-title" className="bg-bg-card rounded-card p-4 flex flex-col gap-3">
       <h3 id="admin-rankings-title" className="flex items-center gap-2 text-sm font-semibold">
         <IconScale size={16} className="text-accent" aria-hidden="true" />
         Rankings balance

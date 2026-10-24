@@ -26,7 +26,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
   const country = user.location ? findCountry(user.location) : null
 
   return (
-    <section aria-labelledby="public-user-name" className="relative bg-bg-card rounded-3xl overflow-hidden">
+    <section aria-labelledby="public-user-name" className="relative bg-bg-card rounded-card overflow-hidden">
       <UserProfileBanner avatar={user.avatar} />
 
       <div className="relative px-4 sm:px-6 pt-6 pb-5 flex flex-col gap-5">

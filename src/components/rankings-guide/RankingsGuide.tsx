@@ -72,7 +72,7 @@ export default function RankingsGuide() {
       <RankingsGuideBlock {...g.notCounted} />
 
       <RankingsGuideBlock {...g.levels}>
-        <div className="bg-bg-card rounded-2xl overflow-x-auto">
+        <div className="bg-bg-card rounded-card overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="border-b border-ink/[0.07] text-[11px] uppercase tracking-wider text-text-secondary">

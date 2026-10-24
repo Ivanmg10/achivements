@@ -5,7 +5,7 @@ export default function RankingsPageSkeleton({ podium = true }: { podium?: boole
       {podium && (
         <div className="grid grid-cols-3 gap-3 items-end">
           {['h-40', 'h-48', 'h-36'].map((h) => (
-            <div key={h} className={`${h} rounded-3xl bg-bg-card`} />
+            <div key={h} className={`${h} rounded-card bg-bg-card`} />
           ))}
         </div>
       )}

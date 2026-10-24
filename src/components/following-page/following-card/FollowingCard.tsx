@@ -37,7 +37,7 @@ export default function FollowingCard({
   const country = friend.location ? findCountry(friend.location) : null
 
   return (
-    <article className="flex-1 bg-bg-card rounded-2xl ring-1 ring-ink/5 hover:ring-accent/40 transition-shadow flex flex-col min-w-0">
+    <article className="flex-1 bg-bg-card rounded-card ring-1 ring-ink/5 hover:ring-accent/40 transition-shadow flex flex-col min-w-0">
       <FollowingCardBanner friend={friend} lastPlayed={lastPlayed} />
 
       <div className="px-4 pb-4 flex flex-col gap-4 flex-1">

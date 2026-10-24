@@ -1,7 +1,7 @@
 /** A two-column table of the guide (a rarity and what it is worth, say), the value column right-aligned. */
 export default function RankingsGuideTable({ head, rows }: { head: [string, string]; rows: [string, string][] }) {
   return (
-    <div className="bg-bg-card rounded-2xl overflow-x-auto">
+    <div className="bg-bg-card rounded-card overflow-x-auto">
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="border-b border-ink/[0.07]">

@@ -18,7 +18,7 @@ export default function ProfileTeaser({ teaser }: { teaser: Teaser }) {
 
   return (
     <section className="max-w-md mx-auto px-4 py-12 sm:py-16">
-      <div className="relative bg-bg-card rounded-3xl p-6 sm:p-8 flex flex-col items-center gap-5 text-center overflow-hidden">
+      <div className="relative bg-bg-card rounded-card p-6 sm:p-8 flex flex-col items-center gap-5 text-center overflow-hidden">
         <span aria-hidden="true" className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,rgb(var(--accent)/0.18),transparent_65%)]" />
         <h1 className="relative text-xl">
           <RankingsPageUser row={{ username: teaser.username, avatar: teaser.avatar, isMe: false }} size="xl" linked={false} stacked />

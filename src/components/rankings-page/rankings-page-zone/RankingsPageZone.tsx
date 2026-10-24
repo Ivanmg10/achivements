@@ -54,7 +54,7 @@ export default function RankingsPageZone({
     .replace('{pct}', String(Math.max(1, Math.ceil((me.rank / Math.max(1, total)) * 100))))
 
   return (
-    <section aria-labelledby="rankings-zone-title" className="bg-bg-card rounded-2xl ring-1 ring-accent/35 overflow-hidden">
+    <section aria-labelledby="rankings-zone-title" className="bg-bg-card rounded-card ring-1 ring-accent/35 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-ink/[0.07]">
         <div className="flex flex-col gap-0.5">
           <h2 id="rankings-zone-title" className="text-sm font-bold">{T.rankings.zone}</h2>

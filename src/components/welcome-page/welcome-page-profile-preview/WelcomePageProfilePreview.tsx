@@ -23,7 +23,7 @@ export default function WelcomePageProfilePreview() {
   return (
     <>
       <span className={`${styles.in} text-xs font-bold uppercase tracking-[0.12em] text-text-secondary`}>{T.welcome.profile.preview}</span>
-      <div className={`${styles.card} rounded-3xl bg-bg-card ring-1 ring-ink/[0.06] overflow-hidden`}>
+      <div className={`${styles.card} rounded-card bg-bg-card ring-1 ring-ink/[0.06] overflow-hidden`}>
         <div className="h-20 bg-linear-to-br from-accent/55 to-bg-card" />
         <div className="px-5 pb-5 -mt-10 flex flex-col gap-2 min-w-0">
           {user?.avatar ? (
