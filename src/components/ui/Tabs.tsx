@@ -7,6 +7,23 @@ export type Tab<V extends string> = {
   count?: number | string
 }
 
+/**
+ * The look of one tab with its slanted line, for a row of pressed buttons that
+ * filter a list in place (no panel to point at) but should read as tabs.
+ */
+export function tabClass(on: boolean, className = '') {
+  return (
+    'relative shrink-0 inline-flex items-center gap-2 h-10 px-3 text-sm font-semibold whitespace-nowrap transition-colors duration-(--motion-hover) cursor-pointer ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:rounded-chip ' +
+    "after:content-[''] after:absolute after:left-2 after:right-2 after:bottom-0 after:h-1 after:bg-accent after:skew-x-(--slant-line) after:origin-left after:transition-transform after:duration-(--motion-open) " +
+    (on ? 'text-text-main after:scale-x-100 ' : 'text-text-secondary hover:text-text-main after:scale-x-0 ') +
+    className
+  )
+}
+
+/** The bottom hairline under a row of tabs. */
+export const TAB_ROW = 'flex items-end gap-1 overflow-x-auto shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]'
+
 /** The ids a tab and its panel share, so the panel can say which tab it belongs to. */
 export function tabIds(base: string, value: string) {
   return { tab: `${base}-tab-${value}`, panel: `${base}-panel-${value}` }

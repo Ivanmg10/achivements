@@ -20,6 +20,7 @@ import { guideLinks } from '@/utils/guideLinks'
 import GameInfoTableFoldBar from '@/components/game-info-table-fold-bar/GameInfoTableFoldBar'
 import AchievementDetailModal from '@/components/achievement-detail-modal/AchievementDetailModal'
 import type { XboxAchievement } from '@/types/xbox'
+import { tabClass, TAB_ROW } from '@/components/ui/Tabs'
 
 type Filter = 'all' | 'earned' | 'unearned'
 
@@ -131,17 +132,13 @@ export default function XboxGameInfoTable({
 
   return (
     <section className="bg-bg-card p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
-      <div className="flex gap-2 flex-wrap" role="group" aria-label={T.xbox.achievements}>
+      <div className={TAB_ROW} role="group" aria-label={T.xbox.achievements}>
         {(['all', 'earned', 'unearned'] as Filter[]).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
             aria-pressed={filter === f}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              filter === f
-                ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30'
-                : 'bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card'
-            }`}
+            className={tabClass(filter === f)}
           >
             {FILTER_LABELS[f]}
           </button>

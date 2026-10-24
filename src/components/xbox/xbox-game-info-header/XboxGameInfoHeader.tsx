@@ -50,25 +50,25 @@ export default function XboxGameInfoHeader({
   ]
 
   return (
-    <section className="relative bg-transparent p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,auto)] mt-5 overflow-hidden">
+    <section className="relative p-5 lg:px-8 min-w-[95%] grid grid-cols-1 gap-8 lg:grid-cols-[1fr_minmax(400px,auto)] mt-5 overflow-hidden">
       <div className="relative z-10 flex flex-row items-start gap-5">
         <GameIcon source="xbox" id={game.id} imageUrl={game.imageIcon} size={200} className="w-28 h-28 lg:w-50 lg:h-50 rounded-xl shrink-0 shadow-xl shadow-black/40" />
 
         <div className="flex flex-col flex-1 min-w-0 gap-3">
-          <h1 className="text-2xl lg:text-3xl">{game.title}</h1>
+          <h1 className="font-display italic font-extrabold text-4xl lg:text-6xl leading-[0.9] pr-2 text-text-main">{game.title}</h1>
 
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`inline-flex items-center gap-1.5 text-sm px-2 py-0.5 rounded-md font-medium ${xboxPlatformChip(game.consoleName)}`}>
+            <span className={`inline-flex items-center gap-1.5 h-7 px-2.5 rounded-chip text-xs font-bold ${xboxPlatformChip(game.consoleName)}`}>
               <XboxLogo size={14} aria-hidden="true" />
               {game.consoleName}
             </span>
             {isComplete && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-warning/20 text-warning">
+              <span className="inline-flex items-center h-7 px-2.5 rounded-chip text-xs font-bold bg-warning/20 text-warning">
                 ★ {T.steam.perfect}
               </span>
             )}
             {inProgress && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-info/20 text-info">
+              <span className="inline-flex items-center h-7 px-2.5 rounded-chip text-xs font-bold bg-info/20 text-info">
                 {T.gameStatus.inProgress}
               </span>
             )}

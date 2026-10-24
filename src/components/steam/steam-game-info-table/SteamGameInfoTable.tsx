@@ -21,6 +21,7 @@ import GameInfoTableFoldBar from '@/components/game-info-table-fold-bar/GameInfo
 import AchievementWarningPanel from '@/components/achievement-warning-panel/AchievementWarningPanel'
 import AchievementDetailModal from '@/components/achievement-detail-modal/AchievementDetailModal'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
+import { tabClass, TAB_ROW } from '@/components/ui/Tabs'
 
 type Filter = 'all' | 'earned' | 'unearned'
 
@@ -147,17 +148,13 @@ export default function SteamGameInfoTable({
         }))}
       />
 
-      <div className="flex gap-2 flex-wrap" role="group" aria-label={T.gameInfoPage.achievements}>
+      <div className={TAB_ROW} role="group" aria-label={T.gameInfoPage.achievements}>
         {(['all', 'earned', 'unearned'] as Filter[]).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
             aria-pressed={filter === f}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              filter === f
-                ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30'
-                : 'bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card'
-            }`}
+            className={tabClass(filter === f)}
           >
             {FILTER_LABELS[f]}
           </button>

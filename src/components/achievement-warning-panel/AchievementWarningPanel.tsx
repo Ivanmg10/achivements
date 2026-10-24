@@ -8,14 +8,14 @@ export type WarningItem = { key: string; title: string; description: string; ico
 
 const TONE = {
   danger: {
-    box: 'border-danger/40',
+    box: 'ring-danger/30',
     head: 'bg-danger/10 hover:bg-danger/15 focus-visible:ring-danger/70',
     text: 'text-danger',
     body: 'bg-danger/5',
     item: 'hover:bg-danger/10 focus-visible:ring-danger/70',
   },
   warning: {
-    box: 'border-warning/40',
+    box: 'ring-warning/30',
     head: 'bg-warning/10 hover:bg-warning/15 focus-visible:ring-warning/70',
     text: 'text-warning',
     body: 'bg-warning/5',
@@ -44,7 +44,7 @@ export default function AchievementWarningPanel({
   if (items.length === 0) return null
 
   return (
-    <div className={`w-full border rounded-xl overflow-hidden ${c.box}`}>
+    <div className={`w-full ring-1 ring-inset rounded-control overflow-hidden ${c.box}`}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -52,7 +52,7 @@ export default function AchievementWarningPanel({
         aria-controls={panelId}
         className={`w-full flex items-center justify-between px-4 py-3 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset ${c.head}`}
       >
-        <span className={`font-semibold text-sm uppercase tracking-wide ${c.text}`}>
+        <span className={`font-semibold text-sm ${c.text}`}>
           {label} ({items.length})
         </span>
         <IconChevronDown className={`w-4 h-4 transition-transform duration-200 ${c.text} ${open ? 'rotate-180' : ''}`} aria-hidden="true" />

@@ -95,7 +95,7 @@ export default function MainPageProfilePsnLinked({
           </div>
         )}
         <div className="flex flex-col gap-1 min-w-0 w-full">
-          <p className="font-display italic font-extrabold text-3xl lg:text-4xl leading-none truncate">{summary.onlineId}</p>
+          <p className="font-display italic font-extrabold text-3xl lg:text-4xl leading-none truncate pr-1.5">{summary.onlineId}</p>
           <div className="flex items-center gap-2 flex-wrap text-xs">
             <span className="inline-flex items-center gap-1 text-text-secondary">
               {T.psn.level}

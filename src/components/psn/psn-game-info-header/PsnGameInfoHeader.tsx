@@ -16,6 +16,7 @@ import { psnPlatformChip } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
 import type { IgdbDetails } from '@/lib/igdbClient'
+import { buttonClass } from '@/components/ui/Button'
 
 /**
  * The top of a PSN game page, laid out like SteamGameInfoHeader: cover,
@@ -55,7 +56,7 @@ export default function PsnGameInfoHeader({
   ]
 
   return (
-    <section className="relative bg-transparent p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,auto)] mt-5 overflow-hidden">
+    <section className="relative p-5 lg:px-8 min-w-[95%] grid grid-cols-1 gap-8 lg:grid-cols-[1fr_minmax(400px,auto)] mt-5 overflow-hidden">
       <div className="relative z-10 flex flex-row items-start gap-5">
         {game.coverUrl ? (
           <Image
@@ -71,25 +72,25 @@ export default function PsnGameInfoHeader({
         )}
 
         <div className="flex flex-col flex-1 min-w-0 gap-3">
-          <h1 className="text-2xl lg:text-3xl">{game.title}</h1>
+          <h1 className="font-display italic font-extrabold text-4xl lg:text-6xl leading-[0.9] pr-2 text-text-main">{game.title}</h1>
 
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`inline-flex items-center gap-1.5 text-sm px-2 py-0.5 rounded-md font-medium ${psnPlatformChip(game.consoleName)}`}>
+            <span className={`inline-flex items-center gap-1.5 h-7 px-2.5 rounded-chip text-xs font-bold ${psnPlatformChip(game.consoleName)}`}>
               <PlaystationLogo size={14} aria-hidden="true" />
               {game.consoleName}
             </span>
             {game.earned.platinum > 0 && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-sky-300/20 text-sky-300">
+              <span className="inline-flex items-center h-7 px-2.5 rounded-chip text-xs font-bold bg-sky-300/20 text-sky-300">
                 ★ {T.psn.platinum}
               </span>
             )}
             {isComplete && game.earned.platinum === 0 && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-warning/20 text-warning">
+              <span className="inline-flex items-center h-7 px-2.5 rounded-chip text-xs font-bold bg-warning/20 text-warning">
                 ★ {T.steam.perfect}
               </span>
             )}
             {inProgress && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-info/20 text-info">
+              <span className="inline-flex items-center h-7 px-2.5 rounded-chip text-xs font-bold bg-info/20 text-info">
                 {T.gameStatus.inProgress}
               </span>
             )}
@@ -119,7 +120,7 @@ export default function PsnGameInfoHeader({
                 href={`https://store.playstation.com/concept/${game.conceptId}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className={buttonClass('secondary', 'sm')}
               >
                 <IconExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
                 {T.psn.viewOnStore}

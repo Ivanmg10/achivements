@@ -13,6 +13,7 @@ import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameDetails, SteamGameProgress } from '@/types/steam'
+import { buttonClass } from '@/components/ui/Button'
 
 /**
  * The top of a Steam game page, laid out like RA's GameInfoHeader: cover,
@@ -54,7 +55,7 @@ export default function SteamGameInfoHeader({
   ]
 
   return (
-    <section className="relative bg-transparent p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_400px] mt-5 overflow-hidden">
+    <section className="relative p-5 lg:px-8 min-w-[95%] grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px] mt-5 overflow-hidden">
       <div className="relative z-10 flex flex-row items-start gap-5">
         <SteamGameImage
           appId={appId}
@@ -66,25 +67,25 @@ export default function SteamGameInfoHeader({
         />
 
         <div className="flex flex-col flex-1 min-w-0 gap-3">
-          <h1 className="text-2xl lg:text-3xl">{title}</h1>
+          <h1 className="font-display italic font-extrabold text-4xl lg:text-6xl leading-[0.9] pr-2 text-text-main">{title}</h1>
 
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 text-sm px-2 py-0.5 rounded-md font-medium bg-[#1b2838] text-[#66c0f4]">
+            <span className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-chip text-xs font-bold bg-[#1b2838] text-[#66c0f4]">
               <SteamLogo size={14} aria-hidden="true" />
               Steam
             </span>
             {isPerfect && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-warning/20 text-warning">
+              <span className="inline-flex items-center h-7 px-2.5 rounded-chip text-xs font-bold bg-warning/20 text-warning">
                 ★ {T.steam.perfect}
               </span>
             )}
             {inProgress && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-info/20 text-info">
+              <span className="inline-flex items-center h-7 px-2.5 rounded-chip text-xs font-bold bg-info/20 text-info">
                 {T.gameStatus.inProgress}
               </span>
             )}
             {!game && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-bg-card text-text-secondary">
+              <span className="inline-flex items-center h-7 px-2.5 rounded-chip text-xs font-bold bg-bg-card text-text-secondary">
                 {T.steam.notOwned}
               </span>
             )}
@@ -114,7 +115,7 @@ export default function SteamGameInfoHeader({
               href={steamStoreUrl(appId)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className={buttonClass('secondary', 'sm')}
             >
               <IconExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
               {T.steam.viewOnSteam}

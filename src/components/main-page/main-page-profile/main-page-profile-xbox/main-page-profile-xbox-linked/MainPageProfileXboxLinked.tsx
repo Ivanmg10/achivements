@@ -94,7 +94,7 @@ export default function MainPageProfileXboxLinked({
           </div>
         )}
         <div className="flex flex-col gap-1 min-w-0 w-full">
-          <p className="font-display italic font-extrabold text-3xl lg:text-4xl leading-none truncate">{summary.gamertag}</p>
+          <p className="font-display italic font-extrabold text-3xl lg:text-4xl leading-none truncate pr-1.5">{summary.gamertag}</p>
           <div className="flex items-center gap-2 flex-wrap text-xs">
             {summary.tier && (
               <span className="inline-flex items-center gap-1 text-text-secondary">

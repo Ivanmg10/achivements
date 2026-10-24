@@ -12,6 +12,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { sumAchievementPoints } from '@/utils/utils'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import GameInfoHeaderStatsBadge from './game-info-header-stats-badge/GameInfoHeaderStatsBadge'
+import { buttonClass } from '@/components/ui/Button'
 
 type StatusKey = 'mastered' | 'completed' | 'beatenHC' | 'beaten' | 'inProgress'
 
@@ -55,28 +56,26 @@ export default function GameInfoHeader({
   const pointsDone = points.total > 0 && points.earned === points.total
 
   return (
-    <section className="relative bg-transparent p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_400px] mt-5 overflow-hidden">
+    <section className="relative p-5 lg:px-8 min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 mt-5">
 
       {/* Content — above background layers */}
-      <div className="relative z-10 flex flex-row items-start gap-5">
+      <div className="relative z-10 flex flex-row items-start gap-6 lg:gap-9">
         {gameData?.ImageBoxArt && (
           <FadeImage
             src={`https://retroachievements.org${gameData.ImageBoxArt}`}
             alt={gameData.Title ?? ''}
             width={150}
             height={150}
-            className="w-28 lg:w-50 rounded-xl shrink-0"
+            className="w-28 lg:w-60 rounded-control shrink-0 overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-ink/10"
             imgClassName="w-full h-auto"
             placeholderClassName="aspect-[3/4]"
           />
         )}
         <div className="flex flex-col flex-1 min-w-0 gap-3">
-          <h1 className="text-2xl lg:text-3xl">{gameData?.Title}</h1>
-
           {/* Console + status row */}
           <div className="flex items-center gap-2 flex-wrap">
             {gameData?.ConsoleName && (
-              <span className={`inline-flex items-center gap-1.5 text-sm px-2 py-0.5 rounded-md font-medium ${consoleColor ?? 'text-text-secondary'}`}>
+              <span className={`inline-flex items-center gap-1.5 h-7 px-2.5 rounded-chip text-xs font-bold bg-ink/[0.08] ${consoleColor ?? 'text-text-main'}`}>
                 {consoleIcon && (
                   <Image
                     src={consoleIcon}
@@ -90,42 +89,45 @@ export default function GameInfoHeader({
               </span>
             )}
             {status && (
-              <span className={`inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium ${STATUS_CLASSES[status]}`}>
+              <span className={`inline-flex items-center h-7 px-2.5 rounded-chip text-xs font-bold ${STATUS_CLASSES[status]}`}>
                 {T.gameStatus[status]}
               </span>
             )}
             {gameData?.ID && <PinToggleButton gameId={gameData.ID} />}
           </div>
 
+          <h1 className="font-display italic font-extrabold text-4xl lg:text-6xl leading-[0.9] pr-2 text-text-main">{gameData?.Title}</h1>
+
           <GameInfoProgressionHeader gameData={gameData} />
           {children}
-          <ul className="flex flex-col gap-1 text-sm">
-            <li>
-              <span className="text-text-secondary">{T.gameInfoPage.id}: </span>
-              {gameData?.ID}
+          <ul className="grid grid-cols-2 sm:grid-cols-5 gap-x-6 gap-y-2 text-sm max-w-3xl">
+            <li className="flex flex-col gap-0.5 min-w-0">
+              <span className="text-xs text-text-secondary">{T.gameInfoPage.id}</span>
+              <span className="font-semibold truncate">{gameData?.ID}</span>
             </li>
-            <li>
-              <span className="text-text-secondary">{T.gameInfoPage.publisher}: </span>
-              {gameData?.Publisher ?? '—'}
+            <li className="flex flex-col gap-0.5 min-w-0">
+              <span className="text-xs text-text-secondary">{T.gameInfoPage.publisher}</span>
+              <span className="font-semibold truncate">{gameData?.Publisher ?? '—'}</span>
             </li>
-            <li>
-              <span className="text-text-secondary">{T.gameInfoPage.developer}: </span>
-              {gameData?.Developer ?? '—'}
+            <li className="flex flex-col gap-0.5 min-w-0">
+              <span className="text-xs text-text-secondary">{T.gameInfoPage.developer}</span>
+              <span className="font-semibold truncate">{gameData?.Developer ?? '—'}</span>
             </li>
-            <li>
-              <span className="text-text-secondary">{T.gameInfoPage.genre}: </span>
-              {gameData?.Genre ?? '—'}
+            <li className="flex flex-col gap-0.5 min-w-0">
+              <span className="text-xs text-text-secondary">{T.gameInfoPage.genre}</span>
+              <span className="font-semibold truncate">{gameData?.Genre ?? '—'}</span>
             </li>
-            <li>
-              <span className="text-text-secondary">{T.gameInfoPage.released}: </span>
-              {gameData?.Released ?? '—'}
+            <li className="flex flex-col gap-0.5 min-w-0">
+              <span className="text-xs text-text-secondary">{T.gameInfoPage.released}</span>
+              <span className="font-semibold truncate">{gameData?.Released ?? '—'}</span>
             </li>
           </ul>
           {gameData?.ID && (
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2.5 flex-wrap mt-1">
+              {actions}
               <button
                 onClick={() => setHashesOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className={buttonClass('secondary', 'sm')}
               >
                 <IconHash className="w-3.5 h-3.5" aria-hidden="true" />
                 {T.gameInfoPage.hashesCompatible}
@@ -134,12 +136,11 @@ export default function GameInfoHeader({
                 href={`https://retroachievements.org/game/${gameData.ID}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className={buttonClass('secondary', 'sm')}
               >
                 <IconExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
                 {T.profileRa.viewOnRA}
               </a>
-              {actions}
             </div>
           )}
         </div>
@@ -166,9 +167,9 @@ export default function GameInfoHeader({
                   alt={T.gameInfoPage.titleScreen}
                   width={200}
                   height={150}
-                  className="w-full rounded-md aspect-4/3"
+                  className="w-full rounded-control aspect-4/3 ring-1 ring-ink/10"
                 />
-                <span className="text-[10px] text-text-secondary text-center">{T.gameInfoPage.titleScreen}</span>
+                <span className="text-xs text-text-secondary">{T.gameInfoPage.titleScreen}</span>
               </div>
             )}
             {gameData.ImageIngame && (
@@ -178,9 +179,9 @@ export default function GameInfoHeader({
                   alt={T.gameInfoPage.inGame}
                   width={200}
                   height={150}
-                  className="w-full rounded-md aspect-4/3"
+                  className="w-full rounded-control aspect-4/3 ring-1 ring-ink/10"
                 />
-                <span className="text-[10px] text-text-secondary text-center">{T.gameInfoPage.inGame}</span>
+                <span className="text-xs text-text-secondary">{T.gameInfoPage.inGame}</span>
               </div>
             )}
           </div>
