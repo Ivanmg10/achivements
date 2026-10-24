@@ -20,8 +20,9 @@ test('title as the page heading, platform, progress and facts', () => {
   expect(screen.getAllByText('PS4').length).toBeGreaterThan(0)
   expect(screen.getByText(en.gameStatus.inProgress)).toBeInTheDocument()
   expect(screen.getByRole('progressbar', { name: 'Bloodborne' })).toHaveAttribute('aria-valuenow', '40')
-  // On the bar and on the badge.
-  expect(screen.getAllByText('12 / 34')).toHaveLength(2)
+  // Under the bar, and on the tile.
+  expect(screen.getByText(en.gameInfoPage.ofTrophies.replace('{n}', '12').replace('{total}', '34'))).toBeInTheDocument()
+  expect(screen.getByText(en.psn.trophies).nextElementSibling).toHaveTextContent('12 / 34')
   expect(screen.getByTestId('pin')).toBeInTheDocument()
   expect(screen.getByTestId('hide')).toBeInTheDocument()
 })
