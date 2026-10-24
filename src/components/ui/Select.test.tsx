@@ -74,3 +74,10 @@ it('closes when clicking outside', () => {
   fireEvent.pointerDown(screen.getByRole('button', { name: 'outside' }))
   expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
 })
+
+test('look="button" draws it as a secondary button, still a combobox', () => {
+  render(<Select aria-label="Order" look="button" value="a" onChange={jest.fn()} options={[{ value: 'a', label: 'Game order' }, { value: 'b', label: 'Points' }]} />)
+  const box = screen.getByRole('combobox', { name: 'Order' })
+  expect(box.className).toContain('before:skew-x-(--slant-button)')
+  expect(box).toHaveTextContent('Game order')
+})

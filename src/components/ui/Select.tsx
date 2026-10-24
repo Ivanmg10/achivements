@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { IconCheck, IconChevronDown } from '@tabler/icons-react'
 import { fieldClass } from './Input'
+import { buttonClass } from './Button'
 import { MENU_SURFACE } from './menu'
 
 export type SelectOption<V extends string> = {
@@ -21,6 +22,8 @@ type Props<V extends string> = {
   'aria-describedby'?: string
   size?: 'sm' | 'md'
   disabled?: boolean
+  /** `button`: drawn as a secondary button (a sort order beside a toolbar's tabs) instead of a field. */
+  look?: 'field' | 'button'
   /** Layout only, on the wrapper. */
   className?: string
 }
@@ -38,6 +41,7 @@ export default function Select<V extends string>({
   id,
   size = 'md',
   disabled,
+  look = 'field',
   className = '',
   ...aria
 }: Props<V>) {
@@ -131,7 +135,7 @@ export default function Select<V extends string>({
         disabled={disabled}
         onClick={() => (open ? setOpen(false) : openList())}
         onKeyDown={onKeyDown}
-        className={fieldClass({ size }, 'flex items-center gap-2 text-left cursor-pointer pr-10')}
+        className={look === 'button' ? buttonClass('secondary', size, 'pr-10') : fieldClass({ size }, 'flex items-center gap-2 text-left cursor-pointer pr-10')}
         {...aria}
       >
         {selected?.icon && <span aria-hidden="true" className="shrink-0">{selected.icon}</span>}
@@ -139,7 +143,7 @@ export default function Select<V extends string>({
         <IconChevronDown
           size={16}
           aria-hidden="true"
-          className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-text-secondary transition-transform duration-(--motion-hover) ${open ? 'rotate-180' : ''}`}
+          className={`absolute right-3.5 top-1/2 -translate-y-1/2 ${look === 'button' ? 'text-text-main' : 'text-text-secondary'} transition-transform duration-(--motion-hover) ${open ? 'rotate-180' : ''}`}
         />
       </button>
 

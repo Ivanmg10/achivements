@@ -26,7 +26,7 @@ export default function GameAiExport({ getSource }: { getSource: () => AiExportS
         type="button"
         onClick={() => setSource(getSource())}
         aria-haspopup="dialog"
-        className={buttonClass('primary', 'sm')}
+        className={buttonClass('primary')}
       >
         <IconSparkles className="w-4 h-4" aria-hidden="true" />
         {T.aiExport.open}

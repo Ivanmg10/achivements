@@ -3,7 +3,7 @@ import RarityBadge, { rarityTone } from './RarityBadge'
 
 it('shows the share as a tinted figure', () => {
   render(<RarityBadge pct={3.21} />)
-  expect(screen.getByText('3.2%').className).toContain('text-hardcore')
+  expect(screen.getByText('3.2 %').className).toContain('text-hardcore')
 })
 
 it('a dash when it is not known', () => {

@@ -33,10 +33,9 @@ test('renders achievement title and description', () => {
   expect(screen.getByText('Kill an enemy')).toBeInTheDocument()
 })
 
-test('renders points value and pts label', () => {
+test('renders the points', () => {
   render(wrap(<GameInfoAchivement achievement={mockAchievement} numDistinctPlayers={1000} />))
   expect(screen.getByText('10')).toBeInTheDocument()
-  expect(screen.getByText('pts')).toBeInTheDocument()
 })
 
 test('renders em dash when achievement not earned', () => {
@@ -46,7 +45,7 @@ test('renders em dash when achievement not earned', () => {
 
 test('renders checkmark when achievement earned', () => {
   render(wrap(<GameInfoAchivement achievement={mockAchievement} numDistinctPlayers={1000} />))
-  expect(screen.getByText('✓')).toBeInTheDocument()
+  expect(screen.getByLabelText('Earned')).toBeInTheDocument()
 })
 
 test('renders nothing when no achievement', () => {

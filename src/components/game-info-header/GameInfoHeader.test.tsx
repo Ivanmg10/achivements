@@ -25,9 +25,9 @@ test("renders game title and info", () => {
   expect(screen.getByText("PS2")).toBeInTheDocument();
 });
 
-test("renders the ID/Publisher/Developer/Genre/Released list", () => {
+test("renders the Released/Developer/Publisher/Genre facts", () => {
   render(<GameInfoHeader gameData={mockGameData} />);
-  const list = screen.getByText("Sly Cooper").closest("section")?.querySelector("ul");
+  const list = screen.getByText("Sly Cooper").closest("section")?.querySelector("dl");
   expect(list?.textContent).toContain("Sony");
   expect(list?.textContent).toContain("Sucker Punch");
   expect(list?.textContent).toContain("Platformer");
@@ -39,14 +39,17 @@ test("renders without gameData", () => {
   expect(container.querySelector("section")).toBeInTheDocument();
 });
 
-test("renders achievements and points as badges in the top-right column", () => {
+// A tile's figure reads "5 / 10": the part, then the whole in a <small>.
+const tile = (label: string) => screen.getAllByText(label).map((n) => n.closest("div")!).find((d) => d.querySelector("dd"))!.querySelector("dd")!;
+
+test("renders achievements and points as tiles in the top-right column", () => {
   render(<GameInfoHeader gameData={mockGameData} />);
-  expect(screen.getByText("5 / 10")).toBeInTheDocument();
+  expect(tile("Achievements").textContent).toBe("5 / 10");
 });
 
 test("highlights the achievements badge in success color once fully earned", () => {
   render(<GameInfoHeader gameData={{ ...mockGameData, NumAwardedToUser: 10 }} />);
-  expect(screen.getByText("10 / 10").closest("div")).toHaveClass("text-success");
+  expect(tile("Achievements")).toHaveClass("text-success");
 });
 
 test("renders a points badge with earned/total when the game has achievements", () => {
@@ -58,7 +61,7 @@ test("renders a points badge with earned/total when the game has achievements", 
     },
   } as unknown as RetroAchievementsGameWithAchievements;
   render(<GameInfoHeader gameData={gameData} />);
-  expect(screen.getByText("10 / 15")).toBeInTheDocument();
+  expect(tile("Points").textContent).toBe("10 / 15");
 });
 
 test("does not render a points badge when the game has no achievement points", () => {

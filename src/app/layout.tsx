@@ -6,7 +6,7 @@ import "./globals.css";
 import Providers from "./providers";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL, THEME_COLOR } from '@/lib/siteUrl'
 import { THEMES, THEME_STORAGE_KEY } from '@/types/types'
-import { inter } from '@/lib/fonts'
+import { display, ui } from '@/lib/fonts'
 
 // Paints the last theme this browser used before the first frame; without it
 // every load flashes dark until the session says otherwise.
@@ -40,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-theme="dark" className={`${inter.variable} bg-bg-header`} suppressHydrationWarning>
+    <html lang="en" data-theme="dark" className={`${ui.variable} ${display.variable} bg-bg-header`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

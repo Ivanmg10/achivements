@@ -18,7 +18,7 @@ test('says it is loading, then lists the comments newest first', async () => {
   const texts = screen.getAllByText(/^text \d$/).map((n) => n.textContent)
   // RA sends them oldest first; the section shows the latest at the top.
   expect(texts).toEqual(['text 2', 'text 1'])
-  expect(screen.getByText('(2)')).toBeInTheDocument()
+  expect(screen.getByText('2')).toBeInTheDocument()
 })
 
 test('draws nothing for a game with no comments', async () => {
@@ -52,19 +52,20 @@ test('only the first few are shown until asked for more, and then folded again',
   ;(fetch as jest.Mock).mockResolvedValue(answer({ Results: many, Total: 8 }))
   render(<GameInfoComments gameId={7} />)
   await screen.findByText('text 8')
-  expect(screen.getAllByText(/^text \d$/)).toHaveLength(5)
+  expect(screen.getAllByText(/^text \d$/)).toHaveLength(2)
 
-  fireEvent.click(screen.getByRole('button', { name: new RegExp(`${en.gameComments.showMore} \\(3\\)`) }))
+  fireEvent.click(screen.getByRole('button', { name: en.gameComments.showAll.replace('{n}', '8') }))
   expect(screen.getAllByText(/^text \d$/)).toHaveLength(8)
 
   fireEvent.click(screen.getByRole('button', { name: en.gameComments.collapse }))
-  expect(screen.getAllByText(/^text \d$/)).toHaveLength(5)
+  expect(screen.getAllByText(/^text \d$/)).toHaveLength(2)
 })
 
 test('no "show more" for a short list', async () => {
   render(<GameInfoComments gameId={7} />)
   await screen.findByText('text 1')
-  expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: /show all|see all/i })).not.toBeInTheDocument()
+  expect(screen.getAllByRole('button')).toHaveLength(1)
 })
 
 test('another game loads again and shows loading meanwhile', async () => {
@@ -89,4 +90,13 @@ test('a slow answer for the previous game does not land on the new one', async (
   await act(async () => { resolveOld(answer({ Results: [comment(1)], Total: 1 })) })
   expect(screen.queryByText('text 1')).not.toBeInTheDocument()
   expect(screen.getByText('text 9')).toBeInTheDocument()
+})
+
+test('the section folds and unfolds from its head', async () => {
+  render(<GameInfoComments gameId={7} />)
+  await screen.findByText('text 1')
+  fireEvent.click(screen.getByRole('button', { name: en.gameComments.fold }))
+  expect(screen.queryByText('text 1')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: en.gameComments.unfold }))
+  expect(screen.getByText('text 1')).toBeInTheDocument()
 })
