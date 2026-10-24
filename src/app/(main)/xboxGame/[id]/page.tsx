@@ -18,6 +18,7 @@ import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPa
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { xboxAiSource } from '@/utils/aiExport'
 import Button from '@/components/ui/Button'
+import { buttonClass } from '@/components/ui/Button'
 
 /**
  * An Xbox game's page — the counterpart of /psnGame/[id], built the same way:
@@ -74,17 +75,17 @@ export default function XboxGamePage() {
             <GameInfoSkeletonTable />
           </div>
         ) : error ? (
-          <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 flex flex-col items-center gap-2 text-center">
+          <section className="bg-bg-card rounded-card ring-1 ring-ink/[0.06] p-6 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-5 flex flex-col items-center gap-2 text-center">
             <p role="alert" className="text-danger">
               {T.xbox.achievementsError}
             </p>
             {error === 'private' && <p className="text-xs text-text-secondary">{T.xbox.errors.private}</p>}
-            <button onClick={retry} className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-ink/10 transition-colors">
+            <button onClick={retry} className={buttonClass('secondary', 'sm')}>
               {T.xbox.retry}
             </button>
           </section>
         ) : achievements.length === 0 ? (
-          <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 text-center">
+          <section className="bg-bg-card rounded-card ring-1 ring-ink/[0.06] p-6 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-5 text-center">
             <p className="text-text-secondary">{T.xbox.noAchievements}</p>
           </section>
         ) : (

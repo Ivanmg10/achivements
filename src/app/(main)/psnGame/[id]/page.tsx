@@ -16,6 +16,7 @@ import PsnGameInfoTable from '@/components/psn/psn-game-info-table/PsnGameInfoTa
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { psnAiSource } from '@/utils/aiExport'
 import Button from '@/components/ui/Button'
+import { buttonClass } from '@/components/ui/Button'
 
 /**
  * A PSN game's page — the counterpart of /steamGame/[appId], built the same
@@ -70,17 +71,17 @@ export default function PsnGamePage() {
             <GameInfoSkeletonTable />
           </div>
         ) : error ? (
-          <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 flex flex-col items-center gap-2 text-center">
+          <section className="bg-bg-card rounded-card ring-1 ring-ink/[0.06] p-6 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-5 flex flex-col items-center gap-2 text-center">
             <p role="alert" className="text-danger">
               {T.psn.trophiesError}
             </p>
             {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}
-            <button onClick={retry} className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-ink/10 transition-colors">
+            <button onClick={retry} className={buttonClass('secondary', 'sm')}>
               {T.psn.retry}
             </button>
           </section>
         ) : trophies.length === 0 ? (
-          <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 text-center">
+          <section className="bg-bg-card rounded-card ring-1 ring-ink/[0.06] p-6 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-5 text-center">
             <p className="text-text-secondary">{T.psn.noTrophies}</p>
           </section>
         ) : (
