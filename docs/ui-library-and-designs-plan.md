@@ -274,7 +274,7 @@ kept inside), `Menu`, `Popover` / `HoverCard`, the dark `Tooltip`, `Lightbox`, t
 (option 1, games / achievements / people, recent searches); `Notice`, `Banner`, the toasts
 restyled, `ProgressNotice` (`VaultFillLine`), `Spinner`, shaped `Skeleton`s, one `EmptyState`.
 
-### PR 3 · Surfaces, data, disclosure and the colour sweep
+### PR 3 · Surfaces, data, disclosure and the colour sweep — built 2026-10-24 (`feat/65-ui-surfaces`), see the worklog for what is left
 
 `Surface`, `StatTile` / the overview's figures without boxes, `ProgressBar` / `CircularProgress`
 (glow only when finished), `LevelBadge`, `PlatformBadge`, `GameThumb`, `AchievementTile` and

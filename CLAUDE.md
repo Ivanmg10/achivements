@@ -224,7 +224,17 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   `aria-labelledby`.
 - **Feedback**: `Notice` (tinted inline notice, `role="alert"` for errors), `TOOLTIP_SURFACE`
   (`ui/tooltip.ts`), `MENU_SURFACE` / `menuItemClass` (`ui/menu.ts`); the toasts are the dark card.
-- PR 3 (surfaces, data, the palette sweep) adds the rest.
+- **Surfaces and data**: `SURFACE` (`ui/surface.ts`; cards use `rounded-card`), `StatPill`'s
+  large size has no box, `RarityBadge` (a tinted figure, never a bar), `ProgressBar` bevelled and
+  glowing only when finished, `GameCardBackdrop` = a flat tint and border of the game's colour
+  (`useImageTint`; never the blurred art again, the user's choice).
+- **Colours with a meaning come from the theme**: danger, success, warning, `hardcore`,
+  `softcore`; the guard refuses red / green / yellow / amber / orange palette classes. Tier and
+  platform hues are the exception.
+- **Streaks are in the accent**; amber (`warning`) only in the streak page's hero.
+- **The home layout is the person's choice** (`useHomeLayout`, synced key `home-layout`):
+  `classic` (default) or `cover` (`MainPagePortada`, the game played last in big on top). It is in
+  Preferences → General and in the welcome's preferences step.
 
 ## Progress bars — in the theme's colours
 

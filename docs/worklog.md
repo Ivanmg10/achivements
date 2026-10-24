@@ -29,6 +29,30 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-24 — Component library, part 3: surfaces, data and the colour sweep (`feat/65-ui-surfaces`, #65)
+
+**Did** — Game rows (recent, pinned, groups, status lists) take a flat tint and border of the
+game's colour instead of the blurred art (`GameCardBackdrop` + `useImageTint`, a canvas read when
+the image host allows CORS, a neutral grey otherwise). Streaks in the accent, amber only in the
+streak hero. No bar under a group's covers. `RarityBadge` in the four achievement tables. The home
+layout preference (`home-layout`: classic / cover) with `MainPagePortada`, in Preferences and the
+welcome; the recent feed moved to `useRecentFeed`. `StatPill`'s large size without a box. Card
+shells on `rounded-card`. Progress bars bevelled, glowing only when finished. The palette sweep
+(81 files) and its guard; RA softcore rings on `--softcore`.
+**Why** — PR 3 of the agreed design.
+**Decisions** — The tint applies to every game row, not only recently played (homogeneity). The
+Following cards already had the last game's art in code (only the canvas lacked it). Tables already
+centre headers and values in code; no change.
+**Open** — Not built yet, for the review pass with the user: the rankings v2 leaderboard, the
+streak page's new sections (day-by-day strip with outlier scale, best-streaks list), the library
+detail panel's exact layout, the opened game's restyle beyond the components, Disclosure pieces
+(`Accordion`, `ShowMore`, `ToggleButton`, `Shelf`). Check `useImageTint` on each image host (Steam,
+PSN, Xbox, RA): a host without CORS shows the grey.
+**Watch out** — `MainPagePortada` sits above the home's `home-fit` grid: check that the home still
+fits the viewport with the cover on.
+
+---
+
 ## 2026-10-24 — Component library, part 2: overlays and feedback (`feat/64-ui-overlays`, #64)
 
 **Did** — `Modal` in `src/components/ui` (dialog role, head / footer, danger variant, sizes, a sheet
