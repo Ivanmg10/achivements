@@ -53,7 +53,7 @@ export default function XboxCategorySection({
   return (
     <CollapsibleSection
       title={T.xbox.gamesSection}
-      icon={<XboxLogo size={22} className="text-green-500" aria-hidden="true" />}
+      icon={<XboxLogo size={22} className="text-success" aria-hidden="true" />}
       count={loading || error ? undefined : games.length}
       storageKey={`xbox-section-open:${category}`}
       preview={

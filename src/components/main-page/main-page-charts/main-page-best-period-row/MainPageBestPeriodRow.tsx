@@ -5,8 +5,8 @@ export type PeriodTone = 'purple' | 'yellow' | 'red'
 
 const TONES: Record<PeriodTone, { text: string; chip: string; ring: string }> = {
   purple: { text: 'text-purple-400', chip: 'bg-purple-500/15 text-purple-400', ring: 'focus-visible:ring-purple-500/70' },
-  yellow: { text: 'text-yellow-400', chip: 'bg-yellow-500/15 text-yellow-400', ring: 'focus-visible:ring-yellow-500/70' },
-  red: { text: 'text-red-400', chip: 'bg-red-500/15 text-red-400', ring: 'focus-visible:ring-red-500/70' },
+  yellow: { text: 'text-hardcore', chip: 'bg-hardcore/15 text-hardcore', ring: 'focus-visible:ring-hardcore/70' },
+  red: { text: 'text-danger', chip: 'bg-danger/15 text-danger', ring: 'focus-visible:ring-danger/70' },
 }
 
 /**

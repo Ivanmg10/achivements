@@ -9,7 +9,7 @@ export default function MainPageFavoritesUnpinButton({ onUnpin }: { onUnpin: () 
       onClick={onUnpin}
       aria-label={T.favorites.removeFavorite}
       title={T.favorites.removeFavorite}
-      className="text-yellow-400 hover:text-yellow-300 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="text-hardcore hover:text-hardcore transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       <IconStarFilled className="w-4 h-4" aria-hidden="true" />
     </button>

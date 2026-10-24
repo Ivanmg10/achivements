@@ -75,7 +75,7 @@ export default function XboxSortableItem({
             {...attributes}
             {...listeners}
             aria-label={T.cards.dragToReorder}
-            className="relative z-10 text-text-secondary/40 hover:text-text-secondary transition-colors cursor-grab active:cursor-grabbing shrink-0 touch-none self-stretch flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+            className="relative z-10 text-text-secondary/40 hover:text-text-secondary transition-colors cursor-grab active:cursor-grabbing shrink-0 touch-none self-stretch flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
           >
             <IconGripVertical className="w-4 h-4" aria-hidden="true" />
           </button>
@@ -87,7 +87,7 @@ export default function XboxSortableItem({
           tabIndex={-1}
           aria-hidden="true"
           className={`relative z-10 shrink-0 rounded-xl transition-all ${
-            isComplete ? 'ring-2 ring-green-500/70 hover:ring-green-500' : 'hover:ring-2 hover:ring-ink/40'
+            isComplete ? 'ring-2 ring-success/70 hover:ring-success' : 'hover:ring-2 hover:ring-ink/40'
           }`}
         >
           <GameIcon source="xbox" id={item.game_id} imageUrl={icon} size={96} className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl block" />
@@ -96,7 +96,7 @@ export default function XboxSortableItem({
         <div className="flex flex-col flex-1 min-w-0 gap-1">
           <Link
             href={href}
-            className="relative z-10 self-start max-w-full hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+            className="relative z-10 self-start max-w-full hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
           >
             <p title={game?.title ?? item.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">
               {game?.title ?? item.title}
@@ -108,12 +108,12 @@ export default function XboxSortableItem({
               {game?.consoleName || 'Xbox'}
             </span>
             {isComplete && (
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-400">
+              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-success/10 text-success">
                 <span aria-hidden="true">★</span> {T.steam.perfect}
               </span>
             )}
           </span>
-          <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>{progressText}</span>
+          <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>{progressText}</span>
           {(totalKnown || pct > 0) && (
             <span className="flex items-center gap-2 mt-1">
               <ProgressBar pct={pct} label={item.title} trackClass="bg-bg-main" className="flex-1" />
@@ -145,7 +145,7 @@ export default function XboxSortableItem({
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? T.xbox.hideAchievements : T.xbox.showAchievements}: ${item.title}`}
-            className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+            className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
           >
             <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               ▼

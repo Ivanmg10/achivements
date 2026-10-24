@@ -60,7 +60,7 @@ export default function MainPageProfileRaAchievements({
               <span className="text-xs text-text-secondary truncate">{ach.GameTitle}</span>
             </div>
             <span
-              className={`text-xs ml-auto shrink-0 ${ach.HardcoreMode === '1' ? 'text-yellow-400' : 'text-text-secondary'}`}
+              className={`text-xs ml-auto shrink-0 ${ach.HardcoreMode === '1' ? 'text-hardcore' : 'text-text-secondary'}`}
             >
               {ach.Points}pts
             </span>

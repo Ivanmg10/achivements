@@ -5,7 +5,7 @@ import type { GameSource } from '@/types/steam'
 const ORDER: GameSource[] = ['ra', 'steam', 'psn', 'xbox']
 const NAMES: Record<GameSource, string> = { ra: 'RA', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
 /** The same platform colours as the charts that compare platforms (CompletionDistribution). */
-export const PLATFORM_FILL: Record<GameSource, string> = { ra: 'bg-accent', steam: 'bg-[#66c0f4]', psn: 'bg-[#0070d1]', xbox: 'bg-green-500' }
+export const PLATFORM_FILL: Record<GameSource, string> = { ra: 'bg-accent', steam: 'bg-[#66c0f4]', psn: 'bg-[#0070d1]', xbox: 'bg-success' }
 
 /**
  * How a user's points split across platforms, as one stacked bar. Its

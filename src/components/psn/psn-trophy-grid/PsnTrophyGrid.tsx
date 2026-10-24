@@ -30,9 +30,9 @@ const TOOLTIP_DELAY_MS = 450
 /** The ring an earned trophy gets, in its grade's colour. */
 const GRADE_RING: Record<TrophyGrade, string> = {
   platinum: 'ring-sky-300',
-  gold: 'ring-yellow-400',
+  gold: 'ring-hardcore',
   silver: 'ring-zinc-400',
-  bronze: 'ring-orange-400',
+  bronze: 'ring-warning',
 }
 
 type Tooltip = { trophy: PsnTrophy; x: number; y: number }

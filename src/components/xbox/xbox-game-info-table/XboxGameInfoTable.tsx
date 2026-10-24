@@ -251,7 +251,7 @@ export default function XboxGameInfoTable({
               earned={selected.unlocked}
               earnedAt={selected.unlockedAt}
               rarity={selected.rarity}
-              tags={<span className="font-semibold text-green-500">{selected.gamerscore} G</span>}
+              tags={<span className="font-semibold text-success">{selected.gamerscore} G</span>}
               guides={concealed ? [] : guideLinks('xbox', { gameTitle, title: selected.name })}
               pinned={canPin ? pinned.has(selected.id) : undefined}
               onTogglePin={() => toggle(selected)}

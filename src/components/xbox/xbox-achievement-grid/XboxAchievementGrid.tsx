@@ -92,7 +92,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
               }}
               onBlur={hide}
               className={`block rounded-lg overflow-hidden shrink-0 transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                a.unlocked ? 'ring-2 ring-green-500' : ''
+                a.unlocked ? 'ring-2 ring-success' : ''
               }`}
             >
               {a.iconUrl && !concealed(a) ? (
@@ -145,7 +145,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
               {concealed(tooltip.achievement) ? T.xbox.secretAchievementDesc : tooltip.achievement.description}
             </p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="text-xs font-semibold text-green-500">{tooltip.achievement.gamerscore} G</span>
+              <span className="text-xs font-semibold text-success">{tooltip.achievement.gamerscore} G</span>
               {tooltip.achievement.rarity !== null && (
                 <span className="text-xs text-text-secondary">
                   {tooltip.achievement.rarity.toFixed(1)}
@@ -153,7 +153,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
                 </span>
               )}
               {tooltip.achievement.unlocked ? (
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400">{T.xbox.earned}</span>
+                <span className="text-xs px-1.5 py-0.5 rounded-full bg-success/20 text-success">{T.xbox.earned}</span>
               ) : (
                 <span className="text-xs text-text-secondary">{T.achievement.notEarned}</span>
               )}

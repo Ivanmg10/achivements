@@ -69,7 +69,7 @@ export default function XboxGameItem({
             imageUrl={game.imageIcon}
             size={64}
             className={`rounded-xl w-14 h-14 sm:w-16 sm:h-16 shadow-md shadow-black/30 transition-transform duration-300 hover:scale-105 ${
-              perfect ? 'ring-2 ring-green-500' : 'ring-1 ring-ink/10'
+              perfect ? 'ring-2 ring-success' : 'ring-1 ring-ink/10'
             }`}
           />
         </Link>
@@ -77,7 +77,7 @@ export default function XboxGameItem({
         <div className="flex flex-col min-w-0 flex-1 gap-1">
           <Link
             href={href}
-            className="relative z-10 w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 rounded"
+            className="relative z-10 w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success rounded"
           >
             <span className="text-base font-bold block truncate leading-tight">{game.title}</span>
           </Link>
@@ -87,7 +87,7 @@ export default function XboxGameItem({
             aria-expanded={isExpanded}
             aria-controls={panelId}
             aria-label={`${isExpanded ? T.xbox.hideAchievements : T.xbox.showAchievements}: ${game.title}`}
-            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 group"
+            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success group"
           >
             <span className="flex items-center gap-2 w-full">
               <span className="flex items-center gap-1 shrink-0 text-xs text-text-secondary">

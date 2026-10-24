@@ -21,7 +21,7 @@ export default function MainPageProfileXboxGame({ game }: { game: XboxGameProgre
   return (
     <Link
       href={gameHref('xbox', game.id, subject)}
-      className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 w-full hover:scale-[1.005] transition-transform duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+      className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 w-full hover:scale-[1.005] transition-transform duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
     >
       <p className="text-xs text-text-secondary uppercase tracking-wider">{T.steam.lastPlayed}</p>
       <div className="flex gap-3 items-center">

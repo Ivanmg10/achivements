@@ -19,7 +19,7 @@ import MainPageProfileSkeleton from '../../main-page-profile-skeleton/MainPagePr
 import MainPageProfileGameSkeleton from '../../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
 
 /** Sony's trophy-level tiers in groups of three: bronze, silver, gold, then platinum at 10. */
-const TIER_RING = ['border-orange-400', 'border-zinc-400', 'border-yellow-400', 'border-sky-300']
+const TIER_RING = ['border-warning', 'border-zinc-400', 'border-hardcore', 'border-sky-300']
 
 /**
  * A linked PSN profile, built like the Steam one block for block: header
@@ -106,7 +106,7 @@ export default function MainPageProfilePsnLinked({
               </span>
             </span>
             {summary.isPlus && (
-              <span className="px-1.5 py-0.5 rounded bg-yellow-400/15 text-yellow-400 font-semibold">PS Plus</span>
+              <span className="px-1.5 py-0.5 rounded bg-hardcore/15 text-hardcore font-semibold">PS Plus</span>
             )}
           </div>
           {summary.aboutMe && <p className="text-xs text-text-secondary line-clamp-2">{summary.aboutMe}</p>}

@@ -53,7 +53,7 @@ export default function StreakDayRow({ date, achievements, awards = [] }: Props)
               key={`${ach.Source ?? 'ra'}:${ach.GameID}:${ach.AchievementID}`}
               href={gameHref(ach.Source ?? 'ra', ach.GameID)}
               aria-label={`${ach.Title} — ${ach.GameTitle}`}
-              className={`relative rounded-lg overflow-hidden shrink-0 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${ach.HardcoreMode === '1' ? 'ring-2 ring-yellow-400/70' : ''}`}
+              className={`relative rounded-lg overflow-hidden shrink-0 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${ach.HardcoreMode === '1' ? 'ring-2 ring-hardcore/70' : ''}`}
             >
               {badge ? (
                 <Image

@@ -55,7 +55,7 @@ export default function XboxGameInfoAchievement({
               alt=""
               width={64}
               height={64}
-              className={`w-16 h-16 rounded-xl ${a.unlocked ? 'ring-2 ring-green-500' : ''}`}
+              className={`w-16 h-16 rounded-xl ${a.unlocked ? 'ring-2 ring-success' : ''}`}
               imgClassName={`w-full h-full object-cover ${a.unlocked ? '' : 'grayscale opacity-50'}`}
               unoptimized
             />
@@ -86,7 +86,7 @@ export default function XboxGameInfoAchievement({
         <p className="text-sm text-text-secondary">{concealed ? T.xbox.secretAchievementDesc : a.description}</p>
       </td>
 
-      <td className="px-3 py-2 w-28 text-center text-sm font-semibold tabular-nums text-green-500">{a.gamerscore} G</td>
+      <td className="px-3 py-2 w-28 text-center text-sm font-semibold tabular-nums text-success">{a.gamerscore} G</td>
 
       <td className="px-3 py-2 w-28 text-center text-sm tabular-nums text-text-secondary">
         <RarityBadge pct={a.rarity} />

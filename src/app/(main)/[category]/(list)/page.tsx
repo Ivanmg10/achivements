@@ -281,7 +281,7 @@ export default function CategoryPage() {
         ) : !showRa ? null : loading ? (
           <StatusPageSkeleton cols={gridCols} />
         ) : error ? (
-          <p className="text-red-400 text-sm text-center mt-10">{error}</p>
+          <p className="text-danger text-sm text-center mt-10">{error}</p>
         ) : !othersLinked ? (
           // RA only: the page as it always was.
           games.length === 0 ? (

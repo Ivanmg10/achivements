@@ -112,7 +112,7 @@ export default function CollectionNumbers({
           </PlatformTile>
         )}
         {xboxPlayable.length > 0 && (
-          <PlatformTile label="Xbox" logo={<XboxLogo size={12} className="text-green-500" aria-hidden="true" />} value={xboxPerfect} valueClass="text-green-500" caption={perfectOf(xboxPlayable.length)}>
+          <PlatformTile label="Xbox" logo={<XboxLogo size={12} className="text-success" aria-hidden="true" />} value={xboxPerfect} valueClass="text-success" caption={perfectOf(xboxPlayable.length)}>
             <CompletionDistribution fractions={xboxFractions} tone="xbox" showTitle={false} />
           </PlatformTile>
         )}

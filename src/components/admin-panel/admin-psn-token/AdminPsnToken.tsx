@@ -30,7 +30,7 @@ export default function AdminPsnToken() {
   const [npsso, setNpsso] = useState('')
 
   const left = status?.daysLeft ?? null
-  const tone = left === null ? 'text-text-secondary' : left <= 0 ? 'text-red-400' : left <= 7 ? 'text-warning' : 'text-green-400'
+  const tone = left === null ? 'text-text-secondary' : left <= 0 ? 'text-danger' : left <= 7 ? 'text-warning' : 'text-success'
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -50,7 +50,7 @@ export default function AdminPsnToken() {
       {loadError ? (
         <p role="alert" className="text-sm text-danger">
           Could not load the PSN status.{' '}
-          <button onClick={retry} className="underline hover:text-red-300">
+          <button onClick={retry} className="underline hover:text-danger">
             Retry
           </button>
         </p>

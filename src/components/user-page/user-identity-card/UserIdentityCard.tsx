@@ -135,7 +135,7 @@ export default function UserIdentityCard() {
           </button>
           <button
             onClick={() => signOut({ callbackUrl: '/authPage' })}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-danger/15 text-danger hover:bg-danger/25 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
           >
             <IconLogout size={13} aria-hidden="true" />
             {T.userConfig.signOut}
@@ -147,13 +147,13 @@ export default function UserIdentityCard() {
 
       {missingEmail && (
         <div role="alert" className="flex items-start gap-3 bg-warning/10 ring-1 ring-inset ring-warning/30 rounded-control p-4">
-          <IconAlertTriangle size={18} className="text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <IconAlertTriangle size={18} className="text-warning shrink-0 mt-0.5" aria-hidden="true" />
           <div className="flex flex-col gap-1 min-w-0">
-            <p className="text-sm font-semibold text-amber-300">{T.passwordReset.missingEmailTitle}</p>
+            <p className="text-sm font-semibold text-warning">{T.passwordReset.missingEmailTitle}</p>
             <p className="text-xs text-text-secondary">{T.passwordReset.missingEmailText}</p>
             <button
               onClick={() => setEdit({ field: 'email', value: '' })}
-              className="self-start mt-1 text-xs font-medium text-amber-300 underline underline-offset-2 hover:text-amber-200 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+              className="self-start mt-1 text-xs font-medium text-warning underline underline-offset-2 hover:text-warning transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning/70"
             >
               {T.passwordReset.addEmail}
             </button>

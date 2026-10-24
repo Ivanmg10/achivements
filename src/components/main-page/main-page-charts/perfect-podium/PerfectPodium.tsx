@@ -15,9 +15,9 @@ import { useSubject } from '@/context/SubjectContext'
  * right. Medal colours mark the steps, and the number on each says it too.
  */
 const STEPS = [
-  { order: 'order-2', step: 'h-8', cover: 'h-32 sm:h-36', medal: 'text-amber-300 border-amber-300/60' },
+  { order: 'order-2', step: 'h-8', cover: 'h-32 sm:h-36', medal: 'text-warning border-warning/60' },
   { order: 'order-1', step: 'h-6.5', cover: 'h-28 sm:h-32', medal: 'text-zinc-300 border-zinc-300/50' },
-  { order: 'order-3', step: 'h-5', cover: 'h-24 sm:h-28', medal: 'text-orange-400 border-orange-400/50' },
+  { order: 'order-3', step: 'h-5', cover: 'h-24 sm:h-28', medal: 'text-warning border-warning/50' },
 ]
 
 /**

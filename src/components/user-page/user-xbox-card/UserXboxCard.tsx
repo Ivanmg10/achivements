@@ -31,7 +31,7 @@ export default function UserXboxCard() {
   const name = summary?.gamertag || gamertag
   const value = (n: number | undefined) => (isLoading || n === undefined ? '—' : n.toLocaleString(lang))
   const stats: PlatformStat[] = [
-    { label: T.xbox.gamerscore, value: value(summary?.gamerscore), accent: 'text-green-500' },
+    { label: T.xbox.gamerscore, value: value(summary?.gamerscore), accent: 'text-success' },
     { label: T.userStats.games, value: value(summary?.games) },
     { label: T.xbox.achievements, value: value(summary?.achievementsUnlocked) },
     { label: T.xbox.tier, value: isLoading ? '—' : summary?.tier || '—' },

@@ -81,7 +81,7 @@ export default function SteamGameItem({
             iconUrl={game.imageIcon}
             size={56}
             className={`rounded-xl w-14 h-14 sm:w-16 sm:h-16 shadow-md shadow-black/30 transition-transform duration-300 hover:scale-105 ${
-              perfect ? 'ring-2 ring-amber-400' : 'ring-1 ring-ink/10'
+              perfect ? 'ring-2 ring-warning' : 'ring-1 ring-ink/10'
             }`}
           />
         </Link>

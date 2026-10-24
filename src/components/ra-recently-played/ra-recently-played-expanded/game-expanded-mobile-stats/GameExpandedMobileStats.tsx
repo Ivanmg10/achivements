@@ -21,7 +21,7 @@ export function GameExpandedMobileStats({
     <dl className="flex flex-col gap-2.5 flex-1 min-w-0 lg:hidden">
       <div className="flex items-baseline justify-between gap-2">
         <dt className="text-[11px] uppercase tracking-wide text-text-secondary">{T.gameExpanded.points}</dt>
-        <dd className="text-base font-bold text-yellow-400">{points}/{totalPoints}</dd>
+        <dd className="text-base font-bold text-hardcore">{points}/{totalPoints}</dd>
       </div>
       <div className="flex items-baseline justify-between gap-2">
         <dt className="text-[11px] uppercase tracking-wide text-text-secondary">{T.profileStats.hardcorePoints}</dt>

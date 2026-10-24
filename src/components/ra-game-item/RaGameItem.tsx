@@ -75,7 +75,7 @@ export default function RaGameItem({
               width={64}
               height={64}
               className={`rounded-xl object-cover w-14 h-14 sm:w-16 sm:h-16 shadow-md shadow-black/30 transition-transform duration-300 hover:scale-105 ${
-                mastered ? 'ring-2 ring-amber-400' : 'ring-1 ring-ink/10'
+                mastered ? 'ring-2 ring-warning' : 'ring-1 ring-ink/10'
               }`}
             />
           ) : (

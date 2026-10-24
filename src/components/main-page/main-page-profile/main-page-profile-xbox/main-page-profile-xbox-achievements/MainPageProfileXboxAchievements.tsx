@@ -66,7 +66,7 @@ export default function MainPageProfileXboxAchievements({
             <li key={`${a.gameId}:${a.achievementId}`} className="w-full">
               <Link
                 href={`${gameHref('xbox', a.gameId, subject)}#${xboxAchievementAnchor(a.achievementId)}`}
-                className="flex gap-2 items-center rounded-lg hover:bg-ink/5 transition-colors group p-1 -mx-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+                className="flex gap-2 items-center rounded-lg hover:bg-ink/5 transition-colors group p-1 -mx-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
               >
                 {a.iconUrl ? (
                   <Image src={a.iconUrl} alt="" width={36} height={36} className="w-9 h-9 rounded object-cover shrink-0" unoptimized />
@@ -76,10 +76,10 @@ export default function MainPageProfileXboxAchievements({
                 <div className="flex flex-col min-w-0">
                   <span className="text-xs font-semibold truncate group-hover:text-accent transition-colors">{a.name}</span>
                   <span className="text-xs text-text-secondary truncate">
-                    <span className="text-green-500">{a.gamerscore} G</span> · {a.gameTitle}
+                    <span className="text-success">{a.gamerscore} G</span> · {a.gameTitle}
                   </span>
                 </div>
-                <time dateTime={a.earnedAt} className="text-xs ml-auto shrink-0 text-green-500">
+                <time dateTime={a.earnedAt} className="text-xs ml-auto shrink-0 text-success">
                   {new Date(a.earnedAt).toLocaleDateString(lang, { day: 'numeric', month: 'short' })}
                 </time>
               </Link>

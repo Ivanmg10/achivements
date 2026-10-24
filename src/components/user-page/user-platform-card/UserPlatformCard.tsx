@@ -10,7 +10,7 @@ import { buttonClass } from '@/components/ui/Button'
 export type PlatformStat = { label: string; value: string; accent?: string }
 
 export const DISCONNECT_CLASS =
-  'w-full py-2 rounded-xl bg-red-500/15 text-red-400 font-semibold text-sm hover:bg-red-500/25 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70'
+  'w-full py-2 rounded-xl bg-danger/15 text-danger font-semibold text-sm hover:bg-danger/25 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70'
 export const CONNECT_CLASS = buttonClass('primary', 'md', 'w-full')
 
 /**
@@ -86,7 +86,7 @@ export default function UserPlatformCard({
           </span>
           <span
             className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-              connected ? 'bg-green-500/20 text-green-400' : 'bg-ink/5 text-text-secondary'
+              connected ? 'bg-success/20 text-success' : 'bg-ink/5 text-text-secondary'
             }`}
           >
             {connected ? T.userData.connected : T.userData.notConnected}

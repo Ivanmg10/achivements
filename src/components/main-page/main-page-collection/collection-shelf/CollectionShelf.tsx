@@ -14,9 +14,9 @@ import { useSubject } from '@/context/SubjectContext'
 
 /** Medal per place, metal-like; the number on it says the place too, so colour is never the only cue. */
 const MEDALS = [
-  'bg-linear-to-b from-amber-200 to-amber-500 text-amber-950',
+  'bg-linear-to-b from-warning to-warning text-amber-950',
   'bg-linear-to-b from-zinc-100 to-zinc-400 text-zinc-900',
-  'bg-linear-to-b from-orange-300 to-orange-600 text-orange-950',
+  'bg-linear-to-b from-warning to-warning text-orange-950',
   'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-ink/10',
   'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-ink/10',
 ]
@@ -60,7 +60,7 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
           {counts.xbox > 0 && (
             <>
               <span aria-hidden="true">·</span>
-              <span className="text-green-500 font-semibold">{counts.xbox} Xbox</span>
+              <span className="text-success font-semibold">{counts.xbox} Xbox</span>
             </>
           )}
         </p>

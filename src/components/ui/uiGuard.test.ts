@@ -67,3 +67,8 @@ test('dialogs come from Modal', () => {
   ]
   expect(offenders(/className="fixed inset-0[^"]*bg-black/).filter((f) => !allowed.includes(f))).toEqual([])
 })
+
+test('meaningful colours come from the theme, not the palette', () => {
+  // red → danger, green → success, yellow → hardcore, amber/orange → warning (each theme tunes them)
+  expect(offenders(/\b(text|bg|ring|border|fill|stroke|from|to|via)-(red|green|yellow|amber|orange)-(200|300|400|500|600)\b/)).toEqual([])
+})

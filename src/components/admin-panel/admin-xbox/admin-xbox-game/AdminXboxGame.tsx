@@ -59,7 +59,7 @@ export default function AdminXboxGame({ xuid, game }: { xuid: string; game: Xbox
           {error && (
             <p role="alert" className="text-sm text-danger">
               Could not load the achievements.{' '}
-              <button type="button" onClick={() => void load()} className="underline hover:text-red-300">
+              <button type="button" onClick={() => void load()} className="underline hover:text-danger">
                 Retry
               </button>
             </p>
@@ -69,7 +69,7 @@ export default function AdminXboxGame({ xuid, game }: { xuid: string; game: Xbox
             <ul className="flex flex-col gap-1.5">
               {achievements.map((a) => (
                 <li key={a.id} className="flex items-start gap-2 text-sm">
-                  <span className={`shrink-0 text-xs font-semibold ${a.unlocked ? 'text-green-400' : 'text-text-secondary'}`}>
+                  <span className={`shrink-0 text-xs font-semibold ${a.unlocked ? 'text-success' : 'text-text-secondary'}`}>
                     {a.unlocked ? 'Unlocked' : 'Locked'}
                   </span>
                   <span className="flex-1 min-w-0">

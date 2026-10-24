@@ -40,7 +40,7 @@ export default function MainPageProfileRa({
 
   const ringColor =
     hardcoreRatio >= 80
-      ? 'ring-yellow-400'
+      ? 'ring-hardcore'
       : hardcoreRatio >= 50
         ? 'ring-blue-400'
         : 'ring-gray-600'

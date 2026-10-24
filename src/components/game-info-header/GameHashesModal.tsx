@@ -24,9 +24,9 @@ type Props = {
 
 const LABEL_COLORS: Record<string, string> = {
   REDUMP: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-  'NO-INTRO': 'bg-green-500/20 text-green-300 border-green-500/30',
+  'NO-INTRO': 'bg-success/20 text-success border-success/30',
   TOSEC: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-  'NOINTRO': 'bg-green-500/20 text-green-300 border-green-500/30',
+  'NOINTRO': 'bg-success/20 text-success border-success/30',
 }
 
 function CopyButton({ text }: { text: string }) {
@@ -46,7 +46,7 @@ function CopyButton({ text }: { text: string }) {
       aria-label="Copy hash"
     >
       {copied
-        ? <IconCheck className="w-3.5 h-3.5 text-green-400" />
+        ? <IconCheck className="w-3.5 h-3.5 text-success" />
         : <IconCopy className="w-3.5 h-3.5" />
       }
     </button>

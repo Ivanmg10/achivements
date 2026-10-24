@@ -6,8 +6,8 @@ import { candidateIconUrl, CandidateStatus, GameCandidate } from '@/utils/gameCa
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 
 const STATUS_CLASSES: Record<CandidateStatus, string> = {
-  'completed-hc': 'bg-amber-500/20 text-amber-400',
-  'completed-sc': 'bg-green-500/20 text-green-400',
+  'completed-hc': 'bg-warning/20 text-warning',
+  'completed-sc': 'bg-success/20 text-success',
   'perfect': 'bg-[#a4d007]/20 text-[#a4d007]',
   'in-progress': 'bg-blue-500/20 text-blue-400',
   'want-to-play': 'bg-purple-500/20 text-purple-400',

@@ -33,7 +33,7 @@ export default function AdminRankings() {
       {loadError ? (
         <p role="alert" className="text-sm text-danger">
           Could not load the rankings.{' '}
-          <button onClick={retry} className="underline hover:text-red-300">
+          <button onClick={retry} className="underline hover:text-danger">
             Retry
           </button>
         </p>

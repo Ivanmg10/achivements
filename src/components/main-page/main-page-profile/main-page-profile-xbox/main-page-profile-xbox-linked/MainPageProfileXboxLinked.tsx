@@ -71,7 +71,7 @@ export default function MainPageProfileXboxLinked({
       <MainPageProfileActions
         href={`https://www.xbox.com/play/user/${encodeURIComponent(summary.gamertag)}`}
         linkLabel={T.xbox.viewOnXbox}
-        ringClass="focus:ring-green-500"
+        ringClass="focus:ring-success"
         onRefresh={refresh}
       />
 
@@ -82,7 +82,7 @@ export default function MainPageProfileXboxLinked({
             alt=""
             width={90}
             height={90}
-            className="m-1 rounded-lg ring-2 ring-green-500 shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5"
+            className="m-1 rounded-lg ring-2 ring-success shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5"
             unoptimized
           />
         ) : (
@@ -99,7 +99,7 @@ export default function MainPageProfileXboxLinked({
             {summary.tier && (
               <span className="inline-flex items-center gap-1 text-text-secondary">
                 {T.xbox.tier}
-                <span className="px-1.5 py-0.5 rounded bg-green-500/15 text-green-400 font-semibold">{summary.tier}</span>
+                <span className="px-1.5 py-0.5 rounded bg-success/15 text-success font-semibold">{summary.tier}</span>
               </span>
             )}
           </div>

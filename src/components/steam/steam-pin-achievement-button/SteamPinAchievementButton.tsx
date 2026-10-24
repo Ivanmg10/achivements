@@ -31,7 +31,7 @@ export default function SteamPinAchievementButton({
       title={label}
       onClick={onToggle}
       className={`transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded ${
-        pinned ? 'text-yellow-400 hover:text-yellow-300' : 'text-text-secondary hover:text-yellow-400'
+        pinned ? 'text-hardcore hover:text-hardcore' : 'text-text-secondary hover:text-hardcore'
       } ${className}`}
     >
       {pinned ? (

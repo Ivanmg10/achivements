@@ -70,7 +70,7 @@ export default function MainPageXboxStats({
       <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={noun} onClick={() => setWeekOpen(true)} />
       <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={noun} onClick={() => setMonthOpen(true)} />
       <StatPill label={T.pointsStats.avgPerDay} value={stats.avg.toFixed(1)} sub={T.pointsStats.perDay} />
-      {summary && <StatPill label={T.xbox.gamerscore} value={summary.gamerscore.toLocaleString(lang)} sub="Xbox" accent="text-green-500" />}
+      {summary && <StatPill label={T.xbox.gamerscore} value={summary.gamerscore.toLocaleString(lang)} sub="Xbox" accent="text-success" />}
       <StatPill
         label={T.streak.title}
         value={`${streak}d`}

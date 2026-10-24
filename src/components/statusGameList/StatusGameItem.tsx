@@ -69,7 +69,7 @@ export default function StatusGameItem({
             {game.ImageIcon && (
               <div
                 className={`w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden transition-all duration-150 ${
-                  isHardcore ? 'ring-2 ring-yellow-400/70 hover:ring-yellow-400' : 'hover:ring-2 hover:ring-ink/40'
+                  isHardcore ? 'ring-2 ring-hardcore/70 hover:ring-hardcore' : 'hover:ring-2 hover:ring-ink/40'
                 }`}
               >
                 <Image
@@ -122,7 +122,7 @@ export default function StatusGameItem({
                 return null
               })}
             </div>
-            <p className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>
+            <p className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>
               {earned !== null ? `${earned} / ${total}` : total} {T.statusGameItem.achievements}
             </p>
             {pct !== null && (

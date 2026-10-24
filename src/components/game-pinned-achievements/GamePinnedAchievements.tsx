@@ -144,7 +144,7 @@ export function GamePinnedAchievements({
                   <button
                     onClick={() => handleUnpin(row.achievement_id)}
                     aria-label={`${T.gameExpanded.unpinAria} ${row.snapshot.Title}`}
-                    className="text-yellow-400 hover:text-yellow-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
+                    className="text-hardcore hover:text-hardcore transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
                   >
                     <IconStarFilled className="w-4 h-4" aria-hidden />
                   </button>

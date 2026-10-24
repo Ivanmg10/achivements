@@ -80,7 +80,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
                 </span>
               )}
             </span>
-            <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>{progressText}</span>
+            <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>{progressText}</span>
             <span className="flex items-center gap-2 mt-1">
               <ProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-main" className="flex-1" />
               <span className={`text-xs tabular-nums ${game.pctWon >= 100 ? 'text-success font-semibold' : 'text-text-secondary'}`}>{game.pctWon}%</span>

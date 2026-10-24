@@ -209,7 +209,7 @@ export default function AdminPanel({
           </div>
         )}
         {error && (
-          <div className="flex items-center justify-center py-12 text-red-400 text-sm">{error}</div>
+          <div className="flex items-center justify-center py-12 text-danger text-sm">{error}</div>
         )}
         {!loading && !error && visible.length === 0 && (
           <p className="py-12 text-center text-text-secondary text-sm">No users match that search</p>

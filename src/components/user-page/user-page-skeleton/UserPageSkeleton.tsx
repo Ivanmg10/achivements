@@ -55,7 +55,7 @@ export default function UserPageSkeleton() {
         </div>
 
         {/* Delete account */}
-        <div className="bg-bg-card rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center gap-4 border border-red-500/20">
+        <div className="bg-bg-card rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center gap-4 border border-danger/20">
           <div className="flex-1 flex flex-col gap-2">
             <div className={`${BLOCK} h-3.5 w-36 rounded`} />
             <div className={`${BLOCK} h-3 w-2/3 rounded`} />

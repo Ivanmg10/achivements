@@ -163,7 +163,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
               )}
               {currentLocation && (
                 <button onClick={() => { setValues(v => ({ ...v, location: '' })); patch('location', null) }}
-                  className="text-xs text-red-400 hover:text-red-300 px-2 py-1">Clear</button>
+                  className="text-xs text-danger hover:text-danger px-2 py-1">Clear</button>
               )}
             </div>
           ) : (
@@ -194,7 +194,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
                 className="text-xs text-text-secondary hover:text-text-main text-left px-1">Cancel</button>
             </div>
           )}
-          {errors.location && <span className="text-xs text-red-400">{errors.location}</span>}
+          {errors.location && <span className="text-xs text-danger">{errors.location}</span>}
         </div>
 
         {/* Admin toggle */}
@@ -253,7 +253,7 @@ function FieldRow({
         <div className="flex-1">{children}</div>
         {canSave && <SaveButton saving={saving} onClick={onSave} />}
       </div>
-      {error && <span className="text-xs text-red-400">{error}</span>}
+      {error && <span className="text-xs text-danger">{error}</span>}
     </div>
   )
 }

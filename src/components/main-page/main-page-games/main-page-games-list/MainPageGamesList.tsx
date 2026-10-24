@@ -21,7 +21,7 @@ function ringColor(game: AnyGame): string {
   if (!isCompleted(game)) return ''
   const pct = (parseFloat(game.PctWon) || 0) * 100
   if (pct < 100) return ''
-  return game.HardcoreMode === '1' ? 'ring-2 ring-yellow-400' : 'ring-2 ring-blue-400'
+  return game.HardcoreMode === '1' ? 'ring-2 ring-hardcore' : 'ring-2 ring-blue-400'
 }
 
 function getBadge(

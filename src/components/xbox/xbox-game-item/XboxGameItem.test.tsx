@@ -48,7 +48,7 @@ test('a controlled card asks its parent', () => {
 test('a finished game is marked, and the link goes to the page of whoever is being looked at', () => {
   const { container } = render(<XboxGameItem game={{ ...GAME, pctWon: 100 }} />)
   expect(screen.getByText('100%')).toHaveClass('text-success')
-  expect(container.querySelector('.ring-green-500')).toBeInTheDocument()
+  expect(container.querySelector('.ring-success')).toBeInTheDocument()
 })
 
 const MINUTES = 3409

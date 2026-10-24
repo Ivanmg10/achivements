@@ -138,7 +138,7 @@ export default function FavoriteGameModal({
                   <button
                     onClick={() => save(null)}
                     disabled={saving}
-                    className="text-xs text-red-400 hover:text-red-300 transition-colors disabled:opacity-50 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    className="text-xs text-danger hover:text-danger transition-colors disabled:opacity-50 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                   >
                     {T.userData.favoriteGameRemove}
                   </button>

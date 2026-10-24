@@ -150,7 +150,7 @@ export const AchievementGrid = memo(function AchievementGrid({
                 setSelected(a)
               }}
               className={`block rounded-lg overflow-hidden shrink-0 cursor-pointer transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                isHardcore ? 'ring-2 ring-yellow-400' : isSoftcore ? 'ring-2 ring-blue-400' : missable ? 'ring-2 ring-danger' : ''
+                isHardcore ? 'ring-2 ring-hardcore' : isSoftcore ? 'ring-2 ring-blue-400' : missable ? 'ring-2 ring-danger' : ''
               }`}
             >
               {a.BadgeName ? (

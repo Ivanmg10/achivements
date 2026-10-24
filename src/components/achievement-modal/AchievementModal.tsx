@@ -260,7 +260,7 @@ export default function AchievementModal({
                               )}
                               <p className="text-sm">{u.User}</p>
                               {u.HardcoreMode === '1' && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-900/60 text-yellow-300">HC</span>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-900/60 text-hardcore">HC</span>
                               )}
                             </div>
                             <p className="text-xs text-text-secondary tabular-nums">
