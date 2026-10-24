@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
-import LibraryEntryCover from '@/components/library-entry-cover/LibraryEntryCover'
+import LibraryEntryCover, { entryIcon } from '@/components/library-entry-cover/LibraryEntryCover'
 import LibraryPlatformBadge from '@/components/library-platform-badge/LibraryPlatformBadge'
 import LibraryEntryProgress from '@/components/library-entry-progress/LibraryEntryProgress'
 import { entryHref } from '@/utils/libraryShelves'
 import type { LibraryEntry } from '@/utils/libraryInsights'
+import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 
 /**
  * One game in the list: icon, title, platform, last played and progress. The
@@ -21,10 +22,12 @@ export default function LibraryListRow({ entry, current, onSelect }: { entry: Li
 
   return (
     <div
-      className={`relative w-full grid grid-cols-[52px_1fr] items-center gap-3 rounded-card bg-bg-card p-2 pr-3 ring-1 transition-shadow focus-within:ring-2 focus-within:ring-accent/70 ${
-        current ? 'ring-2 ring-accent' : 'ring-ink/5 hover:ring-ink/15'
+      className={`relative isolate w-full grid grid-cols-[52px_1fr] items-center gap-3 rounded-control p-2 pr-3 transition-shadow focus-within:ring-2 focus-within:ring-accent/70 ${
+        current ? 'ring-2 ring-accent' : 'hover:ring-1 hover:ring-ink/25'
       }`}
     >
+      {/* The game's colour: a flat tint and a border, as the home's rows. */}
+      <GameCardBackdrop src={entryIcon(entry)} surface="card" />
       {/* Same destination as the title, so it is kept out of the tab order. */}
       <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 rounded-xl hover:ring-2 hover:ring-ink/40 transition-shadow">
         <LibraryEntryCover entry={entry} size={52} />
@@ -48,7 +51,7 @@ export default function LibraryListRow({ entry, current, onSelect }: { entry: Li
         aria-current={current ? 'true' : undefined}
         onClick={() => onSelect(entry)}
         aria-label={entry.title}
-        className="absolute inset-0 z-[1] rounded-2xl cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 z-[1] rounded-control cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       />
     </div>
   )

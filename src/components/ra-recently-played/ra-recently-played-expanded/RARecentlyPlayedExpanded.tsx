@@ -36,7 +36,7 @@ export function RARecentlyPlayedExpanded({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">
-      <div className="bg-bg-header/40 rounded-xl p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
         <CircularProgress
           earned={game.NumAchieved}
           total={game.NumPossibleAchievements}
@@ -51,7 +51,7 @@ export function RARecentlyPlayedExpanded({
           remaining={remaining}
         />
       </div>
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
         <p className="text-xs text-text-secondary mb-2">{T.gameExpanded.allAchievements}</p>
         <AchievementGrid
           achievements={isLoading ? [] : achievements}
@@ -61,10 +61,10 @@ export function RARecentlyPlayedExpanded({
           numDistinctPlayers={numDistinctPlayers}
         />
       </div>
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-2 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-2 lg:row-start-1">
         <GameAchievementsProgressChart achievements={fromRa(achievements, numDistinctPlayers, game.GameID)} isLoading={isLoading} />
       </div>
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-3 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-3 lg:row-start-1">
         <GamePinnedAchievements
           gameId={game.GameID}
           gameTitle={game.Title}

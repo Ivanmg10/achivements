@@ -32,12 +32,12 @@ export default function PsnRecentlyPlayedExpanded({ game }: { game: PsnGameProgr
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">
-      <div className="bg-bg-header/40 rounded-xl p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
         <CircularProgress earned={earned} total={total} label={T.psn.trophies} size={130} />
         <PsnTrophyCounts earned={game.earned} of={game.defined} className="flex-col items-start! lg:items-center!" />
       </div>
 
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
         <p className="text-xs text-text-secondary mb-2">{T.psn.trophies}</p>
         {isLoading ? (
           <ul aria-busy="true" className="flex flex-wrap gap-1">
@@ -62,11 +62,11 @@ export default function PsnRecentlyPlayedExpanded({ game }: { game: PsnGameProgr
         )}
       </div>
 
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-2 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-2 lg:row-start-1">
         <GameAchievementsProgressChart achievements={unlocks} isLoading={isLoading} />
       </div>
 
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-3 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-3 lg:row-start-1">
         <PsnRarestTrophies gameId={game.id} trophies={trophies} isLoading={isLoading} />
       </div>
     </div>

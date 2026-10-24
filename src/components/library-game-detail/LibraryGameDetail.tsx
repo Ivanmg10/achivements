@@ -21,7 +21,7 @@ import LibraryDetailSkeleton from '@/components/library-detail-skeleton/LibraryD
 export type LibraryCategory = 'wantToPlay' | 'playing' | 'completed'
 
 const SKELETON_BADGES = 24
-const PANEL = 'bg-bg-header/40 rounded-xl p-3'
+const PANEL = 'bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3'
 
 /** The panels come in one after another, each rising a little as it fades in. */
 const CONTAINER: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.12 } } }
@@ -178,7 +178,7 @@ export default function LibraryGameDetail({
         variants={CONTAINER}
         initial={reduce ? false : 'hidden'}
         animate="show"
-        className="grid grid-cols-1 @3xl:grid-cols-[190px_1.3fr_1fr] @3xl:grid-rows-[20rem] gap-3 w-full"
+        className="grid grid-cols-1 @3xl:grid-cols-[190px_minmax(0,1.3fr)_minmax(0,1fr)] @3xl:grid-rows-[20rem] gap-3 w-full"
       >
         <motion.div variants={PANEL_IN} className={`${PANEL} p-4 @3xl:p-6 flex flex-col items-center justify-center gap-3`}>
           <CircularProgress earned={ring.earned} total={ring.total} label={ring.label} size={130} />

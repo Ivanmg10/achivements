@@ -34,8 +34,6 @@ function read(src: string) {
     listeners.forEach((l) => l())
   }
   const img = new window.Image()
-  // The colour can only be read from an image its host lets other sites read (CORS).
-  img.crossOrigin = 'anonymous'
   img.onload = () => {
     try {
       const canvas = document.createElement('canvas')
@@ -49,7 +47,8 @@ function read(src: string) {
     }
   }
   img.onerror = () => done(NEUTRAL_TINT)
-  img.src = src
+  // Read through this site, so the canvas may read it whatever the image host allows.
+  img.src = src.startsWith('data:') ? src : `/api/image-proxy?url=${encodeURIComponent(src)}`
 }
 
 function subscribe(listener: () => void) {
