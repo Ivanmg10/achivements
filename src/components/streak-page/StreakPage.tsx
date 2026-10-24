@@ -20,7 +20,7 @@ import StreakYearHeatmap from './streak-year-heatmap/StreakYearHeatmap'
 
 /**
  * The streak page: the streak going now and the record, the longest streaks
- * as bars, and the picked one day by day. On a wide screen the overview and
+ * as a ranked list, and the picked one day by day. On a wide screen the overview and
  * the day by day sit side by side.
  */
 export default function StreakPage() {
@@ -42,10 +42,11 @@ export default function StreakPage() {
   else
     body = (
       <>
-      <StreakQuickStats activeDays={insights.activeDays} avgStreak={insights.avgStreak} daysSinceLast={insights.daysSinceLast} longestGap={insights.longestGap} />
+      <StreakStatsBanner activeStreak={activeStreak} bestStreak={bestStreak} totalStreaks={streaks.length} lastActiveDay={lastActiveDay}>
+        <StreakQuickStats activeDays={insights.activeDays} avgStreak={insights.avgStreak} daysSinceLast={insights.daysSinceLast} longestGap={insights.longestGap} />
+      </StreakStatsBanner>
       <div className="grid gap-5 xl:grid-cols-2">
         <div className="flex flex-col gap-5 min-w-0">
-          <StreakStatsBanner activeStreak={activeStreak} bestStreak={bestStreak} totalStreaks={streaks.length} lastActiveDay={lastActiveDay} />
           <StreakChart streaks={streaks} selectedStreak={selectedStreak} onSelect={setPicked} />
         </div>
         <div className="min-w-0 flex flex-col">

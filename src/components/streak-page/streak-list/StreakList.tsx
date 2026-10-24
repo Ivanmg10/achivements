@@ -6,7 +6,7 @@ import { Streak, UserAward } from '@/types/types'
 import { useUserAwards } from '@/hooks/useUserAwards'
 import { formatDay, plural } from '@/utils/utils'
 import StreakDayRow from '../streak-day-row/StreakDayRow'
-import StreakCalendar from '../streak-calendar/StreakCalendar'
+import StreakDayStrip from '../streak-day-strip/StreakDayStrip'
 
 const COMPLETION_TYPES = new Set(['Mastery/Completion', 'Game Beaten'])
 
@@ -15,7 +15,7 @@ function awardDate(awardedAt: string): string {
 }
 
 /**
- * A streak day by day: a calendar of its days, shaded by how much was
+ * A streak day by day: a strip of its days, as tall as how much was
  * unlocked, and what was unlocked on the day picked (the last one to begin
  * with). Rendered with the streak as key, so picking another streak starts
  * again from its last day.
@@ -73,15 +73,13 @@ export default function StreakList({ selectedStreak }: { selectedStreak: Streak 
         </span>
       </div>
 
-      {/* Calendar and the picked day side by side when there is room; stacked otherwise. */}
-      <div className="flex flex-col md:flex-row gap-5 md:items-start">
-        <div className="flex flex-col gap-2 shrink-0">
-          <StreakCalendar start={selectedStreak.start} end={selectedStreak.end} counts={counts} selected={shown} onSelect={setDay} />
-          <p className="text-xs text-text-secondary">{T.streak.calendarHint}</p>
-        </div>
-        <div className="flex-1 border-t border-ink/5 pt-5 md:border-t-0 md:pt-0 md:border-l md:pl-5 min-w-0">
-          <StreakDayRow date={shown} achievements={byDate[shown] ?? []} awards={streakAwards[shown]} />
-        </div>
+      {/* The strip on top, the picked day's unlocks under it. */}
+      <div className="flex flex-col gap-2">
+        <StreakDayStrip start={selectedStreak.start} end={selectedStreak.end} counts={counts} selected={shown} onSelect={setDay} />
+        <p className="text-xs text-text-secondary">{T.streak.calendarHint}</p>
+      </div>
+      <div className="border-t border-ink/[0.06] pt-5 min-w-0">
+        <StreakDayRow date={shown} achievements={byDate[shown] ?? []} awards={streakAwards[shown]} />
       </div>
     </section>
   )

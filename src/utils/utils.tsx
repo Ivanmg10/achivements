@@ -490,6 +490,17 @@ export function countByDay(achievements: RecentAchievement[]): Record<string, nu
 }
 
 /**
+ * The top of a day-by-day strip: the 90th percentile of the days with something,
+ * so one huge day does not flatten the rest (days above it are cut and say their
+ * figure). At least 1.
+ */
+export function stripCap(counts: number[]): number {
+  const busy = counts.filter((n) => n > 0).sort((a, b) => a - b)
+  if (!busy.length) return 1
+  return Math.max(1, busy[Math.floor((busy.length - 1) * 0.9)])
+}
+
+/**
  * The year at a glance, for the streak page: days with any achievement, the
  * average streak, days since the last achievement (0 = today), the longest
  * run of days without one, and achievements per weekday (Monday first).
