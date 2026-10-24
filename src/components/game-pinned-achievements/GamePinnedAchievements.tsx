@@ -72,7 +72,7 @@ export function GamePinnedAchievements({
 
   return (
     <div className="flex flex-col gap-2 h-full">
-      <p className="text-xs text-text-secondary">{T.gameExpanded.pinnedAchievements}</p>
+      <p className="text-sm font-bold text-text-main">{T.gameExpanded.pinnedAchievements}</p>
 
       {hasError && (
         <p role="alert" className="text-xs text-danger">
@@ -98,9 +98,9 @@ export function GamePinnedAchievements({
           <button
             onClick={() => setModalOpen(true)}
             aria-label={T.gameExpanded.pinAchievementAria}
-            className="w-full flex-1 rounded-lg border-2 border-dashed border-ink/15 flex flex-col items-center justify-center gap-1.5 text-text-secondary hover:text-text-main hover:border-ink/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="w-full flex-1 rounded-control ring-1 ring-inset ring-accent/35 bg-[repeating-linear-gradient(-60deg,rgb(var(--accent)/0.06)_0_10px,transparent_10px_20px)] text-text-main hover:ring-accent/70 transition-shadow flex flex-col items-center justify-center gap-1.5 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
-            <IconPlus className="w-6 h-6" aria-hidden />
+            <IconPlus className="w-6 h-6 text-accent" aria-hidden />
             <span className="text-xs">{T.gameExpanded.pinAchievementAria}</span>
           </button>
         ) : (
@@ -156,9 +156,9 @@ export function GamePinnedAchievements({
             <button
               onClick={() => setModalOpen(true)}
               aria-label={T.gameExpanded.pinAchievementAria}
-              className="w-full rounded-lg border-2 border-dashed border-ink/15 flex items-center justify-center gap-1.5 py-2 text-text-secondary hover:text-text-main hover:border-ink/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="w-full rounded-control ring-1 ring-inset ring-accent/35 bg-[repeating-linear-gradient(-60deg,rgb(var(--accent)/0.06)_0_10px,transparent_10px_20px)] text-text-main hover:ring-accent/70 transition-shadow flex items-center justify-center gap-1.5 py-2 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
-              <IconPlus className="w-4 h-4" aria-hidden />
+              <IconPlus className="w-4 h-4 text-accent" aria-hidden />
               <span className="text-xs">{T.gameExpanded.pinAchievementAria}</span>
             </button>
           )}

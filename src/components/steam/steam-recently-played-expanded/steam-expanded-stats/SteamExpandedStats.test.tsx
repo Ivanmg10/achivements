@@ -15,10 +15,11 @@ test('lists playtime, the last two weeks, completion and what remains', () => {
   expect(value(en.gameExpanded.remaining)).toBe('63')
 })
 
-test('is a description list, shown on small screens only like RA\'s', () => {
+test('is a description list; on a wide screen the completion is left to the ring', () => {
   const { container } = render(<SteamExpandedStats playtimeForever={0} playtime2Weeks={0} completionPct={0} remaining={0} />)
   const dl = container.querySelector('dl')!
-  expect(dl.className).toContain('lg:hidden')
+  expect(dl.className).not.toContain('lg:hidden')
+  expect(screen.getByText(en.gameExpanded.completion).parentElement!.className).toContain('lg:hidden')
   expect(dl.querySelectorAll('dt')).toHaveLength(4)
   expect(value(en.steam.last2Weeks)).toBe(`0 ${en.steam.minutesShort}`)
 })

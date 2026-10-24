@@ -46,7 +46,7 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
       </div>
 
       <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
-        <p className="text-xs text-text-secondary mb-2">{T.gameExpanded.allAchievements}</p>
+        <p className="text-sm font-bold text-text-main mb-2.5">{T.gameExpanded.allAchievements}</p>
         {isLoading ? (
           <ul aria-busy="true" className="flex flex-wrap gap-1">
             {Array.from({ length: Math.min(total || SKELETON_BADGES, 60) }).map((_, i) => (

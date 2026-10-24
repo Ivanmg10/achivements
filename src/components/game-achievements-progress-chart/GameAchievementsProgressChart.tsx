@@ -59,7 +59,7 @@ export function GameAchievementsProgressChart({
   return (
     <div className="w-full flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2 px-1">
-        <p className="text-text-secondary text-sm">{T.gameExpanded.achievementsOverTime}</p>
+        <p className="text-sm font-bold text-text-main">{T.gameExpanded.achievementsOverTime}</p>
         <SegmentedControl
           aria-label={T.gameExpanded.achievementsOverTime}
           size="xs"
