@@ -204,7 +204,7 @@ The site's controls come from the library, in the design agreed on the canvas
 (`docs/ui-library-and-designs-plan.md` → Build plan). **Never draw one by hand**; a
 guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside `ui/`:
 
-- **Buttons**: `Button` (`primary` slanted, `secondary`, `quiet`, `danger`; `size`; `loading`;
+- **Buttons**: `Button` (`primary` slanted, `secondary`, `quiet`, `danger` (tinted, not solid); `size`; `loading`;
   `href` for a link) and `IconButton` (needs `aria-label`). Where an element cannot be one,
   `buttonClass(variant, size, layout)`.
 - **Fields**: `Input`, `Textarea`, `SearchInput`, `PasswordInput`, wrapped in `Field` (label,

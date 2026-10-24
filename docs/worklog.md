@@ -43,13 +43,27 @@ shells on `rounded-card`. Progress bars bevelled, glowing only when finished. Th
 **Decisions** — The tint applies to every game row, not only recently played (homogeneity). The
 Following cards already had the last game's art in code (only the canvas lacked it). Tables already
 centre headers and values in code; no change.
-**Open** — Not built yet, for the review pass with the user: the rankings v2 leaderboard, the
-streak page's new sections (day-by-day strip with outlier scale, best-streaks list), the library
-detail panel's exact layout, the opened game's restyle beyond the components, Disclosure pieces
-(`Accordion`, `ShowMore`, `ToggleButton`, `Shelf`). Check `useImageTint` on each image host (Steam,
-PSN, Xbox, RA): a host without CORS shows the grey.
-**Watch out** — `MainPagePortada` sits above the home's `home-fit` grid: check that the home still
-fits the viewport with the cover on.
+**Then, page by page against the canvas's final boards (same day):** header (slanted nav line,
+sunken search with the accent slash, chips) and the home profile column; game pages (chips, title in
+the display face, facts row, actions as library buttons, table filters as line tabs); library rows
+tinted and the detail panes; page titles in the display face; rankings period and order as
+`Select`s; the streak page v3 (`StreakStatsBanner` is now the hero with the amber flame and the
+year's figures under it, `StreakChart` a ranked list, `StreakDayStrip` replaces the calendar: a bar
+per day, square-root scale capped at the 90th percentile by `stripCap`, cut days marked with their
+figure); the account page (identity fields sunken, buttons from the library, preference rows
+divided, platform cards with a status dot); the group detail (taller hero, title and ring in the
+display face, state chips, filters as line tabs with counts); the opened game (bold pane titles,
+the ring's mini figures under it on desktop, the goal slot striped in the accent).
+`useImageTint` reads every image through `/api/image-proxy` (allowlisted hosts), so the tint works
+on every platform. `Button`'s `danger` variant is tinted (danger text, ring and soft fill), as on
+the agreed account board, not solid.
+**Open** — The review pass with the user (their screenshots, 2560 px). Not built, on purpose: the
+Disclosure pieces (`Accordion`, `ShowMore`, `ToggleButton`, `Shelf`) have no place that uses them
+yet. The cover layout's art is RA's small screenshot, blurry at that size: a wider picture (IGDB's
+hero, as Xbox uses) would fix it.
+**Watch out** — The cover layout is checked: the home grows by the cover's height (the list and
+profile still share the rest). Writing `home-layout` by hand in the browser syncs to the account:
+the values are `classic` and `cover`.
 
 ---
 
