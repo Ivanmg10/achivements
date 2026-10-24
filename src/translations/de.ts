@@ -1750,4 +1750,11 @@ export const de: Translations = {
       profileEmpty: 'Nicht ausgefüllt',
     },
   },
+  homeLayout: {
+    label: 'Startseite',
+    classic: 'Klassisch',
+    cover: 'Titelbild',
+    continueKicker: 'Weiterspielen',
+    openGame: 'Spiel öffnen',
+  },
 }

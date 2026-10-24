@@ -1750,4 +1750,11 @@ export const ja: Translations = {
       profileEmpty: '未入力',
     },
   },
+  homeLayout: {
+    label: 'ホーム画面',
+    classic: 'クラシック',
+    cover: 'カバー',
+    continueKicker: '続きから遊ぶ',
+    openGame: 'ゲームを開く',
+  },
 }

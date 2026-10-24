@@ -1750,4 +1750,11 @@ export const ru: Translations = {
       profileEmpty: 'Не заполнено',
     },
   },
+  homeLayout: {
+    label: 'Главная страница',
+    classic: 'Классическая',
+    cover: 'Обложка',
+    continueKicker: 'Продолжить игру',
+    openGame: 'Открыть игру',
+  },
 }

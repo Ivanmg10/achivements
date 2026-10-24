@@ -1751,6 +1751,13 @@ export const en = {
       profileEmpty: 'Not filled in',
     },
   },
+  homeLayout: {
+    label: 'Home layout',
+    classic: 'Classic',
+    cover: 'Cover',
+    continueKicker: 'Pick up where you left off',
+    openGame: 'Open the game',
+  },
 }
 
 export type Translations = typeof en

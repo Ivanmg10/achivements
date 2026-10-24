@@ -8,6 +8,7 @@ import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { useVaultMe } from '@/hooks/useVaultMe'
+import UserHomeLayoutPreference from '@/components/user-page/user-home-layout-preference/UserHomeLayoutPreference'
 
 const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
 
@@ -47,6 +48,8 @@ export default function UserPreferencesGeneral({
       <ProfileField label={T.userConfig.language} icon={<IconLanguage size={18} />} onEdit={onOpenLanguage}>
         <span className="text-base font-medium uppercase">{lang}</span>
       </ProfileField>
+
+      <UserHomeLayoutPreference />
 
       <ProfileField
         label={T.userData.gender}
