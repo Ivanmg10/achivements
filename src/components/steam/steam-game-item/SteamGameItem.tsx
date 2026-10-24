@@ -72,7 +72,7 @@ export default function SteamGameItem({
       <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} />
 
       {/* relative: the expand button stretches over this whole row (see below). */}
-      <div className="relative flex items-center gap-3 px-3 py-3 shrink-0">
+      <div className="relative flex items-center gap-3.5 px-3.5 py-3 shrink-0">
         {/* Same destination as the title link, so it is kept out of the tab order. */}
         <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
           <SteamGameImage
@@ -80,19 +80,23 @@ export default function SteamGameItem({
             asset="icon"
             iconUrl={game.imageIcon}
             size={56}
-            className={`rounded-xl w-14 h-14 sm:w-16 sm:h-16 shadow-md shadow-black/30 transition-transform duration-300 hover:scale-105 ${
+            className={`rounded-xl w-14 h-14 sm:w-16 sm:h-16 shadow-[0_6px_18px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:scale-105 ${
               perfect ? 'ring-2 ring-warning' : 'ring-1 ring-ink/10'
             }`}
           />
         </Link>
 
         <div className="flex flex-col min-w-0 flex-1 gap-1">
-          <Link
-            href={href}
-            className="relative z-10 w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
-          >
-            <span className="text-base font-bold block truncate leading-tight">{game.title}</span>
-          </Link>
+          <span className="flex items-center gap-2 min-w-0">
+            <Link
+              href={href}
+              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] rounded"
+            >
+              <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.title}</span>
+            </Link>
+            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-[0.375rem] bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><SteamLogo size={12} className="opacity-60" aria-hidden="true" />
+                Steam</span>
+          </span>
 
           <button
             onClick={toggle}
@@ -102,14 +106,10 @@ export default function SteamGameItem({
             className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] group"
           >
             <span className="flex items-center gap-2 w-full">
-              <span className="flex items-center gap-1 shrink-0 text-xs text-text-secondary">
-                <SteamLogo size={12} className="opacity-60" aria-hidden="true" />
-                Steam
-              </span>
               {hasCounts && (
                 <>
                   <ProgressBar pct={game.pctWon} label={game.title} className="flex-1" />
-                  <span className={`text-xs font-semibold tabular-nums shrink-0 ${perfect ? 'text-success' : 'text-text-main'}`}>
+                  <span className={`text-base font-extrabold tabular-nums shrink-0 w-[2.625rem] text-right ${perfect ? 'text-success' : 'text-text-main'}`}>
                     {Math.round(game.pctWon)}%
                   </span>
                 </>
@@ -121,7 +121,7 @@ export default function SteamGameItem({
               />
             </span>
 
-            <span className="flex flex-wrap items-center gap-x-2 text-xs text-text-secondary">
+            <span className="flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-text-secondary">
               <span className="whitespace-nowrap">{progressText}</span>
               <span className="opacity-40" aria-hidden="true">·</span>
               <span className="flex items-center gap-1">

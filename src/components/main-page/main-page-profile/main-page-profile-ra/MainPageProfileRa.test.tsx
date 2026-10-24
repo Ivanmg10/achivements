@@ -26,7 +26,7 @@ test('renders user info when user present', () => {
   render(<MainPageProfileRa user={mockUser} game={mockGame} recentAchievements={[]} />)
   expect(screen.getByText('IvanXMarine')).toBeInTheDocument()
   expect(screen.getByText('Hardcore points')).toBeInTheDocument()
-  expect(screen.getByText('Playing level 1')).toBeInTheDocument()
+  expect(screen.getByText(/Playing level 1/)).toBeInTheDocument()
 })
 
 test('renders login link when no user', () => {

@@ -33,7 +33,7 @@ test('is headed like the RA list', () => {
 test('shows badge, title, game and unlock date, linking to the achievement', () => {
   const { container } = renderIt()
   expect(screen.getByText('Achievement 1')).toBeInTheDocument()
-  expect(screen.getByText('Fallout 4')).toBeInTheDocument()
+  expect(screen.getByText(/Fallout 4/)).toBeInTheDocument()
   expect(container.querySelector('img')?.getAttribute('src')).toBe('a1.jpg')
 
   const time = container.querySelector('time')!

@@ -5,7 +5,6 @@ import {
   RetroAchievementsGameWithAchievements,
   RetroAchievementsUserProfile,
 } from '@/types/types'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 
@@ -14,6 +13,9 @@ import MainPageProfileRaAchievements from './main-page-profile-ra-achievements/M
 import MainPageProfileRaGame from './main-page-profile-ra-game/MainPageProfileRaGame'
 import MainPageProfileRaStats from './main-page-profile-ra-stats/MainPageProfileRaStats'
 import MainPageProfileGameSkeleton from '../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
+import MainPageProfileCard from '../main-page-profile-card/MainPageProfileCard'
+import { SURFACE } from '@/components/ui/surface'
+import { StatCard } from '@/components/ui/StatPill'
 
 export default function MainPageProfileRa({
   user,
@@ -31,60 +33,45 @@ export default function MainPageProfileRa({
   /** Only on the signed-in user's own page. */
   onRefresh?: () => void | Promise<void>
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   const hardcoreRatio =
     user && (user.TotalTruePoints ?? 0) > 0
       ? Math.round(((user.TotalTruePoints ?? 0) / (user.TotalPoints || 1)) * 100)
       : 0
 
-  const ringColor =
-    hardcoreRatio >= 80
-      ? 'ring-hardcore'
-      : hardcoreRatio >= 50
-        ? 'ring-softcore'
-        : 'ring-gray-600'
+  // The picture's ring says how much of the account is played in hardcore.
+  const ring = hardcoreRatio >= 80 ? 'rgb(var(--hardcore))' : hardcoreRatio >= 50 ? 'rgb(var(--softcore))' : 'rgb(var(--ink) / 0.3)'
 
   const memberYear = user?.MemberSince ? new Date(user.MemberSince).getFullYear() : null
   const hasContribs = user && ((user.ContribCount ?? 0) > 0 || (user.ContribYield ?? 0) > 0)
 
   return (
-    <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
+    <div className="flex flex-col gap-3.5 w-full h-full">
       {user?.User ? (
         <>
-          <MainPageProfileActions
-            href={`https://retroachievements.org/user/${user.User}`}
-            linkLabel={T.profileRa.viewOnRA}
-            ringClass="focus:ring-accent/70"
-            onRefresh={onRefresh}
-          />
-
-          <div className={`flex gap-3 items-center ${onRefresh ? 'pr-36' : 'pr-24'}`}>
-            {user?.UserPic && (
-              <Image
-                src={`https://retroachievements.org${user.UserPic}`}
-                alt={`Avatar of ${user.User}`}
-                width={90}
-                height={90}
-                className={`m-1 rounded-lg ring-2 shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5 ${ringColor}`}
+          <MainPageProfileCard
+            avatarSrc={user.UserPic ? `https://retroachievements.org${user.UserPic}` : null}
+            avatarFallback={<span className="w-full h-full bg-bg-main" />}
+            ring={ring}
+            name={user.User}
+            actions={
+              <MainPageProfileActions
+                href={`https://retroachievements.org/user/${user.User}`}
+                linkLabel={T.profileRa.viewOnRA}
+                ringClass="focus:ring-accent/70"
+                onRefresh={onRefresh}
               />
+            }
+            stats={<MainPageProfileRaStats user={user} hardcoreRatio={hardcoreRatio} />}
+          >
+            {user.Motto && <p className="text-[0.8125rem] text-text-secondary italic line-clamp-2">&ldquo;{user.Motto}&rdquo;</p>}
+            {memberYear && (
+              <p className="text-[0.8125rem] text-text-secondary">
+                {T.profileRa.memberSince} {memberYear}
+              </p>
             )}
-            <div className="flex flex-col gap-1 min-w-0 w-full">
-              <p className="font-display italic font-extrabold text-3xl lg:text-4xl leading-none truncate pr-1.5">{user.User}</p>
-              {user.Motto && (
-                <p className="text-xs text-text-secondary italic line-clamp-2">
-                  &ldquo;{user.Motto}&rdquo;
-                </p>
-              )}
-              {memberYear && (
-                <p className="text-xs text-text-secondary">
-                  {T.profileRa.memberSince} {memberYear}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <MainPageProfileRaStats user={user} hardcoreRatio={hardcoreRatio} />
+          </MainPageProfileCard>
 
           {gameLoading && !game ? (
             <MainPageProfileGameSkeleton />
@@ -95,32 +82,17 @@ export default function MainPageProfileRa({
           <MainPageProfileRaAchievements achievements={recentAchievements} isLoading={achievementsLoading} />
 
           {hasContribs && (
-            <div className="flex flex-col gap-2 bg-bg-main rounded-lg p-3">
-              <p className="text-xs text-text-secondary uppercase tracking-wider">
-                {T.profileRa.contributions}
-              </p>
+            <div className={`${SURFACE} p-5 flex flex-col gap-3`}>
+              <p className="text-[1.0625rem] font-bold">{T.profileRa.contributions}</p>
               <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col gap-1">
-                  <span className="text-lg font-bold text-purple-400">
-                    {(user.ContribCount ?? 0).toLocaleString()}
-                  </span>
-                  <span className="text-xs text-text-secondary">{T.profileRa.achievementsCreated}</span>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-lg font-bold text-pink-400">
-                    {(user.ContribYield ?? 0).toLocaleString()}
-                  </span>
-                  <span className="text-xs text-text-secondary">{T.profileRa.pointsContributed}</span>
-                </div>
+                <StatCard label={T.profileRa.achievementsCreated} value={(user.ContribCount ?? 0).toLocaleString(lang)} />
+                <StatCard label={T.profileRa.pointsContributed} value={(user.ContribYield ?? 0).toLocaleString(lang)} />
               </div>
             </div>
           )}
         </>
       ) : (
-        <Link
-          href="/user"
-          className="w-full text-left bg-bg-card p-3 rounded-3xl hover:scale-[1.03] transition-transform duration-200"
-        >
+        <Link href="/user" className={`${SURFACE} p-5 font-semibold hover:ring-accent/50 transition-shadow`}>
           {T.profileRa.signIn}
         </Link>
       )}

@@ -68,9 +68,10 @@ describe('keyboard', () => {
   })
 })
 
-test('renders tab icons when given', () => {
+test('renders tab icons when given, on a page section (md); the profile\'s tabs are words only', () => {
   render(
     <MainPageProfileTabs
+      size="md"
       tabs={[{ id: 'ra', label: 'RA', icon: <svg data-testid="icon" /> }]}
       selected="ra"
       onSelect={jest.fn()}

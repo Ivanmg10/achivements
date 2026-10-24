@@ -65,7 +65,7 @@ export default function RaGameItem({
       <GameCardBackdrop src={art} />
 
       {/* relative: the expand button stretches over this whole row (see below). */}
-      <div className="relative flex items-center gap-3 px-3 py-3 shrink-0">
+      <div className="relative flex items-center gap-3.5 px-3.5 py-3 shrink-0">
         {/* Same destination as the title link, so it is kept out of the tab order. */}
         <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
           {art ? (
@@ -74,7 +74,7 @@ export default function RaGameItem({
               alt=""
               width={64}
               height={64}
-              className={`rounded-xl object-cover w-14 h-14 sm:w-16 sm:h-16 shadow-md shadow-black/30 transition-transform duration-300 hover:scale-105 ${
+              className={`rounded-xl object-cover w-14 h-14 sm:w-16 sm:h-16 shadow-[0_6px_18px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:scale-105 ${
                 mastered ? 'ring-2 ring-warning' : 'ring-1 ring-ink/10'
               }`}
             />
@@ -89,12 +89,15 @@ export default function RaGameItem({
         </Link>
 
         <div className="flex flex-col min-w-0 flex-1 gap-1">
-          <Link
-            href={href}
-            className="relative z-10 w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            <span className="text-base font-bold block truncate leading-tight">{game.Title}</span>
-          </Link>
+          <span className="flex items-center gap-2 min-w-0">
+            <Link
+              href={href}
+              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            >
+              <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.Title}</span>
+            </Link>
+            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-[0.375rem] bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate">{game.ConsoleName}</span>
+          </span>
 
           <button
             onClick={onToggle}
@@ -104,7 +107,6 @@ export default function RaGameItem({
             className="flex flex-col gap-1 w-full text-left rounded group cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <span className="flex items-center gap-2 w-full">
-              <span className="text-xs text-text-secondary truncate max-w-[45%] shrink-0">{game.ConsoleName}</span>
               {total > 0 && (
                 <>
                   <ProgressBar
@@ -113,7 +115,7 @@ export default function RaGameItem({
                     label={game.Title}
                     className="flex-1"
                   />
-                  <span className={`text-xs font-semibold tabular-nums shrink-0 ${progress >= 100 ? 'text-success' : 'text-text-main'}`}>
+                  <span className={`text-base font-extrabold tabular-nums shrink-0 w-[2.625rem] text-right ${progress >= 100 ? 'text-success' : 'text-text-main'}`}>
                     {progress}%
                   </span>
                 </>
@@ -125,7 +127,7 @@ export default function RaGameItem({
               />
             </span>
 
-            <span className="flex flex-wrap items-center gap-x-2 text-xs text-text-secondary">
+            <span className="flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-text-secondary">
               {total > 0 && (
                 <>
                   <span className="whitespace-nowrap">

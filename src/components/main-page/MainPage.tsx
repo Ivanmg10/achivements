@@ -67,11 +67,11 @@ export function MainPageBody() {
       {layout === 'cover' && !visitor && <MainPagePortada />}
       <div className="home-fit-top flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
         {/* Profile first in DOM → top on mobile; placed col-2 on desktop */}
-        <div className="home-fit-side min-h-0 flex flex-col lg:col-start-2 lg:row-start-1">
+        <div className="home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1">
           <MainPageProfile />
         </div>
         {/* Left column: either pinned games or recently played */}
-        <div className="home-fit-main flex flex-col min-h-0 lg:col-start-1 lg:row-start-1">
+        <div className="home-fit-main flex flex-col min-h-0 min-w-0 lg:col-start-1 lg:row-start-1">
           {view === 'pinned' && !visitor ? (
             <MainPagePinnedGames />
           ) : (

@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo } from 'react'
-import Image from 'next/image'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
@@ -17,6 +16,7 @@ import MainPageProfilePsnGame from '../main-page-profile-psn-game/MainPageProfil
 import MainPageProfilePsnTrophies from '../main-page-profile-psn-trophies/MainPageProfilePsnTrophies'
 import MainPageProfileSkeleton from '../../main-page-profile-skeleton/MainPageProfileSkeleton'
 import MainPageProfileGameSkeleton from '../../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
+import MainPageProfileCard from '../../main-page-profile-card/MainPageProfileCard'
 
 /** Sony's trophy-level tiers in groups of three: bronze, silver, gold, then platinum at 10. */
 const TIER_RING = ['border-warning', 'border-zinc-400', 'border-hardcore', 'border-sky-300']
@@ -68,52 +68,33 @@ export default function MainPageProfilePsnLinked({
 
   return (
     // Fills the column like the other cards, so switching tabs does not resize it.
-    <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
-      <MainPageProfileActions
-        href={`https://profile.playstation.com/${encodeURIComponent(summary.onlineId)}`}
-        linkLabel={T.psn.viewOnPsn}
-        ringClass="focus:ring-[#0070d1]"
-        onRefresh={refresh}
-      />
-
-      <div className={`flex gap-3 items-center ${refresh ? 'pr-40' : 'pr-28'}`}>
-        {summary.avatarUrl ? (
-          <Image
-            src={summary.avatarUrl}
-            alt=""
-            width={90}
-            height={90}
-            className="m-1 rounded-lg ring-2 ring-[#0070d1] shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5"
-            unoptimized
+    <div className="flex flex-col gap-3.5 w-full h-full">
+      <MainPageProfileCard
+        avatarSrc={summary.avatarUrl || null}
+        avatarFallback={<span className="w-full h-full bg-[#003791] flex items-center justify-center"><PlaystationLogo size={32} className="text-white" /></span>}
+        ring="#0070d1"
+        name={summary.onlineId}
+        actions={
+          <MainPageProfileActions
+            href={`https://profile.playstation.com/${encodeURIComponent(summary.onlineId)}`}
+            linkLabel={T.psn.viewOnPsn}
+            ringClass="focus:ring-[#0070d1]"
+            onRefresh={refresh}
           />
-        ) : (
-          <div
-            aria-hidden="true"
-            className="m-1 rounded-lg bg-[#003791] shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5 flex items-center justify-center"
-          >
-            <PlaystationLogo size={32} className="text-white" />
-          </div>
-        )}
-        <div className="flex flex-col gap-1 min-w-0 w-full">
-          <p className="font-display italic font-extrabold text-3xl lg:text-4xl leading-none truncate pr-1.5">{summary.onlineId}</p>
-          <div className="flex items-center gap-2 flex-wrap text-xs">
-            <span className="inline-flex items-center gap-1 text-text-secondary">
-              {T.psn.level}
-              <span
-                className={`inline-flex items-center justify-center min-w-6 h-6 px-1 rounded-full border-2 ${ring} text-text-main font-bold tabular-nums`}
-              >
-                {summary.trophyLevel}
-              </span>
+        }
+        stats={<MainPageProfilePsnStats summary={summary} library={library} isLoading={libraryLoading} />}
+      >
+        <div className="flex items-center gap-2 flex-wrap text-[0.8125rem] text-text-secondary">
+          <span className="inline-flex items-center gap-1">
+            {T.psn.level}
+            <span className={`inline-flex items-center justify-center min-w-6 h-6 px-1 rounded-full border-2 ${ring} text-text-main font-bold tabular-nums`}>
+              {summary.trophyLevel}
             </span>
-            {summary.isPlus && (
-              <span className="px-1.5 py-0.5 rounded bg-hardcore/15 text-hardcore font-semibold">PS Plus</span>
-            )}
-          </div>
-          {summary.aboutMe && <p className="text-xs text-text-secondary line-clamp-2">{summary.aboutMe}</p>}
+          </span>
+          {summary.isPlus && <span className="px-1.5 py-0.5 rounded-[0.375rem] bg-hardcore/15 text-hardcore font-bold text-xs">PS Plus</span>}
         </div>
-      </div>
-
-      <MainPageProfilePsnStats summary={summary} library={library} isLoading={libraryLoading} />
+        {summary.aboutMe && <p className="text-[0.8125rem] text-text-secondary line-clamp-2">{summary.aboutMe}</p>}
+      </MainPageProfileCard>
 
       {library[0] ? <MainPageProfilePsnGame game={library[0]} /> : libraryLoading && <MainPageProfileGameSkeleton />}
 

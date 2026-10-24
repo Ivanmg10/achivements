@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import { ProgressBar } from '@/components/ui/ProgressBar'
@@ -8,7 +7,7 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
-import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import MainPageProfileNowPlaying from '../../main-page-profile-now-playing/MainPageProfileNowPlaying'
 import { steamAssetUrl } from '@/lib/steamClient'
 
 /**
@@ -30,37 +29,16 @@ export default function MainPageProfileStGame({
   const playtime = formatPlaytime(game.playtimeForever, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)
 
   return (
-    <Link
+    <MainPageProfileNowPlaying
       href={gameHref('steam', game.id, subject)}
-      className="relative isolate rounded-control p-3 flex flex-col gap-3 w-full transition-transform duration-200 hover:scale-[1.005] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-    >
-      <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} />
-      <p className="text-xs text-text-secondary uppercase tracking-wider">
-        {playingNow ? T.profileRa.playingNow : T.steam.lastPlayed}
-      </p>
-      <div className="flex gap-3 items-center">
-        <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageIcon} size={50} className="w-12.5 h-12.5 rounded-lg shrink-0" />
-        <div className="flex flex-col gap-1 min-w-0">
-          <span className="text-sm font-semibold truncate">{game.title}</span>
-          <span className="text-xs text-text-secondary">
-            Steam · {T.steam.playtime}: {playtime}
-          </span>
-        </div>
-      </div>
-      {hasCounts && (
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between text-xs text-text-secondary">
-            <span className="flex items-center gap-1.5">
-              <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full bg-progress" />
-              <span className={game.pctWon >= 100 ? 'text-success font-semibold' : ''}>{Math.round(game.pctWon)}%</span>
-            </span>
-            <span className="tabular-nums">
-              {game.numAwarded} / {game.maxPossible}
-            </span>
-          </div>
-          <ProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-card" height="h-2" />
-        </div>
-      )}
-    </Link>
+      tintSrc={steamAssetUrl(game.id, 'header')}
+      kicker={playingNow ? T.profileRa.playingNow : T.steam.lastPlayed}
+      icon={<SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageIcon} size={52} className="w-full h-full" />}
+      title={game.title}
+      sub={`Steam · ${playtime}`}
+      share={hasCounts ? `${Math.round(game.pctWon).toLocaleString(lang)} %` : null}
+      done={hasCounts && game.pctWon >= 100}
+      bar={hasCounts ? <ProgressBar pct={game.pctWon} label={game.title} /> : null}
+    />
   )
 }

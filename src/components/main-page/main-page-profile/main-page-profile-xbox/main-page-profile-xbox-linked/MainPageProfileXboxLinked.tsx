@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo } from 'react'
-import Image from 'next/image'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
@@ -18,6 +17,7 @@ import MainPageProfileXboxGame from '../main-page-profile-xbox-game/MainPageProf
 import MainPageProfileXboxAchievements from '../main-page-profile-xbox-achievements/MainPageProfileXboxAchievements'
 import MainPageProfileSkeleton from '../../main-page-profile-skeleton/MainPageProfileSkeleton'
 import MainPageProfileGameSkeleton from '../../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
+import MainPageProfileCard from '../../main-page-profile-card/MainPageProfileCard'
 
 /**
  * A linked Xbox profile, built like the PSN one block for block: header
@@ -67,47 +67,30 @@ export default function MainPageProfileXboxLinked({
 
   return (
     // Fills the column like the other cards, so switching tabs does not resize it.
-    <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
-      <MainPageProfileActions
-        href={`https://www.xbox.com/play/user/${encodeURIComponent(summary.gamertag)}`}
-        linkLabel={T.xbox.viewOnXbox}
-        ringClass="focus:ring-success"
-        onRefresh={refresh}
-      />
-
-      <div className={`flex gap-3 items-center ${refresh ? 'pr-40' : 'pr-28'}`}>
-        {summary.avatarUrl ? (
-          <Image
-            src={summary.avatarUrl}
-            alt=""
-            width={90}
-            height={90}
-            className="m-1 rounded-lg ring-2 ring-success shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5"
-            unoptimized
+    <div className="flex flex-col gap-3.5 w-full h-full">
+      <MainPageProfileCard
+        avatarSrc={summary.avatarUrl || null}
+        avatarFallback={<span className="w-full h-full bg-[#107c10] flex items-center justify-center"><XboxLogo size={32} className="text-white" /></span>}
+        ring="#107c10"
+        name={summary.gamertag}
+        actions={
+          <MainPageProfileActions
+            href={`https://www.xbox.com/play/user/${encodeURIComponent(summary.gamertag)}`}
+            linkLabel={T.xbox.viewOnXbox}
+            ringClass="focus:ring-success"
+            onRefresh={refresh}
           />
-        ) : (
-          <div
-            aria-hidden="true"
-            className="m-1 rounded-lg bg-[#107c10] shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5 flex items-center justify-center"
-          >
-            <XboxLogo size={32} className="text-white" />
-          </div>
+        }
+        stats={<MainPageProfileXboxStats summary={summary} library={library} isLoading={libraryLoading} />}
+      >
+        {summary.tier && (
+          <span className="inline-flex items-center gap-1 text-[0.8125rem] text-text-secondary">
+            {T.xbox.tier}
+            <span className="px-1.5 py-0.5 rounded-[0.375rem] bg-success/15 text-success font-bold text-xs">{summary.tier}</span>
+          </span>
         )}
-        <div className="flex flex-col gap-1 min-w-0 w-full">
-          <p className="font-display italic font-extrabold text-3xl lg:text-4xl leading-none truncate pr-1.5">{summary.gamertag}</p>
-          <div className="flex items-center gap-2 flex-wrap text-xs">
-            {summary.tier && (
-              <span className="inline-flex items-center gap-1 text-text-secondary">
-                {T.xbox.tier}
-                <span className="px-1.5 py-0.5 rounded bg-success/15 text-success font-semibold">{summary.tier}</span>
-              </span>
-            )}
-          </div>
-          {summary.bio && <p className="text-xs text-text-secondary line-clamp-2">{summary.bio}</p>}
-        </div>
-      </div>
-
-      <MainPageProfileXboxStats summary={summary} library={library} isLoading={libraryLoading} />
+        {summary.bio && <p className="text-[0.8125rem] text-text-secondary line-clamp-2">{summary.bio}</p>}
+      </MainPageProfileCard>
 
       {last ? <MainPageProfileXboxGame game={last} /> : libraryLoading && <MainPageProfileGameSkeleton />}
 

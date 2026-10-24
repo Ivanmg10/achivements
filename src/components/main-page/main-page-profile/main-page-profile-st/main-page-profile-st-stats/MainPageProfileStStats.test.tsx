@@ -14,9 +14,9 @@ const LIBRARY = [
   game(0),
 ]
 
-/** StatCard puts the value before its label. */
+/** StatCard puts its label first, the value under it. */
 function value(label: string) {
-  return screen.getByText(label).previousElementSibling?.textContent
+  return screen.getByText(label).nextElementSibling?.textContent
 }
 
 test('shows games, playtime, perfect games and achievements unlocked', () => {
