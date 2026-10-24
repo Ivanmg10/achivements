@@ -158,7 +158,7 @@ test('the completed filter uses live Steam progress', async () => {
   })
   render(<GroupDetailPage />)
   await screen.findByText('ra-item Zelda')
-  fireEvent.click(screen.getByRole('button', { name: en.groups.filter100 }))
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${en.groups.filter100}`) }))
   expect(screen.getByText('steam-item Portal 2')).toBeInTheDocument()
   expect(screen.queryByText('ra-item Zelda')).not.toBeInTheDocument()
 })

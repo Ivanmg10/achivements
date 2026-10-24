@@ -9,12 +9,10 @@ import { MENU_SURFACE, menuItemClass } from '@/components/ui/menu'
 export default function StatusNavDropdown({
   items,
   active,
-  glass,
   label,
 }: {
   items: { href: string; label: string }[]
   active: boolean
-  glass?: boolean
   label: string
 }) {
   const [isOpen, setIsOpen] = useState(false)

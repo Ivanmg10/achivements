@@ -21,7 +21,7 @@ import { plural } from '@/utils/utils'
 import { canUseXbox } from '@/utils/xboxAccess'
 import Button from '@/components/ui/Button'
 
-function NavLink({ href, label, active, glass }: { href: string; label: string; active: boolean; glass?: boolean }) {
+function NavLink({ href, label, active }: { href: string; label: string; active: boolean }) {
   return (
     <Link
       href={href}
@@ -153,7 +153,6 @@ export default function MainHeader() {
                 label,
               }))}
               active={isStatusActive}
-              glass={isGameInfo}
               label={T.header.status}
             />
             {navItems.map(({ href, label }) => (
@@ -162,7 +161,6 @@ export default function MainHeader() {
                 href={session ? href : '/authPage'}
                 label={label}
                 active={pathname === href}
-                glass={isGameInfo}
               />
             ))}
           </nav>
