@@ -1,4 +1,4 @@
-import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, stripCap } from "./utils";
+import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, stripCap, matchParts } from "./utils";
 import type { RecentAchievement } from '@/types/types'
 
 describe("getRandomGameIds", () => {
@@ -452,5 +452,22 @@ describe('stripCap', () => {
   test('at least 1, empty days ignored', () => {
     expect(stripCap([])).toBe(1)
     expect(stripCap([0, 0])).toBe(1)
+  })
+})
+
+describe('matchParts', () => {
+  test('cuts the text around its first match, ignoring case', () => {
+    expect(matchParts("Marvel's Spider-Man", 'spi')).toEqual([
+      { text: "Marvel's ", match: false },
+      { text: 'Spi', match: true },
+      { text: 'der-Man', match: false },
+    ])
+  })
+  test('no match, or no query: the text whole', () => {
+    expect(matchParts('Halo', 'zelda')).toEqual([{ text: 'Halo', match: false }])
+    expect(matchParts('Halo', '  ')).toEqual([{ text: 'Halo', match: false }])
+  })
+  test('a match at the start leaves no empty part', () => {
+    expect(matchParts('Halo', 'ha')).toEqual([{ text: 'Ha', match: true }, { text: 'lo', match: false }])
   })
 })

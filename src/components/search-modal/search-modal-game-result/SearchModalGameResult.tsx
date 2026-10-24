@@ -4,24 +4,28 @@ import Image from 'next/image'
 import { useLanguage } from '@/context/LanguageContext'
 import { candidateIconUrl, CandidateStatus, GameCandidate } from '@/utils/gameCandidates'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
+import SearchModalRow from '../search-modal-row/SearchModalRow'
 
 const STATUS_CLASSES: Record<CandidateStatus, string> = {
-  'completed-hc': 'bg-warning/20 text-warning',
-  'completed-sc': 'bg-success/20 text-success',
-  'perfect': 'bg-[#a4d007]/20 text-[#a4d007]',
-  'in-progress': 'bg-blue-500/20 text-blue-400',
-  'want-to-play': 'bg-purple-500/20 text-purple-400',
+  'completed-hc': 'bg-hardcore/[0.16] text-hardcore',
+  'completed-sc': 'bg-success/[0.16] text-success',
+  'perfect': 'bg-success/[0.16] text-success',
+  'in-progress': 'bg-info/[0.16] text-info',
+  'want-to-play': 'bg-ink/[0.08] text-text-secondary',
 }
 
 /**
- * One game in the header search: icon, title, platform line (console, or
- * Steam with its logo) and a status pill in words, so it is not colour alone.
+ * One game in the header search, as a `SearchModalRow`: icon, title (what
+ * matches drawn in the accent), platform line (console, or Steam with its
+ * logo) and a status tag in words, so it is not colour alone.
  */
 export default function SearchModalGameResult({
   game,
+  query = '',
   onSelect,
 }: {
   game: GameCandidate
+  query?: string
   onSelect: () => void
 }) {
   const { T } = useLanguage()
@@ -36,29 +40,24 @@ export default function SearchModalGameResult({
   }
 
   return (
-    <button
-      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-main transition-colors text-left cursor-pointer focus-visible:outline-none focus-visible:bg-bg-main"
-      onClick={onSelect}
-    >
-      {icon ? (
-        <Image src={icon} alt="" width={32} height={32} className="w-8 h-8 rounded object-cover shrink-0" unoptimized />
-      ) : (
-        <div className="w-8 h-8 rounded bg-ink/10 shrink-0" aria-hidden="true" />
-      )}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-text-main line-clamp-1">{game.title}</p>
-        <p className="text-xs text-text-secondary line-clamp-1 flex items-center gap-1">
+    <SearchModalRow
+      media={icon ? <Image src={icon} alt="" width={40} height={40} className="w-full h-full object-cover" unoptimized /> : null}
+      title={game.title}
+      query={query}
+      sub={
+        <span className="inline-flex items-center gap-1 max-w-full">
           <PlatformLogo source={game.source} size={13} className={game.source === 'ra' ? 'opacity-60' : ''} />
-          {game.subtitle}
-        </p>
-      </div>
-      {game.status && (
-        <span
-          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap shrink-0 ${STATUS_CLASSES[game.status]}`}
-        >
-          {STATUS_LABELS[game.status]}
+          <span className="truncate">{game.subtitle}</span>
         </span>
-      )}
-    </button>
+      }
+      right={
+        game.status && (
+          <span className={`inline-flex items-center h-6 px-2 rounded-[0.375rem] text-xs font-bold whitespace-nowrap shrink-0 ${STATUS_CLASSES[game.status]}`}>
+            {STATUS_LABELS[game.status]}
+          </span>
+        )
+      }
+      onSelect={onSelect}
+    />
   )
 }

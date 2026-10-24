@@ -490,6 +490,21 @@ export function countByDay(achievements: RecentAchievement[]): Record<string, nu
 }
 
 /**
+ * `text` cut where it matches `query` (first match, ignoring case), so the
+ * match can be drawn apart: e.g. "Spider" in "Marvel's Spider-Man".
+ */
+export function matchParts(text: string, query: string): { text: string; match: boolean }[] {
+  const q = query.trim()
+  const at = q ? text.toLowerCase().indexOf(q.toLowerCase()) : -1
+  if (at < 0) return [{ text, match: false }]
+  return [
+    { text: text.slice(0, at), match: false },
+    { text: text.slice(at, at + q.length), match: true },
+    { text: text.slice(at + q.length), match: false },
+  ].filter((p) => p.text !== '')
+}
+
+/**
  * The top of a day-by-day strip: the 90th percentile of the days with something,
  * so one huge day does not flatten the rest (days above it are cut and say their
  * figure). At least 1.
