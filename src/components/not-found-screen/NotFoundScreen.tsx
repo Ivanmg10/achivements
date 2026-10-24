@@ -30,7 +30,7 @@ export default function NotFoundScreen({ fullScreen = false }: { fullScreen?: bo
       </motion.div>
       <motion.div {...rise(0.06)} className="flex flex-col items-center gap-2">
         <p className="text-xs font-semibold tracking-[0.14em] uppercase text-accent">{T.notFound.eyebrow}</p>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-balance">{T.notFound.title}</h1>
+        <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1 text-balance">{T.notFound.title}</h1>
         <p className="text-sm text-text-secondary max-w-sm">{T.notFound.subtitle}</p>
       </motion.div>
       <motion.div {...rise(0.12)} className="w-full flex justify-center">

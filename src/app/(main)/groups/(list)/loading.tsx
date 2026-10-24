@@ -8,7 +8,7 @@ export default function GroupsLoading() {
   return (
     <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4">
       <div className="w-full lg:max-w-[98%] flex flex-col gap-6">
-        <h1 className="text-2xl font-bold text-text-main">{T.groups.title}</h1>
+        <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1 text-text-main">{T.groups.title}</h1>
         <GroupListSkeleton />
       </div>
     </div>

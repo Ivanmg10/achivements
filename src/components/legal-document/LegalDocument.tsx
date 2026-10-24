@@ -18,7 +18,7 @@ export default function LegalDocument({ doc }: { doc: LegalText }) {
     <main className="min-h-screen bg-bg-main text-text-main px-4 sm:px-6 py-12 sm:py-16">
       <article className="max-w-2xl mx-auto flex flex-col gap-8">
         <header className="flex flex-col gap-2">
-          <h1 className="text-2xl sm:text-3xl font-semibold">{doc.title}</h1>
+          <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1">{doc.title}</h1>
           <p className="text-xs text-text-secondary">{doc.updated}</p>
           <p className="text-sm text-text-secondary">{doc.intro}</p>
         </header>

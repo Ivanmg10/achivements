@@ -30,7 +30,7 @@ export default function FollowingHero({ users, className = '' }: { users: Friend
             <IconUsers size={24} />
           </span>
           <div className="min-w-0">
-            <h1 id="following-title" className="text-2xl sm:text-3xl font-bold tracking-tight">{T.following.title}</h1>
+            <h1 id="following-title" className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1">{T.following.title}</h1>
             <p className="text-sm text-text-secondary">{T.following.tagline}</p>
           </div>
         </div>

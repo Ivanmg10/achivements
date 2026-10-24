@@ -44,7 +44,7 @@ export default function ConnectAccounts() {
     <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 text-text-main">
       <div className="w-full max-w-5xl flex flex-col gap-8">
         <header className="flex flex-col items-center text-center gap-2">
-          <h1 className="text-2xl sm:text-3xl font-bold">{T.connect.title}</h1>
+          <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1">{T.connect.title}</h1>
           <p className="text-sm sm:text-base text-text-secondary max-w-xl">{T.connect.subtitle}</p>
         </header>
 

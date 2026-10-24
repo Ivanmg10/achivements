@@ -63,7 +63,7 @@ export default function StreakPage() {
   return (
     <motion.div className="flex flex-col gap-5 px-4 py-6 w-full lg:max-w-[98%] mx-auto" variants={fadeUp} initial="hidden" animate="visible">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-text-main">{T.streak.title}</h1>
+        <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1 text-text-main">{T.streak.title}</h1>
         <p className="text-sm text-text-secondary">{T.streak.pageSub}</p>
       </header>
       {body}

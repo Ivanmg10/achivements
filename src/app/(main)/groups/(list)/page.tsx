@@ -52,7 +52,7 @@ export default function GroupsPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-text-main">{T.groups.title}</h1>
+          <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[0.95] pr-1 text-text-main">{T.groups.title}</h1>
           {groups.length > 0 && (
             <p className="text-sm text-text-secondary mt-0.5">
               {groups.length}/{GROUPS_PER_USER_MAX} {T.groups.title.toLowerCase()}
