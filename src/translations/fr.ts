@@ -323,6 +323,7 @@ export const fr: Translations = {
     completedHC: 'Terminés HC',
   },
   gameInfoTable: {
+    onlineText: 'et les serveurs peuvent fermer :',
     searchPlaceholder: 'Chercher un succès',
     sortGameOrder: 'Ordre du jeu',
     showRest: 'Afficher les {n} restants',
@@ -1628,6 +1629,7 @@ export const fr: Translations = {
     days: { one: '{n} jour', other: '{n} jours' },
     missables: { one: '{n} manquable', other: '{n} manquables' },
     missableCount: { one: '{n} succès peut être manqué', other: '{n} succès peuvent être manqués' },
+    onlineCount: { one: '{n} succès peut demander de jouer en ligne', other: '{n} succès peuvent demander de jouer en ligne' },
   },
   welcome: {
     skipAll: 'Tout passer',

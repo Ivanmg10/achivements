@@ -323,6 +323,7 @@ export const pl: Translations = {
     completedHC: 'Ukończone HC',
   },
   gameInfoTable: {
+    onlineText: 'a serwery mogą zostać zamknięte:',
     searchPlaceholder: 'Szukaj osiągnięcia',
     sortGameOrder: 'Kolejność w grze',
     showRest: 'Pokaż pozostałe ({n})',
@@ -1628,6 +1629,7 @@ export const pl: Translations = {
     days: { one: '{n} dzień', few: '{n} dni', many: '{n} dni', other: '{n} dnia' },
     missables: { one: '{n} do przegapienia', few: '{n} do przegapienia', many: '{n} do przegapienia', other: '{n} do przegapienia' },
     missableCount: { one: '{n} osiągnięcie można przegapić', few: '{n} osiągnięcia można przegapić', many: '{n} osiągnięć można przegapić', other: '{n} osiągnięcia można przegapić' },
+    onlineCount: { one: '{n} osiągnięcie może wymagać gry online', few: '{n} osiągnięcia mogą wymagać gry online', many: '{n} osiągnięć może wymagać gry online', other: '{n} osiągnięcia mogą wymagać gry online' },
   },
   welcome: {
     skipAll: 'Pomiń wszystko',

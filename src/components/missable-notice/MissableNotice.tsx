@@ -14,7 +14,16 @@ export default function MissableNotice({
   names,
   only,
   onToggleOnly,
+  tone = 'danger',
+  lead,
+  text,
 }: {
+  /** Steam uses it for the achievements that likely need online play, in the warning tone. */
+  tone?: 'danger' | 'warning'
+  /** The bold start ("8 achievements can be missed"); the missables' by default. */
+  lead?: string
+  /** What follows it, before the names. */
+  text?: string
   /** The unearned missable achievements, in game order. */
   names: string[]
   /** Whether the table shows only them. */
@@ -29,10 +38,10 @@ export default function MissableNotice({
   const list = more > 0 ? `${named.join(', ')} ${T.gameInfoTable.missableMore.replace('{n}', String(more))}` : named.join(', ')
 
   return (
-    <div role="status" className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 px-3.5 py-3 rounded-xl bg-danger/10 ring-1 ring-inset ring-danger/30 text-sm">
-      <IconAlertTriangle className="w-4 h-4 text-danger shrink-0" aria-hidden="true" />
+    <div role="status" className={`flex flex-wrap sm:flex-nowrap items-center gap-2.5 px-3.5 py-3 rounded-xl ring-1 ring-inset text-sm ${tone === 'danger' ? 'bg-danger/10 ring-danger/30' : 'bg-warning/10 ring-warning/30'}`}>
+      <IconAlertTriangle className={`w-4 h-4 shrink-0 ${tone === 'danger' ? 'text-danger' : 'text-warning'}`} aria-hidden="true" />
       <span className="flex-1 min-w-0">
-        <strong className="font-bold">{plural(names.length, T.plurals.missableCount, lang)}</strong> {T.gameInfoTable.missableText} {list}.
+        <strong className="font-bold">{lead ?? plural(names.length, T.plurals.missableCount, lang)}</strong> {text ?? T.gameInfoTable.missableText} {list}.
       </span>
       <button type="button" onClick={onToggleOnly} aria-pressed={only} className={buttonClass('secondary', 'sm', 'shrink-0')}>
         {only ? T.gameInfoTable.showAllAgain : T.gameInfoTable.showOnlyThese}

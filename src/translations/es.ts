@@ -323,6 +323,7 @@ export const es: Translations = {
     completedHC: 'Completados HC',
   },
   gameInfoTable: {
+    onlineText: 'y sus servidores pueden cerrar:',
     searchPlaceholder: 'Buscar un logro',
     sortGameOrder: 'Orden del juego',
     showRest: 'Mostrar los {n} restantes',
@@ -1628,6 +1629,7 @@ export const es: Translations = {
     days: { one: '{n} día', other: '{n} días' },
     missables: { one: '{n} perdible', other: '{n} perdibles' },
     missableCount: { one: '{n} logro se puede perder', other: '{n} logros se pueden perder' },
+    onlineCount: { one: '{n} logro puede requerir jugar online', other: '{n} logros pueden requerir jugar online' },
   },
   welcome: {
     skipAll: 'Saltar todo',

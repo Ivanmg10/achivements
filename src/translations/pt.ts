@@ -323,6 +323,7 @@ export const pt: Translations = {
     completedHC: 'Concluídos HC',
   },
   gameInfoTable: {
+    onlineText: 'e os servidores podem fechar:',
     searchPlaceholder: 'Buscar uma conquista',
     sortGameOrder: 'Ordem do jogo',
     showRest: 'Mostrar as {n} restantes',
@@ -1628,6 +1629,7 @@ export const pt: Translations = {
     days: { one: '{n} dia', other: '{n} dias' },
     missables: { one: '{n} perdível', other: '{n} perdíveis' },
     missableCount: { one: '{n} conquista pode ser perdida', other: '{n} conquistas podem ser perdidas' },
+    onlineCount: { one: '{n} conquista pode exigir jogar online', other: '{n} conquistas podem exigir jogar online' },
   },
   welcome: {
     skipAll: 'Pular tudo',

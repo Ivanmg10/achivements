@@ -323,6 +323,7 @@ export const de: Translations = {
     completedHC: 'Abgeschlossen HC',
   },
   gameInfoTable: {
+    onlineText: 'und die Server können abgeschaltet werden:',
     searchPlaceholder: 'Erfolg suchen',
     sortGameOrder: 'Spielreihenfolge',
     showRest: 'Die übrigen {n} anzeigen',
@@ -1628,6 +1629,7 @@ export const de: Translations = {
     days: { one: '{n} Tag', other: '{n} Tage' },
     missables: { one: '{n} verpassbar', other: '{n} verpassbar' },
     missableCount: { one: '{n} Erfolg ist verpassbar', other: '{n} Erfolge sind verpassbar' },
+    onlineCount: { one: '{n} Erfolg braucht evtl. Online-Spiel', other: '{n} Erfolge brauchen evtl. Online-Spiel' },
   },
   welcome: {
     skipAll: 'Alles überspringen',

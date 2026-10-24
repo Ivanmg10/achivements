@@ -323,6 +323,7 @@ export const ru: Translations = {
     completedHC: 'Завершено HC',
   },
   gameInfoTable: {
+    onlineText: 'а серверы могут закрыться:',
     searchPlaceholder: 'Найти достижение',
     sortGameOrder: 'Порядок в игре',
     showRest: 'Показать остальные ({n})',
@@ -1628,6 +1629,7 @@ export const ru: Translations = {
     days: { one: '{n} день', few: '{n} дня', many: '{n} дней', other: '{n} дня' },
     missables: { one: '{n} можно упустить', few: '{n} можно упустить', many: '{n} можно упустить', other: '{n} можно упустить' },
     missableCount: { one: '{n} достижение можно упустить', few: '{n} достижения можно упустить', many: '{n} достижений можно упустить', other: '{n} достижения можно упустить' },
+    onlineCount: { one: '{n} достижение может требовать игры онлайн', few: '{n} достижения могут требовать игры онлайн', many: '{n} достижений могут требовать игры онлайн', other: '{n} достижения могут требовать игры онлайн' },
   },
   welcome: {
     skipAll: 'Пропустить всё',

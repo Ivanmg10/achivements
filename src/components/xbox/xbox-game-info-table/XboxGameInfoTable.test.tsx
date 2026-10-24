@@ -27,7 +27,8 @@ const names = () =>
     .getAllByRole('heading', { level: 3 })
     .map((h) => h.textContent)
 
-const filter = (name: string) => within(screen.getByRole('group')).getByRole('button', { name })
+// A tab's name carries its count ("Earned 2"): matched by how it starts.
+const filter = (name: string) => within(screen.getByRole('group')).getByRole('button', { name: new RegExp(`^${name}`) })
 const column = (name: string) => within(screen.getByRole('table')).getByRole('button', { name })
 
 test('every achievement in the order Xbox sends them, secret ones kept secret', () => {
@@ -70,7 +71,7 @@ test('pinned achievements lead the list, highlighted', () => {
   ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set<string>(['12']), leading: new Set<string>(['12']), toggle, canPin: true })
   render(<XboxGameInfoTable gameId={100} gameTitle="Halo" achievements={ACHIEVEMENTS} />)
   expect(names()).toEqual(['Locked', 'Top one', 'Common', en.xbox.secretAchievement])
-  expect(screen.getByRole('table').querySelector('[data-achievement="12"]')!.className).toContain('bg-warning/10')
+  expect(screen.getByRole('table').querySelector('[data-achievement="12"]')!.className).toContain('bg-accent/[0.05]')
 })
 
 test('secret achievements can be revealed all at once, and hidden again', () => {
@@ -116,12 +117,12 @@ test('a secret one still concealed opens without its text or guide links', () =>
   expect(within(dialog).queryByRole('link')).toBeNull()
 })
 
-test('a long list folds to its first rows, and can be opened again', () => {
-  const many = Array.from({ length: 8 }, (_, i) => xboxAchievementFixture({ id: String(i), name: `A${i}` }))
+test('a long list shows its first rows, and the rest on asking', () => {
+  const many = Array.from({ length: 10 }, (_, i) => xboxAchievementFixture({ id: String(i), name: `A${i}` }))
   render(<XboxGameInfoTable gameId={100} gameTitle="Halo" achievements={many} />)
   expect(names()).toHaveLength(8)
-  fireEvent.click(screen.getAllByRole('button', { name: new RegExp(en.gameInfoTable.collapseTable) })[0])
-  expect(names()).toHaveLength(3)
+  fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showRest.replace('{n}', '2') }))
+  expect(names()).toHaveLength(10)
 })
 
 test('opening the page from an achievement link lights that row up and shows it whatever the filter', () => {

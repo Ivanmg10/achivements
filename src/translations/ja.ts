@@ -323,6 +323,7 @@ export const ja: Translations = {
     completedHC: '完了HC',
   },
   gameInfoTable: {
+    onlineText: 'サーバーが終了する可能性があります：',
     searchPlaceholder: '実績を検索',
     sortGameOrder: 'ゲーム内の順番',
     showRest: '残り{n}件を表示',
@@ -1628,6 +1629,7 @@ export const ja: Translations = {
     days: { other: '{n}日' },
     missables: { other: '取り逃し{n}件' },
     missableCount: { other: '取り逃す可能性のある実績が{n}件' },
+    onlineCount: { other: 'オンラインが必要かもしれない実績が{n}件' },
   },
   welcome: {
     skipAll: 'すべてスキップ',

@@ -324,6 +324,7 @@ export const en = {
     completedHC: 'Completed HC',
   },
   gameInfoTable: {
+    onlineText: 'and its servers may close:',
     searchPlaceholder: 'Search an achievement',
     sortGameOrder: 'Game order',
     showRest: 'Show the other {n}',
@@ -1629,6 +1630,7 @@ export const en = {
     days: { one: '{n} day', other: '{n} days' } as PluralForms,
     missables: { one: '{n} missable', other: '{n} missable' } as PluralForms,
     missableCount: { one: '{n} achievement can be missed', other: '{n} achievements can be missed' } as PluralForms,
+    onlineCount: { one: '{n} achievement may need online play', other: '{n} achievements may need online play' } as PluralForms,
   },
   welcome: {
     skipAll: 'Skip all',

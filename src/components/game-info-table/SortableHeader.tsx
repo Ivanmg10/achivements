@@ -18,7 +18,7 @@ export const DEFAULT_DIRS: Record<SortKey, SortDir> = {
  * A sortable column header: the control is a real button, and the column
  * reports its order through aria-sort (as the Steam table's does).
  */
-export function SortableHeader({
+export function SortableHeader<K extends string = SortKey>({
   sortKey,
   sortState,
   onSort,
@@ -26,9 +26,9 @@ export function SortableHeader({
   align = 'left',
   className,
 }: {
-  sortKey: SortKey
-  sortState: SortState
-  onSort: (key: SortKey) => void
+  sortKey: K
+  sortState: { key: K; dir: SortDir }
+  onSort: (key: K) => void
   children: React.ReactNode
   align?: 'left' | 'right' | 'center'
   className?: string

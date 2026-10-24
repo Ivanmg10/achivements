@@ -21,10 +21,11 @@ export const TD_FIRST = `${TD} group-hover:shadow-[inset_2px_0_0_rgb(var(--accen
 export const NUM = 'text-right tabular-nums whitespace-nowrap'
 export const MID = 'text-center'
 
-/** An achievement's badge: 52 px; earned in hardcore ringed in its colour, softcore in its own, locked greyed. */
-export function badgeClass(state: 'hardcore' | 'softcore' | 'locked') {
+/** An achievement's badge: 52 px; earned in hardcore ringed in its colour, softcore in its own, earned elsewhere in the accent, locked greyed. */
+export function badgeClass(state: 'hardcore' | 'softcore' | 'earned' | 'locked') {
   const RING = {
     hardcore: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--hardcore))]',
+    earned: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--accent))]',
     softcore: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--softcore))]',
     locked: '',
   }

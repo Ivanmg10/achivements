@@ -7,15 +7,12 @@ import AchievementModal from '../achievement-modal/AchievementModal'
 import MissableNotice from '../missable-notice/MissableNotice'
 import { useState, useMemo, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
-import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
 import { SortableHeader, SortState, SortKey, DEFAULT_DIRS } from './SortableHeader'
-import { tabClass, TAB_ROW } from '@/components/ui/Tabs'
 import { SURFACE } from '@/components/ui/surface'
-import { buttonClass } from '@/components/ui/Button'
-import SearchInput from '@/components/ui/SearchInput'
-import Select from '@/components/ui/Select'
+import AchievementTableToolbar from '@/components/achievement-table-toolbar/AchievementTableToolbar'
+import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
 import { TABLE, TH } from '@/components/ui/dataTable'
 
 type Filter = 'all' | 'earned' | 'unearned' | 'missable'
@@ -139,33 +136,17 @@ export default function GameInfoTable({
         onToggleOnly={() => setFilter((f) => (f === 'missable' ? 'all' : 'missable'))}
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-end gap-3 lg:gap-4">
-        <div className={`${TAB_ROW} flex-1`} role="group" aria-label={T.gameInfoPage.achievements}>
-          {tabs.map((t) => (
-            <button key={t.value} type="button" onClick={() => setFilter(t.value)} aria-pressed={filter === t.value} className={tabClass(filter === t.value)}>
-              {t.label}
-              <span className="text-xs font-bold tabular-nums text-text-secondary">{t.count}</span>
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-2.5 lg:pb-1.5">
-          <SearchInput
-            aria-label={T.gameInfoTable.searchPlaceholder}
-            placeholder={T.gameInfoTable.searchPlaceholder}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="flex-1 lg:w-[16.25rem] lg:flex-none"
-          />
-          <Select<SortKey>
-            look="button"
-            size="sm"
-            aria-label={T.gameInfoTable.sortLabel}
-            value={sortState.key}
-            onChange={(key) => setSortState({ key, dir: DEFAULT_DIRS[key] })}
-            options={sortOptions}
-          />
-        </div>
-      </div>
+      <AchievementTableToolbar<Filter, SortKey>
+        label={T.gameInfoPage.achievements}
+        tabs={tabs}
+        filter={filter}
+        onFilter={setFilter}
+        query={query}
+        onQuery={setQuery}
+        sortOptions={sortOptions}
+        sort={sortState.key}
+        onSort={(key) => setSortState({ key, dir: DEFAULT_DIRS[key] })}
+      />
 
       {gameData && (
         <>
@@ -229,15 +210,7 @@ export default function GameInfoTable({
           {filtered.length === 0 && <p className="text-sm text-text-secondary text-center py-6">{T.gameInfoTable.noMatches}</p>}
 
           {(folded || (showAll && filtered.length > FIRST_ROWS && !query.trim())) && (
-            <button
-              type="button"
-              onClick={() => setShowAll((v) => !v)}
-              aria-expanded={!folded}
-              className={buttonClass('secondary', 'md', 'self-center')}
-            >
-              {folded ? T.gameInfoTable.showRest.replace('{n}', String(filtered.length - FIRST_ROWS)) : T.gameInfoTable.showLess}
-              {folded ? <IconChevronDown className="w-4 h-4" aria-hidden="true" /> : <IconChevronUp className="w-4 h-4" aria-hidden="true" />}
-            </button>
+            <ShowRestButton folded={folded} rest={filtered.length - FIRST_ROWS} onToggle={() => setShowAll((v) => !v)} />
           )}
         </>
       )}

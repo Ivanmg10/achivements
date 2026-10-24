@@ -323,6 +323,7 @@ export const it: Translations = {
     completedHC: 'Completati HC',
   },
   gameInfoTable: {
+    onlineText: 'e i server potrebbero chiudere:',
     searchPlaceholder: 'Cerca un obiettivo',
     sortGameOrder: 'Ordine del gioco',
     showRest: 'Mostra gli altri {n}',
@@ -1628,6 +1629,7 @@ export const it: Translations = {
     days: { one: '{n} giorno', other: '{n} giorni' },
     missables: { one: '{n} perdibile', other: '{n} perdibili' },
     missableCount: { one: '{n} obiettivo si può perdere', other: '{n} obiettivi si possono perdere' },
+    onlineCount: { one: '{n} obiettivo potrebbe richiedere il gioco online', other: '{n} obiettivi potrebbero richiedere il gioco online' },
   },
   welcome: {
     skipAll: 'Salta tutto',

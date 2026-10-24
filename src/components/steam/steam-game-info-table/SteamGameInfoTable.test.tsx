@@ -71,22 +71,22 @@ test('renders a card list for phones alongside the desktop table', () => {
 describe('filter', () => {
   test('shows earned or unearned only, marking the active choice without colour alone', () => {
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    const earnedButton = filters().getByRole('button', { name: en.gameInfoTable.filterEarned })
+    const earnedButton = filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterEarned}`) })
 
     fireEvent.click(earnedButton)
     expect(earnedButton.getAttribute('aria-pressed')).toBe('true')
     expect(rowOrder()).toEqual(['FIRST', 'THIRD'])
 
-    fireEvent.click(filters().getByRole('button', { name: en.gameInfoTable.filterUnearned }))
+    fireEvent.click(filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterUnearned}`) }))
     expect(rowOrder()).toEqual(['SECOND', 'FOURTH'])
 
-    fireEvent.click(filters().getByRole('button', { name: en.gameInfoTable.filterAll }))
+    fireEvent.click(filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterAll}`) }))
     expect(rowOrder()).toHaveLength(4)
   })
 
   test('says so when a filter leaves nothing', () => {
     render(<SteamGameInfoTable appId={730} gameTitle="Game" achievements={[ach('A')]} />)
-    fireEvent.click(filters().getByRole('button', { name: en.gameInfoTable.filterEarned }))
+    fireEvent.click(filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterEarned}`) }))
     expect(screen.getByText(en.steam.noAchievements)).toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
@@ -132,20 +132,28 @@ describe('sorting', () => {
   })
 })
 
-test('folds to the first rows and unfolds again', () => {
-  render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-  const toggle = screen.getByRole('button', { name: en.gameInfoTable.collapseTable })
-  expect(toggle.getAttribute('aria-expanded')).toBe('true')
+const LONG = Array.from({ length: 10 }, (_, i) => ach(`A${i + 1}`, { displayOrder: i }))
 
-  fireEvent.click(toggle)
-  expect(rowOrder()).toHaveLength(3)
-  fireEvent.click(screen.getByRole('button', { name: `${en.gameInfoTable.expandTable} (4)` }))
-  expect(rowOrder()).toHaveLength(4)
+test('shows the first rows, then a button for the rest, and folds again', () => {
+  render(<SteamGameInfoTable achievements={LONG} appId={620} gameTitle="Portal 2" />)
+  expect(rowOrder()).toHaveLength(8)
+  fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showRest.replace('{n}', '2') }))
+  expect(rowOrder()).toHaveLength(10)
+  fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showLess }))
+  expect(rowOrder()).toHaveLength(8)
 })
 
-test('offers no fold for a short list', () => {
-  render(<SteamGameInfoTable appId={730} gameTitle="Game" achievements={LIST.slice(0, 3)} />)
-  expect(screen.queryByRole('button', { name: en.gameInfoTable.collapseTable })).not.toBeInTheDocument()
+test('offers no "show the rest" for a short list', () => {
+  render(<SteamGameInfoTable appId={730} gameTitle="Game" achievements={LIST} />)
+  expect(screen.queryByRole('button', { name: /show the other/i })).not.toBeInTheDocument()
+})
+
+test('a search shows every match, and says when there is none', () => {
+  render(<SteamGameInfoTable achievements={LONG} appId={620} gameTitle="Portal 2" />)
+  fireEvent.change(screen.getByRole('searchbox', { name: en.gameInfoTable.searchPlaceholder }), { target: { value: 'A10' } })
+  expect(rowOrder()).toEqual(['A10'])
+  fireEvent.change(screen.getByRole('searchbox', { name: en.gameInfoTable.searchPlaceholder }), { target: { value: 'zzz' } })
+  expect(screen.getByText(en.gameInfoTable.noMatches)).toBeInTheDocument()
 })
 
 describe('opened from a badge link', () => {
@@ -211,14 +219,13 @@ describe('polish shared with RA', () => {
     pins(true, ['THIRD'])
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
     expect(rowOrder()).toEqual(['THIRD', 'FIRST', 'SECOND', 'FOURTH'])
-    expect(screen.getByRole('table').querySelector('[data-ach="THIRD"]')!.className).toContain('bg-warning/10')
+    expect(screen.getByRole('table').querySelector('[data-ach="THIRD"]')!.className).toContain('bg-accent/[0.05]')
   })
 
-  test('the fold bar on top shows how many the filter leaves', () => {
+  test('each tab says how many it holds', () => {
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    const [bar] = screen.getAllByRole('button', { name: new RegExp(en.gameInfoTable.collapseTable) })
-    expect(bar).toHaveAttribute('aria-expanded', 'true')
-    expect(bar).toHaveTextContent('4 / 4')
+    expect(filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterAll}`) })).toHaveTextContent('4')
+    expect(filters().getByRole('button', { name: new RegExp(`^${en.gameInfoTable.filterEarned}`) })).toHaveTextContent('2')
   })
 
   test('an achievement opens in a detail window with guide links, and closes', () => {
@@ -241,7 +248,7 @@ describe('polish shared with RA', () => {
     expect(within(screen.getByRole('dialog')).queryByRole('link')).toBeNull()
   })
 
-  test('locked ones that may need online play are listed in a warning, which opens them', () => {
+  test('locked ones that may need online play are named in a line, which can keep only them', () => {
     render(
       <SteamGameInfoTable
         achievements={[ach('MP', { title: 'Win online', likelyOnline: true }), ach('DONE', { likelyOnline: true, earned: true }), ach('SP')]}
@@ -249,9 +256,11 @@ describe('polish shared with RA', () => {
         gameTitle="Portal 2"
       />,
     )
-    const warning = screen.getByRole('button', { name: `${en.steam.onlineWarning} (1)` })
-    fireEvent.click(warning)
-    fireEvent.click(screen.getAllByRole('button', { name: /Win online/ })[0])
+    expect(screen.getByRole('status')).toHaveTextContent('1 achievement may need online play')
+    expect(screen.getByRole('status')).toHaveTextContent('«Win online»')
+    fireEvent.click(screen.getByRole('button', { name: en.gameInfoTable.showOnlyThese }))
+    expect(rowOrder()).toEqual(['Win online'])
+    fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: 'Win online' }))
     expect(screen.getByRole('dialog', { name: 'Win online' })).toBeInTheDocument()
   })
 })
