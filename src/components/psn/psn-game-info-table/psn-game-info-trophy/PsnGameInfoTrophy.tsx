@@ -3,9 +3,10 @@ import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import PsnRevealTrophyButton from '@/components/psn/psn-reveal-trophy-button/PsnRevealTrophyButton'
-import { formatRarity, formatUnlock } from '@/utils/steamFeed'
+import { formatUnlock } from '@/utils/steamFeed'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR, TROPHY_GRADE_RING } from '@/utils/psnTitles'
 import type { PsnTrophy } from '@/types/psn'
+import RarityBadge from '@/components/ui/RarityBadge'
 
 /**
  * One trophy as a table row on the PSN game page, styled like
@@ -90,7 +91,7 @@ export default function PsnGameInfoTrophy({
       <td className={`px-3 py-2 w-28 text-center text-sm font-semibold ${TROPHY_GRADE_COLOR[t.type]}`}>{grade}</td>
 
       <td className="px-3 py-2 w-28 text-center text-sm tabular-nums text-text-secondary">
-        {t.rarity !== null ? `${formatRarity(t.rarity)}%` : '—'}
+        <RarityBadge pct={t.rarity} />
       </td>
 
       <td className="px-3 py-2 w-44 text-center text-xs">

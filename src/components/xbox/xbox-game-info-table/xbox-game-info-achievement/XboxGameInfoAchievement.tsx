@@ -3,9 +3,10 @@ import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import XboxRevealAchievementButton from '@/components/xbox/xbox-reveal-achievement-button/XboxRevealAchievementButton'
-import { formatRarity, formatUnlock } from '@/utils/steamFeed'
+import { formatUnlock } from '@/utils/steamFeed'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
+import RarityBadge from '@/components/ui/RarityBadge'
 
 /**
  * One achievement as a table row on the Xbox game page, styled like
@@ -88,7 +89,7 @@ export default function XboxGameInfoAchievement({
       <td className="px-3 py-2 w-28 text-center text-sm font-semibold tabular-nums text-green-500">{a.gamerscore} G</td>
 
       <td className="px-3 py-2 w-28 text-center text-sm tabular-nums text-text-secondary">
-        {a.rarity !== null ? `${formatRarity(a.rarity)}%` : '—'}
+        <RarityBadge pct={a.rarity} />
       </td>
 
       <td className="px-3 py-2 w-44 text-center text-xs">

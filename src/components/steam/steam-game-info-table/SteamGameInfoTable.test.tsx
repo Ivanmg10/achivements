@@ -172,13 +172,13 @@ describe('opened from a badge link', () => {
   test('ignores a link to an achievement the game does not have', () => {
     window.history.replaceState(null, '', '/steamGame/620#ach-NOPE')
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    expect(screen.getByRole('table').querySelector('.bg-accent\\/15')).toBeNull()
+    expect(screen.getByRole('table').querySelector('tr.bg-accent\\/15')).toBeNull()
   })
 
   test('ignores unrelated hashes', () => {
     window.history.replaceState(null, '', '/steamGame/620#comments')
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    expect(screen.getByRole('table').querySelector('.bg-accent\\/15')).toBeNull()
+    expect(screen.getByRole('table').querySelector('tr.bg-accent\\/15')).toBeNull()
   })
 })
 

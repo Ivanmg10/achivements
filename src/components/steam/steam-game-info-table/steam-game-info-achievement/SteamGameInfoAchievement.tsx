@@ -1,10 +1,11 @@
 import { FadeImage } from '@/components/ui/FadeImage'
 import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { formatRarity, formatUnlock } from '@/utils/steamFeed'
+import { formatUnlock } from '@/utils/steamFeed'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import type { SteamAchievementUnified } from '@/types/steam'
+import RarityBadge from '@/components/ui/RarityBadge'
 
 /**
  * One achievement as a table row on the Steam game page, styled like RA's
@@ -70,7 +71,7 @@ export default function SteamGameInfoAchievement({
       </td>
 
       <td className="px-3 py-2 w-32 text-center text-sm tabular-nums text-text-secondary">
-        {a.globalPct !== null ? `${formatRarity(a.globalPct)}%` : '—'}
+        <RarityBadge pct={a.globalPct} />
       </td>
 
       <td className="px-3 py-2 w-44 text-center text-xs">

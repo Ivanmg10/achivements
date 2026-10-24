@@ -2,6 +2,7 @@ import { IconStar, IconStarFilled } from '@tabler/icons-react'
 import { RetroAchievement } from '@/types/types'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { useLanguage } from '@/context/LanguageContext'
+import RarityBadge from '@/components/ui/RarityBadge'
 
 /**
  * One achievement as a row of the RA game table. The title is the button that
@@ -129,14 +130,7 @@ export default function GameInfoAchivement({
       </td>
 
       <td className="px-3 py-2 w-36 text-center align-middle tabular-nums hidden sm:table-cell">
-        {rarityPct !== null ? (
-          <p className="text-sm leading-snug">
-            <span className="text-text-main font-medium">{rarityPct}</span>
-            <span className="text-text-secondary">{T.achievement.haveIt}</span>
-          </p>
-        ) : (
-          <span className="text-sm text-text-secondary">—</span>
-        )}
+        <RarityBadge pct={rarityPct === null ? null : Number(rarityPct)} />
       </td>
 
       <td className="px-3 py-2 w-40 text-center align-middle hidden sm:table-cell">
