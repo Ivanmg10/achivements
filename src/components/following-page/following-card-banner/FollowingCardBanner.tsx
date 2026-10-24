@@ -21,7 +21,7 @@ export default function FollowingCardBanner({ friend, lastPlayed }: { friend: Fr
   const art = lastPlayed?.image && !failed ? lastPlayed.image : null
 
   return (
-    <div className="relative h-24 rounded-t-2xl overflow-hidden">
+    <div className="relative h-24 overflow-hidden">
       {art ? (
         <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
           <Image
@@ -43,14 +43,14 @@ export default function FollowingCardBanner({ friend, lastPlayed }: { friend: Fr
         {lastPlayed && (
           <Link
             href={gameHref(lastPlayed.source, lastPlayed.id, friend.username)}
-            className="flex items-center gap-2 min-w-0 max-w-[75%] rounded-lg bg-bg-main/75 backdrop-blur-sm px-2 py-1 hover:bg-bg-main/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="flex items-center gap-2 min-w-0 max-w-[85%] rounded-lg bg-black/45 backdrop-blur-sm px-2.5 py-1.5 hover:bg-black/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <PlatformLogo source={lastPlayed.source} size={12} label={PLATFORM_NAME[lastPlayed.source]} />
             <span className="flex flex-col min-w-0">
-              <span className="text-[9px] uppercase tracking-widest text-text-secondary truncate">
+              <span className="text-[0.625rem] font-bold uppercase tracking-[0.09em] text-text-secondary truncate">
                 {T.following.lastPlayed} · {relativeTime(lastPlayed.at, lang)}
               </span>
-              <span className="text-xs font-semibold text-text-main truncate">{lastPlayed.title}</span>
+              <span className="text-[0.8125rem] font-bold text-white truncate">{lastPlayed.title}</span>
             </span>
           </Link>
         )}

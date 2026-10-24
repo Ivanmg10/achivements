@@ -45,8 +45,8 @@ export default function FollowingToolbar({
   ]
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-      <div className="relative sm:w-64 shrink-0">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 xl:pb-1.5">
+      <div className="relative sm:w-[16.25rem] shrink-0">
         <label htmlFor="following-search" className="sr-only">{T.following.searchLabel}</label>
         <IconSearch size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
         <input

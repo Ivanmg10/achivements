@@ -41,7 +41,7 @@ test('each user you follow is a card that opens their profile', () => {
   expect(screen.getByRole('heading', { name: en.following.title })).toBeInTheDocument()
   expect(screen.getByRole('link', { name: 'a b' })).toHaveAttribute('href', '/user/a%20b')
   expect(screen.getByText('Retro fan')).toBeInTheDocument()
-  expect(screen.getByText(en.following.people)).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: en.following.title }).closest('section')).toHaveTextContent(new RegExp(`1 ${en.following.people}`, 'i'))
 })
 
 test('the hero says how many of them are online now', () => {
