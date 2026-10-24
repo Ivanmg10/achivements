@@ -48,7 +48,7 @@ function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
       aria-label={`${T.streak.title}: ${plural(streak, T.plurals.days, lang)}`}
       className={`flex items-center gap-1 ${glass ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-bg-main hover:bg-bg-main/80'} px-3 py-1.5 rounded-full shrink-0 ring-1 ring-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
     >
-      <IconFlame className={`w-3.5 h-3.5 ${streak > 0 ? 'text-orange-400' : 'text-text-secondary'}`} aria-hidden="true" />
+      <IconFlame className={`w-3.5 h-3.5 ${streak > 0 ? 'text-accent' : 'text-text-secondary'}`} aria-hidden="true" />
       <span className={`text-xs font-bold ${streak > 0 ? 'text-text-main' : 'text-text-secondary'}`}>{streak}d</span>
     </Link>
   )

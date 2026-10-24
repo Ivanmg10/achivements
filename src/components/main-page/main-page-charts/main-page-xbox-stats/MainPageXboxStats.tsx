@@ -75,7 +75,7 @@ export default function MainPageXboxStats({
         label={T.streak.title}
         value={`${streak}d`}
         sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
-        accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined}
+        accent={streak > 0 ? 'text-accent' : undefined}
         href="/racha"
       />
       {summary && <StatPill label={T.xbox.achievements} value={summary.achievementsUnlocked.toLocaleString(lang)} sub={T.xbox.total} />}

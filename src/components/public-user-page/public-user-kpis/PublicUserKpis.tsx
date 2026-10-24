@@ -49,7 +49,7 @@ export default function PublicUserKpis() {
         label={T.userProfile.streak}
         value={streak}
         display={days(streak)}
-        accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : 'text-text-secondary'}
+        accent={streak > 0 ? 'text-accent' : 'text-text-secondary'}
       />
       <UserVaultStat
         icon={<IconTrophy size={18} />}

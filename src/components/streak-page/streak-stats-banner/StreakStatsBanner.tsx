@@ -36,8 +36,8 @@ export default function StreakStatsBanner({ activeStreak, bestStreak, totalStrea
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div className="bg-bg-card rounded-2xl p-5 flex items-center gap-4">
-        <div className={`flex items-center justify-center w-12 h-12 rounded-xl shrink-0 ${activeStreak ? 'bg-orange-400/10' : 'bg-ink/5'}`}>
-          <IconFlame className={`w-6 h-6 ${activeStreak ? 'text-orange-400' : 'text-text-secondary'}`} aria-hidden="true" />
+        <div className={`flex items-center justify-center w-12 h-12 rounded-xl shrink-0 ${activeStreak ? 'bg-warning/10' : 'bg-ink/5'}`}>
+          <IconFlame className={`w-6 h-6 ${activeStreak ? 'text-warning' : 'text-text-secondary'}`} aria-hidden="true" />
         </div>
         <div className="min-w-0">
           <p className="text-xs uppercase tracking-widest text-text-secondary">{T.streak.currentStreak}</p>

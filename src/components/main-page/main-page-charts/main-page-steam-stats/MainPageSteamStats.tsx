@@ -81,7 +81,7 @@ export default function MainPageSteamStats({
         label={T.streak.title}
         value={`${streak}d`}
         sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
-        accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined}
+        accent={streak > 0 ? 'text-accent' : undefined}
         href="/racha"
       />
       <StatPill label={T.steam.last2Weeks} value={`${stats.hours2w}${T.steam.hoursShort}`} sub={T.steam.playtime} />

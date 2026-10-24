@@ -68,7 +68,7 @@ export default function MainPagePointsStats({
       <StatPill label={T.pointsStats.thisMonth} value={thisMonth.pts.toLocaleString()} sub={plural(thisMonth.ach, T.plurals.achievements, lang)} onClick={() => setMonthOpen(true)} />
       <StatPill label={T.pointsStats.avgPerDay} value={avgPerDay.toFixed(1)} sub={T.pointsStats.perDay} />
       {rank?.Rank != null && <StatPill label={T.userStats.globalRank} value={`#${rank.Rank.toLocaleString()}`} sub={`${(rank.Score ?? 0).toLocaleString()} pts`} />}
-      <StatPill label={T.streak.title} value={`${streak}d`} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined} href="/racha" />
+      <StatPill label={T.streak.title} value={`${streak}d`} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} accent={streak > 0 ? 'text-accent' : undefined} href="/racha" />
 
       <AnimatePresence>
         {selectedDay && (

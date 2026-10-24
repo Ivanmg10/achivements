@@ -11,9 +11,9 @@ test('shows the current and the longest streak, and says both in one sentence', 
   expect(screen.getByText('12d')).not.toHaveClass('text-warning')
 })
 
-test('the crown turns gold while the current streak is the record', () => {
+test('the crown lights up in the theme colour while the current streak is the record', () => {
   render(<RankingsPageStreak streak={12} best={12} />)
-  expect(screen.getAllByText('12d')[1]).toHaveClass('text-warning')
+  expect(screen.getAllByText('12d')[1]).toHaveClass('text-accent')
 })
 
 test('no streak ever: a dimmed 0 and no crown', () => {

@@ -22,14 +22,14 @@ export default function RankingsPageStreak({ streak, best, className = '' }: { s
       <span
         aria-hidden="true"
         className={`inline-flex items-center gap-1 h-6 pl-1.5 pr-2 rounded-full text-xs font-extrabold ${
-          lit ? 'bg-orange-400/15 text-orange-300 ring-1 ring-orange-400/30' : 'bg-ink/[0.05] text-text-secondary'
+          lit ? 'bg-accent/15 text-accent ring-1 ring-accent/30' : 'bg-ink/[0.05] text-text-secondary'
         }`}
       >
-        <Flame size={13} className={lit ? 'text-orange-400' : ''} />
+        <Flame size={13} className={lit ? 'text-accent' : ''} />
         {n(streak)}d
       </span>
       {best > 0 && (
-        <span aria-hidden="true" className={`inline-flex items-center gap-0.5 text-[11px] font-semibold ${record ? 'text-warning' : 'text-text-secondary'}`}>
+        <span aria-hidden="true" className={`inline-flex items-center gap-0.5 text-[11px] font-semibold ${record ? 'text-accent' : 'text-text-secondary'}`}>
           <IconCrown size={12} />
           {n(best)}d
         </span>
