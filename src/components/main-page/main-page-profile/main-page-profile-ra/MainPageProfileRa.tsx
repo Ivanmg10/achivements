@@ -42,7 +42,7 @@ export default function MainPageProfileRa({
     hardcoreRatio >= 80
       ? 'ring-hardcore'
       : hardcoreRatio >= 50
-        ? 'ring-blue-400'
+        ? 'ring-softcore'
         : 'ring-gray-600'
 
   const memberYear = user?.MemberSince ? new Date(user.MemberSince).getFullYear() : null
