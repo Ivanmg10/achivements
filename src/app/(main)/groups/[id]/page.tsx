@@ -99,6 +99,7 @@ export default function GroupDetailPage() {
                 onDecade={setDecade}
                 onToggleConsole={toggleConsole}
                 onClearConsoles={clearConsoles}
+                counts={states}
               />
             )}
 

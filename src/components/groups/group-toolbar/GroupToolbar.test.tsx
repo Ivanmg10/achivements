@@ -14,7 +14,7 @@ function setup(items: GameGroupItem[], f = filters()) {
 
 test('progress states, the current one pressed', () => {
   const h = setup([item({})])
-  expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByRole('button', { name: 'All 1' })).toHaveAttribute('aria-pressed', 'true')
   fireEvent.click(screen.getByRole('button', { name: 'Completed' }))
   expect(h.onPct).toHaveBeenCalledWith('100')
 })
