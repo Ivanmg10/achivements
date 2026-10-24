@@ -70,7 +70,7 @@ export default function MainPageProfileRa({
               />
             )}
             <div className="flex flex-col gap-1 min-w-0 w-full">
-              <p className="text-xl lg:text-2xl font-bold leading-tight truncate">{user.User}</p>
+              <p className="font-display italic font-extrabold text-3xl lg:text-4xl leading-none truncate">{user.User}</p>
               {user.Motto && (
                 <p className="text-xs text-text-secondary italic line-clamp-2">
                   &ldquo;{user.Motto}&rdquo;

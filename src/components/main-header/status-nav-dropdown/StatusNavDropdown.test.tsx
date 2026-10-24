@@ -50,5 +50,5 @@ test('closes on Escape', () => {
 
 test('applies active styling when active is true', () => {
   render(<StatusNavDropdown items={items} active={true} label="Status" />)
-  expect(screen.getByRole('button', { name: 'Status' })).toHaveClass('text-accent')
+  expect(screen.getByRole('button', { name: 'Status' })).toHaveClass('after:scale-x-100')
 })

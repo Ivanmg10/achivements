@@ -23,7 +23,7 @@ export default function MainHeaderLevel({ glass }: { glass?: boolean }) {
   return (
     <Link
       href="/rankings"
-      className={`hidden sm:flex items-center rounded-full shrink-0 p-0.5 ring-1 ring-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${glass ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-bg-main hover:bg-bg-main/80'}`}
+      className={`hidden sm:flex items-center rounded-chip shrink-0 h-8 px-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${glass ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-ink/[0.06] hover:bg-ink/10'}`}
     >
       <span className="sr-only">{T.rankings.title}</span>
       {calculating ? (

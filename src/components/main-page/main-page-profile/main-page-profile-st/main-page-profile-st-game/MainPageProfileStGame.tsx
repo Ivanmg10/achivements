@@ -8,6 +8,8 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
+import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import { steamAssetUrl } from '@/lib/steamClient'
 
 /**
  * The game card in the Steam profile — MainPageProfileRaGame's counterpart:
@@ -30,8 +32,9 @@ export default function MainPageProfileStGame({
   return (
     <Link
       href={gameHref('steam', game.id, subject)}
-      className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 w-full hover:scale-[1.005] transition-transform duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+      className="relative isolate rounded-control p-3 flex flex-col gap-3 w-full transition-transform duration-200 hover:scale-[1.005] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
+      <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} />
       <p className="text-xs text-text-secondary uppercase tracking-wider">
         {playingNow ? T.profileRa.playingNow : T.steam.lastPlayed}
       </p>

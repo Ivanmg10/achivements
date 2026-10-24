@@ -25,11 +25,8 @@ function NavLink({ href, label, active, glass }: { href: string; label: string; 
   return (
     <Link
       href={href}
-      className={`px-3.5 py-1.5 text-sm rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 whitespace-nowrap ${
-        active
-          ? `text-accent font-medium ${glass ? 'bg-ink/10 backdrop-blur-sm' : 'bg-bg-main'} ring-1 ring-ink/10`
-          : `text-text-secondary hover:text-text-main ${glass ? 'hover:bg-ink/10' : 'hover:bg-bg-main/60'}`
-      }`}
+      aria-current={active ? 'page' : undefined}
+      className={`relative inline-flex items-center gap-1 h-10 px-3 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:rounded-chip after:content-[''] after:absolute after:left-2.5 after:right-2.5 after:bottom-0.5 after:h-[3px] after:bg-accent after:skew-x-(--slant-line) after:origin-left after:transition-transform after:duration-(--motion-open) ${active ? 'text-text-main after:scale-x-100' : 'text-text-secondary hover:text-text-main after:scale-x-0'}`}
     >
       {label}
     </Link>
@@ -46,7 +43,7 @@ function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
     <Link
       href="/racha"
       aria-label={`${T.streak.title}: ${plural(streak, T.plurals.days, lang)}`}
-      className={`flex items-center gap-1 ${glass ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-bg-main hover:bg-bg-main/80'} px-3 py-1.5 rounded-full shrink-0 ring-1 ring-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+      className={`flex items-center gap-1 ${glass ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-ink/[0.06] hover:bg-ink/10'} px-2.5 h-8 rounded-chip shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
     >
       <IconFlame className={`w-3.5 h-3.5 ${streak > 0 ? 'text-accent' : 'text-text-secondary'}`} aria-hidden="true" />
       <span className={`text-xs font-bold ${streak > 0 ? 'text-text-main' : 'text-text-secondary'}`}>{streak}d</span>
@@ -125,7 +122,7 @@ export default function MainHeader() {
       <div className={`sticky top-0 z-40 h-16 shrink-0 pointer-events-none transition-[padding] duration-300 motion-reduce:transition-none ${scrolled ? 'px-0 pt-0' : 'px-2 sm:px-3 pt-2'}`}>
       <header
         className={`pointer-events-auto relative flex items-center text-text-main px-3 sm:px-4 backdrop-blur-xl backdrop-saturate-150 ring-1 shadow-lg shadow-black/20 transition-all duration-300 motion-reduce:transition-none ${
-          scrolled ? 'h-16 rounded-none' : 'h-14 rounded-2xl'
+          scrolled ? 'h-16 rounded-none' : 'h-14 rounded-card'
         } ${isGameInfo ? 'bg-bg-main/30 ring-ink/10' : 'bg-bg-card/80 ring-ink/[0.06]'}`}
       >
         {/* Left: home + back + nav (desktop) / hamburguesa (mobile) */}
@@ -189,8 +186,9 @@ export default function MainHeader() {
           <button
             onClick={openSearch}
             aria-label="Search games"
-            className={`flex w-[40%] mx-auto rounded-full px-4 py-2.5 text-sm text-text-secondary text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 flex items-center gap-2 cursor-pointer ring-1 pointer-events-auto ${isGameInfo ? 'bg-ink/10 backdrop-blur-sm ring-ink/20 hover:bg-ink/20' : 'bg-bg-main ring-ink/5 hover:bg-bg-main/80'}`}
+            className={`flex w-full max-w-[32rem] mx-auto h-11 rounded-field px-3.5 text-sm text-text-secondary text-left transition-[background-color,box-shadow] duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 items-center gap-2.5 cursor-text ring-1 ring-inset pointer-events-auto ${isGameInfo ? 'bg-ink/10 backdrop-blur-sm ring-ink/20 hover:bg-ink/20' : 'bg-bg-main shadow-[inset_0_2px_4px_rgb(0_0_0/0.22)] ring-ink/[0.08] hover:ring-accent/50'}`}
           >
+            <span aria-hidden="true" className="w-1 h-5 shrink-0 bg-accent skew-x-(--slant-line)" />
             <IconSearch className="w-4 h-4 shrink-0" aria-hidden />
             <span>{T.search.placeholder}</span>
           </button>
@@ -217,7 +215,7 @@ export default function MainHeader() {
               <Link
                 href="/user"
                 aria-label={T.sidePanel.userSettings}
-                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ring-1 ring-ink/10 ${isGameInfo ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-bg-main hover:bg-ink/5'}`}
+                className={`flex items-center gap-2 pl-3 pr-1 h-10 rounded-control transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${isGameInfo ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-ink/[0.05] hover:bg-ink/10'}`}
               >
                 <span className="text-sm font-medium hidden sm:block text-text-main leading-none">
                   {session.user?.name ?? session.user?.email}

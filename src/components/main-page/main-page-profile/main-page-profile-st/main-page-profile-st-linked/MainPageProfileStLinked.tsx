@@ -100,7 +100,7 @@ export default function MainPageProfileStLinked({
           </div>
         )}
         <div className="flex flex-col gap-1 min-w-0 w-full">
-          <p className="text-xl lg:text-2xl font-bold leading-tight truncate">{profile.personaname}</p>
+          <p className="font-display italic font-extrabold text-3xl lg:text-4xl leading-none truncate">{profile.personaname}</p>
           <div className="flex items-center gap-2 flex-wrap text-xs">
             {profile.level !== null && (
               <span className="inline-flex items-center gap-1 text-text-secondary">

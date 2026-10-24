@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
+import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 
 export default function MainPageProfileRaGame({
   game,
@@ -23,11 +24,12 @@ export default function MainPageProfileRaGame({
 
   return (
     <Link
-      className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 w-full hover:scale-[1.005] transition-transform duration-200"
+      className="relative isolate rounded-control p-3 flex flex-col gap-3 w-full transition-transform duration-200 hover:scale-[1.005] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       href={gameHref('ra', game.ID ?? 0, subject)}
     >
+      <GameCardBackdrop src={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null} />
       <p className="text-xs text-text-secondary uppercase tracking-wider">{T.profileRa.playingNow}</p>
-      {richPresenceMsg && <p className="text-xs text-gray-300 italic">{richPresenceMsg}</p>}
+      {richPresenceMsg && <p className="text-xs text-text-secondary italic">{richPresenceMsg}</p>}
       <div className="flex gap-3 items-center">
         {game.ImageIcon && (
           <Image
