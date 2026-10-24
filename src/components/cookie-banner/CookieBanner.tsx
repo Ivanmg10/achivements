@@ -23,7 +23,7 @@ export default function CookieBanner() {
       aria-label={T.cookies.title}
       className="fixed inset-x-0 bottom-0 z-50 p-4 sm:bottom-4 sm:left-4 sm:right-auto sm:max-w-md"
     >
-      <div className="flex flex-col gap-3 bg-bg-card border border-ink/10 rounded-2xl p-4 shadow-2xl">
+      <div className="flex flex-col gap-3 bg-bg-header ring-1 ring-ink/12 rounded-card p-4 shadow-2xl shadow-black/50">
         <p className="text-sm font-semibold text-text-main">{T.cookies.title}</p>
         <p className="text-xs text-text-secondary">
           {T.cookies.text}{' '}

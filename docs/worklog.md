@@ -29,6 +29,27 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-24 — Component library, part 2: overlays and feedback (`feat/64-ui-overlays`, #64)
+
+**Did** — `Modal` in `src/components/ui` (dialog role, head / footer, danger variant, sizes, a sheet
+on phones, Escape and outside click, focus trap and return, only the top dialog answers Escape);
+`CommonModal` became a wrapper over it, and the 14 hand-built dialogs (achievement, detail, hashes,
+AI export, groups, add / pin games, pin achievement, showcase picker, favourite game, forgot
+password, delete confirmation, admin panel, day / week / period lists) dropped their own overlay,
+Escape and focus code. `Notice` for tinted inline notices; inline errors in the theme's danger
+colour. One dark tooltip surface, one menu surface (header status menu, sort menu, Select). The
+toasts are a dark card with the tone on the edge and icon and a line for the time left. The search
+panel uses the dialog surface, the segmented control and pills (still opens on typing). The cookie
+banner on the dialog surface. The guard refuses a hand-built dialog overlay.
+**Why** — PR 2 of the agreed design.
+**Decisions** — A dialog focuses itself (its name is read first) unless a field has `autoFocus`.
+`CommonModal` keeps no corner close by default (those modals have their own way out). Branch stacked
+on #63's (it needs its components); rebase onto `develop` once #63 is merged.
+**Open** — The search panel, the phone menu drawer and the sign-in backdrop keep their own overlays
+(allowed in the guard). Skeletons and the empty state were left as they are. PR 3.
+
+---
+
 ## 2026-10-24 — Component library, part 1: foundations and controls (`feat/63-ui-library`, #63)
 
 **Did** — Design tokens in `globals.css` (slants, radii, control heights, motion, `--hardcore` /

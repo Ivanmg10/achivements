@@ -217,7 +217,14 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 - **The look lives in tokens** in `globals.css` (`--slant-*`, `--r-*`, `--h-*`, `--motion-*`,
   `--hardcore`/`--softcore`), defined once for every theme (`designTokens.test.ts`): a future
   site-wide design changes them, not the components.
-- PR 2 (overlays and feedback) and PR 3 (surfaces, data, the palette sweep) add the rest.
+- **Dialogs**: `Modal` (head with icon, title and hint; `footer`; `tone="danger"` is an
+  `alertdialog`; sizes `sm`–`xl`; a sheet on phones; Escape, outside click, focus kept inside and
+  given back; only the top dialog answers Escape). `CommonModal` is a thin wrapper over it (no
+  corner close by default). A modal names itself by its first heading, or `aria-label` /
+  `aria-labelledby`.
+- **Feedback**: `Notice` (tinted inline notice, `role="alert"` for errors), `TOOLTIP_SURFACE`
+  (`ui/tooltip.ts`), `MENU_SURFACE` / `menuItemClass` (`ui/menu.ts`); the toasts are the dark card.
+- PR 3 (surfaces, data, the palette sweep) adds the rest.
 
 ## Progress bars — in the theme's colours
 

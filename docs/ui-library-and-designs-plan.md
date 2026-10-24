@@ -266,7 +266,7 @@ canvas's final page differs from today, it is because a component changed, not t
 8. Search: no shortcut; it keeps opening on typing (`MainHeader`). Only its field is restyled here;
    the panel is PR 2.
 
-### PR 2 · Overlays and feedback
+### PR 2 · Overlays and feedback — built 2026-10-24 (`feat/64-ui-overlays`)
 
 `Modal` over `CommonModal` (head with icon, title and hint, quiet ✕, own footer, `alertdialog`
 variant, three sizes, a bottom sheet under 640 px; `role="dialog"`, `aria-modal`, Escape, focus
