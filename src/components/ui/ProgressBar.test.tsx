@@ -40,7 +40,7 @@ test('a finished bar glows in the theme colour, by either share; no other colour
 
   rerender(<ProgressBar pct={100} label="x" />)
   expect(screen.getByRole('progressbar')).toHaveAttribute('data-complete', 'true')
-  expect(screen.getByRole('progressbar').style.boxShadow).toContain('var(--progress)')
+  expect(screen.getByRole('progressbar').style.filter).toContain('var(--progress)')
   expect(fill(container, 'main')?.style.background).toContain('var(--progress)')
   expect(fill(container, 'main')?.style.background).not.toContain('success')
 
@@ -68,6 +68,14 @@ test('accepts custom sizing classes', () => {
   render(<ProgressBar pct={10} label="x" height="h-3" trackClass="bg-black" className="flex-1" />)
   const bar = screen.getByRole('progressbar')
   expect(bar.className).toContain('h-3')
-  expect(bar.className).toContain('bg-black')
+  expect(bar.querySelector('[data-track]')!.className).toContain('bg-black')
   expect(bar.className).toContain('flex-1')
+})
+
+test('only a finished bar glows, and its ends are cut on the slant', () => {
+  const { rerender } = render(<ProgressBar pct={40} label="x" />)
+  expect(screen.getByRole('progressbar').style.filter).toBe('')
+  expect((screen.getByRole('progressbar').querySelector('[data-track]') as HTMLElement).style.clipPath).toContain('polygon')
+  rerender(<ProgressBar pct={100} label="x" />)
+  expect(screen.getByRole('progressbar').style.filter).toContain('drop-shadow')
 })

@@ -231,7 +231,8 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or
 `CircularProgress`: the theme's `--progress` (its accent), RA softcore a darker
 step of it (`bg-progress-soft`) under hardcore. A finished bar stays in the
-theme's colour and glows; **the green is only in the percentage beside it**
+theme's colour and glows (only a finished bar glows; its ends are cut on the design's slant);
+**the green is only in the percentage beside it**
 (`text-success` at 100%), never on the bar — the user tried a green ring and
 did not like it. Do not paint a bar in a platform's colour; those stay only in
 charts that compare platforms (CompletionDistribution, the line
