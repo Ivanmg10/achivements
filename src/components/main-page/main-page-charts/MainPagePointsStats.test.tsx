@@ -81,7 +81,7 @@ describe('MainPagePointsStats', () => {
       />,
     )
     expect(screen.getByText('#1,234')).toBeInTheDocument()
-    expect(screen.getByText('5000 pts')).toBeInTheDocument()
+    expect(screen.getByText('5,000 pts')).toBeInTheDocument()
   })
 
   test('sums only this-calendar-month points from heatmap achievements', () => {
