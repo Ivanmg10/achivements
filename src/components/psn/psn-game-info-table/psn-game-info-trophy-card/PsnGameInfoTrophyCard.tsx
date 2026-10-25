@@ -93,7 +93,7 @@ export default function PsnGameInfoTrophyCard({
           )}
           {t.rarity !== null && (
             <span className="text-text-secondary">
-              {formatRarity(t.rarity)}
+              {formatRarity(t.rarity, lang)}
               {T.achievement.haveIt}
             </span>
           )}

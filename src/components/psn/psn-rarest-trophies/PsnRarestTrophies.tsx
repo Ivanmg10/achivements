@@ -7,6 +7,7 @@ import { gameHref } from '@/utils/gameRef'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import type { PsnTrophy } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
+import { decimal } from '@/utils/utils'
 
 const SHOWN = 4
 const SKELETON_ROWS = 4
@@ -25,7 +26,7 @@ export default function PsnRarestTrophies({
   trophies: (PsnTrophy & { gameId?: number })[]
   isLoading: boolean
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }
 
@@ -65,7 +66,7 @@ export default function PsnRarestTrophies({
                   <span className="text-sm font-semibold truncate">{t.name}</span>
                   <span className="text-xs">
                     <span className={TROPHY_GRADE_COLOR[t.type]}>{grade[t.type]}</span>
-                    <span className="text-text-secondary"> · {T.psn.rarity.replace('{n}', t.rarity.toFixed(1))}</span>
+                    <span className="text-text-secondary"> · {T.psn.rarity.replace('{n}', decimal(t.rarity, lang))}</span>
                   </span>
                 </span>
               </Link>

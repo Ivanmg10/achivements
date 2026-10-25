@@ -4,6 +4,7 @@ import { IconStar, IconStarFilled } from '@tabler/icons-react'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import { decimal } from '@/utils/utils'
 
 export default function GameInfoAchievementCard({
   achievement,
@@ -18,7 +19,7 @@ export default function GameInfoAchievementCard({
   onToggleFavorite?: (a: RetroAchievement) => void
   onClick?: () => void
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   const TYPE_BADGES: Record<string, { label: string; className: string }> = {
     progression: { label: T.achievement.progression, className: 'bg-info/20 text-info' },
@@ -30,7 +31,7 @@ export default function GameInfoAchievementCard({
   const earnedHardcore = !!achievement.DateEarnedHardcore
   const rarityPct =
     numDistinctPlayers > 0
-      ? ((achievement.NumAwarded / numDistinctPlayers) * 100).toFixed(1)
+      ? decimal(((achievement.NumAwarded / numDistinctPlayers) * 100), lang)
       : null
   const typeBadge = achievement.Type ? TYPE_BADGES[achievement.Type] : null
 

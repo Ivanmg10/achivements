@@ -10,6 +10,7 @@ import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import MainPageFavoritesUnpinButton from '@/components/main-page/main-page-favorites/main-page-favorites-unpin-button/MainPageFavoritesUnpinButton'
+import { decimal } from '@/utils/utils'
 
 const TILE =
   'flex gap-3 w-full h-full rounded-xl p-3 bg-bg-main ring-1 ring-ink/[0.06] hover:ring-accent/40 transition-shadow text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
@@ -33,7 +34,7 @@ export default function MainPagePinnedSectionAchievementTile({
   onUnpin: () => void
   handle?: ReactNode
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
 
   const body = (
@@ -68,7 +69,7 @@ export default function MainPagePinnedSectionAchievementTile({
           {view.value && <span className={`font-semibold ${view.valueClass}`}>{view.value}</span>}
           {view.rarity !== null && (
             <span className="text-text-secondary tabular-nums">
-              {view.rarity.toFixed(1)}
+              {decimal(view.rarity, lang)}
               {T.achievement.haveIt}
             </span>
           )}

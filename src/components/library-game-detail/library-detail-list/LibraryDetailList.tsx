@@ -32,7 +32,7 @@ export default function LibraryDetailList({
   /** Two columns where there is room, for a list that has the width to itself. */
   columns?: 1 | 2
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   return (
     <div className="flex flex-col gap-2 h-full">
@@ -69,7 +69,7 @@ export default function LibraryDetailList({
                     meta(a)
                   ) : (
                     <>
-                      {a.rarity !== null && <span>{T.libraryDetail.rarityOf.replace('{n}', formatRarity(a.rarity))}</span>}
+                      {a.rarity !== null && <span>{T.libraryDetail.rarityOf.replace('{n}', formatRarity(a.rarity, lang))}</span>}
                       {a.points !== null && <span className="text-text-main font-medium">{a.points} {T.libraryDetail.pointsShort}</span>}
                     </>
                   )}

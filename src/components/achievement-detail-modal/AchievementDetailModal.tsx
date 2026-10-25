@@ -103,7 +103,7 @@ export default function AchievementDetailModal({
         <dl className="grid grid-cols-2 divide-x divide-bg-header border-b border-bg-header">
           <div className="flex flex-col items-center gap-0.5 py-4 px-2 text-center">
             <dt className="text-xs text-text-secondary order-2">{T.achievementDetail.rarity}</dt>
-            <dd className="text-lg font-semibold tabular-nums">{rarity !== null ? `${formatRarity(rarity)}%` : '—'}</dd>
+            <dd className="text-lg font-semibold tabular-nums">{rarity !== null ? `${formatRarity(rarity, lang)}%` : '—'}</dd>
           </div>
           <div className="flex flex-col items-center gap-0.5 py-4 px-2 text-center">
             <dt className="text-xs text-text-secondary order-2">{earned ? T.achievementDetail.earned : T.achievementDetail.notEarned}</dt>

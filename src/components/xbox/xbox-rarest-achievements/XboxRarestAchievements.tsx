@@ -7,6 +7,7 @@ import { gameHref } from '@/utils/gameRef'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
 import { useSubject } from '@/context/SubjectContext'
+import { decimal } from '@/utils/utils'
 
 const SHOWN = 4
 const SKELETON_ROWS = 4
@@ -24,7 +25,7 @@ export default function XboxRarestAchievements({
   achievements: XboxAchievement[]
   isLoading: boolean
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
 
   const rarest = achievements
@@ -61,7 +62,7 @@ export default function XboxRarestAchievements({
                   <span className="text-sm font-semibold truncate">{a.name}</span>
                   <span className="text-xs">
                     <span className="text-success">{a.gamerscore} G</span>
-                    <span className="text-text-secondary"> · {T.xbox.rarity.replace('{n}', a.rarity.toFixed(1))}</span>
+                    <span className="text-text-secondary"> · {T.xbox.rarity.replace('{n}', decimal(a.rarity, lang))}</span>
                   </span>
                 </span>
               </Link>

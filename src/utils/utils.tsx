@@ -454,6 +454,11 @@ export async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) =>
  * A counted noun in the right plural form for the language ("1 game",
  * "5 games", "5 игр"), with the number formatted for it too.
  */
+/** A number with a fixed count of decimals, in the reader's language ("0,8" in Spanish, never "0.8"). */
+export function decimal(n: number, lang = 'en', digits = 1): string {
+  return n.toLocaleString(lang, { minimumFractionDigits: digits, maximumFractionDigits: digits })
+}
+
 export function plural(n: number, forms: { zero?: string; one?: string; two?: string; few?: string; many?: string; other: string }, lang = 'en'): string {
   const form = forms[new Intl.PluralRules(lang).select(n)] ?? forms.other
   return form.replace('{n}', n.toLocaleString(lang))

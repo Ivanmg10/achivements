@@ -91,7 +91,7 @@ export default function XboxGameInfoAchievementCard({
           )}
           {a.rarity !== null && (
             <span className="text-text-secondary">
-              {formatRarity(a.rarity)}
+              {formatRarity(a.rarity, lang)}
               {T.achievement.haveIt}
             </span>
           )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useRef, useState } from 'react'
+import { decimal } from '@/utils/utils'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createPortal } from 'react-dom'
@@ -67,7 +68,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
   /** Show only this many until asked for the rest. */
   limit?: number
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   const { pinned, toggle, canPin } = usePsnFavoriteTrophies(gameId, gameTitle)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
@@ -187,7 +188,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
               <span className={`text-xs font-semibold ${TROPHY_GRADE_COLOR[tooltip.trophy.type]}`}>{grade[tooltip.trophy.type]}</span>
               {tooltip.trophy.rarity !== null && (
                 <span className="text-xs text-text-secondary">
-                  {tooltip.trophy.rarity.toFixed(1)}
+                  {decimal(tooltip.trophy.rarity, lang)}
                   {T.achievement.haveIt}
                 </span>
               )}

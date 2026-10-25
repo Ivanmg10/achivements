@@ -305,7 +305,7 @@ export const es: Translations = {
     close: 'Cerrar',
   },
   userStats: {
-    globalRank: 'Rango global',
+    globalRank: 'Puesto global',
     awards: 'Premios',
     total: 'Total',
     masteries: 'Masterías',
@@ -907,7 +907,7 @@ export const es: Translations = {
   },
   cards: {
     sectionFriends: 'Siguiendo',
-    statsActivity: 'Estadísticas & Actividad',
+    statsActivity: 'Estadísticas y actividad',
     dailyAchievements: 'Logros diarios — últimos 7 días',
     activityLabel: 'Actividad',
     activityLastDays: 'últimos {n} días',
@@ -1135,7 +1135,7 @@ export const es: Translations = {
     today: 'Hoy',
     thisWeek: 'Esta semana',
     thisMonth: 'Este mes',
-    avgPerDay: 'Prom/día (30d)',
+    avgPerDay: 'Media al día · 30 d',
     perDay: 'logros/día',
     noActivity: 'sin actividad',
     active: 'activo',

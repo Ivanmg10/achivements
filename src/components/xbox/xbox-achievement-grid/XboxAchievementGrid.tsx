@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useRef, useState } from 'react'
+import { decimal } from '@/utils/utils'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createPortal } from 'react-dom'
@@ -53,7 +54,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
   /** Show only this many until asked for the rest. */
   limit?: number
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   const { pinned, toggle, canPin } = useXboxFavoriteAchievements(gameId, gameTitle)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
@@ -148,7 +149,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
               <span className="text-xs font-semibold text-success">{tooltip.achievement.gamerscore} G</span>
               {tooltip.achievement.rarity !== null && (
                 <span className="text-xs text-text-secondary">
-                  {tooltip.achievement.rarity.toFixed(1)}
+                  {decimal(tooltip.achievement.rarity, lang)}
                   {T.achievement.haveIt}
                 </span>
               )}

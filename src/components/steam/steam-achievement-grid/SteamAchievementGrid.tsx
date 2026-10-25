@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useRef, useState } from 'react'
+import { decimal } from '@/utils/utils'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createPortal } from 'react-dom'
@@ -56,7 +57,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
   /** Show only this many until asked for the rest (a card on a list page). */
   limit?: number
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   const { pinned, toggle, canPin } = useSteamFavoriteAchievements(appId, gameTitle)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
@@ -142,7 +143,7 @@ export const SteamAchievementGrid = memo(function SteamAchievementGrid({
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               {tooltip.achievement.globalPct !== null && (
                 <span className="text-xs text-text-secondary">
-                  {tooltip.achievement.globalPct.toFixed(1)}
+                  {decimal(tooltip.achievement.globalPct, lang)}
                   {T.achievement.haveIt}
                 </span>
               )}

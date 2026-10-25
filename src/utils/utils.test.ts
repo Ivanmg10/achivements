@@ -1,4 +1,4 @@
-import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, stripCap, matchParts } from "./utils";
+import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, stripCap, matchParts, decimal } from "./utils";
 import type { RecentAchievement } from '@/types/types'
 
 describe("getRandomGameIds", () => {
@@ -469,5 +469,13 @@ describe('matchParts', () => {
   })
   test('a match at the start leaves no empty part', () => {
     expect(matchParts('Halo', 'ha')).toEqual([{ text: 'Ha', match: true }, { text: 'lo', match: false }])
+  })
+})
+
+describe('decimal', () => {
+  test('one decimal by default, in the language of the reader', () => {
+    expect(decimal(0.8, 'es')).toBe('0,8')
+    expect(decimal(2, 'en')).toBe('2.0')
+    expect(decimal(1.234, 'de', 2)).toBe('1,23')
   })
 })

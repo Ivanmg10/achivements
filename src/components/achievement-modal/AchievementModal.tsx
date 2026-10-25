@@ -13,6 +13,7 @@ import Spinner from '@/components/main-spinner/Spinner'
 import { raShowcaseEntry } from '@/utils/showcase'
 import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseToggleButton'
 import Modal from '@/components/ui/Modal'
+import { decimal } from '@/utils/utils'
 
 interface AchievementUnlock {
   User: string
@@ -91,7 +92,7 @@ export default function AchievementModal({
   const earned = !!achievement.DateEarned
   const earnedHardcore = !!achievement.DateEarnedHardcore
   const rarityPct = numDistinctPlayers > 0
-    ? ((achievement.NumAwarded / numDistinctPlayers) * 100).toFixed(1)
+    ? decimal(((achievement.NumAwarded / numDistinctPlayers) * 100), lang)
     : null
 
   useEffect(() => {
