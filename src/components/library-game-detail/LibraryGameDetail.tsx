@@ -21,7 +21,7 @@ import LibraryDetailSkeleton from '@/components/library-detail-skeleton/LibraryD
 export type LibraryCategory = 'wantToPlay' | 'playing' | 'completed'
 
 const SKELETON_BADGES = 24
-const PANEL = 'bg-bg-main/55 ring-1 ring-inset ring-ink/[0.06] rounded-[0.875rem] p-3.5 min-w-0'
+const PANEL = 'bg-bg-main/55 ring-1 ring-inset ring-ink/[0.06] rounded-pane p-3.5 min-w-0'
 
 /** The panels come in one after another, each rising a little as it fades in. */
 const CONTAINER: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.12 } } }

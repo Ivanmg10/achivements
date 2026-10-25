@@ -212,10 +212,16 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
   (`ui/shape.ts`), a mark's lean `skew-y-(--slant-mark)`, a control's `skew-x-(--slant-button)`.
   **Never a literal `polygon(...)` or `skew-*-[..]`** (`uiGuard.test.ts` fails on it). The round
   design may override the shape tokens; no theme may (`designTokens.test.ts`).
+- **The round design is the site as it was before the slant**: soft corners on buttons, fields and cards
+  (`--r-button`, `--r-field`, `--r-card`, `--r-pane`, `--r-tile`), tags and chips as pills (`--r-tag`,
+  `--r-chip`), a switch as a pill with a round knob. Use `rounded-card` / `-pane` / `-tile` / `-tag` /
+  `-button`, never a fixed `rounded-[..rem]` for those (`uiGuard.test.ts` refuses it).
+- **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore` and `ToggleButton` are in `ui/`; a pin star or
+  any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
   `GameCardBackdrop` is the one place that draws it, so every game card follows it.
 - **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the
-  streak hero, the cover's streak card). This replaces "streaks in the accent" for those places.
+  streak hero and its live bar, the cover's streak card, the home's stats tile, the rankings' streak column). This replaces "streaks in the accent" for those places.
 - **Adding a piece:** library first (`ui/`, props for layout only, a test), then its specimen in the
   catalogue, then its rule in `uiGuard.test.ts`, then the page. A page that needs a one-off look asks
   for a prop or a variant, never a copy.

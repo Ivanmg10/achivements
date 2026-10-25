@@ -193,15 +193,15 @@ describe('opened from a badge link', () => {
 describe('pinning', () => {
   test('has no pin column for someone who cannot pin', () => {
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    expect(screen.queryByRole('switch')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: new RegExp(en.favorites.addFavorite) })).not.toBeInTheDocument()
     expect(useSteamFavoriteAchievements).toHaveBeenCalledWith(620, 'Portal 2')
   })
 
   test('pins an achievement from its row', () => {
     pins(true)
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    const star = screen.getAllByRole('switch', { name: new RegExp(en.favorites.addFavorite) })[0]
-    expect(star.getAttribute('aria-checked')).toBe('false')
+    const star = screen.getAllByRole('button', { name: new RegExp(en.favorites.addFavorite) })[0]
+    expect(star.getAttribute('aria-pressed')).toBe('false')
     fireEvent.click(star)
     expect(mockToggle).toHaveBeenCalledWith(expect.objectContaining({ apiname: 'FIRST' }))
   })
@@ -209,8 +209,8 @@ describe('pinning', () => {
   test('shows a pinned achievement as checked, labelled to unpin', () => {
     pins(true, ['FIRST'])
     render(<SteamGameInfoTable achievements={LIST} appId={620} gameTitle="Portal 2" />)
-    const star = screen.getAllByRole('switch', { name: new RegExp(en.favorites.removeFavorite) })[0]
-    expect(star.getAttribute('aria-checked')).toBe('true')
+    const star = screen.getAllByRole('button', { name: new RegExp(en.favorites.removeFavorite) })[0]
+    expect(star.getAttribute('aria-pressed')).toBe('true')
   })
 })
 

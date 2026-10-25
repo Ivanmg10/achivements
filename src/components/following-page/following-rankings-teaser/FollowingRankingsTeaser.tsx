@@ -38,11 +38,11 @@ export default function FollowingRankingsTeaser({ className = '' }: { className?
 
       <span className="relative flex items-center justify-between gap-2">
         <span id="following-rankings-title" className="flex items-center gap-2 font-bold">
-          <span aria-hidden="true" className="w-8 h-8 rounded-[0.625rem] bg-accent/15 text-accent ring-1 ring-accent/25 flex items-center justify-center">
+          <span aria-hidden="true" className="w-8 h-8 rounded-tile bg-accent/15 text-accent ring-1 ring-accent/25 flex items-center justify-center">
             <IconTrophy size={16} />
           </span>
           {T.following.rankingsTitle}
-          <span className="inline-flex items-center h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold bg-accent/15 text-accent">{T.rankings.beta}</span>
+          <span className="inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-accent/15 text-accent">{T.rankings.beta}</span>
         </span>
         <span className="flex items-center gap-0.5 text-[0.8125rem] font-bold text-accent">
           {T.rankings.seeAll}

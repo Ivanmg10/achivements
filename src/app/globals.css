@@ -46,6 +46,9 @@
   --radius-field: var(--r-field);
   --radius-card: var(--r-card);
   --radius-button: var(--r-button);
+  --radius-tag: var(--r-tag);
+  --radius-pane: var(--r-pane);
+  --radius-tile: var(--r-tile);
 }
 
 /* ============================================
@@ -99,6 +102,9 @@
   --bar-radius: 0;
   --r-chip: 0.5rem;
   --r-button: 0.75rem;
+  --r-tag: 0.375rem;
+  --r-pane: 0.875rem;
+  --r-tile: 0.625rem;
   --r-track: 7px;
   --r-knob: 4px;
   --knob-w: 1.375rem;
@@ -139,6 +145,11 @@
   --bar-radius: 0;
   --r-chip: 0.5rem;
   --r-button: 0.75rem;
+  --r-tag: 0.375rem;
+  --r-pane: 0.875rem;
+  --r-tile: 0.625rem;
+  --r-field: 0.875rem;
+  --r-card: 1.25rem;
   --r-track: 7px;
   --r-knob: 4px;
   --knob-w: 1.375rem;
@@ -146,7 +157,7 @@
   --knob-shift: 1.125rem;
 }
 
-/* The round design: no slant anywhere. Bars are cut straight and rounded; buttons, chips and switches are pills and circles. */
+/* The round design, the site as it was before the slant: no slant anywhere, bars cut straight and rounded, soft corners on buttons, fields and cards, tags and chips as pills, switches as a pill with a round knob. */
 [data-shape="round"] {
   --slant-button: 0deg;
   --slant-pill: 0deg;
@@ -162,7 +173,12 @@
   --clip-fill: none;
   --bar-radius: min(999px, 0.5rem);
   --r-chip: 9999px;
-  --r-button: 9999px;
+  --r-button: 0.75rem;
+  --r-tag: 9999px;
+  --r-pane: 0.75rem;
+  --r-tile: 0.5rem;
+  --r-field: 0.75rem;
+  --r-card: 1rem;
   --r-track: 9999px;
   --r-knob: 9999px;
   --knob-w: 1.25rem;

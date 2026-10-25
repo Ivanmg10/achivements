@@ -48,9 +48,7 @@ test('no native select: the library has its own', () => {
 })
 
 test('on/off switches come from Switch', () => {
-  // The Steam pin star is a toggle that reads as a switch; it becomes ToggleButton in PR 3.
-  const allowed = [path.join('components', 'steam', 'steam-pin-achievement-button', 'SteamPinAchievementButton.tsx')]
-  expect(offenders(/role="switch"/).filter((f) => !allowed.includes(f))).toEqual([])
+  expect(offenders(/role="switch"/)).toEqual([])
 })
 
 test('checkboxes come from Checkbox', () => {
@@ -81,4 +79,13 @@ test('the shape of a bar or a mark comes from the design tokens, never a fixed p
 
 test('a streak is coloured by its tier, never a fixed hue', () => {
   expect(offenders(/StreakTag[\s\S]{0,200}className="[^"]*\bbg-(?:red|orange|amber|yellow)/)).toEqual([])
+})
+
+test('the radii the designs change come from the tokens, never a fixed value', () => {
+  // rounded-card / -pane / -tile / -tag / -button / -chip: the round design softens them or turns them to pills.
+  expect(offenders(/rounded-\[(?:1\.25|0\.875|0\.625|0\.375)rem\]/)).toEqual([])
+})
+
+test('a disclosure and a show-more button come from the library (Accordion, ShowMore)', () => {
+  expect(offenders(/aria-expanded=\{[^}]*\}[\s\S]{0,400}IconPlus/)).toEqual([])
 })

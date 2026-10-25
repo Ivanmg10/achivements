@@ -1806,7 +1806,7 @@ export const de: Translations = {
     tabPage: 'Seite',
     tabHome: 'Start',
     shapeSlantedHint: 'Schräge Enden bei Schaltflächen, Balken und Tags.',
-    shapeRoundHint: 'Pillen, Kreise und runde Balken.',
+    shapeRoundHint: 'Der klassische Look: weiche Ecken, Pillen-Tags, runde Schalter.',
     shapeLabel: 'Form',
     shapeSlanted: 'Schräg',
     shapeRound: 'Rund',

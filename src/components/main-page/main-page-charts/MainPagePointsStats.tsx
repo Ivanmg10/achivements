@@ -1,5 +1,6 @@
 'use client'
 
+import { streakInk, streakTier } from '@/utils/streakTier'
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { RecentAchievement, UserRankAndScore } from '@/types/types'
@@ -68,7 +69,7 @@ export default function MainPagePointsStats({
       <StatPill label={T.pointsStats.thisMonth} value={thisMonth.pts.toLocaleString()} sub={plural(thisMonth.ach, T.plurals.achievements, lang)} onClick={() => setMonthOpen(true)} />
       <StatPill label={T.pointsStats.avgPerDay} value={decimal(avgPerDay, lang)} sub={T.pointsStats.perDay} />
       {rank?.Rank != null && <StatPill label={T.userStats.globalRank} value={`#${rank.Rank.toLocaleString(lang)}`} sub={`${(rank.Score ?? 0).toLocaleString(lang)} pts`} />}
-      <StatPill label={T.streak.title} value={`${streak}d`} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} accent={streak > 0 ? 'text-accent' : undefined} href="/racha" />
+      <StatPill label={T.streak.title} value={`${streak}d`} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} accentColor={streak > 0 ? streakInk(streakTier(streak)) : undefined} href="/racha" />
 
       <AnimatePresence>
         {selectedDay && (

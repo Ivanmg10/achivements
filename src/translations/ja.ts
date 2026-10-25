@@ -1806,7 +1806,7 @@ export const ja: Translations = {
     tabPage: 'ページ',
     tabHome: 'ホーム',
     shapeSlantedHint: 'ボタン・バー・タグの端が斜めになります。',
-    shapeRoundHint: '丸いボタン、円、丸みのあるバー。',
+    shapeRoundHint: 'クラシックな見た目：やわらかい角、丸いタグ、丸いスイッチ。',
     shapeLabel: '形',
     shapeSlanted: '斜め',
     shapeRound: '丸み',

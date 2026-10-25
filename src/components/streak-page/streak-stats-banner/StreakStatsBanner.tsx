@@ -44,7 +44,7 @@ export default function StreakStatsBanner({ activeStreak, bestStreak, lastActive
     <section
       aria-label={T.streak.currentStreak}
       data-tier={tier.id}
-      className="relative overflow-hidden rounded-[1.25rem] ring-1 ring-inset ring-ink/[0.06] bg-bg-card p-6 sm:p-[2.375rem] flex flex-col lg:flex-row lg:items-center gap-8"
+      className="relative overflow-hidden rounded-card ring-1 ring-inset ring-ink/[0.06] bg-bg-card p-6 sm:p-[2.375rem] flex flex-col lg:flex-row lg:items-center gap-8"
       style={{ backgroundImage: `linear-gradient(110deg, rgb(${tier.color} / 0.22), transparent 55%)` }}
     >
       <div className="flex-1 min-w-0 flex flex-col gap-2">

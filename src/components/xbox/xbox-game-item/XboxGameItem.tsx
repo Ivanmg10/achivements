@@ -82,7 +82,7 @@ export default function XboxGameItem({
             >
               <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.title}</span>
             </Link>
-            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-[0.375rem] bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><XboxLogo size={12} className="opacity-60" aria-hidden="true" />
+            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><XboxLogo size={12} className="opacity-60" aria-hidden="true" />
                 {game.consoleName}</span>
           </span>
 

@@ -1806,7 +1806,7 @@ export const pt: Translations = {
     tabPage: 'Página',
     tabHome: 'Início',
     shapeSlantedHint: 'Pontas inclinadas em botões, barras e etiquetas.',
-    shapeRoundHint: 'Pílulas, círculos e barras arredondadas.',
+    shapeRoundHint: 'O aspeto clássico: cantos suaves, etiquetas em pílula, interruptores redondos.',
     shapeLabel: 'Forma',
     shapeSlanted: 'Inclinada',
     shapeRound: 'Arredondada',

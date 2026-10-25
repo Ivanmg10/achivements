@@ -22,8 +22,8 @@ export default function GameInfoSkeleton() {
           <div className="w-32 sm:w-40 lg:w-[13.5rem] aspect-[216/306] rounded-xl bg-ink/[0.07] shrink-0" />
           <div className="flex flex-col flex-1 min-w-0 gap-3.5 lg:pt-1.5 w-full">
             <div className="flex gap-2">
-              <div className="h-6 w-28 rounded-[0.375rem] bg-ink/[0.07]" />
-              <div className="h-6 w-20 rounded-[0.375rem] bg-ink/[0.06]" />
+              <div className="h-6 w-28 rounded-tag bg-ink/[0.07]" />
+              <div className="h-6 w-20 rounded-tag bg-ink/[0.06]" />
             </div>
             <div className="h-14 lg:h-[4.25rem] w-2/3 rounded-lg bg-ink/[0.09]" />
             <div className="h-2 w-full max-w-[38.75rem] bg-ink/[0.07]" />
@@ -46,8 +46,8 @@ export default function GameInfoSkeleton() {
               <div className="h-[4.5rem] rounded-xl bg-ink/[0.06]" />
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <div className="aspect-[320/224] rounded-[0.625rem] bg-ink/[0.05]" />
-              <div className="aspect-[320/224] rounded-[0.625rem] bg-ink/[0.05]" />
+              <div className="aspect-[320/224] rounded-tile bg-ink/[0.05]" />
+              <div className="aspect-[320/224] rounded-tile bg-ink/[0.05]" />
             </div>
           </div>
         </section>

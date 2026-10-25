@@ -18,7 +18,7 @@ const GAME_ART = steamAssetUrl(1927720, 'cover')
 
 function GameRow({ style }: { style: 'tinted' | 'flat' }) {
   return (
-    <div className="relative isolate rounded-[0.875rem] p-3.5 flex items-center gap-3">
+    <div className="relative isolate rounded-pane p-3.5 flex items-center gap-3">
       <GameCardBackdrop src={GAME_ART} style={style} />
       <span aria-hidden="true" className="w-12 h-12 rounded-lg bg-ink/25 shrink-0" />
       <span className="flex flex-col gap-1.5 flex-1 min-w-0">

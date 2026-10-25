@@ -1806,7 +1806,7 @@ export const pl: Translations = {
     tabPage: 'Strona',
     tabHome: 'Start',
     shapeSlantedHint: 'Skośne końce przycisków, pasków i etykiet.',
-    shapeRoundHint: 'Pigułki, koła i zaokrąglone paski.',
+    shapeRoundHint: 'Klasyczny wygląd: miękkie rogi, etykiety-pigułki, okrągłe przełączniki.',
     shapeLabel: 'Kształt',
     shapeSlanted: 'Skośny',
     shapeRound: 'Zaokrąglony',

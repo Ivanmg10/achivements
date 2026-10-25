@@ -8,7 +8,7 @@ const DESIGN_TOKENS = [
   '--slant-button', '--slant-pill', '--slant-line', '--slant-mark', '--slant-cut',
   '--clip-3', '--clip-4', '--clip-5', '--clip-6', '--clip-8', '--clip-14', '--clip-fill', '--bar-radius',
   '--r-chip', '--r-control', '--r-field', '--r-card',
-  '--r-button', '--r-track', '--r-knob', '--knob-w', '--knob-h', '--knob-shift',
+  '--r-button', '--r-tag', '--r-pane', '--r-tile', '--r-track', '--r-knob', '--knob-w', '--knob-h', '--knob-shift',
   '--h-control-sm', '--h-control', '--h-field',
   '--motion-hover', '--motion-open', '--motion-indicator', '--ease-spring',
 ]
@@ -29,7 +29,7 @@ function designBlock(name: 'slanted' | 'round') {
   const start = css.indexOf(`[data-shape="${name}"] {`)
   return css.slice(start, css.indexOf('}', start))
 }
-const SHAPE_TOKENS = DESIGN_TOKENS.filter((t) => /^--(slant|clip|bar-radius|r-chip|r-button|r-track|r-knob|knob)/.test(t))
+const SHAPE_TOKENS = DESIGN_TOKENS.filter((t) => /^--(slant|clip|bar-radius|r-chip|r-button|r-tag|r-pane|r-tile|r-field|r-card|r-track|r-knob|knob)/.test(t))
 const valueIn = (block: string, token: string) => block.match(new RegExp(`${token}: ([^;]+);`))?.[1]
 
 test('no theme overrides the shapes: only the two designs do, for all themes at once', () => {
@@ -50,7 +50,9 @@ test('the round design takes the slant out of every slanted token and rounds the
   const round = designBlock('round')
   for (const token of ['--slant-button', '--slant-pill', '--slant-line', '--slant-mark', '--slant-cut']) expect(round).toContain(`${token}: 0deg`)
   for (const token of ['--clip-3', '--clip-4', '--clip-5', '--clip-6', '--clip-8', '--clip-14', '--clip-fill']) expect(round).toContain(`${token}: none`)
-  for (const token of ['--r-chip', '--r-button', '--r-track', '--r-knob']) expect(round).toContain(`${token}: 9999px`)
+  // Chips, tags and the switch are pills; buttons, fields and cards keep soft corners.
+  for (const token of ['--r-chip', '--r-tag', '--r-track', '--r-knob']) expect(round).toContain(`${token}: 9999px`)
+  for (const token of ['--r-button', '--r-field', '--r-card']) expect(valueIn(round, token)).not.toBe('9999px')
   // The knob is a circle: as wide as it is tall.
   expect(valueIn(round, '--knob-w')).toBe(valueIn(round, '--knob-h'))
 })
@@ -67,7 +69,7 @@ test('light surfaces get darker RA marks', () => {
 })
 
 test('Tailwind sees the colours and radii', () => {
-  for (const name of ['--color-hardcore', '--color-softcore', '--radius-chip', '--radius-control', '--radius-field', '--radius-card', '--radius-button']) {
+  for (const name of ['--color-hardcore', '--color-softcore', '--radius-chip', '--radius-control', '--radius-field', '--radius-card', '--radius-button', '--radius-tag', '--radius-pane', '--radius-tile']) {
     expect(css).toContain(`${name}:`)
   }
 })

@@ -9,7 +9,7 @@ const SLANT = slantStyle(4)
  */
 export default function RankingsGuideTable({ head, rows, weights }: { head: [string, string]; rows: [string, string][]; weights?: number[] }) {
   return (
-    <div className="bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] rounded-[0.875rem] overflow-x-auto">
+    <div className="bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] rounded-pane overflow-x-auto">
       <table className="w-full text-sm border-separate border-spacing-0">
         <thead>
           <tr>

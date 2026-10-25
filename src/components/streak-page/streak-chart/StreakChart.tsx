@@ -6,6 +6,7 @@ import { Streak } from '@/types/types'
 import { decimal, formatDay, plural } from '@/utils/utils'
 import StreakSectionHead from '../streak-section-head/StreakSectionHead'
 import { slantStyle } from '@/components/ui/shape'
+import { streakInk, streakTier } from '@/utils/streakTier'
 
 const MAX_ROWS = 6
 const SLANT = slantStyle(6)
@@ -34,7 +35,7 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
   const same = (a: Streak | null, b: Streak) => a?.start === b.start && a?.end === b.end
 
   return (
-    <section aria-labelledby="streak-best-title" className="bg-bg-card rounded-[1.25rem] ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-3 h-full">
+    <section aria-labelledby="streak-best-title" className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-3 h-full">
       <StreakSectionHead
         id="streak-best-title"
         title={T.streak.chartTitle}
@@ -56,12 +57,12 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
                   on ? 'bg-ink/[0.05]' : 'hover:bg-ink/[0.04]'
                 }`}
               >
-                <span className={`font-display italic font-extrabold text-2xl tabular-nums ${live ? 'text-accent' : 'text-text-secondary'}`}>{i + 1}</span>
+                <span className={`font-display italic font-extrabold text-2xl tabular-nums ${live ? '' : 'text-text-secondary'}`} style={live ? { color: streakInk(streakTier(streak.days)) } : undefined}>{i + 1}</span>
                 <span className="flex flex-col gap-1 min-w-0">
                   <motion.span
                     aria-hidden="true"
-                    className={`h-[1.375rem] flex items-center px-3 text-xs font-bold text-bg-main whitespace-nowrap overflow-hidden ${live ? 'bg-accent' : 'bg-accent/35'}`}
-                    style={SLANT}
+                    className={`h-[1.375rem] flex items-center px-3 text-xs font-bold text-bg-main whitespace-nowrap overflow-hidden ${live ? '' : 'bg-accent/35'}`}
+                    style={live ? { ...SLANT, backgroundColor: `rgb(${streakTier(streak.days).color})` } : SLANT}
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.max(12, (streak.days / maxDays) * 88)}%` }}
                     transition={{ duration: 0.45, delay: i * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}

@@ -22,7 +22,7 @@ export default function UserVaultLevel() {
   const toNext = T.rankings.toLevel.replace('{n}', n(p.span - p.into)).replace('{level}', String(p.level + 1))
 
   return (
-    <div className="flex flex-col gap-2 rounded-[0.875rem] bg-bg-main p-4">
+    <div className="flex flex-col gap-2 rounded-pane bg-bg-main p-4">
       <Link
         href="/rankings"
         className="group flex flex-col gap-2 rounded-lg -m-1 p-1 hover:bg-ink/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"

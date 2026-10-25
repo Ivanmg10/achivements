@@ -78,7 +78,7 @@ export default function MainPagePortada() {
           {hero.title}
         </h2>
         {hero.console && (
-          <span className="self-start inline-flex items-center h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold bg-black/50 text-text-main">
+          <span className="self-start inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-black/50 text-text-main">
             {hero.console}
           </span>
         )}

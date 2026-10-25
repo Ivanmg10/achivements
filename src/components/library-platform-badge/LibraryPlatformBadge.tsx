@@ -18,7 +18,7 @@ export default function LibraryPlatformBadge({ source, size = 'sm' }: { source: 
   return (
     <span
       className={`inline-flex items-center font-semibold bg-bg-main text-text-main whitespace-nowrap ${
-        large ? 'gap-1.5 h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold bg-black/45' : 'gap-1.5 text-[10px] px-1.5 py-0.5 rounded-md'
+        large ? 'gap-1.5 h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-black/45' : 'gap-1.5 text-[10px] px-1.5 py-0.5 rounded-md'
       }`}
     >
       <PlatformLogo source={source} size={large ? 18 : 11} />

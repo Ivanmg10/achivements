@@ -52,7 +52,7 @@ export default function SearchModalGameResult({
       }
       right={
         game.status && (
-          <span className={`inline-flex items-center h-6 px-2 rounded-[0.375rem] text-xs font-bold whitespace-nowrap shrink-0 ${STATUS_CLASSES[game.status]}`}>
+          <span className={`inline-flex items-center h-6 px-2 rounded-tag text-xs font-bold whitespace-nowrap shrink-0 ${STATUS_CLASSES[game.status]}`}>
             {STATUS_LABELS[game.status]}
           </span>
         )

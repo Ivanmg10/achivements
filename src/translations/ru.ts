@@ -1806,7 +1806,7 @@ export const ru: Translations = {
     tabPage: 'Страница',
     tabHome: 'Главная',
     shapeSlantedHint: 'Скошенные края у кнопок, полос и меток.',
-    shapeRoundHint: 'Таблетки, круги и скруглённые полосы.',
+    shapeRoundHint: 'Классический вид: мягкие углы, метки-таблетки, круглые переключатели.',
     shapeLabel: 'Форма',
     shapeSlanted: 'Скошенная',
     shapeRound: 'Скруглённая',

@@ -19,7 +19,7 @@ export default function UserHomeLayoutPreferencePreview({ layout }: { layout: Ho
     </span>
   )
   return (
-    <span className="flex flex-col gap-1.5 rounded-[0.625rem] bg-bg-main/80 p-2 h-28">
+    <span className="flex flex-col gap-1.5 rounded-tile bg-bg-main/80 p-2 h-28">
       {layout === 'cover' && <span className="block h-10 shrink-0 rounded-[0.3125rem] bg-linear-to-r from-transparent to-accent/80" />}
       <span className="grid grid-cols-[1.7fr_1fr] gap-1.5 flex-1">
         <span className="flex flex-col gap-1.5">

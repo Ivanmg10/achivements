@@ -12,7 +12,7 @@ import VaultPlatformSplit, { PLATFORM_FILL, PLATFORM_NAMES, PLATFORM_ORDER } fro
 import { levelProgress } from '@/utils/vaultLevel'
 
 /** A card of the rankings' side column. */
-export const CARD = 'bg-bg-card rounded-[1.25rem] ring-1 ring-inset ring-ink/[0.06] p-5 flex flex-col gap-3'
+export const CARD = 'bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 flex flex-col gap-3'
 
 /**
  * Your own level beside the rankings: the ring to the next level, your tier,
@@ -78,7 +78,7 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
               <span className="flex flex-wrap justify-center items-center gap-1.5">
                 <VaultLevelBadge points={me.points} />
                 {me.rank > 0 && (
-                  <span className="inline-flex items-center h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold bg-ink/[0.06]">
+                  <span className="inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-ink/[0.06]">
                     {T.rankings.statRank} #{n(me.rank)}
                   </span>
                 )}
@@ -96,7 +96,7 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
                 [T.rankings.statWeek, `+${n(me.week)}`, me.week > 0],
                 [T.rankings.statMonth, `+${n(me.month)}`, me.month > 0],
               ].map(([label, value, up]) => (
-                <div key={String(label)} className="bg-bg-main rounded-[0.625rem] p-2 flex flex-col min-w-0">
+                <div key={String(label)} className="bg-bg-main rounded-tile p-2 flex flex-col min-w-0">
                   <dt className="text-[0.6875rem] text-text-secondary truncate">{label}</dt>
                   <dd className={`font-extrabold tabular-nums truncate ${up ? 'text-success' : ''}`}>{value}</dd>
                 </div>

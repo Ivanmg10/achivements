@@ -51,7 +51,7 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
       <div className="relative -mt-10 px-5 pb-5 flex flex-col gap-2.5 flex-1">
         <span className="flex items-center gap-2 min-w-0">
           <span className="text-2xl font-extrabold truncate group-hover:text-accent transition-colors">{group.title}</span>
-          <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-[0.375rem] font-bold whitespace-nowrap bg-ink/10 text-text-secondary text-xs shrink-0">
+          <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-tag font-bold whitespace-nowrap bg-ink/10 text-text-secondary text-xs shrink-0">
             <Privacy className="w-3 h-3" aria-hidden="true" />
             {group.is_public ? T.groups.public : T.groups.private}
           </span>
@@ -62,7 +62,7 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
         {group.total_possible > 0 && <ProgressBar pct={pct} label={group.title} />}
 
         <span className="flex flex-wrap items-center gap-1.5 text-xs mt-auto">
-          <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-[0.375rem] font-bold whitespace-nowrap bg-ink/[0.07] text-text-secondary">
+          <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-tag font-bold whitespace-nowrap bg-ink/[0.07] text-text-secondary">
             {plural(group.game_count, T.plurals.games, lang)}
             <GroupPlatformLogos group={group} />
           </span>
@@ -74,10 +74,10 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
           ) : (
             <>
               {(group.started_count ?? 0) > 0 && (
-                <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-[0.375rem] font-bold whitespace-nowrap bg-info/[0.14] text-info">{T.groups.startedCount.replace('{n}', String(group.started_count))}</span>
+                <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-tag font-bold whitespace-nowrap bg-info/[0.14] text-info">{T.groups.startedCount.replace('{n}', String(group.started_count))}</span>
               )}
               {(group.completed_count ?? 0) > 0 && (
-                <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-[0.375rem] font-bold whitespace-nowrap bg-success/[0.14] text-success">{T.groups.completedCount.replace('{n}', String(group.completed_count))}</span>
+                <span className="inline-flex items-center gap-1.5 h-[1.375rem] px-2 rounded-tag font-bold whitespace-nowrap bg-success/[0.14] text-success">{T.groups.completedCount.replace('{n}', String(group.completed_count))}</span>
               )}
               <span className="ml-auto text-text-secondary truncate">
                 {group.total_possible > 0 &&

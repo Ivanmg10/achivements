@@ -70,7 +70,7 @@ export default function UserIdentityCard() {
   ]
 
   return (
-    <section className="relative bg-bg-card rounded-[1.25rem] ring-1 ring-inset ring-ink/[0.06] overflow-hidden flex flex-col">
+    <section className="relative bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] overflow-hidden flex flex-col">
       <UserProfileBanner avatar={user?.avatar} />
 
       <div className="relative px-4 sm:px-7 pt-6 sm:pt-7 pb-6 sm:pb-7 flex flex-col gap-4 flex-1">
@@ -107,7 +107,7 @@ export default function UserIdentityCard() {
             <div className="flex items-center gap-2.5 flex-wrap">
               <h1 className="font-display italic font-extrabold text-[2.75rem] sm:text-[4rem] leading-[0.9] pr-1 truncate">{user?.name}</h1>
               {user?.admin && (
-                <span className="inline-flex items-center h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold bg-warning/20 text-warning">
+                <span className="inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-warning/20 text-warning">
                   {T.userData.admin}
                 </span>
               )}

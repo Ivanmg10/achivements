@@ -63,7 +63,7 @@ test('each row carries the anchor its links point at', () => {
 test('signed in, each row can be pinned', () => {
   ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set<string>(), leading: new Set<string>(), toggle, canPin: true })
   render(<XboxGameInfoTable gameId={100} gameTitle="Halo" achievements={ACHIEVEMENTS} />)
-  fireEvent.click(within(screen.getByRole('table')).getByRole('switch', { name: `${en.favorites.addFavorite}: Common` }))
+  fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: `${en.favorites.addFavorite}: Common` }))
   expect(toggle).toHaveBeenCalledWith(ACHIEVEMENTS[1])
 })
 

@@ -35,7 +35,7 @@ export default function RankingsGuideBlock({
             {points.map((p) => (
               <li
                 key={p}
-                className="relative rounded-[0.875rem] bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] py-3 pl-6 pr-4 text-sm sm:text-base text-text-secondary leading-relaxed before:content-[''] before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-[3px] before:bg-accent before:skew-y-(--slant-mark)"
+                className="relative rounded-pane bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] py-3 pl-6 pr-4 text-sm sm:text-base text-text-secondary leading-relaxed before:content-[''] before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-[3px] before:bg-accent before:skew-y-(--slant-mark)"
               >
                 {p}
               </li>

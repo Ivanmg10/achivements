@@ -24,7 +24,7 @@ export default function RankingsGuideExample({ text }: { text: VaultGuideText['e
   ]
 
   return (
-    <div className="bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] rounded-[0.875rem] p-4 flex flex-col gap-3">
+    <div className="bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] rounded-pane p-4 flex flex-col gap-3">
       <p className="text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary">{text.aaa}</p>
       <ul className="flex flex-col gap-2.5">
         {rows.map((r, i) => (

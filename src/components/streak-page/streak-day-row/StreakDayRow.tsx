@@ -51,7 +51,7 @@ export default function StreakDayRow({ date, today, achievements, awards = [] }:
         </div>
       )}
 
-      <div className="flex items-center gap-4 rounded-[0.875rem] bg-bg-main px-4 py-3 min-w-0">
+      <div className="flex items-center gap-4 rounded-pane bg-bg-main px-4 py-3 min-w-0">
         <span aria-hidden="true" className="flex flex-col items-center shrink-0 w-12">
           <span className="font-display italic font-extrabold text-[2rem] leading-none tabular-nums pr-1">{formatDay(date, lang, { day: 'numeric' })}</span>
           <span className="text-xs text-text-secondary">{formatDay(date, lang, { month: 'short' })}</span>

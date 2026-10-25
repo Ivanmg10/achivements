@@ -16,7 +16,7 @@ const MEANING: [string, string, string][] = [
   ['softcore', 'bg-softcore', 'RA softcore'],
 ]
 const INK: [string, string][] = [['ink/6', 'bg-ink/[0.06]'], ['ink/12', 'bg-ink/[0.12]'], ['ink/20', 'bg-ink/20']]
-const RADII = ['rounded-chip', 'rounded-button', 'rounded-control', 'rounded-field', 'rounded-card']
+const RADII = ['rounded-chip', 'rounded-tag', 'rounded-button', 'rounded-tile', 'rounded-pane', 'rounded-field', 'rounded-card']
 const MOTION: [string, string][] = [['--motion-hover', '150ms'], ['--motion-open', '250ms'], ['--motion-indicator', '450ms']]
 
 function Swatch({ name, cls, use }: { name: string; cls: string; use?: string }) {
@@ -64,7 +64,7 @@ export default function DesignCatalogFoundations() {
 
       <DesignCatalogPiece id="shape">
         <Compare>
-          <Specimen name="Radii: chip, button, control, field, card">
+          <Specimen name="Radii: chip, tag, button, tile, pane, field, card">
             {RADII.map((r) => <span key={r} aria-hidden="true" className={`h-12 w-16 bg-ink/15 ring-1 ring-ink/20 ${r}`} />)}
           </Specimen>
           <Specimen name="slantStyle(3 · 8 · 14)">

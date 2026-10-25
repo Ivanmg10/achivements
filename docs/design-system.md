@@ -9,7 +9,7 @@ then `CLAUDE.md` → "The component library" for the hard rules.
 1. **Tokens** (`src/app/globals.css`): colours of a theme (`--accent`, `--bg-card`…),
    and the *design* — shapes, sizes, motion (`--slant-*`, `--clip-*`, `--bar-radius`,
    `--r-*`, `--h-*`, `--motion-*`). A theme changes the colours; a design changes
-   the shapes. Today there are two designs: **slanted** (the default) and **round**
+   the shapes. Today there are two designs: **slanted** (the default) and **round**, the site as it was before the slant
    (`[data-shape="round"]`, the person's choice, `useShapeStyle`; usable on any element). A third
    would be one more block of overrides, not an edit of any component.
 2. **The library** (`src/components/ui`, plus `VaultLevelBadge`, `GameCardBackdrop`…):
@@ -23,6 +23,7 @@ then `CLAUDE.md` → "The component library" for the hard rules.
   text field, select, switch, checkbox, dialog, hard-coded palette colour, fixed
   `polygon(...)` or `skew-*-[..]`. If it fails, use the piece; if the piece is
   missing, add it (below).
+- **Radii come from tokens too** (`rounded-card`, `-pane`, `-tile`, `-tag`, `-button`, `-chip`, `-field`): the round design softens or pills them. The guard refuses the fixed values (`rounded-[1.25rem]`…).
 - **Shapes come from tokens.** A bar's cut ends are `slantStyle(px)`
   (`ui/shape.ts`); a mark's lean is `skew-y-(--slant-mark)`; a control's slant is
   `skew-x-(--slant-button)`. Never a literal.
@@ -70,7 +71,8 @@ flag is read from the database, never the session).
 
 ## What is not here yet
 
-- The Disclosure pieces (`Accordion`, `ShowMore`, `ToggleButton`, `Shelf`) agreed on
-  the canvas have no page that uses them.
+- Two Disclosure pieces agreed on the canvas are still page-specific: the horizontal
+  `Shelf` (`LibraryShelf`) and the striped drop slot of a drag (the groups' sortable
+  rows). `Accordion`, `ShowMore` and `ToggleButton` are in the library and used.
 - The V6 canvas boards are the *history* of the design (`docs/designs.md`); the
   catalogue is the *current* truth. If they disagree, the catalogue wins.

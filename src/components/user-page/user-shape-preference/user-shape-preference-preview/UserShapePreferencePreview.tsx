@@ -8,7 +8,7 @@ import { slantStyle } from '@/components/ui/shape'
  */
 export default function UserShapePreferencePreview({ shape }: { shape: ShapeStyle }) {
   return (
-    <span data-shape={shape} className="flex flex-col gap-2.5 rounded-[0.625rem] bg-bg-main/80 p-3">
+    <span data-shape={shape} className="flex flex-col gap-2.5 rounded-tile bg-bg-main/80 p-3">
       <span className="flex items-center gap-2">
         <span className="relative isolate h-7 w-16 grid place-items-center">
           <span className="absolute inset-y-0 inset-x-[3px] bg-accent skew-x-(--slant-button) rounded-button" />

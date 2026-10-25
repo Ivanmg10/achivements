@@ -44,7 +44,7 @@ export default function RankingsGuide() {
         </Link>
         <h1 className="relative flex items-center gap-3 flex-wrap font-display italic font-extrabold text-5xl sm:text-[4.5rem] leading-[0.9] pr-2">
           {g.heading}
-          <span className="not-italic font-sans inline-flex items-center h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold bg-accent/15 text-accent">{T.rankings.beta}</span>
+          <span className="not-italic font-sans inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-accent/15 text-accent">{T.rankings.beta}</span>
         </h1>
         <p className="relative max-w-2xl text-base sm:text-lg text-text-main/85 leading-relaxed">{g.intro}</p>
         <p className="relative self-start max-w-2xl text-[0.8125rem] text-text-secondary bg-black/25 rounded-xl px-3.5 py-2.5">{T.rankings.betaNote}</p>
@@ -77,7 +77,7 @@ export default function RankingsGuide() {
       <RankingsGuideBlock index={6} {...g.notCounted} />
 
       <RankingsGuideBlock index={7} {...g.levels}>
-        <div className="bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] rounded-[0.875rem] overflow-x-auto">
+        <div className="bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] rounded-pane overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="border-b border-ink/[0.1] text-[0.6875rem] uppercase tracking-[0.08em] text-text-secondary">

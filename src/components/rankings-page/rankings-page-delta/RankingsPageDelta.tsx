@@ -4,7 +4,7 @@ import { IconArrowDown, IconArrowUp } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
 /** The design's 22 px tag. */
-const TAG = 'inline-flex items-center gap-0.5 h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold'
+const TAG = 'inline-flex items-center gap-0.5 h-[1.375rem] px-2 rounded-tag text-xs font-bold'
 
 /** Places moved since Monday: up in green, down in red, each said in words too; null is someone new this week. */
 export default function RankingsPageDelta({ delta }: { delta: number | null }) {

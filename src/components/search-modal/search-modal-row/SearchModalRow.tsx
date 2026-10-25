@@ -7,7 +7,7 @@ import { matchParts } from '@/utils/utils'
  * the accent's slanted mark on the left of the one with focus.
  */
 export const SEARCH_ROW =
-  "relative overflow-hidden w-full flex items-center gap-3 min-h-[3.375rem] px-2.5 py-1.5 rounded-[0.625rem] text-left cursor-pointer transition-colors hover:bg-accent/10 focus-visible:bg-accent/10 focus-visible:outline-none before:content-[''] before:absolute before:left-0 before:top-2.5 before:bottom-2.5 before:w-[3px] before:bg-accent before:skew-y-(--slant-mark) before:opacity-0 focus-visible:before:opacity-100"
+  "relative overflow-hidden w-full flex items-center gap-3 min-h-[3.375rem] px-2.5 py-1.5 rounded-tile text-left cursor-pointer transition-colors hover:bg-accent/10 focus-visible:bg-accent/10 focus-visible:outline-none before:content-[''] before:absolute before:left-0 before:top-2.5 before:bottom-2.5 before:w-[3px] before:bg-accent before:skew-y-(--slant-mark) before:opacity-0 focus-visible:before:opacity-100"
 
 /**
  * One result in the search panel: a picture, the name with what matches the

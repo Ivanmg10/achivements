@@ -15,7 +15,7 @@ export default function StreakWeekdays({ counts }: { counts: number[] }) {
   const top = counts.indexOf(Math.max(...counts))
 
   return (
-    <section aria-labelledby="streak-weekdays-title" className="bg-bg-card rounded-[1.25rem] ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-4 h-full">
+    <section aria-labelledby="streak-weekdays-title" className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-4 h-full">
       <StreakSectionHead id="streak-weekdays-title" title={T.streak.weekdaysTitle} aside={T.streak.weekdaysSub} />
       <ul className="flex items-end gap-2 flex-1" style={{ minHeight: BAR_HEIGHT + 40 }}>
         {counts.map((n, i) => (

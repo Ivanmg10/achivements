@@ -1806,7 +1806,7 @@ export const fr: Translations = {
     tabPage: 'Page',
     tabHome: 'Accueil',
     shapeSlantedHint: 'Bouts inclinés sur les boutons, barres et étiquettes.',
-    shapeRoundHint: 'Pilules, cercles et barres arrondies.',
+    shapeRoundHint: 'L\'aspect classique : coins doux, étiquettes en pilule, interrupteurs ronds.',
     shapeLabel: 'Forme',
     shapeSlanted: 'Inclinée',
     shapeRound: 'Arrondie',

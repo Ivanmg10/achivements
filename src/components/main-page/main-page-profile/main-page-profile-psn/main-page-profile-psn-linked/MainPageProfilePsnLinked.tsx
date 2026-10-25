@@ -91,7 +91,7 @@ export default function MainPageProfilePsnLinked({
               {summary.trophyLevel}
             </span>
           </span>
-          {summary.isPlus && <span className="px-1.5 py-0.5 rounded-[0.375rem] bg-hardcore/15 text-hardcore font-bold text-xs">PS Plus</span>}
+          {summary.isPlus && <span className="px-1.5 py-0.5 rounded-tag bg-hardcore/15 text-hardcore font-bold text-xs">PS Plus</span>}
         </div>
         {summary.aboutMe && <p className="text-[0.8125rem] text-text-secondary line-clamp-2">{summary.aboutMe}</p>}
       </MainPageProfileCard>

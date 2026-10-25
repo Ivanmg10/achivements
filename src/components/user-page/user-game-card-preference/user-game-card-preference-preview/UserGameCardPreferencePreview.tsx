@@ -14,7 +14,7 @@ export default function UserGameCardPreferencePreview({ style }: { style: GameCa
     </span>
   )
   return (
-    <span className="flex flex-col gap-1.5 rounded-[0.625rem] bg-bg-main/80 p-2">
+    <span className="flex flex-col gap-1.5 rounded-tile bg-bg-main/80 p-2">
       {card('bg-linear-to-r from-accent/35 to-transparent')}
       {card('bg-linear-to-r from-info/35 to-transparent')}
     </span>

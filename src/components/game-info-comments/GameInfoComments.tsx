@@ -84,7 +84,7 @@ export default function GameInfoComments({ gameId }: { gameId: number }) {
       <section aria-labelledby="game-comments-title" className={shell}>
         <div className="flex items-center gap-2.5">
           <h2 id="game-comments-title" className="text-xl font-bold">{T.gameComments.title}</h2>
-          <span className="inline-flex items-center h-6 px-2 rounded-[0.375rem] text-xs font-bold tabular-nums bg-ink/[0.07] text-text-secondary">{total}</span>
+          <span className="inline-flex items-center h-6 px-2 rounded-tag text-xs font-bold tabular-nums bg-ink/[0.07] text-text-secondary">{total}</span>
           <IconButton
             onClick={() => setOpen((o) => !o)}
             aria-expanded={open}

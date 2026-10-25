@@ -21,13 +21,13 @@ export default function GameHeroMedia({ shots }: { shots: (GameHeroShot | null)[
             width={320}
             height={224}
             unoptimized
-            className="block w-full aspect-[320/224] rounded-[0.625rem] overflow-hidden ring-1 ring-inset ring-ink/10"
+            className="block w-full aspect-[320/224] rounded-tile overflow-hidden ring-1 ring-inset ring-ink/10"
           />
         )
         return (
           <figure key={s.src} className="flex flex-col gap-1.5 m-0 min-w-0">
             {s.full ? (
-              <a href={s.full} target="_blank" rel="noopener noreferrer" className="block rounded-[0.625rem] hover:ring-2 hover:ring-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 transition-shadow">
+              <a href={s.full} target="_blank" rel="noopener noreferrer" className="block rounded-tile hover:ring-2 hover:ring-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 transition-shadow">
                 {img}
               </a>
             ) : (

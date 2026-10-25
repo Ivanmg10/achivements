@@ -84,7 +84,7 @@ test('with DLC, tabs pick a group; without, no tabs', () => {
 test('signed in, each row can be pinned', () => {
   ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set<number>(), leading: new Set<number>(), toggle, canPin: true })
   render(<PsnGameInfoTable gameId={100} gameTitle="Astro Bot" trophies={TROPHIES} />)
-  fireEvent.click(within(screen.getByRole('table')).getByRole('switch', { name: `${en.favorites.addFavorite}: Common` }))
+  fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: `${en.favorites.addFavorite}: Common` }))
   expect(toggle).toHaveBeenCalledWith(TROPHIES[1])
 })
 

@@ -35,7 +35,7 @@ export default function MainPageProfileNowPlaying({
   return (
     <Link
       href={href}
-      className="relative isolate rounded-[0.875rem] px-3.5 py-3 flex flex-col gap-2.5 w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="relative isolate rounded-pane px-3.5 py-3 flex flex-col gap-2.5 w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       <GameCardBackdrop src={tintSrc} />
       <span className="text-[0.6875rem] font-bold uppercase tracking-[0.09em] text-text-secondary truncate">{kicker}</span>

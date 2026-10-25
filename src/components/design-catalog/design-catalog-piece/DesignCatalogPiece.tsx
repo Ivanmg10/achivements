@@ -67,7 +67,7 @@ export function Specimen({ name, children, className = '' }: { name?: string; ch
 
 const DESIGNS = [
   { shape: 'slanted', label: 'Slanted', note: 'the default' },
-  { shape: 'round', label: 'Round', note: 'pills and circles' },
+  { shape: 'round', label: 'Round', note: 'the classic look' },
 ] as const
 
 /**
@@ -79,7 +79,7 @@ export function Compare({ children }: { children: ReactNode }) {
   return (
     <div className="grid gap-3 lg:grid-cols-2">
       {DESIGNS.map(({ shape, label, note }) => (
-        <div key={shape} data-shape={shape} role="group" aria-label={label} className="rounded-[0.875rem] bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] p-4 sm:p-5 flex flex-col gap-4">
+        <div key={shape} data-shape={shape} role="group" aria-label={label} className="rounded-pane bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] p-4 sm:p-5 flex flex-col gap-4">
           <p className="flex items-baseline gap-2 text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-text-secondary">
             {label} <span className="font-normal normal-case tracking-normal">· {note}</span>
           </p>
@@ -92,5 +92,5 @@ export function Compare({ children }: { children: ReactNode }) {
 
 /** One panel for a specimen that does not change with the design. */
 export function Panel({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-[0.875rem] bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] p-4 sm:p-5 flex flex-col gap-4 ${className}`}>{children}</div>
+  return <div className={`rounded-pane bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] p-4 sm:p-5 flex flex-col gap-4 ${className}`}>{children}</div>
 }

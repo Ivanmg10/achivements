@@ -29,6 +29,24 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-25 (night, 3) — The round design as it was, tiers everywhere, Disclosure (`feat/65-ui-surfaces`, #65)
+
+**Did** — (1) The round design is the old look: buttons, fields and cards keep soft corners (not
+pills), tags and chips are pills, the switch is a pill with a round knob. New radius tokens
+`--r-tag/-pane/-tile` and `rounded-tag/-pane/-tile`; 52 files swapped their fixed `rounded-[..rem]`
+for tokens, and the guard refuses the fixed values. (2) Streak tiers also colour the home's stats
+tile (`StatPill.accentColor`), the rankings' streak column and the live bar on `/racha`.
+(3) Disclosure in the library: `Accordion` (the FAQ's item), `ShowMore` (the two "show the rest"
+buttons), `ToggleButton` (the Steam / PSN / Xbox pin star, now `aria-pressed` instead of
+`role="switch"`; the guard's exception is gone); all three in the catalogue.
+**Decisions** — `ShowMore` replaces the small pill of `ShowAllButton` with a secondary button (small
+size) so there is one look for "show the rest".
+**Open** — `Shelf` and the striped drag slot stay page-specific (`LibraryShelf`, the groups' sortable
+rows): moving them needs their own pass.
+**Watch out** — The pin star is a button with `aria-pressed` now: tests look for `button`, not `switch`.
+
+---
+
 ## 2026-10-25 (night, 2) — Review round 4: round switch, Layout modal, catalogue (`feat/65-ui-surfaces`, #65)
 
 **Did** — (1) The round design's switch is a pill with a circular knob (tokens `--r-track`,

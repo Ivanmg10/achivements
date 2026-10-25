@@ -40,15 +40,15 @@ afterEach(() => jest.useRealTimers())
 describe('pin star', () => {
   test('is absent when the user cannot pin', () => {
     render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
-    expect(screen.queryByRole('switch')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: new RegExp(en.favorites.addFavorite) })).not.toBeInTheDocument()
     expect(useSteamFavoriteAchievements).toHaveBeenCalledWith(620, 'Portal 2')
   })
 
   test('pins an unpinned achievement', () => {
     pins(true)
     render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
-    const star = screen.getByRole('switch', { name: `${en.favorites.addFavorite}: Win a Match` })
-    expect(star.getAttribute('aria-checked')).toBe('false')
+    const star = screen.getByRole('button', { name: `${en.favorites.addFavorite}: Win a Match` })
+    expect(star.getAttribute('aria-pressed')).toBe('false')
     fireEvent.click(star)
     expect(mockToggle).toHaveBeenCalledWith(expect.objectContaining({ apiname: 'WIN' }))
   })
@@ -56,8 +56,8 @@ describe('pin star', () => {
   test('shows a pinned achievement as checked, labelled to unpin', () => {
     pins(true, ['WIN'])
     render(<SteamAchievementGrid appId={620} gameTitle="Portal 2" achievements={[ach()]} />)
-    const star = screen.getByRole('switch', { name: `${en.favorites.removeFavorite}: Win a Match` })
-    expect(star.getAttribute('aria-checked')).toBe('true')
+    const star = screen.getByRole('button', { name: `${en.favorites.removeFavorite}: Win a Match` })
+    expect(star.getAttribute('aria-pressed')).toBe('true')
   })
 })
 

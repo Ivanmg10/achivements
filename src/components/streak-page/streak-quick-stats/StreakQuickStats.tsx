@@ -1,7 +1,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { decimal, plural } from '@/utils/utils'
 
-const TILE = 'bg-bg-main rounded-[0.875rem] px-4 py-3.5 flex flex-col min-w-0'
+const TILE = 'bg-bg-main rounded-pane px-4 py-3.5 flex flex-col min-w-0'
 const LABEL = 'text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-text-secondary truncate'
 const VALUE = 'text-[1.875rem] leading-tight font-extrabold tabular-nums'
 

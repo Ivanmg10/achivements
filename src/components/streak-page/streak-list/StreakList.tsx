@@ -51,7 +51,7 @@ export default function StreakList({ selectedStreak, today }: { selectedStreak: 
 
   if (!selectedStreak) {
     return (
-      <div className="bg-bg-card rounded-[1.25rem] p-6 flex items-center justify-center min-h-[160px]">
+      <div className="bg-bg-card rounded-card p-6 flex items-center justify-center min-h-[160px]">
         <p className="text-text-secondary text-sm">{T.streak.noData}</p>
       </div>
     )
@@ -61,7 +61,7 @@ export default function StreakList({ selectedStreak, today }: { selectedStreak: 
   const shown = day ?? selectedStreak.end
 
   return (
-    <section aria-labelledby="streak-days-title" className="flex-1 bg-bg-card rounded-[1.25rem] ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-4">
+    <section aria-labelledby="streak-days-title" className="flex-1 bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-4">
       <StreakSectionHead
         id="streak-days-title"
         title={T.streak.listTitle}

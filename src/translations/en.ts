@@ -1807,7 +1807,7 @@ export const en = {
     tabPage: 'Page',
     tabHome: 'Home',
     shapeSlantedHint: 'Slanted ends on buttons, bars and tags.',
-    shapeRoundHint: 'Pills, circles and rounded bars.',
+    shapeRoundHint: 'The classic look: soft corners, pill tags, round switches.',
     shapeLabel: 'Shape',
     shapeSlanted: 'Slanted',
     shapeRound: 'Rounded',

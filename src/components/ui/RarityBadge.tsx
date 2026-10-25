@@ -16,7 +16,7 @@ export default function RarityBadge({ pct }: { pct: number | null | undefined })
   if (pct == null || Number.isNaN(pct)) return <span className="text-sm text-text-secondary">—</span>
   const digits = pct < 1 ? 2 : 1
   return (
-    <span className={`inline-flex items-center h-6 px-[0.5625rem] rounded-[0.375rem] text-[0.8125rem] font-bold tabular-nums whitespace-nowrap ${rarityTone(pct)}`}>
+    <span className={`inline-flex items-center h-6 px-[0.5625rem] rounded-tag text-[0.8125rem] font-bold tabular-nums whitespace-nowrap ${rarityTone(pct)}`}>
       {pct.toLocaleString(lang, { minimumFractionDigits: digits, maximumFractionDigits: digits })} %
     </span>
   )

@@ -10,6 +10,7 @@ import DesignCatalogSidebar from './design-catalog-sidebar/DesignCatalogSidebar'
 import DesignCatalogFoundations from './design-catalog-foundations/DesignCatalogFoundations'
 import DesignCatalogControls from './design-catalog-controls/DesignCatalogControls'
 import DesignCatalogData from './design-catalog-data/DesignCatalogData'
+import DesignCatalogDisclosure from './design-catalog-disclosure/DesignCatalogDisclosure'
 import DesignCatalogFeedback from './design-catalog-feedback/DesignCatalogFeedback'
 
 const COUNT = GROUPS.reduce((n, g) => n + g.pieces.length, 0)
@@ -55,6 +56,8 @@ export default function DesignCatalog() {
           <DesignCatalogControls />
           <GroupHead id="data" />
           <DesignCatalogData />
+          <GroupHead id="disclosure" />
+          <DesignCatalogDisclosure />
           <GroupHead id="feedback" />
           <DesignCatalogFeedback />
         </div>

@@ -86,7 +86,7 @@ export default function MainPageProfileXboxLinked({
         {summary.tier && (
           <span className="inline-flex items-center gap-1 text-[0.8125rem] text-text-secondary">
             {T.xbox.tier}
-            <span className="px-1.5 py-0.5 rounded-[0.375rem] bg-success/15 text-success font-bold text-xs">{summary.tier}</span>
+            <span className="px-1.5 py-0.5 rounded-tag bg-success/15 text-success font-bold text-xs">{summary.tier}</span>
           </span>
         )}
         {summary.bio && <p className="text-[0.8125rem] text-text-secondary line-clamp-2">{summary.bio}</p>}
