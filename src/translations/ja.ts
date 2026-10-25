@@ -1636,6 +1636,8 @@ export const ja: Translations = {
     },
   },
   plurals: {
+    following: { other: '{n} フォロー中' },
+    followers: { other: '{n} フォロワー' },
     games: { other: '{n}本のゲーム' },
     achievements: { other: '{n}個の実績' },
     days: { other: '{n}日' },
@@ -1785,6 +1787,9 @@ export const ja: Translations = {
     },
   },
   homeLayout: {
+    classicHint: '左に最近のゲーム、右に各プラットフォームのプロフィール。',
+    coverHint: '上に途中のゲームを大きく、その下に最近のゲーム・レベル・連続記録。',
+    byDefault: '標準',
     label: 'ホーム画面',
     classic: 'クラシック',
     cover: 'カバー',

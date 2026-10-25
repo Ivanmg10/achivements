@@ -1636,6 +1636,8 @@ export const ru: Translations = {
     },
   },
   plurals: {
+    following: { one: '{n} подписка', few: '{n} подписки', many: '{n} подписок', other: '{n} подписки' },
+    followers: { one: '{n} подписчик', few: '{n} подписчика', many: '{n} подписчиков', other: '{n} подписчика' },
     games: { one: '{n} игра', few: '{n} игры', many: '{n} игр', other: '{n} игры' },
     achievements: { one: '{n} достижение', few: '{n} достижения', many: '{n} достижений', other: '{n} достижения' },
     days: { one: '{n} день', few: '{n} дня', many: '{n} дней', other: '{n} дня' },
@@ -1785,6 +1787,9 @@ export const ru: Translations = {
     },
   },
   homeLayout: {
+    classicHint: 'Недавние игры слева, профиль на каждой платформе справа.',
+    coverHint: 'Сверху крупно — игра, брошенная на полпути; ниже — недавние игры, уровень и серия.',
+    byDefault: 'по умолчанию',
     label: 'Главная страница',
     classic: 'Классическая',
     cover: 'Обложка',

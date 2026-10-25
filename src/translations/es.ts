@@ -146,7 +146,7 @@ export const es: Translations = {
     notConnected: 'No conectado',
     connect: 'Conectar',
     steamConnect: 'Conectar Steam',
-    steamDisconnect: 'Desconectar Steam',
+    steamDisconnect: 'Desvincular Steam',
     steamDisconnecting: 'Desconectando…',
     gamesTracked: 'Juegos registrados',
     inProgress: 'En progreso',
@@ -232,8 +232,8 @@ export const es: Translations = {
     accountSettings: 'Configuración de cuenta',
     changePassword: 'Cambiar contraseña',
     language: 'Idioma',
-    signOut: 'Cerrar sesion',
-    signOutRA: 'Cerrar sesion en RA',
+    signOut: 'Cerrar sesión',
+    signOutRA: 'Desvincular RA',
   },
   userCharts: {
     games: 'Juegos',
@@ -1400,7 +1400,7 @@ export const es: Translations = {
   psn: {
     connect: 'Conectar PSN',
     connecting: 'Conectando…',
-    disconnect: 'Desconectar PSN',
+    disconnect: 'Desvincular PSN',
     disconnecting: 'Desconectando…',
     usernameLabel: 'ID online de PSN',
     usernamePlaceholder: 'Tu ID online',
@@ -1456,7 +1456,7 @@ export const es: Translations = {
   xbox: {
     connect: 'Conectar Xbox',
     connecting: 'Conectando…',
-    disconnect: 'Desconectar Xbox',
+    disconnect: 'Desvincular Xbox',
     disconnecting: 'Desconectando…',
     gamertagLabel: 'Gamertag de Xbox',
     gamertagPlaceholder: 'Tu gamertag',
@@ -1636,6 +1636,8 @@ export const es: Translations = {
     },
   },
   plurals: {
+    following: { other: '{n} siguiendo' },
+    followers: { one: '{n} seguidor', other: '{n} seguidores' },
     games: { one: '{n} juego', other: '{n} juegos' },
     achievements: { one: '{n} logro', other: '{n} logros' },
     days: { one: '{n} día', other: '{n} días' },
@@ -1785,6 +1787,9 @@ export const es: Translations = {
     },
   },
   homeLayout: {
+    classicHint: 'Tus juegos recientes a la izquierda y tu perfil de cada plataforma a la derecha.',
+    coverHint: 'Arriba, en grande, el juego que dejaste a medias; debajo, tus recientes, nivel y racha.',
+    byDefault: 'de serie',
     label: 'Diseño del inicio',
     classic: 'Clásico',
     cover: 'Portada',

@@ -3,7 +3,6 @@
 import { useState, type ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
-import { IconSettings } from '@tabler/icons-react'
 import MainPageProfileTabs, { profilePanelId, profileTabId, type ProfileTab } from '@/components/main-page/main-page-profile/main-page-profile-tabs/MainPageProfileTabs'
 import UserPreferencesGeneral from '@/components/user-page/user-preferences-general/UserPreferencesGeneral'
 import UserPreferencesPlatform from '@/components/user-page/user-preferences-platform/UserPreferencesPlatform'
@@ -72,11 +71,11 @@ export default function UserPreferencesCard() {
   }
 
   const tabs: ProfileTab<PrefTab>[] = [
-    { id: 'general', label: T.userData.prefsGeneral, icon: <IconSettings size={13} aria-hidden="true" /> },
-    { id: 'ra', label: 'RetroAchievements', icon: <RaLogo height={11} /> },
-    { id: 'steam', label: 'Steam', icon: <SteamLogo size={13} aria-hidden="true" /> },
-    { id: 'psn', label: 'PlayStation', icon: <PlaystationLogo size={13} aria-hidden="true" /> },
-    ...(xboxEnabled ? [{ id: 'xbox' as const, label: 'Xbox', icon: <XboxLogo size={13} aria-hidden="true" /> }] : []),
+    { id: 'general', label: T.userData.prefsGeneral },
+    { id: 'ra', label: 'RA' },
+    { id: 'steam', label: 'Steam' },
+    { id: 'psn', label: 'PlayStation' },
+    ...(xboxEnabled ? [{ id: 'xbox' as const, label: 'Xbox' }] : []),
   ]
   // A remembered Xbox tab for someone who may no longer see Xbox falls back to General.
   const tab = tabs.some((t) => t.id === saved) ? saved : 'general'
@@ -95,8 +94,8 @@ export default function UserPreferencesCard() {
   }
 
   return (
-    <section className="bg-bg-card rounded-card p-6 flex flex-col gap-4 h-full">
-      <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
+    <section className="bg-bg-card rounded-[1.25rem] ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-3.5 h-full">
+      <h2 className="text-xl font-bold">
         {T.userPage.preferences}
       </h2>
 

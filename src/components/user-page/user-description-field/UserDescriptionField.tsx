@@ -26,9 +26,12 @@ export default function UserDescriptionField() {
 
   return (
     <div className="flex flex-col gap-2 min-w-0 flex-1">
-      <label htmlFor="user-description" className="text-xs text-text-secondary">
-        {T.userData.description}
-      </label>
+      <span className="flex items-center justify-between gap-3">
+        <label htmlFor="user-description" className="text-[0.8125rem] font-semibold text-text-secondary">
+          {T.userData.description}
+        </label>
+        <span className="text-[0.8125rem] text-text-secondary tabular-nums">{text.length} / {DESCRIPTION_MAX}</span>
+      </span>
       <textarea
         id="user-description"
         value={text}
@@ -36,11 +39,10 @@ export default function UserDescriptionField() {
         maxLength={DESCRIPTION_MAX}
         rows={3}
         placeholder={T.userData.descriptionPlaceholder}
-        className={fieldClass({}, 'h-auto! py-2.5 text-sm flex-1 min-h-20 resize-y')}
+        className={fieldClass({}, 'h-auto! py-3 flex-1 min-h-16 resize-y')}
       />
       {error && <p role="alert" className="text-xs text-danger">{error}</p>}
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-xs text-text-secondary tabular-nums">{text.length}/{DESCRIPTION_MAX}</span>
+      <div className="flex items-center justify-end gap-3 empty:hidden">
         {dirty && (
           <Button
             onClick={handleSave}

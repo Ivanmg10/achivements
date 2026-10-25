@@ -19,6 +19,8 @@ export type Choice<V> = {
   label: React.ReactNode
   hint?: React.ReactNode
   icon?: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' }>
+  /** A small drawing of the choice, above its words (decorative: the words say it). */
+  preview?: React.ReactNode
 }
 
 /**
@@ -51,8 +53,9 @@ export default function ChoiceCards<V>({
           const checked = o.value === value
           const Icon = o.icon
           return (
-            <label key={i} className={choiceClass(checked)}>
+            <label key={i} className={choiceClass(checked, o.preview ? 'flex-col items-stretch! gap-3' : '')}>
               <input type="radio" name={name} checked={checked} onChange={() => onChange(o.value)} className="sr-only" />
+              {o.preview && <span aria-hidden="true">{o.preview}</span>}
               {Icon && <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${checked ? 'text-accent' : 'text-text-secondary'}`} aria-hidden="true" />}
               <span className="flex flex-col min-w-0">
                 <span className="text-sm font-medium text-text-main">{o.label}</span>

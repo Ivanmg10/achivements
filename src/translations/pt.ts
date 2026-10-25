@@ -1636,6 +1636,8 @@ export const pt: Translations = {
     },
   },
   plurals: {
+    following: { other: '{n} seguindo' },
+    followers: { one: '{n} seguidor', other: '{n} seguidores' },
     games: { one: '{n} jogo', other: '{n} jogos' },
     achievements: { one: '{n} conquista', other: '{n} conquistas' },
     days: { one: '{n} dia', other: '{n} dias' },
@@ -1785,6 +1787,9 @@ export const pt: Translations = {
     },
   },
   homeLayout: {
+    classicHint: 'Jogos recentes à esquerda e o perfil de cada plataforma à direita.',
+    coverHint: 'No topo, em grande, o jogo deixado pela metade; abaixo, os recentes, o nível e a sequência.',
+    byDefault: 'padrão',
     label: 'Página inicial',
     classic: 'Clássica',
     cover: 'Capa',

@@ -1,7 +1,6 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { GameSource } from '@/types/steam'
 import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
@@ -63,7 +62,7 @@ export default function UserPlatformCard({
     <div className={`rounded-[calc(var(--r-card)+1px)] p-px bg-gradient-to-br ${gradient}`}>
       <section
         aria-label={name}
-        className="relative h-full bg-bg-card rounded-card p-5 flex flex-col gap-4 overflow-hidden"
+        className="relative h-full bg-bg-card rounded-card p-5 flex flex-col gap-3 overflow-hidden"
       >
         <div className="relative flex items-center justify-between gap-2">
           <span className="flex items-center gap-2 min-w-0">
@@ -74,13 +73,12 @@ export default function UserPlatformCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${name} — ${T.userData.openProfile}`}
-                className="font-semibold truncate inline-flex items-center gap-1 hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="font-extrabold truncate hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 {name}
-                <IconExternalLink size={13} aria-hidden="true" className="shrink-0 text-text-secondary" />
               </a>
             ) : (
-              <span className="font-semibold truncate">{name}</span>
+              <span className="font-extrabold truncate">{name}</span>
             )}
           </span>
           <span
@@ -95,19 +93,19 @@ export default function UserPlatformCard({
 
         {connected ? (
           <>
-            {identity}
+            {identity && <div className="rounded-xl bg-ink/[0.03] p-2.5">{identity}</div>}
             {stats.length > 0 && (
-              <dl className="grid grid-cols-2 gap-2">
+              <dl className="grid grid-cols-2 gap-1.5">
                 {stats.map((stat, i) => (
                   <div
                     key={stat.label}
                     /* An odd count leaves the last one alone on its row: let it fill it. */
-                    className={`bg-bg-main rounded-control px-3 py-2.5 flex flex-col gap-0.5 min-w-0 ${
+                    className={`bg-bg-main rounded-xl px-3 py-2.5 flex flex-col min-w-0 ${
                       stats.length % 2 === 1 && i === stats.length - 1 ? 'col-span-2' : ''
                     }`}
                   >
-                    <dt className="text-[11px] text-text-secondary truncate">{stat.label}</dt>
-                    <dd className={`text-lg font-bold tabular-nums truncate ${stat.accent ?? 'text-text-main'}`}>
+                    <dt className="text-xs text-text-secondary truncate">{stat.label}</dt>
+                    <dd className={`text-xl font-extrabold tabular-nums truncate ${stat.accent ?? 'text-text-main'}`}>
                       {stat.value}
                     </dd>
                   </div>

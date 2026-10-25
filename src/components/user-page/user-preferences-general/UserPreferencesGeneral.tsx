@@ -9,6 +9,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { useVaultMe } from '@/hooks/useVaultMe'
 import UserHomeLayoutPreference from '@/components/user-page/user-home-layout-preference/UserHomeLayoutPreference'
+import { LANGUAGES } from '@/utils/languages'
 
 const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
 
@@ -37,19 +38,21 @@ export default function UserPreferencesGeneral({
   const user = session?.user
 
   return (
-    <div className="flex flex-col divide-y divide-ink/[0.06] [&>*]:py-1.5">
+    <div className="flex flex-col divide-y divide-ink/[0.06] [&>*]:py-2">
       <ProfileField label={T.userTheme.theme} icon={<IconPalette size={18} />} onEdit={onOpenTheme}>
         <span className="flex items-center gap-2 min-w-0">
-          <span aria-hidden="true" className="w-4 h-4 rounded-full bg-accent shrink-0" />
-          <span className="text-base font-medium truncate">{T.userTheme[`name_${theme}`]}</span>
+          <span aria-hidden="true" className="w-3.5 h-3.5 rounded-[0.25rem] bg-accent shrink-0 -skew-x-[14deg]" />
+          <span className="text-[0.9375rem] font-bold truncate">{T.userTheme[`name_${theme}`]}</span>
         </span>
       </ProfileField>
 
       <ProfileField label={T.userConfig.language} icon={<IconLanguage size={18} />} onEdit={onOpenLanguage}>
-        <span className="text-base font-medium uppercase">{lang}</span>
+        <span className="text-[0.9375rem] font-bold">{LANGUAGES.find((l) => l.id === lang)?.label ?? lang}</span>
       </ProfileField>
 
-      <UserHomeLayoutPreference />
+      <div className="py-3!">
+        <UserHomeLayoutPreference />
+      </div>
 
       <ProfileField
         label={T.userData.gender}

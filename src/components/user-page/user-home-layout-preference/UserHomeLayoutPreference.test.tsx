@@ -4,10 +4,12 @@ import { en } from '@/translations/en'
 
 beforeEach(() => localStorage.clear())
 
-test('classic by default, and the choice is kept', () => {
+test('two cards, classic by default, and the choice is kept', () => {
   render(<UserHomeLayoutPreference />)
-  expect(screen.getByRole('button', { name: en.homeLayout.classic })).toHaveAttribute('aria-pressed', 'true')
-  fireEvent.click(screen.getByRole('button', { name: en.homeLayout.cover }))
-  expect(screen.getByRole('button', { name: en.homeLayout.cover })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByRole('group', { name: en.homeLayout.label })).toBeInTheDocument()
+  expect(screen.getByRole('radio', { name: new RegExp(en.homeLayout.classic) })).toBeChecked()
+  expect(screen.getByText(en.homeLayout.coverHint)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('radio', { name: new RegExp(en.homeLayout.cover) }))
+  expect(screen.getByRole('radio', { name: new RegExp(en.homeLayout.cover) })).toBeChecked()
   expect(localStorage.getItem('home-layout')).toContain('cover')
 })

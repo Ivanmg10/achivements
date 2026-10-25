@@ -16,14 +16,16 @@ export default function UserPage() {
     <main className="min-h-screen bg-bg-main text-text-main flex flex-col items-center py-6 px-4">
       <div className="w-full lg:max-w-[95%] flex flex-col gap-4">
         <RaKeyInvalidNotice />
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 items-start">
-          <UserIdentityCard />
+        {/* The danger zone under the account's card, so the two columns end together. */}
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
+          <div className="flex flex-col gap-4 min-w-0">
+            <UserIdentityCard />
+            <DeleteAccountCard />
+          </div>
           <UserPreferencesCard />
         </div>
 
         <UserPlatforms />
-
-        <DeleteAccountCard />
       </div>
     </main>
   )

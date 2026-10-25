@@ -36,7 +36,7 @@ beforeEach(() => {
 test('shows who you are: name, id, and an editable username, email and country', () => {
   render(<UserIdentityCard />)
   expect(screen.getByRole('heading', { name: 'ivanxmarine' })).toBeInTheDocument()
-  expect(screen.getByText('ID: 3')).toBeInTheDocument()
+  expect(screen.getByText(/ID 3/)).toBeInTheDocument()
   expect(screen.getByText('Spain')).toBeInTheDocument()
   expect(screen.getByRole('button', { name: `${en.userPage.username}: ivanxmarine` })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: `${en.userData.email}: a@b.c` })).toBeInTheDocument()

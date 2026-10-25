@@ -32,13 +32,13 @@ export default function UserProfileSwitch({
 
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-3 rounded-xl px-2 -mx-1 py-1.5">
-        <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-xl bg-bg-card ring-1 ring-ink/[0.06] flex items-center justify-center text-text-secondary">
+      <div className="flex items-center gap-3.5 rounded-xl px-1 -mx-1 py-1.5">
+        <span aria-hidden="true" className="w-9 h-9 shrink-0 flex items-center justify-center text-text-secondary">
           {icon}
         </span>
-        <span className="flex flex-col gap-0.5 min-w-0 flex-1">
-          <span id={labelId} className="text-xs text-text-secondary">{label}</span>
-          <span className="text-sm font-medium">{checked ? onText : offText}</span>
+        <span className="flex flex-col min-w-0 flex-1">
+          <span id={labelId} className="text-[0.9375rem] font-bold">{label}</span>
+          <span className="text-[0.8125rem] text-text-secondary">{checked ? onText : offText}</span>
         </span>
         <Switch
           checked={checked}

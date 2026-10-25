@@ -76,7 +76,7 @@ export default function UserXboxCard() {
               alt=""
               width={44}
               height={44}
-              className="rounded-lg w-11 h-11 object-cover shrink-0"
+              className="rounded-lg w-10 h-10 object-cover shrink-0"
               unoptimized
             />
           ) : (
@@ -84,7 +84,7 @@ export default function UserXboxCard() {
           )}
           <div className="flex flex-col gap-0.5 min-w-0">
             <span className="font-bold truncate">{name || '—'}</span>
-            <span className="text-xs text-text-secondary font-mono truncate">{xuid}</span>
+            <span className="text-[0.6875rem] text-text-secondary truncate">{xuid}</span>
             <span className="text-[10px] text-text-secondary">{T.xbox.adminOnly}</span>
           </div>
         </div>

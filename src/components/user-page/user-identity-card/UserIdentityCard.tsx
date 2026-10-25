@@ -4,7 +4,7 @@ import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { signOut, useSession } from 'next-auth/react'
-import { IconAlertTriangle, IconCircleCheck, IconDeviceGamepad2, IconFolders, IconLock, IconLogout, IconPencil, IconPin, IconPlayerPlay, IconShield } from '@tabler/icons-react'
+import { IconAlertTriangle, IconPencil } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
 import UserVaultStat from '@/components/user-page/user-vault-stat/UserVaultStat'
@@ -20,7 +20,7 @@ import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { useGroups } from '@/hooks/useGroups'
 import { summarizeSteamLibrary } from '@/utils/steamFeed'
-import { codeToFlag, findCountry } from '@/utils/countries'
+import { codeToFlag, countryName, findCountry } from '@/utils/countries'
 import Button from '@/components/ui/Button'
 
 // Modals are downloaded the first time they are wanted, not with the page — the admin panel above all.
@@ -31,15 +31,15 @@ const ChangePasswordModal = dynamic(() => import('@/components/change-password-m
 const LocationModal = dynamic(() => import('@/components/location-modal/LocationModal'), { loading: () => null })
 
 /**
- * Who you are on CheevoVault: avatar, username, email and country, with
- * change password and sign out kept together at the top right.
- *
- * Under that, what the account holds — games, groups and pins — counted
- * across every connected platform, since nothing here belongs to one of them.
+ * Who you are on CheevoVault: avatar and username, with the id, country and
+ * follows in a line under it, and change password and sign out beside them.
+ * Then your level, the account's fields (username, email, country, your
+ * words) and what the account holds (games, groups and pins), counted across
+ * every connected platform, since nothing here belongs to one of them.
  */
 export default function UserIdentityCard() {
   const { data: session } = useSession()
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const { all, inProgress, hardcore, softcore } = useGamesData()
   const { library } = useSteamGamesData()
   const { pins } = usePinnedGames()
@@ -51,7 +51,8 @@ export default function UserIdentityCard() {
   const [avatarOpen, setAvatarOpen] = useState(false)
 
   const user = session?.user
-  const country = user?.location ? findCountry(user.location) : null
+  const found = user?.location ? findCountry(user.location) : null
+  const country = found ? { ...found, name: countryName(found.code, lang) } : null
   // Accounts made before the email became compulsory have no way back in.
   const missingEmail = Boolean(user) && !user?.email
 
@@ -61,20 +62,20 @@ export default function UserIdentityCard() {
   ).size
 
   const totals = [
-    { label: T.userStats.games, value: all.length + steam.totalGames, accent: 'text-text-main', icon: <IconDeviceGamepad2 size={18} /> },
-    { label: T.userStats.inProgress, value: inProgress.length + steam.playing, accent: 'text-text-main', icon: <IconPlayerPlay size={18} /> },
-    { label: T.groups.filter100, value: completedRa + steam.perfect, accent: 'text-success', icon: <IconCircleCheck size={18} /> },
-    { label: T.groups.title, value: groups.length, accent: 'text-text-main', icon: <IconFolders size={18} /> },
-    { label: T.pinnedGames.title, value: pins.length, accent: 'text-text-main', icon: <IconPin size={18} /> },
+    { label: T.userStats.games, value: all.length + steam.totalGames, accent: 'text-text-main' },
+    { label: T.userStats.inProgress, value: inProgress.length + steam.playing, accent: 'text-text-main' },
+    { label: T.groups.filter100, value: completedRa + steam.perfect, accent: 'text-success' },
+    { label: T.groups.title, value: groups.length, accent: 'text-text-main' },
+    { label: T.pinnedGames.title, value: pins.length, accent: 'text-text-main' },
   ]
 
   return (
-    <section className="relative bg-bg-card rounded-card overflow-hidden flex flex-col h-full">
+    <section className="relative bg-bg-card rounded-[1.25rem] ring-1 ring-inset ring-ink/[0.06] overflow-hidden flex flex-col">
       <UserProfileBanner avatar={user?.avatar} />
 
-      <div className="relative px-4 sm:px-6 pt-6 pb-6 flex flex-col gap-5 flex-1">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-4 sm:gap-5 min-w-0">
+      <div className="relative px-4 sm:px-7 pt-6 sm:pt-7 pb-6 sm:pb-7 flex flex-col gap-4 flex-1">
+      <div className="flex items-end justify-between gap-x-5 gap-y-4 flex-wrap">
+        <div className="flex items-end gap-4 sm:gap-[1.375rem] min-w-0">
           <button
             onClick={() => setAvatarOpen(true)}
             aria-label={T.userPage.editAvatar}
@@ -86,7 +87,7 @@ export default function UserIdentityCard() {
                 alt=""
                 width={112}
                 height={112}
-                className="rounded-full w-24 h-24 sm:w-28 sm:h-28 object-cover ring-4 ring-bg-card shadow-xl shadow-black/40"
+                className="rounded-full w-24 h-24 sm:w-28 sm:h-28 object-cover ring-4 ring-bg-card shadow-[0_14px_30px_rgb(0_0_0/0.5)]"
                 unoptimized
               />
             ) : (
@@ -102,37 +103,47 @@ export default function UserIdentityCard() {
             </span>
           </button>
 
-          <div className="flex flex-col gap-1 min-w-0 pb-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 truncate">{user?.name}</h1>
+          <div className="flex flex-col gap-1.5 min-w-0 pb-1">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="font-display italic font-extrabold text-[2.75rem] sm:text-[4rem] leading-[0.9] pr-1 truncate">{user?.name}</h1>
               {user?.admin && (
-                <span className="inline-flex items-center h-6 px-2 rounded-chip text-xs font-bold bg-warning/20 text-warning">
+                <span className="inline-flex items-center h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold bg-warning/20 text-warning">
                   {T.userData.admin}
                 </span>
               )}
             </div>
-            <p className="text-xs text-text-secondary font-mono">ID: {user?.id}</p>
+            <p className="text-[0.8125rem] text-text-secondary">
+              ID {user?.id}
+              {country && (
+                <>
+                  {' · '}
+                  <span aria-hidden="true">{codeToFlag(country.code)} </span>
+                  {country.name}
+                </>
+              )}
+              {' · '}
+              <UserFollowStats />
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+        <div className="flex items-center gap-2.5 flex-wrap w-full sm:w-auto">
           {/* The flag in the session decides the button; the panel itself asks the DB and a password. */}
           {user?.admin && (
             <Button variant="secondary" size="sm" onClick={() => setAdminOpen(true)} aria-haspopup="dialog">
-              <IconShield size={14} aria-hidden="true" />
               Admin panel
             </Button>
           )}
           <Button variant="secondary" size="sm" onClick={() => setPasswordOpen(true)}>
-            <IconLock size={14} aria-hidden="true" />
             {T.userData.changePassword}
           </Button>
           <Button variant="danger" size="sm" onClick={() => signOut({ callbackUrl: '/authPage' })}>
-            <IconLogout size={14} aria-hidden="true" />
             {T.userConfig.signOut}
           </Button>
         </div>
       </div>
+
+      <UserVaultLevel />
 
       <EmailVerificationNotice />
 
@@ -152,7 +163,7 @@ export default function UserIdentityCard() {
         </div>
       )}
 
-      <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <ProfileField
           sunken
           label={T.userPage.username}
@@ -184,20 +195,14 @@ export default function UserIdentityCard() {
             <span className="text-sm text-text-secondary italic">{T.userData.notSet}</span>
           )}
         </ProfileField>
-        <div className="sm:col-span-3 flex flex-col gap-3">
-          <UserFollowStats />
-          <UserVaultLevel />
-        </div>
         <div className="sm:col-span-3 flex flex-col">
           <UserDescriptionField />
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 mt-auto">
-        <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
-          {T.userPage.library}
-        </h2>
-        <dl className="grid grid-cols-2 sm:grid-cols-5 gap-2 [&>*:last-child]:col-span-2 sm:[&>*:last-child]:col-span-1">
+      <div className="flex flex-col mt-auto">
+        <h2 className="sr-only">{T.userPage.library}</h2>
+        <dl className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 [&>*:last-child]:col-span-2 sm:[&>*:last-child]:col-span-1">
           {totals.map((total) => (
             <UserVaultStat key={total.label} {...total} />
           ))}

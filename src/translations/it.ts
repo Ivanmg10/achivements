@@ -1636,6 +1636,8 @@ export const it: Translations = {
     },
   },
   plurals: {
+    following: { one: '{n} profilo seguito', other: '{n} profili seguiti' },
+    followers: { one: '{n} follower', other: '{n} follower' },
     games: { one: '{n} gioco', other: '{n} giochi' },
     achievements: { one: '{n} obiettivo', other: '{n} obiettivi' },
     days: { one: '{n} giorno', other: '{n} giorni' },
@@ -1785,6 +1787,9 @@ export const it: Translations = {
     },
   },
   homeLayout: {
+    classicHint: 'I tuoi giochi recenti a sinistra e il tuo profilo su ogni piattaforma a destra.',
+    coverHint: 'In alto, in grande, il gioco lasciato a metà; sotto, i tuoi recenti, livello e serie.',
+    byDefault: 'predefinito',
     label: 'Pagina iniziale',
     classic: 'Classica',
     cover: 'Copertina',

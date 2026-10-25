@@ -1636,6 +1636,8 @@ export const pl: Translations = {
     },
   },
   plurals: {
+    following: { one: '{n} obserwowany profil', few: '{n} obserwowane profile', many: '{n} obserwowanych profili', other: '{n} obserwowanego profilu' },
+    followers: { one: '{n} osoba obserwująca', few: '{n} osoby obserwujące', many: '{n} osób obserwujących', other: '{n} osoby obserwującej' },
     games: { one: '{n} gra', few: '{n} gry', many: '{n} gier', other: '{n} gry' },
     achievements: { one: '{n} osiągnięcie', few: '{n} osiągnięcia', many: '{n} osiągnięć', other: '{n} osiągnięcia' },
     days: { one: '{n} dzień', few: '{n} dni', many: '{n} dni', other: '{n} dnia' },
@@ -1785,6 +1787,9 @@ export const pl: Translations = {
     },
   },
   homeLayout: {
+    classicHint: 'Ostatnie gry po lewej, profil na każdej platformie po prawej.',
+    coverHint: 'Na górze, w dużym formacie, gra przerwana w połowie; pod nią ostatnie gry, poziom i seria.',
+    byDefault: 'domyślny',
     label: 'Strona główna',
     classic: 'Klasyczna',
     cover: 'Okładka',

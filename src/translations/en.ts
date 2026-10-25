@@ -1637,6 +1637,8 @@ export const en = {
     },
   },
   plurals: {
+    following: { other: '{n} following' } as PluralForms,
+    followers: { one: '{n} follower', other: '{n} followers' } as PluralForms,
     games: { one: '{n} game', other: '{n} games' } as PluralForms,
     achievements: { one: '{n} achievement', other: '{n} achievements' } as PluralForms,
     days: { one: '{n} day', other: '{n} days' } as PluralForms,
@@ -1786,6 +1788,9 @@ export const en = {
     },
   },
   homeLayout: {
+    classicHint: 'Your recent games on the left and your profile on each platform on the right.',
+    coverHint: 'On top, in big, the game you left halfway; under it, your recent games, level and streak.',
+    byDefault: 'default',
     label: 'Home layout',
     classic: 'Classic',
     cover: 'Cover',
