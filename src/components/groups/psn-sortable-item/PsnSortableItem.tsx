@@ -107,7 +107,7 @@ export default function PsnSortableItem({
               </span>
             )}
           </span>
-          <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>
+          <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>
             {T.psn.trophiesProgress.replace('{earned}', String(earned)).replace('{total}', String(total))}
           </span>
           {total > 0 && (

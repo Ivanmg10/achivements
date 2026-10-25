@@ -2,11 +2,11 @@
 
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
+import MainPageProfileNowPlaying from '../../main-page-profile-now-playing/MainPageProfileNowPlaying'
 
 export default function MainPageProfileRaGame({
   game,
@@ -15,51 +15,24 @@ export default function MainPageProfileRaGame({
   game: RetroAchievementsGameWithAchievements
   richPresenceMsg?: string
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
 
   const scPct = parseFloat(game.UserCompletion ?? '0') || 0
   const hcPct = parseFloat(game.UserCompletionHardcore ?? '0') || 0
+  const icon = game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null
 
   return (
-    <Link
-      className="bg-bg-main rounded-lg p-3 flex flex-col gap-3 w-full hover:scale-[1.005] transition-transform duration-200"
+    <MainPageProfileNowPlaying
       href={gameHref('ra', game.ID ?? 0, subject)}
-    >
-      <p className="text-xs text-text-secondary uppercase tracking-wider">{T.profileRa.playingNow}</p>
-      {richPresenceMsg && <p className="text-xs text-gray-300 italic">{richPresenceMsg}</p>}
-      <div className="flex gap-3 items-center">
-        {game.ImageIcon && (
-          <Image
-            src={`https://retroachievements.org${game.ImageIcon}`}
-            alt="GameIcon"
-            width={50}
-            height={50}
-            className="rounded-lg shrink-0"
-          />
-        )}
-        <div className="flex flex-col gap-1 min-w-0">
-          <span className="text-sm font-semibold truncate">{game.Title}</span>
-          <span className="text-xs text-text-secondary">{game.ConsoleName}</span>
-        </div>
-      </div>
-      {scPct > 0 || hcPct > 0 ? (
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-3 text-xs text-text-secondary">
-            <span className="flex items-center gap-1.5">
-              <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full bg-progress-soft" />
-              <span className={scPct >= 100 ? 'text-success font-semibold' : ''}>{game.UserCompletion ?? '0%'}</span>
-            </span>
-            {hcPct > 0 && (
-              <span className="flex items-center gap-1.5">
-                <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full bg-progress" />
-                <span className={hcPct >= 100 ? 'text-success font-semibold' : ''}>{game.UserCompletionHardcore}</span>
-              </span>
-            )}
-          </div>
-          <ProgressBar pct={hcPct} softPct={scPct} label={game.Title ?? ''} trackClass="bg-bg-card" height="h-2" />
-        </div>
-      ) : null}
-    </Link>
+      tintSrc={icon}
+      kicker={richPresenceMsg ? `${T.profileRa.playingNow} · ${richPresenceMsg}` : T.profileRa.playingNow}
+      icon={icon ? <Image src={icon} alt="" width={52} height={52} className="w-full h-full object-cover" /> : null}
+      title={game.Title ?? ''}
+      sub={game.ConsoleName}
+      share={scPct > 0 || hcPct > 0 ? `${Math.max(hcPct, scPct).toLocaleString(lang, { maximumFractionDigits: 1 })} %` : null}
+      done={Math.max(hcPct, scPct) >= 100}
+      bar={scPct > 0 || hcPct > 0 ? <ProgressBar pct={hcPct} softPct={scPct} label={game.Title ?? ''} /> : null}
+    />
   )
 }

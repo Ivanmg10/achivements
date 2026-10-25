@@ -15,6 +15,7 @@ import { GameListRow } from '@/components/ui/GameListRow'
 import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { useSubject } from '@/context/SubjectContext'
+import { decimal } from '@/utils/utils'
 
 const SHOWN = 6
 
@@ -39,7 +40,7 @@ export default function MainPageRarest({
   xboxAchievements?: XboxRecentAchievement[]
   isLoading?: boolean
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   const rows = useMemo(() => {
     const ra: Row[] = achievements
@@ -63,7 +64,7 @@ export default function MainPageRarest({
         imageUrl: a.badgeUrl || undefined,
         title: a.title,
         subtitle: a.gameTitle,
-        stat: `${a.globalPct.toFixed(1)}%`,
+        stat: `${decimal(a.globalPct, lang)}%`,
         statLabel: T.cards.steamRarityLabel,
       }))
     const psn: Row[] = psnTrophies
@@ -75,7 +76,7 @@ export default function MainPageRarest({
         imageUrl: t.iconUrl || undefined,
         title: t.name,
         subtitle: t.gameTitle,
-        stat: `${t.rarity.toFixed(1)}%`,
+        stat: `${decimal(t.rarity, lang)}%`,
         statLabel: T.cards.steamRarityLabel,
       }))
     const xbox: Row[] = xboxAchievements
@@ -87,7 +88,7 @@ export default function MainPageRarest({
         imageUrl: a.iconUrl || undefined,
         title: a.name,
         subtitle: a.gameTitle,
-        stat: `${a.rarity.toFixed(1)}%`,
+        stat: `${decimal(a.rarity, lang)}%`,
         statLabel: T.cards.steamRarityLabel,
       }))
     const lists = [ra, steam, psn, xbox]
@@ -96,7 +97,7 @@ export default function MainPageRarest({
       for (const list of lists) if (i < list.length && merged.length < SHOWN) merged.push(list[i])
     }
     return merged
-  }, [achievements, steamAchievements, psnTrophies, xboxAchievements, T, subject])
+  }, [achievements, steamAchievements, psnTrophies, xboxAchievements, T, lang, subject])
 
   if (isLoading) return <SkeletonGameList count={4} />
 
@@ -120,7 +121,7 @@ export default function MainPageRarest({
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.rarestUnlocks}</p>
       <div className="flex flex-col gap-2 flex-1">
         {rows.map(({ key, ...row }) => (
-          <GameListRow key={key} {...row} statClassName="text-yellow-400" />
+          <GameListRow key={key} {...row} statClassName="text-hardcore" />
         ))}
       </div>
     </div>

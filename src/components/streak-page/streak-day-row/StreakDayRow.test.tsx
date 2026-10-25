@@ -20,7 +20,7 @@ const STEAM: RecentAchievement = {
 }
 
 test('an RA badge links to its RA page', () => {
-  render(<StreakDayRow date="2024-03-02" achievements={[RA]} />)
+  render(<StreakDayRow date="2024-03-02" today="2024-03-02" achievements={[RA]} />)
 
   const link = screen.getByRole('link', { name: 'Beat it — Zelda' })
   expect(link).toHaveAttribute('href', '/gameInfo/1')
@@ -28,7 +28,7 @@ test('an RA badge links to its RA page', () => {
 })
 
 test('a Steam badge links to its Steam page and uses the URL it carries', () => {
-  render(<StreakDayRow date="2024-03-02" achievements={[STEAM]} />)
+  render(<StreakDayRow date="2024-03-02" today="2024-03-02" achievements={[STEAM]} />)
 
   const link = screen.getByRole('link', { name: 'Win — Portal 2' })
   expect(link).toHaveAttribute('href', '/steamGame/620')
@@ -37,8 +37,15 @@ test('a Steam badge links to its Steam page and uses the URL it carries', () => 
 
 test('both platforms on one day render side by side', () => {
   // A Steam unlock is numbered by its position, so it can collide with an RA id.
-  render(<StreakDayRow date="2024-03-02" achievements={[RA, { ...STEAM, AchievementID: 7 }]} />)
+  render(<StreakDayRow date="2024-03-02" today="2024-03-02" achievements={[RA, { ...STEAM, AchievementID: 7 }]} />)
 
   expect(screen.getAllByRole('link')).toHaveLength(2)
-  expect(screen.getByText("2 achievements")).toBeInTheDocument()
+  expect(screen.getByRole('heading')).toHaveTextContent(/2 achievements · today/)
+  expect(screen.getByText('Zelda, Portal 2')).toBeInTheDocument()
+})
+
+test('one achievement names its game and itself', () => {
+  render(<StreakDayRow date="2024-03-02" today="2024-03-05" achievements={[RA]} />)
+  expect(screen.getByText(/^Zelda · Beat it, /)).toBeInTheDocument()
+  expect(screen.getByRole('heading')).not.toHaveTextContent('today')
 })

@@ -35,7 +35,7 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">
-      <div className="bg-bg-header/40 rounded-xl p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
         <CircularProgress earned={earned} total={total} label={T.gameExpanded.allAchievements} size={130} />
         <SteamExpandedStats
           playtimeForever={game.playtimeForever}
@@ -45,8 +45,8 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
         />
       </div>
 
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
-        <p className="text-xs text-text-secondary mb-2">{T.gameExpanded.allAchievements}</p>
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
+        <p className="text-sm font-bold text-text-main mb-2.5">{T.gameExpanded.allAchievements}</p>
         {isLoading ? (
           <ul aria-busy="true" className="flex flex-wrap gap-1">
             {Array.from({ length: Math.min(total || SKELETON_BADGES, 60) }).map((_, i) => (
@@ -55,7 +55,7 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
           </ul>
         ) : error ? (
           <div className="flex flex-col items-start gap-2">
-            <p role="alert" className="text-sm text-red-400">
+            <p role="alert" className="text-sm text-danger">
               {T.steam.achievementsError}
             </p>
             <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
@@ -73,11 +73,11 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
         )}
       </div>
 
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-2 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-2 lg:row-start-1">
         <GameAchievementsProgressChart achievements={unlocks} isLoading={isLoading} />
       </div>
 
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-3 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-3 lg:row-start-1">
         <SteamRarestAchievements appId={game.id} achievements={achievements} isLoading={isLoading} />
       </div>
     </div>

@@ -28,7 +28,7 @@ export default function MainPageProfileXboxStats({
     <div className="grid grid-cols-2 gap-2">
       <StatCard label={T.steam.statGames} value={summary.games.toLocaleString(lang)} />
       <StatCard label={T.steam.totalPlaytime} value={playtime} />
-      <StatCard label={T.xbox.gamerscore} value={summary.gamerscore.toLocaleString(lang)} accent="text-green-500" />
+      <StatCard label={T.xbox.gamerscore} value={summary.gamerscore.toLocaleString(lang)} accent="text-success" />
       <StatCard label={T.xbox.achievements} value={summary.achievementsUnlocked.toLocaleString(lang)} />
     </div>
   )

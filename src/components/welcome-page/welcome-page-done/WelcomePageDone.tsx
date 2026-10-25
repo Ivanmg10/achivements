@@ -74,7 +74,7 @@ export default function WelcomePageDone({
             return (
               <li
                 key={row.step}
-                className={`${styles.card} flex items-center gap-3 p-3 rounded-2xl bg-bg-card ring-1 ring-ink/[0.06]`}
+                className={`${styles.card} flex items-center gap-3 p-3 rounded-card bg-bg-card ring-1 ring-ink/[0.06]`}
                 style={{ animationDelay: `calc(var(--enter-delay, 0s) + ${220 + i * 70}ms)` }}
               >
                 <span

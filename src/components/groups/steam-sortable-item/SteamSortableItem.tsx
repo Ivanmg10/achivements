@@ -120,7 +120,7 @@ export default function SteamSortableItem({
               </span>
             )}
           </span>
-          <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>{progressText}</span>
+          <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>{progressText}</span>
           {hasCounts && (
             <span className="flex items-center gap-2 mt-1">
               <ProgressBar pct={pct} label={item.title} trackClass="bg-bg-main" className="flex-1" />

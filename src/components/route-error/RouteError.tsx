@@ -50,7 +50,7 @@ export default function RouteError({
       </motion.div>
       <motion.div {...rise(0.06)} role="alert" className="flex flex-col items-center gap-2">
         <p className="text-xs font-semibold tracking-[0.14em] uppercase text-danger">{T.errorBoundary.eyebrow}</p>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-balance">{T.errorBoundary.title}</h1>
+        <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 text-balance">{T.errorBoundary.title}</h1>
         <p className="text-sm text-text-secondary max-w-sm">{T.errorBoundary.subtitle}</p>
       </motion.div>
       <motion.div {...rise(0.12)} className="w-full flex justify-center">

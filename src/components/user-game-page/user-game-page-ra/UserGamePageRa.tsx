@@ -10,6 +10,7 @@ import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
 import GameInfoHeroBackground from '@/components/game-info-hero-background/GameInfoHeroBackground'
 import GameInfoHeader from '@/components/game-info-header/GameInfoHeader'
 import GameCompareTable from '@/components/game-compare-table/GameCompareTable'
+import { buttonClass } from '@/components/ui/Button'
 
 export type UserGamePlatformProps = {
   /** The game as its URL has it. */
@@ -33,9 +34,9 @@ export default function UserGamePageRa({ id, username, banner, comparing, mine, 
     return (
       <>
         {banner}
-        <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 flex flex-col items-center gap-2 text-center">
-          <p role="alert" className="text-red-400">{T.userGame.loadError.replace('{u}', username)}</p>
-          <button onClick={refetch} className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-ink/10 transition-colors">
+        <section className="bg-bg-card rounded-card ring-1 ring-ink/[0.06] p-6 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 flex flex-col items-center gap-2 text-center">
+          <p role="alert" className="text-danger">{T.userGame.loadError.replace('{u}', username)}</p>
+          <button onClick={refetch} className={buttonClass('secondary', 'sm')}>
             {T.publicProfile.retry}
           </button>
         </section>
@@ -51,7 +52,7 @@ export default function UserGamePageRa({ id, username, banner, comparing, mine, 
       {banner}
       <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
         <GameInfoHeader gameData={current} />
-        <div className="w-[95%] mt-5 mb-5">
+        <div className="w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-7">
           <GameCompareTable theirs={theirs} mine={mine} username={username} comparing={comparing} mineLoading={mineLoading} notice={notice} />
         </div>
       </motion.div>

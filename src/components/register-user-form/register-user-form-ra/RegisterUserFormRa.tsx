@@ -68,7 +68,7 @@ export default function RegisterUserFormRa({
         <form onSubmit={handleCheck} noValidate className="flex flex-col gap-3">
           <p className="text-xs text-text-secondary">{t.raLead}</p>
           {error && (
-            <p role="alert" className="text-sm text-danger bg-danger/20 border border-danger/40 rounded-xl p-2.5">
+            <p role="alert" className="text-sm text-danger bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-2.5">
               {error}
             </p>
           )}

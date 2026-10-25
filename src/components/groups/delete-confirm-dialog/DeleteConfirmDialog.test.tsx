@@ -26,7 +26,7 @@ describe('DeleteConfirmDialog', () => {
   it('calls onClose when overlay is clicked', () => {
     const onClose = jest.fn()
     render(<DeleteConfirmDialog isOpen={true} onClose={onClose} onConfirm={() => {}} />)
-    fireEvent.click(screen.getByText('Are you sure?').parentElement!.parentElement!)
+    fireEvent.click(screen.getByRole('dialog').parentElement!)
     expect(onClose).toHaveBeenCalled()
   })
 

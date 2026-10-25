@@ -22,6 +22,7 @@ export default function FollowingList({
   error,
   onRetry,
   empty,
+  tabs,
 }: {
   users: FriendOverview[]
   details?: Record<string, FriendDetails>
@@ -30,6 +31,8 @@ export default function FollowingList({
   onRetry: () => void
   /** The empty state: an icon, a title and a line under it. */
   empty: { icon: ReactNode; title: string; subtitle: string }
+  /** The Following / Followers tabs: the search and the platforms sit on their line, as agreed. */
+  tabs?: ReactNode
 }) {
   const { T } = useLanguage()
   const [query, setQuery] = useState('')
@@ -45,30 +48,39 @@ export default function FollowingList({
   )
   const shown = useMemo(() => filterFollowing(users, query, platforms), [users, query, platforms])
 
-  if (isLoading) return <FollowingPageSkeleton />
+  if (isLoading) return <>{tabs}<FollowingPageSkeleton /></>
   if (error) {
     return (
-      <div className="bg-bg-card rounded-2xl flex flex-col items-center gap-2 py-10 text-center">
-        <p role="alert" className="text-sm text-red-400">{T.following.loadError}</p>
+      <>
+      {tabs}
+      <div className="bg-bg-card rounded-card flex flex-col items-center gap-2 py-10 text-center">
+        <p role="alert" className="text-sm text-danger">{T.following.loadError}</p>
         <button onClick={onRetry} className="text-sm text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
           {T.publicProfile.retry}
         </button>
       </div>
+      </>
     )
   }
   if (users.length === 0) {
     return (
-      <div className="bg-bg-card rounded-2xl">
-        <EmptyState icon={empty.icon} title={empty.title} subtitle={empty.subtitle} className="py-12" />
-      </div>
+      <>
+        {tabs}
+        <div className="bg-bg-card rounded-card">
+          <EmptyState icon={empty.icon} title={empty.title} subtitle={empty.subtitle} className="py-12" />
+        </div>
+      </>
     )
   }
 
   return (
     <>
-      <FollowingToolbar query={query} onQuery={setQuery} platforms={platforms} onPlatforms={setPlatforms} total={users.length} counts={counts} />
+      <div className="flex flex-col xl:flex-row xl:items-end gap-3 xl:gap-4">
+        <div className="flex-1 min-w-0">{tabs}</div>
+        <FollowingToolbar query={query} onQuery={setQuery} platforms={platforms} onPlatforms={setPlatforms} total={users.length} counts={counts} />
+      </div>
       {shown.length === 0 ? (
-        <p role="status" className="bg-bg-card rounded-2xl py-10 text-center text-sm text-text-secondary">{T.following.noMatches}</p>
+        <p role="status" className="bg-bg-card rounded-card py-10 text-center text-sm text-text-secondary">{T.following.noMatches}</p>
       ) : (
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[1800px]:grid-cols-5 gap-3">
           {shown.map((u) => (

@@ -52,7 +52,7 @@ export default function VaultLevelBadge({
       title={`${T.rankings.level.replace('{n}', String(level))} · ${tierText}`}
       // Mixed with the theme's text colour, so the tier's hue stays readable on a light or a dark card.
       style={{ backgroundColor: `rgb(${COLORS[tier]} / 0.15)`, color: `color-mix(in oklab, rgb(${COLORS[tier]}) 72%, rgb(var(--text-main)))` }}
-      className={`inline-flex items-center gap-1 rounded-full pl-1.5 pr-2 py-0.5 text-[11px] font-semibold whitespace-nowrap ${className}`}
+      className={`inline-flex items-center gap-1.5 h-[1.375rem] rounded-tag px-2 text-xs font-bold whitespace-nowrap ${className}`}
     >
       <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true" className="w-3 h-3 shrink-0">
         <path d={SHAPES[tier]} />

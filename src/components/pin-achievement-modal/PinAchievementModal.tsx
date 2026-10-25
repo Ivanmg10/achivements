@@ -8,12 +8,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievement } from '@/types/types'
 import { notify } from '@/lib/notify'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import Modal from '@/components/ui/Modal'
 
-const overlayVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.18 } },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
-}
 const spotlightVariants: Variants = {
   hidden: { opacity: 0, y: -14, scale: 0.97 },
   visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
@@ -80,17 +76,9 @@ export function PinAchievementModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          onClick={onClose}
-        >
-          <div className="absolute top-[12%] left-1/2 -translate-x-1/2 w-full max-w-lg px-4">
+        <Modal isOpen={isOpen} onClose={onClose} size="md" showClose={false} className="gap-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl border border-ink/5 flex flex-col overflow-hidden max-h-[70vh]"
+              className="bg-bg-card rounded-card shadow-2xl border border-ink/5 flex flex-col overflow-hidden max-h-[70vh]"
               variants={spotlightVariants}
               onClick={(e) => e.stopPropagation()}
             >
@@ -148,8 +136,7 @@ export function PinAchievementModal({
                 )}
               </div>
             </motion.div>
-          </div>
-        </motion.div>
+          </Modal>
       )}
     </AnimatePresence>
   )

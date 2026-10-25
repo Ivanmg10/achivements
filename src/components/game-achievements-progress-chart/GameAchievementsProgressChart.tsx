@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { InsightAchievement } from '@/utils/gameInsights'
 import { groupGameAchievementsByPeriod } from '@/utils/utils'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 
 type Period = 'week' | 'month'
 
@@ -58,33 +59,18 @@ export function GameAchievementsProgressChart({
   return (
     <div className="w-full flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2 px-1">
-        <p className="text-text-secondary text-sm">{T.gameExpanded.achievementsOverTime}</p>
-        <div role="tablist" className="flex items-center gap-0.5 p-0.5 rounded-full bg-ink/5 shrink-0">
-          <button
-            role="tab"
-            aria-selected={period === 'week'}
-            onClick={() => setPeriod('week')}
-            className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              period === 'week'
-                ? 'bg-accent text-bg-main'
-                : 'text-text-secondary hover:text-text-main hover:bg-ink/8'
-            }`}
-          >
-            {T.gameExpanded.weekly}
-          </button>
-          <button
-            role="tab"
-            aria-selected={period === 'month'}
-            onClick={() => setPeriod('month')}
-            className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              period === 'month'
-                ? 'bg-accent text-bg-main'
-                : 'text-text-secondary hover:text-text-main hover:bg-ink/8'
-            }`}
-          >
-            {T.gameExpanded.monthly}
-          </button>
-        </div>
+        <p className="text-sm font-bold text-text-main">{T.gameExpanded.achievementsOverTime}</p>
+        <SegmentedControl
+          aria-label={T.gameExpanded.achievementsOverTime}
+          size="xs"
+          className="shrink-0"
+          value={period}
+          onChange={setPeriod}
+          options={[
+            { value: 'week', label: T.gameExpanded.weekly },
+            { value: 'month', label: T.gameExpanded.monthly },
+          ]}
+        />
       </div>
 
       {isLoading ? (

@@ -74,7 +74,8 @@ What to use instead:
 
 `notify.success(T.toast.x)` / `notify.error(T.toast.y)` from `src/lib/notify.ts`,
 callable from components, hooks or contexts; `<Toaster />` (root layout) draws
-them bottom right: green with a check, red with an alert icon, gone after 4 s
+them bottom right: a dark card with the tone on its edge and icon (a check for success, an
+alert for an error) and a line that runs out with the time, gone after 4 s
 (errors 7 s), never while hovered or focused.
 
 - **Use a toast** for actions that happen outside a form — pin/unpin, reorder,
@@ -108,13 +109,13 @@ Steam"); the landing has a FAQ for the same reason. Added 2026-10-17.
 
 **Every new page, section or visual rework follows `docs/design-process.md`**, the way the
 welcome was made (the user's standing preference): study the reference, several clickable
-concepts on a design canvas (Figma when its connector is authorised), iterate with the user one
+concepts on a claude.ai design canvas (the user calls it "Figma"; they mean the canvas), iterate with the user one
 version at a time (changing only what they asked), a plan doc, then build and fix in short rounds
 from their screenshots (they use a 2560 px screen). The welcome's visual language (display
 italic titles, kickers, floating pill bar, curtain, cards that grow into their detail) is the
-one the user likes; an internal component library to make the whole site match it is an idea
-written up in `docs/ui-library-and-designs-plan.md` (a separate development, not started: design
-it first, then ask). **Every design made (Figma or canvas) gets an entry in `docs/designs.md`**
+one the user likes; an internal component library to make the whole site match it was designed
+and agreed on 2026-10-24 and is being built in three PRs (`docs/ui-library-and-designs-plan.md`
+→ Build plan; components only, never page structure). **Every design made (canvas) gets an entry in `docs/designs.md`**
 with its link, versions and what was built, so it can always be found again.
 
 ## Welcome after sign-up (`/welcome`, 2026-10-22)
@@ -197,12 +198,87 @@ its language changes the app. `fromBrowser` says when the language shown is the 
   navigation (the usual way) they are already in the right language.
 - `/privacy` lists the cookie among the necessary ones, in all nine languages.
 
+## The design system — read `docs/design-system.md` before any UI (2026-10-25)
+
+Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes), **the library**
+(`src/components/ui` and friends) and **pages built from it**. The catalogue of every piece is at
+**`/design`, admins only** (the flag is read from the database; others get the 404).
+
+- **Two designs, one switch:** `shape-style` = `slanted` (default) or `round` (Preferences → Layout →
+  Page), as `data-shape` on `<html>`; any element can carry its own `data-shape` to show a design
+  inside another (the catalogue and the choice cards do) (`ShapeSync`; a script in the root layout paints the last one before the first frame). The font is
+  the same in both: only shapes change. A
+  component never reads the choice: it reads tokens. A bar's cut ends are `slantStyle(px)`
+  (`ui/shape.ts`), a mark's lean `skew-y-(--slant-mark)`, a control's `skew-x-(--slant-button)`.
+  **Never a literal `polygon(...)` or `skew-*-[..]`** (`uiGuard.test.ts` fails on it). The round
+  design may override the shape tokens; no theme may (`designTokens.test.ts`).
+- **The round design is the site as it was before the slant**: soft corners on buttons, fields and cards
+  (`--r-button`, `--r-field`, `--r-card`, `--r-pane`, `--r-tile`), tags and chips as pills (`--r-tag`,
+  `--r-chip`), a switch as a pill with a round knob. Use `rounded-card` / `-pane` / `-tile` / `-tag` /
+  `-button`, never a fixed `rounded-[..rem]` for those (`uiGuard.test.ts` refuses it).
+- **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore` and `ToggleButton` are in `ui/`; a pin star or
+  any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
+- **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
+  `GameCardBackdrop` is the one place that draws it, so every game card follows it.
+- **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the
+  streak hero and its live bar, the cover's streak card, the home's stats tile, the rankings' streak column). This replaces "streaks in the accent" for those places.
+- **Adding a piece:** library first (`ui/`, props for layout only, a test), then its specimen in the
+  catalogue, then its rule in `uiGuard.test.ts`, then the page. A page that needs a one-off look asks
+  for a prop or a variant, never a copy.
+
+## The component library — draw with it (`src/components/ui`, 2026-10-24)
+
+The site's controls come from the library, in the design agreed on the canvas
+(`docs/ui-library-and-designs-plan.md` → Build plan). **Never draw one by hand**; a
+guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside `ui/`:
+
+- **Buttons**: `Button` (`primary` slanted, `secondary`, `quiet`, `danger` (tinted, not solid); `size`; `loading`;
+  `href` for a link) and `IconButton` (needs `aria-label`). Where an element cannot be one,
+  `buttonClass(variant, size, layout)`.
+- **Fields**: `Input`, `Textarea`, `SearchInput`, `PasswordInput`, wrapped in `Field` (label,
+  aside, hint or error wired by id); or `fieldClass({ invalid, icon, size })` on a native input.
+- **`Select`** (own listbox, never a native `<select>`), **`Switch`** (slanted; say the state in
+  words beside it), **`Checkbox`**, **`ChoiceCards`** / `choiceClass`.
+- **`Tabs`** (slanted line, roving tabindex; the panel is the caller's, `tabIds`),
+  **`SegmentedControl`** (sliding slanted pill), **`Pill`** / `pillClass` for filter chips.
+- `className` on them is for layout only (margin, width, flex), never colours.
+- **The look lives in tokens** in `globals.css` (`--slant-*`, `--r-*`, `--h-*`, `--motion-*`,
+  `--hardcore`/`--softcore`), defined once for every theme (`designTokens.test.ts`): a future
+  site-wide design changes them, not the components.
+- **Dialogs**: `Modal` (head with icon, title and hint; `footer`; `tone="danger"` is an
+  `alertdialog`; sizes `sm`–`xl`; a sheet on phones; Escape, outside click, focus kept inside and
+  given back; only the top dialog answers Escape). `CommonModal` is a thin wrapper over it (no
+  corner close by default). A modal names itself by its first heading, or `aria-label` /
+  `aria-labelledby`.
+- **Feedback**: `Notice` (tinted inline notice, `role="alert"` for errors), `TOOLTIP_SURFACE`
+  (`ui/tooltip.ts`), `MENU_SURFACE` / `menuItemClass` (`ui/menu.ts`); the toasts are the dark card.
+- **Surfaces and data**: `SURFACE` (`ui/surface.ts`; cards use `rounded-card`), `StatPill`'s
+  large size has no box, `RarityBadge` (a tinted figure, never a bar), `ProgressBar` bevelled and
+  glowing only when finished, `GameCardBackdrop` = a flat tint and border of the game's colour
+  (`useImageTint`; never the blurred art again, the user's choice). The art is read through
+  `/api/image-proxy` (only the platforms' image hosts, images only, 3 MB, a week's cache) so a canvas
+  may read it; do not widen its host list to anything a user can type (it would be an open proxy).
+- **Colours with a meaning come from the theme**: danger, success, warning, `hardcore`,
+  `softcore`; the guard refuses red / green / yellow / amber / orange palette classes. Tier and
+  platform hues are the exception.
+- **Streaks are in the accent**; amber (`warning`) only in the streak page's hero.
+- **Fonts:** Barlow for the UI, Barlow Condensed (italic 800) for display titles, both loaded in the
+  root layout (`src/lib/fonts.ts`). A page title, a big figure or a rank is `font-display italic`.
+- **Numbers a reader sees are in their language:** `toLocaleString(lang)`, `decimal(n, lang)` for a
+  fixed count of decimals, `formatRarity(pct, lang)`; never `toFixed` on screen ("0,8", not "0.8").
+- **A game page's top is `GameHero`** (chips, title, facts, actions, tiles, media) and its tables use
+  `ui/dataTable.ts` and `AchievementTableToolbar`; the four platforms share them.
+- **The home layout is the person's choice** (`useHomeLayout`, synced key `home-layout`):
+  `classic` (default) or `cover` (`MainPagePortada`, the game played last in big on top). It is in
+  Preferences → General and in the welcome's preferences step.
+
 ## Progress bars — in the theme's colours
 
 Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or
 `CircularProgress`: the theme's `--progress` (its accent), RA softcore a darker
 step of it (`bg-progress-soft`) under hardcore. A finished bar stays in the
-theme's colour and glows; **the green is only in the percentage beside it**
+theme's colour and glows (only a finished bar glows; its ends are cut on the design's slant);
+**the green is only in the percentage beside it**
 (`text-success` at 100%), never on the bar — the user tried a green ring and
 did not like it. Do not paint a bar in a platform's colour; those stay only in
 charts that compare platforms (CompletionDistribution, the line
@@ -1079,13 +1155,22 @@ requires `linked-issue` (see Issues).
 - [ ] **An internal component library** (buttons, inputs, selects, switches, modals, pills,
       steps bar, curtain) in the welcome's style, for the whole site, **and a record of every
       design** (`docs/designs.md`, started): `docs/ui-library-and-designs-plan.md`. A separate
-      development, the user's idea (2026-10-23); design the library on a canvas and agree it first.
+      development, the user's idea (2026-10-23). Design agreed 2026-10-24; building in three PRs
+      (foundations and controls, overlays and feedback, surfaces / data / colour sweep).
 - [ ] **Entrance animations on every page and component** (the user's wish, 2026-10-23; issue #61).
       The home has them (left card: `ViewEntrance`; profile column: `MainPageProfile.module.css`);
       the rest of the site should get its own, each suited to what it shows. **CSS keyframes, not
       Framer's `x`/`y`**, for anything that plays on a first load (Framer stutters while the page
       mounts), and **never hide an element until a frame or idle callback** (it shows empty while the
       main thread is busy). Reduced motion: a fade at most. Design it first (`docs/design-process.md`).
+- [ ] **A shareable user card** for social networks (the user's wish, 2026-10-23). Concepts on the
+      component library's canvas (`docs/designs.md`). Only data that is already public (what
+      `profileTeaser` and the showcase show); anything more means changing `/privacy`. Not started.
+- [ ] **`/diario`, a day-by-day journal of play** (the user's wish, 2026-10-23): a new route from
+      home concept C. Mini concept on the component library's canvas (`docs/designs.md`). Not started.
+- [ ] **Styles to the user's taste** (the user's wish, 2026-10-23): the user chooses how parts of the
+      site look. The first one: the home layout (*Classic*, default, or *Portada*), planned with the
+      component library (`docs/ui-library-and-designs-plan.md`).
 - [ ] **More languages** (the user's wish, 2026-10-23). Today nine (`LANGUAGES` in
       `src/utils/languages.ts`); the browser's language is taken when it is one of them, so a new
       language reaches its speakers on its own. A new one needs: its `src/translations/<lang>.ts`

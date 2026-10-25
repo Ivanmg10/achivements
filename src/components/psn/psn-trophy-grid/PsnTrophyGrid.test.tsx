@@ -76,13 +76,13 @@ test('without DLC, no folds', () => {
 
 test('signed in, a star pins a trophy; no star when signed out', () => {
   const { unmount } = render(<PsnTrophyGrid gameId={100} gameTitle="Astro Bot" trophies={TROPHIES} />)
-  expect(screen.queryByRole('switch', { name: new RegExp(en.favorites.addFavorite) })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: new RegExp(en.favorites.addFavorite) })).not.toBeInTheDocument()
   unmount()
   ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set([0]), toggle, canPin: true })
   render(<PsnTrophyGrid gameId={100} gameTitle="Astro Bot" trophies={TROPHIES} />)
   expect(usePsnFavoriteTrophies).toHaveBeenCalledWith(100, 'Astro Bot')
-  expect(screen.getByRole('switch', { name: `${en.favorites.removeFavorite}: All of them` })).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('switch', { name: `${en.favorites.addFavorite}: ${en.psn.hiddenTrophy}` }))
+  expect(screen.getByRole('button', { name: `${en.favorites.removeFavorite}: All of them` })).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: `${en.favorites.addFavorite}: ${en.psn.hiddenTrophy}` }))
   expect(toggle).toHaveBeenCalledWith(TROPHIES[1])
 })
 

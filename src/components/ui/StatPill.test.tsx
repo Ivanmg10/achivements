@@ -37,13 +37,14 @@ describe('StatCard', () => {
 
   test('uses theme text tokens by default, so it reads correctly in light mode too', () => {
     const { container } = render(<StatCard label="Games" value="10" />)
-    const value = container.querySelector('span')!
+    // The label first, the figure under it.
+    const value = container.querySelectorAll('span')[1]
     expect(value.className).toContain('text-text-main')
     expect(value.className).not.toContain('text-white')
   })
 
   test('an accent class overrides the default colour', () => {
     const { container } = render(<StatCard label="Perfect" value="5" accent="text-warning" />)
-    expect(container.querySelector('span')!.className).toContain('text-warning')
+    expect(container.querySelectorAll('span')[1].className).toContain('text-warning')
   })
 })

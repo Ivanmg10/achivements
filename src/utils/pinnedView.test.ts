@@ -32,7 +32,7 @@ test('PSN: its grade in its colour, and a hidden trophy keeps its text', () => {
     pin({ source: 'psn', psn_trophy_id: 3, game_id: 2018800, game_title: 'BO2', num_distinct_players: 0, snapshot: { name: 'X', detail: 'Y', iconUrl: 'i', type: 'gold', earned: false, hidden: true, rarity: 1.5 } }),
     en,
   )
-  expect(v).toMatchObject({ title: en.psn.hiddenTrophy, description: en.psn.hiddenTrophyDesc, value: en.psn.gold, valueClass: 'text-yellow-400', rarity: 1.5 })
+  expect(v).toMatchObject({ title: en.psn.hiddenTrophy, description: en.psn.hiddenTrophyDesc, value: en.psn.gold, valueClass: 'text-hardcore', rarity: 1.5 })
 })
 
 test('Xbox: gamerscore, and a secret one not unlocked is concealed', () => {

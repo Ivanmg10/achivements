@@ -454,6 +454,11 @@ export async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) =>
  * A counted noun in the right plural form for the language ("1 game",
  * "5 games", "5 игр"), with the number formatted for it too.
  */
+/** A number with a fixed count of decimals, in the reader's language ("0,8" in Spanish, never "0.8"). */
+export function decimal(n: number, lang = 'en', digits = 1): string {
+  return n.toLocaleString(lang, { minimumFractionDigits: digits, maximumFractionDigits: digits })
+}
+
 export function plural(n: number, forms: { zero?: string; one?: string; two?: string; few?: string; many?: string; other: string }, lang = 'en'): string {
   const form = forms[new Intl.PluralRules(lang).select(n)] ?? forms.other
   return form.replace('{n}', n.toLocaleString(lang))
@@ -487,6 +492,32 @@ export function countByDay(achievements: RecentAchievement[]): Record<string, nu
     out[d] = (out[d] ?? 0) + 1
   }
   return out
+}
+
+/**
+ * `text` cut where it matches `query` (first match, ignoring case), so the
+ * match can be drawn apart: e.g. "Spider" in "Marvel's Spider-Man".
+ */
+export function matchParts(text: string, query: string): { text: string; match: boolean }[] {
+  const q = query.trim()
+  const at = q ? text.toLowerCase().indexOf(q.toLowerCase()) : -1
+  if (at < 0) return [{ text, match: false }]
+  return [
+    { text: text.slice(0, at), match: false },
+    { text: text.slice(at, at + q.length), match: true },
+    { text: text.slice(at + q.length), match: false },
+  ].filter((p) => p.text !== '')
+}
+
+/**
+ * The top of a day-by-day strip: the 90th percentile of the days with something,
+ * so one huge day does not flatten the rest (days above it are cut and say their
+ * figure). At least 1.
+ */
+export function stripCap(counts: number[]): number {
+  const busy = counts.filter((n) => n > 0).sort((a, b) => a - b)
+  if (!busy.length) return 1
+  return Math.max(1, busy[Math.floor((busy.length - 1) * 0.9)])
 }
 
 /**

@@ -8,6 +8,7 @@ import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
 import { useLanguage } from '@/context/LanguageContext'
 import { checkPassword, PASSWORD_MIN } from '@/utils/authValidation'
+import Button from '@/components/ui/Button'
 
 /**
  * The page the reset link opens: a new password, typed twice, plus the token
@@ -63,7 +64,7 @@ export default function ResetPasswordForm() {
       </div>
 
       {!token ? (
-        <p role="alert" className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3 text-sm text-danger">
+        <p role="alert" className="mb-5 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3 text-sm text-danger">
           {T.passwordReset.missingToken}
         </p>
       ) : done ? (
@@ -73,7 +74,7 @@ export default function ResetPasswordForm() {
       ) : (
         <>
           {error && (
-            <p role="alert" className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3 text-sm text-danger">
+            <p role="alert" className="mb-5 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3 text-sm text-danger">
               {error}
             </p>
           )}
@@ -110,10 +111,10 @@ export default function ResetPasswordForm() {
               disabled={submitting}
             />
 
-            <button
+            <Button
               type="submit"
               disabled={submitting}
-              className="bg-accent text-bg-main w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              size="lg" className="w-full mt-2"
             >
               {submitting ? (
                 <>
@@ -126,7 +127,7 @@ export default function ResetPasswordForm() {
                   <IconArrowRight size={16} aria-hidden="true" />
                 </>
               )}
-            </button>
+            </Button>
           </form>
         </>
       )}

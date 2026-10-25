@@ -11,14 +11,15 @@ export default function MainPageProfileRaStats({
   user: RetroAchievementsUserProfile
   hardcoreRatio: number
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
+  const n = (v: number | null | undefined) => (v ?? 0).toLocaleString(lang)
 
   return (
     <div className="grid grid-cols-2 gap-2">
-      <StatCard label={T.profileStats.hardcorePoints} value={user.TotalPoints ?? 0} accent="text-warning" />
-      <StatCard label={T.profileStats.truePoints} value={user.TotalTruePoints ?? 0} />
-      <StatCard label={T.profileStats.softcorePoints} value={user.TotalSoftcorePoints ?? 0} />
-      <StatCard label={T.profileStats.hardcoreRatio} value={`${hardcoreRatio}%`} />
+      <StatCard label={T.profileStats.hardcorePoints} value={n(user.TotalPoints)} accent="text-hardcore" />
+      <StatCard label={T.profileStats.truePoints} value={n(user.TotalTruePoints)} />
+      <StatCard label={T.profileStats.softcorePoints} value={n(user.TotalSoftcorePoints)} />
+      <StatCard label={T.profileStats.hardcoreRatio} value={`${hardcoreRatio.toLocaleString(lang)} %`} />
     </div>
   )
 }

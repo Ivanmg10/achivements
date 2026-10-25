@@ -56,7 +56,7 @@ export default function XboxGameInfoAchievementCard({
             alt=""
             width={48}
             height={48}
-            className={`w-12 h-12 rounded-lg object-cover ${a.unlocked ? 'ring-2 ring-green-500' : 'grayscale opacity-50'}`}
+            className={`w-12 h-12 rounded-lg object-cover ${a.unlocked ? 'ring-2 ring-success' : 'grayscale opacity-50'}`}
             unoptimized
           />
         ) : (
@@ -77,7 +77,7 @@ export default function XboxGameInfoAchievementCard({
         <h3 className={`text-sm font-semibold ${a.unlocked ? '' : 'text-text-secondary'}`}>{concealed ? T.xbox.secretAchievement : a.name}</h3>
         <p className="text-xs text-text-secondary">{concealed ? T.xbox.secretAchievementDesc : a.description}</p>
         <div className="flex items-center gap-2 flex-wrap text-[11px] mt-1">
-          <span className="font-semibold text-green-500">{a.gamerscore} G</span>
+          <span className="font-semibold text-success">{a.gamerscore} G</span>
           {a.unlocked ? (
             <span className="inline-flex items-center gap-1 text-success">
               <IconCheck size={12} aria-hidden="true" />
@@ -91,7 +91,7 @@ export default function XboxGameInfoAchievementCard({
           )}
           {a.rarity !== null && (
             <span className="text-text-secondary">
-              {formatRarity(a.rarity)}
+              {formatRarity(a.rarity, lang)}
               {T.achievement.haveIt}
             </span>
           )}

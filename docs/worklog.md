@@ -29,6 +29,240 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-25 (night, 3) — The round design as it was, tiers everywhere, Disclosure (`feat/65-ui-surfaces`, #65)
+
+**Did** — (1) The round design is the old look: buttons, fields and cards keep soft corners (not
+pills), tags and chips are pills, the switch is a pill with a round knob. New radius tokens
+`--r-tag/-pane/-tile` and `rounded-tag/-pane/-tile`; 52 files swapped their fixed `rounded-[..rem]`
+for tokens, and the guard refuses the fixed values. (2) Streak tiers also colour the home's stats
+tile (`StatPill.accentColor`), the rankings' streak column and the live bar on `/racha`.
+(3) Disclosure in the library: `Accordion` (the FAQ's item), `ShowMore` (the two "show the rest"
+buttons), `ToggleButton` (the Steam / PSN / Xbox pin star, now `aria-pressed` instead of
+`role="switch"`; the guard's exception is gone); all three in the catalogue.
+**Decisions** — `ShowMore` replaces the small pill of `ShowAllButton` with a secondary button (small
+size) so there is one look for "show the rest".
+**Open** — `Shelf` and the striped drag slot stay page-specific (`LibraryShelf`, the groups' sortable
+rows): moving them needs their own pass.
+**Watch out** — The pin star is a button with `aria-pressed` now: tests look for `button`, not `switch`.
+
+---
+
+## 2026-10-25 (night, 2) — Review round 4: round switch, Layout modal, catalogue (`feat/65-ui-surfaces`, #65)
+
+**Did** — (1) The round design's switch is a pill with a circular knob (tokens `--r-track`,
+`--r-knob`, `--knob-w/h/shift`), buttons and icon buttons are pills and circles (`--r-button`,
+`rounded-button`); the font is the same in both designs again (the upright face and its CSS rule are
+gone). (2) The preferences row is **Layout** and opens `LayoutModal` with two tabs: *Page* (the
+shape, as two cards with a drawing each) and *Home* (home layout and game cards). The welcome keeps
+the choices inline. (3) The catalogue was redone: a left menu that follows the reader, one card per
+piece (26) fed by `catalogue.ts`, and **both designs side by side** for every piece whose shape
+matters (`Compare`; the designs are now scopable: `[data-shape="slanted"|"round"]` on any element).
+**Decisions** — Scoping a design to an element needed the slanted values restated in
+`[data-shape="slanted"]`; `designTokens.test.ts` checks they equal the base. The registry throws on an
+unknown piece id, so a card cannot exist without its menu entry.
+**Open** — The streak tile in the home's stats is still the accent, not the tier's hue. Fields and
+cards keep their radii in the round design (only controls, chips, bars and switches change).
+**Watch out** — `/design` hydration errors in dev right after a recompile come from
+`NavigationProgress`, not from the catalogue.
+
+---
+
+## 2026-10-25 (night) — Review round 3: shape design, tiers, cover art, catalogue (`feat/65-ui-surfaces`, #65)
+
+**Did** — (1) The group ring's number is centred (a `pr-1` was pushing it 2 px left). (2) The
+Followers tab draws the same card as Following: `useFollowers` now reads the newest fans' activity
+and games and "playing now" like `useFriendsData`. (3) Streaks by tier (`streakTier`: 0, 5, 10, 20,
+30, 40, 50+ days, a hue each) in `StreakTag`, the `/racha` hero and the cover's streak card.
+(4) The cover: `homeHeroOf` gives `art[]` (Steam hero then its store header, PSN's backdrop) and
+`icon`; `useGameInsights` adds RA's in-game screenshot and Xbox's IGDB art; the cover tries each and,
+with none, shows the game's picture as a poster over its colour: never an empty box. (5) The
+**shape design**: slanted or round as tokens (`--clip-*`, `--bar-radius`, `--slant-*`), `data-shape`
+on `<html>` (`ShapeSync` + a layout script), a row in Preferences and in the welcome; the display
+face loads upright too (round titles are not italic). (6) The catalogue at `/design` (admins only,
+checked against the database) and `docs/design-system.md`; the guard test now also refuses fixed
+polygons and skews.
+**Decisions** — The round design is only overrides of tokens: no component knows about it. A hard
+rule ("never a literal polygon") beat a convention. The catalogue is English (admin-only, like the
+admin panel).
+**Open** — The home's streak tile (the `48d` in Stats) is still the accent, not the tier's hue. The
+round design is a first pass: look for a hand-made shape the guard cannot see (CSS modules, e.g. the
+welcome's curtain, are untouched). The Disclosure pieces still have no page.
+**Watch out** — Editing `globals.css` sometimes leaves the dev server on stale CSS: change the file's
+content (touching it is not enough). `font-display italic` titles are upright in the round design by a
+CSS rule, not by the component.
+
+---
+
+## 2026-10-25 (later) — The user's review round 2 (`feat/65-ui-surfaces`, #65)
+
+**Did** — (1) The group hero is a ring again (`CircularProgress`, already in `ui/`) with the
+percentage in the display face. (2) Following's hero has its old structure back (icon, title and
+line top left; the count in big with faces and "online now" at the bottom); its rankings card is a
+real podium (gold ring, slanted steps, display-face places). (3) More air under Rankings' title.
+(4) `/rankings/how`: a hero, eight numbered cards (`RankingsGuideBlock` takes `index`), rules as
+marked cards, tables with slanted bars (`weights`). (5) `ui/StreakTag`: flame and days, lit with a
+glow while a streak is going, dimmed with an outline flame at 0; it is the header's streak badge.
+(6) The home layout moved into a modal (`HomeLayoutModal`, opened by one row in Preferences →
+General, which shows "Classic · Colourful"); the welcome keeps the cards inline. (7) New synced
+preference `game-card-style` (`useGameCardStyle`: `tinted` default / `flat`); `GameCardBackdrop`
+draws a plain surface and a hairline when flat and then reads no colour from the art. It applies to
+every game card (home, pinned, groups, library rows, now playing), not only the home's.
+**Decisions** — The card style is global rather than per page, so the site does not mix two looks.
+The rounded-vs-slanted style the user wants next is the same kind of switch: put it beside
+`game-card-style` and read it from the tokens (`--slant-*`), not from each component.
+**Open** — Discuss with the user: a design-system home for the components (canvas + `docs/designs.md`
++ a living catalogue page), and how future agents get the rules.
+**Watch out** — Choosing a card style by writing `game-card-style` in localStorage by hand syncs to
+the account; the values are `tinted` and `flat`.
+
+---
+
+## 2026-10-25 — Every page checked again against the final boards (`feat/65-ui-surfaces`, #65)
+
+**Did** — The user said half of the boards were not on the site. Each page was compared in the
+browser (Playwright) against its board (`.playwright-mcp/canvas/project`, Final01–Final12) and
+rebuilt where it differed:
+- **Fonts:** Barlow (UI) and Barlow Condensed (display) load at the root (`src/lib/fonts.ts`); the
+  display face had only loaded in the welcome.
+- **Top bar, game page (`GameHero`, `dataTable.ts`, table toolbar, missables notice), search
+  panel, home profile column, groups, Following:** see the commits before this entry.
+- **Rankings (board 10):** podium cards with slanted steps (first in the accent, a gold ring), the
+  toolbar on the tabs' hairline (platform chips, `Select` with a `prefix` label), the split under
+  the points, a two-line streak, delta tags; level, "where your points come from" and the week's
+  most active as three side cards.
+- **Library (board 06):** the platform switch is the library's `Tabs` with counts (the list is its
+  tabpanel when two platforms or more have games), one toolbar row (search, quick filters, order,
+  layout), rows with a platform tag and the selected bar, the detail panes at the board's widths.
+- **Account (board 12) and the home picker (board 03):** hero with "ID · country · following ·
+  followers", the level box, labelled fields, plain count tiles, preferences as rows, the home
+  layout as two cards with a drawing each (`ChoiceCards` gained `preview`); the delete card under
+  the account card (a library `Button`, its modal now lazy).
+- **Cover home (board 02):** the next easiest achievement (`useGameInsights`: any platform, through
+  the routes the game page uses) and "see the N left"; in the cover layout the right column is
+  level, streak and recent achievements on every platform (`MainPagePortadaSide`).
+- **Group (board 08):** the percentage in big, the line above the name, tabs in the board's order,
+  console and decade with their label inside, covers with the console above the name, an add tile.
+- **Streak (board 11, v3):** it had not been built to the board. Hero with the days in big and the
+  year's four figures as tiles; best streaks as slanted bars ("ongoing" on the current one); the
+  day card (the day in big, the game and the achievement); slanted weekday bars; card titles with a
+  line on the right (`StreakSectionHead`).
+- **Numbers:** `decimal()` and `formatRarity(pct, lang)` give "0,8" in Spanish (every `toFixed(1)`
+  shown to a reader goes through them); country names in the reader's language (`countryName`).
+- **Small truths fixed:** a game with no achievements says so (not "nothing matches"); the comments
+  button says "the latest N" when RA sent fewer than its total; Spanish "Pinear" became "Fijar".
+
+**Why** — The user's review: the boards were not applied in full.
+**Decisions** — Where a board and an agreed rule disagree, the rule wins (no key hints in the
+library search; tinted, not solid, danger buttons). In the cover layout the platform profiles leave
+the home (the board and the picker's own text say so); they are still on the account page.
+**Open** — The V6 component boards were only spot-checked (the modal matches). The cover's kicker
+does not give total hours (the feed does not carry them for every platform). Spanish does not group
+four-digit numbers ("4930"): that is the language's rule, not a bug.
+**Watch out** — `npm run build` while `next dev` runs leaves the dev server with stale CSS (they
+share `.next`): stop dev, build, start it again. The library page's test mocks `LibraryExplorer`;
+the search and layout controls are now its props (`search`, `layoutToggle`), so the mock draws them.
+
+---
+
+## 2026-10-24 — Component library, part 3: surfaces, data and the colour sweep (`feat/65-ui-surfaces`, #65)
+
+**Did** — Game rows (recent, pinned, groups, status lists) take a flat tint and border of the
+game's colour instead of the blurred art (`GameCardBackdrop` + `useImageTint`, a canvas read when
+the image host allows CORS, a neutral grey otherwise). Streaks in the accent, amber only in the
+streak hero. No bar under a group's covers. `RarityBadge` in the four achievement tables. The home
+layout preference (`home-layout`: classic / cover) with `MainPagePortada`, in Preferences and the
+welcome; the recent feed moved to `useRecentFeed`. `StatPill`'s large size without a box. Card
+shells on `rounded-card`. Progress bars bevelled, glowing only when finished. The palette sweep
+(81 files) and its guard; RA softcore rings on `--softcore`.
+**Why** — PR 3 of the agreed design.
+**Decisions** — The tint applies to every game row, not only recently played (homogeneity). The
+Following cards already had the last game's art in code (only the canvas lacked it). Tables already
+centre headers and values in code; no change.
+**Then, page by page against the canvas's final boards (same day):** header (slanted nav line,
+sunken search with the accent slash, chips) and the home profile column; game pages (chips, title in
+the display face, facts row, actions as library buttons, table filters as line tabs); library rows
+tinted and the detail panes; page titles in the display face; rankings period and order as
+`Select`s; the streak page v3 (`StreakStatsBanner` is now the hero with the amber flame and the
+year's figures under it, `StreakChart` a ranked list, `StreakDayStrip` replaces the calendar: a bar
+per day, square-root scale capped at the 90th percentile by `stripCap`, cut days marked with their
+figure); the account page (identity fields sunken, buttons from the library, preference rows
+divided, platform cards with a status dot); the group detail (taller hero, title and ring in the
+display face, state chips, filters as line tabs with counts); the opened game (bold pane titles,
+the ring's mini figures under it on desktop, the goal slot striped in the accent).
+`useImageTint` reads every image through `/api/image-proxy` (allowlisted hosts), so the tint works
+on every platform. `Button`'s `danger` variant is tinted (danger text, ring and soft fill), as on
+the agreed account board, not solid.
+**Open** — The review pass with the user (their screenshots, 2560 px). Not built, on purpose: the
+Disclosure pieces (`Accordion`, `ShowMore`, `ToggleButton`, `Shelf`) have no place that uses them
+yet. The cover layout's art is RA's small screenshot, blurry at that size: a wider picture (IGDB's
+hero, as Xbox uses) would fix it.
+**Watch out** — The cover layout is checked: the home grows by the cover's height (the list and
+profile still share the rest). Writing `home-layout` by hand in the browser syncs to the account:
+the values are `classic` and `cover`.
+
+---
+
+## 2026-10-24 — Component library, part 2: overlays and feedback (`feat/64-ui-overlays`, #64)
+
+**Did** — `Modal` in `src/components/ui` (dialog role, head / footer, danger variant, sizes, a sheet
+on phones, Escape and outside click, focus trap and return, only the top dialog answers Escape);
+`CommonModal` became a wrapper over it, and the 14 hand-built dialogs (achievement, detail, hashes,
+AI export, groups, add / pin games, pin achievement, showcase picker, favourite game, forgot
+password, delete confirmation, admin panel, day / week / period lists) dropped their own overlay,
+Escape and focus code. `Notice` for tinted inline notices; inline errors in the theme's danger
+colour. One dark tooltip surface, one menu surface (header status menu, sort menu, Select). The
+toasts are a dark card with the tone on the edge and icon and a line for the time left. The search
+panel uses the dialog surface, the segmented control and pills (still opens on typing). The cookie
+banner on the dialog surface. The guard refuses a hand-built dialog overlay.
+**Why** — PR 2 of the agreed design.
+**Decisions** — A dialog focuses itself (its name is read first) unless a field has `autoFocus`.
+`CommonModal` keeps no corner close by default (those modals have their own way out). Branch stacked
+on #63's (it needs its components); rebase onto `develop` once #63 is merged.
+**Open** — The search panel, the phone menu drawer and the sign-in backdrop keep their own overlays
+(allowed in the guard). Skeletons and the empty state were left as they are. PR 3.
+
+---
+
+## 2026-10-24 — Component library, part 1: foundations and controls (`feat/63-ui-library`, #63)
+
+**Did** — Design tokens in `globals.css` (slants, radii, control heights, motion, `--hardcore` /
+`--softcore`, one set for every theme). In `src/components/ui`: `Button` / `IconButton`
+(slanted primary), the fields (`Input`, `Textarea`, `SearchInput`, `Field`, `PasswordInput`
+moved here), `Select` (own listbox), `Switch` (slanted), `Checkbox`, `ChoiceCards`,
+`SegmentedControl`, `Pill`, `Tabs`, each with tests. The whole site moved to them: every primary
+button and the cancel / delete beside them, every text field, the three native selects, the five
+hand-made switches, the console ticks, group visibility, the view / layout / grid toggles, the
+filter chips, the tab rows. `uiGuard.test.ts` refuses hand-drawn primary buttons, fields,
+selects, switches and checkboxes. CLAUDE.md has the rules ("The component library").
+**Why** — The agreed design (`docs/designs.md`), PR 1 of three.
+**Decisions** — The button's shape is a skewed `::before` inset by the slant (a full-width button
+lines up with the fields). The Steam pin star keeps `role="switch"` until PR 3's `ToggleButton`
+(allowed in the guard). The library's platform pill keeps its own Framer slide (labels of different
+widths). The search panels' bare inputs (header search, pin and favourite game) wait for PR 2.
+**Open** — A pass over the whole site with the user's screenshots (the user asked to build
+everything first, then fix). PR 2 and PR 3.
+**Watch out** — A missing space between two classes once put the button's shape over its label:
+`Button.test.tsx` now checks the shape stays behind.
+
+---
+
+## 2026-10-24 — Component library designed and agreed; build plan (`feat/63-ui-library`, #63)
+
+**Did** — Designed the internal component library and every page in its style on the design canvas
+(`docs/designs.md`), over several rounds with the user, then wrote the build plan
+(`docs/ui-library-and-designs-plan.md` → Build plan). The canvas's last section, "Todo lo acordado,
+página a página", holds the agreed version of each page. CLAUDE.md now says the design is agreed and
+being built; roadmap entries added for the shareable card, `/diario` and styles to taste.
+**Why** — The user wants the whole site drawn by its own components, homogeneous between them, so
+future visual designs only change tokens.
+**Decisions** — Components only, never page structure. Concept A (the welcome's), slanted primary
+button, slanted switch, own select, sunken fields, dark tooltip. Streaks in the theme's colour
+(amber only in the streak page's hero). The search opens on typing as today, no Ctrl+K. Tables align
+headers like their values; rarity is a tinted figure, no bar. The statistics section keeps today's
+layout. Three PRs: foundations and controls (#63), overlays and feedback, surfaces / data / colour sweep.
+**Open** — PR 1 code. Issues for PRs 2 and 3 to open when they start.
+**Watch out** — The canvas saves itself from the page: re-read `project/canvas.json` before publishing.
+
 ## 2026-10-23 — The home's Recent / Pinned switch is its title, and entrance animations (`feat/60-home-view-tabs`, #60)
 
 **Did** — `MainViewToggle` no longer draws two 28 px icon buttons beside the title: it *is* the title,

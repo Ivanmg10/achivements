@@ -73,7 +73,7 @@ export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView 
       earned: a.unlocked,
       anchor: xboxAchievementAnchor(fav.xbox_achievement_id),
       value: `${a.gamerscore} G`,
-      valueClass: 'text-green-500',
+      valueClass: 'text-success',
       rarity: a.rarity ?? null,
     }
   }

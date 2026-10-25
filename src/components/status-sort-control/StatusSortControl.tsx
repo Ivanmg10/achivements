@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useClickAway } from '@/hooks/useClickAway'
+import { MENU_SURFACE, menuItemClass } from '@/components/ui/menu'
+import { buttonClass } from '@/components/ui/Button'
 
 export type StatusSortKey = 'name' | 'lastPlayed' | 'percent' | 'points'
 export type SortDir = 'asc' | 'desc'
@@ -74,11 +76,11 @@ export default function StatusSortControl({
         ref={triggerRef}
         type="button"
         aria-expanded={isOpen}
-        aria-label={T.statusSort.label}
         onClick={() => setIsOpen((o) => !o)}
-        className="flex items-center gap-1.5 text-sm px-3 py-1 rounded-lg bg-bg-card text-text-secondary hover:text-text-main transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className={buttonClass('secondary', 'md')}
       >
-        {T.statusSort.label}: {T.statusSort[sortState.key]} <span aria-hidden="true">{arrow}</span>
+        <span className="sr-only">{T.statusSort.label}: </span>
+        {T.statusSort[sortState.key]} <span aria-hidden="true">{arrow}</span>
         <IconChevronDown
           className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           aria-hidden
@@ -86,7 +88,7 @@ export default function StatusSortControl({
       </button>
       {isOpen && (
         <div
-          className="absolute top-full right-0 mt-1 z-20 bg-bg-card rounded-lg shadow-lg py-1 min-w-40"
+          className={`absolute top-full right-0 mt-1 z-20 min-w-40 ${MENU_SURFACE}`}
         >
           {keys.map((key) => {
             const active = sortState.key === key
@@ -96,9 +98,7 @@ export default function StatusSortControl({
                 type="button"
                 aria-pressed={active}
                 onClick={() => handleSelect(key)}
-                className={`w-full text-left text-sm px-3 py-1.5 transition-colors cursor-pointer focus-visible:outline-none focus-visible:bg-ink/10 ${
-                  active ? 'text-accent font-medium' : 'text-text-secondary hover:text-text-main'
-                }`}
+                className={menuItemClass(active)}
               >
                 {T.statusSort[key]} {active && <span aria-hidden="true">{arrow}</span>}
               </button>

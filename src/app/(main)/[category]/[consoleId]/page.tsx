@@ -46,7 +46,7 @@ export default function CategoryConsolePage() {
         {loading ? (
           <StatusPageSkeleton />
         ) : error ? (
-          <p className="text-red-400 text-sm text-center mt-10">{error}</p>
+          <p className="text-danger text-sm text-center mt-10">{error}</p>
         ) : games.length === 0 ? (
           <StatusEmptyState category={cat} className="min-h-[60vh]" />
         ) : (

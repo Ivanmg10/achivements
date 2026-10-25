@@ -18,7 +18,7 @@ export default function LanguageModal({ isOpen, onClose }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose} className="max-w-lg">
+    <CommonModal isOpen={isOpen} onClose={onClose} size="md">
       <h2 className="text-xl font-bold mb-4">{T.userConfig.language}</h2>
 
       <div

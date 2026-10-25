@@ -1,9 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { motion } from 'framer-motion'
 import { RecentAchievement } from '@/types/types'
-import { modalOverlay, modalContent } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { useUserAwards } from '@/hooks/useUserAwards'
 import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
@@ -12,6 +10,7 @@ import Link from 'next/link'
 import { IconX, IconStar, IconCheck } from '@tabler/icons-react'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
+import Modal from '@/components/ui/Modal'
 
 interface Props {
   date: string
@@ -43,22 +42,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
   }, [awards, date])
 
   return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      variants={modalOverlay}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      onClick={onClose}
-    >
-      <motion.div
-        className="bg-bg-header rounded-2xl p-4 w-full max-w-2xl max-h-[70vh] flex flex-col gap-3"
-        variants={modalContent}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={e => e.stopPropagation()}
-      >
+    <Modal isOpen onClose={onClose} size="lg" showClose={false} aria-label={formatted} className="gap-3">
         <div className="flex items-start justify-between gap-2 shrink-0">
           <div>
             <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.dayModal.title}</p>
@@ -100,7 +84,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                       ) : (
                         <div className="w-9 h-9 rounded-lg bg-ink/5" />
                       )}
-                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${isMastery ? 'bg-yellow-400' : 'bg-green-500'}`}>
+                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${isMastery ? 'bg-hardcore' : 'bg-success'}`}>
                         {isMastery
                           ? <IconStar className="w-2.5 h-2.5 text-black" aria-hidden />
                           : <IconCheck className="w-2.5 h-2.5 text-white" aria-hidden />
@@ -112,7 +96,7 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                       <span className="text-[10px] text-text-secondary">{award.ConsoleName}</span>
                     </div>
                     <div className="flex flex-col items-end gap-1 shrink-0">
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isMastery ? 'bg-yellow-400/15 text-yellow-400' : 'bg-green-500/15 text-green-400'}`}>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isMastery ? 'bg-hardcore/15 text-hardcore' : 'bg-success/15 text-success'}`}>
                         {isMastery ? T.streak.mastery : T.streak.beaten}
                       </span>
                       {isHardcore && <span className="text-[10px] text-warning font-semibold">HC</span>}
@@ -142,7 +126,6 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
             {dayAwards.length > 0 && ` · ${dayAwards.length} ${T.streak.completions.split(' ')[0].toLowerCase()}`}
           </p>
         )}
-      </motion.div>
-    </motion.div>
+    </Modal>
   )
 }

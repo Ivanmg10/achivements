@@ -4,6 +4,7 @@ import Spinner from '../main-spinner/Spinner'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRaLink } from '@/hooks/useRaLink'
 import { notify } from '@/lib/notify'
+import { fieldClass } from '@/components/ui/Input'
 
 export default function RaLoginModal({
   isOpen,
@@ -36,7 +37,7 @@ export default function RaLoginModal({
           type="text"
           placeholder={T.raLoginModal.username}
           aria-label={T.raLoginModal.username}
-          className="rounded-xl bg-bg-main p-3 w-full"
+          className={fieldClass()}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
@@ -46,7 +47,7 @@ export default function RaLoginModal({
             placeholder={T.raLoginModal.apiKey}
             aria-label={T.raLoginModal.apiKey}
             value={apiKey}
-            className="rounded-xl bg-bg-main p-3 w-full"
+            className={fieldClass()}
             onChange={(e) => setApiKey(e.target.value)}
           />
           {/* The key is buried in RA's settings, so say exactly where. */}

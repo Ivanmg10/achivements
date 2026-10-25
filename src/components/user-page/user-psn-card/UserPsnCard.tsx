@@ -27,7 +27,7 @@ export default function UserPsnCard() {
   const minutes = totalPlaytime(library)
   const onlineId = summary?.onlineId || username
 
-  const value = (n: number | undefined) => (isLoading || n === undefined ? '—' : n.toLocaleString())
+  const value = (n: number | undefined) => (isLoading || n === undefined ? '—' : n.toLocaleString(lang))
   const earned = summary?.earned
   const stats: PlatformStat[] = [
     { label: T.psn.level, value: value(summary?.trophyLevel) },
@@ -65,7 +65,7 @@ export default function UserPsnCard() {
       status={
         isLinked &&
         summaryError && (
-          <p role="alert" className="text-xs text-red-400">
+          <p role="alert" className="text-xs text-danger">
             {T.psn.errors[summaryError]}
           </p>
         )
@@ -78,7 +78,7 @@ export default function UserPsnCard() {
               alt=""
               width={44}
               height={44}
-              className="rounded-lg w-11 h-11 object-cover shrink-0"
+              className="rounded-lg w-10 h-10 object-cover shrink-0"
               unoptimized
             />
           ) : (
@@ -86,7 +86,7 @@ export default function UserPsnCard() {
           )}
           <div className="flex flex-col gap-0.5 min-w-0">
             <span className="font-bold truncate">{summary?.onlineId || username || '—'}</span>
-            <span className="text-xs text-text-secondary font-mono truncate">{accountId}</span>
+            <span className="text-[0.6875rem] text-text-secondary truncate">{accountId}</span>
           </div>
         </div>
       }

@@ -95,7 +95,7 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
         >
           <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-full max-w-sm px-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl overflow-hidden border border-ink/5"
+              className="bg-bg-card rounded-card shadow-2xl overflow-hidden border border-ink/5"
               variants={contentVariants}
               onClick={(e) => e.stopPropagation()}
             >

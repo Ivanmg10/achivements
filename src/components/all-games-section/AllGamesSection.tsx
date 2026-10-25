@@ -17,7 +17,7 @@ type Category = 'wantToPlay' | 'playing' | 'completed'
 const CATEGORY_META: Record<Category, { icon: string; badge: string }> = {
   wantToPlay: { icon: '🔖', badge: 'bg-purple-900/50 text-purple-300' },
   playing:    { icon: '🎮', badge: 'bg-blue-900/50   text-blue-300'   },
-  completed:  { icon: '🏆', badge: 'bg-green-900/50  text-green-300'  },
+  completed:  { icon: '🏆', badge: 'bg-green-900/50  text-success'  },
 }
 
 export default function AllGamesSection({

@@ -1,9 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { IconTrash } from '@tabler/icons-react'
+import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
-import DeleteAccountModal from '@/components/delete-account-modal/DeleteAccountModal'
+import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+import Button from '@/components/ui/Button'
+
+// Downloaded the first time it is wanted, not with the page.
+const DeleteAccountModal = dynamic(() => import('@/components/delete-account-modal/DeleteAccountModal'), { loading: () => null })
 
 /** The way out: the account and everything in it, gone for good. */
 export default function DeleteAccountCard() {
@@ -11,19 +15,17 @@ export default function DeleteAccountCard() {
   const [open, setOpen] = useState(false)
 
   return (
-    <section className="bg-bg-card rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center gap-4 border border-red-500/20">
+    <section className="bg-bg-card rounded-card p-5 sm:px-7 flex flex-col sm:flex-row sm:items-center gap-4 ring-1 ring-inset ring-danger/25">
       <div className="flex-1 flex flex-col gap-1">
-        <h2 className="text-sm font-semibold text-red-400 uppercase tracking-wider">{T.deleteAccount.title}</h2>
-        <p className="text-sm text-text-secondary">{T.deleteAccount.text}</p>
+        <h2 className="font-bold text-danger">{T.deleteAccount.title}</h2>
+        <p className="text-[0.8125rem] text-text-secondary">{T.deleteAccount.text}</p>
       </div>
-      <button
-        onClick={() => setOpen(true)}
-        className="self-start sm:self-auto flex items-center gap-2 px-4 py-2 rounded-xl border border-red-500/40 text-red-400 text-sm font-semibold hover:bg-red-500/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/60"
-      >
-        <IconTrash size={16} aria-hidden="true" />
+      <Button variant="danger" size="sm" onClick={() => setOpen(true)} aria-haspopup="dialog" className="self-start sm:self-auto">
         {T.deleteAccount.button}
-      </button>
-      <DeleteAccountModal isOpen={open} onClose={() => setOpen(false)} />
+      </Button>
+      <LazyWhenOpened open={open}>
+        <DeleteAccountModal isOpen={open} onClose={() => setOpen(false)} />
+      </LazyWhenOpened>
     </section>
   )
 }

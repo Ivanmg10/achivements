@@ -20,7 +20,7 @@ export default function GroupCard({ group }: { group: GameGroup }) {
   return (
     <Link
       href={`/groups/${group.id}`}
-      className="spotlight flex items-center gap-4 h-full bg-bg-card rounded-2xl p-3 ring-1 ring-ink/5 hover:ring-ink/15 hover:bg-ink/[0.03] transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="spotlight flex items-center gap-4 h-full bg-bg-card rounded-card p-3 ring-1 ring-ink/5 hover:ring-ink/15 hover:bg-ink/[0.03] transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       <GroupCoverMosaic group={group} />
       <div className="flex flex-col min-w-0 flex-1 gap-1.5">

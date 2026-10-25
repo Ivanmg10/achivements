@@ -4,6 +4,7 @@ import { KeyboardEvent, useRef } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { BASE_GROUP, countTrophies, dlcShortName } from '@/utils/psnTitles'
 import type { PsnTrophyGroup } from '@/types/psn'
+import { pillClass } from '@/components/ui/Pill'
 
 /** Which trophies the table shows: every group, or one. */
 export type GroupTab = 'all' | string
@@ -81,11 +82,7 @@ export default function PsnTrophyGroupTabs({
             title={tab.fullName !== tab.label ? tab.fullName : undefined}
             onClick={() => onSelect(tab.id)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className={`shrink-0 flex items-center gap-2 h-9 px-3.5 rounded-full text-sm ring-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              active
-                ? 'bg-accent/15 ring-accent/60 text-text-main font-semibold'
-                : 'bg-bg-main/40 ring-ink/10 text-text-secondary hover:text-text-main hover:bg-bg-main/70'
-            }`}
+            className={pillClass(active, 'shrink-0 h-9 text-sm')}
           >
             <span className="max-w-48 truncate">{tab.label}</span>
             <span className={`text-xs tabular-nums ${complete ? 'text-success font-semibold' : active ? 'text-text-secondary' : 'opacity-80'}`}>

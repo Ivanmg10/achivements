@@ -116,7 +116,7 @@ export default function SortableItem({
               {item.console_name}
             </span>
           )}
-          <p className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>
+          <p className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>
             {achTotal > 0 ? `${Math.max(scEarned, hcEarned)} / ${achTotal}` : achTotal} {T.statusGameItem.achievements}
           </p>
           {achTotal > 0 && (

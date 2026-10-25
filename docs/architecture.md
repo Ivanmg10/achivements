@@ -152,6 +152,14 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   `src/lib/fonts.ts`), loaded only there. Sign-up (`RegisterUserForm`, a new Steam
   account in `useSteamSignup`) signs in and goes there.
 
+## Design system (see `design-system.md`)
+
+- `src/app/globals.css`: the themes' colours and the design's tokens (shapes, sizes, motion); the round design is `:root[data-shape="round"]`.
+- `src/components/ui/`: the library; `ui/shape.ts` (`slantStyle`) is how a bar reads the slant.
+- `src/components/shape-sync/ShapeSync.tsx` (mounted in `app/providers.tsx`) puts `shape-style` on `<html>`; `app/layout.tsx` has the script that applies it before paint.
+- `src/app/(main)/design/page.tsx` + `src/components/design-catalog/`: the catalogue, admins only.
+- `src/utils/streakTier.ts`: the streak's tiers and their hues.
+
 ## Tooling
 
 - `.githooks/pre-commit` bumps the patch in `src/lib/version.ts` and syncs

@@ -6,6 +6,7 @@ import { IconSparkles } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { AiExportSource } from '@/utils/aiExport'
 import GameAiExportDialog from './game-ai-export-dialog/GameAiExportDialog'
+import { buttonClass } from '@/components/ui/Button'
 
 /**
  * "Ask an AI" beside a game's links: a window that turns the game's
@@ -25,9 +26,9 @@ export default function GameAiExport({ getSource }: { getSource: () => AiExportS
         type="button"
         onClick={() => setSource(getSource())}
         aria-haspopup="dialog"
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/15 hover:bg-accent/25 text-text-main text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className={buttonClass('primary')}
       >
-        <IconSparkles className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
+        <IconSparkles className="w-4 h-4" aria-hidden="true" />
         {T.aiExport.open}
       </button>
       <AnimatePresence>{source && <GameAiExportDialog source={source} onClose={() => setSource(null)} />}</AnimatePresence>

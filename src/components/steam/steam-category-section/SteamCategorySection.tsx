@@ -78,7 +78,7 @@ export default function SteamCategorySection({
         </div>
       ) : error ? (
         <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-red-400">
+          <p role="alert" className="text-sm text-danger">
             {T.steam.gamesError}
           </p>
           <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>

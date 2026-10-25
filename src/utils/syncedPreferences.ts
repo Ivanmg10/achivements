@@ -5,7 +5,7 @@
  * folded sections) stay in the browser.
  */
 const KEY =
-  /^(?:hidden-consoles:(?:ra|steam|psn|xbox)|library-(?:layout|view|cols)|groups-view|group-detail-view|library-sort(?:-all)?:[A-Za-z]{1,32}|psn-completion|psn-hidden-trophies|xbox-secret-achievements)$/
+  /^(?:hidden-consoles:(?:ra|steam|psn|xbox)|library-(?:layout|view|cols)|groups-view|group-detail-view|library-sort(?:-all)?:[A-Za-z]{1,32}|psn-completion|psn-hidden-trophies|xbox-secret-achievements|home-layout|game-card-style|shape-style)$/
 
 export const MAX_PREFERENCE_VALUE = 4000
 /** A generous ceiling: one sort per category and platform, a console list each. */

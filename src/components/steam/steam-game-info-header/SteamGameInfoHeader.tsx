@@ -5,22 +5,21 @@ import { IconExternalLink } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
-import GameInfoHeaderStatsBadge from '@/components/game-info-header/game-info-header-stats-badge/GameInfoHeaderStatsBadge'
-import SteamGameInfoHeaderProgression from './steam-game-info-header-progression/SteamGameInfoHeaderProgression'
-import GameInfoHeaderScreenshots from '@/components/game-info-header/game-info-header-screenshots/GameInfoHeaderScreenshots'
 import { steamAssetUrl, steamStoreUrl } from '@/lib/steamClient'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameDetails, SteamGameProgress } from '@/types/steam'
+import { buttonClass } from '@/components/ui/Button'
+import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
+import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
+import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
+import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
 
 /**
- * The top of a Steam game page, laid out like RA's GameInfoHeader: cover,
- * title, chips, completion bar and facts on the left; stat badges and two
- * screenshots on the right.
- *
- * Steam swaps RA's console for a Steam chip, points for playtime, "Mastered"
- * for "Perfect", and adds the store description. Every part tolerates missing
+ * The top of a Steam game page, on the shared `GameHero` as RA's: Steam swaps
+ * the console for a Steam chip, points for play time and "Mastered" for
+ * "Perfect", and adds the store description. Every part tolerates missing
  * data: `game` is null when the game is not in the user's library, `details`
  * when the store has no entry, `counts` until achievements load.
  */
@@ -37,112 +36,67 @@ export default function SteamGameInfoHeader({
   game: SteamGameProgress | null
   details: SteamGameDetails | null
   counts: { earned: number; total: number } | null
-  /** Extra buttons beside the store link (the AI export). */
+  /** The AI export, first among the buttons. */
   actions?: ReactNode
 }) {
   const { T, lang } = useLanguage()
 
   const isPerfect = counts !== null && counts.total > 0 && counts.earned >= counts.total
   const inProgress = counts !== null && counts.earned > 0 && !isPerfect
-
-  const facts: { label: string; value: string }[] = [
-    { label: T.gameInfoPage.id, value: String(appId) },
-    { label: T.gameInfoPage.developer, value: details?.developers.join(', ') || '—' },
-    { label: T.gameInfoPage.publisher, value: details?.publishers.join(', ') || '—' },
-    { label: T.gameInfoPage.genre, value: details?.genres.join(', ') || '—' },
-    { label: T.gameInfoPage.released, value: details?.releaseDate || '—' },
-  ]
+  const pct = counts && counts.total > 0 ? (counts.earned / counts.total) * 100 : 0
 
   return (
-    <section className="relative bg-transparent p-5 rounded-xl min-w-[95%] grid grid-cols-1 lg:grid-cols-[1fr_400px] mt-5 overflow-hidden">
-      <div className="relative z-10 flex flex-row items-start gap-5">
-        <SteamGameImage
-          appId={appId}
-          asset="cover"
-          iconUrl={game?.imageIcon}
-          alt={title}
-          size={200}
-          className="w-28 lg:w-50 aspect-2/3 rounded-xl shrink-0"
-        />
-
-        <div className="flex flex-col flex-1 min-w-0 gap-3">
-          <h1 className="text-2xl lg:text-3xl">{title}</h1>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 text-sm px-2 py-0.5 rounded-md font-medium bg-[#1b2838] text-[#66c0f4]">
-              <SteamLogo size={14} aria-hidden="true" />
-              Steam
-            </span>
-            {isPerfect && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-warning/20 text-warning">
-                ★ {T.steam.perfect}
-              </span>
-            )}
-            {inProgress && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-info/20 text-info">
-                {T.gameStatus.inProgress}
-              </span>
-            )}
-            {!game && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-md font-medium bg-bg-card text-text-secondary">
-                {T.steam.notOwned}
-              </span>
-            )}
-            <PinToggleButton gameId={appId} source="steam" />
-            {game && <HideGameButton source="steam" gameId={appId} title={title} image={steamAssetUrl(appId, 'header')} />}
-          </div>
-
-          {details?.description && (
-            <p className="text-sm text-text-secondary max-w-2xl line-clamp-3">{details.description}</p>
-          )}
-
-          {counts && counts.total > 0 && (
-            <SteamGameInfoHeaderProgression earned={counts.earned} total={counts.total} label={title} />
-          )}
-
-          <ul className="flex flex-col gap-1 text-sm">
-            {facts.map((f) => (
-              <li key={f.label}>
-                <span className="text-text-secondary">{f.label}: </span>
-                {f.value}
-              </li>
-            ))}
-          </ul>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <a
-              href={steamStoreUrl(appId)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-            >
-              <IconExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
-              {T.steam.viewOnSteam}
-            </a>
-            {actions}
-          </div>
-        </div>
-      </div>
-
-      <div className="relative z-10 flex flex-col items-center lg:items-end gap-4 lg:justify-between mt-4 lg:mt-0">
-        <div className="flex flex-wrap justify-center lg:justify-end gap-2">
-          {counts && counts.total > 0 && (
-            <GameInfoHeaderStatsBadge
-              label={T.gameInfoPage.achievements}
-              value={`${counts.earned} / ${counts.total}`}
-              done={isPerfect}
-            />
-          )}
-          {game && (
-            <GameInfoHeaderStatsBadge
-              label={T.steam.playtime}
-              value={formatPlaytime(game.playtimeForever, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
-              done={false}
-            />
-          )}
-        </div>
-        {details && <GameInfoHeaderScreenshots screenshots={details.screenshots} title={title} />}
-      </div>
-    </section>
+    <GameHero
+      cover={<SteamGameImage appId={appId} asset="cover" iconUrl={game?.imageIcon} alt={title} size={216} className="block w-full aspect-2/3" />}
+      title={title}
+      chips={
+        <>
+          <GameHeroChip tone="custom" className="bg-[#1b2838] text-[#66c0f4]">
+            <SteamLogo size={14} aria-hidden="true" />
+            Steam
+          </GameHeroChip>
+          {isPerfect && <GameHeroChip tone="warning">★ {T.steam.perfect}</GameHeroChip>}
+          {inProgress && <GameHeroChip tone="info">{T.gameStatus.inProgress}</GameHeroChip>}
+          {!game && <GameHeroChip>{T.steam.notOwned}</GameHeroChip>}
+        </>
+      }
+      description={details?.description}
+      progress={
+        counts && counts.total > 0 && (
+          <GameHeroProgress
+            pct={pct}
+            label={title}
+            left={<><strong className="text-text-main font-bold">{pct.toLocaleString(lang, { maximumFractionDigits: 1 })} %</strong> {T.gameInfoPage.complete}</>}
+            right={T.gameInfoPage.ofAchievements.replace('{n}', String(counts.earned)).replace('{total}', String(counts.total))}
+          />
+        )
+      }
+      facts={[
+        { label: T.gameInfoPage.released, value: details?.releaseDate },
+        { label: T.gameInfoPage.developer, value: details?.developers.join(', ') },
+        { label: T.gameInfoPage.publisher, value: details?.publishers.join(', ') },
+        { label: T.gameInfoPage.genre, value: details?.genres.join(', ') },
+      ]}
+      actions={
+        <>
+          {actions}
+          <a href={steamStoreUrl(appId)} target="_blank" rel="noopener noreferrer" className={buttonClass('secondary')}>
+            <IconExternalLink className="w-4 h-4" aria-hidden="true" />
+            {T.steam.viewOnSteam}
+          </a>
+        </>
+      }
+      toggles={
+        <>
+          <PinToggleButton gameId={appId} source="steam" className={HERO_TOGGLE} />
+          {game && <HideGameButton source="steam" gameId={appId} title={title} image={steamAssetUrl(appId, 'header')} className={HERO_TOGGLE} />}
+        </>
+      }
+      tiles={[
+        ...(counts && counts.total > 0 ? [{ label: T.gameInfoPage.achievements, value: counts.earned, of: counts.total, done: isPerfect }] : []),
+        ...(game ? [{ label: T.steam.playtime, value: formatPlaytime(game.playtimeForever, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang) }] : []),
+      ]}
+      media={details && <GameHeroMedia shots={details.screenshots.map((s, i) => ({ src: s.thumb, full: s.full, caption: `${T.steam.screenshot} ${i + 1}` }))} />}
+    />
   )
 }

@@ -11,9 +11,9 @@ import UserPsnCard from '@/components/user-page/user-psn-card/UserPsnCard'
 import UserXboxCard from '@/components/user-page/user-xbox-card/UserXboxCard'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { useLanguage } from '@/context/LanguageContext'
+import { buttonClass } from '@/components/ui/Button'
 
-const ACTION =
-  'w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-accent text-bg-main font-semibold text-sm hover:bg-accent-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+const ACTION = buttonClass('primary', 'md', 'w-full')
 
 /**
  * What a new account sees before linking anything: the platforms, what each
@@ -44,7 +44,7 @@ export default function ConnectAccounts() {
     <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 text-text-main">
       <div className="w-full max-w-5xl flex flex-col gap-8">
         <header className="flex flex-col items-center text-center gap-2">
-          <h1 className="text-2xl sm:text-3xl font-bold">{T.connect.title}</h1>
+          <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1">{T.connect.title}</h1>
           <p className="text-sm sm:text-base text-text-secondary max-w-xl">{T.connect.subtitle}</p>
         </header>
 

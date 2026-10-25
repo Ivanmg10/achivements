@@ -93,7 +93,7 @@ export default function MainPagePerfectGames({
       <div className="flex items-center justify-between">
         {header}
         <div className="flex items-center gap-2 text-[10px]">
-          <span className="text-yellow-400 font-semibold">{counts.hc} HC</span>
+          <span className="text-hardcore font-semibold">{counts.hc} HC</span>
           <span className="text-text-secondary/40">·</span>
           <span className="text-text-secondary">{counts.sc} SC</span>
           {counts.steam > 0 && (

@@ -2,8 +2,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { GameSource } from '@/types/steam'
 import { PLATFORM_NAME } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
-
-const CHIP = 'inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+import { pillClass } from '@/components/ui/Pill'
 
 /** All platforms, or one, among those the user has games on; the current one pressed. */
 export default function AddGameModalPlatforms({
@@ -26,7 +25,7 @@ export default function AddGameModalPlatforms({
           type="button"
           aria-pressed={value === s}
           onClick={() => onChange(s)}
-          className={`${CHIP} ${value === s ? 'bg-text-main text-bg-main' : 'bg-bg-main text-text-secondary hover:text-text-main'}`}
+          className={pillClass(value === s)}
         >
           {s && <PlatformLogo source={s} size={11} />}
           {s ? PLATFORM_NAME[s] : T.groups.filterAll}

@@ -55,10 +55,10 @@ test('takes focus when it opens', () => {
 test('pins from inside when the viewer can, and not otherwise', () => {
   const onTogglePin = jest.fn()
   const { rerender } = render(<AchievementDetailModal {...BASE} pinned={false} onTogglePin={onTogglePin} onClose={jest.fn()} />)
-  fireEvent.click(screen.getByRole('switch'))
+  fireEvent.click(screen.getByRole('button', { pressed: false }))
   expect(onTogglePin).toHaveBeenCalled()
   rerender(<AchievementDetailModal {...BASE} onClose={jest.fn()} />)
-  expect(screen.queryByRole('switch')).toBeNull()
+  expect(screen.queryByRole('button', { pressed: false })).toBeNull()
 })
 
 test('opens in the body, out of any section that could cover it', () => {

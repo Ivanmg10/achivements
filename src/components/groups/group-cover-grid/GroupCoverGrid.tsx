@@ -2,6 +2,8 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from '@dnd-kit/sortable'
 import type { GameGroupItem } from '@/types/types'
 import type { ItemProgress } from '@/utils/groupItems'
+import { IconPlus } from '@tabler/icons-react'
+import { useLanguage } from '@/context/LanguageContext'
 import GroupCoverTile from '@/components/groups/group-cover-tile/GroupCoverTile'
 
 /**
@@ -14,13 +16,17 @@ export default function GroupCoverGrid({
   draggable,
   onRemove,
   onReorder,
+  onAdd,
 }: {
   items: GameGroupItem[]
   progress: (item: GameGroupItem) => ItemProgress
   draggable: boolean
   onRemove: (id: number) => void
   onReorder: (activeId: number, overId: number) => void
+  /** The last tile: add games to the group. */
+  onAdd?: () => void
 }) {
+  const { T } = useLanguage()
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
 
   const grid = (
@@ -28,6 +34,18 @@ export default function GroupCoverGrid({
       {items.map((item) => (
         <GroupCoverTile key={item.id} item={item} progress={progress(item)} draggable={draggable} onRemove={onRemove} />
       ))}
+      {onAdd && (
+        <li>
+          <button
+            type="button"
+            onClick={onAdd}
+            className="w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-1 font-bold text-text-main ring-[1.5px] ring-inset ring-accent/35 hover:ring-accent bg-[repeating-linear-gradient(-60deg,rgb(var(--accent)/0.06)_0_10px,transparent_10px_20px)] transition-shadow cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          >
+            <IconPlus className="w-6 h-6 text-accent" aria-hidden="true" />
+            {T.groups.addGames}
+          </button>
+        </li>
+      )}
     </ul>
   )
 

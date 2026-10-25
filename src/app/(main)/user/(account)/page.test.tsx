@@ -23,14 +23,14 @@ import { render, screen } from '@testing-library/react'
 import UserPage from './page'
 import { useSession } from 'next-auth/react'
 
-test('shows identity, preferences, the platforms and deleting the account, in that order', () => {
+test('shows identity and deleting the account, then preferences, then the platforms', () => {
   ;(useSession as jest.Mock).mockReturnValue({ data: null })
   const { container } = render(<UserPage />)
 
   expect(screen.getByTestId('identity')).toBeInTheDocument()
   expect(screen.getByTestId('preferences')).toBeInTheDocument()
   const order = Array.from(container.querySelectorAll('[data-testid]')).map((el) => el.getAttribute('data-testid'))
-  expect(order).toEqual(['identity', 'preferences', 'platforms', 'delete-account'])
+  expect(order).toEqual(['identity', 'delete-account', 'preferences', 'platforms'])
 })
 
 test('the admin panel is not laid out on the page, even for admins: it opens from the top card', () => {

@@ -1,4 +1,3 @@
-import { createRef } from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import SearchModalUserResults from './SearchModalUserResults'
 import { en } from '@/translations/en'
@@ -13,71 +12,29 @@ const FOUND = {
   ],
 }
 
-function setup(users = FOUND as typeof FOUND, recent = [] as { username: string; avatar: string | null }[]) {
+test('each user with country, a line of their bio and their platforms, under a counted group', () => {
   const onSelect = jest.fn()
-  const onClearRecent = jest.fn()
-  const inputRef = createRef<HTMLInputElement>()
-  render(
-    <>
-      <input ref={inputRef} aria-label="search" />
-      <SearchModalUserResults users={users} recent={recent} onClearRecent={onClearRecent} onSelect={onSelect} listRef={createRef()} inputRef={inputRef} />
-    </>,
-  )
-  return { onSelect, onClearRecent }
-}
-
-test('each user with country, a line of their bio and their platforms', () => {
-  const { onSelect } = setup()
+  render(<SearchModalUserResults users={FOUND} onSelect={onSelect} />)
+  expect(screen.getByRole('region', { name: `${en.search.people} · 2` })).toBeInTheDocument()
   const first = screen.getByRole('button', { name: /ivan/ })
   expect(first).toHaveTextContent('Retro fan')
+  expect(first).toHaveAttribute('data-search-option')
   expect(screen.getByRole('img', { name: 'Spain' })).toBeInTheDocument()
   expect(screen.getByRole('img', { name: 'RetroAchievements' })).toBeInTheDocument()
   fireEvent.click(first)
   expect(onSelect).toHaveBeenCalledWith(FOUND.results[0])
 })
 
-test('the arrows move through the results, and up from the first returns to the search box', () => {
-  setup()
-  const [a, b] = screen.getAllByRole('button')
-  a.focus()
-  fireEvent.keyDown(a, { key: 'ArrowDown' })
-  expect(b).toHaveFocus()
-  fireEvent.keyDown(b, { key: 'ArrowDown' })
-  expect(b).toHaveFocus()
-  fireEvent.keyDown(b, { key: 'ArrowUp' })
-  expect(a).toHaveFocus()
-  fireEvent.keyDown(a, { key: 'ArrowUp' })
-  expect(screen.getByLabelText('search')).toHaveFocus()
-  fireEvent.keyDown(screen.getByRole('list'), { key: 'a' })
+test('nothing before three letters are typed', () => {
+  const { container } = render(<SearchModalUserResults users={IDLE} onSelect={jest.fn()} />)
+  expect(container).toBeEmptyDOMElement()
 })
 
-test('before typing, the profiles opened lately, which can be cleared', () => {
-  const { onSelect, onClearRecent } = setup(IDLE as typeof FOUND, [{ username: 'old', avatar: null }])
-  expect(screen.getByText(en.userSearch.recent)).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: 'old' }))
-  expect(onSelect).toHaveBeenCalledWith({ username: 'old', avatar: null })
-  fireEvent.click(screen.getByRole('button', { name: en.userSearch.clearRecent }))
-  expect(onClearRecent).toHaveBeenCalled()
-  expect(screen.getByText(en.publicProfile.searchUsersHint)).toBeInTheDocument()
-})
-
-test('with nothing recent, just the hint', () => {
-  setup(IDLE as typeof FOUND)
-  expect(screen.queryByText(en.userSearch.recent)).not.toBeInTheDocument()
-  expect(screen.getByText(en.publicProfile.searchUsersHint)).toBeInTheDocument()
-})
-
-test('placeholders while searching', () => {
-  setup({ ...FOUND, isLoading: true })
-  expect(document.querySelector('[aria-busy="true"]')).not.toBeNull()
-})
-
-test('a failure is an alert', () => {
-  setup({ ...FOUND, error: true })
-  expect(screen.getByRole('alert')).toHaveTextContent(en.publicProfile.userLoadError)
-})
-
-test('no match says so', () => {
-  setup({ ...FOUND, results: [] })
+test('looking: shapes; nobody: says so; a failure: an alert', () => {
+  const { container, rerender } = render(<SearchModalUserResults users={{ ...FOUND, isLoading: true }} onSelect={jest.fn()} />)
+  expect(container.querySelector('[aria-busy="true"]')).toBeInTheDocument()
+  rerender(<SearchModalUserResults users={{ ...FOUND, results: [] }} onSelect={jest.fn()} />)
   expect(screen.getByText(en.publicProfile.noUserFound)).toBeInTheDocument()
+  rerender(<SearchModalUserResults users={{ ...FOUND, error: true }} onSelect={jest.fn()} />)
+  expect(screen.getByRole('alert')).toHaveTextContent(en.publicProfile.userLoadError)
 })

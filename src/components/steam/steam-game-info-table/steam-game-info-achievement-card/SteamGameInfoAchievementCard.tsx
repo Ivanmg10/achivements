@@ -73,7 +73,7 @@ export default function SteamGameInfoAchievementCard({
           )}
           {a.globalPct !== null && (
             <span className="text-text-secondary">
-              {formatRarity(a.globalPct)}
+              {formatRarity(a.globalPct, lang)}
               {T.achievement.haveIt}
             </span>
           )}

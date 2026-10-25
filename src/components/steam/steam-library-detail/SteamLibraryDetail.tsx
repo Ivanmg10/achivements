@@ -34,7 +34,7 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
       state={isLoading ? 'loading' : error ? 'error' : 'ready'}
       errorNode={
         <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-red-400">{T.steam.achievementsError}</p>
+          <p role="alert" className="text-sm text-danger">{T.steam.achievementsError}</p>
           <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
           <button onClick={retry} className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">
             {T.steam.retry}

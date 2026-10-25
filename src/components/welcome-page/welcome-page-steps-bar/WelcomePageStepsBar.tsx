@@ -46,7 +46,7 @@ export default function WelcomePageStepsBar({
 
   return (
     <header className="fixed top-2 inset-x-2 sm:top-3 sm:inset-x-4 z-30">
-      <div className="relative overflow-hidden rounded-2xl bg-bg-card/80 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-ink/[0.07] shadow-lg shadow-black/20">
+      <div className="relative overflow-hidden rounded-card bg-bg-card/80 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-ink/[0.07] shadow-lg shadow-black/20">
         <div className="hidden lg:flex items-center gap-3 h-15 pl-5 pr-2.5">
           <span className="font-extrabold text-[1.0625rem] tracking-tight shrink-0">
             Cheevo<span className="text-accent">Vault</span>

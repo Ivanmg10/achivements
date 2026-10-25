@@ -8,7 +8,8 @@ import { notify } from '@/lib/notify'
 import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
 import WelcomePageRaGuide from '@/components/welcome-page/welcome-page-ra-guide/WelcomePageRaGuide'
 import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
-import { INPUT_CLASS, PRIMARY_BUTTON, SECONDARY_BUTTON, platformKicker } from '@/components/welcome-page/welcomeArt'
+import { PRIMARY_BUTTON, SECONDARY_BUTTON, platformKicker } from '@/components/welcome-page/welcomeArt'
+import { fieldClass } from '@/components/ui/Input'
 
 const FORM_ID = 'welcome-ra-form'
 
@@ -84,7 +85,7 @@ export default function WelcomePageRa({
               spellCheck={false}
               value={username}
               onChange={(e) => { setUsername(e.target.value); clearError() }}
-              className={INPUT_CLASS}
+              className={fieldClass()}
             />
           </div>
           <div className="flex flex-col gap-1.5">
@@ -98,7 +99,7 @@ export default function WelcomePageRa({
               onChange={(e) => { setApiKey(e.target.value); clearError() }}
               aria-invalid={error !== null}
               aria-describedby={error ? 'welcome-ra-error welcome-ra-note' : 'welcome-ra-note'}
-              className={`${INPUT_CLASS} ${error ? 'ring-2 ring-danger' : ''}`}
+              className={fieldClass({ invalid: error !== null })}
             />
             {error && (
               <p id="welcome-ra-error" role="alert" className="text-sm text-danger">

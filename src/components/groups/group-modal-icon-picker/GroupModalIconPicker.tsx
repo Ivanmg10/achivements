@@ -1,5 +1,6 @@
 import { useId, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { fieldClass } from '@/components/ui/Input'
 
 /** The icons offered in one tap, by category. Anything else goes in the field below them. */
 export const ICON_CATEGORIES = {
@@ -74,7 +75,7 @@ export default function GroupModalIconPicker({ value, onChange }: { value: strin
         value={ALL.includes(current) ? '' : value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={T.groups.customIcon}
-        className="bg-bg-main rounded-lg px-3 py-2 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70"
+        className={fieldClass({ size: 'sm' })}
       />
     </fieldset>
   )

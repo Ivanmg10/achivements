@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { LibraryGame } from '@/utils/library'
 import { normalizeTitle } from '@/utils/gameCandidates'
 import ShowcasePickerModalGameRow from '../showcase-picker-modal-game-row/ShowcasePickerModalGameRow'
+import { fieldClass } from '@/components/ui/Input'
 
 /** The picker's first view: the user's games with an achievement earned, searchable, each opening its achievements. */
 export default function ShowcasePickerModalGames({
@@ -43,7 +44,7 @@ export default function ShowcasePickerModalGames({
             value={query}
             onChange={(e) => onQuery(e.target.value)}
             placeholder={T.showcase.pickerSearch}
-            className="w-full bg-bg-card rounded-xl pl-9 pr-3 py-2 text-sm placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className={fieldClass({ size: 'sm', icon: true })}
           />
         </div>
       </div>

@@ -16,6 +16,7 @@ import XboxGameInfoHeader from '@/components/xbox/xbox-game-info-header/XboxGame
 import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPartialListNote'
 import GameCompareTable from '@/components/game-compare-table/GameCompareTable'
 import type { UserGamePlatformProps } from '../user-game-page-ra/UserGamePageRa'
+import { buttonClass } from '@/components/ui/Button'
 
 /**
  * An Xbox game as a user has it (read inside SubjectProviders): the Xbox page's
@@ -46,7 +47,7 @@ export default function UserGamePageXbox({ id, username, banner, comparing, mine
       {banner}
       <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
         <XboxGameInfoHeader game={game} details={details} />
-        <div className="w-[95%] mt-5 mb-5">
+        <div className="w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-7">
           {isLoading ? (
             <div role="status" aria-busy="true" className="w-full flex flex-col items-center">
               <span className="sr-only">{T.loadingPage.game}</span>
@@ -54,9 +55,9 @@ export default function UserGamePageXbox({ id, username, banner, comparing, mine
             </div>
           ) : error ? (
             <section className="bg-bg-card p-5 rounded-xl flex flex-col items-center gap-2 text-center">
-              <p role="alert" className="text-red-400">{T.userGame.loadError.replace('{u}', username)}</p>
+              <p role="alert" className="text-danger">{T.userGame.loadError.replace('{u}', username)}</p>
               {error === 'private' && <p className="text-xs text-text-secondary">{T.xbox.errors.private}</p>}
-              <button onClick={retry} className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-ink/10 transition-colors">
+              <button onClick={retry} className={buttonClass('secondary', 'sm')}>
                 {T.publicProfile.retry}
               </button>
             </section>

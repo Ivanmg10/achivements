@@ -8,15 +8,13 @@ import { compareSummary, filterCompare, mergeCompare, type CompareAchievement, t
 import EmptyState from '@/components/empty-state/EmptyState'
 import GameCompareTableSummary from './game-compare-table-summary/GameCompareTableSummary'
 import GameCompareTableRow from './game-compare-table-row/GameCompareTableRow'
+import { pillClass } from '@/components/ui/Pill'
 
 const COMPARE_FILTERS: CompareFilter[] = ['all', 'both', 'onlyThem', 'onlyMe', 'neither']
 const SOLO_FILTERS = ['all', 'earned', 'locked'] as const
 type SoloFilter = (typeof SOLO_FILTERS)[number]
 
-const chipClass = (on: boolean) =>
-  `px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-    on ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30' : 'bg-bg-main text-text-secondary hover:text-text-main'
-  }`
+const chipClass = (on: boolean) => pillClass(on)
 
 /**
  * A game's achievements as one user has them, and — comparing — as you do,

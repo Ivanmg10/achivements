@@ -191,7 +191,7 @@ export default function MainPageAbandoned({
               subtitle={g.subtitle}
               stat={`${g.daysAgo}d`}
               statLabel={`${g.pct}%`}
-              statClassName="text-orange-400"
+              statClassName="text-warning"
               progress={g.pct}
             />
           ))}

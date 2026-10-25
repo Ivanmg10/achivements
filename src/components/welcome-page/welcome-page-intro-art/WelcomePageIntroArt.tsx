@@ -14,7 +14,7 @@ import { STEP_SKY } from '@/components/welcome-page/welcomeArt'
  * replace any of them later without touching the rest.
  */
 
-const CARD = 'rounded-2xl bg-bg-card ring-1 ring-ink/[0.06]'
+const CARD = 'rounded-card bg-bg-card ring-1 ring-ink/[0.06]'
 const ARTS = [STEP_SKY.ra, STEP_SKY.steam, STEP_SKY.psn, 'linear-gradient(135deg, rgb(var(--accent)), #f0abfc)']
 
 function Bar({ w, strong = false }: { w: string; strong?: boolean }) {
@@ -101,7 +101,7 @@ function Streak() {
     <div className="flex flex-col gap-3">
       <div className="flex gap-3">
         <div className={`${CARD} flex-1 p-3 flex items-center gap-2.5`}>
-          <IconFlame size={22} className="text-orange-400" />
+          <IconFlame size={22} className="text-warning" />
           <span className="font-display italic font-extrabold text-3xl leading-none">45</span>
           <Bar w="30%" />
         </div>

@@ -58,7 +58,7 @@ export default function MainPageProfileTabs<T extends string>({
     <div
       role="tablist"
       aria-label={label ?? T.steam.profileTabsLabel}
-      className={`flex items-center w-full px-1 border-b border-ink/5 ${size === 'md' ? 'gap-5 overflow-x-auto overflow-y-hidden' : 'gap-4'}`}
+      className={`flex items-end w-full shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)] ${size === 'md' ? 'gap-5 px-1 overflow-x-auto overflow-y-hidden' : 'gap-0.5 overflow-x-auto overflow-y-hidden'}`}
     >
       {tabs.map((tab, i) => {
         const active = tab.id === selected
@@ -73,14 +73,17 @@ export default function MainPageProfileTabs<T extends string>({
             tabIndex={active ? 0 : -1}
             onClick={() => onSelect(tab.id)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className={`-mb-px flex items-center shrink-0 gap-1.5 px-0.5 border-b-2 ${size === 'md' ? 'pb-2.5 pt-1 text-sm' : 'pb-1.5 pt-0.5 text-xs'} transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-t ${
-              active
-                ? 'border-accent text-text-main font-semibold'
-                : 'border-transparent text-text-secondary hover:text-text-main font-medium'
+            className={`relative flex items-center shrink-0 gap-1.5 ${size === 'md' ? 'px-0.5 pb-2.5 pt-1 text-sm' : 'h-10 px-3 text-sm'} transition-colors duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-t ${
+              active ? 'text-text-main font-semibold' : `text-text-secondary hover:text-text-main ${size === 'md' ? 'font-medium' : 'font-semibold'}`
             }`}
           >
-            {tab.icon}
+            {/* The profile's platform tabs are words only, as agreed; a page's own sections keep their icons. */}
+            {size === 'md' && tab.icon}
             {tab.label}
+            <span
+              aria-hidden="true"
+              className={`absolute bottom-0 ${size === 'md' ? 'left-0 right-0 h-1' : 'left-2 right-2 h-[3px]'} bg-accent skew-x-(--slant-line) origin-left transition-transform duration-(--motion-open) ease-out motion-reduce:transition-none ${active ? 'scale-x-100' : 'scale-x-0'}`}
+            />
           </button>
         )
       })}

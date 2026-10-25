@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { Streak } from '@/types/types'
 import { daysBetween, formatDay, plural } from '@/utils/utils'
+import StreakSectionHead from '../streak-section-head/StreakSectionHead'
 
 const WEEKS = 53
 const GAP = 3
@@ -53,13 +54,13 @@ export default function StreakYearHeatmap({
 
 
   return (
-    <section aria-labelledby="streak-year-title" className="bg-bg-card rounded-2xl p-5 flex flex-col gap-3 min-w-0">
-      <div>
-        <h2 id="streak-year-title" className="text-sm uppercase tracking-widest text-text-secondary">
-          {T.streak.yearTitle}
-        </h2>
-        <p className="text-xs text-text-secondary mt-0.5">{T.streak.yearHint}</p>
-      </div>
+    <section aria-labelledby="streak-year-title" className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-3 min-w-0">
+      <StreakSectionHead
+        id="streak-year-title"
+        title={T.streak.yearTitle}
+        aside={T.streak.yearSub.replace('{n}', Object.values(byDay).filter((n) => n > 0).length.toLocaleString(lang))}
+      />
+      <p className="sr-only">{T.streak.yearHint}</p>
       {/* Scrolls sideways on a narrow screen rather than shrinking the days to dots. */}
       <div className="overflow-x-auto pb-1 [scrollbar-width:thin]">
         {/* The days fill the card's width: one grid column per week, each day a square. */}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useId, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion, type Variants } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { IconSearch, IconX, IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { GameGroupItem } from '@/types/types'
@@ -17,20 +17,12 @@ import GamePickerTile from '@/components/game-picker/game-picker-tile/GamePicker
 import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
 import AddGameModalPlatforms from '@/components/groups/add-game-modal-platforms/AddGameModalPlatforms'
 import { notify } from '@/lib/notify'
+import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
+import Modal from '@/components/ui/Modal'
 
 const SOURCES: GameSource[] = ['ra', 'steam', 'psn', 'xbox']
 const RESULTS_MAX = 40
-
-const overlayVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.18 } },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
-}
-const panelVariants: Variants = {
-  hidden: { opacity: 0, y: -14, scale: 0.97 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
-  exit: { opacity: 0, y: -8, scale: 0.97, transition: { duration: 0.15 } },
-}
 
 /**
  * Add games to a group, every platform alike. Opens on suggestions (what is
@@ -170,22 +162,7 @@ export default function AddGameModal({
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start sm:items-center justify-center p-0 sm:p-4"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          onClick={onClose}
-        >
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={titleId}
-            className="bg-bg-card w-full sm:max-w-3xl h-full sm:h-auto sm:max-h-[85vh] sm:rounded-2xl shadow-2xl ring-1 ring-ink/5 flex flex-col overflow-hidden"
-            variants={panelVariants}
-            onClick={(e) => e.stopPropagation()}
-          >
+        <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={titleId} size="xl" showClose={false} className="gap-4">
             <div className="flex flex-col gap-3 px-4 sm:px-6 pt-5 pb-4 border-b border-ink/5 shrink-0">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -211,7 +188,7 @@ export default function AddGameModal({
                   placeholder={T.groups.searchGames}
                   aria-label={T.groups.searchGames}
                   aria-describedby={`${titleId}-hint`}
-                  className="w-full h-11 bg-bg-main rounded-xl pl-10 pr-3 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70"
+                  className={fieldClass({ size: 'sm', icon: true })}
                 />
               </div>
               <p id={`${titleId}-hint`} className="text-[11px] text-text-secondary -mt-1">{T.groups.searchHint}</p>
@@ -282,18 +259,16 @@ export default function AddGameModal({
                     {T.groups.clearSelection}
                   </button>
                 )}
-                <button
+                <Button
                   type="button"
                   onClick={handleConfirm}
                   disabled={saving || selected.size === 0}
-                  className="h-10 px-5 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 >
                   {saving ? '…' : selected.size > 0 ? T.groups.addSelected.replace('{games}', plural(selected.size, T.plurals.games, lang)) : T.groups.addGames}
-                </button>
+                </Button>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </Modal>
       )}
     </AnimatePresence>,
     document.body,

@@ -22,7 +22,7 @@ export default function PsnTrophyGridGroup({
       <summary className="flex items-center gap-1.5 w-fit cursor-pointer list-none [&::-webkit-details-marker]:hidden text-xs text-text-secondary hover:text-text-main py-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]">
         <IconChevronRight className="w-3.5 h-3.5 shrink-0 transition-transform group-open/fold:rotate-90" aria-hidden="true" />
         <span className="font-medium">{name}</span>
-        <span className={`tabular-nums ${earned === total ? 'text-green-400' : ''}`}>
+        <span className={`tabular-nums ${earned === total ? 'text-success' : ''}`}>
           {earned}/{total}
         </span>
       </summary>

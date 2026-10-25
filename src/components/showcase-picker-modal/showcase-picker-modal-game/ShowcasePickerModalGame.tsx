@@ -39,7 +39,7 @@ export default function ShowcasePickerModalGame({
         </div>
       ) : error ? (
         <div className="flex flex-col items-center gap-2 py-10 text-center">
-          <p role="alert" className="text-sm text-red-400">{T.showcase.gameError}</p>
+          <p role="alert" className="text-sm text-danger">{T.showcase.gameError}</p>
           <button
             type="button"
             onClick={retry}

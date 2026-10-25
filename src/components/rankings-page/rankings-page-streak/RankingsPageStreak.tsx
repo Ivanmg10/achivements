@@ -1,12 +1,13 @@
 'use client'
 
-import { IconCrown, IconFlame, IconFlameFilled } from '@tabler/icons-react'
+import { IconFlame, IconFlameFilled } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { streakInk, streakTier } from '@/utils/streakTier'
 
 /**
- * A row's streaks: the current one in a pill (lit while it runs, dimmed at 0) and the longest
- * beside it with a crown, gold while the current one is the record. Read aloud as one sentence;
- * what is lit is also said in numbers, not by colour alone.
+ * A row's streaks: the current one in its tier's colour (`streakTier`; dimmed at 0) and the longest
+ * under it, in its tier's colour too while the current one is the record. Read aloud as one sentence; what is lit is also
+ * said in numbers, not by colour alone.
  */
 export default function RankingsPageStreak({ streak, best, className = '' }: { streak: number; best: number; className?: string }) {
   const { T, lang } = useLanguage()
@@ -17,21 +18,15 @@ export default function RankingsPageStreak({ streak, best, className = '' }: { s
   const Flame = lit ? IconFlameFilled : IconFlame
 
   return (
-    <span title={label} className={`inline-flex items-center gap-2 tabular-nums whitespace-nowrap ${className}`}>
+    <span title={label} className={`inline-flex flex-col items-center gap-0.5 tabular-nums whitespace-nowrap ${className}`}>
       <span className="sr-only">{label}</span>
-      <span
-        aria-hidden="true"
-        className={`inline-flex items-center gap-1 h-6 pl-1.5 pr-2 rounded-full text-xs font-extrabold ${
-          lit ? 'bg-orange-400/15 text-orange-300 ring-1 ring-orange-400/30' : 'bg-ink/[0.05] text-text-secondary'
-        }`}
-      >
-        <Flame size={13} className={lit ? 'text-orange-400' : ''} />
-        {n(streak)}d
+      <span aria-hidden="true" className={`inline-flex items-center gap-1 font-extrabold ${lit ? '' : 'text-text-secondary'}`} style={lit ? { color: streakInk(streakTier(streak)) } : undefined}>
+        <Flame size={14} />
+        {T.rankings.daysShort.replace('{n}', n(streak))}
       </span>
       {best > 0 && (
-        <span aria-hidden="true" className={`inline-flex items-center gap-0.5 text-[11px] font-semibold ${record ? 'text-warning' : 'text-text-secondary'}`}>
-          <IconCrown size={12} />
-          {n(best)}d
+        <span aria-hidden="true" className={`text-[0.6875rem] ${record ? '' : 'text-text-secondary'}`} style={record ? { color: streakInk(streakTier(best)) } : undefined}>
+          {T.rankings.bestShort.replace('{n}', n(best))}
         </span>
       )}
     </span>

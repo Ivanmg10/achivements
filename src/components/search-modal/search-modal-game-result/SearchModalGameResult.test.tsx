@@ -12,7 +12,7 @@ const BASE: GameCandidate = {
 
 test('shows an RA game with its console, icon and status in words', () => {
   const { container } = render(<SearchModalGameResult game={BASE} onSelect={jest.fn()} />)
-  expect(screen.getByText('Zelda')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /^Zelda/ })).toBeInTheDocument()
   expect(screen.getByText('SNES')).toBeInTheDocument()
   expect(screen.getByText(en.search.completedHC)).toBeInTheDocument()
   expect(container.querySelector('img')?.getAttribute('src')).toBe('https://retroachievements.org/Images/1.png')

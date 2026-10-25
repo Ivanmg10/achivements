@@ -9,14 +9,15 @@ import { PLATFORM_NAME } from '@/utils/gameRef'
 import type { GameSource } from '@/types/steam'
 import EmptyState from '@/components/empty-state/EmptyState'
 import PublicUserGameRow from '../public-user-game-row/PublicUserGameRow'
+import { fieldClass } from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
+import { pillClass } from '@/components/ui/Pill'
 
 const PAGE = 30
 
 type Sort = 'progress' | 'name'
 
-const CHIP = 'px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
-const chipClass = (on: boolean) =>
-  `${CHIP} ${on ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30' : 'bg-bg-main text-text-secondary hover:text-text-main'}`
+const chipClass = (on: boolean) => pillClass(on)
 
 /**
  * Every game a user has played, searchable and filtered by platform and
@@ -71,20 +72,21 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={T.userProfile.searchGames}
-            className="w-full bg-bg-main rounded-xl pl-9 pr-3 py-2 text-sm placeholder:text-text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className={fieldClass({ size: 'sm', icon: true })}
           />
         </div>
         <div className="flex items-center gap-2">
           <label htmlFor={`${searchId}-sort`} className="text-xs text-text-secondary">{T.userProfile.sortBy}</label>
-          <select
+          <Select<Sort>
             id={`${searchId}-sort`}
+            size="sm"
             value={sort}
-            onChange={(e) => setSort(e.target.value as Sort)}
-            className="bg-bg-main rounded-xl px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            <option value="progress">{T.userProfile.sortProgress}</option>
-            <option value="name">{T.userProfile.sortName}</option>
-          </select>
+            onChange={setSort}
+            options={[
+              { value: 'progress', label: T.userProfile.sortProgress },
+              { value: 'name', label: T.userProfile.sortName },
+            ]}
+          />
         </div>
       </div>
 

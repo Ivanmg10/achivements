@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -15,6 +14,7 @@ import MainPageProfileStAchievements from '../main-page-profile-st-achievements/
 import MainPageProfileSkeleton from '../../main-page-profile-skeleton/MainPageProfileSkeleton'
 import MainPageProfileGameSkeleton from '../../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
 import type { SteamProfile } from '@/types/steam'
+import MainPageProfileCard from '../../main-page-profile-card/MainPageProfileCard'
 
 /**
  * A linked Steam profile, built like MainPageProfileRa block for block:
@@ -71,66 +71,46 @@ export default function MainPageProfileStLinked({
 
   return (
     // Fills the column like the RA card, so switching tabs does not resize it.
-    <div className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
-      {profile.profileurl && (
-        <MainPageProfileActions
-          href={profile.profileurl}
-          linkLabel={T.steam.viewOnSteam}
-          ringClass="focus:ring-[#66c0f4]"
-          onRefresh={refresh}
-        />
-      )}
-
-      <div className={`flex gap-3 items-center ${refresh ? 'pr-40' : 'pr-28'}`}>
-        {profile.avatarfull ? (
-          <Image
-            src={profile.avatarfull}
-            alt=""
-            width={90}
-            height={90}
-            className="m-1 rounded-lg ring-2 ring-[#66c0f4] shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5"
-            unoptimized
-          />
-        ) : (
-          <div
-            aria-hidden="true"
-            className="m-1 rounded-lg bg-[#1b2838] shrink-0 w-15 h-15 lg:w-22.5 lg:h-22.5 flex items-center justify-center"
-          >
-            <SteamLogo size={32} className="text-[#66c0f4]" />
-          </div>
-        )}
-        <div className="flex flex-col gap-1 min-w-0 w-full">
-          <p className="text-xl lg:text-2xl font-bold leading-tight truncate">{profile.personaname}</p>
-          <div className="flex items-center gap-2 flex-wrap text-xs">
-            {profile.level !== null && (
-              <span className="inline-flex items-center gap-1 text-text-secondary">
-                {T.steam.level}
-                <span className="inline-flex items-center justify-center min-w-6 h-6 px-1 rounded-full border-2 border-[#66c0f4] text-text-main font-bold tabular-nums">
-                  {profile.level}
-                </span>
+    <div className="flex flex-col gap-3.5 w-full h-full">
+      <MainPageProfileCard
+        avatarSrc={profile.avatarfull || null}
+        avatarFallback={<span className="w-full h-full bg-[#1b2838] flex items-center justify-center"><SteamLogo size={32} className="text-[#66c0f4]" /></span>}
+        ring="#66c0f4"
+        name={profile.personaname}
+        actions={
+          profile.profileurl && (
+            <MainPageProfileActions href={profile.profileurl} linkLabel={T.steam.viewOnSteam} ringClass="focus:ring-[#66c0f4]" onRefresh={refresh} />
+          )
+        }
+        stats={<MainPageProfileStStats library={library} isLoading={libraryLoading} />}
+      >
+        <div className="flex items-center gap-2 flex-wrap text-[0.8125rem] text-text-secondary">
+          {profile.level !== null && (
+            <span className="inline-flex items-center gap-1">
+              {T.steam.level}
+              <span className="inline-flex items-center justify-center min-w-6 h-6 px-1 rounded-full border-2 border-[#66c0f4] text-text-main font-bold tabular-nums">
+                {profile.level}
+              </span>
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1.5 min-w-0">
+            <span aria-hidden="true" className={`inline-block w-2 h-2 rounded-full shrink-0 ${status.dot}`} />
+            <span className="truncate">{status.text}</span>
+          </span>
+        </div>
+        {(memberYear || country) && (
+          <p className="text-[0.8125rem] text-text-secondary">
+            {memberYear && `${T.profileRa.memberSince} ${memberYear}`}
+            {memberYear && country && ' · '}
+            {country && (
+              <span>
+                <span aria-hidden="true">{codeToFlag(country.code)} </span>
+                {country.name}
               </span>
             )}
-            <span className="inline-flex items-center gap-1.5 text-text-secondary min-w-0">
-              <span aria-hidden="true" className={`inline-block w-2 h-2 rounded-full shrink-0 ${status.dot}`} />
-              <span className="truncate">{status.text}</span>
-            </span>
-          </div>
-          {(memberYear || country) && (
-            <p className="text-xs text-text-secondary">
-              {memberYear && `${T.profileRa.memberSince} ${memberYear}`}
-              {memberYear && country && ' · '}
-              {country && (
-                <span>
-                  <span aria-hidden="true">{codeToFlag(country.code)} </span>
-                  {country.name}
-                </span>
-              )}
-            </p>
-          )}
-        </div>
-      </div>
-
-      <MainPageProfileStStats library={library} isLoading={libraryLoading} />
+          </p>
+        )}
+      </MainPageProfileCard>
 
       {featured ? (
         <MainPageProfileStGame game={featured} playingNow={featured === running} />

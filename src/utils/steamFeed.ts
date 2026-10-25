@@ -182,8 +182,9 @@ export function summarizeSteamLibrary(games: SteamGameProgress[]): SteamLibraryS
 }
 
 /** Global rarity as shown: rare achievements keep enough digits to tell apart. */
-export function formatRarity(pct: number): string {
-  return pct < 1 ? pct.toFixed(2) : pct.toFixed(1)
+export function formatRarity(pct: number, lang = 'en'): string {
+  const digits = pct < 1 ? 2 : 1
+  return pct.toLocaleString(lang, { minimumFractionDigits: digits, maximumFractionDigits: digits })
 }
 
 /** Unlock date and time, in the app language. */

@@ -13,12 +13,9 @@ import GamePickerRow from '@/components/game-picker/game-picker-row/GamePickerRo
 import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
 import { notify } from '@/lib/notify'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import Button from '@/components/ui/Button'
+import Modal from '@/components/ui/Modal'
 
-const overlayVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.18 } },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
-}
 const spotlightVariants: Variants = {
   hidden: { opacity: 0, y: -14, scale: 0.97 },
   visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
@@ -113,17 +110,9 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          onClick={onClose}
-        >
-          <div className="absolute top-[12%] left-1/2 -translate-x-1/2 w-full max-w-2xl px-4">
+        <Modal isOpen={isOpen} onClose={onClose} size="lg" showClose={false} className="gap-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl border border-ink/5 flex flex-col overflow-hidden"
+              className="bg-bg-card rounded-card shadow-2xl border border-ink/5 flex flex-col overflow-hidden"
               variants={spotlightVariants}
               onClick={(e) => e.stopPropagation()}
             >
@@ -189,13 +178,13 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
                       {T.pinnedGames.error}
                     </p>
                   )}
-                  <button
+                  <Button
                     onClick={handleConfirm}
                     disabled={saving}
-                    className="w-full py-2.5 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
+                    className="w-full"
                   >
                     {saving ? '…' : `${T.pinnedGames.confirmPin} (${selected.size})`}
-                  </button>
+                  </Button>
                 </div>
               )}
 
@@ -203,8 +192,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
                 <p className="text-text-secondary text-xs text-center py-6">{T.pinnedGames.searchPlaceholder}</p>
               )}
             </motion.div>
-          </div>
-        </motion.div>
+          </Modal>
       )}
     </AnimatePresence>
   )

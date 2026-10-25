@@ -33,13 +33,13 @@ test('the active column reports its direction, with a decorative arrow', () => {
   const th = screen.getByRole('columnheader')
   expect(th.getAttribute('aria-sort')).toBe('descending')
   expect(th.className).toContain('w-32')
-  expect(screen.getByText('↓', { exact: false }).getAttribute('aria-hidden')).toBe('true')
+  expect(screen.getByTestId('IconArrowDown').getAttribute('aria-hidden')).toBe('true')
 })
 
 test('ascending shows the up arrow', () => {
   renderHeader({ key: 'rarity', dir: 'asc' })
   expect(screen.getByRole('columnheader').getAttribute('aria-sort')).toBe('ascending')
-  expect(screen.getByText('↑', { exact: false })).toBeInTheDocument()
+  expect(screen.getByTestId('IconArrowUp')).toBeInTheDocument()
 })
 
 test('first-click directions: rarest first, newest unlock first', () => {

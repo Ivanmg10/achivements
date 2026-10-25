@@ -46,7 +46,7 @@ export default function MainPageXboxNav() {
                     {T.categories[slug]}
                   </span>
                 </span>
-                <span className="text-[10px] font-semibold text-green-500 tabular-nums">{loading ? '—' : games.length}</span>
+                <span className="text-[10px] font-semibold text-success tabular-nums">{loading ? '—' : games.length}</span>
               </Link>
 
               {loading ? (

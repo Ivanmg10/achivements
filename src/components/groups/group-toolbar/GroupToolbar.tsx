@@ -1,12 +1,15 @@
 import { useMemo } from 'react'
-import { IconChevronDown, IconLayoutGrid, IconList } from '@tabler/icons-react'
+import { IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { GameGroupItem } from '@/types/types'
 import { DECADES, type DecadeFilter, type GroupFilters as Filters, type PctFilter } from '@/utils/groupItems'
 import GroupViewToggle, { type GroupDetailView } from '@/components/groups/group-view-toggle/GroupViewToggle'
+import Select from '@/components/ui/Select'
+import Checkbox from '@/components/ui/Checkbox'
+import { tabClass } from '@/components/ui/Tabs'
+import { MENU_SURFACE } from '@/components/ui/menu'
 
-const PILL = 'h-9 px-3 rounded-lg text-xs sm:text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
-const MENU = `${PILL} inline-flex items-center gap-1.5 ring-1 ring-ink/10 text-text-main bg-transparent hover:ring-ink/25`
+const MENU = 'h-9 px-3 rounded-control text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer bg-bg-main ring-1 ring-inset ring-ink/10 text-text-main hover:ring-ink/25 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
 /**
  * One bar over a group's games: progress (all / not started / started /
@@ -22,6 +25,7 @@ export default function GroupToolbar({
   onDecade,
   onToggleConsole,
   onClearConsoles,
+  counts,
 }: {
   items: GameGroupItem[]
   filters: Filters
@@ -31,6 +35,8 @@ export default function GroupToolbar({
   onDecade: (v: DecadeFilter) => void
   onToggleConsole: (name: string) => void
   onClearConsoles: () => void
+  /** How many games each state has, beside its name. */
+  counts?: { done: number; started: number; notStarted: number }
 }) {
   const { T } = useLanguage()
   const consoles = useMemo(
@@ -40,46 +46,47 @@ export default function GroupToolbar({
   const hasYears = items.some((i) => (i.release_year ?? 0) > 0)
   const picked = filters.consoles.size
 
-  const states: { value: PctFilter; label: string }[] = [
-    { value: 'all', label: T.groups.filterAll },
-    { value: '0', label: T.groups.filter0 },
-    { value: 'progress', label: T.groups.filterProgress },
-    { value: '100', label: T.groups.filter100 },
+  const states: { value: PctFilter; label: string; count?: number }[] = [
+    { value: 'all', label: T.groups.filterAll, count: items.length },
+    { value: 'progress', label: T.groups.filterProgress, count: counts?.started },
+    { value: '100', label: T.groups.filter100, count: counts?.done },
+    { value: '0', label: T.groups.filter0, count: counts?.notStarted },
   ]
 
   return (
-    <div className="flex flex-wrap items-center gap-2 p-2 rounded-2xl bg-bg-card ring-1 ring-ink/5">
-      <div role="group" aria-label={T.groups.filterProgressLabel} className="flex flex-wrap gap-1">
+    <div className="flex flex-wrap items-center gap-2 px-1 sm:px-4 pb-1.5 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]">
+      <div role="group" aria-label={T.groups.filterProgressLabel} className="flex flex-wrap gap-1 -mb-1.5">
         {states.map((s) => (
           <button
             key={s.value}
             type="button"
             aria-pressed={filters.pct === s.value}
             onClick={() => onPct(s.value)}
-            className={`${PILL} ${filters.pct === s.value ? 'bg-text-main text-bg-main font-semibold' : 'text-text-secondary hover:text-text-main'}`}
+            className={tabClass(filters.pct === s.value)}
           >
             {s.label}
+            {s.count !== undefined && <span className="text-xs font-bold tabular-nums opacity-70">{s.count}</span>}
           </button>
         ))}
       </div>
 
-      {(consoles.length > 1 || hasYears) && <span aria-hidden="true" className="hidden sm:block w-px h-6 bg-ink/10 mx-1" />}
+      <span className="flex-1" aria-hidden="true" />
 
       {consoles.length > 1 && (
         <details className="relative">
           <summary className={`${MENU} list-none [&::-webkit-details-marker]:hidden`}>
-            {T.groups.filterConsoleLabel}: {picked === 0 ? T.groups.allConsoles : picked === 1 ? [...filters.consoles][0] : T.groups.consolesPicked.replace('{n}', String(picked))}
+            <span className="font-medium text-text-secondary">{T.groups.filterConsoleLabel}</span>
+            <span className="font-bold">{picked === 0 ? T.groups.allShort : picked === 1 ? [...filters.consoles][0] : T.groups.consolesPicked.replace('{n}', String(picked))}</span>
             <IconChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
           </summary>
-          <fieldset className="absolute z-20 mt-2 min-w-56 max-h-72 overflow-auto p-2 rounded-xl bg-bg-header ring-1 ring-ink/10 shadow-xl flex flex-col gap-0.5">
+          <fieldset className={`absolute z-20 mt-2 min-w-56 max-h-72 overflow-auto flex flex-col gap-0.5 ${MENU_SURFACE}`}>
             <legend className="sr-only">{T.groups.filterConsoleLabel}</legend>
             {consoles.map((name, i) => {
               const id = `group-console-${i}`
               return (
-                <label key={name} htmlFor={id} className="flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm hover:bg-ink/5 cursor-pointer">
-                  <input id={id} type="checkbox" checked={filters.consoles.has(name)} onChange={() => onToggleConsole(name)} className="accent-[rgb(var(--accent))]" />
+                <Checkbox key={name} id={id} checked={filters.consoles.has(name)} onChange={() => onToggleConsole(name)} className="px-2 py-1.5 rounded-lg text-sm hover:bg-ink/5">
                   {name}
-                </label>
+                </Checkbox>
               )
             })}
             {picked > 0 && (
@@ -93,28 +100,27 @@ export default function GroupToolbar({
 
       {hasYears && (
         <>
-          <label htmlFor="group-decade" className="sr-only">{T.groups.filterDecadeLabel}</label>
-          <select
-            id="group-decade"
+          <Select<DecadeFilter>
+            aria-label={T.groups.filterDecadeLabel}
+            prefix={T.groups.filterDecadeLabel}
+            size="sm"
             value={filters.decade}
-            onChange={(e) => onDecade(e.target.value as DecadeFilter)}
-            className={`${MENU} bg-bg-card`}
-          >
-            <option value="all">{T.groups.decadeAll}</option>
-            {DECADES.map((d) => (
-              <option key={d} value={d}>{`${d.slice(0, 2)}'s`}</option>
-            ))}
-          </select>
+            onChange={onDecade}
+            options={[
+              { value: 'all', label: T.groups.allShort },
+              ...DECADES.map((d) => ({ value: d as DecadeFilter, label: `${d.slice(0, 2)}'s` })),
+            ]}
+          />
         </>
       )}
 
-      <div className="ml-auto">
+      <div>
         <GroupViewToggle
           value={view}
           onChange={onView}
           options={[
-            { value: 'covers', label: T.groups.viewCovers, icon: IconLayoutGrid },
-            { value: 'list', label: T.groups.viewList, icon: IconList },
+            { value: 'covers', label: T.groups.viewCovers },
+            { value: 'list', label: T.groups.viewList },
           ]}
         />
       </div>

@@ -9,7 +9,7 @@ export default function PublicUserSkeleton() {
     <div role="status" aria-busy="true" className="min-h-full flex flex-col items-center py-4 sm:py-6 px-4">
       <span className="sr-only">{T.userProfile.loadingProfile}</span>
       <div aria-hidden="true" className="w-full lg:max-w-[95%] flex flex-col gap-4 animate-pulse motion-reduce:animate-none">
-        <div className="bg-bg-card rounded-3xl px-4 sm:px-6 pt-6 pb-5 flex flex-col gap-5">
+        <div className="bg-bg-card rounded-card px-4 sm:px-6 pt-6 pb-5 flex flex-col gap-5">
           <div className="flex items-center gap-4 sm:gap-5">
             <div className="rounded-full w-20 h-20 sm:w-28 sm:h-28 bg-ink/[0.08] shrink-0" />
             <div className="flex flex-col gap-2 flex-1">

@@ -6,6 +6,7 @@ import { Translations } from '@/translations/en'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
+import { fieldClass } from '@/components/ui/Input'
 
 export default function MainSidePanelCategories() {
   const [open, setOpen] = useState<Record<string, boolean>>({})
@@ -29,7 +30,7 @@ export default function MainSidePanelCategories() {
           placeholder={T.sidePanel.searchConsole}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-bg-main text-text-main text-sm px-3 py-2 rounded-xl outline-none placeholder:text-text-secondary"
+          className={fieldClass({ size: 'sm' })}
         />
       </div>
 

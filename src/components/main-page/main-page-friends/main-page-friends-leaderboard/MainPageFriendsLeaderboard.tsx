@@ -7,13 +7,11 @@ import { IconCrown, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { rankBy, type LeaderRow, type StatKey } from '@/utils/friends'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
+import { pillClass } from '@/components/ui/Pill'
 
 const KEYS: StatKey[] = ['week', 'activeDays', 'streak', 'completed']
 
-const chipClass = (on: boolean) =>
-  `px-2.5 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-    on ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30' : 'bg-bg-main text-text-secondary hover:text-text-main'
-  }`
+const chipClass = (on: boolean) => pillClass(on)
 
 /**
  * You and the people you follow, ranked on one measure at a time: unlocks this

@@ -24,6 +24,9 @@ const DETAILS: SteamGameDetails = {
   ],
 }
 
+// Each fact is a label and its value, read together.
+const facts = () => [...document.querySelector('section dl')!.children].map((d) => d.textContent)
+
 function renderHeader(props: Partial<React.ComponentProps<typeof SteamGameInfoHeader>> = {}) {
   return render(
     <SteamGameInfoHeader
@@ -47,22 +50,19 @@ describe('SteamGameInfoHeader', () => {
 
   test('lists the store facts, like the RA page', () => {
     renderHeader()
-    const facts = screen.getAllByRole('listitem').map((li) => li.textContent)
-    expect(facts).toEqual(expect.arrayContaining([
-      `${en.gameInfoPage.id}: 377160`,
-      `${en.gameInfoPage.developer}: Bethesda Game Studios`,
-      `${en.gameInfoPage.publisher}: Bethesda Softworks`,
-      `${en.gameInfoPage.genre}: Rol, Acción`,
-      `${en.gameInfoPage.released}: 9 NOV 2015`,
+    expect(facts()).toEqual(expect.arrayContaining([
+      `${en.gameInfoPage.developer}Bethesda Game Studios`,
+      `${en.gameInfoPage.publisher}Bethesda Softworks`,
+      `${en.gameInfoPage.genre}Rol, Acción`,
+      `${en.gameInfoPage.released}9 NOV 2015`,
     ]))
     expect(screen.getByText('Post-apocalyptic RPG')).toBeInTheDocument()
   })
 
-  test('falls back to dashes when the store has no entry', () => {
+  test('says "no data" when the store has no entry', () => {
     renderHeader({ details: null })
-    const facts = screen.getAllByRole('listitem').map((li) => li.textContent)
-    expect(facts).toContain(`${en.gameInfoPage.developer}: —`)
-    expect(facts).toContain(`${en.gameInfoPage.released}: —`)
+    expect(facts()).toContain(`${en.gameInfoPage.developer}${en.gameInfoPage.noData}`)
+    expect(facts()).toContain(`${en.gameInfoPage.released}${en.gameInfoPage.noData}`)
     expect(screen.queryByRole('img', { name: /Screenshot/ })).not.toBeInTheDocument()
   })
 

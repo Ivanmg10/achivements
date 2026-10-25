@@ -45,12 +45,14 @@ test('changing the view asks for it', () => {
   render(<RankingsPage signedIn />)
   fireEvent.click(screen.getByRole('tab', { name: en.rankings.following }))
   expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toEqual({ scope: 'following', period: 'all', source: 'all', sort: 'points' })
-  fireEvent.click(screen.getByRole('button', { name: en.rankings.week }))
+  fireEvent.click(screen.getByRole('combobox', { name: en.rankings.period }))
+  fireEvent.click(screen.getByRole('option', { name: en.rankings.week }))
   expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toMatchObject({ period: 'week' })
-  expect(screen.getByRole('button', { name: en.rankings.week })).toHaveAttribute('aria-pressed', 'true')
-  fireEvent.click(screen.getByRole('button', { name: en.rankings.sortBest }))
+  expect(screen.getByRole('combobox', { name: en.rankings.period })).toHaveTextContent(en.rankings.week)
+  fireEvent.click(screen.getByRole('combobox', { name: en.rankings.sort }))
+  fireEvent.click(screen.getByRole('option', { name: en.rankings.sortBest }))
   expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toMatchObject({ sort: 'best' })
-  expect(screen.getByRole('button', { name: en.rankings.sortBest })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByRole('combobox', { name: en.rankings.sort })).toHaveTextContent(en.rankings.sortBest)
 })
 
 test('signed out: only the global list, names open their public card, and how to join', () => {

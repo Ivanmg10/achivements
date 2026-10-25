@@ -2,7 +2,7 @@
 
 import { LanguageProvider } from '@/context/LanguageContext'
 import RouteError from '@/components/route-error/RouteError'
-import { inter } from '@/lib/fonts'
+import { display, ui } from '@/lib/fonts'
 import './globals.css'
 
 /**
@@ -12,7 +12,7 @@ import './globals.css'
  */
 export default function GlobalError(props: { error: Error & { digest?: string }; retry: () => void }) {
   return (
-    <html lang="en" data-theme="dark" className={inter.variable}>
+    <html lang="en" data-theme="dark" className={`${ui.variable} ${display.variable}`}>
       <body className="bg-bg-main text-text-main">
         <LanguageProvider>
           <RouteError {...props} fullScreen />

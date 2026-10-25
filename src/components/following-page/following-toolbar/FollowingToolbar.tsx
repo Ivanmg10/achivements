@@ -5,13 +5,10 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { GameSource } from '@/types/steam'
 import { PLATFORM_NAME } from '@/utils/gameRef'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
+import { fieldClass } from '@/components/ui/Input'
+import { pillClass } from '@/components/ui/Pill'
 
 const PLATFORMS = ['ra', 'steam', 'psn', 'xbox'] as const
-
-const CHIP =
-  'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
-const ON = 'bg-accent/15 text-text-main ring-1 ring-accent font-semibold'
-const OFF = 'bg-bg-card text-text-secondary hover:text-text-main'
 
 /**
  * Narrows the people you follow: by name, and by the platforms they play on.
@@ -48,8 +45,8 @@ export default function FollowingToolbar({
   ]
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-      <div className="relative sm:w-64 shrink-0">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 xl:pb-1.5">
+      <div className="relative sm:w-[16.25rem] shrink-0">
         <label htmlFor="following-search" className="sr-only">{T.following.searchLabel}</label>
         <IconSearch size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
         <input
@@ -58,13 +55,13 @@ export default function FollowingToolbar({
           value={query}
           onChange={(e) => onQuery(e.target.value)}
           placeholder={T.following.searchPlaceholder}
-          className="w-full bg-bg-card rounded-xl pl-9 pr-3 py-2 text-sm placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className={fieldClass({ size: 'sm', icon: true })}
         />
       </div>
 
       <div className="flex flex-wrap gap-2">
         {chips.map(({ key, on, onClick, logo, label, count }) => (
-          <button key={key} type="button" aria-pressed={on} onClick={onClick} className={`${CHIP} ${on ? ON : OFF}`}>
+          <button key={key} type="button" aria-pressed={on} onClick={onClick} className={pillClass(on)}>
             {on && <IconCheck size={12} aria-hidden="true" className="text-accent" />}
             {logo && <PlatformLogo source={logo} size={12} />}
             {label}

@@ -36,7 +36,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { 
   const href = entryHref(entry)
 
   return (
-    <div className="group relative flex flex-col w-full h-full rounded-2xl bg-bg-card ring-1 ring-ink/5 hover:ring-ink/15 focus-within:ring-2 focus-within:ring-accent/70 transition-shadow">
+    <div className="group relative flex flex-col w-full h-full rounded-card bg-bg-card ring-1 ring-ink/5 hover:ring-ink/15 focus-within:ring-2 focus-within:ring-accent/70 transition-shadow">
       <div className={`relative rounded-t-2xl ${banner}`}>
         <LibraryShelfBanner entry={entry} />
         <span className="absolute left-3 top-3">

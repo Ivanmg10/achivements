@@ -12,6 +12,7 @@ import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import { capList } from '@/utils/utils'
 import { tooltipStyle } from '@/utils/tooltipStyle'
+import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 
 type TooltipData = { achievement: RetroAchievement; x: number; y: number }
 
@@ -149,7 +150,7 @@ export const AchievementGrid = memo(function AchievementGrid({
                 setSelected(a)
               }}
               className={`block rounded-lg overflow-hidden shrink-0 cursor-pointer transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                isHardcore ? 'ring-2 ring-yellow-400' : isSoftcore ? 'ring-2 ring-blue-400' : missable ? 'ring-2 ring-danger' : ''
+                isHardcore ? 'ring-2 ring-hardcore' : isSoftcore ? 'ring-2 ring-softcore' : missable ? 'ring-2 ring-danger' : ''
               }`}
             >
               {a.BadgeName ? (
@@ -181,7 +182,8 @@ export const AchievementGrid = memo(function AchievementGrid({
       {tooltip &&
         createPortal(
           <div
-            className="fixed z-50 pointer-events-none bg-bg-card border border-bg-header/80 rounded-xl shadow-2xl p-3 max-w-65"
+            role="tooltip"
+            className={`fixed z-50 pointer-events-none ${TOOLTIP_SURFACE} p-3 max-w-65`}
             style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
           >
             <p className="text-sm font-semibold text-text-main">{tooltip.achievement.Title}</p>

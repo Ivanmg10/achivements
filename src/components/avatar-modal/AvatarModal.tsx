@@ -8,10 +8,12 @@ import Spinner from '@/components/main-spinner/Spinner'
 import { useAvatarUpload } from '@/hooks/useAvatarUpload'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
 import { useLanguage } from '@/context/LanguageContext'
+import { buttonClass } from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
-const BUTTON = 'flex-1 inline-flex items-center justify-center gap-2 min-h-11 px-4 rounded-xl text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 disabled:opacity-50'
-const PRIMARY = `${BUTTON} bg-accent text-bg-main hover:bg-accent-hover`
-const SECONDARY = `${BUTTON} bg-bg-main ring-1 ring-inset ring-ink/10 hover:ring-ink/25 cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/70`
+const BUTTON = 'flex-1'
+const PRIMARY = buttonClass('primary', 'md', BUTTON)
+const SECONDARY = buttonClass('secondary', 'md', `${BUTTON} cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/70`)
 
 /**
  * The profile picture, on its own: the picture as it will look, big and
@@ -53,7 +55,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={close} className="max-w-md min-h-0! justify-start! gap-5 p-5! sm:p-6!">
+    <CommonModal isOpen={isOpen} onClose={close}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h2 className="text-xl font-bold">{t.avatarTitle}</h2>
@@ -121,7 +123,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
       </label>
 
       {error && (
-        <p role="alert" className="text-sm text-danger bg-danger/10 rounded-xl px-4 py-2">
+        <p role="alert" className="text-sm text-danger bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control px-4 py-2">
           {error}
         </p>
       )}
@@ -164,7 +166,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
                   placeholder="https://…"
                   value={url}
                   onChange={(e) => { setUrl(e.target.value); setLinkBroken(false); link.clearError() }}
-                  className="flex-1 min-w-0 h-11 px-3 rounded-xl bg-bg-main text-sm outline-none ring-1 ring-inset ring-ink/10 focus-visible:ring-2 focus-visible:ring-accent"
+                  className={fieldClass({ size: 'sm' }, 'flex-1 min-w-0')}
                 />
                 <button type="submit" disabled={!linkValid || linkBroken || link.saving} className={`${PRIMARY} flex-none`}>
                   {link.saving ? t.saving : t.avatarLinkSave}

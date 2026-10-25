@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion, type Variants } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { GameGroup, GameGroupItem } from '@/types/types'
@@ -15,20 +15,11 @@ import GroupModalPreview from '@/components/groups/group-modal-preview/GroupModa
 import GroupModalIconPicker from '@/components/groups/group-modal-icon-picker/GroupModalIconPicker'
 import GroupModalVisibility from '@/components/groups/group-modal-visibility/GroupModalVisibility'
 import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
-
-const overlayVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.18 } },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
-}
-const contentVariants: Variants = {
-  hidden: { opacity: 0, y: -14, scale: 0.97 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
-  exit: { opacity: 0, y: -8, scale: 0.97, transition: { duration: 0.15, ease: 'easeIn' } },
-}
+import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
+import Modal from '@/components/ui/Modal'
 
 const LABEL = 'text-[10px] uppercase tracking-widest text-text-secondary'
-const FIELD = 'bg-bg-main rounded-lg px-3 py-2 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70'
 
 type Props = {
   isOpen: boolean
@@ -131,25 +122,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          onClick={onClose}
-        >
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={headingId}
-            className={`bg-bg-card w-full h-full sm:h-auto sm:max-h-[88vh] sm:rounded-2xl flex flex-col text-text-main shadow-2xl ring-1 ring-ink/5 overflow-hidden ${isEditing ? 'sm:max-w-md' : 'sm:max-w-4xl'}`}
-            variants={contentVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={headingId} size="md" showClose={false} className="gap-4">
             <div className="flex items-center justify-between px-5 sm:px-6 pt-5 pb-3 shrink-0">
               <h2 id={headingId} className="text-lg font-bold">
                 {isEditing ? T.groups.editGroup : T.groups.newGroup}
@@ -182,7 +155,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                       maxLength={GROUP_TITLE_MAX}
                       aria-invalid={titleMissing || undefined}
                       aria-describedby={titleMissing ? titleErrorId : undefined}
-                      className={`${FIELD} ${titleMissing ? 'ring-2 ring-danger' : ''}`}
+                      className={fieldClass({ size: 'sm', invalid: titleMissing })}
                       autoFocus
                     />
                     {titleMissing && (
@@ -199,7 +172,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                       placeholder={T.groups.descriptionPlaceholder}
                       maxLength={GROUP_DESCRIPTION_MAX}
                       rows={2}
-                      className={`${FIELD} resize-none`}
+                      className={fieldClass({ size: 'sm' }, 'h-auto! py-2 resize-none')}
                     />
                   </div>
 
@@ -219,25 +192,23 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                   <p role="alert" className="text-xs text-danger">{error}</p>
                 )}
                 <div className="flex gap-2 justify-end">
-                  <button
+                  <Button
                     type="button"
                     onClick={onClose}
-                    className="h-10 px-4 rounded-xl text-text-secondary text-sm hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    variant="quiet"
                   >
                     {T.groups.cancel}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="submit"
                     disabled={saving}
-                    className="h-10 px-5 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                   >
                     {saving ? '…' : submitLabel}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </form>
-          </motion.div>
-        </motion.div>
+          </Modal>
       )}
     </AnimatePresence>,
     document.body,

@@ -3,6 +3,8 @@
 import CommonModal from '../common-modal/CommonModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSaveProfileField } from '@/hooks/useSaveProfileField'
+import { choiceClass } from '@/components/ui/ChoiceCards'
+import Notice from '@/components/ui/Notice'
 
 export type Gender = 'male' | 'female' | 'neutral'
 
@@ -30,7 +32,7 @@ export default function GenderModal({ isOpen, onClose, current }: Props) {
   return (
     <CommonModal isOpen={isOpen} onClose={onClose}>
       <h2 className="text-xl font-bold mb-4">{T.userData.gender}</h2>
-      {error && <p role="alert" className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2 mb-3">{error}</p>}
+      {error && <Notice tone="danger" className="mb-3">{error}</Notice>}
       <div role="radiogroup" aria-label={T.userData.gender} className="grid grid-cols-2 gap-3">
         {options.map(({ id, label }) => {
           const selected = (current ?? '') === id
@@ -41,9 +43,7 @@ export default function GenderModal({ isOpen, onClose, current }: Props) {
               aria-checked={selected}
               disabled={saving}
               onClick={() => handleSelect(id)}
-              className={`px-3 py-3 rounded-xl text-sm font-medium transition-all disabled:opacity-50 ${
-                selected ? 'bg-accent text-bg-main' : 'bg-bg-main hover:bg-bg-card text-text-main'
-              }`}
+              className={choiceClass(selected, 'justify-center text-sm font-medium text-text-main')}
             >
               {label}
             </button>

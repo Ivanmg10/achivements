@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion'
 import type { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxSummary } from '@/hooks/useXboxSummary'
-import { calcAvgPerDay } from '@/utils/utils'
+import { calcAvgPerDay, decimal } from '@/utils/utils'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
@@ -69,13 +69,13 @@ export default function MainPageXboxStats({
       />
       <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={noun} onClick={() => setWeekOpen(true)} />
       <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={noun} onClick={() => setMonthOpen(true)} />
-      <StatPill label={T.pointsStats.avgPerDay} value={stats.avg.toFixed(1)} sub={T.pointsStats.perDay} />
-      {summary && <StatPill label={T.xbox.gamerscore} value={summary.gamerscore.toLocaleString(lang)} sub="Xbox" accent="text-green-500" />}
+      <StatPill label={T.pointsStats.avgPerDay} value={decimal(stats.avg, lang)} sub={T.pointsStats.perDay} />
+      {summary && <StatPill label={T.xbox.gamerscore} value={summary.gamerscore.toLocaleString(lang)} sub="Xbox" accent="text-success" />}
       <StatPill
         label={T.streak.title}
         value={`${streak}d`}
         sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
-        accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined}
+        accent={streak > 0 ? 'text-accent' : undefined}
         href="/racha"
       />
       {summary && <StatPill label={T.xbox.achievements} value={summary.achievementsUnlocked.toLocaleString(lang)} sub={T.xbox.total} />}

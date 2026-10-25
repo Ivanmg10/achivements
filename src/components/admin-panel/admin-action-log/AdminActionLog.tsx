@@ -65,7 +65,7 @@ export default function AdminActionLog() {
   }
 
   return (
-    <section className="bg-bg-card rounded-2xl">
+    <section className="bg-bg-card rounded-card">
       <button
         onClick={toggle}
         aria-expanded={open}
@@ -77,7 +77,7 @@ export default function AdminActionLog() {
       </button>
       {open && (
         <div className="px-4 pb-4">
-          {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
+          {error && <p role="alert" className="text-sm text-danger">{error}</p>}
           {!error && entries === null && <p className="text-sm text-text-secondary">Loading…</p>}
           {entries?.length === 0 && <p className="text-sm text-text-secondary">Nothing yet.</p>}
           {entries && entries.length > 0 && (

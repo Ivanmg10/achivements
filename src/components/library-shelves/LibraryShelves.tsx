@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import LibraryShelf from '@/components/library-shelf/LibraryShelf'
 import { buildShelves } from '@/utils/libraryShelves'
 import type { LibraryEntry, QuickFilter } from '@/utils/libraryInsights'
+import Button from '@/components/ui/Button'
 
 /*
  * The entrance. The shelves come in one after another, each starting a beat
@@ -55,13 +56,13 @@ export default function LibraryShelves({
         <LibraryShelf key={s.id} shelf={s} seed={seed + i * 7919} onPick={onPick} onSeeShelf={onSeeShelf} />
       ))}
       <motion.div variants={END} className="sticky bottom-5 z-30 flex justify-center pointer-events-none">
-        <button
+        <Button
           type="button"
           onClick={onSeeAll}
-          className="pointer-events-auto rounded-full bg-accent text-bg-main font-semibold text-sm px-6 py-2.5 shadow-xl shadow-black/40 hover:bg-accent-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main"
+          className="pointer-events-auto shadow-xl shadow-black/40"
         >
           {T.libraryLayout.seeAll.replace('{n}', String(entries.length))}
-        </button>
+        </Button>
       </motion.div>
     </motion.div>
   )

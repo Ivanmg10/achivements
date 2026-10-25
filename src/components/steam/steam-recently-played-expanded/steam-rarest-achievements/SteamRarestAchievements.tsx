@@ -24,7 +24,7 @@ export default function SteamRarestAchievements({
   achievements: SteamAchievementUnified[]
   isLoading: boolean
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   const rarest = achievements
     .filter((a) => a.earned && a.globalPct !== null)
@@ -68,7 +68,7 @@ export default function SteamRarestAchievements({
                 <span className="flex flex-col min-w-0">
                   <span className="text-sm font-semibold truncate">{a.title}</span>
                   <span className="text-xs text-[#a4d007]">
-                    {formatRarity(a.globalPct!)}
+                    {formatRarity(a.globalPct!, lang)}
                     {T.achievement.haveIt}
                   </span>
                 </span>

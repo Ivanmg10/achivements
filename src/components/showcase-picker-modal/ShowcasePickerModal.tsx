@@ -1,19 +1,20 @@
 'use client'
 
 import { useEffect, useId, useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { IconArrowLeft, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useActivityHeatmapYear } from '@/context/ActivityHeatmapYearContext'
 import { useOwnShowcase } from '@/context/ShowcaseContext'
 import { useProfileLibrary } from '@/hooks/useProfileLibrary'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
-import { modalContent, modalOverlay } from '@/lib/animations'
 import { gameKey } from '@/utils/gameRef'
 import type { LibraryGame } from '@/utils/library'
 import { SHOWCASE_MAX, showcaseKey, type ShowcaseEntry } from '@/utils/showcase'
 import ShowcasePickerModalGames from './showcase-picker-modal-games/ShowcasePickerModalGames'
 import ShowcasePickerModalGame from './showcase-picker-modal-game/ShowcasePickerModalGame'
+import Button from '@/components/ui/Button'
+import Modal from '@/components/ui/Modal'
 
 /**
  * Picks achievements for the showcase: first the user's games with something
@@ -87,25 +88,7 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
   return (
     <AnimatePresence>
       {isOpen && showcase && (
-        <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-          variants={modalOverlay}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          onClick={onClose}
-        >
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={titleId}
-            className="bg-bg-main rounded-2xl w-full max-w-xl lg:max-w-5xl h-[85vh] flex flex-col overflow-hidden"
-            variants={modalContent}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={titleId} size="md" showClose={false} className="gap-4">
             <div className="flex items-start justify-between gap-3 p-5 border-b border-bg-header">
               <div className="flex flex-col gap-1 min-w-0">
                 {game && (
@@ -155,17 +138,16 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
                 {T.showcase.selected.replace('{n}', String(selected.length))} ·{' '}
                 {free - selected.length > 0 ? T.showcase.slotsLeft.replace('{n}', String(free - selected.length)) : T.showcase.noSlots}
               </p>
-              <button
+              <Button
                 type="button"
                 onClick={save}
                 disabled={selected.length === 0 || saving}
-                className="shrink-0 px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent/90 disabled:opacity-40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="shrink-0"
               >
                 {T.showcase.addSelected}
-              </button>
+              </Button>
             </div>
-          </motion.div>
-        </motion.div>
+          </Modal>
       )}
     </AnimatePresence>
   )

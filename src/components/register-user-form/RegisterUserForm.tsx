@@ -14,6 +14,7 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import { useWelcomeEntry } from '@/hooks/useWelcomeEntry'
 import type { RaSignupAccount } from '@/hooks/useRaSignupCheck'
 import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, suggestUsername, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
+import Button from '@/components/ui/Button'
 
 export default function RegisterUserForm({
   setIsLogin,
@@ -116,7 +117,7 @@ export default function RegisterUserForm({
       </div>
 
       {error && (
-        <div role="alert" className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3">
+        <div role="alert" className="mb-5 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3">
           <p className="text-sm text-danger">{error}</p>
         </div>
       )}
@@ -185,11 +186,11 @@ export default function RegisterUserForm({
           disabled={submitting}
         />
 
-        <button
+        <Button
           type="submit"
           // With the RA section open, its account is checked first (or the section closed).
           disabled={submitting || (raOpen && !raAccount)}
-          className="bg-accent text-bg-main w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main"
+          size="lg" className="w-full mt-2"
         >
           {submitting ? (
             <>
@@ -202,7 +203,7 @@ export default function RegisterUserForm({
               <IconArrowRight size={16} aria-hidden="true" />
             </>
           )}
-        </button>
+        </Button>
       </form>
 
       <SteamSignInDivider />

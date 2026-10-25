@@ -80,8 +80,8 @@ describe('MainPagePointsStats', () => {
         rank={{ Rank: 1234, Score: 5000, SoftcoreScore: 0 } as unknown as UserRankAndScore}
       />,
     )
-    expect(screen.getByText('#1234')).toBeInTheDocument()
-    expect(screen.getByText('5000 pts')).toBeInTheDocument()
+    expect(screen.getByText('#1,234')).toBeInTheDocument()
+    expect(screen.getByText('5,000 pts')).toBeInTheDocument()
   })
 
   test('sums only this-calendar-month points from heatmap achievements', () => {

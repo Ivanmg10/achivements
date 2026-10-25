@@ -44,11 +44,10 @@ export default function FollowingPage() {
           <FollowingRankingsTeaser />
         </div>
 
-        <FollowingTabs tab={tab} onTab={onTab} counts={counts} />
-
         {tab === 'following' ? (
           <FollowingList
             key="following"
+            tabs={<FollowingTabs tab={tab} onTab={onTab} counts={counts} />}
             users={users}
             details={details}
             isLoading={isLoading}
@@ -59,7 +58,9 @@ export default function FollowingPage() {
         ) : (
           <FollowingList
             key="followers"
+            tabs={<FollowingTabs tab={tab} onTab={onTab} counts={counts} />}
             users={fans.followers ?? []}
+            details={fans.details}
             isLoading={fans.isLoading}
             error={fans.error}
             onRetry={fans.retry}

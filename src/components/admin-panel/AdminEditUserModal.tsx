@@ -9,6 +9,9 @@ import { codeToFlag, findCountry, COUNTRIES } from '@/utils/countries'
 import type { Country } from '@/utils/countries'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
+import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
+import Switch from '@/components/ui/Switch'
 
 interface Props {
   isOpen: boolean
@@ -94,7 +97,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
           <input
             value={values.username as string ?? ''}
             onChange={e => setValues(v => ({ ...v, username: e.target.value }))}
-            className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+            className={fieldClass({ size: 'sm' })}
           />
         </FieldRow>
 
@@ -110,7 +113,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
             type="email"
             value={values.email as string ?? ''}
             onChange={e => setValues(v => ({ ...v, email: e.target.value }))}
-            className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+            className={fieldClass({ size: 'sm' })}
           />
         </FieldRow>
 
@@ -126,7 +129,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
             <input
               value={values.avatar as string ?? ''}
               onChange={e => setValues(v => ({ ...v, avatar: e.target.value }))}
-              className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent flex-1"
+              className={fieldClass({ size: 'sm' }, 'flex-1')}
               placeholder="https://..."
             />
             {(values.avatar as string) && (
@@ -160,7 +163,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
               )}
               {currentLocation && (
                 <button onClick={() => { setValues(v => ({ ...v, location: '' })); patch('location', null) }}
-                  className="text-xs text-red-400 hover:text-red-300 px-2 py-1">Clear</button>
+                  className="text-xs text-danger hover:text-danger px-2 py-1">Clear</button>
               )}
             </div>
           ) : (
@@ -170,7 +173,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
                 value={countrySearch}
                 onChange={e => setCountrySearch(e.target.value)}
                 placeholder="Search country..."
-                className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full"
+                className={fieldClass({ size: 'sm' })}
               />
               <div className="max-h-40 overflow-y-auto flex flex-col gap-0.5">
                 {filteredCountries.map((c: Country) => (
@@ -191,7 +194,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
                 className="text-xs text-text-secondary hover:text-text-main text-left px-1">Cancel</button>
             </div>
           )}
-          {errors.location && <span className="text-xs text-red-400">{errors.location}</span>}
+          {errors.location && <span className="text-xs text-danger">{errors.location}</span>}
         </div>
 
         {/* Admin toggle */}
@@ -201,23 +204,15 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
             {user.id === currentAdminId && (
               <span className="text-xs text-text-secondary italic">Can&apos;t remove own admin</span>
             )}
-            <button
-              type="button"
-              role="switch"
-              aria-checked={values.admin as boolean}
+            <Switch
+              checked={values.admin as boolean}
               aria-label="Admin privileges"
               disabled={user.id === currentAdminId}
-              onClick={() => {
-                const next = !(values.admin as boolean)
+              onChange={(next) => {
                 setValues(v => ({ ...v, admin: next }))
                 patch('admin', next)
               }}
-              className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${
-                user.id === currentAdminId ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
-              } ${values.admin ? 'bg-accent' : 'bg-bg-main'}`}
-            >
-              <div className={`w-4 h-4 rounded-full bg-white transition-transform ${values.admin ? 'translate-x-4' : 'translate-x-0'}`} aria-hidden="true" />
-            </button>
+            />
           </div>
         </div>
 
@@ -234,10 +229,10 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
 
 function SaveButton({ saving, onClick }: { saving: boolean; onClick: () => void }) {
   return (
-    <button onClick={onClick} disabled={saving}
-      className="shrink-0 bg-accent text-bg-main text-xs font-bold px-3 py-2 rounded-xl hover:opacity-90 disabled:opacity-40">
+    <Button onClick={onClick} disabled={saving}
+      size="sm" className="shrink-0">
       {saving ? '...' : 'Save'}
-    </button>
+    </Button>
   )
 }
 
@@ -258,7 +253,7 @@ function FieldRow({
         <div className="flex-1">{children}</div>
         {canSave && <SaveButton saving={saving} onClick={onSave} />}
       </div>
-      {error && <span className="text-xs text-red-400">{error}</span>}
+      {error && <span className="text-xs text-danger">{error}</span>}
     </div>
   )
 }

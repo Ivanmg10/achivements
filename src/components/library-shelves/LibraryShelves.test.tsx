@@ -3,6 +3,7 @@ jest.mock('@/components/library-entry-cover/LibraryEntryCover', () => ({
   __esModule: true,
   default: ({ entry, shared }: { entry: { key: string }; shared?: boolean }) => <span data-testid="cover" data-shared={String(!!shared)}>{entry.key}</span>,
   entryBackdrop: () => null,
+  entryIcon: () => null,
 }))
 
 import { fireEvent, render, screen, within } from '@testing-library/react'

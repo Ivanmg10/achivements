@@ -44,7 +44,7 @@ export default function WelcomePageSteam({
       asideLabel={isLinked ? T.welcome.steps.steam : T.welcome.library.title}
       aside={
         isLinked ? (
-          <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-bg-card ring-1 ring-[#66c0f4]/35">
+          <div className="flex items-center gap-3.5 p-4 rounded-card bg-bg-card ring-1 ring-[#66c0f4]/35">
             {profile?.avatarfull ? (
               <Image src={profile.avatarfull} alt="" width={52} height={52} className="w-13 h-13 rounded-xl object-cover shrink-0" unoptimized />
             ) : (

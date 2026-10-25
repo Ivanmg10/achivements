@@ -52,7 +52,7 @@ export default function SteamSignupForm({ outcome }: { outcome: string }) {
 
       {state.status === 'error' && (
         <div className="flex flex-col gap-3">
-          <div role="alert" className="bg-danger/20 border border-danger/40 rounded-xl p-3">
+          <div role="alert" className="bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3">
             <p className="text-sm text-danger">{messageOf(state.error)}</p>
           </div>
           <SteamSignInButton label={s.tryAgain} />

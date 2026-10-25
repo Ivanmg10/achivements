@@ -1,7 +1,9 @@
-import { IconStar, IconStarFilled } from '@tabler/icons-react'
+import { IconCheck, IconStar, IconStarFilled } from '@tabler/icons-react'
 import { RetroAchievement } from '@/types/types'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { useLanguage } from '@/context/LanguageContext'
+import RarityBadge from '@/components/ui/RarityBadge'
+import { badgeClass, badgeImgClass, MID, NUM, ROW, TD, TD_FIRST, TYPE_TAG } from '@/components/ui/dataTable'
 
 /**
  * One achievement as a row of the RA game table. The title is the button that
@@ -27,67 +29,41 @@ export default function GameInfoAchivement({
   const { T, lang } = useLanguage()
 
   const TYPE_BADGES: Record<string, { label: string; className: string }> = {
-    progression: { label: T.achievement.progression, className: 'bg-info/20 text-info' },
-    win_condition: { label: T.achievement.winCondition, className: 'bg-warning/20 text-warning' },
-    missable: { label: T.achievement.missable, className: 'bg-danger/20 text-danger' },
+    progression: { label: T.achievement.progression, className: 'bg-info/[0.14] text-info' },
+    win_condition: { label: T.achievement.winCondition, className: 'bg-warning/[0.16] text-warning' },
+    missable: { label: T.achievement.missable, className: 'bg-danger/[0.16] text-danger' },
   }
 
   if (!achievement) return null
 
   const earned = !!achievement.DateEarned
   const earnedHardcore = !!achievement.DateEarnedHardcore
-  const rarityPct =
-    numDistinctPlayers > 0
-      ? ((achievement.NumAwarded / numDistinctPlayers) * 100).toFixed(1)
-      : null
-
+  const rarityPct = numDistinctPlayers > 0 ? (achievement.NumAwarded / numDistinctPlayers) * 100 : null
   const typeBadge = achievement.Type ? TYPE_BADGES[achievement.Type] : null
   const fmt = (n: number) => n.toLocaleString(lang)
-
-  const earnedDate = achievement.DateEarned
-    ? new Date(achievement.DateEarned).toLocaleString(lang, {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
+  const when = achievement.DateEarnedHardcore ?? achievement.DateEarned
+  const earnedDate = when
+    ? new Date(when).toLocaleString(lang, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     : null
 
   return (
-    <tr
-      className={`relative group border-b border-bg-header/60 hover:bg-bg-header/30 transition-colors duration-150 ${
-        isFavorited ? 'bg-warning/10' : ''
-      }`}
-    >
-      <td className="px-3 py-2 w-24 align-middle text-center">
+    <tr className={`${ROW} ${isFavorited ? '[&>td]:bg-accent/[0.05]' : ''}`}>
+      <td className={`${TD_FIRST} w-16`}>
         {achievement.BadgeName && (
           <FadeImage
             src={`https://media.retroachievements.org/Badge/${achievement.BadgeName}.png`}
             alt=""
-            width={80}
-            height={80}
-            className={`w-16 h-16 rounded-xl mx-auto ${earnedHardcore ? 'ring-2 ring-warning' : ''}`}
-            imgClassName={`w-full h-full object-cover ${earned ? '' : 'grayscale opacity-60'}`}
+            width={52}
+            height={52}
+            className={badgeClass(earnedHardcore ? 'hardcore' : earned ? 'softcore' : 'locked')}
+            imgClassName={badgeImgClass(!earned)}
           />
         )}
       </td>
 
-      <td className="px-3 py-2">
+      <td className={TD}>
         <div className="flex items-center gap-2 flex-wrap">
-          {onToggleFavorite && (
-            <button
-              onClick={() => onToggleFavorite(achievement)}
-              aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
-              aria-pressed={isFavorited}
-              className={`relative z-10 shrink-0 rounded transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-                isFavorited ? 'text-warning hover:text-warning/80' : 'text-text-secondary hover:text-warning'
-              }`}
-            >
-              {isFavorited ? <IconStarFilled className="w-4 h-4" aria-hidden="true" /> : <IconStar className="w-4 h-4" aria-hidden="true" />}
-            </button>
-          )}
-          <h3 className={`text-lg ${earned ? '' : 'text-text-secondary'}`}>
+          <h3 className="text-[0.9375rem] font-bold">
             <button
               onClick={onClick}
               className="text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
@@ -95,61 +71,42 @@ export default function GameInfoAchivement({
               {achievement.Title}
             </button>
           </h3>
-          {typeBadge && (
-            <span className={`text-xs px-2 py-0.5 rounded-full ${typeBadge.className}`}>
-              {typeBadge.label}
-            </span>
+          {typeBadge && <span className={`${TYPE_TAG} ${typeBadge.className}`}>{typeBadge.label}</span>}
+          {onToggleFavorite && (
+            <button
+              onClick={() => onToggleFavorite(achievement)}
+              aria-label={isFavorited ? T.favorites.removeFavorite : T.favorites.addFavorite}
+              aria-pressed={isFavorited}
+              className={`relative z-10 shrink-0 rounded transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+                isFavorited ? 'text-hardcore' : 'text-text-secondary/60 hover:text-hardcore'
+              }`}
+            >
+              {isFavorited ? <IconStarFilled className="w-4 h-4" aria-hidden="true" /> : <IconStar className="w-4 h-4" aria-hidden="true" />}
+            </button>
           )}
         </div>
-        <p className="text-sm text-text-secondary">{achievement.Description}</p>
+        <p className="mt-0.5 text-[0.8125rem] leading-normal text-text-secondary">{achievement.Description}</p>
         {earnedDate && (
-          <p className="text-xs text-text-secondary mt-0.5">
-            {T.achievement.earnedOn} {earnedDate}
-          </p>
-        )}
-        {achievement.Author && (
-          <p className="text-xs text-text-secondary mt-0.5">
-            {T.achievement.by} {achievement.Author}
+          <p className={`mt-0.5 text-xs ${earnedHardcore ? 'text-hardcore' : 'text-text-secondary'}`}>
+            {earnedHardcore ? T.categoryPage.hardcore : T.categoryPage.softcore} · {earnedDate}
           </p>
         )}
       </td>
 
-      <td className="px-3 py-2 w-48 text-center align-middle tabular-nums hidden sm:table-cell">
-        <p className="text-sm leading-snug">
-          <span className="text-text-main font-medium">{fmt(achievement.NumAwarded)}</span>{' '}
-          <span className="text-text-secondary">{T.achievement.players}</span>
-        </p>
+      <td className={`${TD} ${NUM} hidden sm:table-cell`}>{fmt(achievement.NumAwarded)}</td>
+      <td className={`${TD} ${NUM} text-text-secondary hidden sm:table-cell`}>{fmt(achievement.NumAwardedHardcore)}</td>
+      <td className={`${TD} ${MID} hidden sm:table-cell`}>
+        <RarityBadge pct={rarityPct} />
       </td>
-
-      <td className="px-3 py-2 w-48 text-center align-middle tabular-nums hidden sm:table-cell">
-        <p className="text-sm leading-snug">
-          <span className="text-text-main font-medium">{fmt(achievement.NumAwardedHardcore)}</span>{' '}
-          <span className="text-text-secondary">{T.achievement.inHardcore}</span>
-        </p>
-      </td>
-
-      <td className="px-3 py-2 w-36 text-center align-middle tabular-nums hidden sm:table-cell">
-        {rarityPct !== null ? (
-          <p className="text-sm leading-snug">
-            <span className="text-text-main font-medium">{rarityPct}</span>
-            <span className="text-text-secondary">{T.achievement.haveIt}</span>
-          </p>
-        ) : (
-          <span className="text-sm text-text-secondary">—</span>
-        )}
-      </td>
-
-      <td className="px-3 py-2 w-40 text-center align-middle hidden sm:table-cell">
+      <td className={`${TD} ${NUM} hidden sm:table-cell`}>
         {earned ? (
-          <span className="text-success text-base">✓</span>
+          <IconCheck className="w-[1.125rem] h-[1.125rem] text-success inline-block" aria-label={T.gameInfoTable.headerEarned} />
         ) : (
-          <span className="text-text-secondary text-sm">—</span>
+          <span className="text-text-secondary">—</span>
         )}
       </td>
-
-      <td className="px-3 py-2 w-28 text-center align-middle tabular-nums">
-        <p className="text-sm text-text-main font-medium">{achievement.Points}</p>
-        <p className="text-xs text-text-secondary">pts</p>
+      <td className={`${TD} ${NUM}`}>
+        <span className="text-base font-extrabold">{achievement.Points}</span>
       </td>
     </tr>
   )

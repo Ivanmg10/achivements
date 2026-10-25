@@ -45,7 +45,8 @@ import {
 import LibraryExplorer from '@/components/library-explorer/LibraryExplorer'
 import LibraryExplorerSkeleton from '@/components/library-explorer-skeleton/LibraryExplorerSkeleton'
 import LibraryLayoutToggle, { type LibraryLayout } from '@/components/library-layout-toggle/LibraryLayoutToggle'
-import LibraryPlatformTabs, { type PlatformChoice } from '@/components/library-platform-tabs/LibraryPlatformTabs'
+import LibraryPlatformTabs, { PLATFORM_TABS_ID, type PlatformChoice } from '@/components/library-platform-tabs/LibraryPlatformTabs'
+import { tabIds } from '@/components/ui/Tabs'
 import { countBySource } from '@/utils/libraryShelves'
 
 export default function CategoryPage() {
@@ -213,29 +214,32 @@ export default function CategoryPage() {
   return (
     <OpenCardProvider>
     <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main">
-      <div ref={pageRef} className="w-full lg:max-w-[98%] flex flex-col gap-3">
+      <div ref={pageRef} className="w-full lg:max-w-[98%] flex flex-col gap-4">
         {explorer ? (
           mixedLoading ? (
             <LibraryExplorerSkeleton layout={layout === 'list' ? 'list' : 'shelves'} />
           ) : (
             <>
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <StatusPageHeader category={cat} gameCount={platformEntries.length}>
-                  <LibraryPlatformTabs value={activePlatform} counts={perPlatform} onChange={setPlatform} />
-                </StatusPageHeader>
-                <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
-                  <CategorySearch value={query} onChange={changeQuery} shortcut />
-                  {layoutToggle}
-                </div>
-              </div>
+              <StatusPageHeader category={cat} gameCount={platformEntries.length}>
+                <LibraryPlatformTabs value={activePlatform} counts={perPlatform} onChange={setPlatform} />
+              </StatusPageHeader>
               {(error || steamError || psnError || xboxError) && (
-                <p role="alert" className="text-sm text-red-400">
+                <p role="alert" className="text-sm text-danger">
                   {[error, steamError && (steamError === 'private' ? T.steamLink.errors.private : T.steam.gamesError), psnError && T.psn.gamesError, xboxError && T.xbox.gamesError].filter(Boolean).join(' · ')}
                 </p>
               )}
               {explorerEntries.length === 0 ? (
-                <StatusEmptyState category={cat} className="min-h-[40vh]" />
+                <>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <CategorySearch value={query} onChange={changeQuery} />
+                    <span className="hidden sm:block grow" aria-hidden="true" />
+                    {layoutToggle}
+                  </div>
+                  <StatusEmptyState category={cat} className="min-h-[40vh]" />
+                </>
               ) : (
+                // The platform tabs' panel, only when there are tabs (two platforms with games or more).
+                <div {...(Object.values(perPlatform).filter((n) => n > 0).length > 1 ? { role: 'tabpanel', id: tabIds(PLATFORM_TABS_ID, activePlatform).panel, 'aria-labelledby': tabIds(PLATFORM_TABS_ID, activePlatform).tab } : {})}>
                 <LibraryExplorer
                   key={cat}
                   category={cat}
@@ -251,7 +255,10 @@ export default function CategoryPage() {
                   onSort={setAllSortState}
                   selectedKey={selectedKey}
                   onSelectKey={setSelectedKey}
+                  search={<CategorySearch value={query} onChange={changeQuery} />}
+                  layoutToggle={layoutToggle}
                 />
+                </div>
               )}
             </>
           )
@@ -271,7 +278,7 @@ export default function CategoryPage() {
               </div>
               {quickRow}
               {(error || steamError || psnError || xboxError) && (
-                <p role="alert" className="text-sm text-red-400">
+                <p role="alert" className="text-sm text-danger">
                   {[error, steamError && (steamError === 'private' ? T.steamLink.errors.private : T.steam.gamesError), psnError && T.psn.gamesError, xboxError && T.xbox.gamesError].filter(Boolean).join(' · ')}
                 </p>
               )}
@@ -281,7 +288,7 @@ export default function CategoryPage() {
         ) : !showRa ? null : loading ? (
           <StatusPageSkeleton cols={gridCols} />
         ) : error ? (
-          <p className="text-red-400 text-sm text-center mt-10">{error}</p>
+          <p className="text-danger text-sm text-center mt-10">{error}</p>
         ) : !othersLinked ? (
           // RA only: the page as it always was.
           games.length === 0 ? (

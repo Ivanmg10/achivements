@@ -1,23 +1,20 @@
 'use client'
 
-import { IconCheck } from '@tabler/icons-react'
 import type { RankingsView } from '@/hooks/useRankings'
 import type { RankPeriod, RankScope, RankSort, RankSource } from '@/lib/rankings'
 import { useLanguage } from '@/context/LanguageContext'
 import { PLATFORM_FILL, PLATFORM_NAMES } from '@/components/vault-platform-split/VaultPlatformSplit'
+import { pillClass } from '@/components/ui/Pill'
+import Tabs from '@/components/ui/Tabs'
+import Select from '@/components/ui/Select'
 
 const PERIODS: RankPeriod[] = ['all', 'month', 'week']
 const SORTS: RankSort[] = ['points', 'streak', 'best']
 const SORT_LABEL = { points: 'sortPoints', streak: 'sortStreak', best: 'sortBest' } as const
 
-const chip = (on: boolean) =>
-  `inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-    on ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30' : 'bg-bg-card text-text-secondary hover:text-text-main'
-  }`
-
 /**
  * Who to compare with (tabs: everyone, or you and whom you follow), over what
- * time, on which platform, and ordered by points or by a streak. The chosen chip says so with a tick, not colour alone.
+ * time, on which platform, and ordered by points or by a streak. The chosen chip is ringed, not only coloured.
  */
 export default function RankingsPageToolbar({
   view,
@@ -37,55 +34,43 @@ export default function RankingsPageToolbar({
   const set = (change: Partial<RankingsView>) => onChange({ ...view, ...change })
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="flex flex-col lg:flex-row lg:items-end gap-3 lg:gap-3.5 lg:shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]">
       {scopes.length > 1 && (
-        <div role="tablist" aria-label={T.rankings.scope} className="inline-flex self-start bg-bg-card rounded-xl p-1 gap-0.5">
-          {scopes.map((s) => (
-            <button
-              key={s}
-              role="tab"
-              aria-selected={view.scope === s}
-              onClick={() => set({ scope: s })}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-                view.scope === s ? 'bg-bg-tertiary text-text-main' : 'text-text-secondary hover:text-text-main'
-              }`}
-            >
-              {s === 'global' ? T.rankings.global : T.rankings.following}
-            </button>
-          ))}
-        </div>
+        <Tabs
+          id="rankings-scope"
+          aria-label={T.rankings.scope}
+          className="lg:shadow-none"
+          value={view.scope}
+          onChange={(scope) => set({ scope })}
+          tabs={scopes.map((s) => ({ value: s, label: s === 'global' ? T.rankings.global : T.rankings.following }))}
+        />
       )}
 
-      <div className="flex flex-wrap items-center gap-1.5">
-        <div role="group" aria-label={T.rankings.period} className="flex flex-wrap gap-1.5">
-          {PERIODS.map((p) => (
-            <button key={p} aria-pressed={view.period === p} onClick={() => set({ period: p })} className={chip(view.period === p)}>
-              {view.period === p && <IconCheck size={12} aria-hidden="true" />}
-              {T.rankings[p]}
-            </button>
-          ))}
-        </div>
-        <span aria-hidden="true" className="hidden sm:block w-px h-5 bg-ink/10 mx-1" />
-        <div role="group" aria-label={T.rankings.platform} className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap items-center gap-2 lg:ml-auto lg:mb-1.5">
+        <div role="group" aria-label={T.rankings.platform} className="flex flex-wrap gap-1 pr-2.5 mr-0.5 shadow-[inset_-1px_0_0_rgb(var(--ink)/0.1)]">
           {sources.map((s) => (
-            <button key={s} aria-pressed={view.source === s} onClick={() => set({ source: s })} className={chip(view.source === s)}>
-              {view.source === s ? <IconCheck size={12} aria-hidden="true" /> : s !== 'all' && <span aria-hidden="true" className={`w-2 h-2 rounded-full ${PLATFORM_FILL[s]}`} />}
+            <button key={s} type="button" aria-pressed={view.source === s} onClick={() => set({ source: s })} className={pillClass(view.source === s)}>
+              {s !== 'all' && <span aria-hidden="true" className={`w-3 h-3 rounded-[3px] ${PLATFORM_FILL[s]}`} />}
               {s === 'all' ? T.rankings.allPlatforms : PLATFORM_NAMES[s]}
             </button>
           ))}
         </div>
-        <span aria-hidden="true" className="hidden sm:block w-px h-5 bg-ink/10 mx-1" />
-        <div role="group" aria-label={T.rankings.sort} className="flex flex-wrap gap-1.5">
-          {SORTS.map((s) => {
-            const on = (view.sort ?? 'points') === s
-            return (
-              <button key={s} aria-pressed={on} onClick={() => set({ sort: s })} className={chip(on)}>
-                {on && <IconCheck size={12} aria-hidden="true" />}
-                {T.rankings[SORT_LABEL[s]]}
-              </button>
-            )
-          })}
-        </div>
+        <Select<RankPeriod>
+          aria-label={T.rankings.period}
+          prefix={T.rankings.period}
+          size="sm"
+          value={view.period}
+          onChange={(period) => set({ period })}
+          options={PERIODS.map((p) => ({ value: p, label: T.rankings[p] }))}
+        />
+        <Select<RankSort>
+          aria-label={T.rankings.sort}
+          prefix={T.rankings.sort}
+          size="sm"
+          value={view.sort ?? 'points'}
+          onChange={(sort) => set({ sort })}
+          options={SORTS.map((s) => ({ value: s, label: T.rankings[SORT_LABEL[s]] }))}
+        />
       </div>
     </div>
   )

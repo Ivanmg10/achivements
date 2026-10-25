@@ -9,6 +9,7 @@ import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import { filterLibrary, LibraryFilter, LibraryGame, LibraryStatus } from '@/utils/library'
 import type { GameSource } from '@/types/steam'
 import BrowseSearchChips from '../browse-search-chips/BrowseSearchChips'
+import { fieldClass } from '@/components/ui/Input'
 
 const SHOWN = 4
 
@@ -36,7 +37,7 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
           value={filter.query}
           onChange={(e) => setFilter((f) => ({ ...f, query: e.target.value }))}
           placeholder={T.cards.searchPlaceholder}
-          className="w-full bg-bg-main rounded-xl pl-9 pr-3 py-2.5 text-sm text-text-main placeholder:text-text-secondary outline-none ring-1 ring-ink/[0.06] focus-visible:ring-2 focus-visible:ring-accent/70"
+          className={fieldClass({ size: 'sm', icon: true })}
         />
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-2">

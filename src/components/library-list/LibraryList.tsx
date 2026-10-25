@@ -49,12 +49,12 @@ export default function LibraryList({
   }
 
   return (
-    <div ref={block} className="grid grid-cols-1 lg:grid-cols-[minmax(340px,5fr)_minmax(0,7fr)] gap-4 items-start">
+    <div ref={block} className="grid grid-cols-1 lg:grid-cols-[minmax(22rem,35rem)_minmax(0,1fr)] gap-5 items-start">
       <ul
         ref={list}
         style={fill}
         // Until it is measured, a guess that fits most screens.
-        className={`flex flex-col gap-1.5 p-1 -m-1 lg:overflow-y-auto lg:overscroll-contain ${height === undefined ? 'lg:max-h-[calc(100dvh-16rem)] lg:min-h-88' : ''}`}
+        className={`flex flex-col gap-0.5 p-1 -m-1 lg:overflow-y-auto lg:overscroll-contain ${height === undefined ? 'lg:max-h-[calc(100dvh-16rem)] lg:min-h-88' : ''}`}
       >
         {entries.map((e, i) => {
           const current = e.key === selected?.key

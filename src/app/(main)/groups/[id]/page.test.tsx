@@ -106,7 +106,8 @@ test('the decade filter shows once a year is known, for Steam games too', async 
         : json({}),
   )
   render(<GroupDetailPage />)
-  fireEvent.change(await screen.findByLabelText(en.groups.filterDecadeLabel), { target: { value: '10s' } })
+  fireEvent.click(await screen.findByRole('combobox', { name: en.groups.filterDecadeLabel }))
+  fireEvent.click(screen.getByRole('option', { name: "10's" }))
   expect(screen.getByText('steam-item Portal 2')).toBeInTheDocument()
   expect(screen.queryByText('ra-item Zelda')).not.toBeInTheDocument()
 })
@@ -157,7 +158,7 @@ test('the completed filter uses live Steam progress', async () => {
   })
   render(<GroupDetailPage />)
   await screen.findByText('ra-item Zelda')
-  fireEvent.click(screen.getByRole('button', { name: en.groups.filter100 }))
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${en.groups.filter100}`) }))
   expect(screen.getByText('steam-item Portal 2')).toBeInTheDocument()
   expect(screen.queryByText('ra-item Zelda')).not.toBeInTheDocument()
 })

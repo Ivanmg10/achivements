@@ -16,10 +16,10 @@ design canvas (linked there).
 
 ## 2. Design — several concepts, clickable
 
-- **Figma** when its connector is authorised in the session (it is the user's word for "the
-  design"); **otherwise a design canvas artifact** on claude.ai with live, clickable artboards
-  (that is what the welcome used, and the user was happy with it: animations can be tried, which
-  a static frame cannot do). Say which one is being used and why.
+- **A design canvas artifact** on claude.ai with live, clickable artboards (that is what the
+  welcome used, and the user was happy with it: animations can be tried, which a static frame
+  cannot do). **When the user says "Figma" they mean this canvas**, not the Figma app (they said
+  so on 2026-10-23).
 - **Several concepts, not one**: four for the welcome (A–D), each with its own idea, plus the
   analysis of the reference as its own artboard. Recommend one and say why.
 - **Record it in `docs/designs.md`** as soon as it exists (date, link, what it is for), and keep

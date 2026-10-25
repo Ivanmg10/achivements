@@ -44,7 +44,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
     <>
       <div
         onPointerMove={onPointerMove}
-        className={`spotlight bg-bg-card rounded-2xl overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
+        className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
         <GameCardBackdrop src={psnBackdrop(game)} surface="card" />
         {/* relative: the expand button stretches over this whole header (see the chevron). */}
@@ -80,7 +80,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
                 </span>
               )}
             </span>
-            <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>{progressText}</span>
+            <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>{progressText}</span>
             <span className="flex items-center gap-2 mt-1">
               <ProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-main" className="flex-1" />
               <span className={`text-xs tabular-nums ${game.pctWon >= 100 ? 'text-success font-semibold' : 'text-text-secondary'}`}>{game.pctWon}%</span>

@@ -5,9 +5,9 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { IconArrowRight } from '@tabler/icons-react'
 import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
 import { useLanguage } from '@/context/LanguageContext'
+import { buttonClass } from '@/components/ui/Button'
 
-const PRIMARY =
-  'inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-accent text-bg-main font-semibold hover:bg-accent-hover active:scale-[0.98] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main'
+const PRIMARY = buttonClass('primary', 'lg')
 
 const EASE = [0.16, 1, 0.3, 1] as const
 

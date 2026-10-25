@@ -1,9 +1,10 @@
 'use client'
 
+import { streakInk, streakTier } from '@/utils/streakTier'
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { RecentAchievement, UserRankAndScore } from '@/types/types'
-import { calcAvgPerDay, calcThisMonth, plural } from '@/utils/utils'
+import { calcAvgPerDay, calcThisMonth, plural, decimal } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
@@ -66,9 +67,9 @@ export default function MainPagePointsStats({
       <StatPill label={T.pointsStats.today} value={ptsToday.toLocaleString()} sub={todaySub} onClick={() => setSelectedDay(todayKey)} />
       <StatPill label={T.pointsStats.thisWeek} value={pts7d.toLocaleString()} sub={plural(weekAchievements.length, T.plurals.achievements, lang)} onClick={() => setWeekOpen(true)} />
       <StatPill label={T.pointsStats.thisMonth} value={thisMonth.pts.toLocaleString()} sub={plural(thisMonth.ach, T.plurals.achievements, lang)} onClick={() => setMonthOpen(true)} />
-      <StatPill label={T.pointsStats.avgPerDay} value={avgPerDay.toFixed(1)} sub={T.pointsStats.perDay} />
-      {rank?.Rank != null && <StatPill label={T.userStats.globalRank} value={`#${rank.Rank.toLocaleString()}`} sub={`${(rank.Score ?? 0).toLocaleString()} pts`} />}
-      <StatPill label={T.streak.title} value={`${streak}d`} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined} href="/racha" />
+      <StatPill label={T.pointsStats.avgPerDay} value={decimal(avgPerDay, lang)} sub={T.pointsStats.perDay} />
+      {rank?.Rank != null && <StatPill label={T.userStats.globalRank} value={`#${rank.Rank.toLocaleString(lang)}`} sub={`${(rank.Score ?? 0).toLocaleString(lang)} pts`} />}
+      <StatPill label={T.streak.title} value={`${streak}d`} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} accentColor={streak > 0 ? streakInk(streakTier(streak)) : undefined} href="/racha" />
 
       <AnimatePresence>
         {selectedDay && (

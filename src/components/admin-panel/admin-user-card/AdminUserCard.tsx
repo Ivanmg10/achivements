@@ -31,7 +31,7 @@ export default function AdminUserCard({
   const country = user.location ? findCountry(user.location) : null
 
   return (
-    <li className="bg-bg-card rounded-2xl p-4 flex flex-col gap-3 ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow">
+    <li className="bg-bg-card rounded-card p-4 flex flex-col gap-3 ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow">
       <div className="flex items-start gap-3">
         {user.avatar ? (
           <Image
@@ -120,10 +120,10 @@ export default function AdminUserCard({
           onClick={onDelete}
           disabled={isSelf}
           aria-label={`Delete ${user.username}`}
-          className={`p-2 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 ${
+          className={`p-2 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70 ${
             isSelf
               ? 'opacity-30 cursor-not-allowed bg-bg-main text-text-secondary'
-              : 'bg-bg-main text-text-secondary hover:bg-red-500/15 hover:text-red-400'
+              : 'bg-bg-main text-text-secondary hover:bg-danger/15 hover:text-danger'
           }`}
         >
           <IconTrash size={15} aria-hidden="true" />

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useLanguage } from '@/context/LanguageContext'
 import { RetroAchievementsGameWithAchievements, RetroAchievement } from '@/types/types'
 import { IconDeviceGamepad2 } from '@tabler/icons-react'
@@ -18,10 +17,8 @@ import SteamGameItem from '@/components/steam/steam-game-item/SteamGameItem'
 import PsnGameItem from '@/components/psn/psn-game-item/PsnGameItem'
 import PsnCollectionItem from '@/components/psn/psn-collection-item/PsnCollectionItem'
 import XboxGameItem from '@/components/xbox/xbox-game-item/XboxGameItem'
-import { useXboxGamesData } from '@/context/XboxGamesDataContext'
-import { useSteamGamesData } from '@/context/SteamGamesDataContext'
-import { usePsnGamesData } from '@/context/PsnGamesDataContext'
-import { mergeRecentFeeds, RecentFeedItem } from '@/utils/steamFeed'
+import { RecentFeedItem } from '@/utils/steamFeed'
+import { useRecentFeed } from '@/hooks/useRecentFeed'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 
@@ -43,14 +40,8 @@ export default function RARecentlyPlayed() {
   const { T } = useLanguage()
   const subject = useSubject()
   const reduce = useReducedMotion()
-  const { games, isLoading, error, refetch } = useRecentlyPlayedGames()
-  const { recent: steamRecent, recentLoading: steamLoading } = useSteamGamesData()
-  const { library: psnLibrary, libraryLoading: psnLoading } = usePsnGamesData()
-  const { library: xboxLibrary, libraryLoading: xboxLoading } = useXboxGamesData()
-  // One feed across platforms, newest first. It shows once every linked
-  // platform has answered, so games never pop in (and reorder) a moment later.
-  const loading = isLoading || steamLoading || psnLoading || xboxLoading
-  const feed = mergeRecentFeeds(games, steamRecent, MAX_GAMES, psnLibrary, xboxLibrary)
+  // One feed across platforms, newest first, once every linked platform has answered.
+  const { feed, loading, error, refetch } = useRecentFeed(MAX_GAMES)
 
   // Keyed by feed key, not game id: RA game 730 and Steam app 730 are different games.
   const [expanded, setExpanded] = useState<string | null>(null)

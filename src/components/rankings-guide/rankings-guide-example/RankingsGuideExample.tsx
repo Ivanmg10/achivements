@@ -4,6 +4,9 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { VaultGuideText } from '@/translations/vaultGuide'
 import { PLATFORM_FILL } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { exampleScores } from '@/utils/vaultExamples'
+import { slantStyle } from '@/components/ui/shape'
+
+const SLANT = slantStyle(5)
 
 /**
  * The example games, finished, as bars on one scale: the same demanding game
@@ -21,17 +24,17 @@ export default function RankingsGuideExample({ text }: { text: VaultGuideText['e
   ]
 
   return (
-    <div className="bg-bg-card rounded-2xl p-4 flex flex-col gap-3">
-      <p className="text-xs uppercase tracking-wider font-bold text-text-secondary">{text.aaa}</p>
+    <div className="bg-bg-main/60 ring-1 ring-inset ring-ink/[0.06] rounded-pane p-4 flex flex-col gap-3">
+      <p className="text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary">{text.aaa}</p>
       <ul className="flex flex-col gap-2.5">
         {rows.map((r, i) => (
           <li key={r.label} className={`grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)_4.5rem] sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_4.5rem] items-center gap-3 text-sm ${i === 4 ? 'mt-2 pt-3 border-t border-ink/[0.07]' : ''}`}>
             <span className="leading-tight">{r.label}</span>
-            <span aria-hidden="true" className="h-2.5 rounded-full bg-ink/10 overflow-hidden">
-              <span className={`block h-full rounded-full ${r.fill}`} style={{ width: `${(r.value / max) * 100}%` }} />
+            <span aria-hidden="true" className="h-3 bg-ink/[0.08]" style={SLANT}>
+              <span className={`block h-full ${r.fill}`} style={{ ...SLANT, width: `${(r.value / max) * 100}%` }} />
             </span>
-            <span className="text-right font-bold tabular-nums">
-              {r.value.toLocaleString(lang)} <span className="text-[10px] font-semibold text-text-secondary">{T.rankings.vp}</span>
+            <span className="text-right text-base font-extrabold tabular-nums">
+              {r.value.toLocaleString(lang)} <span className="text-[0.6875rem] font-semibold text-text-secondary">{T.rankings.vp}</span>
             </span>
           </li>
         ))}

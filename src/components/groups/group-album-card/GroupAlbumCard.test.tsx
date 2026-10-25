@@ -17,7 +17,8 @@ test('opens the group and shows its covers, progress and counts', () => {
   expect(screen.getByRole('link')).toHaveAttribute('href', '/groups/3')
   expect(screen.getByText('October')).toBeInTheDocument()
   expect(screen.getByText('Private')).toBeInTheDocument()
-  expect(screen.getByRole('img', { name: '59%' })).toBeInTheDocument()
+  expect(screen.getByText('59%')).toBeInTheDocument()
+  expect(screen.getByRole('progressbar', { name: 'October' })).toHaveAttribute('aria-valuenow', '59')
   expect(screen.getByText('1 completed')).toBeInTheDocument()
   expect(screen.getByText('3 in progress')).toBeInTheDocument()
   expect(screen.getByText(/103\/176 achievements/)).toBeInTheDocument()
@@ -25,9 +26,9 @@ test('opens the group and shows its covers, progress and counts', () => {
   expect(container.querySelector('img[src="https://cdn/2.jpg"]')).toBeInTheDocument()
 })
 
-test('an empty group asks for games and shows no ring', () => {
+test('an empty group asks for games and shows no bar', () => {
   render(<GroupAlbumCard group={{ ...base, game_count: 0, steam_count: 0, total_awarded: 0, total_possible: 0, covers: [] }} />)
-  expect(screen.getByText('No games yet')).toBeInTheDocument()
+  expect(screen.getByText('0 games')).toBeInTheDocument()
   expect(screen.getByText('Add games')).toBeInTheDocument()
-  expect(screen.queryByRole('img', { name: /%/ })).not.toBeInTheDocument()
+  expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
 })

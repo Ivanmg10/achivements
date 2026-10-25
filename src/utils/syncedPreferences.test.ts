@@ -43,3 +43,7 @@ test('stored preferences are cleaned to the allowed keys and string values', () 
   expect(cleanStoredPreferences([])).toEqual({})
   expect(cleanStoredPreferences('x')).toEqual({})
 })
+
+test('the home layout follows the account', () => {
+  expect(isSyncedKey('home-layout')).toBe(true)
+})

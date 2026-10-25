@@ -1,46 +1,56 @@
 'use client'
 
-import { useState } from 'react'
-import Image from 'next/image'
+import { useImageTint, NEUTRAL_TINT } from '@/hooks/useImageTint'
+import { useGameCardStyle, type GameCardStyle } from '@/hooks/useGameCardStyle'
 
-const FADE = {
-  main: 'from-bg-main/30 via-bg-main/80 to-bg-main',
-  card: 'from-bg-card/30 via-bg-card/80 to-bg-card',
+const BASE = {
+  main: 'rgb(var(--bg-main))',
+  card: 'rgb(var(--bg-card))',
 }
 
 /**
- * The game's own art, blown up and blurred behind a card, fading out toward
- * the text side. Gives each card its game's colour without touching the
- * theme: it sits under the card's content at low opacity, so any theme's
- * surface still reads through. Drops itself if the image fails to load.
+ * The game's colour behind a card: a flat tint of it fading toward the text
+ * side and a border in it (the user's choice over the blurred art, 2026-10-24).
+ * The colour is read from the game's art (`useImageTint`); until it is, or if
+ * the art's host does not allow it, a neutral grey. With the flat style chosen
+ * (`useGameCardStyle`) it is the card's plain surface and a hairline instead.
  */
 export default function GameCardBackdrop({
   src,
   surface = 'main',
-  eager = false,
+  style: forced,
 }: {
   src?: string | null
-  /** The card's own background, which the art fades into. */
-  surface?: keyof typeof FADE
-  /** The first card on screen: its art is the page's largest paint, so it loads first. */
+  /** The card's own background, under the tint. */
+  surface?: keyof typeof BASE
+  /** Draw this style whatever the person chose (the design system's catalogue shows both). */
+  style?: GameCardStyle
+  /** Kept for callers; the tint needs no image on screen. */
   eager?: boolean
 }) {
-  const [failed, setFailed] = useState(false)
-  if (!src || failed) return null
+  const [chosen] = useGameCardStyle()
+  const style = forced ?? chosen
+  // A flat card reads no colour from the art at all.
+  const tint = useImageTint(style === 'flat' ? null : src) ?? NEUTRAL_TINT
+
+  if (style === 'flat') {
+    return (
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 rounded-[inherit] pointer-events-none"
+        style={{ background: BASE[surface], boxShadow: 'inset 0 0 0 1px rgb(var(--ink) / 0.08)' }}
+      />
+    )
+  }
 
   return (
-    <div aria-hidden="true" className="absolute inset-0 -z-10 overflow-hidden rounded-[inherit] pointer-events-none">
-      <Image
-        src={src}
-        alt=""
-        width={96}
-        height={96}
-        unoptimized
-        {...(eager ? { loading: 'eager' as const, fetchPriority: 'high' as const } : {})}
-        onError={() => setFailed(true)}
-        className="absolute -left-10 top-1/2 -translate-y-1/2 w-64 h-64 max-w-none object-cover blur-2xl saturate-150 opacity-30"
-      />
-      <div className={`absolute inset-0 bg-linear-to-r ${FADE[surface]}`} />
-    </div>
+    <div
+      aria-hidden="true"
+      className="absolute inset-0 -z-10 rounded-[inherit] pointer-events-none transition-[box-shadow,background] duration-(--motion-open)"
+      style={{
+        background: `linear-gradient(90deg, rgb(${tint} / 0.24), rgb(${tint} / 0.07) 45%, transparent 75%), ${BASE[surface]}`,
+        boxShadow: `inset 0 0 0 1px rgb(${tint} / 0.45)`,
+      }}
+    />
   )
 }

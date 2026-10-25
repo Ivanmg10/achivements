@@ -47,17 +47,17 @@ export const TROPHY_GRADES = ['platinum', 'gold', 'silver', 'bronze'] as const
 /** Text colour per grade. Always shown with the grade's name, never as the only cue. */
 export const TROPHY_GRADE_COLOR: Record<(typeof TROPHY_GRADES)[number], string> = {
   platinum: 'text-sky-300',
-  gold: 'text-yellow-400',
+  gold: 'text-hardcore',
   silver: 'text-zinc-400',
-  bronze: 'text-orange-400',
+  bronze: 'text-warning',
 }
 
 /** Ring colour around an earned trophy's icon, per grade. */
 export const TROPHY_GRADE_RING: Record<(typeof TROPHY_GRADES)[number], string> = {
   platinum: 'ring-sky-300',
-  gold: 'ring-yellow-400',
+  gold: 'ring-hardcore',
   silver: 'ring-zinc-400',
-  bronze: 'ring-orange-400',
+  bronze: 'ring-warning',
 }
 
 /** The widest art there is for a game's backdrop: store hero art, then box art, then the trophy icon. */

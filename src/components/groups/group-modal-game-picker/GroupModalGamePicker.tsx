@@ -9,6 +9,7 @@ import { searchCandidates, suggestCandidates, GameCandidate } from '@/utils/game
 import { gameKey } from '@/utils/gameRef'
 import GamePickerTile from '@/components/game-picker/game-picker-tile/GamePickerTile'
 import GamePickerChip from '@/components/game-picker/game-picker-chip/GamePickerChip'
+import { fieldClass } from '@/components/ui/Input'
 
 const RESULTS_MAX = 24
 
@@ -83,7 +84,7 @@ export default function GroupModalGamePicker({
           }}
           placeholder={T.groups.searchGames}
           aria-describedby="group-game-search-hint"
-          className="w-full h-10 bg-bg-main rounded-xl pl-9 pr-3 text-sm text-text-main placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/70"
+          className={fieldClass({ size: 'sm', icon: true })}
         />
       </div>
       <p id="group-game-search-hint" className="text-[11px] text-text-secondary -mt-2">{T.groups.searchHint}</p>
