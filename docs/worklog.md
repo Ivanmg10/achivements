@@ -140,6 +140,7 @@ Also two lint warnings fixed (`MainPageRarest` memo deps, an unused import).
 animations (#61) were added to the pending work.
 **Decisions** — The library's three parts go to `develop` as one PR (the branches were stacked and never
 had PRs); `develop` → `main` waits until the pending blocks are done.
+**Decisions (added later the same night)** — The roadmap also holds the signed-out landing redesign (login and register: review only), a font proposal (Exo 2 "Tech" and Manrope "Calm" next to today's Barlow, as its own preference, independent of the shape), a proposed Layout modal (live preview, sections on the left, reset) and an explanation of the tinted card style with four concepts to draw. Found while writing it: `src/lib/fonts.ts` loads only the `latin` subset, so Polish letters and all of Cyrillic and Japanese fall back to system fonts; adding `latin-ext` is a one-line fix still to do.
 **Open** — Everything in the roadmap; the PR into `develop` must be opened and checked on the preview.
 **Watch out** — `origin/main` has a commit `develop` lacks (PR #37): merge `main` into `develop` before the release.
 

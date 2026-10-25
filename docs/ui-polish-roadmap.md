@@ -88,29 +88,120 @@ Plan:
 
 - [ ] Check cost: no layout shift, no long task on the first load of the home and a game page.
 
-## 4. Layout modal: friendlier and bigger, with fonts  **Q**
+## 4. The signed-out landing, login and register  **D**
 
-- [ ] **Decide the fonts** (how many, which; today Barlow for the UI and Barlow Condensed italic for
-      display, in both designs). YOUR NOTES:
-- [ ] A font choice as a preference (synced: add its key in `src/utils/syncedPreferences.ts`), loaded
-      lazily so the choice costs nothing to those who keep the default (`src/lib/fonts.ts`).
-- [ ] Rework `LayoutModal`: larger previews that look like the page they change, a live preview of the
-      whole choice, shorter wording, reset to defaults. Keep the welcome's inline version in step
-      (CLAUDE.md → the welcome follows the app).
-- [ ] Texts in all nine languages, gender-neutral; update the `/design` specimens.
+The landing (`src/components/landing-page`, the signed-out home) is older than the welcome and the
+library; it should look like them. Login and register (`auth-*`, `login-user-form`,
+`register-user-form`) already please the user, so they only get a review.
 
-## 5. The tinted (colourful) game-card style  **D** **Q**
+- [ ] **Landing: design round on the canvas** (`docs/design-process.md`): 2–3 concepts in the welcome's
+      language (display italic titles, kickers, floating pill bar, cards that grow into their detail)
+      drawn with the library, in both designs. Show the real product (the cover home, a game page,
+      rankings and levels, streak tiers, the showcase), not generic art. Entry in `docs/designs.md`.
+- [ ] Keep what search engines and chat AIs read (CLAUDE.md → Public pages): the FAQ and its
+      `FAQPage` JSON-LD from one list, honest wording, **no Xbox**, `T` in nine languages; the landing
+      stays static-friendly (no `headers()`/`cookies()` in the root layout) and loads no `recharts`.
+- [ ] `/compare/<slug>` and `/track/<slug>` share the new look (same header, cards and FAQ pieces).
+- [ ] Entrance animations for the landing are part of §3 (it is the first page a visitor sees).
+- [ ] **Login and register: review only** (no redesign): tokens and library pieces (no hand-made
+      control), *round* and *slanted*, phone width, errors inline (`Notice`), the loading state
+      (§2), `/resetPassword`, `/authPage`, and the curtain into `/welcome` after sign-up.
 
-It does not fully convince yet (`game-card-style` = `tinted` default or `flat`;
-`GameCardBackdrop` is the one place that draws it).
+YOUR NOTES (what the landing must say first, who it is for, what you like in other sites):
 
-- [ ] Say what is wrong with it. YOUR NOTES (too strong / muddy on some art / hard to read / not
-      consistent between list, grid and shelf…):
-- [ ] Design round: 2–3 concepts on the canvas, same game art in each (light, dark, very bright, very dark).
-- [ ] Contrast check on text over the tint (WCAG 2.1) for every theme.
-- [ ] Build in `GameCardBackdrop` only; the pages must not change.
+## 5. Fonts: the proposal  **Q**
 
-## 6. Library and page leftovers
+**What is true today.** `src/lib/fonts.ts` loads Barlow (UI) and Barlow Condensed italic 800 (display),
+the same in both designs, with the **`latin` subset only**. So: Polish letters (ł, ą, ę, ś, ż…) and other
+Latin-extended ones fall back to a system font mid-word; Russian (Cyrillic) and Japanese never use Barlow
+(it has no Cyrillic nor kana). Two of the nine languages do not look like the design.
+
+- [ ] **Do now, whatever the choice** (a one-line fix): add `latin-ext` to both Barlow subsets.
+- [ ] Choose at most two more families. My proposal (subsets from memory: **check each family's
+      subsets on Google Fonts before building**; Japanese stays on the system font in all of them):
+
+| Set | UI / display | Feel | For | Against |
+|---|---|---|---|---|
+| **Arcade** (today) | Barlow / Barlow Condensed italic | Sporty, condensed italic titles: the welcome's identity | The look already agreed everywhere | No Cyrillic |
+| **Tech** (proposed) | Exo 2 / Exo 2 italic 800 | Game-like, angular, true italics, so the slanted design fits; has Cyrillic and Latin-ext | Most "gaming vault"; keeps italic titles | Wide letters: tables and small text need a size check |
+| **Calm** (proposed) | Manrope / Manrope 800 (upright) | Modern dashboard, very legible small, has Cyrillic and Latin-ext | Dense data (tables, rankings) read best; pairs with the round design | Loses the italic display; titles lose some of the welcome's energy |
+
+- [ ] The font is **its own preference, independent of the shape** (`font-style`: `arcade` | `tech` |
+      `calm`, synced: add the key to `src/utils/syncedPreferences.ts`), because the user does not want
+      the font to change with the design. Done as tokens like the shapes: `[data-font="…"]` sets
+      `--font-ui` and `--font-barlow` (the `font-display` utility), on `<html>` and on any element, so
+      the Layout modal's preview can show each set inside the modal.
+- [ ] Cost: a family's file is only downloaded when a rule uses it, so the unused sets should cost
+      nothing; confirm in the network panel, and give the extra sets `preload: false`.
+- [ ] Catalogue: a Fonts specimen in `/design` showing a title, a table and a figure in each set.
+
+YOUR NOTES (which of the two extras, or neither):
+
+## 6. Layout modal: the proposed design  **D**
+
+Today `LayoutModal` has two tabs (Page, Home) and small previews. Proposal, to be drawn on the canvas
+first (it needs the fonts of §5):
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│ ▣ Layout                                  Your page, your way │
+│ ───────────────────────────────────────────────────────────── │
+│  Shape      │  ┌───────────────────────────────────────────┐  │
+│  Font       │  │  LIVE PREVIEW (a miniature of your home,  │  │
+│  Home       │  │  header + hero + two game rows), drawn    │  │
+│  Game cards │  │  with the choices as you make them        │  │
+│             │  └───────────────────────────────────────────┘  │
+│             │   Slanted ◉  Aa 1.234       Round ○  Aa 1.234   │
+│             │   (two large cards, each in its own shape)      │
+│ ───────────────────────────────────────────────────────────── │
+│ ↺ Reset to defaults                                  [ Done ] │
+└───────────────────────────────────────────────────────────────┘
+```
+
+- [ ] A wide modal (size `xl`); on the left the sections (Shape, Font, Home, Game cards) as vertical
+      tabs, on phones a sheet with the tabs on top and the preview collapsed above the choices.
+- [ ] **One live preview** that applies every choice at once (`data-shape`, `data-font` and the card
+      style scoped to the preview, so the page behind does not flicker), instead of a drawing per option.
+- [ ] Each choice is a large `ChoiceCards` card that shows itself: a shape card in its own shape, a font
+      card with "Aa 1.234" and a title in that family, a home card with a mini home, a card-style card with
+      two sample rows.
+- [ ] Changes still save at once (synced preferences); no Cancel, but a **Reset to defaults** and a
+      "Done". Short wording, nine languages, gender-neutral.
+- [ ] The welcome's preferences step stays in step (CLAUDE.md → the welcome follows the app): same
+      choices, inline.
+- [ ] Specimen in `/design`; tests for the keyboard path (tabs, cards) and for reset.
+
+YOUR NOTES:
+
+## 7. The tinted game-card style: a future UI section  **D** **Q**
+
+**What it is today** (`GameCardBackdrop`, the one place that draws it). Every game card (library rows,
+the home's recents and pinned games, "now playing", groups, the PSN/Steam/Xbox lists) paints a layer
+behind its content. With `game-card-style` = **`tinted`** (the default) the app takes the game's art,
+shrinks it to 12×12 pixels in a canvas (`useImageTint`, through `/api/image-proxy` so any host can be
+read), averages its colour (colourful pixels count more, near-black and near-white are skipped) and
+paints: a left-to-right gradient of that colour from 24 % to 7 % opacity fading to nothing at 75 %, over
+the card's surface, plus a 1 px border in the same colour at 45 %. A game with a red cover gets a red card.
+With **`flat`** the card is its plain surface and a hairline, and the art is not even read. The user chose
+it over a blurred copy of the art (2026-10-24) and can switch it in Preferences → Layout → Home.
+
+**Why it may not convince** (hypotheses to confirm with the user): the tint comes from an average, so
+many games average to the same muddy brown or grey; a long list of different colours looks busy next to
+the calm sections; text sits on a coloured gradient whose contrast changes per game; the border at 45 %
+can fight the theme's accent; list, grid and shelf each use it a little differently.
+
+- [ ] Say what is wrong with it. YOUR NOTES (too strong / muddy / hard to read / busy / inconsistent):
+- [ ] Concepts to draw on the canvas, with the same six games (light art, dark art, very bright, very
+      dark, grey, multicolour): **(a) accent-only tint** (the border and a tiny corner glow, the body
+      stays neutral); **(b) dominant colour, not average** (pick the most frequent hue, so muddy browns
+      become the game's real colour) with a capped saturation; **(c) art strip** (a thin real-art band
+      on the left edge, the rest neutral); **(d) theme-harmonised** (the game's hue blended toward the
+      theme accent so a whole list feels like one family).
+- [ ] Contrast check (WCAG 2.1) of the text over the tint, every theme, light and dark.
+- [ ] Build it only in `GameCardBackdrop` (and `useImageTint` if the colour maths changes); the pages
+      must not change. Keep `flat` as the choice for people who want calm.
+
+## 8. Library and page leftovers
 
 - [ ] `Shelf` (`LibraryShelf`) and the striped drag slot (groups' sortable rows) as library pieces.
 - [ ] The welcome curtain (`WelcomeCurtain.module.css`) still has fixed clip-paths: move them to the
@@ -123,7 +214,7 @@ It does not fully convince yet (`game-card-style` = `tinted` default or `flat`;
 
 YOUR NOTES:
 
-## 7. Shipping
+## 9. Shipping
 
 - [ ] PR `feat/65-ui-surfaces` → `develop` (squash; closes #63, #64, #65); check on the preview
       (admin `/design`, both designs, the three synced preferences across two browsers).
@@ -134,7 +225,7 @@ YOUR NOTES:
       check the release gates in CLAUDE.md.
 - [ ] After the release: update `CLAUDE.md` milestones (`1.7.0`), `README.md` (screenshots/features) and archive this file.
 
-## 8. Not in this stretch (future wishes, for reference)
+## 10. Not in this stretch (future wishes, for reference)
 
 - A shareable user card (CLAUDE.md → Roadmap). Public data only; changing `/privacy` if more.
 - `/diario`, a day-by-day journal of play.
@@ -143,11 +234,12 @@ YOUR NOTES:
 
 ## Suggested order
 
-1. Your review (§1) → fill the notes.
-2. PR and preview of the current branch (§7, first lines).
-3. Skeletons (§2): cheap, visible, no design round.
+1. Your review (§1) → fill the notes. Choose the fonts (§5) at the same time.
+2. PR and preview of the current branch (§9, first lines).
+3. Skeletons (§2): cheap, visible, no design round. Add `latin-ext` (§5) in the same sitting.
 4. Entrance animations (§3): design round first, then build.
-5. Layout modal + fonts (§4) once the fonts are chosen.
-6. Tinted style (§5): design round, last because it is the least certain.
-7. Leftovers (§6) in between, whatever your review says is worst.
-8. Release (§7).
+5. Landing (§4) and the Layout modal with fonts (§5–§6): both are design rounds; they share the
+   canvas, so draw them together.
+6. Tinted style (§7): design round, last because it is the least certain.
+7. Leftovers (§8) in between, whatever your review says is worst.
+8. Release (§9).
