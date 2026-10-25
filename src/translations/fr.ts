@@ -1636,6 +1636,9 @@ export const fr: Translations = {
     },
   },
   plurals: {
+    streakOf: { one: 'Série de {n} jour', other: 'Série de {n} jours' },
+    todaySome: { one: "{n} aujourd'hui.", other: "{n} aujourd'hui." },
+    seeLeft: { one: 'Voir celui qui manque', other: 'Voir les {n} qui manquent' },
     following: { one: '{n} abonnement', other: '{n} abonnements' },
     followers: { one: '{n} abonné·e', other: '{n} abonné·es' },
     games: { one: '{n} jeu', other: '{n} jeux' },
@@ -1787,6 +1790,10 @@ export const fr: Translations = {
     },
   },
   homeLayout: {
+    nextEasiest: 'Le prochain plus facile :',
+    ownedBy: '{pct} des joueurs l\'ont',
+    todayNone: 'Rien encore aujourd\'hui : il reste {h} h pour la garder.',
+    weekGain: '+{n} cette semaine',
     classicHint: 'Tes jeux récents à gauche et ton profil sur chaque plateforme à droite.',
     coverHint: 'En haut, en grand, le jeu laissé en cours ; en dessous, tes jeux récents, ton niveau et ta série.',
     byDefault: 'par défaut',

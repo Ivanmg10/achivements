@@ -18,6 +18,7 @@ import { canUseXbox } from '@/utils/xboxAccess'
 import { homeFit } from '@/lib/homeFit'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
 import MainPagePortada from '@/components/main-page/main-page-portada/MainPagePortada'
+import MainPagePortadaSide from '@/components/main-page/main-page-portada-side/MainPagePortadaSide'
 
 export default function MainPage() {
   const { status, data: session } = useSession()
@@ -68,7 +69,8 @@ export function MainPageBody() {
       <div className="home-fit-top flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
         {/* Profile first in DOM → top on mobile; placed col-2 on desktop */}
         <div className="home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1">
-          <MainPageProfile />
+          {/* The cover puts your level, streak and last achievements here; the classic home, the platform profiles. */}
+          {layout === 'cover' && !visitor ? <MainPagePortadaSide /> : <MainPageProfile />}
         </div>
         {/* Left column: either pinned games or recently played */}
         <div className="home-fit-main flex flex-col min-h-0 min-w-0 lg:col-start-1 lg:row-start-1">

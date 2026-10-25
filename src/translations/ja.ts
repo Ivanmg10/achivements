@@ -1636,6 +1636,9 @@ export const ja: Translations = {
     },
   },
   plurals: {
+    streakOf: { other: '{n} 日連続' },
+    todaySome: { other: '今日は {n} 個。' },
+    seeLeft: { other: '残り {n} 個を見る' },
     following: { other: '{n} フォロー中' },
     followers: { other: '{n} フォロワー' },
     games: { other: '{n}本のゲーム' },
@@ -1787,6 +1790,10 @@ export const ja: Translations = {
     },
   },
   homeLayout: {
+    nextEasiest: '次に簡単なのは:',
+    ownedBy: '{pct} のプレイヤーが獲得',
+    todayNone: '今日はまだありません。続けるにはあと {h} 時間。',
+    weekGain: '今週 +{n}',
     classicHint: '左に最近のゲーム、右に各プラットフォームのプロフィール。',
     coverHint: '上に途中のゲームを大きく、その下に最近のゲーム・レベル・連続記録。',
     byDefault: '標準',

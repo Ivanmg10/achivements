@@ -1636,6 +1636,9 @@ export const pl: Translations = {
     },
   },
   plurals: {
+    streakOf: { one: 'Seria {n} dnia', few: 'Seria {n} dni', many: 'Seria {n} dni', other: 'Seria {n} dnia' },
+    todaySome: { one: 'Dziś już {n}.', few: 'Dziś już {n}.', many: 'Dziś już {n}.', other: 'Dziś już {n}.' },
+    seeLeft: { one: 'Zobacz brakujące', few: 'Zobacz {n} brakujące', many: 'Zobacz {n} brakujących', other: 'Zobacz {n} brakującego' },
     following: { one: '{n} obserwowany profil', few: '{n} obserwowane profile', many: '{n} obserwowanych profili', other: '{n} obserwowanego profilu' },
     followers: { one: '{n} osoba obserwująca', few: '{n} osoby obserwujące', many: '{n} osób obserwujących', other: '{n} osoby obserwującej' },
     games: { one: '{n} gra', few: '{n} gry', many: '{n} gier', other: '{n} gry' },
@@ -1787,6 +1790,10 @@ export const pl: Translations = {
     },
   },
   homeLayout: {
+    nextEasiest: 'Następne najłatwiejsze:',
+    ownedBy: 'ma je {pct} graczy',
+    todayNone: 'Dziś jeszcze nic: zostało {h} h, by ją utrzymać.',
+    weekGain: '+{n} w tym tygodniu',
     classicHint: 'Ostatnie gry po lewej, profil na każdej platformie po prawej.',
     coverHint: 'Na górze, w dużym formacie, gra przerwana w połowie; pod nią ostatnie gry, poziom i seria.',
     byDefault: 'domyślny',

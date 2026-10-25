@@ -1637,6 +1637,9 @@ export const en = {
     },
   },
   plurals: {
+    streakOf: { one: 'A {n}-day streak', other: 'A {n}-day streak' } as PluralForms,
+    todaySome: { one: '{n} so far today.', other: '{n} so far today.' } as PluralForms,
+    seeLeft: { one: 'See the one left', other: 'See the {n} left' } as PluralForms,
     following: { other: '{n} following' } as PluralForms,
     followers: { one: '{n} follower', other: '{n} followers' } as PluralForms,
     games: { one: '{n} game', other: '{n} games' } as PluralForms,
@@ -1788,6 +1791,10 @@ export const en = {
     },
   },
   homeLayout: {
+    nextEasiest: 'Next easiest:',
+    ownedBy: '{pct} of players have it',
+    todayNone: 'Nothing yet today: {h} h left to keep it going.',
+    weekGain: '+{n} this week',
     classicHint: 'Your recent games on the left and your profile on each platform on the right.',
     coverHint: 'On top, in big, the game you left halfway; under it, your recent games, level and streak.',
     byDefault: 'default',

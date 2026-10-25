@@ -1636,6 +1636,9 @@ export const de: Translations = {
     },
   },
   plurals: {
+    streakOf: { one: 'Serie von {n} Tag', other: 'Serie von {n} Tagen' },
+    todaySome: { one: 'Heute schon {n}.', other: 'Heute schon {n}.' },
+    seeLeft: { one: 'Den letzten ansehen', other: 'Die {n} fehlenden ansehen' },
     following: { other: '{n} gefolgt' },
     followers: { one: '{n} Follower', other: '{n} Follower' },
     games: { one: '{n} Spiel', other: '{n} Spiele' },
@@ -1787,6 +1790,10 @@ export const de: Translations = {
     },
   },
   homeLayout: {
+    nextEasiest: 'Als Nächstes am leichtesten:',
+    ownedBy: '{pct} haben es',
+    todayNone: 'Heute noch nichts: noch {h} Std., um sie zu halten.',
+    weekGain: '+{n} diese Woche',
     classicHint: 'Deine letzten Spiele links und dein Profil je Plattform rechts.',
     coverHint: 'Oben groß das Spiel, das du angefangen hast; darunter deine letzten Spiele, Level und Serie.',
     byDefault: 'Standard',
