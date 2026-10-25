@@ -1802,6 +1802,10 @@ export const ja: Translations = {
     },
   },
   homeLayout: {
+    shapeLabel: '形',
+    shapeSlanted: '斜め',
+    shapeRound: '丸み',
+    shapeHint: 'ボタン・バー・タグの端を、斜めか丸みにします。',
     cardsLabel: 'ゲームカード',
     cardsTinted: 'カラー',
     cardsFlat: 'フラット',

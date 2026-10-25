@@ -1,11 +1,12 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { formatDay, plural } from '@/utils/utils'
 import StreakSectionHead from '../streak-section-head/StreakSectionHead'
+import { slantStyle } from '@/components/ui/shape'
 
 // Mondays first; 2026-06-01 is a Monday.
 const WEEK = ['2026-06-01', '2026-06-02', '2026-06-03', '2026-06-04', '2026-06-05', '2026-06-06', '2026-06-07']
 const BAR_HEIGHT = 120
-const SLANT = { clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)' }
+const SLANT = slantStyle(8)
 
 /** Achievements per day of the week, Monday first, as slanted bars; the busiest day in full accent. */
 export default function StreakWeekdays({ counts }: { counts: number[] }) {

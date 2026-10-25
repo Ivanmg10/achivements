@@ -8,6 +8,7 @@ import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { useVaultMe } from '@/hooks/useVaultMe'
+import UserShapePreference from '@/components/user-page/user-shape-preference/UserShapePreference'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
 import { useGameCardStyle } from '@/hooks/useGameCardStyle'
 import { LANGUAGES } from '@/utils/languages'
@@ -46,7 +47,7 @@ export default function UserPreferencesGeneral({
     <div className="flex flex-col divide-y divide-ink/[0.06] [&>*]:py-2">
       <ProfileField label={T.userTheme.theme} icon={<IconPalette size={18} />} onEdit={onOpenTheme}>
         <span className="flex items-center gap-2 min-w-0">
-          <span aria-hidden="true" className="w-3.5 h-3.5 rounded-[0.25rem] bg-accent shrink-0 -skew-x-[14deg]" />
+          <span aria-hidden="true" className="w-3.5 h-3.5 rounded-[0.25rem] bg-accent shrink-0 skew-x-(--slant-pill)" />
           <span className="text-[0.9375rem] font-bold truncate">{T.userTheme[`name_${theme}`]}</span>
         </span>
       </ProfileField>
@@ -60,6 +61,8 @@ export default function UserPreferencesGeneral({
           {home === 'cover' ? T.homeLayout.cover : T.homeLayout.classic} · {cards === 'flat' ? T.homeLayout.cardsFlat : T.homeLayout.cardsTinted}
         </span>
       </ProfileField>
+
+      <UserShapePreference />
 
       <ProfileField
         label={T.userData.gender}

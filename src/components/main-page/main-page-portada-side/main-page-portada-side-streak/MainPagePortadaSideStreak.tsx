@@ -5,10 +5,12 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useStreakData } from '@/hooks/useStreakData'
 import { groupByDays, plural } from '@/utils/utils'
 import { SURFACE } from '@/components/ui/surface'
+import { streakInk, streakTier } from '@/utils/streakTier'
+import { slantStyle } from '@/components/ui/shape'
 
 /** How many days the bars show. */
 const DAYS = 21
-const SLANT = { clipPath: 'polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%)' }
+const SLANT = slantStyle(3)
 
 /**
  * Your streak beside the cover: how long it is, the last three weeks as
@@ -24,6 +26,7 @@ export default function MainPagePortadaSideStreak() {
   const max = Math.max(1, ...counts)
   const today = counts[DAYS - 1]
   const hoursLeft = 24 - new Date(now).getHours()
+  const tier = streakTier(activeStreak.days)
   const record = bestStreak !== null && activeStreak.days >= bestStreak.days
 
   return (
@@ -32,15 +35,15 @@ export default function MainPagePortadaSideStreak() {
       className={`${SURFACE} p-5 flex flex-col gap-3 hover:ring-accent/40 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
     >
       <span className="flex items-baseline justify-between gap-3">
-        <span className="font-bold">{plural(activeStreak.days, T.plurals.streakOf, lang)}</span>
+        <span className="font-bold" style={{ color: streakInk(tier) }}>{plural(activeStreak.days, T.plurals.streakOf, lang)}</span>
         {record && <span className="text-[0.8125rem] text-text-secondary">{T.streak.newRecord}</span>}
       </span>
       <span aria-hidden="true" className="flex gap-1 h-6">
         {counts.map((c, i) => (
           <span
             key={i}
-            style={{ ...SLANT, opacity: c > 0 ? 0.45 + 0.55 * (c / max) : 1 }}
-            className={`flex-1 ${c > 0 ? 'bg-accent' : 'bg-ink/10'}`}
+            style={{ ...SLANT, opacity: c > 0 ? 0.45 + 0.55 * (c / max) : 1, ...(c > 0 ? { backgroundColor: `rgb(${tier.color})` } : {}) }}
+            className={`flex-1 ${c > 0 ? '' : 'bg-ink/10'}`}
           />
         ))}
       </span>

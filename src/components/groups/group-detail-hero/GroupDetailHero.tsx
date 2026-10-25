@@ -71,7 +71,7 @@ export default function GroupDetailHero({
                 size={128}
                 strokeWidth={10}
                 ariaLabel={`${pct}%`}
-                center={<span className={`font-display italic font-extrabold text-[2.5rem] pr-1 ${pct >= 100 ? 'text-success' : 'text-text-main'}`}>{pct}%</span>}
+                center={<span className={`font-display italic font-extrabold text-[2.5rem] leading-none ${pct >= 100 ? 'text-success' : 'text-text-main'}`}>{pct}%</span>}
               />
             </div>
           ) : (

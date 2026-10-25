@@ -5,7 +5,8 @@ const css: string = require('fs').readFileSync(require('path').join(__dirname, '
 
 const DESIGN_TOKENS = [
   '--hardcore', '--softcore',
-  '--slant-button', '--slant-pill', '--slant-line',
+  '--slant-button', '--slant-pill', '--slant-line', '--slant-mark', '--slant-cut',
+  '--clip-3', '--clip-4', '--clip-5', '--clip-6', '--clip-8', '--clip-14', '--clip-fill', '--bar-radius',
   '--r-chip', '--r-control', '--r-field', '--r-card',
   '--h-control-sm', '--h-control', '--h-field',
   '--motion-hover', '--motion-open', '--motion-indicator', '--ease-spring',
@@ -22,10 +23,24 @@ test('the base block defines every design token, so every theme has them', () =>
   for (const token of DESIGN_TOKENS) expect(base).toContain(`${token}:`)
 })
 
-test('no theme overrides the shapes: a design changes them for all themes at once', () => {
+/** The one block that may change the shapes: the round design (`:root[data-shape="round"] { … }`). */
+function roundBlock() {
+  const start = css.indexOf(':root[data-shape="round"] {')
+  return css.slice(start, css.indexOf('}', start))
+}
+
+test('no theme overrides the shapes: only the round design does, for all themes at once', () => {
+  const round = roundBlock()
   for (const token of DESIGN_TOKENS.filter((t) => !['--hardcore', '--softcore'].includes(t))) {
-    expect(css.split(`${token}:`).length - 1).toBe(1)
+    const inRound = round.includes(`${token}:`) ? 1 : 0
+    expect(css.split(`${token}:`).length - 1).toBe(1 + inRound)
   }
+})
+
+test('the round design takes the slant out of every slanted token', () => {
+  const round = roundBlock()
+  for (const token of ['--slant-button', '--slant-pill', '--slant-line', '--slant-mark', '--slant-cut']) expect(round).toContain(`${token}: 0deg`)
+  for (const token of ['--clip-3', '--clip-4', '--clip-5', '--clip-6', '--clip-8', '--clip-14', '--clip-fill']) expect(round).toContain(`${token}: none`)
 })
 
 test('light surfaces get darker RA marks', () => {

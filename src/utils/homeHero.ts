@@ -2,7 +2,6 @@ import type { RecentFeedItem } from '@/utils/steamFeed'
 import type { GameSource } from '@/types/steam'
 import { steamAssetUrl } from '@/lib/steamClient'
 import { psnBackdrop } from '@/utils/psnTitles'
-import { xboxBackdrop } from '@/utils/xboxTitles'
 
 /** What the home's cover shows of the game played last. */
 export type HomeHero = {
@@ -10,8 +9,10 @@ export type HomeHero = {
   id: number
   title: string
   console: string
-  /** The widest art there is for it (Steam's hero, PSN's backdrop), else its icon. */
-  image: string | null
+  /** The wide art it has, best first (Steam's hero then its store header, PSN's backdrop, then its box art): each one may fail to load, so the cover tries them in turn. */
+  art: string[]
+  /** Its own small picture, the one a list shows. */
+  icon: string | null
   earned: number
   total: number
   /** 0–100. */
@@ -31,7 +32,8 @@ export function homeHeroOf(item: RecentFeedItem | undefined): HomeHero | null {
       id: g.GameID,
       title: g.Title,
       console: g.ConsoleName,
-      image: g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : null,
+      art: [],
+      icon: g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : null,
       earned,
       total,
       pct: total ? Math.round((earned / total) * 100) : 0,
@@ -40,16 +42,17 @@ export function homeHeroOf(item: RecentFeedItem | undefined): HomeHero | null {
   }
   const g = item.source === 'psnCollection' ? item.games[0] : item.game
   if (!g) return null
-  const image =
-    item.source === 'steam' ? steamAssetUrl(g.id, 'hero')
-    : item.source === 'xbox' ? xboxBackdrop(g as Parameters<typeof xboxBackdrop>[0])
-    : psnBackdrop(g as Parameters<typeof psnBackdrop>[0])
+  const art =
+    item.source === 'steam' ? [steamAssetUrl(g.id, 'hero'), steamAssetUrl(g.id, 'header')]
+    : item.source === 'xbox' ? []
+    : [psnBackdrop(g as Parameters<typeof psnBackdrop>[0])]
   return {
     source: item.source === 'psnCollection' ? 'psn' : item.source,
     id: g.id,
     title: g.title,
     console: g.consoleName,
-    image,
+    art: art.filter(Boolean),
+    icon: item.source === 'steam' ? steamAssetUrl(g.id, 'cover') : g.imageIcon || null,
     earned: g.numAwarded,
     total: g.maxPossible,
     pct: Math.round(g.pctWon),

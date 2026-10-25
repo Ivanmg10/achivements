@@ -1802,6 +1802,10 @@ export const it: Translations = {
     },
   },
   homeLayout: {
+    shapeLabel: 'Forma',
+    shapeSlanted: 'Inclinata',
+    shapeRound: 'Arrotondata',
+    shapeHint: 'Pulsanti, barre ed etichette con estremi inclinati o arrotondati.',
     cardsLabel: 'Schede di gioco',
     cardsTinted: 'A colori',
     cardsFlat: 'Piatte',

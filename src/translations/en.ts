@@ -1803,6 +1803,10 @@ export const en = {
     },
   },
   homeLayout: {
+    shapeLabel: 'Shape',
+    shapeSlanted: 'Slanted',
+    shapeRound: 'Rounded',
+    shapeHint: 'Buttons, bars and tags with slanted ends, or rounded.',
     cardsLabel: 'Game cards',
     cardsTinted: 'Colourful',
     cardsFlat: 'Flat',

@@ -1802,6 +1802,10 @@ export const de: Translations = {
     },
   },
   homeLayout: {
+    shapeLabel: 'Form',
+    shapeSlanted: 'Schräg',
+    shapeRound: 'Rund',
+    shapeHint: 'Schaltflächen, Balken und Tags mit schrägen oder runden Enden.',
     cardsLabel: 'Spielkarten',
     cardsTinted: 'Farbig',
     cardsFlat: 'Schlicht',

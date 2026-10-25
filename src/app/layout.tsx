@@ -12,6 +12,9 @@ import { display, ui } from '@/lib/fonts'
 // every load flashes dark until the session says otherwise.
 const THEME_SCRIPT = `try{var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(${JSON.stringify(THEMES)}.indexOf(t)>-1)document.documentElement.dataset.theme=t}catch(e){}`
 
+// Likewise the shape of the controls (slanted by default): the last choice, before the first frame.
+const SHAPE_SCRIPT = `try{if(localStorage.getItem('shape-style')==='round')document.documentElement.dataset.shape='round'}catch(e){}`
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: SITE_TITLE, template: `%s · ${SITE_NAME}` },
@@ -43,6 +46,7 @@ export default function RootLayout({
     <html lang="en" data-theme="dark" className={`${ui.variable} ${display.variable} bg-bg-header`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: SHAPE_SCRIPT }} />
       </head>
       <body className="min-h-screen text-text-main bg-bg-main">
         <Providers>

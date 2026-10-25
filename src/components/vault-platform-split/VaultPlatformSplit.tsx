@@ -1,5 +1,6 @@
 'use client'
 
+import { slantStyle } from '@/components/ui/shape'
 import type { GameSource } from '@/types/steam'
 
 const ORDER: GameSource[] = ['ra', 'steam', 'psn', 'xbox']
@@ -26,7 +27,7 @@ export default function VaultPlatformSplit({ split, className = '' }: { split: P
         <span
           key={p.s}
           className={`h-full ${PLATFORM_FILL[p.s]}`}
-          style={{ width: `${(p.v / total) * 100}%`, clipPath: 'polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%)' }}
+          style={{ width: `${(p.v / total) * 100}%`, ...slantStyle(3) }}
         />
       ))}
     </span>

@@ -11,7 +11,7 @@ beforeEach(() => jest.clearAllMocks())
 
 test('nothing is asked for without a game', () => {
   const { result } = renderHook(() => useGameInsights(null, null))
-  expect(result.current).toEqual({ items: [], loading: false, error: false })
+  expect(result.current).toEqual({ items: [], art: null, loading: false, error: false })
   expect(fetchShared).not.toHaveBeenCalled()
 })
 
@@ -31,4 +31,24 @@ test('a refused answer is an error, not an empty game', async () => {
   const { result } = renderHook(() => useGameInsights('ra', 1))
   await waitFor(() => expect(result.current.error).toBe(true))
   expect(result.current.items).toEqual([])
+})
+
+test('an RA game comes with its in-game screenshot as wide art', async () => {
+  answer({ Achievements: {}, NumDistinctPlayers: 3, ImageIngame: '/Images/9.png', ImageTitle: '/Images/8.png' })
+  const { result } = renderHook(() => useGameInsights('ra', 5))
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(result.current.art).toBe('https://retroachievements.org/Images/9.png')
+})
+
+test('Xbox asks for its wide art apart, and goes without it when that fails', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  ;(fetchShared as jest.Mock).mockImplementation((url: string) =>
+    url.startsWith('/api/xbox/details')
+      ? Promise.resolve({ ok: false, status: 404, json: () => Promise.resolve({}) })
+      : Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ achievements: [] }) }),
+  )
+  const { result } = renderHook(() => useGameInsights('xbox', 9))
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(result.current.error).toBe(false)
+  expect(result.current.art).toBeNull()
 })

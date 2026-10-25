@@ -1,4 +1,6 @@
-const SLANT = { clipPath: 'polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%)' }
+import { slantStyle } from '@/components/ui/shape'
+
+const SLANT = slantStyle(4)
 
 /**
  * A two-column table of the guide (a rarity and what it is worth, say), the

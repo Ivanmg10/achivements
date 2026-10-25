@@ -1802,6 +1802,10 @@ export const ru: Translations = {
     },
   },
   homeLayout: {
+    shapeLabel: 'Форма',
+    shapeSlanted: 'Скошенная',
+    shapeRound: 'Скруглённая',
+    shapeHint: 'Кнопки, полосы и метки со скошенными или скруглёнными краями.',
     cardsLabel: 'Карточки игр',
     cardsTinted: 'Цветные',
     cardsFlat: 'Плоские',

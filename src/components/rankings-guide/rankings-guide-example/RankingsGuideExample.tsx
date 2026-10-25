@@ -4,8 +4,9 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { VaultGuideText } from '@/translations/vaultGuide'
 import { PLATFORM_FILL } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { exampleScores } from '@/utils/vaultExamples'
+import { slantStyle } from '@/components/ui/shape'
 
-const SLANT = { clipPath: 'polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%)' }
+const SLANT = slantStyle(5)
 
 /**
  * The example games, finished, as bars on one scale: the same demanding game

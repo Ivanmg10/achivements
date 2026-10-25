@@ -3,6 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { Streak } from '@/types/types'
 import { formatDay, plural } from '@/utils/utils'
+import { streakInk, streakTier } from '@/utils/streakTier'
 
 interface Props {
   activeStreak: Streak | null
@@ -26,6 +27,8 @@ interface Props {
  */
 export default function StreakStatsBanner({ activeStreak, bestStreak, lastActiveDay, today, todayCount, hoursLeft, children }: Props) {
   const { T, lang } = useLanguage()
+  // The streak going colours the hero by its tier; none going, the dimmest.
+  const tier = streakTier(activeStreak?.days ?? 0)
   const long = (d: string) => formatDay(d, lang, { day: 'numeric', month: 'long' })
 
   let kicker = T.streak.yourStreak
@@ -40,10 +43,12 @@ export default function StreakStatsBanner({ activeStreak, bestStreak, lastActive
   return (
     <section
       aria-label={T.streak.currentStreak}
-      className="relative overflow-hidden rounded-[1.25rem] ring-1 ring-inset ring-ink/[0.06] bg-bg-card bg-[linear-gradient(110deg,rgb(var(--warning)/0.2),transparent_55%)] p-6 sm:p-[2.375rem] flex flex-col lg:flex-row lg:items-center gap-8"
+      data-tier={tier.id}
+      className="relative overflow-hidden rounded-[1.25rem] ring-1 ring-inset ring-ink/[0.06] bg-bg-card p-6 sm:p-[2.375rem] flex flex-col lg:flex-row lg:items-center gap-8"
+      style={{ backgroundImage: `linear-gradient(110deg, rgb(${tier.color} / 0.22), transparent 55%)` }}
     >
       <div className="flex-1 min-w-0 flex flex-col gap-2">
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-warning">{kicker}</p>
+        <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: streakInk(tier) }}>{kicker}</p>
         {activeStreak ? (
           <>
             <p className="font-display italic font-extrabold text-6xl sm:text-[6.5rem] leading-[0.9] pr-3 text-text-main">

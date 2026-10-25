@@ -34,8 +34,9 @@ export function ProgressBar({
   const done = shown >= 100
 
   // The design's slant: the track's ends are cut on a diagonal, and so is the fill's leading edge.
-  const BEVEL = 'polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%)'
-  const FILL_EDGE = 'polygon(0 0, 100% 0, calc(100% - 4px) 100%, 0 100%)'
+  // The ends are the design's: slanted, or straight and rounded (see ui/shape.ts).
+  const BEVEL = 'var(--clip-3)'
+  const FILL_EDGE = 'var(--clip-fill)'
 
   return (
     <span
@@ -49,12 +50,12 @@ export function ProgressBar({
       // Only a finished bar glows.
       style={done ? { filter: 'drop-shadow(0 0 6px rgb(var(--progress) / 0.6))' } : undefined}
     >
-      <span data-track className={`absolute inset-0 overflow-hidden ${trackClass}`} style={{ clipPath: BEVEL }}>
+      <span data-track className={`absolute inset-0 overflow-hidden ${trackClass}`} style={{ clipPath: BEVEL, borderRadius: 'var(--bar-radius)' }}>
         {soft > value && (
           <span
             data-fill="soft"
             className="absolute inset-y-0 left-0 bg-progress-soft transition-[width] duration-500"
-            style={{ width: `${soft}%`, clipPath: FILL_EDGE }}
+            style={{ width: `${soft}%`, clipPath: FILL_EDGE, borderRadius: 'var(--bar-radius)' }}
           />
         )}
         {value > 0 && (
@@ -64,7 +65,7 @@ export function ProgressBar({
             style={
               value >= 100
                 ? { width: '100%', background: 'linear-gradient(90deg, rgb(var(--progress)), color-mix(in oklab, rgb(var(--progress)) 55%, white))' }
-                : { width: `${value}%`, clipPath: FILL_EDGE }
+                : { width: `${value}%`, clipPath: FILL_EDGE, borderRadius: 'var(--bar-radius)' }
             }
           />
         )}

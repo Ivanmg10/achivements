@@ -1,9 +1,10 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
+import { slantStyle } from '@/components/ui/shape'
 
 const HEIGHT = 70
-const SLANT = { clipPath: 'polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%)' }
+const SLANT = slantStyle(3)
 
 /**
  * Points earned each of the last weeks, as bars in the theme's colour (this

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import MainPagePortada from './MainPagePortada'
 import { useRecentFeed } from '@/hooks/useRecentFeed'
 import { useGameInsights } from '@/hooks/useGameInsights'
@@ -35,6 +35,26 @@ test('names the easiest achievement left, with how many players have it', () => 
   expect(useGameInsights).toHaveBeenCalledWith('steam', 620)
   expect(screen.getByText('Easy one')).toBeInTheDocument()
   expect(screen.getByText(/43\.9 % of players have it/)).toBeInTheDocument()
+})
+
+const artOf = (container: HTMLElement) => container.querySelector('section img')?.getAttribute('src') ?? ''
+
+test('the art that fails to load gives way to the next, and the last to the game picture as a poster', () => {
+  ;(useRecentFeed as jest.Mock).mockReturnValue({ feed: [steamItem], loading: false })
+  const { container } = render(<MainPagePortada />)
+  expect(artOf(container)).toContain('library_hero')
+  fireEvent.error(container.querySelector('section img')!)
+  expect(artOf(container)).toContain('header.jpg')
+  fireEvent.error(container.querySelector('section img')!)
+  // Nothing wide left: the poster is the game's cover, never an empty box.
+  expect(artOf(container)).toContain('library_600x900')
+})
+
+test('a wide picture the game page reads (RA, Xbox) comes first', () => {
+  ;(useRecentFeed as jest.Mock).mockReturnValue({ feed: [steamItem], loading: false })
+  ;(useGameInsights as jest.Mock).mockReturnValue({ items: [], art: 'https://wide/art.png', loading: false, error: false })
+  const { container } = render(<MainPagePortada />)
+  expect(artOf(container)).toBe('https://wide/art.png')
 })
 
 test('draws nothing while loading or without a game', () => {

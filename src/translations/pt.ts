@@ -1802,6 +1802,10 @@ export const pt: Translations = {
     },
   },
   homeLayout: {
+    shapeLabel: 'Forma',
+    shapeSlanted: 'Inclinada',
+    shapeRound: 'Arredondada',
+    shapeHint: 'Botões, barras e etiquetas com pontas inclinadas ou arredondadas.',
     cardsLabel: 'Cartões de jogo',
     cardsTinted: 'Com cor',
     cardsFlat: 'Lisos',

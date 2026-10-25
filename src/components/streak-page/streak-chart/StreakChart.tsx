@@ -5,9 +5,10 @@ import { useLanguage } from '@/context/LanguageContext'
 import { Streak } from '@/types/types'
 import { decimal, formatDay, plural } from '@/utils/utils'
 import StreakSectionHead from '../streak-section-head/StreakSectionHead'
+import { slantStyle } from '@/components/ui/shape'
 
 const MAX_ROWS = 6
-const SLANT = { clipPath: 'polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%)' }
+const SLANT = slantStyle(6)
 
 interface Props {
   streaks: Streak[]

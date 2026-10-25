@@ -60,6 +60,7 @@ export default function FollowingPage() {
             key="followers"
             tabs={<FollowingTabs tab={tab} onTab={onTab} counts={counts} />}
             users={fans.followers ?? []}
+            details={fans.details}
             isLoading={fans.isLoading}
             error={fans.error}
             onRetry={fans.retry}

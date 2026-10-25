@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { IconChevronRight, IconTrophy, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRankings } from '@/hooks/useRankings'
+import { slantStyle } from '@/components/ui/shape'
 
 /** Second, first and third, as a podium stands: the picture's size and ring, the step's height and colour. */
 const PODIUM = [
@@ -12,7 +13,7 @@ const PODIUM = [
   { place: 1, avatar: 'w-14 h-14', ring: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(250_204_21)]', step: 'h-14 bg-accent text-bg-main' },
   { place: 3, avatar: 'w-10 h-10', ring: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--ink)/0.3)]', step: 'h-7 bg-ink/[0.14] text-text-main' },
 ]
-const SLANT = { clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)' }
+const SLANT = slantStyle(8)
 
 /**
  * The way into the rankings from Following: the podium of you and the people

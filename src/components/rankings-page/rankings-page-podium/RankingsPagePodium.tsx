@@ -7,6 +7,7 @@ import { PODIUM_CARD, PODIUM_DELAY, PODIUM_STEP } from '../rankingsMotion'
 import { CountUp } from '@/components/ui/CountUp'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import RankingsPageUser from '../rankings-page-user/RankingsPageUser'
+import { slantStyle } from '@/components/ui/shape'
 
 /** Second, first and third, as a podium stands: each step's height and colour, the picture's size and ring. */
 const STEP: Record<number, string> = {
@@ -20,7 +21,7 @@ const RING: Record<number, string> = {
   2: 'shadow-[0_0_0_3px_rgb(var(--bg-card)),0_0_0_5px_rgb(var(--ink)/0.4)]',
   3: 'shadow-[0_0_0_3px_rgb(var(--bg-card)),0_0_0_5px_rgb(var(--ink)/0.3)]',
 }
-const SLANT = { clipPath: 'polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%)' }
+const SLANT = slantStyle(14)
 const STEP_CLASS = 'self-stretch mx-2 sm:mx-3.5 origin-bottom flex items-start justify-center pt-2 font-display italic font-extrabold text-2xl sm:text-[2.125rem] leading-none tabular-nums'
 
 /** The first three, on a podium: picture, name, level and points, with the place on each step. */

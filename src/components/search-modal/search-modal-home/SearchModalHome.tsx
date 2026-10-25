@@ -48,7 +48,7 @@ export default function SearchModalHome({
             {games.map((g) => (
               <li key={`${g.source}:${g.id}`}>
                 <SearchModalRow
-                  media={g.image ? <img src={g.image} alt="" className="w-full h-full object-cover" /> : null}
+                  media={g.icon ? <img src={g.icon} alt="" className="w-full h-full object-cover" /> : null}
                   title={g.title}
                   sub={[g.console, g.total > 0 ? `${g.earned} / ${g.total}` : null, g.lastPlayed ? relativeTime(g.lastPlayed, lang) : null].filter(Boolean).join(' · ')}
                   onSelect={() => onGo(gameHref(g.source, g.id))}

@@ -59,7 +59,7 @@ export default function RankingsPageTable({
         <tbody>
           {rows.map((r, i) => (
             <motion.tr key={r.username} variants={ROW} custom={i} initial="hidden" animate="show" className={`group transition-colors hover:[&>td]:bg-accent/[0.06] ${r.isMe ? '[&>td]:bg-accent/10' : ''}`}>
-              <td className={`${TD} relative font-display italic font-extrabold text-[1.625rem] leading-none tabular-nums ${r.isMe ? "text-accent before:content-[''] before:absolute before:left-0 before:top-2.5 before:bottom-2.5 before:w-1 before:bg-accent before:-skew-y-[20deg]" : 'text-text-secondary'}`}>{r.rank}</td>
+              <td className={`${TD} relative font-display italic font-extrabold text-[1.625rem] leading-none tabular-nums ${r.isMe ? "text-accent before:content-[''] before:absolute before:left-0 before:top-2.5 before:bottom-2.5 before:w-1 before:bg-accent before:skew-y-(--slant-mark)" : 'text-text-secondary'}`}>{r.rank}</td>
               <td className={`${TD} max-w-0 w-[30%]`}>
                 <RankingsPageUser row={r} size="md" linked={linked} nameClass="text-[0.9375rem] font-extrabold">
                   <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">

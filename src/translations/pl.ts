@@ -1802,6 +1802,10 @@ export const pl: Translations = {
     },
   },
   homeLayout: {
+    shapeLabel: 'Kształt',
+    shapeSlanted: 'Skośny',
+    shapeRound: 'Zaokrąglony',
+    shapeHint: 'Przyciski, paski i etykiety ze skośnymi lub zaokrąglonymi końcami.',
     cardsLabel: 'Karty gier',
     cardsTinted: 'Kolorowe',
     cardsFlat: 'Płaskie',

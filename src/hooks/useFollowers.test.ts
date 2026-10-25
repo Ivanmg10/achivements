@@ -25,3 +25,13 @@ test('a failure is an error until retried', async () => {
   await waitFor(() => expect(result.current.followers).toEqual([]))
   expect(result.current.error).toBe(false)
 })
+
+test('like the people you follow, the newest fans get their activity and games read', async () => {
+  ;(global.fetch as jest.Mock).mockImplementation((url: string) =>
+    Promise.resolve({ ok: true, json: async () => (url.startsWith('/api/follows/overview') ? [{ username: 'fan', ra: true }] : []) }),
+  )
+  const { result } = renderHook(() => useFollowers(true))
+  await waitFor(() => expect(result.current.details.fan).toBeDefined())
+  expect(result.current.details.fan).toMatchObject({ recent: [], games: [], lastPlayed: null })
+  expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('/api/getRecentAchievements?user=fan'), expect.anything())
+})
