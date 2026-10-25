@@ -33,9 +33,9 @@ export default function SteamExpandedStats({
   return (
     <dl className="flex flex-col gap-2.5 flex-1 min-w-0 lg:flex-none lg:w-full lg:grid lg:grid-cols-3 lg:gap-1 lg:text-center">
       {rows.map((r) => (
-        <div key={r.label} className={`flex items-baseline justify-between gap-2 lg:flex-col-reverse lg:items-center lg:justify-end lg:gap-0.5 ${r.wide === false ? 'lg:hidden' : ''}`}>
-          <dt className="text-[11px] uppercase tracking-wide text-text-secondary lg:text-[10px] lg:normal-case lg:tracking-normal lg:leading-tight">{r.label}</dt>
-          <dd className={`text-base font-bold lg:text-sm ${r.className}`}>{r.value}</dd>
+        <div key={r.label} className={`flex items-baseline justify-between gap-2 lg:flex-col lg:items-center lg:justify-start lg:gap-0.5 ${r.wide === false ? 'lg:hidden' : ''}`}>
+          <dt className="text-[11px] uppercase tracking-wide text-text-secondary lg:text-[0.625rem] lg:font-bold lg:tracking-[0.06em] lg:leading-tight">{r.label}</dt>
+          <dd className={`text-base font-extrabold ${r.className}`}>{r.value}</dd>
         </div>
       ))}
     </dl>
