@@ -136,7 +136,7 @@ export default function GameInfoHeader({
         tiles={
           gameData?.ID
             ? [
-                { label: T.gameInfoPage.achievements, value: earned, of: total, done: total > 0 && earned === total },
+                ...(total > 0 ? [{ label: T.gameInfoPage.achievements, value: earned, of: total, done: earned === total }] : []),
                 ...(points.total > 0 ? [{ label: T.gameInfoPage.points, value: points.earned, of: points.total, done: points.earned === points.total }] : []),
               ]
             : []

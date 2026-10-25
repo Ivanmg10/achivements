@@ -41,6 +41,12 @@ test('renders empty when no gameData', () => {
   expect(container.querySelector('table')).toBeNull()
 })
 
+test('a game with no achievements says so, with no tabs or table', () => {
+  render(<GameInfoTable gameData={{ Achievements: {} } as never} />)
+  expect(screen.getByText('No published achievements')).toBeInTheDocument()
+  expect(screen.queryByRole('tab')).not.toBeInTheDocument()
+})
+
 test('filters out undefined achievements', () => {
   const gameData = { Achievements: { '1': mockAchievement, '2': undefined } } as never
   render(<GameInfoTable gameData={gameData} />)

@@ -11,6 +11,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useRaFavoriteIds } from '@/hooks/useRaFavoriteIds'
 import { SortableHeader, SortState, SortKey, DEFAULT_DIRS } from './SortableHeader'
 import { SURFACE } from '@/components/ui/surface'
+import EmptyState from '@/components/empty-state/EmptyState'
+import { IconTrophyOff } from '@tabler/icons-react'
 import AchievementTableToolbar from '@/components/achievement-table-toolbar/AchievementTableToolbar'
 import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
 import { TABLE, TH } from '@/components/ui/dataTable'
@@ -126,6 +128,17 @@ export default function GameInfoTable({
     { value: 'players', label: T.gameInfoTable.headerPlayers },
     { value: 'earned', label: T.gameInfoTable.headerEarned },
   ]
+
+  // A game with nothing published says so, rather than an empty table that "nothing matches".
+  if (achievements.length === 0) {
+    return (
+      <div className="w-full px-4 sm:px-8 lg:px-14 mt-7 mb-7">
+        <section aria-label={T.gameInfoPage.achievements} className={SURFACE}>
+          <EmptyState icon={<IconTrophyOff className="w-6 h-6" />} title={T.statusGameItem.noPublishedAchievements} className="py-12" />
+        </section>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full px-4 sm:px-8 lg:px-14 mt-7 mb-7">
