@@ -1102,6 +1102,15 @@ export const pt: Translations = {
     iconNature: 'Natureza',
   },
   streak: {
+    yourStreak: 'A sua sequência',
+    untilToday: 'De {start} até hoje, sem falhar um dia.',
+    untilDay: 'De {start} a {end}, sem falhar um dia.',
+    stillAlive: 'ainda ativa',
+    daysUnit: 'dias',
+    bestSub: '{n} no total · em média {avg}',
+    ongoing: 'em curso',
+    stripHint: 'As barras crescem com a raiz quadrada, assim um dia de 30 não esmaga os de 3; os dias que passam do limite têm um corte e o número em cima.',
+    yearSub: '{n} dias com conquistas · a sequência escolhida, emoldurada',
     title: 'Sequência',
     currentStreak: 'Sequência atual',
     bestStreak: 'Melhor sequência',
@@ -1638,6 +1647,7 @@ export const pt: Translations = {
     },
   },
   plurals: {
+    todayAchievements: { one: 'Já tem uma conquista hoje.', other: 'Já tem {n} conquistas hoje.' },
     streakOf: { one: 'Sequência de {n} dia', other: 'Sequência de {n} dias' },
     todaySome: { one: 'Hoje já são {n}.', other: 'Hoje já são {n}.' },
     seeLeft: { one: 'Ver o que falta', other: 'Ver os {n} que faltam' },

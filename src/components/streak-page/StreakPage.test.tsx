@@ -26,7 +26,7 @@ test('with streaks: the record, the bars and the best streak day by day', () => 
   const best = { start: '2026-05-02', end: '2026-05-04', days: 3, achievements: [] }
   ;(useStreakData as jest.Mock).mockReturnValue({ ...base, streaks: [best], bestStreak: best })
   render(<StreakPage />)
-  expect(screen.getAllByText('3 days').length).toBeGreaterThan(0)
+  expect(screen.getAllByText(/^3 (days|d)$/).length).toBeGreaterThan(0)
   expect(screen.getAllByRole('button', { pressed: true }).length).toBeGreaterThan(0)
   expect(screen.getByRole('heading', { name: en.streak.listTitle })).toBeInTheDocument()
 })

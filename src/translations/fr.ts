@@ -1102,6 +1102,15 @@ export const fr: Translations = {
     iconNature: 'Nature',
   },
   streak: {
+    yourStreak: 'Ta série',
+    untilToday: 'Du {start} à aujourd\'hui, sans manquer un jour.',
+    untilDay: 'Du {start} au {end}, sans manquer un jour.',
+    stillAlive: 'toujours en cours',
+    daysUnit: 'jours',
+    bestSub: '{n} au total · en moyenne {avg}',
+    ongoing: 'en cours',
+    stripHint: 'Les barres suivent la racine carrée : un jour à 30 n\'écrase pas ceux à 3 ; les jours qui dépassent sont coupés et affichent leur nombre.',
+    yearSub: '{n} jours avec succès · la série choisie, encadrée',
     title: 'Série',
     currentStreak: 'Série actuelle',
     bestStreak: 'Meilleure série',
@@ -1638,6 +1647,7 @@ export const fr: Translations = {
     },
   },
   plurals: {
+    todayAchievements: { one: "Déjà un succès aujourd'hui.", other: "Déjà {n} succès aujourd'hui." },
     streakOf: { one: 'Série de {n} jour', other: 'Série de {n} jours' },
     todaySome: { one: "{n} aujourd'hui.", other: "{n} aujourd'hui." },
     seeLeft: { one: 'Voir celui qui manque', other: 'Voir les {n} qui manquent' },

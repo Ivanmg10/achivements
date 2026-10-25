@@ -42,19 +42,19 @@ export default function StreakPage() {
   else
     body = (
       <>
-      <StreakStatsBanner activeStreak={activeStreak} bestStreak={bestStreak} totalStreaks={streaks.length} lastActiveDay={lastActiveDay}>
+      <StreakStatsBanner activeStreak={activeStreak} bestStreak={bestStreak} lastActiveDay={lastActiveDay} today={today} todayCount={byDay[today] ?? 0} hoursLeft={24 - new Date(now).getHours()}>
         <StreakQuickStats activeDays={insights.activeDays} avgStreak={insights.avgStreak} daysSinceLast={insights.daysSinceLast} longestGap={insights.longestGap} />
       </StreakStatsBanner>
-      <div className="grid gap-5 xl:grid-cols-2">
-        <div className="flex flex-col gap-5 min-w-0">
-          <StreakChart streaks={streaks} selectedStreak={selectedStreak} onSelect={setPicked} />
+      <div className="grid gap-4 xl:grid-cols-2">
+        <div className="flex flex-col gap-4 min-w-0">
+          <StreakChart streaks={streaks} selectedStreak={selectedStreak} activeStreak={activeStreak} avgStreak={insights.avgStreak} onSelect={setPicked} />
         </div>
         <div className="min-w-0 flex flex-col">
           {/* Keyed by streak: picking another one starts its calendar on its last day. */}
-          <StreakList key={selectedStreak?.start ?? 'none'} selectedStreak={selectedStreak} />
+          <StreakList key={selectedStreak?.start ?? 'none'} selectedStreak={selectedStreak} today={today} />
         </div>
       </div>
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <StreakYearHeatmap byDay={byDay} streaks={streaks} selected={selectedStreak} today={today} onSelect={setPicked} />
         <StreakWeekdays counts={insights.weekdays} />
       </div>
@@ -62,10 +62,11 @@ export default function StreakPage() {
     )
 
   return (
-    <motion.div className="flex flex-col gap-5 px-4 py-6 w-full lg:max-w-[98%] mx-auto" variants={fadeUp} initial="hidden" animate="visible">
-      <header className="flex flex-col gap-1">
-        <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 text-text-main">{T.streak.title}</h1>
-        <p className="text-sm text-text-secondary">{T.streak.pageSub}</p>
+    <motion.div className="flex flex-col gap-4 px-3 py-4 w-full mx-auto" variants={fadeUp} initial="hidden" animate="visible">
+      {/* The hero is the page's top; its title and what it counts stay for screen readers. */}
+      <header className="sr-only">
+        <h1>{T.streak.title}</h1>
+        <p>{T.streak.pageSub}</p>
       </header>
       {body}
     </motion.div>

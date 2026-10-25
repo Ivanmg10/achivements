@@ -1102,6 +1102,15 @@ export const ja: Translations = {
     iconNature: '自然',
   },
   streak: {
+    yourStreak: 'あなたの連続記録',
+    untilToday: '{start} から今日まで、一日も欠かさず。',
+    untilDay: '{start} から {end} まで、一日も欠かさず。',
+    stillAlive: '継続中',
+    daysUnit: '日',
+    bestSub: '合計 {n} 回 · 平均 {avg}',
+    ongoing: '継続中',
+    stripHint: 'バーは平方根で伸びるので、30 の日が 3 の日を押しつぶしません。はみ出た日は切れ目と数字で示します。',
+    yearSub: '実績のある日 {n} 日 · 選んだ記録を枠で表示',
     title: 'ストリーク',
     currentStreak: '現在のストリーク',
     bestStreak: '最高ストリーク',
@@ -1638,6 +1647,7 @@ export const ja: Translations = {
     },
   },
   plurals: {
+    todayAchievements: { other: '今日はすでに {n} 個。' },
     streakOf: { other: '{n} 日連続' },
     todaySome: { other: '今日は {n} 個。' },
     seeLeft: { other: '残り {n} 個を見る' },

@@ -1103,6 +1103,15 @@ export const en = {
     iconNature: 'Nature',
   },
   streak: {
+    yourStreak: 'Your streak',
+    untilToday: 'From {start} to today, without missing a day.',
+    untilDay: 'From {start} to {end}, without missing a day.',
+    stillAlive: 'still going',
+    daysUnit: 'days',
+    bestSub: '{n} in all · on average, {avg}',
+    ongoing: 'ongoing',
+    stripHint: 'Bars grow with the square root, so a day of 30 does not flatten days of 3; days that overflow are cut and show their number.',
+    yearSub: '{n} days with achievements · the chosen streak, framed',
     title: 'Streak',
     currentStreak: 'Current streak',
     bestStreak: 'Best streak',
@@ -1639,6 +1648,7 @@ export const en = {
     },
   },
   plurals: {
+    todayAchievements: { one: 'One achievement already today.', other: '{n} achievements already today.' } as PluralForms,
     streakOf: { one: 'A {n}-day streak', other: 'A {n}-day streak' } as PluralForms,
     todaySome: { one: '{n} so far today.', other: '{n} so far today.' } as PluralForms,
     seeLeft: { one: 'See the one left', other: 'See the {n} left' } as PluralForms,

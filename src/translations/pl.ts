@@ -1102,6 +1102,15 @@ export const pl: Translations = {
     iconNature: 'Natura',
   },
   streak: {
+    yourStreak: 'Twoja seria',
+    untilToday: 'Od {start} do dziś, bez opuszczenia dnia.',
+    untilDay: 'Od {start} do {end}, bez opuszczenia dnia.',
+    stillAlive: 'wciąż trwa',
+    daysUnit: 'dni',
+    bestSub: 'łącznie {n} · średnio {avg}',
+    ongoing: 'trwa',
+    stripHint: 'Słupki rosną z pierwiastkiem, więc dzień z 30 nie przytłacza dni z 3; dni, które wychodzą poza skalę, są ucięte i pokazują liczbę.',
+    yearSub: 'Dni z osiągnięciami: {n} · wybrana seria w ramce',
     title: 'Seria',
     currentStreak: 'Aktualna seria',
     bestStreak: 'Najlepsza seria',
@@ -1638,6 +1647,7 @@ export const pl: Translations = {
     },
   },
   plurals: {
+    todayAchievements: { one: 'Dziś już jedno osiągnięcie.', few: 'Dziś już {n} osiągnięcia.', many: 'Dziś już {n} osiągnięć.', other: 'Dziś już {n} osiągnięcia.' },
     streakOf: { one: 'Seria {n} dnia', few: 'Seria {n} dni', many: 'Seria {n} dni', other: 'Seria {n} dnia' },
     todaySome: { one: 'Dziś już {n}.', few: 'Dziś już {n}.', many: 'Dziś już {n}.', other: 'Dziś już {n}.' },
     seeLeft: { one: 'Zobacz brakujące', few: 'Zobacz {n} brakujące', many: 'Zobacz {n} brakujących', other: 'Zobacz {n} brakującego' },

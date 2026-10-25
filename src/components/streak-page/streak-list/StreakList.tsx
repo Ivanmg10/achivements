@@ -4,9 +4,10 @@ import { useMemo, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { Streak, UserAward } from '@/types/types'
 import { useUserAwards } from '@/hooks/useUserAwards'
-import { formatDay, plural } from '@/utils/utils'
+import { plural } from '@/utils/utils'
 import StreakDayRow from '../streak-day-row/StreakDayRow'
 import StreakDayStrip from '../streak-day-strip/StreakDayStrip'
+import StreakSectionHead from '../streak-section-head/StreakSectionHead'
 
 const COMPLETION_TYPES = new Set(['Mastery/Completion', 'Game Beaten'])
 
@@ -20,7 +21,7 @@ function awardDate(awardedAt: string): string {
  * with). Rendered with the streak as key, so picking another streak starts
  * again from its last day.
  */
-export default function StreakList({ selectedStreak }: { selectedStreak: Streak | null }) {
+export default function StreakList({ selectedStreak, today }: { selectedStreak: Streak | null; today: string }) {
   const { T, lang } = useLanguage()
   const { awards } = useUserAwards()
   const [day, setDay] = useState<string | null>(null)
@@ -50,7 +51,7 @@ export default function StreakList({ selectedStreak }: { selectedStreak: Streak 
 
   if (!selectedStreak) {
     return (
-      <div className="bg-bg-card rounded-card p-6 flex items-center justify-center min-h-[160px]">
+      <div className="bg-bg-card rounded-[1.25rem] p-6 flex items-center justify-center min-h-[160px]">
         <p className="text-text-secondary text-sm">{T.streak.noData}</p>
       </div>
     )
@@ -60,27 +61,19 @@ export default function StreakList({ selectedStreak }: { selectedStreak: Streak 
   const shown = day ?? selectedStreak.end
 
   return (
-    <section aria-labelledby="streak-days-title" className="flex-1 bg-bg-card rounded-card p-5 flex flex-col gap-5">
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <h2 id="streak-days-title" className="text-sm uppercase tracking-widest text-text-secondary">
-          {T.streak.listTitle}
-        </h2>
-        <span className="text-xs text-text-secondary">
-          {formatDay(selectedStreak.start, lang, { day: 'numeric', month: 'short', year: 'numeric' })} –{' '}
-          {formatDay(selectedStreak.end, lang, { day: 'numeric', month: 'short', year: 'numeric' })}
-          {' · '}
-          {plural(selectedStreak.days, T.plurals.days, lang)}
-        </span>
-      </div>
+    <section aria-labelledby="streak-days-title" className="flex-1 bg-bg-card rounded-[1.25rem] ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-4">
+      <StreakSectionHead
+        id="streak-days-title"
+        title={T.streak.listTitle}
+        aside={`${plural(selectedStreak.days, T.plurals.days, lang)} · ${T.streak.calendarHint}`}
+      />
 
-      {/* The strip on top, the picked day's unlocks under it. */}
+      {/* The strip on top, how it is drawn under it, the picked day's unlocks last. */}
       <div className="flex flex-col gap-2">
-        <StreakDayStrip start={selectedStreak.start} end={selectedStreak.end} counts={counts} selected={shown} onSelect={setDay} />
-        <p className="text-xs text-text-secondary">{T.streak.calendarHint}</p>
+        <StreakDayStrip start={selectedStreak.start} end={selectedStreak.end} today={today} counts={counts} selected={shown} onSelect={setDay} />
+        <p className="text-xs text-text-secondary">{T.streak.stripHint}</p>
       </div>
-      <div className="border-t border-ink/[0.06] pt-5 min-w-0">
-        <StreakDayRow date={shown} achievements={byDate[shown] ?? []} awards={streakAwards[shown]} />
-      </div>
+      <StreakDayRow date={shown} today={today} achievements={byDate[shown] ?? []} awards={streakAwards[shown]} />
     </section>
   )
 }

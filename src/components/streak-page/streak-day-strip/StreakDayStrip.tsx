@@ -14,12 +14,15 @@ const STUB = 4
 export default function StreakDayStrip({
   start,
   end,
+  today,
   counts,
   selected,
   onSelect,
 }: {
   start: string
   end: string
+  /** Today, so the last day can say "today". */
+  today?: string
   counts: Record<string, number>
   selected: string
   onSelect: (day: string) => void
@@ -68,9 +71,10 @@ export default function StreakDayStrip({
           })}
         </div>
       </div>
-      <div aria-hidden="true" className="flex justify-between text-[11px] text-text-secondary tabular-nums">
+      <div aria-hidden="true" className="flex justify-between text-[0.8125rem] text-text-secondary tabular-nums">
         <span>{short(start)}</span>
-        <span>{short(end)}</span>
+        {days.length > 6 && <span>{short(days[Math.floor(days.length / 2)])}</span>}
+        <span>{end === today ? T.streak.today.toLowerCase() : short(end)}</span>
       </div>
     </div>
   )
