@@ -23,16 +23,24 @@ v1.7.0 release (roadmap §9).
 | Login / register | **"Con los detalles"** (small details, not a redesign) | 6 |
 | Fonts | Liked Barlow / Sofia Sans / Fira Sans as options; **which ones ship is not decided** | 4, 3b |
 | Layout chooser | Not the centred modal (3), not the plain panels (3b). **New concept**: background blurred, a floating full preview of the main page showing the changes, options in a side panel | — (to design) |
-| Streaks in the top bar | Shown (board 2: three tag variants, three progress variants); **no pick yet** | 2 |
+| Streaks in the top bar | **Tag without glow** (variant A) ; Vault Points progress **stays as today** (ring in the accent) | 2 |
+| Default design | **Slanted** stays the default | — |
+| Streak tiers | **Approved** as they are (0, 5, 10, 20, 30, 40, 50+; `streakTier.ts`) | 2 |
+| Skeletons | **One per screen**, shaped like what it replaces; **pulse**, not shimmer; **no canvas round** | — |
+| Entrance animations | The family table in §8 approved; **every page and component, nothing left unanimated** | — |
+| Leftovers | §9: all yes, except no total hours in Portada's kicker | — |
+| Release | **Option A** (all the polish in v1.7.0), and **not to `main` yet**: the user wants more style work first | — |
 
 ## Order
 
-1. Tint without border (tiny, ship first).
-2. Fonts: `latin-ext` fix now; the font choice waits for the user.
-3. Login / register details.
-4. Landing v2 with entrance animations.
-5. Layout chooser: **design round first**, then build (it also carries the font choice).
-6. Streak tag / top bar progress: ask the user which variant of board 2, then a one-file change.
+1. Quick wins: tint without border (§1), streak tag without glow (§6), `latin-ext` (§2).
+2. The user's review bugs (§10): f (broken modal) first, then a, b, d, e, i, j.
+3. Skeletons for every screen (§7), including review c and g.
+4. The animation mechanism + landing v2 (§4), then animations everywhere (§8).
+5. Login / register details (§3).
+6. Leftovers (§9).
+7. Layout chooser: **design round first**, then build, with the font choice (§2, §5).
+8. Release when the user says (§11).
 
 ---
 
@@ -161,10 +169,79 @@ Design round on the canvas before code (new boards on the same canvas):
   with its specimen), keep `LayoutModal`'s preferences components, and update the welcome's
   preferences step if it shows these choices.
 
-## 6. Streaks and progress in the top bar (board 2)
+## 6. Streak tag without glow (board 2, variant A)
 
-Ask the user: tag **Hoy** (glow) / **A** (no glow) / **B** (only the flame coloured); Vault Points
-progress **ring in the accent** (today) / **ring in the level's colour** / **a line under the
-bar**. Files: `ui/StreakTag.tsx` (+ every place listed in CLAUDE.md's streak line),
-`main-header/main-header-level/MainHeaderLevel.tsx`. Tier thresholds and colours
-(`src/utils/streakTier.ts`) still need the user's approval (roadmap §1).
+`ui/StreakTag.tsx`: drop the outer glow (`0 0 14px …`) and the flame's `drop-shadow`; keep the
+tinted fill and the 1 px inset ring. It is the one piece, so every place that shows a tag follows.
+The streak page's hero is not a tag: leave it unless the user says otherwise. `MainHeaderLevel`
+(the Vault Points ring) stays as it is. Tiers approved: no change to `streakTier.ts`.
+
+## 7. Skeletons, one per screen (roadmap §2)
+
+Decided 2026-10-25: a `Skeleton` piece in `ui/` (radius and surface from the tokens, so *round* and
+*slanted* follow; a **pulse**, off with reduced motion), then **every** `loading.tsx` and component
+skeleton redrawn in the shape of what it replaces, same gutters, no jump when the content arrives.
+No canvas round. Also the places that load **without** a skeleton today (user review c, g below).
+Guard in `uiGuard.test.ts` against a hand-made `animate-pulse` block; specimen in `/design`.
+
+## 8. Entrance animations everywhere (roadmap §3, issue #61)
+
+Approved 2026-10-25, to apply to **every page and component, leaving nothing unanimated** (make an
+inventory of pages and families first and tick it off), the welcome included:
+
+| Family | Motion |
+|---|---|
+| Heroes (game page, group, streak, profile, following) | Fade + rise 12 px; the title first, the facts after |
+| Lists and tables | Rows staggered 40 ms, only the first 12 |
+| Cards and tiles | Fade + scale 0.98 → 1 |
+| Charts and figures | Bars grow, rings fill, big numbers count up |
+| Overlays (modals, menus, search, toasts) | As today |
+| Page transitions | Nothing beyond the thin top line that exists |
+
+Same rules and mechanism as §4 (CSS keyframes, `--i` stagger, `--enter-*` tokens, never hidden until
+a frame or observer, reduced motion a fade at most); build the mechanism once (§4 is its first use).
+
+## 9. Leftovers (roadmap §8), decided 2026-10-25
+
+- `Shelf` and the groups' drag slot become library pieces: **yes**.
+- The welcome curtain's fixed clip-paths: **a documented exception** (decorative, must not follow
+  the shape choice); note it in `uiGuard.test.ts` / `docs/design-system.md`.
+- Round mode on Library, Groups, Following, Account: check it in the browser (see review a).
+- Total hours in Portada's kicker: **no**.
+- Compare the canvas's V6 boards with the built pages and bring the user only the differences.
+- Old `rounded-xl` / `rounded-2xl`: **move them to the tokens** (`rounded-card` / `-pane` / `-tile`).
+
+## 10. The user's review of the site (2026-10-25)
+
+Screenshots were of `localhost:3000` at 2560 px, dark theme, slanted unless said.
+
+- a. **Stats & Activity → Overview, round design:** the stat pills do not fit, and their hover is a
+  circle. Fix the pill and its hover in round.
+- b. **Pinned → "Achievements to get"** (and the showcase): every card the same size, no jumps
+  (a two-line title or description makes one taller today; showcase cards differ too).
+- c. **Home → Following / leaderboard:** no skeleton; users appear one by one as they load.
+- d. **Search:** some games' icons do not load (seen: Assassin's Creed Liberation, Steam, empty tile).
+  Find which source/URL fails and fall back to a placeholder like the rest.
+- e. **Library:** the left list gets a fade at its bottom so it reads as scrollable.
+- f. **The "New group" modal is broken.** Reproduce and fix.
+- g. **Following page:** do not show the Following / Followers lists until everything is loaded
+  (a skeleton until then); today they pop in with jumps.
+- h. Rankings: fine.
+- i. **`/racha` → "Your year":** the framed current streak is cut off at the right edge. Also check
+  that the year really includes **old Steam and PSN history**: the user feels it misses it. Start
+  from CLAUDE.md → Performance rules (`steam_unlocks`: only what the score refresh has read; the
+  live part covers the `maxGames` played last) and how PSN's year feed is built; measure on the
+  user's account before changing anything, and tell the user what is and is not counted.
+- j. **`/user`, preferences tabs:** going from a platform tab (RA) to General, one preference
+  arrives late and jumps. Keep the tab's height or render it with the rest.
+- k. **`/welcome`** follows every one of these style and layout changes (skeletons, animations,
+  fonts, Layout chooser, tint, shapes): check it in each block.
+
+Also seen in the screenshots, not raised by the user: the library shows "Could not load your Xbox
+games" in red (admin account; the open `xboxCall` timeout problem, `docs/xbox-integration-plan.md` §7).
+
+## 11. Release
+
+Option A: everything above ships together as v1.7.0, but **not yet**: the user wants to work on
+more style points first. When it is time: merge `main` into `develop` (PR #37 is missing there),
+then `chore(release): v1.7.0` with the release gates of CLAUDE.md.
