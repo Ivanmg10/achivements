@@ -271,6 +271,20 @@ games" in red (admin account; the open `xboxCall` timeout problem, `docs/xbox-in
   the section shows. To decide with the user on the canvas; recommended: put the platform tabs in the
   Stats & Activity head itself (the same state Classic uses), so both layouts work the same way.
 
+### Portada, decided on the canvas (board 7, 2026-10-25)
+
+- Level card: the ring + **option A "Tu semana"** (the week's points, places gained, a 7-day mini bar
+  chart). B and C were not chosen.
+- The Stats & Activity platform switch: **not** the pill tabs drawn on board 7; use the same
+  selector as the account preferences (`ui/Tabs`, the slanted line tabs of `UserPreferencesCard`),
+  sharing its state with Classic's platform tabs.
+- **"Recently played / Pinned games" must end at the same height as the right column.** If
+  something has to give, it is the right column's "Recent achievements" (show fewer).
+- **Slanted tags everywhere:** the level and streak tags drawn skewed in the top bar (boards 2 and
+  7) are liked; in the slanted design, the top bar's level and streak tags and the page's tags
+  (level badge, streak tag, platform chips) lean with `skew-x-(--slant-pill)` (text counter-skewed).
+  Round design unchanged. Do it in the pieces (`VaultLevelBadge`, `StreakTag`, the chip), not per page.
+
 ## 11. Release
 
 Option A: everything above ships together as v1.7.0, but **not yet**: the user wants to work on
