@@ -130,6 +130,23 @@ games eligible for the 365-day window, all within the live-80 cap, so no older g
 account's score data covered 21 games and 207 unlock entries. Steam still cannot include a game
 outside the live cap until its unlocks have been recorded, and a game last played before the window
 is excluded by design.
+## 2026-10-26 — Design round for the UI polish blocks (canvas, )
+
+**Did** — A design canvas with 11 boards for roadmap §4–§7 and the streak tiers
+(https://claude.ai/artifact/3AdM2avNDWS2A2VshH8Cbd, recorded in ): the tinted style in
+six treatments over the same six games in dark and light, the Layout modal (interactive and phone), the
+three font sets, three landings, three login/register proposals and a streak-tier sandbox with three
+top-bar progress variants. No app code changed.
+**Why** — The user could not say what bothers them about the tinted style, so they asked to see options,
+and asked for the Layout modal, fonts, landing, login/register and streak colours to be drawn first
+().
+**Decisions** — Fonts are proposed as Exo 2 (Tech) and Manrope (Calm) next to Barlow; subsets are from memory
+and must be checked before building. The landings avoid invented numbers and free claims; no Xbox.
+**Open** — The user picks per block; then the plan doc and the build, one branch per block.
+**Watch out** — The canvas uses CSS clip-paths and fixed pixel sizes: it is a spec of look, not of code.
+
+---
+
 ## 2026-10-25 (night, 4) — Roadmap to finish the new look (`feat/65-ui-surfaces`, #65)
 
 **Did** — `docs/ui-polish-roadmap.md`: what is left before the new look is done and can go to `main`
