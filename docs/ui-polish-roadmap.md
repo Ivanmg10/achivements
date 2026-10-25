@@ -1,5 +1,8 @@
 # UI polish — roadmap to 100 %
 
+> **2026-10-25:** the design round for §4–§7 (tint, Layout modal, fonts, landing, login/register,
+> streaks) is done; what was decided and how to build it is in `docs/ui-polish-v2-plan.md`.
+
 Written 2026-10-25, at the end of the component library's third part (`feat/65-ui-surfaces`,
 issues #63–#65). It lists what is left before the new look can be called finished and can go to
 `main`. **The user completes it**: every `YOUR NOTES` line is theirs to fill in; an agent picks

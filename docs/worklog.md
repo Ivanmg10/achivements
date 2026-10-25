@@ -131,6 +131,24 @@ account's score data covered 21 games and 207 unlock entries. Steam still cannot
 outside the live cap until its unlocks have been recorded, and a game last played before the window
 is excluded by design.
 ## 2026-10-26 — Design round for the UI polish blocks (canvas, )
+## 2026-10-25 — UI polish v2: design round and build plan (`docs/ui-polish-v2-plan`)
+
+**Did** — A new design canvas (`docs/designs.md`, "UI polish v2") drawn from the code with real game
+art: tint variants, streak tiers and progress in a top bar replica, Layout chooser (centred modal,
+then three in-page panels), fonts, landing (details, then v2) and login/register details. Wrote
+`docs/ui-polish-v2-plan.md`, the build plan for the next agent. No code changed.
+**Why** — The user rejected the first polish canvas as generic ("no me gusta nada") and wanted
+proposals rooted in the project; they ran out of usage before building.
+**Decisions** — Tint: no border. Landing v2 and the login/register details: agreed. Fonts: Sofia
+Sans and Fira Sans liked as options, which ships is open. Layout: a new concept (blurred page,
+floating full-page preview, side panel), to design first.
+**Open** — Everything in the plan; the streak tag / top bar variant; average vs vivid tint colour.
+**Watch out** — Playwright's browser was held by another session, so no screenshots of the live site
+were taken; the "Hoy" boards are redrawn from the code. PR #66 (`feat/65-ui-surfaces`) was already
+merged into `develop`; its four later docs commits were carried onto this branch.
+
+---
+
 ## 2026-10-26 — Design round for the UI polish blocks (canvas, `feat/65-ui-surfaces`)
 
 **Did** — A design canvas with 11 boards for roadmap §4–§7 and the streak tiers
