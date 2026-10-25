@@ -373,6 +373,7 @@ export const de: Translations = {
     showMore: 'Show more',
     collapse: 'Collapse',
     showAll: 'Alle {n} Kommentare ansehen',
+    showLatest: 'Die neuesten {n} ansehen',
     fold: 'Kommentare einklappen',
     unfold: 'Kommentare ausklappen',
   },

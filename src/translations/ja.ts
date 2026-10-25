@@ -373,6 +373,7 @@ export const ja: Translations = {
     showMore: 'Show more',
     collapse: 'Collapse',
     showAll: 'コメント{n}件をすべて表示',
+    showLatest: '最新の {n} 件を見る',
     fold: 'コメントを折りたたむ',
     unfold: 'コメントを展開',
   },

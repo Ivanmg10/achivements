@@ -374,6 +374,7 @@ export const en = {
     showMore: 'Show more',
     collapse: 'Collapse',
     showAll: 'See all {n} comments',
+    showLatest: 'See the latest {n}',
     fold: 'Fold the comments',
     unfold: 'Unfold the comments',
   },

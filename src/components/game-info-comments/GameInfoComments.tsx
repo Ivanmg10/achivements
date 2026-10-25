@@ -107,7 +107,10 @@ export default function GameInfoComments({ gameId }: { gameId: number }) {
 
             {comments.length > PREVIEW_COUNT && (
               <button type="button" onClick={() => setExpanded((e) => !e)} aria-expanded={expanded} className={buttonClass('secondary', 'md', 'self-start')}>
-                {expanded ? T.gameComments.collapse : T.gameComments.showAll.replace('{n}', String(comments.length))}
+                {expanded
+                  ? T.gameComments.collapse
+                  : // RA sends the newest hundred at most: past that, the button says they are the latest.
+                    (total > comments.length ? T.gameComments.showLatest : T.gameComments.showAll).replace('{n}', String(comments.length))}
               </button>
             )}
           </>

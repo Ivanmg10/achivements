@@ -373,6 +373,7 @@ export const ru: Translations = {
     showMore: 'Show more',
     collapse: 'Collapse',
     showAll: 'Показать все комментарии ({n})',
+    showLatest: 'Показать {n} последних',
     fold: 'Свернуть комментарии',
     unfold: 'Развернуть комментарии',
   },

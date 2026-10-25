@@ -61,6 +61,14 @@ test('only the first few are shown until asked for more, and then folded again',
   expect(screen.getAllByText(/^text \d$/)).toHaveLength(2)
 })
 
+test('with more on RA than it sends, the button says they are the latest', async () => {
+  const many = Array.from({ length: 8 }, (_, i) => comment(i + 1))
+  ;(fetch as jest.Mock).mockResolvedValue(answer({ Results: many, Total: 214 }))
+  render(<GameInfoComments gameId={7} />)
+  await screen.findByText('text 8')
+  expect(screen.getByRole('button', { name: en.gameComments.showLatest.replace('{n}', '8') })).toBeInTheDocument()
+})
+
 test('no "show more" for a short list', async () => {
   render(<GameInfoComments gameId={7} />)
   await screen.findByText('text 1')

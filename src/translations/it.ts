@@ -373,6 +373,7 @@ export const it: Translations = {
     showMore: 'Show more',
     collapse: 'Collapse',
     showAll: 'Vedi tutti i {n} commenti',
+    showLatest: 'Vedi i {n} più recenti',
     fold: 'Comprimi i commenti',
     unfold: 'Espandi i commenti',
   },
