@@ -79,16 +79,14 @@ export default function GroupCoverTile({
         </button>
       </div>
 
-      <Link href={href} title={item.title} className="text-sm font-semibold truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+      {item.console_name && <span className="-mb-1.5 text-[0.6875rem] text-text-secondary truncate">{item.console_name}</span>}
+      <Link href={href} title={item.title} className="text-[0.9375rem] font-bold truncate hover:underline decoration-ink/50 underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
         {item.title}
       </Link>
       {/* No bar under the cover (the user's choice, 2026-10-24): the percentage and what is left. */}
-      <span className="flex items-baseline gap-1.5 min-w-0 text-[11px]">
-        <span className={`tabular-nums font-semibold ${done ? 'text-success' : 'text-text-main'}`}>{pct}%</span>
-        <span className="text-text-secondary truncate">
-          {item.console_name ? `${item.console_name} · ` : ''}
-          {status}
-        </span>
+      <span className="flex items-baseline gap-1 min-w-0 text-xs -mt-1">
+        <span className={`tabular-nums font-extrabold ${done ? 'text-success' : 'text-text-main'}`}>{pct}%</span>
+        <span className="text-text-secondary truncate">· {status}</span>
       </span>
     </li>
   )

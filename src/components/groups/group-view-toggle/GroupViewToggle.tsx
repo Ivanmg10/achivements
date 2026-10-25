@@ -9,7 +9,7 @@ export type GroupView = (typeof GROUP_VIEWS)[number]
 export const GROUP_DETAIL_VIEWS = ['covers', 'list'] as const
 export type GroupDetailView = (typeof GROUP_DETAIL_VIEWS)[number]
 
-export type ViewOption<V extends string> = { value: V; label: string; icon: typeof IconLayoutGrid }
+export type ViewOption<V extends string> = { value: V; label: string; icon?: typeof IconLayoutGrid }
 
 /** A choice among a few ways to see the same games; the current one is pressed. */
 export default function GroupViewToggle<V extends string>({
@@ -27,7 +27,7 @@ export default function GroupViewToggle<V extends string>({
       aria-label={T.groups.viewLabel}
       value={value}
       onChange={onChange}
-      options={options.map((o) => ({ ...o, compact: true }))}
+      options={options.map((o) => ({ ...o, compact: !!o.icon }))}
     />
   )
 }

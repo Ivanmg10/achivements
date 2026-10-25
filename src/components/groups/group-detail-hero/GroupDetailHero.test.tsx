@@ -21,7 +21,7 @@ test('names the group, its progress and how many games are in each state', () =>
   expect(screen.getByRole('heading', { name: 'SNES platformers' })).toBeInTheDocument()
   expect(screen.getByText('The ones left')).toBeInTheDocument()
   expect(screen.getByText('Public')).toBeInTheDocument()
-  expect(screen.getByRole('img', { name: '82%' })).toBeInTheDocument()
+  expect(screen.getByText('82 %')).toBeInTheDocument()
   expect(screen.getByText('5 completed')).toBeInTheDocument()
   expect(screen.getByText('6 in progress')).toBeInTheDocument()
   expect(screen.getByText('1 not started')).toBeInTheDocument()

@@ -21,7 +21,8 @@ test('progress states, the current one pressed', () => {
 
 test('consoles only when there is more than one, each a checkbox', () => {
   const h = setup([item({ id: 1, console_name: 'SNES' }), item({ id: 2, console_name: 'Mega Drive' })], filters({ consoles: new Set(['SNES']) }))
-  expect(screen.getByText(/Console: SNES/)).toBeInTheDocument()
+  expect(screen.getByText('Console', { selector: 'summary span' })).toBeInTheDocument()
+  expect(screen.getByText('SNES', { selector: 'summary span' })).toBeInTheDocument()
   expect(screen.getByRole('checkbox', { name: 'SNES' })).toBeChecked()
   fireEvent.click(screen.getByRole('checkbox', { name: 'Mega Drive' }))
   expect(h.onToggleConsole).toHaveBeenCalledWith('Mega Drive')

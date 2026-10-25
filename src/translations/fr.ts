@@ -1074,6 +1074,7 @@ export const fr: Translations = {
     leftCount: 'Plus que {n}',
     finished: 'Terminé',
     decadeAll: 'Décennie : toutes',
+    allShort: 'Toutes',
     addTo: 'À « {group} »',
     suggestions: 'Suggestions',
     suggestionsHint: 'Ce que vous jouez et voulez jouer',

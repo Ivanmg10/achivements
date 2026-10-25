@@ -5,17 +5,15 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { GameGroup } from '@/types/types'
 import type { Counts } from '@/utils/groupItems'
 import { plural } from '@/utils/utils'
-import { CircularProgress } from '@/components/ui/CircularProgress'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
 import Button from '@/components/ui/Button'
-
-const ACTION = 'flex items-center justify-center w-10 h-10 rounded-control ring-1 ring-inset ring-white/15 bg-black/30 text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2'
+import IconButton from '@/components/ui/IconButton'
 
 /**
- * The top of a group's page: its games' covers as a faded banner, a ring with
- * how far along the whole group is, its name, privacy and description, how
- * many games are finished, started and not started, and what can be done to
- * it (add games, edit, delete).
+ * The top of a group's page: its games' covers as a faded banner, how far
+ * along the whole group is in big, its privacy and size above its name, its
+ * description, how many games are started, finished and not started, and what
+ * can be done to it (add games, edit, delete).
  */
 export default function GroupDetailHero({
   group,
@@ -65,16 +63,9 @@ export default function GroupDetailHero({
 
         <div className="flex flex-col md:flex-row md:items-end gap-5 md:gap-7">
           {summary.total > 0 ? (
-            <div className="self-start md:self-auto shrink-0">
-              <CircularProgress
-                earned={summary.earned}
-                total={summary.total}
-                size={120}
-                strokeWidth={10}
-                ariaLabel={`${pct}%`}
-                center={<span className={`font-display italic font-extrabold text-4xl pr-1 ${pct >= 100 ? 'text-success' : 'text-text-main'}`}>{pct}%</span>}
-              />
-            </div>
+            <p className={`shrink-0 font-display italic font-extrabold text-5xl sm:text-[4rem] leading-none tabular-nums pr-2 ${pct >= 100 ? 'text-success' : 'text-text-main'}`}>
+              {pct} %
+            </p>
           ) : (
             <div className="w-20 h-20 rounded-control bg-bg-main ring-1 ring-ink/5 flex items-center justify-center shrink-0 overflow-hidden">
               <GroupIconDisplay icon={group.icon} />
@@ -82,28 +73,28 @@ export default function GroupDetailHero({
           )}
 
           <div className="flex flex-col gap-2 flex-1 min-w-0">
+            <p className="flex items-center gap-2 flex-wrap text-[0.8125rem] text-text-main">
+              <span className="inline-flex items-center gap-1 h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold bg-black/45">
+                <Privacy className="w-3 h-3" aria-hidden="true" />
+                {group.is_public ? T.groups.public : T.groups.private}
+              </span>
+              {plural(gameCount, T.plurals.games, lang)}
+              {summary.total > 0 && ` · ${T.groups.summary.replace('{earned}', String(summary.earned)).replace('{total}', String(summary.total))}`}
+            </p>
             <div className="flex items-center gap-2 flex-wrap">
               {summary.total > 0 && group.icon && (
                 <span className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center shrink-0 [&>span]:text-2xl [&>img]:w-full [&>img]:h-full">
                   <GroupIconDisplay icon={group.icon} />
                 </span>
               )}
-              <h1 className="font-display italic font-extrabold text-5xl sm:text-7xl leading-[0.95] pr-2 text-text-main break-words">{group.title}</h1>
-              <span className="inline-flex items-center gap-1 h-6 px-2 rounded-chip text-xs font-bold bg-black/40 text-text-main">
-                <Privacy className="w-3 h-3" aria-hidden="true" />
-                {group.is_public ? T.groups.public : T.groups.private}
-              </span>
+              <h1 className="font-display italic font-extrabold text-5xl sm:text-[4.5rem] leading-[0.95] pr-2 text-text-main break-words">{group.title}</h1>
             </div>
             {group.description && <p className="text-sm text-text-main/80">{group.description}</p>}
-            <p className="text-sm text-text-secondary">
-              {plural(gameCount, T.plurals.games, lang)}
-              {summary.total > 0 && ` · ${T.groups.summary.replace('{earned}', String(summary.earned)).replace('{total}', String(summary.total))}`}
-            </p>
             {gameCount > 0 && (
-              <ul className="flex flex-wrap gap-2 mt-1 text-xs font-bold">
-                <li className="h-6 inline-flex items-center px-2.5 rounded-chip bg-success/15 text-success">{T.groups.completedCount.replace('{n}', String(states.done))}</li>
-                <li className="h-6 inline-flex items-center px-2.5 rounded-chip bg-info/15 text-info">{T.groups.startedCount.replace('{n}', String(states.started))}</li>
-                <li className="h-6 inline-flex items-center px-2.5 rounded-chip bg-black/35 text-text-secondary">{T.groups.notStartedCount.replace('{n}', String(states.notStarted))}</li>
+              <ul className="flex flex-wrap gap-1.5 text-xs font-bold">
+                <li className="h-[1.375rem] inline-flex items-center px-2 rounded-[0.375rem] bg-info/15 text-info">{T.groups.startedCount.replace('{n}', String(states.started))}</li>
+                <li className="h-[1.375rem] inline-flex items-center px-2 rounded-[0.375rem] bg-success/15 text-success">{T.groups.completedCount.replace('{n}', String(states.done))}</li>
+                <li className="h-[1.375rem] inline-flex items-center px-2 rounded-[0.375rem] bg-black/40 text-text-secondary">{T.groups.notStartedCount.replace('{n}', String(states.notStarted))}</li>
               </ul>
             )}
           </div>
@@ -116,12 +107,12 @@ export default function GroupDetailHero({
               <IconPlus className="w-4 h-4" aria-hidden="true" />
               {T.groups.addGames}
             </Button>
-            <button type="button" onClick={onEdit} aria-label={T.groups.editGroup} className={`${ACTION} hover:text-text-main focus-visible:ring-accent/70`}>
+            <IconButton size="lg" onClick={onEdit} aria-label={T.groups.editGroup}>
               <IconEdit className="w-4 h-4" aria-hidden="true" />
-            </button>
-            <button type="button" onClick={onDelete} aria-label={T.groups.deleteGroup} className={`${ACTION} hover:bg-danger/10 hover:text-danger focus-visible:ring-danger/70`}>
+            </IconButton>
+            <IconButton size="lg" tone="danger" onClick={onDelete} aria-label={T.groups.deleteGroup}>
               <IconTrash className="w-4 h-4" aria-hidden="true" />
-            </button>
+            </IconButton>
           </div>
         </div>
       </div>

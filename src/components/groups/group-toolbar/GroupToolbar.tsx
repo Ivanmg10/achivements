@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { IconChevronDown, IconLayoutGrid, IconList } from '@tabler/icons-react'
+import { IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { GameGroupItem } from '@/types/types'
 import { DECADES, type DecadeFilter, type GroupFilters as Filters, type PctFilter } from '@/utils/groupItems'
@@ -48,9 +48,9 @@ export default function GroupToolbar({
 
   const states: { value: PctFilter; label: string; count?: number }[] = [
     { value: 'all', label: T.groups.filterAll, count: items.length },
-    { value: '0', label: T.groups.filter0, count: counts?.notStarted },
     { value: 'progress', label: T.groups.filterProgress, count: counts?.started },
     { value: '100', label: T.groups.filter100, count: counts?.done },
+    { value: '0', label: T.groups.filter0, count: counts?.notStarted },
   ]
 
   return (
@@ -75,7 +75,8 @@ export default function GroupToolbar({
       {consoles.length > 1 && (
         <details className="relative">
           <summary className={`${MENU} list-none [&::-webkit-details-marker]:hidden`}>
-            {T.groups.filterConsoleLabel}: {picked === 0 ? T.groups.allConsoles : picked === 1 ? [...filters.consoles][0] : T.groups.consolesPicked.replace('{n}', String(picked))}
+            <span className="font-medium text-text-secondary">{T.groups.filterConsoleLabel}</span>
+            <span className="font-bold">{picked === 0 ? T.groups.allShort : picked === 1 ? [...filters.consoles][0] : T.groups.consolesPicked.replace('{n}', String(picked))}</span>
             <IconChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
           </summary>
           <fieldset className={`absolute z-20 mt-2 min-w-56 max-h-72 overflow-auto flex flex-col gap-0.5 ${MENU_SURFACE}`}>
@@ -99,14 +100,14 @@ export default function GroupToolbar({
 
       {hasYears && (
         <>
-          <label htmlFor="group-decade" className="sr-only">{T.groups.filterDecadeLabel}</label>
           <Select<DecadeFilter>
-            id="group-decade"
+            aria-label={T.groups.filterDecadeLabel}
+            prefix={T.groups.filterDecadeLabel}
             size="sm"
             value={filters.decade}
             onChange={onDecade}
             options={[
-              { value: 'all', label: T.groups.decadeAll },
+              { value: 'all', label: T.groups.allShort },
               ...DECADES.map((d) => ({ value: d as DecadeFilter, label: `${d.slice(0, 2)}'s` })),
             ]}
           />
@@ -118,8 +119,8 @@ export default function GroupToolbar({
           value={view}
           onChange={onView}
           options={[
-            { value: 'covers', label: T.groups.viewCovers, icon: IconLayoutGrid },
-            { value: 'list', label: T.groups.viewList, icon: IconList },
+            { value: 'covers', label: T.groups.viewCovers },
+            { value: 'list', label: T.groups.viewList },
           ]}
         />
       </div>

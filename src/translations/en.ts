@@ -1075,6 +1075,7 @@ export const en = {
     leftCount: '{n} left',
     finished: 'Finished',
     decadeAll: 'Decade: all',
+    allShort: 'All',
     addTo: 'Add to “{group}”',
     suggestions: 'Suggestions',
     suggestionsHint: 'What you are playing and want to play',

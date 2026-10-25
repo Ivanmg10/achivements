@@ -120,7 +120,7 @@ export default function GroupDetailPage() {
                 </button>
               </div>
             ) : view === 'covers' ? (
-              <GroupCoverGrid items={filtered} progress={progress} draggable={!filtersActive} onRemove={removeGame} onReorder={reorder} />
+              <GroupCoverGrid items={filtered} progress={progress} draggable={!filtersActive} onRemove={removeGame} onReorder={reorder} onAdd={() => setAddGameOpen(true)} />
             ) : (
               <GroupGameGrid
                 items={filtered}

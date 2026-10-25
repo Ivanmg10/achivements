@@ -1074,6 +1074,7 @@ export const ja: Translations = {
     leftCount: '残り {n}',
     finished: '完了',
     decadeAll: '年代: すべて',
+    allShort: 'すべて',
     addTo: '「{group}」に追加',
     suggestions: 'おすすめ',
     suggestionsHint: 'プレイ中・プレイしたいゲーム',

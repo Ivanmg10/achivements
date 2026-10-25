@@ -1074,6 +1074,7 @@ export const ru: Translations = {
     leftCount: 'Осталось {n}',
     finished: 'Пройдено',
     decadeAll: 'Десятилетие: все',
+    allShort: 'Все',
     addTo: 'В «{group}»',
     suggestions: 'Предложения',
     suggestionsHint: 'Во что вы играете и хотите сыграть',
