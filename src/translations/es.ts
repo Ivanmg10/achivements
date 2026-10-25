@@ -1802,6 +1802,12 @@ export const es: Translations = {
     },
   },
   homeLayout: {
+    cardsLabel: 'Tarjetas de juego',
+    cardsTinted: 'Con color',
+    cardsFlat: 'Planas',
+    cardsTintedHint: 'Cada juego toma el color de su portada.',
+    cardsFlatHint: 'Tarjetas lisas, como los logros recientes.',
+    modalHint: 'Cómo se ve el inicio y cómo se dibujan sus tarjetas de juego.',
     nextEasiest: 'Siguiente más fácil:',
     ownedBy: 'lo tiene el {pct}',
     todayNone: 'Hoy aún no has conseguido ninguno: te quedan {h} h para mantenerla.',

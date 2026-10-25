@@ -1803,6 +1803,12 @@ export const en = {
     },
   },
   homeLayout: {
+    cardsLabel: 'Game cards',
+    cardsTinted: 'Colourful',
+    cardsFlat: 'Flat',
+    cardsTintedHint: 'Each game takes its colour from its art.',
+    cardsFlatHint: 'Plain cards, like the recent achievements.',
+    modalHint: 'How the home looks and how its game cards are drawn.',
     nextEasiest: 'Next easiest:',
     ownedBy: '{pct} of players have it',
     todayNone: 'Nothing yet today: {h} h left to keep it going.',

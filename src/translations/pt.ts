@@ -1802,6 +1802,12 @@ export const pt: Translations = {
     },
   },
   homeLayout: {
+    cardsLabel: 'Cartões de jogo',
+    cardsTinted: 'Com cor',
+    cardsFlat: 'Lisos',
+    cardsTintedHint: 'Cada jogo toma a cor da sua capa.',
+    cardsFlatHint: 'Cartões lisos, como as conquistas recentes.',
+    modalHint: 'Como fica o início e como são desenhados os cartões de jogo.',
     nextEasiest: 'O próximo mais fácil:',
     ownedBy: '{pct} dos jogadores têm',
     todayNone: 'Nada ainda hoje: faltam {h} h para mantê-la.',

@@ -20,6 +20,7 @@ import MainHeaderLevel from './main-header-level/MainHeaderLevel'
 import { plural } from '@/utils/utils'
 import { canUseXbox } from '@/utils/xboxAccess'
 import Button from '@/components/ui/Button'
+import StreakTag from '@/components/ui/StreakTag'
 
 function NavLink({ href, label, active }: { href: string; label: string; active: boolean }) {
   return (
@@ -43,9 +44,9 @@ function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
     <Link
       href="/racha"
       aria-label={`${T.streak.title}: ${plural(streak, T.plurals.days, lang)}`}
-      className={`inline-flex items-center h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold whitespace-nowrap shrink-0 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${glass ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-ink/[0.06] hover:bg-ink/10'} ${streak > 0 ? 'text-text-main' : 'text-text-secondary'}`}
+      className={`rounded-[0.375rem] transition-[filter] hover:brightness-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${glass ? 'backdrop-blur-sm' : ''}`}
     >
-      <span aria-hidden="true">{plural(streak, T.plurals.days, lang)}</span>
+      <StreakTag days={streak} text={T.rankings.daysShort.replace('{n}', streak.toLocaleString(lang))} />
     </Link>
   )
 }

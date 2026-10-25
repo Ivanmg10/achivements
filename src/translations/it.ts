@@ -1802,6 +1802,12 @@ export const it: Translations = {
     },
   },
   homeLayout: {
+    cardsLabel: 'Schede di gioco',
+    cardsTinted: 'A colori',
+    cardsFlat: 'Piatte',
+    cardsTintedHint: 'Ogni gioco prende il colore della sua copertina.',
+    cardsFlatHint: 'Schede semplici, come gli ultimi obiettivi.',
+    modalHint: 'L\'aspetto della home e delle schede di gioco.',
     nextEasiest: 'Il prossimo più facile:',
     ownedBy: 'ce l\'ha il {pct}',
     todayNone: 'Ancora niente oggi: restano {h} h per mantenerla.',

@@ -6,12 +6,13 @@ import type { GameGroup } from '@/types/types'
 import type { Counts } from '@/utils/groupItems'
 import { plural } from '@/utils/utils'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
+import { CircularProgress } from '@/components/ui/CircularProgress'
 import Button from '@/components/ui/Button'
 import IconButton from '@/components/ui/IconButton'
 
 /**
- * The top of a group's page: its games' covers as a faded banner, how far
- * along the whole group is in big, its privacy and size above its name, its
+ * The top of a group's page: its games' covers as a faded banner, a ring with
+ * how far along the whole group is, its privacy and size above its name, its
  * description, how many games are started, finished and not started, and what
  * can be done to it (add games, edit, delete).
  */
@@ -63,9 +64,16 @@ export default function GroupDetailHero({
 
         <div className="flex flex-col md:flex-row md:items-end gap-5 md:gap-7">
           {summary.total > 0 ? (
-            <p className={`shrink-0 font-display italic font-extrabold text-5xl sm:text-[4rem] leading-none tabular-nums pr-2 ${pct >= 100 ? 'text-success' : 'text-text-main'}`}>
-              {pct} %
-            </p>
+            <div className="self-start md:self-auto shrink-0">
+              <CircularProgress
+                earned={summary.earned}
+                total={summary.total}
+                size={128}
+                strokeWidth={10}
+                ariaLabel={`${pct}%`}
+                center={<span className={`font-display italic font-extrabold text-[2.5rem] pr-1 ${pct >= 100 ? 'text-success' : 'text-text-main'}`}>{pct}%</span>}
+              />
+            </div>
           ) : (
             <div className="w-20 h-20 rounded-control bg-bg-main ring-1 ring-ink/5 flex items-center justify-center shrink-0 overflow-hidden">
               <GroupIconDisplay icon={group.icon} />

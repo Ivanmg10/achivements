@@ -1802,6 +1802,12 @@ export const ja: Translations = {
     },
   },
   homeLayout: {
+    cardsLabel: 'ゲームカード',
+    cardsTinted: 'カラー',
+    cardsFlat: 'フラット',
+    cardsTintedHint: '各ゲームがアートの色を使います。',
+    cardsFlatHint: '最近の実績と同じ、無地のカードです。',
+    modalHint: 'ホームの見た目とゲームカードの描き方。',
     nextEasiest: '次に簡単なのは:',
     ownedBy: '{pct} のプレイヤーが獲得',
     todayNone: '今日はまだありません。続けるにはあと {h} 時間。',

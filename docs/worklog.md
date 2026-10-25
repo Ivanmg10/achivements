@@ -29,6 +29,30 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-25 (later) — The user's review round 2 (`feat/65-ui-surfaces`, #65)
+
+**Did** — (1) The group hero is a ring again (`CircularProgress`, already in `ui/`) with the
+percentage in the display face. (2) Following's hero has its old structure back (icon, title and
+line top left; the count in big with faces and "online now" at the bottom); its rankings card is a
+real podium (gold ring, slanted steps, display-face places). (3) More air under Rankings' title.
+(4) `/rankings/how`: a hero, eight numbered cards (`RankingsGuideBlock` takes `index`), rules as
+marked cards, tables with slanted bars (`weights`). (5) `ui/StreakTag`: flame and days, lit with a
+glow while a streak is going, dimmed with an outline flame at 0; it is the header's streak badge.
+(6) The home layout moved into a modal (`HomeLayoutModal`, opened by one row in Preferences →
+General, which shows "Classic · Colourful"); the welcome keeps the cards inline. (7) New synced
+preference `game-card-style` (`useGameCardStyle`: `tinted` default / `flat`); `GameCardBackdrop`
+draws a plain surface and a hairline when flat and then reads no colour from the art. It applies to
+every game card (home, pinned, groups, library rows, now playing), not only the home's.
+**Decisions** — The card style is global rather than per page, so the site does not mix two looks.
+The rounded-vs-slanted style the user wants next is the same kind of switch: put it beside
+`game-card-style` and read it from the tokens (`--slant-*`), not from each component.
+**Open** — Discuss with the user: a design-system home for the components (canvas + `docs/designs.md`
++ a living catalogue page), and how future agents get the rules.
+**Watch out** — Choosing a card style by writing `game-card-style` in localStorage by hand syncs to
+the account; the values are `tinted` and `flat`.
+
+---
+
 ## 2026-10-25 — Every page checked again against the final boards (`feat/65-ui-surfaces`, #65)
 
 **Did** — The user said half of the boards were not on the site. Each page was compared in the

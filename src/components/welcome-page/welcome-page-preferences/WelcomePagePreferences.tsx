@@ -15,6 +15,7 @@ import WelcomePageStep from '@/components/welcome-page/welcome-page-step/Welcome
 import { PRIMARY_BUTTON, QUIET_BUTTON, SECONDARY_BUTTON, SECTION_LABEL } from '@/components/welcome-page/welcomeArt'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
 import Select from '@/components/ui/Select'
+import UserGameCardPreference from '@/components/user-page/user-game-card-preference/UserGameCardPreference'
 import UserHomeLayoutPreference from '@/components/user-page/user-home-layout-preference/UserHomeLayoutPreference'
 
 const ThemeModal = dynamic(() => import('@/components/theme-modal/ThemeModal'), { loading: () => null })
@@ -117,8 +118,9 @@ export default function WelcomePagePreferences({
           <span id="welcome-language-hint" className="text-[0.8125rem] text-text-secondary">{fromBrowser ? t.detected : t.chosen}</span>
         </div>
 
-        <div className="max-w-md">
+        <div className="max-w-md flex flex-col gap-5">
           <UserHomeLayoutPreference />
+          <UserGameCardPreference />
         </div>
 
         <div className="flex flex-col gap-2">

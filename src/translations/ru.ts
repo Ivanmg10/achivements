@@ -1802,6 +1802,12 @@ export const ru: Translations = {
     },
   },
   homeLayout: {
+    cardsLabel: 'Карточки игр',
+    cardsTinted: 'Цветные',
+    cardsFlat: 'Плоские',
+    cardsTintedHint: 'Каждая игра берёт цвет своей обложки.',
+    cardsFlatHint: 'Однотонные карточки, как недавние достижения.',
+    modalHint: 'Как выглядит главная и как рисуются карточки игр.',
     nextEasiest: 'Следующее по лёгкости:',
     ownedBy: 'есть у {pct} игроков',
     todayNone: 'Сегодня пока ничего: осталось {h} ч, чтобы её сохранить.',

@@ -61,7 +61,7 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
     <MotionConfig reducedMotion="user">
       <div className="flex flex-col items-center pt-6 pb-10 px-4 sm:px-8">
         <div className="w-full flex flex-col gap-[1.125rem]">
-          <header className="flex flex-col gap-1.5">
+          <header className="flex flex-col gap-3">
             <h1 className="flex items-center gap-2.5 font-display italic font-extrabold text-5xl sm:text-[4.5rem] leading-[0.88] pr-1">
               {T.rankings.title}
               <span className="not-italic font-sans inline-flex items-center h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold bg-accent/15 text-accent">{T.rankings.beta}</span>

@@ -1802,6 +1802,12 @@ export const fr: Translations = {
     },
   },
   homeLayout: {
+    cardsLabel: 'Cartes de jeu',
+    cardsTinted: 'En couleur',
+    cardsFlat: 'Unies',
+    cardsTintedHint: 'Chaque jeu prend la couleur de sa jaquette.',
+    cardsFlatHint: 'Cartes unies, comme les derniers succès.',
+    modalHint: 'L\'aspect de l\'accueil et des cartes de jeu.',
     nextEasiest: 'Le prochain plus facile :',
     ownedBy: '{pct} des joueurs l\'ont',
     todayNone: 'Rien encore aujourd\'hui : il reste {h} h pour la garder.',

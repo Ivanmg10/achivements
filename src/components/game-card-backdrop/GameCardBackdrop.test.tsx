@@ -19,3 +19,12 @@ test('sits on the card surface it is given', () => {
   const { container } = render(<GameCardBackdrop src={null} surface="card" />)
   expect((container.firstChild as HTMLElement).style.background).toContain('--bg-card')
 })
+
+test('flat: the plain surface and a hairline, with no colour of the game in it', () => {
+  localStorage.setItem('game-card-style', 'flat')
+  const { container } = render(<GameCardBackdrop src="https://example.com/a.png" />)
+  const layer = container.firstChild as HTMLElement
+  expect(layer.style.background).not.toContain('gradient')
+  expect(layer.style.boxShadow).toContain('--ink')
+  localStorage.clear()
+})

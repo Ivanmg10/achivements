@@ -1802,6 +1802,12 @@ export const de: Translations = {
     },
   },
   homeLayout: {
+    cardsLabel: 'Spielkarten',
+    cardsTinted: 'Farbig',
+    cardsFlat: 'Schlicht',
+    cardsTintedHint: 'Jedes Spiel übernimmt die Farbe seines Bildes.',
+    cardsFlatHint: 'Einfarbige Karten, wie die letzten Erfolge.',
+    modalHint: 'Wie die Startseite aussieht und wie ihre Spielkarten gezeichnet sind.',
     nextEasiest: 'Als Nächstes am leichtesten:',
     ownedBy: '{pct} haben es',
     todayNone: 'Heute noch nichts: noch {h} Std., um sie zu halten.',

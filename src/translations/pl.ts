@@ -1802,6 +1802,12 @@ export const pl: Translations = {
     },
   },
   homeLayout: {
+    cardsLabel: 'Karty gier',
+    cardsTinted: 'Kolorowe',
+    cardsFlat: 'Płaskie',
+    cardsTintedHint: 'Każda gra bierze kolor ze swojej okładki.',
+    cardsFlatHint: 'Jednolite karty, jak ostatnie osiągnięcia.',
+    modalHint: 'Jak wygląda ekran główny i jak rysowane są karty gier.',
     nextEasiest: 'Następne najłatwiejsze:',
     ownedBy: 'ma je {pct} graczy',
     todayNone: 'Dziś jeszcze nic: zostało {h} h, by ją utrzymać.',
