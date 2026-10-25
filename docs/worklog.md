@@ -130,6 +130,18 @@ games eligible for the 365-day window, all within the live-80 cap, so no older g
 account's score data covered 21 games and 207 unlock entries. Steam still cannot include a game
 outside the live cap until its unlocks have been recorded, and a game last played before the window
 is excluded by design.
+## 2026-10-25 (night, 4) — Roadmap to finish the new look (`feat/65-ui-surfaces`, #65)
+
+**Did** — `docs/ui-polish-roadmap.md`: what is left before the new look is done and can go to `main`
+(the user's own review, skeletons, entrance animations #61, fonts and the Layout modal, the tinted card
+style, leftovers, shipping) with `YOUR NOTES` slots for the user to complete. Listed in `docs/README.md`.
+Also two lint warnings fixed (`MainPageRarest` memo deps, an unused import).
+**Why** — The user is near the weekly budget and wants the context kept for when they return; entrance
+animations (#61) were added to the pending work.
+**Decisions** — The library's three parts go to `develop` as one PR (the branches were stacked and never
+had PRs); `develop` → `main` waits until the pending blocks are done.
+**Open** — Everything in the roadmap; the PR into `develop` must be opened and checked on the preview.
+**Watch out** — `origin/main` has a commit `develop` lacks (PR #37): merge `main` into `develop` before the release.
 
 ---
 
