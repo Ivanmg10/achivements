@@ -31,6 +31,26 @@ v1.7.0 release (roadmap §9).
 | Leftovers | §9: all yes, except no total hours in Portada's kicker | — |
 | Release | **Option A** (all the polish in v1.7.0), and **not to `main` yet**: the user wants more style work first | — |
 
+## When the user says "empieza"
+
+That is the go-ahead for this whole plan: take the first open issue below, cut its branch from
+`develop` (`<type>/<issue>-<slug>`), build, test (`npm test`, lint, `tsc`, build), worklog, commit
+(never push: the user pushes), then the next. Issues created 2026-10-25:
+
+| Issue | Block |
+|---|---|
+| #67 | This plan (branch `docs/67-ui-polish-v2-plan`) |
+| #68 | Quick wins: tint without border, top-bar streak glow, `latin-ext` (§1, §2, §12) |
+| #69 | The user's review bugs (§10 a, b, d, e, f, i, j) |
+| #70 | A skeleton for every screen (§7, §10 c, g) |
+| #61 | Entrance animations everywhere (§8), the mechanism first |
+| #71 | Landing v2 (§4) |
+| #72 | Login and register details (§3) |
+| #73 | Leftovers (§9) |
+| #74 | Portada (§13) |
+| #75 | Layout chooser with live preview + fonts (§5, §2, §12), design round first |
+| #76 | A more vivid tint (§12), canvas test first |
+
 ## Order
 
 1. Quick wins: tint without border (§1), streak tag without glow (§6), `latin-ext` (§2).
