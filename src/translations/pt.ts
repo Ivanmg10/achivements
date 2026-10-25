@@ -1530,6 +1530,8 @@ export const pt: Translations = {
     close: 'Fechar',
   },
   rankings: {
+    bestShort: 'melhor {n} d',
+    daysShort: '{n} d',
     title: 'Rankings',
     beta: 'Beta',
     intro: 'Pontos Vault: todas as plataformas valem o mesmo, e as conquistas mais raras valem mais.',

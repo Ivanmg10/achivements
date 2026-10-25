@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { MotionConfig, motion } from 'framer-motion'
-import { IconInfoCircle, IconTrophy, IconUsers } from '@tabler/icons-react'
+import { IconTrophy, IconUsers } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRankings, ZONE_MAX, type RankingsView } from '@/hooks/useRankings'
 import { useVaultMe } from '@/hooks/useVaultMe'
@@ -59,30 +59,25 @@ export default function RankingsPage({ signedIn }: { signedIn: boolean }) {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="flex flex-col items-center py-6 px-4">
-        <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
-          <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 flex items-center gap-2.5">
-                <IconTrophy size={26} className="text-accent" aria-hidden="true" />
-                {T.rankings.title}
-                <span className="text-[10px] uppercase tracking-wider font-bold bg-accent/15 text-accent px-2 py-0.5 rounded-full">{T.rankings.beta}</span>
-              </h1>
-              <p className="text-sm text-text-secondary">{T.rankings.intro}</p>
-            </div>
-            <Link
-              href="/rankings/how"
-              className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-bg-card text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-            >
-              <IconInfoCircle size={14} aria-hidden="true" />
-              {T.rankings.how}
-            </Link>
+      <div className="flex flex-col items-center pt-6 pb-10 px-4 sm:px-8">
+        <div className="w-full flex flex-col gap-[1.125rem]">
+          <header className="flex flex-col gap-1.5">
+            <h1 className="flex items-center gap-2.5 font-display italic font-extrabold text-5xl sm:text-[4.5rem] leading-[0.88] pr-1">
+              {T.rankings.title}
+              <span className="not-italic font-sans inline-flex items-center h-[1.375rem] px-2 rounded-[0.375rem] text-xs font-bold bg-accent/15 text-accent">{T.rankings.beta}</span>
+            </h1>
+            <p className="text-sm sm:text-[0.9375rem] text-text-secondary">
+              {T.rankings.intro}{' '}
+              <Link href="/rankings/how" className="font-bold text-accent hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+                {T.rankings.how}
+              </Link>
+            </p>
           </header>
 
           <RankingsPageToolbar view={view} onChange={setView} signedIn={signedIn} xbox={xbox} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-4 items-start">
-            <div className="flex flex-col gap-4 min-w-0">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start">
+            <div className="flex flex-col gap-[1.125rem] min-w-0">
               {isLoading ? (
                 <RankingsPageSkeleton podium={view.scope === 'global'} />
               ) : error ? (

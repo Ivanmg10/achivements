@@ -1531,6 +1531,8 @@ export const en = {
     close: 'Close',
   },
   rankings: {
+    bestShort: 'best {n} d',
+    daysShort: '{n} d',
     title: 'Rankings',
     beta: 'Beta',
     intro: 'Vault Points: every platform is worth the same, and rarer achievements are worth more.',

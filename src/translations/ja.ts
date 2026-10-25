@@ -1530,6 +1530,8 @@ export const ja: Translations = {
     close: '閉じる',
   },
   rankings: {
+    bestShort: '最長{n}日',
+    daysShort: '{n}日',
     title: 'ランキング',
     beta: 'ベータ',
     intro: 'Vaultポイント：どのプラットフォームも同じ価値で、レアな実績ほど高く評価されます。',

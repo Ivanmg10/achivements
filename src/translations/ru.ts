@@ -1530,6 +1530,8 @@ export const ru: Translations = {
     close: 'Закрыть',
   },
   rankings: {
+    bestShort: 'рекорд {n} д',
+    daysShort: '{n} д',
     title: 'Рейтинги',
     beta: 'Бета',
     intro: 'Очки Vault: все платформы стоят одинаково, а более редкие достижения ценятся выше.',

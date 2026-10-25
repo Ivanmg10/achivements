@@ -20,10 +20,14 @@ export default function VaultPlatformSplit({ split, className = '' }: { split: P
     <span
       role="img"
       aria-label={parts.map((p) => `${NAMES[p.s]} ${pct(p.v)} %`).join(', ') || '0'}
-      className={`flex h-2 rounded-full overflow-hidden bg-ink/10 ${className}`}
+      className={`flex h-2 gap-0.5 ${parts.length === 0 ? 'bg-ink/10' : ''} ${className}`}
     >
       {parts.map((p) => (
-        <span key={p.s} className={`h-full ${PLATFORM_FILL[p.s]}`} style={{ width: `${(p.v / total) * 100}%` }} />
+        <span
+          key={p.s}
+          className={`h-full ${PLATFORM_FILL[p.s]}`}
+          style={{ width: `${(p.v / total) * 100}%`, clipPath: 'polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%)' }}
+        />
       ))}
     </span>
   )

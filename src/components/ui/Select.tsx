@@ -24,6 +24,8 @@ type Props<V extends string> = {
   disabled?: boolean
   /** `button`: drawn as a secondary button (a sort order beside a toolbar's tabs) instead of a field. */
   look?: 'field' | 'button'
+  /** A quiet label inside, before the value ("Period  All time"); the accessible name stays `aria-label`. */
+  prefix?: string
   /** Layout only, on the wrapper. */
   className?: string
 }
@@ -42,6 +44,7 @@ export default function Select<V extends string>({
   size = 'md',
   disabled,
   look = 'field',
+  prefix,
   className = '',
   ...aria
 }: Props<V>) {
@@ -139,7 +142,8 @@ export default function Select<V extends string>({
         {...aria}
       >
         {selected?.icon && <span aria-hidden="true" className="shrink-0">{selected.icon}</span>}
-        <span className="truncate">{selected?.label}</span>
+        {prefix && <span aria-hidden="true" className="shrink-0 font-medium text-text-secondary">{prefix}</span>}
+        <span className={`truncate ${prefix ? 'font-bold' : ''}`}>{selected?.label}</span>
         <IconChevronDown
           size={16}
           aria-hidden="true"

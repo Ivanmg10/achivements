@@ -1,12 +1,12 @@
 'use client'
 
-import { IconCrown, IconFlame, IconFlameFilled } from '@tabler/icons-react'
+import { IconFlame, IconFlameFilled } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
 /**
- * A row's streaks: the current one in a pill (lit while it runs, dimmed at 0) and the longest
- * beside it with a crown, gold while the current one is the record. Read aloud as one sentence;
- * what is lit is also said in numbers, not by colour alone.
+ * A row's streaks: the current one in the accent (dimmed at 0) and the longest under it, in the
+ * accent too while the current one is the record. Read aloud as one sentence; what is lit is also
+ * said in numbers, not by colour alone.
  */
 export default function RankingsPageStreak({ streak, best, className = '' }: { streak: number; best: number; className?: string }) {
   const { T, lang } = useLanguage()
@@ -17,21 +17,15 @@ export default function RankingsPageStreak({ streak, best, className = '' }: { s
   const Flame = lit ? IconFlameFilled : IconFlame
 
   return (
-    <span title={label} className={`inline-flex items-center gap-2 tabular-nums whitespace-nowrap ${className}`}>
+    <span title={label} className={`inline-flex flex-col items-center gap-0.5 tabular-nums whitespace-nowrap ${className}`}>
       <span className="sr-only">{label}</span>
-      <span
-        aria-hidden="true"
-        className={`inline-flex items-center gap-1 h-6 pl-1.5 pr-2 rounded-full text-xs font-extrabold ${
-          lit ? 'bg-accent/15 text-accent ring-1 ring-accent/30' : 'bg-ink/[0.05] text-text-secondary'
-        }`}
-      >
-        <Flame size={13} className={lit ? 'text-accent' : ''} />
-        {n(streak)}d
+      <span aria-hidden="true" className={`inline-flex items-center gap-1 font-extrabold ${lit ? 'text-accent' : 'text-text-secondary'}`}>
+        <Flame size={14} />
+        {T.rankings.daysShort.replace('{n}', n(streak))}
       </span>
       {best > 0 && (
-        <span aria-hidden="true" className={`inline-flex items-center gap-0.5 text-[11px] font-semibold ${record ? 'text-accent' : 'text-text-secondary'}`}>
-          <IconCrown size={12} />
-          {n(best)}d
+        <span aria-hidden="true" className={`text-[0.6875rem] ${record ? 'text-accent' : 'text-text-secondary'}`}>
+          {T.rankings.bestShort.replace('{n}', n(best))}
         </span>
       )}
     </span>

@@ -2,15 +2,16 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 
-const HEIGHT = 56
+const HEIGHT = 70
+const SLANT = { clipPath: 'polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%)' }
 
 /**
  * Points earned each of the last weeks, as bars in the theme's colour (this
  * week brighter). Plain SVG on purpose: a chart library is not worth its
  * weight for a dozen bars. Each bar says its week and points to screen
- * readers; the first and last weeks are labelled under it.
+ * readers.
  */
-export default function VaultWeeksChart({ weeks }: { weeks: { start: string; points: number }[] }) {
+export default function VaultWeeksChart({ weeks, className = '' }: { weeks: { start: string; points: number }[]; className?: string }) {
   const { T, lang } = useLanguage()
   if (weeks.length === 0) return null
   const max = Math.max(1, ...weeks.map((w) => w.points))
@@ -18,8 +19,8 @@ export default function VaultWeeksChart({ weeks }: { weeks: { start: string; poi
   const label = (w: { start: string; points: number }) => T.rankings.weeksBar.replace('{date}', date(w.start)).replace('{n}', w.points.toLocaleString(lang))
 
   return (
-    <figure className="flex flex-col gap-1.5">
-      <figcaption className="text-xs font-semibold text-text-secondary">{T.rankings.weeksTitle}</figcaption>
+    <figure className={`flex flex-col gap-1.5 ${className}`}>
+      <figcaption className="sr-only">{T.rankings.weeksTitle}</figcaption>
       <ul className="flex items-end gap-1" style={{ height: HEIGHT }}>
         {weeks.map((w, i) => {
           const last = i === weeks.length - 1
@@ -28,17 +29,13 @@ export default function VaultWeeksChart({ weeks }: { weeks: { start: string; poi
               <span className="sr-only">{label(w)}</span>
               <span
                 aria-hidden="true"
-                className={`w-full rounded-t-sm ${last ? 'bg-progress' : 'bg-progress/45'}`}
-                style={{ height: w.points > 0 ? Math.max(3, (w.points / max) * HEIGHT) : 2, opacity: w.points > 0 ? 1 : 0.35 }}
+                className={`w-full ${last ? 'bg-progress' : 'bg-progress/40'}`}
+                style={{ ...SLANT, height: w.points > 0 ? Math.max(4, (w.points / max) * HEIGHT) : 2, opacity: w.points > 0 ? 1 : 0.35 }}
               />
             </li>
           )
         })}
       </ul>
-      <span aria-hidden="true" className="flex justify-between text-[10px] text-text-secondary tabular-nums">
-        <span>{date(weeks[0].start)}</span>
-        <span>{date(weeks[weeks.length - 1].start)}</span>
-      </span>
     </figure>
   )
 }

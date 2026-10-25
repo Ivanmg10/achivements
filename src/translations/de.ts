@@ -1530,6 +1530,8 @@ export const de: Translations = {
     close: 'Schließen',
   },
   rankings: {
+    bestShort: 'Rekord {n} T',
+    daysShort: '{n} T',
     title: 'Ranglisten',
     beta: 'Beta',
     intro: 'Vault-Punkte: Jede Plattform zählt gleich viel, und seltenere Erfolge zählen mehr.',

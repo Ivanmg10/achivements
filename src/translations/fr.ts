@@ -1530,6 +1530,8 @@ export const fr: Translations = {
     close: 'Fermer',
   },
   rankings: {
+    bestShort: 'record {n} j',
+    daysShort: '{n} j',
     title: 'Classements',
     beta: 'Bêta',
     intro: 'Points Vault : chaque plateforme vaut autant, et les succès plus rares valent plus.',
