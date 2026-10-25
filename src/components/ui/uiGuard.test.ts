@@ -72,3 +72,13 @@ test('meaningful colours come from the theme, not the palette', () => {
   // red → danger, green → success, yellow → hardcore, amber/orange → warning (each theme tunes them)
   expect(offenders(/\b(text|bg|ring|border|fill|stroke|from|to|via)-(red|green|yellow|amber|orange)-(200|300|400|500|600)\b/)).toEqual([])
 })
+
+test('the shape of a bar or a mark comes from the design tokens, never a fixed polygon or skew', () => {
+  // slantStyle(px) / var(--clip-*) and skew-*-(--slant-*): the round design can only remove what the tokens carry.
+  expect(offenders(/clipPath:\s*['"`]polygon\(/)).toEqual([])
+  expect(offenders(/(?<![\w-])-?skew-[xy]-\[/)).toEqual([])
+})
+
+test('a streak is coloured by its tier, never a fixed hue', () => {
+  expect(offenders(/StreakTag[\s\S]{0,200}className="[^"]*\bbg-(?:red|orange|amber|yellow)/)).toEqual([])
+})

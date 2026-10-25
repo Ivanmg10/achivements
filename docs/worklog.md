@@ -29,6 +29,32 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-25 (night) — Review round 3: shape design, tiers, cover art, catalogue (`feat/65-ui-surfaces`, #65)
+
+**Did** — (1) The group ring's number is centred (a `pr-1` was pushing it 2 px left). (2) The
+Followers tab draws the same card as Following: `useFollowers` now reads the newest fans' activity
+and games and "playing now" like `useFriendsData`. (3) Streaks by tier (`streakTier`: 0, 5, 10, 20,
+30, 40, 50+ days, a hue each) in `StreakTag`, the `/racha` hero and the cover's streak card.
+(4) The cover: `homeHeroOf` gives `art[]` (Steam hero then its store header, PSN's backdrop) and
+`icon`; `useGameInsights` adds RA's in-game screenshot and Xbox's IGDB art; the cover tries each and,
+with none, shows the game's picture as a poster over its colour: never an empty box. (5) The
+**shape design**: slanted or round as tokens (`--clip-*`, `--bar-radius`, `--slant-*`), `data-shape`
+on `<html>` (`ShapeSync` + a layout script), a row in Preferences and in the welcome; the display
+face loads upright too (round titles are not italic). (6) The catalogue at `/design` (admins only,
+checked against the database) and `docs/design-system.md`; the guard test now also refuses fixed
+polygons and skews.
+**Decisions** — The round design is only overrides of tokens: no component knows about it. A hard
+rule ("never a literal polygon") beat a convention. The catalogue is English (admin-only, like the
+admin panel).
+**Open** — The home's streak tile (the `48d` in Stats) is still the accent, not the tier's hue. The
+round design is a first pass: look for a hand-made shape the guard cannot see (CSS modules, e.g. the
+welcome's curtain, are untouched). The Disclosure pieces still have no page.
+**Watch out** — Editing `globals.css` sometimes leaves the dev server on stale CSS: change the file's
+content (touching it is not enough). `font-display italic` titles are upright in the round design by a
+CSS rule, not by the component.
+
+---
+
 ## 2026-10-25 (later) — The user's review round 2 (`feat/65-ui-surfaces`, #65)
 
 **Did** — (1) The group hero is a ring again (`CircularProgress`, already in `ui/`) with the

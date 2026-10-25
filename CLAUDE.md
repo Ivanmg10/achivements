@@ -198,6 +198,26 @@ its language changes the app. `fromBrowser` says when the language shown is the 
   navigation (the usual way) they are already in the right language.
 - `/privacy` lists the cookie among the necessary ones, in all nine languages.
 
+## The design system — read `docs/design-system.md` before any UI (2026-10-25)
+
+Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes), **the library**
+(`src/components/ui` and friends) and **pages built from it**. The catalogue of every piece is at
+**`/design`, admins only** (the flag is read from the database; others get the 404).
+
+- **Two designs, one switch:** `shape-style` = `slanted` (default) or `round`, as `data-shape` on
+  `<html>` (`ShapeSync`; a script in the root layout paints the last one before the first frame). A
+  component never reads the choice: it reads tokens. A bar's cut ends are `slantStyle(px)`
+  (`ui/shape.ts`), a mark's lean `skew-y-(--slant-mark)`, a control's `skew-x-(--slant-button)`.
+  **Never a literal `polygon(...)` or `skew-*-[..]`** (`uiGuard.test.ts` fails on it). The round
+  design may override the shape tokens; no theme may (`designTokens.test.ts`).
+- **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
+  `GameCardBackdrop` is the one place that draws it, so every game card follows it.
+- **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the
+  streak hero, the cover's streak card). This replaces "streaks in the accent" for those places.
+- **Adding a piece:** library first (`ui/`, props for layout only, a test), then its specimen in the
+  catalogue, then its rule in `uiGuard.test.ts`, then the page. A page that needs a one-off look asks
+  for a prop or a variant, never a copy.
+
 ## The component library — draw with it (`src/components/ui`, 2026-10-24)
 
 The site's controls come from the library, in the design agreed on the canvas
