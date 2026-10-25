@@ -240,6 +240,37 @@ Screenshots were of `localhost:3000` at 2560 px, dark theme, slanted unless said
 Also seen in the screenshots, not raised by the user: the library shows "Could not load your Xbox
 games" in red (admin account; the open `xboxCall` timeout problem, `docs/xbox-integration-plan.md` §7).
 
+## 12. Answers of 2026-10-25, last round
+
+- **Streak glow:** remove it **only in the top bar** (`MainHeader`'s `StreakTag`): give `StreakTag`
+  a prop (e.g. `glow={false}`) rather than changing the piece for everyone. Supersedes §6.
+- **Fonts:** the user leaves the choice to us. Offer **both** Sofia Sans ("Amable") and Fira Sans
+  ("Legible") beside Barlow (default), as §2 describes; the extra two with `preload: false`.
+- **Tint colour: try a more vivid one**, with the fear that it over-saturates. From the user's home
+  screenshot: Monument Valley (green) and Marvel's Spider-Man (red) look great today; Assassin's
+  Creed Liberation, Call of Duty: Black Ops II, The Impossible Game and Pokémon Colosseum look bad
+  (muddy grey/brown or a hue that is not the game's). Proposal to test: take the most colourful
+  cluster instead of the average, then **cap it in OKLCH** (chroma and lightness in a band, so no
+  neon and no near-black), and when the art has no real colour (low chroma) fall back to the
+  neutral tint instead of a muddy one. Show it first on a canvas board with **exactly those six
+  games** (today / vivid capped / vivid uncapped), dark and light, then change only
+  `useImageTint`'s `averageTint` (+ its tests).
+- **Layout chooser:** choices apply **at once** (as today). The floating page is a **dummy example of
+  the main page** (sample data, not the person's own), shown over the blurred page, with the
+  options in the side panel. This is the concept to draw in §5.
+
+## 13. Portada (the home's cover layout), the user's style points
+
+- The level card needs the **ring** (`CircularProgress` around the level, progress to the next
+  level), as the classic view's level shows; today it is a plain number and looks bland.
+- That card area looks **empty**: add something to it (draw options in the design round; ideas:
+  the week's points and rank change, the next tier, the rarest recent unlock).
+- **Remove the last-played game from "Recently played"** in Portada: it is already the hero.
+- **Stats & Activity's data source:** in Classic it follows the platform chosen in the right
+  column's tabs (RA / Steam / PlayStation / Xbox); Portada has no such tabs, so it is unclear what
+  the section shows. To decide with the user on the canvas; recommended: put the platform tabs in the
+  Stats & Activity head itself (the same state Classic uses), so both layouts work the same way.
+
 ## 11. Release
 
 Option A: everything above ships together as v1.7.0, but **not yet**: the user wants to work on
