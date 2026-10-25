@@ -29,6 +29,53 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-25 — Every page checked again against the final boards (`feat/65-ui-surfaces`, #65)
+
+**Did** — The user said half of the boards were not on the site. Each page was compared in the
+browser (Playwright) against its board (`.playwright-mcp/canvas/project`, Final01–Final12) and
+rebuilt where it differed:
+- **Fonts:** Barlow (UI) and Barlow Condensed (display) load at the root (`src/lib/fonts.ts`); the
+  display face had only loaded in the welcome.
+- **Top bar, game page (`GameHero`, `dataTable.ts`, table toolbar, missables notice), search
+  panel, home profile column, groups, Following:** see the commits before this entry.
+- **Rankings (board 10):** podium cards with slanted steps (first in the accent, a gold ring), the
+  toolbar on the tabs' hairline (platform chips, `Select` with a `prefix` label), the split under
+  the points, a two-line streak, delta tags; level, "where your points come from" and the week's
+  most active as three side cards.
+- **Library (board 06):** the platform switch is the library's `Tabs` with counts (the list is its
+  tabpanel when two platforms or more have games), one toolbar row (search, quick filters, order,
+  layout), rows with a platform tag and the selected bar, the detail panes at the board's widths.
+- **Account (board 12) and the home picker (board 03):** hero with "ID · country · following ·
+  followers", the level box, labelled fields, plain count tiles, preferences as rows, the home
+  layout as two cards with a drawing each (`ChoiceCards` gained `preview`); the delete card under
+  the account card (a library `Button`, its modal now lazy).
+- **Cover home (board 02):** the next easiest achievement (`useGameInsights`: any platform, through
+  the routes the game page uses) and "see the N left"; in the cover layout the right column is
+  level, streak and recent achievements on every platform (`MainPagePortadaSide`).
+- **Group (board 08):** the percentage in big, the line above the name, tabs in the board's order,
+  console and decade with their label inside, covers with the console above the name, an add tile.
+- **Streak (board 11, v3):** it had not been built to the board. Hero with the days in big and the
+  year's four figures as tiles; best streaks as slanted bars ("ongoing" on the current one); the
+  day card (the day in big, the game and the achievement); slanted weekday bars; card titles with a
+  line on the right (`StreakSectionHead`).
+- **Numbers:** `decimal()` and `formatRarity(pct, lang)` give "0,8" in Spanish (every `toFixed(1)`
+  shown to a reader goes through them); country names in the reader's language (`countryName`).
+- **Small truths fixed:** a game with no achievements says so (not "nothing matches"); the comments
+  button says "the latest N" when RA sent fewer than its total; Spanish "Pinear" became "Fijar".
+
+**Why** — The user's review: the boards were not applied in full.
+**Decisions** — Where a board and an agreed rule disagree, the rule wins (no key hints in the
+library search; tinted, not solid, danger buttons). In the cover layout the platform profiles leave
+the home (the board and the picker's own text say so); they are still on the account page.
+**Open** — The V6 component boards were only spot-checked (the modal matches). The cover's kicker
+does not give total hours (the feed does not carry them for every platform). Spanish does not group
+four-digit numbers ("4930"): that is the language's rule, not a bug.
+**Watch out** — `npm run build` while `next dev` runs leaves the dev server with stale CSS (they
+share `.next`): stop dev, build, start it again. The library page's test mocks `LibraryExplorer`;
+the search and layout controls are now its props (`search`, `layoutToggle`), so the mock draws them.
+
+---
+
 ## 2026-10-24 — Component library, part 3: surfaces, data and the colour sweep (`feat/65-ui-surfaces`, #65)
 
 **Did** — Game rows (recent, pinned, groups, status lists) take a flat tint and border of the

@@ -234,6 +234,12 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   `softcore`; the guard refuses red / green / yellow / amber / orange palette classes. Tier and
   platform hues are the exception.
 - **Streaks are in the accent**; amber (`warning`) only in the streak page's hero.
+- **Fonts:** Barlow for the UI, Barlow Condensed (italic 800) for display titles, both loaded in the
+  root layout (`src/lib/fonts.ts`). A page title, a big figure or a rank is `font-display italic`.
+- **Numbers a reader sees are in their language:** `toLocaleString(lang)`, `decimal(n, lang)` for a
+  fixed count of decimals, `formatRarity(pct, lang)`; never `toFixed` on screen ("0,8", not "0.8").
+- **A game page's top is `GameHero`** (chips, title, facts, actions, tiles, media) and its tables use
+  `ui/dataTable.ts` and `AchievementTableToolbar`; the four platforms share them.
 - **The home layout is the person's choice** (`useHomeLayout`, synced key `home-layout`):
   `classic` (default) or `cover` (`MainPagePortada`, the game played last in big on top). It is in
   Preferences → General and in the welcome's preferences step.
