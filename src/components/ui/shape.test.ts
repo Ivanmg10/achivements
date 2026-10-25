@@ -14,6 +14,6 @@ test('every slant a component can ask for is defined, and the round design remov
     expect(css).toContain(`  --clip-${px}: none;`)
   }
   for (const token of ['--slant-button', '--slant-pill', '--slant-line', '--slant-mark', '--slant-cut']) {
-    expect(css).toMatch(new RegExp(`:root\\[data-shape="round"\\][^}]*${token}: 0deg`))
+    expect(css).toMatch(new RegExp(`\\[data-shape="round"\\][^}]*${token}: 0deg`))
   }
 })

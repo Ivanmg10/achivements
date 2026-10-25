@@ -1,7 +1,7 @@
 'use client'
 
 import { useImageTint, NEUTRAL_TINT } from '@/hooks/useImageTint'
-import { useGameCardStyle } from '@/hooks/useGameCardStyle'
+import { useGameCardStyle, type GameCardStyle } from '@/hooks/useGameCardStyle'
 
 const BASE = {
   main: 'rgb(var(--bg-main))',
@@ -18,14 +18,18 @@ const BASE = {
 export default function GameCardBackdrop({
   src,
   surface = 'main',
+  style: forced,
 }: {
   src?: string | null
   /** The card's own background, under the tint. */
   surface?: keyof typeof BASE
+  /** Draw this style whatever the person chose (the design system's catalogue shows both). */
+  style?: GameCardStyle
   /** Kept for callers; the tint needs no image on screen. */
   eager?: boolean
 }) {
-  const [style] = useGameCardStyle()
+  const [chosen] = useGameCardStyle()
+  const style = forced ?? chosen
   // A flat card reads no colour from the art at all.
   const tint = useImageTint(style === 'flat' ? null : src) ?? NEUTRAL_TINT
 

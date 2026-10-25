@@ -26,7 +26,7 @@ const FavoriteGameModal = dynamic(() => import('@/components/favorite-game-modal
 const GenderModal = dynamic(() => import('@/components/gender-modal/GenderModal'), { loading: () => null })
 const LanguageModal = dynamic(() => import('@/components/language-modal/LanguageModal'), { loading: () => null })
 const ThemeModal = dynamic(() => import('@/components/theme-modal/ThemeModal'), { loading: () => null })
-const HomeLayoutModal = dynamic(() => import('@/components/home-layout-modal/HomeLayoutModal'), { loading: () => null })
+const LayoutModal = dynamic(() => import('@/components/layout-modal/LayoutModal'), { loading: () => null })
 const HiddenGamesModal = dynamic(() => import('@/components/hidden-games-modal/HiddenGamesModal'), { loading: () => null })
 
 type PrefTab = 'general' | GameSource
@@ -141,7 +141,7 @@ export default function UserPreferencesCard() {
         <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
       </LazyWhenOpened>
       <LazyWhenOpened open={homeOpen}>
-        <HomeLayoutModal isOpen={homeOpen} onClose={() => setHomeOpen(false)} />
+        <LayoutModal isOpen={homeOpen} onClose={() => setHomeOpen(false)} />
       </LazyWhenOpened>
       <LazyWhenOpened open={hiddenOpen}>
         <HiddenGamesModal isOpen={hiddenOpen} onClose={() => setHiddenOpen(false)} />

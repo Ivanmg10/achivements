@@ -8,6 +8,7 @@ const DESIGN_TOKENS = [
   '--slant-button', '--slant-pill', '--slant-line', '--slant-mark', '--slant-cut',
   '--clip-3', '--clip-4', '--clip-5', '--clip-6', '--clip-8', '--clip-14', '--clip-fill', '--bar-radius',
   '--r-chip', '--r-control', '--r-field', '--r-card',
+  '--r-button', '--r-track', '--r-knob', '--knob-w', '--knob-h', '--knob-shift',
   '--h-control-sm', '--h-control', '--h-field',
   '--motion-hover', '--motion-open', '--motion-indicator', '--ease-spring',
 ]
@@ -23,24 +24,35 @@ test('the base block defines every design token, so every theme has them', () =>
   for (const token of DESIGN_TOKENS) expect(base).toContain(`${token}:`)
 })
 
-/** The one block that may change the shapes: the round design (`:root[data-shape="round"] { … }`). */
-function roundBlock() {
-  const start = css.indexOf(':root[data-shape="round"] {')
+/** The designs' blocks: `[data-shape="slanted"] { … }` restates the base, `[data-shape="round"] { … }` overrides it. */
+function designBlock(name: 'slanted' | 'round') {
+  const start = css.indexOf(`[data-shape="${name}"] {`)
   return css.slice(start, css.indexOf('}', start))
 }
+const SHAPE_TOKENS = DESIGN_TOKENS.filter((t) => /^--(slant|clip|bar-radius|r-chip|r-button|r-track|r-knob|knob)/.test(t))
+const valueIn = (block: string, token: string) => block.match(new RegExp(`${token}: ([^;]+);`))?.[1]
 
-test('no theme overrides the shapes: only the round design does, for all themes at once', () => {
-  const round = roundBlock()
+test('no theme overrides the shapes: only the two designs do, for all themes at once', () => {
+  const [slanted, round] = [designBlock('slanted'), designBlock('round')]
   for (const token of DESIGN_TOKENS.filter((t) => !['--hardcore', '--softcore'].includes(t))) {
-    const inRound = round.includes(`${token}:`) ? 1 : 0
-    expect(css.split(`${token}:`).length - 1).toBe(1 + inRound)
+    const inDesigns = (slanted.includes(`${token}:`) ? 1 : 0) + (round.includes(`${token}:`) ? 1 : 0)
+    expect(css.split(`${token}:`).length - 1).toBe(1 + inDesigns)
   }
 })
 
-test('the round design takes the slant out of every slanted token', () => {
-  const round = roundBlock()
+test('the slanted design restates the base exactly, so a specimen stays slanted inside a round page', () => {
+  const base = baseBlock()
+  const slanted = designBlock('slanted')
+  for (const token of SHAPE_TOKENS) expect(valueIn(slanted, token)).toBe(valueIn(base, token))
+})
+
+test('the round design takes the slant out of every slanted token and rounds the controls', () => {
+  const round = designBlock('round')
   for (const token of ['--slant-button', '--slant-pill', '--slant-line', '--slant-mark', '--slant-cut']) expect(round).toContain(`${token}: 0deg`)
   for (const token of ['--clip-3', '--clip-4', '--clip-5', '--clip-6', '--clip-8', '--clip-14', '--clip-fill']) expect(round).toContain(`${token}: none`)
+  for (const token of ['--r-chip', '--r-button', '--r-track', '--r-knob']) expect(round).toContain(`${token}: 9999px`)
+  // The knob is a circle: as wide as it is tall.
+  expect(valueIn(round, '--knob-w')).toBe(valueIn(round, '--knob-h'))
 })
 
 test('light surfaces get darker RA marks', () => {
@@ -55,7 +67,7 @@ test('light surfaces get darker RA marks', () => {
 })
 
 test('Tailwind sees the colours and radii', () => {
-  for (const name of ['--color-hardcore', '--color-softcore', '--radius-chip', '--radius-control', '--radius-field', '--radius-card']) {
+  for (const name of ['--color-hardcore', '--color-softcore', '--radius-chip', '--radius-control', '--radius-field', '--radius-card', '--radius-button']) {
     expect(css).toContain(`${name}:`)
   }
 })

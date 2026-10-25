@@ -43,7 +43,7 @@ describe('Button', () => {
   })
 
   it('keeps the shape behind the text', () => {
-    expect(buttonClass().split(' ')).toEqual(expect.arrayContaining(['isolate', 'before:-z-10', 'before:rounded-control']))
+    expect(buttonClass().split(' ')).toEqual(expect.arrayContaining(['isolate', 'before:-z-10', 'before:rounded-button']))
   })
 
   it('slants the shape, not the text', () => {

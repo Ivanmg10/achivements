@@ -29,6 +29,26 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-25 (night, 2) — Review round 4: round switch, Layout modal, catalogue (`feat/65-ui-surfaces`, #65)
+
+**Did** — (1) The round design's switch is a pill with a circular knob (tokens `--r-track`,
+`--r-knob`, `--knob-w/h/shift`), buttons and icon buttons are pills and circles (`--r-button`,
+`rounded-button`); the font is the same in both designs again (the upright face and its CSS rule are
+gone). (2) The preferences row is **Layout** and opens `LayoutModal` with two tabs: *Page* (the
+shape, as two cards with a drawing each) and *Home* (home layout and game cards). The welcome keeps
+the choices inline. (3) The catalogue was redone: a left menu that follows the reader, one card per
+piece (26) fed by `catalogue.ts`, and **both designs side by side** for every piece whose shape
+matters (`Compare`; the designs are now scopable: `[data-shape="slanted"|"round"]` on any element).
+**Decisions** — Scoping a design to an element needed the slanted values restated in
+`[data-shape="slanted"]`; `designTokens.test.ts` checks they equal the base. The registry throws on an
+unknown piece id, so a card cannot exist without its menu entry.
+**Open** — The streak tile in the home's stats is still the accent, not the tier's hue. Fields and
+cards keep their radii in the round design (only controls, chips, bars and switches change).
+**Watch out** — `/design` hydration errors in dev right after a recompile come from
+`NavigationProgress`, not from the catalogue.
+
+---
+
 ## 2026-10-25 (night) — Review round 3: shape design, tiers, cover art, catalogue (`feat/65-ui-surfaces`, #65)
 
 **Did** — (1) The group ring's number is centred (a `pr-1` was pushing it 2 px left). (2) The

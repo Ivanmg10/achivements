@@ -204,8 +204,10 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
 (`src/components/ui` and friends) and **pages built from it**. The catalogue of every piece is at
 **`/design`, admins only** (the flag is read from the database; others get the 404).
 
-- **Two designs, one switch:** `shape-style` = `slanted` (default) or `round`, as `data-shape` on
-  `<html>` (`ShapeSync`; a script in the root layout paints the last one before the first frame). A
+- **Two designs, one switch:** `shape-style` = `slanted` (default) or `round` (Preferences → Layout →
+  Page), as `data-shape` on `<html>`; any element can carry its own `data-shape` to show a design
+  inside another (the catalogue and the choice cards do) (`ShapeSync`; a script in the root layout paints the last one before the first frame). The font is
+  the same in both: only shapes change. A
   component never reads the choice: it reads tokens. A bar's cut ends are `slantStyle(px)`
   (`ui/shape.ts`), a mark's lean `skew-y-(--slant-mark)`, a control's `skew-x-(--slant-button)`.
   **Never a literal `polygon(...)` or `skew-*-[..]`** (`uiGuard.test.ts` fails on it). The round

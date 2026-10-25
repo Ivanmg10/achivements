@@ -19,14 +19,14 @@ type Props = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className' | '
 }
 
 /**
- * A button that is only an icon: square, quiet until hovered, tinted with the
+ * A button that is only an icon: square (a circle in the round design), quiet until hovered, tinted with the
  * accent when pressed (`aria-pressed`). The icon inside should be `aria-hidden`.
  */
 export default function IconButton({ tone = 'default', size = 'md', className = '', type = 'button', children, ...rest }: Props) {
   return (
     <button
       type={type}
-      className={`${SIZES[size]} shrink-0 inline-flex items-center justify-center rounded-control transition-colors duration-(--motion-hover) hover:bg-ink/[0.08] aria-pressed:bg-accent/15 aria-pressed:text-accent disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${TONES[tone]} ${className}`}
+      className={`${SIZES[size]} shrink-0 inline-flex items-center justify-center rounded-button transition-colors duration-(--motion-hover) hover:bg-ink/[0.08] aria-pressed:bg-accent/15 aria-pressed:text-accent disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${TONES[tone]} ${className}`}
       {...rest}
     >
       {children}

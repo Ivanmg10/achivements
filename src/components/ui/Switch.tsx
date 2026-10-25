@@ -10,8 +10,8 @@ type Props = {
 
 /**
  * The library's on/off switch, slanted like the button and the segmented
- * control: the track and the knob lean on the design's slant, the knob springs
- * across. Say the state in words beside it (on/off by colour alone is not enough).
+ * control (a pill with a round knob in the round design): the track and the knob
+ * read the design's tokens, the knob springs across. Say the state in words beside it (on/off by colour alone is not enough).
  */
 export default function Switch({ checked, onChange, disabled, className = '', ...aria }: Props) {
   return (
@@ -26,14 +26,14 @@ export default function Switch({ checked, onChange, disabled, className = '', ..
     >
       <span
         aria-hidden="true"
-        className={`absolute inset-y-0 inset-x-[3px] -z-10 rounded-[7px] skew-x-(--slant-pill) shadow-[inset_0_2px_4px_rgb(0_0_0/0.25)] transition-colors duration-(--motion-open) ${
+        className={`absolute inset-y-0 inset-x-[3px] -z-10 rounded-(--r-track) skew-x-(--slant-pill) shadow-[inset_0_2px_4px_rgb(0_0_0/0.25)] transition-colors duration-(--motion-open) ${
           checked ? 'bg-accent' : 'bg-ink/16'
         }`}
       />
       <span
         aria-hidden="true"
-        className={`absolute top-1 left-[7px] w-[1.375rem] h-5 rounded-[4px] bg-white shadow skew-x-(--slant-pill) transition-transform duration-(--motion-open) ease-(--ease-spring) motion-reduce:transition-none ${
-          checked ? 'translate-x-[1.125rem]' : ''
+        className={`absolute top-1 left-[7px] w-(--knob-w) h-(--knob-h) rounded-(--r-knob) bg-white shadow skew-x-(--slant-pill) transition-transform duration-(--motion-open) ease-(--ease-spring) motion-reduce:transition-none ${
+          checked ? 'translate-x-(--knob-shift)' : ''
         }`}
       />
     </button>

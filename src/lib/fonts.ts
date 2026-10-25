@@ -8,11 +8,11 @@ export const ui = Barlow({
   display: 'swap',
 })
 
-/** The display face (big titles, italic; upright in the round design), as `--font-barlow` (the `font-display` utility): set on <html> with `ui`. */
+/** The display face (big italic titles, in every design), as `--font-barlow` (the `font-display` utility): set on <html> with `ui`. */
 export const display = Barlow_Condensed({
   subsets: ['latin'],
   weight: ['700', '800'],
-  style: ['italic', 'normal'],
+  style: ['italic'],
   variable: '--font-barlow',
   display: 'swap',
 })

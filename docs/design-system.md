@@ -10,7 +10,7 @@ then `CLAUDE.md` → "The component library" for the hard rules.
    and the *design* — shapes, sizes, motion (`--slant-*`, `--clip-*`, `--bar-radius`,
    `--r-*`, `--h-*`, `--motion-*`). A theme changes the colours; a design changes
    the shapes. Today there are two designs: **slanted** (the default) and **round**
-   (`:root[data-shape="round"]`, the person's choice, `useShapeStyle`). A third
+   (`[data-shape="round"]`, the person's choice, `useShapeStyle`; usable on any element). A third
    would be one more block of overrides, not an edit of any component.
 2. **The library** (`src/components/ui`, plus `VaultLevelBadge`, `GameCardBackdrop`…):
    every control, field, bar, ring, tag, dialog and surface. They read only tokens.
@@ -37,10 +37,20 @@ then `CLAUDE.md` → "The component library" for the hard rules.
 
 ## The catalogue (`/design`, admins only)
 
-Every piece of `src/components/ui` drawn live with its variants, and the tokens.
-Open it signed in as an admin; anyone else gets the 404. It uses the real
-components, so it cannot drift. Flip the shape, the theme and the game-card style
-in Preferences → General to see every piece follow.
+Every piece of `src/components/ui` (and the few that sit beside it) drawn live,
+with its variants. Open it signed in as an admin; anyone else gets the 404 (the
+flag is read from the database, never the session).
+
+- **A menu on the left** lists every piece under its group (Foundations, Controls,
+  Data, Feedback) and follows the reader (`useActiveSection`). On a phone it is a select.
+- **Both designs, side by side.** A piece whose shape depends on the design is drawn
+  twice, slanted and round, each inside its own scope (`data-shape` on a wrapper:
+  the tokens answer to any element, not only `<html>`), whichever design the site is
+  in. A piece that does not change is drawn once.
+- **One list drives it** (`src/components/design-catalog/catalogue.ts`): the menu,
+  each card's head (name, where it lives, summary), its props and its rules. A piece
+  without an entry throws; a test checks that every entry has its card and menu link.
+- The header flips the person's own shape and game-card style, to see the whole site follow.
 
 ## Adding or changing a piece — the flow
 
@@ -50,8 +60,9 @@ in Preferences → General to see every piece follow.
 3. Build the piece in `src/components/ui/<Piece>.tsx`: props for layout only
    (`className` never carries colour), accessible by default, reading tokens.
 4. Test it next to it (`<Piece>.test.tsx`): render, interaction, the accessible name.
-5. **Show it in the catalogue** (`src/components/design-catalog/`): one specimen
-   per variant.
+5. **Show it in the catalogue**: an entry in `catalogue.ts` (summary, source, props,
+   rules) and its specimens in the group's file, inside `Compare` if its shape depends
+   on the design, `Panel` if not.
 6. If it must not be hand-made any more, add its rule to `uiGuard.test.ts`.
 7. Use it in the page. A page that needs a one-off look asks for a prop or a
    variant on the piece, not a copy.

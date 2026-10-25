@@ -8,9 +8,9 @@ import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { useVaultMe } from '@/hooks/useVaultMe'
-import UserShapePreference from '@/components/user-page/user-shape-preference/UserShapePreference'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
 import { useGameCardStyle } from '@/hooks/useGameCardStyle'
+import { useShapeStyle } from '@/hooks/useShapeStyle'
 import { LANGUAGES } from '@/utils/languages'
 
 const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
@@ -42,6 +42,12 @@ export default function UserPreferencesGeneral({
   const user = session?.user
   const [home] = useHomeLayout()
   const [cards] = useGameCardStyle()
+  const [shape] = useShapeStyle()
+  const layoutSummary = [
+    shape === 'round' ? T.homeLayout.shapeRound : T.homeLayout.shapeSlanted,
+    home === 'cover' ? T.homeLayout.cover : T.homeLayout.classic,
+    cards === 'flat' ? T.homeLayout.cardsFlat : T.homeLayout.cardsTinted,
+  ].join(' · ')
 
   return (
     <div className="flex flex-col divide-y divide-ink/[0.06] [&>*]:py-2">
@@ -56,13 +62,7 @@ export default function UserPreferencesGeneral({
         <span className="text-[0.9375rem] font-bold">{LANGUAGES.find((l) => l.id === lang)?.label ?? lang}</span>
       </ProfileField>
 
-      <ProfileField label={T.homeLayout.label} icon={<IconLayoutDashboard size={18} />} onEdit={onOpenHome}>
-        <span className="text-[0.9375rem] font-bold truncate">
-          {home === 'cover' ? T.homeLayout.cover : T.homeLayout.classic} · {cards === 'flat' ? T.homeLayout.cardsFlat : T.homeLayout.cardsTinted}
-        </span>
-      </ProfileField>
-
-      <UserShapePreference />
+      <ProfileField label={T.homeLayout.layoutLabel} icon={<IconLayoutDashboard size={18} />} value={layoutSummary} onEdit={onOpenHome} />
 
       <ProfileField
         label={T.userData.gender}

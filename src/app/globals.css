@@ -45,6 +45,7 @@
   --radius-control: var(--r-control);
   --radius-field: var(--r-field);
   --radius-card: var(--r-card);
+  --radius-button: var(--r-button);
 }
 
 /* ============================================
@@ -97,6 +98,12 @@
   --clip-fill: polygon(0 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
   --bar-radius: 0;
   --r-chip: 0.5rem;
+  --r-button: 0.75rem;
+  --r-track: 7px;
+  --r-knob: 4px;
+  --knob-w: 1.375rem;
+  --knob-h: 1.25rem;
+  --knob-shift: 1.125rem;
   --r-control: 0.75rem;
   --r-field: 0.875rem;
   --r-card: 1.25rem;
@@ -110,12 +117,37 @@
 }
 
 /*
-   The other design: the same pieces with no slant. Bars are cut straight and
-   rounded, controls and marks are upright, chips are pills. It is the person's
-   choice (Preferences → General, `data-shape` on <html>); components read
-   these tokens, never the choice itself.
+   The two designs, each usable on any element: `data-shape` on <html> is the
+   person's choice (Preferences → Layout), and the design system's catalogue puts
+   one on a specimen to show them side by side. Components read these tokens,
+   never the choice itself. Slanted is the base; this block only restates it so a
+   slanted specimen stays slanted inside a round page.
 */
-:root[data-shape="round"] {
+[data-shape="slanted"] {
+  --slant-button: -12deg;
+  --slant-pill: -14deg;
+  --slant-line: -30deg;
+  --slant-mark: -20deg;
+  --slant-cut: -12deg;
+  --clip-3: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
+  --clip-4: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  --clip-5: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+  --clip-6: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  --clip-8: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  --clip-14: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  --clip-fill: polygon(0 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  --bar-radius: 0;
+  --r-chip: 0.5rem;
+  --r-button: 0.75rem;
+  --r-track: 7px;
+  --r-knob: 4px;
+  --knob-w: 1.375rem;
+  --knob-h: 1.25rem;
+  --knob-shift: 1.125rem;
+}
+
+/* The round design: no slant anywhere. Bars are cut straight and rounded; buttons, chips and switches are pills and circles. */
+[data-shape="round"] {
   --slant-button: 0deg;
   --slant-pill: 0deg;
   --slant-line: 0deg;
@@ -130,10 +162,12 @@
   --clip-fill: none;
   --bar-radius: min(999px, 0.5rem);
   --r-chip: 9999px;
-}
-/* Display titles lean with the slant: in the round design they stand upright. */
-:root[data-shape="round"] .font-display.italic {
-  font-style: normal;
+  --r-button: 9999px;
+  --r-track: 9999px;
+  --r-knob: 9999px;
+  --knob-w: 1.25rem;
+  --knob-h: 1.25rem;
+  --knob-shift: 1.25rem;
 }
 
 /* Light surfaces: the RA marks a step darker, so they still read. */
