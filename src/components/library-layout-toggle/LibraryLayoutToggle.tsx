@@ -1,15 +1,14 @@
 'use client'
 
-import { IconLayoutGrid, IconLayoutRows, IconList } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 
 export type LibraryLayout = 'shelves' | 'list' | 'cards'
 
 const OPTIONS = [
-  { layout: 'shelves', icon: IconLayoutRows, label: 'shelvesLabel' },
-  { layout: 'list', icon: IconList, label: 'listLabel' },
-  { layout: 'cards', icon: IconLayoutGrid, label: 'cardsLabel' },
+  { layout: 'shelves', label: 'shelvesLabel' },
+  { layout: 'list', label: 'listLabel' },
+  { layout: 'cards', label: 'cardsLabel' },
 ] as const
 
 /** The three ways to read a status list: shelves, a list with detail, or cards. */
@@ -18,10 +17,10 @@ export default function LibraryLayoutToggle({ value, onChange }: { value: Librar
   return (
     <SegmentedControl
       aria-label={T.libraryLayout.layoutLabel}
-      size="xs"
+      size="md"
       value={value}
       onChange={onChange}
-      options={OPTIONS.map(({ layout, icon, label }) => ({ value: layout, icon, label: T.libraryLayout[label], compact: true }))}
+      options={OPTIONS.map(({ layout, label }) => ({ value: layout, label: T.libraryLayout[label] }))}
     />
   )
 }

@@ -15,5 +15,5 @@ test('what is given goes beside the title', () => {
     </StatusPageHeader>,
   )
   const title = screen.getByRole('heading')
-  expect(title.parentElement).toContainElement(screen.getByTestId('beside'))
+  expect(title.parentElement!.parentElement!.parentElement).toContainElement(screen.getByTestId('beside'))
 })

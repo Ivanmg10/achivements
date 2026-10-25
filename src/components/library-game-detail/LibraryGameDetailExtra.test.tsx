@@ -58,7 +58,7 @@ test('wantToPlay: the hardest ones, and what is known of the game beside them', 
 test('wantToPlay with nothing known of the game: the hardest take the whole row', () => {
   render(<LibraryGameDetail {...base} category="wantToPlay" items={notStarted} game={game} />)
   expect(screen.queryByText(L.infoTitle)).not.toBeInTheDocument()
-  expect(screen.getByText(L.hardestTitle).parentElement!.parentElement).toHaveClass('@3xl:col-span-3')
+  expect(screen.getByText(L.hardestTitle).parentElement!.parentElement).toHaveClass('@3xl:col-span-2')
 })
 
 test('no calendar when the game is not said, but the list of latest stays', () => {

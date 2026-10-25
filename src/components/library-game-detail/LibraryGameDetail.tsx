@@ -21,7 +21,7 @@ import LibraryDetailSkeleton from '@/components/library-detail-skeleton/LibraryD
 export type LibraryCategory = 'wantToPlay' | 'playing' | 'completed'
 
 const SKELETON_BADGES = 24
-const PANEL = 'bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3'
+const PANEL = 'bg-bg-main/55 ring-1 ring-inset ring-ink/[0.06] rounded-[0.875rem] p-3.5 min-w-0'
 
 /** The panels come in one after another, each rising a little as it fades in. */
 const CONTAINER: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.12 } } }
@@ -98,7 +98,7 @@ export default function LibraryGameDetail({
       if (missed > 0) out.push({ label: L.missable, value: String(missed), className: 'text-warning' })
       const pace = paceEstimate(items)
       if (pace) {
-        out.push({ label: L.pace, value: L.perWeek.replace('{n}', pace.perWeek >= 10 ? String(Math.round(pace.perWeek)) : pace.perWeek.toFixed(1)) })
+        out.push({ label: L.pace, value: L.perWeek.replace('{n}', pace.perWeek.toLocaleString(lang, { maximumFractionDigits: pace.perWeek >= 10 ? 0 : 1 })) })
         if (pace.weeksLeft !== null) {
           out.push({ label: L.atThisPace, value: (pace.weeksLeft === 1 ? L.weekLeft : L.weeksLeft).replace('{n}', String(pace.weeksLeft)) })
         }
@@ -140,7 +140,7 @@ export default function LibraryGameDetail({
     loading || state === 'error' ? null : category === 'playing' ? (
       <>
         {game && (
-          <motion.div variants={PANEL_IN} className={`${PANEL} @3xl:col-span-2`}>
+          <motion.div variants={PANEL_IN} className={PANEL}>
             <LibraryDetailCalendar items={items} game={game} />
           </motion.div>
         )}
@@ -151,7 +151,7 @@ export default function LibraryGameDetail({
     ) : category === 'completed' ? (
       <>
         {game && (
-          <motion.div variants={PANEL_IN} className={`${PANEL} @3xl:col-span-2`}>
+          <motion.div variants={PANEL_IN} className={PANEL}>
             <LibraryDetailCalendar items={items} game={game} />
           </motion.div>
         )}
@@ -161,7 +161,7 @@ export default function LibraryGameDetail({
       </>
     ) : (
       <>
-        <motion.div variants={PANEL_IN} className={`${PANEL} ${info.length > 0 ? '@3xl:col-span-2' : '@3xl:col-span-3'}`}>
+        <motion.div variants={PANEL_IN} className={`${PANEL} ${info.length > 0 ? '' : '@3xl:col-span-2'}`}>
           <LibraryDetailList title={L.hardestTitle} items={hardest(items, 6)} empty={L.noTargets} columns={2} />
         </motion.div>
         {info.length > 0 && (
@@ -178,7 +178,7 @@ export default function LibraryGameDetail({
         variants={CONTAINER}
         initial={reduce ? false : 'hidden'}
         animate="show"
-        className="grid grid-cols-1 @3xl:grid-cols-[190px_minmax(0,1.3fr)_minmax(0,1fr)] @3xl:grid-rows-[20rem] gap-3 w-full"
+        className="grid grid-cols-1 @3xl:grid-cols-[190px_minmax(0,280px)_minmax(0,1fr)] @3xl:grid-rows-[minmax(11rem,auto)] gap-3 w-full"
       >
         <motion.div variants={PANEL_IN} className={`${PANEL} p-4 @3xl:p-6 flex flex-col items-center justify-center gap-3`}>
           <CircularProgress earned={ring.earned} total={ring.total} label={ring.label} size={130} />
@@ -208,7 +208,7 @@ export default function LibraryGameDetail({
           </motion.div>
         )}
 
-        {more}
+        {more && <div className="@3xl:col-span-3 grid grid-cols-1 @3xl:grid-cols-2 gap-3">{more}</div>}
 
         {state !== 'error' && (
           <motion.div variants={PANEL_IN} className={`${PANEL} @3xl:col-span-3`}>

@@ -76,11 +76,11 @@ export default function StatusSortControl({
         ref={triggerRef}
         type="button"
         aria-expanded={isOpen}
-        aria-label={T.statusSort.label}
         onClick={() => setIsOpen((o) => !o)}
-        className={buttonClass('secondary', 'sm')}
+        className={buttonClass('secondary', 'md')}
       >
-        {T.statusSort.label}: {T.statusSort[sortState.key]} <span aria-hidden="true">{arrow}</span>
+        <span className="sr-only">{T.statusSort.label}: </span>
+        {T.statusSort[sortState.key]} <span aria-hidden="true">{arrow}</span>
         <IconChevronDown
           className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           aria-hidden

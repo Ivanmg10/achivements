@@ -36,7 +36,7 @@ export default function LibraryDetailList({
 
   return (
     <div className="flex flex-col gap-2 h-full">
-      <p className="text-text-secondary text-sm px-1">{title}</p>
+      <p className="font-bold px-1">{title}</p>
 
       {isLoading ? (
         <ul aria-busy="true" className="flex flex-col gap-2">

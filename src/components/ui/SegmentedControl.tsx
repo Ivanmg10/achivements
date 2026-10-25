@@ -24,12 +24,12 @@ export default function SegmentedControl<V extends string>({
   value: V
   onChange: (value: V) => void
   options: Segment<V>[]
-  size?: 'xs' | 'sm'
+  size?: 'xs' | 'sm' | 'md'
   /** Layout only. */
   className?: string
 }) {
   const index = Math.max(0, options.findIndex((o) => o.value === value))
-  const height = size === 'xs' ? 'h-7 text-xs px-2.5' : 'h-8 text-[0.8125rem] px-3'
+  const height = size === 'xs' ? 'h-7 text-xs px-2.5' : size === 'md' ? 'h-[2.125rem] text-[0.8125rem] px-4 min-w-20 sm:min-w-24' : 'h-8 text-[0.8125rem] px-3'
 
   return (
     <div
