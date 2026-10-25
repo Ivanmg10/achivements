@@ -97,7 +97,7 @@ export default function MainPageRarest({
       for (const list of lists) if (i < list.length && merged.length < SHOWN) merged.push(list[i])
     }
     return merged
-  }, [achievements, steamAchievements, psnTrophies, xboxAchievements, T, subject])
+  }, [achievements, steamAchievements, psnTrophies, xboxAchievements, T, lang, subject])
 
   if (isLoading) return <SkeletonGameList count={4} />
 

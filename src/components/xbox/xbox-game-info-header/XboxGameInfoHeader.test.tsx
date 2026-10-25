@@ -5,7 +5,6 @@ import { render, screen } from '@testing-library/react'
 import XboxGameInfoHeader from './XboxGameInfoHeader'
 import { en } from '@/translations/en'
 import { xboxGameFixture } from '@/test-utils/xboxFixtures'
-import { formatPlaytime } from '@/utils/steamFeed'
 
 const GAME = xboxGameFixture({
   id: 1738914043, titleId: '1738914043', title: 'Halo Infinite', consoleName: 'Xbox Series · PC',
