@@ -238,7 +238,8 @@ export default function CategoryPage() {
                   <StatusEmptyState category={cat} className="min-h-[40vh]" />
                 </>
               ) : (
-                <div role="tabpanel" id={tabIds(PLATFORM_TABS_ID, activePlatform).panel} aria-labelledby={tabIds(PLATFORM_TABS_ID, activePlatform).tab}>
+                // The platform tabs' panel, only when there are tabs (two platforms with games or more).
+                <div {...(Object.values(perPlatform).filter((n) => n > 0).length > 1 ? { role: 'tabpanel', id: tabIds(PLATFORM_TABS_ID, activePlatform).panel, 'aria-labelledby': tabIds(PLATFORM_TABS_ID, activePlatform).tab } : {})}>
                 <LibraryExplorer
                   key={cat}
                   category={cat}

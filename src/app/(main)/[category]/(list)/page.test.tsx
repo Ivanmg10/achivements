@@ -74,8 +74,10 @@ jest.mock('@/components/library-all-list/LibraryAllList', () => ({
 
 jest.mock('@/components/library-explorer/LibraryExplorer', () => ({
   __esModule: true,
-  default: ({ layout, entries, onLayout }: { layout: string; entries: { key: string }[]; onLayout: (l: string) => void }) => (
+  default: ({ layout, entries, onLayout, search, layoutToggle }: { layout: string; entries: { key: string }[]; onLayout: (l: string) => void; search?: React.ReactNode; layoutToggle?: React.ReactNode }) => (
     <div data-testid="explorer" data-layout={layout}>
+      {search}
+      {layoutToggle}
       {entries.map((e) => e.key).join(',')}
       <button onClick={() => onLayout('list')}>to-list</button>
     </div>
@@ -424,11 +426,13 @@ describe('shelves and list', () => {
   test('a platform selector beside the title narrows what the shelves and the list show', () => {
     render(<CategoryPage />)
     expect(screen.getByTestId('explorer')).toHaveTextContent('ra:1,steam:5')
-    fireEvent.click(screen.getByRole('button', { name: 'Steam 1' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Steam 1' }))
     expect(screen.getByTestId('explorer')).toHaveTextContent('steam:5')
     expect(screen.getByTestId('explorer')).not.toHaveTextContent('ra:1')
-    expect(screen.getByRole('button', { name: 'Steam 1' })).toHaveAttribute('aria-pressed', 'true')
-    fireEvent.click(screen.getByRole('button', { name: 'All 2' }))
+    expect(screen.getByRole('tab', { name: 'Steam 1' })).toHaveAttribute('aria-selected', 'true')
+    // The list is the tabs' panel, named by the tab chosen.
+    expect(screen.getByRole('tabpanel', { name: 'Steam 1' })).toContainElement(screen.getByTestId('explorer'))
+    fireEvent.click(screen.getByRole('tab', { name: 'All 2' }))
     expect(screen.getByTestId('explorer')).toHaveTextContent('ra:1,steam:5')
   })
 
