@@ -59,11 +59,13 @@ That is the go-ahead for this whole plan: take the first open issue below, cut i
 1. Quick wins: tint without border (§1), streak tag without glow (§6), `latin-ext` (§2).
 2. The user's review bugs (§10): f (broken modal) first, then a, b, d, e, i, j.
 3. Skeletons for every screen (§7), including review c and g.
-4. The animation mechanism + landing v2 (§4), then animations everywhere (§8).
+4. Animations everywhere (§8, #61), the shared mechanism first. No landing v2.
 5. Login / register details (§3).
 6. Leftovers (§9).
 7. Layout chooser: **design round first**, then build, with the font choice (§2, §5).
-8. Release when the user says (§11).
+8. Round design everywhere (§15, #78) and the favicon (§16, #79).
+9. Last: the antislop pass over the site and code (§14, #77).
+10. Release when the user says (§11).
 
 ---
 
