@@ -18,11 +18,13 @@ v1.7.0 release (roadmap §9).
 
 | Block | Decision | Board |
 |---|---|---|
-| Tinted game cards | **No border** (variant A). Gradient unchanged. | 1 |
-| Landing | **Landing v2** ("me gusta bastante"), plus entrance animations on components only | 5b |
+| Tinted game cards | **No border** (variant A). Gradient unchanged. Colour: **try a more vivid one** without over-saturating (§12, #76) | 1 |
+| Landing | Landing v2 was liked on the canvas but **will not be built** (2026-10-28): the landing stays until the final antislop pass (#77) | 5b |
 | Login / register | **"Con los detalles"** (small details, not a redesign) | 6 |
-| Fonts | Liked Barlow / Sofia Sans / Fira Sans as options; **which ones ship is not decided** | 4, 3b |
-| Layout chooser | Not the centred modal (3), not the plain panels (3b). **New concept**: background blurred, a floating full preview of the main page showing the changes, options in a side panel | — (to design) |
+| Fonts | **Both** Sofia Sans ("Amable") and Fira Sans ("Legible") offered beside Barlow, the default (§12) | 4, 3b |
+| Layout chooser | Not the centred modal (3), not the plain panels (3b). **New concept**: background blurred, a floating **dummy** main page showing the changes, options in a side panel; choices apply at once (§12) | — (to design) |
+| Logo | **Favicon only**, nowhere else (§16, #79) | — |
+| Entrance animations | Components only, **every page**, nothing left unanimated (§8, #61) | — |
 | Streaks in the top bar | **Tag without glow** (variant A) ; Vault Points progress **stays as today** (ring in the accent) | 2 |
 | Default design | **Slanted** stays the default | — |
 | Streak tiers | **Approved** as they are (0, 5, 10, 20, 30, 40, 50+; `streakTier.ts`) | 2 |
