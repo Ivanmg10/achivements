@@ -50,6 +50,9 @@ That is the go-ahead for this whole plan: take the first open issue below, cut i
 | #74 | Portada (§13) |
 | #75 | Layout chooser with live preview + fonts (§5, §2, §12), design round first |
 | #76 | A more vivid tint (§12), canvas test first |
+| #77 | Anti-slop review of landing, library and site (§14); before #71 |
+| #78 | The round design on every control and surface (§15) |
+| #79 | The logo, coloured by theme (§16) |
 
 ## Order
 
@@ -304,6 +307,60 @@ games" in red (admin account; the open `xboxCall` timeout problem, `docs/xbox-in
   7) are liked; in the slanted design, the top bar's level and streak tags and the page's tags
   (level badge, streak tag, platform chips) lean with `skew-x-(--slant-pill)` (text counter-skewed).
   Round design unchanged. Do it in the pieces (`VaultLevelBadge`, `StreakTag`, the chip), not per page.
+
+## 14. Anti-slop review: landing, component library and the whole site (2026-10-28)
+
+The user asked for another pass at the landing "with the /antislop tool", and to use it to review
+the library and the site in general. **No `/antislop` is installed** in this environment; the
+installed skill that presents itself as anti-slop is `design-taste-frontend`. Ask the user for
+the tool's link if they mean another one; otherwise run that skill.
+
+- Landing v2 (§4, #71) goes through the review **before** it is built, and again after.
+- Then the library (`/design`, every piece in both designs) and every page: list what still reads
+  as template/AI (uniform icon cards, kickers everywhere, glows, gradient washes, blobs, generic
+  copy) with file and fix; bring the list to the user, fix what they keep.
+- Rules still win over the skill's taste: CLAUDE.md, `docs/design-system.md`, the agreed boards.
+
+## 15. The round design, everywhere (2026-10-28)
+
+The user: round must reach **more things, like the search bar**; an extensive analysis. Measured
+2026-10-28 outside `src/components/ui`: **`rounded-full` 211 hits / 125 files, `rounded-xl` 252 /
+158, `rounded-lg` 217 / 128, `rounded-2xl` 48 / 41, `rounded-[N…]` 29 / 19**. Heaviest folders:
+main-page 157, groups 60, public-user-page 44, welcome-page 43, user-page 36, psn 32, xbox 26,
+admin-panel 25, steam 24, then skeletons, showcase picker, following, streak, rankings.
+
+- Classify every hit: a **control** (button, field, search bar, tab, chip, pill) → its library piece
+  or `rounded-button` / `-field` / `-tag` / `-chip`; a **surface** → `rounded-card` / `-pane` /
+  `-tile`; a **true circle** (avatar, dot, ring, knob) stays `rounded-full`. Admin panel: tokens too,
+  lower priority.
+- Known: the header's search bar (`main-header`) is a fixed shape; it must follow `--r-field` (a
+  pill in round, the slanted field in slanted), and the search modal with it.
+- Extend `uiGuard.test.ts` so a fixed `rounded-xl/2xl/lg` on a control or surface fails outside
+  `ui/` (with an allow-list for circles), as it already does for `rounded-[..rem]`.
+- Overlaps §9's "rounded-xl to tokens" (#73): this issue owns it.
+- Check both designs on every page at 390 px and 2560 px when done (with §10 a).
+
+## 16. The logo (2026-10-28)
+
+The user drew a logo: a big hexagonal **C** ("Cheevo") holding a **V** cut into three facets of a
+cube ("Vault"). Source: `docs/brand/cheevovault-logo-source.png` (black on white, 3508×2480).
+A hand-traced draft: `docs/brand/cheevovault-logo.svg` (four paths: the C band and three facets);
+**check its outline against the PNG** (overlay them) and correct the points before using it.
+
+Custom per theme:
+- `src/components/brand-logo/BrandLogo.tsx` (+ test), an inline SVG: the C in `currentColor`
+  (`--text-main`), the three facets three steps of the theme's accent so the V reads as a lit cube:
+  top `rgb(var(--accent))`, left `color-mix(in oklab, rgb(var(--accent)) 75%, black)`, right
+  `color-mix(in oklab, rgb(var(--accent)) 55%, black)` (tune per light themes). Props: `size`,
+  `mono` (all `currentColor`, for one-colour places), `title` (accessible name, else `aria-hidden`).
+  It reads tokens only, so every theme (dark, red, green, light, sakura, arctic…) follows itself.
+- Where it goes: the header's home button (today `IconHome`), the landing nav (beside the
+  wordmark), `AuthBrand` (login/register), the welcome's bar, the footer, `/design` (a specimen in
+  every theme), `src/app/icon.svg` (favicon: fixed colours, with a `prefers-color-scheme` style
+  inside the SVG for dark/light tabs), `apple-icon.tsx`, `manifest.ts` icons, `opengraph-image.tsx`
+  and the profile card preview. A favicon cannot follow the chosen theme: it uses the default.
+- Keep the wordmark "CheevoVault" in `font-display italic` beside it where there is room.
+- Tests: renders with and without `title`; `mono`; the guard does not flag its paths.
 
 ## 11. Release
 
