@@ -4,7 +4,7 @@ import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 
 /**
  * The game being played (or played last) under the profile card, the same on
- * every platform: the game's tint and border, a small kicker (with what the
+ * every platform: the game's tint under the neutral hairline, a small kicker (with what the
  * game says the player is doing, when it says), the game's icon, title and
  * console, its share on the right and the bar under it.
  */

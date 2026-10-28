@@ -254,8 +254,9 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   (`ui/tooltip.ts`), `MENU_SURFACE` / `menuItemClass` (`ui/menu.ts`); the toasts are the dark card.
 - **Surfaces and data**: `SURFACE` (`ui/surface.ts`; cards use `rounded-card`), `StatPill`'s
   large size has no box, `RarityBadge` (a tinted figure, never a bar), `ProgressBar` bevelled and
-  glowing only when finished, `GameCardBackdrop` = a flat tint and border of the game's colour
-  (`useImageTint`; never the blurred art again, the user's choice). The art is read through
+  glowing only when finished, `GameCardBackdrop` = a flat tint of the game's colour behind the
+  same neutral hairline as a flat card (`useImageTint`; never the blurred art again, the user's
+  choice). The art is read through
   `/api/image-proxy` (only the platforms' image hosts, images only, 3 MB, a week's cache) so a canvas
   may read it; do not widen its host list to anything a user can type (it would be an open proxy).
 - **Colours with a meaning come from the theme**: danger, success, warning, `hardcore`,
