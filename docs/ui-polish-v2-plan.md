@@ -311,9 +311,11 @@ games" in red (admin account; the open `xboxCall` timeout problem, `docs/xbox-in
 ## 14. Anti-slop review: landing, component library and the whole site (2026-10-28)
 
 The user asked for another pass at the landing "with the /antislop tool", and to use it to review
-the library and the site in general. **No `/antislop` is installed** in this environment; the
-installed skill that presents itself as anti-slop is `design-taste-frontend`. Ask the user for
-the tool's link if they mean another one; otherwise run that skill.
+the library and the site in general. The tool is **antislop** (github.com/miqdadbadjuber/anti-slop,
+v3.2.24), installed 2026-10-28 as user-level skills in `~/.claude/skills/`: `antislop` (the core),
+`antislop-ui`, `antislop-copywriting`, `antislop-human` (accessibility, with a local contrast
+checker), `antislop-layoutmobile`, `antislop-code`. Its MCP plugin was not installed. Load the core
+plus `-ui`, `-copywriting` and `-human` for this review (a new session sees them; this one did not).
 
 - Landing v2 (§4, #71) goes through the review **before** it is built, and again after.
 - Then the library (`/design`, every piece in both designs) and every page: list what still reads
