@@ -44,15 +44,15 @@ That is the go-ahead for this whole plan: take the first open issue below, cut i
 | #69 | The user's review bugs (§10 a, b, d, e, f, i, j) |
 | #70 | A skeleton for every screen (§7, §10 c, g) |
 | #61 | Entrance animations everywhere (§8), the mechanism first |
-| #71 | Landing v2 (§4) |
+| ~~#71~~ | ~~Landing v2 (§4)~~: **closed 2026-10-28, not to be built**; the landing waits for #77 |
 | #72 | Login and register details (§3) |
 | #73 | Leftovers (§9) |
 | #74 | Portada (§13) |
 | #75 | Layout chooser with live preview + fonts (§5, §2, §12), design round first |
 | #76 | A more vivid tint (§12), canvas test first |
-| #77 | Anti-slop review of landing, library and site (§14); before #71 |
 | #78 | The round design on every control and surface (§15) |
-| #79 | The logo, coloured by theme (§16) |
+| #79 | The logo as the favicon, nowhere else (§16) |
+| #77 | **Last of all:** the antislop pass over the whole site and the internal code (§14) |
 
 ## Order
 
@@ -317,10 +317,15 @@ v3.2.24), installed 2026-10-28 as user-level skills in `~/.claude/skills/`: `ant
 checker), `antislop-layoutmobile`, `antislop-code`. Its MCP plugin was not installed. Load the core
 plus `-ui`, `-copywriting` and `-human` for this review.
 
-- Landing v2 (§4, #71) goes through the review **before** it is built, and again after.
-- Then the library (`/design`, every piece in both designs) and every page: list what still reads
-  as template/AI (uniform icon cards, kickers everywhere, glows, gradient washes, blobs, generic
-  copy) with file and fix; bring the list to the user, fix what they keep.
+**Decided 2026-10-28: this pass is the very last issue.** Landing v2 (§4) is **not built**
+(#71 closed); the landing stays as it is until this pass. Once every other issue is done:
+
+- Every page (the landing included), the library (`/design`, both designs) and the welcome: list
+  what still reads as template/AI (uniform icon cards, kickers everywhere, glows, gradient washes,
+  blobs, generic copy) with file and fix.
+- The internal code with `antislop-code` (generic AI comments; never changes behaviour).
+- Bring the lists to the user first; fix what they keep. §4 can serve as input, not as a spec.
+- The entrance-animation mechanism that §4 was to introduce now comes with #61 itself.
 - Rules still win over the skill's taste: CLAUDE.md, `docs/design-system.md`, the agreed boards.
 
 ## 15. The round design, everywhere (2026-10-28)
@@ -349,20 +354,14 @@ cube ("Vault"). Source: `docs/brand/cheevovault-logo-source.png` (black on white
 A hand-traced draft: `docs/brand/cheevovault-logo.svg` (four paths: the C band and three facets);
 **check its outline against the PNG** (overlay them) and correct the points before using it.
 
-Custom per theme:
-- `src/components/brand-logo/BrandLogo.tsx` (+ test), an inline SVG: the C in `currentColor`
-  (`--text-main`), the three facets three steps of the theme's accent so the V reads as a lit cube:
-  top `rgb(var(--accent))`, left `color-mix(in oklab, rgb(var(--accent)) 75%, black)`, right
-  `color-mix(in oklab, rgb(var(--accent)) 55%, black)` (tune per light themes). Props: `size`,
-  `mono` (all `currentColor`, for one-colour places), `title` (accessible name, else `aria-hidden`).
-  It reads tokens only, so every theme (dark, red, green, light, sakura, arctic…) follows itself.
-- Where it goes: the header's home button (today `IconHome`), the landing nav (beside the
-  wordmark), `AuthBrand` (login/register), the welcome's bar, the footer, `/design` (a specimen in
-  every theme), `src/app/icon.svg` (favicon: fixed colours, with a `prefers-color-scheme` style
-  inside the SVG for dark/light tabs), `apple-icon.tsx`, `manifest.ts` icons, `opengraph-image.tsx`
-  and the profile card preview. A favicon cannot follow the chosen theme: it uses the default.
-- Keep the wordmark "CheevoVault" in `font-display italic` beside it where there is room.
-- Tests: renders with and without `title`; `mono`; the guard does not flag its paths.
+**Decided 2026-10-28: the favicon only, nowhere else** (no header, landing, auth, welcome or
+footer; the user's call). So:
+- Replace `src/app/icon.svg` with the logo: the C in a light ink on dark tabs and dark ink on light
+  tabs through a `@media (prefers-color-scheme: dark)` style inside the SVG, the three facets in the
+  default theme's accent in three steps so the V reads as a lit cube. A favicon cannot follow the
+  theme the person picked: it uses the default.
+- `apple-icon.tsx`, `manifest.ts` icons and the OG image are **not** part of it unless the user asks.
+- Check in a browser tab at 16 and 32 px that it still reads; simplify the facets if it does not.
 
 ## 11. Release
 
