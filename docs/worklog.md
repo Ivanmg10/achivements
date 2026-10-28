@@ -29,6 +29,11 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-28 - CheevoVault favicon (`feat/79-cheevovault-favicon`, #79)
+
+**Did**: Replaced the `CH` placeholder in `src/app/icon.svg` with the existing CheevoVault mark.
+**Why**: The new logo belongs in the favicon only.
+**Decisions**: Kept the four traced paths after checking their overlay against the source drawing. The C follows the browser's light or dark scheme; the three V facets use steps of the default violet accent. Apple icons, manifest icons and the OG image stay unchanged.
 ## 2026-10-28 — UI polish quick wins (`feat/68-polish-quick-wins`, #68)
 
 **Did** — El estilo tinted de `GameCardBackdrop` conserva el gradiente del juego pero usa la hairline
