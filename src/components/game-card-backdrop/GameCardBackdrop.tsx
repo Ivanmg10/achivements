@@ -10,10 +10,11 @@ const BASE = {
 
 /**
  * The game's colour behind a card: a flat tint of it fading toward the text
- * side and a border in it (the user's choice over the blurred art, 2026-10-24).
- * The colour is read from the game's art (`useImageTint`); until it is, or if
+ * side (the user's choice over the blurred art, 2026-10-24). Both styles ring
+ * the card with the same neutral hairline; only the tint is the game's. The
+ * colour is read from the game's art (`useImageTint`); until it is, or if
  * the art's host does not allow it, a neutral grey. With the flat style chosen
- * (`useGameCardStyle`) it is the card's plain surface and a hairline instead.
+ * (`useGameCardStyle`) there is no tint at all: the card's plain surface.
  */
 export default function GameCardBackdrop({
   src,
@@ -46,10 +47,10 @@ export default function GameCardBackdrop({
   return (
     <div
       aria-hidden="true"
-      className="absolute inset-0 -z-10 rounded-[inherit] pointer-events-none transition-[box-shadow,background] duration-(--motion-open)"
+      className="absolute inset-0 -z-10 rounded-[inherit] pointer-events-none transition-[background] duration-(--motion-open)"
       style={{
         background: `linear-gradient(90deg, rgb(${tint} / 0.24), rgb(${tint} / 0.07) 45%, transparent 75%), ${BASE[surface]}`,
-        boxShadow: `inset 0 0 0 1px rgb(${tint} / 0.45)`,
+        boxShadow: 'inset 0 0 0 1px rgb(var(--ink) / 0.08)',
       }}
     />
   )

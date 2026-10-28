@@ -34,6 +34,13 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 **Did**: Replaced the `CH` placeholder in `src/app/icon.svg` with the existing CheevoVault mark.
 **Why**: The new logo belongs in the favicon only.
 **Decisions**: Kept the four traced paths after checking their overlay against the source drawing. The C follows the browser's light or dark scheme; the three V facets use steps of the default violet accent. Apple icons, manifest icons and the OG image stay unchanged.
+## 2026-10-28 — UI polish quick wins (`feat/68-polish-quick-wins`, #68)
+
+**Did** — El estilo tinted de `GameCardBackdrop` conserva el gradiente del juego pero usa la hairline
+neutra del flat; `StreakTag` ganó `glow={false}` y solo el header la usa; Barlow y Barlow Condensed
+cargan `latin-ext`. Tests, lint y `tsc` en verde.
+**Why** — Decisiones de `docs/ui-polish-v2-plan.md` §1, §6 y §12.
+**Watch out** — El glow sigue activo por defecto en `StreakTag`; no cambiarlo para todos.
 
 ---
 

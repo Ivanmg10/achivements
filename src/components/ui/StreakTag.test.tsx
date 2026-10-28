@@ -15,6 +15,12 @@ test('no streak is dimmed, with an outline flame', () => {
   expect(screen.queryByTestId('IconFlameFilled')).not.toBeInTheDocument()
 })
 
+test('glow={false} drops the halo but keeps the ring and the colour', () => {
+  const tag = render(<StreakTag days={48} text="48 d" aria-label="s48" glow={false} />).getByLabelText('s48')
+  expect(tag.style.boxShadow).toContain('inset')
+  expect(tag.style.boxShadow).not.toContain('0 0 14px')
+})
+
 test('each tier has its own colour, from the days', () => {
   const tag = (days: number) => render(<StreakTag days={days} text={`${days} d`} aria-label={`s${days}`} />).getByLabelText(`s${days}`)
   const colours = [1, 5, 10, 20, 30, 40, 50].map((d) => tag(d).style.backgroundColor)

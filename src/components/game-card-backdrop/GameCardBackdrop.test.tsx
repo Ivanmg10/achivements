@@ -2,17 +2,21 @@ import { render } from '@testing-library/react'
 import GameCardBackdrop from './GameCardBackdrop'
 import { NEUTRAL_TINT } from '@/hooks/useImageTint'
 
-test('a flat tint and a border, hidden from assistive tech, never the blurred art', () => {
+test('a flat tint fading to the side, a neutral hairline, hidden from assistive tech, never the blurred art', () => {
   const { container } = render(<GameCardBackdrop src="https://example.com/a.png" />)
   const layer = container.firstChild as HTMLElement
   expect(layer).toHaveAttribute('aria-hidden', 'true')
   expect(container.querySelector('img')).toBeNull()
   expect(layer.style.boxShadow).toContain('inset')
+  expect(layer.style.boxShadow).toContain('--ink')
+  expect(layer.style.background).toContain('gradient')
 })
 
 test('uses a neutral grey until the colour is read, or with no image', () => {
   const { container } = render(<GameCardBackdrop src={null} />)
-  expect((container.firstChild as HTMLElement).style.boxShadow).toContain(NEUTRAL_TINT.replaceAll(' ', ' '))
+  const layer = container.firstChild as HTMLElement
+  expect(layer.style.background).toContain(NEUTRAL_TINT.replaceAll(' ', ' '))
+  expect(layer.style.boxShadow).toContain('--ink')
 })
 
 test('sits on the card surface it is given', () => {

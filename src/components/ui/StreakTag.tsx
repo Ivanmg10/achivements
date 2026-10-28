@@ -11,6 +11,8 @@ type Props = {
   'aria-label'?: string
   /** `md` fits the top bar; `lg` a card's head. */
   size?: 'md' | 'lg'
+  /** The lit halo around the tag. Off where the tag sits on a busy surface (the header's streak). */
+  glow?: boolean
   /** Layout only. */
   className?: string
 }
@@ -18,10 +20,11 @@ type Props = {
 /**
  * A streak as a tag: a flame and its days, in the colour of its tier (0, 5,
  * 10, 20, 30, 40, 50 days: `streakTier`); lit with a soft glow while a streak
- * is going, dimmed with no streak. The flame is filled only while lit, so the
- * difference is never colour alone.
+ * is going, dimmed with no streak. Lit tags glow by default (`glow`); the
+ * header's streak turns the halo off. The flame is filled only while lit, so
+ * the difference is never colour alone.
  */
-export default function StreakTag({ days, text, size = 'md', className = '', ...aria }: Props) {
+export default function StreakTag({ days, text, size = 'md', glow = true, className = '', ...aria }: Props) {
   const lit = days > 0
   const tier = streakTier(days)
   const Flame = lit ? IconFlameFilled : IconFlame
@@ -37,12 +40,12 @@ export default function StreakTag({ days, text, size = 'md', className = '', ...
           ? {
               backgroundColor: `rgb(${tier.color} / 0.16)`,
               color: streakInk(tier),
-              boxShadow: `inset 0 0 0 1px rgb(${tier.color} / 0.35), 0 0 14px rgb(${tier.color} / 0.22)`,
+              boxShadow: `inset 0 0 0 1px rgb(${tier.color} / 0.35)${glow ? `, 0 0 14px rgb(${tier.color} / 0.22)` : ''}`,
             }
           : undefined
       }
     >
-      <Flame size={size === 'lg' ? 16 : 13} aria-hidden="true" style={lit ? { filter: `drop-shadow(0 0 4px rgb(${tier.color} / 0.6))` } : undefined} />
+      <Flame size={size === 'lg' ? 16 : 13} aria-hidden="true" style={lit && glow ? { filter: `drop-shadow(0 0 4px rgb(${tier.color} / 0.6))` } : undefined} />
       <span aria-hidden={aria['aria-label'] ? true : undefined}>{text}</span>
     </span>
   )

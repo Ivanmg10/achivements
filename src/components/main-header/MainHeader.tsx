@@ -46,7 +46,7 @@ function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
       aria-label={`${T.streak.title}: ${plural(streak, T.plurals.days, lang)}`}
       className={`rounded-tag transition-[filter] hover:brightness-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${glass ? 'backdrop-blur-sm' : ''}`}
     >
-      <StreakTag days={streak} text={T.rankings.daysShort.replace('{n}', streak.toLocaleString(lang))} />
+      <StreakTag days={streak} text={T.rankings.daysShort.replace('{n}', streak.toLocaleString(lang))} glow={false} />
     </Link>
   )
 }
