@@ -54,7 +54,7 @@ export default function LibraryList({
         ref={list}
         style={fill}
         // Until it is measured, a guess that fits most screens.
-        className={`flex flex-col gap-0.5 p-1 -m-1 lg:overflow-y-auto lg:overscroll-contain ${height === undefined ? 'lg:max-h-[calc(100dvh-16rem)] lg:min-h-88' : ''}`}
+        className={`flex flex-col gap-0.5 p-1 -m-1 lg:overflow-y-auto lg:overscroll-contain lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] ${height === undefined ? 'lg:max-h-[calc(100dvh-16rem)] lg:min-h-88' : ''}`}
       >
         {entries.map((e, i) => {
           const current = e.key === selected?.key

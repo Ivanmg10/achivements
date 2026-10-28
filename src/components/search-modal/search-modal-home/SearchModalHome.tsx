@@ -8,6 +8,7 @@ import { homeHeroOf } from '@/utils/homeHero'
 import { gameHref } from '@/utils/gameRef'
 import { plural, relativeTime } from '@/utils/utils'
 import { pillClass } from '@/components/ui/Pill'
+import { FadeImage } from '@/components/ui/FadeImage'
 import SearchModalGroup from '../search-modal-group/SearchModalGroup'
 import SearchModalRow from '../search-modal-row/SearchModalRow'
 
@@ -48,7 +49,7 @@ export default function SearchModalHome({
             {games.map((g) => (
               <li key={`${g.source}:${g.id}`}>
                 <SearchModalRow
-                  media={g.icon ? <img src={g.icon} alt="" className="w-full h-full object-cover" /> : null}
+                  media={g.icon ? <FadeImage src={g.icon} alt="" width={40} height={40} className="w-full h-full" unoptimized /> : null}
                   title={g.title}
                   sub={[g.console, g.total > 0 ? `${g.earned} / ${g.total}` : null, g.lastPlayed ? relativeTime(g.lastPlayed, lang) : null].filter(Boolean).join(' · ')}
                   onSelect={() => onGo(gameHref(g.source, g.id))}

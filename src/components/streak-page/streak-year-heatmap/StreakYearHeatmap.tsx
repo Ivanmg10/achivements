@@ -64,7 +64,7 @@ export default function StreakYearHeatmap({
       {/* Scrolls sideways on a narrow screen rather than shrinking the days to dots. */}
       <div className="overflow-x-auto pb-1 [scrollbar-width:thin]">
         {/* The days fill the card's width: one grid column per week, each day a square. */}
-        <div className="relative" style={{ minWidth: columns.length * (MIN_CELL + GAP), paddingTop: 16 }}>
+        <div className="relative px-1" style={{ minWidth: columns.length * (MIN_CELL + GAP), paddingTop: 16 }}>
           {months.map((m) => (
             <span key={m.col} aria-hidden="true" className="absolute top-0 text-[10px] text-text-secondary" style={{ left: `${(m.col / columns.length) * 100}%` }}>
               {m.label}

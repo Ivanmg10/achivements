@@ -26,6 +26,12 @@ describe('StatPill', () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
+
+  test('large figures fit as compact tiles rather than circular chips', () => {
+    const { container } = render(<StatPill label="Avg" value="1.2" />)
+    expect(container.firstChild).toHaveClass('min-w-24', 'px-3', 'rounded-tile')
+    expect(container.firstChild).not.toHaveClass('rounded-chip')
+  })
 })
 
 describe('StatCard', () => {

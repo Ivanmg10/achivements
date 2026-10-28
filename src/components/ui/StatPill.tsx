@@ -46,7 +46,7 @@ export function StatPill({
     </>
   )
   // No box (the agreed design): figures side by side, a fine slanted rule between them.
-  const cls = `relative px-5 py-1 flex flex-col gap-0.5 flex-1 min-w-30 rounded-chip before:content-[''] before:absolute before:left-0 before:top-1 before:bottom-1 before:w-px before:bg-ink/12 before:skew-x-(--slant-button) first:before:hidden ${className}`
+  const cls = `relative px-3 py-1 flex flex-col gap-0.5 flex-1 min-w-24 rounded-tile before:content-[''] before:absolute before:left-0 before:top-1 before:bottom-1 before:w-px before:bg-ink/12 before:skew-x-(--slant-button) first:before:hidden ${className}`
   if (href) return <Link href={href} className={`${cls} ${interactiveCls}`}>{inner}</Link>
   if (onClick) return <button type="button" onClick={onClick} className={`${cls} ${interactiveCls}`}>{inner}</button>
   return <div className={cls}>{inner}</div>

@@ -39,6 +39,24 @@ cargan `latin-ext`. Tests, lint y `tsc` en verde.
 
 ---
 
+## 2026-10-28 — Fixes from the user's site review (`fix/69-user-review-fixes`, #69)
+
+**Did** — Fixed the round Overview stat tiles, equal heights for pinned and showcase achievements,
+the library list's bottom fade, failed search artwork, the New group dialog's desktop width, the
+streak heatmap's clipped selection ring, and the late rankings preference row.
+**Decisions** — Steam's missing `library_600x900.jpg` was the empty search tile; `FadeImage`
+keeps a placeholder on that failure and on any other failed search request. Achievement
+rows and showcase slots use fixed heights so mixed content cannot resize a card. The rankings
+preference reserves its row while loading rather than mounting General in the background.
+**Open** — No Steam or PSN year-feed change was needed after measurement: the account had 33 Steam
+games eligible for the 365-day window, all within the live-80 cap, so no older game depended on
+`steam_unlocks`. PSN reads every title with a trophy in the last 366 days, without a game cap; the
+account's score data covered 21 games and 207 unlock entries. Steam still cannot include a game
+outside the live cap until its unlocks have been recorded, and a game last played before the window
+is excluded by design.
+
+---
+
 ## 2026-10-25 (night, 3) — The round design as it was, tiers everywhere, Disclosure (`feat/65-ui-surfaces`, #65)
 
 **Did** — (1) The round design is the old look: buttons, fields and cards keep soft corners (not

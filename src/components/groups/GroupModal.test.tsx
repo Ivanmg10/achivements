@@ -35,6 +35,7 @@ test('renders nothing while closed', () => {
 test('a new group starts empty and private, and creates with what was typed and the games picked', async () => {
   const { onSave, onClose } = setup()
   expect(screen.getByRole('heading', { name: en.groups.newGroup })).toBeInTheDocument()
+  expect(screen.getByRole('dialog')).toHaveClass('sm:max-w-5xl')
   expect(title()).toHaveValue('')
   expect(isPrivate()).toBeChecked()
 
@@ -58,6 +59,7 @@ test('a new group starts empty and private, and creates with what was typed and 
 test('editing starts from the group, offers no game picker, and saves without initial games', async () => {
   const { onSave } = setup({ group: GROUP })
   expect(screen.getByRole('heading', { name: en.groups.editGroup })).toBeInTheDocument()
+  expect(screen.getByRole('dialog')).toHaveClass('sm:max-w-[33.75rem]')
   expect(title()).toHaveValue('Speedruns')
   expect(description()).toHaveValue('Fast ones')
   expect(icon()).toHaveValue('🏃')

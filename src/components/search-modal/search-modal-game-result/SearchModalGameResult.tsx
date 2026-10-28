@@ -1,9 +1,9 @@
 'use client'
 
-import Image from 'next/image'
 import { useLanguage } from '@/context/LanguageContext'
 import { candidateIconUrl, CandidateStatus, GameCandidate } from '@/utils/gameCandidates'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
+import { FadeImage } from '@/components/ui/FadeImage'
 import SearchModalRow from '../search-modal-row/SearchModalRow'
 
 const STATUS_CLASSES: Record<CandidateStatus, string> = {
@@ -41,7 +41,7 @@ export default function SearchModalGameResult({
 
   return (
     <SearchModalRow
-      media={icon ? <Image src={icon} alt="" width={40} height={40} className="w-full h-full object-cover" unoptimized /> : null}
+      media={icon ? <FadeImage src={icon} alt="" width={40} height={40} className="w-full h-full" unoptimized /> : null}
       title={game.title}
       query={query}
       sub={

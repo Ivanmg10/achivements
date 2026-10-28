@@ -101,7 +101,7 @@ export default function UserPreferencesGeneral({
         icon={<IconBroadcast size={18} />}
       />
 
-      {vault && (
+      {vault ? (
         <UserProfileSwitch
           field="showInRankings"
           checked={vault.showInRankings}
@@ -111,6 +111,8 @@ export default function UserPreferencesGeneral({
           icon={<IconTrophy size={18} />}
           onSaved={setShowInRankings}
         />
+      ) : (
+        <div aria-hidden="true" data-testid="rankings-preference-placeholder" className="h-12" />
       )}
 
       <ProfileField
