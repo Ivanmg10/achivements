@@ -32,6 +32,7 @@ test('the showcase, then an empty slot for each free place', () => {
   expect(screen.getByRole('heading', { name: en.showcase.title })).toBeInTheDocument()
   expect(screen.getByText('Logro 1')).toBeInTheDocument()
   expect(screen.getAllByRole('button', { name: en.showcase.addSlot })).toHaveLength(3)
+  expect(screen.getAllByRole('button', { name: en.showcase.addSlot })[0]).toHaveClass('h-44')
   fireEvent.click(screen.getByRole('button', { name: `${en.showcase.remove}: Logro 1` }))
   expect(remove).toHaveBeenCalledWith(item('1', 1))
 })

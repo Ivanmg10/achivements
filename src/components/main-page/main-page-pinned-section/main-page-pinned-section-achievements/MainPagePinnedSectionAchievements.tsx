@@ -16,7 +16,7 @@ import MainPagePinnedSectionSortable from '../main-page-pinned-section-sortable/
 
 type RaPin = Extract<PinnedAchievement, { source: 'ra' }>
 
-const GRID = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3'
+const GRID = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 auto-rows-40 gap-3'
 
 /**
  * The pinned achievements, the heart of the Pinned section: how many are
@@ -47,7 +47,7 @@ export default function MainPagePinnedSectionAchievements() {
       {isLoading ? (
         <div className={GRID} aria-busy="true">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-28 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+            <div key={i} className="h-full rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
           ))}
         </div>
       ) : error ? (

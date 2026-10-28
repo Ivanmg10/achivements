@@ -122,7 +122,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={headingId} size="md" showClose={false} className="gap-4">
+        <Modal isOpen={isOpen} onClose={onClose} aria-labelledby={headingId} size={isEditing ? 'md' : 'xl'} showClose={false} className="gap-4">
             <div className="flex items-center justify-between px-5 sm:px-6 pt-5 pb-3 shrink-0">
               <h2 id={headingId} className="text-lg font-bold">
                 {isEditing ? T.groups.editGroup : T.groups.newGroup}

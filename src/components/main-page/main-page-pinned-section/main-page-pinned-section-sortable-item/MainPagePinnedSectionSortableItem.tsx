@@ -42,7 +42,7 @@ export default function MainPagePinnedSectionSortableItem({
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`relative ${isDragging ? 'z-10 opacity-70 shadow-2xl' : ''}`}
+      className={`relative h-full ${isDragging ? 'z-10 opacity-70 shadow-2xl' : ''}`}
     >
       {children(handle)}
     </li>

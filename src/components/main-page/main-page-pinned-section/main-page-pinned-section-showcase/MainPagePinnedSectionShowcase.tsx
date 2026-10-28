@@ -14,7 +14,7 @@ import MainPagePinnedSectionSortable from '../main-page-pinned-section-sortable/
 // Downloaded the first time it is opened, not with the page.
 const ShowcasePickerModal = dynamic(() => import('@/components/showcase-picker-modal/ShowcasePickerModal'), { loading: () => null })
 
-const SLOT = 'w-[calc(50%-0.375rem)] sm:w-40 min-h-44'
+const SLOT = 'w-[calc(50%-0.375rem)] sm:w-40 h-44'
 
 /**
  * The achievement showcase, at the top of the Pinned section: up to five
