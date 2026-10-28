@@ -29,6 +29,16 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-28 — UI polish quick wins (`feat/68-polish-quick-wins`, #68)
+
+**Did** — El estilo tinted de `GameCardBackdrop` conserva el gradiente del juego pero usa la hairline
+neutra del flat; `StreakTag` ganó `glow={false}` y solo el header la usa; Barlow y Barlow Condensed
+cargan `latin-ext`. Tests, lint y `tsc` en verde.
+**Why** — Decisiones de `docs/ui-polish-v2-plan.md` §1, §6 y §12.
+**Watch out** — El glow sigue activo por defecto en `StreakTag`; no cambiarlo para todos.
+
+---
+
 ## 2026-10-25 (night, 3) — The round design as it was, tiers everywhere, Disclosure (`feat/65-ui-surfaces`, #65)
 
 **Did** — (1) The round design is the old look: buttons, fields and cards keep soft corners (not
