@@ -29,6 +29,14 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-28 - CheevoVault favicon (`feat/79-cheevovault-favicon`, #79)
+
+**Did**: Replaced the `CH` placeholder in `src/app/icon.svg` with the existing CheevoVault mark.
+**Why**: The new logo belongs in the favicon only.
+**Decisions**: Kept the four traced paths after checking their overlay against the source drawing. The C follows the browser's light or dark scheme; the three V facets use steps of the default violet accent. Apple icons, manifest icons and the OG image stay unchanged.
+
+---
+
 ## 2026-10-25 (night, 3) — The round design as it was, tiers everywhere, Disclosure (`feat/65-ui-surfaces`, #65)
 
 **Did** — (1) The round design is the old look: buttons, fields and cards keep soft corners (not
