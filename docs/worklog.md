@@ -29,6 +29,15 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-29 — Layout chooser and fonts (`feat/75-layout-chooser-fonts`, #75)
+
+**Did** — The Layout dialog is now an `xl` chooser with a fixed sample home on the left (shape, font, home layout and game-card style scoped to it) and the choices in a side panel; the Page tab adds the font preference, and the welcome's preferences step offers it too. `font-style` is synced, painted before the first frame with `data-font`, and swaps `--font-ui` / `--font-barlow`. Sofia Sans and Fira Sans ship with their condensed italic display faces and `preload: false`.
+**Why** — #75: choices apply at once and need a live dummy main page, and the person can pick a type family beside Barlow.
+**Decisions** — The sample uses fixed game data and library pieces, never the person's own page. Barlow remains the default; `data-font="sofia"|"fira"` are the only overrides. On a phone the sample sits above the options.
+**Watch out** — Barlow has no Cyrillic and Japanese still falls back with every pair; only `latin-ext` was added where the face supports it.
+
+---
+
 ## 2026-10-28 - CheevoVault favicon (`feat/79-cheevovault-favicon`, #79)
 
 **Did**: Replaced the `CH` placeholder in `src/app/icon.svg` with the existing CheevoVault mark.

@@ -123,6 +123,23 @@
 }
 
 /*
+   The font pairs. Barlow is the default through the classes next/font sets on
+   <html>; `data-font` swaps the two variables every component reads, on <html>
+   or on a preview that shows another choice inside the page.
+*/
+html[data-font="sofia"],
+[data-font="sofia"]:not(html) {
+  --font-ui: var(--font-sofia);
+  --font-barlow: var(--font-sofia-display);
+}
+
+html[data-font="fira"],
+[data-font="fira"]:not(html) {
+  --font-ui: var(--font-fira);
+  --font-barlow: var(--font-fira-display);
+}
+
+/*
    The two designs, each usable on any element: `data-shape` on <html> is the
    person's choice (Preferences → Layout), and the design system's catalogue puts
    one on a specimen to show them side by side. Components read these tokens,

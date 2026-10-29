@@ -204,11 +204,12 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
 (`src/components/ui` and friends) and **pages built from it**. The catalogue of every piece is at
 **`/design`, admins only** (the flag is read from the database; others get the 404).
 
-- **Two designs, one switch:** `shape-style` = `slanted` (default) or `round` (Preferences → Layout →
-  Page), as `data-shape` on `<html>`; any element can carry its own `data-shape` to show a design
-  inside another (the catalogue and the choice cards do) (`ShapeSync`; a script in the root layout paints the last one before the first frame). The font is
-  the same in both: only shapes change. A
-  component never reads the choice: it reads tokens. A bar's cut ends are `slantStyle(px)`
+- **Two designs, two look preferences:** `shape-style` = `slanted` (default) or `round`, and
+  `font-style` = `barlow` (default), `sofia` or `fira` (Preferences → Layout → Page), as
+  `data-shape` and `data-font` on `<html>`; any element can carry either one to show a look inside
+  another (the catalogue, the choice cards and the Layout chooser's sample do) (`ShapeSync`; a
+  script in the root layout paints the last choices before the first frame). A component never
+  reads the choice: it reads tokens. A bar's cut ends are `slantStyle(px)`
   (`ui/shape.ts`), a mark's lean `skew-y-(--slant-mark)`, a control's `skew-x-(--slant-button)`.
   **Never a literal `polygon(...)` or `skew-*-[..]`** (`uiGuard.test.ts` fails on it). The round
   design may override the shape tokens; no theme may (`designTokens.test.ts`). The welcome curtain's
@@ -265,8 +266,10 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   `softcore`; the guard refuses red / green / yellow / amber / orange palette classes. Tier and
   platform hues are the exception.
 - **Streaks are in the accent**; amber (`warning`) only in the streak page's hero.
-- **Fonts:** Barlow for the UI, Barlow Condensed (italic 800) for display titles, both loaded in the
-  root layout (`src/lib/fonts.ts`). A page title, a big figure or a rank is `font-display italic`.
+- **Fonts:** Barlow + Barlow Condensed is the default pair; Sofia Sans and Fira Sans are optional
+  preferences, each with its condensed italic display face. All six are loaded in the root layout
+  (`src/lib/fonts.ts`); only Barlow preloads. A page title, a big figure or a rank is
+  `font-display italic`.
 - **Numbers a reader sees are in their language:** `toLocaleString(lang)`, `decimal(n, lang)` for a
   fixed count of decimals, `formatRarity(pct, lang)`; never `toFixed` on screen ("0,8", not "0.8").
 - **A game page's top is `GameHero`** (chips, title, facts, actions, tiles, media) and its tables use

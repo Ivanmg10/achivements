@@ -16,6 +16,7 @@ import { PRIMARY_BUTTON, QUIET_BUTTON, SECONDARY_BUTTON, SECTION_LABEL } from '@
 import styles from '@/components/welcome-page/WelcomePage.module.css'
 import Select from '@/components/ui/Select'
 import UserShapePreference from '@/components/user-page/user-shape-preference/UserShapePreference'
+import UserFontPreference from '@/components/user-page/user-font-preference/UserFontPreference'
 import UserGameCardPreference from '@/components/user-page/user-game-card-preference/UserGameCardPreference'
 import UserHomeLayoutPreference from '@/components/user-page/user-home-layout-preference/UserHomeLayoutPreference'
 
@@ -123,6 +124,7 @@ export default function WelcomePagePreferences({
           <UserHomeLayoutPreference />
           <UserGameCardPreference />
           <UserShapePreference />
+          <UserFontPreference />
         </div>
 
         <div className="flex flex-col gap-2">

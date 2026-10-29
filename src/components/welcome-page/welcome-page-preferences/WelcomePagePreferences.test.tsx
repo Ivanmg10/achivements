@@ -58,6 +58,14 @@ test('the three privacy switches, as on the account page', () => {
   expect(screen.getByRole('switch', { name: en.rankings.showInRankings })).toBeInTheDocument()
 })
 
+test('the look choices are the same ones as in the app', () => {
+  renderStep()
+  expect(screen.getByRole('group', { name: en.homeLayout.shapeLabel })).toBeInTheDocument()
+  expect(screen.getByRole('group', { name: en.homeLayout.fontLabel })).toBeInTheDocument()
+  expect(screen.getByRole('group', { name: en.homeLayout.label })).toBeInTheDocument()
+  expect(screen.getByRole('group', { name: en.homeLayout.cardsLabel })).toBeInTheDocument()
+})
+
 test('all themes opens the full picker; next and skip', async () => {
   const { onNext, onSkip } = renderStep()
   fireEvent.click(screen.getByRole('button', { name: T.prefs.allThemes }))

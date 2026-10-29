@@ -11,7 +11,10 @@ then `CLAUDE.md` → "The component library" for the hard rules.
    `--r-*`, `--h-*`, `--motion-*`). A theme changes the colours; a design changes
    the shapes. Today there are two designs: **slanted** (the default) and **round**, the site as it was before the slant
    (`[data-shape="round"]`, the person's choice, `useShapeStyle`; usable on any element). A third
-   would be one more block of overrides, not an edit of any component.
+   would be one more block of overrides, not an edit of any component. The **font** is a separate
+   preference, not a third design: Barlow (the default), Sofia Sans or Fira Sans, each with its
+   condensed italic display face, as `[data-font="sofia"|"fira"]` (`useFontStyle`; also usable on any
+   element). `globals.css` swaps the font variables there; only Barlow preloads.
 2. **The library** (`src/components/ui`, plus `VaultLevelBadge`, `GameCardBackdrop`…):
    every control, field, bar, ring, tag, dialog and surface. They read only tokens.
 3. **Pages and sections** (`src/components/<area>`): built *from* the library; they
@@ -32,7 +35,7 @@ then `CLAUDE.md` → "The component library" for the hard rules.
 - **Colour with a meaning comes from the theme** (danger, success, warning,
   `hardcore`, `softcore`). Hues of a *tier* (level badge, `streakTier`) are the
   exception and live in their own util, mixed with the text colour so they read on any theme.
-- **Preferences about looks** (`home-layout`, `game-card-style`, `shape-style`) are
+- **Preferences about looks** (`home-layout`, `game-card-style`, `shape-style`, `font-style`) are
   synced keys in `src/utils/syncedPreferences.ts`; components read them through a
   hook (`useStoredChoice` underneath), and the *tokens* carry the result.
 - **i18n:** every visible string is in `T` (all nine languages). The catalogue and
