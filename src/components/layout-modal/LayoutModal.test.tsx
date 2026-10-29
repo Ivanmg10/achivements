@@ -6,7 +6,9 @@ beforeEach(() => localStorage.clear())
 
 test('names itself Layout, and opens on the Page tab with the shape', () => {
   render(<LayoutModal isOpen onClose={jest.fn()} />)
-  expect(screen.getByRole('dialog', { name: en.homeLayout.layoutLabel })).toBeInTheDocument()
+  const dialog = screen.getByRole('dialog', { name: en.homeLayout.layoutLabel })
+  expect(dialog).toBeInTheDocument()
+  expect(dialog.parentElement).toHaveClass('bg-black/80')
   expect(screen.getByRole('tab', { name: en.homeLayout.tabPage })).toHaveAttribute('aria-selected', 'true')
   expect(screen.getByRole('group', { name: en.homeLayout.shapeLabel })).toBeInTheDocument()
   expect(screen.getByRole('group', { name: en.homeLayout.fontLabel })).toBeInTheDocument()

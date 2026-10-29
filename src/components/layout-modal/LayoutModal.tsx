@@ -26,7 +26,7 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
   const ids = tabIds(ID, part)
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="xl" title={T.homeLayout.layoutLabel} hint={T.homeLayout.modalHint} icon={<IconLayoutDashboard size={20} />} className="gap-0">
+    <Modal isOpen={isOpen} onClose={onClose} size="xl" backdrop="opaque" title={T.homeLayout.layoutLabel} hint={T.homeLayout.modalHint} icon={<IconLayoutDashboard size={20} />} className="gap-0">
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-0">
         <div className="min-w-0 lg:pr-6">
           <LayoutModalPreview />
@@ -47,7 +47,7 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
             {part === 'page' ? (
               <>
                 <UserShapePreference />
-                <UserFontPreference />
+                <UserFontPreference columns={2} />
               </>
             ) : (
               <>

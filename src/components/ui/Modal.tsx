@@ -5,6 +5,7 @@ import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
 const SIZES = { sm: 'sm:max-w-[27.5rem]', md: 'sm:max-w-[33.75rem]', lg: 'sm:max-w-[47.5rem]', xl: 'sm:max-w-5xl' } as const
+const BACKDROPS = { default: 'bg-black/60 backdrop-blur-[2px]', opaque: 'bg-black/80 backdrop-blur-sm' } as const
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 export type ModalProps = {
@@ -20,6 +21,8 @@ export type ModalProps = {
   size?: keyof typeof SIZES
   /** A confirmation that destroys something: `alertdialog`, the icon in the danger colour. */
   tone?: 'default' | 'danger'
+  /** How much of the page behind shows through; `opaque` is for an immersive chooser. */
+  backdrop?: keyof typeof BACKDROPS
   /** The quiet ✕ in the corner; on unless the content has its own way out. */
   showClose?: boolean
   /** Names the dialog when there is no `title` (otherwise its first heading does). */
@@ -45,6 +48,7 @@ export default function Modal({
   footer,
   size = 'sm',
   tone = 'default',
+  backdrop = 'default',
   showClose = true,
   'aria-label': ariaLabel,
   'aria-labelledby': labelledBy,
@@ -116,7 +120,7 @@ export default function Modal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-[2px] sm:p-4"
+          className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center ${BACKDROPS[backdrop]} sm:p-4`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
