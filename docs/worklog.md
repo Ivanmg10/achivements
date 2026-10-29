@@ -29,6 +29,13 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-29 - Global Portada stats and hero targets (`feat/74-portada-improvements`, #74)
+
+**Did** - Portada's five activity figures now read every platform. The hero keeps one game link and shows up to six unearned achievement icons plus the remaining count.
+**Why** - Follow-up to the user's review: the figures must be global, the duplicate action was redundant, and the hero needed a useful next-target preview.
+
+---
+
 ## 2026-10-29 - Portada stats refinement (`feat/74-portada-improvements`, #74)
 
 **Did** - Removed Portada's platform tabs and global-rank figure, leaving five wider activity figures. The cover no longer trims the shared chart height, so its heatmap cells stay the same size as Classic's.

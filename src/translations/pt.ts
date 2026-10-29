@@ -1831,6 +1831,7 @@ export const pt: Translations = {
     weekGain: '+{n} esta semana',
     yourWeek: 'A tua semana',
     weekDaysA11y: 'Pontos por dia, últimos 7 dias: {list}',
+    unearnedRemaining: '{n} por desbloquear',
     classicHint: 'Jogos recentes à esquerda e o perfil de cada plataforma à direita.',
     coverHint: 'No topo, em grande, o jogo deixado pela metade; abaixo, os recentes, o nível e a sequência.',
     byDefault: 'padrão',

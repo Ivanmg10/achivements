@@ -12,7 +12,7 @@ const steamItem = {
   game: { _source: 'steam', id: 620, title: 'Portal 2', consoleName: 'PC', imageIcon: '', maxPossible: 51, numAwarded: 40, pctWon: 78, lastPlayed: null },
 }
 const target = (title: string, rarity: number) => ({
-  id: title, title, description: '', earned: false, earnedAt: null, rarity, points: null, kind: null, iconUrl: null, href: '#',
+  id: title, title, description: '', earned: false, earnedAt: null, rarity, points: null, kind: null, iconUrl: `https://img/${title}.png`, href: '#',
 })
 
 beforeEach(() => (useGameInsights as jest.Mock).mockReturnValue({ items: [], loading: false, error: false }))
@@ -26,7 +26,7 @@ test('shows the game played last, its console, its progress and the ways in', ()
   expect(screen.getByText('40 / 51')).toBeInTheDocument()
   expect(screen.getByText(en.homeLayout.continueKicker)).toBeInTheDocument()
   expect(screen.getByRole('link', { name: en.homeLayout.openGame })).toHaveAttribute('href', '/steamGame/620')
-  expect(screen.getByRole('link', { name: 'See the 11 left' })).toHaveAttribute('href', '/steamGame/620')
+  expect(screen.getAllByRole('link')).toHaveLength(1)
 })
 
 test('names the easiest achievement left, with how many players have it', () => {
@@ -36,6 +36,15 @@ test('names the easiest achievement left, with how many players have it', () => 
   expect(useGameInsights).toHaveBeenCalledWith('steam', 620)
   expect(screen.getByText('Easy one')).toBeInTheDocument()
   expect(screen.getByText(/43\.9 % of players have it/)).toBeInTheDocument()
+})
+
+test('shows six unearned achievements at most and how many remain', () => {
+  ;(useRecentFeed as jest.Mock).mockReturnValue({ feed: [steamItem], loading: false })
+  ;(useGameInsights as jest.Mock).mockReturnValue({ items: Array.from({ length: 7 }, (_, i) => target(`Target ${i + 1}`, 50 - i)), loading: false, error: false })
+  render(<MainPagePortada />)
+  expect(screen.getByRole('img', { name: 'Target 6' })).toBeInTheDocument()
+  expect(screen.queryByRole('img', { name: 'Target 7' })).not.toBeInTheDocument()
+  expect(screen.getByRole('img', { name: '5 left to unlock' })).toHaveTextContent('+5')
 })
 
 const artOf = (container: HTMLElement) => container.querySelector('section img')?.getAttribute('src') ?? ''

@@ -1831,6 +1831,7 @@ export const de: Translations = {
     weekGain: '+{n} diese Woche',
     yourWeek: 'Deine Woche',
     weekDaysA11y: 'Punkte pro Tag, letzte 7 Tage: {list}',
+    unearnedRemaining: '{n} noch freizuschalten',
     classicHint: 'Deine letzten Spiele links und dein Profil je Plattform rechts.',
     coverHint: 'Oben groß das Spiel, das du angefangen hast; darunter deine letzten Spiele, Level und Serie.',
     byDefault: 'Standard',

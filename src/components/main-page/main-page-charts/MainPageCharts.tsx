@@ -139,11 +139,11 @@ export default function MainPageCharts() {
           <SectionFallback error={achError || rankError} onRefresh={refetchStats}>
             <MainPagePointsStats
               streak={streak}
-              achievements={achievements}
-              heatmapAchievements={heatmapData}
+              achievements={layout === 'cover' ? recent : achievements}
+              heatmapAchievements={layout === 'cover' ? year : heatmapData}
               rank={rank}
               showRank={layout !== 'cover'}
-              isLoading={achLoading || rankLoading}
+              isLoading={layout === 'cover' ? achLoading || steamLoading || psnLoading || xboxLoading || yearLoading : achLoading || rankLoading}
             />
           </SectionFallback>
         )}

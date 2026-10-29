@@ -9,7 +9,7 @@ import { NEUTRAL_TINT, useImageTint } from '@/hooks/useImageTint'
 import { homeHeroOf } from '@/utils/homeHero'
 import { gameHref } from '@/utils/gameRef'
 import { nextTargets } from '@/utils/gameInsights'
-import { decimal, plural, relativeTime } from '@/utils/utils'
+import { decimal, relativeTime } from '@/utils/utils'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import Button from '@/components/ui/Button'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
@@ -34,8 +34,10 @@ export default function MainPagePortada() {
 
   const art = [wide, ...hero.art].find((src): src is string => Boolean(src) && !failed.includes(src as string)) ?? null
   const when = hero.lastPlayed ? relativeTime(hero.lastPlayed, lang) : null
-  const next = nextTargets(items, 1)[0]
+  const upcoming = [...nextTargets(items, 6), ...items.filter((a) => !a.earned && a.rarity === null)].slice(0, 6)
+  const next = upcoming[0]
   const left = hero.total - hero.earned
+  const remaining = Math.max(0, left - upcoming.length)
 
   return (
     <section
@@ -103,13 +105,26 @@ export default function MainPagePortada() {
         )}
         <div className="flex flex-wrap gap-2.5 mt-5">
           <Button href={gameHref(hero.source, hero.id)}>{T.homeLayout.openGame}</Button>
-          {left > 0 && (
-            <Button variant="secondary" href={gameHref(hero.source, hero.id)}>
-              {plural(left, T.plurals.seeLeft, lang)}
-            </Button>
-          )}
         </div>
       </div>
+      {upcoming.length > 0 && (
+        <div className="absolute bottom-6 right-6 sm:bottom-12 sm:right-12 hidden xl:flex flex-col items-end gap-2">
+          <ul aria-label={T.homeLayout.nextEasiest} className="grid grid-cols-3 gap-2">
+            {upcoming.map((achievement) => (
+              <li key={achievement.id} className="w-12 h-12 rounded-tile overflow-hidden ring-1 ring-ink/20 bg-bg-main/70" title={achievement.title}>
+                {achievement.iconUrl && (
+                  <Image src={achievement.iconUrl} alt={achievement.title} width={48} height={48} unoptimized className="w-full h-full object-cover" />
+                )}
+              </li>
+            ))}
+          </ul>
+          {remaining > 0 && (
+            <GameHeroChip tone="custom" className="bg-bg-main/70 text-text-main">
+              <span role="img" aria-label={T.homeLayout.unearnedRemaining.replace('{n}', String(remaining))}>+{remaining}</span>
+            </GameHeroChip>
+          )}
+        </div>
+      )}
     </section>
   )
 }

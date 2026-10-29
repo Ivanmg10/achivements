@@ -1831,6 +1831,7 @@ export const ja: Translations = {
     weekGain: '今週 +{n}',
     yourWeek: '今週',
     weekDaysA11y: '1日ごとのポイント、過去7日間: {list}',
+    unearnedRemaining: '残り{n}個',
     classicHint: '左に最近のゲーム、右に各プラットフォームのプロフィール。',
     coverHint: '上に途中のゲームを大きく、その下に最近のゲーム・レベル・連続記録。',
     byDefault: '標準',

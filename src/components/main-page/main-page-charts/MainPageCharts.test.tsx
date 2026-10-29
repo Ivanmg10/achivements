@@ -22,7 +22,12 @@ function mockProbe(name: string) {
 jest.mock('./MainPageHeatmap', () => mockProbe('heatmap'))
 jest.mock('./MainPageTopGames', () => mockProbe('top-games'))
 jest.mock('@/components/achivements-line-chart/AchievementsLineChart', () => mockProbe('daily'))
-jest.mock('./MainPagePointsStats', () => mockProbe('points'))
+jest.mock('./MainPagePointsStats', () => ({
+  __esModule: true,
+  default: ({ achievements, heatmapAchievements, isLoading }: { achievements: { Title: string }[]; heatmapAchievements: { Title: string }[]; isLoading?: boolean }) => (
+    <div data-testid="points">{isLoading ? 'loading' : `${achievements.map((a) => a.Title).join(',')}|${heatmapAchievements.map((a) => a.Title).join(',')}`}</div>
+  ),
+}))
 jest.mock('./MainPageRarest', () => mockProbe('rarest'))
 jest.mock('./MainPageAbandoned', () => mockProbe('abandoned'))
 jest.mock('../main-page-collection/MainPageCollection', () => mockProbe('collection'))
@@ -93,6 +98,13 @@ test('loads nothing from Steam without a linked account', () => {
   ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false, library: [], libraryLoading: false })
   render(<MainPageCharts />)
   expect(useSteamRecentAchievements).toHaveBeenCalledWith(null)
+})
+
+test('Portada activity figures use every platform and the shared year', () => {
+  platform('ra')
+  ;(useHomeLayout as jest.Mock).mockReturnValue(['cover', jest.fn()])
+  render(<MainPageCharts />)
+  expect(screen.getByTestId('points')).toHaveTextContent('Recent RA,Win|Year RA')
 })
 
 /** Every card id the section rail can reach, visiting each section in turn. */
