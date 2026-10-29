@@ -129,7 +129,19 @@ export default function MainPageCharts() {
   const panels: Record<string, ReactNode> = {
     overview: (
       <>
-        {platform === 'steam' ? (
+        {layout === 'cover' ? (
+          <SectionFallback error={achError || rankError} onRefresh={refetchStats}>
+            <MainPagePointsStats
+              streak={streak}
+              achievements={recent}
+              heatmapAchievements={year}
+              rank={rank}
+              showRank={false}
+              valueMode="achievements"
+              isLoading={achLoading || steamLoading || psnLoading || xboxLoading || yearLoading}
+            />
+          </SectionFallback>
+        ) : platform === 'steam' ? (
           <MainPageSteamStats streak={streak} achievements={steamRecent} games={library} isLoading={steamLoading} />
         ) : platform === 'psn' ? (
           <MainPagePsnStats streak={streak} achievements={psnRecent} isLoading={psnLoading} />
@@ -139,12 +151,10 @@ export default function MainPageCharts() {
           <SectionFallback error={achError || rankError} onRefresh={refetchStats}>
             <MainPagePointsStats
               streak={streak}
-              achievements={layout === 'cover' ? recent : achievements}
-              heatmapAchievements={layout === 'cover' ? year : heatmapData}
+              achievements={achievements}
+              heatmapAchievements={heatmapData}
               rank={rank}
-              showRank={layout !== 'cover'}
-              valueMode={layout === 'cover' ? 'achievements' : 'points'}
-              isLoading={layout === 'cover' ? achLoading || steamLoading || psnLoading || xboxLoading || yearLoading : achLoading || rankLoading}
+              isLoading={achLoading || rankLoading}
             />
           </SectionFallback>
         )}

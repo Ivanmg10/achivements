@@ -17,6 +17,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import Button from '@/components/ui/Button'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import AchievementDetailModal from '@/components/achievement-detail-modal/AchievementDetailModal'
+import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 
 /**
@@ -35,7 +36,7 @@ export default function MainPagePortada() {
   const [selected, setSelected] = useState<InsightAchievement | null>(null)
   const tooltipId = useId()
   const hero = loading ? null : homeHeroOf(feed[0])
-  const { items, art: wide, loading: reading } = useGameInsights(hero?.source ?? null, hero?.id ?? null)
+  const { items, art: wide, loading: reading, ra } = useGameInsights(hero?.source ?? null, hero?.id ?? null)
   const tint = useImageTint(hero?.icon) ?? NEUTRAL_TINT
   if (!hero) return null
 
@@ -45,6 +46,7 @@ export default function MainPagePortada() {
   const next = upcoming[0]
   const left = hero.total - hero.earned
   const remaining = Math.max(0, left - upcoming.length)
+  const selectedRa = selected && hero.source === 'ra' ? ra?.items.find((a) => String(a.ID) === selected.id) : undefined
 
   return (
     <section
@@ -160,7 +162,15 @@ export default function MainPagePortada() {
         </div>
       )}
       <AnimatePresence>
-        {selected && (
+        {selectedRa ? (
+          <AchievementModal
+            achievement={selectedRa}
+            numDistinctPlayers={ra!.players}
+            gameId={hero.id}
+            gameTitle={hero.title}
+            onClose={() => setSelected(null)}
+          />
+        ) : selected && hero.source !== 'ra' ? (
           <AchievementDetailModal
             title={selected.title}
             description={selected.description}
@@ -168,10 +178,10 @@ export default function MainPagePortada() {
             earned={selected.earned}
             earnedAt={selected.earnedAt}
             rarity={selected.rarity}
-            guides={hero.source === 'ra' ? [] : guideLinks(hero.source, { gameTitle: hero.title, title: selected.title, appId: hero.id })}
+            guides={guideLinks(hero.source, { gameTitle: hero.title, title: selected.title, appId: hero.id })}
             onClose={() => setSelected(null)}
           />
-        )}
+        ) : null}
       </AnimatePresence>
     </section>
   )

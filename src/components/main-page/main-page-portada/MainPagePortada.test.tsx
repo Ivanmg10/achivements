@@ -6,6 +6,10 @@ import { en } from '@/translations/en'
 
 jest.mock('@/hooks/useRecentFeed', () => ({ useRecentFeed: jest.fn() }))
 jest.mock('@/hooks/useGameInsights', () => ({ useGameInsights: jest.fn() }))
+jest.mock('@/components/achievement-modal/AchievementModal', () => ({
+  __esModule: true,
+  default: ({ achievement }: { achievement: { Title: string } }) => <div data-testid="ra-achievement-modal">{achievement.Title}</div>,
+}))
 jest.mock('@/components/achievement-detail-modal/AchievementDetailModal', () => ({
   __esModule: true,
   default: ({ title }: { title: string }) => <div data-testid="achievement-modal">{title}</div>,
@@ -14,6 +18,10 @@ jest.mock('@/components/achievement-detail-modal/AchievementDetailModal', () => 
 const steamItem = {
   source: 'steam', key: 's', lastPlayed: null,
   game: { _source: 'steam', id: 620, title: 'Portal 2', consoleName: 'PC', imageIcon: '', maxPossible: 51, numAwarded: 40, pctWon: 78, lastPlayed: null },
+}
+const raItem = {
+  source: 'ra', key: 'r', lastPlayed: null,
+  game: { GameID: 7, Title: 'RA Game', ImageIcon: '', ConsoleName: 'SNES', NumPossibleAchievements: 10, NumAchieved: 1, NumAchievedHardcore: 1 },
 }
 const target = (title: string, rarity: number) => ({
   id: title, title, description: `About ${title}`, earned: false, earnedAt: null, rarity, points: null, kind: null, iconUrl: `https://img/${title}.png`, href: '#',
@@ -57,6 +65,15 @@ test('shows five grey unearned achievements at most and a matching remaining til
   expect(remaining).toHaveTextContent('+6')
   expect(remaining).toHaveAttribute('href', '/steamGame/620')
   expect(remaining).toHaveClass('w-full', 'h-full')
+})
+
+test('an RA target opens the same modal as gameInfo', () => {
+  ;(useRecentFeed as jest.Mock).mockReturnValue({ feed: [raItem], loading: false })
+  ;(useGameInsights as jest.Mock).mockReturnValue({ items: [{ ...target('RA target', 50), id: '1' }], ra: { items: [{ ID: 1, Title: 'RA target' }], players: 100 }, loading: false, error: false })
+  render(<MainPagePortada />)
+  fireEvent.click(screen.getByRole('button', { name: 'RA target' }))
+  expect(screen.getByTestId('ra-achievement-modal')).toHaveTextContent('RA target')
+  expect(screen.queryByTestId('achievement-modal')).not.toBeInTheDocument()
 })
 
 const artOf = (container: HTMLElement) => container.querySelector('section img')?.getAttribute('src') ?? ''

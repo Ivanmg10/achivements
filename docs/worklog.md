@@ -29,6 +29,13 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-29 - Portada review fixes (`feat/74-portada-improvements`, #74)
+
+**Did** - RA hero targets now open gameInfo's own achievement modal. Classic's platform tab no longer changes Portada's global stats, and large stat-pill hover backgrounds lean with the slanted design.
+**Why** - Follow-up to the user's modal, hover and cross-layout state bug reports.
+
+---
+
 ## 2026-10-29 - Portada targets and unlock counts (`feat/74-portada-improvements`, #74)
 
 **Did** - Hero target tiles now have descriptive tooltips and open their achievement detail; the remaining tile links to the game. Portada's activity figures count unlocks instead of RA points.

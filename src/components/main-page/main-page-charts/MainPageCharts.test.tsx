@@ -100,11 +100,12 @@ test('loads nothing from Steam without a linked account', () => {
   expect(useSteamRecentAchievements).toHaveBeenCalledWith(null)
 })
 
-test('Portada activity figures use every platform and the shared year', () => {
-  platform('ra')
+test('Portada activity figures use every platform and ignore the Classic platform tab', () => {
+  platform('steam')
   ;(useHomeLayout as jest.Mock).mockReturnValue(['cover', jest.fn()])
   render(<MainPageCharts />)
   expect(screen.getByTestId('points')).toHaveTextContent('Recent RA,Win|Year RA')
+  expect(screen.queryByTestId('steam-stats')).not.toBeInTheDocument()
 })
 
 /** Every card id the section rail can reach, visiting each section in turn. */
