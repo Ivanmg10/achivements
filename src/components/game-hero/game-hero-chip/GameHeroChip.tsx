@@ -11,8 +11,8 @@ export default function GameHeroChip({ tone = 'neutral', className = '', childre
     custom: '',
   }
   return (
-    <span className={`inline-flex items-center gap-1.5 h-6 px-[0.5625rem] rounded-tag text-xs font-bold whitespace-nowrap ${TONES[tone]} ${className}`}>
-      {children}
+    <span className={`inline-flex items-center gap-1.5 h-6 px-[0.5625rem] rounded-tag text-xs font-bold whitespace-nowrap skew-x-(--slant-pill) ${TONES[tone]} ${className}`}>
+      <span className="inline-flex items-center gap-1.5 -skew-x-(--slant-pill)">{children}</span>
     </span>
   )
 }

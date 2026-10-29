@@ -34,7 +34,7 @@ export default function StreakTag({ days, text, size = 'md', glow = true, classN
     <span
       aria-label={aria['aria-label']}
       data-tier={tier.id}
-      className={`inline-flex items-center font-extrabold tabular-nums whitespace-nowrap shrink-0 ${box} ${lit ? '' : 'bg-ink/[0.06] text-text-secondary'} ${className}`}
+      className={`inline-flex items-center font-extrabold tabular-nums whitespace-nowrap shrink-0 skew-x-(--slant-pill) ${box} ${lit ? '' : 'bg-ink/[0.06] text-text-secondary'} ${className}`}
       style={
         lit
           ? {
@@ -45,8 +45,8 @@ export default function StreakTag({ days, text, size = 'md', glow = true, classN
           : undefined
       }
     >
-      <Flame size={size === 'lg' ? 16 : 13} aria-hidden="true" style={lit && glow ? { filter: `drop-shadow(0 0 4px rgb(${tier.color} / 0.6))` } : undefined} />
-      <span aria-hidden={aria['aria-label'] ? true : undefined}>{text}</span>
+      <Flame size={size === 'lg' ? 16 : 13} aria-hidden="true" className="-skew-x-(--slant-pill)" style={lit && glow ? { filter: `drop-shadow(0 0 4px rgb(${tier.color} / 0.6))` } : undefined} />
+      <span aria-hidden={aria['aria-label'] ? true : undefined} className="-skew-x-(--slant-pill)">{text}</span>
     </span>
   )
 }

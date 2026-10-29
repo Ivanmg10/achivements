@@ -7,6 +7,7 @@ jest.mock('@/hooks/useUserRank', () => ({ useUserRank: () => ({ rank: null, isLo
 jest.mock('@/hooks/useUserAwards', () => ({ useUserAwards: () => ({ awards: null, isLoading: false }) }))
 jest.mock('@/hooks/useSteamRecentAchievements', () => ({ useSteamRecentAchievements: jest.fn() }))
 jest.mock('@/context/MainPlatformContext', () => ({ useMainPlatform: jest.fn() }))
+jest.mock('@/hooks/useHomeLayout', () => ({ useHomeLayout: jest.fn() }))
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
 
 // The cards themselves have their own tests; here only what each one is fed matters.
@@ -46,15 +47,17 @@ import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { useMainPlatform } from '@/context/MainPlatformContext'
+import { useHomeLayout } from '@/hooks/useHomeLayout'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 
 const STEAM_UNLOCK = { appId: 620, gameTitle: 'Portal 2', apiname: 'WIN', title: 'Win', badgeUrl: '', unlockedAt: '2024-01-15T10:00:00.000Z' }
 
 function platform(p: 'ra' | 'steam') {
-  ;(useMainPlatform as jest.Mock).mockReturnValue({ platform: p })
+  ;(useMainPlatform as jest.Mock).mockReturnValue({ platform: p, linked: ['ra', 'steam'], setPlatform: jest.fn() })
 }
 
 beforeEach(() => {
+  ;(useHomeLayout as jest.Mock).mockReturnValue(['classic', jest.fn()])
   ;(useRecentAchievements as jest.Mock).mockReturnValue({ achievements: [{ Title: 'Recent RA', Date: '2024-01-20 10:00:00' }], isLoading: false })
   ;(useActivityHeatmap as jest.Mock).mockReturnValue({ achievements: [{ Title: 'Heatmap RA', Date: '2024-01-10 10:00:00' }], isLoading: false })
   ;(useSteamRecentAchievements as jest.Mock).mockReturnValue({ achievements: [STEAM_UNLOCK], isLoading: false })
@@ -66,6 +69,15 @@ beforeEach(() => {
     error: false,
     refetch: jest.fn(),
   })
+})
+
+test('the cover head switches the same platform as the classic profile', () => {
+  const setPlatform = jest.fn()
+  ;(useMainPlatform as jest.Mock).mockReturnValue({ platform: 'ra', linked: ['ra', 'steam'], setPlatform })
+  ;(useHomeLayout as jest.Mock).mockReturnValue(['cover', jest.fn()])
+  render(<MainPageCharts />)
+  fireEvent.click(screen.getByRole('tab', { name: 'Steam' }))
+  expect(setPlatform).toHaveBeenCalledWith('steam')
 })
 
 test('feeds the shared activity cards both platforms, newest first', () => {

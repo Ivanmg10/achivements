@@ -1830,6 +1830,8 @@ export const en = {
     ownedBy: '{pct} of players have it',
     todayNone: 'Nothing yet today: {h} h left to keep it going.',
     weekGain: '+{n} this week',
+    yourWeek: 'Your week',
+    weekDaysA11y: 'Points per day, last 7 days: {list}',
     classicHint: 'Your recent games on the left and your profile on each platform on the right.',
     coverHint: 'On top, in big, the game you left halfway; under it, your recent games, level and streak.',
     byDefault: 'default',

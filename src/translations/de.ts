@@ -1829,6 +1829,8 @@ export const de: Translations = {
     ownedBy: '{pct} haben es',
     todayNone: 'Heute noch nichts: noch {h} Std., um sie zu halten.',
     weekGain: '+{n} diese Woche',
+    yourWeek: 'Deine Woche',
+    weekDaysA11y: 'Punkte pro Tag, letzte 7 Tage: {list}',
     classicHint: 'Deine letzten Spiele links und dein Profil je Plattform rechts.',
     coverHint: 'Oben groß das Spiel, das du angefangen hast; darunter deine letzten Spiele, Level und Serie.',
     byDefault: 'Standard',

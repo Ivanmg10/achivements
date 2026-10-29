@@ -6,6 +6,8 @@ import VaultPlatformSplit from '@/components/vault-platform-split/VaultPlatformS
 test('shows the level and the tier in words', () => {
   render(<VaultLevelBadge points={126_000} />)
   expect(screen.getByText('Lv 32')).toBeInTheDocument()
+  expect(screen.getByText('Lv 32')).toHaveClass('-skew-x-(--slant-pill)')
+  expect(screen.getByTitle(`Level 32 · ${en.rankings.tiers.veteran}`)).toHaveClass('skew-x-(--slant-pill)')
   expect(screen.getByText(`· ${en.rankings.tiers.veteran}`)).toBeInTheDocument()
 })
 

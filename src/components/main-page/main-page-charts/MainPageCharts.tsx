@@ -27,6 +27,8 @@ import { psnToRecentAchievement } from '@/utils/psnMappers'
 import { xboxToRecentAchievement } from '@/utils/xboxMappers'
 import { ChartCard } from '@/components/ui/ChartCard'
 import { SectionFallback } from '@/components/ui/SectionFallback'
+import Tabs, { tabIds } from '@/components/ui/Tabs'
+import { useHomeLayout } from '@/hooks/useHomeLayout'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
 import MainPageHeatmap from './MainPageHeatmap'
@@ -81,7 +83,10 @@ export default function MainPageCharts() {
   const { all, inProgress, isLoading: gamesLoading, error: gamesError, refetch: refetchGames } = useGamesData()
   const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
   const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
-  const { platform } = useMainPlatform()
+  const { platform, setPlatform, linked } = useMainPlatform()
+  const [layout] = useHomeLayout()
+  const showPlatformTabs = layout === 'cover' && !visitor && linked.length > 1
+  const platformTabIds = tabIds('stats-platform', platform)
   const { isLinked: steamLinked, library } = useSteamGamesData()
   const { achievements: steamActivity, isLoading: steamLoading } = useSteamRecentAchievements(steamLinked ? 'activity' : null)
   const { library: psnLibrary } = usePsnGamesData()
@@ -225,7 +230,20 @@ export default function MainPageCharts() {
 
   return (
     <section ref={sectionRef} className="p-4 flex flex-col gap-4 bg-bg-main scroll-mt-16" aria-labelledby={`${idPrefix}-title`} data-stats-section={section}>
-      <h2 id={`${idPrefix}-title`} className="text-xl font-semibold text-text-main">{T.cards.statsActivity}</h2>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <h2 id={`${idPrefix}-title`} className="text-xl font-semibold text-text-main shrink-0">{T.cards.statsActivity}</h2>
+        {showPlatformTabs && (
+          <Tabs
+            id="stats-platform"
+            aria-label={T.steam.profileTabsLabel}
+            value={platform}
+            onChange={setPlatform}
+            tabs={linked.map((value) => ({ value, label: value === 'ra' ? 'RetroAchievements' : value === 'psn' ? 'PlayStation' : value === 'xbox' ? 'Xbox' : 'Steam' }))}
+            size="sm"
+            className="sm:max-w-[calc(100%-12rem)]"
+          />
+        )}
+      </div>
 
       {/*
         One section at a time instead of every card stacked: on a phone the
@@ -236,7 +254,12 @@ export default function MainPageCharts() {
         what they hold survives a switch): the area is as tall as that section,
         and the rail beside it runs exactly that height.
       */}
-      <div className="flex flex-col lg:grid lg:grid-cols-[minmax(180px,220px)_1fr] gap-4 lg:items-start">
+      <div
+        role={showPlatformTabs ? 'tabpanel' : undefined}
+        id={showPlatformTabs ? platformTabIds.panel : undefined}
+        aria-labelledby={showPlatformTabs ? platformTabIds.tab : undefined}
+        className="flex flex-col lg:grid lg:grid-cols-[minmax(180px,220px)_1fr] gap-4 lg:items-start"
+      >
         <MainPageStatsRail
           sections={sections}
           active={section}

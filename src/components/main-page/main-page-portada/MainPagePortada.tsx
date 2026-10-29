@@ -12,6 +12,7 @@ import { nextTargets } from '@/utils/gameInsights'
 import { decimal, plural, relativeTime } from '@/utils/utils'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import Button from '@/components/ui/Button'
+import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 
 /**
  * The top of the home in its "cover" layout (Preferences → General): the game
@@ -78,9 +79,9 @@ export default function MainPagePortada() {
           {hero.title}
         </h2>
         {hero.console && (
-          <span className="self-start inline-flex items-center h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-black/50 text-text-main">
+          <GameHeroChip tone="custom" className="self-start bg-black/50 text-text-main">
             {hero.console}
-          </span>
+          </GameHeroChip>
         )}
         {hero.total > 0 && (
           <div className="flex items-center gap-3.5 max-w-lg mt-2">

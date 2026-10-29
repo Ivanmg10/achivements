@@ -36,12 +36,13 @@ const VIEW_EASE = [0.4, 0, 0.2, 1] as const
 const ROW_STYLE = { flex: '1 1 0%' }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-export default function RARecentlyPlayed() {
+export default function RARecentlyPlayed({ skipLatest = false }: { skipLatest?: boolean }) {
   const { T } = useLanguage()
   const subject = useSubject()
   const reduce = useReducedMotion()
   // One feed across platforms, newest first, once every linked platform has answered.
-  const { feed, loading, error, refetch } = useRecentFeed(MAX_GAMES)
+  const { feed, loading, error, refetch } = useRecentFeed(MAX_GAMES + (skipLatest ? 1 : 0))
+  const recent = skipLatest ? feed.slice(1) : feed
 
   // Keyed by feed key, not game id: RA game 730 and Steam app 730 are different games.
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -80,7 +81,7 @@ export default function RARecentlyPlayed() {
     }
   }
 
-  const displayedItems = expanded === null ? feed : feed.filter((item) => item.key === expanded)
+  const displayedItems = expanded === null ? recent : recent.filter((item) => item.key === expanded)
 
   return (
     <div className="flex flex-col flex-1 min-h-0 gap-2">
@@ -99,9 +100,9 @@ export default function RARecentlyPlayed() {
               <GameRowSkeleton key={i} className="flex-1" />
             ))}
           </div>
-        ) : error && feed.length === 0 ? (
+        ) : error && recent.length === 0 ? (
           <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>
-        ) : feed.length === 0 ? (
+        ) : recent.length === 0 ? (
           <EmptyState
             icon={<IconDeviceGamepad2 className="w-6 h-6" />}
             title={T.cards.noGames}

@@ -29,6 +29,13 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-29 - Portada layout improvements (`feat/74-portada-improvements`, #74)
+
+**Did** - Added the level ring and a seven-day "Your week" summary, removed the hero from Portada's recent feed, put shared platform tabs in Stats & Activity, and slanted the shared level, streak and platform tags. The home columns explicitly stretch together.
+**Why** - #74: make Portada's level useful, clarify the stats source and remove repeated content while keeping the slanted design consistent.
+
+---
+
 ## 2026-10-29 - Vivid game card tint (`feat/76-vivid-game-tint`, #76)
 
 **Did** - `averageTint` now selects the most colourful hue cluster and caps its OKLCH chroma and lightness; colourless artwork falls back to the neutral tint.

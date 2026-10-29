@@ -47,7 +47,10 @@ test('no tiles and no media: no right column', () => {
 
 test('a chip takes its tone', () => {
   render(<GameHeroChip tone="danger">2 missable</GameHeroChip>)
-  expect(screen.getByText('2 missable')).toHaveClass('text-danger')
+  const chip = screen.getByText('2 missable').parentElement!
+  expect(chip).toHaveClass('text-danger')
+  expect(chip).toHaveClass('skew-x-(--slant-pill)')
+  expect(chip.firstElementChild).toHaveClass('-skew-x-(--slant-pill)')
 })
 
 test('the progress: the bar, the share and the count', () => {
