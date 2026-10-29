@@ -84,6 +84,19 @@ describe('MainPagePointsStats', () => {
     expect(screen.getByText('5,000 pts')).toBeInTheDocument()
   })
 
+  test('Portada leaves out global rank and keeps the five activity figures', () => {
+    render(
+      <MainPagePointsStats
+        achievements={[]}
+        heatmapAchievements={[]}
+        rank={{ Rank: 1234, Score: 5000, SoftcoreScore: 0 } as unknown as UserRankAndScore}
+        showRank={false}
+      />,
+    )
+    for (const label of ['Today', 'This week', 'This month', 'Avg/day (30d)', 'Streak']) expect(screen.getByText(label)).toBeInTheDocument()
+    expect(screen.queryByText('Global rank')).not.toBeInTheDocument()
+  })
+
   test('sums only this-calendar-month points from heatmap achievements', () => {
     const heatmapAchievements = [
       { Date: `${daysAgo(2)} 10:00:00`, Points: 50, HardcoreMode: '0' } as unknown as RecentAchievement,

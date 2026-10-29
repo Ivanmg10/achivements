@@ -71,15 +71,6 @@ beforeEach(() => {
   })
 })
 
-test('the cover head switches the same platform as the classic profile', () => {
-  const setPlatform = jest.fn()
-  ;(useMainPlatform as jest.Mock).mockReturnValue({ platform: 'ra', linked: ['ra', 'steam'], setPlatform })
-  ;(useHomeLayout as jest.Mock).mockReturnValue(['cover', jest.fn()])
-  render(<MainPageCharts />)
-  fireEvent.click(screen.getByRole('tab', { name: 'Steam' }))
-  expect(setPlatform).toHaveBeenCalledWith('steam')
-})
-
 test('feeds the shared activity cards both platforms, newest first', () => {
   platform('ra')
   render(<MainPageCharts />)

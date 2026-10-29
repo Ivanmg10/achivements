@@ -849,7 +849,8 @@ html[data-font="fira"],
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll { overflow-y: auto; }
   /* The daily chart sets the height of the charts row (the heatmap follows its box): scaled to the screen here. */
   /* Less what the box would run past the screen (--home-fit-trim, set by homeFit), so the stats end where the screen does. */
-  .home-fit:has([data-stats-section="overview"]) .home-fit-chart { height: max(160px, clamp(160px, 20dvh, 260px) - var(--home-fit-trim, 0px)); }
+  /* Portada already has its hero above the home: trimming this chart made its heatmap cells smaller than Classic's. */
+  .home-fit:not(:has(.home-cover)):has([data-stats-section="overview"]) .home-fit-chart { height: max(160px, clamp(160px, 20dvh, 260px) - var(--home-fit-trim, 0px)); }
   /* The rows carry flex: 1 1 0 inline (ROW_STYLE). Here they may grow to share spare height but never shrink: short of room, the list scrolls. */
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * { flex: 1 0 auto !important; }
   /* A row taller than its content keeps the content in the middle, not stuck to the top. */

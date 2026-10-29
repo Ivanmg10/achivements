@@ -40,7 +40,7 @@ export default function MainPagePortada() {
   return (
     <section
       aria-labelledby="home-cover-title"
-      className="relative mx-3 mt-3 rounded-card overflow-hidden ring-1 ring-ink/[0.08] bg-bg-card min-h-64 sm:min-h-[23.75rem] flex"
+      className="home-cover relative mx-3 mt-3 rounded-card overflow-hidden ring-1 ring-ink/[0.08] bg-bg-card min-h-64 sm:min-h-[23.75rem] flex"
       style={art ? undefined : { backgroundImage: `radial-gradient(ellipse at 80% 40%, rgb(${tint} / 0.4), transparent 62%)` }}
     >
       {art ? (

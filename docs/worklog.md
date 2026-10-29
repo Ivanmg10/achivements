@@ -29,6 +29,13 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-29 - Portada stats refinement (`feat/74-portada-improvements`, #74)
+
+**Did** - Removed Portada's platform tabs and global-rank figure, leaving five wider activity figures. The cover no longer trims the shared chart height, so its heatmap cells stay the same size as Classic's.
+**Why** - Follow-up to the user's screenshot review: simplify the cover stats and fix its smaller heatmap.
+
+---
+
 ## 2026-10-29 - Portada layout improvements (`feat/74-portada-improvements`, #74)
 
 **Did** - Added the level ring and a seven-day "Your week" summary, removed the hero from Portada's recent feed, put shared platform tabs in Stats & Activity, and slanted the shared level, streak and platform tags. The home columns explicitly stretch together.

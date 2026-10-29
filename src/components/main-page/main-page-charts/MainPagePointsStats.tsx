@@ -15,6 +15,7 @@ export default function MainPagePointsStats({
   heatmapAchievements,
   streak = 0,
   rank,
+  showRank = true,
   isLoading,
 }: {
   achievements: RecentAchievement[]
@@ -22,6 +23,8 @@ export default function MainPagePointsStats({
   /** Current streak in days, the top bar's. */
   streak?: number
   rank: UserRankAndScore | null
+  /** Portada keeps only the five activity figures; Classic also shows global rank. */
+  showRank?: boolean
   isLoading?: boolean
 }) {
   const { T, lang } = useLanguage()
@@ -33,7 +36,7 @@ export default function MainPagePointsStats({
   if (isLoading) {
     return (
       <div className="flex flex-wrap gap-3">
-        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.userStats.globalRank, T.streak.title].map((label) => (
+        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, ...(showRank ? [T.userStats.globalRank] : []), T.streak.title].map((label) => (
           <StatPill key={label} label={label} value="—" accent="text-text-secondary" />
         ))}
       </div>
@@ -68,7 +71,7 @@ export default function MainPagePointsStats({
       <StatPill label={T.pointsStats.thisWeek} value={pts7d.toLocaleString()} sub={plural(weekAchievements.length, T.plurals.achievements, lang)} onClick={() => setWeekOpen(true)} />
       <StatPill label={T.pointsStats.thisMonth} value={thisMonth.pts.toLocaleString()} sub={plural(thisMonth.ach, T.plurals.achievements, lang)} onClick={() => setMonthOpen(true)} />
       <StatPill label={T.pointsStats.avgPerDay} value={decimal(avgPerDay, lang)} sub={T.pointsStats.perDay} />
-      {rank?.Rank != null && <StatPill label={T.userStats.globalRank} value={`#${rank.Rank.toLocaleString(lang)}`} sub={`${(rank.Score ?? 0).toLocaleString(lang)} pts`} />}
+      {showRank && rank?.Rank != null && <StatPill label={T.userStats.globalRank} value={`#${rank.Rank.toLocaleString(lang)}`} sub={`${(rank.Score ?? 0).toLocaleString(lang)} pts`} />}
       <StatPill label={T.streak.title} value={`${streak}d`} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} accentColor={streak > 0 ? streakInk(streakTier(streak)) : undefined} href="/racha" />
 
       <AnimatePresence>
