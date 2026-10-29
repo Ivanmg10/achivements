@@ -29,6 +29,14 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-29 - Vivid game card tint (`feat/76-vivid-game-tint`, #76)
+
+**Did** - `averageTint` now selects the most colourful hue cluster and caps its OKLCH chroma and lightness; colourless artwork falls back to the neutral tint.
+**Why** - #76: keep the game's own colour vivid without muddy averages, neon highlights or near-black card tints.
+**Decisions** - The gradient and card styling stay unchanged; only tint extraction and its focused tests changed.
+
+---
+
 ## 2026-10-29 — Layout chooser and fonts (`feat/75-layout-chooser-fonts`, #75)
 
 **Did** — The Layout dialog is now an `xl` chooser with a fixed sample home on the left (shape, font, home layout and game-card style scoped to it) and the choices in a side panel; the Page tab adds the font preference, and the welcome's preferences step offers it too. `font-style` is synced, painted before the first frame with `data-font`, and swaps `--font-ui` / `--font-barlow`. Sofia Sans and Fira Sans ship with their condensed italic display faces and `preload: false`. After the user's screenshot, `Modal` gained `backdrop="opaque"` (`bg-black/80` with `blur-sm`) and the Layout chooser uses it. A second screenshot showed the font cards too narrow in the side panel: they render two per row there now, and choice-card text wraps instead of spilling.
