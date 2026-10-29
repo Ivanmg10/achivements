@@ -34,7 +34,7 @@ export default function MainPagePortada() {
 
   const art = [wide, ...hero.art].find((src): src is string => Boolean(src) && !failed.includes(src as string)) ?? null
   const when = hero.lastPlayed ? relativeTime(hero.lastPlayed, lang) : null
-  const upcoming = [...nextTargets(items, 6), ...items.filter((a) => !a.earned && a.rarity === null)].slice(0, 6)
+  const upcoming = [...nextTargets(items, 5), ...items.filter((a) => !a.earned && a.rarity === null)].slice(0, 5)
   const next = upcoming[0]
   const left = hero.total - hero.earned
   const remaining = Math.max(0, left - upcoming.length)
@@ -108,21 +108,21 @@ export default function MainPagePortada() {
         </div>
       </div>
       {upcoming.length > 0 && (
-        <div className="absolute bottom-6 right-6 sm:bottom-12 sm:right-12 hidden xl:flex flex-col items-end gap-2">
-          <ul aria-label={T.homeLayout.nextEasiest} className="grid grid-cols-3 gap-2">
+        <div className="absolute bottom-6 right-6 sm:bottom-12 sm:right-12 hidden xl:block">
+          <ul aria-label={T.homeLayout.nextEasiest} className="flex gap-2">
             {upcoming.map((achievement) => (
               <li key={achievement.id} className="w-12 h-12 rounded-tile overflow-hidden ring-1 ring-ink/20 bg-bg-main/70" title={achievement.title}>
                 {achievement.iconUrl && (
-                  <Image src={achievement.iconUrl} alt={achievement.title} width={48} height={48} unoptimized className="w-full h-full object-cover" />
+                  <Image src={achievement.iconUrl} alt={achievement.title} width={48} height={48} unoptimized className="w-full h-full object-cover grayscale" />
                 )}
               </li>
             ))}
+            {remaining > 0 && (
+              <li className="w-12 h-12 rounded-tile overflow-hidden ring-1 ring-ink/20 bg-bg-main/70 flex items-center justify-center text-sm font-bold">
+                <span role="img" aria-label={T.homeLayout.unearnedRemaining.replace('{n}', String(remaining))}>+{remaining}</span>
+              </li>
+            )}
           </ul>
-          {remaining > 0 && (
-            <GameHeroChip tone="custom" className="bg-bg-main/70 text-text-main">
-              <span role="img" aria-label={T.homeLayout.unearnedRemaining.replace('{n}', String(remaining))}>+{remaining}</span>
-            </GameHeroChip>
-          )}
         </div>
       )}
     </section>

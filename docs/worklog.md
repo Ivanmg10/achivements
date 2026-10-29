@@ -29,6 +29,13 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-29 - Portada target tile polish (`feat/74-portada-improvements`, #74)
+
+**Did** - Limited the hero preview to five grey unearned achievements in one row, with the remaining count in a matching square tile.
+**Why** - Follow-up to the user's visual review.
+
+---
+
 ## 2026-10-29 - Global Portada stats and hero targets (`feat/74-portada-improvements`, #74)
 
 **Did** - Portada's five activity figures now read every platform. The hero keeps one game link and shows up to six unearned achievement icons plus the remaining count.

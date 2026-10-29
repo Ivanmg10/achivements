@@ -38,13 +38,15 @@ test('names the easiest achievement left, with how many players have it', () => 
   expect(screen.getByText(/43\.9 % of players have it/)).toBeInTheDocument()
 })
 
-test('shows six unearned achievements at most and how many remain', () => {
+test('shows five grey unearned achievements at most and a matching remaining tile', () => {
   ;(useRecentFeed as jest.Mock).mockReturnValue({ feed: [steamItem], loading: false })
   ;(useGameInsights as jest.Mock).mockReturnValue({ items: Array.from({ length: 7 }, (_, i) => target(`Target ${i + 1}`, 50 - i)), loading: false, error: false })
   render(<MainPagePortada />)
-  expect(screen.getByRole('img', { name: 'Target 6' })).toBeInTheDocument()
-  expect(screen.queryByRole('img', { name: 'Target 7' })).not.toBeInTheDocument()
-  expect(screen.getByRole('img', { name: '5 left to unlock' })).toHaveTextContent('+5')
+  expect(screen.getByRole('img', { name: 'Target 5' })).toHaveClass('grayscale')
+  expect(screen.queryByRole('img', { name: 'Target 6' })).not.toBeInTheDocument()
+  const remaining = screen.getByRole('img', { name: '6 left to unlock' })
+  expect(remaining).toHaveTextContent('+6')
+  expect(remaining.parentElement).toHaveClass('w-12', 'h-12')
 })
 
 const artOf = (container: HTMLElement) => container.querySelector('section img')?.getAttribute('src') ?? ''
