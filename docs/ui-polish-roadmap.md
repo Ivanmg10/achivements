@@ -1,5 +1,9 @@
 # UI polish — roadmap to 100 %
 
+> **Historical record, updated 2026-10-30.** This roadmap and `docs/ui-polish-v2-plan.md` preserve
+> the design round and its decisions. They are no longer active execution plans. Use the open
+> GitHub issues for current scope and order; #77 is the final audit of the current UI block.
+>
 > **2026-10-25:** the design round for §4–§7 (tint, Layout modal, fonts, landing, login/register,
 > streaks) is done; what was decided and how to build it is in `docs/ui-polish-v2-plan.md`.
 
@@ -235,14 +239,7 @@ YOUR NOTES:
 - More languages.
 - Notifications (do not start without the user's idea).
 
-## Suggested order
+## Current work
 
-1. Your review (§1) → fill the notes. Choose the fonts (§5) at the same time.
-2. PR and preview of the current branch (§9, first lines).
-3. Skeletons (§2): cheap, visible, no design round. Add `latin-ext` (§5) in the same sitting.
-4. Entrance animations (§3): design round first, then build.
-5. Landing (§4) and the Layout modal with fonts (§5–§6): both are design rounds; they share the
-   canvas, so draw them together.
-6. Tinted style (§7): design round, last because it is the least certain.
-7. Leftovers (§8) in between, whatever your review says is worst.
-8. Release (§9).
+The former suggested order was removed on 2026-10-30. The open GitHub issues now define the work
+and its dependencies; #77 is the final audit after the implementation block.

@@ -29,6 +29,18 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-30 — UI polish plan becomes historical (`docs/67-ui-polish-v2-plan`)
+
+**Did** — Marked the UI polish roadmap and v2 plan as historical records, removed the old execution
+sequence, recorded which issues were built or dropped and updated the design register. Updated the
+antislop issue with the user's concerns about how slanted is applied and what round lost.
+**Why** — #67 was documentation, not another implementation block, and its old order made the
+remaining work look duplicated. Open issues now own scope and execution order.
+**Open** — Finish #61, #70, #78 and their current prerequisites before #77; create a dedicated
+release issue only when the user asks to ship the collected polish.
+
+---
+
 ## 2026-10-29 - Portada review fixes (`feat/74-portada-improvements`, #74)
 
 **Did** - RA hero targets now open gameInfo's own achievement modal. Classic's platform tab no longer changes Portada's global stats, and large stat-pill hover backgrounds lean with the slanted design.

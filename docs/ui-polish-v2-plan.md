@@ -1,73 +1,44 @@
-# UI polish v2 — integration plan
+# UI polish v2 — design decisions and implementation record
 
-Written 2026-10-25, at the end of a design round the user ran out of usage to build. **Pick this up
-from here.** Design canvas: [UI polish v2](https://claude.ai/artifact/9PhwWGMvcFzsygiGpDcY2F)
-(private to the user's account; boards are named below by their number). Its history and the
-rejected canvas before it are in `docs/designs.md`. This plan replaces §4–§7 of
-`docs/ui-polish-roadmap.md` for the blocks it covers; the rest of that roadmap (skeletons,
-leftovers, release) still stands.
+Written from the 2026-10-25 design round and updated through 2026-10-30. **This is now a historical
+record, not an active backlog or an execution plan.** The open GitHub issues are the only source of
+truth for remaining scope, acceptance criteria and order. In particular, #77 lists the issues that
+must finish before the final antislop audit.
 
-How to work: `docs/design-process.md` (one version at a time, change only what the user asked,
-build in short rounds, check it yourself in the browser — the user does not want to be asked for
-screenshots). Library rules: `docs/design-system.md`. Every block below is one work branch from
-`develop` with its own issue (`<type>/<issue>-<slug>`), its tests, a `docs/worklog.md` entry and,
-if a design changes, its row in `docs/designs.md`. The user commits nothing to `main` until the
-v1.7.0 release (roadmap §9).
+Design canvas: [UI polish v2](https://claude.ai/artifact/9PhwWGMvcFzsygiGpDcY2F) (private to the
+user's account; boards are named below by their number). Its history and the rejected canvas before
+it are in `docs/designs.md`. The detailed sections below preserve what was proposed, approved,
+changed or rejected. Do not use them to reopen completed work or replace the current issue bodies.
 
 ## What the user decided on 2026-10-25
 
 | Block | Decision | Board |
 |---|---|---|
 | Tinted game cards | **No border** (variant A). Gradient unchanged. Colour: **try a more vivid one** without over-saturating (§12, #76) | 1 |
-| Landing | Landing v2 was liked on the canvas but **will not be built** (2026-10-28): the landing stays until the final antislop pass (#77) | 5b |
+| Landing | Landing v2 was liked initially but **was dropped on 2026-10-28**: the landing stays until the final antislop pass (#77) | 5b |
 | Login / register | **"Con los detalles"** (small details, not a redesign) | 6 |
 | Fonts | **Both** Sofia Sans ("Amable") and Fira Sans ("Legible") offered beside Barlow, the default (§12) | 4, 3b |
-| Layout chooser | Not the centred modal (3), not the plain panels (3b). **New concept**: background blurred, a floating **dummy** main page showing the changes, options in a side panel; choices apply at once (§12) | — (to design) |
+| Layout chooser | Background blurred, a floating **dummy** main page showing the changes, options in a side panel; choices apply at once (§12) | — |
 | Logo | **Favicon only**, nowhere else (§16, #79) | — |
-| Entrance animations | Components only, **every page**, nothing left unanimated (§8, #61) | — |
-| Streaks in the top bar | **Tag without glow** (variant A) ; Vault Points progress **stays as today** (ring in the accent) | 2 |
+| Entrance animations | Components on every page, using the approved family table (§8, #61) | — |
+| Streaks in the top bar | **Tag without glow** (variant A); Vault Points progress **stays as today** (ring in the accent) | 2 |
 | Default design | **Slanted** stays the default | — |
 | Streak tiers | **Approved** as they are (0, 5, 10, 20, 30, 40, 50+; `streakTier.ts`) | 2 |
 | Skeletons | **One per screen**, shaped like what it replaces; **pulse**, not shimmer; **no canvas round** | — |
-| Entrance animations | The family table in §8 approved; **every page and component, nothing left unanimated** | — |
 | Leftovers | §9: all yes, except no total hours in Portada's kicker | — |
 | Release | **Option A** (all the polish in v1.7.0), and **not to `main` yet**: the user wants more style work first | — |
 
-## When the user says "empieza"
+## Implementation outcome
 
-That is the go-ahead for this whole plan: take the first open issue below, cut its branch from
-`develop` (`<type>/<issue>-<slug>`), build, test (`npm test`, lint, `tsc`, build), worklog, commit
-(never push: the user pushes), then the next. Issues created 2026-10-25:
-
-| Issue | Block |
+| Issues | Outcome |
 |---|---|
-| #67 | This plan (branch `docs/67-ui-polish-v2-plan`) |
-| #68 | Quick wins: tint without border, top-bar streak glow, `latin-ext` (§1, §2, §12) |
-| #69 | The user's review bugs (§10 a, b, d, e, f, i, j) |
-| #70 | A skeleton for every screen (§7, §10 c, g) |
-| #61 | Entrance animations everywhere (§8), the mechanism first |
-| ~~#71~~ | ~~Landing v2 (§4)~~: **closed 2026-10-28, not to be built**; the landing waits for #77 |
-| #72 | Login and register details (§3) |
-| #73 | Leftovers (§9) |
-| #74 | Portada (§13) |
-| #75 | Layout chooser with live preview + fonts (§5, §2, §12), design round first |
-| #76 | A more vivid tint (§12), canvas test first |
-| #78 | The round design on every control and surface (§15) |
-| #79 | The logo as the favicon, nowhere else (§16) |
-| #77 | **Last of all:** the antislop pass over the whole site and the internal code (§14) |
+| #68, #69, #72, #73, #74, #75, #76, #79 | Built and closed |
+| #71 | Closed without building landing v2; the final landing review belongs to #77 |
+| #61, #70, #78, #77 | Still open; their current GitHub descriptions govern the work |
+| #84 | Later theme/favicon work, additional to this original plan |
 
-## Order
-
-1. Quick wins: tint without border (§1), streak tag without glow (§6), `latin-ext` (§2).
-2. The user's review bugs (§10): f (broken modal) first, then a, b, d, e, i, j.
-3. Skeletons for every screen (§7), including review c and g.
-4. Animations everywhere (§8, #61), the shared mechanism first. No landing v2.
-5. Login / register details (§3).
-6. Leftovers (§9).
-7. Layout chooser: **design round first**, then build, with the font choice (§2, §5).
-8. Round design everywhere (§15, #78) and the favicon (§16, #79).
-9. Last: the antislop pass over the site and code (§14, #77).
-10. Release when the user says (§11).
+The original sequence was removed on 2026-10-30 because it no longer reflected the remaining work.
+There is no implementation task owned by this document itself.
 
 ---
 
@@ -367,8 +338,9 @@ footer; the user's call). So:
 - `apple-icon.tsx`, `manifest.ts` icons and the OG image are **not** part of it unless the user asks.
 - Check in a browser tab at 16 and 32 px that it still reads; simplify the facets if it does not.
 
-## 11. Release
+## 11. Historical release decision
 
-Option A: everything above ships together as v1.7.0, but **not yet**: the user wants to work on
-more style points first. When it is time: merge `main` into `develop` (PR #37 is missing there),
-then `chore(release): v1.7.0` with the release gates of CLAUDE.md.
+Option A was approved on 2026-10-25: the polish ships together as v1.7.0, but **not yet**, because
+the user wants more style work first. This records the decision only; it is not an active release
+checklist. When the user asks to release, create a dedicated issue and rebuild its checklist from
+the current repository state and the release gates in `CLAUDE.md`.
