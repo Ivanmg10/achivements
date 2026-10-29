@@ -41,7 +41,7 @@ export default function PsnGameInfoTrophyCard({
   return (
     <li
       data-trophy={t.id}
-      className={`relative flex items-start gap-3 rounded-xl p-3 transition-colors duration-500 ${
+      className={`relative flex items-start gap-3 rounded-tile p-3 transition-colors duration-500 ${
         highlighted ? 'bg-accent/15' : pinned ? 'bg-warning/10' : 'bg-bg-main/40'
       }`}
     >
@@ -49,7 +49,7 @@ export default function PsnGameInfoTrophyCard({
         type="button"
         onClick={onOpen}
         aria-label={concealed ? T.psn.hiddenTrophy : t.name}
-        className="absolute inset-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       />
       <div className="relative shrink-0 pointer-events-none">
       {t.iconUrl && !concealed ? (

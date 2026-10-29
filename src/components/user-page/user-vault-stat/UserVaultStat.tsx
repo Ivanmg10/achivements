@@ -23,7 +23,7 @@ export default function UserVaultStat({
   sub?: string
 }) {
   return (
-    <div className="bg-bg-main rounded-xl px-3.5 py-3 flex flex-col gap-0.5 min-w-0">
+    <div className="bg-bg-main rounded-tile px-3.5 py-3 flex flex-col gap-0.5 min-w-0">
       {icon && (
         <span aria-hidden="true" className={`${accent} opacity-80 mb-1`}>
           {icon}

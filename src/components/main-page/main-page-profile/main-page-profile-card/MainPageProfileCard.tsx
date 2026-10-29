@@ -44,7 +44,7 @@ export default function MainPageProfileCard({
       {actions && <div className="absolute top-3 right-3 z-10 flex items-center gap-1">{actions}</div>}
       <div className="relative flex gap-4 items-center pr-20">
         <span
-          className="w-16 h-16 lg:w-[5.25rem] lg:h-[5.25rem] shrink-0 rounded-xl overflow-hidden flex items-center justify-center"
+          className="w-16 h-16 lg:w-[5.25rem] lg:h-[5.25rem] shrink-0 rounded-tile overflow-hidden flex items-center justify-center"
           style={{ boxShadow: `0 0 0 2px rgb(var(--bg-card)), 0 0 0 4px ${ring}` }}
         >
           {avatarSrc ? <Image src={avatarSrc} alt="" width={84} height={84} unoptimized className="w-full h-full object-cover" /> : avatarFallback}

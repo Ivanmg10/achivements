@@ -31,7 +31,7 @@ export default function SteamGameInfoAchievementCard({
   return (
     <li
       data-ach={a.apiname}
-      className={`relative flex items-start gap-3 rounded-xl p-3 transition-colors duration-500 ${
+      className={`relative flex items-start gap-3 rounded-tile p-3 transition-colors duration-500 ${
         highlighted ? 'bg-accent/15' : pinned ? 'bg-warning/10' : 'bg-bg-main/40'
       }`}
     >
@@ -39,7 +39,7 @@ export default function SteamGameInfoAchievementCard({
         type="button"
         onClick={onOpen}
         aria-label={concealed ? T.steam.hiddenAchievement : a.title}
-        className="absolute inset-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       />
       {a.badgeUrl ? (
         <Image

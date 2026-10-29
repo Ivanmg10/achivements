@@ -98,7 +98,7 @@ export default function WelcomePageStepsBar({
               onClick={onBack}
               disabled={index === 0}
               aria-label={T.welcome.back}
-              className="w-11 h-11 shrink-0 rounded-xl flex items-center justify-center disabled:opacity-30 hover:bg-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="w-11 h-11 shrink-0 rounded-tile flex items-center justify-center disabled:opacity-30 hover:bg-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <IconChevronLeft size={20} aria-hidden="true" />
             </button>

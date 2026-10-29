@@ -23,6 +23,7 @@ export function StatPill({
   onClick?: () => void
 }) {
   const interactiveCls = 'text-left hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+  const largeInteractiveCls = "text-left isolate after:content-[''] after:absolute after:inset-0 after:-z-10 after:rounded-tile after:skew-x-(--slant-pill) after:transition-colors hover:after:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
 
   if (size === 'sm') {
     const inner = (
@@ -32,7 +33,7 @@ export function StatPill({
         {sub && <span className="text-xs text-text-secondary">{sub}</span>}
       </>
     )
-    const cls = `bg-bg-main rounded-xl p-2 flex flex-col items-center gap-0.5 ${className}`
+    const cls = `bg-bg-main rounded-tile p-2 flex flex-col items-center gap-0.5 ${className}`
     if (href) return <Link href={href} className={`${cls} ${interactiveCls}`}>{inner}</Link>
     if (onClick) return <button type="button" onClick={onClick} className={`${cls} ${interactiveCls}`}>{inner}</button>
     return <div className={cls}>{inner}</div>
@@ -47,8 +48,8 @@ export function StatPill({
   )
   // No box (the agreed design): figures side by side, a fine slanted rule between them.
   const cls = `relative px-3 py-1 flex flex-col gap-0.5 flex-1 min-w-24 rounded-tile before:content-[''] before:absolute before:left-0 before:top-1 before:bottom-1 before:w-px before:bg-ink/12 before:skew-x-(--slant-button) first:before:hidden ${className}`
-  if (href) return <Link href={href} className={`${cls} ${interactiveCls}`}>{inner}</Link>
-  if (onClick) return <button type="button" onClick={onClick} className={`${cls} ${interactiveCls}`}>{inner}</button>
+  if (href) return <Link href={href} className={`${cls} ${largeInteractiveCls}`}>{inner}</Link>
+  if (onClick) return <button type="button" onClick={onClick} className={`${cls} ${largeInteractiveCls}`}>{inner}</button>
   return <div className={cls}>{inner}</div>
 }
 

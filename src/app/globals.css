@@ -123,6 +123,23 @@
 }
 
 /*
+   The font pairs. Barlow is the default through the classes next/font sets on
+   <html>; `data-font` swaps the two variables every component reads, on <html>
+   or on a preview that shows another choice inside the page.
+*/
+html[data-font="sofia"],
+[data-font="sofia"]:not(html) {
+  --font-ui: var(--font-sofia);
+  --font-barlow: var(--font-sofia-display);
+}
+
+html[data-font="fira"],
+[data-font="fira"]:not(html) {
+  --font-ui: var(--font-fira);
+  --font-barlow: var(--font-fira-display);
+}
+
+/*
    The two designs, each usable on any element: `data-shape` on <html> is the
    person's choice (Preferences → Layout), and the design system's catalogue puts
    one on a specimen to show them side by side. Components read these tokens,
@@ -832,7 +849,8 @@
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll { overflow-y: auto; }
   /* The daily chart sets the height of the charts row (the heatmap follows its box): scaled to the screen here. */
   /* Less what the box would run past the screen (--home-fit-trim, set by homeFit), so the stats end where the screen does. */
-  .home-fit:has([data-stats-section="overview"]) .home-fit-chart { height: max(160px, clamp(160px, 20dvh, 260px) - var(--home-fit-trim, 0px)); }
+  /* Portada already has its hero above the home: trimming this chart made its heatmap cells smaller than Classic's. */
+  .home-fit:not(:has(.home-cover)):has([data-stats-section="overview"]) .home-fit-chart { height: max(160px, clamp(160px, 20dvh, 260px) - var(--home-fit-trim, 0px)); }
   /* The rows carry flex: 1 1 0 inline (ROW_STYLE). Here they may grow to share spare height but never shrink: short of room, the list scrolls. */
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * { flex: 1 0 auto !important; }
   /* A row taller than its content keeps the content in the middle, not stuck to the top. */

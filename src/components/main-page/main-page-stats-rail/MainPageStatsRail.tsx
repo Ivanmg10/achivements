@@ -53,7 +53,7 @@ export default function MainPageStatsRail({
   }
 
   return (
-    <div className="sticky top-16 z-30 -mx-4 px-4 py-2 bg-bg-main/85 backdrop-blur-xl lg:static lg:z-auto lg:mx-0 lg:p-2 lg:self-stretch lg:bg-bg-card lg:backdrop-blur-none lg:rounded-2xl">
+    <div className="sticky top-16 z-30 -mx-4 px-4 py-2 bg-bg-main/85 backdrop-blur-xl lg:static lg:z-auto lg:mx-0 lg:p-2 lg:self-stretch lg:bg-bg-card lg:backdrop-blur-none lg:rounded-card">
     <div
       role="tablist"
       aria-label={label}
@@ -75,7 +75,7 @@ export default function MainPageStatsRail({
             tabIndex={selected ? 0 : -1}
             onClick={() => onChange(section.id)}
             onKeyDown={(e) => handleKeyDown(e, i)}
-            className={`relative snap-start shrink-0 flex items-center gap-2.5 px-3.5 py-2 lg:py-2.5 rounded-xl text-sm whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+            className={`relative snap-start shrink-0 flex items-center gap-2.5 px-3.5 py-2 lg:py-2.5 rounded-tile text-sm whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
               selected ? 'text-text-main font-semibold' : 'text-text-secondary hover:text-text-main hover:bg-ink/5'
             }`}
           >
@@ -83,7 +83,7 @@ export default function MainPageStatsRail({
               <motion.span
                 layoutId={`${idPrefix}-pill`}
                 aria-hidden="true"
-                className="absolute inset-0 rounded-xl bg-bg-tertiary ring-1 ring-ink/[0.06]"
+                className="absolute inset-0 rounded-tile bg-bg-tertiary ring-1 ring-ink/[0.06]"
                 transition={{ type: 'spring', stiffness: 400, damping: 34 }}
               >
                 <span className="absolute left-0 bottom-0 lg:bottom-auto lg:top-1/2 lg:-translate-y-1/2 h-0.5 w-full lg:h-5 lg:w-1 rounded-full bg-accent" />

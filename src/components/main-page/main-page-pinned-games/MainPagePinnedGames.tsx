@@ -76,7 +76,7 @@ export default function MainPagePinnedGames() {
   }
 
   return (
-    <section className="main-content bg-bg-card text-text-main m-3 rounded-xl p-4 flex flex-col flex-1 min-h-0 gap-2 overflow-hidden">
+    <section className="main-content bg-bg-card text-text-main m-3 rounded-tile p-4 flex flex-col flex-1 min-h-0 gap-2 overflow-hidden">
       <div className="flex items-center gap-2 shrink-0">
         <MainViewToggle />
       </div>

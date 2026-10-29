@@ -76,7 +76,7 @@ export default function AdminRankings() {
             {flagged.map((g) => {
               const key = `${g.userId}:${g.source}:${g.gameId}`
               return (
-                <li key={key} className="flex flex-wrap items-center justify-between gap-2 bg-bg-main rounded-xl px-3 py-2 text-xs">
+                <li key={key} className="flex flex-wrap items-center justify-between gap-2 bg-bg-main rounded-tile px-3 py-2 text-xs">
                   <span className="min-w-0">
                     <strong>{g.username}</strong> · {g.title} <span className="text-text-secondary">({g.earned}/{g.total}, {num(g.points)} VP)</span>
                   </span>

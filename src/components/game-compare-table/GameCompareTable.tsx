@@ -70,14 +70,14 @@ export default function GameCompareTable({
 
   if (theirs.length === 0) {
     return (
-      <section className="bg-bg-card rounded-xl p-6 w-full">
+      <section className="bg-bg-card rounded-tile p-6 w-full">
         <EmptyState icon={<IconTrophy className="w-6 h-6" />} title={T.userGame.noAchievements} size="compact" />
       </section>
     )
   }
 
   return (
-    <section aria-label={T.gameInfoPage.achievements} className="bg-bg-card rounded-xl p-4 sm:p-5 flex flex-col gap-4 w-full">
+    <section aria-label={T.gameInfoPage.achievements} className="bg-bg-card rounded-tile p-4 sm:p-5 flex flex-col gap-4 w-full">
       <GameCompareTableSummary summary={summary} username={username} comparing={comparing && !mineLoading} />
       {comparing && notice}
 

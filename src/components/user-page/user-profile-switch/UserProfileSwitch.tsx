@@ -32,7 +32,7 @@ export default function UserProfileSwitch({
 
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center gap-3.5 rounded-xl px-1 -mx-1 py-1.5">
+      <div className="flex items-center gap-3.5 rounded-tile px-1 -mx-1 py-1.5">
         <span aria-hidden="true" className="w-9 h-9 shrink-0 flex items-center justify-center text-text-secondary">
           {icon}
         </span>

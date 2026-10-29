@@ -32,7 +32,7 @@ export default function LanguageModal({ isOpen, onClose }: Props) {
             onClick={() => handleSelect(id)}
             role="radio"
             aria-checked={lang === id}
-            className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-all ${
+            className={`flex items-center gap-2 px-3 py-3 rounded-tile transition-all ${
               lang === id
                 ? 'bg-accent text-bg-main'
                 : 'bg-bg-main hover:bg-bg-card text-text-main'

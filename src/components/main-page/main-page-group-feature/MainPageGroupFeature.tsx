@@ -73,7 +73,7 @@ export default function MainPageGroupFeature({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative rounded-2xl overflow-hidden ring-1 ring-ink/5 bg-bg-main">
+      <div className="relative rounded-card overflow-hidden ring-1 ring-ink/5 bg-bg-main">
         {covers.length > 0 && (
           <div aria-hidden="true" className="absolute inset-0 grid opacity-25" style={{ gridTemplateColumns: `repeat(${covers.length}, minmax(0, 1fr))` }}>
             {covers.map((src, i) => (
@@ -133,7 +133,7 @@ export default function MainPageGroupFeature({
       {closest && (
         <Link
           href={gameHref(closest.item.source ?? 'ra', closest.item.game_id)}
-          className="flex items-center gap-3 rounded-xl bg-bg-main px-3 py-2.5 hover:bg-ink/5 transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="flex items-center gap-3 rounded-tile bg-bg-main px-3 py-2.5 hover:bg-ink/5 transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <span className="text-[10px] font-semibold uppercase tracking-wider text-accent shrink-0">{T.groups.nextUp}</span>
           <span className="text-sm truncate flex-1">{T.groups.nextUpLeft.replace('{left}', String(closest.left)).replace('{game}', closest.item.title)}</span>
@@ -144,7 +144,7 @@ export default function MainPageGroupFeature({
       {isLoading ? (
         <div className={`${GRID} animate-pulse motion-reduce:animate-none`} aria-busy="true">
           {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} className="aspect-square rounded-xl bg-ink/10" />
+            <div key={i} className="aspect-square rounded-tile bg-ink/10" />
           ))}
         </div>
       ) : error ? (
@@ -171,7 +171,7 @@ export default function MainPageGroupFeature({
             <li>
               <Link
                 href={`/groups/${group.id}`}
-                className="flex items-center justify-center aspect-square rounded-xl border-2 border-dashed border-ink/10 text-sm font-semibold text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="flex items-center justify-center aspect-square rounded-tile border-2 border-dashed border-ink/10 text-sm font-semibold text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 {T.groups.moreGames.replace('{n}', String(items.length - SHOWN))}
               </Link>

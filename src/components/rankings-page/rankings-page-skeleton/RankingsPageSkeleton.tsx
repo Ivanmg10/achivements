@@ -11,7 +11,7 @@ export default function RankingsPageSkeleton({ podium = true }: { podium?: boole
       )}
       <div className="flex flex-col gap-1.5">
         {Array.from({ length: 8 }, (_, i) => (
-          <div key={i} className="h-14 rounded-xl bg-bg-card" />
+          <div key={i} className="h-14 rounded-tile bg-bg-card" />
         ))}
       </div>
     </div>

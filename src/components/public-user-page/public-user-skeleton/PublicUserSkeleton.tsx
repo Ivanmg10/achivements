@@ -20,7 +20,7 @@ export default function PublicUserSkeleton() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
             {Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="h-24 rounded-2xl bg-bg-main" />
+              <div key={i} className="h-24 rounded-card bg-bg-main" />
             ))}
           </div>
         </div>
@@ -30,8 +30,8 @@ export default function PublicUserSkeleton() {
           ))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
-          <div className="h-[30rem] lg:h-[34rem] rounded-xl bg-bg-card" />
-          <div className="h-80 lg:h-[34rem] rounded-xl bg-bg-card" />
+          <div className="h-[30rem] lg:h-[34rem] rounded-tile bg-bg-card" />
+          <div className="h-80 lg:h-[34rem] rounded-tile bg-bg-card" />
         </div>
       </div>
     </div>

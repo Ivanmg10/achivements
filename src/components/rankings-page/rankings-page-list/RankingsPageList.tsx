@@ -35,7 +35,7 @@ export default function RankingsPageList({
           custom={i}
           initial="hidden"
           animate="show"
-          className={`grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2.5 bg-bg-card rounded-xl px-3 py-2.5 ${r.isMe ? 'ring-[1.5px] ring-accent/60' : ''}`}
+          className={`grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-2.5 bg-bg-card rounded-tile px-3 py-2.5 ${r.isMe ? 'ring-[1.5px] ring-accent/60' : ''}`}
         >
           <span className={`text-center font-extrabold tabular-nums ${r.isMe ? 'text-accent' : 'text-text-secondary'}`}>
             <span className="sr-only">{T.rankings.colRank} </span>

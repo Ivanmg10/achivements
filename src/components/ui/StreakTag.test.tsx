@@ -4,6 +4,7 @@ import StreakTag from './StreakTag'
 test('a streak going is lit, with a filled flame and its days', () => {
   const { container } = render(<StreakTag days={48} text="48 d" aria-label="Streak: 48 days" />)
   expect(screen.getByLabelText('Streak: 48 days')).toHaveAttribute('data-tier', 'inferno')
+  expect(screen.getByLabelText('Streak: 48 days')).toHaveClass('skew-x-(--slant-pill)')
   expect(screen.getByTestId('IconFlameFilled')).toBeInTheDocument()
   expect(container).toHaveTextContent('48 d')
 })

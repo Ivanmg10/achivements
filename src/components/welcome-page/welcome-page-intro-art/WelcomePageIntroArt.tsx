@@ -39,7 +39,7 @@ function Library() {
       </div>
       {rows.map((row, i) => (
         <div key={i} className={`${CARD} flex items-center gap-3 p-3`}>
-          <span className="w-12 h-12 rounded-xl shrink-0" style={{ background: row.art }} />
+          <span className="w-12 h-12 rounded-tile shrink-0" style={{ background: row.art }} />
           <span className="flex-1 flex flex-col gap-2">
             <span className="flex items-center gap-2">
               <Bar w={row.w} strong />
@@ -51,7 +51,7 @@ function Library() {
         </div>
       ))}
       <div className={`${CARD} flex items-center gap-3 p-3 opacity-40`}>
-        <span className="w-12 h-12 rounded-xl shrink-0 bg-ink/10 flex items-center justify-center text-text-secondary">
+        <span className="w-12 h-12 rounded-tile shrink-0 bg-ink/10 flex items-center justify-center text-text-secondary">
           <IconEyeOff size={18} />
         </span>
         <Bar w="40%" />
@@ -64,7 +64,7 @@ function Collect() {
   return (
     <div className="flex flex-col gap-3">
       <div className={`${CARD} flex items-center gap-3 p-3`}>
-        <span className="w-14 h-14 rounded-xl shrink-0" style={{ background: ARTS[1] }} />
+        <span className="w-14 h-14 rounded-tile shrink-0" style={{ background: ARTS[1] }} />
         <span className="flex-1 flex flex-col gap-2"><Bar w="60%" strong /><ProgressBar pct={64} label="" /></span>
         <IconPinFilled size={18} className="text-accent shrink-0" />
       </div>
@@ -80,7 +80,7 @@ function Collect() {
         <span className="flex items-center gap-2 text-accent"><IconTrophy size={16} /><Bar w="35%" strong /></span>
         <span className="grid grid-cols-5 gap-2">
           {[0, 1, 2, 3, 4].map((i) => (
-            <span key={i} className="aspect-square rounded-xl ring-2 ring-accent/30" style={{ background: ARTS[i % ARTS.length] }} />
+            <span key={i} className="aspect-square rounded-tile ring-2 ring-accent/30" style={{ background: ARTS[i % ARTS.length] }} />
           ))}
         </span>
       </div>

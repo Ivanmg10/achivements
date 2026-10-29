@@ -24,9 +24,9 @@ export default function UserConsolesPreference({ source, consoles }: { source: G
   const shown = consoles.filter((c) => !hidden.has(c.name)).length
 
   return (
-    <div role="group" aria-labelledby={labelId} aria-describedby={hintId} className="flex flex-col gap-2 rounded-xl px-2 -mx-1 py-1.5">
+    <div role="group" aria-labelledby={labelId} aria-describedby={hintId} className="flex flex-col gap-2 rounded-tile px-2 -mx-1 py-1.5">
       <div className="flex items-center gap-3">
-        <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-xl bg-bg-card ring-1 ring-ink/[0.06] flex items-center justify-center text-text-secondary">
+        <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-tile bg-bg-card ring-1 ring-ink/[0.06] flex items-center justify-center text-text-secondary">
           <IconDeviceGamepad2 size={18} />
         </span>
         <span className="flex flex-col gap-0.5 min-w-0 flex-1">

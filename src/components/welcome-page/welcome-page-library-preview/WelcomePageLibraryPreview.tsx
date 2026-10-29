@@ -25,7 +25,7 @@ export default function WelcomePageLibraryPreview({ art }: { art: string }) {
             className={`${styles.card} flex items-center gap-3.5 p-3 rounded-card bg-bg-card ring-1 ring-ink/[0.06]`}
             style={{ animationDelay: `calc(var(--enter-delay, 0s) + ${260 + i * 90}ms)` }}
           >
-            <span className="w-14 h-14 shrink-0 rounded-xl" style={{ background: art }} />
+            <span className="w-14 h-14 shrink-0 rounded-tile" style={{ background: art }} />
             <span className="flex-1 flex flex-col gap-2">
               <span className="h-2.5 rounded-full bg-ink/15" style={{ width: row.name }} />
               <ProgressBar pct={row.progress} label={T.welcome.library.note} />

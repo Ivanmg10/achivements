@@ -15,7 +15,7 @@ export default function MainSidePanelLastAchievement({
 
   if (isLoading && !achievement) {
     return (
-      <section className="w-[90%] bg-bg-main rounded-2xl p-3 flex items-center gap-3 animate-pulse">
+      <section className="w-[90%] bg-bg-main rounded-card p-3 flex items-center gap-3 animate-pulse">
         <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" />
         <div className="flex flex-col gap-1.5 flex-1 min-w-0">
           <div className="h-2.5 bg-ink/10 rounded w-2/3" />
@@ -28,14 +28,14 @@ export default function MainSidePanelLastAchievement({
 
   if (!achievement) {
     return (
-      <section className="w-[90%] bg-bg-main rounded-2xl p-3">
+      <section className="w-[90%] bg-bg-main rounded-card p-3">
         <EmptyState icon={<IconTrophy className="w-5 h-5" />} title={T.cards.noEarned} size="compact" />
       </section>
     )
   }
 
   return (
-    <section className="w-[90%] bg-bg-main rounded-2xl p-3 flex items-center gap-3">
+    <section className="w-[90%] bg-bg-main rounded-card p-3 flex items-center gap-3">
       {achievement.BadgeName ? (
         <Image
           src={`https://media.retroachievements.org/Badge/${achievement.BadgeName}.png`}

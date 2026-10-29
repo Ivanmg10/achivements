@@ -22,7 +22,7 @@ export default function MainPageProfileError({
   onRetry: () => void
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 text-center px-6 py-10 bg-bg-card rounded-xl w-full h-full">
+    <div className="flex flex-col items-center justify-center gap-4 text-center px-6 py-10 bg-bg-card rounded-tile w-full h-full">
       <StatusBadge tone="danger" icon={<IconCloudOff size={40} stroke={1.75} />} corner={logo} />
       <div role="alert" className="flex flex-col items-center gap-1.5">
         <p className="text-base font-semibold text-text-main text-balance">{title}</p>

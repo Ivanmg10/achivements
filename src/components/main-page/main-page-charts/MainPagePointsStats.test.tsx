@@ -62,9 +62,12 @@ describe('MainPagePointsStats', () => {
       { Date: `${daysAgo(3)} 10:00:00`, Points: 5, HardcoreMode: '0' } as unknown as RecentAchievement,
       { Date: `${daysAgo(20)} 10:00:00`, Points: 100, HardcoreMode: '0' } as unknown as RecentAchievement,
     ]
-    render(<MainPagePointsStats achievements={achievements} heatmapAchievements={[]} rank={null} />)
+    const { rerender } = render(<MainPagePointsStats achievements={achievements} heatmapAchievements={[]} rank={null} />)
     expect(screen.getByText('10')).toBeInTheDocument()
     expect(screen.getByText('15')).toBeInTheDocument()
+    rerender(<MainPagePointsStats achievements={achievements} heatmapAchievements={[]} rank={null} valueMode="achievements" />)
+    expect(screen.getByText('Today').nextSibling).toHaveTextContent('1')
+    expect(screen.getByText('This week').nextSibling).toHaveTextContent('2')
   })
 
   test('renders global rank pill only when rank is known', () => {
@@ -84,15 +87,30 @@ describe('MainPagePointsStats', () => {
     expect(screen.getByText('5,000 pts')).toBeInTheDocument()
   })
 
+  test('Portada leaves out global rank and keeps the five activity figures', () => {
+    render(
+      <MainPagePointsStats
+        achievements={[]}
+        heatmapAchievements={[]}
+        rank={{ Rank: 1234, Score: 5000, SoftcoreScore: 0 } as unknown as UserRankAndScore}
+        showRank={false}
+      />,
+    )
+    for (const label of ['Today', 'This week', 'This month', 'Avg/day (30d)', 'Streak']) expect(screen.getByText(label)).toBeInTheDocument()
+    expect(screen.queryByText('Global rank')).not.toBeInTheDocument()
+  })
+
   test('sums only this-calendar-month points from heatmap achievements', () => {
     const heatmapAchievements = [
       { Date: `${daysAgo(2)} 10:00:00`, Points: 50, HardcoreMode: '0' } as unknown as RecentAchievement,
       { Date: `${daysAgo(5)} 10:00:00`, Points: 50, HardcoreMode: '0' } as unknown as RecentAchievement,
       { Date: '2000-01-01 10:00:00', Points: 999, HardcoreMode: '0' } as unknown as RecentAchievement,
     ]
-    render(<MainPagePointsStats achievements={[]} heatmapAchievements={heatmapAchievements} rank={null} />)
+    const { rerender } = render(<MainPagePointsStats achievements={[]} heatmapAchievements={heatmapAchievements} rank={null} />)
     expect(screen.getByText('This month')).toBeInTheDocument()
     expect(screen.getByText('100')).toBeInTheDocument()
+    rerender(<MainPagePointsStats achievements={[]} heatmapAchievements={heatmapAchievements} rank={null} valueMode="achievements" />)
+    expect(screen.getByText('This month').nextSibling).toHaveTextContent('2')
   })
 
   test('shows zero for this month when there is no heatmap data', () => {

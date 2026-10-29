@@ -68,7 +68,7 @@ export default function SteamSortableItem({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       {/* The same blurred art and pointer glow as the game cards in the status lists. */}
       <GameCardBackdrop src={steamAssetUrl(item.game_id, 'header')} surface="card" />
@@ -89,7 +89,7 @@ export default function SteamSortableItem({
           href={href}
           tabIndex={-1}
           aria-hidden="true"
-          className={`relative z-10 shrink-0 rounded-xl transition-all ${
+          className={`relative z-10 shrink-0 rounded-tile transition-all ${
             isComplete ? 'ring-2 ring-[#a4d007]/70 hover:ring-[#a4d007]' : 'hover:ring-2 hover:ring-ink/40'
           }`}
         >
@@ -98,7 +98,7 @@ export default function SteamSortableItem({
             asset="icon"
             iconUrl={game?.imageIcon ?? item.image_icon ?? ''}
             size={96}
-            className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl block"
+            className="w-16 h-16 sm:w-24 sm:h-24 rounded-tile block"
           />
         </Link>
 

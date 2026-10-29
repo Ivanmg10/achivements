@@ -12,7 +12,7 @@ const SHELF_CARDS = 4
 function Row() {
   return (
     <div className="rounded-card bg-bg-card ring-1 ring-ink/5 p-2 pr-3 grid grid-cols-[52px_1fr] items-center gap-3">
-      <div className={`${BLOCK} w-[52px] h-[52px] rounded-xl`} />
+      <div className={`${BLOCK} w-[52px] h-[52px] rounded-tile`} />
       <div className="flex flex-col gap-2">
         <div className={`${BLOCK} h-3.5 w-2/3 rounded`} />
         <div className={`${BLOCK} h-3 w-1/3 rounded`} />
@@ -28,21 +28,21 @@ function Detail() {
     <div className="rounded-card bg-bg-card ring-1 ring-accent/30 p-4 flex flex-col gap-3">
       <div className="flex items-center gap-3">
         <div className={`${BLOCK} h-9 w-1/2 rounded-lg`} />
-        <div className={`${BLOCK} h-8 w-32 rounded-xl`} />
+        <div className={`${BLOCK} h-8 w-32 rounded-tile`} />
       </div>
       <div className="grid grid-cols-1 xl:grid-cols-[190px_1.3fr_1fr] gap-3">
-        <div className={`${BLOCK} h-80 rounded-xl flex items-center justify-center`}>
+        <div className={`${BLOCK} h-80 rounded-tile flex items-center justify-center`}>
           <div className="w-32 h-32 rounded-full border-[9px] border-bg-card" />
         </div>
-        <div className={`${BLOCK} h-80 rounded-xl`} />
-        <div className={`${BLOCK} h-80 rounded-xl`} />
+        <div className={`${BLOCK} h-80 rounded-tile`} />
+        <div className={`${BLOCK} h-80 rounded-tile`} />
         <div className="xl:col-span-3 flex flex-wrap gap-2">
           {[28, 32, 28, 36].map((w, i) => (
-            <div key={i} className={`${BLOCK} h-14 rounded-xl`} style={{ width: `${w * 0.25}rem` }} />
+            <div key={i} className={`${BLOCK} h-14 rounded-tile`} style={{ width: `${w * 0.25}rem` }} />
           ))}
         </div>
-        <div className={`${BLOCK} h-72 rounded-xl xl:col-span-2`} />
-        <div className={`${BLOCK} h-72 rounded-xl`} />
+        <div className={`${BLOCK} h-72 rounded-tile xl:col-span-2`} />
+        <div className={`${BLOCK} h-72 rounded-tile`} />
       </div>
     </div>
   )
@@ -93,7 +93,7 @@ export default function LibraryExplorerSkeleton({ layout }: { layout: 'shelves' 
           <div className={`${BLOCK} h-4 w-24 rounded mt-1`} />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <div className={`${BLOCK} h-[34px] w-full sm:w-[30rem] rounded-xl`} />
+          <div className={`${BLOCK} h-[34px] w-full sm:w-[30rem] rounded-tile`} />
           <div className={`${BLOCK} h-8 w-[6.5rem] sm:w-[13.5rem] rounded-lg`} />
         </div>
         {layout === 'list' ? (

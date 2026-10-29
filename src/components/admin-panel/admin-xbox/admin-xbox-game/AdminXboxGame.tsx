@@ -22,13 +22,13 @@ export default function AdminXboxGame({ xuid, game }: { xuid: string; game: Xbox
   }
 
   return (
-    <li className="bg-bg-main rounded-xl">
+    <li className="bg-bg-main rounded-tile">
       <button
         type="button"
         onClick={toggle}
         aria-expanded={open}
         aria-controls={panelId}
-        className="w-full flex items-center gap-3 p-3 text-left rounded-xl focus-visible:ring-2 focus-visible:ring-accent/70 outline-none"
+        className="w-full flex items-center gap-3 p-3 text-left rounded-tile focus-visible:ring-2 focus-visible:ring-accent/70 outline-none"
       >
         {game.imageIcon ? (
           <img src={game.imageIcon} alt="" width={40} height={40} loading="lazy" decoding="async" className="size-10 rounded-md object-cover shrink-0" />

@@ -7,6 +7,7 @@ jest.mock('@/hooks/useUserRank', () => ({ useUserRank: () => ({ rank: null, isLo
 jest.mock('@/hooks/useUserAwards', () => ({ useUserAwards: () => ({ awards: null, isLoading: false }) }))
 jest.mock('@/hooks/useSteamRecentAchievements', () => ({ useSteamRecentAchievements: jest.fn() }))
 jest.mock('@/context/MainPlatformContext', () => ({ useMainPlatform: jest.fn() }))
+jest.mock('@/hooks/useHomeLayout', () => ({ useHomeLayout: jest.fn() }))
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
 
 // The cards themselves have their own tests; here only what each one is fed matters.
@@ -21,7 +22,12 @@ function mockProbe(name: string) {
 jest.mock('./MainPageHeatmap', () => mockProbe('heatmap'))
 jest.mock('./MainPageTopGames', () => mockProbe('top-games'))
 jest.mock('@/components/achivements-line-chart/AchievementsLineChart', () => mockProbe('daily'))
-jest.mock('./MainPagePointsStats', () => mockProbe('points'))
+jest.mock('./MainPagePointsStats', () => ({
+  __esModule: true,
+  default: ({ achievements, heatmapAchievements, isLoading }: { achievements: { Title: string }[]; heatmapAchievements: { Title: string }[]; isLoading?: boolean }) => (
+    <div data-testid="points">{isLoading ? 'loading' : `${achievements.map((a) => a.Title).join(',')}|${heatmapAchievements.map((a) => a.Title).join(',')}`}</div>
+  ),
+}))
 jest.mock('./MainPageRarest', () => mockProbe('rarest'))
 jest.mock('./MainPageAbandoned', () => mockProbe('abandoned'))
 jest.mock('../main-page-collection/MainPageCollection', () => mockProbe('collection'))
@@ -46,15 +52,17 @@ import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { useMainPlatform } from '@/context/MainPlatformContext'
+import { useHomeLayout } from '@/hooks/useHomeLayout'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 
 const STEAM_UNLOCK = { appId: 620, gameTitle: 'Portal 2', apiname: 'WIN', title: 'Win', badgeUrl: '', unlockedAt: '2024-01-15T10:00:00.000Z' }
 
 function platform(p: 'ra' | 'steam') {
-  ;(useMainPlatform as jest.Mock).mockReturnValue({ platform: p })
+  ;(useMainPlatform as jest.Mock).mockReturnValue({ platform: p, linked: ['ra', 'steam'], setPlatform: jest.fn() })
 }
 
 beforeEach(() => {
+  ;(useHomeLayout as jest.Mock).mockReturnValue(['classic', jest.fn()])
   ;(useRecentAchievements as jest.Mock).mockReturnValue({ achievements: [{ Title: 'Recent RA', Date: '2024-01-20 10:00:00' }], isLoading: false })
   ;(useActivityHeatmap as jest.Mock).mockReturnValue({ achievements: [{ Title: 'Heatmap RA', Date: '2024-01-10 10:00:00' }], isLoading: false })
   ;(useSteamRecentAchievements as jest.Mock).mockReturnValue({ achievements: [STEAM_UNLOCK], isLoading: false })
@@ -90,6 +98,14 @@ test('loads nothing from Steam without a linked account', () => {
   ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: false, library: [], libraryLoading: false })
   render(<MainPageCharts />)
   expect(useSteamRecentAchievements).toHaveBeenCalledWith(null)
+})
+
+test('Portada activity figures use every platform and ignore the Classic platform tab', () => {
+  platform('steam')
+  ;(useHomeLayout as jest.Mock).mockReturnValue(['cover', jest.fn()])
+  render(<MainPageCharts />)
+  expect(screen.getByTestId('points')).toHaveTextContent('Recent RA,Win|Year RA')
+  expect(screen.queryByTestId('steam-stats')).not.toBeInTheDocument()
 })
 
 /** Every card id the section rail can reach, visiting each section in turn. */

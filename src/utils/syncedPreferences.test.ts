@@ -2,7 +2,7 @@ import { cleanStoredPreferences, isSyncedKey, MAX_PREFERENCE_KEYS, MAX_PREFERENC
 
 test.each([
   'hidden-consoles:ra', 'hidden-consoles:xbox', 'library-layout', 'library-view', 'library-cols', 'groups-view', 'group-detail-view', 'library-sort:playing', 'library-sort-all:completed',
-  'psn-completion', 'psn-hidden-trophies', 'xbox-secret-achievements',
+  'psn-completion', 'psn-hidden-trophies', 'xbox-secret-achievements', 'font-style',
 ])('%s is stored on the account', (key) => expect(isSyncedKey(key)).toBe(true))
 
 test.each([

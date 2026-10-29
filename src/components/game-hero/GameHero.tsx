@@ -44,7 +44,7 @@ export default function GameHero({
 
   return (
     <section className="relative w-full px-4 sm:px-8 lg:px-14 pt-6 lg:pt-10 flex flex-col lg:flex-row gap-6 lg:gap-9 items-start">
-      <div className="w-32 sm:w-40 lg:w-[13.5rem] shrink-0 rounded-xl overflow-hidden shadow-[0_24px_60px_rgb(0_0_0/0.55)] ring-1 ring-inset ring-ink/10">
+      <div className="w-32 sm:w-40 lg:w-[13.5rem] shrink-0 rounded-tile overflow-hidden shadow-[0_24px_60px_rgb(0_0_0/0.55)] ring-1 ring-inset ring-ink/10">
         {cover}
       </div>
 

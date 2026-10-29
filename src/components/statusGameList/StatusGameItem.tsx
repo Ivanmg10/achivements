@@ -68,7 +68,7 @@ export default function StatusGameItem({
           <Link href={`/gameInfo/${gameId}`} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
             {game.ImageIcon && (
               <div
-                className={`w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden transition-all duration-150 ${
+                className={`w-16 h-16 sm:w-24 sm:h-24 rounded-tile overflow-hidden transition-all duration-150 ${
                   isHardcore ? 'ring-2 ring-hardcore/70 hover:ring-hardcore' : 'hover:ring-2 hover:ring-ink/40'
                 }`}
               >
@@ -77,7 +77,7 @@ export default function StatusGameItem({
                   alt=""
                   width={96}
                   height={96}
-                  className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl object-cover block"
+                  className="w-16 h-16 sm:w-24 sm:h-24 rounded-tile object-cover block"
                 />
               </div>
             )}

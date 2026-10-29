@@ -114,7 +114,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
               {loading ? (
                 <div className="flex flex-col gap-3 animate-pulse">
                   {[0, 1, 2].map((i) => (
-                    <div key={i} className="bg-bg-main rounded-xl p-4 flex flex-col gap-2">
+                    <div key={i} className="bg-bg-main rounded-tile p-4 flex flex-col gap-2">
                       <div className="h-3 w-48 rounded bg-ink/10" />
                       <div className="h-2.5 w-64 rounded bg-ink/10" />
                     </div>
@@ -136,7 +136,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                     {hashes.length} {hashes.length === 1 ? 'hash registrado' : 'hashes registrados'}
                   </p>
                   {hashes.map((h) => (
-                    <div key={h.MD5} className="bg-bg-main rounded-xl p-4 flex flex-col gap-2">
+                    <div key={h.MD5} className="bg-bg-main rounded-tile p-4 flex flex-col gap-2">
                       <div className="flex items-start justify-between gap-2">
                         <p className="text-xs font-medium text-text-main leading-relaxed wrap-break-word min-w-0">{h.Name}</p>
                         {h.Labels.length > 0 && (

@@ -187,7 +187,7 @@ export default function AdminPanel({
           </Button>
           <button
             onClick={lockNow}
-            className="flex items-center gap-1.5 px-3 py-2 bg-bg-card text-text-secondary text-sm rounded-xl hover:text-text-main transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 bg-bg-card text-text-secondary text-sm rounded-tile hover:text-text-main transition-colors"
           >
             <IconLock size={14} aria-hidden="true" />
             Lock

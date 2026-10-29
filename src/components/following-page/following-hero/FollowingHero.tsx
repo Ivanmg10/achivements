@@ -30,7 +30,7 @@ export default function FollowingHero({ users, className = '' }: { users: Friend
 
       <div className="relative px-4 sm:px-7 py-6 sm:py-7 flex flex-col gap-6 h-full justify-between">
         <div className="flex items-center gap-4 min-w-0">
-          <span aria-hidden="true" className="w-14 h-14 rounded-2xl bg-accent/15 text-accent ring-1 ring-accent/25 flex items-center justify-center shrink-0">
+          <span aria-hidden="true" className="w-14 h-14 rounded-card bg-accent/15 text-accent ring-1 ring-accent/25 flex items-center justify-center shrink-0">
             <IconUsers size={26} />
           </span>
           <div className="min-w-0">

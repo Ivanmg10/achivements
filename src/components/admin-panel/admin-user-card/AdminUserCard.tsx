@@ -98,7 +98,7 @@ export default function AdminUserCard({
           onClick={onToggleAdmin}
           disabled={isSelf}
           aria-label={user.admin ? `Remove admin from ${user.username}` : `Make ${user.username} admin`}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-xl text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-tile text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
             isSelf
               ? 'opacity-30 cursor-not-allowed bg-bg-main text-text-secondary'
               : user.admin
@@ -112,7 +112,7 @@ export default function AdminUserCard({
         <button
           onClick={onEdit}
           aria-label={`Edit ${user.username}`}
-          className="p-2 rounded-xl bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="p-2 rounded-tile bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <IconPencil size={15} aria-hidden="true" />
         </button>
@@ -120,7 +120,7 @@ export default function AdminUserCard({
           onClick={onDelete}
           disabled={isSelf}
           aria-label={`Delete ${user.username}`}
-          className={`p-2 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70 ${
+          className={`p-2 rounded-tile transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70 ${
             isSelf
               ? 'opacity-30 cursor-not-allowed bg-bg-main text-text-secondary'
               : 'bg-bg-main text-text-secondary hover:bg-danger/15 hover:text-danger'

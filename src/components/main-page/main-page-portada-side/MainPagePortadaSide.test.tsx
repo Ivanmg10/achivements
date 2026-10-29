@@ -21,11 +21,14 @@ const streak = (achievements: ReturnType<typeof unlock>[], days = 46, best = 46)
 
 describe('level', () => {
   test('the level in big, the points, what is left, the place and this week; it opens the rankings', () => {
-    ;(useVaultMe as jest.Mock).mockReturnValue({ me: { points: 116671, week: 461, rank: 19 } })
+    ;(useVaultMe as jest.Mock).mockReturnValue({ me: { points: 116671, week: 461, rank: 19, rankDelta: 3, days: [10, 0, 20, 30, 0, 40, 50].map((points, i) => ({ start: `2026-10-${19 + i}`, points })) } })
     render(<MainPagePortadaSideLevel />)
     expect(screen.getByRole('link')).toHaveAttribute('href', '/rankings')
     expect(screen.getByText('116,671')).toBeInTheDocument()
-    expect(screen.getByText('+461 this week')).toBeInTheDocument()
+    expect(screen.getByText('+461')).toBeInTheDocument()
+    expect(screen.getByText(en.homeLayout.yourWeek)).toBeInTheDocument()
+    expect(screen.getByText('Up 3')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Points per day, last 7 days: 10, 0, 20, 30, 0, 40, 50' })).toBeInTheDocument()
     expect(screen.getByText(/#19/)).toBeInTheDocument()
   })
 

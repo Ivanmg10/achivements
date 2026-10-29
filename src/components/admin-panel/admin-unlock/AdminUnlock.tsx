@@ -48,7 +48,7 @@ export default function AdminUnlock({ onUnlocked }: { onUnlocked: () => void }) 
     <form onSubmit={unlock} className="w-full max-w-sm mx-auto flex flex-col items-center text-center gap-4 py-4">
       <span
         aria-hidden="true"
-        className="w-14 h-14 rounded-2xl bg-accent/10 ring-1 ring-accent/20 text-accent flex items-center justify-center"
+        className="w-14 h-14 rounded-card bg-accent/10 ring-1 ring-accent/20 text-accent flex items-center justify-center"
       >
         <IconLock size={26} />
       </span>

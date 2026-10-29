@@ -42,9 +42,9 @@ export default function WelcomePageIntroPerk({
         ref={buttonRef}
         type="button"
         onClick={onOpen}
-        className="group w-full flex items-center gap-3 p-2.5 pr-3.5 text-left rounded-2xl hover:bg-ink/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="group w-full flex items-center gap-3 p-2.5 pr-3.5 text-left rounded-card hover:bg-ink/[0.04] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
-        <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-xl bg-accent/15 text-accent flex items-center justify-center font-display italic font-extrabold text-lg">
+        <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-tile bg-accent/15 text-accent flex items-center justify-center font-display italic font-extrabold text-lg">
           {number}
         </span>
         <span className="flex-1 min-w-0 font-bold text-[0.9375rem]">{title}</span>

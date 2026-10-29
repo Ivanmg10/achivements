@@ -74,7 +74,7 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
             <li key={g.key}>
               <Link
                 href={g.href}
-                className="flex items-center gap-2.5 rounded-xl bg-bg-main p-2 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 min-w-0"
+                className="flex items-center gap-2.5 rounded-tile bg-bg-main p-2 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 min-w-0"
               >
                 {g.iconUrl ? (
                   <Image src={g.iconUrl} alt="" width={32} height={32} unoptimized className="w-8 h-8 rounded-md object-cover shrink-0" />

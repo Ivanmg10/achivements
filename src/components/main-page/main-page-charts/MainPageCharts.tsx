@@ -27,6 +27,7 @@ import { psnToRecentAchievement } from '@/utils/psnMappers'
 import { xboxToRecentAchievement } from '@/utils/xboxMappers'
 import { ChartCard } from '@/components/ui/ChartCard'
 import { SectionFallback } from '@/components/ui/SectionFallback'
+import { useHomeLayout } from '@/hooks/useHomeLayout'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
 import MainPageHeatmap from './MainPageHeatmap'
@@ -82,6 +83,7 @@ export default function MainPageCharts() {
   const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
   const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
   const { platform } = useMainPlatform()
+  const [layout] = useHomeLayout()
   const { isLinked: steamLinked, library } = useSteamGamesData()
   const { achievements: steamActivity, isLoading: steamLoading } = useSteamRecentAchievements(steamLinked ? 'activity' : null)
   const { library: psnLibrary } = usePsnGamesData()
@@ -127,7 +129,19 @@ export default function MainPageCharts() {
   const panels: Record<string, ReactNode> = {
     overview: (
       <>
-        {platform === 'steam' ? (
+        {layout === 'cover' ? (
+          <SectionFallback error={achError || rankError} onRefresh={refetchStats}>
+            <MainPagePointsStats
+              streak={streak}
+              achievements={recent}
+              heatmapAchievements={year}
+              rank={rank}
+              showRank={false}
+              valueMode="achievements"
+              isLoading={achLoading || steamLoading || psnLoading || xboxLoading || yearLoading}
+            />
+          </SectionFallback>
+        ) : platform === 'steam' ? (
           <MainPageSteamStats streak={streak} achievements={steamRecent} games={library} isLoading={steamLoading} />
         ) : platform === 'psn' ? (
           <MainPagePsnStats streak={streak} achievements={psnRecent} isLoading={psnLoading} />

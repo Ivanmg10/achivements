@@ -89,7 +89,7 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
               onClick={() => handleSelect(country.code)}
               disabled={loading}
               aria-pressed={currentCode === country.code}
-              className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-all disabled:opacity-50 ${
+              className={`flex items-center gap-2 px-3 py-3 rounded-tile transition-all disabled:opacity-50 ${
                 currentCode === country.code
                   ? 'bg-accent text-bg-main'
                   : 'bg-bg-main hover:bg-bg-card text-text-main'

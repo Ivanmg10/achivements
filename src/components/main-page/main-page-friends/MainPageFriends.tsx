@@ -78,8 +78,8 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
     return (
       <div role="status" aria-busy="true" className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <span className="sr-only">{T.friends.loading}</span>
-        <div className="h-80 rounded-xl bg-bg-card animate-pulse motion-reduce:animate-none xl:col-span-2" />
-        <div className="h-80 rounded-xl bg-bg-card animate-pulse motion-reduce:animate-none" />
+        <div className="h-80 rounded-tile bg-bg-card animate-pulse motion-reduce:animate-none xl:col-span-2" />
+        <div className="h-80 rounded-tile bg-bg-card animate-pulse motion-reduce:animate-none" />
       </div>
     )
   }

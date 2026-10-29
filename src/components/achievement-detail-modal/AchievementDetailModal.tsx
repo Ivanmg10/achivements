@@ -72,12 +72,12 @@ export default function AchievementDetailModal({
               alt=""
               width={80}
               height={80}
-              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl shrink-0 ${earned ? 'ring-2 ring-accent' : ''}`}
+              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-tile shrink-0 ${earned ? 'ring-2 ring-accent' : ''}`}
               imgClassName={`w-full h-full object-cover ${earned ? '' : 'grayscale opacity-60'}`}
               unoptimized
             />
           ) : (
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-ink/10 shrink-0" aria-hidden="true" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-tile bg-ink/10 shrink-0" aria-hidden="true" />
           )}
           <div className="flex flex-col gap-1.5 flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">

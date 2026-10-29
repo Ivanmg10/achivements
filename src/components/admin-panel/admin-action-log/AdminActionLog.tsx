@@ -69,7 +69,7 @@ export default function AdminActionLog() {
       <button
         onClick={toggle}
         aria-expanded={open}
-        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-2xl"
+        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-card"
       >
         <IconHistory size={16} className="text-accent" aria-hidden="true" />
         <span className="flex-1">Action log</span>

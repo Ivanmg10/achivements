@@ -12,7 +12,7 @@ export default function ThemeModalOption({ theme, checked, onSelect }: { theme: 
       onClick={() => onSelect(theme)}
       role="radio"
       aria-checked={checked}
-      className={`theme-button rounded-xl p-2 border-2 transition-all text-left ${
+      className={`theme-button rounded-tile p-2 border-2 transition-all text-left ${
         checked ? 'border-accent ring-2 ring-accent/30' : 'border-bg-header hover:border-accent/50'
       }`}
     >

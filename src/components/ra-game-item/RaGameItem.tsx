@@ -60,7 +60,7 @@ export default function RaGameItem({
   return (
     <div
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={art} />
 
@@ -74,12 +74,12 @@ export default function RaGameItem({
               alt=""
               width={64}
               height={64}
-              className={`rounded-xl object-cover w-14 h-14 sm:w-16 sm:h-16 shadow-[0_6px_18px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:scale-105 ${
+              className={`rounded-tile object-cover w-14 h-14 sm:w-16 sm:h-16 shadow-[0_6px_18px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:scale-105 ${
                 mastered ? 'ring-2 ring-warning' : 'ring-1 ring-ink/10'
               }`}
             />
           ) : (
-            <span className="block w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-ink/10" />
+            <span className="block w-14 h-14 sm:w-16 sm:h-16 rounded-tile bg-ink/10" />
           )}
           {consoleIcon && (
             <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-md bg-bg-card ring-1 ring-ink/10 flex items-center justify-center">

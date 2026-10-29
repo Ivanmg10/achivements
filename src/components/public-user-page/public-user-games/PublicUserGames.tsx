@@ -43,10 +43,10 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
 
   if (isLoading) {
     return (
-      <div aria-busy="true" className="bg-bg-card rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div aria-busy="true" className="bg-bg-card rounded-tile p-4 grid grid-cols-1 md:grid-cols-2 gap-2">
         <span className="sr-only">{T.userProfile.loadingGames}</span>
         {Array.from({ length: 8 }, (_, i) => (
-          <div key={i} className="h-16 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+          <div key={i} className="h-16 rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
         ))}
       </div>
     )
@@ -54,14 +54,14 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
 
   if (games.length === 0) {
     return (
-      <div className="bg-bg-card rounded-xl p-8">
+      <div className="bg-bg-card rounded-tile p-8">
         <EmptyState icon={<IconDeviceGamepad2 className="w-6 h-6" />} title={T.userProfile.noGames} />
       </div>
     )
   }
 
   return (
-    <div className="bg-bg-card rounded-xl p-4 flex flex-col gap-4">
+    <div className="bg-bg-card rounded-tile p-4 flex flex-col gap-4">
       <div className="flex flex-col lg:flex-row lg:items-center gap-3">
         <div className="relative flex-1 min-w-0">
           <label htmlFor={searchId} className="sr-only">{T.userProfile.searchGames}</label>

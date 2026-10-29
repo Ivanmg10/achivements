@@ -35,7 +35,7 @@ export default function VaultFillProgress({ wide = false, className = '' }: { wi
             const failed = p.state === 'error'
             const counted = p.read + (p.skipped ?? 0)
             return (
-              <li key={s} className="bg-bg-main rounded-xl px-3 py-2 flex flex-col gap-1.5 min-w-0">
+              <li key={s} className="bg-bg-main rounded-tile px-3 py-2 flex flex-col gap-1.5 min-w-0">
                 <span className="flex items-center justify-between gap-2 text-xs">
                   <span className="flex items-center gap-1.5 min-w-0 font-medium">
                     <span aria-hidden="true" className={`w-2 h-2 rounded-full shrink-0 ${PLATFORM_FILL[s]}`} />

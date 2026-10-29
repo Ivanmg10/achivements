@@ -1,4 +1,4 @@
-const BLOCK = 'rounded-xl bg-ink/[0.06]'
+const BLOCK = 'rounded-tile bg-ink/[0.06]'
 
 /**
  * What a game's detail has under its ring while it loads: the row of figures

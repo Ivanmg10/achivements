@@ -95,7 +95,7 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
       {error && <Notice tone="danger">{error}</Notice>}
 
       <div className="flex gap-3 mt-2">
-        <button onClick={handleClose} className="flex-1 bg-bg-main text-text-secondary rounded-xl py-3 hover:text-text-main transition-colors">
+        <button onClick={handleClose} className="flex-1 bg-bg-main text-text-secondary rounded-tile py-3 hover:text-text-main transition-colors">
           Cancel
         </button>
         <Button onClick={handleSubmit} disabled={!canSubmit}

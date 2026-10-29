@@ -147,7 +147,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowCountryPicker(true)}
-                className="flex-1 bg-bg-main rounded-xl px-4 py-2.5 text-sm text-left flex items-center gap-2"
+                className="flex-1 bg-bg-main rounded-tile px-4 py-2.5 text-sm text-left flex items-center gap-2"
               >
                 {currentLocation ? (
                   <>
@@ -220,7 +220,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
       </div>
 
       <button onClick={onClose}
-        className="w-full bg-bg-main text-text-secondary rounded-xl py-3 hover:text-text-main transition-colors text-sm mt-1">
+        className="w-full bg-bg-main text-text-secondary rounded-tile py-3 hover:text-text-main transition-colors text-sm mt-1">
         Close
       </button>
     </CommonModal>

@@ -99,7 +99,7 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
         <label className="text-xs text-text-secondary uppercase tracking-wider">
           {T.editProfileModal.current}
         </label>
-        <div className="bg-bg-main rounded-xl px-4 py-3 text-text-secondary font-mono text-sm">
+        <div className="bg-bg-main rounded-tile px-4 py-3 text-text-secondary font-mono text-sm">
           {currentValue || '—'}
         </div>
       </div>

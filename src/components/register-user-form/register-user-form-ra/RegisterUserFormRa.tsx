@@ -42,7 +42,7 @@ export default function RegisterUserFormRa({
   }
 
   return (
-    <section aria-labelledby="register-ra-title" className="mb-4 rounded-2xl border border-ink/10 p-4 flex flex-col gap-3">
+    <section aria-labelledby="register-ra-title" className="mb-4 rounded-card border border-ink/10 p-4 flex flex-col gap-3">
       <h2 id="register-ra-title" className="flex items-center gap-2 text-sm font-semibold text-text-main">
         <RaLogo height={16} />
         {t.raTitle}
@@ -118,7 +118,7 @@ export default function RegisterUserFormRa({
           <button
             type="submit"
             disabled={checking || disabled || !username.trim() || !apiKey.trim()}
-            className="w-full py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-bg-main border border-ink/15 hover:border-accent transition-colors disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="w-full py-2.5 rounded-tile font-semibold text-sm flex items-center justify-center gap-2 bg-bg-main border border-ink/15 hover:border-accent transition-colors disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             {checking ? (
               <>

@@ -59,14 +59,14 @@ export default function CollapsibleSection({
   return (
     <section
       aria-labelledby={titleId}
-      className={`w-full flex flex-col rounded-2xl border border-ink/5 bg-bg-header/70 p-3 sm:p-4 ${className}`}
+      className={`w-full flex flex-col rounded-card border border-ink/5 bg-bg-header/70 p-3 sm:p-4 ${className}`}
     >
       <h2 className="text-lg sm:text-xl font-bold">
         <button
           onClick={() => setAndRemember(!open)}
           aria-expanded={open}
           aria-controls={panelId}
-          className="group w-full flex items-center gap-2.5 text-left rounded-xl px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="group w-full flex items-center gap-2.5 text-left rounded-tile px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           {icon}
           <span id={titleId}>{title}</span>

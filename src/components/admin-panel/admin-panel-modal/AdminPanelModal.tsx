@@ -33,7 +33,7 @@ export default function AdminPanelModal({ isOpen, onClose }: { isOpen: boolean; 
                 <button
                   onClick={onClose}
                   aria-label="Close admin panel"
-                  className="p-2 rounded-xl text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="p-2 rounded-tile text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 >
                   <IconX size={18} aria-hidden="true" />
                 </button>

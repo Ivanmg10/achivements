@@ -25,7 +25,7 @@ export default function CollapsibleSectionPreview({
     return (
       <div aria-busy="true" className="grid gap-2.5" style={style}>
         {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="h-19 rounded-xl bg-bg-card animate-pulse" />
+          <div key={i} className="h-19 rounded-tile bg-bg-card animate-pulse" />
         ))}
       </div>
     )

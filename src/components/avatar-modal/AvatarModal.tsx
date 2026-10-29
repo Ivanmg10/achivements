@@ -65,7 +65,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
           type="button"
           onClick={close}
           aria-label={t.close}
-          className="w-9 h-9 -mr-1 -mt-1 shrink-0 rounded-xl flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="w-9 h-9 -mr-1 -mt-1 shrink-0 rounded-tile flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <IconX size={18} aria-hidden="true" />
         </button>
@@ -80,7 +80,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
           setDragging(false)
           upload.pick(e.dataTransfer.files?.[0])
         }}
-        className={`group flex flex-col items-center gap-3 rounded-2xl p-5 cursor-pointer transition ring-1 ring-inset has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/70 ${
+        className={`group flex flex-col items-center gap-3 rounded-card p-5 cursor-pointer transition ring-1 ring-inset has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent/70 ${
           dragging ? 'bg-accent/10 ring-accent' : 'bg-bg-main ring-ink/10 hover:ring-ink/25'
         }`}
       >

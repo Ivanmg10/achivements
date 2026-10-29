@@ -58,8 +58,8 @@ export default function ChoiceCards<V>({
               {o.preview && <span aria-hidden="true">{o.preview}</span>}
               {Icon && <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${checked ? 'text-accent' : 'text-text-secondary'}`} aria-hidden="true" />}
               <span className="flex flex-col min-w-0">
-                <span className="text-sm font-medium text-text-main">{o.label}</span>
-                {o.hint && <span className="text-[11px] text-text-secondary leading-snug">{o.hint}</span>}
+                <span className="text-sm font-medium text-text-main break-words">{o.label}</span>
+                {o.hint && <span className="text-[11px] text-text-secondary leading-snug break-words">{o.hint}</span>}
               </span>
             </label>
           )

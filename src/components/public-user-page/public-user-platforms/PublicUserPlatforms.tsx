@@ -31,7 +31,7 @@ export default function PublicUserPlatforms({ games, isLoading }: { games: Libra
       {isLoading ? (
         <div aria-busy="true" className="flex flex-col gap-2">
           {[0, 1].map((i) => (
-            <div key={i} className="h-24 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+            <div key={i} className="h-24 rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
           ))}
         </div>
       ) : platforms.length === 0 ? (
@@ -39,7 +39,7 @@ export default function PublicUserPlatforms({ games, isLoading }: { games: Libra
       ) : (
         <ul className="flex flex-col gap-2">
           {platforms.map((p) => (
-            <li key={p.source} className="bg-bg-main rounded-xl p-3 flex flex-col gap-2.5">
+            <li key={p.source} className="bg-bg-main rounded-tile p-3 flex flex-col gap-2.5">
               <p className="flex items-center gap-2 text-sm font-semibold">
                 {LOGOS[p.source]}
                 {PLATFORM_NAME[p.source]}

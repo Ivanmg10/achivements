@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { IconBookmark, IconBookmarkFilled, IconStar, IconStarFilled } from '@tabler/icons-react'
+import { IconBookmark, IconBookmarkFilled, IconPlus, IconStar, IconStarFilled } from '@tabler/icons-react'
 import AccordionItem from '@/components/ui/Accordion'
 import ShowMore from '@/components/ui/ShowMore'
 import ToggleButton from '@/components/ui/ToggleButton'
+import Shelf from '@/components/ui/Shelf'
+import DropSlot from '@/components/ui/DropSlot'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
 
 function ShowMoreDemo() {
@@ -29,6 +31,16 @@ function ToggleDemo() {
   )
 }
 
+function DropSlotDemo() {
+  const [added, setAdded] = useState(false)
+  return (
+    <DropSlot label="Add games" onClick={() => setAdded((v) => !v)} className="min-h-32 flex-col">
+      <IconPlus className="w-6 h-6 text-accent" aria-hidden="true" />
+      <span className="font-bold">{added ? 'Game added' : 'Add games'}</span>
+    </DropSlot>
+  )
+}
+
 /** What opens and closes: questions, "show more", and the on/off icon. */
 export default function DesignCatalogDisclosure() {
   return (
@@ -44,6 +56,16 @@ export default function DesignCatalogDisclosure() {
       </DesignCatalogPiece>
       <DesignCatalogPiece id="show-more"><Compare><ShowMoreDemo /></Compare></DesignCatalogPiece>
       <DesignCatalogPiece id="toggle-button"><Panel><ToggleDemo /></Panel></DesignCatalogPiece>
+      <DesignCatalogPiece id="shelf">
+        <Panel>
+          <Shelf title="Keep playing" hint="The games with something left">
+            <div className="grid grid-cols-2 gap-3"><div className="rounded-tile bg-bg-card p-5">A game card</div><div className="rounded-tile bg-bg-card p-5">Another game</div></div>
+          </Shelf>
+        </Panel>
+      </DesignCatalogPiece>
+      <DesignCatalogPiece id="drop-slot">
+        <Compare><DropSlotDemo /></Compare>
+      </DesignCatalogPiece>
     </>
   )
 }

@@ -19,7 +19,7 @@ export default function GameInfoSkeleton() {
 
       <div aria-hidden="true" className="w-full flex flex-col items-center">
         <section className="w-full px-4 sm:px-8 lg:px-14 pt-6 lg:pt-10 flex flex-col lg:flex-row gap-6 lg:gap-9 items-start animate-pulse motion-reduce:animate-none">
-          <div className="w-32 sm:w-40 lg:w-[13.5rem] aspect-[216/306] rounded-xl bg-ink/[0.07] shrink-0" />
+          <div className="w-32 sm:w-40 lg:w-[13.5rem] aspect-[216/306] rounded-tile bg-ink/[0.07] shrink-0" />
           <div className="flex flex-col flex-1 min-w-0 gap-3.5 lg:pt-1.5 w-full">
             <div className="flex gap-2">
               <div className="h-6 w-28 rounded-tag bg-ink/[0.07]" />
@@ -42,8 +42,8 @@ export default function GameInfoSkeleton() {
           </div>
           <div className="hidden lg:flex flex-col gap-3 w-[26.25rem] shrink-0">
             <div className="grid grid-cols-2 gap-2">
-              <div className="h-[4.5rem] rounded-xl bg-ink/[0.06]" />
-              <div className="h-[4.5rem] rounded-xl bg-ink/[0.06]" />
+              <div className="h-[4.5rem] rounded-tile bg-ink/[0.06]" />
+              <div className="h-[4.5rem] rounded-tile bg-ink/[0.06]" />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="aspect-[320/224] rounded-tile bg-ink/[0.05]" />

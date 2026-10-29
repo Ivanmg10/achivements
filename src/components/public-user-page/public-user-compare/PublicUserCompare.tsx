@@ -86,7 +86,7 @@ export default function PublicUserCompare({
 
   return (
     <div className="flex flex-col gap-4">
-      <section aria-labelledby="public-compare-title" className="bg-bg-card rounded-xl p-4 sm:p-6 flex flex-col gap-5">
+      <section aria-labelledby="public-compare-title" className="bg-bg-card rounded-tile p-4 sm:p-6 flex flex-col gap-5">
         <h2 id="public-compare-title" className="sr-only">
           {T.userProfile.compareTitle.replace('{u}', user.username)}
         </h2>
@@ -131,7 +131,7 @@ export default function PublicUserCompare({
         )}
       </section>
 
-      <section aria-labelledby="public-compare-shared" className="bg-bg-card rounded-xl p-4 flex flex-col gap-3">
+      <section aria-labelledby="public-compare-shared" className="bg-bg-card rounded-tile p-4 flex flex-col gap-3">
         <div className="flex items-baseline justify-between gap-2">
           <h2 id="public-compare-shared" className="text-[10px] uppercase tracking-widest text-text-secondary">
             {T.userProfile.sharedGames}
@@ -141,7 +141,7 @@ export default function PublicUserCompare({
         {loading ? (
           <div aria-busy="true" className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {Array.from({ length: 4 }, (_, i) => (
-              <div key={i} className="h-24 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+              <div key={i} className="h-24 rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
             ))}
           </div>
         ) : shared.length === 0 ? (

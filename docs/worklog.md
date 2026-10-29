@@ -29,6 +29,65 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-29 - Portada review fixes (`feat/74-portada-improvements`, #74)
+
+**Did** - RA hero targets now open gameInfo's own achievement modal. Classic's platform tab no longer changes Portada's global stats, and large stat-pill hover backgrounds lean with the slanted design.
+**Why** - Follow-up to the user's modal, hover and cross-layout state bug reports.
+
+---
+
+## 2026-10-29 - Portada targets and unlock counts (`feat/74-portada-improvements`, #74)
+
+**Did** - Hero target tiles now have descriptive tooltips and open their achievement detail; the remaining tile links to the game. Portada's activity figures count unlocks instead of RA points.
+**Why** - Follow-up to the user's interaction review and to keep cross-platform stats meaningful.
+
+---
+
+## 2026-10-29 - Portada target tile polish (`feat/74-portada-improvements`, #74)
+
+**Did** - Limited the hero preview to five grey unearned achievements in one row, with the remaining count in a matching square tile.
+**Why** - Follow-up to the user's visual review.
+
+---
+
+## 2026-10-29 - Global Portada stats and hero targets (`feat/74-portada-improvements`, #74)
+
+**Did** - Portada's five activity figures now read every platform. The hero keeps one game link and shows up to six unearned achievement icons plus the remaining count.
+**Why** - Follow-up to the user's review: the figures must be global, the duplicate action was redundant, and the hero needed a useful next-target preview.
+
+---
+
+## 2026-10-29 - Portada stats refinement (`feat/74-portada-improvements`, #74)
+
+**Did** - Removed Portada's platform tabs and global-rank figure, leaving five wider activity figures. The cover no longer trims the shared chart height, so its heatmap cells stay the same size as Classic's.
+**Why** - Follow-up to the user's screenshot review: simplify the cover stats and fix its smaller heatmap.
+
+---
+
+## 2026-10-29 - Portada layout improvements (`feat/74-portada-improvements`, #74)
+
+**Did** - Added the level ring and a seven-day "Your week" summary, removed the hero from Portada's recent feed, put shared platform tabs in Stats & Activity, and slanted the shared level, streak and platform tags. The home columns explicitly stretch together.
+**Why** - #74: make Portada's level useful, clarify the stats source and remove repeated content while keeping the slanted design consistent.
+
+---
+
+## 2026-10-29 - Vivid game card tint (`feat/76-vivid-game-tint`, #76)
+
+**Did** - `averageTint` now selects the most colourful hue cluster and caps its OKLCH chroma and lightness; colourless artwork falls back to the neutral tint.
+**Why** - #76: keep the game's own colour vivid without muddy averages, neon highlights or near-black card tints.
+**Decisions** - The gradient and card styling stay unchanged; only tint extraction and its focused tests changed.
+
+---
+
+## 2026-10-29 — Layout chooser and fonts (`feat/75-layout-chooser-fonts`, #75)
+
+**Did** — The Layout dialog is now an `xl` chooser with a fixed sample home on the left (shape, font, home layout and game-card style scoped to it) and the choices in a side panel; the Page tab adds the font preference, and the welcome's preferences step offers it too. `font-style` is synced, painted before the first frame with `data-font`, and swaps `--font-ui` / `--font-barlow`. Sofia Sans and Fira Sans ship with their condensed italic display faces and `preload: false`. After the user's screenshot, `Modal` gained `backdrop="opaque"` (`bg-black/80` with `blur-sm`) and the Layout chooser uses it. A second screenshot showed the font cards too narrow in the side panel: they render two per row there now, and choice-card text wraps instead of spilling.
+**Why** — #75: choices apply at once and need a live dummy main page, and the person can pick a type family beside Barlow.
+**Decisions** — The sample uses fixed game data and library pieces, never the person's own page. Barlow remains the default; `data-font="sofia"|"fira"` are the only overrides. On a phone the sample sits above the options.
+**Watch out** — Barlow has no Cyrillic and Japanese still falls back with every pair; only `latin-ext` was added where the face supports it.
+
+---
+
 ## 2026-10-28 - CheevoVault favicon (`feat/79-cheevovault-favicon`, #79)
 
 **Did**: Replaced the `CH` placeholder in `src/app/icon.svg` with the existing CheevoVault mark.
@@ -41,6 +100,18 @@ neutra del flat; `StreakTag` ganó `glow={false}` y solo el header la usa; Barlo
 cargan `latin-ext`. Tests, lint y `tsc` en verde.
 **Why** — Decisiones de `docs/ui-polish-v2-plan.md` §1, §6 y §12.
 **Watch out** — El glow sigue activo por defecto en `StreakTag`; no cambiarlo para todos.
+
+---
+
+## 2026-10-29 — Component-library leftovers (`refactor/73-ui-library-leftovers`, #73)
+
+**Did** — Added `Shelf` and `DropSlot` to `src/components/ui`, with tests and catalogue specimens;
+`LibraryShelf` and both group add tiles now use them. Replaced every old `rounded-xl` / `rounded-2xl`
+in `src` with `rounded-tile` / `rounded-card`, and made the guard refuse them. Documented the welcome
+curtain's fixed decorative clip paths in the guard, design-system doc and `CLAUDE.md`.
+**Decisions** — The generic `Shelf` owns the title and optional action while `LibraryShelf` keeps its
+seeded card layout. `DropSlot` owns the striped surface; callers supply only their layout and content.
+No total-hours kicker was added to Portada.
 
 ---
 

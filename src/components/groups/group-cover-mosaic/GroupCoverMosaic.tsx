@@ -41,13 +41,13 @@ export default function GroupCoverMosaic({ group, size = 'w-24 h-24' }: { group:
   return (
     <div aria-hidden="true" className={`relative shrink-0 ${size}`}>
       {covers.length > 0 ? (
-        <div className={`grid gap-0.5 w-full h-full rounded-xl overflow-hidden bg-bg-main ${LAYOUT[covers.length]}`}>
+        <div className={`grid gap-0.5 w-full h-full rounded-tile overflow-hidden bg-bg-main ${LAYOUT[covers.length]}`}>
           {covers.map((src, i) => (
             <Image key={i} src={src} alt="" width={96} height={96} className="w-full h-full object-cover" unoptimized />
           ))}
         </div>
       ) : (
-        <div className="w-full h-full rounded-xl bg-bg-main flex items-center justify-center text-4xl">
+        <div className="w-full h-full rounded-tile bg-bg-main flex items-center justify-center text-4xl">
           {iconMark ?? <IconFolder className="w-8 h-8 text-text-secondary" />}
         </div>
       )}

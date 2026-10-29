@@ -75,7 +75,7 @@ export default function ProfileField({
       className={`group flex flex-col gap-0.5 min-w-0 text-left transition-[background-color,box-shadow] duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
         sunken
           ? 'rounded-field bg-bg-main px-3.5 py-2.5 shadow-[inset_0_2px_4px_rgb(0_0_0/0.22)] ring-1 ring-inset ring-ink/[0.08] hover:ring-accent/50'
-          : 'rounded-xl px-1 -mx-1 py-1.5 hover:bg-ink/5'
+          : 'rounded-tile px-1 -mx-1 py-1.5 hover:bg-ink/5'
       }`}
     >
       {content}

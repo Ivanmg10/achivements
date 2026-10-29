@@ -38,7 +38,7 @@ export default function RecentGamesList() {
       {recentLoading || psnLoading || xboxLoading ? (
         <div aria-busy="true" className="flex flex-col gap-1.5 flex-1">
           {Array.from({ length: MAX_GAMES }).map((_, i) => (
-            <div key={i} className="h-20 bg-bg-main rounded-xl animate-pulse" />
+            <div key={i} className="h-20 bg-bg-main rounded-tile animate-pulse" />
           ))}
         </div>
       ) : failed ? (

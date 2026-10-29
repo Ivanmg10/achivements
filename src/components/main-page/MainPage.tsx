@@ -66,7 +66,7 @@ export function MainPageBody() {
     <>
       {/* The "cover" layout: the game played last, in big, before the usual home. Never on someone else's page. */}
       {layout === 'cover' && !visitor && <MainPagePortada />}
-      <div className="home-fit-top flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
+      <div className="home-fit-top flex-1 min-h-0 grid grid-cols-1 items-stretch lg:grid-cols-[2fr_1fr]">
         {/* Profile first in DOM → top on mobile; placed col-2 on desktop */}
         <div className="home-fit-side min-h-0 min-w-0 flex flex-col lg:col-start-2 lg:row-start-1">
           {/* The cover puts your level, streak and last achievements here; the classic home, the platform profiles. */}
@@ -77,8 +77,8 @@ export function MainPageBody() {
           {view === 'pinned' && !visitor ? (
             <MainPagePinnedGames />
           ) : (
-            <div className="m-3 bg-bg-card rounded-xl p-4 flex flex-col flex-1 min-h-0">
-              <RARecentlyPlayed />
+            <div className="m-3 bg-bg-card rounded-tile p-4 flex flex-col flex-1 min-h-0">
+              <RARecentlyPlayed skipLatest={layout === 'cover' && !visitor} />
             </div>
           )}
         </div>

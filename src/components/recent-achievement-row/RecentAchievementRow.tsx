@@ -19,7 +19,7 @@ export default function RecentAchievementRow({ ach, onNavigate }: { ach: RecentA
     <Link
       href={gameHref(ach.Source ?? 'ra', ach.GameID, subject)}
       onClick={onNavigate}
-      className="flex gap-2 items-center p-3 rounded-xl bg-bg-main hover:bg-bg-card transition-colors group min-w-0"
+      className="flex gap-2 items-center p-3 rounded-tile bg-bg-main hover:bg-bg-card transition-colors group min-w-0"
     >
       {badge ? (
         <Image src={badge} alt={ach.Title} width={36} height={36} className="rounded shrink-0" unoptimized={isSteam} />

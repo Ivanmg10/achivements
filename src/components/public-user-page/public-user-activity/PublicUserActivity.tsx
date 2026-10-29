@@ -21,7 +21,7 @@ export default function PublicUserActivity() {
   return (
     <div className="flex flex-col gap-2">
       {tabbed && (
-        <div className="bg-bg-card rounded-xl px-4 pt-3">
+        <div className="bg-bg-card rounded-tile px-4 pt-3">
           <MainPageProfileTabs<MainPlatform>
             idPrefix={ID_PREFIX}
             label={T.userProfile.statsPlatform}

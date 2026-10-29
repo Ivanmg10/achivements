@@ -9,7 +9,7 @@ import { fromPsn, fromRa, fromSteam, fromXbox, type InsightAchievement } from '@
 import { psnTitleId } from '@/utils/psnTitles'
 import { toSteamLanguage } from '@/utils/steamLanguage'
 
-type Loaded = { items: InsightAchievement[]; art: string | null }
+type Loaded = { items: InsightAchievement[]; art: string | null; ra?: { items: RetroAchievement[]; players: number } }
 type Answer = ({ key: string } & Loaded) | { key: string; error: true }
 
 async function json(url: string): Promise<unknown> {
@@ -44,7 +44,7 @@ async function load(source: GameSource, id: number, lang: string): Promise<Loade
       ImageTitle?: string
     }
     const list = Object.values(data.Achievements ?? {}).filter((a): a is RetroAchievement => Boolean(a))
-    return { items: fromRa(list, data.NumDistinctPlayers ?? 0, id), art: await wideArt('ra', id, data) }
+    return { items: fromRa(list, data.NumDistinctPlayers ?? 0, id), art: await wideArt('ra', id, data), ra: { items: list, players: data.NumDistinctPlayers ?? 0 } }
   }
   if (source === 'steam') {
     const data = await json(`/api/steam/achievements?appid=${id}&lang=${toSteamLanguage(lang)}`)
@@ -94,6 +94,8 @@ export function useGameInsights(source: GameSource | null, id: number | null) {
     items: settled && 'items' in settled ? settled.items : [],
     /** A wide picture of the game, when its platform's page reads one. */
     art: settled && 'items' in settled ? settled.art : null,
+    /** RA's original rows, so its targets can open the same detail as gameInfo. */
+    ...(settled && 'ra' in settled ? { ra: settled.ra } : {}),
     loading: want !== null && settled === null,
     error: settled !== null && 'error' in settled,
   }

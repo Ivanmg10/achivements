@@ -73,6 +73,7 @@ test('meaningful colours come from the theme, not the palette', () => {
 
 test('the shape of a bar or a mark comes from the design tokens, never a fixed polygon or skew', () => {
   // slantStyle(px) / var(--clip-*) and skew-*-(--slant-*): the round design can only remove what the tokens carry.
+  // Exception: WelcomeCurtain.module.css is a fixed decorative illustration, not a shape-controlled component.
   expect(offenders(/clipPath:\s*['"`]polygon\(/)).toEqual([])
   expect(offenders(/(?<![\w-])-?skew-[xy]-\[/)).toEqual([])
 })
@@ -84,6 +85,7 @@ test('a streak is coloured by its tier, never a fixed hue', () => {
 test('the radii the designs change come from the tokens, never a fixed value', () => {
   // rounded-card / -pane / -tile / -tag / -button / -chip: the round design softens them or turns them to pills.
   expect(offenders(/rounded-\[(?:1\.25|0\.875|0\.625|0\.375)rem\]/)).toEqual([])
+  expect(offenders(/\brounded-(?:xl|2xl)\b/)).toEqual([])
 })
 
 test('a disclosure and a show-more button come from the library (Accordion, ShowMore)', () => {

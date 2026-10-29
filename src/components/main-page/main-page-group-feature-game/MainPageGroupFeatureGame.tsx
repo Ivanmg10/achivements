@@ -13,8 +13,8 @@ export default function MainPageGroupFeatureGame({ item, progress }: { item: Gam
   const done = pct >= 100
 
   return (
-    <Link href={gameHref(item.source ?? 'ra', item.game_id)} className="group flex flex-col gap-1.5 min-w-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
-      <span className={`block aspect-square rounded-xl overflow-hidden bg-bg-main ring-2 transition-all ${done ? 'ring-progress' : 'ring-transparent group-hover:ring-ink/30'}`}>
+    <Link href={gameHref(item.source ?? 'ra', item.game_id)} className="group flex flex-col gap-1.5 min-w-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+      <span className={`block aspect-square rounded-tile overflow-hidden bg-bg-main ring-2 transition-all ${done ? 'ring-progress' : 'ring-transparent group-hover:ring-ink/30'}`}>
         {src && <Image src={src} alt="" width={128} height={128} className="w-full h-full object-cover" unoptimized />}
       </span>
       <span className="text-xs font-medium truncate">{item.title}</span>

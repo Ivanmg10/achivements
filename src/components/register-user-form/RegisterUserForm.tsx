@@ -212,7 +212,7 @@ export default function RegisterUserForm({
         <button
           type="button"
           onClick={() => setRaOpen(true)}
-          className="mt-3 w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-bg-card text-text-main border border-ink/15 hover:border-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="mt-3 w-full py-3 rounded-tile font-semibold flex items-center justify-center gap-2 bg-bg-card text-text-main border border-ink/15 hover:border-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <RaLogo height={16} />
           {T.registerForm.raCta}

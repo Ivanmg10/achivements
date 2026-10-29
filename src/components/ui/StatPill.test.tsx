@@ -19,6 +19,7 @@ describe('StatPill', () => {
     render(<StatPill label="Today" value="3" onClick={onClick} />)
     fireEvent.click(screen.getByRole('button'))
     expect(onClick).toHaveBeenCalled()
+    expect(screen.getByRole('button')).toHaveClass('after:skew-x-(--slant-pill)', 'hover:after:bg-ink/5')
   })
 
   test('renders as a plain div without href or onClick', () => {

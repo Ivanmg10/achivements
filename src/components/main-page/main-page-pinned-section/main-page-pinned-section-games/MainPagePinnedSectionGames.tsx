@@ -49,7 +49,7 @@ export default function MainPagePinnedSectionGames() {
       {isLoading ? (
         <div className={GRID} aria-busy="true">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-15 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+            <div key={i} className="h-15 rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
           ))}
         </div>
       ) : pinned.length === 0 ? (

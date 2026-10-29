@@ -24,7 +24,7 @@ export function entryBackdrop(e: LibraryEntry): string | null {
 /** A game's icon, at the size asked. */
 export default function LibraryEntryCover({ entry, size, className = '' }: { entry: LibraryEntry; size: number; className?: string }) {
   return (
-    <span className={`block shrink-0 overflow-hidden rounded-xl ${className}`} style={{ width: size, height: size }}>
+    <span className={`block shrink-0 overflow-hidden rounded-tile ${className}`} style={{ width: size, height: size }}>
       <GameIcon source={entry.kind} id={entryId(entry)} imageUrl={entryIcon(entry)} size={size} className="w-full h-full rounded-none" />
     </span>
   )

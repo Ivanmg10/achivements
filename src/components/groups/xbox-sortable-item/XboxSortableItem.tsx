@@ -66,7 +66,7 @@ export default function XboxSortableItem({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       <GameCardBackdrop src={game ? xboxBackdrop(game) : icon} surface="card" />
       <div className="relative flex items-center gap-3 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">
@@ -86,11 +86,11 @@ export default function XboxSortableItem({
           href={href}
           tabIndex={-1}
           aria-hidden="true"
-          className={`relative z-10 shrink-0 rounded-xl transition-all ${
+          className={`relative z-10 shrink-0 rounded-tile transition-all ${
             isComplete ? 'ring-2 ring-success/70 hover:ring-success' : 'hover:ring-2 hover:ring-ink/40'
           }`}
         >
-          <GameIcon source="xbox" id={item.game_id} imageUrl={icon} size={96} className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl block" />
+          <GameIcon source="xbox" id={item.game_id} imageUrl={icon} size={96} className="w-16 h-16 sm:w-24 sm:h-24 rounded-tile block" />
         </Link>
 
         <div className="flex flex-col flex-1 min-w-0 gap-1">

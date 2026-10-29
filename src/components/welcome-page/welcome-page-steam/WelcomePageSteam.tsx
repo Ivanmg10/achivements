@@ -46,9 +46,9 @@ export default function WelcomePageSteam({
         isLinked ? (
           <div className="flex items-center gap-3.5 p-4 rounded-card bg-bg-card ring-1 ring-[#66c0f4]/35">
             {profile?.avatarfull ? (
-              <Image src={profile.avatarfull} alt="" width={52} height={52} className="w-13 h-13 rounded-xl object-cover shrink-0" unoptimized />
+              <Image src={profile.avatarfull} alt="" width={52} height={52} className="w-13 h-13 rounded-tile object-cover shrink-0" unoptimized />
             ) : (
-              <span aria-hidden="true" className="w-13 h-13 rounded-xl flex items-center justify-center text-white shrink-0" style={{ background: STEP_SKY.steam }}>
+              <span aria-hidden="true" className="w-13 h-13 rounded-tile flex items-center justify-center text-white shrink-0" style={{ background: STEP_SKY.steam }}>
                 <SteamLogo size={26} aria-hidden="true" />
               </span>
             )}

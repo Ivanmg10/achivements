@@ -52,7 +52,7 @@ export default function PsnGameItem({
   return (
     <div
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={psnBackdrop(game)} />
 
@@ -65,7 +65,7 @@ export default function PsnGameItem({
             id={game.id}
             imageUrl={game.imageIcon}
             size={64}
-            className={`rounded-xl w-14 h-14 sm:w-16 sm:h-16 shadow-[0_6px_18px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:scale-105 ${
+            className={`rounded-tile w-14 h-14 sm:w-16 sm:h-16 shadow-[0_6px_18px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:scale-105 ${
               perfect ? 'ring-2 ring-sky-300' : 'ring-1 ring-ink/10'
             }`}
           />
