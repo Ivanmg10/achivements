@@ -16,6 +16,7 @@ export default function MainPagePointsStats({
   streak = 0,
   rank,
   showRank = true,
+  valueMode = 'points',
   isLoading,
 }: {
   achievements: RecentAchievement[]
@@ -25,6 +26,8 @@ export default function MainPagePointsStats({
   rank: UserRankAndScore | null
   /** Portada keeps only the five activity figures; Classic also shows global rank. */
   showRank?: boolean
+  /** Global cover stats count unlocks; Classic's platform-specific stats count RA points. */
+  valueMode?: 'points' | 'achievements'
   isLoading?: boolean
 }) {
   const { T, lang } = useLanguage()
@@ -67,9 +70,9 @@ export default function MainPagePointsStats({
 
   return (
     <div className="flex flex-wrap gap-3">
-      <StatPill label={T.pointsStats.today} value={ptsToday.toLocaleString()} sub={todaySub} onClick={() => setSelectedDay(todayKey)} />
-      <StatPill label={T.pointsStats.thisWeek} value={pts7d.toLocaleString()} sub={plural(weekAchievements.length, T.plurals.achievements, lang)} onClick={() => setWeekOpen(true)} />
-      <StatPill label={T.pointsStats.thisMonth} value={thisMonth.pts.toLocaleString()} sub={plural(thisMonth.ach, T.plurals.achievements, lang)} onClick={() => setMonthOpen(true)} />
+      <StatPill label={T.pointsStats.today} value={(valueMode === 'points' ? ptsToday : achToday).toLocaleString(lang)} sub={valueMode === 'points' ? todaySub : achToday === 0 ? T.pointsStats.noActivity : undefined} onClick={() => setSelectedDay(todayKey)} />
+      <StatPill label={T.pointsStats.thisWeek} value={(valueMode === 'points' ? pts7d : weekAchievements.length).toLocaleString(lang)} sub={valueMode === 'points' ? plural(weekAchievements.length, T.plurals.achievements, lang) : undefined} onClick={() => setWeekOpen(true)} />
+      <StatPill label={T.pointsStats.thisMonth} value={(valueMode === 'points' ? thisMonth.pts : thisMonth.ach).toLocaleString(lang)} sub={valueMode === 'points' ? plural(thisMonth.ach, T.plurals.achievements, lang) : undefined} onClick={() => setMonthOpen(true)} />
       <StatPill label={T.pointsStats.avgPerDay} value={decimal(avgPerDay, lang)} sub={T.pointsStats.perDay} />
       {showRank && rank?.Rank != null && <StatPill label={T.userStats.globalRank} value={`#${rank.Rank.toLocaleString(lang)}`} sub={`${(rank.Score ?? 0).toLocaleString(lang)} pts`} />}
       <StatPill label={T.streak.title} value={`${streak}d`} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} accentColor={streak > 0 ? streakInk(streakTier(streak)) : undefined} href="/racha" />

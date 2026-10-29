@@ -143,6 +143,7 @@ export default function MainPageCharts() {
               heatmapAchievements={layout === 'cover' ? year : heatmapData}
               rank={rank}
               showRank={layout !== 'cover'}
+              valueMode={layout === 'cover' ? 'achievements' : 'points'}
               isLoading={layout === 'cover' ? achLoading || steamLoading || psnLoading || xboxLoading || yearLoading : achLoading || rankLoading}
             />
           </SectionFallback>

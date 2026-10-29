@@ -29,6 +29,13 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-29 - Portada targets and unlock counts (`feat/74-portada-improvements`, #74)
+
+**Did** - Hero target tiles now have descriptive tooltips and open their achievement detail; the remaining tile links to the game. Portada's activity figures count unlocks instead of RA points.
+**Why** - Follow-up to the user's interaction review and to keep cross-platform stats meaningful.
+
+---
+
 ## 2026-10-29 - Portada target tile polish (`feat/74-portada-improvements`, #74)
 
 **Did** - Limited the hero preview to five grey unearned achievements in one row, with the remaining count in a matching square tile.
