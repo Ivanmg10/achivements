@@ -29,6 +29,18 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-30 — UI polish plan becomes historical (`docs/67-ui-polish-v2-plan`)
+
+**Did** — Marked the UI polish roadmap and v2 plan as historical records, removed the old execution
+sequence, recorded which issues were built or dropped and updated the design register. Updated the
+antislop issue with the user's concerns about how slanted is applied and what round lost.
+**Why** — #67 was documentation, not another implementation block, and its old order made the
+remaining work look duplicated. Open issues now own scope and execution order.
+**Open** — Finish #61, #70, #78 and their current prerequisites before #77; create a dedicated
+release issue only when the user asks to ship the collected polish.
+
+---
+
 ## 2026-10-29 - Portada review fixes (`feat/74-portada-improvements`, #74)
 
 **Did** - RA hero targets now open gameInfo's own achievement modal. Classic's platform tab no longer changes Portada's global stats, and large stat-pill hover backgrounds lean with the slanted design.
@@ -130,6 +142,55 @@ games eligible for the 365-day window, all within the live-80 cap, so no older g
 account's score data covered 21 games and 207 unlock entries. Steam still cannot include a game
 outside the live cap until its unlocks have been recorded, and a game last played before the window
 is excluded by design.
+## 2026-10-26 — Design round for the UI polish blocks (canvas, )
+## 2026-10-25 — UI polish v2: design round and build plan (`docs/ui-polish-v2-plan`)
+
+**Did** — A new design canvas (`docs/designs.md`, "UI polish v2") drawn from the code with real game
+art: tint variants, streak tiers and progress in a top bar replica, Layout chooser (centred modal,
+then three in-page panels), fonts, landing (details, then v2) and login/register details. Wrote
+`docs/ui-polish-v2-plan.md`, the build plan for the next agent. No code changed.
+**Why** — The user rejected the first polish canvas as generic ("no me gusta nada") and wanted
+proposals rooted in the project; they ran out of usage before building.
+**Decisions** — Tint: no border. Landing v2 and the login/register details: agreed. Fonts: Sofia
+Sans and Fira Sans liked as options, which ships is open. Layout: a new concept (blurred page,
+floating full-page preview, side panel), to design first.
+**Open** — Everything in the plan; the streak tag / top bar variant; average vs vivid tint colour.
+**Watch out** — Playwright's browser was held by another session, so no screenshots of the live site
+were taken; the "Hoy" boards are redrawn from the code. PR #66 (`feat/65-ui-surfaces`) was already
+merged into `develop`; its four later docs commits were carried onto this branch.
+
+---
+
+## 2026-10-26 — Design round for the UI polish blocks (canvas, `feat/65-ui-surfaces`)
+
+**Did** — A design canvas with 11 boards for roadmap §4–§7 and the streak tiers
+(https://claude.ai/artifact/3AdM2avNDWS2A2VshH8Cbd, recorded in `docs/designs.md`): the tinted style in
+six treatments over the same six games in dark and light, the Layout modal (interactive and phone), the
+three font sets, three landings, three login/register proposals and a streak-tier sandbox with three
+top-bar progress variants. No app code changed.
+**Why** — The user could not say what bothers them about the tinted style, so they asked to see options,
+and asked for the Layout modal, fonts, landing, login/register and streak colours to be drawn first
+(`docs/design-process.md`).
+**Decisions** — Fonts are proposed as Exo 2 (Tech) and Manrope (Calm) next to Barlow; subsets are from memory
+and must be checked before building. The landings avoid invented numbers and "free" claims; no Xbox.
+**Open** — The user picks per block; then the plan doc and the build, one branch per block.
+**Watch out** — The canvas uses CSS clip-paths and fixed pixel sizes: it is a spec of look, not of code.
+
+---
+
+## 2026-10-25 (night, 4) — Roadmap to finish the new look (`feat/65-ui-surfaces`, #65)
+
+**Did** — `docs/ui-polish-roadmap.md`: what is left before the new look is done and can go to `main`
+(the user's own review, skeletons, entrance animations #61, fonts and the Layout modal, the tinted card
+style, leftovers, shipping) with `YOUR NOTES` slots for the user to complete. Listed in `docs/README.md`.
+Also two lint warnings fixed (`MainPageRarest` memo deps, an unused import).
+**Why** — The user is near the weekly budget and wants the context kept for when they return; entrance
+animations (#61) were added to the pending work.
+**Decisions** — The library's three parts go to `develop` as one PR (the branches were stacked and never
+had PRs); `develop` → `main` waits until the pending blocks are done.
+**Decisions (added later the same night)** — The roadmap also holds the signed-out landing redesign (login and register: review only), a font proposal (Exo 2 "Tech" and Manrope "Calm" next to today's Barlow, as its own preference, independent of the shape), a proposed Layout modal (live preview, sections on the left, reset) and an explanation of the tinted card style with four concepts to draw. Found while writing it: `src/lib/fonts.ts` loads only the `latin` subset, so Polish letters and all of Cyrillic and Japanese fall back to system fonts; adding `latin-ext` is a one-line fix still to do.
+**Open** — Everything in the roadmap; the PR into `develop` must be opened and checked on the preview.
+**Watch out** — `origin/main` has a commit `develop` lacks (PR #37): merge `main` into `develop` before the release.
 
 ---
 
