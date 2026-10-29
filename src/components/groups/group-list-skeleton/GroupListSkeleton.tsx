@@ -10,7 +10,7 @@ export default function GroupListSkeleton() {
       <span className="sr-only">{T.loadingPage.title}</span>
       {[0, 1, 2].map((i) => (
         <div key={i} aria-hidden="true" className="flex items-center gap-4 bg-bg-card rounded-card p-3">
-          <div className="w-24 h-24 rounded-xl bg-ink/10 shrink-0" />
+          <div className="w-24 h-24 rounded-tile bg-ink/10 shrink-0" />
           <div className="flex flex-col gap-2 flex-1">
             <div className="h-3.5 w-40 rounded bg-ink/10" />
             <div className="h-2.5 w-24 rounded bg-ink/10" />

@@ -52,7 +52,7 @@ export default function ShowcasePickerModalGames({
         {isLoading ? (
           <div aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
             {[0, 1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-14 rounded-xl bg-bg-card animate-pulse motion-reduce:animate-none" />
+              <div key={i} className="h-14 rounded-tile bg-bg-card animate-pulse motion-reduce:animate-none" />
             ))}
           </div>
         ) : games.length === 0 ? (

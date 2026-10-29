@@ -124,7 +124,7 @@ export default function AchievementModal({
               alt=""
               width={80}
               height={80}
-              className={`w-20 h-20 rounded-xl object-cover shrink-0 ${
+              className={`w-20 h-20 rounded-tile object-cover shrink-0 ${
                 earnedHardcore ? 'ring-2 ring-warning' : earned ? 'ring-2 ring-info/50' : 'grayscale opacity-50'
               }`}
             />
@@ -233,7 +233,7 @@ export default function AchievementModal({
               <>
                 {/* Recent unlocks — collapsible */}
                 {detail.unlocks?.Unlocks && detail.unlocks.Unlocks.length > 0 && (
-                  <div className="flex flex-col gap-0 border border-bg-header rounded-xl overflow-hidden">
+                  <div className="flex flex-col gap-0 border border-bg-header rounded-tile overflow-hidden">
                     <button
                       onClick={() => setUnlocksOpen((o) => !o)}
                       className="flex items-center justify-between px-4 py-3 hover:bg-bg-header/40 transition-colors text-left"

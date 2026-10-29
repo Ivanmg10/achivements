@@ -44,6 +44,18 @@ cargan `latin-ext`. Tests, lint y `tsc` en verde.
 
 ---
 
+## 2026-10-29 — Component-library leftovers (`refactor/73-ui-library-leftovers`, #73)
+
+**Did** — Added `Shelf` and `DropSlot` to `src/components/ui`, with tests and catalogue specimens;
+`LibraryShelf` and both group add tiles now use them. Replaced every old `rounded-xl` / `rounded-2xl`
+in `src` with `rounded-tile` / `rounded-card`, and made the guard refuse them. Documented the welcome
+curtain's fixed decorative clip paths in the guard, design-system doc and `CLAUDE.md`.
+**Decisions** — The generic `Shelf` owns the title and optional action while `LibraryShelf` keeps its
+seeded card layout. `DropSlot` owns the striped surface; callers supply only their layout and content.
+No total-hours kicker was added to Portada.
+
+---
+
 ## 2026-10-28 — Fixes from the user's site review (`fix/69-user-review-fixes`, #69)
 
 **Did** — Fixed the round Overview stat tiles, equal heights for pinned and showcase achievements,

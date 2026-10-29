@@ -42,7 +42,7 @@ export default function LandingBento() {
               alt=""
               loading="lazy"
               decoding="async"
-              className="absolute bottom-0 w-24 h-32 sm:w-32 sm:h-44 object-cover rounded-2xl ring-1 ring-ink/10 shadow-2xl shadow-black/50 transition-transform duration-500"
+              className="absolute bottom-0 w-24 h-32 sm:w-32 sm:h-44 object-cover rounded-card ring-1 ring-ink/10 shadow-2xl shadow-black/50 transition-transform duration-500"
               style={{
                 transform: `translateX(calc(var(--fan) * ${FAN[i]})) rotate(${FAN[i]}deg) translateY(${Math.abs(FAN[i]) * 0.8}px)`,
                 zIndex: 10 - Math.abs(FAN[i]),

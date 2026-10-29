@@ -31,11 +31,11 @@ export default function ProfileTeaser({ teaser }: { teaser: Teaser }) {
         <VaultPlatformSplit split={teaser.split} className="relative w-full max-w-60" />
 
         <dl className="relative grid grid-cols-2 gap-3 w-full">
-          <div className="bg-ink/5 rounded-2xl p-3">
+          <div className="bg-ink/5 rounded-card p-3">
             <dt className="text-xs text-text-secondary">{T.rankings.colCompleted}</dt>
             <dd className="text-lg font-semibold tabular-nums">{n(teaser.completed)}</dd>
           </div>
-          <div className="bg-ink/5 rounded-2xl p-3">
+          <div className="bg-ink/5 rounded-card p-3">
             <dt className="text-xs text-text-secondary">{T.rankings.colAchievements}</dt>
             <dd className="text-lg font-semibold tabular-nums">{n(teaser.achievements)}</dd>
           </div>

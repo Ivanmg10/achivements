@@ -8,7 +8,7 @@ import { PRIMARY_BUTTON, QUIET_BUTTON } from '@/components/welcome-page/welcomeA
 export type IntroPerk = { title: string; text: string; detail: string; highlights: string[] }
 
 const ICON_BUTTON =
-  'w-11 h-11 rounded-xl flex items-center justify-center ring-1 ring-inset ring-ink/15 text-text-main hover:bg-ink/5 disabled:opacity-30 disabled:cursor-default transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+  'w-11 h-11 rounded-tile flex items-center justify-center ring-1 ring-inset ring-ink/15 text-text-main hover:bg-ink/5 disabled:opacity-30 disabled:cursor-default transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
 /**
  * One of the intro's points, opened over the whole step: its card grows into
@@ -54,7 +54,7 @@ export default function WelcomePageIntroDetail({
         type="button"
         onClick={onClose}
         aria-label={T.editProfileModal.close}
-        className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 w-10 h-10 rounded-xl flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 w-10 h-10 rounded-tile flex items-center justify-center text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
         <IconX size={20} aria-hidden="true" />
       </button>
@@ -78,7 +78,7 @@ export default function WelcomePageIntroDetail({
           </div>
 
           <div className="flex items-start gap-4">
-            <span aria-hidden="true" className="w-14 h-14 shrink-0 rounded-2xl bg-accent/15 text-accent flex items-center justify-center font-display italic font-extrabold text-3xl">
+            <span aria-hidden="true" className="w-14 h-14 shrink-0 rounded-card bg-accent/15 text-accent flex items-center justify-center font-display italic font-extrabold text-3xl">
               {index + 1}
             </span>
             <div className="flex flex-col gap-1 min-w-0">

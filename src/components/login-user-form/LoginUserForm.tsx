@@ -70,7 +70,7 @@ export default function LoginUserForm({
       </div>
 
       {isRegister && (
-        <div role="status" className="mb-5 bg-success/20 border border-success/40 rounded-xl p-3">
+        <div role="status" className="mb-5 bg-success/20 border border-success/40 rounded-tile p-3">
           <p className="text-sm text-success">{T.loginForm.accountCreated}</p>
         </div>
       )}

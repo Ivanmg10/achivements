@@ -79,7 +79,7 @@ export default function SortableItem({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       <GameCardBackdrop src={cover} surface="card" />
       <div className="relative flex items-center gap-3 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">
@@ -95,11 +95,11 @@ export default function SortableItem({
         )}
 
         {/* Same destination as the title link, so it is kept out of the tab order. */}
-        <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0 rounded-xl hover:ring-2 hover:ring-ink/40 transition-all">
+        <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0 rounded-tile hover:ring-2 hover:ring-ink/40 transition-all">
           {cover ? (
-            <Image src={cover} alt="" width={96} height={96} className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl object-cover block" unoptimized />
+            <Image src={cover} alt="" width={96} height={96} className="w-16 h-16 sm:w-24 sm:h-24 rounded-tile object-cover block" unoptimized />
           ) : (
-            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl bg-bg-main" />
+            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-tile bg-bg-main" />
           )}
         </Link>
 

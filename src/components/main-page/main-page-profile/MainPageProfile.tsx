@@ -70,7 +70,7 @@ export default function MainPageProfile() {
   // One account: the column as it always was — no switch with a single option.
   if (linked.length <= 1) {
     return (
-      <section className="main-content text-text-main m-3 rounded-xl flex flex-col items-center overflow-y-auto">
+      <section className="main-content text-text-main m-3 rounded-tile flex flex-col items-center overflow-y-auto">
         <div className={`w-full flex-1 min-h-0 flex flex-col items-center ${styles.enter}`}>{profiles[tab]}</div>
       </section>
     )
@@ -78,7 +78,7 @@ export default function MainPageProfile() {
 
   // Several: one profile at a time, switched by low-key tabs at the top.
   return (
-    <section className="main-content text-text-main m-3 rounded-xl flex flex-col items-center gap-3 overflow-y-auto">
+    <section className="main-content text-text-main m-3 rounded-tile flex flex-col items-center gap-3 overflow-y-auto">
       <MainPageProfileTabs<MainPlatform>
         idPrefix={ID_PREFIX}
         selected={tab}

@@ -28,7 +28,7 @@ export default function MainPageWithoutRa() {
         </div>
 
         <div className="flex flex-col min-h-0 lg:col-start-1 lg:row-start-1">
-          <div className="m-3 bg-bg-card rounded-xl p-4 flex flex-col flex-1 min-h-0">
+          <div className="m-3 bg-bg-card rounded-tile p-4 flex flex-col flex-1 min-h-0">
             <RecentGamesList />
           </div>
         </div>

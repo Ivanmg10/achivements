@@ -29,7 +29,7 @@ const PLATFORM_ICONS: Record<GameSource, ReactNode> = {
 function Fact({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
   return (
     <div className="flex items-center gap-3 min-w-0">
-      <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-xl bg-bg-main ring-1 ring-ink/[0.06] flex items-center justify-center text-text-secondary">
+      <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-tile bg-bg-main ring-1 ring-ink/[0.06] flex items-center justify-center text-text-secondary">
         {icon}
       </span>
       <div className="flex flex-col min-w-0">
@@ -55,7 +55,7 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <section aria-labelledby="public-user-preferences" className="bg-bg-card rounded-xl p-4 flex flex-col gap-4">
+      <section aria-labelledby="public-user-preferences" className="bg-bg-card rounded-tile p-4 flex flex-col gap-4">
         <h2 id="public-user-preferences" className="text-[10px] uppercase tracking-widest text-text-secondary">
           {T.userProfile.preferences}
         </h2>
@@ -83,7 +83,7 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
                 <li key={source}>
                   <Link
                     href={gameHref(source, game!.id, subject)}
-                    className="flex items-center gap-2.5 p-2 rounded-xl bg-bg-main hover:bg-ink/10 transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    className="flex items-center gap-2.5 p-2 rounded-tile bg-bg-main hover:bg-ink/10 transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                   >
                     {icon ? (
                       <Image src={icon} alt="" width={36} height={36} className="w-9 h-9 rounded-lg object-cover shrink-0" unoptimized />
@@ -100,7 +100,7 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
         )}
       </section>
 
-      <section aria-labelledby="public-user-groups" className="bg-bg-card rounded-xl p-4 flex flex-col gap-3 lg:col-span-2">
+      <section aria-labelledby="public-user-groups" className="bg-bg-card rounded-tile p-4 flex flex-col gap-3 lg:col-span-2">
         <h2 id="public-user-groups" className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-text-secondary">
           <IconFolders size={14} aria-hidden="true" />
           {T.userProfile.publicGroups}

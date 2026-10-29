@@ -22,7 +22,7 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
     .filter((f) => f.game !== null)
 
   return (
-    <article className="bg-bg-main rounded-xl p-3 flex flex-col gap-3 min-w-0">
+    <article className="bg-bg-main rounded-tile p-3 flex flex-col gap-3 min-w-0">
       <div className="flex items-center justify-between gap-2 min-w-0">
         <Link
           href={`/user/${encodeURIComponent(friend.username)}`}

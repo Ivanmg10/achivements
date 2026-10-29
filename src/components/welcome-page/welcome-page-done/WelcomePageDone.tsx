@@ -79,7 +79,7 @@ export default function WelcomePageDone({
               >
                 <span
                   aria-hidden="true"
-                  className={`w-10 h-10 shrink-0 rounded-xl flex items-center justify-center text-white ${isPlatform && !row.done ? 'opacity-40' : ''}`}
+                  className={`w-10 h-10 shrink-0 rounded-tile flex items-center justify-center text-white ${isPlatform && !row.done ? 'opacity-40' : ''}`}
                   style={{ background: isPlatform ? STEP_SKY[row.step] : 'color-mix(in oklab, rgb(var(--accent)) 45%, rgb(var(--bg-card)))' }}
                 >
                   {row.mark}

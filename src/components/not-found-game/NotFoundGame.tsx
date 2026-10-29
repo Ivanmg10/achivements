@@ -26,7 +26,7 @@ export default function NotFoundGame({ source }: { source: GameSource }) {
       <motion.div
         {...rise(0)}
         aria-hidden="true"
-        className="relative w-28 aspect-[3/4] rounded-xl grid place-items-center text-text-secondary bg-ink/5 border-2 border-dashed border-ink/20"
+        className="relative w-28 aspect-[3/4] rounded-tile grid place-items-center text-text-secondary bg-ink/5 border-2 border-dashed border-ink/20"
       >
         <span className="absolute top-2 left-2 p-1 rounded-md bg-bg-card">
           <PlatformLogo source={source} size={14} />

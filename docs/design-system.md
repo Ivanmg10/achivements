@@ -26,7 +26,9 @@ then `CLAUDE.md` → "The component library" for the hard rules.
 - **Radii come from tokens too** (`rounded-card`, `-pane`, `-tile`, `-tag`, `-button`, `-chip`, `-field`): the round design softens or pills them. The guard refuses the fixed values (`rounded-[1.25rem]`…).
 - **Shapes come from tokens.** A bar's cut ends are `slantStyle(px)`
   (`ui/shape.ts`); a mark's lean is `skew-y-(--slant-mark)`; a control's slant is
-  `skew-x-(--slant-button)`. Never a literal.
+  `skew-x-(--slant-button)`. Never a literal. The welcome curtain's fixed `polygon(...)`
+  values in `WelcomeCurtain.module.css` are the documented exception: the illustration is
+  decorative and deliberately does not follow the shape choice.
 - **Colour with a meaning comes from the theme** (danger, success, warning,
   `hardcore`, `softcore`). Hues of a *tier* (level badge, `streakTier`) are the
   exception and live in their own util, mixed with the text colour so they read on any theme.
@@ -71,8 +73,5 @@ flag is read from the database, never the session).
 
 ## What is not here yet
 
-- Two Disclosure pieces agreed on the canvas are still page-specific: the horizontal
-  `Shelf` (`LibraryShelf`) and the striped drop slot of a drag (the groups' sortable
-  rows). `Accordion`, `ShowMore` and `ToggleButton` are in the library and used.
 - The V6 canvas boards are the *history* of the design (`docs/designs.md`); the
   catalogue is the *current* truth. If they disagree, the catalogue wins.

@@ -12,7 +12,7 @@ export default function StreakPageSkeleton() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[0, 1].map((i) => (
             <div key={i} className="bg-bg-card rounded-card p-5 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-ink/10 shrink-0" />
+              <div className="w-12 h-12 rounded-tile bg-ink/10 shrink-0" />
               <div className="flex flex-col gap-2 flex-1">
                 <div className="h-2.5 w-24 rounded bg-ink/10" />
                 <div className="h-6 w-20 rounded bg-ink/10" />

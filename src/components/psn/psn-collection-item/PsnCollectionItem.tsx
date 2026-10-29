@@ -50,7 +50,7 @@ export default function PsnCollectionItem({
   return (
     <div
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={collection.heroUrl ?? psnBackdrop(games[0])} />
 
@@ -59,14 +59,14 @@ export default function PsnCollectionItem({
         aria-expanded={isExpanded}
         aria-controls={panelId}
         aria-label={`${isExpanded ? T.psn.hideGames : T.psn.showGames}: ${collection.title}`}
-        className="relative flex items-center gap-3.5 px-3.5 py-3 shrink-0 w-full text-left cursor-pointer rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] group"
+        className="relative flex items-center gap-3.5 px-3.5 py-3 shrink-0 w-full text-left cursor-pointer rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] group"
       >
         <GameIcon
           source="psn"
           id={games[0].id}
           imageUrl={collection.iconUrl ?? games[0].imageIcon}
           size={64}
-          className="rounded-xl w-14 h-14 sm:w-16 sm:h-16 shrink-0 shadow-md shadow-black/30 ring-1 ring-ink/10"
+          className="rounded-tile w-14 h-14 sm:w-16 sm:h-16 shrink-0 shadow-md shadow-black/30 ring-1 ring-ink/10"
         />
 
         <span className="flex flex-col min-w-0 flex-1 gap-1">

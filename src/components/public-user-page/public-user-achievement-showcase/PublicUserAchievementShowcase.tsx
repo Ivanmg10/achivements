@@ -30,7 +30,7 @@ export default function PublicUserAchievementShowcase() {
       {isLoading ? (
         <div aria-busy="true" className={GRID}>
           {Array.from({ length: SHOWCASE_MAX }, (_, i) => (
-            <div key={i} className="min-h-44 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+            <div key={i} className="min-h-44 rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
           ))}
         </div>
       ) : error ? (

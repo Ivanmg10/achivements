@@ -52,7 +52,7 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
           {/* Same destination as the title link, so it is kept out of the tab order. */}
           <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
             <div
-              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden transition-all duration-150 ${
+              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-tile overflow-hidden transition-all duration-150 ${
                 isComplete ? 'ring-2 ring-success/70 hover:ring-success' : 'hover:ring-2 hover:ring-ink/40'
               }`}
             >

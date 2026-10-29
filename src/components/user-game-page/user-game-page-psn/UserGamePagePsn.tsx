@@ -53,7 +53,7 @@ export default function UserGamePagePsn({ id, username, banner, comparing, mine,
               <GameInfoSkeletonTable />
             </div>
           ) : error ? (
-            <section className="bg-bg-card p-5 rounded-xl flex flex-col items-center gap-2 text-center">
+            <section className="bg-bg-card p-5 rounded-tile flex flex-col items-center gap-2 text-center">
               <p role="alert" className="text-danger">{T.userGame.loadError.replace('{u}', username)}</p>
               {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}
               <button onClick={retry} className={buttonClass('secondary', 'sm')}>

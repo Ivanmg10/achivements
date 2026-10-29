@@ -47,7 +47,7 @@ export default function SteamSignupFormFields({
 
   return (
     <>
-      <div className="flex items-center gap-3 mb-4 rounded-xl border border-ink/10 p-3">
+      <div className="flex items-center gap-3 mb-4 rounded-tile border border-ink/10 p-3">
         {profile.avatar && (
           <Image src={profile.avatar} alt="" width={48} height={48} className="rounded-lg shrink-0" />
         )}
@@ -60,7 +60,7 @@ export default function SteamSignupFormFields({
       <p className="text-sm text-text-secondary mb-4">{T.steamAuth.lead}</p>
 
       {!profile.isPublic && (
-        <p className="mb-4 text-xs text-warning bg-warning/10 border border-warning/30 rounded-xl p-3">
+        <p className="mb-4 text-xs text-warning bg-warning/10 border border-warning/30 rounded-tile p-3">
           {T.steam.privateProfileHint}
         </p>
       )}

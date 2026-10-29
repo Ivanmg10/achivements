@@ -24,7 +24,7 @@ export default function WelcomePageRaGuide() {
           href={RA_SETTINGS}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 min-h-10 px-2 -mr-2 rounded-xl text-sm font-semibold text-text-main hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="inline-flex items-center gap-1.5 min-h-10 px-2 -mr-2 rounded-tile text-sm font-semibold text-text-main hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           {t.openRa}
           <IconExternalLink size={14} aria-hidden="true" />
@@ -32,14 +32,14 @@ export default function WelcomePageRaGuide() {
       </div>
       <ol className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         {t.guide.map((line, i) => (
-          <li key={line} className={`${STEP_CLASS[i]} flex sm:flex-col gap-2 sm:gap-0.5 p-2.5 rounded-xl bg-bg-main text-[0.8125rem] leading-snug`}>
+          <li key={line} className={`${STEP_CLASS[i]} flex sm:flex-col gap-2 sm:gap-0.5 p-2.5 rounded-tile bg-bg-main text-[0.8125rem] leading-snug`}>
             <span aria-hidden="true" className="font-display italic font-extrabold text-xl leading-none text-[#e5b53f]">{i + 1}</span>
             {line}
           </li>
         ))}
       </ol>
 
-      <div aria-hidden="true" className="hidden sm:block relative w-[460px] max-w-full h-[290px] rounded-2xl overflow-hidden bg-[#17181e] ring-1 ring-[#2a2c3a] text-[#e1e4eb]">
+      <div aria-hidden="true" className="hidden sm:block relative w-[460px] max-w-full h-[290px] rounded-card overflow-hidden bg-[#17181e] ring-1 ring-[#2a2c3a] text-[#e1e4eb]">
         <div className="h-10 flex items-center gap-2 px-3 bg-[#1d1e27] border-b border-[#2a2c3a]">
           <span className="w-2.5 h-2.5 rounded-full bg-[#3a3d4c]" />
           <span className="w-2.5 h-2.5 rounded-full bg-[#3a3d4c]" />

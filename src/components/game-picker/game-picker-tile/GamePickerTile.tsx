@@ -26,9 +26,9 @@ export default function GamePickerTile({
       type="button"
       onClick={onToggle}
       aria-pressed={selected}
-      className="group flex flex-col gap-1.5 text-left min-w-0 rounded-xl p-1 -m-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="group flex flex-col gap-1.5 text-left min-w-0 rounded-tile p-1 -m-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
-      <span className={`relative block aspect-square rounded-xl overflow-hidden bg-bg-main ring-2 transition-all ${selected ? 'ring-accent' : 'ring-transparent group-hover:ring-ink/30'}`}>
+      <span className={`relative block aspect-square rounded-tile overflow-hidden bg-bg-main ring-2 transition-all ${selected ? 'ring-accent' : 'ring-transparent group-hover:ring-ink/30'}`}>
         {icon && <Image src={icon} alt="" width={128} height={128} className={`w-full h-full object-cover transition-opacity ${selected ? 'opacity-70' : ''}`} unoptimized />}
         <span
           aria-hidden="true"

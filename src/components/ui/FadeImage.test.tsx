@@ -4,10 +4,10 @@ import { FadeImage } from './FadeImage'
 const box = () => screen.getByRole('img').parentElement!
 
 test('holds a pulsing placeholder in its shape until the picture loads, then fades it in', () => {
-  render(<FadeImage src="https://example.com/a.png" alt="Zelda" width={64} height={64} className="w-16 h-16 rounded-xl" />)
+  render(<FadeImage src="https://example.com/a.png" alt="Zelda" width={64} height={64} className="w-16 h-16 rounded-tile" />)
   const img = screen.getByRole('img', { name: 'Zelda' })
   expect(img).toHaveClass('opacity-0')
-  expect(box()).toHaveClass('animate-pulse', 'w-16', 'h-16', 'rounded-xl')
+  expect(box()).toHaveClass('animate-pulse', 'w-16', 'h-16', 'rounded-tile')
 
   fireEvent.load(img)
   expect(img).toHaveClass('opacity-100')

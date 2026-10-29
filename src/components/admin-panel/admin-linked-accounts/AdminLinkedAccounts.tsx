@@ -13,7 +13,7 @@ type Platform = 'ra' | 'steam' | 'psn' | 'xbox'
 
 const PLATFORM_NAMES: Record<Platform, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
 
-const BUTTON = 'shrink-0 text-xs font-bold px-3 py-2 rounded-xl disabled:opacity-40'
+const BUTTON = 'shrink-0 text-xs font-bold px-3 py-2 rounded-tile disabled:opacity-40'
 
 /**
  * Links or unlinks a user's RetroAchievements, Steam, PSN and Xbox accounts, for support.
@@ -73,7 +73,7 @@ export default function AdminLinkedAccounts({
       onUpdated(user.id, changes))
 
   return (
-    <div className="bg-bg-main/50 rounded-xl p-3 flex flex-col gap-4">
+    <div className="bg-bg-main/50 rounded-tile p-3 flex flex-col gap-4">
       <span className="text-xs text-text-secondary uppercase tracking-wider">Linked accounts</span>
 
       <div className="flex flex-col gap-2">

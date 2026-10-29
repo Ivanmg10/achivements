@@ -47,7 +47,7 @@ export default function MainPagePinnedSectionAchievements() {
       {isLoading ? (
         <div className={GRID} aria-busy="true">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-full rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+            <div key={i} className="h-full rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
           ))}
         </div>
       ) : error ? (

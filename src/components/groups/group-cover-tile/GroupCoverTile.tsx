@@ -48,7 +48,7 @@ export default function GroupCoverTile({
           href={href}
           tabIndex={-1}
           aria-hidden="true"
-          className={`block aspect-square rounded-2xl overflow-hidden bg-bg-card ring-2 transition-all ${done ? 'ring-progress' : 'ring-transparent group-hover:ring-ink/30'}`}
+          className={`block aspect-square rounded-card overflow-hidden bg-bg-card ring-2 transition-all ${done ? 'ring-progress' : 'ring-transparent group-hover:ring-ink/30'}`}
         >
           {src && <Image src={src} alt="" width={240} height={240} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" unoptimized />}
         </Link>

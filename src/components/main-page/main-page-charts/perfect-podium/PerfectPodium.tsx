@@ -52,7 +52,7 @@ export default function PerfectPodium({ games }: { games: LatestPerfect[] }) {
             >
               <Link
                 href={href}
-                className="group w-full flex flex-col items-center gap-2 min-w-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="group w-full flex flex-col items-center gap-2 min-w-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 <span className="transition-transform duration-300 group-hover:-translate-y-1 max-w-full flex justify-center">
                   <GameCover source={game.source} id={game.id} iconUrl={game.iconUrl} className={s.cover} />

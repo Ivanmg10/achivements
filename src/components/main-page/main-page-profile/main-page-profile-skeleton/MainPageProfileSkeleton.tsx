@@ -10,7 +10,7 @@ const ROWS = 3
  */
 export default function MainPageProfileSkeleton({ label }: { label: string }) {
   return (
-    <div role="status" aria-busy="true" aria-label={label} className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-xl w-full h-full">
+    <div role="status" aria-busy="true" aria-label={label} className="relative flex flex-col gap-3 p-3 bg-bg-card rounded-tile w-full h-full">
       <div aria-hidden="true" className="flex flex-col gap-3 animate-pulse">
         <div className="absolute top-3 right-3 w-24 h-7 rounded-lg bg-ink/8" />
         <div className="flex gap-3 items-center pr-28">

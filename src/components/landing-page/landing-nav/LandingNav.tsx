@@ -14,7 +14,7 @@ export default function LandingNav() {
     <div className="sticky top-0 z-40 px-2 sm:px-3 pt-2">
       <nav
         aria-label={T.authPage.brand}
-        className="max-w-6xl mx-auto h-14 px-4 rounded-2xl flex items-center justify-between bg-bg-card/75 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-ink/[0.06] shadow-lg shadow-black/20"
+        className="max-w-6xl mx-auto h-14 px-4 rounded-card flex items-center justify-between bg-bg-card/75 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-ink/[0.06] shadow-lg shadow-black/20"
       >
         <Link
           href="/"

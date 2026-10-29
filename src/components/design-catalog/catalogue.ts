@@ -61,6 +61,8 @@ export const GROUPS: Group[] = [
       { id: 'accordion', title: 'Accordion', summary: 'A question that slides its answer open. The answer stays in the page while closed (inert), so search engines read it.', source: '@/components/ui/Accordion', props: [['title', 'the question'], ['index', 'its place in a list, shown as 01, 02…'], ['defaultOpen', 'start open']], rules: ['Instant with reduced motion.'] },
       { id: 'show-more', title: 'ShowMore', summary: 'Under a capped list: "show the other N", then "show fewer". A secondary button whose chevron turns over.', source: '@/components/ui/ShowMore', props: [['more / less', 'the words in each state'], ['size', 'sm · md']] },
       { id: 'toggle-button', title: 'ToggleButton', summary: 'A button that is on or off (a pinned star). It reports aria-pressed and its icon changes shape when on, never colour alone.', source: '@/components/ui/ToggleButton', props: [['icon / pressedIcon', 'the quiet and the filled one'], ['label', 'what it does, read aloud']] },
+      { id: 'shelf', title: 'Shelf', summary: 'A titled group of cards, with a hint and an optional action to see the whole group.', source: '@/components/ui/Shelf', props: [['title / hint', 'the group heading and its short description'], ['action', 'label and click handler for the whole group']] },
+      { id: 'drop-slot', title: 'DropSlot', summary: 'The striped empty place that adds another item to a collection.', source: '@/components/ui/DropSlot', props: [['label', 'its accessible action name'], ['children', 'the icon and words inside']], rules: ['className is for layout only; the striped surface belongs to the piece.'] },
     ],
   },
   {

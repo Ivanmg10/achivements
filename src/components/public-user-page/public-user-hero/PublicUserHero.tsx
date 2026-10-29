@@ -78,7 +78,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
             {user.isSelf && (
               <Link
                 href="/user"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-tile bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 <IconPencil size={13} aria-hidden="true" />
                 {T.userProfile.editProfile}

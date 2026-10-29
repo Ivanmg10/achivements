@@ -36,7 +36,7 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
         ) : (
           <div className="absolute inset-0 grid grid-cols-4 gap-2 p-4">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="rounded-xl border-2 border-dashed border-ink/10" />
+              <div key={i} className="rounded-tile border-2 border-dashed border-ink/10" />
             ))}
           </div>
         )}

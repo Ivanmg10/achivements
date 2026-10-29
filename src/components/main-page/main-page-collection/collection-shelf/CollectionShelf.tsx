@@ -81,7 +81,7 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
               <Link
                 href={gameHref(game.source, game.id, subject)}
                 onPointerMove={onPointerMove}
-                className="spotlight group relative flex flex-col items-center gap-3 h-full rounded-xl bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="spotlight group relative flex flex-col items-center gap-3 h-full rounded-tile bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 <span className={`absolute top-2 left-2 z-10 w-6 h-6 rounded-full text-[11px] font-extrabold flex items-center justify-center shadow-md shadow-black/40 ${MEDALS[i]}`}>
                   {i + 1}

@@ -32,7 +32,7 @@ export function StatPill({
         {sub && <span className="text-xs text-text-secondary">{sub}</span>}
       </>
     )
-    const cls = `bg-bg-main rounded-xl p-2 flex flex-col items-center gap-0.5 ${className}`
+    const cls = `bg-bg-main rounded-tile p-2 flex flex-col items-center gap-0.5 ${className}`
     if (href) return <Link href={href} className={`${cls} ${interactiveCls}`}>{inner}</Link>
     if (onClick) return <button type="button" onClick={onClick} className={`${cls} ${interactiveCls}`}>{inner}</button>
     return <div className={cls}>{inner}</div>

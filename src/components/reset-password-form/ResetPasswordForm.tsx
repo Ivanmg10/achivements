@@ -68,7 +68,7 @@ export default function ResetPasswordForm() {
           {T.passwordReset.missingToken}
         </p>
       ) : done ? (
-        <p role="status" className="mb-5 bg-success/20 border border-success/40 rounded-xl p-3 text-sm text-success">
+        <p role="status" className="mb-5 bg-success/20 border border-success/40 rounded-tile p-3 text-sm text-success">
           {T.passwordReset.done}
         </p>
       ) : (

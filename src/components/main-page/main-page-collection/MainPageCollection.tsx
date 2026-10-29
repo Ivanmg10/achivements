@@ -52,11 +52,11 @@ export default function MainPageCollection({
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4 animate-pulse motion-reduce:animate-none" aria-busy="true">
-        <div className="h-60 rounded-xl bg-bg-card" />
-        <div className="h-36 rounded-xl bg-bg-card" />
+        <div className="h-60 rounded-tile bg-bg-card" />
+        <div className="h-36 rounded-tile bg-bg-card" />
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <div className="h-64 rounded-xl bg-bg-card xl:col-span-2" />
-          <div className="h-64 rounded-xl bg-bg-card" />
+          <div className="h-64 rounded-tile bg-bg-card xl:col-span-2" />
+          <div className="h-64 rounded-tile bg-bg-card" />
         </div>
       </div>
     )

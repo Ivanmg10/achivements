@@ -122,7 +122,7 @@ export default function MainHeader() {
       <div className={`sticky top-0 z-40 h-16 shrink-0 pointer-events-none transition-[padding] duration-300 motion-reduce:transition-none ${scrolled ? 'px-0 pt-0' : 'px-2 sm:px-3 pt-2'}`}>
       <header
         className={`pointer-events-auto relative flex items-center gap-2.5 text-text-main px-2.5 backdrop-blur-xl backdrop-saturate-150 ring-1 shadow-lg shadow-black/20 transition-all duration-300 motion-reduce:transition-none ${
-          scrolled ? 'h-16 rounded-none' : 'h-14 rounded-2xl'
+          scrolled ? 'h-16 rounded-none' : 'h-14 rounded-card'
         } ${isGameInfo ? 'bg-bg-header/60 ring-ink/10' : 'bg-bg-header/85 ring-ink/[0.08]'}`}
       >
         {/* Left: home + back + nav (desktop) / hamburguesa (mobile) */}

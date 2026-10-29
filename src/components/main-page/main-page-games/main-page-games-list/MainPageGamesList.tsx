@@ -72,7 +72,7 @@ export default function MainPageGamesList({
     return (
       <Link
         key={index}
-        className="flex flex-row items-center justify-between p-2 mx-2 my-1 bg-bg-main rounded-xl w-[95%] border-2 border-bg-main cursor-pointer hover:scale-[1.02] transition-transform duration-200"
+        className="flex flex-row items-center justify-between p-2 mx-2 my-1 bg-bg-main rounded-tile w-[95%] border-2 border-bg-main cursor-pointer hover:scale-[1.02] transition-transform duration-200"
         href={`/gameInfo/${game.ID ? game.ID : game.GameID}`}
       >
         <div className="flex flex-row items-center gap-3">

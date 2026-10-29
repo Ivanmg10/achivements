@@ -34,9 +34,9 @@ export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId:
   if (!game) {
     // Loading, or a pin for a game no longer in the list (PSN unlinked): a placeholder that can still be unpinned.
     return libraryLoading ? (
-      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-xl h-24 animate-pulse" />
+      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-tile h-24 animate-pulse" />
     ) : (
-      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-2xl flex items-center gap-3 px-3 py-3">
+      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-card flex items-center gap-3 px-3 py-3">
         <PlaystationLogo size={20} className="text-text-secondary shrink-0" aria-hidden="true" />
         <span className="text-sm text-text-secondary flex-1">PlayStation</span>
         <PinToggleButton gameId={gameId} source="psn" />
@@ -51,7 +51,7 @@ export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId:
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
+      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
       <GameCardBackdrop src={psnBackdrop(game)} />
       <div className="flex items-center gap-3 px-3 py-3 w-full">
@@ -66,7 +66,7 @@ export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId:
 
         {/* Same destination as the title link, so it is kept out of the tab order. */}
         <Link href={href} tabIndex={-1} aria-hidden="true" className="shrink-0">
-          <GameIcon source="psn" id={gameId} imageUrl={game.imageIcon} size={56} className="rounded-xl w-14 h-14" />
+          <GameIcon source="psn" id={gameId} imageUrl={game.imageIcon} size={56} className="rounded-tile w-14 h-14" />
         </Link>
 
         <div className="flex flex-col min-w-0 flex-1 gap-1">

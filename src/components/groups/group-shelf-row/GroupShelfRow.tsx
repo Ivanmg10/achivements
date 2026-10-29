@@ -11,7 +11,7 @@ import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDi
 import GroupPlatformLogos from '@/components/groups/group-platform-logos/GroupPlatformLogos'
 import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgressBar'
 
-const TILE = 'flex flex-col items-center justify-center gap-1 aspect-square rounded-xl border-2 border-dashed border-ink/10 text-xs text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+const TILE = 'flex flex-col items-center justify-center gap-1 aspect-square rounded-tile border-2 border-dashed border-ink/10 text-xs text-text-secondary hover:text-accent hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
 /**
  * A group as a shelf: its name, progress and the game closest to done on one
@@ -53,7 +53,7 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
           {T.groups.updatedAgo.replace('{when}', relativeTime(group.updated_at, lang))}
         </p>
         {group.next_up && (
-          <div className="mt-auto rounded-xl bg-bg-main/60 p-3 flex flex-col gap-0.5">
+          <div className="mt-auto rounded-tile bg-bg-main/60 p-3 flex flex-col gap-0.5">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-accent">{T.groups.nextUp}</span>
             <span className="text-sm">
               {T.groups.nextUpLeft.replace('{left}', String(group.next_up.left)).replace('{game}', group.next_up.title)}
@@ -69,8 +69,8 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
           const pct = total > 0 ? Math.min(100, Math.round(((g.num_awarded ?? 0) / total) * 100)) : 0
           return (
             <li key={`${g.source}:${g.game_id}`} className="min-w-0">
-              <Link href={gameHref(g.source, g.game_id)} className="group flex flex-col gap-1.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
-                <div className="aspect-square rounded-xl overflow-hidden bg-bg-main ring-1 ring-ink/5 group-hover:ring-ink/30 transition-all">
+              <Link href={gameHref(g.source, g.game_id)} className="group flex flex-col gap-1.5 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+                <div className="aspect-square rounded-tile overflow-hidden bg-bg-main ring-1 ring-ink/5 group-hover:ring-ink/30 transition-all">
                   {src && <Image src={src} alt="" width={160} height={160} className="w-full h-full object-cover" unoptimized />}
                 </div>
                 <span className="text-xs truncate">{g.title}</span>

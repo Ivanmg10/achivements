@@ -28,7 +28,7 @@ export default function GameCompareTableRow({
   return (
     <li
       id={row.anchor}
-      className={`scroll-mt-24 grid grid-cols-[3rem_1fr] gap-3 items-center p-3 rounded-xl bg-bg-main ${
+      className={`scroll-mt-24 grid grid-cols-[3rem_1fr] gap-3 items-center p-3 rounded-tile bg-bg-main ${
         comparing ? 'sm:grid-cols-[3rem_1fr_9rem_9rem]' : 'sm:grid-cols-[3rem_1fr_10rem]'
       }`}
     >

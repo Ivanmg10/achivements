@@ -24,7 +24,7 @@ export default function LibraryListRow({ entry, current, onSelect }: { entry: Li
 
   return (
     <div
-      className={`relative isolate w-full flex items-center gap-3 rounded-xl p-2.5 transition-shadow focus-within:ring-2 focus-within:ring-accent/70 after:content-[''] after:absolute after:-z-[5] after:inset-0 after:rounded-[inherit] after:pointer-events-none after:transition-colors ${
+      className={`relative isolate w-full flex items-center gap-3 rounded-tile p-2.5 transition-shadow focus-within:ring-2 focus-within:ring-accent/70 after:content-[''] after:absolute after:-z-[5] after:inset-0 after:rounded-[inherit] after:pointer-events-none after:transition-colors ${
         current
           ? 'after:bg-accent/10 after:shadow-[inset_3px_0_0_rgb(var(--accent)),inset_0_0_0_1px_rgb(var(--accent)/0.45)]'
           : 'hover:after:bg-accent/[0.06] hover:after:shadow-[inset_0_0_0_1px_rgb(var(--accent)/0.5)]'
@@ -60,7 +60,7 @@ export default function LibraryListRow({ entry, current, onSelect }: { entry: Li
         aria-current={current ? 'true' : undefined}
         onClick={() => onSelect(entry)}
         aria-label={entry.title}
-        className="absolute inset-0 z-[1] rounded-xl cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 z-[1] rounded-tile cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       />
     </div>
   )

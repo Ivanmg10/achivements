@@ -11,7 +11,7 @@ export type GameHeroTileData = {
 /** One figure of a game's hero (achievements, points, play time) on a glass tile. */
 export default function GameHeroTile({ label, value, of, done }: GameHeroTileData) {
   return (
-    <div className="rounded-xl px-3.5 py-3 bg-bg-card/85 ring-1 ring-inset ring-ink/[0.07] backdrop-blur-md min-w-0">
+    <div className="rounded-tile px-3.5 py-3 bg-bg-card/85 ring-1 ring-inset ring-ink/[0.07] backdrop-blur-md min-w-0">
       <dt className="text-xs text-text-secondary truncate">{label}</dt>
       <dd className={`mt-0.5 text-[1.625rem] leading-tight font-extrabold tabular-nums tracking-[-0.01em] truncate ${done ? 'text-success' : 'text-text-main'}`}>
         {value}

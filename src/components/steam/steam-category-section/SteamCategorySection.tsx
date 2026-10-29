@@ -73,7 +73,7 @@ export default function SteamCategorySection({
       {loading ? (
         <div aria-busy="true" className={`grid gap-3 ${GRID_CLASS[gridCols]}`}>
           {Array.from({ length: SKELETON_CARDS }).map((_, i) => (
-            <div key={i} className="h-36 bg-bg-card rounded-xl animate-pulse" />
+            <div key={i} className="h-36 bg-bg-card rounded-tile animate-pulse" />
           ))}
         </div>
       ) : error ? (

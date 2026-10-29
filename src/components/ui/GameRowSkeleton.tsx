@@ -5,8 +5,8 @@
  */
 export function GameRowSkeleton({ className = '' }: { className?: string }) {
   return (
-    <div aria-hidden="true" className={`bg-bg-main rounded-2xl ring-1 ring-ink/[0.04] flex items-center gap-3 px-3 py-3 ${className}`}>
-      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-ink/[0.06] shrink-0" />
+    <div aria-hidden="true" className={`bg-bg-main rounded-card ring-1 ring-ink/[0.04] flex items-center gap-3 px-3 py-3 ${className}`}>
+      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-tile bg-ink/[0.06] shrink-0" />
       <div className="flex flex-col flex-1 min-w-0 gap-2">
         <div className="h-3.5 w-2/5 rounded-full bg-ink/[0.08]" />
         <div className="flex items-center gap-2">

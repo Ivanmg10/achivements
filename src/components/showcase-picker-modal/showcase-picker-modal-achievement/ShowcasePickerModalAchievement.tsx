@@ -43,7 +43,7 @@ export default function ShowcasePickerModalAchievement({
       aria-pressed={earned && !inShowcase ? selected : undefined}
       aria-label={state ? `${title} · ${state}` : title}
       aria-describedby={description ? descriptionId : undefined}
-      className={`group relative h-full w-full rounded-xl p-2 flex flex-col items-center gap-1.5 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+      className={`group relative h-full w-full rounded-tile p-2 flex flex-col items-center gap-1.5 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
         selected
           ? 'bg-accent/15 ring-2 ring-accent'
           : earned && !inShowcase
@@ -87,7 +87,7 @@ export default function ShowcasePickerModalAchievement({
       {description && (
         <span
           id={descriptionId}
-          className="pointer-events-none absolute inset-0 z-10 rounded-xl bg-bg-main ring-1 ring-accent/40 p-2 flex flex-col items-center justify-center gap-1 text-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+          className="pointer-events-none absolute inset-0 z-10 rounded-tile bg-bg-main ring-1 ring-accent/40 p-2 flex flex-col items-center justify-center gap-1 text-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
         >
           <span aria-hidden="true" className="text-[11px] font-semibold text-text-main leading-tight line-clamp-2">{title}</span>
           <span className="text-[10px] text-text-secondary leading-snug line-clamp-5">{description}</span>

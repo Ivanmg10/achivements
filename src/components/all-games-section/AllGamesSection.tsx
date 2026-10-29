@@ -54,7 +54,7 @@ export default function AllGamesSection({
 
   return (
     <motion.div
-      className="w-full bg-bg-card rounded-xl overflow-hidden"
+      className="w-full bg-bg-card rounded-tile overflow-hidden"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: 'easeOut' }}

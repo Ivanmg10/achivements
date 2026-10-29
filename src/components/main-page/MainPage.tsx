@@ -77,7 +77,7 @@ export function MainPageBody() {
           {view === 'pinned' && !visitor ? (
             <MainPagePinnedGames />
           ) : (
-            <div className="m-3 bg-bg-card rounded-xl p-4 flex flex-col flex-1 min-h-0">
+            <div className="m-3 bg-bg-card rounded-tile p-4 flex flex-col flex-1 min-h-0">
               <RARecentlyPlayed />
             </div>
           )}

@@ -63,7 +63,7 @@ export default function HideGameButton({
       <span className="contents" onClick={(e) => e.stopPropagation()}>
       <CommonModal isOpen={open} onClose={() => setOpen(false)} className="min-h-0">
         <div className="flex flex-col gap-4">
-          <span aria-hidden="true" className="w-12 h-12 rounded-2xl bg-accent/10 ring-1 ring-accent/20 text-accent flex items-center justify-center">
+          <span aria-hidden="true" className="w-12 h-12 rounded-card bg-accent/10 ring-1 ring-accent/20 text-accent flex items-center justify-center">
             <IconEyeOff size={22} />
           </span>
           <h2 id={`hide-${source}-${gameId}`} className="text-lg font-semibold">

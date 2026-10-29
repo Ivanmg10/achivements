@@ -20,7 +20,7 @@ export default function ShowcasePickerModalGameRow({ game, selected, onOpen }: {
     <button
       type="button"
       onClick={onOpen}
-      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+      className={`w-full flex items-center gap-3 px-3 py-2 rounded-tile text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
         on ? 'bg-accent/10 ring-1 ring-accent/60' : 'hover:bg-bg-card'
       }`}
     >

@@ -42,7 +42,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
         ) : (
           <ul className="flex flex-col gap-1.5 max-h-[60dvh] overflow-y-auto -mx-1 px-1">
             {hidden.map((g) => (
-              <li key={`${g.source}:${g.id}`} className="flex items-center gap-3 rounded-xl bg-bg-main p-2 pr-1.5">
+              <li key={`${g.source}:${g.id}`} className="flex items-center gap-3 rounded-tile bg-bg-main p-2 pr-1.5">
                 {g.image ? (
                   <Image src={g.image} alt="" width={40} height={40} unoptimized className="w-10 h-10 rounded-lg object-cover shrink-0" />
                 ) : (

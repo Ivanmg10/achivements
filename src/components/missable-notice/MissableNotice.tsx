@@ -38,7 +38,7 @@ export default function MissableNotice({
   const list = more > 0 ? `${named.join(', ')} ${T.gameInfoTable.missableMore.replace('{n}', String(more))}` : named.join(', ')
 
   return (
-    <div role="status" className={`flex flex-wrap sm:flex-nowrap items-center gap-2.5 px-3.5 py-3 rounded-xl ring-1 ring-inset text-sm ${tone === 'danger' ? 'bg-danger/10 ring-danger/30' : 'bg-warning/10 ring-warning/30'}`}>
+    <div role="status" className={`flex flex-wrap sm:flex-nowrap items-center gap-2.5 px-3.5 py-3 rounded-tile ring-1 ring-inset text-sm ${tone === 'danger' ? 'bg-danger/10 ring-danger/30' : 'bg-warning/10 ring-warning/30'}`}>
       <IconAlertTriangle className={`w-4 h-4 shrink-0 ${tone === 'danger' ? 'text-danger' : 'text-warning'}`} aria-hidden="true" />
       <span className="flex-1 min-w-0">
         <strong className="font-bold">{lead ?? plural(names.length, T.plurals.missableCount, lang)}</strong> {text ?? T.gameInfoTable.missableText} {list}.

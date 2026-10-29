@@ -23,14 +23,14 @@ export default function UserPageSkeleton() {
               </div>
             </div>
             <div className="flex gap-2">
-              <div className={`${BLOCK} h-8 w-24 rounded-xl`} />
-              <div className={`${BLOCK} h-8 w-24 rounded-xl`} />
+              <div className={`${BLOCK} h-8 w-24 rounded-tile`} />
+              <div className={`${BLOCK} h-8 w-24 rounded-tile`} />
             </div>
           </div>
           {/* Preferences: theme, language, favourite games */}
           <div className="bg-bg-card rounded-card p-6 flex flex-col gap-5">
             <div className={`${BLOCK} h-3.5 w-28 rounded`} />
-            <div className="bg-bg-main rounded-2xl p-4 flex flex-col gap-4">
+            <div className="bg-bg-main rounded-card p-4 flex flex-col gap-4">
               {[0, 1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center justify-between gap-3">
                   <div className={`${BLOCK} h-4 w-1/3 rounded`} />
@@ -60,7 +60,7 @@ export default function UserPageSkeleton() {
             <div className={`${BLOCK} h-3.5 w-36 rounded`} />
             <div className={`${BLOCK} h-3 w-2/3 rounded`} />
           </div>
-          <div className={`${BLOCK} h-9 w-32 rounded-xl`} />
+          <div className={`${BLOCK} h-9 w-32 rounded-tile`} />
         </div>
       </div>
     </div>

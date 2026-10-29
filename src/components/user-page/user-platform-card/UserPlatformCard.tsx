@@ -93,14 +93,14 @@ export default function UserPlatformCard({
 
         {connected ? (
           <>
-            {identity && <div className="rounded-xl bg-ink/[0.03] p-2.5">{identity}</div>}
+            {identity && <div className="rounded-tile bg-ink/[0.03] p-2.5">{identity}</div>}
             {stats.length > 0 && (
               <dl className="grid grid-cols-2 gap-1.5">
                 {stats.map((stat, i) => (
                   <div
                     key={stat.label}
                     /* An odd count leaves the last one alone on its row: let it fill it. */
-                    className={`bg-bg-main rounded-xl px-3 py-2.5 flex flex-col min-w-0 ${
+                    className={`bg-bg-main rounded-tile px-3 py-2.5 flex flex-col min-w-0 ${
                       stats.length % 2 === 1 && i === stats.length - 1 ? 'col-span-2' : ''
                     }`}
                   >

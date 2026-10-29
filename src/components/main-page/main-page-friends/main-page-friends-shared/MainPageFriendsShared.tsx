@@ -24,7 +24,7 @@ export default function MainPageFriendsShared({ rows, isLoading }: { rows: Share
         isLoading ? (
           <div aria-busy="true" className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-16 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+              <div key={i} className="h-16 rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
             ))}
           </div>
         ) : (
@@ -33,7 +33,7 @@ export default function MainPageFriendsShared({ rows, isLoading }: { rows: Share
       ) : (
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {rows.map(({ game, friends }) => (
-            <li key={game.key} className="flex items-center gap-3 p-2.5 rounded-xl bg-bg-main min-w-0">
+            <li key={game.key} className="flex items-center gap-3 p-2.5 rounded-tile bg-bg-main min-w-0">
               <GameIcon source={game.source} id={game.id} imageUrl={game.iconUrl} size={44} className="w-11 h-11 rounded-lg shrink-0" />
               <span className="flex flex-col gap-1.5 min-w-0 flex-1">
                 <span className="text-sm font-medium truncate">{game.title}</span>

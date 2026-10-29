@@ -24,8 +24,8 @@ export default function PsnPreferenceSwitch({
 }) {
   const labelId = useId()
   return (
-    <div className="flex items-center gap-3 rounded-xl px-2 -mx-1 py-1.5">
-      <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-xl bg-bg-card ring-1 ring-ink/[0.06] flex items-center justify-center text-text-secondary">
+    <div className="flex items-center gap-3 rounded-tile px-2 -mx-1 py-1.5">
+      <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-tile bg-bg-card ring-1 ring-ink/[0.06] flex items-center justify-center text-text-secondary">
         {icon}
       </span>
       <span className="flex flex-col gap-0.5 min-w-0 flex-1">

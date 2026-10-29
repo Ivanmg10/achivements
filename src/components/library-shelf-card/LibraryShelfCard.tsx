@@ -47,7 +47,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { 
           href={href}
           tabIndex={-1}
           aria-hidden="true"
-          className="absolute left-3 bottom-0 translate-y-1/2 z-10 rounded-xl ring-2 ring-bg-card shadow-lg shadow-black/30 hover:ring-ink/40 transition-shadow"
+          className="absolute left-3 bottom-0 translate-y-1/2 z-10 rounded-tile ring-2 ring-bg-card shadow-lg shadow-black/30 hover:ring-ink/40 transition-shadow"
         >
           <LibraryEntryCover entry={entry} size={icon} />
         </Link>
@@ -74,7 +74,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { 
         type="button"
         onClick={() => onPick(entry)}
         aria-label={`${T.libraryLayout.openInList}: ${entry.title}`}
-        className="absolute inset-0 z-[1] rounded-2xl cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 z-[1] rounded-card cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       />
     </div>
   )

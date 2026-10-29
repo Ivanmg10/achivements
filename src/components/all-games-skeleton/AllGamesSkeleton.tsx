@@ -15,7 +15,7 @@ export default function AllGamesSkeleton() {
       <span className="sr-only">{T.loadingPage.title}</span>
       <div aria-hidden="true" className="flex flex-col gap-4 animate-pulse motion-reduce:animate-none">
         {Array.from({ length: SECTIONS }, (_, s) => (
-          <div key={s} className="w-full bg-bg-card rounded-xl overflow-hidden">
+          <div key={s} className="w-full bg-bg-card rounded-tile overflow-hidden">
             <div className="flex items-center gap-3 px-5 py-4">
               <div className="h-6 w-36 rounded-lg bg-ink/[0.08]" />
               <div className="h-5 w-10 rounded-full bg-ink/[0.06]" />

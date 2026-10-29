@@ -5,6 +5,7 @@ import type { ItemProgress } from '@/utils/groupItems'
 import { IconPlus } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import GroupCoverTile from '@/components/groups/group-cover-tile/GroupCoverTile'
+import DropSlot from '@/components/ui/DropSlot'
 
 /**
  * A group's games as a grid of covers, every platform alike. Like the list,
@@ -36,14 +37,10 @@ export default function GroupCoverGrid({
       ))}
       {onAdd && (
         <li>
-          <button
-            type="button"
-            onClick={onAdd}
-            className="w-full aspect-square rounded-2xl flex flex-col items-center justify-center gap-1 font-bold text-text-main ring-[1.5px] ring-inset ring-accent/35 hover:ring-accent bg-[repeating-linear-gradient(-60deg,rgb(var(--accent)/0.06)_0_10px,transparent_10px_20px)] transition-shadow cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
+          <DropSlot label={T.groups.addGames} onClick={onAdd} className="aspect-square flex-col gap-1 font-bold">
             <IconPlus className="w-6 h-6 text-accent" aria-hidden="true" />
             {T.groups.addGames}
-          </button>
+          </DropSlot>
         </li>
       )}
     </ul>

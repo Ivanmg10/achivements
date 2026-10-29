@@ -32,7 +32,7 @@ export default function PublicUserShowcase() {
     <div className="flex flex-col gap-4">
       <ChartCard>
         {gamesLoading || awardsLoading ? (
-          <div aria-busy="true" className="h-60 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+          <div aria-busy="true" className="h-60 rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
         ) : (
           <CollectionShelf games={latest} counts={counts} />
         )}

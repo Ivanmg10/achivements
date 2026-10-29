@@ -40,7 +40,7 @@ export default function MainPageProfileNowPlaying({
       <GameCardBackdrop src={tintSrc} />
       <span className="text-[0.6875rem] font-bold uppercase tracking-[0.09em] text-text-secondary truncate">{kicker}</span>
       <span className="flex gap-3 items-center min-w-0">
-        <span className="w-[3.25rem] h-[3.25rem] shrink-0 rounded-xl overflow-hidden shadow-[0_6px_18px_rgb(0_0_0/0.45)]">{icon}</span>
+        <span className="w-[3.25rem] h-[3.25rem] shrink-0 rounded-tile overflow-hidden shadow-[0_6px_18px_rgb(0_0_0/0.45)]">{icon}</span>
         <span className="flex flex-col min-w-0 flex-1">
           <span className="font-extrabold truncate">{title}</span>
           <span className="text-[0.8125rem] text-text-secondary truncate">{sub}</span>
