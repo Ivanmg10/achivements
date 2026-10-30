@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server'
 import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
 import { findXboxAccount, isGamertag, xboxFailure, xboxLibrary, xboxRateLimit } from '@/lib/xboxClient'
+import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 
 /**
  * Admin-only Xbox explorer: a gamertag in, its profile and library out.
  * Nothing is saved on any account — this is how the OpenXBL integration is
  * tried out before any user can link Xbox. Every lookup is logged.
  */
-export async function GET(req: Request) {
+async function get(req: Request) {
   const auth = await requireAdmin(req)
   if (!auth.ok) return auth.response
 
@@ -23,4 +24,8 @@ export async function GET(req: Request) {
   } catch (err) {
     return xboxFailure(err, 'admin/xbox')
   }
+}
+
+export async function GET(req: Request) {
+  return withXboxTelemetry('admin/xbox', () => get(req))
 }

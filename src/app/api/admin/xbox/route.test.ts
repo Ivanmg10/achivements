@@ -1,4 +1,5 @@
 jest.mock('@/lib/steamCache', () => ({ withSteamCache: jest.fn() }))
+jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn(async () => true) }))
 jest.mock('@/lib/adminAuth', () => ({ requireAdmin: jest.fn(), logAdminAction: jest.fn() }))
 jest.mock('@/lib/xboxClient', () => ({
   ...jest.requireActual('@/lib/xboxClient'),

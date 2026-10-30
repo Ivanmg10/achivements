@@ -6,6 +6,7 @@ jest.mock('@/lib/steamCache', () => ({
     }),
   ),
 }))
+jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn(async () => true) }))
 
 import {
   findXboxAccount,
@@ -25,19 +26,30 @@ import {
   xboxRateLimit,
   xboxRecentAchievements,
   xboxSummary,
+  resetXboxCallState,
 } from './xboxClient'
 import { withSteamCache } from '@/lib/steamCache'
+import { allowAttempt } from '@/lib/attemptLimit'
+import { recordXboxCacheEvent, withXboxTelemetry } from '@/lib/xboxTelemetry'
+import { NextResponse } from 'next/server'
 import { RAW_360_ACHIEVEMENT, RAW_360_TITLE, RAW_ACHIEVED, RAW_LOCKED, RAW_MODERN_TITLE, RAW_PROFILE, xboxGameFixture } from '@/test-utils/xboxFixtures'
 
 const fetchMock = jest.fn()
 const XUID = '2535400000000001'
 
 /** What OpenXBL answers: an HTTP status, the rate-limit headers and a body that carries its own code. */
-function answer(content: unknown, { status = 200, code = 200, remaining = '147' }: { status?: number; code?: number; remaining?: string | null } = {}) {
+function answer(content: unknown, { status = 200, code = 200, remaining = '147', reset = null }: { status?: number; code?: number; remaining?: string | null; reset?: string | null } = {}) {
   return {
     ok: status >= 200 && status < 300,
     status,
-    headers: { get: (name: string) => (name === 'x-ratelimit-remaining' ? remaining : name === 'x-ratelimit-limit' ? '150' : null) },
+    headers: {
+      get: (name: string) => {
+        if (name === 'x-ratelimit-remaining') return remaining
+        if (name === 'x-ratelimit-limit') return '150'
+        if (name === 'x-ratelimit-reset') return reset
+        return null
+      },
+    },
     json: async () => ({ content, code }),
   }
 }
@@ -64,15 +76,27 @@ const title = (id: string, overrides: Record<string, unknown> = {}) => ({
 
 beforeEach(() => {
   jest.clearAllMocks()
+  ;(withSteamCache as jest.Mock).mockImplementation((_key: string, _ttl: number, fetcher: () => Promise<unknown>, options?: { shouldCache?: (d: unknown) => boolean }) =>
+    fetcher().then((data) => {
+      options?.shouldCache?.(data)
+      return data
+    }),
+  )
   global.fetch = fetchMock
   fetchMock.mockReset()
   process.env.OPENXBL_API_KEY = 'key-for-tests'
   jest.spyOn(console, 'error').mockImplementation(() => {})
+  jest.spyOn(console, 'info').mockImplementation(() => {})
+  jest.spyOn(console, 'warn').mockImplementation(() => {})
 })
 
 afterEach(() => {
   ;(console.error as jest.Mock).mockRestore()
+  ;(console.info as jest.Mock).mockRestore()
+  ;(console.warn as jest.Mock).mockRestore()
   delete process.env.OPENXBL_API_KEY
+  jest.useRealTimers()
+  resetXboxCallState()
 })
 
 describe('input checks', () => {
@@ -122,6 +146,20 @@ describe('xboxCall', () => {
     expect(fetchMock.mock.calls[0][1].headers['Accept-Language']).toBe('es-ES')
   })
 
+  test('reports one sanitized upstream operation inside the request telemetry', async () => {
+    fetchMock.mockResolvedValue(answer({ titles: [] }))
+    const res = await withXboxTelemetry('xbox/test', async () => {
+      await xboxCall(`titles/${XUID}`)
+      return NextResponse.json({})
+    })
+
+    expect(res.headers.get('X-Xbox-Upstream-Calls')).toBe('1')
+    const line = (console.info as jest.Mock).mock.calls.map(([value]) => String(value)).find((value) => value.includes('xbox_upstream'))
+    expect(line).toContain('"operation":"library"')
+    expect(line).not.toContain(XUID)
+    expect(line).not.toContain('key-for-tests')
+  })
+
   test('remembers the calls left this hour', async () => {
     fetchMock.mockResolvedValue(answer({}, { remaining: '41' }))
     await xboxCall('account')
@@ -165,6 +203,42 @@ describe('xboxCall', () => {
     await expect(xboxCall('x')).rejects.toMatchObject({ kind: 'failed' })
     fetchMock.mockResolvedValue({ ok: true, status: 200, headers: { get: () => null }, json: async () => { throw new Error('html') } })
     await expect(xboxCall('x')).rejects.toMatchObject({ kind: 'failed' })
+  })
+
+  test('a timeout is bounded and has its own retryable failure kind', async () => {
+    fetchMock.mockRejectedValue(Object.assign(new Error('timed out'), { name: 'TimeoutError' }))
+    await expect(xboxCall('x')).rejects.toMatchObject({ kind: 'timeout' })
+    expect(fetchMock.mock.calls[0][1].signal).toBeDefined()
+  })
+
+  test('a timeout while reading the response body is still a timeout', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => null },
+      json: async () => { throw Object.assign(new Error('body timed out'), { name: 'TimeoutError' }) },
+    })
+    await expect(xboxCall('titles/1')).rejects.toMatchObject({ kind: 'timeout' })
+  })
+
+  test('the app-wide attempt budget refuses an upstream call before fetch', async () => {
+    ;(allowAttempt as jest.Mock).mockResolvedValueOnce(false)
+    await expect(xboxCall('titles/1')).rejects.toMatchObject({ kind: 'rate-limited' })
+    expect(allowAttempt).toHaveBeenCalledWith('xbox-upstream', 'app')
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  test('a 429 pauses this instance until the reset window has passed', async () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-10-30T12:00:00Z'))
+    fetchMock.mockResolvedValue(answer(null, { status: 429, code: 429 }))
+    await expect(xboxCall('titles/1')).rejects.toMatchObject({ kind: 'rate-limited' })
+    await expect(xboxCall('titles/1')).rejects.toMatchObject({ kind: 'rate-limited' })
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+
+    jest.advanceTimersByTime(61_000)
+    fetchMock.mockResolvedValue(answer({ titles: [] }))
+    await expect(xboxCall('titles/1')).resolves.toEqual({ titles: [] })
+    expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -215,7 +289,22 @@ describe('the library', () => {
   test('the refresh button may replace it, and it is kept for the user', async () => {
     fetchMock.mockResolvedValue(answer({ titles: [], achievementSummary: {} }))
     await xboxLibraryData(XUID, '7')
-    expect((withSteamCache as jest.Mock).mock.calls[0][3]).toEqual({ userId: '7', refreshable: true })
+    expect((withSteamCache as jest.Mock).mock.calls[0][3]).toMatchObject({ userId: '7', refreshable: true })
+  })
+
+  test.each([
+    ['failed', true],
+    ['timeout', true],
+    ['rate-limited', true],
+    ['private', false],
+    ['not-found', false],
+    ['not-configured', false],
+    ['unauthorized', false],
+  ] as const)('%s stale eligibility is %s', async (kind, expected) => {
+    fetchMock.mockResolvedValue(answer({ titles: [], achievementSummary: {} }))
+    await xboxLibraryData(XUID)
+    const options = (withSteamCache as jest.Mock).mock.calls[0][3]
+    expect(options.staleIfError(new XboxError(kind, 'x'))).toBe(expected)
   })
 
   describe('play time', () => {
@@ -243,11 +332,12 @@ describe('the library', () => {
       expect((await xboxLibrary(XUID))[0].playtimeMinutes).toBeNull()
     })
 
-    test('a stats call that fails leaves the library whole, without play time, and says so in the log', async () => {
+    test('a stats call that fails leaves the library whole and marks its cached play time partial', async () => {
       routes({ titles: answer({ titles: [RAW_MODERN_TITLE] }), 'player/stats': new Error('boom') })
-      const games = await xboxLibrary(XUID)
-      expect(games).toHaveLength(1)
-      expect(games[0].playtimeMinutes).toBeNull()
+      const data = await xboxLibraryData(XUID)
+      expect(data.games).toHaveLength(1)
+      expect(data.games[0].playtimeMinutes).toBeNull()
+      expect(data.playtimeComplete).toBe(false)
       expect(console.error).toHaveBeenCalledWith('[xbox] play time', expect.anything())
     })
 
@@ -277,6 +367,18 @@ describe('the library', () => {
     })
   })
 
+  test('a cached partial library still carries its partial play-time marker', async () => {
+    ;(withSteamCache as jest.Mock).mockImplementation(async (_key: string, _ttl: number, _fetcher: () => Promise<unknown>, options?: { onEvent?: (event: string) => void }) => {
+      options?.onEvent?.('hit')
+      return { games: [], achievementsUnlocked: 0, playtimeComplete: false }
+    })
+    const res = await withXboxTelemetry('xbox/test', async () => {
+      await xboxLibraryData(XUID)
+      return NextResponse.json({})
+    })
+    expect(res.headers.get('X-Xbox-Partial')).toBe('playtime')
+  })
+
   test('a game is found by its title id, or is null', async () => {
     fetchMock.mockResolvedValue(library)
     expect((await findXboxGame(XUID, '1096157159'))?.title).toBe('Old Game')
@@ -299,6 +401,26 @@ describe('xboxSummary', () => {
       achievementsUnlocked: 593,
       games: 2,
     })
+  })
+
+  test('a stale nested account or library makes the summary stale instead of fresh cacheable data', async () => {
+    let staleResult: boolean | undefined
+    ;(withSteamCache as jest.Mock).mockImplementation(async (key: string, _ttl: number, fetcher: () => Promise<unknown>, options?: { staleResult?: () => boolean }) => {
+      if (key.startsWith('xbox:account:')) recordXboxCacheEvent('stale')
+      const data = await fetcher()
+      if (key.startsWith('xbox:summary:')) staleResult = options?.staleResult?.()
+      return data
+    })
+    routes({
+      'friends/search': answer({ profileUsers: [RAW_PROFILE] }),
+      titles: answer({ titles: [], achievementSummary: { totalAchievementsUnlocked: 0 } }),
+    })
+
+    await withXboxTelemetry('xbox/test', async () => {
+      await xboxSummary(XUID, 'TestPlayer')
+      return NextResponse.json({})
+    })
+    expect(staleResult).toBe(true)
   })
 
   test('a gamertag that now belongs to someone else is not-found, not the wrong person', async () => {
@@ -362,6 +484,56 @@ describe('the feeds', () => {
     ...extra,
   })
 
+  test('an assembled feed has a versioned scope, window, activity and language key', async () => {
+    const lastPlayed = daysAgo(1)
+    routes({
+      titles: answer({ titles: [title('1', { titleHistory: { lastTimePlayed: lastPlayed } })] }),
+      'achievements/player': answer({ achievements: [] }),
+    })
+    await xboxRecentAchievements(XUID, 'activity', 60, '7', 'es-ES')
+
+    const keys = (withSteamCache as jest.Mock).mock.calls.map((call) => call[0])
+    expect(keys).toContain(`xbox:feed:v2:${XUID}:activity:60:${lastPlayed}:es-ES`)
+  })
+
+  test('a warm assembled feed does not repeat its library or per-game scans', async () => {
+    const cache = new Map<string, unknown>()
+    ;(withSteamCache as jest.Mock).mockImplementation(async (key: string, _ttl: number, fetcher: () => Promise<unknown>) => {
+      if (cache.has(key)) return cache.get(key)
+      const data = await fetcher()
+      cache.set(key, data)
+      return data
+    })
+    routes({
+      titles: answer({ titles: [title('1')] }),
+      'achievements/player': answer({ achievements: [earned('new', daysAgo(1))] }),
+    })
+
+    await xboxRecentAchievements(XUID, 'activity', 60)
+    await xboxRecentAchievements(XUID, 'activity', 60)
+
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).includes('/titles/'))).toHaveLength(1)
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).includes('achievements/player'))).toHaveLength(1)
+    const keys = (withSteamCache as jest.Mock).mock.calls.map((call) => call[0])
+    expect(keys.filter((key: string) => key.startsWith('xbox:feed:'))).toHaveLength(2)
+    expect(keys.filter((key: string) => key.startsWith('xbox:achievements:'))).toHaveLength(1)
+  })
+
+  test('a moved latest session selects a new assembled feed key', async () => {
+    routes({ titles: answer({ titles: [title('1')] }), 'achievements/player': answer({ achievements: [] }) })
+    await xboxRecentAchievements(XUID, 'year', 366)
+    const firstKey = (withSteamCache as jest.Mock).mock.calls.map((call) => call[0]).find((key: string) => key.startsWith('xbox:feed:'))
+
+    const moved = daysAgo(0)
+    routes({ titles: answer({ titles: [title('1', { titleHistory: { lastTimePlayed: moved } })] }), 'achievements/player': answer({ achievements: [] }) })
+    await xboxRecentAchievements(XUID, 'year', 366)
+    const keys = (withSteamCache as jest.Mock).mock.calls.map((call) => call[0]).filter((key: string) => key.startsWith('xbox:feed:'))
+
+    expect(keys).toHaveLength(2)
+    expect(keys[1]).not.toBe(firstKey)
+    expect(keys[1]).toContain(moved)
+  })
+
   test('the latest: from the last few games played with something earned, newest first, whatever their age', async () => {
     routes({
       titles: answer({
@@ -403,15 +575,19 @@ describe('the feeds', () => {
     expect(fetchMock.mock.calls.filter(([url]) => String(url).includes('achievements/player'))).toHaveLength(20)
   })
 
-  test('one game failing leaves it out; the rest still count', async () => {
+  test('one game failing leaves a partial feed, marked on the initial and cached responses', async () => {
     fetchMock.mockImplementation(async (url: string) => {
       if (url.includes('/titles/')) return answer({ titles: [title('1'), title('2')] })
       if (url.endsWith('/1')) throw new Error('boom')
       return answer({ achievements: [earned('x', daysAgo(1))] })
     })
-    const list = await xboxRecentAchievements(XUID, 'activity', 60)
-    expect(list).toHaveLength(1)
-    expect(list[0].titleId).toBe('2')
+    const res = await withXboxTelemetry('xbox/test', async () => {
+      const list = await xboxRecentAchievements(XUID, 'activity', 60)
+      expect(list).toHaveLength(1)
+      expect(list[0].titleId).toBe('2')
+      return NextResponse.json(list)
+    })
+    expect(res.headers.get('X-Xbox-Partial')).toBe('achievements')
   })
 
   test('every game failing is a failure, not an empty feed', async () => {
@@ -420,6 +596,22 @@ describe('the feeds', () => {
       return answer(null, { status: 429, code: 429 })
     })
     await expect(xboxRecentAchievements(XUID, 'activity', 60)).rejects.toMatchObject({ kind: 'rate-limited' })
+  })
+
+  test('a 429 stops scheduling new games and never returns a partial feed as complete', async () => {
+    const titles = Array.from({ length: 10 }, (_, i) => title(String(i + 1)))
+    fetchMock.mockImplementation(async (url: string) => {
+      if (url.includes('/titles/')) return answer({ titles })
+      if (url.endsWith('/1')) return answer(null, { status: 429, code: 429 })
+      return answer({ achievements: [earned('ok', daysAgo(1))] })
+    })
+
+    await expect(xboxRecentAchievements(XUID, 'activity', 60)).rejects.toMatchObject({ kind: 'rate-limited' })
+    const achievementCalls = fetchMock.mock.calls.filter(([url]) => String(url).includes('achievements/player'))
+    expect(achievementCalls.length).toBeLessThanOrEqual(3)
+    const cacheOptions = (withSteamCache as jest.Mock).mock.calls.filter(([key]) => String(key).startsWith('xbox:achievements:')).map((call) => call[3])
+    expect(cacheOptions.length).toBeGreaterThan(0)
+    for (const options of cacheOptions) expect(options.staleIfError(new XboxError('rate-limited', 'quota'))).toBe(false)
   })
 
   test('no game in the window is an empty feed with no calls for achievements', async () => {
@@ -448,6 +640,7 @@ describe('xboxFailure', () => {
     ['private', 403, 'private'],
     ['not-found', 404, 'not-found'],
     ['rate-limited', 429, 'rate-limited'],
+    ['timeout', 504, 'timeout'],
     ['failed', 502, 'failed'],
   ] as const)('%s becomes %i', (kind, code, error) => {
     const res = xboxFailure(new XboxError(kind, 'x'), 'test')

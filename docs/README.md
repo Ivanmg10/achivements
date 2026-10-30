@@ -6,6 +6,7 @@ What to read, and when.
 |---|---|
 | [`../CLAUDE.md`](../CLAUDE.md) | Always, first. The rules and invariants: code style, state and effects, auth, email, admin, each platform, git. |
 | [`architecture.md`](architecture.md) | When you need to find where something lives, or how a request travels from a page to RA/Steam/PSN and back. |
+| [`87-xbox-quota-hardening-spec.md`](87-xbox-quota-hardening-spec.md) | Before changing OpenXBL quota, timeout, stale/cache, telemetry, activity scans or Following/score limits; the approved #87 contract. |
 | [`rankings-plan.md`](rankings-plan.md) | Before working on Vault Points, levels, the rankings page or account verification. |
 | [`design-process.md`](design-process.md) | Before any new page, section or visual rework: how UI work is done here (idea → design canvas → iterations → development), with the welcome as the example. |
 | [`design-system.md`](design-system.md) | Before building any page, section or piece of UI: the layers (tokens, library, pages), the rules, the catalogue at `/design` (admins) and the flow for adding a piece. |

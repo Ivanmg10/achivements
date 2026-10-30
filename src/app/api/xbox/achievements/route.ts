@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cachedJson } from '@/lib/httpCache'
 import { requireXboxSession } from '@/lib/apiAuth'
 import { findXboxGame, isTitleId, xboxFailure, xboxGameAchievements, xboxLanguage } from '@/lib/xboxClient'
+import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 
 /** How long the browser may keep an answer; the server's own cache is the longer one. Vary: Cookie (see cachedJson) lets the refresh button and a re-link through. */
 const BROWSER_TTL_MS = 5 * 60 * 1000
@@ -12,7 +13,7 @@ const BROWSER_TTL_MS = 5 * 60 * 1000
  * 360 or newer) and when it was last played — the cache key. Texts come in the
  * app's language.
  */
-export async function GET(req: NextRequest) {
+async function get(req: NextRequest) {
   const auth = await requireXboxSession(req)
   if (!auth.ok) return auth.response
   const { id: userId, xboxxuid } = auth.session
@@ -28,4 +29,8 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     return xboxFailure(err, 'xbox/achievements')
   }
+}
+
+export async function GET(req: NextRequest) {
+  return withXboxTelemetry('xbox/achievements', () => get(req))
 }

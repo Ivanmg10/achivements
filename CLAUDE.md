@@ -591,8 +591,12 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   `NEXT_PUBLIC_`), like PSN's NPSSO. Without it the routes answer
   `503 not-configured`; a refused key answers `503 unauthorized`.
 - **150 calls an hour for the whole app** on the free plan. Everything is cached
-  in `steam_cache` under `xbox:` keys; a profile costs ~3 calls cold (search,
-  library, one game's achievements). Bump a key's `_vN` when its value's shape changes.
+  in `steam_cache` under `xbox:` keys. The ~3-call figure covers only search,
+  library and one game's achievements, not a home with activity/year scans.
+  `xboxCall` also enforces a PostgreSQL-backed 150-attempt hourly budget per
+  environment: refused attempts are removed and a database failure refuses the
+  call. OpenXBL headers remain authoritative across environments sharing the key.
+  Bump a key's `_vN` when its value's shape changes.
 - **OpenXBL answers errors with HTTP 200** and the real status in the body
   (`{ code: 400 }`): `xboxCall` checks both. It also refuses
   `Accept-Language: *`, which Node's fetch sends by default, so a language is
@@ -614,10 +618,11 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   Keep every Xbox image going through it. `titleId` is a decimal string; the largest
   seen is under 2^31 (the `game_id` columns are INTEGER), but check before storing it.
 - **Play time** comes from one `POST player/stats` (`MinutesPlayed`, up to 150
-  titles per call) made inside the cached library load (`xbox:titles:v6`); a
+  titles per call) made inside the cached library load (`xbox:titles:v7`); a
   backward-compatible 360 game is asked under its `modernTitleId`
-  (`xboxStatsTitleId`). A failure leaves the library whole, without hours. Many
-  games simply have none.
+  (`xboxStatsTitleId`). A failure leaves the library whole, without hours, and
+  `playtimeComplete: false` keeps `X-Xbox-Partial: playtime` on later cache hits.
+  Many games simply have none.
 - **Twin titles:** Xbox can list a game twice under one name, the game and a title with no
   achievements that launches it (Minecraft: Xbox 360 Edition, measured 2026-10-21).
   `foldTwinTitles` drops the empty twin in the library load and gives its session and play time
@@ -640,10 +645,18 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   "RetroAchievements, Steam and PlayStation" on purpose: change them when Xbox opens to everyone.
 - Admin explorer lookups and linking are logged (`xbox-lookup`, `link-xbox`,
   `unlink-xbox`). Do not add a second Xbox provider without asking.
-- **Open problem (2026-10-17, not fixed):** when `api.xbl.io` does not answer,
-  `xboxCall` has no timeout, failures are not cached and there is no stale fallback, so
-  every Xbox read waits ~11 s and "Recently played" waits with it. Diagnosis and the
-  proposed fix: `docs/xbox-integration-plan.md` §7. Read it before touching `xboxCall`.
+- **Quota/failure hardening (2026-10-30, #87):** `xboxCall` has a 5 s timeout
+  (504 `timeout`), a per-instance 429 cooldown and feed scans stop scheduling
+  games on 429. `steam_cache` can serve the last success stale only for
+  `failed`/`timeout`/`rate-limited`, never for private/not-found/disabled keys;
+  nested stale is never rewritten fresh and in-flight/backoff callers recheck
+  their own failure policy. Expired Xbox successes stay 30 days. Responses and
+  logs use `xboxTelemetry.ts`: sanitized operations, request ids, real upstream
+  counts, cache outcomes, `X-Xbox-Stale` and `X-Xbox-Partial`, never XUIDs or
+  gamertags. Assembled feeds are `xbox:feed:v2:`; home derives 60-day Xbox
+  activity from the shared year instead of requesting it twice. Following reads
+  one detailed friend at a time and Xbox score reads two games per pass. Full
+  contract: `docs/87-xbox-quota-hardening-spec.md`.
 
 ## PlayStation (PSN) — read before touching it
 

@@ -9,6 +9,7 @@ import { getPlayerSummaries } from '@/lib/steamClient'
 import { readSteamId } from '@/lib/steamAccount'
 import { findPsnAccount, psnConfigured, psnFailure, psnSummary } from '@/lib/psnClient'
 import { findXboxAccount, isGamertag, xboxConfigured, xboxFailure, xboxSummary } from '@/lib/xboxClient'
+import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 import { forgetUser } from '@/lib/userRecord'
 
 /**
@@ -112,7 +113,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, psnaccountid: account.accountId, psnusername: account.onlineId })
     }
 
-    if (body.platform === 'xbox') {
+    if (body.platform === 'xbox') return withXboxTelemetry('admin/users/accounts/xbox', async () => {
       const gamertag = typeof body.gamertag === 'string' ? body.gamertag.trim() : ''
       if (!isGamertag(gamertag)) return NextResponse.json({ error: 'An Xbox gamertag (up to 15 letters, digits or spaces) is required' }, { status: 400 })
       if (!xboxConfigured()) return NextResponse.json({ error: 'not-configured' }, { status: 503 })
@@ -131,7 +132,7 @@ export async function POST(req: Request) {
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-xbox', target, { xboxxuid: account.xuid, xboxgamertag: account.gamertag })
       return NextResponse.json({ ok: true, xboxxuid: account.xuid, xboxgamertag: account.gamertag })
-    }
+    })
 
     return NextResponse.json({ error: 'platform must be ra, steam, psn or xbox' }, { status: 400 })
   } catch (err) {

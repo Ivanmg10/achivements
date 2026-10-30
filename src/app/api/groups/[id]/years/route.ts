@@ -9,6 +9,7 @@ import { getAppDetails } from '@/lib/steamClient'
 import { psnReleaseYear, psnTitles } from '@/lib/psnClient'
 import { igdbArt, igdbXboxArt } from '@/lib/igdbClient'
 import { xboxLibrary } from '@/lib/xboxClient'
+import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 import { canUseXbox } from '@/utils/xboxAccess'
 import type { XboxGameProgress } from '@/types/xbox'
 import type { PsnGameProgress } from '@/types/psn'
@@ -30,7 +31,7 @@ type Row = { id: number; source: GameSource; game_id: number }
  * up once and stored (0 when there is no year to find), so a group costs these
  * requests the first time only. Answers the years it filled.
  */
-export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function post(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const groupId = parseInt(id)
@@ -115,4 +116,8 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     console.error('[groups/[id]/years POST]', err)
     return NextResponse.json({ message: 'Error interno' }, { status: 500 })
   }
+}
+
+export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  return withXboxTelemetry('groups/years', () => post(req, context))
 }

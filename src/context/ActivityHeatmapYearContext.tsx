@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { RecentAchievement } from '@/types/types'
+import type { XboxRecentAchievement } from '@/types/xbox'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { toRecentAchievement } from '@/utils/steamMappers'
@@ -15,12 +16,14 @@ import { withSubject } from '@/utils/withSubject'
 
 type CtxType = {
   achievements: RecentAchievement[]
+  xboxAchievements: XboxRecentAchievement[]
+  xboxLoading: boolean
   isLoading: boolean
   error: boolean
   refetch: () => void
 }
 
-const Ctx = createContext<CtxType>({ achievements: [], isLoading: true, error: false, refetch: () => {} })
+const Ctx = createContext<CtxType>({ achievements: [], xboxAchievements: [], xboxLoading: true, isLoading: true, error: false, refetch: () => {} })
 
 const byDateDesc = (a: RecentAchievement, b: RecentAchievement) => b.Date.localeCompare(a.Date)
 
@@ -112,8 +115,8 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
   const error = (raError || Boolean(steam.error) || Boolean(psn.error) || Boolean(xbox.error)) && achievements.length === 0
 
   const value = useMemo(
-    () => ({ achievements, isLoading, error, refetch }),
-    [achievements, isLoading, error, refetch],
+    () => ({ achievements, xboxAchievements: xbox.achievements, xboxLoading: xbox.isLoading, isLoading, error, refetch }),
+    [achievements, xbox.achievements, xbox.isLoading, isLoading, error, refetch],
   )
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

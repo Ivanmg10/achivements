@@ -58,12 +58,20 @@ auth, 429 rate limited, 502/503 upstream).
 | Layer | Where | Used for |
 |---|---|---|
 | Memory | `src/lib/raCache.ts` (`withCache`, LRU of 5000) | First level for RA, per instance |
-| Postgres | `steam_cache` table, `src/lib/steamCache.ts` | Second level for RA (`ra:` keys), Steam, PSN (`psn:`) and IGDB; swept daily |
+| Postgres | `steam_cache` table, `src/lib/steamCache.ts` | Second level for RA (`ra:` keys), Steam, PSN, Xbox (`xbox:`) and IGDB; swept daily, with expired Xbox successes kept 30 days for explicit stale-if-error |
 | Postgres | `steam_unlocks` table, `src/lib/steamUnlocks.ts` | Every Steam unlock read, dated, per user and Steam account: the streak and activity use it past the games read live. Not a cache: kept until Steam is unlinked |
 | HTTP | `src/lib/httpCache.ts` (`cachedJson`) | `Cache-Control` on the response |
 
 Change the shape of a cached value → bump its key's version (`gameData_v2:` →
 `_v3`) in the same change.
+
+Xbox server loaders share one OpenXBL guard: a 5 s timeout, a PostgreSQL-backed
+150-call hourly budget, and per-instance 429 cooldown. `xboxTelemetry.ts` uses
+`AsyncLocalStorage` to attach sanitized operation logs and request-scoped counts
+without XUIDs or gamertags. Xbox responses carry `X-Request-Id`,
+`X-Xbox-Upstream-Calls`, cache outcomes, observed rate limits, and explicit
+`X-Xbox-Stale` / `X-Xbox-Partial` markers. Library entries use `xbox:titles:v7:`;
+assembled feeds use `xbox:feed:v2:` and include the latest-played fingerprint.
 
 ## Vault Points (rankings)
 
@@ -105,7 +113,7 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
 ## Client side
 
 - **Contexts** (`src/context/`): library data per platform (`GamesDataContext`,
-  `SteamGamesDataContext`, `PsnGamesDataContext`), recent achievements,
+  `SteamGamesDataContext`, `PsnGamesDataContext`, `XboxGamesDataContext`), recent achievements,
   pinned/hidden games, theme, language, which platform/view is shown, and
   `SubjectContext` (whose profile is being looked at).
 - **Hooks** (`src/hooks/`): one per concern; fetches live here, not in

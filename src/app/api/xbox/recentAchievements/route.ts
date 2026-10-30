@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cachedJson } from '@/lib/httpCache'
 import { requireXboxSession } from '@/lib/apiAuth'
 import { xboxFailure, xboxLanguage, xboxLatestAchievements, xboxRecentAchievements } from '@/lib/xboxClient'
+import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 
 /** How long the browser may keep an answer: short, as these change as the person plays. */
 const BROWSER_TTL_MS = 2 * 60 * 1000
@@ -14,7 +15,7 @@ const DAYS = { activity: 60, year: 366 } as const
  * profile column; `activity` — the last 60 days, for the main page's charts;
  * `year` — the last year, for the streak and the heatmap.
  */
-export async function GET(req: NextRequest) {
+async function get(req: NextRequest) {
   const auth = await requireXboxSession(req)
   if (!auth.ok) return auth.response
   const { id, xboxxuid } = auth.session
@@ -35,4 +36,8 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     return xboxFailure(err, 'xbox/recentAchievements')
   }
+}
+
+export async function GET(req: NextRequest) {
+  return withXboxTelemetry('xbox/recentAchievements', () => get(req))
 }

@@ -7,7 +7,8 @@ import { getOwnedGames } from '@/lib/steamClient'
 import { readCache, withSteamCache, writeCache } from '@/lib/steamCache'
 import { fetchPlayerAchievements, isNoStats, loadGlobalPct } from '@/lib/steamProgress'
 import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
-import { xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
+import { XboxError, xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
+import { runWithXboxTelemetry } from '@/lib/xboxTelemetry'
 import type { GameSource, SteamOwnedGamesResponse } from '@/types/steam'
 import type { TrophyCounts } from '@/types/psn'
 import { isConsoleShown } from '@/utils/consoleFilter'
@@ -43,7 +44,7 @@ export const PACE: Record<GameSource, { concurrency: number; gapMs: number; perP
   steam: { concurrency: 8, gapMs: 0, perPass: Infinity },
   ra: { concurrency: 1, gapMs: 300, perPass: Infinity },
   psn: { concurrency: 2, gapMs: 0, perPass: 100 },
-  xbox: { concurrency: 1, gapMs: 0, perPass: 5 },
+  xbox: { concurrency: 1, gapMs: 0, perPass: 2 },
 }
 
 const RA_PAGE = 500
@@ -246,6 +247,7 @@ function plansFor(user: UserRow): Plan[] {
 export function classifyFailure(source: GameSource, err: unknown): FillError {
   if (err instanceof SteamLibraryPrivate) return 'private'
   if (err instanceof PsnError) return err.isPrivate ? 'private' : err.isRateLimited ? 'busy' : 'unavailable'
+  if (source === 'xbox' && err instanceof XboxError && err.kind === 'rate-limited') return 'busy'
   const status = (err as { status?: number } | null)?.status
   if (status === 429) return 'busy'
   if (source === 'ra' && (status === 401 || status === 403)) return 'key'
@@ -437,10 +439,10 @@ export function fillComplete(platforms: FillStatus['platforms']): boolean {
  * Refreshes one user's score until `deadline`, telling `report` how each
  * platform is getting on. The platforms as they ended, and whether all are settled.
  */
-export async function refreshScore(
+async function refreshScoreNow(
   userId: number,
   deadline: number,
-  report: (source: GameSource, p: FillPlatform) => void = () => {},
+  report: (source: GameSource, p: FillPlatform) => void,
 ): Promise<{ complete: boolean; platforms: FillStatus['platforms'] }> {
   try {
     const rows = await queryRows<UserRow>(
@@ -472,6 +474,14 @@ export async function refreshScore(
     console.error('[scoreRefresh]', userId, err)
     return { complete: false, platforms: {} }
   }
+}
+
+export async function refreshScore(
+  userId: number,
+  deadline: number,
+  report: (source: GameSource, p: FillPlatform) => void = () => {},
+): Promise<{ complete: boolean; platforms: FillStatus['platforms'] }> {
+  return runWithXboxTelemetry('scoreRefresh', () => refreshScoreNow(userId, deadline, report))
 }
 
 const fillKey = (userId: number) => `score:fill:${userId}`

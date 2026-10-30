@@ -6,6 +6,7 @@ jest.mock('@/context/GamesDataContext', () => ({ useGamesData: () => ({ all: [],
 jest.mock('@/hooks/useUserRank', () => ({ useUserRank: () => ({ rank: null, isLoading: false }) }))
 jest.mock('@/hooks/useUserAwards', () => ({ useUserAwards: () => ({ awards: null, isLoading: false }) }))
 jest.mock('@/hooks/useSteamRecentAchievements', () => ({ useSteamRecentAchievements: jest.fn() }))
+jest.mock('@/hooks/useXboxRecentAchievements', () => ({ useXboxRecentAchievements: jest.fn() }))
 jest.mock('@/context/MainPlatformContext', () => ({ useMainPlatform: jest.fn() }))
 jest.mock('@/hooks/useHomeLayout', () => ({ useHomeLayout: jest.fn() }))
 jest.mock('@/context/SteamGamesDataContext', () => ({ useSteamGamesData: jest.fn() }))
@@ -51,6 +52,8 @@ import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
+import { useXboxRecentAchievements } from '@/hooks/useXboxRecentAchievements'
+import { xboxRecentFixture } from '@/test-utils/xboxFixtures'
 import { useMainPlatform } from '@/context/MainPlatformContext'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -66,10 +69,13 @@ beforeEach(() => {
   ;(useRecentAchievements as jest.Mock).mockReturnValue({ achievements: [{ Title: 'Recent RA', Date: '2024-01-20 10:00:00' }], isLoading: false })
   ;(useActivityHeatmap as jest.Mock).mockReturnValue({ achievements: [{ Title: 'Heatmap RA', Date: '2024-01-10 10:00:00' }], isLoading: false })
   ;(useSteamRecentAchievements as jest.Mock).mockReturnValue({ achievements: [STEAM_UNLOCK], isLoading: false })
+  ;(useXboxRecentAchievements as jest.Mock).mockReturnValue({ achievements: [], isLoading: false, error: null, retry: jest.fn() })
   ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true, library: [], libraryLoading: false })
   // The year context merges both platforms itself, so the page passes it on whole.
   ;(useActivityHeatmapYear as jest.Mock).mockReturnValue({
     achievements: [{ Title: 'Year RA', Date: '2023-06-01 10:00:00' }],
+    xboxAchievements: [],
+    xboxLoading: false,
     isLoading: false,
     error: false,
     refetch: jest.fn(),
@@ -84,6 +90,27 @@ test('feeds the shared activity cards both platforms, newest first', () => {
   expect(screen.getByTestId('daily')).toHaveTextContent('Recent RA,Win')
   fireEvent.click(screen.getByRole('tab', { name: 'Activity' }))
   expect(screen.getByTestId('top-games')).toHaveTextContent('Recent RA,Win')
+})
+
+test.each(['classic', 'cover'])('%s derives Xbox activity from the shared year without a second request', (layout) => {
+  platform('ra')
+  ;(useHomeLayout as jest.Mock).mockReturnValue([layout, jest.fn()])
+  const recent = xboxRecentFixture({ name: 'Recent Xbox', earnedAt: new Date(Date.now() - 10 * 86_400_000).toISOString() })
+  const old = xboxRecentFixture({ name: 'Old Xbox', earnedAt: new Date(Date.now() - 100 * 86_400_000).toISOString() })
+  ;(useActivityHeatmapYear as jest.Mock).mockReturnValue({
+    achievements: [],
+    xboxAchievements: [recent, old],
+    xboxLoading: false,
+    isLoading: false,
+    error: false,
+    refetch: jest.fn(),
+  })
+
+  render(<MainPageCharts />)
+
+  expect(screen.getByTestId('daily')).toHaveTextContent('Recent Xbox')
+  expect(screen.getByTestId('daily')).not.toHaveTextContent('Old Xbox')
+  expect(useXboxRecentAchievements).not.toHaveBeenCalled()
 })
 
 test('the month, habits and diary read the year every platform already loads', () => {

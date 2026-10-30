@@ -29,6 +29,27 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-30 — Xbox quota and failure hardening (`feat/87-xbox-quota-hardening`, #87)
+
+**Did** — Added bounded OpenXBL calls, a PostgreSQL hourly budget, 429 scan stops,
+explicit stale/partial cache semantics, sanitized request telemetry, aggregate feed caches,
+home activity reuse, and Following/score limits. Updated the Xbox rules, architecture and spec.
+**Why** — Eager scans and retry/failure behavior could spend the shared Free quota while admin-only,
+and OpenXBL outages left routes waiting without a usable last good response.
+**Decisions** — Home derives 60-day Xbox activity from the shared year so cross-platform cards stay
+complete. Stale never applies to private/not-found/disabled keys, never becomes fresh on nested writes,
+and each in-flight/backoff caller rechecks its own failure policy. The DB counter fails closed and
+refused attempts do not extend the lockout. Following keeps its full 60-day window, loading one friend
+at a time; Xbox score reads two games per pass.
+**Open** — Nothing is pushed or deployed to pre. Cold-cache before/after quota measurements remain open;
+the local check was warm and is not presented as a benchmark.
+**Watch out** — Verified 812 suites / 5,076 tests, TypeScript and production build. Local warm admin
+checks rendered Xbox profile and Activity; telemetry logged one 624 ms account call for summary with
+147 remaining. ESLint still has two pre-existing `.playwright-mcp` warnings and the browser has the
+existing Recharts width warnings. Expired Xbox cache rows are retained for 30 days for stale fallback.
+
+---
+
 ## 2026-10-30 — UI polish plan becomes historical (`docs/67-ui-polish-v2-plan`)
 
 **Did** — Marked the UI polish roadmap and v2 plan as historical records, removed the old execution

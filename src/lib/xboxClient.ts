@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { withSteamCache } from '@/lib/steamCache'
-import { mapLimit } from '@/utils/utils'
+import { allowAttempt } from '@/lib/attemptLimit'
+import { recordXboxCacheEvent, recordXboxPartial, recordXboxUpstream, recordXboxUpstreamSkip, xboxOperation, xboxStaleVersion } from '@/lib/xboxTelemetry'
 import { foldTwinTitles, isXboxTitleId } from '@/utils/xboxTitles'
 import {
   sortByLastPlayed,
@@ -36,6 +37,8 @@ import type { XboxAchievement, XboxGameProgress, XboxProfile, XboxRecentAchievem
 
 const BASE_URL = 'https://api.xbl.io/v2'
 const DEFAULT_LANGUAGE = 'en-US'
+const UPSTREAM_TIMEOUT_MS = 5000
+const RATE_LIMIT_COOLDOWN_MS = 60 * 1000
 /** The language tags for the app's languages. */
 const LANGUAGES: Record<string, string> = {
   en: 'en-US', es: 'es-ES', de: 'de-DE', fr: 'fr-FR', it: 'it-IT', ja: 'ja-JP', pl: 'pl-PL', pt: 'pt-PT', ru: 'ru-RU',
@@ -63,6 +66,7 @@ const LATEST_GAMES = 3
  * cached it costs nothing until it is played again.
  */
 const MAX_SCAN_GAMES = { activity: 20, year: 40 } as const
+const FEED_TTL_MS = { recent: 2 * 60 * 1000, activity: 5 * 60 * 1000, year: 30 * 60 * 1000 } as const
 
 /** Modern gamertags are 12 characters, old ones 15; letters, digits and spaces, with an optional #1234 suffix. */
 const GAMERTAG = /^[A-Za-z0-9 ]{1,15}(#\d{1,4})?$/
@@ -83,7 +87,7 @@ export function xboxLanguage(lang: string | null | undefined): string {
   return (lang && LANGUAGES[lang]) || DEFAULT_LANGUAGE
 }
 
-export type XboxErrorKind = 'not-configured' | 'unauthorized' | 'private' | 'not-found' | 'rate-limited' | 'failed'
+export type XboxErrorKind = 'not-configured' | 'unauthorized' | 'private' | 'not-found' | 'rate-limited' | 'timeout' | 'failed'
 
 export class XboxError extends Error {
   constructor(readonly kind: XboxErrorKind, message: string) {
@@ -91,11 +95,42 @@ export class XboxError extends Error {
   }
 }
 
+function withXboxCache<T>(
+  key: string,
+  ttlMs: number,
+  fetcher: () => Promise<T>,
+  options: { userId?: string | null; shouldCache?: (data: T) => boolean; refreshable?: boolean; staleOnRateLimit?: boolean } = {},
+): Promise<T> {
+  const { staleOnRateLimit = true, ...cacheOptions } = options
+  const staleAtStart = xboxStaleVersion()
+  return withSteamCache(key, ttlMs, fetcher, {
+    ...cacheOptions,
+    staleIfError: (err) => err instanceof XboxError && (err.kind === 'failed' || err.kind === 'timeout' || (staleOnRateLimit && err.kind === 'rate-limited')),
+    staleResult: () => xboxStaleVersion() > staleAtStart,
+    onEvent: recordXboxCacheEvent,
+  })
+}
+
 /** The calls left this hour, as OpenXBL last reported. Per server instance, so a hint and not a count. */
 let lastRateLimit: { remaining: number; limit: number } | null = null
+let rateLimitedUntil = 0
 
 export function xboxRateLimit() {
   return lastRateLimit
+}
+
+/** Clears module-local observations between isolated tests. */
+export function resetXboxCallState() {
+  lastRateLimit = null
+  rateLimitedUntil = 0
+}
+
+function rateLimitDelay(reset: string | null): number {
+  if (!reset) return RATE_LIMIT_COOLDOWN_MS
+  const numeric = Number(reset)
+  const resetMs = Number.isFinite(numeric) ? (numeric > 1_000_000_000_000 ? numeric : numeric * 1000) : Date.parse(reset)
+  if (!Number.isFinite(resetMs)) return RATE_LIMIT_COOLDOWN_MS
+  return Math.max(1000, Math.min(60 * 60 * 1000, resetMs - Date.now()))
 }
 
 export function xboxConfigured(): boolean {
@@ -118,11 +153,22 @@ export async function xboxCall<T>(
 ): Promise<T> {
   const key = process.env.OPENXBL_API_KEY?.trim()
   if (!key) throw new XboxError('not-configured', 'OPENXBL_API_KEY is not set')
+  const operation = xboxOperation(path)
+  if (Date.now() < rateLimitedUntil) {
+    recordXboxUpstreamSkip(operation, 'rate-limited')
+    throw new XboxError('rate-limited', 'OpenXBL is in its rate-limit cooldown')
+  }
+  if (!(await allowAttempt('xbox-upstream', 'app'))) {
+    recordXboxUpstreamSkip(operation, 'rate-limited')
+    throw new XboxError('rate-limited', 'The app OpenXBL hourly budget is exhausted')
+  }
 
+  const startedAt = Date.now()
   let res: Response
   try {
     res = await fetch(`${BASE_URL}/${path}`, {
       method: init.method ?? 'GET',
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
       headers: {
         'X-Authorization': key,
         Accept: 'application/json',
@@ -132,26 +178,57 @@ export async function xboxCall<T>(
       body: init.body ? JSON.stringify(init.body) : undefined,
     })
   } catch (err) {
-    throw new XboxError('failed', `OpenXBL unreachable: ${err instanceof Error ? err.message : String(err)}`)
+    const timedOut = err instanceof Error && (err.name === 'TimeoutError' || err.name === 'AbortError')
+    const kind = timedOut ? 'timeout' : 'failed'
+    recordXboxUpstream(operation, kind, Date.now() - startedAt)
+    throw new XboxError(kind, timedOut ? 'OpenXBL timed out' : 'OpenXBL is unreachable')
   }
 
-  const remaining = Number(res.headers.get('x-ratelimit-remaining'))
-  const limit = Number(res.headers.get('x-ratelimit-limit'))
-  if (res.headers.get('x-ratelimit-remaining') !== null && Number.isFinite(remaining)) {
+  const remainingHeader = res.headers.get('x-ratelimit-remaining')
+  const limitHeader = res.headers.get('x-ratelimit-limit')
+  const reset = res.headers.get('x-ratelimit-reset')
+  const remaining = Number(remainingHeader)
+  const limit = limitHeader === null ? 150 : Number(limitHeader)
+  const rateLimit = {
+    ...(remainingHeader !== null && Number.isFinite(remaining) ? { remaining, limit: Number.isFinite(limit) ? limit : 150 } : {}),
+    ...(reset ? { reset } : {}),
+  }
+  if (remainingHeader !== null && Number.isFinite(remaining)) {
     lastRateLimit = { remaining, limit: Number.isFinite(limit) ? limit : 150 }
   }
 
-  const body = (await res.json().catch(() => null)) as { code?: number; content?: unknown } | null
-  if (!res.ok) throw new XboxError(kindOf(res.status), `OpenXBL answered ${res.status}`)
-  if (!body || typeof body !== 'object') throw new XboxError('failed', 'OpenXBL sent something that is not JSON')
-  if (typeof body.code === 'number' && body.code >= 400) throw new XboxError(kindOf(body.code), `OpenXBL answered ${body.code} in the body`)
+  let body: { code?: number; content?: unknown } | null
+  try {
+    body = (await res.json()) as { code?: number; content?: unknown }
+  } catch (err) {
+    const timedOut = err instanceof Error && (err.name === 'TimeoutError' || err.name === 'AbortError')
+    const kind = timedOut ? 'timeout' : 'failed'
+    recordXboxUpstream(operation, kind, Date.now() - startedAt, rateLimit)
+    throw new XboxError(kind, timedOut ? 'OpenXBL timed out reading the response' : 'OpenXBL sent something that is not JSON')
+  }
+  if (res.status === 429 || body?.code === 429) rateLimitedUntil = Date.now() + rateLimitDelay(reset)
+  if (!res.ok) {
+    const kind = kindOf(res.status)
+    recordXboxUpstream(operation, kind, Date.now() - startedAt, rateLimit)
+    throw new XboxError(kind, `OpenXBL answered ${res.status}`)
+  }
+  if (!body || typeof body !== 'object') {
+    recordXboxUpstream(operation, 'failed', Date.now() - startedAt, rateLimit)
+    throw new XboxError('failed', 'OpenXBL sent something that is not JSON')
+  }
+  if (typeof body.code === 'number' && body.code >= 400) {
+    const kind = kindOf(body.code)
+    recordXboxUpstream(operation, kind, Date.now() - startedAt, rateLimit)
+    throw new XboxError(kind, `OpenXBL answered ${body.code} in the body`)
+  }
+  recordXboxUpstream(operation, 'success', Date.now() - startedAt, rateLimit)
   return body.content as T
 }
 
 /** The account with exactly this gamertag, or null. One call tells the XUID and the profile. */
 export async function findXboxAccount(gamertag: string): Promise<XboxProfile | null> {
   const name = gamertag.trim()
-  return withSteamCache<XboxProfile | null>(
+  return withXboxCache<XboxProfile | null>(
     `xbox:account:v2:${name.toLowerCase()}`,
     PROFILE_TTL_MS,
     async () => {
@@ -177,7 +254,7 @@ const MAX_STATS_TITLES = 300
  * titles. Play time is an extra: if the call fails the library goes on without
  * it (and says so in the log), rather than losing the whole list.
  */
-async function xboxPlaytimes(xuid: string, titles: RawTitle[]): Promise<Map<string, number>> {
+async function xboxPlaytimes(xuid: string, titles: RawTitle[]): Promise<{ minutes: Map<string, number>; complete: boolean }> {
   const owners = new Map<string, string[]>()
   const recent = [...titles]
     .sort((a, b) => (b.titleHistory?.lastTimePlayed ?? '').localeCompare(a.titleHistory?.lastTimePlayed ?? ''))
@@ -188,6 +265,7 @@ async function xboxPlaytimes(xuid: string, titles: RawTitle[]): Promise<Map<stri
   }
   const ids = [...owners.keys()]
   const result = new Map<string, number>()
+  let complete = true
   for (let i = 0; i < ids.length; i += STATS_CHUNK) {
     try {
       const content = await xboxCall<unknown>('player/stats', {
@@ -198,13 +276,15 @@ async function xboxPlaytimes(xuid: string, titles: RawTitle[]): Promise<Map<stri
         for (const titleId of owners.get(statsId) ?? []) result.set(titleId, minutes)
       }
     } catch (err) {
+      complete = false
+      recordXboxPartial('playtime')
       console.error('[xbox] play time', err)
     }
   }
-  return result
+  return { minutes: result, complete }
 }
 
-export type XboxLibraryData = { games: XboxGameProgress[]; achievementsUnlocked: number }
+export type XboxLibraryData = { games: XboxGameProgress[]; achievementsUnlocked: number; playtimeComplete: boolean }
 
 /**
  * Every game in an account's library, most recently played first, with how
@@ -212,26 +292,32 @@ export type XboxLibraryData = { games: XboxGameProgress[]; achievementsUnlocked:
  * games in one answer).
  */
 export async function xboxLibraryData(xuid: string, userId: string | null = null): Promise<XboxLibraryData> {
-  return withSteamCache(
-    `xbox:titles:v6:${xuid}`,
+  const data = await withXboxCache(
+    `xbox:titles:v7:${xuid}`,
     LIBRARY_TTL_MS,
     async () => {
       const res = await xboxCall<{ titles?: RawTitle[]; achievementSummary?: { totalAchievementsUnlocked?: number } }>(`titles/${xuid}`)
       const titles = res?.titles ?? []
       // Measured 2026-10-16: a library the viewer cannot read answers like an account that does not exist,
       // `titles: []` with no `achievementSummary`; a public account with no games still has the summary.
-      if (titles.length === 0 && !res?.achievementSummary) throw new XboxError('private', `The library of ${xuid} is not readable`)
-      const minutes = await xboxPlaytimes(xuid, titles)
+      if (titles.length === 0 && !res?.achievementSummary) throw new XboxError('private', 'The Xbox library is not readable')
+      const playtime = await xboxPlaytimes(xuid, titles)
       const games: XboxGameProgress[] = []
       for (const t of titles) {
         const game = toXboxGame(t)
-        if (game) games.push({ ...game, playtimeMinutes: minutes.get(game.titleId) ?? null })
+        if (game) games.push({ ...game, playtimeMinutes: playtime.minutes.get(game.titleId) ?? null })
       }
       // A launcher title beside its game (same name, no achievements) is not a second game.
-      return { games: sortByLastPlayed(foldTwinTitles(games)), achievementsUnlocked: res?.achievementSummary?.totalAchievementsUnlocked ?? 0 }
+      return {
+        games: sortByLastPlayed(foldTwinTitles(games)),
+        achievementsUnlocked: res?.achievementSummary?.totalAchievementsUnlocked ?? 0,
+        playtimeComplete: playtime.complete,
+      }
     },
     { userId, refreshable: true },
   )
+  if (!data.playtimeComplete) recordXboxPartial('playtime')
+  return data
 }
 
 export async function xboxLibrary(xuid: string, userId: string | null = null): Promise<XboxGameProgress[]> {
@@ -249,12 +335,12 @@ export async function findXboxGame(xuid: string, titleId: string, userId: string
  * else (or no one) and the summary says not-found rather than showing the wrong person.
  */
 export async function xboxSummary(xuid: string, gamertag: string, userId: string | null = null): Promise<XboxSummary> {
-  return withSteamCache(
+  return withXboxCache(
     `xbox:summary:v1:${xuid}`,
     SUMMARY_TTL_MS,
     async () => {
       const profile = await findXboxAccount(gamertag)
-      if (!profile || profile.xuid !== xuid) throw new XboxError('not-found', `No account ${xuid} under the gamertag ${gamertag}`)
+      if (!profile || profile.xuid !== xuid) throw new XboxError('not-found', 'No matching Xbox account under the linked gamertag')
       const library = await xboxLibraryData(xuid, userId)
       return {
         gamertag: profile.gamertag,
@@ -280,8 +366,9 @@ export async function xboxGameAchievements(
   game: Pick<XboxGameProgress, 'titleId' | 'is360' | 'lastPlayed'>,
   userId: string | null = null,
   language = DEFAULT_LANGUAGE,
+  staleOnRateLimit = true,
 ): Promise<XboxAchievement[]> {
-  return withSteamCache(
+  return withXboxCache(
     `xbox:achievements:v5:${xuid}:${game.titleId}:${game.lastPlayed ?? ''}:${language}`,
     SETTLED_ACHIEVEMENTS_TTL_MS,
     async () => {
@@ -296,7 +383,7 @@ export async function xboxGameAchievements(
       const res = await xboxCall<{ achievements?: RawAchievement[] }>(`achievements/player/${xuid}/${game.titleId}`, { language })
       return (res?.achievements ?? []).map(toXboxAchievement)
     },
-    { userId },
+    { userId, staleOnRateLimit },
   )
 }
 
@@ -315,6 +402,8 @@ function toRecent(game: XboxGameProgress, a: XboxAchievement & { unlockedAt: str
   }
 }
 
+type XboxFeed = { achievements: XboxRecentAchievement[]; partial: boolean }
+
 /** Achievements earned on or after `since` (ISO; '' for all) across `games`, newest first, a few games at a time. */
 async function earnedSince(
   xuid: string,
@@ -322,8 +411,25 @@ async function earnedSince(
   since: string,
   userId: string | null,
   language: string,
-): Promise<XboxRecentAchievement[]> {
-  const lists = await mapLimit(games, PARALLEL, (game) => xboxGameAchievements(xuid, game, userId, language))
+): Promise<XboxFeed> {
+  const lists: PromiseSettledResult<XboxAchievement[]>[] = new Array(games.length)
+  let next = 0
+  let rateLimited: XboxError | null = null
+  async function worker() {
+    while (next < games.length && !rateLimited) {
+      const i = next++
+      try {
+        lists[i] = { status: 'fulfilled', value: await xboxGameAchievements(xuid, games[i], userId, language, false) }
+      } catch (reason) {
+        lists[i] = { status: 'rejected', reason }
+        if (reason instanceof XboxError && reason.kind === 'rate-limited') rateLimited = reason
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(PARALLEL, games.length) }, worker))
+  // Quota exhaustion makes the feed incomplete: stop new work and let the route report it.
+  if (rateLimited) throw rateLimited
+
   const unlocks: XboxRecentAchievement[] = []
   lists.forEach((list, i) => {
     // One game failing leaves it out of the feed rather than failing the feed.
@@ -334,11 +440,20 @@ async function earnedSince(
   })
   // Nothing at all came back: that is a failure, not an empty feed.
   if (games.length > 0 && lists.every((l) => l.status === 'rejected')) throw (lists[0] as PromiseRejectedResult).reason
-  return unlocks.sort((a, b) => b.earnedAt.localeCompare(a.earnedAt))
+  return {
+    achievements: unlocks.sort((a, b) => b.earnedAt.localeCompare(a.earnedAt)),
+    partial: lists.some((list) => list.status === 'rejected'),
+  }
 }
 
 /** Only games with something earned can hold a recent achievement. */
 const hasEarned = (g: XboxGameProgress) => g.numAwarded > 0 || g.earnedGamerscore > 0
+
+async function cachedFeed(key: string, ttlMs: number, userId: string | null, build: () => Promise<XboxFeed>): Promise<XboxRecentAchievement[]> {
+  const feed = await withXboxCache(key, ttlMs, build, { userId })
+  if (feed.partial) recordXboxPartial('achievements')
+  return feed.achievements
+}
 
 /**
  * The latest achievements, however long ago they were earned — from the last
@@ -349,8 +464,15 @@ export async function xboxLatestAchievements(
   userId: string | null = null,
   language = DEFAULT_LANGUAGE,
 ): Promise<XboxRecentAchievement[]> {
-  const games = (await xboxLibrary(xuid, userId)).filter(hasEarned).slice(0, LATEST_GAMES)
-  return earnedSince(xuid, games, '', userId, language)
+  const library = await xboxLibrary(xuid, userId)
+  const games = library.filter(hasEarned).slice(0, LATEST_GAMES)
+  const fingerprint = library[0]?.lastPlayed ?? ''
+  return cachedFeed(
+    `xbox:feed:v2:${xuid}:recent:${fingerprint}:${language}`,
+    FEED_TTL_MS.recent,
+    userId,
+    () => earnedSince(xuid, games, '', userId, language),
+  )
 }
 
 /**
@@ -367,10 +489,17 @@ export async function xboxRecentAchievements(
   language = DEFAULT_LANGUAGE,
 ): Promise<XboxRecentAchievement[]> {
   const since = new Date(Date.now() - days * DAY_MS).toISOString()
-  const games = (await xboxLibrary(xuid, userId))
+  const library = await xboxLibrary(xuid, userId)
+  const games = library
     .filter((g) => hasEarned(g) && g.lastPlayed && g.lastPlayed >= since)
     .slice(0, MAX_SCAN_GAMES[scope])
-  return earnedSince(xuid, games, since, userId, language)
+  const fingerprint = library[0]?.lastPlayed ?? ''
+  return cachedFeed(
+    `xbox:feed:v2:${xuid}:${scope}:${days}:${fingerprint}:${language}`,
+    FEED_TTL_MS[scope],
+    userId,
+    () => earnedSince(xuid, games, since, userId, language),
+  )
 }
 
 /** The response for an Xbox call that threw: 503 with no key (or a refused one), 403 hidden, 404 no such gamertag, 429 over the hour's limit, 502 anything else. */
@@ -386,6 +515,7 @@ export function xboxFailure(err: unknown, where: string): NextResponse {
     if (err.kind === 'rate-limited') {
       return NextResponse.json({ error: 'rate-limited' }, { status: 429, headers: { 'Retry-After': '60' } })
     }
+    if (err.kind === 'timeout') return NextResponse.json({ error: 'timeout' }, { status: 504 })
   }
   console.error(`[${where}]`, err)
   return NextResponse.json({ error: 'failed' }, { status: 502 })

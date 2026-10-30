@@ -21,7 +21,6 @@ import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { usePsnRecentTrophies } from '@/hooks/usePsnRecentTrophies'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
-import { useXboxRecentAchievements } from '@/hooks/useXboxRecentAchievements'
 import { toRecentAchievement } from '@/utils/steamMappers'
 import { psnToRecentAchievement } from '@/utils/psnMappers'
 import { xboxToRecentAchievement } from '@/utils/xboxMappers'
@@ -61,6 +60,7 @@ export default function MainPageCharts() {
   // Someone else's page: their numbers, without the viewer's own pins, groups and library browser.
   const visitor = useSubject() !== null
   const [section, setSection] = useState('overview')
+  const [xboxActivitySince] = useState(() => new Date(Date.now() - 60 * 86_400_000).toISOString())
   const idPrefix = useId().replace(/:/g, '')
   const reduceMotion = useReducedMotion()
   const { ref: sectionRef, scrollToTop } = useSectionScroll<HTMLElement>()
@@ -75,7 +75,7 @@ export default function MainPageCharts() {
   const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()
   // The heatmap draws as far back as the card is wide, so it reads the year
   // the streak already loads — both platforms, and no call of its own.
-  const { achievements: year, activeStreak, isLoading: yearLoading, error: yearError, refetch: refetchYear } = useStreakData()
+  const { achievements: year, xboxAchievements: xboxYear, xboxLoading, activeStreak, isLoading: yearLoading, error: yearError, refetch: refetchYear } = useStreakData()
   // The same streak the top bar shows: one source, so they cannot disagree.
   const streak = activeStreak?.days ?? 0
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
@@ -89,7 +89,8 @@ export default function MainPageCharts() {
   const { library: psnLibrary } = usePsnGamesData()
   const { trophies: psnActivity, isLoading: psnLoading } = usePsnRecentTrophies('activity')
   const { library: xboxLibrary } = useXboxGamesData()
-  const { achievements: xboxActivity, isLoading: xboxLoading } = useXboxRecentAchievements('activity')
+  // The year is a superset of the 60-day window: reuse it instead of scanning the same games twice.
+  const xboxActivity = useMemo(() => xboxYear.filter((a) => a.earnedAt >= xboxActivitySince), [xboxYear, xboxActivitySince])
 
   // Steam and PSN unlocks in RA's shape, so the shared cards render every platform as one list.
   const steamRecent = useMemo(() => steamActivity.map(toRecentAchievement), [steamActivity])

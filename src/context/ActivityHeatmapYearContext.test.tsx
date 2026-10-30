@@ -3,9 +3,12 @@ import { ActivityHeatmapYearProvider, useActivityHeatmapYear } from './ActivityH
 import { useSession } from 'next-auth/react'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
+import { useXboxRecentAchievements } from '@/hooks/useXboxRecentAchievements'
+import { xboxRecentFixture } from '@/test-utils/xboxFixtures'
 
 jest.mock('next-auth/react', () => ({ useSession: jest.fn() }))
 jest.mock('@/hooks/useSteamRecentAchievements', () => ({ useSteamRecentAchievements: jest.fn() }))
+jest.mock('@/hooks/useXboxRecentAchievements', () => ({ useXboxRecentAchievements: jest.fn() }))
 jest.mock('@/lib/fetchWithRetry', () => ({
   ...jest.requireActual('@/lib/fetchWithRetry'),
   fetchWithRetry: jest.fn(),
@@ -19,10 +22,15 @@ const steamYear = (achievements: unknown[] = [], extra: Record<string, unknown> 
   (useSteamRecentAchievements as jest.Mock).mockReturnValue({
     achievements, isLoading: false, error: null, retry: jest.fn(), ...extra,
   })
+const xboxYear = (achievements: unknown[] = [], extra: Record<string, unknown> = {}) =>
+  (useXboxRecentAchievements as jest.Mock).mockReturnValue({
+    achievements, isLoading: false, error: null, retry: jest.fn(), ...extra,
+  })
 
 beforeEach(() => {
   jest.clearAllMocks()
   steamYear()
+  xboxYear()
 })
 
 test('does not fetch when there is no linked RA username', async () => {
@@ -97,6 +105,18 @@ test('a Steam-only account still gets its year — the streak is not RA only', a
   expect(useSteamRecentAchievements).toHaveBeenCalledWith('year')
   expect(result.current.achievements).toHaveLength(1)
   expect(result.current.achievements[0]).toMatchObject({ GameID: 620, Source: 'steam', Title: 'Win' })
+})
+
+test('exposes the raw Xbox year and its independent loading state for the 60-day views', async () => {
+  const unlock = xboxRecentFixture()
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { xboxxuid: '25354' } } })
+  xboxYear([unlock], { isLoading: true })
+
+  const { result } = renderHook(() => useActivityHeatmapYear(), { wrapper })
+
+  expect(result.current.xboxAchievements).toEqual([unlock])
+  expect(result.current.xboxLoading).toBe(true)
+  expect(useXboxRecentAchievements).toHaveBeenCalledWith('year')
 })
 
 test('asks Steam for nothing when no Steam account is linked', async () => {

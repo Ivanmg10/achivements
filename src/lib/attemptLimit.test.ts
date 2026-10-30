@@ -9,7 +9,7 @@ const query = pool.query as jest.Mock
 function recent(count: number) {
   query.mockReset()
   query.mockImplementation((sql: string) =>
-    Promise.resolve(sql.includes('COUNT(*)') ? { rows: [{ recent: count }] } : { rows: [] }),
+    Promise.resolve(sql.includes('COUNT(*)') ? { rows: [{ recent: count }] } : sql.includes('INSERT INTO signup_attempts') ? { rows: [{ id: 42 }] } : { rows: [] }),
   )
 }
 
@@ -71,6 +71,23 @@ test('asking for a password reset has a tighter window of its own', async () => 
   recent(1)
   await allowAttempt('reset', '1.2.3.4')
   expect(countCall()![1]).toEqual(['reset', '1.2.3.4', '15'])
+})
+
+test('Xbox upstream calls share a 150-attempt sliding hour across the app', async () => {
+  recent(150)
+  await expect(allowAttempt('xbox-upstream', 'app')).resolves.toBe(true)
+  expect(countCall()![1]).toEqual(['xbox-upstream', 'app', '60'])
+  recent(151)
+  await expect(allowAttempt('xbox-upstream', 'app')).resolves.toBe(false)
+  expect(query.mock.calls.some(([sql, params]) => String(sql).includes('DELETE FROM signup_attempts WHERE id') && params[0] === 42)).toBe(true)
+})
+
+test('Xbox fails closed when PostgreSQL cannot count or record the shared budget', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  query.mockReset()
+  query.mockRejectedValue(new Error('db down'))
+  await expect(allowAttempt('xbox-upstream', 'app')).resolves.toBe(false)
+  ;(console.error as jest.Mock).mockRestore()
 })
 
 describe('sign-in', () => {

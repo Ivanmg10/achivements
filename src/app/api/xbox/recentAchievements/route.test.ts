@@ -11,6 +11,7 @@ import { NextRequest } from 'next/server'
 import { GET } from './route'
 import { getServerSession } from 'next-auth'
 import { XboxError, xboxLatestAchievements, xboxRecentAchievements } from '@/lib/xboxClient'
+import { recordXboxCacheEvent } from '@/lib/xboxTelemetry'
 import { xboxRecentFixture } from '@/test-utils/xboxFixtures'
 
 const FEED = [xboxRecentFixture()]
@@ -67,4 +68,16 @@ test('the browser may keep the answer for 2 minutes, privately, and a new sessio
   expect(res.status).toBe(200)
   expect(res.headers.get('Cache-Control')).toBe('private, max-age=120')
   expect(res.headers.get('Vary')).toBe('Cookie')
+})
+
+test('reports request telemetry and marks a stale assembled response', async () => {
+  ;(xboxRecentAchievements as jest.Mock).mockImplementationOnce(async () => {
+    recordXboxCacheEvent('stale')
+    return FEED
+  })
+  const res = await GET(new NextRequest('http://localhost/api/xbox/recentAchievements?scope=year'))
+  expect(res.headers.get('X-Request-Id')).toBeTruthy()
+  expect(res.headers.get('X-Xbox-Upstream-Calls')).toBe('0')
+  expect(res.headers.get('X-Xbox-Stale')).toBe('true')
+  expect(res.headers.get('Warning')).toBe('110 - "Response is stale"')
 })
