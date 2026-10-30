@@ -7,11 +7,12 @@ jest.mock('@/lib/rankings', () => ({
   weekStartRanks: jest.fn(),
   weeklyTrend: jest.fn(),
   streaksOf: jest.fn(),
+  orderingStreaks: jest.fn(),
 }))
 
 import { getServerSession } from 'next-auth'
 import { GET } from './route'
-import { loadRanking, presenceOf, streaksOf, weekStartRanks, weeklyTrend, type RankEntry } from '@/lib/rankings'
+import { loadRanking, orderingStreaks, presenceOf, streaksOf, weekStartRanks, weeklyTrend, type RankEntry } from '@/lib/rankings'
 
 const entry = (id: number, rank: number, points: number, listed = true): RankEntry => ({
   id, username: `u${id}`, avatar: null, points, totalPoints: points, split: { ra: points }, completed: 1, achievements: 10, rank, listed,
@@ -25,6 +26,7 @@ beforeEach(() => {
   ;(presenceOf as jest.Mock).mockResolvedValue(new Map([[1, { online: true, lastSeenAt: null }]]))
   ;(weekStartRanks as jest.Mock).mockResolvedValue(new Map([[1, 2], [2, 1]]))
   ;(weeklyTrend as jest.Mock).mockResolvedValue(new Map([[1, [0, 5, 9]]]))
+  ;(orderingStreaks as jest.Mock).mockImplementation(async (...args: unknown[]) => (streaksOf as jest.Mock)(...args))
   ;(streaksOf as jest.Mock).mockResolvedValue(new Map([[1, { current: 2, best: 4 }], [3, { current: 6, best: 6 }]]))
 })
 
@@ -90,7 +92,7 @@ test('each row carries its streaks; ordered by one, who has none leaves and ther
   expect((res.data.rows as Record<string, unknown>[]).map((r) => [r.username, r.rank])).toEqual([['u3', 1], ['u1', 2]])
   expect(res.data.total).toBe(2)
   expect(res.data.arrows).toBe(false)
-  expect(streaksOf).toHaveBeenCalledWith([1, 2, 3], 'all', false)
+  expect(orderingStreaks).toHaveBeenCalledWith(expect.any(Array), expect.objectContaining({ period: 'all', source: 'all', xbox: false }))
 })
 
 test('refuses what it does not know, Following signed out, and Xbox to non-admins', async () => {

@@ -5,7 +5,7 @@ import type { XboxGameProgress } from '@/types/xbox'
 import type { UserSearchResult } from '@/hooks/useUserSearch'
 import type { LibraryGame } from '@/utils/library'
 import { achievementBadgeUrl, achievementGameIconUrl } from '@/utils/utils'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 
 type SavedGame = { id: number; title: string; imageIcon: string } | null
 

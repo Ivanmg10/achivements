@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react'
 import Image from 'next/image'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
-import { steamAssetUrl, gameIconUrl, SteamAsset } from '@/lib/steamClient'
+import { steamAssetUrl, gameIconUrl, SteamAsset } from '@/lib/steamAssets'
 
 /**
  * Official Steam artwork for a game, falling back when an asset is missing.

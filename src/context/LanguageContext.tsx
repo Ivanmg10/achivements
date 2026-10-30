@@ -1,21 +1,15 @@
 'use client'
 
-import { createContext, useContext, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { useStorageValue } from '@/hooks/useStorageValue'
 import { en, Translations } from '@/translations/en'
-import { es } from '@/translations/es'
-import { pt } from '@/translations/pt'
-import { fr } from '@/translations/fr'
-import { de } from '@/translations/de'
-import { it } from '@/translations/it'
-import { ru } from '@/translations/ru'
-import { pl } from '@/translations/pl'
-import { ja } from '@/translations/ja'
+import { loadMessages } from '@/translations/load'
 import { LANGUAGE_COOKIE, browserLanguages, isLang, languageCookie, pickLanguage, type Lang } from '@/utils/languages'
 
 export type { Lang }
 
-const translations: Record<Lang, Translations> = { en, es, pt, fr, de, it, ru, pl, ja }
+/** The languages this tab has downloaded, shared by the providers on a page. */
+const loaded: Partial<Record<Lang, Translations>> = { en }
 
 const STORAGE_KEY = 'app-language'
 
@@ -52,9 +46,12 @@ function cookieChoice(): Lang | null {
  * `initial` is what the server rendered in (`serverLanguage`, in layouts that
  * read the request): used while hydrating, so the first paint is already in
  * the person's language and matches. Without it the server and hydration
- * render English.
+ * render English. `messages` are that language's texts, so they are in the page
+ * from the first byte and nothing has to be fetched to hydrate. Any other language
+ * is fetched when it is needed, with English on screen until it arrives.
  */
-export function LanguageProvider({ children, initial }: { children: ReactNode; initial?: Lang | null }) {
+export function LanguageProvider({ children, initial, messages }: { children: ReactNode; initial?: Lang | null; messages?: Translations }) {
+  const [, setArrived] = useState<Lang | null>(null)
   // `undefined` on the server and while hydrating.
   const [saved, save] = useStorageValue(STORAGE_KEY)
   const chosen = isLang(saved) ? saved : saved === undefined ? null : cookieChoice()
@@ -62,6 +59,22 @@ export function LanguageProvider({ children, initial }: { children: ReactNode; i
   // what is stored is a person's choice, and the browser's can change.
   const detected = saved === undefined || chosen ? null : pickLanguage(browserLanguages())
   const lang: Lang = saved === undefined ? (initial ?? 'en') : (chosen ?? detected ?? 'en')
+
+  const T = loaded[lang] ?? (lang === initial ? messages : undefined)
+
+  useEffect(() => {
+    if (T) return
+    let current = true
+    loadMessages(lang)
+      .then((texts) => {
+        loaded[lang] = texts
+        if (current) setArrived(lang)
+      })
+      .catch((err) => console.error('[LanguageContext] could not load', lang, err))
+    return () => {
+      current = false
+    }
+  }, [lang, T])
 
   // Screen readers pick their voice from <html lang>; keep it on the language actually shown.
   useEffect(() => {
@@ -79,7 +92,7 @@ export function LanguageProvider({ children, initial }: { children: ReactNode; i
   }
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang, T: translations[lang], fromBrowser: !chosen && detected !== null }}>
+    <LanguageContext.Provider value={{ lang, setLang, T: T ?? en, fromBrowser: !chosen && detected !== null }}>
       {children}
     </LanguageContext.Provider>
   )
