@@ -234,6 +234,8 @@ Probado con una cuenta de 135 juegos. Base real: `https://api.xbl.io/v2/` (no `x
 
 Búsqueda (1) + biblioteca (1) + logros de un juego (1 por juego abierto). Mejor que el ≈ 7 estimado:
 con la caché de Postgres, el plan Free aguanta **unos 50 perfiles en frío por hora**.
+Esta cifra no incluye `activity` (hasta 20 juegos), `year` (hasta 40), play time,
+Following ni Vault Score; no es el coste de un home completo.
 
 ### Sigue sin verificar
 
@@ -248,37 +250,27 @@ cada juego al abrirlo (con las llamadas que quedan esta hora). `src/lib/xboxClie
 `src/utils/xboxMappers.ts`, `/api/admin/xbox` y `/api/admin/xbox/achievements`, cada búsqueda queda en
 el registro de admin (`xbox-lookup`). Sin migraciones: no toca la base de datos compartida con producción.
 
-## 7. Problema abierto: OpenXBL inaccesible y la app esperando (2026-10-17)
+## 7. Hardening de cuota y fallos (2026-10-30, #87)
 
-**Pendiente, sin arreglar.** El usuario decidió dejarlo para más adelante.
+El 2026-10-17 se midió un OpenXBL inaccesible: las rutas esperaban unos 11,5 s,
+no había timeout ni fallback y cada visita reintentaba upstream. La feature #87
+aborda ese problema y el gasto de los scans. Contrato completo:
+`docs/87-xbox-quota-hardening-spec.md`.
 
-### Qué se vio
-- En local, para un admin con Xbox vinculado, "Jugados recientemente" se quedó ~12 s en
-  esqueleto. `/api/xbox/titles` y `/api/xbox/recentAchievements` respondían **502 a los
-  ~11,5 s**.
-- Causa inmediata: `api.xbl.io` no aceptaba conexiones desde la máquina de desarrollo
-  (`UND_ERR_CONNECT_TIMEOUT`; `curl` sin respuesta en 20 s a 188.114.96.5 / 188.114.97.5,
-  IPs de Cloudflare), mientras `www.cloudflare.com` respondía en 0,3 s. No era la cuota
-  ni nuestro código.
-- Sospecha sin confirmar: el bloqueo de IPs de Cloudflare que hacen operadoras españolas
-  durante los partidos de LaLiga (era sábado). Para confirmarlo: probar con VPN. En
-  producción (Vercel, `fra1`) no debería pasar, pero OpenXBL también puede caerse.
+### Implementación
 
-### Por qué duele tanto (lo que sí es nuestro)
-1. `xboxCall` (`src/lib/xboxClient.ts`) no tiene timeout: cada llamada espera lo que tarde
-   la red en rendirse (~10–11 s).
-2. Un fallo no se cachea y no hay *stale-if-error*: `withSteamCache` solo escribe lo que
-   sale bien, así que cada visita vuelve a llamar, vuelve a esperar y vuelve a gastar
-   cuota. Con la caché caducada, Xbox desaparece entero aunque la última biblioteca buena
-   siga en `steam_cache`.
-3. `RARecentlyPlayed` espera a todas las plataformas (`xboxLoading` incluido) antes de
-   pintar la lista, así que RA, Steam y PSN, ya cargados, esperan a Xbox.
-
-### Arreglo propuesto (rama `fix/xbox-unreachable`, sin empezar)
-- `signal: AbortSignal.timeout(~5 s)` en `xboxCall`; el aborto se trata como `failed` (502).
-- Si OpenXBL falla, servir la última copia buena de `steam_cache` aunque haya caducado
-  (necesita que `readCache` pueda leer filas caducadas).
-- Recordar ~60 s por instancia que OpenXBL no responde, para fallar al momento en vez de
-  esperar otra vez en cada llamada.
-- Que la lista de recientes espere a Xbox como mucho ~2 s y lo añada cuando llegue
-  (acepta que se reordene una vez).
+- `xboxCall` tiene timeout de 5 s (504 `timeout`), presupuesto PostgreSQL de
+  150 llamadas/hora por entorno y cooldown por instancia tras 429. Los intentos
+  rechazados no prolongan el bloqueo; un fallo del contador cierra el paso.
+- Los scans dejan de programar juegos al recibir 429. Un feed no acepta un valor
+  stale de un 429 aunque otra ruta detalle/score lo permita.
+- `withSteamCache` permite stale solo para `failed`, `timeout` y `rate-limited`.
+  Nunca para privado, no encontrado o configuración/credencial deshabilitada.
+  Los datos stale anidados no se reescriben como frescos y las filas Xbox
+  caducadas se conservan 30 días para el fallback.
+- Biblioteca y feeds parciales conservan `X-Xbox-Partial` también en hits.
+  Los feeds ensamblados usan `xbox:feed:v2:`; el home deriva 60 días del año ya
+  cargado, Following procesa un amigo cada vez y score lee dos juegos por pasada.
+- `xboxTelemetry.ts` registra operaciones sanitizadas, request id, duración,
+  llamadas upstream reales, caché y rate-limit sin XUIDs, gamertags ni secretos.
+  Las respuestas exponen los contadores y `X-Xbox-Stale`/`Warning` cuando aplica.

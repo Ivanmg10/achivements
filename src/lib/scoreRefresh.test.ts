@@ -19,17 +19,27 @@ jest.mock('@/lib/psnClient', () => {
   }
   return { PsnError, psnTitles: jest.fn(), psnGameTrophies: jest.fn() }
 })
-jest.mock('@/lib/xboxClient', () => ({ xboxLibrary: jest.fn(), xboxGameAchievements: jest.fn() }))
+jest.mock('@/lib/xboxClient', () => {
+  class XboxError extends Error {
+    kind: string
+    constructor(kind: string, message: string) {
+      super(message)
+      this.kind = kind
+    }
+  }
+  return { XboxError, xboxLibrary: jest.fn(), xboxGameAchievements: jest.fn() }
+})
 
 import pool from '@/lib/db'
 import { readCache, writeCache } from '@/lib/steamCache'
 import { allowAttempt } from '@/lib/attemptLimit'
 import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
+import { XboxError } from '@/lib/xboxClient'
 import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raClient'
 import { getOwnedGames } from '@/lib/steamClient'
 import { fetchPlayerAchievements } from '@/lib/steamProgress'
 import { RULES_VERSION } from '@/utils/vaultScore'
-import { classifyFailure, continueFill, onPlatformLinked, refreshScore, refreshScoreIfStale, runScorePass } from './scoreRefresh'
+import { classifyFailure, continueFill, onPlatformLinked, PACE, refreshScore, refreshScoreIfStale, runScorePass } from './scoreRefresh'
 
 const query = pool.query as jest.Mock
 const client = { query: jest.fn(), release: jest.fn() }
@@ -199,11 +209,16 @@ describe('refreshScore', () => {
   })
 })
 
+test('Xbox score reads at most two changed games per pass', () => {
+  expect(PACE.xbox).toMatchObject({ concurrency: 1, perPass: 2 })
+})
+
 describe('classifyFailure', () => {
   it('tells what the user can fix from what to wait out', () => {
     expect(classifyFailure('ra', { status: 401 })).toBe('key')
     expect(classifyFailure('ra', { status: 429 })).toBe('busy')
     expect(classifyFailure('psn', new PsnError('privacy'))).toBe('private')
+    expect(classifyFailure('xbox', new XboxError('rate-limited', 'quota'))).toBe('busy')
     expect(classifyFailure('xbox', new Error('down'))).toBe('unavailable')
   })
 })

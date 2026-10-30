@@ -4,6 +4,7 @@ import { findXboxGame, isTitleId, xboxFailure } from '@/lib/xboxClient'
 import { igdbXboxArt, igdbXboxDetails } from '@/lib/igdbClient'
 import { cachedJson } from '@/lib/httpCache'
 import { TTL } from '@/lib/steamCache'
+import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 
 /**
  * An Xbox game page's facts — summary, studios, genres, release date,
@@ -13,7 +14,7 @@ import { TTL } from '@/lib/steamCache'
  * not text from the request. 404 when IGDB is not set up or knows no match: the
  * page simply has no details.
  */
-export async function GET(req: NextRequest) {
+async function get(req: NextRequest) {
   const auth = await requireXboxSession(req)
   if (!auth.ok) return auth.response
   const { id: userId, xboxxuid } = auth.session
@@ -44,4 +45,8 @@ export async function GET(req: NextRequest) {
     console.error('[xbox/details]', titleId, err)
     return NextResponse.json({ error: 'details-unavailable' }, { status: 503 })
   }
+}
+
+export async function GET(req: NextRequest) {
+  return withXboxTelemetry('xbox/details', () => get(req))
 }

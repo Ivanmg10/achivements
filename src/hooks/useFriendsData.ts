@@ -14,7 +14,7 @@ import { mapLimit } from '@/utils/utils'
 
 /** How many friends get their activity and games read: the newest follows. Each costs a few cached platform calls. */
 export const DETAIL_LIMIT = 10
-const AT_ONCE = 2
+const AT_ONCE = 1
 /** RA's own system "consoles" (events, hubs) are not games. */
 const RA_SYSTEM_CONSOLES = new Set([100, 101])
 
@@ -92,7 +92,7 @@ export async function loadFriendDetails(friend: FriendOverview, lang: string): P
 /**
  * The Friends section's data: everyone you follow from our own database (cheap,
  * all of them), then the activity and games of the newest DETAIL_LIMIT, two at
- * a time, each filled in as it arrives. Nothing is asked until `enabled` first
+ * at a time, each filled in as it arrives. Nothing is asked until `enabled` first
  * turns true — the section is opened — and it is kept after.
  */
 export function useFriendsData(enabled: boolean) {

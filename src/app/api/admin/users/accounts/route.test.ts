@@ -210,6 +210,7 @@ describe('Xbox', () => {
   test('links an account Xbox knows, as it spells it, and logs it', async () => {
     const res = await POST(post({ id: 11, platform: 'xbox', gamertag: ' testplayer ' }))
     expect(res.status).toBe(200)
+    expect(res.headers.get('X-Request-Id')).toBeTruthy()
     expect(findXboxAccount).toHaveBeenCalledWith('testplayer')
     expect(xboxSummary).toHaveBeenCalledWith(PROFILE.xuid, 'TestPlayer', '11')
     expect(updates()[0][1]).toEqual([PROFILE.xuid, 'TestPlayer', 11])

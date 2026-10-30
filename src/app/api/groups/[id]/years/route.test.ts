@@ -16,6 +16,7 @@ import { getAppDetails } from '@/lib/steamClient'
 import { psnReleaseYear, psnTitles } from '@/lib/psnClient'
 import { igdbArt, igdbXboxArt } from '@/lib/igdbClient'
 import { xboxLibrary } from '@/lib/xboxClient'
+import { recordXboxCacheEvent } from '@/lib/xboxTelemetry'
 import { NextRequest } from 'next/server'
 
 const params = (id = '5') => ({ params: Promise.resolve({ id }) })
@@ -51,6 +52,24 @@ test('a failed lookup is not stored, so a later visit tries again', async () => 
   const res = await call()
   expect(data(res).years).toEqual([])
   expect(pool.query).toHaveBeenCalledTimes(2)
+})
+
+test('an Xbox year answer built from stale data carries the freshness header', async () => {
+  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', raid: 'key', admin: true, xboxxuid: '25354' } })
+  ;(pool.query as jest.Mock)
+    .mockResolvedValueOnce({ rows: [{ id: 5 }] })
+    .mockResolvedValueOnce({ rows: [{ id: 1, source: 'xbox', game_id: 10 }] })
+    .mockResolvedValueOnce({ rows: [] })
+  ;(xboxLibrary as jest.Mock).mockImplementation(async () => {
+    recordXboxCacheEvent('stale')
+    return [{ id: 10, title: 'Halo', consoleName: 'Xbox 360' }]
+  })
+  ;(igdbXboxArt as jest.Mock).mockResolvedValue(null)
+
+  const res = await call()
+  expect(res.status).toBe(200)
+  expect(res.headers.get('X-Request-Id')).toBeTruthy()
+  expect(res.headers.get('X-Xbox-Stale')).toBe('true')
 })
 
 test('only the owner can fill a group', async () => {
