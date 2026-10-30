@@ -7,10 +7,13 @@ jest.mock('@/lib/apiAuth', () => ({ requireSession: jest.fn() }))
 jest.mock('@/lib/steamClient', () => ({ getPlayerSummaries: jest.fn() }))
 jest.mock('@/lib/scoreRefresh', () => ({ onPlatformLinked: jest.fn() }))
 jest.mock('@/lib/userRecord', () => ({ forgetUser: jest.fn() }))
+jest.mock('@/lib/steamLinkNotice', () => ({ sendSteamLinkNotice: jest.fn() }))
 
 import { GET } from './route'
 import { NextRequest } from 'next/server'
 import pool from '@/lib/db'
+import { after } from 'next/server'
+import { sendSteamLinkNotice } from '@/lib/steamLinkNotice'
 import { requireSession } from '@/lib/apiAuth'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
@@ -41,6 +44,13 @@ beforeEach(() => {
 })
 
 afterEach(() => { (console.error as jest.Mock).mockRestore() })
+
+test('linking tells the account\'s address', async () => {
+  ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ username: 'ana', email: 'ana@test.com' }] })
+  await GET(callback({ intent: 'link', state: 's2', next: '/user' }))
+  await Promise.all((after as unknown as { pending: Promise<unknown>[] }).pending)
+  expect(sendSteamLinkNotice).toHaveBeenCalledWith({ to: 'ana@test.com', username: 'ana', linked: true })
+})
 
 describe('signing in', () => {
   const back = { intent: 'signin', state: 's1' }

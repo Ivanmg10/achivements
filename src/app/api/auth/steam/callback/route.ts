@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import pool from '@/lib/db'
 import { requireSession } from '@/lib/apiAuth'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
+import { sendSteamLinkNotice } from '@/lib/steamLinkNotice'
 import { forgetUser } from '@/lib/userRecord'
 import {
   cookieFromHeader,
@@ -39,11 +40,13 @@ async function linkSteam(userId: string, steamid: string): Promise<'linked' | 't
   try {
     const { rows } = await pool.query('SELECT id FROM users WHERE steam_login_id = $1', [steamid])
     if (rows.length > 0 && String(rows[0].id) !== userId) return 'taken'
-    await pool.query('UPDATE users SET steamid = $1, steamusername = $2, steam_login_id = $1 WHERE id = $3', [
-      steamid,
-      await personaOf(steamid),
-      userId,
-    ])
+    const updated = await pool.query(
+      'UPDATE users SET steamid = $1, steamusername = $2, steam_login_id = $1 WHERE id = $3 RETURNING username, email',
+      [steamid, await personaOf(steamid), userId],
+    )
+    const { username, email } = updated.rows[0] ?? {}
+    // It adds a way in that a new password does not end: the owner must hear about it.
+    if (email) after(() => sendSteamLinkNotice({ to: email, username, linked: true }))
   } catch (err) {
     if ((err as { code?: string }).code === '23505') return 'taken'
     console.error('[auth/steam] link', err)
