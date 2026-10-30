@@ -19,6 +19,9 @@ import pool from '@/lib/db'
  * signed-up account from walking the whole user list. 'follow' counts follows
  * per account, for the same reason: a follow also says whether a name exists.
  *
+ * 'ra-borrowed' counts reads a viewer with no RA key makes through someone
+ * else's: the key's limit is its owner's, not the viewer's to spend.
+ *
  * 'avatar' counts uploads per account: an avatar is small, but each one is a
  * write of up to 512 KB to the database.
  *
@@ -26,7 +29,7 @@ import pool from '@/lib/db'
  * (address 'app'): PSN is one app account for everyone, so the score fill goes
  * gently whoever it is for. 300 games is 600 calls to Sony in 15 minutes.
  */
-export type AttemptScope = 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'avatar' | 'user-search' | 'follow' | 'psn-score' | 'xbox-upstream' | 'ra-check'
+export type AttemptScope = 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'ra-borrowed' | 'avatar' | 'user-search' | 'follow' | 'psn-score' | 'xbox-upstream' | 'ra-check'
 
 const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   signup: { max: 5, windowMinutes: 60 },
@@ -42,6 +45,8 @@ const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   'xbox-upstream': { max: 150, windowMinutes: 60 },
   // Checking an RA key before signing up: signed out, so per address, and few, or it would test stolen keys.
   'ra-check': { max: 10, windowMinutes: 15 },
+  // About twenty profile visits. Past it the page shows the owner without RA.
+  'ra-borrowed': { max: 200, windowMinutes: 15 },
 }
 
 type HeaderSource = Headers | Record<string, string | string[] | undefined>
@@ -85,6 +90,32 @@ async function recentAttempts(scope: AttemptScope, address: string, failOpen = t
     if (!failOpen) throw err
     console.error('[attemptLimit]', scope, err)
     return 0
+  }
+}
+
+/** What reserveAttempt answers: whether the attempt may go on, and how to take it back. */
+export type Reservation = { allowed: boolean; release: () => Promise<void> }
+
+/**
+ * Takes an attempt before the work it guards, so a burst cannot get past the
+ * limit together: each insert is committed before its count runs, and they all
+ * see one another. Release it when it should not count (it succeeded, or it was
+ * refused, so hammering does not lengthen the wait). A database that will not
+ * answer must not lock people out, so a failure here lets them through.
+ */
+export async function reserveAttempt(scope: AttemptScope, address: string): Promise<Reservation> {
+  let id: number | null = null
+  const release = async () => {
+    if (id === null) return
+    await pool.query('DELETE FROM signup_attempts WHERE id = $1', [id]).catch((err: unknown) => console.error('[attemptLimit]', scope, err))
+  }
+  try {
+    const { rows } = await pool.query('INSERT INTO signup_attempts (scope, address) VALUES ($1, $2) RETURNING id', [scope, address])
+    id = rows[0]?.id ?? null
+    return { allowed: (await recentAttempts(scope, address, false)) <= LIMITS[scope].max, release }
+  } catch (err) {
+    console.error('[attemptLimit]', scope, err)
+    return { allowed: true, release }
   }
 }
 

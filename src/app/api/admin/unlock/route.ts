@@ -16,7 +16,10 @@ export async function POST(req: Request) {
     const check = await checkCurrentPassword(admin.id, password)
     if (check === 'too-many') return NextResponse.json({ error: 'too-many-attempts' }, { status: 429 })
     if (check === 'no-user') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    if (check === 'wrong') return NextResponse.json({ error: 'wrong-password' }, { status: 403 })
+    if (check === 'wrong') {
+      await logAdminAction(admin, 'unlock-failed', null)
+      return NextResponse.json({ error: 'wrong-password' }, { status: 403 })
+    }
 
     const expiresAt = Date.now() + ELEVATION_MS
     await logAdminAction(admin, 'unlock', null)

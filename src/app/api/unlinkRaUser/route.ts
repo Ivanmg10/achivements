@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
+import { clearUserCache } from '@/lib/steamCache'
 import { forgetUser } from '@/lib/userRecord'
 
 export async function POST() {
@@ -20,6 +21,7 @@ export async function POST() {
     return NextResponse.json({ message: 'Could not unlink RA account' }, { status: 500 })
   }
 
+  await clearUserCache(session.user.id)
   forgetUser(session.user.id)
   return NextResponse.json({ ok: true })
 }

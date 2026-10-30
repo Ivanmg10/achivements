@@ -1,15 +1,9 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 
-const mockClient = {
-  query: jest.fn(),
-  release: jest.fn(),
-}
-
 jest.mock('@/lib/db', () => ({
   __esModule: true,
   default: {
     query: jest.fn(),
-    connect: jest.fn(),
   },
 }))
 
@@ -30,8 +24,7 @@ function makePutRequest(body: unknown) {
 beforeEach(() => {
   jest.clearAllMocks()
   ;(getServerSession as jest.Mock).mockResolvedValue(mockSession)
-  ;(pool.connect as jest.Mock).mockResolvedValue(mockClient)
-  mockClient.query.mockResolvedValue({ rows: [] })
+  ;(pool.query as jest.Mock).mockResolvedValue({ rows: [] })
 })
 
 describe('GET', () => {
@@ -82,28 +75,23 @@ describe('PUT', () => {
     expect((await PUT(makePutRequest({ order: ['switch:5'] }))).status).toBe(400)
   })
 
-  test('upserts each game with its platform and its index as position', async () => {
+  test('saves every game in one statement, in order', async () => {
     const res = await PUT(makePutRequest({ order: ['ra:10', 'steam:20', 30] }))
     expect(res.data).toEqual({ ok: true })
-    expect(mockClient.query).toHaveBeenCalledWith('BEGIN')
-    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 'ra', 10, 0])
-    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 'steam', 20, 1])
+    expect(pool.query).toHaveBeenCalledTimes(1)
     // A bare number is an RA id, as the order was stored before Steam joined.
-    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('ON CONFLICT'), ['1', 'ra', 30, 2])
-    expect(mockClient.query).toHaveBeenCalledWith('COMMIT')
-    expect(mockClient.release).toHaveBeenCalled()
+    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['1', ['ra', 'steam', 'ra'], [10, 20, 30]])
   })
 
-  test('rolls back and returns 500 when a query fails mid-transaction', async () => {
-    mockClient.query.mockImplementation((sql: string) => {
-      if (sql === 'BEGIN') return Promise.resolve()
-      if (sql.includes('ON CONFLICT')) return Promise.reject(new Error('fail'))
-      return Promise.resolve()
-    })
-    const res = await PUT(makePutRequest({ order: ['ra:10'] }))
-    expect(res.status).toBe(500)
-    expect(mockClient.query).toHaveBeenCalledWith('ROLLBACK')
-    expect(mockClient.release).toHaveBeenCalled()
+  test('refuses an order longer than any library', async () => {
+    const res = await PUT(makePutRequest({ order: Array.from({ length: 5001 }, (_, i) => i + 1) }))
+    expect(res.status).toBe(400)
+  })
+
+  test('returns 500 when the save fails', async () => {
+    ;(pool.query as jest.Mock).mockRejectedValueOnce(new Error('fail'))
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    expect((await PUT(makePutRequest({ order: ['ra:10'] }))).status).toBe(500)
   })
 })
 
@@ -111,13 +99,13 @@ describe('Xbox is admin-only', () => {
   test('a non-admin cannot put an Xbox game in the order', async () => {
     const res = await PUT(makePutRequest({ order: ['ra:1', 'xbox:1738914043'] }))
     expect(res.status).toBe(403)
-    expect(pool.connect).not.toHaveBeenCalled()
+    expect(pool.query).not.toHaveBeenCalled()
   })
 
   test('an admin can', async () => {
     ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
     const res = await PUT(makePutRequest({ order: ['xbox:1738914043'] }))
     expect(res.status).toBe(200)
-    expect(mockClient.query).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO perfect_games_order'), ['1', 'xbox', 1738914043, 0])
+    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['1', ['xbox'], [1738914043]])
   })
 })

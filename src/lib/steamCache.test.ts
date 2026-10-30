@@ -209,6 +209,12 @@ describe('withSteamCache', () => {
 })
 
 describe('clearUserCache', () => {
+  test('takes RA\'s rows too, which carry the user in their key alone', async () => {
+    query.mockResolvedValue({ rowCount: 1 })
+    await clearUserCache('7')
+    expect(query).toHaveBeenCalledWith(expect.stringContaining("cache_key ~ ('^ra:[^:]+:'"), ['7'])
+  })
+
   test('deletes every row for the user', async () => {
     query.mockResolvedValue({ rowCount: 3 })
     await clearUserCache('7')

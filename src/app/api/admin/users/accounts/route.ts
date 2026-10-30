@@ -159,7 +159,7 @@ export async function DELETE(req: Request) {
     if (platform === 'ra') {
       await pool.query('UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL WHERE id = $1', [target.id])
     } else if (platform === 'steam') {
-      await pool.query('UPDATE users SET steamid = NULL, steamusername = NULL WHERE id = $1', [target.id])
+      await pool.query('UPDATE users SET steamid = NULL, steamusername = NULL, steam_login_id = NULL WHERE id = $1', [target.id])
       await clearUserCache(String(target.id))
       await forgetUnlocks(String(target.id))
     } else if (platform === 'psn') {

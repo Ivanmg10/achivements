@@ -97,6 +97,8 @@ export async function requireAdmin(req: Request): Promise<AdminResult> {
 
 export type AdminAction =
   | 'unlock'
+  | 'unlock-failed'
+  | 'list-users'
   | 'create-user'
   | 'update-user'
   | 'delete-user'
@@ -110,6 +112,7 @@ export type AdminAction =
   | 'unlink-xbox'
   | 'psn-token'
   | 'xbox-lookup'
+  | 'xbox-achievements'
   | 'ranking-flag'
 
 /** How long the action log is kept. */

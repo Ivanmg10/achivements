@@ -13,6 +13,8 @@ const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location', 'description'
 type AllowedField = (typeof ALLOWED_FIELDS)[number]
 
 const DESCRIPTION_MAX = 280
+/** It travels in the session cookie and in every list that shows this user. */
+const AVATAR_URL_MAX = 500
 const GENDERS = ['male', 'female', 'neutral']
 /** On/off settings, and the column each is kept in. */
 const SWITCHES: Partial<Record<AllowedField, string>> = { profilePublic: 'profile_public', genderPublic: 'gender_public', showPresence: 'show_presence', showInRankings: 'show_in_rankings' }
@@ -34,7 +36,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { field, value, currentPassword } = body as { field: AllowedField; value: string; currentPassword?: unknown }
 
     if (!ALLOWED_FIELDS.includes(field)) {
@@ -82,7 +84,7 @@ export async function POST(req: Request) {
     }
 
     if (field === 'avatar') {
-      if (!isValidUrl(trimmed)) {
+      if (trimmed.length > AVATAR_URL_MAX || !isValidUrl(trimmed)) {
         return NextResponse.json({ error: 'Avatar must be a valid https URL' }, { status: 400 })
       }
     }

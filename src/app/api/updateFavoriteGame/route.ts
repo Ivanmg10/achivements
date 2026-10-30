@@ -15,6 +15,10 @@ const COLUMN: Record<GameSource, string> = {
   xbox: 'favorite_xbox_game',
 }
 
+// A favourite travels in the session cookie and in every list that shows this user.
+const TITLE_MAX = 300
+const IMAGE_MAX = 500
+
 function readColumn(value: unknown): string | null {
   if (value === undefined || value === null) return COLUMN.ra
   return isGameSource(value) ? COLUMN[value] : null
@@ -25,7 +29,7 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { id, title, imageIcon, source } = body as {
       id?: number
       title?: string
@@ -34,7 +38,10 @@ export async function POST(req: Request) {
     }
     const column = readColumn(source)
 
-    if (!id || !title) return NextResponse.json({ error: 'id and title required' }, { status: 400 })
+    if (!Number.isInteger(id) || typeof title !== 'string' || !title) return NextResponse.json({ error: 'id and title required' }, { status: 400 })
+    if (title.length > TITLE_MAX || (imageIcon != null && (typeof imageIcon !== 'string' || imageIcon.length > IMAGE_MAX))) {
+      return NextResponse.json({ error: 'Too long' }, { status: 400 })
+    }
     if (!column) return NextResponse.json({ error: 'source must be ra, steam, psn or xbox' }, { status: 400 })
     if (!sourceAllowed(source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 

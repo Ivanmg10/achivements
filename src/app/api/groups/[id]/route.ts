@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
 import { readGroupFields } from '@/utils/groupValidation'
+import { dbId } from '@/utils/dbId'
 import { canUseXbox } from '@/utils/xboxAccess'
 
 async function ownsGroup(userId: string, groupId: number) {
@@ -14,7 +15,7 @@ async function ownsGroup(userId: string, groupId: number) {
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
     if (!Number.isInteger(groupId)) {
       return NextResponse.json({ message: 'No encontrado' }, { status: 404 })
@@ -58,7 +59,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
@@ -91,7 +92,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {

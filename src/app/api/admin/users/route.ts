@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
 import { sendEmailChangedNotice } from '@/lib/emailChangedNotice'
 import { retireResetTokens } from '@/lib/passwordReset'
+import { clearUserCache } from '@/lib/steamCache'
 import { forgetUser } from '@/lib/userRecord'
 import { sendVerificationEmail } from '@/lib/verificationEmail'
 import { BCRYPT_COST, PASSWORD_MIN, isEmail } from '@/utils/authValidation'
@@ -34,6 +35,7 @@ export async function GET(req: Request) {
               "raUser"->>'User' AS ra_display
        FROM users ORDER BY id ASC`
     )
+    await logAdminAction(auth.admin, 'list-users', null)
     return NextResponse.json(result.rows)
   } catch (err) {
     console.error('[admin/users GET]', err)
@@ -212,6 +214,7 @@ export async function DELETE(req: Request) {
 
     const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id, username', [id])
     if (!result.rows.length) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    await clearUserCache(id)
     forgetUser(id)
     await logAdminAction(auth.admin, 'delete-user', result.rows[0])
 

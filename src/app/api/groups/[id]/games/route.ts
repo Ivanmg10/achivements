@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
 import { isGameSource } from '@/utils/gameRef'
+import { dbId } from '@/utils/dbId'
 import { sourceAllowed } from '@/utils/xboxAccess'
 import type { GameSource } from '@/types/steam'
 import { GROUP_ITEMS_MAX, readItemCounts, readItemFields } from '@/utils/groupValidation'
@@ -26,7 +27,7 @@ async function ownsGroup(userId: string, groupId: number) {
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
@@ -92,7 +93,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     const gameId = req.nextUrl.searchParams.get('gameId')
     const source = readSource(req.nextUrl.searchParams.get('source'))
-    if (!gameId) {
+    if (dbId(gameId) === null) {
       return NextResponse.json({ message: 'Falta gameId' }, { status: 400 })
     }
     if (!source) {
@@ -114,7 +115,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
@@ -148,7 +149,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {

@@ -10,6 +10,7 @@ import { psnReleaseYear, psnTitles } from '@/lib/psnClient'
 import { igdbArt, igdbXboxArt } from '@/lib/igdbClient'
 import { xboxLibrary } from '@/lib/xboxClient'
 import { withXboxTelemetry } from '@/lib/xboxTelemetry'
+import { dbId } from '@/utils/dbId'
 import { canUseXbox } from '@/utils/xboxAccess'
 import type { XboxGameProgress } from '@/types/xbox'
 import type { PsnGameProgress } from '@/types/psn'
@@ -34,7 +35,7 @@ type Row = { id: number; source: GameSource; game_id: number }
 async function post(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
     if (!Number.isInteger(groupId)) return NextResponse.json({ message: 'Grupo no válido' }, { status: 400 })

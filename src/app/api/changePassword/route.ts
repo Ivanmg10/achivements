@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { currentPassword, newPassword } = (await req.json()) as { currentPassword?: unknown; newPassword?: unknown }
+    const { currentPassword, newPassword } = (await req.json().catch(() => ({}))) as { currentPassword?: unknown; newPassword?: unknown }
 
     if (!currentPassword || !newPassword) {
       return NextResponse.json({ error: 'missing-fields' }, { status: 400 })

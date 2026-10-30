@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
 import { checkCurrentPassword } from '@/lib/currentPassword'
+import { clearUserCache } from '@/lib/steamCache'
 import { forgetUser, loadUser } from '@/lib/userRecord'
 
 /**
@@ -35,6 +36,7 @@ export async function DELETE(req: Request) {
       if (!rows[0]?.n) return NextResponse.json({ error: 'last-admin' }, { status: 409 })
     }
 
+    await clearUserCache(userId)
     await pool.query('DELETE FROM users WHERE id = $1', [userId])
     forgetUser(userId)
 

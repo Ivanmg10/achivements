@@ -21,18 +21,24 @@ test('GET lists the user’s hidden games, newest first', async () => {
   const res = await GET()
   expect(status(res)).toBe(200)
   expect((res as unknown as { data: unknown[] }).data).toHaveLength(1)
-  expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['7'])
+  expect((pool.query as jest.Mock).mock.calls.at(-1)![1]).toEqual(['7'])
+})
+
+test('POST stops at the cap, so one account cannot fill the table', async () => {
+  ;(pool.query as jest.Mock).mockResolvedValueOnce({ rows: [{ n: 5000 }] })
+  const res = await POST(post({ source: 'steam', gameId: 620, title: 'Portal 2' }))
+  expect(res.status).toBe(409)
 })
 
 test('POST hides a game, keeping its title and image', async () => {
   const res = await POST(post({ source: 'steam', gameId: 620, title: ' Portal 2 ', image: 'https://cdn/x.jpg' }))
   expect(status(res)).toBe(200)
-  expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['7', 'steam', 620, 'Portal 2', 'https://cdn/x.jpg'])
+  expect((pool.query as jest.Mock).mock.calls.at(-1)![1]).toEqual(['7', 'steam', 620, 'Portal 2', 'https://cdn/x.jpg'])
 })
 
 test('POST drops an image that is not https or a site path', async () => {
   await POST(post({ source: 'ra', gameId: 5, title: 'Zelda', image: 'javascript:alert(1)' }))
-  expect((pool.query as jest.Mock).mock.calls[0][1][4]).toBeNull()
+  expect((pool.query as jest.Mock).mock.calls.at(-1)![1][4]).toBeNull()
 })
 
 test('POST refuses a bad source, id or title', async () => {
@@ -45,7 +51,7 @@ test('POST refuses a bad source, id or title', async () => {
 
 test('DELETE shows a game again, only for this user', async () => {
   expect(status(await DELETE(del('source=ra&gameId=5')))).toBe(200)
-  expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['7', 'ra', 5])
+  expect((pool.query as jest.Mock).mock.calls.at(-1)![1]).toEqual(['7', 'ra', 5])
   expect(status(await DELETE(del('source=ra')))).toBe(400)
   expect(status(await DELETE(del('source=xx&gameId=5')))).toBe(400)
 })
@@ -73,6 +79,6 @@ describe('Xbox is admin-only', () => {
   test('an admin can', async () => {
     ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '7', admin: true } })
     expect(status(await POST(post({ source: 'xbox', gameId: 1738914043, title: 'Halo' })))).toBe(200)
-    expect((pool.query as jest.Mock).mock.calls[0][1]).toEqual(['7', 'xbox', 1738914043, 'Halo', null])
+    expect((pool.query as jest.Mock).mock.calls.at(-1)![1]).toEqual(['7', 'xbox', 1738914043, 'Halo', null])
   })
 })

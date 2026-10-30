@@ -6,6 +6,9 @@ import pool from '@/lib/db'
 import { gameKey, parseGameKey } from '@/utils/gameRef'
 import { canUseXbox, sourceAllowed } from '@/utils/xboxAccess'
 
+/** More than any library's perfect games; a cap so one request cannot hold a connection. */
+const ORDER_MAX = 5000
+
 export async function GET(req?: Request) {
   try {
     const owner = await dataOwner(req)
@@ -33,10 +36,10 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
     }
 
-    const { order } = await req.json() as { order: unknown }
+    const { order } = (await req.json().catch(() => ({}))) as { order?: unknown }
     // Keys name the platform ("ra:123", "steam:620"); a bare number is an RA id,
     // as the order was stored before Steam games joined the list.
-    const refs = Array.isArray(order)
+    const refs = Array.isArray(order) && order.length <= ORDER_MAX
       ? order.map((entry) => (typeof entry === 'number' ? parseGameKey(gameKey('ra', entry)) : parseGameKey(String(entry))))
       : null
     if (!refs || refs.some((ref) => ref === null)) {
@@ -47,25 +50,15 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
-    const client = await pool.connect()
-    try {
-      await client.query('BEGIN')
-      for (let i = 0; i < refs.length; i++) {
-        const { source, id } = refs[i]!
-        await client.query(
-          `INSERT INTO perfect_games_order (user_id, source, game_id, position)
-           VALUES ($1, $2, $3, $4)
-           ON CONFLICT (user_id, source, game_id) DO UPDATE SET position = EXCLUDED.position, updated_at = NOW()`,
-          [session.user.id, source, id, i],
-        )
-      }
-      await client.query('COMMIT')
-    } catch (e) {
-      await client.query('ROLLBACK')
-      throw e
-    } finally {
-      client.release()
-    }
+    // One statement: every game gets its index in the array, or none does. Keyed, as a game named twice would stop it.
+    const games = [...new Map(refs.map((ref) => [gameKey(ref!.source, ref!.id), ref!])).values()]
+    await pool.query(
+      `INSERT INTO perfect_games_order (user_id, source, game_id, position)
+       SELECT $1, o.source, o.game_id, o.position - 1
+       FROM unnest($2::text[], $3::int[]) WITH ORDINALITY AS o(source, game_id, position)
+       ON CONFLICT (user_id, source, game_id) DO UPDATE SET position = EXCLUDED.position, updated_at = NOW()`,
+      [session.user.id, games.map((g) => g.source), games.map((g) => g.id)],
+    )
 
     return NextResponse.json({ ok: true })
   } catch (err) {
