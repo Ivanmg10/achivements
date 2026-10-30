@@ -93,6 +93,20 @@ test.each([
   expect(global.fetch).not.toHaveBeenCalled()
 })
 
+test.each(['openid.claimed_id', 'openid.identity', 'openid.return_to', 'openid.sig', 'openid.ns'])(
+  'an answer with %s twice is refused without asking Steam, in either order',
+  async (name) => {
+    steamSays('is_valid:true')
+    const other = `https://steamcommunity.com/openid/id/76561197960287931`
+    const after = answer()
+    after.append(name, other)
+    const before = new URLSearchParams([[name, other], ...answer()])
+    expect(await verifySteamLogin(after, BASE)).toBeNull()
+    expect(await verifySteamLogin(before, BASE)).toBeNull()
+    expect(global.fetch).not.toHaveBeenCalled()
+  },
+)
+
 test('Steam not answering throws, so the callback can say "try later"', async () => {
   steamSays('', false)
   await expect(verifySteamLogin(answer(), BASE)).rejects.toThrow()
