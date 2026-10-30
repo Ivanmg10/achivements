@@ -793,7 +793,7 @@ pending**: the shared loader, its timeout and stale policy, and whether one aggr
 
 # Fix status
 
-Added on the development branch `fix/audit-v17-findings`, 2026-10-30. Everything above describes the audited
+Added on the development branch `fix/96-audit-v17-findings`, 2026-10-30. Everything above describes the audited
 commit and is left as it was written. Results use the same local method as the audit, not production.
 
 | ID | Status | Result or what is left |

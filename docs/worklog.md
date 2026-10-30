@@ -29,7 +29,7 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
-## 2026-10-30 — Fixes from the v1.7 audit (`fix/audit-v17-findings`, from #90)
+## 2026-10-30 — Fixes from the v1.7 audit (`fix/96-audit-v17-findings`, from #90)
 
 **Did** — Fixed what the audit found that needed no decision: Steam's sign-in answer refused when a
 parameter repeats, image proxy, private-profile leaks, attempt limits, write caps, cross-site writes,
