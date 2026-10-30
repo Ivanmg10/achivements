@@ -1,4 +1,8 @@
-import { emailConfigured, emailSender, sendEmail } from './email'
+import { emailConfigured, emailSender, escapeHtml, sendEmail } from './email'
+
+test('a value put in a message stays text', () => {
+  expect(escapeHtml('<b a="1">\'&')).toBe('&#60;b a=&#34;1&#34;&#62;&#39;&#38;')
+})
 
 const message = { to: 'a@b.c', subject: 'Hi', html: '<p>Hi</p>', text: 'Hi' }
 

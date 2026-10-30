@@ -7,6 +7,7 @@ import { onPlatformLinked } from '@/lib/scoreRefresh'
 import { forgetUser } from '@/lib/userRecord'
 import {
   cookieFromHeader,
+  expiredStateCookie,
   linkReturn,
   returnParams,
   siteBase,
@@ -79,13 +80,17 @@ export async function GET(req: NextRequest) {
   const state = cookieFromHeader(req.headers.get('cookie'), STEAM_STATE_COOKIE)
   if (!steamid || !state || back.get('state') !== state) return fail('failed')
 
+  const secure = base.startsWith('https:')
   if (linking) {
     const auth = await requireSession()
     if (!auth.ok) return NextResponse.redirect(`${base}/authPage`)
-    return NextResponse.redirect(`${base}${next}#steam-${await linkSteam(auth.id, steamid)}`)
+    const res = NextResponse.redirect(`${base}${next}#steam-${await linkSteam(auth.id, steamid)}`)
+    res.headers.append('Set-Cookie', expiredStateCookie(secure))
+    return res
   }
 
-  return NextResponse.redirect(`${base}/authPage?steam=1`, {
-    headers: { 'Set-Cookie': ticketCookie(signTicket(steamid), base.startsWith('https:')) },
-  })
+  const res = NextResponse.redirect(`${base}/authPage?steam=1`)
+  res.headers.append('Set-Cookie', ticketCookie(signTicket(steamid), secure))
+  res.headers.append('Set-Cookie', expiredStateCookie(secure))
+  return res
 }

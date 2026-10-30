@@ -23,16 +23,19 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const session = await getServerSession(authOptions)
 
     const groupRes = await pool.query(
-      `SELECT g.id, g.title, g.description, g.icon, g.is_public, g.position, g.user_id, g.created_at, g.updated_at
-       FROM game_groups g WHERE g.id = $1`,
+      `SELECT g.id, g.title, g.description, g.icon, g.is_public, g.position, g.user_id, g.created_at, g.updated_at,
+              u.profile_public AS owner_public
+       FROM game_groups g JOIN users u ON u.id = g.user_id WHERE g.id = $1`,
       [groupId],
     )
     if (!groupRes.rows.length) {
       return NextResponse.json({ message: 'No encontrado' }, { status: 404 })
     }
 
-    const group = groupRes.rows[0]
-    if (!group.is_public && String(session?.user?.id) !== String(group.user_id)) {
+    const { user_id, owner_public, ...group } = groupRes.rows[0]
+    // A public group is for signed-in users, and only while its owner's profile is public.
+    const visible = session?.user?.id && group.is_public && owner_public
+    if (!visible && String(session?.user?.id) !== String(user_id)) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
     }
 

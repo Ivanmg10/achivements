@@ -41,6 +41,11 @@ describe('GET', () => {
     expect(res.status).toBe(401)
   })
 
+  test('Xbox rows reach nobody who may not see Xbox', async () => {
+    ;(pool.query as jest.Mock).mockResolvedValue({ rows: [{ source: 'xbox', game_id: 1 }, { source: 'ra', game_id: 2 }] })
+    expect((await GET()).data).toEqual([{ source: 'ra', game_id: 2 }])
+  })
+
   test('returns saved order rows', async () => {
     ;(pool.query as jest.Mock).mockResolvedValue({ rows: [{ game_id: 1, position: 0 }] })
     const res = await GET()

@@ -19,6 +19,11 @@ export function emailSender(): string {
   return process.env.EMAIL_FROM || SHARED_SENDER
 }
 
+/** A value for a message's HTML: whatever it holds, it stays text. */
+export function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)
+}
+
 export type SendResult = 'sent' | 'not-configured' | 'failed'
 
 export function emailConfigured(): boolean {

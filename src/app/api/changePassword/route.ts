@@ -4,6 +4,7 @@ import pool from '@/lib/db'
 import bcrypt from 'bcrypt'
 import { authOptions } from '@/lib/authOptions'
 import { checkCurrentPassword } from '@/lib/currentPassword'
+import { retireResetTokens } from '@/lib/passwordReset'
 import { forgetUser } from '@/lib/userRecord'
 import { BCRYPT_COST, PASSWORD_MIN } from '@/utils/authValidation'
 
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
 
     const hashed = await bcrypt.hash(newPassword, BCRYPT_COST)
     await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, session.user.id])
+    await retireResetTokens(session.user.id)
     forgetUser(session.user.id)
 
     return NextResponse.json({ ok: true })

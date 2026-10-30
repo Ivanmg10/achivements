@@ -2,7 +2,7 @@ import { NextRequest, NextResponse, after } from "next/server";
 import pool from "@/lib/db";
 import bcrypt from "bcrypt";
 import { allowAttempt, clientAddress } from "@/lib/attemptLimit";
-import { BCRYPT_COST, PASSWORD_MIN } from "@/utils/authValidation";
+import { BCRYPT_COST, PASSWORD_MIN, isEmail } from "@/utils/authValidation";
 import { sendVerificationEmail } from "@/lib/verificationEmail";
 import { fetchRaProfile, raAvatarUrl, validRaCredentials } from "@/lib/raProfile";
 import { onPlatformLinked } from "@/lib/scoreRefresh";
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     // Required: it is the only way to recover an account later.
     const trimmedEmail = typeof email === "string" ? email.trim() : "";
-    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    if (!isEmail(trimmedEmail)) {
       return NextResponse.json({ error: "Correo no válido" }, { status: 400 });
     }
 

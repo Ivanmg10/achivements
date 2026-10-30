@@ -55,6 +55,11 @@ describe('signing in', () => {
     expect(cookie).toContain('Secure')
   })
 
+  test('the state is spent with the answer, so the same link cannot be used twice', async () => {
+    const res = await GET(callback(back))
+    expect(res.headers.get('Set-Cookie')).toContain('steam-state=; Path=/api/auth/steam/callback; HttpOnly; SameSite=Lax; Max-Age=0')
+  })
+
   test('an answer Steam does not confirm sets no cookie', async () => {
     verify.mockResolvedValue(null)
     const res = await GET(callback(back))

@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/authOptions'
 import { dataOwner } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { gameKey, parseGameKey } from '@/utils/gameRef'
-import { sourceAllowed } from '@/utils/xboxAccess'
+import { canUseXbox, sourceAllowed } from '@/utils/xboxAccess'
 
 export async function GET(req?: Request) {
   try {
@@ -17,7 +17,9 @@ export async function GET(req?: Request) {
       'SELECT source, game_id, position FROM perfect_games_order WHERE user_id = $1 ORDER BY position ASC',
       [owner.id],
     )
-    return NextResponse.json(result.rows)
+    // Xbox is admin-only for now: to anyone else it is not there at all (see canUseXbox).
+    const xbox = canUseXbox((await getServerSession(authOptions))?.user?.admin)
+    return NextResponse.json(xbox ? result.rows : result.rows.filter((r: { source: string }) => r.source !== 'xbox'))
   } catch (err) {
     console.error('[perfectGamesOrder GET]', err)
     return NextResponse.json({ message: 'Error interno' }, { status: 500 })

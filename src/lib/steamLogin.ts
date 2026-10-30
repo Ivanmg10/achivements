@@ -92,6 +92,16 @@ export function ticketCookie(ticket: string, secure: boolean): string {
   return `${STEAM_TICKET_COOKIE}=${encodeURIComponent(ticket)}; Path=/api/auth; HttpOnly; SameSite=Lax; Max-Age=${TICKET_TTL_MS / 1000}${secure ? '; Secure' : ''}`
 }
 
+/** Set-Cookie that ends a ticket once it has been used. */
+export function expiredTicketCookie(secure: boolean): string {
+  return `${STEAM_TICKET_COOKIE}=; Path=/api/auth; HttpOnly; SameSite=Lax; Max-Age=0${secure ? '; Secure' : ''}`
+}
+
+/** Set-Cookie that ends a `state` once the callback has spent it. */
+export function expiredStateCookie(secure: boolean): string {
+  return `${STEAM_STATE_COOKIE}=; Path=${CALLBACK_PATH}; HttpOnly; SameSite=Lax; Max-Age=0${secure ? '; Secure' : ''}`
+}
+
 /**
  * Set-Cookie for the random `state` a trip to Steam starts with. The callback
  * only acts when the signed `return_to` carries the same value, so a callback

@@ -5,7 +5,7 @@ import pool from '@/lib/db'
 import { allowAttempt, clientAddress } from '@/lib/attemptLimit'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { getPlayerSummaries } from '@/lib/steamClient'
-import { readTicket, ticketFromCookieHeader, usernameFromPersona } from '@/lib/steamLogin'
+import { expiredTicketCookie, readTicket, siteBase, ticketFromCookieHeader, usernameFromPersona } from '@/lib/steamLogin'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
 import { sendVerificationEmail } from '@/lib/verificationEmail'
 import { BCRYPT_COST, checkEmail, checkUsername } from '@/utils/authValidation'
@@ -52,6 +52,12 @@ export async function GET(req: NextRequest) {
     console.error('[auth/steam/register GET]', err)
     return NextResponse.json({ error: 'failed' }, { status: 502 })
   }
+}
+
+/** The sign-in is done: the ticket must not outlive it, or a shared computer could use it again. */
+export function DELETE(req: NextRequest) {
+  const secure = siteBase(req.nextUrl.origin).startsWith('https:')
+  return NextResponse.json({ ok: true }, { headers: { 'Set-Cookie': expiredTicketCookie(secure) } })
 }
 
 /**
