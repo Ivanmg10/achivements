@@ -1,6 +1,8 @@
 import pool from '@/lib/db'
 import { open, seal } from '@/lib/secretBox'
 
+const TIMEOUT_MS = 8_000
+
 /**
  * The app's PSN credentials (migrations/026_psn_credentials.sql): the NPSSO
  * an admin pasted, and the tokens made from it. Secrets are sealed with
@@ -94,7 +96,7 @@ export async function markPsnWarned(): Promise<void> {
  */
 export async function npssoExpiry(npsso: string): Promise<number | null> {
   try {
-    const res = await fetch(SSO_COOKIE_URL, { headers: { Cookie: `npsso=${npsso}` }, cache: 'no-store' })
+    const res = await fetch(SSO_COOKIE_URL, { headers: { Cookie: `npsso=${npsso}` }, cache: 'no-store', signal: AbortSignal.timeout(TIMEOUT_MS) })
     if (!res.ok) return null
     const body = (await res.json()) as { npsso?: string; expires_in?: number }
     if (body.npsso !== npsso || typeof body.expires_in !== 'number') return null

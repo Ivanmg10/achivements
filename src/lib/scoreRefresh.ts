@@ -6,6 +6,7 @@ import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raC
 import { getOwnedGames } from '@/lib/steamClient'
 import { readCache, withSteamCache, writeCache } from '@/lib/steamCache'
 import { fetchPlayerAchievements, isNoStats, loadGlobalPct } from '@/lib/steamProgress'
+import { steamBudgetLow } from '@/lib/upstreamCount'
 import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
 import { XboxError, xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
 import { runWithXboxTelemetry } from '@/lib/xboxTelemetry'
@@ -336,6 +337,8 @@ async function refreshSource(
       if (pace.gapMs) await sleep(pace.gapMs)
     }
   }
+  // One key serves everyone: near its daily cap, fills wait so that browsing keeps working.
+  if (plan.source === 'steam' && (await steamBudgetLow())) stopped = 'busy'
   await Promise.all(Array.from({ length: Math.min(pace.concurrency, Math.max(1, todo.length)) }, worker))
 
   const writes: Write[] = [...read.values()]

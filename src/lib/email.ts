@@ -11,6 +11,7 @@
  * message went out. See README.md → Email.
  */
 const RESEND_ENDPOINT = 'https://api.resend.com/emails'
+const TIMEOUT_MS = 8_000
 
 /** Resend's shared sender. Delivers only to the account owner, but needs no domain. */
 const SHARED_SENDER = 'CheevoVault <onboarding@resend.dev>'
@@ -51,6 +52,7 @@ export async function sendEmail({
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ from: emailSender(), to: [to], subject, html, text }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     })
 
     if (!res.ok) {
