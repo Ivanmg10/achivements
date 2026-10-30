@@ -29,15 +29,20 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
-## 2026-10-30 — Stricter reading of Steam's sign-in answer (`fix/steam-openid-strict`)
+## 2026-10-30 — Fixes from the v1.7 audit (`fix/audit-v17-findings`, from #90)
 
-**Did** — `verifySteamLogin` refuses an answer with a repeated parameter before reading it or asking
-Steam, with tests. Added the rule to CLAUDE.md.
-**Why** — Hardening from the security audit of #90 (its hypothesis H-01). Steam's own behaviour was not
-tested, on purpose, so this does not say a bypass existed.
-**Decisions** — Fixed in `verifySteamLogin`, the one function sign-in and linking both go through. Branch
-cut from `chore/90-security-audit`, by the user's choice: its diff against `develop` includes the report.
-**Open** — No issue or PR yet: a PR needs its own issue, and must not name #90, which stays open.
+**Did** — Fixed what the audit found that needed no decision: Steam's sign-in answer refused when a
+parameter repeats, image proxy, private-profile leaks, attempt limits, write caps, cross-site writes,
+platform deadlines and budgets, landing and sign-in first paint, languages in chunks, `next` 16.4.2.
+`docs/audits/perf-security-apilimits-v17.md` → Fix status lists each finding.
+**Why** — The user asked to fix everything the report found, in a development branch based on #90's.
+**Decisions** — `next` 16.4.2, not the newest, as 16.4.3 is under two weeks old. Steam stays reachable
+with "forgot password" after an unlink. Two token-style counters would need a migration, so streak
+orderings got a cache and Steam's count lives in `steam_cache`.
+**Open** — See Fix status: SEC-01's password step, SEC-07 and SEC-08 wait for the user; Vercel and GitHub
+settings are theirs. No issue or PR yet: a PR needs its own issue and must not name #90, which stays open.
+**Watch out** — Nothing here ran on Vercel, and platforms were mocked. The first cold streak ordering took
+about 23 s at 600,000 rows. Unlinking Steam now ends sign-in with it.
 
 ---
 

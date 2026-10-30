@@ -788,3 +788,48 @@ No call reached a real platform, so all limits come from documentation or earlie
 Sony's limits and production call volumes were not measured, and OpenXBL's current plans could not be confirmed online.
 Xbox relies on #87's work, which was not repeated. PSN and Xbox failures were read in code, not run. **Post-BFF validation is
 pending**: the shared loader, its timeout and stale policy, and whether one aggregate multiplies upstream calls.
+
+---
+
+# Fix status
+
+Added on the development branch `fix/audit-v17-findings`, 2026-10-30. Everything above describes the audited
+commit and is left as it was written. Results use the same local method as the audit, not production.
+
+| ID | Status | Result or what is left |
+|---|---|---|
+| H-01 | Fixed | Repeated parameters are refused. Whether Steam was affected stays unknown. |
+| SEC-01 | **Partly** | Unlink ends the sign-in and link/unlink mail the owner. Asking for the password before linking needs a decision (UI, welcome flow). |
+| SEC-02 | Fixed | Raster types only. |
+| SEC-03 | Fixed | Attempts counted before the work. |
+| SEC-04 | Fixed | Groups and avatars follow the owner's privacy; `user_id` left the response. |
+| SEC-05 | Fixed for now | Per-viewer limit and a 10-game cap on a borrowed key. RA's answer is still pending. |
+| SEC-06 | Fixed | Length and row caps, single-statement order saves. Database `CHECK`s not added. |
+| SEC-07 | **Open** | Needs a migration and a backfill on real databases, and depends on H-03. |
+| SEC-08 | **Open** | Needs a decision on the second factor. |
+| SEC-09 | Partly | Proxy and `appid` bounded, streak orderings cached. Per-address limits are Vercel WAF settings. |
+| SEC-10 | Partly | `next` 16.4.2: no critical left, production advisories no longer reported for `next`. Dependabot is a repository setting. |
+| SEC-11 | Partly | COOP added. Inline scripts remain: nonces would cost the static pages. |
+| SEC-12 | Fixed | Cross-site writes refused in the proxy. |
+| SEC-13 | Fixed | Mail values escaped, address shape tightened. |
+| SEC-14 | Fixed | Unused tokens retired on email and password change. |
+| SEC-15 | Fixed | Cookies end after use. |
+| SEC-16 | Fixed | Both reads filter Xbox. |
+| SEC-17 | Accepted | Kept: a neutral sign-up would change the flow for a low-rate leak. |
+| SEC-18 | Partly | 14-day sessions, RA key out of the token. "Sign out everywhere" needs a migration. |
+| SEC-19 | Fixed | Bad ids and bodies answer 4xx. |
+| SEC-20 | Fixed | Logged. |
+| SEC-21 | Partly | RA rows cleared on unlink and deletion. Xbox's 30 days remain, for stale-if-error. |
+| PERF-01 | Fixed | LCP 12.8 s → 1.4 s. |
+| PERF-02 | Fixed | 190 KB less on every route; home 628 → 438 KB, minimum 437 → 246 KB. |
+| PERF-03 | Partly | 12.2 s → 15 ms warm. A cold read still took about 23 s at 600,000 rows; columns need a migration. |
+| PERF-04 | Fixed | FCP 4.3 s → 1.7 s. Desktop LCP is still about 6 s, on a collage image. |
+| PERF-05 | **Open** | Dropping weights changes the look: needs checking by eye. |
+| PERF-06 | **Open** | Needs a real account. |
+| PERF-07 | **Open** | Needs a real large library. |
+| API-01 | Fixed | One budget for every Sony call, deadline and cooldown. The 900/15 min figure is a guess until measured. |
+| API-02 | Fixed | 429 with `Retry-After`. |
+| API-03 | Fixed | Deadlines under the client's. |
+| API-04 | Fixed | Pace per key, per instance. 100 uncached games now take about 25 s. |
+| API-05 | Partly | Daily count and a brake for fills. Separate keys per environment are Vercel settings. |
+| API-06 | Partly | RA, Steam and PSN counted per day. Steam warns in the logs; there is no admin view yet. |
