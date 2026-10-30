@@ -39,8 +39,10 @@ platform deadlines and budgets, landing and sign-in first paint, languages in ch
 **Decisions** — `next` 16.4.2, not the newest, as 16.4.3 is under two weeks old. Steam stays reachable
 with "forgot password" after an unlink. Two token-style counters would need a migration, so streak
 orderings got a cache and Steam's count lives in `steam_cache`.
-**Open** — See Fix status: SEC-01's password step, SEC-07 and SEC-08 wait for the user; Vercel and GitHub
-settings are theirs. No issue or PR yet: a PR needs its own issue and must not name #90, which stays open.
+Linking Steam stays without a password, by the user's choice (2026-10-31). Admin TOTP needs no new
+dependency and has no QR: a key to type and a link for the app on the same device.
+**Open** — See Fix status. `migrations/043` and `044` go to pre before this runs there, and to production
+with the release. Vercel WAF rules are the user's.
 **Watch out** — Nothing here ran on Vercel, and platforms were mocked. The first cold streak ordering took
 about 23 s at 600,000 rows. Unlinking Steam now ends sign-in with it.
 

@@ -799,14 +799,14 @@ commit and is left as it was written. Results use the same local method as the a
 | ID | Status | Result or what is left |
 |---|---|---|
 | H-01 | Fixed | Repeated parameters are refused. Whether Steam was affected stays unknown. |
-| SEC-01 | **Partly** | Unlink ends the sign-in and link/unlink mail the owner. Asking for the password before linking needs a decision (UI, welcome flow). |
+| SEC-01 | Accepted in part | Unlink ends the sign-in and link/unlink mail the owner. No password before linking: the owner's choice, for the most comfortable flow. |
 | SEC-02 | Fixed | Raster types only. |
 | SEC-03 | Fixed | Attempts counted before the work. |
 | SEC-04 | Fixed | Groups and avatars follow the owner's privacy; `user_id` left the response. |
 | SEC-05 | Fixed for now | Per-viewer limit and a 10-game cap on a borrowed key. RA's answer is still pending. |
 | SEC-06 | Fixed | Length and row caps, single-statement order saves. Database `CHECK`s not added. |
-| SEC-07 | **Open** | Needs a migration and a backfill on real databases, and depends on H-03. |
-| SEC-08 | **Open** | Needs a decision on the second factor. |
+| SEC-07 | Fixed | Keys sealed at rest with a keyed hash for uniqueness (`migrations/043`). Older keys stay as they are until linked again. |
+| SEC-08 | Fixed | TOTP at unlock, enrolment on the next unlock, recovery codes (`migrations/044`). |
 | SEC-09 | Partly | Proxy and `appid` bounded, streak orderings cached. Per-address limits are Vercel WAF settings. |
 | SEC-10 | Partly | `next` 16.4.2: no critical left, production advisories no longer reported for `next`. Dependabot is a repository setting. |
 | SEC-11 | Partly | COOP added. Inline scripts remain: nonces would cost the static pages. |

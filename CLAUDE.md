@@ -523,7 +523,10 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
 `requireAdmin(req)`.
 
 - **Two locks.** The admin flag is read fresh from the DB, and the panel must be
-  **unlocked with the admin's own password** (`POST /api/admin/unlock`). The
+  **unlocked with the admin's own password and a one-time code** (`POST /api/admin/unlock`,
+  `src/lib/adminTotp.ts`, `migrations/044_admin_totp.sql`; without that table the unlock answers 500).
+  An admin with no authenticator enrols on their next unlock, after the password. Recovery codes are
+  shown once and stored hashed. Lost both: `DELETE FROM admin_totp WHERE user_id = <id>`. The
   unlock is a signed, httpOnly cookie scoped to `/api/admin`, valid 15 minutes,
   bound to the admin and to their password hash (a password change ends it).
   Without it the endpoints answer `403 reauth-required` and the panel shows the
@@ -551,6 +554,10 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   shape of what it returns changes.
 - **A 429 waits.** `fetchRA` honours `Retry-After` up to `MAX_RETRY_AFTER`
   (5 s) and retries; a longer ask is thrown. Other 4xx are never retried.
+- **Keys are sealed at rest** (`src/lib/raKey.ts`, `migrations/043_ra_key_sealed.sql`; without it linking
+  answers 500, reads still work). `users.raid` is read through `readRaKey`, never directly: a key from
+  before sealing reads as it is, until it is linked again. `raid_hash` keeps one key to one account.
+  Changing `NEXTAUTH_SECRET` makes every key unreadable and everyone links RA again.
 - **Whose key.** Never a shared app key (see the roadmap). On the user's own
   page the call uses their `raid`; `requireViewerApiKey` never falls back to
   another key. On someone else's page `dataOwner` (`src/lib/apiAuth.ts`) signs
@@ -1042,8 +1049,9 @@ reads that column, so the rest of the app works without it.
   by the user's choice; `steamid` stays not unique for them. **Unlinking clears both** (changed
   2026-10-30, audit SEC-01): a sign-in nobody can remove outlives a password change. Someone who
   signed up through Steam gets back in with "forgot password". Link and unlink mail the account's
-  address (`sendSteamLinkNotice`). Linking still asks for no password: decision pending. Admins
-  still link by typing (logged).
+  address (`sendSteamLinkNotice`). Linking asks for no password, by the user's choice (2026-10-31,
+  the most comfortable flow, here and in the welcome): the mail and the unlink are what answer a
+  link nobody asked for. Admins still link by typing (logged).
 
 ## Git — branches, commits, PRs (MANDATORY for every session and agent)
 
