@@ -49,15 +49,50 @@ describe('GET', () => {
     expect(res.headers.get('Cache-Control')).toContain('max-age')
   })
 
-  it('refuses what is not an image, and a redirect off the list', async () => {
-    jest.spyOn(global, 'fetch').mockResolvedValueOnce(
-      fake('<html>', 'text/html', 'https://media.retroachievements.org/a'),
-    )
+  it.each(['text/html', 'image/svg+xml', 'image/svg+xml; charset=utf-8', 'IMAGE/SVG+XML'])('refuses %s', async (type) => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(fake('<svg/>', type, 'https://media.retroachievements.org/a'))
     expect((await GET(req('https://media.retroachievements.org/a'))).status).toBe(415)
-    jest.spyOn(global, 'fetch').mockResolvedValueOnce(
-      fake(new Uint8Array([1]), 'image/png', 'https://evil.com/a.png'),
-    )
+  })
+
+  it('takes the icons Steam serves', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(fake(new Uint8Array([0, 0, 1, 0]), 'image/x-icon', 'https://cdn.akamai.steamstatic.com/a.ico'))
+    expect((await GET(req('https://cdn.akamai.steamstatic.com/a.ico'))).status).toBe(200)
+  })
+
+  const redirect = (location: string) => new Response(null, { status: 302, headers: { location } })
+
+  it('checks every hop of a redirect and never requests one off the list', async () => {
+    const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(redirect('https://evil.com/a.png'))
     expect((await GET(req('https://media.retroachievements.org/b.png'))).status).toBe(400)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('follows a redirect that stays on the list', async () => {
+    const fetchMock = jest.spyOn(global, 'fetch')
+      .mockResolvedValueOnce(redirect('https://cdn.akamai.steamstatic.com/a.png'))
+      .mockResolvedValueOnce(fake(new Uint8Array([1]), 'image/png', 'https://cdn.akamai.steamstatic.com/a.png'))
+    expect((await GET(req('https://media.retroachievements.org/b.png'))).status).toBe(200)
+    expect(String(fetchMock.mock.calls[1][0])).toContain('cdn.akamai.steamstatic.com')
+  })
+
+  it('gives up on a redirect loop', async () => {
+    const fetchMock = jest.spyOn(global, 'fetch').mockImplementation(async () => redirect('https://media.retroachievements.org/a.png'))
+    expect((await GET(req('https://media.retroachievements.org/a.png'))).status).toBe(400)
+    expect(fetchMock).toHaveBeenCalledTimes(4)
+  })
+
+  it('stops reading an image past the limit, whatever it declares', async () => {
+    const big = new Uint8Array(1024 * 1024)
+    let sent = 0
+    const body = new ReadableStream({ pull(c) { sent++; c.enqueue(big) } })
+    jest.spyOn(global, 'fetch').mockResolvedValue(new Response(body, { headers: { 'content-type': 'image/png' } }))
+    expect((await GET(req('https://media.retroachievements.org/a.png'))).status).toBe(413)
+    expect(sent).toBeLessThan(6)
+  })
+
+  it('refuses an image that declares it is too large without reading it', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(new Response('x', { headers: { 'content-type': 'image/png', 'content-length': String(4 * 1024 * 1024) } }))
+    expect((await GET(req('https://media.retroachievements.org/a.png'))).status).toBe(413)
   })
 
   it('says when the host fails', async () => {
