@@ -15,6 +15,7 @@ import { isConsoleShown } from '@/utils/consoleFilter'
 import { RULES_VERSION, looksUnlockedByTool, provisionalScore, scoreGame, stackFactors, stackKey, type GameScore, type ScoreUnlock } from '@/utils/vaultScore'
 import { hiddenConsolesFrom, psnGradeShare, psnScoreInputs, raScoreInputs, steamScoreInputs, xboxScoreInputs } from '@/utils/vaultScoreInputs'
 import { monthStart, weekStart } from '@/utils/vaultLevel'
+import { psnBaseCompletedAt, raAwardCompletedAt } from '@/utils/completionDates'
 
 /**
  * Keeps a user's Vault Points up to date (docs/rankings-plan.md). Each
@@ -148,9 +149,11 @@ function raPlan(username: string, apiKey: string): Plan {
             const data = (await getGameInfoAndUserProgress(username, apiKey, g.GameID)) as {
               Achievements?: Parameters<typeof raScoreInputs>[0]
               NumDistinctPlayers?: number
+              HighestAwardKind?: string | null
+              HighestAwardDate?: string | null
             } | null
             const players = data?.NumDistinctPlayers ?? 0
-            return { score: scoreGame(raScoreInputs(data?.Achievements ?? {}, players), players), suspect: false }
+            return { score: scoreGame(raScoreInputs(data?.Achievements ?? {}, players), players, data ? raAwardCompletedAt(data) : null), suspect: false }
           },
         }))
     },
@@ -204,7 +207,10 @@ function psnPlan(userId: number, accountId: string): Plan {
           changeKey: g.lastTrophyAt ?? '',
           provisional: provisionalScore(psnGradeShare(g.earned, g.defined), sum(g.earned), sum(g.defined), sum(g.earned) >= sum(g.defined)),
           // Cached by the date of the last trophy, so a moved game is always read anew.
-          read: async () => ({ score: scoreGame(psnScoreInputs(await psnGameTrophies(accountId, g, String(userId)))), suspect: false }),
+          read: async () => {
+            const trophies = await psnGameTrophies(accountId, g, String(userId))
+            return { score: scoreGame(psnScoreInputs(trophies), undefined, psnBaseCompletedAt(trophies)), suspect: false }
+          },
         })),
   }
 }

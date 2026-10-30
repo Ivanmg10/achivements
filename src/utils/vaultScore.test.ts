@@ -36,15 +36,21 @@ describe('scoreGame', () => {
     expect(scoreGame([{ native: 10, rarity: 50, earned: false, earnedAt: null }])).toEqual({ points: 0, earned: 0, total: 1, completed: false, unlocks: [] })
   })
 
-  it('adds a fifth for a finished game, dated on its last unlock', () => {
+  it('adds a fifth for a finished game on the supplied base date, not the latest DLC unlock', () => {
     const list: ScoreAchievement[] = lin(5, 90, 10).map((r, i) => ({ native: 1, rarity: r, earned: true, earnedAt: `2026-10-0${i + 1}T12:00:00Z` }))
-    const done = scoreGame(list)
+    const done = scoreGame(list, undefined, '2021-05-10T12:00:00Z')
     const partial = scoreGame(list.map((a, i) => (i === 4 ? { ...a, earned: false, earnedAt: null } : a)))
     expect(done.completed).toBe(true)
     expect(partial.completed).toBe(false)
-    const last = done.unlocks[done.unlocks.length - 1]
-    expect(last[0]).toBe(Date.UTC(2026, 9, 5) / 1000)
+    expect(done.unlocks[0][0]).toBe(Date.UTC(2021, 4, 10) / 1000)
     expect(done.points).toBe(done.unlocks.reduce((s, [, p]) => s + p, 0))
+  })
+
+  it('keeps the completion bonus out of dated periods when the base date is unknown', () => {
+    const list = all(lin(5, 90, 10).map((r) => ({ w: 1, r })), '2026-10-05T12:00:00Z')
+    const done = scoreGame(list)
+    expect(done.unlocks[0][0]).toBe(0)
+    expect(done.unlocks.some(([time]) => time === Date.UTC(2026, 9, 5) / 1000)).toBe(true)
   })
 
   it('halves softcore unlocks and never counts them as finished', () => {

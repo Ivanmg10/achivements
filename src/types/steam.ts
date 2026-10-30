@@ -87,7 +87,7 @@ export type SteamPlayerAchievement = {
 export type SteamUnlockCounts = {
   total: number
   awarded: number
-  /** ISO date of the latest unlock — at 100%, the one that finished the game. */
+  /** ISO date of the latest unlock — activity only, not proof of base-game completion. */
   lastUnlock?: string | null
 }
 

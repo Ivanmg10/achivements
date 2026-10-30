@@ -68,7 +68,7 @@ describe('latestPerfects', () => {
     AwardedAt: date, AwardType: type, AwardData: id, AwardDataExtra: extra, Title: `Game ${id}`, ConsoleName: 'SNES', ImageIcon: `/Images/${id}.png`,
   })
 
-  test('newest first across both platforms, three by default', () => {
+  test('newest reliably dated completions first, three by default', () => {
     const steamGames = [
       steam(620, 'Portal 2', { lastPlayed: '2024-03-01T00:00:00Z' }),
     ]
@@ -76,7 +76,7 @@ describe('latestPerfects', () => {
       [award(1, '2024-01-01T00:00:00Z'), award(2, '2024-05-01T00:00:00Z'), award(3, '2024-02-01T00:00:00Z')],
       steamGames,
     )
-    expect(result.map((r) => r.key)).toEqual(['ra:2', 'steam:620', 'ra:3'])
+    expect(result.map((r) => r.key)).toEqual(['ra:2', 'ra:3', 'ra:1'])
   })
 
   test('only masteries and completions count, not beaten awards', () => {
@@ -97,15 +97,16 @@ describe('collection helpers', () => {
   })
   const games = buildPerfectGames([ra(1, 'A'), ra(2, 'B', { HardcoreMode: '0' }), ra(3, 'C')], [steam(620, 'Portal 2')])
 
-  test('perfectDates: RA from its latest award, Steam from its last session', () => {
+  test('perfectDates: RA from its latest award, Steam conservatively undated', () => {
     const dates = perfectDates([award(1, '2024-01-01T00:00:00Z'), award(1, '2025-03-01T00:00:00Z')], [steam(620, 'Portal 2', { lastPlayed: '2023-05-01T00:00:00Z' })])
     expect(dates.get('ra:1')).toBe('2025-03-01T00:00:00Z')
-    expect(dates.get('steam:620')).toBe('2023-05-01T00:00:00Z')
+    expect(dates.has('steam:620')).toBe(false)
   })
 
-  test('perfectDates: Steam prefers its last unlock over a later replay session', () => {
+  test('perfectDates: Steam activity never becomes a completion date', () => {
     const g = steam(620, 'Portal 2', { lastPlayed: '2025-05-01T00:00:00Z', lastUnlock: '2022-03-01T00:00:00Z' })
-    expect(perfectDates([], [g]).get('steam:620')).toBe('2022-03-01T00:00:00Z')
+    expect(perfectDates([], [g]).has('steam:620')).toBe(false)
+    expect(latestPerfects([], [g])).toEqual([])
   })
 
   test('groupPerfectsByYear: RA dates are UTC, so New Year does not shift the year', () => {
@@ -142,11 +143,11 @@ const psnGame = (id: number, pctWon: number, lastPlayed = '2024-01-02T00:00:00.0
   maxPossible: 10, numAwarded: Math.round(pctWon / 10), pctWon, lastPlayed,
   earned: { bronze: 1, silver: 0, gold: 0, platinum: pctWon >= 100 ? 1 : 0 },
   defined: { bronze: 9, silver: 0, gold: 0, platinum: 1 },
-  lastTrophyAt: lastPlayed, playtimeMinutes: null, playedAs: [], playCount: null, coverUrl: null, heroUrl: null,
+  lastTrophyAt: lastPlayed, completedAt: lastPlayed, playtimeMinutes: null, playedAs: [], playCount: null, coverUrl: null, heroUrl: null,
 })
 
 describe('PSN', () => {
-  test('a PSN game at 100% is perfect, dated by its last trophy', () => {
+  test('a PSN game at 100% is perfect, dated by its base completion', () => {
     const games = buildPerfectGames([], [], [psnGame(100, 100), psnGame(200, 50)])
     expect(games.map((g) => g.key)).toEqual(['psn:100'])
     expect(countPerfectGames(games)).toEqual({ hc: 0, sc: 0, steam: 0, psn: 1, xbox: 0 })
@@ -157,6 +158,13 @@ describe('PSN', () => {
   test('the latest perfects take PSN in date order', () => {
     const latest = latestPerfects([], [], 3, [psnGame(100, 100, '2024-01-01T00:00:00Z'), psnGame(200, 100, '2024-02-01T00:00:00Z')])
     expect(latest.map((g) => g.key)).toEqual(['psn:200', 'psn:100'])
+  })
+
+  test('newer DLC activity does not replace the base completion date', () => {
+    const game = psnGame(100, 100, '2026-03-01T00:00:00Z')
+    game.completedAt = '2021-05-10T10:00:00Z'
+    expect(perfectDates([], [], [game]).get('psn:100')).toBe('2021-05-10T10:00:00Z')
+    expect(latestPerfects([], [], 3, [game])[0].date).toBe('2021-05-10T10:00:00Z')
   })
 })
 
@@ -176,9 +184,9 @@ describe('Xbox', () => {
     expect(pg.countPerfectGames(games)).toEqual({ hc: 0, sc: 0, steam: 0, psn: 0, xbox: 1 })
   })
 
-  test('its last session stands in for the date it got to 100 %', () => {
-    expect(pg.perfectDates([], [], [], [done]).get('xbox:730')).toBe('2026-03-01T00:00:00Z')
-    expect(pg.latestPerfects([], [], 3, [], [done, half])).toMatchObject([{ key: 'xbox:730', date: '2026-03-01T00:00:00Z' }])
+  test('its last session is not treated as a base completion date', () => {
+    expect(pg.perfectDates([], [], [], [done]).has('xbox:730')).toBe(false)
+    expect(pg.latestPerfects([], [], 3, [], [done, half])).toEqual([])
   })
 
   test('a perfect game with no known session is not in the latest', () => {

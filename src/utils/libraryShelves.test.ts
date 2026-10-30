@@ -43,11 +43,21 @@ describe('buildShelves, in progress', () => {
   })
 })
 
-test('completed: the latest nine on show, the rest as earlier ones', () => {
-  const list = Array.from({ length: 11 }, (_, d) => steam(`c${d}`, 100, d * 40))
+test('completed: the latest nine base dates on show, the rest as earlier ones', () => {
+  const list = Array.from({ length: 11 }, (_, d) => ({ ...steam(`c${d}`, 100, 0), completedAt: daysAgo(d * 40) }))
   const s = shelves(list, 'completed')
   expect(s.recent).toEqual(['c0', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8'])
   expect(s.older).toEqual(['c9', 'c10'])
+})
+
+test('completed: unknown base dates stay out of recent even after newer activity', () => {
+  const list = [
+    { ...steam('dated', 100, 200), completedAt: daysAgo(200) },
+    steam('undated-recent-activity', 100, 0),
+  ]
+  const s = shelves(list, 'completed')
+  expect(s.recent).toEqual(['dated'])
+  expect(s.older).toEqual(['undated-recent-activity'])
 })
 
 test('want to play: the shortest games first, the rest by name', () => {

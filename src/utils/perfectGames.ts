@@ -131,18 +131,16 @@ export type LatestPerfect = {
   subtitle: string
   /** RA icon, the fallback while (or if) the box art does not load. */
   iconUrl?: string
-  /** ISO-ish date string; for Steam the last session, the closest it reports; for PSN the last trophy. */
+  /** Platform-proven base completion date; activity-only timestamps are never used. */
   date: string
   hardcore: boolean
 }
 
 /**
- * The most recent games taken to 100%, every platform, newest first. RA dates
- * come from its mastery and completion awards; Steam has no completion date,
- * so a perfect game's last session stands in for it (for a finished game, the
- * session that finished it); PSN's last trophy is, at 100%, the one that
- * finished it. One entry per RA game: a mastery after an earlier completion
- * is the same game, at its latest date.
+ * The most recent games with a reliable base-completion date, newest first.
+ * RA uses mastery/completion awards and PSN its default-group timestamp.
+ * Steam and Xbox stay undated because their current data cannot separate base
+ * content from DLC. One entry per RA game, at its latest completion award.
  */
 export function latestPerfects(
   awards: UserAward[] = [],
@@ -151,6 +149,9 @@ export function latestPerfects(
   psnGames: PsnGameProgress[] = [],
   xboxGames: XboxGameProgress[] = [],
 ): LatestPerfect[] {
+  // Their current DTOs cannot prove base completion, so activity never dates these games.
+  void steamGames
+  void xboxGames
   const ra = new Map<number, LatestPerfect>()
   for (const a of awards) {
     if (a.AwardType !== 'Mastery/Completion') continue
@@ -168,20 +169,8 @@ export function latestPerfects(
     })
   }
 
-  const steam: LatestPerfect[] = steamGames
-    .filter((g) => classifySteamGame(g) === 'completed' && (g.lastUnlock ?? g.lastPlayed))
-    .map((g) => ({
-      key: gameKey('steam', g.id),
-      source: 'steam',
-      id: g.id,
-      title: g.title,
-      subtitle: g.consoleName,
-      date: (g.lastUnlock ?? g.lastPlayed)!,
-      hardcore: false,
-    }))
-
   const psn: LatestPerfect[] = psnGames
-    .filter((g) => classifyPsnGame(g) === 'completed' && g.lastTrophyAt)
+    .filter((g) => classifyPsnGame(g) === 'completed' && g.completedAt)
     .map((g) => ({
       key: gameKey('psn', g.id),
       source: 'psn',
@@ -189,34 +178,18 @@ export function latestPerfects(
       title: g.title,
       subtitle: g.consoleName,
       iconUrl: g.coverUrl ?? (g.imageIcon || undefined),
-      date: g.lastTrophyAt!,
+      date: g.completedAt!,
       hardcore: false,
     }))
 
-  // Xbox has no completion date either: a finished game's last session is the one that finished it.
-  const xbox: LatestPerfect[] = xboxGames
-    .filter((g) => classifyXboxGame(g) === 'completed' && g.lastPlayed)
-    .map((g) => ({
-      key: gameKey('xbox', g.id),
-      source: 'xbox',
-      id: g.id,
-      title: g.title,
-      subtitle: g.consoleName,
-      iconUrl: g.imageIcon || undefined,
-      date: g.lastPlayed!,
-      hardcore: false,
-    }))
-
-  return [...ra.values(), ...steam, ...psn, ...xbox]
+  return [...ra.values(), ...psn]
     .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
     .slice(0, count)
 }
 
 /**
- * When each perfect game got to 100%, by key: RA from its latest mastery or
- * completion award, Steam from its last session (Steam keeps no completion
- * date; for a finished game that session is the one that finished it), PSN
- * from its last trophy.
+ * Reliable base-completion dates by key. Steam and Xbox deliberately have no
+ * entry when base content cannot be separated from DLC.
  */
 export function perfectDates(
   awards: UserAward[] = [],
@@ -224,18 +197,15 @@ export function perfectDates(
   psnGames: PsnGameProgress[] = [],
   xboxGames: XboxGameProgress[] = [],
 ): Map<string, string> {
+  void steamGames
+  void xboxGames
   const byKey = new Map<string, string>()
   for (const a of awards) {
     if (a.AwardType !== 'Mastery/Completion') continue
     const key = gameKey('ra', a.AwardData)
     if ((byKey.get(key) ?? '') < a.AwardedAt) byKey.set(key, a.AwardedAt)
   }
-  for (const g of steamGames) {
-    const date = g.lastUnlock ?? g.lastPlayed
-    if (date) byKey.set(gameKey('steam', g.id), date)
-  }
-  for (const g of psnGames) if (g.lastTrophyAt) byKey.set(gameKey('psn', g.id), g.lastTrophyAt)
-  for (const g of xboxGames) if (g.lastPlayed) byKey.set(gameKey('xbox', g.id), g.lastPlayed)
+  for (const g of psnGames) if (g.completedAt) byKey.set(gameKey('psn', g.id), g.completedAt)
   return byKey
 }
 

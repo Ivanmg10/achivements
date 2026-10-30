@@ -244,7 +244,7 @@ export async function enrichWithAchievementCounts(
   const misses = countable.filter((g) => !cached.has(keyOf.get(g.id)!))
   const { counts: batch, probe } = await batchCountsFor(auth, misses)
   // A game in progress (or not started) is counted from the batch; a finished
-  // one still needs its own call, for the date it was finished (lastUnlock).
+  // one still needs its own call for its complete unlock activity (lastUnlock).
   const fromBatch = (g: SteamGameProgress) => {
     const b = batch?.get(g.id)
     return b && b.total > 0 && b.awarded < b.total ? b : null

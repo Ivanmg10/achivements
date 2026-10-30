@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
 import {
-  beatenProgress, finishedAt, hardest, milestones, missablesLeft, nextTargets, paceEstimate, rarestEarned, recentEarned,
+  beatenProgress, hardest, milestones, missablesLeft, nextTargets, paceEstimate, rarestEarned, recentEarned,
   type InsightAchievement, type InsightGame,
 } from '@/utils/gameInsights'
 import { unlockSpan } from '@/utils/utils'
@@ -51,6 +51,7 @@ export default function LibraryGameDetail({
   ring,
   ringExtra,
   facts = [],
+  completedAt = null,
   game,
   info = [],
   grid,
@@ -66,6 +67,8 @@ export default function LibraryGameDetail({
   ringExtra?: ReactNode
   /** The platform's own figures, shown before the computed ones. */
   facts?: DetailFact[]
+  /** Platform-proven base completion; null when the data cannot distinguish it from DLC. */
+  completedAt?: string | null
   /** Which game this is: what the calendar of its unlocks links back to. */
   game?: InsightGame
   /** What is known of the game itself (who made it, when), shown for one not yet played. */
@@ -106,8 +109,7 @@ export default function LibraryGameDetail({
     }
 
     if (category === 'completed') {
-      const done = finishedAt(items)
-      if (done) out.push({ label: L.finished, value: new Date(done).toLocaleDateString(lang), className: 'text-success' })
+      if (completedAt) out.push({ label: L.finished, value: new Date(completedAt).toLocaleDateString(lang), className: 'text-success' })
       const span = unlockSpan(items.map((a) => a.earnedAt), {
         underMinute: T.statusGameItem.spanUnderMinute,
         minutes: T.statusGameItem.spanMinutes,
@@ -118,7 +120,7 @@ export default function LibraryGameDetail({
       if (span) out.push({ label: L.timeSpan, value: span })
     }
     return out
-  }, [items, category, T, L, lang])
+  }, [items, category, T, L, lang, completedAt])
 
   const allFacts = loading || state === 'error' ? facts : [...facts, ...computed]
 
