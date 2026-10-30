@@ -1,6 +1,7 @@
 import pool from '@/lib/db'
 import { gameKey, isGameSource } from '@/utils/gameRef'
 import { presenceColumns } from '@/lib/presence'
+import { readRaKey } from '@/lib/raKey'
 
 /** What another user may see of an account: no email, no keys, no hash. */
 export type PublicUserRow = {
@@ -80,5 +81,6 @@ export async function findSubject(username: string): Promise<(PublicUserRow & { 
      FROM users WHERE LOWER(username) = LOWER($1) LIMIT 1`,
     [username],
   )
-  return (rows[0] as (PublicUserRow & { raid: string | null; xboxgamertag: string | null }) | undefined) ?? null
+  const row = rows[0] as (PublicUserRow & { raid: string | null; xboxgamertag: string | null }) | undefined
+  return row ? { ...row, raid: readRaKey(row.raid) } : null
 }

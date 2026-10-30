@@ -13,7 +13,7 @@ export async function POST() {
 
   try {
     await pool.query(
-      `UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL WHERE id = $1`,
+      `UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL, raid_hash = NULL WHERE id = $1`,
       [session.user.id],
     )
   } catch (err) {

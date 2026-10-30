@@ -6,6 +6,7 @@ import { BCRYPT_COST, PASSWORD_MIN, isEmail } from "@/utils/authValidation";
 import { sendVerificationEmail } from "@/lib/verificationEmail";
 import { fetchRaProfile, raAvatarUrl, validRaCredentials } from "@/lib/raProfile";
 import { onPlatformLinked } from "@/lib/scoreRefresh";
+import { sealRaKey } from "@/lib/raKey";
 
 export async function POST(req: NextRequest) {
   try {
@@ -84,10 +85,11 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, BCRYPT_COST);
     const raName = linkedRa ? String(linkedRa.profile.User) : null;
+    const sealedRa = linkedRa ? sealRaKey(linkedRa.key) : null;
 
     const result = await pool.query(
-      `INSERT INTO users (username, password, email, theme, avatar, rausername, raid, "raUser")
-       VALUES ($1, $2, $3, 'dark', $4, $5, $6, $7)
+      `INSERT INTO users (username, password, email, theme, avatar, rausername, raid, "raUser", raid_hash)
+       VALUES ($1, $2, $3, 'dark', $4, $5, $6, $7, $8)
        RETURNING id, username, email, theme, avatar, admin`,
       [
         username,
@@ -95,8 +97,9 @@ export async function POST(req: NextRequest) {
         trimmedEmail,
         raName ? raAvatarUrl(raName) : null,
         raName,
-        linkedRa?.key ?? null,
+        sealedRa?.sealed ?? null,
         linkedRa ? JSON.stringify(linkedRa.profile) : null,
+        sealedRa?.hash ?? null,
       ],
     );
 
@@ -111,8 +114,8 @@ export async function POST(req: NextRequest) {
     // Two sign-ups raced past the checks above; the unique index stopped the second.
     const { code, constraint } = err as { code?: string; constraint?: string };
     if (code === "23505") {
-      // raid is unique: that key already links another account here.
-      if (constraint === "users_raId_key") return NextResponse.json({ error: "key-in-use" }, { status: 409 });
+      // One key, one account: that key already links another account here.
+      if (constraint === "users_raid_hash_key" || constraint === "users_raId_key") return NextResponse.json({ error: "key-in-use" }, { status: 409 });
       return constraint === "users_email_lower_key"
         ? NextResponse.json({ error: "email-taken" }, { status: 409 })
         : NextResponse.json({ error: "Username ya en uso" }, { status: 409 });

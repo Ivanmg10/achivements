@@ -8,9 +8,9 @@ import { loadUser, passwordVersion } from '@/lib/userRecord'
 /**
  * Admin access has two locks. Being admin is read from the database on every
  * request, never from the session: someone just demoted loses access now.
- * And the admin panel must be unlocked with the admin's own password, which
- * lasts ELEVATION_MS: a stolen or forgotten-open session alone cannot read
- * every user's email or take over an account.
+ * And the admin panel must be unlocked with the admin's own password and a
+ * one-time code (adminTotp), which lasts ELEVATION_MS: a stolen or
+ * forgotten-open session alone cannot read every user's email or take over an account.
  *
  * The unlock is a cookie signed with the app secret, bound to the admin and
  * to their current password hash, so changing the password ends it too.
@@ -98,6 +98,7 @@ export async function requireAdmin(req: Request): Promise<AdminResult> {
 export type AdminAction =
   | 'unlock'
   | 'unlock-failed'
+  | 'totp-enrolled'
   | 'list-users'
   | 'create-user'
   | 'update-user'

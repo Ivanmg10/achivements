@@ -1,3 +1,4 @@
+jest.mock('@/lib/raKey', () => ({ sealRaKey: (key: string) => ({ sealed: `sealed:${key}`, hash: `hash:${key}` }), raKeyHash: (key: string) => `hash:${key}` }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/scoreRefresh', () => ({ onPlatformLinked: jest.fn() }))
 jest.mock('next-auth', () => ({ getServerSession: jest.fn() }))
@@ -35,9 +36,9 @@ describe('POST (link)', () => {
     expect(res.status).toBe(200)
     expect(getUserProfile).toHaveBeenCalledWith('ivan', 'my-key')
     const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
-    expect(sql).toContain('UPDATE users SET "raUser" = $1, rausername = $2, raid = $3')
+    expect(sql).toContain('UPDATE users SET "raUser" = $1, rausername = $2, raid = $3, raid_hash = $4')
     expect(JSON.parse(params[0])).toEqual(profile)
-    expect(params.slice(1)).toEqual(['Ivan', 'my-key', '1'])
+    expect(params.slice(1)).toEqual(['Ivan', 'sealed:my-key', 'hash:my-key', '1'])
     expect(forgetUser).toHaveBeenCalledWith('1')
   })
 

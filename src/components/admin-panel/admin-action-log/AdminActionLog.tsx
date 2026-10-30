@@ -18,6 +18,7 @@ const LABELS: Record<string, string> = {
   'delete-user': 'deleted',
   'list-users': 'listed all users',
   'unlock-failed': 'failed to unlock the panel',
+  'totp-enrolled': 'set up the authenticator',
   'xbox-achievements': 'read Xbox achievements',
   'link-ra': 'linked RA for',
   'unlink-ra': 'unlinked RA from',

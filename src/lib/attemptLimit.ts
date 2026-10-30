@@ -29,7 +29,7 @@ import pool from '@/lib/db'
  * (address 'app'): PSN is one app account for everyone, so the score fill goes
  * gently whoever it is for. 300 games is 600 calls to Sony in 15 minutes.
  */
-export type AttemptScope = 'psn-upstream' | 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'ra-borrowed' | 'avatar' | 'user-search' | 'follow' | 'psn-score' | 'xbox-upstream' | 'ra-check'
+export type AttemptScope = 'totp' | 'psn-upstream' | 'signup' | 'reset' | 'login' | 'login-ip' | 'password-check' | 'ra-borrowed' | 'avatar' | 'user-search' | 'follow' | 'psn-score' | 'xbox-upstream' | 'ra-check'
 
 const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   signup: { max: 5, windowMinutes: 60 },
@@ -37,6 +37,8 @@ const LIMITS: Record<AttemptScope, { max: number; windowMinutes: number }> = {
   login: { max: 10, windowMinutes: 15 },
   'login-ip': { max: 50, windowMinutes: 15 },
   'password-check': { max: 10, windowMinutes: 15 },
+  // Six digits are few: a handful of wrong codes per admin.
+  totp: { max: 5, windowMinutes: 15 },
   avatar: { max: 20, windowMinutes: 60 },
   'user-search': { max: 60, windowMinutes: 5 },
   follow: { max: 60, windowMinutes: 5 },
