@@ -993,7 +993,9 @@ reads that column, so the rest of the app works without it.
 - `/api/auth/steam` → Steam → `/api/auth/steam/callback`, which asks Steam to confirm
   its own signature (`check_authentication`) and checks the claimed id, `return_to`
   (built from `NEXTAUTH_URL`) and that those fields were signed. **Never trust the
-  callback's query without that round trip.**
+  callback's query without that round trip**, and refuse a query with a repeated
+  parameter before reading any of it: what is checked here and what Steam checks must
+  be the same value.
 - **A random `state`** rides on `return_to` (signed by Steam) and in an httpOnly cookie on
   the callback path; the callback does nothing unless they match. Without it, a callback link
   made with someone else's Steam account could link it to your account, and then sign them in
