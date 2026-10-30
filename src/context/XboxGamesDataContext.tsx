@@ -9,6 +9,7 @@ import { consoleOptions, filterByConsole, type ConsoleOption } from '@/utils/con
 import type { XboxGameProgress } from '@/types/xbox'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 type XboxGamesCtx = {
   isLinked: boolean
@@ -46,6 +47,7 @@ export function XboxGamesDataProvider({ children }: { children: React.ReactNode 
   const enabled = useXboxEnabled()
   const subject = useSubject()
   const { hidden } = useHiddenConsoles('xbox')
+  const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
   const xuid = enabled ? (session?.user?.xboxxuid ?? null) : null
 
   const [library, setLibrary] = useState<XboxGameProgress[]>([])
@@ -100,7 +102,10 @@ export function XboxGamesDataProvider({ children }: { children: React.ReactNode 
   const current = Boolean(xuid) && loadedFor === xuid
   const fullLibrary = useMemo(() => (current ? library : []), [current, library])
   // The preference is the viewer's own: someone else's library is shown whole.
-  const shown = useMemo(() => (subject ? fullLibrary : filterByConsole(fullLibrary, (g) => g.consoleName, hidden)), [subject, fullLibrary, hidden])
+  const shown = useMemo(
+    () => hiddenLoading ? [] : (subject ? fullLibrary : filterByConsole(fullLibrary, (g) => g.consoleName, hidden)).filter((g) => !isHidden(g.id, 'xbox')),
+    [subject, fullLibrary, hidden, isHidden, hiddenLoading],
+  )
   const consoles = useMemo(() => consoleOptions(fullLibrary.map((g) => g.consoleName)), [fullLibrary])
 
   return (
@@ -110,7 +115,7 @@ export function XboxGamesDataProvider({ children }: { children: React.ReactNode 
         library: shown,
         fullLibrary,
         consoles,
-        libraryLoading: Boolean(xuid) && (libraryLoading || !current),
+        libraryLoading: Boolean(xuid && (hiddenLoading || libraryLoading || !current)),
         libraryError: current ? libraryError : null,
         refetch,
       }}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { xboxErrorFrom, type XboxLinkError } from '@/hooks/useXboxLink'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
@@ -6,6 +6,7 @@ import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import type { XboxSummary } from '@/types/xbox'
 import { fetchShared } from '@/lib/fetchShared'
+import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 
 /** The linked Xbox account's headline numbers: avatar, gamerscore, achievements unlocked, games. */
 export function useXboxSummary() {
@@ -13,6 +14,7 @@ export function useXboxSummary() {
   const enabled = useXboxEnabled()
   const subject = useSubject()
   const xuid = enabled ? (session?.user?.xboxxuid ?? null) : null
+  const { library, libraryLoading } = useXboxGamesData()
 
   const [summary, setSummary] = useState<XboxSummary | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -47,10 +49,17 @@ export function useXboxSummary() {
     load()
   }, [xuid, load])
 
-  // Unlinked, whatever the last account left behind is not shown.
+  const visibleSummary = useMemo(() => summary && !libraryLoading ? {
+    ...summary,
+    games: library.length,
+    gamerscore: library.reduce((total, game) => total + game.earnedGamerscore, 0),
+    achievementsUnlocked: library.reduce((total, game) => total + game.numAwarded, 0),
+  } : null, [summary, library, libraryLoading])
+
+  // Profile identity stays; game-derived totals follow the visible library.
   return {
-    summary: xuid ? summary : null,
-    isLoading,
+    summary: xuid ? visibleSummary : null,
+    isLoading: isLoading || libraryLoading,
     error: xuid ? error : null,
     retry: load,
   }

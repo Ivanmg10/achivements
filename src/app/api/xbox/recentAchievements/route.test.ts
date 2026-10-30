@@ -1,5 +1,6 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
+jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
 jest.mock('@/lib/steamCache', () => ({ withSteamCache: jest.fn() }))
 jest.mock('@/lib/xboxClient', () => ({
   ...jest.requireActual('@/lib/xboxClient'),
@@ -63,10 +64,10 @@ test('failures are structured', async () => {
   expect((await call()).status).toBe(502)
 })
 
-test('the browser may keep the answer for 2 minutes, privately, and a new session cookie asks again', async () => {
+test('the browser never keeps a visibility-filtered answer, and a new session cookie asks again', async () => {
   const res = await GET(new NextRequest('http://localhost/api/xbox/recentAchievements'))
   expect(res.status).toBe(200)
-  expect(res.headers.get('Cache-Control')).toBe('private, max-age=120')
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=0')
   expect(res.headers.get('Vary')).toBe('Cookie')
 })
 

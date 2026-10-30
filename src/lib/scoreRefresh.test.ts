@@ -71,7 +71,7 @@ beforeEach(() => {
   ;(allowAttempt as jest.Mock).mockResolvedValue(true)
   query.mockImplementation(async (sql: string, params: unknown[]) => {
     if (sql.includes('FROM users WHERE id')) return { rows: [userRow] }
-    if (sql.includes('FROM hidden_games')) return { rows: [{ source: 'psn', game_id: 3 }] }
+    if (sql.includes('SELECT source, game_id FROM hidden_games')) return { rows: [{ source: 'psn', game_id: 3 }] }
     if (sql.includes('SELECT game_id, account')) return { rows: stored }
     if (sql.includes('INSERT INTO score_games')) {
       writes = JSON.parse(params[4] as string)
@@ -100,6 +100,12 @@ describe('refreshScore', () => {
     expect(result).toEqual({ complete: true, platforms: { psn: { read: 2, total: 2, state: 'done' } } })
     expect(reports[0]).toEqual(['psn', { read: 1, total: 2, state: 'reading' }])
     expect(client.query).toHaveBeenCalledWith('COMMIT')
+  })
+
+  it('keeps hidden score rows so unhide restores their aggregates without an upstream read', async () => {
+    stored.push({ game_id: '3', account: 'acc', title: 'Game 3', points: 200, change_key: 'k3', rules_version: RULES_VERSION, provisional: false, flag: null })
+    await refreshScore(7, Date.now() + 10_000)
+    expect([...(kept ?? [])].sort()).toEqual([1, 2, 3])
   })
 
   it('out of time, a moved game stands in from the list and the fill is unfinished', async () => {

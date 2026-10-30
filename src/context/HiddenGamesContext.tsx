@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
-import { gameKey, isGameSource } from '@/utils/gameRef'
+import { gameKey, isGameSource, parseGameKey } from '@/utils/gameRef'
 import { notify } from '@/lib/notify'
 import type { GameSource } from '@/types/steam'
 
@@ -30,12 +30,15 @@ const Ctx = createContext<CtxType>({
  * update the list at once and roll back, saying so, if the server refuses;
  * the outcome is always told with a toast (these happen outside a form).
  */
-export function HiddenGamesProvider({ children }: { children: React.ReactNode }) {
+export function HiddenGamesProvider({ children, initialKeys }: { children: React.ReactNode; initialKeys?: string[] }) {
   const { status } = useSession()
   const { T } = useLanguage()
-  const [hidden, setHidden] = useState<HiddenGame[]>([])
-  const [loaded, setLoaded] = useState(false)
-  const fetched = useRef(false)
+  const [hidden, setHidden] = useState<HiddenGame[]>(() => (initialKeys ?? []).flatMap((key) => {
+    const ref = parseGameKey(key)
+    return ref ? [{ ...ref, title: '', image: null }] : []
+  }))
+  const [loaded, setLoaded] = useState(initialKeys !== undefined)
+  const fetched = useRef(initialKeys !== undefined)
   // Loading only while a signed-in user's list is still on its way.
   const isLoading = status === 'loading' || (status === 'authenticated' && !loaded)
 

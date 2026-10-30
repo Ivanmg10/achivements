@@ -65,7 +65,7 @@ test('Xbox — the account, the favourite and the pins — is for an admin viewe
   await GET()
   const [sql, params] = query.mock.calls[0]
   expect(sql).toContain('u.xboxxuid IS NOT NULL AND $2::boolean')
-  expect(sql).toContain("'xbox', CASE WHEN $2::boolean THEN u.favorite_xbox_game END")
+  expect(sql).toContain("'xbox', CASE WHEN $2::boolean AND NOT EXISTS")
   expect(sql).toContain("$2::boolean OR sc.source <> 'xbox'")
   expect(sql).toContain("'xbox', CASE WHEN $2::boolean THEN u.xboxgamertag END")
   expect(params).toEqual(['3', false])

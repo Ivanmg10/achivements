@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { IconSearch, IconX, IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { fetchRaCandidateById } from '@/utils/apiCallsUtils'
@@ -27,6 +28,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
   const { T } = useLanguage()
   const { pins, pinGame } = usePinnedGames()
   const candidates = useGameCandidates(isOpen)
+  const { isHidden } = useHiddenGames()
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<Map<string, GameCandidate>>(new Map())
   const [saving, setSaving] = useState(false)
@@ -62,10 +64,10 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
   /** A pasted RA id or game URL opens that RA game directly. */
   const directGameId = useMemo(() => {
     const q = query.trim()
-    if (/^\d{3,}$/.test(q)) return parseInt(q)
-    const m = q.match(/retroachievements\.org\/game\/(\d+)/i)
-    return m ? parseInt(m[1]) : null
-  }, [query])
+    const id = /^\d{3,}$/.test(q) ? parseInt(q) : q.match(/retroachievements\.org\/game\/(\d+)/i)?.[1]
+    const parsed = typeof id === 'string' ? parseInt(id) : id
+    return parsed && !isHidden(parsed, 'ra') ? parsed : null
+  }, [query, isHidden])
 
   const results = useMemo(
     () => (directGameId ? [] : searchCandidates(candidates, query, pinnedKeys)),

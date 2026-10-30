@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { IconSearch } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { fetchRaCandidateById } from '@/utils/apiCallsUtils'
 import { searchCandidates, suggestCandidates, GameCandidate } from '@/utils/gameCandidates'
@@ -30,6 +31,7 @@ export default function GroupModalGamePicker({
 }) {
   const { T } = useLanguage()
   const candidates = useGameCandidates(enabled)
+  const { isHidden } = useHiddenGames()
   const [query, setQuery] = useState('')
   const [lookupFailed, setLookupFailed] = useState(false)
 
@@ -37,10 +39,10 @@ export default function GroupModalGamePicker({
 
   const directGameId = useMemo(() => {
     const q = query.trim()
-    if (/^\d{3,}$/.test(q)) return parseInt(q)
-    const m = q.match(/retroachievements\.org\/game\/(\d+)/i)
-    return m ? parseInt(m[1]) : null
-  }, [query])
+    const id = /^\d{3,}$/.test(q) ? parseInt(q) : q.match(/retroachievements\.org\/game\/(\d+)/i)?.[1]
+    const parsed = typeof id === 'string' ? parseInt(id) : id
+    return parsed && !isHidden(parsed, 'ra') ? parsed : null
+  }, [query, isHidden])
 
   const searching = query.trim() !== ''
   // Chosen games stay in the grid (ticked), so they can be unticked where they were picked.

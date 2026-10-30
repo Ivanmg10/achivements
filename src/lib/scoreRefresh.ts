@@ -360,13 +360,17 @@ async function refreshSource(
     )
   }
 
-  // Games that left the library, were hidden, or belong to an account no longer linked.
-  const keep = eligible.filter((c) => writes.some((w) => w.game_id === c.id) || stored.get(c.id)?.account === plan.account).map((c) => c.id)
+  // Hidden rows stay as raw score data so unhide can restore every aggregate without an upstream read.
+  const keptVisible = eligible.filter((c) => writes.some((w) => w.game_id === c.id) || stored.get(c.id)?.account === plan.account).map((c) => c.id)
+  const keptHidden = rows.filter((row) => row.account === plan.account && hiddenGames.has(`${plan.source}:${row.game_id}`)).map((row) => Number(row.game_id))
+  const keep = [...new Set([...keptVisible, ...keptHidden])]
   await pool.query(`DELETE FROM score_games WHERE user_id = $1 AND source = $2 AND NOT (game_id = ANY($3::bigint[]))`, [userId, plan.source, keep])
 
   // The same title listed again on this platform counts less (see stackFactors).
   const kept = await queryRows<{ game_id: string; title: string; points: number }>(
-    `SELECT game_id, title, points FROM score_games WHERE user_id = $1 AND source = $2`,
+    `SELECT g.game_id, g.title, g.points FROM score_games g
+     WHERE g.user_id = $1 AND g.source = $2
+       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)`,
     [userId, plan.source],
   )
   const factors = stackFactors(kept.map((r) => ({ key: stackKey(r.title), points: r.points })))
@@ -390,7 +394,9 @@ async function refreshSource(
 /** Weeks and months, per platform, rebuilt from the stored games. */
 export async function rebuildPeriods(userId: number): Promise<void> {
   const rows = await queryRows<{ source: string; unlocks: ScoreUnlock[]; stack_factor: number }>(
-    `SELECT source, unlocks, stack_factor FROM score_games WHERE user_id = $1 AND flag IS DISTINCT FROM 'suspect'`,
+    `SELECT g.source, g.unlocks, g.stack_factor FROM score_games g
+     WHERE g.user_id = $1 AND g.flag IS DISTINCT FROM 'suspect'
+       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)`,
     [userId],
   )
   const totals = new Map<string, { source: string; kind: 'w' | 'm'; start: string; points: number }>()

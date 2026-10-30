@@ -9,6 +9,7 @@ import { useHiddenConsoles } from '@/hooks/useHiddenConsoles'
 import { consoleOptions, filterByConsole, type ConsoleOption } from '@/utils/consoleFilter'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 /** Every PlayStation with trophies, as `psnPlatformName` writes them: always in the preference, games or not. */
 const PSN_CONSOLES = ['PS3', 'PS Vita', 'PS4', 'PS5']
@@ -47,6 +48,7 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
   const subject = useSubject()
   const [platinumCompletes] = usePsnPlatinumCompletes()
   const { hidden } = useHiddenConsoles('psn')
+  const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
   const accountId = session?.user?.psnaccountid ?? null
 
   const [library, setLibrary] = useState<PsnGameProgress[]>([])
@@ -105,7 +107,10 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
   )
   const fullLibrary = useMemo(() => (current ? games : []), [current, games])
   // The preference is the viewer's own: someone else's list is shown whole.
-  const shown = useMemo(() => (subject ? fullLibrary : filterByConsole(fullLibrary, (g) => g.consoleName, hidden)), [subject, fullLibrary, hidden])
+  const shown = useMemo(
+    () => hiddenLoading ? [] : (subject ? fullLibrary : filterByConsole(fullLibrary, (g) => g.consoleName, hidden)).filter((g) => !isHidden(g.id, 'psn')),
+    [subject, fullLibrary, hidden, isHidden, hiddenLoading],
+  )
   const consoles = useMemo(() => fullLibrary.length ? consoleOptions(fullLibrary.map((g) => g.consoleName), PSN_CONSOLES) : [], [fullLibrary])
 
   return (
@@ -115,7 +120,7 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
         library: shown,
         fullLibrary,
         consoles,
-        libraryLoading: Boolean(accountId) && (libraryLoading || !current),
+        libraryLoading: Boolean(accountId && (hiddenLoading || libraryLoading || !current)),
         libraryError: current ? libraryError : null,
         refetch,
       }}

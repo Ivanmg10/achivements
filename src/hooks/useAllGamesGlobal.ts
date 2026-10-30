@@ -3,6 +3,7 @@ import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useGamesData } from '@/context/GamesDataContext'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 export type AllGamesGlobal = {
   wantToPlay: WantToPlayGame[]
@@ -16,6 +17,7 @@ export type AllGamesGlobal = {
 export function useAllGamesGlobal(): AllGamesGlobal {
   const { data: session, status } = useSession()
   const rausername = session?.user?.rausername
+  const { isHidden } = useHiddenGames()
   // Completed/in-progress games are fetched once and shared app-wide via
   // GamesDataContext — don't re-fetch /api/getGamesCompleted here too.
   const { all: allCompleted, isLoading: completedLoading, error: completedError, refetch: refetchCompleted } = useGamesData()
@@ -68,8 +70,8 @@ export function useAllGamesGlobal(): AllGamesGlobal {
   )
 
   const filteredWantToPlay = useMemo(
-    () => wantToPlay.filter((g) => !startedIds.has(g.ID ?? g.GameID!) && g.ConsoleName !== 'Events'),
-    [wantToPlay, startedIds],
+    () => wantToPlay.filter((g) => !startedIds.has(g.ID ?? g.GameID!) && g.ConsoleName !== 'Events' && !isHidden(g.ID ?? g.GameID!, 'ra')),
+    [wantToPlay, startedIds, isHidden],
   )
 
   const playing = useMemo(() => {

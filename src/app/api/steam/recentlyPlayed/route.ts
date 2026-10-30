@@ -6,6 +6,7 @@ import { enrichWithAchievementCounts, isPrivateLibrary, loadOwnedGames, SteamPri
 import { lastPlayedGames, toSteamGameProgress } from '@/utils/steamMappers'
 import { cachedJson } from '@/lib/httpCache'
 import type { SteamRecentlyPlayedResponse, SteamGameProgress } from '@/types/steam'
+import { visibleGamesForUser } from '@/lib/gameVisibility'
 
 const COUNT = 20
 
@@ -46,8 +47,9 @@ export async function GET(req?: Request) {
       { userId: id, refreshable: true },
     )
 
-    // Not browser-cached — see ownedGames; the DB cache keeps it cheap.
-    return cachedJson(games, 0)
+    // Visibility is a per-user projection over the canonical cache, never cached by the browser.
+    const visible = await visibleGamesForUser(id, games, 'steam')
+    return cachedJson(visible, 0)
   } catch (err) {
     if (err instanceof SteamPrivateError) return NextResponse.json({ error: 'private' }, { status: 403 })
     console.error('[steam/recentlyPlayed]', err)

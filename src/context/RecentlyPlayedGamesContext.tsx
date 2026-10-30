@@ -7,6 +7,7 @@ import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { withSubject } from '@/utils/withSubject'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 type CtxType = {
   games: RecentlyPlayedGame[]
@@ -20,6 +21,7 @@ const Ctx = createContext<CtxType>({ games: [], isLoading: true, error: false, r
 export function RecentlyPlayedGamesProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const subject = useSubject()
+  const { isHidden } = useHiddenGames()
   // No RetroAchievements account means nothing to ask for.
   const rausername = session?.user?.rausername
   const [games, setGames] = useState<RecentlyPlayedGame[]>([])
@@ -89,7 +91,8 @@ export function RecentlyPlayedGamesProvider({ children }: { children: React.Reac
 
   // One object per change of what it holds, so a re-render of the provider (the session updating)
   // does not re-render everything that reads it.
-  const value = useMemo(() => ({ games, isLoading, error, refetch }), [games, isLoading, error, refetch])
+  const visibleGames = useMemo(() => games.filter((game) => !isHidden(game.GameID, 'ra')), [games, isHidden])
+  const value = useMemo(() => ({ games: visibleGames, isLoading, error, refetch }), [visibleGames, isLoading, error, refetch])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

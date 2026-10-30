@@ -1,7 +1,9 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
+jest.mock('@/lib/steamCache', () => ({ readCache: jest.fn(async () => 0), writeCache: jest.fn() }))
 
 import pool from '@/lib/db'
 import { loadRanking, profileTeaser, rankByStreak, rankEntries, streakOf, streaksOf, takeWeeklySnapshot, vaultTotals, vaultTotalsOrNone, weekStartRanks, type RankEntry } from './rankings'
+import { readCache } from '@/lib/steamCache'
 
 const query = pool.query as jest.Mock
 
@@ -99,6 +101,18 @@ describe('loadRanking', () => {
   })
 })
 
+describe('hidden score projections', () => {
+  it('excludes hidden games from rankings, streaks, totals and public teasers', async () => {
+    query.mockResolvedValue({ rows: [] })
+    await loadRanking({ scope: 'following', period: 'all', source: 'all', viewerId: 3, xbox: false })
+    await streaksOf([3], 'all', false)
+    await vaultTotals([3], false)
+    await profileTeaser('ana')
+
+    for (const [sql] of query.mock.calls) expect(sql).toContain('hidden_games')
+  })
+})
+
 describe('loadRanking, global', () => {
   it('keeps everyone else cached a few minutes, but reads the viewer anew every time', async () => {
     query
@@ -111,6 +125,18 @@ describe('loadRanking, global', () => {
     const again = await loadRanking(opts)
     expect(query).toHaveBeenCalledTimes(3)
     expect(again.map((e) => [e.username, e.points, e.rank])).toEqual([['me', 1000, 1], ['ana', 900, 2]])
+  })
+})
+
+describe('loadRanking, shared visibility revision', () => {
+  it('a new revision bypasses the warm global cache in another instance', async () => {
+    ;(readCache as jest.Mock).mockResolvedValueOnce('1').mockResolvedValueOnce('2')
+    query.mockResolvedValue({ rows: [] })
+    const opts = { scope: 'global' as const, period: 'all' as const, source: 'all' as const, viewerId: null, xbox: false }
+
+    await loadRanking(opts)
+    await loadRanking(opts)
+    expect(query).toHaveBeenCalledTimes(2)
   })
 })
 

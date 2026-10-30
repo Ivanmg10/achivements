@@ -76,7 +76,7 @@ export async function loadFriendDetails(friend: FriendOverview, lang: string): P
     (raGames as RetroAchievementsGameCompleted[]).filter((g) => !RA_SYSTEM_CONSOLES.has(g.ConsoleID)),
     steamGames as SteamGameProgress[],
     psnGames as PsnGameProgress[],
-    [],
+    friend.hiddenGames ?? [],
     friend.username,
     xboxGames as XboxGameProgress[],
   )
