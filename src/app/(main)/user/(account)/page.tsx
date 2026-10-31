@@ -22,7 +22,7 @@ export default function UserPage() {
   if (status === 'loading' && !session) return <UserPageSkeleton />
 
   return (
-    <main className="min-h-screen bg-bg-main text-text-main flex flex-col items-center py-6 px-4">
+    <main className="min-h-screen bg-bg-main text-text-main flex flex-col items-center py-6 px-4 enter-slow">
       <div className="w-full lg:max-w-[95%] flex flex-col gap-4">
         <RaKeyInvalidNotice />
         {/* The danger zone under the account's card, so the two columns end together. */}

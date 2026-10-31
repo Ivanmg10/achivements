@@ -51,6 +51,12 @@ test('shows the page once it is', () => {
   expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument()
 })
 
+test('it enters slowly: it waits for nothing, so no skeleton softens its arrival', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { name: 'ivan' } } })
+  const { container } = render(<UserPage />)
+  expect(container.querySelector('main')).toHaveClass('enter-slow')
+})
+
 test('update() refreshing the session does not send the page back to its skeleton', () => {
   ;(useSession as jest.Mock).mockReturnValue({ status: 'loading', data: { user: { name: 'ivan' } } })
   render(<UserPage />)

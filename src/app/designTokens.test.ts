@@ -84,6 +84,11 @@ test('under reduced motion an entrance is a plain fade: nothing moves and nothin
   expect(valueIn(block, '--enter-stagger')).toBe('0ms')
 })
 
+test('a slower entrance never reaches reduced motion: it would undo the 200 ms fade', () => {
+  expect(css).toMatch(/@media \(prefers-reduced-motion: no-preference\) \{\n  \.enter-slow \{/)
+  expect(css.match(/\.enter-slow/g)).toHaveLength(1)
+})
+
 test('an entrance leaves nothing behind: a fill that stays would keep a transform on the element', () => {
   const rules = css.match(/animation: [^;]*--enter-duration[^;]*;/g) ?? []
   expect(rules.length).toBeGreaterThan(0)

@@ -55,6 +55,7 @@ One set of CSS classes in `globals.css` for the whole site (issue #61; families 
 | Charts and figures | `.enter-grow-x` / `-y`; `animateIn` on `CircularProgress`; `CountUp` | Bars grow, rings fill, numbers count. A `ProgressBar` inside any entering element grows by itself |
 | Overlays, page transitions | none | As they were |
 
+- **A page that waits for nothing may take longer:** `.enter-slow` on its root (800 ms, 70 ms apart; `/user`, the user's call, 2026-10-31). It has no skeleton to soften its arrival, so the general timing reads as abrupt. It only applies without reduced motion.
 - **Retune in one place:** `--enter-duration`, `--enter-ease`, `--enter-stagger`, `--enter-rise`, `--enter-scale`, `--enter-grow`. Reduced motion only restates those tokens, so every entrance becomes a 200 ms fade with no movement and no delay; `CountUp` stays on its final number.
 - **`backwards`, never `both`.** A fill that stays would keep a transform on the element: it traps `position: fixed` inside and fights a sortable row's own transform.
 - **A list plays once.** `useEntrancesOnce` (mounted by `ShapeSync`) sets `data-entered` when its rows finish, because moving a node restarts its animation: measured 2026-10-31, 12 rows replayed on a reorder without the mark, 0 with it. It only ever switches an entrance off; nothing waits for it to show.

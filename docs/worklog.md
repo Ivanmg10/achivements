@@ -38,6 +38,10 @@ the identity card and its banner were at full opacity in one frame, while its tw
 top line. View Transitions were rejected: they touch every route, and #61 left page transitions as they are.
 **Verification** — Production build, client navigation from `/rankings`, two warm runs at 2560 px and one at 390 px: the page is drawn at
 70–90 ms and the three cards are done at ~500 ms. 835 suites / 5,277 tests, tsc and ESLint on the three components pass.
+**Then** — The user found it far too fast, since the shorter delays took it from ~850 to ~500 ms and the curve does most of its work
+early. `.enter-slow` on the page's `<main>` sets 800 ms and 70 ms apart, and only there: the global tokens also time the shelves, whose
+restored cascade must not change. It sits under `prefers-reduced-motion: no-preference`, or it would undo reduced motion's 200 ms fade.
+Measured: the cards end at ~800 ms (rounded to two decimals), and at ~220 ms with reduced motion.
 **Open** — The brief skeleton is still there, and may last longer in production than on localhost. If it bothers the user, that is the next thing to look at.
 
 ---
