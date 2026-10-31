@@ -51,7 +51,7 @@ at 4× CPU 836–972 ms against 816–944 ms, CLS 0.
 **Open** — Home CLS moved a little: 0.098 against 0.094 at 2560 px, 0.25–0.31 against 0.29 at 390 px. The home's CLS was
 already high and comes from data arriving; the Framer fade that was removed probably hid part of it. On a phone the level
 badge overlaps the points on `/user` (`UserVaultLevel`), the same on `develop`; not touched here.
-**Watch out** — Xbox's game page was not opened in the browser (same `GameHero` and table classes as the others). The issue's
+**Watch out** — Xbox's game page and someone's game page (`/user/<name>/<platform>/<id>`) were not opened in the browser (same `GameHero` and table classes as the others). The issue's
 comment has the route inventory. A list that mounts with a skeleton as its child would play on the skeleton. Measuring in one
 Playwright page, init scripts pile up and CLS counts several times: use a new page per run.
 
