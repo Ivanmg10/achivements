@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { motion, useReducedMotion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatDate } from '@/utils/utils'
 import type { LatestPerfect } from '@/utils/perfectGames'
@@ -31,25 +30,18 @@ const STEPS = [
 export default function PerfectPodium({ games }: { games: LatestPerfect[] }) {
   const { T } = useLanguage()
   const subject = useSubject()
-  const reduce = useReducedMotion()
 
   if (games.length === 0) return null
 
   return (
     <div className="flex flex-col gap-3">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.latestPerfects}</p>
-      <ol className="grid grid-cols-3 items-end gap-2 sm:gap-3 max-w-md mx-auto w-full">
+      <ol className="grid grid-cols-3 items-end gap-2 sm:gap-3 max-w-md mx-auto w-full enter-cards">
         {games.map((game, i) => {
           const s = STEPS[i]
           const href = gameHref(game.source, game.id, subject)
           return (
-            <motion.li
-              key={game.key}
-              className={`${s.order} flex flex-col items-center gap-2 min-w-0`}
-              initial={reduce ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: reduce ? 0 : 0.08 * i, ease: [0.16, 1, 0.3, 1] }}
-            >
+            <li key={game.key} className={`${s.order} flex flex-col items-center gap-2 min-w-0`}>
               <Link
                 href={href}
                 className="group w-full flex flex-col items-center gap-2 min-w-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
@@ -67,7 +59,7 @@ export default function PerfectPodium({ games }: { games: LatestPerfect[] }) {
               >
                 {i + 1}
               </span>
-            </motion.li>
+            </li>
           )
         })}
       </ol>

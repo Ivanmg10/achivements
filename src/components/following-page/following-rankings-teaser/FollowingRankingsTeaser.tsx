@@ -31,7 +31,7 @@ export default function FollowingRankingsTeaser({ className = '' }: { className?
     <Link
       href="/rankings"
       aria-labelledby="following-rankings-title"
-      className={`group relative rounded-card overflow-hidden ring-1 ring-inset ring-ink/[0.06] p-5 flex flex-col gap-3 hover:ring-accent/50 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${className}`}
+      className={`enter-card [--i:3] group relative rounded-card overflow-hidden ring-1 ring-inset ring-ink/[0.06] p-5 flex flex-col gap-3 hover:ring-accent/50 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${className}`}
       style={{ background: 'radial-gradient(ellipse at 50% 100%, rgb(var(--accent) / 0.2), transparent 70%), rgb(var(--bg-card))' }}
     >
       <IconTrophy aria-hidden="true" size={150} stroke={1} className="absolute -right-6 -top-6 text-accent/[0.08] pointer-events-none" />

@@ -18,7 +18,7 @@ export default function RankingsPageHot({ rows, linked, onSeeWeek }: { rows: Ran
       <h2 id="rankings-hot-title" className="font-bold mb-1.5">
         {T.rankings.hotTitle}
       </h2>
-      <ol className="flex flex-col">
+      <ol className="flex flex-col enter-rows">
         {rows.map((r, i) => (
           <li key={r.username} className="grid grid-cols-[1.125rem_minmax(0,1fr)_auto] items-center gap-2.5 py-1.5 text-sm">
             <span className="font-display italic font-extrabold text-lg leading-none tabular-nums text-text-secondary">{i + 1}</span>

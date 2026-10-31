@@ -191,7 +191,7 @@ export default function GameInfoTable({
                   </SortableHeader>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="enter-rows">
                 {shown.map((achievement) => (
                   <GameInfoAchivement
                     achievement={achievement}
@@ -207,7 +207,7 @@ export default function GameInfoTable({
           </div>
 
           {/* Mobile card list */}
-          <div className="sm:hidden w-full flex flex-col gap-2">
+          <div className="sm:hidden w-full flex flex-col gap-2 enter-rows">
             {shown.map((achievement) => (
               <GameInfoAchievementCard
                 key={achievement.ID}

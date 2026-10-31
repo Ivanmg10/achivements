@@ -20,7 +20,7 @@ export default function MainPageFriendsFeed({ items }: { items: FeedItem[] }) {
         // Centred in whatever height the card is given (it stretches to the column beside it).
         <EmptyState icon={<IconSparkles className="w-6 h-6" />} title={T.friends.feedEmpty} size="compact" className="py-6 flex-1 justify-center" />
       ) : (
-        <ul className="flex flex-col gap-1 max-h-[26rem] xl:max-h-none xl:flex-1 xl:min-h-0 overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:rgb(var(--accent)/0.35)_transparent]">
+        <ul className="flex flex-col gap-1 max-h-[26rem] xl:max-h-none xl:flex-1 xl:min-h-0 overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:rgb(var(--accent)/0.35)_transparent] enter-rows">
           {items.map(({ username, achievement: a }) => {
             const badge = achievementBadgeUrl(a)
             return (

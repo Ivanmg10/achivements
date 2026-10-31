@@ -70,10 +70,10 @@ export default function UserIdentityCard() {
   ]
 
   return (
-    <section className="relative bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] overflow-hidden flex flex-col">
+    <section className="relative bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] overflow-hidden flex flex-col enter-card">
       <UserProfileBanner avatar={user?.avatar} />
 
-      <div className="relative px-4 sm:px-7 pt-6 sm:pt-7 pb-6 sm:pb-7 flex flex-col gap-4 flex-1">
+      <div className="relative px-4 sm:px-7 pt-6 sm:pt-7 pb-6 sm:pb-7 flex flex-col gap-4 flex-1 enter-rows">
       <div className="flex items-end justify-between gap-x-5 gap-y-4 flex-wrap">
         <div className="flex items-end gap-4 sm:gap-[1.375rem] min-w-0">
           <button
@@ -202,7 +202,7 @@ export default function UserIdentityCard() {
 
       <div className="flex flex-col mt-auto">
         <h2 className="sr-only">{T.userPage.library}</h2>
-        <dl className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 [&>*:last-child]:col-span-2 sm:[&>*:last-child]:col-span-1">
+        <dl className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 [&>*:last-child]:col-span-2 sm:[&>*:last-child]:col-span-1 enter-cards">
           {totals.map((total) => (
             <UserVaultStat key={total.label} {...total} />
           ))}

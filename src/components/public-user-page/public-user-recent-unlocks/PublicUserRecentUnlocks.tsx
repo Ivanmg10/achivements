@@ -24,7 +24,7 @@ export default function PublicUserRecentUnlocks() {
       ) : achievements.length === 0 ? (
         <EmptyState icon={<IconSparkles className="w-6 h-6" />} title={T.userProfile.noRecentUnlocks} size="compact" />
       ) : (
-        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 enter-rows">
           {achievements.slice(0, SHOWN).map((a) => (
             <li key={`${a.Source ?? 'ra'}:${a.GameID}:${a.AchievementID}:${a.Date}`} className="min-w-0">
               <RecentAchievementRow ach={a} onNavigate={noop} />

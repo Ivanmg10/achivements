@@ -27,7 +27,7 @@ export default function LandingBento() {
   const { T } = useLanguage()
 
   return (
-    <section className="max-w-6xl w-full mx-auto px-4 sm:px-6 pb-20 grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-4">
+    <section className="max-w-6xl w-full mx-auto px-4 sm:px-6 pb-20 grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-4 enter-cards">
       <LandingFeature
         icon={<IconLibrary size={22} />}
         title={T.landing.libraryTitle}

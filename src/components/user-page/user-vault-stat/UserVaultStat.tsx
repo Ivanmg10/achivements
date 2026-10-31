@@ -10,6 +10,7 @@ export default function UserVaultStat({
   value,
   accent,
   display,
+  format,
   sub,
 }: {
   icon?: ReactNode
@@ -19,6 +20,8 @@ export default function UserVaultStat({
   accent: string
   /** Shown instead of the counting number, for a value that is not a whole count ("1.5"). */
   display?: string
+  /** How to write the number as it counts, for one with a unit ("12 days"). */
+  format?: (n: number) => string
   /** A line under the label. */
   sub?: string
 }) {
@@ -31,7 +34,7 @@ export default function UserVaultStat({
       )}
       <dt className="text-xs text-text-secondary truncate">{label}</dt>
       <dd className={`text-2xl font-extrabold leading-tight tabular-nums ${accent}`}>
-        {display ?? <CountUp value={value} />}
+        {display ?? <CountUp value={value} format={format} />}
       </dd>
       {sub && <dd className="text-[10px] text-text-secondary/80 truncate">{sub}</dd>}
     </div>

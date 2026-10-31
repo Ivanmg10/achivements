@@ -56,5 +56,8 @@ export function useVaultMe() {
     setAttempt((n) => n + 1)
   }, [])
 
-  return { me, isLoading: signedIn && !answered, error: signedIn && answered && me === null, retry, setShowInRankings }
+  // Loading while the session is read too: a block that holds its room must hold it from the first paint.
+  const isLoading = (signedIn || status === 'loading') && !answered
+
+  return { me, isLoading, error: signedIn && answered && me === null, retry, setShowInRankings }
 }

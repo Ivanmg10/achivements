@@ -199,7 +199,7 @@ export default function SteamGameInfoTable({
                   )}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="enter-rows">
                 {shown.map((a) => (
                   <SteamGameInfoAchievement
                     key={a.apiname}
@@ -215,7 +215,7 @@ export default function SteamGameInfoTable({
           </div>
 
           {/* Phone card list */}
-          <ul className="sm:hidden w-full flex flex-col gap-2">
+          <ul className="sm:hidden w-full flex flex-col gap-2 enter-rows">
             {shown.map((a) => (
               <SteamGameInfoAchievementCard
                 key={a.apiname}

@@ -29,6 +29,83 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-31 — `/user` enters as a whole (`feat/61-entrance-rollout`, #61)
+
+**Did** — `UserIdentityCard`'s `<section>` has `enter-card`, and the preferences and delete cards went from `--i` 3 and 6 to 1 and 2.
+**Why** — The user found reaching `/user` abrupt. Measured at 2560 px from `/racha` and `/rankings`: the skeleton lasted ~45 ms, then
+the identity card and its banner were at full opacity in one frame, while its two neighbours stayed invisible for up to 240 ms more.
+**Decisions** — `/user`'s `loading.tsx` stays, though its skeleton shows only for a moment: without it, a slow connection gets just the thin
+top line. View Transitions were rejected: they touch every route, and #61 left page transitions as they are.
+**Verification** — Production build, client navigation from `/rankings`, two warm runs at 2560 px and one at 390 px: the page is drawn at
+70–90 ms and the three cards are done at ~500 ms. 835 suites / 5,277 tests, tsc and ESLint on the three components pass.
+**Then** — The user found it far too fast, since the shorter delays took it from ~850 to ~500 ms and the curve does most of its work
+early. `.enter-slow` on the page's `<main>` sets 800 ms and 70 ms apart, and only there: the global tokens also time the shelves, whose
+restored cascade must not change. It sits under `prefers-reduced-motion: no-preference`, or it would undo reduced motion's 200 ms fade.
+Measured: the cards end at ~800 ms (rounded to two decimals), and at ~220 ms with reduced motion.
+**Open** — The brief skeleton is still there, and may last longer in production than on localhost. If it bothers the user, that is the next thing to look at.
+**Watch out** — Vercel builds fail now and then (2026-10-31, three times on this PR) with `Can't resolve
+'@vercel/turbopack-next/internal/font/google/font'` / `next/font/google queries have exactly one entry`, on a font that changes between
+runs (Sofia Sans, then Sofia Sans Extra Condensed). It is intermittent: a later build restoring the same cache as a failed one passed, so
+the cache is not the cause, and the commit's code neither (fonts untouched, the same commit passed). Root cause not found. To retry,
+`npx vercel redeploy <deployment url>`, which turns the commit's status green; a `develop` → `main` release may need it too. Local
+`node_modules` was on Next 16.3.6 while the lockfile says 16.4.2, so a local build is not proof of what Vercel builds: use a clean
+`npm ci` copy to compare.
+
+---
+
+## 2026-10-31 — The user's first round on the entrances (`feat/61-entrance-rollout`, #61)
+
+**Did** — Shelves: `.enter-shelves` brings back their cascade in CSS, with the old timings (160 ms between shelves, 55 ms
+between cards, title sliding in, bounce). `/user`: `UserVaultLevel` holds its room with `UserVaultLevelSkeleton`, which
+`UserPageSkeleton` uses too, and the rankings switch renders unseen until it is known. `useVaultMe`'s `isLoading` now covers
+the session read, but not `update()`'s brief `loading` once it has answered.
+**Why** — The user preferred the shelves as they were, and on `/user` the level came last and pushed the page down. The home
+stays as it is (the user's answer).
+**Decisions** — The switch's room is the same row, `invisible` and `inert`, not a fixed height: a guessed 54 px was 17 px
+short (real rows are 71 px, up to 132 px on a phone), and any height would fail in another language. An `&nbsp;` in the empty
+`h1` was tried and removed: it changed nothing measurable.
+**Verification** — With `/api/rankings/me` held back 1.5 s: the card went from a 118 px jump (471→589 px) to none (1009 and
+589 px throughout), the platforms from moving 17 px to not moving, and that moment's CLS to 0.0003. Shelves' delays read from
+the browser match the old ones, and `data-entered` ends them.
+**Then** — The last jumps of a full load of `/user`: the page holds `UserPageSkeleton` until the session is known, as the home
+does (`status === 'loading' && !session`), and the follow counts' block is as wide as the text, so it wraps with it on a phone.
+CLS went from 0.13 to 0.0004 at 390 px (four loads) and from 0.024 to 0.0004 at 2560 px. Handing the session over from the
+server was read and rejected: a nested `SessionProvider` shares next-auth's module-level `__NEXTAUTH`, so the root one would
+never fetch, read as `unauthenticated` (`ThemeContext`, `ShapeSync`), and lose its state when the nested one unmounts; in the root
+layout it would make every page dynamic; moving it down touches every segment. The layout's own session has `raid`, too.
+**Open** — A single load of other pages, signed in as an admin: `/racha` at 390 px has CLS 0.19, the footer moving at 184 ms;
+`/following` at 2560 px 0.018; `/rankings`, `/groups` and `/playing` under 0.001. Not looked into.
+
+---
+
+## 2026-10-31 — Entrance animations on every page (`feat/61-entrance-rollout`, #61)
+
+**Did** — One set of CSS entrances in `globals.css` (`.enter-rise`, `-card`, `-rows`, `-cards`, `-grow-x/y`, `--enter-*`
+tokens) applied to every route with the families agreed on 2026-10-25; `/user` first as the reference. Replaced every
+first-load Framer entrance with it (whole pages fading in, `useRise`, `rankingsMotion`, the shelves' cascade, `ChartCard`'s
+`whileInView`, the landing's module). `useEntrancesOnce` ends a list's entrance. `CountUp` gained `format`; `StatPill`,
+`GameHeroTile` and the big figures count up. Guard in `uiGuard.test.ts`, specimen in `/design`, docs in `docs/design-system.md`.
+**Why** — `/user` felt static next to the home. Most other pages did animate, but through Framer: hidden until hydration,
+which the issue forbids.
+**Decisions** — A class on the list plus one document listener for `data-entered`, not a wrapper component: a one-word
+change per list, and it works in server components. Reduced motion restates the tokens instead of a second set of rules.
+A `ProgressBar` grows by being inside an entering element, so no prop. The home's left card and profile column and the
+welcome keep their own keyframes (the first are what the user liked, the second is timed to the curtain). `/design` got
+its title only; a reference page should not make you wait.
+**Verification** — 834 suites / 5,269 tests, ESLint, tsc and the build pass. In a production build, signed in, every route
+at 390 and 2560 px in both designs: entrances play, no horizontal overflow, nothing visible stays faint. Reorder: 0 rows
+replay with `data-entered`, 12 without. Reduced motion: 200 ms fades, no delay, no movement. Against a build of `develop`, 3
+runs each: game page CLS 0 (390) and 0.015 against 0.016–0.037 (2560); no long tasks. Home long tasks equal. Landing LCP
+at 4× CPU 836–972 ms against 816–944 ms, CLS 0.
+**Open** — Home CLS moved a little: 0.098 against 0.094 at 2560 px, 0.25–0.31 against 0.29 at 390 px. The home's CLS was
+already high and comes from data arriving; the Framer fade that was removed probably hid part of it. On a phone the level
+badge overlaps the points on `/user` (`UserVaultLevel`), the same on `develop`; not touched here.
+**Watch out** — Xbox's game page and someone's game page (`/user/<name>/<platform>/<id>`) were not opened in the browser (same `GameHero` and table classes as the others). The issue's
+comment has the route inventory. A list that mounts with a skeleton as its child would play on the skeleton. Measuring in one
+Playwright page, init scripts pile up and CLS counts several times: use a new page per run.
+
+---
+
 ## 2026-10-31 — Hidden-game visibility and completion dates (`fix/88-hidden-games-completion-dates`, #88)
 
 **Did** — Applied source-qualified hidden filtering at listing BFF and shared client boundaries, including

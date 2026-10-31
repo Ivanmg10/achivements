@@ -14,7 +14,7 @@ const CHIP = 'flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full ring-1 
 export default function AuthBrand() {
   const { T } = useLanguage()
   return (
-    <div className="flex flex-col items-center text-center gap-2">
+    <div className="flex flex-col items-center text-center gap-2 enter-rise">
       <p className="text-3xl sm:text-4xl font-extrabold text-text-main tracking-tight">{T.authPage.brand}</p>
       <p className="text-sm text-text-secondary max-w-xs text-balance">{T.landing.tagline}</p>
       <ul className="flex flex-wrap items-center justify-center gap-2 mt-1">

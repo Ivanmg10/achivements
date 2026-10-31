@@ -15,7 +15,7 @@ export default function EmptyState({
 
   return (
     <div
-      className={`flex flex-col items-center justify-center gap-2 text-center px-6 ${isCompact ? '' : 'flex-1'} ${className ?? ''}`}
+      className={`enter-rise flex flex-col items-center justify-center gap-2 text-center px-6 ${isCompact ? '' : 'flex-1'} ${className ?? ''}`}
     >
       <span
         aria-hidden="true"

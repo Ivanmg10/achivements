@@ -21,7 +21,7 @@ export default function RankingsGuideBlock({
   children?: React.ReactNode
 }) {
   return (
-    <section aria-labelledby={`guide-${index}`} className={`${SURFACE} p-5 sm:p-7 grid gap-5 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10`}>
+    <section aria-labelledby={`guide-${index}`} className={`enter-card ${SURFACE} p-5 sm:p-7 grid gap-5 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10`}>
       <div className="lg:sticky lg:top-24 self-start flex flex-col gap-2">
         <span aria-hidden="true" className="font-display italic font-extrabold text-6xl leading-[0.85] text-accent pr-2">
           {String(index).padStart(2, '0')}

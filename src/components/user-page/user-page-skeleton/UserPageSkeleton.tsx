@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { canUseXbox } from '@/utils/xboxAccess'
 import { Skeleton } from '@/components/ui/Skeleton'
+import UserVaultLevelSkeleton from '../user-vault-level/user-vault-level-skeleton/UserVaultLevelSkeleton'
 
 const CARD = 'bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06]'
 
@@ -35,7 +36,7 @@ export default function UserPageSkeleton() {
                   <Skeleton radius="button" className="h-9 w-28" />
                 </div>
               </div>
-              <Skeleton radius="tile" className="h-28" />
+              <UserVaultLevelSkeleton />
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 flex-1">
                 {[0, 1, 2, 3].map((i) => (
                   <Skeleton key={i} radius="tile" className="min-h-24" />

@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { useLanguage } from '@/context/LanguageContext'
+import { CountUp } from '@/components/ui/CountUp'
 import { Skeleton } from '@/components/ui/Skeleton'
 
 export function StatPill({
@@ -26,6 +28,7 @@ export function StatPill({
   href?: string
   onClick?: () => void
 }) {
+  const { lang } = useLanguage()
   const interactiveCls = 'text-left hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
   const largeInteractiveCls = "text-left isolate after:content-[''] after:absolute after:inset-0 after:-z-10 after:rounded-tile after:skew-x-(--slant-pill) after:transition-colors hover:after:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
 
@@ -46,7 +49,7 @@ export function StatPill({
   const inner = (
     <>
       <span className="text-[10px] font-semibold uppercase tracking-widest text-text-secondary">{label}</span>
-      <span className={`text-[1.75rem] leading-tight font-bold tabular-nums ${accentColor ? '' : (accent ?? 'text-text-main')}`} style={accentColor ? { color: accentColor } : undefined}>{loading ? <Skeleton className="h-[1lh] w-16 max-w-full" /> : value}</span>
+      <span className={`text-[1.75rem] leading-tight font-bold tabular-nums ${accentColor ? '' : (accent ?? 'text-text-main')}`} style={accentColor ? { color: accentColor } : undefined}>{loading ? <Skeleton className="h-[1lh] w-16 max-w-full" /> : typeof value === 'number' ? <CountUp value={value} locale={lang} /> : value}</span>
       {sub && <span className="text-xs text-text-secondary">{sub}</span>}
     </>
   )

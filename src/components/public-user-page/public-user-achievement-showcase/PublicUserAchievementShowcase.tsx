@@ -41,7 +41,7 @@ export default function PublicUserAchievementShowcase() {
       ) : items.length === 0 ? (
         <EmptyState icon={<IconTrophy className="w-6 h-6" />} title={T.showcase.emptyPublic} size="compact" className="py-6" />
       ) : (
-        <ul className={GRID}>
+        <ul className={`${GRID} enter-cards`}>
           {items.map((item) => (
             <li key={showcaseKey(item)}>
               <ShowcaseTile item={item} subject={subject} />

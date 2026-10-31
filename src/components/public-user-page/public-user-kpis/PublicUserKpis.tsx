@@ -33,7 +33,7 @@ export default function PublicUserKpis() {
   const days = (n: number) => T.userProfile.days.replace('{n}', n.toLocaleString(lang))
 
   return (
-    <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+    <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 enter-cards">
       <UserVaultStat icon={<IconCalendarEvent size={18} />} label={T.userProfile.today} value={kpis.today} accent="text-text-main" />
       <UserVaultStat icon={<IconCalendarWeek size={18} />} label={T.userProfile.week} value={kpis.week} accent="text-text-main" />
       <UserVaultStat icon={<IconCalendarMonth size={18} />} label={T.userProfile.month} value={kpis.month} accent="text-text-main" />
@@ -49,14 +49,14 @@ export default function PublicUserKpis() {
         icon={<IconFlame size={18} />}
         label={T.userProfile.streak}
         value={streak}
-        display={days(streak)}
+        format={days}
         accent={streak > 0 ? 'text-accent' : 'text-text-secondary'}
       />
       <UserVaultStat
         icon={<IconTrophy size={18} />}
         label={T.userProfile.bestStreak}
         value={bestStreak?.days ?? 0}
-        display={days(bestStreak?.days ?? 0)}
+        format={days}
         accent="text-text-main"
       />
     </dl>

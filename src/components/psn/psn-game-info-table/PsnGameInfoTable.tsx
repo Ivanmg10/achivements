@@ -205,7 +205,7 @@ export default function PsnGameInfoTable({
                   )}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="enter-rows">
                 {shown.map((t) => (
                   <PsnGameInfoTrophy
                     key={t.id}
@@ -223,7 +223,7 @@ export default function PsnGameInfoTable({
           </div>
 
           {/* Phone card list */}
-          <ul className="sm:hidden w-full flex flex-col gap-2">
+          <ul className="sm:hidden w-full flex flex-col gap-2 enter-rows">
             {shown.map((t) => (
               <PsnGameInfoTrophyCard
                 key={t.id}

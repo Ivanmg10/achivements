@@ -192,7 +192,7 @@ export default function XboxGameInfoTable({
                   )}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="enter-rows">
                 {shown.map((a) => (
                   <XboxGameInfoAchievement
                     key={a.id}
@@ -210,7 +210,7 @@ export default function XboxGameInfoTable({
           </div>
 
           {/* Phone card list */}
-          <ul className="sm:hidden w-full flex flex-col gap-2">
+          <ul className="sm:hidden w-full flex flex-col gap-2 enter-rows">
             {shown.map((a) => (
               <XboxGameInfoAchievementCard
                 key={a.id}

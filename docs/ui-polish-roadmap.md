@@ -65,6 +65,9 @@ YOUR NOTES:
 
 ## 3. Entrance animations on every page and component  **D** (issue #61)
 
+**Done 2026-10-31 (`feat/61-entrance-rollout`), with the families agreed on 2026-10-25 and no design round:
+see `docs/design-system.md` → Entrances.** What follows is the original plan, kept for the record.
+
 The home has them (left card `ViewEntrance`, profile column `MainPageProfile.module.css`); the rest of
 the site is static next to it. Rules already agreed (CLAUDE.md → Roadmap):
 

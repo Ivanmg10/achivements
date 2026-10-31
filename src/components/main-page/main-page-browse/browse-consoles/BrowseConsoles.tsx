@@ -23,7 +23,7 @@ export default function BrowseConsoles({ consoles }: { consoles: ConsoleSummary[
   return (
     <div className="flex flex-col gap-3">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.consolesTitle}</p>
-      <ul className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2">
+      <ul className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 enter-cards">
         {consoles.map((c) => {
           const icon = ICON_BY_ID.get(c.consoleId)
           return (

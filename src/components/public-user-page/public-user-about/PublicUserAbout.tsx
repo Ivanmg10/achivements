@@ -76,7 +76,7 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
         {favorites.length === 0 ? (
           <p className="text-xs text-text-secondary italic">{T.userProfile.noFavorites}</p>
         ) : (
-          <ul className="flex flex-col gap-1.5">
+          <ul className="flex flex-col gap-1.5 enter-rows">
             {favorites.map(({ source, game }) => {
               const icon = candidateIconUrl({ source, imageRef: game!.imageIcon })
               return (
@@ -108,7 +108,7 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
         {groups.length === 0 ? (
           <EmptyState icon={<IconFolders className="w-6 h-6" />} title={T.userProfile.noGroups} subtitle={T.userProfile.noGroupsHint} className="py-8" />
         ) : (
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 enter-cards">
             {groups.map((g) => (
               <li key={g.id}>
                 <GroupCard group={g} />

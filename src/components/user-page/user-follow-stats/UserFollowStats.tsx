@@ -17,7 +17,8 @@ export default function UserFollowStats() {
   const { T, lang } = useLanguage()
   const { counts, isLoading, error } = useFollowCounts()
   if (error) return <span role="alert" className="text-danger">{T.following.countsError}</span>
-  if (isLoading || !counts) return <Skeleton className="inline-block h-3 w-40 max-w-full align-middle" />
+  // As wide as the two counts: on a phone they take a second line, and the block must too.
+  if (isLoading || !counts) return <Skeleton className="inline-block h-3 w-44 max-w-full align-middle" />
 
   return (
     <>

@@ -94,6 +94,19 @@ test('a loading block comes from Skeleton, never a hand-made pulse', () => {
   expect(offenders(/\banimate-pulse\b/).filter((f) => !allowed.includes(f))).toEqual([])
 })
 
+test('an entrance is CSS (globals.css → .enter-*), never Framer', () => {
+  // What opens on a click, not on a load: dialogs, toasts, the library's swaps and opened rows, the welcome's opened point.
+  const allowed = [
+    path.join('components', 'library-detail-row', 'LibraryDetailRow.tsx'),
+    path.join('components', 'library-explorer', 'LibraryExplorer.tsx'),
+    path.join('components', 'toaster', 'toast-item', 'ToastItem.tsx'),
+    path.join('components', 'welcome-page', 'welcome-page-intro-detail', 'WelcomePageIntroDetail.tsx'),
+  ]
+  expect(offenders(/initial=\{[^}]*\{[^}]*\b[xy]: /).filter((f) => !allowed.includes(f))).toEqual([])
+  expect(offenders(/whileInView|useInView/)).toEqual([])
+  expect(offenders(/variants=\{fadeUp\}/)).toEqual([])
+})
+
 test('a disclosure and a show-more button come from the library (Accordion, ShowMore)', () => {
   expect(offenders(/aria-expanded=\{[^}]*\}[\s\S]{0,400}IconPlus/)).toEqual([])
 })
