@@ -195,7 +195,8 @@ export default function MainHeader() {
         )}
 
         {/* Right: search icon (mobile) + streak + user */}
-        <div className="flex items-center gap-2.5 shrink-0 ml-auto lg:ml-0 z-10">
+        {/* On lg+ the search bar pushes this to the right; with no platform there is none to push it. */}
+        <div className={`flex items-center gap-2.5 shrink-0 ml-auto z-10 ${hasPlatform ? 'lg:ml-0' : ''}`}>
           {/* Search icon - mobile only, to the right */}
           {hasPlatform && (
           <button
