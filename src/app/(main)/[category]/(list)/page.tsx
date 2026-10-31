@@ -40,7 +40,7 @@ import LibraryQuickFilters from '@/components/library-quick-filters/LibraryQuick
 import LibraryViewToggle from '@/components/library-view-toggle/LibraryViewToggle'
 import LibraryAllList from '@/components/library-all-list/LibraryAllList'
 import {
-  buildEntries, countQuick, matchesQuick, MIXED_SORT_KEYS, psnProgress, raProgress, sortEntries, steamProgress, xboxProgress, type QuickFilter,
+  buildEntries, countQuick, matchesQuick, mixedSortKeys, psnProgress, raProgress, sortEntries, steamProgress, xboxProgress, type QuickFilter,
 } from '@/utils/libraryInsights'
 import LibraryExplorer from '@/components/library-explorer/LibraryExplorer'
 import LibraryExplorerSkeleton from '@/components/library-explorer-skeleton/LibraryExplorerSkeleton'
@@ -271,7 +271,7 @@ export default function CategoryPage() {
                 <StatusPageHeader category={cat} gameCount={mixedList.length} />
                 <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
                   <CategorySearch value={query} onChange={setQuery} />
-                  <StatusSortControl cat={cat} keys={[...MIXED_SORT_KEYS]} sortState={allSortState} onChange={setAllSortState} />
+                  <StatusSortControl cat={cat} keys={mixedSortKeys(cat)} sortState={allSortState} onChange={setAllSortState} />
                   <StatusGridControl cols={gridCols} onChange={setGridCols} />
                   {viewToggle}{layoutToggle}
                 </div>

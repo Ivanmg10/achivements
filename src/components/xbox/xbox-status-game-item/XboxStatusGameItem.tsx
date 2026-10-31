@@ -92,7 +92,11 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
                 {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
               </span>
             )}
-            {game.lastPlayed && (
+            {category === 'completed' && game.completedAt ? (
+              <span className="text-xs text-text-secondary mt-1">
+                {T.libraryDetail.finished} · {new Date(game.completedAt).toLocaleDateString(lang)}
+              </span>
+            ) : game.lastPlayed && (
               <span className="text-xs text-text-secondary mt-1">
                 {T.steam.lastPlayed} · {new Date(game.lastPlayed).toLocaleDateString(lang)}
               </span>

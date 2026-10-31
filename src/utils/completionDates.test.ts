@@ -1,4 +1,4 @@
-import { latestFullSetCompletedAt, psnBaseCompletedAt, raAwardCompletedAt, validCompletionDate, xboxFullSetCompletedAt } from './completionDates'
+import { latestFullSetCompletedAt, psnBaseCompletedAt, raAwardCompletedAt, validCompletionDate, xboxFullSetCompletedAt, byCompletedDesc } from './completionDates'
 import type { PsnTrophy } from '@/types/psn'
 
 const trophy = (over: Partial<PsnTrophy>): PsnTrophy => ({
@@ -71,4 +71,9 @@ test('Xbox reads unlockedAt and never substitutes lastPlayed', () => {
     { unlocked: true, unlockedAt: '2026-04-01T00:00:00Z' },
   ])).toBe('2026-04-01T00:00:00Z')
   expect(xboxFullSetCompletedAt([{ unlocked: false, unlockedAt: null }])).toBeNull()
+})
+
+test('completed lists go by completion, not by what was played last', () => {
+  const games = [{ id: 'dlc-this-year', at: '2021-12-23T00:26:33Z' }, { id: 'undated', at: null }, { id: 'newer', at: '2024-05-25T10:40:56Z' }]
+  expect([...games].sort(byCompletedDesc((g) => g.at)).map((g) => g.id)).toEqual(['newer', 'dlc-this-year', 'undated'])
 })

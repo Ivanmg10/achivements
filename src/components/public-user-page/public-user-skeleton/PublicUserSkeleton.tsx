@@ -12,7 +12,7 @@ export default function PublicUserSkeleton() {
     <div role="status" aria-busy="true" className="min-h-full flex flex-col items-center py-4 sm:py-6 px-4">
       <span className="sr-only">{T.userProfile.loadingProfile}</span>
       <div aria-hidden="true" className="w-full lg:max-w-[95%] flex flex-col gap-4">
-        <div className="bg-bg-card rounded-card px-4 sm:px-6 pt-6 pb-5 flex flex-col gap-5">
+        <div className="bg-bg-card rounded-card px-4 sm:px-6 pt-6 pb-5 flex flex-col gap-5 min-h-[685px] sm:min-h-[352px]">
           <div className="flex items-center gap-4 sm:gap-5">
             <Skeleton radius="circle" className="w-20 h-20 sm:w-28 sm:h-28 shrink-0" />
             <div className="flex flex-col gap-2 flex-1">
@@ -27,13 +27,13 @@ export default function PublicUserSkeleton() {
             ))}
           </div>
         </div>
-        <div className="flex gap-5 border-b border-ink/5 pb-2.5 overflow-hidden">
+        <div className="flex items-center gap-5 border-b border-ink/5 h-[49px] sm:h-[34px] overflow-hidden">
           {[0, 1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-4 w-20" />
           ))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
-          <div className="bg-bg-card rounded-tile p-4 flex flex-col gap-2 min-h-[26rem]">
+          <div className="bg-bg-card rounded-tile p-4 flex flex-col gap-2 min-h-[26rem] lg:min-h-[692px]">
             <Skeleton className="h-8 w-48" />
             {[0, 1, 2, 3, 4, 5].map((i) => (
               <GameRowSkeleton key={i} />

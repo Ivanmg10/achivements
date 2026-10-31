@@ -21,7 +21,7 @@ export default function GameInfoSkeleton() {
       <div aria-hidden="true" className="w-full flex flex-col items-center">
         <section className="w-full px-4 sm:px-8 lg:px-14 pt-6 lg:pt-10 flex flex-col lg:flex-row gap-6 lg:gap-9 items-start">
           <Skeleton radius="tile" className="w-32 sm:w-40 lg:w-[13.5rem] aspect-[216/306] shrink-0" />
-          <div className="flex flex-col flex-1 min-w-0 gap-3.5 lg:pt-1.5 w-full">
+          <div className="flex flex-col flex-1 min-w-0 gap-3.5 lg:pt-1.5 w-full min-h-[451px] lg:min-h-0">
             <div className="flex gap-2">
               <Skeleton radius="tag" className="h-6 w-28" />
               <Skeleton radius="tag" className="h-6 w-20" />
@@ -41,10 +41,10 @@ export default function GameInfoSkeleton() {
               <Skeleton radius="button" className="h-11 w-40" />
             </div>
           </div>
-          <div className="hidden lg:flex flex-col gap-3 w-[26.25rem] shrink-0">
+          <div className="flex flex-col gap-3 w-full lg:w-[26.25rem] shrink-0">
             <div className="grid grid-cols-2 gap-2">
-              <Skeleton radius="tile" className="h-[4.5rem]" />
-              <Skeleton radius="tile" className="h-[4.5rem]" />
+              <Skeleton radius="tile" className="h-[4.6875rem]" />
+              <Skeleton radius="tile" className="h-[4.6875rem]" />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <Skeleton radius="tile" className="aspect-[320/224]" />

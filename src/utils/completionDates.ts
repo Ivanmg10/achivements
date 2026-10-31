@@ -21,6 +21,11 @@ export function psnBaseCompletedAt(trophies: PsnTrophy[]): string | null {
   return dates.reduce((latest, date) => date > latest ? date : latest, dates[0])
 }
 
+/** Newest completion first, undated games last, for a list of completed games. */
+export function byCompletedDesc<T>(dateOf: (game: T) => string | null | undefined) {
+  return (a: T, b: T) => (validCompletionDate(dateOf(b)) ?? '').localeCompare(validCompletionDate(dateOf(a)) ?? '')
+}
+
 /** Steam/Xbox rule: latest earned achievement only when the whole current set is earned. */
 export function latestFullSetCompletedAt(achievements: { earned: boolean; earnedAt: string | null }[]): string | null {
   if (achievements.length === 0 || achievements.some((achievement) => !achievement.earned)) return null

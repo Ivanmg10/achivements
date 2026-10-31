@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { IconClock } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
+import { validCompletionDate } from '@/utils/completionDates'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamLibraryDetail from '@/components/steam/steam-library-detail/SteamLibraryDetail'
@@ -106,9 +107,15 @@ export default function SteamStatusGameItem({
               <IconClock size={12} aria-hidden="true" />
               {T.steam.playtime} · {playtime}
             </span>
-            <span className="text-xs text-text-secondary mt-1">
-              {T.steam.lastPlayed} · {game.lastPlayed ? new Date(game.lastPlayed).toLocaleDateString(lang) : T.steam.neverPlayed}
-            </span>
+            {category === 'completed' && validCompletionDate(game.lastUnlock) ? (
+              <span className="text-xs text-text-secondary mt-1">
+                {T.libraryDetail.finished} · {new Date(game.lastUnlock!).toLocaleDateString(lang)}
+              </span>
+            ) : (
+              <span className="text-xs text-text-secondary mt-1">
+                {T.steam.lastPlayed} · {game.lastPlayed ? new Date(game.lastPlayed).toLocaleDateString(lang) : T.steam.neverPlayed}
+              </span>
+            )}
           </div>
 
           <span className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 shrink-0 self-start sm:self-center -mr-2 sm:mr-0">

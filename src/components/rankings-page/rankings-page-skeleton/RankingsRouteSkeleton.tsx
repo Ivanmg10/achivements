@@ -1,6 +1,5 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { SURFACE } from '@/components/ui/surface'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -9,7 +8,6 @@ import RankingsPageSkeleton from './RankingsPageSkeleton'
 /** The rankings page before it arrives: its title, its filters, the list and the column beside it, in the page's gutters. Announced once. */
 export default function RankingsRouteSkeleton() {
   const { T } = useLanguage()
-  const signedIn = useSession().status === 'authenticated'
 
   return (
     <div role="status" aria-busy="true" className="flex flex-col items-center pt-6 pb-10 px-4 sm:px-8">
@@ -23,14 +21,17 @@ export default function RankingsRouteSkeleton() {
         </header>
 
         <div aria-hidden="true" className="flex flex-col lg:flex-row lg:items-end gap-3 lg:gap-3.5 lg:shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)]">
-          {signedIn ? <Skeleton className="h-11 lg:h-[50px] w-56 max-w-full" /> : <span className="hidden lg:block h-[50px]" />}
-          <div className={`flex flex-wrap items-center content-start gap-x-2 gap-y-1 lg:ml-auto lg:mb-1.5 lg:min-h-0 ${signedIn ? 'min-h-[172px]' : 'min-h-[136px]'}`}>
+          <Skeleton className="if-signed-in h-11 lg:h-[50px] w-56 max-w-full" />
+          <span className="if-signed-out hidden lg:block h-[50px]" />
+          <div className="flex flex-wrap items-center content-start gap-x-2 gap-y-1 lg:ml-auto lg:mb-1.5 min-h-[136px] lg:min-h-0">
             {[0, 1, 2, 3].map((i) => (
               <Skeleton key={i} radius="chip" className="h-8 w-14" />
             ))}
             <Skeleton radius="control" className="h-8 w-32" />
             <Skeleton radius="control" className="h-8 w-32" />
           </div>
+          {/* Signed in, one more platform and the tabs push the filters down a row on a phone. */}
+          <span className="if-signed-in h-6 lg:hidden" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start">

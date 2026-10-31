@@ -73,3 +73,17 @@ test('the opened detail is its own full-width row beside the card, not inside it
   expect(card).not.toContainElement(row)
   expect(card).toHaveClass('ring-2')
 })
+
+test('on Completed it says when the game was completed, not when a DLC was played', () => {
+  render(<PsnStatusGameItem game={{ ...GAME, lastPlayed: '2026-10-25T14:18:57Z', completedAt: '2021-12-23T00:26:33Z' }} category="completed" />)
+  expect(screen.getByText(new RegExp(en.libraryDetail.finished))).toHaveTextContent(new Date('2021-12-23T00:26:33Z').toLocaleDateString('en'))
+  expect(screen.queryByText(new RegExp(en.steam.lastPlayed))).not.toBeInTheDocument()
+})
+
+test('with no completion date, or elsewhere, it keeps the last session', () => {
+  const { unmount } = render(<PsnStatusGameItem game={{ ...GAME, completedAt: null }} category="completed" />)
+  expect(screen.getByText(new RegExp(en.steam.lastPlayed))).toBeInTheDocument()
+  unmount()
+  render(<PsnStatusGameItem game={{ ...GAME, completedAt: '2021-12-23T00:26:33Z' }} category="playing" />)
+  expect(screen.getByText(new RegExp(en.steam.lastPlayed))).toBeInTheDocument()
+})

@@ -7,13 +7,14 @@ import { useClickAway } from '@/hooks/useClickAway'
 import { MENU_SURFACE, menuItemClass } from '@/components/ui/menu'
 import { buttonClass } from '@/components/ui/Button'
 
-export type StatusSortKey = 'name' | 'lastPlayed' | 'percent' | 'points'
+export type StatusSortKey = 'name' | 'lastPlayed' | 'completed' | 'percent' | 'points'
 export type SortDir = 'asc' | 'desc'
 export type StatusSortState = { key: StatusSortKey; dir: SortDir }
 
 const STATUS_SORT_DEFAULT_DIRS: Record<StatusSortKey, SortDir> = {
   name: 'asc',
   lastPlayed: 'desc',
+  completed: 'desc',
   percent: 'desc',
   points: 'desc',
 }

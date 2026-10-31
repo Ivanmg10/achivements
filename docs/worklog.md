@@ -75,6 +75,24 @@ tested, on purpose, so this does not say a bypass existed.
 
 ---
 
+## 2026-10-31 — Completed lists by completion date, and the skeleton leftovers (`fix/99-completed-dates-skeletons`, #99)
+
+**Did** — `/completed` now orders by completion date by default, with a new `completed` sort key, and its rows, cards and shelf
+cards say "Finished" with that date. Skeletons: Activity, Pinned, Browse, game pages (tiles on a phone, ten rows), public profile,
+group detail and the home's phone stats measured against real pages. The root script now also carries the library layout
+and whether a session is expected, so full loads paint the right variant. New `RememberedHeight` for data-sized blocks.
+**Why** — The user's Marvel's Spider-Man (platinum 2021-12-23, DLC trophies 2026-10-25, 74 %) topped Completed dated 2026. The API
+was already right (`completedAt`, #88): the list sorted and dated by last activity. Also, `main` has neither #93 nor this.
+**Decisions** — Fall back to the last session when no completion date exists. RA's own list keeps its orders: it has no key
+for this. `RememberedHeight` stores `width:height` per block, device-bound, and is not a synced preference.
+A lazy chart's stages (page skeleton, data, plot download) now draw one `ChartSkeleton`, not bars and then a solid block.
+**Open** — Production needs a release to show any of this. First visits still adjust on data-sized blocks. Modals were not
+measured in a browser. Followers' cards are shorter than the skeleton's, and the list relies on its remembered height.
+**Watch out** — The session look reads the last visit, so right after signing out in another tab a full load can show the
+signed-in variant until the session is read.
+
+---
+
 ## 2026-10-31 — A skeleton for every screen (`feat/70-skeleton-every-screen`, #70)
 
 **Did** — Audited every loading state (inventory on issue #70), added `ui/Skeleton` with the `--color-skeleton`

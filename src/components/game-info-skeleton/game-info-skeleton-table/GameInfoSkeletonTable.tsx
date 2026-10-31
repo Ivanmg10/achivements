@@ -1,6 +1,6 @@
 import { Skeleton } from '@/components/ui/Skeleton'
 
-const ROWS = 6
+const ROWS = 10
 
 /**
  * The achievement table while it loads: rows shaped like the real ones

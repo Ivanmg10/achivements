@@ -58,6 +58,7 @@ export default function FollowingPage() {
         ) : (
           <FollowingList
             key="followers"
+            id="followers"
             tabs={<FollowingTabs tab={tab} onTab={onTab} counts={counts} />}
             users={fans.followers ?? []}
             details={fans.details}

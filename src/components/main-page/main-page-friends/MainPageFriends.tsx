@@ -10,6 +10,7 @@ import { useProfileLibrary } from '@/hooks/useProfileLibrary'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { ACTIVITY_DAYS, friendStats, friendsFeed, sharedWithFriends, type LeaderRow } from '@/utils/friends'
 import { ChartCard } from '@/components/ui/ChartCard'
+import { RememberedHeight } from '@/components/ui/RememberedHeight'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import EmptyState from '@/components/empty-state/EmptyState'
 import MainPageFriendsLeaderboard from './main-page-friends-leaderboard/MainPageFriendsLeaderboard'
@@ -75,7 +76,14 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
   }
 
   // The whole section at once, never friend by friend (the user's preference). A failed read still lands, as `partial`.
-  if (isLoading || detailsLoading || mine.isLoading) return <MainPageFriendsSkeleton leaders={friends ? Math.min(friends.length, DETAIL_LIMIT) + 1 : undefined} cards={friends?.length} />
+  const loading = isLoading || detailsLoading || mine.isLoading
+  if (loading) {
+    return (
+      <RememberedHeight id="friends" loading>
+        <MainPageFriendsSkeleton leaders={friends ? Math.min(friends.length, DETAIL_LIMIT) + 1 : undefined} cards={friends?.length} />
+      </RememberedHeight>
+    )
+  }
 
   if (!friends || friends.length === 0) {
     return (
@@ -86,7 +94,7 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <RememberedHeight id="friends" loading={false} className="flex flex-col gap-4">
       {/* Where you stand, and beside it what they did lately, as tall as it (scrolling inside); then who they are, across the width. */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="xl:col-span-2 flex flex-col min-w-0">
@@ -130,6 +138,6 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
       <ChartCard>
         <MainPageFriendsShared rows={shared} />
       </ChartCard>
-    </div>
+    </RememberedHeight>
   )
 }

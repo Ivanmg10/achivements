@@ -23,6 +23,7 @@ export const en = {
     label: 'Sort',
     name: 'A-Z',
     lastPlayed: 'Last played',
+    completed: 'Finished',
     percent: '% completed',
     points: 'Points',
   },
@@ -545,7 +546,7 @@ export const en = {
       {
         heading: 'Cookies and local storage',
         body: [
-          'Necessary, no consent needed: a session cookie that keeps you signed in, a cookie with the language you choose (so pages arrive already in it), and local storage for your language, theme and cookie choice.',
+          'Necessary, no consent needed: a session cookie that keeps you signed in, a cookie with the language you choose (so pages arrive already in it), and local storage for your language, theme and cookie choice, plus how pages paint (layout, whether you were signed in, the height of some blocks) so they load without jumps.',
           'Analytics, only if you accept: Google Analytics cookies (_ga, _ga_*), which last up to two years. Google is told the page path, never the rest of the address. You can withdraw consent at any time from "Cookie settings" at the bottom of the page: analytics stops at once and its cookies are deleted.',
         ],
       },

@@ -12,6 +12,7 @@ import CollectionShelf from './collection-shelf/CollectionShelf'
 import CollectionGrid from './collection-grid/CollectionGrid'
 import CollectionNumbers from './collection-numbers/CollectionNumbers'
 import CollectionClosest from './collection-closest/CollectionClosest'
+import { RememberedHeight } from '@/components/ui/RememberedHeight'
 import MainPageCollectionSkeleton from './main-page-collection-skeleton/MainPageCollectionSkeleton'
 
 /** Boxes on the shelf: enough to fill the card's width, few enough to read each one. */
@@ -51,11 +52,15 @@ export default function MainPageCollection({
   )
 
   if (isLoading) {
-    return <MainPageCollectionSkeleton />
+    return (
+      <RememberedHeight id="collection" loading>
+        <MainPageCollectionSkeleton />
+      </RememberedHeight>
+    )
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <RememberedHeight id="collection" loading={false} className="flex flex-col gap-4">
       <ChartCard>
         <CollectionShelf games={latest} counts={counts} />
       </ChartCard>
@@ -70,6 +75,6 @@ export default function MainPageCollection({
         </ChartCard>
         <CollectionClosest inProgress={inProgress} steamGames={steamGames} psnGames={psnGames} xboxGames={xboxGames} />
       </div>
-    </div>
+    </RememberedHeight>
   )
 }

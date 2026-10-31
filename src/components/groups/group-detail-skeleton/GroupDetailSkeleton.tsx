@@ -8,8 +8,8 @@ export default function GroupDetailSkeleton() {
     <div role="status" aria-busy="true" className="flex flex-col gap-5">
       <span className="sr-only">{T.loadingPage.title}</span>
       <div aria-hidden="true" className="flex flex-col gap-5">
-        <Skeleton radius="card" className="h-64 -mx-4 sm:mx-0" />
-        <Skeleton radius="card" className="h-13" />
+        <Skeleton radius="card" className="h-[412px] sm:h-[288px] -mx-4 sm:mx-0" />
+        <Skeleton radius="card" className="h-[182px] sm:h-[50px]" />
         <div className="grid gap-x-4 gap-y-6 grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(7.5rem,9rem))]">
           {Array.from({ length: 6 }, (_, i) => (
             <div key={i} className="flex flex-col gap-2">
