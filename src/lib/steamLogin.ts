@@ -38,9 +38,13 @@ export function steamLoginUrl(base: string, back: URLSearchParams): string {
 /**
  * The SteamID64 Steam vouches for in a callback's query, or null when the
  * answer is not one (cancelled, tampered, for another site). Steam is asked to
- * confirm its own signature; throws when it cannot be reached.
+ * confirm its own signature; throws when it cannot be reached. A repeated
+ * parameter is refused: what is read here and what Steam checks must be the
+ * same value, and Steam's answer does not say which copy it took.
  */
 export async function verifySteamLogin(query: URLSearchParams, base: string): Promise<string | null> {
+  const names = [...query.keys()]
+  if (new Set(names).size !== names.length) return null
   if (query.get('openid.mode') !== 'id_res' || query.get('openid.op_endpoint') !== OPENID) return null
   if ((query.get('openid.return_to') ?? '').split('?')[0] !== `${base}${CALLBACK_PATH}`) return null
   const claimed = query.get('openid.claimed_id') ?? ''

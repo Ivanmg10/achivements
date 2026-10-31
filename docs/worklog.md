@@ -29,6 +29,17 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-30 — Stricter reading of Steam's sign-in answer (`fix/steam-openid-strict`)
+
+**Did** — `verifySteamLogin` refuses an answer with a repeated parameter before reading it or asking
+Steam, with tests. Added the rule to CLAUDE.md.
+**Why** — Hardening from the security audit of #90 (its hypothesis H-01). Steam's own behaviour was not
+tested, on purpose, so this does not say a bypass existed.
+**Decisions** — Fixed in `verifySteamLogin`, the one function sign-in and linking both go through.
+**Watch out** — This code is on `develop` only, not on `main`.
+
+---
+
 ## 2026-10-30 — Xbox quota and failure hardening (`feat/87-xbox-quota-hardening`, #87)
 
 **Did** — Added bounded OpenXBL calls, a PostgreSQL hourly budget, 429 scan stops,
