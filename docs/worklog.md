@@ -42,7 +42,7 @@ platinum/default-group dates and RA completion awards. At the user's explicit de
 and Xbox the latest `unlockedAt` when the current set is 100%, without attempting base/DLC separation. Activity
 and cache fingerprints remain unchanged. Vault rules version 3 recomputes persisted scores on normal refreshes;
 historical snapshots and display data need no migration.
-**Verification** — 816 Jest suites / 5,111 tests, focused cache and platform regressions, ESLint, TypeScript,
+**Verification** — 826 Jest suites / 5,227 tests after merging current `develop`, focused cache and platform regressions, ESLint, TypeScript,
 `git diff --check` and the Next.js production build all passed.
 **Open** — Exact PSN dates with DLC and all completed Xbox dates require per-game achievement reads;
 enrichment failures leave only that date unknown. Missing timestamps remain in collections under Undated.
