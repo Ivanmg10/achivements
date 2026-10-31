@@ -43,13 +43,13 @@ early. `.enter-slow` on the page's `<main>` sets 800 ms and 70 ms apart, and onl
 restored cascade must not change. It sits under `prefers-reduced-motion: no-preference`, or it would undo reduced motion's 200 ms fade.
 Measured: the cards end at ~800 ms (rounded to two decimals), and at ~220 ms with reduced motion.
 **Open** — The brief skeleton is still there, and may last longer in production than on localhost. If it bothers the user, that is the next thing to look at.
-**Watch out** — Vercel builds that restore a build cache failed for this PR, three of three (2026-10-31), with `Can't resolve
+**Watch out** — Vercel builds fail now and then (2026-10-31, three times on this PR) with `Can't resolve
 '@vercel/turbopack-next/internal/font/google/font'` / `next/font/google queries have exactly one entry`, on a font that changes between
-runs (Sofia Sans, then Sofia Sans Extra Condensed). The same commit built without the cache, and so did the last good branch, two of two:
-`npx vercel redeploy <deployment url>` skips the cache and turns the commit's status green. Root cause not found. It is not this branch's
-code (fonts untouched), `turbopackFileSystemCacheForBuild` (already off) or Google's CSS as seen from here, and a second local build on
-its own cache passes. A `develop` → `main` release may hit it too. Local `node_modules` was on Next 16.3.6 while the lockfile says
-16.4.2, so a local build is not proof of what Vercel builds: use a clean `npm ci` copy to compare.
+runs (Sofia Sans, then Sofia Sans Extra Condensed). It is intermittent: a later build restoring the same cache as a failed one passed, so
+the cache is not the cause, and the commit's code neither (fonts untouched, the same commit passed). Root cause not found. To retry,
+`npx vercel redeploy <deployment url>`, which turns the commit's status green; a `develop` → `main` release may need it too. Local
+`node_modules` was on Next 16.3.6 while the lockfile says 16.4.2, so a local build is not proof of what Vercel builds: use a clean
+`npm ci` copy to compare.
 
 ---
 
