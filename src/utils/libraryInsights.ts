@@ -4,7 +4,7 @@ import type { RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
 import type { XboxGameProgress } from '@/types/xbox'
-import type { StatusSortState } from '@/components/status-sort-control/StatusSortControl'
+import type { StatusSortKey, StatusSortState } from '@/components/status-sort-control/StatusSortControl'
 import { compareSortValues } from '@/utils/utils'
 import { raLatestCompletionAward, validCompletionDate } from '@/utils/completionDates'
 import { classifySteamGame } from '@/utils/steamFeed'
@@ -13,6 +13,8 @@ export type QuickFilter = 'all' | 'almost' | 'stalled'
 
 /** The orders every platform can be sorted by: points are RA's alone, so the mixed list does not offer them. */
 export const MIXED_SORT_KEYS = ['name', 'lastPlayed', 'percent'] as const
+/** The orders of a mixed list: a completed one can also go by when each game was completed. */
+export const mixedSortKeys = (category: string): StatusSortKey[] => (category === 'completed' ? ['name', 'completed', 'lastPlayed', 'percent'] : [...MIXED_SORT_KEYS])
 export const QUICK_FILTERS: readonly QuickFilter[] = ['all', 'almost', 'stalled']
 
 /** From this progress (and below 100) a game is "almost done". */
@@ -78,6 +80,6 @@ export function buildEntries(
 
 /** The mixed list's order. "points" is RA's alone, so it is not offered here. */
 export function sortEntries(entries: LibraryEntry[], { key, dir }: StatusSortState): LibraryEntry[] {
-  const value = (e: LibraryEntry) => (key === 'lastPlayed' ? e.lastPlayed : key === 'percent' ? e.pct : e.title)
+  const value = (e: LibraryEntry) => (key === 'lastPlayed' ? e.lastPlayed : key === 'completed' ? e.completedAt ?? null : key === 'percent' ? e.pct : e.title)
   return [...entries].sort((a, b) => compareSortValues(value(a), value(b), dir))
 }

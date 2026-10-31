@@ -1,5 +1,6 @@
 import { homeFit } from '@/lib/homeFit'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { ChartSkeleton } from '@/components/ui/ChartSkeleton'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 import MainPageProfileSkeleton from '../../main-page-profile/main-page-profile-skeleton/MainPageProfileSkeleton'
 import MainPagePortadaSkeleton, { PortadaSideSkeleton } from '../../main-page-portada-skeleton/MainPagePortadaSkeleton'
@@ -8,14 +9,15 @@ const ROWS = 6
 const PINS = 4
 const STATS = 6
 const SECTIONS = 7
+const HEAT_CELLS = 7 * 30
 
 /**
  * One layout of the home, empty, on the same boxes and `home-fit` classes as
  * the page. Each layout is its own `home-fit` box, because the page's rules ask
- * whether that box holds a `.home-cover`. `tabs`: several platforms, so the
- * profile has its switch on top. `label` names the profile's skeleton.
+ * whether that box holds a `.home-cover`. The profile's platform switch shows
+ * by `data-session` on <html>. `label` names the profile's skeleton.
  */
-export default function MainPageSkeletonBody({ cover, pinned, tabs, label }: { cover: boolean; pinned: boolean; tabs: boolean; label: string }) {
+export default function MainPageSkeletonBody({ cover, pinned, label }: { cover: boolean; pinned: boolean; label: string }) {
   return (
     <div ref={homeFit} className={`home-fit flex flex-col min-h-full ${cover ? 'home-if-cover' : 'home-if-classic'}`}>
       {cover && <MainPagePortadaSkeleton />}
@@ -27,7 +29,7 @@ export default function MainPageSkeletonBody({ cover, pinned, tabs, label }: { c
             <PortadaSideSkeleton />
           ) : (
             <section className="main-content m-3 rounded-tile flex flex-col items-center gap-3 overflow-y-auto">
-              {tabs && <Skeleton radius="tile" className="h-[55px] lg:h-10 w-full shrink-0" />}
+              <Skeleton radius="tile" className="if-platform-tabs h-[55px] lg:h-10 w-full shrink-0" />
               <MainPageProfileSkeleton label={label} />
             </section>
           )}
@@ -63,7 +65,7 @@ export default function MainPageSkeletonBody({ cover, pinned, tabs, label }: { c
             ))}
           </div>
           <div className="min-w-0 flex flex-col gap-4">
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap content-start gap-3 min-h-[183px] lg:min-h-0">
               {Array.from({ length: STATS }, (_, i) => (
                 <div key={i} className="px-3 py-1 flex flex-col gap-1 flex-1 min-w-24">
                   <Skeleton className="h-3 w-16" />
@@ -75,12 +77,17 @@ export default function MainPageSkeletonBody({ cover, pinned, tabs, label }: { c
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
               <div className="bg-bg-card rounded-tile p-4 flex flex-col gap-3 xl:col-span-2">
                 <Skeleton className="h-4 w-40" />
-                <Skeleton radius="tag" className="flex-1 min-h-40" />
+                {/* The heatmap's own grid: its loading state draws the same cells. */}
+                <div className="flex-1 min-h-[174px] lg:min-h-40 grid grid-rows-7 grid-flow-col auto-cols-fr gap-1 overflow-hidden">
+                  {Array.from({ length: HEAT_CELLS }, (_, i) => (
+                    <Skeleton key={i} radius="tag" />
+                  ))}
+                </div>
               </div>
               <div className="bg-bg-card rounded-tile p-4 flex flex-col gap-3">
                 <Skeleton className="h-3 w-32" />
                 <Skeleton className="h-8 w-28" />
-                <Skeleton radius="tag" className="home-fit-chart h-[260px]" />
+                <div className="home-fit-chart h-[260px]"><ChartSkeleton labels /></div>
               </div>
             </div>
           </div>

@@ -158,6 +158,9 @@ export function getGameSortValue(
       return game.Title
     case 'lastPlayed':
       return isWantToPlay ? null : (extra?.lastPlayed ?? null)
+    case 'completed':
+      // Offered on the mixed lists only, which carry the date: RA's own list has no such order.
+      return null
     case 'percent':
       return isWantToPlay ? null : (parseFloat((game as RetroAchievementsGameCompleted).PctWon) || 0) * 100
     case 'points':

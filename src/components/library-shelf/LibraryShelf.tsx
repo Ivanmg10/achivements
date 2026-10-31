@@ -66,7 +66,7 @@ export default function LibraryShelf({
       <div className={GRID}>
         {shown.map((e, i) => (
           <motion.div key={e.key} variants={CARD} className={slot(cells[i], i)}>
-            <LibraryShelfCard entry={e} size={cells[i].size} onPick={onPick} />
+            <LibraryShelfCard entry={e} size={cells[i].size} completed={shelf.id === 'recent' || shelf.id === 'older'} onPick={onPick} />
           </motion.div>
         ))}
       </div>

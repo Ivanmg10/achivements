@@ -22,6 +22,7 @@ export const de: Translations = {
     label: 'Sortieren',
     name: 'A-Z',
     lastPlayed: 'Zuletzt gespielt',
+    completed: 'Abgeschlossen',
     percent: '% abgeschlossen',
     points: 'Punkte',
   },
@@ -544,7 +545,7 @@ export const de: Translations = {
       {
         heading: 'Cookies und lokaler Speicher',
         body: [
-          'Notwendig, ohne Einwilligung: ein Sitzungs-Cookie, das dich angemeldet hält, ein Cookie mit der Sprache, die du wählst (damit die Seiten gleich in ihr ankommen), und lokaler Speicher für Sprache, Theme und deine Cookie-Auswahl.',
+          'Notwendig, ohne Einwilligung: ein Sitzungs-Cookie, das dich angemeldet hält, ein Cookie mit der Sprache, die du wählst (damit die Seiten gleich in ihr ankommen), und lokaler Speicher für Sprache, Theme und deine Cookie-Auswahl sowie dafür, wie Seiten gezeichnet werden (Layout, ob du angemeldet warst, Höhe einiger Blöcke), damit sie ohne Sprünge laden.',
           'Analyse, nur mit deiner Zustimmung: Google-Analytics-Cookies (_ga, _ga_*), die bis zu zwei Jahre gelten. Google erhält nur den Seitenpfad, nie den Rest der Adresse. Du kannst die Einwilligung jederzeit über die Cookie-Einstellungen unten auf der Seite widerrufen: Die Analyse stoppt sofort und ihre Cookies werden gelöscht.',
         ],
       },

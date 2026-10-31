@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
+import { byCompletedDesc } from '@/utils/completionDates'
 import { classifySteamGame, hasUnloadedProgress, SteamCategory } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
 
@@ -24,7 +25,7 @@ export function useSteamGamesByCategory(category: string) {
     // The backlog has no play dates to sort by; alphabetical is the useful order.
     return category === 'wantToPlay'
       ? inCategory.sort((a, b) => a.title.localeCompare(b.title))
-      : inCategory.sort(byLastPlayedDesc)
+      : inCategory.sort(category === 'completed' ? byCompletedDesc((g) => g.lastUnlock) : byLastPlayedDesc)
   }, [category, library, isHidden])
 
   /**

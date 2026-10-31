@@ -27,10 +27,11 @@ const SIZES: Record<CardSize, { banner: string; icon: number; title: string }> =
  * the two links above it (as the cards of the lists do), so no link is inside
  * a button nor the other way round.
  */
-export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { entry: LibraryEntry; size?: CardSize; onPick: (entry: LibraryEntry) => void }) {
+export default function LibraryShelfCard({ entry, size = 'compact', completed = false, onPick }: { entry: LibraryEntry; size?: CardSize; completed?: boolean; onPick: (entry: LibraryEntry) => void }) {
   const { T, lang } = useLanguage()
   const counts = entryCounts(entry)
-  const ago = lastPlayedAgo(entry.lastPlayed, lang)
+  // On Completed, how long ago it was completed: a DLC played later does not make it recent.
+  const ago = lastPlayedAgo((completed && entry.completedAt) || entry.lastPlayed, lang)
   const total = entryTotal(entry)
   const { banner, icon, title } = SIZES[size]
   const href = entryHref(entry)

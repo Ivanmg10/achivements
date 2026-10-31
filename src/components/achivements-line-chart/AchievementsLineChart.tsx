@@ -7,11 +7,11 @@ import { RecentAchievement } from '@/types/types'
 import { groupByDaySource } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
-import { Skeleton } from '@/components/ui/Skeleton'
+import { ChartSkeleton } from '@/components/ui/ChartSkeleton'
 
 // recharts is the heaviest thing on the page: it arrives after the page is up, in the room the chart keeps.
 const AchievementsLinePlot = dynamic(() => import('./achievements-line-plot/AchievementsLinePlot'), {
-  loading: () => <Skeleton radius="tile" className="h-full" />,
+  loading: () => <ChartSkeleton labels />,
 })
 
 /**
@@ -59,24 +59,13 @@ export default function AchievementsLineChart({
         </div>
       </div>
 
+      <div className="home-fit-chart h-[260px]">
       {isLoading ? (
-        <div className="home-fit-chart h-[260px] px-1 flex flex-col justify-end gap-1">
-          <div className="flex items-end gap-2 flex-1 min-h-0">
-            {[45, 70, 30, 90, 55, 20, 80].map((h, i) => (
-              <Skeleton key={i} radius="tag" className="flex-1" style={{ height: `${h}%` }} />
-            ))}
-          </div>
-          <div className="flex gap-2">
-            {Array.from({ length: 7 }).map((_, i) => (
-              <Skeleton key={i} className="flex-1 h-3" />
-            ))}
-          </div>
-        </div>
+        <ChartSkeleton labels />
       ) : (
-        <div className="home-fit-chart h-[260px]">
         <AchievementsLinePlot data={data} total={total} fillId={fillId} tick={tick} animate={!reduce} onDayClick={handleChartClick} />
-        </div>
       )}
+      </div>
 
       <AnimatePresence>
         {selectedDate && (

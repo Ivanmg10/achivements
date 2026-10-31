@@ -5,6 +5,7 @@ import type { GameSource } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import type { FriendDetails } from '@/hooks/useFriendsData'
 import { filterFollowing, type FriendOverview } from '@/utils/friends'
+import { RememberedHeight } from '@/components/ui/RememberedHeight'
 import EmptyState from '@/components/empty-state/EmptyState'
 import FollowingPageSkeleton from '../following-page-skeleton/FollowingPageSkeleton'
 import FollowingToolbar from '../following-toolbar/FollowingToolbar'
@@ -23,6 +24,7 @@ export default function FollowingList({
   onRetry,
   empty,
   tabs,
+  id = 'following',
 }: {
   users: FriendOverview[]
   details?: Record<string, FriendDetails>
@@ -33,6 +35,8 @@ export default function FollowingList({
   empty: { icon: ReactNode; title: string; subtitle: string }
   /** The Following / Followers tabs: the search and the platforms sit on their line, as agreed. */
   tabs?: ReactNode
+  /** Which list: each remembers its own height. */
+  id?: string
 }) {
   const { T } = useLanguage()
   const [query, setQuery] = useState('')
@@ -48,7 +52,7 @@ export default function FollowingList({
   )
   const shown = useMemo(() => filterFollowing(users, query, platforms), [users, query, platforms])
 
-  if (isLoading) return <FollowingPageSkeleton tabs={tabs} />
+  if (isLoading) return <FollowingPageSkeleton tabs={tabs} id={id} />
   if (error) {
     return (
       <>
@@ -74,7 +78,7 @@ export default function FollowingList({
   }
 
   return (
-    <>
+    <RememberedHeight id={id} loading={false} className="flex flex-col gap-4">
       <div className="flex flex-col xl:flex-row xl:items-end gap-3 xl:gap-4">
         <div className="flex-1 min-w-0">{tabs}</div>
         <FollowingToolbar query={query} onQuery={setQuery} platforms={platforms} onPlatforms={setPlatforms} total={users.length} counts={counts} />
@@ -90,6 +94,6 @@ export default function FollowingList({
           ))}
         </ul>
       )}
-    </>
+    </RememberedHeight>
   )
 }

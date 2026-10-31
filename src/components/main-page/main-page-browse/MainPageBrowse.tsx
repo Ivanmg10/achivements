@@ -17,6 +17,7 @@ import MainPageXboxNav from '@/components/main-page/main-page-charts/main-page-x
 import BrowseSearch from './browse-search/BrowseSearch'
 import BrowseConsoles from './browse-consoles/BrowseConsoles'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { RememberedHeight } from '@/components/ui/RememberedHeight'
 
 /**
  * The Browse section: the way into each list (by status, and by console on
@@ -25,7 +26,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
  * nav and the consoles follow it.
  */
 export default function MainPageBrowse() {
-  const { wantToPlay, playing, completed } = useAllGamesGlobal()
+  const { wantToPlay, playing, completed, loading } = useAllGamesGlobal()
   const { all, isLoading } = useGamesData()
   const { library: steam } = useSteamGamesData()
   const { library: psn } = usePsnGamesData()
@@ -40,7 +41,7 @@ export default function MainPageBrowse() {
   const showConsoles = platform === 'ra' && consoles.length > 0
 
   return (
-    <div className="flex flex-col gap-4">
+    <RememberedHeight id="browse" loading={loading || isLoading} className="flex flex-col gap-4">
       <ChartCard>
         {platform === 'steam' ? <MainPageSteamNav /> : platform === 'psn' ? <MainPagePsnNav /> : platform === 'xbox' ? <MainPageXboxNav /> : <MainPageConsoleNav />}
       </ChartCard>
@@ -67,6 +68,6 @@ export default function MainPageBrowse() {
           <BrowseConsoles consoles={consoles} />
         </ChartCard>
       )}
-    </div>
+    </RememberedHeight>
   )
 }

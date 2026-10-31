@@ -11,14 +11,18 @@ import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 
 /**
  * One game in the list: icon, title and platform, progress, and when it was
- * played last. The current one is marked by a bar on its left and an outline,
- * not only a colour. The icon and the title open the game's own page; the rest
- * of the row shows the game beside the list. As on a shelf, that is a button
- * stretched over the row with the two links above it.
+ * played last (on Completed, when it was completed). The current one is marked
+ * by a bar on its left and an outline, not only a colour. The icon and the title
+ * open the game's own page; the rest of the row shows the game beside the list.
+ * As on a shelf, that is a button stretched over the row with the two links
+ * above it.
  */
-export default function LibraryListRow({ entry, current, onSelect }: { entry: LibraryEntry; current: boolean; onSelect: (entry: LibraryEntry) => void }) {
+export default function LibraryListRow({ entry, current, category, onSelect }: { entry: LibraryEntry; current: boolean; category?: string; onSelect: (entry: LibraryEntry) => void }) {
   const { T, lang } = useLanguage()
-  const played = entry.lastPlayed ? new Date(entry.lastPlayed).toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' }) : null
+  // On Completed, when it was completed: playing a DLC later does not make it a recent one.
+  const finished = category === 'completed' ? entry.completedAt ?? null : null
+  const date = finished ?? entry.lastPlayed
+  const when = date ? new Date(date).toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' }) : null
   const href = entryHref(entry)
   const pct = entry.pct === null ? null : Math.min(100, Math.max(0, entry.pct))
 
@@ -53,7 +57,7 @@ export default function LibraryListRow({ entry, current, onSelect }: { entry: Li
             <span className={`w-9 text-right text-[0.8125rem] font-extrabold tabular-nums ${pct >= 100 ? 'text-success' : ''}`}>{Math.round(pct)}%</span>
           </span>
         )}
-        {played && <span className="text-xs text-text-secondary truncate">{T.statusGameItem.lastPlayed} · {played}</span>}
+        {when && <span className="text-xs text-text-secondary truncate">{finished ? T.libraryDetail.finished : T.statusGameItem.lastPlayed} · {when}</span>}
       </div>
       <button
         type="button"

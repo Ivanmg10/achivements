@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { RememberedHeight } from '@/components/ui/RememberedHeight'
 
 const CARDS = 8
 
@@ -47,9 +48,10 @@ function Card() {
  * come. It stays until everyone's last game and unlocks are in, so nothing fills
  * in card by card. `tabs` is the real tabs, when the page already has them.
  */
-export default function FollowingPageSkeleton({ tabs }: { tabs?: ReactNode }) {
+export default function FollowingPageSkeleton({ tabs, id = 'following' }: { tabs?: ReactNode; id?: string }) {
   const { T } = useLanguage()
   return (
+    <RememberedHeight id={id} loading>
     <div role="status" aria-busy="true" className="flex flex-col gap-4">
       <span className="sr-only">{T.following.loading}</span>
       <div className="flex flex-col xl:flex-row xl:items-end gap-3 xl:gap-4">
@@ -69,5 +71,6 @@ export default function FollowingPageSkeleton({ tabs }: { tabs?: ReactNode }) {
         ))}
       </div>
     </div>
+    </RememberedHeight>
   )
 }

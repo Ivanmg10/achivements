@@ -11,7 +11,7 @@ import LibraryQuickFilters from '@/components/library-quick-filters/LibraryQuick
 import StatusSortControl, { type StatusSortState } from '@/components/status-sort-control/StatusSortControl'
 import type { LibraryLayout } from '@/components/library-layout-toggle/LibraryLayoutToggle'
 import type { PlatformChoice } from '@/components/library-platform-tabs/LibraryPlatformTabs'
-import { countQuick, MIXED_SORT_KEYS, sortEntries, type LibraryEntry, type QuickFilter } from '@/utils/libraryInsights'
+import { countQuick, mixedSortKeys, sortEntries, type LibraryEntry, type QuickFilter } from '@/utils/libraryInsights'
 import { filterEntries } from '@/utils/libraryShelves'
 
 export const SEARCH_ID = 'category-search'
@@ -106,7 +106,7 @@ export default function LibraryExplorer({
           {search}
           {layout === 'list' && category === 'playing' && <LibraryQuickFilters value={quick} counts={quickCounts} onChange={onQuick} />}
           <span className="hidden sm:block grow" aria-hidden="true" />
-          {layout === 'list' && <StatusSortControl cat={category} keys={[...MIXED_SORT_KEYS]} sortState={sort} onChange={onSort} />}
+          {layout === 'list' && <StatusSortControl cat={category} keys={mixedSortKeys(category)} sortState={sort} onChange={onSort} />}
           {layoutToggle}
         </div>
 

@@ -66,7 +66,7 @@ export default function LibraryList({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1], delay: Math.min(i, 12) * 0.03 }}
             >
-              <LibraryListRow entry={e} current={current} onSelect={(x) => onSelect(!wide && current ? null : x)} />
+              <LibraryListRow entry={e} current={current} category={category} onSelect={(x) => onSelect(!wide && current ? null : x)} />
               {!wide && current && (
                 <div className="mt-2">
                   <LibraryEntryDetail key={e.key} entry={e} category={category} />
