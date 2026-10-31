@@ -70,7 +70,7 @@ export default function UserIdentityCard() {
   ]
 
   return (
-    <section className="relative bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] overflow-hidden flex flex-col">
+    <section className="relative bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] overflow-hidden flex flex-col enter-card">
       <UserProfileBanner avatar={user?.avatar} />
 
       <div className="relative px-4 sm:px-7 pt-6 sm:pt-7 pb-6 sm:pb-7 flex flex-col gap-4 flex-1 enter-rows">

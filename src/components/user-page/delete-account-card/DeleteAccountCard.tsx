@@ -15,7 +15,7 @@ export default function DeleteAccountCard() {
   const [open, setOpen] = useState(false)
 
   return (
-    <section className="bg-bg-card rounded-card p-5 sm:px-7 flex flex-col sm:flex-row sm:items-center gap-4 ring-1 ring-inset ring-danger/25 enter-card [--i:6]">
+    <section className="bg-bg-card rounded-card p-5 sm:px-7 flex flex-col sm:flex-row sm:items-center gap-4 ring-1 ring-inset ring-danger/25 enter-card [--i:2]">
       <div className="flex-1 flex flex-col gap-1">
         <h2 className="font-bold text-danger">{T.deleteAccount.title}</h2>
         <p className="text-[0.8125rem] text-text-secondary">{T.deleteAccount.text}</p>

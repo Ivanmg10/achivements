@@ -29,6 +29,19 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-31 — `/user` enters as a whole (`feat/61-entrance-rollout`, #61)
+
+**Did** — `UserIdentityCard`'s `<section>` has `enter-card`, and the preferences and delete cards went from `--i` 3 and 6 to 1 and 2.
+**Why** — The user found reaching `/user` abrupt. Measured at 2560 px from `/racha` and `/rankings`: the skeleton lasted ~45 ms, then
+the identity card and its banner were at full opacity in one frame, while its two neighbours stayed invisible for up to 240 ms more.
+**Decisions** — `/user`'s `loading.tsx` stays, though its skeleton shows only for a moment: without it, a slow connection gets just the thin
+top line. View Transitions were rejected: they touch every route, and #61 left page transitions as they are.
+**Verification** — Production build, client navigation from `/rankings`, two warm runs at 2560 px and one at 390 px: the page is drawn at
+70–90 ms and the three cards are done at ~500 ms. 835 suites / 5,277 tests, tsc and ESLint on the three components pass.
+**Open** — The brief skeleton is still there, and may last longer in production than on localhost. If it bothers the user, that is the next thing to look at.
+
+---
+
 ## 2026-10-31 — The user's first round on the entrances (`feat/61-entrance-rollout`, #61)
 
 **Did** — Shelves: `.enter-shelves` brings back their cascade in CSS, with the old timings (160 ms between shelves, 55 ms
