@@ -526,6 +526,10 @@ it sets `users.email_verified_at` (`migrations/017_email_verification.sql`).
   user's session ends too.
 - The RA API key (`raid`) is server-only: `getServerSession(authOptions)` has it,
   the browser's session (`authHandlerOptions`) does not. Client code uses `raLinked`.
+- **Do not hand the session to a second `SessionProvider`** (2026-10-31): next-auth keeps module-level state, so a nested
+  one leaves the root's reading `unauthenticated`, and the root layout must not read the session (see Language). A page whose
+  shape depends on the session holds its skeleton while `status === 'loading' && !session`, as the home and `/user` do.
+  `getServerSession(authOptions)` carries `raid`: never pass that object to a client component.
 - Admin checks read the DB (`loadUser(id, { fresh: true })`), not the session.
   See Admin panel below for the rest.
 - Sign-in, current-password checks, sign-up and reset requests are rate limited

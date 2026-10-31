@@ -43,10 +43,14 @@ short (real rows are 71 px, up to 132 px on a phone), and any height would fail 
 **Verification** — With `/api/rankings/me` held back 1.5 s: the card went from a 118 px jump (471→589 px) to none (1009 and
 589 px throughout), the platforms from moving 17 px to not moving, and that moment's CLS to 0.0003. Shelves' delays read from
 the browser match the old ones, and `data-entered` ends them.
-**Open** — On a full load of `/user`, the session arriving still moves the page: CLS 0.13 at 390 px, 0.024 at 2560 px, for an
-admin. Sources are the row of buttons (the Admin button wraps it on a phone) and the platforms' grid (Xbox's card makes it four
-columns). `SessionProvider` gets no server session; not touched here. A client navigation has the session already.
-The route inventory on #61 still says shelves are plain cards.
+**Then** — The last jumps of a full load of `/user`: the page holds `UserPageSkeleton` until the session is known, as the home
+does (`status === 'loading' && !session`), and the follow counts' block is as wide as the text, so it wraps with it on a phone.
+CLS went from 0.13 to 0.0004 at 390 px (four loads) and from 0.024 to 0.0004 at 2560 px. Handing the session over from the
+server was read and rejected: a nested `SessionProvider` shares next-auth's module-level `__NEXTAUTH`, so the root one would
+never fetch, read as `unauthenticated` (`ThemeContext`, `ShapeSync`), and lose its state when the nested one unmounts; in the root
+layout it would make every page dynamic; moving it down touches every segment. The layout's own session has `raid`, too.
+**Open** — A single load of other pages, signed in as an admin: `/racha` at 390 px has CLS 0.19, the footer moving at 184 ms;
+`/following` at 2560 px 0.018; `/rankings`, `/groups` and `/playing` under 0.001. Not looked into.
 
 ---
 
