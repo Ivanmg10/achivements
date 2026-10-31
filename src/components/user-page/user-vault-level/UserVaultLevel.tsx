@@ -8,6 +8,7 @@ import { useVaultFillState } from '@/context/VaultFillContext'
 import VaultFillProgress from '@/components/vault-fill-progress/VaultFillProgress'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
+import UserVaultLevelSkeleton from './user-vault-level-skeleton/UserVaultLevelSkeleton'
 import { levelProgress } from '@/utils/vaultLevel'
 
 /** Your level on your account page: points, place, the bar to the next level, and the way to the rankings. */
@@ -15,14 +16,15 @@ export default function UserVaultLevel() {
   const { T, lang } = useLanguage()
   const { me, isLoading } = useVaultMe()
   const fill = useVaultFillState()
-  if (isLoading || !me) return null
+  if (isLoading) return <UserVaultLevelSkeleton />
+  if (!me) return null
 
   const n = (x: number) => x.toLocaleString(lang)
   const p = levelProgress(me.points)
   const toNext = T.rankings.toLevel.replace('{n}', n(p.span - p.into)).replace('{level}', String(p.level + 1))
 
   return (
-    <div className="flex flex-col gap-2 rounded-pane bg-bg-main p-4">
+    <div className="flex flex-col gap-2 rounded-pane bg-bg-main p-4 enter-rise">
       <Link
         href="/rankings"
         className="group flex flex-col gap-2 rounded-lg -m-1 p-1 hover:bg-ink/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"

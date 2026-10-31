@@ -59,7 +59,8 @@ One set of CSS classes in `globals.css` for the whole site (issue #61; families 
 - **`backwards`, never `both`.** A fill that stays would keep a transform on the element: it traps `position: fixed` inside and fights a sortable row's own transform.
 - **A list plays once.** `useEntrancesOnce` (mounted by `ShapeSync`) sets `data-entered` when its rows finish, because moving a node restarts its animation: measured 2026-10-31, 12 rows replayed on a reorder without the mark, 0 with it. It only ever switches an entrance off; nothing waits for it to show.
 - **Only for what appears on its own.** A list that is mounted with its skeleton inside would play on the skeleton: keep the skeleton outside. What opens on a click may stay in Framer (dialogs, toasts, the library's swaps and opened rows); the guard in `uiGuard.test.ts` lists those. No `whileInView`: entrances are not scroll-triggered.
-- The home's left card (`ViewEntrance`) and profile column (`MainPageProfile.module.css`) came first and keep their own keyframes. The welcome keeps its own too (`WelcomePage.module.css`): they are timed to its curtain.
+- **The library's shelves keep their own cascade** (`.enter-shelves` on their root, the user's call, 2026-10-31): each shelf 160 ms after the last, its title sliding in, its cards lifting and settling with a bounce 55 ms apart, "see all" closing it. The general `.enter-cards` was too plain there. It is built on the same tokens, so reduced motion needs nothing more, and its progress bars do not grow.
+- The home's left card (`ViewEntrance`) and profile column (`MainPageProfile.module.css`) came first and keep their own keyframes (the user confirmed it on 2026-10-31). The welcome keeps its own too (`WelcomePage.module.css`): they are timed to its curtain.
 
 ## The catalogue (`/design`, admins only)
 

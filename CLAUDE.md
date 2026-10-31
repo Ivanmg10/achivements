@@ -245,6 +245,10 @@ change:** `.enter-rows` on a list, `tbody` or a hero's text; `.enter-cards` on a
 - **CSS keyframes, never Framer's `x`/`y`/`initial` on what appears on a load** (`uiGuard.test.ts` fails on it;
   what opens on a click may stay in Framer), and never hide an element until a frame, idle callback or observer.
 - `backwards`, never `both`: a fill that stays keeps a transform, which traps `position: fixed` and breaks dragging.
+- The library's shelves keep their own cascade (`.enter-shelves`), and the home its own keyframes: the user prefers them
+  that way (2026-10-31). Do not fold them into the general families.
+- A block that waits for a fetch holds its exact room, measured, or the same element unseen: the account page's level
+  and rankings switch did not, and the page jumped 118 px when they landed. `useVaultMe`'s `isLoading` covers the session read.
 - A list plays once: `useEntrancesOnce` sets `data-entered`, as a reorder would restart it. Keep a skeleton out of
   the element that has the class.
 - Reduced motion restates the `--enter-*` tokens, so nothing else is needed for it. Entrance-only: no scroll

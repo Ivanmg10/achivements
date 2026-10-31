@@ -29,6 +29,27 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-31 — The user's first round on the entrances (`feat/61-entrance-rollout`, #61)
+
+**Did** — Shelves: `.enter-shelves` brings back their cascade in CSS, with the old timings (160 ms between shelves, 55 ms
+between cards, title sliding in, bounce). `/user`: `UserVaultLevel` holds its room with `UserVaultLevelSkeleton`, which
+`UserPageSkeleton` uses too, and the rankings switch renders unseen until it is known. `useVaultMe`'s `isLoading` now covers
+the session read, but not `update()`'s brief `loading` once it has answered.
+**Why** — The user preferred the shelves as they were, and on `/user` the level came last and pushed the page down. The home
+stays as it is (the user's answer).
+**Decisions** — The switch's room is the same row, `invisible` and `inert`, not a fixed height: a guessed 54 px was 17 px
+short (real rows are 71 px, up to 132 px on a phone), and any height would fail in another language. An `&nbsp;` in the empty
+`h1` was tried and removed: it changed nothing measurable.
+**Verification** — With `/api/rankings/me` held back 1.5 s: the card went from a 118 px jump (471→589 px) to none (1009 and
+589 px throughout), the platforms from moving 17 px to not moving, and that moment's CLS to 0.0003. Shelves' delays read from
+the browser match the old ones, and `data-entered` ends them.
+**Open** — On a full load of `/user`, the session arriving still moves the page: CLS 0.13 at 390 px, 0.024 at 2560 px, for an
+admin. Sources are the row of buttons (the Admin button wraps it on a phone) and the platforms' grid (Xbox's card makes it four
+columns). `SessionProvider` gets no server session; not touched here. A client navigation has the session already.
+The route inventory on #61 still says shelves are plain cards.
+
+---
+
 ## 2026-10-31 — Entrance animations on every page (`feat/61-entrance-rollout`, #61)
 
 **Did** — One set of CSS entrances in `globals.css` (`.enter-rise`, `-card`, `-rows`, `-cards`, `-grow-x/y`, `--enter-*`
