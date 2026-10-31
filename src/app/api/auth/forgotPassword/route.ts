@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'too-many-requests' }, { status: 429 })
     }
 
-    const { email } = (await req.json()) as { email?: unknown }
+    const { email } = (await req.json().catch(() => ({}))) as { email?: unknown }
     if (!email || typeof email !== 'string' || !email.trim()) {
       return NextResponse.json({ error: 'email required' }, { status: 400 })
     }

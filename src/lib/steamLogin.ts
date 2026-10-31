@@ -38,9 +38,13 @@ export function steamLoginUrl(base: string, back: URLSearchParams): string {
 /**
  * The SteamID64 Steam vouches for in a callback's query, or null when the
  * answer is not one (cancelled, tampered, for another site). Steam is asked to
- * confirm its own signature; throws when it cannot be reached.
+ * confirm its own signature; throws when it cannot be reached. A repeated
+ * parameter is refused: what is read here and what Steam checks must be the
+ * same value, and Steam's answer does not say which copy it took.
  */
 export async function verifySteamLogin(query: URLSearchParams, base: string): Promise<string | null> {
+  const names = [...query.keys()]
+  if (new Set(names).size !== names.length) return null
   if (query.get('openid.mode') !== 'id_res' || query.get('openid.op_endpoint') !== OPENID) return null
   if ((query.get('openid.return_to') ?? '').split('?')[0] !== `${base}${CALLBACK_PATH}`) return null
   const claimed = query.get('openid.claimed_id') ?? ''
@@ -86,6 +90,16 @@ export function readTicket(ticket: string | null | undefined, now = Date.now()):
 /** Set-Cookie for a ticket: only /api/auth (the sign-up route and NextAuth's sign-in) ever sees it. */
 export function ticketCookie(ticket: string, secure: boolean): string {
   return `${STEAM_TICKET_COOKIE}=${encodeURIComponent(ticket)}; Path=/api/auth; HttpOnly; SameSite=Lax; Max-Age=${TICKET_TTL_MS / 1000}${secure ? '; Secure' : ''}`
+}
+
+/** Set-Cookie that ends a ticket once it has been used. */
+export function expiredTicketCookie(secure: boolean): string {
+  return `${STEAM_TICKET_COOKIE}=; Path=/api/auth; HttpOnly; SameSite=Lax; Max-Age=0${secure ? '; Secure' : ''}`
+}
+
+/** Set-Cookie that ends a `state` once the callback has spent it. */
+export function expiredStateCookie(secure: boolean): string {
+  return `${STEAM_STATE_COOKIE}=; Path=${CALLBACK_PATH}; HttpOnly; SameSite=Lax; Max-Age=0${secure ? '; Secure' : ''}`
 }
 
 /**

@@ -7,6 +7,7 @@ import {
   RANK_SORTS,
   RANK_SOURCES,
   loadRanking,
+  orderingStreaks,
   presenceOf,
   rankByStreak,
   streaksOf,
@@ -104,7 +105,10 @@ export async function GET(req: Request) {
 
     const entries = await loadRanking({ scope, period, source, viewerId, xbox })
     // Ordered by a streak, everyone's is needed to place them; ordered by points, only those shown.
-    const allStreaks = sort === 'points' ? null : await streaksOf(entries.map((e) => e.id), source, xbox)
+    const allStreaks =
+      sort === 'points' ? null
+        : scope === 'global' ? await orderingStreaks(entries, { period, source, xbox, viewerId })
+          : await streaksOf(entries.map((e) => e.id), source, xbox)
     const ordered = allStreaks ? rankByStreak(entries, allStreaks, sort === 'streak' ? 'current' : 'best') : entries
     const weekly = scope === 'global' && period === 'week' && source === 'all' ? entries : await loadRanking({ scope: 'global', period: 'week', source: 'all', viewerId, xbox })
     const hot = weekly.filter((e) => e.listed).slice(0, HOT)

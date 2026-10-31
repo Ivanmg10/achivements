@@ -1,8 +1,31 @@
-const RA_TIMEOUT = 12_000
-const MAX_ATTEMPTS = 3
+import { countUpstream } from '@/lib/upstreamCount'
+
+// Two attempts stay under the browser's 20 s, so it never asks again while this still runs.
+const RA_TIMEOUT = 8_000
+const MAX_ATTEMPTS = 2
 const BASE_DELAY = 500
+/** Measured 2026-10-20: one call every 250 ms never failed, a burst of about seven gets a 429. */
+const RA_GAP_MS = 250
+const RA_BURST = 4
+const MAX_KEYS = 5000
 /** Longest we sit on a 429 inside one request; a longer ask is passed up as an error. */
 export const MAX_RETRY_AFTER = 5_000
+
+const nextSlot = new Map<string, number>()
+
+/**
+ * Waits for this key's turn: a short burst at once, then one call per gap. Per
+ * instance, like every RA call a person's own page makes.
+ */
+async function paced(url: string): Promise<void> {
+  const key = new URL(url).searchParams.get('y')
+  if (!key) return
+  if (nextSlot.size > MAX_KEYS) nextSlot.clear()
+  const now = Date.now()
+  const slot = Math.max(now - RA_BURST * RA_GAP_MS, nextSlot.get(key) ?? 0)
+  nextSlot.set(key, slot + RA_GAP_MS)
+  if (slot > now) await new Promise((r) => setTimeout(r, slot - now))
+}
 
 /** `Retry-After` is seconds or an HTTP date; null when absent or unreadable. */
 function retryAfterMs(header: string | null | undefined): number | null {
@@ -29,6 +52,8 @@ export async function fetchRA(url: string): Promise<unknown> {
     const timer = setTimeout(() => ctrl.abort(), RA_TIMEOUT)
     let delay = BASE_DELAY * (attempt + 1)
     try {
+      await paced(url)
+      countUpstream('ra')
       const res = await fetch(url, { signal: ctrl.signal })
       clearTimeout(timer)
       if (!res.ok) {

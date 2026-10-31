@@ -7,6 +7,7 @@ class NextRequest {
     try {
       const parsed = new URL(url)
       this.nextUrl = {
+        origin: parsed.origin,
         pathname: parsed.pathname,
         search: parsed.search,
         searchParams: parsed.searchParams,
@@ -27,6 +28,8 @@ class NextResponse {
     this.body = body
     this.status = init.status || 200
     this.headers = new Map(Object.entries(init.headers || {}))
+    // As Headers does: a second value of a name joins the first.
+    this.headers.append = (name, value) => this.headers.set(name, this.headers.has(name) ? `${this.headers.get(name)}, ${value}` : value)
   }
 
   /** Lets the request through, as the real one does in middleware. */

@@ -1,6 +1,6 @@
 import type { RecentFeedItem } from '@/utils/steamFeed'
 import type { GameSource } from '@/types/steam'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 import { psnBackdrop } from '@/utils/psnTitles'
 
 /** What the home's cover shows of the game played last. */

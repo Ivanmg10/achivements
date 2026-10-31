@@ -1,0 +1,30 @@
+/*
+ * In CSS, not Framer: Framer starts these at opacity 0 in the server's HTML and
+ * only reveals them after hydrating, so the page's headline waits for every script.
+ */
+.rise {
+  animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.riseSecond {
+  composes: rise;
+  animation-delay: 0.08s;
+}
+
+.riseThird {
+  composes: rise;
+  animation-delay: 0.16s;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+}

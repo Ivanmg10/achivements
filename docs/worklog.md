@@ -48,6 +48,30 @@ historical snapshots and display data need no migration.
 enrichment failures leave only that date unknown. Missing timestamps remain in collections under Undated.
 **Watch out** — Do not move the filter into canonical upstream caches or direct-detail loaders. Hidden rows must
 stay available for unhide, while visible stack factors, periods and rankings must not include them.
+## 2026-10-30 — Fixes from the v1.7 audit (`fix/96-audit-v17-findings`, from #90)
+
+**Did** — Fixed what the audit found that needed no decision: Steam's sign-in answer refused when a
+parameter repeats, image proxy, private-profile leaks, attempt limits, write caps, cross-site writes,
+platform deadlines and budgets, landing and sign-in first paint, languages in chunks, `next` 16.4.2.
+`docs/audits/perf-security-apilimits-v17.md` → Fix status lists each finding.
+**Why** — The user asked to fix everything the report found, in a development branch based on #90's.
+**Decisions** — `next` 16.4.2, not the newest, as 16.4.3 is under two weeks old. Steam stays reachable
+with "forgot password" after an unlink. Two token-style counters would need a migration, so streak
+orderings got a cache and Steam's count lives in `steam_cache`.
+Linking Steam stays without a password, by the user's choice (2026-10-31). Admin TOTP needs no new
+dependency and has no QR: a key to type and a link for the app on the same device.
+**Open** — See Fix status. `migrations/043` and `044` were applied to pre on 2026-10-31 and go to production
+with the release. Vercel WAF rules are the user's.
+**Watch out** — Nothing here ran on Vercel, and platforms were mocked. The first cold streak ordering took
+about 23 s at 600,000 rows. Unlinking Steam now ends sign-in with it.
+## 2026-10-30 — Stricter reading of Steam's sign-in answer (`fix/steam-openid-strict`)
+
+**Did** — `verifySteamLogin` refuses an answer with a repeated parameter before reading it or asking
+Steam, with tests. Added the rule to CLAUDE.md.
+**Why** — Hardening from the security audit of #90 (its hypothesis H-01). Steam's own behaviour was not
+tested, on purpose, so this does not say a bypass existed.
+**Decisions** — Fixed in `verifySteamLogin`, the one function sign-in and linking both go through.
+**Watch out** — This code is on `develop` only, not on `main`.
 
 ---
 

@@ -56,7 +56,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ usernam
       theme: user.theme,
       gender: user.genderPublic ? user.gender : null,
       favorites: { ra: favorite('ra', user.favorite_game), steam: favorite('steam', user.favorite_steam_game), psn: favorite('psn', user.favorite_psn_game), xbox: xbox ? favorite('xbox', user.favorite_xbox_game) : null },
-      hiddenGames,
+      hiddenGames: xbox ? hiddenGames : hiddenGames.filter((key: string) => !key.startsWith('xbox:')),
       groups,
       // Whether the viewer follows them, for the Follow button.
       following: follow.rows.length > 0,

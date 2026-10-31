@@ -1,3 +1,4 @@
+jest.mock('@/lib/raKey', () => ({ sealRaKey: (key: string) => ({ sealed: `sealed:${key}`, hash: `hash:${key}` }), raKeyHash: (key: string) => `hash:${key}` }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/attemptLimit', () => ({ clientAddress: () => '1.2.3.4', allowAttempt: jest.fn() }))
 jest.mock('@/lib/raProfile', () => ({ ...jest.requireActual('@/lib/raProfile'), fetchRaProfile: jest.fn() }))

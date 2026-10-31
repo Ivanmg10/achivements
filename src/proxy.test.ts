@@ -8,6 +8,24 @@ const request = (path: string) => new NextRequest(`http://localhost:3000${path}`
 
 beforeEach(() => jest.clearAllMocks())
 
+describe('a write to the API', () => {
+  const write = (origin: string, method = 'POST') =>
+    proxy(new NextRequest('http://localhost:3000/api/updateTheme', { method, headers: { origin, host: 'localhost:3000' } }))
+
+  test('from this site goes through', async () => {
+    expect((await write('http://localhost:3000')).status).toBe(200)
+  })
+
+  test.each(['https://evil.example', 'https://dev.localhost:3000', 'null'])('from %s is refused', async (origin) => {
+    expect((await write(origin)).status).toBe(403)
+    expect((await write(origin, 'DELETE')).status).toBe(403)
+  })
+
+  test('a read is left alone', async () => {
+    expect((await write('https://evil.example', 'GET')).status).toBe(200)
+  })
+})
+
 test('the landing, the auth page, the legal pages and the images other sites fetch are open to anyone', async () => {
   for (const path of ['/', '/authPage', '/privacy', '/terms', '/opengraph-image', '/apple-icon', '/rankings', '/rankings/how']) {
     const res = await proxy(request(path))

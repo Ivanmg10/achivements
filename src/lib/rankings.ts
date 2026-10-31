@@ -143,12 +143,22 @@ export async function markRankingVisibilityChanged(): Promise<void> {
   clearRankingCache()
 }
 
+const loading = new Map<string, Promise<unknown>>()
+
 async function cached<T>(key: string, load: () => Promise<T>): Promise<T> {
   const hit = globalCache.get(key)
   if (hit && Date.now() - hit.at < GLOBAL_TTL_MS) return hit.rows as T
-  const rows = await load()
-  globalCache.set(key, { at: Date.now(), rows })
-  return rows
+  // Requests that find it missing together share one read: this one can take seconds.
+  const running = loading.get(key)
+  if (running) return running as Promise<T>
+  const read = load()
+    .then((rows) => {
+      globalCache.set(key, { at: Date.now(), rows })
+      return rows
+    })
+    .finally(() => loading.delete(key))
+  loading.set(key, read)
+  return read
 }
 
 export async function loadRanking(opts: { scope: RankScope; period: RankPeriod; source: RankSource; viewerId: number | null; xbox: boolean; now?: Date }): Promise<RankEntry[]> {
@@ -253,6 +263,18 @@ export function rankByStreak(entries: RankEntry[], streaks: Map<number, Streak>,
 }
 
 /** Where each listed user stood at the start of this week (global, all time, no Xbox). */
+/**
+ * Everyone's streaks, to order a global list by them. They read every listed
+ * user's unlocks, so they are kept like the list itself; the viewer's own row
+ * may not be in the list others see, and is read now.
+ */
+export async function orderingStreaks(entries: RankEntry[], opts: { period: RankPeriod; source: RankSource; xbox: boolean; viewerId: number | null }): Promise<Map<number, Streak>> {
+  const { period, source, xbox, viewerId } = opts
+  const everyone = await cached(`st|${period}|${source}|${xbox}`, () => streaksOf(entries.filter((e) => e.listed).map((e) => e.id), source, xbox))
+  if (viewerId === null || everyone.has(viewerId)) return everyone
+  return new Map([...everyone, ...(await streaksOf([viewerId], source, xbox))])
+}
+
 export async function weekStartRanks(now = new Date()): Promise<Map<number, number>> {
   const rows = await queryRows<{ user_id: number; rank: number }>('SELECT user_id, rank FROM score_snapshots WHERE week = $1::date', [weekStart(now)])
   return new Map(rows.map((r) => [r.user_id, r.rank]))

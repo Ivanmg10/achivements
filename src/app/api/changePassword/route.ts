@@ -4,6 +4,7 @@ import pool from '@/lib/db'
 import bcrypt from 'bcrypt'
 import { authOptions } from '@/lib/authOptions'
 import { checkCurrentPassword } from '@/lib/currentPassword'
+import { retireResetTokens } from '@/lib/passwordReset'
 import { forgetUser } from '@/lib/userRecord'
 import { BCRYPT_COST, PASSWORD_MIN } from '@/utils/authValidation'
 
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { currentPassword, newPassword } = (await req.json()) as { currentPassword?: unknown; newPassword?: unknown }
+    const { currentPassword, newPassword } = (await req.json().catch(() => ({}))) as { currentPassword?: unknown; newPassword?: unknown }
 
     if (!currentPassword || !newPassword) {
       return NextResponse.json({ error: 'missing-fields' }, { status: 400 })
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
 
     const hashed = await bcrypt.hash(newPassword, BCRYPT_COST)
     await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, session.user.id])
+    await retireResetTokens(session.user.id)
     forgetUser(session.user.id)
 
     return NextResponse.json({ ok: true })

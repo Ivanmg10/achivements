@@ -13,6 +13,7 @@ jest.mock('psn-api', () => ({
   getTitleTrophyGroups: jest.fn(),
   getUserTrophyGroupEarningsForTitle: jest.fn(),
 }))
+jest.mock('@/lib/attemptLimit', () => ({ reserveAttempt: jest.fn(async () => ({ allowed: true, release: async () => {} })) }))
 jest.mock('@/lib/psnCredentials', () => ({
   loadPsnCredentials: jest.fn(async () => null),
   savePsnTokens: jest.fn(async () => {}),
@@ -50,6 +51,7 @@ import {
   psnTitles,
   PsnError,
   withPlayData,
+  psnCall,
 } from './psnClient'
 import { psnGameFixture } from '@/test-utils/psnFixtures'
 
@@ -255,6 +257,8 @@ test('the latest trophies look at the last few games with something earned, howe
 })
 
 describe('when Sony says too many requests', () => {
+  afterEach(() => forgetPsnTokens())
+
   const tooMany = { error: { code: 1, message: 'Too many requests' } }
   const waitOut = () => jest.advanceTimersByTimeAsync(2_000)
 
@@ -557,4 +561,33 @@ test('PS3/Vita games take their cover and backdrop from IGDB; a failed lookup le
   expect(games[1].consoleName).toBe('PS Vita')
   mock(igdbConfigured).mockReturnValue(false)
   ;(console.error as jest.Mock).mockRestore()
+})
+
+describe('the budget for Sony', () => {
+  const { reserveAttempt } = jest.requireMock('@/lib/attemptLimit') as { reserveAttempt: jest.Mock }
+  const release = jest.fn()
+
+  beforeEach(() => {
+    jest.useRealTimers()
+    release.mockClear()
+    reserveAttempt.mockReset()
+    reserveAttempt.mockResolvedValue({ allowed: true, release })
+  })
+
+  test('a call past the budget is refused without reaching Sony, as a rate limit', async () => {
+    reserveAttempt.mockResolvedValue({ allowed: false, release })
+    const call = jest.fn()
+    const failure = (await psnCall(call).catch((err: unknown) => err)) as PsnError
+    expect(failure.isRateLimited).toBe(true)
+    expect(call).not.toHaveBeenCalled()
+    expect(release).toHaveBeenCalled()
+  })
+
+  test('a call Sony never answers ends at the deadline', async () => {
+    jest.useFakeTimers()
+    const pending = psnCall(() => new Promise(() => {})).catch((err: unknown) => err as PsnError)
+    await jest.advanceTimersByTimeAsync(8_000)
+    expect(((await pending) as PsnError).message).toContain('did not answer')
+    jest.useRealTimers()
+  })
 })

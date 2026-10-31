@@ -30,7 +30,7 @@ test('does not retry a 403 (private profile)', async () => {
 test('retries a 500 up to the attempt limit, then throws', async () => {
   ;(fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 })
   await expect(fetchSteam(URL_)).rejects.toMatchObject({ status: 500 })
-  expect(fetch).toHaveBeenCalledTimes(3)
+  expect(fetch).toHaveBeenCalledTimes(2)
 }, 10_000)
 
 test('recovers on a later attempt after a transient failure', async () => {

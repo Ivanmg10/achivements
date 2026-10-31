@@ -15,6 +15,8 @@ import { markRankingVisibilityChanged } from '@/lib/rankings'
 
 const MAX_TITLE = 300
 const MAX_IMAGE = 500
+/** A cap so one account cannot fill the table. */
+const HIDDEN_MAX = 5000
 
 export async function GET() {
   try {
@@ -50,6 +52,9 @@ export async function POST(req: NextRequest) {
     // Only an https URL or a site path: it is drawn as an image for this user.
     const safeImage =
       typeof image === 'string' && image.length <= MAX_IMAGE && (image.startsWith('https://') || image.startsWith('/')) ? image : null
+
+    const { rows: held } = await pool.query('SELECT COUNT(*)::int AS n FROM hidden_games WHERE user_id = $1', [session.user.id])
+    if (held[0]?.n >= HIDDEN_MAX) return NextResponse.json({ error: 'too-many-hidden' }, { status: 409 })
 
     await pool.query(
       `INSERT INTO hidden_games (user_id, source, game_id, title, image)

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { motion, useReducedMotion } from 'framer-motion'
+import styles from './LandingHero.module.css'
 import { IconArrowRight } from '@tabler/icons-react'
 import AuthCollagePanel from '@/components/auth-collage-panel/AuthCollagePanel'
 import { useLanguage } from '@/context/LanguageContext'
@@ -19,27 +20,22 @@ const EASE = [0.16, 1, 0.3, 1] as const
 export default function LandingHero() {
   const { T } = useLanguage()
   const reduce = useReducedMotion()
-  const rise = (delay: number) =>
-    reduce ? {} : { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6, delay, ease: EASE } }
 
   return (
     <section className="max-w-6xl w-full mx-auto px-4 sm:px-6 pt-10 pb-16 lg:pt-16 lg:pb-24 grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-12 items-center">
       <div className="flex flex-col items-start gap-6">
-        <motion.h1
-          {...rise(0)}
-          className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tighter leading-[1.05] text-balance"
-        >
+        <h1 className={`${styles.rise} text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tighter leading-[1.05] text-balance`}>
           {T.landing.tagline}
-        </motion.h1>
-        <motion.p {...rise(0.08)} className="text-base sm:text-lg text-text-secondary max-w-[52ch] leading-relaxed">
+        </h1>
+        <p className={`${styles.riseSecond} text-base sm:text-lg text-text-secondary max-w-[52ch] leading-relaxed`}>
           {T.landing.intro}
-        </motion.p>
-        <motion.div {...rise(0.16)}>
+        </p>
+        <div className={styles.riseThird}>
           <Link href="/authPage?mode=register" className={PRIMARY}>
             {T.landing.createAccount}
             <IconArrowRight size={18} aria-hidden="true" />
           </Link>
-        </motion.div>
+        </div>
       </div>
 
       <motion.div

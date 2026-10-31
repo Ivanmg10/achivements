@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import { authOptions } from "@/lib/authOptions";
 import { fetchRaProfile, validRaCredentials, type RaProfileResult } from "@/lib/raProfile";
+import { sealRaKey } from "@/lib/raKey";
 import { forgetUser } from "@/lib/userRecord";
 import { onPlatformLinked } from "@/lib/scoreRefresh";
 
@@ -28,9 +29,10 @@ export async function POST(req: Request) {
   const { profile } = fetched;
 
   try {
+    const { sealed, hash } = sealRaKey((apiKey as string).trim());
     await pool.query(
-      `UPDATE users SET "raUser" = $1, rausername = $2, raid = $3 WHERE id = $4`,
-      [JSON.stringify(profile), profile.User, (apiKey as string).trim(), session.user.id],
+      `UPDATE users SET "raUser" = $1, rausername = $2, raid = $3, raid_hash = $4 WHERE id = $5`,
+      [JSON.stringify(profile), profile.User, sealed, hash, session.user.id],
     );
   } catch (err) {
     // raid is unique: the same key already links another account here.

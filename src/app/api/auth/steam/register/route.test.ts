@@ -46,6 +46,12 @@ beforeEach(() => {
 
 afterEach(() => { (console.error as jest.Mock).mockRestore() })
 
+test('ending the ticket expires its cookie', async () => {
+  const { DELETE } = jest.requireActual('./route')
+  const res = DELETE(new NextRequest('https://www.cheevovault.com/api/auth/steam/register', { method: 'DELETE' }))
+  expect(res.headers.get('Set-Cookie')).toContain('steam-login=; Path=/api/auth; HttpOnly; SameSite=Lax; Max-Age=0')
+})
+
 describe('GET', () => {
   test('a new Steam account gets what the form starts from', async () => {
     db()

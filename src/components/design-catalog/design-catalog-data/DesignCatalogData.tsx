@@ -10,7 +10,7 @@ import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { SURFACE } from '@/components/ui/surface'
 import { STREAK_TIERS } from '@/utils/streakTier'
 import { pointsForLevel } from '@/utils/vaultLevel'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
 
 const LEVELS = [1, 10, 20, 30, 45, 60, 75, 90]

@@ -11,7 +11,7 @@ import SteamRecentlyPlayedExpanded from '@/components/steam/steam-recently-playe
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { useSpotlight } from '@/hooks/useSpotlight'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/utils'
 import type { SteamGameProgress } from '@/types/steam'

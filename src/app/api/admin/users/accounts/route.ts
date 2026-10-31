@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
 import { fetchRaProfile, validRaCredentials } from '@/lib/raProfile'
+import { sealRaKey } from '@/lib/raKey'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { clearUserCache } from '@/lib/steamCache'
 import { forgetUnlocks } from '@/lib/steamUnlocks'
@@ -51,8 +52,9 @@ export async function POST(req: Request) {
       const { profile } = fetched
 
       try {
-        await pool.query('UPDATE users SET "raUser" = $1, rausername = $2, raid = $3 WHERE id = $4', [
-          JSON.stringify(profile), profile.User, apiKey, target.id,
+        const { sealed, hash } = sealRaKey(apiKey)
+        await pool.query('UPDATE users SET "raUser" = $1, rausername = $2, raid = $3, raid_hash = $4 WHERE id = $5', [
+          JSON.stringify(profile), profile.User, sealed, hash, target.id,
         ])
       } catch (err) {
         if ((err as { code?: string }).code === '23505') {
@@ -157,9 +159,9 @@ export async function DELETE(req: Request) {
     if (!target) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     if (platform === 'ra') {
-      await pool.query('UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL WHERE id = $1', [target.id])
+      await pool.query('UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL, raid_hash = NULL WHERE id = $1', [target.id])
     } else if (platform === 'steam') {
-      await pool.query('UPDATE users SET steamid = NULL, steamusername = NULL WHERE id = $1', [target.id])
+      await pool.query('UPDATE users SET steamid = NULL, steamusername = NULL, steam_login_id = NULL WHERE id = $1', [target.id])
       await clearUserCache(String(target.id))
       await forgetUnlocks(String(target.id))
     } else if (platform === 'psn') {
