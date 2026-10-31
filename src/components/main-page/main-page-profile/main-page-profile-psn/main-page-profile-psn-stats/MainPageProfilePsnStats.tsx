@@ -23,12 +23,12 @@ export default function MainPageProfilePsnStats({
 }) {
   const { T, lang } = useLanguage()
   const minutes = totalPlaytime(library)
-  const playtime = isLoading ? '—' : formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)
+  const playtime = formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)
 
   return (
     <div className="grid grid-cols-2 gap-2">
       <StatCard label={T.steam.statGames} value={summary.games.toLocaleString(lang)} />
-      <StatCard label={T.steam.totalPlaytime} value={playtime} />
+      <StatCard label={T.steam.totalPlaytime} value={playtime} loading={isLoading} />
       <StatCard label={T.psn.platinum} value={summary.earned.platinum.toLocaleString(lang)} accent="text-sky-300" />
       <StatCard label={T.psn.trophies} value={countTrophies(summary.earned).toLocaleString(lang)} />
     </div>

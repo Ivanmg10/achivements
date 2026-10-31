@@ -2,6 +2,7 @@
 
 import { useCallback, useState, type ReactNode } from 'react'
 import Image, { type ImageProps } from 'next/image'
+import { SKELETON_PULSE } from './Skeleton'
 
 /**
  * An image that holds its place until it has loaded: the box shows a soft
@@ -40,7 +41,7 @@ export function FadeImage({
 
   return (
     <span
-      className={`relative block overflow-hidden ${state === 'loaded' ? '' : `bg-ink/[0.06] ${placeholderClassName}`} ${state === 'loading' ? 'animate-pulse motion-reduce:animate-none' : ''} ${className}`}
+      className={`relative block overflow-hidden ${state === 'loaded' ? '' : `bg-skeleton ${placeholderClassName}`} ${state === 'loading' ? SKELETON_PULSE : ''} ${className}`}
     >
       {state !== 'failed' && (
         <Image

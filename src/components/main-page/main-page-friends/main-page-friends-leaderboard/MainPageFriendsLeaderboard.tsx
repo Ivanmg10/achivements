@@ -16,9 +16,9 @@ const chipClass = (on: boolean) => pillClass(on)
 /**
  * You and the people you follow, ranked on one measure at a time: unlocks this
  * week, active days, streak or games at 100%. Your own row is marked in words
- * as well as tint; a friend still loading holds their place with a dash.
+ * as well as tint.
  */
-export default function MainPageFriendsLeaderboard({ rows, pending }: { rows: LeaderRow[]; pending: { username: string; avatar: string | null }[] }) {
+export default function MainPageFriendsLeaderboard({ rows }: { rows: LeaderRow[] }) {
   const { T, lang } = useLanguage()
   const [key, setKey] = useState<StatKey>('week')
   const ranked = rankBy(rows, key)
@@ -92,14 +92,6 @@ export default function MainPageFriendsLeaderboard({ rows, pending }: { rows: Le
             </li>
           )
         })}
-        {pending.map((p) => (
-          <li key={p.username} aria-busy="true" className="flex items-center gap-3 px-2 py-1.5 text-text-secondary">
-            <span className="w-6 text-center text-xs">·</span>
-            <span className="w-7 h-7 rounded-full bg-ink/10 animate-pulse motion-reduce:animate-none shrink-0" />
-            <span className="text-sm truncate flex-1">{p.username}</span>
-            <span className="text-sm w-14 text-right">—</span>
-          </li>
-        ))}
       </ol>
     </div>
   )

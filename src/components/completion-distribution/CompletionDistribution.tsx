@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { completionBuckets } from '@/utils/utils'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /** Ordered bands, least complete first — a magnitude scale, so one hue, light to dark. */
 const BAND_LABELS = ['<25%', '25–49%', '50–74%', '75–99%', '100%']
@@ -43,10 +44,10 @@ export default function CompletionDistribution({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-2 animate-pulse" aria-busy="true">
-        <div className="h-2 w-32 rounded bg-ink/10" />
-        <div className="h-2.5 w-full rounded-full bg-ink/10" />
-        <div className="h-2 w-40 rounded bg-ink/10" />
+      <div className="flex flex-col gap-2" aria-busy="true">
+        <Skeleton className="h-2 w-32" />
+        <Skeleton className="h-2.5 w-full" />
+        <Skeleton className="h-2 w-40" />
       </div>
     )
   }

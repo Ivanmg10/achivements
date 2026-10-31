@@ -13,6 +13,7 @@ import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 // Downloaded the first time it is opened, not with the page.
 const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
 import GroupListSkeleton from '@/components/groups/group-list-skeleton/GroupListSkeleton'
+import { Skeleton } from '@/components/ui/Skeleton'
 import GroupList from '@/components/groups/group-list/GroupList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import GroupViewToggle, { GROUP_VIEWS, type GroupView } from '@/components/groups/group-view-toggle/GroupViewToggle'
@@ -53,6 +54,7 @@ export default function GroupsPage() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 text-text-main">{T.groups.title}</h1>
+          {isLoading && <Skeleton className="h-5 w-24 mt-0.5" />}
           {groups.length > 0 && (
             <p className="text-sm text-text-secondary mt-0.5">
               {groups.length}/{GROUPS_PER_USER_MAX} {T.groups.title.toLowerCase()}

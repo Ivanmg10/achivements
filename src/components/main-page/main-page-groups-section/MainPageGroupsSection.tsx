@@ -5,6 +5,7 @@ import { useGroups } from '@/hooks/useGroups'
 import { ChartCard } from '@/components/ui/ChartCard'
 import MainPageGroups from '@/components/main-page/main-page-charts/MainPageGroups'
 import MainPageGroupFeature from '@/components/main-page/main-page-group-feature/MainPageGroupFeature'
+import MainPageGroupsSectionSkeleton from './main-page-groups-section-skeleton/MainPageGroupsSectionSkeleton'
 
 /**
  * The Groups section: one group shown in full on the left, its games as a
@@ -16,6 +17,8 @@ export default function MainPageGroupsSection() {
   const [picked, setPicked] = useState<number | null>(null)
   // The pick only counts while that group still exists (it may have just been deleted).
   const featured = groups.find((g) => g.id === picked) ?? groups[0] ?? null
+
+  if (isLoading) return <MainPageGroupsSectionSkeleton />
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">

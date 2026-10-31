@@ -7,6 +7,7 @@ import type { LibraryGame } from '@/utils/library'
 import { normalizeTitle } from '@/utils/gameCandidates'
 import ShowcasePickerModalGameRow from '../showcase-picker-modal-game-row/ShowcasePickerModalGameRow'
 import { fieldClass } from '@/components/ui/Input'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 /** The picker's first view: the user's games with an achievement earned, searchable, each opening its achievements. */
 export default function ShowcasePickerModalGames({
@@ -52,7 +53,7 @@ export default function ShowcasePickerModalGames({
         {isLoading ? (
           <div aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
             {[0, 1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-14 rounded-tile bg-bg-card animate-pulse motion-reduce:animate-none" />
+              <SkeletonRow key={i} className="h-14 bg-bg-card rounded-tile px-2 gap-3" />
             ))}
           </div>
         ) : games.length === 0 ? (

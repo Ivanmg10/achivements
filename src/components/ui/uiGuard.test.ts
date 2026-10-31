@@ -88,6 +88,12 @@ test('the radii the designs change come from the tokens, never a fixed value', (
   expect(offenders(/\brounded-(?:xl|2xl)\b/)).toEqual([])
 })
 
+test('a loading block comes from Skeleton, never a hand-made pulse', () => {
+  // Not a skeleton: the status badge's glow is decoration. An image's placeholder uses SKELETON_PULSE.
+  const allowed = [path.join('components', 'status-badge', 'StatusBadge.tsx')]
+  expect(offenders(/\banimate-pulse\b/).filter((f) => !allowed.includes(f))).toEqual([])
+})
+
 test('a disclosure and a show-more button come from the library (Accordion, ShowMore)', () => {
   expect(offenders(/aria-expanded=\{[^}]*\}[\s\S]{0,400}IconPlus/)).toEqual([])
 })

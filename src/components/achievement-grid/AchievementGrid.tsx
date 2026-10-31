@@ -13,6 +13,7 @@ import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import { capList } from '@/utils/utils'
 import { tooltipStyle } from '@/utils/tooltipStyle'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 type TooltipData = { achievement: RetroAchievement; x: number; y: number }
 
@@ -105,7 +106,7 @@ export const AchievementGrid = memo(function AchievementGrid({
     return (
       <div className="flex flex-wrap gap-1">
         {Array.from({ length: Math.min(total, 30) }).map((_, i) => (
-          <div key={i} className={`${size.badge} rounded-lg bg-ink/10 animate-pulse`} />
+          <Skeleton key={i} radius="tile" className={size.badge} />
         ))}
       </div>
     )
@@ -122,7 +123,7 @@ export const AchievementGrid = memo(function AchievementGrid({
       {!allLoaded && (
         <div className="flex flex-wrap gap-1">
           {shown.map((_, i) => (
-            <div key={i} className={`${size.badge} rounded-lg bg-bg-main animate-pulse`} />
+            <Skeleton key={i} radius="tile" className={size.badge} />
           ))}
         </div>
       )}

@@ -1,4 +1,4 @@
-const BLOCK = 'rounded-tile bg-ink/[0.06]'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /**
  * What a game's detail has under its ring while it loads: the row of figures
@@ -12,11 +12,11 @@ export default function LibraryDetailSkeleton() {
     <>
       <div aria-hidden="true" className="@3xl:col-span-3 flex flex-wrap gap-2">
         {[28, 32, 28, 36].map((w, i) => (
-          <div key={i} className={`${BLOCK} h-14`} style={{ width: `${w * 0.25}rem` }} />
+          <Skeleton key={i} radius="tile" className="h-14" style={{ width: `${w * 0.25}rem` }} />
         ))}
       </div>
-      <div aria-hidden="true" className={`${BLOCK} h-72 @3xl:col-span-2`} />
-      <div aria-hidden="true" className={`${BLOCK} h-72`} />
+      <Skeleton radius="tile" className="h-72 @3xl:col-span-2" />
+      <Skeleton radius="tile" className="h-72" />
     </>
   )
 }

@@ -12,6 +12,7 @@ import PublicUserGameRow from '../public-user-game-row/PublicUserGameRow'
 import { fieldClass } from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import { pillClass } from '@/components/ui/Pill'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 const PAGE = 30
 
@@ -46,7 +47,7 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
       <div aria-busy="true" className="bg-bg-card rounded-tile p-4 grid grid-cols-1 md:grid-cols-2 gap-2">
         <span className="sr-only">{T.userProfile.loadingGames}</span>
         {Array.from({ length: 8 }, (_, i) => (
-          <div key={i} className="h-16 rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
+          <SkeletonRow key={i} icon="w-11 h-11" className="p-2.5 gap-3 bg-bg-main rounded-tile" />
         ))}
       </div>
     )

@@ -7,6 +7,7 @@ import type { InsightAchievement } from '@/utils/gameInsights'
 import { groupGameAchievementsByPeriod } from '@/utils/utils'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import SegmentedControl from '@/components/ui/SegmentedControl'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 type Period = 'week' | 'month'
 
@@ -15,7 +16,7 @@ const PLOT_HEIGHT = 'h-[208px]'
 // recharts is the heaviest thing on the page: it arrives when there is a line to draw, with the room kept meanwhile.
 const GameAchievementsProgressPlot = dynamic(
   () => import('./game-achievements-progress-plot/GameAchievementsProgressPlot'),
-  { loading: () => <div aria-hidden="true" className={`${PLOT_HEIGHT} animate-pulse rounded-lg bg-ink/5`} /> },
+  { loading: () => <Skeleton radius="tile" className={PLOT_HEIGHT} /> },
 )
 // Downloaded the first time a point is clicked, not with the card. `loading` gives it its
 // own Suspense boundary: without one the download suspends the whole page (the home
@@ -74,10 +75,10 @@ export function GameAchievementsProgressChart({
       </div>
 
       {isLoading ? (
-        <div className="px-1 h-52 flex flex-col justify-end gap-1 animate-pulse">
+        <div className="px-1 h-52 flex flex-col justify-end gap-1">
           <div className="flex items-end gap-2 h-44">
             {[45, 70, 30, 90, 55, 20, 80, 60].map((h, i) => (
-              <div key={i} className="flex-1 bg-ink/10 rounded-t-sm" style={{ height: `${h}%` }} />
+              <Skeleton key={i} radius="tag" className="flex-1" style={{ height: `${h}%` }} />
             ))}
           </div>
         </div>

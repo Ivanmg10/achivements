@@ -44,7 +44,7 @@ test('a failed icon leaves its placeholder instead of a broken image', () => {
   const image = container.querySelector('button img')!
   fireEvent.error(image)
   expect(container.querySelector('img[src="https://retroachievements.org/Images/1.png"]')).toBeNull()
-  expect(container.querySelector('button > span > span')).toHaveClass('bg-ink/[0.06]')
+  expect(container.querySelector('button > span > span')).toHaveClass('bg-skeleton')
 })
 
 test('marks an RA game with the RA logo, a Steam one with the Steam logo', () => {

@@ -2,6 +2,7 @@
 
 import CollapsibleSectionPreviewCard from '../collapsible-section-preview-card/CollapsibleSectionPreviewCard'
 import type { PreviewGame } from '@/utils/sectionPreview'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 /**
  * The first games of a folded section, as a teaser. How many, and in how many
@@ -25,7 +26,7 @@ export default function CollapsibleSectionPreview({
     return (
       <div aria-busy="true" className="grid gap-2.5" style={style}>
         {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="h-19 rounded-tile bg-bg-card animate-pulse" />
+          <SkeletonRow key={i} icon="w-14 h-14" className="rounded-card bg-bg-card p-2.5 pr-3 ring-1 ring-ink/5 gap-3" />
         ))}
       </div>
     )

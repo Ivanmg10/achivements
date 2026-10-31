@@ -6,6 +6,7 @@ import type { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { playHabits } from '@/utils/activityInsights'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const HOUR_MARKS = [0, 6, 12, 18]
 /** A Monday, to name the weekdays in the app's language. */
@@ -53,7 +54,18 @@ export default function MainPageHabits({ achievements, isLoading }: { achievemen
     return (
       <div className="flex flex-col gap-3">
         {header}
-        <div aria-busy="true" className="h-40 rounded-lg bg-ink/5 animate-pulse" />
+        <div aria-busy="true" className="flex flex-col gap-3">
+          <Skeleton className="h-4 w-3/5" />
+          <div className="grid sm:grid-cols-2 gap-6">
+            {[7, 24].map((bars) => (
+              <div key={bars} className="flex items-end gap-1 h-28">
+                {Array.from({ length: bars }, (_, i) => (
+                  <Skeleton key={i} radius="tag" className="flex-1" style={{ height: `${30 + ((i * 37) % 70)}%` }} />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }

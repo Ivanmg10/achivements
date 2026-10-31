@@ -62,5 +62,6 @@ export function useFollowers(enabled: boolean) {
   }, [])
 
   const withGames = useMemo(() => (followers ? withPlaying(followers, playing) : null), [followers, playing])
-  return { followers: withGames, details, isLoading: enabled && followers === null && !failed, error: failed, retry }
+  const detailsLoading = !failed && (followers ?? []).slice(0, DETAIL_LIMIT).some((f) => !details[f.username])
+  return { followers: withGames, details, isLoading: enabled && followers === null && !failed, detailsLoading, error: failed, retry }
 }

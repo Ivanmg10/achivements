@@ -40,7 +40,7 @@ export default function MainPagePointsStats({
     return (
       <div className="flex flex-wrap gap-3">
         {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, ...(showRank ? [T.userStats.globalRank] : []), T.streak.title].map((label) => (
-          <StatPill key={label} label={label} value="—" accent="text-text-secondary" />
+          <StatPill key={label} label={label} value="" loading />
         ))}
       </div>
     )

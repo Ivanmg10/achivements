@@ -12,6 +12,7 @@ import CollectionShelf from './collection-shelf/CollectionShelf'
 import CollectionGrid from './collection-grid/CollectionGrid'
 import CollectionNumbers from './collection-numbers/CollectionNumbers'
 import CollectionClosest from './collection-closest/CollectionClosest'
+import MainPageCollectionSkeleton from './main-page-collection-skeleton/MainPageCollectionSkeleton'
 
 /** Boxes on the shelf: enough to fill the card's width, few enough to read each one. */
 const SHELF = 5
@@ -50,16 +51,7 @@ export default function MainPageCollection({
   )
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col gap-4 animate-pulse motion-reduce:animate-none" aria-busy="true">
-        <div className="h-60 rounded-tile bg-bg-card" />
-        <div className="h-36 rounded-tile bg-bg-card" />
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <div className="h-64 rounded-tile bg-bg-card xl:col-span-2" />
-          <div className="h-64 rounded-tile bg-bg-card" />
-        </div>
-      </div>
-    )
+    return <MainPageCollectionSkeleton />
   }
 
   return (

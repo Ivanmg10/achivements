@@ -46,12 +46,12 @@ test('says how many days it is showing, which the measurement decides', () => {
 })
 
 test('loading draws the same grid, so nothing moves when it fills', () => {
-  const { rerender } = render(<MainPageHeatmap achievements={[]} isLoading />)
+  const { container, rerender } = render(<MainPageHeatmap achievements={[]} isLoading />)
   const loading = Array.from(cells()).map((c) => (c as HTMLElement).style.backgroundColor)
   expect(loading).toHaveLength(WEEKS * 7)
   // Every cell is an empty one — no invented activity while it loads.
   expect(new Set(loading).size).toBe(1)
-  expect(screen.getByText('—')).toBeInTheDocument()
+  expect(container.querySelector('p .bg-skeleton')).toBeInTheDocument()
 
   rerender(<MainPageHeatmap achievements={[unlock(today(), 'Win')]} />)
   expect(cells()).toHaveLength(loading.length)

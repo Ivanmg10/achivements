@@ -5,6 +5,7 @@ import { IconUser, IconUsers } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { FriendOverview } from '@/utils/friends'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const STACK_MAX = 5
 
@@ -14,7 +15,7 @@ const STACK_MAX = 5
  * you follow (in the display face) with a few of their faces and how many of
  * them are online now, at the bottom.
  */
-export default function FollowingHero({ users, className = '' }: { users: FriendOverview[]; className?: string }) {
+export default function FollowingHero({ users, isLoading = false, className = '' }: { users: FriendOverview[]; isLoading?: boolean; className?: string }) {
   const { T, lang } = useLanguage()
   const stack = users.slice(0, STACK_MAX)
   const more = users.length - stack.length
@@ -39,6 +40,20 @@ export default function FollowingHero({ users, className = '' }: { users: Friend
           </div>
         </div>
 
+        {/* Its room is kept while the list is read, so the page below does not move when it comes. */}
+        {isLoading && (
+          <div aria-hidden="true" className="flex items-end gap-5 min-h-[6.5rem] sm:min-h-0">
+            <div className="flex flex-col gap-1.5">
+              <Skeleton className="h-11 w-16" />
+              <Skeleton className="h-3 w-20" />
+            </div>
+            <div className="flex pb-0.5 pl-2">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} radius="circle" className="w-9 h-9 -ml-2 ring-[3px] ring-bg-card" />
+              ))}
+            </div>
+          </div>
+        )}
         {users.length > 0 && (
           <div className="flex items-end gap-x-5 gap-y-3 flex-wrap">
             <p className="flex flex-col">

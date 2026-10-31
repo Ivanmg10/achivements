@@ -13,13 +13,13 @@ import AdminPsnToken from './admin-psn-token/AdminPsnToken'
 import AdminXbox from './admin-xbox/AdminXbox'
 import AdminRankings from './admin-rankings/AdminRankings'
 import DeleteConfirmDialog from '@/components/groups/delete-confirm-dialog/DeleteConfirmDialog'
-import Spinner from '@/components/main-spinner/Spinner'
 import { normalizeTitle } from '@/utils/gameCandidates'
 import { ADMIN_LOCKED_EVENT, adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
+import AdminUsersSkeleton from './admin-users-skeleton/AdminUsersSkeleton'
 
 /** What the panel is showing, for a container that sizes itself to it. */
 export type AdminPanelMode = 'loading' | 'locked' | 'open'
@@ -203,10 +203,7 @@ export default function AdminPanel({
       <AdminRankings />
       <div>
         {loading && (
-          <div className="flex items-center justify-center gap-3 py-12 text-text-secondary text-sm">
-            <Spinner size={20} />
-            Loading users...
-          </div>
+          <AdminUsersSkeleton />
         )}
         {error && (
           <div className="flex items-center justify-center py-12 text-danger text-sm">{error}</div>

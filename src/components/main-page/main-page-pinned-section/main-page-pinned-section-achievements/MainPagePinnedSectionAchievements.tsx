@@ -13,6 +13,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import MainPagePinnedSectionAchievementTile from '../main-page-pinned-section-achievement-tile/MainPagePinnedSectionAchievementTile'
 import MainPagePinnedSectionSortable from '../main-page-pinned-section-sortable/MainPagePinnedSectionSortable'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 type RaPin = Extract<PinnedAchievement, { source: 'ra' }>
 
@@ -47,7 +48,7 @@ export default function MainPagePinnedSectionAchievements() {
       {isLoading ? (
         <div className={GRID} aria-busy="true">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-full rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
+            <Skeleton key={i} radius="tile" className="h-40" />
           ))}
         </div>
       ) : error ? (

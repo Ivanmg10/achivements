@@ -14,22 +14,14 @@ import PresenceDot from '@/components/presence-dot/PresenceDot'
  * Your games that the people you follow play too, the most shared first: your
  * progress, then each of them with theirs, opening the two side by side.
  */
-export default function MainPageFriendsShared({ rows, isLoading }: { rows: SharedGameRow[]; isLoading: boolean }) {
+export default function MainPageFriendsShared({ rows }: { rows: SharedGameRow[] }) {
   const { T } = useLanguage()
 
   return (
     <div className="flex flex-col gap-3">
       <h3 className="text-[10px] uppercase tracking-widest text-text-secondary">{T.friends.shared}</h3>
       {rows.length === 0 ? (
-        isLoading ? (
-          <div aria-busy="true" className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-16 rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
-            ))}
-          </div>
-        ) : (
-          <EmptyState icon={<IconArrowsDiff className="w-6 h-6" />} title={T.friends.sharedEmpty} size="compact" className="py-6" />
-        )
+        <EmptyState icon={<IconArrowsDiff className="w-6 h-6" />} title={T.friends.sharedEmpty} size="compact" className="py-6" />
       ) : (
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {rows.map(({ game, friends }) => (

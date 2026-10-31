@@ -7,10 +7,11 @@ import { RecentAchievement } from '@/types/types'
 import { groupByDaySource } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 // recharts is the heaviest thing on the page: it arrives after the page is up, in the room the chart keeps.
 const AchievementsLinePlot = dynamic(() => import('./achievements-line-plot/AchievementsLinePlot'), {
-  loading: () => <div aria-hidden="true" className="h-full animate-pulse rounded-lg bg-ink/5" />,
+  loading: () => <Skeleton radius="tile" className="h-full" />,
 })
 
 /**
@@ -59,15 +60,15 @@ export default function AchievementsLineChart({
       </div>
 
       {isLoading ? (
-        <div className="home-fit-chart px-1 h-64 flex flex-col justify-end gap-1 animate-pulse">
-          <div className="flex items-end gap-2 h-56">
+        <div className="home-fit-chart h-[260px] px-1 flex flex-col justify-end gap-1">
+          <div className="flex items-end gap-2 flex-1 min-h-0">
             {[45, 70, 30, 90, 55, 20, 80].map((h, i) => (
-              <div key={i} className="flex-1 bg-ink/10 rounded-t-md" style={{ height: `${h}%` }} />
+              <Skeleton key={i} radius="tag" className="flex-1" style={{ height: `${h}%` }} />
             ))}
           </div>
           <div className="flex gap-2">
             {Array.from({ length: 7 }).map((_, i) => (
-              <div key={i} className="flex-1 h-3 bg-ink/10 rounded" />
+              <Skeleton key={i} className="flex-1 h-3" />
             ))}
           </div>
         </div>

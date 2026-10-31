@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatRarity } from '@/utils/steamFeed'
 import type { InsightAchievement } from '@/utils/gameInsights'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 const SKELETON_ROWS = 4
 
@@ -41,7 +42,7 @@ export default function LibraryDetailList({
       {isLoading ? (
         <ul aria-busy="true" className="flex flex-col gap-2">
           {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-            <li key={i} className="h-12 bg-ink/5 rounded-lg animate-pulse" />
+            <li key={i}><SkeletonRow className="h-12 px-1" /></li>
           ))}
         </ul>
       ) : items.length === 0 ? (

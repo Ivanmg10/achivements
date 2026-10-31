@@ -8,6 +8,7 @@ import { IconRefresh } from '@tabler/icons-react'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHeatmapGrid, HEATMAP_GAP as GAP, HEATMAP_MAX_DAYS } from '@/hooks/useHeatmapGrid'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /** Empty, then the theme's accent at rising strength: one hue per theme, so every theme reads the same way. */
 /*
@@ -149,7 +150,7 @@ export default function MainPageHeatmap({
               {T.cards.activeDays.replace('{n}', String(activeDays))} · {T.lineChart.bestDay.replace('{n}', String(best))}
             </p>
           )}
-          <p className="text-sm font-bold tabular-nums text-text-main">{isLoading ? '—' : totalAch}</p>
+          <p className="text-sm font-bold tabular-nums text-text-main">{isLoading ? <Skeleton className="h-[1lh] w-8" /> : totalAch}</p>
           {onRefresh && (
             <button
               onClick={onRefresh}

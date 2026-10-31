@@ -16,6 +16,7 @@ import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamRecentlyPlayedExpanded from '@/components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded'
 import { gameKey } from '@/utils/gameRef'
 import { toSteamGameProgress } from '@/utils/steamMappers'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 /**
  * A pinned Steam game on the main page — PinnedGameRow's counterpart: drag
@@ -43,7 +44,7 @@ export default function SteamPinnedGameRow({
   const found = library.find((g) => g.id === appId) ?? recent.find((g) => g.id === appId)
 
   if (!found && libraryLoading) {
-    return <div ref={setNodeRef} style={style} className="bg-bg-main rounded-tile h-24 animate-pulse" />
+    return <div ref={setNodeRef} style={style}><GameRowSkeleton /></div>
   }
 
   // A pin for a game no longer in the library (refunded, family share ended)

@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesByCategory } from '@/hooks/useSteamGamesByCategory'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const PREVIEW = 6
 
@@ -49,8 +50,8 @@ export default function MainPageSteamNav() {
               </Link>
 
               {loading ? (
-                <div className="flex gap-1.5 animate-pulse" aria-busy="true">
-                  {[0, 1, 2, 3].map((i) => <div key={i} className="w-8 h-8 rounded bg-ink/10" />)}
+                <div className="flex gap-1.5" aria-busy="true">
+                  {[0, 1, 2, 3].map((i) => <Skeleton key={i} radius="tag" className="w-8 h-8" />)}
                 </div>
               ) : games.length === 0 ? (
                 <p className="text-[10px] text-text-secondary">{T.steam.noGamesInCategory}</p>

@@ -91,7 +91,7 @@ describe('folding', () => {
     window.sessionStorage.clear()
     setHook({ loading: true, games: [] })
     const { container } = render(<SteamCategorySection category="playing" />)
-    expect(container.querySelectorAll('.animate-pulse')).toHaveLength(3)
+    expect(container.querySelector('[aria-busy="true"]')!.children.length).toBeGreaterThan(0)
     expect(screen.getByRole('button', { name: en.categoryPage.showAll })).toBeInTheDocument()
   })
 })

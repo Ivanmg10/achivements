@@ -20,6 +20,7 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import MainPageGroupFeatureGame from '@/components/main-page/main-page-group-feature-game/MainPageGroupFeatureGame'
 import Button from '@/components/ui/Button'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 // Downloaded the first time it is opened, not with the page.
 const AddGameModal = dynamic(() => import('@/components/groups/add-game-modal/AddGameModal'), { loading: () => null })
@@ -142,9 +143,9 @@ export default function MainPageGroupFeature({
       )}
 
       {isLoading ? (
-        <div className={`${GRID} animate-pulse motion-reduce:animate-none`} aria-busy="true">
+        <div className={GRID} aria-busy="true">
           {Array.from({ length: 6 }, (_, i) => (
-            <div key={i} className="aspect-square rounded-tile bg-ink/10" />
+            <Skeleton key={i} radius="tile" className="aspect-square" />
           ))}
         </div>
       ) : error ? (

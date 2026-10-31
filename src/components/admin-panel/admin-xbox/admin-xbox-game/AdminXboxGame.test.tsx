@@ -85,9 +85,9 @@ test('a failure is announced and can be retried', () => {
   expect(load).toHaveBeenCalledTimes(1)
 })
 
-test('while loading, a busy placeholder shows', () => {
+test('while loading, a placeholder shows', () => {
   set({ loading: true })
   render(<ul><AdminXboxGame xuid="1" game={xboxGameFixture()} /></ul>)
   fireEvent.click(screen.getByRole('button', { name: /Modern Game/ }))
-  expect(document.querySelector('[aria-busy="true"]')).not.toBeNull()
+  expect(document.querySelector('.bg-skeleton')).not.toBeNull()
 })

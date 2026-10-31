@@ -20,6 +20,8 @@
 
   /* Overlays, hairlines and tints: white on the dark themes, ink on the light one. */
   --color-ink: rgb(var(--ink));
+  /* A skeleton's block: reads on the page, a card or a pane, in any theme. */
+  --color-skeleton: rgb(var(--ink) / 0.08);
 
   --color-accent: rgb(var(--accent));
   --color-accent-hover: rgb(var(--accent-hover));
@@ -856,6 +858,10 @@ html[data-font="fira"],
   /* A row taller than its content keeps the content in the middle, not stuck to the top. */
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * > * { justify-content: center; }
 }
+
+/* The home's skeleton draws both layouts; <html> says which one shows, before the first frame (LOOK_SCRIPT). */
+[data-home-layout="cover"] .home-if-classic,
+:root:not([data-home-layout="cover"]) .home-if-cover { display: none; }
 
 /* Heatmap: the cells come in column by column, oldest week first (--col is the week). */
 @keyframes heat-in {

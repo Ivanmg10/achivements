@@ -7,6 +7,7 @@ import { IconX, IconHash, IconCopy, IconCheck } from '@tabler/icons-react'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useIsClient } from '@/hooks/useIsClient'
 import Modal from '@/components/ui/Modal'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 type GameHash = {
   MD5: string
@@ -112,11 +113,11 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
             {/* Body */}
             <div className="overflow-y-auto flex-1 p-5">
               {loading ? (
-                <div className="flex flex-col gap-3 animate-pulse">
+                <div className="flex flex-col gap-3">
                   {[0, 1, 2].map((i) => (
                     <div key={i} className="bg-bg-main rounded-tile p-4 flex flex-col gap-2">
-                      <div className="h-3 w-48 rounded bg-ink/10" />
-                      <div className="h-2.5 w-64 rounded bg-ink/10" />
+                      <Skeleton className="h-3 w-48 max-w-full" />
+                      <Skeleton className="h-2.5 w-64 max-w-full" />
                     </div>
                   ))}
                 </div>

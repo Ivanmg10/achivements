@@ -10,6 +10,7 @@ import XboxRarestAchievements from '@/components/xbox/xbox-rarest-achievements/X
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import XboxPartialListNote from '@/components/xbox/xbox-partial-list-note/XboxPartialListNote'
 import type { XboxGameProgress } from '@/types/xbox'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const SKELETON_BADGES = 24
 
@@ -43,7 +44,7 @@ export default function XboxRecentlyPlayedExpanded({ game }: { game: XboxGamePro
         {isLoading ? (
           <ul aria-busy="true" className="flex flex-wrap gap-1">
             {Array.from({ length: Math.min(total || SKELETON_BADGES, 60) }).map((_, i) => (
-              <li key={i} className="w-10 h-10 rounded-lg bg-ink/10 animate-pulse" />
+              <li key={i}><Skeleton radius="tile" className="w-10 h-10" /></li>
             ))}
           </ul>
         ) : error ? (

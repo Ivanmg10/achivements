@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import { formatRarity } from '@/utils/steamFeed'
 import type { SteamAchievementUnified } from '@/types/steam'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 const SHOWN = 4
 const SKELETON_ROWS = 4
@@ -38,7 +39,7 @@ export default function SteamRarestAchievements({
       {isLoading ? (
         <ul aria-busy="true" className="flex flex-col gap-2">
           {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-            <li key={i} className="h-12 bg-ink/5 rounded-lg animate-pulse" />
+            <li key={i}><SkeletonRow className="h-12 px-1" /></li>
           ))}
         </ul>
       ) : rarest.length === 0 ? (

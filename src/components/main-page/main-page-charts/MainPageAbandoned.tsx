@@ -171,7 +171,7 @@ export default function MainPageAbandoned({
       </p>
 
       {loading ? (
-        <SkeletonGameList count={3} />
+        <SkeletonGameList count={7} />
       ) : abandoned.length === 0 ? (
         <EmptyState
           icon={<IconMoodEmpty className="w-6 h-6" />}

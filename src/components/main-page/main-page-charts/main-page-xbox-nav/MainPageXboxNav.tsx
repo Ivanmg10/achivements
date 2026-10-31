@@ -5,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useXboxGamesByCategory } from '@/hooks/useXboxGamesByCategory'
 import GameIcon from '@/components/game-icon/GameIcon'
 import { gameHref } from '@/utils/gameRef'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const PREVIEW = 6
 
@@ -50,8 +51,8 @@ export default function MainPageXboxNav() {
               </Link>
 
               {loading ? (
-                <div className="flex gap-1.5 animate-pulse" aria-busy="true">
-                  {[0, 1, 2, 3].map((i) => <div key={i} className="w-8 h-8 rounded bg-ink/10" />)}
+                <div className="flex gap-1.5" aria-busy="true">
+                  {[0, 1, 2, 3].map((i) => <Skeleton key={i} radius="tag" className="w-8 h-8" />)}
                 </div>
               ) : games.length === 0 ? (
                 <p className="text-[10px] text-text-secondary">{T.xbox.noGamesInCategory}</p>

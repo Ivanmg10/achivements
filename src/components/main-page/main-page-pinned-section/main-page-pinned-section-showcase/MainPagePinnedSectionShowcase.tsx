@@ -10,6 +10,7 @@ import { SectionFallback } from '@/components/ui/SectionFallback'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import ShowcaseTile from '@/components/showcase-tile/ShowcaseTile'
 import MainPagePinnedSectionSortable from '../main-page-pinned-section-sortable/MainPagePinnedSectionSortable'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 // Downloaded the first time it is opened, not with the page.
 const ShowcasePickerModal = dynamic(() => import('@/components/showcase-picker-modal/ShowcasePickerModal'), { loading: () => null })
@@ -43,7 +44,7 @@ export default function MainPagePinnedSectionShowcase() {
       {isLoading ? (
         <div aria-busy="true" className="flex flex-wrap gap-3">
           {Array.from({ length: SHOWCASE_MAX }, (_, i) => (
-            <div key={i} className={`${SLOT} rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none`} />
+            <Skeleton key={i} radius="tile" className={SLOT} />
           ))}
         </div>
       ) : error ? (

@@ -9,11 +9,11 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import { IconStar, IconStarFilled } from '@tabler/icons-react'
-import Spinner from '@/components/main-spinner/Spinner'
 import { raShowcaseEntry } from '@/utils/showcase'
 import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseToggleButton'
 import Modal from '@/components/ui/Modal'
 import { decimal } from '@/utils/utils'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 interface AchievementUnlock {
   User: string
@@ -210,8 +210,11 @@ export default function AchievementModal({
 
         <div className="flex flex-col gap-6 p-6">
           {loading && (
-            <div className="flex justify-center py-8">
-              <Spinner size={28} />
+            <div role="status" aria-busy="true" className="flex flex-col gap-2 border border-bg-header rounded-tile p-4">
+              <span className="sr-only">{T.loadingPage.title}</span>
+              {[0, 1, 2, 3].map((i) => (
+                <SkeletonRow key={i} icon="w-7 h-7" radius="circle" figure />
+              ))}
             </div>
           )}
 

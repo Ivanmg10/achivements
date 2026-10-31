@@ -9,6 +9,6 @@ test('announces itself as loading and has every block of a profile', () => {
   expect(status).toHaveClass('h-full')
   // Four stats, the last game, three unlock rows.
   expect(container.querySelectorAll('.grid > div')).toHaveLength(4)
-  expect(container.querySelectorAll('.w-9.h-9')).toHaveLength(3)
+  expect(container.querySelectorAll('.w-10.h-10')).toHaveLength(3)
   expect(container.querySelector('.w-12\\.5')).toBeInTheDocument()
 })

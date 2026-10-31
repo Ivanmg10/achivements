@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { SubsetGame } from '@/types/types'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 function extractSubsetLabel(title: string): string {
   const match = title.match(/\[Subset\s*-\s*(.+?)\]/)
@@ -23,9 +24,9 @@ export default function GameInfoSubsetSelector({
 }) {
   if (isLoading) {
     return (
-      <div aria-hidden="true" className="flex gap-2 mt-3 animate-pulse motion-reduce:animate-none">
-        <span className="w-12 h-12 rounded-lg bg-ink/[0.07]" />
-        <span className="w-12 h-12 rounded-lg bg-ink/[0.05]" />
+      <div aria-hidden="true" className="flex gap-2 mt-3">
+        <Skeleton radius="tile" className="w-12 h-12" />
+        <Skeleton radius="tile" className="w-12 h-12" />
       </div>
     )
   }

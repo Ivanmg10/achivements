@@ -16,6 +16,7 @@ import MainPagePsnNav from '@/components/main-page/main-page-charts/main-page-ps
 import MainPageXboxNav from '@/components/main-page/main-page-charts/main-page-xbox-nav/MainPageXboxNav'
 import BrowseSearch from './browse-search/BrowseSearch'
 import BrowseConsoles from './browse-consoles/BrowseConsoles'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /**
  * The Browse section: the way into each list (by status, and by console on
@@ -25,7 +26,7 @@ import BrowseConsoles from './browse-consoles/BrowseConsoles'
  */
 export default function MainPageBrowse() {
   const { wantToPlay, playing, completed } = useAllGamesGlobal()
-  const { all } = useGamesData()
+  const { all, isLoading } = useGamesData()
   const { library: steam } = useSteamGamesData()
   const { library: psn } = usePsnGamesData()
   const { library: xbox } = useXboxGamesData()
@@ -47,6 +48,19 @@ export default function MainPageBrowse() {
       <ChartCard>
         <BrowseSearch library={library} />
       </ChartCard>
+
+      {platform === 'ra' && isLoading && all.length === 0 && (
+        <ChartCard>
+          <div aria-busy="true" className="flex flex-col gap-3">
+            <Skeleton className="h-3 w-24" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2">
+              {Array.from({ length: 12 }, (_, i) => (
+                <Skeleton key={i} radius="tile" className="h-[4.5rem]" />
+              ))}
+            </div>
+          </div>
+        </ChartCard>
+      )}
 
       {showConsoles && (
         <ChartCard>

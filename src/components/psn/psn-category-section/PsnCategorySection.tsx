@@ -13,6 +13,7 @@ import PsnStatusGameItem from '@/components/psn/psn-status-game-item/PsnStatusGa
 import EmptyState from '@/components/empty-state/EmptyState'
 import { STATUS_GRID_COLS } from '@/components/statusGameList/StatusGameList'
 import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
+import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
 
 const SKELETON_CARDS = 4
 
@@ -65,7 +66,7 @@ export default function PsnCategorySection({
       {loading ? (
         <div aria-busy="true" className={`grid gap-3 ${GRID_CLASS[gridCols]}`}>
           {Array.from({ length: SKELETON_CARDS }).map((_, i) => (
-            <div key={i} className="h-36 bg-bg-card rounded-tile animate-pulse" />
+            <GameCardSkeleton key={i} />
           ))}
         </div>
       ) : error ? (

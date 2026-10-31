@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export default function MainSidePanelLastAchievement({
   achievement,
@@ -15,12 +16,12 @@ export default function MainSidePanelLastAchievement({
 
   if (isLoading && !achievement) {
     return (
-      <section className="w-[90%] bg-bg-main rounded-card p-3 flex items-center gap-3 animate-pulse">
-        <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" />
+      <section className="w-[90%] bg-bg-main rounded-card p-3 flex items-center gap-3">
+        <Skeleton radius="tile" className="w-10 h-10 shrink-0" />
         <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-          <div className="h-2.5 bg-ink/10 rounded w-2/3" />
-          <div className="h-3 bg-ink/10 rounded w-3/4" />
-          <div className="h-2.5 bg-ink/10 rounded w-1/4" />
+          <Skeleton className="h-2.5 w-2/3" />
+          <Skeleton className="h-3 w-3/4" />
+          <Skeleton className="h-2.5 w-1/4" />
         </div>
       </section>
     )

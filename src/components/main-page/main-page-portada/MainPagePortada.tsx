@@ -19,6 +19,7 @@ import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import AchievementDetailModal from '@/components/achievement-detail-modal/AchievementDetailModal'
 import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
+import MainPagePortadaSkeleton from '../main-page-portada-skeleton/MainPagePortadaSkeleton'
 
 /**
  * The top of the home in its "cover" layout (Preferences → General): the game
@@ -38,7 +39,7 @@ export default function MainPagePortada() {
   const hero = loading ? null : homeHeroOf(feed[0])
   const { items, art: wide, loading: reading, ra } = useGameInsights(hero?.source ?? null, hero?.id ?? null)
   const tint = useImageTint(hero?.icon) ?? NEUTRAL_TINT
-  if (!hero) return null
+  if (!hero) return loading ? <MainPagePortadaSkeleton /> : null
 
   const art = [wide, ...hero.art].find((src): src is string => Boolean(src) && !failed.includes(src as string)) ?? null
   const when = hero.lastPlayed ? relativeTime(hero.lastPlayed, lang) : null

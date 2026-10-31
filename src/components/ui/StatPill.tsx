@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export function StatPill({
   label,
@@ -10,11 +11,14 @@ export function StatPill({
   className = '',
   href,
   onClick,
+  loading = false,
 }: {
   label: string
   value: string | number
   sub?: string
   accent?: string
+  /** Its figure is on its way: a block in its line, so the row does not move. */
+  loading?: boolean
   /** A colour for the figure that is not a theme class (a streak tier's hue); wins over `accent`. */
   accentColor?: string
   size?: 'sm' | 'lg'
@@ -29,7 +33,7 @@ export function StatPill({
     const inner = (
       <>
         <span className="text-xs text-text-secondary">{label}</span>
-        <span className={`text-sm font-bold ${accent ?? 'text-text-main'}`}>{value}</span>
+        <span className={`text-sm font-bold ${accent ?? 'text-text-main'}`}>{loading ? <Skeleton className="h-[1lh] w-10" /> : value}</span>
         {sub && <span className="text-xs text-text-secondary">{sub}</span>}
       </>
     )
@@ -42,7 +46,7 @@ export function StatPill({
   const inner = (
     <>
       <span className="text-[10px] font-semibold uppercase tracking-widest text-text-secondary">{label}</span>
-      <span className={`text-[1.75rem] leading-tight font-bold tabular-nums ${accentColor ? '' : (accent ?? 'text-text-main')}`} style={accentColor ? { color: accentColor } : undefined}>{value}</span>
+      <span className={`text-[1.75rem] leading-tight font-bold tabular-nums ${accentColor ? '' : (accent ?? 'text-text-main')}`} style={accentColor ? { color: accentColor } : undefined}>{loading ? <Skeleton className="h-[1lh] w-16 max-w-full" /> : value}</span>
       {sub && <span className="text-xs text-text-secondary">{sub}</span>}
     </>
   )
@@ -58,18 +62,20 @@ export function StatCard({
   label,
   value,
   accent,
+  loading = false,
   className = '',
 }: {
   label: string
   value: string | number
   accent?: string
+  loading?: boolean
   className?: string
 }) {
   return (
     <div className={`bg-bg-main rounded-tile px-3 py-2.5 flex flex-col gap-0.5 min-w-0 ${className}`}>
       <span className="text-[0.8125rem] text-text-secondary truncate">{label}</span>
       <span className={`text-2xl leading-tight font-extrabold tabular-nums truncate ${accent ?? 'text-text-main'}`}>
-        {typeof value === 'number' ? value.toLocaleString() : value}
+        {loading ? <Skeleton className="h-[1lh] w-2/3" /> : typeof value === 'number' ? value.toLocaleString() : value}
       </span>
     </div>
   )
