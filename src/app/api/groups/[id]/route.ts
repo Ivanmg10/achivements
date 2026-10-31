@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
 import { readGroupFields } from '@/utils/groupValidation'
+import { dbId } from '@/utils/dbId'
 import { canUseXbox } from '@/utils/xboxAccess'
 
 async function ownsGroup(userId: string, groupId: number) {
@@ -14,7 +15,7 @@ async function ownsGroup(userId: string, groupId: number) {
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
     if (!Number.isInteger(groupId)) {
       return NextResponse.json({ message: 'No encontrado' }, { status: 404 })
@@ -23,16 +24,19 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const session = await getServerSession(authOptions)
 
     const groupRes = await pool.query(
-      `SELECT g.id, g.title, g.description, g.icon, g.is_public, g.position, g.user_id, g.created_at, g.updated_at
-       FROM game_groups g WHERE g.id = $1`,
+      `SELECT g.id, g.title, g.description, g.icon, g.is_public, g.position, g.user_id, g.created_at, g.updated_at,
+              u.profile_public AS owner_public
+       FROM game_groups g JOIN users u ON u.id = g.user_id WHERE g.id = $1`,
       [groupId],
     )
     if (!groupRes.rows.length) {
       return NextResponse.json({ message: 'No encontrado' }, { status: 404 })
     }
 
-    const group = groupRes.rows[0]
-    if (!group.is_public && String(session?.user?.id) !== String(group.user_id)) {
+    const { user_id, owner_public, ...group } = groupRes.rows[0]
+    // A public group is for signed-in users, and only while its owner's profile is public.
+    const visible = session?.user?.id && group.is_public && owner_public
+    if (!visible && String(session?.user?.id) !== String(user_id)) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
     }
 
@@ -55,7 +59,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
@@ -88,7 +92,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const groupId = parseInt(id)
+    const groupId = dbId(id) ?? NaN
 
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {

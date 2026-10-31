@@ -3,17 +3,15 @@ import pool from '@/lib/db'
 import bcrypt from 'bcrypt'
 import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
 import { sendEmailChangedNotice } from '@/lib/emailChangedNotice'
+import { retireResetTokens } from '@/lib/passwordReset'
+import { clearUserCache } from '@/lib/steamCache'
 import { forgetUser } from '@/lib/userRecord'
 import { sendVerificationEmail } from '@/lib/verificationEmail'
-import { BCRYPT_COST, PASSWORD_MIN } from '@/utils/authValidation'
+import { BCRYPT_COST, PASSWORD_MIN, isEmail } from '@/utils/authValidation'
 import { isTheme } from '@/types/types'
 
 // Every handler here needs an admin who has unlocked the panel with their
 // password (see adminAuth), and every change is written to the action log.
-
-function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
 
 function isValidUrl(url: string) {
   try {
@@ -37,6 +35,7 @@ export async function GET(req: Request) {
               "raUser"->>'User' AS ra_display
        FROM users ORDER BY id ASC`
     )
+    await logAdminAction(auth.admin, 'list-users', null)
     return NextResponse.json(result.rows)
   } catch (err) {
     console.error('[admin/users GET]', err)
@@ -61,7 +60,7 @@ export async function POST(req: Request) {
     if (typeof password !== 'string' || password.length < PASSWORD_MIN) {
       return NextResponse.json({ error: `Password must be at least ${PASSWORD_MIN} characters` }, { status: 400 })
     }
-    if (email && (typeof email !== 'string' || !isValidEmail(email))) {
+    if (email && (typeof email !== 'string' || !isEmail(email))) {
       return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
     }
     const address = (email as string | undefined) || null
@@ -142,7 +141,7 @@ export async function PATCH(req: Request) {
     }
 
     if (field === 'email') {
-      if (value !== null && (typeof value !== 'string' || !isValidEmail(value))) {
+      if (value !== null && (typeof value !== 'string' || !isEmail(value))) {
         return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
       }
       if (value !== null) {
@@ -179,6 +178,7 @@ export async function PATCH(req: Request) {
     // A new address has not been confirmed yet, whatever the old one was.
     const resetVerified = field === 'email' ? ', email_verified_at = NULL' : ''
     await pool.query(`UPDATE users SET "${field}" = $1${resetVerified} WHERE id = $2`, [value, id])
+    if (field === 'email') await retireResetTokens(id as string)
     forgetUser(id as string)
     await logAdminAction(auth.admin, 'update-user', target, { field, from: target.previous ?? null, to: value ?? null })
 
@@ -214,6 +214,7 @@ export async function DELETE(req: Request) {
 
     const result = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id, username', [id])
     if (!result.rows.length) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    await clearUserCache(id)
     forgetUser(id)
     await logAdminAction(auth.admin, 'delete-user', result.rows[0])
 

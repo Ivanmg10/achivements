@@ -192,9 +192,15 @@ its language changes the app. `fromBrowser` says when the language shown is the 
   `Accept-Language`) and wraps the page in a `LanguageProvider initial={…}`, which renders that
   language on the server and while hydrating, so they match. That covers the landing and the
   whole signed-in app.
+- **Each language is its own chunk (2026-10-30, audit PERF-02):** `loadMessages`
+  (`src/translations/load.ts`) imports it on demand; only English is in every page. A language
+  must stay plain data, as `(main)/layout.tsx` sends the active one to the client as `messages`
+  so hydration needs no fetch (`load.test.ts` fails on a function). Never import `es`, `pt`… into
+  client code.
 - **Do not call `serverLanguage()` (or `headers()`/`cookies()`) in the root layout**: it would
   make every page dynamic, the static ones too (`/privacy`, `/terms`, `/compare`, `/track`,
-  `/authPage`, `/welcome`). Those still paint English until they hydrate; reached by a client
+  `/welcome`). `/authPage` is dynamic on purpose: it reads `searchParams` on the server, because
+  `useSearchParams` would send it empty. Those still paint English until they hydrate; reached by a client
   navigation (the usual way) they are already in the right language.
 - `/privacy` lists the cookie among the necessary ones, in all nine languages.
 
@@ -517,7 +523,11 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
 `requireAdmin(req)`.
 
 - **Two locks.** The admin flag is read fresh from the DB, and the panel must be
-  **unlocked with the admin's own password** (`POST /api/admin/unlock`). The
+  **unlocked with the admin's own password and a one-time code** (`POST /api/admin/unlock`,
+  `src/lib/adminTotp.ts`, `migrations/044_admin_totp.sql`, applied to pre 2026-10-31; any other database
+  needs it first, or the unlock answers 500).
+  An admin with no authenticator enrols on their next unlock, after the password. Recovery codes are
+  shown once and stored hashed. Lost both: `DELETE FROM admin_totp WHERE user_id = <id>`. The
   unlock is a signed, httpOnly cookie scoped to `/api/admin`, valid 15 minutes,
   bound to the admin and to their password hash (a password change ends it).
   Without it the endpoints answer `403 reauth-required` and the panel shows the
@@ -545,6 +555,10 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   shape of what it returns changes.
 - **A 429 waits.** `fetchRA` honours `Retry-After` up to `MAX_RETRY_AFTER`
   (5 s) and retries; a longer ask is thrown. Other 4xx are never retried.
+- **Keys are sealed at rest** (`src/lib/raKey.ts`, `migrations/043_ra_key_sealed.sql`, applied to pre
+  2026-10-31; any other database needs it first, or linking answers 500; reads still work). `users.raid` is read through `readRaKey`, never directly: a key from
+  before sealing reads as it is, until it is linked again. `raid_hash` keeps one key to one account.
+  Changing `NEXTAUTH_SECRET` makes every key unreadable and everyone links RA again.
 - **Whose key.** Never a shared app key (see the roadmap). On the user's own
   page the call uses their `raid`; `requireViewerApiKey` never falls back to
   another key. On someone else's page `dataOwner` (`src/lib/apiAuth.ts`) signs
@@ -719,6 +733,23 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   failure with a retry button.
 
 ## Performance rules — keep these true (audited 2026-10-16)
+
+- **Nothing the first paint needs waits for JavaScript (audit v1.7, 2026-10-30).** No Framer `initial`
+  with opacity 0 on what a visitor reads first; use CSS keyframes, or `AnimatePresence initial={false}`.
+  That one change took the landing's LCP from 12.8 s to 1.4 s under the audit's throttling.
+- **Code the browser loads must not reach `pg`.** `steamClient` and `fetchRA` are server code; picture
+  and page URLs live in `steamAssets.ts` (pure). Reaching the database from something a client imports
+  breaks the build even through a dynamic import.
+- **Every call to a platform has a deadline shorter than the client's 20 s** (two 8 s attempts on RA
+  and Steam, 8 s per PSN call through `psnCall`, since `psn-api` takes no signal). RA keeps its measured
+  pace per key in `fetchRA`; every Sony call spends the app's `psn-upstream` budget and a refusal
+  cools the instance down a minute. `countUpstream` counts calls per day; Steam fills wait at 85 % of its
+  100,000 a day (`steamBudgetLow`).
+- **Guarded work counts first:** `reserveAttempt` before a password check, not `isLimited` then
+  `recordAttempt`: a burst passes those together (30 of 30 past a limit of 10, measured).
+- **What a user stores has an end:** a length on text, a row cap, one `unnest` statement for an order.
+- **Cross-site writes stop in `src/proxy.ts`**, whose matcher takes `/api` only when the request carries
+  `Origin`, so same-origin reads never pay for it.
 
 - **recharts is only loaded through the lazy plots** (`AchievementsLinePlot`,
   `GameAchievementsProgressPlot`, via `next/dynamic`). Never import `recharts` in
@@ -922,8 +953,8 @@ A person must be able to tell "nothing here" from "I cannot read it" from "try l
 
 | | Unknown account | Private / unreadable | Credential refused | Busy |
 |---|---|---|---|---|
-| **RA** | RA says 401 for a bad key, for any username | n/a (profiles are public) | `raUnavailable()` → `403 ra-key-invalid`, not retried; `RaKeyInvalidNotice` | 429 waits `Retry-After`, then 503 (retried) |
-| **Steam** | link goes through Steam (no unknown account); ids that do not exist answer 400 | a private profile links; **after linking**, `{ response: {} }` → `ownedGames` answers `403 private` (not an empty library) and the list page says so | key is the app's | 503 |
+| **RA** | RA says 401 for a bad key, for any username | n/a (profiles are public) | `raUnavailable()` → `403 ra-key-invalid`, not retried; `RaKeyInvalidNotice` | 429 waits `Retry-After`, then 429 with `Retry-After`, not retried |
+| **Steam** | link goes through Steam (no unknown account); ids that do not exist answer 400 | a private profile links; **after linking**, `{ response: {} }` → `ownedGames` answers `403 private` (not an empty library) and the list page says so | key is the app's | 429 with `Retry-After` (`steamFailure`), not retried |
 | **PSN** | link: not found | `psnFailure` → 403 | NPSSO expiry, admin panel | 429 + `Retry-After: 60` |
 | **Xbox** | `code: 404` in the body → `not-found` | no titles and no `achievementSummary` → `private` | app key: `503 unauthorized` | 429 |
 
@@ -1016,8 +1047,12 @@ reads that column, so the rest of the app works without it.
   it started from (`/`, `/user` or `/welcome`, `linkReturn`), toasted by `useSteamLink`.
 - `steam_login_id` is **separate from `steamid`**: links typed before 2026-10-21 (three, all
   the user's test accounts) keep `steamid` with no `steam_login_id` and were left as they are,
-  by the user's choice; `steamid` stays not unique for them. Unlinking clears `steamid` only,
-  so sign-in with Steam keeps working. Admins still link by typing (logged).
+  by the user's choice; `steamid` stays not unique for them. **Unlinking clears both** (changed
+  2026-10-30, audit SEC-01): a sign-in nobody can remove outlives a password change. Someone who
+  signed up through Steam gets back in with "forgot password". Link and unlink mail the account's
+  address (`sendSteamLinkNotice`). Linking asks for no password, by the user's choice (2026-10-31,
+  the most comfortable flow, here and in the welcome): the mail and the unlink are what answer a
+  link nobody asked for. Admins still link by typing (logged).
 
 ## Git — branches, commits, PRs (MANDATORY for every session and agent)
 

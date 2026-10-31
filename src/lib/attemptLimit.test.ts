@@ -1,6 +1,6 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 
-import { allowAttempt, clientAddress, isLimited, recordAttempt } from './attemptLimit'
+import { allowAttempt, clientAddress, isLimited, recordAttempt, reserveAttempt } from './attemptLimit'
 import pool from '@/lib/db'
 
 const query = pool.query as jest.Mock
@@ -129,5 +129,31 @@ describe('sign-in', () => {
     expect(clientAddress({ 'x-forwarded-for': '9.9.9.9, 10.0.0.1' })).toBe('9.9.9.9')
     expect(clientAddress({ 'x-real-ip': ['8.8.8.8'] })).toBe('8.8.8.8')
     expect(clientAddress({})).toBe('unknown')
+  })
+})
+
+describe('reserveAttempt', () => {
+  test('counts itself before answering, so a burst past the limit is refused', async () => {
+    recent(11)
+    expect((await reserveAttempt('login', 'a')).allowed).toBe(false)
+    recent(10)
+    expect((await reserveAttempt('login', 'a')).allowed).toBe(true)
+  })
+
+  test('takes the attempt back by its own id', async () => {
+    query.mockReset()
+    query.mockImplementation((sql: string) => Promise.resolve(sql.includes('INSERT') ? { rows: [{ id: 42 }] } : { rows: [{ recent: 1 }] }))
+    const attempt = await reserveAttempt('login', 'a')
+    await attempt.release()
+    expect(query).toHaveBeenCalledWith('DELETE FROM signup_attempts WHERE id = $1', [42])
+  })
+
+  test('a database that will not answer does not lock anyone out', async () => {
+    query.mockReset()
+    query.mockRejectedValue(new Error('down'))
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+    const attempt = await reserveAttempt('login', 'a')
+    expect(attempt.allowed).toBe(true)
+    await expect(attempt.release()).resolves.toBeUndefined()
   })
 })

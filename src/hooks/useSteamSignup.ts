@@ -18,7 +18,14 @@ export type SteamSignupState =
 
 async function signInWithSteam(): Promise<boolean> {
   const result = await signIn('steam', { redirect: false })
-  return Boolean(result?.ok)
+  if (!result?.ok) return false
+  try {
+    await fetch('/api/auth/steam/register', { method: 'DELETE' })
+  } catch (err) {
+    // The session is in place: the ticket simply ends on its own in a few minutes.
+    console.error('[useSteamSignup] ticket', err)
+  }
+  return true
 }
 
 /** After Steam sends the user back: sign in when the account exists, otherwise offer the sign-up. */

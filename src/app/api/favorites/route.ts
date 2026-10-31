@@ -3,7 +3,13 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
 import { dataOwner } from '@/lib/apiAuth'
+import { dbId } from '@/utils/dbId'
 import { canUseXbox, sourceAllowed } from '@/utils/xboxAccess'
+
+/** Enough for any list of goals; a cap so one account cannot fill the table. */
+const PINS_MAX = 1000
+const TEXT_MAX = 300
+const SNAPSHOT_MAX = 8 * 1024
 
 function parseSource(req: NextRequest): 'ra' | 'steam' | 'psn' | 'xbox' {
   const source = req.nextUrl.searchParams.get('source')
@@ -22,6 +28,7 @@ export async function GET(req: NextRequest) {
     }
 
     const gameId = req.nextUrl.searchParams.get('gameId')
+    if (gameId && dbId(gameId) === null) return NextResponse.json({ message: 'gameId no válido' }, { status: 400 })
     // Xbox is admin-only for now: to anyone else it is not there at all (see canUseXbox).
     const xboxVisible = canUseXbox((await getServerSession(authOptions))?.user?.admin)
     const visible = <T extends { source: string }>(rows: T[]) => (xboxVisible ? rows : rows.filter((r) => r.source !== 'xbox'))
@@ -67,9 +74,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => null)
+    if (!body || typeof body !== 'object') return NextResponse.json({ message: 'Datos incompletos' }, { status: 400 })
     const { gameId, gameTitle, numDistinctPlayers } = body
     if (!sourceAllowed(body.source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+    const tooLong = (v: unknown) => v != null && (typeof v !== 'string' || v.length > TEXT_MAX)
+    if (tooLong(gameTitle) || tooLong(body.steamApiname) || tooLong(body.xboxAchievementId) || JSON.stringify(body.achievement ?? {}).length > SNAPSHOT_MAX) {
+      return NextResponse.json({ message: 'Datos no válidos' }, { status: 400 })
+    }
+    const { rows: held } = await pool.query('SELECT COUNT(*)::int AS n FROM pinned_achievements WHERE user_id = $1', [session.user.id])
+    if (held[0]?.n >= PINS_MAX) return NextResponse.json({ error: 'too-many-pins' }, { status: 409 })
 
     if (body.source === 'xbox') {
       const { xboxAchievementId, achievement } = body
@@ -144,6 +158,9 @@ export async function DELETE(req: NextRequest) {
     const psnTrophyId = req.nextUrl.searchParams.get('psnTrophyId')
     const xboxAchievementId = req.nextUrl.searchParams.get('xboxAchievementId')
     const gameId = req.nextUrl.searchParams.get('gameId')
+    if ((gameId && dbId(gameId) === null) || (achievementId && dbId(achievementId) === null) || (psnTrophyId && dbId(psnTrophyId) === null)) {
+      return NextResponse.json({ message: 'Id no válido' }, { status: 400 })
+    }
 
     if (achievementId) {
       await pool.query(

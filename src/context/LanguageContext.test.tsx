@@ -1,5 +1,8 @@
-import { act, renderHook } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { LanguageProvider, useLanguage } from './LanguageContext'
+import { en } from '@/translations/en'
+import { es } from '@/translations/es'
+import { fr } from '@/translations/fr'
 
 const wrapper = ({ children }: { children: React.ReactNode }) => <LanguageProvider>{children}</LanguageProvider>
 
@@ -86,5 +89,24 @@ describe('what the server rendered, and the cookie that tells it', () => {
     const { result } = renderHook(() => useLanguage(), { wrapper })
     expect(result.current.lang).toBe('ru')
     expect(result.current.fromBrowser).toBe(false)
+  })
+})
+
+describe('the texts', () => {
+  test('a language is fetched when it is needed, with English until it arrives', async () => {
+    const { result } = renderHook(() => useLanguage(), { wrapper })
+    expect(result.current.T).toBe(en)
+    act(() => result.current.setLang('fr'))
+    expect(result.current.lang).toBe('fr')
+    await waitFor(() => expect(result.current.T).toBe(fr))
+  })
+
+  test('the ones the server sent are there from the first render', () => {
+    const withMessages = ({ children }: { children: React.ReactNode }) => (
+      <LanguageProvider initial="es" messages={es}>{children}</LanguageProvider>
+    )
+    localStorage.setItem('app-language', 'es')
+    const { result } = renderHook(() => useLanguage(), { wrapper: withMessages })
+    expect(result.current.T).toBe(es)
   })
 })

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { allowAttempt, clientAddress } from '@/lib/attemptLimit'
 import { fetchRaProfile, raAvatarUrl, validRaCredentials } from '@/lib/raProfile'
+import { raKeyHash } from '@/lib/raKey'
 
 /**
  * Before signing up with RetroAchievements: whether RA accepts this username
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'too-many' }, { status: 429 })
     }
     const key = (apiKey as string).trim()
-    const taken = await pool.query('SELECT 1 FROM users WHERE raid = $1', [key])
+    const taken = await pool.query('SELECT 1 FROM users WHERE raid = $1 OR raid_hash = $2', [key, raKeyHash(key)])
     if (taken.rows.length > 0) return NextResponse.json({ error: 'key-in-use' }, { status: 409 })
 
     const fetched = await fetchRaProfile(username.trim(), key)

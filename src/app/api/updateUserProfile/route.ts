@@ -3,21 +3,21 @@ import { NextResponse, after } from 'next/server'
 import pool from '@/lib/db'
 import { authOptions } from '@/lib/authOptions'
 import { checkCurrentPassword } from '@/lib/currentPassword'
+import { retireResetTokens } from '@/lib/passwordReset'
 import { forgetUser, loadUser } from '@/lib/userRecord'
 import { sendVerificationEmail } from '@/lib/verificationEmail'
 import { sendEmailChangedNotice } from '@/lib/emailChangedNotice'
+import { isEmail } from '@/utils/authValidation'
 
 const ALLOWED_FIELDS = ['username', 'email', 'avatar', 'location', 'description', 'gender', 'profilePublic', 'genderPublic', 'showPresence', 'showInRankings'] as const
 type AllowedField = (typeof ALLOWED_FIELDS)[number]
 
 const DESCRIPTION_MAX = 280
+/** It travels in the session cookie and in every list that shows this user. */
+const AVATAR_URL_MAX = 500
 const GENDERS = ['male', 'female', 'neutral']
 /** On/off settings, and the column each is kept in. */
 const SWITCHES: Partial<Record<AllowedField, string>> = { profilePublic: 'profile_public', genderPublic: 'gender_public', showPresence: 'show_presence', showInRankings: 'show_in_rankings' }
-
-function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
 
 // https only: a plain-http image would be loaded by everyone who sees the
 // avatar, over a connection anyone on their network can read or alter.
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { field, value, currentPassword } = body as { field: AllowedField; value: string; currentPassword?: unknown }
 
     if (!ALLOWED_FIELDS.includes(field)) {
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     }
 
     if (field === 'email') {
-      if (!isValidEmail(trimmed)) {
+      if (!isEmail(trimmed)) {
         return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
       }
       const existing = await pool.query('SELECT id FROM users WHERE LOWER(email) = LOWER($1) AND id != $2', [trimmed, session.user.id])
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     }
 
     if (field === 'avatar') {
-      if (!isValidUrl(trimmed)) {
+      if (trimmed.length > AVATAR_URL_MAX || !isValidUrl(trimmed)) {
         return NextResponse.json({ error: 'Avatar must be a valid https URL' }, { status: 400 })
       }
     }
@@ -117,6 +117,7 @@ export async function POST(req: Request) {
       await pool.query('DELETE FROM user_avatars WHERE user_id = $1', [session.user.id])
     }
     if (field === 'email') {
+      await retireResetTokens(session.user.id)
       const username = session.user.name ?? ''
       after(() => sendVerificationEmail(session.user.id, username, trimmed))
       // The old address hears about it too: it is the one a takeover would silence.

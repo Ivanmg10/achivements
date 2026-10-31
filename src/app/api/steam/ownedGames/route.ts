@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
+import { steamFailure } from '@/lib/steamFailure'
 import { withSteamCache, TTL } from '@/lib/steamCache'
 import { enrichWithAchievementCounts, isPrivateLibrary, loadOwnedGames, SteamPrivateError } from '@/lib/steamProgress'
 import { toSteamGameProgress } from '@/utils/steamMappers'
@@ -52,6 +53,6 @@ export async function GET(req?: Request) {
   } catch (err) {
     if (err instanceof SteamPrivateError) return NextResponse.json({ error: 'private' }, { status: 403 })
     console.error('[steam/ownedGames]', err)
-    return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })
+    return steamFailure(err)
   }
 }

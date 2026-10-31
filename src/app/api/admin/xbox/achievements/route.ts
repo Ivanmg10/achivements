@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/adminAuth'
+import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
 import { findXboxGame, isTitleId, isXuid, xboxFailure, xboxGameAchievements, xboxRateLimit } from '@/lib/xboxClient'
 import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 
@@ -18,6 +18,7 @@ async function get(req: Request) {
     const game = await findXboxGame(xuid, titleId)
     if (!game) return NextResponse.json({ error: 'not-in-library' }, { status: 404 })
     const achievements = await xboxGameAchievements(xuid, game)
+    await logAdminAction(auth.admin, 'xbox-achievements', null, { xuid, titleId })
     return NextResponse.json({ achievements, rateLimit: xboxRateLimit() })
   } catch (err) {
     return xboxFailure(err, 'admin/xbox/achievements')

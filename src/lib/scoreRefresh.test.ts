@@ -8,6 +8,7 @@ jest.mock('@/lib/steamCache', () => ({
 }))
 jest.mock('@/lib/steamProgress', () => ({ fetchPlayerAchievements: jest.fn(), isNoStats: () => false, loadGlobalPct: jest.fn(async () => new Map()) }))
 jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn(async () => true) }))
+jest.mock('@/lib/upstreamCount', () => ({ steamBudgetLow: jest.fn(async () => false) }))
 jest.mock('@/lib/psnClient', () => {
   class PsnError extends Error {
     get isPrivate() {

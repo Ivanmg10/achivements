@@ -1,4 +1,13 @@
-import { checkEmail, checkPassword, checkUsername, suggestUsername } from './authValidation'
+import { checkEmail, checkPassword, checkUsername, isEmail, suggestUsername } from './authValidation'
+
+describe('isEmail', () => {
+  test('takes an ordinary address', () => {
+    expect(isEmail('ana.perez+vault@mail.example.com')).toBe(true)
+  })
+  test.each(['x@<b>hi</b>.example', 'a"b@c.de', "a'b@c.de", 'a&b@c.de', 'a b@c.de', 'a@b', `${'a'.repeat(250)}@c.de`])('refuses %s', (address) => {
+    expect(isEmail(address)).toBe(false)
+  })
+})
 
 describe('checkUsername', () => {
   test('accepts letters, numbers and underscores, 3 to 20 long', () => {

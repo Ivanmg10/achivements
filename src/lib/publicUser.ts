@@ -1,6 +1,7 @@
 import pool from '@/lib/db'
 import { gameKey, isGameSource } from '@/utils/gameRef'
 import { presenceColumns } from '@/lib/presence'
+import { readRaKey } from '@/lib/raKey'
 
 /** What another user may see of an account: no email, no keys, no hash. */
 export type PublicUserRow = {
@@ -41,6 +42,8 @@ export type PublicProfileRow = PublicUserRow & {
 
 /** A CheevoVault user by name, case-insensitively; null if there is none. */
 export async function findPublicUser(username: string): Promise<PublicProfileRow | null> {
+  // Postgres refuses a NUL in text, and no username has one.
+  if (username.includes('\0')) return null
   const { rows } = await pool.query(
     `SELECT id, username, avatar, description, location, rausername, steamid, psnaccountid, xboxxuid,
             steamusername, psnusername, xboxgamertag, theme, gender, gender_public AS "genderPublic",
@@ -71,11 +74,13 @@ export async function hiddenGameKeys(userId: number): Promise<string[]> {
  * to a client.
  */
 export async function findSubject(username: string): Promise<(PublicUserRow & { raid: string | null; xboxgamertag: string | null }) | null> {
+  if (username.includes('\0')) return null
   const { rows } = await pool.query(
     `SELECT id, username, avatar, description, location, rausername, steamid, psnaccountid, xboxxuid, xboxgamertag, raid,
             (raid IS NOT NULL) AS "hasRaKey", profile_public AS "profilePublic"
      FROM users WHERE LOWER(username) = LOWER($1) LIMIT 1`,
     [username],
   )
-  return (rows[0] as (PublicUserRow & { raid: string | null; xboxgamertag: string | null }) | undefined) ?? null
+  const row = rows[0] as (PublicUserRow & { raid: string | null; xboxgamertag: string | null }) | undefined
+  return row ? { ...row, raid: readRaKey(row.raid) } : null
 }

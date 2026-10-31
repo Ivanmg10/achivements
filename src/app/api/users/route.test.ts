@@ -1,3 +1,4 @@
+jest.mock('@/lib/raKey', () => ({ sealRaKey: (key: string) => ({ sealed: `sealed:${key}`, hash: `hash:${key}` }), raKeyHash: (key: string) => `hash:${key}` }))
 jest.mock('@/lib/db', () => {
   const query = jest.fn()
   return { __esModule: true, default: { query } }
@@ -153,8 +154,9 @@ describe('signing up with RetroAchievements', () => {
     expect(params.slice(3)).toEqual([
       'https://media.retroachievements.org/UserPic/PalmeraMiami.png',
       'PalmeraMiami',
-      'key',
+      'sealed:key',
       JSON.stringify({ User: 'PalmeraMiami', TotalPoints: 10 }),
+      'hash:key',
     ])
     expect(onPlatformLinked).toHaveBeenCalledWith(1, 'ra')
   })
@@ -162,7 +164,7 @@ describe('signing up with RetroAchievements', () => {
   test('without RA, nothing of it is stored and nothing is asked', async () => {
     await POST(makeReq({ username: 'ivan', password: 'pass1234', email: 'ivan@test.com' }))
     expect(fetchRaProfile).not.toHaveBeenCalled()
-    expect(insert()[1].slice(3)).toEqual([null, null, null, null])
+    expect(insert()[1].slice(3)).toEqual([null, null, null, null, null])
     expect(onPlatformLinked).not.toHaveBeenCalled()
   })
 

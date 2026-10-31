@@ -1,5 +1,8 @@
-const STEAM_TIMEOUT = 12_000
-const MAX_ATTEMPTS = 3
+import { countUpstream } from '@/lib/upstreamCount'
+
+// Two attempts stay under the browser's 20 s, so it never asks again while this still runs.
+const STEAM_TIMEOUT = 8_000
+const MAX_ATTEMPTS = 2
 const BASE_DELAY = 500
 
 export const STEAM_API_BASE = 'https://api.steampowered.com'
@@ -19,6 +22,7 @@ export async function fetchSteam(url: string): Promise<unknown> {
     const ctrl = new AbortController()
     const timer = setTimeout(() => ctrl.abort(), STEAM_TIMEOUT)
     try {
+      countUpstream('steam')
       const res = await fetch(url, { signal: ctrl.signal })
       clearTimeout(timer)
       if (!res.ok) {

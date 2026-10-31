@@ -1,4 +1,4 @@
-import { gameIconUrl, gameLogoUrl } from '@/lib/steamClient'
+import { gameIconUrl, gameLogoUrl } from '@/lib/steamAssets'
 import type { RecentAchievement } from '@/types/types'
 import type {
   SteamOwnedGame,

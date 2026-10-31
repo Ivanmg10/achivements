@@ -2,12 +2,13 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import type { NextAuthOptions, Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
-import { clientAddress, isLimited, recordAttempt } from "@/lib/attemptLimit";
+import { clientAddress, reserveAttempt } from "@/lib/attemptLimit";
 import { readTicket, ticketFromCookieHeader } from "@/lib/steamLogin";
-import { loadUserBySteamLogin, loadUserByUsername, loadUserSynced, passwordVersion, type UserRecord } from "@/lib/userRecord";
+import { loadUser, loadUserBySteamLogin, loadUserByUsername, loadUserSynced, passwordVersion, type UserRecord } from "@/lib/userRecord";
 
 export const SESSION_REVOKED = "session-revoked";
 export const TOO_MANY_ATTEMPTS = "too-many-attempts";
+const SESSION_DAYS = 14;
 
 // Compared against when the username does not exist, so a wrong username
 // takes as long to reject as a wrong password.
@@ -21,8 +22,6 @@ function tokenFields(row: UserRecord) {
     theme: row.theme,
     avatar: row.avatar ?? undefined,
     rausername: row.rausername ?? undefined,
-    // Server-side only: authHandlerOptions strips it from what the browser gets.
-    raid: row.raid ?? undefined,
     raLinked: Boolean(row.rausername && row.raid),
     steamid: row.steamid ?? undefined,
     steamusername: row.steamusername ?? undefined,
@@ -65,18 +64,19 @@ export const authOptions: NextAuthOptions = {
 
         const ip = clientAddress(req?.headers ?? {});
         const accountKey = `${ip}:${username.toLowerCase()}`;
-        if ((await isLimited("login", accountKey)) || (await isLimited("login-ip", ip))) {
+        const perAccount = await reserveAttempt("login", accountKey);
+        const perAddress = await reserveAttempt("login-ip", ip);
+        const forget = () => Promise.all([perAccount.release(), perAddress.release()]);
+        if (!perAccount.allowed || !perAddress.allowed) {
+          await forget();
           throw new Error(TOO_MANY_ATTEMPTS);
         }
 
         const user = await loadUserByUsername(username);
         const valid = await bcrypt.compare(password, user?.password ?? DUMMY_HASH);
-        if (!user || !valid) {
-          await recordAttempt("login", accountKey);
-          await recordAttempt("login-ip", ip);
-          return null;
-        }
+        if (!user || !valid) return null;
 
+        await forget();
         return { ...tokenFields(user), syncedAt: Date.now() };
       },
     }),
@@ -96,6 +96,7 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
+    maxAge: SESSION_DAYS * 24 * 60 * 60,
   },
   callbacks: {
     /**
@@ -126,7 +127,8 @@ export const authOptions: NextAuthOptions = {
       if (!row || !token.pwv || passwordVersion(row.password) !== token.pwv) {
         throw new Error(SESSION_REVOKED);
       }
-      return { ...token, ...tokenFields(row), syncedAt };
+      // raid: undefined drops the key from a token issued when it was still carried there.
+      return { ...token, ...tokenFields(row), raid: undefined, syncedAt };
     },
     async session({ session, token }) {
       if (token) {
@@ -135,7 +137,8 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name;
         session.user.avatar = token.avatar;
         session.user.rausername = token.rausername;
-        session.user.raid = token.raid;
+        // Server-side only, and never in the cookie: authHandlerOptions strips it from what the browser gets.
+        session.user.raid = (await loadUser(token.id))?.raid ?? undefined;
         session.user.raLinked = token.raLinked === true;
         session.user.steamid = token.steamid;
         session.user.steamusername = token.steamusername;

@@ -122,6 +122,13 @@ describe('Xbox is admin-only', () => {
     expect(listGroups).toHaveBeenCalledWith(7, { publicOnly: true, xbox: false })
   })
 
+  test('their hidden Xbox games are left out for a viewer who is not an admin', async () => {
+    ;(hiddenGameKeys as jest.Mock).mockResolvedValue(['ra:9', 'xbox:12'])
+    expect((await body(get())).hiddenGames).toEqual(['ra:9'])
+    ;(dataOwner as jest.Mock).mockResolvedValue({ id: '1', admin: true })
+    expect((await body(get())).hiddenGames).toEqual(['ra:9', 'xbox:12'])
+  })
+
   test('an admin viewer sees the account, its name, its favourite and its groups', async () => {
     ;(dataOwner as jest.Mock).mockResolvedValue({ id: '1', raid: 'my-key', admin: true })
     ;(findPublicUser as jest.Mock).mockResolvedValue(WITH_XBOX)

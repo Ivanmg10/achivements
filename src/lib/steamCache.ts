@@ -196,6 +196,8 @@ export async function withSteamCache<T>(
 export async function clearUserCache(userId: string): Promise<void> {
   try {
     await pool.query('DELETE FROM steam_cache WHERE user_id = $1', [userId])
+    // RA's rows carry no user_id: their key does ("ra:recentAch_v2:7", "ra:gameProgression_v3:7:123").
+    await pool.query("DELETE FROM steam_cache WHERE cache_key ~ ('^ra:[^:]+:' || $1 || '(:|$)')", [userId])
   } catch (err) {
     console.error('[steamCache] clearUserCache', userId, err)
   }

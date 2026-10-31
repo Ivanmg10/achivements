@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
+import { steamFailure } from '@/lib/steamFailure'
 import { withSteamCache, TTL } from '@/lib/steamCache'
 import { loadRecentAchievements } from '@/lib/steamRecentAchievements'
 import { parseSteamLanguage } from '@/utils/steamLanguage'
@@ -24,6 +25,6 @@ export async function GET(req: NextRequest) {
     return cachedJson(achievements, 0)
   } catch (err) {
     console.error('[steam/recentAchievements]', err)
-    return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })
+    return steamFailure(err)
   }
 }

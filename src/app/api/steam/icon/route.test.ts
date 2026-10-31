@@ -29,7 +29,7 @@ beforeEach(() => {
 
 afterEach(() => { (console.error as jest.Mock).mockRestore() })
 
-test.each(['', 'appid=', 'appid=abc', 'appid=-1'])('rejects %p with 400', async (q) => {
+test.each(['', 'appid=', 'appid=abc', 'appid=-1', 'appid=12345678901'])('rejects %p with 400', async (q) => {
   expect((await GET(makeRequest(q))).status).toBe(400)
   expect(getAppInfo).not.toHaveBeenCalled()
 })

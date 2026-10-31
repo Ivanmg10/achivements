@@ -1,7 +1,7 @@
 'use client'
 
 import GameIcon from '@/components/game-icon/GameIcon'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 import { psnBackdrop } from '@/utils/psnTitles'
 import { xboxBackdrop } from '@/utils/xboxTitles'
 import { entryId } from '@/utils/libraryShelves'

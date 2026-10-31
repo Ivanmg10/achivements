@@ -1,4 +1,4 @@
-import { upgradeLegacyIconUrl } from '@/lib/steamClient'
+import { upgradeLegacyIconUrl } from '@/lib/steamAssets'
 import { gameKey } from '@/utils/gameRef'
 import { classifySteamGame } from '@/utils/steamFeed'
 import { classifyPsnGame } from '@/utils/psnTitles'

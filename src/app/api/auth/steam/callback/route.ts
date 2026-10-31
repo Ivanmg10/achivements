@@ -1,12 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import pool from '@/lib/db'
 import { requireSession } from '@/lib/apiAuth'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
+import { sendSteamLinkNotice } from '@/lib/steamLinkNotice'
 import { forgetUser } from '@/lib/userRecord'
 import {
   cookieFromHeader,
+  expiredStateCookie,
   linkReturn,
   returnParams,
   siteBase,
@@ -38,11 +40,13 @@ async function linkSteam(userId: string, steamid: string): Promise<'linked' | 't
   try {
     const { rows } = await pool.query('SELECT id FROM users WHERE steam_login_id = $1', [steamid])
     if (rows.length > 0 && String(rows[0].id) !== userId) return 'taken'
-    await pool.query('UPDATE users SET steamid = $1, steamusername = $2, steam_login_id = $1 WHERE id = $3', [
-      steamid,
-      await personaOf(steamid),
-      userId,
-    ])
+    const updated = await pool.query(
+      'UPDATE users SET steamid = $1, steamusername = $2, steam_login_id = $1 WHERE id = $3 RETURNING username, email',
+      [steamid, await personaOf(steamid), userId],
+    )
+    const { username, email } = updated.rows[0] ?? {}
+    // It adds a way in that a new password does not end: the owner must hear about it.
+    if (email) after(() => sendSteamLinkNotice({ to: email, username, linked: true }))
   } catch (err) {
     if ((err as { code?: string }).code === '23505') return 'taken'
     console.error('[auth/steam] link', err)
@@ -79,13 +83,17 @@ export async function GET(req: NextRequest) {
   const state = cookieFromHeader(req.headers.get('cookie'), STEAM_STATE_COOKIE)
   if (!steamid || !state || back.get('state') !== state) return fail('failed')
 
+  const secure = base.startsWith('https:')
   if (linking) {
     const auth = await requireSession()
     if (!auth.ok) return NextResponse.redirect(`${base}/authPage`)
-    return NextResponse.redirect(`${base}${next}#steam-${await linkSteam(auth.id, steamid)}`)
+    const res = NextResponse.redirect(`${base}${next}#steam-${await linkSteam(auth.id, steamid)}`)
+    res.headers.append('Set-Cookie', expiredStateCookie(secure))
+    return res
   }
 
-  return NextResponse.redirect(`${base}/authPage?steam=1`, {
-    headers: { 'Set-Cookie': ticketCookie(signTicket(steamid), base.startsWith('https:')) },
-  })
+  const res = NextResponse.redirect(`${base}/authPage?steam=1`)
+  res.headers.append('Set-Cookie', ticketCookie(signTicket(steamid), secure))
+  res.headers.append('Set-Cookie', expiredStateCookie(secure))
+  return res
 }

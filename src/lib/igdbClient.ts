@@ -1,5 +1,7 @@
 import { withSteamCache } from '@/lib/steamCache'
 
+const TIMEOUT_MS = 8_000
+
 /**
  * IGDB (Twitch's game database), for what Sony keeps nothing of on PS3 and
  * Vita games: cover, backdrop and release year. PS4/PS5 games get those from
@@ -66,7 +68,7 @@ async function appToken(): Promise<string> {
     client_secret: process.env.TWITCH_CLIENT_SECRET!.trim(),
     grant_type: 'client_credentials',
   })
-  const res = await fetch(`${TOKEN_URL}?${params}`, { method: 'POST' })
+  const res = await fetch(`${TOKEN_URL}?${params}`, { method: 'POST', signal: AbortSignal.timeout(TIMEOUT_MS) })
   if (!res.ok) throw new IgdbError(`Twitch token answered ${res.status}`)
   const body = (await res.json()) as { access_token?: string; expires_in?: number }
   if (!body.access_token) throw new IgdbError('Twitch token response had no token')
@@ -80,6 +82,7 @@ async function searchGames(query: string): Promise<IgdbGame[]> {
       method: 'POST',
       headers: { 'Client-ID': process.env.TWITCH_CLIENT_ID!.trim(), Authorization: `Bearer ${await appToken()}` },
       body: query,
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     })
   let res = await send()
   // A token Twitch revoked early: get a new one and try once more.

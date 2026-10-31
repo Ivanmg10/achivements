@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 import { useIsClient } from '@/hooks/useIsClient'
 
 const RA_IMAGES: string[] = [
@@ -274,16 +274,11 @@ function intoColumns(images: string[]): string[][] {
  * column so it can be read; reduced motion stops all of them.
  */
 export default function AuthCollagePanel() {
-  // A fixed order first, so the server and the first paint agree; a different
-  // draw once mounted, so no two visits look the same.
+  // Dealt once mounted, so no two visits look the same. Nothing before that: a
+  // first deal for the server's HTML would download every tile twice, and the
+  // art would compete with the scripts that make the page work.
   const client = useIsClient()
-  const images = useMemo(
-    () =>
-      client
-        ? dealBothPlatforms(shuffle(RA_IMAGES), shuffle(STEAM_IMAGES), TILES_SHOWN)
-        : dealBothPlatforms(RA_IMAGES, STEAM_IMAGES, TILES_SHOWN),
-    [client],
-  )
+  const images = useMemo(() => (client ? dealBothPlatforms(shuffle(RA_IMAGES), shuffle(STEAM_IMAGES), TILES_SHOWN) : []), [client])
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-bg-card [--zig:1.2rem] md:[--zig:2rem] xl:[--zig:3.6rem]">

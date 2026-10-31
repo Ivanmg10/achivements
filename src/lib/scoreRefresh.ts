@@ -6,6 +6,8 @@ import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raC
 import { getOwnedGames } from '@/lib/steamClient'
 import { readCache, withSteamCache, writeCache } from '@/lib/steamCache'
 import { fetchPlayerAchievements, isNoStats, loadGlobalPct } from '@/lib/steamProgress'
+import { steamBudgetLow } from '@/lib/upstreamCount'
+import { readRaKey } from '@/lib/raKey'
 import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
 import { XboxError, xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
 import { runWithXboxTelemetry } from '@/lib/xboxTelemetry'
@@ -234,7 +236,8 @@ function xboxPlan(userId: number, xuid: string): Plan {
 
 function plansFor(user: UserRow): Plan[] {
   const plans: Plan[] = []
-  if (user.rausername && user.raid) plans.push(raPlan(user.rausername, user.raid))
+  const raKey = readRaKey(user.raid)
+  if (user.rausername && raKey) plans.push(raPlan(user.rausername, raKey))
   const steamKey = process.env.STEAM_API_KEY?.trim()
   if (user.steamid && steamKey) plans.push(steamPlan(user.id, user.steamid, steamKey))
   if (user.psnaccountid) plans.push(psnPlan(user.id, user.psnaccountid))
@@ -336,6 +339,8 @@ async function refreshSource(
       if (pace.gapMs) await sleep(pace.gapMs)
     }
   }
+  // One key serves everyone: near its daily cap, fills wait so that browsing keeps working.
+  if (plan.source === 'steam' && (await steamBudgetLow())) stopped = 'busy'
   await Promise.all(Array.from({ length: Math.min(pace.concurrency, Math.max(1, todo.length)) }, worker))
 
   const writes: Write[] = [...read.values()]
