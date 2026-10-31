@@ -97,6 +97,14 @@ test('a list plays its first 12 rows, 40 ms apart', () => {
   expect(css).toContain('.enter-cards:not([data-entered]) > :nth-child(-n + 12)')
 })
 
+test('the shelves keep their cascade on the same tokens, so reduced motion reaches it too', () => {
+  for (const name of ['enter-shelf-title', 'enter-shelf-card', 'enter-shelf-end']) {
+    const frame = css.slice(css.indexOf(`@keyframes ${name} {`), css.indexOf('}\n}', css.indexOf(`@keyframes ${name} {`)))
+    expect(frame).toContain('var(--enter-rise)')
+  }
+  expect(css).toContain('.enter-shelves > :nth-child(5) { --shelf: 4; }')
+})
+
 test('Tailwind sees the colours and radii', () => {
   for (const name of ['--color-hardcore', '--color-softcore', '--radius-chip', '--radius-control', '--radius-field', '--radius-card', '--radius-button', '--radius-tag', '--radius-pane', '--radius-tile']) {
     expect(css).toContain(`${name}:`)

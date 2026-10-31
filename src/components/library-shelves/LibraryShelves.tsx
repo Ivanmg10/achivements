@@ -11,7 +11,7 @@ import Button from '@/components/ui/Button'
  * A status list opened on its shelves: what to pick up next, grouped by what
  * each game needs. "See all" is always on screen: it sticks to the bottom edge
  * while the shelves are in view, and rests under the last one at the end, so
- * there is only ever one.
+ * there is only ever one. They come in one after another (`.enter-shelves`).
  */
 export default function LibraryShelves({
   entries,
@@ -33,11 +33,11 @@ export default function LibraryShelves({
   const shelves = useMemo(() => buildShelves(entries, category), [entries, category])
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 enter-shelves">
       {shelves.map((s, i) => (
         <LibraryShelf key={s.id} shelf={s} seed={seed + i * 7919} onPick={onPick} onSeeShelf={onSeeShelf} />
       ))}
-      <div className="sticky bottom-5 z-30 flex justify-center pointer-events-none enter-rise [--i:6]">
+      <div className="sticky bottom-5 z-30 flex justify-center pointer-events-none enter-rise">
         <Button
           type="button"
           onClick={onSeeAll}
