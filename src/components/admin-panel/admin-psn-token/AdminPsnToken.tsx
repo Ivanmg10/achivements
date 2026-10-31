@@ -7,6 +7,7 @@ import { useAdminPsnToken, type PsnTokenError } from '@/hooks/useAdminPsnToken'
 import { notify } from '@/lib/notify'
 import Button from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const SSO_COOKIE_URL = 'https://ca.account.sony.com/api/v1/ssocookie'
 const INPUT_ID = 'admin-psn-npsso'
@@ -55,7 +56,7 @@ export default function AdminPsnToken() {
           </button>
         </p>
       ) : !status ? (
-        <div aria-busy="true" className="h-5 w-48 rounded bg-ink/10 animate-pulse" />
+        <Skeleton className="h-5 w-48" />
       ) : !status.configured ? (
         <p className="text-sm text-text-secondary">Not set up: PSN pages answer “not configured” until an NPSSO is saved.</p>
       ) : (

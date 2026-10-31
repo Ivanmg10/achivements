@@ -36,7 +36,7 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
       .slice(0, 6)
   }, [achievements, subject])
 
-  if (isLoading) return <SkeletonGameList count={4} />
+  if (isLoading) return <SkeletonGameList count={7} />
 
   if (data.length === 0) {
     return (

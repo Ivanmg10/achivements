@@ -10,6 +10,7 @@ import type { GameGroup } from '@/types/types'
 import type { GameCandidate } from '@/utils/gameCandidates'
 import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 // Downloaded the first time it is opened, not with the page.
 const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
@@ -84,15 +85,9 @@ export default function MainPageGroups({
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col gap-2 animate-pulse">
+        <div className="flex flex-col gap-2">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="flex items-center gap-2 bg-bg-main rounded-lg p-2">
-              <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
-              <div className="flex flex-col flex-1 gap-1.5">
-                <div className="h-2.5 w-28 rounded bg-ink/10" />
-                <div className="h-2 w-16 rounded bg-ink/10" />
-              </div>
-            </div>
+            <SkeletonRow key={i} icon="w-9 h-9" className="p-2 gap-2.5" />
           ))}
         </div>
       ) : groups.length === 0 ? (

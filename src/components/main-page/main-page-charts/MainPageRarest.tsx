@@ -99,7 +99,7 @@ export default function MainPageRarest({
     return merged
   }, [achievements, steamAchievements, psnTrophies, xboxAchievements, T, lang, subject])
 
-  if (isLoading) return <SkeletonGameList count={4} />
+  if (isLoading) return <SkeletonGameList count={7} />
 
   if (rows.length === 0) {
     return (

@@ -16,6 +16,7 @@ import { SectionFallback } from '@/components/ui/SectionFallback'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-recently-played-expanded/RARecentlyPlayedExpanded'
 import { gameKey } from '@/utils/gameRef'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 const CONSOLE_BY_ID = new Map(CONSOLES.map((c) => [c.id, c.icon]))
 
@@ -52,7 +53,7 @@ export default function PinnedGameRow({
 
   if (isLoading || !game) {
     return (
-      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-tile h-24 animate-pulse" />
+      <div ref={setNodeRef} style={style}><GameRowSkeleton /></div>
     )
   }
 

@@ -12,7 +12,7 @@ const ROW: SharedGameRow = {
 }
 
 test('your progress, then each friend opening the two side by side', () => {
-  render(<MainPageFriendsShared rows={[ROW]} isLoading={false} />)
+  render(<MainPageFriendsShared rows={[ROW]} />)
   expect(screen.getByText(`RetroAchievements · ${en.userProfile.you} 40%`)).toBeInTheDocument()
   const ana = screen.getByRole('link', { name: `${en.friends.compareWith.replace('{u}', 'ana')} (100%)` })
   expect(ana).toHaveAttribute('href', '/user/ana/ra/1?compare=1')
@@ -20,10 +20,7 @@ test('your progress, then each friend opening the two side by side', () => {
   expect(screen.getByRole('link', { name: /bo/ })).toHaveAttribute('href', '/user/bo/ra/1?compare=1')
 })
 
-test('placeholders while loading, then a note when nothing is shared', () => {
-  const { container, unmount } = render(<MainPageFriendsShared rows={[]} isLoading />)
-  expect(container.querySelector('[aria-busy="true"]')).not.toBeNull()
-  unmount()
-  render(<MainPageFriendsShared rows={[]} isLoading={false} />)
+test('a note when nothing is shared', () => {
+  render(<MainPageFriendsShared rows={[]} />)
   expect(screen.getByText(en.friends.sharedEmpty)).toBeInTheDocument()
 })

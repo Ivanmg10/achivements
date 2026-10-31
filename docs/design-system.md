@@ -41,6 +41,8 @@ then `CLAUDE.md` → "The component library" for the hard rules.
 - **i18n:** every visible string is in `T` (all nine languages). The catalogue and
   the admin panel are the exception (English).
 
+- **Loading is drawn from `Skeleton`.** One composed skeleton per screen or view, on the real page's boxes, gutters and classes (the home's uses the `home-fit` ones), so the content lands without a jump. Where a height comes from data, measure the real thing in the browser and write that number down. Pulse only; the guard refuses a hand-made `animate-pulse`.
+
 ## The catalogue (`/design`, admins only)
 
 Every piece of `src/components/ui` (and the few that sit beside it) drawn live,

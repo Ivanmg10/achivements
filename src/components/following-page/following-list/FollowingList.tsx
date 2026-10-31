@@ -48,7 +48,7 @@ export default function FollowingList({
   )
   const shown = useMemo(() => filterFollowing(users, query, platforms), [users, query, platforms])
 
-  if (isLoading) return <>{tabs}<FollowingPageSkeleton /></>
+  if (isLoading) return <FollowingPageSkeleton tabs={tabs} />
   if (error) {
     return (
       <>

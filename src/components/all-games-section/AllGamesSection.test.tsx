@@ -6,7 +6,6 @@ jest.mock('@/components/statusGameList/StatusGameList', () => ({
     </ul>
   ),
 }))
-jest.mock('@/components/main-spinner/Spinner', () => ({ __esModule: true, default: () => <div data-testid="spinner" /> }))
 
 import { render, screen, fireEvent } from '@testing-library/react'
 import AllGamesSection from './AllGamesSection'
@@ -28,10 +27,10 @@ function setup(props: Partial<React.ComponentProps<typeof AllGamesSection>> = {}
 const titles = () => screen.getAllByRole('listitem').map((li) => li.textContent)
 const header = () => screen.getByRole('button', { name: new RegExp(en.categories.playing) })
 
-test('a spinner while loading, and an ellipsis instead of a count', () => {
+test('rows in the list\'s shape while loading, and a block instead of a count', () => {
   setup({ loading: true })
-  expect(screen.getByTestId('spinner')).toBeInTheDocument()
-  expect(header()).toHaveTextContent('…')
+  expect(document.querySelector('[aria-busy="true"]')!.children).toHaveLength(3)
+  expect(header().querySelector('.bg-skeleton')).toBeInTheDocument()
   expect(screen.queryByTestId('list')).not.toBeInTheDocument()
 })
 

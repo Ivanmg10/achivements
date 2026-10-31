@@ -46,8 +46,8 @@ describe('MainPagePointsStats', () => {
   afterEach(() => jest.useRealTimers())
 
   test('renders loading skeleton with labels only', () => {
-    render(<MainPagePointsStats achievements={[]} heatmapAchievements={[]} rank={null} isLoading />)
-    expect(screen.getAllByText('—').length).toBeGreaterThan(0)
+    const { container } = render(<MainPagePointsStats achievements={[]} heatmapAchievements={[]} rank={null} isLoading />)
+    expect(container.querySelectorAll('.bg-skeleton').length).toBeGreaterThan(0)
     expect(screen.getByText('Today')).toBeInTheDocument()
   })
 

@@ -12,6 +12,7 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const LOGOS: Record<GameSource, ReactNode> = {
   ra: <RaLogo height={11} />,
@@ -31,7 +32,15 @@ export default function PublicUserPlatforms({ games, isLoading }: { games: Libra
       {isLoading ? (
         <div aria-busy="true" className="flex flex-col gap-2">
           {[0, 1].map((i) => (
-            <div key={i} className="h-24 rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
+            <div key={i} className="bg-bg-main rounded-tile p-3 flex flex-col gap-2.5">
+              <Skeleton className="h-5 w-28" />
+              <div className="grid grid-cols-3 gap-2">
+                {[0, 1, 2].map((n) => (
+                  <Skeleton key={n} className="h-10" />
+                ))}
+              </div>
+              <Skeleton className="h-2" />
+            </div>
           ))}
         </div>
       ) : platforms.length === 0 ? (

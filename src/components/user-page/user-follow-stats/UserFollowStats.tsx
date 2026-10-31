@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { useFollowCounts } from '@/hooks/useFollowCounts'
 import { plural } from '@/utils/utils'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const LINK = 'hover:text-text-main hover:underline underline-offset-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
@@ -16,7 +17,7 @@ export default function UserFollowStats() {
   const { T, lang } = useLanguage()
   const { counts, isLoading, error } = useFollowCounts()
   if (error) return <span role="alert" className="text-danger">{T.following.countsError}</span>
-  if (isLoading || !counts) return <span aria-hidden="true">—</span>
+  if (isLoading || !counts) return <Skeleton className="inline-block h-3 w-40 max-w-full align-middle" />
 
   return (
     <>

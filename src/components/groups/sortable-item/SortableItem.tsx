@@ -16,6 +16,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 // About three rows on a wide card; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
@@ -169,7 +170,7 @@ export default function SortableItem({
             {loadingAch ? (
               <div className="flex flex-wrap gap-1">
                 {Array.from({ length: Math.min(achTotal || 12, 60) }).map((_, i) => (
-                  <div key={i} className="w-12 h-12 rounded-lg bg-bg-main animate-pulse" />
+                  <Skeleton key={i} radius="tile" className="w-12 h-12" />
                 ))}
               </div>
             ) : achError && !gameData ? (

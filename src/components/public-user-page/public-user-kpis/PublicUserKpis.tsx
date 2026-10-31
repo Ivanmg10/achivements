@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useStreakData } from '@/hooks/useStreakData'
 import { activityKpis } from '@/utils/utils'
 import UserVaultStat from '@/components/user-page/user-vault-stat/UserVaultStat'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /**
  * A user's pace at a glance, every platform together: unlocks today, in the
@@ -22,7 +23,7 @@ export default function PublicUserKpis() {
       <div aria-busy="true" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
         <span className="sr-only">{T.userProfile.loadingActivity}</span>
         {Array.from({ length: 6 }, (_, i) => (
-          <div key={i} className="h-24 rounded-card bg-bg-main animate-pulse motion-reduce:animate-none" />
+          <Skeleton key={i} radius="card" className="h-24" />
         ))}
       </div>
     )

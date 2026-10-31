@@ -5,6 +5,7 @@ import { IconArrowDownRight, IconArrowUpRight, IconMinus } from '@tabler/icons-r
 import type { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { compareMonths, type MonthNumbers } from '@/utils/activityInsights'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /**
  * This month so far against the same days of last month: achievements, games
@@ -45,7 +46,7 @@ export default function MainPageMonthCompare({ achievements, isLoading }: { achi
               {/* Wraps (hyphenated, by the page language) rather than truncates: on a phone each of the three is ~90px wide. */}
               <dt className="text-[10px] uppercase tracking-wider leading-tight text-text-secondary hyphens-auto break-words">{label}</dt>
               <dd className="flex flex-wrap items-baseline gap-x-2">
-                <span className="text-2xl font-bold tabular-nums">{isLoading ? '—' : value.toLocaleString(lang)}</span>
+                <span className="text-2xl font-bold tabular-nums">{isLoading ? <Skeleton className="h-[1lh] w-12" /> : value.toLocaleString(lang)}</span>
                 {!isLoading && (
                   <span className={`flex items-center text-xs font-semibold tabular-nums ${tone}`}>
                     <Arrow size={14} aria-hidden="true" />

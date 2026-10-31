@@ -17,6 +17,7 @@ import LibraryDetailCalendar from './library-detail-calendar/LibraryDetailCalend
 import LibraryDetailMilestones from './library-detail-milestones/LibraryDetailMilestones'
 import LibraryDetailInfo, { type InfoRow } from './library-detail-info/LibraryDetailInfo'
 import LibraryDetailSkeleton from '@/components/library-detail-skeleton/LibraryDetailSkeleton'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export type LibraryCategory = 'wantToPlay' | 'playing' | 'completed'
 
@@ -218,7 +219,7 @@ export default function LibraryGameDetail({
             {loading ? (
               <ul aria-busy="true" className="flex flex-wrap gap-1">
                 {Array.from({ length: Math.min(ring.total || SKELETON_BADGES, 60) }).map((_, i) => (
-                  <li key={i} className="w-10 h-10 rounded-lg bg-ink/10 animate-pulse" />
+                  <li key={i}><Skeleton radius="tile" className="w-10 h-10" /></li>
                 ))}
               </ul>
             ) : items.length === 0 ? (

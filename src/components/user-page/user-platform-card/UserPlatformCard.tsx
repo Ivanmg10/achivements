@@ -5,8 +5,9 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { GameSource } from '@/types/steam'
 import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
 import { buttonClass } from '@/components/ui/Button'
+import { Skeleton } from '@/components/ui/Skeleton'
 
-export type PlatformStat = { label: string; value: string; accent?: string }
+export type PlatformStat = { label: string; value: string; accent?: string; loading?: boolean }
 
 export const DISCONNECT_CLASS = buttonClass('danger', 'md', 'w-full')
 export const CONNECT_CLASS = buttonClass('primary', 'md', 'w-full')
@@ -106,7 +107,7 @@ export default function UserPlatformCard({
                   >
                     <dt className="text-xs text-text-secondary truncate">{stat.label}</dt>
                     <dd className={`text-xl font-extrabold tabular-nums truncate ${stat.accent ?? 'text-text-main'}`}>
-                      {stat.value}
+                      {stat.loading ? <Skeleton className="h-[1lh] w-2/3" /> : stat.value}
                     </dd>
                   </div>
                 ))}

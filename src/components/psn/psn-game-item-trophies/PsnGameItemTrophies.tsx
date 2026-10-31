@@ -3,6 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnTrophies } from '@/hooks/usePsnTrophies'
 import { PsnTrophyGrid } from '@/components/psn/psn-trophy-grid/PsnTrophyGrid'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const SKELETON_BADGES = 12
 
@@ -36,7 +37,7 @@ export default function PsnGameItemTrophies({
     return (
       <ul aria-busy="true" className="flex flex-wrap gap-1">
         {Array.from({ length: Math.min(expectedCount || SKELETON_BADGES, 60) }).map((_, i) => (
-          <li key={i} className={`${badge} rounded-lg bg-bg-main animate-pulse`} />
+          <li key={i}><Skeleton radius="tile" className={badge} /></li>
         ))}
       </ul>
     )

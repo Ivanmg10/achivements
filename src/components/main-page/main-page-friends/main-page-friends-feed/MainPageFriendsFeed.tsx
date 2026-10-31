@@ -10,23 +10,15 @@ import { achievementBadgeUrl, relativeTime } from '@/utils/utils'
 import EmptyState from '@/components/empty-state/EmptyState'
 
 /** What the people you follow unlocked lately, all together and newest first; each opens their progress in that game. */
-export default function MainPageFriendsFeed({ items, isLoading }: { items: FeedItem[]; isLoading: boolean }) {
+export default function MainPageFriendsFeed({ items }: { items: FeedItem[] }) {
   const { T, lang } = useLanguage()
 
   return (
     <div className="flex flex-col gap-3 min-h-0 flex-1">
       <h3 className="text-[10px] uppercase tracking-widest text-text-secondary">{T.friends.feed}</h3>
       {items.length === 0 ? (
-        isLoading ? (
-          <div aria-busy="true" className="flex flex-col gap-2">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-11 rounded-lg bg-bg-main animate-pulse motion-reduce:animate-none" />
-            ))}
-          </div>
-        ) : (
-          // Centred in whatever height the card is given (it stretches to the column beside it).
-          <EmptyState icon={<IconSparkles className="w-6 h-6" />} title={T.friends.feedEmpty} size="compact" className="py-6 flex-1 justify-center" />
-        )
+        // Centred in whatever height the card is given (it stretches to the column beside it).
+        <EmptyState icon={<IconSparkles className="w-6 h-6" />} title={T.friends.feedEmpty} size="compact" className="py-6 flex-1 justify-center" />
       ) : (
         <ul className="flex flex-col gap-1 max-h-[26rem] xl:max-h-none xl:flex-1 xl:min-h-0 overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:rgb(var(--accent)/0.35)_transparent]">
           {items.map(({ username, achievement: a }) => {

@@ -4,6 +4,7 @@ import { IconScale } from '@tabler/icons-react'
 import { useAdminRankings } from '@/hooks/useAdminRankings'
 import { notify } from '@/lib/notify'
 import type { FlaggedGame } from '@/app/api/admin/rankings/route'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const NAMES: Record<string, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PlayStation', xbox: 'Xbox' }
 const num = (x: number | null) => (x === null ? '—' : x.toLocaleString('en'))
@@ -38,7 +39,7 @@ export default function AdminRankings() {
           </button>
         </p>
       ) : !balance ? (
-        <div aria-busy="true" className="h-16 rounded bg-ink/10 animate-pulse" />
+        <Skeleton radius="tile" className="h-16" />
       ) : balance.length === 0 ? (
         <p className="text-sm text-text-secondary">No scores yet: they appear as users visit and the daily cron runs.</p>
       ) : (

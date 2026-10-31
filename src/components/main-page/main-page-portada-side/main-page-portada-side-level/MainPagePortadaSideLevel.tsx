@@ -7,11 +7,13 @@ import { levelProgress } from '@/utils/vaultLevel'
 import { SURFACE } from '@/components/ui/surface'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
+import { PortadaLevelSkeleton } from '../../main-page-portada-skeleton/MainPagePortadaSkeleton'
 
 /** Your level beside the cover: the number in big, your tier, your points, what is left to the next and this week's gain. Opens the rankings. */
 export default function MainPagePortadaSideLevel() {
   const { T, lang } = useLanguage()
-  const { me } = useVaultMe()
+  const { me, isLoading } = useVaultMe()
+  if (isLoading) return <PortadaLevelSkeleton />
   if (!me || me.points === 0) return null
 
   const n = (x: number) => x.toLocaleString(lang)

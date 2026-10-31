@@ -16,6 +16,7 @@ import MainPageFriendsLeaderboard from './main-page-friends-leaderboard/MainPage
 import MainPageFriendsFeed from './main-page-friends-feed/MainPageFriendsFeed'
 import MainPageFriendsShared from './main-page-friends-shared/MainPageFriendsShared'
 import MainPageFriendsCard from './main-page-friends-card/MainPageFriendsCard'
+import MainPageFriendsSkeleton from './main-page-friends-skeleton/MainPageFriendsSkeleton'
 
 /**
  * Stats & Activity's Friends section: how you rank against the people you
@@ -51,7 +52,6 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
       .map((f) => ({ username: f.username, avatar: f.avatar, online: f.online, isMe: false, stats: friendStats(details[f.username].recent, details[f.username].games, now) }))
     return [me, ...them]
   }, [session?.user?.name, session?.user?.avatar, T, myRecent, mine.games, now, detailed, details])
-  const pending = detailed.filter((f) => !details[f.username]).map((f) => ({ username: f.username, avatar: f.avatar }))
   const feed = useMemo(
     () => friendsFeed(detailed.filter((f) => details[f.username]).map((f) => ({ username: f.username, avatar: f.avatar, recent: details[f.username].recent }))),
     [detailed, details],
@@ -74,15 +74,8 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
     )
   }
 
-  if (isLoading) {
-    return (
-      <div role="status" aria-busy="true" className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <span className="sr-only">{T.friends.loading}</span>
-        <div className="h-80 rounded-tile bg-bg-card animate-pulse motion-reduce:animate-none xl:col-span-2" />
-        <div className="h-80 rounded-tile bg-bg-card animate-pulse motion-reduce:animate-none" />
-      </div>
-    )
-  }
+  // The whole section at once, never friend by friend (the user's preference). A failed read still lands, as `partial`.
+  if (isLoading || detailsLoading || mine.isLoading) return <MainPageFriendsSkeleton leaders={friends ? Math.min(friends.length, DETAIL_LIMIT) + 1 : undefined} cards={friends?.length} />
 
   if (!friends || friends.length === 0) {
     return (
@@ -98,7 +91,7 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="xl:col-span-2 flex flex-col min-w-0">
           <ChartCard className="h-auto! flex-1">
-            <MainPageFriendsLeaderboard rows={leaderRows} pending={pending} />
+            <MainPageFriendsLeaderboard rows={leaderRows} />
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-text-secondary">
               <span>{T.friends.windowNote.replace('{n}', String(ACTIVITY_DAYS))}</span>
               {friends.length > DETAIL_LIMIT && <span>{T.friends.limitNote.replace('{n}', String(DETAIL_LIMIT))}</span>}
@@ -114,7 +107,7 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
         {/* Out of the flow on xl, so a long feed never makes the row taller than the leaderboard. */}
         <div className="relative min-w-0">
           <ChartCard className="h-auto! xl:absolute xl:inset-0">
-            <MainPageFriendsFeed items={feed} isLoading={detailsLoading} />
+            <MainPageFriendsFeed items={feed} />
           </ChartCard>
         </div>
       </div>
@@ -135,7 +128,7 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
       </ChartCard>
 
       <ChartCard>
-        <MainPageFriendsShared rows={shared} isLoading={detailsLoading || mine.isLoading} />
+        <MainPageFriendsShared rows={shared} />
       </ChartCard>
     </div>
   )

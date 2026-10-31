@@ -8,6 +8,7 @@ import { RetroAchievement } from '@/types/types'
 import { PinAchievementModal } from '@/components/pin-achievement-modal/PinAchievementModal'
 import { notify } from '@/lib/notify'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 type PinnedRow = { achievement_id: number; snapshot: RetroAchievement }
 
@@ -81,16 +82,9 @@ export function GamePinnedAchievements({
       )}
 
       {isLoading ? (
-        <div className="flex flex-col gap-2 animate-pulse">
+        <div className="flex flex-col gap-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 px-2 py-1.5">
-              <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
-              <div className="flex flex-col gap-1.5 flex-1">
-                <div className="h-2.5 w-28 rounded bg-ink/10" />
-                <div className="h-2 w-20 rounded bg-ink/10" />
-              </div>
-              <div className="w-6 h-4 rounded bg-ink/10 shrink-0" />
-            </div>
+            <SkeletonRow key={i} icon="w-9 h-9" figure className="gap-3 px-2 py-1.5" />
           ))}
         </div>
       ) : pinned.length === 0 ? (

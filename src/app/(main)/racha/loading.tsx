@@ -7,10 +7,10 @@ export default function RachaLoading() {
   const { T } = useLanguage()
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-y-auto bg-bg-main text-text-main">
-      <div className="flex flex-col gap-5 px-4 py-6 w-full lg:max-w-[98%] mx-auto">
-        <header className="flex flex-col gap-1">
-          <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 text-text-main">{T.streak.title}</h1>
-          <p className="text-sm text-text-secondary">{T.streak.pageSub}</p>
+      <div className="flex flex-col gap-4 px-3 py-4 w-full mx-auto">
+        <header className="sr-only">
+          <h1>{T.streak.title}</h1>
+          <p>{T.streak.pageSub}</p>
         </header>
         <StreakPageSkeleton />
       </div>

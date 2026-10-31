@@ -10,6 +10,8 @@ import { SURFACE } from '@/components/ui/surface'
 import { buttonClass } from '@/components/ui/Button'
 import IconButton from '@/components/ui/IconButton'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 const PREVIEW_COUNT = 2
 
@@ -59,7 +61,13 @@ export default function GameInfoComments({ gameId }: { gameId: number }) {
     return (
       <Wrap>
         <section className={shell}>
-          <p className="text-sm text-text-secondary animate-pulse">{T.gameComments.loading}</p>
+          <div role="status" aria-busy="true" className="flex flex-col">
+            <span className="sr-only">{T.gameComments.loading}</span>
+            <Skeleton className="h-6 w-40" />
+            {[0, 1, 2].map((i) => (
+              <SkeletonRow key={i} radius="circle" className="gap-3 py-3" />
+            ))}
+          </div>
         </section>
       </Wrap>
     )

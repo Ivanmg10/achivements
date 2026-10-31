@@ -8,8 +8,11 @@ import Notice from '@/components/ui/Notice'
 import { notify } from '@/lib/notify'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 import { MENU_SURFACE, menuItemClass } from '@/components/ui/menu'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
+import { SURFACE } from '@/components/ui/surface'
 import EmptyState from '@/components/empty-state/EmptyState'
-import DesignCatalogPiece, { Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
+import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
 
 /** What the site says back: notices, toasts, dialogs, menus, tooltips and the empty state. */
 export default function DesignCatalogFeedback() {
@@ -58,6 +61,28 @@ export default function DesignCatalogFeedback() {
         >
           <p className="text-sm text-text-secondary">A confirmation that destroys something is an alert dialog.</p>
         </Modal>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="skeleton">
+        <Compare>
+          <div className="flex flex-col gap-4">
+            <Specimen name="radius: line · tag · tile · card · circle">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton radius="tag" className="h-6 w-16" />
+              <Skeleton radius="tile" className="h-12 w-12" />
+              <Skeleton radius="card" className="h-12 w-20" />
+              <Skeleton radius="circle" className="h-12 w-12" />
+            </Specimen>
+            <div className={`${SURFACE} p-4 flex items-center gap-3`}>
+              <Skeleton radius="circle" className="w-12 h-12 shrink-0" />
+              <div className="flex flex-col gap-2 flex-1">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-3 w-1/3" />
+              </div>
+            </div>
+            <GameRowSkeleton />
+          </div>
+        </Compare>
       </DesignCatalogPiece>
 
       <DesignCatalogPiece id="menu">

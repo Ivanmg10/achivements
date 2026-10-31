@@ -75,6 +75,32 @@ tested, on purpose, so this does not say a bypass existed.
 
 ---
 
+## 2026-10-31 — A skeleton for every screen (`feat/70-skeleton-every-screen`, #70)
+
+**Did** — Audited every loading state (inventory on issue #70), added `ui/Skeleton` with the `--color-skeleton`
+token and its catalogue specimen, moved every hand-made pulse onto it and extended `uiGuard.test.ts`. New composed
+skeletons: cover hero and side, Friends, Collection, Groups section, rankings route, `/rankings/how`, `/design`, auth forms,
+admin users. Figures on their way are blocks (`loading` on `StatPill`, `StatCard`, `PlatformStat`), not `—`.
+**Why** — Screens shared grey boxes and spinners, and the page jumped when content landed.
+**Decisions** — The home's whole Friends section and both Following lists hold the skeleton until `detailsLoading` is
+false: the user does not want a section loading in fits and starts, even if the wait is longer (details are read one
+friend at a time). The home's skeleton draws both layouts and `data-home-layout` on `<html>` picks one before the first
+frame, so a full load in the cover layout does not flash the classic one. `useFollowers` gained a derived `detailsLoading`; no fetch changed. The skeleton reads the view with
+`useOptionalMainView` because `(home)/loading.tsx` also renders signed out without `MainProviders`. Spinners inside
+buttons stay: they report an action, not content. No canvas: the issue rules it out.
+**Open** — Measured signed in as an admin with all four platforms, skeleton against the settled page at 390 and 2560 px.
+Exact or within 1 px: Following, account, groups (2560), rankings, the streak page, `/rankings/how`, the classic home's top
+and the cover. Heights that depend on how much an account has (Collection's grid, pinned games, friends' cards, shared games, a
+library's list) cannot match every account and were not pinned to one. On a phone the home's stats sit about 40 px high.
+On a full load the platform tabs over the home's profile and the rankings' tabs wait for the session, and a saved list
+layout in the library shows the shelves until hydration; a client navigation has neither. The stats of the page
+below the rankings' list still add height.
+**Watch out** — Stop `next dev` before `npm run build`: the build overwrites `.next` under it and every route answers 500.
+`/rankings/how`'s section heights are measured desktop numbers; a large rewrite of the guide needs them
+remeasured. On `/rankings`, the rows' heights also come from real data (102.7 and 69.4 px).
+
+---
+
 ## 2026-10-30 — Xbox quota and failure hardening (`feat/87-xbox-quota-hardening`, #87)
 
 **Did** — Added bounded OpenXBL calls, a PostgreSQL hourly budget, 429 scan stops,

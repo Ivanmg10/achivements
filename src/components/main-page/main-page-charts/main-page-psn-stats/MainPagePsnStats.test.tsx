@@ -21,6 +21,6 @@ test("today's trophies, the level and the platinums", () => {
 })
 
 test('placeholders while loading', () => {
-  render(<MainPagePsnStats streak={0} achievements={[]} isLoading />)
-  expect(screen.getAllByText('—').length).toBeGreaterThan(3)
+  const { container } = render(<MainPagePsnStats streak={0} achievements={[]} isLoading />)
+  expect(container.querySelectorAll('.bg-skeleton').length).toBeGreaterThan(3)
 })

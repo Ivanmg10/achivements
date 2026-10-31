@@ -37,8 +37,8 @@ test('marks counts as a lower bound while some are still missing', () => {
 })
 
 test('shows placeholders while the library loads', () => {
-  render(<MainPageProfileStStats library={[]} isLoading />)
-  expect(screen.getAllByText('—')).toHaveLength(4)
+  const { container } = render(<MainPageProfileStStats library={[]} isLoading />)
+  expect(container.querySelectorAll('.bg-skeleton')).toHaveLength(4)
 })
 
 test('is a 2×2 grid like the RA stats', () => {

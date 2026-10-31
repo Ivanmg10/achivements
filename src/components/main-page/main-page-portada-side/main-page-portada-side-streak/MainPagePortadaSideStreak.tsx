@@ -7,6 +7,7 @@ import { groupByDays, plural } from '@/utils/utils'
 import { SURFACE } from '@/components/ui/surface'
 import { streakInk, streakTier } from '@/utils/streakTier'
 import { slantStyle } from '@/components/ui/shape'
+import { PortadaStreakSkeleton } from '../../main-page-portada-skeleton/MainPagePortadaSkeleton'
 
 /** How many days the bars show. */
 const DAYS = 21
@@ -19,7 +20,8 @@ const SLANT = slantStyle(3)
  */
 export default function MainPagePortadaSideStreak() {
   const { T, lang } = useLanguage()
-  const { achievements, activeStreak, bestStreak, now } = useStreakData()
+  const { achievements, activeStreak, bestStreak, now, isLoading } = useStreakData()
+  if (isLoading && !activeStreak) return <PortadaStreakSkeleton />
   if (!activeStreak) return null
 
   const counts = groupByDays(achievements, DAYS, new Date(now)).map((d) => d.count)

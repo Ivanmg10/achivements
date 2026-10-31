@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import ClosestToComplete, { CLOSEST_SHOWN } from './closest-to-complete/ClosestToComplete'
 import MasteryByConsole from './mastery-by-console/MasteryByConsole'
 import MasteryMix from './mastery-mix/MasteryMix'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export default function MainPageMastery({
   awards,
@@ -30,12 +31,12 @@ export default function MainPageMastery({
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.masteryAwards}</p>
         <div className="grid grid-cols-2 gap-2">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-bg-main rounded-lg h-16 animate-pulse" />
+            <Skeleton key={i} radius="tile" className="h-16" />
           ))}
         </div>
         <div className="grid grid-cols-4 gap-1.5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="aspect-square rounded bg-ink/10 animate-pulse" />
+            <Skeleton key={i} radius="tag" className="aspect-square" />
           ))}
         </div>
       </div>

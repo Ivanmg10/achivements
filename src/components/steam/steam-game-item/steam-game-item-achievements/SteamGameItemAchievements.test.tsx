@@ -39,7 +39,7 @@ test('shows a badge-shaped skeleton sized to the known count while loading', () 
   const { container } = render(<SteamGameItemAchievements appId={730} gameTitle="Counter-Strike" expectedCount={5} />)
   const skeleton = container.querySelector('[aria-busy="true"]')!
   expect(skeleton.children).toHaveLength(5)
-  expect(skeleton.children[0].className).toContain('w-12')
+  expect(skeleton.children[0].firstElementChild!.className).toContain('w-12')
 })
 
 test('caps a huge skeleton and uses a default when the count is unknown', () => {
@@ -50,7 +50,7 @@ test('caps a huge skeleton and uses a default when the count is unknown', () => 
   rerender(<SteamGameItemAchievements appId={730} gameTitle="Counter-Strike" badgeSize={40} />)
   const skeleton = container.querySelector('[aria-busy="true"]')!
   expect(skeleton.children).toHaveLength(12)
-  expect(skeleton.children[0].className).toContain('w-10')
+  expect(skeleton.children[0].firstElementChild!.className).toContain('w-10')
 })
 
 test('announces an error with the privacy hint and a retry', () => {

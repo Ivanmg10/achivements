@@ -4,6 +4,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { SURFACE } from '@/components/ui/surface'
 import { buttonClass } from '@/components/ui/Button'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 /**
  * The last achievements under the profile, the same card on every platform:
@@ -38,15 +39,9 @@ export default function MainPageProfileRecent({
     <div className={`${SURFACE} p-5 flex flex-col gap-1 flex-1 min-h-[12rem]`}>
       <p className="text-[1.0625rem] font-bold mb-1.5">{title}</p>
       {loading ? (
-        <div aria-busy="true" className="flex flex-col gap-1 animate-pulse motion-reduce:animate-none">
+        <div aria-busy="true" className="flex flex-col gap-1">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex gap-3 items-center py-1.5">
-              <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" />
-              <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-                <div className="h-2.5 bg-ink/10 rounded w-3/4" />
-                <div className="h-2 bg-ink/10 rounded w-1/2" />
-              </div>
-            </div>
+            <SkeletonRow key={i} className="gap-3 py-1.5" />
           ))}
         </div>
       ) : error ? (

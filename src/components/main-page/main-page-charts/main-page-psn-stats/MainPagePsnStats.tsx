@@ -53,7 +53,7 @@ export default function MainPagePsnStats({
     return (
       <div className="flex flex-wrap gap-3" aria-busy="true">
         {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.streak.title, T.psn.level].map((label) => (
-          <StatPill key={label} label={label} value="—" accent="text-text-secondary" />
+          <StatPill key={label} label={label} value="" loading />
         ))}
       </div>
     )

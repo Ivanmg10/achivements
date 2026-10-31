@@ -15,10 +15,10 @@ test('both counts in words, each opening its list', () => {
   expect(screen.getByRole('link', { name: '2 followers' })).toHaveAttribute('href', '/following#followers')
 })
 
-test('a dash while loading; a failure says so', () => {
+test('a block in its line while loading; a failure says so', () => {
   setup({ isLoading: true })
-  const { unmount } = render(<UserFollowStats />)
-  expect(screen.getByText('—')).toBeInTheDocument()
+  const { container, unmount } = render(<UserFollowStats />)
+  expect(container.querySelector('.bg-skeleton')).toBeInTheDocument()
   unmount()
   setup({ error: true })
   render(<UserFollowStats />)

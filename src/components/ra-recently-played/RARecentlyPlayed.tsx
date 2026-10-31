@@ -95,9 +95,9 @@ export default function RARecentlyPlayed({ skipLatest = false }: { skipLatest?: 
       <div className="flex flex-col flex-1 min-h-0">
         {loading ? (
           // Sized like the loaded list (home-fit-scroll, rows sharing the height), so the rows fill the card and nothing jumps when it loads.
-          <div className="home-fit-scroll flex flex-col gap-1.5 flex-1 min-h-0 overflow-hidden animate-pulse motion-reduce:animate-none">
+          <div className="home-fit-scroll flex flex-col gap-1.5 flex-1 min-h-0 overflow-hidden">
             {Array.from({ length: MAX_GAMES }).map((_, i) => (
-              <GameRowSkeleton key={i} className="flex-1" />
+              <GameRowSkeleton key={i} className="flex-1 min-h-[116px] lg:min-h-0" />
             ))}
           </div>
         ) : error && recent.length === 0 ? (

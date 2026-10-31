@@ -12,6 +12,7 @@ import PsnCollectionItem from '@/components/psn/psn-collection-item/PsnCollectio
 import XboxGameItem from '@/components/xbox/xbox-game-item/XboxGameItem'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 const MAX_GAMES = 7
 
@@ -38,7 +39,7 @@ export default function RecentGamesList() {
       {recentLoading || psnLoading || xboxLoading ? (
         <div aria-busy="true" className="flex flex-col gap-1.5 flex-1">
           {Array.from({ length: MAX_GAMES }).map((_, i) => (
-            <div key={i} className="h-20 bg-bg-main rounded-tile animate-pulse" />
+            <GameRowSkeleton key={i} />
           ))}
         </div>
       ) : failed ? (

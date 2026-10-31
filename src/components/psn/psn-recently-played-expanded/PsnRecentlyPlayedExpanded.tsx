@@ -9,6 +9,7 @@ import { PsnTrophyGrid } from '@/components/psn/psn-trophy-grid/PsnTrophyGrid'
 import PsnRarestTrophies from '@/components/psn/psn-rarest-trophies/PsnRarestTrophies'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
 import type { PsnGameProgress } from '@/types/psn'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const SKELETON_BADGES = 24
 
@@ -42,7 +43,7 @@ export default function PsnRecentlyPlayedExpanded({ game }: { game: PsnGameProgr
         {isLoading ? (
           <ul aria-busy="true" className="flex flex-wrap gap-1">
             {Array.from({ length: Math.min(total || SKELETON_BADGES, 60) }).map((_, i) => (
-              <li key={i} className="w-10 h-10 rounded-lg bg-ink/10 animate-pulse" />
+              <li key={i}><Skeleton radius="tile" className="w-10 h-10" /></li>
             ))}
           </ul>
         ) : error ? (

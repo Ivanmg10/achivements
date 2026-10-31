@@ -3,6 +3,7 @@
 import { RetroAchievementsGameCompleted } from '@/types/types'
 import { groupByConsole } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const COLORS = [
   '#6366f1',
@@ -22,12 +23,12 @@ export default function ConsolesPieChart({ games, isLoading }: { games: RetroAch
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-2 w-full animate-pulse">
+      <div className="flex flex-col gap-2 w-full">
         {[70, 50, 35, 25, 15].map((w, i) => (
           <div key={i} className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-ink/10 shrink-0" />
-            <div className="flex-1 bg-ink/10 rounded-full h-2" style={{ maxWidth: `${w}%` }} />
-            <div className="h-2 w-6 rounded bg-ink/10 shrink-0" />
+            <Skeleton radius="circle" className="w-2 h-2 shrink-0" />
+            <Skeleton className="flex-1 h-2" style={{ maxWidth: `${w}%` }} />
+            <Skeleton className="h-2 w-6 shrink-0" />
           </div>
         ))}
       </div>

@@ -47,7 +47,8 @@ export default function UserPlatforms() {
   const raStats: PlatformStat[] = [
     {
       label: T.userStats.globalRank,
-      value: rankLoading ? '…' : rank?.Rank ? `#${rank.Rank.toLocaleString(lang)}` : '—',
+      value: rank?.Rank ? `#${rank.Rank.toLocaleString(lang)}` : '—',
+      loading: rankLoading,
     },
     {
       label: T.profileStats.hardcorePoints,

@@ -63,5 +63,5 @@ test('says there is no activity today, and leaves the level out until the profil
 
 test('shows placeholders while loading', () => {
   render(<MainPageSteamStats streak={0} achievements={[]} games={[]} isLoading />)
-  expect(pill(en.pointsStats.today)).toHaveTextContent('—')
+  expect(pill(en.pointsStats.today).querySelector('.bg-skeleton')).toBeInTheDocument()
 })

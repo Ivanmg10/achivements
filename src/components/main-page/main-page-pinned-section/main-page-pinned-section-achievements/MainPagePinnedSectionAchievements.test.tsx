@@ -67,7 +67,7 @@ test('placeholders while loading', () => {
   setPins({ pinned: [], isLoading: true })
   const { container } = render(<MainPagePinnedSectionAchievements />)
   expect(container.querySelector('[aria-busy="true"]')).toHaveClass('auto-rows-40')
-  expect(container.querySelector('[aria-busy="true"] > div')).toHaveClass('h-full')
+  expect(container.querySelector('[aria-busy="true"] > *')).toHaveClass('h-40')
 })
 
 test('a new order is saved as the pins themselves', () => {

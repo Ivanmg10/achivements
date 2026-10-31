@@ -13,6 +13,7 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import PublicUserDuelRow from '../public-user-duel-row/PublicUserDuelRow'
 import PublicUserSharedGameRow from '../public-user-shared-game-row/PublicUserSharedGameRow'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /** The signed-in viewer's own numbers, read outside the profile's providers. */
 export type ViewerStats = {
@@ -112,7 +113,7 @@ export default function PublicUserCompare({
           <div aria-busy="true" className="flex flex-col gap-4">
             <span className="sr-only">{T.userProfile.loadingCompare}</span>
             {Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="h-9 rounded-lg bg-bg-main animate-pulse motion-reduce:animate-none" />
+              <Skeleton key={i} radius="tile" className="h-9" />
             ))}
           </div>
         ) : (
@@ -141,7 +142,7 @@ export default function PublicUserCompare({
         {loading ? (
           <div aria-busy="true" className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {Array.from({ length: 4 }, (_, i) => (
-              <div key={i} className="h-24 rounded-tile bg-bg-main animate-pulse motion-reduce:animate-none" />
+              <Skeleton key={i} radius="tile" className="h-24" />
             ))}
           </div>
         ) : shared.length === 0 ? (

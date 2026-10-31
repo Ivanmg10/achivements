@@ -59,7 +59,7 @@ test('while the library loads, the last-game block keeps its place with a skelet
   ;(usePsnGamesData as jest.Mock).mockReturnValue({ library: [], libraryLoading: true })
   const { container } = render(<MainPageProfilePsnLinked summary={SUMMARY} isLoading={false} error={null} onRetry={jest.fn()} />)
   expect(screen.queryByTestId('game')).not.toBeInTheDocument()
-  expect(container.querySelector('.animate-pulse [class*="w-12.5"]')).toBeInTheDocument()
+  expect(container.querySelector('.animate-pulse[class*="w-12.5"]')).toBeInTheDocument()
 })
 
 describe('the refresh button', () => {

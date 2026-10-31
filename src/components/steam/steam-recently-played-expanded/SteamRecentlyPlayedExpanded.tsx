@@ -9,6 +9,7 @@ import { SteamAchievementGrid } from '@/components/steam/steam-achievement-grid/
 import SteamExpandedStats from './steam-expanded-stats/SteamExpandedStats'
 import SteamRarestAchievements from './steam-rarest-achievements/SteamRarestAchievements'
 import type { SteamGameProgress } from '@/types/steam'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const SKELETON_BADGES = 24
 
@@ -50,7 +51,7 @@ export default function SteamRecentlyPlayedExpanded({ game }: { game: SteamGameP
         {isLoading ? (
           <ul aria-busy="true" className="flex flex-wrap gap-1">
             {Array.from({ length: Math.min(total || SKELETON_BADGES, 60) }).map((_, i) => (
-              <li key={i} className="w-10 h-10 rounded-lg bg-ink/10 animate-pulse" />
+              <li key={i}><Skeleton radius="tile" className="w-10 h-10" /></li>
             ))}
           </ul>
         ) : error ? (

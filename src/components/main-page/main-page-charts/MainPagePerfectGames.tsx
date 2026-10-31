@@ -12,6 +12,7 @@ import PerfectPodium from './perfect-podium/PerfectPodium'
 import PerfectGameTile from './perfect-game-tile/PerfectGameTile'
 import PerfectGamesOrderModal from '@/components/main-page/perfect-games-order-modal/PerfectGamesOrderModal'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /**
  * Games with every achievement, from both platforms in one list, in the order
@@ -42,11 +43,11 @@ export default function MainPagePerfectGames({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-2 animate-pulse">
-        <div className="h-2 w-28 rounded bg-ink/10" />
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-2 w-28" />
         <div className="flex flex-wrap gap-2">
           {[0, 1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="w-8 h-8 rounded bg-ink/10" />
+            <Skeleton key={i} radius="tag" className="w-8 h-8" />
           ))}
         </div>
       </div>

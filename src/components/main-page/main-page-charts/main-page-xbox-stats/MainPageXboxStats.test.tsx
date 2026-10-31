@@ -37,7 +37,7 @@ test('without a summary yet, only what the achievements say', () => {
 
 test('placeholders while loading', () => {
   render(<MainPageXboxStats streak={0} achievements={[]} isLoading />)
-  expect(screen.getAllByText('—').length).toBeGreaterThan(3)
+  expect(document.querySelectorAll('.bg-skeleton').length).toBeGreaterThan(3)
 })
 
 test("the day's pill opens what was earned that day", () => {

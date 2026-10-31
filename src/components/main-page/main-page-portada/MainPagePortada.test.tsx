@@ -96,10 +96,10 @@ test('a wide picture the game page reads (RA, Xbox) comes first', () => {
   expect(artOf(container)).toBe('https://wide/art.png')
 })
 
-test('draws nothing while loading or without a game', () => {
+test('holds its box while loading, and draws nothing without a game', () => {
   ;(useRecentFeed as jest.Mock).mockReturnValue({ feed: [steamItem], loading: true })
   const { container, rerender } = render(<MainPagePortada />)
-  expect(container).toBeEmptyDOMElement()
+  expect(container.querySelector('.home-cover .bg-skeleton')).toBeInTheDocument()
   ;(useRecentFeed as jest.Mock).mockReturnValue({ feed: [], loading: false })
   rerender(<MainPagePortada />)
   expect(container).toBeEmptyDOMElement()

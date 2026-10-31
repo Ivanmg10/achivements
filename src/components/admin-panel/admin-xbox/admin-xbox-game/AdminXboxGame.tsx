@@ -5,6 +5,7 @@ import { IconChevronDown } from '@tabler/icons-react'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { useAdminXboxAchievements } from '@/hooks/useAdminXboxAchievements'
 import type { XboxGameProgress } from '@/types/xbox'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /** Admin panel text is English (exempt from i18n). */
 
@@ -55,7 +56,7 @@ export default function AdminXboxGame({ xuid, game }: { xuid: string; game: Xbox
 
       {open && (
         <div id={panelId} className="px-3 pb-3">
-          {loading && <div aria-busy="true" className="h-5 w-40 rounded bg-ink/10 animate-pulse" />}
+          {loading && <Skeleton className="h-5 w-40" />}
           {error && (
             <p role="alert" className="text-sm text-danger">
               Could not load the achievements.{' '}

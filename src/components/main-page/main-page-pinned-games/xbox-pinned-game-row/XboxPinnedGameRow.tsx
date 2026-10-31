@@ -16,6 +16,7 @@ import XboxRecentlyPlayedExpanded from '@/components/xbox/xbox-recently-played-e
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import { gameHref, gameKey } from '@/utils/gameRef'
 import { xboxBackdrop } from '@/utils/xboxTitles'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 /**
  * A pinned Xbox game on the main page — PsnPinnedGameRow's counterpart: drag
@@ -35,7 +36,7 @@ export default function XboxPinnedGameRow({ gameId, isOpen, onToggle }: { gameId
   if (!game) {
     // Loading, or a pin for a game no longer in the library (Xbox unlinked): a placeholder that can still be unpinned.
     return libraryLoading ? (
-      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-tile h-24 animate-pulse" />
+      <div ref={setNodeRef} style={style}><GameRowSkeleton /></div>
     ) : (
       <div ref={setNodeRef} style={style} className="bg-bg-main rounded-card flex items-center gap-3 px-3 py-3">
         <XboxLogo size={20} className="text-text-secondary shrink-0" aria-hidden="true" />

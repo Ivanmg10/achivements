@@ -21,7 +21,7 @@ export default function MainPageJournal({ achievements, isLoading }: { achieveme
     <div className="flex flex-col gap-2">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.journal}</p>
       {isLoading ? (
-        <SkeletonGameList count={4} />
+        <SkeletonGameList count={7} />
       ) : days.length === 0 ? (
         <EmptyState icon={<IconNotebook className="w-6 h-6" />} title={T.cards.noData} size="compact" className="py-2" />
       ) : (

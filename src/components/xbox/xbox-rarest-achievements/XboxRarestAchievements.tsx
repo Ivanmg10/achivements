@@ -8,6 +8,7 @@ import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
 import { useSubject } from '@/context/SubjectContext'
 import { decimal } from '@/utils/utils'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 const SHOWN = 4
 const SKELETON_ROWS = 4
@@ -40,7 +41,7 @@ export default function XboxRarestAchievements({
       {isLoading ? (
         <ul aria-busy="true" className="flex flex-col gap-2">
           {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-            <li key={i} className="h-12 bg-ink/5 rounded-lg animate-pulse" />
+            <li key={i}><SkeletonRow className="h-12 px-1" /></li>
           ))}
         </ul>
       ) : rarest.length === 0 ? (

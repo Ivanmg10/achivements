@@ -11,6 +11,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useStreakData } from '@/hooks/useStreakData'
 import { IconHome, IconChevronLeft, IconSearch, IconMenu } from '@tabler/icons-react'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 // Downloaded the first time it is opened, not with the page.
 const SearchModal = dynamic(() => import('@/components/search-modal/SearchModal'), { loading: () => null })
@@ -241,7 +242,7 @@ export default function MainHeader() {
             </>
           ) : status === 'loading' ? (
             // Still reading the session: a placeholder where the avatar goes, not a flash of "Sign in".
-            <span aria-hidden="true" className="w-36 h-11 rounded-full bg-bg-main/60 animate-pulse motion-reduce:animate-none" />
+            <Skeleton radius="circle" className="w-36 h-11" />
           ) : (
             <Button
               href="/authPage"

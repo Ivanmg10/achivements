@@ -4,10 +4,10 @@ import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamSignup } from '@/hooks/useSteamSignup'
 import { USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
-import Spinner from '@/components/main-spinner/Spinner'
 import SteamSignInButton from '@/components/steam-sign-in-button/SteamSignInButton'
 import SteamSignupFormFields from '@/components/steam-signup-form-fields/SteamSignupFormFields'
 import WelcomeEntryCurtain from '@/components/welcome-entry-curtain/WelcomeEntryCurtain'
+import AuthFormSkeleton from '@/components/auth-form-skeleton/AuthFormSkeleton'
 
 /**
  * Where the Steam callback lands (/authPage?steam=…): signs in a known Steam
@@ -44,10 +44,7 @@ export default function SteamSignupForm({ outcome }: { outcome: string }) {
       </div>
 
       {(state.status === 'loading' || state.status === 'signed-in') && (
-        <div role="status" className="flex flex-col items-center gap-3 py-6 text-text-secondary text-sm">
-          <Spinner size={28} />
-          {s.checking}
-        </div>
+        <AuthFormSkeleton label={s.checking} />
       )}
 
       {state.status === 'error' && (

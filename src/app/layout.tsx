@@ -12,8 +12,8 @@ import { display, fira, firaDisplay, sofia, sofiaDisplay, ui } from '@/lib/fonts
 // every load flashes dark until the session says otherwise.
 const THEME_SCRIPT = `try{var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(${JSON.stringify(THEMES)}.indexOf(t)>-1)document.documentElement.dataset.theme=t}catch(e){}`
 
-// Likewise the page's shape and font (slanted Barlow by default): the last choices, before the first frame.
-const LOOK_SCRIPT = `try{var d=document.documentElement;if(localStorage.getItem('shape-style')==='round')d.dataset.shape='round';var f=localStorage.getItem('font-style');if(f==='sofia'||f==='fira')d.dataset.font=f}catch(e){}`
+// Likewise the page's shape and font (slanted Barlow by default) and the home's layout: the last choices, before the first frame.
+const LOOK_SCRIPT = `try{var d=document.documentElement;if(localStorage.getItem('shape-style')==='round')d.dataset.shape='round';var f=localStorage.getItem('font-style');if(f==='sofia'||f==='fira')d.dataset.font=f;if(localStorage.getItem('home-layout')==='cover')d.dataset.homeLayout='cover'}catch(e){}`
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

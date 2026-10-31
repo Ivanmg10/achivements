@@ -15,6 +15,7 @@ import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import PsnRecentlyPlayedExpanded from '@/components/psn/psn-recently-played-expanded/PsnRecentlyPlayedExpanded'
 import { gameHref, gameKey } from '@/utils/gameRef'
 import { psnBackdrop } from '@/utils/psnTitles'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 /**
  * A pinned PSN game on the main page — SteamPinnedGameRow's counterpart:
@@ -34,7 +35,7 @@ export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId:
   if (!game) {
     // Loading, or a pin for a game no longer in the list (PSN unlinked): a placeholder that can still be unpinned.
     return libraryLoading ? (
-      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-tile h-24 animate-pulse" />
+      <div ref={setNodeRef} style={style}><GameRowSkeleton /></div>
     ) : (
       <div ref={setNodeRef} style={style} className="bg-bg-main rounded-card flex items-center gap-3 px-3 py-3">
         <PlaystationLogo size={20} className="text-text-secondary shrink-0" aria-hidden="true" />
