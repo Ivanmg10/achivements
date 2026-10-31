@@ -2,6 +2,9 @@ import { StrictMode } from 'react'
 import { render, renderHook, waitFor, act } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { SteamGamesDataProvider, useSteamGamesData } from './SteamGamesDataContext'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
+
+jest.mock('@/context/HiddenGamesContext', () => ({ useHiddenGames: jest.fn() }))
 
 const RECENT = [{ _source: 'steam', id: 1, title: 'Recent', hasStats: true }]
 const LIBRARY = [{ _source: 'steam', id: 2, title: 'Owned', hasStats: true }]
@@ -38,6 +41,7 @@ function wrapper({ children }: { children: React.ReactNode }) {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  ;(useHiddenGames as jest.Mock).mockReturnValue({ isHidden: () => false })
   global.fetch = jest.fn()
   jest.spyOn(console, 'error').mockImplementation(() => {})
 })
@@ -72,6 +76,21 @@ test('loads the recent feed, then the library', async () => {
     '/api/steam/recentlyPlayed',
     '/api/steam/ownedGames',
   ])
+})
+
+test('hidden games leave recent and library listings but not direct id lookups', async () => {
+  setSteamId('765')
+  mockRoutes(
+    ok([...RECENT, { _source: 'steam', id: 2, title: 'Visible', hasStats: true }]),
+    ok([...RECENT, ...LIBRARY]),
+  )
+  ;(useHiddenGames as jest.Mock).mockReturnValue({ isHidden: (id: number, source: string) => source === 'steam' && id === 1 })
+  const { result } = renderHook(() => useSteamGamesData(), { wrapper })
+
+  await waitFor(() => expect(result.current.libraryLoading).toBe(false))
+  expect(result.current.recent.map((game) => game.id)).toEqual([2])
+  expect(result.current.library.map((game) => game.id)).toEqual([2])
+  expect(result.current.fullLibrary.map((game) => game.id)).toEqual([1, 2])
 })
 
 test('surfaces a failed recent feed and still loads the library', async () => {

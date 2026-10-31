@@ -56,6 +56,13 @@ test('only their public groups are listed', async () => {
   expect(listGroups).toHaveBeenCalledWith(7, { publicOnly: true, xbox: false })
 })
 
+test('a hidden favorite game leaves the public profile without hiding the user', async () => {
+  ;(hiddenGameKeys as jest.Mock).mockResolvedValue(['ra:1'])
+  const data = await body(get())
+  expect(data.username).toBe('ivan')
+  expect(data.favorites).toEqual({ ra: null, steam: null, psn: null, xbox: null })
+})
+
 test('the gender is shown only when they chose to show it', async () => {
   expect((await body(get())).gender).toBeNull()
   ;(findPublicUser as jest.Mock).mockResolvedValue({ ...ROW, genderPublic: true })

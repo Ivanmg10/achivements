@@ -5,6 +5,9 @@ import { listGroups } from '@/lib/groupList'
 import pool from '@/lib/db'
 import { canUseXbox } from '@/utils/xboxAccess'
 import { vaultTotalsOrNone } from '@/lib/rankings'
+import type { GameSource } from '@/types/steam'
+
+type SavedGame = { id: number; title: string; imageIcon: string } | null
 
 /**
  * A CheevoVault user's public profile: who they are, which platforms they
@@ -34,6 +37,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ usernam
       vaultTotalsOrNone([user.id], xbox),
     ])
 
+    const favorite = (source: GameSource, game: SavedGame) => game && !hiddenGames.includes(`${source}:${game.id}`) ? game : null
+
     return NextResponse.json({
       username: user.username,
       avatar: user.avatar,
@@ -50,7 +55,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ usernam
       isSelf: String(user.id) === String(viewer.id),
       theme: user.theme,
       gender: user.genderPublic ? user.gender : null,
-      favorites: { ra: user.favorite_game, steam: user.favorite_steam_game, psn: user.favorite_psn_game, xbox: xbox ? user.favorite_xbox_game : null },
+      favorites: { ra: favorite('ra', user.favorite_game), steam: favorite('steam', user.favorite_steam_game), psn: favorite('psn', user.favorite_psn_game), xbox: xbox ? favorite('xbox', user.favorite_xbox_game) : null },
       hiddenGames: xbox ? hiddenGames : hiddenGames.filter((key: string) => !key.startsWith('xbox:')),
       groups,
       // Whether the viewer follows them, for the Follow button.

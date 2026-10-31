@@ -51,6 +51,11 @@ const time = (e: LibraryEntry) => {
   return Number.isNaN(t) ? -Infinity : t
 }
 const recentFirst = (a: LibraryEntry, b: LibraryEntry) => time(b) - time(a) || a.title.localeCompare(b.title)
+const completedTime = (e: LibraryEntry) => {
+  const t = e.completedAt ? Date.parse(e.completedAt) : NaN
+  return Number.isNaN(t) ? -Infinity : t
+}
+const completedFirst = (a: LibraryEntry, b: LibraryEntry) => completedTime(b) - completedTime(a) || a.title.localeCompare(b.title)
 const closestFirst = (a: LibraryEntry, b: LibraryEntry) => (b.pct ?? -1) - (a.pct ?? -1) || recentFirst(a, b)
 
 /**
@@ -66,8 +71,8 @@ export function buildShelves(entries: LibraryEntry[], category: string, now = Da
   const out: Shelf[] =
     category === 'completed'
       ? [
-          shelf('recent', take([...entries].sort(recentFirst).slice(0, SHELF_CAP))),
-          shelf('older', take([...entries].sort(recentFirst))),
+          shelf('recent', take(entries.filter((e) => e.completedAt).sort(completedFirst).slice(0, SHELF_CAP))),
+          shelf('older', take([...entries].sort(completedFirst))),
         ]
       : category === 'wantToPlay'
         ? [

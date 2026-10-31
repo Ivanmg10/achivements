@@ -146,13 +146,6 @@ export function beatenProgress(items: InsightAchievement[]): { done: number; tot
 /** Missable achievements still not earned. */
 export const missablesLeft = (items: InsightAchievement[]) => items.filter((a) => a.kind === 'missable' && !a.earned).length
 
-/** When the last achievement fell, for a game with every one earned. */
-export function finishedAt(items: InsightAchievement[]): string | null {
-  if (items.length === 0 || items.some((a) => !a.earned)) return null
-  const times = items.map((a) => (a.earnedAt ? Date.parse(a.earnedAt) : NaN)).filter((t) => !Number.isNaN(t))
-  return times.length ? new Date(Math.max(...times)).toISOString() : null
-}
-
 /** What was earned last, newest first. */
 export const recentEarned = (items: InsightAchievement[], n = 5) =>
   items

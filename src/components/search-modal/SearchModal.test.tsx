@@ -5,6 +5,9 @@ import { useRaLinked } from '@/hooks/useRaLinked'
 import { useSession } from 'next-auth/react'
 import { en } from '@/translations/en'
 import type { GameCandidate } from '@/utils/gameCandidates'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
+
+jest.mock('@/context/HiddenGamesContext', () => ({ useHiddenGames: jest.fn() }))
 
 const mockPush = jest.fn()
 jest.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }))
@@ -29,6 +32,7 @@ function candidate(source: 'ra' | 'steam' | 'psn', id: number, title: string): G
 
 beforeEach(() => {
   jest.clearAllMocks()
+  ;(useHiddenGames as jest.Mock).mockReturnValue({ isHidden: () => false })
   localStorage.clear()
   ;(useGameCandidates as jest.Mock).mockReturnValue([candidate('ra', 620, 'Zelda'), candidate('steam', 620, 'Portal 2')])
   ;(useRaLinked as jest.Mock).mockReturnValue(true)
@@ -110,6 +114,14 @@ test('a pasted id opens that RA game; without an RA account it is not looked up'
   render(<SearchModal isOpen onClose={jest.fn()} />)
   type('620')
   expect(screen.queryByText(en.search.openById)).not.toBeInTheDocument()
+})
+
+test('a hidden game is not offered again through a pasted id', () => {
+  ;(useHiddenGames as jest.Mock).mockReturnValue({ isHidden: (id: number, source: string) => source === 'ra' && id === 1234 })
+  render(<SearchModal isOpen onClose={jest.fn()} />)
+  type('1234')
+  expect(screen.queryByText(en.search.openById)).not.toBeInTheDocument()
+  expect(mockPush).not.toHaveBeenCalled()
 })
 
 test('says so when nothing matches', () => {

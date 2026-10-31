@@ -1,10 +1,14 @@
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
+jest.mock('@/lib/scoreRefresh', () => ({ rebuildPeriods: jest.fn() }))
+jest.mock('@/lib/rankings', () => ({ markRankingVisibilityChanged: jest.fn() }))
 
 import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
 import { DELETE, GET, POST } from './route'
+import { rebuildPeriods } from '@/lib/scoreRefresh'
+import { markRankingVisibilityChanged } from '@/lib/rankings'
 
 const post = (body: unknown) => new NextRequest('http://localhost/api/hiddenGames', { method: 'POST', body: JSON.stringify(body) })
 const del = (qs: string) => new NextRequest(`http://localhost/api/hiddenGames?${qs}`, { method: 'DELETE' })
@@ -34,6 +38,8 @@ test('POST hides a game, keeping its title and image', async () => {
   const res = await POST(post({ source: 'steam', gameId: 620, title: ' Portal 2 ', image: 'https://cdn/x.jpg' }))
   expect(status(res)).toBe(200)
   expect((pool.query as jest.Mock).mock.calls.at(-1)![1]).toEqual(['7', 'steam', 620, 'Portal 2', 'https://cdn/x.jpg'])
+  expect(rebuildPeriods).toHaveBeenCalledWith(7)
+  expect(markRankingVisibilityChanged).toHaveBeenCalled()
 })
 
 test('POST drops an image that is not https or a site path', async () => {
@@ -52,6 +58,8 @@ test('POST refuses a bad source, id or title', async () => {
 test('DELETE shows a game again, only for this user', async () => {
   expect(status(await DELETE(del('source=ra&gameId=5')))).toBe(200)
   expect((pool.query as jest.Mock).mock.calls.at(-1)![1]).toEqual(['7', 'ra', 5])
+  expect(rebuildPeriods).toHaveBeenCalledWith(7)
+  expect(markRankingVisibilityChanged).toHaveBeenCalled()
   expect(status(await DELETE(del('source=ra')))).toBe(400)
   expect(status(await DELETE(del('source=xx&gameId=5')))).toBe(400)
 })

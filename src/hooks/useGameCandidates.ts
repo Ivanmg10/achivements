@@ -9,6 +9,7 @@ import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { buildPsnCandidates, buildRaCandidates, buildSteamCandidates, buildXboxCandidates, GameCandidate } from '@/utils/gameCandidates'
 import { xboxHasAchievements } from '@/utils/xboxTitles'
 import type { WantToPlayGame } from '@/types/types'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 /**
  * Every game the user can pick from, RA, Steam, PSN and Xbox, for the pin,
@@ -21,6 +22,7 @@ import type { WantToPlayGame } from '@/types/types'
 export function useGameCandidates(enabled: boolean): GameCandidate[] {
   // Want-to-play is RA-only: a viewer without that account has none to fetch.
   const rausername = useSession().data?.user?.rausername
+  const { isHidden } = useHiddenGames()
   const { all } = useGamesData()
   const { games: recent } = useRecentlyPlayedGames()
   const { library } = useSteamGamesData()
@@ -42,11 +44,11 @@ export function useGameCandidates(enabled: boolean): GameCandidate[] {
 
   return useMemo(
     () => [
-      ...buildRaCandidates(all ?? [], recent ?? [], wantToPlay),
+      ...buildRaCandidates(all ?? [], recent ?? [], wantToPlay.filter((game) => !isHidden(game.ID ?? game.GameID!, 'ra'))),
       ...buildSteamCandidates(library ?? []),
       ...buildPsnCandidates(psnLibrary ?? []),
       ...buildXboxCandidates((xboxLibrary ?? []).filter(xboxHasAchievements)),
     ],
-    [all, recent, wantToPlay, library, psnLibrary, xboxLibrary],
+    [all, recent, wantToPlay, library, psnLibrary, xboxLibrary, isHidden],
   )
 }

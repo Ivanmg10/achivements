@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
 import { isGameSource } from '@/utils/gameRef'
 import { sourceAllowed } from '@/utils/xboxAccess'
+import { rebuildPeriods } from '@/lib/scoreRefresh'
+import { markRankingVisibilityChanged } from '@/lib/rankings'
 
 /**
  * Games the user has hidden from their status lists, RA or Steam. A hidden
@@ -60,6 +62,8 @@ export async function POST(req: NextRequest) {
        ON CONFLICT (user_id, source, game_id) DO UPDATE SET title = EXCLUDED.title, image = EXCLUDED.image`,
       [session.user.id, source, gameId, title.trim(), safeImage],
     )
+    await rebuildPeriods(Number(session.user.id))
+    await markRankingVisibilityChanged()
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[hiddenGames POST]', err)
@@ -78,6 +82,8 @@ export async function DELETE(req: NextRequest) {
     if (!Number.isInteger(gameId) || gameId <= 0) return NextResponse.json({ message: 'Falta gameId' }, { status: 400 })
 
     await pool.query('DELETE FROM hidden_games WHERE user_id = $1 AND source = $2 AND game_id = $3', [session.user.id, source, gameId])
+    await rebuildPeriods(Number(session.user.id))
+    await markRankingVisibilityChanged()
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('[hiddenGames DELETE]', err)

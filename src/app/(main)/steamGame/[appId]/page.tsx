@@ -30,7 +30,7 @@ export default function SteamGamePage() {
   const { appId: rawId } = useParams()
   const appId = typeof rawId === 'string' && /^\d+$/.test(rawId) ? Number(rawId) : null
   const { T } = useLanguage()
-  const { isLinked, library, libraryLoading } = useSteamGamesData()
+  const { isLinked, fullLibrary, libraryLoading } = useSteamGamesData()
   const { achievements, isLoading: achievementsLoading, error: achievementsError, retry } = useSteamAchievements(
     isLinked ? appId : null,
   )
@@ -52,7 +52,7 @@ export default function SteamGamePage() {
     )
   }
 
-  const game = library.find((g) => g.id === appId) ?? null
+  const game = fullLibrary.find((g) => g.id === appId) ?? null
 
   // Nothing to title the page with yet.
   if (!game && !details && (libraryLoading || detailsLoading)) {

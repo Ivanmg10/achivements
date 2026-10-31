@@ -2,6 +2,9 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { GamesDataProvider, useGamesData } from './GamesDataContext'
 import { useSession } from 'next-auth/react'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
+
+jest.mock('@/context/HiddenGamesContext', () => ({ useHiddenGames: jest.fn() }))
 
 jest.mock('next-auth/react', () => ({ useSession: jest.fn() }))
 jest.mock('@/lib/fetchWithRetry', () => ({
@@ -15,6 +18,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 beforeEach(() => {
   jest.clearAllMocks()
+  ;(useHiddenGames as jest.Mock).mockReturnValue({ isHidden: () => false })
 })
 
 test('does not fetch when rausername is null, sets isLoading false', async () => {
@@ -37,6 +41,22 @@ test('fetches games when rausername is present', async () => {
   await waitFor(() => expect(result.current.isLoading).toBe(false))
   expect(fetchWithRetry).toHaveBeenCalledWith('/api/getGamesCompleted')
   expect(result.current.all).toHaveLength(1)
+})
+
+test('removes hidden games from every derived library selector', async () => {
+  const games = [
+    { GameID: 1, ConsoleID: 1, ConsoleName: 'SNES', HardcoreMode: '1', PctWon: '1' },
+    { GameID: 2, ConsoleID: 1, ConsoleName: 'SNES', HardcoreMode: '0', PctWon: '0.5' },
+  ]
+  ;(fetchWithRetry as jest.Mock).mockResolvedValue(games)
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { id: '1', rausername: 'testuser' } }, status: 'authenticated' })
+  ;(useHiddenGames as jest.Mock).mockReturnValue({ isHidden: (id: number, source: string) => source === 'ra' && id === 1 })
+
+  const { result } = renderHook(() => useGamesData(), { wrapper })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  expect(result.current.all.map((game) => game.GameID)).toEqual([2])
+  expect(result.current.hardcore).toEqual([])
+  expect(result.current.inProgress.map((game) => game.GameID)).toEqual([2])
 })
 
 test('fetches when rausername changes from null to value', async () => {

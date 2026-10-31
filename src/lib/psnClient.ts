@@ -31,6 +31,7 @@ import {
 import { countTrophies, psnNumericId, psnPlatformName } from '@/utils/psnTitles'
 import { mapLimit } from '@/utils/utils'
 import type { PsnGameProgress, PsnRecentTrophy, PsnTrophy, PsnTrophyGroup, TrophyCounts } from '@/types/psn'
+import { withPsnCompletionDates } from '@/lib/psnCompletion'
 
 /**
  * PlayStation Network through psn-api, which speaks Sony's own (unofficial)
@@ -550,6 +551,12 @@ export async function psnTitles(accountId: string, userId: string | null = null)
     },
     { userId, refreshable: true },
   )
+}
+
+/** Library DTO with base completion dates; raw title/activity caches keep their existing shape and keys. */
+export async function psnTitlesWithCompletion(accountId: string, userId: string | null = null): Promise<PsnGameProgress[]> {
+  const games = await psnTitles(accountId, userId)
+  return withPsnCompletionDates(games, (game) => psnGameTrophies(accountId, game, userId))
 }
 
 /**

@@ -65,6 +65,12 @@ auth, 429 rate limited, 502/503 upstream).
 Change the shape of a cached value → bump its key's version (`gameData_v2:` →
 `_v3`) in the same change.
 
+Hidden-game visibility is a projection, not a canonical-cache key. Listing routes apply
+`src/lib/gameVisibility.ts` after the cached read and disable browser reuse; shared client providers
+apply the same `source:id` rule for immediate hide/show. Raw `fullLibrary` remains available to direct
+game pages. Stored score periods are rebuilt and a shared Postgres revision changes the five-minute
+ranking-cache key in every instance on visibility changes.
+
 Xbox server loaders share one OpenXBL guard: a 5 s timeout, a PostgreSQL-backed
 150-call hourly budget, and per-instance 429 cooldown. `xboxTelemetry.ts` uses
 `AsyncLocalStorage` to attach sanitized operation logs and request-scoped counts
@@ -90,6 +96,9 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
    is kept in `steam_cache` (`score:fill:<user>`) for the screens.
 2. **Formula** — `src/utils/vaultScore.ts` (pure), fed by the per-platform
    mappers in `src/utils/vaultScoreInputs.ts`; levels in `src/utils/vaultLevel.ts`.
+   `src/utils/completionDates.ts` supplies the separate nullable base-completion date used by the
+   completion bonus. PSN/Xbox library responses are enriched through existing achievement caches;
+   Steam uses `lastUnlock` and Xbox `unlockedAt` when the current set is complete.
 3. **Storage** — `score_games` (one row per game, points before the stack
    factor, unlocks by day), `score_periods` (weeks and months, rebuilt per user),
    `score_snapshots` (Monday ranks, for the arrows). `migrations/040`.

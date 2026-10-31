@@ -1,6 +1,7 @@
 jest.mock('@/lib/apiAuth', () => ({ requireRaSession: jest.fn() }))
 jest.mock('@/lib/raCache', () => ({ withCache: jest.fn() }))
 jest.mock('@/lib/raClient', () => ({ getAchievementsEarnedBetween: jest.fn() }))
+jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
 
 import { GET } from './route'
 import { NextResponse } from 'next/server'

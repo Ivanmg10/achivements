@@ -1,5 +1,5 @@
 import {
-  beatenProgress, finishedAt, fromPsn, fromRa, fromSteam, hardest, milestones, missablesLeft, nextTargets, paceEstimate, rarestEarned, rarityBands, recentEarned, calendarEnd, toRecentAchievements,
+  beatenProgress, fromPsn, fromRa, fromSteam, hardest, milestones, missablesLeft, nextTargets, paceEstimate, rarestEarned, rarityBands, recentEarned, calendarEnd, toRecentAchievements,
   type InsightAchievement,
 } from './gameInsights'
 
@@ -87,13 +87,6 @@ test('beatenProgress and missablesLeft read the RA tags', () => {
   expect(beatenProgress(list)).toEqual({ done: 1, total: 2 })
   expect(missablesLeft(list)).toBe(1)
   expect(beatenProgress([a('x')])).toBeNull()
-})
-
-test('finishedAt is the last unlock, and only for a finished game', () => {
-  expect(finishedAt([a('1', { earned: true, earnedAt: '2024-01-01T00:00:00Z' }), a('2', { earned: true, earnedAt: '2024-03-01T00:00:00Z' })])).toBe('2024-03-01T00:00:00.000Z')
-  expect(finishedAt([a('1', { earned: true, earnedAt: '2024-01-01T00:00:00Z' }), a('2')])).toBeNull()
-  expect(finishedAt([])).toBeNull()
-  expect(finishedAt([a('1', { earned: true })])).toBeNull()
 })
 
 describe('recentEarned and hardest', () => {

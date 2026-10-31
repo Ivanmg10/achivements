@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { IconSearch, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
 import { useRaLinked } from '@/hooks/useRaLinked'
 import { USER_SEARCH_MIN, useUserSearch } from '@/hooks/useUserSearch'
@@ -52,6 +53,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
   const router = useRouter()
   const { data: session } = useSession()
   const candidates = useGameCandidates(isOpen)
+  const { isHidden } = useHiddenGames()
   const raLinked = useRaLinked()
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -86,11 +88,10 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
 
   const directGameId = useMemo(() => {
     if (!raLinked) return null
-    if (/^\d{3,}$/.test(typed)) return parseInt(typed)
-    const urlMatch = typed.match(/retroachievements\.org\/game\/(\d+)/i)
-    if (urlMatch) return parseInt(urlMatch[1])
-    return null
-  }, [typed, raLinked])
+    const id = /^\d{3,}$/.test(typed) ? parseInt(typed) : typed.match(/retroachievements\.org\/game\/(\d+)/i)?.[1]
+    const parsed = typeof id === 'string' ? parseInt(id) : id
+    return parsed && !isHidden(parsed, 'ra') ? parsed : null
+  }, [typed, raLinked, isHidden])
 
   // What the box searches, by name: only the platforms this person can use.
   const platforms = ['RetroAchievements', 'Steam', 'PlayStation', ...(canUseXbox(session?.user?.admin) ? ['Xbox'] : [])]

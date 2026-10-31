@@ -23,13 +23,13 @@ export function MainProviders({ children }: { children: React.ReactNode }) {
       <PreferencesSync />
       <PresenceHeartbeat />
       <BackInterceptProvider>
+      <HiddenGamesProvider>
       <RecentAchievementsProvider>
         <RecentlyPlayedGamesProvider>
           <ActivityHeatmapYearProvider>
             <GamesDataProvider>
               <PinnedGamesProvider>
                 <ShowcaseProvider>
-                <HiddenGamesProvider>
                 <SteamGamesDataProvider>
                 <PsnGamesDataProvider>
                 <XboxGamesDataProvider>
@@ -40,13 +40,13 @@ export function MainProviders({ children }: { children: React.ReactNode }) {
                 </XboxGamesDataProvider>
                 </PsnGamesDataProvider>
                 </SteamGamesDataProvider>
-                </HiddenGamesProvider>
                 </ShowcaseProvider>
               </PinnedGamesProvider>
             </GamesDataProvider>
           </ActivityHeatmapYearProvider>
         </RecentlyPlayedGamesProvider>
       </RecentAchievementsProvider>
+      </HiddenGamesProvider>
       </BackInterceptProvider>
     </MainViewProvider>
   )

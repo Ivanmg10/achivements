@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { pinnedKey } from '@/utils/utils'
 import type { PinnedAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 /**
  * The user's own pinned achievements (their goals, "achievements to get") across RA,
@@ -16,6 +17,7 @@ import { notify } from '@/lib/notify'
  */
 export function usePinnedAchievements() {
   const { T } = useLanguage()
+  const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
   const [pinned, setPinned] = useState<PinnedAchievement[]>([])
   /** Which load the answer (data or final failure) belongs to; loading is any other being asked for. */
   const [loadedKey, setLoadedKey] = useState<number | null>(null)
@@ -111,5 +113,6 @@ export function usePinnedAchievements() {
   }, [pinned, T])
 
   const answered = loadedKey === reloadKey
-  return { pinned, isLoading: !answered, error: answered && failed, refetch, unpin, reorder }
+  const visible = useMemo(() => hiddenLoading ? [] : pinned.filter((item) => !isHidden(item.game_id, item.source)), [pinned, isHidden, hiddenLoading])
+  return { pinned: visible, isLoading: hiddenLoading || !answered, error: answered && failed, refetch, unpin, reorder }
 }

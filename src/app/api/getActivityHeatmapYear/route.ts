@@ -3,6 +3,7 @@ import { withCache } from '@/lib/raCache'
 import { cachedJson } from '@/lib/httpCache'
 import { requireRaSession } from '@/lib/apiAuth'
 import { getAchievementsEarnedBetween } from '@/lib/raClient'
+import { visibleGamesForUser } from '@/lib/gameVisibility'
 
 const DAY = 24 * 60 * 60
 const CHUNK_DAYS = 30
@@ -67,7 +68,8 @@ export async function GET(req?: Request) {
       )
       for (const chunk of batch) merged.push(...(chunk as unknown[]))
     }
-    return cachedJson(merged, TTL_CURRENT)
+    const visible = await visibleGamesForUser(id, merged, 'ra', (achievement) => (achievement as { GameID: number }).GameID)
+    return cachedJson(visible, 0)
   } catch (err) {
     // Rather than draw a hole: the buckets that did load stay cached, so the
     // client's retry only costs the one that failed.

@@ -69,6 +69,16 @@ test('if the list cannot be read, every game stays visible', async () => {
   expect(console.error).toHaveBeenCalled()
 })
 
+test('a public subject uses the profile owner keys without fetching the viewer list', async () => {
+  const subjectWrapper = ({ children }: { children: React.ReactNode }) => <HiddenGamesProvider initialKeys={['psn:2018800']}>{children}</HiddenGamesProvider>
+  const { result } = renderHook(() => useHiddenGames(), { wrapper: subjectWrapper })
+
+  expect(result.current.isHidden(2018800, 'psn')).toBe(true)
+  expect(result.current.isHidden(2018800, 'steam')).toBe(false)
+  expect(result.current.isLoading).toBe(false)
+  expect(fetchMock).not.toHaveBeenCalled()
+})
+
 test('a re-render of the provider keeps the same value, so what reads it is not re-rendered for nothing', async () => {
   fetchMock.mockImplementation(() => ok([]))
   const { result, rerender } = renderHook(() => useHiddenGames(), { wrapper })

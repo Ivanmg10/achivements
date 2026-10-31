@@ -7,10 +7,9 @@ import { RetroAchievementsGameCompleted, UserAwards } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePerfectGamesOrder } from '@/hooks/usePerfectGamesOrder'
-import { applyPerfectOrder, buildPerfectGames, countPerfectGames, latestPerfects } from '@/utils/perfectGames'
+import { applyPerfectOrder, buildPerfectGames, countPerfectGames, latestPerfects, perfectDates } from '@/utils/perfectGames'
 import PerfectPodium from './perfect-podium/PerfectPodium'
 import PerfectGameTile from './perfect-game-tile/PerfectGameTile'
-import { gameKey } from '@/utils/gameRef'
 import PerfectGamesOrderModal from '@/components/main-page/perfect-games-order-modal/PerfectGamesOrderModal'
 import EmptyState from '@/components/empty-state/EmptyState'
 
@@ -39,17 +38,7 @@ export default function MainPagePerfectGames({
   const perfects = useMemo(() => applyPerfectOrder(rawPerfects, order), [rawPerfects, order])
   const counts = useMemo(() => countPerfectGames(rawPerfects), [rawPerfects])
   const latest = useMemo(() => latestPerfects(awards?.VisibleUserAwards, steamGames), [awards, steamGames])
-  // When each reached 100%, for the tooltips: RA from its awards, Steam its last session.
-  const dates = useMemo(() => {
-    const byKey = new Map<string, string>()
-    for (const a of awards?.VisibleUserAwards ?? []) {
-      if (a.AwardType !== 'Mastery/Completion') continue
-      const key = gameKey('ra', a.AwardData)
-      if ((byKey.get(key) ?? '') < a.AwardedAt) byKey.set(key, a.AwardedAt)
-    }
-    for (const g of steamGames) if (g.lastPlayed) byKey.set(gameKey('steam', g.id), g.lastPlayed)
-    return byKey
-  }, [awards, steamGames])
+  const dates = useMemo(() => perfectDates(awards?.VisibleUserAwards, steamGames), [awards, steamGames])
 
   if (isLoading) {
     return (

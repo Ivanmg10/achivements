@@ -6,6 +6,7 @@ import { loadRecentAchievements } from '@/lib/steamRecentAchievements'
 import { parseSteamLanguage } from '@/utils/steamLanguage'
 import { cachedJson } from '@/lib/httpCache'
 import type { SteamRecentAchievement } from '@/types/steam'
+import { visibleGamesForUser } from '@/lib/gameVisibility'
 
 /** The player's latest Steam unlocks, for the profile column — like RA's recent achievements. */
 export async function GET(req: NextRequest) {
@@ -21,8 +22,8 @@ export async function GET(req: NextRequest) {
       () => loadRecentAchievements(auth.session, lang),
       { userId: id, refreshable: true },
     )
-    // Not browser-cached, like the other Steam lists; the DB cache keeps it cheap.
-    return cachedJson(achievements, 0)
+    const visible = await visibleGamesForUser(id, achievements, 'steam', (achievement) => achievement.appId)
+    return cachedJson(visible, 0)
   } catch (err) {
     console.error('[steam/recentAchievements]', err)
     return steamFailure(err)

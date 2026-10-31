@@ -5,6 +5,9 @@ import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { useXboxRecentAchievements } from '@/hooks/useXboxRecentAchievements'
 import { xboxRecentFixture } from '@/test-utils/xboxFixtures'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
+
+jest.mock('@/context/HiddenGamesContext', () => ({ useHiddenGames: jest.fn() }))
 
 jest.mock('next-auth/react', () => ({ useSession: jest.fn() }))
 jest.mock('@/hooks/useSteamRecentAchievements', () => ({ useSteamRecentAchievements: jest.fn() }))
@@ -29,6 +32,7 @@ const xboxYear = (achievements: unknown[] = [], extra: Record<string, unknown> =
 
 beforeEach(() => {
   jest.clearAllMocks()
+  ;(useHiddenGames as jest.Mock).mockReturnValue({ isHidden: () => false })
   steamYear()
   xboxYear()
 })
@@ -51,6 +55,18 @@ test('fetches once when a rausername is present', async () => {
   await waitFor(() => expect(result.current.isLoading).toBe(false))
   expect(fetchWithRetry).toHaveBeenCalledWith('/api/getActivityHeatmapYear')
   expect(result.current.achievements).toEqual(achievements)
+})
+
+test('hidden games do not contribute unlocks to the shared year, streak or Xbox aggregates', async () => {
+  ;(fetchWithRetry as jest.Mock).mockResolvedValue([{ AchievementID: 1, GameID: 10, Date: '2026-01-01' }])
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { rausername: 'ivan' } } })
+  xboxYear([{ gameId: 20, earnedAt: '2026-01-02T00:00:00Z' }])
+  ;(useHiddenGames as jest.Mock).mockReturnValue({ isHidden: () => true })
+
+  const { result } = renderHook(() => useActivityHeatmapYear(), { wrapper })
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  expect(result.current.achievements).toEqual([])
+  expect(result.current.xboxAchievements).toEqual([])
 })
 
 test('shares a single fetch across multiple consumers under the same provider', async () => {

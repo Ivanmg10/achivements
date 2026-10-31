@@ -49,7 +49,7 @@ test('a shelf with more than it shows says how many, and opens them', () => {
 })
 
 test('a completed list opens on the latest finished', () => {
-  const done = [libraryEntry('ra', 9, 'Old', { pct: 100, lastPlayed: days(400) }), libraryEntry('ra', 8, 'New', { pct: 100, lastPlayed: days(2) })]
+  const done = [libraryEntry('ra', 9, 'Old', { pct: 100, lastPlayed: days(400), completedAt: days(400) }), libraryEntry('ra', 8, 'New', { pct: 100, lastPlayed: days(2), completedAt: days(2) })]
   render(<LibraryShelves {...props} entries={done} category="completed" />)
   expect(within(shelf(en.libraryLayout.shelves.recent.title)).getByText('New')).toBeInTheDocument()
 })

@@ -4,6 +4,7 @@ import { presenceColumns } from '@/lib/presence'
 import { isUploadedAvatar } from '@/lib/avatarImage'
 import type { GameSource } from '@/types/steam'
 import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
+import { readCache, writeCache } from '@/lib/steamCache'
 
 /**
  * The rankings, read from the stored scores (scoreRefresh keeps them). Only
@@ -62,6 +63,7 @@ async function gameRows(scope: RankScope | 'self', viewerId: number, xbox: boole
             COUNT(*) FILTER (WHERE g.completed)::int AS completed, SUM(g.earned)::int AS achievements
      FROM score_games g JOIN users u ON u.id = g.user_id
      WHERE g.flag IS DISTINCT FROM 'suspect' AND ${LINKED_ACCOUNT}
+       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)
        AND ($1::boolean OR g.source <> 'xbox') AND ${audience(scope)}
      GROUP BY u.id, g.source`,
     [xbox, viewerId],
@@ -123,6 +125,24 @@ export function rankEntries(rows: GameRow[], periods: PeriodRow[] | null, source
 const GLOBAL_TTL_MS = 5 * 60 * 1000
 const globalCache = new Map<string, { at: number; rows: unknown }>()
 
+/** Hide/show changes the read projection even when no platform data changed. */
+export function clearRankingCache(): void {
+  globalCache.clear()
+}
+
+const VISIBILITY_KEY = 'rankings:hidden-version'
+const VISIBILITY_TTL_MS = 10 * 365 * 24 * 60 * 60 * 1000
+
+async function visibilityVersion(): Promise<string> {
+  return (await readCache<string>(VISIBILITY_KEY)) ?? '0'
+}
+
+/** One shared revision invalidates the five-minute cache in every instance. */
+export async function markRankingVisibilityChanged(): Promise<void> {
+  await writeCache(VISIBILITY_KEY, crypto.randomUUID(), VISIBILITY_TTL_MS)
+  clearRankingCache()
+}
+
 const loading = new Map<string, Promise<unknown>>()
 
 async function cached<T>(key: string, load: () => Promise<T>): Promise<T> {
@@ -152,9 +172,10 @@ export async function loadRanking(opts: { scope: RankScope; period: RankPeriod; 
   }
 
   const start = period === 'week' ? weekStart(now) : monthStart(now)
+  const visibility = await visibilityVersion()
   const [rows, periods] = await Promise.all([
-    cached(`g|${xbox}`, () => gameRows('global', -1, xbox)),
-    period === 'all' ? null : cached(`p|${period}|${start}|${xbox}`, () => periodRows(period, xbox, now)),
+    cached(`g|${xbox}|${visibility}`, () => gameRows('global', -1, xbox)),
+    period === 'all' ? null : cached(`p|${period}|${start}|${xbox}|${visibility}`, () => periodRows(period, xbox, now)),
   ])
   if (viewer < 0) return rankEntries(rows, periods, source)
   // Everyone else may be a few minutes old; the viewer's own row is always read now, so their
@@ -209,7 +230,7 @@ export function streakOf(days: number[], today: number): Streak {
 /**
  * Each user's streaks on the chosen platforms, from the days stored with their scored games
  * (UTC days, as weeks and months are), so no platform is asked. Games without dates
- * (provisional) do not count; hidden games and unticked consoles are not stored at all.
+ * (provisional) do not count; hidden games are excluded from this read projection.
  */
 export async function streaksOf(userIds: number[], source: RankSource, xbox: boolean, now = new Date()): Promise<Map<number, Streak>> {
   if (userIds.length === 0) return new Map()
@@ -218,6 +239,7 @@ export async function streaksOf(userIds: number[], source: RankSource, xbox: boo
     `SELECT g.user_id AS id, array_agg(DISTINCT ((x->>0)::bigint / ${DAY_S})::int ORDER BY ((x->>0)::bigint / ${DAY_S})::int) AS days
      FROM score_games g JOIN users u ON u.id = g.user_id, jsonb_array_elements(g.unlocks) x
      WHERE g.user_id = ANY($1::int[]) AND (x->>0)::bigint > 0 AND g.flag IS DISTINCT FROM 'suspect' AND ${LINKED_ACCOUNT}
+       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)
        AND ($2::text = 'all' OR g.source = $2) AND ($3::boolean OR g.source <> 'xbox')
      GROUP BY g.user_id`,
     [userIds, source, xbox],
@@ -283,6 +305,7 @@ export async function vaultTotals(userIds: number[], xbox: boolean): Promise<Map
     `SELECT g.user_id AS id, SUM(g.points * g.stack_factor)::float AS points
      FROM score_games g JOIN users u ON u.id = g.user_id
      WHERE g.user_id = ANY($1::int[]) AND g.flag IS DISTINCT FROM 'suspect' AND ${LINKED_ACCOUNT}
+       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)
        AND ($2::boolean OR g.source <> 'xbox')
      GROUP BY g.user_id`,
     [userIds, xbox],
@@ -321,6 +344,7 @@ export async function profileTeaser(username: string): Promise<ProfileTeaser | n
             COUNT(g.*) FILTER (WHERE g.completed)::int AS completed, COALESCE(SUM(g.earned), 0)::int AS achievements
      FROM users u
      LEFT JOIN score_games g ON g.user_id = u.id AND g.flag IS DISTINCT FROM 'suspect' AND g.source <> 'xbox' AND ${LINKED_ACCOUNT}
+       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)
      WHERE LOWER(u.username) = LOWER($1) AND u.profile_public AND u.show_in_rankings
      GROUP BY u.username, u.avatar, g.source`,
     [username],

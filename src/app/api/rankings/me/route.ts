@@ -58,7 +58,9 @@ export async function GET() {
          GROUP BY kind`,
         [id, weekStart(now), monthStart(now), xbox],
       ),
-      queryRows<{ n: number }>(`SELECT COUNT(*)::int AS n FROM score_games WHERE user_id = $1 AND provisional AND ($2::boolean OR source <> 'xbox')`, [id, xbox]),
+      queryRows<{ n: number }>(`SELECT COUNT(*)::int AS n FROM score_games g
+        WHERE g.user_id = $1 AND g.provisional AND ($2::boolean OR g.source <> 'xbox')
+          AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)`, [id, xbox]),
       queryRows<{ start: string; points: number }>(
         `SELECT to_char(start, 'YYYY-MM-DD') AS start, SUM(points)::int AS points FROM score_periods
          WHERE user_id = $1 AND kind = 'w' AND start >= $2::date AND ($3::boolean OR source <> 'xbox')
@@ -67,9 +69,10 @@ export async function GET() {
       ),
       queryRows<{ start: string; points: number }>(
         `SELECT to_char(to_timestamp((x->>0)::bigint) AT TIME ZONE 'UTC', 'YYYY-MM-DD') AS start,
-                ROUND(SUM((x->>1)::numeric * stack_factor::numeric))::int AS points
-         FROM score_games, jsonb_array_elements(unlocks) x
-         WHERE user_id = $1 AND flag IS DISTINCT FROM 'suspect' AND ($3::boolean OR source <> 'xbox')
+                ROUND(SUM((x->>1)::numeric * g.stack_factor::numeric))::int AS points
+         FROM score_games g, jsonb_array_elements(g.unlocks) x
+         WHERE g.user_id = $1 AND g.flag IS DISTINCT FROM 'suspect' AND ($3::boolean OR g.source <> 'xbox')
+           AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)
            AND (x->>0)::bigint >= EXTRACT(EPOCH FROM $2::date)::bigint
            AND (x->>0)::bigint < EXTRACT(EPOCH FROM ($2::date + interval '7 days'))::bigint
          GROUP BY start`,

@@ -10,6 +10,7 @@ import LibraryGameDetail, { type LibraryCategory } from '@/components/library-ga
 import { fromRa } from '@/utils/gameInsights'
 import { parseReleaseYear } from '@/utils/utils'
 import type { InfoRow } from '@/components/library-game-detail/library-detail-info/LibraryDetailInfo'
+import { raAwardCompletedAt } from '@/utils/completionDates'
 
 // About three rows at two columns on a wide screen; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
@@ -74,6 +75,7 @@ export default function RaLibraryDetail({
     <LibraryGameDetail
       category={asCategory(category)}
       items={items}
+      completedAt={data ? raAwardCompletedAt(data) : null}
       state={loading ? 'loading' : error && !data ? 'error' : 'ready'}
       errorNode={<SectionFallback error onRefresh={onRetry}>{null}</SectionFallback>}
       ring={{ earned, total, label: T.gameExpanded.allAchievements }}

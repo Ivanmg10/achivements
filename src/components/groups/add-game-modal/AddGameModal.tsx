@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence } from 'framer-motion'
 import { IconSearch, IconX, IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 import type { GameGroupItem } from '@/types/types'
 import type { GameSource } from '@/types/steam'
 import { useGameCandidates } from '@/hooks/useGameCandidates'
@@ -47,6 +48,7 @@ export default function AddGameModal({
 }) {
   const { T, lang } = useLanguage()
   const candidates = useGameCandidates(isOpen)
+  const { isHidden } = useHiddenGames()
   const [query, setQuery] = useState('')
   const [source, setSource] = useState<GameSource | null>(null)
   const [selected, setSelected] = useState<Map<string, GameCandidate>>(new Map())
@@ -83,10 +85,10 @@ export default function AddGameModal({
   /** A pasted RA id or game URL opens that RA game directly. */
   const directGameId = useMemo(() => {
     const q = query.trim()
-    if (/^\d{3,}$/.test(q)) return parseInt(q)
-    const m = q.match(/retroachievements\.org\/game\/(\d+)/i)
-    return m ? parseInt(m[1]) : null
-  }, [query])
+    const id = /^\d{3,}$/.test(q) ? parseInt(q) : q.match(/retroachievements\.org\/game\/(\d+)/i)?.[1]
+    const parsed = typeof id === 'string' ? parseInt(id) : id
+    return parsed && !isHidden(parsed, 'ra') ? parsed : null
+  }, [query, isHidden])
 
   const offered = useMemo(() => candidates.filter((c) => !existingKeys.has(c.key)), [candidates, existingKeys])
   const sources = useMemo(() => SOURCES.filter((s) => offered.some((c) => c.source === s)), [offered])

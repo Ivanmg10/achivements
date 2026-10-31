@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { gameKey, isGameSource, GameRef } from '@/utils/gameRef'
 import type { GameSource } from '@/types/steam'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 type CtxType = {
   /** Pinned games in display order, RA and Steam mixed. */
@@ -34,6 +35,7 @@ const same = (a: GameRef, b: GameRef) => a.source === b.source && a.id === b.id
  */
 export function PinnedGamesProvider({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
+  const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
   const [pins, setPins] = useState<GameRef[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const fetched = useRef(false)
@@ -127,7 +129,8 @@ export function PinnedGamesProvider({ children }: { children: React.ReactNode })
 
   // One object per change of what it holds, so a re-render of the provider (the session updating)
   // does not re-render everything that reads it.
-  const value = useMemo(() => ({ pins, isLoading, isPinned, pinGame, unpinGame, reorder }), [pins, isLoading, isPinned, pinGame, unpinGame, reorder])
+  const visiblePins = useMemo(() => hiddenLoading ? [] : pins.filter((pin) => !isHidden(pin.id, pin.source)), [pins, isHidden, hiddenLoading])
+  const value = useMemo(() => ({ pins: visiblePins, isLoading: Boolean(isLoading || hiddenLoading), isPinned, pinGame, unpinGame, reorder }), [visiblePins, isLoading, hiddenLoading, isPinned, pinGame, unpinGame, reorder])
 
   return (
     <Ctx.Provider value={value}>

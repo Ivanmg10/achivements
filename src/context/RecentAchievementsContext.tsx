@@ -7,6 +7,7 @@ import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { withSubject } from '@/utils/withSubject'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 type CtxType = {
   achievements: RecentAchievement[]
@@ -27,6 +28,7 @@ const Ctx = createContext<ProviderValue>({ achievements: [], isLoading: true, er
 export function RecentAchievementsProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const subject = useSubject()
+  const { isHidden } = useHiddenGames()
   const [wanted, setWanted] = useState(false)
   const request = useCallback(() => setWanted(true), [])
   const [achievements, setAchievements] = useState<RecentAchievement[]>([])
@@ -98,7 +100,8 @@ export function RecentAchievementsProvider({ children }: { children: React.React
 
   // One object per change of what it holds, so a re-render of the provider (the session updating)
   // does not re-render everything that reads it.
-  const value = useMemo(() => ({ achievements, isLoading, error, refetch, request }), [achievements, isLoading, error, refetch, request])
+  const visible = useMemo(() => achievements.filter((achievement) => !isHidden(achievement.GameID, 'ra')), [achievements, isHidden])
+  const value = useMemo(() => ({ achievements: visible, isLoading, error, refetch, request }), [visible, isLoading, error, refetch, request])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { psnErrorFrom, type PsnError } from '@/hooks/usePsnLink'
@@ -6,6 +6,7 @@ import type { PsnRecentTrophy } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { fetchShared } from '@/lib/fetchShared'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 export type PsnTrophyScope = 'recent' | 'activity' | 'year'
 
@@ -18,6 +19,7 @@ export type PsnTrophyScope = 'recent' | 'activity' | 'year'
 export function usePsnRecentTrophies(scope: PsnTrophyScope | null = 'recent') {
   const { data: session } = useSession()
   const subject = useSubject()
+  const { isHidden } = useHiddenGames()
   const accountId = session?.user?.psnaccountid ?? null
   const { lang } = useLanguage()
   const key = accountId && scope ? `${accountId}:${scope}:${lang}` : null
@@ -78,8 +80,9 @@ export function usePsnRecentTrophies(scope: PsnTrophyScope | null = 'recent') {
   }, [key, request, settle])
 
   const ready = Boolean(key) && loadedKey === key
+  const visible = useMemo(() => trophies.filter((trophy) => !isHidden(trophy.gameId, 'psn')), [trophies, isHidden])
   return {
-    trophies: ready ? trophies : [],
+    trophies: ready ? visible : [],
     isLoading: Boolean(key) && (isLoading || !ready),
     error: ready ? error : null,
     retry,
