@@ -69,7 +69,7 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
       {matches.length === 0 ? (
         <p className="text-xs text-text-secondary py-4 text-center">{T.cards.noMatches}</p>
       ) : (
-        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 enter-rows">
           {matches.slice(0, SHOWN).map((g) => (
             <li key={g.key}>
               <Link

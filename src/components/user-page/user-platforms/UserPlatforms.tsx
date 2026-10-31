@@ -63,7 +63,7 @@ export default function UserPlatforms() {
 
   return (
     // Xbox is a fourth card, only for who may use it (an admin, for now): three columns otherwise.
-    <div className={`grid grid-cols-1 gap-4 ${xboxEnabled ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
+    <div className={`grid grid-cols-1 gap-4 enter-cards ${xboxEnabled ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
       <UserPlatformCard
         name="RetroAchievements"
         source="ra"

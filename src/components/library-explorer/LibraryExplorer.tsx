@@ -112,10 +112,9 @@ export default function LibraryExplorer({
 
         {/*
           Changing the view or the platform swaps the whole thing: the old one leaves, the new one comes in.
-          Not initial={false}: that would also switch off the entrance of everything inside (the shelves
-          cascade) the first time the page loads, and leave it for the swaps only.
+          initial={false}: on the first load the rows and cards inside make the entrance, in CSS.
         */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={`${platform}:${layout}`}
             initial={reduce ? false : { opacity: 0, y: 14 }}

@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo } from 'react'
-import { motion, type Variants } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import LibraryShelfCard from '@/components/library-shelf-card/LibraryShelfCard'
 import Shelf from '@/components/ui/Shelf'
@@ -33,12 +32,6 @@ const PHONE_LIMIT = 6
 const slot = (cell: Cell, index: number) =>
   [SLOT[cell.size], cell.right ? RIGHT : '', index >= PHONE_LIMIT ? 'max-sm:hidden' : ''].filter(Boolean).join(' ')
 
-/* The cards follow the shelf's title, one after another in their drawn order. */
-const CARD: Variants = {
-  hidden: { opacity: 0, y: 36, scale: 0.9 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 230, damping: 21 } },
-}
-
 /** One shelf: a titled bento grid of cards, with "see N" when there are more than it shows. */
 export default function LibraryShelf({
   shelf,
@@ -63,11 +56,11 @@ export default function LibraryShelf({
       hint={text.hint}
       action={shelf.entries.length > shelf.cap ? { label: T.libraryLayout.seeShelf.replace('{n}', String(shelf.entries.length)), onClick: () => onSeeShelf(shelf.quick) } : undefined}
     >
-      <div className={GRID}>
+      <div className={`${GRID} enter-cards`}>
         {shown.map((e, i) => (
-          <motion.div key={e.key} variants={CARD} className={slot(cells[i], i)}>
+          <div key={e.key} className={slot(cells[i], i)}>
             <LibraryShelfCard entry={e} size={cells[i].size} completed={shelf.id === 'recent' || shelf.id === 'older'} onPick={onPick} />
-          </motion.div>
+          </div>
         ))}
       </div>
     </Shelf>

@@ -235,6 +235,21 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
   catalogue, then its rule in `uiGuard.test.ts`, then the page. A page that needs a one-off look asks
   for a prop or a variant, never a copy.
 
+### Entrances — a class, never a new animation (2026-10-31, #61)
+
+`docs/design-system.md` → Entrances has the table. **A new page or list brings its entrance in the same
+change:** `.enter-rows` on a list, `tbody` or a hero's text; `.enter-cards` on a grid; `.enter-card` /
+`.enter-rise` on one piece (`[--i:n]` orders them); `.enter-grow-x` / `-y` on a bar, `animateIn` on a ring,
+`CountUp` on a big number. A `ProgressBar` inside any of them grows by itself.
+
+- **CSS keyframes, never Framer's `x`/`y`/`initial` on what appears on a load** (`uiGuard.test.ts` fails on it;
+  what opens on a click may stay in Framer), and never hide an element until a frame, idle callback or observer.
+- `backwards`, never `both`: a fill that stays keeps a transform, which traps `position: fixed` and breaks dragging.
+- A list plays once: `useEntrancesOnce` sets `data-entered`, as a reorder would restart it. Keep a skeleton out of
+  the element that has the class.
+- Reduced motion restates the `--enter-*` tokens, so nothing else is needed for it. Entrance-only: no scroll
+  triggers, no loops. Overlays and page transitions stay as they are.
+
 ## The component library — draw with it (`src/components/ui`, 2026-10-24)
 
 The site's controls come from the library, in the design agreed on the canvas
@@ -1255,12 +1270,8 @@ requires `linked-issue` (see Issues).
       design** (`docs/designs.md`, started): `docs/ui-library-and-designs-plan.md`. A separate
       development, the user's idea (2026-10-23). Design agreed 2026-10-24; building in three PRs
       (foundations and controls, overlays and feedback, surfaces / data / colour sweep).
-- [ ] **Entrance animations on every page and component** (the user's wish, 2026-10-23; issue #61).
-      The home has them (left card: `ViewEntrance`; profile column: `MainPageProfile.module.css`);
-      the rest of the site should get its own, each suited to what it shows. **CSS keyframes, not
-      Framer's `x`/`y`**, for anything that plays on a first load (Framer stutters while the page
-      mounts), and **never hide an element until a frame or idle callback** (it shows empty while the
-      main thread is busy). Reduced motion: a fade at most. Design it first (`docs/design-process.md`).
+- [x] **Entrance animations on every page and component** (issue #61, 2026-10-31). See "Entrances"
+      in the design system section.
 - [ ] **A shareable user card** for social networks (the user's wish, 2026-10-23). Concepts on the
       component library's canvas (`docs/designs.md`). Only data that is already public (what
       `profileTeaser` and the showcase show); anything more means changing `/privacy`. Not started.

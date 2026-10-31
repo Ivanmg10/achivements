@@ -8,7 +8,6 @@ import StatusGameList from '@/components/statusGameList/StatusGameList'
 import CompletedFilter, { CompletedMode } from '@/components/completed-filter/CompletedFilter'
 import ConsoleFilter, { buildConsolePills } from '@/components/console-filter/ConsoleFilter'
 import { useConsoleFilter } from '@/hooks/useConsoleFilter'
-import { motion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
@@ -54,12 +53,7 @@ export default function AllGamesSection({
   }, [games, selected, completedMode, category])
 
   return (
-    <motion.div
-      className="w-full bg-bg-card rounded-tile overflow-hidden"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
-    >
+    <div className="w-full bg-bg-card rounded-tile overflow-hidden enter-card">
       {/* Section header */}
       <button
         onClick={() => setOpen((o) => !o)}
@@ -126,6 +120,6 @@ export default function AllGamesSection({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

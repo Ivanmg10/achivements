@@ -1,8 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { notFound, useParams } from 'next/navigation'
-import { fadeUp } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
@@ -70,7 +68,7 @@ export default function SteamGamePage() {
   return (
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <SteamGameHeroBackground appId={appId} />
-      <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
+      <div className="relative w-full flex flex-col items-center">
         <SteamGameInfoHeader
           appId={appId}
           title={title}
@@ -111,7 +109,7 @@ export default function SteamGamePage() {
         ) : (
           <SteamGameInfoTable achievements={achievements} appId={appId} gameTitle={title} />
         )}
-      </motion.div>
+      </div>
     </main>
   )
 }

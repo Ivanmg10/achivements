@@ -181,7 +181,7 @@ export default function MainPageAbandoned({
           className="py-2"
         />
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 enter-rows">
           {abandoned.slice(0, 6).map((g) => (
             <GameListRow
               key={g.key}

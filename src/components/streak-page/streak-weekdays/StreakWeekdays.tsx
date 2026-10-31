@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatDay, plural } from '@/utils/utils'
 import StreakSectionHead from '../streak-section-head/StreakSectionHead'
@@ -24,8 +25,8 @@ export default function StreakWeekdays({ counts }: { counts: number[] }) {
             <div className="w-full flex items-end" style={{ height: BAR_HEIGHT }}>
               <div
                 aria-hidden="true"
-                className={`w-full ${i === top ? 'bg-accent' : 'bg-accent/35'}`}
-                style={{ ...SLANT, height: Math.max(4, Math.round((n / max) * BAR_HEIGHT)) }}
+                className={`enter-grow-y w-full ${i === top ? 'bg-accent' : 'bg-accent/35'}`}
+                style={{ ...SLANT, '--i': i, height: Math.max(4, Math.round((n / max) * BAR_HEIGHT)) } as CSSProperties}
               />
             </div>
             <span className="text-[0.8125rem] text-text-secondary">

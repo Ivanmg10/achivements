@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { motion, useReducedMotion } from 'framer-motion'
 import { IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSpotlight } from '@/hooks/useSpotlight'
@@ -31,7 +30,6 @@ const MEDALS = [
 export default function CollectionShelf({ games, counts }: { games: LatestPerfect[]; counts: PerfectCounts }) {
   const { T } = useLanguage()
   const subject = useSubject()
-  const reduce = useReducedMotion()
   const onPointerMove = useSpotlight()
 
   return (
@@ -69,15 +67,9 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
       {games.length === 0 ? (
         <EmptyState icon={<IconTrophy className="w-6 h-6" />} title={T.cards.noCompletedGames} subtitle={T.cards.noCompletedGamesSub} size="compact" />
       ) : (
-        <ol className="grid grid-flow-col auto-cols-[minmax(8.5rem,1fr)] gap-3 overflow-x-auto snap-x [scrollbar-width:none]">
+        <ol className="grid grid-flow-col auto-cols-[minmax(8.5rem,1fr)] gap-3 overflow-x-auto snap-x [scrollbar-width:none] enter-cards">
           {games.map((game, i) => (
-            <motion.li
-              key={game.key}
-              className="snap-start"
-              initial={reduce ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: reduce ? 0 : 0.06 * i, ease: [0.16, 1, 0.3, 1] }}
-            >
+            <li key={game.key} className="snap-start">
               <Link
                 href={gameHref(game.source, game.id, subject)}
                 onPointerMove={onPointerMove}
@@ -97,7 +89,7 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
                   </span>
                 </span>
               </Link>
-            </motion.li>
+            </li>
           ))}
         </ol>
       )}

@@ -1,11 +1,9 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
 import { IconFlame } from '@tabler/icons-react'
 import { useStreakData } from '@/hooks/useStreakData'
 import { useLanguage } from '@/context/LanguageContext'
-import { fadeUp } from '@/lib/animations'
 import { Streak } from '@/types/types'
 import { countByDay, streakInsights } from '@/utils/utils'
 import { SectionFallback } from '@/components/ui/SectionFallback'
@@ -45,7 +43,7 @@ export default function StreakPage() {
       <StreakStatsBanner activeStreak={activeStreak} bestStreak={bestStreak} lastActiveDay={lastActiveDay} today={today} todayCount={byDay[today] ?? 0} hoursLeft={24 - new Date(now).getHours()}>
         <StreakQuickStats activeDays={insights.activeDays} avgStreak={insights.avgStreak} daysSinceLast={insights.daysSinceLast} longestGap={insights.longestGap} />
       </StreakStatsBanner>
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2 enter-cards">
         <div className="flex flex-col gap-4 min-w-0">
           <StreakChart streaks={streaks} selectedStreak={selectedStreak} activeStreak={activeStreak} avgStreak={insights.avgStreak} onSelect={setPicked} />
         </div>
@@ -54,7 +52,7 @@ export default function StreakPage() {
           <StreakList key={selectedStreak?.start ?? 'none'} selectedStreak={selectedStreak} today={today} />
         </div>
       </div>
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2 enter-cards">
         <StreakYearHeatmap byDay={byDay} streaks={streaks} selected={selectedStreak} today={today} onSelect={setPicked} />
         <StreakWeekdays counts={insights.weekdays} />
       </div>
@@ -62,13 +60,13 @@ export default function StreakPage() {
     )
 
   return (
-    <motion.div className="flex flex-col gap-4 px-3 py-4 w-full mx-auto" variants={fadeUp} initial="hidden" animate="visible">
+    <div className="flex flex-col gap-4 px-3 py-4 w-full mx-auto">
       {/* The hero is the page's top; its title and what it counts stay for screen readers. */}
       <header className="sr-only">
         <h1>{T.streak.title}</h1>
         <p>{T.streak.pageSub}</p>
       </header>
       {body}
-    </motion.div>
+    </div>
   )
 }

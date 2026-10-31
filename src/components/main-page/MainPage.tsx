@@ -1,7 +1,6 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { motion } from 'framer-motion'
 
 import MainPageSkeleton from './main-page-skeleton/MainPageSkeleton'
 import MainPagePinnedGames from './main-page-pinned-games/MainPagePinnedGames'
@@ -38,17 +37,10 @@ export default function MainPage() {
   }
 
   return (
-    <motion.main
-      ref={homeFit}
-      className="home-fit flex flex-col min-h-full text-text-main"
-      // Opacity only: content landing where the skeleton was, with no slide on top.
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
-    >
+    <main ref={homeFit} className="home-fit flex flex-col min-h-full text-text-main">
       <RaKeyInvalidNotice />
       <MainPageBody />
-    </motion.main>
+    </main>
   )
 }
 

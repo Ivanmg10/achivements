@@ -7,6 +7,7 @@ import type { Counts } from '@/utils/groupItems'
 import { plural } from '@/utils/utils'
 import GroupIconDisplay from '@/components/groups/group-icon-display/GroupIconDisplay'
 import { CircularProgress } from '@/components/ui/CircularProgress'
+import { CountUp } from '@/components/ui/CountUp'
 import Button from '@/components/ui/Button'
 import IconButton from '@/components/ui/IconButton'
 
@@ -64,23 +65,24 @@ export default function GroupDetailHero({
 
         <div className="flex flex-col md:flex-row md:items-end gap-5 md:gap-7">
           {summary.total > 0 ? (
-            <div className="self-start md:self-auto shrink-0">
+            <div className="self-start md:self-auto shrink-0 enter-rise">
               <CircularProgress
                 earned={summary.earned}
                 total={summary.total}
                 size={128}
                 strokeWidth={10}
+                animateIn
                 ariaLabel={`${pct}%`}
-                center={<span className={`font-display italic font-extrabold text-[2.5rem] leading-none ${pct >= 100 ? 'text-success' : 'text-text-main'}`}>{pct}%</span>}
+                center={<span className={`font-display italic font-extrabold text-[2.5rem] leading-none ${pct >= 100 ? 'text-success' : 'text-text-main'}`}><CountUp value={pct} format={(n) => `${n}%`} /></span>}
               />
             </div>
           ) : (
-            <div className="w-20 h-20 rounded-control bg-bg-main ring-1 ring-ink/5 flex items-center justify-center shrink-0 overflow-hidden">
+            <div className="w-20 h-20 rounded-control bg-bg-main ring-1 ring-ink/5 flex items-center justify-center shrink-0 overflow-hidden enter-rise">
               <GroupIconDisplay icon={group.icon} />
             </div>
           )}
 
-          <div className="flex flex-col gap-2 flex-1 min-w-0">
+          <div className="flex flex-col gap-2 flex-1 min-w-0 enter-rows">
             <p className="flex items-center gap-2 flex-wrap text-[0.8125rem] text-text-main">
               <span className="inline-flex items-center gap-1 h-[1.375rem] px-2 rounded-tag text-xs font-bold bg-black/45">
                 <Privacy className="w-3 h-3" aria-hidden="true" />
@@ -107,7 +109,7 @@ export default function GroupDetailHero({
             )}
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 enter-rise [--i:4]">
             <Button
               type="button"
               onClick={onAdd}

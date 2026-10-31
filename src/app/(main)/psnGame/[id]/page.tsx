@@ -1,8 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { notFound, useParams } from 'next/navigation'
-import { fadeUp } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { usePsnTrophies } from '@/hooks/usePsnTrophies'
@@ -58,7 +56,7 @@ export default function PsnGamePage() {
   return (
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <PsnGameHeroBackground src={psnBackdrop(game)} />
-      <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
+      <div className="relative w-full flex flex-col items-center">
         <PsnGameInfoHeader
           game={game}
           details={details}
@@ -87,7 +85,7 @@ export default function PsnGamePage() {
         ) : (
           <PsnGameInfoTable trophies={trophies} groups={groups} gameId={game.id} gameTitle={game.title} />
         )}
-      </motion.div>
+      </div>
     </main>
   )
 }

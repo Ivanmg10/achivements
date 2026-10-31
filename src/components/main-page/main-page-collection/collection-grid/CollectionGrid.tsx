@@ -88,7 +88,7 @@ export default function CollectionGrid({
       {shown.length === 0 ? (
         <p className="text-xs text-text-secondary py-6 text-center">{T.cards.noMatches}</p>
       ) : view === 'order' ? (
-        <ul className={GRID}>
+        <ul className={`${GRID} enter-cards`}>
           {shown.map((g) => (
             <li key={g.key}>
               <CollectionTile game={g} date={dates.get(g.key)} />
@@ -104,7 +104,7 @@ export default function CollectionGrid({
                 <span className="tabular-nums">· {group.games.length}</span>
                 <span aria-hidden="true" className="h-px flex-1 bg-ink/[0.06]" />
               </h4>
-              <ul className={GRID}>
+              <ul className={`${GRID} enter-cards`}>
                 {group.games.map((g) => (
                   <li key={g.key}>
                     <CollectionTile game={g} date={dates.get(g.key)} />

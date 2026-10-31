@@ -122,6 +122,24 @@
   --motion-open: 250ms;
   --motion-indicator: 450ms;
   --ease-spring: cubic-bezier(0.3, 1.2, 0.4, 1);
+  --enter-duration: 450ms;
+  --enter-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --enter-stagger: 40ms;
+  --enter-rise: 12px;
+  --enter-scale: 0.98;
+  --enter-grow: 0;
+}
+
+/* Less motion: the entrances below stay, as a plain fade. Stated here, so every one of them follows. */
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  [data-theme] {
+    --enter-duration: 200ms;
+    --enter-stagger: 0ms;
+    --enter-rise: 0px;
+    --enter-scale: 1;
+    --enter-grow: 1;
+  }
 }
 
 /*
@@ -929,6 +947,73 @@ html[data-font="fira"],
     animation: ring-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
   }
 }
+
+/*
+   Entrances, one set for the whole site (docs/design-system.md → Entrances).
+   .enter-rise   a hero's part: fade and rise. --i orders them, the title first.
+   .enter-card   one card or tile: fade and scale.
+   .enter-rows   on a list or a <tbody>: its first 12 rows rise, one after another.
+   .enter-cards  on a grid: its first 12 cards scale in, one after another.
+   .enter-grow-x / -y  a bar or a podium step growing from its base.
+   A progress bar inside any of them grows on its own ([data-fill]).
+
+   CSS, never Framer: it plays on the compositor while a first load keeps the main
+   thread busy, and what is in the HTML shows without waiting for a script.
+   `backwards`, never `both`: a fill that stays would keep a transform on the element,
+   which traps position: fixed inside it and breaks dragging a sortable row.
+   A list plays once: moving a node restarts its animation, so useEntrancesOnce sets
+   data-entered when the rows are done and a new order or filter does not replay it.
+*/
+@keyframes enter-rise {
+  from { opacity: 0; transform: translateY(var(--enter-rise)); }
+}
+@keyframes enter-card {
+  from { opacity: 0; transform: scale(var(--enter-scale)); }
+}
+@keyframes enter-grow-x {
+  from { transform: scaleX(var(--enter-grow)); }
+}
+@keyframes enter-grow-y {
+  from { transform: scaleY(var(--enter-grow)); }
+}
+
+.enter-rise,
+.enter-rows:not([data-entered]) > :nth-child(-n + 12) { --enter-name: enter-rise; }
+.enter-card,
+.enter-cards:not([data-entered]) > :nth-child(-n + 12) { --enter-name: enter-card; }
+.enter-grow-x { --enter-name: enter-grow-x; transform-origin: left; }
+.enter-grow-y { --enter-name: enter-grow-y; transform-origin: bottom; }
+
+.enter-rise,
+.enter-card,
+.enter-grow-x,
+.enter-grow-y,
+.enter-rows:not([data-entered]) > :nth-child(-n + 12),
+.enter-cards:not([data-entered]) > :nth-child(-n + 12) {
+  animation: var(--enter-name) var(--enter-duration) var(--enter-ease) calc(var(--i, 0) * var(--enter-stagger)) backwards;
+}
+
+.enter-rise [data-fill],
+.enter-card [data-fill],
+.enter-rows:not([data-entered]) > :nth-child(-n + 12) [data-fill],
+.enter-cards:not([data-entered]) > :nth-child(-n + 12) [data-fill] {
+  transform-origin: left;
+  animation: enter-grow-x calc(var(--enter-duration) * 2) var(--enter-ease) calc(var(--i, 0) * var(--enter-stagger)) backwards;
+}
+
+:is(.enter-rows, .enter-cards) > :nth-child(2) { --i: 1; }
+:is(.enter-rows, .enter-cards) > :nth-child(3) { --i: 2; }
+:is(.enter-rows, .enter-cards) > :nth-child(4) { --i: 3; }
+:is(.enter-rows, .enter-cards) > :nth-child(5) { --i: 4; }
+:is(.enter-rows, .enter-cards) > :nth-child(6) { --i: 5; }
+:is(.enter-rows, .enter-cards) > :nth-child(7) { --i: 6; }
+:is(.enter-rows, .enter-cards) > :nth-child(8) { --i: 7; }
+:is(.enter-rows, .enter-cards) > :nth-child(9) { --i: 8; }
+:is(.enter-rows, .enter-cards) > :nth-child(10) { --i: 9; }
+:is(.enter-rows, .enter-cards) > :nth-child(11) { --i: 10; }
+:is(.enter-rows, .enter-cards) > :nth-child(12) { --i: 11; }
+/* A hero's title comes first, with whatever sits above it; its facts follow. */
+.enter-rows > :is(h1, :has(h1)):nth-child(n) { --i: 0; }
 
 /* The top line while a page is on its way (NavigationProgress): fills fast, then slows down and waits. */
 @keyframes nav-progress {

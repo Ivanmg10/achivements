@@ -82,7 +82,7 @@ export default function MainPagePortada() {
       <div aria-hidden="true" className={`absolute inset-0 bg-linear-to-r from-bg-main via-bg-main/85 ${art ? 'to-bg-main/10' : 'to-transparent'}`} />
       <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-bg-main/80 to-transparent to-50%" />
 
-      <div className="relative flex flex-col gap-3 p-6 sm:p-12 max-w-3xl justify-center">
+      <div className="relative flex flex-col gap-3 p-6 sm:p-12 max-w-3xl justify-center enter-rows">
         <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">
           {T.homeLayout.continueKicker}
           {when && <span className="text-text-secondary"> · {when}</span>}

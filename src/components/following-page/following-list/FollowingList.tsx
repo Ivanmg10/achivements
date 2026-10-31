@@ -86,7 +86,7 @@ export default function FollowingList({
       {shown.length === 0 ? (
         <p role="status" className="bg-bg-card rounded-card py-10 text-center text-sm text-text-secondary">{T.following.noMatches}</p>
       ) : (
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[1800px]:grid-cols-5 gap-3">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 min-[1800px]:grid-cols-5 gap-3 enter-cards">
           {shown.map((u) => (
             <li key={u.username} className="flex flex-col">
               <FollowingCard friend={u} lastPlayed={details[u.username]?.lastPlayed} recent={details[u.username]?.recent} />

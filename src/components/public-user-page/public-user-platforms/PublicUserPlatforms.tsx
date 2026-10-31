@@ -46,7 +46,7 @@ export default function PublicUserPlatforms({ games, isLoading }: { games: Libra
       ) : platforms.length === 0 ? (
         <EmptyState icon={null} title={T.userProfile.noGames} size="compact" />
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-2 enter-rows">
           {platforms.map((p) => (
             <li key={p.source} className="bg-bg-main rounded-tile p-3 flex flex-col gap-2.5">
               <p className="flex items-center gap-2 text-sm font-semibold">

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
 import { IconFilterOff } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useFillViewport } from '@/hooks/useFillViewport'
@@ -37,7 +36,6 @@ export default function LibraryList({
   // Measured from the block they share, not from either: the pinned one moves, the block's top is where both start.
   const height = useFillViewport(block, wide)
   const fill = height === undefined ? undefined : { height }
-  const reduce = useReducedMotion()
 
   // The arrow keys can move the selection out of view: keep it in the list's.
   useEffect(() => {
@@ -54,38 +52,29 @@ export default function LibraryList({
         ref={list}
         style={fill}
         // Until it is measured, a guess that fits most screens.
-        className={`flex flex-col gap-0.5 p-1 -m-1 lg:overflow-y-auto lg:overscroll-contain lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] ${height === undefined ? 'lg:max-h-[calc(100dvh-16rem)] lg:min-h-88' : ''}`}
+        className={`enter-rows flex flex-col gap-0.5 p-1 -m-1 lg:overflow-y-auto lg:overscroll-contain lg:[mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] ${height === undefined ? 'lg:max-h-[calc(100dvh-16rem)] lg:min-h-88' : ''}`}
       >
-        {entries.map((e, i) => {
+        {entries.map((e) => {
           const current = e.key === selected?.key
           return (
-            // The rows come in one after another, the first dozen; the rest are below the fold anyway.
-            <motion.li
-              key={e.key}
-              initial={reduce ? false : { opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1], delay: Math.min(i, 12) * 0.03 }}
-            >
+            <li key={e.key}>
               <LibraryListRow entry={e} current={current} category={category} onSelect={(x) => onSelect(!wide && current ? null : x)} />
               {!wide && current && (
                 <div className="mt-2">
                   <LibraryEntryDetail key={e.key} entry={e} category={category} />
                 </div>
               )}
-            </motion.li>
+            </li>
           )
         })}
       </ul>
       {wide && selected && (
-        <motion.aside
-          initial={reduce ? false : { opacity: 0, x: 32 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1], delay: 0.1 }}
+        <aside
           style={fill}
-          className={`sticky top-4 lg:flex lg:flex-col lg:overflow-y-auto lg:overscroll-contain ${height === undefined ? 'lg:h-[calc(100dvh-2rem)]' : ''}`}
+          className={`enter-card [--i:3] sticky top-4 lg:flex lg:flex-col lg:overflow-y-auto lg:overscroll-contain ${height === undefined ? 'lg:h-[calc(100dvh-2rem)]' : ''}`}
         >
           <LibraryEntryDetail key={selected.key} entry={selected} category={category} />
-        </motion.aside>
+        </aside>
       )}
     </div>
   )

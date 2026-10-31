@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { useEntrancesOnce } from '@/hooks/useEntrancesOnce'
 import { useFontStyle } from '@/hooks/useFontStyle'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
 import { useLibraryPrefs } from '@/hooks/useLibraryPrefs'
@@ -22,6 +23,7 @@ export default function ShapeSync() {
   const { layout: libraryLayout } = useLibraryPrefs('')
   const { data: session, status } = useSession()
   const look = status === 'loading' ? undefined : sessionLook(session?.user)
+  useEntrancesOnce()
 
   useEffect(() => {
     const { dataset } = document.documentElement

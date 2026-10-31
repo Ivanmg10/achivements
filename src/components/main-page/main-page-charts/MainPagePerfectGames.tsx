@@ -108,7 +108,7 @@ export default function MainPagePerfectGames({
       <PerfectPodium games={latest} />
 
       {/* An even grid across the card's width, so the icons spread out instead of bunching at one side. */}
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(2.75rem,1fr))] gap-y-3 justify-items-center">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(2.75rem,1fr))] gap-y-3 justify-items-center enter-cards">
         {perfects.map((g) => (
           <PerfectGameTile key={g.key} game={g} date={dates.get(g.key)} />
         ))}

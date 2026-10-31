@@ -29,6 +29,34 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-31 — Entrance animations on every page (`feat/61-entrance-rollout`, #61)
+
+**Did** — One set of CSS entrances in `globals.css` (`.enter-rise`, `-card`, `-rows`, `-cards`, `-grow-x/y`, `--enter-*`
+tokens) applied to every route with the families agreed on 2026-10-25; `/user` first as the reference. Replaced every
+first-load Framer entrance with it (whole pages fading in, `useRise`, `rankingsMotion`, the shelves' cascade, `ChartCard`'s
+`whileInView`, the landing's module). `useEntrancesOnce` ends a list's entrance. `CountUp` gained `format`; `StatPill`,
+`GameHeroTile` and the big figures count up. Guard in `uiGuard.test.ts`, specimen in `/design`, docs in `docs/design-system.md`.
+**Why** — `/user` felt static next to the home. Most other pages did animate, but through Framer: hidden until hydration,
+which the issue forbids.
+**Decisions** — A class on the list plus one document listener for `data-entered`, not a wrapper component: a one-word
+change per list, and it works in server components. Reduced motion restates the tokens instead of a second set of rules.
+A `ProgressBar` grows by being inside an entering element, so no prop. The home's left card and profile column and the
+welcome keep their own keyframes (the first are what the user liked, the second is timed to the curtain). `/design` got
+its title only; a reference page should not make you wait.
+**Verification** — 834 suites / 5,269 tests, ESLint, tsc and the build pass. In a production build, signed in, every route
+at 390 and 2560 px in both designs: entrances play, no horizontal overflow, nothing visible stays faint. Reorder: 0 rows
+replay with `data-entered`, 12 without. Reduced motion: 200 ms fades, no delay, no movement. Against a build of `develop`, 3
+runs each: game page CLS 0 (390) and 0.015 against 0.016–0.037 (2560); no long tasks. Home long tasks equal. Landing LCP
+at 4× CPU 836–972 ms against 816–944 ms, CLS 0.
+**Open** — Home CLS moved a little: 0.098 against 0.094 at 2560 px, 0.25–0.31 against 0.29 at 390 px. The home's CLS was
+already high and comes from data arriving; the Framer fade that was removed probably hid part of it. On a phone the level
+badge overlaps the points on `/user` (`UserVaultLevel`), the same on `develop`; not touched here.
+**Watch out** — Xbox's game page was not opened in the browser (same `GameHero` and table classes as the others). The issue's
+comment has the route inventory. A list that mounts with a skeleton as its child would play on the skeleton. Measuring in one
+Playwright page, init scripts pile up and CLS counts several times: use a new page per run.
+
+---
+
 ## 2026-10-31 — Hidden-game visibility and completion dates (`fix/88-hidden-games-completion-dates`, #88)
 
 **Did** — Applied source-qualified hidden filtering at listing BFF and shared client boundaries, including

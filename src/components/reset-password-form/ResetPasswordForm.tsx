@@ -57,7 +57,7 @@ export default function ResetPasswordForm() {
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto">
+    <div className="w-full max-w-sm mx-auto enter-card">
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-text-main">{T.passwordReset.title}</h1>
         <div className="mt-2 h-0.5 w-10 bg-accent mx-auto rounded-full" />

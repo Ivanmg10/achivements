@@ -47,7 +47,7 @@ export default function MainPageFriendsLeaderboard({ rows }: { rows: LeaderRow[]
         </div>
       </div>
 
-      <ol className="flex flex-col gap-1">
+      <ol className="flex flex-col gap-1 enter-rows">
         {ranked.map((r, i) => {
           const inner = (
             <>
