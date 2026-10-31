@@ -47,7 +47,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
          AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = $3 AND h.source = i.source AND h.game_id = i.game_id)
        ORDER BY i.position ASC`,
       // Hidden items stay stored and return on unhide; public reads use the group owner's keys.
-      [groupId, canUseXbox(session?.user?.admin), group.user_id],
+      [groupId, canUseXbox(session?.user?.admin), user_id],
     )
 
     return NextResponse.json({ ...group, items: itemsRes.rows })
