@@ -45,6 +45,14 @@ dependency and has no QR: a key to type and a link for the app on the same devic
 with the release. Vercel WAF rules are the user's.
 **Watch out** — Nothing here ran on Vercel, and platforms were mocked. The first cold streak ordering took
 about 23 s at 600,000 rows. Unlinking Steam now ends sign-in with it.
+## 2026-10-30 — Stricter reading of Steam's sign-in answer (`fix/steam-openid-strict`)
+
+**Did** — `verifySteamLogin` refuses an answer with a repeated parameter before reading it or asking
+Steam, with tests. Added the rule to CLAUDE.md.
+**Why** — Hardening from the security audit of #90 (its hypothesis H-01). Steam's own behaviour was not
+tested, on purpose, so this does not say a bypass existed.
+**Decisions** — Fixed in `verifySteamLogin`, the one function sign-in and linking both go through.
+**Watch out** — This code is on `develop` only, not on `main`.
 
 ---
 
