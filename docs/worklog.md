@@ -41,7 +41,7 @@ with "forgot password" after an unlink. Two token-style counters would need a mi
 orderings got a cache and Steam's count lives in `steam_cache`.
 Linking Steam stays without a password, by the user's choice (2026-10-31). Admin TOTP needs no new
 dependency and has no QR: a key to type and a link for the app on the same device.
-**Open** — See Fix status. `migrations/043` and `044` go to pre before this runs there, and to production
+**Open** — See Fix status. `migrations/043` and `044` were applied to pre on 2026-10-31 and go to production
 with the release. Vercel WAF rules are the user's.
 **Watch out** — Nothing here ran on Vercel, and platforms were mocked. The first cold streak ordering took
 about 23 s at 600,000 rows. Unlinking Steam now ends sign-in with it.

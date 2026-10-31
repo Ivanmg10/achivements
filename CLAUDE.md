@@ -524,7 +524,8 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
 
 - **Two locks.** The admin flag is read fresh from the DB, and the panel must be
   **unlocked with the admin's own password and a one-time code** (`POST /api/admin/unlock`,
-  `src/lib/adminTotp.ts`, `migrations/044_admin_totp.sql`; without that table the unlock answers 500).
+  `src/lib/adminTotp.ts`, `migrations/044_admin_totp.sql`, applied to pre 2026-10-31; any other database
+  needs it first, or the unlock answers 500).
   An admin with no authenticator enrols on their next unlock, after the password. Recovery codes are
   shown once and stored hashed. Lost both: `DELETE FROM admin_totp WHERE user_id = <id>`. The
   unlock is a signed, httpOnly cookie scoped to `/api/admin`, valid 15 minutes,
@@ -554,8 +555,8 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   shape of what it returns changes.
 - **A 429 waits.** `fetchRA` honours `Retry-After` up to `MAX_RETRY_AFTER`
   (5 s) and retries; a longer ask is thrown. Other 4xx are never retried.
-- **Keys are sealed at rest** (`src/lib/raKey.ts`, `migrations/043_ra_key_sealed.sql`; without it linking
-  answers 500, reads still work). `users.raid` is read through `readRaKey`, never directly: a key from
+- **Keys are sealed at rest** (`src/lib/raKey.ts`, `migrations/043_ra_key_sealed.sql`, applied to pre
+  2026-10-31; any other database needs it first, or linking answers 500; reads still work). `users.raid` is read through `readRaKey`, never directly: a key from
   before sealing reads as it is, until it is linked again. `raid_hash` keeps one key to one account.
   Changing `NEXTAUTH_SECRET` makes every key unreadable and everyone links RA again.
 - **Whose key.** Never a shared app key (see the roadmap). On the user's own
