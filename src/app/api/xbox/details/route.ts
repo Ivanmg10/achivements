@@ -8,8 +8,8 @@ import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 
 /**
  * An Xbox game page's facts — summary, studios, genres, release date,
- * screenshots, and a wide picture for the backdrop — from IGDB, since Xbox's
- * library gives none: ?id=1738914043. The
+ * screenshots, a wide picture for the backdrop and the box art — from IGDB, since
+ * Xbox's library gives none: ?id=1738914043. The
  * game is looked up in the user's library, so the title searched for is Xbox's,
  * not text from the request. 404 when IGDB is not set up or knows no match: the
  * page simply has no details.
@@ -33,14 +33,12 @@ async function get(req: NextRequest) {
   try {
     const details = await igdbXboxDetails(game.title, game.consoleName)
     if (!details) return NextResponse.json({ error: 'no-details' }, { status: 404 })
-    // The backdrop is an extra: without it the page keeps the game's own tile.
-    const heroUrl = await igdbXboxArt(game.title, game.consoleName)
-      .then((art) => art?.heroUrl ?? null)
-      .catch((err) => {
-        console.error('[xbox/details] art', titleId, err)
-        return null
-      })
-    return cachedJson({ ...details, heroUrl }, TTL.schema)
+    // The pictures are an extra: without them the page keeps the game's own tile.
+    const art = await igdbXboxArt(game.title, game.consoleName).catch((err) => {
+      console.error('[xbox/details] art', titleId, err)
+      return null
+    })
+    return cachedJson({ ...details, heroUrl: art?.heroUrl ?? null, coverUrl: art?.coverUrl ?? null }, TTL.schema)
   } catch (err) {
     console.error('[xbox/details]', titleId, err)
     return NextResponse.json({ error: 'details-unavailable' }, { status: 503 })
