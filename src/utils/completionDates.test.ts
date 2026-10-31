@@ -1,4 +1,4 @@
-import { psnBaseCompletedAt, raAwardCompletedAt, validCompletionDate } from './completionDates'
+import { latestFullSetCompletedAt, psnBaseCompletedAt, raAwardCompletedAt, validCompletionDate, xboxFullSetCompletedAt } from './completionDates'
 import type { PsnTrophy } from '@/types/psn'
 
 const trophy = (over: Partial<PsnTrophy>): PsnTrophy => ({
@@ -51,4 +51,24 @@ test('RA accepts only a dated mastery or completion highest award', () => {
   expect(raAwardCompletedAt({ HighestAwardKind: 'completed', HighestAwardDate: '2020-01-01 10:00:00' })).toBe('2020-01-01 10:00:00')
   expect(raAwardCompletedAt({ HighestAwardKind: 'beaten', HighestAwardDate: '2020-01-01 10:00:00' })).toBeNull()
   expect(raAwardCompletedAt({ HighestAwardKind: 'mastered', HighestAwardDate: null })).toBeNull()
+})
+
+test('Steam and Xbox use the latest achievement only when the whole current set is complete', () => {
+  expect(latestFullSetCompletedAt([
+    { earned: true, earnedAt: '2021-01-01T00:00:00Z' },
+    { earned: true, earnedAt: '2026-03-01T00:00:00Z' },
+  ])).toBe('2026-03-01T00:00:00Z')
+  expect(latestFullSetCompletedAt([
+    { earned: true, earnedAt: '2021-01-01T00:00:00Z' },
+    { earned: false, earnedAt: null },
+  ])).toBeNull()
+  expect(latestFullSetCompletedAt([{ earned: true, earnedAt: null }])).toBeNull()
+})
+
+test('Xbox reads unlockedAt and never substitutes lastPlayed', () => {
+  expect(xboxFullSetCompletedAt([
+    { unlocked: true, unlockedAt: '2022-01-01T00:00:00Z' },
+    { unlocked: true, unlockedAt: '2026-04-01T00:00:00Z' },
+  ])).toBe('2026-04-01T00:00:00Z')
+  expect(xboxFullSetCompletedAt([{ unlocked: false, unlockedAt: null }])).toBeNull()
 })

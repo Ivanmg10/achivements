@@ -70,13 +70,13 @@ describe('latestPerfects', () => {
 
   test('newest reliably dated completions first, three by default', () => {
     const steamGames = [
-      steam(620, 'Portal 2', { lastPlayed: '2024-03-01T00:00:00Z' }),
+      steam(620, 'Portal 2', { lastPlayed: '2024-03-01T00:00:00Z', lastUnlock: '2024-03-01T00:00:00Z' }),
     ]
     const result = latestPerfects(
       [award(1, '2024-01-01T00:00:00Z'), award(2, '2024-05-01T00:00:00Z'), award(3, '2024-02-01T00:00:00Z')],
       steamGames,
     )
-    expect(result.map((r) => r.key)).toEqual(['ra:2', 'ra:3', 'ra:1'])
+    expect(result.map((r) => r.key)).toEqual(['ra:2', 'steam:620', 'ra:3'])
   })
 
   test('only masteries and completions count, not beaten awards', () => {
@@ -97,14 +97,20 @@ describe('collection helpers', () => {
   })
   const games = buildPerfectGames([ra(1, 'A'), ra(2, 'B', { HardcoreMode: '0' }), ra(3, 'C')], [steam(620, 'Portal 2')])
 
-  test('perfectDates: RA from its latest award, Steam conservatively undated', () => {
-    const dates = perfectDates([award(1, '2024-01-01T00:00:00Z'), award(1, '2025-03-01T00:00:00Z')], [steam(620, 'Portal 2', { lastPlayed: '2023-05-01T00:00:00Z' })])
+  test('perfectDates: RA from its latest award, Steam from the latest unlock at 100%', () => {
+    const dates = perfectDates([award(1, '2024-01-01T00:00:00Z'), award(1, '2025-03-01T00:00:00Z')], [steam(620, 'Portal 2', { lastPlayed: '2023-05-01T00:00:00Z', lastUnlock: '2023-04-01T00:00:00Z' })])
     expect(dates.get('ra:1')).toBe('2025-03-01T00:00:00Z')
-    expect(dates.has('steam:620')).toBe(false)
+    expect(dates.get('steam:620')).toBe('2023-04-01T00:00:00Z')
   })
 
-  test('perfectDates: Steam activity never becomes a completion date', () => {
+  test('perfectDates: Steam uses lastUnlock, never a later replay session', () => {
     const g = steam(620, 'Portal 2', { lastPlayed: '2025-05-01T00:00:00Z', lastUnlock: '2022-03-01T00:00:00Z' })
+    expect(perfectDates([], [g]).get('steam:620')).toBe('2022-03-01T00:00:00Z')
+    expect(latestPerfects([], [g])[0].date).toBe('2022-03-01T00:00:00Z')
+  })
+
+  test('an incomplete Steam game gets no completion date even with unlock history', () => {
+    const g = steam(620, 'Portal 2', { pctWon: 50, numAwarded: 5, lastUnlock: '2026-01-01T00:00:00Z' })
     expect(perfectDates([], [g]).has('steam:620')).toBe(false)
     expect(latestPerfects([], [g])).toEqual([])
   })
@@ -174,7 +180,7 @@ describe('Xbox', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { xboxGameFixture } = require('@/test-utils/xboxFixtures') as typeof import('@/test-utils/xboxFixtures')
 
-  const done = xboxGameFixture({ id: 730, title: 'Halo', pctWon: 100, lastPlayed: '2026-03-01T00:00:00Z' })
+  const done = xboxGameFixture({ id: 730, title: 'Halo', pctWon: 100, lastPlayed: '2026-03-01T00:00:00Z', completedAt: '2026-02-01T00:00:00Z' })
   const half = xboxGameFixture({ id: 731, title: 'Half', pctWon: 50 })
 
   test('a game at 100 % is perfect, and counted as Xbox', () => {
@@ -184,12 +190,12 @@ describe('Xbox', () => {
     expect(pg.countPerfectGames(games)).toEqual({ hc: 0, sc: 0, steam: 0, psn: 0, xbox: 1 })
   })
 
-  test('its last session is not treated as a base completion date', () => {
-    expect(pg.perfectDates([], [], [], [done]).has('xbox:730')).toBe(false)
-    expect(pg.latestPerfects([], [], 3, [], [done, half])).toEqual([])
+  test('its latest unlocked achievement dates the completed set, not its last session', () => {
+    expect(pg.perfectDates([], [], [], [done]).get('xbox:730')).toBe('2026-02-01T00:00:00Z')
+    expect(pg.latestPerfects([], [], 3, [], [done, half])).toMatchObject([{ key: 'xbox:730', date: '2026-02-01T00:00:00Z' }])
   })
 
-  test('a perfect game with no known session is not in the latest', () => {
+  test('a perfect game with no known completion timestamp is not in the latest', () => {
     expect(pg.latestPerfects([], [], 3, [], [xboxGameFixture({ id: 1, pctWon: 100, lastPlayed: null })])).toEqual([])
   })
 

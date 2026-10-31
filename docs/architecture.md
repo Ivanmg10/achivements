@@ -97,8 +97,8 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
 2. **Formula** — `src/utils/vaultScore.ts` (pure), fed by the per-platform
    mappers in `src/utils/vaultScoreInputs.ts`; levels in `src/utils/vaultLevel.ts`.
    `src/utils/completionDates.ts` supplies the separate nullable base-completion date used by the
-   completion bonus. PSN library responses are enriched by `src/lib/psnCompletion.ts` through the
-   existing trophy cache; Steam/Xbox stay undated without reliable base/DLC separation.
+   completion bonus. PSN/Xbox library responses are enriched through existing achievement caches;
+   Steam uses `lastUnlock` and Xbox `unlockedAt` when the current set is complete.
 3. **Storage** — `score_games` (one row per game, points before the stack
    factor, unlocks by day), `score_periods` (weeks and months, rebuilt per user),
    `score_snapshots` (Monday ranks, for the arrows). `migrations/040`.

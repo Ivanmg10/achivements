@@ -17,6 +17,7 @@ import {
   type RawTitle,
 } from '@/utils/xboxMappers'
 import type { XboxAchievement, XboxGameProgress, XboxProfile, XboxRecentAchievement, XboxSummary } from '@/types/xbox'
+import { withXboxCompletionDates } from '@/lib/xboxCompletion'
 
 /**
  * Xbox Live through OpenXBL (xbl.io), an unofficial proxy. Every call is made
@@ -322,6 +323,12 @@ export async function xboxLibraryData(xuid: string, userId: string | null = null
 
 export async function xboxLibrary(xuid: string, userId: string | null = null): Promise<XboxGameProgress[]> {
   return (await xboxLibraryData(xuid, userId)).games
+}
+
+/** Library DTO with full-set completion dates; raw title/activity caches keep their existing shape and keys. */
+export async function xboxTitlesWithCompletion(xuid: string, userId: string | null = null): Promise<XboxGameProgress[]> {
+  const games = await xboxLibrary(xuid, userId)
+  return withXboxCompletionDates(games, (game) => xboxGameAchievements(xuid, game, userId))
 }
 
 /** A game of the account's by its title id, or null when it is not in their library. */

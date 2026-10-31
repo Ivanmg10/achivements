@@ -29,22 +29,23 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
-## 2026-10-31 — Hidden-game visibility and base completion dates (`fix/88-hidden-games-completion-dates`, #88)
+## 2026-10-31 — Hidden-game visibility and completion dates (`fix/88-hidden-games-completion-dates`, #88)
 
 **Did** — Applied source-qualified hidden filtering at listing BFF and shared client boundaries, including
 public subjects, groups, friends, searches, awards, activity, stats and score reads. Hide/show rebuilds
 periods and versions ranking caches without deleting curated or score rows. Added nullable base-completion
-rules, PSN `completedAt` enrichment through existing trophy caches, and matching collection/detail/Vault consumers.
+rules, PSN/Xbox `completedAt` enrichment through existing achievement caches, and matching collection/detail/Vault consumers.
 **Why** — Hidden games leaked through recently played and other raw listing paths, and PSN DLC activity moved
 base completion to a later year.
 **Decisions** — Raw `fullLibrary` and direct game URLs keep their behavior; hidden is not authorization. PSN uses
-platinum/default-group dates, RA completion awards, and Steam/Xbox unknown dates because their current models
-cannot separate base content from DLC reliably. Activity and cache fingerprints remain unchanged. Vault rules
-version 2 recomputes persisted scores on normal refreshes; historical snapshots and display data need no migration.
-**Verification** — 815 Jest suites / 5,106 tests, focused cache and platform regressions, ESLint, TypeScript,
+platinum/default-group dates and RA completion awards. At the user's explicit decision, Steam uses `lastUnlock`
+and Xbox the latest `unlockedAt` when the current set is 100%, without attempting base/DLC separation. Activity
+and cache fingerprints remain unchanged. Vault rules version 3 recomputes persisted scores on normal refreshes;
+historical snapshots and display data need no migration.
+**Verification** — 816 Jest suites / 5,111 tests, focused cache and platform regressions, ESLint, TypeScript,
 `git diff --check` and the Next.js production build all passed.
-**Open** — Exact PSN dates for completed DLC games require per-game trophy reads; enrichment failures leave only
-that date unknown. Steam/Xbox games remain in collections under Undated rather than receiving inferred dates.
+**Open** — Exact PSN dates with DLC and all completed Xbox dates require per-game achievement reads;
+enrichment failures leave only that date unknown. Missing timestamps remain in collections under Undated.
 **Watch out** — Do not move the filter into canonical upstream caches or direct-detail loaders. Hidden rows must
 stay available for unhide, while visible stack factors, periods and rankings must not include them.
 

@@ -6,6 +6,7 @@ import type { XboxGameProgress } from '@/types/xbox'
 import { gameKey } from '@/utils/gameRef'
 import type { RetroAchievementsGameCompleted, UserAward } from '@/types/types'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
+import { validCompletionDate } from '@/utils/completionDates'
 
 /**
  * A game with every achievement, from either platform, in one shape — what
@@ -137,10 +138,9 @@ export type LatestPerfect = {
 }
 
 /**
- * The most recent games with a reliable base-completion date, newest first.
- * RA uses mastery/completion awards and PSN its default-group timestamp.
- * Steam and Xbox stay undated because their current data cannot separate base
- * content from DLC. One entry per RA game, at its latest completion award.
+ * The most recent games with a reliable completion date, newest first. RA uses
+ * mastery/completion awards and PSN its default-group timestamp. Steam and Xbox
+ * use the latest achievement only when their whole current set is complete.
  */
 export function latestPerfects(
   awards: UserAward[] = [],
@@ -149,9 +149,6 @@ export function latestPerfects(
   psnGames: PsnGameProgress[] = [],
   xboxGames: XboxGameProgress[] = [],
 ): LatestPerfect[] {
-  // Their current DTOs cannot prove base completion, so activity never dates these games.
-  void steamGames
-  void xboxGames
   const ra = new Map<number, LatestPerfect>()
   for (const a of awards) {
     if (a.AwardType !== 'Mastery/Completion') continue
@@ -169,6 +166,18 @@ export function latestPerfects(
     })
   }
 
+  const steam: LatestPerfect[] = steamGames
+    .filter((g) => classifySteamGame(g) === 'completed' && validCompletionDate(g.lastUnlock))
+    .map((g) => ({
+      key: gameKey('steam', g.id),
+      source: 'steam',
+      id: g.id,
+      title: g.title,
+      subtitle: g.consoleName,
+      date: validCompletionDate(g.lastUnlock)!,
+      hardcore: false,
+    }))
+
   const psn: LatestPerfect[] = psnGames
     .filter((g) => classifyPsnGame(g) === 'completed' && g.completedAt)
     .map((g) => ({
@@ -182,14 +191,27 @@ export function latestPerfects(
       hardcore: false,
     }))
 
-  return [...ra.values(), ...psn]
+  const xbox: LatestPerfect[] = xboxGames
+    .filter((g) => classifyXboxGame(g) === 'completed' && g.completedAt)
+    .map((g) => ({
+      key: gameKey('xbox', g.id),
+      source: 'xbox',
+      id: g.id,
+      title: g.title,
+      subtitle: g.consoleName,
+      iconUrl: g.imageIcon || undefined,
+      date: g.completedAt!,
+      hardcore: false,
+    }))
+
+  return [...ra.values(), ...steam, ...psn, ...xbox]
     .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
     .slice(0, count)
 }
 
 /**
- * Reliable base-completion dates by key. Steam and Xbox deliberately have no
- * entry when base content cannot be separated from DLC.
+ * Reliable completion dates by key. Steam uses its latest unlock and Xbox its
+ * enriched latest achievement, only for games whose current set is complete.
  */
 export function perfectDates(
   awards: UserAward[] = [],
@@ -197,15 +219,15 @@ export function perfectDates(
   psnGames: PsnGameProgress[] = [],
   xboxGames: XboxGameProgress[] = [],
 ): Map<string, string> {
-  void steamGames
-  void xboxGames
   const byKey = new Map<string, string>()
   for (const a of awards) {
     if (a.AwardType !== 'Mastery/Completion') continue
     const key = gameKey('ra', a.AwardData)
     if ((byKey.get(key) ?? '') < a.AwardedAt) byKey.set(key, a.AwardedAt)
   }
+  for (const g of steamGames) if (classifySteamGame(g) === 'completed' && validCompletionDate(g.lastUnlock)) byKey.set(gameKey('steam', g.id), validCompletionDate(g.lastUnlock)!)
   for (const g of psnGames) if (g.completedAt) byKey.set(gameKey('psn', g.id), g.completedAt)
+  for (const g of xboxGames) if (classifyXboxGame(g) === 'completed' && g.completedAt) byKey.set(gameKey('xbox', g.id), g.completedAt)
   return byKey
 }
 

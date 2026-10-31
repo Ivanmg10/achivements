@@ -15,7 +15,7 @@ import { isConsoleShown } from '@/utils/consoleFilter'
 import { RULES_VERSION, looksUnlockedByTool, provisionalScore, scoreGame, stackFactors, stackKey, type GameScore, type ScoreUnlock } from '@/utils/vaultScore'
 import { hiddenConsolesFrom, psnGradeShare, psnScoreInputs, raScoreInputs, steamScoreInputs, xboxScoreInputs } from '@/utils/vaultScoreInputs'
 import { monthStart, weekStart } from '@/utils/vaultLevel'
-import { psnBaseCompletedAt, raAwardCompletedAt } from '@/utils/completionDates'
+import { latestFullSetCompletedAt, psnBaseCompletedAt, raAwardCompletedAt } from '@/utils/completionDates'
 
 /**
  * Keeps a user's Vault Points up to date (docs/rankings-plan.md). Each
@@ -186,7 +186,7 @@ function steamPlan(userId: number, steamid: string, apiKey: string): Plan {
           read: async () => {
             const [unlocks, pct] = await Promise.all([fetchPlayerAchievements(auth, g.appid), loadGlobalPct(g.appid)])
             const list = isNoStats(unlocks) ? [] : steamScoreInputs(unlocks, pct)
-            return { score: scoreGame(list), suspect: looksUnlockedByTool(list) }
+            return { score: scoreGame(list, undefined, latestFullSetCompletedAt(list)), suspect: looksUnlockedByTool(list) }
           },
         }))
     },
@@ -233,7 +233,10 @@ function xboxPlan(userId: number, xuid: string): Plan {
             g.maxPossible,
             g.totalGamerscore > 0 && g.earnedGamerscore >= g.totalGamerscore,
           ),
-          read: async () => ({ score: scoreGame(xboxScoreInputs(await xboxGameAchievements(xuid, g, String(userId)))), suspect: false }),
+          read: async () => {
+            const achievements = xboxScoreInputs(await xboxGameAchievements(xuid, g, String(userId)))
+            return { score: scoreGame(achievements, undefined, latestFullSetCompletedAt(achievements)), suspect: false }
+          },
         })),
   }
 }

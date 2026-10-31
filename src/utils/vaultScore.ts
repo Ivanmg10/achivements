@@ -8,7 +8,7 @@
  * Bump RULES_VERSION whenever a number here changes: stored scores carry it,
  * and the refresh recomputes every game scored under another one.
  */
-export const RULES_VERSION = 2
+export const RULES_VERSION = 3
 
 /** One achievement as the score sees it, whatever the platform. */
 export type ScoreAchievement = {

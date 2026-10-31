@@ -9,6 +9,7 @@ import LibraryGameDetail, { type LibraryCategory } from '@/components/library-ga
 import { fromXbox } from '@/utils/gameInsights'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { XboxGameProgress } from '@/types/xbox'
+import { latestFullSetCompletedAt } from '@/utils/completionDates'
 
 const asCategory = (c?: string): LibraryCategory => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
@@ -33,6 +34,7 @@ export default function XboxLibraryDetail({ game, category }: { game: XboxGamePr
       game={{ source: 'xbox', id: game.id, title: game.title, iconUrl: game.imageIcon || undefined }}
       info={game.consoleName ? [{ label: T.libraryDetail.console, value: game.consoleName }] : []}
       items={items}
+      completedAt={latestFullSetCompletedAt(items)}
       state={isLoading ? 'loading' : error ? 'error' : 'ready'}
       errorNode={
         <div className="flex flex-col items-start gap-2">

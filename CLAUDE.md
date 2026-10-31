@@ -978,20 +978,20 @@ nothing is deleted.
 ## Completion dates are not latest activity (2026-10-31, #88)
 
 Completion status still uses each platform's whole set, but its date is a separate nullable value in
-`src/utils/completionDates.ts`. `lastTrophyAt`, `lastUnlock` and `lastPlayed` remain activity, cache and
-sync fingerprints; never reuse them as a base-completion date.
+`src/utils/completionDates.ts`. Activity fields remain cache and sync fingerprints; PSN/RA use base
+completion, while Steam/Xbox deliberately use full-current-set completion (user decision, 2026-10-31).
 
-| Platform | Base-completion date | Conservative fallback |
+| Platform | Completion-date rule | Conservative fallback |
 |---|---|---|
 | **PSN** | Earned platinum in `default`, else the latest dated trophy only when the whole `default` group is earned. `/api/psn/titles` adds `completedAt`; no-DLC completed games may use `lastTrophyAt`, DLC games read the existing per-game trophy cache. | `null` when base data/date is incomplete or enrichment fails. A failed date lookup does not fail the library and is not cached as a complete enrichment. |
 | **RetroAchievements** | `Mastery/Completion` award date, or `HighestAwardDate` when `HighestAwardKind` is `mastered`/`completed`. | `null`; never the latest achievement or a title-based subset guess. |
-| **Steam** | The current API/model does not distinguish base achievements from DLC. | Always `null`, never `lastUnlock`/`lastPlayed`. |
-| **Xbox** | The current API/model has no reliable base/DLC groups. | Always `null`, never `lastPlayed` or the latest achievement. |
+| **Steam** | When the current set is 100%, use `lastUnlock` (the latest earned achievement). Do not attempt base/DLC separation. | `null` without a valid unlock date; never `lastPlayed`. |
+| **Xbox** | When the current set is 100%, `/api/xbox/titles` reads achievements and uses the latest `unlockedAt`. Do not attempt base/DLC separation. | `null` when the read or date is unavailable; never `lastPlayed`. Partial enrichment is not cached as complete. |
 
 Collection grids keep undated games in their existing **Undated** group and library details omit
 **Finished** when the date is unknown. Activity feeds, `/racha` and charts still show DLC on its real
 unlock day. Vault's completion bonus uses the same date (timestamp 0 when unknown), with
-`RULES_VERSION = 2` so normal score refreshes rebuild stored games and periods; display data needs no
+`RULES_VERSION = 3` so normal score refreshes rebuild stored games and periods; display data needs no
 migration and historical score snapshots are left untouched.
 
 ## Registration

@@ -21,6 +21,18 @@ export function psnBaseCompletedAt(trophies: PsnTrophy[]): string | null {
   return dates.reduce((latest, date) => date > latest ? date : latest, dates[0])
 }
 
+/** Steam/Xbox rule: latest earned achievement only when the whole current set is earned. */
+export function latestFullSetCompletedAt(achievements: { earned: boolean; earnedAt: string | null }[]): string | null {
+  if (achievements.length === 0 || achievements.some((achievement) => !achievement.earned)) return null
+  const dates = achievements.map((achievement) => validCompletionDate(achievement.earnedAt)).filter((date): date is string => date !== null)
+  if (dates.length !== achievements.length) return null
+  return dates.reduce((latest, date) => date > latest ? date : latest, dates[0])
+}
+
+export function xboxFullSetCompletedAt(achievements: { unlocked: boolean; unlockedAt: string | null }[]): string | null {
+  return latestFullSetCompletedAt(achievements.map((achievement) => ({ earned: achievement.unlocked, earnedAt: achievement.unlockedAt })))
+}
+
 export function raLatestCompletionAward(awards: UserAward[], gameId: number): string | null {
   const dates = awards
     .filter((award) => award.AwardData === gameId && award.AwardType === 'Mastery/Completion')

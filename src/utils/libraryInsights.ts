@@ -6,7 +6,8 @@ import type { PsnGameProgress } from '@/types/psn'
 import type { XboxGameProgress } from '@/types/xbox'
 import type { StatusSortState } from '@/components/status-sort-control/StatusSortControl'
 import { compareSortValues } from '@/utils/utils'
-import { raLatestCompletionAward } from '@/utils/completionDates'
+import { raLatestCompletionAward, validCompletionDate } from '@/utils/completionDates'
+import { classifySteamGame } from '@/utils/steamFeed'
 
 export type QuickFilter = 'all' | 'almost' | 'stalled'
 
@@ -69,9 +70,9 @@ export function buildEntries(
       const e = extra.get(raId(game))
       return { kind: 'ra', key: `ra:${raId(game)}`, title: game.Title, game, extra: e, completedAt: e ? raLatestCompletionAward(e.awards, raId(game)) : null, ...raProgress(game, e) }
     }),
-    ...steam.map((game): LibraryEntry => ({ kind: 'steam', key: `steam:${game.id}`, title: game.title, game, completedAt: null, ...steamProgress(game) })),
+    ...steam.map((game): LibraryEntry => ({ kind: 'steam', key: `steam:${game.id}`, title: game.title, game, completedAt: classifySteamGame(game) === 'completed' ? validCompletionDate(game.lastUnlock) : null, ...steamProgress(game) })),
     ...psn.map((game): LibraryEntry => ({ kind: 'psn', key: `psn:${game.id}`, title: game.title, game, completedAt: game.completedAt ?? null, ...psnProgress(game) })),
-    ...xbox.map((game): LibraryEntry => ({ kind: 'xbox', key: `xbox:${game.id}`, title: game.title, game, completedAt: null, ...xboxProgress(game) })),
+    ...xbox.map((game): LibraryEntry => ({ kind: 'xbox', key: `xbox:${game.id}`, title: game.title, game, completedAt: game.completedAt ?? null, ...xboxProgress(game) })),
   ]
 }
 
