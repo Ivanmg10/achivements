@@ -42,18 +42,49 @@ test("Sony's platform names map to IGDB's ids; PS4/PS5 to none", () => {
   expect(igdb.igdbPlatforms('PS4')).toEqual([])
 })
 
-test('toIgdbArt prefers the exact title, falls back to the first hit, and builds the image URLs', () => {
+test('toIgdbArt prefers the exact title, falls back to one with the same words, and builds the image URLs', () => {
   const other = { name: 'Jak II: Renegade Collection' }
   expect(igdb.toIgdbArt('Jak II', [other, GAME])).toEqual({
     coverUrl: 'https://images.igdb.com/igdb/image/upload/t_cover_big_2x/co1.jpg',
     heroUrl: 'https://images.igdb.com/igdb/image/upload/t_1080p/ar1.jpg',
     releaseYear: 2003,
   })
-  expect(igdb.toIgdbArt('Nothing alike', [other])).toEqual({ coverUrl: null, heroUrl: null, releaseYear: null })
+  expect(igdb.toIgdbArt('Jak II', [other])).toEqual({ coverUrl: null, heroUrl: null, releaseYear: null })
+  expect(igdb.toIgdbArt('Assassin’s Creed Liberation', [{ name: 'Assassin\'s Creed: Liberation HD', first_release_date: 1389052800 }])?.releaseYear).toBe(2014)
   expect(igdb.toIgdbArt('Jak II', [])).toBeNull()
 })
 
-test('toIgdbArt takes a title that ends with the name before the first hit', () => {
+test('the title as written beats another that only reads the same without its punctuation', () => {
+  const mod = { name: 'Chrono Trigger+', first_release_date: 1262304000 }
+  const game = { name: 'Chrono Trigger', first_release_date: 794016000 }
+  expect(igdb.toIgdbArt('Chrono Trigger', [mod, game])?.releaseYear).toBe(1995)
+})
+
+test('a hit that is another game is no match, so its art is never shown', () => {
+  expect(igdb.toIgdbArt('Forza Horizon 5', [{ name: 'Minecraft: Story Mode', artworks: [{ image_id: 'ar9' }] }])).toBeNull()
+  expect(igdb.toIgdbDetails('Forza Horizon 5', [{ name: 'Minecraft: Story Mode', summary: 'Blocks' }])).toBeNull()
+})
+
+test('the backdrop is the widest landscape picture, not the first', () => {
+  const game = {
+    name: 'X',
+    artworks: [{ image_id: 'small', width: 512, height: 244 }, { image_id: 'tall', width: 2000, height: 3000 }],
+    screenshots: [{ image_id: 'wide', width: 1920, height: 1080 }],
+  }
+  expect(igdb.toIgdbArt('X', [game])?.heroUrl).toBe('https://images.igdb.com/igdb/image/upload/t_1080p/wide.jpg')
+})
+
+test('a picture below 1080p is asked for at its real size: t_1080p would stretch it', () => {
+  const game = { name: 'X', screenshots: [{ image_id: 'shot', width: 1000, height: 562 }] }
+  expect(igdb.toIgdbArt('X', [game])?.heroUrl).toBe('https://images.igdb.com/igdb/image/upload/t_original/shot.jpg')
+})
+
+test('a game with portrait pictures only still names one: the cover decides whether it fits', () => {
+  const game = { name: 'X', artworks: [{ image_id: 'tall', width: 600, height: 900 }] }
+  expect(igdb.toIgdbArt('X', [game])?.heroUrl).toContain('tall')
+})
+
+test('toIgdbArt takes a title that ends with the name before any other hit', () => {
   const newer = { name: 'Call of Duty: Modern Warfare III', first_release_date: 1699574400 }
   const older = { name: 'Call of Duty: Modern Warfare 3', first_release_date: 1320710400 }
   expect(igdb.toIgdbArt('Modern Warfare 3', [newer, older])?.releaseYear).toBe(2011)
@@ -81,7 +112,8 @@ test('gets an app token once, searches on the platform, and caches the art', asy
   expect(init.headers).toEqual({ 'Client-ID': 'client', Authorization: 'Bearer tok' })
   expect(init.body).toContain('search "Jak II"')
   expect(init.body).toContain('where platforms = (9)')
-  expect(withSteamCache).toHaveBeenCalledWith('igdb:art:v2:9:jak ii', expect.any(Number), expect.any(Function))
+  expect(init.body).toContain('artworks.width')
+  expect(withSteamCache).toHaveBeenCalledWith('igdb:art:v3:9:jak ii', expect.any(Number), expect.any(Function))
 })
 
 test('a miss is cached as such, not as a bare null the cache would read as "not cached"', async () => {
@@ -152,7 +184,7 @@ test('igdbDetails searches every platform of the game and caches under its own k
   expect(init.body).toContain('search "Call of Duty: Black Ops II"')
   expect(init.body).toContain('involved_companies.company.name')
   expect(init.body).toContain('where platforms = (9)')
-  expect(withSteamCache).toHaveBeenCalledWith('igdb:details:v1:9:call of duty black ops ii', expect.any(Number), expect.any(Function))
+  expect(withSteamCache).toHaveBeenCalledWith('igdb:details:v2:9:call of duty black ops ii', expect.any(Number), expect.any(Function))
 })
 
 test('igdbDetails asks nothing without a Twitch app', async () => {
@@ -179,7 +211,23 @@ test("an Xbox game's art is looked up on its own platforms, apart from a PlaySta
   expect(await igdb.igdbXboxArt('Jak II™', 'Xbox One · Xbox Series')).toMatchObject({ releaseYear: 2003 })
   const [, init] = (global.fetch as jest.Mock).mock.calls[1]
   expect(init.body).toContain('where platforms = (49,169)')
-  expect(withSteamCache).toHaveBeenCalledWith('igdb:art:v2:49,169:jak ii', expect.any(Number), expect.any(Function))
+  expect(withSteamCache).toHaveBeenCalledWith('igdb:art:v3:49,169:jak ii', expect.any(Number), expect.any(Function))
+})
+
+test("an RA game's art is looked up on its console's platforms", async () => {
+  ;(global.fetch as jest.Mock)
+    .mockResolvedValueOnce(ok({ access_token: 'tok', expires_in: 5_000_000 }))
+    .mockResolvedValue(ok([GAME]))
+  expect(await igdb.igdbRaArt('Jak II', 'SNES/Super Famicom')).toMatchObject({ releaseYear: 2003 })
+  const [, init] = (global.fetch as jest.Mock).mock.calls[1]
+  expect(init.body).toContain('where platforms = (19,58)')
+})
+
+test('a hack, a subset or a console IGDB is not asked about keeps RA\'s pictures', async () => {
+  expect(await igdb.igdbRaArt('~Hack~ Pokemon Unbound', 'Game Boy Advance')).toBeNull()
+  expect(await igdb.igdbRaArt('Super Metroid [Subset - Bonus]', 'SNES/Super Famicom')).toBeNull()
+  expect(await igdb.igdbRaArt('Some Game', 'Pokemon Mini')).toBeNull()
+  expect(global.fetch).not.toHaveBeenCalled()
 })
 
 test('with no Xbox platform, or without a Twitch app, an Xbox game asks nothing', async () => {
@@ -196,5 +244,5 @@ test("an Xbox game's details come from its own platforms too", async () => {
     .mockResolvedValue(ok([{ name: 'Halo 3', summary: 'Finish the fight', first_release_date: 1190678400 }]))
   expect(await igdb.igdbXboxDetails('Halo 3', 'Xbox 360')).toMatchObject({ summary: 'Finish the fight', releaseDate: '2007-09-25' })
   expect((global.fetch as jest.Mock).mock.calls[1][1].body).toContain('where platforms = (12)')
-  expect(withSteamCache).toHaveBeenCalledWith('igdb:details:v1:12:halo 3', expect.any(Number), expect.any(Function))
+  expect(withSteamCache).toHaveBeenCalledWith('igdb:details:v2:12:halo 3', expect.any(Number), expect.any(Function))
 })

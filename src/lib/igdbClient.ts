@@ -1,4 +1,5 @@
 import { withSteamCache } from '@/lib/steamCache'
+import { isWideEnough } from '@/utils/homeHero'
 
 const TIMEOUT_MS = 8_000
 
@@ -22,6 +23,7 @@ export type IgdbArt = {
 const TOKEN_URL = 'https://id.twitch.tv/oauth2/token'
 const GAMES_URL = 'https://api.igdb.com/v4/games'
 const IMAGE_URL = 'https://images.igdb.com/igdb/image/upload'
+const FULL_HD_WIDTH = 1920
 
 /** IGDB's platform ids. */
 
@@ -43,12 +45,14 @@ export type IgdbDetails = {
   screenshots: { thumb: string; full: string }[]
 }
 
+type IgdbPicture = { image_id: string; width?: number; height?: number }
+
 type IgdbGame = {
   name: string
   first_release_date?: number
   cover?: { image_id: string }
-  artworks?: { image_id: string }[]
-  screenshots?: { image_id: string }[]
+  artworks?: IgdbPicture[]
+  screenshots?: IgdbPicture[]
   summary?: string
   genres?: { name: string }[]
   involved_companies?: { developer?: boolean; publisher?: boolean; company?: { name: string } }[]
@@ -126,20 +130,95 @@ export function igdbXboxPlatforms(consoleName: string): number[] {
   return ids.filter(([re]) => re.test(consoleName)).map(([, id]) => id)
 }
 
-/** The best match: the exact title if IGDB has it, else one that ends with it (Xbox's "Modern Warfare 3" is "Call of Duty: Modern Warfare 3"), else its first hit. */
+/**
+ * IGDB's platforms for RA's console names, checked against IGDB's list on 2026-10-31.
+ * A console not here asks nothing, and the game keeps RA's own pictures.
+ */
+const RA_PLATFORMS: Record<string, number[]> = {
+  '32X': [30],
+  Arcade: [52],
+  'Atari 2600': [59],
+  'Atari 7800': [60],
+  'Atari Jaguar': [62],
+  'Atari Lynx': [61],
+  Dreamcast: [23],
+  'Game Boy': [33],
+  'Game Boy Advance': [24],
+  'Game Boy Color': [22],
+  'Game Gear': [35],
+  GameCube: [21],
+  'Genesis/Mega Drive': [29],
+  'Master System': [64],
+  'Mega Drive': [29],
+  'NES/Famicom': [18, 99],
+  'Neo Geo Pocket': [119, 120],
+  'Nintendo 3DS': [37],
+  'Nintendo 64': [4],
+  'Nintendo DS': [20],
+  'Nintendo DSi': [159],
+  'PC Engine CD/TurboGrafx-CD': [150],
+  'PC Engine/TurboGrafx-16': [86],
+  PSP: [38],
+  PlayStation: [7],
+  'PlayStation 2': [8],
+  'PlayStation Portable': [38],
+  'SNES/Super Famicom': [19, 58],
+  Saturn: [32],
+  'Sega CD': [78],
+  'Virtual Boy': [87],
+  VirtualBoy: [87],
+  Wii: [5],
+  'Wii U': [41],
+  WonderSwan: [57],
+}
+
+/** Every word of the shorter title is in the longer one ("Minecraft: Xbox 360 Edition" and "Minecraft", not "Forza Motorsport"). */
+function sameGame(a: string, b: string): boolean {
+  const [short, long] = [titleKey(a).split(' '), titleKey(b).split(' ')].sort((x, y) => x.length - y.length)
+  return short.every((word) => long.includes(word))
+}
+
+/**
+ * The best match: the exact title if IGDB has it (as written first: "Chrono
+ * Trigger+", a mod, reads the same once its "+" is gone), else one that ends with
+ * it (Xbox's "Modern Warfare 3" is "Call of Duty: Modern Warfare 3"), else one that
+ * shares its words. Nothing else: a search's first hit can be any other game.
+ */
 function bestMatch(title: string, games: IgdbGame[]): IgdbGame | undefined {
   const key = titleKey(title)
-  return games.find((g) => titleKey(g.name) === key) ?? games.find((g) => titleKey(g.name).endsWith(` ${key}`)) ?? games[0]
+  return (
+    games.find((g) => g.name.toLowerCase() === title.toLowerCase()) ??
+    games.find((g) => titleKey(g.name) === key) ??
+    games.find((g) => titleKey(g.name).endsWith(` ${key}`)) ??
+    games.find((g) => sameGame(title, g.name))
+  )
+}
+
+const isLandscape = ({ width, height }: IgdbPicture) => !width || !height || isWideEnough(width / height)
+
+/** The widest landscape picture: IGDB's first can be a 512 px artwork over 1280 px screenshots. */
+function widestPicture(game: IgdbGame): IgdbPicture | undefined {
+  const pictures = [...(game.artworks ?? []), ...(game.screenshots ?? [])]
+  return pictures.filter(isLandscape).sort((a, b) => (b.width ?? 0) - (a.width ?? 0))[0] ?? pictures[0]
+}
+
+/**
+ * Its URL, never above its real size: `t_1080p` stretches a smaller original
+ * (1000×562 served as 1920×1079, measured 2026-10-31), which would hide a blurred
+ * picture from anything that checks its size.
+ */
+function pictureUrl({ image_id, width }: IgdbPicture): string {
+  return `${IMAGE_URL}/${width && width < FULL_HD_WIDTH ? 't_original' : 't_1080p'}/${image_id}.jpg`
 }
 
 /** The art for the best match. */
 export function toIgdbArt(title: string, games: IgdbGame[]): IgdbArt | null {
   const game = bestMatch(title, games)
   if (!game) return null
-  const backdrop = game.artworks?.[0] ?? game.screenshots?.[0]
+  const backdrop = widestPicture(game)
   return {
     coverUrl: game.cover ? `${IMAGE_URL}/t_cover_big_2x/${game.cover.image_id}.jpg` : null,
-    heroUrl: backdrop ? `${IMAGE_URL}/t_1080p/${backdrop.image_id}.jpg` : null,
+    heroUrl: backdrop ? pictureUrl(backdrop) : null,
     releaseYear: game.first_release_date ? new Date(game.first_release_date * 1000).getUTCFullYear() : null,
   }
 }
@@ -159,12 +238,18 @@ export async function igdbXboxArt(title: string, consoleName: string): Promise<I
   return artOn(title, igdbXboxPlatforms(consoleName))
 }
 
+/** The same for an RA game. A hack or a subset ("~Hack~ …", "… [Subset - …]") is not the game IGDB knows, so it asks nothing. */
+export async function igdbRaArt(title: string, consoleName: string): Promise<IgdbArt | null> {
+  if (/^~|\[Subset/i.test(title)) return null
+  return artOn(title, RA_PLATFORMS[consoleName] ?? [])
+}
+
 async function artOn(title: string, platforms: number[]): Promise<IgdbArt | null> {
   if (!igdbConfigured() || platforms.length === 0) return null
   const name = title.replace(/[®™©]/g, '').trim()
   // A miss is cached too ({ art: null }): the cache reads a bare null as "not cached".
-  const { art } = await withSteamCache<{ art: IgdbArt | null }>(`igdb:art:v2:${platforms.join(',')}:${titleKey(name)}`, ART_TTL_MS, async () => {
-    const query = `search "${name.replace(/["\\]/g, ' ')}"; fields name,first_release_date,cover.image_id,artworks.image_id,screenshots.image_id; where platforms = (${platforms.join(',')}); limit 10;`
+  const { art } = await withSteamCache<{ art: IgdbArt | null }>(`igdb:art:v3:${platforms.join(',')}:${titleKey(name)}`, ART_TTL_MS, async () => {
+    const query = `search "${name.replace(/["\\]/g, ' ')}"; fields name,first_release_date,cover.image_id,artworks.image_id,artworks.width,artworks.height,screenshots.image_id,screenshots.width,screenshots.height; where platforms = (${platforms.join(',')}); limit 10;`
     return { art: toIgdbArt(name, await searchGames(query)) }
   })
   return art
@@ -208,7 +293,7 @@ async function detailsOn(title: string, platforms: number[]): Promise<IgdbDetail
   if (!igdbConfigured() || platforms.length === 0) return null
   const name = title.replace(/[®™©]/g, '').trim()
   const { details } = await withSteamCache<{ details: IgdbDetails | null }>(
-    `igdb:details:v1:${platforms.join(',')}:${titleKey(name)}`,
+    `igdb:details:v2:${platforms.join(',')}:${titleKey(name)}`,
     ART_TTL_MS,
     async () => {
       const query = `search "${name.replace(/["\\]/g, ' ')}"; fields name,summary,first_release_date,genres.name,involved_companies.developer,involved_companies.publisher,involved_companies.company.name,screenshots.image_id; where platforms = (${platforms.join(',')}); limit 10;`

@@ -303,6 +303,14 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 - **The home layout is the person's choice** (`useHomeLayout`, synced key `home-layout`):
   `classic` (default) or `cover` (`MainPagePortada`, the game played last in big on top). It is in
   Preferences → General and in the welcome's preferences step.
+- **The cover's art** (source order in `HomeHero.art`, `src/utils/homeHero.ts`) shows only once it has loaded
+  and been judged for its box (`artVerdict`: at most 2× stretch, aspect 8:7 to 4:1). Each source is tried once;
+  if none fits, the first too small for the box is the background anyway. **The big cover is never just a box
+  art while a wide picture exists (the user's call, 2026-10-31):** the poster is for a game with no wide picture
+  at all, or only portrait ones, then the game's colour alone. Xbox and RA take IGDB's first (`heroUrl`, `coverUrl`
+  in `/api/xbox/details` and `/api/getGameArt`); RA then its own screenshots and box art, Xbox its tile. Hacks and
+  subsets never ask IGDB (`igdbRaArt`). **IGDB pictures go through `pictureUrl`**: `t_1080p` stretches a
+  smaller original (measured 2026-10-31), which hides a blurred picture from that check.
 
 ## Progress bars — in the theme's colours
 

@@ -9,7 +9,8 @@ import { fromPsn, fromRa, fromSteam, fromXbox, type InsightAchievement } from '@
 import { psnTitleId } from '@/utils/psnTitles'
 import { toSteamLanguage } from '@/utils/steamLanguage'
 
-type Loaded = { items: InsightAchievement[]; art: string | null; ra?: { items: RetroAchievement[]; players: number } }
+type Art = { art: string[]; poster: string | null }
+type Loaded = Art & { items: InsightAchievement[]; ra?: { items: RetroAchievement[]; players: number } }
 type Answer = ({ key: string } & Loaded) | { key: string; error: true }
 
 async function json(url: string): Promise<unknown> {
@@ -18,47 +19,52 @@ async function json(url: string): Promise<unknown> {
   return res.json()
 }
 
-/** A wide picture of the game where its page already reads one (RA's in-game screenshot, Xbox's from IGDB). A failure only means no picture. */
-async function wideArt(source: GameSource, id: number, ra: { ImageIngame?: string; ImageTitle?: string } | null): Promise<string | null> {
-  if (source === 'ra') {
-    const path = ra?.ImageIngame || ra?.ImageTitle
-    return path ? `https://retroachievements.org${path}` : null
-  }
-  if (source !== 'xbox') return null
+/** A game's pictures from IGDB, through the route that has them. A failure only means none. */
+async function igdbPictures(url: string): Promise<Art> {
   try {
-    const data = (await json(`/api/xbox/details?id=${id}`)) as { heroUrl?: string | null }
-    return data.heroUrl ?? null
+    const data = (await json(url)) as { heroUrl?: string | null; coverUrl?: string | null }
+    return { art: data.heroUrl ? [data.heroUrl] : [], poster: data.coverUrl ?? null }
   } catch (err) {
-    console.error("Could not read the game's wide picture:", err)
-    return null
+    console.error("Could not read the game's pictures:", err)
+    return { art: [], poster: null }
   }
 }
 
-/** One game's achievements on any platform, read through the routes its page uses, in the shape the insights take; and its wide art. */
+const raImage = (path: string) => `https://retroachievements.org${path}`
+
+/** One game's achievements on any platform, read through the routes its page uses, in the shape the insights take; and the pictures those routes give. */
 async function load(source: GameSource, id: number, lang: string): Promise<Loaded> {
   if (source === 'ra') {
-    const data = (await json(`/api/getGameProgression?gameId=${id}`)) as {
+    const [progress, igdb] = await Promise.all([json(`/api/getGameProgression?gameId=${id}`), igdbPictures(`/api/getGameArt?gameId=${id}`)])
+    const data = progress as {
       Achievements?: Record<string, RetroAchievement | undefined>
       NumDistinctPlayers?: number
       ImageIngame?: string
       ImageTitle?: string
+      ImageBoxArt?: string
     }
     const list = Object.values(data.Achievements ?? {}).filter((a): a is RetroAchievement => Boolean(a))
-    return { items: fromRa(list, data.NumDistinctPlayers ?? 0, id), art: await wideArt('ra', id, data), ra: { items: list, players: data.NumDistinctPlayers ?? 0 } }
+    const own = [data.ImageIngame, data.ImageTitle].filter((path): path is string => Boolean(path)).map(raImage)
+    return {
+      items: fromRa(list, data.NumDistinctPlayers ?? 0, id),
+      art: [...igdb.art, ...own],
+      poster: data.ImageBoxArt ? raImage(data.ImageBoxArt) : igdb.poster,
+      ra: { items: list, players: data.NumDistinctPlayers ?? 0 },
+    }
   }
   if (source === 'steam') {
     const data = await json(`/api/steam/achievements?appid=${id}&lang=${toSteamLanguage(lang)}`)
     if (!Array.isArray(data)) throw new Error('Unexpected Steam answer')
-    return { items: fromSteam(data as SteamAchievementUnified[], id), art: null }
+    return { items: fromSteam(data as SteamAchievementUnified[], id), art: [], poster: null }
   }
   if (source === 'psn') {
     const data = (await json(`/api/psn/trophies?id=${encodeURIComponent(psnTitleId(id))}&lang=${lang}`)) as { trophies?: PsnTrophy[] }
     if (!Array.isArray(data.trophies)) throw new Error('Unexpected PSN answer')
-    return { items: fromPsn(data.trophies, id), art: null }
+    return { items: fromPsn(data.trophies, id), art: [], poster: null }
   }
   const data = (await json(`/api/xbox/achievements?id=${id}&lang=${lang}`)) as { achievements?: XboxAchievement[] }
   if (!Array.isArray(data.achievements)) throw new Error('Unexpected Xbox answer')
-  return { items: fromXbox(data.achievements, id), art: await wideArt('xbox', id, null) }
+  return { items: fromXbox(data.achievements, id), ...(await igdbPictures(`/api/xbox/details?id=${id}`)) }
 }
 
 /**
@@ -92,8 +98,10 @@ export function useGameInsights(source: GameSource | null, id: number | null) {
   const settled = answer?.key === want ? answer : null
   return {
     items: settled && 'items' in settled ? settled.items : [],
-    /** A wide picture of the game, when its platform's page reads one. */
-    art: settled && 'items' in settled ? settled.art : null,
+    /** Wide pictures of the game, best first, where its reads give any (IGDB's, RA's screenshots). */
+    art: settled && 'items' in settled ? settled.art : [],
+    /** Its box art, when its platform's page reads one (RA's own, Xbox's from IGDB). */
+    poster: settled && 'items' in settled ? settled.poster : null,
     /** RA's original rows, so its targets can open the same detail as gameInfo. */
     ...(settled && 'ra' in settled ? { ra: settled.ra } : {}),
     loading: want !== null && settled === null,

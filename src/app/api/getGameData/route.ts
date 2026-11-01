@@ -2,11 +2,8 @@ import { raUnavailable } from '@/lib/raFailure'
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { requireViewerApiKey } from "@/lib/apiAuth";
-import { withCache } from "@/lib/raCache";
 import { cachedJson } from "@/lib/httpCache";
-import { getGame } from "@/lib/raClient";
-
-const TTL = 4 * 60 * 60 * 1000;
+import { cachedGame, GAME_TTL_MS } from "@/lib/raGame";
 
 export async function GET(request: NextRequest) {
   const gameId = request.nextUrl.searchParams.get("gameId");
@@ -22,15 +19,8 @@ export async function GET(request: NextRequest) {
   if (!auth.ok) return auth.response;
 
   try {
-    const data = await withCache(
-      `gameData_v2:${gameId}`,
-      TTL,
-      () => getGame(gameId, auth.apiKey),
-      // API_GetGame answers with Title, ImageBoxArt, Released… but no ID field:
-      // checking for 'ID' threw every real answer away and returned 503.
-      (d) => d !== null && typeof d === 'object' && 'Title' in d,
-    );
-    return cachedJson(data, TTL);
+    const data = await cachedGame(gameId, auth.apiKey);
+    return cachedJson(data, GAME_TTL_MS);
   } catch (err) {
     return raUnavailable(err)
   }

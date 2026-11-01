@@ -29,6 +29,37 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-10-31 — Expanded card stats and the cover's art (`fix/89-hero-art-expanded-stats`, #89)
+
+**Did** — The RA and Steam stats under an expanded game's ring are one line each (`GameExpandedStatList`, shared), not
+three columns in a 142 px cell. The cover (`MainPagePortada`) shows art only once it has loaded and been judged for
+its box (`artVerdict`); each source is tried once, the first too small for the box is the background if none fits,
+and only a game with no wide picture gets the poster, then its colour alone. RA now reads IGDB too (`/api/getGameArt`,
+`igdbRaArt`, `src/lib/raGame.ts`). IGDB's
+backdrop is the widest landscape picture, asked for at its real size, and a search hit that shares no title with the
+game is no match (`igdb:art:v3`, `igdb:details:v2`).
+**Why** — #89: stats piled up, and the cover showed blurred or stretched art.
+**Decisions** — The issue says low-resolution art must not be stretched into the background. The user overrode that
+on 2026-10-31: a soft wide picture beats a cover with only a box art, so it is set aside and comes back as a last
+resort. A portrait is still never cropped in. Source order: Steam library hero → store header; RA IGDB → in-game →
+title screen; Xbox IGDB; PSN `heroUrl`
+(no longer its portrait cover); then the poster (Steam/PSN box art, RA box art → icon, Xbox IGDB cover through
+`/api/xbox/details` → its tile, the user's call), then the tint, or
+`NEUTRAL_TINT` if unreadable. Fit depends on the box (at most 2× stretch, aspect 8:7 to 4:1), so a 460 px header fits
+on a phone and not at 2560 px. IGDB for RA measured 2026-10-31 with 16 well-known games of 11 consoles: 16 matched, 14
+fit at 2560 px. Hacks and subsets skip IGDB; consoles outside `RA_PLATFORMS` keep RA's pictures. Art stays a direct image, not
+through `/api/image-proxy`: only the colour needs a canvas, and the 3 MB cap would refuse large backdrops. The proxy
+keeps reading the tint, where a failure is neutral and never asked again.
+**Verification** — Stats measured in a browser at 390, 1024 and 2560 px, both designs, nine languages, long values: no
+overlap or overflow. The real `next/image` was checked with Steam art, cold and cached, including low-res, portrait and
+404: the box height never moved. The whole cover was not seen signed in with real data: its behaviour is in Jest.
+**Open** — A DLC whose name contains the game's ("Minecraft: Master Chief Mash-up" for "Minecraft") still passes the
+title check; IGDB's parent-game field could refuse it, unmeasured.
+**Watch out** — IGDB's `t_1080p` stretches a smaller original (1000×562 served as 1920×1079, measured 2026-10-31), so
+the file's size says nothing there: that is what made Minecraft: Xbox 360 Edition look blurred. Use `pictureUrl`.
+
+---
+
 ## 2026-10-31 — `/user` enters as a whole (`feat/61-entrance-rollout`, #61)
 
 **Did** — `UserIdentityCard`'s `<section>` has `enter-card`, and the preferences and delete cards went from `--i` 3 and 6 to 1 and 2.

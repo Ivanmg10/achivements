@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
 import { averageTint, useImageTint, NEUTRAL_TINT } from './useImageTint'
 
 const px = (...rgba: number[][]) => new Uint8ClampedArray(rgba.flat())
@@ -36,5 +36,23 @@ describe('useImageTint', () => {
   it('is null without an image or while it is read', () => {
     expect(renderHook(() => useImageTint(null)).result.current).toBeNull()
     expect(renderHook(() => useImageTint('https://example.com/x.png')).result.current).toBeNull()
+  })
+
+  it('takes a proxy failure as neutral, once: not on a re-render, nor on a later mount', () => {
+    const images: { onerror?: () => void; src: string }[] = []
+    jest.spyOn(window, 'Image').mockImplementation(function Fake() {
+      const img = { src: '' }
+      images.push(img)
+      return img as unknown as HTMLImageElement
+    })
+    const src = 'https://example.com/broken.png'
+    const { result, rerender } = renderHook(() => useImageTint(src))
+    expect(images[0].src).toBe(`/api/image-proxy?url=${encodeURIComponent(src)}`)
+    act(() => images[0].onerror!())
+    rerender()
+    expect(result.current).toBe(NEUTRAL_TINT)
+    expect(renderHook(() => useImageTint(src)).result.current).toBe(NEUTRAL_TINT)
+    expect(images).toHaveLength(1)
+    jest.restoreAllMocks()
   })
 })

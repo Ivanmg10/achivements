@@ -11,7 +11,7 @@ beforeEach(() => jest.clearAllMocks())
 
 test('nothing is asked for without a game', () => {
   const { result } = renderHook(() => useGameInsights(null, null))
-  expect(result.current).toEqual({ items: [], art: null, loading: false, error: false })
+  expect(result.current).toEqual({ items: [], art: [], poster: null, loading: false, error: false })
   expect(fetchShared).not.toHaveBeenCalled()
 })
 
@@ -33,14 +33,44 @@ test('a refused answer is an error, not an empty game', async () => {
   expect(result.current.items).toEqual([])
 })
 
-test('an RA game comes with its in-game screenshot as wide art', async () => {
-  answer({ Achievements: {}, NumDistinctPlayers: 3, ImageIngame: '/Images/9.png', ImageTitle: '/Images/8.png' })
+const RA_GAME = { Achievements: {}, NumDistinctPlayers: 3, ImageIngame: '/Images/9.png', ImageTitle: '/Images/8.png', ImageBoxArt: '/Images/7.png' }
+const byRoute = (art: { ok: boolean; body: unknown }) =>
+  (fetchShared as jest.Mock).mockImplementation((url: string) =>
+    Promise.resolve(url.startsWith('/api/getGameArt') ? { ok: art.ok, status: art.ok ? 200 : 503, json: () => Promise.resolve(art.body) } : { ok: true, status: 200, json: () => Promise.resolve(RA_GAME) }),
+  )
+
+test('an RA game takes IGDB\'s wide picture first, then its own screenshots', async () => {
+  byRoute({ ok: true, body: { heroUrl: 'https://igdb/wide.jpg', coverUrl: 'https://igdb/cover.jpg' } })
   const { result } = renderHook(() => useGameInsights('ra', 5))
   await waitFor(() => expect(result.current.loading).toBe(false))
-  expect(result.current.art).toBe('https://retroachievements.org/Images/9.png')
+  expect(fetchShared).toHaveBeenCalledWith('/api/getGameArt?gameId=5')
+  expect(result.current.art).toEqual(['https://igdb/wide.jpg', 'https://retroachievements.org/Images/9.png', 'https://retroachievements.org/Images/8.png'])
+  expect(result.current.poster).toBe('https://retroachievements.org/Images/7.png')
 })
 
-test('Xbox asks for its wide art apart, and goes without it when that fails', async () => {
+test('an RA game with no answer from IGDB keeps its own pictures and its achievements', async () => {
+  jest.spyOn(console, 'error').mockImplementation(() => {})
+  byRoute({ ok: false, body: {} })
+  const { result } = renderHook(() => useGameInsights('ra', 5))
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(result.current.error).toBe(false)
+  expect(result.current.art).toEqual(['https://retroachievements.org/Images/9.png', 'https://retroachievements.org/Images/8.png'])
+})
+
+test('Xbox takes both its pictures from IGDB, through its details', async () => {
+  ;(fetchShared as jest.Mock).mockImplementation((url: string) =>
+    Promise.resolve({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve(url.startsWith('/api/xbox/details') ? { heroUrl: 'https://igdb/wide.jpg', coverUrl: 'https://igdb/cover.jpg' } : { achievements: [] }),
+    }),
+  )
+  const { result } = renderHook(() => useGameInsights('xbox', 9))
+  await waitFor(() => expect(result.current.loading).toBe(false))
+  expect(result.current).toMatchObject({ art: ['https://igdb/wide.jpg'], poster: 'https://igdb/cover.jpg' })
+})
+
+test('Xbox asks for its pictures apart, and goes without them when that fails', async () => {
   jest.spyOn(console, 'error').mockImplementation(() => {})
   ;(fetchShared as jest.Mock).mockImplementation((url: string) =>
     url.startsWith('/api/xbox/details')
@@ -50,5 +80,5 @@ test('Xbox asks for its wide art apart, and goes without it when that fails', as
   const { result } = renderHook(() => useGameInsights('xbox', 9))
   await waitFor(() => expect(result.current.loading).toBe(false))
   expect(result.current.error).toBe(false)
-  expect(result.current.art).toBeNull()
+  expect(result.current).toMatchObject({ art: [], poster: null })
 })
