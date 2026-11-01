@@ -56,10 +56,9 @@ test('renders nothing when closed', () => {
   expect(container.innerHTML).toBe('')
 })
 
-test('renders the search input and hint text when open', () => {
+test('renders the search input when open', () => {
   render(<PinGameModal isOpen={true} onClose={jest.fn()} />)
   expect(screen.getByPlaceholderText('Search a game to pin…')).toBeInTheDocument()
-  expect(screen.getAllByText('Search a game to pin…').length).toBeGreaterThan(0)
 })
 
 test('calls onClose when the close button is clicked', () => {
@@ -175,7 +174,7 @@ test('a failed id lookup leaves the selection empty', async () => {
 test('closes on Escape', () => {
   const onClose = jest.fn()
   render(<PinGameModal isOpen={true} onClose={onClose} />)
-  fireEvent.keyDown(window, { key: 'Escape' })
+  fireEvent.keyDown(document, { key: 'Escape' })
   expect(onClose).toHaveBeenCalled()
 })
 

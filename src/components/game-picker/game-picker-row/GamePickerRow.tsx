@@ -25,7 +25,7 @@ export default function GamePickerRow({
     <button
       onClick={onToggle}
       aria-pressed={selected}
-      className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left focus-visible:outline-none focus-visible:bg-bg-main ${selected ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
+      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-box transition-colors text-left focus-visible:outline-none focus-visible:bg-bg-main ${selected ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
     >
       {icon ? (
         <Image src={icon} alt="" width={32} height={32} className="w-8 h-8 rounded-box-sm object-cover shrink-0" unoptimized />
