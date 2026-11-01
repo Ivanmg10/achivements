@@ -1244,6 +1244,8 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
   `main` keeps one entry per release.
 
 ### Environments (set up 2026-10-10)
+**Keep Next at 16.4.3 or later (2026-11-01).** Up to 16.4.2 about 13 % of Vercel builds failed with `next/font/google queries have exactly one entry`: Google sometimes answers with `/l/font?kit=…&skey=…` URLs for Sofia Sans, and Turbopack split the query on the `&`. It has nothing to do with the commit being built. If it comes back, read the log before retrying (`npx vercel inspect dpl_… --logs`).
+
 `develop` is served at `dev.cheevovault.com` (Vercel Preview, branch `develop`). `main` and
 `develop` are protected on GitHub (PR required, no force-push). A third ruleset,
 `pr description` (2026-10-14), requires the `pr-description` check to pass **and the

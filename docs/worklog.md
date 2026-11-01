@@ -29,6 +29,15 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-01 — Vercel's font failures, and Next 16.4.3 (`fix/106-look-transition-races`)
+
+**Did** — Next and `eslint-config-next` to 16.4.3.
+**Why** — Vercel failed 5 of 31 deployments on 2026-10-31 and 11-01 with `next/font/google queries have exactly one entry`, on commits that had nothing to do with it. Two earlier notes here called it unexplained.
+**Decisions** — The cause: Google sometimes answers with `https://fonts.gstatic.com/l/font?kit=…&skey=…&v=v20`, and Turbopack up to 16.4.2 splits its font query on that `&` (vercel/next.js#99114, fixed by #100158, in stable through #100277). Measured against Google with the build's user agent: Sofia Sans 22 of 220 answers, Sofia Sans Extra Condensed 7 of 220, Fira and Barlow 0 of 440, which makes about 13 % of builds. It hit since those fonts came in (2026-10-29), and a failure's 25 or 10 errors are that family's files. Proven with `NEXT_FONT_GOOGLE_MOCKED_RESPONSES` and a captured `/l/font` answer: 16.4.2 fails with the same 25 errors, 16.4.3 builds with valid woff2. Self-hosting the fonts was dropped: the update removes the failure. A retry would only roll the dice again.
+**Watch out** — The lockfile was updated with `--package-lock-only` so as not to change `node_modules` under a running `next dev`: run `npm ci` locally to get 16.4.3. The sample's rate moves with Google, and another family may start doing the same.
+
+---
+
 ## 2026-11-01 — Clicks, scope and blur during a look transition (`fix/106-look-transition-races`)
 
 **Did** — A click during a transition now works: `lookTransition` ends the transition and hands the click to the button under the pointer. A transition skipped by a newer one no longer clears the scope (`running`, `keepTo`). `ThemeModal` has the new `backdrop="dim"` of `Modal`, with no blur.
@@ -170,7 +179,7 @@ Measured: the cards end at ~800 ms (rounded to two decimals), and at ~220 ms wit
 **Watch out** — Vercel builds fail now and then (2026-10-31, three times on this PR) with `Can't resolve
 '@vercel/turbopack-next/internal/font/google/font'` / `next/font/google queries have exactly one entry`, on a font that changes between
 runs (Sofia Sans, then Sofia Sans Extra Condensed). It is intermittent: a later build restoring the same cache as a failed one passed, so
-the cache is not the cause, and the commit's code neither (fonts untouched, the same commit passed). Root cause not found. To retry,
+the cache is not the cause, and the commit's code neither (fonts untouched, the same commit passed). Root cause found on 2026-11-01, see the entry on Vercel's font failures: Google's `/l/font?kit=` URLs. To retry,
 `npx vercel redeploy <deployment url>`, which turns the commit's status green; a `develop` → `main` release may need it too. Local
 `node_modules` was on Next 16.3.6 while the lockfile says 16.4.2, so a local build is not proof of what Vercel builds: use a clean
 `npm ci` copy to compare.
