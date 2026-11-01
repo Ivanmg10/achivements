@@ -57,6 +57,9 @@ overlap or overflow. The real `next/image` was checked with Steam art, cold and 
 title check; IGDB's parent-game field could refuse it, unmeasured.
 **Watch out** — IGDB's `t_1080p` stretches a smaller original (1000×562 served as 1920×1079, measured 2026-10-31), so
 the file's size says nothing there: that is what made Minecraft: Xbox 360 Edition look blurred. Use `pictureUrl`.
+
+---
+
 ## 2026-10-31 — `/user` enters as a whole (`feat/61-entrance-rollout`, #61)
 
 **Did** — `UserIdentityCard`'s `<section>` has `enter-card`, and the preferences and delete cards went from `--i` 3 and 6 to 1 and 2.
