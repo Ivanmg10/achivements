@@ -21,7 +21,7 @@ export default function PublicUserOverview({ user, games, gamesLoading }: { user
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 enter-cards">
         {/* As tall as the profile beside it: no fixed height, so neither is cut. */}
         <div className="profile-recent bg-bg-card rounded-tile p-4 flex flex-col min-h-[26rem] min-w-0">
           {raLinked ? <RARecentlyPlayed /> : <RecentGamesList />}
@@ -31,7 +31,7 @@ export default function PublicUserOverview({ user, games, gamesLoading }: { user
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 enter-cards">
         <div className="bg-bg-card rounded-tile p-4 min-w-0">
           <PublicUserRecentUnlocks />
         </div>

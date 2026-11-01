@@ -117,7 +117,7 @@ export default function PublicUserCompare({
             ))}
           </div>
         ) : (
-          <ul className="flex flex-col gap-4">
+          <ul className="flex flex-col gap-4 enter-rows">
             {rows.map((r) => (
               <PublicUserDuelRow
                 key={r.label}
@@ -148,7 +148,7 @@ export default function PublicUserCompare({
         ) : shared.length === 0 ? (
           <EmptyState icon={<IconArrowsDiff className="w-6 h-6" />} title={T.userProfile.noSharedGames} size="compact" className="py-6" />
         ) : (
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 enter-rows">
             {shared.slice(0, SHARED_SHOWN).map((g) => (
               <li key={g.key} className="min-w-0">
                 <PublicUserSharedGameRow game={g} username={user.username} />

@@ -4,8 +4,6 @@ import { useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { fadeUp } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentlyPlayedGames } from '@/hooks/useRecentlyPlayedGames'
 import { useGroupPage } from '@/hooks/useGroupPage'
@@ -72,7 +70,7 @@ export default function GroupDetailPage() {
   }
 
   return (
-    <motion.div className={PAGE} variants={fadeUp} initial="hidden" animate="visible">
+    <div className={PAGE}>
       <div className="w-full lg:max-w-[98%] flex flex-col gap-5">
         {!group ? (
           <GroupDetailSkeleton />
@@ -146,6 +144,6 @@ export default function GroupDetailPage() {
         </LazyWhenOpened>
       )}
       <DeleteConfirmDialog isOpen={confirmDelete} onClose={() => setConfirmDelete(false)} onConfirm={handleDelete} />
-    </motion.div>
+    </div>
   )
 }

@@ -7,8 +7,6 @@ import { useAllGamesGlobal } from '@/hooks/useAllGamesGlobal'
 import { useGameExtraData } from '@/hooks/useGameExtraData'
 import { useLanguage } from '@/context/LanguageContext'
 import { SectionFallback } from '@/components/ui/SectionFallback'
-import { motion } from 'framer-motion'
-import { fadeUp } from '@/lib/animations'
 
 const CATEGORIES = ['wantToPlay', 'playing', 'completed'] as const
 
@@ -20,12 +18,7 @@ export default function AllGamesPage() {
   const raGames = { wantToPlay, playing, completed }
 
   return (
-    <motion.div
-      className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main"
-      variants={fadeUp}
-      initial="hidden"
-      animate="visible"
-    >
+    <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4 text-text-main">
       <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
         <NoMainHeader />
 
@@ -47,6 +40,6 @@ export default function AllGamesPage() {
           </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   )
 }

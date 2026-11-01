@@ -59,7 +59,7 @@ export default function StreakDayStrip({
                 <span
                   aria-hidden="true"
                   data-cut={cut || undefined}
-                  className={`relative w-full rounded-t-[3px] transition-[background-color,box-shadow] duration-(--motion-hover) ${
+                  className={`enter-grow-y relative w-full rounded-t-[3px] transition-[background-color,box-shadow] duration-(--motion-hover) ${
                     on ? 'bg-accent ring-2 ring-accent/40 ring-offset-2 ring-offset-bg-card' : n > 0 ? 'bg-accent/45 group-hover:bg-accent/70' : 'bg-ink/10'
                   }`}
                   style={{ height: h }}

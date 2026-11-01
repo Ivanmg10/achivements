@@ -1,5 +1,6 @@
 import { slantStyle } from '@/components/ui/shape'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
+import DesignCatalogEntrances from '../design-catalog-entrances/DesignCatalogEntrances'
 
 const SURFACES: [string, string, string][] = [
   ['bg-main', 'bg-bg-main', 'the page'],
@@ -94,6 +95,7 @@ export default function DesignCatalogFoundations() {
               </Specimen>
             ))}
           </div>
+          <DesignCatalogEntrances />
         </Panel>
       </DesignCatalogPiece>
     </>

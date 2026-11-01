@@ -35,7 +35,7 @@ export default function DesignCatalog() {
         style={{ background: 'radial-gradient(ellipse at top left, rgb(var(--accent) / 0.2), transparent 60%), rgb(var(--bg-card))' }}
       >
         <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">CheevoVault · {COUNT} pieces · admins only</p>
-        <h1 className="font-display italic font-extrabold text-5xl sm:text-[5rem] leading-[0.9] pr-2">Design system</h1>
+        <h1 className="enter-rise font-display italic font-extrabold text-5xl sm:text-[5rem] leading-[0.9] pr-2">Design system</h1>
         <p className="max-w-3xl text-base sm:text-lg text-text-main/85 leading-relaxed">
           Every piece of <code>src/components/ui</code>, live. New screens are built from these; a missing piece is added here first, with its test.
           Where the shape matters, each piece is drawn twice: slanted, and round.

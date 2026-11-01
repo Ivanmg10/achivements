@@ -29,7 +29,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
     <section aria-labelledby="public-user-name" className="relative bg-bg-card rounded-card overflow-hidden">
       <UserProfileBanner avatar={user.avatar} />
 
-      <div className="relative px-4 sm:px-6 pt-6 pb-5 flex flex-col gap-5">
+      <div className="relative px-4 sm:px-6 pt-6 pb-5 flex flex-col gap-5 enter-rows">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-4 sm:gap-5 min-w-0">
             <span className="relative shrink-0">

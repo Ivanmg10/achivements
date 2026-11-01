@@ -25,7 +25,7 @@ export default function MainPageJournal({ achievements, isLoading }: { achieveme
       ) : days.length === 0 ? (
         <EmptyState icon={<IconNotebook className="w-6 h-6" />} title={T.cards.noData} size="compact" className="py-2" />
       ) : (
-        <ol className="flex flex-col gap-3">
+        <ol className="flex flex-col gap-3 enter-rows">
           {days.map((d) => (
             <li key={d.day}>
               <MainPageJournalDay day={d} />

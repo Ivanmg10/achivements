@@ -68,6 +68,48 @@ test('light surfaces get darker RA marks', () => {
   expect(block).toContain('--softcore:')
 })
 
+const ENTER_TOKENS = ['--enter-duration', '--enter-ease', '--enter-stagger', '--enter-rise', '--enter-scale', '--enter-grow']
+
+test('the entrances read tokens, defined once for every theme', () => {
+  const base = baseBlock()
+  for (const token of ENTER_TOKENS) expect(base).toContain(`${token}:`)
+})
+
+test('under reduced motion an entrance is a plain fade: nothing moves and nothing waits', () => {
+  const start = css.indexOf('@media (prefers-reduced-motion: reduce) {\n  :root')
+  const block = css.slice(start, css.indexOf('}', start))
+  expect(valueIn(block, '--enter-rise')).toBe('0px')
+  expect(valueIn(block, '--enter-scale')).toBe('1')
+  expect(valueIn(block, '--enter-grow')).toBe('1')
+  expect(valueIn(block, '--enter-stagger')).toBe('0ms')
+})
+
+test('a slower entrance never reaches reduced motion: it would undo the 200 ms fade', () => {
+  expect(css).toMatch(/@media \(prefers-reduced-motion: no-preference\) \{\n  \.enter-slow \{/)
+  expect(css.match(/\.enter-slow/g)).toHaveLength(1)
+})
+
+test('an entrance leaves nothing behind: a fill that stays would keep a transform on the element', () => {
+  const rules = css.match(/animation: [^;]*--enter-duration[^;]*;/g) ?? []
+  expect(rules.length).toBeGreaterThan(0)
+  for (const rule of rules) expect(rule).toMatch(/ backwards;$/)
+})
+
+test('a list plays its first 12 rows, 40 ms apart', () => {
+  expect(valueIn(baseBlock(), '--enter-stagger')).toBe('40ms')
+  expect(css.match(/:is\(\.enter-rows, \.enter-cards\) > :nth-child\(\d+\) \{ --i: \d+; \}/g)).toHaveLength(11)
+  expect(css).toContain('.enter-rows:not([data-entered]) > :nth-child(-n + 12)')
+  expect(css).toContain('.enter-cards:not([data-entered]) > :nth-child(-n + 12)')
+})
+
+test('the shelves keep their cascade on the same tokens, so reduced motion reaches it too', () => {
+  for (const name of ['enter-shelf-title', 'enter-shelf-card', 'enter-shelf-end']) {
+    const frame = css.slice(css.indexOf(`@keyframes ${name} {`), css.indexOf('}\n}', css.indexOf(`@keyframes ${name} {`)))
+    expect(frame).toContain('var(--enter-rise)')
+  }
+  expect(css).toContain('.enter-shelves > :nth-child(5) { --shelf: 4; }')
+})
+
 test('Tailwind sees the colours and radii', () => {
   for (const name of ['--color-hardcore', '--color-softcore', '--radius-chip', '--radius-control', '--radius-field', '--radius-card', '--radius-button', '--radius-tag', '--radius-pane', '--radius-tile']) {
     expect(css).toContain(`${name}:`)

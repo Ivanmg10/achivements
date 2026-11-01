@@ -31,7 +31,7 @@ export default function RankingsGuide() {
   return (
     <div className="max-w-5xl w-full mx-auto px-4 sm:px-6 py-10 sm:py-14 flex flex-col gap-6">
       <header
-        className="relative overflow-hidden rounded-card ring-1 ring-inset ring-ink/[0.06] p-6 sm:p-10 flex flex-col gap-4"
+        className="relative overflow-hidden rounded-card ring-1 ring-inset ring-ink/[0.06] p-6 sm:p-10 flex flex-col gap-4 enter-rows"
         style={{ background: 'radial-gradient(ellipse at top left, rgb(var(--accent) / 0.22), transparent 60%), rgb(var(--bg-card))' }}
       >
         <IconTrophy aria-hidden="true" size={240} stroke={1} className="hidden sm:block absolute -right-8 -bottom-10 text-accent/[0.08] pointer-events-none" />

@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import type { RankRow } from '@/app/api/rankings/route'
 import { useLanguage } from '@/context/LanguageContext'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
@@ -9,7 +8,6 @@ import VaultSparkline from '@/components/vault-sparkline/VaultSparkline'
 import RankingsPageUser from '../rankings-page-user/RankingsPageUser'
 import RankingsPageDelta from '../rankings-page-delta/RankingsPageDelta'
 import RankingsPageStreak from '../rankings-page-streak/RankingsPageStreak'
-import { ROW } from '../rankingsMotion'
 
 const TH = 'px-3 py-2.5 text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary text-left shadow-[inset_0_-1px_0_rgb(var(--ink)/0.1)] whitespace-nowrap'
 const TD = 'px-3 py-3 shadow-[inset_0_-1px_0_rgb(var(--ink)/0.05)] align-middle'
@@ -56,9 +54,9 @@ export default function RankingsPageTable({
             {arrows && <th scope="col" className={`${TH} text-right`}>{T.rankings.colChange}</th>}
           </tr>
         </thead>
-        <tbody>
-          {rows.map((r, i) => (
-            <motion.tr key={r.username} variants={ROW} custom={i} initial="hidden" animate="show" className={`group transition-colors hover:[&>td]:bg-accent/[0.06] ${r.isMe ? '[&>td]:bg-accent/10' : ''}`}>
+        <tbody className="enter-rows">
+          {rows.map((r) => (
+            <tr key={r.username} className={`group transition-colors hover:[&>td]:bg-accent/[0.06] ${r.isMe ? '[&>td]:bg-accent/10' : ''}`}>
               <td className={`${TD} relative font-display italic font-extrabold text-[1.625rem] leading-none tabular-nums ${r.isMe ? "text-accent before:content-[''] before:absolute before:left-0 before:top-2.5 before:bottom-2.5 before:w-1 before:bg-accent before:skew-y-(--slant-mark)" : 'text-text-secondary'}`}>{r.rank}</td>
               <td className={`${TD} max-w-0 w-[30%]`}>
                 <RankingsPageUser row={r} size="md" linked={linked} nameClass="text-[0.9375rem] font-extrabold">
@@ -96,7 +94,7 @@ export default function RankingsPageTable({
                   <RankingsPageDelta delta={r.delta} />
                 </td>
               )}
-            </motion.tr>
+            </tr>
           ))}
         </tbody>
       </table>

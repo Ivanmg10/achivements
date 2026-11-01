@@ -116,7 +116,11 @@ test('a failed save does not touch the session', async () => {
 
 test('reserves the rankings preference row while its value loads', () => {
   render(<UserPreferencesCard />)
-  expect(screen.getByTestId('rankings-preference-placeholder')).toHaveClass('h-12')
+  const row = screen.getByTestId('rankings-preference-placeholder')
+  expect(row).toHaveClass('invisible')
+  expect(row).toHaveAttribute('aria-hidden', 'true')
+  expect(row).toHaveAttribute('inert')
+  expect(screen.queryByRole('switch', { name: en.rankings.showInRankings })).not.toBeInTheDocument()
 })
 
 test('the public profile switch reads the session, on unless turned off', () => {

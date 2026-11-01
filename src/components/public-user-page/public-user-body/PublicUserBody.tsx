@@ -1,13 +1,11 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { motion } from 'framer-motion'
 import { IconActivity, IconArrowsDiff, IconDeviceGamepad2, IconLayoutDashboard } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHashTab } from '@/hooks/useHashTab'
 import { useProfileLibrary } from '@/hooks/useProfileLibrary'
 import type { CheevoUser } from '@/hooks/useCheevoUser'
-import { fadeUp } from '@/lib/animations'
 import MainPageProfileTabs, { profilePanelId, profileTabId } from '@/components/main-page/main-page-profile/main-page-profile-tabs/MainPageProfileTabs'
 import PublicUserHero from '../public-user-hero/PublicUserHero'
 import PublicUserOverview from '../public-user-overview/PublicUserOverview'
@@ -47,7 +45,7 @@ export default function PublicUserBody({ user, viewer }: { user: CheevoUser; vie
   }
 
   return (
-    <motion.div className="flex flex-col gap-4" variants={fadeUp} initial="hidden" animate="visible">
+    <div className="flex flex-col gap-4">
       <PublicUserHero user={user} onCompare={() => setTab('compare')} />
 
       <MainPageProfileTabs<Tab> idPrefix={ID_PREFIX} size="md" label={T.userProfile.sectionsLabel} selected={tab} onSelect={setTab} tabs={tabs} />
@@ -55,6 +53,6 @@ export default function PublicUserBody({ user, viewer }: { user: CheevoUser; vie
       <div key={tab} role="tabpanel" id={profilePanelId(ID_PREFIX, tab)} aria-labelledby={profileTabId(ID_PREFIX, tab)} className="min-w-0">
         {panels[tab]}
       </div>
-    </motion.div>
+    </div>
   )
 }

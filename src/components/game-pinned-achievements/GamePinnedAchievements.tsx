@@ -103,7 +103,7 @@ export function GamePinnedAchievements({
           </div>
         )
       ) : (
-        <div className="flex flex-col gap-1 flex-1 overflow-y-auto">
+        <div className="flex flex-col gap-1 flex-1 overflow-y-auto enter-rows">
           {pinned.map((row) => {
             const earned = !!row.snapshot.DateEarned
             return (

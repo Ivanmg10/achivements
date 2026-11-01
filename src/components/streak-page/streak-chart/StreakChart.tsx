@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { Streak } from '@/types/types'
 import { decimal, formatDay, plural } from '@/utils/utils'
@@ -42,7 +41,7 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
         aside={T.streak.bestSub.replace('{n}', String(streaks.length)).replace('{avg}', `${decimal(avgStreak, lang)} ${T.streak.daysUnit}`)}
       />
 
-      <ol className="flex flex-col">
+      <ol className="flex flex-col enter-rows">
         {top.map((streak, i) => {
           const on = same(selectedStreak, streak)
           const live = same(activeStreak, streak)
@@ -59,16 +58,13 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
               >
                 <span className={`font-display italic font-extrabold text-2xl tabular-nums ${live ? '' : 'text-text-secondary'}`} style={live ? { color: streakInk(streakTier(streak.days)) } : undefined}>{i + 1}</span>
                 <span className="flex flex-col gap-1 min-w-0">
-                  <motion.span
+                  <span
                     aria-hidden="true"
-                    className={`h-[1.375rem] flex items-center px-3 text-xs font-bold text-bg-main whitespace-nowrap overflow-hidden ${live ? '' : 'bg-accent/35'}`}
-                    style={live ? { ...SLANT, backgroundColor: `rgb(${streakTier(streak.days).color})` } : SLANT}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${Math.max(12, (streak.days / maxDays) * 88)}%` }}
-                    transition={{ duration: 0.45, delay: i * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className={`enter-grow-x h-[1.375rem] flex items-center px-3 text-xs font-bold text-bg-main whitespace-nowrap overflow-hidden ${live ? '' : 'bg-accent/35'}`}
+                    style={{ ...SLANT, width: `${Math.max(12, (streak.days / maxDays) * 88)}%`, ...(live ? { backgroundColor: `rgb(${streakTier(streak.days).color})` } : {}) }}
                   >
                     {live && T.streak.ongoing}
-                  </motion.span>
+                  </span>
                   <span aria-hidden="true" className="text-[0.6875rem] text-text-secondary tabular-nums truncate">
                     {short(streak.start)} – {short(streak.end)}
                   </span>

@@ -1,8 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { notFound, useParams } from 'next/navigation'
-import { fadeUp } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
@@ -62,7 +60,7 @@ export default function XboxGamePage() {
   return (
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <XboxGameHeroBackground src={details?.heroUrl ?? xboxBackdrop(game)} />
-      <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
+      <div className="relative w-full flex flex-col items-center">
         <XboxGameInfoHeader
           game={game}
           details={details}
@@ -94,7 +92,7 @@ export default function XboxGamePage() {
             <XboxGameInfoTable achievements={achievements} gameId={game.id} gameTitle={game.title} />
           </>
         )}
-      </motion.div>
+      </div>
     </main>
   )
 }

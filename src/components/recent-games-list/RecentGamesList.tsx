@@ -62,7 +62,7 @@ export default function RecentGamesList() {
       ) : games.length === 0 ? (
         <EmptyState icon={<SteamLogo className="w-6 h-6" />} title={steamLinked ? T.steam.recentEmpty : T.cards.noGames} />
       ) : (
-        <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-y-auto">
+        <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-y-auto enter-rows">
           {games.map((item) => {
             const toggle = () => setExpanded((cur) => (cur === item.key ? null : item.key))
             if (item.source === 'psn') {

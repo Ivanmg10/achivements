@@ -1,12 +1,10 @@
 'use client'
 
 import { useMemo } from 'react'
-import { motion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { useXboxGameDetails } from '@/hooks/useXboxGameDetails'
-import { fadeUp } from '@/lib/animations'
 import { xboxBackdrop } from '@/utils/xboxTitles'
 import { xboxCompareList } from '@/utils/gameCompare'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
@@ -45,7 +43,7 @@ export default function UserGamePageXbox({ id, username, banner, comparing, mine
     <>
       <XboxGameHeroBackground src={details?.heroUrl ?? xboxBackdrop(game)} />
       {banner}
-      <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
+      <div className="relative w-full flex flex-col items-center">
         <XboxGameInfoHeader game={game} details={details} />
         <div className="w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-7">
           {isLoading ? (
@@ -68,7 +66,7 @@ export default function UserGamePageXbox({ id, username, banner, comparing, mine
             </>
           )}
         </div>
-      </motion.div>
+      </div>
     </>
   )
 }

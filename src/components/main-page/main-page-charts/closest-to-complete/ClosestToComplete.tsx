@@ -37,7 +37,7 @@ export default function ClosestToComplete({
   if (games.length === 0) return null
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-1.5 enter-rows">
       <p className="text-[10px] text-text-secondary uppercase tracking-widest">{T.cards.closestToPerfect}</p>
       {games.map((game) => (
         <GameListRow

@@ -119,7 +119,7 @@ export default function MainPageRarest({
   return (
     <div className="flex flex-col gap-2 flex-1">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.rarestUnlocks}</p>
-      <div className="flex flex-col gap-2 flex-1">
+      <div className="flex flex-col gap-2 flex-1 enter-rows">
         {rows.map(({ key, ...row }) => (
           <GameListRow key={key} {...row} statClassName="text-hardcore" />
         ))}

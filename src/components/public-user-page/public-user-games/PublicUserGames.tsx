@@ -117,7 +117,7 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
         <EmptyState icon={<IconSearch className="w-6 h-6" />} title={T.userProfile.noGamesMatch} size="compact" className="py-8" />
       ) : (
         <>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 enter-rows">
             {filtered.slice(0, shown).map((g) => (
               <li key={g.key} className="min-w-0">
                 <PublicUserGameRow game={g} />

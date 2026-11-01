@@ -43,6 +43,26 @@ then `CLAUDE.md` → "The component library" for the hard rules.
 
 - **Loading is drawn from `Skeleton`.** One composed skeleton per screen or view, on the real page's boxes, gutters and classes (the home's uses the `home-fit` ones), so the content lands without a jump. Where a height comes from data, measure the real thing in the browser and write that number down. Pulse only; the guard refuses a hand-made `animate-pulse`.
 
+## Entrances
+
+One set of CSS classes in `globals.css` for the whole site (issue #61; families agreed 2026-10-25). A page asks for an entrance with a class; it never writes one.
+
+| Family | Class | What it does |
+|---|---|---|
+| Heroes | `.enter-rows` on the column of text, `.enter-rise` on the rest with `[--i:n]` | Fade + 12 px rise; a child holding the `h1` goes first, whatever sits above it |
+| Lists and tables | `.enter-rows` on the `ul` / `ol` / `tbody` | Rows 40 ms apart, only the first 12 |
+| Cards and tiles | `.enter-card` on one, `.enter-cards` on a grid | Fade + scale 0.98 → 1 (a grid: first 12, 40 ms apart) |
+| Charts and figures | `.enter-grow-x` / `-y`; `animateIn` on `CircularProgress`; `CountUp` | Bars grow, rings fill, numbers count. A `ProgressBar` inside any entering element grows by itself |
+| Overlays, page transitions | none | As they were |
+
+- **A page that waits for nothing may take longer:** `.enter-slow` on its root (800 ms, 70 ms apart; `/user`, the user's call, 2026-10-31). It has no skeleton to soften its arrival, so the general timing reads as abrupt. It only applies without reduced motion.
+- **Retune in one place:** `--enter-duration`, `--enter-ease`, `--enter-stagger`, `--enter-rise`, `--enter-scale`, `--enter-grow`. Reduced motion only restates those tokens, so every entrance becomes a 200 ms fade with no movement and no delay; `CountUp` stays on its final number.
+- **`backwards`, never `both`.** A fill that stays would keep a transform on the element: it traps `position: fixed` inside and fights a sortable row's own transform.
+- **A list plays once.** `useEntrancesOnce` (mounted by `ShapeSync`) sets `data-entered` when its rows finish, because moving a node restarts its animation: measured 2026-10-31, 12 rows replayed on a reorder without the mark, 0 with it. It only ever switches an entrance off; nothing waits for it to show.
+- **Only for what appears on its own.** A list that is mounted with its skeleton inside would play on the skeleton: keep the skeleton outside. What opens on a click may stay in Framer (dialogs, toasts, the library's swaps and opened rows); the guard in `uiGuard.test.ts` lists those. No `whileInView`: entrances are not scroll-triggered.
+- **The library's shelves keep their own cascade** (`.enter-shelves` on their root, the user's call, 2026-10-31): each shelf 160 ms after the last, its title sliding in, its cards lifting and settling with a bounce 55 ms apart, "see all" closing it. The general `.enter-cards` was too plain there. It is built on the same tokens, so reduced motion needs nothing more, and its progress bars do not grow.
+- The home's left card (`ViewEntrance`) and profile column (`MainPageProfile.module.css`) came first and keep their own keyframes (the user confirmed it on 2026-10-31). The welcome keeps its own too (`WelcomePage.module.css`): they are timed to its curtain.
+
 ## The catalogue (`/design`, admins only)
 
 Every piece of `src/components/ui` (and the few that sit beside it) drawn live,

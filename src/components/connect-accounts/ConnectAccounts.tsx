@@ -43,12 +43,12 @@ export default function ConnectAccounts() {
   return (
     <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 text-text-main">
       <div className="w-full max-w-5xl flex flex-col gap-8">
-        <header className="flex flex-col items-center text-center gap-2">
+        <header className="flex flex-col items-center text-center gap-2 enter-rows">
           <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1">{T.connect.title}</h1>
           <p className="text-sm sm:text-base text-text-secondary max-w-xl">{T.connect.subtitle}</p>
         </header>
 
-        <div className={`grid grid-cols-1 gap-4 ${xboxEnabled ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
+        <div className={`grid grid-cols-1 gap-4 enter-cards ${xboxEnabled ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
           {!raLinked && (
             <UserPlatformCard
               name="RetroAchievements"

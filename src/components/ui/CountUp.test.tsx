@@ -20,6 +20,13 @@ test('animates from zero up to the value', () => {
   expect(animate).toHaveBeenCalledWith(0, 42, expect.objectContaining({ duration: 0.9 }))
 })
 
+test('a number with words around it keeps them, in the markup and while it counts', () => {
+  render(<CountUp value={12} format={(n) => `${n} days`} />)
+  expect(screen.getByText('12 days')).toBeInTheDocument()
+  animate.mock.calls[0][2].onUpdate(6.4)
+  expect(screen.getByText('6 days')).toBeInTheDocument()
+})
+
 test('does not animate when the user asks for less motion', () => {
   useReducedMotion.mockReturnValue(true)
   render(<CountUp value={42} />)

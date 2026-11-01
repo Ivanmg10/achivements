@@ -124,7 +124,7 @@ export default function MainPageFriends({ active, myRecent }: { active: boolean;
         <h3 className="text-[10px] uppercase tracking-widest text-text-secondary">
           {T.friends.cards} <span className="tabular-nums">· {friends.length.toLocaleString(lang)}</span>
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 enter-cards">
           {friends.map((f) => (
             <MainPageFriendsCard
               key={f.username}

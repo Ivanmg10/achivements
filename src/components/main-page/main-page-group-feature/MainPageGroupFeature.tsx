@@ -162,7 +162,7 @@ export default function MainPageGroupFeature({
           </Button>
         </div>
       ) : (
-        <ul className={GRID}>
+        <ul className={`${GRID} enter-cards`}>
           {items.slice(0, SHOWN).map((item) => (
             <li key={item.id} className="min-w-0">
               <MainPageGroupFeatureGame item={item} progress={progress(item)} />

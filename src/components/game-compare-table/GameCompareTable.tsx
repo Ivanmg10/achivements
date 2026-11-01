@@ -92,7 +92,7 @@ export default function GameCompareTable({
       {shown.length === 0 ? (
         <p className="text-sm text-text-secondary text-center py-6">{T.userGame.noneMatch}</p>
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-2 enter-rows">
           {shown.map((row) => (
             <GameCompareTableRow key={row.id} row={row} username={username} comparing={comparing} mineLoading={mineLoading} />
           ))}

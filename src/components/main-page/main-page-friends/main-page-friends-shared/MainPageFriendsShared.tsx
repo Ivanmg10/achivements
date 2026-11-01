@@ -23,7 +23,7 @@ export default function MainPageFriendsShared({ rows }: { rows: SharedGameRow[] 
       {rows.length === 0 ? (
         <EmptyState icon={<IconArrowsDiff className="w-6 h-6" />} title={T.friends.sharedEmpty} size="compact" className="py-6" />
       ) : (
-        <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 enter-rows">
           {rows.map(({ game, friends }) => (
             <li key={game.key} className="flex items-center gap-3 p-2.5 rounded-tile bg-bg-main min-w-0">
               <GameIcon source={game.source} id={game.id} imageUrl={game.iconUrl} size={44} className="w-11 h-11 rounded-lg shrink-0" />

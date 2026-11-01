@@ -87,7 +87,7 @@ export default function XboxCategorySection({
           className="py-6"
         />
       ) : (
-        <div className={`grid gap-3 items-start w-full ${STATUS_GRID_COLS[gridCols]}`}>
+        <div className={`grid gap-3 items-start w-full enter-cards ${STATUS_GRID_COLS[gridCols]}`}>
           {games.map((g) => (
             <XboxStatusGameItem key={g.id} game={g} category={category} />
           ))}

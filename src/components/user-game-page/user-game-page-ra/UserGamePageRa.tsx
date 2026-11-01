@@ -1,10 +1,8 @@
 'use client'
 
 import { useMemo, type ReactNode } from 'react'
-import { motion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGameProgression } from '@/hooks/useGameProgression'
-import { fadeUp } from '@/lib/animations'
 import { raCompareList, type CompareAchievement } from '@/utils/gameCompare'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
 import GameInfoHeroBackground from '@/components/game-info-hero-background/GameInfoHeroBackground'
@@ -50,12 +48,12 @@ export default function UserGamePageRa({ id, username, banner, comparing, mine, 
     <>
       <GameInfoHeroBackground imagePath={current.ImageTitle ?? current.ImageIngame ?? null} />
       {banner}
-      <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
+      <div className="relative w-full flex flex-col items-center">
         <GameInfoHeader gameData={current} />
         <div className="w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-7">
           <GameCompareTable theirs={theirs} mine={mine} username={username} comparing={comparing} mineLoading={mineLoading} notice={notice} />
         </div>
-      </motion.div>
+      </div>
     </>
   )
 }

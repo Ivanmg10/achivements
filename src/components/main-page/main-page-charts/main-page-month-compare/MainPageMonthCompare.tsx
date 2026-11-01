@@ -35,7 +35,7 @@ export default function MainPageMonthCompare({ achievements, isLoading }: { achi
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.monthCompare}</p>
         <p className="text-[10px] text-text-secondary">{T.cards.monthVs.replace('{range}', range)}</p>
       </div>
-      <dl className="grid grid-cols-3 gap-2 sm:gap-3">
+      <dl className="grid grid-cols-3 gap-2 sm:gap-3 enter-cards">
         {tiles.map(({ key, label }) => {
           const value = c.current[key]
           const delta = value - c.previous[key]

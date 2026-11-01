@@ -1,12 +1,10 @@
 'use client'
 
 import { useMemo } from 'react'
-import { motion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
 import { useSteamGameDetails } from '@/hooks/useSteamGameDetails'
-import { fadeUp } from '@/lib/animations'
 import { steamCompareList } from '@/utils/gameCompare'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
 import GameInfoSkeletonTable from '@/components/game-info-skeleton/game-info-skeleton-table/GameInfoSkeletonTable'
@@ -40,7 +38,7 @@ export default function UserGamePageSteam({ id, username, banner, comparing, min
     <>
       <SteamGameHeroBackground appId={appId} />
       {banner}
-      <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
+      <div className="relative w-full flex flex-col items-center">
         <SteamGameInfoHeader appId={appId} title={title} game={game} details={details} counts={counts} />
         <div className="w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-7">
           {isLoading ? (
@@ -60,7 +58,7 @@ export default function UserGamePageSteam({ id, username, banner, comparing, min
             <GameCompareTable theirs={theirs} mine={mine} username={username} comparing={comparing} mineLoading={mineLoading} notice={notice} />
           )}
         </div>
-      </motion.div>
+      </div>
     </>
   )
 }

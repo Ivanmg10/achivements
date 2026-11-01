@@ -101,19 +101,18 @@ export default function UserPreferencesGeneral({
         icon={<IconBroadcast size={18} />}
       />
 
-      {vault ? (
+      {/* Until the rankings answer, the same row unseen: it holds its exact height in any language and width. */}
+      <div {...(vault ? {} : { 'aria-hidden': true, inert: true, className: 'invisible', 'data-testid': 'rankings-preference-placeholder' })}>
         <UserProfileSwitch
           field="showInRankings"
-          checked={vault.showInRankings}
+          checked={vault?.showInRankings ?? true}
           label={T.rankings.showInRankings}
           onText={T.rankings.showInRankingsOn}
           offText={T.rankings.showInRankingsOff}
           icon={<IconTrophy size={18} />}
           onSaved={setShowInRankings}
         />
-      ) : (
-        <div aria-hidden="true" data-testid="rankings-preference-placeholder" className="h-12" />
-      )}
+      </div>
 
       <ProfileField
         label={T.userPage.hiddenGames}

@@ -41,7 +41,7 @@ export default function GroupGameGrid({
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
 
   const grid = (
-    <div className={`grid gap-3 ${GRID_COLS_CLASS[gridCols]}`}>
+    <div className={`grid gap-3 enter-cards ${GRID_COLS_CLASS[gridCols]}`}>
       {items.map((item) =>
         isRa(item) ? (
           <SortableItem

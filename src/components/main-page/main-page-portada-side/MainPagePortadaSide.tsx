@@ -11,7 +11,7 @@ import MainPagePortadaSideRecent from './main-page-portada-side-recent/MainPageP
  */
 export default function MainPagePortadaSide() {
   return (
-    <div className="m-3 flex flex-col gap-4 flex-1 min-h-0">
+    <div className="m-3 flex flex-col gap-4 flex-1 min-h-0 enter-cards">
       <MainPagePortadaSideLevel />
       <MainPagePortadaSideStreak />
       <MainPagePortadaSideRecent />

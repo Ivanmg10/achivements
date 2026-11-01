@@ -36,7 +36,7 @@ export default function StatusGameList({
   gridCols?: StatusGridCols
 }) {
   return (
-    <div className={`grid gap-3 items-start w-full ${STATUS_GRID_COLS[gridCols]}`}>
+    <div className={`grid gap-3 items-start w-full enter-cards ${STATUS_GRID_COLS[gridCols]}`}>
       {games.map((g) => (
         <StatusGameItem key={g.ID ?? g.GameID} game={g} extra={extraData?.get(g.GameID ?? (g.ID as number))} category={category} />
       ))}
