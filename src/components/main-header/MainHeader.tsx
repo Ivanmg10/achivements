@@ -217,7 +217,7 @@ export default function MainHeader() {
                 href="/user"
                 aria-label={T.sidePanel.userSettings}
                 aria-current={pathname === '/user' ? 'page' : undefined}
-                className={`flex items-center gap-2.5 pl-3 pr-1 h-10 rounded-tile transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${pathname === '/user' ? 'bg-accent/[0.14] ring-1 ring-inset ring-accent/50' : isGameInfo ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-ink/[0.05] hover:bg-ink/10'}`}
+                className={`flex items-center gap-2.5 pl-3 pr-1 h-10 rounded-nav transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${pathname === '/user' ? 'bg-accent/[0.14] ring-1 ring-inset ring-accent/50' : isGameInfo ? 'bg-ink/10 backdrop-blur-sm hover:bg-ink/20' : 'bg-ink/[0.05] hover:bg-ink/10'}`}
               >
                 <span className="text-[0.9375rem] font-bold hidden sm:block text-text-main leading-none">
                   {session.user?.name ?? session.user?.email}

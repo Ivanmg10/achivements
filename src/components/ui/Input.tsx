@@ -49,7 +49,7 @@ export function Textarea({ invalid, className = '', ...rest }: TextareaProps) {
   return (
     <textarea
       aria-invalid={invalid || undefined}
-      className={`${fieldClass({ invalid, multiline: true }, 'h-auto! py-3 resize-y')} ${className}`}
+      className={`${fieldClass({ invalid, multiline: true }, 'h-auto! py-3 [resize:var(--area-resize)]')} ${className}`}
       {...rest}
     />
   )

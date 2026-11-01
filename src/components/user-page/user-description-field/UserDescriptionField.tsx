@@ -39,7 +39,7 @@ export default function UserDescriptionField() {
         maxLength={DESCRIPTION_MAX}
         rows={3}
         placeholder={T.userData.descriptionPlaceholder}
-        className={fieldClass({}, 'h-auto! py-3 flex-1 min-h-16 resize-y')}
+        className={fieldClass({ multiline: true }, 'h-auto! py-3 flex-1 min-h-16 [resize:var(--area-resize)]')}
       />
       {error && <p role="alert" className="text-xs text-danger">{error}</p>}
       <div className="flex items-center justify-end gap-3 empty:hidden">

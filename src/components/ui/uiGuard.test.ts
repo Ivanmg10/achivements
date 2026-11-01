@@ -43,6 +43,14 @@ test('text fields come from the library (fieldClass, Input, Textarea, SearchInpu
   expect(bad).toEqual([])
 })
 
+test('a textarea drawn with fieldClass says it has several lines: a pill would deform it', () => {
+  const bad: string[] = []
+  for (const { file, text } of FILES) {
+    for (const m of text.matchAll(/<textarea\b[\s\S]*?\/>/g)) if (/fieldClass\(/.test(m[0]) && !/multiline: true/.test(m[0])) bad.push(file)
+  }
+  expect(bad).toEqual([])
+})
+
 test('no native select: the library has its own', () => {
   expect(offenders(/<select[\s>]/)).toEqual([])
 })

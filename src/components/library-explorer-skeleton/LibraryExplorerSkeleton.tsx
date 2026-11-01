@@ -56,7 +56,7 @@ function Shelf({ cards = SHELF_CARDS }: { cards?: number }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {Array.from({ length: cards }, (_, i) => (
           <div key={i} className="rounded-card bg-bg-card ring-1 ring-ink/5 overflow-hidden">
-            <Skeleton radius="tag" className="aspect-video rounded-none" />
+            <Skeleton radius="none" className="aspect-video" />
             <div className="p-4 min-h-[7.25rem] flex flex-col justify-end gap-3">
               <Skeleton className="h-4 w-2/3" />
               <Skeleton className="h-1.5 w-full" />

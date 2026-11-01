@@ -79,7 +79,7 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
             rows={3}
             maxLength={1000}
             placeholder={T.aiExport.questionPlaceholder}
-            className={fieldClass({}, 'h-auto! py-2.5 text-sm resize-y')}
+            className={fieldClass({ multiline: true }, 'h-auto! py-2.5 text-sm [resize:var(--area-resize)]')}
           />
         </div>
 

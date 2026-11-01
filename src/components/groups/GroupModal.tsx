@@ -172,7 +172,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                       placeholder={T.groups.descriptionPlaceholder}
                       maxLength={GROUP_DESCRIPTION_MAX}
                       rows={2}
-                      className={fieldClass({ size: 'sm' }, 'h-auto! py-2 resize-none')}
+                      className={fieldClass({ size: 'sm', multiline: true }, 'h-auto! py-2 resize-none')}
                     />
                   </div>
 

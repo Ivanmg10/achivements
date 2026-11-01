@@ -11,7 +11,7 @@ export default function GroupListSkeleton() {
       <span className="sr-only">{T.loadingPage.title}</span>
       {[0, 1, 2, 3, 4, 5].map((i) => (
         <div key={i} aria-hidden="true" className="flex flex-col h-[232px] sm:h-[268px] bg-bg-card rounded-card overflow-hidden ring-1 ring-inset ring-ink/[0.06]">
-          <Skeleton radius="tag" className="h-[9.375rem] rounded-none" />
+          <Skeleton radius="none" className="h-[9.375rem]" />
           <div className="px-5 py-4 flex flex-col gap-2.5">
             <Skeleton className="h-7 w-1/2" />
             <Skeleton className="h-3.5 w-1/3" />
