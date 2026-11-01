@@ -13,6 +13,17 @@ const EDGE_POINTS = 32
 
 const nextFrame = () => new Promise(requestAnimationFrame)
 
+/** The transition under way, the only one that may end the scope, and what it is kept to. */
+let running: ViewTransition | null = null
+let scoped: HTMLElement | undefined
+
+function keepTo(element?: HTMLElement) {
+  if (scoped && scoped !== element) scoped.style.viewTransitionName = ''
+  scoped = element
+  document.documentElement.style.viewTransitionName = element ? 'none' : ''
+  if (element) element.style.viewTransitionName = 'look-panel'
+}
+
 type Reveal = {
   keyframes: PropertyIndexedKeyframes
   /** What the old look does, when it does not simply stay under the new one. */
@@ -76,12 +87,10 @@ export function lookTransition(change: () => void, reveal: Reveal = FADE, within
     return
   }
   const root = document.documentElement
-  if (within) {
-    root.style.viewTransitionName = 'none'
-    within.style.viewTransitionName = 'look-panel'
-  }
+  keepTo(within)
   const layer = within ? 'look-panel' : 'root'
   const transition = document.startViewTransition(() => {})
+  running = transition
   transition.ready.then(async () => {
     const timing = { duration: reveal.duration, easing: reveal.easing }
     root.animate(reveal.keyframes, { ...timing, pseudoElement: `::view-transition-new(${layer})` })
@@ -91,10 +100,23 @@ export function lookTransition(change: () => void, reveal: Reveal = FADE, within
     flushSync(change)
     // Skipped (a hidden tab, another transition): it just changes.
   }, change)
-  if (within) {
-    transition.finished.catch(() => {}).finally(() => {
-      root.style.viewTransitionName = ''
-      within.style.viewTransitionName = ''
+  const ended = transition.finished.catch(() => {})
+  // `::view-transition` covers the window and takes every click (on <html>). Letting clicks through
+  // is not the way: Firefox cannot hit the captured element, so one lands on what is behind and closes
+  // the dialog. The transition steps aside for it instead, and the button under the pointer gets it.
+  const pass = (e: MouseEvent) => {
+    if (e.target !== root) return
+    root.removeEventListener('click', pass)
+    transition.skipTransition()
+    ended.then(() => {
+      const button = document.elementFromPoint(e.clientX, e.clientY)?.closest('button')
+      if (button && (within ?? root).contains(button)) button.click()
     })
   }
+  root.addEventListener('click', pass)
+  ended.finally(() => {
+    root.removeEventListener('click', pass)
+    // A newer transition skips this one and owns the scope now: cleared here, it would capture the whole page.
+    if (running === transition) keepTo()
+  })
 }

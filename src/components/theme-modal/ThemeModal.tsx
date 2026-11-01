@@ -17,7 +17,8 @@ interface Props {
  * Every theme by family. A pick spreads over the whole page from its tile and
  * the dialog stays open, so themes can be compared; the line under the title
  * says which one is on and when it has been saved. A failed save brings the
- * old one back and says so here.
+ * old one back and says so here. No blur behind it: the whole page has to take
+ * part in the spread, and Firefox would drop the blur for as long as it lasts.
  */
 export default function ThemeModal({ isOpen, onClose }: Props) {
   const { theme, choose, saveError } = useThemeChoice()
@@ -41,6 +42,7 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
       isOpen={isOpen}
       onClose={onClose}
       size="xl"
+      backdrop="dim"
       title={T.userTheme.theme}
       hint={<span role="status">{savedTheme === theme ? `${name} · ${T.toast.saved}` : name}</span>}
     >

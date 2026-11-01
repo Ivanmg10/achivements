@@ -20,6 +20,13 @@ it('can darken the page behind an immersive dialog', () => {
   expect(screen.getByRole('dialog', { name: 'Layout' }).parentElement).toHaveClass('bg-black/80')
 })
 
+it('can leave the blur out, for a page that takes part in a view transition', () => {
+  render(<Modal isOpen onClose={jest.fn()} backdrop="dim" title="Theme"><p>Choices</p></Modal>)
+  const backdrop = screen.getByRole('dialog', { name: 'Theme' }).parentElement
+  expect(backdrop).toHaveClass('bg-black/60')
+  expect(backdrop?.className).not.toContain('backdrop-blur')
+})
+
 it('is an alertdialog for a dangerous confirmation', () => {
   render(<Modal isOpen onClose={jest.fn()} tone="danger" title="Delete group?"><p>Gone for good</p></Modal>)
   expect(screen.getByRole('alertdialog', { name: 'Delete group?' })).toBeInTheDocument()
