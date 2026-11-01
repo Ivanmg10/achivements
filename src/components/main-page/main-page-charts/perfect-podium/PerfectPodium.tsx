@@ -55,7 +55,7 @@ export default function PerfectPodium({ games }: { games: LatestPerfect[] }) {
                 </span>
               </Link>
               <span
-                className={`w-full ${s.step} rounded-t-lg bg-bg-main border-t-2 ${s.medal} flex items-start justify-center pt-0.5 text-xs font-bold tabular-nums`}
+                className={`w-full ${s.step} rounded-t-box bg-bg-main border-t-2 ${s.medal} flex items-start justify-center pt-0.5 text-xs font-bold tabular-nums`}
               >
                 {i + 1}
               </span>

@@ -19,18 +19,18 @@ export default function MainPageProfileRecentRow({
 }) {
   return (
     <li>
-    <Link href={href} className="group flex gap-3 items-center py-1.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+    <Link href={href} className="group flex gap-3 items-center py-1.5 rounded-box focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
       {badge ? (
         <img
           src={badge}
           alt=""
           width={40}
           height={40}
-          className="w-10 h-10 rounded-lg shrink-0 object-cover"
+          className="w-10 h-10 rounded-box shrink-0 object-cover"
           style={hardcore ? { boxShadow: '0 0 0 2px rgb(var(--bg-card)), 0 0 0 4px rgb(var(--hardcore))' } : undefined}
         />
       ) : (
-        <span className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+        <span className="w-10 h-10 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
       )}
       <span className="flex flex-col min-w-0 flex-1">
         <span className="text-sm font-bold truncate group-hover:text-accent transition-colors">{title}</span>

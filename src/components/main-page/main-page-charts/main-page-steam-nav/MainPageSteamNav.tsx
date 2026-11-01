@@ -35,7 +35,7 @@ export default function MainPageSteamNav() {
         {SECTIONS.map(({ slug, emoji }) => {
           const { games } = sections[slug]
           return (
-            <div key={slug} className="bg-bg-main rounded-lg p-3 flex flex-col gap-2.5">
+            <div key={slug} className="bg-bg-main rounded-box p-3 flex flex-col gap-2.5">
               <Link
                 href={`/${slug}`}
                 className="flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
@@ -66,16 +66,16 @@ export default function MainPageSteamNav() {
                       className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                     >
                       {g.imageIcon ? (
-                        <Image src={g.imageIcon} alt="" width={32} height={32} className="rounded hover:scale-110 transition-transform" />
+                        <Image src={g.imageIcon} alt="" width={32} height={32} className="rounded-box-sm hover:scale-110 transition-transform" />
                       ) : (
-                        <span className="block w-8 h-8 rounded bg-ink/10" aria-hidden="true" />
+                        <span className="block w-8 h-8 rounded-box-sm bg-ink/10" aria-hidden="true" />
                       )}
                     </Link>
                   ))}
                   {games.length > PREVIEW && (
                     <Link
                       href={`/${slug}`}
-                      className="w-8 h-8 rounded bg-bg-card/60 flex items-center justify-center text-[10px] text-text-secondary hover:text-text-main transition-colors"
+                      className="w-8 h-8 rounded-box-sm bg-bg-card/60 flex items-center justify-center text-[10px] text-text-secondary hover:text-text-main transition-colors"
                     >
                       +{games.length - PREVIEW}
                     </Link>

@@ -100,7 +100,7 @@ export default function MainPageBestPeriod({
               onClick={() => setSelectedDay(bestDay[0])}
             />
           ) : (
-            <div className="bg-bg-main rounded-lg px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
+            <div className="bg-bg-main rounded-box px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
 
           {/* Best Week — yellow */}
@@ -114,7 +114,7 @@ export default function MainPageBestPeriod({
               onClick={() => setSelectedWeek(bestWeek[0])}
             />
           ) : (
-            <div className="bg-bg-main rounded-lg px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
+            <div className="bg-bg-main rounded-box px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
 
           {/* Best Month — red */}
@@ -129,7 +129,7 @@ export default function MainPageBestPeriod({
               onClick={() => setSelectedMonth(bestMonth[0])}
             />
           ) : (
-            <div className="bg-bg-main rounded-lg p-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
+            <div className="bg-bg-main rounded-box p-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
         </div>
       )}

@@ -82,7 +82,7 @@ export default function MainPageGamesList({
               alt="imagen"
               width={48}
               height={48}
-              className={`w-12 h-12 rounded-lg object-cover shrink-0 ${ringColor(game)}`}
+              className={`w-12 h-12 rounded-box object-cover shrink-0 ${ringColor(game)}`}
             />
           )}
           <div className="flex flex-col justify-center gap-0.5">
@@ -90,7 +90,7 @@ export default function MainPageGamesList({
               {game?.GameTitle ? game?.GameTitle : game?.Title}
             </p>
             <div className="flex flex-row items-center gap-1">
-              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${consoleDef?.color ?? 'text-text-secondary'}`}>
+              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${consoleDef?.color ?? 'text-text-secondary'}`}>
                 {consoleDef?.icon && (
                   <Image
                     src={consoleDef.icon}

@@ -76,7 +76,7 @@ export default function MainPageFriendsLeaderboard({ rows }: { rows: LeaderRow[]
               <span className="text-sm font-bold tabular-nums shrink-0 w-14 text-right">{show(r)}</span>
             </>
           )
-          const cls = `flex items-center gap-3 px-2 py-1.5 rounded-lg ${r.isMe ? 'bg-accent/10' : ''}`
+          const cls = `flex items-center gap-3 px-2 py-1.5 rounded-box ${r.isMe ? 'bg-accent/10' : ''}`
           return (
             <li key={r.username}>
               {r.isMe ? (

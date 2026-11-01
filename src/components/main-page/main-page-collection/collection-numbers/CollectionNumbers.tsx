@@ -20,7 +20,7 @@ import MasteryMix from '@/components/main-page/main-page-charts/mastery-mix/Mast
 /** One platform's tile in the strip: its name, its headline number and what it counts, then its bar. */
 function PlatformTile({ label, logo, value, valueClass, caption, children }: { label: string; logo: ReactNode; value: number; valueClass: string; caption: string; children: ReactNode }) {
   return (
-    <section aria-label={label} className="flex flex-col gap-2 rounded-lg bg-bg-main p-3 min-w-0">
+    <section aria-label={label} className="flex flex-col gap-2 rounded-box bg-bg-main p-3 min-w-0">
       <span className="flex items-center gap-2 text-xs text-text-secondary">
         {logo} {label}
       </span>

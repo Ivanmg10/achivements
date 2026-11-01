@@ -33,7 +33,7 @@ export default function MasteryMix({ awards }: { awards: UserAwards }) {
       <ul className="flex flex-wrap gap-x-3 gap-y-1">
         {mix.map((m) => (
           <li key={m.label} className="flex items-center gap-1.5 text-[11px] text-text-secondary">
-            <span className={`w-2 h-2 rounded-sm shrink-0 ${m.color}`} aria-hidden="true" />
+            <span className={`w-2 h-2 rounded-full shrink-0 ${m.color}`} aria-hidden="true" />
             {m.label}
             <span className="text-text-main tabular-nums">{m.value}</span>
           </li>

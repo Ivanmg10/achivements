@@ -227,8 +227,8 @@ export default function MainPageHeatmap({
                         key={`${wi}-${di}`}
                         className={
                           isLoading
-                            ? 'heat-loading rounded-[3px]'
-                            : `heat-cell rounded-[3px] transition-transform${count > 0 ? ' cursor-pointer hover:scale-125 hover:ring-1 hover:ring-text-main/40' : ''}${isToday ? ' ring-1 ring-text-main/70' : ''}`
+                            ? 'heat-loading rounded-cell'
+                            : `heat-cell rounded-cell transition-transform${count > 0 ? ' cursor-pointer hover:scale-125 hover:ring-1 hover:ring-text-main/40' : ''}${isToday ? ' ring-1 ring-text-main/70' : ''}`
                         }
                         style={{ backgroundColor: isLoading ? undefined : LEVEL_BG[heatLevel(count, best)], '--col': wi, '--row': di } as React.CSSProperties}
                         data-date={day?.date}
@@ -244,7 +244,7 @@ export default function MainPageHeatmap({
               <div className="flex items-center justify-end gap-1" style={{ height: LEGEND_ROW }}>
                 <span className="text-[9px] text-text-secondary">{T.cards.heatLess}</span>
                 {Array.from({ length: HEAT_LEVELS + 1 }, (_, level) => (
-                  <div key={level} className="w-2.5 h-2.5 rounded-[3px]" style={{ backgroundColor: LEVEL_BG[level] }} />
+                  <div key={level} className="w-2.5 h-2.5 rounded-cell" style={{ backgroundColor: LEVEL_BG[level] }} />
                 ))}
                 <span className="text-[9px] text-text-secondary">{T.cards.heatMore}</span>
               </div>

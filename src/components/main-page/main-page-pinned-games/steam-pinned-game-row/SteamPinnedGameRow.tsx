@@ -97,7 +97,7 @@ export default function SteamPinnedGameRow({
               onClick={onToggle}
               aria-expanded={isOpen}
               aria-label={`${isOpen ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.title}`}
-              className="p-1 rounded text-text-secondary/40 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] shrink-0"
+              className="p-1 rounded-box-sm text-text-secondary/40 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] shrink-0"
             >
               <IconChevronDown
                 size={14}

@@ -38,9 +38,9 @@ export default function MainPageBestPeriodRow({
     <button
       onClick={onClick}
       {...(expanded === undefined ? {} : { 'aria-expanded': expanded })}
-      className={`w-full bg-bg-main rounded-lg px-3 py-2.5 flex items-center gap-3 text-left cursor-pointer hover:bg-bg-card transition-colors focus-visible:outline-none focus-visible:ring-2 ${t.ring}`}
+      className={`w-full bg-bg-main rounded-box px-3 py-2.5 flex items-center gap-3 text-left cursor-pointer hover:bg-bg-card transition-colors focus-visible:outline-none focus-visible:ring-2 ${t.ring}`}
     >
-      <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${t.chip}`} aria-hidden="true">
+      <span className={`w-8 h-8 rounded-box flex items-center justify-center shrink-0 ${t.chip}`} aria-hidden="true">
         {icon}
       </span>
       <span className="flex flex-col min-w-0 flex-1 gap-0.5">
