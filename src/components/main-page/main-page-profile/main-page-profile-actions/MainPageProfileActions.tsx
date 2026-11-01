@@ -29,7 +29,7 @@ export default function MainPageProfileActions({
         rel="noopener noreferrer"
         aria-label={linkLabel}
         title={linkLabel}
-        className={`w-8 h-8 inline-flex items-center justify-center rounded-[0.5625rem] text-text-secondary hover:text-text-main hover:bg-ink/[0.08] transition-colors focus:outline-none focus:ring-2 ${ringClass}`}
+        className={`w-8 h-8 inline-flex items-center justify-center rounded-icon text-text-secondary hover:text-text-main hover:bg-ink/[0.08] transition-colors focus:outline-none focus:ring-2 ${ringClass}`}
       >
         <IconExternalLink className="w-4 h-4" aria-hidden="true" />
       </a>

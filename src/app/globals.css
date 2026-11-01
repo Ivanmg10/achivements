@@ -246,7 +246,7 @@ html[data-font="fira"],
   --clip-8: none;
   --clip-14: none;
   --clip-fill: none;
-  --bar-radius: min(999px, 0.5rem);
+  --bar-radius: 0.75rem;
   --r-chip: 9999px;
   --r-button: 9999px;
   --r-tag: 9999px;

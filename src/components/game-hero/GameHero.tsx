@@ -93,4 +93,4 @@ export default function GameHero({
 
 /** The hero's icon buttons (pin, hide): 38 px, tinted in the accent while on. */
 export const HERO_TOGGLE =
-  'inline-flex items-center justify-center w-[2.375rem] h-[2.375rem] rounded-[0.5625rem] hover:bg-ink/[0.08] aria-pressed:bg-accent/[0.16]'
+  'inline-flex items-center justify-center w-[2.375rem] h-[2.375rem] rounded-icon hover:bg-ink/[0.08] aria-pressed:bg-accent/[0.16]'

@@ -28,7 +28,7 @@ function NavLink({ href, label, active }: { href: string; label: string; active:
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={`relative inline-flex items-center gap-1 h-10 px-3 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:rounded-chip after:content-[''] after:absolute after:left-2.5 after:right-2.5 after:bottom-0.5 after:h-[3px] after:bg-accent after:skew-x-(--slant-line) after:origin-left after:transition-transform after:duration-(--motion-open) ${active ? 'text-text-main after:scale-x-100' : 'text-text-secondary hover:text-text-main after:scale-x-0'}`}
+      className={`relative inline-flex items-center gap-1 h-10 px-3 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:rounded-chip after:content-[''] after:absolute after:left-2.5 after:right-2.5 after:bottom-0.5 after:h-[3px] after:bg-accent after:rounded-(--bar-radius) after:skew-x-(--slant-line) after:origin-left after:transition-transform after:duration-(--motion-open) ${active ? 'text-text-main after:scale-x-100' : 'text-text-secondary hover:text-text-main after:scale-x-0'}`}
     >
       {label}
     </Link>
@@ -132,7 +132,7 @@ export default function MainHeader() {
             href="/"
             aria-label="Home"
             aria-current={isHome ? 'page' : undefined}
-            className={`inline-flex items-center justify-center w-9 h-9 rounded-[0.5625rem] shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${isHome ? 'text-accent bg-accent/[0.14]' : 'text-text-secondary hover:text-text-main hover:bg-ink/[0.08]'}`}
+            className={`inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${isHome ? 'text-accent bg-accent/[0.14]' : 'text-text-secondary hover:text-text-main hover:bg-ink/[0.08]'}`}
           >
             <IconHome className="w-[1.125rem] h-[1.125rem]" aria-hidden="true" />
           </Link>
@@ -140,7 +140,7 @@ export default function MainHeader() {
             <button
               onClick={() => { if (!tryHandleBack()) router.back() }}
               aria-label="Go back"
-              className="inline-flex items-center justify-center w-9 h-9 rounded-[0.5625rem] shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
             >
               <IconChevronLeft className="w-[1.125rem] h-[1.125rem]" aria-hidden="true" />
             </button>
@@ -173,7 +173,7 @@ export default function MainHeader() {
           <button
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Menu"
-            className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-[0.5625rem] shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
+            className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
           >
             <IconMenu className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -186,9 +186,9 @@ export default function MainHeader() {
           <button
             onClick={openSearch}
             aria-label="Search games"
-            className={`flex w-full h-11 rounded-control pl-3.5 pr-2 text-sm text-text-secondary text-left transition-[background-color,box-shadow] duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 items-center gap-2.5 cursor-text ring-1 ring-inset pointer-events-auto ${isGameInfo ? 'bg-ink/10 backdrop-blur-sm ring-ink/20 hover:bg-ink/20' : 'bg-bg-main shadow-[inset_0_2px_4px_rgb(0_0_0/0.22)] ring-ink/[0.08] hover:ring-accent/50'}`}
+            className={`flex w-full h-11 rounded-field pl-3.5 pr-2 text-sm text-text-secondary text-left transition-[background-color,box-shadow] duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 items-center gap-2.5 cursor-text ring-1 ring-inset pointer-events-auto ${isGameInfo ? 'bg-ink/10 backdrop-blur-sm ring-ink/20 hover:bg-ink/20' : 'bg-bg-main shadow-[inset_0_2px_4px_rgb(0_0_0/0.22)] ring-ink/[0.08] hover:ring-accent/50'}`}
           >
-            <span aria-hidden="true" className="w-1 h-5 shrink-0 bg-accent skew-x-(--slant-line)" />
+            <span aria-hidden="true" className="w-1 h-5 shrink-0 bg-accent rounded-(--bar-radius) skew-x-(--slant-line)" />
             <IconSearch className="w-4 h-4 shrink-0" aria-hidden />
             <span>{T.search.placeholder}</span>
           </button>
@@ -203,7 +203,7 @@ export default function MainHeader() {
           <button
             onClick={openSearch}
             aria-label="Search games"
-            className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-[0.5625rem] shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
+            className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-icon shrink-0 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 text-text-secondary hover:text-text-main hover:bg-ink/[0.08]"
           >
             <IconSearch className="w-5 h-5" aria-hidden="true" />
           </button>

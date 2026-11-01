@@ -74,7 +74,7 @@ export default function DesignCatalogFoundations() {
             <span aria-hidden="true" className="h-8 w-24 bg-accent" style={slantStyle(14)} />
           </Specimen>
           <Specimen name="--slant-line · --slant-mark">
-            <span aria-hidden="true" className="h-1 w-24 bg-accent skew-x-(--slant-line)" />
+            <span aria-hidden="true" className="h-1 w-24 bg-accent rounded-(--bar-radius) skew-x-(--slant-line)" />
             <span aria-hidden="true" className="h-9 w-1 bg-accent skew-y-(--slant-mark)" />
           </Specimen>
         </Compare>

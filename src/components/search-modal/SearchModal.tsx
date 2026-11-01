@@ -163,7 +163,7 @@ export default function SearchModal({ isOpen, onClose, initialQuery = '' }: Sear
               role="dialog"
               aria-modal="true"
               aria-label={T.search.placeholder}
-              className="bg-bg-header rounded-[1.125rem] overflow-hidden ring-1 ring-inset ring-ink/10 shadow-[0_30px_70px_rgb(0_0_0/0.55)]"
+              className="bg-bg-header rounded-sheet overflow-hidden ring-1 ring-inset ring-ink/10 shadow-[0_30px_70px_rgb(0_0_0/0.55)]"
               variants={contentVariants}
               onClick={(e) => e.stopPropagation()}
             >
