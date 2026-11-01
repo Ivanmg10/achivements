@@ -20,7 +20,7 @@ function LayoutChoice<V extends string>({ label, ...control }: { label: string; 
   )
 }
 
-const fontName = (font: FontStyle, name: string) => <span data-font={font} className="font-sans">{name}</span>
+const fontName = (font: FontStyle, name: string) => <span data-font={font}>{name}</span>
 
 /**
  * Where the site's look is chosen: every option in view at once, beside a sample

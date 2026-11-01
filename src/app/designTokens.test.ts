@@ -20,6 +20,19 @@ function baseBlock() {
   return css.slice(start, css.indexOf('}', start))
 }
 
+test('a font preview shows its font: it takes the family, and Barlow can undo a page in another font', () => {
+  for (const font of ['barlow', 'sofia', 'fira']) expect(css).toContain(`[data-font="${font}"]:not(html)`)
+  expect(css).toMatch(/\[data-font\]:not\(html\) \{\s+@apply font-sans;/)
+})
+
+test('a dialog\'s transition draws the ring and shadow of `Modal`\'s panel', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const modal: string = require('fs').readFileSync(require('path').join(__dirname, '../components/ui/Modal.tsx'), 'utf8')
+  const start = css.lastIndexOf('::view-transition-image-pair(look-panel) {')
+  const frame = css.slice(start, css.indexOf('}', start)).match(/@apply ([^;]+);/)![1]
+  for (const name of frame.split(' ')) expect(modal).toContain(name)
+})
+
 test('the base block defines every design token, so every theme has them', () => {
   const base = baseBlock()
   for (const token of DESIGN_TOKENS) expect(base).toContain(`${token}:`)

@@ -7,8 +7,8 @@
 */
 
 @theme inline {
-  --font-sans: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-barlow), var(--font-ui), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-face), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-face-display), var(--font-face), ui-sans-serif, system-ui, sans-serif;
 
   --color-bg-main: rgb(var(--bg-main));
   --color-bg-header: rgb(var(--bg-header));
@@ -179,10 +179,23 @@
   background: rgb(var(--accent));
 }
 
-/* A dialog's own transition keeps the dialog's corners. */
+/*
+   A dialog's frame stays still through its transition. Its ring and shadow are outside its box: a fade
+   would draw them twice and a sweep's clip-path cuts them, so the pair clips the looks and draws them
+   itself, the same classes as `Modal`'s panel. The band stops short of the edge, so it never tints the
+   corners; the looks ignore that padding.
+*/
 ::view-transition-image-pair(look-panel) {
+  @apply ring-1 ring-ink/[0.08] shadow-2xl shadow-black/50;
   overflow: hidden;
+  padding: 3px;
+  background-clip: content-box;
   border-radius: var(--r-card);
+}
+
+::view-transition-old(look-panel),
+::view-transition-new(look-panel) {
+  left: 0;
 }
 
 /* A page that waits for nothing has no skeleton to soften its arrival, so its entrance takes longer. */
@@ -194,20 +207,34 @@
 }
 
 /*
-   The font pairs. Barlow is the default through the classes next/font sets on
-   <html>; `data-font` swaps the two variables every component reads, on <html>
-   or on a preview that shows another choice inside the page.
+   The font pairs. `data-font` swaps the two variables every component reads, on
+   <html> or on a preview that shows another choice inside the page. A preview is
+   given the family itself, as its text inherits <html>'s, and Barlow is a choice
+   like the others there: it has to undo the page's. In a layer, so that
+   `font-display` on a preview's title still wins.
 */
+:root,
+[data-font="barlow"]:not(html) {
+  --font-face: var(--font-ui);
+  --font-face-display: var(--font-barlow);
+}
+
 html[data-font="sofia"],
 [data-font="sofia"]:not(html) {
-  --font-ui: var(--font-sofia);
-  --font-barlow: var(--font-sofia-display);
+  --font-face: var(--font-sofia);
+  --font-face-display: var(--font-sofia-display);
 }
 
 html[data-font="fira"],
 [data-font="fira"]:not(html) {
-  --font-ui: var(--font-fira);
-  --font-barlow: var(--font-fira-display);
+  --font-face: var(--font-fira);
+  --font-face-display: var(--font-fira-display);
+}
+
+@layer base {
+  [data-font]:not(html) {
+    @apply font-sans;
+  }
 }
 
 /*

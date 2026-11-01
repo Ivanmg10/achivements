@@ -213,7 +213,7 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
 - **Two designs, two look preferences:** `shape-style` = `slanted` (default) or `round`, and
   `font-style` = `barlow` (default), `sofia` or `fira` (Preferences → Layout), as
   `data-shape` and `data-font` on `<html>`; any element can carry either one to show a look inside
-  another (the catalogue, the choice cards and the Layout chooser's sample do) (`ShapeSync`; a
+  another (the catalogue, the choice cards and the Layout chooser's sample do; `data-font` swaps `--font-face` and `--font-face-display`, and such an element takes the family itself) (`ShapeSync`; a
   script in the root layout paints the last choices before the first frame). A component never
   reads the choice: it reads tokens. A bar's cut ends are `slantStyle(px)`
   (`ui/shape.ts`), a mark's lean `skew-y-(--slant-mark)`, a control's `skew-x-(--slant-button)`.
@@ -241,7 +241,7 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
   the cover (Framer `layoutId`), the flat style wipes across the cards, and the rest goes through `lookTransition`
   (`src/utils/lookTransition.ts`, the browser's view transition): a font fades (in the sample: the page takes it when the modal closes, so it never changes behind; the user's call), a theme spreads from its tile, and a shape sweeps
   across the window behind a band of the accent shaped like it (`sweepEdge`). Do not ease a shape with CSS: the bars' `clip-path` cannot, so half the
-  page jumped (the user turned that down). A browser without view transitions, or reduced motion, just changes. **Over a blurred backdrop a transition must be kept to the dialog** (`lookTransition(…, within)`): Firefox leaves `backdrop-filter` out of its capture of the page, so a whole-page transition shows the page sharp behind the dialog until it ends. Test motion in Firefox too, on the real screen.
+  page jumped (the user turned that down). A browser without view transitions, or reduced motion, just changes. **Over a blurred backdrop a transition must be kept to the dialog** (`lookTransition(…, within)`): Firefox leaves `backdrop-filter` out of its capture of the page, so a whole-page transition shows the page sharp behind the dialog until it ends. A dialog's ring and shadow are outside its box, so a fade draws them twice and a sweep's `clip-path` cuts them: the `look-panel` pair clips the looks and draws them itself. Test motion in Firefox too, on the real screen.
 - **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the best streaks' bars, the
   streak hero and its live bar, the cover's streak card, the home's stats tile, the rankings' streak column). This replaces "streaks in the accent" for those places.
 - **Adding a piece:** library first (`ui/`, props for layout only, a test), then its specimen in the
