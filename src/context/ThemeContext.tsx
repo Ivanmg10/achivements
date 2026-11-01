@@ -1,6 +1,7 @@
 "use client";
 
 import { Theme, THEME_STORAGE_KEY, isTheme } from "@/types/types";
+import { setThemeIcon } from "@/utils/themeIcon";
 import { useSession } from "next-auth/react";
 import {
   createContext,
@@ -30,11 +31,12 @@ export function ThemeProvider({
   const [syncedTheme, setSyncedTheme] = useState<string | undefined>(undefined);
 
   // The account's theme is taken during render, not in an effect, so the page
-  // is never repainted in the default for a frame before it arrives.
+  // is never repainted in the default for a frame before it arrives. An
+  // account still holding a theme that was removed lands on the default.
   const sessionTheme = session?.user?.theme;
   if (sessionTheme !== syncedTheme) {
     setSyncedTheme(sessionTheme);
-    if (isTheme(sessionTheme)) setTheme(sessionTheme);
+    if (sessionTheme) setTheme(isTheme(sessionTheme) ? sessionTheme : defaultTheme);
   }
 
   useEffect(() => {
@@ -42,6 +44,7 @@ export function ThemeProvider({
     // layout (the last one this browser used) stays on screen.
     if (status === "loading") return;
     document.documentElement.dataset.theme = theme;
+    setThemeIcon(theme);
     try {
       localStorage.setItem(THEME_STORAGE_KEY, theme);
     } catch {

@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react'
 import { en } from '@/translations/en'
 import WelcomePageDone from './WelcomePageDone'
 
-jest.mock('@/context/ThemeContext', () => ({ useTheme: () => ({ theme: 'ocean', setTheme: jest.fn() }) }))
+jest.mock('@/context/ThemeContext', () => ({ useTheme: () => ({ theme: 'sakura', setTheme: jest.fn() }) }))
 
 const T = en.welcome
 
@@ -26,7 +26,7 @@ test('with something linked: ready, what is linked, and a way back to what is no
 test('the profile and preferences say how they were left, and can be edited', () => {
   const { onGoTo } = renderDone(undefined, { description: 'hi' })
   expect(screen.getByText(T.done.profileDone)).toBeInTheDocument()
-  expect(screen.getByText(`English · ${en.userTheme.name_ocean}`)).toBeInTheDocument()
+  expect(screen.getByText(`English · ${en.userTheme.name_sakura}`)).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: `${T.done.edit}: ${T.steps.prefs}` }))
   expect(onGoTo).toHaveBeenCalledWith(5)
 })

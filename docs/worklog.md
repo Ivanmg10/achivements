@@ -29,6 +29,45 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-02 — Venom in bone white, and the theme groups (`feat/84-theme-favicon`, #84)
+
+**Did** — Venom's accent back to bone white (the red did not stay), with a purple logo, the one theme whose logo is not its accent. The picker's basics split into Dark and Light. "Video games" is now "Tributes" (`tributes`, "Homenajes"), as it holds Venom and Steam Retro.
+**Why** — The user's feedback after trying them. "Grove" was Gruvbox, as assumed: confirmed.
+**Decisions** — "Homenajes" was my choice of name: a character and a client are not video games, and it still fits Black Ops II and Snake Eater. Venom's logo starts from `#8b5cf6`; the issue's `#2B1B47` is too dark for a tab.
+
+---
+
+## 2026-11-02 — The favicon without a ground, Crimson, Venom's red (`feat/84-theme-favicon`, #84)
+
+**Did** — Favicon is concept B of canvas v3: no ground, the whole logo in the accent, with a tone for each browser scheme inside the SVG (`tone` in `src/utils/themeIcon.ts`); the table is one accent per theme now. New `crimson` ("Carmesí"), Midnight's cream on deep red. Venom takes option B, the red accent, so its `--danger` goes orange. 22 themes.
+**Why** — The user picked B and Venom B, and asked for a red one with that yellow as secondary, read as the accent. They also asked whether a themed icon is worth it over one basic logo: the answer given was yes, as a single logo has the same problem with tab colours and the cost is this one file of about 100 lines, half of it the table and the logo.
+**Decisions** — White and black accents take the browser's ink, as a grey logo looked dead on a light tab. Midnight and Crimson share an icon, as they share the accent. Facet steps go towards the tab, the same as the logo's first file.
+**Verification** — Real tabs in headed Chromium, Firefox light and Firefox dark (`ui.systemUsesDarkTheme`): Venom, Crimson, Sakura, Dark · White and Steam Retro change with no reload and follow the scheme. Tests, lint, types and the build pass.
+**Open** — A browser with a custom theme (the user's grey, a pink one) was not measured: the user can see it on their own tab. Safari. Update #84's text. Confirm "grove" meant Gruvbox.
+
+---
+
+## 2026-11-02 — Second round of themes, and the favicon without a ground (`feat/84-theme-favicon`, #84)
+
+**Did** — San Andreas's palette is now `midnight` ("Medianoche"), among the palettes: the user does not want it named after the game. Venom redone, near black with bone white and a purple sheen only on the surfaces. New `steam-retro`, from the old client's green VGUI (vgui.css by leonill007: `#292d23`, `#3e4637`, `#4c5844`, `#c4b550`, `#d8ded3`). `gruvbox` removed. Canvas v3 proposes the favicon with no ground.
+**Why** — Tried on the page: Venom's saturated purple cards looked ugly, and the ground behind the logo clashes with a browser's own theme (grey, pink…), which a page cannot read.
+**Decisions** — "Quita el de grove": the old Grove Street green no longer existed, so it was read as Gruvbox, which was still on the list; confirm with the user. Steam Retro sits one step darker than the original (card `#3e4637`, not `#4c5844`), or the gold misses 4.5:1 on a card. The Venom options not built are on the canvas. Measured: `prefers-color-scheme` works inside a data-URL SVG favicon, in Chromium dark and Firefox light and dark, and in Firefox it matched the tab with `ui.systemUsesDarkTheme`.
+**Open** — The code still draws concept D, with a ground, until the user picks on the canvas; `CLAUDE.md` describes that until then. A browser with a custom theme was not measured.
+**Watch out** — A window capture by title can catch the user's own browser: match a title only the test page has.
+
+---
+
+## 2026-11-01 — A favicon per theme, and the theme list (`feat/84-theme-favicon`, #84)
+
+**Did** — The favicon follows the theme (`src/utils/themeIcon.ts`: `themeScript()` before the first frame, `setThemeIcon` in `ThemeContext`), on one `<link id="theme-icon">` in the root layout; `src/app/icon.svg` moved to `public/icon.svg`. 9 themes out (synthwave, catppuccin, rose-pine, oled, ocean, terminal, daxter, bentley, clank), 5 in (venom, dark-blue, dark-white, light-blue, light-black), so 21. San Andreas rebuilt, Snake Eater retouched. `FEATURED_THEMES` of the welcome updated. CLAUDE.md has the rules.
+**Why** — Issue #84, widened by the user on the canvas: it asked for 5 removals and left Snake Eater out of scope. The issue's text still says so.
+**Decisions** — v1 of the canvas replaced the logo with a V for 16 px; the user turned it down (a friend drew the logo), so v2 keeps its paths exactly and the ground goes only inside the C, which keeps the C open. Chosen D on the canvas. Fewer themes would not have simplified it: what did was a table of two colours per theme, facets derived. San Andreas takes the game's HUD table (`CHudColours`, gta-reversed: dark blue 50 60 127, light blue 172 203 241, grey, cream 226 192 99): that is the HUD, not checked against a capture of the pause menu. The user said to discard San Andreas but liked style A, read as: the old one goes, A takes its place under the same name; a saved `san-andreas` stays valid. Snake Eater took option A, jungle green and khaki, my reading of MGS3: no published palette. `--info` moves to cyan or teal on the blue accents, as `--danger` and `--success` already do beside red and green. Bootstrap embeds colours and one template, not 21 data URLs (about 10 KB in every page). The file convention was dropped because a second link from Next could win over ours, and the public profile no longer prints a removed theme's raw id.
+**Verification** — Headed Chromium and Firefox from Playwright, screenshots of the real tab strip: Venom, Sakura, Dark · Green and San Andreas change with no reload, through a real session change (`/api/auth/session` mocked, refetched on `visibilitychange`). No hydration warning, one icon link in `<head>`, a removed theme lands on `dark`, and with the session pending the saved theme and icon are already there. Tests, lint, types and the build pass.
+**Open** — Safari is not tested. The signed-in pages were not looked at in the new themes: contrast is tested on tokens, the user will try them on the page. Update #84's text. `apple-icon.tsx` still says "CH".
+**Watch out** — A signed-out visitor keeps the default after hydration, as before this change (`ThemeProvider` starts dark and writes it): the saved theme only lasts the first paint for them. To test a tab's icon, a screenshot of the page shows nothing: capture the window, and bring it to the front first (the first run caught VS Code).
+
+---
+
 ## 2026-11-01 — Vercel's font failures, and Next 16.4.3 (`fix/106-look-transition-races`)
 
 **Did** — Next and `eslint-config-next` to 16.4.3.

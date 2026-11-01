@@ -8,6 +8,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import type { CheevoUser } from '@/hooks/useCheevoUser'
 import type { GameSource } from '@/types/steam'
+import { isTheme } from '@/types/types'
 import { candidateIconUrl } from '@/utils/gameCandidates'
 import { gameHref } from '@/utils/gameRef'
 import GroupCard from '@/components/groups/group-card/GroupCard'
@@ -50,7 +51,8 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
   const favorites = (['ra', 'steam', 'psn', 'xbox'] as const)
     .map((source) => ({ source, game: user.favorites?.[source] ?? null }))
     .filter((f) => f.game !== null)
-  const themeName = user.theme ? (T.userTheme as Record<string, string>)[`name_${user.theme}`] ?? user.theme : null
+  // An account can still hold a theme that was removed: no row, never its raw id.
+  const themeName = isTheme(user.theme) ? T.userTheme[`name_${user.theme}`] : null
   const groups = user.groups ?? []
 
   return (
