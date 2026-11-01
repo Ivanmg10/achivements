@@ -59,7 +59,7 @@ export default function PsnCollectionItem({
         aria-expanded={isExpanded}
         aria-controls={panelId}
         aria-label={`${isExpanded ? T.psn.hideGames : T.psn.showGames}: ${collection.title}`}
-        className="relative flex items-center gap-3.5 px-3.5 py-3 shrink-0 w-full text-left cursor-pointer rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] group"
+        className="relative flex items-center gap-3.5 px-3.5 py-2 shrink-0 w-full text-left cursor-pointer rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] group"
       >
         <GameIcon
           source="psn"

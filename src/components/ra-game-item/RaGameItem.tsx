@@ -65,7 +65,7 @@ export default function RaGameItem({
       <GameCardBackdrop src={art} />
 
       {/* relative: the expand button stretches over this whole row (see below). */}
-      <div className="relative flex items-center gap-3.5 px-3.5 py-3 shrink-0">
+      <div className="relative flex items-center gap-3.5 px-3.5 py-2 shrink-0">
         {/* Same destination as the title link, so it is kept out of the tab order. */}
         <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
           {art ? (
