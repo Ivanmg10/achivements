@@ -55,7 +55,7 @@ export default function MainPageHeatmap({
 
   // How many days fit is a question about the card, not about the data.
   const grid = useHeatmapGrid(boxRef, MONTH_ROW + LEGEND_ROW + 2 * ROW_GAP)
-  const { weeks, cell } = grid
+  const { weeks, cell, cellWidth } = grid
   // The last column is the week the grid ends in: the days that fit depend on which weekday that is.
   const days = until ? Math.min(HEATMAP_MAX_DAYS, weeks * 7 - (6 - until.getDay())) : grid.days
   const label = title ?? T.cards.activityLastDays.replace('{n}', String(days))
@@ -101,10 +101,10 @@ export default function MainPageHeatmap({
 
   const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: `repeat(${weeks}, ${cell}px)`,
+    gridTemplateColumns: `repeat(${weeks}, ${cellWidth}px)`,
     gap: `${GAP}px`,
   } as const
-  const gridWidth = weeks * cell + (weeks - 1) * GAP
+  const gridWidth = weeks * cellWidth + (weeks - 1) * GAP
   const today = new Date().toISOString().split('T')[0]
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
@@ -200,7 +200,7 @@ export default function MainPageHeatmap({
                   <span
                     key={col}
                     className="absolute top-0 text-[10px] font-medium text-text-secondary capitalize whitespace-nowrap leading-none"
-                    style={{ left: Math.min(col * (cell + GAP), Math.max(0, gridWidth - 26)) }}
+                    style={{ left: Math.min(col * (cellWidth + GAP), Math.max(0, gridWidth - 26)) }}
                   >
                     {label}
                   </span>

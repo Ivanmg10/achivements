@@ -7,7 +7,8 @@ export const MAX_TRIM = 100
  * its share pushed the end of the stats off the bottom. Whatever the box runs
  * past the screen comes off the daily chart instead (`--home-fit-trim`; the
  * heatmap follows the chart's box), and the page ends where the screen does.
- * Measured again when the box or the window changes size.
+ * Measured again when the box or the window changes size, and when the profile
+ * changes: a trimmed box does not resize when a shorter profile leaves it room.
  */
 export function homeFit(el: HTMLElement | null) {
   if (!el) return
@@ -23,14 +24,17 @@ export function homeFit(el: HTMLElement | null) {
   const schedule = () => {
     if (!frame) frame = requestAnimationFrame(fit)
   }
-  // ponytail: a profile that shrinks while trimmed keeps the trim until the next resize (the box does not change size then).
   const observer = new ResizeObserver(schedule)
   observer.observe(el)
+  const profile = new MutationObserver(schedule)
+  const side = el.querySelector('.home-fit-side')
+  if (side) profile.observe(side, { childList: true, subtree: true })
   window.addEventListener('resize', schedule)
   schedule()
   return () => {
     cancelAnimationFrame(frame)
     observer.disconnect()
+    profile.disconnect()
     window.removeEventListener('resize', schedule)
   }
 }

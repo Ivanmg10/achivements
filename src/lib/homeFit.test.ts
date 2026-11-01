@@ -31,6 +31,20 @@ test('never more than the chart can give', () => {
   expect(el.style.getPropertyValue('--home-fit-trim')).toBe(`${MAX_TRIM}px`)
 })
 
+test('measured again when the profile changes, as a trimmed box does not resize then', async () => {
+  const el = box(960)
+  const side = document.createElement('div')
+  side.className = 'home-fit-side'
+  el.appendChild(side)
+  homeFit(el)
+  expect(el.style.getPropertyValue('--home-fit-trim')).toBe('24px')
+  Object.defineProperty(el, 'offsetHeight', { configurable: true, get: () => 900 })
+  side.appendChild(document.createElement('div'))
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(el.style.getPropertyValue('--home-fit-trim')).toBe('0px')
+})
+
 test('measured again when the window changes, and not after it is gone', () => {
   const el = box(960)
   const cleanup = homeFit(el)

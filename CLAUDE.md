@@ -237,9 +237,9 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
   are in `ui/`; a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
   `GameCardBackdrop` is the one place that draws it, so every game card follows it.
-- **The Layout modal moves on every change (2026-11-01, #78):** all its options in view, no tabs. The first game's card grows into
+- **The Layout modal moves on every change (2026-11-01, #78):** all its options in view, no tabs. The theme stays in its own dialog (`ThemeModal`, which stays open on a pick and says what is on and saved), by the user's choice after trying it inside. The first game's card grows into
   the cover (Framer `layoutId`), the flat style wipes across the cards, and the rest goes through `lookTransition`
-  (`src/utils/lookTransition.ts`, the browser's view transition): a font fades (in the sample: the page takes it when the modal closes, so it never changes behind; the user's call), a theme spreads from its swatch, and a shape sweeps
+  (`src/utils/lookTransition.ts`, the browser's view transition): a font fades (in the sample: the page takes it when the modal closes, so it never changes behind; the user's call), a theme spreads from its tile, and a shape sweeps
   across the window behind a band of the accent shaped like it (`sweepEdge`). Do not ease a shape with CSS: the bars' `clip-path` cannot, so half the
   page jumped (the user turned that down). A browser without view transitions, or reduced motion, just changes.
 - **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the best streaks' bars, the
