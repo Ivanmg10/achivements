@@ -29,13 +29,13 @@ export function badgeClass(state: 'hardcore' | 'softcore' | 'earned' | 'locked')
     softcore: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--softcore))]',
     locked: '',
   }
-  return `block w-[3.25rem] h-[3.25rem] rounded-[0.625rem] ${RING[state]}`
+  return `block w-[3.25rem] h-[3.25rem] rounded-tile ${RING[state]}`
 }
 
 /** The picture inside a badge: a locked one grey and faint. */
 export function badgeImgClass(locked: boolean) {
-  return `w-full h-full object-cover rounded-[0.625rem] ${locked ? 'grayscale opacity-40' : ''}`
+  return `w-full h-full object-cover rounded-tile ${locked ? 'grayscale opacity-40' : ''}`
 }
 
 /** An achievement's type (progression, missable…) beside its title. */
-export const TYPE_TAG = 'inline-flex items-center h-5 px-2 rounded-[0.375rem] text-[0.6875rem] font-bold whitespace-nowrap'
+export const TYPE_TAG = 'inline-flex items-center h-5 px-2 rounded-tag text-[0.6875rem] font-bold whitespace-nowrap'

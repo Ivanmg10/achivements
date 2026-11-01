@@ -28,7 +28,7 @@ export function GameListRow({
   return (
     <Link
       href={href}
-      className="flex items-center gap-2 bg-bg-main rounded-lg p-2 hover:bg-ink/5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="flex items-center gap-2 bg-bg-main rounded-box p-2 hover:bg-ink/5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       {/* Decorative: the title is right beside it. With the title as its alt, an icon that
           failed to load printed the name inside its 28px box, wrapping over the row. */}

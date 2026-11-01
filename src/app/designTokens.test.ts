@@ -9,6 +9,7 @@ const DESIGN_TOKENS = [
   '--clip-3', '--clip-4', '--clip-5', '--clip-6', '--clip-8', '--clip-14', '--clip-fill', '--bar-radius',
   '--r-chip', '--r-control', '--r-field', '--r-card',
   '--r-button', '--r-tag', '--r-pane', '--r-tile', '--r-track', '--r-knob', '--knob-w', '--knob-h', '--knob-shift',
+  '--r-sheet', '--r-area', '--r-icon', '--r-box', '--r-box-md', '--r-box-sm', '--r-tag-sm', '--r-badge', '--r-cell', '--button-inset',
   '--h-control-sm', '--h-control', '--h-field',
   '--motion-hover', '--motion-open', '--motion-indicator', '--ease-spring',
 ]
@@ -29,7 +30,7 @@ function designBlock(name: 'slanted' | 'round') {
   const start = css.indexOf(`[data-shape="${name}"] {`)
   return css.slice(start, css.indexOf('}', start))
 }
-const SHAPE_TOKENS = DESIGN_TOKENS.filter((t) => /^--(slant|clip|bar-radius|r-chip|r-button|r-tag|r-pane|r-tile|r-field|r-card|r-track|r-knob|knob)/.test(t))
+const SHAPE_TOKENS = DESIGN_TOKENS.filter((t) => /^--(slant|clip|bar-radius|button-inset|r-sheet|r-area|r-icon|r-box|r-box-md|r-box-sm|r-tag-sm|r-badge|r-cell|r-control|r-chip|r-button|r-tag|r-pane|r-tile|r-field|r-card|r-track|r-knob|knob)/.test(t))
 const valueIn = (block: string, token: string) => block.match(new RegExp(`${token}: ([^;]+);`))?.[1]
 
 test('no theme overrides the shapes: only the two designs do, for all themes at once', () => {
@@ -50,11 +51,20 @@ test('the round design takes the slant out of every slanted token and rounds the
   const round = designBlock('round')
   for (const token of ['--slant-button', '--slant-pill', '--slant-line', '--slant-mark', '--slant-cut']) expect(round).toContain(`${token}: 0deg`)
   for (const token of ['--clip-3', '--clip-4', '--clip-5', '--clip-6', '--clip-8', '--clip-14', '--clip-fill']) expect(round).toContain(`${token}: none`)
-  // Chips, tags and the switch are pills; buttons, fields and cards keep soft corners.
-  for (const token of ['--r-chip', '--r-tag', '--r-track', '--r-knob']) expect(round).toContain(`${token}: 9999px`)
-  for (const token of ['--r-button', '--r-field', '--r-card']) expect(valueIn(round, token)).not.toBe('9999px')
+  // A one-line control is a pill; what holds several lines keeps soft corners, or it would look deformed.
+  for (const token of ['--r-chip', '--r-tag', '--r-tag-sm', '--r-badge', '--r-icon', '--r-track', '--r-knob', '--r-button', '--r-field']) expect(round).toContain(`${token}: 9999px`)
+  for (const token of ['--r-area', '--r-control', '--r-card', '--r-sheet']) expect(valueIn(round, token)).not.toBe('9999px')
   // The knob is a circle: as wide as it is tall.
   expect(valueIn(round, '--knob-w')).toBe(valueIn(round, '--knob-h'))
+})
+
+test('every surface is rounder in the round design than in the slanted one', () => {
+  // It was the other way round for a while, and nothing failed: the round design simply looked square.
+  const [slanted, round] = [designBlock('slanted'), designBlock('round')]
+  const rem = (block: string, token: string) => parseFloat(valueIn(block, token) ?? '')
+  for (const token of ['--r-card', '--r-sheet', '--r-pane', '--r-tile', '--r-control', '--r-area', '--r-box', '--r-box-md', '--r-box-sm']) {
+    expect(rem(round, token)).toBeGreaterThan(rem(slanted, token))
+  }
 })
 
 test('light surfaces get darker RA marks', () => {

@@ -35,7 +35,7 @@ export default function SegmentedControl<V extends string>({
     <div
       role="group"
       aria-label={label}
-      className={`relative isolate inline-grid grid-flow-col auto-cols-fr p-[3px] rounded-control bg-ink/[0.06] ${className}`}
+      className={`relative isolate inline-grid grid-flow-col auto-cols-fr p-[3px] rounded-button bg-ink/[0.06] ${className}`}
     >
       <span
         aria-hidden="true"

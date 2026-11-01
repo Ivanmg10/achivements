@@ -51,6 +51,15 @@
   --radius-tag: var(--r-tag);
   --radius-pane: var(--r-pane);
   --radius-tile: var(--r-tile);
+  --radius-sheet: var(--r-sheet);
+  --radius-area: var(--r-area);
+  --radius-icon: var(--r-icon);
+  --radius-box: var(--r-box);
+  --radius-box-md: var(--r-box-md);
+  --radius-box-sm: var(--r-box-sm);
+  --radius-tag-sm: var(--r-tag-sm);
+  --radius-badge: var(--r-badge);
+  --radius-cell: var(--r-cell);
 }
 
 /* ============================================
@@ -115,6 +124,16 @@
   --r-control: 0.75rem;
   --r-field: 0.875rem;
   --r-card: 1.25rem;
+  --r-sheet: 1.125rem;
+  --r-area: 0.875rem;
+  --r-icon: 0.5625rem;
+  --r-box: 0.5rem;
+  --r-box-md: 0.375rem;
+  --r-box-sm: 0.25rem;
+  --r-tag-sm: 0.25rem;
+  --r-badge: 0.3125rem;
+  --r-cell: 3px;
+  --button-inset: 5px;
   --h-control-sm: 2.25rem;
   --h-control: 2.75rem;
   --h-field: 3.25rem;
@@ -193,8 +212,19 @@ html[data-font="fira"],
   --r-tag: 0.375rem;
   --r-pane: 0.875rem;
   --r-tile: 0.625rem;
+  --r-control: 0.75rem;
   --r-field: 0.875rem;
   --r-card: 1.25rem;
+  --r-sheet: 1.125rem;
+  --r-area: 0.875rem;
+  --r-icon: 0.5625rem;
+  --r-box: 0.5rem;
+  --r-box-md: 0.375rem;
+  --r-box-sm: 0.25rem;
+  --r-tag-sm: 0.25rem;
+  --r-badge: 0.3125rem;
+  --r-cell: 3px;
+  --button-inset: 5px;
   --r-track: 7px;
   --r-knob: 4px;
   --knob-w: 1.375rem;
@@ -202,7 +232,7 @@ html[data-font="fira"],
   --knob-shift: 1.125rem;
 }
 
-/* The round design, the site as it was before the slant: no slant anywhere, bars cut straight and rounded, soft corners on buttons, fields and cards, tags and chips as pills, switches as a pill with a round knob. */
+/* The round design: no slant anywhere, bars rounded at the ends, soft surfaces a step rounder than the slanted design's, and every one-line control (button, field, tag, chip, icon button) a pill or a circle. */
 [data-shape="round"] {
   --slant-button: 0deg;
   --slant-pill: 0deg;
@@ -218,12 +248,23 @@ html[data-font="fira"],
   --clip-fill: none;
   --bar-radius: min(999px, 0.5rem);
   --r-chip: 9999px;
-  --r-button: 0.75rem;
+  --r-button: 9999px;
   --r-tag: 9999px;
-  --r-pane: 0.75rem;
-  --r-tile: 0.5rem;
-  --r-field: 0.75rem;
-  --r-card: 1rem;
+  --r-pane: 1.25rem;
+  --r-tile: 1rem;
+  --r-control: 1rem;
+  --r-field: 9999px;
+  --r-card: 1.5rem;
+  --r-sheet: 1.5rem;
+  --r-area: 1.25rem;
+  --r-icon: 9999px;
+  --r-box: 0.75rem;
+  --r-box-md: 0.625rem;
+  --r-box-sm: 0.5rem;
+  --r-tag-sm: 9999px;
+  --r-badge: 9999px;
+  --r-cell: 5px;
+  --button-inset: 0px;
   --r-track: 9999px;
   --r-knob: 9999px;
   --knob-w: 1.25rem;

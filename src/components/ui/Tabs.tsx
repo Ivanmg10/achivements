@@ -15,7 +15,7 @@ export function tabClass(on: boolean, className = '') {
   return (
     'relative shrink-0 inline-flex items-center gap-2 h-10 px-3 text-sm font-semibold whitespace-nowrap transition-colors duration-(--motion-hover) cursor-pointer ' +
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:rounded-chip ' +
-    "after:content-[''] after:absolute after:left-2 after:right-2 after:bottom-0 after:h-1 after:bg-accent after:skew-x-(--slant-line) after:origin-left after:transition-transform after:duration-(--motion-open) " +
+    "after:content-[''] after:absolute after:left-2 after:right-2 after:bottom-0 after:h-1 after:rounded-(--bar-radius) after:bg-accent after:skew-x-(--slant-line) after:origin-left after:transition-transform after:duration-(--motion-open) " +
     (on ? 'text-text-main after:scale-x-100 ' : 'text-text-secondary hover:text-text-main after:scale-x-0 ') +
     className
   )
@@ -91,7 +91,7 @@ export default function Tabs<V extends string>({
             {t.count !== undefined && <span className="text-xs font-bold tabular-nums text-text-secondary">{t.count}</span>}
             <span
               aria-hidden="true"
-              className={`absolute left-2 right-2 bottom-0 h-1 bg-accent skew-x-(--slant-line) origin-left transition-transform duration-(--motion-open) ease-out motion-reduce:transition-none ${on ? 'scale-x-100' : 'scale-x-0'}`}
+              className={`absolute left-2 right-2 bottom-0 h-1 rounded-(--bar-radius) bg-accent skew-x-(--slant-line) origin-left transition-transform duration-(--motion-open) ease-out motion-reduce:transition-none ${on ? 'scale-x-100' : 'scale-x-0'}`}
             />
           </button>
         )

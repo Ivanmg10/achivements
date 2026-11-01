@@ -28,7 +28,7 @@ export default function StreakTag({ days, text, size = 'md', glow = true, classN
   const lit = days > 0
   const tier = streakTier(days)
   const Flame = lit ? IconFlameFilled : IconFlame
-  const box = size === 'lg' ? 'h-8 px-3 text-sm gap-1.5 rounded-[0.5rem]' : 'h-[1.5rem] px-2 text-xs gap-1 rounded-tag'
+  const box = size === 'lg' ? 'h-8 px-3 text-sm gap-1.5 rounded-chip' : 'h-[1.5rem] px-2 text-xs gap-1 rounded-tag'
 
   return (
     <span
