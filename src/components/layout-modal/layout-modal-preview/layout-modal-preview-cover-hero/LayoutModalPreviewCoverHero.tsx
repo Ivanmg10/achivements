@@ -1,26 +1,23 @@
 'use client'
 
-import { useLanguage } from '@/context/LanguageContext'
-import type { GameCardStyle } from '@/hooks/useGameCardStyle'
-import Button from '@/components/ui/Button'
-import { ProgressBar } from '@/components/ui/ProgressBar'
-import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { SAMPLE_ART, SAMPLE_GAMES, samplePct } from '../layout-modal-preview-sample'
+import { motion } from 'framer-motion'
+import { buttonClass } from '@/components/ui/Button'
+import { FadeImage } from '@/components/ui/FadeImage'
+import { SAMPLE_LEAD_ID, sampleHero, type SampleGame } from '../layout-modal-preview-sample'
 
-/** The big game-on-top block of the sample home in its cover layout. */
-export default function LayoutModalPreviewCoverHero({ cards, kicker, open }: { cards: GameCardStyle; kicker: string; open: string }) {
-  const { lang } = useLanguage()
-  const game = SAMPLE_GAMES[0]
+const SETTLE = { duration: 0.3, delay: 0.2 }
+
+/** The big game-on-top block of the sample home in its cover layout. It grows out of the game's card (`SAMPLE_LEAD_ID`). */
+export default function LayoutModalPreviewCoverHero({ game, kicker, open }: { game: SampleGame; kicker: string; open: string }) {
   return (
-    <section className="relative isolate overflow-hidden rounded-card bg-bg-card p-5 ring-1 ring-ink/[0.08] sm:p-6">
-      <GameCardBackdrop src={SAMPLE_ART} style={cards} />
-      <p className="text-[0.625rem] font-bold uppercase tracking-[0.16em] text-accent">{kicker}</p>
-      <h3 className="mt-1 font-display italic font-extrabold text-4xl leading-[0.9] text-text-main pr-2">{game.title}</h3>
-      <div className="mt-4 flex max-w-sm items-center gap-3">
-        <ProgressBar pct={samplePct(game)} label={game.title} className="flex-1" />
-        <span className="text-sm font-extrabold tabular-nums text-text-main">{game.earned.toLocaleString(lang)} / {game.total.toLocaleString(lang)}</span>
-      </div>
-      <Button size="sm" disabled className="mt-4">{open}</Button>
-    </section>
+    <motion.div layoutId={SAMPLE_LEAD_ID} className="relative isolate flex h-44 shrink-0 flex-col items-start justify-end gap-1.5 overflow-hidden rounded-card p-5 @2xl:h-56">
+      <FadeImage src={sampleHero(game)} alt="" fill sizes="56rem" className="absolute! inset-0 -z-20" imgClassName="h-full w-full object-cover object-[50%_30%]" />
+      <span aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-r from-black/90 to-black/20" />
+      <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={SETTLE} className="flex flex-col items-start gap-1.5">
+        <span className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-white/80">{kicker}</span>
+        <span className="font-display italic font-extrabold text-3xl leading-none text-white pr-2 @2xl:text-4xl">{game.title}</span>
+        <span className={buttonClass('primary', 'sm', 'mt-1')}>{open}</span>
+      </motion.span>
+    </motion.div>
   )
 }

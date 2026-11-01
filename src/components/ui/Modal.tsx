@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
-const SIZES = { sm: 'sm:max-w-[27.5rem]', md: 'sm:max-w-[33.75rem]', lg: 'sm:max-w-[47.5rem]', xl: 'sm:max-w-5xl' } as const
+const SIZES = { sm: 'sm:max-w-[27.5rem]', md: 'sm:max-w-[33.75rem]', lg: 'sm:max-w-[47.5rem]', xl: 'sm:max-w-5xl', '2xl': 'sm:max-w-[77.5rem]' } as const
 const BACKDROPS = { default: 'bg-black/60 backdrop-blur-[2px]', opaque: 'bg-black/80 backdrop-blur-sm' } as const
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 

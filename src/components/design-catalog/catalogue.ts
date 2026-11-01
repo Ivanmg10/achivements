@@ -37,7 +37,7 @@ export const GROUPS: Group[] = [
       { id: 'checkbox', title: 'Checkbox', summary: 'A native checkbox drawn in the library\'s style; the whole row toggles.', source: '@/components/ui/Checkbox' },
       { id: 'choice-cards', title: 'ChoiceCards', summary: 'A choice among a few options as cards (native radios underneath, so the arrows work), each with an optional drawing above its words.', source: '@/components/ui/ChoiceCards', props: [['options', 'value, label, hint, icon, preview'], ['columns', '2 · 3 · 4']] },
       { id: 'tabs', title: 'Tabs', summary: 'A row of tabs with the accent line under the current one; roving tabindex.', source: '@/components/ui/Tabs', props: [['tabs', 'value, label, count'], ['tabIds()', 'the ids a tab and its panel share']] },
-      { id: 'segmented', title: 'SegmentedControl', summary: 'A choice among a few ways to see the same thing; a pill slides to the chosen one.', source: '@/components/ui/SegmentedControl', props: [['size', 'xs · sm · md']] },
+      { id: 'segmented', title: 'SegmentedControl', summary: 'A choice among a few ways to see the same thing; a pill slides to the chosen one.', source: '@/components/ui/SegmentedControl', props: [['size', 'xs · sm · md · lg'], ['tone', 'solid · outline']] },
       { id: 'pill', title: 'Pill', summary: 'A filter chip that toggles (aria-pressed), with an optional count.', source: '@/components/ui/Pill' },
     ],
   },

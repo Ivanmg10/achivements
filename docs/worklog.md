@@ -29,6 +29,26 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-01 — The Layout modal, concept A, and picking a streak (`refactor/78-round-design`)
+
+**Did** — `LayoutModal` is concept A of the canvas: every option in view (no tabs), the theme beside them, a fixed height, the sample
+on top of the options on a phone (sticky, sized with container queries). The sample has real games (Steam art through the usual hosts)
+and the top bar. Every change animates, see CLAUDE.md → design system. `SegmentedControl` gained `size="lg"` and `tone="outline"`, `Modal`
+the `2xl` size. On `/racha`: nothing is picked by default, a streak is picked in the best streaks or on the year and picking it again
+lets go; with one picked only it keeps the accent and a rail spans its weeks; each best streak's bar and place are in its tier's colour.
+**Why** — the user chose A and asked for an animation per change, tried it on the page instead of the canvas; a ring around the days
+and then a halo were both rejected for the streak, and the colour-only version was liked.
+**Decisions** — Native first: CSS transitions for the shape and the card wipe, the view transition API for font and theme, Framer only
+for the card that grows into the cover. The day by day still opens on the streak going now (or the best) with nothing picked, so the
+card is never empty and the page does not jump. The year stays in the accent, not the tier's colour: the user asked for tier colours
+on the best streaks only. The theme shortlist is six swatches, the person's own always among them, and the rest in `ThemeModal`.
+A theme picked in the modal gets no toast (the dialog stays open and nothing else there toasts); a failed save says so inline.
+**Open** — `npm run build` not rerun since these changes (it breaks the running dev server's CSS, see the entry below); run it before the
+PR. The bars of the sample snap between slanted and round: `clip-path` cannot ease from a polygon to `none`. #102 still lists the Layout modal.
+**Watch out** — Translations are CRLF in the working copy: a script that rewrites one line must keep that, or git shows the whole file changed.
+
+---
+
 ## 2026-11-01 — The round design on every control and surface (`refactor/78-round-design`, #78)
 
 **Did** — New round scale in `globals.css`: surfaces a step softer than slanted, one-line controls as pills, icon buttons as
@@ -50,8 +70,8 @@ Slanted: of 1,061 elements compared, only the header search changed (12 to 14 px
 my comparison: a swatch absent from the second run, as the new account had no points yet, paired with a presence dot of its size. 834 suites
 / 5,307 tests, tsc, ESLint and the build pass. Screenshots: `docs/audits/78-round-design/`.
 **Open** — Not seen by eye: RA and Xbox pages, generic modals, tooltips, an open `Select`, the admin panel, `/design`, the light
-themes. The audit comment for the issue is written but not posted: the permission system refused `gh issue comment`, so #78's
-"audit comment posted" criterion is still open. The full-width pill buttons are the most debatable part; the user said to look
+themes. The audit comment for the issue was posted once the user authorised it (it is what closes #78's "audit comment posted"
+criterion). The full-width pill buttons are the most debatable part; the user said to look
 at it again if it does not convince them.
 **Then, from the user's screenshots** — The Following, group and library skeletons asked for `tag` plus `rounded-none`, and the pill won: `Skeleton` has `radius="none"`.
 The account's description was an oval: it, `GroupModal` and `GameAiExportDialog` draw a raw `<textarea>` with `fieldClass`, so they got the pill. `multiline: true` is now

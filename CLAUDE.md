@@ -211,7 +211,7 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
 **`/design`, admins only** (the flag is read from the database; others get the 404).
 
 - **Two designs, two look preferences:** `shape-style` = `slanted` (default) or `round`, and
-  `font-style` = `barlow` (default), `sofia` or `fira` (Preferences → Layout → Page), as
+  `font-style` = `barlow` (default), `sofia` or `fira` (Preferences → Layout), as
   `data-shape` and `data-font` on `<html>`; any element can carry either one to show a look inside
   another (the catalogue, the choice cards and the Layout chooser's sample do) (`ShapeSync`; a
   script in the root layout paints the last choices before the first frame). A component never
@@ -237,7 +237,12 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
   are in `ui/`; a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
   `GameCardBackdrop` is the one place that draws it, so every game card follows it.
-- **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the
+- **The Layout modal moves on every change (2026-11-01, #78):** all its options in view, no tabs. The shape eases in the sample
+  (`.look-morph`, `--motion-morph`), the first game's card grows into the cover (Framer `layoutId`), the flat style wipes across
+  the cards, and a font or a theme goes through `lookTransition` (`src/utils/lookTransition.ts`, the browser's view transition:
+  the font fades, the theme spreads from its swatch). `.look-morph` never transitions `transform` on everything: Framer's layout
+  animations would drag behind it. A browser without view transitions, or reduced motion, just changes.
+- **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the best streaks' bars, the
   streak hero and its live bar, the cover's streak card, the home's stats tile, the rankings' streak column). This replaces "streaks in the accent" for those places.
 - **Adding a piece:** library first (`ui/`, props for layout only, a test), then its specimen in the
   catalogue, then its rule in `uiGuard.test.ts`, then the page. A page that needs a one-off look asks

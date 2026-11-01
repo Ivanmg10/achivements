@@ -1,19 +1,25 @@
 'use client'
 
+import { LayoutGroup, MotionConfig, motion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { useFontStyle } from '@/hooks/useFontStyle'
 import { useGameCardStyle } from '@/hooks/useGameCardStyle'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
 import { useShapeStyle } from '@/hooks/useShapeStyle'
 import LayoutModalPreviewCoverHero from './layout-modal-preview-cover-hero/LayoutModalPreviewCoverHero'
+import LayoutModalPreviewHeader from './layout-modal-preview-header/LayoutModalPreviewHeader'
 import LayoutModalPreviewSampleGameCard from './layout-modal-preview-sample-game-card/LayoutModalPreviewSampleGameCard'
 import LayoutModalPreviewSampleProfile from './layout-modal-preview-sample-profile/LayoutModalPreviewSampleProfile'
-import { SAMPLE_GAMES } from './layout-modal-preview-sample'
+import { SAMPLE_GAMES, SAMPLE_LEAD_ID } from './layout-modal-preview-sample'
+
+const GROW = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const }
 
 /**
  * A sample home made from the library's pieces, scoped to the choices being
- * tried so every change is visible before it is saved. The sample data is
- * fixed on purpose: the page behind the dialog never leaks into the preview.
+ * tried. Each choice moves it its own way: the shape eases its corners
+ * (`.look-morph`), the first game grows into the cover, and the flat style
+ * wipes across the cards. The sample data is fixed on purpose: the page behind
+ * the dialog never leaks into the preview.
  */
 export default function LayoutModalPreview() {
   const { T } = useLanguage()
@@ -21,6 +27,8 @@ export default function LayoutModalPreview() {
   const [font] = useFontStyle()
   const [layout] = useHomeLayout()
   const [cards] = useGameCardStyle()
+  const [lead, ...rest] = SAMPLE_GAMES
+  const cover = layout === 'cover'
 
   return (
     <section
@@ -29,31 +37,34 @@ export default function LayoutModalPreview() {
       data-font={font}
       data-layout={layout}
       data-cards={cards}
-      className="overflow-hidden rounded-card bg-bg-main ring-1 ring-ink/[0.1] shadow-2xl shadow-black/30"
+      className="look-morph @container flex h-full flex-col overflow-hidden rounded-card bg-bg-main ring-1 ring-ink/[0.1]"
     >
-      <div className="flex h-11 items-center gap-2 border-b border-ink/[0.08] bg-bg-header px-3">
-        <span className="font-display italic font-extrabold text-lg leading-none text-accent pr-1">CV</span>
-        <span className="h-5 w-16 rounded-tag bg-ink/[0.08]" />
-        <span className="h-5 w-10 rounded-tag bg-ink/[0.08]" />
-        <span className="ml-auto h-7 w-7 rounded-full bg-accent/20 ring-1 ring-inset ring-ink/10" />
-      </div>
+      <LayoutModalPreviewHeader />
 
-      <div className="flex flex-col gap-3 p-3 sm:p-4">
-        {layout === 'cover' && <LayoutModalPreviewCoverHero cards={cards} kicker={T.homeLayout.continueKicker} open={T.homeLayout.openGame} />}
+      <MotionConfig reducedMotion="user" transition={GROW}>
+        <LayoutGroup>
+          <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden p-3">
+            {cover && <LayoutModalPreviewCoverHero game={lead} kicker={T.homeLayout.continueKicker} open={T.homeLayout.openGame} />}
 
-        <div className="grid gap-3 lg:grid-cols-[1.6fr_1fr]">
-          <div className="flex min-w-0 flex-col gap-2">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-text-secondary">{T.homeLayout.continueKicker}</p>
-              <span className="h-1.5 w-12 rounded-full bg-ink/10" />
+            <div className="grid min-w-0 items-start gap-3 @2xl:grid-cols-[1.55fr_1fr]">
+              <div className="flex min-w-0 flex-col gap-2">
+                {!cover && (
+                  <motion.p layout="position" className="text-xs font-bold uppercase tracking-[0.14em] text-text-secondary">
+                    {T.homeLayout.continueKicker}
+                  </motion.p>
+                )}
+                {!cover && <LayoutModalPreviewSampleGameCard game={lead} cards={cards} order={0} layoutId={SAMPLE_LEAD_ID} />}
+                {rest.map((game, i) => (
+                  <LayoutModalPreviewSampleGameCard key={game.appId} game={game} cards={cards} order={i + 1} />
+                ))}
+              </div>
+              <motion.div layout="position" className="hidden @2xl:block">
+                <LayoutModalPreviewSampleProfile />
+              </motion.div>
             </div>
-            {SAMPLE_GAMES.map((game) => (
-              <LayoutModalPreviewSampleGameCard key={game.title} game={game} cards={cards} />
-            ))}
           </div>
-          <LayoutModalPreviewSampleProfile />
-        </div>
-      </div>
+        </LayoutGroup>
+      </MotionConfig>
     </section>
   )
 }
