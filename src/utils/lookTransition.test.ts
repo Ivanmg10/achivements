@@ -56,14 +56,19 @@ test('a shape sweeps across the whole window, the old look leaving room for the 
   const slanted = sweepEdge('slanted')
   expect((round.keyframes.maskImage as string[])[0]).toContain('radial-gradient')
   expect((slanted.keyframes.maskImage as string[])[0]).toContain('linear-gradient(102deg')
-  expect((round.old!.maskImage as string[])[0]).toContain('circle 620px')
-  // Both sides: with the width alone the mask is as tall as the window and hides both looks, a full screen of the accent.
-  expect((slanted.keyframes.maskSize as string[])[0]).toBe('3000px 3000px')
+  expect((round.old!.maskImage as string[])[0]).toContain('circle 626px')
+  // Both sides: with the width alone the mask is not the window's height and hides both looks, a full screen of the accent.
+  const [wide, tall] = (slanted.keyframes.maskSize as string[])[0].split(' ').map(parseFloat)
+  expect(tall).toBe(500)
+  // The new look is solid behind the arc, or the band's colour stays in the corners a circle leaves out.
+  expect((round.keyframes.maskImage as string[])[0]).toContain('linear-gradient(#000, #000)')
 
-  // The mask is 3000 px wide with the edge in its middle, and the edge starts and ends out of the window.
-  const [from, to] = (slanted.keyframes.maskPosition as string[]).map((at) => parseFloat(at) + 1500)
+  // The edge rides in the mask's middle and starts and ends just out of the window, or it idles there and then lurches.
+  const [from, to] = (slanted.keyframes.maskPosition as string[]).map((at) => parseFloat(at) + wide / 2)
   expect(from).toBeLessThan(0)
+  expect(from).toBeGreaterThan(-100)
   expect(to).toBeGreaterThan(1000)
+  expect(to).toBeLessThan(1250)
   expect(slanted.old!.maskPosition).toEqual(slanted.keyframes.maskPosition)
 })
 

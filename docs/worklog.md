@@ -41,7 +41,11 @@ and then a halo were both rejected for the streak, and the colour-only version w
 **Decisions** — Native first: a CSS transition for the card wipe, the view transition API for shape, font and theme, Framer only for the
 card that grows into the cover. The shape first eased its corners inside the sample: the user did not like it, as the bars, the frame
 and the page jumped around it. Then a bare sweep of the whole window, invisible because the two looks are nearly the same colour, so
-it got a band of the accent in the shape chosen (`sweepEdge`; two masks over the transition's pair, whose background is the band). The day by day still opens on the streak going now (or the best) with nothing picked, so the
+it got a band of the accent in the shape chosen (`sweepEdge`; two masks over the transition's pair, whose background is the band). It
+still jerked, measured frame by frame in Chrome on the GPU: 60 fps with no lost frames, the fault was the curve (14 idle frames, the dialog
+crossed in 6 at up to 206 px a frame with a 20 px band). Hence the gentler curve, 1 s, no idle time off screen and a trail. Measure this kind
+of thing in a real window: headless software rendering says 7 fps, and an off-screen window adds a false 1 s. The round mask needs a
+solid layer behind its arc: a circle leaves the corners out, and the band's colour stayed there on the last frames (more on an ultrawide). The day by day still opens on the streak going now (or the best) with nothing picked, so the
 card is never empty and the page does not jump. The year stays in the accent, not the tier's colour: the user asked for tier colours
 on the best streaks only. The theme shortlist is six swatches, the person's own always among them, and the rest in `ThemeModal`.
 A theme picked in the modal gets no toast (the dialog stays open and nothing else there toasts); a failed save says so inline.
