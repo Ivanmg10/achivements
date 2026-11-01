@@ -49,7 +49,7 @@ export default function SteamSignupFormFields({
     <>
       <div className="flex items-center gap-3 mb-4 rounded-tile border border-ink/10 p-3">
         {profile.avatar && (
-          <Image src={profile.avatar} alt="" width={48} height={48} className="rounded-lg shrink-0" />
+          <Image src={profile.avatar} alt="" width={48} height={48} className="rounded-box shrink-0" />
         )}
         <div className="min-w-0">
           <p className="text-xs text-text-secondary">{T.steamAuth.steamAccount}</p>

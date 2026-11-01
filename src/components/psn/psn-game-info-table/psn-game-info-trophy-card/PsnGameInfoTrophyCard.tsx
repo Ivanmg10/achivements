@@ -58,11 +58,11 @@ export default function PsnGameInfoTrophyCard({
           alt=""
           width={48}
           height={48}
-          className={`w-12 h-12 rounded-lg object-cover ${t.earned ? `ring-2 ${TROPHY_GRADE_RING[t.type]}` : 'grayscale opacity-50'}`}
+          className={`w-12 h-12 rounded-box object-cover ${t.earned ? `ring-2 ${TROPHY_GRADE_RING[t.type]}` : 'grayscale opacity-50'}`}
           unoptimized
         />
       ) : (
-        <div className="w-12 h-12 rounded-lg bg-ink/10" aria-hidden="true" />
+        <div className="w-12 h-12 rounded-box bg-ink/10" aria-hidden="true" />
       )}
       {t.hidden && !t.earned && onToggleReveal && (
         // No hover on a phone: the eye is always there.
