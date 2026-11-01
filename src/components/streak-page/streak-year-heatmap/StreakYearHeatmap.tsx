@@ -8,6 +8,8 @@ const WEEKS = 53
 const GAP = 3
 /** Below this a day is too small to pick: the grid scrolls sideways instead. */
 const MIN_CELL = 10
+/** Fills the gap around each day of the picked streak: opaque, so where two meet there is no seam, and the streak reads as one shape. */
+const STREAK_HALO = `0 0 0 ${GAP / 2 + 0.5}px color-mix(in oklab, rgb(var(--accent)) 38%, rgb(var(--bg-card)))`
 
 function isoDay(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -15,7 +17,7 @@ function isoDay(d: Date): string {
 
 /**
  * The last year as a grid of days (a column per week, Monday on top), shaded
- * by achievements, with the picked streak outlined. Picking a played day opens
+ * by achievements, with the picked streak as one shape. Picking a played day opens
  * the streak it belongs to.
  */
 export default function StreakYearHeatmap({
@@ -79,6 +81,7 @@ export default function StreakYearHeatmap({
                   const inSelected = !!selected && day >= selected.start && day <= selected.end
                   const style = {
                     aspectRatio: '1',
+                    boxShadow: inSelected ? STREAK_HALO : undefined,
                     backgroundColor: n > 0 ? `rgb(var(--accent) / ${0.25 + 0.75 * (n / max)})` : 'rgb(var(--ink) / 0.06)',
                   }
                   const label = `${formatDay(day, lang, { weekday: 'long', day: 'numeric', month: 'long' })}: ${plural(n, T.plurals.achievements, lang)}`
@@ -88,8 +91,9 @@ export default function StreakYearHeatmap({
                       type="button"
                       onClick={() => onSelect(streak)}
                       aria-label={label}
+                      aria-pressed={inSelected}
                       title={label}
-                      className={`w-full rounded-cell focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${inSelected ? 'ring-2 ring-text-main ring-offset-1 ring-offset-bg-card' : 'hover:ring-1 hover:ring-text-main/60'}`}
+                      className={`w-full rounded-cell focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${inSelected ? '' : 'hover:ring-1 hover:ring-text-main/60'}`}
                       style={style}
                     />
                   ) : (
