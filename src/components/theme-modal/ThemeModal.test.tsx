@@ -56,6 +56,6 @@ test('offers every theme, the current one checked, each drawn in its own colours
   const radios = screen.getAllByRole('radio')
   expect(radios).toHaveLength(THEMES.length)
   expect(screen.getByRole('radio', { name: en.userTheme.name_dark })).toHaveAttribute('aria-checked', 'true')
-  expect(screen.getByRole('radio', { name: en.userTheme.name_gruvbox })).toHaveAttribute('aria-checked', 'false')
-  expect(container.ownerDocument.querySelector('[data-theme="gruvbox"]')).not.toBeNull()
+  expect(screen.getByRole('radio', { name: en.userTheme.name_sakura })).toHaveAttribute('aria-checked', 'false')
+  expect(container.ownerDocument.querySelector('[data-theme="sakura"]')).not.toBeNull()
 })

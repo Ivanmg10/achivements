@@ -600,29 +600,6 @@ html[data-font="fira"],
 }
 
 /* ============================================
-   GRUVBOX: retro warm, orange on charcoal
-   ============================================ */
-[data-theme="gruvbox"] {
-  --bg-main: 40 40 40;
-  --bg-header: 29 32 33;
-  --bg-card: 50 48 47;
-  --bg-tertiary: 80 73 69;
-
-  --text-main: 235 219 178;
-  --text-secondary: 168 153 132;
-
-  --accent: 254 128 25;
-  --accent-hover: 255 152 64;
-  --accent-muted: 254 128 25;
-
-  --success: 184 187 38;
-  --warning: 250 189 47;
-  --info: 131 165 152;
-  --danger: 255 110 90;
-  --chart-2: 250 189 47;
-}
-
-/* ============================================
    SAKURA (light): cherry pink on blossom white
    ============================================ */
 [data-theme="sakura"] {
@@ -694,9 +671,9 @@ html[data-font="fira"],
 }
 
 /* ============================================
-   SAN ANDREAS: the game's own HUD colours, dark blue, light blue and cream
+   MIDNIGHT: deep blue, light blue text and cream
    ============================================ */
-[data-theme="san-andreas"] {
+[data-theme="midnight"] {
   --bg-main: 14 20 48;
   --bg-header: 10 14 36;
   --bg-card: 26 35 80;
@@ -740,26 +717,50 @@ html[data-font="fira"],
 }
 
 /* ============================================
-   VENOM (Ultimate Spider-Man): white on near-black, the symbiote's purple on the cards
+   VENOM (Ultimate Spider-Man): the symbiote's black, bone white, a purple sheen on the surfaces
    ============================================ */
 [data-theme="venom"] {
   --bg-main: 11 9 10;
-  --bg-header: 7 5 6;
-  --bg-card: 43 27 71;
-  --bg-tertiary: 64 44 102;
+  --bg-header: 6 5 6;
+  --bg-card: 18 15 22;
+  --bg-tertiary: 34 28 42;
 
-  --text-main: 255 255 255;
-  --text-secondary: 196 186 212;
+  --text-main: 240 237 244;
+  --text-secondary: 170 162 180;
 
-  --accent: 255 255 255;
-  --accent-hover: 226 220 236;
-  --accent-muted: 255 255 255;
+  --accent: 236 232 242;
+  --accent-hover: 255 255 255;
+  --accent-muted: 236 232 242;
 
   --success: 52 211 153;
   --warning: 251 191 36;
   --info: 160 170 255;
   --danger: 248 113 113;
-  --chart-2: 180 150 240;
+  --chart-2: 168 140 240;
+}
+
+/* ============================================
+   STEAM RETRO: the client's old green VGUI, olive panels and gold titles
+   One step darker than the original, so the gold reads on a card
+   ============================================ */
+[data-theme="steam-retro"] {
+  --bg-main: 51 58 45;
+  --bg-header: 41 45 35;
+  --bg-card: 62 70 55;
+  --bg-tertiary: 76 88 68;
+
+  --text-main: 216 222 211;
+  --text-secondary: 194 205 183;
+
+  --accent: 196 181 80;
+  --accent-hover: 227 228 31;
+  --accent-muted: 196 181 80;
+
+  --success: 74 222 128;
+  --warning: 253 186 116;
+  --info: 147 197 253;
+  --danger: 252 165 165;
+  --chart-2: 147 197 253;
 }
 
 /* ============================================

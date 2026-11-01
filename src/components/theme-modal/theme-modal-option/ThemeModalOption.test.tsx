@@ -12,7 +12,7 @@ test('names the theme, reports whether it is current and picks it on click', () 
 })
 
 test('the current theme is ticked, not told by colour alone', () => {
-  const { container } = render(<ThemeModalOption theme="san-andreas" checked onSelect={jest.fn()} />)
+  const { container } = render(<ThemeModalOption theme="snake-eater" checked onSelect={jest.fn()} />)
   expect(screen.getByRole('radio')).toHaveAttribute('aria-checked', 'true')
   expect(container.querySelector('svg')).not.toBeNull()
 })

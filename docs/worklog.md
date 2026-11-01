@@ -29,6 +29,16 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-02 — Second round of themes, and the favicon without a ground (`feat/84-theme-favicon`, #84)
+
+**Did** — San Andreas's palette is now `midnight` ("Medianoche"), among the palettes: the user does not want it named after the game. Venom redone, near black with bone white and a purple sheen only on the surfaces. New `steam-retro`, from the old client's green VGUI (vgui.css by leonill007: `#292d23`, `#3e4637`, `#4c5844`, `#c4b550`, `#d8ded3`). `gruvbox` removed. Canvas v3 proposes the favicon with no ground.
+**Why** — Tried on the page: Venom's saturated purple cards looked ugly, and the ground behind the logo clashes with a browser's own theme (grey, pink…), which a page cannot read.
+**Decisions** — "Quita el de grove": the old Grove Street green no longer existed, so it was read as Gruvbox, which was still on the list; confirm with the user. Steam Retro sits one step darker than the original (card `#3e4637`, not `#4c5844`), or the gold misses 4.5:1 on a card. The Venom options not built are on the canvas. Measured: `prefers-color-scheme` works inside a data-URL SVG favicon, in Chromium dark and Firefox light and dark, and in Firefox it matched the tab with `ui.systemUsesDarkTheme`.
+**Open** — The code still draws concept D, with a ground, until the user picks on the canvas; `CLAUDE.md` describes that until then. A browser with a custom theme was not measured.
+**Watch out** — A window capture by title can catch the user's own browser: match a title only the test page has.
+
+---
+
 ## 2026-11-01 — A favicon per theme, and the theme list (`feat/84-theme-favicon`, #84)
 
 **Did** — The favicon follows the theme (`src/utils/themeIcon.ts`: `themeScript()` before the first frame, `setThemeIcon` in `ThemeContext`), on one `<link id="theme-icon">` in the root layout; `src/app/icon.svg` moved to `public/icon.svg`. 9 themes out (synthwave, catppuccin, rose-pine, oled, ocean, terminal, daxter, bentley, clank), 5 in (venom, dark-blue, dark-white, light-blue, light-black), so 21. San Andreas rebuilt, Snake Eater retouched. `FEATURED_THEMES` of the welcome updated. CLAUDE.md has the rules.

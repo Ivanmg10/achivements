@@ -41,8 +41,8 @@ test('says when it was the person who chose it', () => {
 
 test('a theme applies at once; a failed save is said in place', async () => {
   renderStep()
-  fireEvent.click(screen.getByRole('radio', { name: /Gruvbox/ }))
-  expect(mockChoose).toHaveBeenCalledWith('gruvbox')
+  fireEvent.click(screen.getByRole('radio', { name: /Venom/ }))
+  expect(mockChoose).toHaveBeenCalledWith('venom')
 })
 
 test('the save error shows', () => {

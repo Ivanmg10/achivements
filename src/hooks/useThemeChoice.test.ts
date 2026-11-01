@@ -22,11 +22,11 @@ test('shows the theme at once and saves it on the account', async () => {
   const { result } = renderHook(() => useThemeChoice())
   let ok = false
   await act(async () => {
-    ok = await result.current.choose('gruvbox')
+    ok = await result.current.choose('sakura')
   })
   expect(ok).toBe(true)
-  expect(setTheme).toHaveBeenCalledWith('gruvbox')
-  expect(fetch).toHaveBeenCalledWith('/api/updateTheme', expect.objectContaining({ body: JSON.stringify({ theme: 'gruvbox' }) }))
+  expect(setTheme).toHaveBeenCalledWith('sakura')
+  expect(fetch).toHaveBeenCalledWith('/api/updateTheme', expect.objectContaining({ body: JSON.stringify({ theme: 'sakura' }) }))
   expect(update).toHaveBeenCalled()
   expect(result.current.saveError).toBe(false)
 })
@@ -35,7 +35,7 @@ test('puts the old theme back and says so when the save fails', async () => {
   ;(fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 })
   const { result } = renderHook(() => useThemeChoice())
   await act(async () => {
-    expect(await result.current.choose('gruvbox')).toBe(false)
+    expect(await result.current.choose('sakura')).toBe(false)
   })
   expect(setTheme).toHaveBeenLastCalledWith('dark')
   expect(result.current.saveError).toBe(true)

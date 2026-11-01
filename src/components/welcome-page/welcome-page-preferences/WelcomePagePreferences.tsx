@@ -23,7 +23,7 @@ import UserHomeLayoutPreference from '@/components/user-page/user-home-layout-pr
 const ThemeModal = dynamic(() => import('@/components/theme-modal/ThemeModal'), { loading: () => null })
 
 /** A short pick of the themes, dark ones with distinct accents; the rest are one click away. */
-const FEATURED_THEMES: Theme[] = ['dark', 'dark-red', 'dark-blue', 'gruvbox', 'black-ops-2', 'san-andreas', 'snake-eater', 'venom']
+const FEATURED_THEMES: Theme[] = ['dark', 'dark-red', 'dark-blue', 'midnight', 'black-ops-2', 'steam-retro', 'snake-eater', 'venom']
 
 /**
  * How the app reads and looks, and what others see: the language (the

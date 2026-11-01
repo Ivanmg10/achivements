@@ -40,23 +40,22 @@ test('each theme\'s favicon uses its own accent, on its header or card', () => {
   }
 })
 
-test('venom has the colours asked for', () => {
+test('venom keeps to the dark: every surface stays close to black', () => {
   const t = tokens('venom')
   expect(toHex(t['--bg-main'])).toBe('#0b090a')
-  expect(toHex(t['--bg-card'])).toBe('#2b1b47')
-  expect(toHex(t['--text-main'])).toBe('#ffffff')
-  expect(toHex(t['--accent'])).toBe('#ffffff')
+  for (const surface of ['--bg-header', '--bg-main', '--bg-card', '--bg-tertiary']) expect(luminance(t[surface])).toBeLessThan(0.02)
 })
 
-test('san andreas takes the game\'s own HUD colours', () => {
-  const t = tokens('san-andreas')
-  expect(toHex(t['--bg-tertiary'])).toBe('#323c7f')
-  expect(toHex(t['--text-secondary'])).toBe('#accbf1')
-  expect(toHex(t['--text-main'])).toBe('#e1e1e1')
-  expect(toHex(t['--accent'])).toBe('#e2c063')
+test('steam retro takes the old client\'s own colours', () => {
+  const t = tokens('steam-retro')
+  expect(toHex(t['--bg-header'])).toBe('#292d23')
+  expect(toHex(t['--bg-card'])).toBe('#3e4637')
+  expect(toHex(t['--bg-tertiary'])).toBe('#4c5844')
+  expect(toHex(t['--text-main'])).toBe('#d8ded3')
+  expect(toHex(t['--accent'])).toBe('#c4b550')
 })
 
-describe.each(['venom', 'san-andreas', 'snake-eater', 'dark-blue', 'dark-white', 'light-blue', 'light-black'] as Theme[])('%s reads', (theme) => {
+describe.each(['venom', 'midnight', 'steam-retro', 'snake-eater', 'dark-blue', 'dark-white', 'light-blue', 'light-black'] as Theme[])('%s reads', (theme) => {
   const t = tokens(theme)
 
   test.each(['--bg-main', '--bg-card', '--bg-tertiary'])('text and secondary text on %s', (surface) => {

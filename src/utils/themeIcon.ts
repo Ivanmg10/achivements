@@ -16,14 +16,13 @@ const THEME_ICON: Record<Theme, [ground: string, accent: string]> = {
   red: ['#14080a', '#ec5466'],
   green: ['#090c07', '#84b850'],
   blue: ['#080c14', '#607dff'],
-  gruvbox: ['#1d2021', '#fe8019'],
+  midnight: ['#0a0e24', '#e2c063'],
   sakura: ['#fdf4f8', '#be185d'],
   arctic: ['#f0f6fa', '#0f766e'],
   'black-ops-2': ['#050607', '#ff6600'],
-  'san-andreas': ['#0a0e24', '#e2c063'],
+  'steam-retro': ['#292d23', '#c4b550'],
   'snake-eater': ['#0a130c', '#c9b458'],
-  // The card's purple, not the near-black header: it is what says Venom in a white logo.
-  venom: ['#2b1b47', '#ffffff'],
+  venom: ['#060506', '#ece8f2'],
 }
 
 // The logo as drawn. Its shape is not to be changed: only the colours go in `$0`–`$3`.
