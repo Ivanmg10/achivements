@@ -329,13 +329,15 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 
 - **The logo was drawn by a friend of the user and keeps its shape** (the user's call): recolour it, never redraw it or swap it
   for a simpler mark, here or anywhere. Its paths are `LOGO` in `src/utils/themeIcon.ts`.
-- **The favicon follows the theme:** C and V in the accent, the theme's ground only inside the C. Nothing behind it fails: the accent
-  alone misses 3:1 on a dark or a white tab in most themes. The accepted cost: a white C (Venom, Dark · White) disappears on a white tab, the inside stays.
-- **A new theme needs its row in `THEME_ICON`:** the types refuse a missing one, `src/app/themes.test.ts` refuses colours that differ from `globals.css`
+- **The favicon follows the theme, with nothing behind it:** the whole logo in the accent, toned for the browser through `prefers-color-scheme` inside the SVG
+  (4:1 on `#35363a` or on white); white and black accents take the browser's ink. **Never a ground or a plate** (the user tried it, 2026-11-02): a page cannot read a
+  tab's colour, so any ground clashes with some browser's theme. The same cost as any single logo: a browser whose scheme does not match its tab colour reads worse, and a mid grey tab is the weakest.
+  Themes that share an accent share an icon (Midnight and Crimson): it goes with the theme, it does not name it.
+- **A new theme needs its row in `THEME_ACCENT`:** the types refuse a missing one, `src/app/themes.test.ts` refuses one that differs from `globals.css`
   (and checks contrast for the themes added in #84). A new light theme also joins the light selector lists in `globals.css`.
 - **One `<link id="theme-icon">`, in the root layout, before the script.** Not `src/app/icon.svg`: Next's link can land after the script. Both the script
-  and `ThemeContext` set its `href`; a data URL has nothing to cache. Measured 2026-11-01 on real tabs, Chromium and Firefox change with no reload. Safari is
-  not tested (no Windows build): if it refuses, it keeps `/icon.svg`, the default theme's logo.
+  and `ThemeContext` set its `href`; a data URL has nothing to cache. Measured 2026-11-02 on real tabs, Chromium and Firefox change with no reload and follow the
+  scheme. Safari is not tested (no Windows build): if it refuses, it keeps `/icon.svg`, the default theme's logo. A browser with a custom theme is not measured either.
 - **A theme that no longer exists lands on `dark`** in the head script, `ThemeContext` and the public profile (no row, never its raw id). `users.theme` keeps
   the old value until the person picks another: no migration, nothing else reads it.
 - **`apple-icon.tsx` still says "CH"**: out of #84, left as it was.

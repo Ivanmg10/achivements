@@ -214,6 +214,7 @@ export const ja: Translations = {
     name_green: 'グリーン',
     name_red: 'レッド',
     name_midnight: 'ミッドナイト',
+    name_crimson: 'クリムゾン',
     name_sakura: '桜',
     name_arctic: 'アークティック',
     'name_black-ops-2': 'Black Ops II',

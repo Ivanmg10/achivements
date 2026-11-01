@@ -153,7 +153,7 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
 - **Themes**: `THEMES` in `src/types/types.ts`, CSS variables in
   `src/app/globals.css`, applied before paint by the script `themeScript()` builds
   (`src/utils/themeIcon.ts`) for `src/app/layout.tsx`. It also sets the favicon, the logo
-  in the theme's colours as a data URL on the layout's `<link id="theme-icon">`;
+  in the theme's accent as a data URL on the layout's `<link id="theme-icon">`;
   `public/icon.svg` is that logo in the default theme, for no JavaScript and the manifest.
 - **Language**: `LanguageContext` shows the saved choice (`app-language`, in storage and in a
   cookie of the same name), else the first of `navigator.languages` the app has (`pickLanguage`,

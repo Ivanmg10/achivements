@@ -1,5 +1,5 @@
 import { THEMES } from '@/types/types'
-import { setThemeIcon, themeIconHref, themeIconSvg, themeScript } from './themeIcon'
+import { iconContrast, setThemeIcon, themeIconHref, themeIconSvg, themeIconTones, themeScript } from './themeIcon'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const read = (file: string): string => require('fs').readFileSync(require('path').join(process.cwd(), file), 'utf8')
@@ -18,13 +18,24 @@ function freshHead() {
 test('every theme draws the logo with its shapes untouched', () => {
   const shapes = (svg: string) => svg.match(/ d="[^"]+"/g)
   for (const theme of THEMES) expect(shapes(themeIconSvg(theme))).toEqual(shapes(themeIconSvg('dark')))
-  expect(new Set(THEMES.map(themeIconSvg)).size).toBe(THEMES.length)
+  expect(themeIconSvg('dark-red')).not.toBe(themeIconSvg('dark'))
 })
 
-test('the logo keeps the opening of the C: its ground stays inside, short of the outer edge', () => {
-  const ground = themeIconSvg('dark').match(/ d="([^"]+)"/)![1]
-  expect(ground).toContain('L1376 452 L1374 893')
-  expect(ground).not.toContain('1482')
+test('nothing is drawn behind the logo: it is the four shapes of the logo and no more', () => {
+  expect(themeIconSvg('dark').match(/<path /g)).toHaveLength(4)
+  expect(themeIconSvg('dark')).not.toContain('<rect')
+})
+
+test('a theme with hue keeps it on a light browser; white and black take the browser\'s ink', () => {
+  expect(themeIconTones('dark-white')).toEqual({ dark: '#e1e4eb', light: '#17181e' })
+  expect(themeIconTones('light-black')).toEqual({ dark: '#e1e4eb', light: '#17181e' })
+  expect(themeIconTones('sakura').light).toBe('#be185d')
+})
+
+test.each(THEMES)('%s reads on a dark and on a light browser', (theme) => {
+  const tones = themeIconTones(theme)
+  expect(iconContrast(tones.dark, '#35363a')).toBeGreaterThanOrEqual(4)
+  expect(iconContrast(tones.light, '#ffffff')).toBeGreaterThanOrEqual(4)
 })
 
 test('the file on disk, served without JavaScript, is the default theme', () => {

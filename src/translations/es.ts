@@ -214,6 +214,7 @@ export const es: Translations = {
     name_green: 'Verde',
     name_red: 'Rojo',
     name_midnight: 'Medianoche',
+    name_crimson: 'Carmesí',
     name_sakura: 'Sakura',
     name_arctic: 'Ártico',
     'name_black-ops-2': 'Black Ops II',

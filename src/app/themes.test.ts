@@ -1,5 +1,5 @@
 import { THEMES, type Theme } from '@/types/types'
-import { themeIconSvg } from '@/utils/themeIcon'
+import { themeAccent } from '@/utils/themeIcon'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const css: string = require('fs').readFileSync(require('path').join(__dirname, 'globals.css'), 'utf8').replace(/\r\n/g, '\n')
@@ -31,13 +31,8 @@ function contrast(a: string, b: string) {
   return (high + 0.05) / (low + 0.05)
 }
 
-test('each theme\'s favicon uses its own accent, on its header or card', () => {
-  for (const theme of THEMES) {
-    const t = tokens(theme)
-    const fills = themeIconSvg(theme).match(/fill="(#[0-9a-f]{6})"/g)!.map((f) => f.slice(6, -1))
-    expect(fills[0] === toHex(t['--bg-header']) || fills[0] === toHex(t['--bg-card'])).toBe(true)
-    expect(fills[1]).toBe(toHex(t['--accent']))
-  }
+test('each theme\'s favicon starts from its own accent', () => {
+  for (const theme of THEMES) expect(themeAccent(theme)).toBe(toHex(tokens(theme)['--accent']))
 })
 
 test('venom keeps to the dark: every surface stays close to black', () => {
@@ -55,7 +50,7 @@ test('steam retro takes the old client\'s own colours', () => {
   expect(toHex(t['--accent'])).toBe('#c4b550')
 })
 
-describe.each(['venom', 'midnight', 'steam-retro', 'snake-eater', 'dark-blue', 'dark-white', 'light-blue', 'light-black'] as Theme[])('%s reads', (theme) => {
+describe.each(['venom', 'midnight', 'crimson', 'steam-retro', 'snake-eater', 'dark-blue', 'dark-white', 'light-blue', 'light-black'] as Theme[])('%s reads', (theme) => {
   const t = tokens(theme)
 
   test.each(['--bg-main', '--bg-card', '--bg-tertiary'])('text and secondary text on %s', (surface) => {

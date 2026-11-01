@@ -214,6 +214,7 @@ export const ru: Translations = {
     name_green: 'Зелёная',
     name_red: 'Красная',
     name_midnight: 'Полночь',
+    name_crimson: 'Багрянец',
     name_sakura: 'Сакура',
     name_arctic: 'Арктика',
     'name_black-ops-2': 'Black Ops II',

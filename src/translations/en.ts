@@ -215,6 +215,7 @@ export const en = {
     name_green: 'Green',
     name_red: 'Red',
     name_midnight: 'Midnight',
+    name_crimson: 'Crimson',
     name_sakura: 'Sakura',
     name_arctic: 'Arctic',
     'name_black-ops-2': 'Black Ops II',

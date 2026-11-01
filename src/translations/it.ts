@@ -214,6 +214,7 @@ export const it: Translations = {
     name_green: 'Verde',
     name_red: 'Rosso',
     name_midnight: 'Mezzanotte',
+    name_crimson: 'Cremisi',
     name_sakura: 'Sakura',
     name_arctic: 'Artico',
     'name_black-ops-2': 'Black Ops II',

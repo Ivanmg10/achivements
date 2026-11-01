@@ -29,6 +29,16 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-02 — The favicon without a ground, Crimson, Venom's red (`feat/84-theme-favicon`, #84)
+
+**Did** — Favicon is concept B of canvas v3: no ground, the whole logo in the accent, with a tone for each browser scheme inside the SVG (`tone` in `src/utils/themeIcon.ts`); the table is one accent per theme now. New `crimson` ("Carmesí"), Midnight's cream on deep red. Venom takes option B, the red accent, so its `--danger` goes orange. 22 themes.
+**Why** — The user picked B and Venom B, and asked for a red one with that yellow as secondary, read as the accent. They also asked whether a themed icon is worth it over one basic logo: the answer given was yes, as a single logo has the same problem with tab colours and the cost is this one file of about 100 lines, half of it the table and the logo.
+**Decisions** — White and black accents take the browser's ink, as a grey logo looked dead on a light tab. Midnight and Crimson share an icon, as they share the accent. Facet steps go towards the tab, the same as the logo's first file.
+**Verification** — Real tabs in headed Chromium, Firefox light and Firefox dark (`ui.systemUsesDarkTheme`): Venom, Crimson, Sakura, Dark · White and Steam Retro change with no reload and follow the scheme. Tests, lint, types and the build pass.
+**Open** — A browser with a custom theme (the user's grey, a pink one) was not measured: the user can see it on their own tab. Safari. Update #84's text. Confirm "grove" meant Gruvbox.
+
+---
+
 ## 2026-11-02 — Second round of themes, and the favicon without a ground (`feat/84-theme-favicon`, #84)
 
 **Did** — San Andreas's palette is now `midnight` ("Medianoche"), among the palettes: the user does not want it named after the game. Venom redone, near black with bone white and a purple sheen only on the surfaces. New `steam-retro`, from the old client's green VGUI (vgui.css by leonill007: `#292d23`, `#3e4637`, `#4c5844`, `#c4b550`, `#d8ded3`). `gruvbox` removed. Canvas v3 proposes the favicon with no ground.

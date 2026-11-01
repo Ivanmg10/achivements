@@ -3,7 +3,7 @@ import type { PsnTrophy } from '@/types/psn'
 import type { XboxAchievement } from '@/types/xbox'
 
 /** Every theme the app has a stylesheet for; the endpoints that store one accept only these. */
-export const THEMES = ['dark', 'light', 'dark-red', 'dark-green', 'dark-blue', 'dark-white', 'light-red', 'light-green', 'light-blue', 'light-black', 'blue', 'purple', 'green', 'red', 'midnight', 'sakura', 'arctic', 'black-ops-2', 'steam-retro', 'snake-eater', 'venom'] as const
+export const THEMES = ['dark', 'light', 'dark-red', 'dark-green', 'dark-blue', 'dark-white', 'light-red', 'light-green', 'light-blue', 'light-black', 'blue', 'purple', 'green', 'red', 'midnight', 'crimson', 'sakura', 'arctic', 'black-ops-2', 'steam-retro', 'snake-eater', 'venom'] as const
 
 /** Where the browser keeps the last theme, so the page is painted in it before React loads. */
 export const THEME_STORAGE_KEY = 'app-theme'
@@ -15,7 +15,7 @@ export const THEME_GROUPS: { id: 'base' | 'tinted' | 'palettes' | 'games'; theme
   // Neutral dark and light, each with a violet, red, green or blue accent, and white or black.
   { id: 'base', themes: ['dark', 'dark-red', 'dark-green', 'dark-blue', 'dark-white', 'light', 'light-red', 'light-green', 'light-blue', 'light-black'] },
   { id: 'tinted', themes: ['purple', 'red', 'green', 'blue'] },
-  { id: 'palettes', themes: ['midnight', 'sakura', 'arctic'] },
+  { id: 'palettes', themes: ['midnight', 'crimson', 'sakura', 'arctic'] },
   { id: 'games', themes: ['black-ops-2', 'steam-retro', 'snake-eater', 'venom'] },
 ]
 
