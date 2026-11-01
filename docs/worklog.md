@@ -29,6 +29,36 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-01 — The round design on every control and surface (`refactor/78-round-design`, #78)
+
+**Did** — New round scale in `globals.css`: surfaces a step softer than slanted, one-line controls as pills, icon buttons as
+circles. New tokens `--r-sheet`, `-area`, `-icon`, `-box`, `-box-md`, `-box-sm`, `-tag-sm`, `-badge`, `-cell` and
+`--button-inset`, and `--r-control` restated in the slanted block, where it was missing. The header search follows
+`rounded-field`. About 245 fixed radii moved to tokens by what each thing is. `uiGuard.test.ts` now refuses `rounded-lg`,
+`-md`, `-sm`, `-3xl` and arbitrary values on anything painted, and `designTokens.test.ts` fails if a surface is not rounder
+in round than in slanted. `MainSidePanel` and `UserCharts` are deleted (dead, only their tests imported them).
+**Why** — #78: round did not feel round. Measured on 96 captures, 946 elements were *less* round than in slanted and 366
+more: its values were copied from the site before the slant, and slanted grew past them.
+**Decisions** — Buttons are pills too (the user's call, 2026-11-01), though the issue only asks for fields. `rounded-full`
+chips stay: right in round, and moving them would change slanted, which the issue rules out; if slanted wants corners there
+it is #77's. The search panel is `rounded-sheet`, not `--r-field`: its input draws no box and it holds results. 103 bare
+`rounded` stay, as they only show as a focus ring's corner. Tokens are named for the use, and slanted's values restate what
+it drew, so several look redundant there (`--r-box-sm` and `--r-tag-sm` are both 4 px) but differ in round.
+**Verification** — The computed radius of every boxed element, on 96 captures at 390 and 2560 px, before and after, with a throwaway
+account on pre (deleted after; pre back to 68 users). Round compared with slanted went from 946 less round to 0, and 3,797 are now rounder.
+Slanted: of 1,061 elements compared, only the header search changed (12 to 14 px, on purpose). 2 more showed up as a change but were
+my comparison: a swatch absent from the second run, as the new account had no points yet, paired with a presence dot of its size. 834 suites
+/ 5,307 tests, tsc, ESLint and the build pass. Screenshots: `docs/audits/78-round-design/`.
+**Open** — Not seen by eye: RA and Xbox pages, generic modals, tooltips, an open `Select`, the admin panel, `/design`, the light
+themes. The audit comment for the issue is written but not posted: the permission system refused `gh issue comment`, so #78's
+"audit comment posted" criterion is still open. The full-width pill buttons are the most debatable part; the user said to look
+at it again if it does not convince them.
+**Watch out** — `rounded-control` is a soft surface despite its name: it must never become a pill. Tailwind's `rounded-sm` is 4 px, the same as a bare
+`rounded`. The audit's preference must be set on the account too: the account wins over `localStorage` on sign-in, so a test
+that only sets the browser's value renders the other design.
+
+---
+
 ## 2026-10-31 — Expanded card stats and the cover's art (`fix/89-hero-art-expanded-stats`, #89)
 
 **Did** — The RA and Steam stats under an expanded game's ring are one line each (`GameExpandedStatList`, shared), not

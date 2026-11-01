@@ -220,11 +220,18 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
   **Never a literal `polygon(...)` or `skew-*-[..]`** (`uiGuard.test.ts` fails on it). The round
   design may override the shape tokens; no theme may (`designTokens.test.ts`). The welcome curtain's
   fixed clip paths are the documented decorative exception and do not follow the shape choice.
-- **The round design is the site as it was before the slant**: soft corners on buttons, fields and cards
-  (`--r-button`, `--r-field`, `--r-card`, `--r-pane`, `--r-tile`), tags and chips as pills (`--r-tag`,
-  `--r-chip`), a switch as a pill with a round knob. Use `rounded-card` / `-pane` / `-tile` / `-tag` /
-  `-button`, never old `rounded-xl` / `rounded-2xl` or a fixed `rounded-[..rem]` for those
-  (`uiGuard.test.ts` refuses them).
+- **The round design must always be rounder than the slanted one (2026-11-01, #78):** every surface a step
+  softer (`--r-card`, `-sheet`, `-pane`, `-tile`, `-control`, `-area`, `-box*`; `designTokens.test.ts` fails if one
+  is not), and every one-line control a pill or a circle (`--r-button`, `-field`, `-icon`, `-tag`, `-tag-sm`, `-badge`,
+  `-chip`). It started as a copy of the site before the slant, and the slanted design then grew past it, so it looked
+  square with nothing failing. **Choose by what the thing is:** a card `rounded-card`, a floating panel `rounded-sheet`,
+  an inner tile `rounded-tile`, a thumbnail, row or small box `rounded-box` (`-md`, `-sm`), a heatmap cell `rounded-cell`, a
+  button `rounded-button`, an icon button `rounded-icon` or `rounded-chip`, one line of input `rounded-field`, several lines
+  `rounded-area` (`multiline` on `fieldClass`). **`rounded-control` is a soft surface, despite its name** (notices, menus,
+  tooltips): it must never be a pill, and a real control does not use it. A value new to the slanted block restates what
+  that design drew, so it does not move. Outside `ui/`, `uiGuard.test.ts` refuses `rounded-lg`, `-md`, `-sm`, `-xl`, `-2xl`,
+  `-3xl` and arbitrary values, on any side, but for its short list of exceptions; a bare `rounded` is only a focus ring's corner.
+  A `rounded-full` chip is a pill in both designs: left so on purpose, since moving it would change the slanted design.
 - **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `Shelf`, `DropSlot` and `ToggleButton`
   are in `ui/`; a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
