@@ -71,7 +71,7 @@ export default function VaultFillProgress({ wide = false, className = '' }: { wi
         <p
           key={s}
           role={platforms[s]?.state === 'error' ? 'alert' : undefined}
-          className={`text-xs rounded-chip px-2.5 py-1.5 ${platforms[s]?.state === 'error' ? 'bg-danger/10 text-text-main ring-1 ring-danger/30' : 'text-text-secondary'}`}
+          className={`text-xs rounded-box px-2.5 py-1.5 ${platforms[s]?.state === 'error' ? 'bg-danger/10 text-text-main ring-1 ring-danger/30' : 'text-text-secondary'}`}
         >
           {message}
         </p>

@@ -167,7 +167,7 @@ export const AchievementGrid = memo(function AchievementGrid({
                 <div className={`${size.badge} rounded-box bg-ink/10 ${earnedAny ? '' : 'opacity-40'}`} />
               )}
               {missable && (
-                <span aria-hidden="true" className="absolute bottom-0 right-0 flex items-center justify-center w-4 h-4 rounded-tl-md bg-danger text-white">
+                <span aria-hidden="true" className="absolute bottom-0 right-0 flex items-center justify-center w-4 h-4 rounded-tl-box-md bg-danger text-white">
                   <IconAlertTriangle size={11} stroke={2.5} />
                 </span>
               )}
