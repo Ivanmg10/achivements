@@ -22,9 +22,9 @@ interface Props {
 
 /**
  * The longest streaks as a ranked list: the place in the display face, a
- * slanted bar as long as the streak against the best (the one going now in
- * the accent, saying so), its dates under it and its days on the right.
- * Picking one shows it day by day.
+ * slanted bar in the colour of its tier and as long as the streak against the
+ * best (the one going now says so), its dates under it and its days on the
+ * right. Picking one shows it day by day and on the year; picking it again lets go.
  */
 export default function StreakChart({ streaks, selectedStreak, activeStreak, avgStreak, onSelect }: Props) {
   const { T, lang } = useLanguage()
@@ -45,6 +45,7 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
         {top.map((streak, i) => {
           const on = same(selectedStreak, streak)
           const live = same(activeStreak, streak)
+          const tier = streakTier(streak.days)
           return (
             <li key={streak.start}>
               <button
@@ -53,15 +54,15 @@ export default function StreakChart({ streaks, selectedStreak, activeStreak, avg
                 aria-label={`${plural(streak.days, T.plurals.days, lang)}, ${short(streak.start)} – ${short(streak.end)}${live ? `, ${T.streak.ongoing}` : ''}`}
                 aria-pressed={on}
                 className={`w-full grid grid-cols-[2rem_minmax(0,1fr)_3.5rem] items-center gap-3 px-2 py-1.5 rounded-control text-left transition-colors duration-(--motion-hover) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-                  on ? 'bg-ink/[0.05]' : 'hover:bg-ink/[0.04]'
+                  on ? 'bg-ink/[0.06] ring-1 ring-inset ring-ink/20' : 'hover:bg-ink/[0.04]'
                 }`}
               >
-                <span className={`font-display italic font-extrabold text-2xl tabular-nums ${live ? '' : 'text-text-secondary'}`} style={live ? { color: streakInk(streakTier(streak.days)) } : undefined}>{i + 1}</span>
+                <span className="font-display italic font-extrabold text-2xl tabular-nums" style={{ color: streakInk(tier) }}>{i + 1}</span>
                 <span className="flex flex-col gap-1 min-w-0">
                   <span
                     aria-hidden="true"
-                    className={`enter-grow-x h-[1.375rem] flex items-center px-3 text-xs font-bold text-bg-main whitespace-nowrap overflow-hidden ${live ? '' : 'bg-accent/35'}`}
-                    style={{ ...SLANT, width: `${Math.max(12, (streak.days / maxDays) * 88)}%`, ...(live ? { backgroundColor: `rgb(${streakTier(streak.days).color})` } : {}) }}
+                    className="enter-grow-x h-[1.375rem] flex items-center px-3 text-xs font-bold text-bg-main whitespace-nowrap overflow-hidden"
+                    style={{ ...SLANT, width: `${Math.max(12, (streak.days / maxDays) * 88)}%`, backgroundColor: `rgb(${tier.color})` }}
                   >
                     {live && T.streak.ongoing}
                   </span>
