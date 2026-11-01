@@ -12,7 +12,7 @@ afterEach(() => {
 function stubTransition(ready: Promise<void>) {
   const start = jest.fn((run: () => void) => {
     run()
-    return { ready }
+    return { ready, finished: new Promise<void>(() => {}), skipTransition: jest.fn() }
   })
   document.startViewTransition = start as unknown as typeof document.startViewTransition
   const animate = jest.fn()
@@ -123,7 +123,7 @@ test('kept to an element, the page stays out of it, and goes back in after', asy
   document.documentElement.animate = animate
   document.startViewTransition = jest.fn((run: () => void) => {
     run()
-    return { ready: Promise.resolve(), finished }
+    return { ready: Promise.resolve(), finished, skipTransition: jest.fn() }
   }) as unknown as typeof document.startViewTransition
   const panel = document.createElement('div')
 
@@ -138,6 +138,104 @@ test('kept to an element, the page stays out of it, and goes back in after', asy
   await new Promise((done) => setTimeout(done))
   expect(document.documentElement.style.viewTransitionName).toBe('')
   expect(panel.style.viewTransitionName).toBe('')
+})
+
+test('a transition skipped by a newer one leaves it its scope, and the last one to end clears it', async () => {
+  stubMotion(false)
+  document.documentElement.animate = jest.fn()
+  const ends: (() => void)[] = []
+  document.startViewTransition = jest.fn(() => ({
+    ready: new Promise(() => {}),
+    finished: new Promise<void>((done) => ends.push(done)),
+    skipTransition: jest.fn(),
+  })) as unknown as typeof document.startViewTransition
+  const settle = () => new Promise((done) => setTimeout(done))
+  const panel = document.createElement('div')
+
+  lookTransition(jest.fn(), undefined, panel)
+  lookTransition(jest.fn(), undefined, panel)
+  ends[0]()
+  await settle()
+  expect(document.documentElement.style.viewTransitionName).toBe('none')
+  expect(panel.style.viewTransitionName).toBe('look-panel')
+
+  ends[1]()
+  await settle()
+  expect(document.documentElement.style.viewTransitionName).toBe('')
+  expect(panel.style.viewTransitionName).toBe('')
+})
+
+test('a whole-page transition takes over from one kept to an element', () => {
+  stubMotion(false)
+  stubTransition(new Promise(() => {}))
+  const panel = document.createElement('div')
+  lookTransition(jest.fn(), undefined, panel)
+  lookTransition(jest.fn())
+  expect(document.documentElement.style.viewTransitionName).toBe('')
+  expect(panel.style.viewTransitionName).toBe('')
+})
+
+describe('a click while a transition covers the window', () => {
+  const root = document.documentElement
+  let end = () => {}
+  const skipTransition = jest.fn(() => end())
+  const settle = () => new Promise((done) => setTimeout(done))
+
+  beforeEach(() => {
+    stubMotion(false)
+    skipTransition.mockClear()
+    root.animate = jest.fn()
+    document.startViewTransition = jest.fn(() => ({
+      ready: new Promise(() => {}),
+      finished: new Promise<void>((done) => { end = done }),
+      skipTransition,
+    })) as unknown as typeof document.startViewTransition
+  })
+  afterEach(() => { delete (document as Partial<Document>).elementFromPoint })
+
+  function under(element: Element | null) {
+    document.elementFromPoint = jest.fn(() => element)
+  }
+
+  test('ends it, and goes to the button under the pointer', async () => {
+    const dialog = document.body.appendChild(document.createElement('div'))
+    const button = dialog.appendChild(document.createElement('button'))
+    const pressed = jest.fn()
+    button.addEventListener('click', pressed)
+    under(button)
+    lookTransition(jest.fn(), undefined, dialog)
+    root.dispatchEvent(new MouseEvent('click', { clientX: 5, clientY: 6 }))
+    expect(skipTransition).toHaveBeenCalledTimes(1)
+    await settle()
+    expect(document.elementFromPoint).toHaveBeenCalledWith(5, 6)
+    expect(pressed).toHaveBeenCalledTimes(1)
+    dialog.remove()
+  })
+
+  test('never goes to anything outside the dialog: a click there must not close it', async () => {
+    const dialog = document.body.appendChild(document.createElement('div'))
+    const outside = document.body.appendChild(document.createElement('button'))
+    const pressed = jest.fn()
+    outside.addEventListener('click', pressed)
+    under(outside)
+    lookTransition(jest.fn(), undefined, dialog)
+    root.dispatchEvent(new MouseEvent('click'))
+    await settle()
+    expect(pressed).not.toHaveBeenCalled()
+    dialog.remove()
+    outside.remove()
+  })
+
+  test('a click on the page itself is left alone, as the keyboard presses a real button', async () => {
+    const dialog = document.body.appendChild(document.createElement('div'))
+    const button = dialog.appendChild(document.createElement('button'))
+    lookTransition(jest.fn(), undefined, dialog)
+    button.click()
+    await settle()
+    expect(skipTransition).not.toHaveBeenCalled()
+    end()
+    dialog.remove()
+  })
 })
 
 test('a sweep kept to a box runs across that box, not the window', () => {

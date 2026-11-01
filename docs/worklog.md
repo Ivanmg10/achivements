@@ -29,6 +29,26 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-01 — Vercel's font failures, and Next 16.4.3 (`fix/106-look-transition-races`)
+
+**Did** — Next and `eslint-config-next` to 16.4.3.
+**Why** — Vercel failed 5 of 31 deployments on 2026-10-31 and 11-01 with `next/font/google queries have exactly one entry`, on commits that had nothing to do with it. Two earlier notes here called it unexplained.
+**Decisions** — The cause: Google sometimes answers with `https://fonts.gstatic.com/l/font?kit=…&skey=…&v=v20`, and Turbopack up to 16.4.2 splits its font query on that `&` (vercel/next.js#99114, fixed by #100158, in stable through #100277). Measured against Google with the build's user agent: Sofia Sans 22 of 220 answers, Sofia Sans Extra Condensed 7 of 220, Fira and Barlow 0 of 440, which makes about 13 % of builds. It hit since those fonts came in (2026-10-29), and a failure's 25 or 10 errors are that family's files. Proven with `NEXT_FONT_GOOGLE_MOCKED_RESPONSES` and a captured `/l/font` answer: 16.4.2 fails with the same 25 errors, 16.4.3 builds with valid woff2. Self-hosting the fonts was dropped: the update removes the failure. A retry would only roll the dice again.
+**Watch out** — The lockfile was updated with `--package-lock-only` so as not to change `node_modules` under a running `next dev`: run `npm ci` locally to get 16.4.3. The sample's rate moves with Google, and another family may start doing the same.
+
+---
+
+## 2026-11-01 — Clicks, scope and blur during a look transition (`fix/106-look-transition-races`)
+
+**Did** — A click during a transition now works: `lookTransition` ends the transition and hands the click to the button under the pointer. A transition skipped by a newer one no longer clears the scope (`running`, `keepTo`). `ThemeModal` has the new `backdrop="dim"` of `Modal`, with no blur.
+**Why** — The three leftovers of #78: the Layout modal ignored the mouse for the second a sweep lasts, the race took the whole page and lost the blur once something reached it, and Firefox dropped the theme dialog's blur for the 650 ms of a change.
+**Decisions** — `::view-transition { pointer-events: none }`, the usual answer and the one this worklog proposed, is wrong here: Firefox cannot hit the captured element, so a real click landed on the backdrop and closed the dialog. Hence the handler on `<html>`, where the overlay's clicks land; it only presses a button inside the dialog, so a click outside does nothing during a transition. The sweep snaps to its end when clicked through: the next one starts at once. The theme's transition has to take the whole page, as the page changes with it, so the blur could not be kept out of it: the dialog gives the blur up in every browser (`bg-black/60`), which is the one visible change. Scoping it to the dialog would have changed the page behind at a stroke.
+**Verification** — Firefox 159, real pointer: shape then font, shape twice, theme twice all apply; a click outside during a sweep leaves the dialog open; the race, with scripted clicks 400 ms apart, keeps `look-panel` and the page behind stays at 0.01 from the frame at rest (1.86 before). The rule for the dialog's `dim` backdrop was not measured on screen: with no blur there is nothing to lose.
+**Open** — #102's text still lists the Layout modal: its rewrite was refused by this session's permissions, the owner decides. The keyboard path is covered by unit tests only: the script's Enter did not reach the buttons.
+**Watch out** — Test clicks during a transition with real pointer input: a scripted `.click()` skips the overlay and proves nothing. The dev server left the last edit of `globals.css` out again: read the served rule first.
+
+---
+
 ## 2026-11-01 — The Layout modal, concept A, and picking a streak (`refactor/78-round-design`)
 
 **Did** — `LayoutModal` is concept A of the canvas: every option in view (no tabs), the theme beside them, a fixed height, the sample
@@ -69,7 +89,7 @@ The home's heatmap changed size between platforms (29×29 and 46 weeks on RA, 25
 Small jumps as a platform loads, each found by logging every frame's sizes: the recent list's loading rows had a `gap-1` the real ones have not (8 px, the column rose and fell on PlayStation and Xbox); PSN's profile is 0.3 px past 48rem, hence 48.25rem; loading pills had no line under the figure (60 px against 78); the daily chart's heading was 35 px loading and 30 loaded (a block has no baseline, in `items-baseline`); and Steam's, PSN's and Xbox's pills that need the summary were left out until it came, so the row reflowed from five to seven some 150 ms in. They are now in the row from the first frame, as `loading` pills, and in the same order in the loading list.
 A game's "Achievements unlocked" was a second drawing of the home's daily chart (a plain line with its own grid, axes and tooltip): the user asked for one. `AchievementsLinePlot` takes the names of its fields, its ticks and its tooltip, `GameAchievementsProgressPlot` is gone, and so is `ChartSkeleton`, which only that chart used; both load as `LineChartSkeleton`.
 **Verification** — 838 suites / 5,348 tests, ESLint, tsc, and the build from a clean `npm ci` copy in a temporary worktree, so `next dev` was left alone (Next 16.4.2, as the lockfile).
-**Open** — #102 still lists the Layout modal. The test account's RA key fails, so its home shows RA's error card, 2 px taller than the pills; a working RA was not measured. Two bugs measured in Firefox and left as they are: `::view-transition` covers the window and swallows mouse clicks, so the modal ignores you for the second a shape sweep lasts; and when a transition is skipped by a newer one, the old one's `.finally` in `lookTransition` clears the names before the new one captures, which takes the whole page and loses the blur (reached by a scripted click, not by a mouse, because of the first bug; keyboard not checked). `pointer-events: none` on `::view-transition` alone would make a mouse reach it: fix the `.finally` with it.
+**Open** — #102 still lists the Layout modal. The test account's RA key fails, so its home shows RA's error card, 2 px taller than the pills; a working RA was not measured. The modal ignoring clicks during a transition and the race in `lookTransition` were closed in #106, see the entry above; letting clicks through with `pointer-events: none`, as this note first said, closes the dialog.
 **Watch out** — `sharp(buf).extract(a).stats()` ignores the extract: it measures the whole image, which here read as a page lighting up (the band's own share of the frame). Crop to a
 buffer first. A dev server can stop picking up `globals.css` with no error: compare the served CSS before believing a measurement. Translations are CRLF in the working copy: a script that rewrites one line must keep that, or git shows the whole file changed.
 
@@ -159,7 +179,7 @@ Measured: the cards end at ~800 ms (rounded to two decimals), and at ~220 ms wit
 **Watch out** — Vercel builds fail now and then (2026-10-31, three times on this PR) with `Can't resolve
 '@vercel/turbopack-next/internal/font/google/font'` / `next/font/google queries have exactly one entry`, on a font that changes between
 runs (Sofia Sans, then Sofia Sans Extra Condensed). It is intermittent: a later build restoring the same cache as a failed one passed, so
-the cache is not the cause, and the commit's code neither (fonts untouched, the same commit passed). Root cause not found. To retry,
+the cache is not the cause, and the commit's code neither (fonts untouched, the same commit passed). Root cause found on 2026-11-01, see the entry on Vercel's font failures: Google's `/l/font?kit=` URLs. To retry,
 `npx vercel redeploy <deployment url>`, which turns the commit's status green; a `develop` → `main` release may need it too. Local
 `node_modules` was on Next 16.3.6 while the lockfile says 16.4.2, so a local build is not proof of what Vercel builds: use a clean
 `npm ci` copy to compare.
