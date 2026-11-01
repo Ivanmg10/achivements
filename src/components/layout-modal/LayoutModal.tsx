@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useFontStyle, type FontStyle } from '@/hooks/useFontStyle'
 import { useGameCardStyle } from '@/hooks/useGameCardStyle'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
-import { useShapeStyle } from '@/hooks/useShapeStyle'
+import { useShapeStyle, type ShapeStyle } from '@/hooks/useShapeStyle'
 import { lookTransition, sweepEdge } from '@/utils/lookTransition'
 import Modal from '@/components/ui/Modal'
 import SegmentedControl, { type Segment } from '@/components/ui/SegmentedControl'
@@ -38,20 +38,25 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
   const [cards, setCards] = useGameCardStyle()
   const [triedFont, setTriedFont] = useState<FontStyle | null>(null)
   const shownFont = triedFont ?? font
+  const body = useRef<HTMLDivElement>(null)
+
+  /** The dialog, which every transition here stays inside: the page behind keeps its blur. */
+  const panel = () => body.current?.closest<HTMLElement>('[role="dialog"]') ?? undefined
 
   function close() {
-    const leave = () => {
-      if (triedFont) setFont(triedFont)
-      setTriedFont(null)
-      onClose()
-    }
-    if (shownFont === font) leave()
-    else lookTransition(leave)
+    if (triedFont) setFont(triedFont)
+    setTriedFont(null)
+    onClose()
+  }
+
+  function changeShape(next: ShapeStyle) {
+    const dialog = panel()
+    lookTransition(() => setShape(next), sweepEdge(next, dialog?.getBoundingClientRect()), dialog)
   }
 
   return (
     <Modal isOpen={isOpen} onClose={close} size="2xl" backdrop="opaque" title={T.homeLayout.layoutLabel} hint={T.homeLayout.modalHint} className="gap-0">
-      <div className="flex flex-col gap-5 lg:grid lg:h-[min(30rem,calc(92dvh-8rem))] lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[minmax(0,1fr)] lg:gap-5">
+      <div ref={body} className="flex flex-col gap-5 lg:grid lg:h-[min(30rem,calc(92dvh-8rem))] lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[minmax(0,1fr)] lg:gap-5">
         <div className="sticky -top-5 z-10 -mt-5 h-[17.5rem] shrink-0 bg-bg-header pt-5 pb-3 lg:static lg:mt-0 lg:h-auto lg:min-h-0 lg:p-0 min-w-0">
           <LayoutModalPreview font={shownFont} />
         </div>
@@ -60,7 +65,7 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
           <LayoutChoice
             label={T.homeLayout.shapeLabel}
             value={shape}
-            onChange={(next) => lookTransition(() => setShape(next), sweepEdge(next))}
+            onChange={changeShape}
             options={[
               { value: 'slanted', label: T.homeLayout.shapeSlanted },
               { value: 'round', label: T.homeLayout.shapeRound },
@@ -69,7 +74,7 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
           <LayoutChoice
             label={T.homeLayout.fontLabel}
             value={shownFont}
-            onChange={(next) => lookTransition(() => setTriedFont(next))}
+            onChange={(next) => lookTransition(() => setTriedFont(next), undefined, panel())}
             options={[
               { value: 'barlow', label: fontName('barlow', 'Barlow') },
               { value: 'sofia', label: fontName('sofia', 'Sofia') },

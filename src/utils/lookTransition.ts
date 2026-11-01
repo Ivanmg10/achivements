@@ -33,11 +33,12 @@ export function spreadFrom(x: number, y: number): Reveal {
  * it: leaning for the slanted design, curved for the round one. The two looks
  * are clipped apart and the band is what shows between them, the background of
  * the view transition's pair (globals.css): they differ too little for a bare
- * edge to be seen. The page changes whole, so nothing jumps, as it did when only
- * the corners eased (the bars' own `clip-path` cannot ease into `none`).
+ * edge to be seen. All of `box` (the window, unless a transition is scoped to
+ * something smaller) changes at once, so nothing jumps, as it did when only the
+ * corners eased (the bars' own `clip-path` cannot ease into `none`).
  */
-export function sweepEdge(shape: ShapeStyle): Reveal {
-  const { innerWidth: w, innerHeight: h } = window
+export function sweepEdge(shape: ShapeStyle, box?: { width: number; height: number }): Reveal {
+  const { width: w, height: h } = box ?? { width: window.innerWidth, height: window.innerHeight }
   const radius = h * 1.2
   const offset = (y: number) => (shape === 'round' ? Math.sqrt(radius ** 2 - (y - h / 2) ** 2) - radius : (h / 2 - y) * LEAN)
   const ys = Array.from({ length: EDGE_POINTS + 1 }, (_, i) => (h * i) / EDGE_POINTS)
@@ -56,19 +57,36 @@ export function sweepEdge(shape: ShapeStyle): Reveal {
  * A change of the site's look through the browser's view transition, for what
  * CSS cannot ease on its own. A browser without view transitions, or reduced
  * motion, just changes.
+ *
+ * `within` keeps the transition to one element, and what is around it stays
+ * live. A dialog over a blurred page needs it: Firefox leaves `backdrop-filter`
+ * out of its capture of the page, so the blur behind the dialog vanishes for the
+ * length of a transition of the whole page (seen on the real screen, 2026-11-01).
  */
-export function lookTransition(change: () => void, reveal: Reveal = FADE) {
+export function lookTransition(change: () => void, reveal: Reveal = FADE, within?: HTMLElement) {
   if (!document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     change()
     return
   }
+  const root = document.documentElement
+  if (within) {
+    root.style.viewTransitionName = 'none'
+    within.style.viewTransitionName = 'look-panel'
+  }
+  const layer = within ? 'look-panel' : 'root'
   const transition = document.startViewTransition(() => flushSync(change))
   transition.ready
     .then(() => {
       const timing = { duration: reveal.duration, easing: reveal.easing }
-      document.documentElement.animate(reveal.keyframes, { ...timing, pseudoElement: '::view-transition-new(root)' })
-      if (reveal.old) document.documentElement.animate(reveal.old, { ...timing, pseudoElement: '::view-transition-old(root)' })
+      root.animate(reveal.keyframes, { ...timing, pseudoElement: `::view-transition-new(${layer})` })
+      if (reveal.old) root.animate(reveal.old, { ...timing, pseudoElement: `::view-transition-old(${layer})` })
     })
     // Skipped (a hidden tab, another transition): the change itself already happened.
     .catch(() => {})
+  if (within) {
+    transition.finished.catch(() => {}).finally(() => {
+      root.style.viewTransitionName = ''
+      within.style.viewTransitionName = ''
+    })
+  }
 }

@@ -166,14 +166,23 @@
 
 /* `lookTransition` plays these by hand: a font fades, a shape sweeps, a theme spreads from where it was picked. */
 ::view-transition-old(root),
-::view-transition-new(root) {
+::view-transition-new(root),
+::view-transition-old(look-panel),
+::view-transition-new(look-panel) {
   animation: none;
   mix-blend-mode: normal;
 }
 
 /* Only seen in a sweep: the band between the two looks. */
-::view-transition-image-pair(root) {
+::view-transition-image-pair(root),
+::view-transition-image-pair(look-panel) {
   background: rgb(var(--accent));
+}
+
+/* A dialog's own transition keeps the dialog's corners. */
+::view-transition-image-pair(look-panel) {
+  overflow: hidden;
+  border-radius: var(--r-card);
 }
 
 /* A page that waits for nothing has no skeleton to soften its arrival, so its entrance takes longer. */

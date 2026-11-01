@@ -58,9 +58,11 @@ The home's skeleton now draws the two charts' own loading states: it drew its ow
 not bars, and no longer shows a "0" that is not known yet.
 The home's skeleton was taller than the page: the profile's skeleton had a fixed 667 px, which set the whole top of the home to 743 px on any screen. `homeFit` now remembers how tall
 the loaded profile is (`block-height:home-profile`, as `RememberedHeight`) and the skeleton takes exactly that; a first visit has nothing to go by and keeps its natural height.
-**Open** — The user sees the background change on every change in the Layout modal. Not reproduced, in any way tried: per frame the overlay's opacity is constant, and the real screen
-(captured from Windows at 59 samples a second, in Brave, with the user's theme and shape) does not move but for the band. So the cause is unknown; the backdrop was made solid
-(`opaque` in `Modal`, the theme's background, no blur), so nothing of the page can show through it, whatever reacts there. The test account's page is nearly empty, which may be why. `npm run build` not rerun since these changes (it breaks the running dev server's CSS, see the entry below); run it before the
+The Layout modal's background changing on each change was Firefox: it leaves `backdrop-filter` out of the view transition's capture, so a transition of the whole page showed the page sharp behind
+the dialog until it ended (only there, which is why Chrome and Brave measured flat; the user pointed at Firefox). The transitions in the modal now stay inside the dialog (`within`, `look-panel`), the page stays live.
+A font tried no longer fades on closing. `ThemeModal`'s spread still takes the whole page, as the page changes with it: in Firefox its lighter blur goes for those 650 ms.
+The Recently played rows lost 8 px (`py-2`, on all five platforms' items): they set the height of the top of the home, so the trim on the charts, and through it the size of the heatmap's cells.
+**Open** — `npm run build` not rerun since these changes (it breaks the running dev server's CSS, see the entry below); run it before the
 PR. #102 still lists the Layout modal.
 **Watch out** — `sharp(buf).extract(a).stats()` ignores the extract: it measures the whole image, which here read as a page lighting up (the band's own share of the frame). Crop to a
 buffer first. A dev server can stop picking up `globals.css` with no error: compare the served CSS before believing a measurement. Translations are CRLF in the working copy: a script that rewrites one line must keep that, or git shows the whole file changed.

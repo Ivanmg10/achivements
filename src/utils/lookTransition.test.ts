@@ -92,6 +92,40 @@ test('with an old look to move, both are animated together', async () => {
   expect(animate.mock.calls.map(([, options]) => options.pseudoElement)).toEqual(['::view-transition-new(root)', '::view-transition-old(root)'])
 })
 
+test('kept to an element, the page stays out of it, and goes back in after', async () => {
+  stubMotion(false)
+  let finish = () => {}
+  const finished = new Promise<void>((done) => { finish = done })
+  const animate = jest.fn()
+  document.documentElement.animate = animate
+  document.startViewTransition = jest.fn((run: () => void) => {
+    run()
+    return { ready: Promise.resolve(), finished }
+  }) as unknown as typeof document.startViewTransition
+  const panel = document.createElement('div')
+
+  lookTransition(jest.fn(), undefined, panel)
+  expect(document.documentElement.style.viewTransitionName).toBe('none')
+  expect(panel.style.viewTransitionName).toBe('look-panel')
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(animate.mock.calls[0][1].pseudoElement).toBe('::view-transition-new(look-panel)')
+
+  finish()
+  await new Promise((done) => setTimeout(done))
+  expect(document.documentElement.style.viewTransitionName).toBe('')
+  expect(panel.style.viewTransitionName).toBe('')
+})
+
+test('a sweep kept to a box runs across that box, not the window', () => {
+  window.innerWidth = 2000
+  window.innerHeight = 1000
+  const ends = (sweepEdge('slanted', { width: 400, height: 300 }).keyframes.clipPath as string[])[1]
+  const xs = points(ends).slice(1, -1)
+  expect(Math.min(...xs)).toBeGreaterThanOrEqual(400)
+  expect(Math.max(...xs)).toBeLessThan(500)
+})
+
 test('a skipped transition neither throws nor loses the change', async () => {
   stubMotion(false)
   const { animate } = stubTransition(Promise.reject(new Error('skipped')))
