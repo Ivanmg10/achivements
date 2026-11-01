@@ -221,10 +221,11 @@ export const es: Translations = {
     'name_steam-retro': 'Steam Retro',
     'name_snake-eater': 'Snake Eater',
     name_venom: 'Venom',
-    group_base: 'Básicos',
+    group_dark: 'Oscuros',
+    group_light: 'Claros',
     group_tinted: 'Con color',
     group_palettes: 'Paletas',
-    group_games: 'Videojuegos',
+    group_tributes: 'Homenajes',
   },
   userConfig: {
     accountSettings: 'Configuración de cuenta',

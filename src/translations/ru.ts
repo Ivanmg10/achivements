@@ -221,10 +221,11 @@ export const ru: Translations = {
     'name_steam-retro': 'Steam Retro',
     'name_snake-eater': 'Пожиратель змей',
     name_venom: 'Веном',
-    group_base: 'Базовые',
+    group_dark: 'Тёмные',
+    group_light: 'Светлые',
     group_tinted: 'Цветные',
     group_palettes: 'Палитры',
-    group_games: 'Видеоигры',
+    group_tributes: 'Посвящения',
   },
   userConfig: {
     accountSettings: 'Настройки аккаунта',

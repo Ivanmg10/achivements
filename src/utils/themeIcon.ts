@@ -1,6 +1,6 @@
 import { THEMES, THEME_STORAGE_KEY, type Theme } from '@/types/types'
 
-/** Each theme's accent, as in globals.css (`themes.test.ts` holds them to it). */
+/** Each theme's logo colour: its accent, as in globals.css (`themes.test.ts` holds them to it), but for Venom. */
 const THEME_ACCENT: Record<Theme, string> = {
   dark: '#a78bfa',
   'dark-red': '#f87171',
@@ -23,7 +23,8 @@ const THEME_ACCENT: Record<Theme, string> = {
   'black-ops-2': '#ff6600',
   'steam-retro': '#c4b550',
   'snake-eater': '#c9b458',
-  venom: '#ef5a5f',
+  // The symbiote's purple, the user's call: its bone white accent would only be the browser's ink.
+  venom: '#8b5cf6',
 }
 
 // The logo as drawn. Its shape is not to be changed: only the colours go in `$0`–`$5`.

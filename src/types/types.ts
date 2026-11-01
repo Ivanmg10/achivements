@@ -11,12 +11,13 @@ export const THEME_STORAGE_KEY = 'app-theme'
 export type Theme = (typeof THEMES)[number]
 
 /** How the theme picker sorts them; every theme sits in exactly one group. */
-export const THEME_GROUPS: { id: 'base' | 'tinted' | 'palettes' | 'games'; themes: Theme[] }[] = [
-  // Neutral dark and light, each with a violet, red, green or blue accent, and white or black.
-  { id: 'base', themes: ['dark', 'dark-red', 'dark-green', 'dark-blue', 'dark-white', 'light', 'light-red', 'light-green', 'light-blue', 'light-black'] },
+export const THEME_GROUPS: { id: 'dark' | 'light' | 'tinted' | 'palettes' | 'tributes'; themes: Theme[] }[] = [
+  // Neutral dark and light, with the same accents: violet, red, green, blue, and white or black.
+  { id: 'dark', themes: ['dark', 'dark-red', 'dark-green', 'dark-blue', 'dark-white'] },
+  { id: 'light', themes: ['light', 'light-red', 'light-green', 'light-blue', 'light-black'] },
   { id: 'tinted', themes: ['purple', 'red', 'green', 'blue'] },
   { id: 'palettes', themes: ['midnight', 'crimson', 'sakura', 'arctic'] },
-  { id: 'games', themes: ['black-ops-2', 'steam-retro', 'snake-eater', 'venom'] },
+  { id: 'tributes', themes: ['black-ops-2', 'steam-retro', 'snake-eater', 'venom'] },
 ]
 
 export function isTheme(value: unknown): value is Theme {

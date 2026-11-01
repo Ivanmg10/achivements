@@ -740,7 +740,7 @@ html[data-font="fira"],
 }
 
 /* ============================================
-   VENOM (Ultimate Spider-Man): the symbiote's black, the tongue's red, a purple sheen on the surfaces
+   VENOM (Ultimate Spider-Man): the symbiote's black, bone white, a purple sheen on the surfaces
    ============================================ */
 [data-theme="venom"] {
   --bg-main: 11 9 10;
@@ -751,14 +751,14 @@ html[data-font="fira"],
   --text-main: 240 237 244;
   --text-secondary: 170 162 180;
 
-  --accent: 239 90 95;
-  --accent-hover: 245 130 134;
-  --accent-muted: 239 90 95;
+  --accent: 236 232 242;
+  --accent-hover: 255 255 255;
+  --accent-muted: 236 232 242;
 
   --success: 52 211 153;
   --warning: 251 191 36;
   --info: 160 170 255;
-  --danger: 251 146 60;
+  --danger: 248 113 113;
   --chart-2: 168 140 240;
 }
 

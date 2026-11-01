@@ -332,7 +332,7 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 - **The favicon follows the theme, with nothing behind it:** the whole logo in the accent, toned for the browser through `prefers-color-scheme` inside the SVG
   (4:1 on `#35363a` or on white); white and black accents take the browser's ink. **Never a ground or a plate** (the user tried it, 2026-11-02): a page cannot read a
   tab's colour, so any ground clashes with some browser's theme. The same cost as any single logo: a browser whose scheme does not match its tab colour reads worse, and a mid grey tab is the weakest.
-  Themes that share an accent share an icon (Midnight and Crimson): it goes with the theme, it does not name it.
+  Themes that share an accent share an icon (Midnight and Crimson): it goes with the theme, it does not name it. Venom is the one exception: bone white accent, purple logo (the user's call).
 - **A new theme needs its row in `THEME_ACCENT`:** the types refuse a missing one, `src/app/themes.test.ts` refuses one that differs from `globals.css`
   (and checks contrast for the themes added in #84). A new light theme also joins the light selector lists in `globals.css`.
 - **One `<link id="theme-icon">`, in the root layout, before the script.** Not `src/app/icon.svg`: Next's link can land after the script. Both the script

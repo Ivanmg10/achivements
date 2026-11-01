@@ -222,10 +222,11 @@ export const en = {
     'name_steam-retro': 'Steam Retro',
     'name_snake-eater': 'Snake Eater',
     name_venom: 'Venom',
-    group_base: 'Basics',
+    group_dark: 'Dark',
+    group_light: 'Light',
     group_tinted: 'Tinted',
     group_palettes: 'Palettes',
-    group_games: 'Video games',
+    group_tributes: 'Tributes',
   },
   userConfig: {
     accountSettings: 'Account settings',

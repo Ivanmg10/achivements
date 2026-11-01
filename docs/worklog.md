@@ -29,6 +29,14 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-02 — Venom in bone white, and the theme groups (`feat/84-theme-favicon`, #84)
+
+**Did** — Venom's accent back to bone white (the red did not stay), with a purple logo, the one theme whose logo is not its accent. The picker's basics split into Dark and Light. "Video games" is now "Tributes" (`tributes`, "Homenajes"), as it holds Venom and Steam Retro.
+**Why** — The user's feedback after trying them. "Grove" was Gruvbox, as assumed: confirmed.
+**Decisions** — "Homenajes" was my choice of name: a character and a client are not video games, and it still fits Black Ops II and Snake Eater. Venom's logo starts from `#8b5cf6`; the issue's `#2B1B47` is too dark for a tab.
+
+---
+
 ## 2026-11-02 — The favicon without a ground, Crimson, Venom's red (`feat/84-theme-favicon`, #84)
 
 **Did** — Favicon is concept B of canvas v3: no ground, the whole logo in the accent, with a tone for each browser scheme inside the SVG (`tone` in `src/utils/themeIcon.ts`); the table is one accent per theme now. New `crimson` ("Carmesí"), Midnight's cream on deep red. Venom takes option B, the red accent, so its `--danger` goes orange. 22 themes.

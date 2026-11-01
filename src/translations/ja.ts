@@ -221,10 +221,11 @@ export const ja: Translations = {
     'name_steam-retro': 'Steam Retro',
     'name_snake-eater': 'スネークイーター',
     name_venom: 'ヴェノム',
-    group_base: 'ベーシック',
+    group_dark: 'ダーク',
+    group_light: 'ライト',
     group_tinted: 'カラー',
     group_palettes: 'パレット',
-    group_games: 'ゲーム',
+    group_tributes: 'オマージュ',
   },
   userConfig: {
     accountSettings: 'アカウント設定',

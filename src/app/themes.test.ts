@@ -31,8 +31,10 @@ function contrast(a: string, b: string) {
   return (high + 0.05) / (low + 0.05)
 }
 
-test('each theme\'s favicon starts from its own accent', () => {
-  for (const theme of THEMES) expect(themeAccent(theme)).toBe(toHex(tokens(theme)['--accent']))
+test('each theme\'s favicon starts from its own accent, but for Venom\'s purple logo', () => {
+  for (const theme of THEMES.filter((t) => t !== 'venom')) expect(themeAccent(theme)).toBe(toHex(tokens(theme)['--accent']))
+  expect(themeAccent('venom')).toBe('#8b5cf6')
+  expect(toHex(tokens('venom')['--accent'])).toBe('#ece8f2')
 })
 
 test('venom keeps to the dark: every surface stays close to black', () => {

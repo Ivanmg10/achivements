@@ -12,8 +12,9 @@ test('every theme has its colours in globals.css', () => {
   for (const theme of THEMES) expect(css).toContain(`[data-theme="${theme}"]`)
 })
 
-test('dark and light come with the same accents, first in the picker', () => {
-  expect(THEME_GROUPS[0]).toEqual({ id: 'base', themes: ['dark', 'dark-red', 'dark-green', 'dark-blue', 'dark-white', 'light', 'light-red', 'light-green', 'light-blue', 'light-black'] })
+test('dark and light come apart, with the same accents, first in the picker', () => {
+  expect(THEME_GROUPS[0]).toEqual({ id: 'dark', themes: ['dark', 'dark-red', 'dark-green', 'dark-blue', 'dark-white'] })
+  expect(THEME_GROUPS[1]).toEqual({ id: 'light', themes: ['light', 'light-red', 'light-green', 'light-blue', 'light-black'] })
 })
 
 test('a removed theme is gone from the list and from the stylesheet', () => {
