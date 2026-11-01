@@ -29,6 +29,16 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-02 — Welcome preferences: concepts on the canvas, and /welcome open for now (`feat/102-welcome-look-sample`, #102)
+
+**Did** — A new row on the Layout modal's canvas: Hoy (a real capture), A (two steps), B (one step), C (the sample as the stage), A on a phone. `/welcome` added to `PUBLIC_PATHS` in `src/proxy.ts`, for now. No welcome code changed: the process asks for an agreed design first.
+**Why** — The user wants to try the step without registering another account.
+**Decisions** — Only signed-out visitors were kept out: nothing redirects an account, so `/welcome` already worked signed in. Measured at 1536×864: the step is 2114 px tall on an 864 px screen, with the theme about 1400 px down. A is recommended: the look stops competing with privacy, and privacy gets a sample of its own, which answers the issue's "the sample has nothing to show for them". The issue's text is behind: the modal's gaps were closed in #78, and the theme stays in `ThemeModal`, by the user's choice after trying it inside. On the canvas the font changes only in the sample, as in the modal.
+**Open** — **Take `/welcome` out of `PUBLIC_PATHS` before this PR merges** (a `TEMP (#102)` comment marks it). The user picks a concept, then the plan doc and the build.
+**Watch out** — Signed out, the step works but a theme answers 401, rolls back and says so inline, and the rankings switch is missing (measured): try the real thing signed in, which saves on that account. The Playwright browser here keeps a session, so a signed-out check needs a new context. The canvas was published without being looked at, by its type's rule.
+
+---
+
 ## 2026-11-02 — Venom in bone white, and the theme groups (`feat/84-theme-favicon`, #84)
 
 **Did** — Venom's accent back to bone white (the red did not stay), with a purple logo, the one theme whose logo is not its accent. The picker's basics split into Dark and Light. "Video games" is now "Tributes" (`tributes`, "Homenajes"), as it holds Venom and Steam Retro.

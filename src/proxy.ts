@@ -10,7 +10,8 @@ import { getToken } from 'next-auth/jwt'
 // /opengraph-image is the link preview and /apple-icon the iOS home-screen icon:
 // whoever fetches them (other sites, a phone saving the page) has no session.
 // /rankings and how its points work are public (signed out: no presence, no Following).
-const PUBLIC_PATHS = ['/', '/authPage', '/resetPassword', '/privacy', '/terms', '/opengraph-image', '/apple-icon', '/rankings', '/rankings/how']
+// TEMP (#102): /welcome is open only while its preferences are reworked, so it can be tried with no new account. Remove before that PR merges.
+const PUBLIC_PATHS = ['/', '/authPage', '/resetPassword', '/privacy', '/terms', '/opengraph-image', '/apple-icon', '/rankings', '/rankings/how', '/welcome']
 // The comparison and how-to pages (src/translations/seoPages.ts): written for visitors and crawlers.
 const PUBLIC_PREFIXES = ['/compare/', '/track/']
 // A profile and its link preview: signed out, the page shows only what the rankings do (profileTeaser).
