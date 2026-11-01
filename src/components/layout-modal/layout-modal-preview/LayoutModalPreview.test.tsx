@@ -6,11 +6,10 @@ beforeEach(() => localStorage.clear())
 
 test('the sample home carries the chosen design and font', () => {
   localStorage.setItem('shape-style', 'round')
-  localStorage.setItem('font-style', 'fira')
   localStorage.setItem('home-layout', 'cover')
   localStorage.setItem('game-card-style', 'flat')
 
-  const { container } = render(<LayoutModalPreview />)
+  const { container } = render(<LayoutModalPreview font="fira" />)
   const preview = screen.getByRole('region', { name: en.homeLayout.previewLabel })
 
   expect(preview).toHaveAttribute('data-shape', 'round')

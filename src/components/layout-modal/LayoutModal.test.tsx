@@ -42,6 +42,21 @@ test('choices apply to the sample home at once', () => {
   expect(preview).toHaveAttribute('data-cards', 'flat')
 })
 
+test('a font is tried in the sample and reaches the page on the way out', () => {
+  const onClose = jest.fn()
+  render(<LayoutModal isOpen onClose={onClose} />)
+  const preview = screen.getByRole('region', { name: en.homeLayout.previewLabel })
+
+  fireEvent.click(group(en.homeLayout.fontLabel).getByRole('button', { name: 'Fira' }))
+  expect(preview).toHaveAttribute('data-font', 'fira')
+  expect(group(en.homeLayout.fontLabel).getByRole('button', { name: 'Fira' })).toHaveAttribute('aria-pressed', 'true')
+  expect(localStorage.getItem('font-style')).toBeNull()
+
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(localStorage.getItem('font-style')).toBe('fira')
+  expect(onClose).toHaveBeenCalledTimes(1)
+})
+
 test('a swatch chooses its theme; the one already on does nothing', () => {
   render(<LayoutModal isOpen onClose={jest.fn()} />)
   const themes = group(en.userTheme.theme)

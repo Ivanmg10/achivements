@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useFontStyle, type FontStyle } from '@/hooks/useFontStyle'
 import { useGameCardStyle } from '@/hooks/useGameCardStyle'
@@ -26,7 +27,9 @@ const fontName = (font: FontStyle, name: string) => <span data-font={font} class
  * Where the site's look is chosen: every option in view at once, beside a sample
  * home that follows them (fixed on top of them on a phone). Each kind of
  * change moves in its own way, see `LayoutModalPreview` and `LayoutModalThemes`.
- * Each choice is kept the moment it is made; the dialog only closes.
+ * Each choice is kept the moment it is made, but for the font: it is tried in
+ * the sample, and the page takes it on the way out, however the dialog closes,
+ * so its text does not change behind (the user's call, 2026-11-01).
  */
 export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { T } = useLanguage()
@@ -34,12 +37,24 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
   const [font, setFont] = useFontStyle()
   const [layout, setLayout] = useHomeLayout()
   const [cards, setCards] = useGameCardStyle()
+  const [triedFont, setTriedFont] = useState<FontStyle | null>(null)
+  const shownFont = triedFont ?? font
+
+  function close() {
+    const leave = () => {
+      if (triedFont) setFont(triedFont)
+      setTriedFont(null)
+      onClose()
+    }
+    if (shownFont === font) leave()
+    else lookTransition(leave)
+  }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="2xl" backdrop="opaque" title={T.homeLayout.layoutLabel} hint={T.homeLayout.modalHint} className="gap-0">
+    <Modal isOpen={isOpen} onClose={close} size="2xl" backdrop="opaque" title={T.homeLayout.layoutLabel} hint={T.homeLayout.modalHint} className="gap-0">
       <div className="flex flex-col gap-5 lg:grid lg:h-[min(36rem,calc(92dvh-8rem))] lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-6">
         <div className="sticky top-0 z-10 h-56 shrink-0 bg-bg-header lg:static lg:h-auto lg:min-h-0 min-w-0">
-          <LayoutModalPreview />
+          <LayoutModalPreview font={shownFont} />
         </div>
 
         <div className="flex min-w-0 flex-col gap-5 lg:overflow-y-auto lg:pr-1">
@@ -54,8 +69,8 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
           />
           <LayoutChoice
             label={T.homeLayout.fontLabel}
-            value={font}
-            onChange={(next) => lookTransition(() => setFont(next))}
+            value={shownFont}
+            onChange={(next) => lookTransition(() => setTriedFont(next))}
             options={[
               { value: 'barlow', label: fontName('barlow', 'Barlow') },
               { value: 'sofia', label: fontName('sofia', 'Sofia') },

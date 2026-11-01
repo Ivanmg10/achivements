@@ -16,8 +16,8 @@ type Reveal = {
   easing: string
 }
 
-/** The new look fades in over the old one. */
-const FADE: Reveal = { keyframes: { opacity: [0, 1], filter: ['blur(3px)', 'blur(0)'] }, duration: 320, easing: EASE_OUT }
+/** The new look fades in over the old one; what did not change does not move. */
+const FADE: Reveal = { keyframes: { opacity: [0, 1] }, duration: 320, easing: EASE_OUT }
 
 /** The new look spreads from a point to the farthest corner of the window. */
 export function spreadFrom(x: number, y: number): Reveal {

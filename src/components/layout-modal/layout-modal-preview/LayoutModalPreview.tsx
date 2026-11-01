@@ -2,7 +2,7 @@
 
 import { LayoutGroup, MotionConfig, motion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
-import { useFontStyle } from '@/hooks/useFontStyle'
+import type { FontStyle } from '@/hooks/useFontStyle'
 import { useGameCardStyle } from '@/hooks/useGameCardStyle'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
 import { useShapeStyle } from '@/hooks/useShapeStyle'
@@ -20,10 +20,9 @@ const GROW = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const }
  * and the flat style wipes across the cards. The sample data is fixed on
  * purpose: the page behind the dialog never leaks into the preview.
  */
-export default function LayoutModalPreview() {
+export default function LayoutModalPreview({ font }: { font: FontStyle }) {
   const { T } = useLanguage()
   const [shape] = useShapeStyle()
-  const [font] = useFontStyle()
   const [layout] = useHomeLayout()
   const [cards] = useGameCardStyle()
   const [lead, ...rest] = SAMPLE_GAMES

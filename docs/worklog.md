@@ -49,6 +49,7 @@ solid layer behind its arc: a circle leaves the corners out, and the band's colo
 card is never empty and the page does not jump. The year stays in the accent, not the tier's colour: the user asked for tier colours
 on the best streaks only. The theme shortlist is six swatches, the person's own always among them, and the rest in `ThemeModal`.
 A theme picked in the modal gets no toast (the dialog stays open and nothing else there toasts); a failed save says so inline.
+The font is tried in the sample and reaches the page when the modal closes: the user did not like seeing the page change behind.
 **Open** — `npm run build` not rerun since these changes (it breaks the running dev server's CSS, see the entry below); run it before the
 PR. #102 still lists the Layout modal.
 **Watch out** — Translations are CRLF in the working copy: a script that rewrites one line must keep that, or git shows the whole file changed.
