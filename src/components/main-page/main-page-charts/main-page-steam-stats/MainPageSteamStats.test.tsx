@@ -54,11 +54,26 @@ test('opens the day and period modals from the pills', () => {
   expect(screen.getByTestId('period-modal')).toHaveTextContent(`${en.pointsStats.thisWeek}:1`)
 })
 
-test('says there is no activity today, and leaves the level out until the profile loads', () => {
-  ;(useSteamProfile as jest.Mock).mockReturnValue({ profile: null })
+test('says there is no activity today, and keeps the level in the row while the profile loads', () => {
+  ;(useSteamProfile as jest.Mock).mockReturnValue({ profile: null, error: null })
   render(<MainPageSteamStats streak={0} achievements={[]} games={[]} />)
   expect(pill(en.pointsStats.today)).toHaveTextContent(en.pointsStats.noActivity)
+  expect(pill(en.steam.level).querySelector('.bg-skeleton')).toBeInTheDocument()
+})
+
+test('leaves the level out when the profile cannot be read', () => {
+  ;(useSteamProfile as jest.Mock).mockReturnValue({ profile: null, error: 'failed' })
+  render(<MainPageSteamStats streak={0} achievements={[]} games={[]} />)
   expect(screen.queryByText(en.steam.level)).not.toBeInTheDocument()
+})
+
+test('while loading it draws the same pills, in the same order, as loaded', () => {
+  const labels = () => [...document.querySelectorAll('.flex-wrap > *')].map((p) => p.firstElementChild?.textContent)
+  const { unmount } = render(<MainPageSteamStats streak={0} achievements={[]} games={[]} />)
+  const loaded = labels()
+  unmount()
+  render(<MainPageSteamStats streak={0} achievements={[]} games={[]} isLoading />)
+  expect(labels()).toEqual(loaded)
 })
 
 test('shows placeholders while loading', () => {

@@ -17,7 +17,7 @@ const MEANING: [string, string, string][] = [
   ['softcore', 'bg-softcore', 'RA softcore'],
 ]
 const INK: [string, string][] = [['ink/6', 'bg-ink/[0.06]'], ['ink/12', 'bg-ink/[0.12]'], ['ink/20', 'bg-ink/20']]
-const RADII = ['rounded-chip', 'rounded-tag', 'rounded-button', 'rounded-tile', 'rounded-pane', 'rounded-field', 'rounded-card']
+const RADII = ['rounded-cell', 'rounded-box-sm', 'rounded-box-md', 'rounded-box', 'rounded-tag-sm', 'rounded-badge', 'rounded-tag', 'rounded-chip', 'rounded-icon', 'rounded-button', 'rounded-control', 'rounded-tile', 'rounded-area', 'rounded-pane', 'rounded-field', 'rounded-sheet', 'rounded-card']
 const MOTION: [string, string][] = [['--motion-hover', '150ms'], ['--motion-open', '250ms'], ['--motion-indicator', '450ms']]
 
 function Swatch({ name, cls, use }: { name: string; cls: string; use?: string }) {
@@ -74,7 +74,7 @@ export default function DesignCatalogFoundations() {
             <span aria-hidden="true" className="h-8 w-24 bg-accent" style={slantStyle(14)} />
           </Specimen>
           <Specimen name="--slant-line · --slant-mark">
-            <span aria-hidden="true" className="h-1 w-24 bg-accent skew-x-(--slant-line)" />
+            <span aria-hidden="true" className="h-1 w-24 bg-accent rounded-(--bar-radius) skew-x-(--slant-line)" />
             <span aria-hidden="true" className="h-9 w-1 bg-accent skew-y-(--slant-mark)" />
           </Specimen>
         </Compare>

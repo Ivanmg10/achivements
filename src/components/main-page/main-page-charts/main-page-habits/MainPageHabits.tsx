@@ -18,7 +18,7 @@ function Bar({ count, max, peak, title }: { count: number; max: number; peak: bo
   return (
     <span title={title} className="flex-1 h-full flex items-end min-w-0">
       <span
-        className={`w-full rounded-t-[3px] ${peak ? 'bg-accent' : 'bg-accent/30'}`}
+        className={`w-full rounded-t-cell ${peak ? 'bg-accent' : 'bg-accent/30'}`}
         style={{ height: count > 0 ? `max(3px, ${(count / max) * 100}%)` : '0' }}
       />
     </span>

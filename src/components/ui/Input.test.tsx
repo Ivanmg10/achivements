@@ -40,7 +40,7 @@ describe('Textarea', () => {
   it('renders a textarea with the field look', () => {
     render(<Textarea aria-label="Bio" defaultValue="hi" />)
     expect(screen.getByLabelText('Bio').tagName).toBe('TEXTAREA')
-    expect(screen.getByLabelText('Bio').className).toContain('rounded-field')
+    expect(screen.getByLabelText('Bio').className).toContain('rounded-area')
   })
 })
 

@@ -43,7 +43,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="p-1 rounded text-text-secondary hover:text-text-main transition-colors shrink-0"
+      className="p-1 rounded-box-sm text-text-secondary hover:text-text-main transition-colors shrink-0"
       aria-label="Copy hash"
     >
       {copied
@@ -94,7 +94,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
         <Modal isOpen={isOpen} onClose={onClose} size="md" showClose={false} className="gap-4">
             {/* Header */}
             <div className="flex items-center gap-3 p-5 border-b border-ink/8 shrink-0">
-              <div className="w-9 h-9 rounded-lg bg-bg-main flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-box bg-bg-main flex items-center justify-center shrink-0">
                 <IconHash className="w-4.5 h-4.5 text-accent" />
               </div>
               <div className="flex-1 min-w-0">
@@ -103,7 +103,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-ink/8 text-text-secondary hover:text-text-main transition-colors"
+                className="p-1.5 rounded-chip hover:bg-ink/8 text-text-secondary hover:text-text-main transition-colors"
                 aria-label="Cerrar"
               >
                 <IconX className="w-4 h-4" />
@@ -145,7 +145,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                             {h.Labels.map((label) => (
                               <span
                                 key={label}
-                                className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border font-semibold ${LABEL_COLORS[label] ?? 'bg-ink/10 text-text-secondary border-ink/10'}`}
+                                className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-tag-sm border font-semibold ${LABEL_COLORS[label] ?? 'bg-ink/10 text-text-secondary border-ink/10'}`}
                               >
                                 {label}
                               </span>
@@ -153,7 +153,7 @@ export default function GameHashesModal({ isOpen, onClose, gameId, gameTitle }: 
                           </div>
                         )}
                       </div>
-                      <div className="flex items-center gap-1 bg-bg-card rounded-lg px-2.5 py-1.5">
+                      <div className="flex items-center gap-1 bg-bg-card rounded-box px-2.5 py-1.5">
                         <code className="text-[11px] text-text-secondary font-mono flex-1 select-all">{h.MD5}</code>
                         <CopyButton text={h.MD5} />
                       </div>

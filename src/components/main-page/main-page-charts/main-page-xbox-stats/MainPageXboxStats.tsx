@@ -29,7 +29,9 @@ export default function MainPageXboxStats({
   isLoading?: boolean
 }) {
   const { T, lang } = useLanguage()
-  const { summary } = useXboxSummary()
+  const { summary, error } = useXboxSummary()
+  // Its pills are in the row from the start: arriving late, they pushed every other one aside.
+  const summaryWaiting = !summary && !error
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [weekOpen, setWeekOpen] = useState(false)
   const [monthOpen, setMonthOpen] = useState(false)
@@ -51,7 +53,7 @@ export default function MainPageXboxStats({
   if (isLoading) {
     return (
       <div className="flex flex-wrap gap-3" aria-busy="true">
-        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.streak.title, T.xbox.gamerscore].map((label) => (
+        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.xbox.gamerscore, T.streak.title, T.xbox.achievements].map((label) => (
           <StatPill key={label} label={label} value="" loading />
         ))}
       </div>
@@ -70,7 +72,7 @@ export default function MainPageXboxStats({
       <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={noun} onClick={() => setWeekOpen(true)} />
       <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={noun} onClick={() => setMonthOpen(true)} />
       <StatPill label={T.pointsStats.avgPerDay} value={decimal(stats.avg, lang)} sub={T.pointsStats.perDay} />
-      {summary && <StatPill label={T.xbox.gamerscore} value={summary.gamerscore.toLocaleString(lang)} sub="Xbox" accent="text-success" />}
+      {(summary || summaryWaiting) && <StatPill label={T.xbox.gamerscore} value={summary?.gamerscore.toLocaleString(lang) ?? ''} sub="Xbox" accent="text-success" loading={summaryWaiting} />}
       <StatPill
         label={T.streak.title}
         value={`${streak}d`}
@@ -78,7 +80,7 @@ export default function MainPageXboxStats({
         accent={streak > 0 ? 'text-accent' : undefined}
         href="/racha"
       />
-      {summary && <StatPill label={T.xbox.achievements} value={summary.achievementsUnlocked.toLocaleString(lang)} sub={T.xbox.total} />}
+      {(summary || summaryWaiting) && <StatPill label={T.xbox.achievements} value={summary?.achievementsUnlocked.toLocaleString(lang) ?? ''} sub={T.xbox.total} loading={summaryWaiting} />}
 
       <AnimatePresence>
         {selectedDay && (

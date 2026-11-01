@@ -43,6 +43,14 @@ test('text fields come from the library (fieldClass, Input, Textarea, SearchInpu
   expect(bad).toEqual([])
 })
 
+test('a textarea drawn with fieldClass says it has several lines: a pill would deform it', () => {
+  const bad: string[] = []
+  for (const { file, text } of FILES) {
+    for (const m of text.matchAll(/<textarea\b[\s\S]*?\/>/g)) if (/fieldClass\(/.test(m[0]) && !/multiline: true/.test(m[0])) bad.push(file)
+  }
+  expect(bad).toEqual([])
+})
+
 test('no native select: the library has its own', () => {
   expect(offenders(/<select[\s>]/)).toEqual([])
 })
@@ -83,9 +91,29 @@ test('a streak is coloured by its tier, never a fixed hue', () => {
 })
 
 test('the radii the designs change come from the tokens, never a fixed value', () => {
-  // rounded-card / -pane / -tile / -tag / -button / -chip: the round design softens them or turns them to pills.
-  expect(offenders(/rounded-\[(?:1\.25|0\.875|0\.625|0\.375)rem\]/)).toEqual([])
+  // rounded-card / -sheet / -pane / -tile / -box / -tag / -badge / -cell / -icon / -button / -chip: the round design softens them or turns them to pills.
   expect(offenders(/\brounded-(?:xl|2xl)\b/)).toEqual([])
+  // What may keep its own radius: art bigger than a card, which is round enough in both designs, and the
+  // tiny drawings of a layout inside the preferences, which are not controls or surfaces.
+  const allowed = [
+    path.join('components', 'landing-page', 'landing-hero', 'LandingHero.tsx'),
+    path.join('components', 'main-page', 'main-page-portada', 'MainPagePortada.tsx'),
+    path.join('components', 'main-page', 'main-page-profile', 'main-page-profile-psn', 'MainPageProfilePsn.tsx'),
+    path.join('components', 'main-page', 'main-page-profile', 'main-page-profile-st', 'MainPageProfileSt.tsx'),
+    path.join('components', 'main-page', 'main-page-profile', 'main-page-profile-xbox', 'MainPageProfileXbox.tsx'),
+    path.join('components', 'status-badge', 'StatusBadge.tsx'),
+    path.join('components', 'user-page', 'user-game-card-preference', 'user-game-card-preference-preview', 'UserGameCardPreferencePreview.tsx'),
+    path.join('components', 'user-page', 'user-home-layout-preference', 'user-home-layout-preference-preview', 'UserHomeLayoutPreferencePreview.tsx'),
+    path.join('components', 'welcome-page', 'welcome-page-intro-detail', 'WelcomePageIntroDetail.tsx'),
+  ]
+  // A value of its own, on any side. `inherit` and a calc on a token follow the design, so they pass.
+  const fixed = offenders(/(?<![\w-])rounded(?:-[tblrse]{1,2})?-(?:lg|md|sm|3xl|\[(?!inherit\]|calc\(var\())(?![\w-])/)
+  expect(fixed.filter((f) => !allowed.includes(f))).toEqual([])
+})
+
+test('a bare rounded is only ever a focus ring: anything painted takes a token', () => {
+  const painted = /(?<=["'`\s])rounded(?=[\s"'`])[^"'`]*(?<![\w:-])(?:bg-(?!transparent)|object-cover|ring-1)|(?<![\w:-])(?:bg-(?!transparent)|object-cover|ring-1)[^"'`]*\srounded(?=[\s"'`])/
+  expect(offenders(painted)).toEqual([])
 })
 
 test('a loading block comes from Skeleton, never a hand-made pulse', () => {

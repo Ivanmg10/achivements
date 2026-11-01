@@ -3,12 +3,12 @@ import { GameAchievementsProgressChart } from './GameAchievementsProgressChart'
 import type { InsightAchievement } from '@/utils/gameInsights'
 
 // The real plot is recharts; this one has a button per bucket, like clicking its point.
-jest.mock('./game-achievements-progress-plot/GameAchievementsProgressPlot', () => ({
+jest.mock('@/components/achivements-line-chart/achievements-line-plot/AchievementsLinePlot', () => ({
   __esModule: true,
-  default: ({ data, onSelect }: { data: { label: string; count: number }[]; onSelect: (label: string) => void }) => (
+  default: ({ data, onPick, tick }: { data: { label: string; count: number }[]; onPick: (label: string) => void; tick: (label: string) => string }) => (
     <div data-testid="ResponsiveContainer">
       {data.map((d) => (
-        <button key={d.label} onClick={() => onSelect(d.label)}>
+        <button key={d.label} onClick={() => onPick(d.label)} data-tick={tick(d.label)}>
           point {d.label} {d.count}
         </button>
       ))}

@@ -105,7 +105,7 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
                 <button
                   onClick={onClose}
                   aria-label="Close menu"
-                  className="p-1 rounded-lg text-text-secondary hover:text-text-main transition-colors"
+                  className="p-1 rounded-chip text-text-secondary hover:text-text-main transition-colors"
                 >
                   <IconX className="w-5 h-5" aria-hidden />
                 </button>

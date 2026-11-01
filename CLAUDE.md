@@ -211,25 +211,38 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
 **`/design`, admins only** (the flag is read from the database; others get the 404).
 
 - **Two designs, two look preferences:** `shape-style` = `slanted` (default) or `round`, and
-  `font-style` = `barlow` (default), `sofia` or `fira` (Preferences → Layout → Page), as
+  `font-style` = `barlow` (default), `sofia` or `fira` (Preferences → Layout), as
   `data-shape` and `data-font` on `<html>`; any element can carry either one to show a look inside
-  another (the catalogue, the choice cards and the Layout chooser's sample do) (`ShapeSync`; a
+  another (the catalogue, the choice cards and the Layout chooser's sample do; `data-font` swaps `--font-face` and `--font-face-display`, and such an element takes the family itself) (`ShapeSync`; a
   script in the root layout paints the last choices before the first frame). A component never
   reads the choice: it reads tokens. A bar's cut ends are `slantStyle(px)`
   (`ui/shape.ts`), a mark's lean `skew-y-(--slant-mark)`, a control's `skew-x-(--slant-button)`.
   **Never a literal `polygon(...)` or `skew-*-[..]`** (`uiGuard.test.ts` fails on it). The round
   design may override the shape tokens; no theme may (`designTokens.test.ts`). The welcome curtain's
   fixed clip paths are the documented decorative exception and do not follow the shape choice.
-- **The round design is the site as it was before the slant**: soft corners on buttons, fields and cards
-  (`--r-button`, `--r-field`, `--r-card`, `--r-pane`, `--r-tile`), tags and chips as pills (`--r-tag`,
-  `--r-chip`), a switch as a pill with a round knob. Use `rounded-card` / `-pane` / `-tile` / `-tag` /
-  `-button`, never old `rounded-xl` / `rounded-2xl` or a fixed `rounded-[..rem]` for those
-  (`uiGuard.test.ts` refuses them).
+- **The round design must always be rounder than the slanted one (2026-11-01, #78):** every surface a step
+  softer (`--r-card`, `-sheet`, `-pane`, `-tile`, `-control`, `-area`, `-box*`; `designTokens.test.ts` fails if one
+  is not), and every one-line control a pill or a circle (`--r-button`, `-field`, `-icon`, `-tag`, `-tag-sm`, `-badge`,
+  `-chip`). It started as a copy of the site before the slant, and the slanted design then grew past it, so it looked
+  square with nothing failing. **Choose by what the thing is:** a card `rounded-card`, a floating panel `rounded-sheet`,
+  an inner tile `rounded-tile`, a thumbnail, row or small box `rounded-box` (`-md`, `-sm`), a heatmap cell `rounded-cell`, a
+  button `rounded-button`, an icon button `rounded-icon` or `rounded-chip`, one line of input `rounded-field`, several lines
+  `rounded-area` (`multiline: true` on `fieldClass`, which the guard requires on a raw `<textarea>`; a round corner cuts its grip,
+  so `[resize:var(--area-resize)]`). A `Modal` draws the frame: never a card inside it. **`rounded-control` is a soft surface, despite its name** (notices, menus,
+  tooltips): it must never be a pill, and a real control does not use it. A value new to the slanted block restates what
+  that design drew, so it does not move. Outside `ui/`, `uiGuard.test.ts` refuses `rounded-lg`, `-md`, `-sm`, `-xl`, `-2xl`,
+  `-3xl` and arbitrary values, on any side, but for its short list of exceptions; a bare `rounded` is only a focus ring's corner.
+  A `rounded-full` chip is a pill in both designs: left so on purpose, since moving it would change the slanted design.
 - **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `Shelf`, `DropSlot` and `ToggleButton`
   are in `ui/`; a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
   `GameCardBackdrop` is the one place that draws it, so every game card follows it.
-- **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the
+- **The Layout modal moves on every change (2026-11-01, #78):** all its options in view, no tabs. The theme stays in its own dialog (`ThemeModal`, which stays open on a pick and says what is on and saved), by the user's choice after trying it inside. The first game's card grows into
+  the cover (Framer `layoutId`), the flat style wipes across the cards, and the rest goes through `lookTransition`
+  (`src/utils/lookTransition.ts`, the browser's view transition): a font fades (in the sample: the page takes it when the modal closes, so it never changes behind; the user's call), a theme spreads from its tile, and a shape sweeps
+  across the window behind a band of the accent shaped like it (`sweepEdge`). Do not ease a shape with CSS: the bars' `clip-path` cannot, so half the
+  page jumped (the user turned that down). A browser without view transitions, or reduced motion, just changes. **Over a blurred backdrop a transition must be kept to the dialog** (`lookTransition(…, within)`): Firefox leaves `backdrop-filter` out of its capture of the page, so a whole-page transition shows the page sharp behind the dialog until it ends. A dialog's ring and shadow are outside its box, so a fade draws them twice and a sweep's `clip-path` cuts them: the `look-panel` pair clips the looks and draws them itself. **The change goes in after `ready`, two frames in, never in the transition's callback:** Firefox shows the element itself on a transition's first frame, a flash of the new look; the new look is live, so it takes the change behind the animation. Test motion in Firefox too, on the real screen.
+- **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the best streaks' bars, the
   streak hero and its live bar, the cover's streak card, the home's stats tile, the rankings' streak column). This replaces "streaks in the accent" for those places.
 - **Adding a piece:** library first (`ui/`, props for layout only, a test), then its specimen in the
   catalogue, then its rule in `uiGuard.test.ts`, then the page. A page that needs a one-off look asks
@@ -273,7 +286,7 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 - **The look lives in tokens** in `globals.css` (`--slant-*`, `--r-*`, `--h-*`, `--motion-*`,
   `--hardcore`/`--softcore`), defined once for every theme (`designTokens.test.ts`): a future
   site-wide design changes them, not the components.
-- **Loading**: `Skeleton` (`ui/Skeleton.tsx`: `radius` from the tokens, colour `bg-skeleton`, pulse, still under reduced motion, always hidden), `SkeletonRow` / `SkeletonGameList`, `GameRowSkeleton`, `GameCardSkeleton`; an image's own placeholder uses `SKELETON_PULSE`. **Each screen and view has its own composed skeleton, on the real boxes and gutters** (2026-10-31, #70): a new screen, section or fetch brings its own in the same change, and a figure on its way is `loading` on `StatPill` / `StatCard` / `PlatformStat`, never a `—`. The guard refuses a hand-made `animate-pulse`; only `StatusBadge`'s glow is exempt. Spinners stay for actions (inside a button), not for content. **`(home)/loading.tsx` also renders signed out, without `MainProviders`**: a skeleton there reads `useOptionalMainView`, never a context that throws. **A section lands whole (the user's preference, 2026-10-31):** the home's Friends and both Following lists hold their skeleton until `detailsLoading` is false, even if that takes longer; no row pops in or re-sorts, and a failed read still ends the wait. Do not add a timeout or a progressive reveal without asking. **A skeleton draws every variant and `<html>` picks one**, so a full load paints the right one before React can read a preference: `data-home-layout`, `data-library-layout` and `data-session` (`in` or `tabs`, nothing signed out; `sessionLook`, no account data) are set by `LOOK_SCRIPT` before the first frame, then kept by `ShapeSync`, and read in `globals.css` (`.if-*`, `.home-if-*`). A block sized by the person's data is a `RememberedHeight` (`ui/`): it keeps in this browser how tall it ended up and holds that room while it loads; the first visit has nothing to go by.
+- **Loading**: `Skeleton` (`ui/Skeleton.tsx`: `radius` from the tokens, colour `bg-skeleton`, pulse, still under reduced motion, always hidden), `SkeletonRow` / `SkeletonGameList`, `GameRowSkeleton`, `GameCardSkeleton`; an image's own placeholder uses `SKELETON_PULSE`. **Each screen and view has its own composed skeleton, on the real boxes and gutters** (2026-10-31, #70): a new screen, section or fetch brings its own in the same change, and a figure on its way is `loading` on `StatPill` / `StatCard` / `PlatformStat`, never a `—`. The guard refuses a hand-made `animate-pulse`; only `StatusBadge`'s glow is exempt. Spinners stay for actions (inside a button), not for content. **The home's profile skeleton takes the height the real one had last time** (`homeFit` keeps it, `HOME_PROFILE_KEY`): that height sets the top of the home, and a fixed guess made the skeleton taller than the page (2026-11-01). **With profile tabs the home's profile column keeps one height (`min-height`, globals.css, the tallest platform's):** that height sets `--home-fit-trim`, so a shorter profile resized the charts and the heatmap on every switch (2026-11-01). **A line of unlocks over time is `AchievementsLinePlot`** (the home's week, a game's weeks or months): the user's rule, 2026-11-01, one chart, never a second drawing of it. **What a row or a card may show must be in it from the first frame:** a pill whose data comes later is a `loading` pill, gone only if the read fails (`!summary && !error`), or it pushes the others aside when it lands; a large `StatPill` keeps the line under its figure. **A chart in a skeleton is the real chart with `isLoading`**, never a second drawing of it. **`(home)/loading.tsx` also renders signed out, without `MainProviders`**: a skeleton there reads `useOptionalMainView`, never a context that throws. **A section lands whole (the user's preference, 2026-10-31):** the home's Friends and both Following lists hold their skeleton until `detailsLoading` is false, even if that takes longer; no row pops in or re-sorts, and a failed read still ends the wait. Do not add a timeout or a progressive reveal without asking. **A skeleton draws every variant and `<html>` picks one**, so a full load paints the right one before React can read a preference: `data-home-layout`, `data-library-layout` and `data-session` (`in` or `tabs`, nothing signed out; `sessionLook`, no account data) are set by `LOOK_SCRIPT` before the first frame, then kept by `ShapeSync`, and read in `globals.css` (`.if-*`, `.home-if-*`). A block sized by the person's data is a `RememberedHeight` (`ui/`): it keeps in this browser how tall it ended up and holds that room while it loads; the first visit has nothing to go by.
 - **Dialogs**: `Modal` (head with icon, title and hint; `footer`; `tone="danger"` is an
   `alertdialog`; sizes `sm`–`xl`; a sheet on phones; Escape, outside click, focus kept inside and
   given back; only the top dialog answers Escape). `CommonModal` is a thin wrapper over it (no
@@ -783,9 +796,9 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
 - **Cross-site writes stop in `src/proxy.ts`**, whose matcher takes `/api` only when the request carries
   `Origin`, so same-origin reads never pay for it.
 
-- **recharts is only loaded through the lazy plots** (`AchievementsLinePlot`,
-  `GameAchievementsProgressPlot`, via `next/dynamic`). Their `loading` and the chart's data state are the same
-  `ChartSkeleton`, or the reader sees a second skeleton between them. Never import `recharts` in
+- **recharts is only loaded through the lazy plot** (`AchievementsLinePlot`, via
+  `next/dynamic`). Their `loading` and the chart's data state are the same
+  `LineChartSkeleton`, or the reader sees a second skeleton between them. Never import `recharts` in
   a component that is part of a page's first render: it is ~390 KB.
 - **A modal is a `next/dynamic` import wrapped in `LazyWhenOpened`**, so it is
   downloaded the first time it opens and stays mounted after (its exit animation

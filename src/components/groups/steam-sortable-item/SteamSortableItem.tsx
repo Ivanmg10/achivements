@@ -110,7 +110,7 @@ export default function SteamSortableItem({
             <p title={game?.title ?? item.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game?.title ?? item.title}</p>
           </Link>
           <span className="flex items-center gap-1.5 flex-wrap">
-            <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium bg-[#1b2838] text-[#66c0f4]">
+            <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium bg-[#1b2838] text-[#66c0f4]">
               <SteamLogo size={12} aria-hidden="true" />
               Steam
             </span>
@@ -150,7 +150,7 @@ export default function SteamSortableItem({
           <button
             onClick={() => onRemove(item.id)}
             aria-label={`${T.groups.removeGame}: ${item.title}`}
-            className="relative z-10 p-2 rounded-lg text-text-secondary hover:text-danger hover:bg-danger/10 transition-all [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
+            className="relative z-10 p-2 rounded-chip text-text-secondary hover:text-danger hover:bg-danger/10 transition-all [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
           >
             <IconX className="w-4 h-4" aria-hidden="true" />
           </button>
@@ -161,7 +161,7 @@ export default function SteamSortableItem({
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${item.title}`}
-            className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
           >
             <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               ▼

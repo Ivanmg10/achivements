@@ -26,7 +26,7 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
       <div className="flex items-center justify-between gap-2 min-w-0">
         <Link
           href={`/user/${encodeURIComponent(friend.username)}`}
-          className="flex items-center gap-3 rounded-lg -m-1 p-1 hover:bg-ink/[0.06] transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="flex items-center gap-3 rounded-box -m-1 p-1 hover:bg-ink/[0.06] transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <UserSummary user={friend} size={40} />
         </Link>
@@ -43,12 +43,12 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
                   href={gameHref(source, game!.id, friend.username)}
                   title={game!.title}
                   aria-label={game!.title}
-                  className="block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="block rounded-box focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 >
                   {icon ? (
-                    <Image src={icon} alt="" width={36} height={36} className="w-9 h-9 rounded-lg object-cover" unoptimized />
+                    <Image src={icon} alt="" width={36} height={36} className="w-9 h-9 rounded-box object-cover" unoptimized />
                   ) : (
-                    <span aria-hidden="true" className="block w-9 h-9 rounded-lg bg-ink/10" />
+                    <span aria-hidden="true" className="block w-9 h-9 rounded-box bg-ink/10" />
                   )}
                 </Link>
               </li>
@@ -69,9 +69,9 @@ export default function MainPageFriendsCard({ friend, week }: { friend: FriendOv
             {friend.showcase.slice(0, 3).map((p, i) => (
               <li key={`${p.source}:${p.gameId}:${i}`} className="flex items-center gap-2 min-w-0">
                 {p.badge ? (
-                  <Image src={p.badge} alt="" width={24} height={24} className="w-6 h-6 rounded object-cover shrink-0" unoptimized />
+                  <Image src={p.badge} alt="" width={24} height={24} className="w-6 h-6 rounded-box-sm object-cover shrink-0" unoptimized />
                 ) : (
-                  <span aria-hidden="true" className="w-6 h-6 rounded bg-ink/10 shrink-0" />
+                  <span aria-hidden="true" className="w-6 h-6 rounded-box-sm bg-ink/10 shrink-0" />
                 )}
                 <span className="text-xs truncate">
                   {p.title ?? '—'} <span className="text-text-secondary">· {p.gameTitle}</span>

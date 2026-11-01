@@ -13,7 +13,7 @@ export default function MainPagePinnedSectionGameTile({ game, handle }: { game: 
         href={game.href}
         className={`flex items-center gap-3 rounded-tile p-2.5 bg-bg-main ring-1 ring-ink/[0.06] hover:ring-accent/40 transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${handle ? 'pr-9' : ''}`}
       >
-        <GameIcon source={game.source} id={game.id} imageUrl={game.iconUrl} size={40} className="w-10 h-10 rounded-lg shrink-0" />
+        <GameIcon source={game.source} id={game.id} imageUrl={game.iconUrl} size={40} className="w-10 h-10 rounded-box shrink-0" />
         <span className="flex flex-col min-w-0 flex-1 gap-1">
           <span className="flex items-center gap-1.5 min-w-0">
             <PlatformLogo source={game.source} size={11} className="shrink-0" />

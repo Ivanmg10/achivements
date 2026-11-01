@@ -52,7 +52,7 @@ export default function SteamRarestAchievements({
             <li key={a.apiname}>
               <Link
                 href={`/steamGame/${appId}#${achievementAnchor(a.apiname)}`}
-                className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
               >
                 {a.badgeUrl ? (
                   <Image
@@ -60,11 +60,11 @@ export default function SteamRarestAchievements({
                     alt=""
                     width={40}
                     height={40}
-                    className="w-10 h-10 rounded-lg ring-2 ring-[#66c0f4] shrink-0"
+                    className="w-10 h-10 rounded-box ring-2 ring-[#66c0f4] shrink-0"
                     unoptimized
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+                  <div className="w-10 h-10 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
                 )}
                 <span className="flex flex-col min-w-0">
                   <span className="text-sm font-semibold truncate">{a.title}</span>

@@ -78,7 +78,7 @@ export default function UserPsnCard() {
               alt=""
               width={44}
               height={44}
-              className="rounded-lg w-10 h-10 object-cover shrink-0"
+              className="rounded-box w-10 h-10 object-cover shrink-0"
               unoptimized
             />
           ) : (

@@ -86,7 +86,7 @@ export default function SteamStatusGameItem({
               <p title={game.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game.title}</p>
             </Link>
             <span className="flex items-center gap-1.5 flex-wrap">
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium bg-[#1b2838] text-[#66c0f4]">
+              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium bg-[#1b2838] text-[#66c0f4]">
                 <SteamLogo size={12} aria-hidden="true" />
                 Steam
               </span>
@@ -128,7 +128,7 @@ export default function SteamStatusGameItem({
               aria-expanded={open}
               aria-controls={panelId}
               aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.title}`}
-              className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
             >
               <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                 ▼

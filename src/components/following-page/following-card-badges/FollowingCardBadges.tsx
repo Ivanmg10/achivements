@@ -9,8 +9,8 @@ import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 
 const SIZE = {
-  md: { px: 40, box: 'w-10 h-10 rounded-lg', gap: 'gap-1.5' },
-  sm: { px: 28, box: 'w-7 h-7 rounded-md', gap: 'gap-1' },
+  md: { px: 40, box: 'w-10 h-10 rounded-box', gap: 'gap-1.5' },
+  sm: { px: 28, box: 'w-7 h-7 rounded-box-md', gap: 'gap-1' },
 }
 
 /**
@@ -43,7 +43,7 @@ export default function FollowingCardBadges({
               href={gameHref(p.source, p.gameId, username)}
               aria-label={`${p.title ?? '—'} · ${p.gameTitle}`}
               aria-describedby={p.description ? tip : undefined}
-              className="block rounded-lg transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="block rounded-box transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               {p.badge ? (
                 <Image src={p.badge} alt="" width={px} height={px} className={`${box} object-cover`} unoptimized />

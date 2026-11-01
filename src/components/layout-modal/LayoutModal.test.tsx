@@ -1,43 +1,53 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import LayoutModal from './LayoutModal'
 import { en } from '@/translations/en'
 
 beforeEach(() => localStorage.clear())
 
-test('names itself Layout, and opens on the Page tab with the shape', () => {
+function group(name: string) {
+  return within(screen.getByRole('group', { name }))
+}
+
+test('names itself Layout, with every option in view and no tabs', () => {
   render(<LayoutModal isOpen onClose={jest.fn()} />)
   const dialog = screen.getByRole('dialog', { name: en.homeLayout.layoutLabel })
-  expect(dialog).toBeInTheDocument()
   expect(dialog.parentElement).toHaveClass('bg-black/80')
-  expect(screen.getByRole('tab', { name: en.homeLayout.tabPage })).toHaveAttribute('aria-selected', 'true')
-  expect(screen.getByRole('group', { name: en.homeLayout.shapeLabel })).toBeInTheDocument()
-  expect(screen.getByRole('group', { name: en.homeLayout.fontLabel })).toBeInTheDocument()
+  expect(screen.queryByRole('tab')).not.toBeInTheDocument()
+  for (const name of [en.homeLayout.shapeLabel, en.homeLayout.fontLabel, en.homeLayout.label, en.homeLayout.cardsLabel]) {
+    expect(screen.getByRole('group', { name })).toBeInTheDocument()
+  }
+  expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument()
   expect(screen.getByRole('region', { name: en.homeLayout.previewLabel })).toBeInTheDocument()
-  expect(screen.queryByRole('group', { name: en.homeLayout.cardsLabel })).not.toBeInTheDocument()
 })
 
 test('choices apply to the sample home at once', () => {
   render(<LayoutModal isOpen onClose={jest.fn()} />)
   const preview = screen.getByRole('region', { name: en.homeLayout.previewLabel })
 
-  fireEvent.click(screen.getByRole('radio', { name: new RegExp(en.homeLayout.shapeRound) }))
-  fireEvent.click(screen.getByRole('radio', { name: new RegExp(en.homeLayout.fontSofia) }))
+  fireEvent.click(group(en.homeLayout.shapeLabel).getByRole('button', { name: en.homeLayout.shapeRound }))
+  fireEvent.click(group(en.homeLayout.fontLabel).getByRole('button', { name: 'Sofia' }))
+  fireEvent.click(group(en.homeLayout.label).getByRole('button', { name: en.homeLayout.cover }))
+  fireEvent.click(group(en.homeLayout.cardsLabel).getByRole('button', { name: en.homeLayout.cardsFlat }))
+
   expect(preview).toHaveAttribute('data-shape', 'round')
   expect(preview).toHaveAttribute('data-font', 'sofia')
-
-  fireEvent.click(screen.getByRole('tab', { name: en.homeLayout.tabHome }))
-  fireEvent.click(screen.getByRole('radio', { name: new RegExp(en.homeLayout.cover) }))
-  fireEvent.click(screen.getByRole('radio', { name: new RegExp(en.homeLayout.cardsFlat) }))
   expect(preview).toHaveAttribute('data-layout', 'cover')
   expect(preview).toHaveAttribute('data-cards', 'flat')
 })
 
-test('the Home tab holds the home layout and the game cards', () => {
-  render(<LayoutModal isOpen onClose={jest.fn()} />)
-  fireEvent.click(screen.getByRole('tab', { name: en.homeLayout.tabHome }))
-  expect(screen.getByRole('group', { name: en.homeLayout.label })).toBeInTheDocument()
-  expect(screen.getByRole('group', { name: en.homeLayout.cardsLabel })).toBeInTheDocument()
-  expect(screen.queryByRole('group', { name: en.homeLayout.shapeLabel })).not.toBeInTheDocument()
+test('a font is tried in the sample and reaches the page on the way out', () => {
+  const onClose = jest.fn()
+  render(<LayoutModal isOpen onClose={onClose} />)
+  const preview = screen.getByRole('region', { name: en.homeLayout.previewLabel })
+
+  fireEvent.click(group(en.homeLayout.fontLabel).getByRole('button', { name: 'Fira' }))
+  expect(preview).toHaveAttribute('data-font', 'fira')
+  expect(group(en.homeLayout.fontLabel).getByRole('button', { name: 'Fira' })).toHaveAttribute('aria-pressed', 'true')
+  expect(localStorage.getItem('font-style')).toBeNull()
+
+  fireEvent.keyDown(document, { key: 'Escape' })
+  expect(localStorage.getItem('font-style')).toBe('fira')
+  expect(onClose).toHaveBeenCalledTimes(1)
 })
 
 test('closed, it draws nothing', () => {

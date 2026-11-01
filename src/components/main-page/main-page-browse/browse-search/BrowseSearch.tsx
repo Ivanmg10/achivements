@@ -77,9 +77,9 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
                 className="flex items-center gap-2.5 rounded-tile bg-bg-main p-2 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 min-w-0"
               >
                 {g.iconUrl ? (
-                  <Image src={g.iconUrl} alt="" width={32} height={32} unoptimized className="w-8 h-8 rounded-md object-cover shrink-0" />
+                  <Image src={g.iconUrl} alt="" width={32} height={32} unoptimized className="w-8 h-8 rounded-box-md object-cover shrink-0" />
                 ) : (
-                  <span className="w-8 h-8 rounded-md bg-ink/10 shrink-0" aria-hidden="true" />
+                  <span className="w-8 h-8 rounded-box-md bg-ink/10 shrink-0" aria-hidden="true" />
                 )}
                 <span className="flex flex-col min-w-0 flex-1">
                   <span className="text-xs font-semibold truncate">{g.title}</span>

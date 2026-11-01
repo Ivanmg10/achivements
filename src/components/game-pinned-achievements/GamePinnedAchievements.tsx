@@ -109,7 +109,7 @@ export function GamePinnedAchievements({
             return (
               <div
                 key={row.achievement_id}
-                className="group flex items-center gap-2 hover:bg-bg-main/60 rounded-lg px-2 py-1.5 transition-colors"
+                className="group flex items-center gap-2 hover:bg-bg-main/60 rounded-box px-2 py-1.5 transition-colors"
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {row.snapshot.BadgeName ? (
@@ -118,11 +118,11 @@ export function GamePinnedAchievements({
                       alt={row.snapshot.Title}
                       width={36}
                       height={36}
-                      className={`w-9 h-9 rounded-lg object-cover shrink-0 ${earned ? '' : 'grayscale opacity-50'}`}
+                      className={`w-9 h-9 rounded-box object-cover shrink-0 ${earned ? '' : 'grayscale opacity-50'}`}
                       unoptimized
                     />
                   ) : (
-                    <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
+                    <div className="w-9 h-9 rounded-box bg-ink/10 shrink-0" />
                   )}
                   <div className="flex flex-col min-w-0 flex-1">
                     <p className="text-xs font-medium truncate">{row.snapshot.Title}</p>

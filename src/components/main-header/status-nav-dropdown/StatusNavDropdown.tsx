@@ -27,7 +27,7 @@ export default function StatusNavDropdown({
         aria-expanded={isOpen}
         aria-label={label}
         onClick={() => setIsOpen((o) => !o)}
-        className={`relative inline-flex items-center gap-1 h-10 px-3 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:rounded-chip after:content-[''] after:absolute after:left-2.5 after:right-2.5 after:bottom-0.5 after:h-[3px] after:bg-accent after:skew-x-(--slant-line) after:origin-left after:transition-transform after:duration-(--motion-open) ${active ? 'text-text-main after:scale-x-100' : 'text-text-secondary hover:text-text-main after:scale-x-0'}`}
+        className={`relative inline-flex items-center gap-1 h-10 px-3 text-[0.9375rem] font-semibold whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:rounded-chip after:content-[''] after:absolute after:left-2.5 after:right-2.5 after:bottom-0.5 after:h-[3px] after:bg-accent after:rounded-(--bar-radius) after:skew-x-(--slant-line) after:origin-left after:transition-transform after:duration-(--motion-open) ${active ? 'text-text-main after:scale-x-100' : 'text-text-secondary hover:text-text-main after:scale-x-0'}`}
       >
         {label}
         <IconChevronDown

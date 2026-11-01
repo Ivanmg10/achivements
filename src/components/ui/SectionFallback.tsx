@@ -24,7 +24,7 @@ export function SectionFallback({
         <p className="text-[10px] uppercase tracking-widest text-text-secondary" role="alert">{T.charts.failedToLoad}</p>
         <button
           onClick={onRefresh}
-          className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-bg-main border border-accent/30 text-text-main rounded-lg hover:bg-accent/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-bg-main border border-accent/30 text-text-main rounded-chip hover:bg-accent/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <IconRefresh size={12} aria-hidden="true" />
           {T.gameInfoPage.retry}

@@ -56,7 +56,7 @@ export default function UserSteamCard() {
         isLinked ? (
           <div className="flex items-center gap-3 min-w-0">
             {profile?.avatarfull ? (
-              <Image src={profile.avatarfull} alt="" width={44} height={44} className="rounded-lg w-10 h-10 object-cover shrink-0" unoptimized />
+              <Image src={profile.avatarfull} alt="" width={44} height={44} className="rounded-box w-10 h-10 object-cover shrink-0" unoptimized />
             ) : (
               <SteamLogo size={40} className="shrink-0 text-text-secondary" aria-hidden="true" />
             )}

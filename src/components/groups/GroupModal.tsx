@@ -130,7 +130,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
               <button
                 type="button"
                 onClick={onClose}
-                className="p-2 -m-1 rounded-lg hover:bg-ink/5 transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="p-2 -m-1 rounded-chip hover:bg-ink/5 transition-colors text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 aria-label={T.groups.close}
               >
                 <IconX className="w-5 h-5" aria-hidden />
@@ -172,7 +172,7 @@ export default function GroupModal({ isOpen, onClose, group, onSave }: Props) {
                       placeholder={T.groups.descriptionPlaceholder}
                       maxLength={GROUP_DESCRIPTION_MAX}
                       rows={2}
-                      className={fieldClass({ size: 'sm' }, 'h-auto! py-2 resize-none')}
+                      className={fieldClass({ size: 'sm', multiline: true }, 'h-auto! py-2 resize-none')}
                     />
                   </div>
 

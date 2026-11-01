@@ -1,17 +1,19 @@
 'use client'
 
-import { useId, useMemo, useState } from 'react'
-import { AnimatePresence, useReducedMotion } from 'framer-motion'
+import { useMemo, useState } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { RecentAchievement } from '@/types/types'
 import { groupByDaySource } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
-import { ChartSkeleton } from '@/components/ui/ChartSkeleton'
+import { LineChartSkeleton } from '@/components/ui/ChartSkeleton'
+import { Skeleton } from '@/components/ui/Skeleton'
+import AchivementsLineChartTooltip from './achivements-line-chart-tooltip/AchivementsLineChartTooltip'
 
 // recharts is the heaviest thing on the page: it arrives after the page is up, in the room the chart keeps.
 const AchievementsLinePlot = dynamic(() => import('./achievements-line-plot/AchievementsLinePlot'), {
-  loading: () => <ChartSkeleton labels />,
+  loading: () => <LineChartSkeleton />,
 })
 
 /**
@@ -28,13 +30,11 @@ export default function AchievementsLineChart({
   isLoading?: boolean
 }) {
   const { T, lang } = useLanguage()
-  const reduce = useReducedMotion()
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
 
   const data = useMemo(() => groupByDaySource(achievements, 7), [achievements])
   const total = data.reduce((sum, d) => sum + d.total, 0)
   const best = Math.max(...data.map((d) => d.total))
-  const fillId = `daily-fill-${useId().replace(/:/g, '')}`
   const today = data[data.length - 1]?.date
 
   const tick = (date: string) =>
@@ -42,16 +42,11 @@ export default function AchievementsLineChart({
       ? T.lineChart.today
       : new Date(date + 'T00:00:00').toLocaleDateString(lang, { weekday: 'short', day: 'numeric' })
 
-  function handleChartClick(payload: { activeLabel?: string | number } | null) {
-    const label = payload?.activeLabel
-    if (typeof label === 'string') setSelectedDate(label)
-  }
-
   return (
     <div className="w-full flex flex-col gap-3">
       <div className="flex items-end justify-between gap-3 flex-wrap px-1">
-        <p className="flex items-baseline gap-2">
-          <span className="text-3xl font-bold tabular-nums leading-none text-text-main">{total}</span>
+        <p className={`flex gap-2 ${isLoading ? 'items-end' : 'items-baseline'}`}>
+          <span className="text-3xl font-bold tabular-nums leading-none text-text-main">{isLoading ? <Skeleton className="h-[1lh] w-10" /> : total}</span>
           <span className="text-xs text-text-secondary">{total === 1 ? T.lineChart.last7DaysOne : T.lineChart.last7Days}</span>
         </p>
         <div className="flex items-center gap-3 text-[11px] text-text-secondary">
@@ -61,9 +56,9 @@ export default function AchievementsLineChart({
 
       <div className="home-fit-chart h-[260px]">
       {isLoading ? (
-        <ChartSkeleton labels />
+        <LineChartSkeleton />
       ) : (
-        <AchievementsLinePlot data={data} total={total} fillId={fillId} tick={tick} animate={!reduce} onDayClick={handleChartClick} />
+        <AchievementsLinePlot data={data} x="date" y="total" tick={tick} tooltip={<AchivementsLineChartTooltip />} onPick={setSelectedDate} />
       )}
       </div>
 

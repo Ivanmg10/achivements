@@ -122,7 +122,7 @@ export default function MainPageGroupFeature({
               type="button"
               onClick={() => setEditing(true)}
               aria-label={T.groups.editGroup}
-              className="self-start p-2 rounded-lg bg-bg-card/80 ring-1 ring-ink/10 text-text-secondary hover:text-text-main transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="self-start p-2 rounded-chip bg-bg-card/80 ring-1 ring-ink/10 text-text-secondary hover:text-text-main transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <IconEdit className="w-4 h-4" aria-hidden="true" />
             </button>

@@ -7,8 +7,8 @@
 */
 
 @theme inline {
-  --font-sans: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-barlow), var(--font-ui), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-face), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-face-display), var(--font-face), ui-sans-serif, system-ui, sans-serif;
 
   --color-bg-main: rgb(var(--bg-main));
   --color-bg-header: rgb(var(--bg-header));
@@ -51,6 +51,16 @@
   --radius-tag: var(--r-tag);
   --radius-pane: var(--r-pane);
   --radius-tile: var(--r-tile);
+  --radius-sheet: var(--r-sheet);
+  --radius-area: var(--r-area);
+  --radius-icon: var(--r-icon);
+  --radius-box: var(--r-box);
+  --radius-box-md: var(--r-box-md);
+  --radius-box-sm: var(--r-box-sm);
+  --radius-tag-sm: var(--r-tag-sm);
+  --radius-badge: var(--r-badge);
+  --radius-cell: var(--r-cell);
+  --radius-nav: var(--r-nav);
 }
 
 /* ============================================
@@ -115,6 +125,18 @@
   --r-control: 0.75rem;
   --r-field: 0.875rem;
   --r-card: 1.25rem;
+  --r-sheet: 1.125rem;
+  --r-area: 0.875rem;
+  --r-icon: 0.5625rem;
+  --r-box: 0.5rem;
+  --r-box-md: 0.375rem;
+  --r-box-sm: 0.25rem;
+  --r-tag-sm: 0.25rem;
+  --r-badge: 0.3125rem;
+  --r-cell: 3px;
+  --r-nav: 0.625rem;
+  --button-inset: 5px;
+  --area-resize: vertical;
   --h-control-sm: 2.25rem;
   --h-control: 2.75rem;
   --h-field: 3.25rem;
@@ -142,6 +164,40 @@
   }
 }
 
+/* `lookTransition` plays these by hand: a font fades, a shape sweeps, a theme spreads from where it was picked. */
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-old(look-panel),
+::view-transition-new(look-panel) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Only seen in a sweep: the band between the two looks. */
+::view-transition-image-pair(root),
+::view-transition-image-pair(look-panel) {
+  background: rgb(var(--accent));
+}
+
+/*
+   A dialog's frame stays still through its transition. Its ring and shadow are outside its box: a fade
+   would draw them twice and a sweep's clip-path cuts them, so the pair clips the looks and draws them
+   itself, the same classes as `Modal`'s panel. The band stops short of the edge, so it never tints the
+   corners; the looks ignore that padding.
+*/
+::view-transition-image-pair(look-panel) {
+  @apply ring-1 ring-ink/[0.08] shadow-2xl shadow-black/50;
+  overflow: hidden;
+  padding: 3px;
+  background-clip: content-box;
+  border-radius: var(--r-card);
+}
+
+::view-transition-old(look-panel),
+::view-transition-new(look-panel) {
+  left: 0;
+}
+
 /* A page that waits for nothing has no skeleton to soften its arrival, so its entrance takes longer. */
 @media (prefers-reduced-motion: no-preference) {
   .enter-slow {
@@ -151,20 +207,34 @@
 }
 
 /*
-   The font pairs. Barlow is the default through the classes next/font sets on
-   <html>; `data-font` swaps the two variables every component reads, on <html>
-   or on a preview that shows another choice inside the page.
+   The font pairs. `data-font` swaps the two variables every component reads, on
+   <html> or on a preview that shows another choice inside the page. A preview is
+   given the family itself, as its text inherits <html>'s, and Barlow is a choice
+   like the others there: it has to undo the page's. In a layer, so that
+   `font-display` on a preview's title still wins.
 */
+:root,
+[data-font="barlow"]:not(html) {
+  --font-face: var(--font-ui);
+  --font-face-display: var(--font-barlow);
+}
+
 html[data-font="sofia"],
 [data-font="sofia"]:not(html) {
-  --font-ui: var(--font-sofia);
-  --font-barlow: var(--font-sofia-display);
+  --font-face: var(--font-sofia);
+  --font-face-display: var(--font-sofia-display);
 }
 
 html[data-font="fira"],
 [data-font="fira"]:not(html) {
-  --font-ui: var(--font-fira);
-  --font-barlow: var(--font-fira-display);
+  --font-face: var(--font-fira);
+  --font-face-display: var(--font-fira-display);
+}
+
+@layer base {
+  [data-font]:not(html) {
+    @apply font-sans;
+  }
 }
 
 /*
@@ -193,8 +263,21 @@ html[data-font="fira"],
   --r-tag: 0.375rem;
   --r-pane: 0.875rem;
   --r-tile: 0.625rem;
+  --r-control: 0.75rem;
   --r-field: 0.875rem;
   --r-card: 1.25rem;
+  --r-sheet: 1.125rem;
+  --r-area: 0.875rem;
+  --r-icon: 0.5625rem;
+  --r-box: 0.5rem;
+  --r-box-md: 0.375rem;
+  --r-box-sm: 0.25rem;
+  --r-tag-sm: 0.25rem;
+  --r-badge: 0.3125rem;
+  --r-cell: 3px;
+  --r-nav: 0.625rem;
+  --button-inset: 5px;
+  --area-resize: vertical;
   --r-track: 7px;
   --r-knob: 4px;
   --knob-w: 1.375rem;
@@ -202,7 +285,7 @@ html[data-font="fira"],
   --knob-shift: 1.125rem;
 }
 
-/* The round design, the site as it was before the slant: no slant anywhere, bars cut straight and rounded, soft corners on buttons, fields and cards, tags and chips as pills, switches as a pill with a round knob. */
+/* The round design: no slant anywhere, bars rounded at the ends, soft surfaces a step rounder than the slanted design's, and every one-line control (button, field, tag, chip, icon button) a pill or a circle. */
 [data-shape="round"] {
   --slant-button: 0deg;
   --slant-pill: 0deg;
@@ -216,14 +299,27 @@ html[data-font="fira"],
   --clip-8: none;
   --clip-14: none;
   --clip-fill: none;
-  --bar-radius: min(999px, 0.5rem);
+  --bar-radius: 0.75rem;
   --r-chip: 9999px;
-  --r-button: 0.75rem;
+  --r-button: 9999px;
   --r-tag: 9999px;
-  --r-pane: 0.75rem;
-  --r-tile: 0.5rem;
-  --r-field: 0.75rem;
-  --r-card: 1rem;
+  --r-pane: 1.25rem;
+  --r-tile: 1rem;
+  --r-control: 1rem;
+  --r-field: 9999px;
+  --r-card: 1.5rem;
+  --r-sheet: 1.5rem;
+  --r-area: 1.25rem;
+  --r-icon: 9999px;
+  --r-box: 0.75rem;
+  --r-box-md: 0.625rem;
+  --r-box-sm: 0.5rem;
+  --r-tag-sm: 9999px;
+  --r-badge: 9999px;
+  --r-cell: 5px;
+  --r-nav: 9999px;
+  --button-inset: 0px;
+  --area-resize: none;
   --r-track: 9999px;
   --r-knob: 9999px;
   --knob-w: 1.25rem;
@@ -872,6 +968,8 @@ html[data-font="fira"],
   /* The top row is never shorter than the profile: on a screen a little too low the page grows, instead of the profile being cut off behind its own scrollbar. */
   .home-fit:has([data-stats-section="overview"]) > .home-fit-top { grid-template-rows: minmax(auto, 1fr); }
   .home-fit:has([data-stats-section="overview"]) .home-fit-side { min-height: auto; }
+  /* With tabs, the column keeps the room of the tallest platform's profile: it sets the trim, so a shorter one changed the charts and the heatmap's size on every switch. */
+  .home-fit:has([data-stats-section="overview"]) .home-fit-side:has([role="tablist"]) { min-height: 48.25rem; }
   .home-fit:has([data-stats-section="overview"]) .home-fit-side > section { overflow-y: visible; }
   .home-fit:has([data-stats-section="overview"]) .home-fit-side > * { flex: 1 1 0%; }
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll { overflow-y: auto; }

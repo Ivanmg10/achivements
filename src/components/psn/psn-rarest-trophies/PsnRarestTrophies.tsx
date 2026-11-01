@@ -56,12 +56,12 @@ export default function PsnRarestTrophies({
             <li key={`${t.gameId ?? gameId}:${t.id}`}>
               <Link
                 href={`${gameHref('psn', t.gameId ?? gameId, subject)}#${psnTrophyAnchor(t.id)}`}
-                className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
+                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
               >
                 {t.iconUrl ? (
-                  <Image src={t.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-lg object-cover ring-2 ring-[#0070d1] shrink-0" unoptimized />
+                  <Image src={t.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-box object-cover ring-2 ring-[#0070d1] shrink-0" unoptimized />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+                  <div className="w-10 h-10 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
                 )}
                 <span className="flex flex-col min-w-0">
                   <span className="text-sm font-semibold truncate">{t.name}</span>

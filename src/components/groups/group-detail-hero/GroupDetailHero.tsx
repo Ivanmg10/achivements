@@ -93,7 +93,7 @@ export default function GroupDetailHero({
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               {summary.total > 0 && group.icon && (
-                <span className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center shrink-0 [&>span]:text-2xl [&>img]:w-full [&>img]:h-full">
+                <span className="w-9 h-9 rounded-box overflow-hidden flex items-center justify-center shrink-0 [&>span]:text-2xl [&>img]:w-full [&>img]:h-full">
                   <GroupIconDisplay icon={group.icon} />
                 </span>
               )}

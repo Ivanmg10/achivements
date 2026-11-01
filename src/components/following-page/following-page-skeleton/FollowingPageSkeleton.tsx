@@ -11,7 +11,7 @@ const CARDS = 8
 function Card() {
   return (
     <div aria-hidden="true" className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] flex flex-col overflow-hidden">
-      <Skeleton radius="tag" className="h-24 rounded-none" />
+      <Skeleton radius="none" className="h-24" />
       <div className="px-4 pb-4 flex flex-col gap-3 flex-1">
         <div className="relative flex items-end gap-3 -mt-7">
           <Skeleton radius="circle" className="w-15 h-15 shrink-0 ring-4 ring-bg-card" />

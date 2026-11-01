@@ -30,7 +30,7 @@ function unlock(date: string, title: string): RecentAchievement {
 const cells = () => document.querySelectorAll('[data-count]')
 
 beforeEach(() => {
-  ;(useHeatmapGrid as jest.Mock).mockReturnValue({ weeks: WEEKS, cell: CELL, days: DAYS })
+  ;(useHeatmapGrid as jest.Mock).mockReturnValue({ weeks: WEEKS, cell: CELL, cellWidth: CELL, days: DAYS })
 })
 
 test('draws a cell for every day of every column it was measured for', () => {
@@ -76,7 +76,7 @@ test('a day with unlocks opens that day, an empty one does nothing', () => {
 })
 
 test('draws nothing at all until the card has been measured', () => {
-  ;(useHeatmapGrid as jest.Mock).mockReturnValue({ weeks: 0, cell: 0, days: 0 })
+  ;(useHeatmapGrid as jest.Mock).mockReturnValue({ weeks: 0, cell: 0, cellWidth: 0, days: 0 })
   render(<MainPageHeatmap achievements={[unlock(today(), 'Win')]} />)
   expect(cells()).toHaveLength(0)
 })
@@ -104,6 +104,14 @@ describe('month labels', () => {
     expect(last.left).toBeGreaterThan(placed[placed.length - 2].left)
   })
 
+  test('wider cells move the columns and the months with them', () => {
+    ;(useHeatmapGrid as jest.Mock).mockReturnValue({ weeks: WEEKS, cell: CELL, cellWidth: 30, days: DAYS })
+    render(<MainPageHeatmap achievements={wholeWindow} />)
+    const placed = labels()
+    for (const { left } of placed.slice(0, -1)) expect(left % 33).toBe(0)
+    expect(document.querySelector<HTMLElement>('[data-count]')?.parentElement?.style.gridTemplateColumns).toContain('30px')
+  })
+
   test('two months never print on top of each other', () => {
     render(<MainPageHeatmap achievements={wholeWindow} />)
     const lefts = labels().map((l) => l.left).sort((a, b) => a - b)
@@ -114,7 +122,7 @@ describe('month labels', () => {
   })
 
   test('a month too narrow to name is left unnamed rather than overlapping', () => {
-    ;(useHeatmapGrid as jest.Mock).mockReturnValue({ weeks: 5, cell: CELL, days: 33 })
+    ;(useHeatmapGrid as jest.Mock).mockReturnValue({ weeks: 5, cell: CELL, cellWidth: CELL, days: 33 })
     render(<MainPageHeatmap achievements={wholeWindow} />)
 
     // Five columns can hold at most one month name with room to read it.

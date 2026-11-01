@@ -117,7 +117,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
                     show(t, r.right, r.top, 0)
                   }}
                   onBlur={hide}
-                  className={`block rounded-lg overflow-hidden shrink-0 transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                  className={`block rounded-box overflow-hidden shrink-0 transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
                     t.earned ? `ring-2 ${GRADE_RING[t.type]}` : ''
                   }`}
                 >

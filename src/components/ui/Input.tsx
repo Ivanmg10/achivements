@@ -7,6 +7,8 @@ type FieldShape = {
   icon?: boolean
   /** `sm` for toolbars and dense rows; `md` (52 px) for forms. */
   size?: 'sm' | 'md'
+  /** Several lines: a pill would deform it, so it takes the design's soft corners. */
+  multiline?: boolean
 }
 
 /**
@@ -14,9 +16,9 @@ type FieldShape = {
  * lighter and ringed with the accent on hover, the card's colour with an
  * accent ring when focused, the danger colour when invalid.
  */
-export function fieldClass({ invalid = false, icon = false, size = 'md' }: FieldShape = {}, className = '') {
+export function fieldClass({ invalid = false, icon = false, size = 'md', multiline = false }: FieldShape = {}, className = '') {
   return (
-    'w-full rounded-field bg-bg-main text-text-main placeholder:text-text-secondary outline-none ' +
+    `w-full ${multiline ? 'rounded-area' : 'rounded-field'} bg-bg-main text-text-main placeholder:text-text-secondary outline-none ` +
     'shadow-[inset_0_2px_4px_rgb(0_0_0/0.22)] ring-1 ring-inset transition-[background-color,box-shadow] duration-(--motion-hover) ' +
     'focus-visible:bg-bg-card focus-visible:ring-2 disabled:opacity-60 disabled:cursor-not-allowed ' +
     (invalid
@@ -47,7 +49,7 @@ export function Textarea({ invalid, className = '', ...rest }: TextareaProps) {
   return (
     <textarea
       aria-invalid={invalid || undefined}
-      className={`${fieldClass({ invalid }, 'h-auto! py-3 resize-y')} ${className}`}
+      className={`${fieldClass({ invalid, multiline: true }, 'h-auto! py-3 [resize:var(--area-resize)]')} ${className}`}
       {...rest}
     />
   )

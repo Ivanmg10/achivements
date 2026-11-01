@@ -82,7 +82,7 @@ export default function MainPageProfileTabs<T extends string>({
             {tab.label}
             <span
               aria-hidden="true"
-              className={`absolute bottom-0 ${size === 'md' ? 'left-0 right-0 h-1' : 'left-2 right-2 h-[3px]'} bg-accent skew-x-(--slant-line) origin-left transition-transform duration-(--motion-open) ease-out motion-reduce:transition-none ${active ? 'scale-x-100' : 'scale-x-0'}`}
+              className={`absolute bottom-0 ${size === 'md' ? 'left-0 right-0 h-1' : 'left-2 right-2 h-[3px]'} bg-accent rounded-(--bar-radius) skew-x-(--slant-line) origin-left transition-transform duration-(--motion-open) ease-out motion-reduce:transition-none ${active ? 'scale-x-100' : 'scale-x-0'}`}
             />
           </button>
         )

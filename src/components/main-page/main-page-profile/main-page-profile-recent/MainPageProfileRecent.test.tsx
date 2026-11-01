@@ -16,6 +16,11 @@ test('its title and the rows, as a list', () => {
   expect(screen.getByText('10')).toBeInTheDocument()
 })
 
+test('its loading rows sit like the real ones, with no gap, or the column drops when they land', () => {
+  const { container } = render(<MainPageProfileRecent title="T" loading />)
+  expect(container.querySelector('[aria-busy="true"]')).not.toHaveClass('gap-1')
+})
+
 test('loading: shapes; none: a quiet empty state', () => {
   const { container, rerender } = render(<MainPageProfileRecent title="T" loading />)
   expect(container.querySelector('[aria-busy="true"]')).toBeInTheDocument()

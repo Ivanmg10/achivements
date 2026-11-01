@@ -46,7 +46,7 @@ export default function PerfectGameTile({ game, date }: { game: PerfectGame; dat
           unoptimized={game.source !== 'ra'}
         />
       ) : (
-        <span className="block w-8 h-8 rounded bg-ink/10" aria-hidden="true" />
+        <span className="block w-8 h-8 rounded-box-sm bg-ink/10" aria-hidden="true" />
       )}
       {game.source === 'ra' ? (
         game.hardcore && <span className="absolute -top-1 -right-1 w-3 h-3 bg-warning rounded-full border border-bg-card" aria-hidden="true" />

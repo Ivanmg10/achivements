@@ -114,7 +114,7 @@ test('closes on escape key', () => {
       onPinned={jest.fn()}
     />,
   )
-  fireEvent.keyDown(window, { key: 'Escape' })
+  fireEvent.keyDown(document, { key: 'Escape' })
   expect(onClose).toHaveBeenCalled()
 })
 

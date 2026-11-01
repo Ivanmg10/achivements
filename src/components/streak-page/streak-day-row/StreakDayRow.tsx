@@ -74,12 +74,12 @@ export default function StreakDayRow({ date, today, achievements, awards = [] }:
                 key={`${ach.Source ?? 'ra'}:${ach.GameID}:${ach.AchievementID}`}
                 href={gameHref(ach.Source ?? 'ra', ach.GameID)}
                 aria-label={`${ach.Title} — ${ach.GameTitle}`}
-                className={`relative rounded-lg overflow-hidden shrink-0 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${ach.HardcoreMode === '1' ? 'ring-2 ring-hardcore/70' : ''}`}
+                className={`relative rounded-box overflow-hidden shrink-0 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${ach.HardcoreMode === '1' ? 'ring-2 ring-hardcore/70' : ''}`}
               >
                 {badge ? (
                   <Image src={badge} alt="" width={40} height={40} className="w-10 h-10 object-cover" unoptimized />
                 ) : (
-                  <div className="w-10 h-10 bg-bg-card rounded-lg" />
+                  <div className="w-10 h-10 bg-bg-card rounded-box" />
                 )}
               </Link>
             )
@@ -89,7 +89,7 @@ export default function StreakDayRow({ date, today, achievements, awards = [] }:
               type="button"
               onClick={() => setModalOpen(true)}
               aria-label={`+${plural(overflow, T.plurals.achievements, lang)}`}
-              className="w-10 h-10 rounded-lg bg-bg-card ring-1 ring-ink/10 flex items-center justify-center shrink-0 cursor-pointer hover:ring-accent/40 hover:bg-accent/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 group"
+              className="w-10 h-10 rounded-box bg-bg-card ring-1 ring-ink/10 flex items-center justify-center shrink-0 cursor-pointer hover:ring-accent/40 hover:bg-accent/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 group"
             >
               <span className="text-[10px] font-bold text-text-secondary group-hover:text-accent transition-colors leading-none">+{overflow}</span>
             </button>

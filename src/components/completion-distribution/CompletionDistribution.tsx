@@ -75,7 +75,7 @@ export default function CompletionDistribution({
           <ul className="flex flex-wrap gap-x-3 gap-y-1">
             {counts.map((count, i) => (
               <li key={BAND_LABELS[i]} className="flex items-center gap-1.5 text-[10px] text-text-secondary">
-                <span className={`w-2 h-2 rounded-sm shrink-0 ${shades[i]}`} aria-hidden="true" />
+                <span className={`w-2 h-2 rounded-full shrink-0 ${shades[i]}`} aria-hidden="true" />
                 {BAND_LABELS[i]}
                 <span className="text-text-main tabular-nums">{count}</span>
               </li>

@@ -133,7 +133,7 @@ export default function WelcomePagePreferences({
           </span>
           <div role="radiogroup" aria-labelledby="welcome-theme" className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {FEATURED_THEMES.map((id) => (
-              <ThemeModalOption key={id} theme={id} checked={theme === id} onSelect={choose} />
+              <ThemeModalOption key={id} theme={id} checked={theme === id} onSelect={(id) => choose(id)} />
             ))}
           </div>
           {saveError && (

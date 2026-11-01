@@ -7,6 +7,8 @@ const ROWS = 7
 const MIN_CELL = 7
 const MAX_CELL = 30
 const MIN_WEEKS = 6
+/** How much wider than tall a cell may grow to fill the card. */
+const MAX_STRETCH = 1.5
 
 /** As far back as both platforms are fetched — a year, in whole weeks. */
 export const HEATMAP_MAX_DAYS = 365
@@ -15,13 +17,15 @@ const MAX_WEEKS = Math.ceil(HEATMAP_MAX_DAYS / 7)
 export type HeatmapGrid = {
   /** Columns to draw. 0 until the box has been measured. */
   weeks: number
-  /** Side of a cell, in px. */
+  /** Height of a cell, in px. */
   cell: number
+  /** Width of a cell: its height, or a little more when that leaves the card unfilled. */
+  cellWidth: number
   /** Days of history the columns cover, ending today. */
   days: number
 }
 
-export const UNMEASURED: HeatmapGrid = { weeks: 0, cell: 0, days: 0 }
+export const UNMEASURED: HeatmapGrid = { weeks: 0, cell: 0, cellWidth: 0, days: 0 }
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value))
@@ -34,6 +38,8 @@ function clamp(value: number, min: number, max: number): number {
  *
  * So the card is filled in both directions instead of holding a small square
  * in the middle, and a wider card shows more days rather than bigger days.
+ * Past a year there are no more days to show: what is left of a short, wide
+ * card goes to the cells' width, or it would hold a small grid between two gaps.
  *
  * `todayDow` is today's weekday (0 = Sunday): the last column is the current
  * week, so the days counted back stop short by whatever is left of it.
@@ -44,8 +50,9 @@ export function measureHeatmapGrid(width: number, height: number, todayDow: numb
   const cell = clamp(Math.floor((height - (ROWS - 1) * HEATMAP_GAP) / ROWS), MIN_CELL, MAX_CELL)
   const weeks = clamp(Math.floor((width + HEATMAP_GAP) / (cell + HEATMAP_GAP)), MIN_WEEKS, MAX_WEEKS)
   const days = Math.min(HEATMAP_MAX_DAYS, weeks * ROWS - (6 - todayDow))
+  const cellWidth = clamp(Math.floor((width + HEATMAP_GAP) / weeks) - HEATMAP_GAP, cell, Math.floor(cell * MAX_STRETCH))
 
-  return { weeks, cell, days }
+  return { weeks, cell, cellWidth, days }
 }
 
 /**
@@ -66,7 +73,7 @@ export function useHeatmapGrid(ref: RefObject<HTMLElement | null>, reserved = 0)
     const measure = () =>
       setGrid((prev) => {
         const next = measureHeatmapGrid(box.clientWidth, box.clientHeight - reserved, new Date().getDay())
-        return next.weeks === prev.weeks && next.cell === prev.cell ? prev : next
+        return next.weeks === prev.weeks && next.cell === prev.cell && next.cellWidth === prev.cellWidth ? prev : next
       })
 
     measure()

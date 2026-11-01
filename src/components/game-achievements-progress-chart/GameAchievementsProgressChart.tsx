@@ -7,18 +7,17 @@ import type { InsightAchievement } from '@/utils/gameInsights'
 import { groupGameAchievementsByPeriod } from '@/utils/utils'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import SegmentedControl from '@/components/ui/SegmentedControl'
-import { ChartSkeleton } from '@/components/ui/ChartSkeleton'
+import { LineChartSkeleton } from '@/components/ui/ChartSkeleton'
+import GameAchievementsProgressChartTooltip from './game-achievements-progress-chart-tooltip/GameAchievementsProgressChartTooltip'
 
 type Period = 'week' | 'month'
 
-const BARS = [45, 70, 30, 90, 55, 20, 80, 60]
 const PLOT_HEIGHT = 'h-[208px]'
 
 // recharts is the heaviest thing on the page: it arrives when there is a line to draw, with the room kept meanwhile.
-const GameAchievementsProgressPlot = dynamic(
-  () => import('./game-achievements-progress-plot/GameAchievementsProgressPlot'),
-  { loading: () => <div className={PLOT_HEIGHT}><ChartSkeleton bars={BARS} /></div> },
-)
+const AchievementsLinePlot = dynamic(() => import('@/components/achivements-line-chart/achievements-line-plot/AchievementsLinePlot'), {
+  loading: () => <LineChartSkeleton />,
+})
 // Downloaded the first time a point is clicked, not with the card. `loading` gives it its
 // own Suspense boundary: without one the download suspends the whole page (the home
 // skeleton flashes).
@@ -28,8 +27,8 @@ const GameAchievementsProgressChartModal = dynamic(
 )
 
 /**
- * A game's unlocks per week or month. Clicking a point lists what was unlocked
- * in that period.
+ * A game's unlocks per week or month, on the same line as the home's week.
+ * Clicking a point lists what was unlocked in that period.
  */
 export function GameAchievementsProgressChart({
   achievements,
@@ -46,15 +45,20 @@ export function GameAchievementsProgressChart({
   const data = groupGameAchievementsByPeriod(achievements, period)
   const total = data.reduce((sum, d) => sum + d.count, 0)
 
+  const periodTitle = (start: number) =>
+    period === 'week'
+      ? T.gameExpanded.weekOf.replace('{date}', new Date(start).toLocaleDateString(lang, { day: 'numeric', month: 'short' }))
+      : new Date(start).toLocaleDateString(lang, { month: 'long', year: 'numeric' })
+
+  function tick(label: string) {
+    const bucket = data.find((d) => d.label === label)
+    return bucket ? new Date(bucket.start).toLocaleDateString(lang, period === 'week' ? { day: 'numeric', month: 'short' } : { month: 'short' }) : label
+  }
+
   function handleSelect(label: string) {
     const bucket = data.find((d) => d.label === label)
     if (!bucket?.count) return
-    const start = new Date(bucket.start)
-    const title =
-      period === 'week'
-        ? T.gameExpanded.weekOf.replace('{date}', start.toLocaleDateString(lang, { day: 'numeric', month: 'short' }))
-        : start.toLocaleDateString(lang, { month: 'long', year: 'numeric' })
-    setSelected({ title, items: bucket.items })
+    setSelected({ title: periodTitle(bucket.start), items: bucket.items })
     setOpen(true)
   }
 
@@ -76,13 +80,15 @@ export function GameAchievementsProgressChart({
       </div>
 
       {isLoading ? (
-        <div className={PLOT_HEIGHT}><ChartSkeleton bars={BARS} /></div>
+        <div className={PLOT_HEIGHT}><LineChartSkeleton /></div>
       ) : total === 0 ? (
         <div className="flex items-center justify-center h-52 text-text-secondary text-sm text-center px-4">
           {T.gameExpanded.noActivity}
         </div>
       ) : (
-        <GameAchievementsProgressPlot data={data} onSelect={handleSelect} />
+        <div className={PLOT_HEIGHT}>
+          <AchievementsLinePlot data={data} x="label" y="count" tick={tick} tooltip={<GameAchievementsProgressChartTooltip title={periodTitle} />} onPick={handleSelect} />
+        </div>
       )}
 
       <LazyWhenOpened open={open}>

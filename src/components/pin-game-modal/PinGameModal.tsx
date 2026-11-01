@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { AnimatePresence, motion, type Variants } from 'framer-motion'
-import { IconSearch, IconX, IconCheck } from '@tabler/icons-react'
+import { IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
@@ -16,12 +15,7 @@ import { notify } from '@/lib/notify'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
-
-const spotlightVariants: Variants = {
-  hidden: { opacity: 0, y: -14, scale: 0.97 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
-  exit: { opacity: 0, y: -8, scale: 0.97, transition: { duration: 0.15 } },
-}
+import SearchInput from '@/components/ui/SearchInput'
 
 /** Pick games to pin — RA and Steam alike — by title, or an RA game by id. */
 export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -51,15 +45,6 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
     const t = setTimeout(() => inputRef.current?.focus(), 50)
     return () => clearTimeout(t)
   }, [isOpen])
-
-  useEffect(() => {
-    if (!isOpen) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [isOpen, onClose])
 
   /** A pasted RA id or game URL opens that RA game directly. */
   const directGameId = useMemo(() => {
@@ -110,92 +95,72 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
   const directKey = directGameId ? gameKey('ra', directGameId) : null
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <Modal isOpen={isOpen} onClose={onClose} size="lg" showClose={false} className="gap-4">
-            <motion.div
-              className="bg-bg-card rounded-card shadow-2xl border border-ink/5 flex flex-col overflow-hidden"
-              variants={spotlightVariants}
-              onClick={(e) => e.stopPropagation()}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="md"
+      title={T.pinnedGames.addAria}
+      className="gap-3"
+      footer={
+        selected.size > 0 ? (
+          <Button onClick={handleConfirm} disabled={saving} className="w-full">
+            {saving ? '…' : `${T.pinnedGames.confirmPin} (${selected.size})`}
+          </Button>
+        ) : undefined
+      }
+    >
+      <SearchInput
+        ref={inputRef}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={T.pinnedGames.searchPlaceholder}
+        aria-label={T.pinnedGames.searchPlaceholder}
+      />
+
+      {(results.length > 0 || directGameId) && (
+        <div className="-mx-3 max-h-80 overflow-y-auto">
+          {results.map((c) => (
+            <GamePickerRow key={c.key} candidate={c} selected={selected.has(c.key)} onToggle={() => toggle(c)} />
+          ))}
+          {directGameId && directKey && !pinnedKeys.has(directKey) && (
+            <button
+              onClick={() => addDirectById(directGameId)}
+              aria-pressed={selected.has(directKey)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-box transition-colors text-left ${selected.has(directKey) ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
             >
-              <div className="flex items-center gap-3 px-4 py-3.5 border-b border-ink/5 shrink-0">
-                <IconSearch className="w-5 h-5 text-text-secondary shrink-0" aria-hidden />
-                <input
-                  ref={inputRef}
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={T.pinnedGames.searchPlaceholder}
-                  aria-label={T.pinnedGames.searchPlaceholder}
-                  className="flex-1 bg-transparent text-text-main text-base outline-none placeholder:text-text-secondary"
-                />
-                <button
-                  onClick={onClose}
-                  className="p-1 rounded-lg text-text-secondary hover:text-text-main transition-colors shrink-0"
-                  aria-label="Close"
-                >
-                  <IconX className="w-4 h-4" aria-hidden />
-                </button>
+              <div className="w-8 h-8 rounded-box-sm bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">
+                ID
               </div>
-
-              {(results.length > 0 || directGameId) && (
-                <div className="max-h-80 overflow-y-auto">
-                  {results.map((c) => (
-                    <GamePickerRow key={c.key} candidate={c} selected={selected.has(c.key)} onToggle={() => toggle(c)} />
-                  ))}
-                  {directGameId && directKey && !pinnedKeys.has(directKey) && (
-                    <button
-                      onClick={() => addDirectById(directGameId)}
-                      aria-pressed={selected.has(directKey)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-t border-ink/5 ${selected.has(directKey) ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
-                    >
-                      <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">
-                        ID
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-text-main">
-                          {T.search.openById} #{directGameId}
-                        </p>
-                        <p className="text-xs text-text-secondary">Game ID</p>
-                      </div>
-                      <div
-                        aria-hidden="true"
-                        className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected.has(directKey) ? 'bg-accent border-accent' : 'border-ink/20'}`}
-                      >
-                        {selected.has(directKey) && <IconCheck className="w-3 h-3 text-bg-main" />}
-                      </div>
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {selected.size > 0 && (
-                <div className="border-t border-ink/5 px-4 py-3 flex flex-col gap-3 shrink-0">
-                  <div className="flex flex-wrap gap-1.5">
-                    {Array.from(selected.values()).map((c) => (
-                      <GamePickerChip key={c.key} candidate={c} removeLabel={`Remove ${c.title}`} onRemove={() => toggle(c)} />
-                    ))}
-                  </div>
-                  {error && (
-                    <p role="alert" className="text-xs text-danger">
-                      {T.pinnedGames.error}
-                    </p>
-                  )}
-                  <Button
-                    onClick={handleConfirm}
-                    disabled={saving}
-                    className="w-full"
-                  >
-                    {saving ? '…' : `${T.pinnedGames.confirmPin} (${selected.size})`}
-                  </Button>
-                </div>
-              )}
-
-              {!query.trim() && selected.size === 0 && (
-                <p className="text-text-secondary text-xs text-center py-6">{T.pinnedGames.searchPlaceholder}</p>
-              )}
-            </motion.div>
-          </Modal>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-text-main">
+                  {T.search.openById} #{directGameId}
+                </p>
+                <p className="text-xs text-text-secondary">Game ID</p>
+              </div>
+              <div
+                aria-hidden="true"
+                className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected.has(directKey) ? 'bg-accent border-accent' : 'border-ink/20'}`}
+              >
+                {selected.has(directKey) && <IconCheck className="w-3 h-3 text-bg-main" />}
+              </div>
+            </button>
+          )}
+        </div>
       )}
-    </AnimatePresence>
+
+      {selected.size > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {Array.from(selected.values()).map((c) => (
+            <GamePickerChip key={c.key} candidate={c} removeLabel={`Remove ${c.title}`} onRemove={() => toggle(c)} />
+          ))}
+        </div>
+      )}
+
+      {error && (
+        <p role="alert" className="text-xs text-danger">
+          {T.pinnedGames.error}
+        </p>
+      )}
+    </Modal>
   )
 }

@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 
-const SIZES = { sm: 'sm:max-w-[27.5rem]', md: 'sm:max-w-[33.75rem]', lg: 'sm:max-w-[47.5rem]', xl: 'sm:max-w-5xl' } as const
+const SIZES = { sm: 'sm:max-w-[27.5rem]', md: 'sm:max-w-[33.75rem]', lg: 'sm:max-w-[47.5rem]', xl: 'sm:max-w-5xl', '2xl': 'sm:max-w-[77.5rem]' } as const
 const BACKDROPS = { default: 'bg-black/60 backdrop-blur-[2px]', opaque: 'bg-black/80 backdrop-blur-sm' } as const
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
@@ -147,7 +147,7 @@ export default function Modal({
                 type="button"
                 onClick={onClose}
                 aria-label={T.cards.close}
-                className="absolute top-3 right-3 z-10 w-9 h-9 inline-flex items-center justify-center rounded-control text-text-secondary hover:text-text-main hover:bg-ink/[0.08] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="absolute top-3 right-3 z-10 w-9 h-9 inline-flex items-center justify-center rounded-button text-text-secondary hover:text-text-main hover:bg-ink/[0.08] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 <IconX size={18} aria-hidden="true" />
               </button>

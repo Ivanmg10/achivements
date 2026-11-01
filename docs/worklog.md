@@ -29,6 +29,88 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-01 — The Layout modal, concept A, and picking a streak (`refactor/78-round-design`)
+
+**Did** — `LayoutModal` is concept A of the canvas: every option in view (no tabs), the theme beside them, a fixed height, the sample
+on top of the options on a phone (sticky, sized with container queries). The sample has real games (Steam art through the usual hosts)
+and the top bar. Every change animates, see CLAUDE.md → design system. `SegmentedControl` gained `size="lg"` and `tone="outline"`, `Modal`
+the `2xl` size. On `/racha`: nothing is picked by default, a streak is picked in the best streaks or on the year and picking it again
+lets go; with one picked only it keeps the accent and a rail spans its weeks; each best streak's bar and place are in its tier's colour.
+**Why** — the user chose A and asked for an animation per change, tried it on the page instead of the canvas; a ring around the days
+and then a halo were both rejected for the streak, and the colour-only version was liked.
+**Decisions** — Native first: a CSS transition for the card wipe, the view transition API for shape, font and theme, Framer only for the
+card that grows into the cover. The shape first eased its corners inside the sample: the user did not like it, as the bars, the frame
+and the page jumped around it. Then a bare sweep of the whole window, invisible because the two looks are nearly the same colour, so
+it got a band of the accent in the shape chosen (`sweepEdge`; the two looks clipped apart, and the band is the background of the transition's pair showing between them). It
+still jerked, measured frame by frame in Chrome on the GPU: 60 fps with no lost frames, the fault was the curve (14 idle frames, the dialog
+crossed in 6 at up to 206 px a frame with a 20 px band). Hence the gentler curve, 1 s, no idle time off screen and a wider band. Measure this kind
+of thing in a real window: headless software rendering says 7 fps, and an off-screen window adds a false 1 s. The day by day still opens on the streak going now (or the best) with nothing picked, so the
+card is never empty and the page does not jump. The year stays in the accent, not the tier's colour: the user asked for tier colours
+on the best streaks only. The theme shortlist is six swatches, the person's own always among them, and the rest in `ThemeModal`.
+A theme picked in the modal gets no toast (the dialog stays open and nothing else there toasts); a failed save says so inline.
+The font is tried in the sample and reaches the page when the modal closes: the user did not like seeing the page change behind.
+The theme went into the modal as swatches, then as a strip under the sample (concept C, v2 broken on the canvas, v3 built); tried on the page, the user
+preferred it in its own dialog, so `ThemeModal` stays open on a pick, spreads from the tile and says what is on and saved. The modal's options went back together.
+The home's heatmap: the height sets the cell and it stops at 53 weeks, so a row shortened by `--home-fit-trim` left gaps at both sides (cells 30 px → ~22). Cells may now
+grow up to 1.5× wider to fill the card (`cellWidth`), and the trim comes back when the profile shrinks (a `MutationObserver`, which was the `ponytail:` ceiling).
+The header's account link is cut on the slant like a button (only its background, as `Button` does), the one square piece left beside the level and the streak.
+The home's skeleton now draws the two charts' own loading states: it drew its own grid and bars, which were then swapped for theirs. Daily loads as a line (`LineChartSkeleton`),
+not bars, and no longer shows a "0" that is not known yet.
+The home's skeleton was taller than the page: the profile's skeleton had a fixed 667 px, which set the whole top of the home to 743 px on any screen. `homeFit` now remembers how tall
+the loaded profile is (`block-height:home-profile`, as `RememberedHeight`) and the skeleton takes exactly that; a first visit has nothing to go by and keeps its natural height.
+The Layout modal's background changing on each change was Firefox: it leaves `backdrop-filter` out of the view transition's capture, so a transition of the whole page showed the page sharp behind
+the dialog until it ended (only there, which is why Chrome and Brave measured flat; the user pointed at Firefox). The transitions in the modal now stay inside the dialog (`within`, `look-panel`), the page stays live.
+A font tried no longer fades on closing. `ThemeModal`'s spread still takes the whole page, as the page changes with it: in Firefox its lighter blur goes for those 650 ms.
+The Recently played rows lost 8 px (`py-2`, on all five platforms' items): they set the height of the top of the home, so the trim on the charts, and through it the size of the heatmap's cells.
+The dialog's four edges went wrong during a font or shape transition: `overflow: hidden` on the `look-panel` pair cut the ring and the shadow (both outside the dialog's box) and the band's accent tinted the corners. Dropping the clip was not enough, measured in Firefox on the ring's pixels (25 at rest): a fade drew it twice (33), and a sweep's `clip-path` cut it (7) even with the polygon running 80 px past the box. So the pair clips the looks and draws the ring and shadow itself (`Modal`'s classes), and the band stops 3 px short of the edge (`background-clip: content-box`, so the looks need `left: 0` or the padding moves them).
+The font never reached the sample: `data-font` swapped the variables but the sample's text inherits `<html>`'s family, and Barlow had no rule at all, so it could not undo a page in Sofia or Fira. Any `[data-font]` now takes the family, and the swap is in `--font-face` / `--font-face-display`, which leaves `--font-ui` and `--font-barlow` as Barlow itself. The choice cards had the same bug.
+Clicking Slanted or Rounded flashed the dialog in the new look for one or two frames before the sweep: Firefox shows the element itself on the first frame of a transition, before the old look covers it (not `::view-transition-new`: with that layer forced invisible the flash stayed). `lookTransition` now starts the transition with nothing changed and makes the change two frames after `ready`, as the new look is live: it takes it behind the animation. Seen only at 60 fps on a crop of the screen; a 30 fps capture of the whole screen shows nothing. `requestAnimationFrame` does not run inside a transition's callback in Firefox (it hangs), so the wait cannot go there.
+The home's heatmap changed size between platforms (29×29 and 46 weeks on RA, 25×21 and 53 on the others, at 1314 px): the profile is 585 px on RA and 673 to 692 elsewhere, it sets the height of the top row, so `homeFit`'s trim (40 against 100 px) and through it the chart's box. With profile tabs the column now keeps 48rem, the tallest measured, so nothing below moves on a switch. Measured the same on the four platforms at 1314, 1600 and 940 px. RA pays for it: 25×21 at 1314, a full year of weeks, and its stats end 45 px past the screen like the others'.
+Small jumps as a platform loads, each found by logging every frame's sizes: the recent list's loading rows had a `gap-1` the real ones have not (8 px, the column rose and fell on PlayStation and Xbox); PSN's profile is 0.3 px past 48rem, hence 48.25rem; loading pills had no line under the figure (60 px against 78); the daily chart's heading was 35 px loading and 30 loaded (a block has no baseline, in `items-baseline`); and Steam's, PSN's and Xbox's pills that need the summary were left out until it came, so the row reflowed from five to seven some 150 ms in. They are now in the row from the first frame, as `loading` pills, and in the same order in the loading list.
+A game's "Achievements unlocked" was a second drawing of the home's daily chart (a plain line with its own grid, axes and tooltip): the user asked for one. `AchievementsLinePlot` takes the names of its fields, its ticks and its tooltip, `GameAchievementsProgressPlot` is gone, and so is `ChartSkeleton`, which only that chart used; both load as `LineChartSkeleton`.
+**Verification** — 838 suites / 5,348 tests, ESLint, tsc, and the build from a clean `npm ci` copy in a temporary worktree, so `next dev` was left alone (Next 16.4.2, as the lockfile).
+**Open** — #102 still lists the Layout modal. The test account's RA key fails, so its home shows RA's error card, 2 px taller than the pills; a working RA was not measured. Two bugs measured in Firefox and left as they are: `::view-transition` covers the window and swallows mouse clicks, so the modal ignores you for the second a shape sweep lasts; and when a transition is skipped by a newer one, the old one's `.finally` in `lookTransition` clears the names before the new one captures, which takes the whole page and loses the blur (reached by a scripted click, not by a mouse, because of the first bug; keyboard not checked). `pointer-events: none` on `::view-transition` alone would make a mouse reach it: fix the `.finally` with it.
+**Watch out** — `sharp(buf).extract(a).stats()` ignores the extract: it measures the whole image, which here read as a page lighting up (the band's own share of the frame). Crop to a
+buffer first. A dev server can stop picking up `globals.css` with no error: compare the served CSS before believing a measurement. Translations are CRLF in the working copy: a script that rewrites one line must keep that, or git shows the whole file changed.
+
+---
+
+## 2026-11-01 — The round design on every control and surface (`refactor/78-round-design`, #78)
+
+**Did** — New round scale in `globals.css`: surfaces a step softer than slanted, one-line controls as pills, icon buttons as
+circles. New tokens `--r-sheet`, `-area`, `-icon`, `-box`, `-box-md`, `-box-sm`, `-tag-sm`, `-badge`, `-cell` and
+`--button-inset`, and `--r-control` restated in the slanted block, where it was missing. The header search follows
+`rounded-field`. About 245 fixed radii moved to tokens by what each thing is. `uiGuard.test.ts` now refuses `rounded-lg`,
+`-md`, `-sm`, `-3xl` and arbitrary values on anything painted, and `designTokens.test.ts` fails if a surface is not rounder
+in round than in slanted. `MainSidePanel` and `UserCharts` are deleted (dead, only their tests imported them).
+**Why** — #78: round did not feel round. Measured on 96 captures, 946 elements were *less* round than in slanted and 366
+more: its values were copied from the site before the slant, and slanted grew past them.
+**Decisions** — Buttons are pills too (the user's call, 2026-11-01), though the issue only asks for fields. `rounded-full`
+chips stay: right in round, and moving them would change slanted, which the issue rules out; if slanted wants corners there
+it is #77's. The search panel is `rounded-sheet`, not `--r-field`: its input draws no box and it holds results. 103 bare
+`rounded` stay, as they only show as a focus ring's corner. Tokens are named for the use, and slanted's values restate what
+it drew, so several look redundant there (`--r-box-sm` and `--r-tag-sm` are both 4 px) but differ in round.
+**Verification** — The computed radius of every boxed element, on 96 captures at 390 and 2560 px, before and after, with a throwaway
+account on pre (deleted after; pre back to 68 users). Round compared with slanted went from 946 less round to 0, and 3,797 are now rounder.
+Slanted: of 1,061 elements compared, only the header search changed (12 to 14 px, on purpose). 2 more showed up as a change but were
+my comparison: a swatch absent from the second run, as the new account had no points yet, paired with a presence dot of its size. 834 suites
+/ 5,307 tests, tsc, ESLint and the build pass. Screenshots: `docs/audits/78-round-design/`.
+**Open** — Not seen by eye: RA and Xbox pages, generic modals, tooltips, an open `Select`, the admin panel, `/design`, the light
+themes. The audit comment for the issue was posted once the user authorised it (it is what closes #78's "audit comment posted"
+criterion). The full-width pill buttons are the most debatable part; the user said to look
+at it again if it does not convince them.
+**Then, from the user's screenshots** — The Following, group and library skeletons asked for `tag` plus `rounded-none`, and the pill won: `Skeleton` has `radius="none"`.
+The account's description was an oval: it, `GroupModal` and `GameAiExportDialog` draw a raw `<textarea>` with `fieldClass`, so they got the pill. `multiline: true` is now
+required by the guard, and a round corner cuts a textarea's grip, so `--area-resize` is none in round. The header's account link is `rounded-nav`. The favourite game, pin
+game and pin achievement modals were a card inside `Modal` (a double frame): now the library's own dialog, with `SearchInput`, and without their own Escape handler. The year's
+streak on `/racha` was a white ring per day: each picked day now fills the gap around it in an opaque tone, so the streak reads as one shape, and has `aria-pressed`.
+**Watch out** — Do not run `npm run build` with `next dev` running: measured 2026-11-01, the dev server stopped seeing `globals.css` afterwards (it kept the old tokens while
+Tailwind picked up new classes) until restarted. `rounded-control` is a soft surface despite its name: it must never become a pill. Tailwind's `rounded-sm` is 4 px, the same as a bare
+`rounded`. The audit's preference must be set on the account too: the account wins over `localStorage` on sign-in, so a test
+that only sets the browser's value renders the other design.
+
+---
+
 ## 2026-10-31 — Expanded card stats and the cover's art (`fix/89-hero-art-expanded-stats`, #89)
 
 **Did** — The RA and Steam stats under an expanded game's ring are one line each (`GameExpandedStatList`, shared), not

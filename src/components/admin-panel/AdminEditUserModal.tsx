@@ -183,7 +183,7 @@ export default function AdminEditUserModal({ isOpen, onClose, user, onUpdated, o
                       setShowCountryPicker(false)
                       patch('location', c.code)
                     }}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-bg-card text-sm text-left"
+                    className="flex items-center gap-3 px-3 py-2 rounded-box hover:bg-bg-card text-sm text-left"
                   >
                     <span className="text-base" aria-hidden="true">{codeToFlag(c.code)}</span>
                     <span>{c.name}</span>

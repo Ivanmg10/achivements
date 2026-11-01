@@ -106,7 +106,7 @@ export default function GroupModalGamePicker({
             onClick={() => addById(directGameId)}
             className="flex items-center gap-3 px-3 py-2.5 rounded-tile ring-1 ring-ink/10 hover:bg-bg-main transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
-            <span aria-hidden="true" className="w-8 h-8 rounded-lg bg-bg-main flex items-center justify-center shrink-0 text-[10px] font-bold text-text-secondary">ID</span>
+            <span aria-hidden="true" className="w-8 h-8 rounded-box bg-bg-main flex items-center justify-center shrink-0 text-[10px] font-bold text-text-secondary">ID</span>
             <span className="text-sm text-text-main">{T.search.openById} #{directGameId}</span>
           </button>
         )

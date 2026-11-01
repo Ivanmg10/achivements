@@ -12,6 +12,8 @@ const RADIUS = {
   card: 'rounded-card',
   /** Avatars and rings, round in both designs. */
   circle: 'rounded-full',
+  /** A block flush with its card, which clips it. */
+  none: 'rounded-none',
 } as const
 
 /** The pulse, for an element that cannot be a Skeleton (an image's own placeholder). */

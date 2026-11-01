@@ -32,7 +32,7 @@ export default function SearchModalRow({
 }) {
   return (
     <button type="button" data-search-option onClick={onSelect} className={SEARCH_ROW}>
-      <span className="w-10 h-10 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-ink/10">{media}</span>
+      <span className="w-10 h-10 rounded-box overflow-hidden shrink-0 flex items-center justify-center bg-ink/10">{media}</span>
       <span className="flex-1 min-w-0">
         {/* The title whole for a screen reader; drawn in parts, where it matches, for the eye. */}
         <span className="sr-only">{title}</span>

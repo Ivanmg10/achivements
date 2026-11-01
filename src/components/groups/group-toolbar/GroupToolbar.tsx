@@ -9,7 +9,7 @@ import Checkbox from '@/components/ui/Checkbox'
 import { tabClass } from '@/components/ui/Tabs'
 import { MENU_SURFACE } from '@/components/ui/menu'
 
-const MENU = 'h-9 px-3 rounded-control text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer bg-bg-main ring-1 ring-inset ring-ink/10 text-text-main hover:ring-ink/25 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+const MENU = 'h-9 px-3 rounded-button text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer bg-bg-main ring-1 ring-inset ring-ink/10 text-text-main hover:ring-ink/25 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
 /**
  * One bar over a group's games: progress (all / not started / started /
@@ -84,13 +84,13 @@ export default function GroupToolbar({
             {consoles.map((name, i) => {
               const id = `group-console-${i}`
               return (
-                <Checkbox key={name} id={id} checked={filters.consoles.has(name)} onChange={() => onToggleConsole(name)} className="px-2 py-1.5 rounded-lg text-sm hover:bg-ink/5">
+                <Checkbox key={name} id={id} checked={filters.consoles.has(name)} onChange={() => onToggleConsole(name)} className="px-2 py-1.5 rounded-box text-sm hover:bg-ink/5">
                   {name}
                 </Checkbox>
               )
             })}
             {picked > 0 && (
-              <button type="button" onClick={onClearConsoles} className="mt-1 px-2 py-1.5 rounded-lg text-left text-xs text-accent hover:bg-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
+              <button type="button" onClick={onClearConsoles} className="mt-1 px-2 py-1.5 rounded-box text-left text-xs text-accent hover:bg-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70">
                 {T.groups.allConsoles}
               </button>
             )}

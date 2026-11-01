@@ -50,7 +50,7 @@ export default function RegisterUserFormRa({
 
       {account ? (
         <div className="flex items-center gap-3">
-          <Image src={account.avatar} alt="" width={44} height={44} className="rounded-lg shrink-0" unoptimized />
+          <Image src={account.avatar} alt="" width={44} height={44} className="rounded-box shrink-0" unoptimized />
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-text-main truncate">{account.user}</p>
             <p role="status" className="text-xs text-success">{t.raReady}</p>

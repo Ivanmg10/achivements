@@ -54,7 +54,7 @@ export default function HideGameButton({
         onClick={ask}
         aria-label={`${T.cards.hideGame}: ${title}`}
         aria-haspopup="dialog"
-        className={`p-1.5 rounded-lg text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0 ${className}`}
+        className={`p-1.5 rounded-chip text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0 ${className}`}
       >
         <IconEyeOff className="w-4 h-4" aria-hidden="true" />
       </button>

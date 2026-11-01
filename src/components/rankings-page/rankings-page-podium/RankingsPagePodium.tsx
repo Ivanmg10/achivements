@@ -47,7 +47,7 @@ export default function RankingsPagePodium({ rows, linked, approx = false }: { r
           <li
             key={r.username}
             style={arrival(place)}
-            className={`enter-card relative rounded-[1.125rem] pt-4 sm:pt-[1.125rem] px-2 sm:px-3.5 flex flex-col items-center gap-1.5 overflow-hidden ring-1 ring-inset ${r.isMe ? 'ring-accent/50' : 'ring-ink/[0.06]'} ${
+            className={`enter-card relative rounded-sheet pt-4 sm:pt-[1.125rem] px-2 sm:px-3.5 flex flex-col items-center gap-1.5 overflow-hidden ring-1 ring-inset ${r.isMe ? 'ring-accent/50' : 'ring-ink/[0.06]'} ${
               place === 1 ? 'bg-[linear-gradient(180deg,rgb(var(--accent)/0.16),rgb(var(--bg-card))_60%)]' : 'bg-bg-card'
             }`}
           >

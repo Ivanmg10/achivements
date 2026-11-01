@@ -20,7 +20,7 @@ export default function PinGameCard() {
         onClick={() => setOpen(true)}
         className="group flex-1 min-h-20 flex items-center gap-4 p-3 rounded-tile border border-dashed border-ink/15 text-left text-text-secondary hover:text-text-main hover:border-accent/50 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
-        <span className="w-14 h-14 shrink-0 rounded-lg bg-ink/5 flex items-center justify-center group-hover:text-accent transition-colors">
+        <span className="w-14 h-14 shrink-0 rounded-box bg-ink/5 flex items-center justify-center group-hover:text-accent transition-colors">
           <IconPlus className="w-6 h-6" aria-hidden />
         </span>
         <span className="flex-1 min-w-0 flex flex-col gap-2">

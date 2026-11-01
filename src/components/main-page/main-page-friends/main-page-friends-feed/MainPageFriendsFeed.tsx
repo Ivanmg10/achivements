@@ -27,12 +27,12 @@ export default function MainPageFriendsFeed({ items }: { items: FeedItem[] }) {
               <li key={`${username}:${a.Source ?? 'ra'}:${a.GameID}:${a.AchievementID}:${a.Date}`}>
                 <Link
                   href={gameHref(a.Source ?? 'ra', a.GameID, username)}
-                  className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-ink/[0.06] transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="flex items-center gap-2.5 px-2 py-1.5 rounded-box hover:bg-ink/[0.06] transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 >
                   {badge ? (
-                    <Image src={badge} alt="" width={36} height={36} className="w-9 h-9 rounded object-cover shrink-0" unoptimized />
+                    <Image src={badge} alt="" width={36} height={36} className="w-9 h-9 rounded-box-sm object-cover shrink-0" unoptimized />
                   ) : (
-                    <span aria-hidden="true" className="w-9 h-9 rounded bg-ink/10 shrink-0" />
+                    <span aria-hidden="true" className="w-9 h-9 rounded-box-sm bg-ink/10 shrink-0" />
                   )}
                   <span className="flex flex-col min-w-0 flex-1">
                     <span className="text-xs font-semibold truncate">{a.Title}</span>

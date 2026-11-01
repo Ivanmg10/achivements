@@ -18,19 +18,21 @@ import StreakYearHeatmap from './streak-year-heatmap/StreakYearHeatmap'
 
 /**
  * The streak page: the streak going now and the record, the longest streaks
- * as a ranked list, and the picked one day by day. On a wide screen the overview and
+ * as a ranked list, and one of them day by day; picked in the list or on the year, and picked again to let go. On a wide screen the overview and
  * the day by day sit side by side.
  */
 export default function StreakPage() {
   const { achievements, streaks, activeStreak, bestStreak, now, isLoading, error, refetch } = useStreakData()
   const { T } = useLanguage()
   const [picked, setPicked] = useState<Streak | null>(null)
-  // The picked streak, or the one going now, or the best: never empty once there are streaks.
-  const selectedStreak = picked ?? activeStreak ?? bestStreak
+  // Nothing is picked until the person picks; the day by day starts on the streak going now, or the best.
+  const shownStreak = picked ?? activeStreak ?? bestStreak
   const today = useMemo(() => { const d = new Date(now); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` }, [now])
   const byDay = useMemo(() => countByDay(achievements), [achievements])
   const insights = useMemo(() => streakInsights(byDay, streaks, today), [byDay, streaks, today])
   const lastActiveDay = useMemo(() => streaks.reduce<string | null>((last, s) => (!last || s.end > last ? s.end : last), null), [streaks])
+
+  const togglePicked = (streak: Streak) => setPicked((current) => (current?.start === streak.start ? null : streak))
 
   let body: React.ReactNode
   if (isLoading) body = <StreakPageSkeleton />
@@ -45,15 +47,15 @@ export default function StreakPage() {
       </StreakStatsBanner>
       <div className="grid gap-4 xl:grid-cols-2 enter-cards">
         <div className="flex flex-col gap-4 min-w-0">
-          <StreakChart streaks={streaks} selectedStreak={selectedStreak} activeStreak={activeStreak} avgStreak={insights.avgStreak} onSelect={setPicked} />
+          <StreakChart streaks={streaks} selectedStreak={picked} activeStreak={activeStreak} avgStreak={insights.avgStreak} onSelect={togglePicked} />
         </div>
         <div className="min-w-0 flex flex-col">
           {/* Keyed by streak: picking another one starts its calendar on its last day. */}
-          <StreakList key={selectedStreak?.start ?? 'none'} selectedStreak={selectedStreak} today={today} />
+          <StreakList key={shownStreak?.start ?? 'none'} selectedStreak={shownStreak} today={today} />
         </div>
       </div>
       <div className="grid gap-4 xl:grid-cols-2 enter-cards">
-        <StreakYearHeatmap byDay={byDay} streaks={streaks} selected={selectedStreak} today={today} onSelect={setPicked} />
+        <StreakYearHeatmap byDay={byDay} streaks={streaks} selected={picked} today={today} onSelect={togglePicked} />
         <StreakWeekdays counts={insights.weekdays} />
       </div>
       </>

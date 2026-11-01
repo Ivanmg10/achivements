@@ -32,7 +32,9 @@ export default function MainPageSteamStats({
   isLoading?: boolean
 }) {
   const { T, lang } = useLanguage()
-  const { profile } = useSteamProfile()
+  const { profile, error } = useSteamProfile()
+  // Its pill is in the row from the start: arriving late, it pushed every other one aside.
+  const levelWaiting = !profile && !error
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [weekOpen, setWeekOpen] = useState(false)
   const [monthOpen, setMonthOpen] = useState(false)
@@ -56,7 +58,7 @@ export default function MainPageSteamStats({
   if (isLoading) {
     return (
       <div className="flex flex-wrap gap-3" aria-busy="true">
-        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.streak.title, T.steam.last2Weeks].map((label) => (
+        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.steam.level, T.streak.title, T.steam.last2Weeks].map((label) => (
           <StatPill key={label} label={label} value="" loading />
         ))}
       </div>
@@ -76,7 +78,7 @@ export default function MainPageSteamStats({
       <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={unlocks} onClick={() => setWeekOpen(true)} />
       <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={unlocks} onClick={() => setMonthOpen(true)} />
       <StatPill label={T.pointsStats.avgPerDay} value={decimal(stats.avg, lang)} sub={T.pointsStats.perDay} />
-      {profile?.level != null && <StatPill label={T.steam.level} value={profile.level} sub="Steam" />}
+      {(levelWaiting || profile?.level != null) && <StatPill label={T.steam.level} value={profile?.level ?? ''} sub="Steam" loading={levelWaiting} />}
       <StatPill
         label={T.streak.title}
         value={`${streak}d`}

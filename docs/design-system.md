@@ -9,7 +9,7 @@ then `CLAUDE.md` → "The component library" for the hard rules.
 1. **Tokens** (`src/app/globals.css`): colours of a theme (`--accent`, `--bg-card`…),
    and the *design* — shapes, sizes, motion (`--slant-*`, `--clip-*`, `--bar-radius`,
    `--r-*`, `--h-*`, `--motion-*`). A theme changes the colours; a design changes
-   the shapes. Today there are two designs: **slanted** (the default) and **round**, the site as it was before the slant
+   the shapes. Today there are two designs: **slanted** (the default) and **round**, softer surfaces with every one-line control a pill or a circle
    (`[data-shape="round"]`, the person's choice, `useShapeStyle`; usable on any element). A third
    would be one more block of overrides, not an edit of any component. The **font** is a separate
    preference, not a third design: Barlow (the default), Sofia Sans or Fira Sans, each with its
@@ -26,7 +26,24 @@ then `CLAUDE.md` → "The component library" for the hard rules.
   text field, select, switch, checkbox, dialog, hard-coded palette colour, fixed
   `polygon(...)` or `skew-*-[..]`. If it fails, use the piece; if the piece is
   missing, add it (below).
-- **Radii come from tokens too** (`rounded-card`, `-pane`, `-tile`, `-tag`, `-button`, `-chip`, `-field`): the round design softens or pills them. The guard refuses the fixed values (`rounded-[1.25rem]`…).
+- **Radii come from tokens too**, chosen by what the thing is. Round must stay rounder than slanted (`designTokens.test.ts`). The guard refuses fixed values on anything painted (`rounded-lg`, `rounded-[1.25rem]`…), with a short list of documented exceptions.
+
+  | Token | For | Slanted | Round |
+  |---|---|---|---|
+  | `rounded-card` | Cards | 20 px | 24 px |
+  | `rounded-sheet` | The search panel, the rankings podium | 18 px | 24 px |
+  | `rounded-pane` | Panes | 14 px | 20 px |
+  | `rounded-tile` | Tiles inside a card | 10 px | 16 px |
+  | `rounded-control` | Soft surfaces: notices, menus, tooltips, toasts. Not controls, despite the name | 12 px | 16 px |
+  | `rounded-area` | A field of several lines | 14 px | 20 px |
+  | `rounded-box`, `-box-md`, `-box-sm` | Thumbnails, rows, small boxes | 8, 6, 4 px | 12, 10, 8 px |
+  | `rounded-cell` | Heatmap cells, chart bars | 3 px | 5 px |
+  | `rounded-button` | Buttons, control groups | 12 px | pill |
+  | `rounded-field` | A field of one line | 14 px | pill |
+  | `rounded-icon`, `rounded-chip`, `rounded-nav` | Icon buttons, chips, the header's account link | 9, 8, 10 px | circle or pill |
+  | `rounded-tag`, `-tag-sm`, `-badge` | Tags and small badges | 6, 4, 5 px | pill |
+
+  `rounded-(--bar-radius)` rounds an accent mark's ends in the round design, and `--button-inset` is the room the slant adds on each side of a button, 0 in round.
 - **Shapes come from tokens.** A bar's cut ends are `slantStyle(px)`
   (`ui/shape.ts`); a mark's lean is `skew-y-(--slant-mark)`; a control's slant is
   `skew-x-(--slant-button)`. Never a literal. The welcome curtain's fixed `polygon(...)`

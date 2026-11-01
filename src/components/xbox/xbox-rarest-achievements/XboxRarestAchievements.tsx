@@ -52,12 +52,12 @@ export default function XboxRarestAchievements({
             <li key={a.id}>
               <Link
                 href={`${gameHref('xbox', gameId, subject)}#${xboxAchievementAnchor(a.id)}`}
-                className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
+                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
               >
                 {a.iconUrl ? (
-                  <Image src={a.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-lg object-cover ring-2 ring-success shrink-0" unoptimized />
+                  <Image src={a.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-box object-cover ring-2 ring-success shrink-0" unoptimized />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+                  <div className="w-10 h-10 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
                 )}
                 <span className="flex flex-col min-w-0">
                   <span className="text-sm font-semibold truncate">{a.name}</span>

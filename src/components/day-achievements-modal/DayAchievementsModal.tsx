@@ -78,11 +78,11 @@ export default function DayAchievementsModal({ date, achievements, onClose }: Pr
                           alt={award.Title}
                           width={36}
                           height={36}
-                          className="w-9 h-9 rounded-lg object-cover"
+                          className="w-9 h-9 rounded-box object-cover"
                           unoptimized
                         />
                       ) : (
-                        <div className="w-9 h-9 rounded-lg bg-ink/5" />
+                        <div className="w-9 h-9 rounded-box bg-ink/5" />
                       )}
                       <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${isMastery ? 'bg-hardcore' : 'bg-success'}`}>
                         {isMastery

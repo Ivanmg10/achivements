@@ -45,6 +45,7 @@ function SegmentedDemo() {
     <div className="flex flex-wrap items-center gap-4">
       <SegmentedControl<string> aria-label="View" value={seg} onChange={setSeg} options={[{ value: 'shelves', label: 'Shelves' }, { value: 'list', label: 'List' }, { value: 'cards', label: 'Cards' }]} />
       <SegmentedControl<string> aria-label="Period" size="xs" value={small} onChange={setSmall} options={[{ value: 'week', label: 'Weekly' }, { value: 'month', label: 'Monthly' }]} />
+      <SegmentedControl<string> aria-label="Period, outlined" size="lg" tone="outline" value={small} onChange={setSmall} options={[{ value: 'week', label: 'Weekly' }, { value: 'month', label: 'Monthly' }]} />
     </div>
   )
 }

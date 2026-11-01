@@ -54,12 +54,12 @@ export default function LibraryDetailList({
               <Link
                 href={a.href}
                 title={a.description}
-                className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 {a.iconUrl ? (
-                  <Image src={a.iconUrl} alt="" width={40} height={40} unoptimized className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                  <Image src={a.iconUrl} alt="" width={40} height={40} unoptimized className="w-10 h-10 rounded-box object-cover shrink-0" />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+                  <div className="w-10 h-10 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
                 )}
                 <span className="flex flex-col min-w-0 flex-1">
                   <span className="text-sm font-semibold truncate">{a.title}</span>

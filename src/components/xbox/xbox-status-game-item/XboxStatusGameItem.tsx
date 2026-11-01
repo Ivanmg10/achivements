@@ -70,7 +70,7 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
               </p>
             </Link>
             <span className="flex items-center gap-1.5 flex-wrap">
-              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${xboxPlatformChip(game.consoleName)}`}>
+              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${xboxPlatformChip(game.consoleName)}`}>
                 <XboxLogo size={12} aria-hidden="true" />
                 {game.consoleName}
               </span>
@@ -113,7 +113,7 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
               aria-expanded={open}
               aria-controls={panelId}
               aria-label={`${open ? T.xbox.hideAchievements : T.xbox.showAchievements}: ${game.title}`}
-              className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
+              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
             >
               <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                 ▼

@@ -27,11 +27,11 @@ export default function StreakCompletionCard({ award }: Props) {
             alt={award.Title}
             width={40}
             height={40}
-            className="w-10 h-10 rounded-lg object-cover"
+            className="w-10 h-10 rounded-box object-cover"
             unoptimized
           />
         ) : (
-          <div className="w-10 h-10 rounded-lg bg-ink/5" />
+          <div className="w-10 h-10 rounded-box bg-ink/5" />
         )}
         <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${isMastery ? 'bg-hardcore' : 'bg-success'}`}>
           {isMastery

@@ -47,11 +47,11 @@ export default function SteamGameInfoAchievementCard({
           alt=""
           width={48}
           height={48}
-          className={`w-12 h-12 rounded-lg object-cover shrink-0 ${a.earned ? 'ring-2 ring-accent' : 'grayscale opacity-50'}`}
+          className={`w-12 h-12 rounded-box object-cover shrink-0 ${a.earned ? 'ring-2 ring-accent' : 'grayscale opacity-50'}`}
           unoptimized
         />
       ) : (
-        <div className="w-12 h-12 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+        <div className="w-12 h-12 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
       )}
 
       <div className="flex flex-col min-w-0 flex-1 gap-0.5">

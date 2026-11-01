@@ -56,11 +56,11 @@ export default function XboxGameInfoAchievementCard({
             alt=""
             width={48}
             height={48}
-            className={`w-12 h-12 rounded-lg object-cover ${a.unlocked ? 'ring-2 ring-success' : 'grayscale opacity-50'}`}
+            className={`w-12 h-12 rounded-box object-cover ${a.unlocked ? 'ring-2 ring-success' : 'grayscale opacity-50'}`}
             unoptimized
           />
         ) : (
-          <div className="w-12 h-12 rounded-lg bg-ink/10" aria-hidden="true" />
+          <div className="w-12 h-12 rounded-box bg-ink/10" aria-hidden="true" />
         )}
         {a.secret && !a.unlocked && onToggleReveal && (
           // No hover on a phone: the eye is always there.

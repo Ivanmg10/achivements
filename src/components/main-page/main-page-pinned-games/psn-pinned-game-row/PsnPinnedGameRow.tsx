@@ -89,7 +89,7 @@ export default function PsnPinnedGameRow({ gameId, isOpen, onToggle }: { gameId:
               onClick={onToggle}
               aria-expanded={isOpen}
               aria-label={`${isOpen ? T.psn.hideTrophies : T.psn.showTrophies}: ${game.title}`}
-              className="p-1 rounded text-text-secondary/40 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] shrink-0"
+              className="p-1 rounded-box-sm text-text-secondary/40 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] shrink-0"
             >
               <IconChevronDown size={14} aria-hidden="true" className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
             </button>

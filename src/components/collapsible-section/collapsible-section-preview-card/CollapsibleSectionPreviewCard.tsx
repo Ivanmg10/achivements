@@ -35,20 +35,20 @@ export default function CollapsibleSectionPreviewCard({ game, eager = false }: {
     >
       <GameCardBackdrop src={art} surface="card" eager={eager} />
       {game.source === 'steam' ? (
-        <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageRef} size={56} className="w-14 h-14 rounded-lg shrink-0" />
+        <SteamGameImage appId={game.id} asset="icon" iconUrl={game.imageRef} size={56} className="w-14 h-14 rounded-box shrink-0" />
       ) : game.source === 'psn' || game.source === 'xbox' ? (
-        <GameIcon source={game.source} id={game.id} imageUrl={game.imageRef} size={56} className="w-14 h-14 rounded-lg shrink-0" />
+        <GameIcon source={game.source} id={game.id} imageUrl={game.imageRef} size={56} className="w-14 h-14 rounded-box shrink-0" />
       ) : game.imageRef ? (
         <Image
           src={`https://retroachievements.org${game.imageRef}`}
           alt=""
           width={56}
           height={56}
-          className="w-14 h-14 rounded-lg object-cover shrink-0"
+          className="w-14 h-14 rounded-box object-cover shrink-0"
           unoptimized
         />
       ) : (
-        <div className="w-14 h-14 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+        <div className="w-14 h-14 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
       )}
 
       <div className="flex flex-col min-w-0 flex-1 gap-1">

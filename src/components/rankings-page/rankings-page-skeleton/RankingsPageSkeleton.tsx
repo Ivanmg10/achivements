@@ -9,7 +9,7 @@ const SLANT = slantStyle(14)
 /** A place on the podium, block for block: picture, name and level, points, and its step. */
 function Step({ who, avatar, step }: { who: string; avatar: string; step: string }) {
   return (
-    <div className="rounded-[1.125rem] bg-bg-card ring-1 ring-inset ring-ink/[0.06] pt-4 sm:pt-[1.125rem] px-2 sm:px-3.5 flex flex-col items-center gap-1.5 overflow-hidden">
+    <div className="rounded-sheet bg-bg-card ring-1 ring-inset ring-ink/[0.06] pt-4 sm:pt-[1.125rem] px-2 sm:px-3.5 flex flex-col items-center gap-1.5 overflow-hidden">
       <div className={`flex flex-col items-center gap-2.5 w-full ${who}`}>
         <Skeleton radius="circle" className={`${avatar} shrink-0`} />
         <Skeleton className="h-5 w-3/4" />

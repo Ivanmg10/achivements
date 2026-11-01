@@ -29,8 +29,15 @@ test('a running streak, in the theme colour', () => {
   expect(screen.getByText('8d')).toHaveClass('text-accent')
 })
 
-test('without a summary yet, only what the achievements say', () => {
-  ;(useXboxSummary as jest.Mock).mockReturnValue({ summary: null })
+test('without a summary yet, its pills wait in the row', () => {
+  ;(useXboxSummary as jest.Mock).mockReturnValue({ summary: null, error: null })
+  render(<MainPageXboxStats streak={0} achievements={[unlock(today)]} />)
+  expect(screen.getByText(en.xbox.gamerscore).parentElement?.querySelector('.bg-skeleton')).toBeInTheDocument()
+  expect(screen.getByText(en.xbox.achievements).parentElement?.querySelector('.bg-skeleton')).toBeInTheDocument()
+})
+
+test('with a summary that failed, only what the achievements say', () => {
+  ;(useXboxSummary as jest.Mock).mockReturnValue({ summary: null, error: 'failed' })
   render(<MainPageXboxStats streak={0} achievements={[unlock(today)]} />)
   expect(screen.queryByText(en.xbox.gamerscore)).not.toBeInTheDocument()
 })

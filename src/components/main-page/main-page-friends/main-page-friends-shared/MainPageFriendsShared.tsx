@@ -26,7 +26,7 @@ export default function MainPageFriendsShared({ rows }: { rows: SharedGameRow[] 
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 enter-rows">
           {rows.map(({ game, friends }) => (
             <li key={game.key} className="flex items-center gap-3 p-2.5 rounded-tile bg-bg-main min-w-0">
-              <GameIcon source={game.source} id={game.id} imageUrl={game.iconUrl} size={44} className="w-11 h-11 rounded-lg shrink-0" />
+              <GameIcon source={game.source} id={game.id} imageUrl={game.iconUrl} size={44} className="w-11 h-11 rounded-box shrink-0" />
               <span className="flex flex-col gap-1.5 min-w-0 flex-1">
                 <span className="text-sm font-medium truncate">{game.title}</span>
                 <span className="text-[11px] text-text-secondary">

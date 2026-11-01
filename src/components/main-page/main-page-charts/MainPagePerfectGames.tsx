@@ -97,7 +97,7 @@ export default function MainPagePerfectGames({
             <button
               onClick={() => setEditOpen(true)}
               aria-label={T.cards.reorderMasteredAria}
-              className="p-1 rounded hover:bg-bg-card transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70 cursor-pointer"
+              className="p-1 rounded-box-sm hover:bg-bg-card transition-colors text-text-secondary hover:text-text-main focus:outline-none focus:ring-2 focus:ring-accent/70 cursor-pointer"
             >
               <IconEdit className="w-3.5 h-3.5" aria-hidden />
             </button>

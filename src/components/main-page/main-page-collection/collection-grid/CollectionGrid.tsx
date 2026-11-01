@@ -63,7 +63,7 @@ export default function CollectionGrid({
             <button
               onClick={() => setEditOpen(true)}
               aria-label={T.cards.reorderMasteredAria}
-              className="p-1.5 rounded-lg text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <IconEdit className="w-4 h-4" aria-hidden="true" />
             </button>
