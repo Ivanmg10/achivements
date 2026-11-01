@@ -29,6 +29,17 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-01 — A favicon per theme, and the theme list (`feat/84-theme-favicon`, #84)
+
+**Did** — The favicon follows the theme (`src/utils/themeIcon.ts`: `themeScript()` before the first frame, `setThemeIcon` in `ThemeContext`), on one `<link id="theme-icon">` in the root layout; `src/app/icon.svg` moved to `public/icon.svg`. 9 themes out (synthwave, catppuccin, rose-pine, oled, ocean, terminal, daxter, bentley, clank), 5 in (venom, dark-blue, dark-white, light-blue, light-black), so 21. San Andreas rebuilt, Snake Eater retouched. `FEATURED_THEMES` of the welcome updated. CLAUDE.md has the rules.
+**Why** — Issue #84, widened by the user on the canvas: it asked for 5 removals and left Snake Eater out of scope. The issue's text still says so.
+**Decisions** — v1 of the canvas replaced the logo with a V for 16 px; the user turned it down (a friend drew the logo), so v2 keeps its paths exactly and the ground goes only inside the C, which keeps the C open. Chosen D on the canvas. Fewer themes would not have simplified it: what did was a table of two colours per theme, facets derived. San Andreas takes the game's HUD table (`CHudColours`, gta-reversed: dark blue 50 60 127, light blue 172 203 241, grey, cream 226 192 99): that is the HUD, not checked against a capture of the pause menu. The user said to discard San Andreas but liked style A, read as: the old one goes, A takes its place under the same name; a saved `san-andreas` stays valid. Snake Eater took option A, jungle green and khaki, my reading of MGS3: no published palette. `--info` moves to cyan or teal on the blue accents, as `--danger` and `--success` already do beside red and green. Bootstrap embeds colours and one template, not 21 data URLs (about 10 KB in every page). The file convention was dropped because a second link from Next could win over ours, and the public profile no longer prints a removed theme's raw id.
+**Verification** — Headed Chromium and Firefox from Playwright, screenshots of the real tab strip: Venom, Sakura, Dark · Green and San Andreas change with no reload, through a real session change (`/api/auth/session` mocked, refetched on `visibilitychange`). No hydration warning, one icon link in `<head>`, a removed theme lands on `dark`, and with the session pending the saved theme and icon are already there. Tests, lint, types and the build pass.
+**Open** — Safari is not tested. The signed-in pages were not looked at in the new themes: contrast is tested on tokens, the user will try them on the page. Update #84's text. `apple-icon.tsx` still says "CH".
+**Watch out** — A signed-out visitor keeps the default after hydration, as before this change (`ThemeProvider` starts dark and writes it): the saved theme only lasts the first paint for them. To test a tab's icon, a screenshot of the page shows nothing: capture the window, and bring it to the front first (the first run caught VS Code).
+
+---
+
 ## 2026-11-01 — Vercel's font failures, and Next 16.4.3 (`fix/106-look-transition-races`)
 
 **Did** — Next and `eslint-config-next` to 16.4.3.

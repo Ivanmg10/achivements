@@ -331,6 +331,8 @@ html[data-font="fira"],
 [data-theme="light"],
 [data-theme="light-red"],
 [data-theme="light-green"],
+[data-theme="light-blue"],
+[data-theme="light-black"],
 [data-theme="sakura"],
 [data-theme="arctic"] {
   --hardcore: 161 98 7;
@@ -342,7 +344,9 @@ html[data-font="fira"],
    ============================================ */
 [data-theme="dark"],
 [data-theme="dark-red"],
-[data-theme="dark-green"] {
+[data-theme="dark-green"],
+[data-theme="dark-blue"],
+[data-theme="dark-white"] {
   --bg-main: 15 16 20;
   --bg-header: 10 10 14;
   --bg-card: 23 24 30;
@@ -368,7 +372,9 @@ html[data-font="fira"],
    ============================================ */
 [data-theme="light"],
 [data-theme="light-red"],
-[data-theme="light-green"] {
+[data-theme="light-green"],
+[data-theme="light-blue"],
+[data-theme="light-black"] {
   --ink: 20 22 28;
   --bg-main: 229 231 235;
   --bg-header: 236 238 242;
@@ -390,10 +396,11 @@ html[data-font="fira"],
 }
 
 /*
-   The same dark and light, with a red or a green accent instead of violet.
+   The same dark and light, with another accent instead of violet.
    Where the accent takes a colour that already means something, that meaning
    moves: errors go orange beside a red accent, "completed" goes teal beside a
-   green one, so a bar never reads as an error or as finished.
+   green one, info goes cyan or teal beside a blue one, so a bar never reads as
+   an error or as finished.
 */
 [data-theme="dark-red"] {
   --accent: 248 113 113;
@@ -419,6 +426,28 @@ html[data-font="fira"],
   --accent-muted: 22 101 52;
   --success: 15 118 110;
 }
+[data-theme="dark-blue"] {
+  --accent: 123 150 255;
+  --accent-hover: 165 180 252;
+  --accent-muted: 123 150 255;
+  --info: 34 211 238;
+}
+[data-theme="dark-white"] {
+  --accent: 240 241 245;
+  --accent-hover: 255 255 255;
+  --accent-muted: 240 241 245;
+}
+[data-theme="light-blue"] {
+  --accent: 29 78 216;
+  --accent-hover: 30 64 175;
+  --accent-muted: 29 78 216;
+  --info: 15 118 110;
+}
+[data-theme="light-black"] {
+  --accent: 23 24 30;
+  --accent-hover: 60 62 72;
+  --accent-muted: 23 24 30;
+}
 
 /*
    Light themes: the fixed palette colours in the code (hardcore gold, ratio
@@ -426,55 +455,55 @@ html[data-font="fira"],
    classes take a darker shade so they still pass AA. Text only: bars and tints
    keep their colour.
 */
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-200 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-300 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-400 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-200 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-300 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-400 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-200 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-300 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-400 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-200 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-300 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-400 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-200 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-300 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-400 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-200 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-300 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-400 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-200 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-300 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-400 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-200 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-300 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-400 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-200 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-300 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-400 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-200 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-300 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-400 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-200 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-300 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-400 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-200 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-300 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-400 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-200 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-300 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-400 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-200 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-300 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-400 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-200 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-300 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-400 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-200 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-300 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-400 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-500 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-200 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-300 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-400 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-200 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-300 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-400 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-200 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-300 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-400 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-200 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-300 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-400 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-200 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-300 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-400 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-200 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-300 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-400 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-200 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-300 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-400 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-200 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-300 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-400 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-200 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-300 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-400 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-200 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-300 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-400 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-200 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-300 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-400 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-200 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-300 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-400 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-200 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-300 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-400 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-200 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-300 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-400 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-200 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-300 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-400 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-200 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-300 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-400 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-500 { @apply text-gray-600; }
 
 /* ============================================
    BLUE
@@ -571,52 +600,6 @@ html[data-font="fira"],
 }
 
 /* ============================================
-   SYNTHWAVE: hot pink on night indigo, cyan for info
-   ============================================ */
-[data-theme="synthwave"] {
-  --bg-main: 14 10 26;
-  --bg-header: 9 6 18;
-  --bg-card: 24 17 42;
-  --bg-tertiary: 38 28 64;
-
-  --text-main: 236 228 255;
-  --text-secondary: 165 150 200;
-
-  --accent: 255 92 190;
-  --accent-hover: 255 128 206;
-  --accent-muted: 255 92 190;
-
-  --success: 52 211 153;
-  --warning: 251 191 36;
-  --info: 34 211 238;
-  --danger: 251 113 133;
-  --chart-2: 34 211 238;
-}
-
-/* ============================================
-   CATPPUCCIN (Mocha): pastel lavender on soft navy
-   ============================================ */
-[data-theme="catppuccin"] {
-  --bg-main: 30 30 46;
-  --bg-header: 24 24 37;
-  --bg-card: 37 37 56;
-  --bg-tertiary: 49 50 68;
-
-  --text-main: 205 214 244;
-  --text-secondary: 166 173 200;
-
-  --accent: 203 166 247;
-  --accent-hover: 218 190 250;
-  --accent-muted: 203 166 247;
-
-  --success: 166 227 161;
-  --warning: 249 226 175;
-  --info: 116 199 236;
-  --danger: 243 139 168;
-  --chart-2: 249 226 175;
-}
-
-/* ============================================
    GRUVBOX: retro warm, orange on charcoal
    ============================================ */
 [data-theme="gruvbox"] {
@@ -637,98 +620,6 @@ html[data-font="fira"],
   --info: 131 165 152;
   --danger: 255 110 90;
   --chart-2: 250 189 47;
-}
-
-/* ============================================
-   ROSÉ PINE: dusty rose on pine night
-   ============================================ */
-[data-theme="rose-pine"] {
-  --bg-main: 25 23 36;
-  --bg-header: 21 19 31;
-  --bg-card: 31 29 46;
-  --bg-tertiary: 38 35 58;
-
-  --text-main: 224 222 244;
-  --text-secondary: 144 140 170;
-
-  --accent: 235 188 186;
-  --accent-hover: 242 205 203;
-  --accent-muted: 235 188 186;
-
-  --success: 52 211 153;
-  --warning: 246 193 119;
-  --info: 156 207 216;
-  --danger: 235 111 146;
-  --chart-2: 246 193 119;
-}
-
-/* ============================================
-   OLED: near-black for OLED screens, neutral accent
-   ============================================ */
-[data-theme="oled"] {
-  --bg-main: 3 3 4;
-  --bg-header: 2 2 3;
-  --bg-card: 12 12 15;
-  --bg-tertiary: 26 26 32;
-
-  --text-main: 235 236 240;
-  --text-secondary: 150 152 160;
-
-  --accent: 167 139 250;
-  --accent-hover: 196 181 253;
-  --accent-muted: 167 139 250;
-
-  --success: 34 197 94;
-  --warning: 245 158 11;
-  --info: 96 165 250;
-  --danger: 239 68 68;
-  --chart-2: 245 158 11;
-}
-
-/* ============================================
-   OCEAN: aqua on deep sea; success is lime, not the accent
-   ============================================ */
-[data-theme="ocean"] {
-  --bg-main: 7 22 28;
-  --bg-header: 4 16 21;
-  --bg-card: 12 32 40;
-  --bg-tertiary: 20 48 58;
-
-  --text-main: 214 236 240;
-  --text-secondary: 128 162 170;
-
-  --accent: 45 212 191;
-  --accent-hover: 94 234 212;
-  --accent-muted: 45 212 191;
-
-  --success: 163 230 53;
-  --warning: 251 191 36;
-  --info: 125 211 252;
-  --danger: 251 113 133;
-  --chart-2: 251 191 36;
-}
-
-/* ============================================
-   TERMINAL: phosphor green on black; success is cyan
-   ============================================ */
-[data-theme="terminal"] {
-  --bg-main: 5 10 7;
-  --bg-header: 2 6 4;
-  --bg-card: 10 20 14;
-  --bg-tertiary: 18 34 24;
-
-  --text-main: 205 224 210;
-  --text-secondary: 110 160 125;
-
-  --accent: 74 222 128;
-  --accent-hover: 134 239 172;
-  --accent-muted: 74 222 128;
-
-  --success: 34 211 238;
-  --warning: 250 204 21;
-  --info: 147 197 253;
-  --danger: 248 113 113;
-  --chart-2: 250 204 21;
 }
 
 /* ============================================
@@ -780,75 +671,6 @@ html[data-font="fira"],
 }
 
 /* ============================================
-   DAXTER (Jak and Daxter): ottsel orange on warm brown; blue and green eco
-   ============================================ */
-[data-theme="daxter"] {
-  --bg-main: 27 17 11;
-  --bg-header: 20 12 7;
-  --bg-card: 40 27 18;
-  --bg-tertiary: 60 41 28;
-
-  --text-main: 250 236 214;
-  --text-secondary: 196 164 128;
-
-  --accent: 255 155 55;
-  --accent-hover: 255 178 96;
-  --accent-muted: 255 155 55;
-
-  --success: 132 220 80;
-  --warning: 250 204 21;
-  --info: 90 180 255;
-  --danger: 248 113 113;
-  --chart-2: 90 180 255;
-}
-
-/* ============================================
-   BENTLEY (Sly Cooper): turtle green on midnight navy noir
-   ============================================ */
-[data-theme="bentley"] {
-  --bg-main: 13 17 32;
-  --bg-header: 9 12 24;
-  --bg-card: 21 27 48;
-  --bg-tertiary: 33 41 68;
-
-  --text-main: 226 232 244;
-  --text-secondary: 140 152 180;
-
-  --accent: 160 208 90;
-  --accent-hover: 184 226 120;
-  --accent-muted: 160 208 90;
-
-  --success: 45 212 191;
-  --warning: 251 191 36;
-  --info: 129 140 248;
-  --danger: 248 113 113;
-  --chart-2: 251 191 36;
-}
-
-/* ============================================
-   CLANK (Ratchet & Clank): gunmetal body, green eyes, red antenna light
-   ============================================ */
-[data-theme="clank"] {
-  --bg-main: 22 25 30;
-  --bg-header: 16 18 22;
-  --bg-card: 33 38 46;
-  --bg-tertiary: 48 55 66;
-
-  --text-main: 222 228 236;
-  --text-secondary: 150 160 174;
-
-  --accent: 110 231 150;
-  --accent-hover: 150 240 180;
-  --accent-muted: 110 231 150;
-
-  --success: 56 189 248;
-  --warning: 251 191 36;
-  --info: 165 180 252;
-  --danger: 255 95 95;
-  --chart-2: 251 191 36;
-}
-
-/* ============================================
    BLACK OPS II: hot safety orange on cold near-black
    ============================================ */
 [data-theme="black-ops-2"] {
@@ -872,49 +694,72 @@ html[data-font="fira"],
 }
 
 /* ============================================
-   SAN ANDREAS: Grove Street green on smoggy Los Santos sepia
+   SAN ANDREAS: the game's own HUD colours, dark blue, light blue and cream
    ============================================ */
 [data-theme="san-andreas"] {
-  --bg-main: 23 19 13;
-  --bg-header: 17 14 9;
-  --bg-card: 35 29 20;
-  --bg-tertiary: 54 45 31;
+  --bg-main: 14 20 48;
+  --bg-header: 10 14 36;
+  --bg-card: 26 35 80;
+  --bg-tertiary: 50 60 127;
 
-  --text-main: 240 230 210;
-  --text-secondary: 176 160 130;
+  --text-main: 225 225 225;
+  --text-secondary: 172 203 241;
 
-  --accent: 88 190 90;
-  --accent-hover: 120 210 120;
-  --accent-muted: 88 190 90;
+  --accent: 226 192 99;
+  --accent-hover: 240 214 140;
+  --accent-muted: 226 192 99;
 
-  --success: 56 189 248;
-  --warning: 250 204 21;
-  --info: 147 197 253;
+  --success: 34 197 94;
+  --warning: 251 146 60;
+  --info: 172 203 241;
   --danger: 248 113 113;
-  --chart-2: 250 204 21;
+  --chart-2: 172 203 241;
 }
 
 /* ============================================
-   SNAKE EATER (Metal Gear Solid 3): olive drab, khaki and tan; codec green
+   SNAKE EATER (Metal Gear Solid 3): jungle green and camouflage khaki
    ============================================ */
 [data-theme="snake-eater"] {
-  --bg-main: 21 23 15;
-  --bg-header: 15 17 10;
-  --bg-card: 32 35 23;
-  --bg-tertiary: 48 52 35;
+  --bg-main: 15 26 18;
+  --bg-header: 10 19 12;
+  --bg-card: 24 39 27;
+  --bg-tertiary: 37 57 42;
 
-  --text-main: 226 220 196;
-  --text-secondary: 160 156 128;
+  --text-main: 227 224 200;
+  --text-secondary: 163 171 140;
 
-  --accent: 222 176 72;
-  --accent-hover: 236 196 100;
-  --accent-muted: 222 176 72;
+  --accent: 201 180 88;
+  --accent-hover: 220 200 110;
+  --accent-muted: 201 180 88;
 
   --success: 132 204 22;
   --warning: 251 146 60;
   --info: 110 220 190;
   --danger: 248 113 113;
   --chart-2: 110 220 190;
+}
+
+/* ============================================
+   VENOM (Ultimate Spider-Man): white on near-black, the symbiote's purple on the cards
+   ============================================ */
+[data-theme="venom"] {
+  --bg-main: 11 9 10;
+  --bg-header: 7 5 6;
+  --bg-card: 43 27 71;
+  --bg-tertiary: 64 44 102;
+
+  --text-main: 255 255 255;
+  --text-secondary: 196 186 212;
+
+  --accent: 255 255 255;
+  --accent-hover: 226 220 236;
+  --accent-muted: 255 255 255;
+
+  --success: 52 211 153;
+  --warning: 251 191 36;
+  --info: 160 170 255;
+  --danger: 248 113 113;
+  --chart-2: 180 150 240;
 }
 
 /* ============================================

@@ -5,14 +5,12 @@ import GoogleAnalytics from '@/components/google-analytics/GoogleAnalytics'
 import "./globals.css";
 import Providers from "./providers";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL, THEME_COLOR } from '@/lib/siteUrl'
-import { THEMES, THEME_STORAGE_KEY } from '@/types/types'
+import { themeScript } from '@/utils/themeIcon'
 import { display, fira, firaDisplay, sofia, sofiaDisplay, ui } from '@/lib/fonts'
 
-// Paints the last theme this browser used before the first frame; without it
-// every load flashes dark until the session says otherwise.
-const THEME_SCRIPT = `try{var t=localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});if(${JSON.stringify(THEMES)}.indexOf(t)>-1)document.documentElement.dataset.theme=t}catch(e){}`
+const THEME_SCRIPT = themeScript()
 
-// Likewise the page's shape and font (slanted Barlow by default) and what the skeletons need (the home's and the library's layouts, whether a session is expected): the last choices, before the first frame.
+// Like the theme, the page's shape and font (slanted Barlow by default) and what the skeletons need (the home's and the library's layouts, whether a session is expected): the last choices, before the first frame.
 const LOOK_SCRIPT = `try{var d=document.documentElement;if(localStorage.getItem('shape-style')==='round')d.dataset.shape='round';var f=localStorage.getItem('font-style');if(f==='sofia'||f==='fira')d.dataset.font=f;if(localStorage.getItem('home-layout')==='cover')d.dataset.homeLayout='cover';var l=localStorage.getItem('library-layout');if(l==='list'||l==='cards')d.dataset.libraryLayout=l;var s=localStorage.getItem('session-look');if(s==='in'||s==='tabs')d.dataset.session=s}catch(e){}`
 
 export const metadata: Metadata = {
@@ -45,6 +43,8 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="dark" className={`${ui.variable} ${display.variable} ${sofia.variable} ${sofiaDisplay.variable} ${fira.variable} ${firaDisplay.variable} bg-bg-header`} suppressHydrationWarning>
       <head>
+        {/* Here, not src/app/icon.svg: Next's own link can land after the script, or in the body. The script and ThemeContext swap its href. */}
+        <link id="theme-icon" rel="icon" href="/icon.svg" type="image/svg+xml" suppressHydrationWarning />
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: LOOK_SCRIPT }} />
       </head>

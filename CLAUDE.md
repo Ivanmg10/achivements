@@ -325,6 +325,21 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   subsets never ask IGDB (`igdbRaArt`). **IGDB pictures go through `pictureUrl`**: `t_1080p` stretches a
   smaller original (measured 2026-10-31), which hides a blurred picture from that check.
 
+## Favicon and the theme list (#84, 2026-11-01)
+
+- **The logo was drawn by a friend of the user and keeps its shape** (the user's call): recolour it, never redraw it or swap it
+  for a simpler mark, here or anywhere. Its paths are `LOGO` in `src/utils/themeIcon.ts`.
+- **The favicon follows the theme:** C and V in the accent, the theme's ground only inside the C. Nothing behind it fails: the accent
+  alone misses 3:1 on a dark or a white tab in most themes. The accepted cost: a white C (Venom, Dark · White) disappears on a white tab, the inside stays.
+- **A new theme needs its row in `THEME_ICON`:** the types refuse a missing one, `src/app/themes.test.ts` refuses colours that differ from `globals.css`
+  (and checks contrast for the themes added in #84). A new light theme also joins the light selector lists in `globals.css`.
+- **One `<link id="theme-icon">`, in the root layout, before the script.** Not `src/app/icon.svg`: Next's link can land after the script. Both the script
+  and `ThemeContext` set its `href`; a data URL has nothing to cache. Measured 2026-11-01 on real tabs, Chromium and Firefox change with no reload. Safari is
+  not tested (no Windows build): if it refuses, it keeps `/icon.svg`, the default theme's logo.
+- **A theme that no longer exists lands on `dark`** in the head script, `ThemeContext` and the public profile (no row, never its raw id). `users.theme` keeps
+  the old value until the person picks another: no migration, nothing else reads it.
+- **`apple-icon.tsx` still says "CH"**: out of #84, left as it was.
+
 ## Progress bars — in the theme's colours
 
 Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or

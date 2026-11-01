@@ -87,7 +87,7 @@ test('every surface is rounder in the round design than in the slanted one', () 
 test('light surfaces get darker RA marks', () => {
   const start = css.indexOf('/* Light surfaces: the RA marks')
   const block = css.slice(start, css.indexOf('}', start))
-  for (const theme of ['light', 'light-red', 'light-green', 'sakura', 'arctic']) {
+  for (const theme of ['light', 'light-red', 'light-green', 'light-blue', 'light-black', 'sakura', 'arctic']) {
     expect(THEMES).toContain(theme)
     expect(block).toContain(`[data-theme="${theme}"]`)
   }
