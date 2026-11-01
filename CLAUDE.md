@@ -237,11 +237,11 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
   are in `ui/`; a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
 - **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
   `GameCardBackdrop` is the one place that draws it, so every game card follows it.
-- **The Layout modal moves on every change (2026-11-01, #78):** all its options in view, no tabs. The shape eases in the sample
-  (`.look-morph`, `--motion-morph`), the first game's card grows into the cover (Framer `layoutId`), the flat style wipes across
-  the cards, and a font or a theme goes through `lookTransition` (`src/utils/lookTransition.ts`, the browser's view transition:
-  the font fades, the theme spreads from its swatch). `.look-morph` never transitions `transform` on everything: Framer's layout
-  animations would drag behind it. A browser without view transitions, or reduced motion, just changes.
+- **The Layout modal moves on every change (2026-11-01, #78):** all its options in view, no tabs. The first game's card grows into
+  the cover (Framer `layoutId`), the flat style wipes across the cards, and the rest goes through `lookTransition`
+  (`src/utils/lookTransition.ts`, the browser's view transition): a font fades, a theme spreads from its swatch, and a shape sweeps
+  across the window behind a band of the accent shaped like it (`sweepEdge`). Do not ease a shape with CSS: the bars' `clip-path` cannot, so half the
+  page jumped (the user turned that down). A browser without view transitions, or reduced motion, just changes.
 - **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the best streaks' bars, the
   streak hero and its live bar, the cover's streak card, the home's stats tile, the rankings' streak column). This replaces "streaks in the accent" for those places.
 - **Adding a piece:** library first (`ui/`, props for layout only, a test), then its specimen in the

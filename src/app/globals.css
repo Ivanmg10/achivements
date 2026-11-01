@@ -143,7 +143,6 @@
   --motion-hover: 150ms;
   --motion-open: 250ms;
   --motion-indicator: 450ms;
-  --motion-morph: 420ms;
   --ease-spring: cubic-bezier(0.3, 1.2, 0.4, 1);
   --enter-duration: 450ms;
   --enter-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -162,30 +161,19 @@
     --enter-rise: 0px;
     --enter-scale: 1;
     --enter-grow: 1;
-    --motion-morph: 0ms;
   }
 }
 
-/* The Layout chooser's sample: what a choice changes eases into place, so the difference is seen. Never `transform` on
-   everything: the sample's blocks move with Framer's layout animations, which a transition would drag behind. */
-.look-morph *,
-.look-morph *::before,
-.look-morph *::after {
-  transition-property: border-radius, background-color, color, box-shadow, clip-path;
-  transition-duration: var(--motion-morph);
-  transition-timing-function: var(--enter-ease);
-}
-
-.look-morph [class*="skew-"],
-.look-morph *::before {
-  transition-property: border-radius, background-color, color, box-shadow, transform;
-}
-
-/* `lookTransition` plays both by hand: a font crossfades, a theme spreads from where it was picked. */
+/* `lookTransition` plays these by hand: a font fades, a shape sweeps, a theme spreads from where it was picked. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
+}
+
+/* Only seen in a sweep: the band between the two looks. */
+::view-transition-image-pair(root) {
+  background: rgb(var(--accent));
 }
 
 /* A page that waits for nothing has no skeleton to soften its arrival, so its entrance takes longer. */

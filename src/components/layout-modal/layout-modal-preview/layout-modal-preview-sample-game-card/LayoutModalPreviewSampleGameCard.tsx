@@ -20,7 +20,7 @@ export default function LayoutModalPreviewSampleGameCard({ game, cards, order, l
       <GameCardBackdrop src={sampleCover(game)} style="tinted" />
       <span
         aria-hidden="true"
-        className="absolute inset-0 -z-10 rounded-[inherit] bg-bg-main shadow-[inset_0_0_0_1px_rgb(var(--ink)/0.08)]"
+        className="absolute inset-0 -z-10 rounded-[inherit] bg-bg-main shadow-[inset_0_0_0_1px_rgb(var(--ink)/0.08)] transition-[clip-path] duration-(--motion-indicator) ease-(--enter-ease) motion-reduce:transition-none"
         style={{ clipPath: cards === 'flat' ? 'inset(0)' : 'inset(0 0 0 100%)', transitionDelay: `${order * 50}ms` }}
       />
       <div className="flex items-center gap-3">

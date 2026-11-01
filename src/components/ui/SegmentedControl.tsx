@@ -45,7 +45,7 @@ export default function SegmentedControl<V extends string>({
         className="absolute top-[3px] bottom-[3px] left-[3px] -z-10 transition-transform duration-(--motion-indicator) ease-(--ease-spring) motion-reduce:transition-none"
         style={{ width: `calc((100% - 6px) / ${options.length})`, transform: `translateX(${index * 100}%)` }}
       >
-        <span className={`absolute inset-y-0 inset-x-[3px] rounded-chip skew-x-(--slant-pill) transition-[border-radius,transform] duration-(--motion-indicator) motion-reduce:transition-none ${tone === 'outline' ? 'bg-accent/15 ring-2 ring-inset ring-accent' : 'bg-accent'}`} />
+        <span className={`absolute inset-y-0 inset-x-[3px] rounded-chip skew-x-(--slant-pill) ${tone === 'outline' ? 'bg-accent/15 ring-2 ring-inset ring-accent' : 'bg-accent'}`} />
       </span>
       {options.map(({ value: v, label: text, icon: Icon, compact, iconOnly }) => {
         const on = v === value

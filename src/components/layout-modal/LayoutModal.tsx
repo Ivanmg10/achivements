@@ -5,7 +5,7 @@ import { useFontStyle, type FontStyle } from '@/hooks/useFontStyle'
 import { useGameCardStyle } from '@/hooks/useGameCardStyle'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
 import { useShapeStyle } from '@/hooks/useShapeStyle'
-import { lookTransition } from '@/utils/lookTransition'
+import { lookTransition, sweepEdge } from '@/utils/lookTransition'
 import Modal from '@/components/ui/Modal'
 import SegmentedControl, { type Segment } from '@/components/ui/SegmentedControl'
 import LayoutModalPreview from './layout-modal-preview/LayoutModalPreview'
@@ -46,7 +46,7 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
           <LayoutChoice
             label={T.homeLayout.shapeLabel}
             value={shape}
-            onChange={setShape}
+            onChange={(next) => lookTransition(() => setShape(next), sweepEdge(next))}
             options={[
               { value: 'slanted', label: T.homeLayout.shapeSlanted },
               { value: 'round', label: T.homeLayout.shapeRound },

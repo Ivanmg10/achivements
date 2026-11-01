@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'
 import { useLanguage } from '@/context/LanguageContext'
 import { useThemeChoice } from '@/hooks/useThemeChoice'
 import { THEMES, type Theme } from '@/types/types'
-import { lookTransition } from '@/utils/lookTransition'
+import { lookTransition, spreadFrom } from '@/utils/lookTransition'
 import Button from '@/components/ui/Button'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 
@@ -27,7 +27,7 @@ export default function LayoutModalThemes() {
   function pick(id: Theme, e: MouseEvent<HTMLButtonElement>) {
     if (id === theme) return
     const box = e.currentTarget.getBoundingClientRect()
-    lookTransition(() => void choose(id), { x: box.left + box.width / 2, y: box.top + box.height / 2 })
+    lookTransition(() => void choose(id), spreadFrom(box.left + box.width / 2, box.top + box.height / 2))
   }
 
   return (

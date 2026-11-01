@@ -16,10 +16,9 @@ const GROW = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const }
 
 /**
  * A sample home made from the library's pieces, scoped to the choices being
- * tried. Each choice moves it its own way: the shape eases its corners
- * (`.look-morph`), the first game grows into the cover, and the flat style
- * wipes across the cards. The sample data is fixed on purpose: the page behind
- * the dialog never leaks into the preview.
+ * tried. Two choices move it from here: the first game grows into the cover,
+ * and the flat style wipes across the cards. The sample data is fixed on
+ * purpose: the page behind the dialog never leaks into the preview.
  */
 export default function LayoutModalPreview() {
   const { T } = useLanguage()
@@ -37,7 +36,7 @@ export default function LayoutModalPreview() {
       data-font={font}
       data-layout={layout}
       data-cards={cards}
-      className="look-morph @container flex h-full flex-col overflow-hidden rounded-card bg-bg-main ring-1 ring-ink/[0.1]"
+      className="@container flex h-full flex-col overflow-hidden rounded-card bg-bg-main ring-1 ring-ink/[0.1]"
     >
       <LayoutModalPreviewHeader />
 

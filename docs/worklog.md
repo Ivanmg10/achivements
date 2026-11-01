@@ -38,13 +38,15 @@ the `2xl` size. On `/racha`: nothing is picked by default, a streak is picked in
 lets go; with one picked only it keeps the accent and a rail spans its weeks; each best streak's bar and place are in its tier's colour.
 **Why** — the user chose A and asked for an animation per change, tried it on the page instead of the canvas; a ring around the days
 and then a halo were both rejected for the streak, and the colour-only version was liked.
-**Decisions** — Native first: CSS transitions for the shape and the card wipe, the view transition API for font and theme, Framer only
-for the card that grows into the cover. The day by day still opens on the streak going now (or the best) with nothing picked, so the
+**Decisions** — Native first: a CSS transition for the card wipe, the view transition API for shape, font and theme, Framer only for the
+card that grows into the cover. The shape first eased its corners inside the sample: the user did not like it, as the bars, the frame
+and the page jumped around it. Then a bare sweep of the whole window, invisible because the two looks are nearly the same colour, so
+it got a band of the accent in the shape chosen (`sweepEdge`; two masks over the transition's pair, whose background is the band). The day by day still opens on the streak going now (or the best) with nothing picked, so the
 card is never empty and the page does not jump. The year stays in the accent, not the tier's colour: the user asked for tier colours
 on the best streaks only. The theme shortlist is six swatches, the person's own always among them, and the rest in `ThemeModal`.
 A theme picked in the modal gets no toast (the dialog stays open and nothing else there toasts); a failed save says so inline.
 **Open** — `npm run build` not rerun since these changes (it breaks the running dev server's CSS, see the entry below); run it before the
-PR. The bars of the sample snap between slanted and round: `clip-path` cannot ease from a polygon to `none`. #102 still lists the Layout modal.
+PR. #102 still lists the Layout modal.
 **Watch out** — Translations are CRLF in the working copy: a script that rewrites one line must keep that, or git shows the whole file changed.
 
 ---
