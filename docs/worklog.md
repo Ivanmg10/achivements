@@ -41,11 +41,10 @@ and then a halo were both rejected for the streak, and the colour-only version w
 **Decisions** — Native first: a CSS transition for the card wipe, the view transition API for shape, font and theme, Framer only for the
 card that grows into the cover. The shape first eased its corners inside the sample: the user did not like it, as the bars, the frame
 and the page jumped around it. Then a bare sweep of the whole window, invisible because the two looks are nearly the same colour, so
-it got a band of the accent in the shape chosen (`sweepEdge`; two masks over the transition's pair, whose background is the band). It
+it got a band of the accent in the shape chosen (`sweepEdge`; the two looks clipped apart, and the band is the background of the transition's pair showing between them). It
 still jerked, measured frame by frame in Chrome on the GPU: 60 fps with no lost frames, the fault was the curve (14 idle frames, the dialog
-crossed in 6 at up to 206 px a frame with a 20 px band). Hence the gentler curve, 1 s, no idle time off screen and a trail. Measure this kind
-of thing in a real window: headless software rendering says 7 fps, and an off-screen window adds a false 1 s. The round mask needs a
-solid layer behind its arc: a circle leaves the corners out, and the band's colour stayed there on the last frames (more on an ultrawide). The day by day still opens on the streak going now (or the best) with nothing picked, so the
+crossed in 6 at up to 206 px a frame with a 20 px band). Hence the gentler curve, 1 s, no idle time off screen and a wider band. Measure this kind
+of thing in a real window: headless software rendering says 7 fps, and an off-screen window adds a false 1 s. The day by day still opens on the streak going now (or the best) with nothing picked, so the
 card is never empty and the page does not jump. The year stays in the accent, not the tier's colour: the user asked for tier colours
 on the best streaks only. The theme shortlist is six swatches, the person's own always among them, and the rest in `ThemeModal`.
 A theme picked in the modal gets no toast (the dialog stays open and nothing else there toasts); a failed save says so inline.
@@ -55,9 +54,13 @@ preferred it in its own dialog, so `ThemeModal` stays open on a pick, spreads fr
 The home's heatmap: the height sets the cell and it stops at 53 weeks, so a row shortened by `--home-fit-trim` left gaps at both sides (cells 30 px → ~22). Cells may now
 grow up to 1.5× wider to fill the card (`cellWidth`), and the trim comes back when the profile shrinks (a `MutationObserver`, which was the `ponytail:` ceiling).
 The header's account link is cut on the slant like a button (only its background, as `Button` does), the one square piece left beside the level and the streak.
-**Open** — `npm run build` not rerun since these changes (it breaks the running dev server's CSS, see the entry below); run it before the
+The home's skeleton now draws the two charts' own loading states: it drew its own grid and bars, which were then swapped for theirs. Daily loads as a line (`LineChartSkeleton`),
+not bars, and no longer shows a "0" that is not known yet.
+**Open** — The user sees the background light up on each change in a modal; not reproduced. Frame by frame in Chrome and Brave the page behind the Layout modal only shows the band
+passing, and the theme modal's overlay neither remounts nor changes opacity. `npm run build` not rerun since these changes (it breaks the running dev server's CSS, see the entry below); run it before the
 PR. #102 still lists the Layout modal.
-**Watch out** — Translations are CRLF in the working copy: a script that rewrites one line must keep that, or git shows the whole file changed.
+**Watch out** — `sharp(buf).extract(a).stats()` ignores the extract: it measures the whole image, which here read as a page lighting up (the band's own share of the frame). Crop to a
+buffer first. A dev server can stop picking up `globals.css` with no error: compare the served CSS before believing a measurement. Translations are CRLF in the working copy: a script that rewrites one line must keep that, or git shows the whole file changed.
 
 ---
 

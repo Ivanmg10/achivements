@@ -38,3 +38,9 @@ test('the pinned view draws the grid; signed out, with no providers, the plain l
   rerender(<MainPageSkeleton />)
   expect(container.querySelector('.home-fit-scroll')).toBeInTheDocument()
 })
+
+test('the charts are the real ones loading, so nothing is swapped when they arrive', () => {
+  const { container } = render(<MainPageSkeleton />)
+  expect(container.querySelector('.home-if-classic [data-testid="heatmap-box"]')).toBeInTheDocument()
+  expect(container.querySelector('.home-if-classic .home-fit-chart path')).toBeInTheDocument()
+})

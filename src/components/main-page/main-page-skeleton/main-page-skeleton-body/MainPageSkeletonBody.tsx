@@ -1,7 +1,9 @@
+import { useLanguage } from '@/context/LanguageContext'
 import { homeFit } from '@/lib/homeFit'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { ChartSkeleton } from '@/components/ui/ChartSkeleton'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
+import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
+import MainPageHeatmap from '../../main-page-charts/MainPageHeatmap'
 import MainPageProfileSkeleton from '../../main-page-profile/main-page-profile-skeleton/MainPageProfileSkeleton'
 import MainPagePortadaSkeleton, { PortadaSideSkeleton } from '../../main-page-portada-skeleton/MainPagePortadaSkeleton'
 
@@ -9,15 +11,19 @@ const ROWS = 6
 const PINS = 4
 const STATS = 6
 const SECTIONS = 7
-const HEAT_CELLS = 7 * 30
+const NO_ACHIEVEMENTS: never[] = []
 
 /**
  * One layout of the home, empty, on the same boxes and `home-fit` classes as
  * the page. Each layout is its own `home-fit` box, because the page's rules ask
  * whether that box holds a `.home-cover`. The profile's platform switch shows
- * by `data-session` on <html>. `label` names the profile's skeleton.
+ * by `data-session` on <html>. `label` names the profile's skeleton. The two
+ * charts are the real ones in their loading state: a skeleton of its own here
+ * would show first, and then be swapped for theirs.
  */
 export default function MainPageSkeletonBody({ cover, pinned, label }: { cover: boolean; pinned: boolean; label: string }) {
+  const { T } = useLanguage()
+
   return (
     <div ref={homeFit} className={`home-fit flex flex-col min-h-full ${cover ? 'home-if-cover' : 'home-if-classic'}`}>
       {cover && <MainPagePortadaSkeleton />}
@@ -75,19 +81,12 @@ export default function MainPageSkeletonBody({ cover, pinned, label }: { cover: 
               ))}
             </div>
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-              <div className="bg-bg-card rounded-tile p-4 flex flex-col gap-3 xl:col-span-2">
-                <Skeleton className="h-4 w-40" />
-                {/* The heatmap's own grid: its loading state draws the same cells. */}
-                <div className="flex-1 min-h-[174px] lg:min-h-40 grid grid-rows-7 grid-flow-col auto-cols-fr gap-1 overflow-hidden">
-                  {Array.from({ length: HEAT_CELLS }, (_, i) => (
-                    <Skeleton key={i} radius="tag" />
-                  ))}
-                </div>
+              <div className="bg-bg-card rounded-tile p-4 flex flex-col gap-3 h-full xl:col-span-2">
+                <MainPageHeatmap achievements={NO_ACHIEVEMENTS} isLoading />
               </div>
-              <div className="bg-bg-card rounded-tile p-4 flex flex-col gap-3">
-                <Skeleton className="h-3 w-32" />
-                <Skeleton className="h-8 w-28" />
-                <div className="home-fit-chart h-[260px]"><ChartSkeleton labels /></div>
+              <div className="bg-bg-card rounded-tile p-4 flex flex-col gap-3 h-full">
+                <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.dailyAchievements}</p>
+                <AchievementsLineChart achievements={NO_ACHIEVEMENTS} isLoading />
               </div>
             </div>
           </div>
