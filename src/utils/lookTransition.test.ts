@@ -49,27 +49,38 @@ test('from a point, the new look spreads from it to the farthest corner', async 
   expect(options.pseudoElement).toBe('::view-transition-new(root)')
 })
 
-test('a shape sweeps across the whole window, the old look leaving room for the band', () => {
+const points = (clip: string) => clip.slice(8, -1).split(', ').map((p) => parseFloat(p))
+
+test('a shape sweeps across the whole window, the band between two clipped looks', () => {
   window.innerWidth = 1000
   window.innerHeight = 500
-  const round = sweepEdge('round')
-  const slanted = sweepEdge('slanted')
-  expect((round.keyframes.maskImage as string[])[0]).toContain('radial-gradient')
-  expect((slanted.keyframes.maskImage as string[])[0]).toContain('linear-gradient(102deg')
-  expect((round.old!.maskImage as string[])[0]).toContain('circle 626px')
-  // Both sides: with the width alone the mask is not the window's height and hides both looks, a full screen of the accent.
-  const [wide, tall] = (slanted.keyframes.maskSize as string[])[0].split(' ').map(parseFloat)
-  expect(tall).toBe(500)
-  // The new look is solid behind the arc, or the band's colour stays in the corners a circle leaves out.
-  expect((round.keyframes.maskImage as string[])[0]).toContain('linear-gradient(#000, #000)')
+  for (const shape of ['round', 'slanted'] as const) {
+    const { keyframes, old } = sweepEdge(shape)
+    const [newFrom, newTo] = keyframes.clipPath as string[]
+    const [oldFrom, oldTo] = old!.clipPath as string[]
+    // The same points at both ends, or a polygon does not ease.
+    expect(points(newFrom)).toHaveLength(points(newTo).length)
 
-  // The edge rides in the mask's middle and starts and ends just out of the window, or it idles there and then lurches.
-  const [from, to] = (slanted.keyframes.maskPosition as string[]).map((at) => parseFloat(at) + wide / 2)
-  expect(from).toBeLessThan(0)
-  expect(from).toBeGreaterThan(-100)
-  expect(to).toBeGreaterThan(1000)
-  expect(to).toBeLessThan(1250)
-  expect(slanted.old!.maskPosition).toEqual(slanted.keyframes.maskPosition)
+    const edge = (clip: string) => points(clip).slice(1, -1)
+    // Starts out of the window on the left, ends out of it on the right, with no idle time past that.
+    expect(Math.max(...edge(newFrom))).toBeLessThanOrEqual(0)
+    expect(Math.min(...edge(newTo))).toBeGreaterThanOrEqual(1000)
+    expect(Math.max(...edge(newFrom))).toBeGreaterThanOrEqual(-100)
+    // The old look starts a band further on.
+    expect(edge(oldFrom)[0] - edge(newFrom)[0]).toBe(40)
+    expect(edge(oldTo)[0] - edge(newTo)[0]).toBe(40)
+  }
+})
+
+test('the edge has the shape chosen: straight and leaning, or curved', () => {
+  window.innerWidth = 1000
+  window.innerHeight = 500
+  const edge = (shape: 'round' | 'slanted') => points((sweepEdge(shape).keyframes.clipPath as string[])[1]).slice(1, -1)
+  const slanted = edge('slanted')
+  expect(slanted[0]).toBeGreaterThan(slanted[slanted.length - 1])
+  const round = edge('round')
+  expect(round[16]).toBeGreaterThan(round[0])
+  expect(round[16]).toBeGreaterThan(round[32])
 })
 
 test('with an old look to move, both are animated together', async () => {
