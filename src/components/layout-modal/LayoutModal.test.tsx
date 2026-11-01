@@ -11,7 +11,7 @@ function group(name: string) {
 test('names itself Layout, with every option in view and no tabs', () => {
   render(<LayoutModal isOpen onClose={jest.fn()} />)
   const dialog = screen.getByRole('dialog', { name: en.homeLayout.layoutLabel })
-  expect(dialog.parentElement).toHaveClass('bg-black/80')
+  expect(dialog.parentElement).toHaveClass('bg-bg-main')
   expect(screen.queryByRole('tab')).not.toBeInTheDocument()
   for (const name of [en.homeLayout.shapeLabel, en.homeLayout.fontLabel, en.homeLayout.label, en.homeLayout.cardsLabel]) {
     expect(screen.getByRole('group', { name })).toBeInTheDocument()

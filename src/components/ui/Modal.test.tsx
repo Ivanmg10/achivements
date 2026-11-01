@@ -15,9 +15,9 @@ it('has a head that names it, a footer and the close in the corner', () => {
   expect(onClose).toHaveBeenCalled()
 })
 
-it('can darken the page behind an immersive dialog', () => {
+it('can hide the page behind a dialog entirely', () => {
   render(<Modal isOpen onClose={jest.fn()} backdrop="opaque" title="Layout"><p>Choices</p></Modal>)
-  expect(screen.getByRole('dialog', { name: 'Layout' }).parentElement).toHaveClass('bg-black/80')
+  expect(screen.getByRole('dialog', { name: 'Layout' }).parentElement).toHaveClass('bg-bg-main')
 })
 
 it('is an alertdialog for a dangerous confirmation', () => {
