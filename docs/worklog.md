@@ -53,7 +53,13 @@ my comparison: a swatch absent from the second run, as the new account had no po
 themes. The audit comment for the issue is written but not posted: the permission system refused `gh issue comment`, so #78's
 "audit comment posted" criterion is still open. The full-width pill buttons are the most debatable part; the user said to look
 at it again if it does not convince them.
-**Watch out** — `rounded-control` is a soft surface despite its name: it must never become a pill. Tailwind's `rounded-sm` is 4 px, the same as a bare
+**Then, from the user's screenshots** — The Following, group and library skeletons asked for `tag` plus `rounded-none`, and the pill won: `Skeleton` has `radius="none"`.
+The account's description was an oval: it, `GroupModal` and `GameAiExportDialog` draw a raw `<textarea>` with `fieldClass`, so they got the pill. `multiline: true` is now
+required by the guard, and a round corner cuts a textarea's grip, so `--area-resize` is none in round. The header's account link is `rounded-nav`. The favourite game, pin
+game and pin achievement modals were a card inside `Modal` (a double frame): now the library's own dialog, with `SearchInput`, and without their own Escape handler. The year's
+streak on `/racha` was a white ring per day: each picked day now fills the gap around it in an opaque tone, so the streak reads as one shape, and has `aria-pressed`.
+**Watch out** — Do not run `npm run build` with `next dev` running: measured 2026-11-01, the dev server stopped seeing `globals.css` afterwards (it kept the old tokens while
+Tailwind picked up new classes) until restarted. `rounded-control` is a soft surface despite its name: it must never become a pill. Tailwind's `rounded-sm` is 4 px, the same as a bare
 `rounded`. The audit's preference must be set on the account too: the account wins over `localStorage` on sign-in, so a test
 that only sets the browser's value renders the other design.
 

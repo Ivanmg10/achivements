@@ -227,7 +227,8 @@ Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes)
   square with nothing failing. **Choose by what the thing is:** a card `rounded-card`, a floating panel `rounded-sheet`,
   an inner tile `rounded-tile`, a thumbnail, row or small box `rounded-box` (`-md`, `-sm`), a heatmap cell `rounded-cell`, a
   button `rounded-button`, an icon button `rounded-icon` or `rounded-chip`, one line of input `rounded-field`, several lines
-  `rounded-area` (`multiline` on `fieldClass`). **`rounded-control` is a soft surface, despite its name** (notices, menus,
+  `rounded-area` (`multiline: true` on `fieldClass`, which the guard requires on a raw `<textarea>`; a round corner cuts its grip,
+  so `[resize:var(--area-resize)]`). A `Modal` draws the frame: never a card inside it. **`rounded-control` is a soft surface, despite its name** (notices, menus,
   tooltips): it must never be a pill, and a real control does not use it. A value new to the slanted block restates what
   that design drew, so it does not move. Outside `ui/`, `uiGuard.test.ts` refuses `rounded-lg`, `-md`, `-sm`, `-xl`, `-2xl`,
   `-3xl` and arbitrary values, on any side, but for its short list of exceptions; a bare `rounded` is only a focus ring's corner.

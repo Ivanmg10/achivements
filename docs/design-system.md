@@ -40,7 +40,7 @@ then `CLAUDE.md` → "The component library" for the hard rules.
   | `rounded-cell` | Heatmap cells, chart bars | 3 px | 5 px |
   | `rounded-button` | Buttons, control groups | 12 px | pill |
   | `rounded-field` | A field of one line | 14 px | pill |
-  | `rounded-icon`, `rounded-chip` | Icon buttons, chips | 9 px, 8 px | circle or pill |
+  | `rounded-icon`, `rounded-chip`, `rounded-nav` | Icon buttons, chips, the header's account link | 9, 8, 10 px | circle or pill |
   | `rounded-tag`, `-tag-sm`, `-badge` | Tags and small badges | 6, 4, 5 px | pill |
 
   `rounded-(--bar-radius)` rounds an accent mark's ends in the round design, and `--button-inset` is the room the slant adds on each side of a button, 0 in round.
