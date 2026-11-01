@@ -1816,8 +1816,6 @@ export const ru: Translations = {
     cardsTintedHint: 'Каждая игра берёт цвет своей обложки.',
     cardsFlatHint: 'Однотонные карточки, как недавние достижения.',
     modalHint: 'Каждое изменение применяется сразу.',
-    themesBack: 'Предыдущие темы',
-    themesOn: 'Другие темы',
     fontLabel: 'Шрифт',
     fontBarlow: 'Barlow',
     fontSofia: 'Sofia Sans · Дружелюбная',

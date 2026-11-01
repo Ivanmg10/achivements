@@ -1816,8 +1816,6 @@ export const pt: Translations = {
     cardsTintedHint: 'Cada jogo toma a cor da sua capa.',
     cardsFlatHint: 'Cartões lisos, como as conquistas recentes.',
     modalHint: 'Cada alteração aplica-se na hora.',
-    themesBack: 'Temas anteriores',
-    themesOn: 'Mais temas',
     fontLabel: 'Tipo de letra',
     fontBarlow: 'Barlow',
     fontSofia: 'Sofia Sans · Amigável',

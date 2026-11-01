@@ -1816,8 +1816,6 @@ export const fr: Translations = {
     cardsTintedHint: 'Chaque jeu prend la couleur de sa jaquette.',
     cardsFlatHint: 'Cartes unies, comme les derniers succès.',
     modalHint: 'Chaque changement s\'applique aussitôt.',
-    themesBack: 'Thèmes précédents',
-    themesOn: 'Plus de thèmes',
     fontLabel: 'Police',
     fontBarlow: 'Barlow',
     fontSofia: 'Sofia Sans · Chaleureuse',

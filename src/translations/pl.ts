@@ -1816,8 +1816,6 @@ export const pl: Translations = {
     cardsTintedHint: 'Każda gra bierze kolor ze swojej okładki.',
     cardsFlatHint: 'Jednolite karty, jak ostatnie osiągnięcia.',
     modalHint: 'Każda zmiana działa od razu.',
-    themesBack: 'Poprzednie motywy',
-    themesOn: 'Więcej motywów',
     fontLabel: 'Czcionka',
     fontBarlow: 'Barlow',
     fontSofia: 'Sofia Sans · Przyjazna',

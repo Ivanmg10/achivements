@@ -1817,8 +1817,6 @@ export const en = {
     cardsTintedHint: 'Each game takes its colour from its art.',
     cardsFlatHint: 'Plain cards, like the recent achievements.',
     modalHint: 'Every change applies at once.',
-    themesBack: 'Previous themes',
-    themesOn: 'More themes',
     fontLabel: 'Font',
     fontBarlow: 'Barlow',
     fontSofia: 'Sofia Sans · Friendly',

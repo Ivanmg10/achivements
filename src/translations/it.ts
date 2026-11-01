@@ -1816,8 +1816,6 @@ export const it: Translations = {
     cardsTintedHint: 'Ogni gioco prende il colore della sua copertina.',
     cardsFlatHint: 'Schede semplici, come gli ultimi obiettivi.',
     modalHint: 'Ogni modifica si applica all\'istante.',
-    themesBack: 'Temi precedenti',
-    themesOn: 'Altri temi',
     fontLabel: 'Carattere',
     fontBarlow: 'Barlow',
     fontSofia: 'Sofia Sans · Cordiale',

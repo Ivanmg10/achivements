@@ -1816,8 +1816,6 @@ export const es: Translations = {
     cardsTintedHint: 'Cada juego toma el color de su portada.',
     cardsFlatHint: 'Tarjetas lisas, como los logros recientes.',
     modalHint: 'Cada cambio se aplica al momento.',
-    themesBack: 'Temas anteriores',
-    themesOn: 'Más temas',
     fontLabel: 'Fuente',
     fontBarlow: 'Barlow',
     fontSofia: 'Sofia Sans · Amable',

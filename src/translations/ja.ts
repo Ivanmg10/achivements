@@ -1816,8 +1816,6 @@ export const ja: Translations = {
     cardsTintedHint: '各ゲームがアートの色を使います。',
     cardsFlatHint: '最近の実績と同じ、無地のカードです。',
     modalHint: '変更はすぐに反映されます。',
-    themesBack: '前のテーマ',
-    themesOn: 'ほかのテーマ',
     fontLabel: 'フォント',
     fontBarlow: 'Barlow',
     fontSofia: 'Sofia Sans · やさしい',

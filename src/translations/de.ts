@@ -1816,8 +1816,6 @@ export const de: Translations = {
     cardsTintedHint: 'Jedes Spiel übernimmt die Farbe seines Bildes.',
     cardsFlatHint: 'Einfarbige Karten, wie die letzten Erfolge.',
     modalHint: 'Jede Änderung gilt sofort.',
-    themesBack: 'Vorherige Themes',
-    themesOn: 'Weitere Themes',
     fontLabel: 'Schriftart',
     fontBarlow: 'Barlow',
     fontSofia: 'Sofia Sans · Freundlich',
