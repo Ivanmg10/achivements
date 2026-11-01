@@ -1,4 +1,4 @@
-import { homeFit, MAX_TRIM } from './homeFit'
+import { HOME_PROFILE_KEY, homeFit, MAX_TRIM } from './homeFit'
 
 function box(height: number, top = 64) {
   const el = document.createElement('main')
@@ -43,6 +43,28 @@ test('measured again when the profile changes, as a trimmed box does not resize 
   await Promise.resolve()
   await Promise.resolve()
   expect(el.style.getPropertyValue('--home-fit-trim')).toBe('0px')
+})
+
+function withProfile(busy: boolean) {
+  const el = box(900)
+  const profile = document.createElement('div')
+  profile.setAttribute('data-home-profile', '')
+  Object.defineProperty(profile, 'offsetHeight', { configurable: true, get: () => 640 })
+  if (busy) profile.innerHTML = '<div aria-busy="true"></div>'
+  el.appendChild(profile)
+  return el
+}
+
+test('remembers how tall the loaded profile ended up, for its skeleton', () => {
+  localStorage.clear()
+  homeFit(withProfile(false))
+  expect(localStorage.getItem(HOME_PROFILE_KEY)).toBe(`${window.innerWidth}:640`)
+})
+
+test('never takes a skeleton for the profile', () => {
+  localStorage.clear()
+  homeFit(withProfile(true))
+  expect(localStorage.getItem(HOME_PROFILE_KEY)).toBeNull()
 })
 
 test('measured again when the window changes, and not after it is gone', () => {

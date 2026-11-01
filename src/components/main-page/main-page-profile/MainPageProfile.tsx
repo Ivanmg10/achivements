@@ -71,7 +71,7 @@ export default function MainPageProfile() {
   if (linked.length <= 1) {
     return (
       <section className="main-content text-text-main m-3 rounded-tile flex flex-col items-center overflow-y-auto">
-        <div className={`w-full flex-1 min-h-0 flex flex-col items-center ${styles.enter}`}>{profiles[tab]}</div>
+        <div data-home-profile className={`w-full flex-1 min-h-0 flex flex-col items-center ${styles.enter}`}>{profiles[tab]}</div>
       </section>
     )
   }
@@ -91,6 +91,7 @@ export default function MainPageProfile() {
         role="tabpanel"
         id={profilePanelId(ID_PREFIX, tab)}
         aria-labelledby={profileTabId(ID_PREFIX, tab)}
+        data-home-profile
         className={`w-full flex-1 min-h-0 flex flex-col ${styles.enter}`}
       >
         {profiles[tab]}

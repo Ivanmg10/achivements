@@ -56,8 +56,11 @@ grow up to 1.5× wider to fill the card (`cellWidth`), and the trim comes back w
 The header's account link is cut on the slant like a button (only its background, as `Button` does), the one square piece left beside the level and the streak.
 The home's skeleton now draws the two charts' own loading states: it drew its own grid and bars, which were then swapped for theirs. Daily loads as a line (`LineChartSkeleton`),
 not bars, and no longer shows a "0" that is not known yet.
-**Open** — The user sees the background light up on each change in a modal; not reproduced. Frame by frame in Chrome and Brave the page behind the Layout modal only shows the band
-passing, and the theme modal's overlay neither remounts nor changes opacity. `npm run build` not rerun since these changes (it breaks the running dev server's CSS, see the entry below); run it before the
+The home's skeleton was taller than the page: the profile's skeleton had a fixed 667 px, which set the whole top of the home to 743 px on any screen. `homeFit` now remembers how tall
+the loaded profile is (`block-height:home-profile`, as `RememberedHeight`) and the skeleton takes exactly that; a first visit has nothing to go by and keeps its natural height.
+**Open** — The user sees the background change on every change in the Layout modal. Not reproduced, in any way tried: per frame the overlay's opacity is constant, and the real screen
+(captured from Windows at 59 samples a second, in Brave, with the user's theme and shape) does not move but for the band. So the cause is unknown; the backdrop was made solid
+(`opaque` in `Modal`, the theme's background, no blur), so nothing of the page can show through it, whatever reacts there. The test account's page is nearly empty, which may be why. `npm run build` not rerun since these changes (it breaks the running dev server's CSS, see the entry below); run it before the
 PR. #102 still lists the Layout modal.
 **Watch out** — `sharp(buf).extract(a).stats()` ignores the extract: it measures the whole image, which here read as a page lighting up (the band's own share of the frame). Crop to a
 buffer first. A dev server can stop picking up `globals.css` with no error: compare the served CSS before believing a measurement. Translations are CRLF in the working copy: a script that rewrites one line must keep that, or git shows the whole file changed.
