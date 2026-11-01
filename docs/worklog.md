@@ -50,7 +50,9 @@ card is never empty and the page does not jump. The year stays in the accent, no
 on the best streaks only. The theme shortlist is six swatches, the person's own always among them, and the rest in `ThemeModal`.
 A theme picked in the modal gets no toast (the dialog stays open and nothing else there toasts); a failed save says so inline.
 The font is tried in the sample and reaches the page when the modal closes: the user did not like seeing the page change behind.
-**Open** — The theme picker: the user does not like the swatches and the second modal; concepts on the canvas (`docs/designs.md`). The home's heatmap
+The theme picker became concept C, a strip under the sample (`LayoutModalThemes`, built from `ThemeModalOption`), which is a grid in the dialog's scroll
+on a phone. Its v2 was published to the canvas unseen and came out broken, so v3 was built and checked on the page.
+**Open** — The home's heatmap
 leaves room at both sides when `--home-fit-trim` shortens its row: cells follow the height and it stops at 53 weeks. Not changed; the user asked why. `npm run build` not rerun since these changes (it breaks the running dev server's CSS, see the entry below); run it before the
 PR. #102 still lists the Layout modal.
 **Watch out** — Translations are CRLF in the working copy: a script that rewrites one line must keep that, or git shows the whole file changed.

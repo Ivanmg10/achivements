@@ -1,12 +1,15 @@
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import LayoutModal from './LayoutModal'
 import { en } from '@/translations/en'
+import { THEMES } from '@/types/types'
 
 const mockChoose = jest.fn()
 const mockSaveError = jest.fn(() => false)
 jest.mock('@/hooks/useThemeChoice', () => ({ useThemeChoice: () => ({ theme: 'dark', choose: mockChoose, saveError: mockSaveError() }) }))
 
 beforeEach(() => {
+  Element.prototype.scrollTo = jest.fn()
+  Element.prototype.scrollBy = jest.fn()
   localStorage.clear()
   mockChoose.mockClear()
   mockSaveError.mockReturnValue(false)
@@ -21,9 +24,10 @@ test('names itself Layout, with every option in view and no tabs', () => {
   const dialog = screen.getByRole('dialog', { name: en.homeLayout.layoutLabel })
   expect(dialog.parentElement).toHaveClass('bg-black/80')
   expect(screen.queryByRole('tab')).not.toBeInTheDocument()
-  for (const name of [en.homeLayout.shapeLabel, en.homeLayout.fontLabel, en.homeLayout.label, en.homeLayout.cardsLabel, en.userTheme.theme]) {
+  for (const name of [en.homeLayout.shapeLabel, en.homeLayout.fontLabel, en.homeLayout.label, en.homeLayout.cardsLabel]) {
     expect(screen.getByRole('group', { name })).toBeInTheDocument()
   }
+  expect(screen.getByRole('radiogroup', { name: en.userTheme.theme })).toBeInTheDocument()
   expect(screen.getByRole('region', { name: en.homeLayout.previewLabel })).toBeInTheDocument()
 })
 
@@ -57,16 +61,29 @@ test('a font is tried in the sample and reaches the page on the way out', () => 
   expect(onClose).toHaveBeenCalledTimes(1)
 })
 
-test('a swatch chooses its theme; the one already on does nothing', () => {
+test('every theme is there, and one is chosen with a click; the one already on does nothing', () => {
   render(<LayoutModal isOpen onClose={jest.fn()} />)
-  const themes = group(en.userTheme.theme)
+  expect(screen.getAllByRole('radio')).toHaveLength(THEMES.length)
 
-  fireEvent.click(themes.getByRole('button', { name: en.userTheme.name_dark }))
+  fireEvent.click(screen.getByRole('radio', { name: en.userTheme.name_dark }))
   expect(mockChoose).not.toHaveBeenCalled()
-  expect(themes.getByRole('button', { name: en.userTheme.name_dark })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByRole('radio', { name: en.userTheme.name_dark })).toHaveAttribute('aria-checked', 'true')
 
-  fireEvent.click(themes.getByRole('button', { name: en.userTheme.name_ocean }))
+  fireEvent.click(screen.getByRole('radio', { name: en.userTheme.name_ocean }))
   expect(mockChoose).toHaveBeenCalledWith('ocean')
+})
+
+test('the pills say where the strip is and jump to a family; the arrows move it', () => {
+  render(<LayoutModal isOpen onClose={jest.fn()} />)
+  const games = screen.getByRole('button', { name: new RegExp(en.userTheme.group_games) })
+  expect(screen.getByRole('button', { name: new RegExp(en.userTheme.group_base) })).toHaveAttribute('aria-pressed', 'true')
+
+  ;(Element.prototype.scrollTo as jest.Mock).mockClear()
+  fireEvent.click(games)
+  expect(Element.prototype.scrollTo).toHaveBeenCalledTimes(1)
+
+  fireEvent.click(screen.getByRole('button', { name: en.homeLayout.themesOn }))
+  expect(Element.prototype.scrollBy).toHaveBeenCalledTimes(1)
 })
 
 test('a failed theme save says so in place, since the dialog stays open', () => {

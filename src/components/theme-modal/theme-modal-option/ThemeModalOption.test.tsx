@@ -8,7 +8,7 @@ test('names the theme, reports whether it is current and picks it on click', () 
   const radio = screen.getByRole('radio', { name: en.userTheme.name_clank })
   expect(radio).toHaveAttribute('aria-checked', 'false')
   fireEvent.click(radio)
-  expect(onSelect).toHaveBeenCalledWith('clank')
+  expect(onSelect).toHaveBeenCalledWith('clank', expect.anything())
 })
 
 test('the current theme is ticked, not told by colour alone', () => {

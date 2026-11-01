@@ -25,8 +25,9 @@ const fontName = (font: FontStyle, name: string) => <span data-font={font} class
 
 /**
  * Where the site's look is chosen: every option in view at once, beside a sample
- * home that follows them (fixed on top of them on a phone). Each kind of
- * change moves in its own way, see `LayoutModalPreview` and `LayoutModalThemes`.
+ * home that follows them, with the themes running under both (the sample stays
+ * fixed on top of it all on a phone). Each kind of change moves in its own way,
+ * see `LayoutModalPreview` and `LayoutModalThemes`.
  * Each choice is kept the moment it is made, but for the font: it is tried in
  * the sample, and the page takes it on the way out, however the dialog closes,
  * so its text does not change behind (the user's call, 2026-11-01).
@@ -52,12 +53,13 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
 
   return (
     <Modal isOpen={isOpen} onClose={close} size="2xl" backdrop="opaque" title={T.homeLayout.layoutLabel} hint={T.homeLayout.modalHint} className="gap-0">
-      <div className="flex flex-col gap-5 lg:grid lg:h-[min(36rem,calc(92dvh-8rem))] lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-6">
-        <div className="sticky top-0 z-10 h-56 shrink-0 bg-bg-header lg:static lg:h-auto lg:min-h-0 min-w-0">
-          <LayoutModalPreview font={shownFont} />
-        </div>
+      <div className="flex flex-col gap-5 lg:h-[min(46rem,calc(92dvh-8rem))] lg:gap-3">
+        <div className="max-lg:contents lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[minmax(0,1fr)] lg:gap-6">
+          <div className="sticky -top-5 z-10 -mt-5 h-[17.5rem] shrink-0 bg-bg-header pt-5 pb-3 lg:static lg:mt-0 lg:h-auto lg:min-h-0 lg:p-0 min-w-0">
+            <LayoutModalPreview font={shownFont} />
+          </div>
 
-        <div className="flex min-w-0 flex-col gap-5 lg:overflow-y-auto lg:pr-1">
+          <div className="flex min-w-0 flex-col gap-5 lg:justify-between lg:gap-3 lg:overflow-y-auto lg:pr-1">
           <LayoutChoice
             label={T.homeLayout.shapeLabel}
             value={shape}
@@ -95,8 +97,10 @@ export default function LayoutModal({ isOpen, onClose }: { isOpen: boolean; onCl
               { value: 'flat', label: T.homeLayout.cardsFlat },
             ]}
           />
-          <LayoutModalThemes />
+          </div>
         </div>
+
+        <LayoutModalThemes />
       </div>
     </Modal>
   )
