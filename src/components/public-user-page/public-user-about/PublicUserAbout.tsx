@@ -86,9 +86,9 @@ export default function PublicUserAbout({ user }: { user: CheevoUser }) {
                     className="flex items-center gap-2.5 p-2 rounded-tile bg-bg-main hover:bg-ink/10 transition-colors min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                   >
                     {icon ? (
-                      <Image src={icon} alt="" width={36} height={36} className="w-9 h-9 rounded-lg object-cover shrink-0" unoptimized />
+                      <Image src={icon} alt="" width={36} height={36} className="w-9 h-9 rounded-box object-cover shrink-0" unoptimized />
                     ) : (
-                      <span aria-hidden="true" className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
+                      <span aria-hidden="true" className="w-9 h-9 rounded-box bg-ink/10 shrink-0" />
                     )}
                     <span className="text-sm font-medium truncate flex-1">{game!.title}</span>
                     <span className="shrink-0">{PLATFORM_ICONS[source]}</span>

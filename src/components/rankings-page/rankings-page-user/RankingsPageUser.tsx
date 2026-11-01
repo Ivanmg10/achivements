@@ -42,7 +42,7 @@ export default function RankingsPageUser({
   const name = (
     <span className={`truncate ${nameClass}`}>
       {row.username}
-      {row.isMe && <span className="ml-1.5 align-middle text-[10px] uppercase tracking-wider font-bold text-accent bg-accent/15 px-1.5 py-0.5 rounded-md">{T.rankings.you}</span>}
+      {row.isMe && <span className="ml-1.5 align-middle text-[10px] uppercase tracking-wider font-bold text-accent bg-accent/15 px-1.5 py-0.5 rounded-tag">{T.rankings.you}</span>}
     </span>
   )
 

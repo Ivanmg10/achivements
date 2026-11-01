@@ -43,7 +43,7 @@ function Library() {
           <span className="flex-1 flex flex-col gap-2">
             <span className="flex items-center gap-2">
               <Bar w={row.w} strong />
-              {row.rare && <span className="text-[0.625rem] font-bold px-1.5 py-0.5 rounded-md bg-[#e5b53f]/20 text-[#e5b53f]">0.8%</span>}
+              {row.rare && <span className="text-[0.625rem] font-bold px-1.5 py-0.5 rounded-tag bg-[#e5b53f]/20 text-[#e5b53f]">0.8%</span>}
             </span>
             <ProgressBar pct={row.pct} label="" />
           </span>
@@ -71,7 +71,7 @@ function Collect() {
       <div className={`${CARD} flex items-center gap-3 p-3`}>
         <span className="relative w-14 h-14 shrink-0">
           {ARTS.slice(0, 3).map((art, i) => (
-            <span key={i} className="absolute w-10 h-10 rounded-lg ring-2 ring-bg-card" style={{ background: art, left: i * 6, top: i * 4 }} />
+            <span key={i} className="absolute w-10 h-10 rounded-box ring-2 ring-bg-card" style={{ background: art, left: i * 6, top: i * 4 }} />
           ))}
         </span>
         <span className="flex-1 flex flex-col gap-2"><span className="flex items-center gap-2 text-text-secondary"><IconFolder size={16} /><Bar w="45%" strong /></span><Bar w="30%" /></span>
@@ -114,7 +114,7 @@ function Streak() {
       <div className={`${CARD} p-3`}>
         <div className="grid grid-flow-col grid-rows-7 gap-1">
           {cells.map((level, i) => (
-            <span key={i} className={`aspect-square rounded-[3px] ${shade[level]}`} />
+            <span key={i} className={`aspect-square rounded-cell ${shade[level]}`} />
           ))}
         </div>
       </div>
@@ -163,7 +163,7 @@ function Friends() {
             {f.online && <span className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-success ring-[3px] ring-bg-card" />}
           </span>
           <span className="flex-1 flex flex-col gap-2"><Bar w="38%" strong /><Bar w={f.w} /></span>
-          <span className="w-10 h-10 rounded-lg shrink-0" style={{ background: f.art }} />
+          <span className="w-10 h-10 rounded-box shrink-0" style={{ background: f.art }} />
         </div>
       ))}
       <div className={`${CARD} p-3 flex items-center gap-3`}>

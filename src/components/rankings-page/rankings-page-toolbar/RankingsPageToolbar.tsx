@@ -50,7 +50,7 @@ export default function RankingsPageToolbar({
         <div role="group" aria-label={T.rankings.platform} className="flex flex-wrap gap-1 pr-2.5 mr-0.5 shadow-[inset_-1px_0_0_rgb(var(--ink)/0.1)]">
           {sources.map((s) => (
             <button key={s} type="button" aria-pressed={view.source === s} onClick={() => set({ source: s })} className={pillClass(view.source === s)}>
-              {s !== 'all' && <span aria-hidden="true" className={`w-3 h-3 rounded-[3px] ${PLATFORM_FILL[s]}`} />}
+              {s !== 'all' && <span aria-hidden="true" className={`w-3 h-3 rounded-cell ${PLATFORM_FILL[s]}`} />}
               {s === 'all' ? T.rankings.allPlatforms : PLATFORM_NAMES[s]}
             </button>
           ))}

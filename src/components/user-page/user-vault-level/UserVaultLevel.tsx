@@ -27,7 +27,7 @@ export default function UserVaultLevel() {
     <div className="flex flex-col gap-2 rounded-pane bg-bg-main p-4 enter-rise">
       <Link
         href="/rankings"
-        className="group flex flex-col gap-2 rounded-lg -m-1 p-1 hover:bg-ink/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="group flex flex-col gap-2 rounded-box -m-1 p-1 hover:bg-ink/[0.06] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
         <span className="flex items-center justify-between gap-2 min-w-0">
           <span className="flex items-center gap-2 min-w-0">

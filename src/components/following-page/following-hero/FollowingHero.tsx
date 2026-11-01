@@ -75,7 +75,7 @@ export default function FollowingHero({ users, isLoading = false, className = ''
                 </span>
               ))}
               {more > 0 && (
-                <span className="ml-1.5 h-9 px-2 rounded-[0.5rem] bg-ink/[0.08] text-xs font-bold text-text-secondary flex items-center tabular-nums">
+                <span className="ml-1.5 h-9 px-2 rounded-chip bg-ink/[0.08] text-xs font-bold text-text-secondary flex items-center tabular-nums">
                   +{more.toLocaleString(lang)}
                 </span>
               )}

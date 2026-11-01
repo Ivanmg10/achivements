@@ -43,21 +43,21 @@ export default function WelcomePageRaGuide() {
         <div className="h-10 flex items-center gap-2 px-3 bg-[#1d1e27] border-b border-[#2a2c3a]">
           <span className="w-2.5 h-2.5 rounded-full bg-[#3a3d4c]" />
           <span className="w-2.5 h-2.5 rounded-full bg-[#3a3d4c]" />
-          <span className="flex-1 ml-2 h-5.5 rounded-md bg-[#0f1014] text-[0.6875rem] text-[#8c919b] flex items-center px-2.5">retroachievements.org</span>
-          <span className={`${styles.settings} px-2.5 py-1 rounded-md text-xs`}>Settings</span>
+          <span className="flex-1 ml-2 h-5.5 rounded-box-md bg-[#0f1014] text-[0.6875rem] text-[#8c919b] flex items-center px-2.5">retroachievements.org</span>
+          <span className={`${styles.settings} px-2.5 py-1 rounded-box-md text-xs`}>Settings</span>
         </div>
         <div className={`${styles.page} absolute inset-x-0 top-10 bottom-0 flex`}>
           <div className="w-32 px-2.5 py-4 flex flex-col gap-1.5 border-r border-[#2a2c3a] text-xs">
-            <span className="px-2.5 py-2 rounded-lg text-[#a3a8b3]">Profile</span>
-            <span className="px-2.5 py-2 rounded-lg text-[#a3a8b3]">Preferences</span>
-            <span className={`${styles.keysItem} px-2.5 py-2 rounded-lg`}>Keys</span>
+            <span className="px-2.5 py-2 rounded-box text-[#a3a8b3]">Profile</span>
+            <span className="px-2.5 py-2 rounded-box text-[#a3a8b3]">Preferences</span>
+            <span className={`${styles.keysItem} px-2.5 py-2 rounded-box`}>Keys</span>
           </div>
           <div className={`${styles.keys} flex-1 p-5 flex flex-col gap-3`}>
             <span className="font-bold text-sm">Keys</span>
             <span className="text-xs text-[#a3a8b3]">Web API Key</span>
             <div className="flex gap-2 items-center">
-              <span className="flex-1 h-9 rounded-lg bg-[#0f1014] ring-1 ring-inset ring-[#2a2c3a] flex items-center px-2.5 font-mono text-[#c9ccd4]">••••••••••••</span>
-              <span className="h-9 px-3 rounded-lg bg-[#2a2c3a] flex items-center text-xs">Copy</span>
+              <span className="flex-1 h-9 rounded-box bg-[#0f1014] ring-1 ring-inset ring-[#2a2c3a] flex items-center px-2.5 font-mono text-[#c9ccd4]">••••••••••••</span>
+              <span className="h-9 px-3 rounded-box bg-[#2a2c3a] flex items-center text-xs">Copy</span>
             </div>
             <span className={`${styles.copied} text-xs text-[#e5b53f]`}>{t.guideCopied}</span>
           </div>

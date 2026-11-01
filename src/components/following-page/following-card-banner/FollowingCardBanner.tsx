@@ -43,7 +43,7 @@ export default function FollowingCardBanner({ friend, lastPlayed }: { friend: Fr
         {lastPlayed && (
           <Link
             href={gameHref(lastPlayed.source, lastPlayed.id, friend.username)}
-            className="flex items-center gap-2 min-w-0 max-w-[85%] rounded-lg bg-black/45 backdrop-blur-sm px-2.5 py-1.5 hover:bg-black/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="flex items-center gap-2 min-w-0 max-w-[85%] rounded-box bg-black/45 backdrop-blur-sm px-2.5 py-1.5 hover:bg-black/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <PlatformLogo source={lastPlayed.source} size={12} label={PLATFORM_NAME[lastPlayed.source]} />
             <span className="flex flex-col min-w-0">

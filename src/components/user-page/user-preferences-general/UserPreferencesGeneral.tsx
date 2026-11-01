@@ -53,7 +53,7 @@ export default function UserPreferencesGeneral({
     <div className="flex flex-col divide-y divide-ink/[0.06] [&>*]:py-2">
       <ProfileField label={T.userTheme.theme} icon={<IconPalette size={18} />} onEdit={onOpenTheme}>
         <span className="flex items-center gap-2 min-w-0">
-          <span aria-hidden="true" className="w-3.5 h-3.5 rounded-[0.25rem] bg-accent shrink-0 skew-x-(--slant-pill)" />
+          <span aria-hidden="true" className="w-3.5 h-3.5 rounded-box-sm bg-accent shrink-0 skew-x-(--slant-pill)" />
           <span className="text-[0.9375rem] font-bold truncate">{T.userTheme[`name_${theme}`]}</span>
         </span>
       </ProfileField>

@@ -119,7 +119,7 @@ export default function RankingsPageLevelPanel({ me }: { me: VaultMe }) {
             {PLATFORM_ORDER.filter((s) => (me.split[s] ?? 0) > 0).map((s) => (
               <div key={s} className="contents">
                 <dt className="flex items-center gap-2">
-                  <span aria-hidden="true" className={`w-2.5 h-2.5 rounded-[3px] ${PLATFORM_FILL[s]}`} />
+                  <span aria-hidden="true" className={`w-2.5 h-2.5 rounded-cell ${PLATFORM_FILL[s]}`} />
                   {PLATFORM_NAMES[s]}
                 </dt>
                 <dd className="font-bold tabular-nums text-right">{n(me.split[s] ?? 0)}</dd>

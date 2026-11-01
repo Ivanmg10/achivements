@@ -1,6 +1,6 @@
 import type { HomeLayout } from '@/hooks/useHomeLayout'
 
-const BAR = 'block h-2 w-1/2 rounded-sm bg-ink/10'
+const BAR = 'block h-2 w-1/2 rounded-full bg-ink/10'
 const ROW = 'block h-4 rounded-[0.3125rem]'
 const SIDE = 'block rounded-[0.3125rem] bg-ink/[0.08]'
 

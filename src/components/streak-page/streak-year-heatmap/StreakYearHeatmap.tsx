@@ -89,11 +89,11 @@ export default function StreakYearHeatmap({
                       onClick={() => onSelect(streak)}
                       aria-label={label}
                       title={label}
-                      className={`w-full rounded-[3px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${inSelected ? 'ring-2 ring-text-main ring-offset-1 ring-offset-bg-card' : 'hover:ring-1 hover:ring-text-main/60'}`}
+                      className={`w-full rounded-cell focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${inSelected ? 'ring-2 ring-text-main ring-offset-1 ring-offset-bg-card' : 'hover:ring-1 hover:ring-text-main/60'}`}
                       style={style}
                     />
                   ) : (
-                    <span key={day} title={label} className="w-full rounded-[3px]" style={style} />
+                    <span key={day} title={label} className="w-full rounded-cell" style={style} />
                   )
                 })}
               </div>

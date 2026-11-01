@@ -46,7 +46,7 @@ export default function UserConsolesPreference({ source, consoles }: { source: G
           const id = `console-${source}-${c.name}`
           return (
             <li key={c.name}>
-              <Checkbox id={id} checked={!hidden.has(c.name)} onChange={() => toggle(c.name)} className="rounded-lg px-2 py-1.5 hover:bg-ink/5 text-sm">
+              <Checkbox id={id} checked={!hidden.has(c.name)} onChange={() => toggle(c.name)} className="rounded-box px-2 py-1.5 hover:bg-ink/5 text-sm">
                 <span className="flex items-center gap-2">
                   <span className="truncate flex-1">{c.name}</span>
                 <span className="text-xs text-text-secondary tabular-nums">{c.count}</span>
