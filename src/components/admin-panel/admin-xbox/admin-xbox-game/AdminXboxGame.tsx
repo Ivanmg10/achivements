@@ -32,9 +32,9 @@ export default function AdminXboxGame({ xuid, game }: { xuid: string; game: Xbox
         className="w-full flex items-center gap-3 p-3 text-left rounded-tile focus-visible:ring-2 focus-visible:ring-accent/70 outline-none"
       >
         {game.imageIcon ? (
-          <img src={game.imageIcon} alt="" width={40} height={40} loading="lazy" decoding="async" className="size-10 rounded-md object-cover shrink-0" />
+          <img src={game.imageIcon} alt="" width={40} height={40} loading="lazy" decoding="async" className="size-10 rounded-box-md object-cover shrink-0" />
         ) : (
-          <span className="size-10 rounded-md bg-ink/10 shrink-0" aria-hidden="true" />
+          <span className="size-10 rounded-box-md bg-ink/10 shrink-0" aria-hidden="true" />
         )}
         <span className="flex-1 min-w-0">
           <span className="block text-sm font-semibold truncate">{game.title}</span>

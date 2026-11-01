@@ -108,7 +108,7 @@ export default function ShowcasePickerModal({ isOpen, onClose }: { isOpen: boole
                 type="button"
                 onClick={onClose}
                 aria-label={T.toast.close}
-                className="p-1 rounded-lg text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="p-1 rounded-chip text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 <IconX size={18} aria-hidden="true" />
               </button>

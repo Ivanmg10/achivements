@@ -325,7 +325,7 @@ export default function AuthCollagePanel() {
                         src={src}
                         alt=""
                         aria-hidden="true"
-                        className="w-16 h-16 sm:w-20 sm:h-20 xl:w-24 xl:h-24 object-cover rounded-lg"
+                        className="w-16 h-16 sm:w-20 sm:h-20 xl:w-24 xl:h-24 object-cover rounded-box"
                         loading="lazy"
                         decoding="async"
                         // Decoration: never ahead of the form or its fonts.

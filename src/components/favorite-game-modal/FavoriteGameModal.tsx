@@ -114,7 +114,7 @@ export default function FavoriteGameModal({
                 <button
                   onClick={onClose}
                   aria-label="Close"
-                  className="p-1 rounded-lg text-text-secondary hover:text-text-main transition-colors"
+                  className="p-1 rounded-chip text-text-secondary hover:text-text-main transition-colors"
                 >
                   <IconX className="w-4 h-4" aria-hidden />
                 </button>
@@ -128,11 +128,11 @@ export default function FavoriteGameModal({
                       alt=""
                       width={28}
                       height={28}
-                      className="w-7 h-7 rounded object-cover shrink-0"
+                      className="w-7 h-7 rounded-box-sm object-cover shrink-0"
                       unoptimized
                     />
                   ) : (
-                    <div className="w-7 h-7 rounded bg-ink/10 shrink-0" aria-hidden="true" />
+                    <div className="w-7 h-7 rounded-box-sm bg-ink/10 shrink-0" aria-hidden="true" />
                   )}
                   <span className="flex-1 text-sm font-medium text-accent line-clamp-1">{current.title}</span>
                   <button

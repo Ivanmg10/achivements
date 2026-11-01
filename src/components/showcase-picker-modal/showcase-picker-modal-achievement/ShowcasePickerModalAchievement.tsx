@@ -63,11 +63,11 @@ export default function ShowcasePickerModalAchievement({
             alt=""
             width={56}
             height={56}
-            className={`w-14 h-14 rounded-lg object-cover ${earned ? '' : 'grayscale opacity-40'}`}
+            className={`w-14 h-14 rounded-box object-cover ${earned ? '' : 'grayscale opacity-40'}`}
             unoptimized
           />
         ) : (
-          <span aria-hidden="true" className="w-14 h-14 rounded-lg bg-ink/10 flex items-center justify-center text-text-secondary">
+          <span aria-hidden="true" className="w-14 h-14 rounded-box bg-ink/10 flex items-center justify-center text-text-secondary">
             <IconTrophy size={22} />
           </span>
         )}

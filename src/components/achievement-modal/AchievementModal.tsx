@@ -291,7 +291,7 @@ export default function AchievementModal({
                           <button
                             onClick={() => setCommentsPage((p) => Math.max(0, p - 1))}
                             disabled={commentsPage === 0}
-                            className="px-2 py-0.5 text-xs rounded bg-bg-card disabled:opacity-30 hover:bg-bg-header transition-colors"
+                            className="px-2 py-0.5 text-xs rounded-tag-sm bg-bg-card disabled:opacity-30 hover:bg-bg-header transition-colors"
                           >
                             ←
                           </button>
@@ -301,7 +301,7 @@ export default function AchievementModal({
                           <button
                             onClick={() => setCommentsPage((p) => Math.min(totalPages - 1, p + 1))}
                             disabled={commentsPage === totalPages - 1}
-                            className="px-2 py-0.5 text-xs rounded bg-bg-card disabled:opacity-30 hover:bg-bg-header transition-colors"
+                            className="px-2 py-0.5 text-xs rounded-tag-sm bg-bg-card disabled:opacity-30 hover:bg-bg-header transition-colors"
                           >
                             →
                           </button>

@@ -57,7 +57,7 @@ export default function GameAiExportDialog({ source, onClose }: { source: AiExpo
             type="button"
             onClick={onClose}
             aria-label={T.aiExport.close}
-            className="p-1 rounded-lg text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <IconX className="w-5 h-5" aria-hidden="true" />
           </button>

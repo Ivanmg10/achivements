@@ -37,7 +37,7 @@ export default function ShowcaseTile({
           type="button"
           onClick={onRemove}
           aria-label={`${T.showcase.remove}: ${item.title}`}
-          className="absolute right-1.5 top-1.5 p-1 rounded-md text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="absolute right-1.5 top-1.5 p-1 rounded-box-md text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <IconX size={14} aria-hidden="true" />
         </button>

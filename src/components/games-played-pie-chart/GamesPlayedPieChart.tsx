@@ -61,14 +61,14 @@ export default function ConsolesPieChart({ games, isLoading }: { games: RetroAch
 
               {/* column track */}
               <div
-                className="flex-1 w-full rounded-md flex flex-col justify-end min-h-0 overflow-hidden"
+                className="flex-1 w-full rounded-box-md flex flex-col justify-end min-h-0 overflow-hidden"
                 style={{ backgroundColor: `${color}18` }}
               >
                 {/* spacer */}
                 <div style={{ flexGrow: max - value }} />
                 {/* bar */}
                 <div
-                  className="w-full rounded-md"
+                  className="w-full rounded-box-md"
                   style={{
                     flexGrow: value,
                     minHeight: '6px',

@@ -37,7 +37,7 @@ export default function LibraryListRow({ entry, current, category, onSelect }: {
       {/* The game's colour: a flat tint behind the neutral hairline, as the home's rows. */}
       <GameCardBackdrop src={entryIcon(entry)} surface="main" />
       {/* Same destination as the title, so it is kept out of the tab order. */}
-      <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0 rounded-lg shadow-[0_6px_16px_rgb(0_0_0/0.45)] hover:ring-2 hover:ring-ink/40 transition-shadow">
+      <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0 rounded-box shadow-[0_6px_16px_rgb(0_0_0/0.45)] hover:ring-2 hover:ring-ink/40 transition-shadow">
         <LibraryEntryCover entry={entry} size={52} />
       </Link>
       <div className="flex flex-col gap-1.5 min-w-0 flex-1">

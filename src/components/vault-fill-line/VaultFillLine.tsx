@@ -20,7 +20,7 @@ export default function VaultFillLine({ source }: { source: GameSource }) {
 
   if (p.state === 'error') {
     return (
-      <p role="alert" className="text-xs rounded-lg px-2.5 py-1.5 bg-danger/10 ring-1 ring-danger/30">
+      <p role="alert" className="text-xs rounded-chip px-2.5 py-1.5 bg-danger/10 ring-1 ring-danger/30">
         {message}
       </p>
     )

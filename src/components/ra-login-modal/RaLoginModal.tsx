@@ -71,14 +71,14 @@ export default function RaLoginModal({
         {!isLoading ? (
           <button
             type="submit"
-            className="bg-bg-main p-3 rounded-lg hover:scale-[1.03] transition-transform duration-200"
+            className="bg-bg-main p-3 rounded-box hover:scale-[1.03] transition-transform duration-200"
           >
             {T.raLoginModal.signIn}
           </button>
         ) : (
           <button
             disabled
-            className="bg-bg-main p-3 rounded-lg flex justify-center items-center"
+            className="bg-bg-main p-3 rounded-box flex justify-center items-center"
           >
             <Spinner size={12} />
           </button>

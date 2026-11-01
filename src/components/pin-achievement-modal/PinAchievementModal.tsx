@@ -88,7 +88,7 @@ export function PinAchievementModal({
                 </p>
                 <button
                   onClick={onClose}
-                  className="p-1 rounded-lg text-text-secondary hover:text-text-main transition-colors shrink-0"
+                  className="p-1 rounded-chip text-text-secondary hover:text-text-main transition-colors shrink-0"
                   aria-label="Close"
                 >
                   <IconX className="w-4 h-4" aria-hidden />
@@ -120,11 +120,11 @@ export function PinAchievementModal({
                           alt={a.Title}
                           width={36}
                           height={36}
-                          className="w-9 h-9 rounded-lg object-cover grayscale opacity-70 shrink-0"
+                          className="w-9 h-9 rounded-box object-cover grayscale opacity-70 shrink-0"
                           unoptimized
                         />
                       ) : (
-                        <div className="w-9 h-9 rounded-lg bg-ink/10 shrink-0" />
+                        <div className="w-9 h-9 rounded-box bg-ink/10 shrink-0" />
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-text-main truncate">{a.Title}</p>

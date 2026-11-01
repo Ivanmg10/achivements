@@ -20,8 +20,8 @@ export default function LayoutModalPreviewSampleProfile() {
         <StatPill size="sm" label={T.sidePanel.streak} value={12} />
       </div>
       <div className="mt-3 flex flex-col gap-2">
-        <span className="h-2 rounded-sm bg-ink/10" />
-        <span className="h-2 w-2/3 rounded-sm bg-ink/10" />
+        <span className="h-2 rounded-full bg-ink/10" />
+        <span className="h-2 w-2/3 rounded-full bg-ink/10" />
       </div>
     </aside>
   )

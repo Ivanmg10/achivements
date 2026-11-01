@@ -130,7 +130,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
                 />
                 <button
                   onClick={onClose}
-                  className="p-1 rounded-lg text-text-secondary hover:text-text-main transition-colors shrink-0"
+                  className="p-1 rounded-chip text-text-secondary hover:text-text-main transition-colors shrink-0"
                   aria-label="Close"
                 >
                   <IconX className="w-4 h-4" aria-hidden />
@@ -148,7 +148,7 @@ export default function PinGameModal({ isOpen, onClose }: { isOpen: boolean; onC
                       aria-pressed={selected.has(directKey)}
                       className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left border-t border-ink/5 ${selected.has(directKey) ? 'bg-accent/10' : 'hover:bg-bg-main'}`}
                     >
-                      <div className="w-8 h-8 rounded bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">
+                      <div className="w-8 h-8 rounded-box-sm bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">
                         ID
                       </div>
                       <div className="flex-1 min-w-0">

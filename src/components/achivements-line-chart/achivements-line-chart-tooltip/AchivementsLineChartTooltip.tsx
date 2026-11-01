@@ -35,7 +35,7 @@ export default function AchivementsLineChartTooltip({
       ) : (
         rows.map((r) => (
           <span key={r.name} className="flex items-center gap-2 text-text-secondary">
-            <span aria-hidden="true" className={`w-2 h-2 rounded-sm ${r.swatch}`} />
+            <span aria-hidden="true" className={`w-2 h-2 rounded-full ${r.swatch}`} />
             {r.name}
             <span className="ml-auto pl-3 font-semibold tabular-nums text-text-main">{r.value}</span>
           </span>

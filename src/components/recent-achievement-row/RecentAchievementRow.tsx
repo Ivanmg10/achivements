@@ -22,9 +22,9 @@ export default function RecentAchievementRow({ ach, onNavigate }: { ach: RecentA
       className="flex gap-2 items-center p-3 rounded-tile bg-bg-main hover:bg-bg-card transition-colors group min-w-0"
     >
       {badge ? (
-        <Image src={badge} alt={ach.Title} width={36} height={36} className="rounded shrink-0" unoptimized={isSteam} />
+        <Image src={badge} alt={ach.Title} width={36} height={36} className="rounded-box-sm shrink-0" unoptimized={isSteam} />
       ) : (
-        <div className="w-9 h-9 rounded bg-ink/10 shrink-0" />
+        <div className="w-9 h-9 rounded-box-sm bg-ink/10 shrink-0" />
       )}
       <div className="flex flex-col min-w-0 flex-1 gap-0.5">
         <span className="text-xs font-semibold text-text-main group-hover:text-accent transition-colors line-clamp-2">

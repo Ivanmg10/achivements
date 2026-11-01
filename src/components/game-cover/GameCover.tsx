@@ -26,7 +26,7 @@ export default function GameCover({
 }) {
   const boxArt = useRaBoxArt(source === 'ra' ? [id] : [])
   const art = source === 'ra' ? boxArt[id] ?? iconUrl : source === 'psn' || source === 'xbox' ? iconUrl : undefined
-  const img = 'h-full w-auto max-w-full object-contain rounded-lg ring-1 ring-ink/10 shadow-xl shadow-black/40'
+  const img = 'h-full w-auto max-w-full object-contain rounded-box ring-1 ring-ink/10 shadow-xl shadow-black/40'
 
   const picture =
     source === 'steam' ? (
@@ -34,7 +34,7 @@ export default function GameCover({
     ) : art ? (
       <Image src={art} alt="" width={240} height={320} unoptimized className={img} />
     ) : (
-      <span className="h-full aspect-[3/4] rounded-lg bg-bg-main" />
+      <span className="h-full aspect-[3/4] rounded-box bg-bg-main" />
     )
 
   return (

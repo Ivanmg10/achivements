@@ -25,9 +25,9 @@ export default function ShowcasePickerModalGameRow({ game, selected, onOpen }: {
       }`}
     >
       {game.iconUrl ? (
-        <Image src={game.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-lg object-cover shrink-0" unoptimized />
+        <Image src={game.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-box object-cover shrink-0" unoptimized />
       ) : (
-        <span aria-hidden="true" className="w-10 h-10 rounded-lg bg-ink/10 flex items-center justify-center text-text-secondary shrink-0">
+        <span aria-hidden="true" className="w-10 h-10 rounded-box bg-ink/10 flex items-center justify-center text-text-secondary shrink-0">
           <IconDeviceGamepad2 size={18} />
         </span>
       )}

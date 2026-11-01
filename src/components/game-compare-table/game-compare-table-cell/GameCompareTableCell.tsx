@@ -25,7 +25,7 @@ export default function GameCompareTableCell({
   const date = formatUnlockDate(unlock?.earnedAt ?? null, lang)
 
   return (
-    <div className={`rounded-lg px-2.5 py-1.5 ring-1 flex flex-col gap-0.5 min-w-0 ${earned ? 'bg-success/10 ring-success/20' : 'bg-ink/[0.04] ring-ink/5'}`}>
+    <div className={`rounded-box px-2.5 py-1.5 ring-1 flex flex-col gap-0.5 min-w-0 ${earned ? 'bg-success/10 ring-success/20' : 'bg-ink/[0.04] ring-ink/5'}`}>
       <span className="text-[10px] uppercase tracking-wider text-text-secondary truncate">{who}</span>
       {loading ? (
         <Skeleton className="h-4 w-20" />

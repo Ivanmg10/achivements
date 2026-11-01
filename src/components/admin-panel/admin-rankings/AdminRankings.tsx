@@ -86,7 +86,7 @@ export default function AdminRankings() {
                     <button
                       disabled={busy === key}
                       onClick={() => handleReview(g, g.flag === 'suspect' ? 'cleared' : 'suspect')}
-                      className="px-2.5 py-1 rounded-lg bg-bg-card hover:bg-ink/10 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                      className="px-2.5 py-1 rounded-box bg-bg-card hover:bg-ink/10 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                     >
                       {g.flag === 'suspect' ? 'Let it count' : 'Keep it out'}
                     </button>

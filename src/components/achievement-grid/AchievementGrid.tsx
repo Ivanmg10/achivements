@@ -150,7 +150,7 @@ export const AchievementGrid = memo(function AchievementGrid({
                 handleLeave()
                 setSelected(a)
               }}
-              className={`block rounded-lg overflow-hidden shrink-0 cursor-pointer transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+              className={`block rounded-box overflow-hidden shrink-0 cursor-pointer transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                 isHardcore ? 'ring-2 ring-hardcore' : isSoftcore ? 'ring-2 ring-softcore' : missable ? 'ring-2 ring-danger' : ''
               }`}
             >
@@ -164,7 +164,7 @@ export const AchievementGrid = memo(function AchievementGrid({
                   unoptimized
                 />
               ) : (
-                <div className={`${size.badge} rounded-lg bg-ink/10 ${earnedAny ? '' : 'opacity-40'}`} />
+                <div className={`${size.badge} rounded-box bg-ink/10 ${earnedAny ? '' : 'opacity-40'}`} />
               )}
               {missable && (
                 <span aria-hidden="true" className="absolute bottom-0 right-0 flex items-center justify-center w-4 h-4 rounded-tl-md bg-danger text-white">

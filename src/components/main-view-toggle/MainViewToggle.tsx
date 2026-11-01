@@ -8,7 +8,7 @@ import { usePinnedGames } from '@/context/PinnedGamesContext'
 
 type View = 'recent' | 'pinned'
 
-const TAB_BASE = 'relative pb-1.5 text-xl tracking-tight transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-sm'
+const TAB_BASE = 'relative pb-1.5 text-xl tracking-tight transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-box-sm'
 
 // Each view renders its own header, so the arrow keys' focus has to survive the remount.
 let focusAfterSwitch = false

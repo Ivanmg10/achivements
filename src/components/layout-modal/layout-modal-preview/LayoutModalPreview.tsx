@@ -45,7 +45,7 @@ export default function LayoutModalPreview() {
           <div className="flex min-w-0 flex-col gap-2">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-bold uppercase tracking-[0.14em] text-text-secondary">{T.homeLayout.continueKicker}</p>
-              <span className="h-1.5 w-12 rounded-sm bg-ink/10" />
+              <span className="h-1.5 w-12 rounded-full bg-ink/10" />
             </div>
             {SAMPLE_GAMES.map((game) => (
               <LayoutModalPreviewSampleGameCard key={game.title} game={game} cards={cards} />

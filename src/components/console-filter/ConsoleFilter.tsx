@@ -67,7 +67,7 @@ export default function ConsoleFilter({
       {selected.size > 0 && (
         <button
           onClick={onClear}
-          className="shrink-0 whitespace-nowrap px-2.5 py-1 rounded-lg text-xs text-text-secondary hover:text-text-main transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="shrink-0 whitespace-nowrap px-2.5 py-1 rounded-chip text-xs text-text-secondary hover:text-text-main transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <span aria-hidden="true">✕</span> {T.categoryPage.clearConsoles}
         </button>

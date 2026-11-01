@@ -38,11 +38,11 @@ export default function GameCompareTableRow({
           alt=""
           width={48}
           height={48}
-          className={`w-12 h-12 rounded-lg object-cover ${anyone ? '' : 'grayscale opacity-60'}`}
+          className={`w-12 h-12 rounded-box object-cover ${anyone ? '' : 'grayscale opacity-60'}`}
           unoptimized
         />
       ) : (
-        <span aria-hidden="true" className="w-12 h-12 rounded-lg bg-ink/10" />
+        <span aria-hidden="true" className="w-12 h-12 rounded-box bg-ink/10" />
       )}
 
       <div className="flex flex-col gap-0.5 min-w-0">
