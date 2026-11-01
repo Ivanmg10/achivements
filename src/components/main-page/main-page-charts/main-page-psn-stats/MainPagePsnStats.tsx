@@ -30,7 +30,9 @@ export default function MainPagePsnStats({
   isLoading?: boolean
 }) {
   const { T, lang } = useLanguage()
-  const { summary } = usePsnSummary()
+  const { summary, error } = usePsnSummary()
+  // Its pills are in the row from the start: arriving late, they pushed every other one aside.
+  const summaryWaiting = !summary && !error
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [weekOpen, setWeekOpen] = useState(false)
   const [monthOpen, setMonthOpen] = useState(false)
@@ -52,7 +54,7 @@ export default function MainPagePsnStats({
   if (isLoading) {
     return (
       <div className="flex flex-wrap gap-3" aria-busy="true">
-        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.streak.title, T.psn.level].map((label) => (
+        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.psn.level, T.streak.title, T.psn.platinum].map((label) => (
           <StatPill key={label} label={label} value="" loading />
         ))}
       </div>
@@ -72,7 +74,7 @@ export default function MainPagePsnStats({
       <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={trophies} onClick={() => setWeekOpen(true)} />
       <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={trophies} onClick={() => setMonthOpen(true)} />
       <StatPill label={T.pointsStats.avgPerDay} value={decimal(stats.avg, lang)} sub={T.pointsStats.perDay} />
-      {summary && <StatPill label={T.psn.level} value={summary.trophyLevel} sub="PlayStation" />}
+      {(summary || summaryWaiting) && <StatPill label={T.psn.level} value={summary?.trophyLevel ?? ''} sub="PlayStation" loading={summaryWaiting} />}
       <StatPill
         label={T.streak.title}
         value={`${streak}d`}
@@ -80,7 +82,7 @@ export default function MainPagePsnStats({
         accent={streak > 0 ? 'text-accent' : undefined}
         href="/racha"
       />
-      {summary && <StatPill label={T.psn.platinum} value={summary.earned.platinum} sub={T.psn.total} accent="text-sky-300" />}
+      {(summary || summaryWaiting) && <StatPill label={T.psn.platinum} value={summary?.earned.platinum ?? ''} sub={T.psn.total} accent="text-sky-300" loading={summaryWaiting} />}
 
       <AnimatePresence>
         {selectedDay && (

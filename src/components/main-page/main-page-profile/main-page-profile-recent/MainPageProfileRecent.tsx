@@ -39,7 +39,7 @@ export default function MainPageProfileRecent({
     <div className={`${SURFACE} p-5 flex flex-col gap-1 flex-1 min-h-[12rem]`}>
       <p className="text-[1.0625rem] font-bold mb-1.5">{title}</p>
       {loading ? (
-        <div aria-busy="true" className="flex flex-col gap-1">
+        <div aria-busy="true" className="flex flex-col">
           {Array.from({ length: 3 }).map((_, i) => (
             <SkeletonRow key={i} className="gap-3 py-1.5" />
           ))}

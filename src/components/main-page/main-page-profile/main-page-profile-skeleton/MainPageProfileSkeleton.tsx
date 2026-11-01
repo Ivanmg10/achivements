@@ -43,9 +43,11 @@ export default function MainPageProfileSkeleton({ label }: { label: string }) {
       <MainPageProfileGameSkeleton />
       <div aria-hidden="true" className="bg-bg-main rounded-tile p-3 flex flex-col gap-1 flex-1">
         <Skeleton className="h-4 w-28 mb-1.5" />
-        {Array.from({ length: ROWS }).map((_, i) => (
-          <SkeletonRow key={i} className="gap-3 py-1.5" />
-        ))}
+        <div className="flex flex-col">
+          {Array.from({ length: ROWS }).map((_, i) => (
+            <SkeletonRow key={i} className="gap-3 py-1.5" />
+          ))}
+        </div>
       </div>
     </div>
   )

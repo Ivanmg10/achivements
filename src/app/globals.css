@@ -969,7 +969,7 @@ html[data-font="fira"],
   .home-fit:has([data-stats-section="overview"]) > .home-fit-top { grid-template-rows: minmax(auto, 1fr); }
   .home-fit:has([data-stats-section="overview"]) .home-fit-side { min-height: auto; }
   /* With tabs, the column keeps the room of the tallest platform's profile: it sets the trim, so a shorter one changed the charts and the heatmap's size on every switch. */
-  .home-fit:has([data-stats-section="overview"]) .home-fit-side:has([role="tablist"]) { min-height: 48rem; }
+  .home-fit:has([data-stats-section="overview"]) .home-fit-side:has([role="tablist"]) { min-height: 48.25rem; }
   .home-fit:has([data-stats-section="overview"]) .home-fit-side > section { overflow-y: visible; }
   .home-fit:has([data-stats-section="overview"]) .home-fit-side > * { flex: 1 1 0%; }
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll { overflow-y: auto; }

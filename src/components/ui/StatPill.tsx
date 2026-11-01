@@ -50,7 +50,7 @@ export function StatPill({
     <>
       <span className="text-[10px] font-semibold uppercase tracking-widest text-text-secondary">{label}</span>
       <span className={`text-[1.75rem] leading-tight font-bold tabular-nums ${accentColor ? '' : (accent ?? 'text-text-main')}`} style={accentColor ? { color: accentColor } : undefined}>{loading ? <Skeleton className="h-[1lh] w-16 max-w-full" /> : typeof value === 'number' ? <CountUp value={value} locale={lang} /> : value}</span>
-      {sub && <span className="text-xs text-text-secondary">{sub}</span>}
+      {sub ? <span className="text-xs text-text-secondary">{sub}</span> : loading && <span className="text-xs"><Skeleton className="h-[1lh] w-16" /></span>}
     </>
   )
   // No box (the agreed design): figures side by side, a fine slanted rule between them.
