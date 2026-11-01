@@ -9,7 +9,7 @@ import type { ItemProgress } from '@/utils/groupItems'
 import { gameHref } from '@/utils/gameRef'
 import { coverSrc } from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 
-const OVERLAY = 'absolute z-10 p-1.5 rounded-lg bg-bg-main/80 text-text-secondary transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2'
+const OVERLAY = 'absolute z-10 p-1.5 rounded-chip bg-bg-main/80 text-text-secondary transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2'
 
 /**
  * A game of a group as a cover: the art (a finished one ringed and marked),

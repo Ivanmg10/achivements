@@ -30,7 +30,7 @@ export default function GroupShelfRow({ group }: { group: GameGroup }) {
       <div className="flex flex-col gap-2 min-w-0">
         <div className="flex items-center gap-2 min-w-0">
           {group.icon && (
-            <span className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shrink-0 [&>span]:text-xl [&>img]:w-full [&>img]:h-full">
+            <span className="w-8 h-8 rounded-box overflow-hidden flex items-center justify-center shrink-0 [&>span]:text-xl [&>img]:w-full [&>img]:h-full">
               <GroupIconDisplay icon={group.icon} />
             </span>
           )}

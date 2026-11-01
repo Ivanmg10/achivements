@@ -42,7 +42,7 @@ export default function GroupAlbumCard({ group }: { group: GameGroup }) {
         )}
         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_40%,rgb(var(--bg-card)))]" />
         {group.icon && (
-          <span className="absolute top-3 left-3 w-9 h-9 rounded-lg bg-bg-card/80 overflow-hidden flex items-center justify-center [&>span]:text-xl [&>img]:w-full [&>img]:h-full">
+          <span className="absolute top-3 left-3 w-9 h-9 rounded-box bg-bg-card/80 overflow-hidden flex items-center justify-center [&>span]:text-xl [&>img]:w-full [&>img]:h-full">
             <GroupIconDisplay icon={group.icon} />
           </span>
         )}

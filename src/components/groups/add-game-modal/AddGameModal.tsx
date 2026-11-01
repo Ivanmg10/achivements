@@ -174,7 +174,7 @@ export default function AddGameModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="p-2 -m-1 rounded-lg text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="p-2 -m-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                   aria-label={T.groups.close}
                 >
                   <IconX className="w-5 h-5" aria-hidden />
@@ -206,7 +206,7 @@ export default function AddGameModal({
                   aria-pressed={selected.has(directKey)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-tile ring-1 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${selected.has(directKey) ? 'ring-accent bg-accent/10' : 'ring-ink/10 hover:bg-bg-main'}`}
                 >
-                  <span aria-hidden="true" className="w-10 h-10 rounded-lg bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">ID</span>
+                  <span aria-hidden="true" className="w-10 h-10 rounded-box bg-bg-main flex items-center justify-center shrink-0 text-xs font-bold text-text-secondary">ID</span>
                   <span className="flex-1 min-w-0 text-sm font-medium text-text-main">
                     {T.search.openById} #{directGameId}
                   </span>

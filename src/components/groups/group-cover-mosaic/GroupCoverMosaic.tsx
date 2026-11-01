@@ -52,7 +52,7 @@ export default function GroupCoverMosaic({ group, size = 'w-24 h-24' }: { group:
         </div>
       )}
       {covers.length > 0 && iconMark && (
-        <span className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-lg bg-bg-card ring-2 ring-bg-card overflow-hidden flex items-center justify-center text-lg">
+        <span className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-box bg-bg-card ring-2 ring-bg-card overflow-hidden flex items-center justify-center text-lg">
           {iconMark}
         </span>
       )}
