@@ -3,6 +3,9 @@
 import { useLanguage } from '@/context/LanguageContext'
 import type { DayBySource } from '@/utils/utils'
 
+/** The box of a tooltip over the unlocks' line. */
+export const LINE_TOOLTIP = 'rounded-tile bg-bg-header ring-1 ring-ink/10 shadow-xl shadow-black/40 px-3 py-2 text-xs flex flex-col gap-1'
+
 /**
  * The day under the pointer: its date written out, then RA, Steam and PSN with
  * their own swatches and counts. A platform with nothing that day is left out.
@@ -28,7 +31,7 @@ export default function AchivementsLineChartTooltip({
   ].filter((r) => r.value > 0)
 
   return (
-    <div className="rounded-tile bg-bg-header ring-1 ring-ink/10 shadow-xl shadow-black/40 px-3 py-2 text-xs flex flex-col gap-1">
+    <div className={LINE_TOOLTIP}>
       <span className="font-semibold text-text-main capitalize">{date}</span>
       {rows.length === 0 ? (
         <span className="text-text-secondary">{count(0)}</span>
