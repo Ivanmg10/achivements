@@ -11,6 +11,8 @@ const LEAN = Math.tan((12 * Math.PI) / 180)
 /** Points along a sweep's edge: enough for its curve to read as one. */
 const EDGE_POINTS = 32
 
+const nextFrame = () => new Promise(requestAnimationFrame)
+
 type Reveal = {
   keyframes: PropertyIndexedKeyframes
   /** What the old look does, when it does not simply stay under the new one. */
@@ -62,6 +64,11 @@ export function sweepEdge(shape: ShapeStyle, box?: { width: number; height: numb
  * live. A dialog over a blurred page needs it: Firefox leaves `backdrop-filter`
  * out of its capture of the page, so the blur behind the dialog vanishes for the
  * length of a transition of the whole page (seen on the real screen, 2026-11-01).
+ *
+ * The change waits until the transition is running: the new look is live, so it
+ * takes it behind the animation. Made in the transition's callback, as is usual,
+ * Firefox shows the element itself for a frame before the old look covers it,
+ * which reads as a flash of the new look (measured on the real screen, 2026-11-01).
  */
 export function lookTransition(change: () => void, reveal: Reveal = FADE, within?: HTMLElement) {
   if (!document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -74,15 +81,16 @@ export function lookTransition(change: () => void, reveal: Reveal = FADE, within
     within.style.viewTransitionName = 'look-panel'
   }
   const layer = within ? 'look-panel' : 'root'
-  const transition = document.startViewTransition(() => flushSync(change))
-  transition.ready
-    .then(() => {
-      const timing = { duration: reveal.duration, easing: reveal.easing }
-      root.animate(reveal.keyframes, { ...timing, pseudoElement: `::view-transition-new(${layer})` })
-      if (reveal.old) root.animate(reveal.old, { ...timing, pseudoElement: `::view-transition-old(${layer})` })
-    })
-    // Skipped (a hidden tab, another transition): the change itself already happened.
-    .catch(() => {})
+  const transition = document.startViewTransition(() => {})
+  transition.ready.then(async () => {
+    const timing = { duration: reveal.duration, easing: reveal.easing }
+    root.animate(reveal.keyframes, { ...timing, pseudoElement: `::view-transition-new(${layer})` })
+    if (reveal.old) root.animate(reveal.old, { ...timing, pseudoElement: `::view-transition-old(${layer})` })
+    await nextFrame()
+    await nextFrame()
+    flushSync(change)
+    // Skipped (a hidden tab, another transition): it just changes.
+  }, change)
   if (within) {
     transition.finished.catch(() => {}).finally(() => {
       root.style.viewTransitionName = ''

@@ -49,6 +49,29 @@ test('from a point, the new look spreads from it to the farthest corner', async 
   expect(options.pseudoElement).toBe('::view-transition-new(root)')
 })
 
+test('the change waits for the transition to be running, two frames in, not in its callback', async () => {
+  stubMotion(false)
+  const { start, animate } = stubTransition(Promise.resolve())
+  const frames: FrameRequestCallback[] = []
+  const raf = jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => frames.push(cb))
+  const change = jest.fn()
+  const settle = async () => { for (let i = 0; i < 4; i++) await Promise.resolve() }
+
+  lookTransition(change)
+  expect(start).toHaveBeenCalledTimes(1)
+  await settle()
+  expect(animate).toHaveBeenCalledTimes(1)
+  expect(change).not.toHaveBeenCalled()
+
+  frames.shift()!(0)
+  await settle()
+  expect(change).not.toHaveBeenCalled()
+  frames.shift()!(0)
+  await settle()
+  expect(change).toHaveBeenCalledTimes(1)
+  raf.mockRestore()
+})
+
 const points = (clip: string) => clip.slice(8, -1).split(', ').map((p) => parseFloat(p))
 
 test('a shape sweeps across the whole window, the band between two clipped looks', () => {
