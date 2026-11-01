@@ -25,6 +25,10 @@ test('a font preview shows its font: it takes the family, and Barlow can undo a 
   expect(css).toMatch(/\[data-font\]:not\(html\) \{\s+@apply font-sans;/)
 })
 
+test('the home keeps one height for the profile through its platform tabs', () => {
+  expect(css).toMatch(/\.home-fit-side:has\(\[role="tablist"\]\) \{ min-height: /)
+})
+
 test('a dialog\'s transition draws the ring and shadow of `Modal`\'s panel', () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const modal: string = require('fs').readFileSync(require('path').join(__dirname, '../components/ui/Modal.tsx'), 'utf8')
