@@ -27,6 +27,7 @@ import { xboxToRecentAchievement } from '@/utils/xboxMappers'
 import { ChartCard } from '@/components/ui/ChartCard'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
+import { useWhenIdle } from '@/hooks/useWhenIdle'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
 import MainPageHeatmap from './MainPageHeatmap'
@@ -48,6 +49,9 @@ import MainPageCollection from '../main-page-collection/MainPageCollection'
 import MainPageGroupsSection from '../main-page-groups-section/MainPageGroupsSection'
 import MainPageFriends from '../main-page-friends/MainPageFriends'
 
+/** Sections that load their own data: mounted (hidden) once the browser is idle, unless opened first. */
+const LOADS_ITS_OWN = new Set(['pinned', 'groups', 'browse'])
+
 /**
  * Stats & Activity. Cards whose idea carries over between platforms —
  * activity, daily, most active, rarest, abandoned, mastered & completed,
@@ -64,6 +68,8 @@ export default function MainPageCharts() {
   const idPrefix = useId().replace(/:/g, '')
   const reduceMotion = useReducedMotion()
   const { ref: sectionRef, scrollToTop } = useSectionScroll<HTMLElement>()
+  // What is on screen first; the sections with loads of their own once there is a moment to spare (#101).
+  const idle = useWhenIdle()
 
   // Opening a section brings the whole of it into view, its top just under the
   // sticky header, and holds it there while a section that loads once opened grows.
@@ -244,8 +250,10 @@ export default function MainPageCharts() {
 
       {/*
         One section at a time instead of every card stacked: on a phone the
-        old wall ran to some 6000px. Every hook above still loads up front,
-        so switching sections never waits on the network.
+        old wall ran to some 6000px. Every hook above still loads up front, and
+        the sections that load their own (pins, groups, browse) mount hidden as
+        soon as the browser is idle, so switching sections never waits on the
+        network while the first paint does not wait on them either (#101).
 
         Only the open section is laid out (the others stay mounted, hidden, so
         what they hold survives a switch): the area is as tall as that section,
@@ -276,7 +284,7 @@ export default function MainPageCharts() {
                 animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: reduceMotion ? 0 : 6 }}
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
               >
-                {panels[id]}
+                {open || idle || !LOADS_ITS_OWN.has(id) ? panels[id] : null}
               </motion.div>
             )
           })}

@@ -46,7 +46,7 @@ jest.mock('../main-page-friends/MainPageFriends', () => ({
 jest.mock('./main-page-steam-stats/MainPageSteamStats', () => mockProbe('steam-stats'))
 jest.mock('./main-page-steam-nav/MainPageSteamNav', () => mockProbe('steam-nav'))
 
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import MainPageCharts from './MainPageCharts'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
@@ -245,4 +245,20 @@ test('the pinned achievements have a section of their own', () => {
   render(<MainPageCharts />)
   fireEvent.click(screen.getByRole('tab', { name: 'Pinned' }))
   expect(within(screen.getByRole('tabpanel')).getByTestId('favorites')).toBeInTheDocument()
+})
+
+test('the sections that load their own data wait for an idle moment, unless opened first (#101)', () => {
+  jest.useFakeTimers()
+  try {
+    platform('ra')
+    render(<MainPageCharts />)
+    expect(screen.queryByTestId('groups')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('favorites')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab', { name: 'Pinned' }))
+    expect(screen.getByTestId('favorites')).toBeInTheDocument()
+    act(() => jest.advanceTimersByTime(2000))
+    expect(screen.getByTestId('groups')).toBeInTheDocument()
+  } finally {
+    jest.useRealTimers()
+  }
 })
