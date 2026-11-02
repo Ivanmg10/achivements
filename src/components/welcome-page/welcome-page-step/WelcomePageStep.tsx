@@ -18,6 +18,10 @@ const AFTER_CURTAIN = `${Math.round(CURTAIN_MS * 0.74 - CURTAIN_SWAP_MS)}ms`
  * is about, its fields, its buttons, and on the right (below, on a phone)
  * what it will look like. The title takes the focus when the step was reached
  * by moving, so a screen reader starts reading the new step.
+ *
+ * With `stage`, what the step's choices change takes the left under the title,
+ * the buttons under it. On a phone it stays stuck under the bar, with the aside
+ * and the buttons after it, so the choices are never made without seeing it.
  */
 export default function WelcomePageStep({
   kicker,
@@ -28,6 +32,7 @@ export default function WelcomePageStep({
   aside,
   asideLabel,
   wideAside = false,
+  stage,
   onBack,
   direction,
   focusTitle,
@@ -41,6 +46,7 @@ export default function WelcomePageStep({
   asideLabel?: string
   /** For the RA guide, which needs room for its sketch. */
   wideAside?: boolean
+  stage?: ReactNode
   onBack?: () => void
   direction: WelcomeDirection
   focusTitle: boolean
@@ -52,12 +58,21 @@ export default function WelcomePageStep({
     if (focusTitle) titleRef.current?.focus()
   }, [focusTitle])
 
+  const buttons = <div className={`${styles.in3} flex flex-wrap gap-2.5 mt-2 ${stage ? 'lg:col-start-1' : ''}`}>{actions}</div>
+  const side = aside && (
+    <aside aria-label={asideLabel} className={`flex flex-col gap-2.5 min-w-0 ${stage ? 'lg:col-start-2 lg:row-start-1 lg:row-span-3' : ''}`}>
+      {aside}
+    </aside>
+  )
+
   return (
     <div
       style={direction === 'none' ? undefined : ({ '--enter-delay': AFTER_CURTAIN } as CSSProperties)}
-      className={`${ENTER[direction] ?? ''} grid gap-10 lg:gap-12 items-center ${wideAside ? 'lg:grid-cols-[minmax(0,1fr)_480px]' : 'lg:grid-cols-[minmax(0,1fr)_380px]'}`}
+      className={`${ENTER[direction] ?? ''} grid items-center ${
+        stage ? 'gap-4 lg:gap-x-12 lg:gap-y-3 lg:-mt-6 lg:grid-cols-[minmax(0,1fr)_22rem]' : `gap-10 lg:gap-12 ${wideAside ? 'lg:grid-cols-[minmax(0,1fr)_480px]' : 'lg:grid-cols-[minmax(0,1fr)_380px]'}`
+      }`}
     >
-      <div className="flex flex-col gap-4 min-w-0">
+      <div className={`flex flex-col gap-4 min-w-0 ${stage ? 'lg:col-start-1' : ''}`}>
         <div className={`${styles.in} flex items-center gap-3 min-h-10`}>
           {onBack && (
             <>
@@ -79,12 +94,16 @@ export default function WelcomePageStep({
         </h1>
         <p className={`${styles.in2} text-base sm:text-lg leading-relaxed text-text-secondary max-w-xl`}>{body}</p>
         {children && <div className={`${styles.in3} mt-1`}>{children}</div>}
-        <div className={`${styles.in3} flex flex-wrap gap-2.5 mt-2`}>{actions}</div>
+        {!stage && buttons}
       </div>
-      {aside && (
-        <aside aria-label={asideLabel} className="flex flex-col gap-2.5 min-w-0">
-          {aside}
-        </aside>
+      {stage ? (
+        <div className="flex flex-col gap-4 min-w-0 lg:contents">
+          <div className={`${styles.card} sticky top-[5.75rem] z-10 min-w-0 lg:static lg:col-start-1`}>{stage}</div>
+          {side}
+          {buttons}
+        </div>
+      ) : (
+        side
       )}
     </div>
   )

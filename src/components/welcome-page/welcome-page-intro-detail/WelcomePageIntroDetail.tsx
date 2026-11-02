@@ -3,12 +3,9 @@ import { motion } from 'framer-motion'
 import { IconArrowRight, IconCheck, IconChevronLeft, IconChevronRight, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import WelcomePageIntroArt from '@/components/welcome-page/welcome-page-intro-art/WelcomePageIntroArt'
-import { PRIMARY_BUTTON, QUIET_BUTTON } from '@/components/welcome-page/welcomeArt'
+import { ICON_BUTTON, PRIMARY_BUTTON, QUIET_BUTTON } from '@/components/welcome-page/welcomeArt'
 
 export type IntroPerk = { title: string; text: string; detail: string; highlights: string[] }
-
-const ICON_BUTTON =
-  'w-11 h-11 rounded-tile flex items-center justify-center ring-1 ring-inset ring-ink/15 text-text-main hover:bg-ink/5 disabled:opacity-30 disabled:cursor-default transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
 /**
  * One of the intro's points, opened over the whole step: its card grows into

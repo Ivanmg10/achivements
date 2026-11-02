@@ -1683,7 +1683,8 @@ export const en = {
       steam: 'Steam',
       psn: 'PlayStation',
       profile: 'Profile',
-      prefs: 'Preferences',
+      prefs: 'Style',
+      privacy: 'Privacy',
       done: 'Done',
     },
     words: {
@@ -1693,6 +1694,7 @@ export const en = {
       psn: 'PLAYSTATION',
       profile: 'PROFILE',
       prefs: 'YOUR WAY',
+      privacy: 'PRIVACY',
       done: 'READY',
     },
     state: {
@@ -1778,14 +1780,20 @@ export const en = {
       noDescription: 'Your description will show here.',
     },
     prefs: {
-      kicker: 'Preferences',
+      kicker: 'Style',
       title: 'Your way',
-      body: 'Which language, how it looks, and what others see of you.',
+      body: 'Tap what you want to change and see it at once.',
+      preview: 'How it will look',
+      choices: 'Your style',
       detected: 'Detected from your browser',
       chosen: 'Chosen by you',
-      themeHint: 'applies at once',
       allThemes: 'All themes',
-      others: 'What others see',
+    },
+    privacy: {
+      kicker: 'Privacy',
+      title: 'What others see',
+      body: 'You decide. You can change it whenever you like, on your account.',
+      privateTitle: 'Private profile',
     },
     done: {
       kicker: 'All set',

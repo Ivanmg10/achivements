@@ -21,7 +21,7 @@ const PLATFORM_MARK: Partial<Record<WelcomeStep, ReactNode>> = {
  * (`aria-current`, and bolder, so it is not colour alone). Done steps carry a
  * tick (a linked platform, its logo), skipped ones a hollow dot; steps not
  * reached yet cannot be jumped to. A 2 px line along the bottom is how far the
- * person has got. On a phone it folds into "Step n of 7" and seven segments.
+ * person has got. On a phone it folds into "Step n of 8" and eight segments.
  * It stays above the curtain, so the step is seen changing as it passes.
  */
 export default function WelcomePageStepsBar({
@@ -58,7 +58,7 @@ export default function WelcomePageStepsBar({
                 const name = T.welcome.steps[step]
                 return (
                   <Fragment key={step}>
-                    {i > 0 && <IconChevronRight size={12} aria-hidden="true" className="text-ink/25 shrink-0" />}
+                    {i > 0 && <IconChevronRight size={12} aria-hidden="true" className="hidden xl:block text-ink/25 shrink-0" />}
                     <li>
                       <button
                         type="button"
@@ -110,7 +110,7 @@ export default function WelcomePageStepsBar({
               {T.welcome.skipAll}
             </button>
           </div>
-          <ol aria-hidden="true" className="grid grid-cols-7 gap-1 mx-2">
+          <ol aria-hidden="true" className="grid grid-cols-8 gap-1 mx-2">
             {WELCOME_STEPS.map((step, i) => (
               <li key={step} className={`h-1 rounded-full transition-colors ${i < index ? 'bg-progress' : i === index ? 'bg-progress-soft' : 'bg-ink/10'}`} />
             ))}

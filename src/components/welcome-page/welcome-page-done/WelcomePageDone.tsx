@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useSession } from 'next-auth/react'
-import { IconAdjustmentsHorizontal, IconArrowRight, IconUser } from '@tabler/icons-react'
+import { IconAdjustmentsHorizontal, IconArrowRight, IconEye, IconUser } from '@tabler/icons-react'
 import { WELCOME_STEPS, isPlatformStep, type PlatformStep, type WelcomeDirection, type WelcomeStep } from '@/hooks/useWelcomeSteps'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
@@ -56,6 +56,7 @@ export default function WelcomePageDone({
     platform('psn', <PlaystationLogo size={20} aria-hidden="true" />),
     { step: 'profile', mark: <IconUser size={20} aria-hidden="true" />, text: profileFilled ? t.profileDone : t.profileEmpty, done: true, action: t.edit },
     { step: 'prefs', mark: <IconAdjustmentsHorizontal size={20} aria-hidden="true" />, text: `${language} · ${T.userTheme[`name_${theme}`]}`, done: true, action: t.edit },
+    { step: 'privacy', mark: <IconEye size={20} aria-hidden="true" />, text: user?.profilePublic === false ? T.welcome.privacy.privateTitle : T.userData.profilePublic, done: true, action: t.edit },
   ]
 
   return (

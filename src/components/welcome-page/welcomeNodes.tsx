@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { IconAdjustmentsHorizontal, IconCheck, IconUser, IconUserPlus } from '@tabler/icons-react'
+import { IconAdjustmentsHorizontal, IconCheck, IconEye, IconUser, IconUserPlus } from '@tabler/icons-react'
 import type { WelcomeStep } from '@/hooks/useWelcomeSteps'
 import type { Translations } from '@/translations/en'
 import type { CurtainNode } from '@/components/welcome-curtain/WelcomeCurtain'
@@ -15,6 +15,7 @@ const MARK: Record<WelcomeStep, ReactNode> = {
   psn: <PlaystationLogo size={30} aria-hidden="true" />,
   profile: <IconUser size={28} aria-hidden="true" />,
   prefs: <IconAdjustmentsHorizontal size={28} aria-hidden="true" />,
+  privacy: <IconEye size={28} aria-hidden="true" />,
   done: <IconCheck size={30} aria-hidden="true" />,
 }
 

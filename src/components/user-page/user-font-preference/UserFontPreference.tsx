@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { useFontStyle, type FontStyle } from '@/hooks/useFontStyle'
+import { lookTransition } from '@/utils/lookTransition'
 import ChoiceCards from '@/components/ui/ChoiceCards'
 import UserFontPreferencePreview from './user-font-preference-preview/UserFontPreferencePreview'
 
@@ -14,7 +15,7 @@ export default function UserFontPreference({ columns = 3 }: { columns?: 2 | 3 | 
     <ChoiceCards<FontStyle>
       legend={T.homeLayout.fontLabel}
       value={font}
-      onChange={setFont}
+      onChange={(next) => lookTransition(() => setFont(next))}
       columns={columns}
       options={[
         { value: 'barlow', label: `${T.homeLayout.fontBarlow} (${T.homeLayout.byDefault})`, hint: T.homeLayout.fontBarlowHint, preview: <UserFontPreferencePreview font="barlow" /> },

@@ -33,11 +33,11 @@ beforeEach(() => {
 })
 afterEach(() => jest.useRealTimers())
 
-test('opens on the welcome, with the seven steps along the top', () => {
+test('opens on the welcome, with the eight steps along the top', () => {
   render(<WelcomePage />)
   expect(screen.getByRole('heading', { level: 1, name: T.intro.title })).toBeInTheDocument()
   const pills = within(bar()).getAllByRole('button')
-  expect(pills).toHaveLength(7)
+  expect(pills).toHaveLength(8)
   expect(pills[0]).toHaveAttribute('aria-current', 'step')
   // Not reached yet: cannot be jumped to.
   expect(pills[3]).toBeDisabled()
@@ -52,7 +52,7 @@ test('moves under the curtain, and the new step takes the focus', () => {
   act(() => jest.advanceTimersByTime(CURTAIN_MS))
   const title = screen.getByRole('heading', { level: 1, name: T.steps.ra })
   expect(title).toHaveFocus()
-  expect(screen.getByRole('status')).toHaveTextContent('Step 2 of 7')
+  expect(screen.getByRole('status')).toHaveTextContent('Step 2 of 8')
 })
 
 test('"not now" leaves a platform for later, and back returns to it', () => {
@@ -97,10 +97,21 @@ test('skip all goes to the end, and the way in forgets the welcome', () => {
 })
 
 test('the end sends each thing left for later back to its step', () => {
-  sessionStorage.setItem('welcome-progress', JSON.stringify({ step: 6, seen: 6, skipped: ['ra'] }))
+  sessionStorage.setItem('welcome-progress', JSON.stringify({ step: 7, seen: 7, skipped: ['ra'] }))
   render(<WelcomePage />)
   press(`${T.done.connect}: ${T.steps.ra}`)
   expect(screen.getByRole('heading', { level: 1, name: T.steps.ra })).toBeInTheDocument()
+})
+
+test('privacy comes after the style, each a step of its own, and the end leads back to it', () => {
+  sessionStorage.setItem('welcome-progress', JSON.stringify({ step: 5, seen: 5, skipped: [] }))
+  render(<WelcomePage />)
+  expect(screen.getByRole('heading', { level: 1, name: T.prefs.title })).toBeInTheDocument()
+  press(T.next)
+  expect(screen.getByRole('heading', { level: 1, name: T.privacy.title })).toBeInTheDocument()
+  press(T.next)
+  press(`${T.done.edit}: ${T.steps.privacy}`)
+  expect(screen.getByRole('heading', { level: 1, name: T.privacy.title })).toBeInTheDocument()
 })
 
 test('says the giant word behind the step to no one', () => {

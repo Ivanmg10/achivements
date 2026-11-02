@@ -1682,7 +1682,8 @@ export const de: Translations = {
       steam: 'Steam',
       psn: 'PlayStation',
       profile: 'Profil',
-      prefs: 'Einstellungen',
+      prefs: 'Stil',
+      privacy: 'Privatsphäre',
       done: 'Fertig',
     },
     words: {
@@ -1692,6 +1693,7 @@ export const de: Translations = {
       psn: 'PLAYSTATION',
       profile: 'PROFIL',
       prefs: 'DEIN STIL',
+      privacy: 'PRIVATSPHÄRE',
       done: 'FERTIG',
     },
     state: {
@@ -1777,14 +1779,20 @@ export const de: Translations = {
       noDescription: 'Deine Beschreibung erscheint hier.',
     },
     prefs: {
-      kicker: 'Einstellungen',
+      kicker: 'Stil',
       title: 'Nach deinem Geschmack',
-      body: 'In welcher Sprache, wie es aussieht, und was andere von dir sehen.',
+      body: 'Tippe an, was du ändern willst, und sieh es sofort.',
+      preview: 'So wird es aussehen',
+      choices: 'Dein Stil',
       detected: 'Von deinem Browser erkannt',
       chosen: 'Von dir gewählt',
-      themeHint: 'gilt sofort',
       allThemes: 'Alle Designs',
-      others: 'Was andere sehen',
+    },
+    privacy: {
+      kicker: 'Privatsphäre',
+      title: 'Was andere sehen',
+      body: 'Du entscheidest. Du kannst es jederzeit in deinem Konto ändern.',
+      privateTitle: 'Privates Profil',
     },
     done: {
       kicker: 'Alles bereit',

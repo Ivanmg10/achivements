@@ -121,8 +121,8 @@ with its link, versions and what was built, so it can always be found again.
 ## Welcome after sign-up (`/welcome`, 2026-10-22)
 
 A new account (form, form with RetroAchievements, or Steam) is signed in and sent to `/welcome`, not to the login form:
-intro, RetroAchievements, Steam, PlayStation, profile, preferences, done. Design and the
-reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there).
+intro, RetroAchievements, Steam, PlayStation, profile, style, privacy, done. Design and the
+reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there); style and privacy: `docs/welcome-look-plan.md`.
 
 - **Never blocks.** Every step has "Not now" / "Skip this step", "Skip all" is always in
   the bar, and back works on every step, the browser's back and forward too (each move is a
@@ -146,6 +146,11 @@ reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there)
   open (120 % from 1536 px, 140 % from 2200 px; a 2560 px screen showed it tiny). So **sizes in
   it are in rem** (`text-[0.8125rem]`, not `text-[13px]`). **Never CSS `zoom`**: it throws Framer
   Motion's layout animations off (the intro's cards grow into their detail with `layoutId`).
+- **Style and privacy are two steps (#102, 2026-11-02):** the step key `prefs` is the one the bar calls Style.
+  Style shows the Layout modal's sample (`LayoutModalPreview`) beside the intro's cards (`LOOK_CHOICES`), each growing into
+  its choice, the account's own preference components. **The sample and how a change moves come from the modal; its controls
+  do not** (the user's call: the welcome keeps its own look). A choice opened is a history entry (`useWelcomeChoice`). Privacy's sample
+  follows its three switches, on the person's own card. A new look preference is a new row in `LOOK_CHOICES`.
 - The avatar is edited in `AvatarModal` (account page and welcome), not `EditProfileModal`,
   which is only for the username and email now.
 - **The Vault Points fill runs in the welcome** (`VaultFillProvider` in `src/app/welcome/page.tsx`,
