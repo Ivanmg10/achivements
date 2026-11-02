@@ -66,7 +66,7 @@ export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
     return () => {
       current = false
     }
-  }, [appId, status, url])
+  }, [appId, status, url, user])
 
   // What is shown is what the next visit starts from, a pin just added included.
   useEffect(() => {

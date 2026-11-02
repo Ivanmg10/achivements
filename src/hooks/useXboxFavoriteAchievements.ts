@@ -59,7 +59,7 @@ export function useXboxFavoriteAchievements(gameId: number, gameTitle: string) {
     return () => {
       current = false
     }
-  }, [gameId, status, url])
+  }, [gameId, status, url, user])
 
   const toggle = useCallback(
     async (achievement: XboxAchievement) => {

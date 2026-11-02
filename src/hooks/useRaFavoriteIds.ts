@@ -49,7 +49,7 @@ export function useRaFavoriteIds(gameId: number | string | null | undefined, ena
     return () => {
       current = false
     }
-  }, [gameId, enabled, url])
+  }, [gameId, enabled, url, user])
 
   const toggleFavorite = useCallback(
     async (achievement: RetroAchievement, meta: FavoriteMeta) => {

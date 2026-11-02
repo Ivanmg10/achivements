@@ -59,7 +59,7 @@ export function usePsnFavoriteTrophies(gameId: number, gameTitle: string) {
     return () => {
       current = false
     }
-  }, [gameId, status, url])
+  }, [gameId, status, url, user])
 
   const toggle = useCallback(
     async (trophy: PsnTrophy) => {
