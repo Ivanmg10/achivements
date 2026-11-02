@@ -4,7 +4,7 @@ import { activeStreak as activeOf, calcAllStreaks } from '@/utils/streaks'
 import { Streak } from '@/types/types'
 
 export function useStreakData() {
-  const { achievements, xboxAchievements, xboxLoading, isLoading, error, refetch } = useActivityHeatmapYear()
+  const { achievements, xboxAchievements, xboxLoading, psnTrophies, psnLoading, isLoading, error, refetch } = useActivityHeatmapYear()
   // Read once, when the page opens: render has to give the same answer every time.
   const [now] = useState(Date.now)
 
@@ -14,5 +14,5 @@ export function useStreakData() {
 
   const bestStreak = streaks[0] ?? null
 
-  return { achievements, xboxAchievements, xboxLoading, streaks, activeStreak, bestStreak, now, isLoading, error, refetch }
+  return { achievements, xboxAchievements, xboxLoading, psnTrophies, psnLoading, streaks, activeStreak, bestStreak, now, isLoading, error, refetch }
 }

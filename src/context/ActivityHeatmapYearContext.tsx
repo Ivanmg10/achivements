@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useSession } from 'next-auth/react'
 import { RecentAchievement } from '@/types/types'
 import type { XboxRecentAchievement } from '@/types/xbox'
+import type { PsnRecentTrophy } from '@/types/psn'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { toRecentAchievement } from '@/utils/steamMappers'
@@ -19,6 +20,9 @@ type CtxType = {
   achievements: RecentAchievement[]
   xboxAchievements: XboxRecentAchievement[]
   xboxLoading: boolean
+  /** PlayStation's year as Sony's trophies, for what needs their own fields (the home's 60 days, its rarest). */
+  psnTrophies: PsnRecentTrophy[]
+  psnLoading: boolean
   isLoading: boolean
   error: boolean
   refetch: () => void
@@ -26,7 +30,7 @@ type CtxType = {
 
 type ProviderValue = CtxType & { request: () => void }
 
-const Ctx = createContext<ProviderValue>({ achievements: [], xboxAchievements: [], xboxLoading: true, isLoading: true, error: false, refetch: () => {}, request: () => {} })
+const Ctx = createContext<ProviderValue>({ achievements: [], xboxAchievements: [], xboxLoading: true, psnTrophies: [], psnLoading: true, isLoading: true, error: false, refetch: () => {}, request: () => {} })
 
 const byDateDesc = (a: RecentAchievement, b: RecentAchievement) => b.Date.localeCompare(a.Date)
 
@@ -126,8 +130,8 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
   const error = (raError || Boolean(steam.error) || Boolean(psn.error) || Boolean(xbox.error)) && achievements.length === 0
 
   const value = useMemo(
-    () => ({ achievements, xboxAchievements: visibleXbox, xboxLoading: xbox.isLoading, isLoading, error, refetch, request }),
-    [achievements, visibleXbox, xbox.isLoading, isLoading, error, refetch, request],
+    () => ({ achievements, xboxAchievements: visibleXbox, xboxLoading: xbox.isLoading, psnTrophies: psn.trophies, psnLoading: psn.isLoading, isLoading, error, refetch, request }),
+    [achievements, visibleXbox, xbox.isLoading, psn.trophies, psn.isLoading, isLoading, error, refetch, request],
   )
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

@@ -1,5 +1,4 @@
 jest.mock('@/hooks/useRecentAchievements', () => ({ useRecentAchievements: jest.fn() }))
-jest.mock('@/hooks/useActivityHeatmap', () => ({ useActivityHeatmap: jest.fn() }))
 jest.mock('@/hooks/useActivityHeatmapYear', () => ({ useActivityHeatmapYear: jest.fn() }))
 jest.mock('@/hooks/useGamesInProgressPreview', () => ({ useGamesInProgressPreview: () => ({ listGames: [], isLoading: false }) }))
 jest.mock('@/context/GamesDataContext', () => ({ useGamesData: () => ({ all: [], hardcore: [], softcore: [], isLoading: false }) }))
@@ -49,7 +48,6 @@ jest.mock('./main-page-steam-nav/MainPageSteamNav', () => mockProbe('steam-nav')
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import MainPageCharts from './MainPageCharts'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
-import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useActivityHeatmapYear } from '@/hooks/useActivityHeatmapYear'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { useXboxRecentAchievements } from '@/hooks/useXboxRecentAchievements'
@@ -58,6 +56,7 @@ import { useMainPlatform } from '@/context/MainPlatformContext'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 
+const RECENT_DAY = `${new Date(Date.now() - 10 * 86_400_000).toISOString().slice(0, 10)} 10:00:00`
 const STEAM_UNLOCK = { appId: 620, gameTitle: 'Portal 2', apiname: 'WIN', title: 'Win', badgeUrl: '', unlockedAt: '2024-01-15T10:00:00.000Z' }
 
 function platform(p: 'ra' | 'steam') {
@@ -67,15 +66,17 @@ function platform(p: 'ra' | 'steam') {
 beforeEach(() => {
   ;(useHomeLayout as jest.Mock).mockReturnValue(['classic', jest.fn()])
   ;(useRecentAchievements as jest.Mock).mockReturnValue({ achievements: [{ Title: 'Recent RA', Date: '2024-01-20 10:00:00' }], isLoading: false })
-  ;(useActivityHeatmap as jest.Mock).mockReturnValue({ achievements: [{ Title: 'Heatmap RA', Date: '2024-01-10 10:00:00' }], isLoading: false })
   ;(useSteamRecentAchievements as jest.Mock).mockReturnValue({ achievements: [STEAM_UNLOCK], isLoading: false })
   ;(useXboxRecentAchievements as jest.Mock).mockReturnValue({ achievements: [], isLoading: false, error: null, retry: jest.fn() })
   ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: true, library: [], libraryLoading: false })
   // The year context merges both platforms itself, so the page passes it on whole.
   ;(useActivityHeatmapYear as jest.Mock).mockReturnValue({
-    achievements: [{ Title: 'Year RA', Date: '2023-06-01 10:00:00' }],
+    // RA's last 60 days are taken from the year (#101): one old unlock, one inside the window.
+    achievements: [{ Title: 'Year RA', Date: '2023-06-01 10:00:00' }, { Title: 'Heatmap RA', Date: RECENT_DAY }],
     xboxAchievements: [],
     xboxLoading: false,
+    psnTrophies: [],
+    psnLoading: false,
     isLoading: false,
     error: false,
     refetch: jest.fn(),
@@ -101,6 +102,8 @@ test.each(['classic', 'cover'])('%s derives Xbox activity from the shared year w
     achievements: [],
     xboxAchievements: [recent, old],
     xboxLoading: false,
+    psnTrophies: [],
+    psnLoading: false,
     isLoading: false,
     error: false,
     refetch: jest.fn(),
@@ -131,7 +134,7 @@ test('Portada activity figures use every platform and ignore the Classic platfor
   platform('steam')
   ;(useHomeLayout as jest.Mock).mockReturnValue(['cover', jest.fn()])
   render(<MainPageCharts />)
-  expect(screen.getByTestId('points')).toHaveTextContent('Recent RA,Win|Year RA')
+  expect(screen.getByTestId('points')).toHaveTextContent('Recent RA,Win|Year RA,Heatmap RA')
   expect(screen.queryByTestId('steam-stats')).not.toBeInTheDocument()
 })
 
@@ -164,6 +167,7 @@ test('in RA mode, shows the RA versions of the platform-specific cards', () => {
   for (const id of STEAM_ONLY) expect(cards).not.toContain(id)
   fireEvent.click(screen.getByRole('tab', { name: 'Activity' }))
   expect(screen.getByTestId('best')).toHaveTextContent('Heatmap RA')
+  expect(screen.getByTestId('best')).not.toHaveTextContent('Year RA')
 })
 
 test('in Steam mode, swaps them for the Steam versions and feeds best performance Steam unlocks', () => {
@@ -183,8 +187,7 @@ test('the heatmap reads the year both platforms share, not the 60-day list', () 
   render(<MainPageCharts />)
 
   // Its own call would be a second one for data the streak already loaded.
-  expect(screen.getByTestId('heatmap')).toHaveTextContent('Year RA')
-  expect(screen.getByTestId('heatmap')).not.toHaveTextContent('Heatmap RA')
+  expect(screen.getByTestId('heatmap')).toHaveTextContent('Year RA,Heatmap RA')
 })
 
 describe('sections', () => {
@@ -261,4 +264,23 @@ test('the sections that load their own data wait for an idle moment, unless open
   } finally {
     jest.useRealTimers()
   }
+})
+
+test('the PlayStation 60 days come from the year, without a second request (#101)', () => {
+  platform('ra')
+  const trophy = (name: string, daysAgo: number) =>
+    ({ trophyId: daysAgo, gameId: 7, gameTitle: 'Astro Bot', name, earnedAt: new Date(Date.now() - daysAgo * 86_400_000).toISOString() }) as never
+  ;(useActivityHeatmapYear as jest.Mock).mockReturnValue({
+    achievements: [],
+    xboxAchievements: [],
+    xboxLoading: false,
+    psnTrophies: [trophy('Recent PSN', 10), trophy('Old PSN', 100)],
+    psnLoading: false,
+    isLoading: false,
+    error: false,
+    refetch: jest.fn(),
+  })
+  render(<MainPageCharts />)
+  expect(screen.getByTestId('daily')).toHaveTextContent('Recent PSN')
+  expect(screen.getByTestId('daily')).not.toHaveTextContent('Old PSN')
 })
