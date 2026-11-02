@@ -916,3 +916,26 @@ local only, the owner's account, nothing sent to another user's account or probe
 Injected failures, timeouts and 429s per platform in a controlled environment; a real cold server cache;
 an RA-only account and a single non-RA account; latency over several samples.
 
+## Second pass: moving inside the app (2026-11-02)
+
+The first pass measured full loads only. Measured again on the branch, production build, the same account,
+walking through the app's own links (`/` → `/rankings` → back → a game → back → the same game → `/following`):
+
+| Step | Before this pass | After |
+|---|---:|---:|
+| Full load of `/` | 35 | 33 |
+| Back to `/` | 12, behind skeletons | 10, painted at once and read again |
+| The same game again | 4 | 4 requests; subsets and comments from the browser's copy |
+
+- **The browser cache was almost never used.** next-auth rewrites the session cookie on every session read
+  (each page load and tab focus), and every `cachedJson` answer had `Vary: Cookie`: a `max-age=900` answer
+  served from the copy until the next session read, then went to the network again. Answers that depend only
+  on the URL now skip `Vary` (`sameForEveryone`): checked, `getGameSubsets` is served from the copy past a
+  session read, `getUserRankAndScore` (per user) is not.
+- **RA's and PSN's 60 days come from the year** on the home (−2 requests, −2 RA calls every 15 min); Steam's
+  does not, so its 5-minute freshness stays.
+- **RA game pictures are kept in localStorage**: `getGameData` for covers and shelves is asked once per game, ever.
+- **Coming back paints the last answer** (rank, awards, last game, groups, pins, perfect order, Following) and
+  reads again: no request saved there, by the user's rule that platform data is never older than its server cache.
+- **The RA profile refresh and the arrival beat run at most once a minute per tab.**
+

@@ -32,7 +32,7 @@ page (src/app/(main)/…)            client component
 
 | Area | Routes | Notes |
 |---|---|---|
-| RetroAchievements | `get*` (gameData, recentAchievements, activityHeatmap…), `updateRaUser`, `unlinkRaUser` | Older flat names; keep them, the client calls them |
+| RetroAchievements | `get*` (gameData, recentAchievements, activityHeatmapYear…), `updateRaUser`, `unlinkRaUser` | Older flat names; keep them, the client calls them |
 | Steam | `steam/*` (ownedGames, achievements, recentlyPlayed…, unlink) | Linked through Steam sign-in (`auth/steam?intent=link`); admins by name (`src/lib/steamAccount.ts`) |
 | PlayStation | `psn/*` (link, titles, trophies, details…) | One app account, `src/lib/psnClient.ts` |
 | Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}`, `admin/xbox`, `admin/xbox/achievements` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
@@ -132,7 +132,9 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   read; `bootstrapPart` hands each reader its part once) and the header `me/streak` (a few bytes,
   counted on the server). The home mounts its self-loading sections when idle (`useWhenIdle`);
   Following reads `follows/cards`, which calls the profile routes' handlers in-process.
-  `scripts/measure-api-calls.js` counts a route's `/api` calls.
+  `scripts/measure-api-calls.js` counts a route's `/api` calls. Coming back to a page paints its
+  last answers (`lastAnswers`) and reads again; RA pictures are kept in localStorage (`raArtStore`);
+  on-every-load work is limited per tab (`dueInThisTab`).
 - **Hooks** (`src/hooks/`): one per concern; fetches live here, not in
   components. `useWhenChanged`, `useStorageValue`, `useIsClient` are the
   building blocks the lint rule pushes towards (see `CLAUDE.md` → State and effects).

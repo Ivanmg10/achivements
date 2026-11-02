@@ -856,7 +856,10 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
 - **Read routes that are expensive upstream send `cachedJson(data, ttl)`**
   (private, `Vary: Cookie`): the PSN and Xbox reads (5 min per game, 2 min for
   recent unlocks) as RA's and Steam's already did. Mutable data (groups, pins,
-  preferences) never does.
+  preferences) never does. **`Vary: Cookie` almost never lets the browser's copy serve:**
+  next-auth rewrites the session cookie on every session read (measured 2026-11-02). An answer
+  that depends only on the URL (a game's definition, subsets, comments, Steam/PSN details)
+  passes `{ sameForEveryone: true }` and drops it; anything per user or refreshed by cookie keeps it.
 - **A context value is memoized** when its provider reads the session (the session
   updates on every visit and would re-render every consumer).
 - **A route group has an `error.tsx`** (`RouteError`), or its errors replace the
@@ -910,6 +913,16 @@ Rankings). Keep these true:
   not wait on them. The home's own platform data still comes from the libraries: an `overview` per
   platform was not built, because the profile column and the overview panel need the whole library
   (see the worklog, 2026-11-02).
+- **Platforms stay as fresh as the server lets them (the user's rule, 2026-11-02):** they want a game
+  change seen at once, and to make it faster later. So nothing in the browser may make a platform's
+  data older than its server cache: page reads of platform data are **painted from their last answer
+  and always read again** (`lastAnswers`, by user and URL, memory only), never served from a client
+  TTL. Our own data uses the same (no invalidation to forget). The home takes RA's and PSN's 60 days
+  from the year (refreshed as often); **Steam keeps its own** (its year is kept 30 min, its 60 days 5).
+- **What runs on every load runs at most once a minute per tab** (`dueInThisTab`, sessionStorage):
+  the RA profile refresh (it updates the profile's last game, so keep it short) and the arrival beat.
+- **RA game pictures are kept in the browser** (`raArtStore`, localStorage `ra-art`, 400 games): they
+  never change. `/privacy` says so in all nine languages; a new kind of thing kept there says so too.
 - **Measure before and after** with `scripts/measure-api-calls.js` (Playwright, a signed-in browser,
   the same environment both times). Results of #101 in `docs/audits/perf-security-apilimits-v17.md`.
 

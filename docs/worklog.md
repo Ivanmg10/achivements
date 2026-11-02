@@ -28,6 +28,25 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 "added X to CLAUDE.md".
 
 ---
+## 2026-11-02 — Second pass: caches and moving inside the app (`perf/101-bff-by-domains`, #101)
+
+**Did** — Measured client navigation (the first pass measured full loads only): coming back to the home asked
+12 reads again. `cachedJson(..., { sameForEveryone })` for game-only answers; the home's RA and PSN 60 days
+from the year (`getActivityHeatmap` and its hook removed); `raArtStore` (RA pictures in localStorage, `/privacy`
+in nine languages); `lastAnswers` (paint the last answer on return, read again) in rank, awards, last game,
+groups, a group, perfect order, pins and Following; `dueInThisTab` for the RA profile refresh and the arrival beat.
+**Why** — The user asked for a deeper second analysis of caching and repeated reads.
+**Decisions** — The user wants platforms as fresh as possible (see a game change at once, and faster later):
+no client TTL on platform data, only paint-then-read; Steam keeps its own 60 days (its year is 30 min). Own data
+got the same (not a TTL) because its writers are spread over many hooks: a forgotten invalidation would show
+old data after an edit. `fill` left alone: its POST is the work, a GET would not save a request.
+**Open** — A faster platform refresh as its own issue (the user's wish; costs each platform's budget). Not done:
+`useAllGamesGlobal`, Steam's activity hook and the game page's pins could paint their last answer too; slimming
+the year's payload (measure which fields are read first).
+**Watch out** — `Vary: Cookie` stays on anything per user or refreshed by cookie; next-auth rewrites the session
+cookie on every read, so only `sameForEveryone` answers really reach the browser cache.
+
+---
 ## 2026-11-02 — Pages load only what they show: the BFF by domains (`perf/101-bff-by-domains`, #101)
 
 **Did** — `useAuthSession` (next-auth's `update()` flipped `status` and re-ran every "signed in" effect: the
