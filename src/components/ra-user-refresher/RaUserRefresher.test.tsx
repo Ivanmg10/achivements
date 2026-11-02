@@ -11,6 +11,7 @@ function mockSession(status: string, user?: object, update = jest.fn()) {
 }
 
 beforeEach(() => {
+  window.sessionStorage.clear()
   jest.clearAllMocks()
   // Reset module-level raRefreshed by simulating a logout cycle first
   mockSession('unauthenticated')
@@ -65,6 +66,15 @@ test('does not fetch when authenticated but no raUser', async () => {
 
 test('does not fetch when unauthenticated', async () => {
   mockSession('unauthenticated')
+  await act(async () => {
+    render(<RaUserRefresher />)
+  })
+  expect(fetch).not.toHaveBeenCalled()
+})
+
+test('a reload within a minute does not ask RA again (#101)', async () => {
+  window.sessionStorage.setItem('ra-profile-refresh:IvanXMarine', String(Date.now()))
+  mockSession('authenticated', { raUser: { User: 'IvanXMarine' } })
   await act(async () => {
     render(<RaUserRefresher />)
   })
