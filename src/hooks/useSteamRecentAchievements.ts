@@ -7,6 +7,7 @@ import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { fetchShared } from '@/lib/fetchShared'
+import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 const ENDPOINTS = {
@@ -31,6 +32,9 @@ export function useSteamRecentAchievements(scope: SteamUnlockScope | null = 'rec
   const steamid = session?.user?.steamid ?? null
   const { lang } = useLanguage()
   const steamLang = toSteamLanguage(lang)
+  const user = session?.user?.id
+  // Keyed by the account too: another Steam account linked never paints the last one's unlocks.
+  const url = endpoint && steamid ? `${withSubject(`/api/steam/${endpoint}?lang=${steamLang}`, subject)}#${steamid}` : null
 
   const [achievements, setAchievements] = useState<SteamRecentAchievement[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -52,15 +56,20 @@ export function useSteamRecentAchievements(scope: SteamUnlockScope | null = 'rec
 
   const settle = useCallback((outcome: { achievements: SteamRecentAchievement[] } | { error: string }) => {
     if ('error' in outcome) setError(outcome.error)
-    else setAchievements(outcome.achievements)
+    else {
+      if (url) keepAnswer(user, url, outcome.achievements)
+      setAchievements(outcome.achievements)
+    }
     setIsLoading(false)
-  }, [])
+  }, [url, user])
 
-  // A new account, language or scope starts over; state, so while rendering. The load is the effect.
+  // A new account, language or scope starts over, from what it last showed (lastAnswers) while it is
+  // read again; state, so while rendering. The load is the effect.
   useWhenChanged([steamid, steamLang, endpoint], () => {
-    setAchievements([])
+    const shown = url ? lastAnswer<SteamRecentAchievement[]>(user, url) : undefined
+    setAchievements(shown ?? [])
     setError(null)
-    setIsLoading(Boolean(steamid && endpoint))
+    setIsLoading(Boolean(steamid && endpoint) && !shown)
   })
 
   useEffect(() => {

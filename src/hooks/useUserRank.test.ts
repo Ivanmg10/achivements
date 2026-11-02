@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useUserRank } from './useUserRank'
+import { forgetAnswers } from '@/lib/lastAnswers'
 
 jest.mock('@/lib/fetchWithRetry', () => ({ fetchWithRetry: jest.fn(), scheduleRetry: jest.fn() }))
 
@@ -63,7 +64,6 @@ test('out of retries, the error shows; refetch tries again', async () => {
 })
 
 test('coming back paints the last rank at once, and still reads it again (#101)', async () => {
-  const { forgetAnswers } = jest.requireActual('@/lib/lastAnswers')
   forgetAnswers()
   ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { id: '7', rausername: 'ivan' } } })
   ;(fetchWithRetry as jest.Mock).mockResolvedValueOnce({ Rank: 10, Score: 1 }).mockResolvedValueOnce({ Rank: 9, Score: 2 })

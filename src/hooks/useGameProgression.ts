@@ -10,7 +10,8 @@ import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
 export function useGameProgression(gameId: string | null) {
   const { status, data: session } = useAuthSession()
   const subject = useSubject()
-  const user = session?.user?.id
+  // Keyed by the RA account too: another one linked never paints the last one's answers.
+  const user = session?.user?.id ? `${session.user.id}:${session.user.rausername ?? ''}` : undefined
   const urlOf = useCallback((id: string) => withSubject(`/api/getGameProgression?gameId=${id}`, subject), [subject])
   // Coming back to a page: the game as it showed, at once, while it is read again (lastAnswers).
   const shown = gameId ? lastAnswer<RetroAchievementsGameWithAchievements>(user, urlOf(gameId)) : undefined

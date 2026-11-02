@@ -9,7 +9,8 @@ import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
 export function useUserRank() {
   const { data: session } = useSession()
   const subject = useSubject()
-  const user = session?.user?.id
+  // Keyed by the RA account too: another one linked never paints the last one's answers.
+  const user = session?.user?.id ? `${session.user.id}:${session.user.rausername ?? ''}` : undefined
   const url = withSubject('/api/getUserRankAndScore', subject)
   // Coming back to a page: what it showed, at once, while it is read again (lastAnswers).
   const [rank, setRank] = useState<UserRankAndScore | null>(() => lastAnswer<UserRankAndScore>(user, url) ?? null)

@@ -12,7 +12,8 @@ export function useUserAwards() {
   const { data: session } = useSession()
   const subject = useSubject()
   const { hidden } = useHiddenGames()
-  const user = session?.user?.id
+  // Keyed by the RA account too: another one linked never paints the last one's answers.
+  const user = session?.user?.id ? `${session.user.id}:${session.user.rausername ?? ''}` : undefined
   const url = withSubject('/api/getUserAwards', subject)
   // Coming back to a page: what it showed, at once, while it is read again (lastAnswers).
   const [awards, setAwards] = useState<UserAwards | null>(() => lastAnswer<UserAwards>(user, url) ?? null)

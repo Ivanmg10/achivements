@@ -4,6 +4,8 @@ import { useRaFavoriteIds } from './useRaFavoriteIds'
 import type { RetroAchievement } from '@/types/types'
 import { en } from '@/translations/en'
 import { notify } from '@/lib/notify'
+import { useSession } from 'next-auth/react'
+import { forgetAnswers } from '@/lib/lastAnswers'
 
 const ACH = { ID: 7, Title: 'First blood' } as RetroAchievement
 const META = { gameTitle: 'Zelda', numDistinctPlayers: 10 }
@@ -87,4 +89,19 @@ test('the list order is the pins as they loaded: pinning one now does not move i
   await act(() => result.current.toggleFavorite(ACH, META))
   expect(result.current.favoritedIds.has(7)).toBe(true)
   expect(result.current.leadingIds.has(7)).toBe(false)
+})
+
+test('coming back to a game paints its pins at once, then reads them again (#101)', async () => {
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { id: '7' } } })
+  forgetAnswers()
+  ;(fetch as jest.Mock).mockResolvedValueOnce(ok([{ achievement_id: 7 }])).mockResolvedValueOnce(ok([{ achievement_id: 7 }, { achievement_id: 9 }]))
+  const first = renderHook(() => useRaFavoriteIds(1))
+  await waitFor(() => expect(first.result.current.favoritedIds).toEqual(new Set([7])))
+  first.unmount()
+
+  const again = renderHook(() => useRaFavoriteIds(1))
+  expect(again.result.current.favoritedIds).toEqual(new Set([7]))
+  await waitFor(() => expect(again.result.current.favoritedIds).toEqual(new Set([7, 9])))
+  expect(fetch).toHaveBeenCalledTimes(2)
+  forgetAnswers()
 })

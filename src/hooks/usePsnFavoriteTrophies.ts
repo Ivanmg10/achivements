@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import { useAuthSession } from '@/hooks/useAuthSession'
 import { useSubject } from '@/context/SubjectContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
+import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
 import type { PsnTrophy } from '@/types/psn'
 
 /**
@@ -13,22 +14,31 @@ import type { PsnTrophy } from '@/types/psn'
  */
 export function usePsnFavoriteTrophies(gameId: number, gameTitle: string) {
   const { T } = useLanguage()
-  const { status } = useAuthSession()
+  const { status, data: session } = useAuthSession()
+  const user = session?.user?.id
+  const url = `/api/favorites?source=psn&gameId=${gameId}`
   // Pins are the viewer's own; on someone else's page they are not offered.
   const subject = useSubject()
-  const [pinned, setPinned] = useState<Set<number>>(new Set())
+  // Coming back to a game: its pins as they showed, at once, while they are read again (lastAnswers).
+  const [pinned, setPinned] = useState<Set<number>>(() => new Set(lastAnswer<number[]>(user, url) ?? []))
   /**
    * The pins as they were when the page loaded: what a list orders by. Pinning
    * then leaves the row where it is — moved to the top, it took the focused star
    * with it, and the browser scrolled up after it.
    */
-  const [leading, setLeading] = useState<Set<number>>(new Set())
+  const [leading, setLeading] = useState<Set<number>>(() => new Set(lastAnswer<number[]>(user, url) ?? []))
   const [error, setError] = useState<string | null>(null)
+  const loadedUrl = useRef<string | null>(null)
+
+  // What is shown is what the next visit starts from, a pin just added included.
+  useEffect(() => {
+    if (loadedUrl.current === url) keepAnswer(user, url, [...pinned])
+  }, [pinned, user, url])
 
   useEffect(() => {
     if (status !== 'authenticated') return
     let current = true
-    fetch(`/api/favorites?source=psn&gameId=${gameId}`)
+    fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to load pinned trophies (${res.status})`)
         return res.json()
@@ -36,6 +46,8 @@ export function usePsnFavoriteTrophies(gameId: number, gameTitle: string) {
       .then((rows: { psn_trophy_id: number }[]) => {
         if (current && Array.isArray(rows)) {
           const ids = new Set(rows.map((r) => r.psn_trophy_id))
+          loadedUrl.current = url
+          keepAnswer(user, url, [...ids])
           setPinned(ids)
           setLeading(ids)
         }
@@ -47,7 +59,7 @@ export function usePsnFavoriteTrophies(gameId: number, gameTitle: string) {
     return () => {
       current = false
     }
-  }, [gameId, status])
+  }, [gameId, status, url])
 
   const toggle = useCallback(
     async (trophy: PsnTrophy) => {

@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
+import { useAuthSession } from '@/hooks/useAuthSession'
+import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
 
 type FavoriteMeta = { gameTitle?: string | null; numDistinctPlayers: number }
 
@@ -13,14 +15,23 @@ type FavoriteMeta = { gameTitle?: string | null; numDistinctPlayers: number }
  */
 export function useRaFavoriteIds(gameId: number | string | null | undefined, enabled = true) {
   const { T } = useLanguage()
-  const [favoritedIds, setFavoritedIds] = useState<Set<number>>(new Set())
+  const user = useAuthSession().data?.user?.id
+  const url = `/api/favorites?gameId=${gameId}`
+  // Coming back to a game: its pins as they showed, at once, while they are read again (lastAnswers).
+  const [favoritedIds, setFavoritedIds] = useState<Set<number>>(() => new Set(lastAnswer<number[]>(user, url) ?? []))
   /** The pins as they loaded: what a list orders by, so pinning leaves the row (and the page) where it is. */
-  const [leadingIds, setLeadingIds] = useState<Set<number>>(new Set())
+  const [leadingIds, setLeadingIds] = useState<Set<number>>(() => new Set(lastAnswer<number[]>(user, url) ?? []))
+  const loadedUrl = useRef<string | null>(null)
+
+  // What is shown is what the next visit starts from, a pin just added included.
+  useEffect(() => {
+    if (loadedUrl.current === url) keepAnswer(user, url, [...favoritedIds])
+  }, [favoritedIds, user, url])
 
   useEffect(() => {
     if (!gameId || !enabled) return
     let current = true
-    fetch(`/api/favorites?gameId=${gameId}`)
+    fetch(url)
       .then((r) => {
         if (!r.ok) throw new Error(`Failed to load favorites (${r.status})`)
         return r.json()
@@ -28,6 +39,8 @@ export function useRaFavoriteIds(gameId: number | string | null | undefined, ena
       .then((rows: { achievement_id: number }[]) => {
         if (!current) return
         const ids = new Set(rows.map((r) => r.achievement_id))
+        loadedUrl.current = url
+        keepAnswer(user, url, [...ids])
         setFavoritedIds(ids)
         setLeadingIds(ids)
       })
@@ -36,7 +49,7 @@ export function useRaFavoriteIds(gameId: number | string | null | undefined, ena
     return () => {
       current = false
     }
-  }, [gameId, enabled])
+  }, [gameId, enabled, url])
 
   const toggleFavorite = useCallback(
     async (achievement: RetroAchievement, meta: FavoriteMeta) => {
