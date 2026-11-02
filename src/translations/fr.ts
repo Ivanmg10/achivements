@@ -1786,7 +1786,6 @@ export const fr: Translations = {
       choices: 'Votre style',
       detected: 'Détectée depuis votre navigateur',
       chosen: 'Choisie par vous',
-      allThemes: 'Tous les thèmes',
     },
     privacy: {
       kicker: 'Confidentialité',

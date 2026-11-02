@@ -1,7 +1,7 @@
 import type { LookChoice } from '@/hooks/useWelcomeChoice'
 import { useLanguage } from '@/context/LanguageContext'
 import { LANGUAGES, type Lang } from '@/utils/languages'
-import Select from '@/components/ui/Select'
+import ChoiceCards from '@/components/ui/ChoiceCards'
 import UserShapePreference from '@/components/user-page/user-shape-preference/UserShapePreference'
 import UserFontPreference from '@/components/user-page/user-font-preference/UserFontPreference'
 import UserGameCardPreference from '@/components/user-page/user-game-card-preference/UserGameCardPreference'
@@ -19,18 +19,9 @@ export default function WelcomePagePreferencesChoice({ choice }: { choice: LookC
   if (choice === 'cards') return <UserGameCardPreference />
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor="welcome-language" className="sr-only">{T.userConfig.language}</label>
-      <Select<Lang>
-        id="welcome-language"
-        value={lang}
-        onChange={setLang}
-        aria-describedby="welcome-language-hint"
-        options={LANGUAGES.map((l) => ({ value: l.id, label: l.label }))}
-      />
-      <span id="welcome-language-hint" className="text-[0.8125rem] text-text-secondary">
-        {fromBrowser ? T.welcome.prefs.detected : T.welcome.prefs.chosen}
-      </span>
+    <div className="flex flex-col gap-2">
+      <ChoiceCards<Lang> legend={T.userConfig.language} value={lang} onChange={setLang} options={LANGUAGES.map((l) => ({ value: l.id, label: l.label }))} />
+      <span className="text-[0.8125rem] text-text-secondary">{fromBrowser ? T.welcome.prefs.detected : T.welcome.prefs.chosen}</span>
     </div>
   )
 }

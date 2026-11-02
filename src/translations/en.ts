@@ -1787,7 +1787,6 @@ export const en = {
       choices: 'Your style',
       detected: 'Detected from your browser',
       chosen: 'Chosen by you',
-      allThemes: 'All themes',
     },
     privacy: {
       kicker: 'Privacy',

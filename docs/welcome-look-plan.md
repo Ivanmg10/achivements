@@ -23,6 +23,16 @@ two steps and left the way to code: tried on the page, way 2 only changes how a 
   The rankings switch holds its row from the first frame.
 - **Phone:** `WelcomePageStep`'s `stage`: the sample stuck under the bar, rows and buttons after it.
 
+## Round 4, from the user's screenshots (2026-11-02)
+
+- **Linked** is one card for all three platforms (`WelcomePagePlatformLinked`): its colours, the account, a tick, and the
+  reading of its games inside. RA and PSN no longer move on by themselves after linking, or the card was never seen.
+- **Theme** opens over the whole step, the user's idea: the sample on one side and all 22 by family on the other
+  (`ThemeModalGroups`, shared with `ThemeModal`), with its own Next. The welcome's short list and "All themes" are gone.
+- **Language** is the list itself, not a row that opens a dropdown.
+- **The sample** goes up to 34rem, so the cover can be seen whole on a big screen.
+- **Profile:** no thumbnail in the Photo field; the card beside it shows the picture.
+
 ## Decided while building
 
 - The font applies to the whole welcome at once, unlike the modal, which holds it until it closes:

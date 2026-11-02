@@ -1786,7 +1786,6 @@ export const ru: Translations = {
       choices: 'Ваш стиль',
       detected: 'Определён по браузеру',
       chosen: 'Выбран вами',
-      allThemes: 'Все темы',
     },
     privacy: {
       kicker: 'Приватность',

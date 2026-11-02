@@ -4,16 +4,17 @@ import type { WelcomeDirection } from '@/hooks/useWelcomeSteps'
 import { usePsnLink } from '@/hooks/usePsnLink'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
-import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
+import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
 import WelcomePageLibraryPreview from '@/components/welcome-page/welcome-page-library-preview/WelcomePageLibraryPreview'
+import WelcomePagePlatformLinked from '@/components/welcome-page/welcome-page-platform-linked/WelcomePagePlatformLinked'
 import { PRIMARY_BUTTON, SECONDARY_BUTTON, STEP_SKY, platformKicker } from '@/components/welcome-page/welcomeArt'
 import { fieldClass } from '@/components/ui/Input'
 
 const FORM_ID = 'welcome-psn-form'
 const INPUT_ID = 'welcome-psn-id'
 
-/** PlayStation by online ID, as on the account page (`usePsnLink`); a refusal is said under the box. */
+/** PlayStation by online ID, as on the account page (`usePsnLink`); a refusal is said under the box. Linked, the step stays, to show it. */
 export default function WelcomePagePsn({
   onNext,
   onSkip,
@@ -35,7 +36,6 @@ export default function WelcomePagePsn({
     e.preventDefault()
     if (!username.trim() || !(await link(username.trim()))) return
     notify.success(T.toast.psnLinked)
-    onNext()
   }
 
   return (
@@ -46,8 +46,14 @@ export default function WelcomePagePsn({
       onBack={onBack}
       direction={direction}
       focusTitle={focusTitle}
-      asideLabel={T.welcome.library.title}
-      aside={<WelcomePageLibraryPreview art={STEP_SKY.psn} />}
+      asideLabel={isLinked ? T.welcome.steps.psn : T.welcome.library.title}
+      aside={
+        isLinked ? (
+          <WelcomePagePlatformLinked platform="psn" name={linkedAs || T.welcome.steps.psn} mark={<PlaystationLogo size={26} aria-hidden="true" />} />
+        ) : (
+          <WelcomePageLibraryPreview art={STEP_SKY.psn} />
+        )
+      }
       actions={
         isLinked ? (
           <button type="button" onClick={onNext} className={PRIMARY_BUTTON}>
@@ -88,12 +94,6 @@ export default function WelcomePagePsn({
           )}
           <p id={`${INPUT_ID}-help`} className="text-[0.8125rem] text-text-secondary">{T.welcome.psn.help}</p>
         </form>
-      )}
-      {/* Its trophies being read for Vault Points, or why they cannot be (private trophies). */}
-      {isLinked && (
-        <div className="max-w-md">
-          <VaultFillLine source="psn" />
-        </div>
       )}
     </WelcomePageStep>
   )

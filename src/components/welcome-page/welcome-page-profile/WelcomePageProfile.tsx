@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
 import { IconArrowRight, IconGenderBigender, IconMapPin, IconPhoto, IconUserShare } from '@tabler/icons-react'
@@ -78,14 +77,7 @@ export default function WelcomePageProfile({
             value={user?.avatar ? T.userPage.editAvatar : null}
             empty={T.userData.notSet}
             onEdit={() => setOpen('avatar')}
-          >
-            {user?.avatar ? (
-              <span className="flex items-center gap-2 min-w-0">
-                <Image src={user.avatar} alt="" width={22} height={22} unoptimized className="w-5.5 h-5.5 rounded-full object-cover shrink-0" />
-                <span className="text-sm font-medium truncate">{T.userPage.editAvatar}</span>
-              </span>
-            ) : undefined}
-          </ProfileField>
+          />
           <ProfileField
             label={T.userData.location}
             icon={<IconMapPin size={18} />}

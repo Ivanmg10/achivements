@@ -1,13 +1,12 @@
-import Image from 'next/image'
 import { IconArrowRight } from '@tabler/icons-react'
 import type { WelcomeDirection } from '@/hooks/useWelcomeSteps'
 import { useSteamLink } from '@/hooks/useSteamLink'
 import { useSteamProfile } from '@/hooks/useSteamProfile'
 import { useLanguage } from '@/context/LanguageContext'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
-import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
 import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
 import WelcomePageLibraryPreview from '@/components/welcome-page/welcome-page-library-preview/WelcomePageLibraryPreview'
+import WelcomePagePlatformLinked from '@/components/welcome-page/welcome-page-platform-linked/WelcomePagePlatformLinked'
 import { PRIMARY_BUTTON, SECONDARY_BUTTON, STEP_SKY, platformKicker } from '@/components/welcome-page/welcomeArt'
 
 /**
@@ -44,19 +43,12 @@ export default function WelcomePageSteam({
       asideLabel={isLinked ? T.welcome.steps.steam : T.welcome.library.title}
       aside={
         isLinked ? (
-          <div className="flex items-center gap-3.5 p-4 rounded-card bg-bg-card ring-1 ring-[#66c0f4]/35">
-            {profile?.avatarfull ? (
-              <Image src={profile.avatarfull} alt="" width={52} height={52} className="w-13 h-13 rounded-tile object-cover shrink-0" unoptimized />
-            ) : (
-              <span aria-hidden="true" className="w-13 h-13 rounded-tile flex items-center justify-center text-white shrink-0" style={{ background: STEP_SKY.steam }}>
-                <SteamLogo size={26} aria-hidden="true" />
-              </span>
-            )}
-            <span className="flex flex-col gap-0.5 min-w-0">
-              <span className="font-bold truncate">{profile?.personaname || steamUsername}</span>
-              <span className="text-[0.8125rem] text-text-secondary">{T.welcome.done.linked}</span>
-            </span>
-          </div>
+          <WelcomePagePlatformLinked
+            platform="steam"
+            name={profile?.personaname || steamUsername || T.welcome.steps.steam}
+            mark={<SteamLogo size={26} aria-hidden="true" />}
+            picture={profile?.avatarfull}
+          />
         ) : (
           <WelcomePageLibraryPreview art={STEP_SKY.steam} />
         )
@@ -79,13 +71,6 @@ export default function WelcomePageSteam({
           </>
         )
       }
-    >
-      {/* Its games being read for Vault Points, or why they cannot be (a private profile). */}
-      {isLinked && (
-        <div className="max-w-md">
-          <VaultFillLine source="steam" />
-        </div>
-      )}
-    </WelcomePageStep>
+    />
   )
 }

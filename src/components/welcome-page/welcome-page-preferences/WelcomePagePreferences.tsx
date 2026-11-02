@@ -19,8 +19,9 @@ import { PRIMARY_BUTTON, SECONDARY_BUTTON, SECTION_LABEL } from '@/components/we
 /**
  * How the app reads and looks, each choice shown on the spot on the same sample
  * home as the Layout modal. The choices are the intro's cards: pressing one grows
- * it into its detail, one decision at a time, and every one is optional. What
- * others see has its own step (`WelcomePagePrivacy`).
+ * it into its detail, one decision at a time, and every one is optional. The
+ * theme alone opens over the whole step, as it has the most to show. What others
+ * see has its own step (`WelcomePagePrivacy`).
  */
 export default function WelcomePagePreferences({
   onNext,
@@ -46,6 +47,8 @@ export default function WelcomePagePreferences({
   const t = T.welcome.prefs
   const h = T.homeLayout
   const layoutId = (choice: LookChoice) => (reducedMotion ? undefined : `welcome-choice-${choice}`)
+  // Back from a choice, the step is already there: it does not arrive again.
+  const settled = open !== null || returnTo !== null
 
   const rows: Record<LookChoice, { title: string; value: string }> = {
     theme: { title: T.userTheme.theme, value: T.userTheme[`name_${theme}`] },
@@ -56,67 +59,72 @@ export default function WelcomePagePreferences({
     language: { title: T.userConfig.language, value: `${LANGUAGES.find((l) => l.id === lang)?.label ?? lang} · ${fromBrowser ? t.detected : t.chosen}` },
   }
 
-  const index = open ? LOOK_CHOICES.indexOf(open) : -1
+  const sample = <LayoutModalPreview font={font} />
+  const detail = open && (
+    <WelcomePagePreferencesDetail
+      index={LOOK_CHOICES.indexOf(open)}
+      total={LOOK_CHOICES.length}
+      label={rows[open].title}
+      layoutId={layoutId(open)}
+      onClose={close}
+      onGo={(i) => go(LOOK_CHOICES[i])}
+      stage={open === 'theme' ? sample : undefined}
+      onNext={open === 'theme' ? onNext : undefined}
+    >
+      <WelcomePagePreferencesChoice choice={open} />
+    </WelcomePagePreferencesDetail>
+  )
 
   return (
-    <WelcomePageStep
-      kicker={t.kicker}
-      title={t.title}
-      body={t.body}
-      onBack={onBack}
-      direction={direction}
-      focusTitle={focusTitle}
-      stage={
-        <>
-          <span className={`${SECTION_LABEL} hidden lg:block mb-2`}>{t.preview}</span>
-          <div className="h-56 lg:h-[clamp(13rem,calc(100dvh-27.5rem),24rem)] shadow-2xl shadow-black/30 rounded-card">
-            <LayoutModalPreview font={font} />
-          </div>
-        </>
-      }
-      asideLabel={t.choices}
-      aside={
-        <LayoutGroup>
-          {open ? (
-            <WelcomePagePreferencesDetail
-              index={index}
-              total={LOOK_CHOICES.length}
-              label={rows[open].title}
-              layoutId={layoutId(open)}
-              onClose={close}
-              onGo={(i) => go(LOOK_CHOICES[i])}
-            >
-              <WelcomePagePreferencesChoice choice={open} />
-            </WelcomePagePreferencesDetail>
-          ) : (
-            <ul className="flex flex-col gap-2.5">
-              {LOOK_CHOICES.map((choice, i) => (
-                <WelcomePageIntroPerk
-                  key={choice}
-                  number={i + 1}
-                  title={rows[choice].title}
-                  value={rows[choice].value}
-                  layoutId={layoutId(choice)}
-                  onOpen={() => show(choice)}
-                  delayMs={returnTo === null ? 220 + i * 70 : 0}
-                  focusOnMount={returnTo === choice}
-                />
-              ))}
-            </ul>
-          )}
-        </LayoutGroup>
-      }
-      actions={
-        <>
-          <button type="button" onClick={onNext} className={PRIMARY_BUTTON}>
-            {T.welcome.next}
-            <IconArrowRight size={16} aria-hidden="true" />
-          </button>
-          <button type="button" onClick={onSkip} className={SECONDARY_BUTTON}>
-            {T.welcome.skipStep}
-          </button>
-        </>
-      }
-    />
+    <LayoutGroup>
+      {open === 'theme' ? (
+        detail
+      ) : (
+        <WelcomePageStep
+          kicker={t.kicker}
+          title={t.title}
+          body={t.body}
+          onBack={onBack}
+          direction={settled ? 'none' : direction}
+          focusTitle={focusTitle && !settled}
+          stage={
+            <>
+              <span className={`${SECTION_LABEL} hidden lg:block mb-2`}>{t.preview}</span>
+              <div className="h-56 lg:h-[clamp(13rem,calc(100dvh-27.5rem),34rem)] shadow-2xl shadow-black/30 rounded-card">{sample}</div>
+            </>
+          }
+          asideLabel={t.choices}
+          aside={
+            detail || (
+              <ul className="flex flex-col gap-2.5">
+                {LOOK_CHOICES.map((choice, i) => (
+                  <WelcomePageIntroPerk
+                    key={choice}
+                    number={i + 1}
+                    title={rows[choice].title}
+                    value={rows[choice].value}
+                    layoutId={layoutId(choice)}
+                    onOpen={() => show(choice)}
+                    delayMs={returnTo === null ? 220 + i * 70 : 0}
+                    focusOnMount={returnTo === choice}
+                  />
+                ))}
+              </ul>
+            )
+          }
+          actions={
+            <>
+              <button type="button" onClick={onNext} className={PRIMARY_BUTTON}>
+                {T.welcome.next}
+                <IconArrowRight size={16} aria-hidden="true" />
+              </button>
+              <button type="button" onClick={onSkip} className={SECONDARY_BUTTON}>
+                {T.welcome.skipStep}
+              </button>
+            </>
+          }
+        />
+      )}
+    </LayoutGroup>
   )
 }

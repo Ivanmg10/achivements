@@ -1786,7 +1786,6 @@ export const ja: Translations = {
       choices: 'あなたのスタイル',
       detected: 'ブラウザから検出',
       chosen: 'あなたが選択',
-      allThemes: 'すべてのテーマ',
     },
     privacy: {
       kicker: 'プライバシー',

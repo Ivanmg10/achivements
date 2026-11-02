@@ -80,8 +80,8 @@ test('Escape closes it and the row gets the focus back', async () => {
 test('the language is picked from a list of their own names', () => {
   renderStep()
   fireEvent.click(row(en.userConfig.language))
-  fireEvent.click(screen.getByRole('combobox', { name: en.userConfig.language }))
-  fireEvent.click(screen.getByRole('option', { name: 'Español' }))
+  expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('radio', { name: 'Español' }))
   expect(setLang).toHaveBeenCalledWith('es')
 })
 
@@ -106,11 +106,23 @@ test('a failed save is said in place', () => {
   expect(screen.getByRole('alert')).toHaveTextContent(en.userTheme.saveError)
 })
 
-test('all themes opens the full picker', async () => {
+test('the theme opens over the whole step: every theme by family, the sample beside them, and a way on', () => {
+  const { onNext } = renderStep()
+  fireEvent.click(row(en.userTheme.theme))
+  expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument()
+  expect(screen.getByRole('region', { name: en.homeLayout.previewLabel })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: en.userTheme.group_tributes })).toBeInTheDocument()
+  expect(screen.getByRole('radio', { name: /Sakura/ })).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: T.next }))
+  expect(onNext).toHaveBeenCalled()
+})
+
+test('closing the theme brings the step back with its row in focus', async () => {
   renderStep()
   fireEvent.click(row(en.userTheme.theme))
-  fireEvent.click(screen.getByRole('button', { name: T.prefs.allThemes }))
-  await waitFor(() => expect(screen.getAllByRole('radiogroup').length).toBeGreaterThan(1))
+  fireEvent.click(screen.getByRole('button', { name: en.editProfileModal.close }))
+  await waitFor(() => expect(row(en.userTheme.theme)).toHaveFocus())
+  expect(screen.getByRole('heading', { level: 1, name: T.prefs.title })).toBeInTheDocument()
 })
 
 test('nothing has to be chosen: next and skip are always there, also with a choice open', () => {
