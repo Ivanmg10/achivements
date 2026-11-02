@@ -874,6 +874,45 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   `<main>` is a block: these screens size themselves (`STATUS_SCREEN`) and are a
   `<div>` inside it, a `<main>` only full screen.
 
+## Data loading — what each page asks for (#101, 2026-11-02)
+
+Every route used to pay for the home's data: `MainProviders` loaded every library, the year of
+unlocks, pins and the showcase at mount, read or not (#86 measured ~25 shared calls and 1.3 MB on
+Rankings). Keep these true:
+
+- **A global data provider loads on its first reader.** Reading the hook is what asks for it
+  (`request()` in the context, called by `useGamesData`, `useSteamGamesData`, `usePinnedGames`…, as
+  `RecentAchievementsContext` started). A reader that only needs `isLinked` (from the session) passes
+  `{ passive: true }`; `useConsoleVisibility` reads the PSN/Xbox libraries only when one of their
+  consoles is unticked. **A new provider in `MainProviders` follows the same pattern; never fetch at mount.**
+- **The header never reads the year.** Its streak is `useStreakSummary` → `GET /api/me/streak`, counted
+  on the server from the same loaders and caches the streak page uses (`lib/raYear`, `lib/steamUnlockYear`,
+  `psnRecentTrophies`, `xboxRecentAchievements`; `lib/meStreak.ts`), with hidden games and the consoles
+  unticked in the browser (`?hidden=`) left out, UTC days, `calcAllStreaks` from `utils/streaks.ts`.
+  Only the viewer's own (it ignores `?user=`); Xbox for admins; every platform failing is a 502.
+  Anything else that only shows the streak number uses it too (the search modal does).
+- **`useAuthSession`, never `useSession`, wherever `status` is read.** next-auth's `update()` flips `status`
+  to `'loading'` and back, which re-ran every effect keyed on "signed in" on each page load.
+  `RaUserRefresher` only calls `update()` when RA's profile moved.
+- **`GET /api/me/bootstrap`** is the start-up CheevoVault data in one answer: preferences, hidden games,
+  Vault Points (`lib/meBootstrap.ts`, `lib/vaultMe.ts`). **Database only, never a platform**, each part on
+  its own (a failed part is null). Readers take it for their **first** read only (`bootstrapPart`, 10 s
+  window); every refresh keeps its own route, which shares the same loader. A new small start-up read
+  of our own data can become a part; anything that calls a platform cannot.
+- **`GET /api/follows/cards`** (`?who=followers`) gives the Following lists with the ten newest people's
+  activity and games, in one answer that lands whole. It calls the profile routes' own `GET` handlers in
+  this process with `?user=` (`lib/friendCards.ts`), so `dataOwner`, whose RA key, private profiles,
+  Xbox for admins, hidden games and the caches stay exactly the routes' rules. **Do not re-implement
+  those rules there**; a new list on the card is a new handler in that file. Pace: one person at a
+  time for the people you follow (Xbox's budget, #87), two for followers.
+- **The home mounts its self-loading sections (pins, groups, browse) when the browser is idle**
+  (`useWhenIdle`, two seconds at most) or when opened: switching stays instant, the first paint does
+  not wait on them. The home's own platform data still comes from the libraries: an `overview` per
+  platform was not built, because the profile column and the overview panel need the whole library
+  (see the worklog, 2026-11-02).
+- **Measure before and after** with `scripts/measure-api-calls.js` (Playwright, a signed-in browser,
+  the same environment both times). Results of #101 in `docs/audits/perf-security-apilimits-v17.md`.
+
 ## Presence — "online" and "last seen" (2026-10-19)
 
 `users.last_seen_at` and `users.show_presence` (`migrations/038_user_presence.sql`,

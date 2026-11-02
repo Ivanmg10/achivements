@@ -38,6 +38,7 @@ page (src/app/(main)/…)            client component
 | Xbox | `xbox/{link,unlink,summary,titles,achievements,recentAchievements,details}`, `admin/xbox`, `admin/xbox/achievements` | OpenXBL via `src/lib/xboxClient.ts`; 1:1 with PSN but admin-only (`src/utils/xboxAccess.ts`); pages under `/xboxGame/[id]` |
 | Library state | `pinnedGames`, `hiddenGames`, `favorites`, `perfectGamesOrder`, `groups` | Our own DB only |
 | People | `users`, `users/search`, `public/user`, `follows/*` | Search reads our DB, never RA |
+| Me (start-up) | `me/bootstrap`, `me/streak`, `follows/cards` | #101: the viewer's own; bootstrap reads only our DB, streak and cards reuse the platforms' loaders and routes |
 | Rankings | `rankings` (public), `rankings/me`, `rankings/fill`, `admin/rankings` | Read stored scores; `fill` runs a pass. See Vault Points below |
 | Account | `account`, `auth/*`, `changePassword`, `updateUserProfile`, `updateTheme`, `avatar` | `auth/ra/check`: an RA key checked before signing up with it (signed out, rate limited) |
 | Admin | `admin/*` | Every one starts with `requireAdmin(req)` |
@@ -125,6 +126,13 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   `SteamGamesDataContext`, `PsnGamesDataContext`, `XboxGamesDataContext`), recent achievements,
   pinned/hidden games, theme, language, which platform/view is shown, and
   `SubjectContext` (whose profile is being looked at).
+- **What a page asks for** (#101): each data context loads on its first reader (`request()`;
+  `{ passive: true }` reads `isLinked` without loading), so a route pays only for what it shows. At
+  start-up a signed-in page asks `me/bootstrap` (preferences, hidden games, Vault Points, one DB
+  read; `bootstrapPart` hands each reader its part once) and the header `me/streak` (a few bytes,
+  counted on the server). The home mounts its self-loading sections when idle (`useWhenIdle`);
+  Following reads `follows/cards`, which calls the profile routes' handlers in-process.
+  `scripts/measure-api-calls.js` counts a route's `/api` calls.
 - **Hooks** (`src/hooks/`): one per concern; fetches live here, not in
   components. `useWhenChanged`, `useStorageValue`, `useIsClient` are the
   building blocks the lint rule pushes towards (see `CLAUDE.md` → State and effects).
