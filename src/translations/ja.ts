@@ -1682,7 +1682,8 @@ export const ja: Translations = {
       steam: 'Steam',
       psn: 'PlayStation',
       profile: 'プロフィール',
-      prefs: '設定',
+      prefs: 'スタイル',
+      privacy: 'プライバシー',
       done: '完了',
     },
     words: {
@@ -1692,6 +1693,7 @@ export const ja: Translations = {
       psn: 'PLAYSTATION',
       profile: 'PROFILE',
       prefs: 'YOUR WAY',
+      privacy: 'PRIVACY',
       done: 'READY',
     },
     state: {
@@ -1777,14 +1779,19 @@ export const ja: Translations = {
       noDescription: 'ここに自己紹介が表示されます。',
     },
     prefs: {
-      kicker: '設定',
+      kicker: 'スタイル',
       title: 'お好みに',
-      body: '表示言語、見た目、そしてほかの人に見える内容。',
+      body: '変えたい項目を選ぶと、すぐに確認できます。',
+      preview: 'プレビュー',
+      choices: 'あなたのスタイル',
       detected: 'ブラウザから検出',
       chosen: 'あなたが選択',
-      themeHint: 'すぐに反映',
-      allThemes: 'すべてのテーマ',
-      others: 'ほかの人に見えるもの',
+    },
+    privacy: {
+      kicker: 'プライバシー',
+      title: 'ほかの人に見えるもの',
+      body: '決めるのはあなたです。アカウントでいつでも変更できます。',
+      privateTitle: '非公開プロフィール',
     },
     done: {
       kicker: '準備完了',

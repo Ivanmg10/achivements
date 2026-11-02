@@ -33,5 +33,5 @@ test('a pill goes to its step; skip all and back are there on a phone too', () =
 
 test('announces the step once', () => {
   renderBar()
-  expect(screen.getByRole('status')).toHaveTextContent(`Step 4 of 7 · ${T.steps.psn}`)
+  expect(screen.getByRole('status')).toHaveTextContent(`Step 4 of 8 · ${T.steps.psn}`)
 })

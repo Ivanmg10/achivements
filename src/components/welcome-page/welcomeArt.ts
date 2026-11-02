@@ -15,6 +15,7 @@ export const STEP_SKY: Record<WelcomeStep, string> = {
   psn: 'linear-gradient(135deg, #00246b, #0070d1)',
   profile: 'linear-gradient(135deg, rgb(var(--accent)), color-mix(in oklab, rgb(var(--accent)) 40%, #fff))',
   prefs: 'linear-gradient(135deg, rgb(var(--accent)), #f0abfc)',
+  privacy: 'linear-gradient(135deg, rgb(var(--accent)), #67e8f9)',
   done: 'linear-gradient(135deg, rgb(var(--accent)), #fff)',
 }
 
@@ -31,5 +32,8 @@ export const SECONDARY_BUTTON = buttonClass('secondary', 'lg')
 
 export const QUIET_BUTTON = buttonClass('quiet', 'sm')
 
+/** The arrows that go through the opened points and choices. */
+export const ICON_BUTTON =
+  'w-11 h-11 rounded-tile flex items-center justify-center ring-1 ring-inset ring-ink/15 text-text-main hover:bg-ink/5 disabled:opacity-30 disabled:cursor-default transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
 
 export const SECTION_LABEL = 'text-xs font-bold uppercase tracking-[0.12em] text-text-secondary'

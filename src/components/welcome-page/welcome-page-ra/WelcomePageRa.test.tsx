@@ -35,13 +35,13 @@ test('the form and, beside it, the guide to the key with a link to RA', () => {
   expect(screen.getByRole('link', { name: T.ra.openRa })).toHaveAttribute('href', 'https://retroachievements.org/settings')
 })
 
-test('linking toasts and moves on', async () => {
+test('linking toasts and stays, to show it linked', async () => {
   ;(fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({}) })
   const { onNext } = renderStep()
   fill()
   fireEvent.click(screen.getByRole('button', { name: T.ra.connect }))
-  await waitFor(() => expect(onNext).toHaveBeenCalled())
-  expect(notify.success).toHaveBeenCalledWith(en.toast.raLinked)
+  await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.raLinked))
+  expect(onNext).not.toHaveBeenCalled()
   expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body)).toEqual({ username: 'ivan', apiKey: 'abc123' })
 })
 

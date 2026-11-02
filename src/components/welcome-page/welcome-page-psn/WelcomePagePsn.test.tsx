@@ -19,14 +19,14 @@ function renderStep(state: Record<string, unknown> = {}) {
 
 beforeEach(() => jest.clearAllMocks())
 
-test('links by online ID, toasts and moves on', async () => {
+test('links by online ID, toasts and stays, to show it linked', async () => {
   link.mockResolvedValue(true)
   const { onNext } = renderStep()
   fireEvent.change(screen.getByLabelText(en.psn.usernameLabel), { target: { value: ' Kirby_92 ' } })
   fireEvent.click(screen.getByRole('button', { name: T.psn.connect }))
-  await waitFor(() => expect(onNext).toHaveBeenCalled())
+  await waitFor(() => expect(notify.success).toHaveBeenCalledWith(en.toast.psnLinked))
   expect(link).toHaveBeenCalledWith('Kirby_92')
-  expect(notify.success).toHaveBeenCalledWith(en.toast.psnLinked)
+  expect(onNext).not.toHaveBeenCalled()
 })
 
 test('a refusal is said under the box', () => {

@@ -5,7 +5,8 @@ import styles from '@/components/welcome-page/WelcomePage.module.css'
 
 /**
  * One of the intro's numbered points, as a card: its number and title only, so the
- * list stays short (its line is in the opened point). The whole card is the
+ * list stays short (its line is in the opened point), and on the Style step the
+ * `value` chosen under the title. The whole card is the
  * button; pressing it grows the card (`layoutId`) into the
  * point opened over the whole step (`WelcomePageIntroDetail`). Coming back,
  * the focus returns to it.
@@ -13,6 +14,7 @@ import styles from '@/components/welcome-page/WelcomePage.module.css'
 export default function WelcomePageIntroPerk({
   number,
   title,
+  value,
   layoutId,
   onOpen,
   delayMs,
@@ -20,6 +22,7 @@ export default function WelcomePageIntroPerk({
 }: {
   number: number
   title: string
+  value?: string
   layoutId?: string
   onOpen: () => void
   delayMs: number
@@ -47,7 +50,10 @@ export default function WelcomePageIntroPerk({
         <span aria-hidden="true" className="w-9 h-9 shrink-0 rounded-tile bg-accent/15 text-accent flex items-center justify-center font-display italic font-extrabold text-lg">
           {number}
         </span>
-        <span className="flex-1 min-w-0 font-bold text-[0.9375rem]">{title}</span>
+        <span className="flex-1 min-w-0 flex flex-col">
+          <span className="font-bold text-[0.9375rem]">{title}</span>
+          {value && <span className="text-[0.8125rem] text-text-secondary truncate">{value}</span>}
+        </span>
         <IconArrowsDiagonal
           size={16}
           aria-hidden="true"

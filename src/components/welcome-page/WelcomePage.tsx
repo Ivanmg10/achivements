@@ -15,6 +15,7 @@ import WelcomePageSteam from '@/components/welcome-page/welcome-page-steam/Welco
 import WelcomePagePsn from '@/components/welcome-page/welcome-page-psn/WelcomePagePsn'
 import WelcomePageProfile from '@/components/welcome-page/welcome-page-profile/WelcomePageProfile'
 import WelcomePagePreferences from '@/components/welcome-page/welcome-page-preferences/WelcomePagePreferences'
+import WelcomePagePrivacy from '@/components/welcome-page/welcome-page-privacy/WelcomePagePrivacy'
 import WelcomePageDone from '@/components/welcome-page/welcome-page-done/WelcomePageDone'
 import styles from '@/components/welcome-page/WelcomePage.module.css'
 
@@ -22,8 +23,8 @@ const SCALE_ON_BIG_SCREENS = '@media (min-width: 1536px) { html { font-size: 120
 
 /**
  * Where a new account lands after signing up: what CheevoVault does, then
- * RetroAchievements, Steam and PlayStation one at a time, the profile and the
- * preferences, and the way in. Nothing is required ("not now", "skip all"),
+ * RetroAchievements, Steam and PlayStation one at a time, the profile, the
+ * style, the privacy, and the way in. Nothing is required ("not now", "skip all"),
  * every step can be gone back to, and the app's header only comes after.
  * Xbox is not offered: it is admin-only, and a new account is not an admin.
  */
@@ -85,6 +86,7 @@ export default function WelcomePage() {
             {steps.step === 'psn' && <WelcomePagePsn {...nav} />}
             {steps.step === 'profile' && <WelcomePageProfile {...nav} />}
             {steps.step === 'prefs' && <WelcomePagePreferences {...nav} />}
+            {steps.step === 'privacy' && <WelcomePagePrivacy {...nav} />}
             {steps.step === 'done' && (
               <WelcomePageDone linked={linked} onGoTo={steps.goTo} onFinish={finish} onBack={steps.back} direction={steps.direction} focusTitle={focusTitle} />
             )}

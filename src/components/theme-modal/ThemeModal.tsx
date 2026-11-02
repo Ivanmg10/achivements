@@ -4,9 +4,9 @@ import { useState, type MouseEvent } from 'react'
 import Modal from '@/components/ui/Modal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useThemeChoice } from '@/hooks/useThemeChoice'
-import { Theme, THEME_GROUPS } from '@/types/types'
+import type { Theme } from '@/types/types'
 import { lookTransition, spreadFrom } from '@/utils/lookTransition'
-import ThemeModalOption from './theme-modal-option/ThemeModalOption'
+import ThemeModalGroups from './theme-modal-groups/ThemeModalGroups'
 
 interface Props {
   isOpen: boolean
@@ -46,22 +46,7 @@ export default function ThemeModal({ isOpen, onClose }: Props) {
       title={T.userTheme.theme}
       hint={<span role="status">{savedTheme === theme ? `${name} · ${T.toast.saved}` : name}</span>}
     >
-      <div role="radiogroup" aria-label={T.userTheme.theme} className="flex flex-col gap-5">
-        {THEME_GROUPS.map((group) => (
-          <section key={group.id} aria-labelledby={`theme-group-${group.id}`} className="flex flex-col gap-2">
-            <h3 id={`theme-group-${group.id}`} className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              {T.userTheme[`group_${group.id}`]}
-            </h3>
-            {/* One grid for every group, so the previews are the same size throughout. In threes the
-                base themes sit a row of dark over a row of light; in sixes, all on one row. */}
-            <div className="grid grid-cols-2 min-[400px]:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
-              {group.themes.map((id) => (
-                <ThemeModalOption key={id} theme={id} checked={theme === id} onSelect={pick} />
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
+      <ThemeModalGroups theme={theme} onSelect={pick} columns="grid-cols-2 min-[400px]:grid-cols-3 lg:grid-cols-6" />
       {saveError && (
         <p role="alert" className="text-sm text-danger">
           {T.userTheme.saveError}

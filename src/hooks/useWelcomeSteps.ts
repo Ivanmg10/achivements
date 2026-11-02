@@ -3,7 +3,7 @@ import { useReducedMotion } from 'framer-motion'
 import { useStorageValue } from '@/hooks/useStorageValue'
 import { useLocationHash } from '@/hooks/useLocationHash'
 
-export const WELCOME_STEPS = ['intro', 'ra', 'steam', 'psn', 'profile', 'prefs', 'done'] as const
+export const WELCOME_STEPS = ['intro', 'ra', 'steam', 'psn', 'profile', 'prefs', 'privacy', 'done'] as const
 export type WelcomeStep = (typeof WELCOME_STEPS)[number]
 
 /**

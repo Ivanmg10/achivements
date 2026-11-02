@@ -7,7 +7,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
 import WelcomePageRaGuide from '@/components/welcome-page/welcome-page-ra-guide/WelcomePageRaGuide'
-import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
+import WelcomePagePlatformLinked from '@/components/welcome-page/welcome-page-platform-linked/WelcomePagePlatformLinked'
+import RaLogo from '@/components/ra-logo/RaLogo'
 import { PRIMARY_BUTTON, SECONDARY_BUTTON, platformKicker } from '@/components/welcome-page/welcomeArt'
 import { fieldClass } from '@/components/ui/Input'
 
@@ -16,7 +17,7 @@ const FORM_ID = 'welcome-ra-form'
 /**
  * RetroAchievements, the one platform that asks for a key: the username and
  * Web API key on the left, the guide to finding the key on the right. A
- * refused key is said under the fields; a link toasts and moves on.
+ * refused key is said under the fields; a link toasts and the step stays, to show it.
  */
 export default function WelcomePageRa({
   onNext,
@@ -43,7 +44,6 @@ export default function WelcomePageRa({
     e.preventDefault()
     if (!(await link(username.trim(), apiKey.trim()))) return
     notify.success(T.toast.raLinked)
-    onNext()
   }
 
   return (
@@ -55,8 +55,8 @@ export default function WelcomePageRa({
       direction={direction}
       focusTitle={focusTitle}
       wideAside={!linkedAs}
-      asideLabel={t.guideTitle}
-      aside={linkedAs ? undefined : <WelcomePageRaGuide />}
+      asideLabel={linkedAs ? T.welcome.steps.ra : t.guideTitle}
+      aside={linkedAs ? <WelcomePagePlatformLinked platform="ra" name={linkedAs} mark={<RaLogo height={18} />} /> : <WelcomePageRaGuide />}
       actions={
         linkedAs ? (
           <button type="button" onClick={onNext} className={PRIMARY_BUTTON}>
@@ -109,12 +109,6 @@ export default function WelcomePageRa({
             <p id="welcome-ra-note" className="text-[0.8125rem] leading-snug text-text-secondary">{t.keyNote}</p>
           </div>
         </form>
-      )}
-      {/* Came linked (signed up with RetroAchievements) or just linked: its games being read for Vault Points. */}
-      {linkedAs && (
-        <div className="max-w-md">
-          <VaultFillLine source="ra" />
-        </div>
       )}
     </WelcomePageStep>
   )

@@ -1682,7 +1682,8 @@ export const ru: Translations = {
       steam: 'Steam',
       psn: 'PlayStation',
       profile: 'Профиль',
-      prefs: 'Настройки',
+      prefs: 'Стиль',
+      privacy: 'Приватность',
       done: 'Готово',
     },
     words: {
@@ -1692,6 +1693,7 @@ export const ru: Translations = {
       psn: 'PLAYSTATION',
       profile: 'ПРОФИЛЬ',
       prefs: 'ПО-СВОЕМУ',
+      privacy: 'ПРИВАТНОСТЬ',
       done: 'ГОТОВО',
     },
     state: {
@@ -1777,14 +1779,19 @@ export const ru: Translations = {
       noDescription: 'Здесь появится ваше описание.',
     },
     prefs: {
-      kicker: 'Настройки',
+      kicker: 'Стиль',
       title: 'По-своему',
-      body: 'На каком языке, как выглядит, и что видят о вас другие.',
+      body: 'Нажмите на то, что хотите изменить, и сразу увидите результат.',
+      preview: 'Как это будет выглядеть',
+      choices: 'Ваш стиль',
       detected: 'Определён по браузеру',
       chosen: 'Выбран вами',
-      themeHint: 'применяется сразу',
-      allThemes: 'Все темы',
-      others: 'Что видят другие',
+    },
+    privacy: {
+      kicker: 'Приватность',
+      title: 'Что видят другие',
+      body: 'Решать вам. Это можно изменить в любой момент в вашем аккаунте.',
+      privateTitle: 'Закрытый профиль',
     },
     done: {
       kicker: 'Всё готово',
