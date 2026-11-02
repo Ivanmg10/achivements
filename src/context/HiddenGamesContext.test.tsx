@@ -1,3 +1,4 @@
+jest.mock('@/lib/bootstrapParts', () => ({ bootstrapPart: jest.fn(async () => null) }))
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { HiddenGamesProvider, useHiddenGames } from './HiddenGamesContext'
@@ -86,4 +87,14 @@ test('a re-render of the provider keeps the same value, so what reads it is not 
   const before = result.current
   rerender()
   expect(result.current).toBe(before)
+})
+
+test('the list comes from the start-up bootstrap when it has it (#101)', async () => {
+  const { bootstrapPart } = jest.requireMock('@/lib/bootstrapParts')
+  ;(bootstrapPart as jest.Mock).mockResolvedValueOnce([{ source: 'psn', game_id: 9, title: 'Astro', image: null }])
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { id: '7' } } })
+  const { result } = renderHook(() => useHiddenGames(), { wrapper })
+  await waitFor(() => expect(result.current.isHidden(9, 'psn')).toBe(true))
+  expect(bootstrapPart).toHaveBeenCalledWith('7', 'hiddenGames')
+  expect(fetchMock).not.toHaveBeenCalled()
 })

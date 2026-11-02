@@ -1,3 +1,4 @@
+jest.mock('@/lib/bootstrapParts', () => ({ bootstrapPart: jest.fn(async () => null) }))
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { useVaultMe } from './useVaultMe'
@@ -49,4 +50,13 @@ test('a failure is an error; the switch shows at once and reads again', async ()
   await waitFor(() => expect(result.current.me?.points).toBe(1200))
   act(() => result.current.setShowInRankings(false))
   expect(result.current.me?.showInRankings).toBe(false)
+})
+
+test('the first read takes the start-up bootstrap points, without asking the route (#101)', async () => {
+  const { bootstrapPart } = jest.requireMock('@/lib/bootstrapParts')
+  ;(bootstrapPart as jest.Mock).mockResolvedValueOnce(ME)
+  const { result } = renderHook(() => useVaultMe())
+  await waitFor(() => expect(result.current.me).toEqual(ME))
+  expect(bootstrapPart).toHaveBeenCalledWith('1', 'vault')
+  expect(global.fetch).not.toHaveBeenCalled()
 })

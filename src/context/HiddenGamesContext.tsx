@@ -5,9 +5,20 @@ import { useAuthSession } from '@/hooks/useAuthSession'
 import { useLanguage } from '@/context/LanguageContext'
 import { gameKey, isGameSource, parseGameKey } from '@/utils/gameRef'
 import { notify } from '@/lib/notify'
+import { bootstrapPart } from '@/lib/bootstrapParts'
+import type { HiddenGameRow } from '@/lib/meBootstrap'
 import type { GameSource } from '@/types/steam'
 
 export type HiddenGame = { source: GameSource; id: number; title: string; image: string | null }
+
+/** The stored list: from the start-up bootstrap when it has it, else its own route. */
+async function hiddenRows(userId: string | undefined): Promise<HiddenGameRow[]> {
+  const fromBootstrap = userId ? await bootstrapPart(userId, 'hiddenGames') : null
+  if (fromBootstrap) return fromBootstrap
+  const res = await fetch('/api/hiddenGames')
+  if (!res.ok) throw new Error(`hiddenGames ${res.status}`)
+  return res.json()
+}
 
 type CtxType = {
   hidden: HiddenGame[]
@@ -34,7 +45,8 @@ const Ctx = createContext<CtxType>({
  * the outcome is always told with a toast (these happen outside a form).
  */
 export function HiddenGamesProvider({ children, initialKeys }: { children: React.ReactNode; initialKeys?: string[] }) {
-  const { status } = useAuthSession()
+  const { status, data: session } = useAuthSession()
+  const userId = session?.user?.id
   const { T } = useLanguage()
   const [hidden, setHidden] = useState<HiddenGame[]>(() => (initialKeys ?? []).flatMap((key) => {
     const ref = parseGameKey(key)
@@ -49,12 +61,8 @@ export function HiddenGamesProvider({ children, initialKeys }: { children: React
   useEffect(() => {
     if (status !== 'authenticated' || fetched.current) return
     fetched.current = true
-    fetch('/api/hiddenGames')
-      .then((res) => {
-        if (!res.ok) throw new Error(`hiddenGames ${res.status}`)
-        return res.json()
-      })
-      .then((rows: { source: string; game_id: number; title: string; image: string | null }[]) =>
+    hiddenRows(userId)
+      .then((rows) =>
         setHidden(rows.filter((r) => isGameSource(r.source)).map((r) => ({ source: r.source as GameSource, id: r.game_id, title: r.title, image: r.image }))),
       )
       .catch((err) => {
@@ -63,7 +71,7 @@ export function HiddenGamesProvider({ children, initialKeys }: { children: React
         fetched.current = false
       })
       .finally(() => setLoaded(true))
-  }, [status])
+  }, [status, userId])
 
   const keys = useMemo(() => new Set(hidden.map((g) => gameKey(g.source, g.id))), [hidden])
   const isHidden = useCallback((id: number, source: GameSource) => keys.has(gameKey(source, id)), [keys])

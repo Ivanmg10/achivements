@@ -1,0 +1,92 @@
+import { queryRows } from '@/lib/queryRows'
+import { loadRanking, weekStartRanks } from '@/lib/rankings'
+import type { GameSource } from '@/types/steam'
+import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
+
+export type VaultMe = {
+  /** All time, every platform the viewer may see. */
+  points: number
+  split: Partial<Record<GameSource, number>>
+  week: number
+  month: number
+  /** Global, all time; 0 with nothing scored. */
+  rank: number
+  /** Whether others see them in the rankings (public profile and not opted out). */
+  listed: boolean
+  /** The switch in Preferences, whatever the profile. */
+  showInRankings: boolean
+  /** Games scored from their library progress, until their achievements are read. */
+  provisional: number
+  refreshedAt: string | null
+  /** Points earned each of the last WEEKS weeks, oldest first (Monday, UTC), zeros included. */
+  weeks: { start: string; points: number }[]
+  /** Points earned each of the last seven UTC days, oldest first, zeros included. */
+  days?: { start: string; points: number }[]
+  /** Places gained since Monday's snapshot; null before the first one or when unlisted. */
+  rankDelta?: number | null
+}
+
+/** How many weeks the history goes back. */
+const WEEKS = 12
+
+/** The user's own Vault Points: what `/api/rankings/me` and the bootstrap answer. Xbox only when `xbox`. */
+export async function loadVaultMe(id: number, xbox: boolean): Promise<VaultMe> {
+  const now = new Date()
+  const weeks = lastWeeks(now, WEEKS)
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  const days = Array.from({ length: 7 }, (_, i) => new Date(today - (6 - i) * 86400000).toISOString().slice(0, 10))
+  const [entries, user, periods, provisional, weekly, daily, before] = await Promise.all([
+    loadRanking({ scope: 'global', period: 'all', source: 'all', viewerId: id, xbox }),
+    queryRows<{ show_in_rankings: boolean; profile_public: boolean; score_refreshed_at: string | null }>(
+      'SELECT show_in_rankings, profile_public, score_refreshed_at FROM users WHERE id = $1',
+      [id],
+    ),
+    queryRows<{ kind: 'w' | 'm'; points: number }>(
+      `SELECT kind, SUM(points)::int AS points FROM score_periods
+       WHERE user_id = $1 AND ($4::boolean OR source <> 'xbox')
+         AND ((kind = 'w' AND start = $2::date) OR (kind = 'm' AND start = $3::date))
+       GROUP BY kind`,
+      [id, weekStart(now), monthStart(now), xbox],
+    ),
+    queryRows<{ n: number }>(`SELECT COUNT(*)::int AS n FROM score_games g
+      WHERE g.user_id = $1 AND g.provisional AND ($2::boolean OR g.source <> 'xbox')
+        AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)`, [id, xbox]),
+    queryRows<{ start: string; points: number }>(
+      `SELECT to_char(start, 'YYYY-MM-DD') AS start, SUM(points)::int AS points FROM score_periods
+       WHERE user_id = $1 AND kind = 'w' AND start >= $2::date AND ($3::boolean OR source <> 'xbox')
+       GROUP BY start`,
+      [id, weeks[0], xbox],
+    ),
+    queryRows<{ start: string; points: number }>(
+      `SELECT to_char(to_timestamp((x->>0)::bigint) AT TIME ZONE 'UTC', 'YYYY-MM-DD') AS start,
+              ROUND(SUM((x->>1)::numeric * g.stack_factor::numeric))::int AS points
+       FROM score_games g, jsonb_array_elements(g.unlocks) x
+       WHERE g.user_id = $1 AND g.flag IS DISTINCT FROM 'suspect' AND ($3::boolean OR g.source <> 'xbox')
+         AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)
+         AND (x->>0)::bigint >= EXTRACT(EPOCH FROM $2::date)::bigint
+         AND (x->>0)::bigint < EXTRACT(EPOCH FROM ($2::date + interval '7 days'))::bigint
+       GROUP BY start`,
+      [id, days[0], xbox],
+    ),
+    weekStartRanks(now),
+  ])
+  const byWeek = new Map(weekly.map((w) => [w.start, w.points]))
+  const byDay = new Map(daily.map((d) => [d.start, d.points]))
+  const own = entries.find((e) => e.id === id)
+  const previousRank = before.get(id)
+  const row = user[0]
+  return {
+    points: own?.totalPoints ?? 0,
+    split: own?.split ?? {},
+    week: periods.find((p) => p.kind === 'w')?.points ?? 0,
+    month: periods.find((p) => p.kind === 'm')?.points ?? 0,
+    rank: own?.rank ?? 0,
+    listed: Boolean(row?.profile_public && row?.show_in_rankings),
+    showInRankings: row?.show_in_rankings !== false,
+    provisional: provisional[0]?.n ?? 0,
+    refreshedAt: row?.score_refreshed_at ? new Date(row.score_refreshed_at).toISOString() : null,
+    weeks: weeks.map((start) => ({ start, points: byWeek.get(start) ?? 0 })),
+    days: days.map((start) => ({ start, points: byDay.get(start) ?? 0 })),
+    rankDelta: own && previousRank !== undefined ? previousRank - own.rank : null,
+  }
+}
