@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
@@ -53,7 +53,7 @@ function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
 }
 
 export default function MainHeader() {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useAuthSession()
   const { T } = useLanguage()
   const { activeStreak } = useStreakData()
   const router = useRouter()

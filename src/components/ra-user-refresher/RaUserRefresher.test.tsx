@@ -22,14 +22,25 @@ beforeEach(() => {
   })
 })
 
-test('asks the server to refresh the stored RA profile, then re-reads the session', async () => {
+test('asks the server to refresh the stored RA profile, then re-reads the session when it moved', async () => {
+  ;(fetch as jest.Mock).mockResolvedValue({ ok: true, json: () => Promise.resolve({ User: 'IvanXMarine', TotalPoints: 120 }) })
+  const update = jest.fn()
+  mockSession('authenticated', { raUser: { User: 'IvanXMarine', TotalPoints: 100 } }, update)
+  await act(async () => {
+    render(<RaUserRefresher />)
+  })
+  expect(fetch).toHaveBeenCalledWith('/api/updateRaUser', { method: 'PUT' })
+  expect(update).toHaveBeenCalledWith()
+})
+
+test('a profile that did not move leaves the session alone', async () => {
   const update = jest.fn()
   mockSession('authenticated', { raUser: { User: 'IvanXMarine' } }, update)
   await act(async () => {
     render(<RaUserRefresher />)
   })
   expect(fetch).toHaveBeenCalledWith('/api/updateRaUser', { method: 'PUT' })
-  expect(update).toHaveBeenCalledWith()
+  expect(update).not.toHaveBeenCalled()
 })
 
 test('a failed refresh is logged and leaves the session alone', async () => {

@@ -1,6 +1,6 @@
 import { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
@@ -15,7 +15,7 @@ export type AllGamesGlobal = {
 }
 
 export function useAllGamesGlobal(): AllGamesGlobal {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useAuthSession()
   const rausername = session?.user?.rausername
   const { isHidden } = useHiddenGames()
   // Completed/in-progress games are fetched once and shared app-wide via

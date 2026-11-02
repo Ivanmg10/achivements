@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
@@ -37,7 +37,7 @@ function isRealGame(g: RetroAchievementsGameCompleted) {
 }
 
 export function GamesDataProvider({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useAuthSession()
   const subject = useSubject()
   const rausername = session?.user?.rausername
   const { hidden } = useHiddenConsoles('ra')

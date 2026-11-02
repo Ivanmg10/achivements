@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useLanguage } from '@/context/LanguageContext'
 import { applyStoredValue, observeStoredWrites, readStoredValue, storedKeys } from '@/hooks/useStorageValue'
 import { isSyncedKey } from '@/utils/syncedPreferences'
@@ -31,7 +31,7 @@ async function putChanges(changes: Changes): Promise<void> {
  * a short pause. A change that cannot be saved stays in this browser and says so.
  */
 export function usePreferencesSync() {
-  const { status, data: session } = useSession()
+  const { status, data: session } = useAuthSession()
   const { T } = useLanguage()
   const userId = status === 'authenticated' ? (session?.user?.id ?? null) : null
   // The message is read when something fails, not when the sync starts.

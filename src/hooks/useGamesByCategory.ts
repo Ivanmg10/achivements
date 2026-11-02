@@ -1,5 +1,5 @@
 import { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { fetchWithRetry } from '@/lib/fetchWithRetry'
 import { useGamesData } from '@/context/GamesDataContext'
@@ -15,7 +15,7 @@ function isValidCategory(cat: string): cat is ValidCategory {
 export type CategoryGame = WantToPlayGame | RetroAchievementsGameCompleted
 
 export function useGamesByCategory(category: string, consoleId?: string) {
-  const { status } = useSession()
+  const { status } = useAuthSession()
   const raLinked = useRaLinked()
   // Completed/in-progress games are fetched once and shared app-wide via
   // GamesDataContext — don't re-fetch /api/getGamesCompleted here too.

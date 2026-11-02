@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { fetchShared } from '@/lib/fetchShared'
 import { useVaultFillState } from '@/context/VaultFillContext'
 import type { VaultMe } from '@/app/api/rankings/me/route'
@@ -24,7 +24,7 @@ async function request(): Promise<VaultMe | null> {
  * signed out. `error` when they could not be read.
  */
 export function useVaultMe() {
-  const { status } = useSession()
+  const { status } = useAuthSession()
   const signedIn = status === 'authenticated'
   const [me, setMe] = useState<VaultMe | null>(null)
   const [answered, setAnswered] = useState(false)

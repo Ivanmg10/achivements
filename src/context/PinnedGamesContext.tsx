@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { gameKey, isGameSource, GameRef } from '@/utils/gameRef'
 import type { GameSource } from '@/types/steam'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
@@ -34,7 +34,7 @@ const same = (a: GameRef, b: GameRef) => a.source === b.source && a.id === b.id
  * source argument defaults to RA, so RA-only callers read as before.
  */
 export function PinnedGamesProvider({ children }: { children: React.ReactNode }) {
-  const { status } = useSession()
+  const { status } = useAuthSession()
   const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
   const [pins, setPins] = useState<GameRef[]>([])
   const [isLoading, setIsLoading] = useState(true)

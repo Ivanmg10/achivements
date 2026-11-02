@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useSubject } from '@/context/SubjectContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
@@ -13,7 +13,7 @@ import type { XboxAchievement } from '@/types/xbox'
  */
 export function useXboxFavoriteAchievements(gameId: number, gameTitle: string) {
   const { T } = useLanguage()
-  const { status } = useSession()
+  const { status } = useAuthSession()
   // Pins are the viewer's own; on someone else's page they are not offered.
   const subject = useSubject()
   const [pinned, setPinned] = useState<Set<string>>(new Set())

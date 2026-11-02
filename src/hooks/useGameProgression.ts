@@ -1,5 +1,5 @@
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
@@ -7,7 +7,7 @@ import { withSubject } from '@/utils/withSubject'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 export function useGameProgression(gameId: string | null) {
-  const { status } = useSession()
+  const { status } = useAuthSession()
   const subject = useSubject()
   const [game, setGame] = useState<RetroAchievementsGameWithAchievements | null>(null)
   /** The game whose answer (the data, or the final failure) is in; loading is anything else being asked for. */

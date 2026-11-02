@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { gameKey } from '@/utils/gameRef'
@@ -10,7 +10,7 @@ import type { GameSource } from '@/types/steam'
  * ("ra:123", "steam:620") — both platforms share the one list.
  */
 export function usePerfectGamesOrder() {
-  const { status } = useSession()
+  const { status } = useAuthSession()
   const subject = useSubject()
   const [order, setOrder] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)

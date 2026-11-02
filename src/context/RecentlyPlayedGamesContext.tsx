@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, useMemo } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { RecentlyPlayedGame } from '@/types/types'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
@@ -19,7 +19,7 @@ type CtxType = {
 const Ctx = createContext<CtxType>({ games: [], isLoading: true, error: false, refetch: () => {} })
 
 export function RecentlyPlayedGamesProvider({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useAuthSession()
   const subject = useSubject()
   const { isHidden } = useHiddenGames()
   // No RetroAchievements account means nothing to ask for.

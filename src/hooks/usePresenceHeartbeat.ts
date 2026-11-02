@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 
 /** How often a visible tab says it is still there. "Online" lasts 5 minutes, so one missed beat does not drop it. */
 export const HEARTBEAT_MS = 2 * 60 * 1000
@@ -20,7 +20,7 @@ async function beat(): Promise<void> {
  * while the tab is visible, so a tab left in the background does not count.
  */
 export function usePresenceHeartbeat() {
-  const { status } = useSession()
+  const { status } = useAuthSession()
   const signedIn = status === 'authenticated'
 
   useEffect(() => {

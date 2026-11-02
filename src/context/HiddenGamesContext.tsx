@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useLanguage } from '@/context/LanguageContext'
 import { gameKey, isGameSource, parseGameKey } from '@/utils/gameRef'
 import { notify } from '@/lib/notify'
@@ -31,7 +31,7 @@ const Ctx = createContext<CtxType>({
  * the outcome is always told with a toast (these happen outside a form).
  */
 export function HiddenGamesProvider({ children, initialKeys }: { children: React.ReactNode; initialKeys?: string[] }) {
-  const { status } = useSession()
+  const { status } = useAuthSession()
   const { T } = useLanguage()
   const [hidden, setHidden] = useState<HiddenGame[]>(() => (initialKeys ?? []).flatMap((key) => {
     const ref = parseGameKey(key)

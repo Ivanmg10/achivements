@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 
 import MainPageSkeleton from './main-page-skeleton/MainPageSkeleton'
 import MainPagePinnedGames from './main-page-pinned-games/MainPagePinnedGames'
@@ -20,7 +20,7 @@ import MainPagePortada from '@/components/main-page/main-page-portada/MainPagePo
 import MainPagePortadaSide from '@/components/main-page/main-page-portada-side/MainPagePortadaSide'
 
 export default function MainPage() {
-  const { status, data: session } = useSession()
+  const { status, data: session } = useAuthSession()
   const raLinked = useRaLinked()
 
   // Only the first read, while there is no session yet. update() (RaUserRefresher

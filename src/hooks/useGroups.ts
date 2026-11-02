@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { GameGroup } from '@/types/types'
 
 export function useGroups() {
-  const { status } = useSession()
+  const { status } = useAuthSession()
   const [groups, setGroups] = useState<GameGroup[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
