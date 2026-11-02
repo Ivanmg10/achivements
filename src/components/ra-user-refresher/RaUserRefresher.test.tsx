@@ -11,6 +11,7 @@ function mockSession(status: string, user?: object, update = jest.fn()) {
 }
 
 beforeEach(() => {
+  window.sessionStorage.clear()
   jest.clearAllMocks()
   // Reset module-level raRefreshed by simulating a logout cycle first
   mockSession('unauthenticated')
@@ -22,14 +23,25 @@ beforeEach(() => {
   })
 })
 
-test('asks the server to refresh the stored RA profile, then re-reads the session', async () => {
+test('asks the server to refresh the stored RA profile, then re-reads the session when it moved', async () => {
+  ;(fetch as jest.Mock).mockResolvedValue({ ok: true, json: () => Promise.resolve({ User: 'IvanXMarine', TotalPoints: 120 }) })
+  const update = jest.fn()
+  mockSession('authenticated', { raUser: { User: 'IvanXMarine', TotalPoints: 100 } }, update)
+  await act(async () => {
+    render(<RaUserRefresher />)
+  })
+  expect(fetch).toHaveBeenCalledWith('/api/updateRaUser', { method: 'PUT' })
+  expect(update).toHaveBeenCalledWith()
+})
+
+test('a profile that did not move leaves the session alone', async () => {
   const update = jest.fn()
   mockSession('authenticated', { raUser: { User: 'IvanXMarine' } }, update)
   await act(async () => {
     render(<RaUserRefresher />)
   })
   expect(fetch).toHaveBeenCalledWith('/api/updateRaUser', { method: 'PUT' })
-  expect(update).toHaveBeenCalledWith()
+  expect(update).not.toHaveBeenCalled()
 })
 
 test('a failed refresh is logged and leaves the session alone', async () => {
@@ -54,6 +66,15 @@ test('does not fetch when authenticated but no raUser', async () => {
 
 test('does not fetch when unauthenticated', async () => {
   mockSession('unauthenticated')
+  await act(async () => {
+    render(<RaUserRefresher />)
+  })
+  expect(fetch).not.toHaveBeenCalled()
+})
+
+test('a reload within a minute does not ask RA again (#101)', async () => {
+  window.sessionStorage.setItem('ra-profile-refresh:IvanXMarine', String(Date.now()))
+  mockSession('authenticated', { raUser: { User: 'IvanXMarine' } })
   await act(async () => {
     render(<RaUserRefresher />)
   })

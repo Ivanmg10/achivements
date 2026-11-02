@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useCallback, useEffect, useState, useRef } from 'react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useSubject } from '@/context/SubjectContext'
 import type { SteamAchievementUnified } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
+import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 
 /**
@@ -15,7 +16,9 @@ import { useWhenChanged } from '@/hooks/useWhenChanged'
  */
 export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
   const { T } = useLanguage()
-  const { status } = useSession()
+  const { status, data: session } = useAuthSession()
+  const user = session?.user?.id
+  const url = `/api/favorites?source=steam&gameId=${appId}`
   // Pins are the viewer's own; on someone else's page they are not offered.
   const subject = useSubject()
   const [pinned, setPinned] = useState<Set<string>>(new Set())
@@ -26,12 +29,15 @@ export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
    */
   const [leading, setLeading] = useState<Set<string>>(new Set())
   const [error, setError] = useState<string | null>(null)
+  const loadedUrl = useRef<string | null>(null)
 
-  // Another game (or signing in) starts over; state, so while rendering. The load is the effect.
+  // Another game (or signing in) starts over, from its pins as they last showed (lastAnswers), while
+  // they are read again; state, so while rendering. The load is the effect.
   useWhenChanged([appId, status], () => {
     if (status === 'authenticated') {
-      setPinned(new Set())
-      setLeading(new Set())
+      const shown = new Set(lastAnswer<string[]>(user, url) ?? [])
+      setPinned(shown)
+      setLeading(shown)
       setError(null)
     }
   })
@@ -39,7 +45,7 @@ export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
   useEffect(() => {
     if (status !== 'authenticated') return
     let current = true
-    fetch(`/api/favorites?source=steam&gameId=${appId}`)
+    fetch(url)
       .then((res) => {
         if (!res.ok) throw new Error(`Failed to load pinned achievements (${res.status})`)
         return res.json()
@@ -47,6 +53,8 @@ export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
       .then((rows: { steam_apiname: string }[]) => {
         if (current && Array.isArray(rows)) {
           const ids = new Set(rows.map((r) => r.steam_apiname))
+          loadedUrl.current = url
+          keepAnswer(user, url, [...ids])
           setPinned(ids)
           setLeading(ids)
         }
@@ -58,7 +66,12 @@ export function useSteamFavoriteAchievements(appId: number, gameTitle: string) {
     return () => {
       current = false
     }
-  }, [appId, status])
+  }, [appId, status, url, user])
+
+  // What is shown is what the next visit starts from, a pin just added included.
+  useEffect(() => {
+    if (loadedUrl.current === url) keepAnswer(user, url, [...pinned])
+  }, [pinned, user, url])
 
   const toggle = useCallback(
     async (achievement: SteamAchievementUnified) => {

@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useLanguage } from '@/context/LanguageContext'
 import { applyStoredValue, observeStoredWrites, readStoredValue, storedKeys } from '@/hooks/useStorageValue'
 import { isSyncedKey } from '@/utils/syncedPreferences'
 import { notify } from '@/lib/notify'
+import { bootstrapPart } from '@/lib/bootstrapParts'
 
 /** Changes are sent together, this long after the last one: a toggle clicked three times is one request. */
 const FLUSH_DELAY_MS = 800
@@ -20,6 +21,16 @@ async function putChanges(changes: Changes): Promise<void> {
   if (!res.ok) throw new Error(`Saving preferences failed (${res.status})`)
 }
 
+/** What the account holds: from the start-up bootstrap when it has it, else its own route. */
+async function accountPreferences(userId: string): Promise<Record<string, unknown>> {
+  const fromBootstrap = await bootstrapPart(userId, 'preferences')
+  if (fromBootstrap) return fromBootstrap
+  const res = await fetch('/api/preferences')
+  if (!res.ok) throw new Error(`Loading preferences failed (${res.status})`)
+  const body = (await res.json()) as { preferences?: Record<string, unknown> }
+  return body.preferences ?? {}
+}
+
 /**
  * Keeps the display preferences that live in this browser (which consoles show,
  * the library layout, a few switches — see syncedPreferences) the same on the
@@ -31,7 +42,7 @@ async function putChanges(changes: Changes): Promise<void> {
  * a short pause. A change that cannot be saved stays in this browser and says so.
  */
 export function usePreferencesSync() {
-  const { status, data: session } = useSession()
+  const { status, data: session } = useAuthSession()
   const { T } = useLanguage()
   const userId = status === 'authenticated' ? (session?.user?.id ?? null) : null
   // The message is read when something fails, not when the sync starts.
@@ -59,12 +70,9 @@ export function usePreferencesSync() {
       }
     }
 
-    fetch('/api/preferences')
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`Loading preferences failed (${res.status})`)
-        const body = (await res.json()) as { preferences?: Record<string, unknown> }
+    accountPreferences(userId)
+      .then(async (server) => {
         if (!current) return
-        const server = body.preferences ?? {}
 
         // The account wins where it has a value.
         for (const [key, value] of Object.entries(server)) {

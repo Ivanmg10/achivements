@@ -2,6 +2,7 @@ import { UserAwards } from '@/types/types'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
+import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
@@ -11,8 +12,12 @@ export function useUserAwards() {
   const { data: session } = useSession()
   const subject = useSubject()
   const { hidden } = useHiddenGames()
-  const [awards, setAwards] = useState<UserAwards | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  // Keyed by the RA account too: another one linked never paints the last one's answers.
+  const user = session?.user?.id ? `${session.user.id}:${session.user.rausername ?? ''}` : undefined
+  const url = withSubject('/api/getUserAwards', subject)
+  // Coming back to a page: what it showed, at once, while it is read again (lastAnswers).
+  const [awards, setAwards] = useState<UserAwards | null>(() => lastAnswer<UserAwards>(user, url) ?? null)
+  const [isLoading, setIsLoading] = useState(() => lastAnswer(user, url) === undefined)
   const [error, setError] = useState(false)
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
@@ -25,9 +30,10 @@ export function useUserAwards() {
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
-      fetchWithRetry(withSubject('/api/getUserAwards', subject))
+      fetchWithRetry(url)
         .then((data) => {
           if (!data || typeof data !== 'object' || Array.isArray(data)) return onFail()
+          keepAnswer(user, url, data)
           setAwards(data as UserAwards)
           setIsLoading(false)
           attemptRef.current = 0
@@ -35,7 +41,7 @@ export function useUserAwards() {
         .catch(onFail)
     }
     run()
-  }, [session?.user?.rausername, subject])
+  }, [session?.user?.rausername, url, user])
 
   useEffect(() => {
     if (!session?.user?.rausername || hasFetched.current) return

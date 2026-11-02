@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { RetroAchievementsGameCompleted } from '@/types/types'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
@@ -26,9 +26,11 @@ type CtxType = {
   refetch: () => void
 }
 
-const Ctx = createContext<CtxType>({
+type ProviderValue = CtxType & { request: () => void }
+
+const Ctx = createContext<ProviderValue>({
   all: [], consoles: [], softcore: [], hardcore: [], inProgress: [],
-  isLoading: true, error: false, keyInvalid: false, refetch: () => {},
+  isLoading: true, error: false, keyInvalid: false, refetch: () => {}, request: () => {},
 })
 
 const RA_SYSTEM_CONSOLE_IDS = new Set([100, 101])
@@ -36,8 +38,12 @@ function isRealGame(g: RetroAchievementsGameCompleted) {
   return !RA_SYSTEM_CONSOLE_IDS.has(g.ConsoleID)
 }
 
+/**
+ * The RA library. Loaded on first use, as RecentAchievementsContext is: a route
+ * that never reads it (rankings, groups, following) does not ask RA for it (#101).
+ */
 export function GamesDataProvider({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useAuthSession()
   const subject = useSubject()
   const rausername = session?.user?.rausername
   const { hidden } = useHiddenConsoles('ra')
@@ -46,6 +52,8 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
   const [keyInvalid, setKeyInvalid] = useState(false)
+  const [wanted, setWanted] = useState(false)
+  const request = useCallback(() => setWanted(true), [])
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -98,10 +106,10 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
       attemptRef.current = 0
       return
     }
-    if (!canFetch || hasFetched.current) return
+    if (!canFetch || !wanted || hasFetched.current) return
     hasFetched.current = true
     doFetch()
-  }, [signedOut, canFetch, doFetch])
+  }, [signedOut, canFetch, doFetch, wanted])
 
   useEffect(() => () => clearTimeout(retryTimer.current), [])
 
@@ -133,7 +141,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
 
   // One object per change of what it holds, so a re-render of the provider (the session updating)
   // does not re-render everything that reads it.
-  const value = useMemo(() => ({ all, consoles, softcore, hardcore, inProgress, isLoading: Boolean(isLoading || hiddenLoading), error, keyInvalid, refetch }), [all, consoles, softcore, hardcore, inProgress, isLoading, hiddenLoading, error, keyInvalid, refetch])
+  const value = useMemo(() => ({ all, consoles, softcore, hardcore, inProgress, isLoading: Boolean(isLoading || hiddenLoading), error, keyInvalid, refetch, request }), [all, consoles, softcore, hardcore, inProgress, isLoading, hiddenLoading, error, keyInvalid, refetch, request])
 
   return (
     <Ctx.Provider value={value}>
@@ -142,4 +150,9 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-export const useGamesData = () => useContext(Ctx)
+/** Reading the library is what asks for it: the first reader starts the load. */
+export function useGamesData(): CtxType {
+  const { request, ...value } = useContext(Ctx)
+  useEffect(request, [request])
+  return value
+}

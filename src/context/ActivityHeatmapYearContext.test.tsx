@@ -176,3 +176,11 @@ test('an error only when nothing came back from anywhere', async () => {
 
   await waitFor(() => expect(result.current.error).toBe(true))
 })
+
+test('no platform is asked for its year until something reads it (#101)', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { rausername: 'ivan', steamid: '7' } } })
+  renderHook(() => null, { wrapper })
+  expect(fetchWithRetry).not.toHaveBeenCalled()
+  expect(useSteamRecentAchievements).toHaveBeenLastCalledWith(null)
+  expect(useXboxRecentAchievements).toHaveBeenLastCalledWith(null)
+})

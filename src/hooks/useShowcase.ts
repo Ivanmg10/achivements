@@ -12,8 +12,9 @@ import { useHiddenGames } from '@/context/HiddenGamesContext'
  * The user's own (to add, take out and reorder), or on someone's public profile
  * theirs, to read. Every change is optimistic and goes back, saying so, if it
  * cannot be saved; adding to a full showcase says it is full instead.
+ * Nothing is asked until `enabled` (ShowcaseProvider waits for a reader).
  */
-export function useShowcase() {
+export function useShowcase(enabled = true) {
   const { T } = useLanguage()
   const subject = useSubject()
   const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
@@ -26,6 +27,7 @@ export function useShowcase() {
   const tempId = useRef(-1)
 
   useEffect(() => {
+    if (!enabled) return
     let current = true
     const retryTimer: { current: ReturnType<typeof setTimeout> | undefined } = { current: undefined }
     attemptRef.current = 0
@@ -54,7 +56,7 @@ export function useShowcase() {
       current = false
       clearTimeout(retryTimer.current)
     }
-  }, [reloadKey, subject])
+  }, [reloadKey, subject, enabled])
 
   const retry = useCallback(() => {
     setFailed(false)

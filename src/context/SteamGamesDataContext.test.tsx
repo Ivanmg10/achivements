@@ -329,3 +329,12 @@ test('games with no achievements at all are left out of both lists', async () =>
   expect(result.current.library.map((g) => g.id)).toEqual([2])
   expect(result.current.recent.map((g) => g.id)).toEqual([1])
 })
+
+test('nothing is asked without a reader, nor for one that only needs isLinked (#101)', () => {
+  setSteamId('76561198000000000')
+  mockRoutes()
+  renderHook(() => null, { wrapper })
+  const { result } = renderHook(() => useSteamGamesData({ passive: true }), { wrapper })
+  expect(result.current.isLinked).toBe(true)
+  expect(global.fetch).not.toHaveBeenCalled()
+})

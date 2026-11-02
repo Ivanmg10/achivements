@@ -28,7 +28,9 @@ type SteamGamesCtx = {
   refetch: () => void
 }
 
-const EMPTY: SteamGamesCtx = {
+type ProviderValue = SteamGamesCtx & { request: () => void }
+
+const EMPTY: ProviderValue = {
   isLinked: false,
   recent: [],
   recentLoading: false,
@@ -38,9 +40,10 @@ const EMPTY: SteamGamesCtx = {
   libraryLoading: false,
   libraryError: null,
   refetch: () => {},
+  request: () => {},
 }
 
-const Ctx = createContext<SteamGamesCtx>(EMPTY)
+const Ctx = createContext<ProviderValue>(EMPTY)
 
 /**
  * Always straight from the server: these lists change as the server fills in
@@ -80,6 +83,8 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
   const [library, setLibrary] = useState<SteamGameProgress[]>([])
   const [libraryLoading, setLibraryLoading] = useState(false)
   const [libraryError, setLibraryError] = useState<string | null>(null)
+  const [wanted, setWanted] = useState(false)
+  const request = useCallback(() => setWanted(true), [])
   /** Which account the lists belong to — a stale response for a previous link is dropped. */
   const loadedFor = useRef<string | null>(null)
   const generation = useRef(0)
@@ -155,7 +160,7 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
       loadedFor.current = null
       return
     }
-    if (loadedFor.current === steamid) return
+    if (!wanted || loadedFor.current === steamid) return
     loadedFor.current = steamid
     load(steamid)
     // The ref objects themselves: the cleanup must bump whatever load is live then.
@@ -170,7 +175,7 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
       gen.current++
       loaded.current = null
     }
-  }, [steamid, load])
+  }, [steamid, load, wanted])
 
   const refetch = useCallback(() => {
     if (!steamid) return
@@ -198,6 +203,7 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
         libraryLoading: Boolean(libraryLoading || hiddenLoading),
         libraryError,
         refetch,
+        request,
       }}
     >
       {children}
@@ -205,4 +211,14 @@ export function SteamGamesDataProvider({ children }: { children: React.ReactNode
   )
 }
 
-export const useSteamGamesData = () => useContext(Ctx)
+/**
+ * Reading the lists is what asks for them: the first reader starts the load (#101).
+ * `passive` reads without asking, for what only needs `isLinked` (from the session).
+ */
+export function useSteamGamesData({ passive = false }: { passive?: boolean } = {}): SteamGamesCtx {
+  const { request, ...value } = useContext(Ctx)
+  useEffect(() => {
+    if (!passive) request()
+  }, [passive, request])
+  return value
+}

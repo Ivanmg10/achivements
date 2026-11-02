@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
+import { readHiddenGames } from '@/lib/meBootstrap'
 import { isGameSource } from '@/utils/gameRef'
 import { sourceAllowed } from '@/utils/xboxAccess'
 import { rebuildPeriods } from '@/lib/scoreRefresh'
@@ -23,11 +24,7 @@ export async function GET() {
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
 
-    const { rows } = await pool.query(
-      'SELECT source, game_id, title, image FROM hidden_games WHERE user_id = $1 ORDER BY created_at DESC',
-      [session.user.id],
-    )
-    return NextResponse.json(rows)
+    return NextResponse.json(await readHiddenGames(session.user.id))
   } catch (err) {
     console.error('[hiddenGames GET]', err)
     return NextResponse.json({ message: 'Error interno' }, { status: 500 })

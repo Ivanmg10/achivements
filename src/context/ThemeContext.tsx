@@ -2,7 +2,7 @@
 
 import { Theme, THEME_STORAGE_KEY, isTheme } from "@/types/types";
 import { setThemeIcon } from "@/utils/themeIcon";
-import { useSession } from "next-auth/react";
+import { useAuthSession } from "@/hooks/useAuthSession";
 import {
   createContext,
   useContext,
@@ -26,7 +26,7 @@ export function ThemeProvider({
   children: ReactNode;
   defaultTheme?: Theme;
 }) {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthSession();
   const [theme, setTheme] = useState<Theme>(defaultTheme);
   const [syncedTheme, setSyncedTheme] = useState<string | undefined>(undefined);
 

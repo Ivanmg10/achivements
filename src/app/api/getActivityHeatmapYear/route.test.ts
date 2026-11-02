@@ -3,7 +3,8 @@ jest.mock('@/lib/raCache', () => ({ withCache: jest.fn(), clearCache: jest.fn() 
 jest.mock('@/lib/raClient', () => ({ getAchievementsEarnedBetween: jest.fn() }))
 jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
 
-import { GET, heatmapBuckets } from './route'
+import { GET } from './route'
+import { heatmapBuckets } from '@/lib/raYear'
 import { getServerSession } from 'next-auth'
 import { withCache } from '@/lib/raCache'
 import { getAchievementsEarnedBetween } from '@/lib/raClient'

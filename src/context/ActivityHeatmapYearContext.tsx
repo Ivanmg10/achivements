@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useSession } from 'next-auth/react'
 import { RecentAchievement } from '@/types/types'
 import type { XboxRecentAchievement } from '@/types/xbox'
+import type { PsnRecentTrophy } from '@/types/psn'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSteamRecentAchievements } from '@/hooks/useSteamRecentAchievements'
 import { toRecentAchievement } from '@/utils/steamMappers'
@@ -19,12 +20,17 @@ type CtxType = {
   achievements: RecentAchievement[]
   xboxAchievements: XboxRecentAchievement[]
   xboxLoading: boolean
+  /** PlayStation's year as Sony's trophies, for what needs their own fields (the home's 60 days, its rarest). */
+  psnTrophies: PsnRecentTrophy[]
+  psnLoading: boolean
   isLoading: boolean
   error: boolean
   refetch: () => void
 }
 
-const Ctx = createContext<CtxType>({ achievements: [], xboxAchievements: [], xboxLoading: true, isLoading: true, error: false, refetch: () => {} })
+type ProviderValue = CtxType & { request: () => void }
+
+const Ctx = createContext<ProviderValue>({ achievements: [], xboxAchievements: [], xboxLoading: true, psnTrophies: [], psnLoading: true, isLoading: true, error: false, refetch: () => {}, request: () => {} })
 
 const byDateDesc = (a: RecentAchievement, b: RecentAchievement) => b.Date.localeCompare(a.Date)
 
@@ -35,6 +41,10 @@ const byDateDesc = (a: RecentAchievement, b: RecentAchievement) => b.Date.locale
  *
  * Every platform together is the point: a day spent on Steam or PlayStation is
  * a day played, and leaving it out broke streaks that never happened.
+ *
+ * Loaded on first use: the header's streak is counted on the server
+ * (useStreakSummary), so only what draws the year (the home, the streak page, a
+ * profile) asks for it, not every route (#101).
  */
 export function ActivityHeatmapYearProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession()
@@ -45,17 +55,19 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
   const [raAchievements, setRaAchievements] = useState<RecentAchievement[]>([])
   const [raLoading, setRaLoading] = useState(true)
   const [raError, setRaError] = useState(false)
+  const [wanted, setWanted] = useState(false)
+  const request = useCallback(() => setWanted(true), [])
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   // A year of Steam has to be assembled game by game, so it comes from its own
   // endpoint; the hook already handles the language and the account changing.
-  const steam = useSteamRecentAchievements(steamid ? 'year' : null)
+  const steam = useSteamRecentAchievements(steamid && wanted ? 'year' : null)
   // PSN the same way: Sony has no feed, the server assembles it per game.
-  const psn = usePsnRecentTrophies('year')
+  const psn = usePsnRecentTrophies(wanted ? 'year' : null)
   // And Xbox, which also assembles it per game (nothing is asked unless it is linked and allowed).
-  const xbox = useXboxRecentAchievements('year')
+  const xbox = useXboxRecentAchievements(wanted ? 'year' : null)
 
   const doFetch = useCallback(() => {
     // Named, so a retry can call it again.
@@ -77,10 +89,10 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
   }, [rausername, subject])
 
   useEffect(() => {
-    if (!rausername || hasFetched.current) return
+    if (!rausername || !wanted || hasFetched.current) return
     hasFetched.current = true
     doFetch()
-  }, [rausername, doFetch])
+  }, [rausername, doFetch, wanted])
 
   useEffect(() => () => clearTimeout(retryTimer.current), [])
 
@@ -118,11 +130,16 @@ export function ActivityHeatmapYearProvider({ children }: { children: React.Reac
   const error = (raError || Boolean(steam.error) || Boolean(psn.error) || Boolean(xbox.error)) && achievements.length === 0
 
   const value = useMemo(
-    () => ({ achievements, xboxAchievements: visibleXbox, xboxLoading: xbox.isLoading, isLoading, error, refetch }),
-    [achievements, visibleXbox, xbox.isLoading, isLoading, error, refetch],
+    () => ({ achievements, xboxAchievements: visibleXbox, xboxLoading: xbox.isLoading, psnTrophies: psn.trophies, psnLoading: psn.isLoading, isLoading, error, refetch, request }),
+    [achievements, visibleXbox, xbox.isLoading, psn.trophies, psn.isLoading, isLoading, error, refetch, request],
   )
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 
-export const useActivityHeatmapYear = () => useContext(Ctx)
+/** Reading the year is what asks for it: the first reader starts the load. */
+export function useActivityHeatmapYear(): CtxType {
+  const { request, ...value } = useContext(Ctx)
+  useEffect(request, [request])
+  return value
+}

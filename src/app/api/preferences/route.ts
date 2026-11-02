@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
+import { readPreferences } from '@/lib/meBootstrap'
 import { cleanStoredPreferences, readPreferenceChanges } from '@/utils/syncedPreferences'
 
 /**
@@ -15,8 +16,7 @@ export async function GET() {
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
 
-    const { rows } = await pool.query('SELECT preferences FROM users WHERE id = $1', [session.user.id])
-    return NextResponse.json({ preferences: cleanStoredPreferences(rows[0]?.preferences) })
+    return NextResponse.json({ preferences: await readPreferences(session.user.id) })
   } catch (err) {
     console.error('[preferences GET]', err)
     return NextResponse.json({ message: 'Error interno' }, { status: 500 })

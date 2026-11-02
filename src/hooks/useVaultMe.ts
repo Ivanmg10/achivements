@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { fetchShared } from '@/lib/fetchShared'
+import { bootstrapPart } from '@/lib/bootstrapParts'
 import { useVaultFillState } from '@/context/VaultFillContext'
 import type { VaultMe } from '@/app/api/rankings/me/route'
 
-async function request(): Promise<VaultMe | null> {
+/** The first read takes the start-up bootstrap's when it has them; every other read asks the route. */
+async function request(userId: string | undefined, first: boolean): Promise<VaultMe | null> {
   try {
+    const fromBootstrap = first && userId ? await bootstrapPart(userId, 'vault') : null
+    if (fromBootstrap) return fromBootstrap
     // Shared: the header, the profile and the rankings page may all ask at once.
     const res = await fetchShared('/api/rankings/me')
     if (!res.ok) throw new Error(`rankings/me ${res.status}`)
@@ -24,8 +28,9 @@ async function request(): Promise<VaultMe | null> {
  * signed out. `error` when they could not be read.
  */
 export function useVaultMe() {
-  const { status } = useSession()
+  const { status, data: session } = useAuthSession()
   const signedIn = status === 'authenticated'
+  const userId = session?.user?.id
   const [me, setMe] = useState<VaultMe | null>(null)
   const [answered, setAnswered] = useState(false)
   const [attempt, setAttempt] = useState(0)
@@ -35,7 +40,7 @@ export function useVaultMe() {
   useEffect(() => {
     if (!signedIn) return
     let current = true
-    request().then((data) => {
+    request(userId, attempt === 0 && fillVersion === 0).then((data) => {
       if (!current) return
       setMe(data)
       setAnswered(true)
@@ -43,7 +48,7 @@ export function useVaultMe() {
     return () => {
       current = false
     }
-  }, [signedIn, attempt, fillVersion])
+  }, [signedIn, userId, attempt, fillVersion])
 
   const retry = useCallback(() => {
     setAnswered(false)

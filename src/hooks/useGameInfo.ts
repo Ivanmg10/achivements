@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import type { RetroAchievementsGameWithAchievements, SubsetGame } from '@/types/types'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 
@@ -28,7 +28,7 @@ function baseTitle(title: string | null | undefined): string {
  * subset lookup only costs the tabs, never the page. `retry` asks again.
  */
 export function useGameInfo(gameId: string | null) {
-  const { status } = useSession()
+  const { status } = useAuthSession()
   const [state, setState] = useState<State>(EMPTY)
   const [attempt, setAttempt] = useState(0)
 

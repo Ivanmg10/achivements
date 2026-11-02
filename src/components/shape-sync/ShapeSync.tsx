@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useEntrancesOnce } from '@/hooks/useEntrancesOnce'
 import { useFontStyle } from '@/hooks/useFontStyle'
 import { useHomeLayout } from '@/hooks/useHomeLayout'
@@ -21,7 +21,7 @@ export default function ShapeSync() {
   const [font] = useFontStyle()
   const [homeLayout] = useHomeLayout()
   const { layout: libraryLayout } = useLibraryPrefs('')
-  const { data: session, status } = useSession()
+  const { data: session, status } = useAuthSession()
   const look = status === 'loading' ? undefined : sessionLook(session?.user)
   useEntrancesOnce()
 

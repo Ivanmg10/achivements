@@ -167,3 +167,9 @@ test('the consoles unticked in preferences leave the list, and the options still
   expect(result.current.hardcore.map((g) => g.GameID)).toEqual([2])
   expect(result.current.consoles.map((c) => c.name).sort()).toEqual(['GameCube', 'SNES'])
 })
+
+test('nothing is asked until something reads the library (#101)', () => {
+  ;(useSession as jest.Mock).mockReturnValue({ data: { user: { id: '1', rausername: 'testuser' } }, status: 'authenticated' })
+  renderHook(() => null, { wrapper })
+  expect(fetchWithRetry).not.toHaveBeenCalled()
+})

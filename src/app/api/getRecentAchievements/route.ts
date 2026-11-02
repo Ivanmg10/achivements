@@ -5,6 +5,7 @@ import { withCache } from '@/lib/raCache'
 import { cachedJson } from '@/lib/httpCache'
 import { getUserRecentAchievements } from '@/lib/raClient'
 import { visibleGamesForUser } from '@/lib/gameVisibility'
+import { slimUnlock } from '@/lib/raYear'
 import type { RecentAchievement } from '@/types/types'
 
 const TTL = 60 * 1000
@@ -48,7 +49,7 @@ export async function GET(req?: Request) {
       { refreshable: true },
     )
     const visible = await visibleGamesForUser(id, data, 'ra', (achievement) => achievement.GameID)
-    return cachedJson(visible, 0)
+    return cachedJson(visible.map(slimUnlock), 0)
   } catch (err) {
     return raUnavailable(err)
   }

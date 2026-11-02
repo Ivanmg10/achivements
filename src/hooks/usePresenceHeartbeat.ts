@@ -1,10 +1,15 @@
 import { useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
+import { dueInThisTab } from '@/lib/tabThrottle'
 
 /** How often a visible tab says it is still there. "Online" lasts 5 minutes, so one missed beat does not drop it. */
 export const HEARTBEAT_MS = 2 * 60 * 1000
 
+/** The route writes at most once a minute: a beat sooner than that (a reload) is not sent. */
+const MIN_GAP_MS = 60 * 1000
+
 async function beat(): Promise<void> {
+  if (!dueInThisTab('presence-beat', MIN_GAP_MS)) return
   try {
     const res = await fetch('/api/presence', { method: 'POST' })
     if (!res.ok) console.error('[usePresenceHeartbeat]', res.status)
@@ -20,7 +25,7 @@ async function beat(): Promise<void> {
  * while the tab is visible, so a tab left in the background does not count.
  */
 export function usePresenceHeartbeat() {
-  const { status } = useSession()
+  const { status } = useAuthSession()
   const signedIn = status === 'authenticated'
 
   useEffect(() => {

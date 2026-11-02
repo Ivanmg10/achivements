@@ -6,8 +6,8 @@ independently and appended here. Nothing in this file changes application code.
 | Section | Status | Base commit |
 |---|---|---|
 | Security | **Complete** (2026-10-30) | `c250f4bc21c96e6d6034a49cfa6b2a97ebcbb0e3` (`develop`, after #92) |
-| Performance | **Complete** for this base (2026-10-30); post-BFF comparison pending | same |
-| API limits | **Complete** for this base (2026-10-30); post-BFF comparison pending | same |
+| Performance | **Complete** for this base (2026-10-30); post-BFF comparison [done 2026-11-02](#post-bff-comparison-101) | same; after: `perf/101-bff-by-domains` |
+| API limits | **Complete** for this base (2026-10-30); post-BFF review [done 2026-11-02](#post-bff-comparison-101), injected failures still to run | same |
 
 **Reading this later.** Findings describe that commit. Work that landed after it, including #88 (hidden
 games in lists, in progress when this was written), was not reviewed. Check `git diff c250f4bc..HEAD` on
@@ -418,7 +418,7 @@ Installing with `--ignore-scripts` worked from the lockfile. No `Dependabot` con
 | CI | `pull_request` only, minimal permissions, user text passed through `env`. |
 | Security headers | CSP, HSTS, `X-Frame-Options`, `nosniff`, Referrer and Permissions policies present on pages and API. No CORS headers. No `X-Powered-By`. |
 | Caching | Per-user reads are `private` with `Vary: Cookie`. `public` appears only on the image proxy and Steam icons. |
-| BFF aggregates | **None exist at this commit.** See [Re-audit](#re-audit-when-the-bff-lands). |
+| BFF aggregates | **None exist at this commit.** Reviewed when #101 added them: see [Post-BFF comparison](#post-bff-comparison-101). |
 
 ## OWASP Top Ten
 
@@ -638,8 +638,7 @@ it proves nothing. **Proposal:** measure with a real large library before adding
 ## Not audited
 
 Field data (CrUX, RUM), production Vitals, INP on real interactions, signed-in routes with real data, re-render
-profiling, and everything in #77's scope. **Post-BFF comparison is pending:** no aggregate exists at this commit.
-When the rollout lands, compare calls, bytes, latency and failure isolation against #86's table.
+profiling, and everything in #77's scope. The post-BFF comparison is [below](#post-bff-comparison-101) (#101, 2026-11-02).
 
 ---
 
@@ -786,8 +785,8 @@ account identifiers.
 
 No call reached a real platform, so all limits come from documentation or earlier project measurements. Real 429 behaviour,
 Sony's limits and production call volumes were not measured, and OpenXBL's current plans could not be confirmed online.
-Xbox relies on #87's work, which was not repeated. PSN and Xbox failures were read in code, not run. **Post-BFF validation is
-pending**: the shared loader, its timeout and stale policy, and whether one aggregate multiplies upstream calls.
+Xbox relies on #87's work, which was not repeated. PSN and Xbox failures were read in code, not run. The post-BFF review is
+[below](#post-bff-comparison-101).
 
 ---
 
@@ -833,3 +832,114 @@ commit and is left as it was written. Results use the same local method as the a
 | API-04 | Fixed | Pace per key, per instance. 100 uncached games now take about 25 s. |
 | API-05 | Partly | Daily count and a brake for fills. Separate keys per environment are Vercel settings. |
 | API-06 | Partly | RA, Steam and PSN counted per day. Steam warns in the logs; there is no admin view yet. |
+
+---
+
+# Post-BFF comparison (#101)
+
+2026-11-02, branch `perf/101-bff-by-domains` against `develop` at `af08c7ba` (v1.7.0).
+
+## Method
+
+- Both as production builds (`next build`, `next start`), side by side on localhost (3101 `develop` in a
+  separate worktree, 3100 the branch), the same `.env.local`: the **preview** database, real platforms.
+- The project owner's own account, linked to RA, Steam, PSN and Xbox (an admin), signed in by them in the
+  Playwright browser. Page loads only: no clicks, no writes beyond what any page load does (presence, fill).
+- `scripts/measure-api-calls.js`: a full load of each route, network idle, 4 s more (the home's idle mount,
+  Steam's fill passes), idle again. Data/actions are `/api` answers that are not images, as in #86; bytes
+  decoded. One warm-up pass per server, then the measured pass, so server caches were warm on both sides,
+  as in #86. One pass each: not a benchmark, and no latency percentiles.
+- The home is compared with the browser cache off on both: `getGameData` (box art, `max-age`) came from each
+  port's own browser cache or not depending on the order of the runs, with identical DOM on both.
+
+## Calls and bytes
+
+| Route | `develop` calls | after | `develop` KB | after KB |
+|---|---:|---:|---:|---:|
+| Home `/` (browser cache off) | 42 | 35 | 1,464 | 1,464 |
+| Library `/playing` | 33 | 21 | 1,287 | 254 |
+| RA game | 33 | 11 | 1,358 | 60 |
+| Steam game | 28 | 12 | 1,263 | 107 |
+| PSN game | 28 | 11 | 1,276 | 52 |
+| Xbox game | 25 | 6 | 1,248 | 4 |
+| Groups | 31 | 10 | 1,251 | 7 |
+| Group detail | 27 | 14 | 1,249 | 216 |
+| Following | 55 | 10 | 1,494 | 295 |
+| Rankings | 26 | 7 | 1,258 | 14 |
+| `/racha` | 26 | 12 | 1,256 | 1,108 |
+| Account `/user` | 32 | 19 | 1,260 | 206 |
+
+Public profile not measured: the script takes its link from the home, which had none to the account's own.
+
+**What moved it.** (1) `update()` no longer re-runs every "signed in" effect: the second wave (`auth/session`,
+`preferences`, `presence`, `rankings/me`, `rankings/fill`, each ×2, plus `auth/csrf`) is gone from every route,
+and the RA game page's repeated `getGameProgression`, `getGameSubsets`, `getGameComments`, `favorites`.
+(2) Providers load on first read: the ~20 shared calls (libraries, the year, pins, showcase) left the routes
+that do not show them. (3) The header's streak is `me/streak` (a few bytes) instead of the year of four
+platforms and two libraries. (4) `me/bootstrap` replaces `preferences`, `hiddenGames` and `rankings/me`.
+(5) Following: 28 detail calls are one `follows/cards`.
+
+**What did not.** The home still decodes ~1.46 MB: it draws the year (heatmap, charts) and every library
+(profile column, collection, browse), which it needs. An `overview` per platform was not built: the profile
+column and the overview panel compute from the whole library, so it would add requests, not remove them.
+`/racha` reads the year by design (1.1 MB; #86 measured RA's year alone at ~766 KB). Those are the next candidates if the
+home's weight matters: a server-side daily-count DTO for the heatmap and charts.
+
+## Security review of the new aggregates
+
+Against [Re-audit when the BFF lands](#re-audit-when-the-bff-lands). Code reading plus the routes' tests;
+local only, the owner's account, nothing sent to another user's account or probed in production.
+
+| Check | `me/streak` | `me/bootstrap` | `follows/cards` |
+|---|---|---|---|
+| `dataOwner` | Not used on purpose: the session user only, `?user=` ignored (test) | Session user only, DB only | Every sub-read goes through the profile route's own handler with `?user=`, so `dataOwner` runs per read as before |
+| Private profiles | Own data only | Own data only | The overview lists public profiles only; each sub-read's `dataOwner` refuses a private one |
+| Per platform, Xbox | RA with the viewer's own key; Xbox only under `canUseXbox` (test) | Xbox points only under `canUseXbox` (test) | Xbox only when the overview marked it (admin viewers) and the Xbox routes check again |
+| Cache keys | The loaders' own (user/account in each key), shared with the pages | None | The routes' own, keyed on the subject |
+| HTTP | `private, max-age=0`, `Vary: Cookie` | `private, no-store`, `Vary: Cookie` | `private, no-store`, `Vary: Cookie` |
+| SEC-05 (someone else's key) | Cannot happen: own key only | No platform | Same sub-reads, same ten people, same `ra-borrowed` limit per sub-read: no more calls on a borrowed key than the browser made |
+
+## API limits
+
+- **Upstream calls are the same reads, through the same loaders and caches** (`loadRaYear`, `loadSteamYear`,
+  `psnRecentTrophies`, `xboxRecentAchievements`, the profile routes). The aggregates cut browser requests,
+  not by doing less upstream: on a cold cache the streak reads the same year the streak page would.
+- **Fewer triggers.** The removed second wave also ran `rankings/fill` twice per page load; one is left.
+- **Pace kept.** `follows/cards` reads one person at a time for the people you follow (Xbox, #87) and two for
+  followers, as the browser did. Xbox's hardening (#87) is untouched: every Xbox read still goes through its routes.
+- **Timeouts and stale policy** are each loader's, unchanged. A new risk: `follows/cards` waits for all ten people
+  in one function call (the section already waited for all of them); on a cold cache that is the sum of their reads,
+  within the function's 300 s but long. Watch its duration in Vercel's logs.
+
+## Still to measure
+
+Injected failures, timeouts and 429s per platform in a controlled environment; a real cold server cache;
+an RA-only account and a single non-RA account; latency over several samples.
+
+## Second pass: moving inside the app (2026-11-02)
+
+The first pass measured full loads only. Measured again on the branch, production build, the same account,
+walking through the app's own links (`/` → `/rankings` → back → a game → back → the same game → `/following`):
+
+| Step | Before this pass | After |
+|---|---:|---:|
+| Full load of `/` | 35 | 33 |
+| Back to `/` | 12, behind skeletons | 10, painted at once and read again |
+| The same game again | 4 | 4 requests; subsets and comments from the browser's copy |
+
+- **The browser cache was almost never used.** next-auth rewrites the session cookie on every session read
+  (each page load and tab focus), and every `cachedJson` answer had `Vary: Cookie`: a `max-age=900` answer
+  served from the copy until the next session read, then went to the network again. Answers that depend only
+  on the URL now skip `Vary` (`sameForEveryone`): checked, `getGameSubsets` is served from the copy past a
+  session read, `getUserRankAndScore` (per user) is not.
+- **RA's and PSN's 60 days come from the year** on the home (−2 requests, −2 RA calls every 15 min); Steam's
+  does not, so its 5-minute freshness stays.
+- **RA game pictures are kept in localStorage**: `getGameData` for covers and shelves is asked once per game, ever.
+- **Coming back paints the last answer** (rank, awards, last game, groups, pins, perfect order, Following) and
+  reads again: no request saved there, by the user's rule that platform data is never older than its server cache.
+- **The RA profile refresh and the arrival beat run at most once a minute per tab.**
+- **RA's year is lighter**: four fields no page reads left out of the answer (`slimUnlock`): 755 → 577 KB for the
+  same 1,601 unlocks. PSN's year (166 KB) is mostly icon URLs repeated per trophy (101 KB): not changed.
+- **Every page read that comes back paints its last answer**, keyed by user and platform account: browse, Steam's
+  feeds and each game page's pins too.
+

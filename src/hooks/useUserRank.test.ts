@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useUserRank } from './useUserRank'
+import { forgetAnswers } from '@/lib/lastAnswers'
 
 jest.mock('@/lib/fetchWithRetry', () => ({ fetchWithRetry: jest.fn(), scheduleRetry: jest.fn() }))
 
@@ -60,4 +61,19 @@ test('out of retries, the error shows; refetch tries again', async () => {
   act(() => result.current.refetch())
   await waitFor(() => expect(result.current.rank).toEqual({ Rank: 7, Score: 100, SoftcoreScore: 0 }))
   expect(result.current.error).toBe(false)
+})
+
+test('coming back paints the last rank at once, and still reads it again (#101)', async () => {
+  forgetAnswers()
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { id: '7', rausername: 'ivan' } } })
+  ;(fetchWithRetry as jest.Mock).mockResolvedValueOnce({ Rank: 10, Score: 1 }).mockResolvedValueOnce({ Rank: 9, Score: 2 })
+  const first = renderHook(() => useUserRank())
+  await waitFor(() => expect(first.result.current.rank).toEqual({ Rank: 10, Score: 1 }))
+  first.unmount()
+
+  const again = renderHook(() => useUserRank())
+  expect(again.result.current).toMatchObject({ rank: { Rank: 10, Score: 1 }, isLoading: false })
+  await waitFor(() => expect(again.result.current.rank).toEqual({ Rank: 9, Score: 2 }))
+  expect(fetchWithRetry).toHaveBeenCalledTimes(2)
+  forgetAnswers()
 })

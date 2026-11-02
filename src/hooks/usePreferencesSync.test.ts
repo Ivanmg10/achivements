@@ -1,3 +1,4 @@
+jest.mock('@/lib/bootstrapParts', () => ({ bootstrapPart: jest.fn(async () => null) }))
 jest.mock('@/lib/notify', () => ({ notify: { error: jest.fn(), success: jest.fn() } }))
 
 import { renderHook, act, waitFor } from '@testing-library/react'
@@ -140,4 +141,15 @@ test('leaving with a change still waiting sends it', async () => {
 test('a value applied from the account updates what shows it, without being sent back', () => {
   applyStoredValue('library-layout', 'list')
   expect(window.localStorage.getItem('library-layout')).toBe('list')
+})
+
+test('the account\'s values come from the start-up bootstrap when it has them (#101)', async () => {
+  const { bootstrapPart } = jest.requireMock('@/lib/bootstrapParts')
+  ;(bootstrapPart as jest.Mock).mockResolvedValueOnce({ 'library-layout': 'list' })
+  signIn()
+  respond({})
+  renderHook(() => usePreferencesSync())
+  await waitFor(() => expect(window.localStorage.getItem('library-layout')).toBe('list'))
+  expect(bootstrapPart).toHaveBeenCalledWith('7', 'preferences')
+  expect((global.fetch as jest.Mock).mock.calls.filter((c) => c[0] === '/api/preferences' && !c[1]?.method)).toEqual([])
 })

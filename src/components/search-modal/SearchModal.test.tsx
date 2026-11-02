@@ -19,7 +19,7 @@ jest.mock('@/hooks/useRecentFeed', () => ({
     loading: false,
   }),
 }))
-jest.mock('@/hooks/useStreakData', () => ({ useStreakData: () => ({ activeStreak: { days: 46 } }) }))
+jest.mock('@/hooks/useStreakSummary', () => ({ useStreakSummary: () => ({ streak: 46 }) }))
 jest.mock('@/hooks/useVaultMe', () => ({ useVaultMe: () => ({ me: { rank: 19, points: 10 } }) }))
 jest.mock('next/image', () => ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />)
 

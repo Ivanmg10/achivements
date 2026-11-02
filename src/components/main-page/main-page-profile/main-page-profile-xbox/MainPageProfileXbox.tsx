@@ -12,7 +12,7 @@ import MainPageProfileXboxLinked from './main-page-profile-xbox-linked/MainPageP
  */
 export default function MainPageProfileXbox() {
   const { T } = useLanguage()
-  const { isLinked } = useXboxGamesData()
+  const { isLinked } = useXboxGamesData({ passive: true })
   const { summary, isLoading, error, retry } = useXboxSummary()
 
   if (!isLinked) {

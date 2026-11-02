@@ -1,17 +1,23 @@
 import { RetroAchievementsGameWithAchievements } from '@/types/types'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
+import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
 
 export function useGameProgression(gameId: string | null) {
-  const { status } = useSession()
+  const { status, data: session } = useAuthSession()
   const subject = useSubject()
-  const [game, setGame] = useState<RetroAchievementsGameWithAchievements | null>(null)
+  // Keyed by the RA account too: another one linked never paints the last one's answers.
+  const user = session?.user?.id ? `${session.user.id}:${session.user.rausername ?? ''}` : undefined
+  const urlOf = useCallback((id: string) => withSubject(`/api/getGameProgression?gameId=${id}`, subject), [subject])
+  // Coming back to a page: the game as it showed, at once, while it is read again (lastAnswers).
+  const shown = gameId ? lastAnswer<RetroAchievementsGameWithAchievements>(user, urlOf(gameId)) : undefined
+  const [game, setGame] = useState<RetroAchievementsGameWithAchievements | null>(() => shown ?? null)
   /** The game whose answer (the data, or the final failure) is in; loading is anything else being asked for. */
-  const [loadedFor, setLoadedFor] = useState<string | null>(null)
+  const [loadedFor, setLoadedFor] = useState<string | null>(() => (shown ? gameId : null))
   const [failed, setFailed] = useState(false)
   const fetchedGameId = useRef<string | null>(null)
   const attemptRef = useRef(0)
@@ -37,7 +43,7 @@ export function useGameProgression(gameId: string | null) {
         const onFail = (err?: unknown) => {
           if (!scheduleRetry(attemptRef, retryTimer, () => run(id), err)) { setFailed(true); setLoadedFor(id) }
         }
-        fetch(withSubject(`/api/getGameProgression?gameId=${id}`, subject))
+        fetch(urlOf(id))
           .then((r) => {
             // The status is what lets scheduleRetry give up at once on a 4xx.
             if (!r.ok) throw Object.assign(new Error(`HTTP ${r.status}`), { status: r.status })
@@ -45,6 +51,7 @@ export function useGameProgression(gameId: string | null) {
           })
           .then((data: RetroAchievementsGameWithAchievements) => {
             if (!data?.ID) return onFail()
+            keepAnswer(user, urlOf(id), data)
             setGame(data)
             setFailed(false)
             setLoadedFor(id)
@@ -54,7 +61,7 @@ export function useGameProgression(gameId: string | null) {
       }
       run(id)
     },
-    [status, subject],
+    [status, urlOf, user],
   )
 
   useEffect(() => {

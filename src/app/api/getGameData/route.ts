@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const data = await cachedGame(gameId, auth.apiKey);
-    return cachedJson(data, GAME_TTL_MS);
+    return cachedJson(data, GAME_TTL_MS, { sameForEveryone: true });
   } catch (err) {
     return raUnavailable(err)
   }

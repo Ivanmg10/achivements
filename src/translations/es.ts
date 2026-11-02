@@ -543,7 +543,7 @@ export const es: Translations = {
       {
         heading: 'Cookies y almacenamiento local',
         body: [
-          'Necesarias, sin consentimiento: una cookie de sesión que mantiene tu sesión iniciada, una cookie con el idioma que eliges (para que las páginas lleguen ya en él), y almacenamiento local para tu idioma, tema y elección de cookies, además de cómo se pintan las páginas (diseño, si tenías la sesión iniciada, la altura de algunos bloques) para que carguen sin saltos.',
+          'Necesarias, sin consentimiento: una cookie de sesión que mantiene tu sesión iniciada, una cookie con el idioma que eliges (para que las páginas lleguen ya en él), y almacenamiento local para tu idioma, tema y elección de cookies, además de cómo se pintan las páginas (diseño, si tenías la sesión iniciada, la altura de algunos bloques) para que carguen sin saltos. También guarda las direcciones de las imágenes de juegos ya mostradas, para no volver a pedirlas.',
           'Analítica, solo si aceptas: cookies de Google Analytics (_ga, _ga_*), que duran hasta dos años. A Google solo se le envía la ruta de la página, nunca el resto de la dirección. Puedes retirar el consentimiento cuando quieras desde «Configurar cookies» al pie de la página: la analítica se detiene al momento y sus cookies se borran.',
         ],
       },

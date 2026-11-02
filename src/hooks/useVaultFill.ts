@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useLanguage } from '@/context/LanguageContext'
 import { notify } from '@/lib/notify'
 import type { FillAnswer, FillStatus } from '@/lib/scoreRefresh'
@@ -35,7 +35,7 @@ async function call(method: 'GET' | 'POST'): Promise<FillAnswer | FillStatus | n
  * linked. `version` grows after every pass that ran, for whatever shows points.
  */
 export function useVaultFill() {
-  const { status: auth, data: session } = useSession()
+  const { status: auth, data: session } = useAuthSession()
   const { T } = useLanguage()
   const [status, setStatus] = useState<FillStatus | null>(null)
   const [version, setVersion] = useState(0)

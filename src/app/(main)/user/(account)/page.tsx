@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import UserIdentityCard from '@/components/user-page/user-identity-card/UserIdentityCard'
 import UserPreferencesCard from '@/components/user-page/user-preferences-card/UserPreferencesCard'
 import UserPlatforms from '@/components/user-page/user-platforms/UserPlatforms'
@@ -14,7 +14,7 @@ import UserPageSkeleton from '@/components/user-page/user-page-skeleton/UserPage
  * last. The admin panel, for those who have one, opens from the top card.
  */
 export default function UserPage() {
-  const { status, data: session } = useSession()
+  const { status, data: session } = useAuthSession()
 
   // On a full load the session comes after the first paint, and it decides the page's shape (the
   // admin button, Xbox's card): its skeleton holds until then, as the home's does. Only the first

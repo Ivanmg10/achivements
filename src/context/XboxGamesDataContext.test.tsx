@@ -106,3 +106,11 @@ describe('the consoles unticked in preferences', () => {
     await waitFor(() => expect(result.current.library).toHaveLength(3))
   })
 })
+
+test('nothing is asked without a reader, nor for one that only needs isLinked (#101)', () => {
+  setSession({ id: '7', admin: true, xboxxuid: '25354' })
+  renderHook(() => null, { wrapper })
+  const { result } = renderHook(() => useXboxGamesData({ passive: true }), { wrapper })
+  expect(result.current.isLinked).toBe(true)
+  expect(global.fetch).not.toHaveBeenCalled()
+})

@@ -1,13 +1,18 @@
 'use client'
 
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { GameGroup } from '@/types/types'
+import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
+
+const GROUPS_URL = '/api/groups'
 
 export function useGroups() {
-  const { status } = useSession()
-  const [groups, setGroups] = useState<GameGroup[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { status, data: session } = useAuthSession()
+  const user = session?.user?.id
+  // Coming back to a page: the groups as they showed, at once, while they are read again (lastAnswers).
+  const [groups, setGroups] = useState<GameGroup[]>(() => lastAnswer<GameGroup[]>(user, GROUPS_URL) ?? [])
+  const [isLoading, setIsLoading] = useState(() => lastAnswer(user, GROUPS_URL) === undefined)
   const [error, setError] = useState<string | null>(null)
   const fetched = useRef(false)
 
@@ -25,6 +30,11 @@ export function useGroups() {
       setIsLoading(false)
     }
   }, [status])
+
+  // What is shown is what the next visit starts from, edits included.
+  useEffect(() => {
+    if (!isLoading) keepAnswer(user, GROUPS_URL, groups)
+  }, [groups, isLoading, user])
 
   useEffect(() => {
     if (status !== 'authenticated' || fetched.current) return

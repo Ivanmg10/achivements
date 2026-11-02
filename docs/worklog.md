@@ -28,6 +28,54 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 "added X to CLAUDE.md".
 
 ---
+## 2026-11-02 — Second pass: caches and moving inside the app (`perf/101-bff-by-domains`, #101)
+
+**Did** — Measured client navigation (the first pass measured full loads only): coming back to the home asked
+12 reads again. `cachedJson(..., { sameForEveryone })` for game-only answers; the home's RA and PSN 60 days
+from the year (`getActivityHeatmap` and its hook removed); `raArtStore` (RA pictures in localStorage, `/privacy`
+in nine languages); `lastAnswers` (paint the last answer on return, read again) in rank, awards, last game,
+groups, a group, perfect order, pins and Following; `dueInThisTab` for the RA profile refresh and the arrival beat.
+**Why** — The user asked for a deeper second analysis of caching and repeated reads.
+**Decisions** — The user wants platforms as fresh as possible (see a game change at once, and faster later):
+no client TTL on platform data, only paint-then-read; Steam keeps its own 60 days (its year is 30 min). Own data
+got the same (not a TTL) because its writers are spread over many hooks: a forgotten invalidation would show
+old data after an edit. `fill` left alone: its POST is the work, a GET would not save a request.
+**Open** — A faster platform refresh as its own issue (the user's wish; costs each platform's budget); its text is
+ready but `gh issue create` was refused by the permission check, so the user opens it. Done later the same day:
+browse (want to play), Steam's feeds and every game page's pins paint their last answer (keyed by platform account
+too: Steam's unlink test caught a link painting the old account); RA unlocks drop four unread fields (year 755 → 577 KB).
+Left: `getGamesLastPlayed` in the home's abandoned card (its ids come from data loaded first, so painting gains
+nothing); PSN's year repeats each game's icon URL per trophy (101 of 166 KB): a per-game table would cut it, but
+changes the shape.
+**Watch out** — `Vary: Cookie` stays on anything per user or refreshed by cookie; next-auth rewrites the session
+cookie on every read, so only `sameForEveryone` answers really reach the browser cache.
+
+---
+## 2026-11-02 — Pages load only what they show: the BFF by domains (`perf/101-bff-by-domains`, #101)
+
+**Did** — `useAuthSession` (next-auth's `update()` flipped `status` and re-ran every "signed in" effect: the
+second wave on every page); `RaUserRefresher` only updates when RA's profile moved. The header's streak from
+`GET /api/me/streak` (`lib/meStreak.ts`, the RA and Steam years moved to `lib/raYear`, `lib/steamUnlockYear`).
+Every global data provider loads on its first reader (`request()`, `{ passive: true }`). `GET /api/me/bootstrap`
+(preferences, hidden games, Vault Points; `lib/meBootstrap`, `lib/vaultMe`, `lib/bootstrapParts`). The home mounts
+pins, groups and browse when idle (`useWhenIdle`). `GET /api/follows/cards` (`lib/friendCards.ts`) for both
+Following lists. `scripts/measure-api-calls.js`. Rules in `CLAUDE.md` → Data loading; results in the v1.7 audit.
+**Why** — #86 measured ~25 shared calls and ~1.3 MB on routes that show little (Rankings, Groups), 55 on Following.
+Measured after (same environment, warm): Rankings 26 → 7 calls, 1,258 → 14 KB; Following 55 → 10; game pages
+25–33 → 6–12; home 42 → 35 (its bytes stay: it draws the year and the libraries).
+**Decisions** — The user asked for everything in one PR, commits per step. No `overview` per platform: the
+home's profile column and overview panel compute from the whole library, so it would add requests (told the
+user). `follows/cards` calls the profile routes' own handlers in-process instead of copying `dataOwner`, keys,
+private checks and caches: parity by construction. The streak takes the browser's unticked consoles as
+`?hidden=` (the account copy lags 800 ms). Bootstrap is DB-only so no platform can hold up start-up data.
+Home sections are prefetched when idle, not on open (the user's choice: tabs stay instant).
+**Open** — Injected failures/429s, a cold server cache, RA-only and single-platform accounts (the audit's
+"Still to measure"). The public profile route was not measured. A daily-count DTO for the home's heatmap and
+charts would be the next cut in bytes. Watch `follows/cards` duration on Vercel (ten people in one call).
+**Watch out** — A new provider in `MainProviders` must load on first read, never at mount; read `status` through
+`useAuthSession`. Measuring on two ports: each has its own browser cache, which moved `getGameData` between runs.
+
+---
 ## 2026-11-02 — Release v1.7.0 to production (`chore/merge-main-into-develop-3`)
 
 **Did** — Applied `migrations/043_ra_key_sealed.sql` and `044_admin_totp.sql` to production (checked first:

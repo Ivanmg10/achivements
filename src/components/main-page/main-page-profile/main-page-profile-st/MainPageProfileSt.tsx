@@ -12,7 +12,7 @@ import MainPageProfileStLinked from './main-page-profile-st-linked/MainPageProfi
  */
 export default function MainPageProfileSt() {
   const { T } = useLanguage()
-  const { isLinked } = useSteamGamesData()
+  const { isLinked } = useSteamGamesData({ passive: true })
   const { profile, isLoading, error, retry } = useSteamProfile()
 
   if (!isLinked) {
