@@ -67,3 +67,17 @@ export async function loadRaYear(id: string, rausername: string, raid: string): 
   }
   return merged
 }
+
+/**
+ * RA's unlock fields no page reads (checked 2026-11-02): about a quarter of a year's
+ * answer (178 of 755 KB measured on a real account). Left out of what is sent, kept
+ * in the cache. `Author` and `Type` stay: the achievement modal shows them.
+ */
+const UNREAD = ['AuthorULID', 'BadgeURL', 'GameURL', 'CumulScore'] as const
+
+export function slimUnlock<T>(unlock: T): T {
+  if (!unlock || typeof unlock !== 'object') return unlock
+  const copy = { ...unlock } as Record<string, unknown>
+  for (const key of UNREAD) delete copy[key]
+  return copy as T
+}
