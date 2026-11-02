@@ -39,6 +39,3 @@ two steps and left the way to code: tried on the page, way 2 only changes how a 
   there the page is behind a dialog; here the page is what is being styled.
 - Only the sample is shared. The modal keeps its own choosers, and the theme keeps its own dialog there.
 
-## Left
-
-- `/welcome` must leave `PUBLIC_PATHS` in `src/proxy.ts` before the PR merges.

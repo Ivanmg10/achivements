@@ -18,8 +18,8 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
   behind a second password check, with every action logged.
 - **Welcome** — after signing up, `/welcome` walks a new account through what the
   app does, linking RetroAchievements (with a guide to finding the key), Steam and
-  PlayStation, the profile and the preferences, one step at a time; every step can
-  be skipped or gone back to.
+  PlayStation, the profile, the style (with a live sample) and the privacy, one step
+  at a time; every step can be skipped or gone back to.
 - **Three platforms, linked by the user**
   - *RetroAchievements* — with the user's own Web API key (never a shared one).
   - *Steam* — by signing in on Steam (proves the account is yours; game details must be public).

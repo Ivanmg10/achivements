@@ -165,8 +165,8 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
   header): `WelcomePage` and its steps in `src/components/welcome-page/`, the step
   state in `useWelcomeSteps` (this tab's sessionStorage, `welcome-progress`, so Steam's
   sign-in round trip lands back on its step). Linking reuses `useRaLink`, `useSteamLink`
-  (`next=/welcome` is an allowed return) and `usePsnLink`; the profile and preferences
-  reuse the account page's fields. The curtain is `welcome-curtain/WelcomeCurtain` (shared with
+  (`next=/welcome` is an allowed return) and `usePsnLink`; the profile, style and privacy steps
+  reuse the account page's fields, and style shows the Layout modal's sample. The curtain is `welcome-curtain/WelcomeCurtain` (shared with
   the sign-up forms, which start it: `useWelcomeEntry`). The rest of its motion is a CSS module (`WelcomePage.module.css`)
   and its titles use the `font-display` face (Barlow Condensed, `display` in
   `src/lib/fonts.ts`), loaded only there. Sign-up (`RegisterUserForm`, a new Steam
