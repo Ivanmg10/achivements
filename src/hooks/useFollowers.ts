@@ -1,17 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { withPlaying, type FriendOverview, type PlayingNow } from '@/utils/friends'
-import { DETAIL_LIMIT, loadFriendDetails, loadPlaying, type FriendDetails } from '@/hooks/useFriendsData'
-import { mapLimit } from '@/utils/utils'
-
-const AT_ONCE = 2
+import { withPlaying, type FriendDetails, type FriendOverview, type PlayingNow } from '@/utils/friends'
+import { loadCards, loadPlaying } from '@/hooks/useFriendsData'
 
 /**
  * The people who follow you, as the Following page's cards show them (public
  * profiles only, newest first), read once `enabled` turns on, and, as for the
- * people you follow, the activity and games of the newest DETAIL_LIMIT and who
- * is in a Steam game now: so the two lists draw the same card. Only you ever
- * see this list. `retry` after a failure asks again.
+ * people you follow, the activity and games of the newest DETAIL_LIMIT (one
+ * answer, see loadCards) and who is in a Steam game now: so the two lists draw
+ * the same card. Only you ever see this list. `retry` after a failure asks again.
  */
 export function useFollowers(enabled: boolean) {
   const { lang } = useLanguage()
@@ -24,25 +21,16 @@ export function useFollowers(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return
     let current = true
-    fetch('/api/follows/overview?who=followers', { cache: 'no-store' })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`followers ${res.status}`)
-        const data = await res.json()
-        if (!Array.isArray(data)) throw new Error('followers: not a list')
-        return data as FriendOverview[]
-      })
-      .then(async (data) => {
+    loadCards(lang, 'followers')
+      .then((cards) => {
         if (!current) return
-        setFollowers(data)
-        if (data.some((f) => f.steam)) {
+        setFollowers(cards.friends)
+        setDetails(cards.details)
+        if (cards.friends.some((f) => f.steam)) {
           loadPlaying().then((p) => {
             if (current) setPlaying(p)
           })
         }
-        await mapLimit(data.slice(0, DETAIL_LIMIT), AT_ONCE, async (friend) => {
-          const d = await loadFriendDetails(friend, lang)
-          if (current) setDetails((prev) => ({ ...prev, [friend.username]: d }))
-        })
       })
       .catch((err) => {
         console.error('[useFollowers]', err)
@@ -62,6 +50,7 @@ export function useFollowers(enabled: boolean) {
   }, [])
 
   const withGames = useMemo(() => (followers ? withPlaying(followers, playing) : null), [followers, playing])
-  const detailsLoading = !failed && (followers ?? []).slice(0, DETAIL_LIMIT).some((f) => !details[f.username])
-  return { followers: withGames, details, isLoading: enabled && followers === null && !failed, detailsLoading, error: failed, retry }
+  const isLoading = enabled && followers === null && !failed
+  // The details come with the list: "loading" until both are in, as the section waits for.
+  return { followers: withGames, details, isLoading, detailsLoading: isLoading, error: failed, retry }
 }
