@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
+import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { pinnedKey } from '@/utils/utils'
 import type { PinnedAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
@@ -15,12 +17,16 @@ import { useHiddenGames } from '@/context/HiddenGamesContext'
  * up, `error` is set so the card can say so and offer a retry. Unpinning is
  * optimistic and puts the row back if the request fails.
  */
+const PINS_URL = '/api/favorites?source=all'
+
 export function usePinnedAchievements() {
   const { T } = useLanguage()
   const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
-  const [pinned, setPinned] = useState<PinnedAchievement[]>([])
+  const user = useAuthSession().data?.user?.id
+  // Coming back to a page: the pins as they showed, at once, while they are read again (lastAnswers).
+  const [pinned, setPinned] = useState<PinnedAchievement[]>(() => lastAnswer<PinnedAchievement[]>(user, PINS_URL) ?? [])
   /** Which load the answer (data or final failure) belongs to; loading is any other being asked for. */
-  const [loadedKey, setLoadedKey] = useState<number | null>(null)
+  const [loadedKey, setLoadedKey] = useState<number | null>(() => (lastAnswer(user, PINS_URL) ? 0 : null))
   const [failed, setFailed] = useState(false)
   const [reloadKey, setReloadKey] = useState(0)
   const attemptRef = useRef(0)
@@ -32,7 +38,7 @@ export function usePinnedAchievements() {
     attemptRef.current = 0
 
     function load() {
-      fetchWithRetry('/api/favorites?source=all')
+      fetchWithRetry(PINS_URL)
         .then((data) => {
           if (!current) return
           setPinned(Array.isArray(data) ? (data as PinnedAchievement[]) : [])
@@ -56,6 +62,11 @@ export function usePinnedAchievements() {
       clearTimeout(retryTimer.current)
     }
   }, [reloadKey])
+
+  // What is shown is what the next visit starts from, an unpin or a new order included.
+  useEffect(() => {
+    if (loadedKey !== null && !failed) keepAnswer(user, PINS_URL, pinned)
+  }, [pinned, loadedKey, failed, user])
 
   const refetch = useCallback(() => {
     setPinned([])

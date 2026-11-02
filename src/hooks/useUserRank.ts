@@ -4,12 +4,16 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
 
 export function useUserRank() {
   const { data: session } = useSession()
   const subject = useSubject()
-  const [rank, setRank] = useState<UserRankAndScore | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const user = session?.user?.id
+  const url = withSubject('/api/getUserRankAndScore', subject)
+  // Coming back to a page: what it showed, at once, while it is read again (lastAnswers).
+  const [rank, setRank] = useState<UserRankAndScore | null>(() => lastAnswer<UserRankAndScore>(user, url) ?? null)
+  const [isLoading, setIsLoading] = useState(() => lastAnswer(user, url) === undefined)
   const [error, setError] = useState(false)
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
@@ -22,9 +26,10 @@ export function useUserRank() {
       const onFail = (err?: unknown) => {
         if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setIsLoading(false) }
       }
-      fetchWithRetry(withSubject('/api/getUserRankAndScore', subject))
+      fetchWithRetry(url)
         .then((data) => {
           if (!data || typeof data !== 'object' || Array.isArray(data) || !('Rank' in data)) return onFail()
+          keepAnswer(user, url, data)
           setRank(data as UserRankAndScore)
           setIsLoading(false)
           attemptRef.current = 0
@@ -32,7 +37,7 @@ export function useUserRank() {
         .catch(onFail)
     }
     run()
-  }, [session?.user?.rausername, subject])
+  }, [session?.user?.rausername, url, user])
 
   useEffect(() => {
     if (!session?.user?.rausername || hasFetched.current) return

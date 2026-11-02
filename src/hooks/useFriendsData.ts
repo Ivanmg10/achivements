@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { withPlaying, type FriendDetails, type FriendOverview, type PlayingNow } from '@/utils/friends'
 
+import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
+import { useAuthSession } from '@/hooks/useAuthSession'
+
 export { DETAIL_LIMIT } from '@/utils/friends'
 export type { FriendDetails } from '@/utils/friends'
 
@@ -39,8 +42,11 @@ export async function loadCards(lang: string, who: 'following' | 'followers' = '
  */
 export function useFriendsData(enabled: boolean) {
   const { lang } = useLanguage()
-  const [friends, setFriends] = useState<FriendOverview[] | null>(null)
-  const [details, setDetails] = useState<Record<string, FriendDetails>>({})
+  const user = useAuthSession().data?.user?.id
+  const cardsUrl = `/api/follows/cards?lang=${lang}`
+  // Coming back: the cards as they showed, at once, while they are read again (lastAnswers).
+  const [friends, setFriends] = useState<FriendOverview[] | null>(() => lastAnswer<FriendCards>(user, cardsUrl)?.friends ?? null)
+  const [details, setDetails] = useState<Record<string, FriendDetails>>(() => lastAnswer<FriendCards>(user, cardsUrl)?.details ?? {})
   const [playing, setPlaying] = useState<PlayingNow>({})
   const [error, setError] = useState(false)
   const [attempt, setAttempt] = useState(0)
@@ -53,6 +59,7 @@ export function useFriendsData(enabled: boolean) {
     let finished = false
     loadCards(lang)
       .then((cards) => {
+        keepAnswer(user, cardsUrl, cards)
         if (!current) return
         setFriends(cards.friends)
         setDetails(cards.details)
@@ -74,7 +81,7 @@ export function useFriendsData(enabled: boolean) {
       // Stopped halfway (a page that wants it from its first render, run twice by Strict Mode): the next run asks again.
       if (!finished) started.current = null
     }
-  }, [enabled, attempt, lang])
+  }, [enabled, attempt, lang, user, cardsUrl])
 
   const retry = useCallback(() => {
     setError(false)
