@@ -28,6 +28,21 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 "added X to CLAUDE.md".
 
 ---
+## 2026-11-02 — Release v1.7.0 to production (`chore/merge-main-into-develop-3`)
+
+**Did** — Applied `migrations/043_ra_key_sealed.sql` and `044_admin_totp.sql` to production (checked first:
+neither was there; checked after: `users.raid_hash`, its unique index and `admin_totp` exist). Merged `main` into
+`develop` (no file changes, it only records the link) and bumped to 1.7.0 for the `develop` → `main` PR (62 commits,
+#46–#109).
+**Why** — The user asked to ship what `develop` holds. Without 043/044 in production, linking RA and the admin
+unlock would answer 500 the moment the code is live.
+**Decisions** — Minor bump: new pages, the component library and the two designs. No new environment variable
+(compared the `process.env` reads of both branches); Next went from 16.3 to 16.4.
+**Open** — After the merge to `main`: check `www.cheevovault.com`, and the admin panel's first unlock enrols a
+second factor (the admin needs an authenticator app). Vercel WAF rules (audit v1.7) are the user's.
+**Watch out** — Merge this PR with **"Create a merge commit"**, never squash: a squash drops the link to `main`.
+
+---
 
 ## 2026-11-02 — Welcome preferences: concepts on the canvas, and /welcome open for now (`feat/102-welcome-look-sample`, #102)
 
