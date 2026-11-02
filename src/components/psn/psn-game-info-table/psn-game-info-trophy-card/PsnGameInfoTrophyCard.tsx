@@ -41,7 +41,7 @@ export default function PsnGameInfoTrophyCard({
   return (
     <li
       data-trophy={t.id}
-      className={`relative flex items-start gap-3 rounded-xl p-3 transition-colors duration-500 ${
+      className={`relative flex items-start gap-3 rounded-tile p-3 transition-colors duration-500 ${
         highlighted ? 'bg-accent/15' : pinned ? 'bg-warning/10' : 'bg-bg-main/40'
       }`}
     >
@@ -49,7 +49,7 @@ export default function PsnGameInfoTrophyCard({
         type="button"
         onClick={onOpen}
         aria-label={concealed ? T.psn.hiddenTrophy : t.name}
-        className="absolute inset-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       />
       <div className="relative shrink-0 pointer-events-none">
       {t.iconUrl && !concealed ? (
@@ -58,11 +58,11 @@ export default function PsnGameInfoTrophyCard({
           alt=""
           width={48}
           height={48}
-          className={`w-12 h-12 rounded-lg object-cover ${t.earned ? `ring-2 ${TROPHY_GRADE_RING[t.type]}` : 'grayscale opacity-50'}`}
+          className={`w-12 h-12 rounded-box object-cover ${t.earned ? `ring-2 ${TROPHY_GRADE_RING[t.type]}` : 'grayscale opacity-50'}`}
           unoptimized
         />
       ) : (
-        <div className="w-12 h-12 rounded-lg bg-ink/10" aria-hidden="true" />
+        <div className="w-12 h-12 rounded-box bg-ink/10" aria-hidden="true" />
       )}
       {t.hidden && !t.earned && onToggleReveal && (
         // No hover on a phone: the eye is always there.
@@ -93,7 +93,7 @@ export default function PsnGameInfoTrophyCard({
           )}
           {t.rarity !== null && (
             <span className="text-text-secondary">
-              {formatRarity(t.rarity)}
+              {formatRarity(t.rarity, lang)}
               {T.achievement.haveIt}
             </span>
           )}

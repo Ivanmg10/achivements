@@ -50,9 +50,9 @@ export default function MainPageProfileActionsRefresh({
       disabled={busy || resting}
       aria-label={T.profileRa.refreshData}
       title={T.profileRa.refreshData}
-      className={`flex items-center px-2 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main transition-colors focus:outline-none focus:ring-2 disabled:opacity-50 disabled:hover:bg-ink/8 disabled:hover:text-text-secondary ${ringClass}`}
+      className={`w-8 h-8 inline-flex items-center justify-center rounded-icon text-text-secondary hover:text-text-main hover:bg-ink/[0.08] transition-colors focus:outline-none focus:ring-2 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-text-secondary ${ringClass}`}
     >
-      <IconRefresh className={`w-3.5 h-3.5 ${busy ? 'animate-spin' : ''}`} aria-hidden="true" />
+      <IconRefresh className={`w-4 h-4 ${busy ? 'animate-spin' : ''}`} aria-hidden="true" />
     </button>
   )
 }

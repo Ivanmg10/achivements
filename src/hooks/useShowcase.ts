@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import { notify } from '@/lib/notify'
 import { withSubject } from '@/utils/withSubject'
 import { SHOWCASE_MAX, showcaseKey, type ShowcaseEntry, type ShowcaseItem } from '@/utils/showcase'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 /**
  * The achievement showcase: up to five earned achievements, in the user's order.
@@ -15,6 +16,7 @@ import { SHOWCASE_MAX, showcaseKey, type ShowcaseEntry, type ShowcaseItem } from
 export function useShowcase() {
   const { T } = useLanguage()
   const subject = useSubject()
+  const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
   const [items, setItems] = useState<ShowcaseItem[]>([])
   /** Which load the answer (data or final failure) belongs to; loading is any other being asked for. */
   const [loadedKey, setLoadedKey] = useState<number | null>(null)
@@ -146,5 +148,6 @@ export function useShowcase() {
   )
 
   const answered = loadedKey === reloadKey
-  return { items, isLoading: !answered, error: answered && failed, retry, has, add, addMany, remove, reorder, full: items.length >= SHOWCASE_MAX }
+  const visible = useMemo(() => hiddenLoading ? [] : items.filter((item) => !isHidden(item.gameId, item.source)), [items, isHidden, hiddenLoading])
+  return { items: visible, isLoading: hiddenLoading || !answered, error: answered && failed, retry, has, add, addMany, remove, reorder, full: items.length >= SHOWCASE_MAX }
 }

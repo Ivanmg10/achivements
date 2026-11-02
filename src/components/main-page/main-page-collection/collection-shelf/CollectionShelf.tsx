@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { motion, useReducedMotion } from 'framer-motion'
 import { IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSpotlight } from '@/hooks/useSpotlight'
@@ -14,9 +13,9 @@ import { useSubject } from '@/context/SubjectContext'
 
 /** Medal per place, metal-like; the number on it says the place too, so colour is never the only cue. */
 const MEDALS = [
-  'bg-linear-to-b from-amber-200 to-amber-500 text-amber-950',
+  'bg-linear-to-b from-warning to-warning text-amber-950',
   'bg-linear-to-b from-zinc-100 to-zinc-400 text-zinc-900',
-  'bg-linear-to-b from-orange-300 to-orange-600 text-orange-950',
+  'bg-linear-to-b from-warning to-warning text-orange-950',
   'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-ink/10',
   'bg-linear-to-b from-bg-tertiary to-bg-main text-text-main ring-1 ring-ink/10',
 ]
@@ -31,7 +30,6 @@ const MEDALS = [
 export default function CollectionShelf({ games, counts }: { games: LatestPerfect[]; counts: PerfectCounts }) {
   const { T } = useLanguage()
   const subject = useSubject()
-  const reduce = useReducedMotion()
   const onPointerMove = useSpotlight()
 
   return (
@@ -60,7 +58,7 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
           {counts.xbox > 0 && (
             <>
               <span aria-hidden="true">·</span>
-              <span className="text-green-500 font-semibold">{counts.xbox} Xbox</span>
+              <span className="text-success font-semibold">{counts.xbox} Xbox</span>
             </>
           )}
         </p>
@@ -69,19 +67,13 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
       {games.length === 0 ? (
         <EmptyState icon={<IconTrophy className="w-6 h-6" />} title={T.cards.noCompletedGames} subtitle={T.cards.noCompletedGamesSub} size="compact" />
       ) : (
-        <ol className="grid grid-flow-col auto-cols-[minmax(8.5rem,1fr)] gap-3 overflow-x-auto snap-x [scrollbar-width:none]">
+        <ol className="grid grid-flow-col auto-cols-[minmax(8.5rem,1fr)] gap-3 overflow-x-auto snap-x [scrollbar-width:none] enter-cards">
           {games.map((game, i) => (
-            <motion.li
-              key={game.key}
-              className="snap-start"
-              initial={reduce ? false : { opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: reduce ? 0 : 0.06 * i, ease: [0.16, 1, 0.3, 1] }}
-            >
+            <li key={game.key} className="snap-start">
               <Link
                 href={gameHref(game.source, game.id, subject)}
                 onPointerMove={onPointerMove}
-                className="spotlight group relative flex flex-col items-center gap-3 h-full rounded-xl bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="spotlight group relative flex flex-col items-center gap-3 h-full rounded-tile bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 <span className={`absolute top-2 left-2 z-10 w-6 h-6 rounded-full text-[11px] font-extrabold flex items-center justify-center shadow-md shadow-black/40 ${MEDALS[i]}`}>
                   {i + 1}
@@ -97,7 +89,7 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
                   </span>
                 </span>
               </Link>
-            </motion.li>
+            </li>
           ))}
         </ol>
       )}

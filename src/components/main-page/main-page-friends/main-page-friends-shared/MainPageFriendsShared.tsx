@@ -14,27 +14,19 @@ import PresenceDot from '@/components/presence-dot/PresenceDot'
  * Your games that the people you follow play too, the most shared first: your
  * progress, then each of them with theirs, opening the two side by side.
  */
-export default function MainPageFriendsShared({ rows, isLoading }: { rows: SharedGameRow[]; isLoading: boolean }) {
+export default function MainPageFriendsShared({ rows }: { rows: SharedGameRow[] }) {
   const { T } = useLanguage()
 
   return (
     <div className="flex flex-col gap-3">
       <h3 className="text-[10px] uppercase tracking-widest text-text-secondary">{T.friends.shared}</h3>
       {rows.length === 0 ? (
-        isLoading ? (
-          <div aria-busy="true" className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-16 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
-            ))}
-          </div>
-        ) : (
-          <EmptyState icon={<IconArrowsDiff className="w-6 h-6" />} title={T.friends.sharedEmpty} size="compact" className="py-6" />
-        )
+        <EmptyState icon={<IconArrowsDiff className="w-6 h-6" />} title={T.friends.sharedEmpty} size="compact" className="py-6" />
       ) : (
-        <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 enter-rows">
           {rows.map(({ game, friends }) => (
-            <li key={game.key} className="flex items-center gap-3 p-2.5 rounded-xl bg-bg-main min-w-0">
-              <GameIcon source={game.source} id={game.id} imageUrl={game.iconUrl} size={44} className="w-11 h-11 rounded-lg shrink-0" />
+            <li key={game.key} className="flex items-center gap-3 p-2.5 rounded-tile bg-bg-main min-w-0">
+              <GameIcon source={game.source} id={game.id} imageUrl={game.iconUrl} size={44} className="w-11 h-11 rounded-box shrink-0" />
               <span className="flex flex-col gap-1.5 min-w-0 flex-1">
                 <span className="text-sm font-medium truncate">{game.title}</span>
                 <span className="text-[11px] text-text-secondary">

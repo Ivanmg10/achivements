@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion'
 import type { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnSummary } from '@/hooks/usePsnSummary'
-import { calcAvgPerDay } from '@/utils/utils'
+import { calcAvgPerDay, decimal } from '@/utils/utils'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
@@ -29,8 +29,10 @@ export default function MainPagePsnStats({
   streak: number
   isLoading?: boolean
 }) {
-  const { T } = useLanguage()
-  const { summary } = usePsnSummary()
+  const { T, lang } = useLanguage()
+  const { summary, error } = usePsnSummary()
+  // Its pills are in the row from the start: arriving late, they pushed every other one aside.
+  const summaryWaiting = !summary && !error
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [weekOpen, setWeekOpen] = useState(false)
   const [monthOpen, setMonthOpen] = useState(false)
@@ -52,8 +54,8 @@ export default function MainPagePsnStats({
   if (isLoading) {
     return (
       <div className="flex flex-wrap gap-3" aria-busy="true">
-        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.streak.title, T.psn.level].map((label) => (
-          <StatPill key={label} label={label} value="—" accent="text-text-secondary" />
+        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.psn.level, T.streak.title, T.psn.platinum].map((label) => (
+          <StatPill key={label} label={label} value="" loading />
         ))}
       </div>
     )
@@ -71,16 +73,16 @@ export default function MainPagePsnStats({
       />
       <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={trophies} onClick={() => setWeekOpen(true)} />
       <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={trophies} onClick={() => setMonthOpen(true)} />
-      <StatPill label={T.pointsStats.avgPerDay} value={stats.avg.toFixed(1)} sub={T.pointsStats.perDay} />
-      {summary && <StatPill label={T.psn.level} value={summary.trophyLevel} sub="PlayStation" />}
+      <StatPill label={T.pointsStats.avgPerDay} value={decimal(stats.avg, lang)} sub={T.pointsStats.perDay} />
+      {(summary || summaryWaiting) && <StatPill label={T.psn.level} value={summary?.trophyLevel ?? ''} sub="PlayStation" loading={summaryWaiting} />}
       <StatPill
         label={T.streak.title}
         value={`${streak}d`}
         sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
-        accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined}
+        accent={streak > 0 ? 'text-accent' : undefined}
         href="/racha"
       />
-      {summary && <StatPill label={T.psn.platinum} value={summary.earned.platinum} sub={T.psn.total} accent="text-sky-300" />}
+      {(summary || summaryWaiting) && <StatPill label={T.psn.platinum} value={summary?.earned.platinum ?? ''} sub={T.psn.total} accent="text-sky-300" loading={summaryWaiting} />}
 
       <AnimatePresence>
         {selectedDay && (

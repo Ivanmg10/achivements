@@ -1,0 +1,104 @@
+/*
+ * The welcome's motion besides the curtain (welcome-curtain/): the content coming
+ * in from the side it was reached from, the giant word drifting, and the RA key
+ * guide. Only transform and opacity move. With reduced motion everything here only
+ * fades or stands still (and the curtain is never mounted).
+ */
+
+/* Content coming in: from the left going forward, from the right going back. */
+.in,
+.in2,
+.in3,
+.card {
+  animation: in-forward 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+/* Reached under the curtain, it waits for the curtain to start leaving (`--enter-delay`),
+   so the step is seen arriving rather than found already there. */
+.in, .card { animation-delay: var(--enter-delay, 0s); }
+.in2 { animation-delay: calc(var(--enter-delay, 0s) + 0.12s); }
+.in3 { animation-delay: calc(var(--enter-delay, 0s) + 0.24s); }
+.back .in,
+.back .in2,
+.back .in3 {
+  animation-name: in-back;
+}
+.card {
+  animation-name: card;
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1.1);
+}
+.calm .in,
+.calm .in2,
+.calm .in3,
+.calm .card {
+  animation: fade 0.15s linear both;
+}
+
+@keyframes in-forward { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: none; } }
+@keyframes in-back { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+@keyframes card { from { opacity: 0; transform: translateY(24px) rotate(2deg); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* The tick on a platform just linked lands after its card. */
+.pop { animation: pop 0.45s cubic-bezier(0.2, 0.8, 0.2, 1.4) calc(var(--enter-delay, 0s) + 0.3s) backwards; }
+@keyframes pop { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: none; } }
+
+/* The giant word behind everything, drifting. */
+.drift { animation: drift 14s linear infinite; }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(-30%); } }
+
+/* "Reading your games": a line that keeps moving while it is not done. */
+.shimmer {
+  background: linear-gradient(90deg, color-mix(in oklab, rgb(var(--accent)) 25%, transparent), rgb(var(--accent)), color-mix(in oklab, rgb(var(--accent)) 25%, transparent));
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: 0 0; } }
+
+/* The RA key guide: a cursor goes Settings → Keys → Copy, 7 s a lap, and the three
+   numbered steps light up as it gets to each. The browser sketch is 460 px wide. */
+.cursor { animation: cursor 7s cubic-bezier(0.6, 0, 0.3, 1) infinite; }
+@keyframes cursor {
+  0% { transform: translate(300px, 260px); }
+  10%, 22% { transform: translate(404px, 14px); }
+  32%, 48% { transform: translate(46px, 144px); }
+  58%, 78% { transform: translate(396px, 132px); }
+  90%, 100% { transform: translate(300px, 260px); }
+}
+.click { animation: click 7s linear infinite; }
+@keyframes click {
+  0%, 13% { opacity: 0; transform: scale(0.4); }
+  15% { opacity: 0.9; transform: scale(1); }
+  19%, 35% { opacity: 0; transform: scale(1.6); }
+  36% { opacity: 0; transform: scale(0.4); }
+  38% { opacity: 0.9; transform: scale(1); }
+  42%, 61% { opacity: 0; transform: scale(1.6); }
+  62% { opacity: 0; transform: scale(0.4); }
+  64% { opacity: 0.9; transform: scale(1); }
+  68%, 100% { opacity: 0; transform: scale(1.6); }
+}
+.settings { animation: settings 7s linear infinite; }
+@keyframes settings { 0%, 14% { background: transparent; } 15%, 30% { background: rgba(229, 181, 63, 0.3); } 31%, 100% { background: transparent; } }
+.page { animation: page 7s linear infinite; }
+@keyframes page { 0%, 15% { opacity: 0; } 18%, 92% { opacity: 1; } 96%, 100% { opacity: 0; } }
+.keysItem { animation: keys-item 7s linear infinite; }
+@keyframes keys-item { 0%, 37% { background: transparent; color: #a3a8b3; } 38%, 100% { background: #2a2c3a; color: #fff; } }
+.keys { animation: keys 7s linear infinite; }
+@keyframes keys { 0%, 39% { opacity: 0; transform: translateY(8px); } 43%, 92% { opacity: 1; transform: none; } 96%, 100% { opacity: 0; } }
+.copied { animation: copied 7s linear infinite; }
+@keyframes copied { 0%, 63% { opacity: 0; } 65%, 88% { opacity: 1; } 92%, 100% { opacity: 0; } }
+.step1, .step2, .step3 { box-shadow: inset 0 0 0 1px rgb(var(--ink) / 0.06); animation: 7s linear infinite; }
+.step1 { animation-name: step1; }
+.step2 { animation-name: step2; }
+.step3 { animation-name: step3; }
+@keyframes step1 { 0%, 30% { box-shadow: inset 0 0 0 2px #e5b53f; } 31%, 100% { box-shadow: inset 0 0 0 1px rgb(var(--ink) / 0.06); } }
+@keyframes step2 { 0%, 30% { box-shadow: inset 0 0 0 1px rgb(var(--ink) / 0.06); } 31%, 58% { box-shadow: inset 0 0 0 2px #e5b53f; } 59%, 100% { box-shadow: inset 0 0 0 1px rgb(var(--ink) / 0.06); } }
+@keyframes step3 { 0%, 58% { box-shadow: inset 0 0 0 1px rgb(var(--ink) / 0.06); } 59%, 92% { box-shadow: inset 0 0 0 2px #e5b53f; } 93%, 100% { box-shadow: inset 0 0 0 1px rgb(var(--ink) / 0.06); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .in, .in2, .in3, .card { animation: fade 0.15s linear both; }
+  .pop, .drift, .shimmer, .cursor, .click, .settings, .keysItem, .step1, .step2, .step3, .copied { animation: none; }
+  /* The guide's sketch stands still on its last page: the key, ready to copy. */
+  .page, .keys { animation: none; opacity: 1; }
+  .cursor { display: none; }
+}

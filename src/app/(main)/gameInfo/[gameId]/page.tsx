@@ -1,10 +1,8 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { useParams } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGameInfo } from '@/hooks/useGameInfo'
-import { fadeUp } from '@/lib/animations'
 import GameInfoSkeleton from '@/components/game-info-skeleton/GameInfoSkeleton'
 import GameInfoHeroBackground from '@/components/game-info-hero-background/GameInfoHeroBackground'
 import GameInfoHeader from '@/components/game-info-header/GameInfoHeader'
@@ -29,7 +27,7 @@ export default function GameInfo() {
   if (error) {
     return (
       <main className="flex-1 flex flex-col justify-center items-center text-text-main gap-3">
-        <p role="alert" className="text-red-400 text-lg">{error}</p>
+        <p role="alert" className="text-danger text-lg">{error}</p>
         <button onClick={retry} className="text-sm text-text-secondary underline">
           {T.gameInfoPage.retry}
         </button>
@@ -45,7 +43,7 @@ export default function GameInfo() {
   return (
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <GameInfoHeroBackground imagePath={heroImage} />
-      <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
+      <div className="relative w-full flex flex-col items-center">
         <GameInfoHeader gameData={game} actions={(game.NumAchievements ?? 0) > 0 && <GameAiExport getSource={() => raAiSource(game)} />}>
           {showSelector && (
             <GameInfoSubsetSelector
@@ -59,7 +57,7 @@ export default function GameInfo() {
         </GameInfoHeader>
         <GameInfoTable gameData={game} />
         {game.ID && <GameInfoComments gameId={game.ID} />}
-      </motion.div>
+      </div>
     </main>
   )
 }

@@ -9,7 +9,7 @@ jest.mock('@/hooks/useVaultMe', () => ({ useVaultMe: jest.fn() }))
 jest.mock('@/hooks/useXboxEnabled', () => ({ useXboxEnabled: () => false }))
 
 const row = (rank: number, username: string, over: Record<string, unknown> = {}) => ({
-  username, avatar: null, rank, points: 10_000 - rank * 100, totalPoints: 10_000 - rank * 100, split: { ra: 100 }, completed: 3, achievements: 40, delta: null, isMe: false, trend: [], ...over,
+  username, avatar: null, rank, points: 10_000 - rank * 100, totalPoints: 10_000 - rank * 100, split: { ra: 100 }, completed: 3, achievements: 40, delta: null, isMe: false, trend: [], streak: 0, bestStreak: 0, ...over,
 })
 const rows = Array.from({ length: 6 }, (_, i) => row(i + 1, `user${i + 1}`))
 const retry = jest.fn()
@@ -44,16 +44,21 @@ test('a podium for the first three, then the table, and more on demand', () => {
 test('changing the view asks for it', () => {
   render(<RankingsPage signedIn />)
   fireEvent.click(screen.getByRole('tab', { name: en.rankings.following }))
-  expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toEqual({ scope: 'following', period: 'all', source: 'all' })
-  fireEvent.click(screen.getByRole('button', { name: en.rankings.week }))
+  expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toEqual({ scope: 'following', period: 'all', source: 'all', sort: 'points' })
+  fireEvent.click(screen.getByRole('combobox', { name: en.rankings.period }))
+  fireEvent.click(screen.getByRole('option', { name: en.rankings.week }))
   expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toMatchObject({ period: 'week' })
-  expect(screen.getByRole('button', { name: en.rankings.week })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByRole('combobox', { name: en.rankings.period })).toHaveTextContent(en.rankings.week)
+  fireEvent.click(screen.getByRole('combobox', { name: en.rankings.sort }))
+  fireEvent.click(screen.getByRole('option', { name: en.rankings.sortBest }))
+  expect((useRankings as jest.Mock).mock.calls.at(-1)[0]).toMatchObject({ sort: 'best' })
+  expect(screen.getByRole('combobox', { name: en.rankings.sort })).toHaveTextContent(en.rankings.sortBest)
 })
 
-test('signed out: only the global list, no profile links, and how to join', () => {
+test('signed out: only the global list, names open their public card, and how to join', () => {
   render(<RankingsPage signedIn={false} />)
   expect(screen.queryByRole('tab', { name: en.rankings.following })).not.toBeInTheDocument()
-  expect(screen.queryByRole('link', { name: 'user4' })).not.toBeInTheDocument()
+  expect(screen.getAllByRole('link', { name: 'user4' })[0]).toHaveAttribute('href', '/user/user4')
   expect(screen.getByRole('link', { name: en.rankings.joinCta })).toHaveAttribute('href', '/authPage')
 })
 
@@ -120,7 +125,7 @@ test('beside your level, who is most active this week, and a way to that ranking
   expect(hot).toHaveTextContent('blazing')
   expect(hot).toHaveTextContent('+677')
   fireEvent.click(screen.getByRole('button', { name: en.rankings.hotSee }))
-  expect(useRankings).toHaveBeenLastCalledWith({ scope: 'global', period: 'week', source: 'all' })
+  expect(useRankings).toHaveBeenLastCalledWith({ scope: 'global', period: 'week', source: 'all', sort: 'points' })
   // Already on the weekly ranking: no way to it.
   expect(screen.queryByRole('button', { name: en.rankings.hotSee })).not.toBeInTheDocument()
 })

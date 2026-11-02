@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useLibraryKeys } from '@/hooks/useLibraryKeys'
@@ -11,7 +11,7 @@ import LibraryQuickFilters from '@/components/library-quick-filters/LibraryQuick
 import StatusSortControl, { type StatusSortState } from '@/components/status-sort-control/StatusSortControl'
 import type { LibraryLayout } from '@/components/library-layout-toggle/LibraryLayoutToggle'
 import type { PlatformChoice } from '@/components/library-platform-tabs/LibraryPlatformTabs'
-import { countQuick, MIXED_SORT_KEYS, sortEntries, type LibraryEntry, type QuickFilter } from '@/utils/libraryInsights'
+import { countQuick, mixedSortKeys, sortEntries, type LibraryEntry, type QuickFilter } from '@/utils/libraryInsights'
 import { filterEntries } from '@/utils/libraryShelves'
 
 export const SEARCH_ID = 'category-search'
@@ -37,6 +37,8 @@ export default function LibraryExplorer({
   onSort,
   selectedKey,
   onSelectKey,
+  search,
+  layoutToggle,
 }: {
   category: string
   /** The games of the list, of the platform chosen. */
@@ -53,6 +55,10 @@ export default function LibraryExplorer({
   onSort: (sort: StatusSortState) => void
   selectedKey: string | null
   onSelectKey: (key: string | null) => void
+  /** The page's search box, first in the row of controls. */
+  search?: ReactNode
+  /** The choice of layout, last in it. */
+  layoutToggle?: ReactNode
 }) {
   const wide = useMediaQuery('(min-width: 1024px)')
   const reduce = useReducedMotion()
@@ -96,19 +102,19 @@ export default function LibraryExplorer({
 
   return (
       <div className="flex flex-col gap-4">
-        {layout === 'list' && (
-          <div className="flex items-center gap-x-4 gap-y-2 flex-wrap">
-            {category === 'playing' && <LibraryQuickFilters value={quick} counts={quickCounts} onChange={onQuick} />}
-            <StatusSortControl cat={category} keys={[...MIXED_SORT_KEYS]} sortState={sort} onChange={onSort} />
-          </div>
-        )}
+        <div className="flex items-center gap-3 flex-wrap">
+          {search}
+          {layout === 'list' && category === 'playing' && <LibraryQuickFilters value={quick} counts={quickCounts} onChange={onQuick} />}
+          <span className="hidden sm:block grow" aria-hidden="true" />
+          {layout === 'list' && <StatusSortControl cat={category} keys={mixedSortKeys(category)} sortState={sort} onChange={onSort} />}
+          {layoutToggle}
+        </div>
 
         {/*
           Changing the view or the platform swaps the whole thing: the old one leaves, the new one comes in.
-          Not initial={false}: that would also switch off the entrance of everything inside (the shelves
-          cascade) the first time the page loads, and leave it for the swaps only.
+          initial={false}: on the first load the rows and cards inside make the entrance, in CSS.
         */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={`${platform}:${layout}`}
             initial={reduce ? false : { opacity: 0, y: 14 }}

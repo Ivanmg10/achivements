@@ -44,7 +44,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
     <>
       <div
         onPointerMove={onPointerMove}
-        className={`spotlight bg-bg-card rounded-2xl overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
+        className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
         <GameCardBackdrop src={psnBackdrop(game)} surface="card" />
         {/* relative: the expand button stretches over this whole header (see the chevron). */}
@@ -52,7 +52,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
           {/* Same destination as the title link, so it is kept out of the tab order. */}
           <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
             <div
-              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden transition-all duration-150 ${
+              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-tile overflow-hidden transition-all duration-150 ${
                 isComplete ? 'ring-2 ring-sky-300/70 hover:ring-sky-300' : 'hover:ring-2 hover:ring-ink/40'
               }`}
             >
@@ -70,7 +70,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
               </p>
             </Link>
             <span className="flex items-center gap-1.5 flex-wrap">
-              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${psnPlatformChip(game.consoleName)}`}>
+              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${psnPlatformChip(game.consoleName)}`}>
                 <PlaystationLogo size={12} aria-hidden="true" />
                 {game.consoleName}
               </span>
@@ -80,7 +80,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
                 </span>
               )}
             </span>
-            <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>{progressText}</span>
+            <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>{progressText}</span>
             <span className="flex items-center gap-2 mt-1">
               <ProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-main" className="flex-1" />
               <span className={`text-xs tabular-nums ${game.pctWon >= 100 ? 'text-success font-semibold' : 'text-text-secondary'}`}>{game.pctWon}%</span>
@@ -92,7 +92,11 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
                 {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
               </span>
             )}
-            {game.lastPlayed && (
+            {category === 'completed' && game.completedAt ? (
+              <span className="text-xs text-text-secondary mt-1">
+                {T.libraryDetail.finished} · {new Date(game.completedAt).toLocaleDateString(lang)}
+              </span>
+            ) : game.lastPlayed && (
               <span className="text-xs text-text-secondary mt-1">
                 {T.steam.lastPlayed} · {new Date(game.lastPlayed).toLocaleDateString(lang)}
               </span>
@@ -109,7 +113,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
               aria-expanded={open}
               aria-controls={panelId}
               aria-label={`${open ? T.psn.hideTrophies : T.psn.showTrophies}: ${game.title}`}
-              className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
+              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
             >
               <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                 ▼

@@ -1,10 +1,11 @@
 'use client'
 
-import { useId, useMemo, useRef, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { IconActivity, IconAward, IconCompass, IconFolders, IconLayoutDashboard, IconPin, IconUsers } from '@tabler/icons-react'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
+import { useSectionScroll } from '@/hooks/useSectionScroll'
 import { useConsoleVisibility } from '@/hooks/useConsoleVisibility'
 import { useActivityHeatmap } from '@/hooks/useActivityHeatmap'
 import { useStreakData } from '@/hooks/useStreakData'
@@ -20,12 +21,12 @@ import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { usePsnRecentTrophies } from '@/hooks/usePsnRecentTrophies'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
-import { useXboxRecentAchievements } from '@/hooks/useXboxRecentAchievements'
 import { toRecentAchievement } from '@/utils/steamMappers'
 import { psnToRecentAchievement } from '@/utils/psnMappers'
 import { xboxToRecentAchievement } from '@/utils/xboxMappers'
 import { ChartCard } from '@/components/ui/ChartCard'
 import { SectionFallback } from '@/components/ui/SectionFallback'
+import { useHomeLayout } from '@/hooks/useHomeLayout'
 
 import AchievementsLineChart from '@/components/achivements-line-chart/AchievementsLineChart'
 import MainPageHeatmap from './MainPageHeatmap'
@@ -59,22 +60,22 @@ export default function MainPageCharts() {
   // Someone else's page: their numbers, without the viewer's own pins, groups and library browser.
   const visitor = useSubject() !== null
   const [section, setSection] = useState('overview')
+  const [xboxActivitySince] = useState(() => new Date(Date.now() - 60 * 86_400_000).toISOString())
   const idPrefix = useId().replace(/:/g, '')
   const reduceMotion = useReducedMotion()
-  const sectionRef = useRef<HTMLElement>(null)
+  const { ref: sectionRef, scrollToTop } = useSectionScroll<HTMLElement>()
 
   // Opening a section brings the whole of it into view, its top just under the
-  // sticky header (scroll-mt), gliding unless the user asked for less motion.
-  // On the next frame, once the new panel is laid out.
+  // sticky header, and holds it there while a section that loads once opened grows.
   const openSection = (id: string) => {
     setSection(id)
-    requestAnimationFrame(() => sectionRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }))
+    scrollToTop()
   }
   const { achievements, isLoading: achLoading, error: achError, refetch: refetchAch } = useRecentAchievements()
   const { achievements: heatmapData, isLoading: heatmapLoading, error: heatmapError, refetch: refetchHeatmap } = useActivityHeatmap()
   // The heatmap draws as far back as the card is wide, so it reads the year
   // the streak already loads — both platforms, and no call of its own.
-  const { achievements: year, activeStreak, isLoading: yearLoading, error: yearError, refetch: refetchYear } = useStreakData()
+  const { achievements: year, xboxAchievements: xboxYear, xboxLoading, activeStreak, isLoading: yearLoading, error: yearError, refetch: refetchYear } = useStreakData()
   // The same streak the top bar shows: one source, so they cannot disagree.
   const streak = activeStreak?.days ?? 0
   const { listGames: playing, isLoading: playingLoading } = useGamesInProgressPreview()
@@ -82,12 +83,14 @@ export default function MainPageCharts() {
   const { rank, isLoading: rankLoading, error: rankError, refetch: refetchRank } = useUserRank()
   const { awards, isLoading: awardsLoading, error: awardsError, refetch: refetchAwards } = useUserAwards()
   const { platform } = useMainPlatform()
+  const [layout] = useHomeLayout()
   const { isLinked: steamLinked, library } = useSteamGamesData()
   const { achievements: steamActivity, isLoading: steamLoading } = useSteamRecentAchievements(steamLinked ? 'activity' : null)
   const { library: psnLibrary } = usePsnGamesData()
   const { trophies: psnActivity, isLoading: psnLoading } = usePsnRecentTrophies('activity')
   const { library: xboxLibrary } = useXboxGamesData()
-  const { achievements: xboxActivity, isLoading: xboxLoading } = useXboxRecentAchievements('activity')
+  // The year is a superset of the 60-day window: reuse it instead of scanning the same games twice.
+  const xboxActivity = useMemo(() => xboxYear.filter((a) => a.earnedAt >= xboxActivitySince), [xboxYear, xboxActivitySince])
 
   // Steam and PSN unlocks in RA's shape, so the shared cards render every platform as one list.
   const steamRecent = useMemo(() => steamActivity.map(toRecentAchievement), [steamActivity])
@@ -127,7 +130,19 @@ export default function MainPageCharts() {
   const panels: Record<string, ReactNode> = {
     overview: (
       <>
-        {platform === 'steam' ? (
+        {layout === 'cover' ? (
+          <SectionFallback error={achError || rankError} onRefresh={refetchStats}>
+            <MainPagePointsStats
+              streak={streak}
+              achievements={recent}
+              heatmapAchievements={year}
+              rank={rank}
+              showRank={false}
+              valueMode="achievements"
+              isLoading={achLoading || steamLoading || psnLoading || xboxLoading || yearLoading}
+            />
+          </SectionFallback>
+        ) : platform === 'steam' ? (
           <MainPageSteamStats streak={streak} achievements={steamRecent} games={library} isLoading={steamLoading} />
         ) : platform === 'psn' ? (
           <MainPagePsnStats streak={streak} achievements={psnRecent} isLoading={psnLoading} />

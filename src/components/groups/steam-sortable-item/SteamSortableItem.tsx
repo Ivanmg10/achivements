@@ -13,7 +13,7 @@ import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { useSpotlight } from '@/hooks/useSpotlight'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { relativeTime } from '@/utils/utils'
 import type { GameGroupItem } from '@/types/types'
@@ -68,7 +68,7 @@ export default function SteamSortableItem({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       {/* The same blurred art and pointer glow as the game cards in the status lists. */}
       <GameCardBackdrop src={steamAssetUrl(item.game_id, 'header')} surface="card" />
@@ -89,7 +89,7 @@ export default function SteamSortableItem({
           href={href}
           tabIndex={-1}
           aria-hidden="true"
-          className={`relative z-10 shrink-0 rounded-xl transition-all ${
+          className={`relative z-10 shrink-0 rounded-tile transition-all ${
             isComplete ? 'ring-2 ring-[#a4d007]/70 hover:ring-[#a4d007]' : 'hover:ring-2 hover:ring-ink/40'
           }`}
         >
@@ -98,7 +98,7 @@ export default function SteamSortableItem({
             asset="icon"
             iconUrl={game?.imageIcon ?? item.image_icon ?? ''}
             size={96}
-            className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl block"
+            className="w-16 h-16 sm:w-24 sm:h-24 rounded-tile block"
           />
         </Link>
 
@@ -110,7 +110,7 @@ export default function SteamSortableItem({
             <p title={game?.title ?? item.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game?.title ?? item.title}</p>
           </Link>
           <span className="flex items-center gap-1.5 flex-wrap">
-            <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium bg-[#1b2838] text-[#66c0f4]">
+            <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium bg-[#1b2838] text-[#66c0f4]">
               <SteamLogo size={12} aria-hidden="true" />
               Steam
             </span>
@@ -120,7 +120,7 @@ export default function SteamSortableItem({
               </span>
             )}
           </span>
-          <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>{progressText}</span>
+          <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>{progressText}</span>
           {hasCounts && (
             <span className="flex items-center gap-2 mt-1">
               <ProgressBar pct={pct} label={item.title} trackClass="bg-bg-main" className="flex-1" />
@@ -150,7 +150,7 @@ export default function SteamSortableItem({
           <button
             onClick={() => onRemove(item.id)}
             aria-label={`${T.groups.removeGame}: ${item.title}`}
-            className="relative z-10 p-2 rounded-lg text-text-secondary hover:text-danger hover:bg-danger/10 transition-all [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
+            className="relative z-10 p-2 rounded-chip text-text-secondary hover:text-danger hover:bg-danger/10 transition-all [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
           >
             <IconX className="w-4 h-4" aria-hidden="true" />
           </button>
@@ -161,7 +161,7 @@ export default function SteamSortableItem({
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${item.title}`}
-            className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
           >
             <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               ▼

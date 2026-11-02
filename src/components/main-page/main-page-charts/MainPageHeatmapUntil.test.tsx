@@ -16,7 +16,7 @@ const unlock = (date: string): RecentAchievement => ({
 })
 
 beforeEach(() => {
-  ;(useHeatmapGrid as jest.Mock).mockReturnValue({ weeks: WEEKS, cell: 24, days: 68 })
+  ;(useHeatmapGrid as jest.Mock).mockReturnValue({ weeks: WEEKS, cell: 24, cellWidth: 24, days: 68 })
 })
 
 describe('a calendar that ends before today', () => {

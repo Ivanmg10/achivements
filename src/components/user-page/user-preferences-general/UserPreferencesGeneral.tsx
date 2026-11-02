@@ -1,13 +1,17 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { IconBroadcast, IconEyeOff, IconTrophy, IconGenderBigender, IconLanguage, IconPalette, IconUserShare, IconWorld } from '@tabler/icons-react'
+import { IconBroadcast, IconEyeOff, IconTrophy, IconGenderBigender, IconLanguage, IconLayoutDashboard, IconPalette, IconUserShare, IconWorld } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import UserProfileSwitch from '@/components/user-page/user-profile-switch/UserProfileSwitch'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
 import { useVaultMe } from '@/hooks/useVaultMe'
+import { useHomeLayout } from '@/hooks/useHomeLayout'
+import { useGameCardStyle } from '@/hooks/useGameCardStyle'
+import { useShapeStyle } from '@/hooks/useShapeStyle'
+import { LANGUAGES } from '@/utils/languages'
 
 const GENDER_KEYS = { male: 'genderMale', female: 'genderFemale', neutral: 'genderNeutral' } as const
 
@@ -21,11 +25,13 @@ export default function UserPreferencesGeneral({
   onOpenLanguage,
   onOpenGender,
   onOpenHidden,
+  onOpenHome,
 }: {
   onOpenTheme: () => void
   onOpenLanguage: () => void
   onOpenGender: () => void
   onOpenHidden: () => void
+  onOpenHome: () => void
 }) {
   const { data: session } = useSession()
   const { lang, T } = useLanguage()
@@ -34,19 +40,29 @@ export default function UserPreferencesGeneral({
   // Not in the session on purpose: read with the rankings, so a database without it breaks only them.
   const { me: vault, setShowInRankings } = useVaultMe()
   const user = session?.user
+  const [home] = useHomeLayout()
+  const [cards] = useGameCardStyle()
+  const [shape] = useShapeStyle()
+  const layoutSummary = [
+    shape === 'round' ? T.homeLayout.shapeRound : T.homeLayout.shapeSlanted,
+    home === 'cover' ? T.homeLayout.cover : T.homeLayout.classic,
+    cards === 'flat' ? T.homeLayout.cardsFlat : T.homeLayout.cardsTinted,
+  ].join(' · ')
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col divide-y divide-ink/[0.06] [&>*]:py-2">
       <ProfileField label={T.userTheme.theme} icon={<IconPalette size={18} />} onEdit={onOpenTheme}>
         <span className="flex items-center gap-2 min-w-0">
-          <span aria-hidden="true" className="w-4 h-4 rounded-full bg-accent shrink-0" />
-          <span className="text-base font-medium truncate">{T.userTheme[`name_${theme}`]}</span>
+          <span aria-hidden="true" className="w-3.5 h-3.5 rounded-box-sm bg-accent shrink-0 skew-x-(--slant-pill)" />
+          <span className="text-[0.9375rem] font-bold truncate">{T.userTheme[`name_${theme}`]}</span>
         </span>
       </ProfileField>
 
       <ProfileField label={T.userConfig.language} icon={<IconLanguage size={18} />} onEdit={onOpenLanguage}>
-        <span className="text-base font-medium uppercase">{lang}</span>
+        <span className="text-[0.9375rem] font-bold">{LANGUAGES.find((l) => l.id === lang)?.label ?? lang}</span>
       </ProfileField>
+
+      <ProfileField label={T.homeLayout.layoutLabel} icon={<IconLayoutDashboard size={18} />} value={layoutSummary} onEdit={onOpenHome} />
 
       <ProfileField
         label={T.userData.gender}
@@ -85,17 +101,18 @@ export default function UserPreferencesGeneral({
         icon={<IconBroadcast size={18} />}
       />
 
-      {vault && (
+      {/* Until the rankings answer, the same row unseen: it holds its exact height in any language and width. */}
+      <div {...(vault ? {} : { 'aria-hidden': true, inert: true, className: 'invisible', 'data-testid': 'rankings-preference-placeholder' })}>
         <UserProfileSwitch
           field="showInRankings"
-          checked={vault.showInRankings}
+          checked={vault?.showInRankings ?? true}
           label={T.rankings.showInRankings}
           onText={T.rankings.showInRankingsOn}
           offText={T.rankings.showInRankingsOff}
           icon={<IconTrophy size={18} />}
           onSaved={setShowInRankings}
         />
-      )}
+      </div>
 
       <ProfileField
         label={T.userPage.hiddenGames}

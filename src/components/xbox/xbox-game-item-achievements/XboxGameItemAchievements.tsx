@@ -3,6 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { XboxAchievementGrid } from '@/components/xbox/xbox-achievement-grid/XboxAchievementGrid'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const SKELETON_BADGES = 12
 
@@ -36,7 +37,7 @@ export default function XboxGameItemAchievements({
     return (
       <ul aria-busy="true" className="flex flex-wrap gap-1">
         {Array.from({ length: Math.min(expectedCount || SKELETON_BADGES, 60) }).map((_, i) => (
-          <li key={i} className={`${badge} rounded-lg bg-bg-main animate-pulse`} />
+          <li key={i}><Skeleton radius="tile" className={badge} /></li>
         ))}
       </ul>
     )
@@ -45,7 +46,7 @@ export default function XboxGameItemAchievements({
   if (error) {
     return (
       <div className="flex flex-col items-start gap-2">
-        <p role="alert" className="text-sm text-red-400">
+        <p role="alert" className="text-sm text-danger">
           {T.xbox.achievementsError}
         </p>
         {error === 'private' && <p className="text-xs text-text-secondary">{T.xbox.errors.private}</p>}

@@ -1,10 +1,14 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import GroupList from './GroupList'
 import { GameGroup } from '@/types/types'
 
-jest.mock('@/components/groups/group-card/GroupCard', () => ({
+jest.mock('@/components/groups/group-album-card/GroupAlbumCard', () => ({
   __esModule: true,
-  default: ({ group }: { group: { title: string } }) => <div>{group.title}</div>,
+  default: ({ group }: { group: { title: string } }) => <div>album {group.title}</div>,
+}))
+jest.mock('@/components/groups/group-shelf-row/GroupShelfRow', () => ({
+  __esModule: true,
+  default: ({ group }: { group: { title: string } }) => <div>shelf {group.title}</div>,
 }))
 
 const mockGroups = [
@@ -12,10 +16,12 @@ const mockGroups = [
   { id: 2, title: 'Backlog' },
 ] as GameGroup[]
 
-test('renders list of groups', () => {
-  render(<GroupList groups={mockGroups} />)
-  expect(screen.getByText('Speedruns')).toBeInTheDocument()
-  expect(screen.getByText('Backlog')).toBeInTheDocument()
+test('cover cards by default, shelves when asked', () => {
+  const { rerender } = render(<GroupList groups={mockGroups} />)
+  expect(screen.getByText('album Speedruns')).toBeInTheDocument()
+  expect(screen.getByText('album Backlog')).toBeInTheDocument()
+  rerender(<GroupList groups={mockGroups} view="shelves" />)
+  expect(screen.getByText('shelf Speedruns')).toBeInTheDocument()
 })
 
 test('renders without crashing with empty list', () => {
@@ -23,9 +29,11 @@ test('renders without crashing with empty list', () => {
   expect(container.firstChild).toBeInTheDocument()
 })
 
-test('one per row in list mode, as many as fit otherwise', () => {
-  const { container, rerender } = render(<GroupList groups={mockGroups} gridCols={1} />)
-  expect(container.firstChild).toHaveClass('grid-cols-1')
-  rerender(<GroupList groups={mockGroups} gridCols={3} />)
-  expect((container.firstChild as HTMLElement).className).toMatch(/auto-fill/)
+test('a new-group tile while any fit', () => {
+  const onCreate = jest.fn()
+  const { rerender } = render(<GroupList groups={mockGroups} remaining={8} onCreate={onCreate} />)
+  fireEvent.click(screen.getByRole('button', { name: /New group/ }))
+  expect(onCreate).toHaveBeenCalled()
+  rerender(<GroupList groups={mockGroups} remaining={0} onCreate={onCreate} />)
+  expect(screen.queryByRole('button', { name: /New group/ })).not.toBeInTheDocument()
 })

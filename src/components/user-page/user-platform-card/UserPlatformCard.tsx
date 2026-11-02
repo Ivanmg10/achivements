@@ -1,17 +1,16 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { IconExternalLink } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { GameSource } from '@/types/steam'
 import VaultFillLine from '@/components/vault-fill-line/VaultFillLine'
+import { buttonClass } from '@/components/ui/Button'
+import { Skeleton } from '@/components/ui/Skeleton'
 
-export type PlatformStat = { label: string; value: string; accent?: string }
+export type PlatformStat = { label: string; value: string; accent?: string; loading?: boolean }
 
-export const DISCONNECT_CLASS =
-  'w-full py-2 rounded-xl bg-red-500/15 text-red-400 font-semibold text-sm hover:bg-red-500/25 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70'
-export const CONNECT_CLASS =
-  'w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-accent text-bg-main font-semibold text-sm hover:opacity-90 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
+export const DISCONNECT_CLASS = buttonClass('danger', 'md', 'w-full')
+export const CONNECT_CLASS = buttonClass('primary', 'md', 'w-full')
 
 /**
  * One platform on the account page: its logo, whether it is connected, the
@@ -61,10 +60,10 @@ export default function UserPlatformCard({
   const { T } = useLanguage()
 
   return (
-    <div className={`rounded-3xl p-px bg-gradient-to-br ${gradient}`}>
+    <div className={`rounded-[calc(var(--r-card)+1px)] p-px bg-gradient-to-br ${gradient}`}>
       <section
         aria-label={name}
-        className="relative h-full bg-bg-card rounded-[calc(1.5rem-1px)] p-5 flex flex-col gap-4 overflow-hidden"
+        className="relative h-full bg-bg-card rounded-card p-5 flex flex-col gap-3 overflow-hidden"
       >
         <div className="relative flex items-center justify-between gap-2">
           <span className="flex items-center gap-2 min-w-0">
@@ -75,20 +74,18 @@ export default function UserPlatformCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${name} — ${T.userData.openProfile}`}
-                className="font-semibold truncate inline-flex items-center gap-1 hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="font-extrabold truncate hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 {name}
-                <IconExternalLink size={13} aria-hidden="true" className="shrink-0 text-text-secondary" />
               </a>
             ) : (
-              <span className="font-semibold truncate">{name}</span>
+              <span className="font-extrabold truncate">{name}</span>
             )}
           </span>
           <span
-            className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
-              connected ? 'bg-green-500/20 text-green-400' : 'bg-ink/5 text-text-secondary'
-            }`}
+            className={`inline-flex items-center gap-1.5 text-xs font-bold shrink-0 ${connected ? 'text-success' : 'text-text-secondary'}`}
           >
+            <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-current" />
             {connected ? T.userData.connected : T.userData.notConnected}
           </span>
         </div>
@@ -97,20 +94,20 @@ export default function UserPlatformCard({
 
         {connected ? (
           <>
-            {identity}
+            {identity && <div className="rounded-tile bg-ink/[0.03] p-2.5">{identity}</div>}
             {stats.length > 0 && (
-              <dl className="grid grid-cols-2 gap-2">
+              <dl className="grid grid-cols-2 gap-1.5">
                 {stats.map((stat, i) => (
                   <div
                     key={stat.label}
                     /* An odd count leaves the last one alone on its row: let it fill it. */
-                    className={`bg-bg-main rounded-xl px-3 py-2.5 flex flex-col gap-0.5 min-w-0 ${
+                    className={`bg-bg-main rounded-tile px-3 py-2.5 flex flex-col min-w-0 ${
                       stats.length % 2 === 1 && i === stats.length - 1 ? 'col-span-2' : ''
                     }`}
                   >
-                    <dt className="text-[11px] text-text-secondary truncate">{stat.label}</dt>
-                    <dd className={`text-lg font-bold tabular-nums truncate ${stat.accent ?? 'text-text-main'}`}>
-                      {stat.value}
+                    <dt className="text-xs text-text-secondary truncate">{stat.label}</dt>
+                    <dd className={`text-xl font-extrabold tabular-nums truncate ${stat.accent ?? 'text-text-main'}`}>
+                      {stat.loading ? <Skeleton className="h-[1lh] w-2/3" /> : stat.value}
                     </dd>
                   </div>
                 ))}

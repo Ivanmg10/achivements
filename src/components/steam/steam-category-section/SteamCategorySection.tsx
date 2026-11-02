@@ -12,6 +12,7 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
 import { steamPreviewGames } from '@/utils/sectionPreview'
 import { matchesQuick, steamProgress, type QuickFilter } from '@/utils/libraryInsights'
+import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
 
 const SKELETON_CARDS = 4
 
@@ -73,12 +74,12 @@ export default function SteamCategorySection({
       {loading ? (
         <div aria-busy="true" className={`grid gap-3 ${GRID_CLASS[gridCols]}`}>
           {Array.from({ length: SKELETON_CARDS }).map((_, i) => (
-            <div key={i} className="h-36 bg-bg-card rounded-xl animate-pulse" />
+            <GameCardSkeleton key={i} />
           ))}
         </div>
       ) : error ? (
         <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-red-400">
+          <p role="alert" className="text-sm text-danger">
             {T.steam.gamesError}
           </p>
           <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>

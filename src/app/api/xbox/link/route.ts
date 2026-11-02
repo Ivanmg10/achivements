@@ -4,6 +4,7 @@ import { requireXboxUser } from '@/lib/apiAuth'
 import { findXboxAccount, isGamertag, xboxConfigured, xboxFailure, xboxSummary } from '@/lib/xboxClient'
 import { forgetUser } from '@/lib/userRecord'
 import { onPlatformLinked } from '@/lib/scoreRefresh'
+import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 
 /**
  * Links an Xbox account by its gamertag. Nothing proves the account is the
@@ -11,7 +12,7 @@ import { onPlatformLinked } from '@/lib/scoreRefresh'
  * games, which is checked here so a hidden profile fails now, not later.
  * Admin-only while Xbox is (requireXboxUser).
  */
-export async function POST(req: Request) {
+async function post(req: Request) {
   const auth = await requireXboxUser()
   if (!auth.ok) return auth.response
 
@@ -44,4 +45,8 @@ export async function POST(req: Request) {
   forgetUser(auth.id)
   await onPlatformLinked(Number(auth.id), 'xbox')
   return NextResponse.json({ xboxxuid: account.xuid, xboxgamertag: account.gamertag })
+}
+
+export async function POST(req: Request) {
+  return withXboxTelemetry('xbox/link', () => post(req))
 }

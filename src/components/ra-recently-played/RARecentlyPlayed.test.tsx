@@ -11,10 +11,10 @@ jest.mock('@/context/SteamGamesDataContext', () => ({
   useSteamGamesData: jest.fn(() => ({ recent: [] })),
 }))
 
-function renderWithProviders() {
+function renderWithProviders(skipLatest = false) {
   return render(
     <MainViewProvider>
-      <RARecentlyPlayed />
+      <RARecentlyPlayed skipLatest={skipLatest} />
     </MainViewProvider>
   )
 }
@@ -72,6 +72,14 @@ describe('merged RA + Steam feed', () => {
     renderFeed()
     const titles = screen.getAllByText(/^(RA|Steam) Game$/).map((e) => e.textContent)
     expect(titles).toEqual(['Steam Game', 'RA Game'])
+  })
+
+  test('the cover feed leaves out the game already in its hero', () => {
+    ;(useRecentlyPlayedGames as jest.Mock).mockReturnValue({ games: [RA_GAME], isLoading: false })
+    ;(useSteamGamesData as jest.Mock).mockReturnValue({ recent: [STEAM_GAME] })
+    renderWithProviders(true)
+    expect(screen.queryByText('Steam Game')).not.toBeInTheDocument()
+    expect(screen.getByText('RA Game')).toBeInTheDocument()
   })
 
   test('keeps an RA game and a Steam app with the same id as two entries', () => {

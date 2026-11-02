@@ -65,6 +65,11 @@ export type SteamOwnedGamesResponse = {
   response: { game_count?: number; games?: SteamOwnedGame[] }
 }
 
+/** GetTopAchievementsForGames: `achievements` are the unlocked ones (all of them, see steamClient). */
+export type SteamTopAchievementsResponse = {
+  response?: { games?: { appid: number; total_achievements?: number; achievements?: { name: string }[] }[] }
+}
+
 export type SteamRecentlyPlayedResponse = {
   response: { total_count?: number; games?: SteamOwnedGame[] }
 }
@@ -82,7 +87,7 @@ export type SteamPlayerAchievement = {
 export type SteamUnlockCounts = {
   total: number
   awarded: number
-  /** ISO date of the latest unlock — at 100%, the one that finished the game. */
+  /** ISO date of the latest unlock — activity only, not proof of base-game completion. */
   lastUnlock?: string | null
 }
 

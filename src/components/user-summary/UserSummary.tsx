@@ -41,6 +41,7 @@ export default function UserSummary({ user, size = 36 }: { user: UserSearchResul
         <PresenceLabel
           online={user.online}
           lastSeenAt={user.lastSeenAt}
+          playing={user.playing}
           fallback={user.description && <span className="text-xs text-text-secondary truncate">{user.description}</span>}
         />
       </span>

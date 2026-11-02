@@ -5,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useXboxGamesByCategory } from '@/hooks/useXboxGamesByCategory'
 import GameIcon from '@/components/game-icon/GameIcon'
 import { gameHref } from '@/utils/gameRef'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const PREVIEW = 6
 
@@ -35,7 +36,7 @@ export default function MainPageXboxNav() {
         {SECTIONS.map(({ slug, emoji }) => {
           const { games } = sections[slug]
           return (
-            <div key={slug} className="bg-bg-main rounded-lg p-3 flex flex-col gap-2.5">
+            <div key={slug} className="bg-bg-main rounded-box p-3 flex flex-col gap-2.5">
               <Link
                 href={`/${slug}`}
                 className="flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
@@ -46,12 +47,12 @@ export default function MainPageXboxNav() {
                     {T.categories[slug]}
                   </span>
                 </span>
-                <span className="text-[10px] font-semibold text-green-500 tabular-nums">{loading ? '—' : games.length}</span>
+                <span className="text-[10px] font-semibold text-success tabular-nums">{loading ? '—' : games.length}</span>
               </Link>
 
               {loading ? (
-                <div className="flex gap-1.5 animate-pulse" aria-busy="true">
-                  {[0, 1, 2, 3].map((i) => <div key={i} className="w-8 h-8 rounded bg-ink/10" />)}
+                <div className="flex gap-1.5" aria-busy="true">
+                  {[0, 1, 2, 3].map((i) => <Skeleton key={i} radius="tag" className="w-8 h-8" />)}
                 </div>
               ) : games.length === 0 ? (
                 <p className="text-[10px] text-text-secondary">{T.xbox.noGamesInCategory}</p>
@@ -65,13 +66,13 @@ export default function MainPageXboxNav() {
                       aria-label={g.title}
                       className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                     >
-                      <GameIcon source="xbox" id={g.id} imageUrl={g.imageIcon} size={32} className="w-8 h-8 rounded hover:scale-110 transition-transform" />
+                      <GameIcon source="xbox" id={g.id} imageUrl={g.imageIcon} size={32} className="w-8 h-8 rounded-box-sm hover:scale-110 transition-transform" />
                     </Link>
                   ))}
                   {games.length > PREVIEW && (
                     <Link
                       href={`/${slug}`}
-                      className="w-8 h-8 rounded bg-bg-card/60 flex items-center justify-center text-[10px] text-text-secondary hover:text-text-main transition-colors"
+                      className="w-8 h-8 rounded-box-sm bg-bg-card/60 flex items-center justify-center text-[10px] text-text-secondary hover:text-text-main transition-colors"
                     >
                       +{games.length - PREVIEW}
                     </Link>

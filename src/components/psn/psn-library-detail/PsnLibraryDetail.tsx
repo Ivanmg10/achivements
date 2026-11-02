@@ -9,6 +9,7 @@ import LibraryGameDetail, { type LibraryCategory } from '@/components/library-ga
 import { fromPsn } from '@/utils/gameInsights'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
+import { psnBaseCompletedAt } from '@/utils/completionDates'
 
 const asCategory = (c?: string): LibraryCategory => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
@@ -21,6 +22,7 @@ export default function PsnLibraryDetail({ game, category }: { game: PsnGameProg
   const { T, lang } = useLanguage()
   const { trophies, groups, isLoading, error, retry } = usePsnTrophies(game.titleId)
   const items = useMemo(() => fromPsn(trophies, game.id), [trophies, game.id])
+  const completedAt = useMemo(() => psnBaseCompletedAt(trophies), [trophies])
 
   const loaded = trophies.length > 0
   // The whole set, DLC included, as "completed" counts it.
@@ -34,10 +36,11 @@ export default function PsnLibraryDetail({ game, category }: { game: PsnGameProg
       game={{ source: 'psn', id: game.id, title: game.title, iconUrl: game.imageIcon || undefined }}
       info={game.consoleName ? [{ label: T.libraryDetail.console, value: game.consoleName }] : []}
       items={items}
+      completedAt={completedAt}
       state={isLoading ? 'loading' : error ? 'error' : 'ready'}
       errorNode={
         <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-red-400">{T.psn.trophiesError}</p>
+          <p role="alert" className="text-sm text-danger">{T.psn.trophiesError}</p>
           {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}
           <button onClick={retry} className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">
             {T.psn.retry}

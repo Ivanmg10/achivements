@@ -3,6 +3,9 @@
 import { useLanguage } from '@/context/LanguageContext'
 import type { DayBySource } from '@/utils/utils'
 
+/** The box of a tooltip over the unlocks' line. */
+export const LINE_TOOLTIP = 'rounded-tile bg-bg-header ring-1 ring-ink/10 shadow-xl shadow-black/40 px-3 py-2 text-xs flex flex-col gap-1'
+
 /**
  * The day under the pointer: its date written out, then RA, Steam and PSN with
  * their own swatches and counts. A platform with nothing that day is left out.
@@ -24,18 +27,18 @@ export default function AchivementsLineChartTooltip({
     { name: 'RetroAchievements', value: day.ra, swatch: 'bg-chart-2' },
     { name: 'Steam', value: day.steam, swatch: 'bg-[#66c0f4]' },
     { name: 'PlayStation', value: day.psn, swatch: 'bg-[#0070d1]' },
-    { name: 'Xbox', value: day.xbox, swatch: 'bg-green-500' },
+    { name: 'Xbox', value: day.xbox, swatch: 'bg-success' },
   ].filter((r) => r.value > 0)
 
   return (
-    <div className="rounded-xl bg-bg-header ring-1 ring-ink/10 shadow-xl shadow-black/40 px-3 py-2 text-xs flex flex-col gap-1">
+    <div className={LINE_TOOLTIP}>
       <span className="font-semibold text-text-main capitalize">{date}</span>
       {rows.length === 0 ? (
         <span className="text-text-secondary">{count(0)}</span>
       ) : (
         rows.map((r) => (
           <span key={r.name} className="flex items-center gap-2 text-text-secondary">
-            <span aria-hidden="true" className={`w-2 h-2 rounded-sm ${r.swatch}`} />
+            <span aria-hidden="true" className={`w-2 h-2 rounded-full ${r.swatch}`} />
             {r.name}
             <span className="ml-auto pl-3 font-semibold tabular-nums text-text-main">{r.value}</span>
           </span>

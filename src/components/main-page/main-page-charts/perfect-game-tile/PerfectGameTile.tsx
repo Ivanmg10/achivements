@@ -9,6 +9,7 @@ import { gameHref } from '@/utils/gameRef'
 import type { PerfectGame } from '@/utils/perfectGames'
 import PlatformMark from '@/components/platform-mark/PlatformMark'
 import { useSubject } from '@/context/SubjectContext'
+import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 
 /**
  * Tile side in px. Steam hands out its game icons at 32×32 and publishes no
@@ -45,7 +46,7 @@ export default function PerfectGameTile({ game, date }: { game: PerfectGame; dat
           unoptimized={game.source !== 'ra'}
         />
       ) : (
-        <span className="block w-8 h-8 rounded bg-ink/10" aria-hidden="true" />
+        <span className="block w-8 h-8 rounded-box-sm bg-ink/10" aria-hidden="true" />
       )}
       {game.source === 'ra' ? (
         game.hardcore && <span className="absolute -top-1 -right-1 w-3 h-3 bg-warning rounded-full border border-bg-card" aria-hidden="true" />
@@ -56,7 +57,7 @@ export default function PerfectGameTile({ game, date }: { game: PerfectGame; dat
       <span
         id={tipId}
         role="tooltip"
-        className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 w-max max-w-56 rounded-lg bg-bg-header ring-1 ring-ink/10 shadow-xl shadow-black/40 px-2.5 py-1.5 text-left opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-visible:opacity-100 group-focus-visible:translate-y-0 transition duration-150"
+        className={`pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-20 w-max max-w-56 ${TOOLTIP_SURFACE} px-2.5 py-1.5 text-left opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-visible:opacity-100 group-focus-visible:translate-y-0 transition duration-150`}
       >
         <span className="block text-xs font-semibold text-text-main truncate">{game.title}</span>
         <span className="block text-[10px] text-text-secondary truncate">

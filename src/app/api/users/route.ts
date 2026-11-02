@@ -2,8 +2,11 @@ import { NextRequest, NextResponse, after } from "next/server";
 import pool from "@/lib/db";
 import bcrypt from "bcrypt";
 import { allowAttempt, clientAddress } from "@/lib/attemptLimit";
-import { BCRYPT_COST, PASSWORD_MIN } from "@/utils/authValidation";
+import { BCRYPT_COST, PASSWORD_MIN, isEmail } from "@/utils/authValidation";
 import { sendVerificationEmail } from "@/lib/verificationEmail";
+import { fetchRaProfile, raAvatarUrl, validRaCredentials } from "@/lib/raProfile";
+import { onPlatformLinked } from "@/lib/scoreRefresh";
+import { sealRaKey } from "@/lib/raKey";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,11 +22,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json();
-    const { username, password, email } = body as {
+    const body = await req.json().catch(() => ({}));
+    const { username, password, email, ra } = body as {
       username?: string;
       password?: string;
       email?: string;
+      /** Sign up with RetroAchievements: its username and Web API key, linked at once. */
+      ra?: { username?: unknown; apiKey?: unknown } | null;
     };
 
     if (typeof username !== "string" || typeof password !== "string" || !username || !password) {
@@ -49,7 +54,7 @@ export async function POST(req: NextRequest) {
 
     // Required: it is the only way to recover an account later.
     const trimmedEmail = typeof email === "string" ? email.trim() : "";
-    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    if (!isEmail(trimmedEmail)) {
       return NextResponse.json({ error: "Correo no válido" }, { status: 400 });
     }
 
@@ -66,25 +71,51 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "email-taken" }, { status: 409 });
     }
 
+    // With RetroAchievements: asked of RA again here (what the form showed is not taken on its word),
+    // and stored as linking from the account page stores it, with RA's picture as the avatar.
+    let linkedRa: { profile: Record<string, unknown>; key: string } | null = null;
+    if (ra) {
+      if (!validRaCredentials(ra.username, ra.apiKey)) {
+        return NextResponse.json({ error: "ra-invalid" }, { status: 400 });
+      }
+      const fetched = await fetchRaProfile(ra.username.trim(), (ra.apiKey as string).trim());
+      if (!fetched.ok) return NextResponse.json({ error: fetched.error }, { status: fetched.status });
+      linkedRa = { profile: fetched.profile, key: (ra.apiKey as string).trim() };
+    }
+
     const hashedPassword = await bcrypt.hash(password, BCRYPT_COST);
+    const raName = linkedRa ? String(linkedRa.profile.User) : null;
+    const sealedRa = linkedRa ? sealRaKey(linkedRa.key) : null;
 
     const result = await pool.query(
-      `INSERT INTO users (username, password, email, theme)
-       VALUES ($1, $2, $3, 'dark')
+      `INSERT INTO users (username, password, email, theme, avatar, rausername, raid, "raUser", raid_hash)
+       VALUES ($1, $2, $3, 'dark', $4, $5, $6, $7, $8)
        RETURNING id, username, email, theme, avatar, admin`,
-      [username, hashedPassword, trimmedEmail],
+      [
+        username,
+        hashedPassword,
+        trimmedEmail,
+        raName ? raAvatarUrl(raName) : null,
+        raName,
+        sealedRa?.sealed ?? null,
+        linkedRa ? JSON.stringify(linkedRa.profile) : null,
+        sealedRa?.hash ?? null,
+      ],
     );
 
     const created = result.rows[0];
     // After the response: a slow mail server must not hold up the sign-up, and
     // an address that cannot be reached is not a reason to refuse an account.
     after(() => sendVerificationEmail(created.id, created.username, trimmedEmail));
+    if (linkedRa) await onPlatformLinked(created.id, "ra");
 
     return NextResponse.json(created, { status: 201 });
   } catch (err) {
     // Two sign-ups raced past the checks above; the unique index stopped the second.
     const { code, constraint } = err as { code?: string; constraint?: string };
     if (code === "23505") {
+      // One key, one account: that key already links another account here.
+      if (constraint === "users_raid_hash_key" || constraint === "users_raId_key") return NextResponse.json({ error: "key-in-use" }, { status: 409 });
       return constraint === "users_email_lower_key"
         ? NextResponse.json({ error: "email-taken" }, { status: 409 })
         : NextResponse.json({ error: "Username ya en uso" }, { status: 409 });

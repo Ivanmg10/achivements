@@ -1,4 +1,4 @@
-import { buildEntries, countQuick, matchesQuick, sortEntries } from './libraryInsights'
+import { buildEntries, countQuick, matchesQuick, mixedSortKeys, sortEntries, type LibraryEntry } from './libraryInsights'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
 
@@ -52,6 +52,21 @@ describe('mixed list', () => {
     expect(order('percent', 'desc')).toEqual(['Alpha', 'Beta', 'Gamma'])
     expect(order('lastPlayed', 'desc')).toEqual(['Alpha', 'Beta', 'Gamma'])
     expect(order('lastPlayed', 'asc')).toEqual(['Gamma', 'Beta', 'Alpha'])
+  })
+})
+
+describe('completed list', () => {
+  const entry = (title: string, lastPlayed: string | null, completedAt: string | null) => ({ title, lastPlayed, completedAt, pct: 100 }) as LibraryEntry
+
+  test('goes by when each game was completed: a DLC played today does not move a platinum from 2021', () => {
+    const entries = [entry('Spider-Man', '2026-10-25', '2021-12-23'), entry('Undated', '2026-01-01', null), entry('Newer', '2024-01-01', '2024-05-25')]
+    expect(sortEntries(entries, { key: 'completed', dir: 'desc' }).map((e) => e.title)).toEqual(['Newer', 'Spider-Man', 'Undated'])
+    expect(sortEntries(entries, { key: 'completed', dir: 'asc' }).map((e) => e.title)).toEqual(['Spider-Man', 'Newer', 'Undated'])
+  })
+
+  test('only Completed offers that order', () => {
+    expect(mixedSortKeys('completed')).toContain('completed')
+    expect(mixedSortKeys('playing')).not.toContain('completed')
   })
 })
 

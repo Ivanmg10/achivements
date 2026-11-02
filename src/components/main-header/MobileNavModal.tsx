@@ -95,7 +95,7 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
         >
           <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-full max-w-sm px-4">
             <motion.div
-              className="bg-bg-card rounded-2xl shadow-2xl overflow-hidden border border-ink/5"
+              className="bg-bg-card rounded-card shadow-2xl overflow-hidden border border-ink/5"
               variants={contentVariants}
               onClick={(e) => e.stopPropagation()}
             >
@@ -105,7 +105,7 @@ export default function MobileNavModal({ isOpen, onClose }: MobileNavModalProps)
                 <button
                   onClick={onClose}
                   aria-label="Close menu"
-                  className="p-1 rounded-lg text-text-secondary hover:text-text-main transition-colors"
+                  className="p-1 rounded-chip text-text-secondary hover:text-text-main transition-colors"
                 >
                   <IconX className="w-5 h-5" aria-hidden />
                 </button>

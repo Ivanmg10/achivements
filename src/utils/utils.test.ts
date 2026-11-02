@@ -1,4 +1,4 @@
-import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath } from "./utils";
+import { activityKpis, calcAvgPerDay, calcStreak, calcThisMonth, compareSortValues, getBestMonth, getGameSortValue, getRandomGameIds, groupByConsole, groupByDay, pinnedKey, sumAchievementPoints, achievementBadgeUrl, achievementGameIconUrl, completionBuckets, dominantColors, groupByDaySource, groupGameAchievementsByPeriod, heatLevel, gameSourceFromPath, stripCap, matchParts, decimal } from "./utils";
 import type { RecentAchievement } from '@/types/types'
 
 describe("getRandomGameIds", () => {
@@ -441,5 +441,41 @@ describe('gameSourceFromPath', () => {
     expect(gameSourceFromPath('/nope')).toBeNull()
     expect(gameSourceFromPath('/')).toBeNull()
     expect(gameSourceFromPath(null)).toBeNull()
+  })
+})
+
+describe('stripCap', () => {
+  test('the 90th percentile of the busy days, so one huge day is cut', () => {
+    expect(stripCap([1, 2, 3, 4, 5, 6, 7, 8, 9, 200])).toBe(9)
+    expect(stripCap([0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 90])).toBe(3)
+  })
+  test('at least 1, empty days ignored', () => {
+    expect(stripCap([])).toBe(1)
+    expect(stripCap([0, 0])).toBe(1)
+  })
+})
+
+describe('matchParts', () => {
+  test('cuts the text around its first match, ignoring case', () => {
+    expect(matchParts("Marvel's Spider-Man", 'spi')).toEqual([
+      { text: "Marvel's ", match: false },
+      { text: 'Spi', match: true },
+      { text: 'der-Man', match: false },
+    ])
+  })
+  test('no match, or no query: the text whole', () => {
+    expect(matchParts('Halo', 'zelda')).toEqual([{ text: 'Halo', match: false }])
+    expect(matchParts('Halo', '  ')).toEqual([{ text: 'Halo', match: false }])
+  })
+  test('a match at the start leaves no empty part', () => {
+    expect(matchParts('Halo', 'ha')).toEqual([{ text: 'Ha', match: true }, { text: 'lo', match: false }])
+  })
+})
+
+describe('decimal', () => {
+  test('one decimal by default, in the language of the reader', () => {
+    expect(decimal(0.8, 'es')).toBe('0,8')
+    expect(decimal(2, 'en')).toBe('2.0')
+    expect(decimal(1.234, 'de', 2)).toBe('1,23')
   })
 })

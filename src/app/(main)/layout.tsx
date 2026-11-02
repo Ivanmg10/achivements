@@ -1,5 +1,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+import { serverLanguage } from "@/lib/serverLanguage";
+import { LanguageProvider } from "@/context/LanguageContext";
+import { loadMessages } from "@/translations/load";
 import MainFooter from "@/components/main-footer/MainFooter";
 import NavigationProgress from "@/components/navigation-progress/NavigationProgress";
 import MainHeader from "@/components/main-header/MainHeader";
@@ -13,12 +16,17 @@ export default async function MainLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
+  // This layout is dynamic already (it reads the session), so it can also render in the
+  // person's language from the first byte: their choice's cookie, else their browser's.
+  const lang = await serverLanguage();
+  const messages = lang && lang !== "en" ? await loadMessages(lang) : undefined;
 
   // Signed out, the only page that gets this far is the landing (see
   // proxy.ts), and it brings its own header and footer.
-  if (!session) return <>{children}</>;
+  if (!session) return <LanguageProvider initial={lang} messages={messages}>{children}</LanguageProvider>;
 
   return (
+    <LanguageProvider initial={lang} messages={messages}>
     <MainProviders>
       <NavigationProgress />
       <div className="min-h-screen flex flex-col">
@@ -30,5 +38,6 @@ export default async function MainLayout({
       </div>
       <VersionBadge />
     </MainProviders>
+    </LanguageProvider>
   );
 }

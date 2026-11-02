@@ -5,6 +5,9 @@ import { IconExternalLink } from '@tabler/icons-react'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useAdminPsnToken, type PsnTokenError } from '@/hooks/useAdminPsnToken'
 import { notify } from '@/lib/notify'
+import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const SSO_COOKIE_URL = 'https://ca.account.sony.com/api/v1/ssocookie'
 const INPUT_ID = 'admin-psn-npsso'
@@ -28,7 +31,7 @@ export default function AdminPsnToken() {
   const [npsso, setNpsso] = useState('')
 
   const left = status?.daysLeft ?? null
-  const tone = left === null ? 'text-text-secondary' : left <= 0 ? 'text-red-400' : left <= 7 ? 'text-warning' : 'text-green-400'
+  const tone = left === null ? 'text-text-secondary' : left <= 0 ? 'text-danger' : left <= 7 ? 'text-warning' : 'text-success'
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -39,21 +42,21 @@ export default function AdminPsnToken() {
   }
 
   return (
-    <section aria-labelledby="admin-psn-title" className="bg-bg-card rounded-2xl p-4 flex flex-col gap-3">
+    <section aria-labelledby="admin-psn-title" className="bg-bg-card rounded-card p-4 flex flex-col gap-3">
       <h3 id="admin-psn-title" className="flex items-center gap-2 text-sm font-semibold">
         <PlaystationLogo size={16} className="text-[#0070d1]" aria-hidden="true" />
         PlayStation sign-in
       </h3>
 
       {loadError ? (
-        <p role="alert" className="text-sm text-red-400">
+        <p role="alert" className="text-sm text-danger">
           Could not load the PSN status.{' '}
-          <button onClick={retry} className="underline hover:text-red-300">
+          <button onClick={retry} className="underline hover:text-danger">
             Retry
           </button>
         </p>
       ) : !status ? (
-        <div aria-busy="true" className="h-5 w-48 rounded bg-ink/10 animate-pulse" />
+        <Skeleton className="h-5 w-48" />
       ) : !status.configured ? (
         <p className="text-sm text-text-secondary">Not set up: PSN pages answer “not configured” until an NPSSO is saved.</p>
       ) : (
@@ -92,18 +95,17 @@ export default function AdminPsnToken() {
             onChange={(e) => setNpsso(e.target.value)}
             aria-invalid={saveError !== null}
             aria-describedby={saveError ? `${INPUT_ID}-error` : undefined}
-            className="flex-1 min-w-0 bg-bg-main rounded-xl px-3 py-2 text-sm font-mono outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className={fieldClass({ size: 'sm', invalid: saveError !== null }, 'flex-1 min-w-0 font-mono')}
           />
-          <button
+          <Button
             type="submit"
             disabled={saving || !npsso.trim()}
-            className="px-4 py-2 bg-accent text-bg-main text-sm font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {saving ? 'Checking…' : 'Save'}
-          </button>
+          </Button>
         </div>
         {saveError && (
-          <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-red-400">
+          <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-danger">
             {ERRORS[saveError]}
           </p>
         )}

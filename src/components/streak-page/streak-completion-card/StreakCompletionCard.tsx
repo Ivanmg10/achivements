@@ -18,7 +18,7 @@ export default function StreakCompletionCard({ award }: Props) {
   return (
     <Link
       href={`/gameInfo/${award.AwardData}`}
-      className="flex items-center gap-3 p-3 rounded-xl bg-bg-main hover:bg-ink/5 transition-colors group ring-1 ring-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="flex items-center gap-3 p-3 rounded-tile bg-bg-main hover:bg-ink/5 transition-colors group ring-1 ring-ink/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
       <div className="relative shrink-0">
         {award.ImageIcon ? (
@@ -27,13 +27,13 @@ export default function StreakCompletionCard({ award }: Props) {
             alt={award.Title}
             width={40}
             height={40}
-            className="w-10 h-10 rounded-lg object-cover"
+            className="w-10 h-10 rounded-box object-cover"
             unoptimized
           />
         ) : (
-          <div className="w-10 h-10 rounded-lg bg-ink/5" />
+          <div className="w-10 h-10 rounded-box bg-ink/5" />
         )}
-        <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${isMastery ? 'bg-yellow-400' : 'bg-green-500'}`}>
+        <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center ${isMastery ? 'bg-hardcore' : 'bg-success'}`}>
           {isMastery
             ? <IconStar className="w-2.5 h-2.5 text-black" aria-hidden />
             : <IconCheck className="w-2.5 h-2.5 text-white" aria-hidden />
@@ -49,7 +49,7 @@ export default function StreakCompletionCard({ award }: Props) {
       </div>
 
       <div className="flex flex-col items-end gap-1 shrink-0">
-        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isMastery ? 'bg-yellow-400/15 text-yellow-400' : 'bg-green-500/15 text-green-400'}`}>
+        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isMastery ? 'bg-hardcore/15 text-hardcore' : 'bg-success/15 text-success'}`}>
           {isMastery ? T.streak.mastery : T.streak.beaten}
         </span>
         {isHardcore && (

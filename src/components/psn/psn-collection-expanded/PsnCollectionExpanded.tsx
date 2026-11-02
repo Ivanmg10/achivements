@@ -10,6 +10,7 @@ import { PsnTrophyGrid } from '@/components/psn/psn-trophy-grid/PsnTrophyGrid'
 import PsnTrophyGridGroup from '@/components/psn/psn-trophy-grid/psn-trophy-grid-group/PsnTrophyGridGroup'
 import PsnRarestTrophies from '@/components/psn/psn-rarest-trophies/PsnRarestTrophies'
 import PsnTrophyCounts from '@/components/psn/psn-trophy-counts/PsnTrophyCounts'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const SKELETON_BADGES = 24
 const NONE: TrophyCounts = { bronze: 0, silver: 0, gold: 0, platinum: 0 }
@@ -39,22 +40,22 @@ export default function PsnCollectionExpanded({ games }: { games: PsnGameProgres
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[190px_1.3fr_1fr] lg:grid-rows-[20rem_auto] gap-3 w-full">
-      <div className="bg-bg-header/40 rounded-xl p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-4 lg:p-6 flex flex-row items-center gap-4 lg:flex-col lg:justify-center lg:h-full lg:col-start-1 lg:row-start-1">
         <CircularProgress earned={earned} total={total} label={T.psn.trophies} size={130} />
         <PsnTrophyCounts earned={sum(games.map((g) => g.earned))} of={sum(games.map((g) => g.defined))} className="flex-col items-start! lg:items-center!" />
       </div>
 
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
-        <p className="text-xs text-text-secondary mb-2">{T.psn.trophies}</p>
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:col-start-1 lg:col-span-3 lg:row-start-2">
+        <p className="text-sm font-bold text-text-main mb-2.5">{T.psn.trophies}</p>
         {isLoading ? (
           <ul aria-busy="true" className="flex flex-wrap gap-1">
             {Array.from({ length: Math.min(total || SKELETON_BADGES, 60) }).map((_, i) => (
-              <li key={i} className="w-10 h-10 rounded-lg bg-ink/10 animate-pulse" />
+              <li key={i}><Skeleton radius="tile" className="w-10 h-10" /></li>
             ))}
           </ul>
         ) : error ? (
           <div className="flex flex-col items-start gap-2">
-            <p role="alert" className="text-sm text-red-400">
+            <p role="alert" className="text-sm text-danger">
               {T.psn.trophiesError}
             </p>
             {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}
@@ -78,11 +79,11 @@ export default function PsnCollectionExpanded({ games }: { games: PsnGameProgres
         )}
       </div>
 
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-2 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-2 lg:row-start-1">
         <GameAchievementsProgressChart achievements={unlocks} isLoading={isLoading} />
       </div>
 
-      <div className="bg-bg-header/40 rounded-xl p-3 lg:h-full lg:col-start-3 lg:row-start-1">
+      <div className="bg-bg-main/55 ring-1 ring-ink/[0.06] rounded-control p-3 lg:h-full lg:col-start-3 lg:row-start-1">
         <PsnRarestTrophies gameId={games[0].id} trophies={all} isLoading={isLoading} />
       </div>
     </div>

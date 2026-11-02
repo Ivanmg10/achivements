@@ -16,6 +16,7 @@ import XboxRecentlyPlayedExpanded from '@/components/xbox/xbox-recently-played-e
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import { gameHref, gameKey } from '@/utils/gameRef'
 import { xboxBackdrop } from '@/utils/xboxTitles'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 /**
  * A pinned Xbox game on the main page — PsnPinnedGameRow's counterpart: drag
@@ -35,9 +36,9 @@ export default function XboxPinnedGameRow({ gameId, isOpen, onToggle }: { gameId
   if (!game) {
     // Loading, or a pin for a game no longer in the library (Xbox unlinked): a placeholder that can still be unpinned.
     return libraryLoading ? (
-      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-xl h-24 animate-pulse" />
+      <div ref={setNodeRef} style={style}><GameRowSkeleton /></div>
     ) : (
-      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-2xl flex items-center gap-3 px-3 py-3">
+      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-card flex items-center gap-3 px-3 py-3">
         <XboxLogo size={20} className="text-text-secondary shrink-0" aria-hidden="true" />
         <span className="text-sm text-text-secondary flex-1">Xbox</span>
         <PinToggleButton gameId={gameId} source="xbox" />
@@ -52,7 +53,7 @@ export default function XboxPinnedGameRow({ gameId, isOpen, onToggle }: { gameId
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
+      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
       <GameCardBackdrop src={xboxBackdrop(game)} />
       <div className="flex items-center gap-3 px-3 py-3 w-full">
@@ -60,20 +61,20 @@ export default function XboxPinnedGameRow({ gameId, isOpen, onToggle }: { gameId
           {...attributes}
           {...listeners}
           aria-label={T.cards.dragToReorder}
-          className="text-text-secondary/30 hover:text-text-secondary cursor-grab active:cursor-grabbing touch-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 rounded"
+          className="text-text-secondary/30 hover:text-text-secondary cursor-grab active:cursor-grabbing touch-none shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success rounded"
         >
           <IconGripVertical className="w-4 h-4" aria-hidden />
         </button>
 
         {/* Same destination as the title link, so it is kept out of the tab order. */}
         <Link href={href} tabIndex={-1} aria-hidden="true" className="shrink-0">
-          <GameIcon source="xbox" id={gameId} imageUrl={game.imageIcon} size={56} className="rounded-xl w-14 h-14" />
+          <GameIcon source="xbox" id={gameId} imageUrl={game.imageIcon} size={56} className="rounded-tile w-14 h-14" />
         </Link>
 
         <div className="flex flex-col min-w-0 flex-1 gap-1">
           <Link
             href={href}
-            className="w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 rounded"
+            className="w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success rounded"
           >
             <span className="text-base font-bold block truncate leading-tight">{game.title}</span>
           </Link>
@@ -89,7 +90,7 @@ export default function XboxPinnedGameRow({ gameId, isOpen, onToggle }: { gameId
               onClick={onToggle}
               aria-expanded={isOpen}
               aria-label={`${isOpen ? T.xbox.hideAchievements : T.xbox.showAchievements}: ${game.title}`}
-              className="p-1 rounded text-text-secondary/40 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 shrink-0"
+              className="p-1 rounded-box-sm text-text-secondary/40 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success shrink-0"
             >
               <IconChevronDown size={14} aria-hidden="true" className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
             </button>

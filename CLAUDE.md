@@ -74,7 +74,8 @@ What to use instead:
 
 `notify.success(T.toast.x)` / `notify.error(T.toast.y)` from `src/lib/notify.ts`,
 callable from components, hooks or contexts; `<Toaster />` (root layout) draws
-them bottom right: green with a check, red with an alert icon, gone after 4 s
+them bottom right: a dark card with the tone on its edge and icon (a check for success, an
+alert for an error) and a line that runs out with the time, gone after 4 s
 (errors 7 s), never while hovered or focused.
 
 - **Use a toast** for actions that happen outside a form — pin/unpin, reorder,
@@ -104,12 +105,256 @@ Steam"); the landing has a FAQ for the same reason. Added 2026-10-17.
 - The `FAQPage` JSON-LD (pages and landing) is built from the same English items
   the server renders; keep them one list so the markup matches what is shown.
 
+## How UI work is done — idea → design → iterations → development (2026-10-23)
+
+**Every new page, section or visual rework follows `docs/design-process.md`**, the way the
+welcome was made (the user's standing preference): study the reference, several clickable
+concepts on a claude.ai design canvas (the user calls it "Figma"; they mean the canvas), iterate with the user one
+version at a time (changing only what they asked), a plan doc, then build and fix in short rounds
+from their screenshots (they use a 2560 px screen). The welcome's visual language (display
+italic titles, kickers, floating pill bar, curtain, cards that grow into their detail) is the
+one the user likes; an internal component library to make the whole site match it was designed
+and agreed on 2026-10-24 and is being built in three PRs (`docs/ui-library-and-designs-plan.md`
+→ Build plan; components only, never page structure). **Every design made (canvas) gets an entry in `docs/designs.md`**
+with its link, versions and what was built, so it can always be found again.
+
+## Welcome after sign-up (`/welcome`, 2026-10-22)
+
+A new account (form, form with RetroAchievements, or Steam) is signed in and sent to `/welcome`, not to the login form:
+intro, RetroAchievements, Steam, PlayStation, profile, style, privacy, done. Design and the
+reasoning behind it: `docs/welcome-plan.md` (and the design canvas linked there); style and privacy: `docs/welcome-look-plan.md`.
+
+- **Never blocks.** Every step has "Not now" / "Skip this step", "Skip all" is always in
+  the bar, and back works on every step, the browser's back and forward too (each move is a
+  history entry, its step in `history.state` under Next's own state, which must be spread in,
+  never replaced). Do not add a required step.
+- **No Xbox** in it while Xbox is admin-only (a new account is not an admin).
+- **No app header** until the person leaves it: it lives in `src/app/welcome/`, outside
+  `(main)`, on purpose (the user's call).
+- **Linking reuses the account page's logic** (`useRaLink`, `useSteamLink`, `usePsnLink`);
+  do not add a second way to link. RA's step is a page of its own with the guide to the
+  Web API key, not the modal.
+- **No achievements** for linking (no unlock toasts, no "first achievement"): CheevoVault's
+  own achievements are a future idea, written down in the plan. Linking toasts the usual
+  `notify.success`.
+- The curtain between steps is decorative (`aria-hidden`); with reduced motion it is not
+  shown at all. The bar's pills say each step's state in words. It lasts 2.2 s
+  (`CURTAIN_MS`; 1.1 s felt rushed to the user) and also carries a new account in from
+  sign-up: the sign-up page plays it until covered and holds, the welcome finishes it
+  (`useWelcomeEntry` / `useWelcomeArrival`, flag `welcome-entry` in sessionStorage).
+- On big screens the welcome is scaled as a whole by raising the root font size while it is
+  open (120 % from 1536 px, 140 % from 2200 px; a 2560 px screen showed it tiny). So **sizes in
+  it are in rem** (`text-[0.8125rem]`, not `text-[13px]`). **Never CSS `zoom`**: it throws Framer
+  Motion's layout animations off (the intro's cards grow into their detail with `layoutId`).
+- **Style and privacy are two steps (#102, 2026-11-02):** the step key `prefs` is the one the bar calls Style.
+  Style shows the Layout modal's sample (`LayoutModalPreview`) beside the intro's cards (`LOOK_CHOICES`), each growing into
+  its choice, the account's own preference components. **The sample and how a change moves come from the modal; its controls
+  do not** (the user's call: the welcome keeps its own look). The theme alone opens over the whole step, with all the themes. A choice opened is a
+  history entry (`useWelcomeChoice`). Privacy's sample follows its three switches, on the person's own card. A new look preference is a new row in `LOOK_CHOICES`.
+- **A linked platform is one card, `WelcomePagePlatformLinked`,** with its `VaultFillLine` inside, and linking stays on the step so it is seen. A new platform uses it.
+- The avatar is edited in `AvatarModal` (account page and welcome), not `EditProfileModal`,
+  which is only for the username and email now.
+- **The Vault Points fill runs in the welcome** (`VaultFillProvider` in `src/app/welcome/page.tsx`,
+  since the app's providers are not mounted there): an account that came linked (signed up with
+  Steam or RetroAchievements) or links a platform on the way is read while the person goes
+  through the steps, so "your games are on their way" is true. Each linked platform step's card
+  (`WelcomePagePlatformLinked`) carries its `VaultFillLine` (games counted, or why not: a private profile
+  and how to fix it), and Steam's shows the Steam picture (`useSteamProfile`). Checked end to end 2026-10-23 with a
+  Steam sign-up: linked in the bar, the step, the profile's avatar and the done summary.
+
+### The welcome follows the app — keep it current (the user's standing rule, 2026-10-22)
+
+More platforms will come. **Every platform a user can link must have its step in the welcome**,
+in the same change that makes it available to users (Xbox included, the day `XBOX_ADMIN_ONLY`
+turns false). A new platform touches:
+- `PLATFORM_STEPS` and `WELCOME_STEPS` (`src/hooks/useWelcomeSteps.ts`): its place in the order.
+  The "Platforms · n of total" count follows on its own.
+- Its step component in `src/components/welcome-page/welcome-page-<platform>/`, linking with the
+  platform's own hook (as RA, Steam and PSN do), with `WelcomePagePlatformLinked` when linked, and its tests.
+- `STEP_SKY` (`welcomeArt.ts`), its mark in `welcomeNodes.tsx` (curtain) and in the bar's
+  `PLATFORM_MARK`, its row in `WelcomePageDone`, and its session field in `WelcomePage`'s `linked`.
+- `T.welcome.steps` / `words` and its own texts, in all nine languages; the intro's first perk
+  ("RetroAchievements, Steam and PlayStation together") names the platforms.
+- `LINK_RETURNS` (`src/lib/steamLogin.ts`) if it links through a round trip, like Steam.
+
+The same goes for the rest of the site: **when a change adds or renames a feature, a profile
+field or a preference, check whether the welcome shows it** (intro perks, the profile and
+preferences steps, the done summary) and update it in the same change. The intro's five
+points open over the whole step (`WelcomePageIntroDetail`: `detail`, `highlights` and a drawn
+sketch per point in `WelcomePageIntroArt`): keep their text and sketches true to the features.
+
+## Language — the browser's until the person picks one (2026-10-22)
+
+`LanguageContext`: the saved choice, else the first of `navigator.languages` the app has
+(`pickLanguage` in `src/utils/languages.ts`: `es-MX` → es), else English. **The detected
+language is never saved**: only a person's pick is (`setLang`), so a browser that changes
+its language changes the app. `fromBrowser` says when the language shown is the detected one
+(the welcome says so). The language list with native names is `LANGUAGES` there; do not keep another.
+
+- **The first paint is already in the person's language on the app's pages (2026-10-23).** A
+  pick is also written to the `app-language` cookie (a year, `languageCookie`; a choice saved
+  before the cookie existed is copied into it). `(main)/layout.tsx`, which is dynamic anyway (it
+  reads the session), calls `serverLanguage()` (`src/lib/serverLanguage.ts`: the cookie, else
+  `Accept-Language`) and wraps the page in a `LanguageProvider initial={…}`, which renders that
+  language on the server and while hydrating, so they match. That covers the landing and the
+  whole signed-in app.
+- **Each language is its own chunk (2026-10-30, audit PERF-02):** `loadMessages`
+  (`src/translations/load.ts`) imports it on demand; only English is in every page. A language
+  must stay plain data, as `(main)/layout.tsx` sends the active one to the client as `messages`
+  so hydration needs no fetch (`load.test.ts` fails on a function). Never import `es`, `pt`… into
+  client code.
+- **Do not call `serverLanguage()` (or `headers()`/`cookies()`) in the root layout**: it would
+  make every page dynamic, the static ones too (`/privacy`, `/terms`, `/compare`, `/track`,
+  `/welcome`). `/authPage` is dynamic on purpose: it reads `searchParams` on the server, because
+  `useSearchParams` would send it empty. Those still paint English until they hydrate; reached by a client
+  navigation (the usual way) they are already in the right language.
+- `/privacy` lists the cookie among the necessary ones, in all nine languages.
+
+## The design system — read `docs/design-system.md` before any UI (2026-10-25)
+
+Three layers: **tokens** (`globals.css`: a theme's colours, a *design's* shapes), **the library**
+(`src/components/ui` and friends) and **pages built from it**. The catalogue of every piece is at
+**`/design`, admins only** (the flag is read from the database; others get the 404).
+
+- **Two designs, two look preferences:** `shape-style` = `slanted` (default) or `round`, and
+  `font-style` = `barlow` (default), `sofia` or `fira` (Preferences → Layout), as
+  `data-shape` and `data-font` on `<html>`; any element can carry either one to show a look inside
+  another (the catalogue, the choice cards and the Layout chooser's sample do; `data-font` swaps `--font-face` and `--font-face-display`, and such an element takes the family itself) (`ShapeSync`; a
+  script in the root layout paints the last choices before the first frame). A component never
+  reads the choice: it reads tokens. A bar's cut ends are `slantStyle(px)`
+  (`ui/shape.ts`), a mark's lean `skew-y-(--slant-mark)`, a control's `skew-x-(--slant-button)`.
+  **Never a literal `polygon(...)` or `skew-*-[..]`** (`uiGuard.test.ts` fails on it). The round
+  design may override the shape tokens; no theme may (`designTokens.test.ts`). The welcome curtain's
+  fixed clip paths are the documented decorative exception and do not follow the shape choice.
+- **The round design must always be rounder than the slanted one (2026-11-01, #78):** every surface a step
+  softer (`--r-card`, `-sheet`, `-pane`, `-tile`, `-control`, `-area`, `-box*`; `designTokens.test.ts` fails if one
+  is not), and every one-line control a pill or a circle (`--r-button`, `-field`, `-icon`, `-tag`, `-tag-sm`, `-badge`,
+  `-chip`). It started as a copy of the site before the slant, and the slanted design then grew past it, so it looked
+  square with nothing failing. **Choose by what the thing is:** a card `rounded-card`, a floating panel `rounded-sheet`,
+  an inner tile `rounded-tile`, a thumbnail, row or small box `rounded-box` (`-md`, `-sm`), a heatmap cell `rounded-cell`, a
+  button `rounded-button`, an icon button `rounded-icon` or `rounded-chip`, one line of input `rounded-field`, several lines
+  `rounded-area` (`multiline: true` on `fieldClass`, which the guard requires on a raw `<textarea>`; a round corner cuts its grip,
+  so `[resize:var(--area-resize)]`). A `Modal` draws the frame: never a card inside it. **`rounded-control` is a soft surface, despite its name** (notices, menus,
+  tooltips): it must never be a pill, and a real control does not use it. A value new to the slanted block restates what
+  that design drew, so it does not move. Outside `ui/`, `uiGuard.test.ts` refuses `rounded-lg`, `-md`, `-sm`, `-xl`, `-2xl`,
+  `-3xl` and arbitrary values, on any side, but for its short list of exceptions; a bare `rounded` is only a focus ring's corner.
+  A `rounded-full` chip is a pill in both designs: left so on purpose, since moving it would change the slanted design.
+- **Disclosure:** `Accordion` (`AccordionItem`), `ShowMore`, `Shelf`, `DropSlot` and `ToggleButton`
+  are in `ui/`; a pin star or any on/off icon is a `ToggleButton` (`aria-pressed`), never a hand-made `role="switch"`.
+- **Game cards:** `game-card-style` = `tinted` (default, the colour of the game's art) or `flat`;
+  `GameCardBackdrop` is the one place that draws it, so every game card follows it.
+- **The Layout modal moves on every change (2026-11-01, #78):** all its options in view, no tabs. The theme stays in its own dialog (`ThemeModal`, which stays open on a pick and says what is on and saved), by the user's choice after trying it inside. The first game's card grows into
+  the cover (Framer `layoutId`), the flat style wipes across the cards, and the rest goes through `lookTransition`
+  (`src/utils/lookTransition.ts`, the browser's view transition): a font fades (in the sample: the page takes it when the modal closes, so it never changes behind; the user's call), a theme spreads from its tile, and a shape sweeps
+  across the window behind a band of the accent shaped like it (`sweepEdge`). Do not ease a shape with CSS: the bars' `clip-path` cannot, so half the
+  page jumped (the user turned that down). A browser without view transitions, or reduced motion, just changes. **Over a blurred backdrop a transition must be kept to the dialog** (`lookTransition(…, within)`): Firefox leaves `backdrop-filter` out of its capture of the page, so a whole-page transition shows the page sharp behind the dialog until it ends; a dialog whose page must take part (the theme's) has `backdrop="dim"`, with no blur to lose. **`::view-transition` takes every click, and that stays so:** with `pointer-events: none` Firefox cannot hit the captured element, so a click lands behind it and closes the dialog. `lookTransition` ends the transition and hands the click to the button under the pointer, only inside the dialog. A dialog's ring and shadow are outside its box, so a fade draws them twice and a sweep's `clip-path` cuts them: the `look-panel` pair clips the looks and draws them itself. **The change goes in after `ready`, two frames in, never in the transition's callback:** Firefox shows the element itself on a transition's first frame, a flash of the new look; the new look is live, so it takes the change behind the animation. Test motion in Firefox too, on the real screen.
+- **Streaks are coloured by tier** (`streakTier`: 0, 5, 10, 20, 30, 40, 50+ days; `StreakTag`, the best streaks' bars, the
+  streak hero and its live bar, the cover's streak card, the home's stats tile, the rankings' streak column). This replaces "streaks in the accent" for those places.
+- **Adding a piece:** library first (`ui/`, props for layout only, a test), then its specimen in the
+  catalogue, then its rule in `uiGuard.test.ts`, then the page. A page that needs a one-off look asks
+  for a prop or a variant, never a copy.
+
+### Entrances — a class, never a new animation (2026-10-31, #61)
+
+`docs/design-system.md` → Entrances has the table. **A new page or list brings its entrance in the same
+change:** `.enter-rows` on a list, `tbody` or a hero's text; `.enter-cards` on a grid; `.enter-card` /
+`.enter-rise` on one piece (`[--i:n]` orders them); `.enter-grow-x` / `-y` on a bar, `animateIn` on a ring,
+`CountUp` on a big number. A `ProgressBar` inside any of them grows by itself.
+
+- **CSS keyframes, never Framer's `x`/`y`/`initial` on what appears on a load** (`uiGuard.test.ts` fails on it;
+  what opens on a click may stay in Framer), and never hide an element until a frame, idle callback or observer.
+- `backwards`, never `both`: a fill that stays keeps a transform, which traps `position: fixed` and breaks dragging.
+- The library's shelves keep their own cascade (`.enter-shelves`), and the home its own keyframes: the user prefers them
+  that way (2026-10-31). Do not fold them into the general families.
+- A block that waits for a fetch holds its exact room, measured, or the same element unseen: the account page's level
+  and rankings switch did not, and the page jumped 118 px when they landed. `useVaultMe`'s `isLoading` covers the session read.
+- A list plays once: `useEntrancesOnce` sets `data-entered`, as a reorder would restart it. Keep a skeleton out of
+  the element that has the class.
+- Reduced motion restates the `--enter-*` tokens, so nothing else is needed for it. Entrance-only: no scroll
+  triggers, no loops. Overlays and page transitions stay as they are.
+
+## The component library — draw with it (`src/components/ui`, 2026-10-24)
+
+The site's controls come from the library, in the design agreed on the canvas
+(`docs/ui-library-and-designs-plan.md` → Build plan). **Never draw one by hand**; a
+guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside `ui/`:
+
+- **Buttons**: `Button` (`primary` slanted, `secondary`, `quiet`, `danger` (tinted, not solid); `size`; `loading`;
+  `href` for a link) and `IconButton` (needs `aria-label`). Where an element cannot be one,
+  `buttonClass(variant, size, layout)`.
+- **Fields**: `Input`, `Textarea`, `SearchInput`, `PasswordInput`, wrapped in `Field` (label,
+  aside, hint or error wired by id); or `fieldClass({ invalid, icon, size })` on a native input.
+- **`Select`** (own listbox, never a native `<select>`), **`Switch`** (slanted; say the state in
+  words beside it), **`Checkbox`**, **`ChoiceCards`** / `choiceClass`.
+- **`Tabs`** (slanted line, roving tabindex; the panel is the caller's, `tabIds`),
+  **`SegmentedControl`** (sliding slanted pill), **`Pill`** / `pillClass` for filter chips.
+- `className` on them is for layout only (margin, width, flex), never colours.
+- **The look lives in tokens** in `globals.css` (`--slant-*`, `--r-*`, `--h-*`, `--motion-*`,
+  `--hardcore`/`--softcore`), defined once for every theme (`designTokens.test.ts`): a future
+  site-wide design changes them, not the components.
+- **Loading**: `Skeleton` (`ui/Skeleton.tsx`: `radius` from the tokens, colour `bg-skeleton`, pulse, still under reduced motion, always hidden), `SkeletonRow` / `SkeletonGameList`, `GameRowSkeleton`, `GameCardSkeleton`; an image's own placeholder uses `SKELETON_PULSE`. **Each screen and view has its own composed skeleton, on the real boxes and gutters** (2026-10-31, #70): a new screen, section or fetch brings its own in the same change, and a figure on its way is `loading` on `StatPill` / `StatCard` / `PlatformStat`, never a `—`. The guard refuses a hand-made `animate-pulse`; only `StatusBadge`'s glow is exempt. Spinners stay for actions (inside a button), not for content. **The home's profile skeleton takes the height the real one had last time** (`homeFit` keeps it, `HOME_PROFILE_KEY`): that height sets the top of the home, and a fixed guess made the skeleton taller than the page (2026-11-01). **With profile tabs the home's profile column keeps one height (`min-height`, globals.css, the tallest platform's):** that height sets `--home-fit-trim`, so a shorter profile resized the charts and the heatmap on every switch (2026-11-01). **A line of unlocks over time is `AchievementsLinePlot`** (the home's week, a game's weeks or months): the user's rule, 2026-11-01, one chart, never a second drawing of it. **What a row or a card may show must be in it from the first frame:** a pill whose data comes later is a `loading` pill, gone only if the read fails (`!summary && !error`), or it pushes the others aside when it lands; a large `StatPill` keeps the line under its figure. **A chart in a skeleton is the real chart with `isLoading`**, never a second drawing of it. **`(home)/loading.tsx` also renders signed out, without `MainProviders`**: a skeleton there reads `useOptionalMainView`, never a context that throws. **A section lands whole (the user's preference, 2026-10-31):** the home's Friends and both Following lists hold their skeleton until `detailsLoading` is false, even if that takes longer; no row pops in or re-sorts, and a failed read still ends the wait. Do not add a timeout or a progressive reveal without asking. **A skeleton draws every variant and `<html>` picks one**, so a full load paints the right one before React can read a preference: `data-home-layout`, `data-library-layout` and `data-session` (`in` or `tabs`, nothing signed out; `sessionLook`, no account data) are set by `LOOK_SCRIPT` before the first frame, then kept by `ShapeSync`, and read in `globals.css` (`.if-*`, `.home-if-*`). A block sized by the person's data is a `RememberedHeight` (`ui/`): it keeps in this browser how tall it ended up and holds that room while it loads; the first visit has nothing to go by.
+- **Dialogs**: `Modal` (head with icon, title and hint; `footer`; `tone="danger"` is an
+  `alertdialog`; sizes `sm`–`xl`; a sheet on phones; Escape, outside click, focus kept inside and
+  given back; only the top dialog answers Escape). `CommonModal` is a thin wrapper over it (no
+  corner close by default). A modal names itself by its first heading, or `aria-label` /
+  `aria-labelledby`.
+- **Feedback**: `Notice` (tinted inline notice, `role="alert"` for errors), `TOOLTIP_SURFACE`
+  (`ui/tooltip.ts`), `MENU_SURFACE` / `menuItemClass` (`ui/menu.ts`); the toasts are the dark card.
+- **Surfaces and data**: `SURFACE` (`ui/surface.ts`; cards use `rounded-card`), `StatPill`'s
+  large size has no box, `RarityBadge` (a tinted figure, never a bar), `ProgressBar` bevelled and
+  glowing only when finished, `GameCardBackdrop` = a flat tint of the game's colour behind the
+  same neutral hairline as a flat card (`useImageTint`; never the blurred art again, the user's
+  choice). The art is read through
+  `/api/image-proxy` (only the platforms' image hosts, images only, 3 MB, a week's cache) so a canvas
+  may read it; do not widen its host list to anything a user can type (it would be an open proxy).
+- **Colours with a meaning come from the theme**: danger, success, warning, `hardcore`,
+  `softcore`; the guard refuses red / green / yellow / amber / orange palette classes. Tier and
+  platform hues are the exception.
+- **Streaks are in the accent**; amber (`warning`) only in the streak page's hero.
+- **Fonts:** Barlow + Barlow Condensed is the default pair; Sofia Sans and Fira Sans are optional
+  preferences, each with its condensed italic display face. All six are loaded in the root layout
+  (`src/lib/fonts.ts`); only Barlow preloads. A page title, a big figure or a rank is
+  `font-display italic`.
+- **Numbers a reader sees are in their language:** `toLocaleString(lang)`, `decimal(n, lang)` for a
+  fixed count of decimals, `formatRarity(pct, lang)`; never `toFixed` on screen ("0,8", not "0.8").
+- **A game page's top is `GameHero`** (chips, title, facts, actions, tiles, media) and its tables use
+  `ui/dataTable.ts` and `AchievementTableToolbar`; the four platforms share them.
+- **The home layout is the person's choice** (`useHomeLayout`, synced key `home-layout`):
+  `classic` (default) or `cover` (`MainPagePortada`, the game played last in big on top). It is in
+  Preferences → General and in the welcome's preferences step.
+- **The cover's art** (source order in `HomeHero.art`, `src/utils/homeHero.ts`) shows only once it has loaded
+  and been judged for its box (`artVerdict`: at most 2× stretch, aspect 8:7 to 4:1). Each source is tried once;
+  if none fits, the first too small for the box is the background anyway. **The big cover is never just a box
+  art while a wide picture exists (the user's call, 2026-10-31):** the poster is for a game with no wide picture
+  at all, or only portrait ones, then the game's colour alone. Xbox and RA take IGDB's first (`heroUrl`, `coverUrl`
+  in `/api/xbox/details` and `/api/getGameArt`); RA then its own screenshots and box art, Xbox its tile. Hacks and
+  subsets never ask IGDB (`igdbRaArt`). **IGDB pictures go through `pictureUrl`**: `t_1080p` stretches a
+  smaller original (measured 2026-10-31), which hides a blurred picture from that check.
+
+## Favicon and the theme list (#84, 2026-11-01)
+
+- **The logo was drawn by a friend of the user and keeps its shape** (the user's call): recolour it, never redraw it or swap it
+  for a simpler mark, here or anywhere. Its paths are `LOGO` in `src/utils/themeIcon.ts`.
+- **The favicon follows the theme, with nothing behind it:** the whole logo in the accent, toned for the browser through `prefers-color-scheme` inside the SVG
+  (4:1 on `#35363a` or on white); white and black accents take the browser's ink. **Never a ground or a plate** (the user tried it, 2026-11-02): a page cannot read a
+  tab's colour, so any ground clashes with some browser's theme. The same cost as any single logo: a browser whose scheme does not match its tab colour reads worse, and a mid grey tab is the weakest.
+  Themes that share an accent share an icon (Midnight and Crimson): it goes with the theme, it does not name it. Venom is the one exception: bone white accent, purple logo (the user's call).
+- **A new theme needs its row in `THEME_ACCENT`:** the types refuse a missing one, `src/app/themes.test.ts` refuses one that differs from `globals.css`
+  (and checks contrast for the themes added in #84). A new light theme also joins the light selector lists in `globals.css`.
+- **One `<link id="theme-icon">`, in the root layout, before the script.** Not `src/app/icon.svg`: Next's link can land after the script. Both the script
+  and `ThemeContext` set its `href`; a data URL has nothing to cache. Measured 2026-11-02 on real tabs, Chromium and Firefox change with no reload and follow the
+  scheme. Safari is not tested (no Windows build): if it refuses, it keeps `/icon.svg`, the default theme's logo. A browser with a custom theme is not measured either.
+- **A theme that no longer exists lands on `dark`** in the head script, `ThemeContext` and the public profile (no row, never its raw id). `users.theme` keeps
+  the old value until the person picks another: no migration, nothing else reads it.
+- **`apple-icon.tsx` still says "CH"**: out of #84, left as it was.
+
 ## Progress bars — in the theme's colours
 
 Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or
 `CircularProgress`: the theme's `--progress` (its accent), RA softcore a darker
 step of it (`bg-progress-soft`) under hardcore. A finished bar stays in the
-theme's colour and glows; **the green is only in the percentage beside it**
+theme's colour and glows (only a finished bar glows; its ends are cut on the design's slant);
+**the green is only in the percentage beside it**
 (`text-success` at 100%), never on the bar — the user tried a green ring and
 did not like it. Do not paint a bar in a platform's colour; those stay only in
 charts that compare platforms (CompletionDistribution, the line
@@ -153,6 +398,9 @@ lost. Index of the docs: `docs/README.md`.
   add an entry at the top of `docs/worklog.md` — did / why / decisions / open /
   watch out, as its template says. It goes in the same branch and PR as the work,
   before the last commit. A task is not done without it.
+- **The worklog never conflicts**: `.gitattributes` merges `docs/worklog.md` with
+  git's `union` driver (both sides kept). Do not remove it. After a merge, glance
+  at the top entries: a `---` between two may be missing.
 - **A rule or invariant changed or was learned** (a "never do X", how a
   platform must be called, a new env var, a migration that must run, a release
   gate) → update the matching section of this file in the same change. Do not
@@ -181,6 +429,10 @@ Mobile-first. Tailwind sm/md/lg prefixes. No fixed widths that break mobile.
 
 ### 3. i18n
 - All user-facing strings via `T.*` from `useLanguage()` hook
+- **Gender-neutral wording** in every language: nothing that assumes the reader's gender
+  ("Bienvenido", "Bem-vindo", "Benvenuto", a Polish "zostawiłeś"…). Say "Hola", "Esta es tu
+  bóveda", or rephrase (the user's rule, 2026-10-22). The opt-in gender is for others' profiles,
+  not for addressing the reader.
 - New strings → add to both `src/translations/en.ts` and `src/translations/es.ts`
 - Admin panel exempt
 
@@ -201,6 +453,7 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
 - Every commit auto-bumps patch (`0.8.0` → `0.8.1`)
 - To do a minor/major bump: edit `src/lib/version.ts` manually before committing — hook detects the change, skips auto-bump, and syncs `package.json`
 - Hook is activated via `npm run prepare` (already wired in `package.json`)
+- Two branches never conflict on the version: see "Environments" in Git below
 
 **Milestones:**
 - `0.8.x` — login/register polish + optimizations
@@ -233,6 +486,11 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
   `migrations/040_vault_points.sql`, applied 2026-10-20; any other database needs it before
   this code runs, or the rankings, the header's level and the score refresh answer 500
   (Following and profiles still load, without levels)
+- `1.7.0` — released to `main` 2026-11-02: the component library and the two designs, a skeleton
+  and an entrance for every page, the welcome after sign-up, sign-up and linking through Steam and
+  RetroAchievements, public profile cards, streaks in the rankings, Xbox quota hardening, the v1.7
+  audit fixes. Migrations `041`–`044` are in production (`043`, `044` applied 2026-11-02, just before
+  the release)
 
 ## Release gates — what had to be true before 1.0 (all closed)
 
@@ -317,6 +575,10 @@ it sets `users.email_verified_at` (`migrations/017_email_verification.sql`).
   user's session ends too.
 - The RA API key (`raid`) is server-only: `getServerSession(authOptions)` has it,
   the browser's session (`authHandlerOptions`) does not. Client code uses `raLinked`.
+- **Do not hand the session to a second `SessionProvider`** (2026-10-31): next-auth keeps module-level state, so a nested
+  one leaves the root's reading `unauthenticated`, and the root layout must not read the session (see Language). A page whose
+  shape depends on the session holds its skeleton while `status === 'loading' && !session`, as the home and `/user` do.
+  `getServerSession(authOptions)` carries `raid`: never pass that object to a client component.
 - Admin checks read the DB (`loadUser(id, { fresh: true })`), not the session.
   See Admin panel below for the rest.
 - Sign-in, current-password checks, sign-up and reset requests are rate limited
@@ -334,7 +596,11 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
 `requireAdmin(req)`.
 
 - **Two locks.** The admin flag is read fresh from the DB, and the panel must be
-  **unlocked with the admin's own password** (`POST /api/admin/unlock`). The
+  **unlocked with the admin's own password and a one-time code** (`POST /api/admin/unlock`,
+  `src/lib/adminTotp.ts`, `migrations/044_admin_totp.sql`, applied to pre 2026-10-31; any other database
+  needs it first, or the unlock answers 500).
+  An admin with no authenticator enrols on their next unlock, after the password. Recovery codes are
+  shown once and stored hashed. Lost both: `DELETE FROM admin_totp WHERE user_id = <id>`. The
   unlock is a signed, httpOnly cookie scoped to `/api/admin`, valid 15 minutes,
   bound to the admin and to their password hash (a password change ends it).
   Without it the endpoints answer `403 reauth-required` and the panel shows the
@@ -348,8 +614,8 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   the address, then reset the password.
 - Admins can create users (for odd cases; sign-up is open), edit, delete, and
   link/unlink RA (checked against RA with the user's key) and Steam (checked to
-  exist through the Steam API). Neither proves ownership — users link Steam by
-  name too — so the log records who linked what.
+  exist through the Steam API). Neither proves ownership (users now link Steam
+  through Steam, which does), so the log records who linked what.
 - The privacy policy (`/privacy`) says all of this; `/terms` says when an
   account may be suspended or deleted. Change the policy if the panel changes.
 
@@ -362,6 +628,10 @@ Everything lives in `src/lib/adminAuth.ts`; every admin route starts with
   shape of what it returns changes.
 - **A 429 waits.** `fetchRA` honours `Retry-After` up to `MAX_RETRY_AFTER`
   (5 s) and retries; a longer ask is thrown. Other 4xx are never retried.
+- **Keys are sealed at rest** (`src/lib/raKey.ts`, `migrations/043_ra_key_sealed.sql`, applied to pre
+  2026-10-31; any other database needs it first, or linking answers 500; reads still work). `users.raid` is read through `readRaKey`, never directly: a key from
+  before sealing reads as it is, until it is linked again. `raid_hash` keeps one key to one account.
+  Changing `NEXTAUTH_SECRET` makes every key unreadable and everyone links RA again.
 - **Whose key.** Never a shared app key (see the roadmap). On the user's own
   page the call uses their `raid`; `requireViewerApiKey` never falls back to
   another key. On someone else's page `dataOwner` (`src/lib/apiAuth.ts`) signs
@@ -408,8 +678,12 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   `NEXT_PUBLIC_`), like PSN's NPSSO. Without it the routes answer
   `503 not-configured`; a refused key answers `503 unauthorized`.
 - **150 calls an hour for the whole app** on the free plan. Everything is cached
-  in `steam_cache` under `xbox:` keys; a profile costs ~3 calls cold (search,
-  library, one game's achievements). Bump a key's `_vN` when its value's shape changes.
+  in `steam_cache` under `xbox:` keys. The ~3-call figure covers only search,
+  library and one game's achievements, not a home with activity/year scans.
+  `xboxCall` also enforces a PostgreSQL-backed 150-attempt hourly budget per
+  environment: refused attempts are removed and a database failure refuses the
+  call. OpenXBL headers remain authoritative across environments sharing the key.
+  Bump a key's `_vN` when its value's shape changes.
 - **OpenXBL answers errors with HTTP 200** and the real status in the body
   (`{ code: 400 }`): `xboxCall` checks both. It also refuses
   `Accept-Language: *`, which Node's fetch sends by default, so a language is
@@ -431,12 +705,20 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   Keep every Xbox image going through it. `titleId` is a decimal string; the largest
   seen is under 2^31 (the `game_id` columns are INTEGER), but check before storing it.
 - **Play time** comes from one `POST player/stats` (`MinutesPlayed`, up to 150
-  titles per call) made inside the cached library load (`xbox:titles:v5`); a
+  titles per call) made inside the cached library load (`xbox:titles:v7`); a
   backward-compatible 360 game is asked under its `modernTitleId`
-  (`xboxStatsTitleId`). A failure leaves the library whole, without hours. Many
-  games simply have none.
+  (`xboxStatsTitleId`). A failure leaves the library whole, without hours, and
+  `playtimeComplete: false` keeps `X-Xbox-Partial: playtime` on later cache hits.
+  Many games simply have none.
+- **Twin titles:** Xbox can list a game twice under one name, the game and a title with no
+  achievements that launches it (Minecraft: Xbox 360 Edition, measured 2026-10-21).
+  `foldTwinTitles` drops the empty twin in the library load and gives its session and play time
+  to the game; a game with no achievements and no twin stays.
 - **Backdrop:** a game page's wide picture is IGDB's (`heroUrl` in
-  `/api/xbox/details`), fetched when the page opens; lists keep Xbox's own tile.
+  `/api/xbox/details`), fetched when the page opens. The library's shelf cards
+  (`LibraryShelfBanner`) ask for the same, one card at a time as RA's screenshots,
+  so at most a shelf's worth (`SHELF_CAP`); until it arrives, or with no match, they
+  show the blurred tile. Lists and icons keep Xbox's own tile.
   Do not enrich the whole library from IGDB at load (135 searches).
 - **Measured 2026-10-16:** an unknown gamertag answers HTTP 200 with `code: 404` in
   the body (→ `not-found`). A library the viewer cannot read answers like a
@@ -450,10 +732,18 @@ achievements) were applied 2026-10-15. Plan and measured findings:
   "RetroAchievements, Steam and PlayStation" on purpose: change them when Xbox opens to everyone.
 - Admin explorer lookups and linking are logged (`xbox-lookup`, `link-xbox`,
   `unlink-xbox`). Do not add a second Xbox provider without asking.
-- **Open problem (2026-10-17, not fixed):** when `api.xbl.io` does not answer,
-  `xboxCall` has no timeout, failures are not cached and there is no stale fallback, so
-  every Xbox read waits ~11 s and "Recently played" waits with it. Diagnosis and the
-  proposed fix: `docs/xbox-integration-plan.md` §7. Read it before touching `xboxCall`.
+- **Quota/failure hardening (2026-10-30, #87):** `xboxCall` has a 5 s timeout
+  (504 `timeout`), a per-instance 429 cooldown and feed scans stop scheduling
+  games on 429. `steam_cache` can serve the last success stale only for
+  `failed`/`timeout`/`rate-limited`, never for private/not-found/disabled keys;
+  nested stale is never rewritten fresh and in-flight/backoff callers recheck
+  their own failure policy. Expired Xbox successes stay 30 days. Responses and
+  logs use `xboxTelemetry.ts`: sanitized operations, request ids, real upstream
+  counts, cache outcomes, `X-Xbox-Stale` and `X-Xbox-Partial`, never XUIDs or
+  gamertags. Assembled feeds are `xbox:feed:v2:`; home derives 60-day Xbox
+  activity from the shared year instead of requesting it twice. Following reads
+  one detailed friend at a time and Xbox score reads two games per pass. Full
+  contract: `docs/87-xbox-quota-hardening-spec.md`.
 
 ## PlayStation (PSN) — read before touching it
 
@@ -517,8 +807,26 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
 
 ## Performance rules — keep these true (audited 2026-10-16)
 
-- **recharts is only loaded through the lazy plots** (`AchievementsLinePlot`,
-  `GameAchievementsProgressPlot`, via `next/dynamic`). Never import `recharts` in
+- **Nothing the first paint needs waits for JavaScript (audit v1.7, 2026-10-30).** No Framer `initial`
+  with opacity 0 on what a visitor reads first; use CSS keyframes, or `AnimatePresence initial={false}`.
+  That one change took the landing's LCP from 12.8 s to 1.4 s under the audit's throttling.
+- **Code the browser loads must not reach `pg`.** `steamClient` and `fetchRA` are server code; picture
+  and page URLs live in `steamAssets.ts` (pure). Reaching the database from something a client imports
+  breaks the build even through a dynamic import.
+- **Every call to a platform has a deadline shorter than the client's 20 s** (two 8 s attempts on RA
+  and Steam, 8 s per PSN call through `psnCall`, since `psn-api` takes no signal). RA keeps its measured
+  pace per key in `fetchRA`; every Sony call spends the app's `psn-upstream` budget and a refusal
+  cools the instance down a minute. `countUpstream` counts calls per day; Steam fills wait at 85 % of its
+  100,000 a day (`steamBudgetLow`).
+- **Guarded work counts first:** `reserveAttempt` before a password check, not `isLimited` then
+  `recordAttempt`: a burst passes those together (30 of 30 past a limit of 10, measured).
+- **What a user stores has an end:** a length on text, a row cap, one `unnest` statement for an order.
+- **Cross-site writes stop in `src/proxy.ts`**, whose matcher takes `/api` only when the request carries
+  `Origin`, so same-origin reads never pay for it.
+
+- **recharts is only loaded through the lazy plot** (`AchievementsLinePlot`, via
+  `next/dynamic`). Their `loading` and the chart's data state are the same
+  `LineChartSkeleton`, or the reader sees a second skeleton between them. Never import `recharts` in
   a component that is part of a page's first render: it is ~390 KB.
 - **A modal is a `next/dynamic` import wrapped in `LazyWhenOpened`**, so it is
   downloaded the first time it opens and stays mounted after (its exit animation
@@ -531,6 +839,20 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
 - **Several components asking for the same GET share one request while it is in
   flight**: `fetchWithRetry` does it for you; for a raw `fetch` of a GET use
   `fetchShared`. A shared answer is shared by reference: copy before changing it.
+- **Steam's owned list is read through `loadOwnedGames`** (`src/lib/steamProgress.ts`, 5 min,
+  shared): never call `getOwnedGames` from a route. A home page used to download it five times
+  (2026-10-22). `scoreRefresh` keeps its own cache on purpose. "Recently played" is built from
+  its `rtime_last_played`, not from `GetRecentlyPlayedGames` (two weeks only).
+- **Steam library counts come in batches** (`fetchBatchCounts`, `GetTopAchievementsForGames`, 100
+  games a call; 192 in 0.6 s measured 2026-10-22): only finished games are read one by one, for
+  the date they were finished. The batch also answers for achievements Steam keeps private, so it
+  is trusted only after one per-game read agrees they are public (`batchCountsFor`). Keep that probe.
+- **Every Steam unlock read is kept** in `steam_unlocks` (`migrations/042_steam_unlocks.sql`,
+  applied to pre and production 2026-10-22; any other database needs it, though without it they
+  only log and nothing fails): `fetchPlayerAchievements` records them, so the score refresh (every played game)
+  fills it. The streak and activity read the `maxGames` played last live and the rest of the
+  window from the table, only for games the owned list still shows (a private profile shows none).
+  Unlinking Steam (user or admin) deletes the rows; `/privacy` says they are kept until then.
 - **Read routes that are expensive upstream send `cachedJson(data, ttl)`**
   (private, `Vary: Cookie`): the PSN and Xbox reads (5 min per game, 2 min for
   recent unlocks) as RA's and Steam's already did. Mutable data (groups, pins,
@@ -579,6 +901,11 @@ signed-in request fails).
   someone's game page banner, the friends leaderboard and shared games. A new place
   that shows other users must do the same. Never for your own picture.
 - `/privacy` says signed-in users who come across you see it; change it if that grows.
+- **"Now playing" on Steam** (2026-10-22, the user's ask): `/api/follows/playing` asks Steam, one
+  call per 100 accounts, cached a minute per viewer, for the people you follow who share their
+  presence and have a public profile; `useFriendsData` merges it after the overview (which stays
+  database-only, so cards never wait on Steam) and `PresenceLabel` shows it over "Online". Steam
+  only says it for a public Steam profile. `/privacy` says followers see it.
 
 ## Vault Points and the rankings (beta, 2026-10-20)
 
@@ -618,14 +945,26 @@ decisions: `docs/rankings-plan.md`; layout: `docs/architecture.md` → Vault Poi
   counts only for the account linked now, never while flagged `suspect` (Steam unlock tool;
   admins review it in the panel, logged as `ranking-flag`). Xbox scores only for admins.
 - **No ownership verification, by the user's choice (2026-10-20)**: an account linked by two
-  users scores for both. The analysis of how to verify is in the plan, for later.
+  users scores for both. The analysis of how to verify is in the plan, for later. Since
+  2026-10-21 a user's Steam link is proven by Steam (one user per Steam account); PSN and
+  Xbox, typed, are still unproven.
 - **`/rankings` and `/rankings/how` are public** (`PUBLIC_PATHS` in the proxy, in the sitemap). Signed out: the
-  global list only, no presence (the privacy policy promises it only to signed-in users),
-  no profile links. Responses never carry user ids and are never shared-cached.
+  global list only, no presence (the privacy policy promises it only to signed-in users).
+  Responses never carry user ids and are never shared-cached.
+- **A profile's public card (2026-10-20):** signed out, `/user/<name>` shows `ProfileTeaser` and
+  its link preview (`opengraph-image.tsx`) shows the same, both from `profileTeaser` in
+  `src/lib/rankings.ts`: **only what the rankings already show** (name, level, points per
+  platform, games at 100 %, achievements), only for someone listed there, a 404 for anyone else.
+  Never presence, never an uploaded picture (served to signed-in users only), and the preview
+  never fetches a pasted avatar link (SSRF). The proxy opens `/user/<name>` and its image, not
+  `/user` nor a game inside a profile. Adding anything to the card means changing `/privacy`.
 - **A level shown for another user reads `vaultTotals`/`vaultTotalsOrNone`** (same rules as the
   rankings). Today: the rankings, Following cards, the home's friend cards, the public profile
   hero, the header (yours) and your account page. Progress towards a level is a `ProgressBar`
   or `CircularProgress` in the theme's colour; tiers have their own hue only on their badge.
+- **Streaks in the rankings (2026-10-23)** are read from `score_games.unlocks` (UTC days, `streaksOf`),
+  never from a platform: they lag the score refresh and may differ by a day from the streak page,
+  which reads the live feed. `?sort=streak|best` orders by them (no arrows, no points gap in the zone).
 - Rankings are labelled **Beta** in the UI; drop the label when the user says so.
 
 ## Follows: who you follow and who follows you (2026-10-20)
@@ -688,8 +1027,8 @@ A person must be able to tell "nothing here" from "I cannot read it" from "try l
 
 | | Unknown account | Private / unreadable | Credential refused | Busy |
 |---|---|---|---|---|
-| **RA** | RA says 401 for a bad key, for any username | n/a (profiles are public) | `raUnavailable()` → `403 ra-key-invalid`, not retried; `RaKeyInvalidNotice` | 429 waits `Retry-After`, then 503 (retried) |
-| **Steam** | link: `not-found`; ids that do not exist answer 400 | link: `403 private`; **after linking**, `{ response: {} }` → `ownedGames` answers `403 private` (not an empty library) and the list page says so | key is the app's | 503 |
+| **RA** | RA says 401 for a bad key, for any username | n/a (profiles are public) | `raUnavailable()` → `403 ra-key-invalid`, not retried; `RaKeyInvalidNotice` | 429 waits `Retry-After`, then 429 with `Retry-After`, not retried |
+| **Steam** | link goes through Steam (no unknown account); ids that do not exist answer 400 | a private profile links; **after linking**, `{ response: {} }` → `ownedGames` answers `403 private` (not an empty library) and the list page says so | key is the app's | 429 with `Retry-After` (`steamFailure`), not retried |
 | **PSN** | link: not found | `psnFailure` → 403 | NPSSO expiry, admin panel | 429 + `Retry-After: 60` |
 | **Xbox** | `code: 404` in the body → `not-found` | no titles and no `achievementSummary` → `private` | app key: `503 unauthorized` | 429 |
 
@@ -722,6 +1061,46 @@ nothing is deleted.
   on a hidden console is not a day in the streak. A **new feed of unlocks must
   filter through that hook**, or a hidden game comes back through it.
 
+## Hidden games — a listing preference, never authorization (2026-10-31, #88)
+
+- A hidden game is excluded from every listing and listing-derived aggregate, for its
+  owner and on public/other-user views, keyed by `source:id` (`src/utils/gameVisibility.ts`).
+  The hidden-games modal is the only intentional exception, so showing the game again stays possible.
+- **Two boundaries, one rule.** Listing BFF routes filter after their canonical upstream/cache read
+  (`src/lib/gameVisibility.ts`) and answer with `max-age=0`; shared client providers/selectors filter
+  again so optimistic hide/show is immediate and a warm response cannot leak. Raw upstream caches need
+  no purge. Public subjects mount `HiddenGamesProvider` with the profile owner's keys, never the viewer's.
+- Library `fullLibrary` stays raw for direct game URLs and id lookups. A direct game URL keeps its
+  existing authorization behavior: hidden is not a new privacy or access-control model. Do not filter
+  the canonical detail loaders to “fix” a listing.
+- Stored pins, groups, favorites and showcases stay stored and are excluded at read time, so unhide
+  restores them. Groups filter with the group owner's id. Friends' libraries use the friend's keys.
+- `score_games` also keeps hidden rows as raw data, but every ranking/streak/total read excludes them.
+  Hide/show rebuilds `score_periods` and bumps the shared ranking-cache revision in Postgres; stack
+  factors and periods count only visible games. Historical `score_snapshots` stay point-in-time records. Never delete a hidden row just
+  to make a listing correct.
+
+## Completion dates are not latest activity (2026-10-31, #88)
+
+Completion status still uses each platform's whole set, but its date is a separate nullable value in
+`src/utils/completionDates.ts`. Activity fields remain cache and sync fingerprints; PSN/RA use base
+completion, while Steam/Xbox deliberately use full-current-set completion (user decision, 2026-10-31).
+
+| Platform | Completion-date rule | Conservative fallback |
+|---|---|---|
+| **PSN** | Earned platinum in `default`, else the latest dated trophy only when the whole `default` group is earned. `/api/psn/titles` adds `completedAt`; no-DLC completed games may use `lastTrophyAt`, DLC games read the existing per-game trophy cache. | `null` when base data/date is incomplete or enrichment fails. A failed date lookup does not fail the library and is not cached as a complete enrichment. |
+| **RetroAchievements** | `Mastery/Completion` award date, or `HighestAwardDate` when `HighestAwardKind` is `mastered`/`completed`. | `null`; never the latest achievement or a title-based subset guess. |
+| **Steam** | When the current set is 100%, use `lastUnlock` (the latest earned achievement). Do not attempt base/DLC separation. | `null` without a valid unlock date; never `lastPlayed`. |
+| **Xbox** | When the current set is 100%, `/api/xbox/titles` reads achievements and uses the latest `unlockedAt`. Do not attempt base/DLC separation. | `null` when the read or date is unavailable; never `lastPlayed`. Partial enrichment is not cached as complete. |
+
+**The Completed lists go by this date, not by activity (#99):** on `/completed` the mixed list orders by it by default (`completed` sort key, `mixedSortKeys`), the platforms' own lists too (`byCompletedDesc`), and rows, cards and shelf cards say "Finished" with it, falling back to the last session only when it is unknown. Playing a DLC later must not move a completed game. RA's own list keeps its orders: it has no such key.
+
+Collection grids keep undated games in their existing **Undated** group and library details omit
+**Finished** when the date is unknown. Activity feeds, `/racha` and charts still show DLC on its real
+unlock day. Vault's completion bonus uses the same date (timestamp 0 when unknown), with
+`RULES_VERSION = 3` so normal score refreshes rebuild stored games and periods; display data needs no
+migration and historical score snapshots are left untouched.
+
 ## Registration
 
 Public and open: anyone can sign up with a username, a password and an **email,
@@ -731,6 +1110,63 @@ There is no invite code; the old `REGISTER_TOKEN` / `NEXT_PUBLIC_REGISTER_TOKEN`
 pair is gone, and the public one leaked the secret into the browser bundle.
 `REGISTRATION_OPEN=false` closes sign-ups; unset means open. Sign-ups and reset
 requests are both limited per address in the database (`src/lib/attemptLimit.ts`).
+
+### Sign up with RetroAchievements (2026-10-23)
+
+"Create account with RetroAchievements" under the register form (`RegisterUserFormRa`): the RA
+username and Web API key are checked first (`POST /api/auth/ra/check`, signed out, limited per
+address as `ra-check`, refuses a key already in use), RA's name fills the username (unless one was
+typed, `suggestUsername`) and its picture becomes the avatar; then `POST /api/users` with `ra`
+asks RA again and creates the account already linked, as `/api/updateRaUser` would store it. The
+welcome's RA step then shows "linked as" (the user's choice: shown, not skipped).
+
+- **It is a sign-up, never a sign-in.** Measured 2026-10-23: a valid RA key reads *any* user's
+  profile and RA has no "whose key is this" call (no `u` → 422), so a key proves owning an RA
+  account, not which one, and people paste their key into other tools. **Do not add "sign in with
+  RA" by key.** The account still gets an email and a password. Revisit when RA ships OAuth (see
+  the roadmap): that is when it can become a "Continue with RetroAchievements" like Steam's.
+- The RA username is as unproven as when linking from the account page; `raid` stays unique.
+
+### Steam: sign up, sign in and link, all through Steam (2026-10-21)
+
+"Continue with Steam" under both forms (`SteamSignInDivider`), and "Connect Steam" on the
+Steam card (`UserSteamCardLink`, `/api/auth/steam?intent=link&next=…`). Steam's OpenID 2.0, all
+in `src/lib/steamLogin.ts`; `migrations/041_steam_login.sql` (`users.steam_login_id`,
+unique) was applied to pre (2026-10-21) and production (2026-10-22); any other database needs it first; nothing else
+reads that column, so the rest of the app works without it.
+
+- `/api/auth/steam` → Steam → `/api/auth/steam/callback`, which asks Steam to confirm
+  its own signature (`check_authentication`) and checks the claimed id, `return_to`
+  (built from `NEXTAUTH_URL`) and that those fields were signed. **Never trust the
+  callback's query without that round trip**, and refuse a query with a repeated
+  parameter before reading any of it: what is checked here and what Steam checks must
+  be the same value.
+- **A random `state`** rides on `return_to` (signed by Steam) and in an httpOnly cookie on
+  the callback path; the callback does nothing unless they match. Without it, a callback link
+  made with someone else's Steam account could link it to your account, and then sign them in
+  as you. Keep it on both flows.
+- The proven SteamID64 travels as a signed ticket (HMAC with `NEXTAUTH_SECRET`,
+  10 minutes) in an httpOnly cookie on `Path=/api/auth`. The `steam` NextAuth
+  provider reads it from the Cookie header, never from the request body; so does
+  `POST /api/auth/steam/register`.
+- **Steam gives no email**, so the sign-up still asks for one (required, as always)
+  and for a username (suggested from the Steam name). The Steam name and
+  `avatarfull` are copied in, `steamid`/`steamusername` are linked, and the password
+  is random: the user signs in with Steam, and "forgot password" sets a real one.
+  Same `REGISTRATION_OPEN` and `signup` rate limit as the normal sign-up.
+- **Users link Steam only through Steam** (decided 2026-10-21; the typed link and
+  `/api/steam/link` are gone). A link sets `steamid`, `steamusername` and `steam_login_id`,
+  so it also signs in with Steam; one Steam account to one user (another user's proven link
+  answers `#steam-taken`). The outcome comes back as `#steam-linked|taken|failed` on the page
+  it started from (`/`, `/user` or `/welcome`, `linkReturn`), toasted by `useSteamLink`.
+- `steam_login_id` is **separate from `steamid`**: links typed before 2026-10-21 (three, all
+  the user's test accounts) keep `steamid` with no `steam_login_id` and were left as they are,
+  by the user's choice; `steamid` stays not unique for them. **Unlinking clears both** (changed
+  2026-10-30, audit SEC-01): a sign-in nobody can remove outlives a password change. Someone who
+  signed up through Steam gets back in with "forgot password". Link and unlink mail the account's
+  address (`sendSteamLinkNotice`). Linking asks for no password, by the user's choice (2026-10-31,
+  the most comfortable flow, here and in the welcome): the mail and the unlink are what answer a
+  link nobody asked for. Admins still link by typing (logged).
 
 ## Git — branches, commits, PRs (MANDATORY for every session and agent)
 
@@ -752,7 +1188,23 @@ Do not create, push, merge or delete branches or PRs unless the user asked.
 `<type>/<kebab-case-slug>`, English, short. Types are the same as commit types:
 `feat/`, `fix/`, `refactor/`, `perf/`, `test/`, `docs/`, `chore/`, `hotfix/`.
 e.g. `feat/steam-refresh-button`, `fix/psn-rate-limit`. (Old `feature/…`, `spike/…`
-branches stay as they are; new ones follow this.)
+branches stay as they are; new ones follow this.) With its issue's number in front of the
+slug (`feat/123-steam-refresh-button`), the PR links the issue on its own (see Issues).
+
+### Issues — every PR resolves one (2026-10-23)
+- **No PR without an issue.** Before opening a PR, find its issue or open one
+  (`gh issue create`, from the forms in `.github/ISSUE_TEMPLATE/`: Feature or Bug, in
+  English; blank issues are off). Name the branch `<type>/<issue>-<slug>`.
+- The PR's description starts with `## Issue` → `Closes #123` (the template has it). With
+  a numbered branch and no `Closes #`, CI writes it in.
+- **Enforced in CI**: `.github/workflows/pr-issue.yml` (check `linked-issue`) fails the PR
+  unless it names an open issue (not a PR) that exists. Skipped for releases (head
+  `develop`), merges of `main` into `develop` and PRs from `main`. Fix the description,
+  not the workflow.
+- **Issues close when their PR is merged into `develop`**, by GitHub itself (`Closes #` links
+  them; seen with #47 on 2026-10-23). A workflow that closed them was dropped as redundant.
+- The issues are collected on the repository's GitHub Project board (its built-in
+  auto-add and "closed → Done" workflows, set up on GitHub, not in the repo).
 
 ### Commits — Conventional Commits, in English
 `<type>(<scope>): <imperative summary>` — lowercase, no trailing period, ≤72 chars.
@@ -780,6 +1232,9 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
 - **Description is always in English**, with this template:
 
   ```
+  ## Issue
+  Closes #<the issue it resolves>
+
   ## What
   <what changed, 1–3 bullets>
 
@@ -817,17 +1272,22 @@ Scope is optional but preferred: `ra`, `steam`, `psn`, `admin`, `auth`, `ui`, `c
   `main` keeps one entry per release.
 
 ### Environments (set up 2026-10-10)
+**Keep Next at 16.4.3 or later (2026-11-01).** Up to 16.4.2 about 13 % of Vercel builds failed with `next/font/google queries have exactly one entry`: Google sometimes answers with `/l/font?kit=…&skey=…` URLs for Sofia Sans, and Turbopack split the query on the `&`. It has nothing to do with the commit being built. If it comes back, read the log before retrying (`npx vercel inspect dpl_… --logs`).
+
 `develop` is served at `dev.cheevovault.com` (Vercel Preview, branch `develop`). `main` and
 `develop` are protected on GitHub (PR required, no force-push). A third ruleset,
 `pr description` (2026-10-14), requires the `pr-description` check to pass **and the
-branch to be up to date with its base** before merging, on both.
+branch to be up to date with its base** before merging, on both; since 2026-10-23 it also
+requires `linked-issue` (see Issues).
 
 - **Before merging, bring the branch up to date**: `git fetch` and `git merge
   origin/develop` (or the "Update branch" button), push, wait for the checks again.
   Merge, not rebase — a rebase would need a force-push.
-- **`src/lib/version.ts` and `package.json` will conflict** on that merge whenever
-  `develop` moved, since every commit bumps the patch. Keep the **higher** version
-  in both; never go back below what `develop` already has.
+- **`src/lib/version.ts` and `package.json` do not conflict on a local merge**: a
+  merge driver (`scripts/merge-version.js`, set in `.gitattributes`, registered by
+  `npm run prepare`) keeps the **higher** version on both sides. Run `npm run prepare`
+  once per clone. GitHub's "Update branch" button does not run it, so merge locally;
+  if it ever conflicts by hand, keep the higher version, never below `develop`'s.
 - A `develop` → `main` PR needs `develop` to contain `main`; after a hotfix, merge
   `main` back into `develop` first (as the flow above already says).
 
@@ -852,7 +1312,8 @@ branch to be up to date with its base** before merging, on both.
   taken from what pre already has cached for real users; points come from the real formula. If
   pre loses those cached games (a reset from production, an unlink), games drop out of the seed
   (it warns). No RA (the dev server does not read RA's DB cache; a made-up RA name may be real).
-  PSN trophy lists only in English and Spanish.
+  PSN trophy lists only in English and Spanish. Their current streaks are set in `STREAKS` (`demo-personas.mjs`):
+  reseed to bring them up to today, since a streak ends two days after the seed.
 - Preview needs `NEXTAUTH_URL=https://dev.cheevovault.com` scoped to branch `develop`.
 
 ## Style
@@ -863,6 +1324,28 @@ branch to be up to date with its base** before merging, on both.
 - [x] Steam integration
 - [x] Public user profiles
 - [ ] Group hardcore achievement tracking
+- [ ] **An internal component library** (buttons, inputs, selects, switches, modals, pills,
+      steps bar, curtain) in the welcome's style, for the whole site, **and a record of every
+      design** (`docs/designs.md`, started): `docs/ui-library-and-designs-plan.md`. A separate
+      development, the user's idea (2026-10-23). Design agreed 2026-10-24; building in three PRs
+      (foundations and controls, overlays and feedback, surfaces / data / colour sweep).
+- [x] **Entrance animations on every page and component** (issue #61, 2026-10-31). See "Entrances"
+      in the design system section.
+- [ ] **A shareable user card** for social networks (the user's wish, 2026-10-23). Concepts on the
+      component library's canvas (`docs/designs.md`). Only data that is already public (what
+      `profileTeaser` and the showcase show); anything more means changing `/privacy`. Not started.
+- [ ] **`/diario`, a day-by-day journal of play** (the user's wish, 2026-10-23): a new route from
+      home concept C. Mini concept on the component library's canvas (`docs/designs.md`). Not started.
+- [ ] **Styles to the user's taste** (the user's wish, 2026-10-23): the user chooses how parts of the
+      site look. The first one: the home layout (*Classic*, default, or *Portada*), planned with the
+      component library (`docs/ui-library-and-designs-plan.md`).
+- [ ] **More languages** (the user's wish, 2026-10-23). Today nine (`LANGUAGES` in
+      `src/utils/languages.ts`); the browser's language is taken when it is one of them, so a new
+      language reaches its speakers on its own. A new one needs: its `src/translations/<lang>.ts`
+      (typed as `Translations`, every key), its entry in `LANGUAGES` and in `LanguageContext`'s
+      map, the texts kept outside `T` (`vaultGuide.ts`, `vaultGuideMore.ts`; the public pages fall
+      back to English), plural rules if it has its own (`T.plurals`), and gender-neutral wording.
+      Not started; ask which languages first.
 - [ ] Notifications — **an idea the user wants to expand before it is built; do not
       start it, and do not assume it is push or email.** Ask what they have in mind
       first. Known so far: friends completing games and a game's last chance (a
@@ -872,6 +1355,8 @@ branch to be up to date with its base** before merging, on both.
       link or SteamID64 (`src/lib/steamAccount.ts`), no OpenID, and no
       "already linked elsewhere" check (`migrations/028`), so one person can
       have several CheevoVault accounts. The profile has to be public.
+      **Replaced 2026-10-21**: users now link Steam through Steam's sign-in (see
+      Registration → Steam); only admins still link by typing.
 - [ ] RA: wait for the API v2 with OAuth before changing how accounts are
       linked ([RAWeb releases](https://github.com/RetroAchievements/RAWeb/releases)).
       **RA's answer was clear: each user with their own key.** No shared app

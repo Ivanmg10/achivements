@@ -26,7 +26,7 @@ export default function FollowingPage() {
   const { T } = useLanguage()
   const hash = useLocationHash()
   const tab: FollowingTab = hash === '#followers' ? 'followers' : 'following'
-  const { friends, details, isLoading, error, retry } = useFriendsData(true)
+  const { friends, details, isLoading, detailsLoading, error, retry } = useFriendsData(true)
   const fans = useFollowers(tab === 'followers')
   const { counts } = useFollowCounts()
   const users = useMemo(() => friends ?? [], [friends])
@@ -40,18 +40,17 @@ export default function FollowingPage() {
     <div className="flex flex-col items-center py-6 px-4">
       <div className="w-full lg:max-w-[98%] flex flex-col gap-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <FollowingHero users={users} className="lg:col-span-2" />
+          <FollowingHero users={users} isLoading={isLoading} className="lg:col-span-2" />
           <FollowingRankingsTeaser />
         </div>
-
-        <FollowingTabs tab={tab} onTab={onTab} counts={counts} />
 
         {tab === 'following' ? (
           <FollowingList
             key="following"
+            tabs={<FollowingTabs tab={tab} onTab={onTab} counts={counts} />}
             users={users}
             details={details}
-            isLoading={isLoading}
+            isLoading={(isLoading || detailsLoading) && !error}
             error={error}
             onRetry={retry}
             empty={{ icon: <IconUsers className="w-6 h-6" />, title: T.following.emptyTitle, subtitle: T.following.empty }}
@@ -59,8 +58,11 @@ export default function FollowingPage() {
         ) : (
           <FollowingList
             key="followers"
+            id="followers"
+            tabs={<FollowingTabs tab={tab} onTab={onTab} counts={counts} />}
             users={fans.followers ?? []}
-            isLoading={fans.isLoading}
+            details={fans.details}
+            isLoading={fans.isLoading || fans.detailsLoading}
             error={fans.error}
             onRetry={fans.retry}
             empty={{ icon: <IconHeart className="w-6 h-6" />, title: T.following.noFollowersTitle, subtitle: T.following.noFollowers }}

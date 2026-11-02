@@ -4,7 +4,7 @@ import pool from '@/lib/db'
 import { forgetUser, loadUser, loadUserByUsername, loadUserSynced, passwordVersion } from './userRecord'
 
 const query = pool.query as jest.Mock
-const row = { id: 1, username: 'ivan', password: '$2b$10$hash' }
+const row = { id: 1, username: 'ivan', password: '$2b$10$hash', raid: null }
 
 beforeEach(() => {
   query.mockReset()

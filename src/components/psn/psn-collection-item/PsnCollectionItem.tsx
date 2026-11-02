@@ -50,7 +50,7 @@ export default function PsnCollectionItem({
   return (
     <div
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={collection.heroUrl ?? psnBackdrop(games[0])} />
 
@@ -59,26 +59,26 @@ export default function PsnCollectionItem({
         aria-expanded={isExpanded}
         aria-controls={panelId}
         aria-label={`${isExpanded ? T.psn.hideGames : T.psn.showGames}: ${collection.title}`}
-        className="relative flex items-center gap-3 px-3 py-3 shrink-0 w-full text-left cursor-pointer rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] group"
+        className="relative flex items-center gap-3.5 px-3.5 py-2 shrink-0 w-full text-left cursor-pointer rounded-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1] group"
       >
         <GameIcon
           source="psn"
           id={games[0].id}
           imageUrl={collection.iconUrl ?? games[0].imageIcon}
           size={64}
-          className="rounded-xl w-14 h-14 sm:w-16 sm:h-16 shrink-0 shadow-md shadow-black/30 ring-1 ring-ink/10"
+          className="rounded-tile w-14 h-14 sm:w-16 sm:h-16 shrink-0 shadow-md shadow-black/30 ring-1 ring-ink/10"
         />
 
         <span className="flex flex-col min-w-0 flex-1 gap-1">
-          <span className="text-base font-bold block truncate leading-tight">{collection.title}</span>
+          <span className="flex items-center gap-2 min-w-0">
+            <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{collection.title}</span>
+            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><PlaystationLogo size={12} className="opacity-60" aria-hidden="true" />
+              {consoles}</span>
+          </span>
 
           <span className="flex items-center gap-2 w-full">
-            <span className="flex items-center gap-1 shrink-0 text-xs text-text-secondary">
-              <PlaystationLogo size={12} className="opacity-60" aria-hidden="true" />
-              {consoles}
-            </span>
             <ProgressBar pct={pct} label={collection.title} className="flex-1" />
-            <span className={`text-xs font-semibold tabular-nums shrink-0 ${pct >= 100 ? 'text-success' : 'text-text-main'}`}>{pct}%</span>
+            <span className={`text-base font-extrabold tabular-nums shrink-0 w-[2.625rem] text-right ${pct >= 100 ? 'text-success' : 'text-text-main'}`}>{pct}%</span>
             <IconChevronDown
               size={14}
               aria-hidden="true"
@@ -86,7 +86,7 @@ export default function PsnCollectionItem({
             />
           </span>
 
-          <span className="flex flex-wrap items-center gap-x-2 text-xs text-text-secondary">
+          <span className="flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-text-secondary">
             <span className="whitespace-nowrap">
               {games.length} {T.psn.collectionGames}
             </span>

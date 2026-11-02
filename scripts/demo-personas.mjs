@@ -13,6 +13,7 @@
  *   seen      'online' (always), hours since last seen, or 'hidden' (presence off)
  *   showcase  how many of their rarest achievements they show off (0–5)
  *   isNew     joined this week: no place on Monday's ranking
+ *   streak    days in a row up to today, one unlock a day on their favourite game (STREAKS below)
  *
  * The first game of each platform is their favourite.
  */
@@ -218,4 +219,16 @@ const TWINS = [
   'starfall', 'chorizo', 'obsidian', 'pulpo_x', 'ramen', 'solstice', 'trasgo', 'zigzag', 'lemming', 'bonsai',
 ]
 
-export const PERSONAS = [...ORIGINALS, ...ORIGINALS.map((p, i) => ({ ...p, name: TWINS[i], avatarIndex: 1 }))]
+/**
+ * Their current streak, originals then twins in the same order, varied so the rankings' streak
+ * orders can be tried. Who plays only at weekends has none (a run ending on a weekday would lie).
+ */
+const STREAKS = [
+  34, 5, 0, 58, 12, 2, 21, 0, 0, 9, 27, 1, 44, 7, 0, 0, 15, 3, 0, 6, 11, 0, 18, 4, 0, 2, 8, 0, 30, 10,
+  12, 0, 3, 40, 5, 0, 9, 0, 0, 22, 14, 0, 63, 2, 6, 0, 4, 1, 8, 0, 17, 2, 25, 0, 13, 7, 0, 0, 19, 3,
+]
+
+export const PERSONAS = [...ORIGINALS, ...ORIGINALS.map((p, i) => ({ ...p, name: TWINS[i], avatarIndex: 1 }))].map((p, i) => ({
+  ...p,
+  streak: p.weekends ? 0 : STREAKS[i],
+}))

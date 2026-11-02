@@ -12,7 +12,7 @@ export default function FaqList({ title, lead, items, split = false }: { title: 
         <h2 className={`font-bold tracking-tight ${split ? 'text-2xl sm:text-4xl' : 'text-xl sm:text-2xl'}`}>{title}</h2>
         {lead && <p className="text-sm sm:text-base text-text-secondary max-w-sm">{lead}</p>}
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 enter-rows">
         {items.map((item, i) => (
           <FaqListItem key={item.q} item={item} index={i} />
         ))}

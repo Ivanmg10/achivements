@@ -1,13 +1,23 @@
-import { useCallback, useEffect, useState } from 'react'
-import type { FriendOverview } from '@/utils/friends'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useLanguage } from '@/context/LanguageContext'
+import { withPlaying, type FriendOverview, type PlayingNow } from '@/utils/friends'
+import { DETAIL_LIMIT, loadFriendDetails, loadPlaying, type FriendDetails } from '@/hooks/useFriendsData'
+import { mapLimit } from '@/utils/utils'
+
+const AT_ONCE = 2
 
 /**
  * The people who follow you, as the Following page's cards show them (public
- * profiles only, newest first), read once `enabled` turns on. Only you ever
+ * profiles only, newest first), read once `enabled` turns on, and, as for the
+ * people you follow, the activity and games of the newest DETAIL_LIMIT and who
+ * is in a Steam game now: so the two lists draw the same card. Only you ever
  * see this list. `retry` after a failure asks again.
  */
 export function useFollowers(enabled: boolean) {
+  const { lang } = useLanguage()
   const [followers, setFollowers] = useState<FriendOverview[] | null>(null)
+  const [details, setDetails] = useState<Record<string, FriendDetails>>({})
+  const [playing, setPlaying] = useState<PlayingNow>({})
   const [failed, setFailed] = useState(false)
   const [attempt, setAttempt] = useState(0)
 
@@ -21,8 +31,18 @@ export function useFollowers(enabled: boolean) {
         if (!Array.isArray(data)) throw new Error('followers: not a list')
         return data as FriendOverview[]
       })
-      .then((data) => {
-        if (current) setFollowers(data)
+      .then(async (data) => {
+        if (!current) return
+        setFollowers(data)
+        if (data.some((f) => f.steam)) {
+          loadPlaying().then((p) => {
+            if (current) setPlaying(p)
+          })
+        }
+        await mapLimit(data.slice(0, DETAIL_LIMIT), AT_ONCE, async (friend) => {
+          const d = await loadFriendDetails(friend, lang)
+          if (current) setDetails((prev) => ({ ...prev, [friend.username]: d }))
+        })
       })
       .catch((err) => {
         console.error('[useFollowers]', err)
@@ -31,13 +51,17 @@ export function useFollowers(enabled: boolean) {
     return () => {
       current = false
     }
-  }, [enabled, attempt])
+  }, [enabled, attempt, lang])
 
   const retry = useCallback(() => {
     setFailed(false)
     setFollowers(null)
+    setDetails({})
+    setPlaying({})
     setAttempt((n) => n + 1)
   }, [])
 
-  return { followers, isLoading: enabled && followers === null && !failed, error: failed, retry }
+  const withGames = useMemo(() => (followers ? withPlaying(followers, playing) : null), [followers, playing])
+  const detailsLoading = !failed && (followers ?? []).slice(0, DETAIL_LIMIT).some((f) => !details[f.username])
+  return { followers: withGames, details, isLoading: enabled && followers === null && !failed, detailsLoading, error: failed, retry }
 }

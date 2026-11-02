@@ -13,7 +13,7 @@ type AppInfoResponse = { data?: Record<string, { common?: { clienticon?: string 
  */
 export async function GET(req: NextRequest) {
   const appIdRaw = req.nextUrl.searchParams.get('appid')
-  if (!appIdRaw || !/^\d+$/.test(appIdRaw)) {
+  if (!appIdRaw || !/^\d{1,10}$/.test(appIdRaw)) {
     return NextResponse.json({ message: 'Missing or invalid appid' }, { status: 400 })
   }
   const appId = Number(appIdRaw)

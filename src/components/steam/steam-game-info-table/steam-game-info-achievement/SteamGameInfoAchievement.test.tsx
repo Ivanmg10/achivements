@@ -25,26 +25,26 @@ test('shows title, description and rarity', () => {
   renderRow(ach({ globalPct: 12.34 }))
   expect(screen.getByRole('heading', { name: 'Win a Match' })).toBeInTheDocument()
   expect(screen.getByText('Win your first match')).toBeInTheDocument()
-  expect(screen.getByText('12.3%')).toBeInTheDocument()
+  expect(screen.getByText('12.3 %')).toBeInTheDocument()
 })
 
 test('shows a dash when rarity is unknown', () => {
   renderRow(ach())
-  expect(screen.getByText('—')).toBeInTheDocument()
+  expect(screen.getAllByText('—').length).toBeGreaterThan(0)
 })
 
 test('an earned achievement shows its unlock time and a coloured, ringed badge', () => {
   const { container } = renderRow(ach({ earned: true, dateEarned: '2024-01-15T12:00:00.000Z' }))
   const img = container.querySelector('img')!
   // The ring is on the badge's box, so it shows while the picture loads too.
-  expect(img.parentElement!.className).toContain('ring-2')
+  expect(img.parentElement!.className).toContain('rgb(var(--accent))')
   expect(img.className).not.toContain('grayscale')
   expect(screen.getByText(/2024/)).toBeInTheDocument()
 })
 
 test('an earned achievement with no timestamp still says earned', () => {
   renderRow(ach({ earned: true, dateEarned: null }))
-  expect(screen.getByText(en.steam.earned)).toBeInTheDocument()
+  expect(screen.getByLabelText(en.steam.earned)).toBeInTheDocument()
 })
 
 test('a locked achievement says so in text and greys its badge', () => {

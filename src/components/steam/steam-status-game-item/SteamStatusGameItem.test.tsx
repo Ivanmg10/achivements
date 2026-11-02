@@ -55,7 +55,7 @@ describe('a perfect game', () => {
   test('gets the Perfect chip, green counts and a green ring — not colour alone', () => {
     const { container } = render(<SteamStatusGameItem game={game(perfect)} />)
     expect(screen.getByText(en.steam.perfect, { exact: false })).toBeInTheDocument()
-    expect(screen.getByText(`84 / 84 ${en.steam.achievements}`).className).toContain('text-green-400')
+    expect(screen.getByText(`84 / 84 ${en.steam.achievements}`).className).toContain('text-success')
     expect(container.querySelector('.ring-2')).not.toBeNull()
   })
 

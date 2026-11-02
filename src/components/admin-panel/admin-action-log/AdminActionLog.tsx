@@ -16,6 +16,10 @@ const LABELS: Record<string, string> = {
   'create-user': 'created',
   'update-user': 'edited',
   'delete-user': 'deleted',
+  'list-users': 'listed all users',
+  'unlock-failed': 'failed to unlock the panel',
+  'totp-enrolled': 'set up the authenticator',
+  'xbox-achievements': 'read Xbox achievements',
   'link-ra': 'linked RA for',
   'unlink-ra': 'unlinked RA from',
   'link-steam': 'linked Steam for',
@@ -65,11 +69,11 @@ export default function AdminActionLog() {
   }
 
   return (
-    <section className="bg-bg-card rounded-2xl">
+    <section className="bg-bg-card rounded-card">
       <button
         onClick={toggle}
         aria-expanded={open}
-        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-2xl"
+        className="w-full flex items-center gap-2 px-4 py-3 text-sm font-semibold text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded-card"
       >
         <IconHistory size={16} className="text-accent" aria-hidden="true" />
         <span className="flex-1">Action log</span>
@@ -77,7 +81,7 @@ export default function AdminActionLog() {
       </button>
       {open && (
         <div className="px-4 pb-4">
-          {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
+          {error && <p role="alert" className="text-sm text-danger">{error}</p>}
           {!error && entries === null && <p className="text-sm text-text-secondary">Loading…</p>}
           {entries?.length === 0 && <p className="text-sm text-text-secondary">Nothing yet.</p>}
           {entries && entries.length > 0 && (

@@ -8,6 +8,7 @@ jest.mock('@/lib/steamCache', () => ({
 }))
 jest.mock('@/lib/steamProgress', () => ({ fetchPlayerAchievements: jest.fn(), isNoStats: () => false, loadGlobalPct: jest.fn(async () => new Map()) }))
 jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn(async () => true) }))
+jest.mock('@/lib/upstreamCount', () => ({ steamBudgetLow: jest.fn(async () => false) }))
 jest.mock('@/lib/psnClient', () => {
   class PsnError extends Error {
     get isPrivate() {
@@ -19,17 +20,27 @@ jest.mock('@/lib/psnClient', () => {
   }
   return { PsnError, psnTitles: jest.fn(), psnGameTrophies: jest.fn() }
 })
-jest.mock('@/lib/xboxClient', () => ({ xboxLibrary: jest.fn(), xboxGameAchievements: jest.fn() }))
+jest.mock('@/lib/xboxClient', () => {
+  class XboxError extends Error {
+    kind: string
+    constructor(kind: string, message: string) {
+      super(message)
+      this.kind = kind
+    }
+  }
+  return { XboxError, xboxLibrary: jest.fn(), xboxGameAchievements: jest.fn() }
+})
 
 import pool from '@/lib/db'
 import { readCache, writeCache } from '@/lib/steamCache'
 import { allowAttempt } from '@/lib/attemptLimit'
 import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
+import { XboxError } from '@/lib/xboxClient'
 import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raClient'
 import { getOwnedGames } from '@/lib/steamClient'
 import { fetchPlayerAchievements } from '@/lib/steamProgress'
 import { RULES_VERSION } from '@/utils/vaultScore'
-import { classifyFailure, continueFill, onPlatformLinked, refreshScore, refreshScoreIfStale, runScorePass } from './scoreRefresh'
+import { classifyFailure, continueFill, onPlatformLinked, PACE, refreshScore, refreshScoreIfStale, runScorePass } from './scoreRefresh'
 
 const query = pool.query as jest.Mock
 const client = { query: jest.fn(), release: jest.fn() }
@@ -42,7 +53,7 @@ const trophy = (earned: boolean, rarity: number) => ({ id: 1, name: '', detail: 
 const user = (over: Record<string, unknown>) => ({ id: 7, rausername: null, raid: null, steamid: null, psnaccountid: null, xboxxuid: null, preferences: {}, ...over })
 
 let stored: Record<string, unknown>[]
-let writes: { game_id: number; provisional: boolean; points: number }[]
+let writes: { game_id: number; provisional: boolean; points: number; unlocks: [number, number][] }[]
 let kept: number[] | null
 let userRow: Record<string, unknown>
 
@@ -61,7 +72,7 @@ beforeEach(() => {
   ;(allowAttempt as jest.Mock).mockResolvedValue(true)
   query.mockImplementation(async (sql: string, params: unknown[]) => {
     if (sql.includes('FROM users WHERE id')) return { rows: [userRow] }
-    if (sql.includes('FROM hidden_games')) return { rows: [{ source: 'psn', game_id: 3 }] }
+    if (sql.includes('SELECT source, game_id FROM hidden_games')) return { rows: [{ source: 'psn', game_id: 3 }] }
     if (sql.includes('SELECT game_id, account')) return { rows: stored }
     if (sql.includes('INSERT INTO score_games')) {
       writes = JSON.parse(params[4] as string)
@@ -90,6 +101,26 @@ describe('refreshScore', () => {
     expect(result).toEqual({ complete: true, platforms: { psn: { read: 2, total: 2, state: 'done' } } })
     expect(reports[0]).toEqual(['psn', { read: 1, total: 2, state: 'reading' }])
     expect(client.query).toHaveBeenCalledWith('COMMIT')
+  })
+
+  it('keeps the PSN completion bonus on the old platinum day when a later DLC sync lands', async () => {
+    stored = []
+    ;(psnTitles as jest.Mock).mockResolvedValue([game(1, 'PS5', '2026-03-01T00:00:00Z')])
+    ;(psnGameTrophies as jest.Mock).mockResolvedValue([
+      { ...trophy(true, 2), type: 'platinum', groupId: 'default', earnedAt: '2021-05-10T10:00:00Z' },
+      { ...trophy(true, 30), id: 2, groupId: '001', earnedAt: '2026-03-01T00:00:00Z' },
+    ])
+
+    await refreshScore(7, Date.now() + 10_000)
+    const times = writes[0].unlocks.map(([time]) => time)
+    expect(times).toContain(Math.floor(Date.parse('2021-05-10T00:00:00Z') / 1000))
+    expect(times).toContain(Math.floor(Date.parse('2026-03-01T00:00:00Z') / 1000))
+  })
+
+  it('keeps hidden score rows so unhide restores their aggregates without an upstream read', async () => {
+    stored.push({ game_id: '3', account: 'acc', title: 'Game 3', points: 200, change_key: 'k3', rules_version: RULES_VERSION, provisional: false, flag: null })
+    await refreshScore(7, Date.now() + 10_000)
+    expect([...(kept ?? [])].sort()).toEqual([1, 2, 3])
   })
 
   it('out of time, a moved game stands in from the list and the fill is unfinished', async () => {
@@ -199,11 +230,16 @@ describe('refreshScore', () => {
   })
 })
 
+test('Xbox score reads at most two changed games per pass', () => {
+  expect(PACE.xbox).toMatchObject({ concurrency: 1, perPass: 2 })
+})
+
 describe('classifyFailure', () => {
   it('tells what the user can fix from what to wait out', () => {
     expect(classifyFailure('ra', { status: 401 })).toBe('key')
     expect(classifyFailure('ra', { status: 429 })).toBe('busy')
     expect(classifyFailure('psn', new PsnError('privacy'))).toBe('private')
+    expect(classifyFailure('xbox', new XboxError('rate-limited', 'quota'))).toBe('busy')
     expect(classifyFailure('xbox', new Error('down'))).toBe('unavailable')
   })
 })

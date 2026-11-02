@@ -11,6 +11,8 @@ import { notify } from '@/lib/notify'
 import EmptyState from '@/components/empty-state/EmptyState'
 import MainPagePinnedSectionGameTile from '../main-page-pinned-section-game-tile/MainPagePinnedSectionGameTile'
 import MainPagePinnedSectionSortable from '../main-page-pinned-section-sortable/MainPagePinnedSectionSortable'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
+import { RememberedHeight } from '@/components/ui/RememberedHeight'
 
 const GRID = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2'
 
@@ -47,14 +49,17 @@ export default function MainPagePinnedSectionGames() {
         {!isLoading && pinned.length > 0 && <span className="text-[10px] text-text-secondary tabular-nums">{pinned.length}</span>}
       </div>
       {isLoading ? (
-        <div className={GRID} aria-busy="true">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-15 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
-          ))}
-        </div>
+        <RememberedHeight id="pinned-games" loading>
+          <div className={GRID} aria-busy="true">
+            {[0, 1, 2, 3].map((i) => (
+              <SkeletonRow key={i} icon="w-11 h-11" className="h-15 bg-bg-main rounded-tile px-2 gap-2.5" />
+            ))}
+          </div>
+        </RememberedHeight>
       ) : pinned.length === 0 ? (
         <EmptyState icon={<IconPin className="w-6 h-6" />} title={T.pinnedGames.emptyTitle} subtitle={T.pinnedGames.empty} size="compact" />
       ) : (
+        <RememberedHeight id="pinned-games" loading={false}>
         <MainPagePinnedSectionSortable
           items={pinned}
           idOf={(g) => g.key}
@@ -63,6 +68,7 @@ export default function MainPagePinnedSectionGames() {
           className={GRID}
           renderItem={(g, handle) => <MainPagePinnedSectionGameTile game={g} handle={handle} />}
         />
+        </RememberedHeight>
       )}
     </div>
   )

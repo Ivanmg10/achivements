@@ -1,3 +1,4 @@
+import { countUpstream } from '@/lib/upstreamCount'
 import { NextResponse } from 'next/server'
 import {
   exchangeAccessCodeForAuthTokens,
@@ -30,6 +31,7 @@ import {
 import { countTrophies, psnNumericId, psnPlatformName } from '@/utils/psnTitles'
 import { mapLimit } from '@/utils/utils'
 import type { PsnGameProgress, PsnRecentTrophy, PsnTrophy, PsnTrophyGroup, TrophyCounts } from '@/types/psn'
+import { withPsnCompletionDates } from '@/lib/psnCompletion'
 
 /**
  * PlayStation Network through psn-api, which speaks Sony's own (unofficial)
@@ -48,6 +50,10 @@ import type { PsnGameProgress, PsnRecentTrophy, PsnTrophy, PsnTrophyGroup, Troph
 const PRIVATE_CODE = 2240526
 /** How long a rate-limited call waits before its one retry. Sony sends no Retry-After that psn-api lets through. */
 const RATE_LIMIT_WAIT_MS = 2_000
+/** psn-api takes no signal, so a hung call is left behind rather than aborted. */
+const CALL_TIMEOUT_MS = 8_000
+/** After Sony refuses twice, this instance does not ask again for this long. */
+const COOLDOWN_MS = 60_000
 const MARGIN_MS = 60_000
 const SUMMARY_TTL_MS = 15 * 60 * 1000
 const TITLES_TTL_MS = 15 * 60 * 1000
@@ -132,18 +138,47 @@ function unwrap<T>(res: T): T {
   return res
 }
 
+let cooldownUntil = 0
+
+/** One request to Sony: within the app's budget, and never longer than the deadline. */
+async function attempt<T>(call: () => Promise<T>): Promise<T> {
+  if (Date.now() < cooldownUntil) throw new PsnError('too many requests (cooling down)')
+  const budget = await (await import('@/lib/attemptLimit')).reserveAttempt('psn-upstream', 'app')
+  if (!budget.allowed) {
+    await budget.release()
+    throw new PsnError('too many requests (app budget)')
+  }
+  countUpstream('psn')
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new PsnError('PSN did not answer in time')), CALL_TIMEOUT_MS)
+  })
+  try {
+    return unwrap(await Promise.race([call(), deadline]))
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 /**
  * One Sony call, unwrapped. When Sony says "too many requests" it waits a
  * moment and asks once more; a second refusal is thrown (psnFailure answers
- * 429). Any other error is thrown at once: retrying a hidden profile helps no one.
+ * 429) and this instance stops asking for a minute: one account serves everyone,
+ * so insisting is what would take PSN away from all of them. Any other error is
+ * thrown at once: retrying a hidden profile helps no one.
  */
 export async function psnCall<T>(call: () => Promise<T>): Promise<T> {
   try {
-    return unwrap(await call())
+    return await attempt(call)
   } catch (err) {
-    if (!(err instanceof PsnError && err.isRateLimited)) throw err
+    if (!(err instanceof PsnError && err.isRateLimited) || /cooling down|app budget/.test(err.message)) throw err
     await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_WAIT_MS))
-    return unwrap(await call())
+    try {
+      return await attempt(call)
+    } catch (again) {
+      if (again instanceof PsnError && again.isRateLimited) cooldownUntil = Date.now() + COOLDOWN_MS
+      throw again
+    }
   }
 }
 
@@ -208,6 +243,7 @@ async function authorization(): Promise<AuthorizationPayload> {
 
 /** Drops this instance's tokens, so the next call starts from what is stored (a new NPSSO). */
 export function forgetPsnTokens(): void {
+  cooldownUntil = 0
   tokens = null
 }
 
@@ -517,6 +553,12 @@ export async function psnTitles(accountId: string, userId: string | null = null)
   )
 }
 
+/** Library DTO with base completion dates; raw title/activity caches keep their existing shape and keys. */
+export async function psnTitlesWithCompletion(accountId: string, userId: string | null = null): Promise<PsnGameProgress[]> {
+  const games = await psnTitles(accountId, userId)
+  return withPsnCompletionDates(games, (game) => psnGameTrophies(accountId, game, userId))
+}
+
 /**
  * PS3/Vita games' cover and backdrop from IGDB: Sony keeps none for them (no
  * played-games entry, no Store page). Each is cached half a year, so only a
@@ -678,7 +720,7 @@ export async function psnReleaseYear(conceptId: number): Promise<number | null> 
     `psn:release:${conceptId}`,
     RELEASE_TTL_MS,
     async () => {
-      const res = await fetch(`${STORE_CONCEPT_URL}${conceptId}`, { headers: { 'Accept-Language': 'en-US' } })
+      const res = await fetch(`${STORE_CONCEPT_URL}${conceptId}`, { headers: { 'Accept-Language': 'en-US' }, signal: AbortSignal.timeout(CALL_TIMEOUT_MS) })
       if (!res.ok) throw new PsnError(`PlayStation Store answered ${res.status}`)
       const m = /"releaseDate":"(\d{4})-\d{2}-\d{2}T/.exec(await res.text())
       return m ? Number(m[1]) : null

@@ -20,8 +20,8 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
   const { hidden, showGame } = useHiddenGames()
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose} className="min-h-0 max-w-lg">
-      <div role="dialog" aria-modal="true" aria-labelledby="hidden-games-title" className="flex flex-col gap-4">
+    <CommonModal isOpen={isOpen} onClose={onClose} size="md">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
           <h2 id="hidden-games-title" className="flex items-center gap-2 text-lg font-semibold">
             <IconEyeOff size={18} className="text-text-secondary" aria-hidden="true" />
@@ -31,7 +31,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
             type="button"
             onClick={onClose}
             aria-label={T.userPage.close}
-            className="p-1.5 rounded-lg text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <IconX size={18} aria-hidden="true" />
           </button>
@@ -42,11 +42,11 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
         ) : (
           <ul className="flex flex-col gap-1.5 max-h-[60dvh] overflow-y-auto -mx-1 px-1">
             {hidden.map((g) => (
-              <li key={`${g.source}:${g.id}`} className="flex items-center gap-3 rounded-xl bg-bg-main p-2 pr-1.5">
+              <li key={`${g.source}:${g.id}`} className="flex items-center gap-3 rounded-tile bg-bg-main p-2 pr-1.5">
                 {g.image ? (
-                  <Image src={g.image} alt="" width={40} height={40} unoptimized className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                  <Image src={g.image} alt="" width={40} height={40} unoptimized className="w-10 h-10 rounded-box object-cover shrink-0" />
                 ) : (
-                  <span aria-hidden="true" className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" />
+                  <span aria-hidden="true" className="w-10 h-10 rounded-box bg-ink/10 shrink-0" />
                 )}
                 <span className="flex flex-col min-w-0 flex-1">
                   <span className="text-sm font-medium truncate">{g.title}</span>
@@ -67,7 +67,7 @@ export default function HiddenGamesModal({ isOpen, onClose }: { isOpen: boolean;
                   type="button"
                   onClick={() => showGame(g.id, g.source)}
                   aria-label={T.userPage.showGame.replace('{title}', g.title)}
-                  className="p-2 rounded-lg text-text-secondary hover:text-accent hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                  className="p-2 rounded-chip text-text-secondary hover:text-accent hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                 >
                   <IconEye size={18} aria-hidden="true" />
                 </button>

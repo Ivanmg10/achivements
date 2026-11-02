@@ -14,9 +14,9 @@ const LIBRARY = [
   game(0),
 ]
 
-/** StatCard puts the value before its label. */
+/** StatCard puts its label first, the value under it. */
 function value(label: string) {
-  return screen.getByText(label).previousElementSibling?.textContent
+  return screen.getByText(label).nextElementSibling?.textContent
 }
 
 test('shows games, playtime, perfect games and achievements unlocked', () => {
@@ -37,8 +37,8 @@ test('marks counts as a lower bound while some are still missing', () => {
 })
 
 test('shows placeholders while the library loads', () => {
-  render(<MainPageProfileStStats library={[]} isLoading />)
-  expect(screen.getAllByText('—')).toHaveLength(4)
+  const { container } = render(<MainPageProfileStStats library={[]} isLoading />)
+  expect(container.querySelectorAll('.bg-skeleton')).toHaveLength(4)
 })
 
 test('is a 2×2 grid like the RA stats', () => {

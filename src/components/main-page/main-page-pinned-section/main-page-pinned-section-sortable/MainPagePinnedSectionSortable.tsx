@@ -36,7 +36,7 @@ export default function MainPagePinnedSectionSortable<T>({
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={ids} strategy={rectSortingStrategy}>
-        <ul className={className}>
+        <ul className={`${className} enter-cards`}>
           {items.map((item) => (
             <MainPagePinnedSectionSortableItem key={idOf(item)} id={idOf(item)} label={labelOf(item)}>
               {(handle) => renderItem(item, handle)}

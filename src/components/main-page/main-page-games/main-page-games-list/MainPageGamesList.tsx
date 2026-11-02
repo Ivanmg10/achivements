@@ -21,7 +21,7 @@ function ringColor(game: AnyGame): string {
   if (!isCompleted(game)) return ''
   const pct = (parseFloat(game.PctWon) || 0) * 100
   if (pct < 100) return ''
-  return game.HardcoreMode === '1' ? 'ring-2 ring-yellow-400' : 'ring-2 ring-blue-400'
+  return game.HardcoreMode === '1' ? 'ring-2 ring-hardcore' : 'ring-2 ring-softcore'
 }
 
 function getBadge(
@@ -72,7 +72,7 @@ export default function MainPageGamesList({
     return (
       <Link
         key={index}
-        className="flex flex-row items-center justify-between p-2 mx-2 my-1 bg-bg-main rounded-xl w-[95%] border-2 border-bg-main cursor-pointer hover:scale-[1.02] transition-transform duration-200"
+        className="flex flex-row items-center justify-between p-2 mx-2 my-1 bg-bg-main rounded-tile w-[95%] border-2 border-bg-main cursor-pointer hover:scale-[1.02] transition-transform duration-200"
         href={`/gameInfo/${game.ID ? game.ID : game.GameID}`}
       >
         <div className="flex flex-row items-center gap-3">
@@ -82,7 +82,7 @@ export default function MainPageGamesList({
               alt="imagen"
               width={48}
               height={48}
-              className={`w-12 h-12 rounded-lg object-cover shrink-0 ${ringColor(game)}`}
+              className={`w-12 h-12 rounded-box object-cover shrink-0 ${ringColor(game)}`}
             />
           )}
           <div className="flex flex-col justify-center gap-0.5">
@@ -90,7 +90,7 @@ export default function MainPageGamesList({
               {game?.GameTitle ? game?.GameTitle : game?.Title}
             </p>
             <div className="flex flex-row items-center gap-1">
-              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${consoleDef?.color ?? 'text-text-secondary'}`}>
+              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${consoleDef?.color ?? 'text-text-secondary'}`}>
                 {consoleDef?.icon && (
                   <Image
                     src={consoleDef.icon}

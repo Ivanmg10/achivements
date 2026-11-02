@@ -6,16 +6,18 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { InsightAchievement } from '@/utils/gameInsights'
 import { groupGameAchievementsByPeriod } from '@/utils/utils'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
+import SegmentedControl from '@/components/ui/SegmentedControl'
+import { LineChartSkeleton } from '@/components/ui/ChartSkeleton'
+import GameAchievementsProgressChartTooltip from './game-achievements-progress-chart-tooltip/GameAchievementsProgressChartTooltip'
 
 type Period = 'week' | 'month'
 
 const PLOT_HEIGHT = 'h-[208px]'
 
 // recharts is the heaviest thing on the page: it arrives when there is a line to draw, with the room kept meanwhile.
-const GameAchievementsProgressPlot = dynamic(
-  () => import('./game-achievements-progress-plot/GameAchievementsProgressPlot'),
-  { loading: () => <div aria-hidden="true" className={`${PLOT_HEIGHT} animate-pulse rounded-lg bg-ink/5`} /> },
-)
+const AchievementsLinePlot = dynamic(() => import('@/components/achivements-line-chart/achievements-line-plot/AchievementsLinePlot'), {
+  loading: () => <LineChartSkeleton />,
+})
 // Downloaded the first time a point is clicked, not with the card. `loading` gives it its
 // own Suspense boundary: without one the download suspends the whole page (the home
 // skeleton flashes).
@@ -25,8 +27,8 @@ const GameAchievementsProgressChartModal = dynamic(
 )
 
 /**
- * A game's unlocks per week or month. Clicking a point lists what was unlocked
- * in that period.
+ * A game's unlocks per week or month, on the same line as the home's week.
+ * Clicking a point lists what was unlocked in that period.
  */
 export function GameAchievementsProgressChart({
   achievements,
@@ -43,64 +45,50 @@ export function GameAchievementsProgressChart({
   const data = groupGameAchievementsByPeriod(achievements, period)
   const total = data.reduce((sum, d) => sum + d.count, 0)
 
+  const periodTitle = (start: number) =>
+    period === 'week'
+      ? T.gameExpanded.weekOf.replace('{date}', new Date(start).toLocaleDateString(lang, { day: 'numeric', month: 'short' }))
+      : new Date(start).toLocaleDateString(lang, { month: 'long', year: 'numeric' })
+
+  function tick(label: string) {
+    const bucket = data.find((d) => d.label === label)
+    return bucket ? new Date(bucket.start).toLocaleDateString(lang, period === 'week' ? { day: 'numeric', month: 'short' } : { month: 'short' }) : label
+  }
+
   function handleSelect(label: string) {
     const bucket = data.find((d) => d.label === label)
     if (!bucket?.count) return
-    const start = new Date(bucket.start)
-    const title =
-      period === 'week'
-        ? T.gameExpanded.weekOf.replace('{date}', start.toLocaleDateString(lang, { day: 'numeric', month: 'short' }))
-        : start.toLocaleDateString(lang, { month: 'long', year: 'numeric' })
-    setSelected({ title, items: bucket.items })
+    setSelected({ title: periodTitle(bucket.start), items: bucket.items })
     setOpen(true)
   }
 
   return (
     <div className="w-full flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2 px-1">
-        <p className="text-text-secondary text-sm">{T.gameExpanded.achievementsOverTime}</p>
-        <div role="tablist" className="flex items-center gap-0.5 p-0.5 rounded-full bg-ink/5 shrink-0">
-          <button
-            role="tab"
-            aria-selected={period === 'week'}
-            onClick={() => setPeriod('week')}
-            className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              period === 'week'
-                ? 'bg-accent text-bg-main'
-                : 'text-text-secondary hover:text-text-main hover:bg-ink/8'
-            }`}
-          >
-            {T.gameExpanded.weekly}
-          </button>
-          <button
-            role="tab"
-            aria-selected={period === 'month'}
-            onClick={() => setPeriod('month')}
-            className={`px-2.5 py-1 rounded-full text-[10px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              period === 'month'
-                ? 'bg-accent text-bg-main'
-                : 'text-text-secondary hover:text-text-main hover:bg-ink/8'
-            }`}
-          >
-            {T.gameExpanded.monthly}
-          </button>
-        </div>
+        <p className="text-sm font-bold text-text-main">{T.gameExpanded.achievementsOverTime}</p>
+        <SegmentedControl
+          aria-label={T.gameExpanded.achievementsOverTime}
+          size="xs"
+          className="shrink-0"
+          value={period}
+          onChange={setPeriod}
+          options={[
+            { value: 'week', label: T.gameExpanded.weekly },
+            { value: 'month', label: T.gameExpanded.monthly },
+          ]}
+        />
       </div>
 
       {isLoading ? (
-        <div className="px-1 h-52 flex flex-col justify-end gap-1 animate-pulse">
-          <div className="flex items-end gap-2 h-44">
-            {[45, 70, 30, 90, 55, 20, 80, 60].map((h, i) => (
-              <div key={i} className="flex-1 bg-ink/10 rounded-t-sm" style={{ height: `${h}%` }} />
-            ))}
-          </div>
-        </div>
+        <div className={PLOT_HEIGHT}><LineChartSkeleton /></div>
       ) : total === 0 ? (
         <div className="flex items-center justify-center h-52 text-text-secondary text-sm text-center px-4">
           {T.gameExpanded.noActivity}
         </div>
       ) : (
-        <GameAchievementsProgressPlot data={data} onSelect={handleSelect} />
+        <div className={PLOT_HEIGHT}>
+          <AchievementsLinePlot data={data} x="label" y="count" tick={tick} tooltip={<GameAchievementsProgressChartTooltip title={periodTitle} />} onPick={handleSelect} />
+        </div>
       )}
 
       <LazyWhenOpened open={open}>

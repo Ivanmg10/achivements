@@ -8,6 +8,8 @@ import { getGameInfoAndUserProgress } from "@/lib/raClient";
 const TTL = 10 * 60 * 1000;
 // Each id is one RA call made with the user's key: cap how many one request can ask for.
 const MAX_GAMES = 100;
+/** On someone else's key: what shows first, not the whole list. */
+const MAX_GAMES_BORROWED = 10;
 
 export async function GET(request: NextRequest) {
   const owner = await dataOwner(request);
@@ -29,6 +31,8 @@ export async function GET(request: NextRequest) {
   if (gameIds.length > MAX_GAMES) {
     return NextResponse.json({ message: `At most ${MAX_GAMES} games` }, { status: 400 });
   }
+
+  const asked = owner.borrowedKey ? gameIds.slice(0, MAX_GAMES_BORROWED) : gameIds;
 
   async function fetchGame(gameId: number): Promise<[number, string | null]> {
     try {
@@ -54,8 +58,8 @@ export async function GET(request: NextRequest) {
 
   const BATCH = 5;
   const results: [number, string | null][] = [];
-  for (let i = 0; i < gameIds.length; i += BATCH) {
-    const batch = await Promise.all(gameIds.slice(i, i + BATCH).map(fetchGame));
+  for (let i = 0; i < asked.length; i += BATCH) {
+    const batch = await Promise.all(asked.slice(i, i + BATCH).map(fetchGame));
     results.push(...batch);
   }
 

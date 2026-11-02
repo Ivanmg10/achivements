@@ -7,6 +7,8 @@ import { gameHref } from '@/utils/gameRef'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import type { PsnTrophy } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
+import { decimal } from '@/utils/utils'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 const SHOWN = 4
 const SKELETON_ROWS = 4
@@ -25,7 +27,7 @@ export default function PsnRarestTrophies({
   trophies: (PsnTrophy & { gameId?: number })[]
   isLoading: boolean
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }
 
@@ -41,7 +43,7 @@ export default function PsnRarestTrophies({
       {isLoading ? (
         <ul aria-busy="true" className="flex flex-col gap-2">
           {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-            <li key={i} className="h-12 bg-ink/5 rounded-lg animate-pulse" />
+            <li key={i}><SkeletonRow className="h-12 px-1" /></li>
           ))}
         </ul>
       ) : rarest.length === 0 ? (
@@ -54,18 +56,18 @@ export default function PsnRarestTrophies({
             <li key={`${t.gameId ?? gameId}:${t.id}`}>
               <Link
                 href={`${gameHref('psn', t.gameId ?? gameId, subject)}#${psnTrophyAnchor(t.id)}`}
-                className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
+                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
               >
                 {t.iconUrl ? (
-                  <Image src={t.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-lg object-cover ring-2 ring-[#0070d1] shrink-0" unoptimized />
+                  <Image src={t.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-box object-cover ring-2 ring-[#0070d1] shrink-0" unoptimized />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+                  <div className="w-10 h-10 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
                 )}
                 <span className="flex flex-col min-w-0">
                   <span className="text-sm font-semibold truncate">{t.name}</span>
                   <span className="text-xs">
                     <span className={TROPHY_GRADE_COLOR[t.type]}>{grade[t.type]}</span>
-                    <span className="text-text-secondary"> · {T.psn.rarity.replace('{n}', t.rarity.toFixed(1))}</span>
+                    <span className="text-text-secondary"> · {T.psn.rarity.replace('{n}', decimal(t.rarity, lang))}</span>
                   </span>
                 </span>
               </Link>

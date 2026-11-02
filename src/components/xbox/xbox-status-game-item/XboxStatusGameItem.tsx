@@ -44,7 +44,7 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
     <>
       <div
         onPointerMove={onPointerMove}
-        className={`spotlight bg-bg-card rounded-2xl overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
+        className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
         <GameCardBackdrop src={xboxBackdrop(game)} surface="card" />
         {/* relative: the expand button stretches over this whole header (see the chevron). */}
@@ -52,8 +52,8 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
           {/* Same destination as the title link, so it is kept out of the tab order. */}
           <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
             <div
-              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden transition-all duration-150 ${
-                isComplete ? 'ring-2 ring-green-500/70 hover:ring-green-500' : 'hover:ring-2 hover:ring-ink/40'
+              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-tile overflow-hidden transition-all duration-150 ${
+                isComplete ? 'ring-2 ring-success/70 hover:ring-success' : 'hover:ring-2 hover:ring-ink/40'
               }`}
             >
               <GameIcon source="xbox" id={game.id} imageUrl={game.imageIcon} size={96} className="w-16 h-16 sm:w-24 sm:h-24" />
@@ -63,24 +63,24 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
           <div className="flex flex-col flex-1 min-w-0 gap-1">
             <Link
               href={href}
-              className="relative z-10 self-start max-w-full min-w-0 hover:underline decoration-ink/50 underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 rounded"
+              className="relative z-10 self-start max-w-full min-w-0 hover:underline decoration-ink/50 underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success rounded"
             >
               <p title={game.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">
                 {game.title}
               </p>
             </Link>
             <span className="flex items-center gap-1.5 flex-wrap">
-              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${xboxPlatformChip(game.consoleName)}`}>
+              <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${xboxPlatformChip(game.consoleName)}`}>
                 <XboxLogo size={12} aria-hidden="true" />
                 {game.consoleName}
               </span>
               {isComplete && (
-                <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-400">
+                <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-success/10 text-success">
                   <span aria-hidden="true">★</span> {T.steam.perfect}
                 </span>
               )}
             </span>
-            <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>{progressText}</span>
+            <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>{progressText}</span>
             <span className="flex items-center gap-2 mt-1">
               <ProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-main" className="flex-1" />
               <span className={`text-xs tabular-nums ${isComplete ? 'text-success font-semibold' : 'text-text-secondary'}`}>{game.pctWon}%</span>
@@ -92,7 +92,11 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
                 {T.steam.playtime} · {formatPlaytime(game.playtimeMinutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
               </span>
             )}
-            {game.lastPlayed && (
+            {category === 'completed' && game.completedAt ? (
+              <span className="text-xs text-text-secondary mt-1">
+                {T.libraryDetail.finished} · {new Date(game.completedAt).toLocaleDateString(lang)}
+              </span>
+            ) : game.lastPlayed && (
               <span className="text-xs text-text-secondary mt-1">
                 {T.steam.lastPlayed} · {new Date(game.lastPlayed).toLocaleDateString(lang)}
               </span>
@@ -109,7 +113,7 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
               aria-expanded={open}
               aria-controls={panelId}
               aria-label={`${open ? T.xbox.hideAchievements : T.xbox.showAchievements}: ${game.title}`}
-              className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
             >
               <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                 ▼

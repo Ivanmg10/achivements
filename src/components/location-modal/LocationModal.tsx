@@ -6,6 +6,8 @@ import CommonModal from '../common-modal/CommonModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { COUNTRIES, codeToFlag } from '@/utils/countries'
 import { notify } from '@/lib/notify'
+import { fieldClass } from '@/components/ui/Input'
+import Notice from '@/components/ui/Notice'
 
 interface Props {
   isOpen: boolean
@@ -58,7 +60,7 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={handleClose} className="max-w-lg">
+    <CommonModal isOpen={isOpen} onClose={handleClose} size="md">
       <h2 className="text-xl font-bold mb-4">{T.userData.location}</h2>
 
       <input
@@ -67,12 +69,12 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
         onChange={(e) => setSearch(e.target.value)}
         placeholder={T.userData.searchCountry}
         aria-label={T.userData.searchCountry}
-        className="bg-bg-main rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-accent w-full mb-3"
+        className={fieldClass({ size: 'sm' }, 'mb-3')}
         autoFocus
       />
 
       {error && (
-        <p role="alert" className="text-sm text-danger bg-danger/10 rounded-xl px-4 py-2 mb-3">{error}</p>
+        <Notice tone="danger" className="mb-3">{error}</Notice>
       )}
 
       <div className="grid grid-cols-3 gap-2 overflow-y-auto max-h-80">
@@ -87,7 +89,7 @@ export default function LocationModal({ isOpen, onClose, currentCode }: Props) {
               onClick={() => handleSelect(country.code)}
               disabled={loading}
               aria-pressed={currentCode === country.code}
-              className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-all disabled:opacity-50 ${
+              className={`flex items-center gap-2 px-3 py-3 rounded-tile transition-all disabled:opacity-50 ${
                 currentCode === country.code
                   ? 'bg-accent text-bg-main'
                   : 'bg-bg-main hover:bg-bg-card text-text-main'

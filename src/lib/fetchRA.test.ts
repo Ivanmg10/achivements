@@ -41,7 +41,7 @@ test('a 429 asking for longer than MAX_RETRY_AFTER throws at once', async () => 
 test('retries a 500 response up to the attempt limit, then throws', async () => {
   ;(fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 })
   await expect(fetchRA('https://retroachievements.org/API/x.php')).rejects.toMatchObject({ status: 500 })
-  expect(fetch).toHaveBeenCalledTimes(3)
+  expect(fetch).toHaveBeenCalledTimes(2)
 }, 10_000)
 
 test('recovers on a later attempt after a transient failure', async () => {
@@ -63,3 +63,20 @@ test('retries a network error, not just HTTP error statuses', async () => {
   expect(result).toEqual({ id: 3 })
   expect(fetch).toHaveBeenCalledTimes(2)
 }, 10_000)
+
+test('one key gets a short burst, then one call per gap', async () => {
+  ;(fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({}) })
+  const started = Date.now()
+  await Promise.all(Array.from({ length: 6 }, () => fetchRA('https://retroachievements.org/API/x.php?y=paced-key')))
+  // Four at once, then the fifth and sixth a gap apart.
+  expect(Date.now() - started).toBeGreaterThanOrEqual(200)
+  expect(Date.now() - started).toBeLessThan(1500)
+}, 5_000)
+
+test('another key does not wait for the first', async () => {
+  ;(fetch as jest.Mock).mockResolvedValue({ ok: true, json: async () => ({}) })
+  await Promise.all(Array.from({ length: 4 }, () => fetchRA('https://retroachievements.org/API/x.php?y=key-a')))
+  const started = Date.now()
+  await fetchRA('https://retroachievements.org/API/x.php?y=key-b')
+  expect(Date.now() - started).toBeLessThan(100)
+})

@@ -15,13 +15,18 @@ export function hashToken(token: string): string {
 /** Issues a token for a user, retiring any they already had. */
 export async function createResetToken(userId: number): Promise<string> {
   const token = randomBytes(32).toString('hex')
-  await pool.query('DELETE FROM password_resets WHERE user_id = $1 AND used_at IS NULL', [userId])
+  await retireResetTokens(userId)
   await pool.query(
     `INSERT INTO password_resets (user_id, token_hash, expires_at)
      VALUES ($1, $2, NOW() + ($3 || ' minutes')::interval)`,
     [userId, hashToken(token), String(TTL_MINUTES)],
   )
   return token
+}
+
+/** Drops a user's unused links: a change of password or address must not leave one alive. */
+export async function retireResetTokens(userId: number | string): Promise<void> {
+  await pool.query('DELETE FROM password_resets WHERE user_id = $1 AND used_at IS NULL', [userId])
 }
 
 /**

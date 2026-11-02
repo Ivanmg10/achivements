@@ -8,6 +8,7 @@ import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
 import { useLanguage } from '@/context/LanguageContext'
 import { checkPassword, PASSWORD_MIN } from '@/utils/authValidation'
+import Button from '@/components/ui/Button'
 
 /**
  * The page the reset link opens: a new password, typed twice, plus the token
@@ -56,24 +57,24 @@ export default function ResetPasswordForm() {
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto">
+    <div className="w-full max-w-sm mx-auto enter-card">
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-text-main">{T.passwordReset.title}</h1>
         <div className="mt-2 h-0.5 w-10 bg-accent mx-auto rounded-full" />
       </div>
 
       {!token ? (
-        <p role="alert" className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3 text-sm text-danger">
+        <p role="alert" className="mb-5 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3 text-sm text-danger">
           {T.passwordReset.missingToken}
         </p>
       ) : done ? (
-        <p role="status" className="mb-5 bg-success/20 border border-success/40 rounded-xl p-3 text-sm text-success">
+        <p role="status" className="mb-5 bg-success/20 border border-success/40 rounded-tile p-3 text-sm text-success">
           {T.passwordReset.done}
         </p>
       ) : (
         <>
           {error && (
-            <p role="alert" className="mb-5 bg-danger/20 border border-danger/40 rounded-xl p-3 text-sm text-danger">
+            <p role="alert" className="mb-5 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3 text-sm text-danger">
               {error}
             </p>
           )}
@@ -110,10 +111,10 @@ export default function ResetPasswordForm() {
               disabled={submitting}
             />
 
-            <button
+            <Button
               type="submit"
               disabled={submitting}
-              className="bg-accent text-bg-main w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              size="lg" className="w-full mt-2"
             >
               {submitting ? (
                 <>
@@ -126,7 +127,7 @@ export default function ResetPasswordForm() {
                   <IconArrowRight size={16} aria-hidden="true" />
                 </>
               )}
-            </button>
+            </Button>
           </form>
         </>
       )}

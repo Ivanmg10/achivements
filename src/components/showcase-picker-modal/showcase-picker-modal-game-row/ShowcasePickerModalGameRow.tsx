@@ -20,14 +20,14 @@ export default function ShowcasePickerModalGameRow({ game, selected, onOpen }: {
     <button
       type="button"
       onClick={onOpen}
-      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+      className={`w-full flex items-center gap-3 px-3 py-2 rounded-tile text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
         on ? 'bg-accent/10 ring-1 ring-accent/60' : 'hover:bg-bg-card'
       }`}
     >
       {game.iconUrl ? (
-        <Image src={game.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-lg object-cover shrink-0" unoptimized />
+        <Image src={game.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-box object-cover shrink-0" unoptimized />
       ) : (
-        <span aria-hidden="true" className="w-10 h-10 rounded-lg bg-ink/10 flex items-center justify-center text-text-secondary shrink-0">
+        <span aria-hidden="true" className="w-10 h-10 rounded-box bg-ink/10 flex items-center justify-center text-text-secondary shrink-0">
           <IconDeviceGamepad2 size={18} />
         </span>
       )}

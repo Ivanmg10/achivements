@@ -7,20 +7,18 @@ import { IconCrown, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { rankBy, type LeaderRow, type StatKey } from '@/utils/friends'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
+import { pillClass } from '@/components/ui/Pill'
 
 const KEYS: StatKey[] = ['week', 'activeDays', 'streak', 'completed']
 
-const chipClass = (on: boolean) =>
-  `px-2.5 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-    on ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30' : 'bg-bg-main text-text-secondary hover:text-text-main'
-  }`
+const chipClass = (on: boolean) => pillClass(on)
 
 /**
  * You and the people you follow, ranked on one measure at a time: unlocks this
  * week, active days, streak or games at 100%. Your own row is marked in words
- * as well as tint; a friend still loading holds their place with a dash.
+ * as well as tint.
  */
-export default function MainPageFriendsLeaderboard({ rows, pending }: { rows: LeaderRow[]; pending: { username: string; avatar: string | null }[] }) {
+export default function MainPageFriendsLeaderboard({ rows }: { rows: LeaderRow[] }) {
   const { T, lang } = useLanguage()
   const [key, setKey] = useState<StatKey>('week')
   const ranked = rankBy(rows, key)
@@ -49,7 +47,7 @@ export default function MainPageFriendsLeaderboard({ rows, pending }: { rows: Le
         </div>
       </div>
 
-      <ol className="flex flex-col gap-1">
+      <ol className="flex flex-col gap-1 enter-rows">
         {ranked.map((r, i) => {
           const inner = (
             <>
@@ -78,7 +76,7 @@ export default function MainPageFriendsLeaderboard({ rows, pending }: { rows: Le
               <span className="text-sm font-bold tabular-nums shrink-0 w-14 text-right">{show(r)}</span>
             </>
           )
-          const cls = `flex items-center gap-3 px-2 py-1.5 rounded-lg ${r.isMe ? 'bg-accent/10' : ''}`
+          const cls = `flex items-center gap-3 px-2 py-1.5 rounded-box ${r.isMe ? 'bg-accent/10' : ''}`
           return (
             <li key={r.username}>
               {r.isMe ? (
@@ -94,14 +92,6 @@ export default function MainPageFriendsLeaderboard({ rows, pending }: { rows: Le
             </li>
           )
         })}
-        {pending.map((p) => (
-          <li key={p.username} aria-busy="true" className="flex items-center gap-3 px-2 py-1.5 text-text-secondary">
-            <span className="w-6 text-center text-xs">·</span>
-            <span className="w-7 h-7 rounded-full bg-ink/10 animate-pulse motion-reduce:animate-none shrink-0" />
-            <span className="text-sm truncate flex-1">{p.username}</span>
-            <span className="text-sm w-14 text-right">—</span>
-          </li>
-        ))}
       </ol>
     </div>
   )

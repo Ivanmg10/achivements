@@ -28,7 +28,7 @@ export default function LibraryAllList({
   }
 
   return (
-    <div className={`grid gap-3 items-start w-full ${STATUS_GRID_COLS[gridCols]}`}>
+    <div className={`grid gap-3 items-start w-full enter-cards ${STATUS_GRID_COLS[gridCols]}`}>
       {entries.map((e) =>
         e.kind === 'ra' ? (
           <StatusGameItem key={e.key} game={e.game} extra={e.extra} category={category} />

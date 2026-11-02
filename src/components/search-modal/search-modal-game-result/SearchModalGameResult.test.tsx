@@ -3,7 +3,7 @@ import SearchModalGameResult from './SearchModalGameResult'
 import { en } from '@/translations/en'
 import type { GameCandidate } from '@/utils/gameCandidates'
 
-jest.mock('next/image', () => ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />)
+jest.mock('next/image', () => ({ src, alt, onError }: { src: string; alt: string; onError?: () => void }) => <img src={src} alt={alt} onError={onError} />)
 
 const BASE: GameCandidate = {
   key: 'ra:1', source: 'ra', id: 1, title: 'Zelda', subtitle: 'SNES', imageRef: '/Images/1.png',
@@ -12,7 +12,7 @@ const BASE: GameCandidate = {
 
 test('shows an RA game with its console, icon and status in words', () => {
   const { container } = render(<SearchModalGameResult game={BASE} onSelect={jest.fn()} />)
-  expect(screen.getByText('Zelda')).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /^Zelda/ })).toBeInTheDocument()
   expect(screen.getByText('SNES')).toBeInTheDocument()
   expect(screen.getByText(en.search.completedHC)).toBeInTheDocument()
   expect(container.querySelector('img')?.getAttribute('src')).toBe('https://retroachievements.org/Images/1.png')
@@ -37,6 +37,14 @@ test('no pill for a game without a status, and a placeholder without an icon', (
   // Scoped to the icon slot: a direct child of the button. The platform logo
   // next to the subtitle is nested deeper and always renders.
   expect(container.querySelector('button > img')).toBeNull()
+})
+
+test('a failed icon leaves its placeholder instead of a broken image', () => {
+  const { container } = render(<SearchModalGameResult game={BASE} onSelect={jest.fn()} />)
+  const image = container.querySelector('button img')!
+  fireEvent.error(image)
+  expect(container.querySelector('img[src="https://retroachievements.org/Images/1.png"]')).toBeNull()
+  expect(container.querySelector('button > span > span')).toHaveClass('bg-skeleton')
 })
 
 test('marks an RA game with the RA logo, a Steam one with the Steam logo', () => {

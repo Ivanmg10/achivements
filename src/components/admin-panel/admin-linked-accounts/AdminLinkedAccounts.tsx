@@ -6,13 +6,14 @@ import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { adminFetch } from '@/utils/adminFetch'
 import type { AdminUser } from '@/types/user'
 import { notify } from '@/lib/notify'
+import { buttonClass } from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 type Platform = 'ra' | 'steam' | 'psn' | 'xbox'
 
 const PLATFORM_NAMES: Record<Platform, string> = { ra: 'RetroAchievements', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
 
-const INPUT = 'bg-bg-main rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-accent w-full'
-const BUTTON = 'shrink-0 text-xs font-bold px-3 py-2 rounded-xl disabled:opacity-40'
+const BUTTON = 'shrink-0 text-xs font-bold px-3 py-2 rounded-tile disabled:opacity-40'
 
 /**
  * Links or unlinks a user's RetroAchievements, Steam, PSN and Xbox accounts, for support.
@@ -72,7 +73,7 @@ export default function AdminLinkedAccounts({
       onUpdated(user.id, changes))
 
   return (
-    <div className="bg-bg-main/50 rounded-xl p-3 flex flex-col gap-4">
+    <div className="bg-bg-main/50 rounded-tile p-3 flex flex-col gap-4">
       <span className="text-xs text-text-secondary uppercase tracking-wider">Linked accounts</span>
 
       <div className="flex flex-col gap-2">
@@ -84,7 +85,7 @@ export default function AdminLinkedAccounts({
               <button
                 onClick={() => unlink('ra', { rausername: null, ra_display: null })}
                 disabled={busy !== null}
-                className={`${BUTTON} text-red-400 hover:bg-red-500/10`}
+                className={`${BUTTON} text-danger hover:bg-danger/10`}
               >
                 Unlink
               </button>
@@ -95,8 +96,8 @@ export default function AdminLinkedAccounts({
         </div>
         {!user.rausername && (
           <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="RA username" placeholder="RA username" value={raUsername} onChange={(e) => setRaUsername(e.target.value)} className={INPUT} />
-            <input aria-label="RA Web API key" placeholder="Web API key" type="password" autoComplete="off" value={raKey} onChange={(e) => setRaKey(e.target.value)} className={INPUT} />
+            <input aria-label="RA username" placeholder="RA username" value={raUsername} onChange={(e) => setRaUsername(e.target.value)} className={fieldClass({ size: 'sm' })} />
+            <input aria-label="RA Web API key" placeholder="Web API key" type="password" autoComplete="off" value={raKey} onChange={(e) => setRaKey(e.target.value)} className={fieldClass({ size: 'sm' })} />
             <button
               onClick={() => link('ra', { username: raUsername, apiKey: raKey }, (data) => {
                 setRaUsername('')
@@ -104,13 +105,13 @@ export default function AdminLinkedAccounts({
                 onUpdated(user.id, { rausername: data.rausername as string, ra_display: data.ra_display as string })
               })}
               disabled={busy !== null || !raUsername.trim() || !raKey.trim()}
-              className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}
+              className={buttonClass('primary', 'sm', 'shrink-0')}
             >
               {busy === 'ra' ? '…' : 'Link'}
             </button>
           </div>
         )}
-        {errors.ra && <span role="alert" className="text-xs text-red-400">{errors.ra}</span>}
+        {errors.ra && <span role="alert" className="text-xs text-danger">{errors.ra}</span>}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -122,7 +123,7 @@ export default function AdminLinkedAccounts({
               <button
                 onClick={() => unlink('steam', { steamid: null, steamusername: null })}
                 disabled={busy !== null}
-                className={`${BUTTON} text-red-400 hover:bg-red-500/10`}
+                className={`${BUTTON} text-danger hover:bg-danger/10`}
               >
                 Unlink
               </button>
@@ -133,20 +134,20 @@ export default function AdminLinkedAccounts({
         </div>
         {!user.steamid && (
           <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="SteamID64 or profile link" placeholder="SteamID64 or steamcommunity.com/profiles/…" value={steamId} onChange={(e) => setSteamId(e.target.value)} className={INPUT} />
+            <input aria-label="SteamID64 or profile link" placeholder="SteamID64 or steamcommunity.com/profiles/…" value={steamId} onChange={(e) => setSteamId(e.target.value)} className={fieldClass({ size: 'sm' })} />
             <button
               onClick={() => link('steam', { steamid: steamId }, (data) => {
                 setSteamId('')
                 onUpdated(user.id, { steamid: data.steamid as string, steamusername: data.steamusername as string | null })
               })}
               disabled={busy !== null || !steamId.trim()}
-              className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}
+              className={buttonClass('primary', 'sm', 'shrink-0')}
             >
               {busy === 'steam' ? '…' : 'Link'}
             </button>
           </div>
         )}
-        {errors.steam && <span role="alert" className="text-xs text-red-400">{errors.steam}</span>}
+        {errors.steam && <span role="alert" className="text-xs text-danger">{errors.steam}</span>}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -158,7 +159,7 @@ export default function AdminLinkedAccounts({
               <button
                 onClick={() => unlink('psn', { psnaccountid: null, psnusername: null })}
                 disabled={busy !== null}
-                className={`${BUTTON} text-red-400 hover:bg-red-500/10`}
+                className={`${BUTTON} text-danger hover:bg-danger/10`}
               >
                 Unlink
               </button>
@@ -169,20 +170,20 @@ export default function AdminLinkedAccounts({
         </div>
         {!user.psnaccountid && (
           <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="PSN online ID" placeholder="PSN online ID" value={psnName} onChange={(e) => setPsnName(e.target.value)} className={INPUT} />
+            <input aria-label="PSN online ID" placeholder="PSN online ID" value={psnName} onChange={(e) => setPsnName(e.target.value)} className={fieldClass({ size: 'sm' })} />
             <button
               onClick={() => link('psn', { username: psnName }, (data) => {
                 setPsnName('')
                 onUpdated(user.id, { psnaccountid: data.psnaccountid as string, psnusername: data.psnusername as string })
               })}
               disabled={busy !== null || !psnName.trim()}
-              className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}
+              className={buttonClass('primary', 'sm', 'shrink-0')}
             >
               {busy === 'psn' ? '…' : 'Link'}
             </button>
           </div>
         )}
-        {errors.psn && <span role="alert" className="text-xs text-red-400">{errors.psn}</span>}
+        {errors.psn && <span role="alert" className="text-xs text-danger">{errors.psn}</span>}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -194,7 +195,7 @@ export default function AdminLinkedAccounts({
               <button
                 onClick={() => unlink('xbox', { xboxxuid: null, xboxgamertag: null })}
                 disabled={busy !== null}
-                className={`${BUTTON} text-red-400 hover:bg-red-500/10`}
+                className={`${BUTTON} text-danger hover:bg-danger/10`}
               >
                 Unlink
               </button>
@@ -205,20 +206,20 @@ export default function AdminLinkedAccounts({
         </div>
         {!user.xboxxuid && (
           <div className="flex flex-col sm:flex-row gap-2">
-            <input aria-label="Xbox gamertag" placeholder="Xbox gamertag" value={xboxName} onChange={(e) => setXboxName(e.target.value)} className={INPUT} />
+            <input aria-label="Xbox gamertag" placeholder="Xbox gamertag" value={xboxName} onChange={(e) => setXboxName(e.target.value)} className={fieldClass({ size: 'sm' })} />
             <button
               onClick={() => link('xbox', { gamertag: xboxName }, (data) => {
                 setXboxName('')
                 onUpdated(user.id, { xboxxuid: data.xboxxuid as string, xboxgamertag: data.xboxgamertag as string })
               })}
               disabled={busy !== null || !xboxName.trim()}
-              className={`${BUTTON} bg-accent text-bg-main hover:opacity-90`}
+              className={buttonClass('primary', 'sm', 'shrink-0')}
             >
               {busy === 'xbox' ? '…' : 'Link'}
             </button>
           </div>
         )}
-        {errors.xbox && <span role="alert" className="text-xs text-red-400">{errors.xbox}</span>}
+        {errors.xbox && <span role="alert" className="text-xs text-danger">{errors.xbox}</span>}
       </div>
     </div>
   )

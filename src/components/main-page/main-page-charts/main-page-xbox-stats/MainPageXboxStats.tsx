@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion'
 import type { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxSummary } from '@/hooks/useXboxSummary'
-import { calcAvgPerDay } from '@/utils/utils'
+import { calcAvgPerDay, decimal } from '@/utils/utils'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
@@ -29,7 +29,9 @@ export default function MainPageXboxStats({
   isLoading?: boolean
 }) {
   const { T, lang } = useLanguage()
-  const { summary } = useXboxSummary()
+  const { summary, error } = useXboxSummary()
+  // Its pills are in the row from the start: arriving late, they pushed every other one aside.
+  const summaryWaiting = !summary && !error
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [weekOpen, setWeekOpen] = useState(false)
   const [monthOpen, setMonthOpen] = useState(false)
@@ -51,8 +53,8 @@ export default function MainPageXboxStats({
   if (isLoading) {
     return (
       <div className="flex flex-wrap gap-3" aria-busy="true">
-        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.streak.title, T.xbox.gamerscore].map((label) => (
-          <StatPill key={label} label={label} value="—" accent="text-text-secondary" />
+        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.xbox.gamerscore, T.streak.title, T.xbox.achievements].map((label) => (
+          <StatPill key={label} label={label} value="" loading />
         ))}
       </div>
     )
@@ -69,16 +71,16 @@ export default function MainPageXboxStats({
       />
       <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={noun} onClick={() => setWeekOpen(true)} />
       <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={noun} onClick={() => setMonthOpen(true)} />
-      <StatPill label={T.pointsStats.avgPerDay} value={stats.avg.toFixed(1)} sub={T.pointsStats.perDay} />
-      {summary && <StatPill label={T.xbox.gamerscore} value={summary.gamerscore.toLocaleString(lang)} sub="Xbox" accent="text-green-500" />}
+      <StatPill label={T.pointsStats.avgPerDay} value={decimal(stats.avg, lang)} sub={T.pointsStats.perDay} />
+      {(summary || summaryWaiting) && <StatPill label={T.xbox.gamerscore} value={summary?.gamerscore.toLocaleString(lang) ?? ''} sub="Xbox" accent="text-success" loading={summaryWaiting} />}
       <StatPill
         label={T.streak.title}
         value={`${streak}d`}
         sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
-        accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined}
+        accent={streak > 0 ? 'text-accent' : undefined}
         href="/racha"
       />
-      {summary && <StatPill label={T.xbox.achievements} value={summary.achievementsUnlocked.toLocaleString(lang)} sub={T.xbox.total} />}
+      {(summary || summaryWaiting) && <StatPill label={T.xbox.achievements} value={summary?.achievementsUnlocked.toLocaleString(lang) ?? ''} sub={T.xbox.total} loading={summaryWaiting} />}
 
       <AnimatePresence>
         {selectedDay && (

@@ -21,6 +21,16 @@ test("today's trophies, the level and the platinums", () => {
 })
 
 test('placeholders while loading', () => {
-  render(<MainPagePsnStats streak={0} achievements={[]} isLoading />)
-  expect(screen.getAllByText('—').length).toBeGreaterThan(3)
+  const { container } = render(<MainPagePsnStats streak={0} achievements={[]} isLoading />)
+  expect(container.querySelectorAll('.bg-skeleton').length).toBeGreaterThan(3)
+})
+
+test('without a summary yet, its pills wait in the row, and go if it fails', () => {
+  ;(usePsnSummary as jest.Mock).mockReturnValue({ summary: null, error: null })
+  const { unmount } = render(<MainPagePsnStats streak={0} achievements={[]} />)
+  expect(screen.getByText(en.psn.level).parentElement?.querySelector('.bg-skeleton')).toBeInTheDocument()
+  unmount()
+  ;(usePsnSummary as jest.Mock).mockReturnValue({ summary: null, error: 'failed' })
+  render(<MainPagePsnStats streak={0} achievements={[]} />)
+  expect(screen.queryByText(en.psn.level)).not.toBeInTheDocument()
 })

@@ -4,13 +4,17 @@ import type { RetroAchievementsGameCompleted } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnGameProgress } from '@/types/psn'
 import type { XboxGameProgress } from '@/types/xbox'
-import type { StatusSortState } from '@/components/status-sort-control/StatusSortControl'
+import type { StatusSortKey, StatusSortState } from '@/components/status-sort-control/StatusSortControl'
 import { compareSortValues } from '@/utils/utils'
+import { raLatestCompletionAward, validCompletionDate } from '@/utils/completionDates'
+import { classifySteamGame } from '@/utils/steamFeed'
 
 export type QuickFilter = 'all' | 'almost' | 'stalled'
 
 /** The orders every platform can be sorted by: points are RA's alone, so the mixed list does not offer them. */
 export const MIXED_SORT_KEYS = ['name', 'lastPlayed', 'percent'] as const
+/** The orders of a mixed list: a completed one can also go by when each game was completed. */
+export const mixedSortKeys = (category: string): StatusSortKey[] => (category === 'completed' ? ['name', 'completed', 'lastPlayed', 'percent'] : [...MIXED_SORT_KEYS])
 export const QUICK_FILTERS: readonly QuickFilter[] = ['all', 'almost', 'stalled']
 
 /** From this progress (and below 100) a game is "almost done". */
@@ -49,7 +53,7 @@ export const psnProgress = (g: PsnGameProgress): Progress => ({ pct: g.pctWon, l
 export const xboxProgress = (g: XboxGameProgress): Progress => ({ pct: g.pctWon, lastPlayed: g.lastPlayed })
 
 /** One game of any platform in the mixed list, with what the common sort reads. */
-export type LibraryEntry = Progress & { key: string; title: string } & (
+export type LibraryEntry = Progress & { key: string; title: string; completedAt?: string | null } & (
   | { kind: 'ra'; game: CategoryGame; extra?: GameExtraData }
   | { kind: 'steam'; game: SteamGameProgress }
   | { kind: 'psn'; game: PsnGameProgress }
@@ -66,16 +70,16 @@ export function buildEntries(
   return [
     ...ra.map((game): LibraryEntry => {
       const e = extra.get(raId(game))
-      return { kind: 'ra', key: `ra:${raId(game)}`, title: game.Title, game, extra: e, ...raProgress(game, e) }
+      return { kind: 'ra', key: `ra:${raId(game)}`, title: game.Title, game, extra: e, completedAt: e ? raLatestCompletionAward(e.awards, raId(game)) : null, ...raProgress(game, e) }
     }),
-    ...steam.map((game): LibraryEntry => ({ kind: 'steam', key: `steam:${game.id}`, title: game.title, game, ...steamProgress(game) })),
-    ...psn.map((game): LibraryEntry => ({ kind: 'psn', key: `psn:${game.id}`, title: game.title, game, ...psnProgress(game) })),
-    ...xbox.map((game): LibraryEntry => ({ kind: 'xbox', key: `xbox:${game.id}`, title: game.title, game, ...xboxProgress(game) })),
+    ...steam.map((game): LibraryEntry => ({ kind: 'steam', key: `steam:${game.id}`, title: game.title, game, completedAt: classifySteamGame(game) === 'completed' ? validCompletionDate(game.lastUnlock) : null, ...steamProgress(game) })),
+    ...psn.map((game): LibraryEntry => ({ kind: 'psn', key: `psn:${game.id}`, title: game.title, game, completedAt: game.completedAt ?? null, ...psnProgress(game) })),
+    ...xbox.map((game): LibraryEntry => ({ kind: 'xbox', key: `xbox:${game.id}`, title: game.title, game, completedAt: game.completedAt ?? null, ...xboxProgress(game) })),
   ]
 }
 
 /** The mixed list's order. "points" is RA's alone, so it is not offered here. */
 export function sortEntries(entries: LibraryEntry[], { key, dir }: StatusSortState): LibraryEntry[] {
-  const value = (e: LibraryEntry) => (key === 'lastPlayed' ? e.lastPlayed : key === 'percent' ? e.pct : e.title)
+  const value = (e: LibraryEntry) => (key === 'lastPlayed' ? e.lastPlayed : key === 'completed' ? e.completedAt ?? null : key === 'percent' ? e.pct : e.title)
   return [...entries].sort((a, b) => compareSortValues(value(a), value(b), dir))
 }

@@ -14,6 +14,7 @@ import PublicUserKpis from '../public-user-kpis/PublicUserKpis'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
 import PresenceLabel from '@/components/presence-label/PresenceLabel'
 import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
+import Button from '@/components/ui/Button'
 
 /**
  * The top of a user's page, in the account card's style: their avatar's
@@ -25,10 +26,10 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
   const country = user.location ? findCountry(user.location) : null
 
   return (
-    <section aria-labelledby="public-user-name" className="relative bg-bg-card rounded-3xl overflow-hidden">
+    <section aria-labelledby="public-user-name" className="relative bg-bg-card rounded-card overflow-hidden">
       <UserProfileBanner avatar={user.avatar} />
 
-      <div className="relative px-4 sm:px-6 pt-6 pb-5 flex flex-col gap-5">
+      <div className="relative px-4 sm:px-6 pt-6 pb-5 flex flex-col gap-5 enter-rows">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-4 sm:gap-5 min-w-0">
             <span className="relative shrink-0">
@@ -52,7 +53,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
 
             <div className="flex flex-col gap-1.5 min-w-0">
               <div className="flex items-center gap-2 flex-wrap min-w-0">
-                <h1 id="public-user-name" className="text-2xl sm:text-3xl font-bold tracking-tight truncate">
+                <h1 id="public-user-name" className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 truncate">
                   {user.username}
                 </h1>
                 {user.isSelf && (
@@ -77,7 +78,7 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
             {user.isSelf && (
               <Link
                 href="/user"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-tile bg-bg-main text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 <IconPencil size={13} aria-hidden="true" />
                 {T.userProfile.editProfile}
@@ -85,14 +86,14 @@ export default function PublicUserHero({ user, onCompare }: { user: CheevoUser; 
             )}
             {!user.isSelf && <PublicUserFollowButton username={user.username} initial={user.following === true} />}
             {!user.isSelf && onCompare && (
-              <button
+              <Button
                 type="button"
                 onClick={onCompare}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-xl bg-accent text-bg-main hover:bg-accent/85 shadow-lg shadow-black/20 transition-colors font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                size="sm" className="shadow-lg shadow-black/20"
               >
                 <IconArrowsDiff size={13} aria-hidden="true" />
                 {T.userProfile.compareWithMe}
-              </button>
+              </Button>
             )}
             <PublicUserShareButton />
           </div>

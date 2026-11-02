@@ -9,14 +9,16 @@ import { PLATFORM_NAME } from '@/utils/gameRef'
 import type { GameSource } from '@/types/steam'
 import EmptyState from '@/components/empty-state/EmptyState'
 import PublicUserGameRow from '../public-user-game-row/PublicUserGameRow'
+import { fieldClass } from '@/components/ui/Input'
+import Select from '@/components/ui/Select'
+import { pillClass } from '@/components/ui/Pill'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 const PAGE = 30
 
 type Sort = 'progress' | 'name'
 
-const CHIP = 'px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70'
-const chipClass = (on: boolean) =>
-  `${CHIP} ${on ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30' : 'bg-bg-main text-text-secondary hover:text-text-main'}`
+const chipClass = (on: boolean) => pillClass(on)
 
 /**
  * Every game a user has played, searchable and filtered by platform and
@@ -42,10 +44,10 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
 
   if (isLoading) {
     return (
-      <div aria-busy="true" className="bg-bg-card rounded-xl p-4 grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div aria-busy="true" className="bg-bg-card rounded-tile p-4 grid grid-cols-1 md:grid-cols-2 gap-2">
         <span className="sr-only">{T.userProfile.loadingGames}</span>
         {Array.from({ length: 8 }, (_, i) => (
-          <div key={i} className="h-16 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+          <SkeletonRow key={i} icon="w-11 h-11" className="p-2.5 gap-3 bg-bg-main rounded-tile" />
         ))}
       </div>
     )
@@ -53,14 +55,14 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
 
   if (games.length === 0) {
     return (
-      <div className="bg-bg-card rounded-xl p-8">
+      <div className="bg-bg-card rounded-tile p-8">
         <EmptyState icon={<IconDeviceGamepad2 className="w-6 h-6" />} title={T.userProfile.noGames} />
       </div>
     )
   }
 
   return (
-    <div className="bg-bg-card rounded-xl p-4 flex flex-col gap-4">
+    <div className="bg-bg-card rounded-tile p-4 flex flex-col gap-4">
       <div className="flex flex-col lg:flex-row lg:items-center gap-3">
         <div className="relative flex-1 min-w-0">
           <label htmlFor={searchId} className="sr-only">{T.userProfile.searchGames}</label>
@@ -71,20 +73,21 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={T.userProfile.searchGames}
-            className="w-full bg-bg-main rounded-xl pl-9 pr-3 py-2 text-sm placeholder:text-text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className={fieldClass({ size: 'sm', icon: true })}
           />
         </div>
         <div className="flex items-center gap-2">
           <label htmlFor={`${searchId}-sort`} className="text-xs text-text-secondary">{T.userProfile.sortBy}</label>
-          <select
+          <Select<Sort>
             id={`${searchId}-sort`}
+            size="sm"
             value={sort}
-            onChange={(e) => setSort(e.target.value as Sort)}
-            className="bg-bg-main rounded-xl px-3 py-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            <option value="progress">{T.userProfile.sortProgress}</option>
-            <option value="name">{T.userProfile.sortName}</option>
-          </select>
+            onChange={setSort}
+            options={[
+              { value: 'progress', label: T.userProfile.sortProgress },
+              { value: 'name', label: T.userProfile.sortName },
+            ]}
+          />
         </div>
       </div>
 
@@ -114,7 +117,7 @@ export default function PublicUserGames({ games, isLoading }: { games: LibraryGa
         <EmptyState icon={<IconSearch className="w-6 h-6" />} title={T.userProfile.noGamesMatch} size="compact" className="py-8" />
       ) : (
         <>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 enter-rows">
             {filtered.slice(0, shown).map((g) => (
               <li key={g.key} className="min-w-0">
                 <PublicUserGameRow game={g} />

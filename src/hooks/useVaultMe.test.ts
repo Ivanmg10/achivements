@@ -24,6 +24,21 @@ test('asks nothing signed out', () => {
   expect(result.current.isLoading).toBe(false)
 })
 
+test('counts as loading while the session is read, and not again once answered', async () => {
+  ;(global.fetch as jest.Mock).mockResolvedValue({ ok: true, clone() { return this }, json: async () => ME })
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'loading', data: null })
+  const { result, rerender } = renderHook(() => useVaultMe())
+  expect(result.current.isLoading).toBe(true)
+  expect(global.fetch).not.toHaveBeenCalled()
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'authenticated', data: { user: { id: '1' } } })
+  rerender()
+  await waitFor(() => expect(result.current.me).toEqual(ME))
+  // update() sets the status back to 'loading' for a moment: the level must not go back to its skeleton.
+  ;(useSession as jest.Mock).mockReturnValue({ status: 'loading', data: { user: { id: '1' } } })
+  rerender()
+  expect(result.current.isLoading).toBe(false)
+})
+
 test('a failure is an error; the switch shows at once and reads again', async () => {
   ;(global.fetch as jest.Mock)
     .mockResolvedValueOnce({ ok: false, status: 500, clone() { return this } })

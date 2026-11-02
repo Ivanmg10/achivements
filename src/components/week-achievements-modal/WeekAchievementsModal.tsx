@@ -1,12 +1,11 @@
 'use client'
 
 import { useMemo } from 'react'
-import { motion } from 'framer-motion'
 import { RecentAchievement } from '@/types/types'
-import { modalOverlay, modalContent } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { IconX } from '@tabler/icons-react'
 import RecentAchievementRow from '@/components/recent-achievement-row/RecentAchievementRow'
+import Modal from '@/components/ui/Modal'
 
 interface Props {
   startDate: string
@@ -44,22 +43,7 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
   const totalAch = weekDays.reduce((s, d) => s + d.achievements.length, 0)
 
   return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      variants={modalOverlay}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      onClick={onClose}
-    >
-      <motion.div
-        className="bg-bg-header rounded-2xl p-4 w-full max-w-2xl max-h-[70vh] flex flex-col gap-3"
-        variants={modalContent}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={e => e.stopPropagation()}
-      >
+    <Modal isOpen onClose={onClose} size="lg" showClose={false} aria-label={T.cards.weekOf.replace('{date}', startDate)} className="gap-3">
         <div className="flex items-start justify-between gap-2 shrink-0">
           <div>
             <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestWeek}</p>
@@ -103,7 +87,6 @@ export default function WeekAchievementsModal({ startDate, achievements, onClose
             {totalAch} {T.dayModal.achievements}{hasPoints && ` · ${totalPts.toLocaleString()}pts`}
           </p>
         )}
-      </motion.div>
-    </motion.div>
+    </Modal>
   )
 }

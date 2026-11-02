@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatRarity } from '@/utils/steamFeed'
 import type { InsightAchievement } from '@/utils/gameInsights'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 const SKELETON_ROWS = 4
 
@@ -32,16 +33,16 @@ export default function LibraryDetailList({
   /** Two columns where there is room, for a list that has the width to itself. */
   columns?: 1 | 2
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   return (
     <div className="flex flex-col gap-2 h-full">
-      <p className="text-text-secondary text-sm px-1">{title}</p>
+      <p className="font-bold px-1">{title}</p>
 
       {isLoading ? (
         <ul aria-busy="true" className="flex flex-col gap-2">
           {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-            <li key={i} className="h-12 bg-ink/5 rounded-lg animate-pulse" />
+            <li key={i}><SkeletonRow className="h-12 px-1" /></li>
           ))}
         </ul>
       ) : items.length === 0 ? (
@@ -53,12 +54,12 @@ export default function LibraryDetailList({
               <Link
                 href={a.href}
                 title={a.description}
-                className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 {a.iconUrl ? (
-                  <Image src={a.iconUrl} alt="" width={40} height={40} unoptimized className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                  <Image src={a.iconUrl} alt="" width={40} height={40} unoptimized className="w-10 h-10 rounded-box object-cover shrink-0" />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+                  <div className="w-10 h-10 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
                 )}
                 <span className="flex flex-col min-w-0 flex-1">
                   <span className="text-sm font-semibold truncate">{a.title}</span>
@@ -69,7 +70,7 @@ export default function LibraryDetailList({
                     meta(a)
                   ) : (
                     <>
-                      {a.rarity !== null && <span>{T.libraryDetail.rarityOf.replace('{n}', formatRarity(a.rarity))}</span>}
+                      {a.rarity !== null && <span>{T.libraryDetail.rarityOf.replace('{n}', formatRarity(a.rarity, lang))}</span>}
                       {a.points !== null && <span className="text-text-main font-medium">{a.points} {T.libraryDetail.pointsShort}</span>}
                     </>
                   )}

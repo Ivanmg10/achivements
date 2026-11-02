@@ -3,16 +3,17 @@
 import { RetroAchievement } from '@/types/types'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
-import { motion } from 'framer-motion'
 import { IconStar, IconStarFilled } from '@tabler/icons-react'
-import { modalOverlay, modalContent } from '@/lib/animations'
-import Spinner from '@/components/main-spinner/Spinner'
 import { raShowcaseEntry } from '@/utils/showcase'
 import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseToggleButton'
+import Modal from '@/components/ui/Modal'
+import { decimal } from '@/utils/utils'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 interface AchievementUnlock {
   User: string
@@ -73,7 +74,6 @@ export default function AchievementModal({
   const { T, lang } = useLanguage()
   const subject = useSubject()
   const titleId = useId()
-  const dialogRef = useRef<HTMLDivElement>(null)
   const [detail, setDetail] = useState<AchievementDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -92,7 +92,7 @@ export default function AchievementModal({
   const earned = !!achievement.DateEarned
   const earnedHardcore = !!achievement.DateEarnedHardcore
   const rarityPct = numDistinctPlayers > 0
-    ? ((achievement.NumAwarded / numDistinctPlayers) * 100).toFixed(1)
+    ? decimal(((achievement.NumAwarded / numDistinctPlayers) * 100), lang)
     : null
 
   useEffect(() => {
@@ -106,22 +106,6 @@ export default function AchievementModal({
       .finally(() => setLoading(false))
   }, [achievement.ID])
 
-  // Focus moves into the dialog when it opens and back to where it was opened
-  // from when it closes, so a keyboard user is not left behind the overlay.
-  useEffect(() => {
-    const opener = document.activeElement as HTMLElement | null
-    dialogRef.current?.focus()
-    return () => opener?.focus?.()
-  }, [])
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
-
   const earnedDate = achievement.DateEarned
     ? new Date(achievement.DateEarned).toLocaleString(lang, {
         day: 'numeric', month: 'short', year: 'numeric',
@@ -129,28 +113,9 @@ export default function AchievementModal({
       })
     : null
 
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-      variants={modalOverlay}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      onClick={onClose}
-    >
-      <motion.div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        className="bg-bg-main rounded-2xl w-full max-w-4xl max-h-[65vh] overflow-y-auto overscroll-contain flex flex-col focus:outline-none"
-        variants={modalContent}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={(e) => e.stopPropagation()}
-      >
+  // In body: a transformed ancestor (the home's sections) would otherwise trap it under later sections.
+  return createPortal(
+    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="xl" showClose={false} className="gap-4">
         {/* Header */}
         <div className="flex items-start gap-4 p-6 border-b border-bg-header">
           {achievement.BadgeName && (
@@ -159,7 +124,7 @@ export default function AchievementModal({
               alt=""
               width={80}
               height={80}
-              className={`w-20 h-20 rounded-xl object-cover shrink-0 ${
+              className={`w-20 h-20 rounded-tile object-cover shrink-0 ${
                 earnedHardcore ? 'ring-2 ring-warning' : earned ? 'ring-2 ring-info/50' : 'grayscale opacity-50'
               }`}
             />
@@ -245,8 +210,11 @@ export default function AchievementModal({
 
         <div className="flex flex-col gap-6 p-6">
           {loading && (
-            <div className="flex justify-center py-8">
-              <Spinner size={28} />
+            <div role="status" aria-busy="true" className="flex flex-col gap-2 border border-bg-header rounded-tile p-4">
+              <span className="sr-only">{T.loadingPage.title}</span>
+              {[0, 1, 2, 3].map((i) => (
+                <SkeletonRow key={i} icon="w-7 h-7" radius="circle" figure />
+              ))}
             </div>
           )}
 
@@ -268,7 +236,7 @@ export default function AchievementModal({
               <>
                 {/* Recent unlocks — collapsible */}
                 {detail.unlocks?.Unlocks && detail.unlocks.Unlocks.length > 0 && (
-                  <div className="flex flex-col gap-0 border border-bg-header rounded-xl overflow-hidden">
+                  <div className="flex flex-col gap-0 border border-bg-header rounded-tile overflow-hidden">
                     <button
                       onClick={() => setUnlocksOpen((o) => !o)}
                       className="flex items-center justify-between px-4 py-3 hover:bg-bg-header/40 transition-colors text-left"
@@ -296,7 +264,7 @@ export default function AchievementModal({
                               )}
                               <p className="text-sm">{u.User}</p>
                               {u.HardcoreMode === '1' && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-900/60 text-yellow-300">HC</span>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-900/60 text-hardcore">HC</span>
                               )}
                             </div>
                             <p className="text-xs text-text-secondary tabular-nums">
@@ -323,7 +291,7 @@ export default function AchievementModal({
                           <button
                             onClick={() => setCommentsPage((p) => Math.max(0, p - 1))}
                             disabled={commentsPage === 0}
-                            className="px-2 py-0.5 text-xs rounded bg-bg-card disabled:opacity-30 hover:bg-bg-header transition-colors"
+                            className="px-2 py-0.5 text-xs rounded-tag-sm bg-bg-card disabled:opacity-30 hover:bg-bg-header transition-colors"
                           >
                             ←
                           </button>
@@ -333,7 +301,7 @@ export default function AchievementModal({
                           <button
                             onClick={() => setCommentsPage((p) => Math.min(totalPages - 1, p + 1))}
                             disabled={commentsPage === totalPages - 1}
-                            className="px-2 py-0.5 text-xs rounded bg-bg-card disabled:opacity-30 hover:bg-bg-header transition-colors"
+                            className="px-2 py-0.5 text-xs rounded-tag-sm bg-bg-card disabled:opacity-30 hover:bg-bg-header transition-colors"
                           >
                             →
                           </button>
@@ -376,7 +344,7 @@ export default function AchievementModal({
             )
           })()}
         </div>
-      </motion.div>
-    </motion.div>
+      </Modal>,
+    document.body,
   )
 }

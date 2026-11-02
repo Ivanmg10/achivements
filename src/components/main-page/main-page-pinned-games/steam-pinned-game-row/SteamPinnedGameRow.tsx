@@ -8,7 +8,7 @@ import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
@@ -16,6 +16,7 @@ import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamRecentlyPlayedExpanded from '@/components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded'
 import { gameKey } from '@/utils/gameRef'
 import { toSteamGameProgress } from '@/utils/steamMappers'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 /**
  * A pinned Steam game on the main page — PinnedGameRow's counterpart: drag
@@ -43,7 +44,7 @@ export default function SteamPinnedGameRow({
   const found = library.find((g) => g.id === appId) ?? recent.find((g) => g.id === appId)
 
   if (!found && libraryLoading) {
-    return <div ref={setNodeRef} style={style} className="bg-bg-main rounded-xl h-24 animate-pulse" />
+    return <div ref={setNodeRef} style={style}><GameRowSkeleton /></div>
   }
 
   // A pin for a game no longer in the library (refunded, family share ended)
@@ -59,7 +60,7 @@ export default function SteamPinnedGameRow({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
+      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
       <GameCardBackdrop src={steamAssetUrl(appId, 'header')} />
       <div className="flex items-center gap-3 px-3 py-3 w-full">
@@ -74,7 +75,7 @@ export default function SteamPinnedGameRow({
 
         {/* Same destination as the title link, so it is kept out of the tab order. */}
         <Link href={href} tabIndex={-1} aria-hidden="true" className="shrink-0">
-          <SteamGameImage appId={appId} asset="icon" iconUrl={game.imageIcon} size={56} className="rounded-xl w-14 h-14" />
+          <SteamGameImage appId={appId} asset="icon" iconUrl={game.imageIcon} size={56} className="rounded-tile w-14 h-14" />
         </Link>
 
         <div className="flex flex-col min-w-0 flex-1 gap-1">
@@ -96,7 +97,7 @@ export default function SteamPinnedGameRow({
               onClick={onToggle}
               aria-expanded={isOpen}
               aria-label={`${isOpen ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.title}`}
-              className="p-1 rounded text-text-secondary/40 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] shrink-0"
+              className="p-1 rounded-box-sm text-text-secondary/40 hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4] shrink-0"
             >
               <IconChevronDown
                 size={14}

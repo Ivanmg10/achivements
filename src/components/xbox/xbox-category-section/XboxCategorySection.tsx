@@ -13,6 +13,7 @@ import XboxStatusGameItem from '@/components/xbox/xbox-status-game-item/XboxStat
 import EmptyState from '@/components/empty-state/EmptyState'
 import { STATUS_GRID_COLS } from '@/components/statusGameList/StatusGameList'
 import type { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
+import { GameCardSkeleton } from '@/components/ui/GameCardSkeleton'
 
 const SKELETON_CARDS = 4
 
@@ -53,7 +54,7 @@ export default function XboxCategorySection({
   return (
     <CollapsibleSection
       title={T.xbox.gamesSection}
-      icon={<XboxLogo size={22} className="text-green-500" aria-hidden="true" />}
+      icon={<XboxLogo size={22} className="text-success" aria-hidden="true" />}
       count={loading || error ? undefined : games.length}
       storageKey={`xbox-section-open:${category}`}
       preview={
@@ -65,12 +66,12 @@ export default function XboxCategorySection({
       {loading ? (
         <div aria-busy="true" className={`grid gap-3 ${GRID_CLASS[gridCols]}`}>
           {Array.from({ length: SKELETON_CARDS }).map((_, i) => (
-            <div key={i} className="h-36 bg-bg-card rounded-xl animate-pulse" />
+            <GameCardSkeleton key={i} />
           ))}
         </div>
       ) : error ? (
         <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-red-400">
+          <p role="alert" className="text-sm text-danger">
             {T.xbox.gamesError}
           </p>
           {error === 'private' && <p className="text-xs text-text-secondary">{T.xbox.errors.private}</p>}
@@ -86,7 +87,7 @@ export default function XboxCategorySection({
           className="py-6"
         />
       ) : (
-        <div className={`grid gap-3 items-start w-full ${STATUS_GRID_COLS[gridCols]}`}>
+        <div className={`grid gap-3 items-start w-full enter-cards ${STATUS_GRID_COLS[gridCols]}`}>
           {games.map((g) => (
             <XboxStatusGameItem key={g.id} game={g} category={category} />
           ))}

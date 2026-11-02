@@ -1,4 +1,4 @@
-import { emailConfigured, sendEmail } from '@/lib/email'
+import { emailConfigured, escapeHtml, sendEmail } from '@/lib/email'
 import { CONTACT_EMAIL } from '@/lib/siteUrl'
 
 /** j***@example.com: enough for the owner to recognise it, not enough to hand it out. */
@@ -40,7 +40,7 @@ export async function sendEmailChangedNotice({
       to,
       subject: 'The email on your CheevoVault account changed',
       text: `Hi ${username},\n\n${who} the email address of your CheevoVault account to ${masked}. Password recovery now goes there, not here.\n\nIf this was you, there is nothing to do. ${contact}`,
-      html: `<p>Hi ${username},</p><p>${who} the email address of your CheevoVault account to <strong>${masked}</strong>. Password recovery now goes there, not here.</p><p>If this was you, there is nothing to do. ${contact}</p>`,
+      html: `<p>Hi ${escapeHtml(username)},</p><p>${who} the email address of your CheevoVault account to <strong>${escapeHtml(masked)}</strong>. Password recovery now goes there, not here.</p><p>If this was you, there is nothing to do. ${escapeHtml(contact)}</p>`,
     })
   } catch (err) {
     console.error('[emailChangedNotice]', err)

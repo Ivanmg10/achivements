@@ -20,9 +20,9 @@ test('title as the page heading, platform, progress and facts', () => {
   expect(screen.getAllByText('PS4').length).toBeGreaterThan(0)
   expect(screen.getByText(en.gameStatus.inProgress)).toBeInTheDocument()
   expect(screen.getByRole('progressbar', { name: 'Bloodborne' })).toHaveAttribute('aria-valuenow', '40')
-  expect(screen.getByText('NPWR00001_00')).toBeInTheDocument()
-  // On the bar and on the badge.
-  expect(screen.getAllByText('12 / 34')).toHaveLength(2)
+  // Under the bar, and on the tile.
+  expect(screen.getByText(en.gameInfoPage.ofTrophies.replace('{n}', '12').replace('{total}', '34'))).toBeInTheDocument()
+  expect(screen.getByText(en.psn.trophies).nextElementSibling).toHaveTextContent('12 / 34')
   expect(screen.getByTestId('pin')).toBeInTheDocument()
   expect(screen.getByTestId('hide')).toBeInTheDocument()
 })
@@ -66,13 +66,13 @@ test("IGDB's facts: summary, studios, genre, release date and two screenshots", 
   expect(screen.getByText('Sony Interactive Entertainment')).toBeInTheDocument()
   expect(screen.getByText('Role-playing (RPG)')).toBeInTheDocument()
   // A date-only value, read as UTC: never a day early.
-  expect(screen.getByText(/March 24, 2015|24 March 2015/)).toBeInTheDocument()
+  expect(screen.getByText(/Mar 24, 2015|24 Mar 2015/)).toBeInTheDocument()
   expect(screen.getAllByRole('link').filter((a) => a.getAttribute('href')?.startsWith('f'))).toHaveLength(2)
 })
 
-test('without details, dashes, and no summary or screenshots', () => {
+test('without details, "no data", and no summary or screenshots', () => {
   render(<PsnGameInfoHeader game={GAME} />)
-  expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(4)
+  expect(screen.getAllByText(en.gameInfoPage.noData).length).toBeGreaterThanOrEqual(4)
   expect(screen.queryByRole('list', { name: /screenshot/i })).toBeNull()
 })
 

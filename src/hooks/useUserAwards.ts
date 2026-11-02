@@ -1,13 +1,16 @@
 import { UserAwards } from '@/types/types'
 import { useSession } from 'next-auth/react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
 import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
+import { filterHiddenAwards } from '@/utils/gameVisibility'
 
 export function useUserAwards() {
   const { data: session } = useSession()
   const subject = useSubject()
+  const { hidden } = useHiddenGames()
   const [awards, setAwards] = useState<UserAwards | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -51,6 +54,10 @@ export function useUserAwards() {
     doFetch()
   }, [doFetch])
 
+  const visible = useMemo(
+    () => awards && hidden.length ? filterHiddenAwards(awards, hidden.map((game) => `${game.source}:${game.id}`)) : awards,
+    [awards, hidden],
+  )
   // Nobody to load for is not loading, whatever the last request left behind.
-  return { awards, isLoading: Boolean(session?.user?.rausername) && isLoading, error, refetch }
+  return { awards: visible, isLoading: Boolean(session?.user?.rausername) && isLoading, error, refetch }
 }

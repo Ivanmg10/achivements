@@ -1,3 +1,4 @@
+jest.mock('@/lib/raKey', () => ({ sealRaKey: (key: string) => ({ sealed: `sealed:${key}`, hash: `hash:${key}` }), raKeyHash: (key: string) => `hash:${key}` }))
 jest.mock('@/lib/db', () => {
   const query = jest.fn()
   return { __esModule: true, default: { query } }
@@ -8,6 +9,9 @@ jest.mock('@/lib/attemptLimit', () => ({
   allowAttempt: jest.fn(),
 }))
 
+jest.mock('@/lib/raProfile', () => ({ ...jest.requireActual('@/lib/raProfile'), fetchRaProfile: jest.fn() }))
+jest.mock('@/lib/scoreRefresh', () => ({ onPlatformLinked: jest.fn() }))
+
 jest.mock('bcrypt', () => ({
   hash: jest.fn().mockResolvedValue('hashedPassword'),
 }))
@@ -16,6 +20,8 @@ import { POST } from './route'
 import { NextRequest } from 'next/server'
 import pool from '@/lib/db'
 import { allowAttempt } from '@/lib/attemptLimit'
+import { fetchRaProfile } from '@/lib/raProfile'
+import { onPlatformLinked } from '@/lib/scoreRefresh'
 
 const mockUser = { id: 1, username: 'ivan', email: null, theme: 'dark', avatar: null, admin: false }
 
@@ -124,5 +130,60 @@ describe('two sign-ups racing past the checks', () => {
     raceOn('users_username_lower_key')
     const res = await POST(makeReq({ username: 'ivan', password: 'pass1234', email: 'ivan@test.com' }))
     expect(res.status).toBe(409)
+  })
+})
+
+describe('signing up with RetroAchievements', () => {
+  const body = { username: 'ivan', password: 'pass1234', email: 'ivan@test.com', ra: { username: 'palmeramiami', apiKey: ' key ' } }
+  const insert = () => (pool.query as jest.Mock).mock.calls.find(([sql]) => String(sql).startsWith('INSERT'))
+
+  beforeEach(() => {
+    // The file's own beforeEach sets implementations but keeps old calls; this block reads them.
+    ;(pool.query as jest.Mock).mockClear()
+    ;(onPlatformLinked as jest.Mock).mockClear()
+    ;(fetchRaProfile as jest.Mock).mockClear()
+    ;(fetchRaProfile as jest.Mock).mockResolvedValue({ ok: true, profile: { User: 'PalmeraMiami', TotalPoints: 10 } })
+  })
+
+  test('RA is asked again and the account is created linked, with RA\'s picture', async () => {
+    const res = await POST(makeReq(body))
+    expect(res.status).toBe(201)
+    expect(fetchRaProfile).toHaveBeenCalledWith('palmeramiami', 'key')
+    const [sql, params] = insert()
+    expect(sql).toContain('rausername, raid, "raUser"')
+    expect(params.slice(3)).toEqual([
+      'https://media.retroachievements.org/UserPic/PalmeraMiami.png',
+      'PalmeraMiami',
+      'sealed:key',
+      JSON.stringify({ User: 'PalmeraMiami', TotalPoints: 10 }),
+      'hash:key',
+    ])
+    expect(onPlatformLinked).toHaveBeenCalledWith(1, 'ra')
+  })
+
+  test('without RA, nothing of it is stored and nothing is asked', async () => {
+    await POST(makeReq({ username: 'ivan', password: 'pass1234', email: 'ivan@test.com' }))
+    expect(fetchRaProfile).not.toHaveBeenCalled()
+    expect(insert()[1].slice(3)).toEqual([null, null, null, null, null])
+    expect(onPlatformLinked).not.toHaveBeenCalled()
+  })
+
+  test('RA refusing the key stops the sign-up', async () => {
+    ;(fetchRaProfile as jest.Mock).mockResolvedValue({ ok: false, error: 'ra-invalid', status: 400 })
+    const res = await POST(makeReq(body))
+    expect(res.status).toBe(400)
+    expect((res as unknown as { data: unknown }).data).toEqual({ error: 'ra-invalid' })
+    expect(insert()).toBeUndefined()
+  })
+
+  test('a key another account already uses answers key-in-use', async () => {
+    ;(pool.query as jest.Mock).mockImplementation((sql: string) =>
+      sql.startsWith('SELECT')
+        ? Promise.resolve({ rows: [] })
+        : Promise.reject(Object.assign(new Error('dup'), { code: '23505', constraint: 'users_raId_key' })),
+    )
+    const res = await POST(makeReq(body))
+    expect(res.status).toBe(409)
+    expect((res as unknown as { data: unknown }).data).toEqual({ error: 'key-in-use' })
   })
 })

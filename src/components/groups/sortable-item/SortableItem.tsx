@@ -16,6 +16,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 // About three rows on a wide card; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
@@ -79,7 +80,7 @@ export default function SortableItem({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       <GameCardBackdrop src={cover} surface="card" />
       <div className="relative flex items-center gap-3 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">
@@ -95,11 +96,11 @@ export default function SortableItem({
         )}
 
         {/* Same destination as the title link, so it is kept out of the tab order. */}
-        <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0 rounded-xl hover:ring-2 hover:ring-ink/40 transition-all">
+        <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0 rounded-tile hover:ring-2 hover:ring-ink/40 transition-all">
           {cover ? (
-            <Image src={cover} alt="" width={96} height={96} className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl object-cover block" unoptimized />
+            <Image src={cover} alt="" width={96} height={96} className="w-16 h-16 sm:w-24 sm:h-24 rounded-tile object-cover block" unoptimized />
           ) : (
-            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl bg-bg-main" />
+            <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-tile bg-bg-main" />
           )}
         </Link>
 
@@ -111,12 +112,12 @@ export default function SortableItem({
             <p title={item.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{item.title}</p>
           </Link>
           {item.console_name && (
-            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium self-start ${consoleDef?.color ?? 'bg-bg-main text-text-secondary'}`}>
+            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium self-start ${consoleDef?.color ?? 'bg-bg-main text-text-secondary'}`}>
               {consoleDef?.icon && <Image src={consoleDef.icon} alt="" width={12} height={12} className="w-3 h-3 object-contain shrink-0" />}
               {item.console_name}
             </span>
           )}
-          <p className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>
+          <p className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>
             {achTotal > 0 ? `${Math.max(scEarned, hcEarned)} / ${achTotal}` : achTotal} {T.statusGameItem.achievements}
           </p>
           {achTotal > 0 && (
@@ -138,7 +139,7 @@ export default function SortableItem({
           <button
             onClick={() => onRemove(item.id)}
             aria-label={`${T.groups.removeGame}: ${item.title}`}
-            className="relative z-10 p-2 rounded-lg text-text-secondary hover:text-danger hover:bg-danger/10 transition-all [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
+            className="relative z-10 p-2 rounded-chip text-text-secondary hover:text-danger hover:bg-danger/10 transition-all [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
           >
             <IconX className="w-4 h-4" aria-hidden="true" />
           </button>
@@ -149,7 +150,7 @@ export default function SortableItem({
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${item.title}`}
-            className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               ▼
@@ -169,7 +170,7 @@ export default function SortableItem({
             {loadingAch ? (
               <div className="flex flex-wrap gap-1">
                 {Array.from({ length: Math.min(achTotal || 12, 60) }).map((_, i) => (
-                  <div key={i} className="w-12 h-12 rounded-lg bg-bg-main animate-pulse" />
+                  <Skeleton key={i} radius="tile" className="w-12 h-12" />
                 ))}
               </div>
             ) : achError && !gameData ? (

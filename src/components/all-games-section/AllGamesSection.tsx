@@ -7,17 +7,17 @@ import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import StatusGameList from '@/components/statusGameList/StatusGameList'
 import CompletedFilter, { CompletedMode } from '@/components/completed-filter/CompletedFilter'
 import ConsoleFilter, { buildConsolePills } from '@/components/console-filter/ConsoleFilter'
-import Spinner from '@/components/main-spinner/Spinner'
 import { useConsoleFilter } from '@/hooks/useConsoleFilter'
-import { motion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 type Category = 'wantToPlay' | 'playing' | 'completed'
 
 const CATEGORY_META: Record<Category, { icon: string; badge: string }> = {
   wantToPlay: { icon: '🔖', badge: 'bg-purple-900/50 text-purple-300' },
   playing:    { icon: '🎮', badge: 'bg-blue-900/50   text-blue-300'   },
-  completed:  { icon: '🏆', badge: 'bg-green-900/50  text-green-300'  },
+  completed:  { icon: '🏆', badge: 'bg-green-900/50  text-success'  },
 }
 
 export default function AllGamesSection({
@@ -53,12 +53,7 @@ export default function AllGamesSection({
   }, [games, selected, completedMode, category])
 
   return (
-    <motion.div
-      className="w-full bg-bg-card rounded-xl overflow-hidden"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
-    >
+    <div className="w-full bg-bg-card rounded-tile overflow-hidden enter-card">
       {/* Section header */}
       <button
         onClick={() => setOpen((o) => !o)}
@@ -68,7 +63,7 @@ export default function AllGamesSection({
         <span className="text-xl">{meta.icon}</span>
         <span className="text-xl font-bold">{label}</span>
         <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${meta.badge}`}>
-          {loading ? '…' : filtered.length}
+          {loading ? <Skeleton className="inline-block h-3 w-5 align-middle" /> : filtered.length}
         </span>
         <span
           className="ml-auto text-text-secondary text-xs transition-transform duration-300 shrink-0"
@@ -87,8 +82,10 @@ export default function AllGamesSection({
         <div className="overflow-hidden min-h-0">
           <div className="border-t border-bg-main">
             {loading ? (
-              <div className="flex justify-center py-10">
-                <Spinner size={36} />
+              <div aria-busy="true" className="p-4 flex flex-col gap-2">
+                {[0, 1, 2].map((i) => (
+                  <GameRowSkeleton key={i} />
+                ))}
               </div>
             ) : games.length === 0 ? (
               <p className="text-center text-text-secondary text-sm py-8">{T.cards.noGames}</p>
@@ -123,6 +120,6 @@ export default function AllGamesSection({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

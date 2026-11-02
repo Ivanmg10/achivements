@@ -33,7 +33,7 @@ export default function StatusBadge({
       <div className={`absolute -inset-7 rounded-full motion-safe:animate-pulse ${t.glow}`} />
       <div className={`relative w-24 h-24 rounded-[22px] grid place-items-center ring-1 ${t.tile}`}>
         {icon}
-        <span className={`absolute -right-2 -bottom-2 w-8 h-8 rounded-[10px] grid place-items-center bg-bg-card ring-1 ring-ink/10 ${t.corner}`}>
+        <span className={`absolute -right-2 -bottom-2 w-8 h-8 rounded-tile grid place-items-center bg-bg-card ring-1 ring-ink/10 ${t.corner}`}>
           {corner}
         </span>
       </div>

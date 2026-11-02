@@ -18,6 +18,11 @@ export function MainViewProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
+/** The view, or null where the app's providers are not mounted (a signed-out visitor's loading screen). */
+export function useOptionalMainView() {
+  return useContext(MainViewContext)
+}
+
 export function useMainView() {
   const ctx = useContext(MainViewContext)
   if (!ctx) throw new Error('useMainView must be used inside MainViewProvider')

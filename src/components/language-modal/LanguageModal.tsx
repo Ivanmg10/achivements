@@ -1,19 +1,8 @@
 'use client'
 
 import CommonModal from '../common-modal/CommonModal'
-import { useLanguage, Lang } from '@/context/LanguageContext'
-
-const LANGUAGES: { id: Lang; label: string; flag: string }[] = [
-  { id: 'en', label: 'English', flag: '🇬🇧' },
-  { id: 'es', label: 'Español', flag: '🇪🇸' },
-  { id: 'pt', label: 'Português', flag: '🇧🇷' },
-  { id: 'fr', label: 'Français', flag: '🇫🇷' },
-  { id: 'de', label: 'Deutsch', flag: '🇩🇪' },
-  { id: 'it', label: 'Italiano', flag: '🇮🇹' },
-  { id: 'ru', label: 'Русский', flag: '🇷🇺' },
-  { id: 'pl', label: 'Polski', flag: '🇵🇱' },
-  { id: 'ja', label: '日本語', flag: '🇯🇵' },
-]
+import { useLanguage } from '@/context/LanguageContext'
+import { LANGUAGES, type Lang } from '@/utils/languages'
 
 interface Props {
   isOpen: boolean
@@ -29,7 +18,7 @@ export default function LanguageModal({ isOpen, onClose }: Props) {
   }
 
   return (
-    <CommonModal isOpen={isOpen} onClose={onClose} className="max-w-lg">
+    <CommonModal isOpen={isOpen} onClose={onClose} size="md">
       <h2 className="text-xl font-bold mb-4">{T.userConfig.language}</h2>
 
       <div
@@ -43,7 +32,7 @@ export default function LanguageModal({ isOpen, onClose }: Props) {
             onClick={() => handleSelect(id)}
             role="radio"
             aria-checked={lang === id}
-            className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-all ${
+            className={`flex items-center gap-2 px-3 py-3 rounded-tile transition-all ${
               lang === id
                 ? 'bg-accent text-bg-main'
                 : 'bg-bg-main hover:bg-bg-card text-text-main'

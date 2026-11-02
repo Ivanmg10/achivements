@@ -30,7 +30,7 @@ jest.mock('@/components/groups/steam-sortable-item/SteamSortableItem', () => ({
   ),
 }))
 
-import { act, render, screen, fireEvent, waitFor, within } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { notify } from '@/lib/notify'
 import GroupDetailPage from './page'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
@@ -55,6 +55,8 @@ function json(body: unknown, ok = true, status = ok ? 200 : 500) {
 beforeEach(() => {
   jest.clearAllMocks()
   ;(useSteamGamesData as jest.Mock).mockReturnValue({ library: [] })
+  // These tests read the detailed list; the covers have their own test below.
+  localStorage.setItem('group-detail-view', 'list')
   global.fetch = jest.fn((url: string) => (url === '/api/groups/5' ? json(GROUP) : json({}))) as unknown as typeof fetch
 })
 
@@ -64,7 +66,7 @@ test('renders RA and Steam items with their own cards, even with the same game i
   expect(screen.getByText('steam-item Portal 2')).toBeInTheDocument()
   // The add-game modal is downloaded the first time it opens.
   expect(screen.queryByTestId('add-modal')).not.toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: en.groups.addGame }))
+  fireEvent.click(screen.getByRole('button', { name: en.groups.addGames }))
   expect(await screen.findByTestId('add-modal')).toHaveTextContent('ra:620,steam:620')
 })
 
@@ -104,8 +106,8 @@ test('the decade filter shows once a year is known, for Steam games too', async 
         : json({}),
   )
   render(<GroupDetailPage />)
-  const decade = await screen.findByRole('group', { name: en.groups.filterDecadeLabel })
-  fireEvent.click(within(decade).getByRole('button', { name: "10's" }))
+  fireEvent.click(await screen.findByRole('combobox', { name: en.groups.filterDecadeLabel }))
+  fireEvent.click(screen.getByRole('option', { name: "10's" }))
   expect(screen.getByText('steam-item Portal 2')).toBeInTheDocument()
   expect(screen.queryByText('ra-item Zelda')).not.toBeInTheDocument()
 })
@@ -156,7 +158,21 @@ test('the completed filter uses live Steam progress', async () => {
   })
   render(<GroupDetailPage />)
   await screen.findByText('ra-item Zelda')
-  fireEvent.click(screen.getByRole('button', { name: en.groups.filter100 }))
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${en.groups.filter100}`) }))
   expect(screen.getByText('steam-item Portal 2')).toBeInTheDocument()
   expect(screen.queryByText('ra-item Zelda')).not.toBeInTheDocument()
+})
+
+test('covers by default: a banner with the group and one cover per game, each opening it', async () => {
+  localStorage.clear()
+  render(<GroupDetailPage />)
+  expect(await screen.findByRole('heading', { name: 'Mix' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: en.groups.viewCovers })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByRole('link', { name: 'Zelda' })).toHaveAttribute('href', '/gameInfo/620')
+  expect(screen.getByRole('link', { name: 'Portal 2' })).toHaveAttribute('href', '/steamGame/620')
+  expect(screen.queryByText('ra-item Zelda')).not.toBeInTheDocument()
+  expect(screen.getByText(en.groups.notStartedCount.replace('{n}', '2'))).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: en.groups.viewList }))
+  expect(screen.getByText('ra-item Zelda')).toBeInTheDocument()
+  expect(localStorage.getItem('group-detail-view')).toBe('list')
 })

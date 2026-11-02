@@ -2,12 +2,15 @@ import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { logAdminAction, requireAdmin } from '@/lib/adminAuth'
 import { fetchRaProfile, validRaCredentials } from '@/lib/raProfile'
+import { sealRaKey } from '@/lib/raKey'
 import { steamApiKey } from '@/lib/fetchSteam'
 import { clearUserCache } from '@/lib/steamCache'
+import { forgetUnlocks } from '@/lib/steamUnlocks'
 import { getPlayerSummaries } from '@/lib/steamClient'
 import { readSteamId } from '@/lib/steamAccount'
 import { findPsnAccount, psnConfigured, psnFailure, psnSummary } from '@/lib/psnClient'
 import { findXboxAccount, isGamertag, xboxConfigured, xboxFailure, xboxSummary } from '@/lib/xboxClient'
+import { withXboxTelemetry } from '@/lib/xboxTelemetry'
 import { forgetUser } from '@/lib/userRecord'
 
 /**
@@ -49,8 +52,9 @@ export async function POST(req: Request) {
       const { profile } = fetched
 
       try {
-        await pool.query('UPDATE users SET "raUser" = $1, rausername = $2, raid = $3 WHERE id = $4', [
-          JSON.stringify(profile), profile.User, apiKey, target.id,
+        const { sealed, hash } = sealRaKey(apiKey)
+        await pool.query('UPDATE users SET "raUser" = $1, rausername = $2, raid = $3, raid_hash = $4 WHERE id = $5', [
+          JSON.stringify(profile), profile.User, sealed, hash, target.id,
         ])
       } catch (err) {
         if ((err as { code?: string }).code === '23505') {
@@ -111,7 +115,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, psnaccountid: account.accountId, psnusername: account.onlineId })
     }
 
-    if (body.platform === 'xbox') {
+    if (body.platform === 'xbox') return withXboxTelemetry('admin/users/accounts/xbox', async () => {
       const gamertag = typeof body.gamertag === 'string' ? body.gamertag.trim() : ''
       if (!isGamertag(gamertag)) return NextResponse.json({ error: 'An Xbox gamertag (up to 15 letters, digits or spaces) is required' }, { status: 400 })
       if (!xboxConfigured()) return NextResponse.json({ error: 'not-configured' }, { status: 503 })
@@ -130,7 +134,7 @@ export async function POST(req: Request) {
       forgetUser(target.id)
       await logAdminAction(auth.admin, 'link-xbox', target, { xboxxuid: account.xuid, xboxgamertag: account.gamertag })
       return NextResponse.json({ ok: true, xboxxuid: account.xuid, xboxgamertag: account.gamertag })
-    }
+    })
 
     return NextResponse.json({ error: 'platform must be ra, steam, psn or xbox' }, { status: 400 })
   } catch (err) {
@@ -155,10 +159,11 @@ export async function DELETE(req: Request) {
     if (!target) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
     if (platform === 'ra') {
-      await pool.query('UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL WHERE id = $1', [target.id])
+      await pool.query('UPDATE users SET "raUser" = NULL, rausername = NULL, raid = NULL, raid_hash = NULL WHERE id = $1', [target.id])
     } else if (platform === 'steam') {
-      await pool.query('UPDATE users SET steamid = NULL, steamusername = NULL WHERE id = $1', [target.id])
+      await pool.query('UPDATE users SET steamid = NULL, steamusername = NULL, steam_login_id = NULL WHERE id = $1', [target.id])
       await clearUserCache(String(target.id))
+      await forgetUnlocks(String(target.id))
     } else if (platform === 'psn') {
       await pool.query('UPDATE users SET psnaccountid = NULL, psnusername = NULL WHERE id = $1', [target.id])
       await clearUserCache(String(target.id))

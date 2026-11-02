@@ -1,5 +1,6 @@
 import { createHash } from 'crypto'
 import pool from '@/lib/db'
+import { readRaKey } from '@/lib/raKey'
 import type { RetroAchievementsUserProfile } from '@/types/types'
 
 type SavedGame = { id: number; title: string; imageIcon: string } | null
@@ -51,6 +52,9 @@ const COLUMNS = `id, username, password, theme, avatar, raid, rausername, steami
 const TTL_MS = 60_000
 const cache = new Map<string, { row: UserRecord | null; at: number }>()
 
+/** A row as the app reads it: the RA key opened, or null when it cannot be. */
+const toRecord = (row: UserRecord | undefined): UserRecord | null => (row ? { ...row, raid: readRaKey(row.raid) } : null)
+
 type LoadOptions = { fresh?: boolean; notBefore?: number }
 
 /** The row and when it was read from the database. */
@@ -63,7 +67,7 @@ export async function loadUserSynced(
   if (!fresh && hit && Date.now() - hit.at < TTL_MS && hit.at >= notBefore) return hit
 
   const { rows } = await pool.query(`SELECT ${COLUMNS} FROM users WHERE id = $1`, [key])
-  const entry = { row: (rows[0] as UserRecord | undefined) ?? null, at: Date.now() }
+  const entry = { row: toRecord(rows[0]), at: Date.now() }
   cache.set(key, entry)
   return entry
 }
@@ -74,7 +78,13 @@ export async function loadUser(id: string | number, options: LoadOptions = {}): 
 
 export async function loadUserByUsername(username: string): Promise<UserRecord | null> {
   const { rows } = await pool.query(`SELECT ${COLUMNS} FROM users WHERE username = $1`, [username])
-  return (rows[0] as UserRecord | undefined) ?? null
+  return toRecord(rows[0])
+}
+
+/** The user who signs in with this Steam account (migrations/041_steam_login.sql). */
+export async function loadUserBySteamLogin(steamid: string): Promise<UserRecord | null> {
+  const { rows } = await pool.query(`SELECT ${COLUMNS} FROM users WHERE steam_login_id = $1`, [steamid])
+  return toRecord(rows[0])
 }
 
 /** Drop the cached row after changing it, so this instance sees the change at once. */

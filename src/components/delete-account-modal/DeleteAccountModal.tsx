@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import { signOut } from 'next-auth/react'
 import CommonModal from '@/components/common-modal/CommonModal'
-import PasswordInput from '@/components/password-input/PasswordInput'
+import PasswordInput from '@/components/ui/PasswordInput'
 import { useLanguage } from '@/context/LanguageContext'
+import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
 
 /** Asks for the password once more, then deletes the account and signs out. */
 export default function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -56,30 +58,29 @@ export default function DeleteAccountModal({ isOpen, onClose }: { isOpen: boolea
       <p className="text-sm text-text-secondary">{D.confirmText}</p>
 
       <PasswordInput
-        id="delete-account-password"
         label={D.password}
         value={password}
         onChange={(v) => { setPassword(v); setError(null) }}
         disabled={loading}
       />
 
-      {error && <p role="alert" className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>}
+      {error && <Notice tone="danger">{error}</Notice>}
 
       <div className="flex gap-3 mt-2">
-        <button
+        <Button
           onClick={handleClose}
           disabled={loading}
-          className="flex-1 bg-bg-main text-text-secondary rounded-xl py-3 hover:text-text-main transition-colors disabled:opacity-50"
+          variant="secondary" size="lg" className="flex-1"
         >
           {T.editProfileModal.cancel}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleDelete}
           disabled={!password || loading}
-          className="flex-1 bg-red-600 text-white font-bold rounded-xl py-3 hover:bg-red-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          variant="danger" size="lg" className="flex-1"
         >
           {loading ? D.deleting : D.confirm}
-        </button>
+        </Button>
       </div>
     </CommonModal>
   )

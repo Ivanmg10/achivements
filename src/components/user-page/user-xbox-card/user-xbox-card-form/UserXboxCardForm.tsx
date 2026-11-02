@@ -5,6 +5,7 @@ import type { XboxLinkError } from '@/hooks/useXboxLink'
 import { useLanguage } from '@/context/LanguageContext'
 import XboxLogo from '@/components/xbox-logo/XboxLogo'
 import { CONNECT_CLASS } from '@/components/user-page/user-platform-card/UserPlatformCard'
+import { fieldClass } from '@/components/ui/Input'
 
 const INPUT_ID = 'xbox-gamertag'
 
@@ -45,10 +46,10 @@ export default function UserXboxCardForm({
         onChange={(e) => setGamertag(e.target.value)}
         aria-invalid={error !== null}
         aria-describedby={error ? `${INPUT_ID}-error` : undefined}
-        className="rounded-xl bg-bg-main px-3 py-2 w-full text-sm"
+        className={fieldClass({ size: 'sm', invalid: error !== null })}
       />
       {error && (
-        <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-red-400">
+        <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-danger">
           {T.xbox.errors[error]}
         </p>
       )}

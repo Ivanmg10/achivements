@@ -16,6 +16,8 @@ import MainPagePsnNav from '@/components/main-page/main-page-charts/main-page-ps
 import MainPageXboxNav from '@/components/main-page/main-page-charts/main-page-xbox-nav/MainPageXboxNav'
 import BrowseSearch from './browse-search/BrowseSearch'
 import BrowseConsoles from './browse-consoles/BrowseConsoles'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { RememberedHeight } from '@/components/ui/RememberedHeight'
 
 /**
  * The Browse section: the way into each list (by status, and by console on
@@ -24,8 +26,8 @@ import BrowseConsoles from './browse-consoles/BrowseConsoles'
  * nav and the consoles follow it.
  */
 export default function MainPageBrowse() {
-  const { wantToPlay, playing, completed } = useAllGamesGlobal()
-  const { all } = useGamesData()
+  const { wantToPlay, playing, completed, loading } = useAllGamesGlobal()
+  const { all, isLoading } = useGamesData()
   const { library: steam } = useSteamGamesData()
   const { library: psn } = usePsnGamesData()
   const { library: xbox } = useXboxGamesData()
@@ -39,7 +41,7 @@ export default function MainPageBrowse() {
   const showConsoles = platform === 'ra' && consoles.length > 0
 
   return (
-    <div className="flex flex-col gap-4">
+    <RememberedHeight id="browse" loading={loading || isLoading} className="flex flex-col gap-4">
       <ChartCard>
         {platform === 'steam' ? <MainPageSteamNav /> : platform === 'psn' ? <MainPagePsnNav /> : platform === 'xbox' ? <MainPageXboxNav /> : <MainPageConsoleNav />}
       </ChartCard>
@@ -48,11 +50,24 @@ export default function MainPageBrowse() {
         <BrowseSearch library={library} />
       </ChartCard>
 
+      {platform === 'ra' && isLoading && all.length === 0 && (
+        <ChartCard>
+          <div aria-busy="true" className="flex flex-col gap-3">
+            <Skeleton className="h-3 w-24" />
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2">
+              {Array.from({ length: 12 }, (_, i) => (
+                <Skeleton key={i} radius="tile" className="h-[4.5rem]" />
+              ))}
+            </div>
+          </div>
+        </ChartCard>
+      )}
+
       {showConsoles && (
         <ChartCard>
           <BrowseConsoles consoles={consoles} />
         </ChartCard>
       )}
-    </div>
+    </RememberedHeight>
   )
 }

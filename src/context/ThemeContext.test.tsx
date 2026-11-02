@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ThemeProvider, useTheme } from "./ThemeContext";
 import { useSession } from "next-auth/react";
+import { themeIconHref } from "@/utils/themeIcon";
 
 (useSession as jest.Mock).mockReturnValue({ data: null });
 
@@ -91,6 +92,40 @@ test("ignores a theme the app has no stylesheet for", () => {
     </ThemeProvider>,
   );
   expect(screen.getByTestId("theme").textContent).toBe("dark");
+});
+
+test("a theme since removed lands on dark, also over a theme already on screen, and is not stored", () => {
+  (useSession as jest.Mock).mockReturnValue({ data: { user: { theme: "red" } }, status: "authenticated" });
+  const { rerender } = render(
+    <ThemeProvider>
+      <TestConsumer />
+    </ThemeProvider>,
+  );
+  expect(screen.getByTestId("theme").textContent).toBe("red");
+  (useSession as jest.Mock).mockReturnValue({ data: { user: { theme: "synthwave" } }, status: "authenticated" });
+  rerender(
+    <ThemeProvider>
+      <TestConsumer />
+    </ThemeProvider>,
+  );
+  expect(screen.getByTestId("theme").textContent).toBe("dark");
+  expect(document.documentElement.dataset.theme).toBe("dark");
+  expect(localStorage.getItem("app-theme")).toBe("dark");
+});
+
+test("a change of theme swaps the favicon without touching anything else", () => {
+  (useSession as jest.Mock).mockReturnValue({ data: null, status: "unauthenticated" });
+  const link = document.head.appendChild(document.createElement("link"));
+  link.id = "theme-icon";
+  render(
+    <ThemeProvider defaultTheme="dark">
+      <TestConsumer />
+    </ThemeProvider>,
+  );
+  expect(link.getAttribute("href")).toBe(themeIconHref("dark"));
+  fireEvent.click(screen.getByText("set red"));
+  expect(link.getAttribute("href")).toBe(themeIconHref("red"));
+  link.remove();
 });
 
 test("a re-render of the provider keeps the same value, so what reads the theme is not re-rendered for nothing", () => {

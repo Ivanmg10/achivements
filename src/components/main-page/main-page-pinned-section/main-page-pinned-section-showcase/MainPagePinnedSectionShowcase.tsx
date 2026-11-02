@@ -10,11 +10,12 @@ import { SectionFallback } from '@/components/ui/SectionFallback'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import ShowcaseTile from '@/components/showcase-tile/ShowcaseTile'
 import MainPagePinnedSectionSortable from '../main-page-pinned-section-sortable/MainPagePinnedSectionSortable'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 // Downloaded the first time it is opened, not with the page.
 const ShowcasePickerModal = dynamic(() => import('@/components/showcase-picker-modal/ShowcasePickerModal'), { loading: () => null })
 
-const SLOT = 'w-[calc(50%-0.375rem)] sm:w-40 min-h-44'
+const SLOT = 'w-[calc(50%-0.375rem)] sm:w-40 h-44'
 
 /**
  * The achievement showcase, at the top of the Pinned section: up to five
@@ -43,7 +44,7 @@ export default function MainPagePinnedSectionShowcase() {
       {isLoading ? (
         <div aria-busy="true" className="flex flex-wrap gap-3">
           {Array.from({ length: SHOWCASE_MAX }, (_, i) => (
-            <div key={i} className={`${SLOT} rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none`} />
+            <Skeleton key={i} radius="tile" className={SLOT} />
           ))}
         </div>
       ) : error ? (
@@ -71,7 +72,7 @@ export default function MainPagePinnedSectionShowcase() {
               key={i}
               type="button"
               onClick={() => setPickerOpen(true)}
-              className={`${SLOT} rounded-xl border-2 border-dashed border-ink/15 text-text-secondary hover:text-accent hover:border-accent/50 flex flex-col items-center justify-center gap-2 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
+              className={`${SLOT} rounded-tile border-2 border-dashed border-ink/15 text-text-secondary hover:text-accent hover:border-accent/50 flex flex-col items-center justify-center gap-2 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70`}
             >
               <IconPlus size={22} aria-hidden="true" />
               {T.showcase.addSlot}

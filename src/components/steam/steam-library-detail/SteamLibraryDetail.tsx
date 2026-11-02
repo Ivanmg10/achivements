@@ -8,6 +8,7 @@ import LibraryGameDetail, { type LibraryCategory } from '@/components/library-ga
 import { fromSteam } from '@/utils/gameInsights'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { SteamGameProgress } from '@/types/steam'
+import { latestFullSetCompletedAt } from '@/utils/completionDates'
 
 const asCategory = (c?: string): LibraryCategory => (c === 'wantToPlay' || c === 'completed' ? c : 'playing')
 
@@ -31,10 +32,11 @@ export default function SteamLibraryDetail({ game, category }: { game: SteamGame
       category={asCategory(category)}
       game={{ source: 'steam', id: game.id, title: game.title, iconUrl: game.imageIcon || undefined }}
       items={items}
+      completedAt={latestFullSetCompletedAt(items)}
       state={isLoading ? 'loading' : error ? 'error' : 'ready'}
       errorNode={
         <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-red-400">{T.steam.achievementsError}</p>
+          <p role="alert" className="text-sm text-danger">{T.steam.achievementsError}</p>
           <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
           <button onClick={retry} className="text-xs bg-bg-main px-3 py-1 rounded-full hover:bg-ink/10 transition-colors">
             {T.steam.retry}

@@ -1,4 +1,4 @@
-jest.mock('@/lib/email', () => ({ emailConfigured: jest.fn(), sendEmail: jest.fn() }))
+jest.mock('@/lib/email', () => ({ ...jest.requireActual('@/lib/email'), emailConfigured: jest.fn(), sendEmail: jest.fn() }))
 jest.mock('@/lib/siteUrl', () => ({ CONTACT_EMAIL: 'privacy@test.com' }))
 
 import { maskEmail, sendEmailChangedNotice } from './emailChangedNotice'
@@ -23,6 +23,13 @@ test('tells the old address, with the new one masked and who changed it', async 
   expect(mail.text).toContain('n***@evil.com')
   expect(mail.text).not.toContain('new@evil.com')
   expect(mail.text).toContain('privacy@test.com')
+})
+
+test('nothing typed reaches the message as markup', async () => {
+  await sendEmailChangedNotice({ to: 'old@test.com', username: 'ana', newEmail: 'x@<b>hi</b>.example', byAdmin: false })
+  const mail = (sendEmail as jest.Mock).mock.calls[0][0]
+  expect(mail.html).not.toContain('<b>hi')
+  expect(mail.html).toContain('&#60;b&#62;hi')
 })
 
 test('says "someone" when it was not an admin', async () => {

@@ -31,7 +31,7 @@ export default function SteamGameInfoAchievementCard({
   return (
     <li
       data-ach={a.apiname}
-      className={`relative flex items-start gap-3 rounded-xl p-3 transition-colors duration-500 ${
+      className={`relative flex items-start gap-3 rounded-tile p-3 transition-colors duration-500 ${
         highlighted ? 'bg-accent/15' : pinned ? 'bg-warning/10' : 'bg-bg-main/40'
       }`}
     >
@@ -39,7 +39,7 @@ export default function SteamGameInfoAchievementCard({
         type="button"
         onClick={onOpen}
         aria-label={concealed ? T.steam.hiddenAchievement : a.title}
-        className="absolute inset-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       />
       {a.badgeUrl ? (
         <Image
@@ -47,11 +47,11 @@ export default function SteamGameInfoAchievementCard({
           alt=""
           width={48}
           height={48}
-          className={`w-12 h-12 rounded-lg object-cover shrink-0 ${a.earned ? 'ring-2 ring-accent' : 'grayscale opacity-50'}`}
+          className={`w-12 h-12 rounded-box object-cover shrink-0 ${a.earned ? 'ring-2 ring-accent' : 'grayscale opacity-50'}`}
           unoptimized
         />
       ) : (
-        <div className="w-12 h-12 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+        <div className="w-12 h-12 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
       )}
 
       <div className="flex flex-col min-w-0 flex-1 gap-0.5">
@@ -73,7 +73,7 @@ export default function SteamGameInfoAchievementCard({
           )}
           {a.globalPct !== null && (
             <span className="text-text-secondary">
-              {formatRarity(a.globalPct)}
+              {formatRarity(a.globalPct, lang)}
               {T.achievement.haveIt}
             </span>
           )}

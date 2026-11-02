@@ -1,23 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion, type Variants } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { IconMail, IconX } from '@tabler/icons-react'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Spinner from '@/components/main-spinner/Spinner'
 import { useLanguage } from '@/context/LanguageContext'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
-
-const overlayVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.18 } },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
-}
-const contentVariants: Variants = {
-  hidden: { opacity: 0, y: -14, scale: 0.97 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } },
-  exit: { opacity: 0, y: -8, scale: 0.97, transition: { duration: 0.15, ease: 'easeIn' } },
-}
+import Button from '@/components/ui/Button'
+import Modal from '@/components/ui/Modal'
 
 /**
  * Asks for the address on the account and has a reset link sent to it.
@@ -83,28 +74,13 @@ export default function ForgotPasswordModal({ isOpen, onClose }: { isOpen: boole
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-24 px-4"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          onClick={onClose}
-        >
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-label={T.passwordReset.forgotTitle}
-            className="bg-bg-card rounded-2xl w-full max-w-sm p-6 flex flex-col gap-4 shadow-2xl border border-ink/5"
-            variants={contentVariants}
-            onClick={(e) => e.stopPropagation()}
-          >
+        <Modal isOpen={isOpen} onClose={onClose} aria-label={T.passwordReset.forgotTitle} size="sm" showClose={false} className="gap-4">
             <div className="flex items-start justify-between gap-3">
               <h2 className="text-lg font-bold">{T.passwordReset.forgotTitle}</h2>
               <button
                 onClick={onClose}
                 aria-label="Close"
-                className="p-1 rounded-lg text-text-secondary hover:text-text-main transition-colors"
+                className="p-1 rounded-chip text-text-secondary hover:text-text-main transition-colors"
               >
                 <IconX className="w-4 h-4" aria-hidden="true" />
               </button>
@@ -135,10 +111,10 @@ export default function ForgotPasswordModal({ isOpen, onClose }: { isOpen: boole
                     required
                     disabled={submitting}
                   />
-                  <button
+                  <Button
                     type="submit"
                     disabled={submitting}
-                    className="bg-accent text-bg-main w-full py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors disabled:opacity-70 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                    className="w-full"
                   >
                     {submitting ? (
                       <>
@@ -148,12 +124,11 @@ export default function ForgotPasswordModal({ isOpen, onClose }: { isOpen: boole
                     ) : (
                       T.passwordReset.send
                     )}
-                  </button>
+                  </Button>
                 </form>
               </>
             )}
-          </motion.div>
-        </motion.div>
+          </Modal>
       )}
     </AnimatePresence>
   )

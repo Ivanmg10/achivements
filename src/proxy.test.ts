@@ -8,6 +8,24 @@ const request = (path: string) => new NextRequest(`http://localhost:3000${path}`
 
 beforeEach(() => jest.clearAllMocks())
 
+describe('a write to the API', () => {
+  const write = (origin: string, method = 'POST') =>
+    proxy(new NextRequest('http://localhost:3000/api/updateTheme', { method, headers: { origin, host: 'localhost:3000' } }))
+
+  test('from this site goes through', async () => {
+    expect((await write('http://localhost:3000')).status).toBe(200)
+  })
+
+  test.each(['https://evil.example', 'https://dev.localhost:3000', 'null'])('from %s is refused', async (origin) => {
+    expect((await write(origin)).status).toBe(403)
+    expect((await write(origin, 'DELETE')).status).toBe(403)
+  })
+
+  test('a read is left alone', async () => {
+    expect((await write('https://evil.example', 'GET')).status).toBe(200)
+  })
+})
+
 test('the landing, the auth page, the legal pages and the images other sites fetch are open to anyone', async () => {
   for (const path of ['/', '/authPage', '/privacy', '/terms', '/opengraph-image', '/apple-icon', '/rankings', '/rankings/how']) {
     const res = await proxy(request(path))
@@ -23,6 +41,17 @@ test('the comparison and how-to pages are open to anyone, but only under their p
   expect(getToken).not.toHaveBeenCalled()
   ;(getToken as jest.Mock).mockResolvedValue(null)
   expect((await proxy(request('/compare'))).status).toBe(307)
+})
+
+test('a profile and its preview image are open to anyone, but not the account page or a game in a profile', async () => {
+  for (const path of ['/user/ana', '/user/ana/opengraph-image', '/user/ana/opengraph-image-1a2b']) {
+    expect((await proxy(request(path))).status).toBe(200)
+  }
+  expect(getToken).not.toHaveBeenCalled()
+  ;(getToken as jest.Mock).mockResolvedValue(null)
+  for (const path of ['/user', '/user/ana/psn/123']) {
+    expect((await proxy(request(path))).status).toBe(307)
+  }
 })
 
 test('the app needs an account: a visitor is sent to sign in', async () => {

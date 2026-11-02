@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cachedJson } from '@/lib/httpCache'
 import { requireXboxSession } from '@/lib/apiAuth'
 import { xboxFailure, xboxLanguage, xboxLatestAchievements, xboxRecentAchievements } from '@/lib/xboxClient'
-
-/** How long the browser may keep an answer: short, as these change as the person plays. */
-const BROWSER_TTL_MS = 2 * 60 * 1000
+import { withXboxTelemetry } from '@/lib/xboxTelemetry'
+import { visibleGamesForUser } from '@/lib/gameVisibility'
 
 /** Days each scope looks back — the same windows as Steam's and PSN's. */
 const DAYS = { activity: 60, year: 366 } as const
@@ -14,7 +13,7 @@ const DAYS = { activity: 60, year: 366 } as const
  * profile column; `activity` — the last 60 days, for the main page's charts;
  * `year` — the last year, for the streak and the heatmap.
  */
-export async function GET(req: NextRequest) {
+async function get(req: NextRequest) {
   const auth = await requireXboxSession(req)
   if (!auth.ok) return auth.response
   const { id, xboxxuid } = auth.session
@@ -31,8 +30,13 @@ export async function GET(req: NextRequest) {
       scope === 'recent'
         ? await xboxLatestAchievements(xboxxuid, id, language)
         : await xboxRecentAchievements(xboxxuid, scope, DAYS[scope], id, language)
-    return cachedJson(achievements, BROWSER_TTL_MS)
+    const visible = await visibleGamesForUser(id, achievements, 'xbox', (achievement) => achievement.gameId)
+    return cachedJson(visible, 0)
   } catch (err) {
     return xboxFailure(err, 'xbox/recentAchievements')
   }
+}
+
+export async function GET(req: NextRequest) {
+  return withXboxTelemetry('xbox/recentAchievements', () => get(req))
 }

@@ -12,6 +12,16 @@ test('every theme has its colours in globals.css', () => {
   for (const theme of THEMES) expect(css).toContain(`[data-theme="${theme}"]`)
 })
 
-test('dark and light come with a violet, a red and a green accent, first in the picker', () => {
-  expect(THEME_GROUPS[0]).toEqual({ id: 'base', themes: ['dark', 'dark-red', 'dark-green', 'light', 'light-red', 'light-green'] })
+test('dark and light come apart, with the same accents, first in the picker', () => {
+  expect(THEME_GROUPS[0]).toEqual({ id: 'dark', themes: ['dark', 'dark-red', 'dark-green', 'dark-blue', 'dark-white'] })
+  expect(THEME_GROUPS[1]).toEqual({ id: 'light', themes: ['light', 'light-red', 'light-green', 'light-blue', 'light-black'] })
+})
+
+test('a removed theme is gone from the list and from the stylesheet', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const css: string = require('fs').readFileSync(require('path').join(__dirname, '../app/globals.css'), 'utf8')
+  for (const theme of ['synthwave', 'catppuccin', 'rose-pine', 'oled', 'ocean', 'terminal', 'daxter', 'bentley', 'clank', 'gruvbox', 'san-andreas']) {
+    expect(THEMES).not.toContain(theme)
+    expect(css).not.toContain(`[data-theme="${theme}"]`)
+  }
 })

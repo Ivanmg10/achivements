@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
-import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamFavoriteAchievements } from '@/hooks/useSteamFavoriteAchievements'
 import SteamGameInfoAchievement from './steam-game-info-achievement/SteamGameInfoAchievement'
@@ -17,14 +16,18 @@ import type { SteamAchievementUnified } from '@/types/steam'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useLocationHash } from '@/hooks/useLocationHash'
 import { guideLinks } from '@/utils/guideLinks'
-import GameInfoTableFoldBar from '@/components/game-info-table-fold-bar/GameInfoTableFoldBar'
-import AchievementWarningPanel from '@/components/achievement-warning-panel/AchievementWarningPanel'
+import MissableNotice from '@/components/missable-notice/MissableNotice'
+import AchievementTableToolbar from '@/components/achievement-table-toolbar/AchievementTableToolbar'
+import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
+import { SURFACE } from '@/components/ui/surface'
+import { TABLE, TH } from '@/components/ui/dataTable'
+import { plural } from '@/utils/utils'
 import AchievementDetailModal from '@/components/achievement-detail-modal/AchievementDetailModal'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
+type Filter = 'all' | 'earned' | 'unearned' | 'online'
 
-type Filter = 'all' | 'earned' | 'unearned'
-
-const COLLAPSED_ROWS = 3
+/** Rows shown before "show the other N". */
+const FIRST_ROWS = 8
 const HIGHLIGHT_MS = 2500
 
 function sortAchievements(list: SteamAchievementUnified[], { key, dir }: SteamSortState): SteamAchievementUnified[] {
@@ -51,15 +54,16 @@ function sortAchievements(list: SteamAchievementUnified[], { key, dir }: SteamSo
 
 /**
  * A Steam game's achievements as a table (a card list on phones), matching
- * RA's GameInfoTable: all/earned/unearned filter, sortable columns (order,
- * rarity, unlock date), and fold to the first rows.
+ * RA's GameInfoTable: all/earned/unearned tabs with their counts, a search,
+ * sortable columns (order, rarity, unlock date), and the first rows then a
+ * button for the rest.
  *
  * Opening the page from a badge link (…#ach-<apiname>) scrolls to that
  * achievement and highlights it briefly. Each achievement can be pinned to
  * the main page, as RA's table does, and the ones pinned when it loaded lead the list; each
  * opens in a detail window with links to guides. The ones that likely need
- * online play and are still locked are listed in a warning above, as RA
- * lists its missables — servers close.
+ * online play and are still locked are named in a line above, as RA's
+ * missables, with a button that keeps only them — servers close.
  */
 export default function SteamGameInfoTable({
   achievements,
@@ -70,19 +74,14 @@ export default function SteamGameInfoTable({
   appId: number
   gameTitle: string
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const { pinned, leading, toggle, canPin } = useSteamFavoriteAchievements(appId, gameTitle)
   const [filter, setFilter] = useState<Filter>('all')
   const [sortState, setSortState] = useState<SteamSortState>({ key: 'default', dir: 'asc' })
-  const [expanded, setExpanded] = useState(true)
+  const [showAll, setShowAll] = useState(false)
+  const [query, setQuery] = useState('')
   const [highlighted, setHighlighted] = useState<string | null>(null)
   const [selected, setSelected] = useState<SteamAchievementUnified | null>(null)
-
-  const FILTER_LABELS: Record<Filter, string> = {
-    all: T.gameInfoTable.filterAll,
-    earned: T.gameInfoTable.filterEarned,
-    unearned: T.gameInfoTable.filterUnearned,
-  }
 
   // Deep link from a badge: show it (state, so while rendering), then scroll to
   // the visible copy (table row on desktop, card on phones) once the list is there.
@@ -93,7 +92,8 @@ export default function SteamGameInfoTable({
   useWhenChanged([linked ? linkedApiname : null, achievements], () => {
     if (!linked) return
     setFilter('all')
-    setExpanded(true)
+    setQuery('')
+    setShowAll(true)
     setHighlighted(linkedApiname)
   })
 
@@ -110,19 +110,24 @@ export default function SteamGameInfoTable({
     return () => clearTimeout(timer)
   }, [linked, linkedApiname, achievements])
 
+  const onlineLocked = useMemo(() => achievements.filter((a) => a.likelyOnline && !a.earned), [achievements])
+
   const filtered = useMemo(() => {
-    const list =
+    let list =
       filter === 'earned'
         ? achievements.filter((a) => a.earned)
         : filter === 'unearned'
           ? achievements.filter((a) => !a.earned)
-          : achievements
+          : filter === 'online'
+            ? onlineLocked
+            : achievements
+    // Searched by what is shown: a secret one by its hidden label, not its text.
+    const q = query.trim().toLowerCase()
+    if (q) list = list.filter((a) => (a.hidden && !a.earned ? T.steam.hiddenAchievement : `${a.title} ${a.description}`).toLowerCase().includes(q))
     const sorted = sortAchievements(list, sortState)
     // Pinned first, each part in the chosen order — as RA's table does.
     return canPin ? [...sorted.filter((a) => leading.has(a.apiname)), ...sorted.filter((a) => !leading.has(a.apiname))] : sorted
-  }, [achievements, filter, sortState, canPin, leading])
-
-  const onlineLocked = useMemo(() => achievements.filter((a) => a.likelyOnline && !a.earned), [achievements])
+  }, [achievements, onlineLocked, filter, query, sortState, canPin, leading, T.steam.hiddenAchievement])
 
   function handleSort(key: SteamSortKey) {
     setSortState((prev) =>
@@ -130,67 +135,71 @@ export default function SteamGameInfoTable({
     )
   }
 
-  const needsToggle = filtered.length > COLLAPSED_ROWS
-  const shown = expanded || !needsToggle ? filtered : filtered.slice(0, COLLAPSED_ROWS)
+  const folded = !showAll && !query.trim() && filtered.length > FIRST_ROWS
+  const shown = folded ? filtered.slice(0, FIRST_ROWS) : filtered
+  const earnedCount = achievements.filter((a) => a.earned).length
 
   return (
-    <section className="bg-bg-card p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
-      <AchievementWarningPanel
+    <div className="w-full px-4 sm:px-8 lg:px-14 mt-7 mb-7">
+    <section aria-label={T.gameInfoPage.achievements} className={`${SURFACE} p-4 sm:p-6 flex flex-col gap-4`}>
+      <MissableNotice
         tone="warning"
-        label={T.steam.onlineWarning}
-        items={onlineLocked.map((a) => ({
-          key: a.apiname,
-          title: a.hidden ? T.steam.hiddenAchievement : a.title,
-          description: a.hidden ? T.steam.hiddenAchievementDesc : a.description,
-          iconUrl: a.badgeUrl || null,
-          onSelect: () => setSelected(a),
-        }))}
+        lead={plural(onlineLocked.length, T.plurals.onlineCount, lang)}
+        text={T.gameInfoTable.onlineText}
+        names={onlineLocked.map((a) => (a.hidden ? T.steam.hiddenAchievement : a.title))}
+        only={filter === 'online'}
+        onToggleOnly={() => setFilter((f) => (f === 'online' ? 'all' : 'online'))}
       />
 
-      <div className="flex gap-2 flex-wrap" role="group" aria-label={T.gameInfoPage.achievements}>
-        {(['all', 'earned', 'unearned'] as Filter[]).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            aria-pressed={filter === f}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              filter === f
-                ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30'
-                : 'bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card'
-            }`}
-          >
-            {FILTER_LABELS[f]}
-          </button>
-        ))}
-      </div>
-
-      {needsToggle && (
-        <GameInfoTableFoldBar expanded={expanded} onToggle={() => setExpanded((e) => !e)} shown={filtered.length} total={achievements.length} />
-      )}
+      <AchievementTableToolbar<Filter, SteamSortKey>
+        label={T.gameInfoPage.achievements}
+        tabs={[
+          { value: 'all', label: T.gameInfoTable.filterAll, count: achievements.length },
+          { value: 'earned', label: T.gameInfoTable.filterEarned, count: earnedCount },
+          { value: 'unearned', label: T.gameInfoTable.filterUnearned, count: achievements.length - earnedCount },
+        ]}
+        filter={filter}
+        onFilter={setFilter}
+        query={query}
+        onQuery={setQuery}
+        sortOptions={[
+          { value: 'default', label: T.gameInfoTable.sortGameOrder },
+          { value: 'rarity', label: T.gameInfoTable.headerRarity },
+          { value: 'earned', label: T.gameInfoTable.headerEarned },
+        ]}
+        sort={sortState.key}
+        onSort={(key) => setSortState({ key, dir: STEAM_DEFAULT_DIRS[key] })}
+      />
 
       {filtered.length === 0 ? (
-        <p className="text-sm text-text-secondary self-center py-4">{T.steam.noAchievements}</p>
+        <p className="text-sm text-text-secondary self-center py-6">{query.trim() ? T.gameInfoTable.noMatches : T.steam.noAchievements}</p>
       ) : (
         <>
           {/* Desktop table */}
           <div className="hidden sm:block w-full">
-            <table className="w-full border-collapse">
+            <table className={TABLE}>
               <thead>
-                <tr className="text-sm border-b border-bg-header">
-                  <th className="px-3 py-2 w-24 text-center text-text-secondary">{T.gameInfoTable.headerIcon}</th>
-                  <SteamSortableHeader sortKey="default" sortState={sortState} onSort={handleSort} className="text-left">
+                <tr>
+                  <th scope="col" className={`${TH} w-16`}>
+                    <span className="sr-only">{T.gameInfoTable.headerIcon}</span>
+                  </th>
+                  <SteamSortableHeader sortKey="default" sortState={sortState} onSort={handleSort}>
                     {T.gameInfoTable.headerAchievement}
                   </SteamSortableHeader>
-                  <SteamSortableHeader sortKey="rarity" sortState={sortState} onSort={handleSort} className="w-32 text-center">
+                  <SteamSortableHeader sortKey="rarity" sortState={sortState} onSort={handleSort} align="center" className="w-28">
                     {T.gameInfoTable.headerRarity}
                   </SteamSortableHeader>
-                  <SteamSortableHeader sortKey="earned" sortState={sortState} onSort={handleSort} className="w-44 text-center">
+                  <SteamSortableHeader sortKey="earned" sortState={sortState} onSort={handleSort} align="right" className="w-28">
                     {T.gameInfoTable.headerEarned}
                   </SteamSortableHeader>
-                  {canPin && <th className="w-12" aria-label={T.favorites.title} />}
+                  {canPin && (
+                    <th scope="col" className={`${TH} w-12`}>
+                      <span className="sr-only">{T.favorites.title}</span>
+                    </th>
+                  )}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="enter-rows">
                 {shown.map((a) => (
                   <SteamGameInfoAchievement
                     key={a.apiname}
@@ -206,7 +215,7 @@ export default function SteamGameInfoTable({
           </div>
 
           {/* Phone card list */}
-          <ul className="sm:hidden w-full flex flex-col gap-2">
+          <ul className="sm:hidden w-full flex flex-col gap-2 enter-rows">
             {shown.map((a) => (
               <SteamGameInfoAchievementCard
                 key={a.apiname}
@@ -219,24 +228,8 @@ export default function SteamGameInfoTable({
             ))}
           </ul>
 
-          {needsToggle && (
-            <button
-              onClick={() => setExpanded((e) => !e)}
-              aria-expanded={expanded}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-bg-header hover:bg-bg-header/80 text-text-secondary hover:text-text-main transition-colors self-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-            >
-              {expanded ? (
-                <>
-                  <IconChevronUp className="w-4 h-4" aria-hidden="true" />
-                  {T.gameInfoTable.collapseTable}
-                </>
-              ) : (
-                <>
-                  <IconChevronDown className="w-4 h-4" aria-hidden="true" />
-                  {T.gameInfoTable.expandTable} ({filtered.length})
-                </>
-              )}
-            </button>
+          {(folded || (showAll && filtered.length > FIRST_ROWS && !query.trim())) && (
+            <ShowRestButton folded={folded} rest={filtered.length - FIRST_ROWS} onToggle={() => setShowAll((v) => !v)} />
           )}
         </>
       )}
@@ -264,5 +257,6 @@ export default function SteamGameInfoTable({
         )}
       </AnimatePresence>
     </section>
+    </div>
   )
 }

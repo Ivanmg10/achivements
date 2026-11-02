@@ -10,9 +10,9 @@ export default function PublicUserGameRow({ game }: { game: LibraryGame }) {
   return (
     <Link
       href={game.href}
-      className="flex items-center gap-3 p-2.5 rounded-xl bg-bg-main hover:bg-ink/10 transition-colors min-w-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+      className="flex items-center gap-3 p-2.5 rounded-tile bg-bg-main hover:bg-ink/10 transition-colors min-w-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
     >
-      <GameIcon source={game.source} id={game.id} imageUrl={game.iconUrl} size={44} className="w-11 h-11 rounded-lg shrink-0" />
+      <GameIcon source={game.source} id={game.id} imageUrl={game.iconUrl} size={44} className="w-11 h-11 rounded-box shrink-0" />
       <span className="flex flex-col gap-1.5 min-w-0 flex-1">
         <span className="text-sm font-medium truncate group-hover:text-accent transition-colors">{game.title}</span>
         <span className="text-[11px] text-text-secondary truncate">

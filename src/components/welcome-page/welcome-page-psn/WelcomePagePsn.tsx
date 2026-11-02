@@ -1,0 +1,100 @@
+import { useState } from 'react'
+import { IconArrowRight } from '@tabler/icons-react'
+import type { WelcomeDirection } from '@/hooks/useWelcomeSteps'
+import { usePsnLink } from '@/hooks/usePsnLink'
+import { useLanguage } from '@/context/LanguageContext'
+import { notify } from '@/lib/notify'
+import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
+import WelcomePageStep from '@/components/welcome-page/welcome-page-step/WelcomePageStep'
+import WelcomePageLibraryPreview from '@/components/welcome-page/welcome-page-library-preview/WelcomePageLibraryPreview'
+import WelcomePagePlatformLinked from '@/components/welcome-page/welcome-page-platform-linked/WelcomePagePlatformLinked'
+import { PRIMARY_BUTTON, SECONDARY_BUTTON, STEP_SKY, platformKicker } from '@/components/welcome-page/welcomeArt'
+import { fieldClass } from '@/components/ui/Input'
+
+const FORM_ID = 'welcome-psn-form'
+const INPUT_ID = 'welcome-psn-id'
+
+/** PlayStation by online ID, as on the account page (`usePsnLink`); a refusal is said under the box. Linked, the step stays, to show it. */
+export default function WelcomePagePsn({
+  onNext,
+  onSkip,
+  onBack,
+  direction,
+  focusTitle,
+}: {
+  onNext: () => void
+  onSkip: () => void
+  onBack: () => void
+  direction: WelcomeDirection
+  focusTitle: boolean
+}) {
+  const { T } = useLanguage()
+  const { isLinked, username: linkedAs, link, isLinking, error } = usePsnLink()
+  const [username, setUsername] = useState('')
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!username.trim() || !(await link(username.trim()))) return
+    notify.success(T.toast.psnLinked)
+  }
+
+  return (
+    <WelcomePageStep
+      kicker={platformKicker(T, 'psn')}
+      title={T.welcome.steps.psn}
+      body={isLinked && linkedAs ? T.welcome.ra.linkedAs.replace('{name}', linkedAs) : T.welcome.psn.body}
+      onBack={onBack}
+      direction={direction}
+      focusTitle={focusTitle}
+      asideLabel={isLinked ? T.welcome.steps.psn : T.welcome.library.title}
+      aside={
+        isLinked ? (
+          <WelcomePagePlatformLinked platform="psn" name={linkedAs || T.welcome.steps.psn} mark={<PlaystationLogo size={26} aria-hidden="true" />} />
+        ) : (
+          <WelcomePageLibraryPreview art={STEP_SKY.psn} />
+        )
+      }
+      actions={
+        isLinked ? (
+          <button type="button" onClick={onNext} className={PRIMARY_BUTTON}>
+            {T.welcome.next}
+            <IconArrowRight size={16} aria-hidden="true" />
+          </button>
+        ) : (
+          <>
+            <button type="submit" form={FORM_ID} disabled={isLinking || !username.trim()} className={PRIMARY_BUTTON}>
+              {isLinking ? T.psn.connecting : T.welcome.psn.connect}
+            </button>
+            <button type="button" onClick={onSkip} className={SECONDARY_BUTTON}>
+              {T.welcome.notNow}
+            </button>
+          </>
+        )
+      }
+    >
+      {!isLinked && (
+        <form id={FORM_ID} onSubmit={handleSubmit} noValidate className="flex flex-col gap-1.5 max-w-md">
+          <label htmlFor={INPUT_ID} className="text-sm font-semibold">{T.psn.usernameLabel}</label>
+          <input
+            id={INPUT_ID}
+            autoComplete="off"
+            spellCheck={false}
+            maxLength={16}
+            placeholder={T.psn.usernamePlaceholder}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            aria-invalid={error !== null}
+            aria-describedby={error ? `${INPUT_ID}-error ${INPUT_ID}-help` : `${INPUT_ID}-help`}
+            className={fieldClass({ invalid: error !== null })}
+          />
+          {error && (
+            <p id={`${INPUT_ID}-error`} role="alert" className="text-sm text-danger">
+              {T.psn.errors[error]}
+            </p>
+          )}
+          <p id={`${INPUT_ID}-help`} className="text-[0.8125rem] text-text-secondary">{T.welcome.psn.help}</p>
+        </form>
+      )}
+    </WelcomePageStep>
+  )
+}

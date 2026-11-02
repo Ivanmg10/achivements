@@ -4,10 +4,10 @@ import Image from 'next/image'
 import { IconCheck } from '@tabler/icons-react'
 import { CONSOLES } from '@/constants'
 import { useLanguage } from '@/context/LanguageContext'
+import { pillClass } from '@/components/ui/Pill'
 
 export type ConsolePill = { id: number; name: string; icon?: string; color?: string }
 
-const CONSOLE_COLOR_MAP = new Map(CONSOLES.map((c) => [c.id, c.color]))
 
 export function buildConsolePills(games: { ConsoleID: number; ConsoleName: string }[]): ConsolePill[] {
   const map = new Map<number, ConsolePill>()
@@ -41,18 +41,13 @@ export default function ConsoleFilter({
   return (
     <div role="group" aria-label={T.categoryPage.consoles} className="flex gap-1.5 flex-1 min-w-0 overflow-x-auto [scrollbar-width:none] sm:flex-wrap sm:overflow-visible">
       {pills.map((c) => {
-        const color = c.color ?? CONSOLE_COLOR_MAP.get(c.id)
         const isSelected = selected.has(c.id)
         return (
           <button
             key={c.id}
             onClick={() => onToggle(c.id)}
             aria-pressed={isSelected}
-            className={`shrink-0 whitespace-nowrap flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              isSelected
-                ? (color ?? 'bg-accent text-bg-main')
-                : 'bg-bg-main text-text-secondary hover:text-text-main'
-            }`}
+            className={pillClass(isSelected, 'shrink-0')}
           >
             {c.icon && (
               <Image
@@ -72,7 +67,7 @@ export default function ConsoleFilter({
       {selected.size > 0 && (
         <button
           onClick={onClear}
-          className="shrink-0 whitespace-nowrap px-2.5 py-1 rounded-lg text-xs text-text-secondary hover:text-text-main transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="shrink-0 whitespace-nowrap px-2.5 py-1 rounded-chip text-xs text-text-secondary hover:text-text-main transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <span aria-hidden="true">✕</span> {T.categoryPage.clearConsoles}
         </button>

@@ -5,6 +5,7 @@ import { useShowcaseGameChoices } from '@/hooks/useShowcaseGameChoices'
 import type { LibraryGame } from '@/utils/library'
 import type { ShowcaseEntry } from '@/utils/showcase'
 import ShowcasePickerModalAchievement from '../showcase-picker-modal-achievement/ShowcasePickerModalAchievement'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /**
  * The picker's second view: every achievement of one game, the earned ones
@@ -34,12 +35,12 @@ export default function ShowcasePickerModalGame({
       {isLoading ? (
         <div aria-busy="true" className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2">
           {Array.from({ length: 8 }, (_, i) => (
-            <div key={i} className="h-28 rounded-xl bg-bg-card animate-pulse motion-reduce:animate-none" />
+            <Skeleton key={i} radius="tile" className="h-28" />
           ))}
         </div>
       ) : error ? (
         <div className="flex flex-col items-center gap-2 py-10 text-center">
-          <p role="alert" className="text-sm text-red-400">{T.showcase.gameError}</p>
+          <p role="alert" className="text-sm text-danger">{T.showcase.gameError}</p>
           <button
             type="button"
             onClick={retry}

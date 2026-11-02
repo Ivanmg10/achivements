@@ -1,11 +1,13 @@
 import { FadeImage } from '@/components/ui/FadeImage'
-import { IconCheck, IconLock } from '@tabler/icons-react'
+import { IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import PsnRevealTrophyButton from '@/components/psn/psn-reveal-trophy-button/PsnRevealTrophyButton'
-import { formatRarity, formatUnlock } from '@/utils/steamFeed'
+import { formatUnlock } from '@/utils/steamFeed'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR, TROPHY_GRADE_RING } from '@/utils/psnTitles'
 import type { PsnTrophy } from '@/types/psn'
+import RarityBadge from '@/components/ui/RarityBadge'
+import { badgeClass, badgeImgClass, MID, NUM, ROW, TD, TD_FIRST } from '@/components/ui/dataTable'
 
 /**
  * One trophy as a table row on the PSN game page, styled like
@@ -44,38 +46,36 @@ export default function PsnGameInfoTrophy({
     <tr
       id={psnTrophyAnchor(t.id)}
       data-trophy={t.id}
-      className={`relative group/row border-b border-bg-header/60 transition-colors duration-500 scroll-mt-24 ${
-        highlighted ? 'bg-accent/15' : pinned ? 'bg-warning/10 hover:bg-bg-header/30' : 'hover:bg-bg-header/30'
-      }`}
+      className={`${ROW} group/row scroll-mt-24 ${highlighted ? '[&>td]:bg-accent/15' : pinned ? '[&>td]:bg-accent/[0.05]' : ''}`}
     >
-      <td className="px-3 py-2 w-24 align-middle text-center">
-        <div className="relative w-16 h-16 mx-auto">
-        {t.iconUrl && !concealed ? (
-          <FadeImage
-            src={t.iconUrl}
-            alt=""
-            width={64}
-            height={64}
-            className={`w-16 h-16 rounded-xl ${t.earned ? `ring-2 ${TROPHY_GRADE_RING[t.type]}` : ''}`}
-            imgClassName={`w-full h-full object-cover ${t.earned ? '' : 'grayscale opacity-50'}`}
-            unoptimized
-          />
-        ) : (
-          <div className="w-16 h-16 rounded-xl bg-ink/10" aria-hidden="true" />
-        )}
-        {t.hidden && !t.earned && onToggleReveal && (
-          <PsnRevealTrophyButton
-            revealed={revealed}
-            onToggle={onToggleReveal}
-            size={22}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-bg-card/90 text-text-main flex items-center justify-center opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100"
-          />
-        )}
+      <td className={`${TD_FIRST} w-16`}>
+        <div className="relative w-[3.25rem] h-[3.25rem]">
+          {t.iconUrl && !concealed ? (
+            <FadeImage
+              src={t.iconUrl}
+              alt=""
+              width={52}
+              height={52}
+              className={`${badgeClass('locked')} ${t.earned ? `ring-2 ring-offset-2 ring-offset-bg-card ${TROPHY_GRADE_RING[t.type]}` : ''}`}
+              imgClassName={badgeImgClass(!t.earned)}
+              unoptimized
+            />
+          ) : (
+            <span className={`${badgeClass('locked')} bg-ink/10`} aria-hidden="true" />
+          )}
+          {t.hidden && !t.earned && onToggleReveal && (
+            <PsnRevealTrophyButton
+              revealed={revealed}
+              onToggle={onToggleReveal}
+              size={20}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-bg-card/90 text-text-main flex items-center justify-center opacity-0 group-hover/row:opacity-100 focus-visible:opacity-100"
+            />
+          )}
         </div>
       </td>
 
-      <td className="px-3 py-2">
-        <h3 className={`text-lg ${t.earned ? '' : 'text-text-secondary'}`}>
+      <td className={TD}>
+        <h3 className="text-[0.9375rem] font-bold">
           <button
             type="button"
             onClick={onOpen}
@@ -84,31 +84,28 @@ export default function PsnGameInfoTrophy({
             {concealed ? T.psn.hiddenTrophy : t.name}
           </button>
         </h3>
-        <p className="text-sm text-text-secondary">{concealed ? T.psn.hiddenTrophyDesc : t.detail}</p>
+        <p className="mt-0.5 text-[0.8125rem] leading-normal text-text-secondary">{concealed ? T.psn.hiddenTrophyDesc : t.detail}</p>
+        {t.earned && t.earnedAt && <p className="mt-0.5 text-xs text-accent">{formatUnlock(t.earnedAt, lang)}</p>}
       </td>
 
-      <td className={`px-3 py-2 w-28 text-center text-sm font-semibold ${TROPHY_GRADE_COLOR[t.type]}`}>{grade}</td>
+      <td className={`${TD} ${MID} w-24 font-bold ${TROPHY_GRADE_COLOR[t.type]}`}>{grade}</td>
 
-      <td className="px-3 py-2 w-28 text-center text-sm tabular-nums text-text-secondary">
-        {t.rarity !== null ? `${formatRarity(t.rarity)}%` : '—'}
+      <td className={`${TD} ${MID} w-28`}>
+        <RarityBadge pct={t.rarity} />
       </td>
 
-      <td className="px-3 py-2 w-44 text-center text-xs">
+      <td className={`${TD} ${NUM} w-28`}>
         {t.earned ? (
-          <span className="inline-flex items-center gap-1 text-success">
-            <IconCheck size={14} aria-hidden="true" />
-            {t.earnedAt ? formatUnlock(t.earnedAt, lang) : T.psn.earned}
-          </span>
+          <IconCheck className="w-[1.125rem] h-[1.125rem] text-success inline-block" aria-label={T.psn.earned} />
         ) : (
-          <span className="inline-flex items-center gap-1 text-text-secondary">
-            <IconLock size={14} aria-hidden="true" />
-            {T.psn.locked}
+          <span className="text-text-secondary">
+            <span className="sr-only">{T.psn.locked}</span>—
           </span>
         )}
       </td>
 
       {pinned !== undefined && (
-        <td className="px-3 py-2 w-12 text-center align-middle">
+        <td className={`${TD} ${MID} w-12`}>
           <SteamPinAchievementButton pinned={pinned} title={concealed ? T.psn.hiddenTrophy : t.name} onToggle={() => onTogglePin?.()} size={18} className="relative z-10" />
         </td>
       )}

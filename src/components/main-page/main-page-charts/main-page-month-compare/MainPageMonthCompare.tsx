@@ -5,6 +5,7 @@ import { IconArrowDownRight, IconArrowUpRight, IconMinus } from '@tabler/icons-r
 import type { RecentAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
 import { compareMonths, type MonthNumbers } from '@/utils/activityInsights'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /**
  * This month so far against the same days of last month: achievements, games
@@ -34,18 +35,18 @@ export default function MainPageMonthCompare({ achievements, isLoading }: { achi
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.monthCompare}</p>
         <p className="text-[10px] text-text-secondary">{T.cards.monthVs.replace('{range}', range)}</p>
       </div>
-      <dl className="grid grid-cols-3 gap-2 sm:gap-3">
+      <dl className="grid grid-cols-3 gap-2 sm:gap-3 enter-cards">
         {tiles.map(({ key, label }) => {
           const value = c.current[key]
           const delta = value - c.previous[key]
           const Arrow = delta > 0 ? IconArrowUpRight : delta < 0 ? IconArrowDownRight : IconMinus
           const tone = delta > 0 ? 'text-success' : delta < 0 ? 'text-danger' : 'text-text-secondary'
           return (
-            <div key={key} className="flex flex-col gap-1 rounded-lg bg-bg-main px-2.5 sm:px-3 py-2.5 min-w-0">
+            <div key={key} className="flex flex-col gap-1 rounded-box bg-bg-main px-2.5 sm:px-3 py-2.5 min-w-0">
               {/* Wraps (hyphenated, by the page language) rather than truncates: on a phone each of the three is ~90px wide. */}
               <dt className="text-[10px] uppercase tracking-wider leading-tight text-text-secondary hyphens-auto break-words">{label}</dt>
               <dd className="flex flex-wrap items-baseline gap-x-2">
-                <span className="text-2xl font-bold tabular-nums">{isLoading ? '—' : value.toLocaleString(lang)}</span>
+                <span className="text-2xl font-bold tabular-nums">{isLoading ? <Skeleton className="h-[1lh] w-12" /> : value.toLocaleString(lang)}</span>
                 {!isLoading && (
                   <span className={`flex items-center text-xs font-semibold tabular-nums ${tone}`}>
                     <Arrow size={14} aria-hidden="true" />

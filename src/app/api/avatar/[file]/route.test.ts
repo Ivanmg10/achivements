@@ -21,13 +21,20 @@ test('the picture is typed, typed, unsniffable and cached for good', async () =>
   expect(headers.get('Content-Type')).toBe('image/png')
   expect(headers.get('X-Content-Type-Options')).toBe('nosniff')
   expect(headers.get('Cache-Control')).toContain('immutable')
-  expect(pool.query).toHaveBeenCalledWith(expect.stringContaining('FROM user_avatars'), [7])
+  expect(pool.query).toHaveBeenCalledWith(expect.stringContaining('FROM user_avatars'), expect.arrayContaining([7]))
 })
 
 test('any signed-in user can see someone else\'s: it is part of their public profile', async () => {
   const res = await get('8-1700000000')
   expect(res.status).toBe(200)
-  expect(pool.query).toHaveBeenCalledWith(expect.stringContaining('FROM user_avatars'), [8])
+  expect(pool.query).toHaveBeenCalledWith(expect.stringContaining('FROM user_avatars'), expect.arrayContaining([8]))
+})
+
+test('the current picture is what is asked for, and a private profile stays private', async () => {
+  await get('12-1700000000')
+  const [sql, args] = (pool.query as jest.Mock).mock.calls[0]
+  expect(sql).toContain('u.profile_public OR u.id = $3 OR $4::boolean')
+  expect(args).toEqual([12, '/api/avatar/12-1700000000', '7', false])
 })
 
 test('signed out is refused', async () => {

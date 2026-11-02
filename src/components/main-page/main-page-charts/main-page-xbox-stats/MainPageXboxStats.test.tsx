@@ -24,20 +24,27 @@ test("today's achievements, the gamerscore and the total unlocked", () => {
   expect(screen.getByText('593')).toBeInTheDocument()
 })
 
-test('the streak, in the colour of how long it is', () => {
+test('a running streak, in the theme colour', () => {
   render(<MainPageXboxStats streak={8} achievements={[]} />)
-  expect(screen.getByText('8d')).toHaveClass('text-warning')
+  expect(screen.getByText('8d')).toHaveClass('text-accent')
 })
 
-test('without a summary yet, only what the achievements say', () => {
-  ;(useXboxSummary as jest.Mock).mockReturnValue({ summary: null })
+test('without a summary yet, its pills wait in the row', () => {
+  ;(useXboxSummary as jest.Mock).mockReturnValue({ summary: null, error: null })
+  render(<MainPageXboxStats streak={0} achievements={[unlock(today)]} />)
+  expect(screen.getByText(en.xbox.gamerscore).parentElement?.querySelector('.bg-skeleton')).toBeInTheDocument()
+  expect(screen.getByText(en.xbox.achievements).parentElement?.querySelector('.bg-skeleton')).toBeInTheDocument()
+})
+
+test('with a summary that failed, only what the achievements say', () => {
+  ;(useXboxSummary as jest.Mock).mockReturnValue({ summary: null, error: 'failed' })
   render(<MainPageXboxStats streak={0} achievements={[unlock(today)]} />)
   expect(screen.queryByText(en.xbox.gamerscore)).not.toBeInTheDocument()
 })
 
 test('placeholders while loading', () => {
   render(<MainPageXboxStats streak={0} achievements={[]} isLoading />)
-  expect(screen.getAllByText('—').length).toBeGreaterThan(3)
+  expect(document.querySelectorAll('.bg-skeleton').length).toBeGreaterThan(3)
 })
 
 test("the day's pill opens what was earned that day", () => {

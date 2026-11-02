@@ -1,5 +1,6 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
+jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
 jest.mock('@/lib/psnClient', () => ({
   ...jest.requireActual('@/lib/psnClient'),
   psnLatestTrophies: jest.fn(),
@@ -66,9 +67,9 @@ test("trophy names come in the app's language", async () => {
   expect(psnRecentTrophies).toHaveBeenCalledWith('42', 366, '7', 'fr-FR')
 })
 
-test('the browser may keep the answer for 2 minutes, privately, and a new session cookie asks again', async () => {
+test('the browser never keeps a visibility-filtered answer, and a new session cookie asks again', async () => {
   const res = await GET(new NextRequest('http://localhost/api/psn/recentTrophies'))
   expect(res.status).toBe(200)
-  expect(res.headers.get('Cache-Control')).toBe('private, max-age=120')
+  expect(res.headers.get('Cache-Control')).toBe('private, max-age=0')
   expect(res.headers.get('Vary')).toBe('Cookie')
 })

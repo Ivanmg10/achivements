@@ -16,6 +16,7 @@ import { SectionFallback } from '@/components/ui/SectionFallback'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-recently-played-expanded/RARecentlyPlayedExpanded'
 import { gameKey } from '@/utils/gameRef'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 const CONSOLE_BY_ID = new Map(CONSOLES.map((c) => [c.id, c.icon]))
 
@@ -44,7 +45,7 @@ export default function PinnedGameRow({
 
   if (error && !game) {
     return (
-      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-xl h-24 flex">
+      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-tile h-24 flex">
         <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>
       </div>
     )
@@ -52,7 +53,7 @@ export default function PinnedGameRow({
 
   if (isLoading || !game) {
     return (
-      <div ref={setNodeRef} style={style} className="bg-bg-main rounded-xl h-24 animate-pulse" />
+      <div ref={setNodeRef} style={style}><GameRowSkeleton /></div>
     )
   }
 
@@ -69,7 +70,7 @@ export default function PinnedGameRow({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
+      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
       <GameCardBackdrop src={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null} />
       <div
@@ -100,10 +101,10 @@ export default function PinnedGameRow({
               alt={game.Title ?? ''}
               width={56}
               height={56}
-              className="rounded-xl object-cover w-14 h-14"
+              className="rounded-tile object-cover w-14 h-14"
             />
           ) : (
-            <div className="w-14 h-14 rounded-xl bg-ink/10 shrink-0" />
+            <div className="w-14 h-14 rounded-tile bg-ink/10 shrink-0" />
           )}
         </Link>
 

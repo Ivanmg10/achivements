@@ -1,4 +1,4 @@
-import { filterGroupItems, getDecade, groupSummary, itemKey, liveProgressMap, raProgressMaps } from './groupItems'
+import { filterGroupItems, getDecade, closestItem, groupStateCounts, groupSummary, itemKey, itemProgress, liveProgressMap, raProgressMaps } from './groupItems'
 import type { GameGroupItem } from '@/types/types'
 
 const item = (over: Partial<GameGroupItem>): GameGroupItem => ({
@@ -114,4 +114,28 @@ describe('Xbox live progress', () => {
     const item = { id: 1, source: 'xbox', game_id: 5, num_awarded: 3, max_possible: 50 } as never
     expect(groupSummary([item], new Map(), map)).toEqual({ earned: 3, total: 50 })
   })
+})
+
+describe('itemProgress', () => {
+  test('RA from its live numbers, with the hardcore share apart', () => {
+    const ra = new Map([[1, { scEarned: 5, hcEarned: 2, total: 10 }]])
+    expect(itemProgress(item({ game_id: 1 }), new Map(), ra)).toEqual({ earned: 5, total: 10, pct: 0.5, hard: 0.2 })
+  })
+
+  test('other platforms from their libraries; what was stored when nothing is live', () => {
+    const live = new Map([['steam:620', { earned: 3, total: 4, pct: 0.75 }]])
+    expect(itemProgress(item({ source: 'steam', game_id: 620 }), live).pct).toBe(0.75)
+    expect(itemProgress(item({ game_id: 7, pct_won: '0.3', num_awarded: 3 }), live)).toEqual({ earned: 3, total: 10, pct: 0.3 })
+  })
+})
+
+test('groupStateCounts sorts the games into finished, started and not started', () => {
+  const items = [item({ id: 1, pct_won: '1' }), item({ id: 2, pct_won: '0.4' }), item({ id: 3 }), item({ id: 4 })]
+  expect(groupStateCounts(items, new Map())).toEqual({ done: 1, started: 1, notStarted: 2 })
+})
+
+test('closestItem: the started, unfinished game with the largest share, and what it lacks', () => {
+  const items = [item({ id: 1, pct_won: '1', num_awarded: 10 }), item({ id: 2, pct_won: '0.6', num_awarded: 6 }), item({ id: 3, pct_won: '0.8', num_awarded: 8 }), item({ id: 4 })]
+  expect(closestItem(items, new Map())).toEqual({ item: items[2], left: 2 })
+  expect(closestItem([item({ id: 5 })], new Map())).toBeNull()
 })

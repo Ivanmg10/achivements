@@ -30,22 +30,22 @@ export default function ShowcaseTile({
   const date = new Date(item.earnedAt).toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric' })
 
   return (
-    <article className="relative h-full bg-bg-main rounded-xl p-3 flex flex-col items-center gap-2 text-center ring-1 ring-ink/5">
+    <article className="relative h-full bg-bg-main rounded-tile p-3 flex flex-col items-center gap-2 text-center ring-1 ring-ink/5">
       {handle && <span className="absolute left-1.5 top-1.5">{handle}</span>}
       {onRemove && (
         <button
           type="button"
           onClick={onRemove}
           aria-label={`${T.showcase.remove}: ${item.title}`}
-          className="absolute right-1.5 top-1.5 p-1 rounded-md text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+          className="absolute right-1.5 top-1.5 p-1 rounded-box-md text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           <IconX size={14} aria-hidden="true" />
         </button>
       )}
       {item.badge ? (
-        <Image src={item.badge} alt="" width={64} height={64} className="w-16 h-16 rounded-xl object-cover shadow-lg shadow-black/30" unoptimized />
+        <Image src={item.badge} alt="" width={64} height={64} className="w-16 h-16 rounded-tile object-cover shadow-lg shadow-black/30" unoptimized />
       ) : (
-        <span aria-hidden="true" className="w-16 h-16 rounded-xl bg-ink/10 flex items-center justify-center text-text-secondary">
+        <span aria-hidden="true" className="w-16 h-16 rounded-tile bg-ink/10 flex items-center justify-center text-text-secondary">
           <IconTrophy size={26} />
         </span>
       )}

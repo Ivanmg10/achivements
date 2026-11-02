@@ -17,5 +17,5 @@ test('a fold with the group name and progress, closed until asked', () => {
 
 test('a finished group says so in green, not only by its numbers', () => {
   render(<PsnTrophyGridGroup name="Base" earned={4} total={4}>x</PsnTrophyGridGroup>)
-  expect(screen.getByText('4/4')).toHaveClass('text-green-400')
+  expect(screen.getByText('4/4')).toHaveClass('text-success')
 })

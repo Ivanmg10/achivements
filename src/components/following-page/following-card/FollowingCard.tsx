@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { IconFolders, IconTrophy, IconUser } from '@tabler/icons-react'
+import { IconFolders, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { RecentAchievement } from '@/types/types'
 import { recentAsBadge, type FriendOverview, type LastPlayed } from '@/utils/friends'
@@ -37,10 +37,10 @@ export default function FollowingCard({
   const country = friend.location ? findCountry(friend.location) : null
 
   return (
-    <article className="flex-1 bg-bg-card rounded-2xl ring-1 ring-ink/5 hover:ring-accent/40 transition-shadow flex flex-col min-w-0">
+    <article className="flex-1 bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] hover:ring-accent/60 transition-shadow flex flex-col min-w-0 overflow-hidden">
       <FollowingCardBanner friend={friend} lastPlayed={lastPlayed} />
 
-      <div className="px-4 pb-4 flex flex-col gap-4 flex-1">
+      <div className="px-4 pb-4 flex flex-col gap-3 flex-1">
         <div className="relative flex items-end gap-3 -mt-7 min-w-0">
           <span className="relative shrink-0">
             {friend.avatar ? (
@@ -57,7 +57,7 @@ export default function FollowingCard({
             <span className="flex items-center gap-1.5 min-w-0">
               <Link
                 href={`/user/${encodeURIComponent(friend.username)}`}
-                className="truncate text-base font-bold hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="truncate text-[1.0625rem] font-extrabold hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 {friend.username}
               </Link>
@@ -71,6 +71,7 @@ export default function FollowingCard({
             <PresenceLabel
               online={friend.online}
               lastSeenAt={friend.lastSeenAt}
+              playing={friend.playing}
               fallback={friend.description && <span className="text-xs text-text-secondary truncate">{friend.description}</span>}
             />
           </div>
@@ -90,20 +91,17 @@ export default function FollowingCard({
           </div>
         )}
 
-        <div className="mt-auto pt-3 border-t border-ink/5 flex items-center justify-between gap-2">
-          {friend.showcase.length > 0 ? (
-            <div className="flex items-center gap-1.5 min-w-0">
-              <IconTrophy size={13} className="text-text-secondary shrink-0" aria-hidden="true" />
-              <FollowingCardBadges items={friend.showcase} username={friend.username} label={T.friends.showcase} size="sm" />
-            </div>
-          ) : (
-            <span />
-          )}
-          <p className="flex items-center gap-1 text-[11px] text-text-secondary shrink-0">
-            <IconFolders size={12} aria-hidden="true" />
-            {T.friends.publicGroups.replace('{n}', friend.publicGroups.toLocaleString(lang))}
-          </p>
-        </div>
+        {friend.showcase.length > 0 && (
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-bold text-text-secondary">{T.friends.showcase}</p>
+            <FollowingCardBadges items={friend.showcase} username={friend.username} label={T.friends.showcase} />
+          </div>
+        )}
+
+        <p className="mt-auto pt-3 border-t border-ink/[0.06] flex items-center justify-end gap-1 text-[0.6875rem] text-text-secondary">
+          <IconFolders size={12} aria-hidden="true" />
+          {T.friends.publicGroups.replace('{n}', friend.publicGroups.toLocaleString(lang))}
+        </p>
       </div>
     </article>
   )

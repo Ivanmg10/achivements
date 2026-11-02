@@ -1,16 +1,16 @@
 'use client'
 
-import { ReactNode, useEffect, useId, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { ReactNode, useId } from 'react'
+import { createPortal } from 'react-dom'
 import { IconBrandYoutube, IconBook2, IconCheck, IconLock, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { modalOverlay, modalContent } from '@/lib/animations'
 import { FadeImage } from '@/components/ui/FadeImage'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import ShowcaseToggleButton from '@/components/showcase-toggle-button/ShowcaseToggleButton'
 import type { ShowcaseEntry } from '@/utils/showcase'
 import { formatRarity } from '@/utils/steamFeed'
 import type { GuideLink } from '@/utils/guideLinks'
+import Modal from '@/components/ui/Modal'
 
 const GUIDE_ICON = { youtube: IconBrandYoutube, steamGuides: IconBook2, psnProfiles: IconBook2, trueAchievements: IconBook2 }
 
@@ -56,49 +56,15 @@ export default function AchievementDetailModal({
 }) {
   const { T, lang } = useLanguage()
   const titleId = useId()
-  const dialogRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const opener = document.activeElement as HTMLElement | null
-    dialogRef.current?.focus()
-    return () => opener?.focus?.()
-  }, [])
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
 
   const when = earnedAt
     ? new Date(earnedAt).toLocaleString(lang, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     : null
   const guideLabel = { youtube: T.achievementDetail.youtube, steamGuides: T.achievementDetail.steamGuides, psnProfiles: T.achievementDetail.psnProfiles, trueAchievements: T.achievementDetail.trueAchievements }
 
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-      variants={modalOverlay}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      onClick={onClose}
-    >
-      <motion.div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        className="bg-bg-main rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto overscroll-contain flex flex-col focus:outline-none"
-        variants={modalContent}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
-        onClick={(e) => e.stopPropagation()}
-      >
+  // In body: a transformed ancestor (the home's sections) would otherwise trap it under later sections.
+  return createPortal(
+    <Modal isOpen={true} onClose={onClose} aria-labelledby={titleId} size="md" showClose={false} className="gap-4">
         <div className="flex items-start gap-4 p-5 sm:p-6 border-b border-bg-header">
           {iconUrl ? (
             <FadeImage
@@ -106,12 +72,12 @@ export default function AchievementDetailModal({
               alt=""
               width={80}
               height={80}
-              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl shrink-0 ${earned ? 'ring-2 ring-accent' : ''}`}
+              className={`w-16 h-16 sm:w-20 sm:h-20 rounded-tile shrink-0 ${earned ? 'ring-2 ring-accent' : ''}`}
               imgClassName={`w-full h-full object-cover ${earned ? '' : 'grayscale opacity-60'}`}
               unoptimized
             />
           ) : (
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-ink/10 shrink-0" aria-hidden="true" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-tile bg-ink/10 shrink-0" aria-hidden="true" />
           )}
           <div className="flex flex-col gap-1.5 flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
@@ -128,7 +94,7 @@ export default function AchievementDetailModal({
             type="button"
             onClick={onClose}
             aria-label={T.achievementDetail.close}
-            className="p-1 rounded-lg text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="p-1 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/10 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
           >
             <IconX className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -137,7 +103,7 @@ export default function AchievementDetailModal({
         <dl className="grid grid-cols-2 divide-x divide-bg-header border-b border-bg-header">
           <div className="flex flex-col items-center gap-0.5 py-4 px-2 text-center">
             <dt className="text-xs text-text-secondary order-2">{T.achievementDetail.rarity}</dt>
-            <dd className="text-lg font-semibold tabular-nums">{rarity !== null ? `${formatRarity(rarity)}%` : '—'}</dd>
+            <dd className="text-lg font-semibold tabular-nums">{rarity !== null ? `${formatRarity(rarity, lang)}%` : '—'}</dd>
           </div>
           <div className="flex flex-col items-center gap-0.5 py-4 px-2 text-center">
             <dt className="text-xs text-text-secondary order-2">{earned ? T.achievementDetail.earned : T.achievementDetail.notEarned}</dt>
@@ -160,7 +126,7 @@ export default function AchievementDetailModal({
                       href={g.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-chip bg-ink/8 hover:bg-ink/12 text-text-secondary hover:text-text-main text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
                     >
                       <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                       {guideLabel[g.kind]}
@@ -171,7 +137,7 @@ export default function AchievementDetailModal({
             </ul>
           </div>
         )}
-      </motion.div>
-    </motion.div>
+      </Modal>,
+    document.body,
   )
 }

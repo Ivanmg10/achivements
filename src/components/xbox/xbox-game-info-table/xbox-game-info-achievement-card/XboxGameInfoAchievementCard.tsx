@@ -39,7 +39,7 @@ export default function XboxGameInfoAchievementCard({
   return (
     <li
       data-achievement={a.id}
-      className={`relative flex items-start gap-3 rounded-xl p-3 transition-colors duration-500 ${
+      className={`relative flex items-start gap-3 rounded-tile p-3 transition-colors duration-500 ${
         highlighted ? 'bg-accent/15' : pinned ? 'bg-warning/10' : 'bg-bg-main/40'
       }`}
     >
@@ -47,7 +47,7 @@ export default function XboxGameInfoAchievementCard({
         type="button"
         onClick={onOpen}
         aria-label={concealed ? T.xbox.secretAchievement : a.name}
-        className="absolute inset-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       />
       <div className="relative shrink-0 pointer-events-none">
         {a.iconUrl && !concealed ? (
@@ -56,11 +56,11 @@ export default function XboxGameInfoAchievementCard({
             alt=""
             width={48}
             height={48}
-            className={`w-12 h-12 rounded-lg object-cover ${a.unlocked ? 'ring-2 ring-green-500' : 'grayscale opacity-50'}`}
+            className={`w-12 h-12 rounded-box object-cover ${a.unlocked ? 'ring-2 ring-success' : 'grayscale opacity-50'}`}
             unoptimized
           />
         ) : (
-          <div className="w-12 h-12 rounded-lg bg-ink/10" aria-hidden="true" />
+          <div className="w-12 h-12 rounded-box bg-ink/10" aria-hidden="true" />
         )}
         {a.secret && !a.unlocked && onToggleReveal && (
           // No hover on a phone: the eye is always there.
@@ -77,7 +77,7 @@ export default function XboxGameInfoAchievementCard({
         <h3 className={`text-sm font-semibold ${a.unlocked ? '' : 'text-text-secondary'}`}>{concealed ? T.xbox.secretAchievement : a.name}</h3>
         <p className="text-xs text-text-secondary">{concealed ? T.xbox.secretAchievementDesc : a.description}</p>
         <div className="flex items-center gap-2 flex-wrap text-[11px] mt-1">
-          <span className="font-semibold text-green-500">{a.gamerscore} G</span>
+          <span className="font-semibold text-success">{a.gamerscore} G</span>
           {a.unlocked ? (
             <span className="inline-flex items-center gap-1 text-success">
               <IconCheck size={12} aria-hidden="true" />
@@ -91,7 +91,7 @@ export default function XboxGameInfoAchievementCard({
           )}
           {a.rarity !== null && (
             <span className="text-text-secondary">
-              {formatRarity(a.rarity)}
+              {formatRarity(a.rarity, lang)}
               {T.achievement.haveIt}
             </span>
           )}

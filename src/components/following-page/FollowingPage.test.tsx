@@ -41,7 +41,7 @@ test('each user you follow is a card that opens their profile', () => {
   expect(screen.getByRole('heading', { name: en.following.title })).toBeInTheDocument()
   expect(screen.getByRole('link', { name: 'a b' })).toHaveAttribute('href', '/user/a%20b')
   expect(screen.getByText('Retro fan')).toBeInTheDocument()
-  expect(screen.getByText(en.following.people)).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: en.following.title }).closest('section')).toHaveTextContent(new RegExp(`1${en.following.people}`, "i"))
 })
 
 test('the hero says how many of them are online now', () => {
@@ -105,6 +105,18 @@ test('loading, then a failure with a retry', () => {
   expect(screen.getByRole('alert')).toHaveTextContent(en.following.loadError)
   fireEvent.click(screen.getByRole('button', { name: en.publicProfile.retry }))
   expect(retry).toHaveBeenCalled()
+})
+
+test('the lists wait for everyone: no card until the details are in, on both tabs', () => {
+  setup({ users: [person('ana')], detailsLoading: true })
+  const { unmount } = render(<FollowingPage />)
+  expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'true')
+  expect(screen.queryByRole('article')).not.toBeInTheDocument()
+  unmount()
+
+  setup({ users: [person('ana')], detailsLoading: true, error: true })
+  render(<FollowingPage />)
+  expect(screen.getByRole('alert')).toHaveTextContent(en.following.loadError)
 })
 
 test('a second tab lists who follows you, read only when it is open', () => {

@@ -6,7 +6,7 @@ import RaLogo from '@/components/ra-logo/RaLogo'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
 import { useLanguage } from '@/context/LanguageContext'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 
 /** A handful of the collage's own art, both platforms, fanned out in the big tile. */
 const COVERS = [
@@ -27,7 +27,7 @@ export default function LandingBento() {
   const { T } = useLanguage()
 
   return (
-    <section className="max-w-6xl w-full mx-auto px-4 sm:px-6 pb-20 grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-4">
+    <section className="max-w-6xl w-full mx-auto px-4 sm:px-6 pb-20 grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-4 enter-cards">
       <LandingFeature
         icon={<IconLibrary size={22} />}
         title={T.landing.libraryTitle}
@@ -42,7 +42,7 @@ export default function LandingBento() {
               alt=""
               loading="lazy"
               decoding="async"
-              className="absolute bottom-0 w-24 h-32 sm:w-32 sm:h-44 object-cover rounded-2xl ring-1 ring-ink/10 shadow-2xl shadow-black/50 transition-transform duration-500"
+              className="absolute bottom-0 w-24 h-32 sm:w-32 sm:h-44 object-cover rounded-card ring-1 ring-ink/10 shadow-2xl shadow-black/50 transition-transform duration-500"
               style={{
                 transform: `translateX(calc(var(--fan) * ${FAN[i]})) rotate(${FAN[i]}deg) translateY(${Math.abs(FAN[i]) * 0.8}px)`,
                 zIndex: 10 - Math.abs(FAN[i]),

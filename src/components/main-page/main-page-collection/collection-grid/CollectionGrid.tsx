@@ -63,7 +63,7 @@ export default function CollectionGrid({
             <button
               onClick={() => setEditOpen(true)}
               aria-label={T.cards.reorderMasteredAria}
-              className="p-1.5 rounded-lg text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <IconEdit className="w-4 h-4" aria-hidden="true" />
             </button>
@@ -88,7 +88,7 @@ export default function CollectionGrid({
       {shown.length === 0 ? (
         <p className="text-xs text-text-secondary py-6 text-center">{T.cards.noMatches}</p>
       ) : view === 'order' ? (
-        <ul className={GRID}>
+        <ul className={`${GRID} enter-cards`}>
           {shown.map((g) => (
             <li key={g.key}>
               <CollectionTile game={g} date={dates.get(g.key)} />
@@ -104,7 +104,7 @@ export default function CollectionGrid({
                 <span className="tabular-nums">· {group.games.length}</span>
                 <span aria-hidden="true" className="h-px flex-1 bg-ink/[0.06]" />
               </h4>
-              <ul className={GRID}>
+              <ul className={`${GRID} enter-cards`}>
                 {group.games.map((g) => (
                   <li key={g.key}>
                     <CollectionTile game={g} date={dates.get(g.key)} />

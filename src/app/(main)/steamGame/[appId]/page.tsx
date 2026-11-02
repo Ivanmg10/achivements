@@ -1,9 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { notFound, useParams } from 'next/navigation'
-import { fadeUp } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamGamesData } from '@/context/SteamGamesDataContext'
 import { useSteamAchievements } from '@/hooks/useSteamAchievements'
@@ -15,6 +12,8 @@ import SteamGameInfoHeader from '@/components/steam/steam-game-info-header/Steam
 import SteamGameInfoTable from '@/components/steam/steam-game-info-table/SteamGameInfoTable'
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { steamAiSource } from '@/utils/aiExport'
+import Button from '@/components/ui/Button'
+import { buttonClass } from '@/components/ui/Button'
 
 /**
  * A Steam game's page — the counterpart of /gameInfo/[gameId] for RA, built
@@ -29,7 +28,7 @@ export default function SteamGamePage() {
   const { appId: rawId } = useParams()
   const appId = typeof rawId === 'string' && /^\d+$/.test(rawId) ? Number(rawId) : null
   const { T } = useLanguage()
-  const { isLinked, library, libraryLoading } = useSteamGamesData()
+  const { isLinked, fullLibrary, libraryLoading } = useSteamGamesData()
   const { achievements, isLoading: achievementsLoading, error: achievementsError, retry } = useSteamAchievements(
     isLinked ? appId : null,
   )
@@ -41,17 +40,17 @@ export default function SteamGamePage() {
     return (
       <main className="flex-1 flex flex-col justify-center items-center text-text-main gap-3 p-6 text-center">
         <p className="text-text-secondary">Steam · {T.userData.notConnected}</p>
-        <Link
+        <Button
           href="/user"
-          className="px-4 py-1.5 bg-accent text-bg-main font-semibold rounded-xl hover:scale-[1.03] transition-transform duration-200 text-sm"
+          size="sm"
         >
           {T.userData.steamConnect}
-        </Link>
+        </Button>
       </main>
     )
   }
 
-  const game = library.find((g) => g.id === appId) ?? null
+  const game = fullLibrary.find((g) => g.id === appId) ?? null
 
   // Nothing to title the page with yet.
   if (!game && !details && (libraryLoading || detailsLoading)) {
@@ -69,7 +68,7 @@ export default function SteamGamePage() {
   return (
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <SteamGameHeroBackground appId={appId} />
-      <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
+      <div className="relative w-full flex flex-col items-center">
         <SteamGameInfoHeader
           appId={appId}
           title={title}
@@ -91,26 +90,26 @@ export default function SteamGamePage() {
             <GameInfoSkeletonTable />
           </div>
         ) : achievementsError ? (
-          <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 flex flex-col items-center gap-2 text-center">
-            <p role="alert" className="text-red-400">
+          <section className="bg-bg-card rounded-card ring-1 ring-ink/[0.06] p-6 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-5 flex flex-col items-center gap-2 text-center">
+            <p role="alert" className="text-danger">
               {T.steam.achievementsError}
             </p>
             <p className="text-xs text-text-secondary">{T.steam.privateProfileHint}</p>
             <button
               onClick={retry}
-              className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-ink/10 transition-colors"
+              className={buttonClass('secondary', 'sm')}
             >
               {T.steam.retry}
             </button>
           </section>
         ) : achievements.length === 0 ? (
-          <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 text-center">
+          <section className="bg-bg-card rounded-card ring-1 ring-ink/[0.06] p-6 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-5 text-center">
             <p className="text-text-secondary">{T.steam.noAchievements}</p>
           </section>
         ) : (
           <SteamGameInfoTable achievements={achievements} appId={appId} gameTitle={title} />
         )}
-      </motion.div>
+      </div>
     </main>
   )
 }

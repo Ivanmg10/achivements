@@ -4,6 +4,7 @@ import { IconStar, IconStarFilled } from '@tabler/icons-react'
 import { FadeImage } from '@/components/ui/FadeImage'
 import { RetroAchievement } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
+import { decimal } from '@/utils/utils'
 
 export default function GameInfoAchievementCard({
   achievement,
@@ -18,7 +19,7 @@ export default function GameInfoAchievementCard({
   onToggleFavorite?: (a: RetroAchievement) => void
   onClick?: () => void
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   const TYPE_BADGES: Record<string, { label: string; className: string }> = {
     progression: { label: T.achievement.progression, className: 'bg-info/20 text-info' },
@@ -30,7 +31,7 @@ export default function GameInfoAchievementCard({
   const earnedHardcore = !!achievement.DateEarnedHardcore
   const rarityPct =
     numDistinctPlayers > 0
-      ? ((achievement.NumAwarded / numDistinctPlayers) * 100).toFixed(1)
+      ? decimal(((achievement.NumAwarded / numDistinctPlayers) * 100), lang)
       : null
   const typeBadge = achievement.Type ? TYPE_BADGES[achievement.Type] : null
 
@@ -39,7 +40,7 @@ export default function GameInfoAchievementCard({
   // target, through a button stretched over it; the star sits above that.
   return (
     <div
-      className={`relative w-full flex items-start gap-3 p-3 rounded-xl bg-bg-header/20 hover:bg-bg-header/50 transition-colors text-left ${
+      className={`relative w-full flex items-start gap-3 p-3 rounded-tile bg-bg-header/20 hover:bg-bg-header/50 transition-colors text-left ${
         isFavorited ? 'bg-warning/10' : ''
       }`}
     >
@@ -47,7 +48,7 @@ export default function GameInfoAchievementCard({
         type="button"
         onClick={onClick}
         aria-label={achievement.Title}
-        className="absolute inset-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       />
       {/* Badge */}
       <div className="relative shrink-0">
@@ -57,7 +58,7 @@ export default function GameInfoAchievementCard({
             alt=""
             width={56}
             height={56}
-            className={`w-14 h-14 rounded-xl ${earnedHardcore ? 'ring-2 ring-warning' : ''}`}
+            className={`w-14 h-14 rounded-tile ${earnedHardcore ? 'ring-2 ring-warning' : ''}`}
             imgClassName={`w-full h-full object-cover ${earned ? '' : 'grayscale opacity-60'}`}
           />
         )}

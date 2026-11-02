@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useLanguage } from '@/context/LanguageContext'
 import { toSteamLanguage } from '@/utils/steamLanguage'
@@ -7,6 +7,7 @@ import { useSubject } from '@/context/SubjectContext'
 import { withSubject } from '@/utils/withSubject'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { fetchShared } from '@/lib/fetchShared'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 const ENDPOINTS = {
   recent: 'recentAchievements',
@@ -26,6 +27,7 @@ export function useSteamRecentAchievements(scope: SteamUnlockScope | null = 'rec
   const endpoint = scope ? ENDPOINTS[scope] : null
   const { data: session } = useSession()
   const subject = useSubject()
+  const { isHidden } = useHiddenGames()
   const steamid = session?.user?.steamid ?? null
   const { lang } = useLanguage()
   const steamLang = toSteamLanguage(lang)
@@ -80,5 +82,6 @@ export function useSteamRecentAchievements(scope: SteamUnlockScope | null = 'rec
     request(steamLang).then(settle)
   }, [steamid, steamLang, endpoint, request, settle])
 
-  return { achievements, isLoading, error, retry }
+  const visible = useMemo(() => achievements.filter((achievement) => !isHidden(achievement.appId, 'steam')), [achievements, isHidden])
+  return { achievements: visible, isLoading, error, retry }
 }

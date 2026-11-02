@@ -2,7 +2,6 @@
 
 import { useEffect, useId, useMemo, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
-import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import {
   SteamSortableHeader,
@@ -17,13 +16,18 @@ import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useRevealedAchievements } from '@/hooks/useRevealedAchievements'
 import { useLocationHash } from '@/hooks/useLocationHash'
 import { guideLinks } from '@/utils/guideLinks'
-import GameInfoTableFoldBar from '@/components/game-info-table-fold-bar/GameInfoTableFoldBar'
 import AchievementDetailModal from '@/components/achievement-detail-modal/AchievementDetailModal'
 import type { XboxAchievement } from '@/types/xbox'
+import AchievementTableToolbar from '@/components/achievement-table-toolbar/AchievementTableToolbar'
+import ShowRestButton from '@/components/show-rest-button/ShowRestButton'
+import { SURFACE } from '@/components/ui/surface'
+import { TABLE, TH } from '@/components/ui/dataTable'
+import { buttonClass } from '@/components/ui/Button'
 
 type Filter = 'all' | 'earned' | 'unearned'
 
-const COLLAPSED_ROWS = 3
+/** Rows shown before "show the other N". */
+const FIRST_ROWS = 8
 const HIGHLIGHT_MS = 2500
 const ANCHOR = '#achievement-'
 
@@ -75,16 +79,11 @@ export default function XboxGameInfoTable({
   const panelId = useId()
   const [filter, setFilter] = useState<Filter>('all')
   const [sortState, setSortState] = useState<SteamSortState>({ key: 'default', dir: 'asc' })
-  const [expanded, setExpanded] = useState(true)
+  const [showAll, setShowAll] = useState(false)
+  const [query, setQuery] = useState('')
   const [highlighted, setHighlighted] = useState<string | null>(null)
   const [selected, setSelected] = useState<XboxAchievement | null>(null)
   const { isRevealed, toggle: toggleOne, setAll } = useRevealedAchievements()
-
-  const FILTER_LABELS: Record<Filter, string> = {
-    all: T.gameInfoTable.filterAll,
-    earned: T.gameInfoTable.filterEarned,
-    unearned: T.gameInfoTable.filterUnearned,
-  }
 
   // Deep link from an achievement: show it (state, so while rendering), then scroll
   // to the visible copy (row on desktop, card on phones) and light it up for a moment.
@@ -95,7 +94,8 @@ export default function XboxGameInfoTable({
   useWhenChanged([linked ? linkedId : null, achievements], () => {
     if (!linked) return
     setFilter('all')
-    setExpanded(true)
+    setQuery('')
+    setShowAll(true)
     setHighlighted(linkedId)
   })
 
@@ -111,12 +111,15 @@ export default function XboxGameInfoTable({
   }, [linked, linkedId, achievements])
 
   const filtered = useMemo(() => {
-    const list =
+    let list =
       filter === 'earned' ? achievements.filter((a) => a.unlocked) : filter === 'unearned' ? achievements.filter((a) => !a.unlocked) : achievements
+    // Searched by what is shown: a secret one by its hidden label, not its text.
+    const q = query.trim().toLowerCase()
+    if (q) list = list.filter((a) => (a.secret && !a.unlocked && !isRevealed(a.id) ? T.xbox.secretAchievement : `${a.name} ${a.description}`).toLowerCase().includes(q))
     const sorted = sortAchievements(list, sortState)
     // Pinned first, each part in the chosen order — as RA's table does.
     return canPin ? [...sorted.filter((a) => leading.has(a.id)), ...sorted.filter((a) => !leading.has(a.id))] : sorted
-  }, [achievements, filter, sortState, canPin, leading])
+  }, [achievements, filter, query, sortState, canPin, leading, isRevealed, T.xbox.secretAchievement])
 
   function handleSort(key: SteamSortKey) {
     setSortState((prev) =>
@@ -126,65 +129,70 @@ export default function XboxGameInfoTable({
 
   const secrets = achievements.filter((a) => a.secret && !a.unlocked)
   const allRevealed = secrets.length > 0 && secrets.every((a) => isRevealed(a.id))
-  const needsToggle = filtered.length > COLLAPSED_ROWS
-  const shown = expanded || !needsToggle ? filtered : filtered.slice(0, COLLAPSED_ROWS)
+  const folded = !showAll && !query.trim() && filtered.length > FIRST_ROWS
+  const shown = folded ? filtered.slice(0, FIRST_ROWS) : filtered
+  const earnedCount = achievements.filter((a) => a.unlocked).length
 
   return (
-    <section className="bg-bg-card p-5 rounded-xl flex flex-col items-start gap-5 w-[95%] mt-5 mb-5">
-      <div className="flex gap-2 flex-wrap" role="group" aria-label={T.xbox.achievements}>
-        {(['all', 'earned', 'unearned'] as Filter[]).map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            aria-pressed={filter === f}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
-              filter === f
-                ? 'bg-bg-header text-text-main ring-1 ring-text-secondary/30'
-                : 'bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card'
-            }`}
-          >
-            {FILTER_LABELS[f]}
-          </button>
-        ))}
-        {secrets.length > 0 && (
-          <button
-            onClick={() => setAll(secrets.map((a) => a.id), !allRevealed)}
-            aria-pressed={allRevealed}
-            className="px-3 py-1 rounded-full text-xs font-medium bg-bg-card/60 text-text-secondary hover:text-text-main hover:bg-bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            {allRevealed ? T.xbox.hideSecretAchievements : T.xbox.showSecretAchievements}
-          </button>
-        )}
-      </div>
-
-      {needsToggle && (
-        <GameInfoTableFoldBar expanded={expanded} onToggle={() => setExpanded((e) => !e)} shown={filtered.length} total={achievements.length} />
-      )}
+    <div className="w-full px-4 sm:px-8 lg:px-14 mt-7 mb-7">
+    <section aria-label={T.xbox.achievements} className={`${SURFACE} p-4 sm:p-6 flex flex-col gap-4`}>
+      <AchievementTableToolbar<Filter, SteamSortKey>
+        label={T.xbox.achievements}
+        tabs={[
+          { value: 'all', label: T.gameInfoTable.filterAll, count: achievements.length },
+          { value: 'earned', label: T.gameInfoTable.filterEarned, count: earnedCount },
+          { value: 'unearned', label: T.gameInfoTable.filterUnearned, count: achievements.length - earnedCount },
+        ]}
+        filter={filter}
+        onFilter={setFilter}
+        query={query}
+        onQuery={setQuery}
+        sortOptions={[
+          { value: 'default', label: T.gameInfoTable.sortGameOrder },
+          { value: 'rarity', label: T.gameInfoTable.headerRarity },
+          { value: 'earned', label: T.gameInfoTable.headerEarned },
+        ]}
+        sort={sortState.key}
+        onSort={(key) => setSortState({ key, dir: STEAM_DEFAULT_DIRS[key] })}
+        extra={
+          secrets.length > 0 && (
+            <button type="button" onClick={() => setAll(secrets.map((a) => a.id), !allRevealed)} aria-pressed={allRevealed} className={buttonClass('quiet', 'sm')}>
+              {allRevealed ? T.xbox.hideSecretAchievements : T.xbox.showSecretAchievements}
+            </button>
+          )
+        }
+      />
 
       {filtered.length === 0 ? (
-        <p className="text-sm text-text-secondary self-center py-4">{T.xbox.noAchievements}</p>
+        <p className="text-sm text-text-secondary self-center py-6">{query.trim() ? T.gameInfoTable.noMatches : T.xbox.noAchievements}</p>
       ) : (
         <>
           {/* Desktop table */}
           <div id={panelId} className="hidden sm:block w-full">
-            <table className="w-full border-collapse">
+            <table className={TABLE}>
               <thead>
-                <tr className="text-sm border-b border-bg-header">
-                  <th className="px-3 py-2 w-24 text-center text-text-secondary">{T.gameInfoTable.headerIcon}</th>
-                  <SteamSortableHeader sortKey="default" sortState={sortState} onSort={handleSort} className="text-left">
+                <tr>
+                  <th scope="col" className={`${TH} w-16`}>
+                    <span className="sr-only">{T.gameInfoTable.headerIcon}</span>
+                  </th>
+                  <SteamSortableHeader sortKey="default" sortState={sortState} onSort={handleSort}>
                     {T.xbox.achievement}
                   </SteamSortableHeader>
-                  <th className="px-3 py-2 w-28 text-center text-text-secondary">{T.xbox.score}</th>
-                  <SteamSortableHeader sortKey="rarity" sortState={sortState} onSort={handleSort} className="w-28 text-center">
+                  <th scope="col" className={`${TH} text-right w-24`}>{T.xbox.score}</th>
+                  <SteamSortableHeader sortKey="rarity" sortState={sortState} onSort={handleSort} align="center" className="w-28">
                     {T.gameInfoTable.headerRarity}
                   </SteamSortableHeader>
-                  <SteamSortableHeader sortKey="earned" sortState={sortState} onSort={handleSort} className="w-44 text-center">
+                  <SteamSortableHeader sortKey="earned" sortState={sortState} onSort={handleSort} align="right" className="w-28">
                     {T.gameInfoTable.headerEarned}
                   </SteamSortableHeader>
-                  {canPin && <th className="w-12" aria-label={T.favorites.title} />}
+                  {canPin && (
+                    <th scope="col" className={`${TH} w-12`}>
+                      <span className="sr-only">{T.favorites.title}</span>
+                    </th>
+                  )}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="enter-rows">
                 {shown.map((a) => (
                   <XboxGameInfoAchievement
                     key={a.id}
@@ -202,7 +210,7 @@ export default function XboxGameInfoTable({
           </div>
 
           {/* Phone card list */}
-          <ul className="sm:hidden w-full flex flex-col gap-2">
+          <ul className="sm:hidden w-full flex flex-col gap-2 enter-rows">
             {shown.map((a) => (
               <XboxGameInfoAchievementCard
                 key={a.id}
@@ -217,24 +225,8 @@ export default function XboxGameInfoTable({
             ))}
           </ul>
 
-          {needsToggle && (
-            <button
-              onClick={() => setExpanded((e) => !e)}
-              aria-expanded={expanded}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-bg-header hover:bg-bg-header/80 text-text-secondary hover:text-text-main transition-colors self-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-            >
-              {expanded ? (
-                <>
-                  <IconChevronUp className="w-4 h-4" aria-hidden="true" />
-                  {T.gameInfoTable.collapseTable}
-                </>
-              ) : (
-                <>
-                  <IconChevronDown className="w-4 h-4" aria-hidden="true" />
-                  {T.gameInfoTable.expandTable} ({filtered.length})
-                </>
-              )}
-            </button>
+          {(folded || (showAll && filtered.length > FIRST_ROWS && !query.trim())) && (
+            <ShowRestButton folded={folded} rest={filtered.length - FIRST_ROWS} onToggle={() => setShowAll((v) => !v)} />
           )}
         </>
       )}
@@ -251,7 +243,7 @@ export default function XboxGameInfoTable({
               earned={selected.unlocked}
               earnedAt={selected.unlockedAt}
               rarity={selected.rarity}
-              tags={<span className="font-semibold text-green-500">{selected.gamerscore} G</span>}
+              tags={<span className="font-semibold text-success">{selected.gamerscore} G</span>}
               guides={concealed ? [] : guideLinks('xbox', { gameTitle, title: selected.name })}
               pinned={canPin ? pinned.has(selected.id) : undefined}
               onTogglePin={() => toggle(selected)}
@@ -266,5 +258,6 @@ export default function XboxGameInfoTable({
         })()}
       </AnimatePresence>
     </section>
+    </div>
   )
 }

@@ -6,7 +6,7 @@ import type { RecentAchievement } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamProfile } from '@/hooks/useSteamProfile'
-import { calcAvgPerDay } from '@/utils/utils'
+import { calcAvgPerDay, decimal } from '@/utils/utils'
 import { StatPill } from '@/components/ui/StatPill'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
@@ -31,8 +31,10 @@ export default function MainPageSteamStats({
   games: SteamGameProgress[]
   isLoading?: boolean
 }) {
-  const { T } = useLanguage()
-  const { profile } = useSteamProfile()
+  const { T, lang } = useLanguage()
+  const { profile, error } = useSteamProfile()
+  // Its pill is in the row from the start: arriving late, it pushed every other one aside.
+  const levelWaiting = !profile && !error
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [weekOpen, setWeekOpen] = useState(false)
   const [monthOpen, setMonthOpen] = useState(false)
@@ -56,8 +58,8 @@ export default function MainPageSteamStats({
   if (isLoading) {
     return (
       <div className="flex flex-wrap gap-3" aria-busy="true">
-        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.streak.title, T.steam.last2Weeks].map((label) => (
-          <StatPill key={label} label={label} value="—" accent="text-text-secondary" />
+        {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.steam.level, T.streak.title, T.steam.last2Weeks].map((label) => (
+          <StatPill key={label} label={label} value="" loading />
         ))}
       </div>
     )
@@ -75,13 +77,13 @@ export default function MainPageSteamStats({
       />
       <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={unlocks} onClick={() => setWeekOpen(true)} />
       <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={unlocks} onClick={() => setMonthOpen(true)} />
-      <StatPill label={T.pointsStats.avgPerDay} value={stats.avg.toFixed(1)} sub={T.pointsStats.perDay} />
-      {profile?.level != null && <StatPill label={T.steam.level} value={profile.level} sub="Steam" />}
+      <StatPill label={T.pointsStats.avgPerDay} value={decimal(stats.avg, lang)} sub={T.pointsStats.perDay} />
+      {(levelWaiting || profile?.level != null) && <StatPill label={T.steam.level} value={profile?.level ?? ''} sub="Steam" loading={levelWaiting} />}
       <StatPill
         label={T.streak.title}
         value={`${streak}d`}
         sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
-        accent={streak >= 7 ? 'text-warning' : streak > 0 ? 'text-success' : undefined}
+        accent={streak > 0 ? 'text-accent' : undefined}
         href="/racha"
       />
       <StatPill label={T.steam.last2Weeks} value={`${stats.hours2w}${T.steam.hoursShort}`} sub={T.steam.playtime} />

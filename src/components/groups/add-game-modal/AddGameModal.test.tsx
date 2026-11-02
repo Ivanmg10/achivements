@@ -73,8 +73,8 @@ test('adds a Steam game with its platform, then closes', async () => {
   const { onAdded, onClose } = renderModal()
 
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'portal' } })
-  fireEvent.click(screen.getByRole('button', { name: /Portal 2/ }))
-  fireEvent.click(screen.getByRole('button', { name: `${en.groups.addGame} (1)` }))
+  fireEvent.click(screen.getByRole('button', { name: /^Portal 2/ }))
+  fireEvent.click(screen.getByRole('button', { name: 'Add 1 game' }))
 
   await waitFor(() => expect(onClose).toHaveBeenCalled())
   const [url, init] = (global.fetch as jest.Mock).mock.calls[0]
@@ -92,14 +92,14 @@ test('keeps failed games selected and says so', async () => {
   const { onAdded, onClose } = renderModal()
 
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'a' } })
-  fireEvent.click(screen.getByRole('button', { name: /Zelda/ }))
-  fireEvent.click(screen.getByRole('button', { name: /Portal 2/ }))
-  fireEvent.click(screen.getByRole('button', { name: `${en.groups.addGame} (2)` }))
+  fireEvent.click(screen.getByRole('button', { name: /^Zelda/ }))
+  fireEvent.click(screen.getByRole('button', { name: /^Portal 2/ }))
+  fireEvent.click(screen.getByRole('button', { name: 'Add 2 games' }))
 
   expect(await screen.findByRole('alert')).toHaveTextContent(en.groups.addError)
   expect(onAdded).toHaveBeenCalledWith([{ id: 1, source: 'ra', game_id: 620 }])
   expect(onClose).not.toHaveBeenCalled()
-  expect(screen.getByRole('button', { name: `${en.groups.addGame} (1)` })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Add 1 game' })).toBeInTheDocument()
 })
 
 test('treats a network error like a failed add', async () => {
@@ -108,8 +108,8 @@ test('treats a network error like a failed add', async () => {
   const { onAdded } = renderModal()
 
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'zelda' } })
-  fireEvent.click(screen.getByRole('button', { name: /Zelda/ }))
-  fireEvent.click(screen.getByRole('button', { name: `${en.groups.addGame} (1)` }))
+  fireEvent.click(screen.getByRole('button', { name: /^Zelda/ }))
+  fireEvent.click(screen.getByRole('button', { name: 'Add 1 game' }))
 
   expect(await screen.findByRole('alert')).toBeInTheDocument()
   expect(onAdded).not.toHaveBeenCalled()
@@ -128,11 +128,36 @@ test('opening it again starts over: no search and nothing selected from last tim
   const props = { onClose: jest.fn(), groupId: 3, existingKeys: new Set<string>(), onAdded: jest.fn() }
   const { rerender } = render(<AddGameModal isOpen {...props} />)
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'zel' } })
-  fireEvent.click(screen.getByRole('button', { name: /Zelda/ }))
-  expect(screen.getByText(`${en.groups.addGame} (1)`)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: /^Zelda/ }))
+  expect(screen.getByText('Add 1 game')).toBeInTheDocument()
 
   rerender(<AddGameModal isOpen={false} {...props} />)
   rerender(<AddGameModal isOpen {...props} />)
   expect(screen.getByRole('textbox')).toHaveValue('')
-  expect(screen.queryByText(`${en.groups.addGame} (1)`)).not.toBeInTheDocument()
+  expect(screen.queryByText('Add 1 game')).not.toBeInTheDocument()
+})
+
+test('opens on suggestions: games being played first, nothing typed', () => {
+  const WANTED = { ...candidate('ra', 7, 'Metroid'), status: 'want-to-play' as const, pctWon: 0 }
+  ;(useGameCandidates as jest.Mock).mockReturnValue([WANTED, ZELDA])
+  renderModal({ groupTitle: 'October' })
+  expect(screen.getByRole('dialog', { name: en.groups.addGames })).toBeInTheDocument()
+  expect(screen.getByText('Add to “October”')).toBeInTheDocument()
+  expect(screen.getByText(en.groups.suggestions)).toBeInTheDocument()
+  const names = screen.getAllByRole('button', { pressed: false }).map((b) => b.textContent)
+  expect(names.findIndex((n) => n?.startsWith('Zelda'))).toBeLessThan(names.findIndex((n) => n?.startsWith('Metroid')))
+})
+
+test('narrows to one platform', () => {
+  renderModal()
+  fireEvent.click(screen.getByRole('button', { name: /^Steam$/ }))
+  expect(screen.queryByRole('button', { name: /^Zelda/ })).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /^Portal 2/ })).toBeInTheDocument()
+})
+
+test('says when nothing matches, and the add button waits for a pick', () => {
+  renderModal()
+  expect(screen.getByRole('button', { name: en.groups.addGames })).toBeDisabled()
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'xyz' } })
+  expect(screen.getByText('No games match “xyz”')).toBeInTheDocument()
 })

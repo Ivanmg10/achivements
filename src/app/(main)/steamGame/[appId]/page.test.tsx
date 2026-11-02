@@ -47,7 +47,7 @@ function setup({
   detailsLoading = false,
 } = {}) {
   ;(useParams as jest.Mock).mockReturnValue({ appId })
-  ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: linked, library, libraryLoading })
+  ;(useSteamGamesData as jest.Mock).mockReturnValue({ isLinked: linked, fullLibrary: library, libraryLoading })
   ;(useSteamAchievements as jest.Mock).mockReturnValue({
     achievements, isLoading: achievementsLoading, error: achievementsError, retry,
   })

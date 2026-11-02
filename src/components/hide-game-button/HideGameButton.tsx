@@ -8,6 +8,7 @@ import { useHiddenGames } from '@/context/HiddenGamesContext'
 import { useSubject } from '@/context/SubjectContext'
 import type { GameSource } from '@/types/steam'
 import CommonModal from '@/components/common-modal/CommonModal'
+import Button from '@/components/ui/Button'
 
 /**
  * The eye next to a game in a status list. It asks first, in a small popup
@@ -53,7 +54,7 @@ export default function HideGameButton({
         onClick={ask}
         aria-label={`${T.cards.hideGame}: ${title}`}
         aria-haspopup="dialog"
-        className={`p-1.5 rounded-lg text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0 ${className}`}
+        className={`p-1.5 rounded-chip text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 shrink-0 ${className}`}
       >
         <IconEyeOff className="w-4 h-4" aria-hidden="true" />
       </button>
@@ -61,8 +62,8 @@ export default function HideGameButton({
       {/* React carries clicks out of a portal to the card around it: stop them here. */}
       <span className="contents" onClick={(e) => e.stopPropagation()}>
       <CommonModal isOpen={open} onClose={() => setOpen(false)} className="min-h-0">
-        <div role="dialog" aria-modal="true" aria-labelledby={`hide-${source}-${gameId}`} className="flex flex-col gap-4">
-          <span aria-hidden="true" className="w-12 h-12 rounded-2xl bg-accent/10 ring-1 ring-accent/20 text-accent flex items-center justify-center">
+        <div className="flex flex-col gap-4">
+          <span aria-hidden="true" className="w-12 h-12 rounded-card bg-accent/10 ring-1 ring-accent/20 text-accent flex items-center justify-center">
             <IconEyeOff size={22} />
           </span>
           <h2 id={`hide-${source}-${gameId}`} className="text-lg font-semibold">
@@ -70,20 +71,19 @@ export default function HideGameButton({
           </h2>
           <p className="text-sm text-text-secondary">{T.cards.hideGameText.replace('{title}', title)}</p>
           <div className="flex gap-2 justify-end">
-            <button
+            <Button
               type="button"
               onClick={() => setOpen(false)}
-              className="px-4 py-2 rounded-xl bg-bg-main text-sm text-text-secondary hover:text-text-main transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+              variant="secondary"
             >
               {T.cards.cancel}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={confirm}
-              className="px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-semibold hover:bg-accent-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               {T.cards.hideConfirm}
-            </button>
+            </Button>
           </div>
         </div>
       </CommonModal>

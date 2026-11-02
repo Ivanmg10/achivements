@@ -1,80 +1,77 @@
 'use client'
 
-import { IconFlame, IconTrendingUp } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { Streak } from '@/types/types'
 import { formatDay, plural } from '@/utils/utils'
+import { streakInk, streakTier } from '@/utils/streakTier'
+import { CountUp } from '@/components/ui/CountUp'
 
 interface Props {
   activeStreak: Streak | null
   bestStreak: Streak | null
-  totalStreaks: number
   /** The most recent day with an achievement, for when there is no streak going. */
   lastActiveDay: string | null
+  /** Today, "YYYY-MM-DD", and how much was unlocked on it. */
+  today: string
+  todayCount: number
+  /** Hours left in the day, for "what today still needs". */
+  hoursLeft: number
+  /** The year's numbers, as tiles on the right. */
+  children?: React.ReactNode
 }
 
 /**
- * The two numbers that matter: the streak going now (and how far it is from
- * the record, or when the last achievement was if none is going) and the
- * best one so far.
+ * The top of the streak page, its one warm spot: the streak going now in big,
+ * whether it is the record or how far from it, since when without missing a
+ * day and what today has (or still needs); the year's numbers beside it.
+ * Without a streak, when the last achievement was.
  */
-export default function StreakStatsBanner({ activeStreak, bestStreak, totalStreaks, lastActiveDay }: Props) {
+export default function StreakStatsBanner({ activeStreak, bestStreak, lastActiveDay, today, todayCount, hoursLeft, children }: Props) {
   const { T, lang } = useLanguage()
-  const range = (s: Streak) =>
-    `${formatDay(s.start, lang, { day: 'numeric', month: 'short' })} – ${formatDay(s.end, lang, { day: 'numeric', month: 'short' })}`
+  // The streak going colours the hero by its tier; none going, the dimmest.
+  const tier = streakTier(activeStreak?.days ?? 0)
+  const long = (d: string) => formatDay(d, lang, { day: 'numeric', month: 'long' })
 
-  let nudge: string | null = null
+  let kicker = T.streak.yourStreak
   if (activeStreak && bestStreak) {
-    nudge =
+    kicker += ` · ${
       activeStreak.days >= bestStreak.days
         ? T.streak.newRecord
         : T.streak.toBeatRecord.replace('{days}', plural(bestStreak.days - activeStreak.days + 1, T.plurals.days, lang))
-  } else if (lastActiveDay) {
-    nudge = T.streak.lastActive.replace('{date}', formatDay(lastActiveDay, lang, { weekday: 'long', day: 'numeric', month: 'long' }))
+    }`
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div className="bg-bg-card rounded-2xl p-5 flex items-center gap-4">
-        <div className={`flex items-center justify-center w-12 h-12 rounded-xl shrink-0 ${activeStreak ? 'bg-orange-400/10' : 'bg-ink/5'}`}>
-          <IconFlame className={`w-6 h-6 ${activeStreak ? 'text-orange-400' : 'text-text-secondary'}`} aria-hidden="true" />
-        </div>
-        <div className="min-w-0">
-          <p className="text-xs uppercase tracking-widest text-text-secondary">{T.streak.currentStreak}</p>
-          {activeStreak ? (
-            <>
-              <p className="text-2xl font-bold text-text-main leading-tight">{plural(activeStreak.days, T.plurals.days, lang)}</p>
-              <p className="text-xs text-text-secondary mt-0.5">{range(activeStreak)}</p>
-            </>
-          ) : (
-            <>
-              <p className="text-lg font-semibold text-text-main">{T.streak.noStreak}</p>
-              <p className="text-xs text-text-secondary mt-0.5">{T.streak.noStreakSub}</p>
-            </>
-          )}
-          {nudge && <p className="text-xs font-medium text-accent mt-1.5">{nudge}</p>}
-        </div>
+    <section
+      aria-label={T.streak.currentStreak}
+      data-tier={tier.id}
+      className="relative overflow-hidden rounded-card ring-1 ring-inset ring-ink/[0.06] bg-bg-card p-6 sm:p-[2.375rem] flex flex-col lg:flex-row lg:items-center gap-8"
+      style={{ backgroundImage: `linear-gradient(110deg, rgb(${tier.color} / 0.22), transparent 55%)` }}
+    >
+      <div className="flex-1 min-w-0 flex flex-col gap-2 enter-rows">
+        <p className="text-xs font-bold uppercase tracking-[0.16em]" style={{ color: streakInk(tier) }}>{kicker}</p>
+        {activeStreak ? (
+          <>
+            <p className="font-display italic font-extrabold text-6xl sm:text-[6.5rem] leading-[0.9] pr-3 text-text-main">
+              <CountUp value={activeStreak.days} format={(n) => plural(n, T.plurals.days, lang)} />
+            </p>
+            <p className="text-[0.9375rem] text-text-secondary">
+              {(activeStreak.end === today ? T.streak.untilToday : T.streak.untilDay)
+                .replace('{start}', long(activeStreak.start))
+                .replace('{end}', long(activeStreak.end))}{' '}
+              {todayCount > 0 ? plural(todayCount, T.plurals.todayAchievements, lang) : T.homeLayout.todayNone.replace('{h}', String(hoursLeft))}
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1] pr-2 text-text-main">{T.streak.noStreak}</p>
+            <p className="text-[0.9375rem] text-text-secondary">
+              {lastActiveDay ? T.streak.lastActive.replace('{date}', formatDay(lastActiveDay, lang, { weekday: 'long', day: 'numeric', month: 'long' })) : T.streak.noStreakSub}
+            </p>
+          </>
+        )}
       </div>
-
-      <div className="bg-bg-card rounded-2xl p-5 flex items-center gap-4">
-        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 shrink-0">
-          <IconTrendingUp className="w-6 h-6 text-accent" aria-hidden="true" />
-        </div>
-        <div className="flex flex-col gap-1 min-w-0">
-          <p className="text-xs uppercase tracking-widest text-text-secondary">{T.streak.bestStreak}</p>
-          {bestStreak ? (
-            <>
-              <p className="text-2xl font-bold text-text-main leading-tight">{plural(bestStreak.days, T.plurals.days, lang)}</p>
-              <p className="text-xs text-text-secondary mt-0.5">{range(bestStreak)}</p>
-            </>
-          ) : (
-            <p className="text-lg font-semibold text-text-secondary">—</p>
-          )}
-          <p className="text-xs text-text-secondary mt-0.5">
-            {totalStreaks} {T.streak.totalStreaks.toLowerCase()}
-          </p>
-        </div>
-      </div>
-    </div>
+      {children}
+    </section>
   )
 }

@@ -1,8 +1,8 @@
 import { cleanStoredPreferences, isSyncedKey, MAX_PREFERENCE_KEYS, MAX_PREFERENCE_VALUE, readPreferenceChanges } from './syncedPreferences'
 
 test.each([
-  'hidden-consoles:ra', 'hidden-consoles:xbox', 'library-layout', 'library-view', 'library-cols', 'library-sort:playing', 'library-sort-all:completed',
-  'psn-completion', 'psn-hidden-trophies', 'xbox-secret-achievements',
+  'hidden-consoles:ra', 'hidden-consoles:xbox', 'library-layout', 'library-view', 'library-cols', 'groups-view', 'group-detail-view', 'library-sort:playing', 'library-sort-all:completed',
+  'psn-completion', 'psn-hidden-trophies', 'xbox-secret-achievements', 'font-style',
 ])('%s is stored on the account', (key) => expect(isSyncedKey(key)).toBe(true))
 
 test.each([
@@ -42,4 +42,8 @@ test('stored preferences are cleaned to the allowed keys and string values', () 
   expect(cleanStoredPreferences(null)).toEqual({})
   expect(cleanStoredPreferences([])).toEqual({})
   expect(cleanStoredPreferences('x')).toEqual({})
+})
+
+test('the home layout follows the account', () => {
+  expect(isSyncedKey('home-layout')).toBe(true)
 })

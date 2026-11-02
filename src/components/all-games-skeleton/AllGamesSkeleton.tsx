@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const SECTIONS = 3
 const ROWS = 3
@@ -13,12 +14,12 @@ export default function AllGamesSkeleton() {
   return (
     <div role="status" aria-busy="true" className="flex flex-col gap-4">
       <span className="sr-only">{T.loadingPage.title}</span>
-      <div aria-hidden="true" className="flex flex-col gap-4 animate-pulse motion-reduce:animate-none">
+      <div aria-hidden="true" className="flex flex-col gap-4">
         {Array.from({ length: SECTIONS }, (_, s) => (
-          <div key={s} className="w-full bg-bg-card rounded-xl overflow-hidden">
+          <div key={s} className="w-full bg-bg-card rounded-tile overflow-hidden">
             <div className="flex items-center gap-3 px-5 py-4">
-              <div className="h-6 w-36 rounded-lg bg-ink/[0.08]" />
-              <div className="h-5 w-10 rounded-full bg-ink/[0.06]" />
+              <Skeleton className="h-7 w-36" />
+              <Skeleton radius="circle" className="h-5 w-10" />
             </div>
             <div className="border-t border-bg-main p-4 flex flex-col gap-2">
               {Array.from({ length: ROWS }, (_, i) => (

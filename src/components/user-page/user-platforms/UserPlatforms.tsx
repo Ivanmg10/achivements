@@ -23,8 +23,8 @@ import { RetroAchievementsUserProfile } from '@/types/types'
 import { notify } from '@/lib/notify'
 
 /** A dash rather than a zero while the numbers are still loading. */
-const pending = (loading: boolean, value: number | null | undefined) =>
-  loading || value === null || value === undefined ? '—' : value.toLocaleString()
+const pending = (loading: boolean, value: number | null | undefined, lang: string) =>
+  loading || value === null || value === undefined ? '—' : value.toLocaleString(lang)
 
 /**
  * The platforms CheevoVault can track, side by side: who you are on
@@ -33,7 +33,7 @@ const pending = (loading: boolean, value: number | null | undefined) =>
  */
 export default function UserPlatforms() {
   const { data: session, update } = useSession()
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const { all, inProgress } = useGamesData()
   const { rank, isLoading: rankLoading } = useUserRank()
   const { awards, isLoading: awardsLoading } = useUserAwards()
@@ -47,22 +47,23 @@ export default function UserPlatforms() {
   const raStats: PlatformStat[] = [
     {
       label: T.userStats.globalRank,
-      value: rankLoading ? '…' : rank?.Rank ? `#${rank.Rank.toLocaleString()}` : '—',
+      value: rank?.Rank ? `#${rank.Rank.toLocaleString(lang)}` : '—',
+      loading: rankLoading,
     },
     {
       label: T.profileStats.hardcorePoints,
-      value: (raUser?.TotalPoints ?? 0).toLocaleString(),
+      value: (raUser?.TotalPoints ?? 0).toLocaleString(lang),
       accent: 'text-warning',
     },
-    { label: T.userStats.masteries, value: pending(awardsLoading, awards?.MasteryAwardsCount), accent: 'text-success' },
-    { label: T.userStats.games, value: all.length.toLocaleString() },
-    { label: T.userStats.inProgress, value: inProgress.length.toLocaleString() },
+    { label: T.userStats.masteries, value: pending(awardsLoading, awards?.MasteryAwardsCount, lang), accent: 'text-success' },
+    { label: T.userStats.games, value: all.length.toLocaleString(lang) },
+    { label: T.userStats.inProgress, value: inProgress.length.toLocaleString(lang) },
   ]
 
 
   return (
     // Xbox is a fourth card, only for who may use it (an admin, for now): three columns otherwise.
-    <div className={`grid grid-cols-1 gap-4 ${xboxEnabled ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
+    <div className={`grid grid-cols-1 gap-4 enter-cards ${xboxEnabled ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
       <UserPlatformCard
         name="RetroAchievements"
         source="ra"
@@ -81,13 +82,13 @@ export default function UserPlatforms() {
                   alt=""
                   width={44}
                   height={44}
-                  className="rounded-lg w-11 h-11 object-cover shrink-0"
+                  className="rounded-box w-10 h-10 object-cover shrink-0"
                   unoptimized
                 />
               )}
               <div className="flex flex-col gap-0.5 min-w-0">
                 <span className="font-bold truncate">{raUser.User}</span>
-                <span className="text-xs text-text-secondary font-mono truncate">{raUser.ULID}</span>
+                <span className="text-[0.6875rem] text-text-secondary truncate">{raUser.ULID}</span>
               </div>
             </div>
           ) : null

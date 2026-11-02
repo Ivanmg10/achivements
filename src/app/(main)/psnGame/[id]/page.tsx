@@ -1,9 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { notFound, useParams } from 'next/navigation'
-import { fadeUp } from '@/lib/animations'
 import { useLanguage } from '@/context/LanguageContext'
 import { usePsnGamesData } from '@/context/PsnGamesDataContext'
 import { usePsnTrophies } from '@/hooks/usePsnTrophies'
@@ -16,6 +13,8 @@ import PsnGameInfoHeader from '@/components/psn/psn-game-info-header/PsnGameInfo
 import PsnGameInfoTable from '@/components/psn/psn-game-info-table/PsnGameInfoTable'
 import GameAiExport from '@/components/game-ai-export/GameAiExport'
 import { psnAiSource } from '@/utils/aiExport'
+import Button from '@/components/ui/Button'
+import { buttonClass } from '@/components/ui/Button'
 
 /**
  * A PSN game's page — the counterpart of /steamGame/[appId], built the same
@@ -40,12 +39,12 @@ export default function PsnGamePage() {
     return (
       <main className="flex-1 flex flex-col justify-center items-center text-text-main gap-3 p-6 text-center">
         <p className="text-text-secondary">PlayStation Network · {T.userData.notConnected}</p>
-        <Link
+        <Button
           href="/user"
-          className="px-4 py-1.5 bg-accent text-bg-main font-semibold rounded-xl hover:scale-[1.03] transition-transform duration-200 text-sm"
+          size="sm"
         >
           {T.psn.connect}
-        </Link>
+        </Button>
       </main>
     )
   }
@@ -57,7 +56,7 @@ export default function PsnGamePage() {
   return (
     <main className="flex-1 flex flex-col items-center text-text-main relative">
       <PsnGameHeroBackground src={psnBackdrop(game)} />
-      <motion.div className="relative w-full flex flex-col items-center" variants={fadeUp} initial="hidden" animate="visible">
+      <div className="relative w-full flex flex-col items-center">
         <PsnGameInfoHeader
           game={game}
           details={details}
@@ -70,23 +69,23 @@ export default function PsnGamePage() {
             <GameInfoSkeletonTable />
           </div>
         ) : error ? (
-          <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 flex flex-col items-center gap-2 text-center">
-            <p role="alert" className="text-red-400">
+          <section className="bg-bg-card rounded-card ring-1 ring-ink/[0.06] p-6 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-5 flex flex-col items-center gap-2 text-center">
+            <p role="alert" className="text-danger">
               {T.psn.trophiesError}
             </p>
             {error === 'private' && <p className="text-xs text-text-secondary">{T.psn.errors.private}</p>}
-            <button onClick={retry} className="text-sm bg-bg-main px-4 py-1.5 rounded-full hover:bg-ink/10 transition-colors">
+            <button onClick={retry} className={buttonClass('secondary', 'sm')}>
               {T.psn.retry}
             </button>
           </section>
         ) : trophies.length === 0 ? (
-          <section className="bg-bg-card p-5 rounded-xl w-[95%] mt-5 mb-5 text-center">
+          <section className="bg-bg-card rounded-card ring-1 ring-ink/[0.06] p-6 w-[calc(100%-2rem)] sm:w-[calc(100%-4rem)] lg:w-[calc(100%-7rem)] mt-7 mb-5 text-center">
             <p className="text-text-secondary">{T.psn.noTrophies}</p>
           </section>
         ) : (
           <PsnGameInfoTable trophies={trophies} groups={groups} gameId={game.id} gameTitle={game.title} />
         )}
-      </motion.div>
+      </div>
     </main>
   )
 }

@@ -6,6 +6,8 @@ import { useLanguage } from '@/context/LanguageContext'
 import type { LibraryGame } from '@/utils/library'
 import { normalizeTitle } from '@/utils/gameCandidates'
 import ShowcasePickerModalGameRow from '../showcase-picker-modal-game-row/ShowcasePickerModalGameRow'
+import { fieldClass } from '@/components/ui/Input'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 /** The picker's first view: the user's games with an achievement earned, searchable, each opening its achievements. */
 export default function ShowcasePickerModalGames({
@@ -43,7 +45,7 @@ export default function ShowcasePickerModalGames({
             value={query}
             onChange={(e) => onQuery(e.target.value)}
             placeholder={T.showcase.pickerSearch}
-            className="w-full bg-bg-card rounded-xl pl-9 pr-3 py-2 text-sm placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className={fieldClass({ size: 'sm', icon: true })}
           />
         </div>
       </div>
@@ -51,7 +53,7 @@ export default function ShowcasePickerModalGames({
         {isLoading ? (
           <div aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
             {[0, 1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-14 rounded-xl bg-bg-card animate-pulse motion-reduce:animate-none" />
+              <SkeletonRow key={i} className="h-14 bg-bg-card rounded-tile px-2 gap-3" />
             ))}
           </div>
         ) : games.length === 0 ? (

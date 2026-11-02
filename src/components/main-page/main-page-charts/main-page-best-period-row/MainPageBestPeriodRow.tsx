@@ -5,8 +5,8 @@ export type PeriodTone = 'purple' | 'yellow' | 'red'
 
 const TONES: Record<PeriodTone, { text: string; chip: string; ring: string }> = {
   purple: { text: 'text-purple-400', chip: 'bg-purple-500/15 text-purple-400', ring: 'focus-visible:ring-purple-500/70' },
-  yellow: { text: 'text-yellow-400', chip: 'bg-yellow-500/15 text-yellow-400', ring: 'focus-visible:ring-yellow-500/70' },
-  red: { text: 'text-red-400', chip: 'bg-red-500/15 text-red-400', ring: 'focus-visible:ring-red-500/70' },
+  yellow: { text: 'text-hardcore', chip: 'bg-hardcore/15 text-hardcore', ring: 'focus-visible:ring-hardcore/70' },
+  red: { text: 'text-danger', chip: 'bg-danger/15 text-danger', ring: 'focus-visible:ring-danger/70' },
 }
 
 /**
@@ -38,9 +38,9 @@ export default function MainPageBestPeriodRow({
     <button
       onClick={onClick}
       {...(expanded === undefined ? {} : { 'aria-expanded': expanded })}
-      className={`w-full bg-bg-main rounded-lg px-3 py-2.5 flex items-center gap-3 text-left cursor-pointer hover:bg-bg-card transition-colors focus-visible:outline-none focus-visible:ring-2 ${t.ring}`}
+      className={`w-full bg-bg-main rounded-box px-3 py-2.5 flex items-center gap-3 text-left cursor-pointer hover:bg-bg-card transition-colors focus-visible:outline-none focus-visible:ring-2 ${t.ring}`}
     >
-      <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${t.chip}`} aria-hidden="true">
+      <span className={`w-8 h-8 rounded-box flex items-center justify-center shrink-0 ${t.chip}`} aria-hidden="true">
         {icon}
       </span>
       <span className="flex flex-col min-w-0 flex-1 gap-0.5">

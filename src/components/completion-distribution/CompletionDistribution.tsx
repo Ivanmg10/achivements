@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { completionBuckets } from '@/utils/utils'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /** Ordered bands, least complete first — a magnitude scale, so one hue, light to dark. */
 const BAND_LABELS = ['<25%', '25–49%', '50–74%', '75–99%', '100%']
@@ -9,7 +10,7 @@ const TONES = {
   ra: ['bg-accent/20', 'bg-accent/35', 'bg-accent/55', 'bg-accent/75', 'bg-accent'],
   steam: ['bg-[#66c0f4]/20', 'bg-[#66c0f4]/35', 'bg-[#66c0f4]/55', 'bg-[#66c0f4]/75', 'bg-[#66c0f4]'],
   psn: ['bg-[#0070d1]/20', 'bg-[#0070d1]/35', 'bg-[#0070d1]/55', 'bg-[#0070d1]/75', 'bg-[#0070d1]'],
-  xbox: ['bg-green-500/20', 'bg-green-500/35', 'bg-green-500/55', 'bg-green-500/75', 'bg-green-500'],
+  xbox: ['bg-success/20', 'bg-success/35', 'bg-success/55', 'bg-success/75', 'bg-success'],
 } as const
 
 /**
@@ -43,10 +44,10 @@ export default function CompletionDistribution({
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-2 animate-pulse" aria-busy="true">
-        <div className="h-2 w-32 rounded bg-ink/10" />
-        <div className="h-2.5 w-full rounded-full bg-ink/10" />
-        <div className="h-2 w-40 rounded bg-ink/10" />
+      <div className="flex flex-col gap-2" aria-busy="true">
+        <Skeleton className="h-2 w-32" />
+        <Skeleton className="h-2.5 w-full" />
+        <Skeleton className="h-2 w-40" />
       </div>
     )
   }
@@ -74,7 +75,7 @@ export default function CompletionDistribution({
           <ul className="flex flex-wrap gap-x-3 gap-y-1">
             {counts.map((count, i) => (
               <li key={BAND_LABELS[i]} className="flex items-center gap-1.5 text-[10px] text-text-secondary">
-                <span className={`w-2 h-2 rounded-sm shrink-0 ${shades[i]}`} aria-hidden="true" />
+                <span className={`w-2 h-2 rounded-full shrink-0 ${shades[i]}`} aria-hidden="true" />
                 {BAND_LABELS[i]}
                 <span className="text-text-main tabular-nums">{count}</span>
               </li>

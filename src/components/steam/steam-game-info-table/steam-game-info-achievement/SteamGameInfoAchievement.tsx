@@ -1,15 +1,17 @@
 import { FadeImage } from '@/components/ui/FadeImage'
-import { IconCheck, IconLock } from '@tabler/icons-react'
+import { IconCheck } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { formatRarity, formatUnlock } from '@/utils/steamFeed'
+import { formatUnlock } from '@/utils/steamFeed'
 import SteamOnlineBadge from '@/components/steam/steam-online-badge/SteamOnlineBadge'
 import SteamPinAchievementButton from '@/components/steam/steam-pin-achievement-button/SteamPinAchievementButton'
 import type { SteamAchievementUnified } from '@/types/steam'
+import RarityBadge from '@/components/ui/RarityBadge'
+import { badgeClass, badgeImgClass, MID, NUM, ROW, TD, TD_FIRST } from '@/components/ui/dataTable'
 
 /**
  * One achievement as a table row on the Steam game page, styled like RA's
- * GameInfoAchivement: 64px badge, title, description, unlock date, rarity.
- * Locked ones have a grey badge and say "Locked" in text too, with their
+ * GameInfoAchivement: 52px badge, title, description, unlock date, rarity.
+ * Locked ones have a grey badge and say "Locked" to a screen reader too, with their
  * text kept at full contrast. The title is the button that opens the
  * achievement, stretched over the row; the pin sits above it.
  */
@@ -33,62 +35,56 @@ export default function SteamGameInfoAchievement({
   const concealed = a.hidden && !a.earned
 
   return (
-    <tr
-      data-ach={a.apiname}
-      className={`relative border-b border-bg-header/60 transition-colors duration-500 ${
-        highlighted ? 'bg-accent/15' : pinned ? 'bg-warning/10 hover:bg-bg-header/30' : 'hover:bg-bg-header/30'
-      }`}
-    >
-      <td className="px-3 py-2 w-24 align-middle text-center">
+    <tr data-ach={a.apiname} className={`${ROW} ${highlighted ? '[&>td]:bg-accent/15' : pinned ? '[&>td]:bg-accent/[0.05]' : ''}`}>
+      <td className={`${TD_FIRST} w-16`}>
         {a.badgeUrl ? (
           <FadeImage
             src={a.badgeUrl}
             alt=""
-            width={64}
-            height={64}
-            className={`w-16 h-16 rounded-xl mx-auto ${a.earned ? 'ring-2 ring-accent' : ''}`}
-            imgClassName={`w-full h-full object-cover ${a.earned ? '' : 'grayscale opacity-50'}`}
+            width={52}
+            height={52}
+            className={badgeClass(a.earned ? 'earned' : 'locked')}
+            imgClassName={badgeImgClass(!a.earned)}
             unoptimized
           />
         ) : (
-          <div className="w-16 h-16 rounded-xl bg-ink/10 mx-auto" aria-hidden="true" />
+          <span className={`${badgeClass('locked')} bg-ink/10`} aria-hidden="true" />
         )}
       </td>
 
-      <td className="px-3 py-2">
-        <h3 className={`text-lg ${a.earned ? '' : 'text-text-secondary'}`}>
-          <button
-            type="button"
-            onClick={onOpen}
-            className="text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
-          >
-            {concealed ? T.steam.hiddenAchievement : a.title}
-          </button>
-          {a.likelyOnline && <SteamOnlineBadge className="ml-2 align-middle" />}
-        </h3>
-        <p className="text-sm text-text-secondary">{concealed ? T.steam.hiddenAchievementDesc : a.description}</p>
+      <td className={TD}>
+        <div className="flex items-center gap-2 flex-wrap">
+          <h3 className="text-[0.9375rem] font-bold">
+            <button
+              type="button"
+              onClick={onOpen}
+              className="text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            >
+              {concealed ? T.steam.hiddenAchievement : a.title}
+            </button>
+          </h3>
+          {a.likelyOnline && <SteamOnlineBadge />}
+        </div>
+        <p className="mt-0.5 text-[0.8125rem] leading-normal text-text-secondary">{concealed ? T.steam.hiddenAchievementDesc : a.description}</p>
+        {a.earned && a.dateEarned && <p className="mt-0.5 text-xs text-accent">{formatUnlock(a.dateEarned, lang)}</p>}
       </td>
 
-      <td className="px-3 py-2 w-32 text-center text-sm tabular-nums text-text-secondary">
-        {a.globalPct !== null ? `${formatRarity(a.globalPct)}%` : '—'}
+      <td className={`${TD} ${MID} w-28`}>
+        <RarityBadge pct={a.globalPct} />
       </td>
 
-      <td className="px-3 py-2 w-44 text-center text-xs">
+      <td className={`${TD} ${NUM} w-28`}>
         {a.earned ? (
-          <span className="inline-flex items-center gap-1 text-success">
-            <IconCheck size={14} aria-hidden="true" />
-            {a.dateEarned ? formatUnlock(a.dateEarned, lang) : T.steam.earned}
-          </span>
+          <IconCheck className="w-[1.125rem] h-[1.125rem] text-success inline-block" aria-label={T.steam.earned} />
         ) : (
-          <span className="inline-flex items-center gap-1 text-text-secondary">
-            <IconLock size={14} aria-hidden="true" />
-            {T.steam.locked}
+          <span className="text-text-secondary">
+            <span className="sr-only">{T.steam.locked}</span>—
           </span>
         )}
       </td>
 
       {pinned !== undefined && (
-        <td className="px-3 py-2 w-12 text-center align-middle">
+        <td className={`${TD} ${MID} w-12`}>
           <SteamPinAchievementButton
             pinned={pinned}
             title={concealed ? T.steam.hiddenAchievement : a.title}

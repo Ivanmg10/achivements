@@ -23,7 +23,7 @@ export default function BrowseConsoles({ consoles }: { consoles: ConsoleSummary[
   return (
     <div className="flex flex-col gap-3">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.consolesTitle}</p>
-      <ul className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2">
+      <ul className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 enter-cards">
         {consoles.map((c) => {
           const icon = ICON_BY_ID.get(c.consoleId)
           return (
@@ -31,7 +31,7 @@ export default function BrowseConsoles({ consoles }: { consoles: ConsoleSummary[
               <Link
                 href={`/playing/${c.consoleId}`}
                 onPointerMove={onPointerMove}
-                className="spotlight flex flex-col gap-2 h-full rounded-xl bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+                className="spotlight flex flex-col gap-2 h-full rounded-tile bg-bg-main ring-1 ring-ink/[0.04] p-3 hover:ring-ink/15 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
               >
                 <span className="flex items-center gap-2 min-w-0">
                   {icon && <Image src={icon} alt="" width={20} height={20} className="w-5 h-5 object-contain shrink-0" />}

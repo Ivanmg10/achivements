@@ -31,7 +31,7 @@ export default function UserXboxCard() {
   const name = summary?.gamertag || gamertag
   const value = (n: number | undefined) => (isLoading || n === undefined ? '—' : n.toLocaleString(lang))
   const stats: PlatformStat[] = [
-    { label: T.xbox.gamerscore, value: value(summary?.gamerscore), accent: 'text-green-500' },
+    { label: T.xbox.gamerscore, value: value(summary?.gamerscore), accent: 'text-success' },
     { label: T.userStats.games, value: value(summary?.games) },
     { label: T.xbox.achievements, value: value(summary?.achievementsUnlocked) },
     { label: T.xbox.tier, value: isLoading ? '—' : summary?.tier || '—' },
@@ -63,7 +63,7 @@ export default function UserXboxCard() {
       status={
         isLinked &&
         summaryError && (
-          <p role="alert" className="text-xs text-red-400">
+          <p role="alert" className="text-xs text-danger">
             {T.xbox.errors[summaryError]}
           </p>
         )
@@ -76,7 +76,7 @@ export default function UserXboxCard() {
               alt=""
               width={44}
               height={44}
-              className="rounded-lg w-11 h-11 object-cover shrink-0"
+              className="rounded-box w-10 h-10 object-cover shrink-0"
               unoptimized
             />
           ) : (
@@ -84,7 +84,7 @@ export default function UserXboxCard() {
           )}
           <div className="flex flex-col gap-0.5 min-w-0">
             <span className="font-bold truncate">{name || '—'}</span>
-            <span className="text-xs text-text-secondary font-mono truncate">{xuid}</span>
+            <span className="text-[0.6875rem] text-text-secondary truncate">{xuid}</span>
             <span className="text-[10px] text-text-secondary">{T.xbox.adminOnly}</span>
           </div>
         </div>

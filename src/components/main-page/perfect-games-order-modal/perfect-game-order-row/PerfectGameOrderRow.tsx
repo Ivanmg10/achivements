@@ -22,7 +22,7 @@ export default function PerfectGameOrderRow({ game }: { game: PerfectGame }) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 bg-bg-card rounded-xl p-2 ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`flex items-center gap-3 bg-bg-card rounded-tile p-2 ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       <button
         {...attributes}

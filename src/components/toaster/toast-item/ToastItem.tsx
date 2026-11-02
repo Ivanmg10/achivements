@@ -7,10 +7,10 @@ import { dismissToast, type Toast } from '@/lib/notify'
 /** Errors stay longer: they usually need reading, and acting on. */
 export const TOAST_MS = { success: 4000, error: 7000 } as const
 
-// Solid colours, as dark as needed for white text to pass WCAG AA (4.5:1).
-const STYLE = {
-  success: 'bg-green-700 text-white',
-  error: 'bg-red-700 text-white',
+// A dark card on every theme; the tone is on the icon, the edge and the time line.
+const TONE = {
+  success: { icon: 'text-success', edge: 'bg-success' },
+  error: { icon: 'text-danger', edge: 'bg-danger' },
 } as const
 
 /**
@@ -43,9 +43,10 @@ export default function ToastItem({ toast }: { toast: Toast }) {
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className={`pointer-events-auto flex items-start gap-3 rounded-xl px-4 py-3 shadow-2xl text-sm ${STYLE[toast.kind]}`}
+      className="relative overflow-hidden pointer-events-auto flex items-start gap-3 rounded-control pl-5 pr-3 py-3 text-sm bg-bg-header text-text-main ring-1 ring-ink/12 shadow-2xl shadow-black/50"
     >
-      <Icon size={20} className="shrink-0 mt-px" aria-hidden="true" />
+      <span aria-hidden="true" className={`absolute left-0 top-0 bottom-0 w-1 ${TONE[toast.kind].edge}`} />
+      <Icon size={20} className={`shrink-0 mt-px ${TONE[toast.kind].icon}`} aria-hidden="true" />
       <p className="flex-1 min-w-0 break-words">{toast.message}</p>
       {toast.action && (
         <button
@@ -53,7 +54,7 @@ export default function ToastItem({ toast }: { toast: Toast }) {
             toast.action!.onClick()
             dismissToast(toast.id)
           }}
-          className="shrink-0 -my-0.5 px-2 py-0.5 rounded-md font-semibold underline underline-offset-2 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          className="shrink-0 -my-0.5 px-2 py-0.5 rounded-chip font-semibold text-accent hover:bg-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
         >
           {toast.action.label}
         </button>
@@ -61,10 +62,15 @@ export default function ToastItem({ toast }: { toast: Toast }) {
       <button
         onClick={() => dismissToast(toast.id)}
         aria-label={T.toast.close}
-        className="shrink-0 -mr-1 p-0.5 rounded opacity-80 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        className="shrink-0 -mr-1 p-0.5 rounded-chip text-text-secondary hover:text-text-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       >
         <IconX size={16} aria-hidden="true" />
       </button>
+      <span
+        aria-hidden="true"
+        className={`absolute left-0 bottom-0 h-0.5 w-full origin-left opacity-60 animate-[toast-time_linear_forwards] motion-reduce:hidden ${TONE[toast.kind].edge}`}
+        style={{ animationDuration: `${TOAST_MS[toast.kind]}ms`, animationPlayState: paused ? 'paused' : 'running' }}
+      />
     </motion.li>
   )
 }

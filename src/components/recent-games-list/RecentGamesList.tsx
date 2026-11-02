@@ -12,6 +12,7 @@ import PsnCollectionItem from '@/components/psn/psn-collection-item/PsnCollectio
 import XboxGameItem from '@/components/xbox/xbox-game-item/XboxGameItem'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import EmptyState from '@/components/empty-state/EmptyState'
+import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 
 const MAX_GAMES = 7
 
@@ -38,12 +39,12 @@ export default function RecentGamesList() {
       {recentLoading || psnLoading || xboxLoading ? (
         <div aria-busy="true" className="flex flex-col gap-1.5 flex-1">
           {Array.from({ length: MAX_GAMES }).map((_, i) => (
-            <div key={i} className="h-20 bg-bg-main rounded-xl animate-pulse" />
+            <GameRowSkeleton key={i} />
           ))}
         </div>
       ) : failed ? (
         <div className="flex flex-col items-start gap-2">
-          <p role="alert" className="text-sm text-red-400">
+          <p role="alert" className="text-sm text-danger">
             {recentError ? T.steam.gamesError : psnError ? T.psn.gamesError : T.xbox.gamesError}
           </p>
           <p className="text-xs text-text-secondary">{recentError ? T.steam.privateProfileHint : psnError ? T.psn.errors.private : T.xbox.errors.private}</p>
@@ -61,7 +62,7 @@ export default function RecentGamesList() {
       ) : games.length === 0 ? (
         <EmptyState icon={<SteamLogo className="w-6 h-6" />} title={steamLinked ? T.steam.recentEmpty : T.cards.noGames} />
       ) : (
-        <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-y-auto">
+        <div className="flex flex-col gap-1.5 flex-1 min-h-0 overflow-y-auto enter-rows">
           {games.map((item) => {
             const toggle = () => setExpanded((cur) => (cur === item.key ? null : item.key))
             if (item.source === 'psn') {

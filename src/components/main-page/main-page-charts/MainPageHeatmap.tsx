@@ -8,6 +8,7 @@ import { IconRefresh } from '@tabler/icons-react'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useHeatmapGrid, HEATMAP_GAP as GAP, HEATMAP_MAX_DAYS } from '@/hooks/useHeatmapGrid'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /** Empty, then the theme's accent at rising strength: one hue per theme, so every theme reads the same way. */
 /*
@@ -54,7 +55,7 @@ export default function MainPageHeatmap({
 
   // How many days fit is a question about the card, not about the data.
   const grid = useHeatmapGrid(boxRef, MONTH_ROW + LEGEND_ROW + 2 * ROW_GAP)
-  const { weeks, cell } = grid
+  const { weeks, cell, cellWidth } = grid
   // The last column is the week the grid ends in: the days that fit depend on which weekday that is.
   const days = until ? Math.min(HEATMAP_MAX_DAYS, weeks * 7 - (6 - until.getDay())) : grid.days
   const label = title ?? T.cards.activityLastDays.replace('{n}', String(days))
@@ -100,10 +101,10 @@ export default function MainPageHeatmap({
 
   const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: `repeat(${weeks}, ${cell}px)`,
+    gridTemplateColumns: `repeat(${weeks}, ${cellWidth}px)`,
     gap: `${GAP}px`,
   } as const
-  const gridWidth = weeks * cell + (weeks - 1) * GAP
+  const gridWidth = weeks * cellWidth + (weeks - 1) * GAP
   const today = new Date().toISOString().split('T')[0]
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
@@ -149,7 +150,7 @@ export default function MainPageHeatmap({
               {T.cards.activeDays.replace('{n}', String(activeDays))} · {T.lineChart.bestDay.replace('{n}', String(best))}
             </p>
           )}
-          <p className="text-sm font-bold tabular-nums text-text-main">{isLoading ? '—' : totalAch}</p>
+          <p className="text-sm font-bold tabular-nums text-text-main">{isLoading ? <Skeleton className="h-[1lh] w-8" /> : totalAch}</p>
           {onRefresh && (
             <button
               onClick={onRefresh}
@@ -199,7 +200,7 @@ export default function MainPageHeatmap({
                   <span
                     key={col}
                     className="absolute top-0 text-[10px] font-medium text-text-secondary capitalize whitespace-nowrap leading-none"
-                    style={{ left: Math.min(col * (cell + GAP), Math.max(0, gridWidth - 26)) }}
+                    style={{ left: Math.min(col * (cellWidth + GAP), Math.max(0, gridWidth - 26)) }}
                   >
                     {label}
                   </span>
@@ -226,8 +227,8 @@ export default function MainPageHeatmap({
                         key={`${wi}-${di}`}
                         className={
                           isLoading
-                            ? 'heat-loading rounded-[3px]'
-                            : `heat-cell rounded-[3px] transition-transform${count > 0 ? ' cursor-pointer hover:scale-125 hover:ring-1 hover:ring-text-main/40' : ''}${isToday ? ' ring-1 ring-text-main/70' : ''}`
+                            ? 'heat-loading rounded-cell'
+                            : `heat-cell rounded-cell transition-transform${count > 0 ? ' cursor-pointer hover:scale-125 hover:ring-1 hover:ring-text-main/40' : ''}${isToday ? ' ring-1 ring-text-main/70' : ''}`
                         }
                         style={{ backgroundColor: isLoading ? undefined : LEVEL_BG[heatLevel(count, best)], '--col': wi, '--row': di } as React.CSSProperties}
                         data-date={day?.date}
@@ -243,7 +244,7 @@ export default function MainPageHeatmap({
               <div className="flex items-center justify-end gap-1" style={{ height: LEGEND_ROW }}>
                 <span className="text-[9px] text-text-secondary">{T.cards.heatLess}</span>
                 {Array.from({ length: HEAT_LEVELS + 1 }, (_, level) => (
-                  <div key={level} className="w-2.5 h-2.5 rounded-[3px]" style={{ backgroundColor: LEVEL_BG[level] }} />
+                  <div key={level} className="w-2.5 h-2.5 rounded-cell" style={{ backgroundColor: LEVEL_BG[level] }} />
                 ))}
                 <span className="text-[9px] text-text-secondary">{T.cards.heatMore}</span>
               </div>

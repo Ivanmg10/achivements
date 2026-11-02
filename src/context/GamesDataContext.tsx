@@ -9,6 +9,7 @@ import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { useHiddenConsoles } from '@/hooks/useHiddenConsoles'
 import { consoleOptions, filterByConsole, type ConsoleOption } from '@/utils/consoleFilter'
 import { withSubject } from '@/utils/withSubject'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
 
 type CtxType = {
   /** Every game, without the consoles unticked in preferences. */
@@ -40,6 +41,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   const subject = useSubject()
   const rausername = session?.user?.rausername
   const { hidden } = useHiddenConsoles('ra')
+  const { isHidden, isLoading: hiddenLoading } = useHiddenGames()
   const [loaded, setAll] = useState<RetroAchievementsGameCompleted[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -114,7 +116,10 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
   }, [doFetch])
 
   // The preference is the viewer's own: someone else's list is shown whole.
-  const all = useMemo(() => (subject ? loaded : filterByConsole(loaded, (g) => g.ConsoleName, hidden)), [subject, loaded, hidden])
+  const all = useMemo(
+    () => hiddenLoading ? [] : (subject ? loaded : filterByConsole(loaded, (g) => g.ConsoleName, hidden)).filter((g) => !isHidden(g.GameID, 'ra')),
+    [subject, loaded, hidden, isHidden, hiddenLoading],
+  )
   const consoles = useMemo(() => consoleOptions(loaded.map((g) => g.ConsoleName)), [loaded])
   const softcore = useMemo(() => all.filter((g) => g.HardcoreMode === '0'), [all])
   const hardcore = useMemo(() => all.filter((g) => g.HardcoreMode === '1'), [all])
@@ -128,7 +133,7 @@ export function GamesDataProvider({ children }: { children: React.ReactNode }) {
 
   // One object per change of what it holds, so a re-render of the provider (the session updating)
   // does not re-render everything that reads it.
-  const value = useMemo(() => ({ all, consoles, softcore, hardcore, inProgress, isLoading, error, keyInvalid, refetch }), [all, consoles, softcore, hardcore, inProgress, isLoading, error, keyInvalid, refetch])
+  const value = useMemo(() => ({ all, consoles, softcore, hardcore, inProgress, isLoading: Boolean(isLoading || hiddenLoading), error, keyInvalid, refetch }), [all, consoles, softcore, hardcore, inProgress, isLoading, hiddenLoading, error, keyInvalid, refetch])
 
   return (
     <Ctx.Provider value={value}>

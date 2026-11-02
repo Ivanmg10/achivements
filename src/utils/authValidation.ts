@@ -10,7 +10,9 @@ export const PASSWORD_MIN = 8
 export const BCRYPT_COST = 12
 
 const USERNAME_SHAPE = /^[a-zA-Z0-9_]+$/
-const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const EMAIL_SHAPE = /^[^\s@<>"'&]+@[^\s@<>"'&]+\.[^\s@<>"'&]+$/
+/** RFC 5321's limit on a path. */
+const EMAIL_MAX = 254
 
 export type FieldRule = 'empty' | 'shape' | null
 
@@ -22,11 +24,16 @@ export function checkUsername(value: string): FieldRule {
   return null
 }
 
+/** Whether an address has the shape every endpoint accepts. */
+export function isEmail(value: string): boolean {
+  return value.length <= EMAIL_MAX && EMAIL_SHAPE.test(value)
+}
+
 /** What is wrong with an address, or null when it will be accepted. */
 export function checkEmail(value: string): FieldRule {
   const email = value.trim()
   if (!email) return 'empty'
-  if (!EMAIL_SHAPE.test(email)) return 'shape'
+  if (!isEmail(email)) return 'shape'
   return null
 }
 
@@ -35,4 +42,14 @@ export function checkPassword(value: string): FieldRule {
   if (!value) return 'empty'
   if (value.length < PASSWORD_MIN) return 'shape'
   return null
+}
+
+/**
+ * A name from another site (a Steam or RetroAchievements name) as a username,
+ * when it can be one: spaces to underscores, other characters dropped, cut to
+ * USERNAME_MAX. '' when too little is left, so the person chooses one.
+ */
+export function suggestUsername(name: string): string {
+  const cleaned = name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '').slice(0, USERNAME_MAX)
+  return cleaned.length >= USERNAME_MIN ? cleaned : ''
 }

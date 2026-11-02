@@ -13,7 +13,7 @@ import type { GameSource } from '@/types/steam'
 export default function UserGamePageNotice({ source, linked, onRetry }: { source: GameSource; linked: boolean; onRetry: () => void }) {
   const { T } = useLanguage()
   return (
-    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-secondary bg-bg-main rounded-lg px-3 py-2">
+    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-text-secondary bg-bg-main rounded-box px-3 py-2">
       <IconInfoCircle size={14} className="shrink-0" aria-hidden="true" />
       {linked ? (
         <>

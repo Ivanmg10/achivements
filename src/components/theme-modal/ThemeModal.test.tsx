@@ -18,15 +18,25 @@ beforeEach(() => {
   update.mockResolvedValue(null)
 })
 
-test('saves the theme and closes', async () => {
+test('saves the theme, says so and stays open to try another', async () => {
   ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: true })
   const onClose = jest.fn()
-  render(<ThemeModal isOpen onClose={onClose} />)
-  fireEvent.click(screen.getByRole('radio', { name: /Blue/ }))
-  await waitFor(() => expect(onClose).toHaveBeenCalled())
+  const { rerender } = render(<ThemeModal isOpen onClose={onClose} />)
+  fireEvent.click(screen.getByRole('radio', { name: en.userTheme.name_blue }))
   expect(setTheme).toHaveBeenCalledWith('blue')
   // The theme was saved first; update() only asks the server to re-read it.
-  expect(update).toHaveBeenCalledWith()
+  await waitFor(() => expect(update).toHaveBeenCalledWith())
+  ;(useTheme as jest.Mock).mockReturnValue({ theme: 'blue', setTheme })
+  rerender(<ThemeModal isOpen onClose={onClose} />)
+  expect(await screen.findByRole('status')).toHaveTextContent(`${en.userTheme.name_blue} · ${en.toast.saved}`)
+  expect(onClose).not.toHaveBeenCalled()
+})
+
+test('says which theme is on; picking it again does nothing', () => {
+  render(<ThemeModal isOpen onClose={jest.fn()} />)
+  expect(screen.getByRole('status')).toHaveTextContent(en.userTheme.name_dark)
+  fireEvent.click(screen.getByRole('radio', { name: en.userTheme.name_dark }))
+  expect(fetch).not.toHaveBeenCalled()
 })
 
 test('puts the old theme back and says so when saving fails', async () => {
@@ -34,7 +44,7 @@ test('puts the old theme back and says so when saving fails', async () => {
   ;(fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 500 })
   const onClose = jest.fn()
   render(<ThemeModal isOpen onClose={onClose} />)
-  fireEvent.click(screen.getByRole('radio', { name: /Blue/ }))
+  fireEvent.click(screen.getByRole('radio', { name: en.userTheme.name_blue }))
   expect(await screen.findByRole('alert')).toHaveTextContent(en.userTheme.saveError)
   expect(setTheme).toHaveBeenLastCalledWith('dark')
   expect(update).not.toHaveBeenCalled()
@@ -46,6 +56,6 @@ test('offers every theme, the current one checked, each drawn in its own colours
   const radios = screen.getAllByRole('radio')
   expect(radios).toHaveLength(THEMES.length)
   expect(screen.getByRole('radio', { name: en.userTheme.name_dark })).toHaveAttribute('aria-checked', 'true')
-  expect(screen.getByRole('radio', { name: en.userTheme.name_synthwave })).toHaveAttribute('aria-checked', 'false')
-  expect(container.ownerDocument.querySelector('[data-theme="synthwave"]')).not.toBeNull()
+  expect(screen.getByRole('radio', { name: en.userTheme.name_sakura })).toHaveAttribute('aria-checked', 'false')
+  expect(container.ownerDocument.querySelector('[data-theme="sakura"]')).not.toBeNull()
 })

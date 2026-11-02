@@ -52,13 +52,13 @@ export default function VaultLevelBadge({
       title={`${T.rankings.level.replace('{n}', String(level))} · ${tierText}`}
       // Mixed with the theme's text colour, so the tier's hue stays readable on a light or a dark card.
       style={{ backgroundColor: `rgb(${COLORS[tier]} / 0.15)`, color: `color-mix(in oklab, rgb(${COLORS[tier]}) 72%, rgb(var(--text-main)))` }}
-      className={`inline-flex items-center gap-1 rounded-full pl-1.5 pr-2 py-0.5 text-[11px] font-semibold whitespace-nowrap ${className}`}
+      className={`inline-flex items-center gap-1.5 h-[1.375rem] rounded-tag px-2 text-xs font-bold whitespace-nowrap skew-x-(--slant-pill) ${className}`}
     >
-      <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true" className="w-3 h-3 shrink-0">
+      <svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true" className="w-3 h-3 shrink-0 -skew-x-(--slant-pill)">
         <path d={SHAPES[tier]} />
       </svg>
-      <span className="tabular-nums">{levelText}</span>
-      {compact ? <span className="sr-only">{tierText}</span> : <span>· {tierText}</span>}
+      <span className="tabular-nums -skew-x-(--slant-pill)">{levelText}</span>
+      {compact ? <span className="sr-only">{tierText}</span> : <span className="-skew-x-(--slant-pill)">· {tierText}</span>}
     </span>
   )
 }

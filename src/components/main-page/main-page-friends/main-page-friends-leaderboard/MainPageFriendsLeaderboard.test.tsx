@@ -10,7 +10,7 @@ const ROWS = [row('me', true, 10, 2), row('ana', false, 25, 14, true)]
 const names = () => within(screen.getByRole('list')).getAllByRole('listitem').map((li) => li.textContent)
 
 test('ranks on unlocks this week, the leader crowned, you marked in words, friends opening the comparison', () => {
-  render(<MainPageFriendsLeaderboard rows={ROWS} pending={[]} />)
+  render(<MainPageFriendsLeaderboard rows={ROWS} />)
   expect(names()[0]).toContain('ana')
   expect(screen.getByLabelText(en.friends.leader)).toBeInTheDocument()
   expect(screen.getByText(en.userProfile.you)).toBeInTheDocument()
@@ -19,7 +19,7 @@ test('ranks on unlocks this week, the leader crowned, you marked in words, frien
 })
 
 test('another measure re-ranks; a streak at the window edge reads as "14+"', () => {
-  render(<MainPageFriendsLeaderboard rows={[row('me', true, 30, 2), row('ana', false, 5, 14, true)]} pending={[]} />)
+  render(<MainPageFriendsLeaderboard rows={[row('me', true, 30, 2), row('ana', false, 5, 14, true)]} />)
   expect(names()[0]).toContain('me')
   fireEvent.click(screen.getByRole('button', { name: en.friends.metricStreak }))
   expect(screen.getByRole('button', { name: en.friends.metricStreak })).toHaveAttribute('aria-pressed', 'true')
@@ -27,8 +27,7 @@ test('another measure re-ranks; a streak at the window edge reads as "14+"', () 
   expect(names()[0]).toContain(en.friends.daysCapped.replace('{n}', '14'))
 })
 
-test('nobody is crowned at zero; friends still loading hold a place', () => {
-  render(<MainPageFriendsLeaderboard rows={[row('me', true, 0, 0)]} pending={[{ username: 'slow', avatar: null }]} />)
+test('nobody is crowned at zero', () => {
+  render(<MainPageFriendsLeaderboard rows={[row('me', true, 0, 0)]} />)
   expect(screen.queryByLabelText(en.friends.leader)).not.toBeInTheDocument()
-  expect(screen.getByText('slow').closest('li')).toHaveAttribute('aria-busy', 'true')
 })

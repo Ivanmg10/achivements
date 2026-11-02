@@ -91,16 +91,62 @@ export function liveProgressMap(steam: SteamGameProgress[], psn: PsnGameProgress
   return map
 }
 
-/** Completion 0–1: Steam and PSN live from their libraries, RA from the stored fraction. */
-export function itemPct(item: GameGroupItem, live: LiveProgress): number {
-  const now = isRa(item) ? undefined : live.get(itemKey(item))
-  return now ? now.pct : parseFloat(item.pct_won) || 0
+export type ItemProgress = Counts & {
+  /** Completion 0–1, the best of either mode for RA. */
+  pct: number
+  /** RA's hardcore share 0–1, when RA's live numbers are known. */
+  hard?: number
 }
 
-export function filterGroupItems(items: GameGroupItem[], filters: GroupFilters, live: LiveProgress): GameGroupItem[] {
+/**
+ * How far along one game of the group is, from the freshest numbers there are:
+ * RA's live progress, the Steam/PSN/Xbox libraries, or what the item stored.
+ */
+export function itemProgress(item: GameGroupItem, live: LiveProgress, ra: Map<number, AchStats> = new Map()): ItemProgress {
+  if (isRa(item)) {
+    const a = ra.get(item.game_id)
+    if (a && a.total > 0) {
+      const earned = Math.max(a.hcEarned, a.scEarned)
+      return { earned, total: a.total, pct: Math.min(1, earned / a.total), hard: Math.min(1, a.hcEarned / a.total) }
+    }
+  } else {
+    const now = live.get(itemKey(item))
+    if (now) return now
+  }
+  return { earned: item.num_awarded, total: item.max_possible, pct: parseFloat(item.pct_won) || 0 }
+}
+
+/** Completion 0–1 (see itemProgress); without `ra`, RA's is the stored fraction. */
+export function itemPct(item: GameGroupItem, live: LiveProgress, ra?: Map<number, AchStats>): number {
+  return itemProgress(item, live, ra).pct
+}
+
+/** How many of the games are finished, started and not started. */
+export function groupStateCounts(items: GameGroupItem[], live: LiveProgress, ra?: Map<number, AchStats>) {
+  const counts = { done: 0, started: 0, notStarted: 0 }
+  for (const item of items) {
+    const pct = itemPct(item, live, ra)
+    if (pct >= 1) counts.done++
+    else if (pct > 0) counts.started++
+    else counts.notStarted++
+  }
+  return counts
+}
+
+/** The started, unfinished game with the largest share earned, and how many achievements it lacks. */
+export function closestItem(items: GameGroupItem[], live: LiveProgress, ra?: Map<number, AchStats>): { item: GameGroupItem; left: number } | null {
+  let best: { item: GameGroupItem; left: number; pct: number } | null = null
+  for (const item of items) {
+    const p = itemProgress(item, live, ra)
+    if (p.total > 0 && p.pct > 0 && p.pct < 1 && (!best || p.pct > best.pct)) best = { item, left: p.total - p.earned, pct: p.pct }
+  }
+  return best && { item: best.item, left: best.left }
+}
+
+export function filterGroupItems(items: GameGroupItem[], filters: GroupFilters, live: LiveProgress, ra?: Map<number, AchStats>): GameGroupItem[] {
   return items.filter((item) => {
     if (filters.consoles.size > 0 && (!item.console_name || !filters.consoles.has(item.console_name))) return false
-    const pct = itemPct(item, live)
+    const pct = itemPct(item, live, ra)
     if (filters.pct === '0' && pct !== 0) return false
     if (filters.pct === 'progress' && !(pct > 0 && pct < 1)) return false
     if (filters.pct === '100' && pct < 1) return false

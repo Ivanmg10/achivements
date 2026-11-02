@@ -3,6 +3,7 @@ import { withCache } from "@/lib/raCache";
 import { cachedJson } from "@/lib/httpCache";
 import { requireRaSession } from "@/lib/apiAuth";
 import { getAchievementsEarnedBetween } from "@/lib/raClient";
+import { visibleGamesForUser } from "@/lib/gameVisibility";
 
 const TTL = 15 * 60 * 1000;
 
@@ -28,7 +29,8 @@ export async function GET(req?: Request) {
 
       return [...chunk1, ...chunk2]
     });
-    return cachedJson(data, TTL);
+    const visible = await visibleGamesForUser(id, data, 'ra', (achievement) => achievement.GameID);
+    return cachedJson(visible, 0);
   } catch (err) {
     return raUnavailable(err)
   }

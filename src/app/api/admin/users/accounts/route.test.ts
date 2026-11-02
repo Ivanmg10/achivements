@@ -1,3 +1,4 @@
+jest.mock('@/lib/raKey', () => ({ sealRaKey: (key: string) => ({ sealed: `sealed:${key}`, hash: `hash:${key}` }), raKeyHash: (key: string) => `hash:${key}` }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
 jest.mock('@/lib/adminAuth', () => ({ requireAdmin: jest.fn(), logAdminAction: jest.fn() }))
 jest.mock('@/lib/raProfile', () => ({ ...jest.requireActual('@/lib/raProfile'), fetchRaProfile: jest.fn() }))
@@ -70,7 +71,7 @@ describe('RetroAchievements', () => {
     const res = await POST(post({ id: 11, platform: 'ra', username: ' bobra ', apiKey: ' key ' }))
     expect(res.status).toBe(200)
     expect(fetchRaProfile).toHaveBeenCalledWith('bobra', 'key')
-    expect(updates()[0][1]).toEqual([JSON.stringify({ User: 'BobRA' }), 'BobRA', 'key', 11])
+    expect(updates()[0][1]).toEqual([JSON.stringify({ User: 'BobRA' }), 'BobRA', 'sealed:key', 'hash:key', 11])
     expect(forgetUser).toHaveBeenCalledWith(11)
     expect(logAdminAction).toHaveBeenCalledWith(ADMIN, 'link-ra', BOB, { rausername: 'BobRA' })
   })
@@ -210,6 +211,7 @@ describe('Xbox', () => {
   test('links an account Xbox knows, as it spells it, and logs it', async () => {
     const res = await POST(post({ id: 11, platform: 'xbox', gamertag: ' testplayer ' }))
     expect(res.status).toBe(200)
+    expect(res.headers.get('X-Request-Id')).toBeTruthy()
     expect(findXboxAccount).toHaveBeenCalledWith('testplayer')
     expect(xboxSummary).toHaveBeenCalledWith(PROFILE.xuid, 'TestPlayer', '11')
     expect(updates()[0][1]).toEqual([PROFILE.xuid, 'TestPlayer', 11])

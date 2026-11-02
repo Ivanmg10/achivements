@@ -2,19 +2,23 @@ jest.mock("@/lib/db", () => ({ __esModule: true, default: { query: jest.fn() } }
 jest.mock("bcrypt", () => ({ compare: jest.fn() }));
 jest.mock("@/lib/userRecord", () => ({
   ...jest.requireActual("@/lib/userRecord"),
+  loadUser: jest.fn(),
   loadUserSynced: jest.fn(),
   loadUserByUsername: jest.fn(),
 }));
 jest.mock("@/lib/attemptLimit", () => ({
   ...jest.requireActual("@/lib/attemptLimit"),
-  isLimited: jest.fn(),
-  recordAttempt: jest.fn(),
+  reserveAttempt: jest.fn(),
 }));
 
 import bcrypt from "bcrypt";
 import { authHandlerOptions, authOptions, SESSION_REVOKED, TOO_MANY_ATTEMPTS } from "./authOptions";
-import { loadUserByUsername, loadUserSynced, passwordVersion } from "@/lib/userRecord";
-import { isLimited, recordAttempt } from "@/lib/attemptLimit";
+import { loadUser, loadUserByUsername, loadUserSynced, passwordVersion } from "@/lib/userRecord";
+import { reserveAttempt } from "@/lib/attemptLimit";
+
+const release = jest.fn();
+const refuse = (scope: string) =>
+  (reserveAttempt as jest.Mock).mockImplementation(async (s: string) => ({ allowed: s !== scope, release }));
 
 const row = {
   id: 1,
@@ -54,7 +58,8 @@ beforeEach(() => {
   (loadUserByUsername as jest.Mock).mockResolvedValue(row);
   stored(row);
   (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-  (isLimited as jest.Mock).mockResolvedValue(false);
+  (reserveAttempt as jest.Mock).mockResolvedValue({ allowed: true, release });
+  (loadUser as jest.Mock).mockResolvedValue(row);
 });
 
 describe("authorize", () => {
@@ -62,31 +67,34 @@ describe("authorize", () => {
     const user = await authorize({ username: "ivan", password: "pass" }, req);
     expect(user).toMatchObject({ id: "1", name: "ivan", raLinked: true, steamid: row.steamid, pwv: PWV });
     expect(typeof user.syncedAt).toBe("number");
-    expect(recordAttempt).not.toHaveBeenCalled();
+    expect(release).toHaveBeenCalledTimes(2);
   });
 
   test("a wrong password is null, and counts against the address and the account", async () => {
     (bcrypt.compare as jest.Mock).mockResolvedValue(false);
     expect(await authorize({ username: "Ivan", password: "wrong" }, req)).toBeNull();
-    expect(recordAttempt).toHaveBeenCalledWith("login", "9.9.9.9:ivan");
-    expect(recordAttempt).toHaveBeenCalledWith("login-ip", "9.9.9.9");
+    expect(reserveAttempt).toHaveBeenCalledWith("login", "9.9.9.9:ivan");
+    expect(reserveAttempt).toHaveBeenCalledWith("login-ip", "9.9.9.9");
+    expect(release).not.toHaveBeenCalled();
   });
 
   test("an unknown username still runs a hash comparison, so it takes as long as a wrong password", async () => {
     (loadUserByUsername as jest.Mock).mockResolvedValue(null);
     expect(await authorize({ username: "nobody", password: "x" }, req)).toBeNull();
     expect(bcrypt.compare).toHaveBeenCalledTimes(1);
-    expect(recordAttempt).toHaveBeenCalledWith("login", "9.9.9.9:nobody");
+    expect(reserveAttempt).toHaveBeenCalledWith("login", "9.9.9.9:nobody");
+    expect(release).not.toHaveBeenCalled();
   });
 
   test("too many failures refuse the attempt before the password is even checked", async () => {
-    (isLimited as jest.Mock).mockImplementation(async (scope: string) => scope === "login");
+    refuse("login");
     await expect(authorize({ username: "ivan", password: "pass" }, req)).rejects.toThrow(TOO_MANY_ATTEMPTS);
     expect(bcrypt.compare).not.toHaveBeenCalled();
+    expect(release).toHaveBeenCalledTimes(2);
   });
 
   test("so do too many failures from one address across accounts", async () => {
-    (isLimited as jest.Mock).mockImplementation(async (scope: string) => scope === "login-ip");
+    refuse("login-ip");
     await expect(authorize({ username: "someone", password: "pass" }, req)).rejects.toThrow(TOO_MANY_ATTEMPTS);
   });
 
@@ -131,7 +139,7 @@ describe("jwt", () => {
     });
     expect(token.steamid).toBe(row.steamid);
     expect(token.rausername).toBe("Ivan");
-    expect(token.raid).toBe("ra-key");
+    expect(token.raid).toBeUndefined();
     expect(token.admin).toBe(false);
     expect(token.name).toBe("ivan");
   });
@@ -163,7 +171,7 @@ describe("jwt", () => {
 });
 
 describe("session", () => {
-  const token = { id: "1", name: "ivan", theme: "dark", raid: "ra-key", rausername: "Ivan", raLinked: true, email: null, pwv: PWV };
+  const token = { id: "1", name: "ivan", theme: "dark", rausername: "Ivan", raLinked: true, email: null, pwv: PWV };
 
   test("server-side sessions carry the RA key, for the routes that call RA", async () => {
     const s = await session({ session: { user: {} }, token });

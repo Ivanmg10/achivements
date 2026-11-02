@@ -171,7 +171,7 @@ export default function MainPageAbandoned({
       </p>
 
       {loading ? (
-        <SkeletonGameList count={3} />
+        <SkeletonGameList count={7} />
       ) : abandoned.length === 0 ? (
         <EmptyState
           icon={<IconMoodEmpty className="w-6 h-6" />}
@@ -181,7 +181,7 @@ export default function MainPageAbandoned({
           className="py-2"
         />
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 enter-rows">
           {abandoned.slice(0, 6).map((g) => (
             <GameListRow
               key={g.key}
@@ -191,7 +191,7 @@ export default function MainPageAbandoned({
               subtitle={g.subtitle}
               stat={`${g.daysAgo}d`}
               statLabel={`${g.pct}%`}
-              statClassName="text-orange-400"
+              statClassName="text-warning"
               progress={g.pct}
             />
           ))}

@@ -44,7 +44,8 @@ test('every trophy in game order, hidden ones kept secret', () => {
   expect(screen.getAllByText(en.psn.locked).length).toBeGreaterThan(0)
 })
 
-const filter = (name: string) => within(screen.getByRole('group')).getByRole('button', { name })
+// A tab's name carries its count ("Earned 2"): matched by how it starts.
+const filter = (name: string) => within(screen.getByRole('group')).getByRole('button', { name: new RegExp(`^${name}`) })
 const column = (name: string) => within(screen.getByRole('table')).getByRole('button', { name })
 
 test('filters earned and unearned', () => {
@@ -83,7 +84,7 @@ test('with DLC, tabs pick a group; without, no tabs', () => {
 test('signed in, each row can be pinned', () => {
   ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set<number>(), leading: new Set<number>(), toggle, canPin: true })
   render(<PsnGameInfoTable gameId={100} gameTitle="Astro Bot" trophies={TROPHIES} />)
-  fireEvent.click(within(screen.getByRole('table')).getByRole('switch', { name: `${en.favorites.addFavorite}: Common` }))
+  fireEvent.click(within(screen.getByRole('table')).getByRole('button', { name: `${en.favorites.addFavorite}: Common` }))
   expect(toggle).toHaveBeenCalledWith(TROPHIES[1])
 })
 
@@ -118,14 +119,14 @@ test('pinned trophies lead the list, highlighted', () => {
   ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set<number>([2]), leading: new Set<number>([2]), toggle, canPin: true })
   render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
   expect(names()).toEqual(['Locked', 'Platinum one', 'Common', en.psn.hiddenTrophy])
-  expect(screen.getByRole('table').querySelector('[data-trophy="2"]')!.className).toContain('bg-warning/10')
+  expect(screen.getByRole('table').querySelector('[data-trophy="2"]')!.className).toContain('bg-accent/[0.05]')
 })
 
 test('a trophy pinned now stays where it is (moved up, it dragged the page with it); it leads next time', () => {
   ;(usePsnFavoriteTrophies as jest.Mock).mockReturnValue({ pinned: new Set<number>([2]), leading: new Set<number>(), toggle, canPin: true })
   render(<PsnGameInfoTable gameId={100} gameTitle="Bloodborne" trophies={TROPHIES} />)
   expect(names()[0]).not.toBe('Locked')
-  expect(screen.getByRole('table').querySelector('[data-trophy="2"]')!.className).toContain('bg-warning/10')
+  expect(screen.getByRole('table').querySelector('[data-trophy="2"]')!.className).toContain('bg-accent/[0.05]')
 })
 
 test('a trophy opens in a detail window with its grade, its DLC and guide links', () => {

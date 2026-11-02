@@ -60,7 +60,7 @@ export default function PsnSortableItem({
       ref={setNodeRef}
       style={style}
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-2xl overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       <GameCardBackdrop src={game ? psnBackdrop(game) : icon} surface="card" />
       <div className="relative flex items-center gap-3 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">
@@ -80,11 +80,11 @@ export default function PsnSortableItem({
           href={href}
           tabIndex={-1}
           aria-hidden="true"
-          className={`relative z-10 shrink-0 rounded-xl transition-all ${
+          className={`relative z-10 shrink-0 rounded-tile transition-all ${
             isComplete ? 'ring-2 ring-sky-300/70 hover:ring-sky-300' : 'hover:ring-2 hover:ring-ink/40'
           }`}
         >
-          <GameIcon source="psn" id={item.game_id} imageUrl={icon} size={96} className="w-16 h-16 sm:w-24 sm:h-24 rounded-xl block" />
+          <GameIcon source="psn" id={item.game_id} imageUrl={icon} size={96} className="w-16 h-16 sm:w-24 sm:h-24 rounded-tile block" />
         </Link>
 
         <div className="flex flex-col flex-1 min-w-0 gap-1">
@@ -97,7 +97,7 @@ export default function PsnSortableItem({
             </p>
           </Link>
           <span className="flex items-center gap-1.5 flex-wrap">
-            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${psnPlatformChip(game?.consoleName ?? '')}`}>
+            <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium ${psnPlatformChip(game?.consoleName ?? '')}`}>
               <PlaystationLogo size={12} aria-hidden="true" />
               {game?.consoleName ?? 'PlayStation'}
             </span>
@@ -107,7 +107,7 @@ export default function PsnSortableItem({
               </span>
             )}
           </span>
-          <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>
+          <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>
             {T.psn.trophiesProgress.replace('{earned}', String(earned)).replace('{total}', String(total))}
           </span>
           {total > 0 && (
@@ -138,7 +138,7 @@ export default function PsnSortableItem({
           <button
             onClick={() => onRemove(item.id)}
             aria-label={`${T.groups.removeGame}: ${item.title}`}
-            className="relative z-10 p-2 rounded-lg text-text-secondary hover:text-danger hover:bg-danger/10 transition-all [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
+            className="relative z-10 p-2 rounded-chip text-text-secondary hover:text-danger hover:bg-danger/10 transition-all [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/70"
           >
             <IconX className="w-4 h-4" aria-hidden="true" />
           </button>
@@ -149,7 +149,7 @@ export default function PsnSortableItem({
             aria-expanded={open}
             aria-controls={panelId}
             aria-label={`${open ? T.psn.hideTrophies : T.psn.showTrophies}: ${item.title}`}
-            className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
+            className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0070d1]"
           >
             <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               ▼

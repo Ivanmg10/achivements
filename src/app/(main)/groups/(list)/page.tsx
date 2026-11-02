@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { IconFolder, IconPlus } from '@tabler/icons-react'
+import { IconFolder, IconLayoutGrid, IconLayoutRows, IconPlus } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGroups } from '@/hooks/useGroups'
+import { useStoredChoice } from '@/hooks/useStoredChoice'
 import type { GameCandidate } from '@/utils/gameCandidates'
 import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
@@ -12,18 +13,20 @@ import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 // Downloaded the first time it is opened, not with the page.
 const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
 import GroupListSkeleton from '@/components/groups/group-list-skeleton/GroupListSkeleton'
+import { Skeleton } from '@/components/ui/Skeleton'
 import GroupList from '@/components/groups/group-list/GroupList'
 import EmptyState from '@/components/empty-state/EmptyState'
-import StatusGridControl, { StatusGridCols } from '@/components/status-grid-control/StatusGridControl'
+import GroupViewToggle, { GROUP_VIEWS, type GroupView } from '@/components/groups/group-view-toggle/GroupViewToggle'
 import { notify } from '@/lib/notify'
 import { GROUPS_PER_USER_MAX } from '@/utils/groupValidation'
+import Button from '@/components/ui/Button'
 
 export default function GroupsPage() {
   const { T } = useLanguage()
   const { groups, isLoading, error, createGroup, fetchGroups } = useGroups()
   const canCreate = groups.length < GROUPS_PER_USER_MAX
   const [modalOpen, setModalOpen] = useState(false)
-  const [gridCols, setGridCols] = useState<StatusGridCols>(2)
+  const [view, setView] = useStoredChoice<GroupView>('groups-view', GROUP_VIEWS, 'covers')
 
   async function handleCreate(data: {
     title: string
@@ -48,9 +51,10 @@ export default function GroupsPage() {
     <div className="flex flex-col items-center min-h-screen bg-bg-main py-6 px-4">
     <div className="w-full lg:max-w-[98%] flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+      <div className="flex items-center justify-between gap-4 flex-wrap enter-rows">
         <div>
-          <h1 className="text-2xl font-bold text-text-main">{T.groups.title}</h1>
+          <h1 className="font-display italic font-extrabold text-4xl sm:text-5xl leading-[1.1] pr-1 text-text-main">{T.groups.title}</h1>
+          {isLoading && <Skeleton className="h-5 w-24 mt-0.5" />}
           {groups.length > 0 && (
             <p className="text-sm text-text-secondary mt-0.5">
               {groups.length}/{GROUPS_PER_USER_MAX} {T.groups.title.toLowerCase()}
@@ -58,15 +62,23 @@ export default function GroupsPage() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          {groups.length > 0 && <StatusGridControl cols={gridCols} onChange={setGridCols} />}
+          {groups.length > 0 && (
+            <GroupViewToggle
+              value={view}
+              onChange={setView}
+              options={[
+                { value: 'covers', label: T.groups.viewCovers, icon: IconLayoutGrid },
+                { value: 'shelves', label: T.groups.viewShelves, icon: IconLayoutRows },
+              ]}
+            />
+          )}
           {canCreate && (
-            <button
+            <Button
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-bg-main text-sm font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
             >
               <IconPlus className="w-4 h-4" aria-hidden="true" />
               {T.groups.newGroup}
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -89,15 +101,20 @@ export default function GroupsPage() {
             subtitle={T.groups.noGroupsSub}
             className="min-h-[40vh]"
           />
-          <button
+          <Button
             onClick={() => setModalOpen(true)}
-            className="mx-auto px-5 py-2.5 rounded-xl bg-accent text-bg-main font-medium hover:bg-accent/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className="mx-auto"
           >
             {T.groups.newGroup}
-          </button>
+          </Button>
         </>
       ) : (
-        <GroupList groups={groups} gridCols={gridCols} />
+        <GroupList
+          groups={groups}
+          view={view}
+          remaining={GROUPS_PER_USER_MAX - groups.length}
+          onCreate={() => setModalOpen(true)}
+        />
       )}
 
       <LazyWhenOpened open={modalOpen}>

@@ -24,7 +24,7 @@ export default function RouteErrorCard({ digest }: { digest?: string }) {
   }
 
   return (
-    <div className="w-full max-w-[360px] flex flex-col gap-2 px-4 py-3.5 rounded-2xl bg-bg-card ring-1 ring-ink/10 text-left text-xs text-text-secondary">
+    <div className="w-full max-w-[360px] flex flex-col gap-2 px-4 py-3.5 rounded-card bg-bg-card ring-1 ring-ink/10 text-left text-xs text-text-secondary">
       <div className="flex justify-between gap-3">
         <span>{T.errorBoundary.load}</span>
         <span className="font-semibold text-danger">{T.errorBoundary.interrupted}</span>
@@ -36,7 +36,7 @@ export default function RouteErrorCard({ digest }: { digest?: string }) {
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
           <span>{T.errorBoundary.code}</span>
           <span className="flex items-center gap-2">
-            <code className="font-mono text-text-main bg-ink/5 px-1.5 py-0.5 rounded-md select-all">{digest}</code>
+            <code className="font-mono text-text-main bg-ink/5 px-1.5 py-0.5 rounded-tag select-all">{digest}</code>
             <button
               type="button"
               onClick={handleCopy}

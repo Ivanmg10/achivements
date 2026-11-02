@@ -7,6 +7,10 @@ import type { AdminUser } from '@/types/user'
 import { adminFetch } from '@/utils/adminFetch'
 import { notify } from '@/lib/notify'
 import { PASSWORD_MIN } from '@/utils/authValidation'
+import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
+import Switch from '@/components/ui/Switch'
+import Notice from '@/components/ui/Notice'
 
 interface Props {
   isOpen: boolean
@@ -58,19 +62,19 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
           <label htmlFor="create-username" className="text-xs text-text-secondary uppercase tracking-wider">Username *</label>
           <input id="create-username" value={username} onChange={e => { setUsername(e.target.value); setError(null) }}
             autoFocus
-            className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full" />
+            className={fieldClass()} />
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="create-email" className="text-xs text-text-secondary uppercase tracking-wider">Email</label>
           <input id="create-email" type="email" value={email} onChange={e => setEmail(e.target.value)}
-            className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full" />
+            className={fieldClass()} />
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="create-password" className="text-xs text-text-secondary uppercase tracking-wider">Password *</label>
           <div className="relative">
             <input id="create-password" type={showPass ? 'text' : 'password'} value={password}
               onChange={e => { setPassword(e.target.value); setError(null) }}
-              className="bg-bg-main rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-accent w-full pr-10" />
+              className={fieldClass({}, 'pr-10')} />
             <button type="button" onClick={() => setShowPass(s => !s)}
               aria-label={showPass ? 'Hide password' : 'Show password'}
               aria-pressed={showPass}
@@ -83,30 +87,21 @@ export default function AdminCreateUserModal({ isOpen, onClose, onCreated }: Pro
           )}
         </div>
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            role="switch"
-            aria-checked={isAdmin}
-            onClick={() => setIsAdmin(v => !v)}
-            aria-label="Admin privileges"
-            className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${isAdmin ? 'bg-accent' : 'bg-bg-main'}`}
-          >
-            <div className={`w-4 h-4 rounded-full bg-white transition-transform ${isAdmin ? 'translate-x-4' : 'translate-x-0'}`} aria-hidden="true" />
-          </button>
+          <Switch checked={isAdmin} onChange={setIsAdmin} aria-label="Admin privileges" />
           <span className="text-sm">Admin</span>
         </div>
       </div>
 
-      {error && <p role="alert" className="text-sm text-red-400 bg-red-500/10 rounded-xl px-4 py-2">{error}</p>}
+      {error && <Notice tone="danger">{error}</Notice>}
 
       <div className="flex gap-3 mt-2">
-        <button onClick={handleClose} className="flex-1 bg-bg-main text-text-secondary rounded-xl py-3 hover:text-text-main transition-colors">
+        <button onClick={handleClose} className="flex-1 bg-bg-main text-text-secondary rounded-tile py-3 hover:text-text-main transition-colors">
           Cancel
         </button>
-        <button onClick={handleSubmit} disabled={!canSubmit}
-          className="flex-1 bg-accent text-bg-main font-bold rounded-xl py-3 hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed">
+        <Button onClick={handleSubmit} disabled={!canSubmit}
+          size="lg" className="flex-1">
           {loading ? 'Creating...' : 'Create'}
-        </button>
+        </Button>
       </div>
     </CommonModal>
   )

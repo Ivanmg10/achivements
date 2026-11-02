@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import AdminXboxGame from './admin-xbox-game/AdminXboxGame'
 import { useAdminXbox, type XboxLookupError } from '@/hooks/useAdminXbox'
+import Button from '@/components/ui/Button'
+import { fieldClass } from '@/components/ui/Input'
 
 const INPUT_ID = 'admin-xbox-gamertag'
 
@@ -32,7 +34,7 @@ export default function AdminXbox() {
   }
 
   return (
-    <section aria-labelledby="admin-xbox-title" className="bg-bg-card rounded-2xl p-4 flex flex-col gap-3">
+    <section aria-labelledby="admin-xbox-title" className="bg-bg-card rounded-card p-4 flex flex-col gap-3">
       <h3 id="admin-xbox-title" className="text-sm font-semibold">
         Xbox explorer
       </h3>
@@ -50,18 +52,17 @@ export default function AdminXbox() {
             spellCheck={false}
             aria-invalid={error === 'invalid-gamertag'}
             aria-describedby={error ? `${INPUT_ID}-error` : undefined}
-            className="flex-1 min-w-0 bg-bg-main rounded-xl px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+            className={fieldClass({ size: 'sm', invalid: error === 'invalid-gamertag' }, 'flex-1 min-w-0')}
           />
-          <button
+          <Button
             type="submit"
             disabled={loading || !gamertag.trim()}
-            className="px-4 py-2 bg-accent text-bg-main text-sm font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {loading ? 'Looking up…' : 'Look up'}
-          </button>
+          </Button>
         </div>
         {error && (
-          <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-red-400">
+          <p id={`${INPUT_ID}-error`} role="alert" className="text-xs text-danger">
             {ERRORS[error]}
           </p>
         )}

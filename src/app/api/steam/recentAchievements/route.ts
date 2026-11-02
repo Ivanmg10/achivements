@@ -1,10 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
+import { steamFailure } from '@/lib/steamFailure'
 import { withSteamCache, TTL } from '@/lib/steamCache'
 import { loadRecentAchievements } from '@/lib/steamRecentAchievements'
 import { parseSteamLanguage } from '@/utils/steamLanguage'
 import { cachedJson } from '@/lib/httpCache'
 import type { SteamRecentAchievement } from '@/types/steam'
+import { visibleGamesForUser } from '@/lib/gameVisibility'
 
 /** The player's latest Steam unlocks, for the profile column — like RA's recent achievements. */
 export async function GET(req: NextRequest) {
@@ -20,10 +22,10 @@ export async function GET(req: NextRequest) {
       () => loadRecentAchievements(auth.session, lang),
       { userId: id, refreshable: true },
     )
-    // Not browser-cached, like the other Steam lists; the DB cache keeps it cheap.
-    return cachedJson(achievements, 0)
+    const visible = await visibleGamesForUser(id, achievements, 'steam', (achievement) => achievement.appId)
+    return cachedJson(visible, 0)
   } catch (err) {
     console.error('[steam/recentAchievements]', err)
-    return NextResponse.json({ message: 'Steam API unavailable' }, { status: 503 })
+    return steamFailure(err)
   }
 }

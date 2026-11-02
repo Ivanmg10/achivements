@@ -7,7 +7,8 @@
 */
 
 @theme inline {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-face), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-face-display), var(--font-face), ui-sans-serif, system-ui, sans-serif;
 
   --color-bg-main: rgb(var(--bg-main));
   --color-bg-header: rgb(var(--bg-header));
@@ -19,6 +20,8 @@
 
   /* Overlays, hairlines and tints: white on the dark themes, ink on the light one. */
   --color-ink: rgb(var(--ink));
+  /* A skeleton's block: reads on the page, a card or a pane, in any theme. */
+  --color-skeleton: rgb(var(--ink) / 0.08);
 
   --color-accent: rgb(var(--accent));
   --color-accent-hover: rgb(var(--accent-hover));
@@ -34,6 +37,30 @@
   /* Progress bars: the theme's accent, and a darker step of it (RA softcore under hardcore). */
   --color-progress: rgb(var(--progress));
   --color-progress-soft: color-mix(in oklab, rgb(var(--progress)) 45%, rgb(var(--bg-card)));
+
+  /* RA's two modes, on rings and figures (the bars use progress / progress-soft). */
+  --color-hardcore: rgb(var(--hardcore));
+  --color-softcore: rgb(var(--softcore));
+
+  /* The component library's shapes (src/components/ui). */
+  --radius-chip: var(--r-chip);
+  --radius-control: var(--r-control);
+  --radius-field: var(--r-field);
+  --radius-card: var(--r-card);
+  --radius-button: var(--r-button);
+  --radius-tag: var(--r-tag);
+  --radius-pane: var(--r-pane);
+  --radius-tile: var(--r-tile);
+  --radius-sheet: var(--r-sheet);
+  --radius-area: var(--r-area);
+  --radius-icon: var(--r-icon);
+  --radius-box: var(--r-box);
+  --radius-box-md: var(--r-box-md);
+  --radius-box-sm: var(--r-box-sm);
+  --radius-tag-sm: var(--r-tag-sm);
+  --radius-badge: var(--r-badge);
+  --radius-cell: var(--r-cell);
+  --radius-nav: var(--r-nav);
 }
 
 /* ============================================
@@ -64,6 +91,252 @@
 
   /* Resolved on each element, so it follows the theme that element is in. */
   --progress: var(--accent);
+
+  --hardcore: 250 204 21;
+  --softcore: 96 165 250;
+
+  /*
+     The design: shapes, sizes and motion the components read. Every theme
+     shares them; a future site-wide design is another set of these values.
+  */
+  --slant-button: -12deg;
+  --slant-pill: -14deg;
+  --slant-line: -30deg;
+  --slant-mark: -20deg;
+  --slant-cut: -12deg;
+  --clip-3: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
+  --clip-4: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  --clip-5: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+  --clip-6: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  --clip-8: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  --clip-14: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  --clip-fill: polygon(0 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  --bar-radius: 0;
+  --r-chip: 0.5rem;
+  --r-button: 0.75rem;
+  --r-tag: 0.375rem;
+  --r-pane: 0.875rem;
+  --r-tile: 0.625rem;
+  --r-track: 7px;
+  --r-knob: 4px;
+  --knob-w: 1.375rem;
+  --knob-h: 1.25rem;
+  --knob-shift: 1.125rem;
+  --r-control: 0.75rem;
+  --r-field: 0.875rem;
+  --r-card: 1.25rem;
+  --r-sheet: 1.125rem;
+  --r-area: 0.875rem;
+  --r-icon: 0.5625rem;
+  --r-box: 0.5rem;
+  --r-box-md: 0.375rem;
+  --r-box-sm: 0.25rem;
+  --r-tag-sm: 0.25rem;
+  --r-badge: 0.3125rem;
+  --r-cell: 3px;
+  --r-nav: 0.625rem;
+  --button-inset: 5px;
+  --area-resize: vertical;
+  --h-control-sm: 2.25rem;
+  --h-control: 2.75rem;
+  --h-field: 3.25rem;
+  --motion-hover: 150ms;
+  --motion-open: 250ms;
+  --motion-indicator: 450ms;
+  --ease-spring: cubic-bezier(0.3, 1.2, 0.4, 1);
+  --enter-duration: 450ms;
+  --enter-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --enter-stagger: 40ms;
+  --enter-rise: 12px;
+  --enter-scale: 0.98;
+  --enter-grow: 0;
+}
+
+/* Less motion: the entrances below stay, as a plain fade. Stated here, so every one of them follows. */
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  [data-theme] {
+    --enter-duration: 200ms;
+    --enter-stagger: 0ms;
+    --enter-rise: 0px;
+    --enter-scale: 1;
+    --enter-grow: 1;
+  }
+}
+
+/* `lookTransition` plays these by hand: a font fades, a shape sweeps, a theme spreads from where it was picked. */
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-old(look-panel),
+::view-transition-new(look-panel) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Only seen in a sweep: the band between the two looks. */
+::view-transition-image-pair(root),
+::view-transition-image-pair(look-panel) {
+  background: rgb(var(--accent));
+}
+
+/*
+   A dialog's frame stays still through its transition. Its ring and shadow are outside its box: a fade
+   would draw them twice and a sweep's clip-path cuts them, so the pair clips the looks and draws them
+   itself, the same classes as `Modal`'s panel. The band stops short of the edge, so it never tints the
+   corners; the looks ignore that padding.
+*/
+::view-transition-image-pair(look-panel) {
+  @apply ring-1 ring-ink/[0.08] shadow-2xl shadow-black/50;
+  overflow: hidden;
+  padding: 3px;
+  background-clip: content-box;
+  border-radius: var(--r-card);
+}
+
+::view-transition-old(look-panel),
+::view-transition-new(look-panel) {
+  left: 0;
+}
+
+/* A page that waits for nothing has no skeleton to soften its arrival, so its entrance takes longer. */
+@media (prefers-reduced-motion: no-preference) {
+  .enter-slow {
+    --enter-duration: 800ms;
+    --enter-stagger: 70ms;
+  }
+}
+
+/*
+   The font pairs. `data-font` swaps the two variables every component reads, on
+   <html> or on a preview that shows another choice inside the page. A preview is
+   given the family itself, as its text inherits <html>'s, and Barlow is a choice
+   like the others there: it has to undo the page's. In a layer, so that
+   `font-display` on a preview's title still wins.
+*/
+:root,
+[data-font="barlow"]:not(html) {
+  --font-face: var(--font-ui);
+  --font-face-display: var(--font-barlow);
+}
+
+html[data-font="sofia"],
+[data-font="sofia"]:not(html) {
+  --font-face: var(--font-sofia);
+  --font-face-display: var(--font-sofia-display);
+}
+
+html[data-font="fira"],
+[data-font="fira"]:not(html) {
+  --font-face: var(--font-fira);
+  --font-face-display: var(--font-fira-display);
+}
+
+@layer base {
+  [data-font]:not(html) {
+    @apply font-sans;
+  }
+}
+
+/*
+   The two designs, each usable on any element: `data-shape` on <html> is the
+   person's choice (Preferences → Layout), and the design system's catalogue puts
+   one on a specimen to show them side by side. Components read these tokens,
+   never the choice itself. Slanted is the base; this block only restates it so a
+   slanted specimen stays slanted inside a round page.
+*/
+[data-shape="slanted"] {
+  --slant-button: -12deg;
+  --slant-pill: -14deg;
+  --slant-line: -30deg;
+  --slant-mark: -20deg;
+  --slant-cut: -12deg;
+  --clip-3: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
+  --clip-4: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  --clip-5: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+  --clip-6: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  --clip-8: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  --clip-14: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+  --clip-fill: polygon(0 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  --bar-radius: 0;
+  --r-chip: 0.5rem;
+  --r-button: 0.75rem;
+  --r-tag: 0.375rem;
+  --r-pane: 0.875rem;
+  --r-tile: 0.625rem;
+  --r-control: 0.75rem;
+  --r-field: 0.875rem;
+  --r-card: 1.25rem;
+  --r-sheet: 1.125rem;
+  --r-area: 0.875rem;
+  --r-icon: 0.5625rem;
+  --r-box: 0.5rem;
+  --r-box-md: 0.375rem;
+  --r-box-sm: 0.25rem;
+  --r-tag-sm: 0.25rem;
+  --r-badge: 0.3125rem;
+  --r-cell: 3px;
+  --r-nav: 0.625rem;
+  --button-inset: 5px;
+  --area-resize: vertical;
+  --r-track: 7px;
+  --r-knob: 4px;
+  --knob-w: 1.375rem;
+  --knob-h: 1.25rem;
+  --knob-shift: 1.125rem;
+}
+
+/* The round design: no slant anywhere, bars rounded at the ends, soft surfaces a step rounder than the slanted design's, and every one-line control (button, field, tag, chip, icon button) a pill or a circle. */
+[data-shape="round"] {
+  --slant-button: 0deg;
+  --slant-pill: 0deg;
+  --slant-line: 0deg;
+  --slant-mark: 0deg;
+  --slant-cut: 0deg;
+  --clip-3: none;
+  --clip-4: none;
+  --clip-5: none;
+  --clip-6: none;
+  --clip-8: none;
+  --clip-14: none;
+  --clip-fill: none;
+  --bar-radius: 0.75rem;
+  --r-chip: 9999px;
+  --r-button: 9999px;
+  --r-tag: 9999px;
+  --r-pane: 1.25rem;
+  --r-tile: 1rem;
+  --r-control: 1rem;
+  --r-field: 9999px;
+  --r-card: 1.5rem;
+  --r-sheet: 1.5rem;
+  --r-area: 1.25rem;
+  --r-icon: 9999px;
+  --r-box: 0.75rem;
+  --r-box-md: 0.625rem;
+  --r-box-sm: 0.5rem;
+  --r-tag-sm: 9999px;
+  --r-badge: 9999px;
+  --r-cell: 5px;
+  --r-nav: 9999px;
+  --button-inset: 0px;
+  --area-resize: none;
+  --r-track: 9999px;
+  --r-knob: 9999px;
+  --knob-w: 1.25rem;
+  --knob-h: 1.25rem;
+  --knob-shift: 1.25rem;
+}
+
+/* Light surfaces: the RA marks a step darker, so they still read. */
+[data-theme="light"],
+[data-theme="light-red"],
+[data-theme="light-green"],
+[data-theme="light-blue"],
+[data-theme="light-black"],
+[data-theme="sakura"],
+[data-theme="arctic"] {
+  --hardcore: 161 98 7;
+  --softcore: 29 78 216;
 }
 
 /* ============================================
@@ -71,7 +344,9 @@
    ============================================ */
 [data-theme="dark"],
 [data-theme="dark-red"],
-[data-theme="dark-green"] {
+[data-theme="dark-green"],
+[data-theme="dark-blue"],
+[data-theme="dark-white"] {
   --bg-main: 15 16 20;
   --bg-header: 10 10 14;
   --bg-card: 23 24 30;
@@ -97,7 +372,9 @@
    ============================================ */
 [data-theme="light"],
 [data-theme="light-red"],
-[data-theme="light-green"] {
+[data-theme="light-green"],
+[data-theme="light-blue"],
+[data-theme="light-black"] {
   --ink: 20 22 28;
   --bg-main: 229 231 235;
   --bg-header: 236 238 242;
@@ -119,10 +396,11 @@
 }
 
 /*
-   The same dark and light, with a red or a green accent instead of violet.
+   The same dark and light, with another accent instead of violet.
    Where the accent takes a colour that already means something, that meaning
    moves: errors go orange beside a red accent, "completed" goes teal beside a
-   green one, so a bar never reads as an error or as finished.
+   green one, info goes cyan or teal beside a blue one, so a bar never reads as
+   an error or as finished.
 */
 [data-theme="dark-red"] {
   --accent: 248 113 113;
@@ -148,6 +426,28 @@
   --accent-muted: 22 101 52;
   --success: 15 118 110;
 }
+[data-theme="dark-blue"] {
+  --accent: 123 150 255;
+  --accent-hover: 165 180 252;
+  --accent-muted: 123 150 255;
+  --info: 34 211 238;
+}
+[data-theme="dark-white"] {
+  --accent: 240 241 245;
+  --accent-hover: 255 255 255;
+  --accent-muted: 240 241 245;
+}
+[data-theme="light-blue"] {
+  --accent: 29 78 216;
+  --accent-hover: 30 64 175;
+  --accent-muted: 29 78 216;
+  --info: 15 118 110;
+}
+[data-theme="light-black"] {
+  --accent: 23 24 30;
+  --accent-hover: 60 62 72;
+  --accent-muted: 23 24 30;
+}
 
 /*
    Light themes: the fixed palette colours in the code (hardcore gold, ratio
@@ -155,55 +455,55 @@
    classes take a darker shade so they still pass AA. Text only: bars and tints
    keep their colour.
 */
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-200 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-300 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-400 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-200 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-300 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-400 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-200 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-300 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-400 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-200 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-300 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-400 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-200 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-300 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-400 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-200 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-300 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-400 { @apply text-purple-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-200 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-300 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-400 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-200 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-300 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-400 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-200 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-300 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-400 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-200 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-300 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-400 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-200 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-300 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-400 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-200 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-300 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-400 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-200 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-300 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-400 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-200 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-300 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-400 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-200 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-300 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-400 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-200 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-300 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-400 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-500 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-200 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-300 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-400 { @apply text-red-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-200 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-300 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-400 { @apply text-yellow-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-200 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-300 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-400 { @apply text-green-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-200 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-300 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-400 { @apply text-amber-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-200 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-300 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-400 { @apply text-orange-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-200 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-300 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-400 { @apply text-purple-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-200 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-300 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-400 { @apply text-violet-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-200 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-300 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-400 { @apply text-blue-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-200 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-300 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-400 { @apply text-sky-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-200 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-300 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-400 { @apply text-teal-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-200 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-300 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-400 { @apply text-rose-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-200 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-300 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-400 { @apply text-pink-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-200 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-300 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-400 { @apply text-indigo-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-200 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-300 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-400 { @apply text-cyan-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-200 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-300 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-400 { @apply text-lime-700; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-200 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-300 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-400 { @apply text-gray-600; }
+:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-500 { @apply text-gray-600; }
 
 /* ============================================
    BLUE
@@ -300,167 +600,6 @@
 }
 
 /* ============================================
-   SYNTHWAVE: hot pink on night indigo, cyan for info
-   ============================================ */
-[data-theme="synthwave"] {
-  --bg-main: 14 10 26;
-  --bg-header: 9 6 18;
-  --bg-card: 24 17 42;
-  --bg-tertiary: 38 28 64;
-
-  --text-main: 236 228 255;
-  --text-secondary: 165 150 200;
-
-  --accent: 255 92 190;
-  --accent-hover: 255 128 206;
-  --accent-muted: 255 92 190;
-
-  --success: 52 211 153;
-  --warning: 251 191 36;
-  --info: 34 211 238;
-  --danger: 251 113 133;
-  --chart-2: 34 211 238;
-}
-
-/* ============================================
-   CATPPUCCIN (Mocha): pastel lavender on soft navy
-   ============================================ */
-[data-theme="catppuccin"] {
-  --bg-main: 30 30 46;
-  --bg-header: 24 24 37;
-  --bg-card: 37 37 56;
-  --bg-tertiary: 49 50 68;
-
-  --text-main: 205 214 244;
-  --text-secondary: 166 173 200;
-
-  --accent: 203 166 247;
-  --accent-hover: 218 190 250;
-  --accent-muted: 203 166 247;
-
-  --success: 166 227 161;
-  --warning: 249 226 175;
-  --info: 116 199 236;
-  --danger: 243 139 168;
-  --chart-2: 249 226 175;
-}
-
-/* ============================================
-   GRUVBOX: retro warm, orange on charcoal
-   ============================================ */
-[data-theme="gruvbox"] {
-  --bg-main: 40 40 40;
-  --bg-header: 29 32 33;
-  --bg-card: 50 48 47;
-  --bg-tertiary: 80 73 69;
-
-  --text-main: 235 219 178;
-  --text-secondary: 168 153 132;
-
-  --accent: 254 128 25;
-  --accent-hover: 255 152 64;
-  --accent-muted: 254 128 25;
-
-  --success: 184 187 38;
-  --warning: 250 189 47;
-  --info: 131 165 152;
-  --danger: 255 110 90;
-  --chart-2: 250 189 47;
-}
-
-/* ============================================
-   ROSÉ PINE: dusty rose on pine night
-   ============================================ */
-[data-theme="rose-pine"] {
-  --bg-main: 25 23 36;
-  --bg-header: 21 19 31;
-  --bg-card: 31 29 46;
-  --bg-tertiary: 38 35 58;
-
-  --text-main: 224 222 244;
-  --text-secondary: 144 140 170;
-
-  --accent: 235 188 186;
-  --accent-hover: 242 205 203;
-  --accent-muted: 235 188 186;
-
-  --success: 52 211 153;
-  --warning: 246 193 119;
-  --info: 156 207 216;
-  --danger: 235 111 146;
-  --chart-2: 246 193 119;
-}
-
-/* ============================================
-   OLED: near-black for OLED screens, neutral accent
-   ============================================ */
-[data-theme="oled"] {
-  --bg-main: 3 3 4;
-  --bg-header: 2 2 3;
-  --bg-card: 12 12 15;
-  --bg-tertiary: 26 26 32;
-
-  --text-main: 235 236 240;
-  --text-secondary: 150 152 160;
-
-  --accent: 167 139 250;
-  --accent-hover: 196 181 253;
-  --accent-muted: 167 139 250;
-
-  --success: 34 197 94;
-  --warning: 245 158 11;
-  --info: 96 165 250;
-  --danger: 239 68 68;
-  --chart-2: 245 158 11;
-}
-
-/* ============================================
-   OCEAN: aqua on deep sea; success is lime, not the accent
-   ============================================ */
-[data-theme="ocean"] {
-  --bg-main: 7 22 28;
-  --bg-header: 4 16 21;
-  --bg-card: 12 32 40;
-  --bg-tertiary: 20 48 58;
-
-  --text-main: 214 236 240;
-  --text-secondary: 128 162 170;
-
-  --accent: 45 212 191;
-  --accent-hover: 94 234 212;
-  --accent-muted: 45 212 191;
-
-  --success: 163 230 53;
-  --warning: 251 191 36;
-  --info: 125 211 252;
-  --danger: 251 113 133;
-  --chart-2: 251 191 36;
-}
-
-/* ============================================
-   TERMINAL: phosphor green on black; success is cyan
-   ============================================ */
-[data-theme="terminal"] {
-  --bg-main: 5 10 7;
-  --bg-header: 2 6 4;
-  --bg-card: 10 20 14;
-  --bg-tertiary: 18 34 24;
-
-  --text-main: 205 224 210;
-  --text-secondary: 110 160 125;
-
-  --accent: 74 222 128;
-  --accent-hover: 134 239 172;
-  --accent-muted: 74 222 128;
-
-  --success: 34 211 238;
-  --warning: 250 204 21;
-  --info: 147 197 253;
-  --danger: 248 113 113;
-  --chart-2: 250 204 21;
-}
-
-/* ============================================
    SAKURA (light): cherry pink on blossom white
    ============================================ */
 [data-theme="sakura"] {
@@ -509,75 +648,6 @@
 }
 
 /* ============================================
-   DAXTER (Jak and Daxter): ottsel orange on warm brown; blue and green eco
-   ============================================ */
-[data-theme="daxter"] {
-  --bg-main: 27 17 11;
-  --bg-header: 20 12 7;
-  --bg-card: 40 27 18;
-  --bg-tertiary: 60 41 28;
-
-  --text-main: 250 236 214;
-  --text-secondary: 196 164 128;
-
-  --accent: 255 155 55;
-  --accent-hover: 255 178 96;
-  --accent-muted: 255 155 55;
-
-  --success: 132 220 80;
-  --warning: 250 204 21;
-  --info: 90 180 255;
-  --danger: 248 113 113;
-  --chart-2: 90 180 255;
-}
-
-/* ============================================
-   BENTLEY (Sly Cooper): turtle green on midnight navy noir
-   ============================================ */
-[data-theme="bentley"] {
-  --bg-main: 13 17 32;
-  --bg-header: 9 12 24;
-  --bg-card: 21 27 48;
-  --bg-tertiary: 33 41 68;
-
-  --text-main: 226 232 244;
-  --text-secondary: 140 152 180;
-
-  --accent: 160 208 90;
-  --accent-hover: 184 226 120;
-  --accent-muted: 160 208 90;
-
-  --success: 45 212 191;
-  --warning: 251 191 36;
-  --info: 129 140 248;
-  --danger: 248 113 113;
-  --chart-2: 251 191 36;
-}
-
-/* ============================================
-   CLANK (Ratchet & Clank): gunmetal body, green eyes, red antenna light
-   ============================================ */
-[data-theme="clank"] {
-  --bg-main: 22 25 30;
-  --bg-header: 16 18 22;
-  --bg-card: 33 38 46;
-  --bg-tertiary: 48 55 66;
-
-  --text-main: 222 228 236;
-  --text-secondary: 150 160 174;
-
-  --accent: 110 231 150;
-  --accent-hover: 150 240 180;
-  --accent-muted: 110 231 150;
-
-  --success: 56 189 248;
-  --warning: 251 191 36;
-  --info: 165 180 252;
-  --danger: 255 95 95;
-  --chart-2: 251 191 36;
-}
-
-/* ============================================
    BLACK OPS II: hot safety orange on cold near-black
    ============================================ */
 [data-theme="black-ops-2"] {
@@ -601,49 +671,119 @@
 }
 
 /* ============================================
-   SAN ANDREAS: Grove Street green on smoggy Los Santos sepia
+   MIDNIGHT: deep blue, light blue text and cream
    ============================================ */
-[data-theme="san-andreas"] {
-  --bg-main: 23 19 13;
-  --bg-header: 17 14 9;
-  --bg-card: 35 29 20;
-  --bg-tertiary: 54 45 31;
+[data-theme="midnight"] {
+  --bg-main: 14 20 48;
+  --bg-header: 10 14 36;
+  --bg-card: 26 35 80;
+  --bg-tertiary: 50 60 127;
 
-  --text-main: 240 230 210;
-  --text-secondary: 176 160 130;
+  --text-main: 225 225 225;
+  --text-secondary: 172 203 241;
 
-  --accent: 88 190 90;
-  --accent-hover: 120 210 120;
-  --accent-muted: 88 190 90;
+  --accent: 226 192 99;
+  --accent-hover: 240 214 140;
+  --accent-muted: 226 192 99;
 
-  --success: 56 189 248;
-  --warning: 250 204 21;
-  --info: 147 197 253;
+  --success: 34 197 94;
+  --warning: 251 146 60;
+  --info: 172 203 241;
   --danger: 248 113 113;
-  --chart-2: 250 204 21;
+  --chart-2: 172 203 241;
 }
 
 /* ============================================
-   SNAKE EATER (Metal Gear Solid 3): olive drab, khaki and tan; codec green
+   CRIMSON: Midnight's cream on deep red
+   ============================================ */
+[data-theme="crimson"] {
+  --bg-main: 34 12 16;
+  --bg-header: 24 8 11;
+  --bg-card: 58 20 26;
+  --bg-tertiary: 104 15 17;
+
+  --text-main: 240 228 222;
+  --text-secondary: 232 201 192;
+
+  --accent: 226 192 99;
+  --accent-hover: 240 214 140;
+  --accent-muted: 226 192 99;
+
+  --success: 52 211 153;
+  --warning: 253 230 138;
+  --info: 147 197 253;
+  --danger: 251 146 60;
+  --chart-2: 147 197 253;
+}
+
+/* ============================================
+   SNAKE EATER (Metal Gear Solid 3): jungle green and camouflage khaki
    ============================================ */
 [data-theme="snake-eater"] {
-  --bg-main: 21 23 15;
-  --bg-header: 15 17 10;
-  --bg-card: 32 35 23;
-  --bg-tertiary: 48 52 35;
+  --bg-main: 15 26 18;
+  --bg-header: 10 19 12;
+  --bg-card: 24 39 27;
+  --bg-tertiary: 37 57 42;
 
-  --text-main: 226 220 196;
-  --text-secondary: 160 156 128;
+  --text-main: 227 224 200;
+  --text-secondary: 163 171 140;
 
-  --accent: 222 176 72;
-  --accent-hover: 236 196 100;
-  --accent-muted: 222 176 72;
+  --accent: 201 180 88;
+  --accent-hover: 220 200 110;
+  --accent-muted: 201 180 88;
 
   --success: 132 204 22;
   --warning: 251 146 60;
   --info: 110 220 190;
   --danger: 248 113 113;
   --chart-2: 110 220 190;
+}
+
+/* ============================================
+   VENOM (Ultimate Spider-Man): the symbiote's black, bone white, a purple sheen on the surfaces
+   ============================================ */
+[data-theme="venom"] {
+  --bg-main: 11 9 10;
+  --bg-header: 6 5 6;
+  --bg-card: 18 15 22;
+  --bg-tertiary: 34 28 42;
+
+  --text-main: 240 237 244;
+  --text-secondary: 170 162 180;
+
+  --accent: 236 232 242;
+  --accent-hover: 255 255 255;
+  --accent-muted: 236 232 242;
+
+  --success: 52 211 153;
+  --warning: 251 191 36;
+  --info: 160 170 255;
+  --danger: 248 113 113;
+  --chart-2: 168 140 240;
+}
+
+/* ============================================
+   STEAM RETRO: the client's old green VGUI, olive panels and gold titles
+   One step darker than the original, so the gold reads on a card
+   ============================================ */
+[data-theme="steam-retro"] {
+  --bg-main: 51 58 45;
+  --bg-header: 41 45 35;
+  --bg-card: 62 70 55;
+  --bg-tertiary: 76 88 68;
+
+  --text-main: 216 222 211;
+  --text-secondary: 194 205 183;
+
+  --accent: 196 181 80;
+  --accent-hover: 227 228 31;
+  --accent-muted: 196 181 80;
+
+  --success: 74 222 128;
+  --warning: 253 186 116;
+  --info: 147 197 253;
+  --danger: 252 165 165;
+  --chart-2: 147 197 253;
 }
 
 /* ============================================
@@ -697,16 +837,31 @@
   /* The top row is never shorter than the profile: on a screen a little too low the page grows, instead of the profile being cut off behind its own scrollbar. */
   .home-fit:has([data-stats-section="overview"]) > .home-fit-top { grid-template-rows: minmax(auto, 1fr); }
   .home-fit:has([data-stats-section="overview"]) .home-fit-side { min-height: auto; }
+  /* With tabs, the column keeps the room of the tallest platform's profile: it sets the trim, so a shorter one changed the charts and the heatmap's size on every switch. */
+  .home-fit:has([data-stats-section="overview"]) .home-fit-side:has([role="tablist"]) { min-height: 48.25rem; }
   .home-fit:has([data-stats-section="overview"]) .home-fit-side > section { overflow-y: visible; }
   .home-fit:has([data-stats-section="overview"]) .home-fit-side > * { flex: 1 1 0%; }
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll { overflow-y: auto; }
   /* The daily chart sets the height of the charts row (the heatmap follows its box): scaled to the screen here. */
-  .home-fit:has([data-stats-section="overview"]) .home-fit-chart { height: clamp(160px, 20dvh, 260px); }
+  /* Less what the box would run past the screen (--home-fit-trim, set by homeFit), so the stats end where the screen does. */
+  /* Portada already has its hero above the home: trimming this chart made its heatmap cells smaller than Classic's. */
+  .home-fit:not(:has(.home-cover)):has([data-stats-section="overview"]) .home-fit-chart { height: max(160px, clamp(160px, 20dvh, 260px) - var(--home-fit-trim, 0px)); }
   /* The rows carry flex: 1 1 0 inline (ROW_STYLE). Here they may grow to share spare height but never shrink: short of room, the list scrolls. */
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * { flex: 1 0 auto !important; }
   /* A row taller than its content keeps the content in the middle, not stuck to the top. */
   .home-fit:has([data-stats-section="overview"]) .home-fit-scroll > * > * { justify-content: center; }
 }
+
+/* A skeleton draws every variant; <html> says which ones show, before the first frame (LOOK_SCRIPT, then ShapeSync). */
+[data-home-layout="cover"] .home-if-classic,
+:root:not([data-home-layout="cover"]) .home-if-cover,
+[data-library-layout="list"] .if-library-shelves,
+[data-library-layout="cards"] .if-library-shelves,
+:root:not([data-library-layout="list"]) .if-library-list,
+:root:not([data-library-layout="cards"]) .if-library-cards,
+[data-session] .if-signed-out,
+:root:not([data-session]) .if-signed-in,
+:root:not([data-session="tabs"]) .if-platform-tabs { display: none; }
 
 /* Heatmap: the cells come in column by column, oldest week first (--col is the week). */
 @keyframes heat-in {
@@ -768,10 +923,123 @@
   }
 }
 
+/*
+   Entrances, one set for the whole site (docs/design-system.md → Entrances).
+   .enter-rise   a hero's part: fade and rise. --i orders them, the title first.
+   .enter-card   one card or tile: fade and scale.
+   .enter-rows   on a list or a <tbody>: its first 12 rows rise, one after another.
+   .enter-cards  on a grid: its first 12 cards scale in, one after another.
+   .enter-grow-x / -y  a bar or a podium step growing from its base.
+   A progress bar inside any of them grows on its own ([data-fill]).
+
+   CSS, never Framer: it plays on the compositor while a first load keeps the main
+   thread busy, and what is in the HTML shows without waiting for a script.
+   `backwards`, never `both`: a fill that stays would keep a transform on the element,
+   which traps position: fixed inside it and breaks dragging a sortable row.
+   A list plays once: moving a node restarts its animation, so useEntrancesOnce sets
+   data-entered when the rows are done and a new order or filter does not replay it.
+*/
+@keyframes enter-rise {
+  from { opacity: 0; transform: translateY(var(--enter-rise)); }
+}
+@keyframes enter-card {
+  from { opacity: 0; transform: scale(var(--enter-scale)); }
+}
+@keyframes enter-grow-x {
+  from { transform: scaleX(var(--enter-grow)); }
+}
+@keyframes enter-grow-y {
+  from { transform: scaleY(var(--enter-grow)); }
+}
+
+.enter-rise,
+.enter-rows:not([data-entered]) > :nth-child(-n + 12) { --enter-name: enter-rise; }
+.enter-card,
+.enter-cards:not([data-entered]) > :nth-child(-n + 12) { --enter-name: enter-card; }
+.enter-grow-x { --enter-name: enter-grow-x; transform-origin: left; }
+.enter-grow-y { --enter-name: enter-grow-y; transform-origin: bottom; }
+
+.enter-rise,
+.enter-card,
+.enter-grow-x,
+.enter-grow-y,
+.enter-rows:not([data-entered]) > :nth-child(-n + 12),
+.enter-cards:not([data-entered]) > :nth-child(-n + 12) {
+  animation: var(--enter-name) var(--enter-duration) var(--enter-ease) calc(var(--i, 0) * var(--enter-stagger)) backwards;
+}
+
+.enter-rise [data-fill],
+.enter-card [data-fill],
+.enter-rows:not([data-entered]) > :nth-child(-n + 12) [data-fill],
+.enter-cards:not([data-entered]) > :nth-child(-n + 12) [data-fill] {
+  transform-origin: left;
+  animation: enter-grow-x calc(var(--enter-duration) * 2) var(--enter-ease) calc(var(--i, 0) * var(--enter-stagger)) backwards;
+}
+
+:is(.enter-rows, .enter-cards) > :nth-child(2) { --i: 1; }
+:is(.enter-rows, .enter-cards) > :nth-child(3) { --i: 2; }
+:is(.enter-rows, .enter-cards) > :nth-child(4) { --i: 3; }
+:is(.enter-rows, .enter-cards) > :nth-child(5) { --i: 4; }
+:is(.enter-rows, .enter-cards) > :nth-child(6) { --i: 5; }
+:is(.enter-rows, .enter-cards) > :nth-child(7) { --i: 6; }
+:is(.enter-rows, .enter-cards) > :nth-child(8) { --i: 7; }
+:is(.enter-rows, .enter-cards) > :nth-child(9) { --i: 8; }
+:is(.enter-rows, .enter-cards) > :nth-child(10) { --i: 9; }
+:is(.enter-rows, .enter-cards) > :nth-child(11) { --i: 10; }
+:is(.enter-rows, .enter-cards) > :nth-child(12) { --i: 11; }
+/* A hero's title comes first, with whatever sits above it; its facts follow. */
+.enter-rows > :is(h1, :has(h1)):nth-child(n) { --i: 0; }
+
+/*
+   The library's shelves keep their own, livelier cascade (the user's call, 2026-10-31):
+   shelf after shelf, each one's title slides in, its cards lift and settle with a
+   bounce, and "see all" closes it. The next shelf is already arriving while the cards
+   above settle. Built on the same tokens, so reduced motion makes it a plain fade too.
+*/
+@keyframes enter-shelf-title {
+  from { opacity: 0; transform: translateX(calc(var(--enter-rise) * -5 / 3)); }
+}
+@keyframes enter-shelf-card {
+  from { opacity: 0; transform: translateY(calc(var(--enter-rise) * 3)) scale(calc(1 - (1 - var(--enter-scale)) * 5)); }
+}
+@keyframes enter-shelf-end {
+  from { opacity: 0; transform: translateY(calc(var(--enter-rise) * 2)); }
+}
+.enter-shelves > * { --shelf-at: calc(var(--shelf, 0) * 4 * var(--enter-stagger)); }
+.enter-shelves > :nth-child(2) { --shelf: 1; }
+.enter-shelves > :nth-child(3) { --shelf: 2; }
+.enter-shelves > :nth-child(4) { --shelf: 3; }
+.enter-shelves > :nth-child(5) { --shelf: 4; }
+.enter-shelves .enter-rise,
+.enter-shelves .enter-cards:not([data-entered]) > :nth-child(-n + 12) {
+  animation-duration: calc(var(--enter-duration) * 4 / 3);
+  animation-timing-function: var(--ease-spring);
+}
+.enter-shelves .enter-rise {
+  --enter-name: enter-shelf-title;
+  animation-delay: var(--shelf-at);
+}
+.enter-shelves .enter-cards:not([data-entered]) > :nth-child(-n + 12) {
+  --enter-name: enter-shelf-card;
+  animation-delay: calc(var(--shelf-at) + (var(--i, 0) + 1) * 1.375 * var(--enter-stagger));
+}
+.enter-shelves > .enter-rise { --enter-name: enter-shelf-end; }
+.enter-shelves .enter-cards:not([data-entered]) > :nth-child(-n + 12) [data-fill] { animation: none; }
+
 /* The top line while a page is on its way (NavigationProgress): fills fast, then slows down and waits. */
 @keyframes nav-progress {
   from { width: 0; }
   to { width: 85%; }
+}
+
+/* A toast's time left, running out. */
+@keyframes toast-time {
+  to { transform: scaleX(0); }
+}
+
+/* The library's Select list opening under its field. */
+@keyframes select-in {
+  from { opacity: 0; transform: translateY(-4px); }
 }
 
 /*

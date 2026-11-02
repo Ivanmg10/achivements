@@ -3,6 +3,7 @@
 import { IconCheck, IconLock } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { formatUnlockDate, type Unlock } from '@/utils/gameCompare'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /**
  * Whether one person has an achievement, and when: a tick and the day, or a
@@ -24,10 +25,10 @@ export default function GameCompareTableCell({
   const date = formatUnlockDate(unlock?.earnedAt ?? null, lang)
 
   return (
-    <div className={`rounded-lg px-2.5 py-1.5 ring-1 flex flex-col gap-0.5 min-w-0 ${earned ? 'bg-success/10 ring-success/20' : 'bg-ink/[0.04] ring-ink/5'}`}>
+    <div className={`rounded-box px-2.5 py-1.5 ring-1 flex flex-col gap-0.5 min-w-0 ${earned ? 'bg-success/10 ring-success/20' : 'bg-ink/[0.04] ring-ink/5'}`}>
       <span className="text-[10px] uppercase tracking-wider text-text-secondary truncate">{who}</span>
       {loading ? (
-        <span className="h-4 w-20 rounded bg-ink/10 animate-pulse motion-reduce:animate-none" aria-hidden="true" />
+        <Skeleton className="h-4 w-20" />
       ) : (
         <span className={`flex items-center gap-1 text-xs font-medium ${earned ? 'text-text-main' : 'text-text-secondary'}`}>
           {earned ? <IconCheck size={13} className="text-success shrink-0" aria-hidden="true" /> : <IconLock size={12} className="shrink-0" aria-hidden="true" />}

@@ -1,5 +1,5 @@
 const mockPush = jest.fn();
-const mockRouter = { push: mockPush, replace: jest.fn(), prefetch: jest.fn() };
+const mockRouter = { push: mockPush, replace: jest.fn(), prefetch: jest.fn(), refresh: jest.fn() };
 const useRouter = jest.fn(() => mockRouter);
 const usePathname = jest.fn(() => "/");
 const useSearchParams = jest.fn(() => new URLSearchParams());

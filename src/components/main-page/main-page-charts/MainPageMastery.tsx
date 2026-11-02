@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import ClosestToComplete, { CLOSEST_SHOWN } from './closest-to-complete/ClosestToComplete'
 import MasteryByConsole from './mastery-by-console/MasteryByConsole'
 import MasteryMix from './mastery-mix/MasteryMix'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export default function MainPageMastery({
   awards,
@@ -30,12 +31,12 @@ export default function MainPageMastery({
         <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.masteryAwards}</p>
         <div className="grid grid-cols-2 gap-2">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-bg-main rounded-lg h-16 animate-pulse" />
+            <Skeleton key={i} radius="tile" className="h-16" />
           ))}
         </div>
         <div className="grid grid-cols-4 gap-1.5">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="aspect-square rounded bg-ink/10 animate-pulse" />
+            <Skeleton key={i} radius="tag" className="aspect-square" />
           ))}
         </div>
       </div>
@@ -134,10 +135,10 @@ export default function MainPageMastery({
                     alt={a.Title}
                     width={56}
                     height={56}
-                    className="w-full aspect-square object-cover rounded hover:scale-105 transition-transform"
+                    className="w-full aspect-square object-cover rounded-box-sm hover:scale-105 transition-transform"
                   />
                 ) : (
-                  <div className="w-full aspect-square rounded bg-ink/10" />
+                  <div className="w-full aspect-square rounded-box-sm bg-ink/10" />
                 )}
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-warning rounded-full border border-bg-card" aria-hidden="true" />
               </Link>

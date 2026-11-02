@@ -7,6 +7,8 @@ import { gameHref } from '@/utils/gameRef'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
 import { useSubject } from '@/context/SubjectContext'
+import { decimal } from '@/utils/utils'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 const SHOWN = 4
 const SKELETON_ROWS = 4
@@ -24,7 +26,7 @@ export default function XboxRarestAchievements({
   achievements: XboxAchievement[]
   isLoading: boolean
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
 
   const rarest = achievements
@@ -39,7 +41,7 @@ export default function XboxRarestAchievements({
       {isLoading ? (
         <ul aria-busy="true" className="flex flex-col gap-2">
           {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-            <li key={i} className="h-12 bg-ink/5 rounded-lg animate-pulse" />
+            <li key={i}><SkeletonRow className="h-12 px-1" /></li>
           ))}
         </ul>
       ) : rarest.length === 0 ? (
@@ -50,18 +52,18 @@ export default function XboxRarestAchievements({
             <li key={a.id}>
               <Link
                 href={`${gameHref('xbox', gameId, subject)}#${xboxAchievementAnchor(a.id)}`}
-                className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
               >
                 {a.iconUrl ? (
-                  <Image src={a.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-lg object-cover ring-2 ring-green-500 shrink-0" unoptimized />
+                  <Image src={a.iconUrl} alt="" width={40} height={40} className="w-10 h-10 rounded-box object-cover ring-2 ring-success shrink-0" unoptimized />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+                  <div className="w-10 h-10 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
                 )}
                 <span className="flex flex-col min-w-0">
                   <span className="text-sm font-semibold truncate">{a.name}</span>
                   <span className="text-xs">
-                    <span className="text-green-500">{a.gamerscore} G</span>
-                    <span className="text-text-secondary"> · {T.xbox.rarity.replace('{n}', a.rarity.toFixed(1))}</span>
+                    <span className="text-success">{a.gamerscore} G</span>
+                    <span className="text-text-secondary"> · {T.xbox.rarity.replace('{n}', decimal(a.rarity, lang))}</span>
                   </span>
                 </span>
               </Link>

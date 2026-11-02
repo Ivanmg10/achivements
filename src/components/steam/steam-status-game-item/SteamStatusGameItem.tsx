@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { IconClock } from '@tabler/icons-react'
 import SteamLogo from '@/components/steam-logo/SteamLogo'
 import { useLanguage } from '@/context/LanguageContext'
+import { validCompletionDate } from '@/utils/completionDates'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamLibraryDetail from '@/components/steam/steam-library-detail/SteamLibraryDetail'
@@ -14,7 +15,7 @@ import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import { useExclusiveOpen } from '@/hooks/useExclusiveOpen'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 import type { SteamGameProgress } from '@/types/steam'
 import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
 
@@ -60,7 +61,7 @@ export default function SteamStatusGameItem({
     <>
       <div
         onPointerMove={onPointerMove}
-        className={`spotlight bg-bg-card rounded-2xl overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
+        className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
         {/* The same blurred art and pointer glow as the RA card beside it. */}
         <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} surface="card" />
@@ -69,7 +70,7 @@ export default function SteamStatusGameItem({
           {/* Same destination as the title link, so it is kept out of the tab order. */}
           <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
             <div
-              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-xl overflow-hidden transition-all duration-150 ${
+              className={`w-16 h-16 sm:w-24 sm:h-24 rounded-tile overflow-hidden transition-all duration-150 ${
                 isComplete ? 'ring-2 ring-[#a4d007]/70 hover:ring-[#a4d007]' : 'hover:ring-2 hover:ring-ink/40'
               }`}
             >
@@ -85,7 +86,7 @@ export default function SteamStatusGameItem({
               <p title={game.title} className="text-lg sm:text-xl font-semibold leading-tight sm:truncate">{game.title}</p>
             </Link>
             <span className="flex items-center gap-1.5 flex-wrap">
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium bg-[#1b2838] text-[#66c0f4]">
+              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-tag-sm font-medium bg-[#1b2838] text-[#66c0f4]">
                 <SteamLogo size={12} aria-hidden="true" />
                 Steam
               </span>
@@ -95,7 +96,7 @@ export default function SteamStatusGameItem({
                 </span>
               )}
             </span>
-            <span className={`text-sm mt-0.5 ${isComplete ? 'text-green-400' : 'text-text-secondary'}`}>{progressText}</span>
+            <span className={`text-sm mt-0.5 ${isComplete ? 'text-success' : 'text-text-secondary'}`}>{progressText}</span>
             {hasCounts && (
               <span className="flex items-center gap-2 mt-1">
                 <ProgressBar pct={game.pctWon} label={game.title} trackClass="bg-bg-main" className="flex-1" />
@@ -106,9 +107,15 @@ export default function SteamStatusGameItem({
               <IconClock size={12} aria-hidden="true" />
               {T.steam.playtime} · {playtime}
             </span>
-            <span className="text-xs text-text-secondary mt-1">
-              {T.steam.lastPlayed} · {game.lastPlayed ? new Date(game.lastPlayed).toLocaleDateString(lang) : T.steam.neverPlayed}
-            </span>
+            {category === 'completed' && validCompletionDate(game.lastUnlock) ? (
+              <span className="text-xs text-text-secondary mt-1">
+                {T.libraryDetail.finished} · {new Date(game.lastUnlock!).toLocaleDateString(lang)}
+              </span>
+            ) : (
+              <span className="text-xs text-text-secondary mt-1">
+                {T.steam.lastPlayed} · {game.lastPlayed ? new Date(game.lastPlayed).toLocaleDateString(lang) : T.steam.neverPlayed}
+              </span>
+            )}
           </div>
 
           <span className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 shrink-0 self-start sm:self-center -mr-2 sm:mr-0">
@@ -121,7 +128,7 @@ export default function SteamStatusGameItem({
               aria-expanded={open}
               aria-controls={panelId}
               aria-label={`${open ? T.steam.hideAchievements : T.steam.showAchievements}: ${game.title}`}
-              className="p-1.5 rounded-lg text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+              className="p-1.5 rounded-chip text-text-secondary hover:text-text-main cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
             >
               <span aria-hidden="true" className="block text-xs transition-transform duration-300" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                 ▼

@@ -5,7 +5,7 @@ import type { XboxGameProgress } from '@/types/xbox'
 import type { UserSearchResult } from '@/hooks/useUserSearch'
 import type { LibraryGame } from '@/utils/library'
 import { achievementBadgeUrl, achievementGameIconUrl } from '@/utils/utils'
-import { steamAssetUrl } from '@/lib/steamClient'
+import { steamAssetUrl } from '@/lib/steamAssets'
 
 type SavedGame = { id: number; title: string; imageIcon: string } | null
 
@@ -27,8 +27,18 @@ export type FriendOverview = UserSearchResult & {
   publicGroups: number
   /** Their achievement showcase, in their order (up to five, earned). */
   showcase: FriendPin[]
+  /** Source-qualified keys used only to project their visible library. */
+  hiddenGames?: string[]
   /** Their Vault Points, for the level on their card; null before they are scored. */
   vaultPoints?: number | null
+}
+
+/** What the people you follow are playing on Steam right now, by username (/api/follows/playing). */
+export type PlayingNow = Record<string, { appId: number; name: string }>
+
+/** Friends with the Steam game each is in right now, when there is one. */
+export function withPlaying(friends: FriendOverview[], playing: PlayingNow): FriendOverview[] {
+  return friends.map((f) => (playing[f.username] ? { ...f, playing: playing[f.username].name } : f))
 }
 
 /**

@@ -70,6 +70,14 @@ test('Xbox alone counts only for who may see Xbox', () => {
 })
 
 describe('with no platform linked', () => {
+  test('the account stays on the right, with no search bar to push it there', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan' } } })
+    render(<MainHeader />)
+    const right = screen.getByRole('link', { name: en.sidePanel.userSettings }).parentElement
+    expect(right?.className).toContain('ml-auto')
+    expect(right?.className).not.toContain('lg:ml-0')
+  })
+
   beforeEach(() => {
     ;(useSession as jest.Mock).mockReturnValue({ data: { user: { name: 'Ivan', avatar: null } } })
   })

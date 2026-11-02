@@ -12,6 +12,8 @@ import AchievementModal from '@/components/achievement-modal/AchievementModal'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
 import { capList } from '@/utils/utils'
 import { tooltipStyle } from '@/utils/tooltipStyle'
+import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 type TooltipData = { achievement: RetroAchievement; x: number; y: number }
 
@@ -104,7 +106,7 @@ export const AchievementGrid = memo(function AchievementGrid({
     return (
       <div className="flex flex-wrap gap-1">
         {Array.from({ length: Math.min(total, 30) }).map((_, i) => (
-          <div key={i} className={`${size.badge} rounded-lg bg-ink/10 animate-pulse`} />
+          <Skeleton key={i} radius="tile" className={size.badge} />
         ))}
       </div>
     )
@@ -121,7 +123,7 @@ export const AchievementGrid = memo(function AchievementGrid({
       {!allLoaded && (
         <div className="flex flex-wrap gap-1">
           {shown.map((_, i) => (
-            <div key={i} className={`${size.badge} rounded-lg bg-bg-main animate-pulse`} />
+            <Skeleton key={i} radius="tile" className={size.badge} />
           ))}
         </div>
       )}
@@ -148,8 +150,8 @@ export const AchievementGrid = memo(function AchievementGrid({
                 handleLeave()
                 setSelected(a)
               }}
-              className={`block rounded-lg overflow-hidden shrink-0 cursor-pointer transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
-                isHardcore ? 'ring-2 ring-yellow-400' : isSoftcore ? 'ring-2 ring-blue-400' : missable ? 'ring-2 ring-danger' : ''
+              className={`block rounded-box overflow-hidden shrink-0 cursor-pointer transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                isHardcore ? 'ring-2 ring-hardcore' : isSoftcore ? 'ring-2 ring-softcore' : missable ? 'ring-2 ring-danger' : ''
               }`}
             >
               {a.BadgeName ? (
@@ -162,10 +164,10 @@ export const AchievementGrid = memo(function AchievementGrid({
                   unoptimized
                 />
               ) : (
-                <div className={`${size.badge} rounded-lg bg-ink/10 ${earnedAny ? '' : 'opacity-40'}`} />
+                <div className={`${size.badge} rounded-box bg-ink/10 ${earnedAny ? '' : 'opacity-40'}`} />
               )}
               {missable && (
-                <span aria-hidden="true" className="absolute bottom-0 right-0 flex items-center justify-center w-4 h-4 rounded-tl-md bg-danger text-white">
+                <span aria-hidden="true" className="absolute bottom-0 right-0 flex items-center justify-center w-4 h-4 rounded-tl-box-md bg-danger text-white">
                   <IconAlertTriangle size={11} stroke={2.5} />
                 </span>
               )}
@@ -181,7 +183,8 @@ export const AchievementGrid = memo(function AchievementGrid({
       {tooltip &&
         createPortal(
           <div
-            className="fixed z-50 pointer-events-none bg-bg-card border border-bg-header/80 rounded-xl shadow-2xl p-3 max-w-65"
+            role="tooltip"
+            className={`fixed z-50 pointer-events-none ${TOOLTIP_SURFACE} p-3 max-w-65`}
             style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
           >
             <p className="text-sm font-semibold text-text-main">{tooltip.achievement.Title}</p>

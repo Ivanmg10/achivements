@@ -60,13 +60,13 @@ test('a long set shows the first few until asked for the rest', () => {
 
 test('signed in, a star pins an achievement; no star when it cannot be pinned', () => {
   const { unmount } = render(<XboxAchievementGrid gameId={100} gameTitle="Halo" achievements={ACHIEVEMENTS} />)
-  expect(screen.queryByRole('switch', { name: new RegExp(en.favorites.addFavorite) })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: new RegExp(en.favorites.addFavorite) })).not.toBeInTheDocument()
   unmount()
   ;(useXboxFavoriteAchievements as jest.Mock).mockReturnValue({ pinned: new Set(['0']), toggle, canPin: true })
   render(<XboxAchievementGrid gameId={100} gameTitle="Halo" achievements={ACHIEVEMENTS} />)
   expect(useXboxFavoriteAchievements).toHaveBeenCalledWith(100, 'Halo')
-  expect(screen.getByRole('switch', { name: `${en.favorites.removeFavorite}: All of them` })).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('switch', { name: `${en.favorites.addFavorite}: ${en.xbox.secretAchievement}` }))
+  expect(screen.getByRole('button', { name: `${en.favorites.removeFavorite}: All of them` })).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: `${en.favorites.addFavorite}: ${en.xbox.secretAchievement}` }))
   expect(toggle).toHaveBeenCalledWith(ACHIEVEMENTS[1])
 })
 

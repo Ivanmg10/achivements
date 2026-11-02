@@ -17,6 +17,7 @@ import MainPageProfileSt from './main-page-profile-st/MainPageProfileSt'
 import MainPageProfilePsn from './main-page-profile-psn/MainPageProfilePsn'
 import MainPageProfileXbox from './main-page-profile-xbox/MainPageProfileXbox'
 import MainPageProfileTabs, { ProfileTab, profilePanelId, profileTabId } from './main-page-profile-tabs/MainPageProfileTabs'
+import styles from './MainPageProfile.module.css'
 
 const ID_PREFIX = 'main-profile'
 
@@ -69,26 +70,29 @@ export default function MainPageProfile() {
   // One account: the column as it always was — no switch with a single option.
   if (linked.length <= 1) {
     return (
-      <section className="main-content text-text-main m-3 rounded-xl flex flex-col items-center overflow-y-auto">
-        {profiles[tab]}
+      <section className="main-content text-text-main m-3 rounded-tile flex flex-col items-center overflow-y-auto">
+        <div data-home-profile className={`w-full flex-1 min-h-0 flex flex-col items-center ${styles.enter}`}>{profiles[tab]}</div>
       </section>
     )
   }
 
   // Several: one profile at a time, switched by low-key tabs at the top.
   return (
-    <section className="main-content text-text-main m-3 rounded-xl flex flex-col items-center gap-3 overflow-y-auto">
+    <section className="main-content text-text-main m-3 rounded-tile flex flex-col items-center gap-3 overflow-y-auto">
       <MainPageProfileTabs<MainPlatform>
         idPrefix={ID_PREFIX}
         selected={tab}
         onSelect={setTab}
         tabs={linked.map((p) => TABS[p])}
       />
+      {/* Keyed by tab, so each platform makes its entrance. */}
       <div
+        key={tab}
         role="tabpanel"
         id={profilePanelId(ID_PREFIX, tab)}
         aria-labelledby={profileTabId(ID_PREFIX, tab)}
-        className="w-full flex-1 min-h-0 flex flex-col"
+        data-home-profile
+        className={`w-full flex-1 min-h-0 flex flex-col ${styles.enter}`}
       >
         {profiles[tab]}
       </div>

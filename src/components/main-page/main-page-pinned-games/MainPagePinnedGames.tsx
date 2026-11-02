@@ -19,6 +19,7 @@ import {
 import { useLanguage } from '@/context/LanguageContext'
 import { usePinnedGames } from '@/context/PinnedGamesContext'
 import { MainViewToggle } from '@/components/main-view-toggle/MainViewToggle'
+import ViewEntrance from '@/components/view-entrance/ViewEntrance'
 import PinnedGameRow from './pinned-game-row/PinnedGameRow'
 import PinGameCard from './pin-game-card/PinGameCard'
 import SteamPinnedGameRow from './steam-pinned-game-row/SteamPinnedGameRow'
@@ -75,17 +76,16 @@ export default function MainPagePinnedGames() {
   }
 
   return (
-    <section className="main-content bg-bg-card text-text-main m-3 rounded-xl p-4 flex flex-col flex-1 min-h-0 gap-2 overflow-hidden">
+    <section className="main-content bg-bg-card text-text-main m-3 rounded-tile p-4 flex flex-col flex-1 min-h-0 gap-2 overflow-hidden">
       <div className="flex items-center gap-2 shrink-0">
-        <p className="text-2xl font-bold flex-1">{T.pinnedGames.title}</p>
         <MainViewToggle />
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <GameRowSkeleton className="animate-pulse" />
-            <GameRowSkeleton className="animate-pulse" />
+            <GameRowSkeleton />
+            <GameRowSkeleton />
           </div>
         ) : expandedKey !== null && displayPins.some((p) => gameKey(p.source, p.id) === expandedKey) ? (
           renderRow(displayPins.find((p) => gameKey(p.source, p.id) === expandedKey)!, true)
@@ -93,8 +93,14 @@ export default function MainPagePinnedGames() {
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={keys} strategy={rectSortingStrategy}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {displayPins.map((pin) => renderRow(pin, false))}
-                <PinGameCard />
+                {displayPins.map((pin, i) => (
+                  <ViewEntrance key={gameKey(pin.source, pin.id)} kind="tile" index={i}>
+                    {renderRow(pin, false)}
+                  </ViewEntrance>
+                ))}
+                <ViewEntrance kind="tile" index={displayPins.length} className="flex">
+                  <PinGameCard />
+                </ViewEntrance>
               </div>
             </SortableContext>
           </DndContext>

@@ -12,6 +12,8 @@ export type DataOwner = {
   psnaccountid?: string
   xboxxuid?: string
   xboxgamertag?: string
+  /** `raid` is the page owner's, for a viewer with no key of their own: spend it sparingly. */
+  borrowedKey?: boolean
   /** Only on the signed-in user's own: whether they are an admin (what Xbox is limited to for now). */
   admin?: boolean
 }
@@ -43,10 +45,14 @@ export async function dataOwner(req?: Request): Promise<DataOwner | null> {
   if (!target) return null
   // A private profile is for its owner only: nobody else reads its data by name.
   if (!target.profilePublic && String(target.id) !== String(me.id)) return null
+  // Limited per viewer: past it they get the page without RA, and the owner's key is left alone.
+  const borrowedKey = !me.raid && String(target.id) !== String(me.id) && Boolean(target.raid)
+  const mayBorrow = !borrowedKey || (await (await import('@/lib/attemptLimit')).allowAttempt('ra-borrowed', `user:${me.id}`))
   return {
     id: String(target.id),
     rausername: target.rausername ?? undefined,
-    raid: me.raid ?? target.raid ?? undefined,
+    raid: (mayBorrow ? (me.raid ?? target.raid) : me.raid) ?? undefined,
+    borrowedKey: borrowedKey || undefined,
     steamid: target.steamid ?? undefined,
     psnaccountid: target.psnaccountid ?? undefined,
     xboxxuid: target.xboxxuid ?? undefined,

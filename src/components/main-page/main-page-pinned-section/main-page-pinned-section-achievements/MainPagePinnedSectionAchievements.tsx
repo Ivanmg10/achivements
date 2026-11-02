@@ -13,10 +13,12 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SectionFallback } from '@/components/ui/SectionFallback'
 import MainPagePinnedSectionAchievementTile from '../main-page-pinned-section-achievement-tile/MainPagePinnedSectionAchievementTile'
 import MainPagePinnedSectionSortable from '../main-page-pinned-section-sortable/MainPagePinnedSectionSortable'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { RememberedHeight } from '@/components/ui/RememberedHeight'
 
 type RaPin = Extract<PinnedAchievement, { source: 'ra' }>
 
-const GRID = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3'
+const GRID = 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 auto-rows-40 gap-3'
 
 /**
  * The pinned achievements, the heart of the Pinned section: how many are
@@ -45,16 +47,19 @@ export default function MainPagePinnedSectionAchievements() {
       </div>
 
       {isLoading ? (
-        <div className={GRID} aria-busy="true">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-28 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
-          ))}
-        </div>
+        <RememberedHeight id="pinned-achievements" loading>
+          <div className={GRID} aria-busy="true">
+            {[0, 1, 2, 3].map((i) => (
+              <Skeleton key={i} radius="tile" className="h-40" />
+            ))}
+          </div>
+        </RememberedHeight>
       ) : error ? (
         <SectionFallback error onRefresh={refetch}>{null}</SectionFallback>
       ) : views.length === 0 ? (
         <EmptyState icon={<IconStar className="w-6 h-6" />} title={T.favorites.emptyTitle} subtitle={T.favorites.empty} size="compact" />
       ) : (
+        <RememberedHeight id="pinned-achievements" loading={false}>
         <MainPagePinnedSectionSortable
           items={views}
           idOf={({ view }) => view.key}
@@ -70,6 +75,7 @@ export default function MainPagePinnedSectionAchievements() {
             />
           )}
         />
+        </RememberedHeight>
       )}
 
       <AnimatePresence>

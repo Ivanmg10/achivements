@@ -1,4 +1,4 @@
-import { upgradeLegacyIconUrl } from '@/lib/steamClient'
+import { upgradeLegacyIconUrl } from '@/lib/steamAssets'
 import { gameKey } from '@/utils/gameRef'
 import { classifySteamGame } from '@/utils/steamFeed'
 import { classifyPsnGame } from '@/utils/psnTitles'
@@ -170,6 +170,19 @@ export function searchCandidates(
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
     .map(({ c }) => c)
+}
+
+const SUGGEST_ORDER: Record<string, number> = { 'in-progress': 0, 'want-to-play': 1 }
+
+/**
+ * What to offer before anything is typed: games being played (closest to done
+ * first), then the ones wanted, then the rest. Already-chosen games are left out.
+ */
+export function suggestCandidates(candidates: GameCandidate[], exclude: Set<string> = new Set(), limit = 30): GameCandidate[] {
+  return candidates
+    .filter((c) => !exclude.has(c.key))
+    .sort((a, b) => (SUGGEST_ORDER[a.status ?? ''] ?? 2) - (SUGGEST_ORDER[b.status ?? ''] ?? 2) || b.pctWon - a.pctWon)
+    .slice(0, limit)
 }
 
 /** The body that adds a candidate to a group (POST /api/groups/[id]/games). */

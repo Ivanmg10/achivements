@@ -22,11 +22,20 @@ test("someone else's page gets only the public ones", async () => {
   expect(query.mock.calls[0][0]).toContain('AND g.is_public')
 })
 
+test('excludes hidden items from counts, covers and next-up using the group owner keys', async () => {
+  await listGroups(5, { publicOnly: true })
+  const [sql, params] = query.mock.calls[0]
+  expect(sql).toContain('hidden_games')
+  expect(sql).toContain('h.user_id = g.user_id')
+  expect(params).toEqual([5, true])
+})
+
 test('counts Xbox games, and leaves them out for who may not see Xbox', async () => {
   await listGroups(5, { publicOnly: true, xbox: false })
   const [sql, params] = query.mock.calls[0]
   expect(sql).toContain('xbox_count')
   expect(sql).toContain("i.source <> 'xbox'")
   expect(sql).toContain("source <> 'xbox'")
+  expect(sql).toContain("n.source <> 'xbox'")
   expect(params).toEqual([5, false])
 })

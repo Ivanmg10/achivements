@@ -33,6 +33,11 @@ export function ProgressBar({
   const shown = Math.max(value, soft)
   const done = shown >= 100
 
+  // The design's slant: the track's ends are cut on a diagonal, and so is the fill's leading edge.
+  // The ends are the design's: slanted, or straight and rounded (see ui/shape.ts).
+  const BEVEL = 'var(--clip-3)'
+  const FILL_EDGE = 'var(--clip-fill)'
+
   return (
     <span
       role="progressbar"
@@ -41,31 +46,30 @@ export function ProgressBar({
       aria-valuemax={100}
       aria-valuenow={Math.round(shown)}
       data-complete={done || undefined}
-      className={`relative block w-full ${height} ${trackClass} rounded-full overflow-hidden ${className}`}
-      style={done ? { boxShadow: '0 0 12px rgb(var(--progress) / 0.45)' } : undefined}
+      className={`relative block w-full ${height} ${className}`}
+      // Only a finished bar glows.
+      style={done ? { filter: 'drop-shadow(0 0 6px rgb(var(--progress) / 0.6))' } : undefined}
     >
-      {soft > value && (
-        <span
-          data-fill="soft"
-          className="absolute inset-y-0 left-0 rounded-full bg-progress-soft transition-[width] duration-500"
-          style={{ width: `${soft}%` }}
-        />
-      )}
-      {value > 0 && (
-        <span
-          data-fill="main"
-          className="absolute inset-y-0 left-0 rounded-full bg-progress transition-[width] duration-500"
-          style={
-            value >= 100
-              ? {
-                  width: '100%',
-                  background: 'linear-gradient(90deg, rgb(var(--progress)), color-mix(in oklab, rgb(var(--progress)) 55%, white))',
-                  boxShadow: '0 0 10px rgb(var(--progress) / 0.8)',
-                }
-              : { width: `${value}%`, boxShadow: '0 0 6px rgb(var(--progress) / 0.5)' }
-          }
-        />
-      )}
+      <span data-track className={`absolute inset-0 overflow-hidden ${trackClass}`} style={{ clipPath: BEVEL, borderRadius: 'var(--bar-radius)' }}>
+        {soft > value && (
+          <span
+            data-fill="soft"
+            className="absolute inset-y-0 left-0 bg-progress-soft transition-[width] duration-500"
+            style={{ width: `${soft}%`, clipPath: FILL_EDGE, borderRadius: 'var(--bar-radius)' }}
+          />
+        )}
+        {value > 0 && (
+          <span
+            data-fill="main"
+            className="absolute inset-y-0 left-0 bg-progress transition-[width] duration-500"
+            style={
+              value >= 100
+                ? { width: '100%', background: 'linear-gradient(90deg, rgb(var(--progress)), color-mix(in oklab, rgb(var(--progress)) 55%, white))' }
+                : { width: `${value}%`, clipPath: FILL_EDGE, borderRadius: 'var(--bar-radius)' }
+            }
+          />
+        )}
+      </span>
     </span>
   )
 }

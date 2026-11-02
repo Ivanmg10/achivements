@@ -26,8 +26,8 @@ test("calls onClose when backdrop clicked", () => {
       <p>Content</p>
     </CommonModal>,
   );
-  // Rendered on <body>: the backdrop is the content's grandparent.
-  fireEvent.click(screen.getByText("Content").parentElement!.parentElement!);
+  // Rendered on <body>: the backdrop holds the dialog.
+  fireEvent.click(screen.getByRole("dialog").parentElement!);
   expect(onClose).toHaveBeenCalled();
 });
 
@@ -50,4 +50,17 @@ test("does not call onClose when inner div clicked", () => {
   );
   fireEvent.click(screen.getByText("Content").parentElement!);
   expect(onClose).not.toHaveBeenCalled();
+});
+
+test("is a modal dialog named by its first heading, closed by Escape", () => {
+  const onClose = jest.fn();
+  render(
+    <CommonModal isOpen={true} onClose={onClose}>
+      <h2>Settings</h2>
+      <button>Save</button>
+    </CommonModal>,
+  );
+  expect(screen.getByRole("dialog", { name: "Settings" })).toHaveAttribute("aria-modal", "true");
+  fireEvent.keyDown(document, { key: "Escape" });
+  expect(onClose).toHaveBeenCalled();
 });

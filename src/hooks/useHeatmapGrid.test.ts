@@ -30,6 +30,25 @@ test('a wider card shows more days rather than bigger ones', () => {
   expect(wide.days).toBeGreaterThan(narrow.days)
 })
 
+test('a short, wide card shows a year and fills the rest with wider cells', () => {
+  const { weeks, cell, cellWidth } = measureHeatmapGrid(1523, 172, WEDNESDAY)
+  expect(weeks).toBe(53)
+  expect(cell).toBe(22)
+  expect(cellWidth).toBe(25)
+  expect(weeks * cellWidth + (weeks - 1) * 3).toBeLessThanOrEqual(1523)
+  expect(weeks * (cellWidth + 1) + (weeks - 1) * 3).toBeGreaterThan(1523)
+})
+
+test('a cell never stretches past half as wide again', () => {
+  const { cell, cellWidth } = measureHeatmapGrid(5000, 100, WEDNESDAY)
+  expect(cellWidth).toBe(Math.floor(cell * 1.5))
+})
+
+test('a card that fits its days keeps them square', () => {
+  const { cell, cellWidth } = measureHeatmapGrid(1491, 265, WEDNESDAY)
+  expect(cellWidth).toBe(cell)
+})
+
 test('a taller card shows fewer, bigger days — a week is always seven rows', () => {
   const short = measureHeatmapGrid(600, 120, WEDNESDAY)
   const tall = measureHeatmapGrid(600, 260, WEDNESDAY)

@@ -84,6 +84,25 @@ describe('useFriendsData', () => {
     expect(result.current.friends).toHaveLength(DETAIL_LIMIT + 3)
   })
 
+  test('reads one detailed friend at a time to bound simultaneous Xbox scans', async () => {
+    const pending = new Map<string, () => void>()
+    global.fetch = jest.fn((url: string) => {
+      if (url === '/api/follows/overview') return Promise.resolve({ ok: true, json: async () => [friend('f1'), friend('f2')] })
+      return new Promise((resolve) => {
+        pending.set(url, () => resolve({ ok: true, json: async () => [] }))
+      })
+    }) as unknown as typeof fetch
+    const { result } = renderHook(() => useFriendsData(true))
+
+    await waitFor(() => expect((global.fetch as jest.Mock).mock.calls.map((call) => call[0])).toContain('/api/getRecentAchievements?user=f1'))
+    expect((global.fetch as jest.Mock).mock.calls.map((call) => call[0])).not.toContain('/api/getRecentAchievements?user=f2')
+
+    for (const resolve of pending.values()) resolve()
+    await waitFor(() => expect((global.fetch as jest.Mock).mock.calls.map((call) => call[0])).toContain('/api/getRecentAchievements?user=f2'))
+    for (const resolve of pending.values()) resolve()
+    await waitFor(() => expect(result.current.details.f2).toBeDefined())
+  })
+
   test('a failed overview is an error; retry asks again', async () => {
     respond({})
     const { result } = renderHook(() => useFriendsData(true))
@@ -92,5 +111,21 @@ describe('useFriendsData', () => {
     act(() => result.current.retry())
     await waitFor(() => expect(result.current.friends).toEqual([]))
     expect(result.current.error).toBe(false)
+  })
+  test('a friend in a Steam game right now carries its name; a failure shows none', async () => {
+    respond({
+      '/api/follows/overview': [friend('x', { ra: false, steam: true }), friend('y', { ra: false, steam: true })],
+      '/api/follows/playing': { x: { appId: 620, name: 'Portal 2' } },
+    })
+    const { result } = renderHook(() => useFriendsData(true))
+    await waitFor(() => expect(result.current.friends?.[0].playing).toBe('Portal 2'))
+    expect(result.current.friends?.[1].playing).toBeUndefined()
+  })
+
+  test('nobody on Steam, nobody asked about', async () => {
+    respond({ '/api/follows/overview': [friend('x', { ra: false })] })
+    const { result } = renderHook(() => useFriendsData(true))
+    await waitFor(() => expect(result.current.friends).toHaveLength(1))
+    expect((global.fetch as jest.Mock).mock.calls.map((c) => c[0])).not.toContain('/api/follows/playing')
   })
 })

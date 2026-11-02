@@ -1,6 +1,7 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/raCache', () => ({ withCache: jest.fn(), clearCache: jest.fn() }))
 jest.mock('@/lib/raClient', () => ({ getAchievementsEarnedBetween: jest.fn() }))
+jest.mock('@/lib/gameVisibility', () => ({ visibleGamesForUser: jest.fn(async (_id, games) => games) }))
 
 import { GET, heatmapBuckets } from './route'
 import { getServerSession } from 'next-auth'

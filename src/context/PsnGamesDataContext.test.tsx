@@ -1,6 +1,9 @@
 import { renderHook, waitFor, act } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
 import { PsnGamesDataProvider, usePsnGamesData } from './PsnGamesDataContext'
+import { useHiddenGames } from '@/context/HiddenGamesContext'
+
+jest.mock('@/context/HiddenGamesContext', () => ({ useHiddenGames: jest.fn() }))
 
 function setSession(user: Record<string, unknown>) {
   ;(useSession as jest.Mock).mockReturnValue({ data: { user }, status: 'authenticated', update: jest.fn() })
@@ -11,6 +14,7 @@ const GAMES = [{ id: 100, title: 'Astro Bot' }]
 
 beforeEach(() => {
   jest.clearAllMocks()
+  ;(useHiddenGames as jest.Mock).mockReturnValue({ isHidden: () => false })
   global.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200, json: async () => GAMES })
   jest.spyOn(console, 'error').mockImplementation(() => {})
 })
@@ -65,6 +69,25 @@ test('with "platinum completes" on, only games with a platinum are flagged', asy
   window.localStorage.clear()
 })
 
+test('hidden games leave listings but stay available to direct game URLs', async () => {
+  setSession({ id: '7', psnaccountid: '42' })
+  ;(useHiddenGames as jest.Mock).mockReturnValue({ isHidden: (id: number, source: string) => source === 'psn' && id === 100 })
+  const { result } = renderHook(() => usePsnGamesData(), { wrapper })
+
+  await waitFor(() => expect(result.current.fullLibrary).toEqual(GAMES))
+  expect(result.current.library).toEqual([])
+})
+
+test('the visible listing waits for visibility keys while direct id data stays available', async () => {
+  setSession({ id: '7', psnaccountid: '42' })
+  ;(useHiddenGames as jest.Mock).mockReturnValue({ isHidden: () => false, isLoading: true })
+  const { result } = renderHook(() => usePsnGamesData(), { wrapper })
+
+  await waitFor(() => expect(result.current.fullLibrary).toEqual(GAMES))
+  expect(result.current.library).toEqual([])
+  expect(result.current.libraryLoading).toBe(true)
+})
+
 describe('the consoles unticked in preferences', () => {
   const MIXED = [
     { id: 1, title: 'Old', consoleName: 'PS3', earned: { platinum: 0 } },
@@ -82,6 +105,6 @@ describe('the consoles unticked in preferences', () => {
     const { result } = renderHook(() => usePsnGamesData(), { wrapper })
     await waitFor(() => expect(result.current.fullLibrary).toHaveLength(2))
     expect(result.current.library.map((g) => g.id)).toEqual([2])
-    expect(result.current.consoles.map((c) => c.name).sort()).toEqual(['PS3', 'PS4', 'PS5'])
+    expect(result.current.consoles.map((c) => c.name).sort()).toEqual(['PS Vita', 'PS3', 'PS4', 'PS5'])
   })
 })

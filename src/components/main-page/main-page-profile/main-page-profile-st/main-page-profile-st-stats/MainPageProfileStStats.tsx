@@ -25,19 +25,19 @@ export default function MainPageProfileStStats({
   const perfect = library.filter((g) => classifySteamGame(g) === 'completed').length
   const unlocked = library.reduce((sum, g) => sum + (g.achievementsLoaded ? g.numAwarded : 0), 0)
 
-  const value = (v: string) => (isLoading ? '—' : v)
-
   return (
     <div className="grid grid-cols-2 gap-2">
-      <StatCard label={T.steam.statGames} value={value(library.length.toLocaleString(lang))} />
+      <StatCard label={T.steam.statGames} value={library.length.toLocaleString(lang)} loading={isLoading} />
       <StatCard
         label={T.steam.totalPlaytime}
-        value={value(formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang))}
+        value={formatPlaytime(minutes, { minutes: T.steam.minutesShort, hours: T.steam.hoursShort }, lang)}
+        loading={isLoading}
       />
-      <StatCard label={T.steam.statPerfect} value={value(`${perfect.toLocaleString(lang)}${partial}`)} accent="text-success" />
+      <StatCard label={T.steam.statPerfect} value={`${perfect.toLocaleString(lang)}${partial}`} accent="text-success" loading={isLoading} />
       <StatCard
         label={T.steam.statAchievements}
-        value={value(`${unlocked.toLocaleString(lang)}${partial}`)}
+        value={`${unlocked.toLocaleString(lang)}${partial}`}
+        loading={isLoading}
       />
     </div>
   )

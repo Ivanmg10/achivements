@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode, useId } from 'react'
+import { fieldClass } from '@/components/ui/Input'
 
 /**
  * One field of the sign-in and register forms: icon, label, input, and the
@@ -49,9 +50,7 @@ export default function AuthFormField({
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={error ? true : undefined}
           aria-describedby={note ? noteId : undefined}
-          className={`bg-bg-tertiary text-text-main rounded-xl pl-10 pr-3 py-3 w-full outline-none placeholder:text-text-secondary focus-visible:ring-2 transition-shadow ${
-            error ? 'ring-1 ring-danger focus-visible:ring-danger' : 'focus-visible:ring-accent'
-          }`}
+          className={fieldClass({ invalid: !!error, icon: true })}
         />
       </div>
       {note && (

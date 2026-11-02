@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import { formatRarity } from '@/utils/steamFeed'
 import type { SteamAchievementUnified } from '@/types/steam'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 const SHOWN = 4
 const SKELETON_ROWS = 4
@@ -24,7 +25,7 @@ export default function SteamRarestAchievements({
   achievements: SteamAchievementUnified[]
   isLoading: boolean
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
 
   const rarest = achievements
     .filter((a) => a.earned && a.globalPct !== null)
@@ -38,7 +39,7 @@ export default function SteamRarestAchievements({
       {isLoading ? (
         <ul aria-busy="true" className="flex flex-col gap-2">
           {Array.from({ length: SKELETON_ROWS }).map((_, i) => (
-            <li key={i} className="h-12 bg-ink/5 rounded-lg animate-pulse" />
+            <li key={i}><SkeletonRow className="h-12 px-1" /></li>
           ))}
         </ul>
       ) : rarest.length === 0 ? (
@@ -51,7 +52,7 @@ export default function SteamRarestAchievements({
             <li key={a.apiname}>
               <Link
                 href={`/steamGame/${appId}#${achievementAnchor(a.apiname)}`}
-                className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
+                className="flex items-center gap-3 rounded-box p-1.5 hover:bg-ink/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#66c0f4]"
               >
                 {a.badgeUrl ? (
                   <Image
@@ -59,16 +60,16 @@ export default function SteamRarestAchievements({
                     alt=""
                     width={40}
                     height={40}
-                    className="w-10 h-10 rounded-lg ring-2 ring-[#66c0f4] shrink-0"
+                    className="w-10 h-10 rounded-box ring-2 ring-[#66c0f4] shrink-0"
                     unoptimized
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-ink/10 shrink-0" aria-hidden="true" />
+                  <div className="w-10 h-10 rounded-box bg-ink/10 shrink-0" aria-hidden="true" />
                 )}
                 <span className="flex flex-col min-w-0">
                   <span className="text-sm font-semibold truncate">{a.title}</span>
                   <span className="text-xs text-[#a4d007]">
-                    {formatRarity(a.globalPct!)}
+                    {formatRarity(a.globalPct!, lang)}
                     {T.achievement.haveIt}
                   </span>
                 </span>

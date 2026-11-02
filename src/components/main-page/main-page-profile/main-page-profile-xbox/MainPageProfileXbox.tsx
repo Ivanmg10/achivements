@@ -17,7 +17,7 @@ export default function MainPageProfileXbox() {
 
   if (!isLinked) {
     return (
-      <div className="flex flex-col gap-3 m-2 bg-bg-main rounded-xl w-[95%] p-2">
+      <div className="flex flex-col gap-3 m-2 bg-bg-main rounded-tile w-[95%] p-2">
         <h2 className="text-xl p-1">Xbox</h2>
         <Link
           href="/user"

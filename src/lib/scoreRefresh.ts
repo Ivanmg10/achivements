@@ -6,14 +6,18 @@ import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raC
 import { getOwnedGames } from '@/lib/steamClient'
 import { readCache, withSteamCache, writeCache } from '@/lib/steamCache'
 import { fetchPlayerAchievements, isNoStats, loadGlobalPct } from '@/lib/steamProgress'
+import { steamBudgetLow } from '@/lib/upstreamCount'
+import { readRaKey } from '@/lib/raKey'
 import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
-import { xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
+import { XboxError, xboxGameAchievements, xboxLibrary } from '@/lib/xboxClient'
+import { runWithXboxTelemetry } from '@/lib/xboxTelemetry'
 import type { GameSource, SteamOwnedGamesResponse } from '@/types/steam'
 import type { TrophyCounts } from '@/types/psn'
 import { isConsoleShown } from '@/utils/consoleFilter'
 import { RULES_VERSION, looksUnlockedByTool, provisionalScore, scoreGame, stackFactors, stackKey, type GameScore, type ScoreUnlock } from '@/utils/vaultScore'
 import { hiddenConsolesFrom, psnGradeShare, psnScoreInputs, raScoreInputs, steamScoreInputs, xboxScoreInputs } from '@/utils/vaultScoreInputs'
 import { monthStart, weekStart } from '@/utils/vaultLevel'
+import { latestFullSetCompletedAt, psnBaseCompletedAt, raAwardCompletedAt } from '@/utils/completionDates'
 
 /**
  * Keeps a user's Vault Points up to date (docs/rankings-plan.md). Each
@@ -43,7 +47,7 @@ export const PACE: Record<GameSource, { concurrency: number; gapMs: number; perP
   steam: { concurrency: 8, gapMs: 0, perPass: Infinity },
   ra: { concurrency: 1, gapMs: 300, perPass: Infinity },
   psn: { concurrency: 2, gapMs: 0, perPass: 100 },
-  xbox: { concurrency: 1, gapMs: 0, perPass: 5 },
+  xbox: { concurrency: 1, gapMs: 0, perPass: 2 },
 }
 
 const RA_PAGE = 500
@@ -147,9 +151,11 @@ function raPlan(username: string, apiKey: string): Plan {
             const data = (await getGameInfoAndUserProgress(username, apiKey, g.GameID)) as {
               Achievements?: Parameters<typeof raScoreInputs>[0]
               NumDistinctPlayers?: number
+              HighestAwardKind?: string | null
+              HighestAwardDate?: string | null
             } | null
             const players = data?.NumDistinctPlayers ?? 0
-            return { score: scoreGame(raScoreInputs(data?.Achievements ?? {}, players), players), suspect: false }
+            return { score: scoreGame(raScoreInputs(data?.Achievements ?? {}, players), players, data ? raAwardCompletedAt(data) : null), suspect: false }
           },
         }))
     },
@@ -182,7 +188,7 @@ function steamPlan(userId: number, steamid: string, apiKey: string): Plan {
           read: async () => {
             const [unlocks, pct] = await Promise.all([fetchPlayerAchievements(auth, g.appid), loadGlobalPct(g.appid)])
             const list = isNoStats(unlocks) ? [] : steamScoreInputs(unlocks, pct)
-            return { score: scoreGame(list), suspect: looksUnlockedByTool(list) }
+            return { score: scoreGame(list, undefined, latestFullSetCompletedAt(list)), suspect: looksUnlockedByTool(list) }
           },
         }))
     },
@@ -203,7 +209,10 @@ function psnPlan(userId: number, accountId: string): Plan {
           changeKey: g.lastTrophyAt ?? '',
           provisional: provisionalScore(psnGradeShare(g.earned, g.defined), sum(g.earned), sum(g.defined), sum(g.earned) >= sum(g.defined)),
           // Cached by the date of the last trophy, so a moved game is always read anew.
-          read: async () => ({ score: scoreGame(psnScoreInputs(await psnGameTrophies(accountId, g, String(userId)))), suspect: false }),
+          read: async () => {
+            const trophies = await psnGameTrophies(accountId, g, String(userId))
+            return { score: scoreGame(psnScoreInputs(trophies), undefined, psnBaseCompletedAt(trophies)), suspect: false }
+          },
         })),
   }
 }
@@ -226,14 +235,18 @@ function xboxPlan(userId: number, xuid: string): Plan {
             g.maxPossible,
             g.totalGamerscore > 0 && g.earnedGamerscore >= g.totalGamerscore,
           ),
-          read: async () => ({ score: scoreGame(xboxScoreInputs(await xboxGameAchievements(xuid, g, String(userId)))), suspect: false }),
+          read: async () => {
+            const achievements = xboxScoreInputs(await xboxGameAchievements(xuid, g, String(userId)))
+            return { score: scoreGame(achievements, undefined, latestFullSetCompletedAt(achievements)), suspect: false }
+          },
         })),
   }
 }
 
 function plansFor(user: UserRow): Plan[] {
   const plans: Plan[] = []
-  if (user.rausername && user.raid) plans.push(raPlan(user.rausername, user.raid))
+  const raKey = readRaKey(user.raid)
+  if (user.rausername && raKey) plans.push(raPlan(user.rausername, raKey))
   const steamKey = process.env.STEAM_API_KEY?.trim()
   if (user.steamid && steamKey) plans.push(steamPlan(user.id, user.steamid, steamKey))
   if (user.psnaccountid) plans.push(psnPlan(user.id, user.psnaccountid))
@@ -246,6 +259,7 @@ function plansFor(user: UserRow): Plan[] {
 export function classifyFailure(source: GameSource, err: unknown): FillError {
   if (err instanceof SteamLibraryPrivate) return 'private'
   if (err instanceof PsnError) return err.isPrivate ? 'private' : err.isRateLimited ? 'busy' : 'unavailable'
+  if (source === 'xbox' && err instanceof XboxError && err.kind === 'rate-limited') return 'busy'
   const status = (err as { status?: number } | null)?.status
   if (status === 429) return 'busy'
   if (source === 'ra' && (status === 401 || status === 403)) return 'key'
@@ -334,6 +348,8 @@ async function refreshSource(
       if (pace.gapMs) await sleep(pace.gapMs)
     }
   }
+  // One key serves everyone: near its daily cap, fills wait so that browsing keeps working.
+  if (plan.source === 'steam' && (await steamBudgetLow())) stopped = 'busy'
   await Promise.all(Array.from({ length: Math.min(pace.concurrency, Math.max(1, todo.length)) }, worker))
 
   const writes: Write[] = [...read.values()]
@@ -358,13 +374,17 @@ async function refreshSource(
     )
   }
 
-  // Games that left the library, were hidden, or belong to an account no longer linked.
-  const keep = eligible.filter((c) => writes.some((w) => w.game_id === c.id) || stored.get(c.id)?.account === plan.account).map((c) => c.id)
+  // Hidden rows stay as raw score data so unhide can restore every aggregate without an upstream read.
+  const keptVisible = eligible.filter((c) => writes.some((w) => w.game_id === c.id) || stored.get(c.id)?.account === plan.account).map((c) => c.id)
+  const keptHidden = rows.filter((row) => row.account === plan.account && hiddenGames.has(`${plan.source}:${row.game_id}`)).map((row) => Number(row.game_id))
+  const keep = [...new Set([...keptVisible, ...keptHidden])]
   await pool.query(`DELETE FROM score_games WHERE user_id = $1 AND source = $2 AND NOT (game_id = ANY($3::bigint[]))`, [userId, plan.source, keep])
 
   // The same title listed again on this platform counts less (see stackFactors).
   const kept = await queryRows<{ game_id: string; title: string; points: number }>(
-    `SELECT game_id, title, points FROM score_games WHERE user_id = $1 AND source = $2`,
+    `SELECT g.game_id, g.title, g.points FROM score_games g
+     WHERE g.user_id = $1 AND g.source = $2
+       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)`,
     [userId, plan.source],
   )
   const factors = stackFactors(kept.map((r) => ({ key: stackKey(r.title), points: r.points })))
@@ -388,7 +408,9 @@ async function refreshSource(
 /** Weeks and months, per platform, rebuilt from the stored games. */
 export async function rebuildPeriods(userId: number): Promise<void> {
   const rows = await queryRows<{ source: string; unlocks: ScoreUnlock[]; stack_factor: number }>(
-    `SELECT source, unlocks, stack_factor FROM score_games WHERE user_id = $1 AND flag IS DISTINCT FROM 'suspect'`,
+    `SELECT g.source, g.unlocks, g.stack_factor FROM score_games g
+     WHERE g.user_id = $1 AND g.flag IS DISTINCT FROM 'suspect'
+       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)`,
     [userId],
   )
   const totals = new Map<string, { source: string; kind: 'w' | 'm'; start: string; points: number }>()
@@ -437,10 +459,10 @@ export function fillComplete(platforms: FillStatus['platforms']): boolean {
  * Refreshes one user's score until `deadline`, telling `report` how each
  * platform is getting on. The platforms as they ended, and whether all are settled.
  */
-export async function refreshScore(
+async function refreshScoreNow(
   userId: number,
   deadline: number,
-  report: (source: GameSource, p: FillPlatform) => void = () => {},
+  report: (source: GameSource, p: FillPlatform) => void,
 ): Promise<{ complete: boolean; platforms: FillStatus['platforms'] }> {
   try {
     const rows = await queryRows<UserRow>(
@@ -472,6 +494,14 @@ export async function refreshScore(
     console.error('[scoreRefresh]', userId, err)
     return { complete: false, platforms: {} }
   }
+}
+
+export async function refreshScore(
+  userId: number,
+  deadline: number,
+  report: (source: GameSource, p: FillPlatform) => void = () => {},
+): Promise<{ complete: boolean; platforms: FillStatus['platforms'] }> {
+  return runWithXboxTelemetry('scoreRefresh', () => refreshScoreNow(userId, deadline, report))
 }
 
 const fillKey = (userId: number) => `score:fill:${userId}`

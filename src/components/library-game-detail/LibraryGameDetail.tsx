@@ -6,7 +6,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import { GameAchievementsProgressChart } from '@/components/game-achievements-progress-chart/GameAchievementsProgressChart'
 import {
-  beatenProgress, finishedAt, hardest, milestones, missablesLeft, nextTargets, paceEstimate, rarestEarned, recentEarned,
+  beatenProgress, hardest, milestones, missablesLeft, nextTargets, paceEstimate, rarestEarned, recentEarned,
   type InsightAchievement, type InsightGame,
 } from '@/utils/gameInsights'
 import { unlockSpan } from '@/utils/utils'
@@ -17,11 +17,12 @@ import LibraryDetailCalendar from './library-detail-calendar/LibraryDetailCalend
 import LibraryDetailMilestones from './library-detail-milestones/LibraryDetailMilestones'
 import LibraryDetailInfo, { type InfoRow } from './library-detail-info/LibraryDetailInfo'
 import LibraryDetailSkeleton from '@/components/library-detail-skeleton/LibraryDetailSkeleton'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export type LibraryCategory = 'wantToPlay' | 'playing' | 'completed'
 
 const SKELETON_BADGES = 24
-const PANEL = 'bg-bg-header/40 rounded-xl p-3'
+const PANEL = 'bg-bg-main/55 ring-1 ring-inset ring-ink/[0.06] rounded-pane p-3.5 min-w-0'
 
 /** The panels come in one after another, each rising a little as it fades in. */
 const CONTAINER: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.12 } } }
@@ -51,6 +52,7 @@ export default function LibraryGameDetail({
   ring,
   ringExtra,
   facts = [],
+  completedAt = null,
   game,
   info = [],
   grid,
@@ -66,6 +68,8 @@ export default function LibraryGameDetail({
   ringExtra?: ReactNode
   /** The platform's own figures, shown before the computed ones. */
   facts?: DetailFact[]
+  /** Platform-proven base completion; null when the data cannot distinguish it from DLC. */
+  completedAt?: string | null
   /** Which game this is: what the calendar of its unlocks links back to. */
   game?: InsightGame
   /** What is known of the game itself (who made it, when), shown for one not yet played. */
@@ -98,7 +102,7 @@ export default function LibraryGameDetail({
       if (missed > 0) out.push({ label: L.missable, value: String(missed), className: 'text-warning' })
       const pace = paceEstimate(items)
       if (pace) {
-        out.push({ label: L.pace, value: L.perWeek.replace('{n}', pace.perWeek >= 10 ? String(Math.round(pace.perWeek)) : pace.perWeek.toFixed(1)) })
+        out.push({ label: L.pace, value: L.perWeek.replace('{n}', pace.perWeek.toLocaleString(lang, { maximumFractionDigits: pace.perWeek >= 10 ? 0 : 1 })) })
         if (pace.weeksLeft !== null) {
           out.push({ label: L.atThisPace, value: (pace.weeksLeft === 1 ? L.weekLeft : L.weeksLeft).replace('{n}', String(pace.weeksLeft)) })
         }
@@ -106,8 +110,7 @@ export default function LibraryGameDetail({
     }
 
     if (category === 'completed') {
-      const done = finishedAt(items)
-      if (done) out.push({ label: L.finished, value: new Date(done).toLocaleDateString(lang), className: 'text-success' })
+      if (completedAt) out.push({ label: L.finished, value: new Date(completedAt).toLocaleDateString(lang), className: 'text-success' })
       const span = unlockSpan(items.map((a) => a.earnedAt), {
         underMinute: T.statusGameItem.spanUnderMinute,
         minutes: T.statusGameItem.spanMinutes,
@@ -118,7 +121,7 @@ export default function LibraryGameDetail({
       if (span) out.push({ label: L.timeSpan, value: span })
     }
     return out
-  }, [items, category, T, L, lang])
+  }, [items, category, T, L, lang, completedAt])
 
   const allFacts = loading || state === 'error' ? facts : [...facts, ...computed]
 
@@ -140,7 +143,7 @@ export default function LibraryGameDetail({
     loading || state === 'error' ? null : category === 'playing' ? (
       <>
         {game && (
-          <motion.div variants={PANEL_IN} className={`${PANEL} @3xl:col-span-2`}>
+          <motion.div variants={PANEL_IN} className={PANEL}>
             <LibraryDetailCalendar items={items} game={game} />
           </motion.div>
         )}
@@ -151,7 +154,7 @@ export default function LibraryGameDetail({
     ) : category === 'completed' ? (
       <>
         {game && (
-          <motion.div variants={PANEL_IN} className={`${PANEL} @3xl:col-span-2`}>
+          <motion.div variants={PANEL_IN} className={PANEL}>
             <LibraryDetailCalendar items={items} game={game} />
           </motion.div>
         )}
@@ -161,7 +164,7 @@ export default function LibraryGameDetail({
       </>
     ) : (
       <>
-        <motion.div variants={PANEL_IN} className={`${PANEL} ${info.length > 0 ? '@3xl:col-span-2' : '@3xl:col-span-3'}`}>
+        <motion.div variants={PANEL_IN} className={`${PANEL} ${info.length > 0 ? '' : '@3xl:col-span-2'}`}>
           <LibraryDetailList title={L.hardestTitle} items={hardest(items, 6)} empty={L.noTargets} columns={2} />
         </motion.div>
         {info.length > 0 && (
@@ -178,7 +181,7 @@ export default function LibraryGameDetail({
         variants={CONTAINER}
         initial={reduce ? false : 'hidden'}
         animate="show"
-        className="grid grid-cols-1 @3xl:grid-cols-[190px_1.3fr_1fr] @3xl:grid-rows-[20rem] gap-3 w-full"
+        className="grid grid-cols-1 @3xl:grid-cols-[190px_minmax(0,280px)_minmax(0,1fr)] @3xl:grid-rows-[minmax(11rem,auto)] gap-3 w-full"
       >
         <motion.div variants={PANEL_IN} className={`${PANEL} p-4 @3xl:p-6 flex flex-col items-center justify-center gap-3`}>
           <CircularProgress earned={ring.earned} total={ring.total} label={ring.label} size={130} />
@@ -208,7 +211,7 @@ export default function LibraryGameDetail({
           </motion.div>
         )}
 
-        {more}
+        {more && <div className="@3xl:col-span-3 grid grid-cols-1 @3xl:grid-cols-2 gap-3">{more}</div>}
 
         {state !== 'error' && (
           <motion.div variants={PANEL_IN} className={`${PANEL} @3xl:col-span-3`}>
@@ -216,7 +219,7 @@ export default function LibraryGameDetail({
             {loading ? (
               <ul aria-busy="true" className="flex flex-wrap gap-1">
                 {Array.from({ length: Math.min(ring.total || SKELETON_BADGES, 60) }).map((_, i) => (
-                  <li key={i} className="w-10 h-10 rounded-lg bg-ink/10 animate-pulse" />
+                  <li key={i}><Skeleton radius="tile" className="w-10 h-10" /></li>
                 ))}
               </ul>
             ) : items.length === 0 ? (

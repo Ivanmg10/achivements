@@ -27,16 +27,17 @@ const SIZES: Record<CardSize, { banner: string; icon: number; title: string }> =
  * the two links above it (as the cards of the lists do), so no link is inside
  * a button nor the other way round.
  */
-export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { entry: LibraryEntry; size?: CardSize; onPick: (entry: LibraryEntry) => void }) {
+export default function LibraryShelfCard({ entry, size = 'compact', completed = false, onPick }: { entry: LibraryEntry; size?: CardSize; completed?: boolean; onPick: (entry: LibraryEntry) => void }) {
   const { T, lang } = useLanguage()
   const counts = entryCounts(entry)
-  const ago = lastPlayedAgo(entry.lastPlayed, lang)
+  // On Completed, how long ago it was completed: a DLC played later does not make it recent.
+  const ago = lastPlayedAgo((completed && entry.completedAt) || entry.lastPlayed, lang)
   const total = entryTotal(entry)
   const { banner, icon, title } = SIZES[size]
   const href = entryHref(entry)
 
   return (
-    <div className="group relative flex flex-col w-full h-full rounded-2xl bg-bg-card ring-1 ring-ink/5 hover:ring-ink/15 focus-within:ring-2 focus-within:ring-accent/70 transition-shadow">
+    <div className="group relative flex flex-col w-full h-full rounded-card bg-bg-card ring-1 ring-ink/5 hover:ring-ink/15 focus-within:ring-2 focus-within:ring-accent/70 transition-shadow">
       <div className={`relative rounded-t-2xl ${banner}`}>
         <LibraryShelfBanner entry={entry} />
         <span className="absolute left-3 top-3">
@@ -47,7 +48,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { 
           href={href}
           tabIndex={-1}
           aria-hidden="true"
-          className="absolute left-3 bottom-0 translate-y-1/2 z-10 rounded-xl ring-2 ring-bg-card shadow-lg shadow-black/30 hover:ring-ink/40 transition-shadow"
+          className="absolute left-3 bottom-0 translate-y-1/2 z-10 rounded-tile ring-2 ring-bg-card shadow-lg shadow-black/30 hover:ring-ink/40 transition-shadow"
         >
           <LibraryEntryCover entry={entry} size={icon} />
         </Link>
@@ -74,7 +75,7 @@ export default function LibraryShelfCard({ entry, size = 'compact', onPick }: { 
         type="button"
         onClick={() => onPick(entry)}
         aria-label={`${T.libraryLayout.openInList}: ${entry.title}`}
-        className="absolute inset-0 z-[1] rounded-2xl cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
+        className="absolute inset-0 z-[1] rounded-card cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70"
       />
     </div>
   )

@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useRef, useState } from 'react'
+import { decimal } from '@/utils/utils'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createPortal } from 'react-dom'
@@ -18,6 +19,7 @@ import { usePsnFavoriteTrophies } from '@/hooks/usePsnFavoriteTrophies'
 import type { PsnTrophy, PsnTrophyGroup, TrophyGrade } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
 import { tooltipStyle } from '@/utils/tooltipStyle'
+import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -29,9 +31,9 @@ const TOOLTIP_DELAY_MS = 450
 /** The ring an earned trophy gets, in its grade's colour. */
 const GRADE_RING: Record<TrophyGrade, string> = {
   platinum: 'ring-sky-300',
-  gold: 'ring-yellow-400',
+  gold: 'ring-hardcore',
   silver: 'ring-zinc-400',
-  bronze: 'ring-orange-400',
+  bronze: 'ring-warning',
 }
 
 type Tooltip = { trophy: PsnTrophy; x: number; y: number }
@@ -66,7 +68,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
   /** Show only this many until asked for the rest. */
   limit?: number
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   const { pinned, toggle, canPin } = usePsnFavoriteTrophies(gameId, gameTitle)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
@@ -115,7 +117,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
                     show(t, r.right, r.top, 0)
                   }}
                   onBlur={hide}
-                  className={`block rounded-lg overflow-hidden shrink-0 transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                  className={`block rounded-box overflow-hidden shrink-0 transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
                     t.earned ? `ring-2 ${GRADE_RING[t.type]}` : ''
                   }`}
                 >
@@ -175,7 +177,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
         createPortal(
           <div
             role="tooltip"
-            className="fixed z-50 pointer-events-none bg-bg-card border border-bg-header/80 rounded-xl shadow-2xl p-3 max-w-65"
+            className={`fixed z-50 pointer-events-none ${TOOLTIP_SURFACE} p-3 max-w-65`}
             style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
           >
             <p className="text-sm font-semibold text-text-main">{nameOf(tooltip.trophy)}</p>
@@ -186,7 +188,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
               <span className={`text-xs font-semibold ${TROPHY_GRADE_COLOR[tooltip.trophy.type]}`}>{grade[tooltip.trophy.type]}</span>
               {tooltip.trophy.rarity !== null && (
                 <span className="text-xs text-text-secondary">
-                  {tooltip.trophy.rarity.toFixed(1)}
+                  {decimal(tooltip.trophy.rarity, lang)}
                   {T.achievement.haveIt}
                 </span>
               )}

@@ -10,6 +10,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import WeekAchievementsModal from '@/components/week-achievements-modal/WeekAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
+import { SkeletonRow } from '@/components/ui/SkeletonList'
 
 type Metric = 'pts' | 'ach'
 
@@ -81,16 +82,9 @@ export default function MainPageBestPeriod({
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.bestPerformance}</p>
 
       {isLoading ? (
-        <div className="flex flex-col gap-2 animate-pulse">
+        <div className="flex flex-col gap-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="bg-bg-main rounded-lg px-3 py-2.5 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-ink/10 shrink-0" />
-              <div className="flex flex-col gap-1.5 flex-1">
-                <div className="h-2 w-16 bg-ink/10 rounded" />
-                <div className="h-2 w-28 bg-ink/10 rounded" />
-              </div>
-              <div className="h-5 w-10 bg-ink/10 rounded" />
-            </div>
+            <SkeletonRow key={i} icon="w-8 h-8" figure className="bg-bg-main rounded-tile px-3 py-2.5 gap-3" />
           ))}
         </div>
       ) : (
@@ -106,7 +100,7 @@ export default function MainPageBestPeriod({
               onClick={() => setSelectedDay(bestDay[0])}
             />
           ) : (
-            <div className="bg-bg-main rounded-lg px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
+            <div className="bg-bg-main rounded-box px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
 
           {/* Best Week — yellow */}
@@ -120,7 +114,7 @@ export default function MainPageBestPeriod({
               onClick={() => setSelectedWeek(bestWeek[0])}
             />
           ) : (
-            <div className="bg-bg-main rounded-lg px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
+            <div className="bg-bg-main rounded-box px-3 py-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
 
           {/* Best Month — red */}
@@ -135,7 +129,7 @@ export default function MainPageBestPeriod({
               onClick={() => setSelectedMonth(bestMonth[0])}
             />
           ) : (
-            <div className="bg-bg-main rounded-lg p-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
+            <div className="bg-bg-main rounded-box p-2.5 text-xs text-text-secondary">{T.cards.noData}</div>
           )}
         </div>
       )}

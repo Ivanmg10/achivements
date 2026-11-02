@@ -7,6 +7,7 @@ import { useAllGamesGlobal } from '@/hooks/useAllGamesGlobal'
 import { CONSOLES } from '@/constants'
 import { useLanguage } from '@/context/LanguageContext'
 import { SectionFallback } from '@/components/ui/SectionFallback'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 const CONSOLE_MAP = new Map(CONSOLES.map((c) => [c.id, c]))
 
@@ -36,15 +37,15 @@ export default function MainPageConsoleNav() {
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-3 animate-pulse">
-        <div className="h-2 w-20 rounded bg-ink/10" />
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-2 w-20" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="bg-bg-main rounded-lg p-3 flex flex-col gap-2">
-              <div className="h-3 w-24 rounded bg-ink/10" />
+            <div key={i} className="bg-bg-main rounded-box p-3 flex flex-col gap-2">
+              <Skeleton className="h-3 w-24" />
               <div className="flex flex-wrap gap-1.5">
                 {[0, 1, 2, 3].map((j) => (
-                  <div key={j} className="h-7 w-20 rounded-lg bg-ink/10" />
+                  <Skeleton key={j} radius="chip" className="h-7 w-20" />
                 ))}
               </div>
             </div>
@@ -67,7 +68,7 @@ export default function MainPageConsoleNav() {
           const label = T.categories[key]
           const sectionGames = gamesBySection[key]
           return (
-            <div key={slug} className="bg-bg-main rounded-lg p-3 flex flex-col gap-2.5">
+            <div key={slug} className="bg-bg-main rounded-box p-3 flex flex-col gap-2.5">
               <Link
                 href={`/${slug}`}
                 className="flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 rounded"
@@ -91,7 +92,7 @@ export default function MainPageConsoleNav() {
                       href={`/${slug}/${con.id}`}
                       title={con.name}
                       // On a phone only the consoles with games: the greyed-out rest made each list very long.
-                      className={`items-center gap-1.5 rounded-md px-2 py-1.5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
+                      className={`items-center gap-1.5 rounded-tag px-2 py-1.5 transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${
                         active
                           ? `flex ${def.color} hover:brightness-125`
                           : 'hidden sm:flex bg-bg-card/40 text-text-secondary hover:bg-bg-card hover:text-text-secondary'

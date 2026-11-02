@@ -1,4 +1,4 @@
-import { gameIconUrl, gameLogoUrl } from '@/lib/steamClient'
+import { gameIconUrl, gameLogoUrl } from '@/lib/steamAssets'
 import type { RecentAchievement } from '@/types/types'
 import type {
   SteamOwnedGame,
@@ -27,6 +27,18 @@ export const STEAM_PLATFORM = 'Steam'
 export function unixToIso(seconds?: number): string | null {
   if (!seconds || seconds <= 0) return null
   return new Date(seconds * 1000).toISOString()
+}
+
+/**
+ * The `limit` games played last, newest first, from the owned list. Steam's
+ * "recently played" call only covers two weeks (empty for someone who stopped
+ * months ago); the owned list dates every game. Never-played games are left out.
+ */
+export function lastPlayedGames(games: SteamOwnedGame[], limit: number): SteamOwnedGame[] {
+  return games
+    .filter((g) => (g.rtime_last_played ?? 0) > 0)
+    .sort((a, b) => (b.rtime_last_played ?? 0) - (a.rtime_last_played ?? 0))
+    .slice(0, limit)
 }
 
 /**

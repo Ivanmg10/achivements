@@ -1,7 +1,9 @@
 import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { slantStyle } from '@/components/ui/shape'
 import type { Streak } from '@/types/types'
 import { daysBetween, formatDay, plural } from '@/utils/utils'
+import StreakSectionHead from '../streak-section-head/StreakSectionHead'
 
 const WEEKS = 53
 const GAP = 3
@@ -14,8 +16,9 @@ function isoDay(d: Date): string {
 
 /**
  * The last year as a grid of days (a column per week, Monday on top), shaded
- * by achievements, with the picked streak outlined. Picking a played day opens
- * the streak it belongs to.
+ * by achievements in the accent. With a streak picked only it keeps the accent,
+ * the rest of the year goes grey and a rail over the grid spans its weeks, so
+ * the choice is never colour alone. Picking a played day picks its streak.
  */
 export default function StreakYearHeatmap({
   byDay,
@@ -51,24 +54,34 @@ export default function StreakYearHeatmap({
     return { columns: cols, months: labels, streakOf: of, max: Math.max(1, ...Object.values(byDay)) }
   }, [byDay, streaks, today, lang])
 
+  const firstCol = selected ? columns.findIndex((col) => col[col.length - 1] >= selected.start) : -1
+  const lastCol = selected ? columns.findLastIndex((col) => col[0] <= selected.end) : -1
+  const onGrid = firstCol !== -1 && firstCol <= lastCol
 
   return (
-    <section aria-labelledby="streak-year-title" className="bg-bg-card rounded-2xl p-5 flex flex-col gap-3 min-w-0">
-      <div>
-        <h2 id="streak-year-title" className="text-sm uppercase tracking-widest text-text-secondary">
-          {T.streak.yearTitle}
-        </h2>
-        <p className="text-xs text-text-secondary mt-0.5">{T.streak.yearHint}</p>
-      </div>
+    <section aria-labelledby="streak-year-title" className="bg-bg-card rounded-card ring-1 ring-inset ring-ink/[0.06] p-5 sm:p-[1.375rem] flex flex-col gap-3 min-w-0">
+      <StreakSectionHead
+        id="streak-year-title"
+        title={T.streak.yearTitle}
+        aside={T.streak.yearSub.replace('{n}', Object.values(byDay).filter((n) => n > 0).length.toLocaleString(lang))}
+      />
+      <p className="sr-only">{T.streak.yearHint}</p>
       {/* Scrolls sideways on a narrow screen rather than shrinking the days to dots. */}
       <div className="overflow-x-auto pb-1 [scrollbar-width:thin]">
         {/* The days fill the card's width: one grid column per week, each day a square. */}
-        <div className="relative" style={{ minWidth: columns.length * (MIN_CELL + GAP), paddingTop: 16 }}>
+        <div className="relative px-1" style={{ minWidth: columns.length * (MIN_CELL + GAP), paddingTop: 22 }}>
           {months.map((m) => (
             <span key={m.col} aria-hidden="true" className="absolute top-0 text-[10px] text-text-secondary" style={{ left: `${(m.col / columns.length) * 100}%` }}>
               {m.label}
             </span>
           ))}
+          {onGrid && (
+            <span
+              aria-hidden="true"
+              className="absolute top-[0.9rem] h-[3px] bg-accent transition-[left,width] duration-(--motion-indicator) ease-(--enter-ease) motion-reduce:transition-none"
+              style={{ ...slantStyle(3), left: `calc(0.25rem + (100% - 0.5rem) * ${firstCol / columns.length})`, width: `calc((100% - 0.5rem) * ${(lastCol - firstCol + 1) / columns.length} - ${GAP}px)` }}
+            />
+          )}
           <div role="group" aria-label={T.streak.yearTitle} className="grid" style={{ gap: GAP, gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}>
             {columns.map((col) => (
               <div key={col[0]} className="flex flex-col" style={{ gap: GAP }}>
@@ -76,9 +89,10 @@ export default function StreakYearHeatmap({
                   const n = byDay[day] ?? 0
                   const streak = streakOf.get(day)
                   const inSelected = !!selected && day >= selected.start && day <= selected.end
+                  const heat = n / max
                   const style = {
                     aspectRatio: '1',
-                    backgroundColor: n > 0 ? `rgb(var(--accent) / ${0.25 + 0.75 * (n / max)})` : 'rgb(var(--ink) / 0.06)',
+                    backgroundColor: n === 0 ? 'rgb(var(--ink) / 0.06)' : !selected || inSelected ? `rgb(var(--accent) / ${0.3 + 0.7 * heat})` : `rgb(var(--ink) / ${0.1 + 0.2 * heat})`,
                   }
                   const label = `${formatDay(day, lang, { weekday: 'long', day: 'numeric', month: 'long' })}: ${plural(n, T.plurals.achievements, lang)}`
                   return streak ? (
@@ -87,12 +101,13 @@ export default function StreakYearHeatmap({
                       type="button"
                       onClick={() => onSelect(streak)}
                       aria-label={label}
+                      aria-pressed={inSelected}
                       title={label}
-                      className={`w-full rounded-[3px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 ${inSelected ? 'ring-2 ring-text-main ring-offset-1 ring-offset-bg-card' : 'hover:ring-1 hover:ring-text-main/60'}`}
+                      className="w-full rounded-cell transition-colors duration-(--motion-open) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 hover:ring-1 hover:ring-text-main/60"
                       style={style}
                     />
                   ) : (
-                    <span key={day} title={label} className="w-full rounded-[3px]" style={style} />
+                    <span key={day} title={label} className="w-full rounded-cell" style={style} />
                   )
                 })}
               </div>

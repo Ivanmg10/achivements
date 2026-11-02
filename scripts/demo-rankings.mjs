@@ -114,18 +114,29 @@ async function loadPool(client) {
   return pool
 }
 
-/** When each of `count` unlocks happened, oldest first: spread from `span` days before `last` days ago, at the persona's hours. */
-function unlockTimes(count, last, span, persona) {
+/**
+ * When each of `count` unlocks happened, oldest first: spread from `span` days before `last` days ago, at the persona's hours.
+ * With `run`, the last `run` of them fall one a day up to today (a streak of that many days), and the rest before it.
+ */
+function unlockTimes(count, last, span, persona, run = 0) {
   const now = Math.floor(Date.now() / 1000)
   const today = Math.floor(now / DAY) * DAY
   const [from, to] = persona.hours
   const width = ((to - from + 24) % 24) || 24
-  const times = Array.from({ length: count }, (_, i) => {
-    let day = today - DAY * (last + Math.round(count > 1 ? span * (1 - i / (count - 1)) : 0))
+  const tail = Math.min(run, count)
+  const spread = count - tail
+  const before = tail > 0 ? Math.max(last, tail) : last
+  const times = Array.from({ length: spread }, (_, i) => {
+    let day = today - DAY * (before + Math.round(spread > 1 ? span * (1 - i / (spread - 1)) : 0))
     if (persona.weekends) while (![0, 6].includes(new Date(day * 1000).getUTCDay())) day -= DAY
     const t = day + Math.floor((from + rnd() * width) * 3600)
     return Math.min(t, now - between(5, 90) * 60)
   })
+  // The streak's unlocks stay inside their own day, even for hours that wrap midnight.
+  for (let k = tail - 1; k >= 0; k--) {
+    const t = today - DAY * k + Math.floor((from + rnd() * Math.min(width, 24 - from)) * 3600)
+    times.push(Math.min(t, now - between(5, 90) * 60))
+  }
   return times.sort((a, b) => a - b)
 }
 
@@ -135,12 +146,12 @@ function pickEarned(list, rarity, share) {
   return order.slice(0, Math.max(1, Math.round(list.length * share)))
 }
 
-function steamGame(persona, pool, [appId, share, last, span]) {
+function steamGame(persona, pool, [appId, share, last, span], run = 0) {
   const def = pool.steam.get(appId)
   const english = def?.schema.english
   if (!english?.length || !def.title) return null
   const earned = pickEarned(english, (a) => def.pct.get(a.name), share)
-  const times = unlockTimes(earned.length, last, span, persona)
+  const times = unlockTimes(earned.length, last, span, persona, run)
   const when = new Map(earned.map((a, i) => [a.name, times[i]]))
   const player = english.map((a) => ({
     name: a.displayName, apiname: a.name, achieved: when.has(a.name) ? 1 : 0, unlocktime: when.get(a.name) ?? 0, description: a.description ?? '',
@@ -160,7 +171,7 @@ function steamGame(persona, pool, [appId, share, last, span]) {
   }
 }
 
-function psnGame(persona, pool, [titleId, share, last, span]) {
+function psnGame(persona, pool, [titleId, share, last, span], run = 0) {
   const def = pool.psn.get(titleId)
   const base = def?.trophies['en-US']
   if (!def?.meta || !base?.length) return null
@@ -173,7 +184,7 @@ function psnGame(persona, pool, [titleId, share, last, span]) {
   const earned = full ? candidates : pickEarned(candidates, (t) => t.rarity, share)
   // The platinum comes last.
   earned.sort((a, b) => (a.type === 'platinum') - (b.type === 'platinum'))
-  const times = unlockTimes(earned.length, last, span, persona)
+  const times = unlockTimes(earned.length, last, span, persona, run)
   const when = new Map(earned.map((t, i) => [t.id, times[i]]))
   const trophiesIn = (lang) => (def.trophies[lang] ?? base).filter(keep).map((t) => ({
     ...t, earned: when.has(t.id), earnedAt: when.has(t.id) ? sonyIso(when.get(t.id)) : null,
@@ -281,8 +292,13 @@ function showcaseOf(steam, psn, count) {
 
 async function seedPersona(client, persona, pool) {
   const accounts = { steam: persona.steam ? `7656119${digits(10)}` : null, psn: persona.psn ? digits(19) : null }
-  const steam = (persona.steam ?? []).map((g) => steamGame(persona, pool, g)).filter(Boolean)
-  const psn = (persona.psn ?? []).map((g) => psnGame(persona, pool, g)).filter(Boolean)
+  // The streak is played on their favourite game, of the first platform they have.
+  const runOn = (source, i) => (i === 0 && source === (persona.steam ? 'steam' : 'psn') ? persona.streak ?? 0 : 0)
+  const steam = (persona.steam ?? []).map((g, i) => steamGame(persona, pool, g, runOn('steam', i))).filter(Boolean)
+  const psn = (persona.psn ?? []).map((g, i) => psnGame(persona, pool, g, runOn('psn', i))).filter(Boolean)
+  const fav = (persona.steam ? steam : psn)[0]
+  const got = fav ? (fav.source === 'steam' ? fav.when.size : Object.keys(fav.earnedCounts).reduce((n, k) => n + fav.earnedCounts[k], 0)) : 0
+  if ((persona.streak ?? 0) > got) console.warn(`  ${persona.name}: a streak of ${persona.streak} asked, ${got} days possible (${got} unlocks)`)
   const missing = (persona.steam?.length ?? 0) + (persona.psn?.length ?? 0) - steam.length - psn.length
   if (missing > 0) console.warn(`  ${persona.name}: ${missing} game(s) not in the cache, left out`)
   const showcase = showcaseOf(steam, psn, 5)

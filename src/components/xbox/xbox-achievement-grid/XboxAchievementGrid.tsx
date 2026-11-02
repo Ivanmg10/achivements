@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useRef, useState } from 'react'
+import { decimal } from '@/utils/utils'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createPortal } from 'react-dom'
@@ -17,6 +18,7 @@ import { useXboxFavoriteAchievements } from '@/hooks/useXboxFavoriteAchievements
 import { useSubject } from '@/context/SubjectContext'
 import type { XboxAchievement } from '@/types/xbox'
 import { tooltipStyle } from '@/utils/tooltipStyle'
+import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 
 const SIZE_CLASSES = {
   40: { badge: 'w-10 h-10', img: 40 },
@@ -52,7 +54,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
   /** Show only this many until asked for the rest. */
   limit?: number
 }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   const { pinned, toggle, canPin } = useXboxFavoriteAchievements(gameId, gameTitle)
   const [tooltip, setTooltip] = useState<Tooltip | null>(null)
@@ -90,8 +92,8 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
                 show(a, r.right, r.top, 0)
               }}
               onBlur={hide}
-              className={`block rounded-lg overflow-hidden shrink-0 transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                a.unlocked ? 'ring-2 ring-green-500' : ''
+              className={`block rounded-box overflow-hidden shrink-0 transition-transform duration-100 hover:scale-110 focus-visible:scale-110 hover:z-10 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                a.unlocked ? 'ring-2 ring-success' : ''
               }`}
             >
               {a.iconUrl && !concealed(a) ? (
@@ -136,7 +138,7 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
         createPortal(
           <div
             role="tooltip"
-            className="fixed z-50 pointer-events-none bg-bg-card border border-bg-header/80 rounded-xl shadow-2xl p-3 max-w-65"
+            className={`fixed z-50 pointer-events-none ${TOOLTIP_SURFACE} p-3 max-w-65`}
             style={tooltipStyle(tooltip.x, tooltip.y, window.innerWidth, window.innerHeight)}
           >
             <p className="text-sm font-semibold text-text-main">{nameOf(tooltip.achievement)}</p>
@@ -144,15 +146,15 @@ export const XboxAchievementGrid = memo(function XboxAchievementGrid({
               {concealed(tooltip.achievement) ? T.xbox.secretAchievementDesc : tooltip.achievement.description}
             </p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="text-xs font-semibold text-green-500">{tooltip.achievement.gamerscore} G</span>
+              <span className="text-xs font-semibold text-success">{tooltip.achievement.gamerscore} G</span>
               {tooltip.achievement.rarity !== null && (
                 <span className="text-xs text-text-secondary">
-                  {tooltip.achievement.rarity.toFixed(1)}
+                  {decimal(tooltip.achievement.rarity, lang)}
                   {T.achievement.haveIt}
                 </span>
               )}
               {tooltip.achievement.unlocked ? (
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400">{T.xbox.earned}</span>
+                <span className="text-xs px-1.5 py-0.5 rounded-full bg-success/20 text-success">{T.xbox.earned}</span>
               ) : (
                 <span className="text-xs text-text-secondary">{T.achievement.notEarned}</span>
               )}

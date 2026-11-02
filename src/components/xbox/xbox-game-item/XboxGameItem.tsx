@@ -55,12 +55,12 @@ export default function XboxGameItem({
   return (
     <div
       onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-2xl overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={xboxBackdrop(game)} />
 
       {/* relative: the expand button stretches over this whole row (see below). */}
-      <div className="relative flex items-center gap-3 px-3 py-3 shrink-0">
+      <div className="relative flex items-center gap-3.5 px-3.5 py-2 shrink-0">
         {/* Same destination as the title link, so it is kept out of the tab order. */}
         <Link href={href} tabIndex={-1} aria-hidden="true" className="relative z-10 shrink-0">
           <GameIcon
@@ -68,34 +68,34 @@ export default function XboxGameItem({
             id={game.id}
             imageUrl={game.imageIcon}
             size={64}
-            className={`rounded-xl w-14 h-14 sm:w-16 sm:h-16 shadow-md shadow-black/30 transition-transform duration-300 hover:scale-105 ${
-              perfect ? 'ring-2 ring-green-500' : 'ring-1 ring-ink/10'
+            className={`rounded-tile w-14 h-14 sm:w-16 sm:h-16 shadow-[0_6px_18px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:scale-105 ${
+              perfect ? 'ring-2 ring-success' : 'ring-1 ring-ink/10'
             }`}
           />
         </Link>
 
         <div className="flex flex-col min-w-0 flex-1 gap-1">
-          <Link
-            href={href}
-            className="relative z-10 w-fit max-w-full hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 rounded"
-          >
-            <span className="text-base font-bold block truncate leading-tight">{game.title}</span>
-          </Link>
+          <span className="flex items-center gap-2 min-w-0">
+            <Link
+              href={href}
+              className="relative z-10 w-fit max-w-full min-w-0 hover:underline underline-offset-2 decoration-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success rounded"
+            >
+              <span className="text-[1.0625rem] font-extrabold block truncate leading-tight">{game.title}</span>
+            </Link>
+            <span className="inline-flex items-center gap-1 h-5 px-2 rounded-tag bg-black/35 text-text-main text-[0.6875rem] font-bold whitespace-nowrap shrink-0 max-w-[45%] truncate"><XboxLogo size={12} className="opacity-60" aria-hidden="true" />
+                {game.consoleName}</span>
+          </span>
 
           <button
             onClick={toggle}
             aria-expanded={isExpanded}
             aria-controls={panelId}
             aria-label={`${isExpanded ? T.xbox.hideAchievements : T.xbox.showAchievements}: ${game.title}`}
-            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 group"
+            className="flex flex-col gap-1 w-full text-left rounded cursor-pointer before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success group"
           >
             <span className="flex items-center gap-2 w-full">
-              <span className="flex items-center gap-1 shrink-0 text-xs text-text-secondary">
-                <XboxLogo size={12} className="opacity-60" aria-hidden="true" />
-                {game.consoleName}
-              </span>
               <ProgressBar pct={game.pctWon} label={game.title} className="flex-1" />
-              <span className={`text-xs font-semibold tabular-nums shrink-0 ${perfect ? 'text-success' : 'text-text-main'}`}>
+              <span className={`text-base font-extrabold tabular-nums shrink-0 w-[2.625rem] text-right ${perfect ? 'text-success' : 'text-text-main'}`}>
                 {game.pctWon}%
               </span>
               <IconChevronDown
@@ -105,7 +105,7 @@ export default function XboxGameItem({
               />
             </span>
 
-            <span className="flex flex-wrap items-center gap-x-2 text-xs text-text-secondary">
+            <span className="flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-text-secondary">
               <span className="whitespace-nowrap">{progressText}</span>
               <span className="opacity-40" aria-hidden="true">·</span>
               <XboxGamerscore earned={game.earnedGamerscore} total={game.totalGamerscore} />

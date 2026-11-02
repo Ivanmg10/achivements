@@ -36,7 +36,7 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
       .slice(0, 6)
   }, [achievements, subject])
 
-  if (isLoading) return <SkeletonGameList count={4} />
+  if (isLoading) return <SkeletonGameList count={7} />
 
   if (data.length === 0) {
     return (
@@ -50,7 +50,7 @@ export default function MainPageTopGames({ achievements, isLoading }: { achievem
   return (
     <div className="flex flex-col gap-2 flex-1">
       <p className="text-[10px] uppercase tracking-widest text-text-secondary">{T.cards.mostActiveGames}</p>
-      <div className="flex flex-col gap-2 flex-1">
+      <div className="flex flex-col gap-2 flex-1 enter-rows">
         {data.map(({ name, count, href, icon, console: con }) => (
           // The bar is each game against the busiest one, so the ranking reads at a glance.
           <GameListRow

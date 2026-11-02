@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireSteamSession } from '@/lib/apiAuth'
+import { steamFailure } from '@/lib/steamFailure'
 import { withSteamCache, TTL } from '@/lib/steamCache'
 import { getAppDetails } from '@/lib/steamClient'
 import { toSteamGameDetails } from '@/utils/steamMappers'
@@ -37,6 +38,6 @@ export async function GET(req: NextRequest) {
     return cachedJson(details, TTL.schema)
   } catch (err) {
     console.error('[steam/gameDetails]', appId, err)
-    return NextResponse.json({ message: 'Steam store unavailable' }, { status: 503 })
+    return steamFailure(err, 'Steam store unavailable')
   }
 }

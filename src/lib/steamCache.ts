@@ -36,8 +36,17 @@ export const TTL = {
   settledProgress: 30 * 24 * 60 * 60 * 1000,
 } as const
 
+export type SteamCacheEvent = 'hit' | 'miss' | 'inflight' | 'stale'
+type CacheOutcome<T> = { data: T; stale: boolean; reason?: unknown }
+
 /** Dedupes concurrent misses within one process before they reach Steam. */
-const inFlight = new Map<string, Promise<unknown>>()
+const inFlight = new Map<string, Promise<CacheOutcome<unknown>>>()
+const staleRetryAfter = new Map<string, { until: number; reason: unknown }>()
+const STALE_RETRY_MS = 60 * 1000
+
+function cacheLogKey(key: string): string {
+  return key.startsWith('xbox:') ? key.split(':').slice(0, 3).join(':') : key
+}
 
 /** `maxAgeMs` turns an entry older than that into a miss — what the refresh button asks for. */
 export async function readCache<T>(key: string, maxAgeMs?: number): Promise<T | null> {
@@ -52,7 +61,18 @@ export async function readCache<T>(key: string, maxAgeMs?: number): Promise<T | 
     return result.rows[0] ? (result.rows[0].cache_data as T) : null
   } catch (err) {
     // A cache read failing must not take the request down with it.
-    console.error('[steamCache] read', key, err)
+    console.error('[steamCache] read', cacheLogKey(key), err)
+    return null
+  }
+}
+
+/** The last successful value, even expired. Only used after an allowed upstream failure. */
+async function readStaleCache<T>(key: string): Promise<T | null> {
+  try {
+    const result = await pool.query('SELECT cache_data FROM steam_cache WHERE cache_key = $1', [key])
+    return result.rows[0] ? (result.rows[0].cache_data as T) : null
+  } catch (err) {
+    console.error('[steamCache] read stale', cacheLogKey(key), err)
     return null
   }
 }
@@ -95,7 +115,7 @@ export async function writeCache(
       [key, userId, JSON.stringify(data), String(ttlMs)],
     )
   } catch (err) {
-    console.error('[steamCache] write', key, err)
+    console.error('[steamCache] write', cacheLogKey(key), err)
   }
 }
 
@@ -110,43 +130,86 @@ export async function withSteamCache<T>(
   key: string,
   ttlMs: number,
   fetcher: () => Promise<T>,
-  options: { userId?: string | null; shouldCache?: (data: T) => boolean; refreshable?: boolean } = {},
+  options: {
+    userId?: string | null
+    shouldCache?: (data: T) => boolean
+    refreshable?: boolean
+    staleIfError?: (err: unknown) => boolean
+    staleResult?: () => boolean
+    onEvent?: (event: SteamCacheEvent) => void
+  } = {},
 ): Promise<T> {
   const maxAge = options.refreshable && (await wantsFresh()) ? MIN_REFRESH_AGE_MS : undefined
   const hit = await readCache<T>(key, maxAge)
-  if (hit !== null) return hit
+  if (hit !== null) {
+    staleRetryAfter.delete(key)
+    options.onEvent?.('hit')
+    return hit
+  }
 
   const existing = inFlight.get(key)
-  if (existing) return existing as Promise<T>
+  if (existing) {
+    options.onEvent?.('inflight')
+    const outcome = (await existing) as CacheOutcome<T>
+    if (outcome.stale && outcome.reason && !options.staleIfError?.(outcome.reason)) throw outcome.reason
+    if (outcome.stale) options.onEvent?.('stale')
+    return outcome.data
+  }
 
-  const promise = (async () => {
-    const data = await fetcher()
-    if (!options.shouldCache || options.shouldCache(data)) {
-      await writeCache(key, data, ttlMs, options.userId ?? null)
+  options.onEvent?.('miss')
+  const retry = staleRetryAfter.get(key)
+  if (options.staleIfError && retry && retry.until > Date.now()) {
+    if (!options.staleIfError(retry.reason)) throw retry.reason
+    const stale = await readStaleCache<T>(key)
+    if (stale !== null) {
+      options.onEvent?.('stale')
+      return stale
     }
-    return data
+  }
+
+  const promise = (async (): Promise<CacheOutcome<T>> => {
+    try {
+      const data = await fetcher()
+      const stale = options.staleResult?.() ?? false
+      if (!stale && (!options.shouldCache || options.shouldCache(data))) {
+        await writeCache(key, data, ttlMs, options.userId ?? null)
+      }
+      staleRetryAfter.delete(key)
+      return { data, stale }
+    } catch (err) {
+      if (!options.staleIfError?.(err)) throw err
+      const stale = await readStaleCache<T>(key)
+      if (stale === null) throw err
+      staleRetryAfter.set(key, { until: Date.now() + STALE_RETRY_MS, reason: err })
+      return { data: stale, stale: true, reason: err }
+    }
   })()
     .finally(() => inFlight.delete(key))
 
-  inFlight.set(key, promise as Promise<unknown>)
-  return promise
+  inFlight.set(key, promise as Promise<CacheOutcome<unknown>>)
+  const outcome = await promise
+  if (outcome.stale) options.onEvent?.('stale')
+  return outcome.data
 }
 
 /** Drops every cached row for a user — used when they unlink Steam. */
 export async function clearUserCache(userId: string): Promise<void> {
   try {
     await pool.query('DELETE FROM steam_cache WHERE user_id = $1', [userId])
+    // RA's rows carry no user_id: their key does ("ra:recentAch_v2:7", "ra:gameProgression_v3:7:123").
+    await pool.query("DELETE FROM steam_cache WHERE cache_key ~ ('^ra:[^:]+:' || $1 || '(:|$)')", [userId])
   } catch (err) {
     console.error('[steamCache] clearUserCache', userId, err)
   }
 }
 
 /**
- * Deletes expired rows; run daily by /api/cron/sweepCache. Reads filter on
- * expiry, so a missed run costs only disk. Throws, so the cron run shows as
- * failed instead of quietly deleting nothing.
+ * Deletes expired rows; run daily by /api/cron/sweepCache. Xbox rows stay for
+ * 30 days so stale-if-error still has a last good value. Throws on failure.
  */
 export async function sweepExpired(): Promise<number> {
-  const result = await pool.query('DELETE FROM steam_cache WHERE expires_at <= NOW()')
+  const result = await pool.query(`DELETE FROM steam_cache
+    WHERE expires_at <= NOW()
+      AND (cache_key NOT LIKE 'xbox:%' OR expires_at <= NOW() - INTERVAL '30 days')`)
   return result.rowCount ?? 0
 }

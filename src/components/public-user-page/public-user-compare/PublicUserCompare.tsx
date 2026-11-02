@@ -13,6 +13,7 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import PublicUserDuelRow from '../public-user-duel-row/PublicUserDuelRow'
 import PublicUserSharedGameRow from '../public-user-shared-game-row/PublicUserSharedGameRow'
 import PresenceDot from '@/components/presence-dot/PresenceDot'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 /** The signed-in viewer's own numbers, read outside the profile's providers. */
 export type ViewerStats = {
@@ -86,7 +87,7 @@ export default function PublicUserCompare({
 
   return (
     <div className="flex flex-col gap-4">
-      <section aria-labelledby="public-compare-title" className="bg-bg-card rounded-xl p-4 sm:p-6 flex flex-col gap-5">
+      <section aria-labelledby="public-compare-title" className="bg-bg-card rounded-tile p-4 sm:p-6 flex flex-col gap-5">
         <h2 id="public-compare-title" className="sr-only">
           {T.userProfile.compareTitle.replace('{u}', user.username)}
         </h2>
@@ -112,11 +113,11 @@ export default function PublicUserCompare({
           <div aria-busy="true" className="flex flex-col gap-4">
             <span className="sr-only">{T.userProfile.loadingCompare}</span>
             {Array.from({ length: 6 }, (_, i) => (
-              <div key={i} className="h-9 rounded-lg bg-bg-main animate-pulse motion-reduce:animate-none" />
+              <Skeleton key={i} radius="tile" className="h-9" />
             ))}
           </div>
         ) : (
-          <ul className="flex flex-col gap-4">
+          <ul className="flex flex-col gap-4 enter-rows">
             {rows.map((r) => (
               <PublicUserDuelRow
                 key={r.label}
@@ -131,7 +132,7 @@ export default function PublicUserCompare({
         )}
       </section>
 
-      <section aria-labelledby="public-compare-shared" className="bg-bg-card rounded-xl p-4 flex flex-col gap-3">
+      <section aria-labelledby="public-compare-shared" className="bg-bg-card rounded-tile p-4 flex flex-col gap-3">
         <div className="flex items-baseline justify-between gap-2">
           <h2 id="public-compare-shared" className="text-[10px] uppercase tracking-widest text-text-secondary">
             {T.userProfile.sharedGames}
@@ -141,13 +142,13 @@ export default function PublicUserCompare({
         {loading ? (
           <div aria-busy="true" className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {Array.from({ length: 4 }, (_, i) => (
-              <div key={i} className="h-24 rounded-xl bg-bg-main animate-pulse motion-reduce:animate-none" />
+              <Skeleton key={i} radius="tile" className="h-24" />
             ))}
           </div>
         ) : shared.length === 0 ? (
           <EmptyState icon={<IconArrowsDiff className="w-6 h-6" />} title={T.userProfile.noSharedGames} size="compact" className="py-6" />
         ) : (
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 enter-rows">
             {shared.slice(0, SHARED_SHOWN).map((g) => (
               <li key={g.key} className="min-w-0">
                 <PublicUserSharedGameRow game={g} username={user.username} />
