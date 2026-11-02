@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
   try {
     const details = await igdbDetails(game.title, game.consoleName)
     if (!details) return NextResponse.json({ error: 'no-details' }, { status: 404 })
-    return cachedJson(details, TTL.schema)
+    return cachedJson(details, TTL.schema, { sameForEveryone: true })
   } catch (err) {
     console.error('[psn/details]', titleId, err)
     return NextResponse.json({ error: 'details-unavailable' }, { status: 503 })

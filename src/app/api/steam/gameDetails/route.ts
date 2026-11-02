@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
     )
 
     if (!details) return NextResponse.json({ message: 'No store details for this game' }, { status: 404 })
-    return cachedJson(details, TTL.schema)
+    return cachedJson(details, TTL.schema, { sameForEveryone: true })
   } catch (err) {
     console.error('[steam/gameDetails]', appId, err)
     return steamFailure(err, 'Steam store unavailable')

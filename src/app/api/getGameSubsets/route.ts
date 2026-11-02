@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       return g.Title.startsWith(baseTitle + ' [') || g.Title.startsWith(baseTitle + ' |')
     })
 
-    return cachedJson(subsets, TTL)
+    return cachedJson(subsets, TTL, { sameForEveryone: true })
   } catch {
     return NextResponse.json([], { status: 200 })
   }
