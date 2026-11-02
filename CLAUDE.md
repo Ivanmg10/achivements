@@ -486,6 +486,11 @@ Single source of truth: `src/lib/version.ts` → `APP_VERSION`.
   `migrations/040_vault_points.sql`, applied 2026-10-20; any other database needs it before
   this code runs, or the rankings, the header's level and the score refresh answer 500
   (Following and profiles still load, without levels)
+- `1.7.0` — released to `main` 2026-11-02: the component library and the two designs, a skeleton
+  and an entrance for every page, the welcome after sign-up, sign-up and linking through Steam and
+  RetroAchievements, public profile cards, streaks in the rankings, Xbox quota hardening, the v1.7
+  audit fixes. Migrations `041`–`044` are in production (`043`, `044` applied 2026-11-02, just before
+  the release)
 
 ## Release gates — what had to be true before 1.0 (all closed)
 
