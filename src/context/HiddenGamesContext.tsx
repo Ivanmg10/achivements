@@ -11,6 +11,8 @@ export type HiddenGame = { source: GameSource; id: number; title: string; image:
 
 type CtxType = {
   hidden: HiddenGame[]
+  /** Goes up each time a hide or show is saved: what is counted on the server (the streak) reads again. */
+  revision: number
   isLoading: boolean
   isHidden: (id: number, source: GameSource) => boolean
   hideGame: (game: HiddenGame) => Promise<void>
@@ -19,6 +21,7 @@ type CtxType = {
 
 const Ctx = createContext<CtxType>({
   hidden: [],
+  revision: 0,
   isLoading: false,
   isHidden: () => false,
   hideGame: async () => {},
@@ -38,6 +41,7 @@ export function HiddenGamesProvider({ children, initialKeys }: { children: React
     return ref ? [{ ...ref, title: '', image: null }] : []
   }))
   const [loaded, setLoaded] = useState(initialKeys !== undefined)
+  const [revision, setRevision] = useState(0)
   const fetched = useRef(initialKeys !== undefined)
   // Loading only while a signed-in user's list is still on its way.
   const isLoading = status === 'loading' || (status === 'authenticated' && !loaded)
@@ -74,6 +78,7 @@ export function HiddenGamesProvider({ children, initialKeys }: { children: React
           body: JSON.stringify({ source: game.source, gameId: game.id, title: game.title, image: game.image }),
         })
         if (!res.ok) throw new Error(`hide ${res.status}`)
+        setRevision((n) => n + 1)
         notify.success(T.toast.gameHidden)
       } catch (err) {
         console.error('[HiddenGames] hide', err)
@@ -91,6 +96,7 @@ export function HiddenGamesProvider({ children, initialKeys }: { children: React
       try {
         const res = await fetch(`/api/hiddenGames?source=${source}&gameId=${id}`, { method: 'DELETE' })
         if (!res.ok) throw new Error(`show ${res.status}`)
+        setRevision((n) => n + 1)
         notify.success(T.toast.gameShown)
       } catch (err) {
         console.error('[HiddenGames] show', err)
@@ -103,7 +109,7 @@ export function HiddenGamesProvider({ children, initialKeys }: { children: React
 
   // One object per change of what it holds, so a re-render of the provider (the session updating)
   // does not re-render everything that reads it.
-  const value = useMemo(() => ({ hidden, isLoading, isHidden, hideGame, showGame }), [hidden, isLoading, isHidden, hideGame, showGame])
+  const value = useMemo(() => ({ hidden, revision, isLoading, isHidden, hideGame, showGame }), [hidden, revision, isLoading, isHidden, hideGame, showGame])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

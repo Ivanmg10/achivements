@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useBackRegistry } from '@/context/BackInterceptContext'
 import { useLanguage } from '@/context/LanguageContext'
-import { useStreakData } from '@/hooks/useStreakData'
+import { useStreakSummary } from '@/hooks/useStreakSummary'
 import { IconHome, IconChevronLeft, IconSearch, IconMenu } from '@tabler/icons-react'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -55,7 +55,7 @@ function StreakBadge({ streak, glass }: { streak: number; glass?: boolean }) {
 export default function MainHeader() {
   const { data: session, status } = useAuthSession()
   const { T } = useLanguage()
-  const { activeStreak } = useStreakData()
+  const { streak } = useStreakSummary()
   const router = useRouter()
   const { tryHandleBack } = useBackRegistry()
   const pathname = usePathname()
@@ -64,7 +64,6 @@ export default function MainHeader() {
   const [initialQuery, setInitialQuery] = useState('')
   const [scrolled, setScrolled] = useState(false)
 
-  const streak = activeStreak?.days ?? 0
   // With no platform linked there is nothing to search, sort or count: the
   // bar keeps only the way home and the way to the account. Any platform counts
   // (Xbox only for who may see it, see canUseXbox): a PSN-only account has a library too.
