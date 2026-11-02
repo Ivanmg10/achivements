@@ -27,7 +27,9 @@ type PsnGamesCtx = {
   refetch: () => void
 }
 
-const Ctx = createContext<PsnGamesCtx>({
+type ProviderValue = PsnGamesCtx & { request: () => void }
+
+const Ctx = createContext<ProviderValue>({
   isLinked: false,
   library: [],
   fullLibrary: [],
@@ -35,6 +37,7 @@ const Ctx = createContext<PsnGamesCtx>({
   libraryLoading: false,
   libraryError: null,
   refetch: () => {},
+  request: () => {},
 })
 
 /**
@@ -56,6 +59,8 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
   const [libraryError, setLibraryError] = useState<PsnError | null>(null)
   /** The account the list (or error) belongs to — the first paint for a new one is "loading". */
   const [loadedFor, setLoadedFor] = useState<string | null>(null)
+  const [wanted, setWanted] = useState(false)
+  const request = useCallback(() => setWanted(true), [])
   const requested = useRef<string | null>(null)
   const generation = useRef(0)
 
@@ -91,10 +96,10 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
       generation.current++
       return
     }
-    if (requested.current === accountId) return
+    if (!wanted || requested.current === accountId) return
     requested.current = accountId
     load(accountId)
-  }, [accountId, load])
+  }, [accountId, load, wanted])
 
   const refetch = useCallback(() => {
     if (accountId) load(accountId)
@@ -123,6 +128,7 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
         libraryLoading: Boolean(accountId && (hiddenLoading || libraryLoading || !current)),
         libraryError: current ? libraryError : null,
         refetch,
+        request,
       }}
     >
       {children}
@@ -130,4 +136,14 @@ export function PsnGamesDataProvider({ children }: { children: React.ReactNode }
   )
 }
 
-export const usePsnGamesData = () => useContext(Ctx)
+/**
+ * Reading the lists is what asks for them: the first reader starts the load (#101).
+ * `passive` reads without asking, for what only needs `isLinked` (from the session).
+ */
+export function usePsnGamesData({ passive = false }: { passive?: boolean } = {}): PsnGamesCtx {
+  const { request, ...value } = useContext(Ctx)
+  useEffect(() => {
+    if (!passive) request()
+  }, [passive, request])
+  return value
+}

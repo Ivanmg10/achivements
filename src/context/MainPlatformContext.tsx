@@ -32,9 +32,10 @@ export function MainPlatformProvider({ children }: { children: React.ReactNode }
   const subject = useSubject()
   const [stored, setPlatform] = useStoredChoice<MainPlatform>(subject ? 'public-profile-tab' : 'main-profile-tab', PLATFORMS, 'ra')
   const raLinked = useRaLinked()
-  const { isLinked: steamLinked } = useSteamGamesData()
-  const { isLinked: psnLinked } = usePsnGamesData()
-  const { isLinked: xboxLinked } = useXboxGamesData()
+  // Linked comes from the session: reading it must not load the libraries on every route.
+  const { isLinked: steamLinked } = useSteamGamesData({ passive: true })
+  const { isLinked: psnLinked } = usePsnGamesData({ passive: true })
+  const { isLinked: xboxLinked } = useXboxGamesData({ passive: true })
   const linked = useMemo(
     () => PLATFORMS.filter((p) => (p === 'ra' ? raLinked : p === 'steam' ? steamLinked : p === 'psn' ? psnLinked : xboxLinked)),
     [raLinked, steamLinked, psnLinked, xboxLinked],

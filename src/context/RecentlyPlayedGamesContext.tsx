@@ -16,8 +16,11 @@ type CtxType = {
   refetch: () => void
 }
 
-const Ctx = createContext<CtxType>({ games: [], isLoading: true, error: false, refetch: () => {} })
+type ProviderValue = CtxType & { request: () => void }
 
+const Ctx = createContext<ProviderValue>({ games: [], isLoading: true, error: false, refetch: () => {}, request: () => {} })
+
+/** RA's recently played games, loaded on first use like RecentAchievementsContext (#101). */
 export function RecentlyPlayedGamesProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useAuthSession()
   const subject = useSubject()
@@ -27,6 +30,8 @@ export function RecentlyPlayedGamesProvider({ children }: { children: React.Reac
   const [games, setGames] = useState<RecentlyPlayedGame[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [wanted, setWanted] = useState(false)
+  const request = useCallback(() => setWanted(true), [])
   const hasFetched = useRef(false)
   const attemptRef = useRef(0)
   const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -73,10 +78,10 @@ export function RecentlyPlayedGamesProvider({ children }: { children: React.Reac
       attemptRef.current = 0
       return
     }
-    if (!canFetch || hasFetched.current) return
+    if (!canFetch || !wanted || hasFetched.current) return
     hasFetched.current = true
     doFetch()
-  }, [signedOut, canFetch, doFetch])
+  }, [signedOut, canFetch, doFetch, wanted])
 
   useEffect(() => () => clearTimeout(retryTimer.current), [])
 
@@ -92,9 +97,14 @@ export function RecentlyPlayedGamesProvider({ children }: { children: React.Reac
   // One object per change of what it holds, so a re-render of the provider (the session updating)
   // does not re-render everything that reads it.
   const visibleGames = useMemo(() => games.filter((game) => !isHidden(game.GameID, 'ra')), [games, isHidden])
-  const value = useMemo(() => ({ games: visibleGames, isLoading, error, refetch }), [visibleGames, isLoading, error, refetch])
+  const value = useMemo(() => ({ games: visibleGames, isLoading, error, refetch, request }), [visibleGames, isLoading, error, refetch, request])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }
 
-export const useRecentlyPlayedGames = () => useContext(Ctx)
+/** Reading the list is what asks for it: the first reader starts the load. */
+export function useRecentlyPlayedGames(): CtxType {
+  const { request, ...value } = useContext(Ctx)
+  useEffect(request, [request])
+  return value
+}

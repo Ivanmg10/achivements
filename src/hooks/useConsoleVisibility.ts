@@ -21,8 +21,9 @@ export function useConsoleVisibility() {
   const { hidden: raHidden } = useHiddenConsoles('ra')
   const { hidden: psnHidden } = useHiddenConsoles('psn')
   const { hidden: xboxHidden } = useHiddenConsoles('xbox')
-  const { fullLibrary: psnLibrary = [] } = usePsnGamesData()
-  const { fullLibrary: xboxLibrary = [] } = useXboxGamesData()
+  // Their libraries say which console each game is on; only worth loading when one is unticked.
+  const { fullLibrary: psnLibrary = [] } = usePsnGamesData({ passive: psnHidden.size === 0 })
+  const { fullLibrary: xboxLibrary = [] } = useXboxGamesData({ passive: xboxHidden.size === 0 })
 
   const hiddenPsn = useMemo(() => new Set(psnLibrary.filter((g) => !isConsoleShown(g.consoleName, psnHidden)).map((g) => g.id)), [psnLibrary, psnHidden])
   const hiddenXbox = useMemo(() => new Set(xboxLibrary.filter((g) => !isConsoleShown(g.consoleName, xboxHidden)).map((g) => g.id)), [xboxLibrary, xboxHidden])

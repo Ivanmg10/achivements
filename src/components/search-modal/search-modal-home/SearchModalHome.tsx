@@ -1,7 +1,7 @@
 import { IconFlame, IconTrophy, IconUser } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRecentFeed } from '@/hooks/useRecentFeed'
-import { useStreakData } from '@/hooks/useStreakData'
+import { useStreakSummary } from '@/hooks/useStreakSummary'
 import { useVaultMe } from '@/hooks/useVaultMe'
 import type { RecentUser } from '@/hooks/useRecentUsers'
 import { homeHeroOf } from '@/utils/homeHero'
@@ -37,7 +37,7 @@ export default function SearchModalHome({
 }) {
   const { T, lang } = useLanguage()
   const { feed } = useRecentFeed(SHOWN_GAMES)
-  const { activeStreak } = useStreakData()
+  const { streak } = useStreakSummary()
   const { me } = useVaultMe()
   const games = feed.map(homeHeroOf).filter((g): g is NonNullable<typeof g> => g !== null).slice(0, SHOWN_GAMES)
 
@@ -109,7 +109,7 @@ export default function SearchModalHome({
             <SearchModalRow
               media={<IconFlame className="w-[1.125rem] h-[1.125rem] text-text-main" aria-hidden="true" />}
               title={T.streak.title}
-              right={<span className="text-[0.8125rem] text-text-secondary shrink-0">{plural(activeStreak?.days ?? 0, T.plurals.days, lang)}</span>}
+              right={<span className="text-[0.8125rem] text-text-secondary shrink-0">{plural(streak, T.plurals.days, lang)}</span>}
               onSelect={() => onGo('/racha')}
             />
           </li>

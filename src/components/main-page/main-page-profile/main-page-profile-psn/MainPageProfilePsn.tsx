@@ -12,7 +12,7 @@ import MainPageProfilePsnLinked from './main-page-profile-psn-linked/MainPagePro
  */
 export default function MainPageProfilePsn() {
   const { T } = useLanguage()
-  const { isLinked } = usePsnGamesData()
+  const { isLinked } = usePsnGamesData({ passive: true })
   const { summary, isLoading, error, retry } = usePsnSummary()
 
   if (!isLinked) {

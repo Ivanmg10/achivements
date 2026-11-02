@@ -77,7 +77,7 @@ export default function CategoryPage() {
     setPlatform('all')
   })
   const quick = cat === 'playing' ? quickChoice : 'all'
-  const { isLinked: steamLinked } = useSteamGamesData()
+  const { isLinked: steamLinked } = useSteamGamesData({ passive: true })
   // A Steam-only user has no RA list to show — its empty state would tell them
   // to go play on RetroAchievements. Without either account, keep the RA page.
   // No RA account, no RA section — not even an empty one.

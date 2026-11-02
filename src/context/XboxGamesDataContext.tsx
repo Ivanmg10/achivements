@@ -24,7 +24,9 @@ type XboxGamesCtx = {
   refetch: () => void
 }
 
-const Ctx = createContext<XboxGamesCtx>({
+type ProviderValue = XboxGamesCtx & { request: () => void }
+
+const Ctx = createContext<ProviderValue>({
   isLinked: false,
   library: [],
   fullLibrary: [],
@@ -32,6 +34,7 @@ const Ctx = createContext<XboxGamesCtx>({
   libraryLoading: false,
   libraryError: null,
   refetch: () => {},
+  request: () => {},
 })
 
 /**
@@ -55,6 +58,8 @@ export function XboxGamesDataProvider({ children }: { children: React.ReactNode 
   const [libraryError, setLibraryError] = useState<XboxLinkError | null>(null)
   /** The account the list (or error) belongs to — the first paint for a new one is "loading". */
   const [loadedFor, setLoadedFor] = useState<string | null>(null)
+  const [wanted, setWanted] = useState(false)
+  const request = useCallback(() => setWanted(true), [])
   const requested = useRef<string | null>(null)
   const generation = useRef(0)
 
@@ -90,10 +95,10 @@ export function XboxGamesDataProvider({ children }: { children: React.ReactNode 
       generation.current++
       return
     }
-    if (requested.current === xuid) return
+    if (!wanted || requested.current === xuid) return
     requested.current = xuid
     load(xuid)
-  }, [xuid, load])
+  }, [xuid, load, wanted])
 
   const refetch = useCallback(() => {
     if (xuid) load(xuid)
@@ -118,6 +123,7 @@ export function XboxGamesDataProvider({ children }: { children: React.ReactNode 
         libraryLoading: Boolean(xuid && (hiddenLoading || libraryLoading || !current)),
         libraryError: current ? libraryError : null,
         refetch,
+        request,
       }}
     >
       {children}
@@ -125,4 +131,14 @@ export function XboxGamesDataProvider({ children }: { children: React.ReactNode 
   )
 }
 
-export const useXboxGamesData = () => useContext(Ctx)
+/**
+ * Reading the lists is what asks for them: the first reader starts the load (#101).
+ * `passive` reads without asking, for what only needs `isLinked` (from the session).
+ */
+export function useXboxGamesData({ passive = false }: { passive?: boolean } = {}): XboxGamesCtx {
+  const { request, ...value } = useContext(Ctx)
+  useEffect(() => {
+    if (!passive) request()
+  }, [passive, request])
+  return value
+}

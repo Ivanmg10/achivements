@@ -52,3 +52,11 @@ test("someone else's page is never filtered", () => {
   expect(result.current.filtering).toBe(false)
   expect(result.current.isShown(unlock(1, 'SNES'))).toBe(true)
 })
+
+test('a library is only asked for when one of its consoles is unticked (#101)', () => {
+  setup()
+  window.localStorage.setItem('hidden-consoles:psn', '["PS3"]')
+  renderHook(() => useConsoleVisibility())
+  expect(usePsnGamesData).toHaveBeenLastCalledWith({ passive: false })
+  expect(useXboxGamesData).toHaveBeenLastCalledWith({ passive: true })
+})

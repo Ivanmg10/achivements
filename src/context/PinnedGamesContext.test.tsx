@@ -190,3 +190,9 @@ describe('reorder', () => {
     expect(result.current.pins).toEqual(before)
   })
 })
+
+test('nothing is asked until something reads the pins (#101)', () => {
+  signedIn()
+  renderHook(() => null, { wrapper })
+  expect(global.fetch).not.toHaveBeenCalled()
+})

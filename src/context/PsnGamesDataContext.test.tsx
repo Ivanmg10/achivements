@@ -108,3 +108,11 @@ describe('the consoles unticked in preferences', () => {
     expect(result.current.consoles.map((c) => c.name).sort()).toEqual(['PS Vita', 'PS3', 'PS4', 'PS5'])
   })
 })
+
+test('nothing is asked without a reader, nor for one that only needs isLinked (#101)', () => {
+  setSession({ id: '7', psnaccountid: '42' })
+  renderHook(() => null, { wrapper })
+  const { result } = renderHook(() => usePsnGamesData({ passive: true }), { wrapper })
+  expect(result.current.isLinked).toBe(true)
+  expect(global.fetch).not.toHaveBeenCalled()
+})
