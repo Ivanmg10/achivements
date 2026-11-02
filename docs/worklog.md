@@ -28,6 +28,31 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 "added X to CLAUDE.md".
 
 ---
+## 2026-11-02 — Pages load only what they show: the BFF by domains (`perf/101-bff-by-domains`, #101)
+
+**Did** — `useAuthSession` (next-auth's `update()` flipped `status` and re-ran every "signed in" effect: the
+second wave on every page); `RaUserRefresher` only updates when RA's profile moved. The header's streak from
+`GET /api/me/streak` (`lib/meStreak.ts`, the RA and Steam years moved to `lib/raYear`, `lib/steamUnlockYear`).
+Every global data provider loads on its first reader (`request()`, `{ passive: true }`). `GET /api/me/bootstrap`
+(preferences, hidden games, Vault Points; `lib/meBootstrap`, `lib/vaultMe`, `lib/bootstrapParts`). The home mounts
+pins, groups and browse when idle (`useWhenIdle`). `GET /api/follows/cards` (`lib/friendCards.ts`) for both
+Following lists. `scripts/measure-api-calls.js`. Rules in `CLAUDE.md` → Data loading; results in the v1.7 audit.
+**Why** — #86 measured ~25 shared calls and ~1.3 MB on routes that show little (Rankings, Groups), 55 on Following.
+Measured after (same environment, warm): Rankings 26 → 7 calls, 1,258 → 14 KB; Following 55 → 10; game pages
+25–33 → 6–12; home 42 → 35 (its bytes stay: it draws the year and the libraries).
+**Decisions** — The user asked for everything in one PR, commits per step. No `overview` per platform: the
+home's profile column and overview panel compute from the whole library, so it would add requests (told the
+user). `follows/cards` calls the profile routes' own handlers in-process instead of copying `dataOwner`, keys,
+private checks and caches: parity by construction. The streak takes the browser's unticked consoles as
+`?hidden=` (the account copy lags 800 ms). Bootstrap is DB-only so no platform can hold up start-up data.
+Home sections are prefetched when idle, not on open (the user's choice: tabs stay instant).
+**Open** — Injected failures/429s, a cold server cache, RA-only and single-platform accounts (the audit's
+"Still to measure"). The public profile route was not measured. A daily-count DTO for the home's heatmap and
+charts would be the next cut in bytes. Watch `follows/cards` duration on Vercel (ten people in one call).
+**Watch out** — A new provider in `MainProviders` must load on first read, never at mount; read `status` through
+`useAuthSession`. Measuring on two ports: each has its own browser cache, which moved `getGameData` between runs.
+
+---
 ## 2026-11-02 — Release v1.7.0 to production (`chore/merge-main-into-develop-3`)
 
 **Did** — Applied `migrations/043_ra_key_sealed.sql` and `044_admin_totp.sql` to production (checked first:

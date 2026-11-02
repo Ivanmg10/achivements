@@ -34,8 +34,7 @@ async (page) => {
       all: seen.length,
       data: data.length,
       kb: Math.round(data.reduce((n, r) => n + r.bytes, 0) / 1024),
-      repeated: Object.entries(counts).filter(([, n]) => n > 1).map(([p, n]) => `${p}×${n}`),
-      calls: counts,
+      repeated: Object.entries(counts).filter(([, n]) => n > 1).map(([p, n]) => `${p.replace('/api/', '')}×${n}`).join(' '),
     }
   }
 
