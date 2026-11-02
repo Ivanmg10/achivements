@@ -938,4 +938,8 @@ walking through the app's own links (`/` → `/rankings` → back → a game →
 - **Coming back paints the last answer** (rank, awards, last game, groups, pins, perfect order, Following) and
   reads again: no request saved there, by the user's rule that platform data is never older than its server cache.
 - **The RA profile refresh and the arrival beat run at most once a minute per tab.**
+- **RA's year is lighter**: four fields no page reads left out of the answer (`slimUnlock`): 755 → 577 KB for the
+  same 1,601 unlocks. PSN's year (166 KB) is mostly icon URLs repeated per trophy (101 KB): not changed.
+- **Every page read that comes back paints its last answer**, keyed by user and platform account: browse, Steam's
+  feeds and each game page's pins too.
 

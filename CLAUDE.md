@@ -923,6 +923,9 @@ Rankings). Keep these true:
   the RA profile refresh (it updates the profile's last game, so keep it short) and the arrival beat.
 - **RA game pictures are kept in the browser** (`raArtStore`, localStorage `ra-art`, 400 games): they
   never change. `/privacy` says so in all nine languages; a new kind of thing kept there says so too.
+- **RA unlocks are sent without the fields no page reads** (`slimUnlock` in `lib/raYear.ts`: `AuthorULID`,
+  `BadgeURL`, `GameURL`, `CumulScore`; the year went 755 → 577 KB). The cache keeps them whole. A page that
+  starts reading one of them takes it off that list.
 - **Measure before and after** with `scripts/measure-api-calls.js` (Playwright, a signed-in browser,
   the same environment both times). Results of #101 in `docs/audits/perf-security-apilimits-v17.md`.
 

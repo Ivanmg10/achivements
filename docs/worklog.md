@@ -40,9 +40,13 @@ groups, a group, perfect order, pins and Following; `dueInThisTab` for the RA pr
 no client TTL on platform data, only paint-then-read; Steam keeps its own 60 days (its year is 30 min). Own data
 got the same (not a TTL) because its writers are spread over many hooks: a forgotten invalidation would show
 old data after an edit. `fill` left alone: its POST is the work, a GET would not save a request.
-**Open** — A faster platform refresh as its own issue (the user's wish; costs each platform's budget). Not done:
-`useAllGamesGlobal`, Steam's activity hook and the game page's pins could paint their last answer too; slimming
-the year's payload (measure which fields are read first).
+**Open** — A faster platform refresh as its own issue (the user's wish; costs each platform's budget); its text is
+ready but `gh issue create` was refused by the permission check, so the user opens it. Done later the same day:
+browse (want to play), Steam's feeds and every game page's pins paint their last answer (keyed by platform account
+too: Steam's unlink test caught a link painting the old account); RA unlocks drop four unread fields (year 755 → 577 KB).
+Left: `getGamesLastPlayed` in the home's abandoned card (its ids come from data loaded first, so painting gains
+nothing); PSN's year repeats each game's icon URL per trophy (101 of 166 KB): a per-game table would cut it, but
+changes the shape.
 **Watch out** — `Vary: Cookie` stays on anything per user or refreshed by cookie; next-auth rewrites the session
 cookie on every read, so only `sameForEveryone` answers really reach the browser cache.
 
