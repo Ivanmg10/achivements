@@ -6,7 +6,10 @@ import { fetchWithRetry } from '@/lib/fetchWithRetry'
 
 const answer = (data: unknown) => (fetchWithRetry as jest.Mock).mockResolvedValue(data)
 
-beforeEach(() => jest.clearAllMocks())
+beforeEach(() => {
+  window.localStorage.clear()
+  jest.clearAllMocks()
+})
 
 test('the title screen, as a full URL', async () => {
   answer({ ImageTitle: '/Images/t.png', ImageIngame: '/Images/g.png' })

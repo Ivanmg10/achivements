@@ -543,7 +543,7 @@ export const fr: Translations = {
       {
         heading: 'Cookies et stockage local',
         body: [
-          'Nécessaires, sans consentement : un cookie de session qui maintient votre session ouverte, un cookie avec la langue que vous choisissez (pour que les pages arrivent déjà dans cette langue), et le stockage local pour votre langue, votre thème et votre choix de cookies, ainsi que pour l’affichage des pages (mise en page, session ouverte ou non, hauteur de certains blocs) afin qu’elles se chargent sans sauts.',
+          'Nécessaires, sans consentement : un cookie de session qui maintient votre session ouverte, un cookie avec la langue que vous choisissez (pour que les pages arrivent déjà dans cette langue), et le stockage local pour votre langue, votre thème et votre choix de cookies, ainsi que pour l’affichage des pages (mise en page, session ouverte ou non, hauteur de certains blocs) afin qu’elles se chargent sans sauts. Il garde aussi les adresses des images de jeux déjà affichées, pour ne pas les redemander.',
           'Mesure d’audience, seulement si vous acceptez : cookies Google Analytics (_ga, _ga_*), conservés jusqu’à deux ans. Google ne reçoit que le chemin de la page, jamais le reste de l’adresse. Vous pouvez retirer votre consentement à tout moment depuis les paramètres des cookies en bas de page : la mesure s’arrête aussitôt et ses cookies sont supprimés.',
         ],
       },
