@@ -28,6 +28,28 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 "added X to CLAUDE.md".
 
 ---
+## 2026-11-06 — Antislop audit: code, visuals, identity (`chore/77-antislop-pass`, #77)
+
+**Did** — The deepest audit so far, report only: `docs/audits/antislop-v17.md` (synthesis: cross-cutting code
+patterns, probable bugs, owner questions, visuals screen by screen, why slanted feels off, round, three identity
+directions, cut proposals, the plan) with 20 auditor reports as appendices in `docs/audits/antislop-v17/` (each with a
+per-file coverage table). Every file in `src/` read, 853 test files, everything outside `src/`; 391 screenshots
+(git-ignored under `.audit/`). Issue #77 updated with the owner's wider scope and a coverage manifest. `.audit/`
+added to `.gitignore`. Nothing in the app changed.
+**Why** — The owner felt a loss of control over a largely AI-built site and wanted code a human can maintain, an
+identity of its own, simplicity, and a deeper component library.
+**Decisions** — antislop in "after" (audit) mode. Every screen in one theme plus a theme sample (owner); then the
+per-theme visual review was cut as not worth its cost (owner, 2026-11-06), so themes are judged from tokens.
+Mechanical auditing moved from Opus to Sonnet after the first rounds burned the five-hour limit (owner).
+**Open** — The owner's decisions (report 3.1), then a design canvas for the identity directions A/B/C and the MGS2-
+style landing, then issues for S0–S9, the per-platform shells and the screens. Nothing is fixed yet, the ~30 probable
+bugs included.
+**Watch out** — Signed-in screenshots take the **account's** synced shape, home layout and theme, not what a script
+puts in `localStorage`: the first round shots were all slanted Venom. Re-take by intercepting `/api/preferences` and
+`/api/me/bootstrap` in Playwright (and block their writes), as `.audit/shots/app2/` was. Signed out, `ThemeContext`
+overwrites the stored theme with dark. Agents left on the default model inherit Opus: pass `model` for mechanical work.
+
+---
 ## 2026-11-02 — Second pass: caches and moving inside the app (`perf/101-bff-by-domains`, #101)
 
 **Did** — Measured client navigation (the first pass measured full loads only): coming back to the home asked

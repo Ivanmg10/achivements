@@ -15,6 +15,7 @@ What to read, and when.
 | [`ui-polish-v2-plan.md`](ui-polish-v2-plan.md) | Historical decisions and implementation outcomes from the 2026-10-25 design round; open issues supersede its detailed build instructions. |
 | [`designs.md`](designs.md) | To find any design made for the app (Figma or canvas) and which version was built; add an entry for every new one. |
 | [`welcome-plan.md`](welcome-plan.md) | Before building the welcome shown after sign-up (designs, the Inazuma reference, how to build it). |
+| [`audits/antislop-v17.md`](audits/antislop-v17.md) | Before any cleanup, refactor or visual change from #77: the whole-project audit (code, visuals, identity), its plan and the owner's open decisions; per-area reports in `audits/antislop-v17/`. |
 | [`worklog.md`](worklog.md) | At the start of a session (the last few entries), and at the end (add yours). |
 | [`archive/`](archive) | Only for history. Plans and notes that are no longer true. |
 
