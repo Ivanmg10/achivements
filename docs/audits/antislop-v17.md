@@ -264,8 +264,12 @@ None was fixed (report only). Each needs a quick check before its fix.
 
 ## 1.4 Questions only the owner can answer (code)
 
+**Answered 2026-11-06:** (1) every text goes through `T` (CLAUDE.md, Style, updated); the home's rail keeps its
+sections, at most Explorar goes; themes, cuts and the identity directions are decided on a design canvas; the plan's
+issues are opened (see 3.6).
+
 1. **"Spanish UI text is intentional"** (CLAUDE.md, Style) vs **"all user-facing strings via `T`"** (i18n):
-   several components hold literal Spanish or English. Which rule wins? (D2-03)
+   several components hold literal Spanish or English. Which rule wins? (D2-03) **Answer: `T`.**
 2. **`utils.tsx`**: split it by topic (and update CLAUDE.md), or keep one file? (UT-05)
 3. **Platform links**: which cache behaviour is right on unlink, the user route's or the admin's? (AP-02)
 4. **`MainPageWithoutRa`** copies the home and has drifted (no cover layout, no pinned view): fold it into
@@ -425,7 +429,7 @@ All are proposals; each needs the owner's yes.
 
 | Proposal | Why | Id |
 |---|---|---|
-| Home's side rail from 7 sections to 4 (Resumen, Actividad, Colección, Fijados): Siguiendo, Grupos and Explorar are already in the header | duplicates | V1-04 |
+| ~~Home's side rail from 7 sections to 4~~ **Declined by the owner (2026-11-06): the sections stay; at most Explorar goes** | duplicates | V1-04 |
 | Home overview: drop the 7-day chart from Resumen, KPI row to 4 figures, fold "Jugando ahora" into the list's first row | about 10 blocks and 45 figures on the first screen | V1-03 |
 | One scope for the whole overview (the KPI row follows the profile tab while the charts count every platform) | "This week 1" next to "55 achievements in 7 days" | V1-02 |
 | Following: two hero cards become one line of heading | 560 px before the first person on a phone | V3-05 |
@@ -526,6 +530,25 @@ Each uses the shared pieces and the chosen direction; each is checked on the own
 | Following, rankings, profiles, groups | one person row, one heading, rankings' focal point, the profile's repeats | V3 |
 | Account and dialogs | quiet destructive actions, the welcome's language on the account page, the preferences card | V4 |
 | Landing and auth | the title screen (canvas first) | V5, 2.8 |
+
+## 3.6 Issues opened (2026-11-06)
+
+What can start now has its issue; what waits on the design canvas is gathered in one (#126). The per-screen issues
+(3.4) are opened after the canvas, from what is agreed there.
+
+| Plan | Issue | Depends on |
+|---|---|---|
+| S0 CI | #116 | — (do first) |
+| S1 dead code | #117 | #116 |
+| S2 probable bugs | #118 | #116 |
+| S3 shared helpers | #119 | #116 |
+| S4 library gaps and guard rules | #120 | #116; the slant inside `Tag`/`DataBar` follows #126 |
+| S5 dialogs | #121 | #120 |
+| S8 copy and i18n | #122 | — |
+| S7 contrast (the theme list and colour budget go to #126) | #123 | #116 |
+| S9 CLAUDE.md and docs | #124 | — |
+| 3.3 per-platform shells | #125 | #116, #119 |
+| S6 identity, cuts, themes, then the landing (design canvas) | #126 | — |
 
 ## 3.5 Coverage
 

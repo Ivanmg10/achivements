@@ -1373,7 +1373,8 @@ requires `linked-issue` (see Issues).
 
 ## Style
 - Single quotes, no trailing semicolons
-- Spanish UI text is intentional — do not change it
+- **Every user-facing text goes through `T`** (the owner's decision, 2026-11-06, #77): a literal Spanish or English
+  string in a component is a bug, however it got there. The admin panel stays exempt.
 
 ## Roadmap (pending)
 - [x] Steam integration
