@@ -312,8 +312,10 @@ out) plus the code behind them. Full reports: `antislop-v17/visual/V1.md`…`V7.
 own theme: `shape-style`, `home-layout` and the theme follow the account (`usePreferencesSync`, `users.theme`) and
 win over whatever a script puts in `localStorage`. The round pairs used here were re-taken with the account's
 preferences answered differently *in the browser only* (Playwright intercepting `/api/preferences` and
-`/api/me/bootstrap`, every write blocked): `.audit/shots/app2/`. The account was never changed. Any future visual
-capture must do the same.
+`/api/me/bootstrap`, every write blocked): `.audit/shots/app2/`, 110 shots. The account was never changed. V6 and
+this synthesis used them from the start; V1–V4 first judged round from the tokens and were then re-checked against
+the real pairs (each has a section "Slanted vs round in this area (re-checked 2026-11-06 with real pairs)"). Any
+future visual capture must do the same.
 
 ## 2.1 What reads as AI-made, in one list
 
@@ -383,9 +385,14 @@ round in both designs and its cards are upright. That rarity is why it reads as 
 
 ## 2.4 Round today
 
-**Round is "slanted with the cuts removed"**: every slanted device has a round fallback (lean to 0, cut to capsule,
-plate to pill) and none has a round idea. The podium shows it best: slanted steps are an image of a podium, round
-steps are three grey boxes. The italic display type keeps leaning in round with nothing answering it (V6, "Round's
+**Round is mostly "slanted with the cuts removed"**: every slanted device has a round fallback (lean to 0, cut to
+capsule, plate to pill). The real pairs (re-checked 2026-11-06) show cards, rows, tables, heatmaps, tiles, dialog
+frames and most dialogs identical in both designs; only controls, tags and bar ends change. The podium shows it best:
+slanted steps are an image of a podium, round steps are three grey boxes. **One exception, worth building on:** on
+bars round does have a small idea of its own. The rankings' weekly bars, the best-streak bars and the platform split
+become capsules, the current week a dot, and the home's streak day strip is a better drawing in round than in slanted
+(at 390 the slanted strip reads as hatching). But round applies it to only about half its bar charts (V3-32), and its
+segmented track keeps 12 px corners next to capsule thumbs (V2-21). The italic display type keeps leaning in round with nothing answering it (V6, "Round's
 own character"). What round does have: pills and circles for every one-line control (consistent since #78), round
 platform dots, softer cards. Honestly kept, it is the calmer, friendlier design.
 
@@ -449,6 +456,7 @@ All are proposals; each needs the owner's yes.
 | At 2560 the game table runs the full width (about 1,800 px between a name and its numbers); public pages are 416 to 980 px columns in an empty screen | V2-03, V5-19 |
 | `/rankings/how` names Xbox to signed-out visitors | V3-15 |
 | On phones the platform tag "RetroAchievements" cuts the game title short; tab rows wrap; sideways strips show no sign of more | V2-14, V1-14, V1-15 |
+| Two Xbox game pages opened from links in the owner's own library (`/xboxGame/1480659447`, `/xboxGame/1096157159`) show "game not found" to an admin, in both designs. Could be a dead id, the Xbox quota or a real bug: verify first | V2, app2 |
 | A figure on its way shows "—" ("Tiempo total —" on the home's Xbox profile, the account's platform cards) | B-05, seen in `app2/home-classic__round__venom__2560.jpg` |
 
 ## 2.8 The new landing (inputs for the MGS2 idea)
@@ -524,13 +532,17 @@ Each uses the shared pieces and the chosen direction; each is checked on the own
 - **Code**: every non-test file in `src/` read in full by one of eleven auditors, each with a per-file table
   (`antislop-v17/code/*.md`): 1,000+ files, about 94,000 lines. Tests (853 files, guard tests read in full, the rest
   by heads, titles, diffs and counts) and everything outside `src/` in a second pass (`T.md`, `MS.md`).
-- **Visuals**: 361 screenshots in the first capture (`.audit/shots/`, git-ignored) and 30 re-taken round pairs
-  (`app2/`): every route, each home section and profile tab, each preferences tab, ten dialogs, both designs, 390 px and
+- **Visuals**: 361 screenshots in the first capture (`.audit/shots/`, git-ignored) and 110 re-taken signed-in
+  shots with real slanted/round pairs, eight dialogs included (`app2/`): every route, each home section and profile tab, each preferences tab, ten dialogs, both designs, 390 px and
   2560 px, signed in and out. The manifest is on issue #77.
 - **Left out, on purpose**:
   - **Per-theme visual review**: cut by the owner (2026-11-06) as not worth its cost. Themes are judged from their
     tokens (the contrast table in V7) and from the owner's own theme, Venom, which is what the signed-in shots show.
   - The welcome beyond its first screen and the admin panel beyond its unlock: judged from code.
+  - **No Xbox game page was seen**: both Xbox ids tried show "game not found" (listed in 2.7). Its page is judged
+    from code (it shares `GameHero` and the table with PSN).
+  - Not read line by line: the smaller test files (heads, titles, diffs and counts), the migrations (names and
+    sizes) and `scripts/demo-rankings.mjs`.
   - `allGames` and `playing` at 390 are cut at 10,000 px (Chromium's limit).
   - Tools that measure duplication and dead exports (`jscpd`, `knip`) were not run: downloading them needs the
     owner's permission. The auditors found duplication and dead code by reading and grep instead.

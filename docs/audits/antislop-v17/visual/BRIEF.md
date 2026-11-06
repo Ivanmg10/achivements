@@ -30,7 +30,7 @@ screenshots already taken and from the code.
 `.audit/shots/<area>/<screen>__<shape>__<theme>__<width>.jpg`. shape = `slanted` | `round`, width = `390` | `2560`.
 Areas: `app/` (signed in, theme dark), `public/` (signed out), `modals/` (viewport shots of dialogs), `themes/`
 (21 themes, slanted). Full-page shots are tall: to see a detail, crop it:
-`node .audit/crop.js <in.jpg> .audit/visual/crops/<name>.jpg <left> <top> <width> <height>` (no numbers = print size).
+`node .audit/crop.mjs <in.jpg> .audit/visual/crops/<name>.jpg <left> <top> <width> <height>` (no numbers = print size).
 Shots were taken ~3.5 s after load; a section that still shows a skeleton or an empty chart may simply not have
 loaded in time: say "possibly not loaded" rather than calling it a bug, unless the code confirms it.
 
