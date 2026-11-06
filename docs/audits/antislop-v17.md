@@ -569,7 +569,7 @@ Three issues opened before the audit join the plan (2026-11-06):
   `light-black`), leaving violet to purple; drawn as Temas v2. **Chosen 2026-11-06**: dark white, light black, 22 → 14; Venom stays though close to dark.
 - **Landing:** concept 2 (the moving band of covers under the title), but a working landing that explains the
   site below, with no "press start". Drawn as Landing v2, desktop and phone. v2's first screen read flat and its italic menu off-style; landing v3 has three first screens and the sections below with real crops and the real FAQ.
-- **Cuts:** instead of page reworks, a review of what can be improved inside each screen as it is (see the reply of 2026-11-06 in #126).
+- **Cuts:** instead of page reworks, a review of what can be improved inside each screen as it is (proposed 2026-11-06, waiting for the owner).
 
 ## 3.5 Coverage
 
