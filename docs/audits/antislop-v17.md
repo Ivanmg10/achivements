@@ -550,6 +550,26 @@ What can start now has its issue; what waits on the design canvas is gathered in
 | 3.3 per-platform shells | #125 | #116, #119 |
 | S6 identity, cuts, themes, then the landing (design canvas) | #126 | — |
 
+Three issues opened before the audit join the plan (2026-11-06):
+
+| Issue | Where it goes | Why there |
+|---|---|---|
+| #113 Steam last-played only for the key owner | with #118, right after #117 | a data bug every Steam user but one sees (recently played, activity, streak, score refresh); no design needed |
+| #114 recently-played rows misaligned | inside #115's viewport sweep | same sweep, same rows; the cause may be a width band |
+| #115 profile on Steam Deck and AYN Thor | after #125 and the per-screen issues | fixing rows before they become one shell and take direction B would be done twice |
+
+## 3.7 The owner's answers on the canvas (2026-11-06)
+
+- **Identity: B.** Plus: slant the player's own marks (level and streak in the header, the rank's level) at the
+  one angle. In round, the tabs take the mark in front like slanted, not the short underline. Drawn as B v2.
+- **Cuts (2.6): rejected as drawn.** The owner felt they took the site's personality away (the proposals were
+  redrawn flat instead of on the real components). Only repeats and real bugs may come back, one by one, with
+  the owner's yes; the current look stays.
+- **Themes:** purple stays. Open: dark and light take white and black as accent (absorbing `dark-white` and
+  `light-black`), leaving violet to purple; drawn as Temas v2 for the owner to choose. 22 → 14.
+- **Landing:** concept 2 (the moving band of covers under the title), but a working landing that explains the
+  site below, with no "press start". Drawn as Landing v2, desktop and phone.
+
 ## 3.5 Coverage
 
 - **Code**: every non-test file in `src/` read in full by one of eleven auditors, each with a per-file table

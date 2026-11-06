@@ -28,6 +28,20 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 "added X to CLAUDE.md".
 
 ---
+
+## 2026-11-06 — Antislop: the owner's answers, v2 of the canvas, lessons in CLAUDE.md (`chore/77-antislop-pass`)
+
+**Did** — CLAUDE.md gained "The antislop audit (#77)": where the report is, the issue order, the owner's
+decisions and the mistakes not to repeat. The report's §3.6 places #113–#115 in the plan and §3.7 records the
+answers. Canvas v2 (B v2, Temas v2, Landing v2 desktop and phone); `docs/designs.md` updated.
+**Why** — the owner wants every later agent to know the audit and not repeat its mistakes.
+**Decisions** — identity B, with the slant on the player's own marks; the page-by-page cuts rejected (they took
+the personality away); purple stays; the landing is concept 2 made functional. #114 goes inside #115's sweep;
+#115 after the shells and the per-screen work; #113 with the bugs.
+**Open** — the owner's verdict on v2: dark/light accents (white/black or violet), B v2, the landing. The cuts
+are under debate: none is built without a yes, one by one.
+
+---
 ## 2026-11-06 — Antislop audit: code, visuals, identity (`chore/77-antislop-pass`, #77)
 
 **Did** — The deepest audit so far, report only: `docs/audits/antislop-v17.md` (synthesis: cross-cutting code
