@@ -566,9 +566,10 @@ Three issues opened before the audit join the plan (2026-11-06):
   redrawn flat instead of on the real components). Only repeats and real bugs may come back, one by one, with
   the owner's yes; the current look stays.
 - **Themes:** purple stays. Open: dark and light take white and black as accent (absorbing `dark-white` and
-  `light-black`), leaving violet to purple; drawn as Temas v2 for the owner to choose. 22 → 14.
+  `light-black`), leaving violet to purple; drawn as Temas v2. **Chosen 2026-11-06**: dark white, light black, 22 → 14; Venom stays though close to dark.
 - **Landing:** concept 2 (the moving band of covers under the title), but a working landing that explains the
-  site below, with no "press start". Drawn as Landing v2, desktop and phone.
+  site below, with no "press start". Drawn as Landing v2, desktop and phone. v2's first screen read flat and its italic menu off-style; landing v3 has three first screens and the sections below with real crops and the real FAQ.
+- **Cuts:** instead of page reworks, a review of what can be improved inside each screen as it is (see the reply of 2026-11-06 in #126).
 
 ## 3.5 Coverage
 
