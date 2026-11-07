@@ -61,14 +61,13 @@ signed-out 404), the public pages and the phone. Welcome left alone; app 404 kep
 Public pages: the owner asked whether the signed-out profile card is needed; kept (it is what a shared link and its
 preview show), all nine points agreed. Phone: all agreed but 11 (cookie notice stays); 7 left to the agent: the profile
 folded to one line ("Ver perfil" opens it), not moved below the games. The owner leaves phone details to the agent's
-judgement. The cursor spotlight (`.spotlight`, `useSpotlight`, 21 components): the owner asked; dropped (owner,
+judgement. The cursor spotlight (`.spotlight`, `useSpotlight`, 26 files): the owner asked; dropped (owner,
 2026-11-07; as the audit's V5/V7 said): the finished bar keeps the only glow, the links inside a card keep their own hover. The canvas is complete.
 **Issues** — Opened from the canvas, 2026-11-07: #127–#136 (list and order in the report's §3.6); comments on #118
 (cookie sheet stays), #120 (spotlight goes) and #126 (the result).
-**Next** — #116 CI, then the plan's order. Old note: turn the agreed points into
-issues (the plan in the report's §3.6: per-screen issues go after the canvas), starting with the bugs and the shared pieces.
-**Open** — The owner's review of the last six boards. Pages 3 (themes from zero) and 4 (landing). Captures: the Playwright
-MCP profile was locked by another process this session; a fresh `playwright-cli` profile is signed out.
+**Next** — #116 CI, then the plan's order (#117, #113 + #118, #119, #120, #121/#123/#122, #125, #127–#135, #115, #136).
+**Open** — Captures: the Playwright MCP profile was locked by another process this session; a fresh `playwright-cli`
+profile is signed out.
 **Watch out** — Captures of the account page or anything over it show the owner's email (sharp, or readable behind a
 dialog's blur): cover it in the image before uploading (System.Drawing in PowerShell works here; Python has no PIL).
 **Open (old)** — Pages 2 (improvements per screen, from `MejHome.dc.html`), 3 (themes from
