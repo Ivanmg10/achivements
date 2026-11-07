@@ -451,7 +451,7 @@ export async function rebuildPeriods(userId: number): Promise<void> {
 }
 
 /** Every platform read or settled; 'busy' and plain 'reading' are not. */
-export function fillComplete(platforms: FillStatus['platforms']): boolean {
+function fillComplete(platforms: FillStatus['platforms']): boolean {
   return Object.values(platforms).every((p) => p && (p.state === 'done' || p.state === 'estimated' || p.state === 'error'))
 }
 
@@ -536,7 +536,7 @@ async function totalPoints(userId: number): Promise<number> {
  * Marks a platform as about to be read (just linked), so the screens say
  * "calculating" at once and the next pass is not skipped as already complete.
  */
-export async function markFillPending(userId: number, source: GameSource): Promise<void> {
+async function markFillPending(userId: number, source: GameSource): Promise<void> {
   const prev = await readFillStatus(userId)
   await saveFillStatus(userId, {
     complete: false,
@@ -618,7 +618,7 @@ export async function continueFill(userId: number, budgetMs: number): Promise<Fi
 }
 
 /** Right after a platform is linked: one pass at once, if none is running. */
-export async function startFill(userId: number, budgetMs = 60_000): Promise<void> {
+async function startFill(userId: number, budgetMs = 60_000): Promise<void> {
   try {
     if (await claim(userId, `${CLAIM_SECONDS} seconds`)) await runScorePass(userId, budgetMs)
   } catch (err) {

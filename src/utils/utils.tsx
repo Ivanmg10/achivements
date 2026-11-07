@@ -1,4 +1,3 @@
-import { ragamesIds } from '@/constants/ragamesidpool'
 import { PinnedAchievement, RecentAchievement, RetroAchievement, RetroAchievementsGameCompleted } from '@/types/types'
 import { CategoryGame } from '@/hooks/useGamesByCategory'
 import { GameExtraData } from '@/components/statusGameList/StatusGameList'
@@ -29,47 +28,6 @@ export function relativeTime(dateStr: string | null | undefined, lang = 'en'): s
   return fmt.format(0, 'minute')
 }
 
-export function getRandomGameIds(count: number = 5): string[] {
-  const shuffled = [...ragamesIds].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, count)
-}
-
-export const groupByDay = (achievements: RecentAchievement[]) => {
-  const last7Days: string[] = []
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    last7Days.push(d.toISOString().split('T')[0])
-  }
-
-  if (!Array.isArray(achievements)) return last7Days.map((date) => ({ date, count: 0 }))
-
-  const grouped = achievements.reduce(
-    (acc, a) => {
-      const day = a.Date.split(' ')[0]
-      acc[day] = (acc[day] || 0) + 1
-      return acc
-    },
-    {} as Record<string, number>,
-  )
-
-  return last7Days.map((date) => ({ date, count: grouped[date] || 0 }))
-}
-
-export const groupByConsole = (games: RetroAchievementsGameCompleted[]) => {
-  const grouped = games
-    .filter((game) => game.ConsoleName !== 'Events')
-    .reduce(
-      (acc, game) => {
-        acc[game.ConsoleName] = (acc[game.ConsoleName] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    )
-
-  return Object.entries(grouped).map(([name, value]) => ({ name, value }))
-}
-
 /** The last `totalDays` days up to `end` (today unless said otherwise), each with how many achievements fell on it. */
 export const groupByDays = (achievements: RecentAchievement[], totalDays: number, end: Date = new Date()) => {
   const days: string[] = []
@@ -84,22 +42,6 @@ export const groupByDays = (achievements: RecentAchievement[], totalDays: number
     return acc
   }, {} as Record<string, number>)
   return days.map((date) => ({ date, count: grouped[date] || 0 }))
-}
-
-
-export function calcStreak(achievements: RecentAchievement[]): number {
-  if (!achievements.length) return 0
-  const days = new Set(achievements.map((a) => a.Date.split(' ')[0]))
-  let count = 0
-  const today = new Date()
-  for (let i = 0; i < 30; i++) {
-    const d = new Date(today)
-    d.setDate(d.getDate() - i)
-    const key = d.toISOString().split('T')[0]
-    if (days.has(key)) count++
-    else if (i > 0) break
-  }
-  return count
 }
 
 
@@ -233,9 +175,6 @@ export function activityKpis(achievements: RecentAchievement[], now: number = Da
   }
   return { today, week, month, avgPerDay: last30 / 30 }
 }
-
-export { calcAllStreaks } from '@/utils/streaks'
-
 
 export function sumAchievementPoints(
   achievements: Record<string, RetroAchievement | undefined | null>,

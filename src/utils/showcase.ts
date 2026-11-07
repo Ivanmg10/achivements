@@ -1,6 +1,4 @@
 import type { GameSource } from '@/types/steam'
-import type { RecentAchievement } from '@/types/types'
-import { achievementBadgeUrl } from '@/utils/utils'
 
 /** How many achievements a showcase holds. */
 export const SHOWCASE_MAX = 5
@@ -55,24 +53,6 @@ export function parseShowcaseEntry(v: unknown, now: number = Date.now()): Showca
   if (o.badge != null && o.badge !== '' && badge === null) return null
   if (Number.isNaN(earnedAt) || earnedAt > now + DAY) return null
   return { source, gameId: gameId as number, achievementKey, gameTitle, title, description, badge, earnedAt: new Date(earnedAt).toISOString() }
-}
-
-/** One of the year's unlocks (any platform) as a showcase entry; null without a key to tell it apart. */
-export function showcaseFromUnlock(a: RecentAchievement): ShowcaseEntry | null {
-  const source = a.Source ?? 'ra'
-  const achievementKey = a.Key ?? (source === 'ra' ? String(a.AchievementID) : null)
-  const at = Date.parse(a.Date.includes('T') ? a.Date : a.Date.replace(' ', 'T'))
-  if (!achievementKey || Number.isNaN(at)) return null
-  return {
-    source,
-    gameId: a.GameID,
-    achievementKey,
-    gameTitle: a.GameTitle,
-    title: a.Title,
-    description: a.Description || null,
-    badge: achievementBadgeUrl(a) ?? null,
-    earnedAt: new Date(at).toISOString(),
-  }
 }
 
 /** An RA achievement as a showcase entry, if it was earned (hardcore first); null otherwise. */

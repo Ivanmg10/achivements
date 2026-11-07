@@ -21,9 +21,9 @@ export const CLOSEST_SHOWN = 3
 /**
  * The started games nearest to finished — the ones worth picking back up.
  *
- * Both mastery cards show it, so both feed it the same shape: what counts as
- * "complete" differs between platforms (a mastery on RA, every achievement on
- * Steam) but "how far along am I" does not.
+ * Every platform feeds it the same shape: what counts as "complete" differs
+ * between platforms (a mastery on RA, every achievement on Steam) but "how far
+ * along am I" does not.
  */
 export default function ClosestToComplete({
   games,

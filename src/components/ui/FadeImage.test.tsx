@@ -14,13 +14,6 @@ test('holds a pulsing placeholder in its shape until the picture loads, then fad
   expect(box()).not.toHaveClass('animate-pulse')
 })
 
-test('the loading-only classes go once it has loaded', () => {
-  render(<FadeImage src="https://example.com/a.png" alt="box" width={150} height={200} placeholderClassName="aspect-[3/4]" />)
-  expect(box()).toHaveClass('aspect-[3/4]')
-  fireEvent.load(screen.getByRole('img'))
-  expect(box()).not.toHaveClass('aspect-[3/4]')
-})
-
 test('a picture that fails leaves a still placeholder, not a broken icon', () => {
   const { container } = render(<FadeImage src="https://example.com/broken.png" alt="x" width={64} height={64} className="w-16 h-16" />)
   fireEvent.error(screen.getByRole('img'))

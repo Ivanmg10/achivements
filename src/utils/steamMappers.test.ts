@@ -2,7 +2,6 @@ import {
   lastPlayedGames,
   unixToIso,
   toSteamGameProgress,
-  withAchievementCounts,
   toSteamAchievements,
   countUnlocks,
   withUnlockCounts,
@@ -68,36 +67,6 @@ describe('toSteamGameProgress', () => {
 
   test('treats a missing has_community_visible_stats as no stats', () => {
     expect(toSteamGameProgress({ ...GAME, has_community_visible_stats: undefined }).hasStats).toBe(false)
-  })
-})
-
-describe('withAchievementCounts', () => {
-  const base = toSteamGameProgress(GAME)
-
-  test('counts earned achievements and the percentage', () => {
-    const result = withAchievementCounts(base, [
-      { earned: true },
-      { earned: false },
-      { earned: true },
-      { earned: false },
-    ] as never)
-
-    expect(result.maxPossible).toBe(4)
-    expect(result.numAwarded).toBe(2)
-    expect(result.pctWon).toBe(50)
-  })
-
-  test('rounds the percentage to two decimals', () => {
-    const result = withAchievementCounts(base, [
-      { earned: true }, { earned: false }, { earned: false },
-    ] as never)
-    expect(result.pctWon).toBe(33.33)
-  })
-
-  test('avoids dividing by zero for a game with no achievements', () => {
-    const result = withAchievementCounts(base, [])
-    expect(result.maxPossible).toBe(0)
-    expect(result.pctWon).toBe(0)
   })
 })
 
@@ -167,7 +136,7 @@ describe('toSteamAchievements', () => {
 
   test('an earned-but-undated achievement still counts as earned', () => {
     const [a] = toSteamAchievements(schema, [{ apiname: 'ACH_WIN', achieved: 1, unlocktime: 0 }])
-    expect(withAchievementCounts(toSteamGameProgress(GAME), [a]).numAwarded).toBe(1)
+    expect(a.earned).toBe(true)
   })
 })
 
@@ -192,7 +161,7 @@ describe('countUnlocks / withUnlockCounts', () => {
 test('a freshly mapped game is not yet loaded; counting marks it loaded', () => {
   const base = toSteamGameProgress(GAME)
   expect(base.achievementsLoaded).toBe(false)
-  expect(withAchievementCounts(base, []).achievementsLoaded).toBe(true)
+  expect(withUnlockCounts(base, countUnlocks([{ apiname: 'A', achieved: 1, unlocktime: 1 }])).achievementsLoaded).toBe(true)
 })
 
 describe('toGlobalPctMap', () => {

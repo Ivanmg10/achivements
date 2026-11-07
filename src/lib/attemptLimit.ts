@@ -71,14 +71,6 @@ export function clientAddress(headers: HeaderSource): string {
   return readHeader(headers, 'x-real-ip') ?? 'unknown'
 }
 
-/**
- * Whether the address has used up its attempts in the window. A database that
- * will not answer must not lock people out, so a failure here lets them through.
- */
-export async function isLimited(scope: AttemptScope, address: string): Promise<boolean> {
-  return (await recentAttempts(scope, address)) >= LIMITS[scope].max
-}
-
 /** Attempts in the window. A database that will not answer counts as none. */
 async function recentAttempts(scope: AttemptScope, address: string, failOpen = true): Promise<number> {
   const { windowMinutes } = LIMITS[scope]

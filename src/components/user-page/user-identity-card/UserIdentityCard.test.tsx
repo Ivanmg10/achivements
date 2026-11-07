@@ -41,7 +41,6 @@ test('shows who you are: name, id, and an editable username, email and country',
   expect(screen.getByRole('button', { name: `${en.userPage.username}: ivanxmarine` })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: `${en.userData.email}: a@b.c` })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: `${en.userData.location}: Spain` })).toBeInTheDocument()
-  expect(screen.queryByText(en.userData.userId)).not.toBeInTheDocument()
 })
 
 test('the RetroAchievements rank belongs to its platform card, not here', () => {

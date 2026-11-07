@@ -1,8 +1,7 @@
-type Tone = 'default' | 'accent' | 'danger'
+type Tone = 'default' | 'danger'
 
 const TONES: Record<Tone, string> = {
   default: 'text-text-secondary hover:text-text-main',
-  accent: 'text-accent',
   danger: 'text-text-secondary hover:text-danger',
 }
 

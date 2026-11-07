@@ -27,7 +27,7 @@ export default function LayoutModalPreviewSampleGameCard({ game, cards, order, l
         <FadeImage src={sampleCover(game)} alt="" width={46} height={62} className="h-[3.875rem] w-[2.875rem] shrink-0 overflow-hidden rounded-box" />
         <span className="flex min-w-0 flex-1 flex-col gap-1.5">
           <span className="truncate text-sm font-bold text-text-main">{game.title}</span>
-          <ProgressBar pct={samplePct(game)} label={game.title} height="h-1.5" />
+          <ProgressBar pct={samplePct(game)} label={game.title} />
           <span className="text-xs tabular-nums text-text-secondary">
             {game.earned.toLocaleString(lang)} / {game.total.toLocaleString(lang)}
           </span>

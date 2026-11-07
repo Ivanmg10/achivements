@@ -10,15 +10,12 @@ import { SKELETON_PULSE } from './Skeleton'
  * So a page never shows half its icons missing and then popping in.
  *
  * `className` sizes and shapes the box (width, height, rounding, ring); the
- * picture fills it. `placeholderClassName` applies only while loading, for
- * images whose height comes from the picture itself (give them an aspect
- * ratio to stand in until then). An image that fails keeps the placeholder,
- * still, instead of a broken icon, or shows `fallback` in its place if given.
+ * picture fills it. An image that fails keeps the placeholder, still, instead
+ * of a broken icon, or shows `fallback` in its place if given.
  */
 export function FadeImage({
   className = '',
   imgClassName = 'w-full h-full object-cover',
-  placeholderClassName = '',
   fallback,
   alt,
   ...props
@@ -26,7 +23,6 @@ export function FadeImage({
   className?: string
   /** Classes for the picture itself; it fills the box by default. */
   imgClassName?: string
-  placeholderClassName?: string
   /** Shown instead of the box when the picture fails (an avatar's initial, say). */
   fallback?: ReactNode
 }) {
@@ -41,7 +37,7 @@ export function FadeImage({
 
   return (
     <span
-      className={`relative block overflow-hidden ${state === 'loaded' ? '' : `bg-skeleton ${placeholderClassName}`} ${state === 'loading' ? SKELETON_PULSE : ''} ${className}`}
+      className={`relative block overflow-hidden ${state === 'loaded' ? '' : 'bg-skeleton'} ${state === 'loading' ? SKELETON_PULSE : ''} ${className}`}
     >
       {state !== 'failed' && (
         <Image
