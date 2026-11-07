@@ -50,7 +50,14 @@ already brings marked "ya lo trae B"; V1-03's cuts left out, as the owner reject
 `MejPlataformas` (8). Portada's point 3 (hero says AC II, the list starts with Fallout 4) must be checked in code first.
 **Round 5** — Home review closed: what not to touch is in the report's §3.7 (one surface level declined, the heatmap's
 entrance stays, the cover's hero by design, platform colours stay); the "99 %" ring is the level loader getting stuck.
-**Open** — Pages 2 (improvements per screen, from `MejHome.dc.html`), 3 (themes from
+**Round 6** — Page 2 finished: every remaining screen in one go at the owner's request (game page, /allGames, groups,
+rankings, streak, dialogs). Points the owner already declined elsewhere were not proposed again (colours per platform,
+boxes, shrinking, cuts). Library views came from the owner's own production captures (browser bar cropped off).
+**Open** — The owner's review of the last six boards. Pages 3 (themes from zero) and 4 (landing). Captures: the Playwright
+MCP profile was locked by another process this session; a fresh `playwright-cli` profile is signed out.
+**Watch out** — Captures of the account page or anything over it show the owner's email (sharp, or readable behind a
+dialog's blur): cover it in the image before uploading (System.Drawing in PowerShell works here; Python has no PIL).
+**Open (old)** — Pages 2 (improvements per screen, from `MejHome.dc.html`), 3 (themes from
 zero) and 4 (landing: screen 1 v2 kept, a second variant with Landing v2's band, and the "qué es" sections redone).
 **Watch out** — The canvas sources live in the scratchpad of that session; read them back from the artifact (`read`
 with `path`) before editing in a new one.
