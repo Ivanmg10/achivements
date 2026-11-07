@@ -65,22 +65,6 @@ export function toSteamGameProgress(game: SteamOwnedGame): SteamGameProgress {
   }
 }
 
-/** Applies counts from a loaded achievement list onto a game. */
-export function withAchievementCounts(
-  game: SteamGameProgress,
-  achievements: SteamAchievementUnified[],
-): SteamGameProgress {
-  const maxPossible = achievements.length
-  const numAwarded = achievements.filter((a) => a.earned).length
-  return {
-    ...game,
-    maxPossible,
-    numAwarded,
-    pctWon: maxPossible === 0 ? 0 : Math.round((numAwarded / maxPossible) * 10000) / 100,
-    achievementsLoaded: true,
-  }
-}
-
 /**
  * Joins the player's unlock state with the game schema. The schema holds the
  * display text and both badge icons; the player call holds only unlock state,

@@ -98,9 +98,6 @@ test('the radii the designs change come from the tokens, never a fixed value', (
   const allowed = [
     path.join('components', 'landing-page', 'landing-hero', 'LandingHero.tsx'),
     path.join('components', 'main-page', 'main-page-portada', 'MainPagePortada.tsx'),
-    path.join('components', 'main-page', 'main-page-profile', 'main-page-profile-psn', 'MainPageProfilePsn.tsx'),
-    path.join('components', 'main-page', 'main-page-profile', 'main-page-profile-st', 'MainPageProfileSt.tsx'),
-    path.join('components', 'main-page', 'main-page-profile', 'main-page-profile-xbox', 'MainPageProfileXbox.tsx'),
     path.join('components', 'status-badge', 'StatusBadge.tsx'),
     path.join('components', 'user-page', 'user-game-card-preference', 'user-game-card-preference-preview', 'UserGameCardPreferencePreview.tsx'),
     path.join('components', 'user-page', 'user-home-layout-preference', 'user-home-layout-preference-preview', 'UserHomeLayoutPreferencePreview.tsx'),

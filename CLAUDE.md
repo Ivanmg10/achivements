@@ -818,8 +818,8 @@ Read through `psn-api` (Sony's unofficial mobile API), all in `src/lib/psnClient
   pace per key in `fetchRA`; every Sony call spends the app's `psn-upstream` budget and a refusal
   cools the instance down a minute. `countUpstream` counts calls per day; Steam fills wait at 85 % of its
   100,000 a day (`steamBudgetLow`).
-- **Guarded work counts first:** `reserveAttempt` before a password check, not `isLimited` then
-  `recordAttempt`: a burst passes those together (30 of 30 past a limit of 10, measured).
+- **Guarded work counts first:** `reserveAttempt` before a password check, never a count and then a
+  record: a burst passes those together (30 of 30 past a limit of 10, measured).
 - **What a user stores has an end:** a length on text, a row cap, one `unnest` statement for an order.
 - **Cross-site writes stop in `src/proxy.ts`**, whose matcher takes `/api` only when the request carries
   `Origin`, so same-origin reads never pay for it.
@@ -1055,8 +1055,6 @@ Two different things; do not mix them up again.
   goes in at once (`addMany`), never more than fits. Also added from any earned
   achievement through `ShowcaseToggleButton` in `AchievementModal` (RA) and
   `AchievementDetailModal` (Steam, PSN, Xbox). One shared state: `ShowcaseProvider`.
-- Unlocks carry `Key` (the platform's own id), so an unlock maps to a showcase entry
-  (`showcaseFromUnlock`); RA uses `AchievementID`.
 
 ## Preferences that follow the account
 

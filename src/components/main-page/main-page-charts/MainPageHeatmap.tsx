@@ -185,7 +185,7 @@ export default function MainPageHeatmap({
                 style={{
                   display: 'none',
                   backgroundColor: 'rgb(var(--bg-card))',
-                  border: '1px solid rgb(var(--accent-muted) / 0.5)',
+                  border: '1px solid rgb(var(--accent) / 0.5)',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
                 }}
               />

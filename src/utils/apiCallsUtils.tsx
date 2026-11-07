@@ -1,29 +1,6 @@
-import { Dispatch, SetStateAction } from "react";
 import { Session } from "next-auth";
-import {
-  RetroAchievementsGameWithAchievements,
-  WantToPlayGame,
-} from "@/types/types";
-import { fetchWithRetry } from "@/lib/fetchWithRetry";
 import { gameKey } from "@/utils/gameRef";
 import { candidateToGroupItemBody, type GameCandidate } from "@/utils/gameCandidates";
-
-export const getGamesInfo = async (
-  gameId: string,
-  session: Session | null,
-  setGameData: Dispatch<
-    SetStateAction<RetroAchievementsGameWithAchievements | null>
-  >,
-) => {
-  try {
-    const res = await fetch(`/api/getGameProgression?gameId=${gameId}`)
-    if (!res.ok) throw new Error(`Failed to fetch game ${gameId}`)
-    const newGame = await res.json()
-    setGameData(newGame)
-  } catch (err) {
-    console.error('[getGamesInfo]', err)
-  }
-};
 
 /** Unlinks the RA account; says whether it worked, so the caller can tell the user. */
 export const unlinkRaUser = async (
@@ -37,28 +14,6 @@ export const unlinkRaUser = async (
   } catch (err) {
     console.error('[unlinkRaUser]', err)
     return false
-  }
-};
-
-export const getWantGames = async (
-  session: Session | null,
-  setWantGames: Dispatch<SetStateAction<Array<WantToPlayGame>>>,
-  setError: Dispatch<SetStateAction<string | undefined>>,
-) => {
-  try {
-    const games = await fetchWithRetry(`/api/getWantPlayGames`) as { Results?: WantToPlayGame[] };
-
-    const getSliceGames = [...(games?.Results ?? [])]
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 7);
-
-    setWantGames(getSliceGames);
-  } catch (err) {
-    if (err instanceof Error) {
-      setError(err.message);
-    } else {
-      setError("Unknown error");
-    }
   }
 };
 

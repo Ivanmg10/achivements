@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useState } from 'react'
-import { IconPencil, IconPlus, IconTrash } from '@tabler/icons-react'
+import { IconPencil, IconTrash } from '@tabler/icons-react'
 import Button from '@/components/ui/Button'
 import IconButton from '@/components/ui/IconButton'
 import Input, { Field, Textarea } from '@/components/ui/Input'
@@ -127,7 +127,6 @@ export default function DesignCatalogControls() {
         <Compare>
           <div className="flex flex-wrap items-center gap-2">
             {SIZES.map((s) => <IconButton key={s} size={s} aria-label={`Edit ${s}`}><IconPencil size={16} /></IconButton>)}
-            <IconButton aria-label="Add" tone="accent"><IconPlus size={16} /></IconButton>
             <IconButton aria-label="Delete" tone="danger"><IconTrash size={16} /></IconButton>
             <IconButton aria-label="Pressed" aria-pressed><IconPencil size={16} /></IconButton>
             <IconButton aria-label="Disabled" disabled><IconPencil size={16} /></IconButton>

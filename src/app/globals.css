@@ -25,7 +25,6 @@
 
   --color-accent: rgb(var(--accent));
   --color-accent-hover: rgb(var(--accent-hover));
-  --color-accent-muted: rgb(var(--accent-muted));
 
   --color-success: rgb(var(--success));
   --color-warning: rgb(var(--warning));
@@ -64,7 +63,7 @@
 }
 
 /* ============================================
-   VARIABLES BASE — fallback
+   VARIABLES BASE — fallback, and the dark themes' values
    ============================================ */
 
 :root,
@@ -81,7 +80,6 @@
   /* Violet, a step lighter than the light theme's so it stands out on a dark surface. */
   --accent: 167 139 250;
   --accent-hover: 196 181 253;
-  --accent-muted: 167 139 250;
 
   --success: 34 197 94;
   --warning: 245 158 11;
@@ -340,34 +338,6 @@ html[data-font="fira"],
 }
 
 /* ============================================
-   DARK
-   ============================================ */
-[data-theme="dark"],
-[data-theme="dark-red"],
-[data-theme="dark-green"],
-[data-theme="dark-blue"],
-[data-theme="dark-white"] {
-  --bg-main: 15 16 20;
-  --bg-header: 10 10 14;
-  --bg-card: 23 24 30;
-  --bg-tertiary: 35 36 46;
-
-  --text-main: 225 228 235;
-  --text-secondary: 140 145 155;
-
-  /* Violet, a step lighter than the light theme's so it stands out on a dark surface. */
-  --accent: 167 139 250;
-  --accent-hover: 196 181 253;
-  --accent-muted: 167 139 250;
-
-  --success: 34 197 94;
-  --warning: 245 158 11;
-  --info: 96 165 250;
-  --danger: 239 68 68;
-  --chart-2: 245 158 11;
-}
-
-/* ============================================
    LIGHT — Neutro suave
    ============================================ */
 [data-theme="light"],
@@ -386,7 +356,6 @@ html[data-font="fira"],
 
   --accent: 124 58 237;
   --accent-hover: 109 40 217;
-  --accent-muted: 124 58 237;
 
   --success: 22 101 52;
   --warning: 146 64 14;
@@ -405,105 +374,58 @@ html[data-font="fira"],
 [data-theme="dark-red"] {
   --accent: 248 113 113;
   --accent-hover: 252 165 165;
-  --accent-muted: 248 113 113;
   --danger: 251 146 60;
 }
 [data-theme="dark-green"] {
   --accent: 74 222 128;
   --accent-hover: 134 239 172;
-  --accent-muted: 74 222 128;
   --success: 45 212 191;
 }
 [data-theme="light-red"] {
   --accent: 185 28 28;
   --accent-hover: 153 27 27;
-  --accent-muted: 185 28 28;
   --danger: 154 52 18;
 }
 [data-theme="light-green"] {
   --accent: 22 101 52;
   --accent-hover: 20 83 45;
-  --accent-muted: 22 101 52;
   --success: 15 118 110;
 }
 [data-theme="dark-blue"] {
   --accent: 123 150 255;
   --accent-hover: 165 180 252;
-  --accent-muted: 123 150 255;
   --info: 34 211 238;
 }
 [data-theme="dark-white"] {
   --accent: 240 241 245;
   --accent-hover: 255 255 255;
-  --accent-muted: 240 241 245;
 }
 [data-theme="light-blue"] {
   --accent: 29 78 216;
   --accent-hover: 30 64 175;
-  --accent-muted: 29 78 216;
   --info: 15 118 110;
 }
 [data-theme="light-black"] {
   --accent: 23 24 30;
   --accent-hover: 60 62 72;
-  --accent-muted: 23 24 30;
 }
 
 /*
-   Light themes: the fixed palette colours in the code (hardcore gold, ratio
-   green, error red...) are tuned for dark surfaces. On a light one, the same
-   classes take a darker shade so they still pass AA. Text only: bars and tints
-   keep their colour.
+   Light themes: the palette hues still in the code (tier and platform
+   colours) are tuned for dark surfaces. On a light one, the same classes take
+   a darker shade so they still pass AA. Text only: bars and tints keep their
+   colour. A hue the code starts using as text gets its rule here.
 */
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-200 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-300 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-red-400 { @apply text-red-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-200 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-300 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-yellow-400 { @apply text-yellow-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-200 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-300 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-green-400 { @apply text-green-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-200 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-300 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-amber-400 { @apply text-amber-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-200 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-300 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-orange-400 { @apply text-orange-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-200 { @apply text-purple-700; }
 :is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-300 { @apply text-purple-700; }
 :is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-purple-400 { @apply text-purple-700; }
 :is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-200 { @apply text-violet-700; }
 :is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-300 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-violet-400 { @apply text-violet-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-200 { @apply text-blue-700; }
 :is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-300 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-blue-400 { @apply text-blue-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-200 { @apply text-sky-700; }
 :is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-300 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-sky-400 { @apply text-sky-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-200 { @apply text-teal-700; }
 :is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-300 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-teal-400 { @apply text-teal-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-200 { @apply text-rose-700; }
 :is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-300 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-rose-400 { @apply text-rose-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-200 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-300 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-pink-400 { @apply text-pink-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-200 { @apply text-indigo-700; }
 :is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-300 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-indigo-400 { @apply text-indigo-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-200 { @apply text-cyan-700; }
 :is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-300 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-cyan-400 { @apply text-cyan-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-200 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-300 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-lime-400 { @apply text-lime-700; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-200 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-300 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-400 { @apply text-gray-600; }
-:is([data-theme="light"], [data-theme="light-red"], [data-theme="light-green"], [data-theme="light-blue"], [data-theme="light-black"], [data-theme="sakura"], [data-theme="arctic"]) .text-gray-500 { @apply text-gray-600; }
 
 /* ============================================
    BLUE
@@ -520,7 +442,6 @@ html[data-font="fira"],
   /* Cobalt, not sky: sky blue is Steam and True points. */
   --accent: 96 125 255;
   --accent-hover: 124 148 255;
-  --accent-muted: 96 125 255;
 
   --success: 34 197 94;
   --warning: 245 158 11;
@@ -543,7 +464,6 @@ html[data-font="fira"],
 
   --accent: 150 110 250;
   --accent-hover: 172 140 252;
-  --accent-muted: 150 110 250;
 
   --success: 52 211 153;
   --warning: 251 191 36;
@@ -566,7 +486,6 @@ html[data-font="fira"],
 
   --accent: 132 184 80;
   --accent-hover: 152 204 100;
-  --accent-muted: 132 184 80;
 
   /* Teal, so "completed" is not mistaken for the accent. */
   --success: 45 212 191;
@@ -590,7 +509,6 @@ html[data-font="fira"],
 
   --accent: 236 84 102;
   --accent-hover: 246 104 120;
-  --accent-muted: 236 84 102;
 
   --success: 52 211 153;
   --warning: 251 191 36;
@@ -614,7 +532,6 @@ html[data-font="fira"],
 
   --accent: 190 24 93;
   --accent-hover: 157 23 77;
-  --accent-muted: 190 24 93;
 
   --success: 22 101 52;
   --warning: 146 64 14;
@@ -638,7 +555,6 @@ html[data-font="fira"],
 
   --accent: 15 118 110;
   --accent-hover: 17 94 89;
-  --accent-muted: 15 118 110;
 
   --success: 22 101 52;
   --warning: 146 64 14;
@@ -661,7 +577,6 @@ html[data-font="fira"],
 
   --accent: 255 102 0;
   --accent-hover: 255 133 51;
-  --accent-muted: 255 102 0;
 
   --success: 34 197 94;
   --warning: 250 204 21;
@@ -684,7 +599,6 @@ html[data-font="fira"],
 
   --accent: 226 192 99;
   --accent-hover: 240 214 140;
-  --accent-muted: 226 192 99;
 
   --success: 34 197 94;
   --warning: 251 146 60;
@@ -707,7 +621,6 @@ html[data-font="fira"],
 
   --accent: 226 192 99;
   --accent-hover: 240 214 140;
-  --accent-muted: 226 192 99;
 
   --success: 52 211 153;
   --warning: 253 230 138;
@@ -730,7 +643,6 @@ html[data-font="fira"],
 
   --accent: 201 180 88;
   --accent-hover: 220 200 110;
-  --accent-muted: 201 180 88;
 
   --success: 132 204 22;
   --warning: 251 146 60;
@@ -753,7 +665,6 @@ html[data-font="fira"],
 
   --accent: 236 232 242;
   --accent-hover: 255 255 255;
-  --accent-muted: 236 232 242;
 
   --success: 52 211 153;
   --warning: 251 191 36;
@@ -777,7 +688,6 @@ html[data-font="fira"],
 
   --accent: 196 181 80;
   --accent-hover: 227 228 31;
-  --accent-muted: 196 181 80;
 
   --success: 74 222 128;
   --warning: 253 186 116;

@@ -126,7 +126,7 @@ const GLOBAL_TTL_MS = 5 * 60 * 1000
 const globalCache = new Map<string, { at: number; rows: unknown }>()
 
 /** Hide/show changes the read projection even when no platform data changed. */
-export function clearRankingCache(): void {
+function clearRankingCache(): void {
   globalCache.clear()
 }
 

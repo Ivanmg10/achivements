@@ -16,9 +16,3 @@ export const CONSOLES = [
   { name: 'SNES/Super Famicom',  id: 3,  icon: '/media/SNES.png',     color: 'bg-rose-900/40 text-rose-300'   },
   { name: 'Dreamcast',           id: 40, icon: '/media/dc.png',       color: 'bg-cyan-900/40 text-cyan-300'   },
 ]
-
-export const CATEGORIES = [
-  { label: 'Quiero jugar', slug: 'wantToPlay' },
-  { label: 'Estoy jugando', slug: 'playing' },
-  { label: 'He completado', slug: 'completed' },
-]
