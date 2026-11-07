@@ -1,4 +1,4 @@
-# Component library and a record of every design — plan (designed and agreed; building)
+# Component library and a record of every design — plan (built; released in 1.7.0)
 
 Written 2026-10-23 at the user's request. **Its own development, on its own branch**, not part
 of the welcome. Two things the user wants:
@@ -9,8 +9,9 @@ of the welcome. Two things the user wants:
    design canvas, with its link, what it is for, its versions and which one was built.
 
 **Design agreed 2026-10-24** on the canvas (`docs/designs.md`: the section "Todo lo acordado, página a
-página" holds the version of every page to build). Building now, in the three PRs below; the
-build plan is the section "Build plan" at the end of Part 1.
+página" holds the version of every page to build). Built in the three PRs below and released in
+1.7.0 (2026-11-02); the build plan is the section "Build plan" at the end of Part 1. Today's rules:
+`docs/design-system.md`.
 
 ## Decided with the user (2026-10-23)
 
@@ -286,7 +287,7 @@ the opened game, library detail panel, Following cards with the last game's art,
 streak (amber only in its hero), group covers without a bar, and the home layout preference
 (*Classic* / *Portada*, a synced key).
 
-**Not in these PRs:** `/diario` and the shareable card (future, see the roadmap in `CLAUDE.md`).
+**Not in these PRs:** `/diario` and the shareable card (future, see `docs/roadmap.md`).
 
 ## Answered (2026-10-23/24)
 

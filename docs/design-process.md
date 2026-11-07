@@ -2,7 +2,7 @@
 
 Written 2026-10-23, after the welcome (`/welcome`, branch `feat/welcome-onboarding`), which the
 user liked both for how it turned out and for how it was reached. **Any new page, section or
-visual rework follows this.** The welcome is the worked example: `docs/welcome-plan.md` and its
+visual rework follows this.** The welcome is the worked example: `docs/archive/welcome-plan.md` and its
 design canvas (linked there).
 
 ## 1. Idea and references

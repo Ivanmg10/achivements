@@ -60,7 +60,7 @@ Live at [www.cheevovault.com](https://www.cheevovault.com) · pre-production at
 | Database | PostgreSQL on Neon, via a `pg` pool (`src/lib/db.js`) |
 | Data | RetroAchievements API, Steam Web API, `psn-api`, IGDB |
 | Email | Resend (REST, no SDK) |
-| Hosting | Vercel, functions in `fra1`, two daily crons (`vercel.json`) |
+| Hosting | Vercel, functions in `fra1`, daily crons (`vercel.json`) |
 | Tests | Jest + Testing Library |
 
 ## Getting started
@@ -82,7 +82,7 @@ missing:
 | `PSN_NPSSO` | PSN linking answers `not-configured` |
 | `OPENXBL_API_KEY` | Xbox (admin-only for now) answers `not-configured` |
 | `TWITCH_CLIENT_ID` / `_SECRET` | PS3/Vita games keep their trophy icon, no IGDB details |
-| `RESEND_API_KEY` (+ `EMAIL_FROM`) | Password recovery and verification mail — see `CLAUDE.md` → Email |
+| `RESEND_API_KEY` (+ `EMAIL_FROM`) | Password recovery and verification mail — see `docs/accounts.md` → Email |
 | `CRON_SECRET` | The cron routes refuse to run |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | `/privacy` has no contact address (required before going public) |
 | `NEXT_PUBLIC_GA_ID` | No analytics and no cookie banner (that is fine) |
@@ -136,13 +136,13 @@ Short version — the full rules are in [`CLAUDE.md`](CLAUDE.md) → Git:
 - `npm test`, `npm run lint` and `npm run build` pass before a PR.
 - New user-facing strings go in every file under `src/translations/`.
 - **Write down what you did** in [`docs/worklog.md`](docs/worklog.md), and
-  update `CLAUDE.md` when a rule or invariant changes.
+  update its area doc in `docs/` (and `CLAUDE.md`, if every task must obey it) when a rule or invariant changes.
 
 ## Documentation
 
 | File | For |
 |---|---|
-| [`CLAUDE.md`](CLAUDE.md) | Rules and invariants: auth, email, admin, each platform, git. Read before touching any of them. |
+| [`CLAUDE.md`](CLAUDE.md) | The rules every task obeys, with a link to each area's doc in `docs/` (accounts, platforms, performance, social, releases…). |
 | [`docs/README.md`](docs/README.md) | Index of internal docs |
 | [`docs/architecture.md`](docs/architecture.md) | How the code is laid out and how data flows |
 | [`docs/worklog.md`](docs/worklog.md) | What each session did, why, and what it left open |

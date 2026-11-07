@@ -1,4 +1,6 @@
-# Welcome after sign-up — plan (not started)
+# Welcome after sign-up — plan (built)
+
+> **Archived 2026-11-07 (#124):** the welcome is built; this is its history. The rules today: `docs/welcome.md`.
 
 Written 2026-10-22 on `feat/welcome-onboarding` (cut from `feat/steam-sign-in`, PR #46,
 not merged yet). **The design built is v4** (below): concept E with a top step bar in the
