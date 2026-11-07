@@ -136,6 +136,8 @@ that keep the look; the landing's first screen is chosen ("Primera pantalla 1 v2
 - **Antislop is not minimalism.** Cutting colour, art, density or the slant to look "clean" took the site's
   personality away and was rejected. What goes: repeats, bugs, hand-drawn copies of library pieces, comments
   that say what the code says. What stays: what makes it CheevoVault.
+- **A page does not shrink when data is missing** (the owner, 2026-11-07): an empty or one-item section keeps its
+  room and its place, so the visual order holds. Do not size a card to its content to "fix" empty space.
 - **Look before writing.** The two biggest findings were the same component written once per platform (~4,500
   lines) and the library walked around (kickers in 95 files, the focus ring ×220, platform hex ×116). New
   platform code goes into its family's shell; a new look goes into `ui/` with its guard rule.

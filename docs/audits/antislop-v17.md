@@ -582,6 +582,12 @@ last game played on top and the rest below (by design); **the heatmap's column-b
 it loads now)**; the per-platform colour of the "finished" figure on the profile card. Type-to-search is intended; only "/"
 being typed into the box is the bug (V1-12). The cover's "99 %" ring is the level's loader, which sometimes never resolves: a bug.
 
+**Public profile (2026-11-07).** Approved: the triple achievements list (the side "Logros recientes" goes), the Vault level
+leads and the Steam one is labelled and secondary, the completed strip without the medal number and "HC/SC", one heading
+style, **one date format as a library piece used everywhere**, no green zero; the six boxed figures as an unboxed row
+(drawn, waiting). Declined: shrinking the empty "Jugados recientemente" card and the "Sin grupos públicos" block (the page
+keeps its size; now in CLAUDE.md).
+
 ## 3.5 Coverage
 
 - **Code**: every non-test file in `src/` read in full by one of eleven auditors, each with a per-file table
