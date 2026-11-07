@@ -560,6 +560,10 @@ Three issues opened before the audit join the plan (2026-11-06):
 
 ## 3.7 The owner's answers on the canvas (2026-11-06)
 
+**2026-11-07: the identity and theme answers below are no longer binding.** The owner asked for the canvas to be redone
+from zero in a new session, with identity and themes proposed again (`antislop-canvas-v2-brief.md`). What still holds:
+cuts became per-screen improvements, and the landing's first screen is chosen.
+
 - **Identity: B.** Plus: slant the player's own marks (level and streak in the header, the rank's level) at the
   one angle. In round, the tabs take the mark in front like slanted, not the short underline. Drawn as B v2.
 - **Cuts (2.6): rejected as drawn.** The owner felt they took the site's personality away (the proposals were

@@ -1,20 +1,18 @@
 # Brief: the antislop design canvas, done again (#126, 2026-11-07)
 
 For a new session. The first canvas was made at the end of a very long session and the owner judged it uneven.
-Redo it **from zero, in a new canvas**, with what was learned. Read this whole file before doing anything.
+Redo it **from zero, in a new canvas**, with what was learned. Its identity and theme choices are not binding; only the two points marked "chosen" below are. Read this whole file before doing anything.
 
 ## What the owner wants
 
 A new design canvas (claude.ai Design type: start with the Artifact tool's `quickstart`, intent `design`) with four
 pages, each a clear proposal:
 
-1. **Identidad.** Starting point: **direction B** ("/" as the signature, one angle, 12°), which the owner chose. Polish it,
-   do not reopen A or C. What the owner added on B: the slant also on what is the player's own (level and streak in the
-   header, the rank's level) and on the primary action, never on data. The owner **liked how B handled the tabs in
-   slanted** (no underline, a "/" in front of the active tab) and **did not like round's version** (a short centred
-   capsule underline); the v2 attempt put the mark in front in round too (a dot). Show B in **slanted and round**, on
-   the real pieces (header, tabs, game row, figures, podium, segmented control, switch, buttons, weekly bars), in Dark
-   and in Venom (the owner's own theme).
+1. **Identidad. From zero.** The first canvas's choice (its direction "B") is **not** a starting point: the owner wants
+   identity proposed again, properly. Start from the audit's diagnosis (report 2.1–2.5: why slanted feels off, what round
+   is today, what is already ours) and propose directions of your own, each on the real pieces (header, tabs, game row,
+   figures, podium, segmented control, switch, buttons, weekly bars), in **slanted and round**, in Dark and in Venom (the
+   owner's own theme), with today beside them.
 2. **Mejoras por pantalla** (it was "Recortes"; the owner **rejected** the cuts: they took the site's personality away).
    Now: screen by screen, the owner's **real capture** with numbered marks on it, each a small improvement that keeps the
    look (bugs, clarity, coherence, copy, legibility), with "what" and "fix" in one line each; anything that changes the
@@ -22,11 +20,10 @@ pages, each a clear proposal:
    that board (13 points) is in the old canvas (`MejHome.dc.html`) and is a good base. Then Following, public profile,
    account, library/game pages, rankings. The findings per screen are already written: `docs/audits/antislop-v17/visual/V1.md`
    (home) to `V4.md`, `V7.md` (colour).
-3. **Temas.** Starting point, **chosen by the owner**: 22 → **14**. Purple stays (the owner's personal favourite).
-   **Dark takes a white accent and light a black one** (they absorb `dark-white` and `light-black`); violet stays only in
-   purple. Venom stays even though it is close to the new dark (the owner knows and does not mind). Gone, each to its
-   successor: dark-red→red, dark-green→green, dark-blue→blue, dark-white→dark, light-red/light-green/light-blue/light-black→light.
-   Present it well: each kept theme as a small real screen in its colours (from `globals.css`), not just swatches.
+3. **Temas. From zero.** The first canvas's list is **not** a starting point. Propose the theme list again, properly:
+   which themes, why, and where each removed one goes (whoever uses it must keep a theme close to theirs). The only
+   facts to respect: the audit's findings (V7: contrast failures, near-duplicates) and that a theme is never removed
+   without a successor. Present each theme as a small real screen in its colours (from `globals.css`), not just swatches.
 4. **Landing.** The **first screen is chosen**: "Primera pantalla 1 v2" (old canvas, `LandH1b.dc.html`). Reuse it as it is:
    title on top like the Metal Gear Solid 2 logo, the logo in a signature colour (violet) where MGS2 has its red "2", one
    slowly drifting blurred art background (no tile seams), "Crear cuenta" and "Iniciar sesión" (no Steam button: the owner

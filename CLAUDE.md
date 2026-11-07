@@ -127,10 +127,10 @@ order (§3.6 of the report): #116 CI → #117 dead code → #113 Steam last-play
 #120 library and guards → #121 dialogs, #123 contrast and themes, #122 texts → #125 per-platform shells →
 per-screen issues from the canvas (#126) → #115 handhelds (with #114) → the landing. #124 (this file) at any time.
 
-**The owner's decisions (canvas `docs/designs.md`, 2026-11-06):** identity **B**, the "/" as signature on one
-angle (12°), and the slant also on what is the player's own (level, streak, rank) and the primary action, never
-on data. Themes 22 → 14 (purple stays). Landing: the moving band of covers under a big title, but a real,
-working landing with sections that explain the site, no "press start". The page-by-page cuts were **rejected**.
+**Where the design stands (2026-11-07):** the first canvas (#126) is history, not a decision. Its identity and theme
+choices are **not binding**: both are proposed again from zero in a new canvas (`docs/audits/antislop-canvas-v2-brief.md`).
+What holds: the page-by-page cuts were **rejected** (they took the personality away) and became improvements per screen
+that keep the look; the landing's first screen is chosen ("Primera pantalla 1 v2").
 
 **Mistakes not to repeat:**
 - **Antislop is not minimalism.** Cutting colour, art, density or the slant to look "clean" took the site's
