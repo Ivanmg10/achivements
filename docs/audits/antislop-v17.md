@@ -588,6 +588,11 @@ style, **one date format as a library piece used everywhere**, no green zero; th
 (drawn, waiting). Declined: shrinking the empty "Jugados recientemente" card and the "Sin grupos públicos" block (the page
 keeps its size; now in CLAUDE.md).
 
+**Rest of page 2 (2026-11-07).** Declined: both "Nuevo grupo" / "Añadir juegos" entries stay (no scrolling with many
+groups); the RA subset thumbnails keep no label (a tooltip only if missing). Owner's own calls: `/allGames` gets a full
+rework to look like the library; the best streaks are grey until one is picked; "La racha, día a día" goes back to the
+calendar removed in `d56b7fee` (2026-10-24).
+
 ## 3.5 Coverage
 
 - **Code**: every non-test file in `src/` read in full by one of eleven auditors, each with a per-file table
