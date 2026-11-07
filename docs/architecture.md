@@ -1,6 +1,6 @@
 # Architecture
 
-A map, not a spec. The rules each area must follow are in `CLAUDE.md`; this
+A map, not a spec. The rules each area must follow are in `CLAUDE.md` and the area docs it links; this
 file says where things are and how they connect. Keep it current when you add
 a folder, a data path or a cache.
 

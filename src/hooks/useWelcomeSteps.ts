@@ -8,7 +8,7 @@ export type WelcomeStep = (typeof WELCOME_STEPS)[number]
 
 /**
  * The platforms the welcome links, in their order among the steps. A new platform is
- * a new entry here and in WELCOME_STEPS (see CLAUDE.md → Welcome for everything else).
+ * a new entry here and in WELCOME_STEPS (see docs/welcome.md for everything else).
  */
 export const PLATFORM_STEPS = ['ra', 'steam', 'psn'] as const satisfies readonly WelcomeStep[]
 export type PlatformStep = (typeof PLATFORM_STEPS)[number]
