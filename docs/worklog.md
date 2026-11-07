@@ -37,10 +37,12 @@ B El título, C La vitrina) on the same pieces, each switchable slanted/round an
 **Why** — The owner wants identity, per-screen improvements, themes and the landing proposed again, one page at a time.
 **Decisions** — Asked first (2026-11-07): both designs stay; the app takes only the logo and its colour from the MGS2
 landing; three directions; the problem is "generic / AI-made" and "not recognisable", not the slant. So every direction
-shares an antislop base (no kicker wallpaper, no glow, one colour for "yours" = the logo's, upright data bars, the logo
-on screen) and differs in where the signature comes from: the logo's shape (A), the type (B), the games' art (C).
-In Venom "yours" is the logo's purple, not the bone accent. C's split of the week by game is illustrative (totals real).
-**Open** — The owner's verdict on page 1; then pages 2 (improvements per screen, from `MejHome.dc.html`), 3 (themes from
+shared an antislop base and differed in where the signature came from (logo shape, type, game art). Rejected, see Round 2.
+**Round 2** — The owner rejected the three directions: identity here means how the slant the site already has is
+applied (one angle, only big gestures and the player's own marks, never data, the "/" as signature, a dot in round), not new
+brand devices. They chose the old canvas's B (B v2); its `Piezas`, `SheetHoy` and `SheetB2` were brought over unchanged but
+for the image ids, and A/B/C removed.
+**Open** — Pages 2 (improvements per screen, from `MejHome.dc.html`), 3 (themes from
 zero) and 4 (landing: screen 1 v2 kept, a second variant with Landing v2's band, and the "qué es" sections redone).
 **Watch out** — The canvas sources live in the scratchpad of that session; read them back from the artifact (`read`
 with `path`) before editing in a new one.
