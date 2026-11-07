@@ -1,5 +1,8 @@
 # Xbox integration — análisis y plan
 
+> **Archived 2026-11-07 (#124):** Xbox shipped admin-only in 1.5.0; this is the spike's history. The rules today:
+> `docs/platforms/xbox.md` and `docs/87-xbox-quota-hardening-spec.md`.
+
 Rama: `feat/xbox-integration` (cortada de `develop`). Estado: **análisis, spike hecho y explorador de administrador**; el resto del plan, pendiente.
 
 > **Estado (2026-10-15).** Fase 0 hecha con una key real (ver sección 6). Está implementado un

@@ -236,7 +236,7 @@ Screenshots were of `localhost:3000` at 2560 px, dark theme, slanted unless said
   fonts, Layout chooser, tint, shapes): check it in each block.
 
 Also seen in the screenshots, not raised by the user: the library shows "Could not load your Xbox
-games" in red (admin account; the open `xboxCall` timeout problem, `docs/xbox-integration-plan.md` §7).
+games" in red (admin account; the open `xboxCall` timeout problem, `docs/archive/xbox-integration-plan.md` §7).
 
 ## 12. Answers of 2026-10-25, last round
 

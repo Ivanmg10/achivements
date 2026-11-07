@@ -1,5 +1,7 @@
 # The welcome's style and privacy steps (#102)
 
+> **Archived 2026-11-07 (#124):** built; kept as history. The rules today: `docs/welcome.md`.
+
 Agreed on the canvas on 2026-11-02 (`docs/designs.md`, row "Preferencias del welcome"): concept A,
 two steps, with its v2 in the welcome's own language, way 1 (one choice at a time). The user chose
 two steps and left the way to code: tried on the page, way 2 only changes how a row opens.
