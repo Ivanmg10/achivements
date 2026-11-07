@@ -53,6 +53,8 @@ entrance stays, the cover's hero by design, platform colours stay); the "99 %" r
 **Round 6** — Page 2 finished: every remaining screen in one go at the owner's request (game page, /allGames, groups,
 rankings, streak, dialogs). Points the owner already declined elsewhere were not proposed again (colours per platform,
 boxes, shrinking, cuts). Library views came from the owner's own production captures (browser bar cropped off).
+**Round 7** — Pages 3 (themes: base + accent, named eight kept, no removals) and 4 (landing: chosen screen, Fondo/Franja
+page, "Qué es" redone, phone) drawn; /allGames rework proposed as the library with a "Todos" status; streak calendar widened.
 **Open** — The owner's review of the last six boards. Pages 3 (themes from zero) and 4 (landing). Captures: the Playwright
 MCP profile was locked by another process this session; a fresh `playwright-cli` profile is signed out.
 **Watch out** — Captures of the account page or anything over it show the owner's email (sharp, or readable behind a
