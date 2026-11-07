@@ -29,6 +29,20 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-07 — CI on every pull request (`ci/116-pr-checks`)
+
+**Did** — `.github/workflows/ci.yml`: one job, `checks`, on PRs into `develop` and `main`: `npm ci`, `tsc --noEmit`,
+`npm run lint`, `jest --ci`, `npm run build`, Node 24, npm cache, older runs of the same PR cancelled. CLAUDE.md → Git says so.
+**Why** — #116, plan S0 of the antislop audit (#77): the guard tests only held when someone ran them by hand.
+**Decisions** — No env vars or secrets: a clean checkout of `develop` with no `.env.local` passed all four on 2026-11-07
+(855 suites, 5,569 tests; the build with every route). One job, not four, so `npm ci` runs once. Node 24 as Vercel's default
+(`.tool-versions` is ivm's `ivm-node`, which `setup-node` does not read).
+**Open** — After the first green run, add `checks` as required to the `develop` and `main` rulesets (GitHub settings, the owner).
+**Watch out** — Testing the build from a git worktree with `node_modules` as a junction fails: Turbopack refuses files
+outside the project root. Give a worktree its own `npm ci`.
+
+---
+
 ## 2026-11-07 — Antislop canvas v2: page 1, identity from zero (`chore/77-antislop-pass`, #126)
 
 **Did** — New design canvas (https://claude.ai/artifact/SZB3BhCYKkXabJMA75fz8D), as `docs/audits/antislop-canvas-v2-brief.md`
