@@ -18,6 +18,8 @@ import { GET } from './route'
 import { getServerSession } from 'next-auth'
 import { withSteamCache } from '@/lib/steamCache'
 import { getRecentlyPlayedGames, getPlayerAchievements, getOwnedGames } from '@/lib/steamClient'
+import pool from '@/lib/db'
+import { TWO_WEEKS_S } from '@/utils/steamMappers'
 import type { SteamGameProgress } from '@/types/steam'
 
 function data(res: unknown) {
@@ -159,16 +161,19 @@ describe('last played dates', () => {
     expect(games[0].lastPlayed).toBe(new Date(1789808762 * 1000).toISOString())
   })
 
-  test('still returns the games, undated, if the owned lookup fails', async () => {
+  const withinTwoWeeks = (g: SteamGameProgress) =>
+    Date.parse(g.lastPlayed!) >= Date.now() - TWO_WEEKS_S * 1000 - 60_000
+
+  test('still returns the recent games, as played in the last two weeks, if the owned lookup fails', async () => {
     ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue(RECENT)
     ;(getOwnedGames as jest.Mock).mockRejectedValue(new Error('steam down'))
 
     const games = data(await GET())
     expect(games).toHaveLength(3)
-    expect(games.every((g) => g.lastPlayed === null)).toBe(true)
+    expect(games.every(withinTwoWeeks)).toBe(true)
   })
 
-  test('leaves a game undated when it is missing from the owned list (e.g. family sharing)', async () => {
+  test('a game missing from the owned list (e.g. family sharing) goes after the owned ones', async () => {
     ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue(RECENT)
     ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { games: [
       { appid: 12210, name: 'GTA IV', playtime_forever: 500, rtime_last_played: 1789324742 },
@@ -176,7 +181,42 @@ describe('last played dates', () => {
 
     const games = data(await GET())
     expect(games[0].title).toBe('GTA IV')
-    expect(games.slice(1).every((g) => g.lastPlayed === null)).toBe(true)
+    expect(games.slice(1).every(withinTwoWeeks)).toBe(true)
+  })
+
+  // Every account but the API key's owner (#113, measured 2026-11-03): no game carries
+  // rtime_last_played, while playtime_forever and playtime_2weeks come through.
+  test('dates a library Steam leaves undated from kept unlocks, kept hours and the last two weeks', async () => {
+    const day = 86_400
+    const now = Math.floor(Date.now() / 1000)
+    ;(getRecentlyPlayedGames as jest.Mock).mockResolvedValue({ response: { total_count: 2, games: [
+      { appid: 1145360, name: 'Hades', playtime_forever: 3410, playtime_2weeks: 95, img_icon_url: 'h' },
+      { appid: 1794680, name: 'Vampire Survivors', playtime_forever: 1220, playtime_2weeks: 40, img_icon_url: 'v' },
+    ] } })
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { game_count: 5, games: [
+      { appid: 620, name: 'Portal 2', playtime_forever: 1874, img_icon_url: 'p', has_community_visible_stats: true },
+      { appid: 1145360, name: 'Hades', playtime_forever: 3410, playtime_2weeks: 95, img_icon_url: 'h', has_community_visible_stats: true },
+      { appid: 105600, name: 'Terraria', playtime_forever: 610, img_icon_url: 't' },
+      { appid: 1794680, name: 'Vampire Survivors', playtime_forever: 1220, img_icon_url: 'v', has_community_visible_stats: true },
+      { appid: 4000, name: 'Garrys Mod', playtime_forever: 95, img_icon_url: 'g' },
+    ] } })
+    ;(pool.query as jest.Mock).mockImplementation(async (sql: string) => {
+      if (sql.includes('FROM steam_unlocks')) return { rows: [{ appid: 620, at: String(now - 8 * day) }] }
+      if (sql.includes('FROM steam_playtime')) {
+        return { rows: [
+          { appid: 105600, minutes: 610, played: String(now - 2 * day) },
+          { appid: 4000, minutes: 95, played: null },
+        ] }
+      }
+      return { rows: [] }
+    })
+
+    const games = data(await GET())
+    // Garrys Mod: hours from before they were kept, no achievements: no date, left out.
+    expect(games.map((g) => g.title)).toEqual(['Terraria', 'Portal 2', 'Hades', 'Vampire Survivors'])
+    expect(games[0].lastPlayed).toBe(new Date((now - 2 * day) * 1000).toISOString())
+    expect(games[1].lastPlayed).toBe(new Date((now - 8 * day) * 1000).toISOString())
+    expect(games.slice(2).every(withinTwoWeeks)).toBe(true)
   })
 
   test('keeps a date Steam did send on the recent entry', async () => {

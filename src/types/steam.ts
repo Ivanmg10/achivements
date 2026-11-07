@@ -57,8 +57,13 @@ export type SteamOwnedGame = {
   img_logo_url?: string
   /** False means the game exposes no achievements — treat it as having none. */
   has_community_visible_stats?: boolean
-  /** Only GetOwnedGames returns this — GetRecentlyPlayedGames does not. */
+  /**
+   * Only GetOwnedGames returns this, and only for the account that owns the
+   * API key (#113): everyone else's games come without it.
+   */
   rtime_last_played?: number
+  /** Ours, not Steam's: when it was last played, from kept unlocks and observed hours (`withLastPlayed`). */
+  last_played_at?: number
 }
 
 export type SteamOwnedGamesResponse = {

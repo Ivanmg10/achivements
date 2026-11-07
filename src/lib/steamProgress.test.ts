@@ -32,7 +32,9 @@ import {
   loadGlobalPct,
   loadOwnedGames,
   fetchBatchCounts,
+  withLastPlayed,
 } from './steamProgress'
+import pool from '@/lib/db'
 import { toSteamGameProgress } from '@/utils/steamMappers'
 
 const AUTH = { id: '7', steamid: '765', apiKey: 'key' }
@@ -132,24 +134,23 @@ describe('mapWithConcurrency', () => {
 
 describe('progress cache key and TTL', () => {
   test('the key moves when the game is played again', () => {
-    const before = progressCacheKey('765', game(1, { rtime_last_played: LONG_AGO }))
-    const after = progressCacheKey('765', game(1, { rtime_last_played: LONG_AGO + 3600 }))
-    expect(before).toBe(`steamProgress2:765:1:${LONG_AGO * 1000}`)
+    const before = progressCacheKey('765', game(1))
+    const after = progressCacheKey('765', game(1, { playtime_forever: 130 }))
+    expect(before).toBe('steamProgress3:765:1:100')
     expect(after).not.toBe(before)
   })
 
-  test('an undated game gets a stable key', () => {
-    expect(progressCacheKey('765', game(1, { rtime_last_played: undefined }))).toBe('steamProgress2:765:1:0')
+  test('a game Steam leaves undated (#113) gets the same key, and it still moves with its minutes', () => {
+    const undated = { rtime_last_played: undefined }
+    expect(progressCacheKey('765', game(1, undated))).toBe('steamProgress3:765:1:100')
+    expect(progressCacheKey('765', game(1, { ...undated, playtime_forever: 101 }))).toBe('steamProgress3:765:1:101')
   })
 
-  test('settled games keep counts for a month; ones played in the last 48h for an hour', () => {
-    const now = Date.parse('2026-09-21T12:00:00Z')
-    const old = game(1, { rtime_last_played: Math.floor(now / 1000) - 3 * 24 * 3600 })
-    const active = game(2, { rtime_last_played: Math.floor(now / 1000) - 3600 })
-
-    expect(progressTtl(old, now)).toBe(TTL.settledProgress)
-    expect(progressTtl(active, now)).toBe(TTL.achievements)
-    expect(progressTtl(game(3, { rtime_last_played: undefined }), now)).toBe(TTL.settledProgress)
+  test('settled games keep counts for a month; ones played in the last two weeks for an hour', () => {
+    expect(progressTtl(game(1))).toBe(TTL.settledProgress)
+    expect(progressTtl(game(2, { playtime_2weeks: 30 }))).toBe(TTL.achievements)
+    expect(progressTtl(game(3, { rtime_last_played: undefined, playtime_2weeks: 30 }))).toBe(TTL.achievements)
+    expect(progressTtl(game(4, { rtime_last_played: undefined }))).toBe(TTL.settledProgress)
   })
 
   test('only played games with achievements are countable', () => {
@@ -368,7 +369,7 @@ describe('loadOwnedGames', () => {
 
     expect(await loadOwnedGames(AUTH)).toEqual({ response: { game_count: 1, games: [{ appid: 1 }] } })
     const [key, ttl, , options] = (withSteamCache as jest.Mock).mock.calls[0]
-    expect(key).toBe('steamOwnedRaw:765')
+    expect(key).toBe('steamOwnedRaw:v2:765')
     expect(ttl).toBe(TTL.recentlyPlayed)
     expect(options).toMatchObject({ userId: '7', refreshable: true })
     expect(getOwnedGames).toHaveBeenCalledWith('765', 'key')
@@ -451,5 +452,54 @@ describe('batched counts', () => {
     top.mockResolvedValue({ response: { games: [] } })
     expect(await fetchBatchCounts(AUTH, Array.from({ length: 250 }, (_, i) => i + 1))).toEqual(new Map())
     expect(top.mock.calls.map((c) => c[2].length)).toEqual([100, 100, 50])
+  })
+})
+
+describe('withLastPlayed (#113)', () => {
+  const now = 1_790_000_000_000
+  const t = now / 1000
+  const query = pool.query as jest.Mock
+
+  beforeEach(() => query.mockReset())
+
+  test("the API key's owner keeps Steam's dates and costs no query", async () => {
+    const data = { response: { game_count: 2, games: [
+      { appid: 1, playtime_forever: 50, rtime_last_played: t - 100 },
+      { appid: 2, playtime_forever: 0 },
+    ] } }
+    expect(await withLastPlayed(AUTH, data, now)).toBe(data)
+    expect(query).not.toHaveBeenCalled()
+  })
+
+  test('anyone else gets the newest of their kept unlock and kept hours, and the new hours are kept', async () => {
+    query.mockImplementation(async (sql: string) => {
+      if (sql.includes('FROM steam_unlocks')) return { rows: [{ appid: 1, at: String(t - 5000) }, { appid: 2, at: String(t - 9000) }] }
+      if (sql.includes('FROM steam_playtime')) return { rows: [{ appid: 2, minutes: 40, played: String(t - 7000) }, { appid: 3, minutes: 10, played: null }] }
+      return { rows: [] }
+    })
+    const data = { response: { game_count: 4, games: [
+      { appid: 1, playtime_forever: 120 },
+      { appid: 2, playtime_forever: 40 },
+      { appid: 3, playtime_forever: 25, playtime_2weeks: 15 },
+      { appid: 4, playtime_forever: 0 },
+    ] } }
+    const games = (await withLastPlayed(AUTH, data, now)).response.games!
+    expect(games.map((g) => g.last_played_at)).toEqual([t - 5000, t - 7000, t, undefined])
+    const write = query.mock.calls.find(([sql]) => sql.startsWith('INSERT INTO steam_playtime'))!
+    // Game 1 first seen (undated), game 3 played since (now, as Steam counts it in the two weeks).
+    expect(write[1]).toEqual(['7', '765', [1, 3], [120, 25], [null, t]])
+  })
+
+  test('without the tables (migration 045 not applied) the dates come from what is left, and nothing fails', async () => {
+    query.mockRejectedValue(Object.assign(new Error('relation "steam_playtime" does not exist'), { code: '42P01' }))
+    const data = { response: { games: [{ appid: 1, playtime_forever: 120, playtime_2weeks: 30 }] } }
+    const games = (await withLastPlayed(AUTH, data, now)).response.games!
+    expect(games[0].last_played_at).toBeUndefined()
+    expect(console.error).toHaveBeenCalled()
+  })
+
+  test('a private library is left as it came', async () => {
+    const data = { response: {} }
+    expect(await withLastPlayed(AUTH, data, now)).toBe(data)
   })
 })

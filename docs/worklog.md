@@ -33,6 +33,47 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-07 — Steam last-played for everyone, not only the key's owner (`fix/113-steam-last-played`, #113)
+
+**Did** — One "last played" for Steam, `lastPlayedOf` (`src/utils/steamMappers.ts`): Steam's `rtime_last_played` when it
+comes (only the API key's owner), else the newest of the game's last kept unlock (`steam_unlocks`), the last rise in its
+hours (new `steam_playtime`, `migrations/045_steam_playtime.sql`) and `playtime_2weeks > 0` / the game in
+`GetRecentlyPlayedGames`. `withLastPlayed` (`src/lib/steamProgress.ts`) adds `last_played_at` inside `loadOwnedGames` and
+the score refresh's owned read, and records the hours. Readers moved onto it: `lastPlayedGames`, `toSteamGameProgress` (so
+the library, recently played, the friend banner and every `lastPlayed` sort), `loadActivityAchievements` (activity, the
+year, the streak, the Following and home Friends data), `/api/steam/recentlyPlayed` (the recent list now counts every game
+in it, not only the ones the owned list lacks). `progressCacheKey` is keyed by minutes (`steamProgress3:`), `progressTtl` is
+one hour for games with minutes in the last two weeks. `scoreRefresh`'s Steam `changeKey` is
+`playtime_forever:rtime_last_played`. Unlinking deletes the kept hours too; `/privacy` says so in all nine languages.
+Cache keys bumped: `steamOwnedRaw:v2:`, `steamOwned3:`, `steamRecent:v3:` (and `scripts/demo-rankings.mjs` seeds the new
+ones). Tests with an account Steam does not date in every touched file.
+**Why** — Steam's `GetOwnedGames` sends `rtime_last_played` only for the key's owner (measured 2026-11-03), so for everyone
+else recently played, recent achievements, the counters, the streak and the friends' cards were empty, and their Steam games
+were scored once and never read again (`changeKey` `''` on both sides).
+**Decisions** — Dates per signal: a kept unlock is exact; a rise in hours is dated at the read that saw it when Steam counts
+minutes in the last two weeks, else two weeks before that read (it cannot be later); a first sight is undated; two-week
+minutes alone are `now − 14 days`, the start of the window, so a date is never later than the truth (a game played
+yesterday may read "two weeks ago" until a rise or an unlock dates it). None of them reaches the streak, heatmap or counters
+as a day: those count unlocks with their own dates; a date only picks which games are read. The derived date is not in the
+score `changeKey`: its two-week part moves every read, its unlock part is written by the refresh's own read, and a rise in
+hours already moves the minutes. The new key differs from every stored one, so each Steam game is read once more on the next
+refresh (what a `RULES_VERSION` bump does). The score refresh also records hours, so the daily cron dates the games of
+someone who stays away to about a day. `TWO_WEEKS_S` lives in the mappers and is reused.
+**Also checked (PSN, RA, read from code and docs, no calls):** neither depends on whose credential reads. PSN reads every
+profile as the app's one account anyway: `getUserTitles` gives `lastUpdatedDateTime` per trophy set and
+`getUserPlayedGames` `lastPlayedDateTime`, both governed by the target's own privacy settings (`psnClient.ts`, 331/390); the
+owner's measurement on #113 (39/39, 50/50, 2/2 on other accounts) agrees. RA keys are not scoped to their owner (a valid key
+reads any public user, `docs/accounts.md` → RA sign-up), and the score's change key is `MostRecentAwardedDate`, not a
+last-played field. Xbox, measured on #113, is fine too. Steam is the only one.
+**Open** — **Apply `migrations/045_steam_playtime.sql`** to pre, then production when it reaches `main` (owner). Until then
+every owned-list read logs the missing table and games with no achievements played more than two weeks ago stay undated;
+nothing fails. Check on the preview with an ordinary account (not the key's owner): recently played, the counters, the
+streak, a Steam-only friend's card. No `friends.ts` test was added: it reads `lastPlayed`, which is now filled upstream.
+**Watch out** — Never read `rtime_last_played` directly: go through `lastPlayedOf`. The first owned read after the
+migration only records hours (no dates); dates from hours start with the next rise.
+
+---
+
 ## 2026-11-07 — CLAUDE.md slimmed to its rules, the old worklog archived (`docs/124-slim-claude-md`, #124)
 
 **Did** — `CLAUDE.md` from 1,495 lines / 111 KB to about 565 / 38 KB: the rules every task obeys, one line each, with

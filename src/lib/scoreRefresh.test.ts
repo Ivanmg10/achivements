@@ -6,7 +6,12 @@ jest.mock('@/lib/steamCache', () => ({
   readCache: jest.fn(),
   writeCache: jest.fn(),
 }))
-jest.mock('@/lib/steamProgress', () => ({ fetchPlayerAchievements: jest.fn(), isNoStats: () => false, loadGlobalPct: jest.fn(async () => new Map()) }))
+jest.mock('@/lib/steamProgress', () => ({
+  fetchPlayerAchievements: jest.fn(),
+  isNoStats: () => false,
+  loadGlobalPct: jest.fn(async () => new Map()),
+  withLastPlayed: jest.fn(async (_auth: unknown, data: unknown) => data),
+}))
 jest.mock('@/lib/attemptLimit', () => ({ allowAttempt: jest.fn(async () => true) }))
 jest.mock('@/lib/upstreamCount', () => ({ steamBudgetLow: jest.fn(async () => false) }))
 jest.mock('@/lib/psnClient', () => {
@@ -38,7 +43,7 @@ import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
 import { XboxError } from '@/lib/xboxClient'
 import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raClient'
 import { getOwnedGames } from '@/lib/steamClient'
-import { fetchPlayerAchievements } from '@/lib/steamProgress'
+import { fetchPlayerAchievements, withLastPlayed } from '@/lib/steamProgress'
 import { RULES_VERSION } from '@/utils/vaultScore'
 import { classifyFailure, continueFill, onPlatformLinked, PACE, refreshScore, refreshScoreIfStale, runScorePass } from './scoreRefresh'
 
@@ -199,6 +204,27 @@ describe('refreshScore', () => {
     // Every read failing is the platform down, not a few odd games.
     ;(fetchPlayerAchievements as jest.Mock).mockRejectedValue(Object.assign(new Error('Steam 500'), { status: 500 }))
     expect((await refreshScore(7, Date.now() + 10_000)).platforms.steam).toMatchObject({ state: 'error', error: 'unavailable' })
+    delete process.env.STEAM_API_KEY
+  })
+
+  it('a Steam game moves with its minutes, though Steam sends no date (#113)', async () => {
+    userRow = user({ steamid: 's1' })
+    process.env.STEAM_API_KEY = 'key'
+    const row = (id: number, key: string) => ({ game_id: String(id), account: 's1', title: `G${id}`, points: 10, change_key: key, rules_version: RULES_VERSION, provisional: false, flag: null })
+    // Scored before the fix: an empty key for every game of an account that is not the key's owner.
+    stored = [row(1, '1874:0'), row(2, '')]
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { game_count: 3, games: [
+      { appid: 1, name: 'Portal 2', playtime_forever: 1874, has_community_visible_stats: true },
+      { appid: 2, name: 'Hades', playtime_forever: 3410, playtime_2weeks: 95, has_community_visible_stats: true },
+      { appid: 3, name: 'Terraria', playtime_forever: 610, has_community_visible_stats: true },
+    ] } })
+    ;(fetchPlayerAchievements as jest.Mock).mockResolvedValue([{ apiname: 'A', achieved: 1, unlocktime: 1_760_000_000 }])
+
+    await refreshScore(7, Date.now() + 10_000)
+    expect((fetchPlayerAchievements as jest.Mock).mock.calls.map(([, appId]) => appId).sort()).toEqual([2, 3])
+    expect(writes.map((w) => w.game_id).sort()).toEqual([2, 3])
+    // The library read keeps the hours seen, for the dates.
+    expect(withLastPlayed).toHaveBeenCalledWith({ id: '7', steamid: 's1', apiKey: 'key' }, expect.anything())
     delete process.env.STEAM_API_KEY
   })
 
