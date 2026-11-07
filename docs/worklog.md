@@ -42,6 +42,9 @@ shared an antislop base and differed in where the signature came from (logo shap
 applied (one angle, only big gestures and the player's own marks, never data, the "/" as signature, a dot in round), not new
 brand devices. They chose the old canvas's B (B v2); its `Piezas`, `SheetHoy` and `SheetB2` were brought over unchanged but
 for the image ids, and A/B/C removed.
+**Round 3** — B v2 confirmed after the owner asked why only some pieces slant. Page 2 started with the Home: the
+old `MejHome` points re-checked against `visual/V1.md`, 14 now (month names in the browser's locale added), the ones B
+already brings marked "ya lo trae B"; V1-03's cuts left out, as the owner rejected cuts.
 **Open** — Pages 2 (improvements per screen, from `MejHome.dc.html`), 3 (themes from
 zero) and 4 (landing: screen 1 v2 kept, a second variant with Landing v2's band, and the "qué es" sections redone).
 **Watch out** — The canvas sources live in the scratchpad of that session; read them back from the artifact (`read`
