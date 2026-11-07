@@ -33,6 +33,10 @@ test('anything off is refused', () => {
   }
 })
 
+test('an entry is keyed by platform, game and achievement', () => {
+  expect(showcaseKey({ source: 'ra', gameId: 3, achievementKey: '42' })).toBe('ra:3:42')
+})
+
 test('an RA achievement is an entry only once earned, hardcore date first', () => {
   const a = { ID: 7, Title: 'A', Description: 'Do it', BadgeName: '9', DateEarned: '2026-10-01 10:00:00', DateEarnedHardcore: '2026-10-02 10:00:00' }
   expect(raShowcaseEntry(a, 3, 'Zelda')).toMatchObject({ source: 'ra', gameId: 3, achievementKey: '7', badge: 'https://media.retroachievements.org/Badge/9.png' })

@@ -28,6 +28,28 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 "added X to CLAUDE.md".
 
 ---
+
+## 2026-11-07 — Dead code out (`refactor/117-dead-code`, #117)
+
+**Did** — Deleted what nothing reads, each checked by grep first (antislop audit #77, plan S1): the old home cards
+(`MainPageMastery`, `MainPagePerfectGames`, `MainPageGamesList` and their pieces), `GamesPlayedPieChart`, `MainStart`,
+`ragamesidpool.ts`, `CATEGORIES`, `getGamesInfo`, `getWantGames`, `groupByDay`, `groupByConsole`, `calcStreak`, the
+`calcAllStreaks` re-export, `showcaseFromUnlock`, `withAchievementCounts`, `GET /api/follows`, `modalOverlay`/`modalContent`,
+`isLimited`, `FadeImage.placeholderClassName`, `IconButton`'s `accent` tone, the home's unreachable "not linked" profile
+branches (and their three `rounded-3xl` guard exceptions), 39 light-theme rules for palette classes nobody uses,
+`--accent-muted` (equal to `--accent` in every theme), `commit_all.tmp.sh`,
+`tailwind.config.ts`, `tasks/`, `public/media/3DSa.png`; un-exported four `lib` functions used only in their file.
+Then 121 translation keys no component reads, in all nine languages (~1,160 lines). About 3,200 lines in all.
+**Decisions** — Kept what the audit marked as plausible or owned by a later issue: `GAME_SOURCES` (#119 uses it),
+`Tabs.size` (#120 may need the small tabs), `Notice.title/action`, `StreakTag lg`, `rarityTone` (its test), the shape-token
+move of AP-07 (a visible change, with #118), the DARK block (it restates the base, but
+`themeGroups.test.ts` checks every theme is named in `globals.css`). No test for unread keys: dynamic access (`T.libraryLayout.shelves[id].hint`)
+fools a grep, so it would fail on keys that are read. The keys were found by a script and then checked by eye.
+**Watch out** — `Key` on unlocks is now set by the mappers and read by nothing (only `showcaseFromUnlock` read it); left
+in place, as dropping it changes cached shapes. CLAUDE.md lost its line about it.
+
+---
+
 ## 2026-11-02 — Second pass: caches and moving inside the app (`perf/101-bff-by-domains`, #101)
 
 **Did** — Measured client navigation (the first pass measured full loads only): coming back to the home asked

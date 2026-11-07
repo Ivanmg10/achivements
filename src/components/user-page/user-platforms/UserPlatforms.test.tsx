@@ -55,7 +55,6 @@ test('each connected platform shows its headline numbers', () => {
   const ra = screen.getByRole('region', { name: 'RetroAchievements' })
   expect(ra).toHaveTextContent(en.userStats.globalRank)
   expect(ra).toHaveTextContent(/4.?200/)
-  expect(screen.queryByRole('button', { name: en.userPage.viewData })).not.toBeInTheDocument()
 })
 
 test('disconnecting RA unlinks it', () => {

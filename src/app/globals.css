@@ -63,7 +63,7 @@
 }
 
 /* ============================================
-   VARIABLES BASE — fallback, and the dark themes' values
+   VARIABLES BASE — fallback
    ============================================ */
 
 :root,
@@ -335,6 +335,33 @@ html[data-font="fira"],
 [data-theme="arctic"] {
   --hardcore: 161 98 7;
   --softcore: 29 78 216;
+}
+
+/* ============================================
+   DARK
+   ============================================ */
+[data-theme="dark"],
+[data-theme="dark-red"],
+[data-theme="dark-green"],
+[data-theme="dark-blue"],
+[data-theme="dark-white"] {
+  --bg-main: 15 16 20;
+  --bg-header: 10 10 14;
+  --bg-card: 23 24 30;
+  --bg-tertiary: 35 36 46;
+
+  --text-main: 225 228 235;
+  --text-secondary: 140 145 155;
+
+  /* Violet, a step lighter than the light theme's so it stands out on a dark surface. */
+  --accent: 167 139 250;
+  --accent-hover: 196 181 253;
+
+  --success: 34 197 94;
+  --warning: 245 158 11;
+  --info: 96 165 250;
+  --danger: 239 68 68;
+  --chart-2: 245 158 11;
 }
 
 /* ============================================
