@@ -57,7 +57,11 @@ boxes, shrinking, cuts). Library views came from the owner's own production capt
 page, "Qué es" redone, phone) drawn; /allGames rework proposed as the library with a "Todos" status; streak calendar widened.
 **Round 8** — Landing approved with "Fondo". Last screens drawn while the owner was away: sign-in and sign-up (+ reset,
 signed-out 404), the public pages and the phone. Welcome left alone; app 404 kept.
-**Next** — The owner reviews `MejAcceso`, `MejPublicas`, `MejMovil` by board and number. Then turn the agreed points into
+**Round 9** — Last three boards reviewed. Sign-in: all agreed, 4 (bigger covers at 2560) to try and revert if disliked.
+Public pages: the owner asked whether the signed-out profile card is needed; kept (it is what a shared link and its
+preview show), all nine points agreed. Phone: all agreed but 11 (cookie notice stays); 7 still open, proposed a folded
+profile (one line, "Ver perfil" opens it) over moving it below the games. The canvas is complete.
+**Next** — Decide phone 7. Then turn the agreed points into
 issues (the plan in the report's §3.6: per-screen issues go after the canvas), starting with the bugs and the shared pieces.
 **Open** — The owner's review of the last six boards. Pages 3 (themes from zero) and 4 (landing). Captures: the Playwright
 MCP profile was locked by another process this session; a fresh `playwright-cli` profile is signed out.
