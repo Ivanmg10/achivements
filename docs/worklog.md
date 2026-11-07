@@ -55,6 +55,10 @@ rankings, streak, dialogs). Points the owner already declined elsewhere were not
 boxes, shrinking, cuts). Library views came from the owner's own production captures (browser bar cropped off).
 **Round 7** — Pages 3 (themes: base + accent, named eight kept, no removals) and 4 (landing: chosen screen, Fondo/Franja
 page, "Qué es" redone, phone) drawn; /allGames rework proposed as the library with a "Todos" status; streak calendar widened.
+**Round 8** — Landing approved with "Fondo". Last screens drawn while the owner was away: sign-in and sign-up (+ reset,
+signed-out 404), the public pages and the phone. Welcome left alone; app 404 kept.
+**Next** — The owner reviews `MejAcceso`, `MejPublicas`, `MejMovil` by board and number. Then turn the agreed points into
+issues (the plan in the report's §3.6: per-screen issues go after the canvas), starting with the bugs and the shared pieces.
 **Open** — The owner's review of the last six boards. Pages 3 (themes from zero) and 4 (landing). Captures: the Playwright
 MCP profile was locked by another process this session; a fresh `playwright-cli` profile is signed out.
 **Watch out** — Captures of the account page or anything over it show the owner's email (sharp, or readable behind a
