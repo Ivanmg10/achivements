@@ -61,8 +61,8 @@ signed-out 404), the public pages and the phone. Welcome left alone; app 404 kep
 Public pages: the owner asked whether the signed-out profile card is needed; kept (it is what a shared link and its
 preview show), all nine points agreed. Phone: all agreed but 11 (cookie notice stays); 7 left to the agent: the profile
 folded to one line ("Ver perfil" opens it), not moved below the games. The owner leaves phone details to the agent's
-judgement. The cursor spotlight (`.spotlight`, `useSpotlight`, 21 components): the owner asked; recommended dropping it
-(as the audit's V5/V7 say), waiting on their answer. The canvas is complete.
+judgement. The cursor spotlight (`.spotlight`, `useSpotlight`, 21 components): the owner asked; dropped (owner,
+2026-11-07; as the audit's V5/V7 said): the finished bar keeps the only glow, the links inside a card keep their own hover. The canvas is complete.
 **Next** — Turn the agreed points into
 issues (the plan in the report's §3.6: per-screen issues go after the canvas), starting with the bugs and the shared pieces.
 **Open** — The owner's review of the last six boards. Pages 3 (themes from zero) and 4 (landing). Captures: the Playwright
