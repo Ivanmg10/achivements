@@ -63,7 +63,9 @@ preview show), all nine points agreed. Phone: all agreed but 11 (cookie notice s
 folded to one line ("Ver perfil" opens it), not moved below the games. The owner leaves phone details to the agent's
 judgement. The cursor spotlight (`.spotlight`, `useSpotlight`, 21 components): the owner asked; dropped (owner,
 2026-11-07; as the audit's V5/V7 said): the finished bar keeps the only glow, the links inside a card keep their own hover. The canvas is complete.
-**Next** — Turn the agreed points into
+**Issues** — Opened from the canvas, 2026-11-07: #127–#136 (list and order in the report's §3.6); comments on #118
+(cookie sheet stays), #120 (spotlight goes) and #126 (the result).
+**Next** — #116 CI, then the plan's order. Old note: turn the agreed points into
 issues (the plan in the report's §3.6: per-screen issues go after the canvas), starting with the bugs and the shared pieces.
 **Open** — The owner's review of the last six boards. Pages 3 (themes from zero) and 4 (landing). Captures: the Playwright
 MCP profile was locked by another process this session; a fresh `playwright-cli` profile is signed out.

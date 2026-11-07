@@ -558,6 +558,12 @@ Three issues opened before the audit join the plan (2026-11-06):
 | #114 recently-played rows misaligned | inside #115's viewport sweep | same sweep, same rows; the cause may be a width band |
 | #115 profile on Steam Deck and AYN Thor | after #125 and the per-screen issues | fixing rows before they become one shell and take direction B would be done twice |
 
+Opened from the second canvas (2026-11-07), in this order after #125: #127 slant grammar of B v2 (before the screens),
+#128 home, #129 library, game pages and `/allGames`, #130 following, profiles, rankings and groups, #131 streak page,
+#132 account and dialogs, #133 sign-in, sign-up and public pages, #134 phone, #135 theme picker (with #123), then #115
+and #136 the landing last. Bugs already in #118 are pointed at, not repeated; the cursor spotlight goes to #120; the
+cookie sheet on phones stays (dropped from #118).
+
 ## 3.7 The owner's answers on the canvas (2026-11-06)
 
 **2026-11-07: the identity and theme answers below are no longer binding.** The owner asked for the canvas to be redone
