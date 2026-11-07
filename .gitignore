@@ -47,3 +47,6 @@ graphify-out/
 
 # playwright mcp (logs and snapshots of browser sessions)
 .playwright-mcp/
+
+# antislop audit (#77): screenshots and working notes
+.audit/
