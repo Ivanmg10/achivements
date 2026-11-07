@@ -575,6 +575,13 @@ cuts became per-screen improvements, and the landing's first screen is chosen.
   site below, with no "press start". Drawn as Landing v2, desktop and phone. v2's first screen read flat and its italic menu off-style; landing v3 has three first screens and the sections below with real crops and the real FAQ.
 - **Cuts:** instead of page reworks, a review of what can be improved inside each screen as it is (proposed 2026-11-06, waiting for the owner).
 
+**Home, per-screen review (2026-11-07, new canvas).** Approved: the Home points but 14, the cover's points but 3, the
+platform tabs' points but 3 and 8 (`docs/designs.md`, canvas SZB3BhCYKkXabJMA75fz8D). **Do not touch, the owner's call:**
+the cards inside cards on the home (one surface level was drawn and declined; V1-07 stays as it is); the cover showing the
+last game played on top and the rest below (by design); **the heatmap's column-by-column entrance (V1-17: the owner likes how
+it loads now)**; the per-platform colour of the "finished" figure on the profile card. Type-to-search is intended; only "/"
+being typed into the box is the bug (V1-12). The cover's "99 %" ring is the level's loader, which sometimes never resolves: a bug.
+
 ## 3.5 Coverage
 
 - **Code**: every non-test file in `src/` read in full by one of eleven auditors, each with a per-file table

@@ -48,6 +48,8 @@ already brings marked "ya lo trae B"; V1-03's cuts left out, as the owner reject
 **Round 4** — Home points approved but 10 (type-to-search is intended; only "/" typed into the box is the bug) and 14
 (drawn as `Mej14`). The owner asked to cover the cover layout and the per-platform profile tabs too: `MejPortada` (12) and
 `MejPlataformas` (8). Portada's point 3 (hero says AC II, the list starts with Fallout 4) must be checked in code first.
+**Round 5** — Home review closed: what not to touch is in the report's §3.7 (one surface level declined, the heatmap's
+entrance stays, the cover's hero by design, platform colours stay); the "99 %" ring is the level loader getting stuck.
 **Open** — Pages 2 (improvements per screen, from `MejHome.dc.html`), 3 (themes from
 zero) and 4 (landing: screen 1 v2 kept, a second variant with Landing v2's band, and the "qué es" sections redone).
 **Watch out** — The canvas sources live in the scratchpad of that session; read them back from the artifact (`read`
