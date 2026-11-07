@@ -1237,6 +1237,8 @@ Hotfix (production is broken): `hotfix/<slug>` from `main` → PR into `main`, t
 merge `main` back into `develop` so they do not diverge.
 
 Never force-push `main` or `develop`. Never merge a PR with failing `npm test`/lint/build.
+`.github/workflows/ci.yml` (check `checks`) runs types, lint, tests and build on every PR into `develop` or
+`main`, with no secrets: the build needs none (checked 2026-11-07). Fix the code, never the workflow.
 Do not create, push, merge or delete branches or PRs unless the user asked.
 
 ### Branch names

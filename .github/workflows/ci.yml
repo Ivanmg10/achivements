@@ -1,0 +1,36 @@
+# Types, lint, tests and build on every PR, so the guard tests (uiGuard,
+# designTokens, themes) and "never merge red" hold without anyone checking
+# by hand (CLAUDE.md → Git; antislop audit #77, X10).
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          # Vercel's default runtime (.tool-versions is ivm's, not read here).
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Types
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npm run lint
+      - name: Tests
+        run: npx jest --ci
+      - name: Build
+        run: npm run build
