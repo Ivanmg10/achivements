@@ -29,6 +29,24 @@ Facts that must keep holding go in `CLAUDE.md`, not here; an entry can say
 
 ---
 
+## 2026-11-07 — Antislop canvas v2: page 1, identity from zero (`chore/77-antislop-pass`, #126)
+
+**Did** — New design canvas (https://claude.ai/artifact/SZB3BhCYKkXabJMA75fz8D), as `docs/audits/antislop-canvas-v2-brief.md`
+asks. Page 1 only: the owner's real crops, Hoy redrawn from today's tokens, and three identity directions (A El escudo,
+B El título, C La vitrina) on the same pieces, each switchable slanted/round and Dark/Venom. Row in `docs/designs.md`.
+**Why** — The owner wants identity, per-screen improvements, themes and the landing proposed again, one page at a time.
+**Decisions** — Asked first (2026-11-07): both designs stay; the app takes only the logo and its colour from the MGS2
+landing; three directions; the problem is "generic / AI-made" and "not recognisable", not the slant. So every direction
+shares an antislop base (no kicker wallpaper, no glow, one colour for "yours" = the logo's, upright data bars, the logo
+on screen) and differs in where the signature comes from: the logo's shape (A), the type (B), the games' art (C).
+In Venom "yours" is the logo's purple, not the bone accent. C's split of the week by game is illustrative (totals real).
+**Open** — The owner's verdict on page 1; then pages 2 (improvements per screen, from `MejHome.dc.html`), 3 (themes from
+zero) and 4 (landing: screen 1 v2 kept, a second variant with Landing v2's band, and the "qué es" sections redone).
+**Watch out** — The canvas sources live in the scratchpad of that session; read them back from the artifact (`read`
+with `path`) before editing in a new one.
+
+---
+
 ## 2026-11-06 — Antislop: the owner's answers, v2 of the canvas, lessons in CLAUDE.md (`chore/77-antislop-pass`)
 
 **Did** — CLAUDE.md gained "The antislop audit (#77)": where the report is, the issue order, the owner's
