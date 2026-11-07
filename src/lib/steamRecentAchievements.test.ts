@@ -120,6 +120,22 @@ test('names a game without a title by its app id', async () => {
   expect(first.gameTitle).toBe('App 1')
 })
 
+test('scans the games played last for an account Steam does not date (#113)', async () => {
+  ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { game_count: 3, games: [
+    { appid: 1, name: 'Fallout 4', playtime_forever: 4120, has_community_visible_stats: true },
+    { appid: 2, name: 'Hades', playtime_forever: 3410, playtime_2weeks: 95, has_community_visible_stats: true },
+    { appid: 3, name: 'Untouched', playtime_forever: 50, has_community_visible_stats: true },
+  ] } })
+  ;(pool.query as jest.Mock).mockImplementation(async (sql: string) =>
+    sql.includes('GROUP BY appid') ? { rows: [{ appid: 1, at: '1700000200' }] } : { rows: [] },
+  )
+
+  const list = await loadRecentAchievements(AUTH, 'english')
+
+  expect((getPlayerAchievements as jest.Mock).mock.calls.map(([, , appId]) => appId).sort()).toEqual([1, 2])
+  expect(list[0].apiname).toBe('NEWEST')
+})
+
 test('returns nothing when nothing was ever played', async () => {
   ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: {} })
   await expect(loadRecentAchievements(AUTH, 'english')).resolves.toEqual([])
@@ -174,6 +190,24 @@ describe('loadActivityAchievements', () => {
     expect(list.map((a) => [a.gameTitle, a.apiname])).toEqual([['Fallout 4', 'NEWEST'], ['Hades', 'MIDDLE']])
     const read = (pool.query as jest.Mock).mock.calls.find(([sql]) => String(sql).includes('FROM steam_unlocks'))
     expect(read[1]).toEqual(['7', '765', [1], 40 * DAY])
+  })
+
+  // Every account but the API key's owner (#113): no rtime_last_played on any game.
+  test('a library Steam leaves undated is scanned by its kept unlocks and the last two weeks', async () => {
+    ;(getOwnedGames as jest.Mock).mockResolvedValue({ response: { game_count: 4, games: [
+      { appid: 1, name: 'Fallout 4', playtime_forever: 4120, has_community_visible_stats: true },
+      { appid: 2, name: 'Hades', playtime_forever: 3410, playtime_2weeks: 95, has_community_visible_stats: true },
+      { appid: 3, name: 'Stale', playtime_forever: 300, has_community_visible_stats: true },
+      { appid: 4, name: 'No stats', playtime_forever: 610, playtime_2weeks: 30, has_community_visible_stats: false },
+    ] } })
+    ;(pool.query as jest.Mock).mockImplementation(async (sql: string) =>
+      sql.includes('GROUP BY appid') ? { rows: [{ appid: 1, at: String(90 * DAY) }, { appid: 3, at: String(10 * DAY) }] } : { rows: [] },
+    )
+
+    const list = await loadActivityAchievements(AUTH, 'english', 60, NOW_MS)
+
+    expect((getPlayerAchievements as jest.Mock).mock.calls.map(([, , appId]) => appId).sort()).toEqual([1, 2])
+    expect(list.map((a) => a.apiname)).toEqual(['NEWEST', 'MIDDLE'])
   })
 
   test('every read keeps its dated unlocks', async () => {

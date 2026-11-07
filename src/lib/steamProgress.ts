@@ -1,5 +1,5 @@
 import { withSteamCache, readCacheMany, writeCache, TTL } from '@/lib/steamCache'
-import { recordUnlocks } from '@/lib/steamUnlocks'
+import { latestUnlocks, observePlaytime, recordUnlocks } from '@/lib/steamUnlocks'
 import { getGlobalAchievementPercentages, getOwnedGames, getPlayerAchievements, getSchemaForGame, getTopAchievementsForGames } from '@/lib/steamClient'
 import { countUnlocks, toGlobalPctMap, withUnlockCounts } from '@/utils/steamMappers'
 import type {
@@ -16,13 +16,6 @@ import type {
 
 /** Parallel Steam calls per enrichment — keeps a burst well under the rate limit. */
 const CONCURRENCY = 4
-
-/**
- * A game played this recently may still be mid-session, unlocking achievements
- * without its last-played time having moved yet — so its counts get the short
- * TTL instead of the settled one.
- */
-const ACTIVE_WINDOW_MS = 48 * 60 * 60 * 1000
 
 export type SteamAuth = { id: string; steamid: string; apiKey: string }
 
@@ -51,15 +44,41 @@ export function isPrivateLibrary(data: SteamOwnedGamesResponse | null | undefine
  */
 export function loadOwnedGames(auth: SteamAuth): Promise<SteamOwnedGamesResponse> {
   return withSteamCache<SteamOwnedGamesResponse>(
-    `steamOwnedRaw:${auth.steamid}`,
+    // v2: games Steam does not date carry `last_played_at`.
+    `steamOwnedRaw:v2:${auth.steamid}`,
     TTL.recentlyPlayed,
-    async () => (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse,
+    async () => withLastPlayed(auth, (await getOwnedGames(auth.steamid, auth.apiKey)) as SteamOwnedGamesResponse),
     {
       userId: auth.id,
       shouldCache: (d) => !isPrivateLibrary(d),
       refreshable: true,
     },
   )
+}
+
+/**
+ * Dates the played games Steam leaves undated (every account but the API key's
+ * owner, #113) with `last_played_at`: the newest of their kept unlocks and of
+ * the rises in hours seen so far, which this read also records. The key owner's
+ * games keep Steam's own date and cost no query.
+ */
+export async function withLastPlayed(
+  auth: SteamAuth,
+  data: SteamOwnedGamesResponse,
+  now = Date.now(),
+): Promise<SteamOwnedGamesResponse> {
+  const games = data?.response?.games
+  const undated = games?.filter((g) => !g.rtime_last_played && g.playtime_forever > 0) ?? []
+  if (!games || undated.length === 0) return data
+  const [unlocks, seen] = await Promise.all([
+    latestUnlocks(auth.id, auth.steamid),
+    observePlaytime(auth.id, auth.steamid, undated, now),
+  ])
+  const dated = games.map((g) => {
+    const at = g.rtime_last_played ? 0 : Math.max(unlocks.get(g.appid) ?? 0, seen.get(g.appid) ?? 0)
+    return at > 0 ? { ...g, last_played_at: at } : g
+  })
+  return { ...data, response: { ...data.response, games: dated } }
 }
 
 /**
@@ -148,18 +167,21 @@ export async function mapWithConcurrency<T, R>(
 }
 
 /**
- * Cache key for a game's unlock counts, including when it was last played.
- * Progress can only change by playing, and playing changes this key — so a
- * hit is correct however old it is, and a game played since is a miss.
+ * Cache key for a game's unlock counts, including its minutes played. Progress
+ * can only change by playing, and playing changes this key — so a hit is
+ * correct however old it is, and a game played since is a miss. Minutes, not
+ * the last-played date: Steam sends that date to the key's owner only (#113).
  */
 export function progressCacheKey(steamid: string, game: SteamGameProgress): string {
-  const played = game.lastPlayed ? Date.parse(game.lastPlayed) : 0
-  return `steamProgress2:${steamid}:${game.id}:${played}`
+  return `steamProgress3:${steamid}:${game.id}:${game.playtimeForever}`
 }
 
-export function progressTtl(game: SteamGameProgress, now = Date.now()): number {
-  const played = game.lastPlayed ? Date.parse(game.lastPlayed) : 0
-  return now - played < ACTIVE_WINDOW_MS ? TTL.achievements : TTL.settledProgress
+/**
+ * A game played in the last two weeks may still be mid-session, unlocking
+ * achievements before its minutes move — so its counts get the short TTL.
+ */
+export function progressTtl(game: SteamGameProgress): number {
+  return game.playtime2Weeks > 0 ? TTL.achievements : TTL.settledProgress
 }
 
 /** Only played games with achievements have counts worth fetching. */

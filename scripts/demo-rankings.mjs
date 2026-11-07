@@ -90,7 +90,7 @@ const psnNumericId = (titleId) => Number(titleId.slice(4, 9) + titleId.slice(10)
 async function loadPool(client) {
   const { rows } = await client.query(
     `SELECT cache_key, cache_data FROM steam_cache
-     WHERE cache_key LIKE 'steamSchema:%' OR cache_key LIKE 'steamGlobalPct:%' OR cache_key LIKE 'steamOwned2:%'
+     WHERE cache_key LIKE 'steamSchema:%' OR cache_key LIKE 'steamGlobalPct:%' OR cache_key LIKE 'steamOwned2:%' OR cache_key LIKE 'steamOwned3:%'
         OR cache_key LIKE 'psn:titles:v12:%' OR cache_key LIKE 'psn:trophies:v2:%' OR cache_key LIKE 'psn:groups:%'
      ORDER BY created_at`,
   )
@@ -102,7 +102,7 @@ async function loadPool(client) {
     if (parts[0] === 'steamSchema') steam(Number(parts[1])).schema[parts[2]] = data
     else if (parts[0] === 'steamGlobalPct') {
       for (const a of data?.achievementpercentages?.achievements ?? []) steam(Number(parts[1])).pct.set(a.name, parseFloat(a.percent))
-    } else if (parts[0] === 'steamOwned2') for (const g of data) steam(g.id).title ??= g.title
+    } else if (parts[0] === 'steamOwned2' || parts[0] === 'steamOwned3') for (const g of data) steam(g.id).title ??= g.title
     else if (parts[1] === 'titles') for (const g of data) psn(g.titleId).meta ??= g
     else {
       // psn:trophies:v2:<account>:<titleId>:<lastTrophyAt, with colons>:<lang>
@@ -223,8 +223,8 @@ function cacheRows(persona, accounts, steam, psn) {
   if (steam.length > 0) {
     const sid = accounts.steam
     const owned = steam.map((g) => g.progress).sort((a, b) => b.playtimeForever - a.playtimeForever)
-    put(`steamOwned2:${sid}`, owned)
-    put(`steamRecent:${sid}`, owned.filter((g) => g.playtime2Weeks > 0).sort((a, b) => b.lastPlayed.localeCompare(a.lastPlayed)).slice(0, 20))
+    put(`steamOwned3:${sid}`, owned)
+    put(`steamRecent:v3:${sid}`, owned.filter((g) => g.playtime2Weeks > 0).sort((a, b) => b.lastPlayed.localeCompare(a.lastPlayed)).slice(0, 20))
     for (const g of steam) put(`steamAch:${sid}:${g.id}`, g.player)
     for (const lang of STEAM_LANGS) {
       const unlocks = steam.flatMap((g) => {

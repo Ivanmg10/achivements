@@ -5,7 +5,7 @@ import { allowAttempt } from '@/lib/attemptLimit'
 import { getGameInfoAndUserProgress, getUserCompletionProgress } from '@/lib/raClient'
 import { getOwnedGames } from '@/lib/steamClient'
 import { readCache, withSteamCache, writeCache } from '@/lib/steamCache'
-import { fetchPlayerAchievements, isNoStats, loadGlobalPct } from '@/lib/steamProgress'
+import { fetchPlayerAchievements, isNoStats, loadGlobalPct, withLastPlayed } from '@/lib/steamProgress'
 import { steamBudgetLow } from '@/lib/upstreamCount'
 import { readRaKey } from '@/lib/raKey'
 import { PsnError, psnGameTrophies, psnTitles } from '@/lib/psnClient'
@@ -171,7 +171,8 @@ function steamPlan(userId: number, steamid: string, apiKey: string): Plan {
       const data = await withSteamCache<SteamOwnedGamesResponse>(
         `score:steamOwned:${steamid}`,
         STEAM_OWNED_TTL_MS,
-        async () => (await getOwnedGames(steamid, apiKey)) as SteamOwnedGamesResponse,
+        // Also keeps the hours seen, so the daily refresh dates the games of someone who stays away.
+        async () => withLastPlayed(auth, (await getOwnedGames(steamid, apiKey)) as SteamOwnedGamesResponse),
         // A private library is not cached: making it public takes effect on the next pass.
         { userId: String(userId), shouldCache: (d) => Boolean(d?.response?.games) },
       )
@@ -183,7 +184,8 @@ function steamPlan(userId: number, steamid: string, apiKey: string): Plan {
           id: g.appid,
           title: g.name ?? String(g.appid),
           console: '',
-          changeKey: g.rtime_last_played ? new Date(g.rtime_last_played * 1000).toISOString() : '',
+          // Minutes move whenever the game is played; Steam's date reaches the key's owner only (#113).
+          changeKey: `${g.playtime_forever}:${g.rtime_last_played ?? 0}`,
           provisional: null,
           read: async () => {
             const [unlocks, pct] = await Promise.all([fetchPlayerAchievements(auth, g.appid), loadGlobalPct(g.appid)])

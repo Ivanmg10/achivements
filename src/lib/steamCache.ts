@@ -29,7 +29,7 @@ export const TTL = {
   /** Achievement definitions change only when a developer ships an update. */
   schema: 24 * 60 * 60 * 1000,
   /**
-   * Unlock counts keyed by the game's last-played time. Progress can only move
+   * Unlock counts keyed by the game's minutes played. Progress can only move
    * when the game is played, which changes the key — so an entry for a game
    * not touched since is still right a month later.
    */
