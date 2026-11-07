@@ -59,9 +59,11 @@ page, "Qué es" redone, phone) drawn; /allGames rework proposed as the library w
 signed-out 404), the public pages and the phone. Welcome left alone; app 404 kept.
 **Round 9** — Last three boards reviewed. Sign-in: all agreed, 4 (bigger covers at 2560) to try and revert if disliked.
 Public pages: the owner asked whether the signed-out profile card is needed; kept (it is what a shared link and its
-preview show), all nine points agreed. Phone: all agreed but 11 (cookie notice stays); 7 still open, proposed a folded
-profile (one line, "Ver perfil" opens it) over moving it below the games. The canvas is complete.
-**Next** — Decide phone 7. Then turn the agreed points into
+preview show), all nine points agreed. Phone: all agreed but 11 (cookie notice stays); 7 left to the agent: the profile
+folded to one line ("Ver perfil" opens it), not moved below the games. The owner leaves phone details to the agent's
+judgement. The cursor spotlight (`.spotlight`, `useSpotlight`, 21 components): the owner asked; recommended dropping it
+(as the audit's V5/V7 say), waiting on their answer. The canvas is complete.
+**Next** — Turn the agreed points into
 issues (the plan in the report's §3.6: per-screen issues go after the canvas), starting with the bugs and the shared pieces.
 **Open** — The owner's review of the last six boards. Pages 3 (themes from zero) and 4 (landing). Captures: the Playwright
 MCP profile was locked by another process this session; a fresh `playwright-cli` profile is signed out.
