@@ -50,6 +50,103 @@ in place, as dropping it changes cached shapes. CLAUDE.md lost its line about it
 
 ---
 
+## 2026-11-07 — CI on every pull request (`ci/116-pr-checks`)
+
+**Did** — `.github/workflows/ci.yml`: one job, `checks`, on PRs into `develop` and `main`: `npm ci`, `tsc --noEmit`,
+`npm run lint`, `jest --ci`, `npm run build`, Node 24, npm cache, older runs of the same PR cancelled. CLAUDE.md → Git says so.
+**Why** — #116, plan S0 of the antislop audit (#77): the guard tests only held when someone ran them by hand.
+**Decisions** — No env vars or secrets: a clean checkout of `develop` with no `.env.local` passed all four on 2026-11-07
+(855 suites, 5,569 tests; the build with every route). One job, not four, so `npm ci` runs once. Node 24 as Vercel's default
+(`.tool-versions` is ivm's `ivm-node`, which `setup-node` does not read).
+**Open** — After the first green run, add `checks` as required to the `develop` and `main` rulesets (GitHub settings, the owner).
+**Watch out** — Testing the build from a git worktree with `node_modules` as a junction fails: Turbopack refuses files
+outside the project root. Give a worktree its own `npm ci`.
+
+---
+
+## 2026-11-07 — Antislop canvas v2: page 1, identity from zero (`chore/77-antislop-pass`, #126)
+
+**Did** — New design canvas (https://claude.ai/artifact/SZB3BhCYKkXabJMA75fz8D), as `docs/audits/antislop-canvas-v2-brief.md`
+asks. Page 1 only: the owner's real crops, Hoy redrawn from today's tokens, and three identity directions (A El escudo,
+B El título, C La vitrina) on the same pieces, each switchable slanted/round and Dark/Venom. Row in `docs/designs.md`.
+**Why** — The owner wants identity, per-screen improvements, themes and the landing proposed again, one page at a time.
+**Decisions** — Asked first (2026-11-07): both designs stay; the app takes only the logo and its colour from the MGS2
+landing; three directions; the problem is "generic / AI-made" and "not recognisable", not the slant. So every direction
+shared an antislop base and differed in where the signature came from (logo shape, type, game art). Rejected, see Round 2.
+**Round 2** — The owner rejected the three directions: identity here means how the slant the site already has is
+applied (one angle, only big gestures and the player's own marks, never data, the "/" as signature, a dot in round), not new
+brand devices. They chose the old canvas's B (B v2); its `Piezas`, `SheetHoy` and `SheetB2` were brought over unchanged but
+for the image ids, and A/B/C removed.
+**Round 3** — B v2 confirmed after the owner asked why only some pieces slant. Page 2 started with the Home: the
+old `MejHome` points re-checked against `visual/V1.md`, 14 now (month names in the browser's locale added), the ones B
+already brings marked "ya lo trae B"; V1-03's cuts left out, as the owner rejected cuts.
+**Round 4** — Home points approved but 10 (type-to-search is intended; only "/" typed into the box is the bug) and 14
+(drawn as `Mej14`). The owner asked to cover the cover layout and the per-platform profile tabs too: `MejPortada` (12) and
+`MejPlataformas` (8). Portada's point 3 (hero says AC II, the list starts with Fallout 4) must be checked in code first.
+**Round 5** — Home review closed: what not to touch is in the report's §3.7 (one surface level declined, the heatmap's
+entrance stays, the cover's hero by design, platform colours stay); the "99 %" ring is the level loader getting stuck.
+**Round 6** — Page 2 finished: every remaining screen in one go at the owner's request (game page, /allGames, groups,
+rankings, streak, dialogs). Points the owner already declined elsewhere were not proposed again (colours per platform,
+boxes, shrinking, cuts). Library views came from the owner's own production captures (browser bar cropped off).
+**Round 7** — Pages 3 (themes: base + accent, named eight kept, no removals) and 4 (landing: chosen screen, Fondo/Franja
+page, "Qué es" redone, phone) drawn; /allGames rework proposed as the library with a "Todos" status; streak calendar widened.
+**Round 8** — Landing approved with "Fondo". Last screens drawn while the owner was away: sign-in and sign-up (+ reset,
+signed-out 404), the public pages and the phone. Welcome left alone; app 404 kept.
+**Round 9** — Last three boards reviewed. Sign-in: all agreed, 4 (bigger covers at 2560) to try and revert if disliked.
+Public pages: the owner asked whether the signed-out profile card is needed; kept (it is what a shared link and its
+preview show), all nine points agreed. Phone: all agreed but 11 (cookie notice stays); 7 left to the agent: the profile
+folded to one line ("Ver perfil" opens it), not moved below the games. The owner leaves phone details to the agent's
+judgement. The cursor spotlight (`.spotlight`, `useSpotlight`, 26 files): the owner asked; dropped (owner,
+2026-11-07; as the audit's V5/V7 said): the finished bar keeps the only glow, the links inside a card keep their own hover. The canvas is complete.
+**Issues** — Opened from the canvas, 2026-11-07: #127–#136 (list and order in the report's §3.6); comments on #118
+(cookie sheet stays), #120 (spotlight goes) and #126 (the result).
+**Next** — #116 CI, then the plan's order (#117, #113 + #118, #119, #120, #121/#123/#122, #125, #127–#135, #115, #136).
+**Open** — Captures: the Playwright MCP profile was locked by another process this session; a fresh `playwright-cli`
+profile is signed out.
+**Watch out** — Captures of the account page or anything over it show the owner's email (sharp, or readable behind a
+dialog's blur): cover it in the image before uploading (System.Drawing in PowerShell works here; Python has no PIL).
+**Open (old)** — Pages 2 (improvements per screen, from `MejHome.dc.html`), 3 (themes from
+zero) and 4 (landing: screen 1 v2 kept, a second variant with Landing v2's band, and the "qué es" sections redone).
+**Watch out** — The canvas sources live in the scratchpad of that session; read them back from the artifact (`read`
+with `path`) before editing in a new one.
+
+---
+
+## 2026-11-06 — Antislop: the owner's answers, v2 of the canvas, lessons in CLAUDE.md (`chore/77-antislop-pass`)
+
+**Did** — CLAUDE.md gained "The antislop audit (#77)": where the report is, the issue order, the owner's
+decisions and the mistakes not to repeat. The report's §3.6 places #113–#115 in the plan and §3.7 records the
+answers. Canvas v2 (B v2, Temas v2, Landing v2 desktop and phone); `docs/designs.md` updated.
+**Why** — the owner wants every later agent to know the audit and not repeat its mistakes.
+**Decisions** — identity B, with the slant on the player's own marks; the page-by-page cuts rejected (they took
+the personality away); purple stays; the landing is concept 2 made functional. #114 goes inside #115's sweep;
+#115 after the shells and the per-screen work; #113 with the bugs.
+**Open** — the owner's verdict on v2: dark/light accents (white/black or violet), B v2, the landing. The cuts
+are under debate: none is built without a yes, one by one.
+
+---
+## 2026-11-06 — Antislop audit: code, visuals, identity (`chore/77-antislop-pass`, #77)
+
+**Did** — The deepest audit so far, report only: `docs/audits/antislop-v17.md` (synthesis: cross-cutting code
+patterns, probable bugs, owner questions, visuals screen by screen, why slanted feels off, round, three identity
+directions, cut proposals, the plan) with 20 auditor reports as appendices in `docs/audits/antislop-v17/` (each with a
+per-file coverage table). Every file in `src/` read, 853 test files, everything outside `src/`; 391 screenshots
+(git-ignored under `.audit/`). Issue #77 updated with the owner's wider scope and a coverage manifest. `.audit/`
+added to `.gitignore`. Nothing in the app changed.
+**Why** — The owner felt a loss of control over a largely AI-built site and wanted code a human can maintain, an
+identity of its own, simplicity, and a deeper component library.
+**Decisions** — antislop in "after" (audit) mode. Every screen in one theme plus a theme sample (owner); then the
+per-theme visual review was cut as not worth its cost (owner, 2026-11-06), so themes are judged from tokens.
+Mechanical auditing moved from Opus to Sonnet after the first rounds burned the five-hour limit (owner).
+**Open** — The owner's decisions (report 3.1), then a design canvas for the identity directions A/B/C and the MGS2-
+style landing, then issues for S0–S9, the per-platform shells and the screens. Nothing is fixed yet, the ~30 probable
+bugs included.
+**Watch out** — Signed-in screenshots take the **account's** synced shape, home layout and theme, not what a script
+puts in `localStorage`: the first round shots were all slanted Venom. Re-take by intercepting `/api/preferences` and
+`/api/me/bootstrap` in Playwright (and block their writes), as `.audit/shots/app2/` was. Signed out, `ThemeContext`
+overwrites the stored theme with dark. Agents left on the default model inherit Opus: pass `model` for mechanical work.
+
+---
 ## 2026-11-02 — Second pass: caches and moving inside the app (`perf/101-bff-by-domains`, #101)
 
 **Did** — Measured client navigation (the first pass measured full loads only): coming back to the home asked

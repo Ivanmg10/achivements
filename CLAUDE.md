@@ -118,6 +118,41 @@ and agreed on 2026-10-24 and is being built in three PRs (`docs/ui-library-and-d
 → Build plan; components only, never page structure). **Every design made (canvas) gets an entry in `docs/designs.md`**
 with its link, versions and what was built, so it can always be found again.
 
+## The antislop audit (#77) — read before any UI, refactor or new feature (2026-11-06)
+
+The whole code and every screen were audited: `docs/audits/antislop-v17.md` (Part 1 code, 2 visuals,
+3 the plan; appendices per area in `docs/audits/antislop-v17/`). **Before touching an area, read its part**:
+the finding may already say what to reuse or why it looks the way it does. The work is in issues, in this
+order (§3.6 of the report): #116 CI → #117 dead code → #113 Steam last-played and #118 bugs → #119 helpers →
+#120 library and guards → #121 dialogs, #123 contrast and themes, #122 texts → #125 per-platform shells →
+per-screen issues from the canvas (#126) → #115 handhelds (with #114) → the landing. #124 (this file) at any time.
+
+**Where the design stands (2026-11-07):** the first canvas (#126) is history, not a decision. Its identity and theme
+choices are **not binding**: both are proposed again from zero in a new canvas (`docs/audits/antislop-canvas-v2-brief.md`).
+What holds: the page-by-page cuts were **rejected** (they took the personality away) and became improvements per screen
+that keep the look; the landing's first screen is chosen ("Primera pantalla 1 v2").
+
+**Mistakes not to repeat:**
+- **Antislop is not minimalism.** Cutting colour, art, density or the slant to look "clean" took the site's
+  personality away and was rejected. What goes: repeats, bugs, hand-drawn copies of library pieces, comments
+  that say what the code says. What stays: what makes it CheevoVault.
+- **A page does not shrink when data is missing** (the owner, 2026-11-07): an empty or one-item section keeps its
+  room and its place, so the visual order holds. Do not size a card to its content to "fix" empty space.
+- **Look before writing.** The two biggest findings were the same component written once per platform (~4,500
+  lines) and the library walked around (kickers in 95 files, the focus ring ×220, platform hex ×116). New
+  platform code goes into its family's shell; a new look goes into `ui/` with its guard rule.
+- **Short functions, short components.** A 200-line function that could be 50 is a bug (the owner's words).
+  Split before it grows; one helper, never two or three copies.
+- **Screenshots of a signed-in account lie unless intercepted:** the account's synced preferences and theme
+  (`users.preferences`, `users.theme`) beat `localStorage`, so setting the browser captures the account's own
+  look. Intercept `/api/preferences` and `/api/me/bootstrap` in Playwright, block writes, and **never change
+  the account**. Signed-out shots in a fresh browser context.
+- **Data read with the app's own credential hides per-account differences** (#113: Steam sends
+  `rtime_last_played` only for the API key's owner). Check a second, ordinary account before trusting it.
+- **Sizes to check:** 390 and 2560 px, and the handhelds (Steam Deck 1280×800, AYN Thor ~800×450, #115).
+- **Designs are drawn from the real components and art, with today beside them**, and each round changes only
+  what the owner asked.
+
 ## Welcome after sign-up (`/welcome`, 2026-10-22)
 
 A new account (form, form with RetroAchievements, or Steam) is signed in and sent to `/welcome`, not to the login form:
@@ -1235,6 +1270,8 @@ Hotfix (production is broken): `hotfix/<slug>` from `main` → PR into `main`, t
 merge `main` back into `develop` so they do not diverge.
 
 Never force-push `main` or `develop`. Never merge a PR with failing `npm test`/lint/build.
+`.github/workflows/ci.yml` (check `checks`) runs types, lint, tests and build on every PR into `develop` or
+`main`, with no secrets: the build needs none (checked 2026-11-07). Fix the code, never the workflow.
 Do not create, push, merge or delete branches or PRs unless the user asked.
 
 ### Branch names
@@ -1371,7 +1408,8 @@ requires `linked-issue` (see Issues).
 
 ## Style
 - Single quotes, no trailing semicolons
-- Spanish UI text is intentional — do not change it
+- **Every user-facing text goes through `T`** (the owner's decision, 2026-11-06, #77): a literal Spanish or English
+  string in a component is a bug, however it got there. The admin panel stays exempt.
 
 ## Roadmap (pending)
 - [x] Steam integration
