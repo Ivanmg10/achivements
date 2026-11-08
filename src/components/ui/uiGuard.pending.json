@@ -86,12 +86,5 @@
     "components/status-page-header/StatusPageHeader.tsx",
     "constants/index.ts",
     "utils/psnTitles.ts"
-  ],
-  "sideRadius": [
-    "components/library-shelf-card/LibraryShelfCard.tsx"
-  ],
-  "variants": [
-    "components/auth-page/AuthPage.tsx",
-    "components/library-game-detail/LibraryGameDetail.tsx"
   ]
 }

@@ -270,5 +270,11 @@ test('a side radius follows the design too (rounded-t-card, never rounded-t-2xl)
 })
 
 test('Framer variants only on what opens on a click; an entrance is CSS', () => {
-  expect(newOffenders('variants', NEW_RULES.variants)).toEqual([])
+  // The auth page swaps its forms on a click (AnimatePresence, mode="wait"), and the library's opened card brings its
+  // panels in one by one when it is opened: both are a click's, not a load's.
+  const onClick = [
+    'components/auth-page/AuthPage.tsx',
+    'components/library-game-detail/LibraryGameDetail.tsx',
+  ]
+  expect(newOffenders('variants', NEW_RULES.variants, onClick)).toEqual([])
 })
