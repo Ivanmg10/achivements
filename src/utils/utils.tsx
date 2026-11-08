@@ -3,14 +3,7 @@ import { CategoryGame } from '@/hooks/useGamesByCategory'
 import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
 import type { GameSource } from '@/types/steam'
-import { parseUnlockTime } from '@/utils/dates'
-
-export function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return '—'
-  const d = new Date(parseUnlockTime(dateStr))
-  if (isNaN(d.getTime())) return '—'
-  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-}
+import { localDay, parseUnlockTime } from '@/utils/dates'
 
 /**
  * How long ago, in the given language ("2 hours ago", "hace 2 horas"), in the
@@ -48,11 +41,6 @@ export const groupByDays = (achievements: RecentAchievement[], totalDays: number
 
 /** Only the unlock date is read, so any platform's achievements can be grouped. */
 export type DatedUnlock = { earnedAt: string | null }
-
-/** `YYYY-MM-DD` of a date in local time (toISOString would give the UTC day). */
-function localDay(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
 
 /**
  * A game's unlocks counted per week (the last 8) or month (the last 6), in local
@@ -391,7 +379,7 @@ export function daysBetween(start: string, end: string): string[] {
   const d = new Date(`${start}T00:00:00`)
   const last = new Date(`${end}T00:00:00`)
   while (d <= last) {
-    out.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+    out.push(localDay(d))
     d.setDate(d.getDate() + 1)
   }
   return out

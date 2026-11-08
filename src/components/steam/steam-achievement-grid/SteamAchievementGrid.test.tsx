@@ -116,7 +116,7 @@ describe('tooltip', () => {
     expect(tip).toHaveTextContent('Win your first match')
     expect(tip).toHaveTextContent(`12.3${en.achievement.haveIt}`)
     expect(tip).toHaveTextContent(en.steam.earned)
-    expect(tip).toHaveTextContent('15 Jan 2024')
+    expect(tip).toHaveTextContent('Jan 15, 2024')
   })
 
   test('says not earned, and omits rarity when Steam gave none', () => {

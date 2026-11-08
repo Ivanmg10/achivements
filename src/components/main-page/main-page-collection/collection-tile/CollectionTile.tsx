@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
-import { formatDate } from '@/utils/utils'
+import { formatDate } from '@/utils/dates'
 import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
 import type { PerfectGame } from '@/utils/perfectGames'
 import GameIcon from '@/components/game-icon/GameIcon'
@@ -16,9 +16,9 @@ import { useSubject } from '@/context/SubjectContext'
  * readers, and the year heading above shows it to everyone else.
  */
 export default function CollectionTile({ game, date }: { game: PerfectGame; date?: string }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
-  const when = date ? (game.source === 'steam' ? T.cards.lastPlayedOn : T.cards.perfectOn).replace('{date}', formatDate(date)) : null
+  const when = date ? (game.source === 'steam' ? T.cards.lastPlayedOn : T.cards.perfectOn).replace('{date}', formatDate(date, lang)) : null
 
   return (
     <Link

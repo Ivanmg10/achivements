@@ -33,7 +33,7 @@ test('shows title, platform, playtime and last played', () => {
   expect(screen.getByText('Portal 2')).toBeInTheDocument()
   expect(screen.getByText('Steam')).toBeInTheDocument()
   expect(screen.getByText('1.5 h', { exact: false })).toBeInTheDocument()
-  expect(screen.getByText('15 Jan 2024')).toBeInTheDocument()
+  expect(screen.getByText('Jan 15, 2024')).toBeInTheDocument()
 })
 
 test('labels playtime for screen readers', () => {
@@ -67,7 +67,7 @@ test('shows no bar for a loaded game with zero achievements', () => {
 
 test('omits the date when the game was never played', () => {
   render(<SteamGameItem game={game({ lastPlayed: null })} />)
-  expect(screen.queryByText('15 Jan 2024')).not.toBeInTheDocument()
+  expect(screen.queryByText('Jan 15, 2024')).not.toBeInTheDocument()
 })
 
 test('shows the square desktop icon rather than the 32×32 library icon', () => {

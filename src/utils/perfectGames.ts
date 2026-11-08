@@ -1,4 +1,4 @@
-import { classifySteamGame, raDateToIso } from '@/utils/steamFeed'
+import { classifySteamGame } from '@/utils/steamFeed'
 import { classifyPsnGame } from '@/utils/psnTitles'
 import type { PsnGameProgress } from '@/types/psn'
 import { classifyXboxGame } from '@/utils/xboxTitles'
@@ -7,6 +7,7 @@ import { gameKey } from '@/utils/gameRef'
 import type { RetroAchievementsGameCompleted, UserAward } from '@/types/types'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
 import { validCompletionDate } from '@/utils/completionDates'
+import { parseUnlockTime } from '@/utils/dates'
 
 /**
  * A game with every achievement, from either platform, in one shape — what
@@ -254,10 +255,7 @@ export function groupPerfectsByYear(
 ): { year: number | null; games: PerfectGame[] }[] {
   const byYear = new Map<number | null, PerfectGame[]>()
   // RA dates are "YYYY-MM-DD HH:MM:SS" in UTC; the others are ISO with a zone.
-  const time = (g: PerfectGame) => {
-    const date = dates.get(g.key)
-    return date ? Date.parse(raDateToIso(date) ?? date) : NaN
-  }
+  const time = (g: PerfectGame) => parseUnlockTime(dates.get(g.key))
   for (const g of games) {
     const t = time(g)
     const key = isNaN(t) ? null : new Date(t).getFullYear()

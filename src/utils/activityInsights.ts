@@ -1,5 +1,6 @@
 import type { RecentAchievement } from '@/types/types'
 import type { GameSource } from '@/types/steam'
+import { localDay, parseUnlockTime } from '@/utils/dates'
 
 /**
  * What the Activity section reads from the year of unlocks the streak already
@@ -13,12 +14,7 @@ import type { GameSource } from '@/types/steam'
 
 /** The moment of an unlock. */
 export function unlockTime(a: Pick<RecentAchievement, 'Date'>): Date {
-  return new Date(`${a.Date.replace(' ', 'T')}Z`)
-}
-
-/** "2026-10-17", in local time. */
-export function localDay(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  return new Date(parseUnlockTime(a.Date))
 }
 
 /** Monday 0 … Sunday 6. */

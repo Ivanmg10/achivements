@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSpotlight } from '@/hooks/useSpotlight'
-import { formatDate } from '@/utils/utils'
+import { formatDate } from '@/utils/dates'
 import { gameHref } from '@/utils/gameRef'
 import type { LatestPerfect, PerfectCounts } from '@/utils/perfectGames'
 import GameCover from '@/components/game-cover/GameCover'
@@ -28,7 +28,7 @@ const MEDALS = [
  * sideways.
  */
 export default function CollectionShelf({ games, counts }: { games: LatestPerfect[]; counts: PerfectCounts }) {
-  const { T } = useLanguage()
+  const { T, lang } = useLanguage()
   const subject = useSubject()
   const onPointerMove = useSpotlight()
 
@@ -85,7 +85,7 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
                 <span className="flex flex-col items-center w-full min-w-0">
                   <span className="text-xs font-semibold truncate max-w-full">{game.title}</span>
                   <span className="text-[11px] text-text-secondary truncate max-w-full">
-                    {game.subtitle} · {formatDate(game.date)}
+                    {game.subtitle} · {formatDate(game.date, lang)}
                   </span>
                 </span>
               </Link>

@@ -11,7 +11,7 @@ import PsnRecentlyPlayedExpanded from '@/components/psn/psn-recently-played-expa
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { formatDate } from '@/utils/utils'
+import { formatDate } from '@/utils/dates'
 import { gameHref } from '@/utils/gameRef'
 import { psnBackdrop } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
@@ -125,7 +125,7 @@ export default function PsnGameItem({
               {game.lastPlayed && (
                 <>
                   <span className="opacity-40" aria-hidden="true">·</span>
-                  <span>{formatDate(game.lastPlayed)}</span>
+                  <span>{formatDate(game.lastPlayed, lang)}</span>
                 </>
               )}
             </span>

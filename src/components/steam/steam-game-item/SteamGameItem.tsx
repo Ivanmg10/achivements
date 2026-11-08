@@ -13,7 +13,7 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { formatDate } from '@/utils/utils'
+import { formatDate } from '@/utils/dates'
 import type { SteamGameProgress } from '@/types/steam'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
@@ -132,7 +132,7 @@ export default function SteamGameItem({
               {game.lastPlayed && (
                 <>
                   <span className="opacity-40" aria-hidden="true">·</span>
-                  <span>{formatDate(game.lastPlayed)}</span>
+                  <span>{formatDate(game.lastPlayed, lang)}</span>
                 </>
               )}
             </span>

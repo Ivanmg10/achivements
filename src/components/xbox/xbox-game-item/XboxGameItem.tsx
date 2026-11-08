@@ -12,7 +12,7 @@ import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { formatDate } from '@/utils/utils'
+import { formatDate } from '@/utils/dates'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { gameHref } from '@/utils/gameRef'
 import { xboxBackdrop } from '@/utils/xboxTitles'
@@ -122,7 +122,7 @@ export default function XboxGameItem({
               {game.lastPlayed && (
                 <>
                   <span className="opacity-40" aria-hidden="true">·</span>
-                  <span>{formatDate(game.lastPlayed)}</span>
+                  <span>{formatDate(game.lastPlayed, lang)}</span>
                 </>
               )}
             </span>

@@ -1,4 +1,4 @@
-import { classifySteamGame, raDateToIso, mergeRecentFeeds, formatPlaytime, hasUnloadedProgress, countLoadedProgress, formatRarity, formatUnlock } from './steamFeed'
+import { classifySteamGame, mergeRecentFeeds, formatPlaytime, hasUnloadedProgress, countLoadedProgress, formatRarity, formatUnlock } from './steamFeed'
 import { toSteamGameProgress } from './steamMappers'
 import type { RecentlyPlayedGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
@@ -47,18 +47,6 @@ describe('classifySteamGame', () => {
   })
 })
 
-describe('raDateToIso', () => {
-  test('reads RA dates as UTC', () => {
-    expect(raDateToIso('2024-01-15 20:30:00')).toBe('2024-01-15T20:30:00.000Z')
-  })
-
-  test('returns null for missing or garbage input', () => {
-    expect(raDateToIso(null)).toBeNull()
-    expect(raDateToIso(undefined)).toBeNull()
-    expect(raDateToIso('')).toBeNull()
-    expect(raDateToIso('not a date')).toBeNull()
-  })
-})
 
 describe('mergeRecentFeeds', () => {
   test('interleaves both platforms newest first', () => {

@@ -1,4 +1,4 @@
-import { parseUnlockTime } from '@/utils/dates'
+import { parseUnlockTime, utcDay } from '@/utils/dates'
 import type { RecentAchievement, RetroAchievementsGameCompleted } from '@/types/types'
 import type { GameSource, SteamGameProgress, SteamRecentAchievement } from '@/types/steam'
 import type { PsnGameProgress, PsnRecentTrophy } from '@/types/psn'
@@ -67,7 +67,6 @@ export type FriendStats = {
 export type StatKey = 'week' | 'activeDays' | 'streak' | 'completed'
 
 const DAY = 86400000
-const dayKey = (t: number) => new Date(t).toISOString().slice(0, 10)
 
 export function friendStats(recent: RecentAchievement[], games: LibraryGame[], now: number = Date.now()): FriendStats {
   const days = new Set<string>()
@@ -79,9 +78,9 @@ export function friendStats(recent: RecentAchievement[], games: LibraryGame[], n
     if (t >= now - ACTIVITY_DAYS * DAY) days.add(a.Date.slice(0, 10))
   }
   // A streak still counts when today has nothing yet: it runs up to yesterday.
-  let start = days.has(dayKey(now)) ? now : now - DAY
+  let start = days.has(utcDay(now)) ? now : now - DAY
   let streak = 0
-  while (streak < ACTIVITY_DAYS && days.has(dayKey(start))) {
+  while (streak < ACTIVITY_DAYS && days.has(utcDay(start))) {
     streak++
     start -= DAY
   }

@@ -2,6 +2,7 @@ import type { RecentlyPlayedGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnCollection, PsnGameProgress } from '@/types/psn'
 import type { XboxGameProgress } from '@/types/xbox'
+import { unlockIso } from '@/utils/dates'
 
 /**
  * Pure helpers for putting Steam games next to RA ones: category rules, the
@@ -46,11 +47,6 @@ export function classifySteamGame(game: SteamGameProgress): SteamCategory | null
  * RA reports LastPlayed as "YYYY-MM-DD HH:MM:SS" in UTC; Steam entries are ISO.
  * Both must be ISO to sort against each other as strings.
  */
-export function raDateToIso(raDate: string | null | undefined): string | null {
-  if (!raDate) return null
-  const d = new Date(`${raDate.replace(' ', 'T')}Z`)
-  return isNaN(d.getTime()) ? null : d.toISOString()
-}
 
 export type RecentFeedItem =
   | { source: 'ra'; key: string; lastPlayed: string | null; game: RecentlyPlayedGame }
@@ -95,7 +91,7 @@ export function mergeRecentFeeds(
     ...ra.map((game) => ({
       source: 'ra' as const,
       key: `ra:${game.GameID}`,
-      lastPlayed: raDateToIso(game.LastPlayed),
+      lastPlayed: unlockIso(game.LastPlayed),
       game,
     })),
     ...steam.map((game) => ({

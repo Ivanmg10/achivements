@@ -1,4 +1,4 @@
-import { parseUnlockTime } from '@/utils/dates'
+import { parseUnlockTime, unlockIso } from '@/utils/dates'
 import type { GameSource } from '@/types/steam'
 
 /** How many achievements a showcase holds. */
@@ -101,16 +101,11 @@ type ChoiceInput = {
   hidden?: boolean
 }
 
-const isoOf = (d: string | null | undefined) => {
-  if (!d) return null
-  const t = parseUnlockTime(d)
-  return Number.isNaN(t) ? null : new Date(t).toISOString()
-}
 
 /** A game's achievements as picker choices, earned first (newest first), then the rest in the game's order. */
 export function showcaseChoices(source: ShowcaseEntry['source'], gameId: number, gameTitle: string, list: ChoiceInput[]): ShowcaseChoice[] {
   const choices = list.map((a) => {
-    const earnedAt = isoOf(a.earnedAt)
+    const earnedAt = unlockIso(a.earnedAt)
     const concealed = Boolean(a.hidden) && !earnedAt
     return {
       key: a.key,

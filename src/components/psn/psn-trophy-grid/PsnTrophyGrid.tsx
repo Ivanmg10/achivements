@@ -7,7 +7,8 @@ import Link from 'next/link'
 import { createPortal } from 'react-dom'
 import ConcealedBadge from '@/components/concealed-badge/ConcealedBadge'
 import { useLanguage } from '@/context/LanguageContext'
-import { capList, formatDate } from '@/utils/utils'
+import { capList } from '@/utils/utils'
+import { formatDate } from '@/utils/dates'
 import { gameHref } from '@/utils/gameRef'
 import { BASE_GROUP, psnTrophyAnchor, trophiesByGroup, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import ShowAllButton from '@/components/show-all-button/ShowAllButton'
@@ -198,7 +199,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
                 <span className="text-xs text-text-secondary">{T.achievement.notEarned}</span>
               )}
             </div>
-            {tooltip.trophy.earnedAt && <p className="text-xs text-text-secondary mt-1">{formatDate(tooltip.trophy.earnedAt)}</p>}
+            {tooltip.trophy.earnedAt && <p className="text-xs text-text-secondary mt-1">{formatDate(tooltip.trophy.earnedAt, lang)}</p>}
           </div>,
           document.body,
         )}
