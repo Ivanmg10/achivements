@@ -1,8 +1,7 @@
 import { RetroAchievementsGameCompleted, WantToPlayGame } from '@/types/types'
-import { fetchWithRetry, scheduleRetry } from '@/lib/fetchWithRetry'
-import { keepAnswer, lastAnswer } from '@/lib/lastAnswers'
+import { useCallback, useMemo } from 'react'
 import { useAuthSession } from '@/hooks/useAuthSession'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useRetryingRead } from '@/hooks/useRetryingRead'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useHiddenGames } from '@/context/HiddenGamesContext'
 
@@ -16,6 +15,8 @@ export type AllGamesGlobal = {
 }
 
 const WANT_URL = '/api/getWantPlayGames'
+const NONE: WantToPlayGame[] = []
+const wantResults = (data: unknown) => (data as { Results?: WantToPlayGame[] } | null)?.Results ?? NONE
 
 export function useAllGamesGlobal(): AllGamesGlobal {
   const { data: session, status } = useAuthSession()
@@ -26,50 +27,14 @@ export function useAllGamesGlobal(): AllGamesGlobal {
   const { all: allCompleted, isLoading: completedLoading, error: completedError, refetch: refetchCompleted } = useGamesData()
   // Keyed by the RA account too: another one linked never paints the last one's answers.
   const user = session?.user?.id ? `${session.user.id}:${session.user.rausername ?? ''}` : undefined
-  // Coming back: the list as it showed, at once, while it is read again (lastAnswers).
-  const [wantToPlay, setWantToPlay] = useState<WantToPlayGame[]>(() => lastAnswer<WantToPlayGame[]>(user, WANT_URL) ?? [])
-  const [wantLoading, setWantLoading] = useState(() => lastAnswer(user, WANT_URL) === undefined)
-  const [error, setError] = useState(false)
-  const fetched = useRef(false)
-  const attemptRef = useRef(0)
-  const retryTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
-
-  const doFetch = useCallback(() => {
-    // Named, so a retry can call it again.
-    const run = () => {
-      if (status !== 'authenticated' || !rausername) return
-      const onFail = (err?: unknown) => {
-        if (!scheduleRetry(attemptRef, retryTimer, run, err)) { setError(true); setWantLoading(false) }
-      }
-      fetchWithRetry(WANT_URL)
-        .then((wantData) => {
-          const wantResults: WantToPlayGame[] = (wantData as { Results?: WantToPlayGame[] })?.Results ?? []
-          keepAnswer(user, WANT_URL, wantResults)
-          setWantToPlay(wantResults)
-          setWantLoading(false)
-          attemptRef.current = 0
-        })
-        .catch(onFail)
-    }
-    run()
-  }, [status, rausername, user])
-
-  useEffect(() => {
-    if (status === 'loading' || status === 'unauthenticated' || fetched.current) return
-    fetched.current = true
-    doFetch()
-  }, [status, doFetch])
-
-  useEffect(() => () => clearTimeout(retryTimer.current), [])
+  const want = useRetryingRead(status === 'authenticated' && rausername ? WANT_URL : null, { parse: wantResults, keepFor: user })
+  const wantToPlay = want.data ?? NONE
+  const refetchWant = want.refetch
 
   const refetch = useCallback(() => {
-    clearTimeout(retryTimer.current)
-    attemptRef.current = 0
-    setWantLoading(true)
-    setError(false)
-    doFetch()
+    refetchWant()
     if (completedError) refetchCompleted()
-  }, [doFetch, completedError, refetchCompleted])
+  }, [refetchWant, completedError, refetchCompleted])
 
   const startedIds = useMemo(
     () => new Set(allCompleted.filter((g) => g.NumAwarded > 0).map((g) => g.GameID)),
@@ -104,7 +69,6 @@ export function useAllGamesGlobal(): AllGamesGlobal {
   }, [allCompleted])
 
   // Signed out, or with no RA account, there is no want-to-play list to wait for.
-  const noWantList = status === 'unauthenticated' || (status === 'authenticated' && !rausername)
-
-  return { wantToPlay: filteredWantToPlay, playing, completed, loading: (wantLoading && !noWantList) || completedLoading, error: error || completedError, refetch }
+  const wantLoading = status === 'loading' || want.isLoading
+  return { wantToPlay: filteredWantToPlay, playing, completed, loading: wantLoading || completedLoading, error: want.error || completedError, refetch }
 }

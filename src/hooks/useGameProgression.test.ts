@@ -25,7 +25,7 @@ test('loads the game and stops loading', async () => {
   await waitFor(() => expect(result.current.game).toEqual(GAME))
   expect(result.current.isLoading).toBe(false)
   expect(result.current.error).toBe(false)
-  expect(fetch).toHaveBeenCalledWith('/api/getGameProgression?gameId=7')
+  expect((fetch as jest.Mock).mock.calls[0][0]).toBe('/api/getGameProgression?gameId=7')
 })
 
 test('asks for nothing without a game id, and is not loading', () => {
