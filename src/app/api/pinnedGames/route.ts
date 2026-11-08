@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { isGameSource } from '@/utils/gameRef'
 import { dbId } from '@/utils/dbId'
@@ -23,14 +22,12 @@ function readSource(value: unknown): GameSource | null {
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const result = await pool.query(
       'SELECT source, game_id, position FROM pinned_games WHERE user_id = $1 ORDER BY position ASC',
-      [session.user.id],
+      [auth.id],
     )
     return NextResponse.json(result.rows)
   } catch (err) {
@@ -41,10 +38,8 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const body = await req.json().catch(() => null)
     const gameId = body?.gameId
@@ -55,16 +50,16 @@ export async function POST(req: NextRequest) {
     if (!source) {
       return NextResponse.json({ message: 'source debe ser ra, steam, psn o xbox' }, { status: 400 })
     }
-    if (!sourceAllowed(source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+    if (!sourceAllowed(source, auth.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 
-    const { rows: held } = await pool.query('SELECT COUNT(*)::int AS n FROM pinned_games WHERE user_id = $1', [session.user.id])
+    const { rows: held } = await pool.query('SELECT COUNT(*)::int AS n FROM pinned_games WHERE user_id = $1', [auth.id])
     if (held[0]?.n >= PINS_MAX) return NextResponse.json({ error: 'too-many-pins' }, { status: 409 })
 
     await pool.query(
       `INSERT INTO pinned_games (user_id, source, game_id, position)
        VALUES ($1, $2, $3, COALESCE((SELECT MAX(position) + 1 FROM pinned_games WHERE user_id = $1), 0))
        ON CONFLICT (user_id, source, game_id) DO NOTHING`,
-      [session.user.id, source, gameId],
+      [auth.id, source, gameId],
     )
 
     return NextResponse.json({ ok: true })
@@ -76,10 +71,8 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const gameId = req.nextUrl.searchParams.get('gameId')
     const source = readSource(req.nextUrl.searchParams.get('source'))
@@ -91,7 +84,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     await pool.query('DELETE FROM pinned_games WHERE user_id = $1 AND source = $2 AND game_id = $3', [
-      session.user.id,
+      auth.id,
       source,
       gameId,
     ])
@@ -121,17 +114,15 @@ function readOrder(value: unknown): OrderEntry[] | null {
 
 export async function PUT(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const body = await req.json().catch(() => null)
     const order = readOrder(body?.order)
     if (!order) {
       return NextResponse.json({ message: 'order debe ser un array de { source, gameId }' }, { status: 400 })
     }
-    if (order.some((entry) => !sourceAllowed(entry.source, session.user.admin))) {
+    if (order.some((entry) => !sourceAllowed(entry.source, auth.user.admin))) {
       return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
@@ -141,7 +132,7 @@ export async function PUT(req: NextRequest) {
        SELECT $1, o.source, o.game_id, o.position - 1
        FROM unnest($2::text[], $3::int[]) WITH ORDINALITY AS o(source, game_id, position)
        ON CONFLICT (user_id, source, game_id) DO UPDATE SET position = EXCLUDED.position`,
-      [session.user.id, order.map((e) => e.source), order.map((e) => e.gameId)],
+      [auth.id, order.map((e) => e.source), order.map((e) => e.gameId)],
     )
 
     return NextResponse.json({ ok: true })

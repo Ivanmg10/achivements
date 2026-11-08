@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { readHiddenGames } from '@/lib/meBootstrap'
 import { isGameSource } from '@/utils/gameRef'
@@ -21,10 +20,10 @@ const HIDDEN_MAX = 5000
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    return NextResponse.json(await readHiddenGames(session.user.id))
+    return NextResponse.json(await readHiddenGames(auth.id))
   } catch (err) {
     console.error('[hiddenGames GET]', err)
     return NextResponse.json({ message: 'Error interno' }, { status: 500 })
@@ -33,13 +32,13 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const body = await req.json().catch(() => null)
     const { source, gameId, title, image } = body ?? {}
     if (!isGameSource(source)) return NextResponse.json({ message: 'source debe ser ra, steam, psn o xbox' }, { status: 400 })
-    if (!sourceAllowed(source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+    if (!sourceAllowed(source, auth.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     if (typeof gameId !== 'number' || !Number.isInteger(gameId) || gameId <= 0) {
       return NextResponse.json({ message: 'gameId debe ser un número' }, { status: 400 })
     }
@@ -50,16 +49,16 @@ export async function POST(req: NextRequest) {
     const safeImage =
       typeof image === 'string' && image.length <= MAX_IMAGE && (image.startsWith('https://') || image.startsWith('/')) ? image : null
 
-    const { rows: held } = await pool.query('SELECT COUNT(*)::int AS n FROM hidden_games WHERE user_id = $1', [session.user.id])
+    const { rows: held } = await pool.query('SELECT COUNT(*)::int AS n FROM hidden_games WHERE user_id = $1', [auth.id])
     if (held[0]?.n >= HIDDEN_MAX) return NextResponse.json({ error: 'too-many-hidden' }, { status: 409 })
 
     await pool.query(
       `INSERT INTO hidden_games (user_id, source, game_id, title, image)
        VALUES ($1, $2, $3, $4, $5)
        ON CONFLICT (user_id, source, game_id) DO UPDATE SET title = EXCLUDED.title, image = EXCLUDED.image`,
-      [session.user.id, source, gameId, title.trim(), safeImage],
+      [auth.id, source, gameId, title.trim(), safeImage],
     )
-    await rebuildPeriods(Number(session.user.id))
+    await rebuildPeriods(Number(auth.id))
     await markRankingVisibilityChanged()
     return NextResponse.json({ ok: true })
   } catch (err) {
@@ -70,16 +69,16 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const source = req.nextUrl.searchParams.get('source')
     const gameId = Number(req.nextUrl.searchParams.get('gameId'))
     if (!isGameSource(source)) return NextResponse.json({ message: 'source debe ser ra o steam' }, { status: 400 })
     if (!Number.isInteger(gameId) || gameId <= 0) return NextResponse.json({ message: 'Falta gameId' }, { status: 400 })
 
-    await pool.query('DELETE FROM hidden_games WHERE user_id = $1 AND source = $2 AND game_id = $3', [session.user.id, source, gameId])
-    await rebuildPeriods(Number(session.user.id))
+    await pool.query('DELETE FROM hidden_games WHERE user_id = $1 AND source = $2 AND game_id = $3', [auth.id, source, gameId])
+    await rebuildPeriods(Number(auth.id))
     await markRankingVisibilityChanged()
     return NextResponse.json({ ok: true })
   } catch (err) {

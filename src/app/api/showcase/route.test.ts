@@ -1,6 +1,6 @@
 jest.mock('@/lib/authOptions', () => ({ authOptions: {} }))
 jest.mock('@/lib/db', () => ({ __esModule: true, default: { query: jest.fn() } }))
-jest.mock('@/lib/apiAuth', () => ({ dataOwner: jest.fn() }))
+jest.mock('@/lib/apiAuth', () => ({ ...jest.requireActual('@/lib/apiAuth'), dataOwner: jest.fn() }))
 
 import { GET, POST, DELETE, PUT } from './route'
 import { getServerSession } from 'next-auth'

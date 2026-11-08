@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
 import pool from '@/lib/db'
-import { dataOwner } from '@/lib/apiAuth'
+import { requireSession } from '@/lib/apiAuth'
 import { dbId } from '@/utils/dbId'
 import { canUseXbox, sourceAllowed } from '@/utils/xboxAccess'
 
@@ -22,15 +20,13 @@ function parseSource(req: NextRequest): 'ra' | 'steam' | 'psn' | 'xbox' {
  */
 export async function GET(req: NextRequest) {
   try {
-    const owner = await dataOwner()
-    if (!owner) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const gameId = req.nextUrl.searchParams.get('gameId')
     if (gameId && dbId(gameId) === null) return NextResponse.json({ message: 'gameId no válido' }, { status: 400 })
     // Xbox is admin-only for now: to anyone else it is not there at all (see canUseXbox).
-    const xboxVisible = canUseXbox((await getServerSession(authOptions))?.user?.admin)
+    const xboxVisible = canUseXbox(auth.user.admin)
     const visible = <T extends { source: string }>(rows: T[]) => (xboxVisible ? rows : rows.filter((r) => r.source !== 'xbox'))
 
     // Every pin across every platform, in the user's order (migrations/037): the
@@ -41,7 +37,7 @@ export async function GET(req: NextRequest) {
          FROM pinned_achievements
          WHERE user_id = $1
          ORDER BY position ASC NULLS FIRST, created_at DESC`,
-        [owner.id],
+        [auth.id],
       )
       return NextResponse.json(visible(result.rows))
     }
@@ -57,7 +53,7 @@ export async function GET(req: NextRequest) {
          WHERE user_id = $1 AND source = $2
          ORDER BY created_at DESC`
 
-    const params = gameId ? [owner.id, source, gameId] : [owner.id, source]
+    const params = gameId ? [auth.id, source, gameId] : [auth.id, source]
     const result = await pool.query(query, params)
 
     return NextResponse.json(visible(result.rows))
@@ -69,20 +65,18 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const body = await req.json().catch(() => null)
     if (!body || typeof body !== 'object') return NextResponse.json({ message: 'Datos incompletos' }, { status: 400 })
     const { gameId, gameTitle, numDistinctPlayers } = body
-    if (!sourceAllowed(body.source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+    if (!sourceAllowed(body.source, auth.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     const tooLong = (v: unknown) => v != null && (typeof v !== 'string' || v.length > TEXT_MAX)
     if (tooLong(gameTitle) || tooLong(body.steamApiname) || tooLong(body.xboxAchievementId) || JSON.stringify(body.achievement ?? {}).length > SNAPSHOT_MAX) {
       return NextResponse.json({ message: 'Datos no válidos' }, { status: 400 })
     }
-    const { rows: held } = await pool.query('SELECT COUNT(*)::int AS n FROM pinned_achievements WHERE user_id = $1', [session.user.id])
+    const { rows: held } = await pool.query('SELECT COUNT(*)::int AS n FROM pinned_achievements WHERE user_id = $1', [auth.id])
     if (held[0]?.n >= PINS_MAX) return NextResponse.json({ error: 'too-many-pins' }, { status: 409 })
 
     if (body.source === 'xbox') {
@@ -96,7 +90,7 @@ export async function POST(req: NextRequest) {
          VALUES ($1, 'xbox', $2, $3, $4, $5, 0)
          ON CONFLICT (user_id, game_id, xbox_achievement_id) WHERE source = 'xbox'
          DO UPDATE SET snapshot = $5, game_title = $4`,
-        [session.user.id, xboxAchievementId, gameId, gameTitle, JSON.stringify(achievement ?? {})],
+        [auth.id, xboxAchievementId, gameId, gameTitle, JSON.stringify(achievement ?? {})],
       )
     } else if (body.source === 'psn') {
       const { psnTrophyId, achievement } = body
@@ -109,7 +103,7 @@ export async function POST(req: NextRequest) {
          VALUES ($1, 'psn', $2, $3, $4, $5, 0)
          ON CONFLICT (user_id, game_id, psn_trophy_id) WHERE source = 'psn'
          DO UPDATE SET snapshot = $5, game_title = $4`,
-        [session.user.id, psnTrophyId, gameId, gameTitle, JSON.stringify(achievement ?? {})],
+        [auth.id, psnTrophyId, gameId, gameTitle, JSON.stringify(achievement ?? {})],
       )
     } else if (body.source === 'steam') {
       const { steamApiname, achievement } = body
@@ -122,7 +116,7 @@ export async function POST(req: NextRequest) {
          VALUES ($1, 'steam', $2, $3, $4, $5, $6)
          ON CONFLICT (user_id, game_id, steam_apiname) WHERE source = 'steam'
          DO UPDATE SET snapshot = $5, game_title = $4, num_distinct_players = $6`,
-        [session.user.id, steamApiname, gameId, gameTitle, JSON.stringify(achievement ?? {}), numDistinctPlayers ?? 0],
+        [auth.id, steamApiname, gameId, gameTitle, JSON.stringify(achievement ?? {}), numDistinctPlayers ?? 0],
       )
     } else {
       const { achievement } = body
@@ -135,7 +129,7 @@ export async function POST(req: NextRequest) {
          VALUES ($1, 'ra', $2, $3, $4, $5, $6)
          ON CONFLICT (user_id, achievement_id)
          DO UPDATE SET snapshot = $5, num_distinct_players = $6, game_title = $4`,
-        [session.user.id, achievement.ID, gameId, gameTitle, JSON.stringify(achievement), numDistinctPlayers ?? 0],
+        [auth.id, achievement.ID, gameId, gameTitle, JSON.stringify(achievement), numDistinctPlayers ?? 0],
       )
     }
 
@@ -148,10 +142,8 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const achievementId = req.nextUrl.searchParams.get('achievementId')
     const steamApiname = req.nextUrl.searchParams.get('steamApiname')
@@ -165,22 +157,22 @@ export async function DELETE(req: NextRequest) {
     if (achievementId) {
       await pool.query(
         `DELETE FROM pinned_achievements WHERE user_id = $1 AND achievement_id = $2 AND source = 'ra'`,
-        [session.user.id, achievementId],
+        [auth.id, achievementId],
       )
     } else if (xboxAchievementId && gameId) {
       await pool.query(
         `DELETE FROM pinned_achievements WHERE user_id = $1 AND game_id = $2 AND xbox_achievement_id = $3 AND source = 'xbox'`,
-        [session.user.id, gameId, xboxAchievementId],
+        [auth.id, gameId, xboxAchievementId],
       )
     } else if (psnTrophyId && gameId) {
       await pool.query(
         `DELETE FROM pinned_achievements WHERE user_id = $1 AND game_id = $2 AND psn_trophy_id = $3 AND source = 'psn'`,
-        [session.user.id, gameId, psnTrophyId],
+        [auth.id, gameId, psnTrophyId],
       )
     } else if (steamApiname && gameId) {
       await pool.query(
         `DELETE FROM pinned_achievements WHERE user_id = $1 AND game_id = $2 AND steam_apiname = $3 AND source = 'steam'`,
-        [session.user.id, gameId, steamApiname],
+        [auth.id, gameId, steamApiname],
       )
     } else {
       return NextResponse.json({ message: 'Falta achievementId, steamApiname/gameId, psnTrophyId/gameId o xboxAchievementId/gameId' }, { status: 400 })
@@ -202,10 +194,8 @@ const MAX_ORDER = 1000
  */
 export async function PUT(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const body = await req.json().catch(() => null)
     const order = body?.order
@@ -223,7 +213,7 @@ export async function PUT(req: NextRequest) {
       `UPDATE pinned_achievements p SET position = v.pos - 1
        FROM unnest($2::int[]) WITH ORDINALITY AS v(id, pos)
        WHERE p.id = v.id AND p.user_id = $1`,
-      [session.user.id, order],
+      [auth.id, order],
     )
     return NextResponse.json({ ok: true })
   } catch (err) {

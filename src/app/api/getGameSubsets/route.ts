@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
+import { requireSession } from '@/lib/apiAuth'
 import { raUnavailable } from '@/lib/raFailure'
 import { NextRequest } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
 import { withCache } from '@/lib/raCache'
 import { cachedJson } from '@/lib/httpCache'
 import { getGameList } from '@/lib/raClient'
@@ -13,8 +12,8 @@ type GameListEntry = { ID: number; Title: string; NumAchievements: number; Image
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const gameId = request.nextUrl.searchParams.get('gameId')
     const consoleId = request.nextUrl.searchParams.get('consoleId')
@@ -24,7 +23,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: 'Missing params' }, { status: 400 })
     }
 
-    const { raid } = session.user
+    const { raid } = auth.user
     if (!raid) return NextResponse.json([], { status: 200 })
 
     const raw = await withCache(

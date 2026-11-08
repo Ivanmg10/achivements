@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
 import pool from '@/lib/db'
-import { authOptions } from '@/lib/authOptions'
 import { requireSession } from '@/lib/apiAuth'
 import { allowAttempt } from '@/lib/attemptLimit'
 import { presenceColumns } from '@/lib/presence'
@@ -40,7 +38,7 @@ export async function GET(req: NextRequest) {
        ORDER BY (LOWER(username) = LOWER($2)) DESC, username ASC
        LIMIT ${LIMIT}`,
       // Xbox is admin-only for now: to anyone else it is not there at all (see canUseXbox).
-      [escapeLike(q), q, auth.id, canUseXbox((await getServerSession(authOptions))?.user?.admin)],
+      [escapeLike(q), q, auth.id, canUseXbox(auth.user.admin)],
     )
     return NextResponse.json(rows)
   } catch (err) {

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { readPreferences } from '@/lib/meBootstrap'
 import { cleanStoredPreferences, readPreferenceChanges } from '@/utils/syncedPreferences'
@@ -13,10 +12,10 @@ import { cleanStoredPreferences, readPreferenceChanges } from '@/utils/syncedPre
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    return NextResponse.json({ preferences: await readPreferences(session.user.id) })
+    return NextResponse.json({ preferences: await readPreferences(auth.id) })
   } catch (err) {
     console.error('[preferences GET]', err)
     return NextResponse.json({ message: 'Error interno' }, { status: 500 })
@@ -26,15 +25,15 @@ export async function GET() {
 /** Body: `{ changes: { "<key>": "<value>" | null } }` — a value saves it, null forgets it. */
 export async function PUT(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const changes = readPreferenceChanges(await req.json().catch(() => null))
     if (!changes) return NextResponse.json({ message: 'Cambios no válidos' }, { status: 400 })
 
     const { rows } = await pool.query(
       'UPDATE users SET preferences = (preferences || $1::jsonb) - $2::text[] WHERE id = $3 RETURNING preferences',
-      [JSON.stringify(changes.set), changes.remove, session.user.id],
+      [JSON.stringify(changes.set), changes.remove, auth.id],
     )
     if (rows.length === 0) return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
     return NextResponse.json({ preferences: cleanStoredPreferences(rows[0].preferences) })

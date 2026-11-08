@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession, type Session } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
 import { canUseXbox } from '@/utils/xboxAccess'
 
@@ -63,15 +63,19 @@ export async function dataOwner(req?: Request): Promise<DataOwner | null> {
 type RaSession = { id: string; rausername: string; raid: string }
 export type RaSessionResult = { ok: true; session: RaSession } | { ok: false; response: NextResponse }
 
-export type SessionResult = { ok: true; id: string } | { ok: false; response: NextResponse }
+export type SessionResult = { ok: true; id: string; user: Session['user'] } | { ok: false; response: NextResponse }
 
-/** Requires just a signed-in user — no RA account linkage needed. */
-export async function requireSession(): Promise<SessionResult> {
+const NOT_SIGNED_IN = { message: 'No autorizado' }
+
+/**
+ * Requires just a signed-in user, no platform linked, and gives back the session's user
+ * (server-side: it carries `raid`). `unauthorized` is the 401's body where a route
+ * answers its own.
+ */
+export async function requireSession(unauthorized: object = NOT_SIGNED_IN): Promise<SessionResult> {
   const session = await getServerSession(authOptions)
-  if (!session?.user?.id) {
-    return { ok: false, response: NextResponse.json({ message: 'No autorizado' }, { status: 401 }) }
-  }
-  return { ok: true, id: session.user.id }
+  if (!session?.user?.id) return { ok: false, response: NextResponse.json(unauthorized, { status: 401 }) }
+  return { ok: true, id: session.user.id, user: session.user }
 }
 
 /**
@@ -106,17 +110,15 @@ export type ViewerApiKeyResult = { ok: true; viewerId: string; apiKey: string } 
  * a server fault (503).
  */
 export async function requireViewerApiKey(): Promise<ViewerApiKeyResult> {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) {
-    return { ok: false, response: NextResponse.json({ message: 'No autorizado' }, { status: 401 }) }
-  }
+  const auth = await requireSession()
+  if (!auth.ok) return auth
 
-  const apiKey = session.user.raid
+  const apiKey = auth.user.raid
   if (!apiKey) {
     return { ok: false, response: NextResponse.json({ message: 'No RA account linked' }, { status: 400 }) }
   }
 
-  return { ok: true, viewerId: session.user.id, apiKey }
+  return { ok: true, viewerId: auth.id, apiKey }
 }
 
 type SteamSession = { id: string; steamid: string; apiKey: string }
@@ -181,10 +183,10 @@ export type XboxUserResult = { ok: true; id: string } | { ok: false; response: N
  * Anyone else gets 403, whatever they ask for.
  */
 export async function requireXboxUser(): Promise<XboxUserResult> {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return { ok: false, response: NextResponse.json({ error: 'unauthorized' }, { status: 401 }) }
-  if (!canUseXbox(session.user.admin)) return { ok: false, response: NextResponse.json({ error: 'forbidden' }, { status: 403 }) }
-  return { ok: true, id: session.user.id }
+  const auth = await requireSession({ error: 'unauthorized' })
+  if (!auth.ok) return auth
+  if (!canUseXbox(auth.user.admin)) return { ok: false, response: NextResponse.json({ error: 'forbidden' }, { status: 403 }) }
+  return { ok: true, id: auth.id }
 }
 
 /**

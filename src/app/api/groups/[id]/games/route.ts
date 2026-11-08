@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/authOptions'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { isGameSource } from '@/utils/gameRef'
 import { dbId } from '@/utils/dbId'
@@ -29,12 +28,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const { id } = await params
     const groupId = dbId(id) ?? NaN
 
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    if (!(await ownsGroup(session.user.id, groupId))) {
+    if (!(await ownsGroup(auth.id, groupId))) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
     }
 
@@ -43,7 +40,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!source) {
       return NextResponse.json({ message: 'source debe ser ra, steam, psn o xbox' }, { status: 400 })
     }
-    if (!sourceAllowed(source, session.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+    if (!sourceAllowed(source, auth.user.admin)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     const fields = readItemFields(body)
     if (!fields.ok) return NextResponse.json({ message: fields.message }, { status: 400 })
     const { game_id, title, image_icon, console_name, pct_won, num_awarded, max_possible, points_won, max_points } = fields.value
@@ -82,12 +79,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const { id } = await params
     const groupId = dbId(id) ?? NaN
 
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    if (!(await ownsGroup(session.user.id, groupId))) {
+    if (!(await ownsGroup(auth.id, groupId))) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
     }
 
@@ -117,12 +112,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id } = await params
     const groupId = dbId(id) ?? NaN
 
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    if (!(await ownsGroup(session.user.id, groupId))) {
+    if (!(await ownsGroup(auth.id, groupId))) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
     }
 
@@ -151,12 +144,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const { id } = await params
     const groupId = dbId(id) ?? NaN
 
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    if (!(await ownsGroup(session.user.id, groupId))) {
+    if (!(await ownsGroup(auth.id, groupId))) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
     }
 

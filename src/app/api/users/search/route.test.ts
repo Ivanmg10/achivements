@@ -9,13 +9,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { requireSession } from '@/lib/apiAuth'
 import { allowAttempt } from '@/lib/attemptLimit'
-import { getServerSession } from 'next-auth'
 
 const get = (query: string) => new NextRequest(`http://localhost/api/users/search?${query}`)
 
 beforeEach(() => {
   jest.clearAllMocks()
-  ;(requireSession as jest.Mock).mockResolvedValue({ ok: true, id: '1' })
+  ;(requireSession as jest.Mock).mockResolvedValue({ ok: true, id: '1', user: { id: '1' } })
   ;(allowAttempt as jest.Mock).mockResolvedValue(true)
   ;(pool.query as jest.Mock).mockResolvedValue({ rows: [{ username: 'ivan_mg', avatar: null, ra: true, steam: false, psn: false }] })
 })
@@ -70,7 +69,7 @@ test('searching too often is a 429, and the table is not touched', async () => {
 })
 
 test('whether a result has Xbox is asked of the database only for an admin searcher', async () => {
-  ;(getServerSession as jest.Mock).mockResolvedValue({ user: { id: '1', admin: true } })
+  ;(requireSession as jest.Mock).mockResolvedValue({ ok: true, id: '1', user: { id: '1', admin: true } })
   await GET(get('q=ivan'))
   const [sql, params] = (pool.query as jest.Mock).mock.calls[0]
   expect(sql).toContain('xboxxuid IS NOT NULL AND $4::boolean')

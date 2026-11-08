@@ -1,8 +1,7 @@
-import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import bcrypt from 'bcrypt'
-import { authOptions } from '@/lib/authOptions'
 import { checkCurrentPassword } from '@/lib/currentPassword'
 import { retireResetTokens } from '@/lib/passwordReset'
 import { forgetUser } from '@/lib/userRecord'
@@ -15,10 +14,8 @@ import { BCRYPT_COST, PASSWORD_MIN } from '@/utils/authValidation'
  */
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const auth = await requireSession({ error: 'Unauthorized' })
+    if (!auth.ok) return auth.response
 
     const { currentPassword, newPassword } = (await req.json().catch(() => ({}))) as { currentPassword?: unknown; newPassword?: unknown }
 
@@ -29,15 +26,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'weak-password' }, { status: 400 })
     }
 
-    const check = await checkCurrentPassword(session.user.id, currentPassword)
+    const check = await checkCurrentPassword(auth.id, currentPassword)
     if (check === 'too-many') return NextResponse.json({ error: 'too-many-attempts' }, { status: 429 })
     if (check === 'no-user') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     if (check === 'wrong') return NextResponse.json({ error: 'wrong-password' }, { status: 403 })
 
     const hashed = await bcrypt.hash(newPassword, BCRYPT_COST)
-    await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, session.user.id])
-    await retireResetTokens(session.user.id)
-    forgetUser(session.user.id)
+    await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, auth.id])
+    await retireResetTokens(auth.id)
+    forgetUser(auth.id)
 
     return NextResponse.json({ ok: true })
   } catch (err) {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
-import { dataOwner } from '@/lib/apiAuth'
+import { dataOwner, requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { gameKey, parseGameKey } from '@/utils/gameRef'
 import { canUseXbox, sourceAllowed } from '@/utils/xboxAccess'
@@ -31,10 +31,8 @@ export async function GET(req?: Request) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
     const { order } = (await req.json().catch(() => ({}))) as { order?: unknown }
     // Keys name the platform ("ra:123", "steam:620"); a bare number is an RA id,
@@ -46,7 +44,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ message: 'order debe ser un array de claves de juego' }, { status: 400 })
     }
 
-    if (refs.some((ref) => !sourceAllowed(ref!.source, session.user.admin))) {
+    if (refs.some((ref) => !sourceAllowed(ref!.source, auth.user.admin))) {
       return NextResponse.json({ error: 'forbidden' }, { status: 403 })
     }
 
@@ -57,7 +55,7 @@ export async function PUT(req: NextRequest) {
        SELECT $1, o.source, o.game_id, o.position - 1
        FROM unnest($2::text[], $3::int[]) WITH ORDINALITY AS o(source, game_id, position)
        ON CONFLICT (user_id, source, game_id) DO UPDATE SET position = EXCLUDED.position, updated_at = NOW()`,
-      [session.user.id, games.map((g) => g.source), games.map((g) => g.id)],
+      [auth.id, games.map((g) => g.source), games.map((g) => g.id)],
     )
 
     return NextResponse.json({ ok: true })

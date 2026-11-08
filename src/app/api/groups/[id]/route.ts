@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/authOptions'
+import { requireSession } from '@/lib/apiAuth'
 import pool from '@/lib/db'
 import { readGroupFields } from '@/utils/groupValidation'
 import { dbId } from '@/utils/dbId'
@@ -62,12 +63,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id } = await params
     const groupId = dbId(id) ?? NaN
 
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    if (!(await ownsGroup(session.user.id, groupId))) {
+    if (!(await ownsGroup(auth.id, groupId))) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
     }
 
@@ -95,12 +94,10 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params
     const groupId = dbId(id) ?? NaN
 
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 })
-    }
+    const auth = await requireSession()
+    if (!auth.ok) return auth.response
 
-    if (!(await ownsGroup(session.user.id, groupId))) {
+    if (!(await ownsGroup(auth.id, groupId))) {
       return NextResponse.json({ message: 'No autorizado' }, { status: 403 })
     }
 
