@@ -1685,8 +1685,8 @@ export const it: Translations = {
   },
   homeLayout: {
     layoutLabel: 'Layout',
-    shapeSlantedHint: 'Estremi inclinati su pulsanti, barre ed etichette.',
-    shapeRoundHint: 'Angoli morbidi, pulsanti ed etichette a pillola, interruttori rotondi.',
+    shapeSlantedHint: 'Il pulsante principale, il livello e la serie sono inclinati; una barra segna la scheda aperta.',
+    shapeRoundHint: 'Angoli morbidi, pulsanti ed etichette a pillola; un punto segna la scheda aperta.',
     shapeLabel: 'Forma',
     shapeSlanted: 'Inclinata',
     shapeRound: 'Arrotondata',

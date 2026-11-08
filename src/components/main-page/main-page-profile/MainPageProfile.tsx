@@ -2,37 +2,29 @@
 
 import { ReactNode } from 'react'
 import { useSession } from 'next-auth/react'
-import SteamLogo from '@/components/steam-logo/SteamLogo'
-import RaLogo from '@/components/ra-logo/RaLogo'
-import PlaystationLogo from '@/components/playstation-logo/PlaystationLogo'
-import XboxLogo from '@/components/xbox-logo/XboxLogo'
 
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { useRecentAchievements } from '@/hooks/useRecentAchievements'
 import { useMainPlatform } from '@/context/MainPlatformContext'
 import { useSubject } from '@/context/SubjectContext'
+import { useLanguage } from '@/context/LanguageContext'
 
 import MainPageProfileRa from './main-page-profile-ra/MainPageProfileRa'
 import MainPageProfileSt from './main-page-profile-st/MainPageProfileSt'
 import MainPageProfilePsn from './main-page-profile-psn/MainPageProfilePsn'
 import MainPageProfileXbox from './main-page-profile-xbox/MainPageProfileXbox'
-import MainPageProfileTabs, { ProfileTab, profilePanelId, profileTabId } from './main-page-profile-tabs/MainPageProfileTabs'
+import Tabs, { tabIds } from '@/components/ui/Tabs'
+import { PLATFORM_NAME } from '@/utils/gameRef'
 import styles from './MainPageProfile.module.css'
 import type { GameSource } from '@/types/game'
 
 const ID_PREFIX = 'main-profile'
 
-const TABS: Record<GameSource, ProfileTab<GameSource>> = {
-  ra: { id: 'ra', label: 'RetroAchievements', icon: <RaLogo height={11} /> },
-  steam: { id: 'steam', label: 'Steam', icon: <SteamLogo size={13} aria-hidden="true" /> },
-  psn: { id: 'psn', label: 'PlayStation', icon: <PlaystationLogo size={13} aria-hidden="true" /> },
-  xbox: { id: 'xbox', label: 'Xbox', icon: <XboxLogo size={13} aria-hidden="true" /> },
-}
-
 export default function MainPageProfile() {
   const { data: session, update } = useSession()
   const subject = useSubject()
   const { platform: tab, setPlatform: setTab, linked } = useMainPlatform()
+  const { T } = useLanguage()
   const lastGameId = session?.user?.raUser?.LastGameID?.toString() ?? null
   const { game, isLoading: gameLoading, refetch: refetchGame } = useGameProgression(lastGameId)
   const {
@@ -80,18 +72,21 @@ export default function MainPageProfile() {
   // Several: one profile at a time, switched by low-key tabs at the top.
   return (
     <section className="main-content text-text-main m-3 rounded-tile flex flex-col items-center gap-3 overflow-y-auto">
-      <MainPageProfileTabs<GameSource>
-        idPrefix={ID_PREFIX}
-        selected={tab}
-        onSelect={setTab}
-        tabs={linked.map((p) => TABS[p])}
+      <Tabs<GameSource>
+        id={ID_PREFIX}
+        aria-label={T.steam.profileTabsLabel}
+        size="sm"
+        className="w-full"
+        value={tab}
+        onChange={setTab}
+        tabs={linked.map((p) => ({ value: p, label: PLATFORM_NAME[p] }))}
       />
       {/* Keyed by tab, so each platform makes its entrance. */}
       <div
         key={tab}
         role="tabpanel"
-        id={profilePanelId(ID_PREFIX, tab)}
-        aria-labelledby={profileTabId(ID_PREFIX, tab)}
+        id={tabIds(ID_PREFIX, tab).panel}
+        aria-labelledby={tabIds(ID_PREFIX, tab).tab}
         data-home-profile
         className={`w-full flex-1 min-h-0 flex flex-col ${styles.enter}`}
       >

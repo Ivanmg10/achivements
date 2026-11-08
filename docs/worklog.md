@@ -33,6 +33,56 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-09 — The slant grammar of identity B v2 (`feat/127-slant-grammar-b2`, #127)
+
+**Did** — Built page 1 of the canvas (boards "SheetB2" and "Piezas", B v2 as the owner confirmed it on 2026-11-07), one
+commit per step:
+- *Tokens:* `--slant` (-12deg slanted, 0 round) and `--mark` ("/" slanted, "\2022" round) replace the five `--slant-*` and the
+  seven `--clip-*`. `ui/shape.ts` is now `SLANT_PLATE` (a plate behind the content leaning on `--slant`: its cut follows the
+  angle at any height) and `MARK`; `slantStyle` is gone. `designTokens.test.ts` checks the angle and the mark.
+- *What leans:* the primary `Button` (alone: secondary, quiet and danger are upright and fill their box), the chosen pill of
+  `SegmentedControl`, `VaultLevelBadge` (`Tag slant`; `size="lg"` in the top bar so it matches the streak) and `StreakTag`,
+  and the podium's steps (rankings, its skeleton, the Following teaser). Upright now: `Switch`, the `Select` box, every
+  other `Tag` (`GameHeroChip` too), `Figure`'s pressed plate, `ListRow`'s and the tables' accent marks, the header's account link.
+- *Data upright:* `ProgressBar` and `DataBar` (its `cut` prop is gone) have square ends slanted, `--bar-radius` round; the
+  streak chart's bars and the heatmap's range mark too. The streak strip's break mark keeps the angle (an annotation).
+- *Tabs:* one `ui/Tabs`, the mark in front of the tab you are on, no underline (`TabMark`; sizes sm/md/lg, `orientation="rail"`,
+  `panels={false}`). Its three drawings are gone: the home's view switch (Framer underline) is `Tabs size="lg"`, the stats rail
+  (pill with bar) is `Tabs orientation="rail"`, and `MainPageProfileTabs` (slanted line) is deleted, its four callers on
+  `Tabs` (audit A-08: its never-drawn logos went too). The top bar's links, `StatusNavDropdown` and the two filter rows
+  (`tabClass`) take `TabMark`; the search bar shows the mark instead of the leaning bar.
+- *Facts:* `ui/Facts` joins the facts of a line with the mark in the accent (a screen reader hears a comma). Used by the
+  four platforms' game rows, the PSN collection, the trophy cabinet, the profile's last game (PSN, Xbox, Steam), the search
+  panel's games, the follow counts and the groups' lines (cards, shelf, album, hero, sortable items, home groups, group feature).
+- *Sentence case:* `Kicker` (xs 13 px semibold, sm 13 px bold, md 14 px bold, no tracking), and with it figure labels and card
+  titles; the achievement tables' heads (`dataTable.ts`), the rankings' and the guide's heads, `SortableHeader`, the public
+  profile's "your profile" tag, `AchievementModal`'s and `ConnectAccounts`' headings.
+- *Guard:* no `--slant-*`/`--clip-*`/`slantStyle`; a lean outside `ui/` only through `SLANT_PLATE` or three named drawings;
+  no hand-made fact separator (`aria-hidden` `·`, the footer's links excepted); no hand-made tablist (PSN's trophy groups
+  excepted, see Open); no `uppercase` (the hash modal's dump-group names excepted). The `kicker` pending list is empty.
+- *Catalogue and docs:* `/design` explains the grammar (Shape, Button, Switch, Tabs, Segmented, Figures, bars, Tag, Facts),
+  shows Facts and the level and streak as the only leaning tags; `docs/design-system.md` → The slant grammar; CLAUDE.md's
+  design-system section; `docs/designs.md` row 2026-11-07; the shape choice's hints in the nine languages.
+**Why** — #127: the owner found the site generic; the slant was everywhere at four angles, so it read as noise. B puts it
+where it means something (audit §2.3–2.5, plan S6).
+**Decisions** — *As drawn:* the progress bar and the week bars upright with square ends (the canvas draws no cut; "nothing
+under ~28 px leans"), so horizontal data bars lost their small cuts too. The canvas draws the level and streak chips in the
+accent; they keep their tier colours (CLAUDE.md's streak and level rules), only the lean and one height changed. The canvas's
+pinned count pill stays a pill. *Points "ya lo trae B" done here:* #128 one tab bar drawing, card titles out of 10 px
+uppercase, level/streak/user in the header as one family; #129 the half-slanted toolbar (select and secondary buttons upright),
+uppercase labels in the detail and the table head; #130 the podium steps at one angle, uppercase titles, two title styles per
+Following card (both label styles are now sentence case); #131 "Cuándo juegas" bars upright, labels out of uppercase; and
+#132's "with B only the primary slants" (its footer layout point stays in #132).
+**Open** — PSN's trophy-group tabs are still pills (`pillClass`), the guard's one tablist exception: they are filter-like and
+not one of the three drawings the issue named; move them to `Tabs` if the owner wants. Many "label · value" pairs (e.g.
+"Played · 12 h", group cover footers, #130's one-line group footer) still use a middle dot: they are not lists of facts;
+the per-screen issues decide. The cover's "PS4 / 33 de 51 trofeos" line is #128's.
+**Watch out** — Screenshots before/after (signed out, `/api/rankings` answered with made-up rows in the browser, no database,
+no account): landing, login, `/rankings`, `/rankings/how` at 2560 and 390 px in both designs, kept in the session scratchpad.
+A mark on a link or a button is an `aria-hidden` span, never `::before` on the control itself (it would join its name).
+
+---
+
 ## 2026-11-08 — Library gaps, their guard rules, and the cursor spotlight gone (`feat/120-library-pieces`, #120)
 
 **Did** — One commit per piece (antislop audit X2 / plan S4; ids are the audit's). Each piece has its test, its

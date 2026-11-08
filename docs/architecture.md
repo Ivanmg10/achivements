@@ -198,7 +198,7 @@ Scores are worked out ahead of time, not when a page asks (plan and formula:
 ## Design system (see `design-system.md`)
 
 - `src/app/globals.css`: the themes' colours and the design's tokens (shapes, sizes, motion); the round design is `:root[data-shape="round"]`.
-- `src/components/ui/`: the library; `ui/shape.ts` (`slantStyle`) is how a bar reads the slant.
+- `src/components/ui/`: the library; `ui/shape.ts` (`SLANT_PLATE`, `MARK`) is how a big piece leans on the one angle and how the mark is drawn (#127).
 - `src/components/shape-sync/ShapeSync.tsx` (mounted in `app/providers.tsx`) puts `shape-style` on `<html>`; `app/layout.tsx` has the script that applies it before paint.
 - `src/app/(main)/design/page.tsx` + `src/components/design-catalog/`: the catalogue, admins only.
 - `src/utils/streakTier.ts`: the streak's tiers and their hues.

@@ -77,7 +77,7 @@ export default function ConnectAccounts() {
         </div>
 
         <section className="flex flex-col items-center gap-3">
-          <h2 className="text-sm font-semibold text-text-secondary uppercase tracking-wider">
+          <h2 className="text-sm font-semibold text-text-secondary">
             {T.connect.whatYouGet}
           </h2>
           <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">

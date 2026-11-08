@@ -1,5 +1,4 @@
 import type { CSSProperties } from 'react'
-import { slantStyle, type SlantPx } from './shape'
 
 const TONES = {
   accent: 'bg-accent',
@@ -8,16 +7,16 @@ const TONES = {
 }
 
 /**
- * A bar of a chart: as long (`x`) or as tall (`y`) as its share, its ends cut
- * on the design's slant (`cut`, from the tokens: straight and rounded in the
- * round design). Decorative: the number it stands for is written beside it.
- * `track` draws the rest of the way under a horizontal bar. Its parent sizes
- * it: the width of an `x` bar's row, the height of a `y` bar's column.
+ * A bar of a chart: as long (`x`) or as tall (`y`) as its share. Upright in
+ * both designs, as data never leans (identity B, #127): square ends in the
+ * slanted design, rounded in the round one (`--bar-radius`). Decorative: the
+ * number it stands for is written beside it. `track` draws the rest of the way
+ * under a horizontal bar. Its parent sizes it: the width of an `x` bar's row,
+ * the height of a `y` bar's column.
  */
 export default function DataBar({
   share,
   axis = 'x',
-  cut = 4,
   tone = 'accent',
   color,
   track = false,
@@ -29,7 +28,6 @@ export default function DataBar({
   /** 0 to 1. */
   share: number
   axis?: 'x' | 'y'
-  cut?: SlantPx
   tone?: keyof typeof TONES
   /** A hue that is not a theme one (a streak tier); wins over `tone`. */
   color?: string
@@ -43,18 +41,17 @@ export default function DataBar({
   /** For the entrance's order (`--i`) or an opacity. */
   style?: CSSProperties
 }) {
-  const slant = slantStyle(cut)
   const size = `max(${min}px, ${Math.min(Math.max(share, 0), 1) * 100}%)`
   const bar = (
     <span
       aria-hidden="true"
-      className={`block ${color ? '' : TONES[tone]} ${grow ? (axis === 'x' ? 'enter-grow-x' : 'enter-grow-y') : ''} ${track ? (axis === 'x' ? 'h-full' : 'w-full') : className}`}
-      style={{ ...slant, ...(color ? { backgroundColor: color } : {}), [axis === 'x' ? 'width' : 'height']: size, ...style }}
+      className={`block rounded-(--bar-radius) ${color ? '' : TONES[tone]} ${grow ? (axis === 'x' ? 'enter-grow-x' : 'enter-grow-y') : ''} ${track ? (axis === 'x' ? 'h-full' : 'w-full') : className}`}
+      style={{ ...(color ? { backgroundColor: color } : {}), [axis === 'x' ? 'width' : 'height']: size, ...style }}
     />
   )
   if (!track) return bar
   return (
-    <span aria-hidden="true" className={`block bg-ink/[0.08] ${className}`} style={slant}>
+    <span aria-hidden="true" className={`block overflow-hidden rounded-(--bar-radius) bg-ink/[0.08] ${className}`}>
       {bar}
     </span>
   )

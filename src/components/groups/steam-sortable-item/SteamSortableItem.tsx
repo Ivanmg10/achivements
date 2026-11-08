@@ -17,6 +17,7 @@ import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import type { GameGroupItem } from '@/types/types'
 import { relativeTime } from '@/utils/dates'
 import Tag from '@/components/ui/Tag'
+import Facts from '@/components/ui/Facts'
 
 /**
  * A Steam game in a group — SortableItem's counterpart: drag handle, cover,
@@ -138,9 +139,7 @@ export default function SteamSortableItem({
             )}
           </span>
           <span className="text-xs text-text-secondary mt-1">
-            {game?.lastPlayed ? T.groups.playedAgo.replace('{when}', relativeTime(game.lastPlayed, lang)) : T.groups.neverPlayed}
-            {' · '}
-            {T.groups.addedAgo.replace('{when}', relativeTime(item.added_at, lang))}
+            <Facts items={[game?.lastPlayed ? T.groups.playedAgo.replace('{when}', relativeTime(game.lastPlayed, lang)) : T.groups.neverPlayed, T.groups.addedAgo.replace('{when}', relativeTime(item.added_at, lang))]} />
           </span>
         </div>
 

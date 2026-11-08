@@ -48,7 +48,9 @@ test('closes on Escape', () => {
   expect(screen.queryByRole('menu')).not.toBeInTheDocument()
 })
 
-test('applies active styling when active is true', () => {
+test('marks the current section like a tab: the mark in front, the bright text', () => {
   render(<StatusNavDropdown items={items} active={true} label="Status" />)
-  expect(screen.getByRole('button', { name: 'Status' })).toHaveClass('after:scale-x-100')
+  const button = screen.getByRole('button', { name: 'Status' })
+  expect(button).toHaveClass('text-text-main')
+  expect(button.querySelector('[aria-hidden="true"]')).toHaveClass('before:content-(--mark)')
 })

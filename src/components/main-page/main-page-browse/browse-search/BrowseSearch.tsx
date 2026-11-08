@@ -12,6 +12,7 @@ import { fieldClass } from '@/components/ui/Input'
 import type { GameSource } from '@/types/game'
 import type { GameStatus } from '@/types/game'
 import { kickerClass } from '@/components/ui/Kicker'
+import Facts from '@/components/ui/Facts'
 
 const SHOWN = 4
 
@@ -86,7 +87,7 @@ export default function BrowseSearch({ library }: { library: LibraryGame[] }) {
                 <span className="flex flex-col min-w-0 flex-1">
                   <span className="text-xs font-semibold truncate">{g.title}</span>
                   <span className="text-[10px] text-text-secondary truncate">
-                    {g.subtitle} · {T.categories[g.status]}
+                    <Facts items={[g.subtitle, T.categories[g.status]]} />
                   </span>
                 </span>
                 <span className="text-[11px] tabular-nums text-text-secondary shrink-0">{g.pct}%</span>

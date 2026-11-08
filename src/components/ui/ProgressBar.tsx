@@ -6,6 +6,7 @@ const clamp = (n: number) => Math.min(Math.max(n, 0), 100)
  * (softcore under hardcore — the same hue, a step down). A finished bar
  * stays in the theme's colour, brightening towards its end with a glow; the
  * green that says "done" is in the percentage beside it, not on the bar.
+ * Upright in both designs: data never leans (#127).
  *
  * Exposed as a progressbar with its value, so the share never rests on the
  * colour or the length alone. Spans, so it fits inside links and buttons.
@@ -33,10 +34,6 @@ export function ProgressBar({
   const shown = Math.max(value, soft)
   const done = shown >= 100
 
-  // The design's slant: the track's ends are cut on a diagonal, and so is the fill's leading edge.
-  // The ends are the design's: slanted, or straight and rounded (see ui/shape.ts).
-  const BEVEL = 'var(--clip-3)'
-  const FILL_EDGE = 'var(--clip-fill)'
 
   return (
     <span
@@ -49,12 +46,12 @@ export function ProgressBar({
       // Only a finished bar glows.
       className={`relative block w-full ${height} ${done ? 'drop-shadow-done' : ''} ${className}`}
     >
-      <span data-track className={`absolute inset-0 overflow-hidden ${trackClass}`} style={{ clipPath: BEVEL, borderRadius: 'var(--bar-radius)' }}>
+      <span data-track className={`absolute inset-0 overflow-hidden rounded-(--bar-radius) ${trackClass}`}>
         {soft > value && (
           <span
             data-fill="soft"
             className="absolute inset-y-0 left-0 bg-progress-soft transition-[width] duration-500"
-            style={{ width: `${soft}%`, clipPath: FILL_EDGE, borderRadius: 'var(--bar-radius)' }}
+            style={{ width: `${soft}%`, borderRadius: 'var(--bar-radius)' }}
           />
         )}
         {value > 0 && (
@@ -64,7 +61,7 @@ export function ProgressBar({
             style={
               value >= 100
                 ? { width: '100%', background: 'linear-gradient(90deg, rgb(var(--progress)), color-mix(in oklab, rgb(var(--progress)) 55%, white))' }
-                : { width: `${value}%`, clipPath: FILL_EDGE, borderRadius: 'var(--bar-radius)' }
+                : { width: `${value}%`, borderRadius: 'var(--bar-radius)' }
             }
           />
         )}

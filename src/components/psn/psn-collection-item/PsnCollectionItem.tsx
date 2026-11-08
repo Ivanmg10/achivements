@@ -13,6 +13,7 @@ import GameIcon from '@/components/game-icon/GameIcon'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import PsnCollectionExpanded from '@/components/psn/psn-collection-expanded/PsnCollectionExpanded'
 import Tag from '@/components/ui/Tag'
+import Facts from '@/components/ui/Facts'
 
 /**
  * A collection (The Ezio Collection) in the recent feed: one card with the
@@ -84,30 +85,21 @@ export default function PsnCollectionItem({
             />
           </span>
 
-          <span className="flex flex-wrap items-center gap-x-2 text-[0.8125rem] text-text-secondary">
-            <span className="whitespace-nowrap">
-              {games.length} {T.psn.collectionGames}
-            </span>
-            <span className="opacity-40" aria-hidden="true">·</span>
-            <span className="whitespace-nowrap">
-              {awarded}/{total} {T.psn.trophies.toLowerCase()}
-            </span>
-            {collection.playtimeMinutes !== null && (
-              <>
-                <span className="opacity-40" aria-hidden="true">·</span>
-                <span className="flex items-center gap-1">
-                  <IconClock size={12} aria-hidden="true" />
-                  <span className="sr-only">{T.steam.playtime}: </span>
-                  {formatPlaytime(collection.playtimeMinutes, T.steam, lang)}
-                </span>
-              </>
-            )}
-            {lastPlayed && (
-              <>
-                <span className="opacity-40" aria-hidden="true">·</span>
-                <span>{formatDate(lastPlayed, lang)}</span>
-              </>
-            )}
+          <span className="flex flex-wrap items-center text-[0.8125rem] text-text-secondary">
+            <Facts
+              items={[
+                <span key="g" className="whitespace-nowrap">{games.length} {T.psn.collectionGames}</span>,
+                <span key="t" className="whitespace-nowrap">{awarded}/{total} {T.psn.trophies.toLowerCase()}</span>,
+                collection.playtimeMinutes !== null && (
+                  <span key="h" className="flex items-center gap-1">
+                    <IconClock size={12} aria-hidden="true" />
+                    <span className="sr-only">{T.steam.playtime}: </span>
+                    {formatPlaytime(collection.playtimeMinutes, T.steam, lang)}
+                  </span>
+                ),
+                lastPlayed && <span key="d">{formatDate(lastPlayed, lang)}</span>,
+              ]}
+            />
           </span>
         </span>
       </button>

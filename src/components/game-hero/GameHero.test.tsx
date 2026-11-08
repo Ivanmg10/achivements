@@ -45,12 +45,11 @@ test('no tiles and no media: no right column', () => {
   expect(container.querySelector('section')!.children).toHaveLength(2)
 })
 
-test('a chip takes its tone', () => {
+test('a chip takes its tone and stands upright, as every tag does', () => {
   render(<GameHeroChip tone="danger">2 missable</GameHeroChip>)
-  const chip = screen.getByText('2 missable').parentElement!
+  const chip = screen.getByText('2 missable')
   expect(chip).toHaveClass('text-danger')
-  expect(chip).toHaveClass('skew-x-(--slant-pill)')
-  expect(chip.firstElementChild).toHaveClass('-skew-x-(--slant-pill)')
+  expect(chip.className).not.toContain('skew')
 })
 
 test('the progress: the bar, the share and the count', () => {

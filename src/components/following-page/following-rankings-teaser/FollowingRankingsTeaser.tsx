@@ -4,17 +4,16 @@ import Link from 'next/link'
 import { IconChevronRight, IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useRankings } from '@/hooks/useRankings'
-import { slantStyle } from '@/components/ui/shape'
+import { SLANT_PLATE } from '@/components/ui/shape'
 import Tag from '@/components/ui/Tag'
 import Avatar from '@/components/ui/Avatar'
 
 /** Second, first and third, as a podium stands: the picture's size (px) and ring, the step's height and colour. */
 const PODIUM = [
-  { place: 2, size: 44, ring: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--ink)/0.4)]', step: 'h-9 bg-ink/20 text-text-main' },
-  { place: 1, size: 56, ring: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(250_204_21)]', step: 'h-14 bg-accent text-bg-main' },
-  { place: 3, size: 40, ring: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--ink)/0.3)]', step: 'h-7 bg-ink/[0.14] text-text-main' },
+  { place: 2, size: 44, ring: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--ink)/0.4)]', step: 'h-9 before:bg-ink/20 text-text-main' },
+  { place: 1, size: 56, ring: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(250_204_21)]', step: 'h-14 before:bg-accent text-bg-main' },
+  { place: 3, size: 40, ring: 'shadow-[0_0_0_2px_rgb(var(--bg-card)),0_0_0_4px_rgb(var(--ink)/0.3)]', step: 'h-7 before:bg-ink/[0.14] text-text-main' },
 ]
-const SLANT = slantStyle(8)
 
 /**
  * The way into the rankings from Following: the podium of you and the people
@@ -69,7 +68,7 @@ export default function FollowingRankingsTeaser({ className = '' }: { className?
               )}
               <span className="w-full text-center truncate text-xs font-bold">{row ? (row.isMe ? T.rankings.you : row.username) : ' '}</span>
               <span className="text-[0.6875rem] font-semibold tabular-nums text-text-secondary">{row ? row.points.toLocaleString(lang) : ' '}</span>
-              <span style={SLANT} className={`${step} w-full flex items-start justify-center pt-1 font-display italic font-extrabold text-xl leading-none tabular-nums`}>
+              <span className={`${SLANT_PLATE} ${step} w-full flex items-start justify-center pt-1 font-display italic font-extrabold text-xl leading-none tabular-nums`}>
                 {place}
               </span>
             </span>

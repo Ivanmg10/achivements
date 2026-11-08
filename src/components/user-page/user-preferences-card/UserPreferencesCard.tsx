@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from 'react'
 import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
-import MainPageProfileTabs, { profilePanelId, profileTabId, type ProfileTab } from '@/components/main-page/main-page-profile/main-page-profile-tabs/MainPageProfileTabs'
+import Tabs, { tabIds, type Tab } from '@/components/ui/Tabs'
 import UserPreferencesGeneral from '@/components/user-page/user-preferences-general/UserPreferencesGeneral'
 import UserPreferencesPlatform from '@/components/user-page/user-preferences-platform/UserPreferencesPlatform'
 import UserRaPreferences from '@/components/user-page/user-ra-preferences/UserRaPreferences'
@@ -72,15 +72,15 @@ export default function UserPreferencesCard() {
     xbox: user?.favorite_xbox_game ?? null,
   }
 
-  const tabs: ProfileTab<PrefTab>[] = [
-    { id: 'general', label: T.userData.prefsGeneral },
-    { id: 'ra', label: 'RA' },
-    { id: 'steam', label: 'Steam' },
-    { id: 'psn', label: 'PlayStation' },
-    ...(xboxEnabled ? [{ id: 'xbox' as const, label: 'Xbox' }] : []),
+  const tabs: Tab<PrefTab>[] = [
+    { value: 'general', label: T.userData.prefsGeneral },
+    { value: 'ra', label: 'RA' },
+    { value: 'steam', label: 'Steam' },
+    { value: 'psn', label: 'PlayStation' },
+    ...(xboxEnabled ? [{ value: 'xbox' as const, label: 'Xbox' }] : []),
   ]
   // A remembered Xbox tab for someone who may no longer see Xbox falls back to General.
-  const tab = tabs.some((t) => t.id === saved) ? saved : 'general'
+  const tab = tabs.some((t) => t.value === saved) ? saved : 'general'
 
   async function handleSave(source: GameSource, game: FavoriteGame | null) {
     await saveFavorite(source, game)
@@ -101,19 +101,18 @@ export default function UserPreferencesCard() {
         {T.userPage.preferences}
       </h2>
 
-      <MainPageProfileTabs<PrefTab>
-        idPrefix={ID_PREFIX}
-        label={T.userData.prefsTabsLabel}
+      <Tabs<PrefTab>
+        id={ID_PREFIX}
+        aria-label={T.userData.prefsTabsLabel}
         tabs={tabs}
-        selected={tab}
-        onSelect={setTab}
-        size="md"
+        value={tab}
+        onChange={setTab}
       />
 
       <div
         role="tabpanel"
-        id={profilePanelId(ID_PREFIX, tab)}
-        aria-labelledby={profileTabId(ID_PREFIX, tab)}
+        id={tabIds(ID_PREFIX, tab).panel}
+        aria-labelledby={tabIds(ID_PREFIX, tab).tab}
         className="flex-1"
       >
         {tab === 'general' ? (

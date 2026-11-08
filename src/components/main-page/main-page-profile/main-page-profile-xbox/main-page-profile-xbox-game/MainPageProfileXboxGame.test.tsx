@@ -28,5 +28,5 @@ const PLAYED = formatPlaytime(MINUTES, en.steam, 'en')
 
 test('the play time beside the console', () => {
   render(<MainPageProfileXboxGame game={{ ...GAME, playtimeMinutes: MINUTES }} />)
-  expect(screen.getByText(new RegExp(`Xbox Series · ${PLAYED}`))).toBeInTheDocument()
+  expect(screen.getByText('Xbox Series', { exact: false }).textContent).toMatch(new RegExp(`Xbox Series, ${PLAYED}`))
 })

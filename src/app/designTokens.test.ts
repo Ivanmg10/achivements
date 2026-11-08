@@ -5,8 +5,7 @@ const css: string = require('fs').readFileSync(require('path').join(__dirname, '
 
 const DESIGN_TOKENS = [
   '--hardcore', '--softcore',
-  '--slant-button', '--slant-pill', '--slant-line', '--slant-mark', '--slant-cut',
-  '--clip-3', '--clip-4', '--clip-5', '--clip-6', '--clip-8', '--clip-14', '--clip-fill', '--bar-radius',
+  '--slant', '--mark', '--bar-radius',
   '--r-chip', '--r-control', '--r-field', '--r-card',
   '--r-button', '--r-tag', '--r-pane', '--r-tile', '--r-track', '--r-knob', '--knob-w', '--knob-h', '--knob-shift',
   '--r-sheet', '--r-area', '--r-icon', '--r-box', '--r-box-md', '--r-box-sm', '--r-tag-sm', '--r-badge', '--r-cell', '--r-nav', '--button-inset', '--area-resize',
@@ -30,7 +29,7 @@ test('the shapes are on :root only, so a theme preview inside a round page stays
   for (const token of SHAPE_TOKEN_NAMES) expect(coloursBlock()).not.toContain(`${token}:`)
 })
 
-const SHAPE_TOKEN_NAMES = ['--slant-button', '--clip-4', '--r-card', '--r-button', '--r-box', '--bar-radius']
+const SHAPE_TOKEN_NAMES = ['--slant', '--mark', '--r-card', '--r-button', '--r-box', '--bar-radius']
 
 test('a font preview shows its font: it takes the family, and Barlow can undo a page in another font', () => {
   for (const font of ['barlow', 'sofia', 'fira']) expect(css).toContain(`[data-font="${font}"]:not(html)`)
@@ -59,7 +58,7 @@ function designBlock(name: 'slanted' | 'round') {
   const start = css.indexOf(`[data-shape="${name}"] {`)
   return css.slice(start, css.indexOf('}', start))
 }
-const SHAPE_TOKENS = DESIGN_TOKENS.filter((t) => /^--(slant|clip|bar-radius|button-inset|area-resize|r-nav|r-sheet|r-area|r-icon|r-box|r-box-md|r-box-sm|r-tag-sm|r-badge|r-cell|r-control|r-chip|r-button|r-tag|r-pane|r-tile|r-field|r-card|r-track|r-knob|knob)/.test(t))
+const SHAPE_TOKENS = DESIGN_TOKENS.filter((t) => /^--(slant|mark|bar-radius|button-inset|area-resize|r-nav|r-sheet|r-area|r-icon|r-box|r-box-md|r-box-sm|r-tag-sm|r-badge|r-cell|r-control|r-chip|r-button|r-tag|r-pane|r-tile|r-field|r-card|r-track|r-knob|knob)/.test(t))
 const valueIn = (block: string, token: string) => block.match(new RegExp(`${token}: ([^;]+);`))?.[1]
 
 test('no theme overrides the shapes: only the two designs do, for all themes at once', () => {
@@ -76,10 +75,17 @@ test('the slanted design restates the base exactly, so a specimen stays slanted 
   for (const token of SHAPE_TOKENS) expect(valueIn(slanted, token)).toBe(valueIn(base, token))
 })
 
-test('the round design takes the slant out of every slanted token and rounds the controls', () => {
+test('the slanted design leans on one angle, 12°, and marks with a slash (identity B, #127)', () => {
+  const slanted = designBlock('slanted')
+  expect(valueIn(slanted, '--slant')).toBe('-12deg')
+  expect(valueIn(slanted, '--mark')).toBe('"/"')
+  expect(css).not.toMatch(/--slant-|--clip-\d/)
+})
+
+test('the round design takes the slant out and rounds the controls', () => {
   const round = designBlock('round')
-  for (const token of ['--slant-button', '--slant-pill', '--slant-line', '--slant-mark', '--slant-cut']) expect(round).toContain(`${token}: 0deg`)
-  for (const token of ['--clip-3', '--clip-4', '--clip-5', '--clip-6', '--clip-8', '--clip-14', '--clip-fill']) expect(round).toContain(`${token}: none`)
+  expect(valueIn(round, '--slant')).toBe('0deg')
+  expect(valueIn(round, '--mark')).toBe('"\\2022"')
   // A one-line control is a pill; what holds several lines keeps soft corners, or it would look deformed.
   for (const token of ['--r-chip', '--r-tag', '--r-tag-sm', '--r-badge', '--r-icon', '--r-nav', '--r-track', '--r-knob', '--r-button', '--r-field']) expect(round).toContain(`${token}: 9999px`)
   for (const token of ['--r-area', '--r-control', '--r-card', '--r-sheet']) expect(valueIn(round, token)).not.toBe('9999px')

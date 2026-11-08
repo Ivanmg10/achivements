@@ -3,7 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { useMainPlatform } from '@/context/MainPlatformContext'
 import { PLATFORM_NAME } from '@/utils/gameRef'
-import MainPageProfileTabs, { profilePanelId, profileTabId } from '@/components/main-page/main-page-profile/main-page-profile-tabs/MainPageProfileTabs'
+import Tabs, { tabIds } from '@/components/ui/Tabs'
 import MainPageCharts from '@/components/main-page/main-page-charts/MainPageCharts'
 import type { GameSource } from '@/types/game'
 
@@ -23,19 +23,20 @@ export default function PublicUserActivity() {
     <div className="flex flex-col gap-2">
       {tabbed && (
         <div className="bg-bg-card rounded-tile px-4 pt-3">
-          <MainPageProfileTabs<GameSource>
-            idPrefix={ID_PREFIX}
-            label={T.userProfile.statsPlatform}
-            selected={platform}
-            onSelect={setPlatform}
-            tabs={linked.map((p) => ({ id: p, label: PLATFORM_NAME[p] }))}
+          <Tabs<GameSource>
+            id={ID_PREFIX}
+            aria-label={T.userProfile.statsPlatform}
+            size="sm"
+            value={platform}
+            onChange={setPlatform}
+            tabs={linked.map((p) => ({ value: p, label: PLATFORM_NAME[p] }))}
           />
         </div>
       )}
       <div
         role={tabbed ? 'tabpanel' : undefined}
-        id={tabbed ? profilePanelId(ID_PREFIX, platform) : undefined}
-        aria-labelledby={tabbed ? profileTabId(ID_PREFIX, platform) : undefined}
+        id={tabbed ? tabIds(ID_PREFIX, platform).panel : undefined}
+        aria-labelledby={tabbed ? tabIds(ID_PREFIX, platform).tab : undefined}
         className="-mx-4 [&>section]:bg-transparent"
       >
         <MainPageCharts />

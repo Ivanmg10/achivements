@@ -1685,8 +1685,8 @@ export const fr: Translations = {
   },
   homeLayout: {
     layoutLabel: 'Disposition',
-    shapeSlantedHint: 'Bouts inclinés sur les boutons, barres et étiquettes.',
-    shapeRoundHint: 'Coins doux, boutons et étiquettes en pilule, interrupteurs ronds.',
+    shapeSlantedHint: 'Le bouton principal, le niveau et la série penchent ; une barre oblique marque l\'onglet ouvert.',
+    shapeRoundHint: 'Coins doux, boutons et étiquettes en pilule ; un point marque l\'onglet ouvert.',
     shapeLabel: 'Forme',
     shapeSlanted: 'Inclinée',
     shapeRound: 'Arrondie',

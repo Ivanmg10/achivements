@@ -272,14 +272,24 @@ the reasons and the details are in `docs/design-system.md` → The rules in full
   `Modal` (`CommonModal` wraps it; a `Modal` draws the frame, never a card inside it; `placement="top"` for a
   command panel or a menu), `Notice`, `ErrorRetry` (a failed read with its retry), `Spinner` (or `Button loading`),
   `TOOLTIP_SURFACE`, `MENU_SURFACE`, `SURFACE`, `Accordion`, `ShowMore`, `Shelf`, `SectionHead`, `DropSlot`,
-  `ToggleButton`, `Kicker` (the uppercase label), `Tag`, `Avatar` (with the presence dot), `ListRow`, `Figure`
-  (every labelled number) and `DataBar` (a chart bar with cut ends). `className` on them is for layout only,
+  `ToggleButton`, `Kicker` (the small label, sentence case), `Tag`, `Avatar` (with the presence dot), `ListRow`, `Figure`
+  (every labelled number), `DataBar` (a chart bar) and `Facts` (facts on one line). `className` on them is for layout only,
   never colours. **Tokens, not strings:** `focus-ring`, `shadow-hairline-t/-b`, `shadow-sunken`,
   `drop-shadow-done`, and a platform's colour is `text-steam` / `bg-psn/10`…, never a hex. Rules added in #120
   start with the files still to migrate (`ui/uiGuard.pending.json`): the list only shrinks, never add to it.
 - **A component never reads the look choice** (`data-shape`, `data-font`): it reads tokens. **Never a literal
-  `polygon(...)` or `skew-*-[..]`** (`slantStyle(px)`, `skew-y-(--slant-mark)`, `skew-x-(--slant-button)`); no theme
-  overrides a shape token. The welcome curtain's fixed clip paths are the documented exception.
+  `polygon(...)` or `skew-*-[..]`**; no theme overrides a shape token. The welcome curtain's fixed clip paths are
+  the documented exception.
+- **The slant grammar, identity B v2 (#127, the owner's choice on the canvas, 2026-11-07):** **one angle**,
+  `--slant` (12°, 0 in round), `skew-x-(--slant)` or `SLANT_PLATE`; no second angle and no fixed cuts (the guard
+  refuses `--slant-*`, `--clip-*`). **Only the big gestures and the player's own marks lean:** the primary button,
+  the chosen option of a `SegmentedControl`, the level (`VaultLevelBadge`) and the streak (`StreakTag`), the
+  podium's steps. Small controls, fields, search, filters, secondary/quiet/danger buttons, the switch, tags and
+  marks stand upright. **Data never leans:** `ProgressBar`, `DataBar` and every chart bar are upright. **The mark
+  is the signature** (`--mark`: "/" slanted, "•" round, `MARK`): in front of the tab you are on (`Tabs`, the one
+  drawing of every tab bar; `TabMark` in a row of pressed buttons), between bare figures, and between facts on
+  one line (`Facts`, never a hand-made `·`). **No label in capitals:** kickers, figure labels and table heads are in
+  sentence case. Details: `docs/design-system.md` → The slant grammar.
 - **The round design is always rounder than the slanted one.** Radii come from tokens, chosen by what the thing
   is (`rounded-card`, `-sheet`, `-tile`, `-box`, `-cell`, `-button`, `-icon`, `-chip`, `-field`, `-area`);
   `rounded-control` is a soft surface (notices, menus, tooltips), never a pill. Outside `ui/` no `rounded-lg`…`-3xl`

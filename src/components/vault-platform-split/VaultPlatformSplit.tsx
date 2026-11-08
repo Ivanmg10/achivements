@@ -26,7 +26,7 @@ export default function VaultPlatformSplit({ split, className = '' }: { split: P
       className={`flex h-2 gap-0.5 ${parts.length === 0 ? 'bg-ink/10' : ''} ${className}`}
     >
       {parts.map((p) => (
-        <DataBar key={p.s} share={p.v / total} cut={3} color={PLATFORM_COLOR[p.s]} className="h-full" />
+        <DataBar key={p.s} share={p.v / total} color={PLATFORM_COLOR[p.s]} className="h-full" />
       ))}
     </span>
   )

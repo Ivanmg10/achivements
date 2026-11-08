@@ -4,6 +4,7 @@ import { IconDeviceGamepad2 } from '@tabler/icons-react'
 import Figure from '@/components/ui/Figure'
 import RarityBadge from '@/components/ui/RarityBadge'
 import Tag, { type TagTone } from '@/components/ui/Tag'
+import Facts from '@/components/ui/Facts'
 import Avatar from '@/components/ui/Avatar'
 import ListRow from '@/components/ui/ListRow'
 import { ProgressBar } from '@/components/ui/ProgressBar'
@@ -69,7 +70,7 @@ export default function DesignCatalogData() {
           </Specimen>
           <Specimen name="y · cut 8 · soft and accent">
             <span className="flex items-end gap-2 h-24 w-48">
-              {[0.3, 0.6, 1, 0.45, 0.15].map((s, i) => <span key={i} className="flex-1 h-full flex items-end"><DataBar axis="y" cut={8} min={4} share={s} tone={s === 1 ? 'accent' : 'soft'} className="w-full" /></span>)}
+              {[0.3, 0.6, 1, 0.45, 0.15].map((s, i) => <span key={i} className="flex-1 h-full flex items-end"><DataBar axis="y" min={4} share={s} tone={s === 1 ? 'accent' : 'soft'} className="w-full" /></span>)}
             </span>
           </Specimen>
         </Compare>
@@ -93,12 +94,26 @@ export default function DesignCatalogData() {
             <Tag tone="accent">Beta</Tag>
             <Tag size="lg" tone="neutral">PS5</Tag>
           </Specimen>
-          <Specimen name="slant · lg">
-            <Tag slant size="lg" tone="neutral">Nintendo 64</Tag>
-            <Tag slant size="lg" tone="danger">2 missable</Tag>
+          <Specimen name="lg, upright (the game page's chips)">
+            <Tag size="lg" tone="neutral">Nintendo 64</Tag>
+            <Tag size="lg" tone="danger">2 missable</Tag>
+          </Specimen>
+          <Specimen name="slant: only the player's own marks, the level and the streak">
+            <VaultLevelBadge points={pointsForLevel(31)} compact size="lg" />
+            <StreakTag days={56} text="56 d" glow={false} />
           </Specimen>
           <Specimen name="overlay, on a picture">
             <span className="rounded-tile p-3 bg-accent/40"><Tag tone="overlay">Steam</Tag></span>
+          </Specimen>
+        </Compare>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="facts">
+        <Compare>
+          <Specimen name="a game's line">
+            <span className="flex flex-wrap items-center text-[0.8125rem] text-text-secondary">
+              <Facts items={['15/49 achievements', '102/485 pts', '2 Nov 2026']} />
+            </span>
           </Specimen>
         </Compare>
       </DesignCatalogPiece>

@@ -7,7 +7,7 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
 ## The three layers
 
 1. **Tokens** (`src/app/globals.css`): colours of a theme (`--accent`, `--bg-card`…),
-   and the *design* — shapes, sizes, motion (`--slant-*`, `--clip-*`, `--bar-radius`,
+   and the *design* — shapes, sizes, motion (`--slant`, `--mark`, `--bar-radius`,
    `--r-*`, `--h-*`, `--motion-*`). A theme changes the colours; a design changes
    the shapes. Today there are two designs: **slanted** (the default) and **round**, softer surfaces with every one-line control a pill or a circle
    (`[data-shape="round"]`, the person's choice, `useShapeStyle`; usable on any element). A third
@@ -60,9 +60,8 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   | `silver`, `silver-light`, `silver-ink`, `gold-ink`, `bronze-ink`, `hardcore-deep`, `offline`, `status-playing`, `status-want` (and `-bg`), `status-done-bg`, `redump`, `tosec` (and `-ink`), `best-period` (and `-soft`), `console-<name>` (and `-ink`), `award-*`, `steam-button`, `steam-slate`, `steam-night`, `steam-sky`, `psn-night`, `psn-light`, `xbox-dark`, `art-pink`, `art-cyan` | the hues that are not a theme's, in the exact values the palette classes gave them (2026-11-08) | `zinc-400`, `blue-900/50`, `violet-300`, `#171a21`… |
 
   In an inline style (an SVG stroke, a ring colour passed as a value) use `var(--color-steam)`. What stays a literal hex, on the guard's `OWN_COLOURS` list with its reason in the test: the logo and the server-drawn pictures, the RA guide's drawing of RetroAchievements' own page, the welcome curtain's ink, and the browser bar's `THEME_COLOR`.
-- **Shapes come from tokens.** A bar's cut ends are `slantStyle(px)`
-  (`ui/shape.ts`); a mark's lean is `skew-y-(--slant-mark)`; a control's slant is
-  `skew-x-(--slant-button)`. Never a literal. The welcome curtain's fixed `polygon(...)`
+- **Shapes come from tokens.** A lean is `skew-x-(--slant)` on a library piece or `SLANT_PLATE`
+  (`ui/shape.ts`), the signature glyph is `MARK`. Never a literal (see The slant grammar below). The welcome curtain's fixed `polygon(...)`
   values in `WelcomeCurtain.module.css` are the documented exception: the illustration is
   decorative and deliberately does not follow the shape choice.
 - **Colour with a meaning comes from the theme** (danger, success, warning,
@@ -96,6 +95,32 @@ One set of CSS classes in `globals.css` for the whole site (issue #61; families 
 - **Only for what appears on its own.** A list that is mounted with its skeleton inside would play on the skeleton: keep the skeleton outside. What opens on a click may stay in Framer (dialogs, toasts, the library's swaps and opened rows); the guard in `uiGuard.test.ts` lists those. No `whileInView`: entrances are not scroll-triggered.
 - **The library's shelves keep their own cascade** (`.enter-shelves` on their root, the user's call, 2026-10-31): each shelf 160 ms after the last, its title sliding in, its cards lifting and settling with a bounce 55 ms apart, "see all" closing it. The general `.enter-cards` was too plain there. It is built on the same tokens, so reduced motion needs nothing more, and its progress bars do not grow.
 - The home's left card (`ViewEntrance`) and profile column (`MainPageProfile.module.css`) came first and keep their own keyframes (the user confirmed it on 2026-10-31). The welcome keeps its own too (`WelcomePage.module.css`): they are timed to its curtain.
+
+## The slant grammar (identity B v2, #127, 2026-11-09)
+
+The owner chose it on the design canvas (`docs/designs.md`, row 2026-11-07: boards "SheetB2" and "Piezas"), as drawn.
+The complaint was "it looks generic, nothing makes it recognisable", not the slant itself: the slant was everywhere at
+four angles (12°, 14°, 20°, 30°) and fixed-pixel cuts, so it read as noise. B keeps it as the site's mark by putting it
+where it means something.
+
+- **One angle.** `--slant` is 12° (0 in round). Every lean is `skew-x-(--slant)` on a library piece, or `SLANT_PLATE`
+  (a plate behind the content) for a big piece; a plate's cut follows the angle at any height, so the three podium steps
+  lean alike. The guard refuses the old `--slant-*` / `--clip-*` and a lean outside the library but three drawings it names.
+- **What leans:** the big gestures and the player's own marks: the primary `Button`, the chosen option of a
+  `SegmentedControl`, the level (`VaultLevelBadge`, `Tag slant`) and the streak (`StreakTag`) wherever they are (the top
+  bar shows them at one height, one family), the podium's steps.
+- **What stands upright:** small controls, fields, search, filters, `Select`, `Switch`, secondary, quiet and danger
+  buttons, every other tag (the game page's chips too), the header's account link, a row's accent mark.
+- **Data never leans:** `ProgressBar`, `DataBar`, the streak page's bars and every chart bar are upright, square in
+  slanted and rounded in round (`--bar-radius`). The streak strip's break mark across a capped bar is an annotation and keeps the angle.
+- **The mark is the signature:** `--mark` ("/" slanted, "•" round; `MARK` on an `aria-hidden` span). In front of the
+  tab you are on (`Tabs`, the one drawing of every tab bar: the profile tabs, the home's view switch, the stats rail,
+  the account and public profile; `TabMark` in the top bar's links and the filter rows), in the search bar, between
+  bare figures (`Figure`) and between facts on one line (`Facts`: "15/49 achievements / 102/485 pts / 2 Nov 2026").
+- **No label in capitals:** `Kicker` (13 px), figure labels, card titles and table heads are in sentence case. The guard
+  refuses the `uppercase` class (the hash modal's dump-group names are the one exception).
+- **Round keeps its rule:** everything rounder than slanted, every one-line control a pill (`designTokens.test.ts`); it
+  takes the dot where slanted has the slash, and nothing leans.
 
 ## The catalogue (`/design`, admins only)
 
@@ -146,8 +171,8 @@ flag is read from the database, never the session).
   `data-shape` and `data-font` on `<html>`; any element can carry either one to show a look inside
   another (the catalogue, the choice cards and the Layout chooser's sample do; `data-font` swaps `--font-face` and `--font-face-display`, and such an element takes the family itself) (`ShapeSync`; a
   script in the root layout paints the last choices before the first frame). A component never
-  reads the choice: it reads tokens. A bar's cut ends are `slantStyle(px)`
-  (`ui/shape.ts`), a mark's lean `skew-y-(--slant-mark)`, a control's `skew-x-(--slant-button)`.
+  reads the choice: it reads tokens. A lean is `skew-x-(--slant)` or `SLANT_PLATE`, the mark `MARK`
+  (`ui/shape.ts`; The slant grammar).
   **Never a literal `polygon(...)` or `skew-*-[..]`** (`uiGuard.test.ts` fails on it). The round
   design may override the shape tokens; no theme may (`designTokens.test.ts`). The base shape tokens sit on
   `:root` only, never on `[data-theme]`, so an element that carries a theme (the theme chooser's preview)
@@ -198,17 +223,17 @@ The site's controls come from the library, in the design agreed on the canvas
 (`docs/ui-library-and-designs-plan.md` → Build plan). **Never draw one by hand**; a
 guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside `ui/`:
 
-- **Buttons**: `Button` (`primary` slanted, `secondary`, `quiet`, `danger` (tinted, not solid); `size`; `loading`;
+- **Buttons**: `Button` (`primary`, the only one that leans, `secondary`, `quiet`, `danger` (tinted, not solid); `size`; `loading`;
   `href` for a link) and `IconButton` (needs `aria-label`). Where an element cannot be one,
   `buttonClass(variant, size, layout)`.
 - **Fields**: `Input`, `Textarea`, `SearchInput`, `PasswordInput`, wrapped in `Field` (label,
   aside, hint or error wired by id); or `fieldClass({ invalid, icon, size })` on a native input.
-- **`Select`** (own listbox, never a native `<select>`), **`Switch`** (slanted; say the state in
+- **`Select`** (own listbox, never a native `<select>`), **`Switch`** (upright; say the state in
   words beside it), **`Checkbox`**, **`ChoiceCards`** / `choiceClass`.
-- **`Tabs`** (slanted line, roving tabindex; the panel is the caller's, `tabIds`),
-  **`SegmentedControl`** (sliding slanted pill), **`Pill`** / `pillClass` for filter chips.
+- **`Tabs`** (the mark in front of the tab you are on, no underline; `lg` a card's title, `orientation="rail"` a column of sections; roving tabindex; the panel is the caller's, `tabIds`; `tabClass` + `TabMark` for pressed buttons),
+  **`SegmentedControl`** (a sliding pill leaning on the one angle), **`Pill`** / `pillClass` for filter chips.
 - `className` on them is for layout only (margin, width, flex), never colours.
-- **The look lives in tokens** in `globals.css` (`--slant-*`, `--r-*`, `--h-*`, `--motion-*`,
+- **The look lives in tokens** in `globals.css` (`--slant`, `--mark`, `--r-*`, `--h-*`, `--motion-*`,
   `--hardcore`/`--softcore`), defined once for every theme (`designTokens.test.ts`): a future
   site-wide design changes them, not the components.
 - **Loading**: `Skeleton` (`ui/Skeleton.tsx`: `radius` from the tokens, colour `bg-skeleton`, pulse, still under reduced motion, always hidden), `SkeletonRow` / `SkeletonGameList`, `GameRowSkeleton`, `GameCardSkeleton`; an image's own placeholder uses `SKELETON_PULSE`. **Each screen and view has its own composed skeleton, on the real boxes and gutters** (2026-10-31, #70): a new screen, section or fetch brings its own in the same change, and a figure on its way is `loading` on `Figure`, never a `—`. The guard refuses a hand-made `animate-pulse`; only `StatusBadge`'s glow is exempt. Spinners stay for actions (inside a button), not for content. **The home's profile skeleton takes the height the real one had last time** (`homeFit` keeps it, `HOME_PROFILE_KEY`): that height sets the top of the home, and a fixed guess made the skeleton taller than the page (2026-11-01). **With profile tabs the home's profile column keeps one height (`min-height`, globals.css, the tallest platform's):** that height sets `--home-fit-trim`, so a shorter profile resized the charts and the heatmap on every switch (2026-11-01). **A line of unlocks over time is `AchievementsLinePlot`** (the home's week, a game's weeks or months): the user's rule, 2026-11-01, one chart, never a second drawing of it. **What a row or a card may show must be in it from the first frame:** a pill whose data comes later is a `loading` pill, gone only if the read fails (`!summary && !error`), or it pushes the others aside when it lands; a large `StatPill` keeps the line under its figure. **A chart in a skeleton is the real chart with `isLoading`**, never a second drawing of it. **`(home)/loading.tsx` also renders signed out, without `MainProviders`**: a skeleton there reads `useOptionalMainView`, never a context that throws. **A section lands whole (the user's preference, 2026-10-31):** the home's Friends and both Following lists hold their skeleton until `detailsLoading` is false, even if that takes longer; no row pops in or re-sorts, and a failed read still ends the wait. Do not add a timeout or a progressive reveal without asking. **A skeleton draws every variant and `<html>` picks one**, so a full load paints the right one before React can read a preference: `data-home-layout`, `data-library-layout` and `data-session` (`in` or `tabs`, nothing signed out; `sessionLook`, no account data) are set by `LOOK_SCRIPT` before the first frame, then kept by `ShapeSync`, and read in `globals.css` (`.if-*`, `.home-if-*`). A block sized by the person's data is a `RememberedHeight` (`ui/`): it keeps in this browser how tall it ended up and holds that room while it loads; the first visit has nothing to go by.
@@ -222,19 +247,18 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
   danger `Notice` with what failed, an optional hint and a quiet retry `Button`), `Spinner` (an action on its
   way, in the text's colour; `Button loading` draws it), `TOOLTIP_SURFACE` (`ui/tooltip.ts`), `MENU_SURFACE` /
   `menuItemClass` (`ui/menu.ts`); the toasts are the dark card.
-- **Labels, people and rows** (#120): `Kicker` / `kickerClass(tone, size)` (the uppercase tracked label: `xs` the
+- **Labels, people and rows** (#120): `Kicker` / `kickerClass(tone, size)` (the small label, in sentence case: `xs` the
   home's chart heads, `sm` a panel's, `md` the welcome's; muted, accent, danger, warning, inherit), `SectionHead` (title, hint, an
   aside at the end; `md` a shelf, `lg` a streak card; Shelf draws its head with it), `Tag` (tinted label; tones
   muted, neutral, accent, info, success, warning, danger, hardcore, gold, surface, overlay, the platforms' steam, psn, xbox and the consoles' white, black, sky, and custom for a tier's hue in `style`; sizes xs a row's console, sm 20 px, md 22 px, lg 24 px;
-  `slant` leans it on `--slant-pill`, the game page's chips), `Avatar` (round picture, initial or icon fallback,
+  `slant` leans it on `--slant`, only for a mark of the player's own: the level), `Avatar` (round picture, initial or icon fallback,
   `online` draws the presence dot, `sizeSm` the size from `sm`), `ListRow` / `LIST_ROW` (media, title, sub line, trailing; the search panel's
-  row). **The shape of `Tag` and `DataBar`, and which of them lean, is #127's slant grammar**: they read today's
-  tokens (`--r-tag`, `--slant-pill`, `--clip-*`), so #127 changes tokens, not the pieces.
+  row), `Facts` (facts on one line joined by the mark; a screen reader hears a comma).
 - **Surfaces and data**: `SURFACE` (`ui/surface.ts`; cards use `rounded-card`), `Figure` (every labelled
-  number: `bare` has no box and a fine slanted rule between figures, `tile` a small box, `card` the label first
+  number: `bare` has no box and the mark between figures, `tile` a small box, `card` the label first
   and the figure big, `compact` the account page's platform cards; `tone` from the theme, `color` for a tier's
   hue, `term` inside a `<dl>`; `StatPill` / `StatCard` are gone and the guard refuses their names),
-  `DataBar` (a chart bar as long or as tall as its share, cut ends from `--clip-*`, optional track), `RarityBadge` (a tinted figure, never a bar), `ProgressBar` bevelled and
+  `DataBar` (a chart bar as long or as tall as its share, upright, optional track), `RarityBadge` (a tinted figure, never a bar), `ProgressBar` upright and
   glowing only when finished, `GameCardBackdrop` = a flat tint of the game's colour behind the
   same neutral hairline as a flat card (`useImageTint`; never the blurred art again, the user's
   choice). The art is read through
@@ -285,7 +309,7 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 Every progress bar is `ProgressBar` (`src/components/ui/ProgressBar.tsx`) or
 `CircularProgress`: the theme's `--progress` (its accent), RA softcore a darker
 step of it (`bg-progress-soft`) under hardcore. A finished bar stays in the
-theme's colour and glows (only a finished bar glows; its ends are cut on the design's slant);
+theme's colour and glows (only a finished bar glows; upright, square ends in slanted and round in round: data never leans);
 **the green is only in the percentage beside it**
 (`text-success` at 100%), never on the bar — the user tried a green ring and
 did not like it. Do not paint a bar in a platform's colour; those stay only in

@@ -23,9 +23,9 @@ test('a tier\'s hue comes from style, and the title names it', () => {
   expect(screen.getByText('Lv 3')).toHaveStyle({ color: 'rgb(1, 2, 3)' })
 })
 
-test('a slanted tag leans on the design token and keeps its text upright', () => {
+test('a slanted tag (the player level) leans on the one angle and keeps its text upright', () => {
   render(<Tag slant size="lg" tone="danger">2 missable</Tag>)
   const inner = screen.getByText('2 missable')
-  expect(inner).toHaveClass('-skew-x-(--slant-pill)')
-  expect(inner.parentElement).toHaveClass('skew-x-(--slant-pill)', 'h-6', 'text-danger')
+  expect(inner).toHaveClass('-skew-x-(--slant)')
+  expect(inner.parentElement).toHaveClass('skew-x-(--slant)', 'h-6', 'text-danger')
 })

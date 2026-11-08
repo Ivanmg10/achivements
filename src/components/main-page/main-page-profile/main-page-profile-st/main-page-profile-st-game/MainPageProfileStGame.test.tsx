@@ -29,7 +29,7 @@ test('shows cover, title and playtime', () => {
   const { container } = render(<MainPageProfileStGame game={GAME} playingNow={false} />)
   expect(container.querySelector('img')?.getAttribute('src')).toBe('/api/steam/icon?appid=311210')
   expect(screen.getByText('Black Ops III')).toBeInTheDocument()
-  expect(screen.getByText('Steam · 20 h')).toBeInTheDocument()
+  expect(screen.getByText('Steam', { exact: false }).textContent).toBe('Steam, 20 h')
 })
 
 test('shows progress with a labelled bar once counts are known', () => {

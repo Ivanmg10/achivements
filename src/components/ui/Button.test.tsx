@@ -46,9 +46,10 @@ describe('Button', () => {
     expect(buttonClass().split(' ')).toEqual(expect.arrayContaining(['isolate', 'before:-z-10', 'before:rounded-button']))
   })
 
-  it('slants the shape, not the text', () => {
-    expect(buttonClass()).toContain('before:skew-x-(--slant-button)')
+  it('leans only the primary, and only its shape, on the one angle', () => {
+    expect(buttonClass()).toContain('before:skew-x-(--slant)')
     expect(buttonClass()).not.toMatch(/(^|\s)skew-x/)
+    for (const v of ['secondary', 'quiet', 'danger'] as const) expect(buttonClass(v)).not.toContain('skew')
   })
 
   it('adds layout classes', () => {

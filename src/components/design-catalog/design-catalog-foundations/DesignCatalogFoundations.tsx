@@ -1,4 +1,4 @@
-import { slantStyle } from '@/components/ui/shape'
+import { MARK, SLANT_PLATE } from '@/components/ui/shape'
 import Kicker from '@/components/ui/Kicker'
 import DesignCatalogPiece, { Compare, Panel, Specimen } from '../design-catalog-piece/DesignCatalogPiece'
 import DesignCatalogEntrances from '../design-catalog-entrances/DesignCatalogEntrances'
@@ -112,7 +112,7 @@ export default function DesignCatalogFoundations() {
         <Panel>
           <p className="font-display italic font-extrabold text-6xl leading-[0.9] pr-2">Display 72</p>
           <p className="font-display italic font-extrabold text-4xl leading-[0.95] pr-2">Display 40 — a section title</p>
-          <Kicker tone="accent" size="md">Kicker, uppercase, tracked</Kicker>
+          <Kicker tone="accent" size="md">Kicker, in sentence case</Kicker>
           <div className="grid gap-1 sm:grid-cols-2">
             {([400, 500, 600, 700, 800] as const).map((w) => (
               <p key={w} style={{ fontWeight: w }} className="text-lg">Barlow {w} — Ultimate Spider-Man</p>
@@ -139,14 +139,11 @@ export default function DesignCatalogFoundations() {
           <Specimen name="Radii: chip, tag, button, tile, pane, field, card">
             {RADII.map((r) => <span key={r} aria-hidden="true" className={`h-12 w-16 bg-ink/15 ring-1 ring-ink/20 ${r}`} />)}
           </Specimen>
-          <Specimen name="slantStyle(3 · 8 · 14)">
-            <span aria-hidden="true" className="h-3 w-24 bg-accent" style={slantStyle(3)} />
-            <span aria-hidden="true" className="h-3 w-24 bg-accent" style={slantStyle(8)} />
-            <span aria-hidden="true" className="h-8 w-24 bg-accent" style={slantStyle(14)} />
+          <Specimen name="--slant: the one angle, on a plate (SLANT_PLATE)">
+            <span aria-hidden="true" className={`${SLANT_PLATE} h-12 w-24 before:bg-accent`} />
           </Specimen>
-          <Specimen name="--slant-line · --slant-mark">
-            <span aria-hidden="true" className="h-1 w-24 bg-accent rounded-(--bar-radius) skew-x-(--slant-line)" />
-            <span aria-hidden="true" className="h-9 w-1 bg-accent skew-y-(--slant-mark)" />
+          <Specimen name="--mark: the signature (MARK)">
+            <span aria-hidden="true" className={`text-3xl font-extrabold leading-none text-accent ${MARK}`} />
           </Specimen>
         </Compare>
       </DesignCatalogPiece>

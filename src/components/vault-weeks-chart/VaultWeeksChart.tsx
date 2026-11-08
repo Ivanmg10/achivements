@@ -27,7 +27,7 @@ export default function VaultWeeksChart({ weeks, className = '' }: { weeks: { st
           return (
             <li key={w.start} title={label(w)} className="flex-1 h-full flex items-end">
               <span className="sr-only">{label(w)}</span>
-              <DataBar axis="y" share={w.points / max} cut={3} min={w.points > 0 ? 4 : 2} tone={last ? 'accent' : 'soft'} style={{ opacity: w.points > 0 ? 1 : 0.35 }} className="w-full" />
+              <DataBar axis="y" share={w.points / max} min={w.points > 0 ? 4 : 2} tone={last ? 'accent' : 'soft'} style={{ opacity: w.points > 0 ? 1 : 0.35 }} className="w-full" />
             </li>
           )
         })}

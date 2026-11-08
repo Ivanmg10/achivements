@@ -72,10 +72,10 @@ test('accepts custom sizing classes', () => {
   expect(bar.className).toContain('flex-1')
 })
 
-test('only a finished bar glows, and its ends come from the design tokens', () => {
+test('only a finished bar glows, and it never leans: data stays upright', () => {
   const { rerender } = render(<ProgressBar pct={40} label="x" />)
   expect(screen.getByRole('progressbar')).not.toHaveClass('drop-shadow-done')
-  expect((screen.getByRole('progressbar').querySelector('[data-track]') as HTMLElement).style.clipPath).toBe('var(--clip-3)')
+  expect((screen.getByRole('progressbar').querySelector('[data-track]') as HTMLElement).style.clipPath).toBe('')
   rerender(<ProgressBar pct={100} label="x" />)
   expect(screen.getByRole('progressbar')).toHaveClass('drop-shadow-done')
 })

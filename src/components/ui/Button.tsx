@@ -4,20 +4,20 @@ import Spinner from './Spinner'
 type Variant = 'primary' | 'secondary' | 'quiet' | 'danger'
 type Size = 'sm' | 'md' | 'lg'
 
-// The shape sits on ::before, skewed by the design's slant; the text stays upright.
-// The shape is inset by what the slant adds on each side, so a full-width button
-// lines up with the fields above and below it.
+// The shape sits on ::before. Only the primary leans on the design's one angle (identity B, #127); the text stays upright.
+// Its shape is inset by what the slant adds on each side, so a full-width primary
+// lines up with the fields above and below it; the others are upright and fill their box.
 const BASE =
   'relative isolate inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none ' +
-  "before:content-[''] before:absolute before:inset-y-0 before:inset-x-(--button-inset) before:-z-10 before:rounded-button before:skew-x-(--slant-button) before:transition-colors before:duration-(--motion-hover) " +
+  "before:content-[''] before:absolute before:inset-y-0 before:-z-10 before:rounded-button before:transition-colors before:duration-(--motion-hover) " +
   'transition-colors duration-(--motion-hover) disabled:opacity-50 disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:pointer-events-none ' +
   'focus-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-main focus-visible:rounded-button'
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'text-bg-main before:bg-accent hover:before:bg-accent-hover',
-  secondary: 'text-text-main before:ring-1 before:ring-inset before:ring-ink/20 hover:before:bg-ink/[0.06]',
-  quiet: 'text-text-secondary hover:text-text-main hover:before:bg-ink/[0.05]',
-  danger: 'text-danger before:bg-danger/12 before:ring-1 before:ring-inset before:ring-danger/45 hover:before:bg-danger/20',
+  primary: 'text-bg-main before:inset-x-(--button-inset) before:skew-x-(--slant) before:bg-accent hover:before:bg-accent-hover',
+  secondary: 'before:inset-x-0 text-text-main before:ring-1 before:ring-inset before:ring-ink/20 hover:before:bg-ink/[0.06]',
+  quiet: 'before:inset-x-0 text-text-secondary hover:text-text-main hover:before:bg-ink/[0.05]',
+  danger: 'before:inset-x-0 text-danger before:bg-danger/12 before:ring-1 before:ring-inset before:ring-danger/45 hover:before:bg-danger/20',
 }
 
 const SIZES: Record<Size, string> = {
@@ -45,7 +45,7 @@ type AsButton = Common & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'cl
 type AsLink = Common & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'className' | 'children'> & { href: string }
 
 /**
- * The site's button: primary (the accent, slanted), secondary (a ring),
+ * The site's button: primary (the accent, the one that leans), secondary (a ring),
  * quiet (text only) and danger. With `href` it renders a link that looks the same.
  */
 export default function Button(props: AsButton | AsLink) {

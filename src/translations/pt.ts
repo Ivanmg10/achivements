@@ -1685,8 +1685,8 @@ export const pt: Translations = {
   },
   homeLayout: {
     layoutLabel: 'Layout',
-    shapeSlantedHint: 'Pontas inclinadas em botões, barras e etiquetas.',
-    shapeRoundHint: 'Cantos suaves, botões e etiquetas em pílula, interruptores redondos.',
+    shapeSlantedHint: 'O botão principal, o nível e a sequência ficam inclinados; uma barra marca o separador aberto.',
+    shapeRoundHint: 'Cantos suaves, botões e etiquetas em pílula; um ponto marca o separador aberto.',
     shapeLabel: 'Forma',
     shapeSlanted: 'Inclinada',
     shapeRound: 'Arredondada',

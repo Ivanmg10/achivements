@@ -1,11 +1,11 @@
-import type { CSSProperties } from 'react'
-
-/** The slants a bar's ends can have, in px (see `--clip-*` in globals.css). */
-export type SlantPx = 3 | 4 | 5 | 6 | 8 | 14
-
 /**
- * The cut ends of a bar, a step or a segment: slanted by `px` in the slanted
- * design, straight and rounded in the round one. Read from the design's tokens
- * (`--clip-*`, `--bar-radius`), so the choice never reaches the component.
+ * A plate behind the content, leaning on the design's one angle (`--slant`, 12°;
+ * upright in the round design), for a big piece that is the player's own: the
+ * podium's steps. The content stays upright; the colour is the caller's
+ * `before:bg-*`. Data never takes it: a bar whose length is the value stays upright.
  */
-export const slantStyle = (px: SlantPx): CSSProperties => ({ clipPath: `var(--clip-${px})`, borderRadius: 'var(--bar-radius)' })
+export const SLANT_PLATE =
+  "relative isolate before:content-[''] before:absolute before:inset-0 before:-z-10 before:skew-x-(--slant) before:rounded-(--bar-radius)"
+
+/** The signature glyph (`--mark`: "/" slanted, "•" round), drawn by `::before`. Put it on an `aria-hidden` span. */
+export const MARK = 'before:content-(--mark)'

@@ -11,9 +11,9 @@ export default function RankingsGuideTable({ head, rows, weights }: { head: [str
       <table className="w-full text-sm border-separate border-spacing-0">
         <thead>
           <tr>
-            <th scope="col" className="px-4 py-2.5 text-left text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary shadow-hairline-b">{head[0]}</th>
+            <th scope="col" className="px-4 py-2.5 text-left text-[0.8125rem] font-semibold text-text-secondary shadow-hairline-b">{head[0]}</th>
             {weights && <th scope="col" aria-hidden="true" className="shadow-hairline-b w-1/3" />}
-            <th scope="col" className="px-4 py-2.5 text-right text-[0.6875rem] uppercase tracking-[0.08em] font-bold text-text-secondary shadow-hairline-b">{head[1]}</th>
+            <th scope="col" className="px-4 py-2.5 text-right text-[0.8125rem] font-semibold text-text-secondary shadow-hairline-b">{head[1]}</th>
           </tr>
         </thead>
         <tbody>

@@ -5,6 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useFollowCounts } from '@/hooks/useFollowCounts'
 import { plural } from '@/utils/utils'
 import { Skeleton } from '@/components/ui/Skeleton'
+import Facts from '@/components/ui/Facts'
 
 const LINK = 'hover:text-text-main hover:underline underline-offset-2 rounded focus-ring'
 
@@ -21,10 +22,11 @@ export default function UserFollowStats() {
   if (isLoading || !counts) return <Skeleton className="inline-block h-3 w-44 max-w-full align-middle" />
 
   return (
-    <>
-      <Link href="/following" className={LINK}>{plural(counts.following, T.plurals.following, lang)}</Link>
-      <span aria-hidden="true"> · </span>
-      <Link href="/following#followers" className={LINK}>{plural(counts.followers, T.plurals.followers, lang)}</Link>
-    </>
+    <Facts
+      items={[
+        <Link key="following" href="/following" className={LINK}>{plural(counts.following, T.plurals.following, lang)}</Link>,
+        <Link key="followers" href="/following#followers" className={LINK}>{plural(counts.followers, T.plurals.followers, lang)}</Link>,
+      ]}
+    />
   )
 }

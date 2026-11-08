@@ -1686,8 +1686,8 @@ export const en = {
   },
   homeLayout: {
     layoutLabel: 'Layout',
-    shapeSlantedHint: 'Slanted ends on buttons, bars and tags.',
-    shapeRoundHint: 'Soft corners, pill buttons and tags, round switches.',
+    shapeSlantedHint: 'The main button, the level and the streak lean; a slash marks the open tab.',
+    shapeRoundHint: 'Soft corners, pill buttons and tags; a dot marks the open tab.',
     shapeLabel: 'Shape',
     shapeSlanted: 'Slanted',
     shapeRound: 'Rounded',

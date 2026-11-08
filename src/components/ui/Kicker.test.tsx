@@ -2,16 +2,17 @@ import { render, screen } from '@testing-library/react'
 import Kicker, { kickerClass } from './Kicker'
 import SectionHead from './SectionHead'
 
-test('a kicker is an uppercase label in the quiet colour by default, as the element asked for', () => {
+test('a kicker is a label in sentence case and the quiet colour by default, as the element asked for', () => {
   render(<Kicker as="span" role="alert">Failed</Kicker>)
   const el = screen.getByRole('alert')
   expect(el.tagName).toBe('SPAN')
-  expect(el).toHaveClass('uppercase', 'text-text-secondary', 'tracking-widest')
+  expect(el).toHaveClass('text-text-secondary', 'text-[0.8125rem]')
+  for (const size of ['xs', 'sm', 'md'] as const) expect(kickerClass('muted', size)).not.toMatch(/uppercase|tracking-/)
 })
 
 test('its tone and size come from the piece, never from className', () => {
   expect(kickerClass('accent', 'md')).toContain('text-accent')
-  expect(kickerClass('accent', 'md')).toContain('tracking-[0.14em]')
+  expect(kickerClass('accent', 'md')).toContain('text-sm')
   expect(kickerClass('danger', 'sm')).toContain('text-danger')
   expect(kickerClass('warning', 'xs')).toContain('text-warning')
   expect(kickerClass('inherit', 'xs')).not.toContain('text-text')

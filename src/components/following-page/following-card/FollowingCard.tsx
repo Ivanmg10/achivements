@@ -84,7 +84,7 @@ export default function FollowingCard({
 
         {friend.showcase.length > 0 && (
           <div className="flex flex-col gap-2">
-            <p className="text-xs font-bold text-text-secondary">{T.friends.showcase}</p>
+            <Kicker>{T.friends.showcase}</Kicker>
             <FollowingCardBadges items={friend.showcase} username={friend.username} label={T.friends.showcase} />
           </div>
         )}

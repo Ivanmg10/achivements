@@ -1,20 +1,20 @@
 import { render } from '@testing-library/react'
 import DataBar from './DataBar'
 
-test('a horizontal bar is as long as its share, cut on the design token, hidden from a screen reader', () => {
+test('a horizontal bar is as long as its share, upright, hidden from a screen reader', () => {
   const { container } = render(<DataBar share={0.25} className="h-2" />)
   const bar = container.firstElementChild as HTMLElement
   expect(bar).toHaveAttribute('aria-hidden', 'true')
-  expect(bar).toHaveClass('bg-accent', 'h-2')
+  expect(bar).toHaveClass('bg-accent', 'h-2', 'rounded-(--bar-radius)')
   expect(bar.style.width).toBe('max(0px, 25%)')
-  expect(bar.style.clipPath).toBe('var(--clip-4)')
+  expect(bar.style.clipPath).toBe('')
+  expect(bar.className).not.toContain('skew')
 })
 
 test('with a track, the rest of the way is drawn under it and the bar fills its height', () => {
-  const { container } = render(<DataBar track share={0.5} cut={8} className="h-2" />)
+  const { container } = render(<DataBar track share={0.5} className="h-2" />)
   const trackEl = container.firstElementChild as HTMLElement
-  expect(trackEl).toHaveClass('bg-ink/[0.08]', 'h-2')
-  expect(trackEl.style.clipPath).toBe('var(--clip-8)')
+  expect(trackEl).toHaveClass('bg-ink/[0.08]', 'h-2', 'overflow-hidden')
   expect(trackEl.firstElementChild).toHaveClass('h-full')
 })
 

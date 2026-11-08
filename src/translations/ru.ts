@@ -1685,8 +1685,8 @@ export const ru: Translations = {
   },
   homeLayout: {
     layoutLabel: 'Макет',
-    shapeSlantedHint: 'Скошенные края у кнопок, полос и меток.',
-    shapeRoundHint: 'Мягкие углы, кнопки и метки-таблетки, круглые переключатели.',
+    shapeSlantedHint: 'Главная кнопка, уровень и серия наклонены; косая черта отмечает открытую вкладку.',
+    shapeRoundHint: 'Мягкие углы, кнопки и метки-таблетки; точка отмечает открытую вкладку.',
     shapeLabel: 'Форма',
     shapeSlanted: 'Скошенная',
     shapeRound: 'Скруглённая',

@@ -9,6 +9,7 @@ import type { LatestPerfect, PerfectCounts } from '@/utils/perfectGames'
 import GameCover from '@/components/game-cover/GameCover'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { useSubject } from '@/context/SubjectContext'
+import Facts from '@/components/ui/Facts'
 
 /** Medal per place, metal-like; the number on it says the place too, so colour is never the only cue. */
 const MEDALS = [
@@ -37,28 +38,16 @@ export default function CollectionShelf({ games, counts }: { games: LatestPerfec
           <IconTrophy size={16} className="text-warning" aria-hidden="true" />
           {T.cards.trophyCabinet}
         </h3>
-        <p className="flex items-center gap-2 text-xs text-text-secondary">
-          <span className="text-warning font-semibold">{counts.hc} HC</span>
-          <span aria-hidden="true">·</span>
-          <span>{counts.sc} SC</span>
-          {counts.steam > 0 && (
-            <>
-              <span aria-hidden="true">·</span>
-              <span className="text-steam font-semibold">{counts.steam} Steam</span>
-            </>
-          )}
-          {counts.psn > 0 && (
-            <>
-              <span aria-hidden="true">·</span>
-              <span className="text-psn font-semibold">{counts.psn} PlayStation</span>
-            </>
-          )}
-          {counts.xbox > 0 && (
-            <>
-              <span aria-hidden="true">·</span>
-              <span className="text-success font-semibold">{counts.xbox} Xbox</span>
-            </>
-          )}
+        <p className="flex items-center text-xs text-text-secondary">
+          <Facts
+            items={[
+              <span key="hc" className="text-warning font-semibold">{counts.hc} HC</span>,
+              <span key="sc">{counts.sc} SC</span>,
+              counts.steam > 0 && <span key="st" className="text-steam font-semibold">{counts.steam} Steam</span>,
+              counts.psn > 0 && <span key="psn" className="text-psn font-semibold">{counts.psn} PlayStation</span>,
+              counts.xbox > 0 && <span key="xb" className="text-success font-semibold">{counts.xbox} Xbox</span>,
+            ]}
+          />
         </p>
       </div>
 

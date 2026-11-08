@@ -45,7 +45,7 @@ export default function MainPagePortadaSideStreak() {
             key={i}
             axis="y"
             share={1}
-            cut={3}
+           
             tone="muted"
             color={c > 0 ? `rgb(${tier.color})` : undefined}
             style={{ opacity: c > 0 ? 0.45 + 0.55 * (c / max) : 1 }}

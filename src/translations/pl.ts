@@ -1685,8 +1685,8 @@ export const pl: Translations = {
   },
   homeLayout: {
     layoutLabel: 'Układ',
-    shapeSlantedHint: 'Skośne końce przycisków, pasków i etykiet.',
-    shapeRoundHint: 'Miękkie rogi, przyciski i etykiety-pigułki, okrągłe przełączniki.',
+    shapeSlantedHint: 'Główny przycisk, poziom i seria są pochylone; ukośnik oznacza otwartą kartę.',
+    shapeRoundHint: 'Miękkie rogi, przyciski i etykiety-pigułki; kropka oznacza otwartą kartę.',
     shapeLabel: 'Kształt',
     shapeSlanted: 'Skośny',
     shapeRound: 'Zaokrąglony',

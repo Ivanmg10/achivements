@@ -42,7 +42,7 @@ export default function DesignCatalogPiece({ id, children }: { id: string; child
                 {piece.rules.map((rule) => (
                   <li
                     key={rule}
-                    className="relative pl-4 text-[0.8125rem] text-text-secondary leading-snug before:content-[''] before:absolute before:left-0 before:top-0.5 before:bottom-0.5 before:w-[3px] before:bg-accent before:skew-y-(--slant-mark)"
+                    className="relative pl-4 text-[0.8125rem] text-text-secondary leading-snug before:content-[''] before:absolute before:left-0 before:top-0.5 before:bottom-0.5 before:w-[3px] before:bg-accent"
                   >
                     {rule}
                   </li>

@@ -1,9 +1,4 @@
 {
-  "kicker": [
-    "components/achievement-modal/AchievementModal.tsx",
-    "components/connect-accounts/ConnectAccounts.tsx",
-    "components/game-info-header/GameHashesModal.tsx"
-  ],
   "tag": [
     "components/achievement-modal/AchievementModal.tsx",
     "components/game-info-header/GameHashesModal.tsx",
