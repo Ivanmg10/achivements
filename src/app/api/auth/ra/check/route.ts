@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { allowAttempt, clientAddress } from '@/lib/attemptLimit'
-import { fetchRaProfile, raAvatarUrl, validRaCredentials } from '@/lib/raProfile'
+import { fetchRaProfile, validRaCredentials } from '@/lib/raProfile'
+import { raAvatarUrl } from '@/utils/raAssets'
 import { raKeyHash } from '@/lib/raKey'
 
 /**

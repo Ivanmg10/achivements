@@ -44,7 +44,3 @@ export async function fetchRaProfile(username: string, apiKey: string): Promise<
   return { ok: true, profile: profile as RaProfile }
 }
 
-/** An RA user's picture, as RA serves it (the comments and the achievement modal use the same). */
-export function raAvatarUrl(user: string): string {
-  return `https://media.retroachievements.org/UserPic/${encodeURIComponent(user)}.png`
-}

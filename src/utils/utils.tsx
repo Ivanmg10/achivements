@@ -4,6 +4,7 @@ import { GameExtraData } from '@/components/statusGameList/StatusGameList'
 import { StatusSortKey, SortDir } from '@/components/status-sort-control/StatusSortControl'
 import type { GameSource } from '@/types/steam'
 import { localDay, parseUnlockTime } from '@/utils/dates'
+import { raBadgeUrl, raImageUrl } from '@/utils/raAssets'
 
 /**
  * How long ago, in the given language ("2 hours ago", "hace 2 horas"), in the
@@ -191,13 +192,13 @@ export function pinnedKey(fav: PinnedAchievement): string {
 /** An achievement's badge image: the full URL a Steam unlock carries, or RA's badge path. */
 export function achievementBadgeUrl(a: RecentAchievement): string | undefined {
   if (a.BadgeUrl) return a.BadgeUrl
-  return a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : undefined
+  return raBadgeUrl(a.BadgeName)
 }
 
 /** The image of an achievement's game: the full URL a Steam unlock carries, or RA's icon path. */
 export function achievementGameIconUrl(a: RecentAchievement): string | undefined {
   if (a.GameIconUrl) return a.GameIconUrl
-  return a.GameIcon ? `https://retroachievements.org${a.GameIcon}` : undefined
+  return raImageUrl(a.GameIcon)
 }
 
 /** Completion bands, as fractions: <25%, 25–49%, 50–74%, 75–99%, 100%. */
