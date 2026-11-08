@@ -5,6 +5,7 @@ import { IconInbox } from '@tabler/icons-react'
 import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import Notice from '@/components/ui/Notice'
+import Spinner from '@/components/ui/Spinner'
 import { notify } from '@/lib/notify'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 import { MENU_SURFACE, menuItemClass } from '@/components/ui/menu'
@@ -28,6 +29,16 @@ export default function DesignCatalogFeedback() {
             <Notice tone="warning" title="Your email is not confirmed" action={<Button size="sm" variant="secondary">Resend</Button>}>Check your inbox.</Notice>
             <Notice tone="danger">That could not be saved.</Notice>
           </div>
+        </Panel>
+      </DesignCatalogPiece>
+
+      <DesignCatalogPiece id="spinner">
+        <Panel>
+          <Specimen name="sm · md · inside a loading Button">
+            <Spinner size="sm" />
+            <Spinner />
+            <Button loading>Saving…</Button>
+          </Specimen>
         </Panel>
       </DesignCatalogPiece>
 

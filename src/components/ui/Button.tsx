@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Spinner from './Spinner'
 
 type Variant = 'primary' | 'secondary' | 'quiet' | 'danger'
 type Size = 'sm' | 'md' | 'lg'
@@ -28,10 +29,6 @@ const SIZES: Record<Size, string> = {
 /** The classes of a library button, for the rare place that cannot render `Button` itself. */
 export function buttonClass(variant: Variant = 'primary', size: Size = 'md', className = '') {
   return `${BASE} ${VARIANTS[variant]} ${SIZES[size]} ${className}`
-}
-
-function Spinner() {
-  return <span aria-hidden="true" className="w-4 h-4 rounded-full border-2 border-current border-r-transparent animate-spin motion-reduce:animate-none" />
 }
 
 type Common = {

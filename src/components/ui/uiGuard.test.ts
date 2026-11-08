@@ -158,6 +158,7 @@ const NEW_RULES = {
   listRow: /\bhover:bg-accent\/10 focus-visible:bg-accent\/10\b/,
   figure: /\b(?:StatPill|StatCard)\b/,
   dataBar: /\bslantStyle\(/,
+  spinner: /\banimate-spin\b|main-spinner\/Spinner/,
 }
 
 test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
@@ -182,4 +183,8 @@ test('a labelled number comes from Figure; StatPill and StatCard are its old nam
 
 test('a chart bar with cut ends comes from DataBar, never slantStyle on a hand-made bar', () => {
   expect(newOffenders('dataBar', NEW_RULES.dataBar)).toEqual([])
+})
+
+test('a spinner comes from Spinner or Button loading, never a hand-made animate-spin', () => {
+  expect(newOffenders('spinner', NEW_RULES.spinner)).toEqual([])
 })
