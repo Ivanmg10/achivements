@@ -98,6 +98,32 @@ test('the shape of a bar or a mark comes from the design tokens, never a fixed p
   expect(offenders(/(?<![\w-])-?skew-[xy]-\[/)).toEqual([])
 })
 
+test('one angle: the drifting slants and the fixed cuts are gone (identity B, #127)', () => {
+  expect(offenders(/--slant-[a-z]|--clip-\d|\bslantStyle\b/)).toEqual([])
+})
+
+test('only the big gestures and the player\'s own marks lean: outside the library a lean is SLANT_PLATE or a piece', () => {
+  // The podium's skeleton step (a Skeleton cannot carry a plate), the shape preference's drawing of the button, and
+  // the streak strip's break mark across a capped bar (an annotation, not the data).
+  const allowed = [
+    'components/rankings-page/rankings-page-skeleton/RankingsPageSkeleton.tsx',
+    'components/streak-page/streak-day-strip/StreakDayStrip.tsx',
+    'components/user-page/user-shape-preference/user-shape-preference-preview/UserShapePreferencePreview.tsx',
+  ]
+  const found = offenders(/(?<![\w-])-?skew-[xy]-\(--slant\)/).map((f) => f.split(path.sep).join('/'))
+  expect(found.filter((f) => !allowed.includes(f))).toEqual([])
+})
+
+test('facts on one line are joined by Facts (the mark), never a hand-made separator', () => {
+  // The footer separates links, not facts.
+  const found = offenders(/aria-hidden="true">\s*[·•/|]\s*</).map((f) => f.split(path.sep).join('/'))
+  expect(found.filter((f) => f !== 'components/main-footer/MainFooter.tsx')).toEqual([])
+})
+
+test('a tab bar is Tabs (or tabClass with its TabMark), never a hand-made tablist', () => {
+  expect(offenders(/role="tablist"/).map((f) => f.split(path.sep).join('/')).filter((f) => f !== 'components/psn/psn-game-info-table/psn-trophy-group-tabs/PsnTrophyGroupTabs.tsx')).toEqual([])
+})
+
 test('a streak is coloured by its tier, never a fixed hue', () => {
   expect(offenders(/StreakTag[\s\S]{0,200}className="[^"]*\bbg-(?:red|orange|amber|yellow)/)).toEqual([])
 })
@@ -151,12 +177,11 @@ test('a disclosure and a show-more button come from the library (Accordion, Show
 // The rules added with #120 (docs/audits/antislop-v17.md, X2 and T-05/T-06). Each pattern is also what the
 // next migration greps for.
 const NEW_RULES = {
-  kicker: /["'`][^"'`]*(?:\buppercase\b[^"'`]*\btracking-|\btracking-[^"'`]*\buppercase\b)/,
+  kicker: /(?<![\w:-])uppercase\b/,
   tag: /["'`](?=[^"'`]*\brounded-tag\b)(?=[^"'`]*(?:\bh-(?:5|6|\[1\.375rem\])|\bpy-0\.5)(?![\w-]))/,
   avatar: /\brounded-full\b[^"'`]*\bobject-cover\b|\bobject-cover\b[^"'`]*\brounded-full\b|from '@\/components\/presence-dot\/PresenceDot'/,
   listRow: /\bhover:bg-accent\/10 focus-visible:bg-accent\/10\b/,
   figure: /\b(?:StatPill|StatCard)\b/,
-  dataBar: /\bslantStyle\(/,
   spinner: /\banimate-spin\b|main-spinner\/Spinner/,
   pillButton: /<button\b[^>]*?className=\{?["'`][^"'`]*\brounded-full\b|px-3 py-1 rounded-full hover:bg-ink\/10/,
   notice: /bg-(?:danger|warning|success|info)\/\d+[^"'`]*ring-(?:1|inset)\b/,
@@ -184,17 +209,9 @@ const OWN_COLOURS = [
   'lib/siteUrl.ts',
 ]
 
-test('a kicker comes from Kicker / kickerClass, never an uppercase tracked class by hand', () => {
-  // A table's head is the table's own look (ui/dataTable.ts TH), not a kicker; the sortable head inherits it.
-  // PublicUserHero's is a pill (rounded-full is left so on purpose), not a label.
-  const tableHeads = [
-    'components/public-user-page/public-user-hero/PublicUserHero.tsx',
-    'components/game-info-table/SortableHeader.tsx',
-    'components/rankings-guide/RankingsGuide.tsx',
-    'components/rankings-guide/rankings-guide-table/RankingsGuideTable.tsx',
-    'components/rankings-page/rankings-page-table/RankingsPageTable.tsx',
-  ]
-  expect(newOffenders('kicker', NEW_RULES.kicker, tableHeads)).toEqual([])
+test('no label in capitals: a kicker, a figure\'s label and a table head are in sentence case (identity B, #127)', () => {
+  // The hash modal's chips name dump groups (Redump, TOSEC, No-Intro) from RA's lowercase ids: capitals there are the names.
+  expect(newOffenders('kicker', NEW_RULES.kicker, ['components/game-info-header/GameHashesModal.tsx'])).toEqual([])
 })
 
 test('a tag comes from Tag, never a tinted rounded-tag box by hand', () => {
@@ -212,21 +229,6 @@ test('a row to pick from comes from ListRow / LIST_ROW', () => {
 
 test('a labelled number comes from Figure; StatPill and StatCard are gone', () => {
   expect(newOffenders('figure', NEW_RULES.figure)).toEqual([])
-})
-
-test('a chart bar with cut ends comes from DataBar, never slantStyle on a hand-made bar', () => {
-  // Not chart bars: the podium's steps (and its skeleton and the Following teaser's), the heatmap's range mark, a bar that carries its
-  // own label (the streak chart's ongoing one), and the two files that draw the shape token itself (the catalogue and the shape preference).
-  const notBars = [
-    'components/design-catalog/design-catalog-foundations/DesignCatalogFoundations.tsx',
-    'components/following-page/following-rankings-teaser/FollowingRankingsTeaser.tsx',
-    'components/rankings-page/rankings-page-podium/RankingsPagePodium.tsx',
-    'components/rankings-page/rankings-page-skeleton/RankingsPageSkeleton.tsx',
-    'components/streak-page/streak-chart/StreakChart.tsx',
-    'components/streak-page/streak-year-heatmap/StreakYearHeatmap.tsx',
-    'components/user-page/user-shape-preference/user-shape-preference-preview/UserShapePreferencePreview.tsx',
-  ]
-  expect(newOffenders('dataBar', NEW_RULES.dataBar, notBars)).toEqual([])
 })
 
 test('a spinner comes from Spinner or Button loading, never a hand-made animate-spin', () => {
