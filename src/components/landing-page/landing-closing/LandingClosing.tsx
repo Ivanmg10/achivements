@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { IconArrowRight } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { buttonClass } from '@/components/ui/Button'
+import { REGISTER_HREF } from '@/utils/authLinks'
 
 const PRIMARY = buttonClass('primary', 'lg')
 
@@ -16,7 +17,7 @@ export default function LandingClosing() {
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_top,rgb(var(--accent)/0.12),transparent_60%)]" />
       <h2 className="relative text-2xl sm:text-3xl font-bold tracking-tight">{T.landing.closingTitle}</h2>
       <p className="relative text-sm sm:text-base text-text-secondary max-w-md">{T.landing.closingText}</p>
-      <Link href="/authPage?mode=register" className={`relative ${PRIMARY}`}>
+      <Link href={REGISTER_HREF} className={`relative ${PRIMARY}`}>
         {T.landing.createAccount}
         <IconArrowRight size={18} aria-hidden="true" />
       </Link>

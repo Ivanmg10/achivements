@@ -11,7 +11,7 @@ test('shows what the rankings show, and the way in for the rest', () => {
   expect(screen.getByRole('img', { name: 'RA 81 %, PSN 19 %' })).toBeInTheDocument()
   expect(screen.getByText('7')).toBeInTheDocument()
   expect(screen.getByText('900')).toBeInTheDocument()
-  expect(screen.getByRole('link', { name: en.rankings.joinCta })).toHaveAttribute('href', '/authPage')
+  expect(screen.getByRole('link', { name: en.rankings.joinCta })).toHaveAttribute('href', '/authPage?mode=register')
   expect(screen.getByRole('link', { name: en.rankings.seeAll })).toHaveAttribute('href', '/rankings')
 })
 

@@ -3,6 +3,7 @@
 import { IconTrophy } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import Button from '@/components/ui/Button'
+import { REGISTER_HREF } from '@/utils/authLinks'
 
 /** For a visitor without an account: how to get onto the list. */
 export default function RankingsPageJoin() {
@@ -16,7 +17,7 @@ export default function RankingsPageJoin() {
       </h2>
       <p className="relative text-sm text-text-secondary">{T.rankings.joinText}</p>
       <Button
-        href="/authPage"
+        href={REGISTER_HREF}
         className="relative self-start"
       >
         {T.rankings.joinCta}

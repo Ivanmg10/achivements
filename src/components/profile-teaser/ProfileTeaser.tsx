@@ -8,6 +8,7 @@ import VaultLevelBadge from '@/components/vault-level-badge/VaultLevelBadge'
 import { CountUp } from '@/components/ui/CountUp'
 import VaultPlatformSplit from '@/components/vault-platform-split/VaultPlatformSplit'
 import Button from '@/components/ui/Button'
+import { REGISTER_HREF } from '@/utils/authLinks'
 
 /**
  * Someone's profile for a visitor without an account (and what a shared link
@@ -45,7 +46,7 @@ export default function ProfileTeaser({ teaser }: { teaser: Teaser }) {
         <p className="relative text-sm text-text-secondary">{T.rankings.profileTeaser}</p>
         <div className="relative flex flex-wrap justify-center gap-2">
           <Button
-            href="/authPage"
+            href={REGISTER_HREF}
           >
             {T.rankings.joinCta}
           </Button>
