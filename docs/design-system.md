@@ -26,6 +26,10 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   text field, select, switch, checkbox, dialog, hard-coded palette colour, fixed
   `polygon(...)` or `skew-*-[..]`. If it fails, use the piece; if the piece is
   missing, add it (below).
+- **A rule that starts with offenders lists them** (#120, 2026-11-08): `NEW_RULES` in the guard, each with its
+  list of files still drawing the piece by hand in `ui/uiGuard.pending.json`. A file not on its list fails; a
+  file on it that no longer offends fails too, so the list only shrinks. Migrate a file, then take it off.
+  Never add one. The worklog's #120 entry says, rule by rule, what replaces what.
 - **Radii come from tokens too**, chosen by what the thing is. Round must stay rounder than slanted (`designTokens.test.ts`). The guard refuses fixed values on anything painted (`rounded-lg`, `rounded-[1.25rem]`…), with a short list of documented exceptions.
 
   | Token | For | Slanted | Round |
@@ -44,14 +48,26 @@ then `CLAUDE.md` → "The design system and the library" for the hard rules (one
   | `rounded-tag`, `-tag-sm`, `-badge` | Tags and small badges | 6, 4, 5 px | pill |
 
   `rounded-(--bar-radius)` rounds an accent mark's ends in the round design, and `--button-inset` is the room the slant adds on each side of a button, 0 in round.
+- **The tokens that are not colours of a theme** (`globals.css`, `@theme inline`, #120):
+
+  | Utility | What | Instead of |
+  |---|---|---|
+  | `focus-ring` | the focus ring of anything that takes the keyboard | `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70` |
+  | `shadow-hairline-t`, `-b`, `-b-soft` | a line between parts (ink 10 %; a table row's 5 %) | `shadow-[inset_0_±1px_0_rgb(var(--ink)/0.05–0.1)]` |
+  | `shadow-sunken` | what you type into, below the card | `shadow-[inset_0_2px_4px_rgb(0_0_0/0.22)]` |
+  | `drop-shadow-done` | the one glow: a finished bar or ring | `filter: drop-shadow(0 0 6px …)` |
+  | `text-/bg-/ring-` `ra`, `ra-gold`, `steam`, `steam-dark`, `steam-perfect`, `psn`, `psn-dark`, `xbox`, `platinum` | a platform's own colour, the same in every theme (`/10` and the rest work) | `#66c0f4`, `#0070d1`, `#107c10`… and `sky-300` for a platinum |
+
+  In an inline style (an SVG stroke, a ring colour passed as a value) use `var(--color-steam)`.
 - **Shapes come from tokens.** A bar's cut ends are `slantStyle(px)`
   (`ui/shape.ts`); a mark's lean is `skew-y-(--slant-mark)`; a control's slant is
   `skew-x-(--slant-button)`. Never a literal. The welcome curtain's fixed `polygon(...)`
   values in `WelcomeCurtain.module.css` are the documented exception: the illustration is
   decorative and deliberately does not follow the shape choice.
 - **Colour with a meaning comes from the theme** (danger, success, warning,
-  `hardcore`, `softcore`). Hues of a *tier* (level badge, `streakTier`) are the
-  exception and live in their own util, mixed with the text colour so they read on any theme.
+  `hardcore`, `softcore`); a platform's is its token; the guard refuses a palette class of any hue and a hex
+  literal outside the logo and the server-drawn pictures. Hues of a *tier* (level badge, `streakTier`) live in
+  their own util, mixed with the text colour so they read on any theme.
 - **Preferences about looks** (`home-layout`, `game-card-style`, `shape-style`, `font-style`) are
   synced keys in `src/utils/syncedPreferences.ts`; components read them through a
   hook (`useStoredChoice` underneath), and the *tokens* carry the result.
@@ -194,16 +210,30 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 - **The look lives in tokens** in `globals.css` (`--slant-*`, `--r-*`, `--h-*`, `--motion-*`,
   `--hardcore`/`--softcore`), defined once for every theme (`designTokens.test.ts`): a future
   site-wide design changes them, not the components.
-- **Loading**: `Skeleton` (`ui/Skeleton.tsx`: `radius` from the tokens, colour `bg-skeleton`, pulse, still under reduced motion, always hidden), `SkeletonRow` / `SkeletonGameList`, `GameRowSkeleton`, `GameCardSkeleton`; an image's own placeholder uses `SKELETON_PULSE`. **Each screen and view has its own composed skeleton, on the real boxes and gutters** (2026-10-31, #70): a new screen, section or fetch brings its own in the same change, and a figure on its way is `loading` on `StatPill` / `StatCard` / `PlatformStat`, never a `—`. The guard refuses a hand-made `animate-pulse`; only `StatusBadge`'s glow is exempt. Spinners stay for actions (inside a button), not for content. **The home's profile skeleton takes the height the real one had last time** (`homeFit` keeps it, `HOME_PROFILE_KEY`): that height sets the top of the home, and a fixed guess made the skeleton taller than the page (2026-11-01). **With profile tabs the home's profile column keeps one height (`min-height`, globals.css, the tallest platform's):** that height sets `--home-fit-trim`, so a shorter profile resized the charts and the heatmap on every switch (2026-11-01). **A line of unlocks over time is `AchievementsLinePlot`** (the home's week, a game's weeks or months): the user's rule, 2026-11-01, one chart, never a second drawing of it. **What a row or a card may show must be in it from the first frame:** a pill whose data comes later is a `loading` pill, gone only if the read fails (`!summary && !error`), or it pushes the others aside when it lands; a large `StatPill` keeps the line under its figure. **A chart in a skeleton is the real chart with `isLoading`**, never a second drawing of it. **`(home)/loading.tsx` also renders signed out, without `MainProviders`**: a skeleton there reads `useOptionalMainView`, never a context that throws. **A section lands whole (the user's preference, 2026-10-31):** the home's Friends and both Following lists hold their skeleton until `detailsLoading` is false, even if that takes longer; no row pops in or re-sorts, and a failed read still ends the wait. Do not add a timeout or a progressive reveal without asking. **A skeleton draws every variant and `<html>` picks one**, so a full load paints the right one before React can read a preference: `data-home-layout`, `data-library-layout` and `data-session` (`in` or `tabs`, nothing signed out; `sessionLook`, no account data) are set by `LOOK_SCRIPT` before the first frame, then kept by `ShapeSync`, and read in `globals.css` (`.if-*`, `.home-if-*`). A block sized by the person's data is a `RememberedHeight` (`ui/`): it keeps in this browser how tall it ended up and holds that room while it loads; the first visit has nothing to go by.
+- **Loading**: `Skeleton` (`ui/Skeleton.tsx`: `radius` from the tokens, colour `bg-skeleton`, pulse, still under reduced motion, always hidden), `SkeletonRow` / `SkeletonGameList`, `GameRowSkeleton`, `GameCardSkeleton`; an image's own placeholder uses `SKELETON_PULSE`. **Each screen and view has its own composed skeleton, on the real boxes and gutters** (2026-10-31, #70): a new screen, section or fetch brings its own in the same change, and a figure on its way is `loading` on `Figure`, never a `—`. The guard refuses a hand-made `animate-pulse`; only `StatusBadge`'s glow is exempt. Spinners stay for actions (inside a button), not for content. **The home's profile skeleton takes the height the real one had last time** (`homeFit` keeps it, `HOME_PROFILE_KEY`): that height sets the top of the home, and a fixed guess made the skeleton taller than the page (2026-11-01). **With profile tabs the home's profile column keeps one height (`min-height`, globals.css, the tallest platform's):** that height sets `--home-fit-trim`, so a shorter profile resized the charts and the heatmap on every switch (2026-11-01). **A line of unlocks over time is `AchievementsLinePlot`** (the home's week, a game's weeks or months): the user's rule, 2026-11-01, one chart, never a second drawing of it. **What a row or a card may show must be in it from the first frame:** a pill whose data comes later is a `loading` pill, gone only if the read fails (`!summary && !error`), or it pushes the others aside when it lands; a large `StatPill` keeps the line under its figure. **A chart in a skeleton is the real chart with `isLoading`**, never a second drawing of it. **`(home)/loading.tsx` also renders signed out, without `MainProviders`**: a skeleton there reads `useOptionalMainView`, never a context that throws. **A section lands whole (the user's preference, 2026-10-31):** the home's Friends and both Following lists hold their skeleton until `detailsLoading` is false, even if that takes longer; no row pops in or re-sorts, and a failed read still ends the wait. Do not add a timeout or a progressive reveal without asking. **A skeleton draws every variant and `<html>` picks one**, so a full load paints the right one before React can read a preference: `data-home-layout`, `data-library-layout` and `data-session` (`in` or `tabs`, nothing signed out; `sessionLook`, no account data) are set by `LOOK_SCRIPT` before the first frame, then kept by `ShapeSync`, and read in `globals.css` (`.if-*`, `.home-if-*`). A block sized by the person's data is a `RememberedHeight` (`ui/`): it keeps in this browser how tall it ended up and holds that room while it loads; the first visit has nothing to go by.
 - **Dialogs**: `Modal` (head with icon, title and hint; `footer`; `tone="danger"` is an
-  `alertdialog`; sizes `sm`–`xl`; a sheet on phones; Escape, outside click, focus kept inside and
+  `alertdialog`; sizes `sm`–`xl`; a sheet on phones, or `placement="top"`, a panel near the top on every screen
+  for a command panel or a menu (the phone menu; the search panel next); Escape, outside click, focus kept inside and
   given back; only the top dialog answers Escape). `CommonModal` is a thin wrapper over it (no
   corner close by default). A modal names itself by its first heading, or `aria-label` /
   `aria-labelledby`.
-- **Feedback**: `Notice` (tinted inline notice, `role="alert"` for errors), `TOOLTIP_SURFACE`
-  (`ui/tooltip.ts`), `MENU_SURFACE` / `menuItemClass` (`ui/menu.ts`); the toasts are the dark card.
-- **Surfaces and data**: `SURFACE` (`ui/surface.ts`; cards use `rounded-card`), `StatPill`'s
-  large size has no box, `RarityBadge` (a tinted figure, never a bar), `ProgressBar` bevelled and
+- **Feedback**: `Notice` (tinted inline notice, `role="alert"` for errors), `ErrorRetry` (a failed read: a
+  danger `Notice` with what failed, an optional hint and a quiet retry `Button`), `Spinner` (an action on its
+  way, in the text's colour; `Button loading` draws it), `TOOLTIP_SURFACE` (`ui/tooltip.ts`), `MENU_SURFACE` /
+  `menuItemClass` (`ui/menu.ts`); the toasts are the dark card.
+- **Labels, people and rows** (#120): `Kicker` / `kickerClass(tone, size)` (the uppercase tracked label: `xs` the
+  home's chart heads, `sm` a panel's, `md` the welcome's; muted, accent, danger), `SectionHead` (title, hint, an
+  aside at the end; `md` a shelf, `lg` a streak card; Shelf draws its head with it), `Tag` (tinted label; tones
+  muted, neutral, accent, info, success, warning, danger, hardcore, overlay; sizes sm 20 px, md 22 px, lg 24 px;
+  `slant` leans it on `--slant-pill`, the game page's chips), `Avatar` (round picture, initial or icon fallback,
+  `online` draws the presence dot), `ListRow` / `LIST_ROW` (media, title, sub line, trailing; the search panel's
+  row). **The shape of `Tag` and `DataBar`, and which of them lean, is #127's slant grammar**: they read today's
+  tokens (`--r-tag`, `--slant-pill`, `--clip-*`), so #127 changes tokens, not the pieces.
+- **Surfaces and data**: `SURFACE` (`ui/surface.ts`; cards use `rounded-card`), `Figure` (every labelled
+  number: `bare` has no box and a fine slanted rule between figures, `tile` a small box, `card` the label first
+  and the figure big, `compact` the account page's platform cards; `tone` from the theme, `color` for a tier's
+  hue, `term` inside a `<dl>`; `StatPill` / `StatCard` are its old names, wrappers until their callers move),
+  `DataBar` (a chart bar as long or as tall as its share, cut ends from `--clip-*`, optional track), `RarityBadge` (a tinted figure, never a bar), `ProgressBar` bevelled and
   glowing only when finished, `GameCardBackdrop` = a flat tint of the game's colour behind the
   same neutral hairline as a flat card (`useImageTint`; never the blurred art again, the user's
   choice). The art is read through
