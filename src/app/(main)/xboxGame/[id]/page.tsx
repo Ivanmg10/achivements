@@ -2,6 +2,7 @@
 
 import { notFound, useParams } from 'next/navigation'
 import { useLanguage } from '@/context/LanguageContext'
+import { useAuthSession } from '@/hooks/useAuthSession'
 import { useXboxGamesData } from '@/context/XboxGamesDataContext'
 import { useXboxAchievements } from '@/hooks/useXboxAchievements'
 import { useXboxGameDetails } from '@/hooks/useXboxGameDetails'
@@ -24,20 +25,26 @@ import { buttonClass } from '@/components/ui/Button'
  *
  * The game itself comes from the shared library, so opening it from a list
  * costs no extra request; its achievements load for the page. A game the
- * account does not have is not in that list, and is a 404.
+ * account does not have is not in that list, and is a 404; a list that could
+ * not be read is not a 404, it says why and offers a retry.
  *
- * Xbox is admin-only for now: anyone else is told there is nothing here.
+ * Xbox is admin-only for now: anyone else is told there is nothing here. Who
+ * is looking is only known once the session is read, so a full load holds the
+ * skeleton until then (it used to 404 every game, admins included).
  */
 export default function XboxGamePage() {
   const { id: rawId } = useParams()
   const titleId = typeof rawId === 'string' && isXboxTitleId(rawId) ? rawId : null
   const { T } = useLanguage()
+  const { status } = useAuthSession()
   const enabled = useXboxEnabled()
-  const { isLinked, fullLibrary, libraryLoading } = useXboxGamesData()
+  const { isLinked, fullLibrary, libraryLoading, libraryError, refetch } = useXboxGamesData()
   const { achievements, isLoading, error, retry } = useXboxAchievements(isLinked ? titleId : null)
   const { details } = useXboxGameDetails(isLinked ? titleId : null)
 
-  if (titleId === null || !enabled) notFound()
+  if (titleId === null) notFound()
+  if (status === 'loading') return <GameInfoSkeleton />
+  if (!enabled) notFound()
 
   if (!isLinked) {
     return (
@@ -55,6 +62,17 @@ export default function XboxGamePage() {
 
   const game = fullLibrary.find((g) => g.titleId === titleId) ?? null
   if (!game && libraryLoading) return <GameInfoSkeleton />
+  if (!game && libraryError) {
+    return (
+      <div className="flex-1 flex flex-col justify-center items-center text-text-main gap-3 p-6 text-center">
+        <p role="alert" className="text-danger text-lg">{T.xbox.gamesError}</p>
+        <p className="text-sm text-text-secondary">{T.xbox.errors[libraryError]}</p>
+        <Button variant="secondary" size="sm" onClick={refetch}>
+          {T.xbox.retry}
+        </Button>
+      </div>
+    )
+  }
   if (!game) notFound()
 
   return (
