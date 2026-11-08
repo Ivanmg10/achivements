@@ -8,6 +8,7 @@ import type { StatusSortKey, StatusSortState } from '@/components/status-sort-co
 import { compareSortValues } from '@/utils/utils'
 import { raLatestCompletionAward, validCompletionDate } from '@/utils/completionDates'
 import { classifySteamGame } from '@/utils/steamFeed'
+import { raGameId } from '@/utils/gameRef'
 
 export type QuickFilter = 'all' | 'almost' | 'stalled'
 
@@ -42,8 +43,6 @@ export function countQuick(items: Progress[], now = Date.now()): Record<QuickFil
   }
 }
 
-const raId = (g: CategoryGame) => ('GameID' in g && g.GameID ? g.GameID : (g as { ID: number }).ID)
-
 export const raProgress = (g: CategoryGame, extra?: GameExtraData): Progress => ({
   pct: 'PctWon' in g ? Math.round(parseFloat((g as RetroAchievementsGameCompleted).PctWon) * 100) : null,
   lastPlayed: extra?.lastPlayed ?? null,
@@ -69,8 +68,8 @@ export function buildEntries(
 ): LibraryEntry[] {
   return [
     ...ra.map((game): LibraryEntry => {
-      const e = extra.get(raId(game))
-      return { kind: 'ra', key: `ra:${raId(game)}`, title: game.Title, game, extra: e, completedAt: e ? raLatestCompletionAward(e.awards, raId(game)) : null, ...raProgress(game, e) }
+      const e = extra.get(raGameId(game))
+      return { kind: 'ra', key: `ra:${raGameId(game)}`, title: game.Title, game, extra: e, completedAt: e ? raLatestCompletionAward(e.awards, raGameId(game)) : null, ...raProgress(game, e) }
     }),
     ...steam.map((game): LibraryEntry => ({ kind: 'steam', key: `steam:${game.id}`, title: game.title, game, completedAt: classifySteamGame(game) === 'completed' ? validCompletionDate(game.lastUnlock) : null, ...steamProgress(game) })),
     ...psn.map((game): LibraryEntry => ({ kind: 'psn', key: `psn:${game.id}`, title: game.title, game, completedAt: game.completedAt ?? null, ...psnProgress(game) })),

@@ -1,4 +1,6 @@
 import type { GameSource } from '@/types/game'
+import type { WantToPlayGame } from '@/types/types'
+import type { CategoryGame } from '@/hooks/useGamesByCategory'
 import { psnTitleId } from '@/utils/psnTitles'
 
 /**
@@ -13,6 +15,14 @@ export const GAME_SOURCES: readonly GameSource[] = ['ra', 'steam', 'psn', 'xbox'
 
 export function isGameSource(value: unknown): value is GameSource {
   return GAME_SOURCES.includes(value as GameSource)
+}
+
+/**
+ * An RA game's id, from a library game (`GameID`) or a want-to-play one (`ID`; its
+ * `GameID`, when it has one, wins, as every list has always read it).
+ */
+export function raGameId(g: CategoryGame): number {
+  return 'GameID' in g && g.GameID ? g.GameID : (g as WantToPlayGame).ID
 }
 
 /** Stable string form, for Set/Map keys and drag-and-drop ids: "ra:123", "steam:730". */
