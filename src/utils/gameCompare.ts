@@ -7,6 +7,7 @@ import { psnTrophyAnchor } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 /** One achievement of a game as someone has it, the same for RA, Steam and PSN. */
 export type CompareAchievement = GameAchievement & {
@@ -29,8 +30,6 @@ export type CompareRow = CompareAchievement & { mine: Unlock | null }
 
 export type CompareFilter = 'all' | 'both' | 'onlyThem' | 'onlyMe' | 'neither'
 
-const raBadge = (badge: string) => (badge ? `https://media.retroachievements.org/Badge/${badge}.png` : null)
-
 export function raCompareList(game: RetroAchievementsGameWithAchievements | null): CompareAchievement[] {
   if (!game) return []
   const players = game.NumDistinctPlayers || 0
@@ -41,7 +40,7 @@ export function raCompareList(game: RetroAchievementsGameWithAchievements | null
       id: String(a.ID),
       title: a.Title,
       description: a.Description,
-      iconUrl: raBadge(a.BadgeName),
+      iconUrl: raBadgeUrl(a.BadgeName) ?? null,
       points: a.Points,
       rarity: players > 0 ? Math.min(100, (a.NumAwarded / players) * 100) : null,
       earned: Boolean(a.DateEarned || a.DateEarnedHardcore),

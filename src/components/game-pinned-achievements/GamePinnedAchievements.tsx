@@ -9,6 +9,7 @@ import { PinAchievementModal } from '@/components/pin-achievement-modal/PinAchie
 import { notify } from '@/lib/notify'
 import { useWhenChanged } from '@/hooks/useWhenChanged'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 type PinnedRow = { achievement_id: number; snapshot: RetroAchievement }
 
@@ -114,7 +115,7 @@ export function GamePinnedAchievements({
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {row.snapshot.BadgeName ? (
                     <Image
-                      src={`https://media.retroachievements.org/Badge/${row.snapshot.BadgeName}.png`}
+                      src={raBadgeUrl(row.snapshot.BadgeName)!}
                       alt={row.snapshot.Title}
                       width={36}
                       height={36}

@@ -7,6 +7,7 @@ import { psnTrophyAnchor } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
 import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 /** An achievement or trophy of any platform, reduced to what a library card tells. */
 export type InsightAchievement = GameAchievement & {
@@ -32,7 +33,7 @@ export function fromRa(list: RetroAchievement[], players: number, gameId: number
       rarity: players > 0 ? Math.min(100, (a.NumAwarded / players) * 100) : null,
       points: a.Points,
       kind,
-      iconUrl: a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : null,
+      iconUrl: raBadgeUrl(a.BadgeName) ?? null,
       href: `/gameInfo/${gameId}`,
     }
   })

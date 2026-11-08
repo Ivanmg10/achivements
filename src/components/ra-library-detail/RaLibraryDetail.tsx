@@ -11,6 +11,7 @@ import { fromRa } from '@/utils/gameInsights'
 import { parseReleaseYear } from '@/utils/utils'
 import type { InfoRow } from '@/components/library-game-detail/library-detail-info/LibraryDetailInfo'
 import { raAwardCompletedAt } from '@/utils/completionDates'
+import { raImageUrl } from '@/utils/raAssets'
 
 // About three rows at two columns on a wide screen; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
@@ -79,7 +80,7 @@ export default function RaLibraryDetail({
       state={loading ? 'loading' : error && !data ? 'error' : 'ready'}
       errorNode={<SectionFallback error onRefresh={onRetry}>{null}</SectionFallback>}
       ring={{ earned, total, label: T.gameExpanded.allAchievements }}
-      game={{ source: 'ra', id: Number(gameId), title: game.Title, iconUrl: game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : undefined }}
+      game={{ source: 'ra', id: Number(gameId), title: game.Title, iconUrl: raImageUrl(game.ImageIcon) }}
       info={info}
       facts={data ? [{ label: T.libraryDetail.players, value: (data.NumDistinctPlayers ?? 0).toLocaleString(lang) }] : []}
       empty={T.statusGameItem.noPublishedAchievements}

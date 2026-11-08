@@ -14,6 +14,7 @@ import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
+import { raImageUrl } from '@/utils/raAssets'
 
 const CONSOLE_BY_NAME = new Map(CONSOLES.map((c) => [c.name, c.icon]))
 
@@ -49,7 +50,7 @@ export default function RaGameItem({
   const panelId = useId()
 
   const href = gameHref('ra', game.GameID, subject)
-  const art = game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null
+  const art = raImageUrl(game.ImageIcon) ?? null
   const consoleIcon = CONSOLE_BY_NAME.get(game.ConsoleName)
   const total = game.NumPossibleAchievements
   const earnedAch = game.NumAchievedHardcore || game.NumAchieved

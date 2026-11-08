@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { raArt } from '@/lib/raArtStore'
+import { raImageUrl } from '@/utils/raAssets'
 
 /**
  * The box art of a few RA games (the cover the game page shows), by id: kept in
@@ -19,7 +20,7 @@ export function useRaBoxArt(gameIds: number[]): Record<number, string | undefine
     Promise.all(
       ids.map(async (id) => {
         const box = (await raArt(id))?.box
-        return [id, box ? `https://retroachievements.org${box}` : undefined] as const
+        return [id, raImageUrl(box)] as const
       }),
     ).then((entries) => {
       if (!cancelled) setArt(Object.fromEntries(entries))

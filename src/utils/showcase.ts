@@ -1,6 +1,7 @@
 import { parseUnlockTime, unlockIso } from '@/utils/dates'
 import type { GameSource } from '@/types/game'
 import { GAME_SOURCES } from '@/utils/gameRef'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 /** How many achievements a showcase holds. */
 export const SHOWCASE_MAX = 5
@@ -72,7 +73,7 @@ export function raShowcaseEntry(
     gameTitle,
     title: a.Title,
     description: a.Description || null,
-    badge: a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : null,
+    badge: raBadgeUrl(a.BadgeName) ?? null,
     earnedAt: new Date(at).toISOString(),
   }
 }

@@ -8,6 +8,7 @@ import type { RetroAchievementsGameCompleted, UserAward } from '@/types/types'
 import type { GameSource, SteamGameProgress } from '@/types/steam'
 import { validCompletionDate } from '@/utils/completionDates'
 import { parseUnlockTime } from '@/utils/dates'
+import { raImageUrl } from '@/utils/raAssets'
 
 /**
  * A game with every achievement, from either platform, in one shape — what
@@ -45,7 +46,7 @@ export function buildPerfectGames(
       source: 'ra',
       id: g.GameID,
       title: g.Title,
-      imageUrl: g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : undefined,
+      imageUrl: raImageUrl(g.ImageIcon),
       subtitle: g.ConsoleName,
       hardcore,
     })
@@ -161,7 +162,7 @@ export function latestPerfects(
       id: a.AwardData,
       title: a.Title,
       subtitle: a.ConsoleName,
-      iconUrl: a.ImageIcon ? `https://retroachievements.org${a.ImageIcon}` : undefined,
+      iconUrl: raImageUrl(a.ImageIcon),
       date: a.AwardedAt,
       hardcore: a.AwardDataExtra === 1,
     })

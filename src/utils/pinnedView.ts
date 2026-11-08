@@ -5,6 +5,7 @@ import { pinnedKey } from '@/utils/utils'
 import { psnTrophyAnchor, TROPHY_GRADE_COLOR } from '@/utils/psnTitles'
 import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 /** A pinned achievement of any platform, in the one shape its tile draws. */
 export type PinnedView = {
@@ -82,7 +83,7 @@ export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView 
     ...base,
     title: a.Title,
     description: a.Description,
-    iconUrl: a.BadgeName ? `https://media.retroachievements.org/Badge/${a.BadgeName}.png` : null,
+    iconUrl: raBadgeUrl(a.BadgeName) ?? null,
     earned: Boolean(a.DateEarned || a.DateEarnedHardcore),
     anchor: null,
     value: `${a.Points} pts`,

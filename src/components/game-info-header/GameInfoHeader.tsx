@@ -16,6 +16,7 @@ import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHero
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
 import GameHashesModal from './GameHashesModal'
 import { formatDay } from '@/utils/dates'
+import { raImageUrl } from '@/utils/raAssets'
 
 type StatusKey = 'mastered' | 'completed' | 'beatenHC' | 'beaten' | 'inProgress'
 
@@ -69,7 +70,7 @@ export default function GameInfoHeader({
 
   const cover = gameData?.ImageBoxArt ? (
     <FadeImage
-      src={`https://retroachievements.org${gameData.ImageBoxArt}`}
+      src={raImageUrl(gameData.ImageBoxArt)!}
       alt={gameData.Title ?? ''}
       width={216}
       height={306}
@@ -145,8 +146,8 @@ export default function GameInfoHeader({
         media={
           <GameHeroMedia
             shots={[
-              gameData?.ImageTitle ? { src: `https://retroachievements.org${gameData.ImageTitle}`, caption: T.gameInfoPage.titleScreen } : null,
-              gameData?.ImageIngame ? { src: `https://retroachievements.org${gameData.ImageIngame}`, caption: T.gameInfoPage.inGame } : null,
+              gameData?.ImageTitle ? { src: raImageUrl(gameData.ImageTitle)!, caption: T.gameInfoPage.titleScreen } : null,
+              gameData?.ImageIngame ? { src: raImageUrl(gameData.ImageIngame)!, caption: T.gameInfoPage.inGame } : null,
             ]}
           />
         }

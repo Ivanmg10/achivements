@@ -16,6 +16,7 @@ import { SkeletonGameList } from '@/components/ui/SkeletonList'
 import EmptyState from '@/components/empty-state/EmptyState'
 import { useSubject } from '@/context/SubjectContext'
 import { decimal } from '@/utils/utils'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 const SHOWN = 6
 
@@ -49,7 +50,7 @@ export default function MainPageRarest({
       .map((a) => ({
         key: `ra:${a.AchievementID}`,
         href: a.GameID ? gameHref('ra', a.GameID, subject) : '#',
-        imageUrl: `https://media.retroachievements.org/Badge/${a.BadgeName}.png`,
+        imageUrl: raBadgeUrl(a.BadgeName),
         title: a.Title,
         subtitle: a.GameTitle,
         stat: String(a.TrueRatio),

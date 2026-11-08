@@ -18,6 +18,7 @@ import EmptyState from '@/components/empty-state/EmptyState'
 import { useRetryingRead } from '@/hooks/useRetryingRead'
 import { useSubject } from '@/context/SubjectContext'
 import { parseUnlockTime } from '@/utils/dates'
+import { raImageUrl } from '@/utils/raAssets'
 
 const ABANDONED_DAYS = 30
 const DAY_MS = 1000 * 60 * 60 * 24
@@ -83,7 +84,7 @@ export default function MainPageAbandoned({
       return [{
         key: `ra:${g.GameID}`,
         href: gameHref('ra', g.GameID, subject),
-        imageUrl: g.ImageIcon ? `https://retroachievements.org${g.ImageIcon}` : undefined,
+        imageUrl: raImageUrl(g.ImageIcon),
         title: g.Title,
         subtitle: g.ConsoleName,
         daysAgo,

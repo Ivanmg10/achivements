@@ -6,10 +6,11 @@ import { psnBackdrop } from '@/utils/psnTitles'
 import { xboxBackdrop } from '@/utils/xboxTitles'
 import { entryId } from '@/utils/libraryShelves'
 import type { LibraryEntry } from '@/utils/libraryInsights'
+import { raImageUrl } from '@/utils/raAssets'
 
 /** The square icon of a game, as its platform gives it (RA's is a path on its site). */
 export function entryIcon(e: LibraryEntry): string | null {
-  if (e.kind === 'ra') return e.game.ImageIcon ? `https://retroachievements.org${e.game.ImageIcon}` : null
+  if (e.kind === 'ra') return raImageUrl(e.game.ImageIcon) ?? null
   return e.game.imageIcon || null
 }
 

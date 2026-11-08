@@ -17,6 +17,7 @@ import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { relativeTime } from '@/utils/dates'
+import { raImageUrl } from '@/utils/raAssets'
 
 // About three rows on a wide card; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
@@ -51,7 +52,7 @@ export default function SortableItem({
 
   const consoleDef = CONSOLES.find((c) => c.name === item.console_name)
   const href = `/gameInfo/${item.game_id}`
-  const cover = item.image_icon ? `https://retroachievements.org${item.image_icon}` : null
+  const cover = raImageUrl(item.image_icon) ?? null
 
   const achTotal = achStats?.total || item.max_possible
   const scEarned = achStats?.scEarned ?? item.num_awarded

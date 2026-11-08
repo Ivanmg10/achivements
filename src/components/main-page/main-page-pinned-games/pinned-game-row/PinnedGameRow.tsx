@@ -17,6 +17,7 @@ import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-recently-played-expanded/RARecentlyPlayedExpanded'
 import { gameKey } from '@/utils/gameRef'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
+import { raImageUrl } from '@/utils/raAssets'
 
 const CONSOLE_BY_ID = new Map(CONSOLES.map((c) => [c.id, c.icon]))
 
@@ -72,7 +73,7 @@ export default function PinnedGameRow({
       onPointerMove={onPointerMove}
       className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
-      <GameCardBackdrop src={game.ImageIcon ? `https://retroachievements.org${game.ImageIcon}` : null} />
+      <GameCardBackdrop src={raImageUrl(game.ImageIcon) ?? null} />
       <div
         role="button"
         tabIndex={0}
@@ -97,7 +98,7 @@ export default function PinnedGameRow({
         >
           {game.ImageIcon ? (
             <Image
-              src={`https://retroachievements.org${game.ImageIcon}`}
+              src={raImageUrl(game.ImageIcon)!}
               alt={game.Title ?? ''}
               width={56}
               height={56}

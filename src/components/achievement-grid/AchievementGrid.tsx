@@ -15,6 +15,7 @@ import { tooltipStyle } from '@/utils/tooltipStyle'
 import { TOOLTIP_SURFACE } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { raTypeTag } from '@/components/ui/dataTable'
+import { raBadgeUrl } from '@/utils/raAssets'
 
 type TooltipData = { achievement: RetroAchievement; x: number; y: number }
 
@@ -79,7 +80,7 @@ export const AchievementGrid = memo(function AchievementGrid({
       const img = new window.Image()
       img.onload = done
       img.onerror = done
-      img.src = `https://media.retroachievements.org/Badge/${name}.png`
+      img.src = raBadgeUrl(name)!
     })
     const timeout = setTimeout(finish, 1500)
     return () => {
@@ -153,7 +154,7 @@ export const AchievementGrid = memo(function AchievementGrid({
             >
               {a.BadgeName ? (
                 <Image
-                  src={`https://media.retroachievements.org/Badge/${a.BadgeName}.png`}
+                  src={raBadgeUrl(a.BadgeName)!}
                   alt=""
                   width={size.img}
                   height={size.img}
