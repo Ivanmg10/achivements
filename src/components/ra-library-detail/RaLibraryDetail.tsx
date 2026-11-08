@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
+import type { RetroAchievementsGameWithAchievements } from '@/types/types'
 import type { CategoryGame } from '@/hooks/useGamesByCategory'
 import { useLanguage } from '@/context/LanguageContext'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
@@ -13,6 +13,7 @@ import type { InfoRow } from '@/components/library-game-detail/library-detail-in
 import { raAwardCompletedAt } from '@/utils/completionDates'
 import { raImageUrl } from '@/utils/raAssets'
 import type { GameStatus } from '@/types/game'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 // About three rows at two columns on a wide screen; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
@@ -45,8 +46,7 @@ export default function RaLibraryDetail({
   const achievements = useMemo(
     () =>
       data
-        ? Object.values(data.Achievements ?? {})
-            .filter((a): a is RetroAchievement => !!a)
+        ? raAchievementList(data)
             .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
         : [],
     [data],

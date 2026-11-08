@@ -17,6 +17,7 @@ import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
 import GameHashesModal from './GameHashesModal'
 import { formatDay } from '@/utils/dates'
 import { raImageUrl } from '@/utils/raAssets'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 type StatusKey = 'mastered' | 'completed' | 'beatenHC' | 'beaten' | 'inProgress'
 
@@ -56,7 +57,7 @@ export default function GameInfoHeader({
   const status = gameData ? deriveStatus(gameData) : null
   const points = useMemo(() => sumAchievementPoints(gameData?.Achievements ?? {}), [gameData])
   const missables = useMemo(
-    () => Object.values(gameData?.Achievements ?? {}).filter((a) => a && a.Type === 'missable' && !a.DateEarned && !a.DateEarnedHardcore).length,
+    () => raAchievementList(gameData).filter((a) => a.Type === 'missable' && !a.DateEarned && !a.DateEarnedHardcore).length,
     [gameData],
   )
   const earned = gameData?.NumAwardedToUser ?? 0

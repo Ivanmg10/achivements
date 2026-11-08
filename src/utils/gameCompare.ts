@@ -1,5 +1,5 @@
 import { parseUnlockTime } from '@/utils/dates'
-import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
+import type { RetroAchievementsGameWithAchievements } from '@/types/types'
 import type { GameAchievement } from '@/types/game'
 import type { SteamAchievementUnified } from '@/types/steam'
 import type { PsnTrophy, TrophyGrade } from '@/types/psn'
@@ -8,6 +8,7 @@ import { xboxAchievementAnchor } from '@/utils/xboxTitles'
 import type { XboxAchievement } from '@/types/xbox'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import { raBadgeUrl } from '@/utils/raAssets'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 /** One achievement of a game as someone has it, the same for RA, Steam and PSN. */
 export type CompareAchievement = GameAchievement & {
@@ -33,8 +34,7 @@ export type CompareFilter = 'all' | 'both' | 'onlyThem' | 'onlyMe' | 'neither'
 export function raCompareList(game: RetroAchievementsGameWithAchievements | null): CompareAchievement[] {
   if (!game) return []
   const players = game.NumDistinctPlayers || 0
-  return Object.values(game.Achievements ?? {})
-    .filter((a): a is RetroAchievement => a !== undefined)
+  return raAchievementList(game)
     .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
     .map((a) => ({
       id: String(a.ID),

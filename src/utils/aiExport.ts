@@ -5,6 +5,7 @@ import type { XboxAchievement, XboxGameProgress } from '@/types/xbox'
 import type { IgdbDetails } from '@/lib/igdbClient'
 import { BASE_GROUP } from '@/utils/psnTitles'
 import type { GameSource } from '@/types/game'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 /**
  * A game's achievements as a file for a chat AI (ChatGPT, Claude, Gemini…),
@@ -78,8 +79,7 @@ const RA_TYPES = new Set(['progression', 'win_condition', 'missable'])
 
 export function raAiSource(game: RetroAchievementsGameWithAchievements): AiExportSource {
   const players = game.NumDistinctPlayers ?? 0
-  const achievements = Object.values(game.Achievements ?? {})
-    .filter((a) => !!a)
+  const achievements = raAchievementList(game)
     .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
     .map(
       (a): AiAchievement => ({

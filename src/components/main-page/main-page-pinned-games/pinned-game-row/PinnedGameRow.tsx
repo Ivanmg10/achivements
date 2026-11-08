@@ -9,7 +9,6 @@ import { useGameProgression } from '@/hooks/useGameProgression'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { RetroAchievement } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SectionFallback } from '@/components/ui/SectionFallback'
@@ -18,6 +17,7 @@ import { RARecentlyPlayedExpanded } from '@/components/ra-recently-played/ra-rec
 import { gameKey } from '@/utils/gameRef'
 import { GameRowSkeleton } from '@/components/ui/GameRowSkeleton'
 import { raImageUrl } from '@/utils/raAssets'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 const CONSOLE_BY_ID = new Map(CONSOLES.map((c) => [c.id, c.icon]))
 
@@ -58,8 +58,7 @@ export default function PinnedGameRow({
     )
   }
 
-  const achievements = Object.values(game.Achievements ?? {})
-    .filter((a): a is RetroAchievement => !!a)
+  const achievements = raAchievementList(game)
     .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
   const total = game.NumAchievements ?? 0
   const consoleIcon = game.ConsoleID ? CONSOLE_BY_ID.get(game.ConsoleID) : undefined

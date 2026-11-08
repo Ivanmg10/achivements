@@ -9,7 +9,7 @@ import { IconGripVertical, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { useSpotlight } from '@/hooks/useSpotlight'
-import { RetroAchievement, GameGroupItem } from '@/types/types'
+import { GameGroupItem } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { SectionFallback } from '@/components/ui/SectionFallback'
@@ -18,6 +18,7 @@ import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { relativeTime } from '@/utils/dates'
 import { raImageUrl } from '@/utils/raAssets'
+import { raAchievementList } from '@/utils/gameAchievements'
 
 // About three rows on a wide card; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60
@@ -68,8 +69,7 @@ export default function SortableItem({
   const { game: gameData, isLoading, error: achError, refetch: refetchAch } = useGameProgression(open ? String(item.game_id) : null)
   const loadingAch = isLoading || (open && !gameData && !achError)
   const achievements = gameData
-    ? Object.values(gameData.Achievements ?? {})
-        .filter((a): a is RetroAchievement => !!a)
+    ? raAchievementList(gameData)
         .sort((a, b) => a.DisplayOrder - b.DisplayOrder)
     : []
 
