@@ -58,6 +58,22 @@ stats, and personalization. Next.js 16 App Router + PostgreSQL + Tailwind v4.
 - Shared data loads on its first reader: the provider's `request()`, called by the hook that reads it
   (`useGamesData`, `usePinnedGames`…), never a fetch at mount (Performance below). The older
   `hasFetched = useRef(false)` guard survives in a few hooks; do not copy it into new code.
+- **A GET that retries goes through `useRetryingRead`** (`src/hooks/`): never another attempt/timer loop
+  around `scheduleRetry`.
+
+### Shared helpers — use them, never a copy (#119)
+- **Platform dates** through `src/utils/dates.ts`: `parseUnlockTime` / `unlockIso` read the platforms'
+  zone-less strings as UTC (never `.replace(' ', 'T')`), `utcDay` / `localDay` are the day keys, and
+  `formatDate(s, lang)` shows a date in the reader's language (never a fixed locale).
+- **RA picture URLs** through `src/utils/raAssets.ts` (`raImageUrl`, `raBadgeUrl`, `raAvatarUrl`), never a
+  hand-written `retroachievements.org` host.
+- **The platform list and names** are `GAME_SOURCES` and `PLATFORM_NAME` (`src/utils/gameRef.ts`); the shared
+  types (`GameSource`, `GameStatus`, `SavedGame`, `GameAchievement`) are in `src/types/game.ts`.
+- **Hidden games in SQL** are `notHidden(row)` (`src/lib/gameVisibility.ts`), as presence is `presenceColumns()`.
+- **Signing, constant-time compares and cookies** through `src/lib/secrets.ts`. **A key derivation never
+  changes**: sealed RA keys, the NPSSO and every link and ticket out there stop being readable;
+  `secrets.test.ts` pins them.
+- What is still written by hand, and how to move it: the #119 entry in `docs/worklog.md`.
 
 ### Sub-component extraction — MANDATORY
 **Goal: pages and components as independent and self-contained as possible.**
@@ -117,6 +133,8 @@ Every API call added or modified must have its own error handling. No exceptions
 - Set appropriate error state so the UI can reflect failure (error message, empty state, retry)
 - Do not let errors propagate silently or swallow them with empty catch blocks
 - API route handlers (`route.ts`): always return structured error responses with correct HTTP status codes
+- **A route that needs a signed-in user starts with `requireSession()`** (or a platform's `require*Session`),
+  which also gives the session's user: never `getServerSession` plus a 401 of its own.
 - **An error that asking again will not fix is a 4xx**: the client retries 5xx (`fetchWithRetry`, then
   `scheduleRetry`) and never a 4xx. Keep "nothing here", "I cannot read it" and "try later" distinct
   (the table per platform: `docs/platforms/README.md`).
