@@ -33,6 +33,52 @@ than it to `archive/worklog-<from>-to-<to>.md` (the first cut is
 
 ---
 
+## 2026-11-08 — Probable bugs from the antislop audit, checked and fixed (`fix/118-audit-bugs`, #118)
+
+**Did** — Each line of #118 was checked in the current code first; one commit per point (ids are the audit's, in
+`docs/audits/antislop-v17/`). Fixed, with a test that fails without the fix where it is logic: E-06 `PlatformMark` draws
+`PlatformLogo` (Xbox no longer gets PlayStation's mark); CP-02 `passwordReset.saveFailed` (and `registerForm.errorCreating`
+reworded) in 9 languages; CP-01 the friends page copy (showcase not pinned achievements, followers are yours alone, the
+public card) and `updated`; UT-04 `parseUnlockTime` (`src/utils/dates.ts`) is the one reader of the platforms' zone-less
+unlock dates, which are UTC, and every `.replace(' ', 'T')` that read them as local now goes through it (`getBestWeek` also
+counts weeks in UTC now, as the key it builds already was); AP-17 `steam/activity` and `steam/unlockYear` pass through
+`visibleGamesForUser`; D1-10 Steam's rarest-earned links use `gameHref(..., subject)`; AP-02 admin unlink clears
+the user cache for all four platforms; C-13 welcome phone bar is `flex` with a `flex-1` segment per step; D2-06 one
+`raTypeTag` in `ui/dataTable.ts` for the four RA type tags (`win_condition` reads "Win" everywhere); D2-10 the status
+skeleton reads `STATUS_GRID_COLS` (moved to `status-grid-control/statusGridCols.ts`); UT-10 `perfectDates` takes a PSN
+date only for a completed game; E-15 `AuthPage` mounts the forms in the layout in use only (`useMediaQuery`; until the
+browser can say, both hold it, as the server printed them); AP-06 the design tokens moved from `:root, [data-theme]` to
+`:root`; V1-12 "/" opens search empty; V4-02 the `Switch` knob is `bg-bg-main` when on; V4-01 `ProfileField` names a
+children-only value through its text; V3-08/V5-18/V4-03 `VaultLevelBadge compact="phone"` (one badge, tier dropped below
+`sm`; podium and the account's level row); V5-16 `REGISTER_HREF` (`utils/authLinks.ts`) on every create-account link;
+V2-09 `useGameInfo` exposes `missing` (RA 404) → `notFound()`, a real failure shows a sentence (`gameInfoPage.loadError`)
+and `Button`, and `raUnavailable` answers RA's 404/422 with a 404 so it is not retried; V7 `ThemeContext` writes the theme
+only once the account's or a pick is known (or the session is authenticated); V3-15 the public rankings guide names no Xbox
+(intro text in 9 languages; the example row only for who `useXboxEnabled`); B-05 `platformStat` (loading figure, `—` only for
+an absent value) on the four platform cards and the Xbox profile's play time; HK-09 pins, the perfect-games order and the home's
+groups show `SectionFallback` (error + retry) instead of an empty list, `saveOrder` rolls back, reads log; AP-10 hashes and
+subsets answer `raUnavailable`, achievement detail no longer swallows a half and so never caches a pair with a hole,
+`getGamesLastPlayed` logs; B-02 the add-game modal says when the id lookup fails.
+**Why** — #118: ~30 probable bugs found while reading the code and the screenshots, none fixed.
+**Decisions** — RA's dates are UTC (every other reader already appended `Z`; `activityInsights` says "every platform
+alike"), so the local readers were the bugs. Type-to-search stays (owner, 2026-11-07); only "/" is special. Steam's rarest
+stays on the viewed profile like PSN and Xbox, the three components are not merged (#125). A page does not shrink: the pins
+and groups error states keep their section. The Xbox mark and Venom switch fixes keep every colour. E-15's SSR is unchanged
+(both layouts still render on the server).
+**Open** — Left out on purpose: the level ring stuck at 99 %, "Two Xbox game pages show game not found" and LB-02
+(`scoreRefresh.totalPoints`), by the owner's order (another agent). Not done, the owner has not decided: V1-01 ("Ratio
+hardcore 285 %": RetroRatio or the hardcore share; the avatar ring reads it too). Not done, the owner declined: V5-09 (cookie
+notice on phones stays, 2026-11-07). Unverified without an RA key: what RA answers for a game that does not exist (V2-09 handles
+a thrown 404/422 and an object without `ID`). The vault guide still says "gamerscore" as one of the native values
+(not a platform name); V4-23's state words beside the four switches are not added. `getGamesLastPlayed` still answers
+`null` per failed game (only logged now).
+**Watch out** — The shape tokens must stay out of `[data-theme]` blocks (a test fails otherwise). `raUnavailable` now
+answers 404 for RA's 404/422: a client that retried that on a 503 no longer will. `withCache`'s validator throws on a
+failed pair in `getAchievementDetail`, so one failing half is a 503 for the modal. `migrations/045_steam_playtime.sql`
+is in pre since 2026-11-07, not in production (`docs/releases.md`).
+
+---
+
 ## 2026-11-07 — Steam last-played for everyone, not only the key's owner (`fix/113-steam-last-played`, #113)
 
 **Did** — One "last played" for Steam, `lastPlayedOf` (`src/utils/steamMappers.ts`): Steam's `rtime_last_played` when it

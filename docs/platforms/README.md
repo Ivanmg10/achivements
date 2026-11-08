@@ -11,7 +11,7 @@ A person must be able to tell "nothing here" from "I cannot read it" from "try l
 
 | | Unknown account | Private / unreadable | Credential refused | Busy |
 |---|---|---|---|---|
-| **RA** | RA says 401 for a bad key, for any username | n/a (profiles are public) | `raUnavailable()` → `403 ra-key-invalid`, not retried; `RaKeyInvalidNotice` | 429 waits `Retry-After`, then 429 with `Retry-After`, not retried |
+| **RA** | RA says 401 for a bad key, for any username; a game or thing RA does not know (its 404 or 422) is `404 not-found` from `raUnavailable()`, not retried | n/a (profiles are public) | `raUnavailable()` → `403 ra-key-invalid`, not retried; `RaKeyInvalidNotice` | 429 waits `Retry-After`, then 429 with `Retry-After`, not retried |
 | **Steam** | link goes through Steam (no unknown account); ids that do not exist answer 400 | a private profile links; **after linking**, `{ response: {} }` → `ownedGames` answers `403 private` (not an empty library) and the list page says so | key is the app's | 429 with `Retry-After` (`steamFailure`), not retried |
 | **PSN** | link: not found | `psnFailure` → 403 | NPSSO expiry, admin panel | 429 + `Retry-After: 60` |
 | **Xbox** | `code: 404` in the body → `not-found` | no titles and no `achievementSummary` → `private` | app key: `503 unauthorized` | 429 |

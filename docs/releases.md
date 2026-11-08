@@ -87,7 +87,7 @@ reads it runs. What each breaks without it, as `CLAUDE.md` used to say section b
 | `042_steam_unlocks` | Every Steam unlock read | pre and prod 2026-10-22 | They only log; nothing fails |
 | `043_ra_key_sealed` | RA keys sealed at rest | pre 2026-10-31, prod 2026-11-02 | Linking RA answers 500; reads still work |
 | `044_admin_totp` | The admin's one-time codes | pre 2026-10-31, prod 2026-11-02 | The admin unlock answers 500 |
-| `045_steam_playtime` | Hours per Steam game, to date games Steam does not (#113) | **not applied** (2026-11-07) | Each owned-list read logs the missing table; dates come from kept unlocks and Steam's two-week minutes only, so a game with no achievements played more than two weeks ago stays undated. Nothing fails |
+| `045_steam_playtime` | Hours per Steam game, to date games Steam does not (#113) | pre 2026-11-07, **not in production yet** | Each owned-list read logs the missing table; dates come from kept unlocks and Steam's two-week minutes only, so a game with no achievements played more than two weeks ago stays undated. Nothing fails |
 
 `—`: not written down in `CLAUDE.md` (the worklog archive may say). All of `041`–`044` are in production since the 1.7.0
 release (2026-11-02).

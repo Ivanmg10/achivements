@@ -42,6 +42,15 @@ test('each links to that achievement on the game page', () => {
   expect(screen.getByRole('link').getAttribute('href')).toBe('/steamGame/620#ach-RARE')
 })
 
+test("on someone's profile each link stays on that person's game (D1-10)", () => {
+  render(
+    <SubjectContext.Provider value="ana">
+      <SteamRarestAchievements appId={620} achievements={[ach('RARE', { globalPct: 1 })]} isLoading={false} />
+    </SubjectContext.Provider>,
+  )
+  expect(screen.getByRole('link').getAttribute('href')).toBe('/user/ana/steam/620#ach-RARE')
+})
+
 test('is headed like the RA side panel it replaces', () => {
   render(<SteamRarestAchievements appId={620} achievements={[]} isLoading={false} />)
   expect(screen.getByText(en.steam.rarestUnlocked)).toBeInTheDocument()
