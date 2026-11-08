@@ -1,5 +1,6 @@
 import { parseUnlockTime } from '@/utils/dates'
 import type { RetroAchievement, RetroAchievementsGameWithAchievements } from '@/types/types'
+import type { GameAchievement } from '@/types/game'
 import type { SteamAchievementUnified } from '@/types/steam'
 import type { PsnTrophy, TrophyGrade } from '@/types/psn'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
@@ -8,24 +9,15 @@ import type { XboxAchievement } from '@/types/xbox'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 
 /** One achievement of a game as someone has it, the same for RA, Steam and PSN. */
-export type CompareAchievement = {
-  id: string
-  title: string
-  description: string
-  iconUrl: string | null
+export type CompareAchievement = GameAchievement & {
   /** RA's points. */
   points?: number
   /** PSN's grade. */
   grade?: TrophyGrade
   /** Xbox's gamerscore for it. */
   gamerscore?: number
-  /** Share of players who have it, 0–100; null when the platform does not say. */
-  rarity: number | null
-  /** Where a link to it lands on the page (Steam and PSN deep links use it). */
+  /** Where a link to it lands on the page (Steam and PSN deep links use it). `earnedAt` is RA's hardcore date when there is one. */
   anchor?: string
-  earned: boolean
-  /** When; RA's hardcore date when there is one. Null for an unlock with no date. */
-  earnedAt: string | null
   /** RA only: earned in hardcore. */
   hardcore?: boolean
 }

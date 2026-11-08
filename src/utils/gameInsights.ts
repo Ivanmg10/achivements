@@ -1,5 +1,6 @@
 import type { RecentAchievement, RetroAchievement } from '@/types/types'
-import type { GameSource, SteamAchievementUnified } from '@/types/steam'
+import type { SteamAchievementUnified } from '@/types/steam'
+import type { GameAchievement, GameSource } from '@/types/game'
 import type { PsnTrophy } from '@/types/psn'
 import { achievementAnchor } from '@/components/steam/steam-achievement-grid/SteamAchievementGrid'
 import { psnTrophyAnchor } from '@/utils/psnTitles'
@@ -8,19 +9,11 @@ import type { XboxAchievement } from '@/types/xbox'
 import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
 
 /** An achievement or trophy of any platform, reduced to what a library card tells. */
-export type InsightAchievement = {
-  id: string
-  title: string
-  description: string
-  earned: boolean
-  earnedAt: string | null
-  /** Share of players who have it, 0–100; null when the platform does not say. */
-  rarity: number | null
+export type InsightAchievement = GameAchievement & {
   /** RA points; the other platforms have none. */
   points: number | null
   /** RA tags: what the game needs to be beaten, and what can be missed for good. */
   kind: 'progression' | 'win_condition' | 'missable' | null
-  iconUrl: string | null
   href: string
 }
 

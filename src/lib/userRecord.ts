@@ -2,8 +2,7 @@ import { createHash } from 'crypto'
 import pool from '@/lib/db'
 import { readRaKey } from '@/lib/raKey'
 import type { RetroAchievementsUserProfile } from '@/types/types'
-
-type SavedGame = { id: number; title: string; imageIcon: string } | null
+import type { SavedGame } from '@/types/game'
 
 /** A users row as the session needs it. The database is the only source of truth for these. */
 export type UserRecord = {
