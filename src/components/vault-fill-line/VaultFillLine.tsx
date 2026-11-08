@@ -5,6 +5,7 @@ import { useVaultFillState } from '@/context/VaultFillContext'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { fillMessage } from '@/utils/vaultFill'
 import type { GameSource } from '@/types/game'
+import Notice from '@/components/ui/Notice'
 
 /**
  * On a platform's card, right after linking it: its Vault Points being
@@ -20,9 +21,7 @@ export default function VaultFillLine({ source }: { source: GameSource }) {
 
   if (p.state === 'error') {
     return (
-      <p role="alert" className="text-xs rounded-box px-2.5 py-1.5 bg-danger/10 ring-1 ring-danger/30">
-        {message}
-      </p>
+      <Notice tone="danger" size="sm">{message}</Notice>
     )
   }
   if (p.state === 'done') {

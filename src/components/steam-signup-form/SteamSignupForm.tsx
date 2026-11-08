@@ -8,6 +8,7 @@ import SteamSignInButton from '@/components/steam-sign-in-button/SteamSignInButt
 import SteamSignupFormFields from '@/components/steam-signup-form-fields/SteamSignupFormFields'
 import WelcomeEntryCurtain from '@/components/welcome-entry-curtain/WelcomeEntryCurtain'
 import AuthFormSkeleton from '@/components/auth-form-skeleton/AuthFormSkeleton'
+import Notice from '@/components/ui/Notice'
 
 /**
  * Where the Steam callback lands (/authPage?steam=…): signs in a known Steam
@@ -49,9 +50,7 @@ export default function SteamSignupForm({ outcome }: { outcome: string }) {
 
       {state.status === 'error' && (
         <div className="flex flex-col gap-3">
-          <div role="alert" className="bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3">
-            <p className="text-sm text-danger">{messageOf(state.error)}</p>
-          </div>
+          <Notice tone="danger">{messageOf(state.error)}</Notice>
           <SteamSignInButton label={s.tryAgain} />
         </div>
       )}

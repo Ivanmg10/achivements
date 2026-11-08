@@ -12,22 +12,6 @@
     "components/statusGameList/StatusGameItem.tsx"
   ],
   "listRow": [],
-  "notice": [
-    "components/avatar-modal/AvatarModal.tsx",
-    "components/change-password-modal/ChangePasswordModal.tsx",
-    "components/edit-profile-modal/EditProfileModal.tsx",
-    "components/login-user-form/LoginUserForm.tsx",
-    "components/ra-key-invalid-notice/RaKeyInvalidNotice.tsx",
-    "components/register-user-form/RegisterUserForm.tsx",
-    "components/register-user-form/register-user-form-ra/RegisterUserFormRa.tsx",
-    "components/reset-password-form/ResetPasswordForm.tsx",
-    "components/steam-signup-form-fields/SteamSignupFormFields.tsx",
-    "components/steam-signup-form/SteamSignupForm.tsx",
-    "components/user-page/email-verification-notice/EmailVerificationNotice.tsx",
-    "components/user-page/user-identity-card/UserIdentityCard.tsx",
-    "components/vault-fill-line/VaultFillLine.tsx",
-    "components/vault-fill-progress/VaultFillProgress.tsx"
-  ],
   "dialogRole": [
     "components/layout-modal/LayoutModal.tsx",
     "components/search-modal/SearchModal.tsx"

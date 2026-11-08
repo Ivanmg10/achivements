@@ -157,9 +157,7 @@ export default function EditProfileModal({ isOpen, onClose, field, currentValue 
 
       {/* Success */}
       {success && (
-        <p role="status" className="text-sm text-success bg-success/10 ring-1 ring-inset ring-success/30 rounded-control px-4 py-2">
-          {T.editProfileModal.success}
-        </p>
+        <Notice tone="success">{T.editProfileModal.success}</Notice>
       )}
 
       {/* Actions */}

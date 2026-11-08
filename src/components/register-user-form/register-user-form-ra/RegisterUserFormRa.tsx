@@ -8,6 +8,7 @@ import { useRaSignupCheck, type RaSignupAccount } from '@/hooks/useRaSignupCheck
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import RaLogo from '@/components/ra-logo/RaLogo'
 import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
 
 const RA_SETTINGS = 'https://retroachievements.org/settings'
 
@@ -68,9 +69,7 @@ export default function RegisterUserFormRa({
         <form onSubmit={handleCheck} noValidate className="flex flex-col gap-3">
           <p className="text-xs text-text-secondary">{t.raLead}</p>
           {error && (
-            <p role="alert" className="text-sm text-danger bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-2.5">
-              {error}
-            </p>
+            <Notice tone="danger">{error}</Notice>
           )}
           <AuthFormField
             label={t.raUsername}

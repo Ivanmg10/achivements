@@ -14,6 +14,7 @@ import { useWelcomeEntry } from '@/hooks/useWelcomeEntry'
 import type { RaSignupAccount } from '@/hooks/useRaSignupCheck'
 import { checkEmail, checkPassword, checkUsername, PASSWORD_MIN, suggestUsername, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
 
 export default function RegisterUserForm({
   setIsLogin,
@@ -116,9 +117,7 @@ export default function RegisterUserForm({
       </div>
 
       {error && (
-        <div role="alert" className="mb-5 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3">
-          <p className="text-sm text-danger">{error}</p>
-        </div>
+        <Notice tone="danger" className="mb-5">{error}</Notice>
       )}
 
       {raOpen && (

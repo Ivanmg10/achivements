@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import { signOut, useSession } from 'next-auth/react'
-import { IconAlertTriangle, IconPencil } from '@tabler/icons-react'
+import { IconPencil } from '@tabler/icons-react'
 import ProfileField from '@/components/user-page/profile-field/ProfileField'
 import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
 import UserVaultStat from '@/components/user-page/user-vault-stat/UserVaultStat'
@@ -23,6 +23,7 @@ import { codeToFlag, countryName, findCountry } from '@/utils/countries'
 import Button from '@/components/ui/Button'
 import Tag from '@/components/ui/Tag'
 import Avatar from '@/components/ui/Avatar'
+import Notice from '@/components/ui/Notice'
 
 // Modals are downloaded the first time they are wanted, not with the page — the admin panel above all.
 const AdminPanelModal = dynamic(() => import('@/components/admin-panel/admin-panel-modal/AdminPanelModal'), { loading: () => null })
@@ -136,19 +137,18 @@ export default function UserIdentityCard() {
       <EmailVerificationNotice />
 
       {missingEmail && (
-        <div role="alert" className="flex items-start gap-3 bg-warning/10 ring-1 ring-inset ring-warning/30 rounded-control p-4">
-          <IconAlertTriangle size={18} className="text-warning shrink-0 mt-0.5" aria-hidden="true" />
-          <div className="flex flex-col gap-1 min-w-0">
-            <p className="text-sm font-semibold text-warning">{T.passwordReset.missingEmailTitle}</p>
-            <p className="text-xs text-text-secondary">{T.passwordReset.missingEmailText}</p>
-            <button
-              onClick={() => setEdit({ field: 'email', value: '' })}
-              className="self-start mt-1 text-xs font-medium text-warning underline underline-offset-2 hover:text-warning transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning/70"
-            >
+        <Notice
+          tone="warning"
+          alert
+          title={T.passwordReset.missingEmailTitle}
+          action={
+            <Button variant="quiet" size="sm" onClick={() => setEdit({ field: 'email', value: '' })}>
               {T.passwordReset.addEmail}
-            </button>
-          </div>
-        </div>
+            </Button>
+          }
+        >
+          {T.passwordReset.missingEmailText}
+        </Notice>
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

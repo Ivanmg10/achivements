@@ -9,6 +9,7 @@ import { useSaveProfileField } from '@/hooks/useSaveProfileField'
 import { useLanguage } from '@/context/LanguageContext'
 import Button, { buttonClass } from '@/components/ui/Button'
 import { fieldClass } from '@/components/ui/Input'
+import Notice from '@/components/ui/Notice'
 
 const BUTTON = 'flex-1'
 const PRIMARY = buttonClass('primary', 'md', BUTTON)
@@ -122,9 +123,7 @@ export default function AvatarModal({ isOpen, onClose, current }: { isOpen: bool
       </label>
 
       {error && (
-        <p role="alert" className="text-sm text-danger bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control px-4 py-2">
-          {error}
-        </p>
+        <Notice tone="danger">{error}</Notice>
       )}
 
       {upload.picked && (

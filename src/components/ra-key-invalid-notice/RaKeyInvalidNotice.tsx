@@ -1,11 +1,11 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { IconAlertTriangle } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGamesData } from '@/context/GamesDataContext'
 import { useSubject } from '@/context/SubjectContext'
+import Notice from '@/components/ui/Notice'
+import Button from '@/components/ui/Button'
 
 /**
  * Shown when RetroAchievements refuses the saved API key (the person revoked or
@@ -22,16 +22,19 @@ export default function RaKeyInvalidNotice() {
   if (!keyInvalid || subject) return null
 
   return (
-    <div role="alert" className="flex items-start gap-3 bg-warning/10 ring-1 ring-inset ring-warning/30 rounded-control p-4 m-3">
-      <IconAlertTriangle size={18} className="text-warning shrink-0 mt-0.5" aria-hidden="true" />
-      <div className="flex flex-col gap-1 min-w-0">
-        <p className="text-sm text-text-main">{T.userPage.raKeyInvalid}</p>
-        {pathname !== '/user' && (
-          <Link href="/user" className="self-start text-xs font-medium text-warning underline underline-offset-2 hover:text-warning rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-warning/70">
+    <Notice
+      tone="warning"
+      alert
+      className="m-3"
+      action={
+        pathname !== '/user' ? (
+          <Button href="/user" variant="quiet" size="sm">
             {T.userPage.raKeyInvalidAction}
-          </Link>
-        )}
-      </div>
-    </div>
+          </Button>
+        ) : undefined
+      }
+    >
+      {T.userPage.raKeyInvalid}
+    </Notice>
   )
 }

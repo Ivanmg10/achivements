@@ -8,6 +8,7 @@ import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import { useLanguage } from '@/context/LanguageContext'
 import { checkPassword, PASSWORD_MIN } from '@/utils/authValidation'
 import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
 
 /**
  * The page the reset link opens: a new password, typed twice, plus the token
@@ -63,19 +64,13 @@ export default function ResetPasswordForm() {
       </div>
 
       {!token ? (
-        <p role="alert" className="mb-5 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3 text-sm text-danger">
-          {T.passwordReset.missingToken}
-        </p>
+        <Notice tone="danger" className="mb-5">{T.passwordReset.missingToken}</Notice>
       ) : done ? (
-        <p role="status" className="mb-5 bg-success/20 border border-success/40 rounded-tile p-3 text-sm text-success">
-          {T.passwordReset.done}
-        </p>
+        <Notice tone="success" className="mb-5">{T.passwordReset.done}</Notice>
       ) : (
         <>
           {error && (
-            <p role="alert" className="mb-5 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3 text-sm text-danger">
-              {error}
-            </p>
+            <Notice tone="danger" className="mb-5">{error}</Notice>
           )}
 
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">

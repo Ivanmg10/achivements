@@ -9,6 +9,7 @@ import type { SteamSignupProfile } from '@/hooks/useSteamSignup'
 import { checkEmail, checkUsername, USERNAME_MAX, USERNAME_MIN } from '@/utils/authValidation'
 import AuthFormField from '@/components/auth-form-field/AuthFormField'
 import Button from '@/components/ui/Button'
+import Notice from '@/components/ui/Notice'
 
 /** The Steam account Steam confirmed, and the username and email it still needs. */
 export default function SteamSignupFormFields({
@@ -65,9 +66,7 @@ export default function SteamSignupFormFields({
       )}
 
       {error && (
-        <div role="alert" className="mb-4 bg-danger/10 ring-1 ring-inset ring-danger/30 rounded-control p-3">
-          <p className="text-sm text-danger">{error}</p>
-        </div>
+        <Notice tone="danger" className="mb-4">{error}</Notice>
       )}
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
