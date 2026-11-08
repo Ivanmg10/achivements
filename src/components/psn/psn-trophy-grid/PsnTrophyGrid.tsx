@@ -78,12 +78,6 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
   const [showAll, setShowAll] = useState(false)
   const { isRevealed, toggle: toggleReveal } = useRevealedTrophies()
   const { visible: shown, capped } = capList(trophies, limit ?? Infinity, showAll)
-  const grade: Record<TrophyGrade, string> = {
-    platinum: T.psn.platinum,
-    gold: T.psn.gold,
-    silver: T.psn.silver,
-    bronze: T.psn.bronze,
-  }
 
   function show(t: PsnTrophy, x: number, y: number, delay = TOOLTIP_DELAY_MS) {
     clearTimeout(hoverTimeout.current)
@@ -110,7 +104,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
               <li key={t.id} className="relative group/badge">
                 <Link
                   href={`${gameHref('psn', gameId, subject)}#${psnTrophyAnchor(t.id)}`}
-                  aria-label={`${nameOf(t)} — ${grade[t.type]}, ${t.earned ? T.psn.earned : T.psn.locked}`}
+                  aria-label={`${nameOf(t)} — ${T.psn[t.type]}, ${t.earned ? T.psn.earned : T.psn.locked}`}
                   onMouseEnter={(e) => show(t, e.clientX, e.clientY)}
                   onMouseLeave={hide}
                   onFocus={(e) => {
@@ -186,7 +180,7 @@ export const PsnTrophyGrid = memo(function PsnTrophyGrid({
               {concealed(tooltip.trophy) ? T.psn.hiddenTrophyDesc : tooltip.trophy.detail}
             </p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className={`text-xs font-semibold ${TROPHY_GRADE_COLOR[tooltip.trophy.type]}`}>{grade[tooltip.trophy.type]}</span>
+              <span className={`text-xs font-semibold ${TROPHY_GRADE_COLOR[tooltip.trophy.type]}`}>{T.psn[tooltip.trophy.type]}</span>
               {tooltip.trophy.rarity !== null && (
                 <span className="text-xs text-text-secondary">
                   {decimal(tooltip.trophy.rarity, lang)}

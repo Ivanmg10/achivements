@@ -137,7 +137,6 @@ export default function PsnGameInfoTable({
     )
   }
 
-  const GRADE_LABEL = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }
   const secrets = trophies.filter((t) => t.hidden && !t.earned)
   const allRevealed = secrets.length > 0 && secrets.every((t) => isRevealed(t.id))
   const folded = !showAll && !query.trim() && filtered.length > FIRST_ROWS
@@ -259,7 +258,7 @@ export default function PsnGameInfoTable({
               rarity={selected.rarity}
               tags={
                 <>
-                  <span className={`font-semibold ${TROPHY_GRADE_COLOR[selected.type]}`}>{GRADE_LABEL[selected.type]}</span>
+                  <span className={`font-semibold ${TROPHY_GRADE_COLOR[selected.type]}`}>{T.psn[selected.type]}</span>
                   {group && <span className="px-2 py-0.5 rounded-full bg-ink/10 text-text-secondary">DLC · {dlcShortName(group.name, gameTitle)}</span>}
                 </>
               }

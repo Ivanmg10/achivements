@@ -28,7 +28,6 @@ export default function MainPageProfilePsnTrophies({
 }) {
   const { T, lang } = useLanguage()
   const subject = useSubject()
-  const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }
 
   return (
     <MainPageProfileRecent
@@ -45,7 +44,7 @@ export default function MainPageProfilePsnTrophies({
           badge={t.iconUrl}
           title={t.name}
           sub={<>{t.gameTitle} · <time dateTime={t.earnedAt}>{formatDate(t.earnedAt, lang, { day: 'numeric', month: 'short' })}</time></>}
-          right={<span className={`text-xs ${TROPHY_GRADE_COLOR[t.type]}`}>{grade[t.type]}</span>}
+          right={<span className={`text-xs ${TROPHY_GRADE_COLOR[t.type]}`}>{T.psn[t.type]}</span>}
         />
       ))}
     </MainPageProfileRecent>

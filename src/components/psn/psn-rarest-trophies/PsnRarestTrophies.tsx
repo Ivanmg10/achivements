@@ -29,7 +29,6 @@ export default function PsnRarestTrophies({
 }) {
   const { T, lang } = useLanguage()
   const subject = useSubject()
-  const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }
 
   const rarest = trophies
     .filter((t): t is PsnTrophy & { gameId?: number; rarity: number } => t.earned && t.rarity !== null)
@@ -66,7 +65,7 @@ export default function PsnRarestTrophies({
                 <span className="flex flex-col min-w-0">
                   <span className="text-sm font-semibold truncate">{t.name}</span>
                   <span className="text-xs">
-                    <span className={TROPHY_GRADE_COLOR[t.type]}>{grade[t.type]}</span>
+                    <span className={TROPHY_GRADE_COLOR[t.type]}>{T.psn[t.type]}</span>
                     <span className="text-text-secondary"> · {T.psn.rarity.replace('{n}', decimal(t.rarity, lang))}</span>
                   </span>
                 </span>
