@@ -12,7 +12,6 @@ import { CONSOLES } from '@/constants'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
 import RaLibraryDetail from '@/components/ra-library-detail/RaLibraryDetail'
@@ -41,7 +40,6 @@ export default function StatusGameItem({
 }) {
   const { T, lang } = useLanguage()
   const panelId = useId()
-  const onPointerMove = useSpotlight()
 
   const gameId = getGameId(game)
   const [open, handleToggle] = useExclusiveOpen(`ra:${gameId}`)
@@ -59,8 +57,7 @@ export default function StatusGameItem({
   return (
     <>
       <div
-        onPointerMove={onPointerMove}
-        className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
+        className={`relative isolate bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
         <GameCardBackdrop src={raImageUrl(game.ImageIcon) ?? null} surface="card" />
         {/* relative: the expand button stretches over this whole header (see the chevron). */}

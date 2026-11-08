@@ -10,7 +10,6 @@ import GameIcon from '@/components/game-icon/GameIcon'
 import XboxRecentlyPlayedExpanded from '@/components/xbox/xbox-recently-played-expanded/XboxRecentlyPlayedExpanded'
 import XboxGamerscore from '@/components/xbox/xbox-gamerscore/XboxGamerscore'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/dates'
 import { formatPlaytime } from '@/utils/steamFeed'
@@ -41,7 +40,6 @@ export default function XboxGameItem({
   const subject = useSubject()
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
 
   const isExpanded = expanded ?? localExpanded
@@ -54,8 +52,7 @@ export default function XboxGameItem({
 
   return (
     <div
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={xboxBackdrop(game)} />
 

@@ -10,7 +10,6 @@ import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamRecentlyPlayedExpanded from '@/components/steam/steam-recently-played-expanded/SteamRecentlyPlayedExpanded'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import { formatPlaytime } from '@/utils/steamFeed'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/dates'
@@ -44,7 +43,6 @@ export default function SteamGameItem({
   const subject = useSubject()
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
 
   const isExpanded = expanded ?? localExpanded
@@ -66,8 +64,7 @@ export default function SteamGameItem({
 
   return (
     <div
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} />
 

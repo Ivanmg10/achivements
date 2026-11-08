@@ -12,7 +12,6 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import SteamGameImage from '@/components/steam/steam-game-image/SteamGameImage'
 import SteamGameItemAchievements from '@/components/steam/steam-game-item/steam-game-item-achievements/SteamGameItemAchievements'
 import { formatPlaytime } from '@/utils/steamFeed'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import type { GameGroupItem } from '@/types/types'
@@ -40,7 +39,6 @@ export default function SteamSortableItem({
   const { library, recent } = useSteamGamesData()
   const [open, setOpen] = useState(false)
   const panelId = useId()
-  const onPointerMove = useSpotlight()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: !draggable,
@@ -67,8 +65,7 @@ export default function SteamSortableItem({
     <div
       ref={setNodeRef}
       style={style}
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`relative isolate bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       {/* The same blurred art and pointer glow as the game cards in the status lists. */}
       <GameCardBackdrop src={steamAssetUrl(item.game_id, 'header')} surface="card" />

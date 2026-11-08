@@ -741,34 +741,6 @@ html[data-font="fira"],
 }
 
 /*
-   Spotlight surface: a soft glow in the theme's accent that follows the
-   pointer (useSpotlight sets --spot-x/--spot-y). Hover devices only.
-*/
-.spotlight {
-  position: relative;
-  isolation: isolate;
-}
-.spotlight::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  background: radial-gradient(
-    360px circle at var(--spot-x, 50%) var(--spot-y, 50%),
-    rgb(var(--accent) / 0.12),
-    transparent 60%
-  );
-}
-@media (hover: hover) {
-  .spotlight:hover::after {
-    opacity: 1;
-  }
-}
-
-/*
    Home on a tall desktop screen, Overview open: exactly one screen. Stats
    keeps its size; Recently played and the profile share what is left, and
    Recently played scrolls inside if it runs short. Other sections, shorter

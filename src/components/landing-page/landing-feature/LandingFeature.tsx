@@ -1,7 +1,6 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { useSpotlight } from '@/hooks/useSpotlight'
 
 /**
  * One thing the app does, said plainly: icon, what it is, what you get.
@@ -20,11 +19,9 @@ export default function LandingFeature({
   children?: ReactNode
   className?: string
 }) {
-  const onPointerMove = useSpotlight()
   return (
     <article
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card rounded-card p-6 sm:p-7 ring-1 ring-ink/[0.06] flex flex-col gap-3 h-full overflow-hidden ${className}`}
+      className={`relative isolate bg-bg-card rounded-card p-6 sm:p-7 ring-1 ring-ink/[0.06] flex flex-col gap-3 h-full overflow-hidden ${className}`}
     >
       <span aria-hidden="true" className="w-10 h-10 rounded-tile bg-accent/10 text-accent flex items-center justify-center">
         {icon}

@@ -13,7 +13,6 @@ import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import LibraryDetailRow from '@/components/library-detail-row/LibraryDetailRow'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { useExclusiveOpen } from '@/hooks/useExclusiveOpen'
 import { gameHref } from '@/utils/gameRef'
 import { psnBackdrop, psnPlatformChip } from '@/utils/psnTitles'
@@ -33,7 +32,6 @@ import { formatDate } from '@/utils/dates'
 export default function PsnStatusGameItem({ game, category }: { game: PsnGameProgress; /** Which list it is in: what the opened card shows depends on it. */ category?: string }) {
   const { T, lang } = useLanguage()
   const [open, toggle] = useExclusiveOpen(`psn:${game.id}`)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
   const href = gameHref('psn', game.id)
   const isComplete = game.pctWon >= 100
@@ -44,8 +42,7 @@ export default function PsnStatusGameItem({ game, category }: { game: PsnGamePro
   return (
     <>
       <div
-        onPointerMove={onPointerMove}
-        className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
+        className={`relative isolate bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
         <GameCardBackdrop src={psnBackdrop(game)} surface="card" />
         {/* relative: the expand button stretches over this whole header (see the chevron). */}

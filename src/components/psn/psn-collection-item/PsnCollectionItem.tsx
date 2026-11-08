@@ -4,7 +4,6 @@ import { useId, useState } from 'react'
 import { IconChevronDown, IconClock } from '@tabler/icons-react'
 import type { PsnCollection, PsnGameProgress } from '@/types/psn'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { formatDate } from '@/utils/dates'
 import { psnBackdrop } from '@/utils/psnTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
@@ -36,7 +35,6 @@ export default function PsnCollectionItem({
 }) {
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
 
   const isExpanded = expanded ?? localExpanded
@@ -49,8 +47,7 @@ export default function PsnCollectionItem({
 
   return (
     <div
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={collection.heroUrl ?? psnBackdrop(games[0])} />
 

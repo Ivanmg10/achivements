@@ -12,7 +12,6 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import GameIcon from '@/components/game-icon/GameIcon'
 import PsnGameItemTrophies from '@/components/psn/psn-game-item-trophies/PsnGameItemTrophies'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { formatPlaytime } from '@/utils/steamFeed'
 import { gameHref } from '@/utils/gameRef'
 import { psnBackdrop, psnTitleId, psnPlatformChip } from '@/utils/psnTitles'
@@ -40,7 +39,6 @@ export default function PsnSortableItem({
   const { fullLibrary } = usePsnGamesData()
   const [open, setOpen] = useState(false)
   const panelId = useId()
-  const onPointerMove = useSpotlight()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
     disabled: !draggable,
@@ -59,8 +57,7 @@ export default function PsnSortableItem({
     <div
       ref={setNodeRef}
       style={style}
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`relative isolate bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       <GameCardBackdrop src={game ? psnBackdrop(game) : icon} surface="card" />
       <div className="relative flex items-center gap-3 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">

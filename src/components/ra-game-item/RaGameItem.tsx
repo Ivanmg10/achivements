@@ -5,7 +5,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { IconChevronDown } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { RecentlyPlayedGame } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { formatDate } from '@/utils/dates'
@@ -46,7 +45,6 @@ export default function RaGameItem({
 }) {
   const subject = useSubject()
   const { T, lang } = useLanguage()
-  const onPointerMove = useSpotlight()
   const panelId = useId()
 
   const href = gameHref('ra', game.GameID, subject)
@@ -60,8 +58,7 @@ export default function RaGameItem({
 
   return (
     <div
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={art} />
 

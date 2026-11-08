@@ -7,7 +7,6 @@ import { CSS } from '@dnd-kit/utilities'
 import { IconGripVertical } from '@tabler/icons-react'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { useLanguage } from '@/context/LanguageContext'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { CONSOLES } from '@/constants'
 import { ProgressBar } from '@/components/ui/ProgressBar'
@@ -36,7 +35,6 @@ export default function PinnedGameRow({
   onToggle: () => void
 }) {
   const { T } = useLanguage()
-  const onPointerMove = useSpotlight()
   const { game, isLoading, error, refetch } = useGameProgression(String(gameId))
   // Keyed by platform too: pinned RA and Steam games share one sortable list.
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -69,8 +67,7 @@ export default function PinnedGameRow({
     <div
       ref={setNodeRef}
       style={style}
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col ring-1 ring-ink/[0.04] ${isDragging ? 'opacity-50 shadow-2xl z-10' : ''}`}
     >
       <GameCardBackdrop src={raImageUrl(game.ImageIcon) ?? null} />
       <div

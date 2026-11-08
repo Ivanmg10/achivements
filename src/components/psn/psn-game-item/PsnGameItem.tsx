@@ -9,7 +9,6 @@ import { ProgressBar } from '@/components/ui/ProgressBar'
 import GameIcon from '@/components/game-icon/GameIcon'
 import PsnRecentlyPlayedExpanded from '@/components/psn/psn-recently-played-expanded/PsnRecentlyPlayedExpanded'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { formatDate } from '@/utils/dates'
 import { gameHref } from '@/utils/gameRef'
@@ -41,7 +40,6 @@ export default function PsnGameItem({
   const subject = useSubject()
   const { T, lang } = useLanguage()
   const [localExpanded, setLocalExpanded] = useState(false)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
 
   const isExpanded = expanded ?? localExpanded
@@ -51,8 +49,7 @@ export default function PsnGameItem({
 
   return (
     <div
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
+      className={`relative isolate bg-bg-main rounded-card overflow-hidden flex flex-col min-h-0 ring-1 ring-ink/[0.04] ${className}`}
     >
       <GameCardBackdrop src={psnBackdrop(game)} />
 

@@ -8,7 +8,6 @@ import { CSS } from '@dnd-kit/utilities'
 import { IconGripVertical, IconX } from '@tabler/icons-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGameProgression } from '@/hooks/useGameProgression'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { GameGroupItem } from '@/types/types'
 import { CONSOLES } from '@/constants'
 import { ProgressBar } from '@/components/ui/ProgressBar'
@@ -45,7 +44,6 @@ export default function SortableItem({
   lastPlayed?: string
 }) {
   const { T, lang } = useLanguage()
-  const onPointerMove = useSpotlight()
   const panelId = useId()
   const [open, setOpen] = useState(false)
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id, disabled: !draggable })
@@ -80,8 +78,7 @@ export default function SortableItem({
     <div
       ref={setNodeRef}
       style={style}
-      onPointerMove={onPointerMove}
-      className={`spotlight bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
+      className={`relative isolate bg-bg-card w-full rounded-card overflow-hidden ring-1 ring-ink/5 hover:ring-ink/15 transition-shadow group ${isDragging ? 'opacity-50 shadow-2xl' : ''}`}
     >
       <GameCardBackdrop src={cover} surface="card" />
       <div className="relative flex items-center gap-3 p-4 sm:p-5 hover:bg-bg-header/20 transition-colors">

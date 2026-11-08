@@ -13,7 +13,6 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import { PinToggleButton } from '@/components/pin-toggle-button/PinToggleButton'
 import HideGameButton from '@/components/hide-game-button/HideGameButton'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
-import { useSpotlight } from '@/hooks/useSpotlight'
 import { useExclusiveOpen } from '@/hooks/useExclusiveOpen'
 import { steamAssetUrl } from '@/lib/steamAssets'
 import type { SteamGameProgress } from '@/types/steam'
@@ -41,7 +40,6 @@ export default function SteamStatusGameItem({
 }) {
   const { T, lang } = useLanguage()
   const [open, toggle] = useExclusiveOpen(`steam:${game.id}`)
-  const onPointerMove = useSpotlight()
   const panelId = useId()
   const href = `/steamGame/${game.id}`
 
@@ -61,8 +59,7 @@ export default function SteamStatusGameItem({
   return (
     <>
       <div
-        onPointerMove={onPointerMove}
-        className={`spotlight bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
+        className={`relative isolate bg-bg-card rounded-card overflow-hidden transition-shadow duration-150 ${open ? 'ring-2 ring-accent/60' : 'ring-1 ring-ink/5 hover:ring-ink/15'}`}
       >
         {/* The same blurred art and pointer glow as the RA card beside it. */}
         <GameCardBackdrop src={steamAssetUrl(game.id, 'header')} surface="card" />
