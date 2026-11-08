@@ -1,5 +1,6 @@
 import { parseUnlockTime, unlockIso } from '@/utils/dates'
-import type { GameSource } from '@/types/steam'
+import type { GameSource } from '@/types/game'
+import { GAME_SOURCES } from '@/utils/gameRef'
 
 /** How many achievements a showcase holds. */
 export const SHOWCASE_MAX = 5
@@ -23,7 +24,6 @@ export type ShowcaseEntry = {
 
 export type ShowcaseItem = ShowcaseEntry & { id: number }
 
-const SOURCES: GameSource[] = ['ra', 'steam', 'psn', 'xbox']
 const DAY = 86400000
 
 export const showcaseKey = (e: Pick<ShowcaseEntry, 'source' | 'gameId' | 'achievementKey'>) => `${e.source}:${e.gameId}:${e.achievementKey}`
@@ -39,7 +39,7 @@ const text = (v: unknown, max: number): string | null => (typeof v === 'string' 
 export function parseShowcaseEntry(v: unknown, now: number = Date.now()): ShowcaseEntry | null {
   if (!v || typeof v !== 'object') return null
   const o = v as Record<string, unknown>
-  const source = SOURCES.find((s) => s === o.source)
+  const source = GAME_SOURCES.find((s) => s === o.source)
   const gameId = o.gameId
   const achievementKey = text(o.achievementKey, 100)
   const gameTitle = text(o.gameTitle, 200)
