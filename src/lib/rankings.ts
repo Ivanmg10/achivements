@@ -1,6 +1,7 @@
 import pool from '@/lib/db'
 import { queryRows } from '@/lib/queryRows'
 import { presenceColumns } from '@/lib/presence'
+import { notHidden } from '@/lib/gameVisibility'
 import { isUploadedAvatar } from '@/lib/avatarImage'
 import type { GameSource } from '@/types/steam'
 import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
@@ -63,7 +64,7 @@ async function gameRows(scope: RankScope | 'self', viewerId: number, xbox: boole
             COUNT(*) FILTER (WHERE g.completed)::int AS completed, SUM(g.earned)::int AS achievements
      FROM score_games g JOIN users u ON u.id = g.user_id
      WHERE g.flag IS DISTINCT FROM 'suspect' AND ${LINKED_ACCOUNT}
-       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)
+       AND ${notHidden('g')}
        AND ($1::boolean OR g.source <> 'xbox') AND ${audience(scope)}
      GROUP BY u.id, g.source`,
     [xbox, viewerId],
@@ -239,7 +240,7 @@ export async function streaksOf(userIds: number[], source: RankSource, xbox: boo
     `SELECT g.user_id AS id, array_agg(DISTINCT ((x->>0)::bigint / ${DAY_S})::int ORDER BY ((x->>0)::bigint / ${DAY_S})::int) AS days
      FROM score_games g JOIN users u ON u.id = g.user_id, jsonb_array_elements(g.unlocks) x
      WHERE g.user_id = ANY($1::int[]) AND (x->>0)::bigint > 0 AND g.flag IS DISTINCT FROM 'suspect' AND ${LINKED_ACCOUNT}
-       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)
+       AND ${notHidden('g')}
        AND ($2::text = 'all' OR g.source = $2) AND ($3::boolean OR g.source <> 'xbox')
      GROUP BY g.user_id`,
     [userIds, source, xbox],
@@ -305,7 +306,7 @@ export async function vaultTotals(userIds: number[], xbox: boolean): Promise<Map
     `SELECT g.user_id AS id, SUM(g.points * g.stack_factor)::float AS points
      FROM score_games g JOIN users u ON u.id = g.user_id
      WHERE g.user_id = ANY($1::int[]) AND g.flag IS DISTINCT FROM 'suspect' AND ${LINKED_ACCOUNT}
-       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)
+       AND ${notHidden('g')}
        AND ($2::boolean OR g.source <> 'xbox')
      GROUP BY g.user_id`,
     [userIds, xbox],
@@ -344,7 +345,7 @@ export async function profileTeaser(username: string): Promise<ProfileTeaser | n
             COUNT(g.*) FILTER (WHERE g.completed)::int AS completed, COALESCE(SUM(g.earned), 0)::int AS achievements
      FROM users u
      LEFT JOIN score_games g ON g.user_id = u.id AND g.flag IS DISTINCT FROM 'suspect' AND g.source <> 'xbox' AND ${LINKED_ACCOUNT}
-       AND NOT EXISTS (SELECT 1 FROM hidden_games h WHERE h.user_id = g.user_id AND h.source = g.source AND h.game_id = g.game_id)
+       AND ${notHidden('g')}
      WHERE LOWER(u.username) = LOWER($1) AND u.profile_public AND u.show_in_rankings
      GROUP BY u.username, u.avatar, g.source`,
     [username],
