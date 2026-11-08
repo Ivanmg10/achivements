@@ -6,7 +6,7 @@ import { AnimatePresence } from 'framer-motion'
 import { RecentAchievement, UserRankAndScore } from '@/types/types'
 import { calcAvgPerDay, calcThisMonth, plural, decimal } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
-import { StatPill } from '@/components/ui/StatPill'
+import Figure from '@/components/ui/Figure'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
 import { parseUnlockTime, utcDay } from '@/utils/dates'
@@ -41,7 +41,7 @@ export default function MainPagePointsStats({
     return (
       <div className="flex flex-wrap gap-3">
         {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, ...(showRank ? [T.userStats.globalRank] : []), T.streak.title].map((label) => (
-          <StatPill key={label} label={label} value="" loading />
+          <Figure key={label} label={label} value="" loading />
         ))}
       </div>
     )
@@ -71,12 +71,12 @@ export default function MainPagePointsStats({
 
   return (
     <div className="flex flex-wrap gap-3">
-      <StatPill label={T.pointsStats.today} value={valueMode === 'points' ? ptsToday : achToday} sub={valueMode === 'points' ? todaySub : achToday === 0 ? T.pointsStats.noActivity : undefined} onClick={() => setSelectedDay(todayKey)} />
-      <StatPill label={T.pointsStats.thisWeek} value={valueMode === 'points' ? pts7d : weekAchievements.length} sub={valueMode === 'points' ? plural(weekAchievements.length, T.plurals.achievements, lang) : undefined} onClick={() => setWeekOpen(true)} />
-      <StatPill label={T.pointsStats.thisMonth} value={valueMode === 'points' ? thisMonth.pts : thisMonth.ach} sub={valueMode === 'points' ? plural(thisMonth.ach, T.plurals.achievements, lang) : undefined} onClick={() => setMonthOpen(true)} />
-      <StatPill label={T.pointsStats.avgPerDay} value={decimal(avgPerDay, lang)} sub={T.pointsStats.perDay} />
-      {showRank && rank?.Rank != null && <StatPill label={T.userStats.globalRank} value={`#${rank.Rank.toLocaleString(lang)}`} sub={`${(rank.Score ?? 0).toLocaleString(lang)} pts`} />}
-      <StatPill label={T.streak.title} value={`${streak}d`} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} accentColor={streak > 0 ? streakInk(streakTier(streak)) : undefined} href="/racha" />
+      <Figure label={T.pointsStats.today} value={valueMode === 'points' ? ptsToday : achToday} sub={valueMode === 'points' ? todaySub : achToday === 0 ? T.pointsStats.noActivity : undefined} onClick={() => setSelectedDay(todayKey)} />
+      <Figure label={T.pointsStats.thisWeek} value={valueMode === 'points' ? pts7d : weekAchievements.length} sub={valueMode === 'points' ? plural(weekAchievements.length, T.plurals.achievements, lang) : undefined} onClick={() => setWeekOpen(true)} />
+      <Figure label={T.pointsStats.thisMonth} value={valueMode === 'points' ? thisMonth.pts : thisMonth.ach} sub={valueMode === 'points' ? plural(thisMonth.ach, T.plurals.achievements, lang) : undefined} onClick={() => setMonthOpen(true)} />
+      <Figure label={T.pointsStats.avgPerDay} value={decimal(avgPerDay, lang)} sub={T.pointsStats.perDay} />
+      {showRank && rank?.Rank != null && <Figure label={T.userStats.globalRank} value={`#${rank.Rank.toLocaleString(lang)}`} sub={`${(rank.Score ?? 0).toLocaleString(lang)} pts`} />}
+      <Figure label={T.streak.title} value={`${streak}d`} sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak} color={streak > 0 ? streakInk(streakTier(streak)) : undefined} href="/racha" />
 
       <AnimatePresence>
         {selectedDay && (

@@ -1,12 +1,14 @@
 'use client'
 
-import { slantStyle } from '@/components/ui/shape'
+import DataBar from '@/components/ui/DataBar'
 import { GAME_SOURCES } from '@/utils/gameRef'
 import type { GameSource } from '@/types/game'
 
 const NAMES: Record<GameSource, string> = { ra: 'RA', steam: 'Steam', psn: 'PSN', xbox: 'Xbox' }
 /** The same platform colours as the charts that compare platforms (CompletionDistribution). */
-export const PLATFORM_FILL: Record<GameSource, string> = { ra: 'bg-accent', steam: 'bg-[#66c0f4]', psn: 'bg-[#0070d1]', xbox: 'bg-success' }
+export const PLATFORM_FILL: Record<GameSource, string> = { ra: 'bg-accent', steam: 'bg-steam', psn: 'bg-psn', xbox: 'bg-success' }
+/** The same, as a colour for a bar (`DataBar color`). */
+export const PLATFORM_COLOR: Record<GameSource, string> = { ra: 'var(--color-accent)', steam: 'var(--color-steam)', psn: 'var(--color-psn)', xbox: 'var(--color-success)' }
 
 /**
  * How a user's points split across platforms, as one stacked bar. Its
@@ -24,11 +26,7 @@ export default function VaultPlatformSplit({ split, className = '' }: { split: P
       className={`flex h-2 gap-0.5 ${parts.length === 0 ? 'bg-ink/10' : ''} ${className}`}
     >
       {parts.map((p) => (
-        <span
-          key={p.s}
-          className={`h-full ${PLATFORM_FILL[p.s]}`}
-          style={{ width: `${(p.v / total) * 100}%`, ...slantStyle(3) }}
-        />
+        <DataBar key={p.s} share={p.v / total} cut={3} color={PLATFORM_COLOR[p.s]} className="h-full" />
       ))}
     </span>
   )

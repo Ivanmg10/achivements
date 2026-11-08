@@ -1,7 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
-import { StatPill } from '@/components/ui/StatPill'
+import Figure from '@/components/ui/Figure'
 import Kicker from '@/components/ui/Kicker'
 
 /** The fixed profile card beside the sample home's recent games. */
@@ -17,8 +17,8 @@ export default function LayoutModalPreviewSampleProfile() {
         </div>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <StatPill size="sm" label="VP" value={(1280).toLocaleString(lang)} />
-        <StatPill size="sm" label={T.sidePanel.streak} value={12} />
+        <Figure look="tile" label="VP" value={(1280).toLocaleString(lang)} />
+        <Figure look="tile" label={T.sidePanel.streak} value={12} />
       </div>
       <div className="mt-3 flex flex-col gap-2">
         <span className="h-2 rounded-full bg-ink/10" />

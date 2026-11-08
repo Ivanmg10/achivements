@@ -7,7 +7,7 @@ import type { SteamGameProgress } from '@/types/steam'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSteamProfile } from '@/hooks/useSteamProfile'
 import { calcAvgPerDay, decimal } from '@/utils/utils'
-import { StatPill } from '@/components/ui/StatPill'
+import Figure from '@/components/ui/Figure'
 import DayAchievementsModal from '@/components/day-achievements-modal/DayAchievementsModal'
 import PeriodAchievementsModal from '@/components/period-achievements-modal/PeriodAchievementsModal'
 import { parseUnlockTime, utcDay } from '@/utils/dates'
@@ -60,7 +60,7 @@ export default function MainPageSteamStats({
     return (
       <div className="flex flex-wrap gap-3" aria-busy="true">
         {[T.pointsStats.today, T.pointsStats.thisWeek, T.pointsStats.thisMonth, T.pointsStats.avgPerDay, T.steam.level, T.streak.title, T.steam.last2Weeks].map((label) => (
-          <StatPill key={label} label={label} value="" loading />
+          <Figure key={label} label={label} value="" loading />
         ))}
       </div>
     )
@@ -69,25 +69,25 @@ export default function MainPageSteamStats({
   const unlocks = T.lineChart.achievements
   return (
     <div className="flex flex-wrap gap-3">
-      <StatPill
+      <Figure
         label={T.pointsStats.today}
         value={stats.today.length}
         sub={stats.today.length ? unlocks : T.pointsStats.noActivity}
        
         onClick={() => setSelectedDay(stats.todayKey)}
       />
-      <StatPill label={T.pointsStats.thisWeek} value={stats.week.length} sub={unlocks} onClick={() => setWeekOpen(true)} />
-      <StatPill label={T.pointsStats.thisMonth} value={stats.month.length} sub={unlocks} onClick={() => setMonthOpen(true)} />
-      <StatPill label={T.pointsStats.avgPerDay} value={decimal(stats.avg, lang)} sub={T.pointsStats.perDay} />
-      {(levelWaiting || profile?.level != null) && <StatPill label={T.steam.level} value={profile?.level ?? ''} sub="Steam" loading={levelWaiting} />}
-      <StatPill
+      <Figure label={T.pointsStats.thisWeek} value={stats.week.length} sub={unlocks} onClick={() => setWeekOpen(true)} />
+      <Figure label={T.pointsStats.thisMonth} value={stats.month.length} sub={unlocks} onClick={() => setMonthOpen(true)} />
+      <Figure label={T.pointsStats.avgPerDay} value={decimal(stats.avg, lang)} sub={T.pointsStats.perDay} />
+      {(levelWaiting || profile?.level != null) && <Figure label={T.steam.level} value={profile?.level ?? ''} sub="Steam" loading={levelWaiting} />}
+      <Figure
         label={T.streak.title}
         value={`${streak}d`}
         sub={streak > 0 ? T.pointsStats.active : T.pointsStats.noStreak}
-        accent={streak > 0 ? 'text-accent' : undefined}
+        tone={streak > 0 ? 'accent' : undefined}
         href="/racha"
       />
-      <StatPill label={T.steam.last2Weeks} value={`${stats.hours2w}${T.steam.hoursShort}`} sub={T.steam.playtime} />
+      <Figure label={T.steam.last2Weeks} value={`${stats.hours2w}${T.steam.hoursShort}`} sub={T.steam.playtime} />
 
       <AnimatePresence>
         {selectedDay && (

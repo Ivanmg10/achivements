@@ -202,12 +202,23 @@ test('a row to pick from comes from ListRow / LIST_ROW', () => {
   expect(newOffenders('listRow', NEW_RULES.listRow)).toEqual([])
 })
 
-test('a labelled number comes from Figure; StatPill and StatCard are its old names', () => {
+test('a labelled number comes from Figure; StatPill and StatCard are gone', () => {
   expect(newOffenders('figure', NEW_RULES.figure)).toEqual([])
 })
 
 test('a chart bar with cut ends comes from DataBar, never slantStyle on a hand-made bar', () => {
-  expect(newOffenders('dataBar', NEW_RULES.dataBar)).toEqual([])
+  // Not chart bars: the podium's steps (and its skeleton and the Following teaser's), the heatmap's range mark, a bar that carries its
+  // own label (the streak chart's ongoing one), and the two files that draw the shape token itself (the catalogue and the shape preference).
+  const notBars = [
+    'components/design-catalog/design-catalog-foundations/DesignCatalogFoundations.tsx',
+    'components/following-page/following-rankings-teaser/FollowingRankingsTeaser.tsx',
+    'components/rankings-page/rankings-page-podium/RankingsPagePodium.tsx',
+    'components/rankings-page/rankings-page-skeleton/RankingsPageSkeleton.tsx',
+    'components/streak-page/streak-chart/StreakChart.tsx',
+    'components/streak-page/streak-year-heatmap/StreakYearHeatmap.tsx',
+    'components/user-page/user-shape-preference/user-shape-preference-preview/UserShapePreferencePreview.tsx',
+  ]
+  expect(newOffenders('dataBar', NEW_RULES.dataBar, notBars)).toEqual([])
 })
 
 test('a spinner comes from Spinner or Button loading, never a hand-made animate-spin', () => {

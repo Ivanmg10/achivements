@@ -2,13 +2,12 @@ import type { CSSProperties } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { plural } from '@/utils/utils'
 import SectionHead from '@/components/ui/SectionHead'
-import { slantStyle } from '@/components/ui/shape'
+import DataBar from '@/components/ui/DataBar'
 import { formatDay } from '@/utils/dates'
 
 // Mondays first; 2026-06-01 is a Monday.
 const WEEK = ['2026-06-01', '2026-06-02', '2026-06-03', '2026-06-04', '2026-06-05', '2026-06-06', '2026-06-07']
 const BAR_HEIGHT = 120
-const SLANT = slantStyle(8)
 
 /** Achievements per day of the week, Monday first, as slanted bars; the busiest day in full accent. */
 export default function StreakWeekdays({ counts }: { counts: number[] }) {
@@ -24,11 +23,7 @@ export default function StreakWeekdays({ counts }: { counts: number[] }) {
           <li key={WEEK[i]} className="flex-1 flex flex-col items-center gap-1.5 min-w-0">
             <span className="text-sm font-extrabold tabular-nums text-text-main">{n.toLocaleString(lang)}</span>
             <div className="w-full flex items-end" style={{ height: BAR_HEIGHT }}>
-              <div
-                aria-hidden="true"
-                className={`enter-grow-y w-full ${i === top ? 'bg-accent' : 'bg-accent/35'}`}
-                style={{ ...SLANT, '--i': i, height: Math.max(4, Math.round((n / max) * BAR_HEIGHT)) } as CSSProperties}
-              />
+              <DataBar axis="y" share={n / max} cut={8} min={4} tone={i === top ? 'accent' : 'soft'} grow className="w-full" style={{ '--i': i } as CSSProperties} />
             </div>
             <span className="text-[0.8125rem] text-text-secondary">
               <span aria-hidden="true">{formatDay(WEEK[i], lang, { weekday: 'narrow' })}</span>

@@ -3,12 +3,11 @@
 import { useLanguage } from '@/context/LanguageContext'
 import { useXboxEnabled } from '@/hooks/useXboxEnabled'
 import type { VaultGuideText } from '@/translations/vaultGuide'
-import { PLATFORM_FILL } from '@/components/vault-platform-split/VaultPlatformSplit'
+import { PLATFORM_COLOR } from '@/components/vault-platform-split/VaultPlatformSplit'
 import { exampleScores } from '@/utils/vaultExamples'
-import { slantStyle } from '@/components/ui/shape'
+import DataBar from '@/components/ui/DataBar'
 import Kicker from '@/components/ui/Kicker'
 
-const SLANT = slantStyle(5)
 const PLATFORMS = ['psn', 'steam', 'ra'] as const
 
 /**
@@ -22,10 +21,10 @@ export default function RankingsGuideExample({ text }: { text: VaultGuideText['e
   const xbox = useXboxEnabled()
   const score = exampleScores()
   const max = Math.max(...Object.values(score))
-  const rows: { label: string; value: number; fill: string }[] = [
-    ...(xbox ? (['psn', 'steam', 'xbox', 'ra'] as const) : PLATFORMS).map((k) => ({ label: text.platforms[k], value: score[k], fill: PLATFORM_FILL[k] })),
-    { label: text.quick, value: score.quick, fill: 'bg-ink/30' },
-    { label: text.spam, value: score.spam, fill: 'bg-ink/30' },
+  const rows: { label: string; value: number; color: string }[] = [
+    ...(xbox ? (['psn', 'steam', 'xbox', 'ra'] as const) : PLATFORMS).map((k) => ({ label: text.platforms[k], value: score[k], color: PLATFORM_COLOR[k] })),
+    { label: text.quick, value: score.quick, color: 'rgb(var(--ink) / 0.3)' },
+    { label: text.spam, value: score.spam, color: 'rgb(var(--ink) / 0.3)' },
   ]
 
   return (
@@ -35,9 +34,7 @@ export default function RankingsGuideExample({ text }: { text: VaultGuideText['e
         {rows.map((r, i) => (
           <li key={r.label} className={`grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)_4.5rem] sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_4.5rem] items-center gap-3 text-sm ${i === rows.length - 2 ? 'mt-2 pt-3 border-t border-ink/[0.07]' : ''}`}>
             <span className="leading-tight">{r.label}</span>
-            <span aria-hidden="true" className="h-3 bg-ink/[0.08]" style={SLANT}>
-              <span className={`block h-full ${r.fill}`} style={{ ...SLANT, width: `${(r.value / max) * 100}%` }} />
-            </span>
+            <DataBar track share={r.value / max} cut={5} color={r.color} className="h-3" />
             <span className="text-right text-base font-extrabold tabular-nums">
               {r.value.toLocaleString(lang)} <span className="text-[0.6875rem] font-semibold text-text-secondary">{T.rankings.vp}</span>
             </span>

@@ -15,7 +15,7 @@ import MainPageProfileRaStats from './main-page-profile-ra-stats/MainPageProfile
 import MainPageProfileGameSkeleton from '../main-page-profile-game-skeleton/MainPageProfileGameSkeleton'
 import MainPageProfileCard from '../main-page-profile-card/MainPageProfileCard'
 import { SURFACE } from '@/components/ui/surface'
-import { StatCard } from '@/components/ui/StatPill'
+import Figure from '@/components/ui/Figure'
 import { raImageUrl } from '@/utils/raAssets'
 
 export default function MainPageProfileRa({
@@ -86,8 +86,8 @@ export default function MainPageProfileRa({
             <div className={`${SURFACE} p-5 flex flex-col gap-3`}>
               <p className="text-[1.0625rem] font-bold">{T.profileRa.contributions}</p>
               <div className="grid grid-cols-2 gap-2">
-                <StatCard label={T.profileRa.achievementsCreated} value={(user.ContribCount ?? 0).toLocaleString(lang)} />
-                <StatCard label={T.profileRa.pointsContributed} value={(user.ContribYield ?? 0).toLocaleString(lang)} />
+                <Figure look="card" label={T.profileRa.achievementsCreated} value={(user.ContribCount ?? 0).toLocaleString(lang)} />
+                <Figure look="card" label={T.profileRa.pointsContributed} value={(user.ContribYield ?? 0).toLocaleString(lang)} />
               </div>
             </div>
           )}

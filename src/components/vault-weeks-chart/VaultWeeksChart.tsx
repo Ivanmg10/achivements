@@ -1,10 +1,9 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
-import { slantStyle } from '@/components/ui/shape'
+import DataBar from '@/components/ui/DataBar'
 
 const HEIGHT = 70
-const SLANT = slantStyle(3)
 
 /**
  * Points earned each of the last weeks, as bars in the theme's colour (this
@@ -28,11 +27,7 @@ export default function VaultWeeksChart({ weeks, className = '' }: { weeks: { st
           return (
             <li key={w.start} title={label(w)} className="flex-1 h-full flex items-end">
               <span className="sr-only">{label(w)}</span>
-              <span
-                aria-hidden="true"
-                className={`w-full ${last ? 'bg-progress' : 'bg-progress/40'}`}
-                style={{ ...SLANT, height: w.points > 0 ? Math.max(4, (w.points / max) * HEIGHT) : 2, opacity: w.points > 0 ? 1 : 0.35 }}
-              />
+              <DataBar axis="y" share={w.points / max} cut={3} min={w.points > 0 ? 4 : 2} tone={last ? 'accent' : 'soft'} style={{ opacity: w.points > 0 ? 1 : 0.35 }} className="w-full" />
             </li>
           )
         })}

@@ -232,7 +232,7 @@ guard test (`src/components/ui/uiGuard.test.ts`) fails when one appears outside 
 - **Surfaces and data**: `SURFACE` (`ui/surface.ts`; cards use `rounded-card`), `Figure` (every labelled
   number: `bare` has no box and a fine slanted rule between figures, `tile` a small box, `card` the label first
   and the figure big, `compact` the account page's platform cards; `tone` from the theme, `color` for a tier's
-  hue, `term` inside a `<dl>`; `StatPill` / `StatCard` are its old names, wrappers until their callers move),
+  hue, `term` inside a `<dl>`; `StatPill` / `StatCard` are gone and the guard refuses their names),
   `DataBar` (a chart bar as long or as tall as its share, cut ends from `--clip-*`, optional track), `RarityBadge` (a tinted figure, never a bar), `ProgressBar` bevelled and
   glowing only when finished, `GameCardBackdrop` = a flat tint of the game's colour behind the
   same neutral hairline as a flat card (`useImageTint`; never the blurred art again, the user's
