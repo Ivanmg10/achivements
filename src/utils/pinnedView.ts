@@ -49,7 +49,7 @@ export function pinnedView(fav: PinnedAchievement, T: Translations): PinnedView 
   if (fav.source === 'psn') {
     const t = fav.snapshot
     const concealed = t.hidden && !t.earned
-    const grade = { platinum: T.psn.platinum, gold: T.psn.gold, silver: T.psn.silver, bronze: T.psn.bronze }[t.type]
+    const grade = T.psn[t.type]
     return {
       ...base,
       title: concealed ? T.psn.hiddenTrophy : t.name,
