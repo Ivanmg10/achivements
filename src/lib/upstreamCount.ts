@@ -5,6 +5,8 @@
  * ponytail: what an instance has not flushed when it stops is lost, at most
  * FLUSH_EVERY calls each; it is a brake and a gauge, not an invoice.
  */
+import { utcDay } from '@/utils/dates'
+
 const FLUSH_EVERY = 50
 const STEAM_DAILY_CAP = 100_000
 const WARN_AT = 0.7
@@ -16,7 +18,7 @@ export type UpstreamPlatform = 'ra' | 'steam' | 'psn'
 const pending: Record<UpstreamPlatform, number> = { ra: 0, steam: 0, psn: 0 }
 let steamToday = { value: 0, at: 0, warned: false }
 
-const keyFor = (platform: UpstreamPlatform, now = new Date()) => `upstream:${platform}:${now.toISOString().slice(0, 10)}`
+const keyFor = (platform: UpstreamPlatform, now = new Date()) => `upstream:${platform}:${utcDay(now)}`
 
 async function flush(platform: UpstreamPlatform, calls: number): Promise<void> {
   try {

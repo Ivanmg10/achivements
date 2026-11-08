@@ -11,10 +11,11 @@ import type { GameCandidate } from '@/utils/gameCandidates'
 import { addGamesToGroup } from '@/utils/apiCallsUtils'
 import LazyWhenOpened from '@/components/lazy-when-opened/LazyWhenOpened'
 import { SkeletonRow } from '@/components/ui/SkeletonList'
+import { relativeTime } from '@/utils/dates'
 
 // Downloaded the first time it is opened, not with the page.
 const GroupModal = dynamic(() => import('@/components/groups/GroupModal'), { loading: () => null })
-import { relativeTime, plural } from '@/utils/utils'
+import { plural } from '@/utils/utils'
 import EmptyState from '@/components/empty-state/EmptyState'
 import GroupIcon from '@/components/groups/group-icon/GroupIcon'
 import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgressBar'

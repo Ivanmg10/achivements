@@ -1,8 +1,9 @@
 import type { CSSProperties } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
-import { formatDay, plural } from '@/utils/utils'
+import { plural } from '@/utils/utils'
 import StreakSectionHead from '../streak-section-head/StreakSectionHead'
 import { slantStyle } from '@/components/ui/shape'
+import { formatDay } from '@/utils/dates'
 
 // Mondays first; 2026-06-01 is a Monday.
 const WEEK = ['2026-06-01', '2026-06-02', '2026-06-03', '2026-06-04', '2026-06-05', '2026-06-06', '2026-06-07']

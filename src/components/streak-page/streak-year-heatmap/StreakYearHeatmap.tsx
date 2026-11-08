@@ -2,17 +2,14 @@ import { useMemo } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { slantStyle } from '@/components/ui/shape'
 import type { Streak } from '@/types/types'
-import { daysBetween, formatDay, plural } from '@/utils/utils'
+import { plural } from '@/utils/utils'
 import StreakSectionHead from '../streak-section-head/StreakSectionHead'
+import { localDay, daysBetween, formatDay } from '@/utils/dates'
 
 const WEEKS = 53
 const GAP = 3
 /** Below this a day is too small to pick: the grid scrolls sideways instead. */
 const MIN_CELL = 10
-
-function isoDay(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
 
 /**
  * The last year as a grid of days (a column per week, Monday on top), shaded
@@ -40,7 +37,7 @@ export default function StreakYearHeatmap({
     const start = new Date(end)
     // Back to the Monday of the week 52 weeks ago, so the grid starts on a full column.
     start.setDate(start.getDate() - (WEEKS - 1) * 7 - ((end.getDay() + 6) % 7))
-    const days = daysBetween(isoDay(start), today)
+    const days = daysBetween(localDay(start), today)
     const cols: string[][] = []
     for (let i = 0; i < days.length; i += 7) cols.push(days.slice(i, i + 7))
     // A month's name over the first column that starts in it.

@@ -2,6 +2,7 @@ import { queryRows } from '@/lib/queryRows'
 import { loadRanking, weekStartRanks } from '@/lib/rankings'
 import type { GameSource } from '@/types/steam'
 import { lastWeeks, monthStart, weekStart } from '@/utils/vaultLevel'
+import { utcDay } from '@/utils/dates'
 
 export type VaultMe = {
   /** All time, every platform the viewer may see. */
@@ -34,7 +35,7 @@ export async function loadVaultMe(id: number, xbox: boolean): Promise<VaultMe> {
   const now = new Date()
   const weeks = lastWeeks(now, WEEKS)
   const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-  const days = Array.from({ length: 7 }, (_, i) => new Date(today - (6 - i) * 86400000).toISOString().slice(0, 10))
+  const days = Array.from({ length: 7 }, (_, i) => utcDay(new Date(today - (6 - i) * 86400000)))
   const [entries, user, periods, provisional, weekly, daily, before] = await Promise.all([
     loadRanking({ scope: 'global', period: 'all', source: 'all', viewerId: id, xbox }),
     queryRows<{ show_in_rankings: boolean; profile_public: boolean; score_refreshed_at: string | null }>(

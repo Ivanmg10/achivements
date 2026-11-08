@@ -6,9 +6,9 @@ import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import type { FriendOverview, LastPlayed } from '@/utils/friends'
 import { gameHref, PLATFORM_NAME } from '@/utils/gameRef'
-import { relativeTime } from '@/utils/utils'
 import PlatformLogo from '@/components/platform-logo/PlatformLogo'
 import UserProfileBanner from '@/components/user-page/user-profile-banner/UserProfileBanner'
+import { relativeTime } from '@/utils/dates'
 
 /**
  * The top of a Following card. Its backdrop is the last game played, blurred

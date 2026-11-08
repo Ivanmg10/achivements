@@ -11,6 +11,7 @@ import { IconX, IconStar, IconCheck } from '@tabler/icons-react'
 import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import Modal from '@/components/ui/Modal'
+import { utcDay } from '@/utils/dates'
 
 interface Props {
   date: string
@@ -21,7 +22,7 @@ interface Props {
 const COMPLETION_TYPES = new Set(['Mastery/Completion', 'Game Beaten'])
 
 function awardDate(awardedAt: string): string {
-  return new Date(awardedAt).toISOString().split('T')[0]
+  return utcDay(new Date(awardedAt))
 }
 
 export default function DayAchievementsModal({ date, achievements, onClose }: Props) {

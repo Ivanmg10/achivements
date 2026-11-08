@@ -15,6 +15,7 @@ import GameHero, { HERO_TOGGLE } from '@/components/game-hero/GameHero'
 import GameHeroChip from '@/components/game-hero/game-hero-chip/GameHeroChip'
 import GameHeroProgress from '@/components/game-hero/game-hero-progress/GameHeroProgress'
 import GameHeroMedia from '@/components/game-hero/game-hero-media/GameHeroMedia'
+import { formatDate } from '@/utils/dates'
 
 /**
  * The top of an Xbox game page, on the shared `GameHero` as the others: the
@@ -38,7 +39,7 @@ export default function XboxGameInfoHeader({
   const inProgress = game.numAwarded > 0 && !isComplete
 
   const date = (iso: string | null, utc = false) =>
-    iso ? new Date(iso).toLocaleDateString(lang, { day: 'numeric', month: 'short', year: 'numeric', ...(utc && { timeZone: 'UTC' }) }) : null
+    iso ? formatDate(iso, lang, { day: 'numeric', month: 'short', year: 'numeric', ...(utc && { timeZone: 'UTC' }) }) : null
 
   return (
     <GameHero

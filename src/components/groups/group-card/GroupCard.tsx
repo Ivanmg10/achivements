@@ -2,10 +2,11 @@ import Link from 'next/link'
 import { IconLock, IconWorld } from '@tabler/icons-react'
 import { GameGroup } from '@/types/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { relativeTime, plural } from '@/utils/utils'
+import { plural } from '@/utils/utils'
 import GroupCoverMosaic from '@/components/groups/group-cover-mosaic/GroupCoverMosaic'
 import GroupProgressBar from '@/components/groups/group-progress-bar/GroupProgressBar'
 import GroupPlatformLogos, { platformCounts } from '@/components/groups/group-platform-logos/GroupPlatformLogos'
+import { relativeTime } from '@/utils/dates'
 
 /**
  * A group in the list: its covers, name and privacy, how many games and from

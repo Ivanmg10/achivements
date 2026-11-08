@@ -1,4 +1,5 @@
 import type { RecentAchievement, Streak } from '@/types/types'
+import { utcDay } from '@/utils/dates'
 
 /** Every run of consecutive days with an unlock, the longest first. Days are the unlocks' own (`YYYY-MM-DD …`). */
 export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
@@ -35,8 +36,8 @@ export function calcAllStreaks(achievements: RecentAchievement[]): Streak[] {
 
 /** The streak still alive at `now`: one that ended today or yesterday (UTC days, as the unlocks'). */
 export function activeStreak<S extends Pick<Streak, 'end'>>(streaks: S[], now: number): S | null {
-  const today = new Date(now).toISOString().split('T')[0]
-  const yesterday = new Date(now - 86400000).toISOString().split('T')[0]
+  const today = utcDay(new Date(now))
+  const yesterday = utcDay(new Date(now - 86400000))
   return streaks.find(s => s.end === today || s.end === yesterday) ?? null
 }
 

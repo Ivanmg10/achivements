@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { IconGripVertical, IconX } from '@tabler/icons-react'
-import { relativeTime } from '@/utils/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import { useGameProgression } from '@/hooks/useGameProgression'
 import { useSpotlight } from '@/hooks/useSpotlight'
@@ -17,6 +16,7 @@ import { SectionFallback } from '@/components/ui/SectionFallback'
 import { AchievementGrid } from '@/components/achievement-grid/AchievementGrid'
 import GameCardBackdrop from '@/components/game-card-backdrop/GameCardBackdrop'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { relativeTime } from '@/utils/dates'
 
 // About three rows on a wide card; the rest is a click away.
 const ACHIEVEMENT_LIMIT = 60

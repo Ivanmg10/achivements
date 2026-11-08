@@ -9,6 +9,7 @@ import { gameHref } from '@/utils/gameRef'
 import { formatPlaytime } from '@/utils/steamFeed'
 import type { PsnGameProgress } from '@/types/psn'
 import { useSubject } from '@/context/SubjectContext'
+import { formatDate } from '@/utils/dates'
 
 /**
  * The game card in the PSN profile — the Steam one's counterpart: the last
@@ -19,7 +20,7 @@ export default function MainPageProfilePsnGame({ game }: { game: PsnGameProgress
   const { T, lang } = useLanguage()
   const subject = useSubject()
 
-  const when = game.lastPlayed ? new Date(game.lastPlayed).toLocaleDateString(lang, { day: 'numeric', month: 'short' }) : null
+  const when = game.lastPlayed ? formatDate(game.lastPlayed, lang, { day: 'numeric', month: 'short' }) : null
   const playtime = game.playtimeMinutes !== null ? formatPlaytime(game.playtimeMinutes, T.steam, lang) : null
 
   return (

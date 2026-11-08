@@ -7,6 +7,7 @@ import { useSubject } from '@/context/SubjectContext'
 import { gameHref } from '@/utils/gameRef'
 import MainPageProfileRecent from '../../main-page-profile-recent/MainPageProfileRecent'
 import MainPageProfileRecentRow from '../../main-page-profile-recent/main-page-profile-recent-row/MainPageProfileRecentRow'
+import { formatDate } from '@/utils/dates'
 
 /**
  * The player's latest Steam unlocks — MainPageProfileRaAchievements'
@@ -41,7 +42,7 @@ export default function MainPageProfileStAchievements({
           href={`${gameHref('steam', a.appId, subject)}#${achievementAnchor(a.apiname)}`}
           badge={a.badgeUrl || null}
           title={a.title}
-          sub={<>{a.gameTitle} · <time dateTime={a.unlockedAt}>{new Date(a.unlockedAt).toLocaleDateString(lang, { day: 'numeric', month: 'short' })}</time></>}
+          sub={<>{a.gameTitle} · <time dateTime={a.unlockedAt}>{formatDate(a.unlockedAt, lang, { day: 'numeric', month: 'short' })}</time></>}
         />
       ))}
     </MainPageProfileRecent>

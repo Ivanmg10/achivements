@@ -17,8 +17,8 @@ import { useSpotlight } from '@/hooks/useSpotlight'
 import { gameHref } from '@/utils/gameRef'
 import { xboxBackdrop, xboxPlatformChip, xboxTitleId } from '@/utils/xboxTitles'
 import { formatPlaytime } from '@/utils/steamFeed'
-import { relativeTime } from '@/utils/utils'
 import type { GameGroupItem } from '@/types/types'
+import { relativeTime } from '@/utils/dates'
 
 /**
  * An Xbox game in a group — PsnSortableItem's counterpart: drag handle, icon,

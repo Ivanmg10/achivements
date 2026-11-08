@@ -1,5 +1,6 @@
 import { useLanguage } from '@/context/LanguageContext'
-import { daysBetween, formatDay, plural, stripCap } from '@/utils/utils'
+import { plural, stripCap } from '@/utils/utils'
+import { daysBetween, formatDay } from '@/utils/dates'
 
 // The tallest bar, in px; a day with nothing still shows a stub.
 const HEIGHT = 120

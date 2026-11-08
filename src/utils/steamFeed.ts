@@ -2,7 +2,7 @@ import type { RecentlyPlayedGame } from '@/types/types'
 import type { SteamGameProgress } from '@/types/steam'
 import type { PsnCollection, PsnGameProgress } from '@/types/psn'
 import type { XboxGameProgress } from '@/types/xbox'
-import { unlockIso } from '@/utils/dates'
+import { formatDate, unlockIso } from '@/utils/dates'
 
 /**
  * Pure helpers for putting Steam games next to RA ones: category rules, the
@@ -183,13 +183,9 @@ export function formatRarity(pct: number, lang = 'en'): string {
   return pct.toLocaleString(lang, { minimumFractionDigits: digits, maximumFractionDigits: digits })
 }
 
+const UNLOCK_DATE_TIME: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }
+
 /** Unlock date and time, in the app language. */
 export function formatUnlock(iso: string, lang: string): string {
-  return new Date(iso).toLocaleString(lang, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return formatDate(iso, lang, UNLOCK_DATE_TIME)
 }

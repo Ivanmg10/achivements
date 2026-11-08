@@ -19,6 +19,7 @@ import { formatPlaytime } from '@/utils/steamFeed'
 import { IconClock } from '@tabler/icons-react'
 import { xboxBackdrop, xboxPlatformChip } from '@/utils/xboxTitles'
 import type { XboxGameProgress } from '@/types/xbox'
+import { formatDate } from '@/utils/dates'
 
 /**
  * An Xbox game on a category page, laid out like PsnStatusGameItem so the
@@ -94,11 +95,11 @@ export default function XboxStatusGameItem({ game, category }: { game: XboxGameP
             )}
             {category === 'completed' && game.completedAt ? (
               <span className="text-xs text-text-secondary mt-1">
-                {T.libraryDetail.finished} · {new Date(game.completedAt).toLocaleDateString(lang)}
+                {T.libraryDetail.finished} · {formatDate(game.completedAt, lang, {})}
               </span>
             ) : game.lastPlayed && (
               <span className="text-xs text-text-secondary mt-1">
-                {T.steam.lastPlayed} · {new Date(game.lastPlayed).toLocaleDateString(lang)}
+                {T.steam.lastPlayed} · {formatDate(game.lastPlayed, lang, {})}
               </span>
             )}
           </div>
